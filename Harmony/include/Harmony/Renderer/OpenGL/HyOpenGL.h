@@ -11,9 +11,7 @@
 #define HyOpenGL_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Renderer/IHyRenderer.h"
-#include "Renderer/OpenGL/HyOpenGLShader.h"
 
 #define HyErrorCheck_OpenGL(funcLoc, funcName) { GLenum eError = glGetError(); HyAssert(eError == GL_NO_ERROR, "HyOpenGL error in " << funcLoc << " on function " << funcName << ": " << eError); }
 

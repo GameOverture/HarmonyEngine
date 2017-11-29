@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/Components/HyRenderState.h"
-#include "Renderer/Components/HyStencil.h"
+#include "Renderer/Effects/HyStencil.h"
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Scene/Nodes/Draws/Instances/HyText2d.h"
 #include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"

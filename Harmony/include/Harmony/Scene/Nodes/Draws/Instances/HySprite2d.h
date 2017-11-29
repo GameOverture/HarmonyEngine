@@ -109,8 +109,8 @@ public:
 	//--------------------------------------------------------------------------------------
 	void AnimSetCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack = HySprite2d::NullAnimCallback, void *pParam = nullptr);
 
-	float AnimGetCurFrameWidth(bool bIncludeScaling = true);
-	float AnimGetCurFrameHeight(bool bIncludScaling = true);
+	float AnimGetCurFrameWidth(bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED width of the current frame
+	float AnimGetCurFrameHeight(bool bIncludScaling = true);	// Returns the ALPHA-CROPPED height of the current frame
 
 	const glm::ivec2 &AnimGetCurFrameOffset();
 

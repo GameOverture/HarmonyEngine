@@ -25,9 +25,9 @@ class HyShader
 {
 	friend class IHyRenderer;
 
-	static HyShaderHandle					sm_hHandleCount;
 	static IHyRenderer *					sm_pRenderer;
 
+	static HyShaderHandle					sm_hHandleCount;
 	const HyShaderHandle					m_hHANDLE;
 
 	bool									m_bIsFinalized;
@@ -40,6 +40,7 @@ public:
 	HyShader();
 private: ~HyShader();
 public:
+	void Destroy();
 
 	HyShaderHandle GetHandle();
 	bool IsFinalized();

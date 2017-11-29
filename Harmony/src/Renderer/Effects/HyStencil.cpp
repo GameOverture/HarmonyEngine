@@ -7,7 +7,7 @@
 *	The zlib License (zlib)
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Renderer/Components/HyStencil.h"
+#include "Renderer/Effects/HyStencil.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyRenderState.h"
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
@@ -24,7 +24,12 @@ HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount),
 
 HyStencil::~HyStencil()
 {
+}
+
+void HyStencil::Destroy()
+{
 	IHyRenderer::RemoveStencil(this);
+	delete this;
 }
 
 HyStencilHandle HyStencil::GetHandle()

@@ -11,9 +11,9 @@
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HyShape2d::HyShape2d(IHyDrawInst2d &ownerRef) :	m_OwnerRef(ownerRef),
-												m_eType(HYSHAPE_Unknown),
-												m_pShape(nullptr)
+HyShape2d::HyShape2d(IHyDrawInst2d *pOwnerInst) :	m_pOwnerInst(pOwnerInst),
+													m_eType(HYSHAPE_Unknown),
+													m_pShape(nullptr)
 {
 }
 
@@ -102,7 +102,8 @@ void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
 	m_pShape = HY_NEW b2EdgeShape();
 	static_cast<b2EdgeShape *>(m_pShape)->Set(b2Vec2(pt1.x, pt1.y), b2Vec2(pt2.x, pt2.y));
 
-	m_OwnerRef.OnShapeSet(this);
+	if(m_pOwnerInst)
+		m_pOwnerInst->OnShapeSet(this);
 }
 
 void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -118,7 +119,8 @@ void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(&vertList[0], uiNumVerts);
 
-	m_OwnerRef.OnShapeSet(this);
+	if(m_pOwnerInst)
+		m_pOwnerInst->OnShapeSet(this);
 }
 
 void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -134,7 +136,8 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts);
 
-	m_OwnerRef.OnShapeSet(this);
+	if(m_pOwnerInst)
+		m_pOwnerInst->OnShapeSet(this);
 }
 
 void HyShape2d::SetAsCircle(float fRadius)
@@ -151,7 +154,8 @@ void HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
 	static_cast<b2CircleShape *>(m_pShape)->m_p.Set(ptCenter.x, ptCenter.y);
 	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
 
-	m_OwnerRef.OnShapeSet(this);
+	if(m_pOwnerInst)
+		m_pOwnerInst->OnShapeSet(this);
 }
 
 void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
@@ -166,7 +170,8 @@ void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->Set(&vertList[0], uiCount);
 
-	m_OwnerRef.OnShapeSet(this);
+	if(m_pOwnerInst)
+		m_pOwnerInst->OnShapeSet(this);
 }
 
 void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight)
@@ -177,7 +182,8 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight)
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight);
 
-	m_OwnerRef.OnShapeSet(this);
+	if(m_pOwnerInst)
+		m_pOwnerInst->OnShapeSet(this);
 }
 
 void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
@@ -188,13 +194,16 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(ptBoxCenter.x, ptBoxCenter.y), glm::radians(fRotDeg));
 
-	m_OwnerRef.OnShapeSet(this);
+	if(m_pOwnerInst)
+		m_pOwnerInst->OnShapeSet(this);
 }
 
 bool HyShape2d::TestPoint(const glm::vec2 &ptWorldPointRef) const
 {
-	glm::mat4 mtxWorld;
-	m_OwnerRef.GetWorldTransform(mtxWorld);
+	glm::mat4 mtxWorld(1.0f);
+	if(m_pOwnerInst)
+		m_pOwnerInst->GetWorldTransform(mtxWorld);
+
 	float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
 
 	return m_pShape && m_pShape->TestPoint(b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), b2Vec2(ptWorldPointRef.x, ptWorldPointRef.y));

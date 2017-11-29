@@ -16,13 +16,13 @@ class IHyDrawInst2d;
 
 class HyShape2d
 {
-	IHyDrawInst2d &					m_OwnerRef;
+	IHyDrawInst2d *					m_pOwnerInst;
 
 	HyShapeType						m_eType;
 	b2Shape *						m_pShape;
 
 public:
-	HyShape2d(IHyDrawInst2d &ownerRef);
+	HyShape2d(IHyDrawInst2d *pOwnerInst);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
