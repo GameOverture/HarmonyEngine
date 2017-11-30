@@ -18,7 +18,7 @@ class IHyDrawInst2d;
 
 class HyRenderState
 {
-	const uint32		m_uiID;
+	const uint32		m_uiID;								// Used for debugging
 	const uint32		m_uiCULL_PASS_MASK;
 	const size_t		m_uiDATA_OFFSET;
 
@@ -28,7 +28,6 @@ class HyRenderState
 	HyShaderHandle		m_hShader;
 	HyScreenRect<int32>	m_ScissorRect;
 	HyStencilHandle		m_hStencil;
-	HyPortal2dHandle	m_hPortals[HY_MAX_PORTAL_HANDLES];			// Only enabled portals that require a "mirror render" will be included (AKA instances that are actually IN the portal)
 
 	int32				m_iCoordinateSystem;				// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
 

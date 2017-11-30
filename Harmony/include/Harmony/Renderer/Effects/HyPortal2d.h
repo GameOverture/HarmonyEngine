@@ -26,7 +26,7 @@ class HyPortal2d
 	HyPortalGate2d								m_Gate2;
 
 	std::vector<IHyDrawInst2d *>				m_DrawInstList;
-	std::map<IHyDrawInst2d *, IHyDrawInst2d *>	m_MirrorMap;
+	std::vector<IHyDrawInst2d *>				m_CloneInstList;
 
 public:
 	HyPortal2d(const HyPortalGate2d &gate1Ref, const HyPortalGate2d &gate2Ref);
@@ -40,10 +40,7 @@ private:
 	void AddInstance(IHyDrawInst2d *pInstance);
 	bool RemoveInstance(IHyDrawInst2d *pInstance);
 
-	void DeleteMirrorInsts();
-	void TestInstance(IHyDrawInst2d *pInstance);
-
-	void LinkIdToInst(uint32 uiID, IHyDrawInst2d *pInstance);
+	void PrepareClones();
 };
 
 #endif /* HyPortal2d_h__ */

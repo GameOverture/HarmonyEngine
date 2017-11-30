@@ -244,11 +244,6 @@ bool IHyDrawInst2d::ClearPortal(HyPortal2d *pPortal)
 	return false;
 }
 
-const HyPortal2dHandle *IHyDrawInst2d::GetPortalHandles() const
-{
-	return m_hPortals;
-}
-
 /*virtual*/ bool IHyDrawInst2d::IsLoaded() const /*override*/
 {
 	return m_eLoadState == HYLOADSTATE_Loaded;
@@ -279,13 +274,6 @@ const HyPortal2dHandle *IHyDrawInst2d::GetPortalHandles() const
 
 	if(m_eLoadState == HYLOADSTATE_Loaded)
 	{
-		// Portals may manipulate the transform and physics of this instance if a portal's gate threshold is reached
-		for(uint32 i = 0; m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
-		{
-			HyPortal2d *pPortal = IHyRenderer::FindPortal2d(m_hPortals[i]);
-			pPortal->TestInstance(this);
-		}
-
 		OnUpdateUniforms();
 		//m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
 	}

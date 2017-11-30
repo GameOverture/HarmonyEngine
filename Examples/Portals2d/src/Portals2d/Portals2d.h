@@ -7,6 +7,7 @@ class Portals2d : public IHyApplication
 	HyCamera2d *	m_pCamera;
 
 	HySprite2d		m_Sprite;
+	HyText2d		m_Text;
 
 public:
 	Portals2d(HarmonyInit &initStruct);

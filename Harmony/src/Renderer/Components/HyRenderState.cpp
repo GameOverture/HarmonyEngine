@@ -27,14 +27,6 @@ HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOf
 	m_ScissorRect.iTag = HY_UNUSED_HANDLE;
 	instanceRef.GetWorldScissor(m_ScissorRect);
 
-	memcpy(m_hPortals, instanceRef.GetPortalHandles(), sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
-	for(uint32 i = 0; m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
-	{
-		HyPortal2d *pPortal = IHyRenderer::FindPortal2d(m_hPortals[i]);
-		pPortal->LinkIdToInst(m_uiID, &instanceRef);
-		//help
-	}
-
 	switch(instanceRef.GetType())
 	{
 	case HYTYPE_Sprite2d:

@@ -70,7 +70,15 @@ void IHyRenderer::PrepareBuffers()
 	m_uiVertexBufferUsedBytes = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Write internal render states first, used by things like HyStencil and HyPortal
+	// Update each portal to determine this frame's draw instance clones that need to be rendered
+	for(auto iter = sm_Portal2dMap.begin(); iter != sm_Portal2dMap.end(); ++iter)
+	{
+		HyPortal2d *pPortal2d = iter->second;
+		pPortal2d->PrepareClones();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Write internal render states first, used by things like HyStencil
 	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
 	{
 		HyStencil *pStencil = iter->second;
@@ -83,12 +91,6 @@ void IHyRenderer::PrepareBuffers()
 			AppendRenderState(0, *instanceListRef[i], HY_FULL_CULL_MASK);
 		}
 	}
-
-	//for(auto iter = sm_Portal2dMap.begin(); iter != sm_Portal2dMap.end(); ++iter)
-	//{
-	//	HyPortal2d *pPortal2d = iter->second;
-	//	pPortal2d->Test
-	//}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set pointers to be ready for HyScene to call AppendRenderState()

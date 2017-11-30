@@ -120,11 +120,12 @@ bool HyEngine::Update()
 		HY_PROFILE_END
 
 		m_Assets.Update(m_Renderer);
+		m_Renderer.ProcessMsgs();
+
 		m_GuiComms.Update();
 	}
 
 	m_Scene.PrepareRender(m_Renderer);
-	m_Renderer.ProcessMsgs();
 	m_Renderer.Render();
 
 	return true;

@@ -82,7 +82,6 @@ public:
 
 	bool SetPortal(HyPortal2d *pPortal);
 	bool ClearPortal(HyPortal2d *pPortal);
-	const HyPortal2dHandle *GetPortalHandles() const;
 
 	virtual bool IsLoaded() const override;
 	virtual void Load() override;

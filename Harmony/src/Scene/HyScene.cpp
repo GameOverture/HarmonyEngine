@@ -136,27 +136,30 @@ void HyScene::UpdateNodes()
 	HY_PROFILE_END
 }
 
+// RENDER STATE BUFFER
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Buffer Header (contains uiNum3dRenderStates; uiNum2dRenderStates) || RenderState3D/UniformData-|-RenderState2D/UniformData-|
 void HyScene::PrepareRender(IHyRenderer &rendererRef)
 {
 	// TODO: Determine whether I can multi-thread this buffer prep and HyRenderState instantiations... Make everything take const references!
+	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
 	HY_PROFILE_BEGIN("PrepareRender")
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Initialize the buffer - PrepareBuffers may manipulate current IHyDrawInsts or insert new IHyDrawInsts while it updates all the effects
+	rendererRef.PrepareBuffers();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Sort 2d draw instances based on their display order
 	if(sm_bInst2dOrderingDirty)
 	{
 		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);
 		sm_bInst2dOrderingDirty = false;
 	}
-	
-	// RENDER STATE BUFFER
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Buffer Header (contains uiNum3dRenderStates; uiNum2dRenderStates) || RenderState3D/UniformData-|-RenderState2D/UniformData-|
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
-
-	rendererRef.PrepareBuffers();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// WRITE 3d Render States
+	// Append 3d Render States to buffer
 	uint32 uiTotalNumInsts = static_cast<uint32>(m_LoadedInst3dList.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
@@ -167,7 +170,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// WRITE 2d Render States
+	// Append 2d Render States to buffer
 	uint32 uiCullMask = 0;
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_Loaded.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
