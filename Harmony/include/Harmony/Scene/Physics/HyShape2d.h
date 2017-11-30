@@ -28,7 +28,8 @@ public:
 	const HyShape2d &operator=(const HyShape2d &rhs);
 
 	HyShapeType GetType() const;
-	b2Shape *GetB2Shape();
+	void GetCentroid(glm::vec2 &ptCentroidOut) const;
+	b2Shape *GetB2Shape() const;
 
 	bool IsValid() const;
 

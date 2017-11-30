@@ -17,8 +17,7 @@ HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Ent
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
 															m_pMouseInputUserParam(nullptr),
-															m_pMouseInputNode(nullptr),
-															m_hPortal(HY_UNUSED_HANDLE)
+															m_pMouseInputNode(nullptr)
 {
 }
 
@@ -268,17 +267,17 @@ void HyEntity2d::DisableMouseInput()
 	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
 }
 
-void HyEntity2d::EnablePortal(HyPortal2d *pPortal)
-{
-	m_hPortal = pPortal->GetHandle();
-	m_uiAttributes |= ATTRIBFLAG_Portal;
-}
-
-void HyEntity2d::DisablePortal()
-{
-	m_hPortal = HY_UNUSED_HANDLE;
-	m_uiAttributes &= ~ATTRIBFLAG_Portal;
-}
+//void HyEntity2d::SetPortal(HyPortal2d *pPortal)
+//{
+//	m_hPortal = pPortal->GetHandle();
+//	m_uiAttributes |= ATTRIBFLAG_Portal;
+//}
+//
+//void HyEntity2d::ClearPortal(HyPortal2d *pPortal)
+//{
+//	m_hPortal = HY_UNUSED_HANDLE;
+//	m_uiAttributes &= ~ATTRIBFLAG_Portal;
+//}
 
 void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 {
@@ -363,15 +362,8 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 				OnMouseUp(m_pMouseInputUserParam);
 				OnMouseClicked(m_pMouseInputUserParam);
 			}
-				
 			break;
 		}
-	}
-
-	if((m_uiAttributes & ATTRIBFLAG_Portal) != 0)
-	{
-		HyPortal2d *pPortal = IHyRenderer::FindPortal2d(m_hPortal);
-		pPortal->TestEntity(this);
 	}
 
 	OnUpdate();

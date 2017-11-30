@@ -198,6 +198,23 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return HyEngine::sm_pInstance->m_Renderer.GetDefaultShaderHandle(eType);
 }
 
+/*friend*/ bool Hy_IsDrawInst(HyType eType)
+{
+	switch(eType)
+	{
+	case HYTYPE_Particles2d:
+	case HYTYPE_Sprite2d:
+	case HYTYPE_Spine2d:
+	case HYTYPE_TexturedQuad2d:
+	case HYTYPE_Primitive2d:
+	case HYTYPE_Text2d:
+	case HYTYPE_Mesh3d:
+		return true;
+	}
+
+	return false;
+}
+
 /*friend*/ std::string Hy_DateTime()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DateTime() was invoked before engine has been initialized.");

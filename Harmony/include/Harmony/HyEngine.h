@@ -82,6 +82,7 @@ private:
 	friend b2World &		Hy_Physics2d();
 	friend HyDiagnostics &	Hy_Diagnostics();
 	friend HyShaderHandle	Hy_DefaultShaderHandle(HyType eType);
+	friend bool				Hy_IsDrawInst(HyType eType);
 	friend std::string		Hy_DateTime();
 };
 

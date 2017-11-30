@@ -29,7 +29,6 @@ class HyStencil
 	const HyStencilHandle			m_hHANDLE;
 
 	std::vector<IHyDrawInst2d *>	m_InstanceList;
-	bool							m_bInstanceListDirty;
 	HyRenderState *					m_pRenderStatePtr;
 
 	HyStencilBehavior				m_eBehavior;
@@ -40,18 +39,19 @@ private: ~HyStencil();
 public:
 	void Destroy();
 
-	HyStencilHandle GetHandle();
+	HyStencilHandle GetHandle() const;
 
+	// It's the user's responsibility to ensure added instances continue to be valid
 	void AddInstance(IHyDrawInst2d *pInstance);
 	bool RemoveInstance(IHyDrawInst2d *pInstance);
 
-	HyStencilBehavior GetBehavior();
+	HyStencilBehavior GetBehavior() const;
 
 	void SetAsMask();
 	void SetAsInvertedMask();
 
-	const std::vector<IHyDrawInst2d *> &GetInstanceList();
-	HyRenderState *GetRenderStatePtr();
+	const std::vector<IHyDrawInst2d *> &GetInstanceList() const;
+	HyRenderState *GetRenderStatePtr() const;
 
 private:
 	void SetRenderStatePtr(HyRenderState *pPtr);

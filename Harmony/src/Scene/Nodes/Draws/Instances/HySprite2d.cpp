@@ -21,15 +21,31 @@ HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 																										m_uiCurFrame(0)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+}
 
-	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
-	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	//m_RenderState.SetNumVerticesPerInstance(4);
-	//m_RenderState.SetNumInstances(1);
+HySprite2d::HySprite2d(const HySprite2d &instRef) :	IHyDrawInst2d(HYTYPE_Sprite2d, instRef.GetPrefix().c_str(), instRef.GetName().c_str(), instRef.ParentGet()),
+													m_bIsAnimPaused(instRef.m_bIsAnimPaused),
+													m_fAnimPlayRate(instRef.m_fAnimPlayRate),
+													m_fElapsedFrameTime(instRef.m_fElapsedFrameTime),
+													m_uiCurAnimState(instRef.m_uiCurAnimState),
+													m_uiCurFrame(instRef.m_uiCurFrame)
+{
+	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+
+	for(uint32 i = 0; i < static_cast<uint32>(instRef.m_AnimCtrlAttribList.size()); ++i)
+		m_AnimCtrlAttribList.push_back(instRef.m_AnimCtrlAttribList[i]);
+
+	for(uint32 i = 0; i < static_cast<uint32>(instRef.m_AnimCallbackList.size()); ++i)
+		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(instRef.m_AnimCallbackList[i].first, instRef.m_AnimCallbackList[i].second));
 }
 
 HySprite2d::~HySprite2d(void)
 {
+}
+
+/*virtual*/ HySprite2d *HySprite2d::Clone() const
+{
+	return HY_NEW HySprite2d(*this);
 }
 
 /*virtual*/ bool HySprite2d::IsEnabled() const /*override*/

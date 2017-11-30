@@ -15,7 +15,6 @@
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
 HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount),
-							m_bInstanceListDirty(false),
 							m_pRenderStatePtr(nullptr),
 							m_eBehavior(HYSTENCILBEHAVIOR_Mask)
 {
@@ -32,18 +31,15 @@ void HyStencil::Destroy()
 	delete this;
 }
 
-HyStencilHandle HyStencil::GetHandle()
+HyStencilHandle HyStencil::GetHandle() const
 {
 	return m_hHANDLE;
 }
 
 void HyStencil::AddInstance(IHyDrawInst2d *pInstance)
 {
-	// TODO: Make this safer by copying instance... user might go ahead and Unload() or delete the instance in here otherwise
 	pInstance->Load();
-
 	m_InstanceList.push_back(pInstance);
-	m_bInstanceListDirty = true;
 }
 
 bool HyStencil::RemoveInstance(IHyDrawInst2d *pInstance)
@@ -53,7 +49,6 @@ bool HyStencil::RemoveInstance(IHyDrawInst2d *pInstance)
 		if((*it) == pInstance)
 		{
 			m_InstanceList.erase(it);
-			m_bInstanceListDirty = true;
 			return true;
 		}
 	}
@@ -61,7 +56,7 @@ bool HyStencil::RemoveInstance(IHyDrawInst2d *pInstance)
 	return false;
 }
 
-HyStencilBehavior HyStencil::GetBehavior()
+HyStencilBehavior HyStencil::GetBehavior() const
 {
 	return m_eBehavior;
 }
@@ -76,12 +71,12 @@ void HyStencil::SetAsInvertedMask()
 	m_eBehavior = HYSTENCILBEHAVIOR_InvertedMask;
 }
 
-const std::vector<IHyDrawInst2d *> &HyStencil::GetInstanceList()
+const std::vector<IHyDrawInst2d *> &HyStencil::GetInstanceList() const
 {
 	return m_InstanceList;
 }
 
-HyRenderState *HyStencil::GetRenderStatePtr()
+HyRenderState *HyStencil::GetRenderStatePtr() const
 {
 	return m_pRenderStatePtr;
 }

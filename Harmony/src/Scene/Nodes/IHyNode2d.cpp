@@ -54,7 +54,7 @@ void IHyNode2d::ParentDetach()
 	m_pParent->ChildRemove(this);
 }
 
-HyEntity2d *IHyNode2d::ParentGet()
+HyEntity2d *IHyNode2d::ParentGet() const
 {
 	return m_pParent;
 }

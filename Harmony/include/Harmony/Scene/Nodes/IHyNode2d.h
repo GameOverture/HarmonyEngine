@@ -45,7 +45,7 @@ public:
 	virtual ~IHyNode2d();
 
 	void ParentDetach();
-	HyEntity2d *ParentGet();
+	HyEntity2d *ParentGet() const;
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	void GetWorldTransform(glm::mat4 &outMtx);

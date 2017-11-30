@@ -78,6 +78,8 @@ public:
 	HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	virtual ~HyText2d(void);
 
+	virtual HyText2d *Clone() const;
+
 	virtual bool IsEnabled() const override;
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'

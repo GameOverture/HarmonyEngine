@@ -27,10 +27,13 @@ HyPrimitive2d::~HyPrimitive2d(void)
 	ClearData();
 }
 
+/*virtual*/ HyPrimitive2d *HyPrimitive2d::Clone() const
+{
+	return HY_NEW HyPrimitive2d(*this);
+}
+
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &p)
 {
-	IHyDrawInst2d::operator=(p);
-
 	m_eRenderMode = p.m_eRenderMode;
 	m_BoundingVolume = p.m_BoundingVolume;
 	m_uiNumVerts = p.m_uiNumVerts;

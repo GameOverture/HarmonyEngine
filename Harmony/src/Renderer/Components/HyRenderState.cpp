@@ -15,22 +15,17 @@
 
 HyRenderState::HyRenderState(/*const*/ IHyDrawInst2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset) :	m_uiCULL_PASS_MASK(uiCullPassMask),
 																													m_uiDATA_OFFSET(uiDataOffset),
+																													m_eRenderMode(instanceRef.GetRenderMode()),
+																													m_hTextureHandle(instanceRef.GetTextureHandle()),
+																													m_hShader(instanceRef.GetShaderHandle()),
+																													m_hStencil(instanceRef.GetStencil() ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE),
+																													m_iCoordinateSystem(instanceRef.GetCoordinateSystem()),
 																													m_uiExDataSize(0)
 {
-	m_eRenderMode = instanceRef.GetRenderMode();
-	m_hTextureHandle = instanceRef.GetTextureHandle();
-
-	m_ScissorRect.iTag = 0;
+	m_ScissorRect.iTag = HY_UNUSED_HANDLE;
 	instanceRef.GetWorldScissor(m_ScissorRect);
 
-	if(instanceRef.GetStencil())
-		m_hStencil = instanceRef.GetStencil()->GetHandle();
-	else
-		m_hStencil = HY_UNUSED_HANDLE;
-
-	m_hShader = instanceRef.GetShaderHandle();
-
-	m_iCoordinateSystem = instanceRef.GetCoordinateSystem();
+	memcpy(m_hPortals, instanceRef.GetPortalHandles(), sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
 
 	switch(instanceRef.GetType())
 	{

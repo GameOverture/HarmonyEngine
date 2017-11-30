@@ -44,9 +44,6 @@
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\OpenGL\HyOpenGLShader.cpp">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="IHyApplication.cpp" />
     <ClCompile Include="Time\Watches\IHyTimeInst.cpp">
       <Filter>Time\Watches</Filter>
@@ -195,9 +192,6 @@
     <ClCompile Include="Time\HyTime.cpp">
       <Filter>Time</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Components\HyStencil.cpp">
-      <Filter>Renderer\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Nodes\Draws\IHyDraw2d.cpp">
       <Filter>Scene\Nodes\Draws</Filter>
     </ClCompile>
@@ -231,10 +225,19 @@
     <ClCompile Include="Scene\Nodes\Misc\HyCamera.cpp">
       <Filter>Scene\Nodes\Misc</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Components\HyShader.cpp">
-      <Filter>Renderer\Components</Filter>
+    <ClCompile Include="Renderer\Effects\HyPortal2d.cpp">
+      <Filter>Renderer\Effects</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Components\HyPortal2d.cpp">
+    <ClCompile Include="Renderer\Effects\HyShader.cpp">
+      <Filter>Renderer\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Effects\HyStencil.cpp">
+      <Filter>Renderer\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Effects\IHyFx.cpp">
+      <Filter>Renderer\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\HyPortalGate2d.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -337,6 +340,9 @@
     </Filter>
     <Filter Include="Scene\Nodes\Misc">
       <UniqueIdentifier>{01bbb433-45bd-442d-a075-dfccb24ad483}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Effects">
+      <UniqueIdentifier>{634b2f45-8acc-476f-aa4e-206f86ac14ed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -441,9 +447,6 @@
       <Filter>Afx\Platforms</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGL.h">
-      <Filter>Renderer\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShader.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\IHyApplication.h" />
@@ -606,9 +609,6 @@
     <ClInclude Include="..\include\Harmony\Time\HyTime.h">
       <Filter>Time</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\Components\HyStencil.h">
-      <Filter>Renderer\Components</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\IHyDraw2d.h">
       <Filter>Scene\Nodes\Draws</Filter>
     </ClInclude>
@@ -645,10 +645,19 @@
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Misc\HyCamera.h">
       <Filter>Scene\Nodes\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\Components\HyShader.h">
-      <Filter>Renderer\Components</Filter>
+    <ClInclude Include="..\include\Harmony\Renderer\Effects\HyPortal2d.h">
+      <Filter>Renderer\Effects</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Renderer\Components\HyPortal2d.h">
+    <ClInclude Include="..\include\Harmony\Renderer\Effects\HyShader.h">
+      <Filter>Renderer\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Effects\HyStencil.h">
+      <Filter>Renderer\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Effects\IHyFx.h">
+      <Filter>Renderer\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyPortalGate2d.h">
       <Filter>Renderer\Components</Filter>
     </ClInclude>
   </ItemGroup>

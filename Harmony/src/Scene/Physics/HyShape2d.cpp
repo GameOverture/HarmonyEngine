@@ -84,7 +84,26 @@ HyShapeType HyShape2d::GetType() const
 	return m_eType;
 }
 
-b2Shape *HyShape2d::GetB2Shape()
+void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
+{
+	switch(m_eType)
+	{
+	case HYSHAPE_Circle:
+		ptCentroidOut.x = static_cast<b2CircleShape *>(m_pShape)->m_p.x;
+		ptCentroidOut.y = static_cast<b2CircleShape *>(m_pShape)->m_p.y;
+		break;
+
+	case HYSHAPE_Polygon:
+		ptCentroidOut.x = static_cast<b2PolygonShape *>(m_pShape)->m_centroid.x;
+		ptCentroidOut.y = static_cast<b2PolygonShape *>(m_pShape)->m_centroid.y;
+		break;
+
+	default:
+		HyError("HyShape2d::GetCentoid() - Unsupported shape type: " << m_eType);
+	}
+}
+
+b2Shape *HyShape2d::GetB2Shape() const
 {
 	return m_pShape;
 }

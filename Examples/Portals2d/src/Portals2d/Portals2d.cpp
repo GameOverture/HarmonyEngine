@@ -15,6 +15,7 @@ Portals2d::~Portals2d()
 	m_pCamera = Window().CreateCamera2d();
 
 	m_Sprite.Load();
+	m_Sprite.scale.Set(1.0f, 1.0f);
 
 	return true;
 }

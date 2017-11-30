@@ -84,7 +84,11 @@ void IHyRenderer::PrepareBuffers()
 		}
 	}
 
-	//for(auto iter = sm_Portal2dMap.begin();
+	//for(auto iter = sm_Portal2dMap.begin(); iter != sm_Portal2dMap.end(); ++iter)
+	//{
+	//	HyPortal2d *pPortal2d = iter->second;
+	//	pPortal2d->Test
+	//}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set pointers to be ready for HyScene to call AppendRenderState()

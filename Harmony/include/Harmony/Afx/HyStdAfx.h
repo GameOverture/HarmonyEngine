@@ -31,9 +31,10 @@
 #endif
 
 #define HY_UNUSED_HANDLE 0
-typedef uint8 HyShaderHandle;
 typedef uint32 HyTextureHandle;
 typedef uint32 HyStencilHandle;
+typedef uint8 HyShaderHandle;
+#define HY_MAX_PORTAL_HANDLES 4
 typedef uint8 HyPortal2dHandle;
 
 enum HyType

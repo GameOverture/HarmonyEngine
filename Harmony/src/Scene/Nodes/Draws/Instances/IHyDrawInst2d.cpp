@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Renderer/Effects/HyStencil.h"
+#include "Renderer/Effects/HyPortal2d.h"
 #include "HyEngine.h"
 
 /*static*/ HyAssets *IHyDrawInst2d::sm_pHyAssets = nullptr;
@@ -23,24 +24,16 @@ IHyDrawInst2d::IHyDrawInst2d(HyType eNodeType, const char *szPrefix, const char 
 																												m_hTextureHandle(HY_UNUSED_HANDLE),
 																												m_BoundingVolume(this)
 {
+	memset(m_hPortals, HY_UNUSED_HANDLE, sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
 }
 
 IHyDrawInst2d::~IHyDrawInst2d()
 {
+	for(uint32 i = 0; m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
+		IHyRenderer::FindPortal2d(m_hPortals[i])->RemoveInstance(this);
+
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		Unload();
-}
-
-const IHyDrawInst2d &IHyDrawInst2d::operator=(const IHyDrawInst2d &rhs)
-{
-	// TODO: Decided whether I copy the underlying data or not, which would require unloading/loading and unlinking/linking from things like HyScene and HyAssets
-	//m_eLoadState;
-	//m_RequiredCustomShaders;
-	//m_pData;
-	//m_sNAME;
-	//m_sPREFIX;
-
-	return *this;
 }
 
 void IHyDrawInst2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
@@ -124,12 +117,12 @@ void IHyDrawInst2d::SetDisplayOrder(int32 iOrderValue)
 	HyScene::SetInstOrderingDirty();
 }
 
-const std::string &IHyDrawInst2d::GetName()
+const std::string &IHyDrawInst2d::GetName() const
 {
 	return m_sNAME;
 }
 
-const std::string &IHyDrawInst2d::GetPrefix()
+const std::string &IHyDrawInst2d::GetPrefix() const
 {
 	return m_sPREFIX;
 }
@@ -213,6 +206,49 @@ HyShaderHandle IHyDrawInst2d::GetShaderHandle()
 	return m_hShader;
 }
 
+bool IHyDrawInst2d::SetPortal(HyPortal2d *pPortal)
+{
+	for(uint32 i = 0; i < HY_MAX_PORTAL_HANDLES; ++i)
+	{
+		if(m_hPortals[i] == pPortal->GetHandle())
+			return true;
+		else if(m_hPortals[i] == HY_UNUSED_HANDLE)
+		{
+			pPortal->AddInstance(this);
+			m_hPortals[i] = pPortal->GetHandle();
+			return true;
+		}
+	}
+
+	HyLogWarning("IHyDrawInst2d::SetPortal() - Too many portals have been set for this instance. Max is: " << HY_MAX_PORTAL_HANDLES);
+	return false;
+}
+
+bool IHyDrawInst2d::ClearPortal(HyPortal2d *pPortal)
+{
+	for(uint32 i = 0; i < HY_MAX_PORTAL_HANDLES; ++i)
+	{
+		// If found, shift all handles to the "left" so handles won't get fragmented in array.
+		if(m_hPortals[i] == pPortal->GetHandle())
+		{
+			pPortal->RemoveInstance(this);
+
+			if(i != HY_MAX_PORTAL_HANDLES - 1)
+				memmove(&m_hPortals[i], &m_hPortals[i+1], sizeof(HyPortal2dHandle) * (HY_MAX_PORTAL_HANDLES - i+1));
+
+			m_hPortals[HY_MAX_PORTAL_HANDLES - 1] = HY_UNUSED_HANDLE;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+const HyPortal2dHandle *IHyDrawInst2d::GetPortalHandles() const
+{
+	return m_hPortals;
+}
+
 /*virtual*/ bool IHyDrawInst2d::IsLoaded() const /*override*/
 {
 	return m_eLoadState == HYLOADSTATE_Loaded;
@@ -238,10 +274,18 @@ HyShaderHandle IHyDrawInst2d::GetShaderHandle()
 
 /*virtual*/ void IHyDrawInst2d::NodeUpdate() /*override final*/
 {
+	// This update will set the appearance of the instance to its current state
 	DrawUpdate();
 
 	if(m_eLoadState == HYLOADSTATE_Loaded)
 	{
+		// Portals may manipulate the transform and physics of this instance if a portal's gate threshold is reached
+		for(uint32 i = 0; m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
+		{
+			HyPortal2d *pPortal = IHyRenderer::FindPortal2d(m_hPortals[i]);
+			pPortal->TestInstance(this);
+		}
+
 		OnUpdateUniforms();
 		//m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
 	}

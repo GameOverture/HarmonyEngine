@@ -17,6 +17,7 @@
 #include "Renderer/Components/HyShaderUniforms.h"
 
 class HyStencil;
+class HyPortal2d;
 
 // NOTE: This class should contain a copy of all the functions/members of IHyLeaf2d. Multiple inheritance is not an option
 class IHyDrawInst2d : public IHyDraw2d
@@ -38,6 +39,7 @@ protected:
 	HyRenderMode					m_eRenderMode;
 	HyTextureHandle					m_hTextureHandle;
 	HyShaderUniforms 				m_ShaderUniforms;
+	HyPortal2dHandle				m_hPortals[HY_MAX_PORTAL_HANDLES];
 
 	HyShape2d						m_BoundingVolume;
 	b2AABB							m_aabbCached;
@@ -46,7 +48,7 @@ public:
 	IHyDrawInst2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	virtual ~IHyDrawInst2d();
 
-	virtual const IHyDrawInst2d &operator=(const IHyDrawInst2d &rhs);
+	virtual IHyDrawInst2d *Clone() const = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// NOTE: Below mutators manipulate data from derived class "IHyDraw2d". Handled in regard to being a "leaf"
@@ -62,8 +64,8 @@ public:
 	void SetDisplayOrder(int32 iOrderValue);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	const std::string &GetName();
-	const std::string &GetPrefix();
+	const std::string &GetName() const;
+	const std::string &GetPrefix() const;
 
 	HyRenderMode GetRenderMode() const;
 	HyTextureHandle GetTextureHandle() const;
@@ -77,6 +79,10 @@ public:
 	// Passing nullptr will use built-in default shader
 	void SetCustomShader(HyShader *pShader);
 	HyShaderHandle GetShaderHandle();
+
+	bool SetPortal(HyPortal2d *pPortal);
+	bool ClearPortal(HyPortal2d *pPortal);
+	const HyPortal2dHandle *GetPortalHandles() const;
 
 	virtual bool IsLoaded() const override;
 	virtual void Load() override;

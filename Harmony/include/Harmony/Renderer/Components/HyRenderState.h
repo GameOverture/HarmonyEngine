@@ -24,14 +24,15 @@ class HyRenderState
 	HyRenderMode		m_eRenderMode;
 	HyTextureHandle		m_hTextureHandle;
 
+	HyShaderHandle		m_hShader;
 	HyScreenRect<int32>	m_ScissorRect;
 	HyStencilHandle		m_hStencil;
-	HyShaderHandle		m_hShader;
+	HyPortal2dHandle	m_hPortals[HY_MAX_PORTAL_HANDLES];	// Only enabled portals that require a "mirror render" will be included (AKA instances that are actually IN the portal)
 
-	int32				m_iCoordinateSystem;			// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
+	int32				m_iCoordinateSystem;				// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
 
 	uint32				m_uiNumInstances;
-	uint32				m_uiNumVerticesPerInstance;		// Or total number of vertices if single instance
+	uint32				m_uiNumVerticesPerInstance;			// Or total number of vertices if single instance
 
 	size_t				m_uiExDataSize;
 

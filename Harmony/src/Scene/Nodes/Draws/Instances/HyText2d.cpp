@@ -52,6 +52,11 @@ HyText2d::~HyText2d(void)
 	}
 }
 
+/*virtual*/ HyText2d *HyText2d::Clone() const
+{
+	return HY_NEW HyText2d(*this);
+}
+
 /*virtual*/ bool HyText2d::IsEnabled() const /*override*/
 {
 	return (IHyNode::IsEnabled() && m_uiNumValidCharacters > 0);
