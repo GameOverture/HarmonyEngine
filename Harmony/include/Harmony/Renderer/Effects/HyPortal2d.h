@@ -16,16 +16,17 @@
 class HyPortal2d
 {
 	friend class IHyRenderer;
+	friend class HyRenderState;
 	friend class IHyDrawInst2d;
 
-	static HyPortal2dHandle			sm_hHandleCount;
-	const HyPortal2dHandle			m_hHANDLE;
+	static HyPortal2dHandle						sm_hHandleCount;
+	const HyPortal2dHandle						m_hHANDLE;
 
-	HyPortalGate2d					m_Gate1;
-	HyPortalGate2d					m_Gate2;
+	HyPortalGate2d								m_Gate1;
+	HyPortalGate2d								m_Gate2;
 
-	std::vector<IHyDrawInst2d *>	m_DrawInstList;
-	std::vector<IHyDrawInst2d *>	m_MirrorInstList;
+	std::vector<IHyDrawInst2d *>				m_DrawInstList;
+	std::map<IHyDrawInst2d *, IHyDrawInst2d *>	m_MirrorMap;
 
 public:
 	HyPortal2d(const HyPortalGate2d &gate1Ref, const HyPortalGate2d &gate2Ref);
@@ -41,6 +42,8 @@ private:
 
 	void DeleteMirrorInsts();
 	void TestInstance(IHyDrawInst2d *pInstance);
+
+	void LinkIdToInst(uint32 uiID, IHyDrawInst2d *pInstance);
 };
 
 #endif /* HyPortal2d_h__ */

@@ -80,7 +80,7 @@ void IHyRenderer::PrepareBuffers()
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
 		{
 			instanceListRef[i]->OnUpdateUniforms();
-			AppendRenderState(*instanceListRef[i], HY_FULL_CULL_MASK);
+			AppendRenderState(0, *instanceListRef[i], HY_FULL_CULL_MASK);
 		}
 	}
 
@@ -99,11 +99,12 @@ void IHyRenderer::PrepareBuffers()
 	m_pCurRenderStateWritePos += sizeof(IHyRenderer::RenderStateBufferHeader);
 }
 
-void IHyRenderer::AppendRenderState(/*const*/ IHyDrawInst2d &instanceRef, HyCullMask uiCullMask)
+void IHyRenderer::AppendRenderState(uint32 uiId, /*const*/ IHyDrawInst2d &instanceRef, HyCullMask uiCullMask)
 {
-	HyRenderState *pRenderState = new (m_pCurRenderStateWritePos)HyRenderState(instanceRef,
+	HyRenderState *pRenderState = new (m_pCurRenderStateWritePos)HyRenderState(uiId,
 																			   uiCullMask,
-																			   m_uiVertexBufferUsedBytes);
+																			   m_uiVertexBufferUsedBytes,
+																			   instanceRef);
 
 	m_pCurRenderStateWritePos += sizeof(HyRenderState);
 

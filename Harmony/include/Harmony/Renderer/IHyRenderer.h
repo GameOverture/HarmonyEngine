@@ -77,7 +77,7 @@ public:
 	virtual ~IHyRenderer(void);
 
 	void PrepareBuffers();
-	void AppendRenderState(/*const*/ IHyDrawInst2d &instanceRef, HyCullMask uiCullMask);
+	void AppendRenderState(uint32 uiId, /*const*/ IHyDrawInst2d &instanceRef, HyCullMask uiCullMask);
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();

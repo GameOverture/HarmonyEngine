@@ -61,10 +61,10 @@ bool HyPortal2d::RemoveInstance(IHyDrawInst2d *pInstance)
 
 void HyPortal2d::DeleteMirrorInsts()
 {
-	for(uint32 i = 0; i < static_cast<uint32>(m_MirrorInstList.size()); ++i)
-		delete m_MirrorInstList[i];
+	for(auto iter = m_MirrorMap.begin(); iter != m_MirrorMap.end(); ++iter)
+		delete iter->second;
 
-	m_MirrorInstList.clear();
+	m_MirrorMap.clear();
 }
 
 void HyPortal2d::TestInstance(IHyDrawInst2d *pInstance)
@@ -110,8 +110,7 @@ void HyPortal2d::TestInstance(IHyDrawInst2d *pInstance)
 		IHyDrawInst2d *pNewInst = pInstance->Clone();
 		pNewInst->pos.Set(m_Gate2.Midpoint() + v);
 
-		m_MirrorInstList.push_back(pNewInst);
-		//asdf
+		m_MirrorMap[pInstance] = pNewInst;
 	}
 	else if(b2TestOverlap(m_Gate2.GetBV(), 0, pInstance->GetBoundingVolume().GetB2Shape(), 0, m_Gate2.GetTransform(), instTransform))
 	{
@@ -120,6 +119,11 @@ void HyPortal2d::TestInstance(IHyDrawInst2d *pInstance)
 		IHyDrawInst2d *pNewInst = pInstance->Clone();
 		pNewInst->pos.Set(m_Gate1.Midpoint() + v);
 
-		m_MirrorInstList.push_back(pNewInst);
+		m_MirrorMap[pInstance] = pNewInst;
 	}
+}
+
+void HyPortal2d::LinkIdToInst(uint32 uiID, IHyDrawInst2d *pInstance)
+{
+
 }

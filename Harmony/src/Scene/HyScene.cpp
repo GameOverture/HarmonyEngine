@@ -163,7 +163,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		if(m_LoadedInst3dList[i]->IsEnabled() == false)
 			continue;
 
-		rendererRef.AppendRenderState(*m_NodeList_Loaded[i], HY_FULL_CULL_MASK);
+		rendererRef.AppendRenderState(i, *m_NodeList_Loaded[i], HY_FULL_CULL_MASK);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		if(m_NodeList_Loaded[i]->IsEnabled() == false || CalculateCullPasses(*m_NodeList_Loaded[i], uiCullMask) == false)
 			continue;
 
-		rendererRef.AppendRenderState(*m_NodeList_Loaded[i], uiCullMask);
+		rendererRef.AppendRenderState(i, *m_NodeList_Loaded[i], uiCullMask);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

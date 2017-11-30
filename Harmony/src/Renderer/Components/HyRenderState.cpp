@@ -9,23 +9,31 @@
  *************************************************************************/
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Effects/HyStencil.h"
+#include "Renderer/Effects/HyPortal2d.h"
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Scene/Nodes/Draws/Instances/HyText2d.h"
 #include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
 
-HyRenderState::HyRenderState(/*const*/ IHyDrawInst2d &instanceRef, uint32 uiCullPassMask, size_t uiDataOffset) :	m_uiCULL_PASS_MASK(uiCullPassMask),
-																													m_uiDATA_OFFSET(uiDataOffset),
-																													m_eRenderMode(instanceRef.GetRenderMode()),
-																													m_hTextureHandle(instanceRef.GetTextureHandle()),
-																													m_hShader(instanceRef.GetShaderHandle()),
-																													m_hStencil(instanceRef.GetStencil() ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE),
-																													m_iCoordinateSystem(instanceRef.GetCoordinateSystem()),
-																													m_uiExDataSize(0)
+HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOffset, /*const*/ IHyDrawInst2d &instanceRef) :	m_uiID(uiId),
+																																m_uiCULL_PASS_MASK(uiCullPassMask),
+																																m_uiDATA_OFFSET(uiDataOffset),
+																																m_eRenderMode(instanceRef.GetRenderMode()),
+																																m_hTextureHandle(instanceRef.GetTextureHandle()),
+																																m_hShader(instanceRef.GetShaderHandle()),
+																																m_hStencil(instanceRef.GetStencil() ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE),
+																																m_iCoordinateSystem(instanceRef.GetCoordinateSystem()),
+																																m_uiExDataSize(0)
 {
 	m_ScissorRect.iTag = HY_UNUSED_HANDLE;
 	instanceRef.GetWorldScissor(m_ScissorRect);
 
 	memcpy(m_hPortals, instanceRef.GetPortalHandles(), sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
+	for(uint32 i = 0; m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
+	{
+		HyPortal2d *pPortal = IHyRenderer::FindPortal2d(m_hPortals[i]);
+		pPortal->LinkIdToInst(m_uiID, &instanceRef);
+		help
+	}
 
 	switch(instanceRef.GetType())
 	{
