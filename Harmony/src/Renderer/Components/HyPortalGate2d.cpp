@@ -9,12 +9,12 @@
 *************************************************************************/
 #include "Renderer/Components/HyPortalGate2d.h"
 
-HyPortalGate2d::HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, bool bPositiveYNormal, float fDepthAmt, float fStencilCullExtents /*= 5000.0f*/) :	m_ptPOINT1(pt1),
-																																								m_ptPOINT2(pt2),
-																																								m_pStencil(HY_NEW HyStencil()),
-																																								m_StencilShape(nullptr),
-																																								m_BoundingVolume(nullptr),
-																																								m_Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f))
+HyPortalGate2d::HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptEntrance, float fDepthAmt, float fStencilCullExtents) :	m_ptPOINT1(pt1),
+																																						m_ptPOINT2(pt2),
+																																						m_pStencil(HY_NEW HyStencil()),
+																																						m_StencilShape(nullptr),
+																																						m_BoundingVolume(nullptr),
+																																						m_Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f))
 {
 	m_ptMidPoint.x = (m_ptPOINT1.x + m_ptPOINT2.x) / 2;
 	m_ptMidPoint.y = (m_ptPOINT1.y + m_ptPOINT2.y) / 2;
@@ -34,12 +34,15 @@ HyPortalGate2d::HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, bool 
 
 	// If dx = x2 - x1 and dy = y2 - y1, then the normals are (-dy, dx) and (dy, -dx)
 	glm::vec2 vNormal1(-(m_ptPOINT2.y - m_ptPOINT1.y), (m_ptPOINT2.x - m_ptPOINT1.x));
+	vNormal1 = glm::normalize(vNormal1);
 
 	boundingVertList[2] = m_ptPOINT2;
 	boundingVertList[3] = m_ptPOINT1;
 	stencilVertList[2] = m_ptPOINT2;
 	stencilVertList[3] = m_ptPOINT1;
-	if((bPositiveYNormal && vNormal1.y > 0) || (bPositiveYNormal == false && vNormal1.y <= 0))
+
+	int32 iHalfSpaceResult = HyHalfSpaceTest<glm::vec2>(ptEntrance, vNormal1, pt1);
+	if(iHalfSpaceResult >= 0) // TODO: determine if this is correct conditional statement
 	{
 		boundingVertList[2] += vNormal1 * fDepthAmt;
 		boundingVertList[3] += vNormal1 * fDepthAmt;
@@ -50,6 +53,7 @@ HyPortalGate2d::HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, bool 
 	else
 	{
 		glm::vec2 vNormal2((m_ptPOINT2.y - m_ptPOINT1.y), -(m_ptPOINT2.x - m_ptPOINT1.x));
+		vNormal2 = glm::normalize(vNormal2);
 
 		boundingVertList[2] += vNormal2 * fDepthAmt;
 		boundingVertList[3] += vNormal2 * fDepthAmt;
@@ -60,6 +64,7 @@ HyPortalGate2d::HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, bool 
 
 	m_BoundingVolume.SetAsPolygon(boundingVertList, 4);
 
+	m_StencilShape.SetEnabled(false);
 	m_StencilShape.GetShape().SetAsPolygon(stencilVertList, 4);
 	m_pStencil->AddInstance(&m_StencilShape);
 }

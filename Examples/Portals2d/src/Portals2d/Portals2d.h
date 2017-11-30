@@ -9,6 +9,16 @@ class Portals2d : public IHyApplication
 	HySprite2d		m_Sprite;
 	HyText2d		m_Text;
 
+	HyPortal2d *	m_pPortal;
+
+	enum Controls
+	{
+		MoveUp = 0,
+		MoveDown,
+		MoveRight,
+		MoveLeft
+	};
+
 public:
 	Portals2d(HarmonyInit &initStruct);
 	virtual ~Portals2d();

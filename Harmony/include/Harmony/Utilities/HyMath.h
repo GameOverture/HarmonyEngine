@@ -33,7 +33,32 @@ void HySetVec(glm::ivec2 &vecOut, int32 iX, int32 iY);
 void HySetVec(glm::ivec3 &vecOut, int32 iX, int32 iY, int32 iZ);
 void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW);
 
-template <typename T> 
+template <typename VEC>
+int32 HyHalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptPointOnPlane)
+{
+	// Calculate a vector from the point on the plane to our test point
+	VEC vTemp(ptTestPoint - ptPointOnPlane);
+
+	// Calculate the distance: dot product of the new vector with the plane's normal
+	float fDist = glm::dot(vTemp, vNormal);
+
+	float fEpsilon = std::numeric_limits<float>::epsilon();
+	if(fDist > fEpsilon)
+	{
+		// ptTestPoint is in front of the plane
+		return 1;
+	}
+	else if(fDist < -fEpsilon)
+	{
+		// ptTestPoint is behind the plane
+		return -1;
+	}
+
+	// If neither of these were true, then ptTestPoint is on the plane
+	return 0;
+}
+
+template <typename T>
 T HyClamp(const T& value, const T& low, const T& high) 
 {
 	return value < low ? low : (value > high ? high : value); 

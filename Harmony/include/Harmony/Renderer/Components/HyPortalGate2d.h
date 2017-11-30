@@ -27,7 +27,7 @@ class HyPortalGate2d
 	HyPrimitive2d		m_StencilShape;
 
 public:
-	HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, bool bPositiveYNormal, float fDepthAmt, float fStencilCullExtents = 5000.0f);
+	HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptEntrance, float fDepthAmt, float fStencilCullExtents);
 	~HyPortalGate2d();
 
 	const glm::vec2 &GetPt1() const;
