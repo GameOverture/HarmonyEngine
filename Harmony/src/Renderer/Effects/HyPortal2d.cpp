@@ -41,6 +41,12 @@ HyPortal2dHandle HyPortal2d::GetHandle() const
 	return m_hHANDLE;
 }
 
+void HyPortal2d::EnableDebugDraw(bool bEnable)
+{
+	m_GateA.EnableDebugDraw(bEnable);
+	m_GateB.EnableDebugDraw(bEnable);
+}
+
 void HyPortal2d::AddInstance(IHyDrawInst2d *pInstance)
 {
 	pInstance->Load();
@@ -117,6 +123,7 @@ void HyPortal2d::PrepareClones()
 			glm::vec2 v = m_GateA.Midpoint() - ptCentroid;
 
 			IHyDrawInst2d *pNewInst = pInstance->Clone();
+			pNewInst->Load();
 			pNewInst->pos.Set(m_GateB.Midpoint() + v);
 
 			m_CloneInstList[i] = pNewInst;
@@ -126,6 +133,7 @@ void HyPortal2d::PrepareClones()
 			glm::vec2 v = m_GateB.Midpoint() - ptCentroid;
 
 			IHyDrawInst2d *pNewInst = pInstance->Clone();
+			pNewInst->Load();
 			pNewInst->pos.Set(m_GateA.Midpoint() + v);
 
 			m_CloneInstList[i] = pNewInst;

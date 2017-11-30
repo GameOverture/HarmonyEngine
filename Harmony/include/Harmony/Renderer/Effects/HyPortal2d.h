@@ -68,6 +68,8 @@ public:
 
 	HyPortal2dHandle GetHandle() const;
 
+	void EnableDebugDraw(bool bEnable);
+
 private:
 	void AddInstance(IHyDrawInst2d *pInstance);
 	bool RemoveInstance(IHyDrawInst2d *pInstance);
