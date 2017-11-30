@@ -240,6 +240,9 @@
     <ClCompile Include="Renderer\Effects\IHyFx.cpp">
       <Filter>Renderer\Effects</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Components\HyPortalGate2d.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -656,6 +659,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Renderer\Effects\IHyFx.h">
       <Filter>Renderer\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyPortalGate2d.h">
+      <Filter>Renderer\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

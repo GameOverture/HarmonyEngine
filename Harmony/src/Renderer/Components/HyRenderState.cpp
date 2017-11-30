@@ -32,7 +32,7 @@ HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOf
 	{
 		HyPortal2d *pPortal = IHyRenderer::FindPortal2d(m_hPortals[i]);
 		pPortal->LinkIdToInst(m_uiID, &instanceRef);
-		help
+		//help
 	}
 
 	switch(instanceRef.GetType())

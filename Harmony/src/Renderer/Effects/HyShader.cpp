@@ -86,6 +86,7 @@ std::vector<HyShaderVertexAttribute> &HyShader::GetVertextAttributes()
 void HyShader::Finalize(HyShaderProgramDefaults eDefaultsFrom)
 {
 	HyAssert(sm_pRenderer, "HyShader::Finalize was invoked before the renderer has been instanciated");
+	sm_pRenderer->UploadShader(eDefaultsFrom, this);
 
 	// Calculate the stride based on the specified vertex attributes
 	m_uiStride = 0;
@@ -115,21 +116,5 @@ void HyShader::Finalize(HyShaderProgramDefaults eDefaultsFrom)
 		}
 	}
 
-	sm_pRenderer->UploadShader(eDefaultsFrom, this);
 	m_bIsFinalized = true;
 }
-
-//void HyShader::OnRenderThread(IHyRenderer &rendererRef)
-//{
-//	// Load state can be HYLOADSTATE_Inactive if it's a default shader being loaded by the Renderer
-//	if(GetLoadableState() == HYLOADSTATE_Inactive)
-//	{
-//		OnUpload(rendererRef);
-//		return;
-//	}
-//
-//	if(GetLoadableState() == HYLOADSTATE_Queued)
-//		OnUpload(rendererRef);
-//	else
-//		OnDelete(rendererRef);
-//}
