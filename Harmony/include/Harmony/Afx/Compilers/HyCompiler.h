@@ -36,7 +36,7 @@
 	#elif defined(__MWERKS__)
 		#define HY_COMPILER_MWERKS
 		#include "HyCompiler_MWerks.h"
-	#elif defined(__GNUC__)
+	#elif defined(__GNUC__) || defined(__clang__)
 		#define HY_COMPILER_GNU
 		#include "HyCompiler_GNU.h"
 	#else
@@ -81,6 +81,10 @@
 
 #if defined(HY_COMPILER_UNKNOWN)
 	#error HyCompiler.h: Could not determine the compiler.
+#endif
+
+#ifndef HY_NOEXCEPT
+	#error HyCompiler.h: HY_NOEXCEPT was not defined
 #endif
 
 #endif /* HyCompiler_h__ */

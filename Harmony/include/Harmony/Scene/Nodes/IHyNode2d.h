@@ -42,7 +42,10 @@ public:
 
 public:
 	IHyNode2d(HyType eNodeType, HyEntity2d *pParent);
+	IHyNode2d(const IHyNode2d &copyRef);
 	virtual ~IHyNode2d();
+
+	IHyNode2d &operator=(const IHyNode2d &rhs);
 
 	void ParentDetach();
 	HyEntity2d *ParentGet() const;

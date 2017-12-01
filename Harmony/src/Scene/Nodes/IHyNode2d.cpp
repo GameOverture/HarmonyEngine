@@ -21,12 +21,49 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 																scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
-	HyAssert(m_pParent != this, "HyEntity2d 'pParent' has been specified as itself!");
-
 	scale.Set(1.0f);
-
-	HyScene::AddNode(this);
 	
+	if(m_pParent)
+		m_pParent->ChildAppend(*this);
+}
+
+IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :	IHyNode(copyRef),
+													m_pParent(copyRef.m_pParent),
+													m_mtxCached(copyRef.m_mtxCached),
+													m_fRotation(copyRef.m_fRotation),
+													m_pPhysicsBody(nullptr),
+													pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+													rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+													rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+													scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+													scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+{
+	pos.Set(copyRef.pos.Get());
+	rot.Set(copyRef.rot.Get());
+	rot_pivot.Set(copyRef.rot_pivot.Get());
+	scale.Set(copyRef.scale.Get());
+	scale_pivot.Set(copyRef.scale_pivot.Get());
+
+	if(copyRef.m_pPhysicsBody)
+	{
+		b2BodyDef def;
+		def.type = copyRef.m_pPhysicsBody->GetType();
+		def.position = copyRef.m_pPhysicsBody->GetPosition();
+		def.angle = copyRef.m_pPhysicsBody->GetAngle();
+		def.linearVelocity = copyRef.m_pPhysicsBody->GetLinearVelocity();
+		def.angularVelocity = copyRef.m_pPhysicsBody->GetAngularVelocity();
+		def.linearDamping = copyRef.m_pPhysicsBody->GetLinearDamping();
+		def.angularDamping = copyRef.m_pPhysicsBody->GetAngularDamping();
+		def.allowSleep = copyRef.m_pPhysicsBody->IsSleepingAllowed();
+		def.awake = copyRef.m_pPhysicsBody->IsAwake();
+		def.fixedRotation = copyRef.m_pPhysicsBody->IsFixedRotation();
+		def.bullet = copyRef.m_pPhysicsBody->IsBullet();
+		def.active = copyRef.m_pPhysicsBody->IsActive();
+		def.gravityScale = copyRef.m_pPhysicsBody->GetGravityScale();
+
+		PhysicsInit(def);
+	}
+
 	if(m_pParent)
 		m_pParent->ChildAppend(*this);
 }
@@ -40,10 +77,23 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 	}
 
 	ParentDetach();
-	HyScene::RemoveNode(this);
+}
 
-	if(m_bPauseOverride)
-		HyScene::RemoveNode_PauseUpdate(this);
+IHyNode2d &IHyNode2d::operator=(const IHyNode2d &rhs)
+{
+	IHyNode::operator=(rhs);
+
+	m_pParent;
+	glm::mat4						m_mtxCached;
+	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
+	b2Body *						m_pPhysicsBody;
+	HyTweenVec2						pos;
+	HyTweenFloat					rot;
+	HyTweenVec2						rot_pivot;
+	HyTweenVec2						scale;
+	HyTweenVec2						scale_pivot;
+
+	asdf
 }
 
 void IHyNode2d::ParentDetach()

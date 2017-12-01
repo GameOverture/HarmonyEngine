@@ -18,10 +18,46 @@ IHyNode::IHyNode(HyType eNodeType) :	m_eTYPE(eNodeType),
 										m_bPauseOverride(false),
 										m_iTag(0)
 {
+	HyScene::AddNode(this);
 }
 
-IHyNode::~IHyNode()
+IHyNode::IHyNode(const IHyNode &copyRef) :	m_eTYPE(copyRef.m_eTYPE),
+											m_uiDirtyFlags(copyRef.m_uiDirtyFlags),
+											m_uiExplicitFlags(copyRef.m_uiExplicitFlags),
+											m_bEnabled(copyRef.m_bEnabled),
+											m_bPauseOverride(copyRef.m_bPauseOverride),
+											m_iTag(copyRef.m_iTag)
 {
+	if(m_bPauseOverride)
+		HyScene::AddNode_PauseUpdate(this);
+}
+
+/*virtual*/ IHyNode::~IHyNode()
+{
+	if(m_bPauseOverride)
+		HyScene::RemoveNode_PauseUpdate(this);
+
+	HyScene::RemoveNode(this);
+}
+
+IHyNode &IHyNode::operator=(const IHyNode &rhs)
+{
+	HyAssert(m_eTYPE == rhs.m_eTYPE, "IHyNode::operator= cannot assign from a different HyType");
+
+	m_uiDirtyFlags = rhs.m_uiDirtyFlags;
+	m_uiExplicitFlags = rhs.m_uiExplicitFlags;
+	m_bEnabled = rhs.m_bEnabled;
+
+	if(m_bPauseOverride != rhs.m_bPauseOverride)
+	{
+		m_bPauseOverride = rhs.m_bPauseOverride;
+		if(m_bPauseOverride)
+			HyScene::AddNode_PauseUpdate(this);
+		else
+			HyScene::RemoveNode_PauseUpdate(this);
+	}
+	
+	m_iTag = rhs.m_iTag;
 }
 
 HyType IHyNode::GetType() const

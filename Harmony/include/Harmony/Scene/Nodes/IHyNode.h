@@ -53,9 +53,16 @@ protected:
 
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 
+	// Don't allow move semantics since pointers to these nodes are stored in things like HyScene, and those pointers would become invalid
+	IHyNode(IHyNode &&moveRef) HY_NOEXCEPT = delete;
+	IHyNode &operator=(IHyNode &&moveRef) HY_NOEXCEPT = delete;
+
 public:
 	IHyNode(HyType eNodeType);
+	IHyNode(const IHyNode &copyRef);
 	virtual ~IHyNode();
+
+	IHyNode &operator=(const IHyNode &rhs);
 
 	HyType GetType() const;
 

@@ -22,6 +22,12 @@
 #define HY_INLINE					__inline
 #define HY_FORCE_INLINE				__forceinline
 
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190023026
+	#define HY_NOEXCEPT noexcept
+#else
+	#define HY_NOEXCEPT
+#endif
+
 // This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
 #define NOMINMAX
 

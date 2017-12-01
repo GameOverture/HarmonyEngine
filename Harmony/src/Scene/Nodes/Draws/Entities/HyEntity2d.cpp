@@ -160,6 +160,8 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 
 void HyEntity2d::ChildAppend(IHyNode2d &childInst)
 {
+	HyAssert(&childInst != this, "HyEntity2d::ChildAppend was passed a child that was itself!");
+
 	childInst.ParentDetach();
 	childInst.m_pParent = this;
 
