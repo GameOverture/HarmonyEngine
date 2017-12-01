@@ -46,12 +46,10 @@ public:
 	void SetLineThickness(float fThickness);
 
 protected:
-	virtual void CalcBoundingVolume() override;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
-
 	virtual void OnShapeSet(HyShape2d *pShape) override;
-
-	virtual void DrawUpdate();
+	virtual void DrawLoadedUpdate() override;
+	virtual void OnUpdateUniforms() override;
+	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 
 private:
 	void ClearData();
@@ -59,9 +57,6 @@ private:
 	void SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices);
 	void SetAsCircle(glm::vec2 &ptCenter, float fRadius);
 	void SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices);
-
-	virtual void OnUpdateUniforms() override;
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };
 
 #endif /* HyPrimitive2d_h__ */

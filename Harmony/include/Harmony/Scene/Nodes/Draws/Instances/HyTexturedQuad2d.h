@@ -30,7 +30,8 @@ public:
 	HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent);
 	virtual ~HyTexturedQuad2d();
 
-	virtual HyTexturedQuad2d *Clone() const;
+	virtual HyTexturedQuad2d *Clone() const override;
+	virtual bool IsLoaded() const override;
 
 	void SetTextureSource(int iX, int iY, int iWidth, int iHeight);
 
@@ -42,12 +43,7 @@ public:
 	uint32 GetEntireTextureHeight();
 
 protected:
-	virtual void CalcBoundingVolume() override;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
-
-private:
-	virtual void DrawUpdate() override;
-	virtual void OnUpdateUniforms() override;
+	virtual void OnDataAcquired() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 };
 

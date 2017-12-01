@@ -162,11 +162,8 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 //}
 
 // Will only be called after it has been initialized by the Factory
-/*virtual*/ void HySpine2d::DrawUpdate()
+/*virtual*/ void HySpine2d::DrawLoadedUpdate() /*override*/
 {
-	if(IsLoaded() == false)
-		return;
-
 	// Update the time field used for attachments and such
 	spSkeleton_update(m_pSpineSkeleton, Hy_UpdateStep());
 

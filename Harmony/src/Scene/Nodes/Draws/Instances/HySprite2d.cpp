@@ -234,6 +234,14 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	return frameRef.vOFFSET;
 }
 
+/*virtual*/ bool HySprite2d::IsLoadDataValid() /*override*/
+{
+	AcquireData();
+
+	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(0, 0);
+	return frameRef.pAtlas != nullptr;
+}
+
 /*virtual*/ void HySprite2d::CalcBoundingVolume() /*override*/
 {
 	glm::ivec2 vFrameOffset = static_cast<HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame).vOFFSET;
@@ -243,25 +251,8 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	m_BoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
 }
 
-/*virtual*/ void HySprite2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
+/*virtual*/ void HySprite2d::DrawLoadedUpdate() /*override*/
 {
-	uiStateOut = m_uiCurAnimState;
-	uiSubStateOut = m_uiCurFrame;
-}
-
-/*virtual*/ bool HySprite2d::IsLoadDataValid() /*override*/
-{
-	AcquireData();
-
-	const HySprite2dFrame &frameRef = static_cast<HySprite2dData *>(UncheckedGetData())->GetFrame(0, 0);
-	return frameRef.pAtlas != nullptr;
-}
-
-/*virtual*/ void HySprite2d::DrawUpdate() /*override*/
-{
-	if(IsLoaded() == false)
-		return;
-
 	if(m_bIsAnimPaused == false)
 		m_fElapsedFrameTime += Hy_UpdateStep() * m_fAnimPlayRate;
 

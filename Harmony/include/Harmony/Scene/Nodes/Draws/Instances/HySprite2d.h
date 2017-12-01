@@ -118,13 +118,10 @@ public:
 	const glm::ivec2 &AnimGetCurFrameOffset();
 
 protected:
-	virtual void CalcBoundingVolume() override;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
-
 	virtual bool IsLoadDataValid() override;
-	virtual void DrawUpdate() override;
+	virtual void CalcBoundingVolume() override;
+	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;
-
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 

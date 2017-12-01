@@ -92,16 +92,6 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 	m_bDirty = true;
 }
 
-/*virtual*/ void HyPrimitive2d::CalcBoundingVolume() /*override*/
-{
-	// Do nothing as m_BoundingVolume is always up to date as it is the actual shape and type of this primitive
-}
-
-/*virtual*/ void HyPrimitive2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
-{
-	uiStateOut = uiSubStateOut = 0;
-}
-
 /*virtual*/ void HyPrimitive2d::OnShapeSet(HyShape2d *pShape) /*override*/
 {
 	IHyDrawInst2d::OnShapeSet(pShape);
@@ -110,7 +100,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 		m_bDirty = true;
 }
 
-/*virtual*/ void HyPrimitive2d::DrawUpdate()
+/*virtual*/ void HyPrimitive2d::DrawLoadedUpdate() /*override*/
 {
 	if(m_bDirty == false)
 		return;

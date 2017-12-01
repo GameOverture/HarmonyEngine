@@ -184,12 +184,6 @@ const b2AABB &IHyDrawInst2d::GetWorldAABB()
 	return m_aabbCached;
 }
 
-HyShape2d *IHyDrawInst2d::GetUserBoundingVolume(uint32 uiIndex)
-{
-	return nullptr;
-	//return m_BoundingVolumeList[uiIndex].Get;
-}
-
 void IHyDrawInst2d::SetCustomShader(HyShader *pShader)
 {
 	if(pShader)
@@ -269,14 +263,22 @@ bool IHyDrawInst2d::ClearPortal(HyPortal2d *pPortal)
 
 /*virtual*/ void IHyDrawInst2d::NodeUpdate() /*override final*/
 {
-	// This update will set the appearance of the instance to its current state
-	DrawUpdate();
-
-	if(m_eLoadState == HYLOADSTATE_Loaded)
+	if(IsLoaded())
 	{
+		// This update will set the appearance of the instance to its current state
+		DrawLoadedUpdate();
 		OnUpdateUniforms();
-		//m_RenderState.SetUniformCrc32(m_ShaderUniforms.GetCrc32());
 	}
+}
+
+IHyNodeData *IHyDrawInst2d::UncheckedGetData()
+{
+	return m_pData;
+}
+
+void IHyDrawInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
+{
+	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
 }
 
 /*virtual*/ void IHyDrawInst2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
@@ -325,14 +327,4 @@ bool IHyDrawInst2d::ClearPortal(HyPortal2d *pPortal)
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
 		UseWindowCoordinates(iWindowIndex);
-}
-
-IHyNodeData *IHyDrawInst2d::UncheckedGetData()
-{
-	return m_pData;
-}
-
-void IHyDrawInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
-{
-	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
 }

@@ -74,7 +74,6 @@ public:
 
 	const HyShape2d &GetBoundingVolume();
 	const b2AABB &GetWorldAABB();
-	HyShape2d *GetUserBoundingVolume(uint32 uiIndex);
 
 	// Passing nullptr will use built-in default shader
 	void SetCustomShader(HyShader *pShader);
@@ -88,28 +87,26 @@ public:
 	virtual void Unload() override;
 
 protected:
-	virtual void CalcBoundingVolume() = 0;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) = 0;
-
-	virtual void OnShapeSet(HyShape2d *pShape) { }
-
 	virtual void NodeUpdate() override final;
 
-	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
-	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override;
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
-	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override;
-
-	IHyNodeData *UncheckedGetData();
-
+	IHyNodeData *UncheckedGetData();									// Used internally when it's guaranteed that data has already been acquired for this instance
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
+	// Optional overrides for derived classes
 	virtual bool IsLoadDataValid() { return true; }
-	virtual void DrawUpdate() { }
+	virtual void OnShapeSet(HyShape2d *pShape) { }
+	virtual void CalcBoundingVolume() { }
+	virtual void DrawLoadedUpdate() { }									// Invoked once after OnLoaded(), then once every frame (guarenteed to only be invoked if this instance is loaded)
 	virtual void OnDataAcquired() { }									// Invoked once on the first time this node's data is queried
 	virtual void OnLoaded() { }											// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) { }		// This function is responsible for incrementing the passed in reference pointer the size of the data written
+
+	// Internal Entity propagation function overrides
+	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
+	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override;
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
+	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override;
 
 #ifdef HY_PLATFORM_GUI
 public:

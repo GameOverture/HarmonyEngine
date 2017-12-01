@@ -122,18 +122,16 @@ public:
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 protected:
-	virtual void CalcBoundingVolume() override;
-	virtual void AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) override;
-
 	virtual bool IsLoadDataValid() override;
-	virtual void DrawUpdate() override;
+	virtual void CalcBoundingVolume() override;
+	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
-	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 
 private:
 	void MarkAsDirty();
+	void CalculateGlyphInfos();
 };
 
 #endif /* HyText2d_h__ */

@@ -548,9 +548,11 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 
 void HyAssets::SetInstAsLoaded(IHyDrawInst2d *pDrawInst2d)
 {
-	m_SceneRef.AddNode_Loaded(pDrawInst2d);
 	pDrawInst2d->m_eLoadState = HYLOADSTATE_Loaded;
 	pDrawInst2d->OnLoaded();
+	pDrawInst2d->DrawLoadedUpdate();
+
+	m_SceneRef.AddNode_Loaded(pDrawInst2d);
 }
 
 /*static*/ void HyAssets::LoadingThread(void *pParam)

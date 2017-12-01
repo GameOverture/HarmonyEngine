@@ -20,11 +20,6 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, H
 																										m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
-	
-	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
-	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	//m_RenderState.SetNumInstances(1);
-	//m_RenderState.SetNumVerticesPerInstance(4);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_TexturedQuad2d, nullptr, "raw", pParent),
@@ -45,9 +40,14 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 {
 }
 
-/*virtual*/ HyTexturedQuad2d *HyTexturedQuad2d::Clone() const
+/*virtual*/ HyTexturedQuad2d *HyTexturedQuad2d::Clone() const /*override*/
 {
 	return HY_NEW HyTexturedQuad2d(*this);
+}
+
+/*virtual*/ bool HyTexturedQuad2d::IsLoaded() const /*override*/
+{
+	return m_bIS_RAW || IHyDrawInst2d::IsLoaded();
 }
 
 void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
@@ -98,27 +98,10 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	return static_cast<HyTexturedQuad2dData *>(AcquireData())->GetAtlas()->GetHeight();
 }
 
-/*virtual*/ void HyTexturedQuad2d::CalcBoundingVolume() /*override*/
+/*virtual*/ void HyTexturedQuad2d::OnDataAcquired() /*override*/
 {
-	// Already calculated
-}
-
-/*virtual*/ void HyTexturedQuad2d::AcquireBoundingVolumeIndex(uint32 &uiStateOut, uint32 &uiSubStateOut) /*override*/
-{
-	uiStateOut = uiSubStateOut = 0;
-}
-
-/*virtual*/ void HyTexturedQuad2d::DrawUpdate()
-{
-	if(IsLoaded() == false || m_bIS_RAW)
-		return;
-
-	m_hTextureHandle = static_cast<HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
-}
-
-/*virtual*/ void HyTexturedQuad2d::OnUpdateUniforms()
-{
-	//m_ShaderUniforms.Set(...);
+	if(m_bIS_RAW == false)
+		m_hTextureHandle = static_cast<HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
 }
 
 /*virtual*/ void HyTexturedQuad2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
