@@ -30,6 +30,8 @@ public:
 	HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent);
 	virtual ~HyTexturedQuad2d();
 
+	virtual HyTexturedQuad2d *Clone() const;
+
 	void SetTextureSource(int iX, int iY, int iWidth, int iHeight);
 
 	uint32 GetAtlasIndexInGroup();

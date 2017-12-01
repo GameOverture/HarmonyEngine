@@ -39,15 +39,15 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiText
 	m_hTextureHandle = hTextureHandle;
 
 	m_BoundingVolume.SetAsBox(m_uiRAW_TEXTURE_WIDTH * 0.5f, m_uiRAW_TEXTURE_HEIGHT * 0.5f, glm::vec2(m_uiRAW_TEXTURE_WIDTH * 0.5f, m_uiRAW_TEXTURE_HEIGHT * 0.5f), 0.0f);
-	
-	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
-	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	//m_RenderState.SetNumInstances(1);
-	//m_RenderState.SetNumVerticesPerInstance(4);
 }
 
 HyTexturedQuad2d::~HyTexturedQuad2d()
 {
+}
+
+/*virtual*/ HyTexturedQuad2d *HyTexturedQuad2d::Clone() const
+{
+	return HY_NEW HyTexturedQuad2d(*this);
 }
 
 void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
