@@ -129,7 +129,7 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp),
     m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
     m_pCheckerGridShader->Finalize(HYSHADERPROG_Primitive);
 
-    m_CheckerGrid.SetCustomShader(m_pCheckerGridShader);
+    m_CheckerGrid.SetShader(m_pCheckerGridShader);
     m_CheckerGrid.SetDisplayOrder(-1000);
 }
 
