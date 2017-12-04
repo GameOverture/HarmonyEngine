@@ -16,7 +16,11 @@ class Portals2d : public IHyApplication
 		MoveUp = 0,
 		MoveDown,
 		MoveRight,
-		MoveLeft
+		MoveLeft,
+		RotLeft,
+		RotRight,
+		ScaleUp,
+		ScaleDown
 	};
 
 public:

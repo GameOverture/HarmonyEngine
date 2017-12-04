@@ -120,21 +120,29 @@ void HyPortal2d::PrepareClones()
 		// Then test if instance is overlapping into either gate, which will render a copy of the instance at the other gate
 		if(b2TestOverlap(m_GateA.GetBV(), 0, pInstance->GetBoundingVolume().GetB2Shape(), 0, m_GateA.GetTransform(), instTransform))
 		{
-			glm::vec2 v = m_GateA.Midpoint() - ptCentroid;
+			glm::vec2 v = ptCentroid - m_GateA.Midpoint();
 
 			IHyDrawInst2d *pNewInst = pInstance->Clone();
+			pNewInst->ClearPortal(this);	// Avoid infinite loop
 			pNewInst->Load();
 			pNewInst->pos.Set(m_GateB.Midpoint() + v);
+
+			pInstance->SetStencil(m_GateA.GetStencil());
+			pNewInst->SetStencil(m_GateB.GetStencil());
 
 			m_CloneInstList[i] = pNewInst;
 		}
 		else if(b2TestOverlap(m_GateB.GetBV(), 0, pInstance->GetBoundingVolume().GetB2Shape(), 0, m_GateB.GetTransform(), instTransform))
 		{
-			glm::vec2 v = m_GateB.Midpoint() - ptCentroid;
+			glm::vec2 v = ptCentroid - m_GateB.Midpoint();
 
 			IHyDrawInst2d *pNewInst = pInstance->Clone();
+			pNewInst->ClearPortal(this);	// Avoid infinite loop
 			pNewInst->Load();
 			pNewInst->pos.Set(m_GateA.Midpoint() + v);
+
+			pInstance->SetStencil(m_GateB.GetStencil());
+			pNewInst->SetStencil(m_GateA.GetStencil());
 
 			m_CloneInstList[i] = pNewInst;
 		}

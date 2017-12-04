@@ -17,6 +17,8 @@ HyPortalGate2d::HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, const
 																																						m_StencilShape(nullptr),
 																																						m_pDebugDraw(nullptr)
 {
+	m_pStencil->SetAsInvertedMask();
+
 	m_ptMidPoint.x = (m_ptPOINT1.x + m_ptPOINT2.x) / 2;
 	m_ptMidPoint.y = (m_ptPOINT1.y + m_ptPOINT2.y) / 2;
 
@@ -100,6 +102,11 @@ const b2PolygonShape *HyPortalGate2d::GetBV() const
 const b2Transform &HyPortalGate2d::GetTransform() const
 {
 	return m_Transform;
+}
+
+HyStencil *HyPortalGate2d::GetStencil() const
+{
+	return m_pStencil;
 }
 
 void HyPortalGate2d::EnableDebugDraw(bool bEnable)

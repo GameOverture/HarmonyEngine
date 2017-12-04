@@ -80,6 +80,7 @@ public:
 
 	const b2PolygonShape *GetBV() const;
 	const b2Transform &GetTransform() const;
+	HyStencil *GetStencil() const;
 
 	void EnableDebugDraw(bool bEnable);
 };

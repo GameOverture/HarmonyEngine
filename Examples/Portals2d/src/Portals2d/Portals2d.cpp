@@ -19,6 +19,10 @@ Portals2d::~Portals2d()
 	Input().MapBtn(MoveDown, HYKEY_Down);
 	Input().MapBtn(MoveRight, HYKEY_Right);
 	Input().MapBtn(MoveLeft, HYKEY_Left);
+	Input().MapBtn(RotLeft, HYKEY_PageUp);
+	Input().MapBtn(RotRight, HYKEY_PageDown);
+	Input().MapBtn(ScaleUp, HYKEY_Home);
+	Input().MapBtn(ScaleDown, HYKEY_End);
 
 	Hy_Diagnostics().Show(HYDIAG_ALL);
 
@@ -52,6 +56,14 @@ Portals2d::~Portals2d()
 		m_Sprite.pos.Offset(fNudgeAmt, 0.0f);
 	if(Input().IsActionDown(MoveLeft))
 		m_Sprite.pos.Offset(-fNudgeAmt, 0.0f);
+	if(Input().IsActionDown(RotLeft))
+		m_Sprite.rot.Offset(-fNudgeAmt);
+	if(Input().IsActionDown(RotRight))
+		m_Sprite.rot.Offset(fNudgeAmt);
+	if(Input().IsActionDown(ScaleUp))
+		m_Sprite.scale.Offset(fNudgeAmt, fNudgeAmt);
+	if(Input().IsActionDown(ScaleDown))
+		m_Sprite.scale.Offset(-fNudgeAmt, -fNudgeAmt);
 
 	return true;
 }
