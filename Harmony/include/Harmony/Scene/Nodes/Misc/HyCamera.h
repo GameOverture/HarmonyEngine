@@ -28,7 +28,10 @@ protected:
 
 protected:
 	IHyCamera(HyWindow *pWindow);
+	IHyCamera(const IHyCamera &copyRef) = delete;
 	virtual ~IHyCamera();
+
+	const IHyNode2d &operator=(const IHyNode2d &rhs) = delete;
 
 public:
 	HyWindow &GetWindow()						{ return *m_pWindowPtr; }

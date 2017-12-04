@@ -131,15 +131,15 @@ public:
 	HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HyText2dData();
 
-	uint32 GetNumStates();
-	uint32 GetNumLayers(uint32 uiStateIndex);
-	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code);
-	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop);
-	HyAtlas *GetAtlas();
-	float GetLineHeight(uint32 uiStateIndex);
-	float GetLineAscender(uint32 uiStateIndex);
-	float GetLineDescender(uint32 uiStateIndex);
-	float GetLeftSideNudgeAmt(uint32 uiStateIndex);
+	uint32 GetNumStates() const;
+	uint32 GetNumLayers(uint32 uiStateIndex) const;
+	const HyText2dGlyphInfo &GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const;
+	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const;
+	HyAtlas *GetAtlas() const;
+	float GetLineHeight(uint32 uiStateIndex) const;
+	float GetLineAscender(uint32 uiStateIndex) const;
+	float GetLineDescender(uint32 uiStateIndex) const;
+	float GetLeftSideNudgeAmt(uint32 uiStateIndex) const;
 };
 
 #endif /* __HyText2dData_h__ */

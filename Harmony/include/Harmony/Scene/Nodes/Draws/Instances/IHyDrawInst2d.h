@@ -31,9 +31,9 @@ protected:
 
 	HyLoadState						m_eLoadState;
 
-	IHyNodeData *					m_pData;
-	const std::string				m_sNAME;
-	const std::string				m_sPREFIX;
+	const IHyNodeData *				m_pData;
+	std::string						m_sName;
+	std::string						m_sPrefix;
 
 	HyShaderHandle					m_hShader;
 	HyRenderMode					m_eRenderMode;
@@ -46,8 +46,10 @@ protected:
 
 public:
 	IHyDrawInst2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
+	IHyDrawInst2d(const IHyDrawInst2d &copyRef);
 	virtual ~IHyDrawInst2d();
 
+	const IHyDrawInst2d &operator=(const IHyDrawInst2d &rhs);
 	virtual IHyDrawInst2d *Clone() const = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,26 +72,26 @@ public:
 	HyRenderMode GetRenderMode() const;
 	HyTextureHandle GetTextureHandle() const;
 
-	IHyNodeData *AcquireData();
+	const IHyNodeData *AcquireData();
 
 	const HyShape2d &GetBoundingVolume();
 	const b2AABB &GetWorldAABB();
 
 	// Passing nullptr will use built-in default shader
-	void SetCustomShader(HyShader *pShader);
+	void SetShader(HyShader *pShader);
 	HyShaderHandle GetShaderHandle();
 
 	bool SetPortal(HyPortal2d *pPortal);
 	bool ClearPortal(HyPortal2d *pPortal);
 
 	virtual bool IsLoaded() const override;
-	virtual void Load() override;
-	virtual void Unload() override;
+	virtual void Load() override final;
+	virtual void Unload() override final;
 
 protected:
 	virtual void NodeUpdate() override final;
 
-	IHyNodeData *UncheckedGetData();									// Used internally when it's guaranteed that data has already been acquired for this instance
+	const IHyNodeData *UncheckedGetData();								// Used internally when it's guaranteed that data has already been acquired for this instance
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
 	// Optional overrides for derived classes

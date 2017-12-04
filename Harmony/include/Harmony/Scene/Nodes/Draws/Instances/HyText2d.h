@@ -72,12 +72,13 @@ protected:
 
 	float				m_fUsedPixelWidth;
 	float				m_fUsedPixelHeight;
-	glm::vec2			m_ptPivotPoint;
 
 public:
 	HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
+	HyText2d(const HyText2d &copyRef);
 	virtual ~HyText2d(void);
 
+	const HyText2d &operator=(const HyText2d &rhs);
 	virtual HyText2d *Clone() const;
 
 	virtual bool IsEnabled() const override;

@@ -25,7 +25,10 @@ public:
 
 public:
 	IHyNode3d(HyType eNodeType, IHyNode3d *pParent);
+	IHyNode3d(const IHyNode3d &copyRef);
 	virtual ~IHyNode3d();
+
+	const IHyNode3d &operator=(const IHyNode3d &rhs);
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 

@@ -32,10 +32,25 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 																									m_fUsedPixelHeight(0.0f)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+}
 
-	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
-	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	//m_RenderState.SetNumVerticesPerInstance(4);
+HyText2d::HyText2d(const HyText2d &copyRef) :	IHyDrawInst2d(copyRef),
+												m_bIsDirty(true),
+												m_sRawString(copyRef.m_sRawString),
+												m_Utf32CodeList(copyRef.m_Utf32CodeList),
+												m_uiCurFontState(copyRef.m_uiCurFontState),
+												m_uiBoxAttributes(copyRef.m_uiBoxAttributes),
+												m_vBoxDimensions(copyRef.m_vBoxDimensions),
+												m_fScaleBoxModifier(copyRef.m_fScaleBoxModifier),
+												m_eAlignment(copyRef.m_eAlignment),
+												m_bMonospacedDigits(copyRef.m_bMonospacedDigits),
+												m_pGlyphInfos(nullptr),
+												m_uiNumReservedGlyphs(copyRef.m_uiNumReservedGlyphs),
+												m_uiNumValidCharacters(copyRef.m_uiNumValidCharacters),
+												m_uiNumRenderQuads(copyRef.m_uiNumRenderQuads),
+												m_fUsedPixelWidth(copyRef.m_fUsedPixelWidth),
+												m_fUsedPixelHeight(copyRef.m_fUsedPixelHeight)
+{
 }
 
 HyText2d::~HyText2d(void)
@@ -50,6 +65,29 @@ HyText2d::~HyText2d(void)
 
 		delete m_StateColors[i];
 	}
+}
+
+const HyText2d &HyText2d::operator=(const HyText2d &rhs)
+{
+	IHyDrawInst2d::operator=(rhs);
+
+	m_bIsDirty = true;
+	m_sRawString = rhs.m_sRawString;
+	m_Utf32CodeList = rhs.m_Utf32CodeList;
+	m_uiCurFontState = rhs.m_uiCurFontState;
+	m_uiBoxAttributes = rhs.m_uiBoxAttributes;
+	m_vBoxDimensions = rhs.m_vBoxDimensions;
+	m_fScaleBoxModifier = rhs.m_fScaleBoxModifier;
+	m_eAlignment = rhs.m_eAlignment;
+	m_bMonospacedDigits = rhs.m_bMonospacedDigits;
+	m_pGlyphInfos = nullptr;
+	m_uiNumReservedGlyphs = rhs.m_uiNumReservedGlyphs;
+	m_uiNumValidCharacters = rhs.m_uiNumValidCharacters;
+	m_uiNumRenderQuads = rhs.m_uiNumRenderQuads;
+	m_fUsedPixelWidth = rhs.m_fUsedPixelWidth;
+	m_fUsedPixelHeight = rhs.m_fUsedPixelHeight;
+
+	return *this;
 }
 
 /*virtual*/ HyText2d *HyText2d::Clone() const
@@ -117,7 +155,7 @@ glm::vec2 HyText2d::TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
 	if(m_pGlyphInfos == nullptr)
 		return glm::vec2(0);
 
-	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
 	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
@@ -128,7 +166,7 @@ glm::vec2 HyText2d::TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
 	CalculateGlyphInfos();
 
-	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
 	const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
 
 	glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
@@ -141,7 +179,7 @@ float HyText2d::TextGetGlyphAlpha(uint32 uiCharIndex)
 	if(m_pGlyphInfos == nullptr)
 		return 1.0f;
 
-	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
@@ -155,7 +193,7 @@ void HyText2d::TextSetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 	if(m_pGlyphInfos == nullptr)
 		return;
 
-	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
 
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
@@ -181,12 +219,12 @@ void HyText2d::TextSetState(uint32 uiStateIndex)
 
 uint32 HyText2d::TextGetNumLayers()
 {
-	return static_cast<HyText2dData *>(AcquireData())->GetNumLayers(m_uiCurFontState);
+	return static_cast<const HyText2dData *>(AcquireData())->GetNumLayers(m_uiCurFontState);
 }
 
 uint32 HyText2d::TextGetNumLayers(uint32 uiStateIndex)
 {
-	return static_cast<HyText2dData *>(AcquireData())->GetNumLayers(uiStateIndex);
+	return static_cast<const HyText2dData *>(AcquireData())->GetNumLayers(uiStateIndex);
 }
 
 std::pair<HyTweenVec3 &, HyTweenVec3 &> HyText2d::TextGetLayerColor(uint32 uiLayerIndex)
@@ -308,7 +346,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ bool HyText2d::IsLoadDataValid() /*override*/
 {
-	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
 	return pData->GetNumStates() != 0;
 }
 
@@ -325,7 +363,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnDataAcquired() /*override*/
 {
-	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(UncheckedGetData());
+	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
 
 	for(uint32 i = 0; i < m_StateColors.size(); ++i)
 	{
@@ -354,7 +392,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnLoaded() /*override*/
 {
-	HyText2dData *pTextData = reinterpret_cast<HyText2dData *>(UncheckedGetData());
+	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
 	if(pTextData == nullptr)
 		return;
 
@@ -369,7 +407,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	// CalculateGlyphInfos called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
 	CalculateGlyphInfos();
 
-	HyText2dData *pData = static_cast<HyText2dData *>(UncheckedGetData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 
 	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
 
@@ -445,7 +483,7 @@ void HyText2d::CalculateGlyphInfos()
 	if(m_bIsDirty == false)
 		return;
 
-	HyText2dData *pData = static_cast<HyText2dData *>(AcquireData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
 
 #ifdef HY_PLATFORM_GUI
 	if(pData->GetAtlas() == nullptr)	// GUI tool may have incomplete data

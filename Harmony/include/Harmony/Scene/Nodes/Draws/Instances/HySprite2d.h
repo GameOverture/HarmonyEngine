@@ -48,9 +48,10 @@ protected:
 
 public:
 	HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
-	HySprite2d(const HySprite2d &instRef);
+	HySprite2d(const HySprite2d &copyRef);
 	virtual ~HySprite2d(void);
 
+	const HySprite2d &operator=(const HySprite2d &rhs);
 	virtual HySprite2d *Clone() const;
 
 	virtual bool IsEnabled() const override;

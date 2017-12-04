@@ -52,7 +52,7 @@ class HyAssets
 
 	public:
 		void Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
-		tData *GetData(const std::string &sPrefix, const std::string &sName);
+		const tData *GetData(const std::string &sPrefix, const std::string &sName) const;
 	};
 	NodeData<HyAudioData>										m_Audio;
 	NodeData<HySprite2dData>									m_Sprite2d;
@@ -108,7 +108,7 @@ public:
 	uint32 GetNumAtlases();
 	HyAtlasIndices *GetLoadedAtlases();
 
-	void GetNodeData(IHyDrawInst2d *pDrawInst2d, IHyNodeData *&pDataOut);
+	void GetNodeData(IHyDrawInst2d *pDrawInst2d, const IHyNodeData *&pDataOut);
 	void LoadNodeData(IHyDrawInst2d *pDrawInst2d);
 	void RemoveNodeData(IHyDrawInst2d *pDrawInst2d);
 	bool IsInstLoaded(IHyDrawInst2d *pDrawInst2d);

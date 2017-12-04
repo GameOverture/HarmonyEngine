@@ -14,7 +14,7 @@
 IHyDraw2d::IHyDraw2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
 																m_fAlpha(1.0f),
 																m_fCachedAlpha(1.0f),
-																m_hScissor(HY_UNUSED_HANDLE),
+																m_pScissor(nullptr),
 																m_hStencil(HY_UNUSED_HANDLE),
 																m_iCoordinateSystem(-1),
 																m_iDisplayOrder(0),
@@ -28,9 +28,62 @@ IHyDraw2d::IHyDraw2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(eNodeTyp
 	m_CachedBotColor = botColor.Get();
 }
 
+IHyDraw2d::IHyDraw2d(const IHyDraw2d &copyRef) :	IHyNode2d(copyRef),
+													m_fAlpha(copyRef.m_fAlpha),
+													m_pScissor(nullptr),
+													m_hStencil(copyRef.m_hStencil),
+													m_iCoordinateSystem(copyRef.m_iCoordinateSystem),
+													m_iDisplayOrder(copyRef.m_iDisplayOrder),
+													topColor(*this, DIRTY_Color),
+													botColor(*this, DIRTY_Color),
+													alpha(m_fAlpha, *this, DIRTY_Color)
+
+{
+	if(copyRef.m_pScissor)
+	{
+		m_pScissor = HY_NEW ScissorRect();
+		m_pScissor->m_LocalScissorRect = copyRef.m_pScissor->m_LocalScissorRect;
+		GetWorldScissor(m_pScissor->m_WorldScissorRect);
+	}
+
+	topColor.Set(copyRef.topColor.Get());
+	botColor.Set(copyRef.botColor.Get());
+	alpha.Set(copyRef.alpha.Get());
+
+	CalculateColor();
+}
+
 IHyDraw2d::~IHyDraw2d()
 {
-	delete m_hScissor;
+	delete m_pScissor;
+}
+
+const IHyDraw2d &IHyDraw2d::operator=(const IHyDraw2d &rhs)
+{
+	IHyNode2d::operator=(rhs);
+
+	m_fAlpha = rhs.m_fAlpha;
+
+	delete m_pScissor;
+	m_pScissor = nullptr;
+	if(rhs.m_pScissor)
+	{
+		m_pScissor = HY_NEW ScissorRect();
+		m_pScissor->m_LocalScissorRect = rhs.m_pScissor->m_LocalScissorRect;
+		GetWorldScissor(m_pScissor->m_WorldScissorRect);
+	}
+
+	m_hStencil = rhs.m_hStencil;
+	m_iCoordinateSystem = rhs.m_iCoordinateSystem;
+	m_iDisplayOrder = rhs.m_iDisplayOrder;
+
+	topColor.Set(rhs.topColor.Get());
+	botColor.Set(rhs.botColor.Get());
+	alpha.Set(rhs.alpha.Get());
+
+	CalculateColor();
+
+	return *this;
 }
 
 void IHyDraw2d::SetTint(float fR, float fG, float fB)
@@ -48,67 +101,67 @@ void IHyDraw2d::SetTint(uint32 uiColor)
 
 float IHyDraw2d::CalculateAlpha()
 {
-	Calculate();
+	CalculateColor();
 	return m_fCachedAlpha;
 }
 
 const glm::vec3 &IHyDraw2d::CalculateTopTint()
 {
-	Calculate();
+	CalculateColor();
 	return m_CachedTopColor;
 }
 
 const glm::vec3 &IHyDraw2d::CalculateBotTint()
 {
-	Calculate();
+	CalculateColor();
 	return m_CachedBotColor;
 }
 
 bool IHyDraw2d::IsScissorSet() const
 {
-	return m_hScissor != HY_UNUSED_HANDLE;
+	return m_pScissor != nullptr;
 }
 
 void IHyDraw2d::GetLocalScissor(HyScreenRect<int32> &scissorOut) const
 {
-	if(m_hScissor == HY_UNUSED_HANDLE)
+	if(m_pScissor == nullptr)
 		return;
 
-	scissorOut = m_hScissor->m_LocalScissorRect;
+	scissorOut = m_pScissor->m_LocalScissorRect;
 }
 
 void IHyDraw2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 {
-	if(m_hScissor == HY_UNUSED_HANDLE)
+	if(m_pScissor == nullptr)
 		return;
 
 	if(IsDirty(DIRTY_Scissor))
 	{
 		if((m_uiExplicitFlags & EXPLICIT_Scissor) == 0 && m_pParent)
-			m_pParent->GetWorldScissor(m_hScissor->m_WorldScissorRect);
+			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
 		else
 		{
-			if(m_hScissor->m_LocalScissorRect.iTag == SCISSORTAG_Enabled)
+			if(m_pScissor->m_LocalScissorRect.iTag == SCISSORTAG_Enabled)
 			{
 				glm::mat4 mtx;
 				GetWorldTransform(mtx);
 
-				m_hScissor->m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_hScissor->m_LocalScissorRect.x);
-				m_hScissor->m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_hScissor->m_LocalScissorRect.y);
-				m_hScissor->m_WorldScissorRect.width = static_cast<uint32>(mtx[0].x * m_hScissor->m_LocalScissorRect.width);
-				m_hScissor->m_WorldScissorRect.height = static_cast<uint32>(mtx[1].y * m_hScissor->m_LocalScissorRect.height);
-				m_hScissor->m_WorldScissorRect.iTag = SCISSORTAG_Enabled;
+				m_pScissor->m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_pScissor->m_LocalScissorRect.x);
+				m_pScissor->m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_pScissor->m_LocalScissorRect.y);
+				m_pScissor->m_WorldScissorRect.width = static_cast<uint32>(mtx[0].x * m_pScissor->m_LocalScissorRect.width);
+				m_pScissor->m_WorldScissorRect.height = static_cast<uint32>(mtx[1].y * m_pScissor->m_LocalScissorRect.height);
+				m_pScissor->m_WorldScissorRect.iTag = SCISSORTAG_Enabled;
 			}
 			else
 			{
-				m_hScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
+				m_pScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
 			}
 		}
 
 		ClearDirty(DIRTY_Scissor);
 	}
 
-	scissorOut = m_hScissor->m_WorldScissorRect;
+	scissorOut = m_pScissor->m_WorldScissorRect;
 }
 
 bool IHyDraw2d::IsStencilSet() const
@@ -131,7 +184,7 @@ int32 IHyDraw2d::GetDisplayOrder() const
 	return m_iDisplayOrder;
 }
 
-void IHyDraw2d::Calculate()
+void IHyDraw2d::CalculateColor()
 {
 	if(IsDirty(DIRTY_Color))
 	{

@@ -19,8 +19,35 @@ IHyNode3d::IHyNode3d(HyType eNodeType, IHyNode3d *pParent) :	IHyNode(eNodeType),
 	scale.Set(1.0f);
 }
 
+IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :	IHyNode(copyRef),
+													pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+													rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+													rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+													scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+													scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+{
+	pos.Set(copyRef.pos.Get());
+	rot.Set(copyRef.rot.Get());
+	rot_pivot.Set(copyRef.rot_pivot.Get());
+	scale.Set(copyRef.scale.Get());
+	scale_pivot.Set(copyRef.scale_pivot.Get());
+}
+
 IHyNode3d::~IHyNode3d()
 {
+}
+
+const IHyNode3d &IHyNode3d::operator=(const IHyNode3d &rhs)
+{
+	IHyNode::operator=(rhs);
+
+	pos.Set(rhs.pos.Get());
+	rot.Set(rhs.rot.Get());
+	rot_pivot.Set(rhs.rot_pivot.Get());
+	scale.Set(rhs.scale.Get());
+	scale_pivot.Set(rhs.scale_pivot.Get());
+
+	return *this;
 }
 
 void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const

@@ -45,7 +45,7 @@ public:
 	IHyNode2d(const IHyNode2d &copyRef);
 	virtual ~IHyNode2d();
 
-	IHyNode2d &operator=(const IHyNode2d &rhs);
+	const IHyNode2d &operator=(const IHyNode2d &rhs);
 
 	void ParentDetach();
 	HyEntity2d *ParentGet() const;
@@ -55,12 +55,14 @@ public:
 
 	void PhysicsInit(b2BodyDef &bodyDefOut);
 	b2Body *PhysicsBody();
+	void PhysicsBodyDef(b2BodyDef &defRefOut) const;
 
 protected:
 	virtual void PhysicsUpdate() override final;
 	virtual void NodeUpdate() override = 0;
 
-	// '_' functions are used to propagate values down from parent, and are overridden with proper functionality later in hierarchy
+	// Internal Entity propagation function overrides
+	// These will be overridden with proper functionality later in hierarchy
 	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) 	{ }
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)							{ return iOrderValue; }
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding)						{ }

@@ -21,10 +21,10 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 																scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
-	scale.Set(1.0f);
-	
 	if(m_pParent)
 		m_pParent->ChildAppend(*this);
+
+	scale.Set(1.0f);
 }
 
 IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :	IHyNode(copyRef),
@@ -38,6 +38,9 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :	IHyNode(copyRef),
 													scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 													scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
+	if(copyRef.m_pParent)
+		copyRef.m_pParent->ChildAppend(*this);
+
 	pos.Set(copyRef.pos.Get());
 	rot.Set(copyRef.rot.Get());
 	rot_pivot.Set(copyRef.rot_pivot.Get());
@@ -47,25 +50,9 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :	IHyNode(copyRef),
 	if(copyRef.m_pPhysicsBody)
 	{
 		b2BodyDef def;
-		def.type = copyRef.m_pPhysicsBody->GetType();
-		def.position = copyRef.m_pPhysicsBody->GetPosition();
-		def.angle = copyRef.m_pPhysicsBody->GetAngle();
-		def.linearVelocity = copyRef.m_pPhysicsBody->GetLinearVelocity();
-		def.angularVelocity = copyRef.m_pPhysicsBody->GetAngularVelocity();
-		def.linearDamping = copyRef.m_pPhysicsBody->GetLinearDamping();
-		def.angularDamping = copyRef.m_pPhysicsBody->GetAngularDamping();
-		def.allowSleep = copyRef.m_pPhysicsBody->IsSleepingAllowed();
-		def.awake = copyRef.m_pPhysicsBody->IsAwake();
-		def.fixedRotation = copyRef.m_pPhysicsBody->IsFixedRotation();
-		def.bullet = copyRef.m_pPhysicsBody->IsBullet();
-		def.active = copyRef.m_pPhysicsBody->IsActive();
-		def.gravityScale = copyRef.m_pPhysicsBody->GetGravityScale();
-
+		copyRef.PhysicsBodyDef(def);
 		PhysicsInit(def);
 	}
-
-	if(m_pParent)
-		m_pParent->ChildAppend(*this);
 }
 
 /*virtual*/ IHyNode2d::~IHyNode2d()
@@ -79,21 +66,30 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :	IHyNode(copyRef),
 	ParentDetach();
 }
 
-IHyNode2d &IHyNode2d::operator=(const IHyNode2d &rhs)
+const IHyNode2d &IHyNode2d::operator=(const IHyNode2d &rhs)
 {
 	IHyNode::operator=(rhs);
 
-	m_pParent;
-	glm::mat4						m_mtxCached;
-	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
-	b2Body *						m_pPhysicsBody;
-	HyTweenVec2						pos;
-	HyTweenFloat					rot;
-	HyTweenVec2						rot_pivot;
-	HyTweenVec2						scale;
-	HyTweenVec2						scale_pivot;
+	if(rhs.m_pParent)
+		rhs.m_pParent->ChildAppend(*this);
 
-	asdf
+	m_mtxCached = rhs.m_mtxCached;
+	m_fRotation = rhs.m_fRotation;
+	
+	if(rhs.m_pPhysicsBody)
+	{
+		b2BodyDef def;
+		rhs.PhysicsBodyDef(def);
+		PhysicsInit(def);
+	}
+
+	pos.Set(rhs.pos.Get());
+	rot.Set(rhs.rot.Get());
+	rot_pivot.Set(rhs.rot_pivot.Get());
+	scale.Set(rhs.scale.Get());
+	scale_pivot.Set(rhs.scale_pivot.Get());
+
+	return *this;
 }
 
 void IHyNode2d::ParentDetach()
@@ -167,6 +163,27 @@ void IHyNode2d::PhysicsInit(b2BodyDef &bodyDefOut)
 b2Body *IHyNode2d::PhysicsBody()
 {
 	return m_pPhysicsBody;
+}
+
+void IHyNode2d::PhysicsBodyDef(b2BodyDef &defRefOut) const
+{
+	if(m_pPhysicsBody == nullptr)
+		return;
+
+	defRefOut.userData = m_pPhysicsBody->GetUserData();
+	defRefOut.type = m_pPhysicsBody->GetType();
+	defRefOut.position = m_pPhysicsBody->GetPosition();
+	defRefOut.angle = m_pPhysicsBody->GetAngle();
+	defRefOut.linearVelocity = m_pPhysicsBody->GetLinearVelocity();
+	defRefOut.angularVelocity = m_pPhysicsBody->GetAngularVelocity();
+	defRefOut.linearDamping = m_pPhysicsBody->GetLinearDamping();
+	defRefOut.angularDamping = m_pPhysicsBody->GetAngularDamping();
+	defRefOut.allowSleep = m_pPhysicsBody->IsSleepingAllowed();
+	defRefOut.awake = m_pPhysicsBody->IsAwake();
+	defRefOut.fixedRotation = m_pPhysicsBody->IsFixedRotation();
+	defRefOut.bullet = m_pPhysicsBody->IsBullet();
+	defRefOut.active = m_pPhysicsBody->IsActive();
+	defRefOut.gravityScale = m_pPhysicsBody->GetGravityScale();
 }
 
 /*virtual*/ void IHyNode2d::PhysicsUpdate() /*override*/

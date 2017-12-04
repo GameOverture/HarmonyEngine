@@ -62,7 +62,7 @@ public:
 	IHyNode(const IHyNode &copyRef);
 	virtual ~IHyNode();
 
-	IHyNode &operator=(const IHyNode &rhs);
+	const IHyNode &operator=(const IHyNode &rhs);
 
 	HyType GetType() const;
 

@@ -46,7 +46,7 @@ void HyAssets::NodeData<tData>::Init(jsonxx::Object &subDirObjRef, HyAssets &ass
 }
 
 template<typename tData>
-tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, const std::string &sName)
+const tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, const std::string &sName) const
 {
 	std::string sPath;
 
@@ -236,7 +236,7 @@ HyAtlasIndices *HyAssets::GetLoadedAtlases()
 	return m_pLoadedAtlasIndices;
 }
 
-void HyAssets::GetNodeData(IHyDrawInst2d *pDrawInst2d, IHyNodeData *&pDataOut)
+void HyAssets::GetNodeData(IHyDrawInst2d *pDrawInst2d, const IHyNodeData *&pDataOut)
 {
 	switch(pDrawInst2d->GetType())
 	{
@@ -308,7 +308,6 @@ void HyAssets::RemoveNodeData(IHyDrawInst2d *pDrawInst2d)
 
 	if(pDrawInst2d->AcquireData() != nullptr)
 	{
-		// TODO: Perhaps make this more efficient by skipping entire 32 bits when those equal '0'
 		const HyAtlasIndices &requiredAtlases = pDrawInst2d->UncheckedGetData()->GetRequiredAtlasIndices();
 		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 		{

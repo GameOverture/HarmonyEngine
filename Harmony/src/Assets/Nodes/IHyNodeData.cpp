@@ -17,17 +17,17 @@ IHyNodeData::IHyNodeData(HyType eType, const std::string &sPath) :	m_eTYPE(eType
 /*virtual*/ IHyNodeData::~IHyNodeData(void)
 { }
 
-HyType IHyNodeData::GetInstType()
+HyType IHyNodeData::GetInstType() const
 {
 	return m_eTYPE;
 }
 
-const std::string &IHyNodeData::GetPath()
+const std::string &IHyNodeData::GetPath() const
 { 
 	return m_sPATH;
 }
 
-const HyAtlasIndices &IHyNodeData::GetRequiredAtlasIndices()
+const HyAtlasIndices &IHyNodeData::GetRequiredAtlasIndices() const
 {
 	return m_RequiredAtlasIndices;
 }

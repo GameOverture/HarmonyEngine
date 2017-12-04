@@ -25,7 +25,7 @@ HyTexturedQuad2dData::~HyTexturedQuad2dData()
 {
 }
 
-HyAtlas *HyTexturedQuad2dData::GetAtlas()
+HyAtlas *HyTexturedQuad2dData::GetAtlas() const
 {
 	return m_pAtlas;
 }

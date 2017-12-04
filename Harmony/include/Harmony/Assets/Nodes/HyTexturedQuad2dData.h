@@ -25,7 +25,7 @@ public:
 	HyTexturedQuad2dData(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyAssets &assetsRef);
 	virtual ~HyTexturedQuad2dData();
 
-	HyAtlas *GetAtlas();
+	HyAtlas *GetAtlas() const;
 };
 
 #endif /* __HyTexturedQuad2dData_h__ */

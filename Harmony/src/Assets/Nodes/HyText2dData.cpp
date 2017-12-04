@@ -148,23 +148,23 @@ HyText2dData::~HyText2dData(void)
 	delete[] m_pTypefaces;
 }
 
-uint32 HyText2dData::GetNumStates()
+uint32 HyText2dData::GetNumStates() const
 {
 	return m_uiNumStates;
 }
 
-uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex)
+uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex) const
 {
 	return m_pFontStates[uiStateIndex].uiNUM_LAYERS;
 }
 
-const HyText2dGlyphInfo &HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code)
+const HyText2dGlyphInfo &HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const
 {
 	HyAssert(m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiUtf32Code) != m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end(), "HyText2d tried to draw a glyph (UTF-32: " << uiUtf32Code << ") that wasn't exported");
 	return *m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.at(uiUtf32Code);
 }
 
-const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop)
+const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const
 {
 	if(bTop)
 		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_TOP_COLOR;
@@ -172,27 +172,27 @@ const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLay
 		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_BOT_COLOR;
 }
 
-HyAtlas *HyText2dData::GetAtlas()
+HyAtlas *HyText2dData::GetAtlas() const
 {
 	return m_pAtlas;
 }
 
-float HyText2dData::GetLineHeight(uint32 uiStateIndex)
+float HyText2dData::GetLineHeight(uint32 uiStateIndex) const
 {
 	return m_pFontStates[uiStateIndex].fLINE_HEIGHT;
 }
 
-float HyText2dData::GetLineAscender(uint32 uiStateIndex)
+float HyText2dData::GetLineAscender(uint32 uiStateIndex) const
 {
 	return m_pFontStates[uiStateIndex].fLINE_ASCENDER;
 }
 
-float HyText2dData::GetLineDescender(uint32 uiStateIndex)
+float HyText2dData::GetLineDescender(uint32 uiStateIndex) const
 {
 	return m_pFontStates[uiStateIndex].fLINE_DESCENDER;
 }
 
-float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex)
+float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex) const
 {
 	if(m_pFontStates)
 		return m_pFontStates[uiStateIndex].fLEFT_SIDE_NUDGE_AMT;

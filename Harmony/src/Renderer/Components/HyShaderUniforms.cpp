@@ -17,8 +17,23 @@ HyShaderUniforms::HyShaderUniforms() :	m_bDirty(true),
 {
 }
 
+HyShaderUniforms::HyShaderUniforms(const HyShaderUniforms &copyRef) :	m_bDirty(copyRef.m_bDirty),
+																		m_uiCrc32(copyRef.m_uiCrc32),
+																		m_UniformList(copyRef.m_UniformList)
+{
+}
+
 HyShaderUniforms::~HyShaderUniforms()
 {
+}
+
+HyShaderUniforms &HyShaderUniforms::operator=(const HyShaderUniforms &rhs)
+{
+	m_bDirty = rhs.m_bDirty;
+	m_uiCrc32 = rhs.m_uiCrc32;
+	m_UniformList = rhs.m_UniformList;
+
+	return *this;
 }
 
 uint32 HyShaderUniforms::GetCrc32()

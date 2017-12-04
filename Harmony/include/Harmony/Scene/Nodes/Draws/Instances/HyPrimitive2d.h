@@ -27,11 +27,11 @@ protected:
 
 public:
 	HyPrimitive2d(HyEntity2d *pParent = nullptr);
+	HyPrimitive2d(const HyPrimitive2d &copyRef);
 	virtual ~HyPrimitive2d(void);
 
+	const HyPrimitive2d &operator=(const HyPrimitive2d &rhs);
 	virtual HyPrimitive2d *Clone() const;
-
-	const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d& p);
 
 	virtual bool IsEnabled() const override;
 

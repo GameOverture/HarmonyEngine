@@ -31,8 +31,8 @@ protected:
 	{
 		HyScreenRect<int32>			m_LocalScissorRect;
 		HyScreenRect<int32>			m_WorldScissorRect;
-	};	typedef ScissorRect* HyScissorHandle;
-	HyScissorHandle					m_hScissor;
+	};
+	ScissorRect *					m_pScissor;
 	HyStencilHandle					m_hStencil;
 
 	int32							m_iCoordinateSystem;	// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
@@ -45,7 +45,10 @@ public:
 
 public:
 	IHyDraw2d(HyType eNodeType, HyEntity2d *pParent);
+	IHyDraw2d(const IHyDraw2d &copyRef);
 	virtual ~IHyDraw2d();
+
+	const IHyDraw2d &operator=(const IHyDraw2d &rhs);
 
 	void SetTint(float fR, float fG, float fB);
 	void SetTint(uint32 uiColor);
@@ -66,12 +69,11 @@ public:
 	int32 GetCoordinateSystem() const;
 	int32 GetDisplayOrder() const;
 
-
 protected:
 	virtual void NodeUpdate() = 0;
 
 private:
-	void Calculate();
+	void CalculateColor();
 };
 
 #endif /* IHyNodeDraw2d_h__ */

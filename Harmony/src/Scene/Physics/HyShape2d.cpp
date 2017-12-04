@@ -17,6 +17,13 @@ HyShape2d::HyShape2d(IHyDrawInst2d *pOwnerInst) :	m_pOwnerInst(pOwnerInst),
 {
 }
 
+HyShape2d::HyShape2d(IHyDrawInst2d *pOwnerInst, const HyShape2d &copyRef) :	m_pOwnerInst(pOwnerInst),
+																			m_eType(HYSHAPE_Unknown),
+																			m_pShape(nullptr)
+{
+	operator=(copyRef);
+}
+
 /*virtual*/ HyShape2d::~HyShape2d()
 {
 	delete m_pShape;
@@ -29,51 +36,51 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 
 	switch(rhs.GetType())
 	{
-		case HYSHAPE_LineSegment: {
-			m_eType = HYSHAPE_LineSegment;
+	case HYSHAPE_LineSegment: {
+		m_eType = HYSHAPE_LineSegment;
 			
-			b2EdgeShape *pRhsEdgeShape = static_cast<b2EdgeShape *>(rhs.m_pShape);
-			m_pShape = HY_NEW b2EdgeShape(*pRhsEdgeShape);
+		b2EdgeShape *pRhsEdgeShape = static_cast<b2EdgeShape *>(rhs.m_pShape);
+		m_pShape = HY_NEW b2EdgeShape(*pRhsEdgeShape);
 		} break;
 
-		case HYSHAPE_LineLoop: {
-			m_eType = HYSHAPE_LineLoop;
+	case HYSHAPE_LineLoop: {
+		m_eType = HYSHAPE_LineLoop;
 			
-			b2ChainShape *pRhsChainShape = static_cast<b2ChainShape *>(rhs.m_pShape);
-			m_pShape = HY_NEW b2ChainShape(*pRhsChainShape);
+		b2ChainShape *pRhsChainShape = static_cast<b2ChainShape *>(rhs.m_pShape);
+		m_pShape = HY_NEW b2ChainShape(*pRhsChainShape);
 
-			// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
-			static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
-			static_cast<b2ChainShape *>(m_pShape)->CreateLoop(pRhsChainShape->m_vertices, pRhsChainShape->m_count);
+		// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
+		static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
+		static_cast<b2ChainShape *>(m_pShape)->CreateLoop(pRhsChainShape->m_vertices, pRhsChainShape->m_count);
 		} break;
 
-		case HYSHAPE_LineChain: {
-			m_eType = HYSHAPE_LineChain;
+	case HYSHAPE_LineChain: {
+		m_eType = HYSHAPE_LineChain;
 			
-			b2ChainShape *pRhsChainShape = static_cast<b2ChainShape *>(rhs.m_pShape);
-			m_pShape = HY_NEW b2ChainShape(*pRhsChainShape);
+		b2ChainShape *pRhsChainShape = static_cast<b2ChainShape *>(rhs.m_pShape);
+		m_pShape = HY_NEW b2ChainShape(*pRhsChainShape);
 
-			// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
-			static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
-			static_cast<b2ChainShape *>(m_pShape)->CreateChain(pRhsChainShape->m_vertices, pRhsChainShape->m_count);
+		// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
+		static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
+		static_cast<b2ChainShape *>(m_pShape)->CreateChain(pRhsChainShape->m_vertices, pRhsChainShape->m_count);
 		} break;
 
-		case HYSHAPE_Circle: {
-			m_eType = HYSHAPE_Circle;
+	case HYSHAPE_Circle: {
+		m_eType = HYSHAPE_Circle;
 			
-			b2CircleShape *pRhsCircleShape = static_cast<b2CircleShape *>(rhs.m_pShape);
-			m_pShape = HY_NEW b2CircleShape(*pRhsCircleShape);
+		b2CircleShape *pRhsCircleShape = static_cast<b2CircleShape *>(rhs.m_pShape);
+		m_pShape = HY_NEW b2CircleShape(*pRhsCircleShape);
 		} break;
 		
-		case HYSHAPE_Polygon: {
-			m_eType = HYSHAPE_Polygon;
+	case HYSHAPE_Polygon: {
+		m_eType = HYSHAPE_Polygon;
 			
-			b2PolygonShape *pRhsPolygonShape = static_cast<b2PolygonShape *>(rhs.m_pShape);
-			m_pShape = HY_NEW b2PolygonShape(*pRhsPolygonShape);
+		b2PolygonShape *pRhsPolygonShape = static_cast<b2PolygonShape *>(rhs.m_pShape);
+		m_pShape = HY_NEW b2PolygonShape(*pRhsPolygonShape);
 		} break;
 
-		default:
-			HyLogError("HyShape2d::operator=() - Unknown shape type: " << rhs.GetType());
+	default:
+		HyLogError("HyShape2d::operator=() - Unknown shape type: " << rhs.GetType());
 	}
 
 	return *this;

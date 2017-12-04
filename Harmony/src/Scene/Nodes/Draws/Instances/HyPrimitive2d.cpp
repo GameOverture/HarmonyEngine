@@ -22,30 +22,35 @@ HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDrawInst2d(
 	ClearData();
 }
 
+HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :	IHyDrawInst2d(copyRef),
+																m_bWireframe(copyRef.m_bWireframe),
+																m_fLineThickness(copyRef.m_fLineThickness)
+{
+	ClearData();
+	m_bDirty = true;
+}
+
 HyPrimitive2d::~HyPrimitive2d(void)
 {
 	ClearData();
 }
 
+const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
+{
+	IHyDrawInst2d::operator=(rhs);
+
+	ClearData();
+
+	m_bWireframe = rhs.m_bWireframe;
+	m_fLineThickness = rhs.m_fLineThickness;
+	m_bDirty = true;
+
+	return *this;
+}
+
 /*virtual*/ HyPrimitive2d *HyPrimitive2d::Clone() const
 {
 	return HY_NEW HyPrimitive2d(*this);
-}
-
-const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &p)
-{
-	m_eRenderMode = p.m_eRenderMode;
-	m_BoundingVolume = p.m_BoundingVolume;
-	m_uiNumVerts = p.m_uiNumVerts;
-
-	ClearData();
-	if(m_uiNumVerts != 0)
-	{
-		m_pVertBuffer = HY_NEW glm::vec2[m_uiNumVerts];
-		memcpy(m_pVertBuffer, p.m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
-	}
-	
-	return *this;
 }
 
 /*virtual*/ bool HyPrimitive2d::IsEnabled() const /*override*/
@@ -160,10 +165,6 @@ void HyPrimitive2d::ClearData()
 	m_uiNumVerts = 0;
 
 	m_eRenderMode = HYRENDERMODE_Unknown;
-	//m_RenderState.SetNumVerticesPerInstance(0);
-	//m_RenderState.SetNumInstances(1);
-	//m_RenderState.Disable(HyRenderState::DRAWINSTANCED);
-
 	m_ShaderUniforms.Clear();
 }
 
@@ -173,9 +174,6 @@ void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	ClearData();
 
 	m_eRenderMode = HYRENDERMODE_Triangles;
-	//m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
-	//m_RenderState.SetNumVerticesPerInstance();
-	//m_RenderState.SetNumInstances(1);
 
 	m_uiNumVerts = (uiNumVertices - 1) * 6;
 	m_pVertBuffer = HY_NEW glm::vec2[m_uiNumVerts];

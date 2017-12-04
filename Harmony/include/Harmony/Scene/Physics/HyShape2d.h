@@ -23,6 +23,8 @@ class HyShape2d
 
 public:
 	HyShape2d(IHyDrawInst2d *pOwnerInst);
+	HyShape2d(const HyShape2d &copyRef) = delete;
+	HyShape2d(IHyDrawInst2d *pOwnerInst, const HyShape2d &copyRef);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);

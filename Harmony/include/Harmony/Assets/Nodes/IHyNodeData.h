@@ -29,10 +29,10 @@ public:
 	IHyNodeData(HyType eInstType, const std::string &sPath);
 	virtual ~IHyNodeData(void);
 	
-	HyType GetInstType();
-	const std::string &GetPath();
+	HyType GetInstType() const;
+	const std::string &GetPath() const;
 
-	const HyAtlasIndices &GetRequiredAtlasIndices();
+	const HyAtlasIndices &GetRequiredAtlasIndices() const;
 };
 
 #endif /* IHyNodeData_h__ */

@@ -23,10 +23,11 @@ HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pPare
 																									m_spSkeletonBounds(NULL)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
-	
-	//m_RenderState.Enable(HyRenderState::DRAWINSTANCED);
-	//m_RenderState.SetShaderId(HYSHADERPROG_QuadBatch);
-	//m_RenderState.SetNumVerticesPerInstance(4);
+}
+
+HySpine2d::HySpine2d(const HySpine2d &copyRef) :	IHyDrawInst2d(copyRef)
+{
+	HyError("HySpine2d::copy ctor implement me!");
 }
 
 HySpine2d::~HySpine2d(void)
@@ -41,6 +42,20 @@ HySpine2d::~HySpine2d(void)
 
 		delete [] m_ppAnimStates;
 	}
+}
+
+const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
+{
+	IHyDrawInst2d::operator=(rhs);
+
+	HyError("HySpine2d::operator= implement me!");
+
+	return *this;
+}
+
+/*virtual*/ HySpine2d *HySpine2d::Clone() const
+{
+	return HY_NEW HySpine2d(*this);
 }
 
 //uint32 HySpine2d::GetTextureId()

@@ -28,6 +28,8 @@ IHyNode::IHyNode(const IHyNode &copyRef) :	m_eTYPE(copyRef.m_eTYPE),
 											m_bPauseOverride(copyRef.m_bPauseOverride),
 											m_iTag(copyRef.m_iTag)
 {
+	HyScene::AddNode(this);
+
 	if(m_bPauseOverride)
 		HyScene::AddNode_PauseUpdate(this);
 }
@@ -40,7 +42,7 @@ IHyNode::IHyNode(const IHyNode &copyRef) :	m_eTYPE(copyRef.m_eTYPE),
 	HyScene::RemoveNode(this);
 }
 
-IHyNode &IHyNode::operator=(const IHyNode &rhs)
+const IHyNode &IHyNode::operator=(const IHyNode &rhs)
 {
 	HyAssert(m_eTYPE == rhs.m_eTYPE, "IHyNode::operator= cannot assign from a different HyType");
 
@@ -58,6 +60,8 @@ IHyNode &IHyNode::operator=(const IHyNode &rhs)
 	}
 	
 	m_iTag = rhs.m_iTag;
+
+	return *this;
 }
 
 HyType IHyNode::GetType() const
