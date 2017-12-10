@@ -40,6 +40,9 @@
     </widget>
    </item>
    <item>
+    <widget class="PropertiesTreeView" name="typefaceProperties"/>
+   </item>
+   <item>
     <widget class="QGroupBox" name="grpAvailableChars">
      <property name="title">
       <string>Available Characters:</string>
@@ -583,6 +586,11 @@
    <class>FontTableView</class>
    <extends>QTableView</extends>
    <header>FontModelView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PropertiesTreeView</class>
+   <extends>QTreeView</extends>
+   <header>PropertiesTreeView.h</header>
   </customwidget>
  </customwidgets>
  <resources>
