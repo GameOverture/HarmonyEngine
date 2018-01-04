@@ -22,15 +22,15 @@ typedef unsigned int		uint32;
 typedef __int64				int64;
 typedef unsigned __int64	uint64;
 
-#define HY_MAXWINDOWS 6
+#define HY_MAXWINDOWS 1
 
 // All x86 and x86-64 machines are little-endian.
 #define HY_ENDIAN_LITTLE
 
 // Diagnostics assertion
 #if defined(HY_DEBUG)
-	#define HyAssert(condition, message) do { } while (false)
-	#define HyError(message) do { } while (false)
+	#define HyAssert(condition, message) do { if((#condition) == false) DebugBreak(); } while (false)
+	#define HyError(message) do { DebugBreak(); } while (false)
 #else
 	#define HyAssert(condition, message) do { } while (false)
 	#define HyError(message) do { } while (false)
