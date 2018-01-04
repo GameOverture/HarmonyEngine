@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IHyTimeInst_h__
-#define __IHyTimeInst_h__
+#ifndef IHyTimeInst_h__
+#define IHyTimeInst_h__
 
 class HyTime;
 
@@ -23,4 +23,4 @@ public:
 	void Update(double dDelta);
 };
 
-#endif /* __IHyTimeInst_h__ */
+#endif /* IHyTimeInst_h__ */

@@ -4,11 +4,11 @@
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
 *
-*	The zlib License (zlib)
+*	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __HyConsole_Gui_h__
-#define __HyConsole_Gui_h__
+#ifndef HyConsole_Gui_h__
+#define HyConsole_Gui_h__
 
 #include "Diagnostics/Console/HyConsole.h"
 
@@ -21,4 +21,4 @@ public:
 	virtual void Log(std::ostream &os, const char *szMsg, LogType eType);
 };
 
-#endif /* __HyConsole_Gui_h__ */
+#endif /* HyConsole_Gui_h__ */

@@ -4,11 +4,11 @@
 *	Harmony Engine
 *	Copyright (c) 2016 Jason Knobler
 *
-*	The zlib License (zlib)
+*	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __HyVariant_h__
-#define __HyVariant_h__
+#ifndef HyVariant_h__
+#define HyVariant_h__
 
 union HyVariant
 {
@@ -54,4 +54,4 @@ public:
 	~HyVariant();
 };
 
-#endif /* __HyVariant_h__ */
+#endif /* HyVariant_h__ */

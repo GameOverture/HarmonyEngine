@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __IHyAudio_h__
-#define __IHyAudio_h__
+#ifndef IHyAudio_h__
+#define IHyAudio_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -25,4 +25,4 @@ public:
 	~IHyAudio(void);
 };
 
-#endif /* __IHyAudio_h__ */
+#endif /* IHyAudio_h__ */

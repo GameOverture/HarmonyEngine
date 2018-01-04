@@ -4,11 +4,11 @@
 *	Harmony Engine
 *	Copyright (c) 2016 Jason Knobler
 *
-*	The zlib License (zlib)
+*	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __IHyAudioInst_Win_h__
-#define __IHyAudioInst_Win_h__
+#ifndef IHyAudioInst_Win_h__
+#define IHyAudioInst_Win_h__
 
 #include "Audio/IHyAudioInst.h"
 
@@ -27,4 +27,4 @@ public:
 	virtual void SetReverb();
 };
 
-#endif /* __IHyAudioInst_Win_h__ */
+#endif /* IHyAudioInst_Win_h__ */

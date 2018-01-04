@@ -4,7 +4,7 @@
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
 *
-*	The zlib License (zlib)
+*	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #ifndef HyPlatform_Gui_h__

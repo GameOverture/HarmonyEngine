@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyStaticArray_h__
-#define __HyStaticArray_h__
+#ifndef HyStaticArray_h__
+#define HyStaticArray_h__
 
 template<intx iSize>
 class HyStaticArray
@@ -72,4 +72,4 @@ public:
 	const uint32* GetData() const  { return m_Data; }
 };
 
-#endif /* __HyStaticArray_h__ */
+#endif /* HyStaticArray_h__ */

@@ -4,7 +4,7 @@
 *	Harmony Engine
 *	Copyright (c) 2015 Jason Knobler
 *
-*	The zlib License (zlib)
+*	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #ifndef HyTexturedQuad2d_h__

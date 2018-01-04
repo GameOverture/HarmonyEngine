@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyText2dData_h__
-#define __HyText2dData_h__
+#ifndef HyText2dData_h__
+#define HyText2dData_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -142,4 +142,4 @@ public:
 	float GetLeftSideNudgeAmt(uint32 uiStateIndex) const;
 };
 
-#endif /* __HyText2dData_h__ */
+#endif /* HyText2dData_h__ */
