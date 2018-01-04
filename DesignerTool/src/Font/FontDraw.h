@@ -1,3 +1,12 @@
+/**************************************************************************
+*	FontDraw.h
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #ifndef FONTDRAW_H
 #define FONTDRAW_H
 
@@ -8,27 +17,27 @@
 
 class FontDraw : public IDraw
 {
-    HyCamera2d *                m_pPreviewTextCamera;
-    HyTexturedQuad2d *          m_pAtlasPreviewTexQuad;
-    HyPrimitive2d               m_DrawAtlasOutline;
+	HyCamera2d *                m_pPreviewTextCamera;
+	HyTexturedQuad2d *          m_pAtlasPreviewTexQuad;
+	HyPrimitive2d               m_DrawAtlasOutline;
 
-    HyPrimitive2d               m_DividerLine;
-    HyPrimitive2d               m_PreviewOriginHorz;
+	HyPrimitive2d               m_DividerLine;
+	HyPrimitive2d               m_PreviewOriginHorz;
 
-    HyText2d                    m_Text;
+	HyText2d                    m_Text;
 
 public:
-    FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
-    virtual ~FontDraw();
+	FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
+	virtual ~FontDraw();
 
-    virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
+	virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
 
 protected:
-    virtual void OnShow(IHyApplication &hyApp) override;
-    virtual void OnHide(IHyApplication &hyApp) override;
-    virtual void OnResizeRenderer() override;
-    
-    virtual void OnUpdate() override;
+	virtual void OnShow(IHyApplication &hyApp) override;
+	virtual void OnHide(IHyApplication &hyApp) override;
+	virtual void OnResizeRenderer() override;
+	
+	virtual void OnUpdate() override;
 };
 
 #endif // FONTDRAW_H

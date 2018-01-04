@@ -1,3 +1,12 @@
+/**************************************************************************
+*	FontDraw.cpp
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #include "FontDraw.h"
 #include "FontWidget.h"
 #include "MainWindow.h"

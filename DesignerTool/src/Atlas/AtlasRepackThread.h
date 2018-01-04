@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2017 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef ATLASREPACKTHREAD_H
@@ -14,16 +14,16 @@
 
 class AtlasRepackThread : public QThread
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    AtlasRepackThread();
-    virtual ~AtlasRepackThread();
+	AtlasRepackThread();
+	virtual ~AtlasRepackThread();
 
-    virtual void run() override;
+	virtual void run() override;
 
 Q_SIGNALS:
-    void RepackIsFinished();
+	void RepackIsFinished();
 };
 
 #endif // ATLASREPACKTHREAD_H

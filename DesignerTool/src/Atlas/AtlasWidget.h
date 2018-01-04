@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef ATLASWIDGET_H
@@ -27,91 +27,91 @@ class AtlasWidget;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class AtlasTreeWidget : public QTreeWidget
 {
-    AtlasWidget *      m_pOwner;
+	AtlasWidget *      m_pOwner;
 
 public:
-    AtlasTreeWidget(QWidget *parent = Q_NULLPTR);
-    void SetAtlasOwner(AtlasWidget *pOwner);
+	AtlasTreeWidget(QWidget *parent = Q_NULLPTR);
+	void SetAtlasOwner(AtlasWidget *pOwner);
 
 protected:
-    virtual void dropEvent(QDropEvent *e) override;
+	virtual void dropEvent(QDropEvent *e) override;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class AtlasTreeItem : public QTreeWidgetItem
 {
 public:
-    AtlasTreeItem(AtlasTreeWidget *pView, int type = Type) : QTreeWidgetItem(pView, type)
-    { }
-    AtlasTreeItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
-    { }
+	AtlasTreeItem(AtlasTreeWidget *pView, int type = Type) : QTreeWidgetItem(pView, type)
+	{ }
+	AtlasTreeItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
+	{ }
 
-    bool operator<(const QTreeWidgetItem& other) const;
+	bool operator<(const QTreeWidgetItem& other) const;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class AtlasWidget : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    friend class WidgetAtlasGroup;
+	friend class WidgetAtlasGroup;
 
-    AtlasModel *                    m_pModel;
-    AtlasDraw                       m_Draw;
+	AtlasModel *                    m_pModel;
+	AtlasDraw                       m_Draw;
 
-    QTreeWidgetItem *               m_pMouseHoverItem;
+	QTreeWidgetItem *               m_pMouseHoverItem;
 
 public:
-    explicit AtlasWidget(QWidget *parent = 0);
-    explicit AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *parent = 0);
-    ~AtlasWidget();
+	explicit AtlasWidget(QWidget *parent = 0);
+	explicit AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *parent = 0);
+	~AtlasWidget();
 
-    quint32 GetSelectedAtlasGrpId();
+	quint32 GetSelectedAtlasGrpId();
 
-    AtlasModel &GetData();
-    AtlasTreeWidget *GetFramesTreeWidget();
+	AtlasModel &GetData();
+	AtlasTreeWidget *GetFramesTreeWidget();
 
-    void DrawUpdate(IHyApplication &hyApp);
+	void DrawUpdate(IHyApplication &hyApp);
 
-    void StashTreeWidgets();
-    
-    void RefreshLcds();
-    
+	void StashTreeWidgets();
+	
+	void RefreshLcds();
+	
 protected:
-    virtual void enterEvent(QEvent *pEvent) override;
-    virtual void leaveEvent(QEvent *pEvent) override;
-    virtual void resizeEvent(QResizeEvent *event) override;
+	virtual void enterEvent(QEvent *pEvent) override;
+	virtual void leaveEvent(QEvent *pEvent) override;
+	virtual void resizeEvent(QResizeEvent *event) override;
 
 private Q_SLOTS:
-    void on_actionDeleteImages_triggered();
+	void on_actionDeleteImages_triggered();
 
-    void on_actionReplaceImages_triggered();
+	void on_actionReplaceImages_triggered();
 
-    void on_atlasList_itemSelectionChanged();
+	void on_atlasList_itemSelectionChanged();
 
-    void OnContextMenu(const QPoint &pos);
+	void OnContextMenu(const QPoint &pos);
 
-    void on_actionRename_triggered();
+	void on_actionRename_triggered();
 
-    void on_cmbAtlasGroups_currentIndexChanged(int index);
-    
-    void on_actionAddGroup_triggered();
+	void on_cmbAtlasGroups_currentIndexChanged(int index);
+	
+	void on_actionAddGroup_triggered();
 
-    void on_actionRemoveGroup_triggered();
-    
-    void on_actionAtlasGrpTransfer_triggered(QAction *pAction);
+	void on_actionRemoveGroup_triggered();
+	
+	void on_actionAtlasGrpTransfer_triggered(QAction *pAction);
 
-    void on_actionImportImages_triggered();
+	void on_actionImportImages_triggered();
 
-    void on_actionImportDirectory_triggered();
+	void on_actionImportDirectory_triggered();
 
-    void on_actionAddFilter_triggered();
+	void on_actionAddFilter_triggered();
 
-    void on_actionGroupSettings_triggered();
+	void on_actionGroupSettings_triggered();
 
 private:
-    Ui::AtlasWidget *ui;
+	Ui::AtlasWidget *ui;
 
-    void GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
+	void GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
 };
 
 #endif // ATLASWIDGET_H

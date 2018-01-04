@@ -1,10 +1,10 @@
 /**************************************************************************
- *	WidgetAudioBank.cpp
+ *	AudioWidgetBank.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "AudioWidgetBank.h"
@@ -19,163 +19,163 @@
 #include <QJsonDocument>
 
 AudioWidgetBank::AudioWidgetBank(QWidget *parent) : QWidget(parent),
-                                                    ui(new Ui::AudioWidgetBank)
+													ui(new Ui::AudioWidgetBank)
 {
-    ui->setupUi(this);
-    
-    // Invalid constructor. This exists so Q_OBJECT can work.
-    HyGuiLog("WidgetAudioBank::WidgetAudioBank() invalid constructor used", LOGTYPE_Error);
+	ui->setupUi(this);
+	
+	// Invalid constructor. This exists so Q_OBJECT can work.
+	HyGuiLog("WidgetAudioBank::WidgetAudioBank() invalid constructor used", LOGTYPE_Error);
 }
 
 AudioWidgetBank::AudioWidgetBank(QDir metaDir, QDir dataDir, AudioWidgetManager *pManager, QWidget *pParent /*= 0*/) :  QWidget(pParent),
-                                                                                                                        ui(new Ui::AudioWidgetBank),
-                                                                                                                        m_pManager(pManager),
-                                                                                                                        m_MetaDir(metaDir),
-                                                                                                                        m_DataDir(dataDir)
+																														ui(new Ui::AudioWidgetBank),
+																														m_pManager(pManager),
+																														m_MetaDir(metaDir),
+																														m_DataDir(dataDir)
 {
-    ui->setupUi(this);
-    
-    m_pModel = new AudioBankTableModel(this);
-    ui->waveTable->setModel(m_pModel);
-    ui->waveTable->setShowGrid(false);
+	ui->setupUi(this);
+	
+	m_pModel = new AudioBankTableModel(this);
+	ui->waveTable->setModel(m_pModel);
+	ui->waveTable->setShowGrid(false);
 
-    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
-    if(settingsFile.exists())
-    {
-        if(!settingsFile.open(QIODevice::ReadOnly))
-            HyGuiLog(QString("WidgetAudioBank::WidgetAudioBank() could not open ") % HYGUIPATH_MetaSettings, LOGTYPE_Error);
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+	if(settingsFile.exists())
+	{
+		if(!settingsFile.open(QIODevice::ReadOnly))
+			HyGuiLog(QString("WidgetAudioBank::WidgetAudioBank() could not open ") % HYGUIPATH_MetaSettings, LOGTYPE_Error);
 
 #ifdef HYGUI_UseBinaryMetaFiles
-        QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
+		QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
 #else
-        QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
+		QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
 #endif
-        settingsFile.close();
+		settingsFile.close();
 
-        QJsonObject settingsObj = settingsDoc.object();
-        
-        SetName(settingsObj["name"].toString());
+		QJsonObject settingsObj = settingsDoc.object();
+		
+		SetName(settingsObj["name"].toString());
 
-        QJsonArray wavesArray = settingsObj["waves"].toArray();
-        for(int i = 0; i < wavesArray.size(); ++i)
-        {
-            QJsonObject waveObj = wavesArray[i].toObject();
-            
-            AudioWave *pNewWave = m_pManager->CreateWave(GetId(),
-                                                         JSONOBJ_TOINT(waveObj, "checksum"),
-                                                         waveObj["name"].toString(),
-                                                         waveObj["formatType"].toInt(),
-                                                         waveObj["numChannels"].toInt(),
-                                                         waveObj["bitsPerSample"].toInt(),
-                                                         waveObj["samplesPerSec"].toInt(),
-                                                         waveObj["errors"].toInt(0));
+		QJsonArray wavesArray = settingsObj["waves"].toArray();
+		for(int i = 0; i < wavesArray.size(); ++i)
+		{
+			QJsonObject waveObj = wavesArray[i].toObject();
+			
+			AudioWave *pNewWave = m_pManager->CreateWave(GetId(),
+														 JSONOBJ_TOINT(waveObj, "checksum"),
+														 waveObj["name"].toString(),
+														 waveObj["formatType"].toInt(),
+														 waveObj["numChannels"].toInt(),
+														 waveObj["bitsPerSample"].toInt(),
+														 waveObj["samplesPerSec"].toInt(),
+														 waveObj["errors"].toInt(0));
 
-            if(QFile::exists(m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName())) == false)
-                pNewWave->SetError(ATLASFRAMEERROR_CannotFindMetaImg);
-            else
-                pNewWave->ClearError(ATLASFRAMEERROR_CannotFindMetaImg);
+			if(QFile::exists(m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName())) == false)
+				pNewWave->SetError(ATLASFRAMEERROR_CannotFindMetaImg);
+			else
+				pNewWave->ClearError(ATLASFRAMEERROR_CannotFindMetaImg);
 
-            m_pModel->AddWave(pNewWave);
-        }
-    }
+			m_pModel->AddWave(pNewWave);
+		}
+	}
 
 }
 
 AudioWidgetBank::~AudioWidgetBank()
 {
-    delete ui;
+	delete ui;
 }
 
 QString AudioWidgetBank::GetName()
 {
-    return m_pModel->GetName();
+	return m_pModel->GetName();
 }
 
 void AudioWidgetBank::SetName(QString sName)
 {
-    m_pModel->SetName(sName);
+	m_pModel->SetName(sName);
 }
 
 int AudioWidgetBank::GetId()
 {
-    return m_MetaDir.dirName().toInt();
+	return m_MetaDir.dirName().toInt();
 }
 
 void AudioWidgetBank::on_btnAddWaves_pressed()
 {
-    QFileDialog dlg(this);
-    dlg.setFileMode(QFileDialog::ExistingFile);
-    dlg.setViewMode(QFileDialog::Detail);
-    dlg.setWindowModality(Qt::ApplicationModal);
-    dlg.setModal(true);
+	QFileDialog dlg(this);
+	dlg.setFileMode(QFileDialog::ExistingFile);
+	dlg.setViewMode(QFileDialog::Detail);
+	dlg.setWindowModality(Qt::ApplicationModal);
+	dlg.setModal(true);
 
-    QString sSelectedFilter(tr("WAVE (*.wav)"));
-    QStringList sImportWaveList = QFileDialog::getOpenFileNames(this,
-                                                               "Import wave(s) into bank",
-                                                               QString(),
-                                                               tr("All files (*.*);;WAVE (*.wav)"),
-                                                               &sSelectedFilter);
+	QString sSelectedFilter(tr("WAVE (*.wav)"));
+	QStringList sImportWaveList = QFileDialog::getOpenFileNames(this,
+															   "Import wave(s) into bank",
+															   QString(),
+															   tr("All files (*.*);;WAVE (*.wav)"),
+															   &sSelectedFilter);
 
-    if(sImportWaveList.empty() == false)
-    {
-        ImportWaves(sImportWaveList);
-        Refresh();
-    }
+	if(sImportWaveList.empty() == false)
+	{
+		ImportWaves(sImportWaveList);
+		Refresh();
+	}
 }
 
 void AudioWidgetBank::on_btnAddDir_pressed()
 {
-    QFileDialog dlg(this);
-    dlg.setFileMode(QFileDialog::Directory);
-    dlg.setOption(QFileDialog::ShowDirsOnly, true);
-    dlg.setViewMode(QFileDialog::Detail);
-    dlg.setWindowModality(Qt::ApplicationModal);
-    dlg.setModal(true);
+	QFileDialog dlg(this);
+	dlg.setFileMode(QFileDialog::Directory);
+	dlg.setOption(QFileDialog::ShowDirsOnly, true);
+	dlg.setViewMode(QFileDialog::Detail);
+	dlg.setWindowModality(Qt::ApplicationModal);
+	dlg.setModal(true);
 
-    if(dlg.exec() == QDialog::Rejected)
-        return;
+	if(dlg.exec() == QDialog::Rejected)
+		return;
 
-    QStringList sDirs = dlg.selectedFiles();
-    QStringList sImportWaveList;
-    for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
-    {
-        QDir dirEntry(sDirs[iDirIndex]);
-        HyGlobal::RecursiveFindFileOfExt("wav", sImportWaveList, dirEntry);
-    }
+	QStringList sDirs = dlg.selectedFiles();
+	QStringList sImportWaveList;
+	for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
+	{
+		QDir dirEntry(sDirs[iDirIndex]);
+		HyGlobal::RecursiveFindFileOfExt("wav", sImportWaveList, dirEntry);
+	}
 
-    if(sImportWaveList.empty() == false)
-    {
-        ImportWaves(sImportWaveList);
-        Refresh();
-    }
+	if(sImportWaveList.empty() == false)
+	{
+		ImportWaves(sImportWaveList);
+		Refresh();
+	}
 }
 
 void AudioWidgetBank::ImportWaves(QStringList sWaveFileList)
 {
-    for(int i = 0; i < sWaveFileList.size(); ++i)
-    {
-        QFileInfo waveFileInfo(sWaveFileList[i]);
+	for(int i = 0; i < sWaveFileList.size(); ++i)
+	{
+		QFileInfo waveFileInfo(sWaveFileList[i]);
 
-        quint32 uiChecksum;
-        QString sName;
-        uint16 uiFormatType;
-        uint16 uiNumChannels;
-        uint16 uiBitsPerSample;
-        uint32 uiSamplesPerSec;
-        
-        if(AudioWave::ParseWaveFile(waveFileInfo, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec))
-        {
-            AudioWave *pNewWave = m_pManager->CreateWave(GetId(), uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, 0);
-            if(pNewWave)
-            {
-                if(QFile::copy(waveFileInfo.absoluteFilePath(), m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName())))
-                {
-                    m_pModel->AddWave(pNewWave);
-                }
-                else
-                {
-                    HyGuiLog("WidgetAudioBank::ImportWaves could not copy wave to meta dir meta: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
-                }
+		quint32 uiChecksum;
+		QString sName;
+		uint16 uiFormatType;
+		uint16 uiNumChannels;
+		uint16 uiBitsPerSample;
+		uint32 uiSamplesPerSec;
+		
+		if(AudioWave::ParseWaveFile(waveFileInfo, uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec))
+		{
+			AudioWave *pNewWave = m_pManager->CreateWave(GetId(), uiChecksum, sName, uiFormatType, uiNumChannels, uiBitsPerSample, uiSamplesPerSec, 0);
+			if(pNewWave)
+			{
+				if(QFile::copy(waveFileInfo.absoluteFilePath(), m_MetaDir.absoluteFilePath(pNewWave->ConstructWaveFileName())))
+				{
+					m_pModel->AddWave(pNewWave);
+				}
+				else
+				{
+					HyGuiLog("WidgetAudioBank::ImportWaves could not copy wave to meta dir meta: " % waveFileInfo.absoluteFilePath(), LOGTYPE_Error);
+				}
 
 //                QFile waveFile(waveFileInfo.absoluteFilePath());
 //                if(!waveFile.open(QIODevice::ReadOnly))
@@ -186,9 +186,9 @@ void AudioWidgetBank::ImportWaves(QStringList sWaveFileList)
 
 //                QByteArray waveData = waveFile.readAll();
 //                waveFile.close();
-            }
-        }
-    }
+			}
+		}
+	}
 }
 
 void AudioWidgetBank::Refresh()
@@ -714,30 +714,30 @@ void AudioWidgetBank::Refresh()
 //        }
 //    }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // WRITE SETTINGS FILE TO AUDIO META DIR
-    QJsonObject settingsObj;
-    m_pModel->GetJsonObj(settingsObj);
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// WRITE SETTINGS FILE TO AUDIO META DIR
+	QJsonObject settingsObj;
+	m_pModel->GetJsonObj(settingsObj);
 
-    QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
-    if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-       HyGuiLog("Couldn't open audio settings file for writing", LOGTYPE_Error);
-    }
-    else
-    {
-        QJsonDocument settingsDoc(settingsObj);
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+	if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+	   HyGuiLog("Couldn't open audio settings file for writing", LOGTYPE_Error);
+	}
+	else
+	{
+		QJsonDocument settingsDoc(settingsObj);
 
 #ifdef HYGUI_UseBinaryMetaFiles
-        qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
+		qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
 #else
-        qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+		qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
 #endif
-        if(0 == iBytesWritten || -1 == iBytesWritten)
-        {
-            HyGuiLog("Could not write to audio settings file: " % settingsFile.errorString(), LOGTYPE_Error);
-        }
+		if(0 == iBytesWritten || -1 == iBytesWritten)
+		{
+			HyGuiLog("Could not write to audio settings file: " % settingsFile.errorString(), LOGTYPE_Error);
+		}
 
-        settingsFile.close();
-    }
+		settingsFile.close();
+	}
 }

@@ -1,10 +1,10 @@
 /**************************************************************************
- *	HyGuiDebugger.h
+ *	HarmonyConnection.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef HARMONYCONNECTION_H
@@ -21,34 +21,34 @@
 
 class HarmonyConnection : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    QTcpSocket      m_Socket;
+	QTcpSocket      m_Socket;
 
-    QHostAddress    m_Address;
-    quint16         m_uiPort;
+	QHostAddress    m_Address;
+	quint16         m_uiPort;
 
-    quint32         m_uiPacketType;
-    quint32         m_uiPacketSize;
+	quint32         m_uiPacketType;
+	quint32         m_uiPacketSize;
 
 public:
-    explicit HarmonyConnection(QObject *parent = 0);
+	explicit HarmonyConnection(QObject *parent = 0);
 
-    void Connect();
+	void Connect();
 
-    void Write(eHyPacketType eType, quint32 uiSize, void *pData);
-    
-    void WriteReloadPacket(QStringList &sPaths);
-    
+	void Write(eHyPacketType eType, quint32 uiSize, void *pData);
+	
+	void WriteReloadPacket(QStringList &sPaths);
+	
 Q_SIGNALS:
-    
+	
 public Q_SLOTS:
-    void OnHostFound();
+	void OnHostFound();
 
 private Q_SLOTS:
-    void ReadData();
-    void OnError(QAbstractSocket::SocketError socketError);
-    
+	void ReadData();
+	void OnError(QAbstractSocket::SocketError socketError);
+	
 };
 
 #endif // HARMONYCONNECTION_H

@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef PROJECTITEM_H
@@ -24,62 +24,62 @@ class IModel;
 
 class ProjectItem : public ExplorerTreeItem
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    friend class Project;
+	friend class Project;
 
-    Project &               m_ProjectRef;
-    QJsonValue              m_SaveValue;
-    bool                    m_bExistencePendingSave;
+	Project &               m_ProjectRef;
+	QJsonValue              m_SaveValue;
+	bool                    m_bExistencePendingSave;
 
-    // Loaded in constructor
-    IModel *                m_pModel;
-    QUndoStack *            m_pUndoStack;
-    QAction *               m_pActionUndo;
-    QAction *               m_pActionRedo;
+	// Loaded in constructor
+	IModel *                m_pModel;
+	QUndoStack *            m_pUndoStack;
+	QAction *               m_pActionUndo;
+	QAction *               m_pActionRedo;
 
-    // Loaded when item is opened
-    QWidget *               m_pWidget;
-    IDraw *                 m_pDraw;
-    
+	// Loaded when item is opened
+	QWidget *               m_pWidget;
+	IDraw *                 m_pDraw;
+	
 public:
-    ProjectItem(Project &projRef, HyGuiItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
-    virtual ~ProjectItem();
+	ProjectItem(Project &projRef, HyGuiItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
+	virtual ~ProjectItem();
 
-    void LoadModel();
-    
-    Project &GetProject();
+	void LoadModel();
+	
+	Project &GetProject();
 
-    IModel *GetModel()                              { return m_pModel; }
-    QWidget *GetWidget()                            { return m_pWidget; }
-    IDraw *GetDraw()                                { return m_pDraw; }
-    QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
-    
-    void GiveMenuActions(QMenu *pMenu);
-    void Save();
-    bool IsExistencePendingSave();
-    bool IsSaveClean();
-    void DiscardChanges();
-    
-    void BlockAllWidgetSignals(bool bBlock);
+	IModel *GetModel()                              { return m_pModel; }
+	QWidget *GetWidget()                            { return m_pWidget; }
+	IDraw *GetDraw()                                { return m_pDraw; }
+	QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
+	
+	void GiveMenuActions(QMenu *pMenu);
+	void Save();
+	bool IsExistencePendingSave();
+	bool IsSaveClean();
+	void DiscardChanges();
+	
+	void BlockAllWidgetSignals(bool bBlock);
 
-    void FocusWidgetState(int iStateIndex, QVariant subState);
-    
-    void DeleteFromProject();
-    
+	void FocusWidgetState(int iStateIndex, QVariant subState);
+	
+	void DeleteFromProject();
+	
 private:
-    void WidgetLoad();
-    void WidgetUnload();
-    
-    void DrawLoad(IHyApplication &hyApp);
-    void DrawUnload();
-    void DrawShow();
-    void DrawHide();
+	void WidgetLoad();
+	void WidgetUnload();
+	
+	void DrawLoad(IHyApplication &hyApp);
+	void DrawUnload();
+	void DrawShow();
+	void DrawHide();
 
 private Q_SLOTS:
-    void on_undoStack_cleanChanged(bool bClean);
-    void on_undoStack_indexChanged(int iIndex);
-    
+	void on_undoStack_cleanChanged(bool bClean);
+	void on_undoStack_indexChanged(int iIndex);
+	
 };
 Q_DECLARE_METATYPE(ProjectItem *)
 

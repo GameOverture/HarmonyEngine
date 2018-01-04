@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "AudioWidget.h"
@@ -18,27 +18,27 @@
 #include <QJsonObject>
 
 AudioWidget::AudioWidget(ProjectItem &itemRef, QWidget *parent) :   QWidget(parent),
-                                                                    ui(new Ui::AudioWidget),
-                                                                    m_ItemRef(itemRef),
-                                                                    m_pCurAudioState(NULL)
+																	ui(new Ui::AudioWidget),
+																	m_ItemRef(itemRef),
+																	m_pCurAudioState(NULL)
 {
-    ui->setupUi(this);
-    
-    ui->btnAddState->setDefaultAction(ui->actionAddState);
-    ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
-    ui->btnRenameState->setDefaultAction(ui->actionRenameState);
-    ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
-    ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
+	ui->setupUi(this);
+	
+	ui->btnAddState->setDefaultAction(ui->actionAddState);
+	ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
+	ui->btnRenameState->setDefaultAction(ui->actionRenameState);
+	ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
+	ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
 
-    m_StateActionsList.push_back(ui->actionImportWaves);
-    m_StateActionsList.push_back(ui->actionRemoveWave);
-    m_StateActionsList.push_back(ui->actionOrderWaveUpwards);
-    m_StateActionsList.push_back(ui->actionOrderWaveDownwards);
+	m_StateActionsList.push_back(ui->actionImportWaves);
+	m_StateActionsList.push_back(ui->actionRemoveWave);
+	m_StateActionsList.push_back(ui->actionOrderWaveUpwards);
+	m_StateActionsList.push_back(ui->actionOrderWaveDownwards);
 
-    ui->cmbStates->clear();
-    
-    
-    
+	ui->cmbStates->clear();
+	
+	
+	
 //    // If a .hyaud file exists, parse and initalize with it, otherwise make default empty audio
 //    QFile audioFile(m_pItemAudio->GetAbsPath());
 //    if(audioFile.exists())
@@ -52,42 +52,42 @@ AudioWidget::AudioWidget(ProjectItem &itemRef, QWidget *parent) :   QWidget(pare
 //        QJsonObject fontObj = fontJsonDoc.object();
 //    }
 //    else
-    {
-        on_actionAddState_triggered();
-    }
-    
-    // Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
-    //m_pItemAudio->GetUndoStack()->clear();
+	{
+		on_actionAddState_triggered();
+	}
+	
+	// Clear the UndoStack because we don't want any of the above initialization to be able to be undone.
+	//m_pItemAudio->GetUndoStack()->clear();
 
-    UpdateActions();
+	UpdateActions();
 }
 
 AudioWidget::~AudioWidget()
 {
-    delete ui;
+	delete ui;
 }
 
 ProjectItem &AudioWidget::GetItem()
 {
-    return m_ItemRef;
+	return m_ItemRef;
 }
 
 QComboBox *AudioWidget::GetCmbStates()
 {
-    return ui->cmbStates;
+	return ui->cmbStates;
 }
 
 void AudioWidget::UpdateActions()
 {
-    ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
-    ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
-    ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+	ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
+	ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
+	ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 }
 
 void AudioWidget::on_actionAddState_triggered()
 {
-    //QUndoCommand *pCmd = new UndoCmd_AddState<AudioWidget, AudioWidgetState>("Add Audio State", this, nullptr, m_StateActionsList, ui->cmbStates);
-    //m_pItemAudio->GetUndoStack()->push(pCmd);
+	//QUndoCommand *pCmd = new UndoCmd_AddState<AudioWidget, AudioWidgetState>("Add Audio State", this, nullptr, m_StateActionsList, ui->cmbStates);
+	//m_pItemAudio->GetUndoStack()->push(pCmd);
 }
 
 void AudioWidget::on_actionRemoveState_triggered()
@@ -121,20 +121,20 @@ void AudioWidget::on_actionOrderStateForwards_triggered()
 
 void AudioWidget::on_cmbStates_currentIndexChanged(int index)
 {
-    AudioWidgetState *pAudioState = ui->cmbStates->itemData(index).value<AudioWidgetState *>();
-    if(m_pCurAudioState == pAudioState)
-        return;
+	AudioWidgetState *pAudioState = ui->cmbStates->itemData(index).value<AudioWidgetState *>();
+	if(m_pCurAudioState == pAudioState)
+		return;
 
-    if(m_pCurAudioState)
-        m_pCurAudioState->hide();
+	if(m_pCurAudioState)
+		m_pCurAudioState->hide();
 
-    if(pAudioState)
-    {
-        ui->grpStateLayout->addWidget(pAudioState);
-    
-        m_pCurAudioState = pAudioState;
-        m_pCurAudioState->show();
-    }
+	if(pAudioState)
+	{
+		ui->grpStateLayout->addWidget(pAudioState);
+	
+		m_pCurAudioState = pAudioState;
+		m_pCurAudioState->show();
+	}
 
-    UpdateActions();
+	UpdateActions();
 }

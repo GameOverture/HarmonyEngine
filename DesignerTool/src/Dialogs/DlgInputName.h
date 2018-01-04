@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef DLGINPUTNAME_H
@@ -19,25 +19,25 @@ class DlgInputName;
 
 class DlgInputName : public QDialog
 {
-    Q_OBJECT
-    
-    void CtorInit(QString sDlgTitle, QString sCurName);
+	Q_OBJECT
+	
+	void CtorInit(QString sDlgTitle, QString sCurName);
 
 public:
-    explicit DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent = 0);
-    explicit DlgInputName(const QString sDlgTitle, ExplorerTreeItem *pItem, QWidget *parent = 0);
-    ~DlgInputName();
-    
-    QString GetName();
-    
+	explicit DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent = 0);
+	explicit DlgInputName(const QString sDlgTitle, ExplorerTreeItem *pItem, QWidget *parent = 0);
+	~DlgInputName();
+	
+	QString GetName();
+	
 private Q_SLOTS:
-    void on_txtName_textChanged(const QString &arg1);
-    
+	void on_txtName_textChanged(const QString &arg1);
+	
 private:
-    Ui::DlgInputName *ui;
+	Ui::DlgInputName *ui;
 
-    
-    void ErrorCheck();
+	
+	void ErrorCheck();
 };
 
 #endif // DLGINPUTNAME_H

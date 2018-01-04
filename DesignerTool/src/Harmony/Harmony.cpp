@@ -1,3 +1,12 @@
+/**************************************************************************
+*	Harmony.cpp
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #include "Harmony.h"
 #include "MainWindow.h"
 #include "HarmonyWidget.h"

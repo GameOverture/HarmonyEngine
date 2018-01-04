@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef WIDGETLIVEVARIABLE_H
@@ -18,14 +18,14 @@ class WidgetLiveVariable;
 
 class WidgetLiveVariable : public QWidget
 {
-    Q_OBJECT
-    
+	Q_OBJECT
+	
 public:
-    explicit WidgetLiveVariable(QWidget *parent = 0);
-    ~WidgetLiveVariable();
-    
+	explicit WidgetLiveVariable(QWidget *parent = 0);
+	~WidgetLiveVariable();
+	
 private:
-    Ui::WidgetLiveVariable *ui;
+	Ui::WidgetLiveVariable *ui;
 };
 
 #endif // WIDGETLIVEVARIABLE_H

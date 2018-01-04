@@ -1,10 +1,10 @@
 /**************************************************************************
- *	WidgetAudioManager.h
+ *	AudioWidgetManager.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef AUDIOWIDGETMANAGER_H
@@ -23,47 +23,47 @@ class AudioWidgetManager;
 
 class AudioWidgetManager : public QWidget
 {
-    Q_OBJECT
-    
-    Project *                   m_pProjOwner;
-    
-    QDir                            m_MetaDir;
-    QDir                            m_DataDir;
+	Q_OBJECT
+	
+	Project *                   m_pProjOwner;
+	
+	QDir                            m_MetaDir;
+	QDir                            m_DataDir;
 
-    QMap<quint32, AudioWave *>      m_DependencyMap;
+	QMap<quint32, AudioWave *>      m_DependencyMap;
 
-    AudioManagerStringListModel *       m_pBankModel;
-    AudioCategoryStringListModel *      m_pCategoryModel;
-    AudioCategoryDelegate *   m_pCategoryDelegate;
+	AudioManagerStringListModel *       m_pBankModel;
+	AudioCategoryStringListModel *      m_pCategoryModel;
+	AudioCategoryDelegate *   m_pCategoryDelegate;
 
 public:
-    explicit AudioWidgetManager(QWidget *parent = 0);
-    explicit AudioWidgetManager(Project *pProjOwner, QWidget *parent = 0);
-    ~AudioWidgetManager();
+	explicit AudioWidgetManager(QWidget *parent = 0);
+	explicit AudioWidgetManager(Project *pProjOwner, QWidget *parent = 0);
+	~AudioWidgetManager();
 
-    Project *GetItemProject();
-    
-    AudioWave *CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors);
-    
-    AudioCategoryStringListModel *GetCategoryModel();
+	Project *GetItemProject();
+	
+	AudioWave *CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors);
+	
+	AudioCategoryStringListModel *GetCategoryModel();
 
 private Q_SLOTS:
-    void on_cmbAudioBanks_currentIndexChanged(int index);
-    
-    void on_actionAddCategory_triggered();
-    
-    void on_actionRemoveCategory_triggered();
-    
-    void on_actionAddAudioBank_triggered();
-    
-    void on_actionDeleteAudioBank_triggered();
+	void on_cmbAudioBanks_currentIndexChanged(int index);
+	
+	void on_actionAddCategory_triggered();
+	
+	void on_actionRemoveCategory_triggered();
+	
+	void on_actionAddAudioBank_triggered();
+	
+	void on_actionDeleteAudioBank_triggered();
 
-    void on_categoryList_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-    
+	void on_categoryList_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+	
 private:
-    Ui::AudioWidgetManager *ui;
-    
-    void AddAudioBankGroup(int iId = -1);
+	Ui::AudioWidgetManager *ui;
+	
+	void AddAudioBankGroup(int iId = -1);
 };
 
 #endif // AUDIOWIDGETMANAGER_H

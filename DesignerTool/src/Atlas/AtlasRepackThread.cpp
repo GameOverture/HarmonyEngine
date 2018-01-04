@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2017 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "AtlasRepackThread.h"
@@ -23,5 +23,5 @@ AtlasRepackThread::AtlasRepackThread()
 //    while(m_pCurrentRenderer && m_pCurrentRenderer->IsLoading())
 //    { }
 
-    Q_EMIT RepackIsFinished();
+	Q_EMIT RepackIsFinished();
 }

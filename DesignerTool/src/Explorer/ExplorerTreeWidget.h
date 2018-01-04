@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2017 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef EXPLORERTREEWIDGET_H
@@ -18,23 +18,23 @@ class ExplorerWidget;
 
 class ExplorerTreeWidget : public QTreeWidget
 {
-    ExplorerWidget *         m_pOwnerWidget;
+	ExplorerWidget *         m_pOwnerWidget;
 
-    ProjectItem *           m_pDraggedProjItem;
-    QPoint                  m_ptDragStart;
+	ProjectItem *           m_pDraggedProjItem;
+	QPoint                  m_ptDragStart;
 
 public:
-    ExplorerTreeWidget(QWidget *pParent = nullptr);
-    virtual ~ExplorerTreeWidget();
+	ExplorerTreeWidget(QWidget *pParent = nullptr);
+	virtual ~ExplorerTreeWidget();
 
-    void SetOwner(ExplorerWidget *pOwner);
+	void SetOwner(ExplorerWidget *pOwner);
 
 protected:
-    virtual void mousePressEvent(QMouseEvent *pEvent) override;
-    virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
+	virtual void mousePressEvent(QMouseEvent *pEvent) override;
+	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 
-    virtual void dragEnterEvent(QDragEnterEvent *pEvent) override;
-    virtual void dropEvent(QDropEvent *pEvent) override;
+	virtual void dragEnterEvent(QDragEnterEvent *pEvent) override;
+	virtual void dropEvent(QDropEvent *pEvent) override;
 };
 
 #endif // EXPLORERTREEWIDGET_H

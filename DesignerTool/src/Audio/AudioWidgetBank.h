@@ -1,10 +1,10 @@
 /**************************************************************************
- *	WidgetAudioBank.h
+ *	AudioWidgetBank.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef AUDIOWIDGETBANK_H
@@ -23,37 +23,37 @@ class AudioWidgetManager;
 
 class AudioWidgetBank : public QWidget
 {
-    Q_OBJECT
-    
-    // NOTE: Order of these member variables matter here for the member initializer list
-    AudioWidgetManager *        m_pManager;
-    
-    QDir                        m_MetaDir;
-    QDir                        m_DataDir;
-    
-    AudioBankTableModel *      m_pModel;
+	Q_OBJECT
+	
+	// NOTE: Order of these member variables matter here for the member initializer list
+	AudioWidgetManager *        m_pManager;
+	
+	QDir                        m_MetaDir;
+	QDir                        m_DataDir;
+	
+	AudioBankTableModel *      m_pModel;
 
 public:
-    explicit AudioWidgetBank(QWidget *parent = 0);
-    explicit AudioWidgetBank(QDir metaDir, QDir dataDir, AudioWidgetManager *pManager, QWidget *pParent = 0);
-    ~AudioWidgetBank();
-    
-    QString GetName();
-    void SetName(QString sName);
-    
-    int GetId();
+	explicit AudioWidgetBank(QWidget *parent = 0);
+	explicit AudioWidgetBank(QDir metaDir, QDir dataDir, AudioWidgetManager *pManager, QWidget *pParent = 0);
+	~AudioWidgetBank();
+	
+	QString GetName();
+	void SetName(QString sName);
+	
+	int GetId();
 
 private Q_SLOTS:
-    void on_btnAddWaves_pressed();
+	void on_btnAddWaves_pressed();
 
-    void on_btnAddDir_pressed();
+	void on_btnAddDir_pressed();
 
 private:
-    Ui::AudioWidgetBank *ui;
+	Ui::AudioWidgetBank *ui;
 
-    void ImportWaves(QStringList sWaveFileList);
+	void ImportWaves(QStringList sWaveFileList);
 
-    void Refresh();
+	void Refresh();
 };
 
 #endif // AUDIOWIDGETBANK_H

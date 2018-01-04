@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "MainWindow.h"
@@ -16,17 +16,17 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+	QApplication a(argc, argv);
 
-    qRegisterMetaTypeStreamOperators<AtlasFrame *>("AtlasFrame *");
-    qRegisterMetaTypeStreamOperators<ExplorerTreeItem *>("ExplorerTreeItem *");
-    //qRegisterMetaTypeStreamOperators<ProjectItem *>("ProjectItem *");
+	qRegisterMetaTypeStreamOperators<AtlasFrame *>("AtlasFrame *");
+	qRegisterMetaTypeStreamOperators<ExplorerTreeItem *>("ExplorerTreeItem *");
+	//qRegisterMetaTypeStreamOperators<ProjectItem *>("ProjectItem *");
 
-    HyGlobal::Initialize();
-    DlgProjectSettings::InitDefaultValues();
+	HyGlobal::Initialize();
+	DlgProjectSettings::InitDefaultValues();
 
-    MainWindow w;
-    w.show();
+	MainWindow w;
+	w.show();
 
-    return a.exec();
+	return a.exec();
 }
