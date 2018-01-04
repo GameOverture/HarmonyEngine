@@ -926,6 +926,8 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 	// Set vertex attribute pointers to the vertex data locations in bound buffer
 	size_t uiStartOffset = pRenderState->GetDataOffset();
 	HyShader *pShader = sm_ShaderMap[hShaderHandle];
+	HyAssert(pShader, "HyShader not found for render state: " << pRenderState->GetId());
+
 	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
 
 	// TODO: if OpenGL 4.3 is available

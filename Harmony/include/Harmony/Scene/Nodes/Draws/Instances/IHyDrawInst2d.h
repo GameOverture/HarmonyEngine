@@ -118,6 +118,8 @@ public:
 		delete m_pData;
 		m_pData = HY_NEW HYDATATYPE("+HyGuiOverride", dataValueRef, *sm_pHyAssets);
 		OnDataAcquired();
+		if(m_hShader == HY_UNUSED_HANDLE)
+			m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
 	}
 #endif
 };
