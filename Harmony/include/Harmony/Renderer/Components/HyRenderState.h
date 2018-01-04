@@ -40,6 +40,8 @@ public:
 	HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOffset, /*const*/ IHyDrawInst2d &instanceRef);
 	~HyRenderState(void);
 
+	uint32 GetId() const;
+
 	size_t GetDataOffset() const;
 	uint32 GetCullMask() const;
 	HyRenderMode GetRenderMode() const;

@@ -24,6 +24,8 @@ HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOf
 																																m_iCoordinateSystem(instanceRef.GetCoordinateSystem()),
 																																m_uiExDataSize(0)
 {
+	HyAssert(m_hShader != HY_UNUSED_HANDLE, "HyRenderState was assigned a null shader");
+
 	m_ScissorRect.iTag = HY_UNUSED_HANDLE;
 	instanceRef.GetWorldScissor(m_ScissorRect);
 
@@ -53,6 +55,11 @@ HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOf
 HyRenderState::~HyRenderState(void)
 {
 	HyError("~HyRenderState dtor was called somehow");
+}
+
+uint32 HyRenderState::GetId() const
+{
+	return m_uiID;
 }
 
 size_t HyRenderState::GetDataOffset() const
