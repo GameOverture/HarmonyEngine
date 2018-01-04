@@ -122,7 +122,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	return static_cast<const HyTexturedQuad2dData *>(AcquireData())->GetAtlas()->GetHeight();
 }
 
-/*virtual*/ void HyTexturedQuad2d::OnDataAcquired() /*override*/
+/*virtual*/ void HyTexturedQuad2d::OnLoaded() /*override*/
 {
 	if(m_bIsRaw == false)
 		m_hTextureHandle = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
