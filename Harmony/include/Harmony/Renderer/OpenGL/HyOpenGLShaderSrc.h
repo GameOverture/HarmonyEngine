@@ -33,7 +33,6 @@ layout(location = 8) in mat4	attr_mtxLocalToWorld;
 smooth out vec2					interp_vUV;
 smooth out vec4					interp_vColor;
 
-//////////////////////////////////////////////////////////////////////////
 const vec2 g_vPOSITION[] = vec2[4](vec2(1.0f, 1.0f),
 								   vec2(0.0f, 1.0f),
 								   vec2(1.0f, 0.0f),
@@ -49,7 +48,6 @@ vec4 g_vCOLORS[] = vec4[4](attr_vTopTint,
 						   attr_vBotTint,
 						   attr_vBotTint);
 
-//////////////////////////////////////////////////////////////////////////
 void main()
 {
 	interp_vUV = g_vUVCOORDS[gl_VertexID];
@@ -75,7 +73,6 @@ smooth in vec4		interp_vColor;
 
 out vec4			out_vColor;
 
-//////////////////////////////////////////////////////////////////////////
 void main()
 {
 	// Blend interp_vColor with whatever texel I get from interp_vUV
@@ -101,7 +98,6 @@ uniform vec4					u_vColor;
 
 layout(location = 0) in vec2	attr_vPosition;
 
-//////////////////////////////////////////////////////////////////////////
 void main()
 {
 	vec4 vTemp = u_mtxTransform * vec4(attr_vPosition, 0, 1);
@@ -116,7 +112,6 @@ const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
 uniform vec4	u_vColor;
 out vec4		out_vColor;
 
-//////////////////////////////////////////////////////////////////////////
 void main()
 {
 	out_vColor = u_vColor;
