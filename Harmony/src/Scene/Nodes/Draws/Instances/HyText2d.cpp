@@ -115,7 +115,7 @@ void HyText2d::TextSet(const std::string sText)
 	uint32 uiNumBytesUsed = 0;
 	for(uint32 i = 0; i < m_sRawString.size(); i += uiNumBytesUsed)
 	{
-		m_Utf32CodeList.push_back(HyUtf8_to_Utf32(&m_sRawString[i], uiNumBytesUsed));
+		m_Utf32CodeList.push_back(HyStr::HyUtf8_to_Utf32(&m_sRawString[i], uiNumBytesUsed));
 		HyAssert(uiNumBytesUsed > 0, "HyText2d::TextSet failed to convert utf8 -> utf32");
 	}
 

@@ -63,7 +63,7 @@ const tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, cons
 	return &m_DataList[iter->second];
 }
 
-HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
+HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
 																	m_SceneRef(sceneRef),
 																	m_pAtlases(nullptr),
 																	m_uiNumAtlases(0),
