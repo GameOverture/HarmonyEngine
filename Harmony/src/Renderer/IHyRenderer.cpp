@@ -87,7 +87,8 @@ void IHyRenderer::PrepareBuffers()
 		const std::vector<IHyDrawInst2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
 		{
-			if(instanceListRef[i]->IsEnabled() == false)
+			// TODO JAY Stencil fix 
+			if(instanceListRef[i]->IsLoaded() == false)
 				continue;
 
 			instanceListRef[i]->OnUpdateUniforms();
