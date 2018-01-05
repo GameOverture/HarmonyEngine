@@ -18,7 +18,7 @@
 #include <QJsonObject>
 
 ExplorerTreeItem::ExplorerTreeItem(HyGuiItemType eType, const QString sPath) :  m_eTYPE(eType),
-																				m_sPATH(MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
+                                                                                m_sPATH(HyStr::MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
 																				m_bIsProjectItem(false)
 {
 	m_pTreeItemPtr = new QTreeWidgetItem();
