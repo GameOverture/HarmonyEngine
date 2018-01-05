@@ -87,6 +87,9 @@ void IHyRenderer::PrepareBuffers()
 		const std::vector<IHyDrawInst2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
 		{
+			if(instanceListRef[i]->IsEnabled() == false)
+				continue;
+
 			instanceListRef[i]->OnUpdateUniforms();
 			AppendRenderState(0, *instanceListRef[i], HY_FULL_CULL_MASK);
 		}
