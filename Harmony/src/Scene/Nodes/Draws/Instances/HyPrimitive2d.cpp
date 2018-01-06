@@ -114,6 +114,9 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 	switch(m_BoundingVolume.GetType())
 	{
+	case HYSHAPE_Unknown:	// Shape hasn't been set yet by user
+		break;
+
 	case HYSHAPE_LineSegment: {
 		std::vector<b2Vec2> pointList;
 		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1);
@@ -158,6 +161,35 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 	m_bDirty = false;
 }
 
+/*virtual*/ void HyPrimitive2d::OnUpdateUniforms()
+{
+	glm::mat4 mtx;
+	GetWorldTransform(mtx);
+
+	// TODO: Get rid of top/bot color
+	glm::vec3 tint = CalculateTopTint();
+	glm::vec4 vTop;
+	vTop.x = tint.x;
+	vTop.y = tint.y;
+	vTop.z = tint.z;
+	vTop.a = CalculateAlpha();
+
+	m_ShaderUniforms.Set("u_mtxTransform", mtx);
+	m_ShaderUniforms.Set("u_vColor", vTop);
+
+	//if(m_RenderState.GetShaderId() == HYSHADERPROG_Lines2d)
+	//{
+	//	m_ShaderUniforms.Set("u_fHalfWidth", m_RenderState.GetLineThickness() * 0.5f);
+	//	m_ShaderUniforms.Set("u_fFeatherAmt", 2.0f);	// Feather amount is how much anti-aliasing to apply. Greater values will make line fuzzier
+	//}
+}
+
+/*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
+{
+	memcpy(pRefDataWritePos, m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
+	pRefDataWritePos += m_uiNumVerts * sizeof(glm::vec2);
+}
+
 void HyPrimitive2d::ClearData()
 {
 	delete [] m_pVertBuffer;
@@ -165,6 +197,7 @@ void HyPrimitive2d::ClearData()
 	m_uiNumVerts = 0;
 
 	m_eRenderMode = HYRENDERMODE_Unknown;
+	m_BoundingVolume.SetAsNothing();
 	m_ShaderUniforms.Clear();
 }
 
@@ -353,33 +386,4 @@ void HyPrimitive2d::SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices)
 		m_pVertBuffer[uiBufferIndex].y = pVertexList[i+1].y;
 		uiBufferIndex++;
 	}
-}
-
-/*virtual*/ void HyPrimitive2d::OnUpdateUniforms()
-{
-	glm::mat4 mtx;
-	GetWorldTransform(mtx);
-
-	// TODO: Get rid of top/bot color
-	glm::vec3 tint = CalculateTopTint();
-	glm::vec4 vTop;
-	vTop.x = tint.x;
-	vTop.y = tint.y;
-	vTop.z = tint.z;
-	vTop.a = CalculateAlpha();
-	
-	m_ShaderUniforms.Set("u_mtxTransform", mtx);
-	m_ShaderUniforms.Set("u_vColor", vTop);
-
-	//if(m_RenderState.GetShaderId() == HYSHADERPROG_Lines2d)
-	//{
-	//	m_ShaderUniforms.Set("u_fHalfWidth", m_RenderState.GetLineThickness() * 0.5f);
-	//	m_ShaderUniforms.Set("u_fFeatherAmt", 2.0f);	// Feather amount is how much anti-aliasing to apply. Greater values will make line fuzzier
-	//}
-}
-
-/*virtual*/ void HyPrimitive2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
-{
-	memcpy(pRefDataWritePos, m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
-	pRefDataWritePos += m_uiNumVerts * sizeof(glm::vec2);
 }

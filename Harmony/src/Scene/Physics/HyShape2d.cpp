@@ -110,7 +110,12 @@ void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
 	}
 }
 
-b2Shape *HyShape2d::GetB2Shape() const
+const b2Shape *HyShape2d::GetB2Shape() const
+{
+	return m_pShape;
+}
+
+b2Shape *HyShape2d::GetB2Shape()
 {
 	return m_pShape;
 }
@@ -118,6 +123,17 @@ b2Shape *HyShape2d::GetB2Shape() const
 bool HyShape2d::IsValid() const
 {
 	return m_pShape != nullptr && m_eType != HYSHAPE_Unknown;
+}
+
+void HyShape2d::SetAsNothing()
+{
+	m_eType = HYSHAPE_Unknown;
+
+	delete m_pShape;
+	m_pShape = nullptr;
+
+	if(m_pOwnerInst)
+		m_pOwnerInst->OnShapeSet(this);
 }
 
 void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)

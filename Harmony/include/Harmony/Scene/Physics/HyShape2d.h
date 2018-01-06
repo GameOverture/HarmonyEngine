@@ -31,9 +31,12 @@ public:
 
 	HyShapeType GetType() const;
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
-	b2Shape *GetB2Shape() const;
+	const b2Shape *GetB2Shape() const;
+	b2Shape *GetB2Shape();
 
 	bool IsValid() const;
+
+	void SetAsNothing();
 
 	// Set as an isolated edge.
 	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);
