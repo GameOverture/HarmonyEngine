@@ -4,7 +4,7 @@
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyInteropAfx.h"
@@ -38,7 +38,7 @@ void HyAssets::NodeData<tData>::Init(jsonxx::Object &subDirObjRef, HyAssets &ass
 	uint32 i = 0;
 	for(auto iter = subDirObjRef.kv_map().begin(); iter != subDirObjRef.kv_map().end(); ++iter, ++i)
 	{
-		std::string sPath = MakeStringProperPath(iter->first.c_str(), nullptr, true);
+		std::string sPath = HyStr::MakeStringProperPath(iter->first.c_str(), nullptr, true);
 		m_LookupIndexMap.insert(std::make_pair(sPath, i));
 
 		m_DataList.emplace_back(iter->first, subDirObjRef.get<jsonxx::Value>(iter->first), assetsRef);
@@ -51,10 +51,10 @@ const tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, cons
 	std::string sPath;
 
 	if(sPrefix.empty() == false)
-		sPath += MakeStringProperPath(sPrefix.c_str(), "/", true);
+		sPath += HyStr::MakeStringProperPath(sPrefix.c_str(), "/", true);
 
 	sPath += sName;
-	sPath = MakeStringProperPath(sPath.c_str(), nullptr, true);
+	sPath = HyStr::MakeStringProperPath(sPath.c_str(), nullptr, true);
 
 	auto iter = m_LookupIndexMap.find(sPath);
 	if(iter == m_LookupIndexMap.end())
@@ -63,7 +63,7 @@ const tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, cons
 	return &m_DataList[iter->second];
 }
 
-HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	m_sDATADIR(MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
+HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
 																	m_SceneRef(sceneRef),
 																	m_pAtlases(nullptr),
 																	m_uiNumAtlases(0),

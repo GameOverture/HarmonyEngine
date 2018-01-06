@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyLiveVarManager_h__
-#define __HyLiveVarManager_h__
+#ifndef HyLiveVarManager_h__
+#define HyLiveVarManager_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -71,4 +71,4 @@ public:
 	static HyLiveVar *GetLiveWatchPage(std::string sName);
 };
 
-#endif /* __HyLiveVarManager_h__ */
+#endif /* HyLiveVarManager_h__ */

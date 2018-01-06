@@ -1,3 +1,12 @@
+/**************************************************************************
+*	PropertiesTreeItem.h
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #ifndef PROPERTIESTREEITEM_H
 #define PROPERTIESTREEITEM_H
 
@@ -10,91 +19,91 @@ class PropertiesTreeModel;
 
 enum PropertiesType
 {
-    PROPERTIESTYPE_Root = 0,
-    PROPERTIESTYPE_Category,
-    PROPERTIESTYPE_CategoryChecked,
+	PROPERTIESTYPE_Root = 0,
+	PROPERTIESTYPE_Category,
+	PROPERTIESTYPE_CategoryChecked,
 
-    PROPERTIESTYPE_bool,
-    PROPERTIESTYPE_int,
-    PROPERTIESTYPE_double,          // delegateBuilder [int] = QDoubleSpinBox's decimals value. Aka percision.
-    PROPERTIESTYPE_ivec2,
-    PROPERTIESTYPE_vec2,
-    PROPERTIESTYPE_LineEdit,
-    PROPERTIESTYPE_ComboBox,        // delegateBuilder [QStringList] = QComboBox's selection list
-    PROPERTIESTYPE_StatesComboBox,  // delegateBuilder [ProjectItem *] = A pointer to the ProjectItem that owns this property
-    PROPERTIESTYPE_Slider,
-    PROPERTIESTYPE_SpriteFrames
+	PROPERTIESTYPE_bool,
+	PROPERTIESTYPE_int,
+	PROPERTIESTYPE_double,          // delegateBuilder [int] = QDoubleSpinBox's decimals value. Aka percision.
+	PROPERTIESTYPE_ivec2,
+	PROPERTIESTYPE_vec2,
+	PROPERTIESTYPE_LineEdit,
+	PROPERTIESTYPE_ComboBox,        // delegateBuilder [QStringList] = QComboBox's selection list
+	PROPERTIESTYPE_StatesComboBox,  // delegateBuilder [ProjectItem *] = A pointer to the ProjectItem that owns this property
+	PROPERTIESTYPE_Slider,
+	PROPERTIESTYPE_SpriteFrames
 };
 
 struct PropertiesDef
 {
-    PropertiesType  eType;
+	PropertiesType  eType;
 
-    QVariant        defaultData;
-    QVariant        minRange;
-    QVariant        maxRange;
-    QVariant        stepAmt;
-    QString         sPrefix;
-    QString         sSuffix;
+	QVariant        defaultData;
+	QVariant        minRange;
+	QVariant        maxRange;
+	QVariant        stepAmt;
+	QString         sPrefix;
+	QString         sSuffix;
 
-    QVariant        delegateBuilder; // Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
+	QVariant        delegateBuilder; // Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
 
-    PropertiesDef()
-    { }
+	PropertiesDef()
+	{ }
 
-    // Convience constructors
-    PropertiesDef(PropertiesType eType_,
-                  QVariant defaultData_) :  eType(eType_),
-                                            defaultData(defaultData_)
-    { }
-    PropertiesDef(PropertiesType eType_,
-                  QVariant defaultData_,
-                  QVariant minRange_,
-                  QVariant maxRange_,
-                  QVariant stepAmt_,
-                  QString sPrefix_,
-                  QString sSuffix_,
-                  QVariant delegateBuilder_ = QVariant()) : eType(eType_),
-                                                            defaultData(defaultData_),
-                                                            minRange(minRange_),
-                                                            maxRange(maxRange_),
-                                                            stepAmt(stepAmt_),
-                                                            sPrefix(sPrefix_),
-                                                            sSuffix(sSuffix_),
-                                                            delegateBuilder(delegateBuilder_)
-    { }
+	// Convience constructors
+	PropertiesDef(PropertiesType eType_,
+				  QVariant defaultData_) :  eType(eType_),
+											defaultData(defaultData_)
+	{ }
+	PropertiesDef(PropertiesType eType_,
+				  QVariant defaultData_,
+				  QVariant minRange_,
+				  QVariant maxRange_,
+				  QVariant stepAmt_,
+				  QString sPrefix_,
+				  QString sSuffix_,
+				  QVariant delegateBuilder_ = QVariant()) : eType(eType_),
+															defaultData(defaultData_),
+															minRange(minRange_),
+															maxRange(maxRange_),
+															stepAmt(stepAmt_),
+															sPrefix(sPrefix_),
+															sSuffix(sSuffix_),
+															delegateBuilder(delegateBuilder_)
+	{ }
 };
 
 class PropertiesTreeItem : public IModelTreeItem
 {
 protected:
-    const QString                               m_sNAME;
-    PropertiesTreeModel *                       m_pTreeModel;
+	const QString                               m_sNAME;
+	PropertiesTreeModel *                       m_pTreeModel;
 
-    QVariant                                    m_Data;
-    PropertiesDef                               m_DataDef;
+	QVariant                                    m_Data;
+	PropertiesDef                               m_DataDef;
 
-    QColor                                      m_Color;
-    QString                                     m_sToolTip;
+	QColor                                      m_Color;
+	QString                                     m_sToolTip;
 
 public:
-    explicit PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip);
-    virtual ~PropertiesTreeItem();
+	explicit PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip);
+	virtual ~PropertiesTreeItem();
 
-    bool IsCategory() const;
+	bool IsCategory() const;
 
-    PropertiesType GetType() const;
-    QString GetName() const;
-    QString GetValue() const;
+	PropertiesType GetType() const;
+	QString GetName() const;
+	QString GetValue() const;
 
-    QVariant GetData() const;
-    const PropertiesDef &GetDataDef() const;
+	QVariant GetData() const;
+	const PropertiesDef &GetDataDef() const;
 
-    QColor GetColor() const;
+	QColor GetColor() const;
 
-    void SetData(const QVariant &newData);
+	void SetData(const QVariant &newData);
 
-    virtual QString GetToolTip() const override;
+	virtual QString GetToolTip() const override;
 };
 
 #endif // PROPERTIESTREEITEM_H

@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2012 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyHeapPageMedium_h__
-#define __HyHeapPageMedium_h__
+#ifndef HyHeapPageMedium_h__
+#define HyHeapPageMedium_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -287,4 +287,4 @@ void HyMedHeapPage<TPageSize, TGranularity>::SanityCheck(void)
 
 //-------------------
 
-#endif /* __HyHeapPageMedium_h__ */
+#endif /* HyHeapPageMedium_h__ */

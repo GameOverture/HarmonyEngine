@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef ATLASFRAME_H
@@ -21,71 +21,71 @@ class AtlasTreeItem;
 
 class AtlasFrame
 {
-    friend class AtlasModel;
-    
-    const quint32                       m_uiUNIQUE_ID;
-    AtlasItemType                      m_eType;
-    
-    quint32                             m_uiAtlasGrpId;
+	friend class AtlasModel;
+	
+	const quint32                       m_uiUNIQUE_ID;
+	AtlasItemType                      m_eType;
+	
+	quint32                             m_uiAtlasGrpId;
 
-    AtlasTreeItem *                     m_pTreeWidgetItem;
+	AtlasTreeItem *                     m_pTreeWidgetItem;
 
-    quint32                             m_uiImageChecksum;
-    QString                             m_sName;
-    int                                 m_iWidth;
-    int                                 m_iHeight;
-    QRect                               m_rAlphaCrop;
+	quint32                             m_uiImageChecksum;
+	QString                             m_sName;
+	int                                 m_iWidth;
+	int                                 m_iHeight;
+	QRect                               m_rAlphaCrop;
 
-    int                                 m_iTextureIndex;
+	int                                 m_iTextureIndex;
 
-    int                                 m_iPosX;
-    int                                 m_iPosY;
+	int                                 m_iPosX;
+	int                                 m_iPosY;
 
-    QSet<ProjectItem *>                 m_DependencySet;
+	QSet<ProjectItem *>                 m_DependencySet;
 
-    uint                                m_uiErrors; // '0' when there is no error
+	uint                                m_uiErrors; // '0' when there is no error
 
-    // Private ctor as WidgetAtlasManager should only construct these
-    AtlasFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
-    ~AtlasFrame();
-    
+	// Private ctor as WidgetAtlasManager should only construct these
+	AtlasFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
+	~AtlasFrame();
+	
 public:
-    AtlasTreeItem *GetTreeItem();
+	AtlasTreeItem *GetTreeItem();
 
-    quint32 GetId();
-    
-    quint32 GetAtlasGrpId();
-    void SetAtlasGrpId(quint32 uiNewAtlasGrpId);
-    
-    quint32 GetImageChecksum();
-    QString GetName();
-    void SetName(QString sNewName);
-    QSize GetSize();
-    QRect GetCrop();
-    QPoint GetPosition();
-    QSet<ProjectItem *> GetLinks();
-    AtlasItemType GetType();
+	quint32 GetId();
+	
+	quint32 GetAtlasGrpId();
+	void SetAtlasGrpId(quint32 uiNewAtlasGrpId);
+	
+	quint32 GetImageChecksum();
+	QString GetName();
+	void SetName(QString sNewName);
+	QSize GetSize();
+	QRect GetCrop();
+	QPoint GetPosition();
+	QSet<ProjectItem *> GetLinks();
+	AtlasItemType GetType();
 
-    int GetTextureIndex();
-    int GetX();
-    int GetY();
-    QString GetFilter();
-    void SetFilter(QString sFilter);
+	int GetTextureIndex();
+	int GetX();
+	int GetY();
+	QString GetFilter();
+	void SetFilter(QString sFilter);
 
-    void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY);
+	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY);
 
-    QString ConstructImageFileName();
+	QString ConstructImageFileName();
 
-    void GetJsonObj(QJsonObject &frameObj);
+	void GetJsonObj(QJsonObject &frameObj);
 
-    void SetError(AtlasFrameError eError);
-    void ClearError(AtlasFrameError eError);
-    uint GetErrors();
+	void SetError(AtlasFrameError eError);
+	void ClearError(AtlasFrameError eError);
+	uint GetErrors();
 
 private:
-    void UpdateTreeItemIconAndToolTip();
-    bool DeleteMetaImage(QDir metaDir);
-    void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
+	void UpdateTreeItemIconAndToolTip();
+	bool DeleteMetaImage(QDir metaDir);
+	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
 };
 Q_DECLARE_METATYPE(AtlasFrame *)
 

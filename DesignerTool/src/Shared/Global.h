@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef GLOBAL_H
@@ -34,96 +34,96 @@ class Project;
 
 enum HyGuiItemType
 {
-    TYPE_Unknown = -1,
+	TYPE_Unknown = -1,
 
-    DIR_Audio = 0,
-    DIR_Particles,
-    DIR_Fonts,
-    DIR_Spine,
-    DIR_Sprites,
-    DIR_Shaders,
-    DIR_Entities,
-    DIR_Atlases,
-    DIR_AudioBanks,
+	DIR_Audio = 0,
+	DIR_Particles,
+	DIR_Fonts,
+	DIR_Spine,
+	DIR_Sprites,
+	DIR_Shaders,
+	DIR_Entities,
+	DIR_Atlases,
+	DIR_AudioBanks,
 
-    ITEM_Project,       // Sorted this way, so debugger uses "ITEM_Project" instead of "NUMDIR"
-    NUMDIR = ITEM_Project,
+	ITEM_Project,       // Sorted this way, so debugger uses "ITEM_Project" instead of "NUMDIR"
+	NUMDIR = ITEM_Project,
 
-    ITEM_Prefix,        // Essentially a sub-directory
-    ITEM_Primitive,
-    ITEM_AtlasImage,
-    ITEM_Audio,
-    ITEM_Particles,
-    ITEM_Font,
-    ITEM_Spine,
-    ITEM_Sprite,
-    ITEM_Shader,
-    ITEM_Entity,
-    ITEM_BoundingVolume,
-    ITEM_Physics,
+	ITEM_Prefix,        // Essentially a sub-directory
+	ITEM_Primitive,
+	ITEM_AtlasImage,
+	ITEM_Audio,
+	ITEM_Particles,
+	ITEM_Font,
+	ITEM_Spine,
+	ITEM_Sprite,
+	ITEM_Shader,
+	ITEM_Entity,
+	ITEM_BoundingVolume,
+	ITEM_Physics,
 
-    NUMTYPES,
-    NUMITEMS = NUMTYPES - NUMDIR
+	NUMTYPES,
+	NUMITEMS = NUMTYPES - NUMDIR
 };
 
 // NOTE: Do not rearrange the order of this enum
 enum AtlasItemType
 {
-    ATLASITEM_Unknown = -1,
+	ATLASITEM_Unknown = -1,
 
-    ATLASITEM_Filter = 0,
-    ATLASITEM_Image,
-    ATLASITEM_Font,
-    ATLASITEM_Spine,
+	ATLASITEM_Filter = 0,
+	ATLASITEM_Image,
+	ATLASITEM_Font,
+	ATLASITEM_Spine,
 
-    NUMATLASITEM
+	NUMATLASITEM
 };
 
 enum AtlasFrameError
 {
-    ATLASFRAMEERROR_CannotFindMetaImg = 0,
-    ATLASFRAMEERROR_CouldNotPack,
+	ATLASFRAMEERROR_CannotFindMetaImg = 0,
+	ATLASFRAMEERROR_CouldNotPack,
 
-    NUMATLASFRAMEERROR
+	NUMATLASFRAMEERROR
 };
 
 enum MdiArea
 {
-    MDI_MainWindow      = 1 << 0,
-    MDI_Explorer        = 1 << 1,
-    MDI_AtlasManager    = 1 << 2,
-    MDI_AudioManager    = 1 << 3,
-    MDI_ItemProperties  = 1 << 4,
-    MDI_Output          = 1 << 5,
+	MDI_MainWindow      = 1 << 0,
+	MDI_Explorer        = 1 << 1,
+	MDI_AtlasManager    = 1 << 2,
+	MDI_AudioManager    = 1 << 3,
+	MDI_ItemProperties  = 1 << 4,
+	MDI_Output          = 1 << 5,
 
-    NUM_MDI             = 6,
-    MDI_Managers        = (MDI_AtlasManager | MDI_AudioManager),
-    MDI_All             = (MDI_MainWindow | MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties | MDI_Output),
+	NUM_MDI             = 6,
+	MDI_Managers        = (MDI_AtlasManager | MDI_AudioManager),
+	MDI_All             = (MDI_MainWindow | MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties | MDI_Output),
 
-    MDILOAD_Renderer    = MDI_MainWindow//(MDI_Explorer | MDI_Managers | MDI_ItemProperties)
+	MDILOAD_Renderer    = MDI_MainWindow//(MDI_Explorer | MDI_Managers | MDI_ItemProperties)
 };
 
 enum SubIcon
 {
-    SUBICON_None = 0,
-    SUBICON_New,
-    SUBICON_Open,
-    SUBICON_Dirty,
-    SUBICON_Close,
-    SUBICON_Delete,
-    SUBICON_Settings,
-    SUBICON_Warning,
-    SUBICON_Pending,
+	SUBICON_None = 0,
+	SUBICON_New,
+	SUBICON_Open,
+	SUBICON_Dirty,
+	SUBICON_Close,
+	SUBICON_Delete,
+	SUBICON_Settings,
+	SUBICON_Warning,
+	SUBICON_Pending,
 
-    NUM_SUBICONS
+	NUM_SUBICONS
 };
 
 enum Theme
 {
-    THEME_Lappy486 = 0,
-    THEME_Compe,
+	THEME_Lappy486 = 0,
+	THEME_Compe,
 
-    NUMTHEMES
+	NUMTHEMES
 };
 
 #define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
@@ -153,67 +153,67 @@ QByteArray JsonValueToSrc(QJsonValue value);
 
 class HyGlobal
 {
-    static QString                  sm_sItemNames[NUMTYPES];
-    static QString                  sm_sSubIconNames[NUM_SUBICONS];
+	static QString                  sm_sItemNames[NUMTYPES];
+	static QString                  sm_sSubIconNames[NUM_SUBICONS];
 
-    static QIcon                    sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
-    static QColor                   sm_ItemColors[NUMTYPES];
+	static QIcon                    sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
+	static QColor                   sm_ItemColors[NUMTYPES];
 
-    static QString                  sm_Themes[NUMTHEMES];
+	static QString                  sm_Themes[NUMTHEMES];
 
-    static QRegExpValidator *       sm_pCodeNameValidator;
-    static QRegExpValidator *       sm_pFileNameValidator;
-    static QRegExpValidator *       sm_pFilePathValidator;
-    static QRegExpValidator *       sm_pVector2dValidator;
+	static QRegExpValidator *       sm_pCodeNameValidator;
+	static QRegExpValidator *       sm_pFileNameValidator;
+	static QRegExpValidator *       sm_pFilePathValidator;
+	static QRegExpValidator *       sm_pVector2dValidator;
 
-    static QString                  sm_ErrorStrings[NUMATLASFRAMEERROR];
+	static QString                  sm_ErrorStrings[NUMATLASFRAMEERROR];
 
 public:
-    static void Initialize();
+	static void Initialize();
 
-    static HyGuiItemType GetDirFromItem(HyGuiItemType eItem);
-    static HyGuiItemType GetItemFromDir(HyGuiItemType eDir);
-    static HyGuiItemType GetItemFromAtlasItem(AtlasItemType eFrameType);
-    static AtlasItemType GetAtlasItemFromItem(HyGuiItemType eItem);
-    static QList<HyGuiItemType> SubDirList();
-    static QStringList SubDirNameList();
-    static QString AtlasTextureTypeString(HyTextureFormat eType);
+	static HyGuiItemType GetDirFromItem(HyGuiItemType eItem);
+	static HyGuiItemType GetItemFromDir(HyGuiItemType eDir);
+	static HyGuiItemType GetItemFromAtlasItem(AtlasItemType eFrameType);
+	static AtlasItemType GetAtlasItemFromItem(HyGuiItemType eItem);
+	static QList<HyGuiItemType> SubDirList();
+	static QStringList SubDirNameList();
+	static QString AtlasTextureTypeString(HyTextureFormat eType);
 
-    static const QString ItemName(HyGuiItemType eItm)                  { return sm_sItemNames[eItm]; }
-    static const QString ItemExt(HyGuiItemType eItem);
-    static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)  { return sm_ItemIcons[eItm][eSubIcon]; }
-    static const QColor ItemColor(HyGuiItemType eItem)                  { return sm_ItemColors[eItem]; }
-    static const QString ThemeString(Theme eTheme)                      { return sm_Themes[eTheme]; }
+	static const QString ItemName(HyGuiItemType eItm)                  { return sm_sItemNames[eItm]; }
+	static const QString ItemExt(HyGuiItemType eItem);
+	static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)  { return sm_ItemIcons[eItm][eSubIcon]; }
+	static const QColor ItemColor(HyGuiItemType eItem)                  { return sm_ItemColors[eItem]; }
+	static const QString ThemeString(Theme eTheme)                      { return sm_Themes[eTheme]; }
 
-    static const QRegExpValidator *CodeNameValidator()                  { return sm_pCodeNameValidator; }
-    static const QRegExpValidator *FileNameValidator()                  { return sm_pFileNameValidator; }
-    static const QRegExpValidator *FilePathValidator()                  { return sm_pFilePathValidator; }
-    static const QRegExpValidator *Vector2dValidator()                  { return sm_pVector2dValidator; }
+	static const QRegExpValidator *CodeNameValidator()                  { return sm_pCodeNameValidator; }
+	static const QRegExpValidator *FileNameValidator()                  { return sm_pFileNameValidator; }
+	static const QRegExpValidator *FilePathValidator()                  { return sm_pFilePathValidator; }
+	static const QRegExpValidator *Vector2dValidator()                  { return sm_pVector2dValidator; }
 
-    static const QString GetGuiFrameErrors(uint uiErrorFlags);
+	static const QString GetGuiFrameErrors(uint uiErrorFlags);
 
-    static bool IsEngineDirValid(const QDir &engineDir);
+	static bool IsEngineDirValid(const QDir &engineDir);
 
-    static quint32 CRCData(quint32 crc, const uchar *buf, size_t len);
+	static quint32 CRCData(quint32 crc, const uchar *buf, size_t len);
 
-    static QString MakeFileNameFromCounter(int iCount);
+	static QString MakeFileNameFromCounter(int iCount);
 
-    static void RecursiveFindFileOfExt(QString sExt, QStringList &appendList, QDir dirEntry);
+	static void RecursiveFindFileOfExt(QString sExt, QStringList &appendList, QDir dirEntry);
 
-    static QString GetTreeWidgetItemPath(const QTreeWidgetItem *pItem);
+	static QString GetTreeWidgetItemPath(const QTreeWidgetItem *pItem);
 
-    // Includes 'pParentItem' in returned list
-    static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem);
+	// Includes 'pParentItem' in returned list
+	static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem);
 
-    static QDir PrepTempDir(Project *pProject);
+	static QDir PrepTempDir(Project *pProject);
 };
 
 struct SortTreeWidgetsPredicate
 {
-    bool operator()(const QTreeWidgetItem *pA, const QTreeWidgetItem *pB) const
-    {
-        return QString::compare(pA->text(0), pB->text(0)) < 0;
-    }
+	bool operator()(const QTreeWidgetItem *pA, const QTreeWidgetItem *pB) const
+	{
+		return QString::compare(pA->text(0), pB->text(0)) < 0;
+	}
 };
 
 #endif // GLOBAL_H

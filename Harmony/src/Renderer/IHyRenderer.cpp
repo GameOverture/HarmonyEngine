@@ -4,7 +4,7 @@
  *	Harmony Engine
  *	Copyright (c) 2012 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyInteropAfx.h"
@@ -87,6 +87,10 @@ void IHyRenderer::PrepareBuffers()
 		const std::vector<IHyDrawInst2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
 		{
+			// TODO JAY Stencil fix 
+			if(instanceListRef[i]->IsLoaded() == false)
+				continue;
+
 			instanceListRef[i]->OnUpdateUniforms();
 			AppendRenderState(0, *instanceListRef[i], HY_FULL_CULL_MASK);
 		}

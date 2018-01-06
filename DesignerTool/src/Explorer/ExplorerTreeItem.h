@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef EXPLORERTREEITEM_H
@@ -22,30 +22,30 @@ class AtlasFrame;
 
 class ExplorerTreeItem : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 protected:
-    const HyGuiItemType     m_eTYPE;
-    const QString           m_sPATH;
+	const HyGuiItemType     m_eTYPE;
+	const QString           m_sPATH;
 
-    bool                    m_bIsProjectItem;
-    
-    QTreeWidgetItem *       m_pTreeItemPtr;
-    
+	bool                    m_bIsProjectItem;
+	
+	QTreeWidgetItem *       m_pTreeItemPtr;
+	
 public:
-    ExplorerTreeItem(HyGuiItemType eType, const QString sPath);
-    virtual ~ExplorerTreeItem();
+	ExplorerTreeItem(HyGuiItemType eType, const QString sPath);
+	virtual ~ExplorerTreeItem();
 
-    HyGuiItemType GetType() const                   { return m_eTYPE; }
-    QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
+	HyGuiItemType GetType() const                   { return m_eTYPE; }
+	QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
 
-    bool IsProjectItem() const;
-    
-    QString GetName(bool bWithPrefix) const;
-    QString GetPrefix() const;
-    QString GetPath() const                         { return m_sPATH; }
-    QIcon GetIcon(SubIcon eSubIcon) const           { return HyGlobal::ItemIcon(m_eTYPE, eSubIcon); }
-    void SetTreeItemSubIcon(SubIcon eSubIcon);
+	bool IsProjectItem() const;
+	
+	QString GetName(bool bWithPrefix) const;
+	QString GetPrefix() const;
+	QString GetPath() const                         { return m_sPATH; }
+	QIcon GetIcon(SubIcon eSubIcon) const           { return HyGlobal::ItemIcon(m_eTYPE, eSubIcon); }
+	void SetTreeItemSubIcon(SubIcon eSubIcon);
 };
 Q_DECLARE_METATYPE(ExplorerTreeItem *)
 

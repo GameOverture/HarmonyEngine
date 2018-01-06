@@ -1,3 +1,12 @@
+/**************************************************************************
+*	EntityDraw.cpp
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #include "EntityDraw.h"
 
 EntityDraw::EntityDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp)

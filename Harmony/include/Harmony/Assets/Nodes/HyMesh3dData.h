@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyMesh3dData_h__
-#define __HyMesh3dData_h__
+#ifndef HyMesh3dData_h__
+#define HyMesh3dData_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -27,4 +27,4 @@ public:
 	virtual ~HyMesh3dData(void);
 };
 
-#endif /* __HyMesh3dData_h__ */
+#endif /* HyMesh3dData_h__ */

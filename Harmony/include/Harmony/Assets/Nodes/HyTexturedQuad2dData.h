@@ -4,11 +4,11 @@
 *	Harmony Engine
 *	Copyright (c) 2013 Jason Knobler
 *
-*	The zlib License (zlib)
+*	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef __HyTexturedQuad2dData_h__
-#define __HyTexturedQuad2dData_h__
+#ifndef HyTexturedQuad2dData_h__
+#define HyTexturedQuad2dData_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -28,4 +28,4 @@ public:
 	HyAtlas *GetAtlas() const;
 };
 
-#endif /* __HyTexturedQuad2dData_h__ */
+#endif /* HyTexturedQuad2dData_h__ */

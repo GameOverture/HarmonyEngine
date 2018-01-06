@@ -1,3 +1,12 @@
+/**************************************************************************
+*	DlgProjectSettings.h
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #ifndef DLGPROJECTSETTINGS_H
 #define DLGPROJECTSETTINGS_H
 
@@ -10,38 +19,38 @@ class DlgProjectSettings;
 
 class DlgProjectSettings : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    const QString                       m_sPROJ_SETTINGS_FILE_PATH;
-    QJsonObject                         m_SettingsObj;
+	const QString                       m_sPROJ_SETTINGS_FILE_PATH;
+	QJsonObject                         m_SettingsObj;
 
-    static QMap<QString, QJsonValue>    sm_DefaultValues;
+	static QMap<QString, QJsonValue>    sm_DefaultValues;
 
-    bool                                m_bHasError;
+	bool                                m_bHasError;
 
 public:
-    static void InitDefaultValues();
+	static void InitDefaultValues();
 
-    explicit DlgProjectSettings(const QString sProjectFilePath, QWidget *parent = 0);
-    ~DlgProjectSettings();
+	explicit DlgProjectSettings(const QString sProjectFilePath, QWidget *parent = 0);
+	~DlgProjectSettings();
 
-    bool HasError() const;
+	bool HasError() const;
 
-    QJsonObject GetSettingsObj() const;
+	QJsonObject GetSettingsObj() const;
 
-    void SetDefaults();
+	void SetDefaults();
 
-    void SaveSettings();
+	void SaveSettings();
 
-    void InitWidgets(QJsonObject &settingsObjRef);
+	void InitWidgets(QJsonObject &settingsObjRef);
 
 public Q_SLOTS:
-    virtual int exec() override;
+	virtual int exec() override;
 
 private:
-    Ui::DlgProjectSettings *ui;
+	Ui::DlgProjectSettings *ui;
 
-    bool MakeValid(QJsonObject &settingsObjRef);
+	bool MakeValid(QJsonObject &settingsObjRef);
 };
 
 #endif // DLGPROJECTSETTINGS_H

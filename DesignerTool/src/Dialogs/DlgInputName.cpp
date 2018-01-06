@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "DlgInputName.h"
@@ -15,79 +15,79 @@
 
 void DlgInputName::CtorInit(QString sDlgTitle, QString sCurName)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
-    setWindowTitle(sDlgTitle);
-    setWindowIcon(QIcon(":/icons16x16/generic-rename.png"));
+	setWindowTitle(sDlgTitle);
+	setWindowIcon(QIcon(":/icons16x16/generic-rename.png"));
 
-    ui->txtName->setValidator(HyGlobal::FileNameValidator());
-    ui->txtName->setText(sCurName);
-    ui->txtName->selectAll();
+	ui->txtName->setValidator(HyGlobal::FileNameValidator());
+	ui->txtName->setText(sCurName);
+	ui->txtName->selectAll();
 
-    ui->lblName->setText("Name:");
+	ui->lblName->setText("Name:");
 }
 
 DlgInputName::DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent /*= 0*/) :   QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-                                                                                                    ui(new Ui::DlgInputName)
+																									ui(new Ui::DlgInputName)
 {
-    CtorInit(sDlgTitle, sCurName);
+	CtorInit(sDlgTitle, sCurName);
 }
 
 DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerTreeItem *pItem, QWidget *parent /*= 0*/) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-                                                                                            ui(new Ui::DlgInputName)
+																							ui(new Ui::DlgInputName)
 {
-    CtorInit(sDlgTitle, pItem->GetName(false));
+	CtorInit(sDlgTitle, pItem->GetName(false));
 
-    if(pItem == NULL)
-    {
-        HyGuiLog("DlgInputName recieved a NULL Item pointer", LOGTYPE_Error);
-        return;
-    }
-    
-    setWindowIcon(pItem->GetIcon(SUBICON_Settings));
-    ui->lblName->setText(HyGlobal::ItemName(pItem->GetType()) % " Name:");
-    
-    ErrorCheck();
+	if(pItem == NULL)
+	{
+		HyGuiLog("DlgInputName recieved a NULL Item pointer", LOGTYPE_Error);
+		return;
+	}
+	
+	setWindowIcon(pItem->GetIcon(SUBICON_Settings));
+	ui->lblName->setText(HyGlobal::ItemName(pItem->GetType()) % " Name:");
+	
+	ErrorCheck();
 }
 
 DlgInputName::~DlgInputName()
 {
-    delete ui;
+	delete ui;
 }
 
 void DlgInputName::on_txtName_textChanged(const QString &arg1)
 {
-    ErrorCheck();
+	ErrorCheck();
 }
 
 QString DlgInputName::GetName()
 {
-    return ui->txtName->text();
+	return ui->txtName->text();
 }
 
 void DlgInputName::ErrorCheck()
 {
-    bool bIsError = false;
-    do
-    {
-        if(ui->txtName->text().isEmpty())
-        {
-            ui->lblError->setText("Error: name cannot be blank");
-            bIsError = true;
-            break;
-        }
-        
-    }while(false);
+	bool bIsError = false;
+	do
+	{
+		if(ui->txtName->text().isEmpty())
+		{
+			ui->lblError->setText("Error: name cannot be blank");
+			bIsError = true;
+			break;
+		}
+		
+	}while(false);
 
-    if(bIsError)
-        ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
-    else
-    {
-        ui->lblError->setStyleSheet("QLabel { color : black; }");
-        ui->lblError->setText("");
-    }
-    ui->lblError->setVisible(bIsError);
-    ui->buttonBox->button(QDialogButtonBox::Ok);
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
+	if(bIsError)
+		ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
+	else
+	{
+		ui->lblError->setStyleSheet("QLabel { color : black; }");
+		ui->lblError->setText("");
+	}
+	ui->lblError->setVisible(bIsError);
+	ui->buttonBox->button(QDialogButtonBox::Ok);
+	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
 }
 

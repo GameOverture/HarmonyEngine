@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyMesh3d_h__
-#define __HyMesh3d_h__
+#ifndef HyMesh3d_h__
+#define HyMesh3d_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -26,4 +26,4 @@
 //	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 //};
 
-#endif /* __HyMesh3d_h__ */
+#endif /* HyMesh3d_h__ */

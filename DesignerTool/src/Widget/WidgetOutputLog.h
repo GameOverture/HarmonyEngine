@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef WIDGETOUTPUTLOG_H
@@ -18,34 +18,34 @@ class WidgetOutputLog;
 
 enum eLogType
 {
-    LOGTYPE_Normal = 0,
-    LOGTYPE_Warning,
-    LOGTYPE_Error,
-    LOGTYPE_Info,
-    LOGTYPE_Title
+	LOGTYPE_Normal = 0,
+	LOGTYPE_Warning,
+	LOGTYPE_Error,
+	LOGTYPE_Info,
+	LOGTYPE_Title
 };
 
 class WidgetOutputLog : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    static WidgetOutputLog *      sm_pInstance;
+	static WidgetOutputLog *      sm_pInstance;
 
-    static const QString    sm_ksNormalHtml;
-    static const QString    sm_ksWarningHtml;
-    static const QString    sm_ksErrorHtml;
-    static const QString    sm_ksInfoHtml;
-    static const QString    sm_ksTitleHtml;
-    static const QString    sm_ksEndHtml;
+	static const QString    sm_ksNormalHtml;
+	static const QString    sm_ksWarningHtml;
+	static const QString    sm_ksErrorHtml;
+	static const QString    sm_ksInfoHtml;
+	static const QString    sm_ksTitleHtml;
+	static const QString    sm_ksEndHtml;
 
 public:
-    explicit WidgetOutputLog(QWidget *parent = 0);
-    ~WidgetOutputLog();
+	explicit WidgetOutputLog(QWidget *parent = 0);
+	~WidgetOutputLog();
 
-    static void Log(QString &sMessage, eLogType eType = LOGTYPE_Normal);
+	static void Log(QString &sMessage, eLogType eType = LOGTYPE_Normal);
 
 private:
-    Ui::WidgetOutputLog *ui;
+	Ui::WidgetOutputLog *ui;
 };
 
 #endif // WIDGETOUTPUTLOG_H

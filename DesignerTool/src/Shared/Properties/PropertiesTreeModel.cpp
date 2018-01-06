@@ -1,80 +1,89 @@
+/**************************************************************************
+*	PropertiesTreeModel.cpp
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #include "PropertiesTreeModel.h"
 
 PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant &subState, QObject *parent) :  QAbstractItemModel(parent),
-                                                                                                                        m_ItemRef(itemRef),
-                                                                                                                        m_iSTATE_INDEX(iStateIndex),
-                                                                                                                        m_iSUBSTATE(subState)
+																														m_ItemRef(itemRef),
+																														m_iSTATE_INDEX(iStateIndex),
+																														m_iSUBSTATE(subState)
 {
-    m_pRootItem = new PropertiesTreeItem("Root", this, PropertiesDef(), QColor(), "");
+	m_pRootItem = new PropertiesTreeItem("Root", this, PropertiesDef(), QColor(), "");
 }
 
 /*virtual*/ PropertiesTreeModel::~PropertiesTreeModel()
 {
-    delete m_pRootItem;
+	delete m_pRootItem;
 }
 
 ProjectItem &PropertiesTreeModel::GetItem()
 {
-    return m_ItemRef;
+	return m_ItemRef;
 }
 
 bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
 {
-    for(int i = 0; i < m_CategoryList.size(); ++i)
-    {
-        if(0 == m_CategoryList[i]->GetName().compare(sName, Qt::CaseInsensitive))
-            return false;
-    }
+	for(int i = 0; i < m_CategoryList.size(); ++i)
+	{
+		if(0 == m_CategoryList[i]->GetName().compare(sName, Qt::CaseInsensitive))
+			return false;
+	}
 
-    PropertiesDef def;
-    def.eType = bCheckable ? PROPERTIESTYPE_CategoryChecked : PROPERTIESTYPE_Category;
-    def.delegateBuilder = commonDelegateBuilder;
+	PropertiesDef def;
+	def.eType = bCheckable ? PROPERTIESTYPE_CategoryChecked : PROPERTIESTYPE_Category;
+	def.delegateBuilder = commonDelegateBuilder;
 
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, def, color, sToolTip);
-    pNewTreeItem->SetData(bStartChecked ? Qt::Checked : Qt::Unchecked);
+	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, def, color, sToolTip);
+	pNewTreeItem->SetData(bStartChecked ? Qt::Checked : Qt::Unchecked);
 
-    InsertItem(m_CategoryList.size(), pNewTreeItem, m_pRootItem);
-    m_CategoryList.push_back(pNewTreeItem);
+	InsertItem(m_CategoryList.size(), pNewTreeItem, m_pRootItem);
+	m_CategoryList.push_back(pNewTreeItem);
 
-    return true;
+	return true;
 }
 
 bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip)
 {
-    PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
-    if(pCategoryTreeItem == nullptr)
-        return false;
+	PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
+	if(pCategoryTreeItem == nullptr)
+		return false;
 
-    PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, defintion, pCategoryTreeItem->GetColor(), sToolTip);
-    pNewTreeItem->SetData(defintion.defaultData);
+	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, defintion, pCategoryTreeItem->GetColor(), sToolTip);
+	pNewTreeItem->SetData(defintion.defaultData);
 
-    InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
-    return true;
+	InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
+	return true;
 }
 
 void PropertiesTreeModel::RefreshProperties()
 {
-    for(int i = 0; i < m_CategoryList.size(); ++i)
-    {
-        dataChanged(createIndex(0, 0, m_CategoryList[i]->GetChild(0)),
-                    createIndex(m_CategoryList[i]->GetNumChildren() - 1, 1, m_CategoryList[i]->GetChild(m_CategoryList[i]->GetNumChildren() - 1)));
-    }
+	for(int i = 0; i < m_CategoryList.size(); ++i)
+	{
+		dataChanged(createIndex(0, 0, m_CategoryList[i]->GetChild(0)),
+					createIndex(m_CategoryList[i]->GetNumChildren() - 1, 1, m_CategoryList[i]->GetChild(m_CategoryList[i]->GetNumChildren() - 1)));
+	}
 }
 
 QVariant PropertiesTreeModel::headerData(int iSection, Qt::Orientation orientation, int role) const
 {
-    if(role == Qt::TextAlignmentRole)
-        return Qt::AlignCenter;
+	if(role == Qt::TextAlignmentRole)
+		return Qt::AlignCenter;
 
-    if(role == Qt::DisplayRole)
-    {
-        if(iSection == 0)
-            return "Property";
-        else
-            return "Value";
-    }
+	if(role == Qt::DisplayRole)
+	{
+		if(iSection == 0)
+			return "Property";
+		else
+			return "Value";
+	}
 
-    return QVariant();
+	return QVariant();
 }
 
 //bool PropertiesModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
@@ -89,161 +98,161 @@ QVariant PropertiesTreeModel::headerData(int iSection, Qt::Orientation orientati
 
 QModelIndex PropertiesTreeModel::index(int iRow, int iColumn, const QModelIndex &parent) const
 {
-    if(hasIndex(iRow, iColumn, parent) == false)
-        return QModelIndex();
+	if(hasIndex(iRow, iColumn, parent) == false)
+		return QModelIndex();
 
-    PropertiesTreeItem *pParentItem;
+	PropertiesTreeItem *pParentItem;
 
-    if(parent.isValid() == false)
-        pParentItem = m_pRootItem;
-    else
-        pParentItem = static_cast<PropertiesTreeItem *>(parent.internalPointer());
+	if(parent.isValid() == false)
+		pParentItem = m_pRootItem;
+	else
+		pParentItem = static_cast<PropertiesTreeItem *>(parent.internalPointer());
 
-    PropertiesTreeItem *pChildItem = static_cast<PropertiesTreeItem *>(pParentItem->GetChild(iRow));
-    if(pChildItem)
-        return createIndex(iRow, iColumn, pChildItem);
-    else
-        return QModelIndex();
+	PropertiesTreeItem *pChildItem = static_cast<PropertiesTreeItem *>(pParentItem->GetChild(iRow));
+	if(pChildItem)
+		return createIndex(iRow, iColumn, pChildItem);
+	else
+		return QModelIndex();
 }
 
 QModelIndex PropertiesTreeModel::parent(const QModelIndex &index) const
 {
-    if(index.isValid() == false)
-        return QModelIndex();
+	if(index.isValid() == false)
+		return QModelIndex();
 
-    PropertiesTreeItem *pChildItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
-    PropertiesTreeItem *pParentItem = static_cast<PropertiesTreeItem *>(pChildItem->GetParent());
+	PropertiesTreeItem *pChildItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
+	PropertiesTreeItem *pParentItem = static_cast<PropertiesTreeItem *>(pChildItem->GetParent());
 
-    if(pParentItem == m_pRootItem)
-        return QModelIndex();
+	if(pParentItem == m_pRootItem)
+		return QModelIndex();
 
-    return createIndex(pParentItem->GetRow(), 0, pParentItem);
+	return createIndex(pParentItem->GetRow(), 0, pParentItem);
 }
 
 int PropertiesTreeModel::rowCount(const QModelIndex &parentIndex) const
 {
-    PropertiesTreeItem *pParentItem;
-    if(parentIndex.isValid() == false)
-        pParentItem = m_pRootItem;
-    else
-        pParentItem = static_cast<PropertiesTreeItem *>(parentIndex.internalPointer());
+	PropertiesTreeItem *pParentItem;
+	if(parentIndex.isValid() == false)
+		pParentItem = m_pRootItem;
+	else
+		pParentItem = static_cast<PropertiesTreeItem *>(parentIndex.internalPointer());
 
-    return pParentItem->GetNumChildren();
+	return pParentItem->GetNumChildren();
 }
 
 int PropertiesTreeModel::columnCount(const QModelIndex &parent) const
 {
-    return 2;
+	return 2;
 }
 
 QVariant PropertiesTreeModel::data(const QModelIndex &index, int iRole) const
 {
-    if(index.isValid() == false)
-        return QVariant();
+	if(index.isValid() == false)
+		return QVariant();
 
-    PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
+	PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
 
-    switch(iRole)
-    {
-    case Qt::DisplayRole:
-        if(index.column() == 0)
-            return pTreeItem->GetName();
-        else if(index.column() == 1)
-            return pTreeItem->GetValue();
+	switch(iRole)
+	{
+	case Qt::DisplayRole:
+		if(index.column() == 0)
+			return pTreeItem->GetName();
+		else if(index.column() == 1)
+			return pTreeItem->GetValue();
 
-    case Qt::TextAlignmentRole:
-        if(pTreeItem->IsCategory())
-            return Qt::AlignHCenter;
+	case Qt::TextAlignmentRole:
+		if(pTreeItem->IsCategory())
+			return Qt::AlignHCenter;
 
-    case Qt::ToolTipRole:
-        return pTreeItem->GetToolTip();
+	case Qt::ToolTipRole:
+		return pTreeItem->GetToolTip();
 
-    case Qt::BackgroundRole:
-        if(pTreeItem->IsCategory())
-            return QBrush(QColor::fromRgb(160, 160, 160));
-        else
-            return QBrush((0 == (pTreeItem->GetRow() & 1)) ? pTreeItem->GetColor() : pTreeItem->GetColor().lighter());
+	case Qt::BackgroundRole:
+		if(pTreeItem->IsCategory())
+			return QBrush(QColor::fromRgb(160, 160, 160));
+		else
+			return QBrush((0 == (pTreeItem->GetRow() & 1)) ? pTreeItem->GetColor() : pTreeItem->GetColor().lighter());
 
-    case Qt::ForegroundRole:
-        if(pTreeItem->IsCategory())
-            return QBrush(QColor::fromRgb(255, 255, 255));
+	case Qt::ForegroundRole:
+		if(pTreeItem->IsCategory())
+			return QBrush(QColor::fromRgb(255, 255, 255));
 
-    case Qt::FontRole:
-        if(pTreeItem->IsCategory())
-        {
-            QFont font;
-            font.setBold(true);
-            return font;
-        }
+	case Qt::FontRole:
+		if(pTreeItem->IsCategory())
+		{
+			QFont font;
+			font.setBold(true);
+			return font;
+		}
 
-    case Qt::CheckStateRole:
-        if((index.column() == 0 && pTreeItem->GetType() == PROPERTIESTYPE_CategoryChecked) ||
-           (index.column() == 1 && pTreeItem->GetType() == PROPERTIESTYPE_bool))
-        {
-            return pTreeItem->GetData().toInt();
-        }
-    }
+	case Qt::CheckStateRole:
+		if((index.column() == 0 && pTreeItem->GetType() == PROPERTIESTYPE_CategoryChecked) ||
+		   (index.column() == 1 && pTreeItem->GetType() == PROPERTIESTYPE_bool))
+		{
+			return pTreeItem->GetData().toInt();
+		}
+	}
 
-    return QVariant();
+	return QVariant();
 }
 
 bool PropertiesTreeModel::setData(const QModelIndex &index, const QVariant &value, int iRole)
 {
-    if(index.isValid() == false)
-        return false;
+	if(index.isValid() == false)
+		return false;
 
-    if(data(index, iRole) != value)
-    {
-        PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
+	if(data(index, iRole) != value)
+	{
+		PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
 
-        QUndoCommand *pCmd = new PropertiesUndoCmd(*this, m_iSTATE_INDEX, m_iSUBSTATE, *pTreeItem, index, value, iRole);
-        m_ItemRef.GetUndoStack()->push(pCmd);
-        //Q_EMIT dataChanged(index, index, QVector<int>() << iRole); <- Called within PropertiesUndoCmd's redo/undo
+		QUndoCommand *pCmd = new PropertiesUndoCmd(*this, m_iSTATE_INDEX, m_iSUBSTATE, *pTreeItem, index, value, iRole);
+		m_ItemRef.GetUndoStack()->push(pCmd);
+		//Q_EMIT dataChanged(index, index, QVector<int>() << iRole); <- Called within PropertiesUndoCmd's redo/undo
 
-        return true;
-    }
+		return true;
+	}
 
-    return false;
+	return false;
 }
 
 Qt::ItemFlags PropertiesTreeModel::flags(const QModelIndex &index) const
 {
-    Qt::ItemFlags returnFlags = Qt::NoItemFlags;
+	Qt::ItemFlags returnFlags = Qt::NoItemFlags;
 
-    if(index.isValid() == false)
-        return returnFlags;
+	if(index.isValid() == false)
+		return returnFlags;
 
-    PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
+	PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
 
-    if(pTreeItem->IsCategory())
-    {
-        returnFlags |= Qt::ItemIsEnabled;
+	if(pTreeItem->IsCategory())
+	{
+		returnFlags |= Qt::ItemIsEnabled;
 
-        if(pTreeItem->GetType() == PROPERTIESTYPE_CategoryChecked && index.column() == 0)
-            returnFlags |= Qt::ItemIsUserCheckable;
-    }
-    else
-    {
-        PropertiesTreeItem *pCategoryItem = static_cast<PropertiesTreeItem *>(pTreeItem->GetParent());
-        if(pCategoryItem->IsCategory() == false)
-            HyGuiLog("PropertiesTreeModel::flags() passed in index is not a category and its parent is not one either", LOGTYPE_Error);
+		if(pTreeItem->GetType() == PROPERTIESTYPE_CategoryChecked && index.column() == 0)
+			returnFlags |= Qt::ItemIsUserCheckable;
+	}
+	else
+	{
+		PropertiesTreeItem *pCategoryItem = static_cast<PropertiesTreeItem *>(pTreeItem->GetParent());
+		if(pCategoryItem->IsCategory() == false)
+			HyGuiLog("PropertiesTreeModel::flags() passed in index is not a category and its parent is not one either", LOGTYPE_Error);
 
-        if(pCategoryItem->GetType() == PROPERTIESTYPE_Category ||
-           (pCategoryItem->GetType() == PROPERTIESTYPE_CategoryChecked && pCategoryItem->GetData().toInt() == Qt::Checked))
-        {
-            returnFlags |= Qt::ItemIsEnabled;
-        }
+		if(pCategoryItem->GetType() == PROPERTIESTYPE_Category ||
+		   (pCategoryItem->GetType() == PROPERTIESTYPE_CategoryChecked && pCategoryItem->GetData().toInt() == Qt::Checked))
+		{
+			returnFlags |= Qt::ItemIsEnabled;
+		}
 
-        if(index.column() == 1)
-        {
-            returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable);
+		if(index.column() == 1)
+		{
+			returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable);
 
-            if(pTreeItem->GetType() == PROPERTIESTYPE_bool)
-                returnFlags |= Qt::ItemIsUserCheckable;
-        }
-    }
+			if(pTreeItem->GetType() == PROPERTIESTYPE_bool)
+				returnFlags |= Qt::ItemIsUserCheckable;
+		}
+	}
 
-    return returnFlags;
+	return returnFlags;
 }
 
 //bool PropertiesModel::insertRows(int row, int count, const QModelIndex &parent)
@@ -266,11 +275,11 @@ Qt::ItemFlags PropertiesTreeModel::flags(const QModelIndex &index) const
 
 bool PropertiesTreeModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    beginRemoveRows(parent, row, row + count - 1);
-    // FIXME: Implement me!
-    endRemoveRows();
+	beginRemoveRows(parent, row, row + count - 1);
+	// FIXME: Implement me!
+	endRemoveRows();
 
-    return true;
+	return true;
 }
 
 //bool PropertiesModel::removeColumns(int column, int count, const QModelIndex &parent)
@@ -284,49 +293,49 @@ bool PropertiesTreeModel::removeRows(int row, int count, const QModelIndex &pare
 
 PropertiesTreeItem *PropertiesTreeModel::ValidateCategory(QString sCategoryName, QString sUniquePropertyName)
 {
-    PropertiesTreeItem *pCategoryTreeItem = nullptr;
-    for(int i = 0; i < m_CategoryList.size(); ++i)
-    {
-        if(0 == m_CategoryList[i]->GetName().compare(sCategoryName, Qt::CaseInsensitive))
-        {
-            pCategoryTreeItem = m_CategoryList[i];
-            break;
-        }
-    }
+	PropertiesTreeItem *pCategoryTreeItem = nullptr;
+	for(int i = 0; i < m_CategoryList.size(); ++i)
+	{
+		if(0 == m_CategoryList[i]->GetName().compare(sCategoryName, Qt::CaseInsensitive))
+		{
+			pCategoryTreeItem = m_CategoryList[i];
+			break;
+		}
+	}
 
-    // Now ensure that no property with this name already exists
-    for(int i = 0; i < pCategoryTreeItem->GetNumChildren(); ++i)
-    {
-        if(0 == static_cast<PropertiesTreeItem *>(pCategoryTreeItem->GetChild(i))->GetName().compare(sUniquePropertyName, Qt::CaseInsensitive))
-            return nullptr; // nullptr indicates failure
-    }
+	// Now ensure that no property with this name already exists
+	for(int i = 0; i < pCategoryTreeItem->GetNumChildren(); ++i)
+	{
+		if(0 == static_cast<PropertiesTreeItem *>(pCategoryTreeItem->GetChild(i))->GetName().compare(sUniquePropertyName, Qt::CaseInsensitive))
+			return nullptr; // nullptr indicates failure
+	}
 
-    return pCategoryTreeItem;
+	return pCategoryTreeItem;
 }
 
 void PropertiesTreeModel::InsertItem(int iRow, PropertiesTreeItem *pItem, PropertiesTreeItem *pParentItem)
 {
-    QList<PropertiesTreeItem *> itemList;
-    itemList << pItem;
-    InsertItems(iRow, itemList, pParentItem);
+	QList<PropertiesTreeItem *> itemList;
+	itemList << pItem;
+	InsertItems(iRow, itemList, pParentItem);
 }
 
 void PropertiesTreeModel::InsertItems(int iRow, QList<PropertiesTreeItem *> itemList, PropertiesTreeItem *pParentItem)
 {
-    QModelIndex parentIndex = pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex();
+	QModelIndex parentIndex = pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex();
 
-    PropertiesTreeItem *pParent;
-    if(parentIndex.isValid() == false)
-        pParent = m_pRootItem;
-    else
-        pParent = static_cast<PropertiesTreeItem *>(parentIndex.internalPointer());
+	PropertiesTreeItem *pParent;
+	if(parentIndex.isValid() == false)
+		pParent = m_pRootItem;
+	else
+		pParent = static_cast<PropertiesTreeItem *>(parentIndex.internalPointer());
 
-    iRow = HyClamp(iRow, 0, pParent->GetNumChildren());
+	iRow = HyClamp(iRow, 0, pParent->GetNumChildren());
 
-    beginInsertRows(parentIndex, iRow, iRow + itemList.size() - 1);
+	beginInsertRows(parentIndex, iRow, iRow + itemList.size() - 1);
 
-    for(int i = 0; i < itemList.size(); ++i)
-        pParent->InsertChild(iRow + i, itemList[i]);
+	for(int i = 0; i < itemList.size(); ++i)
+		pParent->InsertChild(iRow + i, itemList[i]);
 
-    endInsertRows();
+	endInsertRows();
 }

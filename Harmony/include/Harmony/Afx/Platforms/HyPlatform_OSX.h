@@ -4,14 +4,14 @@
  *	Harmony Engine
  *	Copyright (c) 2012 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyPlatform_OSX_h__
-#define __HyPlatform_OSX_h__
+#ifndef HyPlatform_OSX_h__
+#define HyPlatform_OSX_h__
 
 
 //#define HyGetTickCount()				((uint)::UnixInternal::UnixGetTickCount())
 
 
-#endif /* __HyPlatform_OSX_h__ */
+#endif /* HyPlatform_OSX_h__ */

@@ -4,7 +4,7 @@
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
 *
-*	The zlib License (zlib)
+*	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #ifndef IHyLeafDraw2d_h__
@@ -118,6 +118,8 @@ public:
 		delete m_pData;
 		m_pData = HY_NEW HYDATATYPE("+HyGuiOverride", dataValueRef, *sm_pHyAssets);
 		OnDataAcquired();
+		if(m_hShader == HY_UNUSED_HANDLE)
+			m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
 	}
 #endif
 };

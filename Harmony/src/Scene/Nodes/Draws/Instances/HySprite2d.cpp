@@ -4,7 +4,7 @@
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Scene/Nodes/Draws/Instances/HySprite2d.h"

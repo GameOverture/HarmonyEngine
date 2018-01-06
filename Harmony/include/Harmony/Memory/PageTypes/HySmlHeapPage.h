@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2012 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyHeapPageSmall_h__
-#define __HyHeapPageSmall_h__
+#ifndef HyHeapPageSmall_h__
+#define HyHeapPageSmall_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -252,4 +252,4 @@ void HySmlHeapPage<TPageSize>::RemoveFromList(HySmlHeapPage **headPtr)
 
 //-------------------
 
-#endif /* __HyHeapPageSmall_h__ */
+#endif /* HyHeapPageSmall_h__ */

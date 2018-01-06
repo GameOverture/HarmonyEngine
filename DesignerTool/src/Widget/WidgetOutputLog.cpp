@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "WidgetOutputLog.h"
@@ -25,49 +25,49 @@ WidgetOutputLog *WidgetOutputLog::sm_pInstance = NULL;
 /*static*/ const QString WidgetOutputLog::sm_ksEndHtml = "</font>";
 
 WidgetOutputLog::WidgetOutputLog(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::WidgetOutputLog)
+	QWidget(parent),
+	ui(new Ui::WidgetOutputLog)
 {
-    Q_ASSERT(sm_pInstance == NULL);
+	Q_ASSERT(sm_pInstance == NULL);
 
-    ui->setupUi(this);
+	ui->setupUi(this);
 
-    sm_pInstance = this;
+	sm_pInstance = this;
 }
 
 WidgetOutputLog::~WidgetOutputLog()
 {
-    delete ui;
+	delete ui;
 }
 
 /*static*/ void WidgetOutputLog::Log(QString &sMessage, eLogType eType /*= LOGTYPE_Normal*/)
 {
-    QPlainTextEdit *pTxt = sm_pInstance->ui->m_TextLog;
+	QPlainTextEdit *pTxt = sm_pInstance->ui->m_TextLog;
 
-    QString sLogMsg = sMessage;
+	QString sLogMsg = sMessage;
 
-    switch(eType)
-    {
-    case LOGTYPE_Normal:
-        sLogMsg = sm_ksNormalHtml % sLogMsg;
-        break;
-    case LOGTYPE_Warning:
-        QMessageBox::warning(sm_pInstance->parentWidget(), HyDesignerToolName, sLogMsg);
-        sLogMsg = sm_ksWarningHtml % sLogMsg; 
-        break;
-    case LOGTYPE_Error:
-        QMessageBox::critical(sm_pInstance->parentWidget(), HyDesignerToolName, sLogMsg);
-        sLogMsg = sm_ksErrorHtml % sLogMsg;
-        break;
-    case LOGTYPE_Info:
-        sLogMsg = sm_ksInfoHtml % sLogMsg;
-        break;
-    case LOGTYPE_Title:
-        sLogMsg = "<br>" % sm_ksTitleHtml % "<b>----- " % sLogMsg % " -----</b><br>";
-        break;
-    }
+	switch(eType)
+	{
+	case LOGTYPE_Normal:
+		sLogMsg = sm_ksNormalHtml % sLogMsg;
+		break;
+	case LOGTYPE_Warning:
+		QMessageBox::warning(sm_pInstance->parentWidget(), HyDesignerToolName, sLogMsg);
+		sLogMsg = sm_ksWarningHtml % sLogMsg; 
+		break;
+	case LOGTYPE_Error:
+		QMessageBox::critical(sm_pInstance->parentWidget(), HyDesignerToolName, sLogMsg);
+		sLogMsg = sm_ksErrorHtml % sLogMsg;
+		break;
+	case LOGTYPE_Info:
+		sLogMsg = sm_ksInfoHtml % sLogMsg;
+		break;
+	case LOGTYPE_Title:
+		sLogMsg = "<br>" % sm_ksTitleHtml % "<b>----- " % sLogMsg % " -----</b><br>";
+		break;
+	}
 
-    sLogMsg = sLogMsg % sm_ksEndHtml;
+	sLogMsg = sLogMsg % sm_ksEndHtml;
 
-    pTxt->appendHtml(sLogMsg);
+	pTxt->appendHtml(sLogMsg);
 }

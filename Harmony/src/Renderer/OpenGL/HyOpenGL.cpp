@@ -4,7 +4,7 @@
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/OpenGL/HyOpenGL.h"
@@ -14,6 +14,7 @@
 #include "Renderer/Effects/HyStencil.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Scene/Nodes/Misc/HyCamera.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, windowListRef),
 																							m_mtxView(1.0f),
@@ -207,6 +208,10 @@ HyOpenGL::~HyOpenGL(void)
 			char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pStencil->GetRenderStatePtr());
 			for(uint32 i = 0; i < uiNumStencilInstance; ++i)
 			{
+				// TODO JAY Stencil fix 
+				if(pStencil->GetInstanceList()[i]->IsLoaded() == false)
+					continue;
+
 				HyRenderState *pCurRenderState = reinterpret_cast<HyRenderState *>(pStencilRenderStateBufferPos);
 				if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
 					RenderPass2d(pCurRenderState, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);
@@ -926,6 +931,8 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 	// Set vertex attribute pointers to the vertex data locations in bound buffer
 	size_t uiStartOffset = pRenderState->GetDataOffset();
 	HyShader *pShader = sm_ShaderMap[hShaderHandle];
+	HyAssert(pShader, "HyShader not found for render state: " << pRenderState->GetId());
+
 	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
 
 	// TODO: if OpenGL 4.3 is available

@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef PROJECT_H
@@ -29,93 +29,96 @@ class AtlasTreeItem;
 
 class ProjectTabBar : public QTabBar
 {
-    Project *           m_pProjectOwner;
+	Project *           m_pProjectOwner;
 
 public:
-    ProjectTabBar(Project *pProjectOwner);
-    virtual ~ProjectTabBar();
+	ProjectTabBar(Project *pProjectOwner);
+	virtual ~ProjectTabBar();
 
 protected:
-    virtual void dragEnterEvent(QDragEnterEvent *pEvent) override;
-    virtual void dropEvent(QDropEvent *pEvent) override;
+	virtual void dragEnterEvent(QDragEnterEvent *pEvent) override;
+	virtual void dropEvent(QDropEvent *pEvent) override;
 };
 
 class Project : public ExplorerTreeItem, public IHyApplication
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    ExplorerWidget *                                m_pWidget;
-    ProjectDraw *                                   m_pDraw;
-    DlgProjectSettings                              m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
+	ExplorerWidget *                                m_pWidget;
+	ProjectDraw *                                   m_pDraw;
+	DlgProjectSettings                              m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
-    AtlasModel *                                    m_pAtlasModel;
-    AtlasWidget *                                   m_pAtlasWidget;
+	AtlasModel *                                    m_pAtlasModel;
+	AtlasWidget *                                   m_pAtlasWidget;
 
-    AudioWidgetManager *                            m_pAudioMan;
-    ProjectTabBar *                                 m_pTabBar;
+	AudioWidgetManager *                            m_pAudioMan;
+	ProjectTabBar *                                 m_pTabBar;
 
-    ProjectItem *                                   m_pCurOpenItem;
+	ProjectItem *                                   m_pCurOpenItem;
 
-    QJsonObject                                     m_SaveDataObj;
+	QJsonObject                                     m_SaveDataObj;
 
-    bool                                            m_bHasError;
-    
+	bool                                            m_bHasError;
+	
 public:
-    Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath);
-    virtual ~Project();
+	Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath);
+	virtual ~Project();
 
-    bool HasError() const;
-    
-    void ExecProjSettingsDlg();
+	bool HasError() const;
+	
+	void ExecProjSettingsDlg();
 
-    QJsonObject GetSettingsObj() const;
+	QJsonObject GetSettingsObj() const;
 
-    QString GetDirPath() const;
-    QString GetGameName() const;
+	QString GetDirPath() const;
+	QString GetGameName() const;
 
-    QString GetAbsPath() const;
-    QString GetAssetsAbsPath() const;
-    QString GetAssetsRelPath() const;
-    QString GetMetaDataAbsPath() const;
-    QString GetMetaDataRelPath() const;
-    QString GetSourceAbsPath() const;
-    QString GetSourceRelPath() const;
+	QString GetAbsPath() const;
+	QString GetAssetsAbsPath() const;
+	QString GetAssetsRelPath() const;
+	QString GetMetaDataAbsPath() const;
+	QString GetMetaDataRelPath() const;
+	QString GetSourceAbsPath() const;
+	QString GetSourceRelPath() const;
 
-    AtlasModel &GetAtlasModel();
-    AtlasWidget *GetAtlasWidget();
-    AudioWidgetManager *GetAudioWidget();
+	AtlasModel &GetAtlasModel();
+	AtlasWidget *GetAtlasWidget();
+	AudioWidgetManager *GetAudioWidget();
 
-    ProjectTabBar *GetTabBar();
+	ProjectTabBar *GetTabBar();
 
-    ExplorerWidget *GetExplorerWidget();
-    ProjectItem *GetCurrentOpenItem();
+	ExplorerWidget *GetExplorerWidget();
+	ProjectItem *GetCurrentOpenItem();
 
-    void SetRenderSize(int iWidth, int iHeight);
+	void SetRenderSize(int iWidth, int iHeight);
 
-    void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal);
-    void SaveGameData();
-    
-    void DeleteGameData(HyGuiItemType eType, QString sPath);
-    void DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix);
+	void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal);
+	void SaveGameData();
+	
+	void DeleteGameData(HyGuiItemType eType, QString sPath);
+	void DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix);
 
-    QJsonObject GetSubDirObj(HyGuiItemType eType);
+	QJsonObject GetSubDirObj(HyGuiItemType eType);
 
-    // These tab functions are only called from MainWindow
-    void OpenTab(ProjectItem *pItem);
-    void CloseTab(ProjectItem *pItem);
-    bool CloseAllTabs();
+	// These tab functions are only called from MainWindow
+	void OpenTab(ProjectItem *pItem);
+	void CloseTab(ProjectItem *pItem);
+	bool CloseAllTabs();
 
-    void ApplySaveEnables();
+	// This is called in Harmony during a reload project
+	void UnloadAllTabs();
 
-    // IHyApplication overrides
-    virtual bool Initialize();
-    virtual bool Update();
-    virtual void Shutdown();
+	void ApplySaveEnables();
+
+	// IHyApplication overrides
+	virtual bool Initialize();
+	virtual bool Update();
+	virtual void Shutdown();
 
 public Q_SLOTS:
-    void OnTabBarCurrentChanged(int iIndex);
+	void OnTabBarCurrentChanged(int iIndex);
 
-    void OnCloseTab(int iIndex);
+	void OnCloseTab(int iIndex);
 };
 
 #endif // PROJECT_H

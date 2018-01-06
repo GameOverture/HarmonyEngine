@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2017 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyConsole_h__
-#define __HyConsole_h__
+#ifndef HyConsole_h__
+#define HyConsole_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Threading/BasicSync.h"

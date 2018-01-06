@@ -1,3 +1,12 @@
+/**************************************************************************
+*	EntityWidget.cpp
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #include "EntityWidget.h"
 #include "ui_EntityWidget.h"
 #include "Project.h"
@@ -6,59 +15,59 @@
 #include "DlgInputName.h"
 
 EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
-                                                                    ui(new Ui::EntityWidget),
-                                                                    m_ItemRef(itemRef)
+																	ui(new Ui::EntityWidget),
+																	m_ItemRef(itemRef)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
-    ui->btnAddState->setDefaultAction(ui->actionAddState);
-    ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
-    ui->btnRenameState->setDefaultAction(ui->actionRenameState);
-    ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
-    ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
+	ui->btnAddState->setDefaultAction(ui->actionAddState);
+	ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
+	ui->btnRenameState->setDefaultAction(ui->actionRenameState);
+	ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
+	ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
 
-    ui->btnAddChild->setDefaultAction(ui->actionAddSelectedChild);
-    ui->btnAddChildPrimitive->setDefaultAction(ui->actionAddPrimitive);
-    ui->btnInsertBoundingVolume->setDefaultAction(ui->actionInsertBoundingVolume);
-    ui->btnInsertPhysics->setDefaultAction(ui->actionInsertPhysicsBody);
+	ui->btnAddChild->setDefaultAction(ui->actionAddSelectedChild);
+	ui->btnAddChildPrimitive->setDefaultAction(ui->actionAddPrimitive);
+	ui->btnInsertBoundingVolume->setDefaultAction(ui->actionInsertBoundingVolume);
+	ui->btnInsertPhysics->setDefaultAction(ui->actionInsertPhysicsBody);
 
-    ui->cmbStates->clear();
-    ui->cmbStates->setModel(m_ItemRef.GetModel());
+	ui->cmbStates->clear();
+	ui->cmbStates->setModel(m_ItemRef.GetModel());
 
-    ui->childrenTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->childrenTree->setDragEnabled(true);
-    ui->childrenTree->setDropIndicatorShown(true);
-    ui->childrenTree->setDragDropMode(QAbstractItemView::InternalMove);
+	ui->childrenTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	ui->childrenTree->setDragEnabled(true);
+	ui->childrenTree->setDropIndicatorShown(true);
+	ui->childrenTree->setDragDropMode(QAbstractItemView::InternalMove);
 
-    EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
-    ui->childrenTree->setModel(&pEntityModel->GetTreeModel());
+	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
+	ui->childrenTree->setModel(&pEntityModel->GetTreeModel());
 
-    on_childrenTree_clicked(QModelIndex());
+	on_childrenTree_clicked(QModelIndex());
 
-    FocusState(0, QVariant(static_cast<qulonglong>(0)));
+	FocusState(0, QVariant(static_cast<qulonglong>(0)));
 }
 
 EntityWidget::~EntityWidget()
 {
-    delete ui;
+	delete ui;
 }
 
 ProjectItem &EntityWidget::GetItem()
 {
-    return m_ItemRef;
+	return m_ItemRef;
 }
 
 EntityModel *EntityWidget::GetEntityModel()
 {
-    return static_cast<EntityModel *>(m_ItemRef.GetModel());
+	return static_cast<EntityModel *>(m_ItemRef.GetModel());
 }
 
 EntityTreeItem *EntityWidget::GetCurSelectedTreeItem()
 {
-    QModelIndex curIndex = ui->childrenTree->currentIndex();
-    return static_cast<EntityTreeItem *>(curIndex.internalPointer());
+	QModelIndex curIndex = ui->childrenTree->currentIndex();
+	return static_cast<EntityTreeItem *>(curIndex.internalPointer());
 
-    //return static_cast<EntityTreeItem *>(GetEntityModel()->GetTreeModel().index(curIndex.row(), curIndex.column(), curIndex.parent()).internalPointer());
+	//return static_cast<EntityTreeItem *>(GetEntityModel()->GetTreeModel().index(curIndex.row(), curIndex.column(), curIndex.parent()).internalPointer());
 }
 
 void EntityWidget::OnGiveMenuActions(QMenu *pMenu)
@@ -77,99 +86,99 @@ void EntityWidget::OnGiveMenuActions(QMenu *pMenu)
 
 EntityStateData *EntityWidget::GetCurStateData()
 {
-    return static_cast<EntityStateData *>(GetEntityModel()->GetStateData(ui->cmbStates->currentIndex()));
+	return static_cast<EntityStateData *>(GetEntityModel()->GetStateData(ui->cmbStates->currentIndex()));
 }
 
 int EntityWidget::GetNumStates() const
 {
-    return ui->cmbStates->count();
+	return ui->cmbStates->count();
 }
 
 void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 {
-    if(iStateIndex >= 0)
-    {
-        ui->cmbStates->blockSignals(true);
-        ui->cmbStates->setCurrentIndex(iStateIndex);
-        ui->cmbStates->blockSignals(false);
+	if(iStateIndex >= 0)
+	{
+		ui->cmbStates->blockSignals(true);
+		ui->cmbStates->setCurrentIndex(iStateIndex);
+		ui->cmbStates->blockSignals(false);
 
-        // Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
-        EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-        EntityTreeItem *pTreeItem = reinterpret_cast<EntityTreeItem *>(subState.toULongLong());
-        if(pTreeItem == nullptr)
-        {
-            ui->lblSelectedItemIcon->setVisible(false);
-            ui->lblSelectedItemText->setVisible(false);
+		// Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
+		EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+		EntityTreeItem *pTreeItem = reinterpret_cast<EntityTreeItem *>(subState.toULongLong());
+		if(pTreeItem == nullptr)
+		{
+			ui->lblSelectedItemIcon->setVisible(false);
+			ui->lblSelectedItemText->setVisible(false);
 
-            ui->propertyTree->setModel(nullptr);
-        }
-        else
-        {
-            ui->lblSelectedItemIcon->setVisible(true);
-            ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
-            ui->lblSelectedItemText->setVisible(true);
-            ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
+			ui->propertyTree->setModel(nullptr);
+		}
+		else
+		{
+			ui->lblSelectedItemIcon->setVisible(true);
+			ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+			ui->lblSelectedItemText->setVisible(true);
+			ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
 
-            PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem);
-            ui->propertyTree->setModel(pPropertiesModel);
-            ui->propertyTree->setColumnWidth(0, 200);
+			PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem);
+			ui->propertyTree->setModel(pPropertiesModel);
+			ui->propertyTree->setColumnWidth(0, 200);
 
-            // Expand the top level nodes (the properties' categories)
-            QModelIndex rootIndex = ui->propertyTree->rootIndex();
-            ui->propertyTree->expand(rootIndex);
-            for(int i = 0; i < pPropertiesModel->rowCount(); ++i)
-                ui->propertyTree->expand(pPropertiesModel->index(i, 0, rootIndex));
-        }
-    }
+			// Expand the top level nodes (the properties' categories)
+			QModelIndex rootIndex = ui->propertyTree->rootIndex();
+			ui->propertyTree->expand(rootIndex);
+			for(int i = 0; i < pPropertiesModel->rowCount(); ++i)
+				ui->propertyTree->expand(pPropertiesModel->index(i, 0, rootIndex));
+		}
+	}
 
-    UpdateActions();
+	UpdateActions();
 }
 
 void EntityWidget::UpdateActions()
 {
-    ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
-    ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
-    ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+	ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
+	ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
+	ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
 
-    ExplorerTreeItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
-    ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
+	ExplorerTreeItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
+	ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
 
-    bool bFrameIsSelected = ui->propertyTree->model() != nullptr && ui->propertyTree->currentIndex().row() >= 0;
-    ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
-    ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
-    ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
+	bool bFrameIsSelected = ui->propertyTree->model() != nullptr && ui->propertyTree->currentIndex().row() >= 0;
+	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
+	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
+	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
 }
 
 void EntityWidget::on_actionAddSelectedChild_triggered()
 {
-    if(GetCurSelectedTreeItem() == nullptr)
-    {
-        HyGuiLog("Currently selected entity tree item is nullptr. Cannot add child.", LOGTYPE_Error);
-        return;
-    }
+	if(GetCurSelectedTreeItem() == nullptr)
+	{
+		HyGuiLog("Currently selected entity tree item is nullptr. Cannot add child.", LOGTYPE_Error);
+		return;
+	}
 
-    ExplorerTreeItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
-    if(pExplorerItem->IsProjectItem() == false)
-    {
-        HyGuiLog("Currently selected item in Explorer is not a ProjectItem. Cannot add child to entity.", LOGTYPE_Error);
-        return;
-    }
+	ExplorerTreeItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
+	if(pExplorerItem->IsProjectItem() == false)
+	{
+		HyGuiLog("Currently selected item in Explorer is not a ProjectItem. Cannot add child to entity.", LOGTYPE_Error);
+		return;
+	}
 
-    ProjectItem *pItem = static_cast<ProjectItem *>(pExplorerItem);
-    QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChild, m_ItemRef, pItem);
-    m_ItemRef.GetUndoStack()->push(pCmd);
+	ProjectItem *pItem = static_cast<ProjectItem *>(pExplorerItem);
+	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChild, m_ItemRef, pItem);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPrimitive_triggered()
 {
-    if(GetCurSelectedTreeItem() == nullptr)
-    {
-        HyGuiLog("Currently selected entity tree item is nullptr. Cannot add primitive.", LOGTYPE_Error);
-        return;
-    }
+	if(GetCurSelectedTreeItem() == nullptr)
+	{
+		HyGuiLog("Currently selected entity tree item is nullptr. Cannot add primitive.", LOGTYPE_Error);
+		return;
+	}
 
-    QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, nullptr);
-    m_ItemRef.GetUndoStack()->push(pCmd);
+	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, nullptr);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionInsertBoundingVolume_triggered()
@@ -184,8 +193,8 @@ void EntityWidget::on_actionInsertPhysicsBody_triggered()
 
 void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
 {
-    EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
-    FocusState(ui->cmbStates->currentIndex(), QVariant(reinterpret_cast<qulonglong>(pTreeItem)));
+	EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
+	FocusState(ui->cmbStates->currentIndex(), QVariant(reinterpret_cast<qulonglong>(pTreeItem)));
 
 //    ui->toolBox->setVisible(true);
 //    ui->toolBoxLine->setVisible(true);
@@ -235,36 +244,36 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
 
 void EntityWidget::on_actionRenameState_triggered()
 {
-    DlgInputName *pDlg = new DlgInputName("Rename Entity State", GetCurStateData()->GetName());
-    if(pDlg->exec() == QDialog::Accepted)
-    {
-        QUndoCommand *pCmd = new UndoCmd_RenameState("Rename Entity State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
-        m_ItemRef.GetUndoStack()->push(pCmd);
-    }
+	DlgInputName *pDlg = new DlgInputName("Rename Entity State", GetCurStateData()->GetName());
+	if(pDlg->exec() == QDialog::Accepted)
+	{
+		QUndoCommand *pCmd = new UndoCmd_RenameState("Rename Entity State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
+		m_ItemRef.GetUndoStack()->push(pCmd);
+	}
 
-    delete pDlg;
+	delete pDlg;
 }
 
 void EntityWidget::on_actionAddState_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_AddState<EntityStateData>("Add Entity State", m_ItemRef, nullptr);
-    m_ItemRef.GetUndoStack()->push(pCmd);
+	QUndoCommand *pCmd = new UndoCmd_AddState<EntityStateData>("Add Entity State", m_ItemRef, nullptr);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionRemoveState_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_RemoveState<EntityStateData>("Remove Entity State", m_ItemRef, ui->cmbStates->currentIndex());
-    m_ItemRef.GetUndoStack()->push(pCmd);
+	QUndoCommand *pCmd = new UndoCmd_RemoveState<EntityStateData>("Remove Entity State", m_ItemRef, ui->cmbStates->currentIndex());
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionOrderStateBackwards_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift Entity State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
-    m_ItemRef.GetUndoStack()->push(pCmd);
+	QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift Entity State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionOrderStateForwards_triggered()
 {
-    QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift Entity State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
-    m_ItemRef.GetUndoStack()->push(pCmd);
+	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift Entity State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }

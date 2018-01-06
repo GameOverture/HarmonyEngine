@@ -4,7 +4,7 @@
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "IHyApplication.h"
@@ -53,7 +53,7 @@ HarmonyInit::HarmonyInit()
 
 HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 {
-	sHyProjFileName = MakeStringProperPath(sHyProjFileName.c_str(), ".hyproj", false);
+	sHyProjFileName = HyStr::MakeStringProperPath(sHyProjFileName.c_str(), ".hyproj", false);
 
 	std::string sProjFileContents;
 	HyReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
@@ -65,7 +65,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	{
 		sProjectDir = projObject.get<jsonxx::String>("AdjustWorkingDirectory");
 		sHyProjFileName = sProjectDir + "/" + sHyProjFileName;
-		sHyProjFileName = MakeStringProperPath(sHyProjFileName.c_str(), ".hyproj", false);
+		sHyProjFileName = HyStr::MakeStringProperPath(sHyProjFileName.c_str(), ".hyproj", false);
 
 		HyReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
 		projObject.parse(sProjFileContents);
@@ -78,8 +78,8 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		sDataDir = projObject.get<jsonxx::String>("DataPath");
 	}
 
-	sProjectDir = MakeStringProperPath(sProjectDir.c_str(), "", true);
-	sDataDir = MakeStringProperPath(sDataDir.c_str(), "", true);
+	sProjectDir = HyStr::MakeStringProperPath(sProjectDir.c_str(), "", true);
+	sDataDir = HyStr::MakeStringProperPath(sDataDir.c_str(), "", true);
 	
 	sGameName				= projObject.get<jsonxx::String>("GameName");
 	uiUpdateTickMs			= static_cast<uint32>(projObject.get<jsonxx::Number>("UpdateFpsCap")); // TODO: Change name

@@ -1,3 +1,12 @@
+/**************************************************************************
+*	GlobalWidgetMappers.h
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #ifndef GLOBALWIDGETMAPPERS_H
 #define GLOBALWIDGETMAPPERS_H
 
@@ -9,341 +18,341 @@
 
 class SpinBoxMapper : public QDataWidgetMapper
 {
-    class ModelSpinBox : public QAbstractListModel
-    {
-        int          m_iValue;
+	class ModelSpinBox : public QAbstractListModel
+	{
+		int          m_iValue;
 
-    public:
-        ModelSpinBox(QObject *pParent = nullptr) : QAbstractListModel(pParent), m_iValue(0) {
-        }
+	public:
+		ModelSpinBox(QObject *pParent = nullptr) : QAbstractListModel(pParent), m_iValue(0) {
+		}
 
-        virtual ~ModelSpinBox() {
-        }
+		virtual ~ModelSpinBox() {
+		}
 
-        int GetValue() {
-            return m_iValue;
-        }
+		int GetValue() {
+			return m_iValue;
+		}
 
-        void SetValue(int iValue) {
-            m_iValue = iValue;
-        }
+		void SetValue(int iValue) {
+			m_iValue = iValue;
+		}
 
-        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
-            return 1;
-        }
+		virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
+			return 1;
+		}
 
-        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
-            return m_iValue;
-        }
-    };
+		virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
+			return m_iValue;
+		}
+	};
 
 public:
-    SpinBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
-    {
-        setModel(new ModelSpinBox(this));
-    }
-    virtual ~SpinBoxMapper()
-    { }
+	SpinBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+	{
+		setModel(new ModelSpinBox(this));
+	}
+	virtual ~SpinBoxMapper()
+	{ }
 
-    void AddSpinBoxMapping(QSpinBox *pSpinBox)
-    {
-        pSpinBox->blockSignals(true);
+	void AddSpinBoxMapping(QSpinBox *pSpinBox)
+	{
+		pSpinBox->blockSignals(true);
 
-        addMapping(pSpinBox, 0);
-        this->setCurrentIndex(0);
+		addMapping(pSpinBox, 0);
+		this->setCurrentIndex(0);
 
-        if(GetValue() < pSpinBox->minimum())
-            SetValue(pSpinBox->minimum());
-        if(GetValue() > pSpinBox->maximum())
-            SetValue(pSpinBox->maximum());
+		if(GetValue() < pSpinBox->minimum())
+			SetValue(pSpinBox->minimum());
+		if(GetValue() > pSpinBox->maximum())
+			SetValue(pSpinBox->maximum());
 
-        pSpinBox->setValue(GetValue());
+		pSpinBox->setValue(GetValue());
 
-        pSpinBox->blockSignals(false);
-    }
+		pSpinBox->blockSignals(false);
+	}
 
-    int GetValue()
-    {
-        return static_cast<ModelSpinBox *>(model())->GetValue();
-    }
+	int GetValue()
+	{
+		return static_cast<ModelSpinBox *>(model())->GetValue();
+	}
 
-    void SetValue(int iValue)
-    {
-        static_cast<ModelSpinBox *>(model())->SetValue(iValue);
-        setCurrentIndex(0);
-    }
+	void SetValue(int iValue)
+	{
+		static_cast<ModelSpinBox *>(model())->SetValue(iValue);
+		setCurrentIndex(0);
+	}
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class DoubleSpinBoxMapper : public QDataWidgetMapper
 {
-    class ModelDoubleSpinBox : public QAbstractListModel
-    {
-        double          m_dValue;
+	class ModelDoubleSpinBox : public QAbstractListModel
+	{
+		double          m_dValue;
 
-    public:
-        ModelDoubleSpinBox(QObject *pParent = nullptr) : QAbstractListModel(pParent), m_dValue(0.0) {
-        }
+	public:
+		ModelDoubleSpinBox(QObject *pParent = nullptr) : QAbstractListModel(pParent), m_dValue(0.0) {
+		}
 
-        virtual ~ModelDoubleSpinBox() {
-        }
+		virtual ~ModelDoubleSpinBox() {
+		}
 
-        double GetValue() {
-            return m_dValue;
-        }
+		double GetValue() {
+			return m_dValue;
+		}
 
-        void SetValue(double dValue) {
-            m_dValue = dValue;
-        }
+		void SetValue(double dValue) {
+			m_dValue = dValue;
+		}
 
-        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
-            return 1;
-        }
+		virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
+			return 1;
+		}
 
-        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
-            return m_dValue;
-        }
-    };
+		virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
+			return m_dValue;
+		}
+	};
 
 public:
-    DoubleSpinBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
-    {
-        setModel(new ModelDoubleSpinBox(this));
-    }
-    virtual ~DoubleSpinBoxMapper()
-    { }
+	DoubleSpinBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+	{
+		setModel(new ModelDoubleSpinBox(this));
+	}
+	virtual ~DoubleSpinBoxMapper()
+	{ }
 
-    void AddSpinBoxMapping(QDoubleSpinBox *pSpinBox)
-    {
-        pSpinBox->blockSignals(true);
+	void AddSpinBoxMapping(QDoubleSpinBox *pSpinBox)
+	{
+		pSpinBox->blockSignals(true);
 
-        addMapping(pSpinBox, 0);
-        this->setCurrentIndex(0);
+		addMapping(pSpinBox, 0);
+		this->setCurrentIndex(0);
 
-        if(GetValue() < pSpinBox->minimum())
-            SetValue(pSpinBox->minimum());
-        if(GetValue() > pSpinBox->maximum())
-            SetValue(pSpinBox->maximum());
+		if(GetValue() < pSpinBox->minimum())
+			SetValue(pSpinBox->minimum());
+		if(GetValue() > pSpinBox->maximum())
+			SetValue(pSpinBox->maximum());
 
-        pSpinBox->setValue(GetValue());
+		pSpinBox->setValue(GetValue());
 
-        pSpinBox->blockSignals(false);
-    }
+		pSpinBox->blockSignals(false);
+	}
 
-    double GetValue()
-    {
-        return static_cast<ModelDoubleSpinBox *>(model())->GetValue();
-    }
+	double GetValue()
+	{
+		return static_cast<ModelDoubleSpinBox *>(model())->GetValue();
+	}
 
-    void SetValue(double dValue)
-    {
-        static_cast<ModelDoubleSpinBox *>(model())->SetValue(dValue);
-        setCurrentIndex(0);
-    }
+	void SetValue(double dValue)
+	{
+		static_cast<ModelDoubleSpinBox *>(model())->SetValue(dValue);
+		setCurrentIndex(0);
+	}
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class LineEditMapper : public QDataWidgetMapper
 {
-    class ModelLineEdit : public QAbstractListModel
-    {
-        QString     m_sString;
+	class ModelLineEdit : public QAbstractListModel
+	{
+		QString     m_sString;
 
-    public:
-        ModelLineEdit(QObject *pParent = nullptr) : QAbstractListModel(pParent) {
-        }
+	public:
+		ModelLineEdit(QObject *pParent = nullptr) : QAbstractListModel(pParent) {
+		}
 
-        virtual ~ModelLineEdit() {
-        }
+		virtual ~ModelLineEdit() {
+		}
 
-        QString GetString() {
-            return m_sString;
-        }
+		QString GetString() {
+			return m_sString;
+		}
 
-        void SetString(QString sString) {
-            m_sString = sString;
-        }
+		void SetString(QString sString) {
+			m_sString = sString;
+		}
 
-        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
-            return 1;
-        }
+		virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
+			return 1;
+		}
 
-        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
-            return m_sString;
-        }
-    };
+		virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
+			return m_sString;
+		}
+	};
 
 public:
-    LineEditMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
-    {
-        setModel(new ModelLineEdit(this));
-    }
-    virtual ~LineEditMapper()
-    { }
+	LineEditMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+	{
+		setModel(new ModelLineEdit(this));
+	}
+	virtual ~LineEditMapper()
+	{ }
 
-    void AddLineEditMapping(QLineEdit *pLineEdit)
-    {
-        addMapping(pLineEdit, 0);
-        this->setCurrentIndex(0);
-    }
+	void AddLineEditMapping(QLineEdit *pLineEdit)
+	{
+		addMapping(pLineEdit, 0);
+		this->setCurrentIndex(0);
+	}
 
-    QString GetString()
-    {
-        return static_cast<ModelLineEdit *>(model())->GetString();
-    }
+	QString GetString()
+	{
+		return static_cast<ModelLineEdit *>(model())->GetString();
+	}
 
-    void SetString(QString sString)
-    {
-        static_cast<ModelLineEdit *>(model())->SetString(sString);
-        setCurrentIndex(0);
-    }
+	void SetString(QString sString)
+	{
+		static_cast<ModelLineEdit *>(model())->SetString(sString);
+		setCurrentIndex(0);
+	}
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CheckBoxMapper : public QDataWidgetMapper
 {
-    class ModelCheckBox : public QAbstractListModel
-    {
-    public:
-        ModelCheckBox(QObject *pParent = nullptr) : QAbstractListModel(pParent) {
-        }
+	class ModelCheckBox : public QAbstractListModel
+	{
+	public:
+		ModelCheckBox(QObject *pParent = nullptr) : QAbstractListModel(pParent) {
+		}
 
-        virtual ~ModelCheckBox() {
-        }
+		virtual ~ModelCheckBox() {
+		}
 
-        virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
-            return 2;
-        }
+		virtual int rowCount(const QModelIndex &parent /*= QModelIndex()*/) const override {
+			return 2;
+		}
 
-        virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
-            return index.row() == 0 ? false : true;
-        }
-    };
+		virtual QVariant data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const override {
+			return index.row() == 0 ? false : true;
+		}
+	};
 
 public:
-    CheckBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
-    {
-        setModel(new ModelCheckBox(this));
-    }
-    virtual ~CheckBoxMapper()
-    { }
+	CheckBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+	{
+		setModel(new ModelCheckBox(this));
+	}
+	virtual ~CheckBoxMapper()
+	{ }
 
-    void AddCheckBoxMapping(QCheckBox *pCheckBox)
-    {
-        addMapping(pCheckBox, 0);
-        this->setCurrentIndex(this->currentIndex());
-    }
+	void AddCheckBoxMapping(QCheckBox *pCheckBox)
+	{
+		addMapping(pCheckBox, 0);
+		this->setCurrentIndex(this->currentIndex());
+	}
 
-    bool IsChecked()
-    {
-        return currentIndex() == 0 ? false : true;
-    }
+	bool IsChecked()
+	{
+		return currentIndex() == 0 ? false : true;
+	}
 
-    void SetChecked(bool bChecked)
-    {
-        setCurrentIndex(bChecked ? 1 : 0);
-    }
+	void SetChecked(bool bChecked)
+	{
+		setCurrentIndex(bChecked ? 1 : 0);
+	}
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ComboBoxMapper : public QDataWidgetMapper
 {
-    class ModelComboBox : public QAbstractListModel
-    {
-        QStringList         m_sItemList;
-        QVariantList        m_DataList;
+	class ModelComboBox : public QAbstractListModel
+	{
+		QStringList         m_sItemList;
+		QVariantList        m_DataList;
 
-    public:
-        ModelComboBox(QObject *pParent = nullptr) : QAbstractListModel(pParent) {
-        }
+	public:
+		ModelComboBox(QObject *pParent = nullptr) : QAbstractListModel(pParent) {
+		}
 
-        virtual ~ModelComboBox() {
-        }
+		virtual ~ModelComboBox() {
+		}
 
-        void AddItem(QString sName, QVariant data) {
-            m_sItemList.append(sName);
-            m_DataList.append(data);
-        }
+		void AddItem(QString sName, QVariant data) {
+			m_sItemList.append(sName);
+			m_DataList.append(data);
+		}
 
-        QString GetItem(int iIndex) {
-            return m_sItemList[iIndex];
-        }
+		QString GetItem(int iIndex) {
+			return m_sItemList[iIndex];
+		}
 
-        QVariant GetData(int iIndex) {
-            return m_DataList[iIndex];
-        }
+		QVariant GetData(int iIndex) {
+			return m_DataList[iIndex];
+		}
 
-        int FindItemIndex(QString sName) {
-            for(int i = 0; i < m_sItemList.size(); ++i)
-            {
-                if(sName == m_sItemList[i])
-                    return i;
-            }
+		int FindItemIndex(QString sName) {
+			for(int i = 0; i < m_sItemList.size(); ++i)
+			{
+				if(sName == m_sItemList[i])
+					return i;
+			}
 
-            return -1;
-        }
+			return -1;
+		}
 
-        virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override {
-            return m_sItemList.size();
-        }
+		virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override {
+			return m_sItemList.size();
+		}
 
-        virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override {
-            if(role == Qt::UserRole)
-                return m_DataList[index.row()];
-            else if(role == Qt::DisplayRole)
-                return m_sItemList[index.row()];
-            else
-                return QVariant();
-        }
-    };
+		virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override {
+			if(role == Qt::UserRole)
+				return m_DataList[index.row()];
+			else if(role == Qt::DisplayRole)
+				return m_sItemList[index.row()];
+			else
+				return QVariant();
+		}
+	};
 
 public:
-    ComboBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
-    {
-        setModel(new ModelComboBox(this));
-    }
-    virtual ~ComboBoxMapper()
-    { }
+	ComboBoxMapper(QObject *pParent = nullptr) : QDataWidgetMapper(pParent)
+	{
+		setModel(new ModelComboBox(this));
+	}
+	virtual ~ComboBoxMapper()
+	{ }
 
-    void AddComboBoxMapping(QComboBox *pComboBox)
-    {
-        pComboBox->blockSignals(true);
+	void AddComboBoxMapping(QComboBox *pComboBox)
+	{
+		pComboBox->blockSignals(true);
 
-        pComboBox->setModel(model());
-        addMapping(pComboBox, 0);
+		pComboBox->setModel(model());
+		addMapping(pComboBox, 0);
 
-        if(this->currentIndex() == -1 && static_cast<ModelComboBox *>(model())->rowCount() != 0)
-            this->SetIndex(0);
+		if(this->currentIndex() == -1 && static_cast<ModelComboBox *>(model())->rowCount() != 0)
+			this->SetIndex(0);
 
-        pComboBox->setCurrentIndex(this->currentIndex());
+		pComboBox->setCurrentIndex(this->currentIndex());
 
-        pComboBox->blockSignals(false);
-    }
+		pComboBox->blockSignals(false);
+	}
 
-    void AddItem(QString sName, QVariant data)
-    {
-        static_cast<ModelComboBox *>(model())->AddItem(sName, data);
-    }
+	void AddItem(QString sName, QVariant data)
+	{
+		static_cast<ModelComboBox *>(model())->AddItem(sName, data);
+	}
 
-    QString GetCurrentItem()
-    {
-        return static_cast<ModelComboBox *>(model())->GetItem(currentIndex());
-    }
+	QString GetCurrentItem()
+	{
+		return static_cast<ModelComboBox *>(model())->GetItem(currentIndex());
+	}
 
-    QVariant GetCurrentData()
-    {
-        return static_cast<ModelComboBox *>(model())->GetData(currentIndex());
-    }
+	QVariant GetCurrentData()
+	{
+		return static_cast<ModelComboBox *>(model())->GetData(currentIndex());
+	}
 
-    void SetIndex(int iIndex)
-    {
-        setCurrentIndex(iIndex);
+	void SetIndex(int iIndex)
+	{
+		setCurrentIndex(iIndex);
 
-        int iTest = currentIndex();
-        iTest = iTest;
-    }
+		int iTest = currentIndex();
+		iTest = iTest;
+	}
 
-    void SetIndex(QString sName)
-    {
-        int iFoundIndex = static_cast<ModelComboBox *>(model())->FindItemIndex(sName);
-        setCurrentIndex(iFoundIndex);
-    }
+	void SetIndex(QString sName)
+	{
+		int iFoundIndex = static_cast<ModelComboBox *>(model())->FindItemIndex(sName);
+		setCurrentIndex(iFoundIndex);
+	}
 };
 
 #endif // GLOBALWIDGETMAPPERS_H

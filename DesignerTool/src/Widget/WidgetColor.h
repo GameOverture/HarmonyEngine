@@ -4,7 +4,7 @@
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef WIDGETCOLOR_H
@@ -18,34 +18,34 @@ class WidgetColor;
 
 class WidgetColor : public QWidget
 {
-    Q_OBJECT
-    
+	Q_OBJECT
+	
 public:
-    explicit WidgetColor(QWidget *parent = 0);
-    ~WidgetColor();
-    
-    QColor GetColor();
-    void SetColor(QColor color);
-    
+	explicit WidgetColor(QWidget *parent = 0);
+	~WidgetColor();
+	
+	QColor GetColor();
+	void SetColor(QColor color);
+	
 private Q_SLOTS:
-    void on_sbR_valueChanged(int arg1);
-    
-    void on_sbG_valueChanged(int arg1);
-    
-    void on_sbB_valueChanged(int arg1);
-    
-    void on_btnSample_clicked();
-    
-    void on_sliderR_valueChanged(int value);
+	void on_sbR_valueChanged(int arg1);
+	
+	void on_sbG_valueChanged(int arg1);
+	
+	void on_sbB_valueChanged(int arg1);
+	
+	void on_btnSample_clicked();
+	
+	void on_sliderR_valueChanged(int value);
 
-    void on_sliderG_valueChanged(int value);
+	void on_sliderG_valueChanged(int value);
 
-    void on_sliderB_valueChanged(int value);
+	void on_sliderB_valueChanged(int value);
 
 private:
-    Ui::WidgetColor *ui;
-    
-    void ApplyColorToSampleBtn();
+	Ui::WidgetColor *ui;
+	
+	void ApplyColorToSampleBtn();
 };
 
 #endif // WIDGETCOLOR_H

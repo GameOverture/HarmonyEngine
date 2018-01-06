@@ -4,11 +4,11 @@
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef __HyStopwatch_h__
-#define __HyStopwatch_h__
+#ifndef HyStopwatch_h__
+#define HyStopwatch_h__
 
 #include "IHyTimeInst.h"
 
@@ -19,4 +19,4 @@ public:
 	virtual ~HyStopwatch(void);
 };
 
-#endif /* __HyStopwatch_h__ */
+#endif /* HyStopwatch_h__ */

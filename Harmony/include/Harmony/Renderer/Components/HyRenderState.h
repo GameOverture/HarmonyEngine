@@ -4,7 +4,7 @@
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
  *
- *	The zlib License (zlib)
+ *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef HyRenderState_h__
@@ -39,6 +39,8 @@ class HyRenderState
 public:
 	HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOffset, /*const*/ IHyDrawInst2d &instanceRef);
 	~HyRenderState(void);
+
+	uint32 GetId() const;
 
 	size_t GetDataOffset() const;
 	uint32 GetCullMask() const;
