@@ -36,19 +36,19 @@ HyStencilHandle HyStencil::GetHandle() const
 	return m_hHANDLE;
 }
 
-void HyStencil::AddInstance(IHyDrawInst2d *pInstance)
+void HyStencil::AddMask(IHyDrawInst2d *pInstance)
 {
 	pInstance->Load();
-	m_InstanceList.push_back(pInstance);
+	m_MaskInstanceList.push_back(pInstance);
 }
 
-bool HyStencil::RemoveInstance(IHyDrawInst2d *pInstance)
+bool HyStencil::RemoveMask(IHyDrawInst2d *pInstance)
 {
-	for(auto it = m_InstanceList.begin(); it != m_InstanceList.end(); ++it)
+	for(auto it = m_MaskInstanceList.begin(); it != m_MaskInstanceList.end(); ++it)
 	{
 		if((*it) == pInstance)
 		{
-			m_InstanceList.erase(it);
+			m_MaskInstanceList.erase(it);
 			return true;
 		}
 	}
@@ -73,7 +73,7 @@ void HyStencil::SetAsInvertedMask()
 
 const std::vector<IHyDrawInst2d *> &HyStencil::GetInstanceList() const
 {
-	return m_InstanceList;
+	return m_MaskInstanceList;
 }
 
 HyRenderState *HyStencil::GetRenderStatePtr() const

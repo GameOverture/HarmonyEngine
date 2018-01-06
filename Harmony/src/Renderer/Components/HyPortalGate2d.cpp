@@ -65,7 +65,7 @@ HyPortalGate2d::HyPortalGate2d(const glm::vec2 &pt1, const glm::vec2 &pt2, const
 
 	m_StencilShape.SetEnabled(false);
 	m_StencilShape.GetShape().SetAsPolygon(stencilVertList, 4);
-	m_pStencil->AddInstance(&m_StencilShape);
+	m_pStencil->AddMask(&m_StencilShape);
 }
 
 HyPortalGate2d::~HyPortalGate2d()

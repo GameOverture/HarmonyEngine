@@ -132,7 +132,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 	case HYSHAPE_Circle:
 		SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x,
 							  static_cast<b2CircleShape *>(pb2Shape)->m_p.y),
-					static_cast<b2CircleShape *>(pb2Shape)->m_radius);
+							  static_cast<b2CircleShape *>(pb2Shape)->m_radius);
 		break;
 
 	case HYSHAPE_Polygon: {

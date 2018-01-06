@@ -28,7 +28,7 @@ class HyStencil
 	static HyStencilHandle			sm_hHandleCount;
 	const HyStencilHandle			m_hHANDLE;
 
-	std::vector<IHyDrawInst2d *>	m_InstanceList;
+	std::vector<IHyDrawInst2d *>	m_MaskInstanceList;
 	HyRenderState *					m_pRenderStatePtr;
 
 	HyStencilBehavior				m_eBehavior;
@@ -42,8 +42,8 @@ public:
 	HyStencilHandle GetHandle() const;
 
 	// It's the user's responsibility to ensure added instances continue to be valid
-	void AddInstance(IHyDrawInst2d *pInstance);
-	bool RemoveInstance(IHyDrawInst2d *pInstance);
+	void AddMask(IHyDrawInst2d *pInstance);
+	bool RemoveMask(IHyDrawInst2d *pInstance);
 
 	HyStencilBehavior GetBehavior() const;
 
