@@ -402,6 +402,7 @@ void MainWindow::on_actionOpenProject_triggered()
 	QFileDialog *pDlg = new QFileDialog();
 	pDlg->setNameFilter(tr("Harmony Project File (*.hyproj)"));
 	pDlg->setModal(true);
+    pDlg->setDirectory(m_sDefaultProjectLocation);
 
 	if(pDlg->exec() == QDialog::Accepted)
 	{
