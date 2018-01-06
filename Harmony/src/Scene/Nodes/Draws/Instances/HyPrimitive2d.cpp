@@ -97,6 +97,11 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 	m_bDirty = true;
 }
 
+/*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
+{
+	return (m_pVertBuffer != nullptr && m_BoundingVolume.IsValid());
+}
+
 /*virtual*/ void HyPrimitive2d::OnShapeSet(HyShape2d *pShape) /*override*/
 {
 	IHyDrawInst2d::OnShapeSet(pShape);

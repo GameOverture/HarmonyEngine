@@ -29,6 +29,7 @@ class HyStencil
 	const HyStencilHandle			m_hHANDLE;
 
 	std::vector<IHyDrawInst2d *>	m_MaskInstanceList;
+	bool							m_bMaskIsReady;
 	HyRenderState *					m_pRenderStatePtr;
 
 	HyStencilBehavior				m_eBehavior;
@@ -45,6 +46,8 @@ public:
 	void AddMask(IHyDrawInst2d *pInstance);
 	bool RemoveMask(IHyDrawInst2d *pInstance);
 
+	bool IsMaskReady();
+
 	HyStencilBehavior GetBehavior() const;
 
 	void SetAsMask();
@@ -54,6 +57,7 @@ public:
 	HyRenderState *GetRenderStatePtr() const;
 
 private:
+	bool ConfirmMaskReady();
 	void SetRenderStatePtr(HyRenderState *pPtr);
 };
 

@@ -122,8 +122,9 @@ public:
 	void SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitWordsToFit = false);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
-protected:
 	virtual bool IsLoadDataValid() override;
+
+protected:
 	virtual void CalcBoundingVolume() override;
 	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;

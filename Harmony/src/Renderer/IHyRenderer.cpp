@@ -82,15 +82,14 @@ void IHyRenderer::PrepareBuffers()
 	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
 	{
 		HyStencil *pStencil = iter->second;
+		if(pStencil->IsMaskReady() == false && pStencil->ConfirmMaskReady() == false)
+			continue;
+
 		pStencil->SetRenderStatePtr(reinterpret_cast<HyRenderState *>(m_pCurRenderStateWritePos));
 
 		const std::vector<IHyDrawInst2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
 		{
-			// TODO JAY Stencil fix 
-			if(instanceListRef[i]->IsLoaded() == false)
-				continue;
-
 			instanceListRef[i]->OnUpdateUniforms();
 			AppendRenderState(0, *instanceListRef[i], HY_FULL_CULL_MASK);
 		}

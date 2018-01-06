@@ -20,7 +20,7 @@ HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOf
 																																m_eRenderMode(instanceRef.GetRenderMode()),
 																																m_hTextureHandle(instanceRef.GetTextureHandle()),
 																																m_hShader(instanceRef.GetShaderHandle()),
-																																m_hStencil(instanceRef.GetStencil() ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE),
+																																m_hStencil((instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE),
 																																m_iCoordinateSystem(instanceRef.GetCoordinateSystem()),
 																																m_uiExDataSize(0)
 {

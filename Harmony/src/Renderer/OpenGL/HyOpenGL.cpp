@@ -208,10 +208,6 @@ HyOpenGL::~HyOpenGL(void)
 			char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pStencil->GetRenderStatePtr());
 			for(uint32 i = 0; i < uiNumStencilInstance; ++i)
 			{
-				// TODO JAY Stencil fix 
-				if(pStencil->GetInstanceList()[i]->IsLoaded() == false)
-					continue;
-
 				HyRenderState *pCurRenderState = reinterpret_cast<HyRenderState *>(pStencilRenderStateBufferPos);
 				if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
 					RenderPass2d(pCurRenderState, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);

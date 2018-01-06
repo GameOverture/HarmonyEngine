@@ -45,6 +45,8 @@ public:
 	float GetLineThickness();
 	void SetLineThickness(float fThickness);
 
+	virtual bool IsLoadDataValid() override;
+
 protected:
 	virtual void OnShapeSet(HyShape2d *pShape) override;
 	virtual void DrawLoadedUpdate() override;
