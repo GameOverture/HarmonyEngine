@@ -72,15 +72,16 @@
     <ClCompile Include="Input\HyInput.cpp" />
     <ClCompile Include="Input\HyInputMap.cpp" />
     <ClCompile Include="Memory\HyMemoryHeap.cpp" />
-    <ClCompile Include="Renderer\Components\HyPortal2d.cpp" />
+    <ClCompile Include="Renderer\Components\HyPortalGate2d.cpp" />
     <ClCompile Include="Renderer\Components\HyRenderState.cpp" />
-    <ClCompile Include="Renderer\Components\HyShader.cpp" />
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp" />
-    <ClCompile Include="Renderer\Components\HyStencil.cpp" />
     <ClCompile Include="Renderer\Components\HyWindow.cpp" />
+    <ClCompile Include="Renderer\Effects\HyPortal2d.cpp" />
+    <ClCompile Include="Renderer\Effects\HyShader.cpp" />
+    <ClCompile Include="Renderer\Effects\HyStencil.cpp" />
+    <ClCompile Include="Renderer\Effects\IHyFx.cpp" />
     <ClCompile Include="Renderer\IHyRenderer.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp" />
-    <ClCompile Include="Renderer\OpenGL\HyOpenGLShader.cpp" />
     <ClCompile Include="Scene\HyScene.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\Entities\HyEntity2d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\IHyDraw2d.cpp" />
@@ -162,15 +163,16 @@
     <ClInclude Include="..\include\Harmony\Memory\Interop\HyMemAPI_Windows.h" />
     <ClInclude Include="..\include\Harmony\Memory\PageTypes\HyMedHeapPage.h" />
     <ClInclude Include="..\include\Harmony\Memory\PageTypes\HySmlHeapPage.h" />
-    <ClInclude Include="..\include\Harmony\Renderer\Components\HyPortal2d.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\Components\HyPortalGate2d.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyRenderState.h" />
-    <ClInclude Include="..\include\Harmony\Renderer\Components\HyShader.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyShaderUniforms.h" />
-    <ClInclude Include="..\include\Harmony\Renderer\Components\HyStencil.h" />
     <ClInclude Include="..\include\Harmony\Renderer\Components\HyWindow.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\Effects\HyPortal2d.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\Effects\HyShader.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\Effects\HyStencil.h" />
+    <ClInclude Include="..\include\Harmony\Renderer\Effects\IHyFx.h" />
     <ClInclude Include="..\include\Harmony\Renderer\IHyRenderer.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
-    <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShader.h" />
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
     <ClInclude Include="..\include\Harmony\Scene\HyScene.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntity2d.h" />
@@ -407,7 +409,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;HY_PLATFORM_GUI;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\Include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -436,7 +438,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;HY_PLATFORM_GUI;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\Include</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -519,7 +521,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;HY_PLATFORM_GUI;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
@@ -547,7 +549,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>GLEW_STATIC;_HARMONYGUI;_HARMONYSINGLETHREAD;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;HY_PLATFORM_GUI;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\include\Harmony;%DXSDK_DIR%\Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>
