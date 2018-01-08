@@ -23,7 +23,6 @@ protected:
 
 	bool			m_bWireframe;
 	float			m_fLineThickness;
-	bool			m_bDirty;
 
 public:
 	HyPrimitive2d(HyEntity2d *pParent = nullptr);
@@ -49,12 +48,12 @@ public:
 
 protected:
 	virtual void OnShapeSet(HyShape2d *pShape) override;
-	virtual void DrawLoadedUpdate() override;
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
 
 private:
 	void ClearData();
+	void SetData();
 
 	void SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices);
 	void SetAsCircle(glm::vec2 &ptCenter, float fRadius);

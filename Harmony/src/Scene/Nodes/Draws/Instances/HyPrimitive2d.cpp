@@ -16,8 +16,7 @@ HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDrawInst2d(
 																	m_pVertBuffer(nullptr),
 																	m_uiNumVerts(0),
 																	m_bWireframe(false),
-																	m_fLineThickness(1.0f),
-																	m_bDirty(false)
+																	m_fLineThickness(1.0f)
 {
 	ClearData();
 }
@@ -26,8 +25,8 @@ HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :	IHyDrawInst2d(copyR
 																m_bWireframe(copyRef.m_bWireframe),
 																m_fLineThickness(copyRef.m_fLineThickness)
 {
-	ClearData();
-	m_bDirty = true;
+	// TODO: Check to see if this works
+	SetData();
 }
 
 HyPrimitive2d::~HyPrimitive2d(void)
@@ -37,13 +36,12 @@ HyPrimitive2d::~HyPrimitive2d(void)
 
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 {
-	IHyDrawInst2d::operator=(rhs);
-
 	ClearData();
+	IHyDrawInst2d::operator=(rhs);
 
 	m_bWireframe = rhs.m_bWireframe;
 	m_fLineThickness = rhs.m_fLineThickness;
-	m_bDirty = true;
+	SetData();
 
 	return *this;
 }
@@ -80,7 +78,7 @@ void HyPrimitive2d::SetWireframe(bool bIsWireframe)
 		return;
 
 	m_bWireframe = bIsWireframe;
-	m_bDirty = true;
+	SetData();
 }
 
 float HyPrimitive2d::GetLineThickness()
@@ -94,7 +92,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 		return;
 
 	m_fLineThickness = fThickness;
-	m_bDirty = true;
+	SetData();
 }
 
 /*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
@@ -107,63 +105,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 	IHyDrawInst2d::OnShapeSet(pShape);
 
 	if(pShape == &m_BoundingVolume)
-		m_bDirty = true;
-}
-
-/*virtual*/ void HyPrimitive2d::DrawLoadedUpdate() /*override*/
-{
-	if(m_bDirty == false)
-		return;
-
-	b2Shape *pb2Shape = m_BoundingVolume.GetB2Shape();
-
-	switch(m_BoundingVolume.GetType())
-	{
-	case HYSHAPE_Unknown:	// Shape hasn't been set yet by user
-		break;
-
-	case HYSHAPE_LineSegment: {
-		std::vector<b2Vec2> pointList;
-		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1);
-		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2);
-		SetAsLineChain(pointList.data(), 2);
-	} break;
-
-	case HYSHAPE_LineLoop:
-	case HYSHAPE_LineChain: {
-		SetAsLineChain(static_cast<b2ChainShape *>(pb2Shape)->m_vertices, static_cast<b2ChainShape *>(pb2Shape)->m_count);
-	} break;
-
-	case HYSHAPE_Circle:
-		SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x,
-							  static_cast<b2CircleShape *>(pb2Shape)->m_p.y),
-							  static_cast<b2CircleShape *>(pb2Shape)->m_radius);
-		break;
-
-	case HYSHAPE_Polygon: {
-		if(m_bWireframe)
-		{
-			int32 iNumVerts = static_cast<b2PolygonShape *>(pb2Shape)->m_count;
-			HyAssert(iNumVerts >= 3, "HyPrimitive error, not enough verts for HYSHAPE_Polygon");
-
-			std::vector<b2Vec2> vertList;
-			for(int32 i = 0; i < iNumVerts; ++i)
-				vertList.push_back(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices[i]);
-
-			// Make it loop
-			vertList.push_back(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices[0]);
-
-			SetAsLineChain(vertList.data(), iNumVerts + 1);
-		}
-		else
-			SetAsPolygon(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<b2PolygonShape *>(pb2Shape)->m_count);
-	} break;
-
-	default:
-		HyLogError("HyPrimitive2d::OnShapeSet() - Unknown shape type: " << m_BoundingVolume.GetType());
-	}
-
-	m_bDirty = false;
+		SetData();
 }
 
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms()
@@ -202,8 +144,59 @@ void HyPrimitive2d::ClearData()
 	m_uiNumVerts = 0;
 
 	m_eRenderMode = HYRENDERMODE_Unknown;
-	m_BoundingVolume.SetAsNothing();
+//	m_BoundingVolume.SetAsNothing();	
 	m_ShaderUniforms.Clear();
+}
+
+void HyPrimitive2d::SetData()
+{
+	b2Shape *pb2Shape = m_BoundingVolume.GetB2Shape();
+
+	switch(m_BoundingVolume.GetType())
+	{
+	case HYSHAPE_Unknown:	// Shape hasn't been set yet by user
+		break;
+
+	case HYSHAPE_LineSegment: {
+		std::vector<b2Vec2> pointList;
+		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1);
+		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2);
+		SetAsLineChain(pointList.data(), 2);
+	} break;
+
+	case HYSHAPE_LineLoop:
+	case HYSHAPE_LineChain: {
+		SetAsLineChain(static_cast<b2ChainShape *>(pb2Shape)->m_vertices, static_cast<b2ChainShape *>(pb2Shape)->m_count);
+	} break;
+
+	case HYSHAPE_Circle:
+		SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x,
+			static_cast<b2CircleShape *>(pb2Shape)->m_p.y),
+			static_cast<b2CircleShape *>(pb2Shape)->m_radius);
+		break;
+
+	case HYSHAPE_Polygon: {
+		if(m_bWireframe)
+		{
+			int32 iNumVerts = static_cast<b2PolygonShape *>(pb2Shape)->m_count;
+			HyAssert(iNumVerts >= 3, "HyPrimitive error, not enough verts for HYSHAPE_Polygon");
+
+			std::vector<b2Vec2> vertList;
+			for(int32 i = 0; i < iNumVerts; ++i)
+				vertList.push_back(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices[i]);
+
+			// Make it loop
+			vertList.push_back(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices[0]);
+
+			SetAsLineChain(vertList.data(), iNumVerts + 1);
+		}
+		else
+			SetAsPolygon(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<b2PolygonShape *>(pb2Shape)->m_count);
+	} break;
+
+	default:
+		HyLogError("HyPrimitive2d::SetData() - Unknown shape type: " << m_BoundingVolume.GetType());
+	}
 }
 
 void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
