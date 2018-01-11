@@ -171,11 +171,13 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Append 2d Render States to buffer
-	uint32 uiCullMask = 0;
+
+	// TODO: JAY FIX CULLING ISSUE
+	uint32 uiCullMask = HY_FULL_CULL_MASK;//0;
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_Loaded.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_Loaded[i]->IsEnabled() == false || CalculateCullPasses(*m_NodeList_Loaded[i], uiCullMask) == false)
+		if(m_NodeList_Loaded[i]->IsEnabled() == false/* || CalculateCullPasses(*m_NodeList_Loaded[i], uiCullMask) == false*/)
 			continue;
 
 		rendererRef.AppendRenderState(i, *m_NodeList_Loaded[i], uiCullMask);
