@@ -218,7 +218,7 @@ void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInt
 	//m_ShaderUniforms.Set(...);
 }
 
-/*virtual*/ void HySpine2d::OnWriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void HySpine2d::OnWriteVertexData(char *&pRefDataWritePos)
 {
 	spSlot *pCurSlot;
 	for (int i = 0; i < m_pSpineSkeleton->slotsCount; ++i)

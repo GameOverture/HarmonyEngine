@@ -49,7 +49,7 @@ public:
 protected:
 	virtual void OnShapeSet(HyShape2d *pShape) override;
 	virtual void OnUpdateUniforms() override;
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
+	virtual void OnWriteVertexData(char *&pRefDataWritePos) override;
 
 private:
 	void ClearData();

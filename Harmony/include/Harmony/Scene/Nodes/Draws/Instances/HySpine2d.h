@@ -116,7 +116,7 @@ private:
 	virtual void DrawLoadedUpdate() override;
 	
 	virtual void OnUpdateUniforms() override;
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
+	virtual void OnWriteVertexData(char *&pRefDataWritePos) override;
 };
 
 #endif /* HySpine2d_h__ */

@@ -129,7 +129,7 @@ protected:
 	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos) override;
+	virtual void OnWriteVertexData(char *&pRefDataWritePos) override;
 
 private:
 	void MarkAsDirty();
