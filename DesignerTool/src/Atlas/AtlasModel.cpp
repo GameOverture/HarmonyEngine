@@ -1043,7 +1043,7 @@ void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex
 //        }
 
 		QPoint pos(pFrame->GetX(), pFrame->GetY());
-		if(m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude)
+    /*	if(m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude)
 		{
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			QColor color1 = QColor::fromRgba(imgFrame.pixel(crop.x(), crop.y()));
@@ -1086,7 +1086,7 @@ void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex
 
 			p.drawImage(pos.x() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, pos.y() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
 		}
-		else
+        else*/
 			p.drawImage(pos.x(), pos.y(), imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
 	}
 
