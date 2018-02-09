@@ -7,8 +7,8 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IHyLeafDraw2d_h__
-#define IHyLeafDraw2d_h__
+#ifndef IHyDrawInst2d_h__
+#define IHyDrawInst2d_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
@@ -125,4 +125,4 @@ public:
 #endif
 };
 
-#endif /* IHyLeafDraw2d_h__ */
+#endif /* IHyDrawInst2d_h__ */
