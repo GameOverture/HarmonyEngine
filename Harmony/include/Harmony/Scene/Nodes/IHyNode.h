@@ -23,7 +23,7 @@ class IHyNode
 protected:
 	const HyType					m_eTYPE;
 
-	enum HyNodeDirtyFlag
+	enum NodeDirtyFlag
 	{
 		DIRTY_BoundingVolume		= 1 << 0,
 		DIRTY_WorldAABB				= 1 << 1,
@@ -82,8 +82,8 @@ protected:
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
 
 	virtual void SetDirty(uint32 uiDirtyFlags);
-	bool IsDirty(HyNodeDirtyFlag eDirtyType);
-	void ClearDirty(HyNodeDirtyFlag eDirtyType);
+	bool IsDirty(NodeDirtyFlag eDirtyType);
+	void ClearDirty(NodeDirtyFlag eDirtyType);
 
 private:
 	void InsertActiveTweenFloat(HyTweenFloat *pTweenFloat);								// Only HyTweenFloat will invoke this

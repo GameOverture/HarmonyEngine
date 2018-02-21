@@ -143,12 +143,12 @@ void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
 	m_uiDirtyFlags |= uiDirtyFlags;
 }
 
-bool IHyNode::IsDirty(HyNodeDirtyFlag eDirtyType)
+bool IHyNode::IsDirty(NodeDirtyFlag eDirtyType)
 {
 	return ((m_uiDirtyFlags & eDirtyType) != 0);
 }
 
-void IHyNode::ClearDirty(HyNodeDirtyFlag eDirtyType)
+void IHyNode::ClearDirty(NodeDirtyFlag eDirtyType)
 {
 	m_uiDirtyFlags &= ~eDirtyType;
 }
