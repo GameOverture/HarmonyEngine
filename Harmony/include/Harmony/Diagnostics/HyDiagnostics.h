@@ -61,6 +61,7 @@ class HyDiagnostics
 	_CrtMemState				m_MemCheckpoint2;
 #endif
 
+	HyProfiler					m_Profiler;
 	HyDiagOutput				m_DiagOutput;
 
 public:
@@ -79,7 +80,7 @@ public:
 	void StartMemoryCheckpoint();
 	void EndMemoryCheckpoint();
 
-	void ProfileBegin(const char *szName);
+	void ProfileBegin(HyProfilerSection eSection);
 	void ProfileEnd();
 
 private:

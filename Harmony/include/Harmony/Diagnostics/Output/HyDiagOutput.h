@@ -35,7 +35,6 @@ class HyDiagOutput : public HyEntity2d
 
 	HyText2d				m_txtMouse;
 
-	//HyProfiler				m_Profiler;
 	uint32					m_uiShowFlags;
 
 public:
@@ -46,9 +45,6 @@ public:
 	uint32 GetShowFlags();
 
 	void ApplyTimeDelta(double dTimeDelta);
-
-	void ProfileBegin(const char *szName);
-	void ProfileEnd();
 };
 
 #endif /* HyDiagOutput_h__ */

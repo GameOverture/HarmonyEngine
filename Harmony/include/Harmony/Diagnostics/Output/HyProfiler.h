@@ -14,37 +14,39 @@
 #include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
 #include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
 
-#include <time.h>
+#include <stack>
+
+enum HyProfilerSection
+{
+	HYPROFILERSECTION_None = -1,
+	HYPROFILERSECTION_Physics = 0,
+	HYPROFILERSECTION_Nodes,
+	HYPROFILERSECTION_Update,
+	HYPROFILERSECTION_PrepRender,
+	HYPROFILERSECTION_Render,
+	HYPROFILERSECTION_User1,
+	HYPROFILERSECTION_User2,
+	HYPROFILERSECTION_User3,
+
+	HYNUM_PROFILERSECTION
+};
 
 class HyProfiler : public HyEntity2d
 {
-	bool							m_bIsSetup;
-	bool							m_bOpen;
+	uint64							m_uiSectionTicks[HYNUM_PROFILERSECTION];
+	HyProfilerSection				m_eCurrentSection;
 
-	struct ProfileState
-	{
-		const char *				szName;
-		clock_t						time;
-		HyPrimitive2d				barSlice;
-
-		std::vector<ProfileState>	childrenStates;
-
-		ProfileState() : szName(nullptr), time(0)
-		{ }
-	};
-
-	int32							m_iCurProfileStackIndex;	// Value of -1 indicates Start/End of one profile frame
-	std::vector<ProfileState>		m_TopLevelProfileStateList;
-	clock_t							m_TotalClockTicks;
-
-	HyPrimitive2d					m_ProfileOutline;
+	std::stack<HyProfilerSection>	m_SectionStack;
+	uint64							m_uiTotalTicks;
 
 public:
 	HyProfiler();
 	virtual ~HyProfiler();
 
-	void ProfileBegin(const char *szName);
-	void ProfileEnd();
+	void NewFrame();
+
+	void BeginSection(HyProfilerSection eSection);
+	void EndSection();
 };
 
 #endif /* HyProfiler_h__ */

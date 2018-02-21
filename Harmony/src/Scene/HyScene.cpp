@@ -115,14 +115,14 @@ void HyScene::SetPause(bool bPause)
 
 void HyScene::UpdatePhysics()
 {
-	HY_PROFILE_BEGIN("Physics")
+	HY_PROFILE_BEGIN(HYPROFILERSECTION_Physics)
 		m_b2World.Step(Hy_UpdateStep(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 	HY_PROFILE_END
 }
 
 void HyScene::UpdateNodes()
 {
-	HY_PROFILE_BEGIN("Nodes")
+	HY_PROFILE_BEGIN(HYPROFILERSECTION_Nodes)
 	if(m_bPauseGame == false)
 	{
 		for(uint32 i = 0; i < sm_MasterNodeList.size(); ++i)
@@ -144,7 +144,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	// TODO: Determine whether I can multi-thread this buffer prep and HyRenderState instantiations... Make everything take const references!
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
-	HY_PROFILE_BEGIN("PrepareRender")
+	HY_PROFILE_BEGIN(HYPROFILERSECTION_PrepRender)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Initialize the buffer - PrepareBuffers may manipulate current IHyDrawInsts or insert new IHyDrawInsts while it updates all the effects

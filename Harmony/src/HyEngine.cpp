@@ -114,7 +114,7 @@ bool HyEngine::Update()
 		m_Scene.UpdatePhysics();
 		m_Scene.UpdateNodes();
 
-		HY_PROFILE_BEGIN("Update")
+		HY_PROFILE_BEGIN(HYPROFILERSECTION_Update)
 		if(PollPlatformApi() == false || m_AppRef.Update() == false)
 			return false;
 		HY_PROFILE_END

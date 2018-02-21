@@ -104,13 +104,3 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 			m_txtMouse.TextSet("MOUSE UP\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
 	}
 }
-
-void HyDiagOutput::ProfileBegin(const char *szName)
-{
-	//m_Profiler.ProfileBegin(szName);
-}
-
-void HyDiagOutput::ProfileEnd()
-{
-	//m_Profiler.ProfileEnd();
-}

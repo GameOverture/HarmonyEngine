@@ -274,14 +274,14 @@ void HyDiagnostics::EndMemoryCheckpoint()
 #endif
 }
 
-void HyDiagnostics::ProfileBegin(const char *szName)
+void HyDiagnostics::ProfileBegin(HyProfilerSection eSection)
 {
-	m_DiagOutput.ProfileBegin(szName);
+	m_Profiler.BeginSection(eSection);
 }
 
 void HyDiagnostics::ProfileEnd()
 {
-	m_DiagOutput.ProfileEnd();
+	m_Profiler.EndSection();
 }
 
 void HyDiagnostics::ApplyTimeDelta()
