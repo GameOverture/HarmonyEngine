@@ -29,12 +29,12 @@ HyEntity2d::~HyEntity2d(void)
 
 /*virtual*/ void HyEntity2d::SetEnabled(bool bEnabled) /*override*/
 {
-	SetEnabled(bEnabled, true);
+	SetEnabled(bEnabled, HYENTITY_DEFAULT_OVERRIDE_VALUE);
 }
 
 /*virtual*/ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused) /*override*/
 {
-	SetPauseUpdate(bUpdateWhenPaused, true);
+	SetPauseUpdate(bUpdateWhenPaused, HYENTITY_DEFAULT_OVERRIDE_VALUE);
 }
 
 void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)

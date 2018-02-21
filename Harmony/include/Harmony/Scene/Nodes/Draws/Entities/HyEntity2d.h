@@ -15,6 +15,8 @@
 
 class HyPortal2d;
 
+#define HYENTITY_DEFAULT_OVERRIDE_VALUE false
+
 class HyEntity2d : public IHyDraw2d
 {
 protected:
@@ -42,7 +44,7 @@ public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
-	// This overridden method will just behave as "bool bOverrideExplicitChildren = true"
+	// This overridden method will just behave as "bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE"
 	virtual void SetEnabled(bool bEnabled) override;
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused) override;
 
@@ -51,16 +53,16 @@ public:
 	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 	
-	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren = true);
-	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren = true);
+	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
+	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
 
-	void SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren = true);
-	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren = true);
+	void SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
+	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
 
-	void UseCameraCoordinates(bool bOverrideExplicitChildren = true);
-	void UseWindowCoordinates(int32 iWindowIndex = 0, bool bOverrideExplicitChildren = true);
+	void UseCameraCoordinates(bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
+	void UseWindowCoordinates(int32 iWindowIndex = 0, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
 	
-	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = true);
+	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void ChildAppend(IHyNode2d &childRef);
