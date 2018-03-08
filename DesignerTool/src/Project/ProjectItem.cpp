@@ -245,6 +245,9 @@ void ProjectItem::FocusWidgetState(int iStateIndex, QVariant subState)
 		HyGuiLog("Unimplemented ProjectItem::FocusWidgetState() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
 	}
+
+	// This refreshes any changed values done programmatically
+	m_pWidget->repaint();
 }
 
 void ProjectItem::DeleteFromProject()
