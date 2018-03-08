@@ -68,6 +68,7 @@ public:
 
 	int Add(AtlasFrame *pFrame);
 	void Remove(AtlasFrame *pFrame);
+	void RemoveAll();
 	void MoveRowUp(int iIndex);
 	void MoveRowDown(int iIndex);
 	void SetFrameOffset(int iIndex, QPoint vOffset);    // iIndex of -1 will apply to all

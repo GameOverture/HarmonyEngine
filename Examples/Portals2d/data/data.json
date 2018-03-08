@@ -3787,47 +3787,6 @@
                 "name": "",
                 "reverse": false
             }
-        ],
-        "Test": [
-            {
-                "bounce": false,
-                "duration": 0.01600000075995922,
-                "frames": [
-                    {
-                        "checksum": 3835149450,
-                        "duration": 0.01600000075995922,
-                        "id": 1,
-                        "offsetX": -80,
-                        "offsetY": -399
-                    }
-                ],
-                "loop": false,
-                "name": "",
-                "reverse": false
-            },
-            {
-                "bounce": false,
-                "duration": 0.03200000151991844,
-                "frames": [
-                    {
-                        "checksum": 442217388,
-                        "duration": 0.01600000075995922,
-                        "id": 2,
-                        "offsetX": 0,
-                        "offsetY": 0
-                    },
-                    {
-                        "checksum": 442217388,
-                        "duration": 0.01600000075995922,
-                        "id": 2,
-                        "offsetX": 0,
-                        "offsetY": 0
-                    }
-                ],
-                "loop": false,
-                "name": "",
-                "reverse": false
-            }
         ]
     }
 }

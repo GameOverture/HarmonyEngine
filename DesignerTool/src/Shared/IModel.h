@@ -60,6 +60,7 @@ public:
 	QList<AtlasFrame *> RequestFramesById(IStateData *pState, QList<quint32> requestList, int &iAffectedFrameIndexOut);
 	QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut);
 	void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
+	void RelinquishAllFrames();
 	
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

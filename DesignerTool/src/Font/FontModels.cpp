@@ -465,10 +465,11 @@ void FontModel::GeneratePreview()
 
 /*virtual*/ QList<AtlasFrame *> FontModel::GetAtlasFrames() const /*override*/
 {
-	//QList<AtlasFrame *> retAtlasFrameList;
-	//retAtlasFrameList.push_back(m_pTrueAtlasFrame);
+	QList<AtlasFrame *> retAtlasFrameList;
+	if(m_pTrueAtlasFrame)
+		retAtlasFrameList.push_back(m_pTrueAtlasFrame);
 
-	return QList<AtlasFrame *>();//retAtlasFrameList;
+	return retAtlasFrameList;
 }
 
 /*virtual*/ QStringList FontModel::GetFontUrls() const /*override*/

@@ -383,7 +383,7 @@ void SpriteStateData::Refresh()
 	return m_pFramesModel->Add(pFrame);
 }
 
-/*virtual*/ void SpriteStateData::RelinquishFrame(AtlasFrame *pFrame)
+/*virtual*/ void SpriteStateData::RelinquishFrame(AtlasFrame *pFrame) /*override*/
 {
 	m_pFramesModel->Remove(pFrame);
 }

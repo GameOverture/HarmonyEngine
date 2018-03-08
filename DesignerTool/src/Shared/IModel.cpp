@@ -135,6 +135,11 @@ void IModel::RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishLis
 	m_ItemRef.GetProject().GetAtlasModel().RelinquishFrames(&m_ItemRef, relinquishList);
 }
 
+void IModel::RelinquishAllFrames()
+{
+	m_ItemRef.GetProject().GetAtlasModel().RelinquishFrames(&m_ItemRef, GetAtlasFrames());
+}
+
 /*virtual*/ int IModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
 	return m_StateList.size();

@@ -250,6 +250,10 @@ void ProjectItem::FocusWidgetState(int iStateIndex, QVariant subState)
 void ProjectItem::DeleteFromProject()
 {
 	m_pUndoStack->setClean();
+
+	// Unlinks all dependencies
+	m_pModel->RelinquishAllFrames();
+
 	GetProject().DeleteGameData(m_eTYPE, GetName(true));
 }
 
