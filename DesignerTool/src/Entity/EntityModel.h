@@ -31,7 +31,7 @@ public:
 
 	void Refresh();
 
-	virtual void AddFrame(AtlasFrame *pFrame) override;
+	virtual int AddFrame(AtlasFrame *pFrame) override;
 	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
 
 private:

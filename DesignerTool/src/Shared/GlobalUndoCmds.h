@@ -438,14 +438,15 @@ public:
 
 	void redo() override
 	{
-		m_Frames = static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames);
-		m_ItemRef.FocusWidgetState(m_iStateIndex, -2);
+		int iAffectedFrameIndex = 0;
+		m_Frames = static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames, iAffectedFrameIndex);
+		m_ItemRef.FocusWidgetState(m_iStateIndex, iAffectedFrameIndex);
 	}
 	
 	void undo() override
 	{
 		static_cast<IModel *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
-		m_ItemRef.FocusWidgetState(m_iStateIndex, -2);
+		m_ItemRef.FocusWidgetState(m_iStateIndex, -1);
 	}
 };
 
@@ -477,8 +478,9 @@ public:
 	
 	void undo() override
 	{
-		static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames);
-		m_ItemRef.FocusWidgetState(m_iStateIndex, -3);
+		int iAffectedFrameIndex = 0;
+		static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames, iAffectedFrameIndex);
+		m_ItemRef.FocusWidgetState(m_iStateIndex, iAffectedFrameIndex);
 	}
 };
 

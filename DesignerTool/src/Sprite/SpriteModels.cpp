@@ -285,7 +285,8 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject 
 			idRequestList.append(JSONOBJ_TOINT(spriteFrameObj, "id"));
 		}
 
-		QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesById(this, idRequestList);
+		int iAffectedFrameIndex = 0;
+		QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesById(this, idRequestList, iAffectedFrameIndex);
 		
 		if(spriteFrameArray.size() != requestedAtlasFramesList.size())
 			HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
@@ -377,9 +378,9 @@ void SpriteStateData::Refresh()
 	m_pFramesModel->Refresh();
 }
 
-/*virtual*/ void SpriteStateData::AddFrame(AtlasFrame *pFrame)
+/*virtual*/ int SpriteStateData::AddFrame(AtlasFrame *pFrame)
 {
-	m_pFramesModel->Add(pFrame);
+	return m_pFramesModel->Add(pFrame);
 }
 
 /*virtual*/ void SpriteStateData::RelinquishFrame(AtlasFrame *pFrame)

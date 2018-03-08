@@ -34,7 +34,7 @@ public:
 	QString GetName() const;
 	void SetName(QString sNewName);
 	
-	virtual void AddFrame(AtlasFrame *pFrame) = 0;
+	virtual int AddFrame(AtlasFrame *pFrame) = 0;			// Returns the index the frame was inserted to
 	virtual void RelinquishFrame(AtlasFrame *pFrame) = 0;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,8 +57,8 @@ public:
 	void MoveStateBack(int iStateIndex);
 	void MoveStateForward(int iStateIndex);
 	
-	QList<AtlasFrame *> RequestFramesById(IStateData *pState, QList<quint32> requestList);
-	QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList);
+	QList<AtlasFrame *> RequestFramesById(IStateData *pState, QList<quint32> requestList, int &iAffectedFrameIndexOut);
+	QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut);
 	void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
 	
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;

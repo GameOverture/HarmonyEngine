@@ -173,7 +173,8 @@ FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :   IModel(itemR
 		QList<quint32> idRequestList;
 		idRequestList.append(JSONOBJ_TOINT(fontObj, "id"));
 
-		QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, idRequestList);
+		int iAffectedFrameIndex = 0;
+		QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, idRequestList, iAffectedFrameIndex);
 		m_pTrueAtlasFrame = pRequestedList[0];
 
 		m_TypefaceArray = fontObj["typefaceArray"].toArray();

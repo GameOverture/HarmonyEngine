@@ -2922,6 +2922,872 @@
     "Spine": {
     },
     "Sprites": {
+        "BaseGame/Symbols": [
+            {
+                "bounce": false,
+                "duration": 0.4800000488758087,
+                "frames": [
+                    {
+                        "checksum": 3552720210,
+                        "duration": 0.01600000075995922,
+                        "id": 394,
+                        "offsetX": 55,
+                        "offsetY": 23
+                    },
+                    {
+                        "checksum": 3037605117,
+                        "duration": 0.01600000075995922,
+                        "id": 395,
+                        "offsetX": 55,
+                        "offsetY": 23
+                    },
+                    {
+                        "checksum": 1462835236,
+                        "duration": 0.01600000075995922,
+                        "id": 396,
+                        "offsetX": 54,
+                        "offsetY": 23
+                    },
+                    {
+                        "checksum": 3207106469,
+                        "duration": 0.01600000075995922,
+                        "id": 397,
+                        "offsetX": 53,
+                        "offsetY": 22
+                    },
+                    {
+                        "checksum": 1020805869,
+                        "duration": 0.01600000075995922,
+                        "id": 398,
+                        "offsetX": 52,
+                        "offsetY": 21
+                    },
+                    {
+                        "checksum": 3972924088,
+                        "duration": 0.01600000075995922,
+                        "id": 399,
+                        "offsetX": 51,
+                        "offsetY": 20
+                    },
+                    {
+                        "checksum": 1351705274,
+                        "duration": 0.01600000075995922,
+                        "id": 400,
+                        "offsetX": 48,
+                        "offsetY": 19
+                    },
+                    {
+                        "checksum": 3723032769,
+                        "duration": 0.01600000075995922,
+                        "id": 401,
+                        "offsetX": 41,
+                        "offsetY": 18
+                    },
+                    {
+                        "checksum": 2643227575,
+                        "duration": 0.01600000075995922,
+                        "id": 402,
+                        "offsetX": 34,
+                        "offsetY": 17
+                    },
+                    {
+                        "checksum": 2139414812,
+                        "duration": 0.01600000075995922,
+                        "id": 403,
+                        "offsetX": 28,
+                        "offsetY": 16
+                    },
+                    {
+                        "checksum": 598346988,
+                        "duration": 0.01600000075995922,
+                        "id": 404,
+                        "offsetX": 20,
+                        "offsetY": 12
+                    },
+                    {
+                        "checksum": 696318153,
+                        "duration": 0.01600000075995922,
+                        "id": 405,
+                        "offsetX": 13,
+                        "offsetY": 5
+                    },
+                    {
+                        "checksum": 2696657228,
+                        "duration": 0.01600000075995922,
+                        "id": 406,
+                        "offsetX": 7,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2034432239,
+                        "duration": 0.01600000075995922,
+                        "id": 407,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2355360044,
+                        "duration": 0.01600000075995922,
+                        "id": 408,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 640142406,
+                        "duration": 0.01600000075995922,
+                        "id": 409,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1544853164,
+                        "duration": 0.01600000075995922,
+                        "id": 410,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3625455336,
+                        "duration": 0.01600000075995922,
+                        "id": 411,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3578910421,
+                        "duration": 0.01600000075995922,
+                        "id": 412,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3099086992,
+                        "duration": 0.01600000075995922,
+                        "id": 413,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1432813855,
+                        "duration": 0.01600000075995922,
+                        "id": 414,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2212506542,
+                        "duration": 0.01600000075995922,
+                        "id": 415,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3221042090,
+                        "duration": 0.01600000075995922,
+                        "id": 416,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2349178490,
+                        "duration": 0.01600000075995922,
+                        "id": 417,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3968495899,
+                        "duration": 0.01600000075995922,
+                        "id": 418,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3051302750,
+                        "duration": 0.01600000075995922,
+                        "id": 419,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 872362015,
+                        "duration": 0.01600000075995922,
+                        "id": 420,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 4119795516,
+                        "duration": 0.01600000075995922,
+                        "id": 421,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 940888932,
+                        "duration": 0.01600000075995922,
+                        "id": 422,
+                        "offsetX": 0,
+                        "offsetY": 1
+                    },
+                    {
+                        "checksum": 963431882,
+                        "duration": 0.01600000075995922,
+                        "id": 423,
+                        "offsetX": 61,
+                        "offsetY": 32
+                    }
+                ],
+                "loop": false,
+                "name": "Ace",
+                "reverse": false
+            },
+            {
+                "bounce": false,
+                "duration": 0.4800000488758087,
+                "frames": [
+                    {
+                        "checksum": 4165229011,
+                        "duration": 0.01600000075995922,
+                        "id": 304,
+                        "offsetX": 61,
+                        "offsetY": 23
+                    },
+                    {
+                        "checksum": 1855795354,
+                        "duration": 0.01600000075995922,
+                        "id": 305,
+                        "offsetX": 61,
+                        "offsetY": 23
+                    },
+                    {
+                        "checksum": 571505408,
+                        "duration": 0.01600000075995922,
+                        "id": 306,
+                        "offsetX": 60,
+                        "offsetY": 23
+                    },
+                    {
+                        "checksum": 3856722797,
+                        "duration": 0.01600000075995922,
+                        "id": 307,
+                        "offsetX": 60,
+                        "offsetY": 22
+                    },
+                    {
+                        "checksum": 1806429906,
+                        "duration": 0.01600000075995922,
+                        "id": 308,
+                        "offsetX": 59,
+                        "offsetY": 21
+                    },
+                    {
+                        "checksum": 3300481192,
+                        "duration": 0.01600000075995922,
+                        "id": 309,
+                        "offsetX": 55,
+                        "offsetY": 20
+                    },
+                    {
+                        "checksum": 372014762,
+                        "duration": 0.01600000075995922,
+                        "id": 310,
+                        "offsetX": 48,
+                        "offsetY": 19
+                    },
+                    {
+                        "checksum": 2284800647,
+                        "duration": 0.01600000075995922,
+                        "id": 311,
+                        "offsetX": 41,
+                        "offsetY": 18
+                    },
+                    {
+                        "checksum": 2355353434,
+                        "duration": 0.01600000075995922,
+                        "id": 312,
+                        "offsetX": 34,
+                        "offsetY": 17
+                    },
+                    {
+                        "checksum": 214499787,
+                        "duration": 0.01600000075995922,
+                        "id": 313,
+                        "offsetX": 28,
+                        "offsetY": 16
+                    },
+                    {
+                        "checksum": 331723214,
+                        "duration": 0.01600000075995922,
+                        "id": 314,
+                        "offsetX": 20,
+                        "offsetY": 12
+                    },
+                    {
+                        "checksum": 3834252930,
+                        "duration": 0.01600000075995922,
+                        "id": 315,
+                        "offsetX": 13,
+                        "offsetY": 5
+                    },
+                    {
+                        "checksum": 1629423165,
+                        "duration": 0.01600000075995922,
+                        "id": 316,
+                        "offsetX": 7,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 97744340,
+                        "duration": 0.01600000075995922,
+                        "id": 317,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2249304544,
+                        "duration": 0.01600000075995922,
+                        "id": 318,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2676141620,
+                        "duration": 0.01600000075995922,
+                        "id": 319,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 220005570,
+                        "duration": 0.01600000075995922,
+                        "id": 320,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3497486682,
+                        "duration": 0.01600000075995922,
+                        "id": 321,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1383671881,
+                        "duration": 0.01600000075995922,
+                        "id": 322,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 4109077349,
+                        "duration": 0.01600000075995922,
+                        "id": 323,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2074110671,
+                        "duration": 0.01600000075995922,
+                        "id": 324,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1092512922,
+                        "duration": 0.01600000075995922,
+                        "id": 325,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 532281266,
+                        "duration": 0.01600000075995922,
+                        "id": 326,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 407795300,
+                        "duration": 0.01600000075995922,
+                        "id": 327,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 4264824172,
+                        "duration": 0.01600000075995922,
+                        "id": 328,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1555344147,
+                        "duration": 0.01600000075995922,
+                        "id": 329,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 972776968,
+                        "duration": 0.01600000075995922,
+                        "id": 330,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3572498285,
+                        "duration": 0.01600000075995922,
+                        "id": 331,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1771968848,
+                        "duration": 0.01600000075995922,
+                        "id": 332,
+                        "offsetX": 0,
+                        "offsetY": 1
+                    },
+                    {
+                        "checksum": 3268248272,
+                        "duration": 0.01600000075995922,
+                        "id": 333,
+                        "offsetX": 67,
+                        "offsetY": 32
+                    }
+                ],
+                "loop": false,
+                "name": "King",
+                "reverse": false
+            },
+            {
+                "bounce": false,
+                "duration": 0.3360000252723694,
+                "frames": [
+                    {
+                        "checksum": 2310627120,
+                        "duration": 0.01600000075995922,
+                        "id": 154,
+                        "offsetX": 55,
+                        "offsetY": 18
+                    },
+                    {
+                        "checksum": 743010674,
+                        "duration": 0.01600000075995922,
+                        "id": 155,
+                        "offsetX": 55,
+                        "offsetY": 18
+                    },
+                    {
+                        "checksum": 4259430956,
+                        "duration": 0.01600000075995922,
+                        "id": 156,
+                        "offsetX": 55,
+                        "offsetY": 17
+                    },
+                    {
+                        "checksum": 3785877419,
+                        "duration": 0.01600000075995922,
+                        "id": 157,
+                        "offsetX": 54,
+                        "offsetY": 17
+                    },
+                    {
+                        "checksum": 1591260611,
+                        "duration": 0.01600000075995922,
+                        "id": 158,
+                        "offsetX": 53,
+                        "offsetY": 16
+                    },
+                    {
+                        "checksum": 3391494453,
+                        "duration": 0.01600000075995922,
+                        "id": 159,
+                        "offsetX": 52,
+                        "offsetY": 15
+                    },
+                    {
+                        "checksum": 4214353923,
+                        "duration": 0.01600000075995922,
+                        "id": 160,
+                        "offsetX": 48,
+                        "offsetY": 15
+                    },
+                    {
+                        "checksum": 277383612,
+                        "duration": 0.01600000075995922,
+                        "id": 161,
+                        "offsetX": 41,
+                        "offsetY": 13
+                    },
+                    {
+                        "checksum": 1563822034,
+                        "duration": 0.01600000075995922,
+                        "id": 162,
+                        "offsetX": 34,
+                        "offsetY": 13
+                    },
+                    {
+                        "checksum": 1152573292,
+                        "duration": 0.01600000075995922,
+                        "id": 163,
+                        "offsetX": 28,
+                        "offsetY": 12
+                    },
+                    {
+                        "checksum": 223017289,
+                        "duration": 0.01600000075995922,
+                        "id": 164,
+                        "offsetX": 20,
+                        "offsetY": 11
+                    },
+                    {
+                        "checksum": 2167200968,
+                        "duration": 0.01600000075995922,
+                        "id": 174,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2047755408,
+                        "duration": 0.01600000075995922,
+                        "id": 175,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 927439658,
+                        "duration": 0.01600000075995922,
+                        "id": 176,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2360594154,
+                        "duration": 0.01600000075995922,
+                        "id": 177,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3861763346,
+                        "duration": 0.01600000075995922,
+                        "id": 178,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2635697831,
+                        "duration": 0.01600000075995922,
+                        "id": 179,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1839236789,
+                        "duration": 0.01600000075995922,
+                        "id": 180,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1584547547,
+                        "duration": 0.01600000075995922,
+                        "id": 181,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1971563984,
+                        "duration": 0.01600000075995922,
+                        "id": 182,
+                        "offsetX": 0,
+                        "offsetY": 1
+                    },
+                    {
+                        "checksum": 4264491756,
+                        "duration": 0.01600000075995922,
+                        "id": 183,
+                        "offsetX": 62,
+                        "offsetY": 27
+                    }
+                ],
+                "loop": false,
+                "name": "Queen",
+                "reverse": false
+            },
+            {
+                "bounce": false,
+                "duration": 0.4800000488758087,
+                "frames": [
+                    {
+                        "checksum": 2597564491,
+                        "duration": 0.01600000075995922,
+                        "id": 334,
+                        "offsetX": 73,
+                        "offsetY": 22
+                    },
+                    {
+                        "checksum": 387078120,
+                        "duration": 0.01600000075995922,
+                        "id": 335,
+                        "offsetX": 73,
+                        "offsetY": 21
+                    },
+                    {
+                        "checksum": 2796523224,
+                        "duration": 0.01600000075995922,
+                        "id": 336,
+                        "offsetX": 73,
+                        "offsetY": 21
+                    },
+                    {
+                        "checksum": 1797177747,
+                        "duration": 0.01600000075995922,
+                        "id": 337,
+                        "offsetX": 68,
+                        "offsetY": 20
+                    },
+                    {
+                        "checksum": 3362571612,
+                        "duration": 0.01600000075995922,
+                        "id": 338,
+                        "offsetX": 61,
+                        "offsetY": 20
+                    },
+                    {
+                        "checksum": 3389028826,
+                        "duration": 0.01600000075995922,
+                        "id": 339,
+                        "offsetX": 55,
+                        "offsetY": 19
+                    },
+                    {
+                        "checksum": 1838066304,
+                        "duration": 0.01600000075995922,
+                        "id": 340,
+                        "offsetX": 48,
+                        "offsetY": 18
+                    },
+                    {
+                        "checksum": 3208823065,
+                        "duration": 0.01600000075995922,
+                        "id": 341,
+                        "offsetX": 41,
+                        "offsetY": 17
+                    },
+                    {
+                        "checksum": 413554127,
+                        "duration": 0.01600000075995922,
+                        "id": 342,
+                        "offsetX": 34,
+                        "offsetY": 17
+                    },
+                    {
+                        "checksum": 148415355,
+                        "duration": 0.01600000075995922,
+                        "id": 343,
+                        "offsetX": 28,
+                        "offsetY": 16
+                    },
+                    {
+                        "checksum": 2508649835,
+                        "duration": 0.01600000075995922,
+                        "id": 344,
+                        "offsetX": 20,
+                        "offsetY": 12
+                    },
+                    {
+                        "checksum": 3916384242,
+                        "duration": 0.01600000075995922,
+                        "id": 345,
+                        "offsetX": 13,
+                        "offsetY": 5
+                    },
+                    {
+                        "checksum": 3755517933,
+                        "duration": 0.01600000075995922,
+                        "id": 346,
+                        "offsetX": 7,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1421537840,
+                        "duration": 0.01600000075995922,
+                        "id": 347,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 456841061,
+                        "duration": 0.01600000075995922,
+                        "id": 348,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1288917840,
+                        "duration": 0.01600000075995922,
+                        "id": 349,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2481189052,
+                        "duration": 0.01600000075995922,
+                        "id": 350,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2588824355,
+                        "duration": 0.01600000075995922,
+                        "id": 351,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1348739111,
+                        "duration": 0.01600000075995922,
+                        "id": 352,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1801587937,
+                        "duration": 0.01600000075995922,
+                        "id": 353,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2387459220,
+                        "duration": 0.01600000075995922,
+                        "id": 354,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1392054987,
+                        "duration": 0.01600000075995922,
+                        "id": 355,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3219231022,
+                        "duration": 0.01600000075995922,
+                        "id": 356,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1756557163,
+                        "duration": 0.01600000075995922,
+                        "id": 357,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2857701344,
+                        "duration": 0.01600000075995922,
+                        "id": 358,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2868158542,
+                        "duration": 0.01600000075995922,
+                        "id": 359,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2569583661,
+                        "duration": 0.01600000075995922,
+                        "id": 360,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2097919619,
+                        "duration": 0.01600000075995922,
+                        "id": 361,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 126185017,
+                        "duration": 0.01600000075995922,
+                        "id": 362,
+                        "offsetX": 0,
+                        "offsetY": 1
+                    },
+                    {
+                        "checksum": 146423262,
+                        "duration": 0.01600000075995922,
+                        "id": 363,
+                        "offsetX": 77,
+                        "offsetY": 30
+                    }
+                ],
+                "loop": false,
+                "name": "Jack",
+                "reverse": false
+            },
+            {
+                "bounce": false,
+                "duration": 0.09600000828504562,
+                "frames": [
+                    {
+                        "checksum": 4018570291,
+                        "duration": 0.01600000075995922,
+                        "id": 364,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 4089021426,
+                        "duration": 0.01600000075995922,
+                        "id": 365,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1425426155,
+                        "duration": 0.01600000075995922,
+                        "id": 366,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1509497784,
+                        "duration": 0.01600000075995922,
+                        "id": 367,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1416928870,
+                        "duration": 0.01600000075995922,
+                        "id": 368,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2296997124,
+                        "duration": 0.01600000075995922,
+                        "id": 369,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    }
+                ],
+                "loop": false,
+                "name": "",
+                "reverse": false
+            }
+        ],
         "Test": [
             {
                 "bounce": false,
@@ -2933,6 +3799,29 @@
                         "id": 1,
                         "offsetX": -80,
                         "offsetY": -399
+                    }
+                ],
+                "loop": false,
+                "name": "",
+                "reverse": false
+            },
+            {
+                "bounce": false,
+                "duration": 0.03200000151991844,
+                "frames": [
+                    {
+                        "checksum": 442217388,
+                        "duration": 0.01600000075995922,
+                        "id": 2,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 442217388,
+                        "duration": 0.01600000075995922,
+                        "id": 2,
+                        "offsetX": 0,
+                        "offsetY": 0
                     }
                 ],
                 "loop": false,

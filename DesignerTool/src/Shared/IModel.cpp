@@ -98,27 +98,27 @@ void IModel::MoveStateForward(int iStateIndex)
 	dataChanged(createIndex(iStateIndex, 0), createIndex(iStateIndex, 0), roleList);
 }
 
-QList<AtlasFrame *> IModel::RequestFramesById(IStateData *pState, QList<quint32> requestList)
+QList<AtlasFrame *> IModel::RequestFramesById(IStateData *pState, QList<quint32> requestList, int &iAffectedFrameIndexOut)
 {
 	QList<AtlasFrame *> returnedAtlasFramesList = m_ItemRef.GetProject().GetAtlasModel().RequestFramesById(&m_ItemRef, requestList);
 	
 	if(pState)
 	{
 		for(int i = 0; i < returnedAtlasFramesList.size(); ++i)
-			pState->AddFrame(returnedAtlasFramesList[i]);
+			iAffectedFrameIndexOut = pState->AddFrame(returnedAtlasFramesList[i]);
 	}
 	
 	return returnedAtlasFramesList;
 }
 
-QList<AtlasFrame *> IModel::RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList)
+QList<AtlasFrame *> IModel::RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut)
 {
 	QList<AtlasFrame *> returnedAtlasFramesList = m_ItemRef.GetProject().GetAtlasModel().RequestFrames(&m_ItemRef, requestList);
 
 	if(iStateIndex >= 0)
 	{
 		for(int i = 0; i < returnedAtlasFramesList.size(); ++i)
-			m_StateList[iStateIndex]->AddFrame(returnedAtlasFramesList[i]);
+			iAffectedFrameIndexOut = m_StateList[iStateIndex]->AddFrame(returnedAtlasFramesList[i]);
 	}
 
 	return returnedAtlasFramesList;

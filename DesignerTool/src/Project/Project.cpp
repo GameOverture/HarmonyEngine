@@ -381,7 +381,11 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 	if(m_pTabBar && m_pTabBar->count() != 0)
 	{
 		if(m_pTabBar->currentIndex() >= 0)
-			m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->GetDraw()->ResizeRenderer();
+		{
+			IDraw *pDraw = m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->GetDraw();
+			if(pDraw)
+				pDraw->ResizeRenderer();
+		}
 	}
 }
 

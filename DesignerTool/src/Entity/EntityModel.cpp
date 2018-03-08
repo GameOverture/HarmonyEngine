@@ -51,8 +51,9 @@ PropertiesTreeModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeIt
 	return m_PropertiesMap[pTreeItem];
 }
 
-/*virtual*/ void EntityStateData::AddFrame(AtlasFrame *pFrame) /*override*/
+/*virtual*/ int EntityStateData::AddFrame(AtlasFrame *pFrame) /*override*/
 {
+	return 0;
 }
 
 /*virtual*/ void EntityStateData::RelinquishFrame(AtlasFrame *pFrame) /*override*/
