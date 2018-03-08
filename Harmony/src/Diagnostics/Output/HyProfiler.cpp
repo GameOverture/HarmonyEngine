@@ -10,7 +10,7 @@
 #include "Diagnostics/Output/HyProfiler.h"
 
 // Read Time-Stamp Counter
-#ifdef HY_PLATFORM_WINDOWS
+#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_GUI_WIN)
 #include <intrin.h>
 uint64 HyReadTsc() { return __rdtsc(); }
 #else
