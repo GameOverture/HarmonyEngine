@@ -22,6 +22,16 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 {
 }
 
+void SpriteDraw::PlayAnim(quint32 uiFrameIndex)
+{
+	m_Sprite.AnimCtrl(HYANIMCTRL_Reset);
+	if(m_Sprite.AnimIsReverse())
+		m_Sprite.AnimCtrl(HYANIMCTRL_ReversePlay);
+	else
+		m_Sprite.AnimCtrl(HYANIMCTRL_Play);
+	m_Sprite.AnimSetFrame(uiFrameIndex);
+}
+
 void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 {
 	m_Sprite.AnimSetState(uiStateIndex);
@@ -158,5 +168,10 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		m_Sprite.AnimSetFrame(static_cast<uint32>(iFrameIndex));
 	}
 	else
+	{
 		pWidget->SetSelectedFrame(m_Sprite.AnimGetFrame());
+
+		if(m_Sprite.AnimIsFinished())
+			pWidget->StopPlayingAnim();
+	}
 }

@@ -99,6 +99,12 @@ void SpriteWidget::SetSelectedFrame(int iFrameIndex)
 	ui->framesView->selectRow(iFrameIndex);
 }
 
+void SpriteWidget::StopPlayingAnim()
+{
+	m_bPlayActive = false;
+	ui->btnPlay->setIcon(QIcon(":/icons16x16/media-play.png"));
+}
+
 void SpriteWidget::GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut)
 {
 	iStateIndexOut = ui->cmbStates->currentIndex();
@@ -388,6 +394,8 @@ void SpriteWidget::on_actionPlay_triggered()
 		ui->btnPlay->setIcon(QIcon(":/icons16x16/media-pause.png"));
 		m_bIsBounced = false;
 		m_fElapsedTime = 0.0f;
+
+		static_cast<SpriteDraw *>(m_ItemRef.GetDraw())->PlayAnim(ui->framesView->currentIndex().row());
 	}
 	else
 		ui->btnPlay->setIcon(QIcon(":/icons16x16/media-play.png"));

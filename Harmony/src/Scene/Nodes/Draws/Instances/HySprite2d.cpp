@@ -87,10 +87,12 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 	case HYANIMCTRL_Play:
 		m_bIsAnimPaused = false;
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Reverse;
+		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Finished;
 		break;
 	case HYANIMCTRL_ReversePlay:
 		m_bIsAnimPaused = false;
 		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Reverse;
+		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Finished;
 		break;
 	case HYANIMCTRL_Reset:
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_IsBouncing;
@@ -116,13 +118,15 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 	}
 }
 
-void HySprite2d::AnimSetPause(bool bPause)
+bool HySprite2d::AnimIsReverse()
 {
-	if(m_bIsAnimPaused == bPause)
-		return;
-	
-	m_bIsAnimPaused = bPause;
-	m_fElapsedFrameTime = 0.0f;
+	return AnimIsReverse(m_uiCurAnimState);
+}
+
+bool HySprite2d::AnimIsReverse(uint32 uiAnimState)
+{
+	AcquireData();
+	return (m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Reverse) != 0;
 }
 
 uint32 HySprite2d::AnimGetNumStates()
@@ -214,6 +218,21 @@ bool HySprite2d::AnimIsFinished()
 bool HySprite2d::AnimIsPaused()
 {
 	return m_bIsAnimPaused;
+}
+
+void HySprite2d::AnimSetPause(bool bPause)
+{
+	if(m_bIsAnimPaused == bPause)
+		return;
+
+	m_bIsAnimPaused = bPause;
+	m_fElapsedFrameTime = 0.0f;
+
+	if(m_bIsAnimPaused == false)
+	{
+		AcquireData();
+		m_AnimCtrlAttribList[m_uiCurAnimState] &= ~ANIMCTRLATTRIB_Finished;
+	}
 }
 
 float HySprite2d::AnimGetDuration()

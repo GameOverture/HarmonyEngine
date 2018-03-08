@@ -62,7 +62,8 @@ public:
 	void AnimCtrl(HyAnimCtrl eAnimCtrl);
 	void AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState);
 
-	void AnimSetPause(bool bPause);
+	bool AnimIsReverse();
+	bool AnimIsReverse(uint32 uiAnimState);
 	
 	uint32 AnimGetNumStates();
 	uint32 AnimGetState() const;
@@ -102,6 +103,8 @@ public:
 	bool AnimIsFinished();
 
 	bool AnimIsPaused();
+
+	void AnimSetPause(bool bPause);
 
 	float AnimGetDuration();
 	

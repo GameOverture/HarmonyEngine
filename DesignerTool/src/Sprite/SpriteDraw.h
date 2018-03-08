@@ -24,6 +24,7 @@ public:
 	SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
 	virtual ~SpriteDraw();
 
+	void PlayAnim(quint32 uiFrameIndex);
 	void SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex);
 
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent) override;

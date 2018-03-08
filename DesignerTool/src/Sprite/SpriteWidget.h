@@ -45,6 +45,7 @@ public:
 	bool IsPlayingAnim();
 
 	void SetSelectedFrame(int iFrameIndex);
+	void StopPlayingAnim();
 	void GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut);
 
 	void FocusState(int iStateIndex, QVariant subState);
