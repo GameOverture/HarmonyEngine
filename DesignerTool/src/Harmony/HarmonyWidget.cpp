@@ -236,6 +236,7 @@ void HarmonyWidget::OnBootCheck()
 		connect(m_pTimer, SIGNAL(timeout()), this, SLOT(update()));
 		m_pTimer->start(10);
 
+		makeCurrent();
 		sm_bHarmonyLoaded = true;
 	}
 }
