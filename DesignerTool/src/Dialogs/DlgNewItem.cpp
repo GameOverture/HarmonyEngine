@@ -34,17 +34,6 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
 	on_chkNewPrefix_stateChanged(ui->chkNewPrefix->isChecked() ? Qt::Checked : Qt::Unchecked);
 
 	m_PrefixStringList.clear();
-
-//	QTreeWidgetItem *pSubDirItem = nullptr;
-//	for(int i = 0; i < m_pItemProject->GetTreeItem()->childCount(); ++i)
-//	{
-//		pSubDirItem = m_pItemProject->GetTreeItem()->child(i);
-//		ExplorerTreeItem *pCurItem = pSubDirItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
-
-//		if(pCurItem->GetType() == HyGlobal::GetDirFromItem(eItem))
-//			break;
-//	}
-
 	QList<QTreeWidgetItem *> itemList = HyGlobal::RecursiveTreeChildren(pItemProject->GetTreeItem());
 	for(int i = 0; i < itemList.size(); ++i)
 	{
@@ -53,7 +42,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
 
 		ExplorerTreeItem *pItem = itemList[i]->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
 		if(pItem->GetType() == ITEM_Prefix)
-			m_PrefixStringList.append(pItem->GetPrefix());
+			m_PrefixStringList.append(pItem->GetName(true));
 	}
 
 	qSort(m_PrefixStringList.begin(), m_PrefixStringList.end());
