@@ -96,6 +96,22 @@ QIcon ExplorerTreeItem::GetIcon(SubIcon eSubIcon) const
 	return HyGlobal::ItemIcon(m_eTYPE, eSubIcon);
 }
 
+/*virtual*/ void ExplorerTreeItem::Rename(QString sNewName)
+{
+	if(m_eTYPE != ITEM_Prefix)
+	{
+		HyGuiLog("ExplorerTreeItem::Rename on improper item type", LOGTYPE_Error);
+		return;
+	}
+
+	QString sOldPath = GetName(true);
+	m_sPath = sNewName;
+	m_pTreeItemPtr->setText(0, GetName(false));
+	QString sNewPath = GetName(true);
+
+	HyGlobal::GetProjectFromItem(m_pTreeItemPtr)->RenamePrefix(sOldPath, sNewPath);
+}
+
 void ExplorerTreeItem::SetTreeItemSubIcon(SubIcon eSubIcon)
 {
 	m_pTreeItemPtr->setIcon(0, GetIcon(eSubIcon));

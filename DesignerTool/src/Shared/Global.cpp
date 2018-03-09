@@ -334,6 +334,22 @@
 	return sPath;
 }
 
+/*static*/ Project *HyGlobal::GetProjectFromItem(QTreeWidgetItem *pItem)
+{
+	QTreeWidgetItem *pCurProjItem = pItem;
+	if(pCurProjItem == nullptr)
+		return nullptr;
+
+	while(pCurProjItem->parent())
+		pCurProjItem = pCurProjItem->parent();
+
+	ExplorerTreeItem *pProject = pCurProjItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+	if(pProject->GetType() != ITEM_Project)
+		HyGuiLog("HyGlobal::GetProjectFromItem returned a non project item", LOGTYPE_Error);
+
+	return reinterpret_cast<Project *>(pProject);
+}
+
 // Includes 'pParentItem' in returned list
 /*static*/ QList<QTreeWidgetItem *> HyGlobal::RecursiveTreeChildren(QTreeWidgetItem *pParentItem)
 {

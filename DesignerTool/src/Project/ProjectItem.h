@@ -46,6 +46,8 @@ public:
 	ProjectItem(Project &projRef, HyGuiItemType eType, QTreeWidgetItem *pParentTreeItem, const QString sName, QJsonValue initValue, bool bIsPendingSave);
 	virtual ~ProjectItem();
 
+	virtual void Rename(QString sNewName);
+
 	void LoadModel();
 	
 	Project &GetProject();

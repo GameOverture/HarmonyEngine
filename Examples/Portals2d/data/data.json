@@ -2928,7 +2928,438 @@
     "Spine": {
     },
     "Sprites": {
-        "BaseGame/Symbols": [
+        "BaseGame": [
+            {
+                "bounce": false,
+                "duration": 0.9599992632865906,
+                "frames": [
+                    {
+                        "checksum": 3541217371,
+                        "duration": 0.01600000075995922,
+                        "id": 244,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 628939536,
+                        "duration": 0.01600000075995922,
+                        "id": 245,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3323637172,
+                        "duration": 0.01600000075995922,
+                        "id": 246,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 505012864,
+                        "duration": 0.01600000075995922,
+                        "id": 247,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3456839415,
+                        "duration": 0.01600000075995922,
+                        "id": 248,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 244583668,
+                        "duration": 0.01600000075995922,
+                        "id": 249,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2137335429,
+                        "duration": 0.01600000075995922,
+                        "id": 250,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2928248645,
+                        "duration": 0.01600000075995922,
+                        "id": 251,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2805132248,
+                        "duration": 0.01600000075995922,
+                        "id": 252,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1328387514,
+                        "duration": 0.01600000075995922,
+                        "id": 253,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1520385223,
+                        "duration": 0.01600000075995922,
+                        "id": 254,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2437090163,
+                        "duration": 0.01600000075995922,
+                        "id": 255,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 887584564,
+                        "duration": 0.01600000075995922,
+                        "id": 256,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3516796349,
+                        "duration": 0.01600000075995922,
+                        "id": 257,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1867215842,
+                        "duration": 0.01600000075995922,
+                        "id": 258,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3564623282,
+                        "duration": 0.01600000075995922,
+                        "id": 259,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3302879270,
+                        "duration": 0.01600000075995922,
+                        "id": 260,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2057000204,
+                        "duration": 0.01600000075995922,
+                        "id": 261,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 41022973,
+                        "duration": 0.01600000075995922,
+                        "id": 262,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1749567107,
+                        "duration": 0.01600000075995922,
+                        "id": 263,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1333053219,
+                        "duration": 0.01600000075995922,
+                        "id": 264,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 818598495,
+                        "duration": 0.01600000075995922,
+                        "id": 265,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2930471312,
+                        "duration": 0.01600000075995922,
+                        "id": 266,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 4221854029,
+                        "duration": 0.01600000075995922,
+                        "id": 267,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 953040103,
+                        "duration": 0.01600000075995922,
+                        "id": 268,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3907845870,
+                        "duration": 0.01600000075995922,
+                        "id": 269,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 652833007,
+                        "duration": 0.01600000075995922,
+                        "id": 270,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 914500730,
+                        "duration": 0.01600000075995922,
+                        "id": 271,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 864784156,
+                        "duration": 0.01600000075995922,
+                        "id": 272,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 200144097,
+                        "duration": 0.01600000075995922,
+                        "id": 273,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 598599104,
+                        "duration": 0.01600000075995922,
+                        "id": 274,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3222223312,
+                        "duration": 0.01600000075995922,
+                        "id": 275,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1077130052,
+                        "duration": 0.01600000075995922,
+                        "id": 276,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 61347578,
+                        "duration": 0.01600000075995922,
+                        "id": 277,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3200630609,
+                        "duration": 0.01600000075995922,
+                        "id": 278,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1113001324,
+                        "duration": 0.01600000075995922,
+                        "id": 279,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 590369114,
+                        "duration": 0.01600000075995922,
+                        "id": 280,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1346493313,
+                        "duration": 0.01600000075995922,
+                        "id": 281,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2973561950,
+                        "duration": 0.01600000075995922,
+                        "id": 282,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1818265571,
+                        "duration": 0.01600000075995922,
+                        "id": 283,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2427822823,
+                        "duration": 0.01600000075995922,
+                        "id": 284,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2111231148,
+                        "duration": 0.01600000075995922,
+                        "id": 285,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 695832531,
+                        "duration": 0.01600000075995922,
+                        "id": 286,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 734971458,
+                        "duration": 0.01600000075995922,
+                        "id": 287,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2592000089,
+                        "duration": 0.01600000075995922,
+                        "id": 288,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3799354611,
+                        "duration": 0.01600000075995922,
+                        "id": 289,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 695286439,
+                        "duration": 0.01600000075995922,
+                        "id": 290,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 288680873,
+                        "duration": 0.01600000075995922,
+                        "id": 291,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2921027471,
+                        "duration": 0.01600000075995922,
+                        "id": 292,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3584265850,
+                        "duration": 0.01600000075995922,
+                        "id": 293,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2136052743,
+                        "duration": 0.01600000075995922,
+                        "id": 294,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 4032563994,
+                        "duration": 0.01600000075995922,
+                        "id": 295,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2158563064,
+                        "duration": 0.01600000075995922,
+                        "id": 296,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 515785315,
+                        "duration": 0.01600000075995922,
+                        "id": 297,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2309985421,
+                        "duration": 0.01600000075995922,
+                        "id": 298,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3364191834,
+                        "duration": 0.01600000075995922,
+                        "id": 299,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 4062157984,
+                        "duration": 0.01600000075995922,
+                        "id": 300,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2335255818,
+                        "duration": 0.01600000075995922,
+                        "id": 301,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1732020185,
+                        "duration": 0.01600000075995922,
+                        "id": 302,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3541217371,
+                        "duration": 0.01600000075995922,
+                        "id": 303,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    }
+                ],
+                "loop": false,
+                "name": "",
+                "reverse": false
+            }
+        ],
+        "dddd": [
             {
                 "bounce": true,
                 "duration": 0.4800000488758087,
@@ -3788,6 +4219,17 @@
                         "offsetX": 0,
                         "offsetY": 0
                     }
+                ],
+                "loop": false,
+                "name": "",
+                "reverse": false
+            }
+        ],
+        "temp/dda": [
+            {
+                "bounce": false,
+                "duration": 0,
+                "frames": [
                 ],
                 "loop": false,
                 "name": "",

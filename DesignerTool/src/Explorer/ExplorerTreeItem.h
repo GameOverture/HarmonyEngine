@@ -44,6 +44,8 @@ public:
 	QString GetName(bool bWithPrefix) const;
 	QString GetPrefix() const;				// Ends with a '/'
 	QIcon GetIcon(SubIcon eSubIcon) const;
+
+	virtual void Rename(QString sNewName);
 	void SetTreeItemSubIcon(SubIcon eSubIcon);
 };
 Q_DECLARE_METATYPE(ExplorerTreeItem *)

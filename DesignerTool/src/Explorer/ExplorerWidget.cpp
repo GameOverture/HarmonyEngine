@@ -105,7 +105,6 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 
 	// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
 	QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
-	bool bSucceeded = false;
 	for(int i = 0; i < sPathSplitList.size(); ++i)
 	{
 		bool bFound = false;
@@ -121,27 +120,13 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 
 		if(bFound == false)
 		{
-			if(i != sPathSplitList.size()-1)
-			{
-				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
-				ExplorerTreeItem *pPrefixItem = new ExplorerTreeItem(ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
-				pParentTreeItem = pPrefixItem->GetTreeItem();
-			}
-			else
-			{
-				bSucceeded = true;
-				break;
-			}
+			// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
+			ExplorerTreeItem *pPrefixItem = new ExplorerTreeItem(ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
+			pParentTreeItem = pPrefixItem->GetTreeItem();
 		}
 	}
 
 	ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, pParentTreeItem, sName, initValue, true);
-
-	if(bSucceeded == false)
-	{
-		HyGuiLog("Did not add item: " % pItem->GetName(true) % " successfully", LOGTYPE_Error);
-		return nullptr;
-	}
 
 	pItem->SetTreeItemSubIcon(SUBICON_New);
 
@@ -206,20 +191,7 @@ QStringList ExplorerWidget::GetOpenProjectPaths()
 
 Project *ExplorerWidget::GetCurProjSelected()
 {
-	QTreeWidgetItem *pCurProjItem = GetSelectedTreeItem();
-	if(pCurProjItem == nullptr)
-		return nullptr;
-	
-	while(pCurProjItem->parent())
-		pCurProjItem = pCurProjItem->parent();
-	
-	QVariant v = pCurProjItem->data(0, Qt::UserRole);
-	ExplorerTreeItem *pItem = v.value<ExplorerTreeItem *>();
-
-	if(pItem->GetType() != ITEM_Project)
-		HyGuiLog("WidgetExplorer::GetCurProjSelected() returned a non project item", LOGTYPE_Error);
-
-	return reinterpret_cast<Project *>(pItem);
+	return HyGlobal::GetProjectFromItem(GetSelectedTreeItem());
 }
 
 ExplorerTreeItem *ExplorerWidget::GetCurItemSelected()
@@ -525,33 +497,9 @@ void ExplorerWidget::on_actionRename_triggered()
 {
 	ExplorerTreeItem *pItem = GetCurItemSelected();
 	
-	DlgInputName *pDlg = nullptr;
-
-
-	switch(pItem->GetType())
-	{
-	case ITEM_Prefix:
-
-		pDlg = new DlgInputName("Creating New Atlas Group", "NewAtlasGroup");
-		if(pDlg->exec() == QDialog::Accepted)
-		{
-			int i = 0;
-			i++;
-		}
-		break;
-		
-	case ITEM_Audio:
-	case ITEM_Particles:
-	case ITEM_Font:
-	case ITEM_Spine:
-	case ITEM_Sprite:
-	case ITEM_Shader:
-	case ITEM_Entity:
-		break;
-		
-	default:
-		HyGuiLog("ExplorerWidget::on_actionDeleteItem_triggered was invoked on an non-item/prefix:" % QString::number(pItem->GetType()), LOGTYPE_Error);
-	}
+	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pItem->GetType(), false), pItem->GetName(false));
+	if(pDlg->exec() == QDialog::Accepted)
+		pItem->Rename(pDlg->GetName());
 
 	delete pDlg;
 }

@@ -135,7 +135,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 	}
 
 	if(dataFile.exists() == false)
-		SaveGameData();
+		WriteGameData();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -378,28 +378,8 @@ void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVa
 	m_SaveDataObj.insert(sItemTypeName, subDirObj);
 
 #ifndef RESAVE_ENTIRE_PROJECT
-	SaveGameData();
+	WriteGameData();
 #endif
-}
-
-void Project::SaveGameData()
-{
-	QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
-	if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
-	   HyGuiLog(QString("Couldn't open ") % HYGUIPATH_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
-	}
-	else
-	{
-		QJsonDocument userDoc;
-		userDoc.setObject(m_SaveDataObj);
-		qint64 iBytesWritten = dataFile.write(userDoc.toJson());
-		if(0 == iBytesWritten || -1 == iBytesWritten)
-		{
-			HyGuiLog(QString("Could not write to ") % HYGUIPATH_DataFile % " file: " % dataFile.errorString(), LOGTYPE_Error);
-		}
-
-		dataFile.close();
-	}
 }
 
 void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
@@ -416,7 +396,7 @@ void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
 	m_SaveDataObj.remove(sItemTypeName);
 	m_SaveDataObj.insert(sItemTypeName, subDirObj);
 
-	SaveGameData();
+	WriteGameData();
 	
 	// If open, make sure to close as it's been deleted from project
 	for(int i = 0; i < m_pTabBar->count(); ++i)
@@ -447,6 +427,8 @@ void Project::DeletePrefixAndContents(QString sPrefix)
 				break;
 			}
 		}
+		if(eType == TYPE_Unknown)
+			HyGuiLog("DeletePrefixAndContents bad", LOGTYPE_Error);
 
 		QJsonObject itemObj = itemTypeIter.value().toObject();
 		for(auto iter = itemObj.begin(); iter != itemObj.end(); ++iter)
@@ -458,6 +440,85 @@ void Project::DeletePrefixAndContents(QString sPrefix)
 			if(sCurPrefix == sPrefix)
 				DeleteGameData(eType, iter.key());
 		}
+	}
+}
+
+void Project::RenameGameData(HyGuiItemType eType, QString sOldPath, QString sNewPath, QJsonValue itemVal)
+{
+	QString sItemTypeName = HyGlobal::ItemName(eType, true);
+	if(m_SaveDataObj.contains(sItemTypeName) == false) {
+		HyGuiLog("Could not find item type: " % sItemTypeName % " within ItemProject::RenameGameData", LOGTYPE_Error);
+	}
+
+	QJsonObject subDirObj = m_SaveDataObj[sItemTypeName].toObject();
+	subDirObj.remove(sOldPath);
+	subDirObj.insert(sNewPath, itemVal);
+
+	m_SaveDataObj.remove(sItemTypeName);
+	m_SaveDataObj.insert(sItemTypeName, subDirObj);
+
+	WriteGameData();
+}
+
+void Project::RenamePrefix(QString sOldPath, QString sNewPath)
+{
+	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+	for(auto itemTypeIter = m_SaveDataObj.begin(); itemTypeIter != m_SaveDataObj.end(); ++itemTypeIter)
+	{
+		HyGuiItemType eType = TYPE_Unknown;
+		for(int i = 0; i < typeList.size(); ++i)
+		{
+			if(itemTypeIter.key() == HyGlobal::ItemName(typeList[i], true))
+			{
+				eType = typeList[i];
+				break;
+			}
+		}
+		if(eType == TYPE_Unknown)
+			HyGuiLog("RenamePrefix bad", LOGTYPE_Error);
+
+		QJsonObject itemTypeObj = itemTypeIter.value().toObject();
+		for(auto iter = itemTypeObj.begin(); iter != itemTypeObj.end(); ++iter)
+		{
+			if(iter.key().startsWith(sOldPath, Qt::CaseInsensitive))
+			{
+				QString sNewKey = iter.key();
+				sNewKey.replace(sOldPath, sNewPath);
+				QJsonValue data = iter.value();
+				itemTypeObj.remove(iter.key());
+				itemTypeObj.insert(sNewKey, data);
+			}
+		}
+
+		QString sItemTypeName = HyGlobal::ItemName(eType, true);
+		if(m_SaveDataObj.contains(sItemTypeName) == false) {
+			HyGuiLog("Could not find item type: " % sItemTypeName % " within ItemProject::RenamePrefix", LOGTYPE_Error);
+		}
+
+		m_SaveDataObj.remove(sItemTypeName);
+		m_SaveDataObj.insert(sItemTypeName, itemTypeObj);
+	}
+
+	WriteGameData();
+}
+
+void Project::WriteGameData()
+{
+	QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
+	if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
+	   HyGuiLog(QString("Couldn't open ") % HYGUIPATH_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
+	}
+	else
+	{
+		QJsonDocument userDoc;
+		userDoc.setObject(m_SaveDataObj);
+		qint64 iBytesWritten = dataFile.write(userDoc.toJson());
+		if(0 == iBytesWritten || -1 == iBytesWritten)
+		{
+			HyGuiLog(QString("Could not write to ") % HYGUIPATH_DataFile % " file: " % dataFile.errorString(), LOGTYPE_Error);
+		}
+
+		dataFile.close();
 	}
 }
 
