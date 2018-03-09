@@ -18,10 +18,10 @@ class ExplorerWidget;
 
 class ExplorerTreeWidget : public QTreeWidget
 {
-	ExplorerWidget *         m_pOwnerWidget;
+	ExplorerWidget *			m_pOwnerWidget;
 
-	ProjectItem *           m_pDraggedProjItem;
-	QPoint                  m_ptDragStart;
+	ProjectItem *				m_pDraggedProjItem;
+	QPoint						m_ptDragStart;
 
 public:
 	ExplorerTreeWidget(QWidget *pParent = nullptr);

@@ -75,7 +75,9 @@ Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 		return nullptr;
 	}
 
+	ui->treeWidget->sortItems(0, Qt::AscendingOrder);
 	HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
+
 	return pNewProject;
 
 	// BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?.. fucking waste of time)
@@ -141,6 +143,8 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 	
 		MainWindow::OpenItem(pItem);
 	}
+
+	ui->treeWidget->sortItems(0, Qt::AscendingOrder);
 
 	return pItem;
 }

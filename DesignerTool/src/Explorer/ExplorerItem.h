@@ -16,9 +16,19 @@
 #include "Global.h"
 #include "Harmony/HyEngine.h"
 
-class HyGuiDependencies;
-class WidgetRenderer;
-class AtlasFrame;
+class ExplorerTreeWidget;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ExplorerTreeItem : public QTreeWidgetItem
+{
+public:
+	ExplorerTreeItem(int type = Type);
+	ExplorerTreeItem(ExplorerTreeWidget *pView, int type = Type);
+	ExplorerTreeItem(QTreeWidgetItem *parent, int type = Type);
+
+	bool operator<(const QTreeWidgetItem& other) const;
+};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ExplorerItem : public QObject
 {
@@ -30,7 +40,7 @@ protected:
 
 	bool					m_bIsProjectItem;
 	
-	QTreeWidgetItem *		m_pTreeItemPtr;
+	ExplorerTreeItem *		m_pTreeItemPtr;
 	
 public:
 	ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem);

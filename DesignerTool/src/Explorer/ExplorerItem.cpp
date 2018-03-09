@@ -11,17 +11,40 @@
 #include "SpriteWidget.h"
 #include "Global.h"
 #include "Project.h"
+#include "ExplorerTreeWidget.h"
 #include "Harmony/Utilities/HyStrManip.h"
 
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ExplorerTreeItem::ExplorerTreeItem(int type /*= Type*/) : QTreeWidgetItem(type)
+{ }
+ExplorerTreeItem::ExplorerTreeItem(ExplorerTreeWidget *pView, int type /*= Type*/) : QTreeWidgetItem(pView, type)
+{ }
+ExplorerTreeItem::ExplorerTreeItem(QTreeWidgetItem *parent, int type /*= Type*/) : QTreeWidgetItem(parent, type)
+{ }
+
+bool ExplorerTreeItem::operator<(const QTreeWidgetItem &rhs) const
+{
+	ExplorerItem *pLeftItem = this->data(0, Qt::UserRole).value<ExplorerItem *>();
+	ExplorerItem *pRightItem = rhs.data(0, Qt::UserRole).value<ExplorerItem *>();
+
+	if(pLeftItem->GetType() == ITEM_Prefix && pRightItem->GetType() != ITEM_Prefix)
+		return true;
+	if(pLeftItem->GetType() != ITEM_Prefix && pRightItem->GetType() == ITEM_Prefix)
+		return false;
+
+	return this->text(0) < rhs.text(0);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem) :	m_eTYPE(eType),
 																													m_sPath(HyStr::MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
 																													m_bIsProjectItem(false)
 {
-	m_pTreeItemPtr = new QTreeWidgetItem();
+	m_pTreeItemPtr = new ExplorerTreeItem();
 	m_pTreeItemPtr->setText(0, GetName(false));
 	m_pTreeItemPtr->setIcon(0, GetIcon(SUBICON_None));
 
