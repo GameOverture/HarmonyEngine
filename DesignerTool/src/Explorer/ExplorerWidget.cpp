@@ -19,6 +19,7 @@
 #include "ExplorerTreeItem.h"
 #include "AtlasWidget.h"
 #include "IModel.h"
+#include "DlgInputName.h"
 
 #include <QJsonArray>
 #include <QMessageBox>
@@ -59,6 +60,11 @@ ExplorerWidget::~ExplorerWidget()
 	delete ui;
 }
 
+void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
+{
+	m_pNewItemMenuRef = pMenu;
+}
+
 Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 {
 	Project *pNewProject = new Project(this, sNewProjectFilePath);
@@ -70,11 +76,6 @@ Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
 	}
 
 	HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
-
-	QTreeWidgetItem *pProjTreeItem = pNewProject->GetTreeItem();
-	ui->treeWidget->insertTopLevelItem(0, pProjTreeItem);
-	ui->treeWidget->expandItem(pProjTreeItem);
-	
 	return pNewProject;
 
 	// BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?.. fucking waste of time)
@@ -100,69 +101,49 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 		return nullptr;
 	}
 
-	ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, sPrefix, sName, initValue, true);
-	
-	if(sName[0] != HYDEFAULT_PrefixChar)
+	QStringList sPathSplitList = sPrefix.split(QChar('/'));
+
+	// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
+	QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
+	bool bSucceeded = false;
+	for(int i = 0; i < sPathSplitList.size(); ++i)
 	{
-		// Get the relative path from [ProjectDir->ItemPath] e.g. "Sprites/SpritePrefix/MySprite"
-		QString sRelativePath = pItem->GetPath();
-		QStringList sPathSplitList = sRelativePath.split(QChar('/'));
-
-		// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
-		QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
-		bool bSucceeded = false;
-		for(int i = 0; i < sPathSplitList.size(); ++i)
+		bool bFound = false;
+		for(int j = 0; j < pParentTreeItem->childCount(); ++j)
 		{
-			bool bFound = false;
-			for(int j = 0; j < pParentTreeItem->childCount(); ++j)
+			if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
 			{
-				if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
-				{
-					pParentTreeItem = pParentTreeItem->child(j);
-					bFound = true;
-					break;
-				}
-			}
-
-			if(bFound == false)
-			{
-				if(i == 0)
-				{
-					HyGuiLog("Cannot find valid sub directory: " % sPathSplitList[i], LOGTYPE_Error);
-					return nullptr;
-				}
-
-				if(i != sPathSplitList.size()-1)
-				{
-					// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
-					//
-					QString sPath = pParentTreeItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>()->GetName(true) % "/" % sPathSplitList[i];
-
-					ExplorerTreeItem *pPrefixItem = new ExplorerTreeItem(ITEM_Prefix, sPath);
-					QTreeWidgetItem *pPrefixTreeItem = pPrefixItem->GetTreeItem();
-
-					pParentTreeItem->addChild(pPrefixTreeItem);
-					pParentTreeItem = pPrefixTreeItem;
-				}
-				else
-				{
-					// At the final traversal, which is the item itself.
-					pParentTreeItem->addChild(pItem->GetTreeItem());
-
-					bSucceeded = true;
-					break;
-				}
+				pParentTreeItem = pParentTreeItem->child(j);
+				bFound = true;
+				break;
 			}
 		}
 
-		if(bSucceeded == false)
+		if(bFound == false)
 		{
-			HyGuiLog("Did not add item: " % pItem->GetName(true) % " successfully", LOGTYPE_Error);
-			return nullptr;
+			if(i != sPathSplitList.size()-1)
+			{
+				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
+				ExplorerTreeItem *pPrefixItem = new ExplorerTreeItem(ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
+				pParentTreeItem = pPrefixItem->GetTreeItem();
+			}
+			else
+			{
+				bSucceeded = true;
+				break;
+			}
 		}
-
-		pItem->SetTreeItemSubIcon(SUBICON_New);
 	}
+
+	ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, pParentTreeItem, sName, initValue, true);
+
+	if(bSucceeded == false)
+	{
+		HyGuiLog("Did not add item: " % pItem->GetName(true) % " successfully", LOGTYPE_Error);
+		return nullptr;
+	}
+
+	pItem->SetTreeItemSubIcon(SUBICON_New);
 
 	if(bOpenAfterAdd)
 	{
@@ -251,29 +232,9 @@ ExplorerTreeItem *ExplorerWidget::GetCurItemSelected()
 	return v.value<ExplorerTreeItem *>();
 }
 
-ExplorerTreeItem *ExplorerWidget::GetCurSubDirSelected()
+ExplorerTreeWidget *ExplorerWidget::GetTreeWidget()
 {
-	QTreeWidgetItem *pCurTreeItem = GetSelectedTreeItem();
-	if(pCurTreeItem == nullptr)
-		return nullptr;
-	
-	ExplorerTreeItem *pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
-	while(pCurItem->GetType() != DIR_Audio &&
-		  pCurItem->GetType() != DIR_Particles &&
-		  pCurItem->GetType() != DIR_Fonts &&
-		  pCurItem->GetType() != DIR_Spine &&
-		  pCurItem->GetType() != DIR_Sprites &&
-		  pCurItem->GetType() != DIR_Shaders &&
-		  pCurItem->GetType() != DIR_Entities)
-	{
-		pCurTreeItem = pCurItem->GetTreeItem()->parent();
-		if(pCurTreeItem == nullptr)
-			return nullptr;
-		
-		pCurItem = pCurTreeItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
-	}
-	
-	return pCurItem;
+	return ui->treeWidget;
 }
 
 void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
@@ -290,14 +251,12 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
 	// Determine the pasted item type
 	HyGuiItemType ePasteItemType = TYPE_Unknown;
 	QString sItemType = pasteObj["itemType"].toString();
-	QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
-	for(int i = 0; i < subDirList.size(); ++i)
+	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+	for(int i = 0; i < typeList.size(); ++i)
 	{
-		HyGuiItemType eItemType = HyGlobal::GetItemFromDir(subDirList[i]);
-
-		if(sItemType == HyGlobal::ItemName(eItemType))
+		if(sItemType == HyGlobal::ItemName(typeList[i], true))
 		{
-			ePasteItemType = eItemType;
+			ePasteItemType = typeList[i];
 			break;
 		}
 	}
@@ -305,7 +264,7 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
 	// Import any missing fonts (.ttf)
 	if(ePasteItemType == ITEM_Font)
 	{
-		QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(DIR_Fonts));
+		QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_Font, true));
 		QJsonArray fontArray = pasteObj["fonts"].toArray();
 		for(int i = 0; i < fontArray.size(); ++i)
 		{
@@ -451,19 +410,12 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		HyGuiItemType eSelectedItemType = pSelectedExplorerItem->GetType();
 		switch(eSelectedItemType)
 		{
-		case ITEM_Project:
+		case ITEM_Project: {
+			contextMenu.addMenu(m_pNewItemMenuRef);
+			contextMenu.addSeparator();
 			contextMenu.addAction(FINDACTION("actionCloseProject"));
 			contextMenu.addAction(FINDACTION("actionProjectSettings"));
-			break;
-		case DIR_Audio:
-		case DIR_Particles:
-		case DIR_Fonts:
-		case DIR_Spine:
-		case DIR_Sprites:
-		case DIR_Shaders:
-		case DIR_Entities:
-			contextMenu.addAction(FINDACTION("actionNew" % HyGlobal::ItemName(HyGlobal::GetItemFromDir(eSelectedItemType))));
-			break;
+			break; }
 		case ITEM_Audio:
 		case ITEM_Particles:
 		case ITEM_Font:
@@ -471,17 +423,20 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Sprite:
 		case ITEM_Shader:
 		case ITEM_Entity:
-			contextMenu.addAction(FINDACTION("actionNew" % HyGlobal::ItemName(eSelectedItemType)));
+			ui->actionOpen->setText("Open " % pSelectedExplorerItem->GetName(false));
+			ui->actionOpen->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_None));
+			contextMenu.addAction(ui->actionOpen);
 			contextMenu.addSeparator();
-			contextMenu.addAction(ui->actionCutItem);
-			contextMenu.addAction(ui->actionCopyItem);
-			contextMenu.addAction(ui->actionPasteItem);
-			contextMenu.addSeparator();
+			// Fall through
 		case ITEM_Prefix:
 			contextMenu.addAction(ui->actionRename);
 			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_Delete));
 			ui->actionDeleteItem->setText("Delete " % pSelectedExplorerItem->GetName(false));
 			contextMenu.addAction(ui->actionDeleteItem);
+			contextMenu.addSeparator();
+			contextMenu.addAction(ui->actionCutItem);
+			contextMenu.addAction(ui->actionCopyItem);
+			contextMenu.addAction(ui->actionPasteItem);
 			break;
 
 		default: {
@@ -502,13 +457,6 @@ void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
 	
 	switch(pTreeVariantItem->GetType())
 	{
-	case DIR_Audio:
-	case DIR_Particles:
-	case DIR_Fonts:
-	case DIR_Shaders:
-	case DIR_Spine:
-	case DIR_Sprites:
-	case DIR_Entities:
 	case ITEM_Project:
 	case ITEM_Prefix:
 		item->setExpanded(!item->isExpanded());
@@ -577,9 +525,19 @@ void ExplorerWidget::on_actionRename_triggered()
 {
 	ExplorerTreeItem *pItem = GetCurItemSelected();
 	
+	DlgInputName *pDlg = nullptr;
+
+
 	switch(pItem->GetType())
 	{
 	case ITEM_Prefix:
+
+		pDlg = new DlgInputName("Creating New Atlas Group", "NewAtlasGroup");
+		if(pDlg->exec() == QDialog::Accepted)
+		{
+			int i = 0;
+			i++;
+		}
 		break;
 		
 	case ITEM_Audio:
@@ -594,6 +552,8 @@ void ExplorerWidget::on_actionRename_triggered()
 	default:
 		HyGuiLog("ExplorerWidget::on_actionDeleteItem_triggered was invoked on an non-item/prefix:" % QString::number(pItem->GetType()), LOGTYPE_Error);
 	}
+
+	delete pDlg;
 }
 
 void ExplorerWidget::on_actionDeleteItem_triggered()
@@ -603,9 +563,9 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 	switch(pItem->GetType())
 	{
 	case ITEM_Prefix:
-		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the " % HyGlobal::ItemName(pItem->GetType()) % ":\n" % pItem->GetPrefix() % "\n\nAnd all of its contents? This action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
+		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the prefix:\n" % pItem->GetPrefix() % "\n\nAnd all of its contents? This action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
-			GetCurProjSelected()->DeletePrefixAndContents(GetCurSubDirSelected()->GetType(), pItem->GetPrefix());
+			GetCurProjSelected()->DeletePrefixAndContents(pItem->GetPrefix());
 			pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
 		}
 		break;
@@ -617,7 +577,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 	case ITEM_Sprite:
 	case ITEM_Shader:
 	case ITEM_Entity:
-		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the " % HyGlobal::ItemName(pItem->GetType()) % ":\n" % pItem->GetName(true) % "?\n\nThis action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
+		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the " % HyGlobal::ItemName(pItem->GetType(), false) % ":\n" % pItem->GetName(true) % "?\n\nThis action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
 			static_cast<ProjectItem *>(pItem)->DeleteFromProject();
 			
@@ -645,7 +605,7 @@ void ExplorerWidget::on_actionCutItem_triggered()
 	QClipboard *pClipboard = QApplication::clipboard();
 	pClipboard->setText(pNewMimeData->data(HYGUI_MIMETYPE));
 
-	HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
+	HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType(), false) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
 	ui->actionPasteItem->setEnabled(true);
 }
 
@@ -663,7 +623,7 @@ void ExplorerWidget::on_actionCopyItem_triggered()
 	QClipboard *pClipboard = QApplication::clipboard();
 	pClipboard->setText(pNewMimeData->data(HYGUI_MIMETYPE));
 
-	HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType()) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
+	HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType(), false) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
 	ui->actionPasteItem->setEnabled(true);
 }
 
@@ -677,4 +637,11 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 
 	// Don't use QClipboard because someone can just copy random text before pasting and ruin the expected json format
 	PasteItemSrc(sm_sInternalClipboard, pCurProj);
+}
+
+void ExplorerWidget::on_actionOpen_triggered()
+{
+	ExplorerTreeItem *pCurItemSelected = GetCurItemSelected();
+	if(pCurItemSelected->IsProjectItem())
+		MainWindow::OpenItem(static_cast<ProjectItem *>(pCurItemSelected));
 }

@@ -102,6 +102,14 @@
     <string>Paste the item on the clipboard into the selected project</string>
    </property>
   </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Open the selected item</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

@@ -207,7 +207,7 @@ void AtlasWidget::on_actionDeleteImages_triggered()
 		{
 			QString sMessage = "'" % pFrame->GetName() % "' image cannot be deleted because it is in use by the following items: \n\n";
 			for(QSet<ProjectItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
-				sMessage.append(HyGlobal::ItemName(HyGlobal::GetDirFromItem((*LinksIter)->GetType())) % "/" % (*LinksIter)->GetName(true) % "\n");
+				sMessage.append(HyGlobal::ItemName((*LinksIter)->GetType(), true) % "/" % (*LinksIter)->GetName(true) % "\n");
 
 			HyGuiLog(sMessage, LOGTYPE_Warning);
 			return;

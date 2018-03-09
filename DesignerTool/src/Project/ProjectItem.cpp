@@ -28,10 +28,10 @@
 
 ProjectItem::ProjectItem(Project &projRef,
 						 HyGuiItemType eType,
-						 const QString sPrefix,
+						 QTreeWidgetItem *pParentTreeItem,
 						 const QString sName,
 						 QJsonValue initValue,
-						 bool bIsPendingSave) : ExplorerTreeItem(eType, HyGlobal::ItemName(HyGlobal::GetDirFromItem(eType)) % "/" % sPrefix % "/" % sName),
+						 bool bIsPendingSave) : ExplorerTreeItem(eType, sName, pParentTreeItem),
 												m_ProjectRef(projRef),
 												m_SaveValue(initValue),
 												m_bExistencePendingSave(bIsPendingSave),

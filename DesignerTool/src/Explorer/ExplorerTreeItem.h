@@ -25,26 +25,25 @@ class ExplorerTreeItem : public QObject
 	Q_OBJECT
 
 protected:
-	const HyGuiItemType     m_eTYPE;
-	const QString           m_sPATH;
+	const HyGuiItemType		m_eTYPE;
+	QString					m_sPath;
 
-	bool                    m_bIsProjectItem;
+	bool					m_bIsProjectItem;
 	
-	QTreeWidgetItem *       m_pTreeItemPtr;
+	QTreeWidgetItem *		m_pTreeItemPtr;
 	
 public:
-	ExplorerTreeItem(HyGuiItemType eType, const QString sPath);
+	ExplorerTreeItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem);
 	virtual ~ExplorerTreeItem();
 
-	HyGuiItemType GetType() const                   { return m_eTYPE; }
-	QTreeWidgetItem *GetTreeItem() const            { return m_pTreeItemPtr; }
+	HyGuiItemType GetType() const;
+	QTreeWidgetItem *GetTreeItem() const;
 
 	bool IsProjectItem() const;
 	
 	QString GetName(bool bWithPrefix) const;
-	QString GetPrefix() const;
-	QString GetPath() const                         { return m_sPATH; }
-	QIcon GetIcon(SubIcon eSubIcon) const           { return HyGlobal::ItemIcon(m_eTYPE, eSubIcon); }
+	QString GetPrefix() const;				// Ends with a '/'
+	QIcon GetIcon(SubIcon eSubIcon) const;
 	void SetTreeItemSubIcon(SubIcon eSubIcon);
 };
 Q_DECLARE_METATYPE(ExplorerTreeItem *)

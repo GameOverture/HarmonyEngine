@@ -73,6 +73,8 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	ui->explorer->addAction(ui->actionRemove);
 	ui->explorer->addAction(ui->actionRename);
 	ui->explorer->addAction(ui->actionLaunchIDE);
+
+	ui->explorer->SetItemMenuPtr(ui->menu_New_Item);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// FIRST RUN CHECK - Ensure Harmony Engine propject location has been specified

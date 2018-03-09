@@ -13,6 +13,7 @@
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
 #include "Global.h"
+#include "ExplorerTreeWidget.h"
 #include "ProjectItemMimeData.h"
 
 #include <QFile>
@@ -71,7 +72,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : ExplorerTreeItem(ITEM_Project, sProjectFilePath),
+Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : ExplorerTreeItem(ITEM_Project, sProjectFilePath, nullptr),
 																				IHyApplication(g_DefaultInit),
 																				m_pWidget(pProjWidget),
 																				m_pDraw(nullptr),
@@ -120,21 +121,21 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 
 		m_SaveDataObj = userDoc.object();
 	}
-	else
+
+	// Ensure save object has all the valid types in map
+	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+	for(int i = 0; i < typeList.size(); ++i)
 	{
-		// Initialize the project by processing each type of sub dir
-		QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
-		for(int i = 0; i < subDirList.size(); ++i)
-		{
-			if(subDirList[i] == DIR_Atlases || subDirList[i] == DIR_AudioBanks)
-				continue;
+		if(typeList[i] == ITEM_Project || typeList[i] == ITEM_Prefix || typeList[i] == ITEM_AtlasImage)
+			continue;
 
-			QString sSubDirName = HyGlobal::ItemName(subDirList[i]);
-			m_SaveDataObj.insert(sSubDirName, QJsonObject());
-		}
-
-		SaveGameData();
+		QString sTypeName = HyGlobal::ItemName(typeList[i], true);
+		if(m_SaveDataObj.contains(sTypeName) == false)
+			m_SaveDataObj.insert(sTypeName, QJsonObject());
 	}
+
+	if(dataFile.exists() == false)
+		SaveGameData();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -144,50 +145,48 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 
 	bool bDefaultFontFound = false;
 
-	// Initialize the project by processing each type of sub dir
-	QList<HyGuiItemType> subDirList = HyGlobal::SubDirList();
-	for(int i = 0; i < subDirList.size(); ++i)
+	// Initialize the project by processing each type
+	for(auto typeIterator = m_SaveDataObj.begin(); typeIterator != m_SaveDataObj.end(); ++typeIterator)
 	{
-		if(subDirList[i] == DIR_Atlases || subDirList[i] == DIR_AudioBanks)
-			continue;
+		HyGuiItemType eType = TYPE_Unknown;
+		for(int i = 0; i < typeList.size(); ++i)
+		{
+			if(typeIterator.key() == HyGlobal::ItemName(typeList[i], true))
+			{
+				eType = typeList[i];
+				break;
+			}
+		}
 
-		QString sSubDirPath = GetAssetsAbsPath() % HyGlobal::ItemName(subDirList[i]) % HyGlobal::ItemExt(subDirList[i]);
-		ExplorerTreeItem *pSubDirItem = new ExplorerTreeItem(subDirList[i], sSubDirPath);
+		if(eType == TYPE_Unknown)
+			HyGuiLog("Project ctor eType == TYPE_Unknown", LOGTYPE_Error);
 
-		// Adding sub dir tree item
-		QTreeWidgetItem *pSubDirTreeItem = pSubDirItem->GetTreeItem();
-		m_pTreeItemPtr->addChild(pSubDirTreeItem);
-
-		QString sSubDirName = HyGlobal::ItemName(subDirList[i]);
-		if(m_SaveDataObj.contains(sSubDirName) == false)
-			m_SaveDataObj.insert(sSubDirName, QJsonObject());
-
-		// Get the corresponding sub dir QJsonObject, and iterate through the objects (data items) within
-		QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
-		QJsonObject::iterator objsInSubDirIter = subDirObj.begin();
+		// Get the current (type) iterator, and iterate through its objects (items) within
+		QJsonObject subDirObj = typeIterator.value().toObject();
 
 		///////////////////////////////////////
 		/// ITEMS IN SUBDIR
-		for(; objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
+		for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
 		{
 			QString sItemPath = objsInSubDirIter.key();
 
 			// Create prefix folder tree items if they don't exist, and finally adding the tree item for the data itself
+			QString sCurPrefixPath = "";
 			QStringList sPathPartList = sItemPath.split("/");
-			QString sCurPrefix = "";
 
-			QTreeWidgetItem *pCurPrefixTreeItem = pSubDirTreeItem;
+			QTreeWidgetItem *pCurPrefixTreeItem = m_pTreeItemPtr;
+
 			///////////////////////////////////////
 			/// PATH PARTS
 			for(int iPathPartIndex = 0; iPathPartIndex < sPathPartList.size(); ++iPathPartIndex)
 			{
 				if(iPathPartIndex != 0)
-					sCurPrefix += "/";
+					sCurPrefixPath += "/";
 
 				// Not the last path part, must be a prefix
 				if(iPathPartIndex != sPathPartList.size() - 1)
 				{
-					sCurPrefix += sPathPartList[iPathPartIndex];
+					sCurPrefixPath += sPathPartList[iPathPartIndex];
 
 					bool bPrefixFound = false;
 					for(int iChildIndex = 0; iChildIndex < pCurPrefixTreeItem->childCount(); ++iChildIndex)
@@ -202,50 +201,20 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 
 					if(bPrefixFound == false)
 					{
-						ExplorerTreeItem *pPrefixItem = new ExplorerTreeItem(ITEM_Prefix, sSubDirName % "/" % sCurPrefix);
-						QTreeWidgetItem *pNewPrefixTreeWidget = pPrefixItem->GetTreeItem();
-
-						if(sCurPrefix[0] != HYDEFAULT_PrefixChar)
-							pCurPrefixTreeItem->addChild(pNewPrefixTreeWidget);
-
-						pCurPrefixTreeItem = pNewPrefixTreeWidget;
+						ExplorerTreeItem *pNewPrefixItem = new ExplorerTreeItem(ITEM_Prefix, sPathPartList[iPathPartIndex], pCurPrefixTreeItem);
+						pCurPrefixTreeItem = pNewPrefixItem->GetTreeItem();
 					}
 				}
 				else // Last path part, so must be the actual data item
 				{
-					ExplorerTreeItem *pNewDataItem = nullptr;
-					switch(subDirList[i])
-					{
-					case DIR_Audio:
-						pNewDataItem = new ProjectItem(*this, ITEM_Audio, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
-						break;
-					case DIR_Fonts:
-						pNewDataItem = new ProjectItem(*this, ITEM_Font, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
+					ProjectItem *pNewDataItem = new ProjectItem(*this, eType, pCurPrefixTreeItem, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
 
-						if(sCurPrefix == "+Hy/" && sPathPartList[iPathPartIndex] == "+HyFont")
-							bDefaultFontFound = true;
-						break;
-					case DIR_Sprites:
-						pNewDataItem = new ProjectItem(*this, ITEM_Sprite, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
-						break;
-					case DIR_Entities:
-						pNewDataItem = new ProjectItem(*this, ITEM_Entity, sCurPrefix, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
-						break;
-					case DIR_Particles:
-					case DIR_Spine:
-					case DIR_Shaders:
-					case DIR_Atlases:
-					default:
-						{ HyGuiLog("Unknown item type in ItemProject!", LOGTYPE_Error); }
-					}
-
-					if(sCurPrefix[0] != HYDEFAULT_PrefixChar)
-						pCurPrefixTreeItem->addChild(pNewDataItem->GetTreeItem());
+					if(sCurPrefixPath == "+Hy/" && sPathPartList[iPathPartIndex] == "+HyFont")
+						bDefaultFontFound = true;
 
 #ifdef RESAVE_ENTIRE_PROJECT
-					static_cast<ProjectItem *>(pNewDataItem)->Save();
+					pNewDataItem->Save();
 #endif
-
 				}
 			}
 		}
@@ -274,6 +243,10 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 		sContents.replace(sBefore, sAfter);
 		MainWindow::PasteItemSrc(sContents, this);
 	}
+
+	// Add project to the treewidget
+	pProjWidget->GetTreeWidget()->insertTopLevelItem(0, m_pTreeItemPtr);
+	pProjWidget->GetTreeWidget()->expandItem(m_pTreeItemPtr);
 }
 
 /*virtual*/ Project::~Project()
@@ -300,7 +273,7 @@ QJsonObject Project::GetSettingsObj() const
 
 QString Project::GetDirPath() const
 {
-	QFileInfo file(m_sPATH);
+	QFileInfo file(m_sPath);
 	return file.dir().absolutePath() + '/';
 }
 
@@ -311,7 +284,7 @@ QString Project::GetGameName() const
 
 QString Project::GetAbsPath() const
 {
-	return m_sPATH;
+	return m_sPath;
 }
 
 QString Project::GetAssetsAbsPath() const
@@ -391,20 +364,18 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 
 void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal)
 {
-	HyGuiItemType eSubDirType = HyGlobal::GetDirFromItem(eType);
-	QString sSubDirName = HyGlobal::ItemName(eSubDirType);
-
-	if(m_SaveDataObj.contains(sSubDirName) == false) {
-		HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::SaveGameData", LOGTYPE_Error);
+	QString sItemTypeName = HyGlobal::ItemName(eType, true);
+	if(m_SaveDataObj.contains(sItemTypeName) == false) {
+		HyGuiLog("Could not find item type: " % sItemTypeName % " within ItemProject::SaveGameData", LOGTYPE_Error);
 	}
 
-	QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
+	QJsonObject subDirObj = m_SaveDataObj[sItemTypeName].toObject();
 
 	subDirObj.remove(sPath);
 	subDirObj.insert(sPath, itemVal);
 
-	m_SaveDataObj.remove(sSubDirName);
-	m_SaveDataObj.insert(sSubDirName, subDirObj);
+	m_SaveDataObj.remove(sItemTypeName);
+	m_SaveDataObj.insert(sItemTypeName, subDirObj);
 
 #ifndef RESAVE_ENTIRE_PROJECT
 	SaveGameData();
@@ -433,19 +404,17 @@ void Project::SaveGameData()
 
 void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
 {
-	HyGuiItemType eSubDirType = HyGlobal::GetDirFromItem(eType);
-	QString sSubDirName = HyGlobal::ItemName(eSubDirType);
-
-	if(m_SaveDataObj.contains(sSubDirName) == false) {
-		HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::DeleteGameData", LOGTYPE_Error);
+	QString sItemTypeName = HyGlobal::ItemName(eType, true);
+	if(m_SaveDataObj.contains(sItemTypeName) == false) {
+		HyGuiLog("Could not find item type: " % sItemTypeName % " within ItemProject::DeleteGameData", LOGTYPE_Error);
 	}
 
-	QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
+	QJsonObject subDirObj = m_SaveDataObj[sItemTypeName].toObject();
 
 	subDirObj.remove(sPath);
 
-	m_SaveDataObj.remove(sSubDirName);
-	m_SaveDataObj.insert(sSubDirName, subDirObj);
+	m_SaveDataObj.remove(sItemTypeName);
+	m_SaveDataObj.insert(sItemTypeName, subDirObj);
 
 	SaveGameData();
 	
@@ -464,30 +433,37 @@ void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
 	}
 }
 
-void Project::DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix)
+void Project::DeletePrefixAndContents(QString sPrefix)
 {
-	HyGuiItemType eActualSubDir = HyGlobal::GetDirFromItem(eSubDirType);
-	QString sSubDirName = HyGlobal::ItemName(eActualSubDir);
-	
-	if(m_SaveDataObj.contains(sSubDirName) == false) {
-		HyGuiLog("Could not find subdir: " % sSubDirName % " within ItemProject::DeletePrefix", LOGTYPE_Error);
-	}
-
-	QJsonObject subDirObj = m_SaveDataObj[sSubDirName].toObject();
-	for(auto iter = subDirObj.begin(); iter != subDirObj.end(); ++iter)
+	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+	for(auto itemTypeIter = m_SaveDataObj.begin(); itemTypeIter != m_SaveDataObj.end(); ++itemTypeIter)
 	{
-		QFileInfo itemInfo;
-		itemInfo.setFile(iter.key());
-		QString sCurPrefix = itemInfo.path() % "/";
-		
-		if(sCurPrefix == sPrefix)
-			DeleteGameData(eActualSubDir, iter.key());
+		HyGuiItemType eType = TYPE_Unknown;
+		for(int i = 0; i < typeList.size(); ++i)
+		{
+			if(itemTypeIter.key() == HyGlobal::ItemName(typeList[i], true))
+			{
+				eType = typeList[i];
+				break;
+			}
+		}
+
+		QJsonObject itemObj = itemTypeIter.value().toObject();
+		for(auto iter = itemObj.begin(); iter != itemObj.end(); ++iter)
+		{
+			QFileInfo itemInfo;
+			itemInfo.setFile(iter.key());
+			QString sCurPrefix = itemInfo.path() % "/";
+
+			if(sCurPrefix == sPrefix)
+				DeleteGameData(eType, iter.key());
+		}
 	}
 }
 
-QJsonObject Project::GetSubDirObj(HyGuiItemType eType)
+QJsonObject Project::GetSavedItemsObj(HyGuiItemType eType)
 {
-	return m_SaveDataObj[HyGlobal::ItemName(HyGlobal::GetDirFromItem(eType))].toObject();
+	return m_SaveDataObj[HyGlobal::ItemName(eType, true)].toObject();
 }
 
 void Project::OpenTab(ProjectItem *pItem)

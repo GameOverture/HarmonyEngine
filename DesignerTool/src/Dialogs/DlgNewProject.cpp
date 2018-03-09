@@ -100,14 +100,14 @@ void DlgNewProject::on_buttonBox_accepted()
 	// DATA
 	projDir.mkdir(ui->txtRelativeAssetsLocation->text());
 	projDir.cd(ui->txtRelativeAssetsLocation->text());
-	projDir.mkdir(HyGlobal::ItemName(DIR_Atlases));
-	projDir.mkdir(HyGlobal::ItemName(DIR_AudioBanks));
+	projDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
+	projDir.mkdir(HyGlobal::ItemName(ITEM_Audio, true));
 
 	// META-DATA
 	projDir.setPath(GetProjDirPath());
 	projDir.mkdir(ui->txtRelativeMetaDataLocation->text());
 	projDir.cd(ui->txtRelativeMetaDataLocation->text());
-	projDir.mkdir(HyGlobal::ItemName(DIR_Atlases));
+	projDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
 
 	// SOURCE
 	projDir.setPath(GetProjDirPath());

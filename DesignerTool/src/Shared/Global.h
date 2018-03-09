@@ -36,22 +36,10 @@ enum HyGuiItemType
 {
 	TYPE_Unknown = -1,
 
-	DIR_Audio = 0,
-	DIR_Particles,
-	DIR_Fonts,
-	DIR_Spine,
-	DIR_Sprites,
-	DIR_Shaders,
-	DIR_Entities,
-	DIR_Atlases,
-	DIR_AudioBanks,
-
-	ITEM_Project,       // Sorted this way, so debugger uses "ITEM_Project" instead of "NUMDIR"
-	NUMDIR = ITEM_Project,
-
-	ITEM_Prefix,        // Essentially a sub-directory
-	ITEM_Primitive,
+	ITEM_Project,
+	ITEM_Prefix,
 	ITEM_AtlasImage,
+	ITEM_Primitive,
 	ITEM_Audio,
 	ITEM_Particles,
 	ITEM_Font,
@@ -62,8 +50,7 @@ enum HyGuiItemType
 	ITEM_BoundingVolume,
 	ITEM_Physics,
 
-	NUMTYPES,
-	NUMITEMS = NUMTYPES - NUMDIR
+	NUMTYPES
 };
 
 // NOTE: Do not rearrange the order of this enum
@@ -128,7 +115,7 @@ enum Theme
 
 #define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
 
-#define HYDEFAULT_PrefixChar                    '+' // Names prefixed with a '+' are engine defaults that are automatically added to project
+//#define HYDEFAULT_PrefixChar                    '+' // Names prefixed with a '+' are engine defaults that are automatically added to project
 
 #define HYGUIPATH_DataFile                      "data.json"
 #define HYGUIPATH_TempDir                       "temp/"
@@ -154,6 +141,7 @@ QByteArray JsonValueToSrc(QJsonValue value);
 class HyGlobal
 {
 	static QString                  sm_sItemNames[NUMTYPES];
+	static QString                  sm_sItemNamesPlural[NUMTYPES];
 	static QString                  sm_sSubIconNames[NUM_SUBICONS];
 
 	static QIcon                    sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
@@ -171,15 +159,13 @@ class HyGlobal
 public:
 	static void Initialize();
 
-	static HyGuiItemType GetDirFromItem(HyGuiItemType eItem);
-	static HyGuiItemType GetItemFromDir(HyGuiItemType eDir);
 	static HyGuiItemType GetItemFromAtlasItem(AtlasItemType eFrameType);
 	static AtlasItemType GetAtlasItemFromItem(HyGuiItemType eItem);
-	static QList<HyGuiItemType> SubDirList();
-	static QStringList SubDirNameList();
+	static QList<HyGuiItemType> GetTypeList();
+	static QStringList GetTypeNameList();
 	static QString AtlasTextureTypeString(HyTextureFormat eType);
 
-	static const QString ItemName(HyGuiItemType eItm)                  { return sm_sItemNames[eItm]; }
+	static const QString ItemName(HyGuiItemType eItem, bool bPlural)    { return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString ItemExt(HyGuiItemType eItem);
 	static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)  { return sm_ItemIcons[eItm][eSubIcon]; }
 	static const QColor ItemColor(HyGuiItemType eItem)                  { return sm_ItemColors[eItem]; }

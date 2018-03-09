@@ -45,7 +45,7 @@ DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerTreeItem *pItem, QWi
 	}
 	
 	setWindowIcon(pItem->GetIcon(SUBICON_Settings));
-	ui->lblName->setText(HyGlobal::ItemName(pItem->GetType()) % " Name:");
+	ui->lblName->setText(HyGlobal::ItemName(pItem->GetType(), false) % " Name:");
 	
 	ErrorCheck();
 }

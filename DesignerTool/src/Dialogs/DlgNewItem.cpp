@@ -26,7 +26,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
 
 	ui->setupUi(this);
 
-	setWindowTitle("Add a new " % HyGlobal::ItemName(eItem) % " item");
+	setWindowTitle("Add a new " % HyGlobal::ItemName(eItem, false) % " item");
 	setWindowIcon(HyGlobal::ItemIcon(eItem, SUBICON_New));
 	
 	ui->txtName->setValidator(HyGlobal::FileNameValidator());
@@ -35,21 +35,20 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
 
 	m_PrefixStringList.clear();
 
-	QTreeWidgetItem *pSubDirItem = nullptr;
-	for(int i = 0; i < m_pItemProject->GetTreeItem()->childCount(); ++i)
-	{
-		pSubDirItem = m_pItemProject->GetTreeItem()->child(i);
-		ExplorerTreeItem *pCurItem = pSubDirItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+//	QTreeWidgetItem *pSubDirItem = nullptr;
+//	for(int i = 0; i < m_pItemProject->GetTreeItem()->childCount(); ++i)
+//	{
+//		pSubDirItem = m_pItemProject->GetTreeItem()->child(i);
+//		ExplorerTreeItem *pCurItem = pSubDirItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
 
-		if(pCurItem->GetType() == HyGlobal::GetDirFromItem(eItem))
-			break;
-	}
+//		if(pCurItem->GetType() == HyGlobal::GetDirFromItem(eItem))
+//			break;
+//	}
 
-	// prefixes in subdir
-	QList<QTreeWidgetItem *> itemList = HyGlobal::RecursiveTreeChildren(pSubDirItem);
+	QList<QTreeWidgetItem *> itemList = HyGlobal::RecursiveTreeChildren(pItemProject->GetTreeItem());
 	for(int i = 0; i < itemList.size(); ++i)
 	{
-		if(itemList[i] == pSubDirItem)
+		if(itemList[i] == pItemProject->GetTreeItem())
 			continue;
 
 		ExplorerTreeItem *pItem = itemList[i]->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
@@ -63,8 +62,8 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *pare
 	ui->cmbPrefixList->clear();
 	ui->cmbPrefixList->addItems(m_PrefixStringList);
 	
-	ui->lblName->setText(HyGlobal::ItemName(eItem) % " Name:");
-	ui->txtName->setText("New" % HyGlobal::ItemName(eItem));
+	ui->lblName->setText(HyGlobal::ItemName(eItem, false) % " Name:");
+	ui->txtName->setText("New" % HyGlobal::ItemName(eItem, false));
 	
 	ui->txtName->selectAll();
 }
@@ -133,14 +132,14 @@ void DlgNewItem::ErrorCheck()
 	bool bIsError = false;
 	do
 	{
-		QStringList sPrefixDirList = sPrefix.split('/');
-		for(int i = 0; i < sPrefixDirList.size() && bIsError == false; ++i)
+		QStringList sSplitPrefixList = sPrefix.split('/');
+		for(int i = 0; i < sSplitPrefixList.size() && bIsError == false; ++i)
 		{
-			QStringList sSubDirList = HyGlobal::SubDirNameList();
-			for(int j = 0; j < sSubDirList.size() && bIsError == false; ++j)
+			QStringList sTypeNameList = HyGlobal::GetTypeNameList();
+			for(int j = 0; j < sTypeNameList.size() && bIsError == false; ++j)
 			{
-				if(sPrefixDirList[i].compare(sSubDirList[j], Qt::CaseInsensitive) == 0 &&
-				   ui->txtName->text().compare(sSubDirList[j], Qt::CaseInsensitive) == 0)
+				if(sSplitPrefixList[i].compare(sTypeNameList[j], Qt::CaseInsensitive) == 0 ||
+				   ui->txtName->text().compare(sTypeNameList[j], Qt::CaseInsensitive) == 0)
 				{
 					ui->lblError->setText("Error: The prefix and/or name is using a reserved name.");
 					bIsError = true;
@@ -176,7 +175,7 @@ void DlgNewItem::ErrorCheck()
 		}
 
 		QString sNewItemPath = sPrefix % '/' % ui->txtName->text();
-		QJsonObject subDirObj = m_pItemProject->GetSubDirObj(HyGlobal::GetDirFromItem(m_eItemType));
+		QJsonObject subDirObj = m_pItemProject->GetSavedItemsObj(m_eItemType);
 		for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
 		{
 			QString sItemPath = objsInSubDirIter.key();

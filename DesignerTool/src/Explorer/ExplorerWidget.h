@@ -27,6 +27,7 @@ class ExplorerWidget;
 
 class Project;
 class ProjectItem;
+class ExplorerTreeWidget;
 class ExplorerTreeItem;
 class AtlasFrame;
 
@@ -36,9 +37,13 @@ class ExplorerWidget : public QWidget
 
 	static QByteArray       sm_sInternalClipboard;
 
+	QMenu *					m_pNewItemMenuRef;
+
 public:
 	explicit ExplorerWidget(QWidget *parent = 0);
 	~ExplorerWidget();
+
+	void SetItemMenuPtr(QMenu *pMenu);
 	
 	Project *AddItemProject(const QString sNewProjectFilePath);
 
@@ -50,7 +55,8 @@ public:
 
 	Project *GetCurProjSelected();
 	ExplorerTreeItem *GetCurItemSelected();
-	ExplorerTreeItem *GetCurSubDirSelected();
+
+	ExplorerTreeWidget *GetTreeWidget();
 
 	void PasteItemSrc(QByteArray sSrc, Project *pProject);
 
@@ -77,6 +83,8 @@ private Q_SLOTS:
 	void on_actionCopyItem_triggered();
 
 	void on_actionPasteItem_triggered();
+
+	void on_actionOpen_triggered();
 
 Q_SIGNALS:
 	void LoadItemProject();

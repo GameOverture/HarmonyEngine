@@ -96,9 +96,9 @@ public:
 	void SaveGameData();
 	
 	void DeleteGameData(HyGuiItemType eType, QString sPath);
-	void DeletePrefixAndContents(HyGuiItemType eSubDirType, QString sPrefix);
+	void DeletePrefixAndContents(QString sPrefix);
 
-	QJsonObject GetSubDirObj(HyGuiItemType eType);
+	QJsonObject GetSavedItemsObj(HyGuiItemType eType);
 
 	// These tab functions are only called from MainWindow
 	void OpenTab(ProjectItem *pItem);

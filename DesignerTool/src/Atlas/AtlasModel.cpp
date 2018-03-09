@@ -75,8 +75,8 @@ bool AtlasModel::FrameLookup::DoesImageExist(quint32 uiChecksum)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
-												m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(DIR_Atlases) + HyGlobal::ItemExt(DIR_Atlases)),
-												m_RootDataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(DIR_Atlases) + HyGlobal::ItemExt(DIR_Atlases))
+												m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true)),
+												m_RootDataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true))
 {
 	if(m_MetaDir.exists() == false)
 	{
@@ -212,13 +212,11 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
 			else
 				pNewFrame->ClearError(ATLASFRAMEERROR_CannotFindMetaImg);
 
-			if(pNewFrame->GetName()[0] != HYDEFAULT_PrefixChar)
-			{
-				if(pFrameParent)
-					pFrameParent->addChild(pNewFrame->GetTreeItem());
-				else
-					m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
-			}
+			if(pFrameParent)
+				pFrameParent->addChild(pNewFrame->GetTreeItem());
+			else
+				m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
+
 		}
 	}
 	else
@@ -612,17 +610,14 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiA
 	{
 		newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
 
-		if(sName[0] != HYDEFAULT_PrefixChar)
+		if(pParent == nullptr)
+			m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+		else
 		{
-			if(pParent == nullptr)
-				m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
-			else
-			{
-				if(pParent->data(0, Qt::UserRole).toString() != HYTREEWIDGETITEM_IsFilter)
-					HyGuiLog("AtlasModel::ImportImage was passed parent that wasn't a filter", LOGTYPE_Error);
+			if(pParent->data(0, Qt::UserRole).toString() != HYTREEWIDGETITEM_IsFilter)
+				HyGuiLog("AtlasModel::ImportImage was passed parent that wasn't a filter", LOGTYPE_Error);
 
-				pParent->addChild(pNewFrame->GetTreeItem());
-			}
+			pParent->addChild(pNewFrame->GetTreeItem());
 		}
 	}
 

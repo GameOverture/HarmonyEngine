@@ -31,8 +31,8 @@ AudioWidgetManager::AudioWidgetManager(QWidget *parent) :   QWidget(parent),
 AudioWidgetManager::AudioWidgetManager(Project *pProjOwner, QWidget *parent) :  QWidget(parent),
 																					ui(new Ui::AudioWidgetManager),
 																					m_pProjOwner(pProjOwner),
-																					m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(DIR_AudioBanks) + HyGlobal::ItemExt(DIR_AudioBanks)),
-																					m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(DIR_AudioBanks) + HyGlobal::ItemExt(DIR_AudioBanks))
+																					m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_Audio, true)),
+																					m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_Audio, true))
 {
 	ui->setupUi(this);
 	while(ui->audioBanks->currentWidget())

@@ -43,7 +43,7 @@ class ProjectItem : public ExplorerTreeItem
 	IDraw *                 m_pDraw;
 	
 public:
-	ProjectItem(Project &projRef, HyGuiItemType eType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
+	ProjectItem(Project &projRef, HyGuiItemType eType, QTreeWidgetItem *pParentTreeItem, const QString sName, QJsonValue initValue, bool bIsPendingSave);
 	virtual ~ProjectItem();
 
 	void LoadModel();
