@@ -650,7 +650,9 @@ void MainWindow::on_actionTheme_Compe_triggered()
 
 void MainWindow::NewItem(HyGuiItemType eItem)
 {
-	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, this);
+	ExplorerTreeItem *pCurSelectedItem = ui->explorer->GetCurItemSelected();
+	QString sDefaultPrefix = pCurSelectedItem->GetType() == ITEM_Prefix ? pCurSelectedItem->GetName(true) : pCurSelectedItem->GetPrefix();
+	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
 	if(pDlg->exec())
 		ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(), eItem, pDlg->GetPrefix(), pDlg->GetName(), true, QJsonValue());
 

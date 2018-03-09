@@ -28,7 +28,7 @@ class DlgNewItem : public QDialog
 	QStringList     m_PrefixStringList;
 
 public:
-	explicit DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QWidget *parent = 0);
+	explicit DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefaultPrefix, QWidget *parent = 0);
 	~DlgNewItem();
 	
 	QString GetName();

@@ -401,6 +401,11 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			contextMenu.addSeparator();
 			// Fall through
 		case ITEM_Prefix:
+			if(eSelectedItemType == ITEM_Prefix)
+			{
+				contextMenu.addMenu(m_pNewItemMenuRef);
+				contextMenu.addSeparator();
+			}
 			contextMenu.addAction(ui->actionRename);
 			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_Delete));
 			ui->actionDeleteItem->setText("Delete " % pSelectedExplorerItem->GetName(false));
