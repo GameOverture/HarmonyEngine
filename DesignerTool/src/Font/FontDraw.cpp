@@ -115,10 +115,10 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 
 /*virtual*/ void FontDraw::OnHide(IHyApplication &hyApp)
 {
-	SetEnabled(false);
 	m_pPreviewTextCamera->SetEnabled(false);
 	m_PreviewOriginHorz.SetEnabled(false);
 	m_Text.SetEnabled(false);
+	SetEnabled(false, true);
 }
 
 /*virtual*/ void FontDraw::OnResizeRenderer() /*override*/

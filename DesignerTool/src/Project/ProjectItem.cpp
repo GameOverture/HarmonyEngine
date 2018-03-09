@@ -206,7 +206,7 @@ void ProjectItem::DrawLoad(IHyApplication &hyApp)
 
 	m_pDraw->ApplyJsonData();
 	m_pDraw->Load();
-	m_pDraw->SetEnabled(false);
+	m_pDraw->SetEnabled(false, true);
 }
 
 void ProjectItem::DrawUnload()

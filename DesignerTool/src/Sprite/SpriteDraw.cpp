@@ -133,7 +133,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnHide(IHyApplication &hyApp) /*override*/
 {
-	SetEnabled(false);
+	SetEnabled(false, true);
 }
 
 /*virtual*/ void SpriteDraw::OnResizeRenderer() /*override*/
