@@ -457,6 +457,7 @@ void Project::RenameGameData(HyGuiItemType eType, QString sOldPath, QString sNew
 	m_SaveDataObj.remove(sItemTypeName);
 	m_SaveDataObj.insert(sItemTypeName, subDirObj);
 
+	RefreshNamesOnTabs();
 	WriteGameData();
 }
 
@@ -499,7 +500,17 @@ void Project::RenamePrefix(QString sOldPath, QString sNewPath)
 		m_SaveDataObj.insert(sItemTypeName, itemTypeObj);
 	}
 
+	RefreshNamesOnTabs();
 	WriteGameData();
+}
+
+void Project::RefreshNamesOnTabs()
+{
+	for(int i = 0; i < m_pTabBar->count(); ++i)
+		m_pTabBar->setTabText(i, m_pTabBar->tabData(i).value<ProjectItem *>()->GetName(false));
+
+	// By opening the already open item, it will refresh its name
+	MainWindow::OpenItem(m_pCurOpenItem);
 }
 
 void Project::WriteGameData()

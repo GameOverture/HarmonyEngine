@@ -226,7 +226,7 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 	for(int i = 0; i < typeList.size(); ++i)
 	{
-		if(sItemType == HyGlobal::ItemName(typeList[i], true))
+        if(sItemType == HyGlobal::ItemName(typeList[i], false))
 		{
 			ePasteItemType = typeList[i];
 			break;

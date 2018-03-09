@@ -99,6 +99,7 @@ public:
 
 	void RenameGameData(HyGuiItemType eType, QString sOldPath, QString sNewPath, QJsonValue itemVal);
 	void RenamePrefix(QString sOldPath, QString sNewPath);
+	void RefreshNamesOnTabs();
 
 	void WriteGameData();
 
