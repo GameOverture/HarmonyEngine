@@ -28,7 +28,7 @@ class ExplorerWidget;
 class Project;
 class ProjectItem;
 class ExplorerTreeWidget;
-class ExplorerTreeItem;
+class ExplorerItem;
 class AtlasFrame;
 
 class ExplorerWidget : public QWidget
@@ -48,13 +48,13 @@ public:
 	Project *AddItemProject(const QString sNewProjectFilePath);
 
 	ProjectItem *AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue);
-	void RemoveItem(ExplorerTreeItem *pItem);
-	void SelectItem(ExplorerTreeItem *pItem);
+	void RemoveItem(ExplorerItem *pItem);
+	void SelectItem(ExplorerItem *pItem);
 	
 	QStringList GetOpenProjectPaths();
 
 	Project *GetCurProjSelected();
-	ExplorerTreeItem *GetCurItemSelected();
+	ExplorerItem *GetCurItemSelected();
 
 	ExplorerTreeWidget *GetTreeWidget();
 
@@ -63,7 +63,7 @@ public:
 private:
 	Ui::ExplorerWidget *ui;
 
-	void RecursiveRemoveItem(ExplorerTreeItem *pItem);
+	void RecursiveRemoveItem(ExplorerItem *pItem);
 
 	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 

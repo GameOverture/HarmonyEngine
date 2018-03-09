@@ -12,7 +12,7 @@
 #include "Global.h"
 #include "Project.h"
 #include "SpriteWidget.h"
-#include "ExplorerTreeItem.h"
+#include "ExplorerItem.h"
 
 #include <QFileDialog>
 #include <QJsonDocument>

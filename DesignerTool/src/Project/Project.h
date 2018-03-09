@@ -14,7 +14,7 @@
 #include "ProjectDraw.h"
 #include "ProjectItem.h"
 #include "AtlasModel.h"
-#include "ExplorerTreeItem.h"
+#include "ExplorerItem.h"
 #include "DlgProjectSettings.h"
 
 #include <QQueue>
@@ -40,7 +40,7 @@ protected:
 	virtual void dropEvent(QDropEvent *pEvent) override;
 };
 
-class Project : public ExplorerTreeItem, public IHyApplication
+class Project : public ExplorerItem, public IHyApplication
 {
 	Q_OBJECT
 

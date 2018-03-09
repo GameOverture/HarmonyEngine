@@ -16,7 +16,7 @@
 #include "FontItem.h"
 #include "Project.h"
 #include "ProjectItemMimeData.h"
-#include "ExplorerTreeItem.h"
+#include "ExplorerItem.h"
 #include "AtlasWidget.h"
 #include "IModel.h"
 #include "DlgInputName.h"
@@ -121,7 +121,7 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 		if(bFound == false)
 		{
 			// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
-			ExplorerTreeItem *pPrefixItem = new ExplorerTreeItem(ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
+			ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
 			pParentTreeItem = pPrefixItem->GetTreeItem();
 		}
 	}
@@ -145,7 +145,7 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 	return pItem;
 }
 
-void ExplorerWidget::RemoveItem(ExplorerTreeItem *pItem)
+void ExplorerWidget::RemoveItem(ExplorerItem *pItem)
 {
 	if(pItem == nullptr)
 		return;
@@ -156,7 +156,7 @@ void ExplorerWidget::RemoveItem(ExplorerTreeItem *pItem)
 	ui->treeWidget->blockSignals(false);
 }
 
-void ExplorerWidget::SelectItem(ExplorerTreeItem *pItem)
+void ExplorerWidget::SelectItem(ExplorerItem *pItem)
 {
 	if(pItem == nullptr)
 		return;
@@ -181,7 +181,7 @@ QStringList ExplorerWidget::GetOpenProjectPaths()
 	
 	for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
 	{
-		ExplorerTreeItem *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+		ExplorerItem *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<ExplorerItem *>();
 		Project *pItemProject = static_cast<Project *>(pItem);
 		sListOpenProjs.append(pItemProject->GetAbsPath());
 	}
@@ -194,14 +194,14 @@ Project *ExplorerWidget::GetCurProjSelected()
 	return HyGlobal::GetProjectFromItem(GetSelectedTreeItem());
 }
 
-ExplorerTreeItem *ExplorerWidget::GetCurItemSelected()
+ExplorerItem *ExplorerWidget::GetCurItemSelected()
 {
 	QTreeWidgetItem *pCurItem = GetSelectedTreeItem();
 	if(pCurItem == nullptr)
 		return nullptr;
 	
 	QVariant v = pCurItem->data(0, Qt::UserRole);
-	return v.value<ExplorerTreeItem *>();
+	return v.value<ExplorerItem *>();
 }
 
 ExplorerTreeWidget *ExplorerWidget::GetTreeWidget()
@@ -318,7 +318,7 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
 		pNewItem->Save();
 }
 
-void ExplorerWidget::RecursiveRemoveItem(ExplorerTreeItem *pItem)
+void ExplorerWidget::RecursiveRemoveItem(ExplorerItem *pItem)
 {
 	if(pItem == nullptr)
 		return;
@@ -326,7 +326,7 @@ void ExplorerWidget::RecursiveRemoveItem(ExplorerTreeItem *pItem)
 	for(int i = 0; i < pItem->GetTreeItem()->childCount(); ++i)
 	{
 		QVariant v = pItem->GetTreeItem()->child(i)->data(0, Qt::UserRole);
-		RecursiveRemoveItem(v.value<ExplorerTreeItem *>());
+		RecursiveRemoveItem(v.value<ExplorerItem *>());
 	}
 
 	// Children are taken care of at this point, now remove self
@@ -378,7 +378,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else
 	{
-		ExplorerTreeItem *pSelectedExplorerItem = pTreeNode->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+		ExplorerItem *pSelectedExplorerItem = pTreeNode->data(0, Qt::UserRole).value<ExplorerItem *>();
 		HyGuiItemType eSelectedItemType = pSelectedExplorerItem->GetType();
 		switch(eSelectedItemType)
 		{
@@ -430,7 +430,7 @@ void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
 	// setCurrentItem() required if this function is manually invoked. E.g. AddItem()
 	ui->treeWidget->setCurrentItem(item);
 	
-	ExplorerTreeItem *pTreeVariantItem = item->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+	ExplorerItem *pTreeVariantItem = item->data(0, Qt::UserRole).value<ExplorerItem *>();
 	
 	switch(pTreeVariantItem->GetType())
 	{
@@ -472,7 +472,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
 
 	if(pCurSelected)
 	{
-		ExplorerTreeItem *pTreeVariantItem = pCurSelected->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+		ExplorerItem *pTreeVariantItem = pCurSelected->data(0, Qt::UserRole).value<ExplorerItem *>();
 		switch(pTreeVariantItem->GetType())
 		{
 		case ITEM_Audio:
@@ -500,7 +500,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
 
 void ExplorerWidget::on_actionRename_triggered()
 {
-	ExplorerTreeItem *pItem = GetCurItemSelected();
+	ExplorerItem *pItem = GetCurItemSelected();
 	
 	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pItem->GetType(), false), pItem->GetName(false));
 	if(pDlg->exec() == QDialog::Accepted)
@@ -511,7 +511,7 @@ void ExplorerWidget::on_actionRename_triggered()
 
 void ExplorerWidget::on_actionDeleteItem_triggered()
 {
-	ExplorerTreeItem *pItem = GetCurItemSelected();
+	ExplorerItem *pItem = GetCurItemSelected();
 	
 	switch(pItem->GetType())
 	{
@@ -546,7 +546,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 
 void ExplorerWidget::on_actionCutItem_triggered()
 {
-	ExplorerTreeItem *pCurItemSelected = GetCurItemSelected();
+	ExplorerItem *pCurItemSelected = GetCurItemSelected();
 	if(pCurItemSelected->IsProjectItem() == false)
 	{
 		HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
@@ -564,7 +564,7 @@ void ExplorerWidget::on_actionCutItem_triggered()
 
 void ExplorerWidget::on_actionCopyItem_triggered()
 {
-	ExplorerTreeItem *pCurItemSelected = GetCurItemSelected();
+	ExplorerItem *pCurItemSelected = GetCurItemSelected();
 	if(pCurItemSelected->IsProjectItem() == false)
 	{
 		HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
@@ -594,7 +594,7 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 
 void ExplorerWidget::on_actionOpen_triggered()
 {
-	ExplorerTreeItem *pCurItemSelected = GetCurItemSelected();
+	ExplorerItem *pCurItemSelected = GetCurItemSelected();
 	if(pCurItemSelected->IsProjectItem())
 		MainWindow::OpenItem(static_cast<ProjectItem *>(pCurItemSelected));
 }

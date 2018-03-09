@@ -10,7 +10,7 @@
 #ifndef PROJECTITEM_H
 #define PROJECTITEM_H
 
-#include "ExplorerTreeItem.h"
+#include "ExplorerItem.h"
 #include "IDraw.h"
 
 #include <QUndoStack>
@@ -22,7 +22,7 @@ class Project;
 class AtlasFrame;
 class IModel;
 
-class ProjectItem : public ExplorerTreeItem
+class ProjectItem : public ExplorerItem
 {
 	Q_OBJECT
 

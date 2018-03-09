@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ExplorerTreeItem.cpp
+ *	ExplorerItem.cpp
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,7 +7,7 @@
  *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "ExplorerTreeItem.h"
+#include "ExplorerItem.h"
 #include "SpriteWidget.h"
 #include "Global.h"
 #include "Project.h"
@@ -17,7 +17,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-ExplorerTreeItem::ExplorerTreeItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem) :	m_eTYPE(eType),
+ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem) :	m_eTYPE(eType),
 																													m_sPath(HyStr::MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
 																													m_bIsProjectItem(false)
 {
@@ -32,27 +32,27 @@ ExplorerTreeItem::ExplorerTreeItem(HyGuiItemType eType, const QString sPath, QTr
 		pParentTreeItem->addChild(m_pTreeItemPtr);
 }
 
-ExplorerTreeItem::~ExplorerTreeItem()
+ExplorerItem::~ExplorerItem()
 {
 	delete m_pTreeItemPtr;
 }
 
-HyGuiItemType ExplorerTreeItem::GetType() const
+HyGuiItemType ExplorerItem::GetType() const
 {
 	return m_eTYPE;
 }
 
-QTreeWidgetItem *ExplorerTreeItem::GetTreeItem() const
+QTreeWidgetItem *ExplorerItem::GetTreeItem() const
 {
 	return m_pTreeItemPtr;
 }
 
-bool ExplorerTreeItem::IsProjectItem() const
+bool ExplorerItem::IsProjectItem() const
 {
 	return m_bIsProjectItem;
 }
 
-QString ExplorerTreeItem::GetName(bool bWithPrefix) const
+QString ExplorerItem::GetName(bool bWithPrefix) const
 {
 	QString sPrefix;
 	if(bWithPrefix)
@@ -69,13 +69,13 @@ QString ExplorerTreeItem::GetName(bool bWithPrefix) const
 }
 
 // Ends with a '/'
-QString ExplorerTreeItem::GetPrefix() const
+QString ExplorerItem::GetPrefix() const
 {
 	QStringList sPrefixParts;
 	QTreeWidgetItem *pParentTreeItem = m_pTreeItemPtr->parent();
 	while(pParentTreeItem)
 	{
-		ExplorerTreeItem *pParentItem = pParentTreeItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+		ExplorerItem *pParentItem = pParentTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
 		if(pParentItem->GetType() == ITEM_Prefix)
 			sPrefixParts.prepend(pParentTreeItem->text(0));
 
@@ -91,16 +91,16 @@ QString ExplorerTreeItem::GetPrefix() const
 	return sPrefix;
 }
 
-QIcon ExplorerTreeItem::GetIcon(SubIcon eSubIcon) const
+QIcon ExplorerItem::GetIcon(SubIcon eSubIcon) const
 {
 	return HyGlobal::ItemIcon(m_eTYPE, eSubIcon);
 }
 
-/*virtual*/ void ExplorerTreeItem::Rename(QString sNewName)
+/*virtual*/ void ExplorerItem::Rename(QString sNewName)
 {
 	if(m_eTYPE != ITEM_Prefix)
 	{
-		HyGuiLog("ExplorerTreeItem::Rename on improper item type", LOGTYPE_Error);
+		HyGuiLog("ExplorerItem::Rename on improper item type", LOGTYPE_Error);
 		return;
 	}
 
@@ -112,18 +112,18 @@ QIcon ExplorerTreeItem::GetIcon(SubIcon eSubIcon) const
 	HyGlobal::GetProjectFromItem(m_pTreeItemPtr)->RenamePrefix(sOldPath, sNewPath);
 }
 
-void ExplorerTreeItem::SetTreeItemSubIcon(SubIcon eSubIcon)
+void ExplorerItem::SetTreeItemSubIcon(SubIcon eSubIcon)
 {
 	m_pTreeItemPtr->setIcon(0, GetIcon(eSubIcon));
 }
 
-QDataStream &operator<<(QDataStream &out, ExplorerTreeItem *const &rhs)
+QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs)
 {
 	out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
 	return out;
 }
 
-QDataStream &operator>>(QDataStream &in, ExplorerTreeItem *rhs)
+QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs)
 {
 	in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
 	return in;

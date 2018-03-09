@@ -11,7 +11,7 @@
 #define DLGINPUTNAME_H
 
 #include <QDialog>
-#include "ExplorerTreeItem.h"
+#include "ExplorerItem.h"
 
 namespace Ui {
 class DlgInputName;
@@ -25,7 +25,7 @@ class DlgInputName : public QDialog
 
 public:
 	explicit DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent = 0);
-	explicit DlgInputName(const QString sDlgTitle, ExplorerTreeItem *pItem, QWidget *parent = 0);
+	explicit DlgInputName(const QString sDlgTitle, ExplorerItem *pItem, QWidget *parent = 0);
 	~DlgInputName();
 	
 	QString GetName();

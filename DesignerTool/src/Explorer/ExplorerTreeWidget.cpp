@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "ExplorerTreeWidget.h"
 #include "ExplorerWidget.h"
-#include "ExplorerTreeItem.h"
+#include "ExplorerItem.h"
 #include "ProjectItemMimeData.h"
 #include "Project.h"
 
@@ -39,7 +39,7 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 		QTreeWidgetItem *pClickedTreeItem = itemAt(mapFromGlobal(QCursor::pos()));
 		if(pClickedTreeItem)
 		{
-			ExplorerTreeItem *pExplorerItem = pClickedTreeItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+			ExplorerItem *pExplorerItem = pClickedTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
 
 			if(pExplorerItem->IsProjectItem())
 			{

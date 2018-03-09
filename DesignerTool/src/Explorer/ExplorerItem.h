@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ExplorerTreeItem.h
+ *	ExplorerItem.h
  *
  *	Harmony Engine - Designer Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony Designer Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef EXPLORERTREEITEM_H
-#define EXPLORERTREEITEM_H
+#ifndef EXPLORERITEM_H
+#define EXPLORERITEM_H
 
 #include <QObject>
 #include <QTreeWidget>
@@ -20,7 +20,7 @@ class HyGuiDependencies;
 class WidgetRenderer;
 class AtlasFrame;
 
-class ExplorerTreeItem : public QObject
+class ExplorerItem : public QObject
 {
 	Q_OBJECT
 
@@ -33,8 +33,8 @@ protected:
 	QTreeWidgetItem *		m_pTreeItemPtr;
 	
 public:
-	ExplorerTreeItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem);
-	virtual ~ExplorerTreeItem();
+	ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem);
+	virtual ~ExplorerItem();
 
 	HyGuiItemType GetType() const;
 	QTreeWidgetItem *GetTreeItem() const;
@@ -48,9 +48,9 @@ public:
 	virtual void Rename(QString sNewName);
 	void SetTreeItemSubIcon(SubIcon eSubIcon);
 };
-Q_DECLARE_METATYPE(ExplorerTreeItem *)
+Q_DECLARE_METATYPE(ExplorerItem *)
 
-QDataStream &operator<<(QDataStream &out, ExplorerTreeItem *const &rhs);
-QDataStream &operator>>(QDataStream &in, ExplorerTreeItem *rhs);
+QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs);
+QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs);
 
-#endif // EXPLORERTREEITEM_H
+#endif // EXPLORERITEM_H

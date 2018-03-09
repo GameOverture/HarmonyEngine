@@ -343,7 +343,7 @@
 	while(pCurProjItem->parent())
 		pCurProjItem = pCurProjItem->parent();
 
-	ExplorerTreeItem *pProject = pCurProjItem->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+	ExplorerItem *pProject = pCurProjItem->data(0, Qt::UserRole).value<ExplorerItem *>();
 	if(pProject->GetType() != ITEM_Project)
 		HyGuiLog("HyGlobal::GetProjectFromItem returned a non project item", LOGTYPE_Error);
 

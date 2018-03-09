@@ -72,7 +72,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : ExplorerTreeItem(ITEM_Project, sProjectFilePath, nullptr),
+Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : ExplorerItem(ITEM_Project, sProjectFilePath, nullptr),
 																				IHyApplication(g_DefaultInit),
 																				m_pWidget(pProjWidget),
 																				m_pDraw(nullptr),
@@ -201,7 +201,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 
 					if(bPrefixFound == false)
 					{
-						ExplorerTreeItem *pNewPrefixItem = new ExplorerTreeItem(ITEM_Prefix, sPathPartList[iPathPartIndex], pCurPrefixTreeItem);
+						ExplorerItem *pNewPrefixItem = new ExplorerItem(ITEM_Prefix, sPathPartList[iPathPartIndex], pCurPrefixTreeItem);
 						pCurPrefixTreeItem = pNewPrefixItem->GetTreeItem();
 					}
 				}

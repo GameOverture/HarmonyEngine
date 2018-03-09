@@ -77,11 +77,11 @@ SOURCES += main.cpp \
     Sprite/SpriteTableView.cpp \
     Explorer/ExplorerWidget.cpp \
     Explorer/ExplorerTreeWidget.cpp \
-    Explorer/ExplorerTreeItem.cpp \
     Harmony/Harmony.cpp \
     Harmony/HarmonyConnection.cpp \
     Harmony/HarmonyWidget.cpp \
-    Atlas/AtlasRepackThread.cpp
+    Atlas/AtlasRepackThread.cpp \
+    Explorer/ExplorerItem.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -147,11 +147,11 @@ HEADERS  += \
     Widget/WidgetVectorSpinBox.h \
     Sprite/SpriteTableView.h \
     Explorer/ExplorerWidget.h \
-    Explorer/ExplorerTreeItem.h \
     Harmony/Harmony.h \
     Harmony/HarmonyConnection.h \
     Harmony/HarmonyWidget.h \
-    Atlas/AtlasRepackThread.h
+    Atlas/AtlasRepackThread.h \
+    Explorer/ExplorerItem.h
 
 FORMS    += \
     MainWindow.ui \

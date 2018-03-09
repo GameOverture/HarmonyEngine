@@ -40,7 +40,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 		if(itemList[i] == pItemProject->GetTreeItem())
 			continue;
 
-		ExplorerTreeItem *pItem = itemList[i]->data(0, Qt::UserRole).value<ExplorerTreeItem *>();
+		ExplorerItem *pItem = itemList[i]->data(0, Qt::UserRole).value<ExplorerItem *>();
 		if(pItem->GetType() == ITEM_Prefix)
 			m_PrefixStringList.append(pItem->GetName(true));
 	}
