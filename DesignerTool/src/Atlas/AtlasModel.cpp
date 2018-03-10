@@ -128,7 +128,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
 			AtlasTreeItem *pNewTreeItem = new AtlasTreeItem((QTreeWidgetItem *)nullptr, QTreeWidgetItem::Type);
 
 			pNewTreeItem->setText(0, filterPathDir.dirName());
-			pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
+			pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Filter, SUBICON_None));
 
 			QVariant v(QString(filterPathDir.absolutePath()));
 			pNewTreeItem->setData(0, Qt::UserRole, v);
@@ -626,7 +626,7 @@ AtlasTreeItem *AtlasModel::CreateFilter(QString sName, AtlasTreeItem *pParent)
 		pNewTreeItem = new AtlasTreeItem(pParent);
 
 	pNewTreeItem->setText(0, sName);
-	pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
+	pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Filter, SUBICON_None));
 	pNewTreeItem->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
 
 	WriteMetaSettings();

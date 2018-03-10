@@ -418,12 +418,15 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
 		contextMenu.addAction(ui->actionImportDirectory);
 		contextMenu.addAction(ui->actionAddFilter);
 		contextMenu.addSeparator();
+		//ui->actionDeleteImages->setIcon(HyGlobal::ItemIcon(ITEM_Filter, SUBICON_Delete));
 		contextMenu.addAction(ui->actionDeleteImages);
 		contextMenu.addAction(ui->actionReplaceImages);
 		contextMenu.addAction(ui->actionRename);
 	}
 
 	contextMenu.exec(globalPos);
+
+	ui->actionDeleteImages->setIcon
 	
 	QList<QAction *> actionAtlasGrpMoveList = atlasGrpMenu.actions();
 	for(int i = 0; i < actionAtlasGrpMoveList.size(); ++i)

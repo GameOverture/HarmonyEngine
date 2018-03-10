@@ -126,7 +126,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 	for(int i = 0; i < typeList.size(); ++i)
 	{
-		if(typeList[i] == ITEM_Project || typeList[i] == ITEM_Prefix || typeList[i] == ITEM_AtlasImage)
+		if(typeList[i] == ITEM_Project || typeList[i] == ITEM_Prefix || typeList[i] == ITEM_Filter || typeList[i] == ITEM_AtlasImage)
 			continue;
 
 		QString sTypeName = HyGlobal::ItemName(typeList[i], true);

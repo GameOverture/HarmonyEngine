@@ -114,7 +114,6 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 		pEvent->ignore();
 
 
-
 	sortItems(0, Qt::AscendingOrder);
 	//m_pOwner->GetData().WriteMetaSettings();
 

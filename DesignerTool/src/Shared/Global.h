@@ -38,6 +38,7 @@ enum HyGuiItemType
 
 	ITEM_Project,
 	ITEM_Prefix,
+	ITEM_Filter,
 	ITEM_AtlasImage,
 	ITEM_Primitive,
 	ITEM_Audio,

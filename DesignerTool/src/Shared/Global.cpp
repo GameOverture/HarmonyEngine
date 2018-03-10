@@ -30,6 +30,7 @@
 {
 	sm_sItemNames[ITEM_Project] = "Project";
 	sm_sItemNames[ITEM_Prefix] = "Prefix";
+	sm_sItemNames[ITEM_Filter] = "Filter";
 	sm_sItemNames[ITEM_AtlasImage] = "Atlas";
 	sm_sItemNames[ITEM_Primitive] = "Primitive";
 	sm_sItemNames[ITEM_Audio] = "Audio";
@@ -43,7 +44,8 @@
 	sm_sItemNames[ITEM_Physics] = "Physics";
 
 	sm_sItemNamesPlural[ITEM_Project] = "Projects";
-	sm_sItemNamesPlural[ITEM_Prefix] = "Prefix";
+	sm_sItemNamesPlural[ITEM_Prefix] = "Prefixes";
+	sm_sItemNamesPlural[ITEM_Filter] = "Filters";
 	sm_sItemNamesPlural[ITEM_AtlasImage] = "Atlases";
 	sm_sItemNamesPlural[ITEM_Primitive] = "Primitives";
 	sm_sItemNamesPlural[ITEM_Audio] = "Audio";
@@ -75,6 +77,11 @@
 		}
 	}
 
+	sm_ItemColors[ITEM_Project] = QColor(9, 215, 33);
+	sm_ItemColors[ITEM_Prefix] = QColor(228, 212, 128);
+	sm_ItemColors[ITEM_Filter] = QColor(228, 212, 128);
+	sm_ItemColors[ITEM_AtlasImage] = QColor(45, 131, 176);
+	sm_ItemColors[ITEM_Primitive] = QColor(101, 233, 235);
 	sm_ItemColors[ITEM_Audio] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Particles] = QColor(218, 0, 0);
 	sm_ItemColors[ITEM_Font] = QColor(179, 179, 179);
@@ -82,10 +89,6 @@
 	sm_ItemColors[ITEM_Sprite] = QColor(129, 166, 225);
 	sm_ItemColors[ITEM_Shader] = QColor(225, 151, 97);
 	sm_ItemColors[ITEM_Entity] = QColor(128, 128, 128);
-	sm_ItemColors[ITEM_AtlasImage] = QColor(45, 131, 176);
-	sm_ItemColors[ITEM_Project] = QColor(9, 215, 33);
-	sm_ItemColors[ITEM_Primitive] = QColor(101, 233, 235);
-	sm_ItemColors[ITEM_Prefix] = QColor(228, 212, 128);
 	sm_ItemColors[ITEM_BoundingVolume] = QColor(234, 232, 58);
 	sm_ItemColors[ITEM_Physics] = QColor(201, 58, 203);
 
@@ -106,7 +109,7 @@
 	switch(eFrameType)
 	{
 	case ATLASITEM_Filter:
-		return ITEM_Prefix;
+		return ITEM_Filter;
 	case ATLASITEM_Image:
 		return ITEM_AtlasImage;
 	case ATLASITEM_Font:
@@ -124,7 +127,7 @@
 {
 	switch(eItem)
 	{
-	case ITEM_Prefix:
+	case ITEM_Filter:
 		return ATLASITEM_Filter;
 	case ITEM_AtlasImage:
 		return ATLASITEM_Image;
@@ -145,6 +148,7 @@
 
 	list.append(ITEM_Project);
 	list.append(ITEM_Prefix);
+	list.append(ITEM_Filter);
 	list.append(ITEM_AtlasImage);
 	list.append(ITEM_Primitive);
 	list.append(ITEM_Audio);

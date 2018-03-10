@@ -262,7 +262,7 @@
   <action name="actionAddFilter">
    <property name="icon">
     <iconset resource="../res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/items/Prefix-New.png</normaloff>:/icons16x16/items/Prefix-New.png</iconset>
+     <normaloff>:/icons16x16/items/Filter-New.png</normaloff>:/icons16x16/items/Filter-New.png</iconset>
    </property>
    <property name="text">
     <string>Add Filter</string>

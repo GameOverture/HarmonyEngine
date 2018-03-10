@@ -157,5 +157,14 @@
         <file>icons16x16/items/Primitive-Settings.png</file>
         <file>icons16x16/items/Primitive-Warning.png</file>
         <file>icons16x16/items/Audio-New.png</file>
+        <file>icons16x16/items/Filter.png</file>
+        <file>icons16x16/items/Filter-Close.png</file>
+        <file>icons16x16/items/Filter-Delete.png</file>
+        <file>icons16x16/items/Filter-Dirty.png</file>
+        <file>icons16x16/items/Filter-New.png</file>
+        <file>icons16x16/items/Filter-Open.png</file>
+        <file>icons16x16/items/Filter-Pending.png</file>
+        <file>icons16x16/items/Filter-Settings.png</file>
+        <file>icons16x16/items/Filter-Warning.png</file>
     </qresource>
 </RCC>
