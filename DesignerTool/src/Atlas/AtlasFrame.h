@@ -23,27 +23,27 @@ class AtlasFrame
 {
 	friend class AtlasModel;
 	
-	const quint32                       m_uiUNIQUE_ID;
-	AtlasItemType                      m_eType;
+	const quint32						m_uiUNIQUE_ID;
+	AtlasItemType						m_eType;
 	
-	quint32                             m_uiAtlasGrpId;
+	quint32								m_uiAtlasGrpId;
 
-	AtlasTreeItem *                     m_pTreeWidgetItem;
+	AtlasTreeItem *						m_pTreeWidgetItem;
 
-	quint32                             m_uiImageChecksum;
-	QString                             m_sName;
-	int                                 m_iWidth;
-	int                                 m_iHeight;
-	QRect                               m_rAlphaCrop;
+	quint32								m_uiImageChecksum;
+	QString								m_sName;
+	int									m_iWidth;
+	int									m_iHeight;
+	QRect								m_rAlphaCrop;
 
-	int                                 m_iTextureIndex;
+	int									m_iTextureIndex;
 
-	int                                 m_iPosX;
-	int                                 m_iPosY;
+	int									m_iPosX;
+	int									m_iPosY;
 
-	QSet<ProjectItem *>                 m_DependencySet;
+	QSet<ProjectItem *>					m_DependencySet;
 
-	uint                                m_uiErrors; // '0' when there is no error
+	uint								m_uiErrors; // '0' when there is no error
 
 	// Private ctor as WidgetAtlasManager should only construct these
 	AtlasFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);

@@ -293,9 +293,13 @@ HyTextureFormat AtlasModel::GetAtlasTextureType(uint uiAtlasGrpIndex)
 
 void AtlasModel::WriteMetaSettings()
 {
+	// Assemble array with all the frames from every group
 	QJsonArray frameArray;
+	QJsonArray groupsArray;
 	for(int i = 0; i < m_AtlasGrpList.size(); ++i)
 	{
+		groupsArray.append(m_AtlasGrpList[i]->m_PackerSettings);
+
 		QList<AtlasFrame *> &atlasFramesRef = m_AtlasGrpList[i]->m_FrameList;
 		for(int j = 0; j < atlasFramesRef.size(); ++j)
 		{
@@ -304,23 +308,6 @@ void AtlasModel::WriteMetaSettings()
 			frameArray.append(QJsonValue(frameObj));
 		}
 	}
-
-	WriteMetaSettings(frameArray);
-}
-
-// TODO: Combine this function into the one above
-void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
-{
-	QJsonObject settingsObj;
-	settingsObj.insert("startFrameId", QJsonValue(static_cast<qint64>(m_uiNextFrameId)));
-	settingsObj.insert("startAtlasId", QJsonValue(static_cast<qint64>(m_uiNextAtlasId)));
-	
-	QJsonArray groupsArray;
-	for(int i = 0; i < m_AtlasGrpList.size(); ++i)
-		groupsArray.append(m_AtlasGrpList[i]->m_PackerSettings);
-	
-	settingsObj.insert("groups", groupsArray);
-	settingsObj.insert("frames", frameArray);
 
 	QJsonArray filtersArray;
 	if(m_pProjOwner->GetAtlasWidget())
@@ -357,6 +344,12 @@ void AtlasModel::WriteMetaSettings(QJsonArray frameArray)
 		}
 	}
 
+	// Assemble the offical QJsonObject for the write
+	QJsonObject settingsObj;
+	settingsObj.insert("frames", frameArray);
+	settingsObj.insert("groups", groupsArray);
+	settingsObj.insert("startFrameId", QJsonValue(static_cast<qint64>(m_uiNextFrameId)));
+	settingsObj.insert("startAtlasId", QJsonValue(static_cast<qint64>(m_uiNextAtlasId)));
 	settingsObj.insert("filters", filtersArray);
 
 	QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));

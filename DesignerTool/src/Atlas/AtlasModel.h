@@ -97,7 +97,6 @@ public:
 	HyTextureFormat GetAtlasTextureType(uint uiAtlasGrpIndex);
 
 	void WriteMetaSettings();
-	void WriteMetaSettings(QJsonArray frameArray);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);

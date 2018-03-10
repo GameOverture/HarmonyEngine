@@ -22,13 +22,13 @@ class SpriteItem;
 class SpriteFrame
 {
 public:
-	AtlasFrame *            m_pFrame;
-	int                     m_iRowIndex;
+	AtlasFrame *			m_pFrame;
+	int						m_iRowIndex;
 
-	QPoint                  m_vOffset;
-	float                   m_fDuration;
+	QPoint					m_vOffset;
+	float					m_fDuration;
 
-	SpriteFrame(AtlasFrame *pFrame, int iRowIndex) :    m_pFrame(pFrame),
+	SpriteFrame(AtlasFrame *pFrame, int iRowIndex) :	m_pFrame(pFrame),
 														m_iRowIndex(iRowIndex),
 														m_vOffset(0, 0),
 														m_fDuration(0.016f)
