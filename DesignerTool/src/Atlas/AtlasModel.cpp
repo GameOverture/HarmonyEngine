@@ -558,7 +558,6 @@ QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem, QList<AtlasFra
 	for(int i = 0; i < requestList.size(); ++i)
 	{
 		requestList[i]->m_DependencySet.insert(pItem);
-		//SetDependency(requestList[i], pItem);
 		returnList.append(requestList[i]);
 	}
 
@@ -569,8 +568,6 @@ void AtlasModel::RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinq
 {
 	for(int i = 0; i < relinquishList.size(); ++i)
 		relinquishList[i]->m_DependencySet.remove(pItem);
-
-//    RemoveDependency(relinquishList[i], pItem);
 }
 
 QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId, HyGuiItemType eType, QList<AtlasTreeItem *> correspondingParentList)

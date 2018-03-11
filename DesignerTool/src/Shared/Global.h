@@ -34,7 +34,7 @@ class Project;
 
 enum HyGuiItemType
 {
-	TYPE_Unknown = -1,
+	ITEM_Unknown = -1,
 
 	ITEM_Project,
 	ITEM_Prefix,

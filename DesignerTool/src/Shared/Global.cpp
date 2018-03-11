@@ -120,7 +120,7 @@
 		HyGuiLog("HyGlobal::GetItemFromAtlasFrameType() could not find the proper item", LOGTYPE_Error);
 	}
 
-	return TYPE_Unknown;
+	return ITEM_Unknown;
 }
 
 /*static*/ AtlasItemType HyGlobal::GetAtlasItemFromItem(HyGuiItemType eItem)

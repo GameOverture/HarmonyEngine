@@ -148,7 +148,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 	// Initialize the project by processing each type
 	for(auto typeIterator = m_SaveDataObj.begin(); typeIterator != m_SaveDataObj.end(); ++typeIterator)
 	{
-		HyGuiItemType eType = TYPE_Unknown;
+		HyGuiItemType eType = ITEM_Unknown;
 		for(int i = 0; i < typeList.size(); ++i)
 		{
 			if(typeIterator.key() == HyGlobal::ItemName(typeList[i], true))
@@ -158,7 +158,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 			}
 		}
 
-		if(eType == TYPE_Unknown)
+		if(eType == ITEM_Unknown)
 			HyGuiLog("Project ctor eType == TYPE_Unknown", LOGTYPE_Error);
 
 		// Get the current (type) iterator, and iterate through its objects (items) within
@@ -418,7 +418,7 @@ void Project::DeletePrefixAndContents(QString sPrefix)
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 	for(auto itemTypeIter = m_SaveDataObj.begin(); itemTypeIter != m_SaveDataObj.end(); ++itemTypeIter)
 	{
-		HyGuiItemType eType = TYPE_Unknown;
+		HyGuiItemType eType = ITEM_Unknown;
 		for(int i = 0; i < typeList.size(); ++i)
 		{
 			if(itemTypeIter.key() == HyGlobal::ItemName(typeList[i], true))
@@ -427,7 +427,7 @@ void Project::DeletePrefixAndContents(QString sPrefix)
 				break;
 			}
 		}
-		if(eType == TYPE_Unknown)
+		if(eType == ITEM_Unknown)
 			HyGuiLog("DeletePrefixAndContents bad", LOGTYPE_Error);
 
 		QJsonObject itemObj = itemTypeIter.value().toObject();
@@ -466,7 +466,7 @@ void Project::RenamePrefix(QString sOldPath, QString sNewPath)
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 	for(auto itemTypeIter = m_SaveDataObj.begin(); itemTypeIter != m_SaveDataObj.end(); ++itemTypeIter)
 	{
-		HyGuiItemType eType = TYPE_Unknown;
+		HyGuiItemType eType = ITEM_Unknown;
 		for(int i = 0; i < typeList.size(); ++i)
 		{
 			if(itemTypeIter.key() == HyGlobal::ItemName(typeList[i], true))
@@ -475,7 +475,7 @@ void Project::RenamePrefix(QString sOldPath, QString sNewPath)
 				break;
 			}
 		}
-		if(eType == TYPE_Unknown)
+		if(eType == ITEM_Unknown)
 			HyGuiLog("RenamePrefix bad", LOGTYPE_Error);
 
 		QJsonObject itemTypeObj = itemTypeIter.value().toObject();

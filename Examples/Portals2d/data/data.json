@@ -4270,6 +4270,319 @@
                 "name": "",
                 "reverse": false
             }
+        ],
+        "one/two/btest": [
+            {
+                "bounce": false,
+                "duration": 0.09600000828504562,
+                "frames": [
+                    {
+                        "checksum": 743010674,
+                        "duration": 0.01600000075995922,
+                        "id": 155,
+                        "offsetX": 55,
+                        "offsetY": 18
+                    },
+                    {
+                        "checksum": 4259430956,
+                        "duration": 0.01600000075995922,
+                        "id": 156,
+                        "offsetX": 55,
+                        "offsetY": 17
+                    },
+                    {
+                        "checksum": 3785877419,
+                        "duration": 0.01600000075995922,
+                        "id": 157,
+                        "offsetX": 54,
+                        "offsetY": 17
+                    },
+                    {
+                        "checksum": 1591260611,
+                        "duration": 0.01600000075995922,
+                        "id": 158,
+                        "offsetX": 53,
+                        "offsetY": 16
+                    },
+                    {
+                        "checksum": 3391494453,
+                        "duration": 0.01600000075995922,
+                        "id": 159,
+                        "offsetX": 52,
+                        "offsetY": 15
+                    },
+                    {
+                        "checksum": 4214353923,
+                        "duration": 0.01600000075995922,
+                        "id": 160,
+                        "offsetX": 48,
+                        "offsetY": 15
+                    }
+                ],
+                "loop": false,
+                "name": "",
+                "reverse": false
+            }
+        ],
+        "one/two/three/atest": [
+            {
+                "bounce": false,
+                "duration": 0.4800000488758087,
+                "frames": [
+                    {
+                        "checksum": 1288542188,
+                        "duration": 0.01600000075995922,
+                        "id": 184,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1704832242,
+                        "duration": 0.01600000075995922,
+                        "id": 185,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 211234952,
+                        "duration": 0.01600000075995922,
+                        "id": 186,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 145569373,
+                        "duration": 0.01600000075995922,
+                        "id": 187,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3212778053,
+                        "duration": 0.01600000075995922,
+                        "id": 188,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1732947976,
+                        "duration": 0.01600000075995922,
+                        "id": 189,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 579142322,
+                        "duration": 0.01600000075995922,
+                        "id": 190,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3954027251,
+                        "duration": 0.01600000075995922,
+                        "id": 191,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3014759683,
+                        "duration": 0.01600000075995922,
+                        "id": 192,
+                        "offsetX": 0,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 771043490,
+                        "duration": 0.01600000075995922,
+                        "id": 193,
+                        "offsetX": 0,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 3924737475,
+                        "duration": 0.01600000075995922,
+                        "id": 194,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 298501720,
+                        "duration": 0.01600000075995922,
+                        "id": 195,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 1021043476,
+                        "duration": 0.01600000075995922,
+                        "id": 196,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 3886499660,
+                        "duration": 0.01600000075995922,
+                        "id": 197,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 957051331,
+                        "duration": 0.01600000075995922,
+                        "id": 198,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 2812710678,
+                        "duration": 0.01600000075995922,
+                        "id": 199,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 1857833688,
+                        "duration": 0.01600000075995922,
+                        "id": 200,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 3381660719,
+                        "duration": 0.01600000075995922,
+                        "id": 201,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 2191147294,
+                        "duration": 0.01600000075995922,
+                        "id": 202,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 3276258759,
+                        "duration": 0.01600000075995922,
+                        "id": 203,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 928062822,
+                        "duration": 0.01600000075995922,
+                        "id": 204,
+                        "offsetX": 4,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 1981190954,
+                        "duration": 0.01600000075995922,
+                        "id": 205,
+                        "offsetX": 0,
+                        "offsetY": 4
+                    },
+                    {
+                        "checksum": 1392732939,
+                        "duration": 0.01600000075995922,
+                        "id": 206,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1649176222,
+                        "duration": 0.01600000075995922,
+                        "id": 207,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 1449873410,
+                        "duration": 0.01600000075995922,
+                        "id": 208,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 5075004,
+                        "duration": 0.01600000075995922,
+                        "id": 209,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3070069317,
+                        "duration": 0.01600000075995922,
+                        "id": 210,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 2663207979,
+                        "duration": 0.01600000075995922,
+                        "id": 211,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 445040221,
+                        "duration": 0.01600000075995922,
+                        "id": 212,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    {
+                        "checksum": 3112636381,
+                        "duration": 0.01600000075995922,
+                        "id": 213,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    }
+                ],
+                "loop": false,
+                "name": "",
+                "reverse": false
+            }
+        ],
+        "one/two/three/testst12": [
+            {
+                "bounce": false,
+                "duration": 0.06400000303983688,
+                "frames": [
+                    {
+                        "checksum": 1855795354,
+                        "duration": 0.01600000075995922,
+                        "id": 305,
+                        "offsetX": 61,
+                        "offsetY": 23
+                    },
+                    {
+                        "checksum": 571505408,
+                        "duration": 0.01600000075995922,
+                        "id": 306,
+                        "offsetX": 60,
+                        "offsetY": 23
+                    },
+                    {
+                        "checksum": 3856722797,
+                        "duration": 0.01600000075995922,
+                        "id": 307,
+                        "offsetX": 60,
+                        "offsetY": 22
+                    },
+                    {
+                        "checksum": 1806429906,
+                        "duration": 0.01600000075995922,
+                        "id": 308,
+                        "offsetX": 59,
+                        "offsetY": 21
+                    }
+                ],
+                "loop": false,
+                "name": "",
+                "reverse": false
+            }
         ]
     }
 }

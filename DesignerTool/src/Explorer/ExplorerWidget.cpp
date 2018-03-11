@@ -225,7 +225,7 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
 		return;
 
 	// Determine the pasted item type
-	HyGuiItemType ePasteItemType = TYPE_Unknown;
+	HyGuiItemType ePasteItemType = ITEM_Unknown;
 	QString sItemType = pasteObj["itemType"].toString();
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 	for(int i = 0; i < typeList.size(); ++i)
@@ -520,9 +520,9 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 	switch(pItem->GetType())
 	{
 	case ITEM_Prefix:
-		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the prefix:\n" % pItem->GetPrefix() % "\n\nAnd all of its contents? This action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
+		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the prefix:\n" % pItem->GetName(true) % "\n\nAnd all of its contents? This action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
-			GetCurProjSelected()->DeletePrefixAndContents(pItem->GetPrefix());
+			GetCurProjSelected()->DeletePrefixAndContents(pItem->GetName(true));
 			pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
 		}
 		break;

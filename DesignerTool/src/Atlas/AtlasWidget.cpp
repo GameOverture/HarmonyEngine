@@ -357,23 +357,32 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 
 void AtlasWidget::on_atlasList_itemSelectionChanged()
 {
-	m_Draw.SetSelected(ui->atlasList->selectedItems());
-	int iNumSelected = ui->atlasList->selectedItems().count();
+	QList<QTreeWidgetItem *> selectedItemList = ui->atlasList->selectedItems();
 
+	m_Draw.SetSelected(selectedItemList);
+
+	int iNumSelected = selectedItemList.count();
 	ui->actionRename->setEnabled(iNumSelected == 1);
-
 	ui->actionDeleteImages->setEnabled(iNumSelected != 0);
 	ui->actionReplaceImages->setEnabled(iNumSelected != 0);
 	
-	QList<QTreeWidgetItem *> selectedItemList = ui->atlasList->selectedItems();
+	// Determine the best suited icon based on selection
+	HyGuiItemType eIconType = ITEM_Unknown;
 	for(int i = 0; i < selectedItemList.size(); ++i)
 	{
 		if(selectedItemList[i]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
 		{
 			ui->actionReplaceImages->setEnabled(false);
-			break;
+
+			if(eIconType != ITEM_AtlasImage)
+				eIconType = ITEM_Filter;
 		}
+		else
+			eIconType = ITEM_AtlasImage;
 	}
+
+	if(eIconType != ITEM_Unknown)
+		ui->actionDeleteImages->setIcon(HyGlobal::ItemIcon(eIconType, SUBICON_Delete));
 }
 
 void AtlasWidget::OnContextMenu(const QPoint &pos)
@@ -418,15 +427,12 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
 		contextMenu.addAction(ui->actionImportDirectory);
 		contextMenu.addAction(ui->actionAddFilter);
 		contextMenu.addSeparator();
-		//ui->actionDeleteImages->setIcon(HyGlobal::ItemIcon(ITEM_Filter, SUBICON_Delete));
 		contextMenu.addAction(ui->actionDeleteImages);
 		contextMenu.addAction(ui->actionReplaceImages);
 		contextMenu.addAction(ui->actionRename);
 	}
 
 	contextMenu.exec(globalPos);
-
-	ui->actionDeleteImages->setIcon
 	
 	QList<QAction *> actionAtlasGrpMoveList = atlasGrpMenu.actions();
 	for(int i = 0; i < actionAtlasGrpMoveList.size(); ++i)
