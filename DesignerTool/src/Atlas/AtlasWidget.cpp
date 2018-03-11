@@ -92,7 +92,6 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
 	ui->btnRemoveGroup->setDefaultAction(ui->actionRemoveGroup);
 
 	ui->atlasList->SetAtlasOwner(this);
-
 	ui->atlasList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	ui->atlasList->setDragEnabled(true);
 	ui->atlasList->setDropIndicatorShown(true);

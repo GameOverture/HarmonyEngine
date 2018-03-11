@@ -86,8 +86,8 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 		else
 			pEvent->ignore();
 	}
-	else
-		pEvent->ignore();
+	//else
+	//	pEvent->ignore();
 
 	QTreeWidget::dragEnterEvent(pEvent);
 }
@@ -110,8 +110,8 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 		else
 			pEvent->ignore();
 	}
-	else
-		pEvent->ignore();
+	//else
+	//	pEvent->ignore();
 
 
 	sortItems(0, Qt::AscendingOrder);

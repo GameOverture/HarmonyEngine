@@ -45,6 +45,8 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) : QWidget(parent),
 	ui->treeWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	ui->treeWidget->setDragEnabled(true);
 	ui->treeWidget->setDropIndicatorShown(true);
+	//ui->treeWidget->setDragDropMode(QAbstractItemView::DragDrop);
+	//ui->treeWidget->viewport()->setAcceptDrops(true);
 
 	setAcceptDrops(true);
 
