@@ -21,6 +21,12 @@ ExplorerTreeWidget::ExplorerTreeWidget(QWidget *pParent) :  QTreeWidget(pParent)
 															m_pOwnerWidget(nullptr),
 															m_pDraggedProjItem(nullptr)
 {
+	setContextMenuPolicy(Qt::CustomContextMenu);
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	setDragEnabled(true);
+	setDropIndicatorShown(true);
+	//ui->treeWidget->setDragDropMode(QAbstractItemView::DragDrop);
+	//ui->treeWidget->viewport()->setAcceptDrops(true);
 }
 
 /*virtual*/ ExplorerTreeWidget::~ExplorerTreeWidget()
