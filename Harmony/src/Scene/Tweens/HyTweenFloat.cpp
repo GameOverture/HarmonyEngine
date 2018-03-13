@@ -61,6 +61,12 @@ bool HyTweenFloat::IsTweening()
 
 void HyTweenFloat::Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::NullTweenCallback*/)
 {
+	if(fSeconds <= 0.0f)
+	{
+		Set(fTo);
+		return;
+	}
+
 	m_fStart = m_fValueRef;
 	m_fTarget = fTo;
 	m_fDuration = fSeconds;
@@ -74,6 +80,12 @@ void HyTweenFloat::Tween(float fTo, float fSeconds, HyTweenUpdateFunc fpTweenFun
 
 void HyTweenFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenUpdateFunc fpTweenFunc /*= HyTween::Linear*/, HyTweenFinishedCallback tweenFinishedCallback /*= HyTween::NullTweenCallback*/)
 {
+	if(fSeconds <= 0.0f)
+	{
+		Set(m_fValueRef + fOffsetAmt);
+		return;
+	}
+
 	m_fStart = m_fValueRef;
 	m_fTarget = m_fValueRef + fOffsetAmt;
 	m_fDuration = fSeconds;
