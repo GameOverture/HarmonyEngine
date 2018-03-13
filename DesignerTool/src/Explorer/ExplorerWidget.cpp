@@ -25,8 +25,6 @@
 #include <QMessageBox>
 #include <QClipboard>
 
-QByteArray ExplorerWidget::sm_sInternalClipboard = "";
-
 ///*virtual*/ void DataExplorerLoadThread::run() /*override*/
 //{
 //    /* ... here is the expensive or blocking operation ... */
@@ -34,15 +32,15 @@ QByteArray ExplorerWidget::sm_sInternalClipboard = "";
 //    Q_EMIT LoadFinished(pNewItemProject);
 //}
 
-ExplorerWidget::ExplorerWidget(QWidget *parent) : QWidget(parent),
-												ui(new Ui::ExplorerWidget)
+ExplorerWidget::ExplorerWidget(QWidget *parent) :	QWidget(parent),
+													ui(new Ui::ExplorerWidget),
+													m_pNewItemMenuRef(nullptr)
 {
 	ui->setupUi(this);
 	ui->treeWidget->SetOwner(this);
 
 	setAcceptDrops(true);
 
-	ui->actionCutItem->setEnabled(false);
 	ui->actionCopyItem->setEnabled(false);
 	ui->actionPasteItem->setEnabled(false);
 
@@ -397,6 +395,9 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			ui->actionOpen->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_None));
 			contextMenu.addAction(ui->actionOpen);
 			contextMenu.addSeparator();
+			contextMenu.addAction(ui->actionCopyItem);
+			contextMenu.addAction(ui->actionPasteItem);
+			contextMenu.addSeparator();
 			// Fall through
 		case ITEM_Prefix:
 			if(eSelectedItemType == ITEM_Prefix)
@@ -408,10 +409,6 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_Delete));
 			ui->actionDeleteItem->setText("Delete " % pSelectedExplorerItem->GetName(false));
 			contextMenu.addAction(ui->actionDeleteItem);
-			contextMenu.addSeparator();
-			contextMenu.addAction(ui->actionCutItem);
-			contextMenu.addAction(ui->actionCopyItem);
-			contextMenu.addAction(ui->actionPasteItem);
 			break;
 
 		default: {
@@ -480,17 +477,17 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
 		case ITEM_Sprite:
 		case ITEM_Shader:
 		case ITEM_Entity:
-			ui->actionCutItem->setEnabled(true);
 			ui->actionCopyItem->setEnabled(true);
 			break;
 		default:
-			ui->actionCutItem->setEnabled(false);
 			ui->actionCopyItem->setEnabled(false);
 			break;
 		}
 	}
 
-	ui->actionPasteItem->setEnabled(sm_sInternalClipboard.isEmpty() == false);
+	QClipboard *pClipboard = QApplication::clipboard();
+	const QMimeData *pMimeData = pClipboard->mimeData();
+	ui->actionPasteItem->setEnabled(pMimeData && pMimeData->hasFormat(HYGUI_MIMETYPE));
 	
 	if(bValidItem)
 		Harmony::SetProject(GetCurProjSelected());
@@ -542,37 +539,20 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 	}
 }
 
-void ExplorerWidget::on_actionCutItem_triggered()
-{
-	ExplorerItem *pCurItemSelected = GetCurItemSelected();
-	if(pCurItemSelected->IsProjectItem() == false)
-	{
-		HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
-		return;
-	}
-
-	ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
-	ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(pProjItem);
-	QClipboard *pClipboard = QApplication::clipboard();
-	pClipboard->setText(pNewMimeData->data(HYGUI_MIMETYPE));
-
-	HyGuiLog("Cut " % HyGlobal::ItemName(pCurItemSelected->GetType(), false) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
-	ui->actionPasteItem->setEnabled(true);
-}
-
 void ExplorerWidget::on_actionCopyItem_triggered()
 {
 	ExplorerItem *pCurItemSelected = GetCurItemSelected();
-	if(pCurItemSelected->IsProjectItem() == false)
+	if(pCurItemSelected == nullptr || pCurItemSelected->IsProjectItem() == false)
 	{
-		HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % QString::number(pCurItemSelected->GetType()), LOGTYPE_Error);
+		HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % (pCurItemSelected ? QString::number(pCurItemSelected->GetType()) : " nullptr"), LOGTYPE_Error);
 		return;
 	}
 
 	ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
 	ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(pProjItem);
 	QClipboard *pClipboard = QApplication::clipboard();
-	pClipboard->setText(pNewMimeData->data(HYGUI_MIMETYPE));
+	pClipboard->setMimeData(pNewMimeData);
+	//pClipboard->setText(pNewMimeData->data(HYGUI_MIMETYPE));
 
 	HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType(), false) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
 	ui->actionPasteItem->setEnabled(true);
@@ -582,12 +562,10 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 {
 	Project *pCurProj = GetCurProjSelected();
 
-	HyGuiLog("Paste is not implemented", LOGTYPE_Error);
-
-	// TODO: Get rid of the sm_sInternalClipboard???
-
-	// Don't use QClipboard because someone can just copy random text before pasting and ruin the expected json format
-	PasteItemSrc(sm_sInternalClipboard, pCurProj);
+	QClipboard *pClipboard = QApplication::clipboard();
+	const QMimeData *pData = pClipboard->mimeData();
+	if(pData->hasFormat(HYGUI_MIMETYPE))
+		PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj);
 }
 
 void ExplorerWidget::on_actionOpen_triggered()

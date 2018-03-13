@@ -19,7 +19,7 @@ ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) : m_pProjItem(p
 	// STANDARD INFO
 	QJsonObject clipboardObj;
 	clipboardObj.insert("project", m_pProjItem->GetProject().GetAbsPath());
-	clipboardObj.insert("itemType", HyGlobal::ItemName(m_pProjItem->GetType(), true));
+	clipboardObj.insert("itemType", HyGlobal::ItemName(m_pProjItem->GetType(), false));
 	clipboardObj.insert("itemName", m_pProjItem->GetName(true));
 	clipboardObj.insert("src", itemValue);
 

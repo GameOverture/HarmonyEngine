@@ -35,8 +35,6 @@ class ExplorerWidget : public QWidget
 {
 	Q_OBJECT
 
-	static QByteArray       sm_sInternalClipboard;
-
 	QMenu *					m_pNewItemMenuRef;
 
 public:
@@ -77,8 +75,6 @@ private Q_SLOTS:
 	void on_actionRename_triggered();
 	
 	void on_actionDeleteItem_triggered();
-	
-	void on_actionCutItem_triggered();
 
 	void on_actionCopyItem_triggered();
 

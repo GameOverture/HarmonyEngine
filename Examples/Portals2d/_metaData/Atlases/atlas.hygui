@@ -1147,7 +1147,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 0,
+            "x": 704,
             "y": 0
         },
         {
@@ -1165,7 +1165,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 116,
+            "x": 820,
             "y": 0
         },
         {
@@ -2209,7 +2209,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 0,
+            "x": 704,
             "y": 0
         },
         {
@@ -2767,8 +2767,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1867,
-            "y": 0
+            "x": 1234,
+            "y": 160
         },
         {
             "atlasGrpId": 0,
@@ -2785,8 +2785,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1923,
-            "y": 144
+            "x": 1359,
+            "y": 160
         },
         {
             "atlasGrpId": 0,
@@ -2857,8 +2857,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1736,
-            "y": 0
+            "x": 1484,
+            "y": 158
         },
         {
             "atlasGrpId": 0,
@@ -2875,7 +2875,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1166,
+            "x": 1870,
             "y": 0
         },
         {
@@ -2893,7 +2893,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 717,
+            "x": 1421,
             "y": 0
         },
         {
@@ -2911,7 +2911,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 564,
+            "x": 1268,
             "y": 0
         },
         {
@@ -5467,8 +5467,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 973,
-            "y": 155
+            "x": 818,
+            "y": 308
         },
         {
             "atlasGrpId": 0,
@@ -5485,8 +5485,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1086,
-            "y": 154
+            "x": 704,
+            "y": 308
         },
         {
             "atlasGrpId": 0,
@@ -5503,8 +5503,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1200,
-            "y": 154
+            "x": 993,
+            "y": 299
         },
         {
             "atlasGrpId": 0,
@@ -5521,8 +5521,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1438,
-            "y": 153
+            "x": 829,
+            "y": 167
         },
         {
             "atlasGrpId": 0,
@@ -5539,8 +5539,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1679,
-            "y": 152
+            "x": 990,
+            "y": 157
         },
         {
             "atlasGrpId": 0,
@@ -5611,8 +5611,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1303,
-            "y": 0
+            "x": 1896,
+            "y": 154
         },
         {
             "atlasGrpId": 0,
@@ -5629,7 +5629,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 398,
+            "x": 1102,
             "y": 0
         },
         {
@@ -5989,8 +5989,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 764,
-            "y": 158
+            "x": 1340,
+            "y": 304
         },
         {
             "atlasGrpId": 0,
@@ -6133,8 +6133,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1598,
-            "y": 0
+            "x": 1615,
+            "y": 155
         },
         {
             "atlasGrpId": 0,
@@ -6151,7 +6151,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1014,
+            "x": 1718,
             "y": 0
         },
         {
@@ -6169,7 +6169,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 232,
+            "x": 936,
             "y": 0
         },
         {
@@ -7105,8 +7105,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1315,
-            "y": 153
+            "x": 1108,
+            "y": 298
         },
         {
             "atlasGrpId": 0,
@@ -7123,8 +7123,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1554,
-            "y": 152
+            "x": 704,
+            "y": 168
         },
         {
             "atlasGrpId": 0,
@@ -7141,8 +7141,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1797,
-            "y": 152
+            "x": 1108,
+            "y": 156
         },
         {
             "atlasGrpId": 0,
@@ -7213,8 +7213,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1455,
-            "y": 0
+            "x": 1753,
+            "y": 154
         },
         {
             "atlasGrpId": 0,
@@ -7231,7 +7231,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 862,
+            "x": 1566,
             "y": 0
         },
         {
@@ -7609,8 +7609,26 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 864,
-            "y": 155
+            "x": 1231,
+            "y": 304
+        },
+        {
+            "atlasGrpId": 0,
+            "checksum": 442217388,
+            "cropBottom": 934,
+            "cropLeft": 0,
+            "cropRight": 700,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 935,
+            "id": 426,
+            "name": "doge",
+            "textureIndex": 4,
+            "type": 1,
+            "width": 701,
+            "x": 0,
+            "y": 0
         }
     ],
     "groups": [
@@ -7634,5 +7652,5 @@
         }
     ],
     "startAtlasId": 1,
-    "startFrameId": 426
+    "startFrameId": 427
 }

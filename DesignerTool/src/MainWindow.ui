@@ -306,18 +306,6 @@
     <string>Ctrl+Shift+O</string>
    </property>
   </action>
-  <action name="actionCut">
-   <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/edit-cut.png</normaloff>:/icons16x16/edit-cut.png</iconset>
-   </property>
-   <property name="text">
-    <string>Cu&amp;t</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+X</string>
-   </property>
-  </action>
   <action name="actionCopy">
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">

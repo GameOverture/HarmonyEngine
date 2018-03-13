@@ -66,18 +66,6 @@
     <string>Removes the selected item(s) or prefix(es)</string>
    </property>
   </action>
-  <action name="actionCutItem">
-   <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/edit-cut.png</normaloff>:/icons16x16/edit-cut.png</iconset>
-   </property>
-   <property name="text">
-    <string>Cut</string>
-   </property>
-   <property name="toolTip">
-    <string>Cut the selected item in Data Explorer</string>
-   </property>
-  </action>
   <action name="actionCopyItem">
    <property name="icon">
     <iconset resource="../res/DesignerTool.qrc">
