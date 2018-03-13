@@ -59,6 +59,12 @@ int32 HyHalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptP
 }
 
 template <typename T>
+T HyRound(T num)
+{
+	return (num - floor(num) >= 0.5) ? ceil(num) : floor(num);
+}
+
+template <typename T>
 T HyClamp(const T& value, const T& low, const T& high) 
 {
 	return value < low ? low : (value > high ? high : value); 

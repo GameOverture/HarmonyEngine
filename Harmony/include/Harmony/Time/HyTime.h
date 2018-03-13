@@ -44,7 +44,7 @@ public:
 	void SetUpdateTickMs(uint32 uiUpdateTickMs);
 
 	float GetUpdateStepSeconds();
-	float GetFrameDelta();
+	double GetUpdateStepSecondsDbl();
 
 	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
 	// Delta time is in seconds.

@@ -77,6 +77,7 @@ private:
 	HyRendererInterop &GetRenderer();
 
 	friend float			Hy_UpdateStep();
+	friend double			Hy_UpdateStepDbl();
 	friend void				Hy_PauseGame(bool bPause);
 	friend HyInput &		Hy_Input();
 	friend b2World &		Hy_Physics2d();

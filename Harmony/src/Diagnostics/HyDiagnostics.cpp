@@ -286,7 +286,7 @@ void HyDiagnostics::ProfileEnd()
 
 void HyDiagnostics::ApplyTimeDelta()
 {
-	m_DiagOutput.ApplyTimeDelta(m_TimeRef.GetFrameDelta());
+	m_DiagOutput.ApplyTimeDelta(m_TimeRef.GetUpdateStepSecondsDbl());
 }
 
 void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)

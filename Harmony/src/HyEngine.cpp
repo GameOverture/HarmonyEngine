@@ -169,6 +169,12 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return HyEngine::sm_pInstance->m_Time.GetUpdateStepSeconds();
 }
 
+/*friend*/ double Hy_UpdateStepDbl()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_UpdateStepDbl() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_Time.GetUpdateStepSecondsDbl();
+}
+
 /*friend*/ void Hy_PauseGame(bool bPause)
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_PauseGame() was invoked before engine has been initialized.");

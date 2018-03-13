@@ -54,9 +54,9 @@ float HyTime::GetUpdateStepSeconds()
 	return static_cast<float>(m_dCurDeltaTime);//return static_cast<float>(m_dUpdateTick_Seconds);
 }
 
-float HyTime::GetFrameDelta()
+double HyTime::GetUpdateStepSecondsDbl()
 {
-	return static_cast<float>(m_dCurDeltaTime);
+	return m_dCurDeltaTime;
 }
 
 void HyTime::SetCurDeltaTime()
