@@ -205,7 +205,7 @@ ExplorerTreeWidget *ExplorerWidget::GetTreeWidget()
 	return ui->treeWidget;
 }
 
-void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
+void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
 {
 	QDir metaDir(pProject->GetMetaDataAbsPath());
 	QDir metaTempDir = HyGlobal::PrepTempDir(pProject);
@@ -307,7 +307,7 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject)
 
 	// Create a new project item representing the pasted item and save it
 	QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
-	QString sPrefix = itemNameFileInfo.path();
+	QString sPrefix = sPrefixOverride.isEmpty() ? itemNameFileInfo.path() : sPrefixOverride;
 	QString sName = itemNameFileInfo.baseName();
 	ProjectItem *pNewItem = AddNewItem(pProject, ePasteItemType, sPrefix, sName, false, pasteObj["src"]);
 	if(pNewItem)
@@ -564,8 +564,19 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 
 	QClipboard *pClipboard = QApplication::clipboard();
 	const QMimeData *pData = pClipboard->mimeData();
+
+	QString sPrefixOverride; // Leave uninitialized for no override
+	ExplorerItem *pCurSelected = GetCurItemSelected();
+	if(pCurSelected->GetType() != ITEM_Project)
+	{
+		if(pCurSelected->GetType() == ITEM_Prefix)
+			sPrefixOverride = pCurSelected->GetName(true);
+		else
+			sPrefixOverride = pCurSelected->GetPrefix();
+	}
+
 	if(pData->hasFormat(HYGUI_MIMETYPE))
-		PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj);
+		PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
 }
 
 void ExplorerWidget::on_actionOpen_triggered()

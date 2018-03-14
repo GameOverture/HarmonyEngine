@@ -16,6 +16,11 @@ ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) : m_pProjItem(p
 {
 	QJsonValue itemValue = m_pProjItem->GetModel()->GetJson();
 
+	if(pProjItem->GetType() == ITEM_Sprite)
+	{
+
+	}
+
 	// STANDARD INFO
 	QJsonObject clipboardObj;
 	clipboardObj.insert("project", m_pProjItem->GetProject().GetAbsPath());

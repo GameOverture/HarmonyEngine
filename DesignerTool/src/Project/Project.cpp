@@ -241,7 +241,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 		QByteArray sBefore("[HyHarmonyTemplateDataDir]");
 		QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % "templates/data/").toLocal8Bit());
 		sContents.replace(sBefore, sAfter);
-		MainWindow::PasteItemSrc(sContents, this);
+		MainWindow::PasteItemSrc(sContents, this, QString());
 	}
 
 	// Add project to the treewidget

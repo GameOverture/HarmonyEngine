@@ -56,7 +56,7 @@ public:
 
 	ExplorerTreeWidget *GetTreeWidget();
 
-	void PasteItemSrc(QByteArray sSrc, Project *pProject);
+	void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
 
 private:
 	Ui::ExplorerWidget *ui;

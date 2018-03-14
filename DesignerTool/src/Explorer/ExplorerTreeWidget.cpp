@@ -25,8 +25,10 @@ ExplorerTreeWidget::ExplorerTreeWidget(QWidget *pParent) :  QTreeWidget(pParent)
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setDragEnabled(true);
 	setDropIndicatorShown(true);
-	//ui->treeWidget->setDragDropMode(QAbstractItemView::DragDrop);
-	//ui->treeWidget->viewport()->setAcceptDrops(true);
+	viewport()->setAcceptDrops(true);
+
+	//setDragDropMode(QAbstractItemView::DragDrop);
+	//setDragDropMode(QAbstractItemView::InternalMove);
 }
 
 /*virtual*/ ExplorerTreeWidget::~ExplorerTreeWidget()
@@ -111,7 +113,7 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 		if(dragObj["project"].toString().toLower() != projRef.GetAbsPath().toLower())
 		{
 			pEvent->acceptProposedAction();
-			m_pOwnerWidget->PasteItemSrc(dragDataSrc, &projRef);
+			m_pOwnerWidget->PasteItemSrc(dragDataSrc, &projRef, static_cast<ProjectItem *>(pEvent->source())->GetPrefix());
 		}
 		else
 			pEvent->ignore();

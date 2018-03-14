@@ -60,11 +60,19 @@ bool AtlasModel::FrameLookup::RemoveLookup(AtlasFrame *pFrame)  // Returns true 
 	
 	return false;
 }
-AtlasFrame *AtlasModel::FrameLookup::Find(quint32 uiId)
+AtlasFrame *AtlasModel::FrameLookup::FindById(quint32 uiId)
 {
 	auto iter = m_FrameIdMap.find(uiId);
 	if(iter == m_FrameIdMap.end())
 		return nullptr;
+	else
+		return iter.value();
+}
+QList<AtlasFrame *> AtlasModel::FrameLookup::FindByChecksum(quint32 uiChecksum)
+{
+	auto iter = m_FrameChecksumMap.find(uiChecksum);
+	if(iter == m_FrameChecksumMap.end())
+		return QList<AtlasFrame *>();
 	else
 		return iter.value();
 }
@@ -534,7 +542,7 @@ QList<AtlasFrame *> AtlasModel::RequestFramesById(ProjectItem *pItem, QList<quin
 	QList<AtlasFrame *> frameRequestList;
 	for(int i = 0; i < requestList.size(); ++i)
 	{
-		AtlasFrame *pFoundFrame = m_FrameLookup.Find(requestList[i]);
+		AtlasFrame *pFoundFrame = m_FrameLookup.FindById(requestList[i]);
 		if(pFoundFrame == nullptr)
 		{
 			// TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list

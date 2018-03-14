@@ -280,9 +280,9 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	return sm_pInstance->m_sEngineLocation;
 }
 
-/*static*/ void MainWindow::PasteItemSrc(QByteArray sSrc, Project *pProject)
+/*static*/ void MainWindow::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
 {
-	sm_pInstance->ui->explorer->PasteItemSrc(sSrc, pProject);
+	sm_pInstance->ui->explorer->PasteItemSrc(sSrc, pProject, sPrefixOverride);
 }
 
 /*static*/ void MainWindow::ApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty)

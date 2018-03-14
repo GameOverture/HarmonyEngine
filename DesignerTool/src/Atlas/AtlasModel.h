@@ -71,7 +71,8 @@ class AtlasModel : public QAbstractListModel
 	public:
 		void AddLookup(AtlasFrame *pFrame);
 		bool RemoveLookup(AtlasFrame *pFrame);  // Returns true if no remaining duplicates exist
-		AtlasFrame *Find(quint32 uiId);
+		AtlasFrame *FindById(quint32 uiId);
+		QList<AtlasFrame *> FindByChecksum(quint32 uiChecksum);
 		bool DoesImageExist(quint32 uiChecksum);
 	};
 	FrameLookup                                     m_FrameLookup;
