@@ -275,9 +275,10 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 /*virtual*/ bool HySprite2d::IsLoadDataValid() /*override*/
 {
 	AcquireData();
+	return m_pData != nullptr;
 
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(0, 0);
-	return frameRef.pAtlas != nullptr;
+	//const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(0, 0);
+	//return frameRef.pAtlas != nullptr;
 }
 
 /*virtual*/ void HySprite2d::CalcBoundingVolume() /*override*/
