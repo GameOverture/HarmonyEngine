@@ -186,6 +186,24 @@ PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, EntityTree
 	return pPropertiesModel;
 }
 
+bool EntityModel::IsChildAddable(ProjectItem *pItem)
+{
+	if(pItem == nullptr || &m_ItemRef == pItem)
+		return false;
+
+	if(pItem->GetType() == ITEM_Entity)
+	{
+	}
+}
+
+bool EntityModel::AddNewChild(ProjectItem *pItem)
+{
+	if(IsChildAddable(pItem) == false)
+		return false;
+
+	return false;
+}
+
 /*virtual*/ void EntityModel::OnSave() /*override*/
 {
 }

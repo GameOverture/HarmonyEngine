@@ -49,8 +49,10 @@ public:
 	virtual ~EntityModel();
 
 	EntityTreeModel &GetTreeModel();
-
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem);
+
+	bool IsChildAddable(ProjectItem *pItem);
+	bool AddNewChild(ProjectItem *pItem);
 
 	virtual void OnSave() override;
 	virtual QJsonObject PopStateAt(uint32 uiIndex) override;

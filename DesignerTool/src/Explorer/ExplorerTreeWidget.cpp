@@ -68,12 +68,28 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 	if(m_pDraggedProjItem != nullptr &&
 	   (pEvent->pos() - m_ptDragStart).manhattanLength() >= QApplication::startDragDistance())
 	{
-		ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(m_pDraggedProjItem);
-
 		QDrag *pDrag = new QDrag(m_pDraggedProjItem);
-		pDrag->setMimeData(pNewMimeData);
+		pDrag->setMimeData(new ProjectItemMimeData(m_pDraggedProjItem));
 
-		Qt::DropAction dropAction = pDrag->exec(Qt::LinkAction);
+		//pDrag->setPixmap(m_pDraggedProjItem->GetIcon(SUBICON_None).pixmap());
+
+		Qt::DropAction dropAction = pDrag->exec(Qt::CopyAction | Qt::MoveAction | Qt::LinkAction);
+
+		int temp = 0;
+		switch(dropAction)
+		{
+		case Qt::CopyAction:
+			temp++;
+			break;
+
+		case Qt::MoveAction:
+			temp++;
+			break;
+
+		case Qt::LinkAction:
+			temp++;
+			break;
+		}
 	}
 
 	QTreeWidget::mouseMoveEvent(pEvent);

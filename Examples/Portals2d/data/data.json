@@ -4,6 +4,7 @@
     "BoundingVolumes": {
     },
     "Entities": {
+        "Ent/TestEnt": null
     },
     "Fonts": {
         "+Hy/+HyFont": {

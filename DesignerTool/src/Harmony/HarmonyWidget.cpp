@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "HarmonyWidget.h"
 #include "ProjectItemMimeData.h"
+#include "EntityModel.h"
 
 #include <QDragEnterEvent>
 
@@ -122,15 +123,22 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		return;
 
 	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
-	ProjectItem *pCurProjItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
+	ProjectItem *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
 
-	if(pCurProjItem &&
+	if(pCurOpenTabItem &&
 	   pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
-	   static_cast<ProjectItem *>(pEvent->source()) != pCurProjItem &&
-	   pCurProjItem->GetType() == ITEM_Entity)
+	   static_cast<ProjectItem *>(pEvent->source()) != pCurOpenTabItem &&
+	   pCurOpenTabItem->GetType() == ITEM_Entity)
 	{
-		pEvent->acceptProposedAction();
+		EntityModel *pEntModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel());
+
+		if(pEntModel->IsChildAddable(static_cast<ProjectItem *>(pEvent->source())))
+			pEvent->acceptProposedAction();
+		else
+			pEvent->ignore();
 	}
+	else
+		pEvent->ignore();
 }
 
 /*virtual*/ void HarmonyWidget::dropEvent(QDropEvent *pEvent) /*override*/
@@ -139,15 +147,18 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		return;
 
 	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
-	ProjectItem *pCurProjItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
+	ProjectItem *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
 
-	if(pCurProjItem &&
+	if(pCurOpenTabItem &&
 	   pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
-	   static_cast<ProjectItem *>(pEvent->source()) != pCurProjItem &&
-	   pCurProjItem->GetType() == ITEM_Entity &&
-	   pCurProjItem->GetWidget())
+	   static_cast<ProjectItem *>(pEvent->source()) != pCurOpenTabItem &&
+	   pCurOpenTabItem->GetType() == ITEM_Entity)
 	{
+		EntityModel *pEntModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel());
+		pEntModel->AddNewChild(static_cast<ProjectItem *>(pEvent->source()));
 
+		pEvent->setDropAction(Qt::LinkAction);
+		pEvent->accept();
 	}
 }
 

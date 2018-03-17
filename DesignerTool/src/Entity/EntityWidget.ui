@@ -271,7 +271,7 @@
          <item>
           <widget class="PropertiesTreeView" name="propertyTree">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -279,196 +279,6 @@
            <property name="alternatingRowColors">
             <bool>true</bool>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QStackedWidget" name="stackedWidget">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="currentIndex">
-            <number>5</number>
-           </property>
-           <widget class="QWidget" name="pageNull">
-            <layout class="QVBoxLayout" name="verticalLayout_14">
-             <property name="leftMargin">
-              <number>2</number>
-             </property>
-             <property name="topMargin">
-              <number>2</number>
-             </property>
-             <property name="rightMargin">
-              <number>2</number>
-             </property>
-             <property name="bottomMargin">
-              <number>2</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="lblNoChildSelected_2">
-               <property name="text">
-                <string>No child selected</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="pageEntity">
-            <layout class="QVBoxLayout" name="verticalLayout_15">
-             <item>
-              <spacer name="verticalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="pagePrimitive">
-            <layout class="QVBoxLayout" name="verticalLayout_16"/>
-           </widget>
-           <widget class="QWidget" name="pageTexturedQuad">
-            <layout class="QVBoxLayout" name="verticalLayout_17"/>
-           </widget>
-           <widget class="QWidget" name="pageSprite">
-            <layout class="QVBoxLayout" name="verticalLayout_18">
-             <item>
-              <widget class="QGroupBox" name="groupBox_2">
-               <property name="title">
-                <string>Animation State</string>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_19">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>5</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>5</number>
-                </property>
-                <item>
-                 <widget class="QComboBox" name="cmbSpriteStates_2"/>
-                </item>
-                <item>
-                 <layout class="QGridLayout" name="gridLayout_2">
-                  <item row="2" column="0">
-                   <widget class="QCheckBox" name="chkPaused_2">
-                    <property name="text">
-                     <string>Paused</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QCheckBox" name="chkLooping_2">
-                    <property name="text">
-                     <string>Looping</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QCheckBox" name="chkBounce_2">
-                    <property name="text">
-                     <string>Play Bounce</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QCheckBox" name="chkReverse_2">
-                    <property name="text">
-                     <string>Play Reverse</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <layout class="QHBoxLayout" name="horizontalLayout_5">
-                    <item>
-                     <widget class="QLabel" name="label_8">
-                      <property name="text">
-                       <string>Play Rate:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
-                      <property name="suffix">
-                       <string/>
-                      </property>
-                      <property name="maximum">
-                       <double>100000000000000000000.000000000000000</double>
-                      </property>
-                      <property name="singleStep">
-                       <double>0.100000000000000</double>
-                      </property>
-                      <property name="value">
-                       <double>1.000000000000000</double>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QSlider" name="sliFrame_2">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="pageFont">
-            <layout class="QVBoxLayout" name="verticalLayout_20">
-             <item>
-              <widget class="QComboBox" name="cmbFontStates_2"/>
-             </item>
-             <item>
-              <widget class="FontTableView" name="layersTableView_2">
-               <property name="selectionMode">
-                <enum>QAbstractItemView::SingleSelection</enum>
-               </property>
-               <property name="selectionBehavior">
-                <enum>QAbstractItemView::SelectItems</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
-               <item>
-                <widget class="QComboBox" name="cmbLayout_2"/>
-               </item>
-               <item>
-                <widget class="QComboBox" name="cmbAlignment_2"/>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBox_2">
-                 <property name="text">
-                  <string>Monospaced Digits</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="lineEdit_2"/>
-             </item>
-            </layout>
-           </widget>
           </widget>
          </item>
         </layout>
@@ -596,11 +406,6 @@
   </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>FontTableView</class>
-   <extends>QTableView</extends>
-   <header>FontModelView.h</header>
-  </customwidget>
   <customwidget>
    <class>PropertiesTreeView</class>
    <extends>QTreeView</extends>
