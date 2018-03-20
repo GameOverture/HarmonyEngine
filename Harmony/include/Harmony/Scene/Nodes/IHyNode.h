@@ -29,7 +29,9 @@ protected:
 		DIRTY_WorldAABB				= 1 << 1,
 		DIRTY_Transform				= 1 << 2,
 		DIRTY_Color					= 1 << 3,
-		DIRTY_Scissor				= 1 << 4
+		DIRTY_Scissor				= 1 << 4,
+
+		DIRTY_ALL =					DIRTY_BoundingVolume | DIRTY_WorldAABB | DIRTY_Transform | DIRTY_Color | DIRTY_Scissor
 	};
 	uint32							m_uiDirtyFlags;
 

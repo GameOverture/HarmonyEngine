@@ -15,8 +15,6 @@
 
 class HyPortal2d;
 
-#define HYENTITY_DEFAULT_OVERRIDE_VALUE false
-
 class HyEntity2d : public IHyDraw2d
 {
 protected:
@@ -44,7 +42,6 @@ public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
-	// This overridden method will just behave as "bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE"
 	virtual void SetEnabled(bool bEnabled) override;
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused) override;
 
@@ -53,16 +50,16 @@ public:
 	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 	
-	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
-	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
+	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren = false);
+	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren = false);
 
-	void SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
-	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
+	void SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren = false);
+	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren = false);
 
-	void UseCameraCoordinates(bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
-	void UseWindowCoordinates(int32 iWindowIndex = 0, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
+	void UseCameraCoordinates(bool bOverrideExplicitChildren = false);
+	void UseWindowCoordinates(int32 iWindowIndex = 0, bool bOverrideExplicitChildren = false);
 	
-	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = HYENTITY_DEFAULT_OVERRIDE_VALUE);
+	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = false);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void ChildAppend(IHyNode2d &childRef);
@@ -77,9 +74,6 @@ public:
 	bool EnableMouseInput(IHyDrawInst2d *pInputChildNode, void *pUserParam = nullptr);
 	void DisableMouseInput();
 
-	//void SetPortal(HyPortal2d *pPortal);
-	//void ClearPortal(HyPortal2d *pPortal);
-
 	void ReverseDisplayOrder(bool bReverse);
 
 	virtual bool IsLoaded() const override;
@@ -93,12 +87,12 @@ protected:
 
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 
-	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override;
-	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override;
-	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
-	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override;
-	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override;
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
+	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override final;
+	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
+	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override final;
+	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;
+	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override final;
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override final;
 
 	// Optional user overrides below
 	virtual void OnUpdate() { }
