@@ -2,8 +2,9 @@
 
 
 Portals2d::Portals2d(HarmonyInit &initStruct) :	IHyApplication(initStruct),
-												m_Sprite("", "Test", nullptr),
-												m_Text(HY_SYSTEM_FONT, nullptr)
+												m_Sprite("", "Symbols", nullptr),
+												m_Text(HY_SYSTEM_FONT, nullptr),
+												m_Prim(nullptr)
 {
 }
 
@@ -32,14 +33,13 @@ Portals2d::~Portals2d()
 	//m_Text.Load();
 	//m_Text.TextSet("Testing help");
 
-	HyPortal2dInit portalInit;
-	portalInit.SetGateA(glm::vec2(-350.0f, 100.0f), glm::vec2(-350.0f, -100.0f), glm::vec2(0.0f, 0.0f));
-	portalInit.SetGateB(glm::vec2(350.0f, 100.0f), glm::vec2(350.0f, -100.0f), glm::vec2(0.0f, 0.0f));
-	portalInit.fStencilCullExtents = 150.0f;
-	m_pPortal = HY_NEW HyPortal2d(portalInit);
-	m_pPortal->EnableDebugDraw(true);
-
-	m_Sprite.SetPortal(m_pPortal);
+	//HyPortal2dInit portalInit;
+	//portalInit.SetGateA(glm::vec2(-350.0f, 100.0f), glm::vec2(-350.0f, -100.0f), glm::vec2(0.0f, 0.0f));
+	//portalInit.SetGateB(glm::vec2(350.0f, 100.0f), glm::vec2(350.0f, -100.0f), glm::vec2(0.0f, 0.0f));
+	//portalInit.fStencilCullExtents = 150.0f;
+	//m_pPortal = HY_NEW HyPortal2d(portalInit);
+	//m_pPortal->EnableDebugDraw(true);
+	//m_Sprite.SetPortal(m_pPortal);
 
 	return true;
 }

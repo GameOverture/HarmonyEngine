@@ -25,7 +25,7 @@ protected:
 	float			m_fLineThickness;
 
 public:
-	HyPrimitive2d(HyEntity2d *pParent = nullptr);
+	HyPrimitive2d(HyEntity2d *pParent);
 	HyPrimitive2d(const HyPrimitive2d &copyRef);
 	virtual ~HyPrimitive2d(void);
 

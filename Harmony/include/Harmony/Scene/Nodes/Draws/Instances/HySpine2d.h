@@ -32,7 +32,7 @@ protected:
 	bool					m_bLooping;
 
 public:
-	HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
+	HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	HySpine2d(const HySpine2d &copyRef);
 	virtual ~HySpine2d(void);
 

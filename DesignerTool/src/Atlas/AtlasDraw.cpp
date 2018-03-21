@@ -20,6 +20,8 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :	IDraw(null
 																		m_ModelRef(*pModelRef),
 																		m_bIsMouseOver(false),
 																		m_HoverBackground(this),
+																		m_HoverStrokeInner(nullptr),
+																		m_HoverStrokeOutter(nullptr),
 																		m_pHoverTexQuad(nullptr)
 {
 	m_HoverBackground.SetWireframe(false);

@@ -12,15 +12,15 @@
 #include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
 
-HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyDrawInst2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
-																									m_pSpineSkeleton(NULL),
-																									m_ppSpineAnims(NULL),
-																									m_ppAnimStates(NULL),
-																									m_fAnimPlayRate(1.0f),
-																									m_uiNumAnims(0),
-																									m_uiNumAnimStates(0),
-																									m_uiCurAnimState(0),
-																									m_spSkeletonBounds(NULL)
+HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
+																						m_pSpineSkeleton(NULL),
+																						m_ppSpineAnims(NULL),
+																						m_ppAnimStates(NULL),
+																						m_fAnimPlayRate(1.0f),
+																						m_uiNumAnims(0),
+																						m_uiNumAnimStates(0),
+																						m_uiCurAnimState(0),
+																						m_spSkeletonBounds(NULL)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }

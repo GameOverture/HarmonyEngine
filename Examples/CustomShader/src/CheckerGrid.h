@@ -11,7 +11,7 @@ public:
 	CheckerGrid(float fWidth, float fHeight, float fGridSize, HyEntity2d *pParent);
 	virtual ~CheckerGrid();
 
-	virtual void OnUpdateUniforms();
-	virtual void OnWriteDrawBufferData(char *&pRefDataWritePos);
+	virtual void OnUpdateUniforms() override;
+	virtual void OnWriteVertexData(char *&pRefDataWritePos) override;
 };
 

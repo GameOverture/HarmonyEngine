@@ -412,10 +412,11 @@ HyOpenGL::~HyOpenGL(void)
 		{
 			GLuint uiLocation = glGetAttribLocation(hGLShaderProg, shaderVertexAttribListRef[i].sName.c_str());
 			HyErrorCheck_OpenGL("HyOpenGLShader::GetAttribLocation", "glGetAttribLocation");
+			HyAssert(static_cast<GLint>(uiLocation) >= 0, "Vertex attribute \"" << shaderVertexAttribListRef[i].sName.c_str() << "\" is not found in shader: " << static_cast<uint32>(pShader->GetHandle()));
 
 			if(shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_dvec2 || shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_dvec3 || shaderVertexAttribListRef[i].eVarType == HYSHADERVAR_dvec4)
 			{
-				HyError("HYSHADERVAR_dvec2, HYSHADERVAR_dvec3, or HYSHADERVAR_dvec4 is not implemented");
+				HyAssert(false, "HYSHADERVAR_dvec2, HYSHADERVAR_dvec3, or HYSHADERVAR_dvec4 is not tested, remove this if it works");
 
 				glEnableVertexAttribArray(uiLocation + 0);
 				glEnableVertexAttribArray(uiLocation + 1);
@@ -736,16 +737,8 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 	glActiveTexture(GL_TEXTURE0);
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
 
-	if(m_pShaderQuadBatch->GetHandle() == hShaderHandle)
-	{
-		glBindTexture(GL_TEXTURE_2D, pRenderState->GetTextureHandle());
-		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
-	}
-	else
-	{
-		glBindTexture(GL_TEXTURE_2D, 0);
-		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
-	}
+	glBindTexture(GL_TEXTURE_2D, pRenderState->GetTextureHandle());
+	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if(pRenderState->IsScissorRect())

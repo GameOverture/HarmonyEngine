@@ -9,7 +9,9 @@ class Portals2d : public IHyApplication
 	HySprite2d		m_Sprite;
 	HyText2d		m_Text;
 
-	HyPortal2d *	m_pPortal;
+	//HyPortal2d *	m_pPortal;
+
+	HyPrimitive2d	m_Prim;
 
 	enum Controls
 	{

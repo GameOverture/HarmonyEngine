@@ -16,20 +16,20 @@
 
 #define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyDrawInst2d(HYTYPE_Text2d, szPrefix, szName, pParent),
-																									m_bIsDirty(false),
-																									m_sRawString(""),
-																									m_uiCurFontState(0),
-																									m_vBoxDimensions(0.0f, 0.0f),
-																									m_fScaleBoxModifier(1.0f),
-																									m_uiBoxAttributes(0),
-																									m_eAlignment(HYALIGN_Left),
-																									m_bMonospacedDigits(false),
-																									m_pGlyphInfos(nullptr),
-																									m_uiNumReservedGlyphs(0),
-																									m_uiNumValidCharacters(0),
-																									m_fUsedPixelWidth(0.0f),
-																									m_fUsedPixelHeight(0.0f)
+HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_Text2d, szPrefix, szName, pParent),
+																					m_bIsDirty(false),
+																					m_sRawString(""),
+																					m_uiCurFontState(0),
+																					m_vBoxDimensions(0.0f, 0.0f),
+																					m_fScaleBoxModifier(1.0f),
+																					m_uiBoxAttributes(0),
+																					m_eAlignment(HYALIGN_Left),
+																					m_bMonospacedDigits(false),
+																					m_pGlyphInfos(nullptr),
+																					m_uiNumReservedGlyphs(0),
+																					m_uiNumValidCharacters(0),
+																					m_fUsedPixelWidth(0.0f),
+																					m_fUsedPixelHeight(0.0f)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }

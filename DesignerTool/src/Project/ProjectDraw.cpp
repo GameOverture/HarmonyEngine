@@ -64,7 +64,7 @@ CheckerGrid::~CheckerGrid()
 {
 }
 
-/*virtual*/ void CheckerGrid::OnUpdateUniforms()
+/*virtual*/ void CheckerGrid::OnUpdateUniforms() /*override*/
 {
 	glm::mat4 mtx;
 	HyPrimitive2d::GetWorldTransform(mtx);
@@ -76,7 +76,7 @@ CheckerGrid::~CheckerGrid()
 	m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
-/*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void CheckerGrid::OnWriteVertexData(char *&pRefDataWritePos) /*override*/
 {
 	HyAssert(GetNumVerts() == 6, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 

@@ -12,19 +12,35 @@ CheckerGrid::~CheckerGrid()
 {
 }
 
-/*virtual*/ void CheckerGrid::OnUpdateUniforms()
+/*virtual*/ void CheckerGrid::OnUpdateUniforms() /*override*/
 {
 	glm::mat4 mtx;
-	HyPrimitive2d::GetWorldTransform(mtx);
+	GetWorldTransform(mtx);
+
+	// TODO: Get rid of top/bot color
+	glm::vec3 tint = CalculateTopTint();
+	glm::vec4 vTop;
+	vTop.x = tint.x;
+	vTop.y = tint.y;
+	vTop.z = tint.z;
+	vTop.a = CalculateAlpha();
 
 	m_ShaderUniforms.Set("u_mtxTransform", mtx);
-	m_ShaderUniforms.Set("u_fGridSize", m_fGRID_SIZE);
-	m_ShaderUniforms.Set("u_vDimensions", m_vDIMENSIONS);
-	m_ShaderUniforms.Set("u_vGridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
-	m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
+	m_ShaderUniforms.Set("u_vColor", vTop);
+
+
+
+	//glm::mat4 mtx;
+	//HyPrimitive2d::GetWorldTransform(mtx);
+
+	//m_ShaderUniforms.Set("u_mtxTransform", mtx);
+	//m_ShaderUniforms.Set("u_fGridSize", m_fGRID_SIZE);
+	//m_ShaderUniforms.Set("u_vDimensions", m_vDIMENSIONS);
+	//m_ShaderUniforms.Set("u_vGridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
+	//m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
-/*virtual*/ void CheckerGrid::OnWriteDrawBufferData(char *&pRefDataWritePos)
+/*virtual*/ void CheckerGrid::OnWriteVertexData(char *&pRefDataWritePos) /*override*/
 {
 	HyAssert(GetNumVerts() == 6, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 	

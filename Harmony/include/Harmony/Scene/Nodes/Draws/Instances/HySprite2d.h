@@ -47,7 +47,7 @@ protected:
 	std::vector<std::pair<HySprite2dAnimFinishedCallback, void *> >	m_AnimCallbackList;
 
 public:
-	HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
+	HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	HySprite2d(const HySprite2d &copyRef);
 	virtual ~HySprite2d(void);
 

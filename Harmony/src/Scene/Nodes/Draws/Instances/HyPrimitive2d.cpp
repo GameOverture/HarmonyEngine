@@ -12,11 +12,11 @@
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
-HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDrawInst2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
-																	m_pVertBuffer(nullptr),
-																	m_uiNumVerts(0),
-																	m_bWireframe(false),
-																	m_fLineThickness(1.0f)
+HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
+													m_pVertBuffer(nullptr),
+													m_uiNumVerts(0),
+													m_bWireframe(false),
+													m_fLineThickness(1.0f)
 {
 	ClearData();
 }

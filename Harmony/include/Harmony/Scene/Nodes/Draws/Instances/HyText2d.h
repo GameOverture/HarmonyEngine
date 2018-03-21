@@ -74,7 +74,7 @@ protected:
 	float				m_fUsedPixelHeight;
 
 public:
-	HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
+	HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	HyText2d(const HyText2d &copyRef);
 	virtual ~HyText2d(void);
 

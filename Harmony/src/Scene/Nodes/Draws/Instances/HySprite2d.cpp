@@ -13,12 +13,12 @@
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
-HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyDrawInst2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
-																										m_bIsAnimPaused(false),
-																										m_fAnimPlayRate(1.0f),
-																										m_fElapsedFrameTime(0.0f),
-																										m_uiCurAnimState(0),
-																										m_uiCurFrame(0)
+HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
+																						m_bIsAnimPaused(false),
+																						m_fAnimPlayRate(1.0f),
+																						m_fElapsedFrameTime(0.0f),
+																						m_uiCurAnimState(0),
+																						m_uiCurFrame(0)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
