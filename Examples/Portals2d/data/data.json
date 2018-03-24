@@ -2916,6 +2916,84 @@
                     "size": 16
                 }
             ]
+        },
+        "/NewFont": {
+            "availableGlyphs": {
+                "0-9": true,
+                "A-Z": true,
+                "a-z": true,
+                "additional": "",
+                "symbols": true
+            },
+            "checksum": 568473106,
+            "id": 432,
+            "stateArray": [
+                {
+                    "layers": [
+                    ],
+                    "leftSideNudgeAmt": 0,
+                    "lineAscender": 0,
+                    "lineDescender": 0,
+                    "lineHeight": 0,
+                    "name": ""
+                }
+            ],
+            "subAtlasHeight": 25,
+            "subAtlasWidth": 25,
+            "typefaceArray": [
+            ]
+        },
+        "Ent/NewFont": {
+            "availableGlyphs": {
+                "0-9": true,
+                "A-Z": true,
+                "a-z": true,
+                "additional": "",
+                "symbols": true
+            },
+            "checksum": 568473106,
+            "id": 430,
+            "stateArray": [
+                {
+                    "layers": [
+                    ],
+                    "leftSideNudgeAmt": 0,
+                    "lineAscender": 0,
+                    "lineDescender": 0,
+                    "lineHeight": 0,
+                    "name": ""
+                }
+            ],
+            "subAtlasHeight": 25,
+            "subAtlasWidth": 25,
+            "typefaceArray": [
+            ]
+        },
+        "PrefixTest/NewFont": {
+            "availableGlyphs": {
+                "0-9": true,
+                "A-Z": true,
+                "a-z": true,
+                "additional": "",
+                "symbols": true
+            },
+            "checksum": 568473106,
+            "id": 431,
+            "stateArray": [
+                {
+                    "layers": [
+                    ],
+                    "leftSideNudgeAmt": 0,
+                    "lineAscender": 0,
+                    "lineDescender": 0,
+                    "lineHeight": 0,
+                    "name": ""
+                }
+            ],
+            "subAtlasHeight": 25,
+            "subAtlasWidth": 25,
+            "typefaceArray": [
+            ]
         }
     },
     "Particles": {

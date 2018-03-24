@@ -8,13 +8,14 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "PropertiesTreeModel.h"
+#include "PropertiesUndoCmd.h"
 
 PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant &subState, QObject *parent) :  QAbstractItemModel(parent),
 																														m_ItemRef(itemRef),
 																														m_iSTATE_INDEX(iStateIndex),
 																														m_iSUBSTATE(subState)
 {
-	m_pRootItem = new PropertiesTreeItem("Root", this, PropertiesDef(), QColor(), "");
+	m_pRootItem = new PropertiesTreeItem("Root", this, PropertiesDef(), QColor(), "", true);
 }
 
 /*virtual*/ PropertiesTreeModel::~PropertiesTreeModel()
@@ -39,7 +40,7 @@ bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, QVariant c
 	def.eType = bCheckable ? PROPERTIESTYPE_CategoryChecked : PROPERTIESTYPE_Category;
 	def.delegateBuilder = commonDelegateBuilder;
 
-	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, def, color, sToolTip);
+	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, def, color, sToolTip, !bCheckable);
 	pNewTreeItem->SetData(bStartChecked ? Qt::Checked : Qt::Unchecked);
 
 	InsertItem(m_CategoryList.size(), pNewTreeItem, m_pRootItem);
@@ -48,13 +49,13 @@ bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, QVariant c
 	return true;
 }
 
-bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip)
+bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip, bool bReadOnly)
 {
 	PropertiesTreeItem *pCategoryTreeItem = ValidateCategory(sCategoryName, sName);
 	if(pCategoryTreeItem == nullptr)
 		return false;
 
-	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, defintion, pCategoryTreeItem->GetColor(), sToolTip);
+	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, defintion, pCategoryTreeItem->GetColor(), sToolTip, bReadOnly);
 	pNewTreeItem->SetData(defintion.defaultData);
 
 	InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);
@@ -226,7 +227,8 @@ Qt::ItemFlags PropertiesTreeModel::flags(const QModelIndex &index) const
 
 	if(pTreeItem->IsCategory())
 	{
-		returnFlags |= Qt::ItemIsEnabled;
+		if(pTreeItem->IsReadOnly() == false)
+			returnFlags |= Qt::ItemIsEnabled;
 
 		if(pTreeItem->GetType() == PROPERTIESTYPE_CategoryChecked && index.column() == 0)
 			returnFlags |= Qt::ItemIsUserCheckable;
@@ -240,12 +242,14 @@ Qt::ItemFlags PropertiesTreeModel::flags(const QModelIndex &index) const
 		if(pCategoryItem->GetType() == PROPERTIESTYPE_Category ||
 		   (pCategoryItem->GetType() == PROPERTIESTYPE_CategoryChecked && pCategoryItem->GetData().toInt() == Qt::Checked))
 		{
-			returnFlags |= Qt::ItemIsEnabled;
+			if(pTreeItem->IsReadOnly() == false)
+				returnFlags |= Qt::ItemIsEnabled;
 		}
 
 		if(index.column() == 1)
 		{
-			returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable);
+			if(pTreeItem->IsReadOnly() == false)
+				returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable);
 
 			if(pTreeItem->GetType() == PROPERTIESTYPE_bool)
 				returnFlags |= Qt::ItemIsUserCheckable;

@@ -121,7 +121,6 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 
 			PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem);
 			ui->propertyTree->setModel(pPropertiesModel);
-			ui->propertyTree->setColumnWidth(0, 200);
 
 			// Expand the top level nodes (the properties' categories)
 			QModelIndex rootIndex = ui->propertyTree->rootIndex();

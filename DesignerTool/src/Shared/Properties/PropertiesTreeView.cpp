@@ -26,8 +26,9 @@ PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) : QTreeVi
 {
 	setItemDelegate(new PropertiesDelegate(this, this));
 
-	this->setIndentation(0);
-	this->setAnimated(true);
+	setIndentation(0);
+	setAnimated(true);
+	setColumnWidth(0, 200);
 }
 
 PropertiesTreeView::~PropertiesTreeView()

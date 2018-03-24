@@ -15,6 +15,7 @@
 #include "IModel.h"
 #include "AtlasFrame.h"
 #include "GlobalWidgetMappers.h"
+#include "PropertiesTreeModel.h"
 
 #include <QJsonArray>
 
@@ -84,6 +85,8 @@ class FontModel : public IModel
 	Q_OBJECT
 
 	QDir                        m_FontMetaDir;
+
+	PropertiesTreeModel			m_TypeFacePropertiesModel;
 	
 	CheckBoxMapper *            m_pChkMapper_09;
 	CheckBoxMapper *            m_pChkMapper_AZ;
@@ -108,6 +111,8 @@ public:
 	virtual ~FontModel();
 
 	QDir GetMetaDir();
+
+	PropertiesTreeModel *GetTypefaceModel();
 
 	CheckBoxMapper *Get09Mapper();
 	CheckBoxMapper *GetAZMapper();

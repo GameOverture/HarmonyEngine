@@ -81,7 +81,8 @@ SOURCES += main.cpp \
     Harmony/HarmonyConnection.cpp \
     Harmony/HarmonyWidget.cpp \
     Atlas/AtlasRepackThread.cpp \
-    Explorer/ExplorerItem.cpp
+    Explorer/ExplorerItem.cpp \
+    Shared/Properties/PropertiesUndoCmd.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -151,7 +152,8 @@ HEADERS  += \
     Harmony/HarmonyConnection.h \
     Harmony/HarmonyWidget.h \
     Atlas/AtlasRepackThread.h \
-    Explorer/ExplorerItem.h
+    Explorer/ExplorerItem.h \
+    Shared/Properties/PropertiesUndoCmd.h
 
 FORMS    += \
     MainWindow.ui \

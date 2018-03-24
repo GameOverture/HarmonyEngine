@@ -2767,8 +2767,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1413,
-            "y": 542
+            "x": 1923,
+            "y": 633
         },
         {
             "atlasGrpId": 0,
@@ -2785,8 +2785,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1923,
-            "y": 633
+            "x": 1413,
+            "y": 542
         },
         {
             "atlasGrpId": 0,
@@ -7664,7 +7664,7 @@
             "type": 1,
             "width": 512,
             "x": 704,
-            "y": 387
+            "y": 0
         },
         {
             "atlasGrpId": 0,
@@ -7682,6 +7682,60 @@
             "type": 1,
             "width": 512,
             "x": 704,
+            "y": 387
+        },
+        {
+            "atlasGrpId": 0,
+            "checksum": 568473106,
+            "cropBottom": 24,
+            "cropLeft": 0,
+            "cropRight": 24,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 25,
+            "id": 430,
+            "name": "NewFont",
+            "textureIndex": 4,
+            "type": 2,
+            "width": 25,
+            "x": 1966,
+            "y": 0
+        },
+        {
+            "atlasGrpId": 0,
+            "checksum": 568473106,
+            "cropBottom": 24,
+            "cropLeft": 0,
+            "cropRight": 24,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 25,
+            "id": 431,
+            "name": "NewFont",
+            "textureIndex": 4,
+            "type": 2,
+            "width": 25,
+            "x": 1966,
+            "y": 0
+        },
+        {
+            "atlasGrpId": 0,
+            "checksum": 568473106,
+            "cropBottom": 24,
+            "cropLeft": 0,
+            "cropRight": 24,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 25,
+            "id": 432,
+            "name": "NewFont",
+            "textureIndex": 4,
+            "type": 2,
+            "width": 25,
+            "x": 1966,
             "y": 0
         }
     ],
@@ -7706,5 +7760,5 @@
         }
     ],
     "startAtlasId": 1,
-    "startFrameId": 430
+    "startFrameId": 433
 }

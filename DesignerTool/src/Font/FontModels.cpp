@@ -148,11 +148,23 @@ float FontStateData::GetSize()
 
 FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :   IModel(itemRef),
 																	m_FontMetaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_Font, true)),
+																	m_TypeFacePropertiesModel(itemRef, 0, QVariant(0)),
 																	m_pTrueAtlasFrame(nullptr),
 																	m_pFtglAtlas(nullptr),
 																	m_pTrueAtlasPixelData(nullptr),
 																	m_uiTrueAtlasPixelDataSize(0)
 {
+	m_TypeFacePropertiesModel.AppendCategory("Atlas Info", HyGlobal::ItemColor(ITEM_Prefix));
+	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", "Dimensions", PropertiesDef(PROPERTIESTYPE_ivec2, QVariant(QPoint(0, 0))), "The required portion size needed to fit on an atlas", true);
+	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", "Used Percent", PropertiesDef(PROPERTIESTYPE_double, QVariant(0.0)), "Percentage of the maximum size dimensions used", true);
+
+	m_TypeFacePropertiesModel.AppendCategory("Uses Glyphs", HyGlobal::ItemColor(ITEM_Prefix));
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", "0-9", PropertiesDef(PROPERTIESTYPE_bool, QVariant(Qt::Checked)), "Include numerical glyphs 0-9");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", "A-Z", PropertiesDef(PROPERTIESTYPE_bool, QVariant(Qt::Checked)), "Include capital letter glyphs A-Z");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", "a-z", PropertiesDef(PROPERTIESTYPE_bool, QVariant(Qt::Checked)), "Include lowercase letter glyphs a-z");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@", PropertiesDef(PROPERTIESTYPE_bool, QVariant(Qt::Checked)), "Include common punctuation and symbol glyphs");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", "Additional glyphs", PropertiesDef(PROPERTIESTYPE_LineEdit, QVariant("")), "Include specified glyphs");
+
 	m_pChkMapper_09 = new CheckBoxMapper(this);
 	m_pChkMapper_AZ = new CheckBoxMapper(this);
 	m_pChkMapper_az = new CheckBoxMapper(this);
@@ -198,6 +210,11 @@ FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :   IModel(itemR
 QDir FontModel::GetMetaDir()
 {
 	return m_FontMetaDir;
+}
+
+PropertiesTreeModel *FontModel::GetTypefaceModel()
+{
+	return &m_TypeFacePropertiesModel;
 }
 
 CheckBoxMapper *FontModel::Get09Mapper()

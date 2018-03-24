@@ -15,7 +15,6 @@
 #include "ProjectItem.h"
 
 #include <QAbstractItemModel>
-#include <QUndoCommand>
 
 class PropertiesTreeModel : public QAbstractItemModel
 {
@@ -35,7 +34,7 @@ public:
 	ProjectItem &GetItem();
 
 	bool AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
-	bool AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip);
+	bool AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip, bool bReadOnly = false);
 
 	void RefreshProperties();
 
@@ -70,70 +69,5 @@ private:
 	void InsertItem(int iRow, PropertiesTreeItem *pItem, PropertiesTreeItem *pParentItem);
 	void InsertItems(int iRow, QList<PropertiesTreeItem *> itemList, PropertiesTreeItem *pParentItem);
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class PropertiesUndoCmd : public QUndoCommand
-{
-	PropertiesTreeModel &   m_ModelRef;
-	const int               m_iSTATE_INDEX;
-	const QVariant          m_iSUBSTATE;
-	PropertiesTreeItem &    m_TreeItemRef;
-	QModelIndex             m_Index;
-
-	QVariant                m_NewData;
-	QVariant                m_OldData;
-
-	int                     m_iRole;
-
-public:
-	PropertiesUndoCmd(PropertiesTreeModel &modelRef,
-					  int iStateIndex,
-					  const QVariant &subState,
-					  PropertiesTreeItem &treeItemRef,
-					  const QModelIndex &index,
-					  const QVariant &newData,
-					  int iRole,
-					  QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
-													m_ModelRef(modelRef),
-													m_iSTATE_INDEX(iStateIndex),
-													m_iSUBSTATE(subState),
-													m_TreeItemRef(treeItemRef),
-													m_Index(index),
-													m_NewData(newData),
-													m_OldData(m_TreeItemRef.GetData()),
-													m_iRole(iRole)
-	{
-		setText(m_TreeItemRef.GetName());
-	}
-
-	virtual ~PropertiesUndoCmd()
-	{ }
-
-	virtual void redo() override
-	{
-		m_TreeItemRef.SetData(m_NewData);
-
-		m_ModelRef.dataChanged(m_Index, m_Index, QVector<int>() << m_iRole);
-
-		if(m_TreeItemRef.GetType() == PROPERTIESTYPE_CategoryChecked && m_TreeItemRef.GetNumChildren() != 0)
-			m_ModelRef.RefreshProperties();
-
-		m_ModelRef.GetItem().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
-	}
-
-	virtual void undo() override
-	{
-		m_TreeItemRef.SetData(m_OldData);
-
-		m_ModelRef.dataChanged(m_Index, m_Index, QVector<int>() << m_iRole);
-
-		if(m_TreeItemRef.GetType() == PROPERTIESTYPE_CategoryChecked && m_TreeItemRef.GetNumChildren() != 0)
-			m_ModelRef.RefreshProperties();
-
-		m_ModelRef.GetItem().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
-	}
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // PROPERTIESTREEMODEL_H

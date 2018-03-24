@@ -77,20 +77,22 @@ struct PropertiesDef
 class PropertiesTreeItem : public IModelTreeItem
 {
 protected:
-	const QString                               m_sNAME;
-	PropertiesTreeModel *                       m_pTreeModel;
+	const QString								m_sNAME;
+	const bool									m_bREAD_ONLY;
+	PropertiesTreeModel *						m_pTreeModel;
 
-	QVariant                                    m_Data;
-	PropertiesDef                               m_DataDef;
+	QVariant									m_Data;
+	PropertiesDef								m_DataDef;
 
-	QColor                                      m_Color;
-	QString                                     m_sToolTip;
+	QColor										m_Color;
+	QString										m_sToolTip;
 
 public:
-	explicit PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip);
+	explicit PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip, bool bReadOnly);
 	virtual ~PropertiesTreeItem();
 
 	bool IsCategory() const;
+	bool IsReadOnly() const;
 
 	PropertiesType GetType() const;
 	QString GetName() const;

@@ -65,6 +65,8 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
 	static_cast<FontModel *>(m_ItemRef.GetModel())->GetSymbolsMapper()->AddCheckBoxMapping(ui->chk_symbols);
 	static_cast<FontModel *>(m_ItemRef.GetModel())->GetAdditionalSymbolsMapper()->AddLineEditMapping(ui->txtAdditionalSymbols);
 
+	ui->typefaceProperties->setModel(static_cast<FontModel *>(m_ItemRef.GetModel())->GetTypefaceModel());
+
 	// ...set models
 	FocusState(0, -1);
 }

@@ -2807,18 +2807,18 @@
                     "top": 0
                 },
                 {
-                    "bottom": 683,
-                    "checksum": 2310627120,
-                    "left": 1413,
-                    "right": 1535,
-                    "top": 542
-                },
-                {
                     "bottom": 774,
-                    "checksum": 743010674,
+                    "checksum": 2310627120,
                     "left": 1923,
                     "right": 2045,
                     "top": 633
+                },
+                {
+                    "bottom": 683,
+                    "checksum": 743010674,
+                    "left": 1413,
+                    "right": 1535,
+                    "top": 542
                 },
                 {
                     "bottom": 696,
@@ -2982,17 +2982,38 @@
                     "top": 0
                 },
                 {
-                    "bottom": 771,
+                    "bottom": 384,
                     "checksum": 741140157,
+                    "left": 704,
+                    "right": 1216,
+                    "top": 0
+                },
+                {
+                    "bottom": 771,
+                    "checksum": 2682017491,
                     "left": 704,
                     "right": 1216,
                     "top": 387
                 },
                 {
-                    "bottom": 384,
-                    "checksum": 2682017491,
-                    "left": 704,
-                    "right": 1216,
+                    "bottom": 25,
+                    "checksum": 568473106,
+                    "left": 1966,
+                    "right": 1991,
+                    "top": 0
+                },
+                {
+                    "bottom": 25,
+                    "checksum": 568473106,
+                    "left": 1966,
+                    "right": 1991,
+                    "top": 0
+                },
+                {
+                    "bottom": 25,
+                    "checksum": 568473106,
+                    "left": 1966,
+                    "right": 1991,
                     "top": 0
                 }
             ]

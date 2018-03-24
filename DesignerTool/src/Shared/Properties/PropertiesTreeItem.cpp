@@ -11,11 +11,12 @@
 #include "PropertiesTreeModel.h"
 #include "IModel.h"
 
-PropertiesTreeItem::PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip) :    m_sNAME(sName),
-																																								m_pTreeModel(pTreeModel),
-																																								m_DataDef(propertiesDef),
-																																								m_Color(color),
-																																								m_sToolTip(sToolTip)
+PropertiesTreeItem::PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip, bool bReadOnly) :    m_sNAME(sName),
+																																												m_bREAD_ONLY(bReadOnly),
+																																												m_pTreeModel(pTreeModel),
+																																												m_DataDef(propertiesDef),
+																																												m_Color(color),
+																																												m_sToolTip(sToolTip)
 {
 }
 
@@ -26,6 +27,11 @@ PropertiesTreeItem::PropertiesTreeItem(QString sName, PropertiesTreeModel *pTree
 bool PropertiesTreeItem::IsCategory() const
 {
 	return m_DataDef.eType == PROPERTIESTYPE_Category || m_DataDef.eType == PROPERTIESTYPE_CategoryChecked;
+}
+
+bool PropertiesTreeItem::IsReadOnly() const
+{
+	return m_bREAD_ONLY;
 }
 
 PropertiesType PropertiesTreeItem::GetType() const
