@@ -120,7 +120,7 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 
 glm::vec2 HyInput::GetMousePos()
 {
-	return m_ptMousePos;
+	return glm::vec2(m_ptMousePos.x, m_pMouseWindow->GetWindowSize().y - m_ptMousePos.y); // Y-axis goes up in harmony, so flip it
 }
 
 glm::vec2 HyInput::GetWorldMousePos()
