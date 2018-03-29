@@ -287,7 +287,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	float fHalfWidth = AnimGetCurFrameWidth(true) * 0.5f;
 	float fHalfHeight = AnimGetCurFrameHeight(true) * 0.5f;
 
-	m_BoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
+	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
 }
 
 /*virtual*/ void HySprite2d::DrawLoadedUpdate() /*override*/

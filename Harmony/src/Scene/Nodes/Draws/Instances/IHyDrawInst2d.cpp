@@ -22,7 +22,7 @@ IHyDrawInst2d::IHyDrawInst2d(HyType eNodeType, const char *szPrefix, const char 
 																												m_hShader(HY_UNUSED_HANDLE),
 																												m_eRenderMode(HYRENDERMODE_Unknown),
 																												m_hTextureHandle(HY_UNUSED_HANDLE),
-																												m_BoundingVolume(this)
+																												m_LocalBoundingVolume(this)
 {
 	memset(m_hPortals, HY_UNUSED_HANDLE, sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
 }
@@ -36,7 +36,7 @@ IHyDrawInst2d::IHyDrawInst2d(const IHyDrawInst2d &copyRef) :	IHyDraw2d(copyRef),
 																m_eRenderMode(copyRef.m_eRenderMode),
 																m_hTextureHandle(copyRef.m_hTextureHandle),
 																m_ShaderUniforms(copyRef.m_ShaderUniforms),
-																m_BoundingVolume(this, copyRef.m_BoundingVolume),
+																m_LocalBoundingVolume(this, copyRef.m_LocalBoundingVolume),
 																m_aabbCached(copyRef.m_aabbCached)
 {
 	memset(m_hPortals, HY_UNUSED_HANDLE, sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
@@ -76,7 +76,7 @@ const IHyDrawInst2d &IHyDrawInst2d::operator=(const IHyDrawInst2d &rhs)
 	for(uint32 i = 0; rhs.m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
 		SetPortal(IHyRenderer::FindPortal2d(rhs.m_hPortals[i]));
 
-	m_BoundingVolume = rhs.m_BoundingVolume;
+	m_LocalBoundingVolume = rhs.m_LocalBoundingVolume;
 	m_aabbCached = rhs.m_aabbCached;
 
 	if(rhs.IsLoaded())
@@ -205,15 +205,15 @@ const IHyNodeData *IHyDrawInst2d::AcquireData()
 	return m_pData;
 }
 
-const HyShape2d &IHyDrawInst2d::GetBoundingVolume()
+const HyShape2d &IHyDrawInst2d::GetLocalBoundingVolume()
 {
-	if(IsDirty(DIRTY_BoundingVolume) || m_BoundingVolume.IsValid() == false)
+	if(IsDirty(DIRTY_BoundingVolume) || m_LocalBoundingVolume.IsValid() == false)
 	{
 		CalcBoundingVolume();
 		ClearDirty(DIRTY_BoundingVolume);
 	}
 
-	return m_BoundingVolume;
+	return m_LocalBoundingVolume;
 }
 
 const b2AABB &IHyDrawInst2d::GetWorldAABB()
@@ -224,8 +224,8 @@ const b2AABB &IHyDrawInst2d::GetWorldAABB()
 		GetWorldTransform(mtxWorld);
 		float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
 
-		GetBoundingVolume(); // This will update BV if it's dirty
-		m_BoundingVolume.GetB2Shape()->ComputeAABB(&m_aabbCached, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
+		GetLocalBoundingVolume(); // This will update BV if it's dirty
+		m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_aabbCached, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
 
 		ClearDirty(DIRTY_WorldAABB);
 	}

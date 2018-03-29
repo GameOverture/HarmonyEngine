@@ -39,6 +39,13 @@ void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW)
 	vecOut.x = iX; vecOut.y = iY; vecOut.z = iZ; vecOut.w = iW;
 }
 
+bool HyTestPointAABB(const b2AABB &aabb, const glm::vec2 &pt)
+{
+	return (aabb.IsValid() &&
+			pt.x >= aabb.lowerBound.x && pt.y >= aabb.lowerBound.y &&
+			pt.x <= aabb.upperBound.x && pt.y <= aabb.upperBound.y);
+}
+
 float HyEase_Linear(float a, float b, float t)
 {
 	return ((b-a)*t)+a;

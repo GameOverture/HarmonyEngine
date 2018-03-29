@@ -53,13 +53,13 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 
 /*virtual*/ bool HyPrimitive2d::IsEnabled() const /*override*/
 {
-	return (IHyNode::IsEnabled() && m_pVertBuffer != nullptr && m_BoundingVolume.IsValid());
+	return (IHyNode::IsEnabled() && m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValid());
 }
 
 HyShape2d &HyPrimitive2d::GetShape()
 {
 	// The bounding volume in HyPrimitive2d also doubles as the actual shape and type of this primitive
-	return m_BoundingVolume;
+	return m_LocalBoundingVolume;
 }
 
 uint32 HyPrimitive2d::GetNumVerts() const
@@ -97,14 +97,14 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 /*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
 {
-	return (m_pVertBuffer != nullptr && m_BoundingVolume.IsValid());
+	return (m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValid());
 }
 
 /*virtual*/ void HyPrimitive2d::OnShapeSet(HyShape2d *pShape) /*override*/
 {
 	IHyDrawInst2d::OnShapeSet(pShape);
 
-	if(pShape == &m_BoundingVolume)
+	if(pShape == &m_LocalBoundingVolume)
 		SetData();
 }
 
@@ -144,15 +144,15 @@ void HyPrimitive2d::ClearData()
 	m_uiNumVerts = 0;
 
 	m_eRenderMode = HYRENDERMODE_Unknown;
-//	m_BoundingVolume.SetAsNothing();	
+//	m_LocalBoundingVolume.SetAsNothing();	
 	m_ShaderUniforms.Clear();
 }
 
 void HyPrimitive2d::SetData()
 {
-	b2Shape *pb2Shape = m_BoundingVolume.GetB2Shape();
+	b2Shape *pb2Shape = m_LocalBoundingVolume.GetB2Shape();
 
-	switch(m_BoundingVolume.GetType())
+	switch(m_LocalBoundingVolume.GetType())
 	{
 	case HYSHAPE_Unknown:	// Shape hasn't been set yet by user
 		break;
@@ -195,7 +195,7 @@ void HyPrimitive2d::SetData()
 	} break;
 
 	default:
-		HyLogError("HyPrimitive2d::SetData() - Unknown shape type: " << m_BoundingVolume.GetType());
+		HyLogError("HyPrimitive2d::SetData() - Unknown shape type: " << m_LocalBoundingVolume.GetType());
 	}
 }
 

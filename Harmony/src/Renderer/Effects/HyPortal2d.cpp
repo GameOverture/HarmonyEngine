@@ -87,7 +87,7 @@ void HyPortal2d::PrepareClones()
 		IHyDrawInst2d *pInstance = m_DrawInstList[i];
 
 		glm::vec2 ptCentroid;
-		pInstance->GetBoundingVolume().GetCentroid(ptCentroid);
+		pInstance->GetLocalBoundingVolume().GetCentroid(ptCentroid);
 		ptCentroid += pInstance->pos.Get();
 
 		// First test whether the instance's centroid is INSIDE either gate, which will cause it to warp
@@ -98,7 +98,7 @@ void HyPortal2d::PrepareClones()
 			pInstance->pos.Set(m_GateB.Midpoint() + v);
 
 			// Recalculate centroid
-			pInstance->GetBoundingVolume().GetCentroid(ptCentroid);
+			pInstance->GetLocalBoundingVolume().GetCentroid(ptCentroid);
 			ptCentroid += pInstance->pos.Get();
 		}
 		else if(m_GateB.GetBV()->TestPoint(m_GateB.GetTransform(), b2Vec2(ptCentroid.x, ptCentroid.y)))
@@ -108,7 +108,7 @@ void HyPortal2d::PrepareClones()
 			pInstance->pos.Set(m_GateA.Midpoint() + v);
 
 			// Recalculate centroid
-			pInstance->GetBoundingVolume().GetCentroid(ptCentroid);
+			pInstance->GetLocalBoundingVolume().GetCentroid(ptCentroid);
 			ptCentroid += pInstance->pos.Get();
 		}
 
@@ -118,7 +118,7 @@ void HyPortal2d::PrepareClones()
 		b2Transform instTransform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians));
 
 		// Then test if instance is overlapping into either gate, which will render a copy of the instance at the other gate
-		if(b2TestOverlap(m_GateA.GetBV(), 0, pInstance->GetBoundingVolume().GetB2Shape(), 0, m_GateA.GetTransform(), instTransform))
+		if(b2TestOverlap(m_GateA.GetBV(), 0, pInstance->GetLocalBoundingVolume().GetB2Shape(), 0, m_GateA.GetTransform(), instTransform))
 		{
 			glm::vec2 v = ptCentroid - m_GateA.Midpoint();
 
@@ -132,7 +132,7 @@ void HyPortal2d::PrepareClones()
 
 			m_CloneInstList[i] = pNewInst;
 		}
-		else if(b2TestOverlap(m_GateB.GetBV(), 0, pInstance->GetBoundingVolume().GetB2Shape(), 0, m_GateB.GetTransform(), instTransform))
+		else if(b2TestOverlap(m_GateB.GetBV(), 0, pInstance->GetLocalBoundingVolume().GetB2Shape(), 0, m_GateB.GetTransform(), instTransform))
 		{
 			glm::vec2 v = ptCentroid - m_GateB.Midpoint();
 

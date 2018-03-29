@@ -309,7 +309,7 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
 	{
 		bool bLeftClickDown = Hy_Input().IsMouseBtnDown(HYMOUSE_BtnLeft);
-		bool bMouseInBounds = m_pMouseInputNode->GetBoundingVolume().TestPoint(Hy_Input().GetWorldMousePos());
+		bool bMouseInBounds = HyTestPointAABB(m_pMouseInputNode->GetWorldAABB(), Hy_Input().GetWorldMousePos());
 
 		switch(m_eMouseInputState)
 		{

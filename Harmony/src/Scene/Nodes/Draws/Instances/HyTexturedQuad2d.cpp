@@ -33,7 +33,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiText
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 	m_hTextureHandle = hTextureHandle;
 
-	m_BoundingVolume.SetAsBox(m_uiRawTextureWidth * 0.5f, m_uiRawTextureHeight * 0.5f, glm::vec2(m_uiRawTextureWidth * 0.5f, m_uiRawTextureHeight * 0.5f), 0.0f);
+	m_LocalBoundingVolume.SetAsBox(m_uiRawTextureWidth * 0.5f, m_uiRawTextureHeight * 0.5f, glm::vec2(m_uiRawTextureWidth * 0.5f, m_uiRawTextureHeight * 0.5f), 0.0f);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(const HyTexturedQuad2d &copyRef) :	IHyDrawInst2d(copyRef),
@@ -88,7 +88,7 @@ void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
 	m_SrcRect.right = (fX + fWidth) / fTexWidth;
 	m_SrcRect.bottom = (fY + fHeight) / fTexHeight;
 
-	m_BoundingVolume.SetAsBox(iWidth * 0.5f, iHeight * 0.5f, glm::vec2(iWidth * 0.5f, iHeight * 0.5f), 0.0f);
+	m_LocalBoundingVolume.SetAsBox(iWidth * 0.5f, iHeight * 0.5f, glm::vec2(iWidth * 0.5f, iHeight * 0.5f), 0.0f);
 }
 
 uint32 HyTexturedQuad2d::GetAtlasIndexInGroup()

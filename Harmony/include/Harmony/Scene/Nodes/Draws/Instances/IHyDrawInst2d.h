@@ -41,7 +41,7 @@ protected:
 	HyShaderUniforms 				m_ShaderUniforms;
 	HyPortal2dHandle				m_hPortals[HY_MAX_PORTAL_HANDLES];
 
-	HyShape2d						m_BoundingVolume;
+	HyShape2d						m_LocalBoundingVolume;
 	b2AABB							m_aabbCached;
 
 public:
@@ -74,7 +74,7 @@ public:
 
 	const IHyNodeData *AcquireData();
 
-	const HyShape2d &GetBoundingVolume();
+	const HyShape2d &GetLocalBoundingVolume();
 	const b2AABB &GetWorldAABB();
 
 	// Passing nullptr will use built-in default shader

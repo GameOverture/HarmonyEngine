@@ -58,6 +58,8 @@ int32 HyHalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptP
 	return 0;
 }
 
+bool HyTestPointAABB(const b2AABB &aabb, const glm::vec2 &pt);
+
 template <typename T>
 T HyRound(T num)
 {
