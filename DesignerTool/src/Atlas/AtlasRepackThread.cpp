@@ -61,6 +61,10 @@ AtlasRepackThread::AtlasRepackThread(AtlasGrp *pAtlasGrp, QList<int> textureInde
 	int iCurrentIndex = 0;
 	for(; iCurrentIndex < iTotalNumTextures; ++iCurrentIndex)
 	{
+		float fPercComplete = (static_cast<float>(iCurrentIndex) / static_cast<float>(iTotalNumTextures));
+		fPercComplete *= 100.0f;
+		Q_EMIT LoadUpdate("Constructing Atlases", static_cast<int>(fPercComplete));
+
 		bool bFound = false;
 		for(int i = 0; i < existingTexturesInfoList.size(); ++i)
 		{

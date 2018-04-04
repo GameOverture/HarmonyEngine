@@ -54,11 +54,11 @@ public:
 
 	static MainWindow *GetInstance();   // Should only be used to set QWidget parents // TODO: Check if messageboxes even care about their parent set, if not then remove this
 
-	void SetLoading(QString sMsg);
-	void ClearLoading();
-
 	void SetHarmonyWidget(HarmonyWidget *pWidget);
 	void SetCurrentProject(Project *pProject);
+
+	static void SetLoading(QString sMsg, int iPercentComplete);
+	static void ClearLoading();
 
 	static QString EngineSrcLocation();
 

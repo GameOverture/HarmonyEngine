@@ -51,7 +51,7 @@ Harmony::Harmony(MainWindow &mainWindowRef) :  QObject(&mainWindowRef),
 	if(pProject != nullptr)
 	{
 		connect(sm_pInstance->m_pWidget, &HarmonyWidget::HarmonyWidgetReady, sm_pInstance, &Harmony::HarmonyWidgetReady);
-		sm_pInstance->m_MainWindowRef.SetLoading("Loading new Harmony instance");
+		sm_pInstance->m_MainWindowRef.SetLoading("Loading new Harmony instance", -1);
 	}
 	else
 		sm_pInstance->m_MainWindowRef.SetCurrentProject(nullptr);

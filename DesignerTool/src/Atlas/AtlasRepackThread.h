@@ -33,6 +33,7 @@ public:
 	void ConstructAtlasTexture(int iPackerBinIndex, int iActualTextureIndex);
 
 Q_SIGNALS:
+	void LoadUpdate(QString sMsg, int iPercComplete);
 	void RepackIsFinished();
 };
 

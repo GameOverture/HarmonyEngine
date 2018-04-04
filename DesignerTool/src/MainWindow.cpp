@@ -181,6 +181,8 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	}
 
 	m_LoadingMsg.setText("Ready");
+	m_LoadingBar.setRange(0, 100);
+	m_LoadingBar.reset();
 	statusBar()->addWidget(&m_LoadingMsg);
 	statusBar()->addWidget(&m_LoadingBar);
 
@@ -204,36 +206,6 @@ MainWindow::~MainWindow()
 /*static*/ MainWindow *MainWindow::GetInstance()
 {
 	return sm_pInstance;
-}
-
-void MainWindow::SetLoading(QString sMsg)
-{
-	m_LoadingMsg.setText(sMsg);
-
-	for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
-	{
-		WaitingSpinnerWidget *pLoadingSpinner = m_LoadingSpinnerList[i];
-
-		if(pLoadingSpinner->isSpinning() == false)
-			pLoadingSpinner->start();
-	}
-
-	ui->mainToolBar->setEnabled(false);
-	ui->menuBar->setEnabled(false);
-}
-
-void MainWindow::ClearLoading()
-{
-	statusBar()->showMessage("Ready");
-
-	for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
-	{
-		WaitingSpinnerWidget *pLoadingSpinner = m_LoadingSpinnerList[i];
-		pLoadingSpinner->stop();
-	}
-
-	ui->mainToolBar->setEnabled(true);
-	ui->menuBar->setEnabled(true);
 }
 
 void MainWindow::SetHarmonyWidget(HarmonyWidget *pWidget)
@@ -273,6 +245,41 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	ui->dockWidgetAudio->setWidget(pProject->GetAudioWidget());
 	ui->dockWidgetAudio->widget()->show();
+}
+
+/*static*/ void MainWindow::SetLoading(QString sMsg, int iPercentComplete)
+{
+	sm_pInstance->statusBar()->clearMessage();
+
+	sm_pInstance->m_LoadingMsg.setText(sMsg);
+
+	if(iPercentComplete >= 0)
+	{
+		sm_pInstance->m_LoadingBar.setVisible(true);
+		sm_pInstance->m_LoadingBar.setValue(iPercentComplete);
+	}
+	else
+		sm_pInstance->m_LoadingBar.setVisible(false);
+
+	for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
+	{
+		if(sm_pInstance->m_LoadingSpinnerList[i]->isSpinning() == false)
+			sm_pInstance->m_LoadingSpinnerList[i]->start();
+	}
+
+	sm_pInstance->ui->mainToolBar->setEnabled(false);
+	sm_pInstance->ui->menuBar->setEnabled(false);
+}
+
+/*static*/ void MainWindow::ClearLoading()
+{
+	sm_pInstance->statusBar()->showMessage("Ready");
+
+	for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
+		sm_pInstance->m_LoadingSpinnerList[i]->stop();
+
+	sm_pInstance->ui->mainToolBar->setEnabled(true);
+	sm_pInstance->ui->menuBar->setEnabled(true);
 }
 
 /*static*/ QString MainWindow::EngineSrcLocation()

@@ -149,6 +149,7 @@ protected:
 	void SaveAndReloadHarmony();
 
 private Q_SLOTS:
+	void OnLoadUpdate(QString sMsg, int iPercComplete);
 	void OnRepackFinished();
 };
 

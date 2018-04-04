@@ -856,7 +856,10 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 
 	AtlasRepackThread *pWorkerThread = new AtlasRepackThread(m_AtlasGrpList[uiAtlasGrpIndex], textureIndexList, newFramesList, m_MetaDir);
 	connect(pWorkerThread, &AtlasRepackThread::finished, pWorkerThread, &QObject::deleteLater);
+	connect(pWorkerThread, &AtlasRepackThread::LoadUpdate, this, &AtlasModel::OnLoadUpdate);
 	connect(pWorkerThread, &AtlasRepackThread::RepackIsFinished, this, &AtlasModel::OnRepackFinished);
+
+	MainWindow::SetLoading("Repacking Atlases", 0);
 	pWorkerThread->start();
 }
 
@@ -900,6 +903,10 @@ void AtlasModel::SaveAndReloadHarmony()
 	HyGuiLog("Atlas Refresh finished", LOGTYPE_Normal);
 }
 
+/*slot*/ void AtlasModel::OnLoadUpdate(QString sMsg, int iPercComplete)
+{
+	MainWindow::SetLoading(sMsg, iPercComplete);
+}
 
 /*slot*/ void AtlasModel::OnRepackFinished()
 {
