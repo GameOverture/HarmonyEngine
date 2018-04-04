@@ -12,6 +12,7 @@
 #include "Harmony.h"
 #include "Project.h"
 #include "AtlasWidget.h"
+#include "AtlasRepackThread.h"
 #include "MainWindow.h"
 #include "Global.h"
 #include "DlgAtlasGroupSettings.h"
@@ -21,8 +22,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QPainter>
-#include <QImageWriter>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void AtlasModel::FrameLookup::AddLookup(AtlasFrame *pFrame)
@@ -82,7 +81,7 @@ bool AtlasModel::FrameLookup::DoesImageExist(quint32 uiChecksum)
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AtlasModel::AtlasModel(Project *pProjOwner) :   m_pProjOwner(pProjOwner),
+AtlasModel::AtlasModel(Project *pProjOwner) :	m_pProjOwner(pProjOwner),
 												m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true)),
 												m_RootDataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true))
 {
@@ -284,6 +283,11 @@ void AtlasModel::StashTreeWidgets(QList<AtlasTreeItem *> treeItemList)
 QList<AtlasTreeItem *> AtlasModel::GetTopLevelTreeItemList()
 {
 	return m_TopLevelTreeItemList;
+}
+
+int AtlasModel::GetNumTextures(uint uiAtlasGrpIndex)
+{
+	return m_AtlasGrpList[uiAtlasGrpIndex]->GetExistingTextureInfoList().size();
 }
 
 QSize AtlasModel::GetAtlasDimensions(uint uiAtlasGrpIndex)
@@ -813,14 +817,9 @@ quint32 AtlasModel::GetAtlasGrpIdFromAtlasGrpIndex(uint uiAtlasGrpIndex)
 	return m_AtlasGrpList[uiAtlasGrpIndex]->GetId();
 }
 
-QFileInfoList AtlasModel::GetExistingTextureInfoList(uint uiAtlasGrpIndex)
-{
-	return m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-}
-
 void AtlasModel::RepackAll(uint uiAtlasGrpIndex)
 {
-	int iNumTotalTextures = GetExistingTextureInfoList(uiAtlasGrpIndex).size();
+	int iNumTotalTextures = m_AtlasGrpList[uiAtlasGrpIndex]->GetExistingTextureInfoList().size();
 	
 	QSet<int> textureIndexSet;
 	for(int i = 0; i < iNumTotalTextures; ++i)
@@ -829,20 +828,13 @@ void AtlasModel::RepackAll(uint uiAtlasGrpIndex)
 	if(textureIndexSet.empty() == false)
 		Repack(uiAtlasGrpIndex, textureIndexSet, QSet<AtlasFrame *>());
 	else
-		Refresh();
+		SaveAndReloadHarmony();
 }
 
 void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
 {
-	// TODO: Thread this
-//    AtlasRepackThread *pWorkerThread = new AtlasRepackThread(sm_pInstance->m_pCurRenderer, sm_pInstance);
-//    connect(pWorkerThread, &AtlasRepackThread::finished, pWorkerThread, &QObject::deleteLater);
-//    connect(pWorkerThread, &AtlasRepackThread::RepackIsFinished, sm_pInstance, &AtlasModel::OnRepackFinished);
-//    pWorkerThread->start();
-
-
 	// Always repack the last texture to ensure it gets filled as much as it can
-	QFileInfoList existingTexturesInfoList = GetExistingTextureInfoList(uiAtlasGrpIndex);
+	QFileInfoList existingTexturesInfoList = m_AtlasGrpList[uiAtlasGrpIndex]->GetExistingTextureInfoList();
 	for(int i = HyClamp(existingTexturesInfoList.size() - 1, 0, existingTexturesInfoList.size()); i < existingTexturesInfoList.size(); ++i)
 		repackTexIndicesSet.insert(i);
 
@@ -861,304 +853,11 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 
 	QList<AtlasFrame *>newFramesList = newFramesSet.toList();
 
-	// Repack the affected frames and determine how many textures this repack took
-	m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.clear();
-	for(int i = 0; i < newFramesList.size(); ++i)
-	{
-		m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.addItem(newFramesList[i]->GetSize(),
-														  newFramesList[i]->GetCrop(),
-														  newFramesList[i]->GetImageChecksum(),
-														  newFramesList[i],
-														  m_MetaDir.absoluteFilePath(newFramesList[i]->ConstructImageFileName()));
-	}
-	m_AtlasGrpList[uiAtlasGrpIndex]->SetPackerSettings();
-	m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.pack(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["cmbHeuristic"].toInt(),
-												   m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbTextureWidth"].toInt(),
-												   m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbTextureHeight"].toInt());
 
-	// Subtract '1' from the number of new textures because we want to ensure the last generated (and likely least filled) texture is last
-	int iNumNewTextures = m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.bins.size() - 1;
-
-	// Delete the old textures
-	for(int i = 0; i < textureIndexList.size(); ++i)
-	{
-		QFile::remove(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
-		QFile::remove(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".dds"));
-	}
-
-	// Regrab 'existingTexturesInfoList' after deleting obsolete textures
-	existingTexturesInfoList = GetExistingTextureInfoList(uiAtlasGrpIndex);
-
-	// Using our stock of newly generated textures, fill in any gaps in the texture array. If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
-	int iTotalNumTextures = iNumNewTextures + existingTexturesInfoList.size();
-
-	int iNumNewTexturesUsed = 0;
-	int iCurrentIndex = 0;
-	for(; iCurrentIndex < iTotalNumTextures; ++iCurrentIndex)
-	{
-		bool bFound = false;
-		for(int i = 0; i < existingTexturesInfoList.size(); ++i)
-		{
-			if(existingTexturesInfoList[i].baseName().toInt() == iCurrentIndex)
-			{
-				bFound = true;
-				break;
-			}
-		}
-
-		if(bFound)
-			continue;
-
-		if(iNumNewTexturesUsed < iNumNewTextures)
-		{
-			ConstructAtlasTexture(uiAtlasGrpIndex, iNumNewTexturesUsed, iCurrentIndex);
-			iNumNewTexturesUsed++;
-		}
-		else
-		{
-			// There aren't enough new textures to fill all the gaps in indices. Find the next existing texture and assign it to iCurrentIndex
-			bool bHandled = false;
-			int iNextAvailableFoundIndex = iCurrentIndex;
-			do
-			{
-				++iNextAvailableFoundIndex;
-				for(int i = 0; i < existingTexturesInfoList.size(); ++i)
-				{
-					int iExistingTextureIndex = existingTexturesInfoList[i].baseName().toInt();
-
-					if(iExistingTextureIndex == iNextAvailableFoundIndex)
-					{
-						// Texture found, start migrating its frames
-						for(int j = 0; j < atlasGrpFrameListRef.size(); ++j)
-						{
-							if(atlasGrpFrameListRef[j]->GetTextureIndex() == iExistingTextureIndex)
-								atlasGrpFrameListRef[j]->UpdateInfoFromPacker(iCurrentIndex, atlasGrpFrameListRef[j]->GetX(), atlasGrpFrameListRef[j]->GetY());
-						}
-
-						// Rename the texture file to be the new index
-						QFile::rename(existingTexturesInfoList[i].absoluteFilePath(), m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iCurrentIndex) % "." % existingTexturesInfoList[i].completeSuffix()));
-
-						// Regrab 'existingTexturesInfoList' after renaming a texture
-						existingTexturesInfoList = GetExistingTextureInfoList(uiAtlasGrpIndex);
-
-						bHandled = true;
-						break;
-					}
-				}
-			}
-			while(bHandled == false);
-		}
-	}
-
-	// Place the last generated texture at the end of the array
-	if(m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.bins.empty() == false)
-		ConstructAtlasTexture(uiAtlasGrpIndex, m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.bins.size() - 1, iCurrentIndex);
-	
-	// Assign all the duplicate frames
-	for(int i = 0; i < m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.images.size(); ++i)
-	{
-		inputImage &imgInfoRef = m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.images[i];
-		if(imgInfoRef.duplicateId != nullptr)
-		{
-			AtlasFrame *pFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.id);
-			AtlasFrame *pDupFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.duplicateId);
-			
-			pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(), pDupFrame->GetX(), pDupFrame->GetY());
-		}
-	}
-
-	Refresh();
-}
-
-void AtlasModel::ConstructAtlasTexture(uint uiAtlasGrpIndex, int iPackerBinIndex, int iActualTextureIndex)
-{
-	if(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbTextureWidth"].toInt() != m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.bins[iPackerBinIndex].width() ||
-	   m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbTextureHeight"].toInt() != m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.bins[iPackerBinIndex].height())
-	{
-		HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimensions", LOGTYPE_Error);
-	}
-
-	QImage newTexture(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbTextureWidth"].toInt(), m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbTextureHeight"].toInt(), QImage::Format_ARGB32);
-	newTexture.fill(Qt::transparent);
-
-	QPainter p(&newTexture);
-
-	// Iterate through the images that were packed, and update their corresponding AtlasFrame. Then draw them to the blank textures
-	for(int i = 0; i < m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.images.size(); ++i)
-	{
-		inputImage &imgInfoRef = m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.images[i];
-		AtlasFrame *pFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.id);
-		bool bValidToDraw = true;
-
-		if(imgInfoRef.pos.x() == 999999)    // This is scriptum image packer's (dumb) indication of an invalid image...
-		{
-			pFrame->UpdateInfoFromPacker(-1, -1, -1);
-			bValidToDraw = false;
-		}
-		else
-			pFrame->ClearError(ATLASFRAMEERROR_CouldNotPack);
-
-		if(imgInfoRef.duplicateId != nullptr)
-			bValidToDraw = false;
-
-		if(imgInfoRef.textureId != iPackerBinIndex)
-			bValidToDraw = false;
-
-		if(bValidToDraw == false)
-			continue;
-
-		pFrame->UpdateInfoFromPacker(iActualTextureIndex,
-									 imgInfoRef.pos.x() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.border.l,
-									 imgInfoRef.pos.y() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.border.t);
-
-		QImage imgFrame(imgInfoRef.path);
-
-		QSize size;
-		QRect crop;
-		if(!m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.cropThreshold)
-		{
-			size = imgInfoRef.size;
-			crop = QRect(0, 0, size.width(), size.height());
-		}
-		else
-		{
-			size = imgInfoRef.crop.size();
-			crop = imgInfoRef.crop;
-		}
-
-//        if(imgInfoRef.rotated)
-//        {
-//            QTransform rotateTransform;
-//            rotateTransform.rotate(90);
-//            imgFrame = imgFrame.transformed(rotateTransform);
-
-//            size.transpose();
-//            crop = QRect(imgInfoRef.size.height() - crop.y() - crop.height(),
-//                         crop.x(), crop.height(), crop.width());
-//        }
-
-		QPoint pos(pFrame->GetX(), pFrame->GetY());
-    /*	if(m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude)
-		{
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			QColor color1 = QColor::fromRgba(imgFrame.pixel(crop.x(), crop.y()));
-			p.setPen(color1);
-			p.setBrush(color1);
-			if(m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude == 1)
-				p.drawPoint(QPoint(pos.x(), pos.y()));
-			else
-				p.drawRect(QRect(pos.x(), pos.y(), m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude - 1, m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude - 1));
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			QColor color2 = QColor::fromRgba(imgFrame.pixel(crop.x(), crop.y() + crop.height() - 1));
-			p.setPen(color2);
-			p.setBrush(color2);
-			if(m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude == 1)
-				p.drawPoint(QPoint(pos.x(), pos.y() + crop.height() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude));
-			else
-				p.drawRect(QRect(pos.x(), pos.y() + crop.height() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude - 1, m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude - 1));
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			QColor color3 = QColor::fromRgba(imgFrame.pixel(crop.x() + crop.width() - 1, crop.y()));
-			p.setPen(color3);
-			p.setBrush(color3);
-			if(m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude == 1)
-				p.drawPoint(QPoint(pos.x() + crop.width() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, pos.y()));
-			else
-				p.drawRect(QRect(pos.x() + crop.width() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, pos.y(), m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude - 1, m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude - 1));
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			QColor color4 = QColor::fromRgba(imgFrame.pixel(crop.x() + crop.width() - 1, crop.y() + crop.height() - 1));
-			p.setPen(color4);
-			p.setBrush(color4);
-			if(m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude == 1)
-				p.drawPoint(QPoint(pos.x() + crop.width() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, pos.y() + crop.height() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude));
-			else
-				p.drawRect(QRect(pos.x() + crop.width() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, pos.y() + crop.height() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude - 1, m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude - 1));
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			p.drawImage(QRect(pos.x(), pos.y() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, crop.height()), imgFrame, QRect(crop.x(), crop.y(), 1, crop.height()));
-			p.drawImage(QRect(pos.x() + crop.width() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, pos.y() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, crop.height()), imgFrame, QRect(crop.x() + crop.width() - 1, crop.y(), 1, crop.height()));
-			p.drawImage(QRect(pos.x() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, pos.y(), crop.width(), m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude), imgFrame, QRect(crop.x(), crop.y(), crop.width(), 1));
-			p.drawImage(QRect(pos.x() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, pos.y() + crop.height() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, crop.width(), m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude), imgFrame, QRect(crop.x(), crop.y() + crop.height() - 1, crop.width(), 1));
-
-			p.drawImage(pos.x() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, pos.y() + m_AtlasGrpList[uiAtlasGrpIndex]->m_Packer.extrude, imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
-		}
-        else*/
-			p.drawImage(pos.x(), pos.y(), imgFrame, crop.x(), crop.y(), crop.width(), crop.height());
-	}
-
-	QImage *pTexture = static_cast<QImage *>(p.device());
-	HyTextureFormat eTextureType = static_cast<HyTextureFormat>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
-	
-	switch(eTextureType)
-	{
-		case HYTEXTURE_R8G8B8A8: {
-			if(false == pTexture->save(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png"))) {
-				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
-			}
-		} break;
-	
-		case HYTEXTURE_DTX5: {
-			QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGBA8888);
-			if(0 == SOIL_save_image_quality(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
-											SOIL_SAVE_TYPE_DDS,
-											imgProperlyFormatted.width(),
-											imgProperlyFormatted.height(),
-											4,
-											imgProperlyFormatted.bits(),
-											0))
-			{
-				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DTX5 atlas", LOGTYPE_Error);
-			}
-		} break;
-		
-		case HYTEXTURE_RGB_DTX1: {
-			QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGB888);
-			if(0 == SOIL_save_image_quality(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
-											SOIL_SAVE_TYPE_DDS,
-											imgProperlyFormatted.width(),
-											imgProperlyFormatted.height(),
-											3,
-											imgProperlyFormatted.bits(),
-											0))
-			{
-				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a RGB DTX1 atlas", LOGTYPE_Error);
-			}
-		} break;
-		
-		case HYTEXTURE_RGBA_DTX1: {
-			QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGBA8888);
-			if(0 == SOIL_save_image_quality(m_AtlasGrpList[uiAtlasGrpIndex]->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
-											SOIL_SAVE_TYPE_DDS,
-											imgProperlyFormatted.width(),
-											imgProperlyFormatted.height(),
-											4,
-											imgProperlyFormatted.bits(),
-											0))
-			{
-				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a RGBA DTX1 atlas", LOGTYPE_Error);
-			}
-		} break;
-		
-		default: {
-			HyGuiLog("AtlasModel::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(eTextureType), LOGTYPE_Error);
-		} break;
-	}
-}
-
-void AtlasModel::Refresh()
-{
-	WriteMetaSettings();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
-	SaveData();
-
-	// Reload Harmony
-	Harmony::Reload(m_pProjOwner);
-
-//    ui->lcdTexWidth->display(m_dlgSettings.TextureWidth());
-//    ui->lcdTexHeight->display(m_dlgSettings.TextureHeight());
-
-	HyGuiLog("Atlas Refresh finished", LOGTYPE_Normal);
+	AtlasRepackThread *pWorkerThread = new AtlasRepackThread(m_AtlasGrpList[uiAtlasGrpIndex], textureIndexList, newFramesList, m_MetaDir);
+	connect(pWorkerThread, &AtlasRepackThread::finished, pWorkerThread, &QObject::deleteLater);
+	connect(pWorkerThread, &AtlasRepackThread::RepackIsFinished, this, &AtlasModel::OnRepackFinished);
+	pWorkerThread->start();
 }
 
 /*virtual*/ int AtlasModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
@@ -1187,6 +886,22 @@ void AtlasModel::Refresh()
 	return QVariant();
 }
 
+void AtlasModel::SaveAndReloadHarmony()
+{
+	WriteMetaSettings();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)
+	SaveData();
+
+	// Reload Harmony
+	Harmony::Reload(m_pProjOwner);
+
+	HyGuiLog("Atlas Refresh finished", LOGTYPE_Normal);
+}
+
+
 /*slot*/ void AtlasModel::OnRepackFinished()
 {
+	SaveAndReloadHarmony();
 }

@@ -158,7 +158,7 @@ void AtlasWidget::RefreshInfo()
 {
 	uint uiAtlasGrpIndex = ui->cmbAtlasGroups->currentIndex();
 	
-	ui->lblNumTextures->setText(QString::number(m_pModel->GetExistingTextureInfoList(uiAtlasGrpIndex).size()));
+	ui->lblNumTextures->setText(QString::number(m_pModel->GetNumTextures(uiAtlasGrpIndex)));
 	ui->lblTexDimensions->setText("(" % QString::number(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).width()) % "x" % QString::number(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).height()) % ")");
 	ui->lblTexType->setText(HyGlobal::AtlasTextureTypeString(m_pModel->GetAtlasTextureType(uiAtlasGrpIndex)));
 	
