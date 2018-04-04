@@ -124,7 +124,7 @@ public:
 
 	void SaveData();
 	
-	void CreateNewAtlasGrp(QString sName);
+	uint CreateNewAtlasGrp(QString sName);
 	void RemoveAtlasGrp(quint32 uiAtlasGrpId);
 
 	uint GetAtlasGrpIndexFromAtlasGrpId(quint32 uiAtlasGrpId);

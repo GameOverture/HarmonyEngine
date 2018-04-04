@@ -7757,8 +7757,26 @@
             "sbTextureWidth": 2048,
             "textureType": 0,
             "txtName": "Default"
+        },
+        {
+            "atlasGrpId": 1,
+            "chkAutosize": true,
+            "chkMerge": true,
+            "chkSquare": true,
+            "cmbHeuristic": 1,
+            "cmbSortOrder": 0,
+            "extrude": 1,
+            "minFillRate": 80,
+            "sbFrameMarginBottom": 1,
+            "sbFrameMarginLeft": 0,
+            "sbFrameMarginRight": 1,
+            "sbFrameMarginTop": 0,
+            "sbTextureHeight": 2048,
+            "sbTextureWidth": 2048,
+            "textureType": 0,
+            "txtName": "Compressed"
         }
     ],
-    "startAtlasId": 1,
+    "startAtlasId": 2,
     "startFrameId": 433
 }

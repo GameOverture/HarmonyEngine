@@ -737,7 +737,7 @@ void AtlasModel::SaveData()
 //    atlasObjOut.insert("textures", textureArray);
 //}
 
-void AtlasModel::CreateNewAtlasGrp(QString sName)
+uint AtlasModel::CreateNewAtlasGrp(QString sName)
 {
 	m_RootDataDir.mkdir(HyGlobal::MakeFileNameFromCounter(m_uiNextAtlasId));
 	
@@ -752,6 +752,8 @@ void AtlasModel::CreateNewAtlasGrp(QString sName)
 	
 	m_uiNextAtlasId++;
 	WriteMetaSettings();
+
+	return static_cast<uint>(m_AtlasGrpList.size() - 1);
 }
 
 void AtlasModel::RemoveAtlasGrp(quint32 uiAtlasGrpId)

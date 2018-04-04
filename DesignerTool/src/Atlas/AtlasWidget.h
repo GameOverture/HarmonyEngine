@@ -74,7 +74,7 @@ public:
 
 	void StashTreeWidgets();
 	
-	void RefreshLcds();
+	void RefreshInfo();
 	
 protected:
 	virtual void enterEvent(QEvent *pEvent) override;
@@ -96,6 +96,8 @@ private Q_SLOTS:
 	
 	void on_actionAddGroup_triggered();
 
+	void on_actionGroupSettings_triggered();
+
 	void on_actionRemoveGroup_triggered();
 	
 	void on_actionAtlasGrpTransfer_triggered(QAction *pAction);
@@ -105,8 +107,6 @@ private Q_SLOTS:
 	void on_actionImportDirectory_triggered();
 
 	void on_actionAddFilter_triggered();
-
-	void on_actionGroupSettings_triggered();
 
 private:
 	Ui::AtlasWidget *ui;

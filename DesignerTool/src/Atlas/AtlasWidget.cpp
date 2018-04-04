@@ -109,7 +109,7 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *pa
 	ui->atlasList->setSortingEnabled(true);
 	ui->atlasList->sortItems(0, Qt::AscendingOrder);
 
-	RefreshLcds();
+	RefreshInfo();
 
 	ui->atlasList->collapseAll();
 
@@ -154,7 +154,7 @@ void AtlasWidget::StashTreeWidgets()
 	m_pModel->StashTreeWidgets(stashedTreeItemList);
 }
 
-void AtlasWidget::RefreshLcds()
+void AtlasWidget::RefreshInfo()
 {
 	uint uiAtlasGrpIndex = ui->cmbAtlasGroups->currentIndex();
 	
@@ -242,7 +242,7 @@ void AtlasWidget::on_actionDeleteImages_triggered()
 		delete selectedFilterList[i];
 	
 	m_pModel->WriteMetaSettings();
-	RefreshLcds();
+	RefreshInfo();
 }
 
 void AtlasWidget::on_actionReplaceImages_triggered()
@@ -347,7 +347,7 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 			m_pModel->Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
 	}
 	
-	RefreshLcds();
+	RefreshInfo();
 	
 	// Resave all affected items that had a replaced atlas frame
 	for(int i = 0; i < affectedItemList.size(); ++i)
@@ -481,7 +481,7 @@ void AtlasWidget::on_actionRename_triggered()
 
 void AtlasWidget::on_cmbAtlasGroups_currentIndexChanged(int index)
 {
-	RefreshLcds();
+	RefreshInfo();
 }
 
 void AtlasWidget::on_actionAddGroup_triggered()
@@ -489,9 +489,34 @@ void AtlasWidget::on_actionAddGroup_triggered()
 	DlgInputName *pDlg = new DlgInputName("Creating New Atlas Group", "NewAtlasGroup");
 	
 	if(pDlg->exec() == QDialog::Accepted)
-		m_pModel->CreateNewAtlasGrp(pDlg->GetName());
+	{
+		ui->cmbAtlasGroups->setCurrentIndex(m_pModel->CreateNewAtlasGrp(pDlg->GetName()));
+		on_actionGroupSettings_triggered();
+	}
 	
 	delete pDlg;
+}
+
+void AtlasWidget::on_actionGroupSettings_triggered()
+{
+	bool bAtlasGrpHasImages = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex()).size() > 0;
+
+	DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bAtlasGrpHasImages, m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
+	if(QDialog::Accepted == pDlg->exec())
+	{
+		QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
+		pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
+
+		m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
+
+		if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
+			m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
+		else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
+			m_pModel->WriteMetaSettings();
+	}
+
+	delete pDlg;
+	RefreshInfo();
 }
 
 void AtlasWidget::on_actionRemoveGroup_triggered()
@@ -539,7 +564,7 @@ void AtlasWidget::on_actionAtlasGrpTransfer_triggered(QAction *pAction)
 	// Repack new affected atlas group
 	m_pModel->Repack(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(uiNewAtlasGrpId), QSet<int>(), framesGoingToNewAtlasGrpSet);
 	
-	RefreshLcds();
+	RefreshInfo();
 }
 
 void AtlasWidget::on_actionImportImages_triggered()
@@ -578,7 +603,7 @@ void AtlasWidget::on_actionImportImages_triggered()
 						 m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage, correspondingParentList));
 	}
 
-	RefreshLcds();
+	RefreshInfo();
 }
 
 void AtlasWidget::on_actionImportDirectory_triggered()
@@ -648,7 +673,7 @@ void AtlasWidget::on_actionImportDirectory_triggered()
 						 m_pModel->ImportImages(sImportImgList, m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex()), ITEM_AtlasImage, correspondingParentList));
 	}
 
-	RefreshLcds();
+	RefreshInfo();
 }
 
 void AtlasWidget::on_actionAddFilter_triggered()
@@ -680,24 +705,3 @@ void AtlasWidget::on_actionAddFilter_triggered()
 	delete pDlg;
 }
 
-void AtlasWidget::on_actionGroupSettings_triggered()
-{
-	bool bAtlasGrpHasImages = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex()).size() > 0;
-
-	DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bAtlasGrpHasImages, m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
-	if(QDialog::Accepted == pDlg->exec())
-	{
-		QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
-		pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
-
-		m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
-
-		if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
-			m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
-		else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
-			m_pModel->WriteMetaSettings();
-	}
-
-	delete pDlg;
-	RefreshLcds();
-}
