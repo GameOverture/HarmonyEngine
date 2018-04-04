@@ -1147,7 +1147,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1734,
+            "x": 1219,
             "y": 0
         },
         {
@@ -1165,7 +1165,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1850,
+            "x": 1335,
             "y": 0
         },
         {
@@ -2209,7 +2209,7 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1734,
+            "x": 1219,
             "y": 0
         },
         {
@@ -2767,8 +2767,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1923,
-            "y": 633
+            "x": 1884,
+            "y": 314
         },
         {
             "atlasGrpId": 0,
@@ -2785,8 +2785,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1413,
-            "y": 542
+            "x": 1326,
+            "y": 322
         },
         {
             "atlasGrpId": 0,
@@ -2857,8 +2857,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1219,
-            "y": 547
+            "x": 1914,
+            "y": 160
         },
         {
             "atlasGrpId": 0,
@@ -2875,8 +2875,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1745,
-            "y": 325
+            "x": 1219,
+            "y": 168
         },
         {
             "atlasGrpId": 0,
@@ -2893,8 +2893,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1900,
-            "y": 167
+            "x": 1617,
+            "y": 156
         },
         {
             "atlasGrpId": 0,
@@ -2911,8 +2911,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1219,
-            "y": 387
+            "x": 1783,
+            "y": 0
         },
         {
             "atlasGrpId": 0,
@@ -5467,8 +5467,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1842,
-            "y": 777
+            "x": 1706,
+            "y": 466
         },
         {
             "atlasGrpId": 0,
@@ -5485,8 +5485,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1728,
-            "y": 775
+            "x": 1819,
+            "y": 466
         },
         {
             "atlasGrpId": 0,
@@ -5503,8 +5503,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1613,
-            "y": 774
+            "x": 1933,
+            "y": 458
         },
         {
             "atlasGrpId": 0,
@@ -5521,8 +5521,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1497,
-            "y": 693
+            "x": 1073,
+            "y": 387
         },
         {
             "atlasGrpId": 0,
@@ -5539,8 +5539,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1679,
-            "y": 632
+            "x": 830,
+            "y": 387
         },
         {
             "atlasGrpId": 0,
@@ -5611,8 +5611,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1676,
-            "y": 479
+            "x": 1451,
+            "y": 312
         },
         {
             "atlasGrpId": 0,
@@ -5629,8 +5629,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1882,
-            "y": 325
+            "x": 1617,
+            "y": 0
         },
         {
             "atlasGrpId": 0,
@@ -5989,8 +5989,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 813,
-            "y": 774
+            "x": 1356,
+            "y": 167
         },
         {
             "atlasGrpId": 0,
@@ -6133,8 +6133,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1538,
-            "y": 541
+            "x": 1746,
+            "y": 314
         },
         {
             "atlasGrpId": 0,
@@ -6151,8 +6151,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1524,
-            "y": 387
+            "x": 1762,
+            "y": 160
         },
         {
             "atlasGrpId": 0,
@@ -6169,8 +6169,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1734,
-            "y": 168
+            "x": 1451,
+            "y": 0
         },
         {
             "atlasGrpId": 0,
@@ -7105,8 +7105,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1249,
-            "y": 699
+            "x": 1189,
+            "y": 387
         },
         {
             "atlasGrpId": 0,
@@ -7123,8 +7123,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1372,
-            "y": 686
+            "x": 948,
+            "y": 387
         },
         {
             "atlasGrpId": 0,
@@ -7141,8 +7141,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1797,
-            "y": 633
+            "x": 704,
+            "y": 387
         },
         {
             "atlasGrpId": 0,
@@ -7213,8 +7213,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1828,
-            "y": 481
+            "x": 1603,
+            "y": 314
         },
         {
             "atlasGrpId": 0,
@@ -7231,8 +7231,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 1372,
-            "y": 387
+            "x": 1465,
+            "y": 157
         },
         {
             "atlasGrpId": 0,
@@ -7609,8 +7609,8 @@
             "textureIndex": 4,
             "type": 1,
             "width": 220,
-            "x": 704,
-            "y": 774
+            "x": 1936,
+            "y": 0
         },
         {
             "atlasGrpId": 0,
@@ -7632,42 +7632,6 @@
         },
         {
             "atlasGrpId": 0,
-            "checksum": 3590906954,
-            "cropBottom": 383,
-            "cropLeft": 0,
-            "cropRight": 511,
-            "cropTop": 0,
-            "errors": 0,
-            "filter": "",
-            "height": 384,
-            "id": 427,
-            "name": "Chrysanthemum",
-            "textureIndex": 4,
-            "type": 1,
-            "width": 512,
-            "x": 1219,
-            "y": 0
-        },
-        {
-            "atlasGrpId": 0,
-            "checksum": 741140157,
-            "cropBottom": 383,
-            "cropLeft": 0,
-            "cropRight": 511,
-            "cropTop": 0,
-            "errors": 0,
-            "filter": "",
-            "height": 384,
-            "id": 428,
-            "name": "Desert",
-            "textureIndex": 4,
-            "type": 1,
-            "width": 512,
-            "x": 704,
-            "y": 0
-        },
-        {
-            "atlasGrpId": 0,
             "checksum": 2682017491,
             "cropBottom": 383,
             "cropLeft": 0,
@@ -7682,7 +7646,7 @@
             "type": 1,
             "width": 512,
             "x": 704,
-            "y": 387
+            "y": 0
         },
         {
             "atlasGrpId": 0,
@@ -7699,8 +7663,8 @@
             "textureIndex": 4,
             "type": 2,
             "width": 25,
-            "x": 1966,
-            "y": 0
+            "x": 1936,
+            "y": 122
         },
         {
             "atlasGrpId": 0,
@@ -7717,8 +7681,8 @@
             "textureIndex": 4,
             "type": 2,
             "width": 25,
-            "x": 1966,
-            "y": 0
+            "x": 1936,
+            "y": 122
         },
         {
             "atlasGrpId": 0,
@@ -7735,7 +7699,43 @@
             "textureIndex": 4,
             "type": 2,
             "width": 25,
-            "x": 1966,
+            "x": 1936,
+            "y": 122
+        },
+        {
+            "atlasGrpId": 6,
+            "checksum": 3590906954,
+            "cropBottom": 383,
+            "cropLeft": 0,
+            "cropRight": 511,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 384,
+            "id": 427,
+            "name": "Chrysanthemum",
+            "textureIndex": 0,
+            "type": 1,
+            "width": 512,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "atlasGrpId": 7,
+            "checksum": 741140157,
+            "cropBottom": 383,
+            "cropLeft": 0,
+            "cropRight": 511,
+            "cropTop": 0,
+            "errors": 0,
+            "filter": "",
+            "height": 384,
+            "id": 428,
+            "name": "Desert",
+            "textureIndex": 0,
+            "type": 1,
+            "width": 512,
+            "x": 0,
             "y": 0
         }
     ],
@@ -7759,7 +7759,7 @@
             "txtName": "Default"
         },
         {
-            "atlasGrpId": 1,
+            "atlasGrpId": 6,
             "chkAutosize": true,
             "chkMerge": true,
             "chkSquare": true,
@@ -7773,10 +7773,28 @@
             "sbFrameMarginTop": 0,
             "sbTextureHeight": 2048,
             "sbTextureWidth": 2048,
-            "textureType": 0,
+            "textureType": 2,
             "txtName": "Compressed"
+        },
+        {
+            "atlasGrpId": 7,
+            "chkAutosize": true,
+            "chkMerge": true,
+            "chkSquare": true,
+            "cmbHeuristic": 1,
+            "cmbSortOrder": 0,
+            "extrude": 1,
+            "minFillRate": 80,
+            "sbFrameMarginBottom": 1,
+            "sbFrameMarginLeft": 0,
+            "sbFrameMarginRight": 1,
+            "sbFrameMarginTop": 0,
+            "sbTextureHeight": 2048,
+            "sbTextureWidth": 2048,
+            "textureType": 5,
+            "txtName": "Compres5asdfasdf"
         }
     ],
-    "startAtlasId": 2,
+    "startAtlasId": 8,
     "startFrameId": 433
 }

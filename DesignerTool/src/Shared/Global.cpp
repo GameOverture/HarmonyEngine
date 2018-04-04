@@ -187,9 +187,9 @@
 	case HYTEXTURE_R8G8B8:
 		return "R8G8B8 (unsupported)";
 	case HYTEXTURE_RGB_DTX1:
-		return "RGB_DTX1 (unsupported)";
+		return "RGB_DTX1";
 	case HYTEXTURE_RGBA_DTX1:
-		return "RGBA_DTX1";
+		return "RGBA_DTX1 (unsupported)";
 	case HYTEXTURE_DTX3:
 		return "DTX3 (unsupported)";
 	case HYTEXTURE_DTX5:

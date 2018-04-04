@@ -188,6 +188,33 @@ void AtlasWidget::RefreshInfo()
 	ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
 }
 
+bool AtlasWidget::DoAtlasGroupSettingsDlg()
+{
+	bool bAccepted = false;
+	bool bAtlasGrpHasImages = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex()).size() > 0;
+
+	DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bAtlasGrpHasImages, m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
+	if(QDialog::Accepted == pDlg->exec())
+	{
+		QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
+		pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
+
+		m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
+
+		if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
+			m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
+		else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
+			m_pModel->WriteMetaSettings();
+
+		bAccepted = true;
+	}
+
+	delete pDlg;
+	RefreshInfo();
+
+	return bAccepted;
+}
+
 void AtlasWidget::on_actionDeleteImages_triggered()
 {
 	QList<QTreeWidgetItem *> selectedTreeItemList = ui->atlasList->selectedItems();
@@ -491,7 +518,8 @@ void AtlasWidget::on_actionAddGroup_triggered()
 	if(pDlg->exec() == QDialog::Accepted)
 	{
 		ui->cmbAtlasGroups->setCurrentIndex(m_pModel->CreateNewAtlasGrp(pDlg->GetName()));
-		on_actionGroupSettings_triggered();
+		if(DoAtlasGroupSettingsDlg() == false)
+			on_actionRemoveGroup_triggered();
 	}
 	
 	delete pDlg;
@@ -499,24 +527,7 @@ void AtlasWidget::on_actionAddGroup_triggered()
 
 void AtlasWidget::on_actionGroupSettings_triggered()
 {
-	bool bAtlasGrpHasImages = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex()).size() > 0;
-
-	DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bAtlasGrpHasImages, m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
-	if(QDialog::Accepted == pDlg->exec())
-	{
-		QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
-		pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
-
-		m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
-
-		if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
-			m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
-		else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
-			m_pModel->WriteMetaSettings();
-	}
-
-	delete pDlg;
-	RefreshInfo();
+	DoAtlasGroupSettingsDlg();
 }
 
 void AtlasWidget::on_actionRemoveGroup_triggered()

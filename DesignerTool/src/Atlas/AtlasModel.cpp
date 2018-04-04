@@ -1172,7 +1172,7 @@ void AtlasModel::Refresh()
 		return Qt::AlignLeft;
 
 	if(role == Qt::DisplayRole || role == Qt::EditRole)
-		return "Grp: " % QString::number(m_AtlasGrpList[index.row()]->GetId()) % " - " % m_AtlasGrpList[index.row()]->m_PackerSettings["txtName"].toString();
+		return "Id: " % QString::number(m_AtlasGrpList[index.row()]->GetId()) % " - " % m_AtlasGrpList[index.row()]->m_PackerSettings["txtName"].toString();
 
 	return QVariant();
 }

@@ -81,6 +81,8 @@ protected:
 	virtual void leaveEvent(QEvent *pEvent) override;
 	virtual void resizeEvent(QResizeEvent *event) override;
 
+	bool DoAtlasGroupSettingsDlg();
+
 private Q_SLOTS:
 	void on_actionDeleteImages_triggered();
 

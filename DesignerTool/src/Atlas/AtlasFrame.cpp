@@ -53,7 +53,7 @@ AtlasTreeItem *AtlasFrame::GetTreeItem()
 
 	if(m_iTextureIndex >= 0)
 	{
-		m_pTreeWidgetItem->setText(1, "Grp:" % QString::number(m_uiAtlasGrpId));
+		m_pTreeWidgetItem->setText(1, "Id:" % QString::number(m_uiAtlasGrpId));
 		ClearError(ATLASFRAMEERROR_CouldNotPack);
 	}
 	else
@@ -85,7 +85,7 @@ void AtlasFrame::SetAtlasGrpId(quint32 uiNewAtlasGrpId)
 {
 	m_uiAtlasGrpId = uiNewAtlasGrpId;
 	if(m_pTreeWidgetItem)
-		m_pTreeWidgetItem->setText(1, "Grp:" % QString::number(uiNewAtlasGrpId));
+		m_pTreeWidgetItem->setText(1, "Id:" % QString::number(uiNewAtlasGrpId));
 }
 
 quint32 AtlasFrame::GetImageChecksum()
@@ -155,7 +155,7 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 		ClearError(ATLASFRAMEERROR_CouldNotPack);
 
 		if(m_pTreeWidgetItem)
-			m_pTreeWidgetItem->setText(1, "Grp:" % QString::number(m_uiAtlasGrpId));
+			m_pTreeWidgetItem->setText(1, "Id:" % QString::number(m_uiAtlasGrpId));
 	}
 	else
 	{
