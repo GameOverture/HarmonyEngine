@@ -28,10 +28,11 @@ class PropertiesTreeModel : public QAbstractItemModel
 	QList<PropertiesTreeItem *>                 m_CategoryList;
 
 public:
-	explicit PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant &subState, QObject *parent = 0);
+	explicit PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant subState, QObject *parent = 0);
 	virtual ~PropertiesTreeModel();
 
 	ProjectItem &GetItem();
+	QVariant GetValue(QString sUniquePropertyName) const;
 
 	bool AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip, bool bReadOnly = false);

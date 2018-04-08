@@ -88,11 +88,11 @@ class FontModel : public IModel
 
 	PropertiesTreeModel			m_TypeFacePropertiesModel;
 	
-	CheckBoxMapper *            m_pChkMapper_09;
-	CheckBoxMapper *            m_pChkMapper_AZ;
-	CheckBoxMapper *            m_pChkMapper_az;
-	CheckBoxMapper *            m_pChkMapper_Symbols;
-	LineEditMapper *            m_pTxtMapper_AdditionalSymbols;
+//	CheckBoxMapper *            m_pChkMapper_09;
+//	CheckBoxMapper *            m_pChkMapper_AZ;
+//	CheckBoxMapper *            m_pChkMapper_az;
+//	CheckBoxMapper *            m_pChkMapper_Symbols;
+//	LineEditMapper *            m_pTxtMapper_AdditionalSymbols;
 
 	AtlasFrame *                m_pTrueAtlasFrame;
 
@@ -114,11 +114,11 @@ public:
 
 	PropertiesTreeModel *GetTypefaceModel();
 
-	CheckBoxMapper *Get09Mapper();
-	CheckBoxMapper *GetAZMapper();
-	CheckBoxMapper *GetazMapper();
-	CheckBoxMapper *GetSymbolsMapper();
-	LineEditMapper *GetAdditionalSymbolsMapper();
+//	CheckBoxMapper *Get09Mapper();
+//	CheckBoxMapper *GetAZMapper();
+//	CheckBoxMapper *GetazMapper();
+//	CheckBoxMapper *GetSymbolsMapper();
+//	LineEditMapper *GetAdditionalSymbolsMapper();
 
 	QList<FontTypeface *> GetMasterStageList();
 

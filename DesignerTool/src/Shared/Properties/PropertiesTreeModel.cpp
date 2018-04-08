@@ -10,7 +10,7 @@
 #include "PropertiesTreeModel.h"
 #include "PropertiesUndoCmd.h"
 
-PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant &subState, QObject *parent) :  QAbstractItemModel(parent),
+PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant subState, QObject *parent) :	QAbstractItemModel(parent),
 																														m_ItemRef(itemRef),
 																														m_iSTATE_INDEX(iStateIndex),
 																														m_iSUBSTATE(subState)
@@ -28,11 +28,25 @@ ProjectItem &PropertiesTreeModel::GetItem()
 	return m_ItemRef;
 }
 
+QVariant PropertiesTreeModel::GetValue(QString sUniquePropertyName) const
+{
+	for(int i = 0; i < m_CategoryList.size(); ++i)
+	{
+		for(int j = 0; j < m_CategoryList[i]->GetNumChildren(); ++j)
+		{
+			if(0 == static_cast<PropertiesTreeItem *>(m_CategoryList[i]->GetChild(j))->GetName().compare(sUniquePropertyName, Qt::CaseSensitive))
+				return static_cast<PropertiesTreeItem *>(m_CategoryList[i]->GetChild(j))->GetData();
+		}
+	}
+
+	return QVariant();
+}
+
 bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
 {
 	for(int i = 0; i < m_CategoryList.size(); ++i)
 	{
-		if(0 == m_CategoryList[i]->GetName().compare(sName, Qt::CaseInsensitive))
+		if(0 == m_CategoryList[i]->GetName().compare(sName, Qt::CaseSensitive))
 			return false;
 	}
 
@@ -300,7 +314,7 @@ PropertiesTreeItem *PropertiesTreeModel::ValidateCategory(QString sCategoryName,
 	PropertiesTreeItem *pCategoryTreeItem = nullptr;
 	for(int i = 0; i < m_CategoryList.size(); ++i)
 	{
-		if(0 == m_CategoryList[i]->GetName().compare(sCategoryName, Qt::CaseInsensitive))
+		if(0 == m_CategoryList[i]->GetName().compare(sCategoryName, Qt::CaseSensitive))
 		{
 			pCategoryTreeItem = m_CategoryList[i];
 			break;
@@ -310,7 +324,7 @@ PropertiesTreeItem *PropertiesTreeModel::ValidateCategory(QString sCategoryName,
 	// Now ensure that no property with this name already exists
 	for(int i = 0; i < pCategoryTreeItem->GetNumChildren(); ++i)
 	{
-		if(0 == static_cast<PropertiesTreeItem *>(pCategoryTreeItem->GetChild(i))->GetName().compare(sUniquePropertyName, Qt::CaseInsensitive))
+		if(0 == static_cast<PropertiesTreeItem *>(pCategoryTreeItem->GetChild(i))->GetName().compare(sUniquePropertyName, Qt::CaseSensitive))
 			return nullptr; // nullptr indicates failure
 	}
 

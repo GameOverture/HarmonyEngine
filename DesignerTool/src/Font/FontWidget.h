@@ -53,16 +53,6 @@ public:
 	int GetSelectedStageId();
 
 private Q_SLOTS:
-	void on_chk_09_clicked();
-
-	void on_chk_az_clicked();
-
-	void on_chk_AZ_clicked();
-
-	void on_chk_symbols_clicked();
-
-	void on_txtAdditionalSymbols_editingFinished();
-
 	void on_cmbStates_currentIndexChanged(int index);
 
 	void on_actionAddState_triggered();

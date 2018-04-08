@@ -59,11 +59,11 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
 	ui->cmbRenderMode->addItem("Outline Negative", QVariant(static_cast<int>(RENDER_OUTLINE_NEGATIVE)));
 	ui->cmbRenderMode->addItem("Signed Distance Field", QVariant(static_cast<int>(RENDER_SIGNED_DISTANCE_FIELD)));
 
-	static_cast<FontModel *>(m_ItemRef.GetModel())->Get09Mapper()->AddCheckBoxMapping(ui->chk_09);
-	static_cast<FontModel *>(m_ItemRef.GetModel())->GetAZMapper()->AddCheckBoxMapping(ui->chk_AZ);
-	static_cast<FontModel *>(m_ItemRef.GetModel())->GetazMapper()->AddCheckBoxMapping(ui->chk_az);
-	static_cast<FontModel *>(m_ItemRef.GetModel())->GetSymbolsMapper()->AddCheckBoxMapping(ui->chk_symbols);
-	static_cast<FontModel *>(m_ItemRef.GetModel())->GetAdditionalSymbolsMapper()->AddLineEditMapping(ui->txtAdditionalSymbols);
+//	static_cast<FontModel *>(m_ItemRef.GetModel())->Get09Mapper()->AddCheckBoxMapping(ui->chk_09);
+//	static_cast<FontModel *>(m_ItemRef.GetModel())->GetAZMapper()->AddCheckBoxMapping(ui->chk_AZ);
+//	static_cast<FontModel *>(m_ItemRef.GetModel())->GetazMapper()->AddCheckBoxMapping(ui->chk_az);
+//	static_cast<FontModel *>(m_ItemRef.GetModel())->GetSymbolsMapper()->AddCheckBoxMapping(ui->chk_symbols);
+//	static_cast<FontModel *>(m_ItemRef.GetModel())->GetAdditionalSymbolsMapper()->AddLineEditMapping(ui->txtAdditionalSymbols);
 
 	ui->typefaceProperties->setModel(static_cast<FontModel *>(m_ItemRef.GetModel())->GetTypefaceModel());
 
@@ -73,7 +73,6 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
 
 FontWidget::~FontWidget()
 {
-	//delete m_pDraw;
 	delete ui;
 }
 
@@ -164,40 +163,6 @@ int FontWidget::GetSelectedStageId()
 	}
 
 	return static_cast<FontStateLayersModel *>(ui->layersTableView->model())->GetLayerId(iRowIndex);
-}
-
-void FontWidget::on_chk_09_clicked()
-{
-	QUndoCommand *pCmd = new UndoCmd_CheckBox("Glyphs 0-9", m_ItemRef, static_cast<FontModel *>(m_ItemRef.GetModel())->Get09Mapper(), ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void FontWidget::on_chk_az_clicked()
-{
-	QUndoCommand *pCmd = new UndoCmd_CheckBox("Glyphs a-z", m_ItemRef, static_cast<FontModel *>(m_ItemRef.GetModel())->GetazMapper(), ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void FontWidget::on_chk_AZ_clicked()
-{
-	QUndoCommand *pCmd = new UndoCmd_CheckBox("Glyphs A-Z", m_ItemRef, static_cast<FontModel *>(m_ItemRef.GetModel())->GetAZMapper(), ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void FontWidget::on_chk_symbols_clicked()
-{
-	QUndoCommand *pCmd = new UndoCmd_CheckBox("Glyphs symbols", m_ItemRef, static_cast<FontModel *>(m_ItemRef.GetModel())->GetSymbolsMapper(), ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void FontWidget::on_txtAdditionalSymbols_editingFinished()
-{
-	QUndoCommand *pCmd = new UndoCmd_LineEdit("Additional Symbols",
-											  m_ItemRef,
-											  static_cast<FontModel *>(m_ItemRef.GetModel())->GetAdditionalSymbolsMapper(),
-											  ui->cmbStates->currentIndex(), ui->txtAdditionalSymbols->text(),
-											  static_cast<FontModel *>(m_ItemRef.GetModel())->GetAdditionalSymbolsMapper()->GetString());
-	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void FontWidget::on_cmbStates_currentIndexChanged(int index)
