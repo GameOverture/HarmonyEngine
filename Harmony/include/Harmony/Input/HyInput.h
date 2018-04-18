@@ -39,12 +39,13 @@ public:
 	HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
 	~HyInput();
 
-	glm::vec2 GetMousePos();
-	glm::vec2 GetWorldMousePos();
+	uint32 GetMouseWindowIndex() const;
+	glm::vec2 GetMousePos() const;
+	glm::vec2 GetWorldMousePos() const;
 	
 	// All clicks are guaranteed to be down for at least '1' frame, even if it is released before the next update.
 	// Clicks released and then pressed down again within one frame will not be detected.
-	bool IsMouseBtnDown(HyMouseBtn eBtn);
+	bool IsMouseBtnDown(HyMouseBtn eBtn) const;
 
 	void StartRecording();
 	void StopRecording();

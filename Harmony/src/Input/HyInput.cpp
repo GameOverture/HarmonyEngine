@@ -118,17 +118,22 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	delete[] pMemBuffer;
 }
 
-glm::vec2 HyInput::GetMousePos()
+uint32 HyInput::GetMouseWindowIndex() const
+{
+	return m_pMouseWindow->GetIndex();
+}
+
+glm::vec2 HyInput::GetMousePos() const
 {
 	return glm::vec2(m_ptMousePos.x, m_pMouseWindow->GetWindowSize().y - m_ptMousePos.y); // Y-axis goes up in harmony, so flip it
 }
 
-glm::vec2 HyInput::GetWorldMousePos()
+glm::vec2 HyInput::GetWorldMousePos() const
 {
 	return m_pMouseWindow->ConvertViewportCoordinateToWorldPos(m_ptMousePos);
 }
 
-bool HyInput::IsMouseBtnDown(HyMouseBtn eBtn)
+bool HyInput::IsMouseBtnDown(HyMouseBtn eBtn) const
 {
 	return 0 != ((m_uiMouseBtnFlags | m_uiMouseBtnFlags_Buffered) & (1 << eBtn));
 }

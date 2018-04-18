@@ -309,14 +309,19 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
 	{
 		glm::vec2 ptMousePt;
+		bool bMouseInBounds;
 		if(m_pMouseInputNode->GetCoordinateSystem() >= 0)
+		{
 			ptMousePt = Hy_Input().GetMousePos();
+			bMouseInBounds = Hy_Input().GetMouseWindowIndex() == m_pMouseInputNode->GetCoordinateSystem() && HyTestPointAABB(m_pMouseInputNode->GetWorldAABB(), ptMousePt);
+		}
 		else
+		{
 			ptMousePt = Hy_Input().GetWorldMousePos();
-		
+			bMouseInBounds = HyTestPointAABB(m_pMouseInputNode->GetWorldAABB(), ptMousePt);
+		}
+
 		bool bLeftClickDown = Hy_Input().IsMouseBtnDown(HYMOUSE_BtnLeft);
-		
-		bool bMouseInBounds = HyTestPointAABB(m_pMouseInputNode->GetWorldAABB(), ptMousePt);
 
 		switch(m_eMouseInputState)
 		{
