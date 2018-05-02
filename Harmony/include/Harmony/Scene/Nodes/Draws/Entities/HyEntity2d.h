@@ -36,7 +36,6 @@ protected:
 	};
 	MouseInputState					m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
-	IHyDrawInst2d *					m_pMouseInputNode;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -71,10 +70,12 @@ public:
 	virtual IHyNode2d *ChildGet(uint32 uiIndex);
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
-	bool EnableMouseInput(IHyDrawInst2d *pInputChildNode, void *pUserParam = nullptr);
+	bool EnableMouseInput(void *pUserParam = nullptr);
 	void DisableMouseInput();
 
 	void ReverseDisplayOrder(bool bReverse);
+
+	virtual const b2AABB &GetWorldAABB() override;
 
 	virtual bool IsLoaded() const override;
 	virtual void Load() override;

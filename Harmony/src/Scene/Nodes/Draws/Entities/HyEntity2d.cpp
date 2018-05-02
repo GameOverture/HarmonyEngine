@@ -16,8 +16,7 @@
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Entity2d, pParent),
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
-															m_pMouseInputUserParam(nullptr),
-															m_pMouseInputNode(nullptr)
+															m_pMouseInputUserParam(nullptr)
 {
 }
 
@@ -209,12 +208,6 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 	{
 		if(*iter == pChild)
 		{
-			if(m_pMouseInputNode == pChild)
-			{
-				m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
-				m_pMouseInputNode = nullptr;
-			}
-
 			(*iter)->m_pParent = nullptr;
 			m_ChildList.erase(iter);
 			return true;
@@ -252,12 +245,8 @@ void HyEntity2d::ForEachChild(std::function<void(IHyNode2d *)> func)
 	}
 }
 
-bool HyEntity2d::EnableMouseInput(IHyDrawInst2d *pInputChildNode, void *pUserParam /*= nullptr*/)
+bool HyEntity2d::EnableMouseInput(void *pUserParam /*= nullptr*/)
 {
-	if(pInputChildNode == nullptr || ChildExists(*pInputChildNode) == false)
-		return false;
-
-	m_pMouseInputNode = pInputChildNode;
 	m_pMouseInputUserParam = pUserParam;
 	m_uiAttributes |= ATTRIBFLAG_MouseInput;
 
@@ -277,6 +266,20 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 		m_uiAttributes &= ~ATTRIBFLAG_ReverseDisplayOrder;
 
 	SetDisplayOrder(m_iDisplayOrder, false);
+}
+
+/*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
+{
+	m_aabbCached.lowerBound = m_aabbCached.upperBound = b2Vec2(0.0f, 0.0f);
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(i == 0)
+			m_aabbCached = m_ChildList[i]->GetWorldAABB();
+		else
+			m_aabbCached.Combine(m_ChildList[i]->GetWorldAABB());
+	}
+
+	return m_aabbCached;
 }
 
 /*virtual*/ bool HyEntity2d::IsLoaded() const /*override*/
@@ -310,15 +313,15 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	{
 		glm::vec2 ptMousePt;
 		bool bMouseInBounds;
-		if(m_pMouseInputNode->GetCoordinateSystem() >= 0)
+		if(GetCoordinateSystem() >= 0)
 		{
 			ptMousePt = Hy_Input().GetMousePos();
-			bMouseInBounds = Hy_Input().GetMouseWindowIndex() == m_pMouseInputNode->GetCoordinateSystem() && HyTestPointAABB(m_pMouseInputNode->GetWorldAABB(), ptMousePt);
+			bMouseInBounds = Hy_Input().GetMouseWindowIndex() == GetCoordinateSystem() && HyTestPointAABB(GetWorldAABB(), ptMousePt);
 		}
 		else
 		{
 			ptMousePt = Hy_Input().GetWorldMousePos();
-			bMouseInBounds = HyTestPointAABB(m_pMouseInputNode->GetWorldAABB(), ptMousePt);
+			bMouseInBounds = HyTestPointAABB(GetWorldAABB(), ptMousePt);
 		}
 
 		bool bLeftClickDown = Hy_Input().IsMouseBtnDown(HYMOUSE_BtnLeft);

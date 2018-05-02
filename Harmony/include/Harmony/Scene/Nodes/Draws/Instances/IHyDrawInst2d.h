@@ -42,7 +42,6 @@ protected:
 	HyPortal2dHandle				m_hPortals[HY_MAX_PORTAL_HANDLES];
 
 	HyShape2d						m_LocalBoundingVolume;
-	b2AABB							m_aabbCached;
 
 public:
 	IHyDrawInst2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
@@ -75,7 +74,7 @@ public:
 	const IHyNodeData *AcquireData();
 
 	const HyShape2d &GetLocalBoundingVolume();
-	const b2AABB &GetWorldAABB();
+	virtual const b2AABB &GetWorldAABB() override;
 
 	// Passing nullptr will use built-in default shader
 	void SetShader(HyShader *pShader);

@@ -32,6 +32,7 @@ protected:
 	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
 
 	b2Body *						m_pPhysicsBody;
+	b2AABB							m_aabbCached;
 
 public:
 	HyTweenVec2						pos;
@@ -56,6 +57,8 @@ public:
 	void PhysicsInit(b2BodyDef &bodyDefOut);
 	b2Body *PhysicsBody();
 	void PhysicsBodyDef(b2BodyDef &defRefOut) const;
+
+	virtual const b2AABB &GetWorldAABB();
 
 protected:
 	virtual void PhysicsUpdate() override final;

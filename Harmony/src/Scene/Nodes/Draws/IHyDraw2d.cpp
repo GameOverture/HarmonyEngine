@@ -37,7 +37,6 @@ IHyDraw2d::IHyDraw2d(const IHyDraw2d &copyRef) :	IHyNode2d(copyRef),
 													topColor(*this, DIRTY_Color),
 													botColor(*this, DIRTY_Color),
 													alpha(m_fAlpha, *this, DIRTY_Color)
-
 {
 	if(copyRef.m_pScissor)
 	{

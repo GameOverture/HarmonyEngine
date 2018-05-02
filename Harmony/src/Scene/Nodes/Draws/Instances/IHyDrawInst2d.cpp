@@ -36,8 +36,7 @@ IHyDrawInst2d::IHyDrawInst2d(const IHyDrawInst2d &copyRef) :	IHyDraw2d(copyRef),
 																m_eRenderMode(copyRef.m_eRenderMode),
 																m_hTextureHandle(copyRef.m_hTextureHandle),
 																m_ShaderUniforms(copyRef.m_ShaderUniforms),
-																m_LocalBoundingVolume(this, copyRef.m_LocalBoundingVolume),
-																m_aabbCached(copyRef.m_aabbCached)
+																m_LocalBoundingVolume(this, copyRef.m_LocalBoundingVolume)
 {
 	memset(m_hPortals, HY_UNUSED_HANDLE, sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
 	for(uint32 i = 0; copyRef.m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
@@ -216,7 +215,7 @@ const HyShape2d &IHyDrawInst2d::GetLocalBoundingVolume()
 	return m_LocalBoundingVolume;
 }
 
-const b2AABB &IHyDrawInst2d::GetWorldAABB()
+/*virtual*/ const b2AABB &IHyDrawInst2d::GetWorldAABB() /*override*/
 {
 	if(IsDirty(DIRTY_WorldAABB))
 	{

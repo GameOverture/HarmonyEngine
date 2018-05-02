@@ -36,7 +36,8 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :	IHyNode(copyRef),
 													rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 													rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 													scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+													scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+													m_aabbCached(copyRef.m_aabbCached)
 {
 	if(copyRef.m_pParent)
 		copyRef.m_pParent->ChildAppend(*this);
@@ -184,6 +185,11 @@ void IHyNode2d::PhysicsBodyDef(b2BodyDef &defRefOut) const
 	defRefOut.bullet = m_pPhysicsBody->IsBullet();
 	defRefOut.active = m_pPhysicsBody->IsActive();
 	defRefOut.gravityScale = m_pPhysicsBody->GetGravityScale();
+}
+
+/*virtual*/ const b2AABB &IHyNode2d::GetWorldAABB()
+{
+	return m_aabbCached;
 }
 
 /*virtual*/ void IHyNode2d::PhysicsUpdate() /*override*/
