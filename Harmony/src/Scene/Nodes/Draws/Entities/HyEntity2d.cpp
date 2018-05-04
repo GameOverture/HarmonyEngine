@@ -273,6 +273,9 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	m_aabbCached.lowerBound = m_aabbCached.upperBound = b2Vec2(0.0f, 0.0f);
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
+		if(m_ChildList[i]->GetWorldAABB().IsValid() == false)
+			continue;
+
 		if(i == 0)
 			m_aabbCached = m_ChildList[i]->GetWorldAABB();
 		else

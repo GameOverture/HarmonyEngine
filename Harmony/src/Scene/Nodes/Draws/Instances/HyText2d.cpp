@@ -352,8 +352,8 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::CalcBoundingVolume() /*override*/
 {
-	// TODO: Fix this to actually fit the text
-	m_LocalBoundingVolume.SetAsBox(m_fUsedPixelWidth /** 0.5f*/, m_fUsedPixelHeight /** 0.5f*/);//, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
+	// TODO: I don't trust this is accurate in all text types (SetAsLine, SetAsColumn, SetAsScaleBox) - needs testing
+	m_LocalBoundingVolume.SetAsBox(m_fUsedPixelWidth * 0.5f, m_fUsedPixelHeight * 0.5f);
 }
 
 /*virtual*/ void HyText2d::DrawLoadedUpdate() /*override*/
