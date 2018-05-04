@@ -352,8 +352,16 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::CalcBoundingVolume() /*override*/
 {
+	glm::vec2 ptCenter(0.0f, 0.0f);
+
+	if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
+	{
+		ptCenter.x = TextGetBox().x * 0.5f;
+		ptCenter.y = TextGetBox().y * 0.5f;
+	}
+
 	// TODO: I don't trust this is accurate in all text types (SetAsLine, SetAsColumn, SetAsScaleBox) - needs testing
-	m_LocalBoundingVolume.SetAsBox(m_fUsedPixelWidth * 0.5f, m_fUsedPixelHeight * 0.5f);
+	m_LocalBoundingVolume.SetAsBox(m_fUsedPixelWidth * 0.5f, m_fUsedPixelHeight * 0.5f, ptCenter, rot.Get());
 }
 
 /*virtual*/ void HyText2d::DrawLoadedUpdate() /*override*/
