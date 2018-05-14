@@ -21,7 +21,7 @@ HyEngine *		HyEngine::sm_pInstance = nullptr;
 		if(sm_pInstance != nullptr)
 			return nullptr;
 
-		sm_pInstance = new HyEngine(projectRef);
+		sm_pInstance = HY_NEW HyEngine(projectRef);
 		return sm_pInstance;
 	}
 
