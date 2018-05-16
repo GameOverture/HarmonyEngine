@@ -181,24 +181,24 @@ template<class T> struct refcounted_deleter
 
 // helper function to create a new shared pointer and increasing the ref counter
 template<class T>
-inline std::tr1::shared_ptr<T> Make_Shared_AddRef(T * p)
+inline std::shared_ptr<T> Make_Shared_AddRef(T * p)
 {
     if(p) (p)->AddRef();
-    std::tr1::shared_ptr<T> px(p, refcounted_deleter<T>());
+    std::shared_ptr<T> px(p, refcounted_deleter<T>());
     return px;
 }
 
 // helper function to create a new shared pointer without increasing the ref counter
 template<class T>
-inline std::tr1::shared_ptr<T> Make_Shared_NoAddRef(T * p)
+inline std::shared_ptr<T> Make_Shared_NoAddRef(T * p)
 {
-    std::tr1::shared_ptr<T> px(p, refcounted_deleter<T>());
+    std::shared_ptr<T> px(p, refcounted_deleter<T>());
     return px;
 }
 
 // defines the shared pointer class PtrClass and two helper function PtrClassAddRef/PtrClassNoAddRef
 #define DEFINE_SHARED_PTR(Class, PtrClass) \
-	typedef std::tr1::shared_ptr<Class> PtrClass; \
+	typedef std::shared_ptr<Class> PtrClass; \
 	inline PtrClass PtrClass##NoAddRef(Class* p_Ptr) \
 	{ return Make_Shared_NoAddRef(p_Ptr); } \
 	inline PtrClass PtrClass##AddRef(Class* p_Ptr) \
