@@ -188,8 +188,8 @@ RC_FILE = DesignerTool.rc
 
 DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64/ -lHarmonyQt
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64/ -lHarmonyQtd
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64_GuiRelease/ -lHarmony
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64_GuiDebug/ -lHarmony
 
 INCLUDEPATH += "$$PWD/Atlas"
 INCLUDEPATH += "$$PWD/Audio"
@@ -207,16 +207,16 @@ INCLUDEPATH += "$$PWD/Shared/Properties"
 INCLUDEPATH += "$$PWD/../../Harmony/include"
 DEPENDPATH += "$$PWD/../../Harmony/include"
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64/libHarmonyQt.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64/libHarmonyQtd.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64/HarmonyQt.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64/HarmonyQtd.lib
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64_GuiRelease/libHarmony.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64_GuiDebug/libHarmony.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64_GuiRelease/Harmony.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64_GuiDebug/Harmony.lib
 
 win32: LIBS += -lAdvAPI32
 win32: LIBS += -lole32
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/lib/x64/ -lfreetype-glQt
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/lib/x64/ -lfreetype-glQtd
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/lib/x64_GuiRelease/ -lfreetype-gl
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/lib/x64_GuiDebug/ -lfreetype-gl
 
 RESOURCES += \
     res/DesignerTool.qrc
