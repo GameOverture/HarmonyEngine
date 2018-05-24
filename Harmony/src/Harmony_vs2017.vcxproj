@@ -313,42 +313,42 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)d</TargetName>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>$(ProjectName)d</TargetName>
-    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">
-    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)Qtd</TargetName>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">
-    <TargetName>$(ProjectName)Qtd</TargetName>
-    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
-    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)Qt</TargetName>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|x64'">
-    <TargetName>$(ProjectName)Qt</TargetName>
-    <OutDir>$(ProjectDir)..\bin\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\bin\$(Platform)\obj\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -368,10 +368,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfwd.lib;soil2d.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;WS2_32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
     <ProjectReference>
@@ -395,10 +395,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfwd.lib;soil2d.lib;netLinkd.lib;box2Dd.lib;spine-cd.lib;opengl32.lib;glewd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;WS2_32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
     <ProjectReference>
@@ -422,10 +422,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2Qtd.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;WS2_32.lib;AdvAPI32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -451,10 +451,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2Qtd.lib;AdvAPI32.lib;netLinkQtd.lib;box2DQtd.lib;spine-cQtd.lib;opengl32.lib;glewQtd.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;WS2_32.lib;AdvAPI32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -483,10 +483,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw.lib;soil2.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;WS2_32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -509,10 +509,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw.lib;soil2.lib;netLink.lib;box2D.lib;spine-c.lib;opengl32.lib;glew.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;WS2_32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
@@ -535,10 +535,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2Qt.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;WS2_32.lib;AdvAPI32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>
@@ -563,10 +563,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>soil2Qt.lib;AdvAPI32.lib;netLinkQt.lib;box2DQt.lib;spine-cQt.lib;opengl32.lib;glewQt.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;WS2_32.lib;AdvAPI32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Lib>

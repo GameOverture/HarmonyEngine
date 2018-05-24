@@ -158,42 +158,42 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
-    <TargetName>$(ProjectName)d</TargetName>
+    <OutDir>$(ProjectDir)..\..\$(Platform)_$(Configuration)\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">
-    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
-    <TargetName>$(ProjectName)Qtd</TargetName>
+    <OutDir>$(ProjectDir)..\..\$(Platform)_$(Configuration)\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>$(ProjectName)d</TargetName>
-    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(ProjectDir)..\..\$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">
-    <TargetName>$(ProjectName)Qtd</TargetName>
-    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(ProjectDir)..\..\$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
+    <OutDir>$(ProjectDir)..\..\$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
-    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
+    <OutDir>$(ProjectDir)..\..\$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)Qt</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
+    <OutDir>$(ProjectDir)..\..\$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|x64'">
-    <OutDir>$(ProjectDir)..\..\$(Platform)\</OutDir>
+    <OutDir>$(ProjectDir)..\..\$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)Qt</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -209,10 +209,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetyped.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)_$(Configuration)/</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">
@@ -228,10 +228,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetyped.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)_$(Configuration)/</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -248,10 +248,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetyped.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)_$(Configuration)/</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">
@@ -267,10 +267,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetyped.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)_$(Configuration)/</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -294,7 +294,7 @@
       <AdditionalDependencies>freetype.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)_$(Configuration)/</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
@@ -317,7 +317,7 @@
       <AdditionalDependencies>freetype.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)_$(Configuration)/</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -341,7 +341,7 @@
       <AdditionalDependencies>freetype.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)_$(Configuration)/</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|x64'">
@@ -364,7 +364,7 @@
       <AdditionalDependencies>freetype.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)../../$(Platform)_$(Configuration)/</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
