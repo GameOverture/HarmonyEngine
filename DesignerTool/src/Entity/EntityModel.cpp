@@ -92,7 +92,7 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 	switch(pItemToAdd->GetType())
 	{
 		case ITEM_Entity: {
-			pNewPropertiesModel->AppendCategory("Physics", HyGlobal::ItemColor(ITEM_Physics), true, false);
+			pNewPropertiesModel->AppendCategory("Physics", HyGlobal::ItemColor(ITEM_Physics), true, true, false, "Check whether this node has a physics body");
 
 			PropertiesDef defComboBox;
 			defComboBox.eType = PROPERTIESTYPE_ComboBox;
