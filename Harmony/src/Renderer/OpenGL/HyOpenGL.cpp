@@ -246,6 +246,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::FinishRender()
 {
 #ifdef HY_PLATFORM_DESKTOP
+	glfwSwapInterval(0);
 	// This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
 	glfwSwapBuffers(m_pCurWindow->GetHandle());
 #endif
