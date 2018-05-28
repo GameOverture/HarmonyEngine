@@ -62,8 +62,8 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 /*virtual*/ void FontDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
 {
 	texture_atlas_t *pFtglAtlas = static_cast<FontModel *>(m_pProjItem->GetModel())->GetFtglAtlas();
-	unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelData();
-	uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPixelDataSize();
+	unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPreviewPixelData();
+	uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPreviewPixelDataSize();
 	if(pFtglAtlas == nullptr || pAtlasPixelData == nullptr)
 		return;
 
@@ -95,7 +95,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 		m_DrawAtlasOutline.pos.Set(m_pAtlasPreviewTexQuad->pos.Get());
 	}
 	
-	m_Text.GuiOverrideData<HyText2dData>(valueRef);
+	m_Text.GuiOverrideData<HyText2dData>(valueRef, pFtglAtlas->id);
 	m_Text.TextSet("1234567890");
 }
 

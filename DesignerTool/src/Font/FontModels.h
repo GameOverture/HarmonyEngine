@@ -103,8 +103,8 @@ class FontModel : public IModel
 	QList<FontTypeface *>       m_MasterLayerList;
 
 	texture_atlas_t *           m_pFtglAtlas;
-	unsigned char *             m_pTrueAtlasPixelData;
-	uint                        m_uiTrueAtlasPixelDataSize;
+	unsigned char *				m_pSubAtlasPixelData;
+	uint						m_uiSubAtlasBufferSize;
 
 public:
 	FontModel(ProjectItem &itemRef, QJsonObject fontObj);
@@ -126,8 +126,8 @@ public:
 	
 	texture_atlas_t *GetFtglAtlas();
 	AtlasFrame *GetAtlasFrame();
-	unsigned char *GetAtlasPixelData();
-	uint GetAtlasPixelDataSize();
+	unsigned char *GetAtlasPreviewPixelData();
+	uint GetAtlasPreviewPixelDataSize();
 	
 	void GeneratePreview();
 
@@ -137,6 +137,9 @@ public:
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
 	virtual QStringList GetFontUrls() const override;
 	virtual void Refresh() override;
+
+private:
+	QSize GetAtlasGrpSize();
 };
 
 #endif // FONTMODELS_H

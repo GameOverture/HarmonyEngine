@@ -114,7 +114,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		}
 	}
 
-	m_Sprite.GuiOverrideData<HySprite2dData>(valueRef);
+	m_Sprite.GuiOverrideData<HySprite2dData>(valueRef, HY_UNUSED_HANDLE);
 	m_Sprite.AnimCtrl(HYANIMCTRL_Reset);
 	
 	SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());

@@ -493,11 +493,6 @@ void HyText2d::CalculateGlyphInfos()
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
 
-#ifdef HY_PLATFORM_GUI
-	if(pData->GetAtlas() == nullptr)	// GUI tool may have incomplete data
-		return;
-#endif
-
 	m_uiNumValidCharacters = 0;
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
 	const uint32 uiSTR_SIZE = static_cast<uint32>(m_Utf32CodeList.size());

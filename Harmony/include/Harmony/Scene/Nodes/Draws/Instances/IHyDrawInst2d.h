@@ -116,13 +116,17 @@ protected:
 #ifdef HY_PLATFORM_GUI
 public:
 	template<typename HYDATATYPE>
-	void GuiOverrideData(jsonxx::Value &dataValueRef)
+	void GuiOverrideData(jsonxx::Value &dataValueRef, HyTextureHandle hTextureHandle)
 	{
 		delete m_pData;
-		m_pData = HY_NEW HYDATATYPE("+HyGuiOverride", dataValueRef, *sm_pHyAssets);
+		m_pData = HY_NEW HYDATATYPE(HY_GUI_DATAOVERRIDE, dataValueRef, *sm_pHyAssets);
 		OnDataAcquired();
+
 		if(m_hShader == HY_UNUSED_HANDLE)
 			m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
+
+		if(hTextureHandle != HY_UNUSED_HANDLE)
+			m_hTextureHandle = hTextureHandle;
 	}
 #endif
 };

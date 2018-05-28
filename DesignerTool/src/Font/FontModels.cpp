@@ -12,6 +12,8 @@
 
 #include <QJsonArray>
 #include <QStandardPaths>
+#include <QPainter>
+#include <QImageWriter>
 
 FontStateData::FontStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) : IStateData(iStateIndex, modelRef, stateObj["name"].toString())
 {
@@ -158,8 +160,8 @@ FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :   IModel(itemR
 																	m_TypeFacePropertiesModel(itemRef, 0, QVariant(0)),
 																	m_pTrueAtlasFrame(nullptr),
 																	m_pFtglAtlas(nullptr),
-																	m_pTrueAtlasPixelData(nullptr),
-																	m_uiTrueAtlasPixelDataSize(0)
+																	m_pSubAtlasPixelData(nullptr),
+																	m_uiSubAtlasBufferSize(0)
 {
 	m_TypeFacePropertiesModel.AppendCategory("Atlas Info", HyGlobal::ItemColor(ITEM_Prefix));
 	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", FONTPROP_Dimensions, PropertiesDef(PROPERTIESTYPE_ivec2, QVariant(QPoint(0, 0))), "The required portion size needed to fit on an atlas", true);
@@ -269,23 +271,19 @@ AtlasFrame *FontModel::GetAtlasFrame()
 	return m_pTrueAtlasFrame;
 }
 
-unsigned char *FontModel::GetAtlasPixelData()
+unsigned char *FontModel::GetAtlasPreviewPixelData()
 {
-	return m_pTrueAtlasPixelData;
+	return m_pSubAtlasPixelData;
 }
 
-uint FontModel::GetAtlasPixelDataSize()
+uint FontModel::GetAtlasPreviewPixelDataSize()
 {
-	return m_uiTrueAtlasPixelDataSize;
+	return m_uiSubAtlasBufferSize;
 }
 
 void FontModel::GeneratePreview()
 {
-	uint uiAtlasGrpIndex = 0;
-	if(m_pTrueAtlasFrame != nullptr)
-		uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_pTrueAtlasFrame->GetAtlasGrpId());
-
-	QSize atlasSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
+	QSize atlasSize = GetAtlasGrpSize();
 	QSize curAtlasSize = atlasSize;
 	bool bDoInitialShrink = true;
 	size_t iNumMissedGlyphs = 0;
@@ -345,14 +343,14 @@ void FontModel::GeneratePreview()
 	}
 
 	// Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
-	delete [] m_pTrueAtlasPixelData;
 	uint uiNumPixels = static_cast<uint>(m_pFtglAtlas->width * m_pFtglAtlas->height);
-	m_uiTrueAtlasPixelDataSize = uiNumPixels * 4;
-	m_pTrueAtlasPixelData = new unsigned char[m_uiTrueAtlasPixelDataSize];
-	memset(m_pTrueAtlasPixelData, 0xFF, m_uiTrueAtlasPixelDataSize);
+	m_uiSubAtlasBufferSize = uiNumPixels * 4;
+	delete [] m_pSubAtlasPixelData;
+	m_pSubAtlasPixelData = new unsigned char[m_uiSubAtlasBufferSize];
+	memset(m_pSubAtlasPixelData, 0xFF, m_uiSubAtlasBufferSize);
 	// Overwriting alpha channel
 	for(uint i = 0; i < uiNumPixels; ++i)
-		m_pTrueAtlasPixelData[i*4+3] = m_pFtglAtlas->data[i];
+		m_pSubAtlasPixelData[i*4+3] = m_pFtglAtlas->data[i];
 
 	// Signals ItemFont to upload and refresh the preview texture
 	m_pFtglAtlas->id = 0;
@@ -360,7 +358,7 @@ void FontModel::GeneratePreview()
 
 /*virtual*/ void FontModel::OnSave() /*override*/
 {
-	QImage fontAtlasImage(m_pTrueAtlasPixelData, static_cast<int>(m_pFtglAtlas->width), static_cast<int>(m_pFtglAtlas->height), QImage::Format_RGBA8888);
+	QImage fontAtlasImage(m_pSubAtlasPixelData, static_cast<int>(m_pFtglAtlas->width), static_cast<int>(m_pFtglAtlas->height), QImage::Format_RGBA8888);
 
 	if(m_pTrueAtlasFrame)
 		m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
@@ -608,4 +606,14 @@ void FontModel::GeneratePreview()
 	m_sAvailableTypefaceGlyphs += propValue.toString(); // May contain duplicates as stated in freetype-gl documentation
 	
 	GeneratePreview();
+}
+
+// TODO: Fix this implementation
+QSize FontModel::GetAtlasGrpSize()
+{
+	uint uiAtlasGrpIndex = 0;
+	if(m_pTrueAtlasFrame != nullptr)
+		uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_pTrueAtlasFrame->GetAtlasGrpId());
+
+	return m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
 }
