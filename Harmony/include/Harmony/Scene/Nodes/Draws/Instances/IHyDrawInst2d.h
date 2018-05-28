@@ -51,6 +51,8 @@ public:
 	const IHyDrawInst2d &operator=(const IHyDrawInst2d &rhs);
 	virtual IHyDrawInst2d *Clone() const = 0;
 
+	bool IsValid();
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// NOTE: Below mutators manipulate data from derived class "IHyDraw2d". Handled in regard to being a "leaf"
 	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
@@ -96,6 +98,7 @@ protected:
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
 	// Optional overrides for derived classes
+	virtual bool OnIsValid() { return true; }
 	virtual void OnShapeSet(HyShape2d *pShape) { }
 	virtual void CalcBoundingVolume() { }
 	virtual void DrawLoadedUpdate() { }									// Invoked once after OnLoaded(), then once every frame (guarenteed to only be invoked if this instance is loaded)

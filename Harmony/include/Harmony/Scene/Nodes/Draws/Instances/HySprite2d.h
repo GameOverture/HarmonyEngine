@@ -54,8 +54,6 @@ public:
 	const HySprite2d &operator=(const HySprite2d &rhs);
 	virtual HySprite2d *Clone() const;
 
-	virtual bool IsEnabled() const override;
-
 	//--------------------------------------------------------------------------------------
 	// Set how to playback the animation on the current (or specified) state/animation.
 	//--------------------------------------------------------------------------------------
@@ -124,6 +122,7 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 protected:
+	virtual bool OnIsValid() override;
 	virtual void CalcBoundingVolume() override;
 	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;

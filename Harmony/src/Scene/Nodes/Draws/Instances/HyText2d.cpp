@@ -95,11 +95,6 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	return HY_NEW HyText2d(*this);
 }
 
-/*virtual*/ bool HyText2d::IsEnabled() const /*override*/
-{
-	return (IHyNode::IsEnabled() && m_uiNumValidCharacters > 0);
-}
-
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
 void HyText2d::TextSet(const std::string sText)
 {
@@ -348,6 +343,11 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 {
 	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
 	return pData->GetNumStates() != 0;
+}
+
+/*virtual*/ bool HyText2d::OnIsValid() /*override*/
+{
+	return m_uiNumValidCharacters > 0;
 }
 
 /*virtual*/ void HyText2d::CalcBoundingVolume() /*override*/

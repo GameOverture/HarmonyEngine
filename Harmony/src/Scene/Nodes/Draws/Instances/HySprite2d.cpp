@@ -67,11 +67,6 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 	return HY_NEW HySprite2d(*this);
 }
 
-/*virtual*/ bool HySprite2d::IsEnabled() const /*override*/
-{
-	return (IHyNode::IsEnabled() && ((m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Invalid) == 0));
-}
-
 void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl)
 {
 	AnimCtrl(eAnimCtrl, m_uiCurAnimState);
@@ -279,6 +274,11 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 	//const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(0, 0);
 	//return frameRef.pAtlas != nullptr;
+}
+
+/*virtual*/ bool HySprite2d::OnIsValid() /*override*/
+{
+	return ((m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Invalid) == 0);
 }
 
 /*virtual*/ void HySprite2d::CalcBoundingVolume() /*override*/

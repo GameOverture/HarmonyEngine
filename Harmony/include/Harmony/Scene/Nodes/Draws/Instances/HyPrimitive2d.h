@@ -32,8 +32,6 @@ public:
 	const HyPrimitive2d &operator=(const HyPrimitive2d &rhs);
 	virtual HyPrimitive2d *Clone() const;
 
-	virtual bool IsEnabled() const override;
-
 	HyShape2d &GetShape();
 
 	uint32 GetNumVerts() const;
@@ -47,6 +45,7 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 protected:
+	virtual bool OnIsValid() override;
 	virtual void OnShapeSet(HyShape2d *pShape) override;
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteVertexData(char *&pRefDataWritePos) override;

@@ -84,6 +84,11 @@ const IHyDrawInst2d &IHyDrawInst2d::operator=(const IHyDrawInst2d &rhs)
 	return *this;
 }
 
+bool IHyDrawInst2d::IsValid()
+{
+	return m_bEnabled && OnIsValid();
+}
+
 void IHyDrawInst2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
 {
 	if(m_pScissor == nullptr)

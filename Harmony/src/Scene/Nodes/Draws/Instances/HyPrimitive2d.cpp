@@ -51,11 +51,6 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	return HY_NEW HyPrimitive2d(*this);
 }
 
-/*virtual*/ bool HyPrimitive2d::IsEnabled() const /*override*/
-{
-	return (IHyNode::IsEnabled() && m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValid());
-}
-
 HyShape2d &HyPrimitive2d::GetShape()
 {
 	// The bounding volume in HyPrimitive2d also doubles as the actual shape and type of this primitive
@@ -98,6 +93,11 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 /*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
 {
 	return (m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValid());
+}
+
+/*virtual*/ bool HyPrimitive2d::OnIsValid() /*override*/
+{
+	return m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValid();
 }
 
 /*virtual*/ void HyPrimitive2d::OnShapeSet(HyShape2d *pShape) /*override*/

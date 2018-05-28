@@ -81,8 +81,6 @@ public:
 	const HyText2d &operator=(const HyText2d &rhs);
 	virtual HyText2d *Clone() const;
 
-	virtual bool IsEnabled() const override;
-
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
 	void TextSet(const std::string sText);
 	const std::string &TextGet() const;
@@ -125,6 +123,7 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 protected:
+	virtual bool OnIsValid() override;
 	virtual void CalcBoundingVolume() override;
 	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;

@@ -69,7 +69,7 @@ HyType IHyNode::GetType() const
 	return m_eTYPE;
 }
 
-/*virtual*/ bool IHyNode::IsEnabled() const
+bool IHyNode::IsEnabled() const
 {
 	return m_bEnabled;
 }

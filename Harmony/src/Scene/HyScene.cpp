@@ -163,7 +163,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	uint32 uiTotalNumInsts = static_cast<uint32>(m_LoadedInst3dList.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_LoadedInst3dList[i]->IsEnabled() == false)
+		if(m_LoadedInst3dList[i]->IsValid() == false)
 			continue;
 
 		rendererRef.AppendRenderState(i, *m_NodeList_Loaded[i], HY_FULL_CULL_MASK);
@@ -177,7 +177,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_Loaded.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_Loaded[i]->IsEnabled() == false/* || CalculateCullPasses(*m_NodeList_Loaded[i], uiCullMask) == false*/)
+		if(m_NodeList_Loaded[i]->IsValid() == false/* || CalculateCullPasses(*m_NodeList_Loaded[i], uiCullMask) == false*/)
 			continue;
 
 		rendererRef.AppendRenderState(i, *m_NodeList_Loaded[i], uiCullMask);

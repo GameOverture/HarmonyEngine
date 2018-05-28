@@ -68,7 +68,7 @@ public:
 
 	HyType GetType() const;
 
-	virtual bool IsEnabled() const;
+	bool IsEnabled() const;
 	virtual void SetEnabled(bool bEnabled);
 
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused);
