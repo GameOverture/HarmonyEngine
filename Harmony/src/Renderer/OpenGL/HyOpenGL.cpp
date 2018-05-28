@@ -354,8 +354,11 @@ HyOpenGL::~HyOpenGL(void)
 		{
 			SetCurrentWindow(i);
 
-			glGenVertexArrays(1, &m_VaoMapList[i][pShader->GetHandle()]);
+			GLuint uiVao = 0;
+			glGenVertexArrays(1, &uiVao);
 			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glGenVertexArrays");
+
+			m_VaoMapList[i][pShader->GetHandle()] = uiVao;
 		}
 	}
 
@@ -406,7 +409,8 @@ HyOpenGL::~HyOpenGL(void)
 		SetCurrentWindow(i);
 
 		//BindVao(this);
-		glBindVertexArray(m_VaoMapList[m_pCurWindow->GetIndex()][pShader->GetHandle()]);
+		GLuint uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][pShader->GetHandle()];
+		glBindVertexArray(uiVao);
 		HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
 
 		for(uint32 i = 0; i < shaderVertexAttribListRef.size(); ++i)
@@ -726,7 +730,8 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set the proper shader program
 	HyShaderHandle hShaderHandle = pRenderState->GetShaderHandle();
-	glBindVertexArray(m_VaoMapList[m_pCurWindow->GetIndex()][hShaderHandle]);
+	GLuint uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][hShaderHandle];
+	glBindVertexArray(uiVao);
 	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
 
 	GLuint hGlHandle = m_GLShaderMap[hShaderHandle];

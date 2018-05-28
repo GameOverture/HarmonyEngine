@@ -18,7 +18,7 @@
 class HyOpenGL : public IHyRenderer
 {
 protected:
-	// VAO's cannot be shared between windows (aka OpenGL contexts), so there is a std::vector<> element for each window
+	// VAO's cannot be shared between windows (aka OpenGL contexts), so there is a std::map<> for each window
 	std::vector<std::map<HyShaderHandle, GLuint> >	m_VaoMapList;
 	std::map<HyShaderHandle, GLuint>				m_GLShaderMap;
 
