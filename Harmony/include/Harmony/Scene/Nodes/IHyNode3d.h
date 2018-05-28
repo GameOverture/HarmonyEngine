@@ -28,6 +28,10 @@ public:
 	IHyNode3d(const IHyNode3d &copyRef);
 	virtual ~IHyNode3d();
 
+	bool IsValid() {
+		return true;
+	}
+
 	const IHyNode3d &operator=(const IHyNode3d &rhs);
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
