@@ -120,23 +120,17 @@ CheckerGrid::~CheckerGrid()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp),
-													//m_TempGrid(this)
 													m_CheckerGrid(20000.0f, 20000.0f, 25.0f, this)
 {
-	m_pCheckerGridShader = HY_NEW HyShader();
+	m_pCheckerGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
 	m_pCheckerGridShader->AddVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
 	m_pCheckerGridShader->AddVertexAttribute("attr_vUVcoord", HYSHADERVAR_vec2);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
-	m_pCheckerGridShader->Finalize(HYSHADERPROG_Primitive);
+	m_pCheckerGridShader->Finalize();
 
 	m_CheckerGrid.SetShader(m_pCheckerGridShader);
 	m_CheckerGrid.SetDisplayOrder(-1000);
-
-	// TODO: FIX THE CUSTOM SHADERS BEFORE USING ABOVE CHECKERGRID
-//	m_TempGrid.GetShape().SetAsBox(20000.0f * 0.5f, 20000.0f * 0.5f);
-//	m_TempGrid.SetTint(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f);
-//	m_TempGrid.SetDisplayOrder(-1000);
 }
 
 /*virtual*/ ProjectDraw::~ProjectDraw()

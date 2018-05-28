@@ -10,17 +10,16 @@
 #include "Renderer/Effects/HyShader.h"
 #include "Renderer/IHyRenderer.h"
 
-/*static*/ IHyRenderer *HyShader::sm_pRenderer = nullptr;
 /*static*/ HyShaderHandle HyShader::sm_hHandleCount = 0;
 
-HyShader::HyShader() :	m_hHANDLE(++sm_hHandleCount),
-						m_bIsFinalized(false),
-						m_uiStride(0)
+HyShader::HyShader(HyShaderProgramDefaults eDefaultsFrom) : IHyLoadableData(HYLOADABLE_Shader),
+															m_hHANDLE(++sm_hHandleCount),
+															m_eDEFAULTS_FROM(eDefaultsFrom),
+															m_bIsFinalized(false),
+															m_uiStride(0)
 {
 	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
 		m_sSourceCode[i].clear();
-
-	IHyRenderer::AddShader(this);
 }
 
 HyShader::~HyShader()
@@ -83,10 +82,19 @@ std::vector<HyShaderVertexAttribute> &HyShader::GetVertextAttributes()
 	return m_VertexAttributeList;
 }
 
-void HyShader::Finalize(HyShaderProgramDefaults eDefaultsFrom)
+void HyShader::Finalize()
 {
-	HyAssert(sm_pRenderer, "HyShader::Finalize was invoked before the renderer has been instanciated");
-	sm_pRenderer->UploadShader(eDefaultsFrom, this);
+	IHyRenderer::AddShader(this);
+	m_bIsFinalized = true;
+}
+
+/*virtual*/ void HyShader::OnLoadThread() /*override*/
+{
+}
+
+/*virtual*/ void HyShader::OnRenderThread(IHyRenderer &rendererRef) /*override*/
+{
+	rendererRef.UploadShader(m_eDEFAULTS_FROM, this);
 
 	// Calculate the stride based on the specified vertex attributes
 	m_uiStride = 0;
@@ -115,6 +123,4 @@ void HyShader::Finalize(HyShaderProgramDefaults eDefaultsFrom)
 		case HYSHADERVAR_mat4:		m_uiStride += sizeof(glm::mat4);	break;
 		}
 	}
-
-	m_bIsFinalized = true;
 }

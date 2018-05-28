@@ -27,7 +27,6 @@ public:
 
 class ProjectDraw : public IDraw
 {
-	//HyPrimitive2d		m_TempGrid;
 	CheckerGrid			m_CheckerGrid;
 	HyShader *			m_pCheckerGridShader;
 

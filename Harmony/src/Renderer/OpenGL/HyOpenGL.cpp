@@ -126,8 +126,8 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBindBuffer");
 
 	// Built-in shaders
-	m_pShaderQuadBatch->Finalize(HYSHADERPROG_QuadBatch);
-	m_pShaderPrimitive->Finalize(HYSHADERPROG_Primitive);
+	m_pShaderQuadBatch->Finalize();
+	m_pShaderPrimitive->Finalize();
 }
 
 HyOpenGL::~HyOpenGL(void)
@@ -925,7 +925,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set vertex attribute pointers to the vertex data locations in bound buffer
 	size_t uiStartOffset = pRenderState->GetDataOffset();
-	HyShader *pShader = sm_ShaderMap[hShaderHandle];
+	HyShader *pShader = m_ShaderMap[hShaderHandle];
 	HyAssert(pShader, "HyShader not found for render state: " << pRenderState->GetId());
 
 	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();

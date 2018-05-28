@@ -42,6 +42,8 @@ public:
 	};
 
 protected:
+	static IHyRenderer *							sm_pInstance;
+
 	HyDiagnostics &									m_DiagnosticsRef;
 	std::vector<HyWindow *> &						m_WindowListRef;
 
@@ -61,9 +63,9 @@ protected:
 	HyWindow *										m_pCurWindow;
 
 	// Effects containers
-	static std::map<HyShaderHandle, HyShader *>		sm_ShaderMap;
-	static std::map<HyStencilHandle, HyStencil *>	sm_StencilMap;
-	static std::map<HyPortal2dHandle, HyPortal2d *>	sm_Portal2dMap;
+	std::map<HyShaderHandle, HyShader *>			m_ShaderMap;
+	std::map<HyStencilHandle, HyStencil *>			m_StencilMap;
+	std::map<HyPortal2dHandle, HyPortal2d *>		m_Portal2dMap;
 
 	// Built-in shaders
 	HyShader *										m_pShaderQuadBatch;

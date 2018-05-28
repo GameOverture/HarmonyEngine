@@ -17,9 +17,7 @@
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "HyEngine.h"
 
-std::map<HyShaderHandle, HyShader *>		IHyRenderer::sm_ShaderMap;
-std::map<HyStencilHandle, HyStencil *>		IHyRenderer::sm_StencilMap;
-std::map<HyPortal2dHandle, HyPortal2d *>	IHyRenderer::sm_Portal2dMap;
+IHyRenderer *IHyRenderer::sm_pInstance = nullptr;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
@@ -30,34 +28,36 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 																									m_pCurVertexWritePos(nullptr),
 																									m_uiVertexBufferUsedBytes(0),
 																									m_pCurWindow(nullptr),
-																									m_pShaderQuadBatch(HY_NEW HyShader()),
-																									m_pShaderPrimitive(HY_NEW HyShader()),
+																									m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
+																									m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive)),
 																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
 {
-	HyShader::sm_pRenderer = this;
+	HyAssert(sm_pInstance == nullptr, "IHyRenderer ctor called twice");
 
 	memset(m_pBUFFER_VERTEX, 0, HY_VERTEX_BUFFER_SIZE);
 	memset(m_pBUFFER_RENDERSTATES, 0, HY_RENDERSTATE_BUFFER_SIZE);
+
+	sm_pInstance = this;
 }
 
 IHyRenderer::~IHyRenderer(void)
 {
-	HyShader::sm_pRenderer = nullptr;
+	sm_pInstance = nullptr;
 
 	delete[] m_pBUFFER_VERTEX;
 	delete[] m_pBUFFER_RENDERSTATES;
 
-	for(auto iter = sm_ShaderMap.begin(); iter != sm_ShaderMap.end(); ++iter)
+	for(auto iter = m_ShaderMap.begin(); iter != m_ShaderMap.end(); ++iter)
 		delete iter->second;
-	sm_ShaderMap.clear();
+	m_ShaderMap.clear();
 
-	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
+	for(auto iter = m_StencilMap.begin(); iter != m_StencilMap.end(); ++iter)
 		delete iter->second;
-	sm_StencilMap.clear();
+	m_StencilMap.clear();
 
-	for(auto iter = sm_Portal2dMap.begin(); iter != sm_Portal2dMap.end(); ++iter)
+	for(auto iter = m_Portal2dMap.begin(); iter != m_Portal2dMap.end(); ++iter)
 		delete iter->second;
-	sm_Portal2dMap.clear();
+	m_Portal2dMap.clear();
 }
 
 void IHyRenderer::PrepareBuffers()
@@ -71,7 +71,7 @@ void IHyRenderer::PrepareBuffers()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Update each portal to determine this frame's draw instance clones that need to be rendered
-	for(auto iter = sm_Portal2dMap.begin(); iter != sm_Portal2dMap.end(); ++iter)
+	for(auto iter = m_Portal2dMap.begin(); iter != m_Portal2dMap.end(); ++iter)
 	{
 		HyPortal2d *pPortal2d = iter->second;
 		pPortal2d->PrepareClones();
@@ -79,7 +79,7 @@ void IHyRenderer::PrepareBuffers()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Write internal render states first, used by things like HyStencil
-	for(auto iter = sm_StencilMap.begin(); iter != sm_StencilMap.end(); ++iter)
+	for(auto iter = m_StencilMap.begin(); iter != m_StencilMap.end(); ++iter)
 	{
 		HyStencil *pStencil = iter->second;
 		if(pStencil->IsMaskReady() == false && pStencil->ConfirmMaskReady() == false)
@@ -177,57 +177,58 @@ uint32 IHyRenderer::GetNumWindows()
 
 /*static*/ HyShader *IHyRenderer::FindShader(HyShaderHandle hHandle)
 {
-	if(hHandle != HY_UNUSED_HANDLE && sm_ShaderMap.find(hHandle) != sm_ShaderMap.end())
-		return sm_ShaderMap[hHandle];
+	if(hHandle != HY_UNUSED_HANDLE && sm_pInstance->m_ShaderMap.find(hHandle) != sm_pInstance->m_ShaderMap.end())
+		return sm_pInstance->m_ShaderMap[hHandle];
 
 	return nullptr;
 }
 
 /*static*/ void IHyRenderer::AddShader(HyShader *pShader)
 {
-	sm_ShaderMap[pShader->GetHandle()] = pShader;
+	sm_pInstance->m_ShaderMap[pShader->GetHandle()] = pShader;
+	sm_pInstance->TxData(pShader);
 }
 
 /*static*/ void IHyRenderer::RemoveShader(HyShader *pShader)
 {
 	// TODO: Unload shader in graphics API
-	sm_ShaderMap.erase(sm_ShaderMap.find(pShader->GetHandle()));
+	sm_pInstance->m_ShaderMap.erase(sm_pInstance->m_ShaderMap.find(pShader->GetHandle()));
 }
 
 /*static*/ HyStencil *IHyRenderer::FindStencil(HyStencilHandle hHandle)
 {
-	if(hHandle != HY_UNUSED_HANDLE && sm_StencilMap.find(hHandle) != sm_StencilMap.end())
-		return sm_StencilMap[hHandle];
+	if(hHandle != HY_UNUSED_HANDLE && sm_pInstance->m_StencilMap.find(hHandle) != sm_pInstance->m_StencilMap.end())
+		return sm_pInstance->m_StencilMap[hHandle];
 
 	return nullptr;
 }
 
 /*static*/ void IHyRenderer::AddStencil(HyStencil *pStencil)
 {
-	sm_StencilMap[pStencil->GetHandle()] = pStencil;
+	sm_pInstance->m_StencilMap[pStencil->GetHandle()] = pStencil;
 }
 
 /*static*/ void IHyRenderer::RemoveStencil(HyStencil *pStencil)
 {
-	sm_StencilMap.erase(sm_StencilMap.find(pStencil->GetHandle()));
+	sm_pInstance->m_StencilMap.erase(sm_pInstance->m_StencilMap.find(pStencil->GetHandle()));
 }
 
 /*static*/ HyPortal2d *IHyRenderer::FindPortal2d(HyPortal2dHandle hHandle)
 {
-	if(hHandle != HY_UNUSED_HANDLE && sm_Portal2dMap.find(hHandle) != sm_Portal2dMap.end())
-		return sm_Portal2dMap[hHandle];
+	if(hHandle != HY_UNUSED_HANDLE && sm_pInstance->m_Portal2dMap.find(hHandle) != sm_pInstance->m_Portal2dMap.end())
+		return sm_pInstance->m_Portal2dMap[hHandle];
 
 	return nullptr;
 }
 
 /*static*/ void IHyRenderer::AddPortal2d(HyPortal2d *pPortal2d)
 {
-	sm_Portal2dMap[pPortal2d->GetHandle()] = pPortal2d;
+	sm_pInstance->m_Portal2dMap[pPortal2d->GetHandle()] = pPortal2d;
 }
 
 /*static*/ void IHyRenderer::RemovePortal2d(HyPortal2d *pPortal2d)
 {
-	sm_Portal2dMap.erase(sm_Portal2dMap.find(pPortal2d->GetHandle()));
+	sm_pInstance->m_Portal2dMap.erase(sm_pInstance->m_Portal2dMap.find(pPortal2d->GetHandle()));
 }
 
 void IHyRenderer::ProcessMsgs()

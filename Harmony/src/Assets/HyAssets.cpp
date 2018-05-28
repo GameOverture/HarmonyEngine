@@ -452,7 +452,7 @@ void HyAssets::DequeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Discarded;
 
-			if(pData->GetLoadableType() == HYGFXTYPE_AtlasGroup)
+			if(pData->GetLoadableType() == HYLOADABLE_Atlas)
 				m_pLoadedAtlasIndices->Clear(static_cast<HyAtlas *>(pData)->GetMasterIndex());
 
 			m_Load_Prepare.push(pData);
@@ -471,6 +471,10 @@ void HyAssets::DequeData(IHyLoadableData *pData)
 
 void HyAssets::FinalizeData(IHyLoadableData *pData)
 {
+	// TODO: this for now...
+	if(pData->GetLoadableType() == HYLOADABLE_Shader)
+		return;
+
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Inactive, "HyAssets::FinalizeData was passed data that was HYLOADSTATE_Inactive");
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Loaded, "HyAssets::FinalizeData was passed data that was HYLOADSTATE_Loaded");
 
@@ -485,7 +489,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Loaded;
 
-			if(pData->GetLoadableType() == HYGFXTYPE_AtlasGroup)
+			if(pData->GetLoadableType() == HYLOADABLE_Atlas)
 			{
 				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] loaded");
 				m_pLoadedAtlasIndices->Set(static_cast<HyAtlas *>(pData)->GetMasterIndex());
@@ -516,7 +520,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 			{
 				pData->m_eLoadState = HYLOADSTATE_Queued;
 
-				if(pData->GetLoadableType() == HYGFXTYPE_AtlasGroup) {
+				if(pData->GetLoadableType() == HYLOADABLE_Atlas) {
 					HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] reloading");
 				}
 				else {
@@ -535,7 +539,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
 
-			if(pData->GetLoadableType() == HYGFXTYPE_AtlasGroup) {
+			if(pData->GetLoadableType() == HYLOADABLE_Atlas) {
 				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] deleted");
 			}
 			else {

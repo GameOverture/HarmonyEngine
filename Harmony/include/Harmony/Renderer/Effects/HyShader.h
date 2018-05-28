@@ -21,14 +21,13 @@ struct HyShaderVertexAttribute
 	uint32						uiInstanceDivisor;
 };
 
-class HyShader
+class HyShader : public IHyLoadableData
 {
 	friend class IHyRenderer;
 
-	static IHyRenderer *					sm_pRenderer;
-
 	static HyShaderHandle					sm_hHandleCount;
 	const HyShaderHandle					m_hHANDLE;
+	const HyShaderProgramDefaults			m_eDEFAULTS_FROM;
 
 	bool									m_bIsFinalized;
 	std::string								m_sSourceCode[HYNUMSHADERTYPES];
@@ -37,8 +36,9 @@ class HyShader
 	size_t									m_uiStride;
 
 public:
-	HyShader();
-private: ~HyShader();
+	HyShader(HyShaderProgramDefaults eDefaultsFrom);
+private:
+	virtual ~HyShader();
 public:
 	void Destroy();
 
@@ -52,7 +52,10 @@ public:
 	void AddVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize = false, uint32 uiInstanceDivisor = 0);
 	std::vector<HyShaderVertexAttribute> &GetVertextAttributes();
 
-	void Finalize(HyShaderProgramDefaults eDefaultsFrom);
+	void Finalize();
+
+	virtual void OnLoadThread() override;
+	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 };
 
 #endif /* HyShader_h__ */
