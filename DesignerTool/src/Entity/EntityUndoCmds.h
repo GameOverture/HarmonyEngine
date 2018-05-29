@@ -16,7 +16,6 @@ class ProjectItem;
 class EntityWidget;
 class EntityModel;
 class EntityTreeItem;
-class EntityTreeModel;
 
 enum EntityCmd
 {

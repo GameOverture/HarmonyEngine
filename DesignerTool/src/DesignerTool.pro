@@ -42,7 +42,6 @@ SOURCES += main.cpp \
     Entity/EntityDraw.cpp \
     Entity/EntityModel.cpp \
     Entity/EntityWidget.cpp \
-    Entity/EntSpriteFrame.cpp \
     Font/FontDraw.cpp \
     Font/FontItem.cpp \
     Font/FontModels.cpp \
@@ -62,10 +61,8 @@ SOURCES += main.cpp \
     Widget/WidgetLiveVarManager.cpp \
     Widget/WidgetOutputLog.cpp \
     Widget/WidgetRangedSlider.cpp \
-    Entity/EntityToolbox.cpp \
     Entity/EntityTreeModel.cpp \
     Project/ProjectItemMimeData.cpp \
-    Entity/EntityCommon.cpp \
     Entity/EntityUndoCmds.cpp \
     Shared/Global.cpp \
     Shared/IDraw.cpp \
@@ -110,7 +107,6 @@ HEADERS  += \
     Entity/EntityDraw.h \
     Entity/EntityModel.h \
     Entity/EntityWidget.h \
-    Entity/EntSpriteFrame.h \
     Font/FontDraw.h \
     Font/FontItem.h \
     Font/FontModels.h \
@@ -130,11 +126,9 @@ HEADERS  += \
     Widget/WidgetLiveVarManager.h \
     Widget/WidgetOutputLog.h \
     Widget/WidgetRangedSlider.h \
-    Entity/EntityToolbox.h \
     Entity/EntityTreeModel.h \
     Project/ProjectItemMimeData.h \
     Explorer/ExplorerTreeWidget.h \
-    Entity/EntityCommon.h \
     Entity/EntityUndoCmds.h \
     Shared/Global.h \
     Shared/GlobalUndoCmds.h \
