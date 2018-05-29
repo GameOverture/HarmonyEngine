@@ -34,21 +34,21 @@ ProjectItem *EntityTreeItem::GetItem()
 EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, QObject *parent) :  QAbstractItemModel(parent),
 																											m_pEntityModel(pEntityModel)
 {
-	m_pRootItem = new EntityTreeItem(this, nullptr);
-	m_pEntityItem = new EntityTreeItem(this, &entityItemRef);
+	m_pRootNode = new EntityTreeItem(this, nullptr);
+	m_pRootItem = new EntityTreeItem(this, &entityItemRef);
 
-	InsertItem(0, m_pEntityItem, m_pRootItem);
+	InsertItem(0, m_pRootItem, m_pRootNode);
 }
 
 /*virtual*/ EntityTreeModel::~EntityTreeModel()
 {
-	delete m_pEntityItem;
 	delete m_pRootItem;
+	delete m_pRootNode;
 }
 
-int EntityTreeModel::GetNumStates()
+ProjectItem *EntityTreeModel::GetRootItem()
 {
-	return m_pEntityModel->GetNumStates();
+	return m_pRootItem->GetItem();
 }
 
 QModelIndex EntityTreeModel::index(int iRow, int iColumn, const QModelIndex &parent) const
@@ -59,7 +59,7 @@ QModelIndex EntityTreeModel::index(int iRow, int iColumn, const QModelIndex &par
 	EntityTreeItem *pParentItem;
 
 	if(parent.isValid() == false)
-		pParentItem = m_pRootItem;
+		pParentItem = m_pRootNode;
 	else
 		pParentItem = static_cast<EntityTreeItem *>(parent.internalPointer());
 
@@ -78,7 +78,7 @@ QModelIndex EntityTreeModel::parent(const QModelIndex &index) const
 	EntityTreeItem *pChildItem = static_cast<EntityTreeItem *>(index.internalPointer());
 	EntityTreeItem *pParentItem = static_cast<EntityTreeItem *>(pChildItem->GetParent());
 
-	if(pParentItem == m_pRootItem)
+	if(pParentItem == m_pRootNode)
 		return QModelIndex();
 
 	return createIndex(pParentItem->GetRow(), 0, pParentItem);
@@ -92,7 +92,7 @@ int EntityTreeModel::rowCount(const QModelIndex &parentIndex) const
 
 	EntityTreeItem *pParentItem;
 	if(parentIndex.isValid() == false)
-		pParentItem = m_pRootItem;
+		pParentItem = m_pRootNode;
 	else
 		pParentItem = static_cast<EntityTreeItem *>(parentIndex.internalPointer());
 
@@ -137,7 +137,7 @@ void EntityTreeModel::InsertItems(int iRow, QList<EntityTreeItem *> itemList, En
 
 	EntityTreeItem *pParent;
 	if(parentIndex.isValid() == false)
-		pParent = m_pRootItem;
+		pParent = m_pRootNode;
 	else
 		pParent = static_cast<EntityTreeItem *>(parentIndex.internalPointer());
 
@@ -160,7 +160,7 @@ bool EntityTreeModel::removeRows(int iRow, int iCount, const QModelIndex &parent
 {
 	EntityTreeItem *pParent;
 	if(parentIndex.isValid() == false)
-		pParent = m_pRootItem;
+		pParent = m_pRootNode;
 	else
 		pParent = static_cast<EntityTreeItem *>(parentIndex.internalPointer());
 

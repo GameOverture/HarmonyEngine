@@ -164,6 +164,13 @@ void EntityWidget::on_actionAddSelectedChild_triggered()
 	}
 
 	ProjectItem *pItem = static_cast<ProjectItem *>(pExplorerItem);
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->childrenTree->model());
+	if(pItem == pTreeModel->GetRootItem())
+	{
+		HyGuiLog("Entities cannot add themselves as a child.", LOGTYPE_Info);
+		return;
+	}
+
 	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChild, m_ItemRef, pItem);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }

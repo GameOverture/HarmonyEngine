@@ -79,7 +79,8 @@ SOURCES += main.cpp \
     Harmony/HarmonyWidget.cpp \
     Atlas/AtlasRepackThread.cpp \
     Explorer/ExplorerItem.cpp \
-    Shared/Properties/PropertiesUndoCmd.cpp
+    Shared/Properties/PropertiesUndoCmd.cpp \
+    Shared/IModelTreeItem.cpp
 
 HEADERS  += \
     MainWindow.h \

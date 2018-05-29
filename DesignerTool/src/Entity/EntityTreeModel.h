@@ -41,14 +41,14 @@ class EntityTreeModel : public QAbstractItemModel
 	Q_OBJECT
 
 	EntityModel *               m_pEntityModel;
+	EntityTreeItem *            m_pRootNode;
 	EntityTreeItem *            m_pRootItem;
-	EntityTreeItem *            m_pEntityItem;
 
 public:
 	explicit EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, QObject *parent = nullptr);
 	virtual ~EntityTreeModel();
 
-	int GetNumStates();
+	ProjectItem *GetRootItem();
 
 	// Basic functionality:
 	QModelIndex index(int iRow, int iColumn, const QModelIndex &parent = QModelIndex()) const override;
