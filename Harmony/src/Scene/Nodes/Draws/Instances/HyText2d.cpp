@@ -767,8 +767,7 @@ offsetCalculation:
 		vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));	// Push the final line (row)
 	}
 
-	//m_RenderState.SetNumInstances((m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters);
-	m_uiNumRenderQuads = (m_uiNumValidCharacters * uiNUM_LAYERS) - uiNumNewlineCharacters;
+	m_uiNumRenderQuads = ((m_uiNumValidCharacters - uiNumNewlineCharacters) * uiNUM_LAYERS);
 
 	// Fix each text line to match proper alignment (HYALIGN_Left is already set at this point)
 	if(m_eAlignment != HYALIGN_Left)
