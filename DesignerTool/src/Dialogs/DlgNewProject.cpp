@@ -38,7 +38,7 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :  QDia
 		ui->txtTitleName->setText("NewGame");
 		ui->txtTitleName->setFocus();
 		ui->txtTitleName->selectAll();
-		ui->txtTitleName->setValidator(HyGlobal::FileNameValidator());
+		ui->txtTitleName->setValidator(HyGlobal::FreeFormValidator());
 
 		ui->txtClassName->setText("NewGame");
 		ui->txtClassName->setValidator(HyGlobal::CodeNameValidator());
@@ -314,6 +314,12 @@ void DlgNewProject::on_txtTitleName_textChanged(const QString &arg1)
 {
 	ui->lblAppendHint->setText("Appends \"/" % ui->txtTitleName->text() % "/\" to above");
 	UpdateAbsoluteDirLocations();
+
+	QString sFixedForClass = arg1;
+	int iPos;
+	HyGlobal::CodeNameValidator()->fixup(sFixedForClass);
+	if(QValidator::Invalid != HyGlobal::CodeNameValidator()->validate(sFixedForClass, iPos))
+		ui->txtClassName->setText(sFixedForClass);
 }
 
 void DlgNewProject::UpdateAbsoluteDirLocations()
