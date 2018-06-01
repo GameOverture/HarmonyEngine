@@ -57,7 +57,7 @@ void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
 	m_pNewItemMenuRef = pMenu;
 }
 
-Project *ExplorerWidget::AddItemProject(const QString sNewProjectFilePath)
+Project *ExplorerWidget::AddProject(const QString sNewProjectFilePath)
 {
 	Project *pNewProject = new Project(this, sNewProjectFilePath);
 	if(pNewProject->HasError())

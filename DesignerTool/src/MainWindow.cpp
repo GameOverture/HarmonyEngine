@@ -77,15 +77,19 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// FIRST RUN CHECK - Ensure Harmony Engine propject location has been specified
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	HyGuiLog("Checking required initialization parameters...", LOGTYPE_Normal);
 	m_Settings.beginGroup("RequiredParams");
 	{
-		QDir engineDir(m_Settings.value("engineLocation").toString());
-		
+		QString sEngineDir = m_Settings.value("engineLocation").toString();
+		bool bFirstRun = sEngineDir.isEmpty();
+
+		QDir engineDir(sEngineDir);
 		while(HyGlobal::IsEngineDirValid(engineDir) == false)
 		{
-			QMessageBox::information(parentWidget(), HyDesignerToolName, "First run initialization: Please specify where the Harmony Engine project location is on your machine");
+			if(bFirstRun)
+				QMessageBox::information(parentWidget(), HyDesignerToolName, "First run initialization: Please specify where the Harmony Engine project location is on your machine");
+			else
+				QMessageBox::warning(parentWidget(), HyDesignerToolName, "Harmony Engine Directory is Invalid: Please specify where the Harmony Engine project location is on your machine");
 			
 			DlgSetEngineLocation *pDlg = new DlgSetEngineLocation(this);
 			if(pDlg->exec() == QDialog::Accepted)
@@ -101,14 +105,13 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 			delete pDlg;
 		}
 		
-		m_sEngineLocation = engineDir.absolutePath();
-		m_sEngineLocation += "/";
+		m_sEnginePath = engineDir.absolutePath();
+		m_sEnginePath += "/";
 	}
 	m_Settings.endGroup();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Restore workspace
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ui->dockWidgetExplorer->show();
 	ui->dockWidgetAtlas->hide();
 	ui->dockWidgetAudio->hide();
@@ -126,7 +129,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	{
 		QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
 		for(int i = 0; i < sListOpenProjs.size(); ++i)
-			ui->explorer->AddItemProject(sListOpenProjs[i]);
+			ui->explorer->AddProject(sListOpenProjs[i]);
 	}
 	m_Settings.endGroup();
 
@@ -135,7 +138,11 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 		m_sDefaultProjectLocation = m_Settings.value("defaultProjectLocation").toString();
 		QDir defaultProjDir(m_sDefaultProjectLocation);
 		if(m_sDefaultProjectLocation.isEmpty() || defaultProjDir.exists() == false)
-			m_sDefaultProjectLocation = QDir::current().path();
+		{
+			QDir setDefaultProjectDir(m_sEnginePath);
+			setDefaultProjectDir.cdUp();
+			m_sDefaultProjectLocation = setDefaultProjectDir.absolutePath();
+		}
 
 		bool bThemeFound = false;
 		QString sTheme = m_Settings.value("theme").toString();
@@ -157,7 +164,6 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Status bar (and loading indication) initialization
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Create a loading spinner per docking window. The number of docking windows is predefined and their widgets are contextually replaced to what project/item is active.
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetAtlas));
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetAudio));
@@ -284,7 +290,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 /*static*/ QString MainWindow::EngineSrcLocation()
 {
-	return sm_pInstance->m_sEngineLocation;
+	return sm_pInstance->m_sEnginePath;
 }
 
 /*static*/ void MainWindow::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
@@ -398,7 +404,7 @@ void MainWindow::on_actionNewProject_triggered()
 			m_sDefaultProjectLocation = defaultProjDir.absolutePath();
 		}
 
-		ui->explorer->SelectItem(ui->explorer->AddItemProject(pDlg->GetProjFilePath()));
+		ui->explorer->SelectItem(ui->explorer->AddProject(pDlg->GetProjFilePath()));
 		ui->explorer->GetCurProjSelected()->GetAtlasModel().RepackAll(0);
 	}
 	delete pDlg;
@@ -414,7 +420,9 @@ void MainWindow::on_actionOpenProject_triggered()
 
 	if(pDlg->exec() == QDialog::Accepted)
 	{
-		ui->explorer->AddItemProject(pDlg->selectedFiles()[0]);
+		Project *pAddedProject = ui->explorer->AddProject(pDlg->selectedFiles()[0]);
+		if(pAddedProject)
+			m_sDefaultProjectLocation = pAddedProject->GetDirPath();
 	}
 	delete pDlg;
 }

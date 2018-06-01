@@ -1,8 +1,8 @@
 #include "Harmony/HyEngine.h"
-#include "HyTemplate.h"
+#include "%HY_CLASS%.h"
 
 //--------------------------------------------------------------------------------------
-// Entry point to the program.
+// Entry point to %HY_TITLE%
 //
 // Initialize a HarmonyInit structure either by hard-coding some
 // values, using the command line arguments, or simply passing the path to the *.hyproj.
@@ -14,9 +14,9 @@
 //--------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
-	HarmonyInit initStruct("[HyTitle].hyproj");
+	HarmonyInit initStruct("%HY_CLASS%.hyproj");
 
-	HyTemplate *pGame = new HyTemplate(initStruct);
+	%HY_CLASS% *pGame = new %HY_CLASS%(initStruct);
 	HyEngine::RunGame(pGame);
 
 	return 0;
