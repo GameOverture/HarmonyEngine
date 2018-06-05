@@ -35,10 +35,10 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :  QDia
 	ui->txtMetaDataDirName->blockSignals(true);
 	ui->txtSourceDirName->blockSignals(true);
 	{
-		ui->txtTitleName->setText("NewGame");
+		ui->txtTitleName->setText("New Game");
 		ui->txtTitleName->setFocus();
 		ui->txtTitleName->selectAll();
-		ui->txtTitleName->setValidator(HyGlobal::FileNameValidator());
+		ui->txtTitleName->setValidator(HyGlobal::FreeFormValidator());
 
 		ui->txtClassName->setText("NewGame");
 		ui->txtClassName->setValidator(HyGlobal::CodeNameValidator());
@@ -48,6 +48,8 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :  QDia
 		ui->txtAssetsDirName->setValidator(HyGlobal::FileNameValidator());
 		ui->txtMetaDataDirName->setValidator(HyGlobal::FileNameValidator());
 		ui->txtSourceDirName->setValidator(HyGlobal::FileNameValidator());
+
+		on_txtTitleName_textChanged("New Game");
 	}
 	ui->txtTitleName->blockSignals(false);
 	ui->txtClassName->blockSignals(false);
@@ -74,13 +76,13 @@ QString DlgNewProject::GetProjFilePath()
 
 QString DlgNewProject::GetProjFileName()
 {
-	return ui->txtTitleName->text() % HyGlobal::ItemExt(ITEM_Project);
+	return ui->txtClassName->text() % HyGlobal::ItemExt(ITEM_Project);
 }
 
 QString DlgNewProject::GetProjDirPath()
 {
 	if(ui->chkCreateGameDir->isChecked())
-		return ui->txtGameLocation->text() + '/' + ui->txtTitleName->text() + '/';
+		return ui->txtGameLocation->text() + '/' + ui->txtClassName->text() + '/';
 	else
 		return ui->txtGameLocation->text() + '/';
 }
@@ -116,8 +118,8 @@ void DlgNewProject::on_buttonBox_accepted()
 	QDir slnDir(projDir);
 	if(ui->chkCreateProjectDir->isChecked())
 	{
-		projDir.mkdir(ui->txtTitleName->text());
-		projDir.cd(ui->txtTitleName->text());
+		projDir.mkdir(ui->txtClassName->text());
+		projDir.cd(ui->txtClassName->text());
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +135,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	QJsonObject jsonObjForSrc;
 	if(ui->chkCreateProjectDir->isChecked())
 	{
-		QDir srcDir(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtTitleName->text());
+		QDir srcDir(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtClassName->text());
 		jsonObjForSrc.insert("AdjustWorkingDirectory", QJsonValue(srcDir.relativeFilePath(GetProjDirPath())));
 	}
 	else
@@ -161,7 +163,7 @@ void DlgNewProject::on_buttonBox_accepted()
 
 	QFile *pNewProjectFileForSrc = nullptr;
 	if(ui->chkCreateProjectDir->isChecked())
-		pNewProjectFileForSrc = new QFile(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtTitleName->text() % "/" % GetProjFileName());
+		pNewProjectFileForSrc = new QFile(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtClassName->text() % "/" % GetProjFileName());
 	else
 		pNewProjectFileForSrc = new QFile(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % GetProjFileName());
 
@@ -232,18 +234,18 @@ void DlgNewProject::on_buttonBox_accepted()
 
 		for(int i = 0; i < srcFileList.size(); ++i)
 		{
-			if(srcFileList[i].fileName().contains("HyTitle"))
+			if(srcFileList[i].fileName().contains("%HY_TITLE%"))
 			{
 				QFile file(srcFileList[i].absoluteFilePath());
-				QString sNewFileName = srcFileList[i].fileName().replace("HyTitle", ui->txtTitleName->text() % "_" % templateDirList[iTemplateIndex].dirName());
+				QString sNewFileName = srcFileList[i].fileName().replace("%HY_TITLE%", ui->txtTitleName->text() % "_" % templateDirList[iTemplateIndex].dirName());
 				file.rename(srcFileList[i].absoluteDir().absolutePath() % "/" % sNewFileName);
 				file.close();
 			}
 
-			if(srcFileList[i].fileName().contains("HyTemplate"))
+			if(srcFileList[i].fileName().contains("%HY_CLASS%"))
 			{
 				QFile file(srcFileList[i].absoluteFilePath());
-				QString sNewFileName = srcFileList[i].fileName().replace("HyTemplate", ui->txtClassName->text());
+				QString sNewFileName = srcFileList[i].fileName().replace("%HY_CLASS%", ui->txtClassName->text());
 				file.rename(srcFileList[i].absoluteDir().absolutePath() % "/" % sNewFileName);
 				file.close();
 			}
@@ -269,12 +271,12 @@ void DlgNewProject::on_buttonBox_accepted()
 
 			//QDir exeDir(GetProjDirPath() % "bin/");
 
-			sContents.replace("[HyTitle]", ui->txtTitleName->text());
-			sContents.replace("HyTemplate", ui->txtClassName->text());
-			sContents.replace("HyProjGUID", projGUID.toString());
-			sContents.replace("[HyHarmonyProjLocation]", srcFileList[i].dir().relativeFilePath(MainWindow::EngineSrcLocation()) % "/");
-			sContents.replace("HyHarmonyInclude", srcFileList[i].dir().relativeFilePath(MainWindow::EngineSrcLocation() % "include"));
-			sContents.replace("HyWorkingDirectory", projDir.relativeFilePath(GetProjDirPath()) % "/");
+			sContents.replace("%HY_TITLE%", ui->txtTitleName->text());
+			sContents.replace("%HY_CLASS%", ui->txtClassName->text());
+			sContents.replace("%HY_GUID%", projGUID.toString());
+			sContents.replace("%HY_RELPATH%", srcFileList[i].dir().relativeFilePath(MainWindow::EngineSrcLocation()) % "/");
+			sContents.replace("%HY_RELINCLUDE%", srcFileList[i].dir().relativeFilePath(MainWindow::EngineSrcLocation() % "include"));
+			sContents.replace("%HY_OUTPUTDIR%", projDir.relativeFilePath(GetProjDirPath()) % "/");
 
 			if(!file.open(QFile::WriteOnly))
 			{
@@ -312,7 +314,15 @@ void DlgNewProject::on_txtGameLocation_textChanged(const QString &arg1)
 
 void DlgNewProject::on_txtTitleName_textChanged(const QString &arg1)
 {
-	ui->lblAppendHint->setText("Appends \"/" % ui->txtTitleName->text() % "/\" to above");
+	QString sFixedForClass = arg1;
+	HyGlobal::CodeNameValidator()->fixup(sFixedForClass);
+	sFixedForClass.replace(" ", "");
+
+	int iPos;
+	if(QValidator::Invalid != HyGlobal::CodeNameValidator()->validate(sFixedForClass, iPos))
+		ui->txtClassName->setText(sFixedForClass);
+
+	ui->lblAppendHint->setText("Appends \"/" % ui->txtClassName->text() % "/\" to above");
 	UpdateAbsoluteDirLocations();
 }
 

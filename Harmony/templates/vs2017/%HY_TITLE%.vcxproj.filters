@@ -14,12 +14,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HyTemplate.cpp">
+    <ClCompile Include="%HY_CLASS%.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HyTemplate.h">
+    <ClInclude Include="%HY_CLASS%.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

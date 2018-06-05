@@ -151,6 +151,7 @@ class HyGlobal
 	static QString                  sm_Themes[NUMTHEMES];
 
 	static QRegExpValidator *       sm_pCodeNameValidator;
+	static QRegExpValidator *       sm_pFreeFormValidator;
 	static QRegExpValidator *       sm_pFileNameValidator;
 	static QRegExpValidator *       sm_pFilePathValidator;
 	static QRegExpValidator *       sm_pVector2dValidator;
@@ -173,6 +174,7 @@ public:
 	static const QString ThemeString(Theme eTheme)                      { return sm_Themes[eTheme]; }
 
 	static const QRegExpValidator *CodeNameValidator()                  { return sm_pCodeNameValidator; }
+	static const QRegExpValidator *FreeFormValidator()                  { return sm_pFreeFormValidator; }
 	static const QRegExpValidator *FileNameValidator()                  { return sm_pFileNameValidator; }
 	static const QRegExpValidator *FilePathValidator()                  { return sm_pFilePathValidator; }
 	static const QRegExpValidator *Vector2dValidator()                  { return sm_pVector2dValidator; }

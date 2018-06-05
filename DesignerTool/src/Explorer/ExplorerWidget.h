@@ -43,7 +43,7 @@ public:
 
 	void SetItemMenuPtr(QMenu *pMenu);
 	
-	Project *AddItemProject(const QString sNewProjectFilePath);
+	Project *AddProject(const QString sNewProjectFilePath);
 
 	ProjectItem *AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue);
 	void RemoveItem(ExplorerItem *pItem);

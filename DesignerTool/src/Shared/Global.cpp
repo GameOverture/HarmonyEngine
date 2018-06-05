@@ -20,6 +20,7 @@
 /*static*/ QString HyGlobal::sm_Themes[NUMTHEMES];
 
 /*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = nullptr;
+/*static*/ QRegExpValidator *HyGlobal::sm_pFreeFormValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pVector2dValidator = nullptr;
@@ -96,6 +97,7 @@
 	sm_Themes[THEME_Compe] = "Compe";
 
 	sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));
+	sm_pFreeFormValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-\\s]*"));
 	sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-]*"));
 	sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_\\-]*"));
 	sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));
@@ -239,7 +241,7 @@
 	   !dir.exists("lib/") ||
 	   !dir.exists("src/") ||
 	   !dir.exists("templates/") ||
-	   (!dir.exists("Harmony_vs2013.sln") && !dir.exists("Harmony_vs2015.sln")))
+	   !dir.exists("Harmony.sln"))
 	{
 		return false;
 	}

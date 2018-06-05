@@ -41,7 +41,7 @@ class MainWindow : public QMainWindow
 
 	QSettings                       m_Settings;
 
-	QString                         m_sEngineLocation;
+	QString                         m_sEnginePath;
 	QString                         m_sDefaultProjectLocation;
 
 	QList<WaitingSpinnerWidget *>   m_LoadingSpinnerList;
