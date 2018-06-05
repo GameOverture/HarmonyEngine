@@ -91,7 +91,7 @@ void main()
 
 CustomShader::CustomShader(HarmonyInit &initStruct) :	IHyApplication(initStruct),
 														m_CheckerGrid(400.0f, 400.0f, 25.0f, nullptr),
-														m_pCheckerGridShader(HY_NEW HyShader())
+														m_pCheckerGridShader(HY_NEW HyShader(HYSHADERPROG_Primitive))
 {
 }
 
@@ -107,7 +107,7 @@ CustomShader::~CustomShader()
 	m_pCheckerGridShader->AddVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
 	m_pCheckerGridShader->AddVertexAttribute("attr_vUVcoord", HYSHADERVAR_vec2);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
-	m_pCheckerGridShader->Finalize(HYSHADERPROG_Primitive);
+	m_pCheckerGridShader->Finalize();
 
 	m_CheckerGrid.SetShader(m_pCheckerGridShader);
 	m_CheckerGrid.Load();

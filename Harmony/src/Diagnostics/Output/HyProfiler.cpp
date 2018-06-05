@@ -43,8 +43,8 @@ void HyProfiler::BeginSection(HyProfilerSection eSection)
 	//HyAssert(m_eCurrentSection == HYPROFILERSECTION_None, "HyProfiler::BeginSection was invoked without its corresponding EndSe");
 
 	
-	m_SectionStack.push(eSection);
-	m_uiSectionTicks[eSection] = HyReadTsc();
+	//m_SectionStack.push(eSection);
+	//m_uiSectionTicks[eSection] = HyReadTsc();
 
 
 	//if(m_bOpen == false)
