@@ -105,6 +105,7 @@
     <ClCompile Include="Scene\Tweens\HyTweenFuncs.cpp" />
     <ClCompile Include="Scene\Tweens\HyTweenVec2.cpp" />
     <ClCompile Include="Scene\Tweens\HyTweenVec3.cpp" />
+    <ClCompile Include="Threading\IHyThread.cpp" />
     <ClCompile Include="Time\HyTime.cpp" />
     <ClCompile Include="Time\Watches\HyStopwatch.cpp" />
     <ClCompile Include="Time\Watches\HyTimer.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="..\include\Harmony\Threading\BaseMacro.h" />
     <ClInclude Include="..\include\Harmony\Threading\BasicSync.h" />
     <ClInclude Include="..\include\Harmony\Threading\Error.h" />
+    <ClInclude Include="..\include\Harmony\Threading\IHyThread.h" />
     <ClInclude Include="..\include\Harmony\Threading\InteropUnix.h" />
     <ClInclude Include="..\include\Harmony\Threading\InteropWin.h" />
     <ClInclude Include="..\include\Harmony\Threading\PlatformInterop.h" />
