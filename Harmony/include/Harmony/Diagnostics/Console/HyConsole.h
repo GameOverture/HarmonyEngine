@@ -13,8 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Threading/BasicSync.h"
 
-#include <sstream>
-
 class HyConsole
 {
 	static HyConsole *			sm_pInstance;

@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyThread.h
+*	IHyThreadClass.h
 *
 *	Harmony Engine
 *	Copyright (c) 2018 Jason Knobler
@@ -7,12 +7,12 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IHyThread_h__
-#define IHyThread_h__
+#ifndef IHyThreadClass_h__
+#define IHyThreadClass_h__
 
 #include "Afx/HyStdAfx.h"
 
-class IHyThread
+class IHyThreadClass
 {
 	std::thread					m_Thread;
 	std::atomic<HyThreadState>	m_eThreadState;
@@ -20,10 +20,21 @@ class IHyThread
 	std::mutex					m_cvMutex;
 
 public:
-	IHyThread();
-	virtual ~IHyThread();
+	IHyThreadClass();
+	virtual ~IHyThreadClass();
 
-	//void ThreadUpdate
+	bool ThreadStart();
+	bool ThreadStop();
+
+	bool IsThreadFinished();
+	void ThreadJoin();
+
+	virtual void OnThreadInit() = 0;
+	virtual void OnThreadUpdate() = 0;
+	virtual void OnThreadShutdown() = 0;
+
+private:
+	void ThreadFunc();
 };
 
-#endif /* IHyThread_h__ */
+#endif /* IHyThreadClass_h__ */

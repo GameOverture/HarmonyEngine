@@ -10,25 +10,23 @@
 #ifndef HyCompiler_h__
 #define HyCompiler_h__
 
-#include <string>
-
 // These macros use the (compiler-specific) project settings
 // to create independent versions for the game.
 #if !defined(HARMONY_COMPILER_DEFINED)
 
-	#if defined(_UNICODE)
-		#define HY_UNICODE
-		typedef std::wstring HyString;
-		typedef std::wostringstream HyStringStream;
-		typedef wchar_t HyChar;
-		#define HyStr(x) L ## x
-	#else
-		#define HY_ASCII
-		typedef std::string HyString;
-		typedef std::ostringstream HyStringStream;
-		typedef char HyChar;
-		#define HyStr(x) x
-	#endif
+	//#if defined(_UNICODE)
+	//	#define HY_UNICODE
+	//	typedef std::wstring HyString;
+	//	typedef std::wostringstream HyStringStream;
+	//	typedef wchar_t HyChar;
+	//	#define HyStr(x) L ## x
+	//#else
+	//	#define HY_ASCII
+	//	typedef std::string HyString;
+	//	typedef std::ostringstream HyStringStream;
+	//	typedef char HyChar;
+	//	#define HyStr(x) x
+	//#endif
 
 	#if defined(_MSC_VER)
 		#define HY_COMPILER_MSVC
@@ -79,7 +77,7 @@
 	#error HyCompiler.h: Invalid Platform Environment.
 #endif
 
-#if defined(HY_COMPILER_UNKNOWN)
+#if defined(HY_COMPILER_UNKNOWN) || (!defined(HARMONY_COMPILER_DEFINED))
 	#error HyCompiler.h: Could not determine the compiler.
 #endif
 

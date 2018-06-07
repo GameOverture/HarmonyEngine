@@ -23,6 +23,15 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform2.hpp"
 
+#include <string>
+#include <algorithm>
+#include <vector>
+#include <queue>
+#include <set>
+#include <map>
+#include <cctype>
+#include <sstream>
+#include <future>
 
 #if defined(HY_PLATFORM_GUI)// GUI -> Hack for now
 #define WIN32_LEAN_AND_MEAN
@@ -177,7 +186,8 @@ enum HyWindowType
 
 enum HyThreadState
 {
-	HYTHREADSTATE_Run = 0,
+	HYTHREADSTATE_Inactive = 0,
+	HYTHREADSTATE_Run,
 	HYTHREADSTATE_ShouldExit,
 	HYTHREADSTATE_HasExited
 };

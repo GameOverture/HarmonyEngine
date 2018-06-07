@@ -14,8 +14,6 @@
 #include "Scene/Physics/HyBox2dRuntime.h"
 #include "Scene/Physics/HyDebugPhys2d.h"
 
-#include <vector>
-
 // Forward declarations
 class IHyNode;
 class IHyDrawInst2d;

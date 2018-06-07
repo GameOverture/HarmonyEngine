@@ -13,8 +13,6 @@
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Assets/Nodes/HyText2dData.h"
 
-#include <vector>
-
 class HyText2d : public IHyDrawInst2d
 {
 protected:

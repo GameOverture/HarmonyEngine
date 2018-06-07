@@ -12,8 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include <string>
-
 namespace HyStr
 {
 	// Takes the dst char ptr and dynamically allocates the size of src and copies its contents.

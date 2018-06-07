@@ -15,9 +15,6 @@
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
 
-#include <map>
-using std::map;
-
 /*
 * Glyph metrics:
 * --------------

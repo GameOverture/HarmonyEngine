@@ -12,9 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include <set>
-#include <map>
-
 #define PAGE_SIZE 
 #define NUM_CHUNKS 256
 

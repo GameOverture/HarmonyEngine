@@ -9,11 +9,6 @@
  *************************************************************************/
 #include "Utilities/HyStrManip.h"
 
-#include <algorithm>
-#include <vector>
-#include <cctype>
-//#include <locale>
-
 namespace HyStr
 {
 	// Takes the dst char ptr and dynamically allocates the size of src and copies its contents.

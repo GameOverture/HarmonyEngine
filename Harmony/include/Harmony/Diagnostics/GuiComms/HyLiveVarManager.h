@@ -12,8 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include <vector>
-
 class HyLiveVar
 {
 	static uint32	sm_uiGuidCounter;

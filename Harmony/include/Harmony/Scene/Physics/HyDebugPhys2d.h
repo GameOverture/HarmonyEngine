@@ -12,8 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include <vector>
-
 // forward declaration
 class HyEntity2d;
 

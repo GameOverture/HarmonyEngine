@@ -16,9 +16,6 @@
 #include "Scene/HyScene.h"
 #include "Threading/Threading.h"
 
-#include <queue>
-#include <future>
-
 class IHyRenderer;
 class IHyDrawInst2d;
 class IHyNodeData;

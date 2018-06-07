@@ -12,8 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include <vector>
-
 class HyWindow;
 
 class IHyAudio

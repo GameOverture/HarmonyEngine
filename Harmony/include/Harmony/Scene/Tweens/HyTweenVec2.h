@@ -13,8 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Tweens/HyTweenFloat.h"
 
-#include <vector>
-
 class HyTweenVec2
 {
 	glm::vec2					m_vValue;

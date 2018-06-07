@@ -13,8 +13,6 @@
 #include "Renderer/IHyRenderer.h"
 #include "soil2/SOIL2.h"
 
-#include <set>
-
 HyAtlas::HyAtlas(std::string sFilePath,
 				 uint32 uiAtlasGroupId,
 				 uint32 uiIndexInGroup,

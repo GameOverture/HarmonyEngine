@@ -240,7 +240,7 @@
     <ClCompile Include="Renderer\Components\HyPortalGate2d.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\IHyThread.cpp">
+    <ClCompile Include="Threading\IHyThreadClass.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
   </ItemGroup>
@@ -660,7 +660,7 @@
     <ClInclude Include="..\include\Harmony\Renderer\Effects\IHyFx.h">
       <Filter>Renderer\Effects</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\IHyThread.h">
+    <ClInclude Include="..\include\Harmony\Threading\IHyThreadClass.h">
       <Filter>Threading</Filter>
     </ClInclude>
   </ItemGroup>

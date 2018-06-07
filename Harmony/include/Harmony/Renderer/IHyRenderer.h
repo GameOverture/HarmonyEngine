@@ -13,8 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Renderer/Effects/HyShader.h"
 
-#include <queue>
-
 class HyRenderState;
 class HyStencil;
 class HyPortal2d;

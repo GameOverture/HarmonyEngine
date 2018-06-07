@@ -14,8 +14,6 @@
 #include "Watches/HyTimer.h"
 #include "Watches/HyStopwatch.h"
 
-#include <vector>
-
 // Forward declarations
 class IHyTimeInst;
 class HyStopwatch;
