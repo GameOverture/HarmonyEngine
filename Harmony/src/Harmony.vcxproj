@@ -35,14 +35,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\include\Harmony\Threading\BasicSync.cpp" />
-    <ClCompile Include="..\include\Harmony\Threading\InteropUnix.cpp" />
-    <ClCompile Include="..\include\Harmony\Threading\stdafx.cpp" />
-    <ClCompile Include="..\include\Harmony\Threading\Threading.cpp" />
-    <ClCompile Include="..\include\Harmony\Threading\TLSEntry.cpp" />
-    <ClCompile Include="..\include\Harmony\Threading\Utils.cpp" />
-    <ClCompile Include="..\include\Harmony\Threading\WaitObject.cpp" />
-    <ClCompile Include="..\include\Harmony\Threading\WaitObjectEx.cpp" />
     <ClCompile Include="Assets\HyAssets.cpp" />
     <ClCompile Include="Assets\Loadables\HyAtlas.cpp" />
     <ClCompile Include="Assets\Loadables\HyAtlasIndices.cpp" />
@@ -199,20 +191,7 @@
     <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenFuncs.h" />
     <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenVec2.h" />
     <ClInclude Include="..\include\Harmony\Scene\Tweens\HyTweenVec3.h" />
-    <ClInclude Include="..\include\Harmony\Threading\BaseMacro.h" />
-    <ClInclude Include="..\include\Harmony\Threading\BasicSync.h" />
-    <ClInclude Include="..\include\Harmony\Threading\Error.h" />
     <ClInclude Include="..\include\Harmony\Threading\IHyThreadClass.h" />
-    <ClInclude Include="..\include\Harmony\Threading\InteropUnix.h" />
-    <ClInclude Include="..\include\Harmony\Threading\InteropWin.h" />
-    <ClInclude Include="..\include\Harmony\Threading\PlatformInterop.h" />
-    <ClInclude Include="..\include\Harmony\Threading\PrimitiveTypeDefs.h" />
-    <ClInclude Include="..\include\Harmony\Threading\stdafx.h" />
-    <ClInclude Include="..\include\Harmony\Threading\Threading.h" />
-    <ClInclude Include="..\include\Harmony\Threading\TLSEntry.h" />
-    <ClInclude Include="..\include\Harmony\Threading\Utils.h" />
-    <ClInclude Include="..\include\Harmony\Threading\WaitObject.h" />
-    <ClInclude Include="..\include\Harmony\Threading\WaitObjectEx.h" />
     <ClInclude Include="..\include\Harmony\Time\HyTime.h" />
     <ClInclude Include="..\include\Harmony\Time\Watches\HyStopwatch.h" />
     <ClInclude Include="..\include\Harmony\Time\Watches\HyTimer.h" />

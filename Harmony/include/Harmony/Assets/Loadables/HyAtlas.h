@@ -11,10 +11,7 @@
 #define HyAtlas_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Assets/Loadables/IHyLoadableData.h"
-#include "Threading/Threading.h"
-
 #include "Utilities/HyMath.h"
 
 class HyAssets;
@@ -48,7 +45,7 @@ class HyAtlas : public IHyLoadableData
 	HyRectangle<int32> *					m_pFrames;
 	std::map<uint32, HyRectangle<int32> *>	m_ChecksumMap;
 
-	BasicSection							m_csPixelData;
+	std::mutex								m_Mutex_PixelData;
 
 public:
 	HyAtlas(std::string sFilePath, uint32 uiAtlasGroupId, uint32 uiIndexInGroup, uint32 uiMasterIndex, uint32 uiWidth, uint32 uiHeight, HyTextureFormat eTextureFormat, jsonxx::Array &srcFramesArrayRef);

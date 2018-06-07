@@ -24,12 +24,8 @@
 
 #define HYASSETS_AtlasDir "Atlases/"
 
-void HyAssetInit(HyAssets *pThis)
-{
-	HyLog("Assets are initializing...");
-	pThis->ParseInitInfo();
-}
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Nested class NodeData
 template<typename tData>
 void HyAssets::NodeData<tData>::Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef)
 {
@@ -62,17 +58,20 @@ const tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, cons
 
 	return &m_DataList[iter->second];
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
+HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	IHyThreadClass(),
+																	m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
+																	m_bInitialized(false),
 																	m_SceneRef(sceneRef),
 																	m_pAtlases(nullptr),
 																	m_uiNumAtlases(0),
 																	m_pLoadedAtlasIndices(nullptr),
-																	m_LoadingCtrl(m_Load_Shared, m_Load_Retrieval)
+																	m_UniqueLock_ConditionVariable(m_Mutex_ConditionVariable),
+																	m_bProcessThread(false)
 {
 	IHyDrawInst2d::sm_pHyAssets = this;
-
-	m_InitFuture = std::async(std::launch::async, &HyAssetInit, this);
+	ThreadStart();
 }
 
 HyAssets::~HyAssets()
@@ -94,108 +93,9 @@ HyAssets::~HyAssets()
 	delete m_pLoadedAtlasIndices;
 }
 
-bool HyAssets::IsLoaded()
+bool HyAssets::IsInitialized()
 {
-	auto status = m_InitFuture.wait_for(std::chrono::milliseconds(0));
-	return status == std::future_status::ready;
-}
-
-void HyAssets::ParseInitInfo()
-{
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir);
-	sAtlasInfoFilePath += "atlas.json";
-	std::string sAtlasInfoFileContents;
-	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
-
-	jsonxx::Array atlasGrpArray;
-	if(atlasGrpArray.parse(sAtlasInfoFileContents))
-	{
-		// Iterate through each atlas group and determine how many textures total there are between all groups
-		m_uiNumAtlases = 0;
-		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
-		{
-			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
-			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
-			m_uiNumAtlases += static_cast<uint32>(texturesArray.size());
-		}
-		m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNumAtlases]);
-		HyAtlas *pAtlasWriteLocation = m_pAtlases;
-
-		// Then iterate back over each atlas group and instantiate a HyAtlas for each texture
-		uint32 uiMasterIndex = 0;
-		char szTmpBuffer[16];
-		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
-		{
-			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
-			uint32 uiAtlasGroupId = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("atlasGrpId"));
-
-			std::string sRootAtlasFilePath = m_sDATADIR + HYASSETS_AtlasDir;
-			std::sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
-			sRootAtlasFilePath += szTmpBuffer;
-			sRootAtlasFilePath += "/";
-
-			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
-			for(uint32 j = 0; j < static_cast<uint32>(texturesArray.size()); ++j)
-			{
-				HyAssert(uiMasterIndex < m_uiNumAtlases, "HyAssets::ParseInitInfo instantiated too many atlases");
-
-				std::string sAtlasFilePath = sRootAtlasFilePath;
-				std::sprintf(szTmpBuffer, "%05d", j);
-				sAtlasFilePath += szTmpBuffer;
-
-				uint32 uiTextureFormat = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureType"));
-
-				if(uiTextureFormat == HYTEXTURE_R8G8B8A8 || uiTextureFormat == HYTEXTURE_R8G8B8)
-					sAtlasFilePath += ".png";
-				else
-					sAtlasFilePath += ".dds";
-
-				new (pAtlasWriteLocation)HyAtlas(sAtlasFilePath,
-												 uiAtlasGroupId,
-												 j,
-												 uiMasterIndex,
-												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")),
-												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")),
-												 static_cast<HyTextureFormat>(uiTextureFormat),
-												 texturesArray.get<jsonxx::Array>(j));
-
-				++pAtlasWriteLocation;
-				++uiMasterIndex;
-			}
-		}
-	}
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	// Set HyAtlasIndices::sm_iIndexFlagsArraySize now that the total number of atlases is known
-	HyAtlasIndices::sm_iIndexFlagsArraySize = (m_uiNumAtlases / 32);
-	if(m_uiNumAtlases % 32 != 0)
-		HyAtlasIndices::sm_iIndexFlagsArraySize++;
-
-	m_pLoadedAtlasIndices = HY_NEW HyAtlasIndices();
-
-#ifndef HY_PLATFORM_GUI
-	std::string sGameDataFilePath(m_sDATADIR);
-	sGameDataFilePath += "data.json";
-
-	std::string sGameDataFileContents;
-	HyReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);
-	
-	jsonxx::Object gameDataObj;
-	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
-	HyAssert(bGameDataParsed, "Could not parse game data");
-
-	m_Audio.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
-	m_Txt2d.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
-	m_Sprite2d.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
-	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
-	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
-	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");
-	//jsonxx::Object &spineDataObjRef = gameDataObj.get<jsonxx::Object>("Spine");
-#endif
-	
-	// Start up Loading thread
-	m_pLoadingThread = ThreadManager::Get()->BeginThread(_T("Loading Thread"), THREAD_START_PROCEDURE(LoadingThread), &m_LoadingCtrl);
+	return m_bInitialized;
 }
 
 HyAtlas *HyAssets::GetAtlas(uint32 uiMasterIndex)
@@ -365,12 +265,9 @@ bool HyAssets::IsShutdown()
 {
 	if(m_pLoadedAtlasIndices->IsEmpty())
 	{
-		if(m_LoadingCtrl.m_eState == HYTHREADSTATE_Run)
-			m_LoadingCtrl.m_eState = HYTHREADSTATE_ShouldExit;
-
-		m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
-
-		if(m_LoadingCtrl.m_eState == HYTHREADSTATE_HasExited)
+		ThreadStop();
+		
+		if(IsThreadFinished())
 			return true;
 	}
 
@@ -383,7 +280,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	if(m_Load_Prepare.empty() == false)
 	{
 		// Copy load queue data into shared data
-		if(m_LoadingCtrl.m_csSharedQueue.Lock(1))
+		if(m_Mutex_SharedQueue.try_lock())
 		{
 			while(m_Load_Prepare.empty() == false)
 			{
@@ -391,15 +288,19 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 				m_Load_Prepare.pop();
 			}
 		
-			m_LoadingCtrl.m_csSharedQueue.Unlock();
-		}
+			m_Mutex_SharedQueue.unlock();
 
-		m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
+			m_bProcessThread = true;
+			m_ConditionVariable.notify_one();
+			
+			//m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
+		}
 	}
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check to see if any loaded data (from the load thread) is ready to uploaded to graphics card
-	if(m_LoadingCtrl.m_csRetrievalQueue.Lock(1))
+	if(m_Mutex_RetrievalQueue.try_lock())
 	{
 		while(m_Load_Retrieval.empty() == false)
 		{
@@ -409,7 +310,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 			rendererRef.TxData(pData);
 		}
 	
-		m_LoadingCtrl.m_csRetrievalQueue.Unlock();
+		m_Mutex_RetrievalQueue.unlock();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,6 +323,143 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 		FinalizeData(pData);
 	}
+}
+
+/*virtual*/ void HyAssets::OnThreadInit() /*override*/
+{
+	HyLog("Assets are initializing...");
+
+	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir);
+	sAtlasInfoFilePath += "atlas.json";
+	std::string sAtlasInfoFileContents;
+	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
+
+	jsonxx::Array atlasGrpArray;
+	if(atlasGrpArray.parse(sAtlasInfoFileContents))
+	{
+		// Iterate through each atlas group and determine how many textures total there are between all groups
+		m_uiNumAtlases = 0;
+		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
+		{
+			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
+			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
+			m_uiNumAtlases += static_cast<uint32>(texturesArray.size());
+		}
+		m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNumAtlases]);
+		HyAtlas *pAtlasWriteLocation = m_pAtlases;
+
+		// Then iterate back over each atlas group and instantiate a HyAtlas for each texture
+		uint32 uiMasterIndex = 0;
+		char szTmpBuffer[16];
+		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
+		{
+			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
+			uint32 uiAtlasGroupId = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("atlasGrpId"));
+
+			std::string sRootAtlasFilePath = m_sDATADIR + HYASSETS_AtlasDir;
+			std::sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
+			sRootAtlasFilePath += szTmpBuffer;
+			sRootAtlasFilePath += "/";
+
+			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
+			for(uint32 j = 0; j < static_cast<uint32>(texturesArray.size()); ++j)
+			{
+				HyAssert(uiMasterIndex < m_uiNumAtlases, "HyAssets::OnThreadInit instantiated too many atlases");
+
+				std::string sAtlasFilePath = sRootAtlasFilePath;
+				std::sprintf(szTmpBuffer, "%05d", j);
+				sAtlasFilePath += szTmpBuffer;
+
+				uint32 uiTextureFormat = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureType"));
+
+				if(uiTextureFormat == HYTEXTURE_R8G8B8A8 || uiTextureFormat == HYTEXTURE_R8G8B8)
+					sAtlasFilePath += ".png";
+				else
+					sAtlasFilePath += ".dds";
+
+				new (pAtlasWriteLocation)HyAtlas(sAtlasFilePath,
+					uiAtlasGroupId,
+					j,
+					uiMasterIndex,
+					static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")),
+					static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")),
+					static_cast<HyTextureFormat>(uiTextureFormat),
+					texturesArray.get<jsonxx::Array>(j));
+
+				++pAtlasWriteLocation;
+				++uiMasterIndex;
+			}
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Set HyAtlasIndices::sm_iIndexFlagsArraySize now that the total number of atlases is known
+	HyAtlasIndices::sm_iIndexFlagsArraySize = (m_uiNumAtlases / 32);
+	if(m_uiNumAtlases % 32 != 0)
+		HyAtlasIndices::sm_iIndexFlagsArraySize++;
+
+	m_pLoadedAtlasIndices = HY_NEW HyAtlasIndices();
+
+#ifndef HY_PLATFORM_GUI
+	std::string sGameDataFilePath(m_sDATADIR);
+	sGameDataFilePath += "data.json";
+
+	std::string sGameDataFileContents;
+	HyReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);
+
+	jsonxx::Object gameDataObj;
+	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
+	HyAssert(bGameDataParsed, "Could not parse game data");
+
+	m_Audio.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
+	m_Txt2d.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
+	m_Sprite2d.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
+	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
+	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
+	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");
+	//jsonxx::Object &spineDataObjRef = gameDataObj.get<jsonxx::Object>("Spine");
+#endif
+
+	// Atomic boolean indicated to main thread that we're initialized
+	m_bInitialized = true;
+}
+
+/*virtual*/ void HyAssets::OnThreadUpdate() /*override*/
+{
+	// Wait idle indefinitely until there is new data to be grabbed
+	m_ConditionVariable.wait(m_UniqueLock_ConditionVariable, [this] { return m_bProcessThread; } );
+	m_bProcessThread = false;	// Reset the event so we wait the next time we loop
+
+	std::vector<IHyLoadableData *>	dataList;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
+	m_Mutex_SharedQueue.lock();
+	{
+		while(m_Load_Shared.empty() == false)
+		{
+			dataList.push_back(m_Load_Shared.front());
+			m_Load_Shared.pop();
+		}
+	}
+	m_Mutex_SharedQueue.unlock();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Load everything that is enqueued (outside of any critical section)
+	for(uint32 i = 0; i < dataList.size(); ++i)
+	{
+		dataList[i]->OnLoadThread();
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Copy all the (loaded) IData ptrs to the retrieval vector
+		m_Mutex_RetrievalQueue.lock();
+		m_Load_Retrieval.push(dataList[i]);
+		m_Mutex_RetrievalQueue.unlock();
+	}
+}
+
+/*virtual*/ void HyAssets::OnThreadShutdown() /*override*/
+{
 }
 
 void HyAssets::QueueData(IHyLoadableData *pData)
@@ -556,51 +594,4 @@ void HyAssets::SetInstAsLoaded(IHyDrawInst2d *pDrawInst2d)
 	pDrawInst2d->DrawLoadedUpdate();
 
 	m_SceneRef.AddNode_Loaded(pDrawInst2d);
-}
-
-/*static*/ void HyAssets::LoadingThread(void *pParam)
-{
-	LoadThreadCtrl *pLoadingCtrl = reinterpret_cast<LoadThreadCtrl *>(pParam);
-	std::vector<IHyLoadableData *>	dataList;
-
-	while(pLoadingCtrl->m_eState == HYTHREADSTATE_Run)
-	{
-		// Wait idle indefinitely until there is new data to be grabbed
-		pLoadingCtrl->m_WaitEvent_HasNewData.Wait();
-
-		// Reset the event so we wait the next time we loop
-		pLoadingCtrl->m_WaitEvent_HasNewData.Reset();
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
-		pLoadingCtrl->m_csSharedQueue.Lock();
-		{
-			while(pLoadingCtrl->m_Load_SharedRef.empty() == false)
-			{
-				dataList.push_back(pLoadingCtrl->m_Load_SharedRef.front());
-				pLoadingCtrl->m_Load_SharedRef.pop();
-			}
-		}
-		pLoadingCtrl->m_csSharedQueue.Unlock();
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Load everything that is enqueued (outside of any critical section)
-		for(uint32 i = 0; i < dataList.size(); ++i)
-		{
-			dataList[i]->OnLoadThread();
-
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// Copy all the (loaded) IData ptrs to the retrieval vector
-			pLoadingCtrl->m_csRetrievalQueue.Lock();
-			{
-				//for(uint32 i = 0; i < dataList.size(); ++i)
-					pLoadingCtrl->m_Load_RetrievalRef.push(dataList[i]);
-			}
-			pLoadingCtrl->m_csRetrievalQueue.Unlock();
-		}
-
-		dataList.clear();
-	}
-
-	pLoadingCtrl->m_eState = HYTHREADSTATE_HasExited;
 }

@@ -12,7 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Input/HyInputMap.h"
-#include "Threading/Threading.h"
 
 class HyWindow;
 

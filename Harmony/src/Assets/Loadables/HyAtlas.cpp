@@ -116,13 +116,13 @@ void HyAtlas::DeletePixelData()
 
 void HyAtlas::OnLoadThread()
 {
-	m_csPixelData.Lock();
+	m_Mutex_PixelData.lock();
 
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
 		if(m_pPixelData)
 		{
-			m_csPixelData.Unlock();
+			m_Mutex_PixelData.unlock();
 			return;
 		}
 
@@ -139,12 +139,12 @@ void HyAtlas::OnLoadThread()
 		HyAssert(m_pPixelData != nullptr, "HyAtlas failed to load image data");
 	}
 
-	m_csPixelData.Unlock();
+	m_Mutex_PixelData.unlock();
 }
 
 void HyAtlas::OnRenderThread(IHyRenderer &rendererRef)
 {
-	m_csPixelData.Lock();
+	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
 		m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
@@ -154,5 +154,5 @@ void HyAtlas::OnRenderThread(IHyRenderer &rendererRef)
 	{
 		rendererRef.DeleteTexture(m_hTextureHandle);
 	}
-	m_csPixelData.Unlock();
+	m_Mutex_PixelData.unlock();
 }

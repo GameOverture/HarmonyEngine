@@ -17,30 +17,6 @@
       <Filter>Utilities</Filter>
     </ClCompile>
     <ClCompile Include="HyEngine.cpp" />
-    <ClCompile Include="..\include\Harmony\Threading\BasicSync.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\Harmony\Threading\InteropUnix.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\Harmony\Threading\stdafx.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\Harmony\Threading\Threading.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\Harmony\Threading\TLSEntry.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\Harmony\Threading\Utils.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\Harmony\Threading\WaitObject.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\Harmony\Threading\WaitObjectEx.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
@@ -403,45 +379,6 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Utilities\Containers\HyStaticArray.h">
       <Filter>Utilities\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\BaseMacro.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\BasicSync.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\Error.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\InteropUnix.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\InteropWin.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\PlatformInterop.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\PrimitiveTypeDefs.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\stdafx.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\Threading.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\TLSEntry.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\Utils.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\WaitObject.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Threading\WaitObjectEx.h">
-      <Filter>Threading</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Afx\HyInteropAfx.h">
       <Filter>Afx</Filter>

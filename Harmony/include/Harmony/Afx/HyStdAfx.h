@@ -31,6 +31,9 @@
 #include <map>
 #include <cctype>
 #include <sstream>
+#include <thread>
+#include <condition_variable>
+#include <mutex>
 #include <future>
 
 #if defined(HY_PLATFORM_GUI)// GUI -> Hack for now

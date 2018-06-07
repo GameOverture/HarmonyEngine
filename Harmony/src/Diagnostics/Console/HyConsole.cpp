@@ -11,7 +11,7 @@
 
 HyConsole *HyConsole::sm_pInstance = nullptr;
 std::stringstream HyConsole::sm_ss;
-BasicSection HyConsole::sm_csLog;
+std::mutex HyConsole::sm_csLog;
 
 HyConsole::HyConsole() 
 {

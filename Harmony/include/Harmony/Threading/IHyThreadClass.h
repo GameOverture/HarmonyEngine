@@ -16,8 +16,6 @@ class IHyThreadClass
 {
 	std::thread					m_Thread;
 	std::atomic<HyThreadState>	m_eThreadState;
-	std::condition_variable		m_cv;
-	std::mutex					m_cvMutex;
 
 public:
 	IHyThreadClass();
@@ -29,12 +27,13 @@ public:
 	bool IsThreadFinished();
 	void ThreadJoin();
 
+protected:
 	virtual void OnThreadInit() = 0;
 	virtual void OnThreadUpdate() = 0;
 	virtual void OnThreadShutdown() = 0;
 
 private:
-	void ThreadFunc();
+	static void ThreadFunc(IHyThreadClass *pThis);
 };
 
 #endif /* IHyThreadClass_h__ */

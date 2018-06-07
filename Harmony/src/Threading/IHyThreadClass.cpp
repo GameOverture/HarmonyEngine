@@ -1,4 +1,5 @@
 #include "Threading/IHyThreadClass.h"
+#include "Diagnostics/Console/HyConsole.h"
 
 IHyThreadClass::IHyThreadClass() : m_eThreadState(HYTHREADSTATE_Inactive)
 {
@@ -17,15 +18,15 @@ bool IHyThreadClass::ThreadStart()
 	}
 
 	ThreadJoin();
-	m_Thread = std::thread(&IHyThreadClass::ThreadFunc);
 	m_eThreadState = HYTHREADSTATE_Run;
+	m_Thread = std::thread(&IHyThreadClass::ThreadFunc, this);
 
 	return true;
 }
 
 bool IHyThreadClass::ThreadStop()
 {
-	if(m_eThreadState != HYTHREADSTATE_Run)
+	if(m_eThreadState != HYTHREADSTATE_Run && m_eThreadState != HYTHREADSTATE_ShouldExit)
 	{
 		HyLogWarning("IHyThreadClass::ThreadStop failed becaused thread state is not running.");
 		return false;
@@ -52,14 +53,14 @@ void IHyThreadClass::ThreadJoin()
 		m_Thread.join();
 }
 
-void IHyThreadClass::ThreadFunc()
+/*static*/ void IHyThreadClass::ThreadFunc(IHyThreadClass *pThis)
 {
-	OnThreadInit();
-	if(m_eThreadState == HYTHREADSTATE_Run)
+	pThis->OnThreadInit();
+	while(pThis->m_eThreadState == HYTHREADSTATE_Run)
 	{
-		OnThreadUpdate();
+		pThis->OnThreadUpdate();
 	}
 
-	OnThreadShutdown();
-	m_eThreadState = HYTHREADSTATE_HasExited;
+	pThis->OnThreadShutdown();
+	pThis->m_eThreadState = HYTHREADSTATE_HasExited;
 }

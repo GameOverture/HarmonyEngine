@@ -14,7 +14,7 @@
 #include "Assets/Loadables/HyAtlas.h"
 #include "Assets/Loadables/HyAtlasIndices.h"
 #include "Scene/HyScene.h"
-#include "Threading/Threading.h"
+#include "Threading/IHyThreadClass.h"
 
 class IHyRenderer;
 class IHyDrawInst2d;
@@ -27,13 +27,10 @@ class HyTexturedQuad2dData;
 class HyPrimitive2dData;
 class HyMesh3dData;
 
-void HyAssetInit(HyAssets *pThis);
-
-class HyAssets
+class HyAssets : public IHyThreadClass
 {
 	const std::string											m_sDATADIR;
-
-	std::future<void>											m_InitFuture;
+	std::atomic<bool>											m_bInitialized;
 
 	HyScene &													m_SceneRef;
 
@@ -67,36 +64,21 @@ class HyAssets
 	std::queue<IHyLoadableData *>								m_Load_Retrieval;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Thread control structure to help sync loading of factory data
-	struct LoadThreadCtrl
-	{
-		std::queue<IHyLoadableData *> &							m_Load_SharedRef;
-		std::queue<IHyLoadableData *> &							m_Load_RetrievalRef;
+	// Thread control
+	std::condition_variable										m_ConditionVariable;
+	std::mutex													m_Mutex_ConditionVariable;
+	std::unique_lock<std::mutex>								m_UniqueLock_ConditionVariable;
+	bool														m_bProcessThread;
 
-		WaitEvent												m_WaitEvent_HasNewData;
-		BasicSection											m_csSharedQueue;
-		BasicSection											m_csRetrievalQueue;
-
-		
-		HyThreadState											m_eState;
-
-		LoadThreadCtrl(std::queue<IHyLoadableData *> &load_SharedRef,
-					   std::queue<IHyLoadableData *> &Load_RetrievalRef) :	m_Load_SharedRef(load_SharedRef),
-																			m_Load_RetrievalRef(Load_RetrievalRef),
-																			m_WaitEvent_HasNewData(L"Thread Idler", true),
-																			m_eState(HYTHREADSTATE_Run)
-		{ }
-	};
+	std::mutex													m_Mutex_SharedQueue;
+	std::mutex													m_Mutex_RetrievalQueue;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	LoadThreadCtrl												m_LoadingCtrl;
-	ThreadInfoPtr												m_pLoadingThread;	// Loading thread info pointer
 
 public:
 	HyAssets(std::string sDataDirPath, HyScene &sceneRef);
 	virtual ~HyAssets();
 
-	bool IsLoaded();
-	void ParseInitInfo();
+	bool IsInitialized();
 
 	HyAtlas *GetAtlas(uint32 uiMasterIndex);
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
@@ -115,14 +97,17 @@ public:
 
 	void Update(IHyRenderer &rendererRef);
 
+protected:
+	virtual void OnThreadInit() override;
+	virtual void OnThreadUpdate() override;
+	virtual void OnThreadShutdown() override;
+
 private:
 	void QueueData(IHyLoadableData *pData);
 	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
 
 	void SetInstAsLoaded(IHyDrawInst2d *pDrawInst2d);
-
-	static void LoadingThread(void *pParam);
 };
 
 #endif /* HyAssets_h__ */

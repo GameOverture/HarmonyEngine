@@ -29,6 +29,7 @@
 #include "Scene/Nodes/Draws/Instances/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Draws/Entities/HyEntityLeaf2d.h"
 #include "Assets/HyAssets.h"
+#include "Threading/IHyThreadClass.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
 #include "Utilities/HyImage.h"

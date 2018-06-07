@@ -98,7 +98,7 @@ HyEngine::~HyEngine()
 
 bool HyEngine::IsInitialized()
 {
-	if(m_Assets.IsLoaded() == false)
+	if(m_Assets.IsInitialized() == false)
 		return false;
 
 	return true;
