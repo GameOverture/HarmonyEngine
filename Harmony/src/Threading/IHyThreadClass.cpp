@@ -7,6 +7,8 @@ IHyThreadClass::IHyThreadClass() : m_eThreadState(HYTHREADSTATE_Inactive)
 
 /*virtual*/ IHyThreadClass::~IHyThreadClass()
 {
+	ThreadStop();
+	ThreadJoin();
 }
 
 bool IHyThreadClass::ThreadStart()
