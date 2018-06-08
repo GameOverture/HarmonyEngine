@@ -38,8 +38,8 @@ class HyInputMap
 		uint32	uiFlags;
 
 		ActionInfo(int32 iId) :	iID(iId),
-								iBtn(HYKEY_Unknown),
-								iBtnAlternative(HYKEY_Unknown),
+								iBtn(HYKEY_Unassigned),
+								iBtnAlternative(HYKEY_Unassigned),
 								uiFlags(0)
 		{ }
 	};

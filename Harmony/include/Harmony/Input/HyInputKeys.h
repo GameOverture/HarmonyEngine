@@ -31,6 +31,7 @@ enum HyBtnPressState
 enum HyKeyboardBtn
 {
 #ifdef HY_PLATFORM_DESKTOP
+	HYKEY_Unassigned		= -2,
 	HYKEY_Unknown			= GLFW_KEY_UNKNOWN,
 
 	HYKEY_Grave				= GLFW_KEY_GRAVE_ACCENT,
@@ -159,6 +160,7 @@ enum HyKeyboardBtn
 	HYKEY_Kp9				= GLFW_KEY_KP_9,
 	HYKEY_KpDecimal			= GLFW_KEY_KP_DECIMAL,
 #else
+	HYKEY_Unassigned		= -2,
 	HYKEY_Unknown			= -1,
 
 	HYKEY_Grave				= 96,
