@@ -119,6 +119,7 @@
     <ClInclude Include="..\include\Harmony\Afx\HyStdAfx.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatAfx.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform.h" />
+    <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Gui.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_OSX.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />

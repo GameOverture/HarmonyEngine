@@ -600,5 +600,8 @@
     <ClInclude Include="..\include\Harmony\Threading\IHyThreadClass.h">
       <Filter>Threading</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Gui.h">
+      <Filter>Afx\Platforms</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
