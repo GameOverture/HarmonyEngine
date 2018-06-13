@@ -137,6 +137,11 @@ void HyTweenVec3::TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, fl
 	m_AnimFloatList[2].TweenOffset(fOffsetZ, fSeconds, fpEase);
 }
 
+bool HyTweenVec3::IsTweening()
+{
+	return (m_AnimFloatList[0].IsTweening() || m_AnimFloatList[1].IsTweening() || m_AnimFloatList[2].IsTweening());
+}
+
 HyTweenVec3 &HyTweenVec3::operator+=(float rhs)
 {
 	m_AnimFloatList[0] += rhs;

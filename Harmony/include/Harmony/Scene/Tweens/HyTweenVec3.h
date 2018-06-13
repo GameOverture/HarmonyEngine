@@ -47,6 +47,8 @@ public:
 	void Tween(float fX, float fY, float fZ, float fSeconds, HyTweenUpdateFunc fpEase = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::NullTweenCallback);
 	void TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenUpdateFunc fpEase = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::NullTweenCallback);
 
+	bool IsTweening();
+
 	HyTweenVec3 &operator+=(float rhs);
 	HyTweenVec3 &operator-=(float rhs);
 	HyTweenVec3 &operator*=(float rhs);

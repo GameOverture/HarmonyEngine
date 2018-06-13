@@ -67,7 +67,6 @@ HyAssets::HyAssets(std::string sDataDirPath, HyScene &sceneRef) :	IHyThreadClass
 																	m_pAtlases(nullptr),
 																	m_uiNumAtlases(0),
 																	m_pLoadedAtlasIndices(nullptr),
-																	m_UniqueLock_ConditionVariable(m_Mutex_ConditionVariable),
 																	m_bProcessThread(false)
 {
 	IHyDrawInst2d::sm_pHyAssets = this;
@@ -427,7 +426,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 /*virtual*/ void HyAssets::OnThreadUpdate() /*override*/
 {
 	// Wait idle indefinitely until there is new data to be grabbed
-	m_ConditionVariable.wait(m_UniqueLock_ConditionVariable, [this] { return m_bProcessThread; } );
+	m_ConditionVariable.wait(std::unique_lock<std::mutex>(m_Mutex_ConditionVariable), [this] { return m_bProcessThread; } );
 	m_bProcessThread = false;	// Reset the event so we wait the next time we loop
 
 	std::vector<IHyLoadableData *>	dataList;

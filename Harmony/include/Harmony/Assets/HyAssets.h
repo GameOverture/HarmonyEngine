@@ -67,7 +67,6 @@ class HyAssets : public IHyThreadClass
 	// Thread control
 	std::condition_variable										m_ConditionVariable;
 	std::mutex													m_Mutex_ConditionVariable;
-	std::unique_lock<std::mutex>								m_UniqueLock_ConditionVariable;
 	bool														m_bProcessThread;
 
 	std::mutex													m_Mutex_SharedQueue;
