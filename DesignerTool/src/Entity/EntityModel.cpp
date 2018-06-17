@@ -194,12 +194,16 @@ bool EntityModel::IsChildAddable(ProjectItem *pItem)
 	if(pItem->GetType() == ITEM_Entity)
 	{
 	}
+
+	return true;
 }
 
 bool EntityModel::AddNewChild(ProjectItem *pItem)
 {
 	if(IsChildAddable(pItem) == false)
 		return false;
+
+
 
 	return false;
 }
