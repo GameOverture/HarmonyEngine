@@ -95,28 +95,31 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 		return nullptr;
 	}
 
-	QStringList sPathSplitList = sPrefix.split(QChar('/'));
-
-	// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
 	QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
-	for(int i = 0; i < sPathSplitList.size(); ++i)
-	{
-		bool bFound = false;
-		for(int j = 0; j < pParentTreeItem->childCount(); ++j)
-		{
-			if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
-			{
-				pParentTreeItem = pParentTreeItem->child(j);
-				bFound = true;
-				break;
-			}
-		}
 
-		if(bFound == false)
+	if(sPrefix.isEmpty() == false)
+	{
+		QStringList sPathSplitList = sPrefix.split(QChar('/'));
+		// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
+		for(int i = 0; i < sPathSplitList.size(); ++i)
 		{
-			// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
-			ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
-			pParentTreeItem = pPrefixItem->GetTreeItem();
+			bool bFound = false;
+			for(int j = 0; j < pParentTreeItem->childCount(); ++j)
+			{
+				if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
+				{
+					pParentTreeItem = pParentTreeItem->child(j);
+					bFound = true;
+					break;
+				}
+			}
+
+			if(bFound == false)
+			{
+				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
+				ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
+				pParentTreeItem = pPrefixItem->GetTreeItem();
+			}
 		}
 	}
 
