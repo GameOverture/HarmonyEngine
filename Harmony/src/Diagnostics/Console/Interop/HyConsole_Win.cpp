@@ -9,6 +9,8 @@
 *************************************************************************/
 #include "Diagnostics/Console/Interop/HyConsole_Win.h"
 
+#ifdef HY_PLATFORM_WINDOWS
+
 #include <fcntl.h>
 #include <io.h>
 #include <iostream>
@@ -118,3 +120,4 @@ HyConsole_Win::~HyConsole_Win()
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE);
 	os << std::endl;
 }
+#endif /*HY_PLATFORM_WINDOWS*/

@@ -22,12 +22,12 @@ typedef HyOpenGL HyRendererInterop;
 
 	typedef void *HyWindowHandle;
 
-	#include "Audio/Interop/HyAudio_Win.h"
-	typedef HyAudio_Win HyAudioInterop;
-	typedef IHyAudioInst_Win IHyAudioInstInterop;
+	//#include "Audio/Interop/HyAudio_Win.h"
+	//typedef HyAudio_Win HyAudioInterop;
+	//typedef IHyAudioInst_Win IHyAudioInstInterop;
 
-	#include "Memory/Interop/HyMemAPI_Windows.h"
-	typedef HyMemoryAPI_Windows HyMemoryInterop;
+	//#include "Memory/Interop/HyMemAPI_Windows.h"
+	//typedef HyMemoryAPI_Windows HyMemoryInterop;
 #else
 	#if defined(HY_PLATFORM_DESKTOP)
 		typedef GLFWwindow *HyWindowHandle;

@@ -37,8 +37,8 @@
 #include <future>
 
 #if defined(HY_PLATFORM_GUI)// GUI -> Hack for now
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+//#define WIN32_LEAN_AND_MEAN
+//#include <Windows.h>
 #include "GL/glew.h"
 
 #define HY_GUI_DATAOVERRIDE "+HyGuiOverride"

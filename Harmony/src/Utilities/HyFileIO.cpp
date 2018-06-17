@@ -38,12 +38,9 @@ void HyReadTextFile(const char *szFilePath, std::string &sContentsOut)
 
 	if(szFilePath == NULL)
 	{
-		//sm_sLogStr = "ReadTextFile - filename is NULL\n";
+		//HyLogError("ReadTextFile - filename is NULL");
 		return;
 	}
-
-	char szCurDir[128];
-	GetCurrentDirectoryA(128, szCurDir);
 
 	std::ifstream infile(szFilePath, std::ios::binary);
 	HyAssert(infile, "HyReadTextFile invalid file: " << szFilePath);

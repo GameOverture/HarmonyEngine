@@ -8,6 +8,8 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyInteropAfx.h"
+
+#ifdef HY_PLATFORM_WINDOWS
 #include "Audio/Interop/HyAudio_Win.h"
 
 #include "Diagnostics/GuiComms/HyGuiComms.h"
@@ -281,4 +283,4 @@ HRESULT ReadChunkData(HANDLE hFile, void * buffer, DWORD buffersize, DWORD buffe
 		hr = HRESULT_FROM_WIN32( GetLastError() );
 	return hr;
 }
-
+#endif /*HY_PLATFORM_WINDOWS*/

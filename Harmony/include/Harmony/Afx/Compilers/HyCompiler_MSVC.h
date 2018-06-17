@@ -40,22 +40,6 @@ typedef unsigned __int64	uint64;
 	#define HY_NOEXCEPT
 #endif
 
-// This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
-#define NOMINMAX
-
-#ifdef HY_DEBUG
-	#define _CRTDBG_MAP_ALLOC
-	#include <stdlib.h>
-	#include <crtdbg.h>
-
-	#define HY_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)	// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the allocations to be of _CLIENT_BLOCK type
-
-	#define  HY_SET_CRT_DEBUG_FIELD(a)		_CrtSetDbgFlag((a) | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
-	#define  HY_CLEAR_CRT_DEBUG_FIELD(a)	_CrtSetDbgFlag(~(a) & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
-#else
-	#define HY_NEW new
-#endif
-
 #if defined(_WIN64)
 	#define HY_ENV_64
 #else

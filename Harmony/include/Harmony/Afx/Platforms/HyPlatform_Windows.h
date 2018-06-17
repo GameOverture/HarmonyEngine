@@ -19,6 +19,22 @@
 // All x86 and x86-64 machines are little-endian.
 #define HY_ENDIAN_LITTLE
 
+// This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
+#define NOMINMAX
+
+#ifdef HY_DEBUG
+	#define _CRTDBG_MAP_ALLOC
+	#include <stdlib.h>
+	#include <crtdbg.h>
+
+	#define HY_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)	// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the allocations to be of _CLIENT_BLOCK type
+
+	#define  HY_SET_CRT_DEBUG_FIELD(a)		_CrtSetDbgFlag((a) | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
+	#define  HY_CLEAR_CRT_DEBUG_FIELD(a)	_CrtSetDbgFlag(~(a) & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
+#else
+	#define HY_NEW new
+#endif
+
 // Diagnostics assertion
 #if defined(HY_DEBUG)
 	#define HyAssert(condition, message) \

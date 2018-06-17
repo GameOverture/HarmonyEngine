@@ -33,7 +33,7 @@ public:
 	void AnimInitBlend(float fInterpDur);
 
 	void AnimInitBlend(const char *szAnimFrom, const char *szAnimTo, float fInterpDur);
-	void AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInterpDur);
+	void AnimInitBlend(uint32 uiAnimIdFrom, uint32 uiAnimIdTo, float fInterpDur);
 };
 
 #endif /* HyEnt2dData_h__ */

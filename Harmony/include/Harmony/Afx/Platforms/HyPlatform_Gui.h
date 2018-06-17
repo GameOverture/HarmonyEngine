@@ -15,10 +15,12 @@
 // All x86 and x86-64 machines are little-endian.
 #define HY_ENDIAN_LITTLE
 
+#define HY_NEW new
+
 // Diagnostics assertion
 #if defined(HY_DEBUG)
-	#define HyAssert(condition, message) do { if((#condition) == false) DebugBreak(); } while (false)
-	#define HyError(message) do { DebugBreak(); } while (false)
+	#define HyAssert(condition, message) do { if((#condition) == false) int i = 0/*DebugBreak()*/; } while (false)
+	#define HyError(message) do { int i = 0/*DebugBreak()*/; } while (false)
 #else
 	#define HyAssert(condition, message) do { } while (false)
 	#define HyError(message) do { } while (false)

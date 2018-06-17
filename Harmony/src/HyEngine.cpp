@@ -49,8 +49,8 @@ HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Time(m_AppRef.m_Init.uiUpdateTickMs),
 												m_Diagnostics(m_AppRef.m_Init, m_Time, m_Assets, m_Scene),
 												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
-												m_Renderer(m_Diagnostics, m_AppRef.m_WindowList),
-												m_Audio(m_AppRef.m_WindowList)
+												m_Renderer(m_Diagnostics, m_AppRef.m_WindowList)
+												//m_Audio(m_AppRef.m_WindowList)
 {
 	HyAssert(sm_pInstance == nullptr, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
 }
@@ -90,8 +90,8 @@ HyEngine::~HyEngine()
 
 	delete pGame;
 
-	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler)
-#if defined(HY_DEBUG) && defined(_MSC_VER)
+	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler on Windows)
+#if defined(HY_DEBUG) && defined(_MSC_VER) && defined(HY_PLATFORM_WINDOWS)
 	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
 #endif
 }

@@ -142,7 +142,7 @@ void HySpine2d::AnimInitBlend(const char *szAnimFrom, const char *szAnimTo, floa
 	spAnimationStateData_setMixByName(m_pAnimStateData, szAnimFrom, szAnimTo, fInterpDur);
 }
 
-void HySpine2d::AnimInitBlend(UINT32 uiAnimIdFrom, UINT32 uiAnimIdTo, float fInterpDur)
+void HySpine2d::AnimInitBlend(uint32 uiAnimIdFrom, uint32 uiAnimIdTo, float fInterpDur)
 {
 	spAnimationStateData_setMix(m_pAnimStateData, m_ppSpineAnims[uiAnimIdFrom], m_ppSpineAnims[uiAnimIdTo], fInterpDur);
 }
