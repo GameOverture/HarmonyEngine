@@ -16,34 +16,18 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 typedef HyOpenGL HyRendererInterop;
 
+#if defined(HY_PLATFORM_DESKTOP)
+	typedef GLFWwindow *HyWindowHandle;
+#else
+	typedef void *HyWindowHandle;
+#endif
+
 #if defined(HY_PLATFORM_GUI)
 	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
 	typedef HyConsole_Gui HyConsoleInterop;
-
-	typedef void *HyWindowHandle;
-
-	//#include "Audio/Interop/HyAudio_Win.h"
-	//typedef HyAudio_Win HyAudioInterop;
-	//typedef IHyAudioInst_Win IHyAudioInstInterop;
-
-	//#include "Memory/Interop/HyMemAPI_Windows.h"
-	//typedef HyMemoryAPI_Windows HyMemoryInterop;
-#else
-	#if defined(HY_PLATFORM_DESKTOP)
-		typedef GLFWwindow *HyWindowHandle;
-	#endif
-
-	#if defined(HY_PLATFORM_WINDOWS)
-		#include "Diagnostics/Console/Interop/HyConsole_Win.h"
-		typedef HyConsole_Win HyConsoleInterop;
-
-		#include "Audio/Interop/HyAudio_Win.h"
-		typedef HyAudio_Win HyAudioInterop;
-		typedef IHyAudioInst_Win IHyAudioInstInterop;
-
-		#include "Memory/Interop/HyMemAPI_Windows.h"
-		typedef HyMemoryAPI_Windows HyMemoryInterop;
-	#endif
+#elif defined(HY_PLATFORM_WINDOWS)
+	#include "Diagnostics/Console/Interop/HyConsole_Win.h"
+	typedef HyConsole_Win HyConsoleInterop;
 #endif
 
 #endif HyInteropAfx_h__

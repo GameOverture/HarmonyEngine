@@ -10,11 +10,11 @@
 #ifndef HyPlatform_Gui_h__
 #define HyPlatform_Gui_h__
 
+#include "GL/glew.h"
+
+#define HY_GUI_DATAOVERRIDE "+HyGuiOverride"
 #define HY_MAXWINDOWS 1
-
-// All x86 and x86-64 machines are little-endian.
-#define HY_ENDIAN_LITTLE
-
+#define HY_ENDIAN_LITTLE	// All x86 and x86-64 machines are little-endian.
 #define HY_NEW new
 
 // Diagnostics assertion

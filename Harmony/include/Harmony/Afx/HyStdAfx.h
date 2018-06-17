@@ -23,6 +23,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform2.hpp"
 
+// STL includes (TODO: to be replaced with EASTL)
 #include <string>
 #include <algorithm>
 #include <vector>
@@ -35,14 +36,6 @@
 #include <condition_variable>
 #include <mutex>
 #include <future>
-
-#if defined(HY_PLATFORM_GUI)// GUI -> Hack for now
-//#define WIN32_LEAN_AND_MEAN
-//#include <Windows.h>
-#include "GL/glew.h"
-
-#define HY_GUI_DATAOVERRIDE "+HyGuiOverride"
-#endif
 
 #define HY_UNUSED_HANDLE 0
 typedef uint32 HyTextureHandle;
