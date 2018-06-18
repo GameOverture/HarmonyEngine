@@ -49,6 +49,7 @@ class HyEngine
 	HyInput						m_Input;
 
 	HyRendererInterop			m_Renderer;
+	//HyAudioInterop				m_Audio;
 
 // If HY_PLATFORM_GUI, make this ctor public as gui tool requires special usage.
 #ifdef HY_PLATFORM_GUI
