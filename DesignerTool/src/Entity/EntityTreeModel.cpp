@@ -124,6 +124,12 @@ QVariant EntityTreeModel::data(const QModelIndex &index, int iRole /*= Qt::Displ
 	return QVariant();
 }
 
+void EntityTreeModel::AddItem(ProjectItem *pProjectItem)
+{
+	EntityTreeItem *pNewTreeItem = new EntityTreeItem(this, pProjectItem);
+	InsertItem(m_pRootNode->GetNumChildren(), pNewTreeItem, m_pRootItem);
+}
+
 void EntityTreeModel::InsertItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem)
 {
 	QList<EntityTreeItem *> itemList;

@@ -193,6 +193,7 @@ bool EntityModel::IsChildAddable(ProjectItem *pItem)
 
 	if(pItem->GetType() == ITEM_Entity)
 	{
+		// TODO: Ensure that this child entity doesn't contain this as child
 	}
 
 	return true;
@@ -203,9 +204,11 @@ bool EntityModel::AddNewChild(ProjectItem *pItem)
 	if(IsChildAddable(pItem) == false)
 		return false;
 
+	m_TreeModel.AddItem(pItem);
+//	for(int i = 0; i < m_StateList.size(); ++i)
+//		m_StateList[i]->
 
-
-	return false;
+	return true;
 }
 
 /*virtual*/ void EntityModel::OnSave() /*override*/
