@@ -83,12 +83,11 @@ HyEngine::~HyEngine()
 	{ }
 
 	pGame->Shutdown();
-	sm_pInstance->Shutdown();
+	delete pGame;
 
+	sm_pInstance->Shutdown();
 	delete sm_pInstance;
 	sm_pInstance = nullptr;
-
-	delete pGame;
 
 	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler on Windows)
 #if defined(HY_DEBUG) && defined(_MSC_VER) && defined(HY_PLATFORM_WINDOWS)
