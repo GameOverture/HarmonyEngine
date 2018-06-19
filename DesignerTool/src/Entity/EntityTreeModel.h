@@ -59,13 +59,13 @@ public:
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 
-	void InsertItem(int iRow, EntityTreeItem * pItem, EntityTreeItem *pParentItem);
+	void AddItem(ProjectItem *pProjectItem);
+
+	void InsertItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem);
 	void InsertItems(int iRow, QList<EntityTreeItem *> itemList, EntityTreeItem *pParentItem);
 
 	void RemoveItems(int iRow, int iCount, EntityTreeItem *pParentItem);
 	bool removeRows(int iRow, int iCount, const QModelIndex &parentIndex = QModelIndex()) override;
-
-private:
 };
 
 #endif // ENTITYTREEMODEL_H
