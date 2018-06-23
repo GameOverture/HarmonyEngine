@@ -7,6 +7,7 @@ GuiRelease/
 ipch/
 build-DesignerTool-*/
 .vs/
+GeneratedFiles/
 
 *.exe
 *.ilk
@@ -18,5 +19,5 @@ build-DesignerTool-*/
 *.user
 *.db
 *.opendb
-
-
+*.stash
+*.aps
