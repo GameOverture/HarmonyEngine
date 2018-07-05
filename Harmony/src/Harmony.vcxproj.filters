@@ -219,6 +219,12 @@
     <ClCompile Include="Threading\IHyThreadClass.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Nodes\Draws\Entities\HyEntity3d.cpp">
+      <Filter>Scene\Nodes\Draws\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Draws\IHyDraw3d.cpp">
+      <Filter>Scene\Nodes\Draws</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -602,6 +608,12 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Afx\Platforms\HyPlatform_Gui.h">
       <Filter>Afx\Platforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntity3d.h">
+      <Filter>Scene\Nodes\Draws\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\IHyDraw3d.h">
+      <Filter>Scene\Nodes\Draws</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

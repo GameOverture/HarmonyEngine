@@ -14,8 +14,15 @@
 #include "Scene/Nodes/IHyNode.h"
 #include "Scene/Tweens/HyTweenVec3.h"
 
+class HyEntity3d;
+class HyStencil;
+
 class IHyNode3d : public IHyNode
 {
+protected:
+	HyEntity3d *				m_pParent;
+	glm::mat4					m_mtxCached;
+
 public:
 	HyTweenVec3					pos;
 	HyTweenVec3					rot;
@@ -28,13 +35,10 @@ public:
 	IHyNode3d(const IHyNode3d &copyRef);
 	virtual ~IHyNode3d();
 
-	bool IsValid() {
-		return true;
-	}
-
 	const IHyNode3d &operator=(const IHyNode3d &rhs);
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
+	void GetWorldTransform(glm::mat4 &outMtx);
 
 protected:
 	virtual void PhysicsUpdate() override;

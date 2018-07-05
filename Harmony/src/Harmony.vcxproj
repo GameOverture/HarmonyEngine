@@ -76,7 +76,9 @@
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="Scene\HyScene.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\Entities\HyEntity2d.cpp" />
+    <ClCompile Include="Scene\Nodes\Draws\Entities\HyEntity3d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\IHyDraw2d.cpp" />
+    <ClCompile Include="Scene\Nodes\Draws\IHyDraw3d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\Instances\HyMesh3d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\Instances\HyPrimitive2d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\Instances\HySpine2d.cpp" />
@@ -170,8 +172,10 @@
     <ClInclude Include="..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
     <ClInclude Include="..\include\Harmony\Scene\HyScene.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntity2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntity3d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntityLeaf2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\IHyDraw2d.h" />
+    <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\IHyDraw3d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Instances\HyMesh3d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Instances\HyPrimitive2d.h" />
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\Instances\HySpine2d.h" />

@@ -8,6 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/IHyNode3d.h"
+#include "Scene/Nodes/Draws/Entities/HyEntity3d.h"
 
 IHyNode3d::IHyNode3d(HyType eNodeType, IHyNode3d *pParent) :	IHyNode(eNodeType),
 																pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
@@ -65,6 +66,26 @@ void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const
 	outMtx = glm::translate(outMtx, scale_pivot.Get());
 	outMtx = glm::scale(outMtx, scale.Get());
 	outMtx = glm::translate(outMtx, scale_pivot.Get() * -1.0f);
+}
+
+void IHyNode3d::GetWorldTransform(glm::mat4 &outMtx)
+{
+	if(IsDirty(DIRTY_Transform))
+	{
+		if(m_pParent)
+		{
+			m_pParent->GetWorldTransform(m_mtxCached);
+			GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
+
+			m_mtxCached *= outMtx;
+		}
+		else
+			GetLocalTransform(m_mtxCached);
+
+		ClearDirty(DIRTY_Transform);
+	}
+
+	outMtx = m_mtxCached;
 }
 
 /*virtual*/ void IHyNode3d::PhysicsUpdate() /*override*/
