@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Soft\Test\assimp\contrib\irrXML\irrXML.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Soft\Test\assimp\contrib\irrXML\CXMLReaderImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Soft\Test\assimp\contrib\irrXML\heapsort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Soft\Test\assimp\contrib\irrXML\irrArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Soft\Test\assimp\contrib\irrXML\irrString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Soft\Test\assimp\contrib\irrXML\irrTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Soft\Test\assimp\contrib\irrXML\irrXML.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Soft\Test\assimp\contrib\irrXML\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6E1DF9E6-F71A-3669-8A41-F30F6BD864F4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{2103E657-C966-3135-A6D3-62D6891D744A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
