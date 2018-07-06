@@ -112,6 +112,9 @@ CustomShader::~CustomShader()
 	m_CheckerGrid.SetShader(m_pCheckerGridShader);
 	m_CheckerGrid.Load();
 
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(pFile, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+
 	return true;
 }
 

@@ -15,6 +15,9 @@
 #include "Assets/Loadables/HyAtlasIndices.h"
 #include "Scene/HyScene.h"
 #include "Threading/IHyThreadClass.h"
+#include "assimp/Importer.hpp"      // C++ importer interface
+#include "assimp/scene.h"           // Output data structure
+#include "assimp/postprocess.h"     // Post processing flags
 
 class IHyRenderer;
 class IHyDrawInst2d;
