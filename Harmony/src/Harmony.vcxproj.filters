@@ -78,12 +78,6 @@
     <ClCompile Include="Assets\Nodes\HyAudioData.cpp">
       <Filter>Assets\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\Nodes\HyMesh3dData.cpp">
-      <Filter>Assets\Nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="Assets\Nodes\HyPrimitive2dData.cpp">
-      <Filter>Assets\Nodes</Filter>
-    </ClCompile>
     <ClCompile Include="Assets\Nodes\HySpine2dData.cpp">
       <Filter>Assets\Nodes</Filter>
     </ClCompile>
@@ -224,6 +218,9 @@
     </ClCompile>
     <ClCompile Include="Scene\Nodes\Draws\IHyDraw3d.cpp">
       <Filter>Scene\Nodes\Draws</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Nodes\HyEntity3dData.cpp">
+      <Filter>Assets\Nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -459,12 +456,6 @@
     <ClInclude Include="..\include\Harmony\Assets\Nodes\HyAudioData.h">
       <Filter>Assets\Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Nodes\HyMesh3dData.h">
-      <Filter>Assets\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Harmony\Assets\Nodes\HyPrimitive2dData.h">
-      <Filter>Assets\Nodes</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Harmony\Assets\Nodes\HySpine2dData.h">
       <Filter>Assets\Nodes</Filter>
     </ClInclude>
@@ -614,6 +605,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Harmony\Scene\Nodes\Draws\IHyDraw3d.h">
       <Filter>Scene\Nodes\Draws</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Harmony\Assets\Nodes\HyEntity3dData.h">
+      <Filter>Assets\Nodes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

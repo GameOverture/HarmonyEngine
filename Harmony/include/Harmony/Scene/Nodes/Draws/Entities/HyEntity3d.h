@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Draws/IHyDraw3d.h"
+#include "Assets/Nodes/HyEntity3dData.h"
 
 class HyEntity3d : public IHyDraw3d
 {
@@ -19,7 +20,7 @@ protected:
 	std::vector<IHyNode3d *>		m_ChildList;
 
 public:
-	HyEntity3d(HyEntity3d *pParent);
+	HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent);
 	virtual ~HyEntity3d(void);
 
 protected:

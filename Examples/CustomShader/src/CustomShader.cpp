@@ -99,6 +99,8 @@ CustomShader::~CustomShader()
 {
 }
 
+//#include "Harmony/Assets/Nodes/HyEntity3dData.h"
+
 /*virtual*/ bool CustomShader::Initialize()
 {
 	m_pCamera = Window().CreateCamera2d();
@@ -112,8 +114,7 @@ CustomShader::~CustomShader()
 	m_CheckerGrid.SetShader(m_pCheckerGridShader);
 	m_CheckerGrid.Load();
 
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(pFile, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+	HyEntity3d *pTest = new HyEntity3d("", "spider.obj", nullptr);
 
 	return true;
 }

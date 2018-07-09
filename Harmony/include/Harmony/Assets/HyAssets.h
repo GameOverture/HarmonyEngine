@@ -15,9 +15,6 @@
 #include "Assets/Loadables/HyAtlasIndices.h"
 #include "Scene/HyScene.h"
 #include "Threading/IHyThreadClass.h"
-#include "assimp/Importer.hpp"      // C++ importer interface
-#include "assimp/scene.h"           // Output data structure
-#include "assimp/postprocess.h"     // Post processing flags
 
 class IHyRenderer;
 class IHyDrawInst2d;
@@ -27,8 +24,7 @@ class HySprite2dData;
 class HySpine2dData;
 class HyText2dData;
 class HyTexturedQuad2dData;
-class HyPrimitive2dData;
-class HyMesh3dData;
+class HyEntity3dData;
 
 class HyAssets : public IHyThreadClass
 {
@@ -54,7 +50,7 @@ class HyAssets : public IHyThreadClass
 	NodeData<HyAudioData>										m_Audio;
 	NodeData<HySprite2dData>									m_Sprite2d;
 	NodeData<HySpine2dData>										m_Spine2d;
-	NodeData<HyMesh3dData>										m_Mesh3d;
+	NodeData<HyEntity3dData>									m_Mesh3d;
 	NodeData<HyText2dData>										m_Txt2d;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 

@@ -11,8 +11,9 @@
 #include "Scene/HyScene.h"
 #include "HyEngine.h"
 
-HyEntity3d::HyEntity3d(HyEntity3d *pParent) :	IHyDraw3d(HYTYPE_Entity3d, pParent)
+HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyDraw3d(HYTYPE_Entity3d, pParent)
 {
+	HyEntity3dData test(szName);
 }
 
 HyEntity3d::~HyEntity3d(void)

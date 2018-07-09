@@ -15,7 +15,6 @@
 
 // Forward declarations
 class IHyRenderer;
-class HyAtlasContainer;
 
 class IHyNodeData
 {
