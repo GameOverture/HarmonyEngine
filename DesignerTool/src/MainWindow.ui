@@ -71,8 +71,9 @@
      <addaction name="actionNewParticle"/>
      <addaction name="actionNewSprite"/>
      <addaction name="actionNewFont"/>
-     <addaction name="separator"/>
      <addaction name="actionNewEntity"/>
+     <addaction name="separator"/>
+     <addaction name="actionNewPrefab"/>
      <addaction name="actionNewEntity3d"/>
     </widget>
     <addaction name="actionNewProject"/>
@@ -588,6 +589,21 @@
    </property>
    <property name="toolTip">
     <string>Add a new 3d entity</string>
+   </property>
+  </action>
+  <action name="actionNewPrefab">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/items/Prefab-New.png</normaloff>:/icons16x16/items/Prefab-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Prefab</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new prefab from an imported 3d asset</string>
    </property>
   </action>
  </widget>

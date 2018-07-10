@@ -175,5 +175,14 @@
         <file>icons16x16/items/Entity2d-Pending.png</file>
         <file>icons16x16/items/Entity2d-Settings.png</file>
         <file>icons16x16/items/Entity2d-Warning.png</file>
+        <file>icons16x16/items/Prefab.png</file>
+        <file>icons16x16/items/Prefab-Close.png</file>
+        <file>icons16x16/items/Prefab-Delete.png</file>
+        <file>icons16x16/items/Prefab-Dirty.png</file>
+        <file>icons16x16/items/Prefab-New.png</file>
+        <file>icons16x16/items/Prefab-Open.png</file>
+        <file>icons16x16/items/Prefab-Pending.png</file>
+        <file>icons16x16/items/Prefab-Settings.png</file>
+        <file>icons16x16/items/Prefab-Warning.png</file>
     </qresource>
 </RCC>

@@ -80,7 +80,9 @@ SOURCES += main.cpp \
     Atlas/AtlasRepackThread.cpp \
     Explorer/ExplorerItem.cpp \
     Shared/Properties/PropertiesUndoCmd.cpp \
-    Shared/IModelTreeItem.cpp
+    Shared/IModelTreeItem.cpp \
+    Entity3d/Entity3d.cpp \
+    Prefab/Prefab.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -148,7 +150,9 @@ HEADERS  += \
     Harmony/HarmonyWidget.h \
     Atlas/AtlasRepackThread.h \
     Explorer/ExplorerItem.h \
-    Shared/Properties/PropertiesUndoCmd.h
+    Shared/Properties/PropertiesUndoCmd.h \
+    Entity3d/Entity3d.h \
+    Prefab/Prefab.h
 
 FORMS    += \
     MainWindow.ui \
@@ -177,7 +181,9 @@ FORMS    += \
     Entity/EntityToolbox.ui \
     Entity/EntityCommon.ui \
     Widget/WidgetVectorSpinBox.ui \
-    Explorer/ExplorerWidget.ui
+    Explorer/ExplorerWidget.ui \
+    Entity3d/Entity3d.ui \
+    Prefab/Prefab.ui
 
 RC_FILE = DesignerTool.rc
 

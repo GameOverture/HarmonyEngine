@@ -466,6 +466,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
 	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
 	FINDACTION("actionNewEntity")->setEnabled(bValidItem);
+    FINDACTION("actionNewPrefab")->setEnabled(bValidItem);
 	FINDACTION("actionNewEntity3d")->setEnabled(bValidItem);
 	FINDACTION("actionLaunchIDE")->setEnabled(bValidItem);
 

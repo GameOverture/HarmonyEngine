@@ -61,7 +61,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 	
 	ui->txtName->selectAll();
 
-	bool bImportDlgType = (eItem == ITEM_Entity3d || eItem == ITEM_Spine);
+    bool bImportDlgType = (eItem == ITEM_Prefab || eItem == ITEM_Spine);
 	if(bImportDlgType == false)
 		ui->grpImport->hide();
 
@@ -237,7 +237,7 @@ void DlgNewItem::on_btnImportBrowse_clicked()
 	QString sCaption;
 	QString sFilters;
 	QString sSelectedFilter;
-	if(m_eItemType == ITEM_Entity3d)
+    if(m_eItemType == ITEM_Prefab)
 	{
 		sCaption = "Import new 3d asset";
 		sFilters = tr("All files (*.*);;FBX (*.fbx)");

@@ -83,6 +83,8 @@ private Q_SLOTS:
 	void on_actionNewParticle_triggered();
 	void on_actionNewSprite_triggered();
 	void on_actionNewFont_triggered();
+    void on_actionNewEntity3d_triggered();
+    void on_actionNewPrefab_triggered();
 
 	void on_actionSave_triggered();
 	void on_actionSaveAll_triggered();
@@ -102,7 +104,6 @@ private Q_SLOTS:
 
 	void on_actionTheme_Compe_triggered();
 
-	void on_actionNewEntity3d_triggered();
 
 private:
 	Ui::MainWindow *ui;

@@ -67,6 +67,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	ui->explorer->addAction(ui->actionNewFont);
 	ui->explorer->addAction(ui->actionNewSprite);
 	ui->explorer->addAction(ui->actionNewEntity);
+    ui->explorer->addAction(ui->actionNewPrefab);
 	ui->explorer->addAction(ui->actionNewEntity3d);
 	ui->explorer->addAction(ui->actionOpenProject);
 	ui->explorer->addAction(ui->actionPaste);
@@ -444,11 +445,6 @@ void MainWindow::on_actionNewEntity_triggered()
 	NewItem(ITEM_Entity);
 }
 
-void MainWindow::on_actionNewEntity3d_triggered()
-{
-	NewItem(ITEM_Entity3d);
-}
-
 void MainWindow::on_actionNewParticle_triggered()
 {
 	NewItem(ITEM_Particles);
@@ -462,6 +458,16 @@ void MainWindow::on_actionNewSprite_triggered()
 void MainWindow::on_actionNewFont_triggered()
 {
 	NewItem(ITEM_Font);
+}
+
+void MainWindow::on_actionNewPrefab_triggered()
+{
+    NewItem(ITEM_Prefab);
+}
+
+void MainWindow::on_actionNewEntity3d_triggered()
+{
+    NewItem(ITEM_Entity3d);
 }
 
 void MainWindow::on_actionSave_triggered()
