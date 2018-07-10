@@ -68,6 +68,8 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 	int iWidth = width();
 	adjustSize();
 	resize(iWidth, height());
+
+	ErrorCheck();
 }
 
 DlgNewItem::~DlgNewItem()

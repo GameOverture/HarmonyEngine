@@ -148,10 +148,13 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 	// Initialize the project by processing each type
 	for(auto typeIterator = m_SaveDataObj.begin(); typeIterator != m_SaveDataObj.end(); ++typeIterator)
 	{
+		QString sKey = typeIterator.key();
+
 		HyGuiItemType eType = ITEM_Unknown;
 		for(int i = 0; i < typeList.size(); ++i)
 		{
-			if(typeIterator.key() == HyGlobal::ItemName(typeList[i], true))
+
+			if(sKey == HyGlobal::ItemName(typeList[i], true))
 			{
 				eType = typeList[i];
 				break;

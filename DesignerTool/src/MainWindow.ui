@@ -75,11 +75,6 @@
      <addaction name="actionNewEntity"/>
      <addaction name="actionNewEntity3d"/>
     </widget>
-    <widget class="QMenu" name="menu">
-     <property name="title">
-      <string/>
-     </property>
-    </widget>
     <addaction name="actionNewProject"/>
     <addaction name="actionOpenProject"/>
     <addaction name="actionCloseProject"/>
@@ -552,7 +547,7 @@
    </property>
    <property name="icon">
     <iconset resource="res/DesignerTool.qrc">
-     <normaloff>:/icons16x16/items/Entity-New.png</normaloff>:/icons16x16/items/Entity-New.png</iconset>
+     <normaloff>:/icons16x16/items/Entity2d-New.png</normaloff>:/icons16x16/items/Entity2d-New.png</iconset>
    </property>
    <property name="text">
     <string>New 2d Entity</string>
