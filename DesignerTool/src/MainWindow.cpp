@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	ui->explorer->addAction(ui->actionNewFont);
 	ui->explorer->addAction(ui->actionNewSprite);
 	ui->explorer->addAction(ui->actionNewEntity);
-    ui->explorer->addAction(ui->actionNewPrefab);
+	ui->explorer->addAction(ui->actionNewPrefab);
 	ui->explorer->addAction(ui->actionNewEntity3d);
 	ui->explorer->addAction(ui->actionOpenProject);
 	ui->explorer->addAction(ui->actionPaste);
@@ -462,12 +462,12 @@ void MainWindow::on_actionNewFont_triggered()
 
 void MainWindow::on_actionNewPrefab_triggered()
 {
-    NewItem(ITEM_Prefab);
+	NewItem(ITEM_Prefab);
 }
 
 void MainWindow::on_actionNewEntity3d_triggered()
 {
-    NewItem(ITEM_Entity3d);
+	NewItem(ITEM_Entity3d);
 }
 
 void MainWindow::on_actionSave_triggered()
@@ -681,7 +681,14 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 
 	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
 	if(pDlg->exec())
-		ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(), eItem, pDlg->GetPrefix(), pDlg->GetName(), true, QJsonValue());
+	{
+		ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(),
+								 eItem,
+								 pDlg->GetPrefix(),
+								 pDlg->GetName(),
+								 true,
+								 pDlg->GetImportFile().isEmpty() ? QJsonValue() : QJsonValue(pDlg->GetImportFile()));
+	}
 
 	delete pDlg;
 }

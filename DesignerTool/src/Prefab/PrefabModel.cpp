@@ -9,8 +9,20 @@
  *************************************************************************/
 #include "PrefabModel.h"
 
-PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonObject prefabObject) : IModel(itemRef)
+#include "assimp/Importer.hpp"      // C++ importer interface
+#include "assimp/Exporter.hpp"      // C++ importer interface
+#include "assimp/scene.h"           // Output data structure
+#include "assimp/postprocess.h"     // Post processing flags
+
+PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(itemRef)
 {
+	// If initValue is just a string, then it represents the import file
+	if(initValue.isString())
+	{
+		Assimp::Importer importer;
+		const aiScene *pScene = importer.ReadFile(initValue.toString().toStdString(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+		pScene->HasMeshes();
+	}
 }
 
 /*virtual*/ void PrefabModel::OnSave() /*override*/

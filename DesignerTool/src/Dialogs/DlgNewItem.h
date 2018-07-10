@@ -32,8 +32,8 @@ public:
 	~DlgNewItem();
 	
 	QString GetName();
-	
 	QString GetPrefix();
+	QString GetImportFile();
 
 private Q_SLOTS:
 	void on_chkNewPrefix_stateChanged(int arg1);

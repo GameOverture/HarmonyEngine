@@ -91,7 +91,7 @@ void ProjectItem::LoadModel()
 		m_pModel = new EntityModel(*this, m_SaveValue.toArray());
 		break;
 	case ITEM_Prefab:
-		m_pModel = new PrefabModel(*this, m_SaveValue.toObject());
+		m_pModel = new PrefabModel(*this, m_SaveValue);
 		break;
 	default:
 		HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);

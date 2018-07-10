@@ -17,7 +17,7 @@
 class PrefabModel : public IModel
 {
 public:
-	PrefabModel(ProjectItem &itemRef, QJsonObject prefabObject);
+	PrefabModel(ProjectItem &itemRef, QJsonValue initValue);
 
 	virtual void OnSave() override;
 	virtual QJsonObject PopStateAt(uint32 uiIndex) override;

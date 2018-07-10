@@ -61,7 +61,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 	
 	ui->txtName->selectAll();
 
-    bool bImportDlgType = (eItem == ITEM_Prefab || eItem == ITEM_Spine);
+	bool bImportDlgType = (eItem == ITEM_Prefab || eItem == ITEM_Spine);
 	if(bImportDlgType == false)
 		ui->grpImport->hide();
 
@@ -88,6 +88,14 @@ QString DlgNewItem::GetPrefix()
         return QString(HyStr::MakeStringProperPath(ui->txtPrefix->text().toStdString().c_str(), nullptr, false).c_str());
 	else
 		return ui->cmbPrefixList->currentIndex() == 0 ? QString() : ui->cmbPrefixList->currentText();
+}
+
+QString DlgNewItem::GetImportFile()
+{
+	if(ui->grpImport->isHidden() == false)
+		return ui->txtImport->text();
+	else
+		return QString();
 }
 
 void DlgNewItem::on_chkNewPrefix_stateChanged(int arg1)
@@ -236,7 +244,7 @@ void DlgNewItem::on_btnImportBrowse_clicked()
 	QString sCaption;
 	QString sFilters;
 	QString sSelectedFilter;
-    if(m_eItemType == ITEM_Prefab)
+	if(m_eItemType == ITEM_Prefab)
 	{
 		sCaption = "Import new 3d asset";
 		sFilters = tr("All files (*.*);;FBX (*.fbx)");
@@ -248,10 +256,10 @@ void DlgNewItem::on_btnImportBrowse_clicked()
 		sFilters = tr("All files (*.*);;Spine (*.skel)");
 		sSelectedFilter = tr("Spine (*.skel)");
 	}
-    else
-    {
-        HyGuiLog("DlgNewItem has unknown import type", LOGTYPE_Error);
-    }
+	else
+	{
+		HyGuiLog("DlgNewItem has unknown import type", LOGTYPE_Error);
+	}
 	QString sImportFile = QFileDialog::getOpenFileName(this,
 													   sCaption,
 													   QString(),
