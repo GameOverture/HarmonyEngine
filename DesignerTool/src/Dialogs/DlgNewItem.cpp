@@ -225,7 +225,6 @@ void DlgNewItem::on_buttonBox_accepted()
 {
 }
 
-
 void DlgNewItem::on_btnImportBrowse_clicked()
 {
 	QFileDialog dlg(this);
@@ -249,6 +248,10 @@ void DlgNewItem::on_btnImportBrowse_clicked()
 		sFilters = tr("All files (*.*);;Spine (*.skel)");
 		sSelectedFilter = tr("Spine (*.skel)");
 	}
+    else
+    {
+        HyGuiLog("DlgNewItem has unknown import type", LOGTYPE_Error);
+    }
 	QString sImportFile = QFileDialog::getOpenFileName(this,
 													   sCaption,
 													   QString(),

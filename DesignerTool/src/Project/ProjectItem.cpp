@@ -19,6 +19,8 @@
 #include "FontDraw.h"
 #include "AudioWidget.h"
 #include "AudioDraw.h"
+#include "PrefabWidget.h"
+#include "PrefabDraw.h"
 #include "EntityWidget.h"
 #include "EntityDraw.h"
 
@@ -88,6 +90,9 @@ void ProjectItem::LoadModel()
 	case ITEM_Entity:
 		m_pModel = new EntityModel(*this, m_SaveValue.toArray());
 		break;
+	case ITEM_Prefab:
+		m_pModel = new PrefabModel(*this, m_SaveValue.toObject());
+		break;
 	default:
 		HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
@@ -116,6 +121,9 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 		break;
 	case ITEM_Entity:
 		static_cast<EntityWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
+		break;
+	case ITEM_Prefab:
+		static_cast<PrefabWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
 		break;
 	default:
 		HyGuiLog("Unimplemented item GiveMenuActions(): " % QString::number(m_eTYPE), LOGTYPE_Error);
@@ -171,6 +179,9 @@ void ProjectItem::WidgetLoad()
 	case ITEM_Entity:
 		m_pWidget = new EntityWidget(*this);
 		break;
+	case ITEM_Prefab:
+		m_pWidget = new PrefabWidget(*this);
+		break;
 	default:
 		HyGuiLog("Unimplemented WidgetLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
@@ -198,6 +209,9 @@ void ProjectItem::DrawLoad(IHyApplication &hyApp)
 		break;
 	case ITEM_Entity:
 		m_pDraw = new EntityDraw(this, hyApp);
+		break;
+	case ITEM_Prefab:
+		m_pDraw = new PrefabDraw(this, hyApp);
 		break;
 	default:
 		HyGuiLog("Unimplemented DrawLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
@@ -250,6 +264,9 @@ void ProjectItem::FocusWidgetState(int iStateIndex, QVariant subState)
 		break;
 	case ITEM_Entity:
 		static_cast<EntityWidget *>(m_pWidget)->FocusState(iStateIndex, subState);
+		break;
+	case ITEM_Prefab:
+		static_cast<PrefabWidget *>(m_pWidget)->FocusState(iStateIndex, subState);
 		break;
 	default:
 		HyGuiLog("Unimplemented ProjectItem::FocusWidgetState() type: " % QString::number(m_eTYPE), LOGTYPE_Error);

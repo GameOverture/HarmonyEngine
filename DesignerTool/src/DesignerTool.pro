@@ -82,7 +82,9 @@ SOURCES += main.cpp \
     Shared/Properties/PropertiesUndoCmd.cpp \
     Shared/IModelTreeItem.cpp \
     Entity3d/Entity3d.cpp \
-    Prefab/Prefab.cpp
+    Prefab/PrefabModel.cpp \
+    Prefab/PrefabWidget.cpp \
+    Prefab/PrefabDraw.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -152,7 +154,9 @@ HEADERS  += \
     Explorer/ExplorerItem.h \
     Shared/Properties/PropertiesUndoCmd.h \
     Entity3d/Entity3d.h \
-    Prefab/Prefab.h
+    Prefab/PrefabModel.h \
+    Prefab/PrefabWidget.h \
+    Prefab/PrefabDraw.h
 
 FORMS    += \
     MainWindow.ui \
@@ -183,7 +187,7 @@ FORMS    += \
     Widget/WidgetVectorSpinBox.ui \
     Explorer/ExplorerWidget.ui \
     Entity3d/Entity3d.ui \
-    Prefab/Prefab.ui
+    Prefab/PrefabWidget.ui
 
 RC_FILE = DesignerTool.rc
 
@@ -200,6 +204,7 @@ INCLUDEPATH += "$$PWD/Font"
 INCLUDEPATH += "$$PWD/Harmony"
 INCLUDEPATH += "$$PWD/Project"
 INCLUDEPATH += "$$PWD/Sprite"
+INCLUDEPATH += "$$PWD/Prefab"
 INCLUDEPATH += "$$PWD/Widget"
 INCLUDEPATH += "$$PWD/Explorer"
 INCLUDEPATH += "$$PWD/Shared"

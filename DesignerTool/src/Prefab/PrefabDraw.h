@@ -1,0 +1,26 @@
+/**************************************************************************
+*	PrefabDraw.h
+*
+*	Harmony Engine - Designer Tool
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony Designer Tool License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
+#ifndef PREFABDRAW_H
+#define PREFABDRAW_H
+
+#include "IDraw.h"
+#include "PrefabModel.h"
+
+class PrefabDraw : public IDraw
+{
+public:
+	PrefabDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
+
+	virtual void OnShow(IHyApplication &hyApp) override;
+	virtual void OnHide(IHyApplication &hyApp) override;
+	virtual void OnResizeRenderer() override;
+};
+
+#endif // PREFABDRAW_H
