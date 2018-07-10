@@ -166,5 +166,14 @@
         <file>icons16x16/items/Filter-Pending.png</file>
         <file>icons16x16/items/Filter-Settings.png</file>
         <file>icons16x16/items/Filter-Warning.png</file>
+        <file>icons16x16/items/Entity3d.png</file>
+        <file>icons16x16/items/Entity3d-Close.png</file>
+        <file>icons16x16/items/Entity3d-Delete.png</file>
+        <file>icons16x16/items/Entity3d-Dirty.png</file>
+        <file>icons16x16/items/Entity3d-New.png</file>
+        <file>icons16x16/items/Entity3d-Open.png</file>
+        <file>icons16x16/items/Entity3d-Pending.png</file>
+        <file>icons16x16/items/Entity3d-Settings.png</file>
+        <file>icons16x16/items/Entity3d-Warning.png</file>
     </qresource>
 </RCC>

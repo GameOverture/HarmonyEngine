@@ -102,6 +102,8 @@ private Q_SLOTS:
 
 	void on_actionTheme_Compe_triggered();
 
+	void on_actionNewEntity3d_triggered();
+
 private:
 	Ui::MainWindow *ui;
 

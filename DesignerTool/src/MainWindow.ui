@@ -73,6 +73,12 @@
      <addaction name="actionNewFont"/>
      <addaction name="separator"/>
      <addaction name="actionNewEntity"/>
+     <addaction name="actionNewEntity3d"/>
+    </widget>
+    <widget class="QMenu" name="menu">
+     <property name="title">
+      <string/>
+     </property>
     </widget>
     <addaction name="actionNewProject"/>
     <addaction name="actionOpenProject"/>
@@ -549,7 +555,7 @@
      <normaloff>:/icons16x16/items/Entity-New.png</normaloff>:/icons16x16/items/Entity-New.png</iconset>
    </property>
    <property name="text">
-    <string>New Entity</string>
+    <string>New 2d Entity</string>
    </property>
    <property name="toolTip">
     <string>Add a new entity in the currently selected project</string>
@@ -572,6 +578,21 @@
    </property>
    <property name="toolTip">
     <string>So sleek! So-phisticated! So... Compé!</string>
+   </property>
+  </action>
+  <action name="actionNewEntity3d">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res/DesignerTool.qrc">
+     <normaloff>:/icons16x16/items/Entity3d-New.png</normaloff>:/icons16x16/items/Entity3d-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>New 3d Entity</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new 3d entity</string>
    </property>
   </action>
  </widget>

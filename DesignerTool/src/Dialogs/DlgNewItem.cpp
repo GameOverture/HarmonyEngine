@@ -15,6 +15,7 @@
 #include <QDirIterator>
 #include <QStringBuilder>
 #include <QPushButton>
+#include <QFileDialog>
 
 DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefaultPrefix, QWidget *parent) :	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
 																												ui(new Ui::DlgNewItem),
@@ -59,6 +60,14 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 	ui->txtName->setText("New" % HyGlobal::ItemName(eItem, false));
 	
 	ui->txtName->selectAll();
+
+	bool bImportDlgType = (eItem == ITEM_Entity3d || eItem == ITEM_Spine);
+	if(bImportDlgType == false)
+		ui->grpImport->hide();
+
+	int iWidth = width();
+	adjustSize();
+	resize(iWidth, height());
 }
 
 DlgNewItem::~DlgNewItem()
@@ -185,6 +194,17 @@ void DlgNewItem::ErrorCheck()
 			break;
 		}
 
+		if(ui->grpImport->isHidden() == false)
+		{
+			QFile file(ui->txtImport->text());
+			if(file.exists() == false)
+			{
+				ui->lblError->setText("Error: Import file does not exist");
+				bIsError = true;
+				break;
+			}
+		}
+
 	}while(false);
 
 	if(bIsError)
@@ -201,4 +221,43 @@ void DlgNewItem::ErrorCheck()
 
 void DlgNewItem::on_buttonBox_accepted()
 {
+}
+
+
+void DlgNewItem::on_btnImportBrowse_clicked()
+{
+	QFileDialog dlg(this);
+	dlg.setFileMode(QFileDialog::ExistingFile);
+	dlg.setViewMode(QFileDialog::Detail);
+	dlg.setWindowModality(Qt::ApplicationModal);
+	dlg.setModal(true);
+
+	QString sCaption;
+	QString sFilters;
+	QString sSelectedFilter;
+	if(m_eItemType == ITEM_Entity3d)
+	{
+		sCaption = "Import new 3d asset";
+		sFilters = tr("All files (*.*);;FBX (*.fbx)");
+		sSelectedFilter = tr("FBX (*.fbx)");
+	}
+	else if(m_eItemType == ITEM_Spine)
+	{
+		sCaption = "Import new spine file";
+		sFilters = tr("All files (*.*);;Spine (*.skel)");
+		sSelectedFilter = tr("Spine (*.skel)");
+	}
+	QString sImportFile = QFileDialog::getOpenFileName(this,
+													   sCaption,
+													   QString(),
+													   sFilters,
+													   &sSelectedFilter);
+
+	if(sImportFile.isEmpty() == false)
+		ui->txtImport->setText(sImportFile);
+}
+
+void DlgNewItem::on_txtImport_textChanged(const QString &arg1)
+{
+	ErrorCheck();
 }

@@ -40,7 +40,8 @@
 	sm_sItemNames[ITEM_Spine] = "Spine";
 	sm_sItemNames[ITEM_Sprite] = "Sprite";
 	sm_sItemNames[ITEM_Shader] = "Shader";
-	sm_sItemNames[ITEM_Entity] = "Entity";
+	sm_sItemNames[ITEM_Entity] = "Entity2d";
+	sm_sItemNames[ITEM_Entity3d] = "Entity3d";
 	sm_sItemNames[ITEM_BoundingVolume] = "BoundingVolume";
 	sm_sItemNames[ITEM_Physics] = "Physics";
 
@@ -55,7 +56,8 @@
 	sm_sItemNamesPlural[ITEM_Spine] = "Spine";
 	sm_sItemNamesPlural[ITEM_Sprite] = "Sprites";
 	sm_sItemNamesPlural[ITEM_Shader] = "Shaders";
-	sm_sItemNamesPlural[ITEM_Entity] = "Entities";
+	sm_sItemNamesPlural[ITEM_Entity] = "Entities2d";
+	sm_sItemNamesPlural[ITEM_Entity3d] = "Entities3d";
 	sm_sItemNamesPlural[ITEM_BoundingVolume] = "BoundingVolumes";
 	sm_sItemNamesPlural[ITEM_Physics] = "Physics";
 
@@ -90,6 +92,7 @@
 	sm_ItemColors[ITEM_Sprite] = QColor(129, 166, 225);
 	sm_ItemColors[ITEM_Shader] = QColor(225, 151, 97);
 	sm_ItemColors[ITEM_Entity] = QColor(128, 128, 128);
+	sm_ItemColors[ITEM_Entity3d] = QColor(128, 128, 128);
 	sm_ItemColors[ITEM_BoundingVolume] = QColor(234, 232, 58);
 	sm_ItemColors[ITEM_Physics] = QColor(201, 58, 203);
 
@@ -160,6 +163,7 @@
 	list.append(ITEM_Sprite);
 	list.append(ITEM_Shader);
 	list.append(ITEM_Entity);
+	list.append(ITEM_Entity3d);
 	list.append(ITEM_BoundingVolume);
 	list.append(ITEM_Physics);
 

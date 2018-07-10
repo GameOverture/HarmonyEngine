@@ -67,6 +67,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	ui->explorer->addAction(ui->actionNewFont);
 	ui->explorer->addAction(ui->actionNewSprite);
 	ui->explorer->addAction(ui->actionNewEntity);
+	ui->explorer->addAction(ui->actionNewEntity3d);
 	ui->explorer->addAction(ui->actionOpenProject);
 	ui->explorer->addAction(ui->actionPaste);
 	ui->explorer->addAction(ui->actionRemove);
@@ -443,6 +444,11 @@ void MainWindow::on_actionNewEntity_triggered()
 	NewItem(ITEM_Entity);
 }
 
+void MainWindow::on_actionNewEntity3d_triggered()
+{
+	NewItem(ITEM_Entity3d);
+}
+
 void MainWindow::on_actionNewParticle_triggered()
 {
 	NewItem(ITEM_Particles);
@@ -666,6 +672,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 {
 	ExplorerItem *pCurSelectedItem = ui->explorer->GetCurItemSelected();
 	QString sDefaultPrefix = pCurSelectedItem->GetType() == ITEM_Prefix ? pCurSelectedItem->GetName(true) : pCurSelectedItem->GetPrefix();
+
 	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
 	if(pDlg->exec())
 		ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(), eItem, pDlg->GetPrefix(), pDlg->GetName(), true, QJsonValue());

@@ -24,11 +24,11 @@ class DlgNewItem : public QDialog
 	Q_OBJECT
 
 	Project *       m_pItemProject;
-	HyGuiItemType       m_eItemType;
+	HyGuiItemType   m_eItemType;
 	QStringList     m_PrefixStringList;
 
 public:
-	explicit DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefaultPrefix, QWidget *parent = 0);
+	explicit DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefaultPrefix, QWidget *parent);
 	~DlgNewItem();
 	
 	QString GetName();
@@ -45,7 +45,11 @@ private Q_SLOTS:
 	void on_txtName_textChanged(const QString &arg1);
 
 	void on_buttonBox_accepted();
-	
+
+	void on_btnImportBrowse_clicked();
+
+	void on_txtImport_textChanged(const QString &arg1);
+
 private:
 	Ui::DlgNewItem *ui;
 
