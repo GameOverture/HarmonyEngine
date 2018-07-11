@@ -71,13 +71,13 @@ public:
 
 	//--------------------------------------------------------------------------------------
 	// Returns the time modifier (defaulted to 1.0f) that's applied the animation frame duration 
-	// set by the Designer Tool.
+	// set by the Editor Tool.
 	//--------------------------------------------------------------------------------------
 	float AnimGetPlayRate() const;
 
 	//--------------------------------------------------------------------------------------
 	// Modifies the time modifier that's applied the animation frame duration 
-	// set by the Designer Tool. Negative fPlayRate is invalid. 
+	// set by the Editor Tool. Negative fPlayRate is invalid. 
 	//
 	// Note: This method will not unpause an sprite. It will just set its play rate for
 	//       when it is told to resume.

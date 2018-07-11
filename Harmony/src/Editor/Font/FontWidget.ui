@@ -299,7 +299,7 @@
   </layout>
   <action name="actionAddState">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -311,7 +311,7 @@
   </action>
   <action name="actionRemoveState">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -323,7 +323,7 @@
   </action>
   <action name="actionRenameState">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
    </property>
    <property name="text">
@@ -335,7 +335,7 @@
   </action>
   <action name="actionOrderStateBackwards">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
    </property>
    <property name="text">
@@ -347,7 +347,7 @@
   </action>
   <action name="actionOrderStateForwards">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
    </property>
    <property name="text">
@@ -359,7 +359,7 @@
   </action>
   <action name="actionAddLayer">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -371,7 +371,7 @@
   </action>
   <action name="actionRemoveLayer">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -383,7 +383,7 @@
   </action>
   <action name="actionOrderLayerDownwards">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
    </property>
    <property name="text">
@@ -395,7 +395,7 @@
   </action>
   <action name="actionOrderLayerUpwards">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
    </property>
    <property name="text">
@@ -408,18 +408,18 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FontTableView</class>
-   <extends>QTableView</extends>
-   <header>FontModelView.h</header>
-  </customwidget>
-  <customwidget>
    <class>PropertiesTreeView</class>
    <extends>QTreeView</extends>
    <header>PropertiesTreeView.h</header>
   </customwidget>
+  <customwidget>
+   <class>FontTableView</class>
+   <extends>QTableView</extends>
+   <header>FontModelView.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
-  <include location="../res/DesignerTool.qrc"/>
+  <include location="../res/HyEditor.qrc"/>
  </resources>
  <connections/>
 </ui>

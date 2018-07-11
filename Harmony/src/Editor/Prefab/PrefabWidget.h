@@ -1,11 +1,11 @@
 /**************************************************************************
  *	PrefabWidget.h
  *
- *	Harmony Engine - Designer Tool
+ *	Harmony Engine - Editor Tool
  *	Copyright (c) 2018 Jason Knobler
  *
- *	Harmony Designer Tool License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	Harmony Editor Tool License:
+ *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef PREFABWIDGET_H
 #define PREFABWIDGET_H

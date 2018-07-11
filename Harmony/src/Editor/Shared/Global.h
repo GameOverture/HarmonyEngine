@@ -1,11 +1,11 @@
 /**************************************************************************
  *	Global.h
  *
- *	Harmony Engine - Designer Tool
+ *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	Harmony Designer Tool License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	Harmony Editor Tool License:
+ *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -29,7 +29,8 @@
 
 class Project;
 
-#define HyDesignerToolName "Harmony Designer Tool"
+#define HyOrganizationName "Game Overture"
+#define HyEditorToolName "Harmony Editor Tool"
 //#define HYGUI_UseBinaryMetaFiles
 
 enum HyGuiItemType

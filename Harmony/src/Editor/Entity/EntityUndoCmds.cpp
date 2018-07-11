@@ -1,11 +1,11 @@
 /**************************************************************************
  *	EntityUndoCmds.cpp
  *
- *	Harmony Engine - Designer Tool
+ *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	Harmony Designer Tool License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	Harmony Editor Tool License:
+ *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "EntityUndoCmds.h"
 #include "EntityModel.h"

@@ -229,7 +229,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="../res/DesignerTool.qrc">:/icons16x16/Harmony.png</pixmap>
+              <pixmap resource="../res/HyEditor.qrc">:/icons16x16/Harmony.png</pixmap>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -290,7 +290,7 @@
   </layout>
   <action name="actionRenameState">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
    </property>
    <property name="text">
@@ -302,7 +302,7 @@
   </action>
   <action name="actionAddState">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -314,7 +314,7 @@
   </action>
   <action name="actionRemoveState">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -326,7 +326,7 @@
   </action>
   <action name="actionOrderStateBackwards">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
    </property>
    <property name="text">
@@ -338,7 +338,7 @@
   </action>
   <action name="actionOrderStateForwards">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
    </property>
    <property name="text">
@@ -350,7 +350,7 @@
   </action>
   <action name="actionAddPrimitive">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Primitive-New.png</normaloff>:/icons16x16/items/Primitive-New.png</iconset>
    </property>
    <property name="text">
@@ -362,7 +362,7 @@
   </action>
   <action name="actionInsertBoundingVolume">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/BoundingVolume-New.png</normaloff>:/icons16x16/items/BoundingVolume-New.png</iconset>
    </property>
    <property name="text">
@@ -374,7 +374,7 @@
   </action>
   <action name="actionInsertPhysicsBody">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Physics-New.png</normaloff>:/icons16x16/items/Physics-New.png</iconset>
    </property>
    <property name="text">
@@ -394,7 +394,7 @@
   </action>
   <action name="actionAddSelectedChild">
    <property name="icon">
-    <iconset resource="../res/DesignerTool.qrc">
+    <iconset resource="../res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -413,7 +413,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../res/DesignerTool.qrc"/>
+  <include location="../res/HyEditor.qrc"/>
  </resources>
  <connections/>
 </ui>

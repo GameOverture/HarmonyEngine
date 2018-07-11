@@ -146,7 +146,7 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset resource="res/DesignerTool.qrc">
+        <iconset resource="../res/HyEditor.qrc">
          <normaloff>:/icons16x16/media-play.png</normaloff>:/icons16x16/media-play.png</iconset>
        </property>
       </widget>
@@ -434,7 +434,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="res/DesignerTool.qrc"/>
+  <include location="../res/HyEditor.qrc"/>
  </resources>
  <connections/>
 </ui>

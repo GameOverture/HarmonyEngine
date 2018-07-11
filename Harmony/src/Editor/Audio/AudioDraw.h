@@ -1,11 +1,11 @@
 /**************************************************************************
  *	AudioDraw.h
  *
- *	Harmony Engine - Designer Tool
+ *	Harmony Engine - Editor Tool
  *	Copyright (c) 2017 Jason Knobler
  *
- *	Harmony Designer Tool License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	Harmony Editor Tool License:
+ *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef AUDIODRAW_H
 #define AUDIODRAW_H

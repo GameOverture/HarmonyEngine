@@ -1,10 +1,10 @@
 /**************************************************************************
  *	AudioWidgetBank.h
  *
- *	Harmony Engine - Designer Tool
+ *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	Harmony Designer Tool License:
+ *	Harmony Editor Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #ifndef AUDIOWIDGETBANK_H

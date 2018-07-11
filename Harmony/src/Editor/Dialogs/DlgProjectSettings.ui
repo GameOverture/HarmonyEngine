@@ -40,6 +40,14 @@
       <number>2</number>
      </property>
      <widget class="QWidget" name="page_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>100</width>
+        <height>30</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Page</string>
       </attribute>
@@ -49,8 +57,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>316</width>
-        <height>69</height>
+        <width>100</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -183,10 +191,10 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>Num input maps</string>
+          <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="res/DesignerTool.qrc">:/icons16x16/sprite-applyToAll.png</pixmap>
+          <pixmap resource="../res/HyEditor.qrc">:/icons16x16/sprite-applyToAll.png</pixmap>
          </property>
         </widget>
        </item>
@@ -243,7 +251,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="res/DesignerTool.qrc"/>
+  <include location="../res/HyEditor.qrc"/>
  </resources>
  <connections>
   <connection>

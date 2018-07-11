@@ -1,11 +1,11 @@
 /**************************************************************************
  *	WidgetOutputLog.cpp
  *
- *	Harmony Engine - Designer Tool
+ *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	Harmony Designer Tool License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	Harmony Editor Tool License:
+ *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "WidgetOutputLog.h"
 #include "ui_WidgetOutputLog.h"
@@ -52,11 +52,11 @@ WidgetOutputLog::~WidgetOutputLog()
 		sLogMsg = sm_ksNormalHtml % sLogMsg;
 		break;
 	case LOGTYPE_Warning:
-		QMessageBox::warning(sm_pInstance->parentWidget(), HyDesignerToolName, sLogMsg);
+		QMessageBox::warning(sm_pInstance->parentWidget(), HyEditorToolName, sLogMsg);
 		sLogMsg = sm_ksWarningHtml % sLogMsg; 
 		break;
 	case LOGTYPE_Error:
-		QMessageBox::critical(sm_pInstance->parentWidget(), HyDesignerToolName, sLogMsg);
+		QMessageBox::critical(sm_pInstance->parentWidget(), HyEditorToolName, sLogMsg);
 		sLogMsg = sm_ksErrorHtml % sLogMsg;
 		break;
 	case LOGTYPE_Info:

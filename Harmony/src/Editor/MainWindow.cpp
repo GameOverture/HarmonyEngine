@@ -1,11 +1,11 @@
 /**************************************************************************
  *	MainWindow.cpp
  *
- *	Harmony Engine - Designer Tool
+ *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
  *
- *	Harmony Designer Tool License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	Harmony Editor Tool License:
+ *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 											ui(new Ui::MainWindow),
 											m_Harmony(*this),
 											m_eTheme(THEME_Lappy486),
-											m_Settings("Overture Games", "Harmony Designer Tool")
+											m_Settings(HyOrganizationName, HyEditorToolName)
 {
 	ui->setupUi(this);
 	sm_pInstance = this;
@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	connect(ui->menu_View, SIGNAL(aboutToShow), this, SLOT(on_menu_View_aboutToShow));
 	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, SLOT(OnCtrlTab()));
 
-	HyGuiLog("Harmony Designer Tool", LOGTYPE_Title);
+	HyGuiLog(HyEditorToolName, LOGTYPE_Title);
 	HyGuiLog("Initializing...", LOGTYPE_Normal);
 	
 	// TODO: Don't copy action pointers to other widgets, have function here that manipulates them instead
@@ -89,9 +89,9 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 		while(HyGlobal::IsEngineDirValid(engineDir) == false)
 		{
 			if(bFirstRun)
-				QMessageBox::information(parentWidget(), HyDesignerToolName, "First run initialization: Please specify where the Harmony Engine project location is on your machine");
+				QMessageBox::information(parentWidget(), HyEditorToolName, "First run initialization: Please specify where the Harmony Engine project location is on your machine");
 			else
-				QMessageBox::warning(parentWidget(), HyDesignerToolName, "Harmony Engine Directory is Invalid: Please specify where the Harmony Engine project location is on your machine");
+				QMessageBox::warning(parentWidget(), HyEditorToolName, "Harmony Engine Directory is Invalid: Please specify where the Harmony Engine project location is on your machine");
 			
 			DlgSetEngineLocation *pDlg = new DlgSetEngineLocation(this);
 			if(pDlg->exec() == QDialog::Accepted)
@@ -101,7 +101,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 			}
 			else
 			{
-				if(QMessageBox::Retry != QMessageBox::critical(parentWidget(), HyDesignerToolName, "You must specify the Harmony Engine project location to continue", QMessageBox::Retry | QMessageBox::Cancel, QMessageBox::Retry))
+				if(QMessageBox::Retry != QMessageBox::critical(parentWidget(), HyEditorToolName, "You must specify the Harmony Engine project location to continue", QMessageBox::Retry | QMessageBox::Close, QMessageBox::Retry))
 					exit(-1);
 			}
 			delete pDlg;
@@ -648,7 +648,7 @@ void MainWindow::on_actionConnect_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-	QMessageBox::about(this, HyDesignerToolName, "Harmony Engine and Designer Tool\n\nJason Knobler " % QString::number(QDate::currentDate().year()));
+	QMessageBox::about(this, HyEditorToolName, "Harmony Engine and Editor Tool\n\nJason Knobler " % QString::number(QDate::currentDate().year()));
 }
 
 void MainWindow::on_actionExit_triggered()

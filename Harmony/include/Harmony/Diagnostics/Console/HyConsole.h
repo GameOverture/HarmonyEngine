@@ -40,7 +40,7 @@ public:
 };
 
 #ifdef HY_PLATFORM_GUI
-	// TODO: Pipe messages to the Designer Tool
+	// TODO: Pipe messages to the Editor Tool
 	#define HyLog(msg) { }
 	#define HyLogWarning(msg) { }
 	#define HyLogError(msg) { }

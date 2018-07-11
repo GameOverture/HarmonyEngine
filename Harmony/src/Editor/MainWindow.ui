@@ -11,10 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Harmony Designer Tool</string>
+   <string>Harmony Editor Tool</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res/DesignerTool.qrc">
+   <iconset resource="res/HyEditor.qrc">
     <normaloff>:/icons16x16/Harmony.png</normaloff>:/icons16x16/Harmony.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -280,7 +280,7 @@
   </widget>
   <action name="actionNewProject">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Project-New.png</normaloff>:/icons16x16/items/Project-New.png</iconset>
    </property>
    <property name="text">
@@ -295,7 +295,7 @@
   </action>
   <action name="actionOpenProject">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Project-Open.png</normaloff>:/icons16x16/items/Project-Open.png</iconset>
    </property>
    <property name="text">
@@ -310,7 +310,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-copy.png</normaloff>:/icons16x16/edit-copy.png</iconset>
    </property>
    <property name="text">
@@ -322,7 +322,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-paste.png</normaloff>:/icons16x16/edit-paste.png</iconset>
    </property>
    <property name="text">
@@ -334,7 +334,7 @@
   </action>
   <action name="actionRemove">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -349,7 +349,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Project-Close.png</normaloff>:/icons16x16/items/Project-Close.png</iconset>
    </property>
    <property name="text">
@@ -364,7 +364,7 @@
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/file-exit.png</normaloff>:/icons16x16/file-exit.png</iconset>
    </property>
    <property name="text">
@@ -379,7 +379,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/file-save.png</normaloff>:/icons16x16/file-save.png</iconset>
    </property>
    <property name="text">
@@ -397,7 +397,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/file-saveAll.png</normaloff>:/icons16x16/file-saveAll.png</iconset>
    </property>
    <property name="text">
@@ -415,7 +415,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Sprite-New.png</normaloff>:/icons16x16/items/Sprite-New.png</iconset>
    </property>
    <property name="text">
@@ -430,7 +430,7 @@
   </action>
   <action name="actionRename">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
    </property>
    <property name="text">
@@ -445,7 +445,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Font-New.png</normaloff>:/icons16x16/items/Font-New.png</iconset>
    </property>
    <property name="text">
@@ -460,7 +460,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Particles-New.png</normaloff>:/icons16x16/items/Particles-New.png</iconset>
    </property>
    <property name="text">
@@ -478,7 +478,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Audio-New.png</normaloff>:/icons16x16/items/Audio-New.png</iconset>
    </property>
    <property name="text">
@@ -493,7 +493,7 @@
   </action>
   <action name="actionConnect">
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/debug-notConnected.png</normaloff>
      <normalon>:/icons16x16/debug-connected.png</normalon>:/icons16x16/debug-notConnected.png</iconset>
    </property>
@@ -512,7 +512,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/code.png</normaloff>:/icons16x16/code.png</iconset>
    </property>
    <property name="text">
@@ -532,7 +532,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Project-Settings.png</normaloff>:/icons16x16/items/Project-Settings.png</iconset>
    </property>
    <property name="text">
@@ -547,7 +547,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Entity2d-New.png</normaloff>:/icons16x16/items/Entity2d-New.png</iconset>
    </property>
    <property name="text">
@@ -581,7 +581,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Entity3d-New.png</normaloff>:/icons16x16/items/Entity3d-New.png</iconset>
    </property>
    <property name="text">
@@ -596,7 +596,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/DesignerTool.qrc">
+    <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Prefab-New.png</normaloff>:/icons16x16/items/Prefab-New.png</iconset>
    </property>
    <property name="text">
@@ -623,7 +623,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="res/DesignerTool.qrc"/>
+  <include location="res/HyEditor.qrc"/>
  </resources>
  <connections/>
 </ui>
