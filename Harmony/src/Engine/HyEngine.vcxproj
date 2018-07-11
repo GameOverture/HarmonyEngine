@@ -299,40 +299,40 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>..\..\bin\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <TargetName>HyEngine_$(Platform)$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <TargetName>HyEngine_$(Platform)$(Configuration)</TargetName>
     <OutDir>..\..\bin\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">
     <OutDir>..\..\bin\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <TargetName>HyEngine_$(Platform)$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">
-    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <TargetName>HyEngine_$(Platform)$(Configuration)</TargetName>
     <OutDir>..\..\bin\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\..\bin\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <TargetName>HyEngine_$(Platform)$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\bin\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <TargetName>HyEngine_$(Platform)$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
     <OutDir>..\..\bin\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <TargetName>HyEngine_$(Platform)$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|x64'">
-    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <TargetName>HyEngine_$(Platform)$(Configuration)</TargetName>
     <OutDir>..\..\bin\</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>

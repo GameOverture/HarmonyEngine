@@ -86,8 +86,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(QTDIR)\lib\qtmain.lib;shell32.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiRelease\freetype-gl.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiRelease\assimp.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\bin\x64_GuiRelease\Harmony.lib;AdvAPI32.lib;ole32.lib;$(QTDIR)\lib\Qt5OpenGL.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Network.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;C:\openssl\lib;C:\Utils\my_sql\my_sql\lib;C:\Utils\postgresql\pgsql\lib;$(QTDIR)\lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiRelease;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\bin\x64_GuiRelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(QTDIR)\lib\qtmain.lib;shell32.lib;freetype-gl.lib;assimp.lib;AdvAPI32.lib;ole32.lib;$(QTDIR)\lib\Qt5OpenGL.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Network.lib;$(QTDIR)\lib\Qt5Core.lib;HyEngine_x64GuiRelease.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;..\..\bin;..\..\lib\x64_GuiRelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -131,6 +131,11 @@
       <InputFile>%(FullPath)</InputFile>
       <QTDIR>$(QTDIR)</QTDIR>
     </QtUic>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)HyEditor"
+move "$(OutDir)$(TargetName)$(TargetExt)" "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"
+$(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -153,8 +158,8 @@
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(QTDIR)\lib\qtmaind.lib;shell32.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiDebug\freetype-gl.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiDebug\assimp.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\bin\x64_GuiDebug\Harmony.lib;AdvAPI32.lib;ole32.lib;$(QTDIR)\lib\Qt5OpenGLd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Networkd.lib;$(QTDIR)\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;C:\openssl\lib;C:\Utils\my_sql\my_sql\lib;C:\Utils\postgresql\pgsql\lib;$(QTDIR)\lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiDebug;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\bin\x64_GuiDebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(QTDIR)\lib\qtmaind.lib;shell32.lib;freetype-gl.lib;assimp.lib;AdvAPI32.lib;ole32.lib;$(QTDIR)\lib\Qt5OpenGLd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Networkd.lib;$(QTDIR)\lib\Qt5Cored.lib;HyEngine_x64GuiDebug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;..\..\bin;..\..\lib\x64_GuiDebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
