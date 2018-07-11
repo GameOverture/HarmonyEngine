@@ -1,0 +1,699 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5CBC9F1B-80ED-3360-8BCB-4AA9A65D7074}</ProjectGuid>
+    <RootNamespace>HyEditor</RootNamespace>
+    <Keyword>Qt4VSv1.0</Keyword>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.17134.0</WindowsTargetPlatformMinVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <PlatformToolset>v141</PlatformToolset>
+    <OutputDirectory>release\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>release\</IntermediateDirectory>
+    <PrimaryOutput>HyEditor</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <PlatformToolset>v141</PlatformToolset>
+    <OutputDirectory>debug\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>debug\</IntermediateDirectory>
+    <PrimaryOutput>HyEditor</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">
+    <QtMsBuild>$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\$(Platform)\($(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HyEditor</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IgnoreImportLibrary>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\$(Platform)\($(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HyEditor_Debug</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Widget;Explorer;Shared;Shared\Properties;..\..\include;$(QTDIR)\include;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtNetwork;$(QTDIR)\include\QtCore;release;\include;$(QTDIR)\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(QTDIR)\lib\qtmain.lib;shell32.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiRelease\freetype-gl.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiRelease\assimp.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\bin\x64_GuiRelease\Harmony.lib;AdvAPI32.lib;ole32.lib;$(QTDIR)\lib\Qt5OpenGL.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Network.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;C:\openssl\lib;C:\Utils\my_sql\my_sql\lib;C:\Utils\postgresql\pgsql\lib;$(QTDIR)\lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiRelease;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\bin\x64_GuiRelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkIncremental>false</LinkIncremental>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtMoc>
+      <QTDIR>$(QTDIR)</QTDIR>
+      <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
+      <Define>UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_CORE_LIB</Define>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <InputFile>%(FullPath)</InputFile>
+      <DynamicSource>output</DynamicSource>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;$(QTDIR)\mkspecs/win32-msvc;.;./Atlas;./Audio;./Dialogs;./Entity;./Font;./Harmony;./Project;./Sprite;./Prefab;./Widget;./Explorer;./Shared;./Shared/Properties;C:/Soft/LG/SlotFramework/Engines/HarmonyEngine/Harmony/include;$(QTDIR)\include;$(QTDIR)\include/QtOpenGL;$(QTDIR)\include/QtWidgets;$(QTDIR)\include/QtGui;$(QTDIR)\include/QtANGLE;$(QTDIR)\include/QtNetwork;$(QTDIR)\include/QtCore;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.14.26428\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.14.26428\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\winrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\cppwinrt</IncludePath>
+    </QtMoc>
+    <QtRcc>
+      <InitFuncName>HyEditor</InitFuncName>
+      <QTDIR>$(QTDIR)</QTDIR>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+      <Compression>default</Compression>
+      <OutputFile>.\GeneratedFiles\qrc_%(Filename).cpp</OutputFile>
+      <InputFile>%(FullPath)</InputFile>
+    </QtRcc>
+    <QtUic>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <OutputFile>.\GeneratedFiles\ui_%(Filename).h</OutputFile>
+      <InputFile>%(FullPath)</InputFile>
+      <QTDIR>$(QTDIR)</QTDIR>
+    </QtUic>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Widget;Explorer;Shared;Shared\Properties;..\..\include;$(QTDIR)\include;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtNetwork;$(QTDIR)\include\QtCore;debug;\include;$(QTDIR)\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_KEYWORDS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(QTDIR)\lib\qtmaind.lib;shell32.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiDebug\freetype-gl.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiDebug\assimp.lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\bin\x64_GuiDebug\Harmony.lib;AdvAPI32.lib;ole32.lib;$(QTDIR)\lib\Qt5OpenGLd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Networkd.lib;$(QTDIR)\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;C:\openssl\lib;C:\Utils\my_sql\my_sql\lib;C:\Utils\postgresql\pgsql\lib;$(QTDIR)\lib;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\lib\x64_GuiDebug;C:\Soft\LG\SlotFramework\Engines\HarmonyEngine\Harmony\bin\x64_GuiDebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_KEYWORDS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtMoc>
+      <QTDIR>$(QTDIR)</QTDIR>
+      <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
+      <Define>UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_KEYWORDS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_CORE_LIB</Define>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <InputFile>%(FullPath)</InputFile>
+      <DynamicSource>output</DynamicSource>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;$(QTDIR)\mkspecs/win32-msvc;.;./Atlas;./Audio;./Dialogs;./Entity;./Font;./Harmony;./Project;./Sprite;./Prefab;./Widget;./Explorer;./Shared;./Shared/Properties;C:/Soft/LG/SlotFramework/Engines/HarmonyEngine/Harmony/include;$(QTDIR)\include;$(QTDIR)\include/QtOpenGL;$(QTDIR)\include/QtWidgets;$(QTDIR)\include/QtGui;$(QTDIR)\include/QtANGLE;$(QTDIR)\include/QtNetwork;$(QTDIR)\include/QtCore;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.14.26428\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.14.26428\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\winrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.17134.0\cppwinrt</IncludePath>
+    </QtMoc>
+    <QtUic>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <OutputFile>.\GeneratedFiles\ui_%(Filename).h</OutputFile>
+      <InputFile>%(FullPath)</InputFile>
+      <QTDIR>$(QTDIR)</QTDIR>
+    </QtUic>
+    <QtRcc>
+      <Compression>default</Compression>
+      <OutputFile>.\GeneratedFiles\qrc_%(Filename).cpp</OutputFile>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+      <InitFuncName>HyEditor</InitFuncName>
+      <InputFile>%(FullPath)</InputFile>
+      <QTDIR>$(QTDIR)</QTDIR>
+    </QtRcc>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Atlas\AtlasDraw.cpp" />
+    <ClCompile Include="Atlas\AtlasFrame.cpp" />
+    <ClCompile Include="Atlas\AtlasModel.cpp" />
+    <ClCompile Include="Atlas\AtlasRepackThread.cpp" />
+    <ClCompile Include="Atlas\AtlasWidget.cpp" />
+    <ClCompile Include="Audio\AudioDraw.cpp" />
+    <ClCompile Include="Audio\AudioModelView.cpp" />
+    <ClCompile Include="Audio\AudioWave.cpp" />
+    <ClCompile Include="Audio\AudioWidget.cpp" />
+    <ClCompile Include="Audio\AudioWidgetBank.cpp" />
+    <ClCompile Include="Audio\AudioWidgetManager.cpp" />
+    <ClCompile Include="Audio\AudioWidgetState.cpp" />
+    <ClCompile Include="Dialogs\DlgAtlasGroupSettings.cpp" />
+    <ClCompile Include="Dialogs\DlgColorPicker.cpp" />
+    <ClCompile Include="Dialogs\DlgInputName.cpp" />
+    <ClCompile Include="Dialogs\DlgNewItem.cpp" />
+    <ClCompile Include="Dialogs\DlgNewProject.cpp" />
+    <ClCompile Include="Dialogs\DlgProjectSettings.cpp" />
+    <ClCompile Include="Dialogs\DlgSetEngineLocation.cpp" />
+    <ClCompile Include="Entity3d\Entity3d.cpp" />
+    <ClCompile Include="Entity\EntityDraw.cpp" />
+    <ClCompile Include="Entity\EntityModel.cpp" />
+    <ClCompile Include="Entity\EntityTreeModel.cpp" />
+    <ClCompile Include="Entity\EntityUndoCmds.cpp" />
+    <ClCompile Include="Entity\EntityWidget.cpp" />
+    <ClCompile Include="Explorer\ExplorerItem.cpp" />
+    <ClCompile Include="Explorer\ExplorerTreeWidget.cpp" />
+    <ClCompile Include="Explorer\ExplorerWidget.cpp" />
+    <ClCompile Include="Font\FontDraw.cpp" />
+    <ClCompile Include="Font\FontItem.cpp" />
+    <ClCompile Include="Font\FontModelView.cpp" />
+    <ClCompile Include="Font\FontModels.cpp" />
+    <ClCompile Include="Font\FontUndoCmds.cpp" />
+    <ClCompile Include="Font\FontWidget.cpp" />
+    <ClCompile Include="Shared\Global.cpp" />
+    <ClCompile Include="Harmony\Harmony.cpp" />
+    <ClCompile Include="Harmony\HarmonyConnection.cpp" />
+    <ClCompile Include="Harmony\HarmonyWidget.cpp" />
+    <ClCompile Include="Shared\IDraw.cpp" />
+    <ClCompile Include="Shared\IModel.cpp" />
+    <ClCompile Include="Shared\IModelTreeItem.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="Prefab\PrefabDraw.cpp" />
+    <ClCompile Include="Prefab\PrefabModel.cpp" />
+    <ClCompile Include="Prefab\PrefabWidget.cpp" />
+    <ClCompile Include="Project\Project.cpp" />
+    <ClCompile Include="Project\ProjectDraw.cpp" />
+    <ClCompile Include="Project\ProjectItem.cpp" />
+    <ClCompile Include="Project\ProjectItemMimeData.cpp" />
+    <ClCompile Include="Shared\Properties\PropertiesTreeItem.cpp" />
+    <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp" />
+    <ClCompile Include="Shared\Properties\PropertiesTreeView.cpp" />
+    <ClCompile Include="Shared\Properties\PropertiesUndoCmd.cpp" />
+    <ClCompile Include="Sprite\SpriteDraw.cpp" />
+    <ClCompile Include="Sprite\SpriteModels.cpp" />
+    <ClCompile Include="Sprite\SpriteTableView.cpp" />
+    <ClCompile Include="Sprite\SpriteUndoCmds.cpp" />
+    <ClCompile Include="Sprite\SpriteWidget.cpp" />
+    <ClCompile Include="Widget\WidgetColor.cpp" />
+    <ClCompile Include="Widget\WidgetGradientEditor.cpp" />
+    <ClCompile Include="Widget\WidgetLiveVarManager.cpp" />
+    <ClCompile Include="Widget\WidgetLiveVariable.cpp" />
+    <ClCompile Include="Widget\WidgetOutputLog.cpp" />
+    <ClCompile Include="Widget\WidgetRangedSlider.cpp" />
+    <ClCompile Include="Widget\WidgetVectorSpinBox.cpp" />
+    <ClCompile Include="_Dependencies\scriptum\imagecrop.cpp" />
+    <ClCompile Include="_Dependencies\scriptum\imagepacker.cpp" />
+    <ClCompile Include="_Dependencies\scriptum\imagesort.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="_Dependencies\scriptum\maxrects.cpp" />
+    <ClCompile Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Atlas\AtlasDraw.h" />
+    <ClInclude Include="Atlas\AtlasFrame.h" />
+    <QtMoc Include="Atlas\AtlasModel.h">
+    </QtMoc>
+    <QtMoc Include="Atlas\AtlasRepackThread.h">
+    </QtMoc>
+    <QtMoc Include="Atlas\AtlasWidget.h">
+    </QtMoc>
+    <ClInclude Include="Audio\AudioDraw.h" />
+    <QtMoc Include="Audio\AudioModelView.h">
+    </QtMoc>
+    <ClInclude Include="Audio\AudioWave.h" />
+    <QtMoc Include="Audio\AudioWidget.h">
+    </QtMoc>
+    <QtMoc Include="Audio\AudioWidgetBank.h">
+    </QtMoc>
+    <QtMoc Include="Audio\AudioWidgetManager.h">
+    </QtMoc>
+    <QtMoc Include="Audio\AudioWidgetState.h">
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgAtlasGroupSettings.h">
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgColorPicker.h">
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgInputName.h">
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgNewItem.h">
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgNewProject.h">
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgProjectSettings.h">
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgSetEngineLocation.h">
+    </QtMoc>
+    <QtMoc Include="Entity3d\Entity3d.h">
+    </QtMoc>
+    <ClInclude Include="Entity\EntityDraw.h" />
+    <QtMoc Include="Entity\EntityModel.h">
+    </QtMoc>
+    <QtMoc Include="Entity\EntityTreeModel.h">
+    </QtMoc>
+    <ClInclude Include="Entity\EntityUndoCmds.h" />
+    <QtMoc Include="Entity\EntityWidget.h">
+    </QtMoc>
+    <QtMoc Include="Explorer\ExplorerItem.h">
+    </QtMoc>
+    <ClInclude Include="Explorer\ExplorerTreeWidget.h" />
+    <QtMoc Include="Explorer\ExplorerWidget.h">
+    </QtMoc>
+    <ClInclude Include="Font\FontDraw.h" />
+    <ClInclude Include="Font\FontItem.h" />
+    <QtMoc Include="Font\FontModelView.h">
+    </QtMoc>
+    <QtMoc Include="Font\FontModels.h">
+    </QtMoc>
+    <ClInclude Include="Font\FontUndoCmds.h" />
+    <QtMoc Include="Font\FontWidget.h">
+    </QtMoc>
+    <ClInclude Include="Shared\Global.h" />
+    <ClInclude Include="Shared\GlobalUndoCmds.h" />
+    <ClInclude Include="Shared\GlobalWidgetMappers.h" />
+    <QtMoc Include="Harmony\Harmony.h">
+    </QtMoc>
+    <QtMoc Include="Harmony\HarmonyConnection.h">
+    </QtMoc>
+    <QtMoc Include="Harmony\HarmonyWidget.h">
+    </QtMoc>
+    <ClInclude Include="Shared\IDraw.h" />
+    <ClInclude Include="Shared\IModel.h" />
+    <ClInclude Include="Shared\IModelTreeItem.h" />
+    <QtMoc Include="MainWindow.h">
+    </QtMoc>
+    <ClInclude Include="Prefab\PrefabDraw.h" />
+    <ClInclude Include="Prefab\PrefabModel.h" />
+    <QtMoc Include="Prefab\PrefabWidget.h">
+    </QtMoc>
+    <QtMoc Include="Project\Project.h">
+    </QtMoc>
+    <ClInclude Include="Project\ProjectDraw.h" />
+    <QtMoc Include="Project\ProjectItem.h">
+    </QtMoc>
+    <QtMoc Include="Project\ProjectItemMimeData.h">
+    </QtMoc>
+    <ClInclude Include="Shared\Properties\PropertiesTreeItem.h" />
+    <QtMoc Include="Shared\Properties\PropertiesTreeModel.h">
+    </QtMoc>
+    <QtMoc Include="Shared\Properties\PropertiesTreeView.h">
+    </QtMoc>
+    <ClInclude Include="Shared\Properties\PropertiesUndoCmd.h" />
+    <ClInclude Include="Sprite\SpriteDraw.h" />
+    <QtMoc Include="Sprite\SpriteModels.h">
+    </QtMoc>
+    <QtMoc Include="Sprite\SpriteTableView.h">
+    </QtMoc>
+    <ClInclude Include="Sprite\SpriteUndoCmds.h" />
+    <QtMoc Include="Sprite\SpriteWidget.h">
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetColor.h">
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetGradientEditor.h">
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetLiveVarManager.h">
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetLiveVariable.h">
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetOutputLog.h">
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetRangedSlider.h">
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetVectorSpinBox.h">
+    </QtMoc>
+    <ClInclude Include="_Dependencies\scriptum\imagepacker.h" />
+    <ClInclude Include="_Dependencies\scriptum\maxrects.h" />
+    <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="debug\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zi -MDd -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;debug\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\moc_predefs.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="release\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -O2 -MD -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;release\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\moc_predefs.h;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <ClInclude Include="ui_AtlasWidget.h" />
+    <ClInclude Include="ui_AudioWidget.h" />
+    <ClInclude Include="ui_AudioWidgetBank.h" />
+    <ClInclude Include="ui_AudioWidgetManager.h" />
+    <ClInclude Include="ui_AudioWidgetState.h" />
+    <ClInclude Include="ui_DlgAtlasGroupSettings.h" />
+    <ClInclude Include="ui_DlgColorPicker.h" />
+    <ClInclude Include="ui_DlgInputName.h" />
+    <ClInclude Include="ui_DlgNewItem.h" />
+    <ClInclude Include="ui_DlgNewProject.h" />
+    <ClInclude Include="ui_DlgProjectSettings.h" />
+    <ClInclude Include="ui_DlgSetEngineLocation.h" />
+    <ClInclude Include="ui_EntSpriteFrame.h" />
+    <ClInclude Include="ui_Entity3d.h" />
+    <ClInclude Include="ui_EntityCommon.h" />
+    <ClInclude Include="ui_EntityToolbox.h" />
+    <ClInclude Include="ui_EntityWidget.h" />
+    <ClInclude Include="ui_ExplorerWidget.h" />
+    <ClInclude Include="ui_FontWidget.h" />
+    <ClInclude Include="ui_MainWindow.h" />
+    <ClInclude Include="ui_PrefabWidget.h" />
+    <ClInclude Include="ui_SpriteWidget.h" />
+    <ClInclude Include="ui_WidgetColor.h" />
+    <ClInclude Include="ui_WidgetGradientEditor.h" />
+    <ClInclude Include="ui_WidgetLiveVarManager.h" />
+    <ClInclude Include="ui_WidgetLiveVariable.h" />
+    <ClInclude Include="ui_WidgetOutputLog.h" />
+    <ClInclude Include="ui_WidgetRangedSlider.h" />
+    <ClInclude Include="ui_WidgetVectorSpinBox.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="Atlas\AtlasWidget.ui">
+    </QtUic>
+    <QtUic Include="Audio\AudioWidget.ui">
+    </QtUic>
+    <QtUic Include="Audio\AudioWidgetBank.ui">
+    </QtUic>
+    <QtUic Include="Audio\AudioWidgetManager.ui">
+    </QtUic>
+    <QtUic Include="Audio\AudioWidgetState.ui">
+    </QtUic>
+    <QtUic Include="Dialogs\DlgAtlasGroupSettings.ui">
+    </QtUic>
+    <QtUic Include="Dialogs\DlgColorPicker.ui">
+    </QtUic>
+    <QtUic Include="Dialogs\DlgInputName.ui">
+    </QtUic>
+    <QtUic Include="Dialogs\DlgNewItem.ui">
+    </QtUic>
+    <QtUic Include="Dialogs\DlgNewProject.ui">
+    </QtUic>
+    <QtUic Include="Dialogs\DlgProjectSettings.ui">
+    </QtUic>
+    <QtUic Include="Dialogs\DlgSetEngineLocation.ui">
+    </QtUic>
+    <QtUic Include="Entity\EntSpriteFrame.ui">
+    </QtUic>
+    <QtUic Include="Entity3d\Entity3d.ui">
+    </QtUic>
+    <QtUic Include="Entity\EntityCommon.ui">
+    </QtUic>
+    <QtUic Include="Entity\EntityToolbox.ui">
+    </QtUic>
+    <QtUic Include="Entity\EntityWidget.ui">
+    </QtUic>
+    <QtUic Include="Explorer\ExplorerWidget.ui">
+    </QtUic>
+    <QtUic Include="Font\FontWidget.ui">
+    </QtUic>
+    <QtUic Include="MainWindow.ui">
+    </QtUic>
+    <QtUic Include="Prefab\PrefabWidget.ui">
+    </QtUic>
+    <QtUic Include="Sprite\SpriteWidget.ui">
+    </QtUic>
+    <QtUic Include="Widget\WidgetColor.ui">
+    </QtUic>
+    <QtUic Include="Widget\WidgetGradientEditor.ui">
+    </QtUic>
+    <QtUic Include="Widget\WidgetLiveVarManager.ui">
+    </QtUic>
+    <QtUic Include="Widget\WidgetLiveVariable.ui">
+    </QtUic>
+    <QtUic Include="Widget\WidgetOutputLog.ui">
+    </QtUic>
+    <QtUic Include="Widget\WidgetRangedSlider.ui">
+    </QtUic>
+    <QtUic Include="Widget\WidgetVectorSpinBox.ui">
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\icons16x16\items\Atlas-Close.png" />
+    <None Include="res\icons16x16\items\Atlas-Delete.png" />
+    <None Include="res\icons16x16\items\Atlas-Dirty.png" />
+    <None Include="res\icons16x16\items\Atlas-New.png" />
+    <None Include="res\icons16x16\items\Atlas-Open.png" />
+    <None Include="res\icons16x16\items\Atlas-Pending.png" />
+    <None Include="res\icons16x16\items\Atlas-Settings.png" />
+    <None Include="res\icons16x16\items\Atlas-Warning.png" />
+    <None Include="res\icons16x16\items\Atlas.png" />
+    <None Include="res\icons16x16\items\Audio-Close.png" />
+    <None Include="res\icons16x16\items\Audio-Delete.png" />
+    <None Include="res\icons16x16\items\Audio-Dirty.png" />
+    <None Include="res\icons16x16\items\Audio-New.png" />
+    <None Include="res\icons16x16\items\Audio-Open.png" />
+    <None Include="res\icons16x16\items\Audio-Pending.png" />
+    <None Include="res\icons16x16\items\Audio-Settings.png" />
+    <None Include="res\icons16x16\items\Audio-Warning.png" />
+    <None Include="res\icons16x16\items\Audio.png" />
+    <None Include="res\icons16x16\items\BoundingVolume-Close.png" />
+    <None Include="res\icons16x16\items\BoundingVolume-Delete.png" />
+    <None Include="res\icons16x16\items\BoundingVolume-Dirty.png" />
+    <None Include="res\icons16x16\items\BoundingVolume-New.png" />
+    <None Include="res\icons16x16\items\BoundingVolume-Open.png" />
+    <None Include="res\icons16x16\items\BoundingVolume-Pending.png" />
+    <None Include="res\icons16x16\items\BoundingVolume-Settings.png" />
+    <None Include="res\icons16x16\items\BoundingVolume-Warning.png" />
+    <None Include="res\icons16x16\items\BoundingVolume.png" />
+    <None Include="res\icons16x16\items\Entity2d-Close.png" />
+    <None Include="res\icons16x16\items\Entity2d-Delete.png" />
+    <None Include="res\icons16x16\items\Entity2d-Dirty.png" />
+    <None Include="res\icons16x16\items\Entity2d-New.png" />
+    <None Include="res\icons16x16\items\Entity2d-Open.png" />
+    <None Include="res\icons16x16\items\Entity2d-Pending.png" />
+    <None Include="res\icons16x16\items\Entity2d-Settings.png" />
+    <None Include="res\icons16x16\items\Entity2d-Warning.png" />
+    <None Include="res\icons16x16\items\Entity2d.png" />
+    <None Include="res\icons16x16\items\Entity3d-Close.png" />
+    <None Include="res\icons16x16\items\Entity3d-Delete.png" />
+    <None Include="res\icons16x16\items\Entity3d-Dirty.png" />
+    <None Include="res\icons16x16\items\Entity3d-New.png" />
+    <None Include="res\icons16x16\items\Entity3d-Open.png" />
+    <None Include="res\icons16x16\items\Entity3d-Pending.png" />
+    <None Include="res\icons16x16\items\Entity3d-Settings.png" />
+    <None Include="res\icons16x16\items\Entity3d-Warning.png" />
+    <None Include="res\icons16x16\items\Entity3d.png" />
+    <None Include="res\icons16x16\items\Filter-Close.png" />
+    <None Include="res\icons16x16\items\Filter-Delete.png" />
+    <None Include="res\icons16x16\items\Filter-Dirty.png" />
+    <None Include="res\icons16x16\items\Filter-New.png" />
+    <None Include="res\icons16x16\items\Filter-Open.png" />
+    <None Include="res\icons16x16\items\Filter-Pending.png" />
+    <None Include="res\icons16x16\items\Filter-Settings.png" />
+    <None Include="res\icons16x16\items\Filter-Warning.png" />
+    <None Include="res\icons16x16\items\Filter.png" />
+    <None Include="res\icons16x16\items\Font-Close.png" />
+    <None Include="res\icons16x16\items\Font-Delete.png" />
+    <None Include="res\icons16x16\items\Font-Dirty.png" />
+    <None Include="res\icons16x16\items\Font-New.png" />
+    <None Include="res\icons16x16\items\Font-Open.png" />
+    <None Include="res\icons16x16\items\Font-Pending.png" />
+    <None Include="res\icons16x16\items\Font-Settings.png" />
+    <None Include="res\icons16x16\items\Font-Warning.png" />
+    <None Include="res\icons16x16\items\Font.png" />
+    <None Include="res\icons16x16\Harmony.png" />
+    <None Include="res\icons64x64\HarmonyLogo.png" />
+    <QtRcc Include="res\HyEditor.qrc">
+    </QtRcc>
+    <None Include="res\icons16x16\items\Particles-Close.png" />
+    <None Include="res\icons16x16\items\Particles-Delete.png" />
+    <None Include="res\icons16x16\items\Particles-Dirty.png" />
+    <None Include="res\icons16x16\items\Particles-New.png" />
+    <None Include="res\icons16x16\items\Particles-Open.png" />
+    <None Include="res\icons16x16\items\Particles-Pending.png" />
+    <None Include="res\icons16x16\items\Particles-Settings.png" />
+    <None Include="res\icons16x16\items\Particles-Warning.png" />
+    <None Include="res\icons16x16\items\Particles.png" />
+    <None Include="res\icons16x16\items\Physics-Close.png" />
+    <None Include="res\icons16x16\items\Physics-Delete.png" />
+    <None Include="res\icons16x16\items\Physics-Dirty.png" />
+    <None Include="res\icons16x16\items\Physics-New.png" />
+    <None Include="res\icons16x16\items\Physics-Open.png" />
+    <None Include="res\icons16x16\items\Physics-Pending.png" />
+    <None Include="res\icons16x16\items\Physics-Settings.png" />
+    <None Include="res\icons16x16\items\Physics-Warning.png" />
+    <None Include="res\icons16x16\items\Physics.png" />
+    <None Include="res\icons16x16\items\Prefab-Close.png" />
+    <None Include="res\icons16x16\items\Prefab-Delete.png" />
+    <None Include="res\icons16x16\items\Prefab-Dirty.png" />
+    <None Include="res\icons16x16\items\Prefab-New.png" />
+    <None Include="res\icons16x16\items\Prefab-Open.png" />
+    <None Include="res\icons16x16\items\Prefab-Pending.png" />
+    <None Include="res\icons16x16\items\Prefab-Settings.png" />
+    <None Include="res\icons16x16\items\Prefab-Warning.png" />
+    <None Include="res\icons16x16\items\Prefab.png" />
+    <None Include="res\icons16x16\items\Prefix-Close.png" />
+    <None Include="res\icons16x16\items\Prefix-Delete.png" />
+    <None Include="res\icons16x16\items\Prefix-Dirty.png" />
+    <None Include="res\icons16x16\items\Prefix-New.png" />
+    <None Include="res\icons16x16\items\Prefix-Open.png" />
+    <None Include="res\icons16x16\items\Prefix-Pending.png" />
+    <None Include="res\icons16x16\items\Prefix-Settings.png" />
+    <None Include="res\icons16x16\items\Prefix-Warning.png" />
+    <None Include="res\icons16x16\items\Prefix.png" />
+    <None Include="res\icons16x16\items\Primitive-Close.png" />
+    <None Include="res\icons16x16\items\Primitive-Delete.png" />
+    <None Include="res\icons16x16\items\Primitive-Dirty.png" />
+    <None Include="res\icons16x16\items\Primitive-New.png" />
+    <None Include="res\icons16x16\items\Primitive-Open.png" />
+    <None Include="res\icons16x16\items\Primitive-Pending.png" />
+    <None Include="res\icons16x16\items\Primitive-Settings.png" />
+    <None Include="res\icons16x16\items\Primitive-Warning.png" />
+    <None Include="res\icons16x16\items\Primitive.png" />
+    <None Include="res\icons16x16\items\Project-Close.png" />
+    <None Include="res\icons16x16\items\Project-Delete.png" />
+    <None Include="res\icons16x16\items\Project-Dirty.png" />
+    <None Include="res\icons16x16\items\Project-New.png" />
+    <None Include="res\icons16x16\items\Project-Open.png" />
+    <None Include="res\icons16x16\items\Project-Pending.png" />
+    <None Include="res\icons16x16\items\Project-Settings.png" />
+    <None Include="res\icons16x16\items\Project-Warning.png" />
+    <None Include="res\icons16x16\items\Project.png" />
+    <None Include="res\icons16x16\items\Spine-Close.png" />
+    <None Include="res\icons16x16\items\Spine-Delete.png" />
+    <None Include="res\icons16x16\items\Spine-Dirty.png" />
+    <None Include="res\icons16x16\items\Spine-New.png" />
+    <None Include="res\icons16x16\items\Spine-Open.png" />
+    <None Include="res\icons16x16\items\Spine-Pending.png" />
+    <None Include="res\icons16x16\items\Spine-Settings.png" />
+    <None Include="res\icons16x16\items\Spine-Warning.png" />
+    <None Include="res\icons16x16\items\Spine.png" />
+    <None Include="res\icons16x16\items\Sprite-Close.png" />
+    <None Include="res\icons16x16\items\Sprite-Delete.png" />
+    <None Include="res\icons16x16\items\Sprite-Dirty.png" />
+    <None Include="res\icons16x16\items\Sprite-New.png" />
+    <None Include="res\icons16x16\items\Sprite-Open.png" />
+    <None Include="res\icons16x16\items\Sprite-Pending.png" />
+    <None Include="res\icons16x16\items\Sprite-Settings.png" />
+    <None Include="res\icons16x16\items\Sprite-Warning.png" />
+    <None Include="res\icons16x16\items\Sprite.png" />
+    <None Include="res\icons16x16\atlas-assemble.png" />
+    <None Include="res\icons16x16\atlas-file.png" />
+    <None Include="res\icons16x16\atlas-replaceFrame.png" />
+    <None Include="res\icons16x16\audio-folder.png" />
+    <None Include="res\icons16x16\code.png" />
+    <None Include="res\icons16x16\debug-connected.png" />
+    <None Include="res\icons16x16\debug-notConnected.png" />
+    <None Include="res\icons16x16\edit-copy.png" />
+    <None Include="res\icons16x16\edit-cut.png" />
+    <None Include="res\icons16x16\edit-delete.png" />
+    <None Include="res\icons16x16\edit-paste.png" />
+    <None Include="res\icons16x16\edit-redo.png" />
+    <None Include="res\icons16x16\edit-undo.png" />
+    <None Include="res\icons16x16\entity-folder.png" />
+    <None Include="res\icons16x16\file-exit.png" />
+    <None Include="res\icons16x16\file-openProject.png" />
+    <None Include="res\icons16x16\file-save.png" />
+    <None Include="res\icons16x16\file-saveAll.png" />
+    <None Include="res\icons16x16\font-folder.png" />
+    <None Include="res\icons16x16\generic-add.png" />
+    <None Include="res\icons16x16\generic-down.png" />
+    <None Include="res\icons16x16\generic-left.png" />
+    <None Include="res\icons16x16\generic-rename.png" />
+    <None Include="res\icons16x16\generic-right.png" />
+    <None Include="res\icons16x16\generic-settings.png" />
+    <None Include="res\icons16x16\generic-up.png" />
+    <None Include="res\icons16x16\media-forward.png" />
+    <None Include="res\icons16x16\media-pause.png" />
+    <None Include="res\icons16x16\media-pauseRecord.png" />
+    <None Include="res\icons16x16\media-play.png" />
+    <None Include="res\icons16x16\media-rewind.png" />
+    <None Include="res\icons16x16\media-stop.png" />
+    <None Include="res\icons16x16\particle-folder.png" />
+    <None Include="res\icons16x16\shader-folder.png" />
+    <None Include="res\icons16x16\smiley-sad.gif" />
+    <None Include="res\icons16x16\spine-folder.png" />
+    <None Include="res\icons16x16\sprite-alignBottom.Image.png" />
+    <None Include="res\icons16x16\sprite-alignHorzCenter.png" />
+    <None Include="res\icons16x16\sprite-alignLeft.png" />
+    <None Include="res\icons16x16\sprite-alignRight.png" />
+    <None Include="res\icons16x16\sprite-alignUp.png" />
+    <None Include="res\icons16x16\sprite-alignVertCenter.png" />
+    <None Include="res\icons16x16\sprite-applyToAll.png" />
+    <None Include="res\icons16x16\sprite-folder.png" />
+    <None Include="res\icons16x16\view-explorer.png" />
+    <None Include="res\icons16x16\view-outputLog.png" />
+    <None Include="res\icons16x16\view-properties.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HyEditor.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_x64="5.11" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -1,0 +1,1312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Atlas\AtlasDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Atlas\AtlasFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Atlas\AtlasModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Atlas\AtlasRepackThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Atlas\AtlasWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioModelView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioWave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioWidgetBank.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioWidgetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioWidgetState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialogs\DlgAtlasGroupSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialogs\DlgColorPicker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialogs\DlgInputName.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialogs\DlgNewItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialogs\DlgNewProject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialogs\DlgProjectSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialogs\DlgSetEngineLocation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity3d\Entity3d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\EntityDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\EntityModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\EntityTreeModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\EntityUndoCmds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\EntityWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Explorer\ExplorerItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Explorer\ExplorerTreeWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Explorer\ExplorerWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font\FontDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font\FontItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font\FontModelView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font\FontModels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font\FontUndoCmds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font\FontWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\Global.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Harmony\Harmony.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Harmony\HarmonyConnection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Harmony\HarmonyWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\IDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\IModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\IModelTreeItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prefab\PrefabDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prefab\PrefabModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prefab\PrefabWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Project\Project.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Project\ProjectDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Project\ProjectItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Project\ProjectItemMimeData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\Properties\PropertiesTreeItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\Properties\PropertiesTreeView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\Properties\PropertiesUndoCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite\SpriteDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite\SpriteModels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite\SpriteTableView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite\SpriteUndoCmds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite\SpriteWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetGradientEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetLiveVarManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetLiveVariable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetOutputLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetRangedSlider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetVectorSpinBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Dependencies\scriptum\imagecrop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Dependencies\scriptum\imagepacker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Dependencies\scriptum\imagesort.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Dependencies\scriptum\maxrects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Atlas\AtlasDraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Atlas\AtlasFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Atlas\AtlasModel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Atlas\AtlasRepackThread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Atlas\AtlasWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Audio\AudioDraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Audio\AudioModelView.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Audio\AudioWave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Audio\AudioWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Audio\AudioWidgetBank.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Audio\AudioWidgetManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Audio\AudioWidgetState.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgAtlasGroupSettings.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgColorPicker.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgInputName.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgNewItem.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgNewProject.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgProjectSettings.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Dialogs\DlgSetEngineLocation.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Entity3d\Entity3d.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Entity\EntityDraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Entity\EntityModel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Entity\EntityTreeModel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Entity\EntityUndoCmds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Entity\EntityWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Explorer\ExplorerItem.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Explorer\ExplorerTreeWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Explorer\ExplorerWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Font\FontDraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font\FontItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Font\FontModelView.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Font\FontModels.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Font\FontUndoCmds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Font\FontWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Shared\Global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\GlobalUndoCmds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\GlobalWidgetMappers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Harmony\Harmony.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Harmony\HarmonyConnection.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Harmony\HarmonyWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Shared\IDraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\IModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\IModelTreeItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="MainWindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Prefab\PrefabDraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Prefab\PrefabModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Prefab\PrefabWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Project\Project.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Project\ProjectDraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Project\ProjectItem.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Project\ProjectItemMimeData.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Shared\Properties\PropertiesTreeItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Shared\Properties\PropertiesTreeModel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Shared\Properties\PropertiesTreeView.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Shared\Properties\PropertiesUndoCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite\SpriteDraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Sprite\SpriteModels.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Sprite\SpriteTableView.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="Sprite\SpriteUndoCmds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="Sprite\SpriteWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetColor.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetGradientEditor.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetLiveVarManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetLiveVariable.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetOutputLog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetRangedSlider.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetVectorSpinBox.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="_Dependencies\scriptum\imagepacker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="_Dependencies\scriptum\maxrects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <CustomBuild Include="debug\moc_predefs.h.cbt">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="release\moc_predefs.h.cbt">
+      <Filter>Generated Files</Filter>
+    </CustomBuild>
+    
+    
+    
+    
+    <ClInclude Include="ui_AtlasWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_AudioWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_AudioWidgetBank.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_AudioWidgetManager.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_AudioWidgetState.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_DlgAtlasGroupSettings.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_DlgColorPicker.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_DlgInputName.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_DlgNewItem.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_DlgNewProject.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_DlgProjectSettings.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_DlgSetEngineLocation.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_EntSpriteFrame.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_Entity3d.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_EntityCommon.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_EntityToolbox.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_EntityWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_ExplorerWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_FontWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_MainWindow.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_PrefabWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_SpriteWidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_WidgetColor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_WidgetGradientEditor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_WidgetLiveVarManager.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_WidgetLiveVariable.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_WidgetOutputLog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_WidgetRangedSlider.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_WidgetVectorSpinBox.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="Atlas\AtlasWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Audio\AudioWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Audio\AudioWidgetBank.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Audio\AudioWidgetManager.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Audio\AudioWidgetState.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Dialogs\DlgAtlasGroupSettings.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Dialogs\DlgColorPicker.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Dialogs\DlgInputName.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Dialogs\DlgNewItem.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Dialogs\DlgNewProject.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Dialogs\DlgProjectSettings.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Dialogs\DlgSetEngineLocation.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Entity\EntSpriteFrame.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Entity3d\Entity3d.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Entity\EntityCommon.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Entity\EntityToolbox.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Entity\EntityWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Explorer\ExplorerWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Font\FontWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="MainWindow.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Prefab\PrefabWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Sprite\SpriteWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetColor.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetGradientEditor.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetLiveVarManager.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetLiveVariable.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetOutputLog.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetRangedSlider.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetVectorSpinBox.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\icons16x16\items\Atlas-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Atlas-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Atlas-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Atlas-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Atlas-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Atlas-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Atlas-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Atlas-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Atlas.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Audio-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Audio-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Audio-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Audio-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Audio-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Audio-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Audio-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Audio-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Audio.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\BoundingVolume-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\BoundingVolume-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\BoundingVolume-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\BoundingVolume-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\BoundingVolume-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\BoundingVolume-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\BoundingVolume-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\BoundingVolume-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\BoundingVolume.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity2d-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity2d-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity2d-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity2d-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity2d-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity2d-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity2d-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity2d-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity2d.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity3d-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity3d-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity3d-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity3d-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity3d-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity3d-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity3d-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity3d-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Entity3d.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Filter-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Filter-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Filter-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Filter-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Filter-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Filter-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Filter-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Filter-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Filter.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Font-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Font-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Font-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Font-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Font-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Font-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Font-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Font-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Font.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\Harmony.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons64x64\HarmonyLogo.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <QtRcc Include="res\HyEditor.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+    <None Include="res\icons16x16\items\Particles-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Particles-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Particles-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Particles-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Particles-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Particles-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Particles-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Particles-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Particles.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Physics-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Physics-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Physics-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Physics-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Physics-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Physics-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Physics-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Physics-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Physics.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefab-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefab-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefab-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefab-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefab-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefab-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefab-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefab-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefab.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefix-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefix-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefix-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefix-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefix-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefix-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefix-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefix-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Prefix.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Primitive-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Primitive-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Primitive-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Primitive-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Primitive-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Primitive-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Primitive-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Primitive-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Primitive.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Project-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Project-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Project-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Project-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Project-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Project-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Project-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Project-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Project.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Spine-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Spine-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Spine-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Spine-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Spine-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Spine-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Spine-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Spine-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Spine.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Sprite-Close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Sprite-Delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Sprite-Dirty.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Sprite-New.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Sprite-Open.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Sprite-Pending.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Sprite-Settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Sprite-Warning.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\items\Sprite.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\atlas-assemble.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\atlas-file.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\atlas-replaceFrame.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\audio-folder.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\code.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\debug-connected.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\debug-notConnected.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\edit-copy.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\edit-cut.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\edit-delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\edit-paste.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\edit-redo.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\edit-undo.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\entity-folder.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\file-exit.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\file-openProject.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\file-save.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\file-saveAll.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\font-folder.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\generic-add.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\generic-down.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\generic-left.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\generic-rename.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\generic-right.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\generic-settings.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\generic-up.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\media-forward.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\media-pause.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\media-pauseRecord.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\media-play.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\media-rewind.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\media-stop.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\particle-folder.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\shader-folder.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\smiley-sad.gif">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\spine-folder.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\sprite-alignBottom.Image.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\sprite-alignHorzCenter.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\sprite-alignLeft.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\sprite-alignRight.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\sprite-alignUp.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\sprite-alignVertCenter.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\sprite-applyToAll.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\sprite-folder.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\view-explorer.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\view-outputLog.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icons16x16\view-properties.png">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HyEditor.rc" />
+  </ItemGroup>
+</Project>

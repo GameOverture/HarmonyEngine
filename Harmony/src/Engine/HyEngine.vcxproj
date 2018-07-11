@@ -297,42 +297,44 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
-    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>..\..\bin\</OutDir>
+    <IntDir>obj\$(Platform)\($(Configuration)\</IntDir>
+    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>$(ProjectName)</TargetName>
-    <OutDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
+    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <OutDir>..\..\bin\</OutDir>
+    <IntDir>obj\$(Platform)\($(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">
-    <OutDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
-    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>..\..\bin\</OutDir>
+    <IntDir>obj\$(Platform)\($(Configuration)\</IntDir>
+    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">
-    <TargetName>$(ProjectName)</TargetName>
-    <OutDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
+    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <OutDir>..\..\bin\</OutDir>
+    <IntDir>obj\$(Platform)\($(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
+    <OutDir>..\..\bin\</OutDir>
+    <IntDir>obj\$(Platform)\($(Configuration)\</IntDir>
+    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
+    <OutDir>..\..\bin\</OutDir>
+    <IntDir>obj\$(Platform)\($(Configuration)\</IntDir>
+    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">
-    <OutDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
-    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>..\..\bin\</OutDir>
+    <IntDir>obj\$(Platform)\($(Configuration)\</IntDir>
+    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GuiRelease|x64'">
-    <TargetName>$(ProjectName)</TargetName>
-    <OutDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)..\..\bin\$(Platform)_$(Configuration)\obj\</IntDir>
+    <TargetName>HyEngine$(Platform)_$(Configuration)</TargetName>
+    <OutDir>..\..\bin\</OutDir>
+    <IntDir>obj\$(Platform)\($(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
