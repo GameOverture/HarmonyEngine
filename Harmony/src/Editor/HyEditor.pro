@@ -213,33 +213,33 @@ DEPENDPATH += "$$PWD/../../include"
 win32-g++:CONFIG(release, debug|release): {
 	PRE_TARGETDEPS += $$PWD/../../lib/x64_GuiRelease/libfreetype-gl.a \
 					  $$PWD/../../lib/x64_GuiRelease/libassimp.a \
-					  $$PWD/../../bin/x64_GuiRelease/libHarmony.a
+					  $$PWD/../../bin/libHyEngine_x64GuiRelease.a
 }
 win32-g++:CONFIG(debug, debug|release): {
 	PRE_TARGETDEPS += $$PWD/../../lib/x64_GuiDebug/libfreetype-gl.a \
 					  $$PWD/../../lib/x64_GuiDebug/libassimp.a \
-					  $$PWD/../../bin/x64_GuiDebug/libHarmony.a
+					  $$PWD/../../bin/libHyEngine_x64GuiDebug.a
 }
 win32-msvc*:CONFIG(release, debug|release): {
 	PRE_TARGETDEPS += $$PWD/../../lib/x64_GuiRelease/freetype-gl.lib \
 					  $$PWD/../../lib/x64_GuiRelease/assimp.lib \
-					  $$PWD/../../bin/x64_GuiRelease/Harmony.lib
+					  $$PWD/../../bin/HyEngine_x64GuiRelease.lib
 }
 win32-msvc*:CONFIG(debug, debug|release): {
 	PRE_TARGETDEPS += $$PWD/../../lib/x64_GuiDebug/freetype-gl.lib \
 					  $$PWD/../../lib/x64_GuiDebug/assimp.lib \
-					  $$PWD/../../bin/x64_GuiDebug/Harmony.lib
+					  $$PWD/../../bin/HyEngine_x64GuiDebug.lib
 }
 
 win32:CONFIG(release, debug|release): {
 	LIBS += -L$$PWD/../../lib/x64_GuiRelease/ -lfreetype-gl \
 			-L$$PWD/../../lib/x64_GuiRelease/ -lassimp \
-			-L$$PWD/../../bin/x64_GuiRelease/ -lHarmony
+			-L$$PWD/../../bin/ -lHyEngine_x64GuiRelease
 }
 win32:CONFIG(debug, debug|release): {
 	LIBS += -L$$PWD/../../lib/x64_GuiDebug/ -lfreetype-gl \
 			-L$$PWD/../../lib/x64_GuiDebug/ -lassimp \
-			-L$$PWD/../../bin/x64_GuiDebug/ -lHarmony
+			-L$$PWD/../../bin/ -lHyEngine_x64GuiDebug
 }
 
 win32: LIBS += -lAdvAPI32
