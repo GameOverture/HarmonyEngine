@@ -15,14 +15,9 @@
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/Loadables/HyAtlas.h"
 
-#include "assimp/Importer.hpp"      // C++ importer interface
-#include "assimp/Exporter.hpp"      // C++ importer interface
-#include "assimp/scene.h"           // Output data structure
-#include "assimp/postprocess.h"     // Post processing flags
-
 class HyEntity3dData : public IHyNodeData
 {
-	const aiScene *		m_pAiScene;
+	//const aiScene *		m_pAiScene;
 
 public:
 	HyEntity3dData(const std::string &sPath);

@@ -8,7 +8,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CustomShader", "CustomShade
 		{B4471160-742A-4571-BCC5-3EF8163C10E1} = {B4471160-742A-4571-BCC5-3EF8163C10E1}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Harmony", "..\..\..\Harmony\src\Harmony.vcxproj", "{B4471160-742A-4571-BCC5-3EF8163C10E1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HyEngine", "..\..\..\Harmony\src\Engine\HyEngine.vcxproj", "{B4471160-742A-4571-BCC5-3EF8163C10E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

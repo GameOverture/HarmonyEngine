@@ -173,7 +173,7 @@
     <ClInclude Include="CustomShader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Harmony\src\Harmony.vcxproj">
+    <ProjectReference Include="..\..\..\Harmony\src\Engine\HyEngine.vcxproj">
       <Project>{b4471160-742a-4571-bcc5-3ef8163c10e1}</Project>
     </ProjectReference>
   </ItemGroup>
