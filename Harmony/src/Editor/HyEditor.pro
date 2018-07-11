@@ -4,11 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl network
+QT += core gui opengl network widgets
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = DesignerTool
+TARGET = HyEditor
 TEMPLATE = app
 
 CONFIG += axcontainer
@@ -189,12 +187,12 @@ FORMS    += \
     Entity3d/Entity3d.ui \
     Prefab/PrefabWidget.ui
 
-RC_FILE = DesignerTool.rc
+RESOURCES += \
+	res/HyEditor.qrc
 
-DEFINES += _HARMONYGUI _HARMONYSINGLETHREAD QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
+RC_FILE = HyEditor.rc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64_GuiRelease/ -lHarmony
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/bin/x64_GuiDebug/ -lHarmony
+DEFINES += QT_USE_QSTRINGBUILDER HY_PLATFORM_GUI
 
 INCLUDEPATH += "$$PWD/Atlas"
 INCLUDEPATH += "$$PWD/Audio"
@@ -209,20 +207,40 @@ INCLUDEPATH += "$$PWD/Widget"
 INCLUDEPATH += "$$PWD/Explorer"
 INCLUDEPATH += "$$PWD/Shared"
 INCLUDEPATH += "$$PWD/Shared/Properties"
+INCLUDEPATH += "$$PWD/../../include"
+DEPENDPATH += "$$PWD/../../include"
 
-INCLUDEPATH += "$$PWD/../../Harmony/include"
-DEPENDPATH += "$$PWD/../../Harmony/include"
+win32-g++:CONFIG(release, debug|release): {
+	PRE_TARGETDEPS += $$PWD/../../lib/x64_GuiRelease/libfreetype-gl.a \
+					  $$PWD/../../lib/x64_GuiRelease/libassimp.a \
+					  $$PWD/../../bin/x64_GuiRelease/libHarmony.a
+}
+win32-g++:CONFIG(debug, debug|release): {
+	PRE_TARGETDEPS += $$PWD/../../lib/x64_GuiDebug/libfreetype-gl.a \
+					  $$PWD/../../lib/x64_GuiDebug/libassimp.a \
+					  $$PWD/../../bin/x64_GuiDebug/libHarmony.a
+}
+win32-msvc*:CONFIG(release, debug|release): {
+	PRE_TARGETDEPS += $$PWD/../../lib/x64_GuiRelease/freetype-gl.lib \
+					  $$PWD/../../lib/x64_GuiRelease/assimp.lib \
+					  $$PWD/../../bin/x64_GuiRelease/Harmony.lib
+}
+win32-msvc*:CONFIG(debug, debug|release): {
+	PRE_TARGETDEPS += $$PWD/../../lib/x64_GuiDebug/freetype-gl.lib \
+					  $$PWD/../../lib/x64_GuiDebug/assimp.lib \
+					  $$PWD/../../bin/x64_GuiDebug/Harmony.lib
+}
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64_GuiRelease/libHarmony.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64_GuiDebug/libHarmony.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64_GuiRelease/Harmony.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Harmony/bin/x64_GuiDebug/Harmony.lib
+win32:CONFIG(release, debug|release): {
+	LIBS += -L$$PWD/../../lib/x64_GuiRelease/ -lfreetype-gl \
+			-L$$PWD/../../lib/x64_GuiRelease/ -lassimp \
+			-L$$PWD/../../bin/x64_GuiRelease/ -lHarmony
+}
+win32:CONFIG(debug, debug|release): {
+	LIBS += -L$$PWD/../../lib/x64_GuiDebug/ -lfreetype-gl \
+			-L$$PWD/../../lib/x64_GuiDebug/ -lassimp \
+			-L$$PWD/../../bin/x64_GuiDebug/ -lHarmony
+}
 
 win32: LIBS += -lAdvAPI32
 win32: LIBS += -lole32
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Harmony/lib/x64_GuiRelease/ -lfreetype-gl
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Harmony/lib/x64_GuiDebug/ -lfreetype-gl
-
-RESOURCES += \
-    res/DesignerTool.qrc
