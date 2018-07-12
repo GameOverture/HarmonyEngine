@@ -35,8 +35,7 @@ struct MeshEntry
 	MeshEntry() { }
 	~MeshEntry() { }
 
-	void Init(const std::vector<Vertex>& Vertices,
-	const std::vector<unsigned int>& Indices);
+	void Init(const std::vector<Vertex> &Vertices, const std::vector<unsigned int> &Indices);
 
 	GLuint VB;
 	GLuint IB;

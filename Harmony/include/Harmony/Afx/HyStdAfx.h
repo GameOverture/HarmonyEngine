@@ -14,6 +14,11 @@
 #include "Compilers/HyCompiler.h"
 #include "Platforms/HyPlatform.h"
 
+#define TINYGLTF_NO_STB_IMAGE
+#define TINYGLTF_NO_STB_IMAGE_WRITE
+//#define TINYGLTF_NOEXCEPTION
+#include "Utilities/tiny_gltf.h"
+
 #include "Utilities/jsonxx.h"
 #include "Utilities/HyFileIO.h"
 #include "Box2D/Box2D.h"

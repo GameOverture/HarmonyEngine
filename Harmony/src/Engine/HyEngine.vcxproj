@@ -199,14 +199,15 @@
     <ClInclude Include="..\..\include\Harmony\Time\Watches\HyStopwatch.h" />
     <ClInclude Include="..\..\include\Harmony\Time\Watches\HyTimer.h" />
     <ClInclude Include="..\..\include\Harmony\Time\Watches\IHyTimeInst.h" />
-    <ClInclude Include="..\..\include\Harmony\Utilities\Containers\HyStaticArray.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\Crc32.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyBitManip.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyFileIO.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyMath.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyStrManip.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyVariant.h" />
+    <ClInclude Include="..\..\include\Harmony\Utilities\json.hpp" />
     <ClInclude Include="..\..\include\Harmony\Utilities\jsonxx.h" />
+    <ClInclude Include="..\..\include\Harmony\Utilities\tiny_gltf.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B4471160-742A-4571-BCC5-3EF8163C10E1}</ProjectGuid>

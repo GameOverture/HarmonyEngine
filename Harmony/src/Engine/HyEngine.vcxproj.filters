@@ -33,9 +33,6 @@
     <ClCompile Include="Scene\HyScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\jasonxx.cc">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\HyFileIO.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -222,6 +219,9 @@
     <ClCompile Include="Assets\Nodes\HyEntity3dData.cpp">
       <Filter>Assets\Nodes</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities\jasonxx.cc">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -262,9 +262,6 @@
     </Filter>
     <Filter Include="Utilities">
       <UniqueIdentifier>{6b89711e-e657-4696-9011-e81702fda34f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utilities\Containers">
-      <UniqueIdentifier>{d42e95ee-7da4-4caa-96a2-1cc254022bae}</UniqueIdentifier>
     </Filter>
     <Filter Include="Renderer\OpenGL">
       <UniqueIdentifier>{266ff3c9-2890-44c9-90f1-b987c1598bc6}</UniqueIdentifier>
@@ -380,9 +377,6 @@
     <ClInclude Include="..\..\include\Harmony\Utilities\HyStrManip.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Utilities\Containers\HyStaticArray.h">
-      <Filter>Utilities\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Afx\HyInteropAfx.h">
       <Filter>Afx</Filter>
     </ClInclude>
@@ -407,9 +401,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\HyScene.h">
       <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Utilities\jsonxx.h">
-      <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Utilities\HyFileIO.h">
       <Filter>Utilities</Filter>
@@ -608,6 +599,15 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyEntity3dData.h">
       <Filter>Assets\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Utilities\json.hpp">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Utilities\tiny_gltf.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Utilities\jsonxx.h">
+      <Filter>Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,6 +7,7 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#define TINYGLTF_IMPLEMENTATION
 #include "PrefabModel.h"
 
 #include "assimp/Importer.hpp"      // C++ importer interface
@@ -56,8 +57,28 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(it
 			}
 		}
 
+		Assimp::Exporter exporter;
+		const aiExportFormatDesc *pDesc = nullptr;
+		for(uint i = 0; i < exporter.GetExportFormatCount(); ++i)
+		{
+			pDesc = exporter.GetExportFormatDescription(i);
+			if(strcmp(pDesc->description, "GL Transmission Format v. 2") == 0)
+				break;
+		}
+		
+		aiReturn ret = exporter.Export(pScene, pDesc->id, "C:\\TestOutput\\test22.hy3d");
+		ret = ret;
 		//int iNumTextures = m_sTextureFilePathList.size();
 		//iNumTextures = iNumTextures;
+
+
+		tinygltf::Model model; 
+		tinygltf::TinyGLTF loader;
+		std::string err;
+  
+		bool returnVal = loader.LoadASCIIFromFile(&model, &err, "C:\\TestOutput\\test22.hy3d");
+
+		model.meshes;
 	}
 }
 
