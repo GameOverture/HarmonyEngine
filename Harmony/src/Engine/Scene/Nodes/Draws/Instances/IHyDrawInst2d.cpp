@@ -8,8 +8,6 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
-#include "Renderer/Effects/HyStencil.h"
-#include "Renderer/Effects/HyPortal2d.h"
 #include "HyEngine.h"
 
 /*static*/ HyAssets *IHyDrawInst2d::sm_pHyAssets = nullptr;
@@ -24,7 +22,6 @@ IHyDrawInst2d::IHyDrawInst2d(HyType eNodeType, const char *szPrefix, const char 
 																												m_hTextureHandle(HY_UNUSED_HANDLE),
 																												m_LocalBoundingVolume(this)
 {
-	memset(m_hPortals, HY_UNUSED_HANDLE, sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
 }
 
 IHyDrawInst2d::IHyDrawInst2d(const IHyDrawInst2d &copyRef) :	IHyDraw2d(copyRef),
@@ -38,16 +35,10 @@ IHyDrawInst2d::IHyDrawInst2d(const IHyDrawInst2d &copyRef) :	IHyDraw2d(copyRef),
 																m_ShaderUniforms(copyRef.m_ShaderUniforms),
 																m_LocalBoundingVolume(this, copyRef.m_LocalBoundingVolume)
 {
-	memset(m_hPortals, HY_UNUSED_HANDLE, sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
-	for(uint32 i = 0; copyRef.m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
-		SetPortal(IHyRenderer::FindPortal2d(copyRef.m_hPortals[i]));
 }
 
 IHyDrawInst2d::~IHyDrawInst2d()
 {
-	for(uint32 i = 0; m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
-		IHyRenderer::FindPortal2d(m_hPortals[i])->RemoveInstance(this);
-
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		Unload();
 }
@@ -71,10 +62,6 @@ const IHyDrawInst2d &IHyDrawInst2d::operator=(const IHyDrawInst2d &rhs)
 	m_hTextureHandle = rhs.m_hTextureHandle;
 	m_ShaderUniforms = m_ShaderUniforms;
 	
-	memset(m_hPortals, HY_UNUSED_HANDLE, sizeof(HyPortal2dHandle) * HY_MAX_PORTAL_HANDLES);
-	for(uint32 i = 0; rhs.m_hPortals[i] != HY_UNUSED_HANDLE && i < HY_MAX_PORTAL_HANDLES; ++i)
-		SetPortal(IHyRenderer::FindPortal2d(rhs.m_hPortals[i]));
-
 	m_LocalBoundingVolume = rhs.m_LocalBoundingVolume;
 	m_aabbCached = rhs.m_aabbCached;
 
@@ -87,87 +74,6 @@ const IHyDrawInst2d &IHyDrawInst2d::operator=(const IHyDrawInst2d &rhs)
 bool IHyDrawInst2d::IsValid()
 {
 	return m_bEnabled && OnIsValid();
-}
-
-void IHyDrawInst2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
-{
-	if(m_pScissor == nullptr)
-		m_pScissor = HY_NEW ScissorRect();
-
-	m_pScissor->m_LocalScissorRect.x = uiLocalX;
-	m_pScissor->m_LocalScissorRect.y = uiLocalY;
-	m_pScissor->m_LocalScissorRect.width = uiWidth;
-	m_pScissor->m_LocalScissorRect.height = uiHeight;
-	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Enabled;
-
-	m_uiExplicitFlags |= EXPLICIT_Scissor;
-
-	GetWorldScissor(m_pScissor->m_WorldScissorRect);
-}
-
-void IHyDrawInst2d::ClearScissor(bool bUseParentScissor)
-{
-	if(m_pScissor == nullptr)
-		return;
-
-	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Disabled;
-	m_pScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
-
-	if(bUseParentScissor == false)
-		m_uiExplicitFlags |= EXPLICIT_Scissor;
-	else
-	{
-		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
-		if(m_pParent)
-			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
-	}
-}
-
-void IHyDrawInst2d::SetStencil(HyStencil *pStencil)
-{
-	if(pStencil == nullptr)
-		m_hStencil = HY_UNUSED_HANDLE;
-	else
-		m_hStencil = pStencil->GetHandle();
-
-	m_uiExplicitFlags |= EXPLICIT_Stencil;
-}
-
-void IHyDrawInst2d::ClearStencil(bool bUseParentStencil)
-{
-	m_hStencil = HY_UNUSED_HANDLE;
-
-	if(bUseParentStencil == false)
-		m_uiExplicitFlags |= EXPLICIT_Stencil;
-	else
-	{
-		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
-		if(m_pParent)
-		{
-			HyStencil *pStencil = m_pParent->GetStencil();
-			m_hStencil = pStencil ? pStencil->GetHandle() : HY_UNUSED_HANDLE;
-		}
-	}
-}
-
-void IHyDrawInst2d::UseCameraCoordinates()
-{
-	m_iCoordinateSystem = -1;
-	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
-}
-
-void IHyDrawInst2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
-{
-	m_iCoordinateSystem = iWindowIndex;
-	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
-}
-
-void IHyDrawInst2d::SetDisplayOrder(int32 iOrderValue)
-{
-	m_iDisplayOrder = iOrderValue;
-	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
-
-	HyScene::SetInstOrderingDirty();
 }
 
 const std::string &IHyDrawInst2d::GetName() const
@@ -253,44 +159,6 @@ HyShaderHandle IHyDrawInst2d::GetShaderHandle()
 	return m_hShader;
 }
 
-bool IHyDrawInst2d::SetPortal(HyPortal2d *pPortal)
-{
-	for(uint32 i = 0; i < HY_MAX_PORTAL_HANDLES; ++i)
-	{
-		if(m_hPortals[i] == pPortal->GetHandle())
-			return true;
-		else if(m_hPortals[i] == HY_UNUSED_HANDLE)
-		{
-			pPortal->AddInstance(this);
-			m_hPortals[i] = pPortal->GetHandle();
-			return true;
-		}
-	}
-
-	HyLogWarning("IHyDrawInst2d::SetPortal() - Too many portals have been set for this instance. Max is: " << HY_MAX_PORTAL_HANDLES);
-	return false;
-}
-
-bool IHyDrawInst2d::ClearPortal(HyPortal2d *pPortal)
-{
-	for(uint32 i = 0; i < HY_MAX_PORTAL_HANDLES; ++i)
-	{
-		// If found, shift all handles to the "left" so handles won't get fragmented in array.
-		if(m_hPortals[i] == pPortal->GetHandle())
-		{
-			pPortal->RemoveInstance(this);
-
-			if(i != HY_MAX_PORTAL_HANDLES - 1)
-				memmove(&m_hPortals[i], &m_hPortals[i+1], sizeof(HyPortal2dHandle) * (HY_MAX_PORTAL_HANDLES - i+1));
-
-			m_hPortals[HY_MAX_PORTAL_HANDLES - 1] = HY_UNUSED_HANDLE;
-			return true;
-		}
-	}
-
-	return false;
-}
-
 /*virtual*/ bool IHyDrawInst2d::IsLoaded() const /*override*/
 {
 	return m_eLoadState == HYLOADSTATE_Loaded;
@@ -332,52 +200,4 @@ const IHyNodeData *IHyDrawInst2d::UncheckedGetData()
 void IHyDrawInst2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 {
 	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
-}
-
-/*virtual*/ void IHyDrawInst2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
-{
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
-	{
-		if(m_pScissor == nullptr)
-			m_pScissor = HY_NEW ScissorRect();
-
-		m_pScissor->m_WorldScissorRect = worldScissorRectRef;
-	}
-}
-
-/*virtual*/ void IHyDrawInst2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
-{
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
-		m_hStencil = hHandle;
-}
-
-/*virtual*/ int32 IHyDrawInst2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
-{
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_DisplayOrder))
-	{
-		m_iDisplayOrder = iOrderValue;
-		iOrderValue += 1;
-
-		HyScene::SetInstOrderingDirty();
-	}
-
-	return iOrderValue;
-}
-
-/*virtual*/ void IHyDrawInst2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
-{
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
-
-	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
-		UseWindowCoordinates(iWindowIndex);
 }

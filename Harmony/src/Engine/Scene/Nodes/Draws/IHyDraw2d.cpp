@@ -9,7 +9,9 @@
 *************************************************************************/
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 #include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
+#include "Scene/HyScene.h"
 #include "Renderer/IHyRenderer.h"
+#include "Renderer/Effects/HyStencil.h"
 
 IHyDraw2d::IHyDraw2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
 																m_fAlpha(1.0f),
@@ -163,6 +165,87 @@ void IHyDraw2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	scissorOut = m_pScissor->m_WorldScissorRect;
 }
 
+/*virtual*/ void IHyDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
+{
+	if(m_pScissor == nullptr)
+		m_pScissor = HY_NEW ScissorRect();
+
+	m_pScissor->m_LocalScissorRect.x = uiLocalX;
+	m_pScissor->m_LocalScissorRect.y = uiLocalY;
+	m_pScissor->m_LocalScissorRect.width = uiWidth;
+	m_pScissor->m_LocalScissorRect.height = uiHeight;
+	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Enabled;
+
+	m_uiExplicitFlags |= EXPLICIT_Scissor;
+
+	GetWorldScissor(m_pScissor->m_WorldScissorRect);
+}
+
+/*virtual*/ void IHyDraw2d::ClearScissor(bool bUseParentScissor)
+{
+	if(m_pScissor == nullptr)
+		return;
+
+	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Disabled;
+	m_pScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
+
+	if(bUseParentScissor == false)
+		m_uiExplicitFlags |= EXPLICIT_Scissor;
+	else
+	{
+		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+		if(m_pParent)
+			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+	}
+}
+
+/*virtual*/ void IHyDraw2d::SetStencil(HyStencil *pStencil)
+{
+	if(pStencil == nullptr)
+		m_hStencil = HY_UNUSED_HANDLE;
+	else
+		m_hStencil = pStencil->GetHandle();
+
+	m_uiExplicitFlags |= EXPLICIT_Stencil;
+}
+
+/*virtual*/ void IHyDraw2d::ClearStencil(bool bUseParentStencil)
+{
+	m_hStencil = HY_UNUSED_HANDLE;
+
+	if(bUseParentStencil == false)
+		m_uiExplicitFlags |= EXPLICIT_Stencil;
+	else
+	{
+		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+		if(m_pParent)
+		{
+			HyStencil *pStencil = m_pParent->GetStencil();
+			m_hStencil = pStencil ? pStencil->GetHandle() : HY_UNUSED_HANDLE;
+		}
+	}
+}
+
+/*virtual*/ void IHyDraw2d::UseCameraCoordinates()
+{
+	m_iCoordinateSystem = -1;
+	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+}
+
+/*virtual*/ void IHyDraw2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
+{
+	m_iCoordinateSystem = iWindowIndex;
+	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+}
+
+/*virtual*/ void IHyDraw2d::SetDisplayOrder(int32 iOrderValue)
+{
+	m_iDisplayOrder = iOrderValue;
+	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
+
+	HyScene::SetInstOrderingDirty();
+}
+
 bool IHyDraw2d::IsStencilSet() const
 {
 	return m_hStencil != HY_UNUSED_HANDLE;
@@ -181,6 +264,54 @@ int32 IHyDraw2d::GetCoordinateSystem() const
 int32 IHyDraw2d::GetDisplayOrder() const
 {
 	return m_iDisplayOrder;
+}
+
+/*virtual*/ void IHyDraw2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
+	{
+		if(m_pScissor == nullptr)
+			m_pScissor = HY_NEW ScissorRect();
+
+		m_pScissor->m_WorldScissorRect = worldScissorRectRef;
+	}
+}
+
+/*virtual*/ void IHyDraw2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
+		m_hStencil = hHandle;
+}
+
+/*virtual*/ void IHyDraw2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
+		m_iCoordinateSystem = iWindowIndex;
+}
+
+/*virtual*/ int32 IHyDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
+{
+	if(bIsOverriding)
+		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;
+
+	if(0 == (m_uiExplicitFlags & EXPLICIT_DisplayOrder))
+	{
+		m_iDisplayOrder = iOrderValue;
+		iOrderValue += 1;
+
+		HyScene::SetInstOrderingDirty();
+	}
+
+	return iOrderValue;
 }
 
 void IHyDraw2d::CalculateColor()

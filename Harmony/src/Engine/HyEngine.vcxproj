@@ -67,7 +67,6 @@
     <ClCompile Include="Renderer\Components\HyRenderState.cpp" />
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp" />
     <ClCompile Include="Renderer\Components\HyWindow.cpp" />
-    <ClCompile Include="Renderer\Effects\HyPortal2d.cpp" />
     <ClCompile Include="Renderer\Effects\HyShader.cpp" />
     <ClCompile Include="Renderer\Effects\HyStencil.cpp" />
     <ClCompile Include="Renderer\Effects\IHyFx.cpp" />
@@ -78,7 +77,7 @@
     <ClCompile Include="Scene\Nodes\Draws\Entities\HyEntity3d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\IHyDraw2d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\IHyDraw3d.cpp" />
-    <ClCompile Include="Scene\Nodes\Draws\Instances\HyMesh3d.cpp" />
+    <ClCompile Include="Scene\Nodes\Draws\Instances\HyPrefab3d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\Instances\HyPrimitive2d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\Instances\HySpine2d.cpp" />
     <ClCompile Include="Scene\Nodes\Draws\Instances\HySprite2d.cpp" />
@@ -161,7 +160,6 @@
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyRenderState.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyShaderUniforms.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyWindow.h" />
-    <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyPortal2d.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyShader.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyStencil.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\IHyFx.h" />
@@ -174,7 +172,7 @@
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntityLeaf2d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\IHyDraw2d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\IHyDraw3d.h" />
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HyMesh3d.h" />
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HyPrefab3d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HyPrimitive2d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HySpine2d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HySprite2d.h" />

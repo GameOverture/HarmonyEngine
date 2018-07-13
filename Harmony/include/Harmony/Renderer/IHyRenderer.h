@@ -63,7 +63,6 @@ protected:
 	// Effects containers
 	std::map<HyShaderHandle, HyShader *>			m_ShaderMap;
 	std::map<HyStencilHandle, HyStencil *>			m_StencilMap;
-	std::map<HyPortal2dHandle, HyPortal2d *>		m_Portal2dMap;
 
 	// Built-in shaders
 	HyShader *										m_pShaderQuadBatch;
@@ -111,10 +110,6 @@ public:
 	static HyStencil *FindStencil(HyStencilHandle hHandle);
 	static void AddStencil(HyStencil *pStencil);
 	static void RemoveStencil(HyStencil *pStencil);
-
-	static HyPortal2d *FindPortal2d(HyPortal2dHandle hHandle);
-	static void AddPortal2d(HyPortal2d *pPortal2d);
-	static void RemovePortal2d(HyPortal2d *pPortal2d);
 
 	void ProcessMsgs();
 	void Render();

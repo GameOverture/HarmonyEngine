@@ -189,7 +189,7 @@ void HyDiagnostics::DumpNodeUsage()
 	uint32 uiNumTextureQuad2d = 0;
 	uint32 uiNumPrimitive2d = 0;
 	uint32 uiNumText2d = 0;
-	uint32 uiNumMesh3d = 0;
+	uint32 uiNumPrefab3d = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(loadedNodesList.size()); ++i)
 	{
 		switch(loadedNodesList[i]->GetType())
@@ -201,7 +201,7 @@ void HyDiagnostics::DumpNodeUsage()
 		case HYTYPE_TexturedQuad2d:	uiNumTextureQuad2d++;	break;
 		case HYTYPE_Primitive2d:	uiNumPrimitive2d++;		break;
 		case HYTYPE_Text2d:			uiNumText2d++;			break;
-		case HYTYPE_Mesh3d:			uiNumMesh3d++;			break;
+		case HYTYPE_Prefab3d:		uiNumPrefab3d++;		break;
 		}
 	}
 
@@ -213,7 +213,7 @@ void HyDiagnostics::DumpNodeUsage()
 	HyLog("TexturedQuad Nodes: " << uiNumTextureQuad2d);
 	HyLog("Primitive Nodes:    " << uiNumPrimitive2d);
 	HyLog("Text Nodes:         " << uiNumText2d);
-	HyLog("3D Mesh Nodes:      " << uiNumMesh3d);
+	HyLog("3D Prefab Nodes:    " << uiNumPrefab3d);
 }
 
 void HyDiagnostics::DumpMemoryUsage()

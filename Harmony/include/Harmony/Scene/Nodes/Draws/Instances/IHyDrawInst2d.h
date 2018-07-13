@@ -19,7 +19,6 @@
 class HyStencil;
 class HyPortal2d;
 
-// NOTE: This class should contain a copy of all the functions/members of IHyLeaf2d. Multiple inheritance is not an option
 class IHyDrawInst2d : public IHyDraw2d
 {
 	friend class IHyRenderer;
@@ -39,7 +38,6 @@ protected:
 	HyRenderMode					m_eRenderMode;
 	HyTextureHandle					m_hTextureHandle;
 	HyShaderUniforms 				m_ShaderUniforms;
-	HyPortal2dHandle				m_hPortals[HY_MAX_PORTAL_HANDLES];
 
 	HyShape2d						m_LocalBoundingVolume;
 
@@ -52,20 +50,6 @@ public:
 	virtual IHyDrawInst2d *Clone() const = 0;
 
 	bool IsValid();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// NOTE: Below mutators manipulate data from derived class "IHyDraw2d". Handled in regard to being a "leaf"
-	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
-	void ClearScissor(bool bUseParentScissor);
-
-	void SetStencil(HyStencil *pStencil);
-	void ClearStencil(bool bUseParentStencil);
-
-	void UseCameraCoordinates();
-	void UseWindowCoordinates(int32 iWindowIndex = 0);
-
-	void SetDisplayOrder(int32 iOrderValue);
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	const std::string &GetName() const;
 	const std::string &GetPrefix() const;
@@ -81,9 +65,6 @@ public:
 	// Passing nullptr will use built-in default shader
 	void SetShader(HyShader *pShader);
 	HyShaderHandle GetShaderHandle();
-
-	bool SetPortal(HyPortal2d *pPortal);
-	bool ClearPortal(HyPortal2d *pPortal);
 
 	virtual bool IsLoaded() const override;
 	virtual void Load() override final;
@@ -106,12 +87,6 @@ protected:
 	virtual void OnLoaded() { }											// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteVertexData(char *&pRefDataWritePos) { }			// This function is responsible for incrementing the passed in reference pointer the size of the data written
-
-	// Internal Entity propagation function overrides
-	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
-	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override;
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
-	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override;
 
 #ifdef HY_PLATFORM_GUI
 public:

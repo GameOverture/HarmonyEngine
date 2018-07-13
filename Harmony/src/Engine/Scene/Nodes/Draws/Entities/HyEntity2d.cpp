@@ -10,7 +10,6 @@
 #include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Renderer/Effects/HyPortal2d.h"
 #include "HyEngine.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Entity2d, pParent),
@@ -31,11 +30,6 @@ HyEntity2d::~HyEntity2d(void)
 	SetEnabled(bEnabled, false);
 }
 
-/*virtual*/ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused) /*override*/
-{
-	SetPauseUpdate(bUpdateWhenPaused, false);
-}
-
 void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
 {
 	m_bEnabled = bEnabled;
@@ -43,6 +37,11 @@ void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetEnabled(bEnabled, bOverrideExplicitChildren);
+}
+
+/*virtual*/ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused) /*override*/
+{
+	SetPauseUpdate(bUpdateWhenPaused, false);
 }
 
 void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren)
@@ -65,85 +64,92 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 		m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren /*= false*/)
+/*virtual*/ void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight) /*override*/
 {
-	if(m_pScissor == nullptr)
-		m_pScissor = HY_NEW ScissorRect();
+	SetScissor(uiLocalX, uiLocalY, uiWidth, uiHeight, false);
+}
 
-	m_pScissor->m_LocalScissorRect.x = uiLocalX;
-	m_pScissor->m_LocalScissorRect.y = uiLocalY;
-	m_pScissor->m_LocalScissorRect.width = uiWidth;
-	m_pScissor->m_LocalScissorRect.height = uiHeight;
-	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Enabled;
-
-	m_uiExplicitFlags |= EXPLICIT_Scissor;
-
-	GetWorldScissor(m_pScissor->m_WorldScissorRect);
+void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren)
+{
+	IHyDraw2d::SetScissor(uiLocalX, uiLocalY, uiWidth, uiHeight);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetScissor(m_pScissor->m_WorldScissorRect, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren /*= false*/)
+/*virtual*/ void HyEntity2d::ClearScissor(bool bUseParentScissor) /*override*/
 {
-	if(m_pScissor == nullptr)
-		return;
+	ClearScissor(bUseParentScissor, false);
+}
 
-	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Disabled;
-	m_pScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
-
-	if(bUseParentScissor == false)
-		m_uiExplicitFlags |= EXPLICIT_Scissor;
-	else
-	{
-		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
-		if(m_pParent)
-			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
-	}
+void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren)
+{
+	IHyDraw2d::ClearScissor(bUseParentScissor);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetScissor(m_pScissor->m_WorldScissorRect, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren /*= false*/)
+/*virtual*/ void HyEntity2d::SetStencil(HyStencil *pStencil) /*override*/
 {
-	if(pStencil == nullptr)
-		m_hStencil = HY_UNUSED_HANDLE;
-	else
-		m_hStencil = pStencil->GetHandle();
+	SetStencil(pStencil, false);
+}
 
-	m_uiExplicitFlags |= EXPLICIT_Stencil;
+void HyEntity2d::SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren)
+{
+	IHyDraw2d::SetStencil(pStencil);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetStencil(m_hStencil, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren /*= false*/)
+/*virtual*/ void HyEntity2d::ClearStencil(bool bUseParentStencil) /*override*/
 {
+	ClearStencil(bUseParentStencil, false);
+}
+
+void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren)
+{
+	IHyDraw2d::ClearStencil(bUseParentStencil);
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->_SetStencil(m_hStencil, bOverrideExplicitChildren);
+}
+
+/*virtual*/ void HyEntity2d::UseCameraCoordinates() /*override*/
+{
+	UseCameraCoordinates(false);
 }
 
 void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren /*= false*/)
 {
-	m_iCoordinateSystem = -1;
-	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+	IHyDraw2d::UseCameraCoordinates();
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetCoordinateSystem(m_iCoordinateSystem, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/, bool bOverrideExplicitChildren /*= false*/)
+/*virtual*/ void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex) /*override*/
 {
-	m_iCoordinateSystem = iWindowIndex;
-	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+	UseWindowCoordinates(iWindowIndex, false);
+}
+
+void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex, bool bOverrideExplicitChildren)
+{
+	IHyDraw2d::UseWindowCoordinates(iWindowIndex);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetCoordinateSystem(iWindowIndex, bOverrideExplicitChildren);
 }
 
-void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren /*= false*/)
+/*virtual*/ void HyEntity2d::SetDisplayOrder(int32 iOrderValue) /*override*/
 {
-	m_iDisplayOrder = iOrderValue;
-	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
+	SetDisplayOrder(iOrderValue, false);
+}
+
+void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
+{
+	IHyDraw2d::SetDisplayOrder(iOrderValue);
 
 	if((m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder) == 0)
 	{
@@ -425,16 +431,10 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 
 /*virtual*/ void HyEntity2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override final*/
 {
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
-
+	IHyDraw2d::_SetScissor(worldScissorRectRef, bIsOverriding);
+	
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
 	{
-		if(m_pScissor == nullptr)
-			m_pScissor = HY_NEW ScissorRect();
-
-		m_pScissor->m_WorldScissorRect = worldScissorRectRef;
-
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			m_ChildList[i]->_SetScissor(m_pScissor->m_WorldScissorRect, bIsOverriding);
 	}
@@ -442,13 +442,10 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 
 /*virtual*/ void HyEntity2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override final*/
 {
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+	IHyDraw2d::_SetStencil(hHandle, bIsOverriding);
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
 	{
-		m_hStencil = hHandle;
-
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			m_ChildList[i]->_SetStencil(m_hStencil, bIsOverriding);
 	}
@@ -456,13 +453,10 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 
 /*virtual*/ void HyEntity2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override final*/
 {
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
+	IHyDraw2d::_SetCoordinateSystem(iWindowIndex, bIsOverriding);
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
 	{
-		m_iCoordinateSystem = iWindowIndex;
-
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			m_ChildList[i]->_SetCoordinateSystem(iWindowIndex, bIsOverriding);
 	}
@@ -470,13 +464,10 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 
 /*virtual*/ int32 HyEntity2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override final*/
 {
-	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;
+	IHyDraw2d::_SetDisplayOrder(iOrderValue, bIsOverriding);
 
 	if(0 == (m_uiExplicitFlags & EXPLICIT_DisplayOrder))
 	{
-		m_iDisplayOrder = iOrderValue;
-
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bIsOverriding);
 	}

@@ -13,8 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 
-class HyPortal2d;
-
 class HyEntity2d : public IHyDraw2d
 {
 protected:
@@ -41,24 +39,33 @@ public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
-	virtual void SetEnabled(bool bEnabled) override;
-	virtual void SetPauseUpdate(bool bUpdateWhenPaused) override;
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// NOTE: Below mutators manipulate data from derived classes "IHyDraw2d" and "IHyNode". Handled in regard to being an "entity"
+	virtual void SetEnabled(bool bEnabled) override;
 	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
+
+	virtual void SetPauseUpdate(bool bUpdateWhenPaused) override;
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 	
-	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren = false);
-	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren = false);
-
-	void SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren = false);
-	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren = false);
-
-	void UseCameraCoordinates(bool bOverrideExplicitChildren = false);
-	void UseWindowCoordinates(int32 iWindowIndex = 0, bool bOverrideExplicitChildren = false);
+	virtual void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight) override;
+	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren);
 	
-	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren = false);
+	virtual void ClearScissor(bool bUseParentScissor) override;
+	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren);
+
+	virtual void SetStencil(HyStencil *pStencil) override;
+	void SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren);
+	
+	virtual void ClearStencil(bool bUseParentStencil) override;
+	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren);
+
+	virtual void UseCameraCoordinates() override;
+	void UseCameraCoordinates(bool bOverrideExplicitChildren = false);
+
+	virtual void UseWindowCoordinates(int32 iWindowIndex = 0) override;
+	void UseWindowCoordinates(int32 iWindowIndex, bool bOverrideExplicitChildren);
+	
+	virtual void SetDisplayOrder(int32 iOrderValue) override;
+	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void ChildAppend(IHyNode2d &childRef);

@@ -214,7 +214,7 @@ HyRendererInterop &HyEngine::GetRenderer()
 	case HYTYPE_TexturedQuad2d:
 	case HYTYPE_Primitive2d:
 	case HYTYPE_Text2d:
-	case HYTYPE_Mesh3d:
+	case HYTYPE_Prefab3d:
 		return true;
 	}
 

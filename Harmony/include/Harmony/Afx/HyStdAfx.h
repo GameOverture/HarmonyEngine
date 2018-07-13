@@ -46,8 +46,6 @@
 typedef uint32 HyTextureHandle;
 typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
-#define HY_MAX_PORTAL_HANDLES 4
-typedef uint8 HyPortal2dHandle;
 
 enum HyType
 {
@@ -60,7 +58,7 @@ enum HyType
 	HYTYPE_TexturedQuad2d,
 	HYTYPE_Primitive2d,
 	HYTYPE_Text2d,
-	HYTYPE_Mesh3d,
+	HYTYPE_Prefab3d,
 	HYTYPE_Entity2d,
 	HYTYPE_Entity3d,
 	HYTYPE_Camera2d,

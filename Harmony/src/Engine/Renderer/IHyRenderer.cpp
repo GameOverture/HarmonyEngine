@@ -12,7 +12,6 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Renderer/Effects/HyPortal2d.h"
 #include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "HyEngine.h"
@@ -54,10 +53,6 @@ IHyRenderer::~IHyRenderer(void)
 	for(auto iter = m_StencilMap.begin(); iter != m_StencilMap.end(); ++iter)
 		delete iter->second;
 	m_StencilMap.clear();
-
-	for(auto iter = m_Portal2dMap.begin(); iter != m_Portal2dMap.end(); ++iter)
-		delete iter->second;
-	m_Portal2dMap.clear();
 }
 
 void IHyRenderer::PrepareBuffers()
@@ -68,14 +63,6 @@ void IHyRenderer::PrepareBuffers()
 	m_pCurVertexWritePos = m_pBUFFER_VERTEX;
 	m_pRenderStatesUserStartPos = nullptr;
 	m_uiVertexBufferUsedBytes = 0;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Update each portal to determine this frame's draw instance clones that need to be rendered
-	for(auto iter = m_Portal2dMap.begin(); iter != m_Portal2dMap.end(); ++iter)
-	{
-		HyPortal2d *pPortal2d = iter->second;
-		pPortal2d->PrepareClones();
-	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Write internal render states first, used by things like HyStencil
@@ -211,24 +198,6 @@ uint32 IHyRenderer::GetNumWindows()
 /*static*/ void IHyRenderer::RemoveStencil(HyStencil *pStencil)
 {
 	sm_pInstance->m_StencilMap.erase(sm_pInstance->m_StencilMap.find(pStencil->GetHandle()));
-}
-
-/*static*/ HyPortal2d *IHyRenderer::FindPortal2d(HyPortal2dHandle hHandle)
-{
-	if(hHandle != HY_UNUSED_HANDLE && sm_pInstance->m_Portal2dMap.find(hHandle) != sm_pInstance->m_Portal2dMap.end())
-		return sm_pInstance->m_Portal2dMap[hHandle];
-
-	return nullptr;
-}
-
-/*static*/ void IHyRenderer::AddPortal2d(HyPortal2d *pPortal2d)
-{
-	sm_pInstance->m_Portal2dMap[pPortal2d->GetHandle()] = pPortal2d;
-}
-
-/*static*/ void IHyRenderer::RemovePortal2d(HyPortal2d *pPortal2d)
-{
-	sm_pInstance->m_Portal2dMap.erase(sm_pInstance->m_Portal2dMap.find(pPortal2d->GetHandle()));
 }
 
 void IHyRenderer::ProcessMsgs()

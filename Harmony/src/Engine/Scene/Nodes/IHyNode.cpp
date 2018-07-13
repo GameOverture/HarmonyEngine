@@ -107,7 +107,7 @@ void IHyNode::SetTag(int64 iTag)
 	m_iTag = iTag;
 }
 
-void IHyNode::_SetEnabled(bool bEnabled, bool bIsOverriding)
+/*virtual*/ void IHyNode::_SetEnabled(bool bEnabled, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_Enabled;
@@ -116,7 +116,7 @@ void IHyNode::_SetEnabled(bool bEnabled, bool bIsOverriding)
 		m_bEnabled = bEnabled;
 }
 
-void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
+/*virtual*/ void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_PauseUpdate;

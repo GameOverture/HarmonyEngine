@@ -57,20 +57,32 @@ public:
 	const glm::vec3 &CalculateTopTint();
 	const glm::vec3 &CalculateBotTint();
 
-	// NOTE: Below accessors return the data declared in this class. Respective derived classes have the corresponding mutators (whether it's a "leaf" or "entity")
-
 	bool IsScissorSet() const;
 	void GetLocalScissor(HyScreenRect<int32> &scissorOut) const;
 	void GetWorldScissor(HyScreenRect<int32> &scissorOut);
+	virtual void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
+	virtual void ClearScissor(bool bUseParentScissor);
 
 	bool IsStencilSet() const;
 	HyStencil *GetStencil() const;
+	virtual void SetStencil(HyStencil *pStencil);
+	virtual void ClearStencil(bool bUseParentStencil);
 
 	int32 GetCoordinateSystem() const;
+	virtual void UseCameraCoordinates();
+	virtual void UseWindowCoordinates(int32 iWindowIndex = 0);
+
 	int32 GetDisplayOrder() const;
+	virtual void SetDisplayOrder(int32 iOrderValue);
 
 protected:
 	virtual void NodeUpdate() = 0;
+
+	// Internal Entity propagation function overrides
+	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override;
+	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override;
+	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override;
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
 
 private:
 	void CalculateColor();
