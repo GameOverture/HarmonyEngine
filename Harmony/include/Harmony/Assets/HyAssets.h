@@ -24,7 +24,7 @@ class HySprite2dData;
 class HySpine2dData;
 class HyText2dData;
 class HyTexturedQuad2dData;
-class HyEntity3dData;
+class HyPrefabData;
 
 class HyAssets : public IHyThreadClass
 {
@@ -38,7 +38,7 @@ class HyAssets : public IHyThreadClass
 	HyAtlasIndices *											m_pLoadedAtlasIndices;
 
 	template<typename tData>
-	class NodeData
+	class Factory
 	{
 		std::map<std::string, uint32>							m_LookupIndexMap;
 		std::vector<tData>										m_DataList;
@@ -47,11 +47,11 @@ class HyAssets : public IHyThreadClass
 		void Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
 		const tData *GetData(const std::string &sPrefix, const std::string &sName) const;
 	};
-	NodeData<HyAudioData>										m_Audio;
-	NodeData<HySprite2dData>									m_Sprite2d;
-	NodeData<HySpine2dData>										m_Spine2d;
-	NodeData<HyEntity3dData>									m_Mesh3d;
-	NodeData<HyText2dData>										m_Txt2d;
+	Factory<HyAudioData>										m_AudioFactory;
+	Factory<HySprite2dData>										m_SpriteFactory;
+	Factory<HySpine2dData>										m_SpineFactory;
+	Factory<HyPrefabData>										m_PrefabFactory;
+	Factory<HyText2dData>										m_FontFactory;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
 	std::vector<IHyDrawInst2d *>								m_QueuedInst2dList;

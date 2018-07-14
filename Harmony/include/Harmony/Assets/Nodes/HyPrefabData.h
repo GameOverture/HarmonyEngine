@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyEntity3dData.h
+ *	HyPrefabData.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,21 +7,21 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HyEntity3dData_h__
-#define HyEntity3dData_h__
+#ifndef HyPrefabData_h__
+#define HyPrefabData_h__
 
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/Loadables/HyAtlas.h"
 
-class HyEntity3dData : public IHyNodeData
+class HyPrefabData : public IHyNodeData
 {
 	//const aiScene *		m_pAiScene;
 
 public:
-	HyEntity3dData(const std::string &sPath);
-	virtual ~HyEntity3dData(void);
+	HyPrefabData(const std::string &sPath);
+	virtual ~HyPrefabData(void);
 };
 
-#endif /* HyEntity3dData_h__ */
+#endif /* HyPrefabData_h__ */

@@ -58,7 +58,7 @@
 			ss << "Harmony Error has occured.\n\n" << __FILE__ \
 			<< "\nLine: " << __LINE__ << "\n\n" << message << std::endl; \
 			MessageBoxA(NULL, ss.str().c_str(), "Harmony Engine Error!", MB_ICONERROR); \
-			std::exit(EXIT_FAILURE); \
+			DebugBreak();/*std::exit(EXIT_FAILURE);*/ \
 		} while (false)
 #else
 	#define HyAssert(condition, message) do { } while (false)

@@ -16,7 +16,7 @@
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Assets/Nodes/HyText2dData.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
-#include "Assets/Nodes/HyEntity3dData.h"
+#include "Assets/Nodes/HyPrefabData.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
 #include "Diagnostics/Console/HyConsole.h"
@@ -24,9 +24,9 @@
 #define HYASSETS_AtlasDir "Atlases/"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Nested class NodeData
+// Nested class Factory
 template<typename tData>
-void HyAssets::NodeData<tData>::Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef)
+void HyAssets::Factory<tData>::Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef)
 {
 	m_DataList.reserve(subDirObjRef.size());
 
@@ -41,7 +41,7 @@ void HyAssets::NodeData<tData>::Init(jsonxx::Object &subDirObjRef, HyAssets &ass
 }
 
 template<typename tData>
-const tData *HyAssets::NodeData<tData>::GetData(const std::string &sPrefix, const std::string &sName) const
+const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const std::string &sName) const
 {
 	std::string sPath;
 
@@ -139,13 +139,13 @@ void HyAssets::GetNodeData(IHyDrawInst2d *pDrawInst2d, const IHyNodeData *&pData
 	switch(pDrawInst2d->GetType())
 	{
 	case HYTYPE_Sprite2d:
-		pDataOut = m_Sprite2d.GetData(pDrawInst2d->GetPrefix(), pDrawInst2d->GetName());
+		pDataOut = m_SpriteFactory.GetData(pDrawInst2d->GetPrefix(), pDrawInst2d->GetName());
 		break;
 	case HYTYPE_Spine2d:
-		pDataOut = m_Spine2d.GetData(pDrawInst2d->GetPrefix(), pDrawInst2d->GetName());
+		pDataOut = m_SpineFactory.GetData(pDrawInst2d->GetPrefix(), pDrawInst2d->GetName());
 		break;
 	case HYTYPE_Text2d:
-		pDataOut = m_Txt2d.GetData(pDrawInst2d->GetPrefix(), pDrawInst2d->GetName());
+		pDataOut = m_FontFactory.GetData(pDrawInst2d->GetPrefix(), pDrawInst2d->GetName());
 		break;
 	case HYTYPE_TexturedQuad2d:
 		if(pDrawInst2d->GetName() != "raw")
@@ -409,9 +409,9 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
 	HyAssert(bGameDataParsed, "Could not parse game data");
 
-	m_Audio.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
-	m_Txt2d.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
-	m_Sprite2d.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
+	m_AudioFactory.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
+	m_FontFactory.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
+	m_SpriteFactory.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
 	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
 	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
 	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");

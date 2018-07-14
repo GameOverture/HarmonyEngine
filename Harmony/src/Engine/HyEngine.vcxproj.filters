@@ -198,9 +198,6 @@
     <ClCompile Include="Renderer\Effects\IHyFx.cpp">
       <Filter>Renderer\Effects</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Components\HyPortalGate2d.cpp">
-      <Filter>Renderer\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Threading\IHyThreadClass.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
@@ -210,14 +207,14 @@
     <ClCompile Include="Scene\Nodes\Draws\IHyDraw3d.cpp">
       <Filter>Scene\Nodes\Draws</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\Nodes\HyEntity3dData.cpp">
-      <Filter>Assets\Nodes</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\jasonxx.cc">
       <Filter>Utilities</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Nodes\Draws\Instances\HyPrefab3d.cpp">
       <Filter>Scene\Nodes\Draws\Instances</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Nodes\HyPrefabData.cpp">
+      <Filter>Assets\Nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -564,9 +561,6 @@
     <ClInclude Include="..\..\include\Harmony\Time\HyTime.h">
       <Filter>Time</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyPortalGate2d.h">
-      <Filter>Renderer\Components</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyShader.h">
       <Filter>Renderer\Effects</Filter>
     </ClInclude>
@@ -588,9 +582,6 @@
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\IHyDraw3d.h">
       <Filter>Scene\Nodes\Draws</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyEntity3dData.h">
-      <Filter>Assets\Nodes</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Utilities\json.hpp">
       <Filter>Utilities</Filter>
     </ClInclude>
@@ -602,6 +593,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HyPrefab3d.h">
       <Filter>Scene\Nodes\Draws\Instances</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyPrefabData.h">
+      <Filter>Assets\Nodes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

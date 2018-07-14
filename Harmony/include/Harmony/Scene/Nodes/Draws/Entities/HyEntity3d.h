@@ -12,7 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Draws/IHyDraw3d.h"
-#include "Assets/Nodes/HyEntity3dData.h"
 
 class HyEntity3d : public IHyDraw3d
 {
