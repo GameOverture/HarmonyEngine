@@ -12,13 +12,8 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-/*static*/ HyAssets *IHyLoadable3d::sm_pHyAssets = nullptr;
-
 IHyLoadable3d::IHyLoadable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyNode3d(eNodeType, pParent),
-																												m_eLoadState(HYLOADSTATE_Inactive),
-																												m_pData(nullptr),
-																												m_sName(szName ? szName : ""),
-																												m_sPrefix(szPrefix ? szPrefix : ""),
+																												IHyLoadable(szPrefix, szName),
 																												m_fAlpha(1.0f),
 																												m_fCachedAlpha(1.0f),
 																												m_pScissor(nullptr),
@@ -36,10 +31,7 @@ IHyLoadable3d::IHyLoadable3d(HyType eNodeType, const char *szPrefix, const char 
 }
 
 IHyLoadable3d::IHyLoadable3d(const IHyLoadable3d &copyRef) :	IHyNode3d(copyRef),
-																m_eLoadState(HYLOADSTATE_Inactive),
-																m_pData(nullptr),
-																m_sName(copyRef.m_sName),
-																m_sPrefix(copyRef.m_sPrefix),
+																IHyLoadable(copyRef),
 																m_fAlpha(copyRef.m_fAlpha),
 																m_pScissor(nullptr),
 																m_hStencil(copyRef.m_hStencil),
@@ -70,16 +62,6 @@ const IHyLoadable3d &IHyLoadable3d::operator=(const IHyLoadable3d &rhs)
 {
 	IHyNode3d::operator=(rhs);
 
-	if(m_sPrefix != rhs.m_sPrefix || m_sName != rhs.m_sName)
-	{
-		if(m_eLoadState != HYLOADSTATE_Inactive)
-			Unload();
-
-		m_sPrefix = rhs.m_sPrefix;
-		m_sName = rhs.m_sName;
-		m_pData = nullptr;			// Ensures virtual OnDataAcquired() is invoked when the below Load() is invoked
-	}
-
 	m_fAlpha = rhs.m_fAlpha;
 
 	delete m_pScissor;
@@ -101,58 +83,7 @@ const IHyLoadable3d &IHyLoadable3d::operator=(const IHyLoadable3d &rhs)
 
 	//CalculateColor();
 
-	if(rhs.IsLoaded())
-		Load();
-
 	return *this;
-}
-
-const std::string &IHyLoadable3d::GetName() const
-{
-	return m_sName;
-}
-
-const std::string &IHyLoadable3d::GetPrefix() const
-{
-	return m_sPrefix;
-}
-
-const IHyNodeData *IHyLoadable3d::AcquireData()
-{
-	if(m_pData == nullptr)
-	{
-		HyAssert(sm_pHyAssets != nullptr, "AcquireData was called before the engine has initialized HyAssets");
-
-		sm_pHyAssets->AcquireNodeData(this, m_pData);
-		if(m_pData || m_eTYPE == HYTYPE_Primitive2d || m_eTYPE == HYTYPE_Entity2d)
-			OnDataAcquired();
-		else
-			HyError("Could not find data for: " << GetPrefix() << "/" << GetName());
-	}
-
-	return m_pData;
-}
-
-/*virtual*/ bool IHyLoadable3d::IsLoaded() const /*override*/
-{
-	return m_eLoadState == HYLOADSTATE_Loaded;
-}
-
-/*virtual*/ void IHyLoadable3d::Load() /*override*/
-{
-	HyAssert(sm_pHyAssets, "IHyLoadable2d::Load was invoked before engine has been initialized");
-
-	// Don't load if the name is blank, and it's required by this node type
-	if(m_sName.empty() && m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d && m_eTYPE != HYTYPE_TexturedQuad2d)
-		return;
-
-	sm_pHyAssets->LoadNodeData(this);
-}
-
-/*virtual*/ void IHyLoadable3d::Unload() /*override*/
-{
-	HyAssert(sm_pHyAssets, "IHyLoadable2d::Unload was invoked before engine has been initialized");
-	sm_pHyAssets->RemoveNodeData(this);
 }
 
 bool IHyLoadable3d::IsScissorSet() const
@@ -175,7 +106,7 @@ void IHyLoadable3d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 
 	if(IsDirty(DIRTY_Scissor))
 	{
-		if((m_uiExplicitFlags & EXPLICIT_Scissor) == 0 && m_pParent)
+		if((m_uiExplicitAndTypeFlags & EXPLICIT_Scissor) == 0 && m_pParent)
 			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
 		else
 		{
@@ -213,7 +144,7 @@ void IHyLoadable3d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	m_pScissor->m_LocalScissorRect.height = uiHeight;
 	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Enabled;
 
-	m_uiExplicitFlags |= EXPLICIT_Scissor;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_Scissor;
 
 	GetWorldScissor(m_pScissor->m_WorldScissorRect);
 }
@@ -227,10 +158,10 @@ void IHyLoadable3d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	m_pScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
 
 	if(bUseParentScissor == false)
-		m_uiExplicitFlags |= EXPLICIT_Scissor;
+		m_uiExplicitAndTypeFlags |= EXPLICIT_Scissor;
 	else
 	{
-		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Scissor;
 		if(m_pParent)
 			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
 	}
@@ -253,7 +184,7 @@ HyStencil *IHyLoadable3d::GetStencil() const
 	else
 		m_hStencil = pStencil->GetHandle();
 
-	m_uiExplicitFlags |= EXPLICIT_Stencil;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_Stencil;
 }
 
 /*virtual*/ void IHyLoadable3d::ClearStencil(bool bUseParentStencil)
@@ -261,10 +192,10 @@ HyStencil *IHyLoadable3d::GetStencil() const
 	m_hStencil = HY_UNUSED_HANDLE;
 
 	if(bUseParentStencil == false)
-		m_uiExplicitFlags |= EXPLICIT_Stencil;
+		m_uiExplicitAndTypeFlags |= EXPLICIT_Stencil;
 	else
 	{
-		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Stencil;
 		if(m_pParent)
 		{
 			HyStencil *pStencil = m_pParent->GetStencil();
@@ -281,16 +212,16 @@ int32 IHyLoadable3d::GetCoordinateSystem() const
 /*virtual*/ void IHyLoadable3d::UseCameraCoordinates()
 {
 	m_iCoordinateSystem = -1;
-	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_CoordinateSystem;
 }
 
 /*virtual*/ void IHyLoadable3d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
 {
 	m_iCoordinateSystem = iWindowIndex;
-	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_CoordinateSystem;
 }
 
-const IHyNodeData *IHyLoadable3d::UncheckedGetData()
+/*virtual*/ HyType IHyLoadable3d::_LoadableGetType() /*override*/
 {
-	return m_pData;
+	return m_eTYPE;
 }

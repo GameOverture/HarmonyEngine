@@ -74,7 +74,7 @@ public:
 	void GuiOverrideData(jsonxx::Value &dataValueRef, HyTextureHandle hTextureHandle)
 	{
 		delete m_pData;
-		m_pData = HY_NEW HYDATATYPE(HY_GUI_DATAOVERRIDE, dataValueRef, *sm_pHyAssets);
+		m_pData = HY_NEW HYDATATYPE(HY_GUI_DATAOVERRIDE, dataValueRef, *IHyLoadable::sm_pHyAssets);
 		OnDataAcquired();
 
 		if(m_hShader == HY_UNUSED_HANDLE)

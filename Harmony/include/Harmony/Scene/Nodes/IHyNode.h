@@ -44,9 +44,14 @@ protected:
 		EXPLICIT_Scissor			= 1 << 2,
 		EXPLICIT_Stencil			= 1 << 3,
 		EXPLICIT_DisplayOrder		= 1 << 4,
-		EXPLICIT_CoordinateSystem	= 1 << 5
+		EXPLICIT_CoordinateSystem	= 1 << 5,
 	};
-	uint32							m_uiExplicitFlags;
+	enum NodeTypeFlags // NOTE: continue the bits in ExplicitFlags (stored in same 32bit member)
+	{
+		NODETYPE_IsLoadable			= 1 << 6,
+		NODETYPE_IsDrawable			= 1 << 7,
+	};
+	uint32							m_uiExplicitAndTypeFlags;
 
 	std::vector<HyTweenFloat *>		m_ActiveTweenFloatsList;
 

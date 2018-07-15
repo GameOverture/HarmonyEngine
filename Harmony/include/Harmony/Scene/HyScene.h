@@ -17,6 +17,7 @@
 // Forward declarations
 class IHyNode;
 class IHyDrawable2d;
+class IHyDrawable3d;
 class IHyNode3d;
 class HyWindow;
 class IHyRenderer;
@@ -41,7 +42,7 @@ class HyScene
 	bool												m_bPauseGame;
 
 	std::vector<IHyDrawable2d *>						m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
-	std::vector<IHyNode3d *>							m_LoadedInst3dList;	// TODO: rename this
+	std::vector<IHyDrawable3d *>						m_LoadedInst3dList;	// TODO: rename this
 
 public:
 	HyScene(std::vector<HyWindow *> &WindowListRef);
@@ -55,8 +56,10 @@ public:
 	static void AddNode_PauseUpdate(IHyNode *pNode);
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
-	void AddNode_Loaded(IHyDrawable2d *pInst);
-	void RemoveNode_Loaded(const IHyDrawable2d *pInst);
+	void AddNode_Loaded(IHyDrawable2d *pDrawable);
+	void AddNode_Loaded(IHyDrawable3d *pDrawable);
+	void RemoveNode_Loaded(const IHyDrawable2d *pDrawable);
+	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
 
 	void CopyAllLoadedNodes(std::vector<IHyDrawable2d *> &nodeListOut);
 

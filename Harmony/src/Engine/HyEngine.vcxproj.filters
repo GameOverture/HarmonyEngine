@@ -219,6 +219,9 @@
     <ClCompile Include="Scene\Nodes\Loadables\Drawables\IHyDrawable3d.cpp">
       <Filter>Scene\Nodes\Loadables\Drawables</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\IHyLoadable.cpp">
+      <Filter>Scene\Nodes\Loadables</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -602,6 +605,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\IHyDrawable3d.h">
       <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\IHyLoadable.h">
+      <Filter>Scene\Nodes\Loadables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

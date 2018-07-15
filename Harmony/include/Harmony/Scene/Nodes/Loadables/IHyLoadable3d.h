@@ -12,23 +12,14 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode3d.h"
+#include "Scene/Nodes/Loadables/IHyLoadable.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Scene/Tweens/HyTweenVec3.h"
 #include "Utilities/HyMath.h"
 
-class IHyLoadable3d : public IHyNode3d
+class IHyLoadable3d : public IHyNode3d, public IHyLoadable
 {
-	friend class HyAssets;
-
 protected:
-	static HyAssets *				sm_pHyAssets;
-
-	HyLoadState						m_eLoadState;
-
-	const IHyNodeData *				m_pData;
-	std::string						m_sName;
-	std::string						m_sPrefix;
-
 	float							m_fAlpha;
 	float							m_fCachedAlpha;
 	glm::vec3						m_CachedTopColor;
@@ -62,17 +53,6 @@ public:
 
 	const IHyLoadable3d &operator=(const IHyLoadable3d &rhs);
 
-	const std::string &GetName() const;
-	const std::string &GetPrefix() const;
-
-	const IHyNodeData *AcquireData();
-
-	virtual bool IsLoaded() const override;
-	virtual void Load() override;
-	virtual void Unload() override;
-
-	virtual bool IsLoadDataValid() { return true; }						// Optional public override for derived classes
-
 	bool IsScissorSet() const;
 	void GetLocalScissor(HyScreenRect<int32> &scissorOut) const;
 	void GetWorldScissor(HyScreenRect<int32> &scissorOut);
@@ -89,8 +69,6 @@ public:
 	virtual void UseWindowCoordinates(int32 iWindowIndex = 0);
 
 protected:
-	const IHyNodeData *UncheckedGetData();								// Used internally when it's guaranteed that data has already been acquired for this instance
-
 	// Optional overrides for derived classes
 	virtual void DrawLoadedUpdate() { }			// Invoked once after OnLoaded(), then once every frame (guarenteed to only be invoked if this instance is loaded)
 	virtual void OnDataAcquired() { }			// Invoked once on the first time this node's data is queried
@@ -98,6 +76,9 @@ protected:
 	virtual void OnUnloaded() { }				// HyAssets invokes this instance's data has been erased
 
 	virtual void NodeUpdate() = 0;
+
+private:
+	virtual HyType _LoadableGetType() override;
 };
 
 #endif /* IHyLoadable3d_h__ */

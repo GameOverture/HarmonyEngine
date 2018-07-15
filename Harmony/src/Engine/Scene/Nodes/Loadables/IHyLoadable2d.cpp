@@ -12,15 +12,9 @@
 #include "Scene/HyScene.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Assets/HyAssets.h"
-
-/*static*/ HyAssets *IHyLoadable2d::sm_pHyAssets = nullptr;
 
 IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
-																												m_eLoadState(HYLOADSTATE_Inactive),
-																												m_pData(nullptr),
-																												m_sName(szName ? szName : ""),
-																												m_sPrefix(szPrefix ? szPrefix : ""),
+																												IHyLoadable(szPrefix, szName),
 																												m_fAlpha(1.0f),
 																												m_fCachedAlpha(1.0f),
 																												m_pScissor(nullptr),
@@ -31,6 +25,8 @@ IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char 
 																												botColor(*this, DIRTY_Color),
 																												alpha(m_fAlpha, *this, DIRTY_Color)
 {
+	m_uiExplicitAndTypeFlags |= NODETYPE_IsLoadable;
+
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
 	m_CachedTopColor = topColor.Get();
@@ -38,10 +34,7 @@ IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char 
 }
 
 IHyLoadable2d::IHyLoadable2d(const IHyLoadable2d &copyRef) :	IHyNode2d(copyRef),
-																m_eLoadState(HYLOADSTATE_Inactive),
-																m_pData(nullptr),
-																m_sName(copyRef.m_sName),
-																m_sPrefix(copyRef.m_sPrefix),
+																IHyLoadable(copyRef),
 																m_fAlpha(copyRef.m_fAlpha),
 																m_pScissor(nullptr),
 																m_hStencil(copyRef.m_hStencil),
@@ -73,16 +66,7 @@ IHyLoadable2d::~IHyLoadable2d()
 const IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
 {
 	IHyNode2d::operator=(rhs);
-
-	if(m_sPrefix != rhs.m_sPrefix || m_sName != rhs.m_sName)
-	{
-		if(m_eLoadState != HYLOADSTATE_Inactive)
-			Unload();
-
-		m_sPrefix = rhs.m_sPrefix;
-		m_sName = rhs.m_sName;
-		m_pData = nullptr;			// Ensures virtual OnDataAcquired() is invoked when the below Load() is invoked
-	}
+	IHyLoadable::operator=(rhs);
 
 	m_fAlpha = rhs.m_fAlpha;
 
@@ -105,58 +89,7 @@ const IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
 
 	CalculateColor();
 
-	if(rhs.IsLoaded())
-		Load();
-
 	return *this;
-}
-
-const std::string &IHyLoadable2d::GetName() const
-{
-	return m_sName;
-}
-
-const std::string &IHyLoadable2d::GetPrefix() const
-{
-	return m_sPrefix;
-}
-
-const IHyNodeData *IHyLoadable2d::AcquireData()
-{
-	if(m_pData == nullptr)
-	{
-		HyAssert(sm_pHyAssets != nullptr, "AcquireData was called before the engine has initialized HyAssets");
-
-		sm_pHyAssets->AcquireNodeData(this, m_pData);
-		if(m_pData || m_eTYPE == HYTYPE_Primitive2d || m_eTYPE == HYTYPE_Entity2d)
-			OnDataAcquired();
-		else
-			HyError("Could not find data for: " << GetPrefix() << "/" << GetName());
-	}
-
-	return m_pData;
-}
-
-/*virtual*/ bool IHyLoadable2d::IsLoaded() const /*override*/
-{
-	return m_eLoadState == HYLOADSTATE_Loaded;
-}
-
-/*virtual*/ void IHyLoadable2d::Load() /*override*/
-{
-	HyAssert(sm_pHyAssets, "IHyLoadable2d::Load was invoked before engine has been initialized");
-
-	// Don't load if the name is blank, and it's required by this node type
-	if(m_sName.empty() && m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d && m_eTYPE != HYTYPE_TexturedQuad2d)
-		return;
-
-	sm_pHyAssets->LoadNodeData(this);
-}
-
-/*virtual*/ void IHyLoadable2d::Unload() /*override*/
-{
-	HyAssert(sm_pHyAssets, "IHyLoadable2d::Unload was invoked before engine has been initialized");
-	sm_pHyAssets->RemoveNodeData(this);
 }
 
 void IHyLoadable2d::SetTint(float fR, float fG, float fB)
@@ -210,7 +143,7 @@ void IHyLoadable2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 
 	if(IsDirty(DIRTY_Scissor))
 	{
-		if((m_uiExplicitFlags & EXPLICIT_Scissor) == 0 && m_pParent)
+		if((m_uiExplicitAndTypeFlags & EXPLICIT_Scissor) == 0 && m_pParent)
 			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
 		else
 		{
@@ -248,7 +181,7 @@ void IHyLoadable2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	m_pScissor->m_LocalScissorRect.height = uiHeight;
 	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Enabled;
 
-	m_uiExplicitFlags |= EXPLICIT_Scissor;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_Scissor;
 
 	GetWorldScissor(m_pScissor->m_WorldScissorRect);
 }
@@ -262,10 +195,10 @@ void IHyLoadable2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	m_pScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
 
 	if(bUseParentScissor == false)
-		m_uiExplicitFlags |= EXPLICIT_Scissor;
+		m_uiExplicitAndTypeFlags |= EXPLICIT_Scissor;
 	else
 	{
-		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Scissor;
 		if(m_pParent)
 			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
 	}
@@ -288,7 +221,7 @@ HyStencil *IHyLoadable2d::GetStencil() const
 	else
 		m_hStencil = pStencil->GetHandle();
 
-	m_uiExplicitFlags |= EXPLICIT_Stencil;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_Stencil;
 }
 
 /*virtual*/ void IHyLoadable2d::ClearStencil(bool bUseParentStencil)
@@ -296,10 +229,10 @@ HyStencil *IHyLoadable2d::GetStencil() const
 	m_hStencil = HY_UNUSED_HANDLE;
 
 	if(bUseParentStencil == false)
-		m_uiExplicitFlags |= EXPLICIT_Stencil;
+		m_uiExplicitAndTypeFlags |= EXPLICIT_Stencil;
 	else
 	{
-		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Stencil;
 		if(m_pParent)
 		{
 			HyStencil *pStencil = m_pParent->GetStencil();
@@ -316,13 +249,13 @@ int32 IHyLoadable2d::GetCoordinateSystem() const
 /*virtual*/ void IHyLoadable2d::UseCameraCoordinates()
 {
 	m_iCoordinateSystem = -1;
-	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_CoordinateSystem;
 }
 
 /*virtual*/ void IHyLoadable2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
 {
 	m_iCoordinateSystem = iWindowIndex;
-	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_CoordinateSystem;
 }
 
 int32 IHyLoadable2d::GetDisplayOrder() const
@@ -333,22 +266,17 @@ int32 IHyLoadable2d::GetDisplayOrder() const
 /*virtual*/ void IHyLoadable2d::SetDisplayOrder(int32 iOrderValue)
 {
 	m_iDisplayOrder = iOrderValue;
-	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_DisplayOrder;
 
 	HyScene::SetInstOrderingDirty();
-}
-
-const IHyNodeData *IHyLoadable2d::UncheckedGetData()
-{
-	return m_pData;
 }
 
 /*virtual*/ void IHyLoadable2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Scissor;
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Scissor))
 	{
 		if(m_pScissor == nullptr)
 			m_pScissor = HY_NEW ScissorRect();
@@ -360,27 +288,27 @@ const IHyNodeData *IHyLoadable2d::UncheckedGetData()
 /*virtual*/ void IHyLoadable2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Stencil;
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Stencil))
 		m_hStencil = hHandle;
 }
 
 /*virtual*/ void IHyLoadable2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_CoordinateSystem;
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_CoordinateSystem))
 		m_iCoordinateSystem = iWindowIndex;
 }
 
 /*virtual*/ int32 IHyLoadable2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_DisplayOrder;
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_DisplayOrder))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_DisplayOrder))
 	{
 		m_iDisplayOrder = iOrderValue;
 		iOrderValue += 1;
@@ -408,4 +336,9 @@ void IHyLoadable2d::CalculateColor()
 
 		ClearDirty(DIRTY_Color);
 	}
+}
+
+/*virtual*/ HyType IHyLoadable2d::_LoadableGetType() /*override*/
+{
+	return m_eTYPE;
 }

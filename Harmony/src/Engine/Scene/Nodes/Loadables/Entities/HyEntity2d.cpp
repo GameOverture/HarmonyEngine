@@ -33,7 +33,7 @@ HyEntity2d::~HyEntity2d(void)
 void HyEntity2d::SetEnabled(bool bEnabled, bool bOverrideExplicitChildren)
 {
 	m_bEnabled = bEnabled;
-	m_uiExplicitFlags |= EXPLICIT_Enabled;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_Enabled;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetEnabled(bEnabled, bOverrideExplicitChildren);
@@ -58,7 +58,7 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 	}
 
 	m_bPauseOverride = bUpdateWhenPaused;
-	m_uiExplicitFlags |= EXPLICIT_PauseUpdate;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_PauseUpdate;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bOverrideExplicitChildren);
@@ -295,8 +295,11 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 {
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(m_ChildList[i]->IsLoaded() == false)
-			return false;
+		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
+		{
+			if(static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoaded() == false)
+				return false;
+		}
 	}
 
 	return true;
@@ -306,14 +309,20 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 {
 	// Load any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->Load();
+	{
+		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
+			static_cast<IHyLoadable2d *>(m_ChildList[i])->Load();
+	}
 }
 
 /*virtual*/ void HyEntity2d::Unload() /*override*/
 {
 	// Unload any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->Unload();
+	{
+		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
+			static_cast<IHyLoadable2d *>(m_ChildList[i])->Unload();
+	}
 }
 
 /*virtual*/ void HyEntity2d::NodeUpdate() /*override final*/
@@ -411,7 +420,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
 	IHyNode::_SetEnabled(bEnabled, bIsOverriding);
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Enabled))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Enabled))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			m_ChildList[i]->_SetEnabled(m_bEnabled, bIsOverriding);
@@ -422,7 +431,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
 	IHyNode::_SetPauseUpdate(bUpdateWhenPaused, bIsOverriding);
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_PauseUpdate))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_PauseUpdate))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bIsOverriding);
@@ -433,7 +442,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
 	IHyLoadable2d::_SetScissor(worldScissorRectRef, bIsOverriding);
 	
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Scissor))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Scissor))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			m_ChildList[i]->_SetScissor(m_pScissor->m_WorldScissorRect, bIsOverriding);
@@ -444,7 +453,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
 	IHyLoadable2d::_SetStencil(hHandle, bIsOverriding);
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Stencil))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Stencil))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			m_ChildList[i]->_SetStencil(m_hStencil, bIsOverriding);
@@ -455,7 +464,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
 	IHyLoadable2d::_SetCoordinateSystem(iWindowIndex, bIsOverriding);
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_CoordinateSystem))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_CoordinateSystem))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			m_ChildList[i]->_SetCoordinateSystem(iWindowIndex, bIsOverriding);
@@ -466,7 +475,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 {
 	IHyLoadable2d::_SetDisplayOrder(iOrderValue, bIsOverriding);
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_DisplayOrder))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_DisplayOrder))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 			iOrderValue = m_ChildList[i]->_SetDisplayOrder(iOrderValue, bIsOverriding);

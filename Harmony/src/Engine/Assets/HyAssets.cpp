@@ -10,8 +10,7 @@
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
-#include "Scene/Nodes/Loadables/IHyLoadable2d.h"
-#include "Scene/Nodes/Loadables/IHyLoadable3d.h"
+#include "Scene/Nodes/Loadables/IHyLoadable.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
 #include "Assets/Nodes/HySprite2dData.h"
@@ -68,15 +67,13 @@ HyAssets::HyAssets(std::string sDataDirPath) :	IHyThreadClass(),
 												m_pLoadedAtlasIndices(nullptr),
 												m_bProcessThread(false)
 {
-	IHyLoadable2d::sm_pHyAssets = this;
-	IHyLoadable3d::sm_pHyAssets = this;
+	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
 }
 
 HyAssets::~HyAssets()
 {
-	IHyLoadable2d::sm_pHyAssets = nullptr;
-	IHyLoadable3d::sm_pHyAssets = nullptr;
+	IHyLoadable::sm_pHyAssets = nullptr;
 
 	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
 
@@ -136,9 +133,9 @@ HyAtlasIndices *HyAssets::GetLoadedAtlases()
 	return m_pLoadedAtlasIndices;
 }
 
-void HyAssets::AcquireNodeData(IHyLoadable2d *pLoadable, const IHyNodeData *&pDataOut)
+void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut)
 {
-	switch(pLoadable->GetType())
+	switch(pLoadable->_LoadableGetType())
 	{
 	case HYTYPE_Sprite2d:
 		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
@@ -164,7 +161,7 @@ void HyAssets::AcquireNodeData(IHyLoadable2d *pLoadable, const IHyNodeData *&pDa
 	}
 }
 
-void HyAssets::LoadNodeData(IHyLoadable2d *pLoadable)
+void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 {
 	if(pLoadable->m_eLoadState != HYLOADSTATE_Inactive || pLoadable->IsLoadDataValid() == false)
 		return;
@@ -201,7 +198,7 @@ void HyAssets::LoadNodeData(IHyLoadable2d *pLoadable)
 	}
 }
 
-void HyAssets::RemoveNodeData(IHyLoadable2d *pLoadable)
+void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 {
 	if(pLoadable->m_eLoadState == HYLOADSTATE_Inactive)
 		return;
@@ -246,7 +243,7 @@ void HyAssets::RemoveNodeData(IHyLoadable2d *pLoadable)
 	pLoadable->OnUnloaded();
 }
 
-bool HyAssets::IsInstLoaded(IHyLoadable2d *pLoadable)
+bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 {
 	// Atlases check
 	if(pLoadable->AcquireData() != nullptr)
@@ -262,7 +259,7 @@ bool HyAssets::IsInstLoaded(IHyLoadable2d *pLoadable)
 // Unload everything
 void HyAssets::Shutdown()
 {
-	std::vector<IHyLoadable2d *> vReloadInsts;
+	std::vector<IHyLoadable *> vReloadInsts;
 	vReloadInsts = m_FullyLoadedList;
 
 	for(uint32 i = 0; i < m_QueuedInst2dList.size(); ++i)
@@ -598,7 +595,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 	}
 }
 
-void HyAssets::SetInstAsLoaded(IHyLoadable2d *pLoadable)
+void HyAssets::SetInstAsLoaded(IHyLoadable *pLoadable)
 {
 	pLoadable->m_eLoadState = HYLOADSTATE_Loaded;
 	pLoadable->OnLoaded();

@@ -12,6 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
 #include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Drawables/IHyDrawable3d.h"
 #include "Scene/Nodes/Loadables/Drawables/HySprite2d.h"
 #include "Scene/Nodes/Loadables/Drawables/HySpine2d.h"
 #include "Scene/Nodes/Loadables/Drawables/HyPrimitive2d.h"
@@ -80,20 +81,38 @@ HyScene::~HyScene(void)
 	}
 }
 
-void HyScene::AddNode_Loaded(IHyDrawable2d *pInst)
+void HyScene::AddNode_Loaded(IHyDrawable2d *pDrawable)
 {
-	m_NodeList_Loaded.push_back(pInst);
+	m_NodeList_Loaded.push_back(pDrawable);
 	sm_bInst2dOrderingDirty = true;
 }
 
-void HyScene::RemoveNode_Loaded(const IHyDrawable2d *pInst)
+void HyScene::AddNode_Loaded(IHyDrawable3d *pDrawable)
+{
+	m_LoadedInst3dList.push_back(pDrawable);
+}
+
+void HyScene::RemoveNode_Loaded(const IHyDrawable2d *pDrawable)
 {
 	for(auto it = m_NodeList_Loaded.begin(); it != m_NodeList_Loaded.end(); ++it)
 	{
-		if((*it) == pInst)
+		if((*it) == pDrawable)
 		{
 			// TODO: Log about erasing instance
 			m_NodeList_Loaded.erase(it);
+			break;
+		}
+	}
+}
+
+void HyScene::RemoveNode_Loaded(const IHyDrawable3d *pDrawable)
+{
+	for(auto it = m_LoadedInst3dList.begin(); it != m_LoadedInst3dList.end(); ++it)
+	{
+		if((*it) == pDrawable)
+		{
+			// TODO: Log about erasing instance
+			m_LoadedInst3dList.erase(it);
 			break;
 		}
 	}

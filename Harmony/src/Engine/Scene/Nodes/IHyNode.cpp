@@ -13,7 +13,7 @@
 
 IHyNode::IHyNode(HyType eNodeType) :	m_eTYPE(eNodeType),
 										m_uiDirtyFlags(0),
-										m_uiExplicitFlags(0),
+										m_uiExplicitAndTypeFlags(0),
 										m_bEnabled(true),
 										m_bPauseOverride(false),
 										m_iTag(0)
@@ -23,7 +23,7 @@ IHyNode::IHyNode(HyType eNodeType) :	m_eTYPE(eNodeType),
 
 IHyNode::IHyNode(const IHyNode &copyRef) :	m_eTYPE(copyRef.m_eTYPE),
 											m_uiDirtyFlags(copyRef.m_uiDirtyFlags),
-											m_uiExplicitFlags(copyRef.m_uiExplicitFlags),
+											m_uiExplicitAndTypeFlags(copyRef.m_uiExplicitAndTypeFlags),
 											m_bEnabled(copyRef.m_bEnabled),
 											m_bPauseOverride(copyRef.m_bPauseOverride),
 											m_iTag(copyRef.m_iTag)
@@ -47,7 +47,7 @@ const IHyNode &IHyNode::operator=(const IHyNode &rhs)
 	HyAssert(m_eTYPE == rhs.m_eTYPE, "IHyNode::operator= cannot assign from a different HyType");
 
 	m_uiDirtyFlags = rhs.m_uiDirtyFlags;
-	m_uiExplicitFlags = rhs.m_uiExplicitFlags;
+	m_uiExplicitAndTypeFlags = rhs.m_uiExplicitAndTypeFlags;
 	m_bEnabled = rhs.m_bEnabled;
 
 	if(m_bPauseOverride != rhs.m_bPauseOverride)
@@ -77,7 +77,7 @@ bool IHyNode::IsEnabled() const
 /*virtual*/ void IHyNode::SetEnabled(bool bEnabled)
 {
 	m_bEnabled = bEnabled;
-	m_uiExplicitFlags |= EXPLICIT_Enabled;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_Enabled;
 }
 
 /*virtual*/ void IHyNode::SetPauseUpdate(bool bUpdateWhenPaused)
@@ -94,7 +94,7 @@ bool IHyNode::IsEnabled() const
 	}
 
 	m_bPauseOverride = bUpdateWhenPaused;
-	m_uiExplicitFlags |= EXPLICIT_PauseUpdate;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_PauseUpdate;
 }
 
 int64 IHyNode::GetTag() const
@@ -110,18 +110,18 @@ void IHyNode::SetTag(int64 iTag)
 /*virtual*/ void IHyNode::_SetEnabled(bool bEnabled, bool bIsOverriding)
 {
 	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_Enabled;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Enabled;
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_Enabled))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Enabled))
 		m_bEnabled = bEnabled;
 }
 
 /*virtual*/ void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
 {
 	if(bIsOverriding)
-		m_uiExplicitFlags &= ~EXPLICIT_PauseUpdate;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_PauseUpdate;
 
-	if(0 == (m_uiExplicitFlags & EXPLICIT_PauseUpdate))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_PauseUpdate))
 	{
 		if(bUpdateWhenPaused)
 		{

@@ -11,7 +11,7 @@
 #include "Scene/HyScene.h"
 #include "HyEngine.h"
 
-HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyLoadable3d(HYTYPE_Entity3d, pParent)
+HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyLoadable3d(HYTYPE_Entity3d, szPrefix, szName, pParent)
 {
 }
 
