@@ -63,17 +63,6 @@ public:
 protected:
 	virtual void PhysicsUpdate() override final;
 	virtual void NodeUpdate() override = 0;
-
-	// Internal Entity propagation function overrides
-	// These will be overridden with proper functionality later in hierarchy
-	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) 	{ }
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)							{ return iOrderValue; }
-	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding)						{ }
-	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding)							{ }
-
-	//virtual bool IsLoaded() const { return true; }
-	//virtual void Load() { }
-	//virtual void Unload() { }
 };
 
 #endif /* IHyNode2d_h__ */

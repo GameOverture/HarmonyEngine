@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Scene/Nodes/Loadables/IHyVisable.h"
 #include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity3d.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/IHyNode.h"
 #include "Renderer/IHyRenderer.h"
@@ -74,14 +75,24 @@ void IHyVisable::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 
 	if(_VisableGetNodeRef().IsDirty(IHyNode::DIRTY_Scissor))
 	{
-		if((_VisableGetNodeRef().m_uiExplicitAndTypeFlags & IHyNode::EXPLICIT_Scissor) == 0 && m_pParent)
-			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+		bool bHasParent = (_VisableGetParent2dPtr() != nullptr || _VisableGetParent3dPtr() != nullptr);
+		if((_VisableGetNodeRef().m_uiExplicitAndTypeFlags & IHyNode::EXPLICIT_Scissor) == 0 && bHasParent)
+		{
+			if(_VisableGetParent2dPtr())
+				_VisableGetParent2dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+			else
+				_VisableGetParent3dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+		}
 		else
 		{
 			if(m_pScissor->m_LocalScissorRect.iTag == SCISSORTAG_Enabled)
 			{
 				glm::mat4 mtx;
-				_VisableGetNodeRef().GetWorldTransform(mtx);
+
+				if((_VisableGetNodeRef().m_uiExplicitAndTypeFlags & IHyNode::NODETYPE_Is2d) != 0)
+					static_cast<IHyNode2d &>(_VisableGetNodeRef()).GetWorldTransform(mtx);
+				else
+					static_cast<IHyNode3d &>(_VisableGetNodeRef()).GetWorldTransform(mtx);
 
 				m_pScissor->m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_pScissor->m_LocalScissorRect.x);
 				m_pScissor->m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_pScissor->m_LocalScissorRect.y);
@@ -130,8 +141,13 @@ void IHyVisable::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	else
 	{
 		_VisableGetNodeRef().m_uiExplicitAndTypeFlags &= ~IHyNode::EXPLICIT_Scissor;
-		if(m_pParent)
-			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+		if(_VisableGetParent2dPtr() != nullptr || _VisableGetParent3dPtr() != nullptr)
+		{
+			if(_VisableGetParent2dPtr())
+				_VisableGetParent2dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+			else
+				_VisableGetParent3dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+		}
 	}
 }
 
@@ -164,9 +180,15 @@ HyStencil *IHyVisable::GetStencil() const
 	else
 	{
 		_VisableGetNodeRef().m_uiExplicitAndTypeFlags &= ~IHyNode::EXPLICIT_Stencil;
-		if(m_pParent)
+		if(_VisableGetParent2dPtr() != nullptr || _VisableGetParent3dPtr() != nullptr)
 		{
-			HyStencil *pStencil = m_pParent->GetStencil();
+			HyStencil *pStencil = nullptr;
+			
+			if(_VisableGetParent2dPtr())
+				pStencil = _VisableGetParent2dPtr()->GetStencil();
+			else
+				pStencil = _VisableGetParent3dPtr()->GetStencil();
+
 			m_hStencil = pStencil ? pStencil->GetHandle() : HY_UNUSED_HANDLE;
 		}
 	}
@@ -203,7 +225,7 @@ int32 IHyVisable::GetCoordinateSystem() const
 	}
 }
 
-/*virtual*/ void IHyVisable::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyVisable::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		_VisableGetNodeRef().m_uiExplicitAndTypeFlags &= ~IHyNode::EXPLICIT_Stencil;
@@ -212,7 +234,7 @@ int32 IHyVisable::GetCoordinateSystem() const
 		m_hStencil = hHandle;
 }
 
-/*virtual*/ void IHyVisable::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyVisable::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		_VisableGetNodeRef().m_uiExplicitAndTypeFlags &= ~IHyNode::EXPLICIT_CoordinateSystem;

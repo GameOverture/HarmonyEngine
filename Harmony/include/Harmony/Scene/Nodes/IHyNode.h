@@ -49,9 +49,10 @@ protected:
 	};
 	enum NodeTypeFlags // NOTE: continue the bits in ExplicitFlags (stored in same 32bit member)
 	{
-		NODETYPE_IsLoadable			= 1 << 6,
-		NODETYPE_IsDrawable			= 1 << 7,
-		NODETYPE_IsVisable			= 1 << 8,
+		NODETYPE_Is2d				= 1 << 6,
+		NODETYPE_IsLoadable			= 1 << 7,
+		NODETYPE_IsDrawable			= 1 << 8,
+		NODETYPE_IsVisable			= 1 << 9,
 	};
 	uint32							m_uiExplicitAndTypeFlags;
 

@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Scene/Nodes/Loadables/IHyVisable2d.h"
 #include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity3d.h"
 #include "Scene/HyScene.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
@@ -109,7 +110,7 @@ int32 IHyVisable2d::GetDisplayOrder() const
 	HyScene::SetInstOrderingDirty();
 }
 
-/*virtual*/ int32 IHyVisable2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
+/*virtual*/ int32 IHyVisable2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		m_uiExplicitAndTypeFlags &= ~EXPLICIT_DisplayOrder;
@@ -147,4 +148,14 @@ void IHyVisable2d::CalculateColor()
 /*virtual*/ IHyNode &IHyVisable2d::_VisableGetNodeRef() /*override final*/
 {
 	return *this;
+}
+
+/*virtual*/ HyEntity2d *IHyVisable2d::_VisableGetParent2dPtr() /*override final*/
+{
+	return m_pParent;
+}
+
+/*virtual*/ HyEntity3d *IHyVisable2d::_VisableGetParent3dPtr() /*override final*/
+{
+	return nullptr;
 }

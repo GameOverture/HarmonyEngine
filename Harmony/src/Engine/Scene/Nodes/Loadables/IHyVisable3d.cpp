@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/Loadables/IHyVisable3d.h"
-#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity3d.h"
 #include "Scene/HyScene.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
@@ -100,4 +100,14 @@ void IHyVisable3d::CalculateColor()
 /*virtual*/ IHyNode &IHyVisable3d::_VisableGetNodeRef() /*override final*/
 {
 	return *this;
+}
+
+/*virtual*/ HyEntity2d *IHyVisable3d::_VisableGetParent2dPtr() /*override final*/
+{
+	return nullptr;
+}
+
+/*virtual*/ HyEntity3d *IHyVisable3d::_VisableGetParent3dPtr() /*override final*/
+{
+	return m_pParent;
 }

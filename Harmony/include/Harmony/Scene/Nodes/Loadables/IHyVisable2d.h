@@ -18,6 +18,8 @@
 
 class IHyVisable2d : public IHyLoadable2d, public IHyVisable
 {
+	friend class HyEntity2d;
+
 protected:
 	float							m_fAlpha;
 	float							m_fCachedAlpha;
@@ -52,12 +54,14 @@ protected:
 	virtual void NodeUpdate() = 0;
 
 	// Internal Entity propagation function overrides
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override;
+	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding);
 
 private:
 	void CalculateColor();
 
 	virtual IHyNode &_VisableGetNodeRef() override final;
+	virtual HyEntity2d *_VisableGetParent2dPtr() override final;
+	virtual HyEntity3d *_VisableGetParent3dPtr() override final;
 };
 
 #endif /* IHyVisable2d_h__ */

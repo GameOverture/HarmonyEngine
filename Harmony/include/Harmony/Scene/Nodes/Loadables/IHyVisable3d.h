@@ -44,6 +44,8 @@ private:
 	void CalculateColor();
 
 	virtual IHyNode &_VisableGetNodeRef() override final;
+	virtual HyEntity2d *_VisableGetParent2dPtr() override final;
+	virtual HyEntity3d *_VisableGetParent3dPtr() override final;
 };
 
 #endif /* IHyVisable3d_h__ */

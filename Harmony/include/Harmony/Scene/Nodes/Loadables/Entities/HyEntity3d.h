@@ -11,9 +11,9 @@
 #define HyEntity3d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/IHyLoadable3d.h"
+#include "Scene/Nodes/Loadables/IHyVisable3d.h"
 
-class HyEntity3d : public IHyLoadable3d
+class HyEntity3d : public IHyVisable3d
 {
 protected:
 	std::vector<IHyNode3d *>		m_ChildList;

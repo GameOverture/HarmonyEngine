@@ -16,6 +16,8 @@
 #include "Utilities/HyMath.h"
 
 class IHyNode;
+class HyEntity2d;
+class HyEntity3d;
 
 class IHyVisable
 {
@@ -67,6 +69,8 @@ protected:
 
 private:
 	virtual IHyNode &_VisableGetNodeRef() = 0;
+	virtual HyEntity2d *_VisableGetParent2dPtr() = 0;
+	virtual HyEntity3d *_VisableGetParent3dPtr() = 0;
 };
 
 #endif /* IHyVisable_h__ */

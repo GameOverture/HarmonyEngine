@@ -21,6 +21,8 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 																scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
+	m_uiExplicitAndTypeFlags |= NODETYPE_Is2d;
+
 	if(m_pParent)
 		m_pParent->ChildAppend(*this);
 
