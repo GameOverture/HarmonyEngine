@@ -21,6 +21,8 @@ class HyEntity3d;
 
 class IHyVisable
 {
+	friend class HyRenderState;
+
 protected:
 	enum ScissorTag
 	{
@@ -63,7 +65,7 @@ protected:
 	virtual void NodeUpdate() = 0;
 
 	// Internal Entity propagation function overrides
-	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding);
+	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding);
 	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding);
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding);
 

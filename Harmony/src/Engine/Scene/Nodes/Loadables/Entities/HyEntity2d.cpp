@@ -76,7 +76,7 @@ void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-			static_cast<IHyVisable2d *>(m_ChildList[i])->_SetScissor(m_pScissor->m_WorldScissorRect, bOverrideExplicitChildren);
+			static_cast<IHyVisable2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bOverrideExplicitChildren);
 	}
 }
 
@@ -92,7 +92,7 @@ void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChil
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-			static_cast<IHyVisable2d *>(m_ChildList[i])->_SetScissor(m_pScissor->m_WorldScissorRect, bOverrideExplicitChildren);
+			static_cast<IHyVisable2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bOverrideExplicitChildren);
 	}
 }
 
@@ -428,7 +428,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 		static_cast<IHyVisable2d &>(childInst)._SetCoordinateSystem(m_iCoordinateSystem, false);
 
 		if(m_pScissor != nullptr)
-			static_cast<IHyVisable2d &>(childInst)._SetScissor(m_pScissor->m_WorldScissorRect, false);
+			static_cast<IHyVisable2d &>(childInst)._SetScissor(m_pScissor, false);
 
 		int32 iOrderValue = m_iDisplayOrder;
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
@@ -469,16 +469,16 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
 	}
 }
 
-/*virtual*/ void HyEntity2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override final*/
+/*virtual*/ void HyEntity2d::_SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding) /*override final*/
 {
-	IHyVisable2d::_SetScissor(worldScissorRectRef, bIsOverriding);
+	IHyVisable2d::_SetScissor(pParentScissor, bIsOverriding);
 	
 	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Scissor))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
 			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-				static_cast<IHyVisable2d *>(m_ChildList[i])->_SetScissor(m_pScissor->m_WorldScissorRect, bIsOverriding);
+				static_cast<IHyVisable2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bIsOverriding);
 		}
 	}
 }

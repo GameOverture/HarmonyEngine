@@ -97,7 +97,7 @@ protected:
 
 	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override final;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
-	virtual void _SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) override final;
+	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding) override final;
 	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override final;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override final;

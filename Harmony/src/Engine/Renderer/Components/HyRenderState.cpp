@@ -24,8 +24,6 @@ HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOf
 																																m_uiExDataSize(0)
 {
 	HyAssert(m_hShader != HY_UNUSED_HANDLE, "HyRenderState was assigned a null shader");
-
-	m_ScissorRect.iTag = HY_UNUSED_HANDLE;
 	instanceRef.GetWorldScissor(m_ScissorRect);
 
 	switch(instanceRef.GetType())
@@ -93,7 +91,7 @@ uint32 HyRenderState::GetNumVerticesPerInstance() const
 
 bool HyRenderState::IsScissorRect() const
 {
-	return m_ScissorRect.iTag != 0;
+	return m_ScissorRect.iTag != IHyVisable::SCISSORTAG_Disabled;
 }
 
 const HyScreenRect<int32> &HyRenderState::GetScissorRect() const

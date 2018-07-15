@@ -71,7 +71,10 @@ void IHyVisable::GetLocalScissor(HyScreenRect<int32> &scissorOut) const
 void IHyVisable::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 {
 	if(m_pScissor == nullptr)
+	{
+		scissorOut.iTag = SCISSORTAG_Disabled;
 		return;
+	}
 
 	if(_VisableGetNodeRef().IsDirty(IHyNode::DIRTY_Scissor))
 	{
@@ -124,6 +127,7 @@ void IHyVisable::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Enabled;
 
 	_VisableGetNodeRef().m_uiExplicitAndTypeFlags |= IHyNode::EXPLICIT_Scissor;
+	_VisableGetNodeRef().SetDirty(IHyNode::DIRTY_Scissor);
 
 	GetWorldScissor(m_pScissor->m_WorldScissorRect);
 }
@@ -211,17 +215,25 @@ int32 IHyVisable::GetCoordinateSystem() const
 	_VisableGetNodeRef().m_uiExplicitAndTypeFlags |= IHyNode::EXPLICIT_CoordinateSystem;
 }
 
-/*virtual*/ void IHyVisable::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyVisable::_SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		_VisableGetNodeRef().m_uiExplicitAndTypeFlags &= ~IHyNode::EXPLICIT_Scissor;
 
 	if(0 == (_VisableGetNodeRef().m_uiExplicitAndTypeFlags & IHyNode::EXPLICIT_Scissor))
 	{
-		if(m_pScissor == nullptr)
-			m_pScissor = HY_NEW ScissorRect();
+		if(pParentScissor)
+		{
+			if(m_pScissor == nullptr)
+				m_pScissor = HY_NEW ScissorRect();
 
-		m_pScissor->m_WorldScissorRect = worldScissorRectRef;
+			m_pScissor->m_WorldScissorRect = pParentScissor->m_WorldScissorRect;
+		}
+		else
+		{
+			delete m_pScissor;
+			m_pScissor = nullptr;
+		}
 	}
 }
 
