@@ -10,6 +10,7 @@
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
 #include "Scene/Nodes/Draws/Entities/HyEntity3d.h"
 #include "Renderer/IHyRenderer.h"
+#include "Renderer/Effects/HyStencil.h"
 
 IHyDraw3d::IHyDraw3d(HyType eNodeType, HyEntity3d *pParent) :	IHyNode3d(eNodeType, pParent),
 																m_fAlpha(1.0f),
@@ -128,6 +129,40 @@ void IHyDraw3d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	scissorOut = m_pScissor->m_WorldScissorRect;
 }
 
+/*virtual*/ void IHyDraw3d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
+{
+	if(m_pScissor == nullptr)
+		m_pScissor = HY_NEW ScissorRect();
+
+	m_pScissor->m_LocalScissorRect.x = uiLocalX;
+	m_pScissor->m_LocalScissorRect.y = uiLocalY;
+	m_pScissor->m_LocalScissorRect.width = uiWidth;
+	m_pScissor->m_LocalScissorRect.height = uiHeight;
+	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Enabled;
+
+	m_uiExplicitFlags |= EXPLICIT_Scissor;
+
+	GetWorldScissor(m_pScissor->m_WorldScissorRect);
+}
+
+/*virtual*/ void IHyDraw3d::ClearScissor(bool bUseParentScissor)
+{
+	if(m_pScissor == nullptr)
+		return;
+
+	m_pScissor->m_LocalScissorRect.iTag = SCISSORTAG_Disabled;
+	m_pScissor->m_WorldScissorRect.iTag = SCISSORTAG_Disabled;
+
+	if(bUseParentScissor == false)
+		m_uiExplicitFlags |= EXPLICIT_Scissor;
+	else
+	{
+		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
+		if(m_pParent)
+			m_pParent->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+	}
+}
+
 bool IHyDraw3d::IsStencilSet() const
 {
 	return m_hStencil != HY_UNUSED_HANDLE;
@@ -138,3 +173,46 @@ HyStencil *IHyDraw3d::GetStencil() const
 	return IHyRenderer::FindStencil(m_hStencil);
 }
 
+/*virtual*/ void IHyDraw3d::SetStencil(HyStencil *pStencil)
+{
+	if(pStencil == nullptr)
+		m_hStencil = HY_UNUSED_HANDLE;
+	else
+		m_hStencil = pStencil->GetHandle();
+
+	m_uiExplicitFlags |= EXPLICIT_Stencil;
+}
+
+/*virtual*/ void IHyDraw3d::ClearStencil(bool bUseParentStencil)
+{
+	m_hStencil = HY_UNUSED_HANDLE;
+
+	if(bUseParentStencil == false)
+		m_uiExplicitFlags |= EXPLICIT_Stencil;
+	else
+	{
+		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
+		if(m_pParent)
+		{
+			HyStencil *pStencil = m_pParent->GetStencil();
+			m_hStencil = pStencil ? pStencil->GetHandle() : HY_UNUSED_HANDLE;
+		}
+	}
+}
+
+int32 IHyDraw3d::GetCoordinateSystem() const
+{
+	return m_iCoordinateSystem;
+}
+
+/*virtual*/ void IHyDraw3d::UseCameraCoordinates()
+{
+	m_iCoordinateSystem = -1;
+	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+}
+
+/*virtual*/ void IHyDraw3d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
+{
+	m_iCoordinateSystem = iWindowIndex;
+	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
+}

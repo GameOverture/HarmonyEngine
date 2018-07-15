@@ -13,11 +13,10 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/HyAtlas.h"
 #include "Assets/Loadables/HyAtlasIndices.h"
-#include "Scene/HyScene.h"
 #include "Threading/IHyThreadClass.h"
 
 class IHyRenderer;
-class IHyDrawInst2d;
+class IHyDraw2d;
 class IHyNodeData;
 class HyAudioData;
 class HySprite2dData;
@@ -30,8 +29,6 @@ class HyAssets : public IHyThreadClass
 {
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
-
-	HyScene &													m_SceneRef;
 
 	HyAtlas *													m_pAtlases;
 	uint32														m_uiNumAtlases;
@@ -54,7 +51,8 @@ class HyAssets : public IHyThreadClass
 	Factory<HyText2dData>										m_FontFactory;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
-	std::vector<IHyDrawInst2d *>								m_QueuedInst2dList;
+	std::vector<IHyDraw2d *>									m_QueuedInst2dList;
+	std::vector<IHyDraw2d *>									m_FullyLoadedList;
 	std::vector<IHyLoadableData *>								m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
@@ -73,7 +71,7 @@ class HyAssets : public IHyThreadClass
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public:
-	HyAssets(std::string sDataDirPath, HyScene &sceneRef);
+	HyAssets(std::string sDataDirPath);
 	virtual ~HyAssets();
 
 	bool IsInitialized();
@@ -85,10 +83,10 @@ public:
 	uint32 GetNumAtlases();
 	HyAtlasIndices *GetLoadedAtlases();
 
-	void GetNodeData(IHyDrawInst2d *pDrawInst2d, const IHyNodeData *&pDataOut);
-	void LoadNodeData(IHyDrawInst2d *pDrawInst2d);
-	void RemoveNodeData(IHyDrawInst2d *pDrawInst2d);
-	bool IsInstLoaded(IHyDrawInst2d *pDrawInst2d);
+	void AcquireNodeData(IHyDraw2d *pLoadable, const IHyNodeData *&pDataOut);
+	void LoadNodeData(IHyDraw2d *pLoadable);
+	void RemoveNodeData(IHyDraw2d *pLoadable);
+	bool IsInstLoaded(IHyDraw2d *pLoadable);
 
 	void Shutdown();
 	bool IsShutdown();
@@ -105,7 +103,7 @@ private:
 	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
 
-	void SetInstAsLoaded(IHyDrawInst2d *pDrawInst2d);
+	void SetInstAsLoaded(IHyDraw2d *pLoadable);
 };
 
 #endif /* HyAssets_h__ */

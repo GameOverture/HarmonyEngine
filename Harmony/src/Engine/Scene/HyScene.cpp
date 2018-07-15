@@ -11,6 +11,7 @@
 #include "HyEngine.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
+#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
 #include "Scene/Nodes/Draws/Instances/HySprite2d.h"
 #include "Scene/Nodes/Draws/Instances/HySpine2d.h"
 #include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
@@ -28,6 +29,8 @@ HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f
 															m_WindowListRef(WindowListRef),
 															m_bPauseGame(false)
 {
+	IHyDrawInst2d::sm_pScene = this;
+
 	m_b2World.SetDebugDraw(&m_DrawPhys2d);
 	m_b2World.SetContactListener(&m_Phys2dContactListener);
 	
@@ -83,7 +86,7 @@ void HyScene::AddNode_Loaded(IHyDrawInst2d *pInst)
 	sm_bInst2dOrderingDirty = true;
 }
 
-void HyScene::RemoveNode_Loaded(IHyDrawInst2d *pInst)
+void HyScene::RemoveNode_Loaded(const IHyDrawInst2d *pInst)
 {
 	for(auto it = m_NodeList_Loaded.begin(); it != m_NodeList_Loaded.end(); ++it)
 	{
@@ -151,14 +154,6 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	rendererRef.PrepareBuffers();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Sort 2d draw instances based on their display order
-	if(sm_bInst2dOrderingDirty)
-	{
-		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);
-		sm_bInst2dOrderingDirty = false;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Append 3d Render States to buffer
 	uint32 uiTotalNumInsts = static_cast<uint32>(m_LoadedInst3dList.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
@@ -166,11 +161,18 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		//if(m_LoadedInst3dList[i]->IsValid() == false)
 		//	continue;
 
-		rendererRef.AppendRenderState(i, *m_NodeList_Loaded[i], HY_FULL_CULL_MASK);
+		//rendererRef.AppendRenderState(i, *m_NodeList_Loaded[i], HY_FULL_CULL_MASK);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Append 2d Render States to buffer
+
+	// Sort 2d draw instances based on their display order
+	if(sm_bInst2dOrderingDirty)
+	{
+		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);
+		sm_bInst2dOrderingDirty = false;
+	}
 
 	// TODO: JAY FIX CULLING ISSUE
 	uint32 uiCullMask = HY_FULL_CULL_MASK;//0;

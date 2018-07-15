@@ -12,7 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Draws/IHyDraw2d.h"
-#include "Assets/Nodes/IHyNodeData.h"
 #include "Renderer/Effects/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
@@ -21,18 +20,12 @@ class HyPortal2d;
 
 class IHyDrawInst2d : public IHyDraw2d
 {
+	friend class HyScene;
 	friend class IHyRenderer;
-	friend class HyAssets;
 	friend class HyShape2d;
 
 protected:
-	static HyAssets *				sm_pHyAssets;
-
-	HyLoadState						m_eLoadState;
-
-	const IHyNodeData *				m_pData;
-	std::string						m_sName;
-	std::string						m_sPrefix;
+	static HyScene *				sm_pScene;
 
 	HyShaderHandle					m_hShader;
 	HyRenderMode					m_eRenderMode;
@@ -51,13 +44,8 @@ public:
 
 	bool IsValid();
 
-	const std::string &GetName() const;
-	const std::string &GetPrefix() const;
-
 	HyRenderMode GetRenderMode() const;
 	HyTextureHandle GetTextureHandle() const;
-
-	const IHyNodeData *AcquireData();
 
 	const HyShape2d &GetLocalBoundingVolume();
 	virtual const b2AABB &GetWorldAABB() override;
@@ -66,27 +54,19 @@ public:
 	void SetShader(HyShader *pShader);
 	HyShaderHandle GetShaderHandle();
 
-	virtual bool IsLoaded() const override;
-	virtual void Load() override final;
-	virtual void Unload() override final;
-
-	virtual bool IsLoadDataValid() { return true; }						// Optional public override for derived classes
-
 protected:
 	virtual void NodeUpdate() override final;
 
-	const IHyNodeData *UncheckedGetData();								// Used internally when it's guaranteed that data has already been acquired for this instance
 	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
-	// Optional overrides for derived classes
+	virtual void OnLoaded() override;									// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
+	virtual void OnUnloaded() override;									// HyAssets invokes this instance's data has been erased
 	virtual bool OnIsValid() { return true; }
 	virtual void OnShapeSet(HyShape2d *pShape) { }
 	virtual void CalcBoundingVolume() { }
-	virtual void DrawLoadedUpdate() { }									// Invoked once after OnLoaded(), then once every frame (guarenteed to only be invoked if this instance is loaded)
-	virtual void OnDataAcquired() { }									// Invoked once on the first time this node's data is queried
-	virtual void OnLoaded() { }											// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteVertexData(char *&pRefDataWritePos) { }			// This function is responsible for incrementing the passed in reference pointer the size of the data written
+
 
 #ifdef HY_PLATFORM_GUI
 public:

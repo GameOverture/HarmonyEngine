@@ -124,6 +124,8 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 
 /*virtual*/ void HyTexturedQuad2d::OnLoaded() /*override*/
 {
+	IHyDrawInst2d::OnLoaded();
+
 	if(m_bIsRaw == false)
 		m_hTextureHandle = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
 }

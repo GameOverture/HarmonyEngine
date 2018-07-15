@@ -56,7 +56,7 @@ public:
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
 	void AddNode_Loaded(IHyDrawInst2d *pInst);
-	void RemoveNode_Loaded(IHyDrawInst2d *pInst);
+	void RemoveNode_Loaded(const IHyDrawInst2d *pInst);
 
 	void CopyAllLoadedNodes(std::vector<IHyDrawInst2d *> &nodeListOut);
 

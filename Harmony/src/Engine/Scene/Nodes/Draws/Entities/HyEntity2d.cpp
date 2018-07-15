@@ -12,7 +12,7 @@
 #include "Renderer/Effects/HyStencil.h"
 #include "HyEngine.h"
 
-HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Entity2d, pParent),
+HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyDraw2d(HYTYPE_Entity2d, nullptr, nullptr, pParent),
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
 															m_pMouseInputUserParam(nullptr)

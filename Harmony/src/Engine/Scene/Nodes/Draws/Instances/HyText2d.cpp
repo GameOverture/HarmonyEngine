@@ -371,6 +371,8 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnDataAcquired() /*override*/
 {
+	IHyDrawInst2d::OnDataAcquired();
+
 	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
 
 	for(uint32 i = 0; i < m_StateColors.size(); ++i)
@@ -400,6 +402,8 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnLoaded() /*override*/
 {
+	IHyDrawInst2d::OnLoaded();
+
 	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
 	if(pTextData == nullptr)
 		return;

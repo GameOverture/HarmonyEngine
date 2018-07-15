@@ -405,6 +405,8 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 /*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
 {
+	IHyDrawInst2d::OnDataAcquired();
+
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(UncheckedGetData());
 	uint32 uiNumStates = pData->GetNumStates();
 

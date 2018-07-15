@@ -44,7 +44,7 @@ HyEngine *		HyEngine::sm_pInstance = nullptr;
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_AppRef.m_WindowList),
-												m_Assets(m_AppRef.m_Init.sDataDir, m_Scene),
+												m_Assets(m_AppRef.m_Init.sDataDir),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
 												m_Time(m_AppRef.m_Init.uiUpdateTickMs),
 												m_Diagnostics(m_AppRef.m_Init, m_Time, m_Assets, m_Scene),

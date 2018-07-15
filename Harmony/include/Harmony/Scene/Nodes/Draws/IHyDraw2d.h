@@ -12,11 +12,22 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode2d.h"
+#include "Assets/Nodes/IHyNodeData.h"
 #include "Scene/Tweens/HyTweenVec3.h"
 
 class IHyDraw2d : public IHyNode2d
 {
+	friend class HyAssets;
+
 protected:
+	static HyAssets *				sm_pHyAssets;
+
+	HyLoadState						m_eLoadState;
+
+	const IHyNodeData *				m_pData;
+	std::string						m_sName;
+	std::string						m_sPrefix;
+
 	float							m_fAlpha;
 	float							m_fCachedAlpha;
 	glm::vec3						m_CachedTopColor;
@@ -44,11 +55,22 @@ public:
 	HyTweenFloat					alpha;
 
 public:
-	IHyDraw2d(HyType eNodeType, HyEntity2d *pParent);
+	IHyDraw2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	IHyDraw2d(const IHyDraw2d &copyRef);
 	virtual ~IHyDraw2d();
 
 	const IHyDraw2d &operator=(const IHyDraw2d &rhs);
+
+	const std::string &GetName() const;
+	const std::string &GetPrefix() const;
+
+	const IHyNodeData *AcquireData();
+
+	virtual bool IsLoaded() const override;
+	virtual void Load() override;
+	virtual void Unload() override;
+
+	virtual bool IsLoadDataValid() { return true; }						// Optional public override for derived classes
 
 	void SetTint(float fR, float fG, float fB);
 	void SetTint(uint32 uiColor);
@@ -74,6 +96,15 @@ public:
 
 	int32 GetDisplayOrder() const;
 	virtual void SetDisplayOrder(int32 iOrderValue);
+
+protected:
+	const IHyNodeData *UncheckedGetData();								// Used internally when it's guaranteed that data has already been acquired for this instance
+
+	// Optional overrides for derived classes
+	virtual void DrawLoadedUpdate() { }			// Invoked once after OnLoaded(), then once every frame (guarenteed to only be invoked if this instance is loaded)
+	virtual void OnDataAcquired() { }			// Invoked once on the first time this node's data is queried
+	virtual void OnLoaded() { }					// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
+	virtual void OnUnloaded() { }				// HyAssets invokes this instance's data has been erased
 
 protected:
 	virtual void NodeUpdate() = 0;
