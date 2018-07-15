@@ -12,19 +12,13 @@
 
 HyScene *IHyDrawable2d::sm_pScene = nullptr;
 
-IHyDrawable2d::IHyDrawable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyLoadable2d(eNodeType, szPrefix, szName, pParent),
-																												m_hShader(HY_UNUSED_HANDLE),
-																												m_eRenderMode(HYRENDERMODE_Unknown),
-																												m_hTextureHandle(HY_UNUSED_HANDLE),
+IHyDrawable2d::IHyDrawable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyVisable2d(eNodeType, szPrefix, szName, pParent),
 																												m_LocalBoundingVolume(this)
 {
 }
 
-IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :	IHyLoadable2d(copyRef),
-																m_hShader(copyRef.m_hShader),
-																m_eRenderMode(copyRef.m_eRenderMode),
-																m_hTextureHandle(copyRef.m_hTextureHandle),
-																m_ShaderUniforms(copyRef.m_ShaderUniforms),
+IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :	IHyVisable2d(copyRef),
+																IHyDrawable(copyRef),
 																m_LocalBoundingVolume(this, copyRef.m_LocalBoundingVolume)
 {
 }
@@ -37,12 +31,8 @@ IHyDrawable2d::~IHyDrawable2d()
 
 const IHyDrawable2d &IHyDrawable2d::operator=(const IHyDrawable2d &rhs)
 {
-	IHyLoadable2d::operator=(rhs);
-
-	m_hShader = rhs.m_hShader;
-	m_eRenderMode = rhs.m_eRenderMode;
-	m_hTextureHandle = rhs.m_hTextureHandle;
-	m_ShaderUniforms = m_ShaderUniforms;
+	IHyVisable2d::operator=(rhs);
+	IHyDrawable::operator=(rhs);
 	
 	m_LocalBoundingVolume = rhs.m_LocalBoundingVolume;
 	m_aabbCached = rhs.m_aabbCached;
@@ -50,26 +40,11 @@ const IHyDrawable2d &IHyDrawable2d::operator=(const IHyDrawable2d &rhs)
 	return *this;
 }
 
-bool IHyDrawable2d::IsValid()
-{
-	return m_bEnabled && OnIsValid();
-}
-
-HyRenderMode IHyDrawable2d::GetRenderMode() const
-{
-	return m_eRenderMode;
-}
-
-HyTextureHandle IHyDrawable2d::GetTextureHandle() const
-{
-	return m_hTextureHandle;
-}
-
 const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 {
 	if(IsDirty(DIRTY_BoundingVolume) || m_LocalBoundingVolume.IsValid() == false)
 	{
-		CalcBoundingVolume();
+		OnCalcBoundingVolume();
 		ClearDirty(DIRTY_BoundingVolume);
 	}
 
@@ -93,20 +68,9 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 	return m_aabbCached;
 }
 
-void IHyDrawable2d::SetShader(HyShader *pShader)
+/*virtual*/ bool IHyDrawable2d::IsValid() /*override*/
 {
-	if(pShader)
-	{
-		HyAssert(pShader->IsFinalized(), "IHyDrawable2d::SetShader tried to set a non-finalized shader");
-		m_hShader = pShader->GetHandle();
-	}
-	else
-		m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
-}
-
-HyShaderHandle IHyDrawable2d::GetShaderHandle()
-{
-	return m_hShader;
+	return m_bEnabled && OnIsValid();
 }
 
 /*virtual*/ void IHyDrawable2d::NodeUpdate() /*override final*/
@@ -117,11 +81,6 @@ HyShaderHandle IHyDrawable2d::GetShaderHandle()
 		DrawLoadedUpdate();
 		OnUpdateUniforms();
 	}
-}
-
-void IHyDrawable2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
-{
-	m_ShaderUniforms.WriteUniformsBufferData(pRefDataWritePos);
 }
 
 /*virtual*/ void IHyDrawable2d::OnLoaded() /*override*/
@@ -135,4 +94,9 @@ void IHyDrawable2d::WriteShaderUniformBuffer(char *&pRefDataWritePos)
 /*virtual*/ void IHyDrawable2d::OnUnloaded() /*override*/
 {
 	sm_pScene->RemoveNode_Loaded(this);
+}
+
+/*virtual*/ HyType IHyDrawable2d::_DrawableGetType() /*override*/
+{
+	return m_eTYPE;
 }

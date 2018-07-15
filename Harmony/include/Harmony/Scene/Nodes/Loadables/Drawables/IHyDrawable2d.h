@@ -11,26 +11,18 @@
 #define IHyDrawable2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/IHyLoadable2d.h"
+#include "Scene/Nodes/Loadables/IHyVisable2d.h"
+#include "Scene/Nodes/Loadables/Drawables/IHyDrawable.h"
 #include "Renderer/Effects/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
-class HyStencil;
-class HyPortal2d;
-
-class IHyDrawable2d : public IHyLoadable2d
+class IHyDrawable2d : public IHyVisable2d, public IHyDrawable
 {
 	friend class HyScene;
-	friend class IHyRenderer;
 	friend class HyShape2d;
 
 protected:
 	static HyScene *				sm_pScene;
-
-	HyShaderHandle					m_hShader;
-	HyRenderMode					m_eRenderMode;
-	HyTextureHandle					m_hTextureHandle;
-	HyShaderUniforms 				m_ShaderUniforms;
 
 	HyShape2d						m_LocalBoundingVolume;
 
@@ -42,31 +34,18 @@ public:
 	const IHyDrawable2d &operator=(const IHyDrawable2d &rhs);
 	virtual IHyDrawable2d *Clone() const = 0;
 
-	bool IsValid();
-
-	HyRenderMode GetRenderMode() const;
-	HyTextureHandle GetTextureHandle() const;
-
 	const HyShape2d &GetLocalBoundingVolume();
 	virtual const b2AABB &GetWorldAABB() override;
 
-	// Passing nullptr will use built-in default shader
-	void SetShader(HyShader *pShader);
-	HyShaderHandle GetShaderHandle();
-
 protected:
+	virtual bool IsValid() override final;
 	virtual void NodeUpdate() override final;
 
-	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
-
-	virtual void OnLoaded() override;									// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
-	virtual void OnUnloaded() override;									// HyAssets invokes this instance's data has been erased
+	virtual void OnLoaded() override;
+	virtual void OnUnloaded() override;
 	virtual bool OnIsValid() { return true; }
 	virtual void OnShapeSet(HyShape2d *pShape) { }
-	virtual void CalcBoundingVolume() { }
-	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
-	virtual void OnWriteVertexData(char *&pRefDataWritePos) { }			// This function is responsible for incrementing the passed in reference pointer the size of the data written
-
+	virtual void OnCalcBoundingVolume() { }
 
 #ifdef HY_PLATFORM_GUI
 public:
@@ -84,6 +63,9 @@ public:
 			m_hTextureHandle = hTextureHandle;
 	}
 #endif
+
+private:
+	virtual HyType _DrawableGetType() override;
 };
 
 #endif /* IHyDrawable2d_h__ */

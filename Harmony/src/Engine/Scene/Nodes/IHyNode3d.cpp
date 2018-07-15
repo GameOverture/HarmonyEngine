@@ -10,7 +10,7 @@
 #include "Scene/Nodes/IHyNode3d.h"
 #include "Scene/Nodes/Loadables/Entities/HyEntity3d.h"
 
-IHyNode3d::IHyNode3d(HyType eNodeType, IHyNode3d *pParent) :	IHyNode(eNodeType),
+IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :	IHyNode(eNodeType),
 																pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 																rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 																rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),

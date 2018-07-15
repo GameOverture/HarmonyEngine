@@ -122,7 +122,7 @@ public:
 
 protected:
 	virtual bool OnIsValid() override;
-	virtual void CalcBoundingVolume() override;
+	virtual void OnCalcBoundingVolume() override;
 	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;

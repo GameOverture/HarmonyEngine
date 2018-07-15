@@ -24,11 +24,6 @@ HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOf
 																																m_uiExDataSize(0)
 {
 	HyAssert(m_hShader != HY_UNUSED_HANDLE, "HyRenderState was assigned a null shader");
-	if(m_hShader == HY_UNUSED_HANDLE)
-	{
-		int asdf = 0;
-		asdf++;
-	}
 
 	m_ScissorRect.iTag = HY_UNUSED_HANDLE;
 	instanceRef.GetWorldScissor(m_ScissorRect);

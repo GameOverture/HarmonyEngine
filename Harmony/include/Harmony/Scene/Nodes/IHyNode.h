@@ -19,6 +19,7 @@ class IHyNode
 	friend class HyScene;
 	friend class HyEntity2d;
 	friend class HyTweenFloat;
+	friend class IHyVisable;
 
 protected:
 	const HyType					m_eTYPE;
@@ -50,6 +51,7 @@ protected:
 	{
 		NODETYPE_IsLoadable			= 1 << 6,
 		NODETYPE_IsDrawable			= 1 << 7,
+		NODETYPE_IsVisable			= 1 << 8,
 	};
 	uint32							m_uiExplicitAndTypeFlags;
 

@@ -281,7 +281,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	return ((m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Invalid) == 0);
 }
 
-/*virtual*/ void HySprite2d::CalcBoundingVolume() /*override*/
+/*virtual*/ void HySprite2d::OnCalcBoundingVolume() /*override*/
 {
 	glm::ivec2 vFrameOffset = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame).vOFFSET;
 	float fHalfWidth = AnimGetCurFrameWidth(true) * 0.5f;

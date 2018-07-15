@@ -12,25 +12,16 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/IHyLoadable3d.h"
+#include "Scene/Nodes/Loadables/Drawables/IHyDrawable.h"
 #include "Renderer/Effects/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
-class HyStencil;
-class HyPortal2d;
-
-class IHyDrawable3d : public IHyLoadable3d
+class IHyDrawable3d : public IHyLoadable3d, public IHyDrawable
 {
 	friend class HyScene;
-	friend class IHyRenderer;
-	friend class HyShape2d;
 
 protected:
 	static HyScene *				sm_pScene;
-
-	HyShaderHandle					m_hShader;
-	HyRenderMode					m_eRenderMode;
-	HyTextureHandle					m_hTextureHandle;
-	HyShaderUniforms 				m_ShaderUniforms;
 
 public:
 	IHyDrawable3d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity3d *pParent);
@@ -40,28 +31,13 @@ public:
 	const IHyDrawable3d &operator=(const IHyDrawable3d &rhs);
 	virtual IHyDrawable3d *Clone() const = 0;
 
-	bool IsValid();
-
-	HyRenderMode GetRenderMode() const;
-	HyTextureHandle GetTextureHandle() const;
-
-	// Passing nullptr will use built-in default shader
-	void SetShader(HyShader *pShader);
-	HyShaderHandle GetShaderHandle();
-
 protected:
+	virtual bool IsValid() override final;
 	virtual void NodeUpdate() override final;
-
-	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
 
 	virtual void OnLoaded() override;									// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnUnloaded() override;									// HyAssets invokes this instance's data has been erased
 	virtual bool OnIsValid() { return true; }
-	virtual void OnShapeSet(HyShape2d *pShape) { }
-	virtual void CalcBoundingVolume() { }
-	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
-	virtual void OnWriteVertexData(char *&pRefDataWritePos) { }			// This function is responsible for incrementing the passed in reference pointer the size of the data written
-
 
 #ifdef HY_PLATFORM_GUI
 public:
@@ -79,6 +55,9 @@ public:
 			m_hTextureHandle = hTextureHandle;
 	}
 #endif
+
+private:
+	virtual HyType _DrawableGetType() override;
 };
 
 #endif /* IHyDrawable3d_h__ */

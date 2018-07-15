@@ -350,7 +350,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	return m_uiNumValidCharacters > 0;
 }
 
-/*virtual*/ void HyText2d::CalcBoundingVolume() /*override*/
+/*virtual*/ void HyText2d::OnCalcBoundingVolume() /*override*/
 {
 	glm::vec2 ptCenter(0.0f, 0.0f);
 

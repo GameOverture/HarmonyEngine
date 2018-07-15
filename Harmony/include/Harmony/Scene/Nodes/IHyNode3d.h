@@ -31,7 +31,7 @@ public:
 	HyTweenVec3					scale_pivot;
 
 public:
-	IHyNode3d(HyType eNodeType, IHyNode3d *pParent);
+	IHyNode3d(HyType eNodeType, HyEntity3d *pParent);
 	IHyNode3d(const IHyNode3d &copyRef);
 	virtual ~IHyNode3d();
 
