@@ -7,11 +7,11 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Draws/Instances/HyTexturedQuad2d.h"
-#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HyTexturedQuad2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_TexturedQuad2d, std::to_string(uiAtlasGrpId).c_str(), std::to_string(uiIndexInGroup).c_str(), pParent),
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_TexturedQuad2d, std::to_string(uiAtlasGrpId).c_str(), std::to_string(uiIndexInGroup).c_str(), pParent),
 																										m_bIsRaw(false),
 																										m_uiAtlasGroupId(uiAtlasGrpId),
 																										m_uiAtlasIndexInGroup(uiIndexInGroup),
@@ -22,7 +22,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, H
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_TexturedQuad2d, nullptr, "raw", pParent),
+HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_TexturedQuad2d, nullptr, "raw", pParent),
 																																			m_bIsRaw(true),
 																																			m_uiAtlasGroupId(0),
 																																			m_uiAtlasIndexInGroup(0),
@@ -36,7 +36,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiText
 	m_LocalBoundingVolume.SetAsBox(m_uiRawTextureWidth * 0.5f, m_uiRawTextureHeight * 0.5f, glm::vec2(m_uiRawTextureWidth * 0.5f, m_uiRawTextureHeight * 0.5f), 0.0f);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(const HyTexturedQuad2d &copyRef) :	IHyDrawInst2d(copyRef),
+HyTexturedQuad2d::HyTexturedQuad2d(const HyTexturedQuad2d &copyRef) :	IHyDrawable2d(copyRef),
 																		m_bIsRaw(copyRef.m_bIsRaw),
 																		m_uiAtlasGroupId(copyRef.m_uiAtlasGroupId),
 																		m_uiAtlasIndexInGroup(copyRef.m_uiAtlasIndexInGroup),
@@ -52,7 +52,7 @@ HyTexturedQuad2d::~HyTexturedQuad2d()
 
 const HyTexturedQuad2d &HyTexturedQuad2d::operator=(const HyTexturedQuad2d &rhs)
 {
-	IHyDrawInst2d::operator=(rhs);
+	IHyDrawable2d::operator=(rhs);
 
 	m_bIsRaw = rhs.m_bIsRaw;
 	m_uiAtlasGroupId = rhs.m_uiAtlasGroupId;
@@ -71,7 +71,7 @@ const HyTexturedQuad2d &HyTexturedQuad2d::operator=(const HyTexturedQuad2d &rhs)
 
 /*virtual*/ bool HyTexturedQuad2d::IsLoaded() const /*override*/
 {
-	return m_bIsRaw || IHyDrawInst2d::IsLoaded();
+	return m_bIsRaw || IHyDrawable2d::IsLoaded();
 }
 
 void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
@@ -124,7 +124,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 
 /*virtual*/ void HyTexturedQuad2d::OnLoaded() /*override*/
 {
-	IHyDrawInst2d::OnLoaded();
+	IHyDrawable2d::OnLoaded();
 
 	if(m_bIsRaw == false)
 		m_hTextureHandle = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();

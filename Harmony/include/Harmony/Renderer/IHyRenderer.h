@@ -16,7 +16,7 @@
 class HyRenderState;
 class HyStencil;
 class HyPortal2d;
-class IHyDrawInst2d;
+class IHyDrawable2d;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
@@ -76,7 +76,7 @@ public:
 	virtual ~IHyRenderer(void);
 
 	void PrepareBuffers();
-	void AppendRenderState(uint32 uiId, /*const*/ IHyDrawInst2d &instanceRef, HyCullMask uiCullMask);
+	void AppendRenderState(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCullMask uiCullMask);
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();

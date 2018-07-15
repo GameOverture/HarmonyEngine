@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
-#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
 
 class HyPhysEntity2d : public HyEntity2d
 {

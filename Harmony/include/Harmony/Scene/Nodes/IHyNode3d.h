@@ -42,6 +42,10 @@ public:
 
 protected:
 	virtual void PhysicsUpdate() override;
+
+	virtual bool IsLoaded() const { return true; }
+	virtual void Load() { }
+	virtual void Unload() { }
 };
 
 #endif /* IHyNode3d_h__ */

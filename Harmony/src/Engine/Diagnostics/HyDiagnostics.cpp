@@ -11,8 +11,8 @@
 #include "IHyApplication.h"
 #include "Time/HyTime.h"
 #include "Assets/HyAssets.h"
-#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
-#include "Scene/Nodes/Draws/Instances/HyText2d.h"
+#include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HyText2d.h"
 #include "HyEngine.h"
 
 HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :	m_InitStructRef(initStruct),
@@ -179,7 +179,7 @@ void HyDiagnostics::DumpAtlasUsage()
 
 void HyDiagnostics::DumpNodeUsage()
 {
-	std::vector<IHyDrawInst2d *> loadedNodesList;
+	std::vector<IHyDrawable2d *> loadedNodesList;
 	m_SceneRef.CopyAllLoadedNodes(loadedNodesList);
 
 	uint32 uiNumSound2d = 0;

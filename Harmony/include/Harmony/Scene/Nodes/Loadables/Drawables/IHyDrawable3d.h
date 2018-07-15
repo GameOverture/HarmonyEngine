@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyDrawInst2d.h
+*	IHyDrawable3d.h
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -7,18 +7,18 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IHyDrawInst2d_h__
-#define IHyDrawInst2d_h__
+#ifndef IHyDrawable3d_h__
+#define IHyDrawable3d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Draws/IHyDraw2d.h"
+#include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 #include "Renderer/Effects/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
 class HyStencil;
 class HyPortal2d;
 
-class IHyDrawInst2d : public IHyDraw2d
+class IHyDrawable3d : public IHyLoadable3d
 {
 	friend class HyScene;
 	friend class IHyRenderer;
@@ -32,23 +32,18 @@ protected:
 	HyTextureHandle					m_hTextureHandle;
 	HyShaderUniforms 				m_ShaderUniforms;
 
-	HyShape2d						m_LocalBoundingVolume;
-
 public:
-	IHyDrawInst2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
-	IHyDrawInst2d(const IHyDrawInst2d &copyRef);
-	virtual ~IHyDrawInst2d();
+	IHyDrawable3d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity3d *pParent);
+	IHyDrawable3d(const IHyDrawable3d &copyRef);
+	virtual ~IHyDrawable3d();
 
-	const IHyDrawInst2d &operator=(const IHyDrawInst2d &rhs);
-	virtual IHyDrawInst2d *Clone() const = 0;
+	const IHyDrawable3d &operator=(const IHyDrawable3d &rhs);
+	virtual IHyDrawable3d *Clone() const = 0;
 
 	bool IsValid();
 
 	HyRenderMode GetRenderMode() const;
 	HyTextureHandle GetTextureHandle() const;
-
-	const HyShape2d &GetLocalBoundingVolume();
-	virtual const b2AABB &GetWorldAABB() override;
 
 	// Passing nullptr will use built-in default shader
 	void SetShader(HyShader *pShader);
@@ -86,4 +81,4 @@ public:
 #endif
 };
 
-#endif /* IHyDrawInst2d_h__ */
+#endif /* IHyDrawable3d_h__ */

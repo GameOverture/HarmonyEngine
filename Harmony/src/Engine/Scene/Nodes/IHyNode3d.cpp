@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/IHyNode3d.h"
-#include "Scene/Nodes/Draws/Entities/HyEntity3d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity3d.h"
 
 IHyNode3d::IHyNode3d(HyType eNodeType, IHyNode3d *pParent) :	IHyNode(eNodeType),
 																pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),

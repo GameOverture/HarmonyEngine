@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyDraw2d.h
+*	IHyLoadable2d.h
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -7,15 +7,15 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IHyNodeDraw2d_h__
-#define IHyNodeDraw2d_h__
+#ifndef IHyLoadable2d_h__
+#define IHyLoadable2d_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode2d.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Scene/Tweens/HyTweenVec3.h"
 
-class IHyDraw2d : public IHyNode2d
+class IHyLoadable2d : public IHyNode2d
 {
 	friend class HyAssets;
 
@@ -55,11 +55,11 @@ public:
 	HyTweenFloat					alpha;
 
 public:
-	IHyDraw2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
-	IHyDraw2d(const IHyDraw2d &copyRef);
-	virtual ~IHyDraw2d();
+	IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
+	IHyLoadable2d(const IHyLoadable2d &copyRef);
+	virtual ~IHyLoadable2d();
 
-	const IHyDraw2d &operator=(const IHyDraw2d &rhs);
+	const IHyLoadable2d &operator=(const IHyLoadable2d &rhs);
 
 	const std::string &GetName() const;
 	const std::string &GetPrefix() const;
@@ -119,4 +119,4 @@ private:
 	void CalculateColor();
 };
 
-#endif /* IHyNodeDraw2d_h__ */
+#endif /* IHyLoadable2d_h__ */

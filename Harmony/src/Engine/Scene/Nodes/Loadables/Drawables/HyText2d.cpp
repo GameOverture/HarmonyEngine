@@ -7,8 +7,8 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Draws/Instances/HyText2d.h"
-#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HyText2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
 #include "Utilities/HyStrManip.h"
 #include "Diagnostics/Console/HyConsole.h"
 
@@ -16,7 +16,7 @@
 
 #define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_Text2d, szPrefix, szName, pParent),
+HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Text2d, szPrefix, szName, pParent),
 																					m_bIsDirty(false),
 																					m_sRawString(""),
 																					m_uiCurFontState(0),
@@ -34,7 +34,7 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
-HyText2d::HyText2d(const HyText2d &copyRef) :	IHyDrawInst2d(copyRef),
+HyText2d::HyText2d(const HyText2d &copyRef) :	IHyDrawable2d(copyRef),
 												m_bIsDirty(true),
 												m_sRawString(copyRef.m_sRawString),
 												m_Utf32CodeList(copyRef.m_Utf32CodeList),
@@ -69,7 +69,7 @@ HyText2d::~HyText2d(void)
 
 const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 {
-	IHyDrawInst2d::operator=(rhs);
+	IHyDrawable2d::operator=(rhs);
 
 	m_bIsDirty = true;
 	m_sRawString = rhs.m_sRawString;
@@ -371,7 +371,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnDataAcquired() /*override*/
 {
-	IHyDrawInst2d::OnDataAcquired();
+	IHyDrawable2d::OnDataAcquired();
 
 	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
 
@@ -402,7 +402,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnLoaded() /*override*/
 {
-	IHyDrawInst2d::OnLoaded();
+	IHyDrawable2d::OnLoaded();
 
 	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
 	if(pTextData == nullptr)

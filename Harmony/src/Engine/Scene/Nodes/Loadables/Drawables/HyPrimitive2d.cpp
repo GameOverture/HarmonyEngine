@@ -7,12 +7,12 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
-#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
-HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
+HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Primitive2d, nullptr, nullptr, pParent),
 													m_pVertBuffer(nullptr),
 													m_uiNumVerts(0),
 													m_bWireframe(false),
@@ -21,7 +21,7 @@ HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_Primiti
 	ClearData();
 }
 
-HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :	IHyDrawInst2d(copyRef),
+HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :	IHyDrawable2d(copyRef),
 																m_bWireframe(copyRef.m_bWireframe),
 																m_fLineThickness(copyRef.m_fLineThickness)
 {
@@ -37,7 +37,7 @@ HyPrimitive2d::~HyPrimitive2d(void)
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 {
 	ClearData();
-	IHyDrawInst2d::operator=(rhs);
+	IHyDrawable2d::operator=(rhs);
 
 	m_bWireframe = rhs.m_bWireframe;
 	m_fLineThickness = rhs.m_fLineThickness;
@@ -102,7 +102,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 /*virtual*/ void HyPrimitive2d::OnShapeSet(HyShape2d *pShape) /*override*/
 {
-	IHyDrawInst2d::OnShapeSet(pShape);
+	IHyDrawable2d::OnShapeSet(pShape);
 
 	if(pShape == &m_LocalBoundingVolume)
 		SetData();

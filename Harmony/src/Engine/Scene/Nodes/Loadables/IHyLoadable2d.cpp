@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyDraw2d.cpp
+*	IHyLoadable2d.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -7,29 +7,29 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Scene/Nodes/Draws/IHyDraw2d.h"
-#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/IHyLoadable2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Assets/HyAssets.h"
 
-/*static*/ HyAssets *IHyDraw2d::sm_pHyAssets = nullptr;
+/*static*/ HyAssets *IHyLoadable2d::sm_pHyAssets = nullptr;
 
-IHyDraw2d::IHyDraw2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
-																										m_eLoadState(HYLOADSTATE_Inactive),
-																										m_pData(nullptr),
-																										m_sName(szName ? szName : ""),
-																										m_sPrefix(szPrefix ? szPrefix : ""),
-																										m_fAlpha(1.0f),
-																										m_fCachedAlpha(1.0f),
-																										m_pScissor(nullptr),
-																										m_hStencil(HY_UNUSED_HANDLE),
-																										m_iCoordinateSystem(-1),
-																										m_iDisplayOrder(0),
-																										topColor(*this, DIRTY_Color),
-																										botColor(*this, DIRTY_Color),
-																										alpha(m_fAlpha, *this, DIRTY_Color)
+IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
+																												m_eLoadState(HYLOADSTATE_Inactive),
+																												m_pData(nullptr),
+																												m_sName(szName ? szName : ""),
+																												m_sPrefix(szPrefix ? szPrefix : ""),
+																												m_fAlpha(1.0f),
+																												m_fCachedAlpha(1.0f),
+																												m_pScissor(nullptr),
+																												m_hStencil(HY_UNUSED_HANDLE),
+																												m_iCoordinateSystem(-1),
+																												m_iDisplayOrder(0),
+																												topColor(*this, DIRTY_Color),
+																												botColor(*this, DIRTY_Color),
+																												alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
@@ -37,19 +37,19 @@ IHyDraw2d::IHyDraw2d(HyType eNodeType, const char *szPrefix, const char *szName,
 	m_CachedBotColor = botColor.Get();
 }
 
-IHyDraw2d::IHyDraw2d(const IHyDraw2d &copyRef) :	IHyNode2d(copyRef),
-													m_eLoadState(HYLOADSTATE_Inactive),
-													m_pData(nullptr),
-													m_sName(copyRef.m_sName),
-													m_sPrefix(copyRef.m_sPrefix),
-													m_fAlpha(copyRef.m_fAlpha),
-													m_pScissor(nullptr),
-													m_hStencil(copyRef.m_hStencil),
-													m_iCoordinateSystem(copyRef.m_iCoordinateSystem),
-													m_iDisplayOrder(copyRef.m_iDisplayOrder),
-													topColor(*this, DIRTY_Color),
-													botColor(*this, DIRTY_Color),
-													alpha(m_fAlpha, *this, DIRTY_Color)
+IHyLoadable2d::IHyLoadable2d(const IHyLoadable2d &copyRef) :	IHyNode2d(copyRef),
+																m_eLoadState(HYLOADSTATE_Inactive),
+																m_pData(nullptr),
+																m_sName(copyRef.m_sName),
+																m_sPrefix(copyRef.m_sPrefix),
+																m_fAlpha(copyRef.m_fAlpha),
+																m_pScissor(nullptr),
+																m_hStencil(copyRef.m_hStencil),
+																m_iCoordinateSystem(copyRef.m_iCoordinateSystem),
+																m_iDisplayOrder(copyRef.m_iDisplayOrder),
+																topColor(*this, DIRTY_Color),
+																botColor(*this, DIRTY_Color),
+																alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	if(copyRef.m_pScissor)
 	{
@@ -65,12 +65,12 @@ IHyDraw2d::IHyDraw2d(const IHyDraw2d &copyRef) :	IHyNode2d(copyRef),
 	CalculateColor();
 }
 
-IHyDraw2d::~IHyDraw2d()
+IHyLoadable2d::~IHyLoadable2d()
 {
 	delete m_pScissor;
 }
 
-const IHyDraw2d &IHyDraw2d::operator=(const IHyDraw2d &rhs)
+const IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
 {
 	IHyNode2d::operator=(rhs);
 
@@ -111,17 +111,17 @@ const IHyDraw2d &IHyDraw2d::operator=(const IHyDraw2d &rhs)
 	return *this;
 }
 
-const std::string &IHyDraw2d::GetName() const
+const std::string &IHyLoadable2d::GetName() const
 {
 	return m_sName;
 }
 
-const std::string &IHyDraw2d::GetPrefix() const
+const std::string &IHyLoadable2d::GetPrefix() const
 {
 	return m_sPrefix;
 }
 
-const IHyNodeData *IHyDraw2d::AcquireData()
+const IHyNodeData *IHyLoadable2d::AcquireData()
 {
 	if(m_pData == nullptr)
 	{
@@ -137,14 +137,14 @@ const IHyNodeData *IHyDraw2d::AcquireData()
 	return m_pData;
 }
 
-/*virtual*/ bool IHyDraw2d::IsLoaded() const /*override*/
+/*virtual*/ bool IHyLoadable2d::IsLoaded() const /*override*/
 {
 	return m_eLoadState == HYLOADSTATE_Loaded;
 }
 
-/*virtual*/ void IHyDraw2d::Load() /*override*/
+/*virtual*/ void IHyLoadable2d::Load() /*override*/
 {
-	HyAssert(sm_pHyAssets, "IHyDraw2d::Load was invoked before engine has been initialized");
+	HyAssert(sm_pHyAssets, "IHyLoadable2d::Load was invoked before engine has been initialized");
 
 	// Don't load if the name is blank, and it's required by this node type
 	if(m_sName.empty() && m_eTYPE != HYTYPE_Entity2d && m_eTYPE != HYTYPE_Primitive2d && m_eTYPE != HYTYPE_TexturedQuad2d)
@@ -153,49 +153,49 @@ const IHyNodeData *IHyDraw2d::AcquireData()
 	sm_pHyAssets->LoadNodeData(this);
 }
 
-/*virtual*/ void IHyDraw2d::Unload() /*override*/
+/*virtual*/ void IHyLoadable2d::Unload() /*override*/
 {
-	HyAssert(sm_pHyAssets, "IHyDraw2d::Unload was invoked before engine has been initialized");
+	HyAssert(sm_pHyAssets, "IHyLoadable2d::Unload was invoked before engine has been initialized");
 	sm_pHyAssets->RemoveNodeData(this);
 }
 
-void IHyDraw2d::SetTint(float fR, float fG, float fB)
+void IHyLoadable2d::SetTint(float fR, float fG, float fB)
 {
 	topColor.Set(fR, fG, fB);
 	botColor.Set(fR, fG, fB);
 }
 
-void IHyDraw2d::SetTint(uint32 uiColor)
+void IHyLoadable2d::SetTint(uint32 uiColor)
 {
 	SetTint(((uiColor >> 16) & 0xFF) / 255.0f,
 			((uiColor >> 8) & 0xFF) / 255.0f,
 			(uiColor & 0xFF) / 255.0f);
 }
 
-float IHyDraw2d::CalculateAlpha()
+float IHyLoadable2d::CalculateAlpha()
 {
 	CalculateColor();
 	return m_fCachedAlpha;
 }
 
-const glm::vec3 &IHyDraw2d::CalculateTopTint()
+const glm::vec3 &IHyLoadable2d::CalculateTopTint()
 {
 	CalculateColor();
 	return m_CachedTopColor;
 }
 
-const glm::vec3 &IHyDraw2d::CalculateBotTint()
+const glm::vec3 &IHyLoadable2d::CalculateBotTint()
 {
 	CalculateColor();
 	return m_CachedBotColor;
 }
 
-bool IHyDraw2d::IsScissorSet() const
+bool IHyLoadable2d::IsScissorSet() const
 {
 	return m_pScissor != nullptr;
 }
 
-void IHyDraw2d::GetLocalScissor(HyScreenRect<int32> &scissorOut) const
+void IHyLoadable2d::GetLocalScissor(HyScreenRect<int32> &scissorOut) const
 {
 	if(m_pScissor == nullptr)
 		return;
@@ -203,7 +203,7 @@ void IHyDraw2d::GetLocalScissor(HyScreenRect<int32> &scissorOut) const
 	scissorOut = m_pScissor->m_LocalScissorRect;
 }
 
-void IHyDraw2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
+void IHyLoadable2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 {
 	if(m_pScissor == nullptr)
 		return;
@@ -237,7 +237,7 @@ void IHyDraw2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	scissorOut = m_pScissor->m_WorldScissorRect;
 }
 
-/*virtual*/ void IHyDraw2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
+/*virtual*/ void IHyLoadable2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight)
 {
 	if(m_pScissor == nullptr)
 		m_pScissor = HY_NEW ScissorRect();
@@ -253,7 +253,7 @@ void IHyDraw2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	GetWorldScissor(m_pScissor->m_WorldScissorRect);
 }
 
-/*virtual*/ void IHyDraw2d::ClearScissor(bool bUseParentScissor)
+/*virtual*/ void IHyLoadable2d::ClearScissor(bool bUseParentScissor)
 {
 	if(m_pScissor == nullptr)
 		return;
@@ -271,17 +271,17 @@ void IHyDraw2d::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	}
 }
 
-bool IHyDraw2d::IsStencilSet() const
+bool IHyLoadable2d::IsStencilSet() const
 {
 	return m_hStencil != HY_UNUSED_HANDLE;
 }
 
-HyStencil *IHyDraw2d::GetStencil() const
+HyStencil *IHyLoadable2d::GetStencil() const
 {
 	return IHyRenderer::FindStencil(m_hStencil);
 }
 
-/*virtual*/ void IHyDraw2d::SetStencil(HyStencil *pStencil)
+/*virtual*/ void IHyLoadable2d::SetStencil(HyStencil *pStencil)
 {
 	if(pStencil == nullptr)
 		m_hStencil = HY_UNUSED_HANDLE;
@@ -291,7 +291,7 @@ HyStencil *IHyDraw2d::GetStencil() const
 	m_uiExplicitFlags |= EXPLICIT_Stencil;
 }
 
-/*virtual*/ void IHyDraw2d::ClearStencil(bool bUseParentStencil)
+/*virtual*/ void IHyLoadable2d::ClearStencil(bool bUseParentStencil)
 {
 	m_hStencil = HY_UNUSED_HANDLE;
 
@@ -308,29 +308,29 @@ HyStencil *IHyDraw2d::GetStencil() const
 	}
 }
 
-int32 IHyDraw2d::GetCoordinateSystem() const
+int32 IHyLoadable2d::GetCoordinateSystem() const
 {
 	return m_iCoordinateSystem;
 }
 
-/*virtual*/ void IHyDraw2d::UseCameraCoordinates()
+/*virtual*/ void IHyLoadable2d::UseCameraCoordinates()
 {
 	m_iCoordinateSystem = -1;
 	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
 }
 
-/*virtual*/ void IHyDraw2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
+/*virtual*/ void IHyLoadable2d::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
 {
 	m_iCoordinateSystem = iWindowIndex;
 	m_uiExplicitFlags |= EXPLICIT_CoordinateSystem;
 }
 
-int32 IHyDraw2d::GetDisplayOrder() const
+int32 IHyLoadable2d::GetDisplayOrder() const
 {
 	return m_iDisplayOrder;
 }
 
-/*virtual*/ void IHyDraw2d::SetDisplayOrder(int32 iOrderValue)
+/*virtual*/ void IHyLoadable2d::SetDisplayOrder(int32 iOrderValue)
 {
 	m_iDisplayOrder = iOrderValue;
 	m_uiExplicitFlags |= EXPLICIT_DisplayOrder;
@@ -338,12 +338,12 @@ int32 IHyDraw2d::GetDisplayOrder() const
 	HyScene::SetInstOrderingDirty();
 }
 
-const IHyNodeData *IHyDraw2d::UncheckedGetData()
+const IHyNodeData *IHyLoadable2d::UncheckedGetData()
 {
 	return m_pData;
 }
 
-/*virtual*/ void IHyDraw2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyLoadable2d::_SetScissor(const HyScreenRect<int32> &worldScissorRectRef, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_Scissor;
@@ -357,7 +357,7 @@ const IHyNodeData *IHyDraw2d::UncheckedGetData()
 	}
 }
 
-/*virtual*/ void IHyDraw2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyLoadable2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_Stencil;
@@ -366,7 +366,7 @@ const IHyNodeData *IHyDraw2d::UncheckedGetData()
 		m_hStencil = hHandle;
 }
 
-/*virtual*/ void IHyDraw2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
+/*virtual*/ void IHyLoadable2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_CoordinateSystem;
@@ -375,7 +375,7 @@ const IHyNodeData *IHyDraw2d::UncheckedGetData()
 		m_iCoordinateSystem = iWindowIndex;
 }
 
-/*virtual*/ int32 IHyDraw2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
+/*virtual*/ int32 IHyLoadable2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override*/
 {
 	if(bIsOverriding)
 		m_uiExplicitFlags &= ~EXPLICIT_DisplayOrder;
@@ -391,7 +391,7 @@ const IHyNodeData *IHyDraw2d::UncheckedGetData()
 	return iOrderValue;
 }
 
-void IHyDraw2d::CalculateColor()
+void IHyLoadable2d::CalculateColor()
 {
 	if(IsDirty(DIRTY_Color))
 	{

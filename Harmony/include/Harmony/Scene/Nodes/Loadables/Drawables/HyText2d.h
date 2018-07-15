@@ -10,10 +10,10 @@
 #ifndef HyText2d_h__
 #define HyText2d_h__
 
-#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
+#include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
 #include "Assets/Nodes/HyText2dData.h"
 
-class HyText2d : public IHyDrawInst2d
+class HyText2d : public IHyDrawable2d
 {
 protected:
 	bool							m_bIsDirty;

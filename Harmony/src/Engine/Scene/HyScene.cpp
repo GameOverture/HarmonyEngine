@@ -11,12 +11,12 @@
 #include "HyEngine.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyWindow.h"
-#include "Scene/Nodes/Draws/Instances/IHyDrawInst2d.h"
-#include "Scene/Nodes/Draws/Instances/HySprite2d.h"
-#include "Scene/Nodes/Draws/Instances/HySpine2d.h"
-#include "Scene/Nodes/Draws/Instances/HyPrimitive2d.h"
-#include "Scene/Nodes/Draws/Instances/HyText2d.h"
-#include "Scene/Nodes/Draws/Instances/HyTexturedQuad2d.h"
+#include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HySprite2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HySpine2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HyText2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HyTexturedQuad2d.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
@@ -29,7 +29,7 @@ HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f
 															m_WindowListRef(WindowListRef),
 															m_bPauseGame(false)
 {
-	IHyDrawInst2d::sm_pScene = this;
+	IHyDrawable2d::sm_pScene = this;
 
 	m_b2World.SetDebugDraw(&m_DrawPhys2d);
 	m_b2World.SetContactListener(&m_Phys2dContactListener);
@@ -80,13 +80,13 @@ HyScene::~HyScene(void)
 	}
 }
 
-void HyScene::AddNode_Loaded(IHyDrawInst2d *pInst)
+void HyScene::AddNode_Loaded(IHyDrawable2d *pInst)
 {
 	m_NodeList_Loaded.push_back(pInst);
 	sm_bInst2dOrderingDirty = true;
 }
 
-void HyScene::RemoveNode_Loaded(const IHyDrawInst2d *pInst)
+void HyScene::RemoveNode_Loaded(const IHyDrawable2d *pInst)
 {
 	for(auto it = m_NodeList_Loaded.begin(); it != m_NodeList_Loaded.end(); ++it)
 	{
@@ -99,7 +99,7 @@ void HyScene::RemoveNode_Loaded(const IHyDrawInst2d *pInst)
 	}
 }
 
-void HyScene::CopyAllLoadedNodes(std::vector<IHyDrawInst2d *> &nodeListOut)
+void HyScene::CopyAllLoadedNodes(std::vector<IHyDrawable2d *> &nodeListOut)
 {
 	nodeListOut = m_NodeList_Loaded;
 }
@@ -202,7 +202,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	HY_PROFILE_END
 }
 
-bool HyScene::CalculateCullPasses(/*const*/ IHyDrawInst2d &instanceRef, uint32 &uiCullMaskOut)
+bool HyScene::CalculateCullPasses(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCullMaskOut)
 {
 	uiCullMaskOut = 0;
 	if(instanceRef.GetCoordinateSystem() >= 0)
@@ -227,7 +227,7 @@ bool HyScene::CalculateCullPasses(/*const*/ IHyDrawInst2d &instanceRef, uint32 &
 	return uiCullMaskOut != 0;
 }
 
-/*static*/ bool HyScene::Node2dSortPredicate(const IHyDrawInst2d *pInst1, const IHyDrawInst2d *pInst2)
+/*static*/ bool HyScene::Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2)
 {
 	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
 	{

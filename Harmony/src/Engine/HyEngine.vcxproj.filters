@@ -150,35 +150,8 @@
     <ClCompile Include="Scene\Nodes\IHyNode.cpp">
       <Filter>Scene\Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\IHyNode2d.cpp">
-      <Filter>Scene\Nodes</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Nodes\IHyNode3d.cpp">
       <Filter>Scene\Nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\IHyDraw2d.cpp">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\Entities\HyEntity2d.cpp">
-      <Filter>Scene\Nodes\Draws\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\Instances\HyPrimitive2d.cpp">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\Instances\HySpine2d.cpp">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\Instances\HySprite2d.cpp">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\Instances\HyText2d.cpp">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\Instances\HyTexturedQuad2d.cpp">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\Instances\IHyDrawInst2d.cpp">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Nodes\Misc\HyAudio2d.cpp">
       <Filter>Scene\Nodes\Misc</Filter>
@@ -201,20 +174,50 @@
     <ClCompile Include="Threading\IHyThreadClass.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\Entities\HyEntity3d.cpp">
-      <Filter>Scene\Nodes\Draws\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\IHyDraw3d.cpp">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\jasonxx.cc">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Nodes\Draws\Instances\HyPrefab3d.cpp">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClCompile>
     <ClCompile Include="Assets\Nodes\HyPrefabData.cpp">
       <Filter>Assets\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\IHyLoadable2d.cpp">
+      <Filter>Scene\Nodes\Loadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\IHyLoadable3d.cpp">
+      <Filter>Scene\Nodes\Loadables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\IHyNode2d.cpp">
+      <Filter>Scene\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Drawables\HyPrefab3d.cpp">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Drawables\HyPrimitive2d.cpp">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Drawables\HySpine2d.cpp">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Drawables\HySprite2d.cpp">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Drawables\HyText2d.cpp">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Drawables\HyTexturedQuad2d.cpp">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Drawables\IHyDrawable2d.cpp">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Entities\HyEntity2d.cpp">
+      <Filter>Scene\Nodes\Loadables\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Entities\HyEntity3d.cpp">
+      <Filter>Scene\Nodes\Loadables\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Nodes\Loadables\Drawables\IHyDrawable3d.cpp">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -302,20 +305,20 @@
     <Filter Include="Diagnostics\Output">
       <UniqueIdentifier>{ae85f529-d305-4eb7-9b2c-3456faa26bd9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene\Nodes\Draws">
-      <UniqueIdentifier>{644e8e70-a5d7-4e42-83a5-ce85238bfcb7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene\Nodes\Misc">
       <UniqueIdentifier>{09ec6e59-8ffa-4449-95aa-09ba82fab643}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene\Nodes\Draws\Entities">
-      <UniqueIdentifier>{c4a4ef75-09eb-48f5-97d4-38579b88349b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene\Nodes\Draws\Instances">
-      <UniqueIdentifier>{4472acba-e66b-401f-960c-5e80a68878e2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Renderer\Effects">
       <UniqueIdentifier>{19ce65be-549b-4e12-95b3-96acf369a81c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Nodes\Loadables">
+      <UniqueIdentifier>{f17dcc58-e078-42ad-b13a-6c09b5b5ddd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Nodes\Loadables\Drawables">
+      <UniqueIdentifier>{f25c521c-523a-4042-af5a-2d4aad891286}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Nodes\Loadables\Entities">
+      <UniqueIdentifier>{a7ae8a73-4381-4312-a511-255daea4aab0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -516,33 +519,6 @@
     <ClInclude Include="..\..\include\Harmony\Input\HyInputMap.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntity2d.h">
-      <Filter>Scene\Nodes\Draws\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntityLeaf2d.h">
-      <Filter>Scene\Nodes\Draws\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HyPrimitive2d.h">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HySpine2d.h">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HySprite2d.h">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HyText2d.h">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HyTexturedQuad2d.h">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\IHyDrawInst2d.h">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\IHyDraw2d.h">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Misc\HyAudio2d.h">
       <Filter>Scene\Nodes\Misc</Filter>
     </ClInclude>
@@ -550,9 +526,6 @@
       <Filter>Scene\Nodes\Misc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\IHyNode.h">
-      <Filter>Scene\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\IHyNode2d.h">
       <Filter>Scene\Nodes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\IHyNode3d.h">
@@ -576,12 +549,6 @@
     <ClInclude Include="..\..\include\Harmony\Afx\Platforms\HyPlatform_Gui.h">
       <Filter>Afx\Platforms</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Entities\HyEntity3d.h">
-      <Filter>Scene\Nodes\Draws\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\IHyDraw3d.h">
-      <Filter>Scene\Nodes\Draws</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Utilities\json.hpp">
       <Filter>Utilities</Filter>
     </ClInclude>
@@ -591,11 +558,50 @@
     <ClInclude Include="..\..\include\Harmony\Utilities\jsonxx.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Draws\Instances\HyPrefab3d.h">
-      <Filter>Scene\Nodes\Draws\Instances</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyPrefabData.h">
       <Filter>Assets\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\IHyNode2d.h">
+      <Filter>Scene\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\HyPrefab3d.h">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\HyPrimitive2d.h">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\HySpine2d.h">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\HySprite2d.h">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\HyText2d.h">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\HyTexturedQuad2d.h">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\IHyDrawable2d.h">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Entities\HyEntity2d.h">
+      <Filter>Scene\Nodes\Loadables\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Entities\HyEntity3d.h">
+      <Filter>Scene\Nodes\Loadables\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Entities\HyEntityLeaf2d.h">
+      <Filter>Scene\Nodes\Loadables\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\IHyLoadable2d.h">
+      <Filter>Scene\Nodes\Loadables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\IHyLoadable3d.h">
+      <Filter>Scene\Nodes\Loadables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\IHyDrawable3d.h">
+      <Filter>Scene\Nodes\Loadables\Drawables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,12 +7,12 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Draws/Instances/HySpine2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HySpine2d.h"
 #include "HyEngine.h"
-#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
 #include "Scene/HyScene.h"
 
-HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
+HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
 																						m_pSpineSkeleton(NULL),
 																						m_ppSpineAnims(NULL),
 																						m_ppAnimStates(NULL),
@@ -25,7 +25,7 @@ HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pPare
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
-HySpine2d::HySpine2d(const HySpine2d &copyRef) :	IHyDrawInst2d(copyRef)
+HySpine2d::HySpine2d(const HySpine2d &copyRef) :	IHyDrawable2d(copyRef)
 {
 	HyError("HySpine2d::copy ctor implement me!");
 }
@@ -46,7 +46,7 @@ HySpine2d::~HySpine2d(void)
 
 const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
 {
-	IHyDrawInst2d::operator=(rhs);
+	IHyDrawable2d::operator=(rhs);
 
 	HyError("HySpine2d::operator= implement me!");
 

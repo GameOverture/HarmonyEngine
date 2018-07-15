@@ -16,7 +16,7 @@
 #include "Threading/IHyThreadClass.h"
 
 class IHyRenderer;
-class IHyDraw2d;
+class IHyLoadable2d;
 class IHyNodeData;
 class HyAudioData;
 class HySprite2dData;
@@ -51,8 +51,8 @@ class HyAssets : public IHyThreadClass
 	Factory<HyText2dData>										m_FontFactory;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
-	std::vector<IHyDraw2d *>									m_QueuedInst2dList;
-	std::vector<IHyDraw2d *>									m_FullyLoadedList;
+	std::vector<IHyLoadable2d *>									m_QueuedInst2dList;
+	std::vector<IHyLoadable2d *>									m_FullyLoadedList;
 	std::vector<IHyLoadableData *>								m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
@@ -83,10 +83,10 @@ public:
 	uint32 GetNumAtlases();
 	HyAtlasIndices *GetLoadedAtlases();
 
-	void AcquireNodeData(IHyDraw2d *pLoadable, const IHyNodeData *&pDataOut);
-	void LoadNodeData(IHyDraw2d *pLoadable);
-	void RemoveNodeData(IHyDraw2d *pLoadable);
-	bool IsInstLoaded(IHyDraw2d *pLoadable);
+	void AcquireNodeData(IHyLoadable2d *pLoadable, const IHyNodeData *&pDataOut);
+	void LoadNodeData(IHyLoadable2d *pLoadable);
+	void RemoveNodeData(IHyLoadable2d *pLoadable);
+	bool IsInstLoaded(IHyLoadable2d *pLoadable);
 
 	void Shutdown();
 	bool IsShutdown();
@@ -103,7 +103,7 @@ private:
 	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
 
-	void SetInstAsLoaded(IHyDraw2d *pLoadable);
+	void SetInstAsLoaded(IHyLoadable2d *pLoadable);
 };
 
 #endif /* HyAssets_h__ */

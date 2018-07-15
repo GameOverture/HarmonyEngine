@@ -7,11 +7,11 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Draws/Entities/HyEntity3d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity3d.h"
 #include "Scene/HyScene.h"
 #include "HyEngine.h"
 
-HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyDraw3d(HYTYPE_Entity3d, pParent)
+HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyLoadable3d(HYTYPE_Entity3d, pParent)
 {
 }
 

@@ -12,19 +12,19 @@
 
 #include "Afx/HyStdAfx.h"
 
-class IHyDrawInst2d;
+class IHyDrawable2d;
 
 class HyShape2d
 {
-	IHyDrawInst2d *					m_pOwnerInst;
+	IHyDrawable2d *					m_pOwnerInst;
 
 	HyShapeType						m_eType;
 	b2Shape *						m_pShape;
 
 public:
-	HyShape2d(IHyDrawInst2d *pOwnerInst);
+	HyShape2d(IHyDrawable2d *pOwnerInst);
 	HyShape2d(const HyShape2d &copyRef) = delete;
-	HyShape2d(IHyDrawInst2d *pOwnerInst, const HyShape2d &copyRef);
+	HyShape2d(IHyDrawable2d *pOwnerInst, const HyShape2d &copyRef);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);

@@ -11,9 +11,9 @@
 #define HyPrefab3d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Draws/IHyDraw3d.h"
+#include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 
-class HyPrefab3d : public IHyDraw3d
+class HyPrefab3d : public IHyLoadable3d
 {
 public:
 	HyPrefab3d(const char *szPrefix, const char *szName, HyEntity3d *pParent);

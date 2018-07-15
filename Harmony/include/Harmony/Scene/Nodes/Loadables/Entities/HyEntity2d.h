@@ -11,9 +11,9 @@
 #define HyEntity2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Draws/IHyDraw2d.h"
+#include "Scene/Nodes/Loadables/IHyLoadable2d.h"
 
-class HyEntity2d : public IHyDraw2d
+class HyEntity2d : public IHyLoadable2d
 {
 protected:
 	std::vector<IHyNode2d *>		m_ChildList;

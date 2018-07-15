@@ -71,7 +71,6 @@ protected:
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding)						{ }
 	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding)							{ }
 
-private:
 	virtual bool IsLoaded() const { return true; }
 	virtual void Load() { }
 	virtual void Unload() { }

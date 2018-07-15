@@ -13,7 +13,7 @@
 #define HyEntityLeaf2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
 
 template<typename LEAF>
 class HyEntityLeaf2d : public HyEntity2d

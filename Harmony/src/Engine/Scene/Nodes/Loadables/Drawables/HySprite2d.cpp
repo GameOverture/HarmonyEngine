@@ -7,13 +7,13 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "Scene/Nodes/Draws/Instances/HySprite2d.h"
+#include "Scene/Nodes/Loadables/Drawables/HySprite2d.h"
 #include "HyEngine.h"
-#include "Scene/Nodes/Draws/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
-HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawInst2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
+HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
 																						m_bIsAnimPaused(false),
 																						m_fAnimPlayRate(1.0f),
 																						m_fElapsedFrameTime(0.0f),
@@ -23,7 +23,7 @@ HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
-HySprite2d::HySprite2d(const HySprite2d &copyRef) :	IHyDrawInst2d(copyRef),
+HySprite2d::HySprite2d(const HySprite2d &copyRef) :	IHyDrawable2d(copyRef),
 													m_bIsAnimPaused(copyRef.m_bIsAnimPaused),
 													m_fAnimPlayRate(copyRef.m_fAnimPlayRate),
 													m_fElapsedFrameTime(copyRef.m_fElapsedFrameTime),
@@ -43,7 +43,7 @@ HySprite2d::~HySprite2d(void)
 
 const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 {
-	IHyDrawInst2d::operator=(rhs);
+	IHyDrawable2d::operator=(rhs);
 
 	m_bIsAnimPaused = rhs.m_bIsAnimPaused;
 	m_fAnimPlayRate = rhs.m_fAnimPlayRate;
@@ -405,7 +405,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 /*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
 {
-	IHyDrawInst2d::OnDataAcquired();
+	IHyDrawable2d::OnDataAcquired();
 
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(UncheckedGetData());
 	uint32 uiNumStates = pData->GetNumStates();
