@@ -11,8 +11,8 @@
 #define HyProfiler_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
-#include "Scene/Nodes/Loadables/Drawables/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrimitive2d.h"
 
 #include <stack>
 

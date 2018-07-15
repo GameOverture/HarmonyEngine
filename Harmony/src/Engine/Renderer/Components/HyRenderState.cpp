@@ -9,9 +9,9 @@
  *************************************************************************/
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
-#include "Scene/Nodes/Loadables/Drawables/HyText2d.h"
-#include "Scene/Nodes/Loadables/Drawables/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyText2d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrimitive2d.h"
 
 HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOffset, /*const*/ IHyDrawable2d &instanceRef) :	m_uiID(uiId),
 																																m_uiCULL_PASS_MASK(uiCullPassMask),

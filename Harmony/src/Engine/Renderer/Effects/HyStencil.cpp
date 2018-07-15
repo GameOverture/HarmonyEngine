@@ -10,7 +10,7 @@
 #include "Renderer/Effects/HyStencil.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Components/HyRenderState.h"
-#include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 

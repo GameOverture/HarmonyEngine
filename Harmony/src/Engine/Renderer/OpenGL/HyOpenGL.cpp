@@ -13,8 +13,8 @@
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Diagnostics/Console/HyConsole.h"
-#include "Scene/Nodes/Misc/HyCamera.h"
-#include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Objects/HyCamera.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, windowListRef),
 																							m_mtxView(1.0f),

@@ -11,7 +11,7 @@
 #define HyWindow_h__
 
 #include "Afx/HyInteropAfx.h"
-#include "Scene/Nodes/Misc/HyCamera.h"
+#include "Scene/Nodes/Objects/HyCamera.h"
 
 class HyWindow
 {

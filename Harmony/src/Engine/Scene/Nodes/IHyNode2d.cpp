@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/IHyNode2d.h"
-#include "Scene/Nodes/Loadables/Entities/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
 #include "HyEngine.h"
 
 IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType),

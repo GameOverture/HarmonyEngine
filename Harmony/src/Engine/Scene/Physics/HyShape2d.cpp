@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Physics/HyShape2d.h"
-#include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 #include "Diagnostics/Console/HyConsole.h"
 
 HyShape2d::HyShape2d(IHyDrawable2d *pOwnerInst) :	m_pOwnerInst(pOwnerInst),

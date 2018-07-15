@@ -11,8 +11,8 @@
 #include "IHyApplication.h"
 #include "Time/HyTime.h"
 #include "Assets/HyAssets.h"
-#include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
-#include "Scene/Nodes/Loadables/Drawables/HyText2d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyText2d.h"
 #include "HyEngine.h"
 
 HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :	m_InitStructRef(initStruct),
