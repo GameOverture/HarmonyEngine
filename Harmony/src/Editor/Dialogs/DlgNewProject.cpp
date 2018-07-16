@@ -116,11 +116,8 @@ void DlgNewProject::on_buttonBox_accepted()
 	projDir.mkdir(ui->txtRelativeSourceLocation->text());
 	projDir.cd(ui->txtRelativeSourceLocation->text());
 	QDir slnDir(projDir);
-	if(ui->chkCreateProjectDir->isChecked())
-	{
-		projDir.mkdir(ui->txtClassName->text());
-		projDir.cd(ui->txtClassName->text());
-	}
+	projDir.mkdir(ui->txtClassName->text());
+	projDir.cd(ui->txtClassName->text());
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// Insert the minimum required fields for settings file. The project's DlgProjectSettings will fill in the rest of the defaults
@@ -133,16 +130,8 @@ void DlgNewProject::on_buttonBox_accepted()
 
 	// Development .hyproj which sits in the source .proj directory, has only one field which indicates the relative path to the actual settings file
 	QJsonObject jsonObjForSrc;
-	if(ui->chkCreateProjectDir->isChecked())
-	{
-		QDir srcDir(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtClassName->text());
-		jsonObjForSrc.insert("AdjustWorkingDirectory", QJsonValue(srcDir.relativeFilePath(GetProjDirPath())));
-	}
-	else
-	{
-		QDir srcDir(GetProjDirPath() % ui->txtRelativeSourceLocation->text());
-		jsonObjForSrc.insert("AdjustWorkingDirectory", QJsonValue(srcDir.relativeFilePath(GetProjDirPath())));
-	}
+	QDir srcDir(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtClassName->text());
+	jsonObjForSrc.insert("AdjustWorkingDirectory", QJsonValue(srcDir.relativeFilePath(GetProjDirPath())));
 
 	QFile newProjectFile(GetProjFilePath());
 	if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -162,10 +151,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	}
 
 	QFile *pNewProjectFileForSrc = nullptr;
-	if(ui->chkCreateProjectDir->isChecked())
-		pNewProjectFileForSrc = new QFile(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtClassName->text() % "/" % GetProjFileName());
-	else
-		pNewProjectFileForSrc = new QFile(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % GetProjFileName());
+	pNewProjectFileForSrc = new QFile(GetProjDirPath() % ui->txtRelativeSourceLocation->text() % "/" % ui->txtClassName->text() % "/" % GetProjFileName());
 
 	if(pNewProjectFileForSrc->open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 	{
@@ -186,31 +172,15 @@ void DlgNewProject::on_buttonBox_accepted()
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	QList<QDir> templateDirList;
-	if(ui->chkVs2013->isChecked())
-	{
-		QDir templateDir(MainWindow::EngineSrcLocation() % "templates");
-		templateDir.cd("vs2013");
-
-		templateDirList.append(templateDir);
-	}
-
-	if(ui->chkVs2015->isChecked())
-	{
-		QDir templateDir(MainWindow::EngineSrcLocation() % "templates");
-		templateDir.cd("vs2015");
-
-		templateDirList.append(templateDir);
-	}
-
 	if(ui->chkVs2017->isChecked())
 	{
-		QDir templateDir(MainWindow::EngineSrcLocation() % "templates");
+		QDir templateDir(MainWindow::EngineSrcLocation() % "src/Editor/_Templates");
 		templateDir.cd("vs2017");
 
 		templateDirList.append(templateDir);
 	}
 
-	QDir templateDir(MainWindow::EngineSrcLocation() % "templates");
+	QDir templateDir(MainWindow::EngineSrcLocation() % "src/Editor/_Templates");
 	templateDir.cd("common");
 	templateDirList.append(templateDir);
 	
@@ -219,9 +189,9 @@ void DlgNewProject::on_buttonBox_accepted()
 		QFileInfoList templateContentsList = templateDirList[iTemplateIndex].entryInfoList();
 		for(int i = 0; i < templateContentsList.size(); ++i)
 		{
-			if(ui->chkCreateProjectDir->isChecked() && templateContentsList[i].suffix().toLower() == "sln")
+			if(templateContentsList[i].suffix().toLower() == "sln")
 				QFile::copy(templateContentsList[i].absoluteFilePath(), slnDir.absoluteFilePath(templateContentsList[i].fileName()));
-			else // Everything goes in the projDir when chkCreateProjectDir isn't checked
+			else
 				QFile::copy(templateContentsList[i].absoluteFilePath(), projDir.absoluteFilePath(templateContentsList[i].fileName()));
 		}
 
@@ -229,15 +199,14 @@ void DlgNewProject::on_buttonBox_accepted()
 		//
 		// Rename the files themselves
 		QFileInfoList srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-		if(ui->chkCreateProjectDir->isChecked())
-			srcFileList += slnDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+		srcFileList += slnDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
 
 		for(int i = 0; i < srcFileList.size(); ++i)
 		{
 			if(srcFileList[i].fileName().contains("%HY_TITLE%"))
 			{
 				QFile file(srcFileList[i].absoluteFilePath());
-				QString sNewFileName = srcFileList[i].fileName().replace("%HY_TITLE%", ui->txtTitleName->text() % "_" % templateDirList[iTemplateIndex].dirName());
+				QString sNewFileName = srcFileList[i].fileName().replace("%HY_TITLE%", ui->txtTitleName->text());
 				file.rename(srcFileList[i].absoluteDir().absolutePath() % "/" % sNewFileName);
 				file.close();
 			}
@@ -253,8 +222,7 @@ void DlgNewProject::on_buttonBox_accepted()
 		// Then replace the contents
 		QUuid projGUID = QUuid::createUuid();
 		srcFileList = projDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-		if(ui->chkCreateProjectDir->isChecked())
-			srcFileList += slnDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+		srcFileList += slnDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
 
 		QTextCodec *pCodec = QTextCodec::codecForLocale();
 		for(int i = 0; i < srcFileList.size(); ++i)

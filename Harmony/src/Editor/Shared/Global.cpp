@@ -248,7 +248,6 @@
 	if(!dir.exists("include/") ||
 	   !dir.exists("lib/") ||
 	   !dir.exists("src/") ||
-	   !dir.exists("templates/") ||
 	   !dir.exists("Harmony.sln"))
 	{
 		return false;

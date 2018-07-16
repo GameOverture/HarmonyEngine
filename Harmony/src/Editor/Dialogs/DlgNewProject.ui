@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>530</width>
-    <height>490</height>
+    <width>583</width>
+    <height>421</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -300,19 +300,6 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QCheckBox" name="chkCreateProjectDir">
-        <property name="toolTip">
-         <string>Places the solution in the specified source directory, and creates a sub-directory for the project and source code</string>
-        </property>
-        <property name="text">
-         <string>Create solution directory</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
      <zorder>label</zorder>
      <zorder>label_5</zorder>
@@ -329,7 +316,6 @@
      <zorder>txtSourceDirName</zorder>
      <zorder>txtRelativeSourceLocation</zorder>
      <zorder>btnBrowseSource</zorder>
-     <zorder>chkCreateProjectDir</zorder>
     </widget>
    </item>
    <item>
@@ -338,26 +324,6 @@
       <string>Development Environment(s):</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QCheckBox" name="chkVs2013">
-        <property name="text">
-         <string>Visual Studio 2013</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="chkVs2015">
-        <property name="text">
-         <string>Visual Studio 2015</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QCheckBox" name="chkVs2017">
         <property name="text">
@@ -424,8 +390,6 @@
   <tabstop>txtSourceDirName</tabstop>
   <tabstop>txtRelativeSourceLocation</tabstop>
   <tabstop>btnBrowseSource</tabstop>
-  <tabstop>chkVs2013</tabstop>
-  <tabstop>chkVs2015</tabstop>
  </tabstops>
  <resources/>
  <connections>
