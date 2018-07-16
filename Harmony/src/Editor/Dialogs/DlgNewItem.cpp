@@ -93,7 +93,7 @@ QString DlgNewItem::GetPrefix()
 QString DlgNewItem::GetImportFile()
 {
 	if(ui->grpImport->isHidden() == false)
-		return ui->txtImport->text();
+		return HYGUI_ImportPrefix % ui->txtImport->text();
 	else
 		return QString();
 }

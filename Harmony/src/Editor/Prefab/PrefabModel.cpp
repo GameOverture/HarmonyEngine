@@ -17,14 +17,23 @@
 
 PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(itemRef)
 {
-	// If initValue is just a string, then it represents the import file
-	if(initValue.isString())
+	// initValue is just a string, that is either prefixed with HYGUI_ImportPrefix indicating to create a new prefab asset, or is the prefix/name of an existing prefab
+	if(initValue.isString() == false)
 	{
+		HyGuiLog("PrefabModel was given improper initValue", LOGTYPE_Error);
+		return;
+	}
+
+	QString sInitValue = initValue.toString();
+	if(sInitValue.contains(HYGUI_ImportPrefix))	// Importing a new prefab asset
+	{
+		sInitValue = sInitValue.remove(HYGUI_ImportPrefix);
+
 		Assimp::Importer importer;
-		const aiScene *pScene = importer.ReadFile(initValue.toString().toStdString(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+		const aiScene *pScene = importer.ReadFile(sInitValue.toStdString(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 		if(pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
 		{
-			HyGuiLog(initValue.toString() + " was incomplete and is invalid", LOGTYPE_Error);
+			HyGuiLog(sInitValue + " was incomplete and is invalid", LOGTYPE_Error);
 			return;
 		}
 

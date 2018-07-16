@@ -120,6 +120,7 @@ enum Theme
 #define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
 
 //#define HYDEFAULT_PrefixChar                    '+' // Names prefixed with a '+' are engine defaults that are automatically added to project
+#define HYGUI_ImportPrefix						"HY_IMPORT:"
 
 #define HYGUIPATH_DataFile                      "data.json"
 #define HYGUIPATH_TempDir                       "temp/"
