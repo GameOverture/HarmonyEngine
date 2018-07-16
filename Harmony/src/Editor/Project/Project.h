@@ -58,6 +58,7 @@ class Project : public ExplorerItem, public IHyApplication
 
 	QJsonObject                                     m_SaveDataObj;
 
+	bool											m_bSystemFontFound;
 	bool                                            m_bHasError;
 	
 public:

@@ -143,7 +143,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	bool bDefaultFontFound = false;
+	m_bSystemFontFound = false;
 
 	// Initialize the project by processing each type
 	for(auto typeIterator = m_SaveDataObj.begin(); typeIterator != m_SaveDataObj.end(); ++typeIterator)
@@ -212,8 +212,8 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 				{
 					ProjectItem *pNewDataItem = new ProjectItem(*this, eType, pCurPrefixTreeItem, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
 
-//					if(sCurPrefixPath == "+Hy/" && sPathPartList[iPathPartIndex] == "+HyFont")
-//						bDefaultFontFound = true;
+					if(sCurPrefixPath == "+Hy/" && sPathPartList[iPathPartIndex] == "+HyFont")
+						m_bSystemFontFound = true;
 
 #ifdef RESAVE_ENTIRE_PROJECT
 					pNewDataItem->Save();
@@ -226,26 +226,6 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 #ifdef RESAVE_ENTIRE_PROJECT
 	SaveGameData();
 #endif
-
-//	if(bDefaultFontFound == false)
-//	{
-//		QDir templateDataDir(MainWindow::EngineSrcLocation() % "templates/data");
-//		QFile srcFile(templateDataDir.absoluteFilePath("src.json"));
-//		if(!srcFile.open(QFile::ReadOnly))
-//		{
-//			HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
-//			m_bHasError = true;
-//			return;
-//		}
-
-//		QByteArray sContents = srcFile.readAll();
-//		srcFile.close();
-
-//		QByteArray sBefore("[HyHarmonyTemplateDataDir]");
-//		QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % "templates/data/").toLocal8Bit());
-//		sContents.replace(sBefore, sAfter);
-//		MainWindow::PasteItemSrc(sContents, this, QString());
-//	}
 
 	// Add project to the treewidget
 	pProjWidget->GetTreeWidget()->insertTopLevelItem(0, m_pTreeItemPtr);
@@ -661,6 +641,29 @@ void Project::ApplySaveEnables()
 
 	if(m_pTabBar->currentIndex() >= 0)
 		m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawShow();
+
+	if(m_bSystemFontFound == false)
+	{
+		QDir templateDataDir(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/");
+		QFile srcFile(templateDataDir.absoluteFilePath("src.json"));
+		if(!srcFile.open(QFile::ReadOnly))
+		{
+			HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
+			m_bHasError = true;
+		}
+		else
+		{
+			QByteArray sContents = srcFile.readAll();
+			srcFile.close();
+
+			QByteArray sBefore("[HyHarmonyTemplateDataDir]");
+			QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/").toLocal8Bit());
+			sContents.replace(sBefore, sAfter);
+			MainWindow::PasteItemSrc(sContents, this, QString());
+
+			m_bSystemFontFound = true;
+		}
+	}
 
 	return true;
 }

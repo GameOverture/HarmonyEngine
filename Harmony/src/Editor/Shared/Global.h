@@ -123,6 +123,7 @@ enum Theme
 
 #define HYGUIPATH_DataFile                      "data.json"
 #define HYGUIPATH_TempDir                       "temp/"
+#define HYGUIPATH_TemplateDir                   "src/Editor/_Templates/"
 #define HYGUIPATH_DataAtlases                   "atlas.json"
 #define HYGUIPATH_MetaSettings                  "atlas.hygui"
 #define HYGUIPATH_DataAudioCategories           "categories.json"

@@ -236,12 +236,16 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sP
 	if(ePasteItemType == ITEM_Font)
 	{
 		QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_Font, true));
+		QDir fontMetaDir(sFontMetaDir);
+		fontMetaDir.mkdir(".");
+
 		QJsonArray fontArray = pasteObj["fonts"].toArray();
 		for(int i = 0; i < fontArray.size(); ++i)
 		{
 			QFileInfo pasteFontFileInfo(fontArray[i].toString());
 
-			if(QFile::copy(pasteFontFileInfo.absoluteFilePath(), sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
+			QString sAbsFilePath = pasteFontFileInfo.absoluteFilePath();
+			if(QFile::copy(sAbsFilePath, sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
 				HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
 		}
 	}

@@ -174,13 +174,13 @@ void DlgNewProject::on_buttonBox_accepted()
 	QList<QDir> templateDirList;
 	if(ui->chkVs2017->isChecked())
 	{
-		QDir templateDir(MainWindow::EngineSrcLocation() % "src/Editor/_Templates");
+		QDir templateDir(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir);
 		templateDir.cd("vs2017");
 
 		templateDirList.append(templateDir);
 	}
 
-	QDir templateDir(MainWindow::EngineSrcLocation() % "src/Editor/_Templates");
+	QDir templateDir(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir);
 	templateDir.cd("common");
 	templateDirList.append(templateDir);
 	
