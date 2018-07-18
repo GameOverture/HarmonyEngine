@@ -9,6 +9,7 @@
  *************************************************************************/
 #define TINYGLTF_IMPLEMENTATION
 #include "PrefabModel.h"
+#include "Project.h"
 
 #include "assimp/Importer.hpp"      // C++ importer interface
 #include "assimp/Exporter.hpp"      // C++ importer interface
@@ -37,34 +38,14 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(it
 			return;
 		}
 
-		//  http://ogldev.atspace.co.uk/index.html
-
-		m_MeshList.reserve(pScene->mNumMeshes);
-		m_sTextureList.reserve(pScene->mNumMaterials);
-
-		// Rip all required textures from this prefab
-		if(pScene->HasTextures())
+		QDir dataDir(itemRef.GetProject().GetAssetsAbsPath() % HyGlobal::ItemName(ITEM_Prefab, true));
+		if(false == dataDir.mkpath(itemRef.GetPrefix()))
 		{
+			HyGuiLog("PrefabModel::PrefabModel() - Creating directory path failed: " % itemRef.GetPrefix(), LOGTYPE_Error);
+			return;
 		}
-
-		// GetTexture Filenames and Numb of Textures
-		for(uint i = 0; i < pScene->mNumMaterials; ++i)
-		{
-			uint uiTexIndex = 0;
-			aiReturn texFound = AI_SUCCESS;
-			aiString sFilePath;
-			while(true)
-			{
-				texFound = pScene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, uiTexIndex, &sFilePath);
-				if(texFound == AI_SUCCESS)
-				{
-					m_sTextureDiffuseList.append(sFilePath.data);
-					uiTexIndex++;
-				}
-				else
-					break;
-			}
-		}
+		QDir prefabDir(dataDir.absolutePath() % "/" % itemRef.GetPrefix());
+		QString sAbsFilePath = prefabDir.absoluteFilePath(itemRef.GetName(false) % ".gltf");
 
 		Assimp::Exporter exporter;
 		const aiExportFormatDesc *pDesc = nullptr;
@@ -74,20 +55,22 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(it
 			if(strcmp(pDesc->description, "GL Transmission Format v. 2") == 0)
 				break;
 		}
-		
-		aiReturn ret = exporter.Export(pScene, pDesc->id, "C:\\TestOutput\\test22.hy3d");
-		ret = ret;
-		//int iNumTextures = m_sTextureFilePathList.size();
-		//iNumTextures = iNumTextures;
+		aiReturn ret = exporter.Export(pScene, pDesc->id, sAbsFilePath.toStdString());
+		if(ret != aiReturn_SUCCESS)
+		{
+			HyGuiLog(sAbsFilePath + " failed to export to glTF", LOGTYPE_Error);
+			return;
+		}
 
-
-		tinygltf::Model model; 
+		tinygltf::Model model;
 		tinygltf::TinyGLTF loader;
 		std::string err;
-  
-		bool returnVal = loader.LoadASCIIFromFile(&model, &err, "C:\\TestOutput\\test22.hy3d");
-
-		model.meshes;
+		bool bTinyGltfLoaded = loader.LoadASCIIFromFile(&model, &err, sAbsFilePath.toStdString());
+		if(bTinyGltfLoaded == false)
+		{
+			HyGuiLog("tinygltf::TinyGLTF failed to load: " % sAbsFilePath, LOGTYPE_Error);
+			return;
+		}
 	}
 }
 

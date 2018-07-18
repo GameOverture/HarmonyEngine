@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/HyAtlas.h"
 #include "Assets/Loadables/HyAtlasIndices.h"
+#include "Assets/Loadables/HyGLTF.h"
 #include "Threading/IHyThreadClass.h"
 
 class IHyRenderer;
@@ -34,6 +35,9 @@ class HyAssets : public IHyThreadClass
 	uint32														m_uiNumAtlases;
 	HyAtlasIndices *											m_pLoadedAtlasIndices;
 
+	HyGLTF *													m_pGltfModels;
+	uint32														m_uiNumGltfModels;
+
 	template<typename tData>
 	class Factory
 	{
@@ -51,8 +55,8 @@ class HyAssets : public IHyThreadClass
 	Factory<HyText2dData>										m_FontFactory;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
-	std::vector<IHyLoadable *>								m_QueuedInst2dList;
-	std::vector<IHyLoadable *>								m_FullyLoadedList;
+	std::vector<IHyLoadable *>									m_QueuedInst2dList;
+	std::vector<IHyLoadable *>									m_FullyLoadedList;
 	std::vector<IHyLoadableData *>								m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
@@ -79,9 +83,11 @@ public:
 	HyAtlas *GetAtlas(uint32 uiMasterIndex);
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 	HyAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
-
 	uint32 GetNumAtlases();
 	HyAtlasIndices *GetLoadedAtlases();
+
+	HyGLTF *GetGltf(uint32 uiIndex);
+	uint32 GetNumGltf();
 
 	void AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut);
 	void LoadNodeData(IHyLoadable *pLoadable);

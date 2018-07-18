@@ -17,7 +17,6 @@
 
 class HyPrefabData : public IHyNodeData
 {
-	//const aiScene *		m_pAiScene;
 
 public:
 	HyPrefabData(const std::string &sPath);

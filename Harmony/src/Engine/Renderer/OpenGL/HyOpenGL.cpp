@@ -561,7 +561,6 @@ HyOpenGL::~HyOpenGL(void)
 	}
 	else
 	{
-		// TODO: Fix hardcoded size value (will need to retrieve the actual size from HyAtlas::OnLoadThread)
 		glCompressedTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
 	}

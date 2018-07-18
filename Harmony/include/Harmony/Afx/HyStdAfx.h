@@ -82,6 +82,7 @@ enum HyLoadableType
 {
 	HYLOADABLE_Atlas = 0,
 	HYLOADABLE_Shader,
+	HYLOADABLE_GLTF
 };
 
 enum HyAnimCtrl

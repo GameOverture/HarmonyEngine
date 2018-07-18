@@ -234,6 +234,9 @@
     <ClCompile Include="Scene\Nodes\Loadables\Visables\Drawables\Objects\HyTexturedQuad2d.cpp">
       <Filter>Scene\Nodes\Loadables\Visables\Drawables\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Assets\Loadables\HyGLTF.cpp">
+      <Filter>Assets\Loadables</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -641,6 +644,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Visables\Drawables\Objects\HyTexturedQuad2d.h">
       <Filter>Scene\Nodes\Loadables\Visables\Drawables\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Assets\Loadables\HyGLTF.h">
+      <Filter>Assets\Loadables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

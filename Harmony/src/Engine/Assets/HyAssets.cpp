@@ -65,6 +65,8 @@ HyAssets::HyAssets(std::string sDataDirPath) :	IHyThreadClass(),
 												m_pAtlases(nullptr),
 												m_uiNumAtlases(0),
 												m_pLoadedAtlasIndices(nullptr),
+												m_pGltfModels(nullptr),
+												m_uiNumGltfModels(0),
 												m_bProcessThread(false)
 {
 	IHyLoadable::sm_pHyAssets = this;
@@ -79,10 +81,15 @@ HyAssets::~HyAssets()
 
 	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 		m_pAtlases[i].~HyAtlas();
-
 	unsigned char *pAtlases = reinterpret_cast<unsigned char *>(m_pAtlases);
 	delete[] pAtlases;
 	m_pAtlases = nullptr;
+
+	for(uint32 i = 0; i < m_uiNumGltfModels; ++i)
+		m_pGltfModels[i].~HyGLTF();
+	unsigned char *pGltfModels = reinterpret_cast<unsigned char *>(m_pGltfModels);
+	delete[] pGltfModels;
+	m_pGltfModels = nullptr;
 
 	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
 		delete iter->second;
@@ -132,6 +139,8 @@ HyAtlasIndices *HyAssets::GetLoadedAtlases()
 {
 	return m_pLoadedAtlasIndices;
 }
+
+
 
 void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut)
 {
