@@ -143,9 +143,9 @@ void AudioWidgetManager::AddAudioBankGroup(int iId /*= -1*/)
 		
 		// Make new audio bank in both meta and data directories
 		if(false == m_MetaDir.mkdir(HyGlobal::MakeFileNameFromCounter(iId)))
-			HyGuiLog("Failed to create new meta-audio bank directory", LOGTYPE_Error)
+			HyGuiLog("Failed to create new meta-audio bank directory", LOGTYPE_Error);
 		else
-			HyGuiLog("Created new meta-audio bank: " + iId, LOGTYPE_Info)
+			HyGuiLog("Created new meta-audio bank: " + iId, LOGTYPE_Info);
 	}
 	
 	QDir newMetaAudioBankDir(m_MetaDir);

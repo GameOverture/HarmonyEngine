@@ -278,8 +278,19 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sP
 	for(int i = 0; i < importImageList.size(); ++i)
 		correspondingParentList.push_back(nullptr);
 
+
 	// Repack this atlas group with imported images
-	QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, (ePasteItemType == ITEM_Font) ? ITEM_Font : ITEM_AtlasImage, correspondingParentList);
+	HyGuiItemType eType;
+	switch(ePasteItemType)
+	{
+	case ITEM_Prefab: eType = ITEM_Prefab; break;
+	case ITEM_Font: eType = ITEM_Font; break;
+	default:
+		eType = ITEM_AtlasImage;
+		break;
+	}
+
+	QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, eType, correspondingParentList);
 	if(importedFramesSet.empty() == false)
 		pProject->GetAtlasModel().Repack(pProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedFramesSet);
 

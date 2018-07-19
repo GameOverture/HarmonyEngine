@@ -42,7 +42,7 @@ public:
 	explicit WidgetOutputLog(QWidget *parent = 0);
 	~WidgetOutputLog();
 
-	static void Log(QString &sMessage, eLogType eType = LOGTYPE_Normal);
+	static void Log(QString sMessage, eLogType eType = LOGTYPE_Normal);
 
 private:
 	Ui::WidgetOutputLog *ui;

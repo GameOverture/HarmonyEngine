@@ -132,7 +132,7 @@ enum Theme
 QAction *FindAction(QList<QAction *> list, QString sName);
 #define FINDACTION(str) FindAction(this->actions(), str)
 
-#define HyGuiLog(msg, type) { QString sHyLogTmpStr = msg; WidgetOutputLog::Log(sHyLogTmpStr, type); }
+#define HyGuiLog(msg, type) WidgetOutputLog::Log(QString(msg), type)
 
 #define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
 

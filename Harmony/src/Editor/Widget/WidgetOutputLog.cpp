@@ -40,7 +40,7 @@ WidgetOutputLog::~WidgetOutputLog()
 	delete ui;
 }
 
-/*static*/ void WidgetOutputLog::Log(QString &sMessage, eLogType eType /*= LOGTYPE_Normal*/)
+/*static*/ void WidgetOutputLog::Log(QString sMessage, eLogType eType /*= LOGTYPE_Normal*/)
 {
 	QPlainTextEdit *pTxt = sm_pInstance->ui->m_TextLog;
 
