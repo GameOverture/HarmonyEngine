@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "FontModels.h"
 #include "Project.h"
+#include "AtlasWidget.h"
 
 #include <QJsonArray>
 #include <QStandardPaths>
@@ -363,7 +364,13 @@ void FontModel::GeneratePreview()
 	if(m_pTrueAtlasFrame)
 		m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
 	else
-		m_pTrueAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, 0, ITEM_Font);
+	{
+		quint32 uiAtlasGrpIndex = 0;
+		if(m_ItemRef.GetProject().GetAtlasWidget())
+			uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedAtlasGrpId());
+
+		m_pTrueAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasGrpIndex, ITEM_Font);
+	}
 }
 
 /*virtual*/ QJsonObject FontModel::PopStateAt(uint32 uiIndex) /*override*/

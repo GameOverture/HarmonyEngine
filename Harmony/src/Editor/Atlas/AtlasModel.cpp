@@ -603,11 +603,13 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiA
 {
 	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
 
+	AtlasItemType eAtlasItemType = HyGlobal::GetAtlasItemFromItem(eType);
+
 	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
-	if(eType != ITEM_Font && eType != ITEM_Spine) // Cannot crop 'sub-atlases' because they rely on their own UV coordinates
+	if(eAtlasItemType == ATLASITEM_Image) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		rAlphaCrop = ImagePacker::crop(newImage);
 
-	AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, HyGlobal::GetAtlasItemFromItem(eType), newImage.width(), newImage.height(), -1, -1, -1, 0);
+	AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, eAtlasItemType, newImage.width(), newImage.height(), -1, -1, -1, 0);
 	if(pNewFrame)
 	{
 		newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));

@@ -81,7 +81,7 @@ Project *ExplorerWidget::AddProject(const QString sNewProjectFilePath)
 	//pNewLoadThread->start();
 }
 
-ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue)
+ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue importValue)
 {
 	if(pProj == nullptr)
 	{
@@ -123,7 +123,7 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 		}
 	}
 
-	ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, pParentTreeItem, sName, initValue, true);
+	ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, pParentTreeItem, sName, importValue, true);
 
 	pItem->SetTreeItemSubIcon(SUBICON_New);
 
@@ -140,6 +140,10 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 	}
 
 	ui->treeWidget->sortItems(0, Qt::AscendingOrder);
+
+	// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
+	if(importValue.isNull() == false)
+		pItem->Save();
 
 	return pItem;
 }
@@ -328,8 +332,6 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sP
 	QString sPrefix = sPrefixOverride.isEmpty() ? itemNameFileInfo.path() : sPrefixOverride;
 	QString sName = itemNameFileInfo.baseName();
 	ProjectItem *pNewItem = AddNewItem(pProject, ePasteItemType, sPrefix, sName, false, pasteObj["src"]);
-	if(pNewItem)
-		pNewItem->Save();
 }
 
 void ExplorerWidget::RecursiveRemoveItem(ExplorerItem *pItem)

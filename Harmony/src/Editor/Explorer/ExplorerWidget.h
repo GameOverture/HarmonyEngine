@@ -45,7 +45,8 @@ public:
 	
 	Project *AddProject(const QString sNewProjectFilePath);
 
-	ProjectItem *AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue initValue);
+	// If importValue doesn't equal null, then this new ProjectItem will be saved upon creation
+	ProjectItem *AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue importValue);
 	void RemoveItem(ExplorerItem *pItem);
 	void SelectItem(ExplorerItem *pItem);
 	

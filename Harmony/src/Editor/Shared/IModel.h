@@ -49,6 +49,7 @@ public:
 	virtual ~IModel();
 
 	ProjectItem &GetItem();
+	const ProjectItem &GetItem() const;
 	
 	int GetNumStates();
 	IStateData *GetStateData(int iStateIndex);

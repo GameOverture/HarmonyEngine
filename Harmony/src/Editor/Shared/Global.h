@@ -66,6 +66,7 @@ enum AtlasItemType
 	ATLASITEM_Image,
 	ATLASITEM_Font,
 	ATLASITEM_Spine,
+	ATLASITEM_Prefab,
 
 	NUMATLASITEM
 };

@@ -124,8 +124,10 @@
 		return ITEM_Font;
 	case ATLASITEM_Spine:
 		return ITEM_Spine;
+	case ATLASITEM_Prefab:
+		return ITEM_Prefab;
 	default:
-		HyGuiLog("HyGlobal::GetItemFromAtlasFrameType() could not find the proper item", LOGTYPE_Error);
+		HyGuiLog("HyGlobal::GetItemFromAtlasItem() could not find the proper item", LOGTYPE_Error);
 	}
 
 	return ITEM_Unknown;
@@ -143,6 +145,8 @@
 		return ATLASITEM_Font;
 	case ITEM_Spine:
 		return ATLASITEM_Spine;
+	case ITEM_Prefab:
+		return ATLASITEM_Prefab;
 	default:
 		HyGuiLog("HyGlobal::GetAtlasItemFromItem() could not find the atlas item", LOGTYPE_Error);
 	}

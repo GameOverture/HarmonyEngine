@@ -76,6 +76,7 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(it
 
 			QJsonDocument gltfDoc = QJsonDocument::fromJson(gltfFile.readAll());
 			QJsonObject gltfObj = gltfDoc.object();
+			gltfFile.close();
 
 			// Find all the required image dependencies and store their file paths in 'sImageFilePaths'
 			QStringList sImageFilePaths;
@@ -95,30 +96,53 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(it
 					HyGuiLog("PrefabModel::PrefabModel() - while importing, glTF images did not have either a \"uri\" or a \"bufferView\": " % sAbsFilePath, LOGTYPE_Error);
 			}
 
-			if(sImageFilePaths.size() != imagesArray.size())
-				HyGuiLog("PrefabModel::PrefabModel() - sImageFilePaths.size() != imagesArray.size(): " % sAbsFilePath, LOGTYPE_Error);
-			else
+			// Import images into the selected atlas group, or default one
+			QList<AtlasFrame *> newlyImportedAtlasFrameList;
+			if(sImageFilePaths.size() == imagesArray.size())
 			{
-				quint32 uiChecksum;
-
-				// Import images into the selected atlas group, or default one
 				quint32 uiAtlasGrpId = itemRef.GetProject().GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
 				if(itemRef.GetProject().GetAtlasWidget())
 					uiAtlasGrpId = itemRef.GetProject().GetAtlasWidget()->GetSelectedAtlasGrpId();
 
-				QList<AtlasTreeItem *> correspondingParentList;
 				for(int i = 0; i < sImageFilePaths.size(); ++i)
-					correspondingParentList.push_back(nullptr);
+				{
+					QFileInfo fileInfo(sImageFilePaths[i]);
+					QImage newImage(fileInfo.absoluteFilePath());
+					newlyImportedAtlasFrameList.append(itemRef.GetProject().GetAtlasModel().ImportImage(fileInfo.baseName(), newImage, uiAtlasGrpId, ITEM_Prefab, nullptr));
+				}
 				
-				QSet<AtlasFrame *> newlyImportedAtlasFrameSet = itemRef.GetProject().GetAtlasModel().ImportImages(sImageFilePaths, uiAtlasGrpId, ITEM_Prefab, correspondingParentList);
+				// Repack the affected atlas group to generate the final textures and finish setting the AtlasFrames' data
+				QSet<AtlasFrame *> newlyImportedAtlasFrameSet = newlyImportedAtlasFrameList.toSet();
 				if(newlyImportedAtlasFrameSet.empty() == false)
 					itemRef.GetProject().GetAtlasModel().Repack(itemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), newlyImportedAtlasFrameSet);
 
-				// START HERE:
-				//imageObj.insert("checksum", QJsonValue(static_cast<qint64>(uiChecksum)));
-				//imagesArray[i] = imageObj;
+				// Associate the newly added frames with this prefab item
+				itemRef.GetProject().GetAtlasModel().RequestFrames(&itemRef, newlyImportedAtlasFrameList);
+			}
+			else
+				HyGuiLog("PrefabModel::PrefabModel() - sImageFilePaths.size() != imagesArray.size(): " % sAbsFilePath, LOGTYPE_Error);
 
-				//gltfObj.insert("images", imagesArray);
+			// Insert the checksum values into the images array
+			for(int i = 0; i < imagesArray.size(); ++i)
+			{
+				QJsonObject imageObj = imagesArray[i].toObject();
+				imageObj.insert("checksum", QJsonValue(static_cast<qint64>(newlyImportedAtlasFrameList[i]->GetImageChecksum())));
+				imagesArray[i] = imageObj;
+			}
+			gltfObj.insert("images", imagesArray);
+
+			// Resave glTF file with inserted checksums on images
+			if(gltfFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+				HyGuiLog("Couldn't open " % sAbsFilePath % " for writing: " % gltfFile.errorString(), LOGTYPE_Error);
+			else
+			{
+				QJsonDocument userDoc;
+				userDoc.setObject(gltfObj);
+				qint64 iBytesWritten = gltfFile.write(userDoc.toJson());
+				if(0 == iBytesWritten || -1 == iBytesWritten)
+					HyGuiLog("Could not write to " % sAbsFilePath % ": " % gltfFile.errorString(), LOGTYPE_Error);
+
+				gltfFile.close();
 			}
 		}
 		else
@@ -169,7 +193,7 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(it
 
 /*virtual*/ QJsonValue PrefabModel::GetJson() const /*override*/
 {
-	return QJsonValue();
+	return QJsonValue(GetItem().GetName(true));
 }
 
 /*virtual*/ QList<AtlasFrame *> PrefabModel::GetAtlasFrames() const /*override*/
