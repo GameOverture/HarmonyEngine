@@ -11,13 +11,19 @@
 #define PREFABMODEL_H
 
 #include "IModel.h"
+#include "PropertiesTreeModel.h"
 
 #include <QObject>
 
 class PrefabModel : public IModel
 {
+	tinygltf::Model			m_ModelData;
+	PropertiesTreeModel		m_PropertiesModel;
+
 public:
 	PrefabModel(ProjectItem &itemRef, QJsonValue initValue);
+
+	PropertiesTreeModel &GetPropertiesModel();
 
 	virtual void OnSave() override;
 	virtual QJsonObject PopStateAt(uint32 uiIndex) override;

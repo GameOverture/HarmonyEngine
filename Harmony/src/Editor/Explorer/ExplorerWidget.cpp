@@ -411,6 +411,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Sprite:
 		case ITEM_Shader:
 		case ITEM_Entity:
+		case ITEM_Prefab:
 			ui->actionOpen->setText("Open " % pSelectedExplorerItem->GetName(false));
 			ui->actionOpen->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_None));
 			contextMenu.addAction(ui->actionOpen);
@@ -461,6 +462,7 @@ void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
 	case ITEM_Sprite:
 	case ITEM_Shader:
 	case ITEM_Entity:
+	case ITEM_Prefab:
 		MainWindow::OpenItem(static_cast<ProjectItem *>(pTreeVariantItem));
 		break;
 		
@@ -547,6 +549,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 	case ITEM_Sprite:
 	case ITEM_Shader:
 	case ITEM_Entity:
+	case ITEM_Prefab:
 		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the " % HyGlobal::ItemName(pItem->GetType(), false) % ":\n" % pItem->GetName(true) % "?\n\nThis action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
 			static_cast<ProjectItem *>(pItem)->DeleteFromProject();

@@ -15,11 +15,13 @@ PrefabWidget::PrefabWidget(ProjectItem &itemRef, QWidget *parent) :	QWidget(pare
 																	m_ItemRef(itemRef)
 {
     ui->setupUi(this);
+
+	ui->propertyTree->setModel(&static_cast<PrefabModel *>(m_ItemRef.GetModel())->GetPropertiesModel());
 }
 
 PrefabWidget::~PrefabWidget()
 {
-    delete ui;
+	delete ui;
 }
 
 void PrefabWidget::OnGiveMenuActions(QMenu *pMenu)

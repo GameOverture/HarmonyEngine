@@ -17,19 +17,12 @@
 #include "assimp/scene.h"           // Output data structure
 #include "assimp/postprocess.h"     // Post processing flags
 
-PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(itemRef)
+PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :	IModel(itemRef),
+																		m_PropertiesModel(itemRef, 0, 0, this)
 {
-	// initValue is just a string, that is either prefixed with HYGUI_ImportPrefix indicating to create a new prefab asset, or is the prefix/name of an existing prefab
-	if(initValue.isString() == false)
+	if(initValue.isString() && initValue.toString().contains(HYGUI_ImportPrefix))	// Importing a new prefab asset
 	{
-		HyGuiLog("PrefabModel was given improper initValue", LOGTYPE_Error);
-		return;
-	}
-
-	QString sInitValue = initValue.toString();
-	if(sInitValue.contains(HYGUI_ImportPrefix))	// Importing a new prefab asset
-	{
-		sInitValue = sInitValue.remove(HYGUI_ImportPrefix);
+		QString sInitValue = initValue.toString().remove(HYGUI_ImportPrefix);
 
 		// Import the DCC file from artist
 		Assimp::Importer importer;
@@ -148,10 +141,27 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) : IModel(it
 		else
 			HyGuiLog("PrefabModel::PrefabModel() could not find the exported gltf file: " % sAbsFilePath, LOGTYPE_Error);
 	}
-	else // Prefab/glTF already exists for Harmony
-	{
-		//sInitValue
-	}
+
+	QDir dataDir(itemRef.GetProject().GetAssetsAbsPath() % HyGlobal::ItemName(ITEM_Prefab, true));
+	QDir prefabDir(dataDir.absolutePath() % "/" % itemRef.GetPrefix());
+	QString sAbsFilePath = prefabDir.absoluteFilePath(itemRef.GetName(false) % ".gltf");
+
+	tinygltf::TinyGLTF loader;
+	std::string sError;
+	bool bLoadSuccess = loader.LoadASCIIFromFile(&m_ModelData, &sError, sAbsFilePath.toStdString());
+	if(bLoadSuccess == false)
+		HyLogError("Loading glTF file failed: " << sError.c_str());
+
+	m_PropertiesModel.AppendCategory("Scenes", QColor(255, 224, 192), QVariant(), false, false, "The glTF JSON may contain scenes (with an optional default scene). Each scene can contain an array of indices of nodes.");
+	m_PropertiesModel.AppendCategory("Meshes", QColor(224, 255, 192), QVariant(), false, false, "The meshes may contain multiple mesh primitives. These refer to the geometry data that is required for rendering the mesh.");
+	m_PropertiesModel.AppendCategory("Buffers", QColor(192, 255, 192), QVariant(), false, false, "The buffers contain the data that is used for the geometry of 3D models, animations, and skinning.");
+	m_PropertiesModel.AppendCategory("Materials", QColor(192, 255, 224), QVariant(), false, false, "Each mesh primitive may refer to one of the materials that are contained in a glTF asset. The materials describe how an object should be rendered.");
+	m_PropertiesModel.AppendCategory("Textures", QColor(192, 255, 255), QVariant(), false, false, "Contain information about textures that may be applied to rendered objects.");
+}
+
+PropertiesTreeModel &PrefabModel::GetPropertiesModel()
+{
+	return m_PropertiesModel;
 }
 
 //void PrefabModel::CopyNodesWithMeshes( aiNode node, SceneObject targetParent, Matrix4x4 accTransform)
