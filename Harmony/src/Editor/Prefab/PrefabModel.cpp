@@ -7,7 +7,6 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#define TINYGLTF_IMPLEMENTATION
 #include "PrefabModel.h"
 #include "Project.h"
 #include "AtlasWidget.h"
@@ -152,10 +151,11 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :	IModel(it
 	if(bLoadSuccess == false)
 		HyLogError("Loading glTF file failed: " << sError.c_str());
 
-	m_PropertiesModel.AppendCategory("Scenes", QColor(255, 224, 192), QVariant(), false, false, "The glTF JSON may contain scenes (with an optional default scene). Each scene can contain an array of indices of nodes.");
-	m_PropertiesModel.AppendCategory("Meshes", QColor(224, 255, 192), QVariant(), false, false, "The meshes may contain multiple mesh primitives. These refer to the geometry data that is required for rendering the mesh.");
+	m_PropertiesModel.AppendCategory("Scenes", QColor(255, 224, 192), QVariant(), false, false, "The prefab may contain scenes (with an optional default scene). Each scene can contain an array of indices of nodes.");
+
+	m_PropertiesModel.AppendCategory("Meshes", QColor(224, 255, 192), QVariant(), false, false, "May contain multiple mesh primitives. These refer to the geometry data that is required for rendering the mesh.");
 	m_PropertiesModel.AppendCategory("Buffers", QColor(192, 255, 192), QVariant(), false, false, "The buffers contain the data that is used for the geometry of 3D models, animations, and skinning.");
-	m_PropertiesModel.AppendCategory("Materials", QColor(192, 255, 224), QVariant(), false, false, "Each mesh primitive may refer to one of the materials that are contained in a glTF asset. The materials describe how an object should be rendered.");
+	m_PropertiesModel.AppendCategory("Materials", QColor(192, 255, 224), QVariant(), false, false, "Each mesh primitive may refer to one of the materials that are contained in a prefab asset. The materials describe how an object should be rendered.");
 	m_PropertiesModel.AppendCategory("Textures", QColor(192, 255, 255), QVariant(), false, false, "Contain information about textures that may be applied to rendered objects.");
 }
 

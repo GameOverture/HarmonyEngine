@@ -237,6 +237,9 @@
     <ClCompile Include="Assets\Loadables\HyGLTF.cpp">
       <Filter>Assets\Loadables</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities\tiny_gltf.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">

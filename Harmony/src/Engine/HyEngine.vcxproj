@@ -115,6 +115,7 @@
     <ClCompile Include="Utilities\HyStrManip.cpp" />
     <ClCompile Include="Utilities\HyVariant.cpp" />
     <ClCompile Include="Utilities\jasonxx.cc" />
+    <ClCompile Include="Utilities\tiny_gltf.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Harmony\Afx\Compilers\HyCompiler.h" />
