@@ -49,6 +49,9 @@ QString PropertiesTreeItem::GetValue() const
 	QString sRetStr = m_DataDef.sPrefix;
 	switch(m_DataDef.eType)
 	{
+	case PROPERTIESTYPE_bool:
+		sRetStr += m_Data.toBool() ? "True" : "False";
+		break;
 	case PROPERTIESTYPE_int:
 	case PROPERTIESTYPE_Slider:
 	case PROPERTIESTYPE_SpriteFrames:
@@ -65,6 +68,22 @@ QString PropertiesTreeItem::GetValue() const
 		QPointF pt = m_Data.toPointF();
 		sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
 		} break;
+	case PROPERTIESTYPE_ivec3: {
+		QRect rect = m_Data.toRect();
+		sRetStr += "{ " % QString::number(rect.left()) % ", " % QString::number(rect.top()) % ", " % QString::number(rect.width()) % " }";
+		} break;
+	case PROPERTIESTYPE_vec3: {
+		QRectF rect = m_Data.toRectF();
+		sRetStr += "{ " % QString::number(rect.left()) % ", " % QString::number(rect.top()) % ", " % QString::number(rect.width()) % " }";
+		} break;
+	case PROPERTIESTYPE_ivec4: {
+		QRect rect = m_Data.toRect();
+		sRetStr += "{ " % QString::number(rect.left()) % ", " % QString::number(rect.top()) % ", " % QString::number(rect.width()) % ", " % QString::number(rect.height()) % " }";
+		} break;
+	case PROPERTIESTYPE_vec4: {
+		QRectF rect = m_Data.toRectF();
+		sRetStr += "{ " % QString::number(rect.left()) % ", " % QString::number(rect.top()) % ", " % QString::number(rect.width()) % ", " % QString::number(rect.height()) % " }";
+		} break;
 	case PROPERTIESTYPE_LineEdit:
 		sRetStr += m_Data.toString();
 		break;
@@ -76,6 +95,15 @@ QString PropertiesTreeItem::GetValue() const
 		tmpComboBox.setModel(m_DataDef.delegateBuilder.value<ProjectItem *>()->GetModel());
 		sRetStr += tmpComboBox.itemText(m_Data.toInt());
 		} break;
+
+	case PROPERTIESTYPE_Root:
+	case PROPERTIESTYPE_Category:
+	case PROPERTIESTYPE_CategoryChecked:
+		break;
+
+	default:
+		HyGuiLog("PropertiesTreeItem::GetValue not implemented for type: " % QString::number(m_DataDef.eType), LOGTYPE_Error);
+		break;
 	}
 
 	sRetStr += m_DataDef.sSuffix;

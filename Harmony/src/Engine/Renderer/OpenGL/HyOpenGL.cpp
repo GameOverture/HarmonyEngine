@@ -712,7 +712,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 		viewportRect.top = 1.0f;
 
 		m_mtxView = glm::mat4(1.0f);
-		m_mtxView = glm::translate(m_mtxView, vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f);
+		m_mtxView = glm::translate(m_mtxView, glm::vec3(vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f));
 	}
 
 	float fWidth = (viewportRect.Width() * vFramebufferSize.x);

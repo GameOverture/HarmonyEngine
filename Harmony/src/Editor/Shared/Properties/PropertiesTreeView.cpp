@@ -29,6 +29,8 @@ PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) : QTreeVi
 	setIndentation(0);
 	setAnimated(true);
 	setColumnWidth(0, 200);
+
+	expandAll();
 }
 
 PropertiesTreeView::~PropertiesTreeView()
@@ -132,6 +134,18 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(defRef.defaultData);
 		break;
 
+	//case PROPERTIESTYPE_ivec3:
+	//	break;
+
+	//case PROPERTIESTYPE_vec3:
+	//	break;
+
+	//case PROPERTIESTYPE_ivec4:
+	//	break;
+
+	//case PROPERTIESTYPE_vec4:
+	//	break;
+
 	case PROPERTIESTYPE_LineEdit:
 		pReturnWidget = new QLineEdit(pParent);
 
@@ -185,6 +199,10 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		if(defRef.defaultData.isValid())
 			static_cast<QSlider *>(pReturnWidget)->setValue(defRef.defaultData.toInt());
 		break;
+
+	default:
+		HyGuiLog("PropertiesDelegate::createEditor not implemented for type: " % QString::number(pTreeItem->GetType()), LOGTYPE_Error);
+		break;
 	}
 
 	return pReturnWidget;
@@ -209,6 +227,11 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_vec2:
 		static_cast<WidgetVectorSpinBox *>(pEditor)->SetValue(pTreeItem->GetData());
 		break;
+	//case PROPERTIESTYPE_ivec3:
+	//case PROPERTIESTYPE_vec3:
+	//case PROPERTIESTYPE_ivec4:
+	//case PROPERTIESTYPE_vec4:
+	//	break;
 	case PROPERTIESTYPE_LineEdit:
 		static_cast<QLineEdit *>(pEditor)->setText(pTreeItem->GetData().toString());
 		break;
@@ -241,6 +264,11 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_vec2:
 		pModel->setData(index, static_cast<WidgetVectorSpinBox *>(pEditor)->GetValue());
 		break;
+	//case PROPERTIESTYPE_ivec3:
+	//case PROPERTIESTYPE_vec3:
+	//case PROPERTIESTYPE_ivec4:
+	//case PROPERTIESTYPE_vec4:
+	//	break;
 	case PROPERTIESTYPE_LineEdit:
 		pModel->setData(index, static_cast<QLineEdit *>(pEditor)->text());
 		break;

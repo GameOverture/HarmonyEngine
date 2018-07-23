@@ -31,6 +31,9 @@ public:
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
 	virtual QStringList GetFontUrls() const override;
 	virtual void Refresh() override;
+
+private:
+	void AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip);
 };
 
 #endif // PREFABMODEL_H

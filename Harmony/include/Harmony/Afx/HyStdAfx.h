@@ -24,9 +24,11 @@
 #include "Box2D/Box2D.h"
 
 //#define GLM_SWIZZLE
+#define GLM_FORCE_CTOR_INIT
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/transform2.hpp"
+#include "glm/gtx/matrix_decompose.hpp"
 
 // STL includes (TODO: to be replaced with EASTL)
 #include <string>
