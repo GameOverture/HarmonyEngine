@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HySpine2dData::HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_Spine2d, sPath)
+HySpine2dData::HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) : IHyNodeData(sPath)
 {
 	std::string sAtlasPath(GetPath());
 	sAtlasPath += ".atlas";

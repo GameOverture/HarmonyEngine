@@ -10,17 +10,11 @@
 
 #include "Assets/Nodes/IHyNodeData.h"
 
-IHyNodeData::IHyNodeData(HyType eType, const std::string &sPath) :	m_eTYPE(eType),
-																	m_sPATH(sPath)
+IHyNodeData::IHyNodeData(const std::string &sPath) : m_sPATH(sPath)
 { }
 
 /*virtual*/ IHyNodeData::~IHyNodeData(void)
 { }
-
-HyType IHyNodeData::GetInstType() const
-{
-	return m_eTYPE;
-}
 
 const std::string &IHyNodeData::GetPath() const
 { 

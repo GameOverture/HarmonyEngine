@@ -43,7 +43,7 @@ HyText2dData::FontState::~FontState()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_Text2d, sPath),
+HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(sPath),
 																												m_pTypefaces(nullptr),
 																												m_uiNumTypefaces(0),
 																												m_pFontStates(nullptr),

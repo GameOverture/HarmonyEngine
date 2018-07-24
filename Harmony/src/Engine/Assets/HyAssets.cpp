@@ -140,8 +140,6 @@ HyAtlasIndices *HyAssets::GetLoadedAtlases()
 	return m_pLoadedAtlasIndices;
 }
 
-
-
 void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut)
 {
 	switch(pLoadable->_LoadableGetType())
@@ -155,6 +153,9 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 	case HYTYPE_Text2d:
 		pDataOut = m_FontFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
+	case HYTYPE_Prefab3d:
+		pDataOut = m_PrefabFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+		break;
 	case HYTYPE_TexturedQuad2d:
 		if(pLoadable->GetName() != "raw")
 		{
@@ -166,6 +167,10 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 			}
 			pDataOut = m_Quad2d[key];
 		}
+		break;
+
+	default:
+		HyError("HyAssets::AcquireNodeData() Unimplemented data type: " << pLoadable->_LoadableGetType());
 		break;
 	}
 }
@@ -431,6 +436,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	m_AudioFactory.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
 	m_FontFactory.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
 	m_SpriteFactory.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
+	m_PrefabFactory.Init(gameDataObj.get<jsonxx::Object>("Prefabs"), *this);
 	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
 	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
 	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");

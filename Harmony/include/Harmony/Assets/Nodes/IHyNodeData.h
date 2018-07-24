@@ -18,19 +18,16 @@ class IHyRenderer;
 
 class IHyNodeData
 {
-	const HyType					m_eTYPE;
 	const std::string				m_sPATH;
 
 protected:
 	HyAtlasIndices					m_RequiredAtlasIndices;
 
 public:
-	IHyNodeData(HyType eInstType, const std::string &sPath);
+	IHyNodeData(const std::string &sPath);
 	virtual ~IHyNodeData(void);
 	
-	HyType GetInstType() const;
 	const std::string &GetPath() const;
-
 	const HyAtlasIndices &GetRequiredAtlasIndices() const;
 };
 

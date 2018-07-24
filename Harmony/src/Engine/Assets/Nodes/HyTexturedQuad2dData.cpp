@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_TexturedQuad2d, "N/A"),
+HyTexturedQuad2dData::HyTexturedQuad2dData(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyAssets &assetsRef) :	IHyNodeData("N/A"),
 																												m_uiATLAS_GROUP_ID(uiAtlasGrpId),
 																												m_uiINDEX_IN_GROUP(uiIndexInGroup),
 																												m_pAtlas(nullptr)

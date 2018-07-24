@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Assets/Nodes/HyPrefabData.h"
 
-HyPrefabData::HyPrefabData(const std::string &sPath) :	IHyNodeData(HYTYPE_Entity3d, sPath)
+HyPrefabData::HyPrefabData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(sPath)
 {
 	//Assimp::Importer importer;
 	//m_pAiScene = importer.ReadFile(sPath, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);

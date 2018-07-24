@@ -135,31 +135,52 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :	IModel(it
 			}
 			gltfObj.insert("images", imagesArray);
 
-			// Resave glTF file with inserted checksums on images
-			if(gltfFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-				HyGuiLog("Couldn't open " % sAbsFilePath % " for writing: " % gltfFile.errorString(), LOGTYPE_Error);
-			else
-			{
-				QJsonDocument userDoc;
-				userDoc.setObject(gltfObj);
-				qint64 iBytesWritten = gltfFile.write(userDoc.toJson());
-				if(0 == iBytesWritten || -1 == iBytesWritten)
-					HyGuiLog("Could not write to " % sAbsFilePath % ": " % gltfFile.errorString(), LOGTYPE_Error);
+			initValue = gltfObj;
 
-				gltfFile.close();
-			}
+			// Delete the original glTF file, as the new (modified) glTF will be saved in the project's data.json
+			if(gltfFile.remove() == false)
+				HyGuiLog("PrefabModel::PrefabModel() - deleting the newly exported glTF file failed", LOGTYPE_Error);
+
+			//// Resave glTF file with inserted checksums on images
+			//if(gltfFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+			//	HyGuiLog("Couldn't open " % sAbsFilePath % " for writing: " % gltfFile.errorString(), LOGTYPE_Error);
+			//else
+			//{
+			//	QJsonDocument userDoc;
+			//	userDoc.setObject(gltfObj);
+			//	qint64 iBytesWritten = gltfFile.write(userDoc.toJson());
+			//	if(0 == iBytesWritten || -1 == iBytesWritten)
+			//		HyGuiLog("Could not write to " % sAbsFilePath % ": " % gltfFile.errorString(), LOGTYPE_Error);
+
+			//	gltfFile.close();
+			//}
 		}
 		else
 			HyGuiLog("PrefabModel::PrefabModel() could not find the exported gltf file: " % sAbsFilePath, LOGTYPE_Error);
+	} // End of conditional - importing new asset
+
+	if(initValue.isObject() == false)
+	{
+		HyGuiLog("PrefabModel::PrefabModel() initValue is not a QJsonObject (post import)", LOGTYPE_Error);
+		return;
 	}
 
+	m_GltfObject = initValue.toObject();
+
+	QJsonDocument gltfDoc(m_GltfObject);
+	QByteArray gltfJsonSource = gltfDoc.toJson();
+	
 	QDir dataDir(itemRef.GetProject().GetAssetsAbsPath() % HyGlobal::ItemName(ITEM_Prefab, true));
 	QDir prefabDir(dataDir.absolutePath() % "/" % itemRef.GetPrefix());
-	QString sAbsFilePath = prefabDir.absoluteFilePath(itemRef.GetName(false) % ".gltf");
 
 	tinygltf::TinyGLTF loader;
 	std::string sError;
-	bool bLoadSuccess = loader.LoadASCIIFromFile(&m_ModelData, &sError, sAbsFilePath.toStdString(), tinygltf::REQUIRE_ALL);
+	bool bLoadSuccess = loader.LoadASCIIFromString(&m_ModelData,
+												   &sError,
+												   gltfJsonSource.constData(),
+												   static_cast<const unsigned int>(gltfJsonSource.length()),
+												   prefabDir.absolutePath().toStdString(),
+												   tinygltf::REQUIRE_ALL);
 	if(bLoadSuccess == false)
 		HyLogError("Loading glTF file failed: " << sError.c_str());
 
@@ -299,7 +320,7 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 
 /*virtual*/ QJsonValue PrefabModel::GetJson() const /*override*/
 {
-	return QJsonValue(GetItem().GetName(true));
+	return m_GltfObject;
 }
 
 /*virtual*/ QList<AtlasFrame *> PrefabModel::GetAtlasFrames() const /*override*/

@@ -23,7 +23,7 @@ bool HySprite2dFrame::IsValid() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(HYTYPE_Sprite2d, sPath),
+HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(sPath),
 																													m_pAnimStates(NULL),
 																													m_uiNumStates(0)
 {

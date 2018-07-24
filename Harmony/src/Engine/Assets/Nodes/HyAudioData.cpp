@@ -10,7 +10,7 @@
 #include "Assets/Nodes/HyAudioData.h"
 
 
-HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) : IHyNodeData(HYTYPE_Sound2d, sPath)
+HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) : IHyNodeData(sPath)
 {
 }
 

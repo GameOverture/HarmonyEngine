@@ -25,6 +25,7 @@
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HySpine2d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrimitive2d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyText2d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrefab3d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntityLeaf2d.h"
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"

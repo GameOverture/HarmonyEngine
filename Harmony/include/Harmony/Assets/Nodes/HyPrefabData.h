@@ -19,7 +19,7 @@ class HyPrefabData : public IHyNodeData
 {
 
 public:
-	HyPrefabData(const std::string &sPath);
+	HyPrefabData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HyPrefabData(void);
 };
 
