@@ -10,7 +10,7 @@
 #ifndef FONTMODELVIEW_H
 #define FONTMODELVIEW_H
 
-#include "FontItem.h"
+#include "ProjectItem.h"
 #include "freetype-gl/freetype-gl.h"
 
 #include <QWidget>

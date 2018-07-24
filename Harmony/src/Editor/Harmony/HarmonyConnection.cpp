@@ -10,7 +10,6 @@
 #include "HarmonyConnection.h"
 
 #include "Global.h"
-#include "Harmony/HyEngine.h"
 
 #include <QDateTime>
 

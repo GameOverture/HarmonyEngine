@@ -11,7 +11,6 @@
 #define FONTDRAW_H
 
 #include "IDraw.h"
-#include "FontItem.h"
 #include "FontModels.h"
 #include <QList>
 

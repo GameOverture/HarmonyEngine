@@ -17,8 +17,6 @@
 #include "Global.h"
 #include "DlgAtlasGroupSettings.h"
 
-#include "Harmony/HyEngine.h"
-
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>

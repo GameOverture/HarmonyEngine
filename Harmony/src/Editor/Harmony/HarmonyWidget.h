@@ -10,7 +10,6 @@
 #ifndef HARMONYWIDGET_H
 #define HARMONYWIDGET_H
 
-#include "Harmony/HyEngine.h"
 #include "Project.h"
 
 #include <QOpenGLWidget>

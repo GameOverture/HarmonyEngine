@@ -14,7 +14,6 @@
 #include <QTreeWidget>
 
 #include "Global.h"
-#include "Harmony/HyEngine.h"
 
 class ExplorerTreeWidget;
 

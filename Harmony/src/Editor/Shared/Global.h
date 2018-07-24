@@ -26,6 +26,7 @@
 #include "WidgetOutputLog.h"
 
 #include "Harmony/HyEngine.h"
+#include "Harmony/Utilities/jsonxx.h"
 
 class Project;
 

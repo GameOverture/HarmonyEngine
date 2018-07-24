@@ -13,7 +13,6 @@
 #include "Global.h"
 #include "MainWindow.h"
 #include "Harmony.h"
-#include "FontItem.h"
 #include "Project.h"
 #include "ProjectItemMimeData.h"
 #include "ExplorerItem.h"

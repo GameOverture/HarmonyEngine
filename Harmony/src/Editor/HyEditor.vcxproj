@@ -233,7 +233,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Explorer\ExplorerTreeWidget.cpp" />
     <ClCompile Include="Explorer\ExplorerWidget.cpp" />
     <ClCompile Include="Font\FontDraw.cpp" />
-    <ClCompile Include="Font\FontItem.cpp" />
     <ClCompile Include="Font\FontModelView.cpp" />
     <ClCompile Include="Font\FontModels.cpp" />
     <ClCompile Include="Font\FontUndoCmds.cpp" />
@@ -327,7 +326,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtMoc Include="Explorer\ExplorerWidget.h">
     </QtMoc>
     <ClInclude Include="Font\FontDraw.h" />
-    <ClInclude Include="Font\FontItem.h" />
     <QtMoc Include="Font\FontModelView.h">
     </QtMoc>
     <QtMoc Include="Font\FontModels.h">

@@ -10,14 +10,13 @@
 #ifndef HARMONYCONNECTION_H
 #define HARMONYCONNECTION_H
 
+#include "Global.h"
+
 #include <QObject>
 #include <QAction>
 #include <QTcpSocket>
 #include <QTcpServer>
-
 #include <QList>
-
-#include "Harmony/HyEngine.h"
 
 class HarmonyConnection : public QObject
 {

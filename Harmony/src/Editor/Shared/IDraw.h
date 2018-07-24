@@ -10,8 +10,7 @@
 #ifndef IDRAW_H
 #define IDRAW_H
 
-#include "Harmony/HyEngine.h"
-#include "Harmony/Utilities/jsonxx.h"
+#include "Global.h"
 
 #include <QWidget>
 
