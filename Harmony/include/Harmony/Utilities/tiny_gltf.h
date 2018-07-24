@@ -836,7 +836,7 @@ class TinyGLTF {
   ///
   bool LoadASCIIFromFile(Model *model, std::string *err,
                          const std::string &filename,
-                         unsigned int check_sections = REQUIRE_ALL, bool parseBufferData = true);
+                         unsigned int check_sections = REQUIRE_ALL);
 
   ///
   /// Loads glTF ASCII asset from string(memory).
@@ -846,7 +846,7 @@ class TinyGLTF {
   bool LoadASCIIFromString(Model *model, std::string *err, const char *str,
                            const unsigned int length,
                            const std::string &base_dir,
-                           unsigned int check_sections = REQUIRE_ALL, bool parseBufferData = true);
+                           unsigned int check_sections = REQUIRE_ALL);
 
   ///
   /// Loads glTF binary asset from a file.
@@ -854,7 +854,7 @@ class TinyGLTF {
   ///
   bool LoadBinaryFromFile(Model *model, std::string *err,
                           const std::string &filename,
-                          unsigned int check_sections = REQUIRE_ALL, bool parseBufferData = true);
+                          unsigned int check_sections = REQUIRE_ALL);
 
   ///
   /// Loads glTF binary asset from memory.
@@ -865,7 +865,7 @@ class TinyGLTF {
                             const unsigned char *bytes,
                             const unsigned int length,
                             const std::string &base_dir = "",
-                            unsigned int check_sections = REQUIRE_ALL, bool parseBufferData = true);
+                            unsigned int check_sections = REQUIRE_ALL);
 
   ///
   /// Write glTF to file.
@@ -897,7 +897,7 @@ class TinyGLTF {
   ///
   bool LoadFromString(Model *model, std::string *err, const char *str,
                       const unsigned int length, const std::string &base_dir,
-                      unsigned int check_sections, bool parseBufferData);
+                      unsigned int check_sections);
 
   const unsigned char *bin_data_;
   size_t bin_size_;

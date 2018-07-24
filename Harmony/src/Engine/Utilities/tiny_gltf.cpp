@@ -1319,7 +1319,7 @@ static bool ParseBuffer(Buffer *buffer, std::string *err, const json &o,
                         FsCallbacks* fs,
                         const std::string &basedir, bool is_binary = false,
                         const unsigned char *bin_data = nullptr,
-                        size_t bin_size = 0, bool parseBufferData = true) {
+                        size_t bin_size = 0) {
   double byteLength;
   if (!ParseNumberProperty(&byteLength, err, o, "byteLength", true, "Buffer")) {
     return false;
@@ -1346,66 +1346,63 @@ static bool ParseBuffer(Buffer *buffer, std::string *err, const json &o,
     }
   }
 
-  if(parseBufferData)
-  {
-    size_t bytes = static_cast<size_t>(byteLength);
-    if (is_binary) {
-      // Still binary glTF accepts external dataURI. 
-      if (!buffer->uri.empty()) {
-        // First try embedded data URI.
-        if (IsDataURI(buffer->uri)) {
-          std::string mime_type;
-          if (!DecodeDataURI(&buffer->data, mime_type, buffer->uri, bytes, true)) {
-              if (err) {
-                  (*err) += "Failed to decode 'uri' : " + buffer->uri + " in Buffer\n";
-              }
-              return false;
-          }
-        } else { 
-          // External .bin file.
-          LoadExternalFile(&buffer->data, err, buffer->uri, basedir, bytes, true, fs);
-        }
-      } else {
-        // load data from (embedded) binary data
-    
-        if ((bin_size == 0) || (bin_data == nullptr)) {
-          if (err) {
-            (*err) += "Invalid binary data in `Buffer'.\n";
-          }
-          return false;
-        }
-    
-        if (byteLength > bin_size) {
-          if (err) {
-            std::stringstream ss;
-            ss << "Invalid `byteLength'. Must be equal or less than binary size: "
-                  "`byteLength' = "
-               << byteLength << ", binary size = " << bin_size << std::endl;
-            (*err) += ss.str();
-          }
-          return false;
-        }
-    
-        // Read buffer data
-        buffer->data.resize(static_cast<size_t>(byteLength));
-        memcpy(&(buffer->data.at(0)), bin_data, static_cast<size_t>(byteLength));
-      }
-    
-    } else {
+  size_t bytes = static_cast<size_t>(byteLength);
+  if (is_binary) {
+    // Still binary glTF accepts external dataURI. 
+    if (!buffer->uri.empty()) {
+      // First try embedded data URI.
       if (IsDataURI(buffer->uri)) {
         std::string mime_type;
         if (!DecodeDataURI(&buffer->data, mime_type, buffer->uri, bytes, true)) {
-          if (err) {
-            (*err) += "Failed to decode 'uri' : " + buffer->uri + " in Buffer\n";
-          }
-          return false;
+            if (err) {
+                (*err) += "Failed to decode 'uri' : " + buffer->uri + " in Buffer\n";
+            }
+            return false;
         }
-      } else {
-        // Assume external .bin file.
-        if (!LoadExternalFile(&buffer->data, err, buffer->uri, basedir, bytes,
-                              true, fs)) {
-          return false;
+      } else { 
+        // External .bin file.
+        LoadExternalFile(&buffer->data, err, buffer->uri, basedir, bytes, true, fs);
+      }
+    } else {
+      // load data from (embedded) binary data
+
+      if ((bin_size == 0) || (bin_data == nullptr)) {
+        if (err) {
+          (*err) += "Invalid binary data in `Buffer'.\n";
         }
+        return false;
+      }
+
+      if (byteLength > bin_size) {
+        if (err) {
+          std::stringstream ss;
+          ss << "Invalid `byteLength'. Must be equal or less than binary size: "
+                "`byteLength' = "
+             << byteLength << ", binary size = " << bin_size << std::endl;
+          (*err) += ss.str();
+        }
+        return false;
+      }
+
+      // Read buffer data
+      buffer->data.resize(static_cast<size_t>(byteLength));
+      memcpy(&(buffer->data.at(0)), bin_data, static_cast<size_t>(byteLength));
+    }
+
+  } else {
+    if (IsDataURI(buffer->uri)) {
+      std::string mime_type;
+      if (!DecodeDataURI(&buffer->data, mime_type, buffer->uri, bytes, true)) {
+        if (err) {
+          (*err) += "Failed to decode 'uri' : " + buffer->uri + " in Buffer\n";
+        }
+        return false;
+      }
+    } else {
+      // Assume external .bin file.
+      if (!LoadExternalFile(&buffer->data, err, buffer->uri, basedir, bytes,
+                            true, fs)) {
+        return false;
       }
     }
   }
@@ -2033,7 +2030,7 @@ static bool ParseCamera(Camera *camera, std::string *err, const json &o) {
 
 bool TinyGLTF::LoadFromString(Model *model, std::string *err, const char *str,
                               unsigned int length, const std::string &base_dir,
-                              unsigned int check_sections, bool parseBufferData) {
+                              unsigned int check_sections) {
   if (length < 4) {
     if (err) {
       (*err) = "JSON string too short.\n";
@@ -2200,7 +2197,7 @@ bool TinyGLTF::LoadFromString(Model *model, std::string *err, const char *str,
         Buffer buffer;
         if (!ParseBuffer(&buffer, err, it->get<json>(),
                          &fs, base_dir, is_binary_,
-                         bin_data_, bin_size_, parseBufferData)) {
+                         bin_data_, bin_size_)) {
           return false;
         }
 
@@ -2618,17 +2615,17 @@ bool TinyGLTF::LoadFromString(Model *model, std::string *err, const char *str,
 bool TinyGLTF::LoadASCIIFromString(Model *model, std::string *err,
                                    const char *str, unsigned int length,
                                    const std::string &base_dir,
-                                   unsigned int check_sections, bool parseBufferData) {
+                                   unsigned int check_sections) {
   is_binary_ = false;
   bin_data_ = nullptr;
   bin_size_ = 0;
 
-  return LoadFromString(model, err, str, length, base_dir, check_sections, parseBufferData);
+  return LoadFromString(model, err, str, length, base_dir, check_sections);
 }
 
 bool TinyGLTF::LoadASCIIFromFile(Model *model, std::string *err,
                                  const std::string &filename,
-                                 unsigned int check_sections, bool parseBufferData) {
+                                 unsigned int check_sections) {
   std::stringstream ss;
 
   if (fs.ReadWholeFile == nullptr) {
@@ -2666,7 +2663,7 @@ bool TinyGLTF::LoadASCIIFromFile(Model *model, std::string *err,
                                  reinterpret_cast<const char *>(&data.at(0)),
                                  static_cast<unsigned int>(data.size()),
                                  basedir,
-                                 check_sections, parseBufferData);
+                                 check_sections);
 
   return ret;
 }
@@ -2675,7 +2672,7 @@ bool TinyGLTF::LoadBinaryFromMemory(Model *model, std::string *err,
                                     const unsigned char *bytes,
                                     unsigned int size,
                                     const std::string &base_dir,
-                                    unsigned int check_sections, bool parseBufferData) {
+                                    unsigned int check_sections) {
   if (size < 20) {
     if (err) {
       (*err) = "Too short data size for glTF Binary.";
@@ -2731,7 +2728,7 @@ bool TinyGLTF::LoadBinaryFromMemory(Model *model, std::string *err,
 
   bool ret =
       LoadFromString(model, err, reinterpret_cast<const char *>(&bytes[20]),
-                     model_length, base_dir, check_sections, parseBufferData);
+                     model_length, base_dir, check_sections);
   if (!ret) {
     return ret;
   }
@@ -2741,7 +2738,7 @@ bool TinyGLTF::LoadBinaryFromMemory(Model *model, std::string *err,
 
 bool TinyGLTF::LoadBinaryFromFile(Model *model, std::string *err,
                                   const std::string &filename,
-                                  unsigned int check_sections, bool parseBufferData) {
+                                  unsigned int check_sections) {
   std::stringstream ss;
 
   if (fs.ReadWholeFile == nullptr) {
@@ -2769,7 +2766,7 @@ bool TinyGLTF::LoadBinaryFromFile(Model *model, std::string *err,
 
   bool ret = LoadBinaryFromMemory(
       model, err, &data.at(0),
-      static_cast<unsigned int>(data.size()), basedir, check_sections, parseBufferData);
+      static_cast<unsigned int>(data.size()), basedir, check_sections);
 
   return ret;
 }
@@ -3553,4 +3550,3 @@ bool TinyGLTF::WriteGltfSceneToFile(Model *model, const std::string &filename,
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-

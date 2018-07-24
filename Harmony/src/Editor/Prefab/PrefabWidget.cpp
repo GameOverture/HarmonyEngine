@@ -14,7 +14,7 @@ PrefabWidget::PrefabWidget(ProjectItem &itemRef, QWidget *parent) :	QWidget(pare
 																	ui(new Ui::PrefabWidget),
 																	m_ItemRef(itemRef)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
 	ui->propertyTree->setModel(&static_cast<PrefabModel *>(m_ItemRef.GetModel())->GetPropertiesModel());
 }

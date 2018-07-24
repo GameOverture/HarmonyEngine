@@ -159,10 +159,11 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :	IModel(it
 
 	tinygltf::TinyGLTF loader;
 	std::string sError;
-	bool bLoadSuccess = loader.LoadASCIIFromFile(&m_ModelData, &sError, sAbsFilePath.toStdString());
+	bool bLoadSuccess = loader.LoadASCIIFromFile(&m_ModelData, &sError, sAbsFilePath.toStdString(), tinygltf::REQUIRE_ALL);
 	if(bLoadSuccess == false)
 		HyLogError("Loading glTF file failed: " << sError.c_str());
 
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// SCENES
 	for(uint i = 0; i < static_cast<uint>(m_ModelData.scenes.size()); ++i)
 	{
