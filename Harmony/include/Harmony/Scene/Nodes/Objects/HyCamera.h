@@ -37,6 +37,8 @@ public:
 	HyWindow &GetWindow()						{ return *m_pWindowPtr; }
 	const HyRectangle<float> &GetViewport()		{ return m_ViewportRect; }
 
+	virtual void GetCameraTransform(glm::mat4 &outMtx) = 0;
+
 	// All values are [0.0 - 1.0] representing percentages of the entire game window
 	void SetViewport(float fPosX, float fPosY, float fWidth, float fHeight);
 
@@ -61,6 +63,8 @@ public:
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
 
+	virtual void GetCameraTransform(glm::mat4 &outMtx) override;
+
 	const b2AABB &GetWorldViewBounds();
 
 protected:
@@ -78,6 +82,8 @@ protected:
 public:
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
+
+	virtual void GetCameraTransform(glm::mat4 &outMtx) override;
 
 protected:
 	virtual void NodeUpdate() override;

@@ -28,6 +28,7 @@ class HyStencil
 	static HyStencilHandle			sm_hHandleCount;
 	const HyStencilHandle			m_hHANDLE;
 
+	// TODO: Support 3d drawables too
 	std::vector<IHyDrawable2d *>	m_MaskInstanceList;
 	bool							m_bMaskIsReady;
 	HyRenderState *					m_pRenderStatePtr;

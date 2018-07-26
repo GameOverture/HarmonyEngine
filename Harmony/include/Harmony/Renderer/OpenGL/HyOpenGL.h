@@ -40,7 +40,7 @@ public:
 	virtual void DrawRenderState_3d(HyRenderState *pRenderState) override;
 
 	virtual void Begin_2d() override;
-	virtual void DrawRenderState_2d(HyRenderState *pRenderState) override;
+	virtual void DrawRenderState_2d(HyRenderState *pRenderState, IHyCamera *pCamera) override;
 
 	virtual void FinishRender() override;
 
@@ -51,7 +51,7 @@ public:
 
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);
-	void RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera);
+	void RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera);
 };
 
 #endif /* HyOpenGL_h__ */

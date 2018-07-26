@@ -57,6 +57,11 @@ HyCamera2d::~HyCamera2d()
 	return scale.Get().x;
 }
 
+/*virtual*/ void HyCamera2d::GetCameraTransform(glm::mat4 &outMtx) /*override*/
+{
+	GetWorldTransform(outMtx);
+}
+
 const b2AABB &HyCamera2d::GetWorldViewBounds()
 {
 	float fHalfWidth = ((m_pWindowPtr->GetFramebufferSize().x * m_ViewportRect.Width()) * 0.5f) * (1.0f / scale.X());
@@ -104,6 +109,11 @@ HyCamera3d::~HyCamera3d()
 /*virtual*/ float HyCamera3d::GetZoom() const
 {
 	return scale.Get().z;
+}
+
+/*virtual*/ void HyCamera3d::GetCameraTransform(glm::mat4 &outMtx) /*override*/
+{
+	GetWorldTransform(outMtx);
 }
 
 /*virtual*/ void HyCamera3d::NodeUpdate()

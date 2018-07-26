@@ -93,6 +93,37 @@ void IHyRenderer::PrepareBuffers()
 
 void IHyRenderer::AppendRenderState(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCullMask uiCullMask)
 {
+	//HyAssert(m_hShader != HY_UNUSED_HANDLE, "HyRenderState was assigned a null shader");
+	//instanceRef.GetWorldScissor(m_ScissorRect);
+
+	//switch(instanceRef.GetType())
+	//{
+	//case HYTYPE_Sprite2d:
+	//case HYTYPE_TexturedQuad2d:
+	//	m_uiNumInstances = 1;
+	//	m_uiNumVerticesPerInstance = 4;
+	//	break;
+
+	//case HYTYPE_Primitive2d:
+	//	m_uiNumInstances = 1;
+	//	m_uiNumVerticesPerInstance = static_cast<HyPrimitive2d &>(instanceRef).GetNumVerts();
+	//	break;
+	//	
+	//case HYTYPE_Text2d:
+	//	m_uiNumInstances = static_cast<HyText2d &>(instanceRef).GetNumRenderQuads();
+	//	m_uiNumVerticesPerInstance = 4;
+	//	break;
+
+	//default:
+	//	HyError("HyRenderState - Unknown instance type");
+	//}
+
+
+
+
+
+
+
 	HyRenderState *pRenderState = new (m_pCurRenderStateWritePos)HyRenderState(uiId,
 																			   uiCullMask,
 																			   m_uiVertexBufferUsedBytes,
@@ -243,11 +274,27 @@ void IHyRenderer::Render()
 		}
 
 		Begin_2d();
+		HyWindow::CameraIterator2d cameraIter(m_pCurWindow->GetCamera2dList());
 		for(uint32 k = 0; k < pRsHeader->uiNum2dRenderStates; k++)
 		{
 			pCurRenderState = reinterpret_cast<HyRenderState *>(pRsBufferPos);
 			if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
-				DrawRenderState_2d(pCurRenderState);
+			{
+				cameraIter.Reset();
+				do
+				{
+					// Check the cull mask to exit rendering under this camera early if not in frustum
+					if(pCurRenderState->GetCoordinateSystem() < 0 && 0 == (pCurRenderState->GetCullMask() & (1 << cameraIter.Get()->GetCullMaskBit())))
+					{
+						++cameraIter;
+						continue;
+					}
+
+					DrawRenderState_2d(pCurRenderState, cameraIter.Get());
+					
+					++cameraIter;
+				} while(pCurRenderState->GetCoordinateSystem() < 0 && cameraIter.IsEnd() == false);	// Check whether there are other cameras to render from
+			}
 
 			pRsBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
 		}

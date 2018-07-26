@@ -10,7 +10,7 @@ public:
 	%HY_CLASS%(HarmonyInit &initStruct);
 	virtual ~%HY_CLASS%();
 
-	virtual bool Initialize();
-	virtual bool Update();
-	virtual void Shutdown();
+	virtual bool Initialize() override;
+	virtual bool Update() override;
+	virtual void Shutdown() override;
 };

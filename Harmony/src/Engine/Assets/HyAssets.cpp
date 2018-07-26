@@ -168,10 +168,6 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 			pDataOut = m_Quad2d[key];
 		}
 		break;
-
-	default:
-		HyError("HyAssets::AcquireNodeData() Unimplemented data type: " << pLoadable->_LoadableGetType());
-		break;
 	}
 }
 
@@ -185,17 +181,19 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 	// Check whether all the required atlases are loaded
 	if(pLoadable->AcquireData() != nullptr)
 	{
-		// TODO: Perhaps make this more efficient by skipping entire 32 bits when those equal '0'
 		const HyAtlasIndices &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
-		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
+		if(requiredAtlases.IsEmpty() == false)
 		{
-			if(requiredAtlases.IsSet(i))
+			for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 			{
-				HyAtlas *pAtlas = GetAtlas(i);
-				QueueData(pAtlas);
+				if(requiredAtlases.IsSet(i))
+				{
+					HyAtlas *pAtlas = GetAtlas(i);
+					QueueData(pAtlas);
 
-				if(pAtlas->GetLoadableState() != HYLOADSTATE_Loaded)
-					bFullyLoaded = false;
+					if(pAtlas->GetLoadableState() != HYLOADSTATE_Loaded)
+						bFullyLoaded = false;
+				}
 			}
 		}
 	}
@@ -436,7 +434,9 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	m_AudioFactory.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
 	m_FontFactory.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
 	m_SpriteFactory.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
-	m_PrefabFactory.Init(gameDataObj.get<jsonxx::Object>("Prefabs"), *this);
+
+	if(gameDataObj.has<jsonxx::Object>("Prefabs"))
+		m_PrefabFactory.Init(gameDataObj.get<jsonxx::Object>("Prefabs"), *this);
 	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
 	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
 	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");

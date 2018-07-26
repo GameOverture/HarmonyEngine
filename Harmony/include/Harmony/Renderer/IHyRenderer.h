@@ -20,7 +20,7 @@ class IHyDrawable2d;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
-class HyCamera2d;
+class IHyCamera;
 class IHyLoadableData;
 
 typedef uint32 HyCullMask;
@@ -94,7 +94,7 @@ public:
 	virtual void DrawRenderState_3d(HyRenderState *pRenderState) = 0;
 
 	virtual void Begin_2d() = 0;
-	virtual void DrawRenderState_2d(HyRenderState *pRenderState) = 0;
+	virtual void DrawRenderState_2d(HyRenderState *pRenderState, IHyCamera *pCamera) = 0;
 
 	virtual void FinishRender() = 0;
 

@@ -38,15 +38,13 @@ public:
 		CameraIterator2d(const std::vector<HyCamera2d *> &camListRef) :	m_CamsListRef(camListRef),
 																		m_iter(m_CamsListRef.begin())
 		{
-			while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false)
-				++m_iter;
+			Reset();
 		}
 
 		CameraIterator2d(CameraIterator2d &iterRef) :	m_CamsListRef(iterRef.m_CamsListRef),
 														m_iter(m_CamsListRef.begin())
 		{
-			while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false)
-				++m_iter;
+			Reset();
 		}
 
 		CameraIterator2d &operator++()	// Prefix increment operator
@@ -71,6 +69,12 @@ public:
 
 		bool IsEnd()		{ return m_iter == m_CamsListRef.end(); }
 		HyCamera2d *Get()	{ return *m_iter; }
+		void Reset()
+		{
+			m_iter = m_CamsListRef.begin();
+			while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false)
+				++m_iter;
+		}
 	};
 
 public:

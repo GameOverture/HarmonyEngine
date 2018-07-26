@@ -11,17 +11,16 @@
 #define HyPrefab3d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/IHyLoadable3d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable3d.h"
 
-class HyPrefab3d : public IHyLoadable3d
+class HyPrefab3d : public IHyDrawable3d
 {
 public:
 	HyPrefab3d(const char *szPrefix, const char *szName, HyEntity3d *pParent);
 	HyPrefab3d(const HyPrefab3d &copyRef);
 	virtual ~HyPrefab3d();
 
-protected:
-	virtual void NodeUpdate() override;
+	virtual HyPrefab3d *Clone() const override;
 };
 
 #endif /* HyPrefab3d_h__ */

@@ -152,6 +152,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::Begin_3d()
 {
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
 }
 
@@ -175,72 +176,55 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
 }
 
-/*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState *pRenderState)
+/*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState *pRenderState, IHyCamera *pCamera) /*override*/
 {
-	HyWindow::CameraIterator2d cameraIter(m_pCurWindow->GetCamera2dList());
-	do
+	//////////////////////////////////////////////////////////////////////////
+	// Setup stencil buffer if required
+	if(pRenderState->GetStencilHandle() != HY_UNUSED_HANDLE)
 	{
-		//////////////////////////////////////////////////////////////////////////
-		// Check the cull mask to exit rendering under this camera early if not in frustum
-		if(pRenderState->GetCoordinateSystem() < 0 && 0 == (pRenderState->GetCullMask() & (1 << cameraIter.Get()->GetCullMaskBit())))
+		glEnable(GL_STENCIL_TEST);
+		glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
+
+		glDisable(GL_SCISSOR_TEST);								// Ensure scissor test isn't affecting our initial stencil clear
+		glClear(GL_STENCIL_BUFFER_BIT);							// Clear stencil buffer by writing default stencil value '0' to entire buffer.
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	// Disable rendering color while we determine the stencil buffer
+
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);						// All fragments rendered next will "pass" the stencil test, and 'ref' is set to '1'
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);				// Fragments that "passed" will write the 'ref' value in the stencil buffer
+
+		// Render all instances stored in the HyStencil, and affect their pixel locations in stencil buffer
+		HyStencil *pStencil = FindStencil(pRenderState->GetStencilHandle());
+		uint32 uiNumStencilInstance = static_cast<uint32>(pStencil->GetInstanceList().size());
+		char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pStencil->GetRenderStatePtr());
+		for(uint32 i = 0; i < uiNumStencilInstance; ++i)
 		{
-			++cameraIter;
-			continue;
+			HyRenderState *pCurRenderState = reinterpret_cast<HyRenderState *>(pStencilRenderStateBufferPos);
+			if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
+				RenderPass2d(pCurRenderState, pRenderState->GetCoordinateSystem() < 0 ? pCamera : nullptr);
+
+			pStencilRenderStateBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-		// Setup stencil buffer if required
-		if(pRenderState->GetStencilHandle() != HY_UNUSED_HANDLE)
+		switch(pStencil->GetBehavior())
 		{
-			glEnable(GL_STENCIL_TEST);
-			glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
-
-			glDisable(GL_SCISSOR_TEST);								// Ensure scissor test isn't affecting our initial stencil clear
-			glClear(GL_STENCIL_BUFFER_BIT);							// Clear stencil buffer by writing default stencil value '0' to entire buffer.
-			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	// Disable rendering color while we determine the stencil buffer
-
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);						// All fragments rendered next will "pass" the stencil test, and 'ref' is set to '1'
-			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);				// Fragments that "passed" will write the 'ref' value in the stencil buffer
-
-			// Render all instances stored in the HyStencil, and affect their pixel locations in stencil buffer
-			HyStencil *pStencil = FindStencil(pRenderState->GetStencilHandle());
-			uint32 uiNumStencilInstance = static_cast<uint32>(pStencil->GetInstanceList().size());
-			char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pStencil->GetRenderStatePtr());
-			for(uint32 i = 0; i < uiNumStencilInstance; ++i)
-			{
-				HyRenderState *pCurRenderState = reinterpret_cast<HyRenderState *>(pStencilRenderStateBufferPos);
-				if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
-					RenderPass2d(pCurRenderState, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);
-
-				pStencilRenderStateBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
-			}
-
-			switch(pStencil->GetBehavior())
-			{
-			case HYSTENCILBEHAVIOR_Mask:
-				glStencilFunc(GL_EQUAL, 1, 0xFF);					// Only render pixels that pass this check while stencil test is enabled
-				break;
-			case HYSTENCILBEHAVIOR_InvertedMask:
-				glStencilFunc(GL_NOTEQUAL, 1, 0xFF);				// Only render pixels that pass this check while stencil test is enabled
-				break;
-			}
-
-			glStencilMask(0x00);									// Disable further writing to the the stencil buffer
-			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);		// Re-enable the color buffer
-		}
-		else
-		{
-			glDisable(GL_STENCIL_TEST);
-			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
+		case HYSTENCILBEHAVIOR_Mask:
+			glStencilFunc(GL_EQUAL, 1, 0xFF);					// Only render pixels that pass this check while stencil test is enabled
+			break;
+		case HYSTENCILBEHAVIOR_InvertedMask:
+			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);				// Only render pixels that pass this check while stencil test is enabled
+			break;
 		}
 
-		RenderPass2d(pRenderState, pRenderState->GetCoordinateSystem() < 0 ? cameraIter.Get() : nullptr);
-		
-		
-		//////////////////////////////////////////////////////////////////////////
-		// Check whether there are other cameras to render from
-		++cameraIter;
-	} while(pRenderState->GetCoordinateSystem() < 0 && cameraIter.IsEnd() == false);
+		glStencilMask(0x00);									// Disable further writing to the the stencil buffer
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);		// Re-enable the color buffer
+	}
+	else
+	{
+		glDisable(GL_STENCIL_TEST);
+		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
+	}
+
+	RenderPass2d(pRenderState, pRenderState->GetCoordinateSystem() < 0 ? pCamera : nullptr);
 }
 
 /*virtual*/ void HyOpenGL::FinishRender()
@@ -688,7 +672,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glAttachShader");
 }
 
-void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
+void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera)
 {
 	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
 	HyRectangle<float> viewportRect;
@@ -698,7 +682,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, HyCamera2d *pCamera)
 	if(pCamera)// pRenderState->GetCoordinateSystem() < 0)
 	{
 		viewportRect = pCamera->GetViewport();
-		pCamera->GetWorldTransform(m_mtxView);
+		pCamera->GetCameraTransform(m_mtxView);
 
 		// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly somewhere here or in the shader)
 		m_mtxView[3].x *= -1;

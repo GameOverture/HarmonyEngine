@@ -10,18 +10,18 @@
 {
 }
 
-/*virtual*/ bool %HY_CLASS%::Initialize()
+/*virtual*/ bool %HY_CLASS%::Initialize() /*override*/
 {
 	m_pCamera = Window().CreateCamera2d();
 
 	return true;
 }
 
-/*virtual*/ bool %HY_CLASS%::Update()
+/*virtual*/ bool %HY_CLASS%::Update() /*override*/
 {
 	return true;
 }
 
-/*virtual*/ void %HY_CLASS%::Shutdown()
+/*virtual*/ void %HY_CLASS%::Shutdown() /*override*/
 {
 }
