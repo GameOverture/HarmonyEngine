@@ -16,6 +16,10 @@
 #include "Assets/Loadables/HyGLTF.h"
 #include "Threading/IHyThreadClass.h"
 
+#define HYASSETS_DataFile "data.json"
+#define HYASSETS_AtlasDir "Atlases/"
+#define HYASSETS_PrefabDir "Prefabs/"
+
 class IHyRenderer;
 class IHyLoadable;
 class IHyNodeData;
@@ -35,8 +39,8 @@ class HyAssets : public IHyThreadClass
 	uint32														m_uiNumAtlases;
 	HyAtlasIndices *											m_pLoadedAtlasIndices;
 
-	HyGLTF *													m_pGltfModels;
-	uint32														m_uiNumGltfModels;
+	// TODO: make this a map since all node datas store a pointer
+	std::vector<HyGLTF>											m_GltfList;
 
 	template<typename tData>
 	class Factory
@@ -45,7 +49,7 @@ class HyAssets : public IHyThreadClass
 		std::vector<tData>										m_DataList;
 
 	public:
-		void Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
+		void Init(const jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
 		const tData *GetData(const std::string &sPrefix, const std::string &sName) const;
 	};
 	Factory<HyAudioData>										m_AudioFactory;
@@ -78,6 +82,7 @@ public:
 	HyAssets(std::string sDataDirPath);
 	virtual ~HyAssets();
 
+	const std::string &GetDataDir();
 	bool IsInitialized();
 
 	HyAtlas *GetAtlas(uint32 uiMasterIndex);
@@ -86,8 +91,7 @@ public:
 	uint32 GetNumAtlases();
 	HyAtlasIndices *GetLoadedAtlases();
 
-	HyGLTF *GetGltf(uint32 uiIndex);
-	uint32 GetNumGltf();
+	HyGLTF *GetGltf(const std::string &sIdentifier);
 
 	void AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut);
 	void LoadNodeData(IHyLoadable *pLoadable);

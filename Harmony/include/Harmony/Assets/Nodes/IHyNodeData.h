@@ -15,6 +15,7 @@
 
 // Forward declarations
 class IHyRenderer;
+class HyGLTF;
 
 class IHyNodeData
 {
@@ -22,6 +23,7 @@ class IHyNodeData
 
 protected:
 	HyAtlasIndices					m_RequiredAtlasIndices;
+	HyGLTF *						m_pGltf;
 
 public:
 	IHyNodeData(const std::string &sPath);
@@ -29,6 +31,7 @@ public:
 	
 	const std::string &GetPath() const;
 	const HyAtlasIndices &GetRequiredAtlasIndices() const;
+	HyGLTF *GetGltf() const;
 };
 
 #endif /* IHyNodeData_h__ */

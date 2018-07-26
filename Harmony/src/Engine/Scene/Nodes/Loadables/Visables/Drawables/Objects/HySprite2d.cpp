@@ -437,11 +437,6 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	}
 }
 
-/*virtual*/ void HySprite2d::OnUpdateUniforms() /*override*/
-{
-	//m_ShaderUniforms.Set(...);
-}
-
 /*virtual*/ void HySprite2d::OnWriteVertexData(char *&pRefDataWritePos) /*override*/
 {
 	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);

@@ -15,12 +15,14 @@
 
 class HyGLTF : public IHyLoadableData
 {
-	const std::string		m_sFILEPATH;
+	const std::string		m_sIDENTIFIER;
 	tinygltf::Model			m_ModelData;
 
 public:
-	HyGLTF(std::string sFilePath);
+	HyGLTF(const std::string &sIdentifier);
 	~HyGLTF();
+
+	const std::string &GetIdentifier();
 
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;

@@ -21,6 +21,8 @@ HyPrefabData::HyPrefabData(const std::string &sPath, const jsonxx::Value &dataVa
 		m_UvRectList[i].first = assetsRef.GetAtlas(static_cast<uint32>(prefabImagesArray.get<jsonxx::Object>(i).get<jsonxx::Number>("checksum")), m_UvRectList[i].second);
 		m_RequiredAtlasIndices.Set(m_UvRectList[i].first->GetMasterIndex());
 	}
+
+	m_pGltf = assetsRef.GetGltf(sPath);
 }
 
 HyPrefabData::~HyPrefabData(void)

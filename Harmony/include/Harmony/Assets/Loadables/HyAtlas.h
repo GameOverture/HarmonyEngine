@@ -14,8 +14,6 @@
 #include "Assets/Loadables/IHyLoadableData.h"
 #include "Utilities/HyMath.h"
 
-class HyAssets;
-
 class HyAtlas : public IHyLoadableData
 {
 	const std::string						m_sFILE_PATH;

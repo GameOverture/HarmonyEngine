@@ -226,3 +226,9 @@ HyRendererInterop &HyEngine::GetRenderer()
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DateTime() was invoked before engine has been initialized.");
 	return HyEngine::sm_pInstance->m_Time.GetDateTime();
 }
+
+/*friend*/ const std::string &Hy_DataDir()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DataDir() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_Assets.GetDataDir();
+}

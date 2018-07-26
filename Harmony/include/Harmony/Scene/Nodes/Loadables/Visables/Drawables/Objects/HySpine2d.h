@@ -115,7 +115,6 @@ private:
 
 	virtual void DrawLoadedUpdate() override;
 	
-	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteVertexData(char *&pRefDataWritePos) override;
 };
 

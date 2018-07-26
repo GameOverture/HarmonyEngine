@@ -21,12 +21,10 @@
 #include "Utilities/HyStrManip.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-#define HYASSETS_AtlasDir "Atlases/"
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Nested class Factory
 template<typename tData>
-void HyAssets::Factory<tData>::Init(jsonxx::Object &subDirObjRef, HyAssets &assetsRef)
+void HyAssets::Factory<tData>::Init(const jsonxx::Object &subDirObjRef, HyAssets &assetsRef)
 {
 	m_DataList.reserve(subDirObjRef.size());
 
@@ -65,8 +63,6 @@ HyAssets::HyAssets(std::string sDataDirPath) :	IHyThreadClass(),
 												m_pAtlases(nullptr),
 												m_uiNumAtlases(0),
 												m_pLoadedAtlasIndices(nullptr),
-												m_pGltfModels(nullptr),
-												m_uiNumGltfModels(0),
 												m_bProcessThread(false)
 {
 	IHyLoadable::sm_pHyAssets = this;
@@ -85,16 +81,17 @@ HyAssets::~HyAssets()
 	delete[] pAtlases;
 	m_pAtlases = nullptr;
 
-	for(uint32 i = 0; i < m_uiNumGltfModels; ++i)
-		m_pGltfModels[i].~HyGLTF();
-	unsigned char *pGltfModels = reinterpret_cast<unsigned char *>(m_pGltfModels);
-	delete[] pGltfModels;
-	m_pGltfModels = nullptr;
+	m_GltfList.clear();
 
 	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
 		delete iter->second;
 
 	delete m_pLoadedAtlasIndices;
+}
+
+const std::string &HyAssets::GetDataDir()
+{
+	return m_sDATADIR;
 }
 
 bool HyAssets::IsInitialized()
@@ -140,6 +137,17 @@ HyAtlasIndices *HyAssets::GetLoadedAtlases()
 	return m_pLoadedAtlasIndices;
 }
 
+HyGLTF *HyAssets::GetGltf(const std::string &sIdentifier)
+{
+	for(uint32 i = 0; i < static_cast<uint32>(m_GltfList.size()); ++i)
+	{
+		if(m_GltfList[i].GetIdentifier() == sIdentifier)
+			return &m_GltfList[i];
+	}
+
+	return nullptr;
+}
+
 void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut)
 {
 	switch(pLoadable->_LoadableGetType())
@@ -178,6 +186,7 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 
 	bool bFullyLoaded = true;
 
+
 	// Check whether all the required atlases are loaded
 	if(pLoadable->AcquireData() != nullptr)
 	{
@@ -195,6 +204,15 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 						bFullyLoaded = false;
 				}
 			}
+		}
+
+		if(pLoadable->UncheckedGetData()->GetGltf())
+		{
+			HyGLTF *pGltf = pLoadable->UncheckedGetData()->GetGltf();
+			QueueData(pGltf);
+
+			if(pGltf->GetLoadableState() != HYLOADSTATE_Loaded)
+				bFullyLoaded = false;
 		}
 	}
 
@@ -257,11 +275,16 @@ void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 
 bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 {
-	// Atlases check
 	if(pLoadable->AcquireData() != nullptr)
 	{
+		// Atlases check
 		const HyAtlasIndices &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
 		if(m_pLoadedAtlasIndices->IsSet(requiredAtlases) == false)
+			return false;
+
+		// glTF check
+		HyGLTF *pGltf = pLoadable->UncheckedGetData()->GetGltf();
+		if(pGltf && pGltf->GetLoadableState() != HYLOADSTATE_Loaded)
 			return false;
 	}
 
@@ -422,7 +445,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 #ifndef HY_PLATFORM_GUI
 	std::string sGameDataFilePath(m_sDATADIR);
-	sGameDataFilePath += "data.json";
+	sGameDataFilePath += HYASSETS_DataFile;
 
 	std::string sGameDataFileContents;
 	HyReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);
@@ -436,7 +459,16 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	m_SpriteFactory.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
 
 	if(gameDataObj.has<jsonxx::Object>("Prefabs"))
-		m_PrefabFactory.Init(gameDataObj.get<jsonxx::Object>("Prefabs"), *this);
+	{
+		const jsonxx::Object &prefabObj = gameDataObj.get<jsonxx::Object>("Prefabs");
+		
+		m_GltfList.reserve(prefabObj.size());
+		for(auto iter = prefabObj.kv_map().begin(); iter != prefabObj.kv_map().end(); ++iter)
+			m_GltfList.emplace_back(iter->first);
+
+		m_PrefabFactory.Init(prefabObj, *this);
+	}
+
 	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
 	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
 	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");

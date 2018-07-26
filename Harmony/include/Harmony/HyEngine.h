@@ -78,15 +78,16 @@ private:
 
 	HyRendererInterop &GetRenderer();
 
-	friend float			Hy_UpdateStep();
-	friend double			Hy_UpdateStepDbl();
-	friend void				Hy_PauseGame(bool bPause);
-	friend HyInput &		Hy_Input();
-	friend b2World &		Hy_Physics2d();
-	friend HyDiagnostics &	Hy_Diagnostics();
-	friend HyShaderHandle	Hy_DefaultShaderHandle(HyType eType);
-	friend bool				Hy_IsDrawInst(HyType eType);
-	friend std::string		Hy_DateTime();
+	friend float				Hy_UpdateStep();
+	friend double				Hy_UpdateStepDbl();
+	friend void					Hy_PauseGame(bool bPause);
+	friend HyInput &			Hy_Input();
+	friend b2World &			Hy_Physics2d();
+	friend HyDiagnostics &		Hy_Diagnostics();
+	friend HyShaderHandle		Hy_DefaultShaderHandle(HyType eType);
+	friend bool					Hy_IsDrawInst(HyType eType);
+	friend std::string			Hy_DateTime();
+	friend const std::string &	Hy_DataDir();
 };
 
 #endif /* HyEngine_h__ */

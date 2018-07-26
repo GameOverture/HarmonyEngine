@@ -213,11 +213,6 @@ void HySpine2d::AnimInitBlend(uint32 uiAnimIdFrom, uint32 uiAnimIdTo, float fInt
 	spSkeleton_updateWorldTransform(m_pSpineSkeleton);
 }
 
-/*virtual*/ void HySpine2d::OnUpdateUniforms()
-{
-	//m_ShaderUniforms.Set(...);
-}
-
 /*virtual*/ void HySpine2d::OnWriteVertexData(char *&pRefDataWritePos)
 {
 	spSlot *pCurSlot;
