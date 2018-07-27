@@ -10,6 +10,8 @@
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable.h"
 #include "HyEngine.h"
 
+HyScene *IHyDrawable::sm_pScene = nullptr;
+
 IHyDrawable::IHyDrawable() :	m_hShader(HY_UNUSED_HANDLE),
 								m_eRenderMode(HYRENDERMODE_Unknown),
 								m_hTextureHandle(HY_UNUSED_HANDLE)

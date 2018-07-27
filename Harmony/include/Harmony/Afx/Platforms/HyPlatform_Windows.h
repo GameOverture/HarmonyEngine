@@ -13,6 +13,7 @@
 #define WIN32_LEAN_AND_MEAN 
 #include <Windows.h>
 #include <Psapi.h>							// Used in HyDiagnostics for memory leak detection
+#include <direct.h>							// Used to get current working directory
 
 #define HY_MAXWINDOWS 6
 

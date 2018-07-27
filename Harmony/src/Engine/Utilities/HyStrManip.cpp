@@ -45,6 +45,38 @@ namespace HyStr
 
 			sPath.replace(uiIndex, 2, "/");
 		}
+
+		// Resolve any "."
+		// If path begins with "./", get rid of it
+		if(0 == sPath.compare(0, 2, "./"))
+			sPath.replace(0, 2, "");
+
+		// Get rid of any other "/./"
+		while(true)
+		{
+			uiIndex = 0;
+			uiIndex = sPath.find("/./", uiIndex);
+			if(uiIndex == std::string::npos)
+				break;
+
+			sPath.replace(uiIndex, 3, "/");
+		}
+		
+		// Resolve any ".." (as far as possible)
+		while(true)
+		{
+			uiIndex = 0;
+			uiIndex = sPath.find("/..", uiIndex);
+			if(uiIndex == std::string::npos || uiIndex == 0)
+				break;
+
+			size_t uiStartIndex = sPath.rfind("/", uiIndex-1);
+			if(uiStartIndex == std::string::npos)
+				break;
+
+			sPath.erase(uiStartIndex, (uiIndex+3) - uiStartIndex);
+		}
+
 	
 		if(bMakeLowercase)
 			transform(sPath.begin(), sPath.end(), sPath.begin(), ::tolower);

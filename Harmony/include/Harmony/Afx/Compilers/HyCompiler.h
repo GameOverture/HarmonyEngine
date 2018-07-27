@@ -14,18 +14,18 @@
 // to create independent versions for the game.
 #if !defined(HARMONY_COMPILER_DEFINED)
 
-	//#if defined(_UNICODE)
+	//#if defined(UNICODE)
 	//	#define HY_UNICODE
 	//	typedef std::wstring HyString;
 	//	typedef std::wostringstream HyStringStream;
 	//	typedef wchar_t HyChar;
-	//	#define HyStr(x) L ## x
+	//	#define HyT(x) L ## x
 	//#else
 	//	#define HY_ASCII
 	//	typedef std::string HyString;
 	//	typedef std::ostringstream HyStringStream;
 	//	typedef char HyChar;
-	//	#define HyStr(x) x
+	//	#define HyT(x) x
 	//#endif
 
 	#if defined(_MSC_VER)

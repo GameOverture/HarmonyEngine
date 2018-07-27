@@ -20,9 +20,6 @@ class IHyDrawable3d : public IHyLoadable3d, public IHyDrawable
 {
 	friend class HyScene;
 
-protected:
-	static HyScene *				sm_pScene;
-
 public:
 	IHyDrawable3d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity3d *pParent);
 	IHyDrawable3d(const IHyDrawable3d &copyRef);

@@ -12,7 +12,7 @@
 #include "Diagnostics/Console/HyConsole.h"
 #include "HyEngine.h"
 
-HyGLTF::HyGLTF(const std::string &sIdentifier) :	IHyLoadableData(HYLOADABLE_Atlas),
+HyGLTF::HyGLTF(const std::string &sIdentifier) :	IHyLoadableData(HYLOADABLE_GLTF),
 													m_sIDENTIFIER(sIdentifier)
 {
 }
@@ -46,9 +46,14 @@ void HyGLTF::OnLoadThread()
 		const jsonxx::Object &gltfObj = prefabObj.get<jsonxx::Object>(m_sIDENTIFIER);
 		std::string &sGltf = gltfObj.json();
 
+		std::string sBaseDir = sDataDir + HYASSETS_PrefabDir + m_sIDENTIFIER;
+		size_t uiIndex = sBaseDir.rfind("/");
+		if(uiIndex != std::string::npos)
+			sBaseDir.erase(uiIndex);
+
 		tinygltf::TinyGLTF loader;
 		std::string sError;
-		bool bLoadSuccess = loader.LoadASCIIFromString(&m_ModelData, &sError, sGltf.c_str(), static_cast<uint32>(sGltf.length()), sDataDir + HYASSETS_PrefabDir + m_sIDENTIFIER);
+		bool bLoadSuccess = loader.LoadASCIIFromString(&m_ModelData, &sError, sGltf.c_str(), static_cast<uint32>(sGltf.length()), sBaseDir);
 		if(bLoadSuccess == false)
 		{
 			HyLogError("HyGLTF::OnLoadThread failed: " << sError.c_str());

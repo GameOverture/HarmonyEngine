@@ -227,8 +227,22 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return HyEngine::sm_pInstance->m_Time.GetDateTime();
 }
 
-/*friend*/ const std::string &Hy_DataDir()
+/*friend*/ std::string Hy_DataDir()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DataDir() was invoked before engine has been initialized.");
-	return HyEngine::sm_pInstance->m_Assets.GetDataDir();
+
+	char szBuffer[FILENAME_MAX];
+
+#if defined(HY_PLATFORM_WINDOWS)
+	_getcwd(szBuffer, FILENAME_MAX);
+#elif defined(HY_PLATFORM_LINUX)
+	getcwd(szBuffer, FILENAME_MAX);
+#endif
+
+	std::string sAbsDataDir(szBuffer);
+	sAbsDataDir += "/";
+	sAbsDataDir += HyEngine::sm_pInstance->m_Assets.GetDataDir();
+	sAbsDataDir = HyStr::MakeStringProperPath(sAbsDataDir.c_str(), "/", false);
+	
+	return sAbsDataDir;
 }

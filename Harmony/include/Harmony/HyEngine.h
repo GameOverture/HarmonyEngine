@@ -87,7 +87,7 @@ private:
 	friend HyShaderHandle		Hy_DefaultShaderHandle(HyType eType);
 	friend bool					Hy_IsDrawInst(HyType eType);
 	friend std::string			Hy_DateTime();
-	friend const std::string &	Hy_DataDir();
+	friend std::string			Hy_DataDir();
 };
 
 #endif /* HyEngine_h__ */

@@ -10,8 +10,6 @@
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable3d.h"
 #include "HyEngine.h"
 
-HyScene *IHyDrawable3d::sm_pScene = nullptr;
-
 IHyDrawable3d::IHyDrawable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyLoadable3d(eNodeType, szPrefix, szName, pParent)
 {
 }

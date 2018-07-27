@@ -18,12 +18,10 @@
 
 class IHyDrawable2d : public IHyVisable2d, public IHyDrawable
 {
-	friend class HyScene;
 	friend class HyShape2d;
+	friend class HyScene;
 
 protected:
-	static HyScene *				sm_pScene;
-
 	HyShape2d						m_LocalBoundingVolume;
 
 public:

@@ -30,7 +30,7 @@ HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f
 															m_WindowListRef(WindowListRef),
 															m_bPauseGame(false)
 {
-	IHyDrawable2d::sm_pScene = this;
+	IHyDrawable::sm_pScene = this;
 
 	m_b2World.SetDebugDraw(&m_DrawPhys2d);
 	m_b2World.SetContactListener(&m_Phys2dContactListener);

@@ -10,8 +10,6 @@
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 #include "HyEngine.h"
 
-HyScene *IHyDrawable2d::sm_pScene = nullptr;
-
 IHyDrawable2d::IHyDrawable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyVisable2d(eNodeType, szPrefix, szName, pParent),
 																												m_LocalBoundingVolume(this)
 {

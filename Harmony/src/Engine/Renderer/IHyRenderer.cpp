@@ -176,6 +176,9 @@ HyShaderHandle IHyRenderer::GetDefaultShaderHandle(HyType eType)
 	case HYTYPE_Primitive2d:
 		return m_pShaderPrimitive->GetHandle();
 
+	case HYTYPE_Prefab3d:
+		return HYTYPE_Unknown; // TODO: write proper shader
+
 	default:
 		HyError("IHyRenderer::GetDefaultShaderHandle - Unknown instance type");
 	}

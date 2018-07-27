@@ -10,6 +10,8 @@
 #ifndef HyPlatform_Unix_h__
 #define HyPlatform_Unix_h__
 
+#include <unistd.h>					// Used to get current working directory
+
 // Memory related
 #define HY_MEMPLAT //HyMemoryAPI_Windows
 
