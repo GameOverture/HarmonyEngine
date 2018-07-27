@@ -21,11 +21,12 @@ IHyRenderer *IHyRenderer::sm_pInstance = nullptr;
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
 																									m_pBUFFER_RENDERSTATES(HY_NEW char[HY_RENDERSTATE_BUFFER_SIZE]),
-																									m_pBUFFER_VERTEX(HY_NEW char[HY_VERTEX_BUFFER_SIZE]),
+																									m_pBUFFER_VERTEX3D(HY_NEW char[HY_VERTEX_BUFFER_SIZE]),
+																									m_pBUFFER_VERTEX2D(HY_NEW char[HY_VERTEX_BUFFER_SIZE]),
 																									m_pRenderStatesUserStartPos(nullptr),
 																									m_pCurRenderStateWritePos(nullptr),
-																									m_pCurVertexWritePos(nullptr),
-																									m_uiVertexBufferUsedBytes(0),
+																									m_pCurVertex2dWritePos(nullptr),
+																									m_uiVertex2dBufferUsedBytes(0),
 																									m_pCurWindow(nullptr),
 																									m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
 																									m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive)),
@@ -33,7 +34,8 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 {
 	HyAssert(sm_pInstance == nullptr, "IHyRenderer ctor called twice");
 
-	memset(m_pBUFFER_VERTEX, 0, HY_VERTEX_BUFFER_SIZE);
+	memset(m_pBUFFER_VERTEX3D, 0, HY_VERTEX_BUFFER_SIZE);
+	memset(m_pBUFFER_VERTEX2D, 0, HY_VERTEX_BUFFER_SIZE);
 	memset(m_pBUFFER_RENDERSTATES, 0, HY_RENDERSTATE_BUFFER_SIZE);
 
 	sm_pInstance = this;
@@ -43,7 +45,8 @@ IHyRenderer::~IHyRenderer(void)
 {
 	sm_pInstance = nullptr;
 
-	delete[] m_pBUFFER_VERTEX;
+	delete[] m_pBUFFER_VERTEX3D;
+	delete[] m_pBUFFER_VERTEX2D;
 	delete[] m_pBUFFER_RENDERSTATES;
 
 	for(auto iter = m_ShaderMap.begin(); iter != m_ShaderMap.end(); ++iter)
@@ -60,9 +63,9 @@ void IHyRenderer::PrepareBuffers()
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Init everything to beginning of buffers
 	m_pCurRenderStateWritePos = m_pBUFFER_RENDERSTATES;
-	m_pCurVertexWritePos = m_pBUFFER_VERTEX;
+	m_pCurVertex2dWritePos = m_pBUFFER_VERTEX2D;
 	m_pRenderStatesUserStartPos = nullptr;
-	m_uiVertexBufferUsedBytes = 0;
+	m_uiVertex2dBufferUsedBytes = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Write internal render states first, used by things like HyStencil
@@ -126,7 +129,7 @@ void IHyRenderer::AppendRenderState(uint32 uiId, /*const*/ IHyDrawable2d &instan
 
 	HyRenderState *pRenderState = new (m_pCurRenderStateWritePos)HyRenderState(uiId,
 																			   uiCullMask,
-																			   m_uiVertexBufferUsedBytes,
+																			   m_uiVertex2dBufferUsedBytes,
 																			   instanceRef);
 
 	m_pCurRenderStateWritePos += sizeof(HyRenderState);
@@ -138,9 +141,9 @@ void IHyRenderer::AppendRenderState(uint32 uiId, /*const*/ IHyDrawable2d &instan
 
 	// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
 	instanceRef.AcquireData();
-	instanceRef.OnWriteVertexData(m_pCurVertexWritePos);
-	m_uiVertexBufferUsedBytes = reinterpret_cast<size_t>(m_pCurVertexWritePos) - reinterpret_cast<size_t>(m_pBUFFER_VERTEX);
-	HyAssert(m_uiVertexBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
+	instanceRef.OnWriteVertexData(m_pCurVertex2dWritePos);
+	m_uiVertex2dBufferUsedBytes = reinterpret_cast<size_t>(m_pCurVertex2dWritePos) - reinterpret_cast<size_t>(m_pBUFFER_VERTEX2D);
+	HyAssert(m_uiVertex2dBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
 
 	if(m_pRenderStatesUserStartPos)
 	{

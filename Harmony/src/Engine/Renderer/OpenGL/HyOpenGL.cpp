@@ -165,7 +165,7 @@ HyOpenGL::~HyOpenGL(void)
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBindBuffer");
 
-	glBufferData(GL_ARRAY_BUFFER, m_uiVertexBufferUsedBytes, m_pBUFFER_VERTEX, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_uiVertex2dBufferUsedBytes, m_pBUFFER_VERTEX2D, GL_DYNAMIC_DRAW);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBufferData");
 
 	glDisable(GL_DEPTH_TEST);

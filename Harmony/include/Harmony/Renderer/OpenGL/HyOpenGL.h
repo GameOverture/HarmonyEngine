@@ -25,6 +25,8 @@ protected:
 	glm::mat4										m_mtxView;
 	glm::mat4										m_mtxProj;
 
+	GLuint											m_hVBO3d;
+
 	///////// 2D MEMBERS ////////////////////
 	GLuint											m_hVBO2d;
 

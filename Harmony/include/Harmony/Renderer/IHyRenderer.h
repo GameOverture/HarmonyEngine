@@ -47,7 +47,8 @@ protected:
 
 	// Preallocated buffers
 	char * const									m_pBUFFER_RENDERSTATES;
-	char * const									m_pBUFFER_VERTEX;
+	char * const									m_pBUFFER_VERTEX3D;
+	char * const									m_pBUFFER_VERTEX2D;
 
 	// Message queues (transfer and receive)
 	std::queue<IHyLoadableData *>					m_TxDataQueue;
@@ -56,8 +57,8 @@ protected:
 	// Render states and their vertex data
 	char *											m_pRenderStatesUserStartPos; // Includes RenderStateBufferHeader
 	char *											m_pCurRenderStateWritePos;
-	char *											m_pCurVertexWritePos;
-	size_t											m_uiVertexBufferUsedBytes;
+	char *											m_pCurVertex2dWritePos;
+	size_t											m_uiVertex2dBufferUsedBytes;
 	HyWindow *										m_pCurWindow;
 
 	// Effects containers

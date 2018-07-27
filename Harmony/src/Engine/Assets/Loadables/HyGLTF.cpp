@@ -64,9 +64,11 @@ void HyGLTF::OnLoadThread()
 
 void HyGLTF::OnRenderThread(IHyRenderer &rendererRef)
 {
-	//m_Mutex_PixelData.lock();
+	uint32 i = static_cast<uint32>(m_ModelData.buffers.size());
+	i++;
 	//if(GetLoadableState() == HYLOADSTATE_Queued)
 	//{
+	//	m_ModelData.
 	//	m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
 	//	DeletePixelData();
 	//}
@@ -74,5 +76,4 @@ void HyGLTF::OnRenderThread(IHyRenderer &rendererRef)
 	//{
 	//	rendererRef.DeleteTexture(m_hTextureHandle);
 	//}
-	//m_Mutex_PixelData.unlock();
 }
