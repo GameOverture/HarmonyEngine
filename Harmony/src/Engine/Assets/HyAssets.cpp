@@ -62,11 +62,11 @@ HyAssets::HyAssets(std::string sDataDirPath) :	IHyThreadClass(),
 												m_bInitialized(false),
 												m_pAtlases(nullptr),
 												m_uiNumAtlases(0),
-												m_pLoadedAtlasIndices(nullptr),
-												m_bProcessThread(false)
+												m_pLoadedAtlasIndices(nullptr)
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
+	ThreadWait();
 }
 
 HyAssets::~HyAssets()
@@ -330,10 +330,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		
 			m_Mutex_SharedQueue.unlock();
 
-			m_bProcessThread = true;
-			//m_ConditionVariable.notify_one();
-			
-			//m_LoadingCtrl.m_WaitEvent_HasNewData.Set();
+			ThreadContinue(true);
 		}
 	}
 
@@ -475,10 +472,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 /*virtual*/ void HyAssets::OnThreadUpdate() /*override*/
 {
-	// Wait idle indefinitely until there is new data to be grabbed
-	//m_ConditionVariable.wait(std::unique_lock<std::mutex>(m_Mutex_ConditionVariable), [this] { return m_bProcessThread; } );
-	m_bProcessThread = false;	// Reset the event so we wait the next time we loop
-
 	std::vector<IHyLoadableData *>	dataList;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

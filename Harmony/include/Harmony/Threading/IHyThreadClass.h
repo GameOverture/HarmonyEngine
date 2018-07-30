@@ -17,8 +17,10 @@ class IHyThreadClass
 	std::thread					m_Thread;
 	std::atomic<HyThreadState>	m_eThreadState;
 
-	bool						m_bWaiting;
 	const uint32				m_uiTHROTTLE_MS;
+	bool						m_bWaiting;
+	bool						m_bWaitComplete;
+	bool						m_bAutoResetWaiting;
 	std::mutex					stateMutex;
 	std::condition_variable		stateEvent;
 
@@ -28,7 +30,7 @@ public:
 
 	bool ThreadStart();
 	void ThreadWait();
-	void ThreadContinue();
+	void ThreadContinue(bool bOnlyOneUpdate);
 	bool ThreadStop();
 
 	bool IsThreadFinished();
