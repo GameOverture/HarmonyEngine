@@ -40,7 +40,7 @@ class HyAssets : public IHyThreadClass
 	HyAtlasIndices *											m_pLoadedAtlasIndices;
 
 	// TODO: make this a map since all node datas store a pointer
-	std::vector<HyGLTF>											m_GltfList;
+	std::map<std::string, HyGLTF *>								m_GltfMap;
 
 	template<typename tData>
 	class Factory
@@ -52,9 +52,7 @@ class HyAssets : public IHyThreadClass
 		void Init(const jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
 		const tData *GetData(const std::string &sPrefix, const std::string &sName) const;
 	};
-	Factory<HyAudioData>										m_AudioFactory;
 	Factory<HySprite2dData>										m_SpriteFactory;
-	Factory<HySpine2dData>										m_SpineFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
 	Factory<HyText2dData>										m_FontFactory;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;

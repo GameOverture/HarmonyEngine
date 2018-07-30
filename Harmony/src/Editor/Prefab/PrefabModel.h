@@ -17,8 +17,7 @@
 
 class PrefabModel : public IModel
 {
-	QJsonObject				m_GltfObject;
-	tinygltf::Model			m_ModelData;
+	QList<quint32>			m_ChecksumList;
 	PropertiesTreeModel		m_PropertiesModel;
 
 public:

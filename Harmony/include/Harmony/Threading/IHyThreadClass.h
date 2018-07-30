@@ -17,11 +17,18 @@ class IHyThreadClass
 	std::thread					m_Thread;
 	std::atomic<HyThreadState>	m_eThreadState;
 
+	bool						m_bWaiting;
+	const uint32				m_uiTHROTTLE_MS;
+	std::mutex					stateMutex;
+	std::condition_variable		stateEvent;
+
 public:
-	IHyThreadClass();
+	IHyThreadClass(uint32 uiUpdateThrottleMs = 0);	// In milliseconds
 	virtual ~IHyThreadClass();
 
 	bool ThreadStart();
+	void ThreadWait();
+	void ThreadContinue();
 	bool ThreadStop();
 
 	bool IsThreadFinished();

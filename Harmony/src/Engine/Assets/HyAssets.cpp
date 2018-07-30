@@ -81,7 +81,9 @@ HyAssets::~HyAssets()
 	delete[] pAtlases;
 	m_pAtlases = nullptr;
 
-	m_GltfList.clear();
+	for(auto iter = m_GltfMap.begin(); iter != m_GltfMap.end(); ++iter)
+		delete iter->second;
+	m_GltfMap.clear();
 
 	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
 		delete iter->second;
@@ -139,11 +141,9 @@ HyAtlasIndices *HyAssets::GetLoadedAtlases()
 
 HyGLTF *HyAssets::GetGltf(const std::string &sIdentifier)
 {
-	for(uint32 i = 0; i < static_cast<uint32>(m_GltfList.size()); ++i)
-	{
-		if(m_GltfList[i].GetIdentifier() == sIdentifier)
-			return &m_GltfList[i];
-	}
+	auto iter = m_GltfMap.find(sIdentifier);
+	if(iter != m_GltfMap.end())
+		return iter->second;
 
 	return nullptr;
 }
@@ -154,9 +154,6 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 	{
 	case HYTYPE_Sprite2d:
 		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
-		break;
-	case HYTYPE_Spine2d:
-		pDataOut = m_SpineFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
 	case HYTYPE_Text2d:
 		pDataOut = m_FontFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
@@ -443,10 +440,9 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	m_pLoadedAtlasIndices = HY_NEW HyAtlasIndices();
 
-#ifndef HY_PLATFORM_GUI
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::string sGameDataFilePath(m_sDATADIR);
 	sGameDataFilePath += HYASSETS_DataFile;
-
 	std::string sGameDataFileContents;
 	HyReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);
 
@@ -454,25 +450,23 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
 	HyAssert(bGameDataParsed, "Could not parse game data");
 
-	m_AudioFactory.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
-	m_FontFactory.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
-	m_SpriteFactory.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
-
 	if(gameDataObj.has<jsonxx::Object>("Prefabs"))
 	{
 		const jsonxx::Object &prefabObj = gameDataObj.get<jsonxx::Object>("Prefabs");
-		
-		m_GltfList.reserve(prefabObj.size());
+
 		for(auto iter = prefabObj.kv_map().begin(); iter != prefabObj.kv_map().end(); ++iter)
-			m_GltfList.emplace_back(iter->first);
+			m_GltfMap[iter->first] = HY_NEW HyGLTF(iter->first);
 
 		m_PrefabFactory.Init(prefabObj, *this);
 	}
 
-	//jsonxx::Object &entitiesDataObjRef = gameDataObj.get<jsonxx::Object>("Entities");
-	//jsonxx::Object &particlesDataObjRef = gameDataObj.get<jsonxx::Object>("Particles");
-	//jsonxx::Object &shadersDataObjRef = gameDataObj.get<jsonxx::Object>("Shaders");
-	//jsonxx::Object &spineDataObjRef = gameDataObj.get<jsonxx::Object>("Spine");
+#ifndef HY_PLATFORM_GUI
+	if(gameDataObj.has<jsonxx::Object>("Fonts"))
+		m_FontFactory.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
+	if(gameDataObj.has<jsonxx::Object>("Sprites"))
+		m_SpriteFactory.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
+	if(gameDataObj.has<jsonxx::Object>("Prefabs"))
+		m_PrefabFactory.Init(gameDataObj.get<jsonxx::Object>("Prefabs"), *this);
 #endif
 
 	// Atomic boolean indicated to main thread that we're initialized

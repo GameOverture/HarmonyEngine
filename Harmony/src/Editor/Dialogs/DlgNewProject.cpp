@@ -266,7 +266,7 @@ void DlgNewProject::on_btnBrowse_clicked()
 	pDlg->setViewMode(QFileDialog::Detail);
 	pDlg->setWindowModality( Qt::ApplicationModal );
 	pDlg->setModal(true);
-    pDlg->setDirectory(ui->txtGameLocation->text());
+	pDlg->setDirectory(ui->txtGameLocation->text());
 
 	if(pDlg->exec() == QDialog::Accepted)
 	{

@@ -1,7 +1,11 @@
 #include "Threading/IHyThreadClass.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-IHyThreadClass::IHyThreadClass() : m_eThreadState(HYTHREADSTATE_Inactive)
+#include <chrono>
+
+IHyThreadClass::IHyThreadClass(uint32 uiUpdateThrottleMs /*= 0*/) :	m_eThreadState(HYTHREADSTATE_Inactive),
+																	m_uiTHROTTLE_MS(uiUpdateThrottleMs),
+																	m_bWaiting(false)
 {
 }
 
@@ -26,11 +30,25 @@ bool IHyThreadClass::ThreadStart()
 	return true;
 }
 
+void IHyThreadClass::ThreadWait()
+{
+	std::lock_guard<std::mutex> lock(stateMutex);
+	m_bWaiting = true;
+	stateEvent.notify_one();
+}
+
+void IHyThreadClass::ThreadContinue()
+{
+	std::lock_guard<std::mutex> lock(stateMutex);
+	m_bWaiting = false;
+	stateEvent.notify_one();
+}
+
 bool IHyThreadClass::ThreadStop()
 {
 	if(m_eThreadState != HYTHREADSTATE_Run && m_eThreadState != HYTHREADSTATE_ShouldExit)
 	{
-		//HyLogWarning("IHyThreadClass::ThreadStop failed becaused thread state is not running.");
+		HyLogWarning("IHyThreadClass::ThreadStop failed becaused thread state is not running.");
 		return false;
 	}
 
@@ -60,6 +78,14 @@ void IHyThreadClass::ThreadJoin()
 	pThis->OnThreadInit();
 	while(pThis->m_eThreadState == HYTHREADSTATE_Run)
 	{
+		//pThis->stateEvent.wait(ul, [&] { return pThis->m_bWaiting == false; });
+
+		if(pThis->m_uiTHROTTLE_MS != 0)
+		{
+			std::unique_lock<std::mutex> ul(pThis->stateMutex);
+			pThis->stateEvent.wait_for(ul, std::chrono::milliseconds(pThis->m_uiTHROTTLE_MS));
+		}
+
 		pThis->OnThreadUpdate();
 	}
 

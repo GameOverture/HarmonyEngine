@@ -11,14 +11,13 @@
 
 HyPrefabData::HyPrefabData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(sPath)
 {
-	const jsonxx::Object &prefabObj = dataValueRef.get<jsonxx::Object>();
-	const jsonxx::Array &prefabImagesArray = prefabObj.get<jsonxx::Array>("images");
+	const jsonxx::Array &prefabArray = dataValueRef.get<jsonxx::Array>();
 
-	m_UvRectList.reserve(prefabImagesArray.size());
-	for(uint32 i = 0; i < static_cast<uint32>(prefabImagesArray.size()); ++i)
+	m_UvRectList.reserve(prefabArray.size());
+	for(uint32 i = 0; i < static_cast<uint32>(prefabArray.size()); ++i)
 	{
 		m_UvRectList.emplace_back();
-		m_UvRectList[i].first = assetsRef.GetAtlas(static_cast<uint32>(prefabImagesArray.get<jsonxx::Object>(i).get<jsonxx::Number>("checksum")), m_UvRectList[i].second);
+		m_UvRectList[i].first = assetsRef.GetAtlas(static_cast<uint32>(prefabArray.get<jsonxx::Number>(i)), m_UvRectList[i].second);
 		m_RequiredAtlasIndices.Set(m_UvRectList[i].first->GetMasterIndex());
 	}
 
