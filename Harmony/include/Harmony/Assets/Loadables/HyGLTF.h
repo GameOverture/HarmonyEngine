@@ -18,6 +18,7 @@ class HyGLTF : public IHyLoadableData
 	const std::string		m_sIDENTIFIER;
 	tinygltf::Model			m_ModelData;
 
+
 public:
 	HyGLTF(const std::string &sIdentifier);
 	~HyGLTF();

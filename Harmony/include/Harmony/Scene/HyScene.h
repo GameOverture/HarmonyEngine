@@ -42,7 +42,7 @@ class HyScene
 	bool												m_bPauseGame;
 
 	std::vector<IHyDrawable2d *>						m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
-	std::vector<IHyDrawable3d *>						m_LoadedInst3dList;	// TODO: rename this
+	std::vector<IHyDrawable3d *>						m_LoadedInst3dList;			// TODO: rename this
 
 public:
 	HyScene(std::vector<HyWindow *> &WindowListRef);
