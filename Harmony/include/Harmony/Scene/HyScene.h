@@ -35,14 +35,14 @@ class HyScene
 
 	std::vector<HyWindow *> &							m_WindowListRef;
 
-	// TODO: Make tightly packed (memory contiguous) node arrays
-	static std::vector<IHyNode *>						sm_MasterNodeList;			// All nodes in program
-
-	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;	// List of nodes who will update when the game is paused
+	// TODO: Make tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
+	static std::vector<IHyNode *>						sm_NodeList_All;
+	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;		// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
 
-	std::vector<IHyDrawable2d *>						m_NodeList_Loaded;			// List of nodes who can be drawn, and their graphics assets are fully loaded
-	std::vector<IHyDrawable3d *>						m_LoadedInst3dList;			// TODO: rename this
+	// List of nodes who can be drawn, and their graphics assets are fully loaded
+	std::vector<IHyDrawable2d *>						m_NodeList_LoadedDrawable2d;
+	std::vector<IHyDrawable3d *>						m_NodeList_LoadedDrawable3d;
 
 public:
 	HyScene(std::vector<HyWindow *> &WindowListRef);
@@ -74,6 +74,7 @@ public:
 
 	bool CalculateCullPasses(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCullMaskOut);
 	
+	static bool Node3dSortPredicate(const IHyDrawable3d *pInst1, const IHyDrawable3d *pInst2);
 	static bool Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2);
 };
 

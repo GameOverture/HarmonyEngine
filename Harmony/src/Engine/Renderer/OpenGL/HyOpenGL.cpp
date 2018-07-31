@@ -919,6 +919,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera)
 	size_t uiOffset = 0;
 	for(size_t i = 0; i < shaderVertexAttribListRef.size(); ++i)
 	{
+		// TODO: Cache the attribute location instead of finding it everytime
 		GLuint uiLocation = glGetAttribLocation(hGlHandle, shaderVertexAttribListRef[i].sName.c_str());
 
 		switch(shaderVertexAttribListRef[i].eVarType)

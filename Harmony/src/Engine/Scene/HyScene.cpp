@@ -21,7 +21,7 @@
 #include "Scene/Physics/HyPhysEntity2d.h"
 
 bool HyScene::sm_bInst2dOrderingDirty = false;
-std::vector<IHyNode *> HyScene::sm_MasterNodeList;
+std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 
 HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
@@ -47,17 +47,17 @@ HyScene::~HyScene(void)
 
 /*static*/ void HyScene::AddNode(IHyNode *pNode)
 {
-	sm_MasterNodeList.push_back(pNode);
+	sm_NodeList_All.push_back(pNode);
 }
 
 /*static*/ void HyScene::RemoveNode(IHyNode *pNode)
 {
-	for(auto it = sm_MasterNodeList.begin(); it != sm_MasterNodeList.end(); ++it)
+	for(auto it = sm_NodeList_All.begin(); it != sm_NodeList_All.end(); ++it)
 	{
 		if((*it) == pNode)
 		{
 			//HyLog("RemoveNode type: " << pNode->GetType());
-			sm_MasterNodeList.erase(it);
+			sm_NodeList_All.erase(it);
 			break;
 		}
 	}
@@ -83,23 +83,23 @@ HyScene::~HyScene(void)
 
 void HyScene::AddNode_Loaded(IHyDrawable2d *pDrawable)
 {
-	m_NodeList_Loaded.push_back(pDrawable);
+	m_NodeList_LoadedDrawable2d.push_back(pDrawable);
 	sm_bInst2dOrderingDirty = true;
 }
 
 void HyScene::AddNode_Loaded(IHyDrawable3d *pDrawable)
 {
-	m_LoadedInst3dList.push_back(pDrawable);
+	m_NodeList_LoadedDrawable3d.push_back(pDrawable);
 }
 
 void HyScene::RemoveNode_Loaded(const IHyDrawable2d *pDrawable)
 {
-	for(auto it = m_NodeList_Loaded.begin(); it != m_NodeList_Loaded.end(); ++it)
+	for(auto it = m_NodeList_LoadedDrawable2d.begin(); it != m_NodeList_LoadedDrawable2d.end(); ++it)
 	{
 		if((*it) == pDrawable)
 		{
 			// TODO: Log about erasing instance
-			m_NodeList_Loaded.erase(it);
+			m_NodeList_LoadedDrawable2d.erase(it);
 			break;
 		}
 	}
@@ -107,12 +107,12 @@ void HyScene::RemoveNode_Loaded(const IHyDrawable2d *pDrawable)
 
 void HyScene::RemoveNode_Loaded(const IHyDrawable3d *pDrawable)
 {
-	for(auto it = m_LoadedInst3dList.begin(); it != m_LoadedInst3dList.end(); ++it)
+	for(auto it = m_NodeList_LoadedDrawable3d.begin(); it != m_NodeList_LoadedDrawable3d.end(); ++it)
 	{
 		if((*it) == pDrawable)
 		{
 			// TODO: Log about erasing instance
-			m_LoadedInst3dList.erase(it);
+			m_NodeList_LoadedDrawable3d.erase(it);
 			break;
 		}
 	}
@@ -120,7 +120,7 @@ void HyScene::RemoveNode_Loaded(const IHyDrawable3d *pDrawable)
 
 void HyScene::CopyAllLoadedNodes(std::vector<IHyDrawable2d *> &nodeListOut)
 {
-	nodeListOut = m_NodeList_Loaded;
+	nodeListOut = m_NodeList_LoadedDrawable2d;
 }
 
 b2World &HyScene::GetPhysics2d()
@@ -147,8 +147,8 @@ void HyScene::UpdateNodes()
 	HY_PROFILE_BEGIN(HYPROFILERSECTION_Nodes)
 	if(m_bPauseGame == false)
 	{
-		for(uint32 i = 0; i < sm_MasterNodeList.size(); ++i)
-			sm_MasterNodeList[i]->Update();
+		for(uint32 i = 0; i < sm_NodeList_All.size(); ++i)
+			sm_NodeList_All[i]->Update();
 	}
 	else
 	{
@@ -174,13 +174,13 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Append 3d Render States to buffer
-	uint32 uiTotalNumInsts = static_cast<uint32>(m_LoadedInst3dList.size());
+	uint32 uiTotalNumInsts = static_cast<uint32>(m_NodeList_LoadedDrawable3d.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		//if(m_LoadedInst3dList[i]->IsValid() == false)
-		//	continue;
+		if(m_NodeList_LoadedDrawable3d[i]->IsValid() == false)
+			continue;
 
-		//rendererRef.AppendRenderState(i, *m_NodeList_Loaded[i], HY_FULL_CULL_MASK);
+		//rendererRef.AppendRenderState(i, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CULL_MASK);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,19 +189,19 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	// Sort 2d draw instances based on their display order
 	if(sm_bInst2dOrderingDirty)
 	{
-		std::sort(m_NodeList_Loaded.begin(), m_NodeList_Loaded.end(), &Node2dSortPredicate);
+		std::sort(m_NodeList_LoadedDrawable2d.begin(), m_NodeList_LoadedDrawable2d.end(), &Node2dSortPredicate);
 		sm_bInst2dOrderingDirty = false;
 	}
 
 	// TODO: JAY FIX CULLING ISSUE
 	uint32 uiCullMask = HY_FULL_CULL_MASK;//0;
-	uiTotalNumInsts = static_cast<uint32>(m_NodeList_Loaded.size());
+	uiTotalNumInsts = static_cast<uint32>(m_NodeList_LoadedDrawable2d.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_Loaded[i]->IsValid() == false/* || CalculateCullPasses(*m_NodeList_Loaded[i], uiCullMask) == false*/)
+		if(m_NodeList_LoadedDrawable2d[i]->IsValid() == false/* || CalculateCullPasses(*m_NodeList_LoadedDrawable2d[i], uiCullMask) == false*/)
 			continue;
 
-		rendererRef.AppendRenderState(i, *m_NodeList_Loaded[i], uiCullMask);
+		rendererRef.AppendRenderState(i, *m_NodeList_LoadedDrawable2d[i], uiCullMask);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -245,6 +245,11 @@ bool HyScene::CalculateCullPasses(/*const*/ IHyDrawable2d &instanceRef, uint32 &
 
 	return uiCullMaskOut != 0;
 }
+
+///*static*/ bool HyScene::Node3dSortPredicate(const IHyDrawable3d *pInst1, const IHyDrawable3d *pInst2)
+//{
+//	pInst1->GetWorldTransform(
+//}
 
 /*static*/ bool HyScene::Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2)
 {
