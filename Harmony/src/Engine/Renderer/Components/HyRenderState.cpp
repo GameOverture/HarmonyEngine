@@ -9,44 +9,32 @@
  *************************************************************************/
 #include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
-#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyText2d.h"
-#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Visables/IHyVisable.h"
 
-HyRenderState::HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOffset, /*const*/ IHyDrawable2d &instanceRef) :	m_uiID(uiId),
-																																m_uiCULL_PASS_MASK(uiCullPassMask),
-																																m_uiDATA_OFFSET(uiDataOffset),
-																																m_eRenderMode(instanceRef.GetRenderMode()),
-																																m_hTextureHandle(instanceRef.GetTextureHandle()),
-																																m_hShader(instanceRef.GetShaderHandle()),
-																																m_hStencil((instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE),
-																																m_iCoordinateSystem(instanceRef.GetCoordinateSystem()),
-																																m_uiExDataSize(0)
+HyRenderState::HyRenderState(uint32 uiId,
+							 uint32 uiCullPassMask,
+							 size_t uiDataOffset,
+							 HyRenderMode eRenderMode,
+							 HyTextureHandle hTexture,
+							 HyShaderHandle hShader,
+							 HyScreenRect<int32> &scissorRect,
+							 HyStencilHandle hStencil,
+							 int32 iCoordinateSystem,
+							 uint32 uiNumInstances,
+							 uint32 uiNumVerticesPerInstance) :	m_uiID(uiId),
+																m_uiCULL_PASS_MASK(uiCullPassMask),
+																m_uiDATA_OFFSET(uiDataOffset),
+																m_eRenderMode(eRenderMode),
+																m_hTextureHandle(hTexture),
+																m_hShader(hShader),
+																m_ScissorRect(scissorRect),
+																m_hStencil(hStencil),
+																m_iCoordinateSystem(iCoordinateSystem),
+																m_uiNumInstances(uiNumInstances),
+																m_uiNumVerticesPerInstance(uiNumVerticesPerInstance),
+																m_uiExDataSize(0)
 {
 	HyAssert(m_hShader != HY_UNUSED_HANDLE, "HyRenderState was assigned a null shader");
-	instanceRef.GetWorldScissor(m_ScissorRect);
-
-	switch(instanceRef.GetType())
-	{
-	case HYTYPE_Sprite2d:
-	case HYTYPE_TexturedQuad2d:
-		m_uiNumInstances = 1;
-		m_uiNumVerticesPerInstance = 4;
-		break;
-
-	case HYTYPE_Primitive2d:
-		m_uiNumInstances = 1;
-		m_uiNumVerticesPerInstance = static_cast<HyPrimitive2d &>(instanceRef).GetNumVerts();
-		break;
-		
-	case HYTYPE_Text2d:
-		m_uiNumInstances = static_cast<HyText2d &>(instanceRef).GetNumRenderQuads();
-		m_uiNumVerticesPerInstance = 4;
-		break;
-
-	default:
-		HyError("HyRenderState - Unknown instance type");
-	}
 }
 
 HyRenderState::~HyRenderState(void)

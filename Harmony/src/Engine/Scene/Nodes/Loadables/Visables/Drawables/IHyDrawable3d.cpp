@@ -10,11 +10,11 @@
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable3d.h"
 #include "HyEngine.h"
 
-IHyDrawable3d::IHyDrawable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyLoadable3d(eNodeType, szPrefix, szName, pParent)
+IHyDrawable3d::IHyDrawable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyVisable3d(eNodeType, szPrefix, szName, pParent)
 {
 }
 
-IHyDrawable3d::IHyDrawable3d(const IHyDrawable3d &copyRef) :	IHyLoadable3d(copyRef),
+IHyDrawable3d::IHyDrawable3d(const IHyDrawable3d &copyRef) :	IHyVisable3d(copyRef),
 																IHyDrawable(copyRef)
 {
 }

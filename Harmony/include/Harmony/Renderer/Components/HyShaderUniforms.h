@@ -61,7 +61,7 @@ public:
 	void Set(const char *szName, bool val);
 
 	// This function is responsible for incrementing the passed in reference pointer the size of the data written
-	void WriteUniformsBufferData(char *&pRefDataWritePos);
+	void WriteUniformsBufferData(char *&pWritePositionRef);
 
 	void Clear();
 };

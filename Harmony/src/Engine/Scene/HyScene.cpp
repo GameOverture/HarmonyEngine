@@ -180,7 +180,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		if(m_NodeList_LoadedDrawable3d[i]->IsValid() == false)
 			continue;
 
-		//rendererRef.AppendRenderState(i, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CULL_MASK);
+		rendererRef.AppendDrawable3d(i, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CULL_MASK);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +201,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		if(m_NodeList_LoadedDrawable2d[i]->IsValid() == false/* || CalculateCullPasses(*m_NodeList_LoadedDrawable2d[i], uiCullMask) == false*/)
 			continue;
 
-		rendererRef.AppendRenderState(i, *m_NodeList_LoadedDrawable2d[i], uiCullMask);
+		rendererRef.AppendDrawable2d(i, *m_NodeList_LoadedDrawable2d[i], uiCullMask);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

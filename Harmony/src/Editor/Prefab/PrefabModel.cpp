@@ -169,7 +169,7 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :	IModel(it
 												 sAbsGltfFilePath.toStdString(),
 												 tinygltf::REQUIRE_ALL);
 	if(bLoadSuccess == false)
-		HyLogError("Loading glTF file failed: " << sError.c_str());
+		HyGuiLog("Loading glTF file failed: " % QString(sError.c_str()), LOGTYPE_Error);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// SCENES

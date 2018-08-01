@@ -44,10 +44,10 @@ public:
 protected:
 	virtual bool IsValid() = 0;
 
-	void WriteShaderUniformBuffer(char *&pRefDataWritePos);
+	void WriteShaderUniformBuffer(char *&pWritePositionRef);
 
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
-	virtual void OnWriteVertexData(char *&pRefDataWritePos) { }			// This function is responsible for incrementing the passed in reference pointer the size of the data written
+	virtual void OnWriteVertexData(char *&pWritePositionRef) { }			// This function is responsible for incrementing the passed in reference pointer the size of the data written
 
 private:
 	virtual HyType _DrawableGetType() = 0;

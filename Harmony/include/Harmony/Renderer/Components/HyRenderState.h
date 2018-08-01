@@ -14,8 +14,6 @@
 #include "Renderer/IHyRenderer.h"
 #include "Utilities/HyMath.h"
 
-class IHyDrawable2d;
-
 class HyRenderState
 {
 	const uint32		m_uiID;								// Used for debugging
@@ -37,7 +35,17 @@ class HyRenderState
 	size_t				m_uiExDataSize;
 
 public:
-	HyRenderState(uint32 uiId, uint32 uiCullPassMask, size_t uiDataOffset, /*const*/ IHyDrawable2d &instanceRef);
+	HyRenderState(uint32 uiId,
+				  uint32 uiCullPassMask,
+				  size_t uiDataOffset,
+				  HyRenderMode eRenderMode,
+				  HyTextureHandle hTexture,
+				  HyShaderHandle hShader,
+				  HyScreenRect<int32> &scissorRect,
+				  HyStencilHandle hStencil,
+				  int32 iCoordinateSystem,
+				  uint32 uiNumInstances,
+				  uint32 uiNumVerticesPerInstance);
 	~HyRenderState(void);
 
 	uint32 GetId() const;

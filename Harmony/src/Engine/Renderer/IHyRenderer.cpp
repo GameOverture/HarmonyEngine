@@ -21,10 +21,11 @@ IHyRenderer *IHyRenderer::sm_pInstance = nullptr;
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
 																									m_pBUFFER_RENDERSTATES(HY_NEW char[HY_RENDERSTATE_BUFFER_SIZE]),
-																									m_pBUFFER_VERTEX3D(HY_NEW char[HY_VERTEX_BUFFER_SIZE]),
+																									m_pBUFFER_VERTEX3D(HY_NEW uint8[HY_VERTEX_BUFFER_SIZE]),
 																									m_pBUFFER_VERTEX2D(HY_NEW char[HY_VERTEX_BUFFER_SIZE]),
 																									m_pRenderStatesUserStartPos(nullptr),
 																									m_pCurRenderStateWritePos(nullptr),
+																									m_pCurVertex3dWritePos(nullptr),
 																									m_pCurVertex2dWritePos(nullptr),
 																									m_uiVertex2dBufferUsedBytes(0),
 																									m_pCurWindow(nullptr),
@@ -37,6 +38,8 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 	memset(m_pBUFFER_VERTEX3D, 0, HY_VERTEX_BUFFER_SIZE);
 	memset(m_pBUFFER_VERTEX2D, 0, HY_VERTEX_BUFFER_SIZE);
 	memset(m_pBUFFER_RENDERSTATES, 0, HY_RENDERSTATE_BUFFER_SIZE);
+
+	m_pCurVertex3dWritePos = m_pBUFFER_VERTEX3D;
 
 	sm_pInstance = this;
 }
@@ -81,12 +84,12 @@ void IHyRenderer::PrepareBuffers()
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
 		{
 			instanceListRef[i]->OnUpdateUniforms();
-			AppendRenderState(0, *instanceListRef[i], HY_FULL_CULL_MASK);
+			AppendDrawable2d(0, *instanceListRef[i], HY_FULL_CULL_MASK);
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Set pointers to be ready for HyScene to call AppendRenderState()
+	// Set pointers to be ready for HyScene to call AppendDrawable2d()
 	m_pRenderStatesUserStartPos = m_pCurRenderStateWritePos;
 	IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
 	memset(pHeader, 0, sizeof(IHyRenderer::RenderStateBufferHeader));
@@ -94,62 +97,103 @@ void IHyRenderer::PrepareBuffers()
 	m_pCurRenderStateWritePos += sizeof(IHyRenderer::RenderStateBufferHeader);
 }
 
-void IHyRenderer::AppendRenderState(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCullMask uiCullMask)
+void IHyRenderer::AppendDrawable3d(uint32 uiId, /*const*/ IHyDrawable3d &instanceRef, HyCullMask uiCullMask)
 {
-	//HyAssert(m_hShader != HY_UNUSED_HANDLE, "HyRenderState was assigned a null shader");
-	//instanceRef.GetWorldScissor(m_ScissorRect);
+	uint32 uiNumInstances, uiNumVerticesPerInstance;
+	switch(instanceRef.GetType())
+	{
+	case HYTYPE_Prefab3d:
+		uiNumInstances = 1;
+		uiNumVerticesPerInstance = 4;
+		break;
 
-	//switch(instanceRef.GetType())
-	//{
-	//case HYTYPE_Sprite2d:
-	//case HYTYPE_TexturedQuad2d:
-	//	m_uiNumInstances = 1;
-	//	m_uiNumVerticesPerInstance = 4;
-	//	break;
+	default:
+		HyError("HyRenderState - Unknown instance type");
+	}
 
-	//case HYTYPE_Primitive2d:
-	//	m_uiNumInstances = 1;
-	//	m_uiNumVerticesPerInstance = static_cast<HyPrimitive2d &>(instanceRef).GetNumVerts();
-	//	break;
-	//	
-	//case HYTYPE_Text2d:
-	//	m_uiNumInstances = static_cast<HyText2d &>(instanceRef).GetNumRenderQuads();
-	//	m_uiNumVerticesPerInstance = 4;
-	//	break;
-
-	//default:
-	//	HyError("HyRenderState - Unknown instance type");
-	//}
-
-
-
-
-
-
+	HyScreenRect<int32> scissorRect;
+	instanceRef.GetWorldScissor(scissorRect);
 
 	HyRenderState *pRenderState = new (m_pCurRenderStateWritePos)HyRenderState(uiId,
 																			   uiCullMask,
 																			   m_uiVertex2dBufferUsedBytes,
-																			   instanceRef);
+																			   instanceRef.GetRenderMode(),
+																			   instanceRef.GetTextureHandle(),
+																			   instanceRef.GetShaderHandle(),
+																			   scissorRect,
+																			   (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
+																			   instanceRef.GetCoordinateSystem(),
+																			   uiNumInstances,
+																			   uiNumVerticesPerInstance);
+}
+
+void IHyRenderer::AppendDrawable2d(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCullMask uiCullMask)
+{
+	uint32 uiNumInstances, uiNumVerticesPerInstance;
+	switch(instanceRef.GetType())
+	{
+	case HYTYPE_Sprite2d:
+	case HYTYPE_TexturedQuad2d:
+		uiNumInstances = 1;
+		uiNumVerticesPerInstance = 4;
+		break;
+
+	case HYTYPE_Primitive2d:
+		uiNumInstances = 1;
+		uiNumVerticesPerInstance = static_cast<HyPrimitive2d &>(instanceRef).GetNumVerts();
+		break;
+		
+	case HYTYPE_Text2d:
+		uiNumInstances = static_cast<HyText2d &>(instanceRef).GetNumRenderQuads();
+		uiNumVerticesPerInstance = 4;
+		break;
+
+	default:
+		HyError("HyRenderState - Unknown instance type");
+	}
+
+	HyScreenRect<int32> scissorRect;
+	instanceRef.GetWorldScissor(scissorRect);
+
+	HyRenderState *pRenderState = new (m_pCurRenderStateWritePos)HyRenderState(uiId,
+																			   uiCullMask,
+																			   m_uiVertex2dBufferUsedBytes,
+																			   instanceRef.GetRenderMode(),
+																			   instanceRef.GetTextureHandle(),
+																			   instanceRef.GetShaderHandle(),
+																			   scissorRect,
+																			   (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
+																			   instanceRef.GetCoordinateSystem(),
+																			   uiNumInstances,
+																			   uiNumVerticesPerInstance);
 
 	m_pCurRenderStateWritePos += sizeof(HyRenderState);
 
 	char *pStartOfExData = m_pCurRenderStateWritePos;
 	instanceRef.WriteShaderUniformBuffer(m_pCurRenderStateWritePos);	// This function is responsible for incrementing the draw pointer to after what's written
 	pRenderState->SetExSize(reinterpret_cast<size_t>(m_pCurRenderStateWritePos) - reinterpret_cast<size_t>(pStartOfExData));
-	HyAssert(reinterpret_cast<size_t>(m_pCurRenderStateWritePos) - reinterpret_cast<size_t>(m_pBUFFER_RENDERSTATES) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
+	HyAssert(reinterpret_cast<size_t>(m_pCurRenderStateWritePos) - reinterpret_cast<size_t>(m_pBUFFER_RENDERSTATES) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
 
 	// OnWriteDrawBufferData() is responsible for incrementing the draw pointer to after what's written
 	instanceRef.AcquireData();
 	instanceRef.OnWriteVertexData(m_pCurVertex2dWritePos);
 	m_uiVertex2dBufferUsedBytes = reinterpret_cast<size_t>(m_pCurVertex2dWritePos) - reinterpret_cast<size_t>(m_pBUFFER_VERTEX2D);
-	HyAssert(m_uiVertex2dBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "IHyRenderer::AppendRenderState() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
+	HyAssert(m_uiVertex2dBufferUsedBytes < HY_VERTEX_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
 
 	if(m_pRenderStatesUserStartPos)
 	{
 		IHyRenderer::RenderStateBufferHeader *pHeader = reinterpret_cast<IHyRenderer::RenderStateBufferHeader *>(m_pRenderStatesUserStartPos);
 		pHeader->uiNum2dRenderStates++;
 	}
+}
+
+HyVertexDataHandle IHyRenderer::AppendVertexData3d(const uint8 *pData, uint32 uiSize)
+{
+	HyVertexDataHandle hReturnHandle = m_pCurVertex3dWritePos;
+	memcpy(m_pCurRenderStateWritePos, pData, uiSize);
+	m_pCurVertex3dWritePos += uiSize;
+
+	return hReturnHandle;
 }
 
 void IHyRenderer::TxData(IHyLoadableData *pData)

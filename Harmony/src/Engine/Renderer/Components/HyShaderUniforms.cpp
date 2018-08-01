@@ -293,19 +293,19 @@ void HyShaderUniforms::Set(const char *szName, bool bVal)
 }
 
 // This function is responsible for incrementing the passed in reference pointer the size of the data written
-void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
+void HyShaderUniforms::WriteUniformsBufferData(char *&pWritePositionRef)
 {
-	*reinterpret_cast<uint32 *>(pRefDataWritePos) = static_cast<uint32>(m_UniformList.size());
-	pRefDataWritePos += sizeof(uint32);
+	*reinterpret_cast<uint32 *>(pWritePositionRef) = static_cast<uint32>(m_UniformList.size());
+	pWritePositionRef += sizeof(uint32);
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_UniformList.size()); ++i)
 	{
 		uint32 uiStrLen = static_cast<uint32>(strlen(m_UniformList[i].GetName()) + 1);
-		strncpy_s(pRefDataWritePos, uiStrLen, m_UniformList[i].GetName(), HY_SHADER_UNIFORM_NAME_LENGTH);
-		pRefDataWritePos += uiStrLen;
+		strncpy_s(pWritePositionRef, uiStrLen, m_UniformList[i].GetName(), HY_SHADER_UNIFORM_NAME_LENGTH);
+		pWritePositionRef += uiStrLen;
 
-		*reinterpret_cast<int32 *>(pRefDataWritePos) = static_cast<int32>(m_UniformList[i].GetVariableType());
-		pRefDataWritePos += sizeof(int32);
+		*reinterpret_cast<int32 *>(pWritePositionRef) = static_cast<int32>(m_UniformList[i].GetVariableType());
+		pWritePositionRef += sizeof(int32);
 
 		uint32 uiDataSize = 0;
 		switch(m_UniformList[i].GetVariableType())
@@ -330,8 +330,8 @@ void HyShaderUniforms::WriteUniformsBufferData(char *&pRefDataWritePos)
 		case HYSHADERVAR_mat3:		uiDataSize = sizeof(glm::mat3);		break;
 		case HYSHADERVAR_mat4:		uiDataSize = sizeof(glm::mat4);		break;
 		}
-		memcpy(pRefDataWritePos, m_UniformList[i].GetData(), uiDataSize);
-		pRefDataWritePos += uiDataSize;
+		memcpy(pWritePositionRef, m_UniformList[i].GetData(), uiDataSize);
+		pWritePositionRef += uiDataSize;
 	}
 }
 

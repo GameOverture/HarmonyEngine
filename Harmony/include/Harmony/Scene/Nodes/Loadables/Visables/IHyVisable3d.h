@@ -40,6 +40,9 @@ public:
 	float CalculateAlpha();
 	const glm::vec3 &CalculateTint();
 
+protected:
+	virtual void NodeUpdate() = 0;
+
 private:
 	void CalculateColor();
 

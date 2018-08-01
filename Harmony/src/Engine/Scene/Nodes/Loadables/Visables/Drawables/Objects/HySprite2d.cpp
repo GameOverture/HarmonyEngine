@@ -437,56 +437,56 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	}
 }
 
-/*virtual*/ void HySprite2d::OnWriteVertexData(char *&pRefDataWritePos) /*override*/
+/*virtual*/ void HySprite2d::OnWriteVertexData(char *&pWritePositionRef) /*override*/
 {
 	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
 	glm::vec2 vSize(frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth(), frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight());
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
+	pWritePositionRef += sizeof(glm::vec2);
 
 	glm::vec2 vOffset(frameRef.vOFFSET.x, frameRef.vOFFSET.y);
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vOffset;
+	pWritePositionRef += sizeof(glm::vec2);
 
-	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = CalculateTopTint();
-	pRefDataWritePos += sizeof(glm::vec3);
-	*reinterpret_cast<float *>(pRefDataWritePos) = CalculateAlpha();
-	pRefDataWritePos += sizeof(float);
+	*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = CalculateTopTint();
+	pWritePositionRef += sizeof(glm::vec3);
+	*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha();
+	pWritePositionRef += sizeof(float);
 
-	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = CalculateBotTint();
-	pRefDataWritePos += sizeof(glm::vec3);
-	*reinterpret_cast<float *>(pRefDataWritePos) = CalculateAlpha();
-	pRefDataWritePos += sizeof(float);
+	*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = CalculateBotTint();
+	pWritePositionRef += sizeof(glm::vec3);
+	*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha();
+	pWritePositionRef += sizeof(float);
 	
-	//*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(frameRef.GetActualTextureIndex());
-	//pRefDataWritePos += sizeof(float);
+	//*reinterpret_cast<float *>(pWritePositionRef) = static_cast<float>(frameRef.GetActualTextureIndex());
+	//pWritePositionRef += sizeof(float);
 
 	glm::vec2 vUV;
 
 	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
 	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+	pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
 	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+	pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
 	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+	pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
 	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+	pWritePositionRef += sizeof(glm::vec2);
 
-	GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pRefDataWritePos));
+	GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pWritePositionRef));
 
-	pRefDataWritePos += sizeof(glm::mat4);
+	pWritePositionRef += sizeof(glm::mat4);
 }
 
 /*static*/ void HySprite2d::NullAnimCallback(HySprite2d *pSelf, void *pParam)

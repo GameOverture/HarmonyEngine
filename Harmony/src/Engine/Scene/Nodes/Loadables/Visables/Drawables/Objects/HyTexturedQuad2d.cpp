@@ -130,54 +130,54 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 		m_hTextureHandle = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
 }
 
-/*virtual*/ void HyTexturedQuad2d::OnWriteVertexData(char *&pRefDataWritePos)
+/*virtual*/ void HyTexturedQuad2d::OnWriteVertexData(char *&pWritePositionRef)
 {
 	const HyTexturedQuad2dData *pData = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData());
 
 	glm::vec2 vSize(m_SrcRect.Width() * (m_bIsRaw ? m_uiRawTextureWidth : pData->GetAtlas()->GetWidth()),
 					m_SrcRect.Height() * (m_bIsRaw ? m_uiRawTextureHeight : pData->GetAtlas()->GetHeight()));
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vSize;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
+	pWritePositionRef += sizeof(glm::vec2);
 
 	glm::vec2 vOffset(0.0f, 0.0f);
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vOffset;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vOffset;
+	pWritePositionRef += sizeof(glm::vec2);
 
-	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = CalculateTopTint();
-	pRefDataWritePos += sizeof(glm::vec3);
-	*reinterpret_cast<float *>(pRefDataWritePos) = CalculateAlpha();
-	pRefDataWritePos += sizeof(float);
+	*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = CalculateTopTint();
+	pWritePositionRef += sizeof(glm::vec3);
+	*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha();
+	pWritePositionRef += sizeof(float);
 
-	*reinterpret_cast<glm::vec3 *>(pRefDataWritePos) = CalculateBotTint();
-	pRefDataWritePos += sizeof(glm::vec3);
-	*reinterpret_cast<float *>(pRefDataWritePos) = CalculateAlpha();
-	pRefDataWritePos += sizeof(float);
+	*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = CalculateBotTint();
+	pWritePositionRef += sizeof(glm::vec3);
+	*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha();
+	pWritePositionRef += sizeof(float);
 
-	//*reinterpret_cast<float *>(pRefDataWritePos) = static_cast<float>(m_bIsRaw ? m_uiTextureIndex : pData->GetAtlas()->GetActualGfxApiTextureIndex(m_uiTextureIndex));
-	//pRefDataWritePos += sizeof(float);
+	//*reinterpret_cast<float *>(pWritePositionRef) = static_cast<float>(m_bIsRaw ? m_uiTextureIndex : pData->GetAtlas()->GetActualGfxApiTextureIndex(m_uiTextureIndex));
+	//pWritePositionRef += sizeof(float);
 
 	glm::vec2 vUV;
 
 	vUV.x = m_SrcRect.right;//1.0f;
 	vUV.y = m_SrcRect.top;//1.0f;
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+	pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = m_SrcRect.left;//0.0f;
 	vUV.y = m_SrcRect.top;//1.0f;
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+	pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = m_SrcRect.right;//1.0f;
 	vUV.y = m_SrcRect.bottom;//0.0f;
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+	pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = m_SrcRect.left;//0.0f;
 	vUV.y = m_SrcRect.bottom;//0.0f;
-	*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-	pRefDataWritePos += sizeof(glm::vec2);
+	*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+	pWritePositionRef += sizeof(glm::vec2);
 
-	GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pRefDataWritePos));
-	pRefDataWritePos += sizeof(glm::mat4);
+	GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pWritePositionRef));
+	pWritePositionRef += sizeof(glm::mat4);
 }

@@ -11,12 +11,12 @@
 #define IHyDrawable3d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/IHyLoadable3d.h"
+#include "Scene/Nodes/Loadables/Visables/IHyVisable3d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable.h"
 #include "Renderer/Effects/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
-class IHyDrawable3d : public IHyLoadable3d, public IHyDrawable
+class IHyDrawable3d : public IHyVisable3d, public IHyDrawable
 {
 	friend class HyScene;
 

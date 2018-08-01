@@ -48,6 +48,7 @@
 typedef uint32 HyTextureHandle;
 typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
+typedef uint8 *HyVertexDataHandle;
 
 enum HyType
 {

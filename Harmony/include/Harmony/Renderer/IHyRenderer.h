@@ -16,6 +16,7 @@
 class HyRenderState;
 class HyStencil;
 class HyPortal2d;
+class IHyDrawable3d;
 class IHyDrawable2d;
 class HyWindow;
 class HyGfxComms;
@@ -47,7 +48,7 @@ protected:
 
 	// Preallocated buffers
 	char * const									m_pBUFFER_RENDERSTATES;
-	char * const									m_pBUFFER_VERTEX3D;
+	uint8 * const									m_pBUFFER_VERTEX3D;
 	char * const									m_pBUFFER_VERTEX2D;
 
 	// Message queues (transfer and receive)
@@ -57,6 +58,7 @@ protected:
 	// Render states and their vertex data
 	char *											m_pRenderStatesUserStartPos; // Includes RenderStateBufferHeader
 	char *											m_pCurRenderStateWritePos;
+	uint8 *											m_pCurVertex3dWritePos;
 	char *											m_pCurVertex2dWritePos;
 	size_t											m_uiVertex2dBufferUsedBytes;
 	HyWindow *										m_pCurWindow;
@@ -77,7 +79,10 @@ public:
 	virtual ~IHyRenderer(void);
 
 	void PrepareBuffers();
-	void AppendRenderState(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCullMask uiCullMask);
+	void AppendDrawable3d(uint32 uiId, /*const*/ IHyDrawable3d &instanceRef, HyCullMask uiCullMask);
+	void AppendDrawable2d(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCullMask uiCullMask);
+
+	HyVertexDataHandle AppendVertexData3d(const uint8 *pData, uint32 uiSize);
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();
