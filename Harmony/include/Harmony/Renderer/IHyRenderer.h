@@ -11,6 +11,8 @@
 #define IHyRenderer_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Renderer/Components/HyRenderBuffer.h"
+#include "Renderer/Components/HyVertexBuffer.h"
 #include "Renderer/Effects/HyShader.h"
 
 class HyRenderState;
@@ -24,22 +26,8 @@ class HyDiagnostics;
 class IHyCamera;
 class IHyLoadableData;
 
-typedef uint32 HyCullMask;
-#define HY_MAX_PASSES_PER_BUFFER 32						// Number of bits held in 'HyCullMask'
-#define HY_FULL_CULL_MASK 0xFFFFFFFF
-
-#define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1)	// 1MB
-#define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 2)		// 2MB
-
 class IHyRenderer
 {
-public:
-	struct RenderStateBufferHeader
-	{
-		uint32		uiNum3dRenderStates;
-		uint32		uiNum2dRenderStates;
-	};
-
 protected:
 	static IHyRenderer *							sm_pInstance;
 
@@ -47,22 +35,16 @@ protected:
 	std::vector<HyWindow *> &						m_WindowListRef;
 
 	// Preallocated buffers
-	char * const									m_pBUFFER_RENDERSTATES;
-	uint8 * const									m_pBUFFER_VERTEX3D;
-	char * const									m_pBUFFER_VERTEX2D;
+	HyRenderBuffer									m_RenderBuffer;
+	HyVertexBuffer									m_VertexBuffer3d;
+	HyVertexBuffer									m_VertexBuffer2d;
 
+	HyWindow *										m_pCurWindow;
+	
 	// Message queues (transfer and receive)
 	std::queue<IHyLoadableData *>					m_TxDataQueue;
 	std::queue<IHyLoadableData *>					m_RxDataQueue;
-
-	// Render states and their vertex data
-	char *											m_pRenderStatesUserStartPos; // Includes RenderStateBufferHeader
-	char *											m_pCurRenderStateWritePos;
-	uint8 *											m_pCurVertex3dWritePos;
-	char *											m_pCurVertex2dWritePos;
-	size_t											m_uiVertex2dBufferUsedBytes;
-	HyWindow *										m_pCurWindow;
-
+	
 	// Effects containers
 	std::map<HyShaderHandle, HyShader *>			m_ShaderMap;
 	std::map<HyStencilHandle, HyStencil *>			m_StencilMap;
@@ -79,10 +61,10 @@ public:
 	virtual ~IHyRenderer(void);
 
 	void PrepareBuffers();
-	void AppendDrawable3d(uint32 uiId, /*const*/ IHyDrawable3d &instanceRef, HyCullMask uiCullMask);
-	void AppendDrawable2d(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCullMask uiCullMask);
+	void AppendDrawable3d(uint32 uiId, /*const*/ IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask);
+	void AppendDrawable2d(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask);
 
-	HyVertexDataHandle AppendVertexData3d(const uint8 *pData, uint32 uiSize);
+	HyVertexOffsetHandle AppendVertexData3d(const uint8 *pData, uint32 uiSize);
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();
@@ -93,21 +75,9 @@ public:
 	
 	uint32 GetNumWindows();
 	virtual void SetCurrentWindow(uint32 uiIndex);
-
-	virtual void StartRender() = 0;
-
-	virtual void Begin_3d() = 0;
-	virtual void DrawRenderState_3d(HyRenderState *pRenderState) = 0;
-
-	virtual void Begin_2d() = 0;
-	virtual void DrawRenderState_2d(HyRenderState *pRenderState, IHyCamera *pCamera) = 0;
-
-	virtual void FinishRender() = 0;
-
-	virtual void UploadShader(HyShaderProgramDefaults eDefaultsFrom, HyShader *pShader) = 0;
-	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) = 0;
-	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
-	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
+	
+	void ProcessMsgs();
+	void Render();
 
 	static HyShader *FindShader(HyShaderHandle hHandle);
 	static void AddShader(HyShader *pShader);
@@ -117,8 +87,17 @@ public:
 	static void AddStencil(HyStencil *pStencil);
 	static void RemoveStencil(HyStencil *pStencil);
 
-	void ProcessMsgs();
-	void Render();
+	virtual void StartRender() = 0;
+	virtual void Begin_3d() = 0;
+	virtual void DrawRenderState_3d(HyRenderBuffer::State *pRenderState) = 0;
+	virtual void Begin_2d() = 0;
+	virtual void DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCamera) = 0;
+	virtual void FinishRender() = 0;
+	virtual void UploadShader(HyShaderProgramDefaults eDefaultsFrom, HyShader *pShader) = 0;
+	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) = 0;
+	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
+	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
+	virtual void NewVertexData3d() = 0;
 };
 
 #endif /* IHyRenderer_h__ */

@@ -180,7 +180,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		if(m_NodeList_LoadedDrawable3d[i]->IsValid() == false)
 			continue;
 
-		rendererRef.AppendDrawable3d(i, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CULL_MASK);
+		rendererRef.AppendDrawable3d(i, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CAMERA_MASK);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,11 +194,11 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	}
 
 	// TODO: JAY FIX CULLING ISSUE
-	uint32 uiCullMask = HY_FULL_CULL_MASK;//0;
+	uint32 uiCullMask = HY_FULL_CAMERA_MASK;//0;
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_LoadedDrawable2d.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_LoadedDrawable2d[i]->IsValid() == false/* || CalculateCullPasses(*m_NodeList_LoadedDrawable2d[i], uiCullMask) == false*/)
+		if(m_NodeList_LoadedDrawable2d[i]->IsValid() == false/* || CalculateCameraMask(*m_NodeList_LoadedDrawable2d[i], uiCullMask) == false*/)
 			continue;
 
 		rendererRef.AppendDrawable2d(i, *m_NodeList_LoadedDrawable2d[i], uiCullMask);
@@ -221,9 +221,9 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	HY_PROFILE_END
 }
 
-bool HyScene::CalculateCullPasses(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCullMaskOut)
+bool HyScene::CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut)
 {
-	uiCullMaskOut = 0;
+	uiCameraMaskOut = 0;
 	if(instanceRef.GetCoordinateSystem() >= 0)
 		return true;
 
@@ -234,16 +234,16 @@ bool HyScene::CalculateCullPasses(/*const*/ IHyDrawable2d &instanceRef, uint32 &
 		while(iter.IsEnd() == false)
 		{
 			if(b2TestOverlap(iter.Get()->GetWorldViewBounds(), instanceRef.GetWorldAABB()))
-				uiCullMaskOut |= (1 << iBit);
+				uiCameraMaskOut |= (1 << iBit);
 
 			iBit++;
-			HyAssert(iBit <= HY_MAX_PASSES_PER_BUFFER, "HyScene::CalculateCullPasses exceeded maximum number of passes. There are too many cameras enabled.");
+			HyAssert(iBit <= HY_MAX_CAMERA_MASK_BITS, "HyScene::CalculateCameraMask exceeded maximum number of passes. There are too many cameras enabled.");
 
 			++iter;
 		}
 	}
 
-	return uiCullMaskOut != 0;
+	return uiCameraMaskOut != 0;
 }
 
 ///*static*/ bool HyScene::Node3dSortPredicate(const IHyDrawable3d *pInst1, const IHyDrawable3d *pInst2)

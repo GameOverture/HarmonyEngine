@@ -46,7 +46,7 @@ public:
 	virtual float GetZoom() const = 0;
 
 	void SetCullMaskBit(uint32 uiBit);
-	uint32 GetCullMaskBit();
+	uint32 GetCameraBitFlag();
 };
 
 class HyCamera2d final : public IHyNode2d, public IHyCamera

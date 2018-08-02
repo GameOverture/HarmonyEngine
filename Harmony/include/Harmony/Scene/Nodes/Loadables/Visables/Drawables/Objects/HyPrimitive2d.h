@@ -48,7 +48,7 @@ protected:
 	virtual bool OnIsValid() override;
 	virtual void OnShapeSet(HyShape2d *pShape) override;
 	virtual void OnUpdateUniforms() override;
-	virtual void OnWriteVertexData(char *&pWritePositionRef) override;
+	virtual void OnWriteVertexData(uint8 *&pWritePositionRef) override;
 
 private:
 	void ClearData();

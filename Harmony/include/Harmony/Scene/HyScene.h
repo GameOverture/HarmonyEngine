@@ -72,7 +72,7 @@ public:
 	void UpdateNodes();
 	void PrepareRender(IHyRenderer &rendererRef);
 
-	bool CalculateCullPasses(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCullMaskOut);
+	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut);
 	
 	static bool Node3dSortPredicate(const IHyDrawable3d *pInst1, const IHyDrawable3d *pInst2);
 	static bool Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2);

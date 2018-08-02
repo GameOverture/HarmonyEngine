@@ -44,19 +44,13 @@ void HyGLTF::OnLoadThread()
 
 void HyGLTF::OnRenderThread(IHyRenderer &rendererRef)
 {
-	for(uint32 i = 0; i < static_cast<uint32>(m_ModelData.buffers.size()); ++i)
+	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		rendererRef.AppendVertexData3d(&m_ModelData.buffers[i].data[0], static_cast<uint32>(m_ModelData.buffers[i].data.size()));
+		for(uint32 i = 0; i < static_cast<uint32>(m_ModelData.buffers.size()); ++i)
+			m_BufferHandleList.push_back(rendererRef.AppendVertexData3d(&m_ModelData.buffers[i].data[0], static_cast<uint32>(m_ModelData.buffers[i].data.size())));
 	}
-	
-	//if(GetLoadableState() == HYLOADSTATE_Queued)
-	//{
-	//	m_ModelData.
-	//	m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
-	//	DeletePixelData();
-	//}
-	//else // GetLoadableState() == HYLOADSTATE_Discarded
-	//{
-	//	rendererRef.DeleteTexture(m_hTextureHandle);
-	//}
+	else // GetLoadableState() == HYLOADSTATE_Discarded
+	{
+		//rendererRef.RemoveVertexData3d(
+	}
 }

@@ -57,9 +57,6 @@
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Components\HyRenderState.cpp">
-      <Filter>Renderer\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Components\HyWindow.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
@@ -239,6 +236,12 @@
     </ClCompile>
     <ClCompile Include="Utilities\tiny_gltf.cpp">
       <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\HyVertexBuffer.cpp">
+      <Filter>Renderer\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Components\HyRenderBuffer.cpp">
+      <Filter>Renderer\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -453,9 +456,6 @@
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysEntity2d.h">
       <Filter>Scene\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyRenderState.h">
-      <Filter>Renderer\Components</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyWindow.h">
       <Filter>Renderer\Components</Filter>
     </ClInclude>
@@ -650,6 +650,12 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Assets\Loadables\HyGLTF.h">
       <Filter>Assets\Loadables</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyVertexBuffer.h">
+      <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyRenderBuffer.h">
+      <Filter>Renderer\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

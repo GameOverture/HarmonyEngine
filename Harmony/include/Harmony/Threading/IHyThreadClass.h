@@ -18,7 +18,7 @@ class IHyThreadClass
 	std::atomic<HyThreadState>	m_eThreadState;
 
 	const uint32				m_uiTHROTTLE_MS;
-	bool						m_bWaiting;
+	bool						m_bWaitEnabled;
 	bool						m_bWaitComplete;
 	bool						m_bAutoResetWaiting;
 	std::mutex					stateMutex;

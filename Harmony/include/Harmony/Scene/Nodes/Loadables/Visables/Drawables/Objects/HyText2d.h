@@ -126,7 +126,7 @@ protected:
 	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
-	virtual void OnWriteVertexData(char *&pWritePositionRef) override;
+	virtual void OnWriteVertexData(uint8 *&pWritePositionRef) override;
 
 private:
 	void MarkAsDirty();

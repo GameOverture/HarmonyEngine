@@ -10,7 +10,6 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 #include "Renderer/Components/HyWindow.h"
-#include "Renderer/Components/HyRenderState.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Scene/Nodes/Objects/HyCamera.h"
@@ -18,7 +17,8 @@
 
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	IHyRenderer(diagnosticsRef, windowListRef),
 																							m_mtxView(1.0f),
-																							m_mtxProj(1.0f)
+																							m_mtxProj(1.0f),
+																							m_bVBO3dDirty(false)
 {
 	HyLog("OpenGL is initializing...");
 
@@ -117,6 +117,8 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 
 	//glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
+	glGenBuffers(1, &m_hVBO3d);
+
 	//////////////////////////////////////////////////////////////////////////
 	// 2D setup
 	glGenBuffers(1, &m_hVBO2d);
@@ -154,9 +156,20 @@ HyOpenGL::~HyOpenGL(void)
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
+
+	if(m_bVBO3dDirty)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_hVBO3d);
+		HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBindBuffer");
+
+		glBufferData(GL_ARRAY_BUFFER, m_VertexBuffer3d.m_uiNumUsedBytes, m_VertexBuffer3d.m_pBUFFER, GL_STATIC_DRAW);
+		HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBufferData");
+
+		m_bVBO3dDirty = false;
+	}
 }
 
-/*virtual*/ void HyOpenGL::DrawRenderState_3d(HyRenderState *pRenderState) /*override*/
+/*virtual*/ void HyOpenGL::DrawRenderState_3d(HyRenderBuffer::State *pRenderState) /*override*/
 {
 }
 
@@ -165,7 +178,7 @@ HyOpenGL::~HyOpenGL(void)
 	glBindBuffer(GL_ARRAY_BUFFER, m_hVBO2d);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBindBuffer");
 
-	glBufferData(GL_ARRAY_BUFFER, m_uiVertex2dBufferUsedBytes, m_pBUFFER_VERTEX2D, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_VertexBuffer2d.m_uiNumUsedBytes, m_VertexBuffer2d.m_pBUFFER, GL_DYNAMIC_DRAW);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBufferData");
 
 	glDisable(GL_DEPTH_TEST);
@@ -176,11 +189,11 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
 }
 
-/*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderState *pRenderState, IHyCamera *pCamera) /*override*/
+/*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCamera) /*override*/
 {
 	//////////////////////////////////////////////////////////////////////////
 	// Setup stencil buffer if required
-	if(pRenderState->GetStencilHandle() != HY_UNUSED_HANDLE)
+	if(pRenderState->hSTENCIL != HY_UNUSED_HANDLE)
 	{
 		glEnable(GL_STENCIL_TEST);
 		glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
@@ -193,16 +206,16 @@ HyOpenGL::~HyOpenGL(void)
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);				// Fragments that "passed" will write the 'ref' value in the stencil buffer
 
 		// Render all instances stored in the HyStencil, and affect their pixel locations in stencil buffer
-		HyStencil *pStencil = FindStencil(pRenderState->GetStencilHandle());
+		HyStencil *pStencil = FindStencil(pRenderState->hSTENCIL);
 		uint32 uiNumStencilInstance = static_cast<uint32>(pStencil->GetInstanceList().size());
 		char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pStencil->GetRenderStatePtr());
 		for(uint32 i = 0; i < uiNumStencilInstance; ++i)
 		{
-			HyRenderState *pCurRenderState = reinterpret_cast<HyRenderState *>(pStencilRenderStateBufferPos);
-			if(pCurRenderState->GetCoordinateSystem() < 0 || pCurRenderState->GetCoordinateSystem() == m_pCurWindow->GetIndex())
-				RenderPass2d(pCurRenderState, pRenderState->GetCoordinateSystem() < 0 ? pCamera : nullptr);
+			HyRenderBuffer::State *pCurRenderState = reinterpret_cast<HyRenderBuffer::State *>(pStencilRenderStateBufferPos);
+			if(pCurRenderState->iCOORDINATE_SYSTEM < 0 || pCurRenderState->iCOORDINATE_SYSTEM == m_pCurWindow->GetIndex())
+				RenderPass2d(pCurRenderState, pCurRenderState->iCOORDINATE_SYSTEM < 0 ? pCamera : nullptr);
 
-			pStencilRenderStateBufferPos += pCurRenderState->GetExSize() + sizeof(HyRenderState);
+			pStencilRenderStateBufferPos += pCurRenderState->m_uiExDataSize + sizeof(HyRenderBuffer::State);
 		}
 
 		switch(pStencil->GetBehavior())
@@ -224,7 +237,7 @@ HyOpenGL::~HyOpenGL(void)
 		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
 	}
 
-	RenderPass2d(pRenderState, pRenderState->GetCoordinateSystem() < 0 ? pCamera : nullptr);
+	RenderPass2d(pRenderState, pRenderState->iCOORDINATE_SYSTEM < 0 ? pCamera : nullptr);
 }
 
 /*virtual*/ void HyOpenGL::FinishRender()
@@ -620,6 +633,11 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
 }
 
+/*virtual*/ void HyOpenGL::NewVertexData3d() /*override*/
+{
+	m_bVBO3dDirty = true;
+}
+
 void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 {
 	GLuint iShaderHandle = 0;
@@ -672,7 +690,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glAttachShader");
 }
 
-void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera)
+void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCamera)
 {
 	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
 	HyRectangle<float> viewportRect;
@@ -712,12 +730,11 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set the proper shader program
-	HyShaderHandle hShaderHandle = pRenderState->GetShaderHandle();
-	GLuint uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][hShaderHandle];
+	GLuint uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][pRenderState->hSHADER];
 	glBindVertexArray(uiVao);
 	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
 
-	GLuint hGlHandle = m_GLShaderMap[hShaderHandle];
+	GLuint hGlHandle = m_GLShaderMap[pRenderState->hSHADER];
 	glUseProgram(hGlHandle);
 	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glUseProgram");
 
@@ -726,13 +743,13 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera)
 	glActiveTexture(GL_TEXTURE0);
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
 
-	glBindTexture(GL_TEXTURE_2D, pRenderState->GetTextureHandle());
+	glBindTexture(GL_TEXTURE_2D, pRenderState->hTEXTURE_0);
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if(pRenderState->IsScissorRect())
+	if(pRenderState->SCISSOR_RECT.iTag != IHyVisable::SCISSORTAG_Disabled)
 	{
-		const HyScreenRect<int32> &scissorRectRef = pRenderState->GetScissorRect();
+		const HyScreenRect<int32> &scissorRectRef = pRenderState->SCISSOR_RECT;
 
 		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
 				  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
@@ -770,7 +787,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera)
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Assign any other uniforms by parsing the RenderState's ex buffer portion
-	char *pExBuffer = pRenderState->GetExPtr();
+	char *pExBuffer = reinterpret_cast<char *>(pRenderState) + sizeof(HyRenderBuffer::State);
 
 	uint32 uiNumUniforms = *reinterpret_cast<uint32 *>(pExBuffer);
 	pExBuffer += sizeof(uint32);
@@ -907,9 +924,9 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set vertex attribute pointers to the vertex data locations in bound buffer
-	size_t uiStartOffset = pRenderState->GetDataOffset();
-	HyShader *pShader = m_ShaderMap[hShaderHandle];
-	HyAssert(pShader, "HyShader not found for render state: " << pRenderState->GetId());
+	size_t uiStartOffset = pRenderState->uiDATA_OFFSET;
+	HyShader *pShader = m_ShaderMap[pRenderState->hSHADER];
+	HyAssert(pShader, "HyShader not found for render state: " << pRenderState->uiID);
 
 	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
 
@@ -1017,7 +1034,7 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	GLenum eDrawMode;
-	switch(pRenderState->GetRenderMode())
+	switch(pRenderState->eRENDER_MODE)
 	{
 	case HYRENDERMODE_Triangles:		eDrawMode = GL_TRIANGLES;		break;
 	case HYRENDERMODE_TriangleStrip:	eDrawMode = GL_TRIANGLE_STRIP;	break;
@@ -1032,20 +1049,20 @@ void HyOpenGL::RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Everything is prepared, do the drawing
-	if(pRenderState->GetNumInstances() > 1)
+	if(pRenderState->uiNUM_INSTANCES > 1)
 	{
-		glDrawArraysInstanced(eDrawMode, 0, pRenderState->GetNumVerticesPerInstance(), pRenderState->GetNumInstances());
+		glDrawArraysInstanced(eDrawMode, 0, pRenderState->uiNUM_VERTS_PER_INSTANCE, pRenderState->uiNUM_INSTANCES);
 		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArraysInstanced");
 	}
 	else
 	{
 		uint32 uiStartVertex = 0;
-		for(uint32 i = 0; i < pRenderState->GetNumInstances(); ++i)
+		for(uint32 i = 0; i < pRenderState->uiNUM_INSTANCES; ++i)
 		{
-			glDrawArrays(eDrawMode, uiStartVertex, pRenderState->GetNumVerticesPerInstance());
+			glDrawArrays(eDrawMode, uiStartVertex, pRenderState->uiNUM_VERTS_PER_INSTANCE);
 			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArrays");
 
-			uiStartVertex += pRenderState->GetNumVerticesPerInstance();
+			uiStartVertex += pRenderState->uiNUM_VERTS_PER_INSTANCE;
 		}
 	}
 

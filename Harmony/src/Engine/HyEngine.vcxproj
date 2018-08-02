@@ -64,8 +64,9 @@
     <ClCompile Include="Input\HyInput.cpp" />
     <ClCompile Include="Input\HyInputMap.cpp" />
     <ClCompile Include="Memory\HyMemoryHeap.cpp" />
-    <ClCompile Include="Renderer\Components\HyRenderState.cpp" />
+    <ClCompile Include="Renderer\Components\HyRenderBuffer.cpp" />
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp" />
+    <ClCompile Include="Renderer\Components\HyVertexBuffer.cpp" />
     <ClCompile Include="Renderer\Components\HyWindow.cpp" />
     <ClCompile Include="Renderer\Effects\HyShader.cpp" />
     <ClCompile Include="Renderer\Effects\HyStencil.cpp" />
@@ -164,8 +165,9 @@
     <ClInclude Include="..\..\include\Harmony\Memory\Interop\HyMemAPI_Windows.h" />
     <ClInclude Include="..\..\include\Harmony\Memory\PageTypes\HyMedHeapPage.h" />
     <ClInclude Include="..\..\include\Harmony\Memory\PageTypes\HySmlHeapPage.h" />
-    <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyRenderState.h" />
+    <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyRenderBuffer.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyShaderUniforms.h" />
+    <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyVertexBuffer.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyWindow.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyShader.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyStencil.h" />

@@ -5,7 +5,7 @@
 
 IHyThreadClass::IHyThreadClass(uint32 uiUpdateThrottleMs /*= 0*/) :	m_eThreadState(HYTHREADSTATE_Inactive),
 																	m_uiTHROTTLE_MS(uiUpdateThrottleMs),
-																	m_bWaiting(false),
+																	m_bWaitEnabled(false),
 																	m_bWaitComplete(false),
 																	m_bAutoResetWaiting(false)
 {
@@ -35,7 +35,7 @@ bool IHyThreadClass::ThreadStart()
 void IHyThreadClass::ThreadWait()
 {
 	std::lock_guard<std::mutex> lock(stateMutex);
-	m_bWaiting = true;
+	m_bWaitEnabled = true;
 	m_bWaitComplete = false;
 	stateEvent.notify_one();
 }
@@ -58,6 +58,7 @@ bool IHyThreadClass::ThreadStop()
 	}
 
 	m_eThreadState = HYTHREADSTATE_ShouldExit;
+	ThreadContinue(false);
 	return true;
 }
 
@@ -81,21 +82,22 @@ void IHyThreadClass::ThreadJoin()
 /*static*/ void IHyThreadClass::ThreadFunc(IHyThreadClass *pThis)
 {
 	pThis->OnThreadInit();
+
 	while(pThis->m_eThreadState == HYTHREADSTATE_Run)
 	{
-		if(pThis->m_bWaiting)
+		if(pThis->m_bWaitEnabled)
 		{
 			std::unique_lock<std::mutex> ul(pThis->stateMutex);
 			pThis->stateEvent.wait(ul, [&] { return pThis->m_bWaitComplete; });
 
 			if(pThis->m_bAutoResetWaiting)
 			{
-				pThis->m_bWaiting = true;
+				pThis->m_bWaitEnabled = true;
 				pThis->m_bWaitComplete = false;
 				pThis->m_bAutoResetWaiting = false;
 			}
 			else
-				pThis->m_bWaiting = false;
+				pThis->m_bWaitEnabled = false;
 		}
 		else if(pThis->m_uiTHROTTLE_MS != 0)
 		{

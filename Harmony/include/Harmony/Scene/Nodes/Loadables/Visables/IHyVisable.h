@@ -21,14 +21,14 @@ class HyEntity3d;
 
 class IHyVisable
 {
-	friend class HyRenderState;
-
-protected:
+public:
 	enum ScissorTag
 	{
 		SCISSORTAG_Disabled = 0,
 		SCISSORTAG_Enabled,
 	};
+
+protected:
 	struct ScissorRect
 	{
 		HyScreenRect<int32>			m_LocalScissorRect;

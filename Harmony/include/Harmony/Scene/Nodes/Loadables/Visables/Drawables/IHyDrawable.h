@@ -18,6 +18,7 @@ class IHyDrawable
 {
 	friend class HyScene;
 	friend class IHyRenderer;
+	friend class HyRenderBuffer;
 
 protected:
 	static HyScene *				sm_pScene;
@@ -44,10 +45,10 @@ public:
 protected:
 	virtual bool IsValid() = 0;
 
-	void WriteShaderUniformBuffer(char *&pWritePositionRef);
+	void WriteShaderUniformBuffer(uint8 *&pWritePositionRef);
 
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
-	virtual void OnWriteVertexData(char *&pWritePositionRef) { }			// This function is responsible for incrementing the passed in reference pointer the size of the data written
+	virtual void OnWriteVertexData(uint8 *&pWritePositionRef) { }			// This function is responsible for incrementing the passed in reference pointer the size of the data written
 
 private:
 	virtual HyType _DrawableGetType() = 0;

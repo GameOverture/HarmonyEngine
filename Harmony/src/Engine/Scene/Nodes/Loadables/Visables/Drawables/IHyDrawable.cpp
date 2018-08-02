@@ -65,7 +65,7 @@ HyShaderHandle IHyDrawable::GetShaderHandle()
 	return m_hShader;
 }
 
-void IHyDrawable::WriteShaderUniformBuffer(char *&pWritePositionRef)
+void IHyDrawable::WriteShaderUniformBuffer(uint8 *&pWritePositionRef)
 {
 	m_ShaderUniforms.WriteUniformsBufferData(pWritePositionRef);
 }

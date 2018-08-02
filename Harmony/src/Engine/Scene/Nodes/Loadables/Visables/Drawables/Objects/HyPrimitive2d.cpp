@@ -131,7 +131,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 	//}
 }
 
-/*virtual*/ void HyPrimitive2d::OnWriteVertexData(char *&pWritePositionRef)
+/*virtual*/ void HyPrimitive2d::OnWriteVertexData(uint8 *&pWritePositionRef)
 {
 	memcpy(pWritePositionRef, m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
 	pWritePositionRef += m_uiNumVerts * sizeof(glm::vec2);

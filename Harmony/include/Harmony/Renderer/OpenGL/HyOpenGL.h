@@ -26,6 +26,7 @@ protected:
 	glm::mat4										m_mtxProj;
 
 	GLuint											m_hVBO3d;
+	bool											m_bVBO3dDirty;
 
 	///////// 2D MEMBERS ////////////////////
 	GLuint											m_hVBO2d;
@@ -39,10 +40,10 @@ public:
 	virtual void StartRender() override;
 	
 	virtual void Begin_3d() override;
-	virtual void DrawRenderState_3d(HyRenderState *pRenderState) override;
+	virtual void DrawRenderState_3d(HyRenderBuffer::State *pRenderState) override;
 
 	virtual void Begin_2d() override;
-	virtual void DrawRenderState_2d(HyRenderState *pRenderState, IHyCamera *pCamera) override;
+	virtual void DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCamera) override;
 
 	virtual void FinishRender() override;
 
@@ -50,10 +51,11 @@ public:
 	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) override;
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) override;
+	virtual void NewVertexData3d() override;
 
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);
-	void RenderPass2d(HyRenderState *pRenderState, IHyCamera *pCamera);
+	void RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCamera);
 };
 
 #endif /* HyOpenGL_h__ */

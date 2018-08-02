@@ -35,7 +35,7 @@ void IHyCamera::SetCullMaskBit(uint32 uiBit)
 	m_uiCullMaskBit = uiBit;
 }
 
-uint32 IHyCamera::GetCullMaskBit()
+uint32 IHyCamera::GetCameraBitFlag()
 {
 	return m_uiCullMaskBit;
 }

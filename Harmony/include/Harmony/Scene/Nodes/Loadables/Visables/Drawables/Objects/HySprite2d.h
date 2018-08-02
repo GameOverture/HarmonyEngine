@@ -126,7 +126,7 @@ protected:
 	virtual void OnCalcBoundingVolume() override;
 	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;
-	virtual void OnWriteVertexData(char *&pWritePositionRef) override;
+	virtual void OnWriteVertexData(uint8 *&pWritePositionRef) override;
 
 	static void NullAnimCallback(HySprite2d *pSelf, void *pParam);
 };
