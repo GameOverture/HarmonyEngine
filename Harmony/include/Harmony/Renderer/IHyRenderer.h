@@ -61,8 +61,8 @@ public:
 	virtual ~IHyRenderer(void);
 
 	void PrepareBuffers();
-	void AppendDrawable3d(uint32 uiId, /*const*/ IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask);
-	void AppendDrawable2d(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask);
+	void AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask);
+	void AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask);
 
 	HyVertexOffsetHandle AppendVertexData3d(const uint8 *pData, uint32 uiSize);
 

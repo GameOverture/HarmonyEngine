@@ -13,6 +13,7 @@
 #include "Renderer/Effects/HyStencil.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 #include "Assets/Loadables/IHyLoadableData.h"
+#include "Assets/Nodes/HyPrefabData.h"
 #include "HyEngine.h"
 
 IHyRenderer *IHyRenderer::sm_pInstance = nullptr;
@@ -71,24 +72,20 @@ void IHyRenderer::PrepareBuffers()
 	m_RenderBuffer.PrepUserRenderState();
 }
 
-void IHyRenderer::AppendDrawable3d(uint32 uiId, /*const*/ IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask)
+void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask)
 {
-	uint32 uiNumInstances, uiNumVerticesPerInstance;
-	switch(instanceRef.GetType())
+	if(instanceRef.GetType() == HYTYPE_Prefab3d)
 	{
-	case HYTYPE_Prefab3d:
-		uiNumInstances = 1;
-		uiNumVerticesPerInstance = 4;
-		break;
-
-	default:
-		HyError("HyRenderState - Unknown instance type");
+		const HyPrefabData *pData = static_cast<const HyPrefabData *>(instanceRef.AcquireData());
+		uint32 uiDataOffset = 0;//pData->GetGltf()->;
+		uint32 uiNumVerticesPerInstance = 0;
+		m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, uiDataOffset, 1, uiNumVerticesPerInstance);
 	}
-
-	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, 0, uiNumInstances, uiNumVerticesPerInstance);
+	else
+		HyError("IHyRenderer::AppendDrawable3d - Unknown instance type");
 }
 
-void IHyRenderer::AppendDrawable2d(uint32 uiId, /*const*/ IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask)
+void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask)
 {
 	uint32 uiNumInstances, uiNumVerticesPerInstance;
 	switch(instanceRef.GetType())
