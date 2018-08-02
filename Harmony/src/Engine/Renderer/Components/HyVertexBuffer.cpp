@@ -33,7 +33,7 @@ void HyVertexBuffer::Reset()
 HyVertexOffsetHandle HyVertexBuffer::AddDataWithHandle(const uint8 *pData, uint32 uiSize)
 {
 	HyVertexOffsetHandle hReturnHandle = m_hNextHandle;
-	m_OffsetHandleList[hReturnHandle] = m_uiNumUsedBytes;
+	m_OffsetHandleMap[hReturnHandle] = m_uiNumUsedBytes;
 	m_hNextHandle++;
 
 	memcpy(m_pCurWritePosition, pData, uiSize);
@@ -42,4 +42,9 @@ HyVertexOffsetHandle HyVertexBuffer::AddDataWithHandle(const uint8 *pData, uint3
 	HyAssert(m_uiNumUsedBytes < HY_VERTEX_BUFFER_SIZE, "HyVertexBuffer::AddDataWithHandle() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
 
 	return hReturnHandle;
+}
+
+uint32 HyVertexBuffer::GetByteOffset(HyVertexOffsetHandle hHandle)
+{
+	return m_OffsetHandleMap.at(hHandle);
 }

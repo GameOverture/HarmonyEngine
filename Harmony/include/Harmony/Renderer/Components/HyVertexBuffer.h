@@ -22,7 +22,7 @@ public:
 	uint32											m_uiNumUsedBytes;
 
 	HyVertexOffsetHandle							m_hNextHandle;
-	std::map<HyVertexOffsetHandle, uint32>			m_OffsetHandleList;
+	std::map<HyVertexOffsetHandle, uint32>			m_OffsetHandleMap;
 
 public:
 	HyVertexBuffer();
@@ -31,6 +31,7 @@ public:
 	void Reset();
 
 	HyVertexOffsetHandle AddDataWithHandle(const uint8 *pData, uint32 uiSize);
+	uint32 GetByteOffset(HyVertexOffsetHandle hHandle);
 };
 
 #endif /* HyVertexBuffer_h__ */

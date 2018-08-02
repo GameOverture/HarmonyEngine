@@ -171,4 +171,53 @@ void main()
 //	return max(sign(x - y), 0.0);
 //}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GLTF
+const char * const szHYGLTF_VERTEXSHADER = R"src(
+#version 430
+
+uniform mat4					u_mtxTransform;
+uniform mat4					u_mtxWorldToCamera;
+uniform mat4					u_mtxCameraToClip;
+
+layout(location = 0) in vec3	attr_vPosition;
+layout(location = 1) in vec3	attr_vNormal;
+layout(location = 2) in vec2	attr_vUVcoord0;
+
+smooth out vec2					interp_vUV;
+
+//////////////////////////////////////////////////////////////////////////
+void main()
+{
+	vec4 vTemp = u_mtxTransform * vec4(attr_vPosition, 0, 1);
+	vTemp = u_mtxWorldToCamera * vTemp;
+	gl_Position = u_mtxCameraToClip * vTemp;
+
+	interp_vUV = attr_vUVcoord0;
+}
+)src";
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+const char * const szHYGLTF_FRAGMENTSHADER = R"src(
+#version 430
+
+uniform sampler2D	u_Tex;
+
+smooth in vec2		interp_vUV;
+smooth in vec4		interp_vColor;
+
+out vec4			out_vColor;
+
+void main()
+{
+	// Blend interp_vColor with whatever texel I get from interp_vUV
+	vec4 texelClr = texture(u_Tex, interp_vUV);
+
+	out_vColor = interp_vColor * texelClr;
+
+	// Discard fully transparent pixels so any potential stencil test isn't affected
+	if(out_vColor.a == 0.0)
+		discard;
+}
+)src";
+
 #endif /* HyOpenGLShaderSrc_h__ */

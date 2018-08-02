@@ -12,6 +12,9 @@
 #include "Diagnostics/Console/HyConsole.h"
 #include "HyEngine.h"
 
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtx/quaternion.hpp"
+
 HyGLTF::HyGLTF(const std::string &sIdentifier) :	IHyLoadableData(HYLOADABLE_GLTF),
 													m_sIDENTIFIER(sIdentifier)
 {
@@ -21,7 +24,7 @@ HyGLTF::~HyGLTF()
 {
 }
 
-const std::string &HyGLTF::GetIdentifier()
+const std::string &HyGLTF::GetIdentifier() const
 {
 	return m_sIDENTIFIER;
 }
@@ -33,7 +36,7 @@ void HyGLTF::OnLoadThread()
 		tinygltf::TinyGLTF loader;
 		std::string sError;
 		std::string sFilePath = Hy_DataDir() + HYASSETS_PrefabDir + m_sIDENTIFIER + ".gltf";
-		bool bLoadSuccess = loader.LoadASCIIFromFile(&m_ModelData, &sError, sFilePath);
+		bool bLoadSuccess = loader.LoadASCIIFromFile(&m_AssetData, &sError, sFilePath);
 		if(bLoadSuccess == false)
 		{
 			HyLogError("HyGLTF::OnLoadThread failed: " << sError.c_str());
@@ -46,11 +49,92 @@ void HyGLTF::OnRenderThread(IHyRenderer &rendererRef)
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		for(uint32 i = 0; i < static_cast<uint32>(m_ModelData.buffers.size()); ++i)
-			m_BufferHandleList.push_back(rendererRef.AppendVertexData3d(&m_ModelData.buffers[i].data[0], static_cast<uint32>(m_ModelData.buffers[i].data.size())));
+		for(uint32 i = 0; i < static_cast<uint32>(m_AssetData.buffers.size()); ++i)
+			m_BufferOffsetHandleList.push_back(rendererRef.AppendVertexData3d(&m_AssetData.buffers[i].data[0], static_cast<uint32>(m_AssetData.buffers[i].data.size())));
 	}
 	else // GetLoadableState() == HYLOADSTATE_Discarded
 	{
 		//rendererRef.RemoveVertexData3d(
+	}
+}
+
+void HyGLTF::AppendRenderStates(HyRenderBuffer &renderBufferRef, int32 iSceneIndex /*= -1*/)
+{
+	if(iSceneIndex < 0)
+	{
+		if(m_AssetData.defaultScene < 0)
+		{
+			HyLogWarning("IHyRenderer::AppendDrawable3d - default scene is not specified");
+			return;
+		}
+
+		iSceneIndex = m_AssetData.defaultScene;
+	}
+
+	for(uint32 i = 0; i < m_AssetData.scenes[iSceneIndex].nodes.size(); ++i)
+	{
+		int iNodeIndex = m_AssetData.scenes[iSceneIndex].nodes[i];
+		
+		glm::mat4 transformMtx(1.0f);
+		TraverseNode(m_AssetData.nodes[iNodeIndex], transformMtx);
+	}
+}
+
+void HyGLTF::TraverseNode(const tinygltf::Node &nodeRef, glm::mat4 transformMtx)
+{
+	ProcessNode(nodeRef, transformMtx);
+
+	for(uint32 i = 0; i < nodeRef.children.size(); ++i)
+		TraverseNode(m_AssetData.nodes[nodeRef.children[i]], transformMtx);
+}
+
+void HyGLTF::ProcessNode(const tinygltf::Node &nodeRef, glm::mat4 &transformMtxRef)
+{
+	if(nodeRef.matrix.empty() == false)
+	{
+		glm::mat4 mtx;
+		memcpy(glm::value_ptr(mtx), &nodeRef.matrix[0], sizeof(glm::mat4));
+
+		transformMtxRef *= mtx;
+	}
+	else if(!nodeRef.translation.empty() || !nodeRef.rotation.empty() || !nodeRef.scale.empty())
+	{
+		glm::vec3 vTranslation(0.0f);
+		glm::quat quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+		glm::vec3 vScale(1.0f);
+
+		if(nodeRef.translation.size() != 0)
+			memcpy(glm::value_ptr(vTranslation), &nodeRef.translation[0], sizeof(glm::vec3));
+		if(nodeRef.rotation.size() != 0)
+			memcpy(glm::value_ptr(quaternion), &nodeRef.rotation[0], sizeof(glm::quat));
+		if(nodeRef.scale.size() != 0)
+			memcpy(glm::value_ptr(vScale), &nodeRef.scale[0], sizeof(glm::vec3));
+
+		glm::mat4 transformMtx;
+		glm::translate(transformMtx, vTranslation);
+
+		glm::mat4 rotationMtx;
+		rotationMtx = glm::toMat4(quaternion);
+
+		glm::mat4 scaleMtx;
+		glm::scale(scaleMtx, vTranslation);
+
+		transformMtxRef *= (transformMtx * rotationMtx * scaleMtx);
+	}
+
+	if(nodeRef.mesh >= 0)
+	{
+		const tinygltf::Mesh &meshRef = m_AssetData.meshes[nodeRef.mesh];
+		for(uint32 i = 0; i < meshRef.primitives.size(); ++i)
+		{
+			const std::map<std::string, int> &attribMapRef = meshRef.primitives[i].attributes;
+
+			if(attribMapRef.find("POSITION") != attribMapRef.end())
+			{
+				int iAccessorIndex = attribMapRef.at("POSITION");
+
+				//m_AssetData.accessors[iAccessorIndex].
+			}
+		}
 	}
 }

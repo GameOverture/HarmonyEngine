@@ -12,22 +12,29 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/IHyLoadableData.h"
+#include "Renderer/Components/HyRenderBuffer.h"
 
 class HyGLTF : public IHyLoadableData
 {
 	const std::string		m_sIDENTIFIER;
-	tinygltf::Model			m_ModelData;
+	tinygltf::Model			m_AssetData;
 
-	std::vector<HyVertexOffsetHandle>	m_BufferHandleList;
+	std::vector<HyVertexOffsetHandle>	m_BufferOffsetHandleList;
 
 public:
 	HyGLTF(const std::string &sIdentifier);
 	~HyGLTF();
 
-	const std::string &GetIdentifier();
+	const std::string &GetIdentifier() const;
 
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
+
+	void AppendRenderStates(HyRenderBuffer &renderBufferRef, int32 iSceneIndex = -1);
+
+private:
+	void TraverseNode(const tinygltf::Node &nodeRef, glm::mat4 transformMtx);
+	void ProcessNode(const tinygltf::Node &nodeRef, glm::mat4 &transformMtxRef);
 };
 
 #endif /* HyAtlas_h__ */

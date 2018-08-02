@@ -74,15 +74,14 @@ void IHyRenderer::PrepareBuffers()
 
 void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask)
 {
-	if(instanceRef.GetType() == HYTYPE_Prefab3d)
+	if(instanceRef.GetType() != HYTYPE_Prefab3d)
 	{
-		const HyPrefabData *pData = static_cast<const HyPrefabData *>(instanceRef.AcquireData());
-		uint32 uiDataOffset = 0;//pData->GetGltf()->;
-		uint32 uiNumVerticesPerInstance = 0;
-		m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, uiDataOffset, 1, uiNumVerticesPerInstance);
-	}
-	else
 		HyError("IHyRenderer::AppendDrawable3d - Unknown instance type");
+		return;
+	}
+	
+	const HyPrefabData *pData = static_cast<const HyPrefabData *>(instanceRef.AcquireData());
+	pData->GetGltf()->AppendRenderStates(m_RenderBuffer);
 }
 
 void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask)
