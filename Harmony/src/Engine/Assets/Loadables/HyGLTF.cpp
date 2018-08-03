@@ -60,6 +60,10 @@ void HyGLTF::OnRenderThread(IHyRenderer &rendererRef)
 
 void HyGLTF::AppendRenderStates(HyRenderBuffer &renderBufferRef, int32 iSceneIndex /*= -1*/)
 {
+	glGenVertexArrays(1, &m_hVao);
+	glBindVertexArray(m_hVao);
+	
+
 	if(iSceneIndex < 0)
 	{
 		if(m_AssetData.defaultScene < 0)
@@ -132,8 +136,12 @@ void HyGLTF::ProcessNode(const tinygltf::Node &nodeRef, glm::mat4 &transformMtxR
 			if(attribMapRef.find("POSITION") != attribMapRef.end())
 			{
 				int iAccessorIndex = attribMapRef.at("POSITION");
+				const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
 
-				//m_AssetData.accessors[iAccessorIndex].
+				size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
+				uiBufferOffset += bufferViewRef.byteOffset;
+				uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
+				glVertexAttribPointer(VA_Position, 3, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
 			}
 		}
 	}
