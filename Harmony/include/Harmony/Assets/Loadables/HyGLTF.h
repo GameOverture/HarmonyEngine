@@ -27,6 +27,7 @@ class HyGLTF : public IHyLoadableData
 	{
 		VA_Position = 0,
 		VA_Normal,
+		VA_Tangent,
 		VA_UV
 	};
 

@@ -42,11 +42,12 @@ void IHyThreadClass::ThreadWait()
 
 void IHyThreadClass::ThreadContinue(bool bOnlyOneUpdate)
 {
-	std::lock_guard<std::mutex> lock(stateMutex);
-	m_bWaitComplete = true;
+	{
+		std::lock_guard<std::mutex> lock(stateMutex);
+		m_bWaitComplete = true;
+		m_bAutoResetWaiting = bOnlyOneUpdate;
+	}
 	stateEvent.notify_one();
-
-	m_bAutoResetWaiting = bOnlyOneUpdate;
 }
 
 bool IHyThreadClass::ThreadStop()
@@ -57,8 +58,18 @@ bool IHyThreadClass::ThreadStop()
 		return false;
 	}
 
-	m_eThreadState = HYTHREADSTATE_ShouldExit;
-	ThreadContinue(false);
+	if(m_eThreadState != HYTHREADSTATE_ShouldExit)
+	{
+		m_eThreadState = HYTHREADSTATE_ShouldExit;
+		//ThreadContinue(false);
+		{
+			std::lock_guard<std::mutex> lock(stateMutex);
+			m_bAutoResetWaiting = false;
+			m_bWaitComplete = true;
+		}
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		stateEvent.notify_one();
+	}
 	return true;
 }
 

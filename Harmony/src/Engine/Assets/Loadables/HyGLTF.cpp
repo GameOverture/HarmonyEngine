@@ -143,6 +143,48 @@ void HyGLTF::ProcessNode(const tinygltf::Node &nodeRef, glm::mat4 &transformMtxR
 				uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
 				glVertexAttribPointer(VA_Position, 3, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
 			}
+			else
+				HyError("glTF asset wanted to render a primitive that did not have a POSITION attribute");
+
+			if(attribMapRef.find("NORMAL") != attribMapRef.end())
+			{
+				int iAccessorIndex = attribMapRef.at("NORMAL");
+				const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
+
+				size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
+				uiBufferOffset += bufferViewRef.byteOffset;
+				uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
+				glVertexAttribPointer(VA_Normal, 3, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
+			}
+			else
+				HyError("glTF asset wanted to render a primitive that did not have a NORMAL attribute (they should had been generated when initially importing the asset)");
+
+			if(attribMapRef.find("TANGENT") != attribMapRef.end())
+			{
+				int iAccessorIndex = attribMapRef.at("TANGENT");
+				const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
+
+				size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
+				uiBufferOffset += bufferViewRef.byteOffset;
+				uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
+				glVertexAttribPointer(VA_Tangent, 4, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
+			}
+			else
+				HyError("glTF asset wanted to render a primitive that did not have a TANGENT attribute (they should had been generated when initially importing the asset)");
+
+			if(attribMapRef.find("TEXCOORD_0") != attribMapRef.end())
+			{
+				int iAccessorIndex = attribMapRef.at("TEXCOORD_0");
+				const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
+
+				size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
+				uiBufferOffset += bufferViewRef.byteOffset;
+				uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
+				
+				glVertexAttribPointer(VA_UV, 2, m_AssetData.accessors[iAccessorIndex].componentType, m_AssetData.accessors[iAccessorIndex].componentType != GL_FLOAT ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
+			}
+			else
+				HyError("glTF asset wanted to render a primitive that did not have a TEXCOORD_0 attribute (they should had been generated when initially importing the asset)");
 		}
 	}
 }

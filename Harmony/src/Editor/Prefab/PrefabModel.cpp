@@ -45,12 +45,20 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :	IModel(it
 	{
 		QString sInitValue = initValue.toString().remove(HYGUI_ImportPrefix);
 
+		uint uiPreprocessing = aiProcess_GenNormals | aiProcess_Triangulate;// aiProcessPreset_TargetRealtime_MaxQuality;
+
 		// Import the DCC file from artist
 		Assimp::Importer importer;
-		const aiScene *pScene = importer.ReadFile(sInitValue.toStdString(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+		const aiScene *pScene = importer.ReadFile(sInitValue.toStdString(), uiPreprocessing);
+		if(pScene == nullptr)
+		{
+			HyGuiLog(importer.GetErrorString(), LOGTYPE_Error);
+			return;
+		}
+
 		if(pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
 		{
-			HyGuiLog(sInitValue + " was incomplete and is invalid", LOGTYPE_Error);
+			HyGuiLog(sInitValue + " was incomplete and is invalid: " + importer.GetErrorString(), LOGTYPE_Error);
 			return;
 		}
 
@@ -63,7 +71,7 @@ PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :	IModel(it
 			if(strcmp(pDesc->description, "GL Transmission Format v. 2") == 0)
 				break;
 		}
-		aiReturn ret = exporter.Export(pScene, pDesc->id, sAbsGltfFilePath.toStdString());
+		aiReturn ret = exporter.Export(pScene, pDesc->id, sAbsGltfFilePath.toStdString(), uiPreprocessing);
 		if(ret != aiReturn_SUCCESS)
 		{
 			HyGuiLog(sAbsGltfFilePath + " failed to export to glTF", LOGTYPE_Error);

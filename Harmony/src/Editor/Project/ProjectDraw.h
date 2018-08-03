@@ -22,7 +22,7 @@ public:
 	virtual ~CheckerGrid();
 
 	virtual void OnUpdateUniforms() override;
-	virtual void OnWriteVertexData(char *&pRefDataWritePos) override;
+	virtual void OnWriteVertexData(uint8 *&pRefDataWritePos) override;
 };
 
 class ProjectDraw : public IDraw

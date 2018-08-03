@@ -76,7 +76,7 @@ CheckerGrid::~CheckerGrid()
 	m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
-/*virtual*/ void CheckerGrid::OnWriteVertexData(char *&pRefDataWritePos) /*override*/
+/*virtual*/ void CheckerGrid::OnWriteVertexData(uint8 *&pRefDataWritePos) /*override*/
 {
 	HyAssert(GetNumVerts() == 6, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 
