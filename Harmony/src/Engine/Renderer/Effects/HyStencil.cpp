@@ -83,7 +83,7 @@ const std::vector<IHyDrawable2d *> &HyStencil::GetInstanceList() const
 	return m_MaskInstanceList;
 }
 
-HyRenderState *HyStencil::GetRenderStatePtr() const
+HyRenderBuffer::State *HyStencil::GetRenderStatePtr() const
 {
 	return m_pRenderStatePtr;
 }
@@ -104,7 +104,7 @@ bool HyStencil::ConfirmMaskReady()
 	return m_bMaskIsReady;
 }
 
-void HyStencil::SetRenderStatePtr(HyRenderState *pPtr)
+void HyStencil::SetRenderStatePtr(HyRenderBuffer::State *pPtr)
 {
 	m_pRenderStatePtr = pPtr;
 }

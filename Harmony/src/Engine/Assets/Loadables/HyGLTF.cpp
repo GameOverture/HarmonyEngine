@@ -49,6 +49,8 @@ void HyGLTF::OnRenderThread(IHyRenderer &rendererRef)
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
+		//rendererRef.
+
 		for(uint32 i = 0; i < static_cast<uint32>(m_AssetData.buffers.size()); ++i)
 			m_BufferOffsetHandleList.push_back(rendererRef.AppendVertexData3d(&m_AssetData.buffers[i].data[0], static_cast<uint32>(m_AssetData.buffers[i].data.size())));
 	}

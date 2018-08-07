@@ -414,7 +414,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	MarkAsDirty();
 }
 
-/*virtual*/ void HyText2d::OnWriteVertexData(uint8 *&pWritePositionRef)
+/*virtual*/ void HyText2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
 {
 	// CalculateGlyphInfos called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
 	CalculateGlyphInfos();

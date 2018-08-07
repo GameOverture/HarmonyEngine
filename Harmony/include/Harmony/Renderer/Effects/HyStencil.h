@@ -11,8 +11,8 @@
 #define HyStencil_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Renderer/Components/HyRenderBuffer.h"
 
-class HyRenderState;
 class IHyDrawable2d;
 
 enum HyStencilBehavior
@@ -31,7 +31,7 @@ class HyStencil
 	// TODO: Support 3d drawables too
 	std::vector<IHyDrawable2d *>	m_MaskInstanceList;
 	bool							m_bMaskIsReady;
-	HyRenderState *					m_pRenderStatePtr;
+	HyRenderBuffer::State *			m_pRenderStatePtr;
 
 	HyStencilBehavior				m_eBehavior;
 
@@ -55,11 +55,11 @@ public:
 	void SetAsInvertedMask();
 
 	const std::vector<IHyDrawable2d *> &GetInstanceList() const;
-	HyRenderState *GetRenderStatePtr() const;
+	HyRenderBuffer::State *GetRenderStatePtr() const;
 
 private:
 	bool ConfirmMaskReady();
-	void SetRenderStatePtr(HyRenderState *pPtr);
+	void SetRenderStatePtr(HyRenderBuffer::State *pPtr);
 };
 
 #endif /* HyStencil_h__ */

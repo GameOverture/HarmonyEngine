@@ -19,7 +19,7 @@ class HyGLTF : public IHyLoadableData
 	const std::string					m_sIDENTIFIER;
 	tinygltf::Model						m_AssetData;
 
-	std::vector<HyVertexOffsetHandle>	m_BufferOffsetHandleList;
+	std::vector<HyVertexBufferHandle>	m_BufferOffsetHandleList;
 
 	GLuint								m_hVao;
 

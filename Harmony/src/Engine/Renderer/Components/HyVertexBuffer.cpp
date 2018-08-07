@@ -9,42 +9,54 @@
  *************************************************************************/
 #include "Renderer/Components/HyVertexBuffer.h"
 
-HyVertexBuffer::HyVertexBuffer() :	m_pBUFFER(HY_NEW uint8[HY_VERTEX_BUFFER_SIZE]),
-									m_pCurWritePosition(m_pBUFFER),
-									m_uiNumUsedBytes(0),
-									m_hNextHandle(1)
+HyVertexBuffer::HyVertexBuffer() : m_DynamicBuffer(true)
 {
-#ifdef HY_DEBUG
-	memset(m_pBUFFER, 0, HY_VERTEX_BUFFER_SIZE);
-#endif
+	m_StaticBufferList.emplace_back(false);
 }
 
 HyVertexBuffer::~HyVertexBuffer()
 {
-	delete[] m_pBUFFER;
 }
 
-void HyVertexBuffer::Reset()
+void HyVertexBuffer::ResetDynamicBuffer()
 {
-	m_pCurWritePosition = m_pBUFFER;
-	m_uiNumUsedBytes = 0;
+	m_Buffer2d.m_pCurWritePosition = m_Buffer2d.m_pBUFFER;
+	m_Buffer2d.m_uiNumUsedBytes = 0;
 }
 
-HyVertexOffsetHandle HyVertexBuffer::AddDataWithHandle(const uint8 *pData, uint32 uiSize)
+uint32 HyVertexBuffer::GetCurByteOffset2d()
 {
-	HyVertexOffsetHandle hReturnHandle = m_hNextHandle;
-	m_OffsetHandleMap[hReturnHandle] = m_uiNumUsedBytes;
-	m_hNextHandle++;
-
-	memcpy(m_pCurWritePosition, pData, uiSize);
-	m_pCurWritePosition += uiSize;
-	m_uiNumUsedBytes = static_cast<uint32>(m_pCurWritePosition - m_pBUFFER);
-	HyAssert(m_uiNumUsedBytes < HY_VERTEX_BUFFER_SIZE, "HyVertexBuffer::AddDataWithHandle() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
-
-	return hReturnHandle;
+	return m_Buffer2d.m_uiNumUsedBytes;
 }
 
-uint32 HyVertexBuffer::GetByteOffset(HyVertexOffsetHandle hHandle)
+uint8 *HyVertexBuffer::GetCurWritePosPtr2d()
 {
-	return m_OffsetHandleMap.at(hHandle);
+	return m_Buffer2d.m_pCurWritePosition;
 }
+
+void HyVertexBuffer::AppendDynamicData(int8 *pData, uint32 uiSize)
+{
+	HyAssert((m_DynamicBuffer.m_uiNumUsedBytes + uiSize) < HY_DYNAMIC_VERTEX_BUFFER_SIZE, "HyVertexBuffer::AppendDynamicData() has written passed its vertex bounds! Embiggen 'HY_DYNAMIC_VERTEX_BUFFER_SIZE'");
+	memcpy(m_DynamicBuffer.m_pCurWritePosition
+
+	m_DynamicBuffer.m_uiNumUsedBytes = static_cast<uint32>(m_DynamicBuffer.m_pCurWritePosition - m_VertexBuffer2d.m_pBUFFER);
+}
+
+//HyVertexBufferHandle HyVertexBuffer::AddDataWithHandle(const uint8 *pData, uint32 uiSize)
+//{
+//	HyVertexBufferHandle hReturnHandle = m_hNextHandle;
+//	m_OffsetHandleMap[hReturnHandle] = m_uiNumUsedBytes;
+//	m_hNextHandle++;
+//
+//	memcpy(m_pCurWritePosition, pData, uiSize);
+//	m_pCurWritePosition += uiSize;
+//	m_uiNumUsedBytes = static_cast<uint32>(m_pCurWritePosition - m_pBUFFER);
+//	HyAssert(m_uiNumUsedBytes < HY_VERTEX_BUFFER_SIZE, "HyVertexBuffer::AddDataWithHandle() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
+//
+//	return hReturnHandle;
+//}
+//
+//uint32 HyVertexBuffer::GetByteOffset(HyVertexBufferHandle hHandle)
+//{
+//	return m_OffsetHandleMap.at(hHandle);
+//}

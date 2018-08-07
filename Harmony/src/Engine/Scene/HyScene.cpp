@@ -163,7 +163,7 @@ void HyScene::UpdateNodes()
 // Buffer Header (contains uiNum3dRenderStates; uiNum2dRenderStates) || RenderState3D/UniformData-|-RenderState2D/UniformData-|
 void HyScene::PrepareRender(IHyRenderer &rendererRef)
 {
-	// TODO: Determine whether I can multi-thread this buffer prep and HyRenderState instantiations... Make everything take const references!
+	// TODO: Determine whether I can multi-thread this buffer prep and HyRenderBuffer::State instantiations... Make everything take const references!
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
 	HY_PROFILE_BEGIN(HYPROFILERSECTION_PrepRender)

@@ -27,6 +27,16 @@ HyRenderBuffer::~HyRenderBuffer()
 	delete[] m_pBUFFER;
 }
 
+HyRenderBuffer::Header *HyRenderBuffer::GetHeaderPtr()
+{
+	return reinterpret_cast<Header *>(m_pRenderStatesUserStartPos);
+}
+
+HyRenderBuffer::State *HyRenderBuffer::GetCurWritePosPtr()
+{
+	return reinterpret_cast<State *>(m_pCurWritePosition);
+}
+
 void HyRenderBuffer::Reset()
 {
 	m_pCurWritePosition = m_pBUFFER;
@@ -54,7 +64,7 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable3d &instanceRef, 
 	m_pCurWritePosition += sizeof(State);
 
 	uint8 *pStartOfExData = m_pCurWritePosition;
-	instanceRef.WriteShaderUniformBuffer(m_pCurWritePosition);	// This function is responsible for incrementing the draw pointer to after what's written
+	instanceRef.WriteShaderUniformBuffer(m_pCurWritePosition);
 	pRenderState->m_uiExDataSize = (static_cast<uint32>(m_pCurWritePosition - pStartOfExData));
 	HyAssert(static_cast<uint32>(m_pCurWritePosition - m_pBUFFER) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
 
@@ -85,7 +95,7 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 	m_pCurWritePosition += sizeof(State);
 
 	uint8 *pStartOfExData = m_pCurWritePosition;
-	instanceRef.WriteShaderUniformBuffer(m_pCurWritePosition);	// This function is responsible for incrementing the draw pointer to after what's written
+	instanceRef.WriteShaderUniformBuffer(m_pCurWritePosition);
 	pRenderState->m_uiExDataSize = (static_cast<uint32>(m_pCurWritePosition - pStartOfExData));
 	HyAssert(static_cast<uint32>(m_pCurWritePosition - m_pBUFFER) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
 
@@ -96,7 +106,7 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 	}
 }
 
-void HyRenderBuffer::PrepUserRenderState()
+void HyRenderBuffer::CreateRenderHeader()
 {
 	m_pRenderStatesUserStartPos = m_pCurWritePosition;
 	Header *pHeader = reinterpret_cast<Header *>(m_pCurWritePosition);

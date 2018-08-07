@@ -130,7 +130,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 		m_hTextureHandle = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
 }
 
-/*virtual*/ void HyTexturedQuad2d::OnWriteVertexData(uint8 *&pWritePositionRef)
+/*virtual*/ void HyTexturedQuad2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
 {
 	const HyTexturedQuad2dData *pData = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData());
 

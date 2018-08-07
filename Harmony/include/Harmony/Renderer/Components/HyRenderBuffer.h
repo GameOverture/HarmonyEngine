@@ -74,10 +74,11 @@ public:
 														uiNUM_VERTS_PER_INSTANCE(uiNumVerticesPerInstance),
 														m_uiExDataSize(0)
 		{
-			HyAssert(hSHADER != HY_UNUSED_HANDLE, "HyRenderState was assigned a null shader");
+			HyAssert(hSHADER != HY_UNUSED_HANDLE, "HyRenderBuffer::State was assigned a null shader");
 		}
 	};
 
+private:
 	uint8 * const									m_pBUFFER;
 	uint8 *											m_pCurWritePosition;
 	uint32											m_uiNumUsedBytes;
@@ -88,12 +89,15 @@ public:
 	HyRenderBuffer();
 	~HyRenderBuffer();
 
+	Header *GetHeaderPtr();
+	HyRenderBuffer::State *GetCurWritePosPtr();
+
 	void Reset();
 
 	void AppendRenderState(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance);
 	void AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance);
 
-	void PrepUserRenderState();
+	void CreateRenderHeader();
 };
 
 #endif /* HyRenderBuffer_h__ */

@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/HyAssets.h"
+#include "Renderer/Components/HyVertexBuffer.h"
 
 #define HY_SHADER_UNIFORM_NAME_LENGTH		32	// includes the NULL terminator
 #define HY_SHADER_UNIFORM_BUFFER_LENGTH		(sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH + sizeof(glm::mat4))
@@ -60,8 +61,7 @@ public:
 	void Set(const char *szName, uint32 val);
 	void Set(const char *szName, bool val);
 
-	// This function is responsible for incrementing the passed in reference pointer the size of the data written
-	void WriteUniformsBufferData(uint8 *&pWritePositionRef);
+	void WriteUniformsBufferData(HyVertexBuffer &vertexBufferRef);
 
 	void Clear();
 };

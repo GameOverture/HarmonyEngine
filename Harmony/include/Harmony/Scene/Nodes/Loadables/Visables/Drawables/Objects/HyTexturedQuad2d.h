@@ -47,7 +47,7 @@ public:
 
 protected:
 	virtual void OnLoaded() override;
-	virtual void OnWriteVertexData(uint8 *&pWritePositionRef) override;
+	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 };
 
 #endif /* HyTexturedQuad2d_h__ */

@@ -47,7 +47,7 @@ void IHyRenderer::PrepareBuffers()
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Init everything to beginning of buffers
 	m_RenderBuffer.Reset();
-	m_VertexBuffer2d.Reset();
+	m_VertexBuffer.ResetDynamicBuffer();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Write internal render states first, used by things like HyStencil
@@ -57,7 +57,7 @@ void IHyRenderer::PrepareBuffers()
 		if(pStencil->IsMaskReady() == false && pStencil->ConfirmMaskReady() == false)
 			continue;
 
-		pStencil->SetRenderStatePtr(reinterpret_cast<HyRenderState *>(m_RenderBuffer.m_pCurWritePosition));
+		pStencil->SetRenderStatePtr(m_RenderBuffer.GetCurWritePosPtr());
 
 		const std::vector<IHyDrawable2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
@@ -69,7 +69,7 @@ void IHyRenderer::PrepareBuffers()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set pointers to be ready for HyScene to call AppendDrawable
-	m_RenderBuffer.PrepUserRenderState();
+	m_RenderBuffer.CreateRenderHeader();
 }
 
 void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask)
@@ -106,21 +106,18 @@ void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCa
 		break;
 
 	default:
-		HyError("HyRenderState - Unknown instance type");
+		HyError("IHyRenderer::AppendDrawable2d - Unknown instance type");
 	}
 
-	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, m_VertexBuffer2d.m_uiNumUsedBytes, uiNumInstances, uiNumVerticesPerInstance);
+	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, m_VertexBuffer.GetCurByteOffset2d(), uiNumInstances, uiNumVerticesPerInstance);
 	
-	// OnWriteVertexData() is responsible for incrementing the draw pointer to after what's written
 	instanceRef.AcquireData();
-	instanceRef.OnWriteVertexData(m_VertexBuffer2d.m_pCurWritePosition);
-	m_VertexBuffer2d.m_uiNumUsedBytes = static_cast<uint32>(m_VertexBuffer2d.m_pCurWritePosition - m_VertexBuffer2d.m_pBUFFER);
-	HyAssert(m_VertexBuffer2d.m_uiNumUsedBytes < HY_VERTEX_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
+	instanceRef.OnWriteVertexData(m_VertexBuffer);
 }
 
-HyVertexOffsetHandle IHyRenderer::AppendVertexData3d(const uint8 *pData, uint32 uiSize)
+HyVertexBufferHandle IHyRenderer::AppendVertexData3d(const uint8 *pData, uint32 uiSize)
 {
-	HyVertexOffsetHandle hReturnHandle = m_VertexBuffer3d.AddDataWithHandle(pData, uiSize);
+	HyVertexBufferHandle hReturnHandle = m_VertexBuffer3d.AddDataWithHandle(pData, uiSize);
 	NewVertexData3d();
 
 	return hReturnHandle;
@@ -187,7 +184,7 @@ void IHyRenderer::Render()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup render state buffer
-	HyRenderBuffer::Header *pRsHeader = reinterpret_cast<HyRenderBuffer::Header *>(m_RenderBuffer.m_pRenderStatesUserStartPos);
+	HyRenderBuffer::Header *pRsHeader = m_RenderBuffer.GetHeaderPtr();
 	
 	uint8 *pRsBufferPos = nullptr;
 	HyRenderBuffer::State *pCurRenderState = nullptr;
@@ -199,7 +196,7 @@ void IHyRenderer::Render()
 		SetCurrentWindow(i);
 		StartRender();
 
-		pRsBufferPos = m_RenderBuffer.m_pRenderStatesUserStartPos;
+		pRsBufferPos = reinterpret_cast<uint8 *>(m_RenderBuffer.GetHeaderPtr());
 		pRsBufferPos += sizeof(HyRenderBuffer::Header);
 
 		Begin_3d();

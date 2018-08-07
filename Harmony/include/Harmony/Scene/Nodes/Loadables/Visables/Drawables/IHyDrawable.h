@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Renderer/Effects/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
+#include "Renderer/Components/HyVertexBuffer.h"
 
 class IHyDrawable
 {
@@ -43,12 +44,11 @@ public:
 	HyShaderHandle GetShaderHandle();
 
 protected:
+	void WriteShaderUniformBuffer(HyVertexBuffer &vertexBufferRef);
+
 	virtual bool IsValid() = 0;
-
-	void WriteShaderUniformBuffer(uint8 *&pWritePositionRef);
-
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
-	virtual void OnWriteVertexData(uint8 *&pWritePositionRef) { }			// This function is responsible for incrementing the passed in reference pointer the size of the data written
+	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) { }
 
 private:
 	virtual HyType _DrawableGetType() = 0;

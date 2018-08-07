@@ -15,7 +15,6 @@
 #include "Renderer/Components/HyVertexBuffer.h"
 #include "Renderer/Effects/HyShader.h"
 
-class HyRenderState;
 class HyStencil;
 class HyPortal2d;
 class IHyDrawable3d;
@@ -36,8 +35,7 @@ protected:
 
 	// Preallocated buffers
 	HyRenderBuffer									m_RenderBuffer;
-	HyVertexBuffer									m_VertexBuffer3d;
-	HyVertexBuffer									m_VertexBuffer2d;
+	HyVertexBuffer									m_VertexBuffer;
 
 	HyWindow *										m_pCurWindow;
 	
@@ -64,7 +62,7 @@ public:
 	void AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask);
 	void AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask);
 
-	HyVertexOffsetHandle AppendVertexData3d(const uint8 *pData, uint32 uiSize);
+	HyVertexBufferHandle AppendVertexData3d(const uint8 *pData, uint32 uiSize);
 
 	void TxData(IHyLoadableData *pData);
 	std::queue<IHyLoadableData *> &RxData();
