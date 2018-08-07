@@ -121,7 +121,7 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
 	outMtx = glm::translate(outMtx, ptPos);
 
 	outMtx = glm::translate(outMtx, ptRotPivot);
-	outMtx = glm::rotate(outMtx, rot.Get(), glm::vec3(0, 0, 1));
+	outMtx = glm::rotate(outMtx, HyDegToRad(rot.Get()), glm::vec3(0, 0, 1));
 	outMtx = glm::translate(outMtx, ptRotPivot * -1.0f);
 
 	outMtx = glm::translate(outMtx, ptScalePivot);

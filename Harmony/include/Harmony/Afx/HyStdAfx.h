@@ -27,8 +27,7 @@
 #define GLM_FORCE_CTOR_INIT
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/matrix_decompose.hpp"
+#include "glm/gtx/transform.hpp"
 
 // STL includes (TODO: to be replaced with EASTL)
 #include <string>
@@ -48,7 +47,7 @@
 typedef uint32 HyTextureHandle;
 typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
-typedef uint32 HyVertexOffsetHandle;
+typedef uint32 HyVertexBufferHandle;	// Bytes 0-2 are the offset into the buffer; Byte 3 is which buffer index
 
 enum HyType
 {
