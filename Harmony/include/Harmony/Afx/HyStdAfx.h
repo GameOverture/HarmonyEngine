@@ -47,7 +47,7 @@
 typedef uint32 HyTextureHandle;
 typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
-typedef uint32 HyVertexBufferHandle;	// Bytes 0-2 are the offset into the buffer; Byte 3 is which buffer index
+typedef uint32 HyVertexOffsetHandle;	// Bytes 0-2 are the offset into the buffer; Byte 3 is which buffer index
 
 enum HyType
 {
