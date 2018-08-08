@@ -75,6 +75,7 @@ public:
 	const IHyNode &operator=(const IHyNode &rhs);
 
 	HyType GetType() const;
+	bool Is2D() const;
 
 	bool IsEnabled() const;
 	virtual void SetEnabled(bool bEnabled);

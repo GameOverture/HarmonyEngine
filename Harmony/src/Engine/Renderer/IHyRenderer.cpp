@@ -109,7 +109,10 @@ void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCa
 		HyError("IHyRenderer::AppendDrawable2d - Unknown instance type");
 	}
 
-	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, m_VertexBuffer.GetCurByteOffset2d(), uiNumInstances, uiNumVerticesPerInstance);
+	HyScreenRect<int32> scissorRect;
+	instanceRef.GetWorldScissor(scissorRect);
+
+	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, scissorRect, (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE, instanceRef.GetCoordinateSystem(), m_VertexBuffer.GetCurByteOffset2d(), uiNumInstances, uiNumVerticesPerInstance);
 	
 	instanceRef.AcquireData();
 	instanceRef.OnWriteVertexData(m_VertexBuffer);
@@ -117,8 +120,7 @@ void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCa
 
 HyVertexBufferHandle IHyRenderer::AppendVertexData3d(const uint8 *pData, uint32 uiSize)
 {
-	HyVertexBufferHandle hReturnHandle = m_VertexBuffer3d.AddDataWithHandle(pData, uiSize);
-	NewVertexData3d();
+	HyVertexBufferHandle hReturnHandle = 0;// m_VertexBuffer3d.AddDataWithHandle(pData, uiSize);
 
 	return hReturnHandle;
 }

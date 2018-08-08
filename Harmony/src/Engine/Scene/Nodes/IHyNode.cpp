@@ -69,6 +69,11 @@ HyType IHyNode::GetType() const
 	return m_eTYPE;
 }
 
+bool IHyNode::Is2D() const
+{
+	return 0 != (m_uiExplicitAndTypeFlags & NODETYPE_Is2d);
+}
+
 bool IHyNode::IsEnabled() const
 {
 	return m_bEnabled;

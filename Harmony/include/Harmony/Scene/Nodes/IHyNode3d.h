@@ -38,7 +38,7 @@ public:
 	const IHyNode3d &operator=(const IHyNode3d &rhs);
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
-	void GetWorldTransform(glm::mat4 &outMtx);
+	const glm::mat4 &GetWorldTransform();
 
 protected:
 	virtual void PhysicsUpdate() override;

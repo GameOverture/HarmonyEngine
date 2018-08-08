@@ -61,7 +61,7 @@ const IHyDrawable3d &IHyDrawable3d::operator=(const IHyDrawable3d &rhs)
 	sm_pScene->RemoveNode_Loaded(this);
 }
 
-/*virtual*/ HyType IHyDrawable3d::_DrawableGetType() /*override*/
+/*virtual*/ IHyNode &IHyDrawable3d::_DrawableGetNodeRef() /*override final*/
 {
-	return m_eTYPE;
+	return *this;
 }

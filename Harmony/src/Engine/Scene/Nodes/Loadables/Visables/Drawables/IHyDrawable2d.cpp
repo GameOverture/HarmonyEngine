@@ -53,8 +53,7 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 {
 	if(IsDirty(DIRTY_WorldAABB))
 	{
-		glm::mat4 mtxWorld;
-		GetWorldTransform(mtxWorld);
+		glm::mat4 mtxWorld = GetWorldTransform();
 		float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
 
 		GetLocalBoundingVolume(); // This will update BV if it's dirty
@@ -94,7 +93,7 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 	sm_pScene->RemoveNode_Loaded(this);
 }
 
-/*virtual*/ HyType IHyDrawable2d::_DrawableGetType() /*override*/
+/*virtual*/ IHyNode &IHyDrawable2d::_DrawableGetNodeRef() /*override final*/
 {
-	return m_eTYPE;
+	return *this;
 }

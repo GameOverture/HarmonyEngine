@@ -129,16 +129,18 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
 	outMtx = glm::translate(outMtx, ptScalePivot * -1.0f);
 }
 
-void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
+const glm::mat4 &IHyNode2d::GetWorldTransform()
 {
 	if(IsDirty(DIRTY_Transform))
 	{
 		if(m_pParent)
 		{
-			m_pParent->GetWorldTransform(m_mtxCached);
-			GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
+			m_mtxCached = m_pParent->GetWorldTransform();
 
-			m_mtxCached *= outMtx;
+			glm::mat4 mtxLocal;
+			GetLocalTransform(mtxLocal);
+
+			m_mtxCached *= mtxLocal;
 		}
 		else
 			GetLocalTransform(m_mtxCached);
@@ -146,7 +148,7 @@ void IHyNode2d::GetWorldTransform(glm::mat4 &outMtx)
 		ClearDirty(DIRTY_Transform);
 	}
 
-	outMtx = m_mtxCached;
+	return m_mtxCached;
 }
 
 void IHyNode2d::PhysicsInit(b2BodyDef &bodyDefOut)

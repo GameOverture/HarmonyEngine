@@ -68,16 +68,18 @@ void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const
 	outMtx = glm::translate(outMtx, scale_pivot.Get() * -1.0f);
 }
 
-void IHyNode3d::GetWorldTransform(glm::mat4 &outMtx)
+const glm::mat4 &IHyNode3d::GetWorldTransform()
 {
 	if(IsDirty(DIRTY_Transform))
 	{
 		if(m_pParent)
 		{
-			m_pParent->GetWorldTransform(m_mtxCached);
-			GetLocalTransform(outMtx);	// Just use 'outMtx' rather than pushing another mat4 on the stack
+			m_mtxCached = m_pParent->GetWorldTransform();
+			
+			glm::mat4 mtxLocal;
+			GetLocalTransform(mtxLocal);
 
-			m_mtxCached *= outMtx;
+			m_mtxCached *= mtxLocal;
 		}
 		else
 			GetLocalTransform(m_mtxCached);
@@ -85,7 +87,7 @@ void IHyNode3d::GetWorldTransform(glm::mat4 &outMtx)
 		ClearDirty(DIRTY_Transform);
 	}
 
-	outMtx = m_mtxCached;
+	return m_mtxCached;
 }
 
 /*virtual*/ void IHyNode3d::PhysicsUpdate() /*override*/

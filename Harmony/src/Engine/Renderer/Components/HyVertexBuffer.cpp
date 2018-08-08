@@ -18,28 +18,40 @@ HyVertexBuffer::~HyVertexBuffer()
 {
 }
 
+void HyVertexBuffer::SetGfxApiHandle2d(uint32 hGfxApiHandle)
+{
+	m_DynamicBuffer.m_hGfxApiHandle = hGfxApiHandle;
+}
+
 void HyVertexBuffer::ResetDynamicBuffer()
 {
-	m_Buffer2d.m_pCurWritePosition = m_Buffer2d.m_pBUFFER;
-	m_Buffer2d.m_uiNumUsedBytes = 0;
+	m_DynamicBuffer.m_pCurWritePosition = m_DynamicBuffer.m_pBUFFER;
 }
 
 uint32 HyVertexBuffer::GetCurByteOffset2d()
 {
-	return m_Buffer2d.m_uiNumUsedBytes;
+	return static_cast<uint32>(m_DynamicBuffer.m_pCurWritePosition - m_DynamicBuffer.m_pBUFFER);
 }
 
 uint8 *HyVertexBuffer::GetCurWritePosPtr2d()
 {
-	return m_Buffer2d.m_pCurWritePosition;
+	return m_DynamicBuffer.m_pCurWritePosition;
 }
 
-void HyVertexBuffer::AppendDynamicData(int8 *pData, uint32 uiSize)
+uint32 HyVertexBuffer::GetDynamicBufferGfxHandle()
 {
-	HyAssert((m_DynamicBuffer.m_uiNumUsedBytes + uiSize) < HY_DYNAMIC_VERTEX_BUFFER_SIZE, "HyVertexBuffer::AppendDynamicData() has written passed its vertex bounds! Embiggen 'HY_DYNAMIC_VERTEX_BUFFER_SIZE'");
-	memcpy(m_DynamicBuffer.m_pCurWritePosition
+	return m_DynamicBuffer.m_hGfxApiHandle;
+}
 
-	m_DynamicBuffer.m_uiNumUsedBytes = static_cast<uint32>(m_DynamicBuffer.m_pCurWritePosition - m_VertexBuffer2d.m_pBUFFER);
+uint8 * const HyVertexBuffer::GetDynamicBufferData()
+{
+	return m_DynamicBuffer.m_pBUFFER;
+}
+
+void HyVertexBuffer::AppendDynamicData(const void *pData, uint32 uiSize)
+{
+	HyAssert((static_cast<uint32>(m_DynamicBuffer.m_pCurWritePosition - m_DynamicBuffer.m_pBUFFER) + uiSize) < HY_DYNAMIC_VERTEX_BUFFER_SIZE, "HyVertexBuffer::AppendDynamicData() has written passed its vertex bounds! Embiggen 'HY_DYNAMIC_VERTEX_BUFFER_SIZE'");
+	memcpy(m_DynamicBuffer.m_pCurWritePosition, pData, uiSize);
 }
 
 //HyVertexBufferHandle HyVertexBuffer::AddDataWithHandle(const uint8 *pData, uint32 uiSize)

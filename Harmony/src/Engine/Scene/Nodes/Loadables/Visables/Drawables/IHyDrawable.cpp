@@ -57,7 +57,7 @@ void IHyDrawable::SetShader(HyShader *pShader)
 		m_hShader = pShader->GetHandle();
 	}
 	else
-		m_hShader = Hy_DefaultShaderHandle(_DrawableGetType());
+		m_hShader = Hy_DefaultShaderHandle(_DrawableGetNodeRef().GetType());
 }
 
 HyShaderHandle IHyDrawable::GetShaderHandle()
@@ -65,7 +65,7 @@ HyShaderHandle IHyDrawable::GetShaderHandle()
 	return m_hShader;
 }
 
-void IHyDrawable::WriteShaderUniformBuffer(HyVertexBuffer &vertexBufferRef)
+const HyShaderUniforms &IHyDrawable::GetShaderUniforms() const
 {
-	m_ShaderUniforms.WriteUniformsBufferData(vertexBufferRef);
+	return m_ShaderUniforms;
 }

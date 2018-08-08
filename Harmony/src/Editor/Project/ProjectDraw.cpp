@@ -66,8 +66,7 @@ CheckerGrid::~CheckerGrid()
 
 /*virtual*/ void CheckerGrid::OnUpdateUniforms() /*override*/
 {
-	glm::mat4 mtx;
-	HyPrimitive2d::GetWorldTransform(mtx);
+	glm::mat4 mtx = HyPrimitive2d::GetWorldTransform();
 
 	m_ShaderUniforms.Set("u_mtxTransform", mtx);
 	m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);
@@ -76,14 +75,15 @@ CheckerGrid::~CheckerGrid()
 	m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
-/*virtual*/ void CheckerGrid::OnWriteVertexData(uint8 *&pRefDataWritePos) /*override*/
+/*virtual*/ void CheckerGrid::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	HyAssert(GetNumVerts() == 6, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 
 	for(int i = 0; i < 6; ++i)
 	{
-		*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pVertBuffer[i];
-		pRefDataWritePos += sizeof(glm::vec2);
+		vertexBufferRef.AppendDynamicData(&m_pVertBuffer[i], sizeof(glm::vec2));
+		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pVertBuffer[i];
+		//pRefDataWritePos += sizeof(glm::vec2);
 
 		glm::vec2 vUV;
 		switch(i)
@@ -111,8 +111,9 @@ CheckerGrid::~CheckerGrid()
 			break;
 		}
 
-		*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-		pRefDataWritePos += sizeof(glm::vec2);
+		vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
+		//pRefDataWritePos += sizeof(glm::vec2);
 	}
 }
 
@@ -124,8 +125,8 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp),
 {
 	m_pCheckerGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-	m_pCheckerGridShader->AddVertexAttribute("attr_vPosition", HYSHADERVAR_vec2);
-	m_pCheckerGridShader->AddVertexAttribute("attr_vUVcoord", HYSHADERVAR_vec2);
+	m_pCheckerGridShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::HYSHADERVAR_vec2);
+	m_pCheckerGridShader->AddVertexAttribute("attr_vUVcoord", HyShaderVariable::HYSHADERVAR_vec2);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
 	m_pCheckerGridShader->Finalize();
 

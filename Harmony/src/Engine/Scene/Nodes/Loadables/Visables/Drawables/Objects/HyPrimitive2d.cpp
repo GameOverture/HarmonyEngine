@@ -110,8 +110,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms()
 {
-	glm::mat4 mtx;
-	GetWorldTransform(mtx);
+	glm::mat4 mtx = GetWorldTransform();
 
 	// TODO: Get rid of top/bot color
 	glm::vec3 tint = CalculateTopTint();
@@ -133,8 +132,9 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 /*virtual*/ void HyPrimitive2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
 {
-	memcpy(pWritePositionRef, m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
-	pWritePositionRef += m_uiNumVerts * sizeof(glm::vec2);
+	vertexBufferRef.AppendDynamicData(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
+	//memcpy(pWritePositionRef, m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
+	//pWritePositionRef += m_uiNumVerts * sizeof(glm::vec2);
 }
 
 void HyPrimitive2d::ClearData()

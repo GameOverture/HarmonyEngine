@@ -244,7 +244,7 @@ bool HyShape2d::TestPoint(const glm::vec2 &ptWorldPointRef) const
 {
 	glm::mat4 mtxWorld(1.0f);
 	if(m_pOwnerInst)
-		m_pOwnerInst->GetWorldTransform(mtxWorld);
+		mtxWorld = m_pOwnerInst->GetWorldTransform();
 
 	float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
 

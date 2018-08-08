@@ -25,11 +25,11 @@ protected:
 	glm::mat4										m_mtxView;
 	glm::mat4										m_mtxProj;
 
-	GLuint											m_hVBO3d;
-	bool											m_bVBO3dDirty;
+	//GLuint											m_hVBO3d;
+	//bool											m_bVBO3dDirty;
 
-	///////// 2D MEMBERS ////////////////////
-	GLuint											m_hVBO2d;
+	/////////// 2D MEMBERS ////////////////////
+	//GLuint											m_hVBO2d;
 
 public:
 	HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
@@ -51,7 +51,6 @@ public:
 	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) override;
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) override;
-	virtual void NewVertexData3d() override;
 
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);

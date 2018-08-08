@@ -99,25 +99,25 @@ void HyShader::Finalize()
 	{
 		switch(m_VertexAttributeList[i].eVarType)
 		{
-		case HYSHADERVAR_bool:		m_uiStride += sizeof(bool);			break;
-		case HYSHADERVAR_int:		m_uiStride += sizeof(int32);		break;
-		case HYSHADERVAR_uint:		m_uiStride += sizeof(uint32);		break;
-		case HYSHADERVAR_float:		m_uiStride += sizeof(float);		break;
-		case HYSHADERVAR_double:	m_uiStride += sizeof(double);		break;
-		case HYSHADERVAR_bvec2:		m_uiStride += sizeof(glm::bvec2);	break;
-		case HYSHADERVAR_bvec3:		m_uiStride += sizeof(glm::bvec3);	break;
-		case HYSHADERVAR_bvec4:		m_uiStride += sizeof(glm::bvec4);	break;
-		case HYSHADERVAR_ivec2:		m_uiStride += sizeof(glm::ivec2);	break;
-		case HYSHADERVAR_ivec3:		m_uiStride += sizeof(glm::ivec3);	break;
-		case HYSHADERVAR_ivec4:		m_uiStride += sizeof(glm::ivec4);	break;
-		case HYSHADERVAR_vec2:		m_uiStride += sizeof(glm::vec2);	break;
-		case HYSHADERVAR_vec3:		m_uiStride += sizeof(glm::vec3);	break;
-		case HYSHADERVAR_vec4:		m_uiStride += sizeof(glm::vec4);	break;
-		case HYSHADERVAR_dvec2:		m_uiStride += sizeof(glm::dvec2);	break;
-		case HYSHADERVAR_dvec3:		m_uiStride += sizeof(glm::dvec3);	break;
-		case HYSHADERVAR_dvec4:		m_uiStride += sizeof(glm::dvec4);	break;
-		case HYSHADERVAR_mat3:		m_uiStride += sizeof(glm::mat3);	break;
-		case HYSHADERVAR_mat4:		m_uiStride += sizeof(glm::mat4);	break;
+		case HyShaderVariable::HYSHADERVAR_bool:	m_uiStride += sizeof(bool);			break;
+		case HyShaderVariable::HYSHADERVAR_int:		m_uiStride += sizeof(int32);		break;
+		case HyShaderVariable::HYSHADERVAR_uint:	m_uiStride += sizeof(uint32);		break;
+		case HyShaderVariable::HYSHADERVAR_float:	m_uiStride += sizeof(float);		break;
+		case HyShaderVariable::HYSHADERVAR_double:	m_uiStride += sizeof(double);		break;
+		case HyShaderVariable::HYSHADERVAR_bvec2:	m_uiStride += sizeof(glm::bvec2);	break;
+		case HyShaderVariable::HYSHADERVAR_bvec3:	m_uiStride += sizeof(glm::bvec3);	break;
+		case HyShaderVariable::HYSHADERVAR_bvec4:	m_uiStride += sizeof(glm::bvec4);	break;
+		case HyShaderVariable::HYSHADERVAR_ivec2:	m_uiStride += sizeof(glm::ivec2);	break;
+		case HyShaderVariable::HYSHADERVAR_ivec3:	m_uiStride += sizeof(glm::ivec3);	break;
+		case HyShaderVariable::HYSHADERVAR_ivec4:	m_uiStride += sizeof(glm::ivec4);	break;
+		case HyShaderVariable::HYSHADERVAR_vec2:	m_uiStride += sizeof(glm::vec2);	break;
+		case HyShaderVariable::HYSHADERVAR_vec3:	m_uiStride += sizeof(glm::vec3);	break;
+		case HyShaderVariable::HYSHADERVAR_vec4:	m_uiStride += sizeof(glm::vec4);	break;
+		case HyShaderVariable::HYSHADERVAR_dvec2:	m_uiStride += sizeof(glm::dvec2);	break;
+		case HyShaderVariable::HYSHADERVAR_dvec3:	m_uiStride += sizeof(glm::dvec3);	break;
+		case HyShaderVariable::HYSHADERVAR_dvec4:	m_uiStride += sizeof(glm::dvec4);	break;
+		case HyShaderVariable::HYSHADERVAR_mat3:	m_uiStride += sizeof(glm::mat3);	break;
+		case HyShaderVariable::HYSHADERVAR_mat4:	m_uiStride += sizeof(glm::mat4);	break;
 		}
 	}
 }

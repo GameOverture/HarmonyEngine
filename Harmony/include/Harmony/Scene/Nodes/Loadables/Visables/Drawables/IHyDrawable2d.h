@@ -63,7 +63,7 @@ public:
 #endif
 
 private:
-	virtual HyType _DrawableGetType() override;
+	virtual IHyNode &_DrawableGetNodeRef() override final;
 };
 
 #endif /* IHyDrawable2d_h__ */

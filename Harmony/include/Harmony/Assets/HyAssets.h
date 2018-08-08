@@ -29,6 +29,7 @@ class HySpine2dData;
 class HyText2dData;
 class HyTexturedQuad2dData;
 class HyPrefabData;
+class HyGLTF;
 
 class HyAssets : public IHyThreadClass
 {
@@ -39,7 +40,6 @@ class HyAssets : public IHyThreadClass
 	uint32														m_uiNumAtlases;
 	HyAtlasIndices *											m_pLoadedAtlasIndices;
 
-	// TODO: make this a map since all node datas store a pointer
 	std::map<std::string, HyGLTF *>								m_GltfMap;
 
 	template<typename tData>

@@ -423,8 +423,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
 
-	glm::mat4 mtxTransform;
-	GetWorldTransform(mtxTransform);
+	glm::mat4 mtxTransform = GetWorldTransform();
 
 	uint32 iOffsetIndex = 0;
 	for(int32 i = uiNumLayers - 1; i >= 0; --i)
@@ -440,46 +439,60 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 			glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
 			vSize *= m_fScaleBoxModifier;
-			*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
-			pWritePositionRef += sizeof(glm::vec2);
+			vertexBufferRef.AppendDynamicData(&vSize, sizeof(glm::vec2));
+			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
+			//pWritePositionRef += sizeof(glm::vec2);
 
-			*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
-			pWritePositionRef += sizeof(glm::vec2);
+			vertexBufferRef.AppendDynamicData(&m_pGlyphInfos[uiGlyphOffsetIndex].vOffset, sizeof(glm::vec2));
+			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
+			//pWritePositionRef += sizeof(glm::vec2);
 
-			*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get();
-			pWritePositionRef += sizeof(glm::vec3);
-			*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
-			pWritePositionRef += sizeof(float);
+			vertexBufferRef.AppendDynamicData(&m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get(), sizeof(glm::vec3));
+			//*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get();
+			//pWritePositionRef += sizeof(glm::vec3);
 
-			*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->botColor.Get();
-			pWritePositionRef += sizeof(glm::vec3);
-			*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
-			pWritePositionRef += sizeof(float);
+			float fAlpha = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
+			vertexBufferRef.AppendDynamicData(&fAlpha, sizeof(float));
+			//*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
+			//pWritePositionRef += sizeof(float);
+
+			vertexBufferRef.AppendDynamicData(&m_StateColors[m_uiCurFontState]->m_LayerColors[i]->botColor.Get(), sizeof(glm::vec3));
+			//*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->botColor.Get();
+			//pWritePositionRef += sizeof(glm::vec3);
+
+			vertexBufferRef.AppendDynamicData(&fAlpha, sizeof(float));
+			//*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
+			//pWritePositionRef += sizeof(float);
 
 			glm::vec2 vUV;
 
 			vUV.x = glyphRef.rSRC_RECT.right;//1.0f;
 			vUV.y = glyphRef.rSRC_RECT.top;//1.0f;
-			*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-			pWritePositionRef += sizeof(glm::vec2);
+			vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+			//pWritePositionRef += sizeof(glm::vec2);
 
 			vUV.x = glyphRef.rSRC_RECT.left;//0.0f;
 			vUV.y = glyphRef.rSRC_RECT.top;//1.0f;
-			*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-			pWritePositionRef += sizeof(glm::vec2);
+			vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+			//pWritePositionRef += sizeof(glm::vec2);
 
 			vUV.x = glyphRef.rSRC_RECT.right;//1.0f;
 			vUV.y = glyphRef.rSRC_RECT.bottom;//0.0f;
-			*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-			pWritePositionRef += sizeof(glm::vec2);
+			vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+			//pWritePositionRef += sizeof(glm::vec2);
 
 			vUV.x = glyphRef.rSRC_RECT.left;//0.0f;
 			vUV.y = glyphRef.rSRC_RECT.bottom;//0.0f;
-			*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-			pWritePositionRef += sizeof(glm::vec2);
+			vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
+			//pWritePositionRef += sizeof(glm::vec2);
 
-			*reinterpret_cast<glm::mat4 *>(pWritePositionRef) = mtxTransform;
-			pWritePositionRef += sizeof(glm::mat4);
+			vertexBufferRef.AppendDynamicData(&mtxTransform, sizeof(glm::mat4));
+			//*reinterpret_cast<glm::mat4 *>(pWritePositionRef) = mtxTransform;
+			//pWritePositionRef += sizeof(glm::mat4);
 		}
 	}
 }

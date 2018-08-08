@@ -8,13 +8,13 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/Components/HyRenderBuffer.h"
+#include "Renderer/Components/HyShaderUniforms.h"
 #include "Renderer/IHyRenderer.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable3d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 
 HyRenderBuffer::HyRenderBuffer() :	m_pBUFFER(HY_NEW uint8[HY_RENDERSTATE_BUFFER_SIZE]),
 									m_pCurWritePosition(m_pBUFFER),
-									m_uiNumUsedBytes(0),
 									m_pRenderStatesUserStartPos(nullptr)
 {
 #ifdef HY_DEBUG
@@ -40,69 +40,37 @@ HyRenderBuffer::State *HyRenderBuffer::GetCurWritePosPtr()
 void HyRenderBuffer::Reset()
 {
 	m_pCurWritePosition = m_pBUFFER;
-	m_uiNumUsedBytes = 0;
 	m_pRenderStatesUserStartPos = nullptr;
 }
 
-void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance)
+void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, HyCameraMask uiCameraMask, HyScreenRect<int32> &scissorRectRef, HyStencilHandle hStencil, int32 iCoordinateSystem, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance)
 {
-	HyScreenRect<int32> scissorRect;
-	instanceRef.GetWorldScissor(scissorRect);
-
 	State *pRenderState = new (m_pCurWritePosition)State(uiId,
 														 uiCameraMask,
 														 uiDataOffset,
 														 instanceRef.GetRenderMode(),
 														 instanceRef.GetTextureHandle(),
 														 instanceRef.GetShaderHandle(),
-														 scissorRect,
-														 (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
-														 instanceRef.GetCoordinateSystem(),
+														 scissorRectRef,
+														 hStencil,
+														 iCoordinateSystem,
 														 uiNumInstances,
 														 uiNumVerticesPerInstance);
-
 	m_pCurWritePosition += sizeof(State);
 
 	uint8 *pStartOfExData = m_pCurWritePosition;
-	instanceRef.WriteShaderUniformBuffer(m_pCurWritePosition);
+	AppendShaderUniforms(instanceRef.GetShaderUniforms());
 	pRenderState->m_uiExDataSize = (static_cast<uint32>(m_pCurWritePosition - pStartOfExData));
 	HyAssert(static_cast<uint32>(m_pCurWritePosition - m_pBUFFER) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
 
 	if(m_pRenderStatesUserStartPos)
 	{
 		Header *pHeader = reinterpret_cast<Header *>(m_pRenderStatesUserStartPos);
-		pHeader->uiNum3dRenderStates++;
-	}
-}
 
-void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance)
-{
-	HyScreenRect<int32> scissorRect;
-	instanceRef.GetWorldScissor(scissorRect);
-
-	State *pRenderState = new (m_pCurWritePosition)State(uiId,
-														 uiCameraMask,
-														 uiDataOffset,
-														 instanceRef.GetRenderMode(),
-														 instanceRef.GetTextureHandle(),
-														 instanceRef.GetShaderHandle(),
-														 scissorRect,
-														 (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
-														 instanceRef.GetCoordinateSystem(),
-														 uiNumInstances,
-														 uiNumVerticesPerInstance);
-
-	m_pCurWritePosition += sizeof(State);
-
-	uint8 *pStartOfExData = m_pCurWritePosition;
-	instanceRef.WriteShaderUniformBuffer(m_pCurWritePosition);
-	pRenderState->m_uiExDataSize = (static_cast<uint32>(m_pCurWritePosition - pStartOfExData));
-	HyAssert(static_cast<uint32>(m_pCurWritePosition - m_pBUFFER) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
-
-	if(m_pRenderStatesUserStartPos)
-	{
-		Header *pHeader = reinterpret_cast<Header *>(m_pRenderStatesUserStartPos);
-		pHeader->uiNum2dRenderStates++;
+		if(instanceRef._DrawableGetNodeRef().Is2D())
+			pHeader->uiNum2dRenderStates++;
+		else
+			pHeader->uiNum3dRenderStates++;
 	}
 }
 
@@ -113,4 +81,49 @@ void HyRenderBuffer::CreateRenderHeader()
 	memset(pHeader, 0, sizeof(Header));
 
 	m_pCurWritePosition += sizeof(Header);
+}
+
+void HyRenderBuffer::AppendShaderUniforms(const HyShaderUniforms &shaderUniformRef)
+{
+	uint32 uiNumUniforms = shaderUniformRef.GetNumUniforms();
+	*reinterpret_cast<uint32 *>(m_pCurWritePosition) = uiNumUniforms;
+	m_pCurWritePosition += sizeof(uint32);
+
+	for(uint32 i = 0; i < uiNumUniforms; ++i)
+	{
+		const char *szUniformName = shaderUniformRef.GetName(i);
+		uint32 uiStrLen = static_cast<uint32>(strlen(szUniformName) + 1);
+		strncpy_s(reinterpret_cast<char *>(m_pCurWritePosition), uiStrLen, szUniformName, HY_SHADER_UNIFORM_NAME_LENGTH);
+		m_pCurWritePosition += uiStrLen;
+
+		HyShaderVariable eVariableType = shaderUniformRef.GetVariableType(i);
+		*reinterpret_cast<HyShaderVariable *>(m_pCurWritePosition) = eVariableType;
+		m_pCurWritePosition += sizeof(HyShaderVariable);
+
+		uint32 uiDataSize = 0;
+		switch(eVariableType)
+		{
+		case HyShaderVariable::HYSHADERVAR_bool:	uiDataSize = sizeof(bool);			break;
+		case HyShaderVariable::HYSHADERVAR_int:		uiDataSize = sizeof(int32);			break;
+		case HyShaderVariable::HYSHADERVAR_uint:	uiDataSize = sizeof(uint32);		break;
+		case HyShaderVariable::HYSHADERVAR_float:	uiDataSize = sizeof(float);			break;
+		case HyShaderVariable::HYSHADERVAR_double:	uiDataSize = sizeof(double);		break;
+		case HyShaderVariable::HYSHADERVAR_bvec2:	uiDataSize = sizeof(glm::bvec2);	break;
+		case HyShaderVariable::HYSHADERVAR_bvec3:	uiDataSize = sizeof(glm::bvec3);	break;
+		case HyShaderVariable::HYSHADERVAR_bvec4:	uiDataSize = sizeof(glm::bvec4);	break;
+		case HyShaderVariable::HYSHADERVAR_ivec2:	uiDataSize = sizeof(glm::ivec2);	break;
+		case HyShaderVariable::HYSHADERVAR_ivec3:	uiDataSize = sizeof(glm::ivec3);	break;
+		case HyShaderVariable::HYSHADERVAR_ivec4:	uiDataSize = sizeof(glm::ivec4);	break;
+		case HyShaderVariable::HYSHADERVAR_vec2:	uiDataSize = sizeof(glm::vec2);		break;
+		case HyShaderVariable::HYSHADERVAR_vec3:	uiDataSize = sizeof(glm::vec3);		break;
+		case HyShaderVariable::HYSHADERVAR_vec4:	uiDataSize = sizeof(glm::vec4);		break;
+		case HyShaderVariable::HYSHADERVAR_dvec2:	uiDataSize = sizeof(glm::dvec2);	break;
+		case HyShaderVariable::HYSHADERVAR_dvec3:	uiDataSize = sizeof(glm::dvec3);	break;
+		case HyShaderVariable::HYSHADERVAR_dvec4:	uiDataSize = sizeof(glm::dvec4);	break;
+		case HyShaderVariable::HYSHADERVAR_mat3:	uiDataSize = sizeof(glm::mat3);		break;
+		case HyShaderVariable::HYSHADERVAR_mat4:	uiDataSize = sizeof(glm::mat4);		break;
+		}
+		memcpy(m_pCurWritePosition, shaderUniformRef.GetData(i), uiDataSize);
+		m_pCurWritePosition += uiDataSize;
+	}
 }

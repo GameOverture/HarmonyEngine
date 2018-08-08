@@ -24,17 +24,18 @@ class HyShaderUniforms
 
 	struct UniformBuffer
 	{
-		char m_pData[HY_SHADER_UNIFORM_BUFFER_LENGTH];
+		uint8 m_pData[HY_SHADER_UNIFORM_BUFFER_LENGTH];
 
-		HyShaderVariable GetVariableType()				{ return *reinterpret_cast<HyShaderVariable *>(m_pData); }
-		char *GetName()									{ return m_pData + sizeof(uint32); }
-		char *GetData()									{ return m_pData + sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH; }
+		HyShaderVariable GetVariableType() const		{ return *reinterpret_cast<const HyShaderVariable *>(m_pData); }
+		const char *GetName() const						{ return reinterpret_cast<const char *>(m_pData + sizeof(uint32)); }
+		uint8 *GetData()								{ return m_pData + sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH; }
+		const uint8 *GetData() const					{ return m_pData + sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH; }
 
 		void SetVariableType(HyShaderVariable eType)	{ *reinterpret_cast<HyShaderVariable *>(m_pData) = eType; }
 		void SetName(const char *szName)
 		{ 
 			HyAssert(strlen(szName) < HY_SHADER_UNIFORM_NAME_LENGTH, "UniformBuffer::SetName() took a name greater than 'HY_SHADER_UNIFORM_NAME_LENGTH'");
-			strcpy_s(GetName(), HY_SHADER_UNIFORM_NAME_LENGTH, szName);
+			strcpy_s(reinterpret_cast<char *>(m_pData + sizeof(uint32)), HY_SHADER_UNIFORM_NAME_LENGTH, szName);
 		}
 	};
 	std::vector<UniformBuffer>	m_UniformList;
@@ -45,8 +46,13 @@ public:
 	~HyShaderUniforms();
 
 	HyShaderUniforms &operator=(const HyShaderUniforms &rhs);
+	bool operator==(HyShaderUniforms &rhs);
 
 	uint32 GetCrc32();
+	uint32 GetNumUniforms() const;
+	HyShaderVariable GetVariableType(uint32 uiIndex) const;
+	const char *GetName(uint32 uiIndex) const;
+	const uint8 *GetData(uint32 uiIndex) const;
 
 	int32 FindIndex(const char *szName);
 
@@ -60,8 +66,6 @@ public:
 	void Set(const char *szName, int32 val);
 	void Set(const char *szName, uint32 val);
 	void Set(const char *szName, bool val);
-
-	void WriteUniformsBufferData(HyVertexBuffer &vertexBufferRef);
 
 	void Clear();
 };

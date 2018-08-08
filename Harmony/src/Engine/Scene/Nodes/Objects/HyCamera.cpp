@@ -59,7 +59,7 @@ HyCamera2d::~HyCamera2d()
 
 /*virtual*/ void HyCamera2d::GetCameraTransform(glm::mat4 &outMtx) /*override*/
 {
-	GetWorldTransform(outMtx);
+	outMtx = GetWorldTransform();
 }
 
 const b2AABB &HyCamera2d::GetWorldViewBounds()
@@ -113,7 +113,7 @@ HyCamera3d::~HyCamera3d()
 
 /*virtual*/ void HyCamera3d::GetCameraTransform(glm::mat4 &outMtx) /*override*/
 {
-	GetWorldTransform(outMtx);
+	outMtx = GetWorldTransform();
 }
 
 /*virtual*/ void HyCamera3d::NodeUpdate()

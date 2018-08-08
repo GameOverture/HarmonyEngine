@@ -19,13 +19,13 @@ class HyVertexBuffer
 {
 	struct Buffer
 	{
+		uint32								m_hGfxApiHandle;
 		uint8 * const						m_pBUFFER;
 		uint8 *								m_pCurWritePosition;
-		uint32								m_uiNumUsedBytes;
 
-		Buffer(bool bIsDynamic) :	m_pBUFFER(HY_NEW uint8[bIsDynamic ? HY_DYNAMIC_VERTEX_BUFFER_SIZE : HY_VERTEX_BUFFER_SIZE]),
-									m_pCurWritePosition(m_pBUFFER),
-									m_uiNumUsedBytes(0)
+		Buffer(bool bIsDynamic) :	m_hGfxApiHandle(HY_UNUSED_HANDLE),
+									m_pBUFFER(HY_NEW uint8[bIsDynamic ? HY_DYNAMIC_VERTEX_BUFFER_SIZE : HY_VERTEX_BUFFER_SIZE]),
+									m_pCurWritePosition(m_pBUFFER)
 		{
 		#ifdef HY_DEBUG
 			memset(m_pBUFFER, 0, bIsDynamic ? HY_DYNAMIC_VERTEX_BUFFER_SIZE : HY_VERTEX_BUFFER_SIZE);
@@ -45,11 +45,15 @@ public:
 	HyVertexBuffer();
 	~HyVertexBuffer();
 
+	void SetGfxApiHandle2d(uint32 hGfxApiHandle);
+
 	void ResetDynamicBuffer();
 	uint32 GetCurByteOffset2d();
 	uint8 *GetCurWritePosPtr2d();
+	uint32 GetDynamicBufferGfxHandle();
+	uint8 * const GetDynamicBufferData();
 
-	void AppendDynamicData(int8 *pData, uint32 uiSize);
+	void AppendDynamicData(const void *pData, uint32 uiSize);
 
 	//HyVertexBufferHandle AddDataWithHandle(const uint8 *pData, uint32 uiSize);
 	//uint32 GetByteOffset(HyVertexBufferHandle hHandle);

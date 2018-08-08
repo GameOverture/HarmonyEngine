@@ -14,6 +14,7 @@
 #include "Renderer/Effects/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 #include "Renderer/Components/HyVertexBuffer.h"
+#include "Scene/Nodes/IHyNode.h"
 
 class IHyDrawable
 {
@@ -42,16 +43,15 @@ public:
 	// Passing nullptr will use built-in default shader
 	void SetShader(HyShader *pShader);
 	HyShaderHandle GetShaderHandle();
+	const HyShaderUniforms &GetShaderUniforms() const;
 
 protected:
-	void WriteShaderUniformBuffer(HyVertexBuffer &vertexBufferRef);
-
 	virtual bool IsValid() = 0;
 	virtual void OnUpdateUniforms() { }									// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) { }
 
 private:
-	virtual HyType _DrawableGetType() = 0;
+	virtual IHyNode &_DrawableGetNodeRef() = 0;
 };
 
 #endif /* IHyDrawable_h__ */

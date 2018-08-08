@@ -52,7 +52,7 @@ public:
 	HyEntity2d *ParentGet() const;
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
-	void GetWorldTransform(glm::mat4 &outMtx);
+	const glm::mat4 &GetWorldTransform();
 
 	void PhysicsInit(b2BodyDef &bodyDefOut);
 	b2Body *PhysicsBody();
