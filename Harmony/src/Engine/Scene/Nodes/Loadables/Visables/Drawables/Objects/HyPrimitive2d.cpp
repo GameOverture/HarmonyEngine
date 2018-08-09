@@ -132,7 +132,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 
 /*virtual*/ void HyPrimitive2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
 {
-	vertexBufferRef.AppendDynamicData(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
+	vertexBufferRef.AppendData2d(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
 	//memcpy(pWritePositionRef, m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
 	//pWritePositionRef += m_uiNumVerts * sizeof(glm::vec2);
 }

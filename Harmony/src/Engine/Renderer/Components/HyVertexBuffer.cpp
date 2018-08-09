@@ -8,8 +8,10 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Renderer/Components/HyVertexBuffer.h"
+#include "Renderer/IHyRenderer.h"
 
-HyVertexBuffer::HyVertexBuffer() : m_DynamicBuffer(true)
+HyVertexBuffer::HyVertexBuffer(IHyRenderer &rendererRef) :	m_RendererRef(rendererRef),
+															m_Buffer2d(true)
 {
 	m_StaticBufferList.emplace_back(false);
 }
@@ -18,41 +20,36 @@ HyVertexBuffer::~HyVertexBuffer()
 {
 }
 
-void HyVertexBuffer::SetGfxApiHandle2d(uint32 hGfxApiHandle)
+void HyVertexBuffer::Initialize2d()
 {
-	m_DynamicBuffer.m_hGfxApiHandle = hGfxApiHandle;
+	m_Buffer2d.m_hGfxApiHandle = m_RendererRef.GenerateVertexBuffer();
 }
 
-void HyVertexBuffer::ResetDynamicBuffer()
+void HyVertexBuffer::Reset2d()
 {
-	m_DynamicBuffer.m_pCurWritePosition = m_DynamicBuffer.m_pBUFFER;
+	m_Buffer2d.m_pCurWritePosition = m_Buffer2d.m_pBUFFER;
 }
 
-uint32 HyVertexBuffer::GetCurByteOffset2d()
+uint32 HyVertexBuffer::GetNumUsedBytes2d()
 {
-	return static_cast<uint32>(m_DynamicBuffer.m_pCurWritePosition - m_DynamicBuffer.m_pBUFFER);
+	return static_cast<uint32>(m_Buffer2d.m_pCurWritePosition - m_Buffer2d.m_pBUFFER);
 }
 
-uint8 *HyVertexBuffer::GetCurWritePosPtr2d()
+uint32 HyVertexBuffer::GetGfxApiHandle2d()
 {
-	return m_DynamicBuffer.m_pCurWritePosition;
+	return m_Buffer2d.m_hGfxApiHandle;
 }
 
-uint32 HyVertexBuffer::GetDynamicBufferGfxHandle()
+void HyVertexBuffer::AppendData2d(const void *pData, uint32 uiSize)
 {
-	return m_DynamicBuffer.m_hGfxApiHandle;
+	HyAssert((static_cast<uint32>(m_Buffer2d.m_pCurWritePosition - m_Buffer2d.m_pBUFFER) + uiSize) < HY_VERTEX_BUFFER_SIZE_2D, "HyVertexBuffer::AppendData2d() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE_2D'");
+	memcpy(m_Buffer2d.m_pCurWritePosition, pData, uiSize);
+	m_Buffer2d.m_pCurWritePosition += uiSize;
 }
 
-uint8 * const HyVertexBuffer::GetDynamicBufferData()
+uint8 * const HyVertexBuffer::GetData2d()
 {
-	return m_DynamicBuffer.m_pBUFFER;
-}
-
-void HyVertexBuffer::AppendDynamicData(const void *pData, uint32 uiSize)
-{
-	HyAssert((static_cast<uint32>(m_DynamicBuffer.m_pCurWritePosition - m_DynamicBuffer.m_pBUFFER) + uiSize) < HY_DYNAMIC_VERTEX_BUFFER_SIZE, "HyVertexBuffer::AppendDynamicData() has written passed its vertex bounds! Embiggen 'HY_DYNAMIC_VERTEX_BUFFER_SIZE'");
-	memcpy(m_DynamicBuffer.m_pCurWritePosition, pData, uiSize);
-	m_DynamicBuffer.m_pCurWritePosition += uiSize;
+	return m_Buffer2d.m_pBUFFER;
 }
 
 //HyVertexBufferHandle HyVertexBuffer::AddDataWithHandle(const uint8 *pData, uint32 uiSize)

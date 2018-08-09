@@ -20,6 +20,7 @@ IHyRenderer *IHyRenderer::sm_pInstance = nullptr;
 
 IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
 																									m_WindowListRef(windowListRef),
+																									m_VertexBuffer(*this),
 																									m_pCurWindow(nullptr),
 																									m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
 																									m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive)),
@@ -27,6 +28,10 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 {
 	HyAssert(sm_pInstance == nullptr, "IHyRenderer ctor called twice");
 	sm_pInstance = this;
+
+	// Built-in shaders
+	m_pShaderQuadBatch->Finalize();
+	m_pShaderPrimitive->Finalize();
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -47,7 +52,7 @@ void IHyRenderer::PrepareBuffers()
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Init everything to beginning of buffers
 	m_RenderBuffer.Reset();
-	m_VertexBuffer.ResetDynamicBuffer();
+	m_VertexBuffer.Reset2d();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Write internal render states first, used by things like HyStencil
@@ -112,7 +117,7 @@ void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCa
 	HyScreenRect<int32> scissorRect;
 	instanceRef.GetWorldScissor(scissorRect);
 
-	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, scissorRect, (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE, instanceRef.GetCoordinateSystem(), m_VertexBuffer.GetCurByteOffset2d(), uiNumInstances, uiNumVerticesPerInstance);
+	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, scissorRect, (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE, instanceRef.GetCoordinateSystem(), m_VertexBuffer.GetNumUsedBytes2d(), uiNumInstances, uiNumVerticesPerInstance);
 	
 	instanceRef.AcquireData();
 	instanceRef.OnWriteVertexData(m_VertexBuffer);

@@ -158,25 +158,25 @@ enum HyShaderType
 
 enum class HyShaderVariable : uint32
 {
-	HYSHADERVAR_bool = 0,
-	HYSHADERVAR_int,
-	HYSHADERVAR_uint,
-	HYSHADERVAR_float,
-	HYSHADERVAR_double,
-	HYSHADERVAR_bvec2,
-	HYSHADERVAR_bvec3,
-	HYSHADERVAR_bvec4,
-	HYSHADERVAR_ivec2,
-	HYSHADERVAR_ivec3,
-	HYSHADERVAR_ivec4,
-	HYSHADERVAR_vec2,
-	HYSHADERVAR_vec3,
-	HYSHADERVAR_vec4,
-	HYSHADERVAR_dvec2,
-	HYSHADERVAR_dvec3,
-	HYSHADERVAR_dvec4,
-	HYSHADERVAR_mat3,
-	HYSHADERVAR_mat4
+	boolean = 0,
+	int32,
+	uint32,
+	float32,
+	double64,
+	bvec2,
+	bvec3,
+	bvec4,
+	ivec2,
+	ivec3,
+	ivec4,
+	vec2,
+	vec3,
+	vec4,
+	dvec2,
+	dvec3,
+	dvec4,
+	mat3,
+	mat4
 };
 
 enum HyWindowType

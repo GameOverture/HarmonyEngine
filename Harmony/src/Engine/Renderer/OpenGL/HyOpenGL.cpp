@@ -39,15 +39,6 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		}
 		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
 
-		//glEnable(GL_DEPTH_TEST);
-		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
-
-		//glEnable(GL_BLEND);
-		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glEnable");
-
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
-
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	}
 
@@ -114,23 +105,8 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 					iMaxTextureSize,
 					sCompressedTextureFormats);
 
-	//glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-
-	//glGenBuffers(1, &m_hVBO3d);
-
-	//////////////////////////////////////////////////////////////////////////
-	// 2D setup
-	GLuint hVBO2d;
-	glGenBuffers(1, &hVBO2d);
-	m_VertexBuffer.SetGfxApiHandle2d(hVBO2d);
-	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glGenBuffers");
-
-	glBindBuffer(GL_ARRAY_BUFFER, hVBO2d);
-	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBindBuffer");
-
-	// Built-in shaders
-	m_pShaderQuadBatch->Finalize();
-	m_pShaderPrimitive->Finalize();
+	// 2D vertex buffer setup
+	m_VertexBuffer.Initialize2d();
 }
 
 HyOpenGL::~HyOpenGL(void)
@@ -176,10 +152,10 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::Begin_2d()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer.GetDynamicBufferGfxHandle());
+	glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer.GetGfxApiHandle2d());
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBindBuffer");
 
-	glBufferData(GL_ARRAY_BUFFER, m_VertexBuffer.GetCurByteOffset2d(), m_VertexBuffer.GetDynamicBufferData(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_VertexBuffer.GetNumUsedBytes2d(), m_VertexBuffer.GetData2d(), GL_DYNAMIC_DRAW);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBufferData");
 
 	glDisable(GL_DEPTH_TEST);
@@ -264,26 +240,26 @@ HyOpenGL::~HyOpenGL(void)
 		{
 		case HYSHADERPROG_QuadBatch:
 			pShader->SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
-			pShader->AddVertexAttribute("attr_vSize", HyShaderVariable::HYSHADERVAR_vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vOffset", HyShaderVariable::HYSHADERVAR_vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vTopTint", HyShaderVariable::HYSHADERVAR_vec4, false, 1);
-			pShader->AddVertexAttribute("attr_vBotTint", HyShaderVariable::HYSHADERVAR_vec4, false, 1);
-			pShader->AddVertexAttribute("attr_vUVcoord0", HyShaderVariable::HYSHADERVAR_vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vUVcoord1", HyShaderVariable::HYSHADERVAR_vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vUVcoord2", HyShaderVariable::HYSHADERVAR_vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vUVcoord3", HyShaderVariable::HYSHADERVAR_vec2, false, 1);
-			pShader->AddVertexAttribute("attr_mtxLocalToWorld", HyShaderVariable::HYSHADERVAR_mat4, false, 1);
+			pShader->AddVertexAttribute("attr_vSize", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_vOffset", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_vTopTint", HyShaderVariable::vec4, false, 1);
+			pShader->AddVertexAttribute("attr_vBotTint", HyShaderVariable::vec4, false, 1);
+			pShader->AddVertexAttribute("attr_vUVcoord0", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_vUVcoord1", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_vUVcoord2", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_vUVcoord3", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_mtxLocalToWorld", HyShaderVariable::mat4, false, 1);
 			break;
 
 		case HYSHADERPROG_Primitive:
 			pShader->SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
-			pShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::HYSHADERVAR_vec2);
+			pShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
 			break;
 
 		case HYSHADERPROG_Lines2d:
 			pShader->SetSourceCode(szHYLINES2D_VERTEXSHADER, HYSHADER_Vertex);
-			pShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::HYSHADERVAR_vec2);
-			pShader->AddVertexAttribute("attr_vNormal", HyShaderVariable::HYSHADERVAR_vec2);
+			pShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
+			pShader->AddVertexAttribute("attr_vNormal", HyShaderVariable::vec2);
 			break;
 
 		default:
@@ -323,11 +299,11 @@ HyOpenGL::~HyOpenGL(void)
 	int32 iTotalVertexAttribs = 0;
 	for(uint32 i = 0; i < shaderVertexAttribListRef.size(); ++i)
 	{
-		if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_dvec2 || shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_dvec3 || shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_dvec4)
+		if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::dvec2 || shaderVertexAttribListRef[i].eVarType == HyShaderVariable::dvec3 || shaderVertexAttribListRef[i].eVarType == HyShaderVariable::dvec4)
 			iTotalVertexAttribs += 2;
-		else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_mat3)
+		else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::mat3)
 			iTotalVertexAttribs += 3;
-		else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_mat4)
+		else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::mat4)
 			iTotalVertexAttribs += 4;
 		else
 			iTotalVertexAttribs += 1;
@@ -417,9 +393,9 @@ HyOpenGL::~HyOpenGL(void)
 			HyErrorCheck_OpenGL("HyOpenGLShader::GetAttribLocation", "glGetAttribLocation");
 			HyAssert(static_cast<GLint>(uiLocation) >= 0, "Vertex attribute \"" << shaderVertexAttribListRef[i].sName.c_str() << "\" is not found in shader: " << static_cast<uint32>(pShader->GetHandle()));
 
-			if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_dvec2 || shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_dvec3 || shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_dvec4)
+			if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::dvec2 || shaderVertexAttribListRef[i].eVarType == HyShaderVariable::dvec3 || shaderVertexAttribListRef[i].eVarType == HyShaderVariable::dvec4)
 			{
-				HyAssert(false, "HYSHADERVAR_dvec2, HYSHADERVAR_dvec3, or HYSHADERVAR_dvec4 is not tested, remove this if it works");
+				HyAssert(false, "dvec2, dvec3, or dvec4 is not tested, remove this if it works");
 
 				glEnableVertexAttribArray(uiLocation + 0);
 				glEnableVertexAttribArray(uiLocation + 1);
@@ -427,7 +403,7 @@ HyOpenGL::~HyOpenGL(void)
 				glVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
 				glVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
-			else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_mat3)
+			else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::mat3)
 			{
 				glEnableVertexAttribArray(uiLocation + 0);
 				glEnableVertexAttribArray(uiLocation + 1);
@@ -437,7 +413,7 @@ HyOpenGL::~HyOpenGL(void)
 				glVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
 				glVertexAttribDivisor(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
-			else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::HYSHADERVAR_mat4)
+			else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::mat4)
 			{
 				glEnableVertexAttribArray(uiLocation + 0);
 				glEnableVertexAttribArray(uiLocation + 1);
@@ -634,6 +610,15 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
 }
 
+/*virtual*/ uint32 HyOpenGL::GenerateVertexBuffer() /*override*/
+{
+	GLuint hVBO;
+	glGenBuffers(1, &hVBO);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glGenBuffers");
+
+	return hVBO;
+}
+
 void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 {
 	GLuint iShaderHandle = 0;
@@ -801,41 +786,41 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 		pExBuffer += sizeof(uint32);
 		switch(eVarType)
 		{
-		case HyShaderVariable::HYSHADERVAR_bool:
+		case HyShaderVariable::boolean:
 			glUniform1i(iUniLocation, *reinterpret_cast<bool *>(pExBuffer));
 			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1i");
 			pExBuffer += sizeof(bool);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_int:
+		case HyShaderVariable::int32:
 			glUniform1i(iUniLocation, *reinterpret_cast<int32 *>(pExBuffer));
 			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1i");
 			pExBuffer += sizeof(int32);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_uint:
+		case HyShaderVariable::uint32:
 			glUniform1ui(iUniLocation, *reinterpret_cast<uint32 *>(pExBuffer));
 			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1ui");
 			pExBuffer += sizeof(uint32);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_float:
+		case HyShaderVariable::float32:
 			glUniform1f(iUniLocation, *reinterpret_cast<float *>(pExBuffer));
 			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1f");
 			pExBuffer += sizeof(float);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_double:
+		case HyShaderVariable::double64:
 			HyError("GLSL Shader uniform does not support type double yet!");
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_bvec2:
+		case HyShaderVariable::bvec2:
 			glUniform2i(iUniLocation, reinterpret_cast<glm::bvec2 *>(pExBuffer)->x, reinterpret_cast<glm::bvec2 *>(pExBuffer)->y);
 			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2i");
 			pExBuffer += sizeof(glm::bvec2);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_bvec3:
+		case HyShaderVariable::bvec3:
 			glUniform3i(iUniLocation, reinterpret_cast<glm::bvec3 *>(pExBuffer)->x,
 									  reinterpret_cast<glm::bvec3 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::bvec3 *>(pExBuffer)->z);
@@ -843,7 +828,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 			pExBuffer += sizeof(glm::bvec3);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_bvec4:
+		case HyShaderVariable::bvec4:
 			glUniform4i(iUniLocation, reinterpret_cast<glm::bvec4 *>(pExBuffer)->x,
 									  reinterpret_cast<glm::bvec4 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::bvec4 *>(pExBuffer)->z,
@@ -852,13 +837,13 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 			pExBuffer += sizeof(glm::bvec4);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_ivec2:
+		case HyShaderVariable::ivec2:
 			glUniform2i(iUniLocation, reinterpret_cast<glm::ivec2 *>(pExBuffer)->x, reinterpret_cast<glm::ivec2 *>(pExBuffer)->y);
 			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2i");
 			pExBuffer += sizeof(glm::ivec2);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_ivec3:
+		case HyShaderVariable::ivec3:
 			glUniform3i(iUniLocation, reinterpret_cast<glm::ivec3 *>(pExBuffer)->x,
 									  reinterpret_cast<glm::ivec3 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::ivec3 *>(pExBuffer)->z);
@@ -866,7 +851,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 			pExBuffer += sizeof(glm::ivec3);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_ivec4:
+		case HyShaderVariable::ivec4:
 			glUniform4i(iUniLocation, reinterpret_cast<glm::ivec4 *>(pExBuffer)->x,
 									  reinterpret_cast<glm::ivec4 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::ivec4 *>(pExBuffer)->z,
@@ -875,13 +860,13 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 			pExBuffer += sizeof(glm::ivec4);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_vec2:
+		case HyShaderVariable::vec2:
 			glUniform2f(iUniLocation, reinterpret_cast<glm::vec2 *>(pExBuffer)->x, reinterpret_cast<glm::vec2 *>(pExBuffer)->y);
 			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2f");
 			pExBuffer += sizeof(glm::vec2);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_vec3:
+		case HyShaderVariable::vec3:
 			glUniform3f(iUniLocation, reinterpret_cast<glm::vec3 *>(pExBuffer)->x,
 									  reinterpret_cast<glm::vec3 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::vec3 *>(pExBuffer)->z);
@@ -889,7 +874,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 			pExBuffer += sizeof(glm::vec3);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_vec4:
+		case HyShaderVariable::vec4:
 			glUniform4f(iUniLocation, reinterpret_cast<glm::vec4 *>(pExBuffer)->x,
 									  reinterpret_cast<glm::vec4 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::vec4 *>(pExBuffer)->z,
@@ -898,19 +883,19 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 			pExBuffer += sizeof(glm::vec4);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_dvec2:
-		case HyShaderVariable::HYSHADERVAR_dvec3:
-		case HyShaderVariable::HYSHADERVAR_dvec4:
+		case HyShaderVariable::dvec2:
+		case HyShaderVariable::dvec3:
+		case HyShaderVariable::dvec4:
 			HyError("GLSL Shader uniform does not support type double yet!");
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_mat3:
+		case HyShaderVariable::mat3:
 			glUniformMatrix3fv(iUniLocation, 1, GL_FALSE, &(*reinterpret_cast<glm::mat3 *>(pExBuffer))[0][0]);
 			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix3fv");
 			pExBuffer += sizeof(glm::mat3);
 			break;
 
-		case HyShaderVariable::HYSHADERVAR_mat4:
+		case HyShaderVariable::mat4:
 			glUniformMatrix4fv(iUniLocation, 1, GL_FALSE, &(*reinterpret_cast<glm::mat4 *>(pExBuffer))[0][0]);
 			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix4fv");
 			pExBuffer += sizeof(glm::mat4);
@@ -937,75 +922,75 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 
 		switch(shaderVertexAttribListRef[i].eVarType)
 		{
-		case HyShaderVariable::HYSHADERVAR_bool:
+		case HyShaderVariable::boolean:
 			glVertexAttribPointer(uiLocation, 1, GL_BYTE, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLboolean);
 			break;
-		case HyShaderVariable::HYSHADERVAR_int:
+		case HyShaderVariable::int32:
 			glVertexAttribPointer(uiLocation, 1, GL_INT, shaderVertexAttribListRef[i].bNormalized, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLint);
 			break;
-		case HyShaderVariable::HYSHADERVAR_uint:
+		case HyShaderVariable::uint32:
 			glVertexAttribPointer(uiLocation, 1, GL_UNSIGNED_INT, shaderVertexAttribListRef[i].bNormalized, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLuint);
 			break;
-		case HyShaderVariable::HYSHADERVAR_float:
+		case HyShaderVariable::float32:
 			glVertexAttribPointer(uiLocation, 1, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLfloat);
 			break;
-		case HyShaderVariable::HYSHADERVAR_double:
+		case HyShaderVariable::double64:
 			glVertexAttribLPointer(uiLocation, 1, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLdouble);
 			break;
-		case HyShaderVariable::HYSHADERVAR_bvec2:
+		case HyShaderVariable::bvec2:
 			glVertexAttribPointer(uiLocation, 2, GL_BYTE, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::bvec2);
 			break;
-		case HyShaderVariable::HYSHADERVAR_bvec3:
+		case HyShaderVariable::bvec3:
 			glVertexAttribPointer(uiLocation, 3, GL_BYTE, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::bvec3);
 			break;
-		case HyShaderVariable::HYSHADERVAR_bvec4:
+		case HyShaderVariable::bvec4:
 			glVertexAttribPointer(uiLocation, 4, GL_BYTE, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::bvec4);
 			break;
-		case HyShaderVariable::HYSHADERVAR_ivec2:
+		case HyShaderVariable::ivec2:
 			glVertexAttribPointer(uiLocation, 2, GL_INT, shaderVertexAttribListRef[i].bNormalized ? GL_TRUE : GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::ivec2);
 			break;
-		case HyShaderVariable::HYSHADERVAR_ivec3:
+		case HyShaderVariable::ivec3:
 			glVertexAttribPointer(uiLocation, 3, GL_INT, shaderVertexAttribListRef[i].bNormalized ? GL_TRUE : GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::ivec3);
 			break;
-		case HyShaderVariable::HYSHADERVAR_ivec4:
+		case HyShaderVariable::ivec4:
 			glVertexAttribPointer(uiLocation, 4, GL_INT, shaderVertexAttribListRef[i].bNormalized ? GL_TRUE : GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::ivec4);
 			break;
-		case HyShaderVariable::HYSHADERVAR_vec2:
+		case HyShaderVariable::vec2:
 			glVertexAttribPointer(uiLocation, 2, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec2);
 			break;
-		case HyShaderVariable::HYSHADERVAR_vec3:
+		case HyShaderVariable::vec3:
 			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
 			break;
-		case HyShaderVariable::HYSHADERVAR_vec4:
+		case HyShaderVariable::vec4:
 			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
 			break;
-		case HyShaderVariable::HYSHADERVAR_dvec2:
+		case HyShaderVariable::dvec2:
 			glVertexAttribLPointer(uiLocation, 2, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::dvec2);
 			break;
-		case HyShaderVariable::HYSHADERVAR_dvec3:
+		case HyShaderVariable::dvec3:
 			glVertexAttribLPointer(uiLocation, 3, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::dvec3);
 			break;
-		case HyShaderVariable::HYSHADERVAR_dvec4:
+		case HyShaderVariable::dvec4:
 			glVertexAttribLPointer(uiLocation, 4, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::dvec4);
 			break;
-		case HyShaderVariable::HYSHADERVAR_mat3:
+		case HyShaderVariable::mat3:
 			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
 			glVertexAttribPointer(uiLocation + 1, 3, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
@@ -1013,7 +998,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 			glVertexAttribPointer(uiLocation + 2, 3, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
 			break;
-		case HyShaderVariable::HYSHADERVAR_mat4:
+		case HyShaderVariable::mat4:
 			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
 			glVertexAttribPointer(uiLocation + 1, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));

@@ -442,29 +442,29 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 
 	glm::vec2 vSize(frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth(), frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight());
-	vertexBufferRef.AppendDynamicData(&vSize, sizeof(glm::vec2));
+	vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
 	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
 	//pWritePositionRef += sizeof(glm::vec2);
 
 	glm::vec2 vOffset(frameRef.vOFFSET.x, frameRef.vOFFSET.y);
-	vertexBufferRef.AppendDynamicData(&vOffset, sizeof(glm::vec2));
+	vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
 	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vOffset;
 	//pWritePositionRef += sizeof(glm::vec2);
 
-	vertexBufferRef.AppendDynamicData(&CalculateTopTint(), sizeof(glm::vec3));
+	vertexBufferRef.AppendData2d(&CalculateTopTint(), sizeof(glm::vec3));
 	//*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = CalculateTopTint();
 	//pWritePositionRef += sizeof(glm::vec3);
 
 	float fAlpha = CalculateAlpha();
-	vertexBufferRef.AppendDynamicData(&fAlpha, sizeof(float));
+	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 	//*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha();
 	//pWritePositionRef += sizeof(float);
 
-	vertexBufferRef.AppendDynamicData(&CalculateBotTint(), sizeof(glm::vec3));
+	vertexBufferRef.AppendData2d(&CalculateBotTint(), sizeof(glm::vec3));
 	//*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = CalculateBotTint();
 	//pWritePositionRef += sizeof(glm::vec3);
 
-	vertexBufferRef.AppendDynamicData(&fAlpha, sizeof(float));
+	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 	//*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha();
 	//pWritePositionRef += sizeof(float);
 
@@ -472,29 +472,29 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
 	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
-	vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
 	//pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
 	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
-	vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
 	//pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
 	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
-	vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
 	//pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
 	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
-	vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
 	//pWritePositionRef += sizeof(glm::vec2);
 
-	vertexBufferRef.AppendDynamicData(&GetWorldTransform(), sizeof(glm::mat4));
+	vertexBufferRef.AppendData2d(&GetWorldTransform(), sizeof(glm::mat4));
 	//GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pWritePositionRef));
 	//pWritePositionRef += sizeof(glm::mat4);
 }

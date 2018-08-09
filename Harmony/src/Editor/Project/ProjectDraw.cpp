@@ -81,7 +81,7 @@ CheckerGrid::~CheckerGrid()
 
 	for(int i = 0; i < 6; ++i)
 	{
-		vertexBufferRef.AppendDynamicData(&m_pVertBuffer[i], sizeof(glm::vec2));
+		vertexBufferRef.AppendData2d(&m_pVertBuffer[i], sizeof(glm::vec2));
 		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pVertBuffer[i];
 		//pRefDataWritePos += sizeof(glm::vec2);
 
@@ -111,7 +111,7 @@ CheckerGrid::~CheckerGrid()
 			break;
 		}
 
-		vertexBufferRef.AppendDynamicData(&vUV, sizeof(glm::vec2));
+		vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 		//pRefDataWritePos += sizeof(glm::vec2);
 	}
@@ -125,8 +125,8 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp),
 {
 	m_pCheckerGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-	m_pCheckerGridShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::HYSHADERVAR_vec2);
-	m_pCheckerGridShader->AddVertexAttribute("attr_vUVcoord", HyShaderVariable::HYSHADERVAR_vec2);
+	m_pCheckerGridShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
+	m_pCheckerGridShader->AddVertexAttribute("attr_vUVcoord", HyShaderVariable::vec2);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
 	m_pCheckerGridShader->Finalize();
 
