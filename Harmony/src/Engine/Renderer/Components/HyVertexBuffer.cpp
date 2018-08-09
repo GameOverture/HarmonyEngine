@@ -52,6 +52,7 @@ void HyVertexBuffer::AppendDynamicData(const void *pData, uint32 uiSize)
 {
 	HyAssert((static_cast<uint32>(m_DynamicBuffer.m_pCurWritePosition - m_DynamicBuffer.m_pBUFFER) + uiSize) < HY_DYNAMIC_VERTEX_BUFFER_SIZE, "HyVertexBuffer::AppendDynamicData() has written passed its vertex bounds! Embiggen 'HY_DYNAMIC_VERTEX_BUFFER_SIZE'");
 	memcpy(m_DynamicBuffer.m_pCurWritePosition, pData, uiSize);
+	m_DynamicBuffer.m_pCurWritePosition += uiSize;
 }
 
 //HyVertexBufferHandle HyVertexBuffer::AddDataWithHandle(const uint8 *pData, uint32 uiSize)
