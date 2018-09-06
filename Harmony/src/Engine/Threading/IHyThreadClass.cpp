@@ -54,7 +54,7 @@ bool IHyThreadClass::ThreadStop()
 {
 	if(m_eThreadState != HYTHREADSTATE_Run && m_eThreadState != HYTHREADSTATE_ShouldExit)
 	{
-		HyLogWarning("IHyThreadClass::ThreadStop failed becaused thread state is not running.");
+		//HyLogWarning("IHyThreadClass::ThreadStop failed becaused thread state is not running.");
 		return false;
 	}
 
