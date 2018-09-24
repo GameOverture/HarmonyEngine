@@ -142,7 +142,7 @@ void EntityWidget::UpdateActions()
 	ExplorerItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
 	ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
 
-	bool bFrameIsSelected = ui->propertyTree->model() != nullptr && ui->propertyTree->currentIndex().row() >= 0;
+	bool bFrameIsSelected = pExplorerItem && pExplorerItem->GetType() == ITEM_Entity;
 	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
 	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
 	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);

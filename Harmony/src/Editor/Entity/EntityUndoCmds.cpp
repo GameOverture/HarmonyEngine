@@ -31,6 +31,7 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &itemRef, void *pParame
 
 		case ENTITYCMD_AddPrimitive: {
 			setText("Add Primitive");
+			m_pParameter = new EntityTreeItem(&m_pModel->GetTreeModel(), static_cast<ProjectItem *>(pParameter));
 		} break;
 	}
 }

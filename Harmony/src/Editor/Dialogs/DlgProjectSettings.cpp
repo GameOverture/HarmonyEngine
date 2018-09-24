@@ -42,8 +42,8 @@ QMap<QString, QJsonValue> DlgProjectSettings::sm_DefaultValues;
 	windowInfoObj.insert("Type", QJsonValue(0));
 	windowInfoObj.insert("ResolutionX", QJsonValue(1280));
 	windowInfoObj.insert("ResolutionY", QJsonValue(720));
-	windowInfoObj.insert("LocationX", QJsonValue(0));
-	windowInfoObj.insert("LocationY", QJsonValue(0));
+	windowInfoObj.insert("LocationX", QJsonValue(100));
+	windowInfoObj.insert("LocationY", QJsonValue(100));
 	windowInfoArray.append(windowInfoObj);
 	sm_DefaultValues["WindowInfoArray"] = windowInfoArray;
 }

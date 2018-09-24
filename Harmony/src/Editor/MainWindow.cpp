@@ -115,7 +115,6 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Restore workspace
 	ui->dockWidgetExplorer->show();
-	ui->dockWidgetAtlas->hide();
 	ui->dockWidgetAudio->hide();
 	ui->dockWidgetProperties->hide();
 
