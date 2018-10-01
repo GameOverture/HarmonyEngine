@@ -40,7 +40,7 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(pare
 	ui->childrenTree->setDragDropMode(QAbstractItemView::InternalMove);
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
-	ui->childrenTree->setModel(&pEntityModel->GetTreeModel());
+	pEntityModel->SetWidget(ui->childrenTree);
 
 	on_childrenTree_clicked(QModelIndex());
 
@@ -115,9 +115,9 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 		else
 		{
 			ui->lblSelectedItemIcon->setVisible(true);
-			ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+			ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetProjItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
 			ui->lblSelectedItemText->setVisible(true);
-			ui->lblSelectedItemText->setText(pTreeItem->GetItem()->GetName(false) % " Properties");
+			ui->lblSelectedItemText->setText(pTreeItem->GetProjItem()->GetName(false) % " Properties");
 
 			PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem);
 			ui->propertyTree->setModel(pPropertiesModel);
@@ -142,8 +142,13 @@ void EntityWidget::UpdateActions()
 	ExplorerItem *pExplorerItem = m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
 	ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
 
-	bool bFrameIsSelected = pExplorerItem && pExplorerItem->GetType() == ITEM_Entity;
+	EntityTreeItem *pSelectedItem = GetCurSelectedTreeItem();
+	ProjectItem *pSelectedProjItem = pSelectedItem ? pSelectedItem->GetProjItem() : nullptr;
+	bool bFrameIsSelected = pSelectedProjItem && pSelectedProjItem->GetType() == ITEM_Entity;
 	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
+
+	bFrameIsSelected = pSelectedProjItem;
+	ui->actionAddScissorBox->setEnabled(bFrameIsSelected);
 	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
 	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
 }

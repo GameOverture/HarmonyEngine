@@ -25,10 +25,9 @@ enum EntityCmd
 
 class EntityUndoCmd : public QUndoCommand
 {
-	// NOTE: Member order matters!
 	const EntityCmd     m_eCMD;
-	ProjectItem &       m_ItemRef;
-	void *              m_pParameter;
+	ProjectItem &       m_EntityItemRef;
+	EntityTreeItem *    m_pTreeItem;
 
 	EntityWidget *      m_pWidget;
 	EntityModel *       m_pModel;
@@ -37,7 +36,7 @@ class EntityUndoCmd : public QUndoCommand
 	int                 m_iRow;
 
 public:
-	EntityUndoCmd(EntityCmd eCMD, ProjectItem &itemRef, void *pParameter, QUndoCommand *pParent = 0);
+	EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, void *pParameter, QUndoCommand *pParent = 0);
 	virtual ~EntityUndoCmd();
 
 	virtual void redo() override;

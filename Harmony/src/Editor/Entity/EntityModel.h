@@ -44,15 +44,21 @@ class EntityModel : public IModel
 
 	EntityTreeModel         m_TreeModel;
 
+
+
 public:
 	EntityModel(ProjectItem &itemRef, QJsonArray stateArray);
 	virtual ~EntityModel();
 
-	EntityTreeModel &GetTreeModel();
+	//EntityTreeModel &GetTreeModel();
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem);
 
 	bool IsChildAddable(ProjectItem *pItem);
 	bool AddNewChild(ProjectItem *pItem);
+	bool InsertTreeItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem);
+	bool RemoveTreeItems(int iRow, int iCount, EntityTreeItem *pParentItem);
+
+	void SetWidget(QTreeView *pTreeView);
 
 	virtual void OnSave() override;
 	virtual QJsonObject PopStateAt(uint32 uiIndex) override;

@@ -257,6 +257,9 @@
     <ClCompile Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Primitive\PrimitiveModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
@@ -466,6 +469,9 @@
     <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <ClInclude Include="Primitive\PrimitiveModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">

@@ -22,14 +22,14 @@ class EntityTreeModel;
 
 class EntityTreeItem : public IModelTreeItem
 {
-	EntityTreeModel *           m_pTreeModel;
 	ProjectItem *               m_pItem;
 
+
 public:
-	explicit EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem);
+	explicit EntityTreeItem(ProjectItem *pItem);
 	virtual ~EntityTreeItem();
 
-	ProjectItem *GetItem();
+	ProjectItem *GetProjItem();
 
 	virtual QString GetToolTip() const override;
 };
@@ -64,7 +64,7 @@ public:
 	void InsertItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem);
 	void InsertItems(int iRow, QList<EntityTreeItem *> itemList, EntityTreeItem *pParentItem);
 
-	void RemoveItems(int iRow, int iCount, EntityTreeItem *pParentItem);
+	bool RemoveItems(int iRow, int iCount, EntityTreeItem *pParentItem);
 	bool removeRows(int iRow, int iCount, const QModelIndex &parentIndex = QModelIndex()) override;
 };
 

@@ -45,7 +45,7 @@ PropertiesTreeModel *EntityStateData::GetPropertiesModel(EntityTreeItem *pTreeIt
 	if(m_PropertiesMap.contains(pTreeItem) == false)
 	{
 		QVariant var(reinterpret_cast<qulonglong>(pTreeItem));
-		m_PropertiesMap[pTreeItem] = AllocNewPropertiesModel(m_ModelRef.GetItem(), var, pTreeItem->GetItem());
+		m_PropertiesMap[pTreeItem] = AllocNewPropertiesModel(m_ModelRef.GetItem(), var, pTreeItem->GetProjItem());
 	}
 
 	return m_PropertiesMap[pTreeItem];
@@ -172,10 +172,10 @@ EntityModel::EntityModel(ProjectItem &itemRef, QJsonArray stateArray) : IModel(i
 {
 }
 
-EntityTreeModel &EntityModel::GetTreeModel()
-{
-	return m_TreeModel;
-}
+//EntityTreeModel &EntityModel::GetTreeModel()
+//{
+//	return m_TreeModel;
+//}
 
 PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem)
 {
@@ -209,6 +209,24 @@ bool EntityModel::AddNewChild(ProjectItem *pItem)
 //		m_StateList[i]->
 
 	return true;
+}
+
+bool EntityModel::InsertTreeItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem)
+{
+	if(IsChildAddable(pItem->GetProjItem()) == false)
+		return false;
+
+	m_TreeModel.InsertItem(iRow, pItem, pParentItem);
+}
+
+bool EntityModel::RemoveTreeItems(int iRow, int iCount, EntityTreeItem *pParentItem)
+{
+	return m_TreeModel.RemoveItems(iRow, iCount, pParentItem);
+}
+
+void EntityModel::SetWidget(QTreeView *pTreeView)
+{
+	pTreeView->setModel(&m_TreeModel);
 }
 
 /*virtual*/ void EntityModel::OnSave() /*override*/

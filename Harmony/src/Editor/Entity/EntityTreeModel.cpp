@@ -10,8 +10,7 @@
 #include "EntityTreeModel.h"
 #include "EntityModel.h"
 
-EntityTreeItem::EntityTreeItem(EntityTreeModel *pTreeModel, ProjectItem *pItem) :   m_pTreeModel(pTreeModel),
-																					m_pItem(pItem)
+EntityTreeItem::EntityTreeItem(ProjectItem *pItem) :	m_pItem(pItem)
 {
 }
 
@@ -19,7 +18,7 @@ EntityTreeItem::~EntityTreeItem()
 {
 }
 
-ProjectItem *EntityTreeItem::GetItem()
+ProjectItem *EntityTreeItem::GetProjItem()
 {
 	return m_pItem;
 }
@@ -34,8 +33,8 @@ ProjectItem *EntityTreeItem::GetItem()
 EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, QObject *parent) :  QAbstractItemModel(parent),
 																											m_pEntityModel(pEntityModel)
 {
-	m_pRootNode = new EntityTreeItem(this, nullptr);
-	m_pRootItem = new EntityTreeItem(this, &entityItemRef);
+	m_pRootNode = new EntityTreeItem(nullptr);
+	m_pRootItem = new EntityTreeItem(&entityItemRef);
 
 	InsertItem(0, m_pRootItem, m_pRootNode);
 }
@@ -48,7 +47,7 @@ EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityI
 
 ProjectItem *EntityTreeModel::GetRootItem()
 {
-	return m_pRootItem->GetItem();
+	return m_pRootItem->GetProjItem();
 }
 
 QModelIndex EntityTreeModel::index(int iRow, int iColumn, const QModelIndex &parent) const
@@ -114,9 +113,9 @@ QVariant EntityTreeModel::data(const QModelIndex &index, int iRole /*= Qt::Displ
 	switch(iRole)
 	{
 	case Qt::DisplayRole:
-		return pTreeItem->GetItem()->GetName(false);
+		return pTreeItem->GetProjItem()->GetName(false);
 	case Qt::DecorationRole:
-		return pTreeItem->GetItem()->GetIcon(SUBICON_None);
+		return pTreeItem->GetProjItem()->GetIcon(SUBICON_None);
 	case Qt::ToolTipRole:
 		return pTreeItem->GetToolTip();
 	}
@@ -126,7 +125,7 @@ QVariant EntityTreeModel::data(const QModelIndex &index, int iRole /*= Qt::Displ
 
 void EntityTreeModel::AddItem(ProjectItem *pProjectItem)
 {
-	EntityTreeItem *pNewTreeItem = new EntityTreeItem(this, pProjectItem);
+	EntityTreeItem *pNewTreeItem = new EntityTreeItem(pProjectItem);
 	InsertItem(m_pRootNode->GetNumChildren(), pNewTreeItem, m_pRootItem);
 }
 
@@ -157,9 +156,9 @@ void EntityTreeModel::InsertItems(int iRow, QList<EntityTreeItem *> itemList, En
 	endInsertRows();
 }
 
-void EntityTreeModel::RemoveItems(int iRow, int iCount, EntityTreeItem *pParentItem)
+bool EntityTreeModel::RemoveItems(int iRow, int iCount, EntityTreeItem *pParentItem)
 {
-	removeRows(iRow, iCount, pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex());
+	return removeRows(iRow, iCount, pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex());
 }
 
 bool EntityTreeModel::removeRows(int iRow, int iCount, const QModelIndex &parentIndex)

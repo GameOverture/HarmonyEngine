@@ -23,6 +23,7 @@
 #include "PrefabDraw.h"
 #include "EntityWidget.h"
 #include "EntityDraw.h"
+#include "PrimitiveModel.h"
 
 #include <QMenu>
 #include <QJsonDocument>
@@ -92,6 +93,9 @@ void ProjectItem::LoadModel()
 		break;
 	case ITEM_Prefab:
 		m_pModel = new PrefabModel(*this, m_SaveValue);
+		break;
+	case ITEM_Primitive:
+		m_pModel = new PrimitiveModel(*this);
 		break;
 	default:
 		HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);
