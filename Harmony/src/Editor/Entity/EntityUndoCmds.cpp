@@ -11,13 +11,14 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 
-EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, void *pParameter, QUndoCommand *pParent /*= 0*/) :		QUndoCommand(pParent),
-																																m_eCMD(eCMD),
-																																m_EntityItemRef(entityItemRef),
-																																m_pWidget(static_cast<EntityWidget *>(entityItemRef.GetWidget())),
-																																m_pModel(static_cast<EntityModel *>(entityItemRef.GetModel())),
-																																m_pParentTreeItem(static_cast<EntityWidget *>(entityItemRef.GetWidget())->GetCurSelectedTreeItem()),
-																																m_iRow(0)
+EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, ProjectItem *pParameter, QUndoCommand *pParent /*= 0*/) :	QUndoCommand(pParent),
+																																	m_eCMD(eCMD),
+																																	m_EntityItemRef(entityItemRef),
+																																	m_pTreeItem(nullptr),
+																																	m_pWidget(static_cast<EntityWidget *>(entityItemRef.GetWidget())),
+																																	m_pModel(static_cast<EntityModel *>(entityItemRef.GetModel())),
+																																	m_pParentTreeItem(static_cast<EntityWidget *>(entityItemRef.GetWidget())->GetCurSelectedTreeItem()),
+																																	m_iRow(0)
 {
 	if(m_EntityItemRef.GetType() != ITEM_Entity)
 		HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_EntityItemRef.GetType()) , LOGTYPE_Error);
@@ -26,20 +27,21 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, void *p
 	{
 	case ENTITYCMD_AddNewChild:
 		setText("Add New Child");
+		m_pTreeItem = new EntityTreeItem(pParameter);
 		break;
 
 	case ENTITYCMD_AddPrimitive:
 		setText("Add Primitive");
 		if(pParameter == nullptr)
 			pParameter = new ProjectItem(m_EntityItemRef.GetProject(), ITEM_Primitive, nullptr, "Primitive", QJsonValue(), false);
+		m_pTreeItem = new EntityTreeItem(pParameter);
 		break;
 	}
-
-	m_pTreeItem = new EntityTreeItem(static_cast<ProjectItem *>(pParameter));
 }
 
 /*virtual*/ EntityUndoCmd::~EntityUndoCmd()
 {
+	delete m_pTreeItem;
 }
 
 /*virtual*/ void EntityUndoCmd::redo() /*override*/

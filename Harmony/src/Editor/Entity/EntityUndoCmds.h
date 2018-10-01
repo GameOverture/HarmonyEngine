@@ -36,7 +36,7 @@ class EntityUndoCmd : public QUndoCommand
 	int                 m_iRow;
 
 public:
-	EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, void *pParameter, QUndoCommand *pParent = 0);
+	EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, ProjectItem *pParameter, QUndoCommand *pParent = 0);
 	virtual ~EntityUndoCmd();
 
 	virtual void redo() override;
