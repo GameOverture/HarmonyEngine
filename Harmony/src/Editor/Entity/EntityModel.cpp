@@ -224,6 +224,19 @@ bool EntityModel::RemoveTreeItems(int iRow, int iCount, EntityTreeItem *pParentI
 	return m_TreeModel.RemoveItems(iRow, iCount, pParentItem);
 }
 
+const QList<ProjectItem *> &EntityModel::GetPrimitiveList()
+{
+	return m_PrimitiveList;
+}
+
+ProjectItem *EntityModel::CreateNewPrimitive()
+{
+	ProjectItem *pNewPrimitiveItem = new ProjectItem(m_ItemRef.GetProject(), ITEM_Primitive, nullptr, "Primitive", QJsonValue(), false);
+	m_PrimitiveList.push_back(pNewPrimitiveItem);
+
+	return pNewPrimitiveItem;
+}
+
 void EntityModel::SetWidget(QTreeView *pTreeView)
 {
 	pTreeView->setModel(&m_TreeModel);

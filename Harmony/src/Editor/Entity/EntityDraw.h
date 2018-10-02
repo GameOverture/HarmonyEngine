@@ -11,12 +11,15 @@
 #define ENTITYDRAW_H
 
 #include "IDraw.h"
+#include "EntityModel.h"
 
 class EntityDraw : public IDraw
 {
 public:
 	EntityDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
 	virtual ~EntityDraw();
+
+	void Sync();
 
 protected:
 	virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;

@@ -32,8 +32,6 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, Project
 
 	case ENTITYCMD_AddPrimitive:
 		setText("Add Primitive");
-		if(pParameter == nullptr)
-			pParameter = new ProjectItem(m_EntityItemRef.GetProject(), ITEM_Primitive, nullptr, "Primitive", QJsonValue(), false);
 		m_pTreeItem = new EntityTreeItem(pParameter);
 		break;
 	}

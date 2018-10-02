@@ -18,6 +18,15 @@ EntityDraw::EntityDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 {
 }
 
+void EntityDraw::Sync()
+{
+	const QList<ProjectItem *> &primitiveListRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetPrimitiveList();
+	for(uint i = 0; i < primitiveListRef.size(); ++i)
+	{
+
+	}
+}
+
 /*virtual*/ void EntityDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
 {
 }

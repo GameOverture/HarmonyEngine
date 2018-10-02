@@ -188,7 +188,7 @@ void EntityWidget::on_actionAddPrimitive_triggered()
 		return;
 	}
 
-	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, nullptr);
+	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, static_cast<EntityModel *>(m_ItemRef.GetModel())->CreateNewPrimitive());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

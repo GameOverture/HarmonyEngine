@@ -42,8 +42,8 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	EntityTreeModel         m_TreeModel;
-
+	EntityTreeModel			m_TreeModel;
+	QList<ProjectItem *>	m_PrimitiveList;
 
 
 public:
@@ -57,6 +57,9 @@ public:
 	bool AddNewChild(ProjectItem *pItem);
 	bool InsertTreeItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem);
 	bool RemoveTreeItems(int iRow, int iCount, EntityTreeItem *pParentItem);
+
+	const QList<ProjectItem *> &GetPrimitiveList();
+	ProjectItem *CreateNewPrimitive();
 
 	void SetWidget(QTreeView *pTreeView);
 
