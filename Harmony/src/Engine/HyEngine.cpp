@@ -82,6 +82,11 @@ HyEngine::~HyEngine()
 	while(sm_pInstance->Update())
 	{ }
 
+#ifndef HY_PLATFORM_GUI
+	// This return is temporarly here until thread cleanup is done properly
+	return;
+#endif
+
 	pGame->Shutdown();
 	delete pGame;
 
