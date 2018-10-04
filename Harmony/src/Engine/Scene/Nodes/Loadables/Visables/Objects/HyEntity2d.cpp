@@ -12,6 +12,13 @@
 #include "Renderer/Effects/HyStencil.h"
 #include "HyEngine.h"
 
+HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyVisable2d(HYTYPE_Entity2d, szPrefix, szName, pParent),
+																										m_uiAttributes(0),
+																										m_eMouseInputState(MOUSEINPUT_None),
+																										m_pMouseInputUserParam(nullptr)
+{
+}
+
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyVisable2d(HYTYPE_Entity2d, nullptr, nullptr, pParent),
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
@@ -331,6 +338,8 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 
 /*virtual*/ void HyEntity2d::Load() /*override*/
 {
+	AcquireData();
+
 	// Load any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
