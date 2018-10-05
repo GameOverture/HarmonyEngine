@@ -194,14 +194,14 @@ void HyDiagnostics::DumpNodeUsage()
 	{
 		switch(loadedNodesList[i]->GetType())
 		{
-		case HYTYPE_Sound2d:		uiNumSound2d++;			break;
-		case HYTYPE_Particles2d:	uiNumParticles2d++;		break;
-		case HYTYPE_Sprite2d:		uiNumSprite2d++;		break;
-		case HYTYPE_Spine2d:		uiNumSpine2d++;			break;
-		case HYTYPE_TexturedQuad2d:	uiNumTextureQuad2d++;	break;
-		case HYTYPE_Primitive2d:	uiNumPrimitive2d++;		break;
-		case HYTYPE_Text2d:			uiNumText2d++;			break;
-		case HYTYPE_Prefab3d:		uiNumPrefab3d++;		break;
+		case HYTYPE_Sound:		uiNumSound2d++;			break;
+		case HYTYPE_Particles:	uiNumParticles2d++;		break;
+		case HYTYPE_Sprite:		uiNumSprite2d++;		break;
+		case HYTYPE_Spine:		uiNumSpine2d++;			break;
+		case HYTYPE_TexturedQuad:	uiNumTextureQuad2d++;	break;
+		case HYTYPE_Primitive:	uiNumPrimitive2d++;		break;
+		case HYTYPE_Text:			uiNumText2d++;			break;
+		case HYTYPE_Prefab:		uiNumPrefab3d++;		break;
 		}
 	}
 

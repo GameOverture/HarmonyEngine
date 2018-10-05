@@ -7,8 +7,8 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HyEnt2dData_h__
-#define HyEnt2dData_h__
+#ifndef HySpine2dData_h__
+#define HySpine2dData_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
@@ -36,4 +36,4 @@ public:
 	void AnimInitBlend(uint32 uiAnimIdFrom, uint32 uiAnimIdTo, float fInterpDur);
 };
 
-#endif /* HyEnt2dData_h__ */
+#endif /* HySpine2dData_h__ */

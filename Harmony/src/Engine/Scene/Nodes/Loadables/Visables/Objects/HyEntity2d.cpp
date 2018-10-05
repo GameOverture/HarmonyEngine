@@ -10,16 +10,17 @@
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
 #include "Scene/HyScene.h"
 #include "Renderer/Effects/HyStencil.h"
+#include "Assets/Nodes/HyEntityData.h"
 #include "HyEngine.h"
 
-HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyVisable2d(HYTYPE_Entity2d, szPrefix, szName, pParent),
+HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyVisable2d(HYTYPE_Entity, szPrefix, szName, pParent),
 																										m_uiAttributes(0),
 																										m_eMouseInputState(MOUSEINPUT_None),
 																										m_pMouseInputUserParam(nullptr)
 {
 }
 
-HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyVisable2d(HYTYPE_Entity2d, nullptr, nullptr, pParent),
+HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyVisable2d(HYTYPE_Entity, nullptr, nullptr, pParent),
 															m_uiAttributes(0),
 															m_eMouseInputState(MOUSEINPUT_None),
 															m_pMouseInputUserParam(nullptr)
@@ -210,7 +211,7 @@ void HyEntity2d::ChildAppend(IHyNode2d &childInst)
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
 		if((*iter) == &insertBefore || 
-		   ((*iter)->GetType() == HYTYPE_Entity2d && static_cast<HyEntity2d *>(*iter)->ChildExists(insertBefore)))
+		   ((*iter)->GetType() == HYTYPE_Entity && static_cast<HyEntity2d *>(*iter)->ChildExists(insertBefore)))
 		{
 			childInst.ParentDetach();
 			childInst.m_pParent = this;
@@ -230,7 +231,7 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
 		if((*iter) == &childRef ||
-		   ((*iter)->GetType() == HYTYPE_Entity2d && static_cast<HyEntity2d *>(*iter)->ChildExists(childRef)))
+		   ((*iter)->GetType() == HYTYPE_Entity && static_cast<HyEntity2d *>(*iter)->ChildExists(childRef)))
 		{
 			return true;
 		}
@@ -277,7 +278,7 @@ void HyEntity2d::ForEachChild(std::function<void(IHyNode2d *)> func)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(m_ChildList[i]->GetType() == HYTYPE_Entity2d)
+		if(m_ChildList[i]->GetType() == HYTYPE_Entity)
 			static_cast<HyEntity2d *>(m_ChildList[i])->ForEachChild(func);
 	}
 }
@@ -338,7 +339,7 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 
 /*virtual*/ void HyEntity2d::Load() /*override*/
 {
-	AcquireData();
+	IHyLoadable::Load();
 
 	// Load any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
@@ -350,6 +351,8 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 
 /*virtual*/ void HyEntity2d::Unload() /*override*/
 {
+	IHyLoadable::Unload();
+
 	// Unload any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
@@ -423,6 +426,12 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	}
 
 	OnUpdate();
+}
+
+/*virtual*/ void HyEntity2d::OnDataAcquired() /*override*/
+{
+	const HyEntityData *pData = static_cast<const HyEntityData *>(UncheckedGetData());
+	//pData->
 }
 
 void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)

@@ -91,6 +91,7 @@ public:
 	
 protected:
 	virtual void NodeUpdate() override final;
+	virtual void OnDataAcquired() override;
 
 	void SetNewChildAttributes(IHyNode2d &childInst);
 

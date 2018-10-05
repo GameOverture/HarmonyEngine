@@ -11,6 +11,7 @@
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
+#include "Assets/Nodes/HyEntityData.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
 #include "Assets/Nodes/HySprite2dData.h"
@@ -152,16 +153,19 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 {
 	switch(pLoadable->_LoadableGetType())
 	{
-	case HYTYPE_Sprite2d:
+	case HYTYPE_Entity:
+		pDataOut = m_EntityFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+		break;
+	case HYTYPE_Sprite:
 		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
-	case HYTYPE_Text2d:
+	case HYTYPE_Text:
 		pDataOut = m_FontFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
-	case HYTYPE_Prefab3d:
+	case HYTYPE_Prefab:
 		pDataOut = m_PrefabFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
-	case HYTYPE_TexturedQuad2d:
+	case HYTYPE_TexturedQuad:
 		if(pLoadable->GetName() != "raw")
 		{
 			std::pair<uint32, uint32> key(std::stoi(pLoadable->GetPrefix()), std::stoi(pLoadable->GetName()));

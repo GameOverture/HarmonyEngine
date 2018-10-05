@@ -13,7 +13,7 @@
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
-HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Sprite2d, szPrefix, szName, pParent),
+HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Sprite, szPrefix, szName, pParent),
 																						m_bIsAnimPaused(false),
 																						m_fAnimPlayRate(1.0f),
 																						m_fElapsedFrameTime(0.0f),
@@ -405,8 +405,6 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 /*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
 {
-	IHyDrawable2d::OnDataAcquired();
-
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(UncheckedGetData());
 	uint32 uiNumStates = pData->GetNumStates();
 

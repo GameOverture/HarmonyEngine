@@ -23,6 +23,7 @@
 class IHyRenderer;
 class IHyLoadable;
 class IHyNodeData;
+class HyEntityData;
 class HyAudioData;
 class HySprite2dData;
 class HySpine2dData;
@@ -52,6 +53,7 @@ class HyAssets : public IHyThreadClass
 		void Init(const jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
 		const tData *GetData(const std::string &sPrefix, const std::string &sName) const;
 	};
+	Factory<HyEntityData>										m_EntityFactory;
 	Factory<HySprite2dData>										m_SpriteFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
 	Factory<HyText2dData>										m_FontFactory;

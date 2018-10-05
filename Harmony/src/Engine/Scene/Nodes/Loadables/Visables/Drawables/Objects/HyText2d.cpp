@@ -16,7 +16,7 @@
 
 #define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Text2d, szPrefix, szName, pParent),
+HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Text, szPrefix, szName, pParent),
 																					m_bIsDirty(false),
 																					m_sRawString(""),
 																					m_uiCurFontState(0),
@@ -371,8 +371,6 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnDataAcquired() /*override*/
 {
-	IHyDrawable2d::OnDataAcquired();
-
 	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
 
 	for(uint32 i = 0; i < m_StateColors.size(); ++i)

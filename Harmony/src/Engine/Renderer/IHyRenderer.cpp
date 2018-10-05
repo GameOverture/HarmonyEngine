@@ -79,7 +79,7 @@ void IHyRenderer::PrepareBuffers()
 
 void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask)
 {
-	if(instanceRef.GetType() != HYTYPE_Prefab3d)
+	if(instanceRef.GetType() != HYTYPE_Prefab)
 	{
 		HyError("IHyRenderer::AppendDrawable3d - Unknown instance type");
 		return;
@@ -94,18 +94,18 @@ void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCa
 	uint32 uiNumInstances, uiNumVerticesPerInstance;
 	switch(instanceRef.GetType())
 	{
-	case HYTYPE_Sprite2d:
-	case HYTYPE_TexturedQuad2d:
+	case HYTYPE_Sprite:
+	case HYTYPE_TexturedQuad:
 		uiNumInstances = 1;
 		uiNumVerticesPerInstance = 4;
 		break;
 
-	case HYTYPE_Primitive2d:
+	case HYTYPE_Primitive:
 		uiNumInstances = 1;
 		uiNumVerticesPerInstance = static_cast<HyPrimitive2d &>(instanceRef).GetNumVerts();
 		break;
 		
-	case HYTYPE_Text2d:
+	case HYTYPE_Text:
 		uiNumInstances = static_cast<HyText2d &>(instanceRef).GetNumRenderQuads();
 		uiNumVerticesPerInstance = 4;
 		break;
@@ -149,15 +149,15 @@ HyShaderHandle IHyRenderer::GetDefaultShaderHandle(HyType eType)
 {
 	switch(eType)
 	{
-	case HYTYPE_Sprite2d:
-	case HYTYPE_TexturedQuad2d:
-	case HYTYPE_Text2d:
+	case HYTYPE_Sprite:
+	case HYTYPE_TexturedQuad:
+	case HYTYPE_Text:
 		return m_pShaderQuadBatch->GetHandle();
 
-	case HYTYPE_Primitive2d:
+	case HYTYPE_Primitive:
 		return m_pShaderPrimitive->GetHandle();
 
-	case HYTYPE_Prefab3d:
+	case HYTYPE_Prefab:
 		return HYTYPE_Unknown; // TODO: write proper shader
 
 	default:

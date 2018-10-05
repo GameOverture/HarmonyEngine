@@ -213,13 +213,13 @@ HyRendererInterop &HyEngine::GetRenderer()
 {
 	switch(eType)
 	{
-	case HYTYPE_Particles2d:
-	case HYTYPE_Sprite2d:
-	case HYTYPE_Spine2d:
-	case HYTYPE_TexturedQuad2d:
-	case HYTYPE_Primitive2d:
-	case HYTYPE_Text2d:
-	case HYTYPE_Prefab3d:
+	case HYTYPE_Particles:
+	case HYTYPE_Sprite:
+	case HYTYPE_Spine:
+	case HYTYPE_TexturedQuad:
+	case HYTYPE_Primitive:
+	case HYTYPE_Text:
+	case HYTYPE_Prefab:
 		return true;
 	}
 

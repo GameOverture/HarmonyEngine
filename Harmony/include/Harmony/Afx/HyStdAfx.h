@@ -54,18 +54,16 @@ enum HyType
 {
 	HYTYPE_Unknown = 0,
 
-	HYTYPE_Sound2d,
-	HYTYPE_Particles2d,
-	HYTYPE_Sprite2d,
-	HYTYPE_Spine2d,
-	HYTYPE_TexturedQuad2d,
-	HYTYPE_Primitive2d,
-	HYTYPE_Text2d,
-	HYTYPE_Prefab3d,
-	HYTYPE_Entity2d,
-	HYTYPE_Entity3d,
-	HYTYPE_Camera2d,
-	HYTYPE_Camera3d
+	HYTYPE_Sound,
+	HYTYPE_Particles,
+	HYTYPE_Sprite,
+	HYTYPE_Spine,
+	HYTYPE_TexturedQuad,
+	HYTYPE_Primitive,
+	HYTYPE_Text,
+	HYTYPE_Prefab,
+	HYTYPE_Entity,
+	HYTYPE_Camera
 };
 
 enum HyShapeType

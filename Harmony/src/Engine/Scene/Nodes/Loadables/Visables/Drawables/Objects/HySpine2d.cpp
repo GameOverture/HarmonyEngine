@@ -12,7 +12,7 @@
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
 #include "Scene/HyScene.h"
 
-HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Spine2d, szPrefix, szName, pParent),
+HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Spine, szPrefix, szName, pParent),
 																						m_pSpineSkeleton(NULL),
 																						m_ppSpineAnims(NULL),
 																						m_ppAnimStates(NULL),

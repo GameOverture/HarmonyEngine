@@ -243,6 +243,9 @@
     <ClCompile Include="Renderer\Components\HyRenderBuffer.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Assets\Nodes\HyEntityData.cpp">
+      <Filter>Assets\Nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -656,6 +659,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyRenderBuffer.h">
       <Filter>Renderer\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyEntityData.h">
+      <Filter>Assets\Nodes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

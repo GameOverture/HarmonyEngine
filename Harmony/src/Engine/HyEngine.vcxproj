@@ -40,6 +40,7 @@
     <ClCompile Include="Assets\Loadables\HyAtlasIndices.cpp" />
     <ClCompile Include="Assets\Loadables\HyGLTF.cpp" />
     <ClCompile Include="Assets\Nodes\HyAudioData.cpp" />
+    <ClCompile Include="Assets\Nodes\HyEntityData.cpp" />
     <ClCompile Include="Assets\Nodes\HyPrefabData.cpp" />
     <ClCompile Include="Assets\Nodes\HySpine2dData.cpp" />
     <ClCompile Include="Assets\Nodes\HySprite2dData.cpp" />
@@ -137,6 +138,7 @@
     <ClInclude Include="..\..\include\Harmony\Assets\Loadables\HyGLTF.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Loadables\IHyLoadableData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyAudioData.h" />
+    <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyEntityData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyPrefabData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HySpine2dData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HySprite2dData.h" />

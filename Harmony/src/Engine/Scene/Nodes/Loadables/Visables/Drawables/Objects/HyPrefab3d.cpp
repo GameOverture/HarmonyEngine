@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrefab3d.h"
 
-HyPrefab3d::HyPrefab3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) : IHyDrawable3d(HYTYPE_Prefab3d, szPrefix, szName, pParent)
+HyPrefab3d::HyPrefab3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) : IHyDrawable3d(HYTYPE_Prefab, szPrefix, szName, pParent)
 {
 }
 

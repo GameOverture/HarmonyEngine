@@ -40,7 +40,7 @@ uint32 IHyCamera::GetCameraBitFlag()
 	return m_uiCullMaskBit;
 }
 
-HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyNode2d(HYTYPE_Camera2d, nullptr),
+HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyNode2d(HYTYPE_Camera, nullptr),
 											IHyCamera(pWindow)
 { }
 
@@ -94,7 +94,7 @@ const b2AABB &HyCamera2d::GetWorldViewBounds()
 {
 }
 
-HyCamera3d::HyCamera3d(HyWindow *pWindow) : IHyNode3d(HYTYPE_Camera3d, nullptr),
+HyCamera3d::HyCamera3d(HyWindow *pWindow) : IHyNode3d(HYTYPE_Camera, nullptr),
 											IHyCamera(pWindow)
 { }
 

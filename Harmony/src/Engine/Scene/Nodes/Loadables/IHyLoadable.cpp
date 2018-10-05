@@ -8,6 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
+#include "Diagnostics/Console/HyConsole.h"
 #include "Assets/HyAssets.h"
 
 /*static*/ HyAssets *IHyLoadable::sm_pHyAssets = nullptr;
@@ -65,10 +66,10 @@ const IHyNodeData *IHyLoadable::AcquireData()
 		HyAssert(sm_pHyAssets != nullptr, "AcquireData was called before the engine has initialized HyAssets");
 
 		sm_pHyAssets->AcquireNodeData(this, m_pData);
-		if(m_pData || _LoadableGetType() == HYTYPE_Primitive2d || _LoadableGetType() == HYTYPE_Entity2d)
+		if(m_pData)
 			OnDataAcquired();
 		else
-			HyError("Could not find data for: " << GetPrefix() << "/" << GetName());
+			HyLogInfo("Could not find data for: " << GetPrefix() << "/" << GetName());
 	}
 
 	return m_pData;
@@ -84,7 +85,7 @@ const IHyNodeData *IHyLoadable::AcquireData()
 	HyAssert(sm_pHyAssets, "IHyLoadable2d::Load was invoked before engine has been initialized");
 
 	// Don't load if the name is blank, and it's required by this node type
-	if(m_sName.empty() && _LoadableGetType() != HYTYPE_Entity2d && _LoadableGetType() != HYTYPE_Primitive2d && _LoadableGetType() != HYTYPE_TexturedQuad2d)
+	if(m_sName.empty() && _LoadableGetType() != HYTYPE_Entity && _LoadableGetType() != HYTYPE_Primitive && _LoadableGetType() != HYTYPE_TexturedQuad)
 		return;
 
 	sm_pHyAssets->LoadNodeData(this);
