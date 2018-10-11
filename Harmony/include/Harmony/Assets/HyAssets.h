@@ -59,8 +59,8 @@ class HyAssets : public IHyThreadClass
 	Factory<HyText2dData>										m_FontFactory;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
-	std::vector<IHyLoadable *>									m_QueuedInst2dList;
-	std::vector<IHyLoadable *>									m_FullyLoadedList;
+	std::vector<IHyLoadable *>									m_QueuedInstList;
+	std::vector<IHyLoadable *>									m_LoadedInstList;
 	std::vector<IHyLoadableData *>								m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
@@ -109,7 +109,7 @@ private:
 	void DequeData(IHyLoadableData *pData);
 	void FinalizeData(IHyLoadableData *pData);
 
-	void SetInstAsLoaded(IHyLoadable *pLoadable);
+	void SetAsLoaded(IHyLoadable *pLoadable);
 };
 
 #endif /* HyAssets_h__ */

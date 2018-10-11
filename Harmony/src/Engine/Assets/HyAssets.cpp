@@ -187,8 +187,7 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 
 	bool bFullyLoaded = true;
 
-
-	// Check whether all the required atlases are loaded
+	// Check whether all the required data/assets are loaded
 	if(pLoadable->AcquireData() != nullptr)
 	{
 		const HyAtlasIndices &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
@@ -218,14 +217,14 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 	}
 
 	// Set the node's 'm_eLoadState' appropriately below to prevent additional Loads
-	if(bFullyLoaded == false) // Could also use IsInstLoaded() here
+	if(bFullyLoaded == false && pLoadable->_LoadableGetType() != HYTYPE_Entity)
 	{
 		pLoadable->m_eLoadState = HYLOADSTATE_Queued;
-		m_QueuedInst2dList.push_back(pLoadable);
+		m_QueuedInstList.push_back(pLoadable);
 	}
 	else
 	{
-		SetInstAsLoaded(pLoadable);
+		SetAsLoaded(pLoadable);
 	}
 }
 
@@ -249,23 +248,23 @@ void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 
 	if(pLoadable->m_eLoadState == HYLOADSTATE_Queued)
 	{
-		for(auto it = m_QueuedInst2dList.begin(); it != m_QueuedInst2dList.end(); ++it)
+		for(auto it = m_QueuedInstList.begin(); it != m_QueuedInstList.end(); ++it)
 		{
 			if((*it) == pLoadable)
 			{
-				m_QueuedInst2dList.erase(it);
+				m_QueuedInstList.erase(it);
 				break;
 			}
 		}
 	}
 
 	// Remove from fully loaded list
-	for(auto it = m_FullyLoadedList.begin(); it != m_FullyLoadedList.end(); ++it)
+	for(auto it = m_LoadedInstList.begin(); it != m_LoadedInstList.end(); ++it)
 	{
 		if((*it) == pLoadable)
 		{
 			// TODO: Log about erasing instance
-			m_FullyLoadedList.erase(it);
+			m_LoadedInstList.erase(it);
 			break;
 		}
 	}
@@ -296,10 +295,10 @@ bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 void HyAssets::Shutdown()
 {
 	std::vector<IHyLoadable *> vReloadInsts;
-	vReloadInsts = m_FullyLoadedList;
+	vReloadInsts = m_LoadedInstList;
 
-	for(uint32 i = 0; i < m_QueuedInst2dList.size(); ++i)
-		vReloadInsts.push_back(m_QueuedInst2dList[i]);
+	for(uint32 i = 0; i < m_QueuedInstList.size(); ++i)
+		vReloadInsts.push_back(m_QueuedInstList[i]);
 
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();
@@ -583,12 +582,12 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 			}
 
 			// TODO: Check if there's lots of overhead here checking queued list upon every loaded piece of data that comes through
-			for(auto iter = m_QueuedInst2dList.begin(); iter != m_QueuedInst2dList.end(); /*++iter*/) // Increment is handled within loop
+			for(auto iter = m_QueuedInstList.begin(); iter != m_QueuedInstList.end(); /*++iter*/) // Increment is handled within loop
 			{
 				if(IsInstLoaded(*iter))
 				{
-					SetInstAsLoaded(*iter);
-					iter = m_QueuedInst2dList.erase(iter);
+					SetAsLoaded(*iter);
+					iter = m_QueuedInstList.erase(iter);
 				}
 				else
 					++iter;
@@ -633,11 +632,12 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 	}
 }
 
-void HyAssets::SetInstAsLoaded(IHyLoadable *pLoadable)
+void HyAssets::SetAsLoaded(IHyLoadable *pLoadable)
 {
 	pLoadable->m_eLoadState = HYLOADSTATE_Loaded;
 	pLoadable->OnLoaded();
 	pLoadable->DrawLoadedUpdate();
 
-	m_FullyLoadedList.push_back(pLoadable);
+	if(pLoadable->_LoadableGetType() != HYTYPE_Entity)
+		m_LoadedInstList.push_back(pLoadable);
 }
