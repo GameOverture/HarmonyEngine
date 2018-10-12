@@ -36,7 +36,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Assets\HyAssets.cpp" />
-    <ClCompile Include="Assets\Loadables\HyAtlas.cpp" />
+    <ClCompile Include="Assets\Loadables\HyAtlas.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IntrinsicFunctions>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
     <ClCompile Include="Assets\Loadables\HyAtlasIndices.cpp" />
     <ClCompile Include="Assets\Loadables\HyGLTF.cpp" />
     <ClCompile Include="Assets\Nodes\HyAudioData.cpp" />
