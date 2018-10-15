@@ -250,6 +250,8 @@ void HySprite2d::AnimSetCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 float HySprite2d::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
 {
 	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	if(frameRef.pAtlas == nullptr)
+		return 0.0f;
 
 	return frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * (bIncludeScaling ? scale.X() : 1.0f);
 }
@@ -257,6 +259,8 @@ float HySprite2d::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
 float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 {
 	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	if(frameRef.pAtlas == nullptr)
+		return 0.0f;
 
 	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * (bIncludeScaling ? scale.Y() : 1.0f);
 }
