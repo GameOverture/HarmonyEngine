@@ -185,9 +185,8 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 	if(pLoadable->m_eLoadState != HYLOADSTATE_Inactive || pLoadable->IsLoadDataValid() == false)
 		return;
 
+	// Check whether all the required data/assets are loaded to confirm we're fully loaded
 	bool bFullyLoaded = true;
-
-	// Check whether all the required data/assets are loaded
 	if(pLoadable->AcquireData() != nullptr)
 	{
 		const HyAtlasIndices &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
@@ -217,7 +216,14 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 	}
 
 	// Set the node's 'm_eLoadState' appropriately below to prevent additional Loads
-	if(bFullyLoaded == false && pLoadable->_LoadableGetType() != HYTYPE_Entity)
+	if(pLoadable->_LoadableGetType() == HYTYPE_Entity)
+	{
+		if(pLoadable->IsLoaded())
+			SetAsLoaded(pLoadable);
+		else
+			m_QueuedEntityList.push_back(pLoadable);
+	}
+	if(bFullyLoaded == false)
 	{
 		pLoadable->m_eLoadState = HYLOADSTATE_Queued;
 		m_QueuedInstList.push_back(pLoadable);
@@ -297,6 +303,8 @@ void HyAssets::Shutdown()
 	std::vector<IHyLoadable *> vReloadInsts;
 	vReloadInsts = m_LoadedInstList;
 
+	m_QueuedEntityList.clear();
+
 	for(uint32 i = 0; i < m_QueuedInstList.size(); ++i)
 		vReloadInsts.push_back(m_QueuedInstList[i]);
 
@@ -337,6 +345,19 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		}
 	}
 
+	if(m_QueuedEntityList.empty() == false)
+	{
+		for(auto iter = m_QueuedEntityList.begin(); iter != m_QueuedEntityList.end();)
+		{
+			if((*iter)->IsLoaded())
+			{
+				SetAsLoaded(*iter);
+				iter = m_QueuedEntityList.erase(iter);
+			}
+			else
+				++iter;
+		}
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check to see if any loaded data (from the load thread) is ready to uploaded to graphics card

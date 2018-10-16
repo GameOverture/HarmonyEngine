@@ -83,11 +83,6 @@ const IHyNodeData *IHyLoadable::AcquireData()
 /*virtual*/ void IHyLoadable::Load() /*override*/
 {
 	HyAssert(sm_pHyAssets, "IHyLoadable2d::Load was invoked before engine has been initialized");
-
-	// Don't load if the name is blank, and it's required by this node type
-	if(m_sName.empty() && _LoadableGetType() != HYTYPE_Entity && _LoadableGetType() != HYTYPE_Primitive && _LoadableGetType() != HYTYPE_TexturedQuad)
-		return;
-
 	sm_pHyAssets->LoadNodeData(this);
 }
 

@@ -339,14 +339,14 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 
 /*virtual*/ void HyEntity2d::Load() /*override*/
 {
-	IHyLoadable::Load();
-
 	// Load any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
 			static_cast<IHyLoadable2d *>(m_ChildList[i])->Load();
 	}
+
+	IHyLoadable::Load();
 }
 
 /*virtual*/ void HyEntity2d::Unload() /*override*/

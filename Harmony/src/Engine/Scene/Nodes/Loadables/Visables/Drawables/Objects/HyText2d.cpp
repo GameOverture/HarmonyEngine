@@ -342,7 +342,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 /*virtual*/ bool HyText2d::IsLoadDataValid() /*override*/
 {
 	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
-	return pData->GetNumStates() != 0;
+	return pData && pData->GetNumStates() != 0;
 }
 
 /*virtual*/ bool HyText2d::OnIsValid() /*override*/
