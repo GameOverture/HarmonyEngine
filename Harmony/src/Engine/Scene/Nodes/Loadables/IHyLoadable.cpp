@@ -68,8 +68,6 @@ const IHyNodeData *IHyLoadable::AcquireData()
 		sm_pHyAssets->AcquireNodeData(this, m_pData);
 		if(m_pData)
 			OnDataAcquired();
-		else
-			HyLogInfo("Could not find data for: " << GetPrefix() << "/" << GetName());
 	}
 
 	return m_pData;

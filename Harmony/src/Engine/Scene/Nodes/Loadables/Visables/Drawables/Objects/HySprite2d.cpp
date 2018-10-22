@@ -180,7 +180,7 @@ void HySprite2d::AnimSetState(uint32 uiStateIndex)
 {
 	if(uiStateIndex >= static_cast<const HySprite2dData *>(AcquireData())->GetNumStates())
 	{
-		HyLogWarning("HySprite2d::AnimSetState wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySprite2dData *>(AcquireData())->GetNumStates() << "'");
+		HyLogWarning(m_sPrefix << "/" << m_sName << " (HySprite) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySprite2dData *>(AcquireData())->GetNumStates() << "'");
 		return;
 	}
 
