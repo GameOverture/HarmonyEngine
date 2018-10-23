@@ -246,6 +246,9 @@
     <ClCompile Include="Assets\Nodes\HyEntityData.cpp">
       <Filter>Assets\Nodes</Filter>
     </ClCompile>
+    <ClCompile Include="Afx\HyStdAfx.cpp">
+      <Filter>Afx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">

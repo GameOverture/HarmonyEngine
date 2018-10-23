@@ -7,6 +7,7 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Scene/Tweens/HyTweenFuncs.h"
 
 /*static*/ float HyTween::PI = atan(1.0f)*4.0f;

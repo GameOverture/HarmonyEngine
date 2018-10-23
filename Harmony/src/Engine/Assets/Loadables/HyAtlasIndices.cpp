@@ -7,6 +7,7 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Assets/Loadables/HyAtlasIndices.h"
 
 int32 HyAtlasIndices::sm_iIndexFlagsArraySize = -1;	// -1 indicates that this has not been initialized

@@ -7,6 +7,7 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Utilities/HyFileIO.h"
 
 char *HyReadTextFile(const char *szFilePath, int *pLengthOut)

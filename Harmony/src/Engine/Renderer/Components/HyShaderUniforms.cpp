@@ -7,9 +7,9 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 #include "Utilities/Crc32.h"
-
 #include "Afx/HyInteropAfx.h"
 
 HyShaderUniforms::HyShaderUniforms() :	m_bDirty(true),

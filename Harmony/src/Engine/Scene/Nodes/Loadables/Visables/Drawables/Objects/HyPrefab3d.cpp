@@ -7,6 +7,7 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrefab3d.h"
 
 HyPrefab3d::HyPrefab3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) : IHyDrawable3d(HYTYPE_Prefab, szPrefix, szName, pParent)

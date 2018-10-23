@@ -7,22 +7,19 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Afx/HyStdAfx.h"
 
 #ifndef HY_PLATFORM_TOOL
-
 #include "Memory/HyMemoryHeap.h"
-
 
 HyMemoryHeap::HyMemoryHeap(void)
 {
 
 }
 
-
 HyMemoryHeap::~HyMemoryHeap()
 {
 }
-
 
 void *HyMemoryHeap::Alloc(size_t sz)
 {

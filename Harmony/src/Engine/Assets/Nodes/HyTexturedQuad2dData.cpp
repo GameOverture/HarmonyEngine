@@ -7,8 +7,8 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
-
 #include "Renderer/IHyRenderer.h"
 
 

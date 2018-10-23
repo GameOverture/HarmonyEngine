@@ -7,6 +7,7 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 
 #if 0//#ifndef HY_PLATFORM_GUI

@@ -7,7 +7,7 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-
+#include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
 IHyNodeData::IHyNodeData(const std::string &sPath) :	m_sPATH(sPath),

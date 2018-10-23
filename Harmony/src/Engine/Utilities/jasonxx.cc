@@ -5,6 +5,7 @@
 //   Sean Middleditch <sean@middleditch.us>
 //   rlyeh <https://github.com/r-lyeh>
 
+#include "Afx/HyStdAfx.h"
 #include "Harmony/Utilities/jsonxx.h"
 
 #include <cctype>

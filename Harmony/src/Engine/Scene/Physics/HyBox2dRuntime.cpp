@@ -7,6 +7,7 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyBox2dRuntime.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
 

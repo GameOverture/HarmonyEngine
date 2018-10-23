@@ -1,3 +1,13 @@
+/**************************************************************************
+*	IHyThreadClass.cpp
+*
+*	Harmony Engine
+*	Copyright (c) 2018 Jason Knobler
+*
+*	Harmony License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Threading/IHyThreadClass.h"
 #include "Diagnostics/Console/HyConsole.h"
 

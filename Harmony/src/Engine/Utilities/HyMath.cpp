@@ -7,6 +7,7 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Utilities/HyMath.h"
 
 void HySetVec(glm::vec2 &vecOut, float fX, float fY)

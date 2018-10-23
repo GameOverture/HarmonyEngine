@@ -4,7 +4,7 @@
 // Slicing-by-16 contributed by Bulat Ziganshin
 // see http://create.stephan-brumme.com/disclaimer.html
 //
-
+#include "Afx/HyStdAfx.h"
 #include "Utilities/Crc32.h"
 
 /// zlib's CRC32 polynomial

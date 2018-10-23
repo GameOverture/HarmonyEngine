@@ -7,6 +7,7 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Scene/Tweens/HyTweenVec3.h"
 
 HyTweenVec3::HyTweenVec3(IHyNode &ownerRef, uint32 uiDirtyFlags)

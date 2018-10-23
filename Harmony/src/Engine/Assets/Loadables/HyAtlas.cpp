@@ -8,7 +8,6 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Assets/Loadables/HyAtlas.h"
-
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 #include "soil2/SOIL2.h"

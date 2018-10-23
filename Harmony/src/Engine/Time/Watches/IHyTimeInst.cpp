@@ -7,8 +7,8 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Time/Watches/IHyTimeInst.h"
-
 #include "Time/HyTime.h"
 
 HyTime *IHyTimeInst::sm_pTime = NULL;

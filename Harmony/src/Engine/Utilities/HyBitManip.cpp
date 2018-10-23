@@ -7,7 +7,7 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-
+#include "Afx/HyStdAfx.h"
 #include "Utilities/HyBitManip.h"
 
 namespace HyBitManip
