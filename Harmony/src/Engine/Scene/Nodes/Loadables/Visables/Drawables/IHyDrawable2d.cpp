@@ -58,7 +58,13 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 		float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
 
 		GetLocalBoundingVolume(); // This will update BV if it's dirty
-		m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_aabbCached, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
+		if(m_LocalBoundingVolume.GetB2Shape())
+			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_aabbCached, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
+		else
+		{
+			m_aabbCached.lowerBound.SetZero();
+			m_aabbCached.upperBound.SetZero();
+		}
 
 		ClearDirty(DIRTY_WorldAABB);
 	}
