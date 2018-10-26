@@ -330,7 +330,7 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	{
 		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
 		{
-			if(static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoaded() == false)
+			if(static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoadDataValid() != false && static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoaded() == false)
 				return false;
 		}
 	}
