@@ -196,29 +196,29 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	}
 }
 
-void HyEntity2d::ChildAppend(IHyNode2d &childInst)
+void HyEntity2d::ChildAppend(IHyNode2d &childRef)
 {
-	HyAssert(&childInst != this, "HyEntity2d::ChildAppend was passed a child that was itself!");
+	HyAssert(&childRef != this, "HyEntity2d::ChildAppend was passed a child that was itself!");
 
-	childInst.ParentDetach();
-	childInst.m_pParent = this;
+	childRef.ParentDetach();
+	childRef.m_pParent = this;
 
-	m_ChildList.push_back(&childInst);
-	SetNewChildAttributes(childInst);
+	m_ChildList.push_back(&childRef);
+	SetNewChildAttributes(childRef);
 }
 
-/*virtual*/ bool HyEntity2d::ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childInst)
+/*virtual*/ bool HyEntity2d::ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef)
 {
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
 		if((*iter) == &insertBefore || 
 		   ((*iter)->GetType() == HYTYPE_Entity && static_cast<HyEntity2d *>(*iter)->ChildExists(insertBefore)))
 		{
-			childInst.ParentDetach();
-			childInst.m_pParent = this;
+			childRef.ParentDetach();
+			childRef.m_pParent = this;
 
-			m_ChildList.insert(iter, &childInst);
-			SetNewChildAttributes(childInst);
+			m_ChildList.insert(iter, &childRef);
+			SetNewChildAttributes(childRef);
 
 			return true;
 		}
@@ -269,7 +269,7 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 
 /*virtual*/ IHyNode2d *HyEntity2d::ChildGet(uint32 uiIndex)
 {
-	HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size()), "HyEntityLeaf2d::ChildGet passed an invalid index");
+	HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size()), "HyEntity2d::ChildGet passed an invalid index");
 	return m_ChildList[uiIndex];
 }
 
@@ -435,19 +435,19 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	//pData->
 }
 
-void HyEntity2d::SetNewChildAttributes(IHyNode2d &childInst)
+void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	SetDirty(DIRTY_ALL);
 
-	childInst._SetEnabled(m_bEnabled, false);
-	childInst._SetPauseUpdate(m_bPauseOverride, false);
+	childRef._SetEnabled(m_bEnabled, false);
+	childRef._SetPauseUpdate(m_bPauseOverride, false);
 
-	if(0 != (childInst.m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+	if(0 != (childRef.m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
 	{
-		static_cast<IHyVisable2d &>(childInst)._SetCoordinateSystem(m_iCoordinateSystem, false);
+		static_cast<IHyVisable2d &>(childRef)._SetCoordinateSystem(m_iCoordinateSystem, false);
 
 		if(m_pScissor != nullptr)
-			static_cast<IHyVisable2d &>(childInst)._SetScissor(m_pScissor, false);
+			static_cast<IHyVisable2d &>(childRef)._SetScissor(m_pScissor, false);
 
 		int32 iOrderValue = m_iDisplayOrder;
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)

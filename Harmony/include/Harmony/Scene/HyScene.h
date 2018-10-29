@@ -16,9 +16,12 @@
 
 // Forward declarations
 class IHyNode;
+class IHyNode2d;
+class IHyNode3d;
+class HyEntity2d;
+class HyEntity3d;
 class IHyDrawable2d;
 class IHyDrawable3d;
-class IHyNode3d;
 class HyWindow;
 class IHyRenderer;
 
@@ -38,6 +41,7 @@ class HyScene
 	// TODO: Make tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
 	static std::vector<IHyNode *>						sm_NodeList_All;
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;		// List of nodes who will update when the game is paused
+	static std::queue<std::pair<IHyNode *, IHyNode *> >	sm_DeferredChildAppendQueue;	// pair = (child, parent) can be a pair for either 2d or 3d
 	bool												m_bPauseGame;
 
 	// List of nodes who can be drawn, and their graphics assets are fully loaded
@@ -55,6 +59,9 @@ public:
 
 	static void AddNode_PauseUpdate(IHyNode *pNode);
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
+
+	static void AddDeferredChildAppend(IHyNode2d *pChild, HyEntity2d *pParent);
+	static void AddDeferredChildAppend(IHyNode3d *pChild, HyEntity3d *pParent);
 
 	void AddNode_Loaded(IHyDrawable2d *pDrawable);
 	void AddNode_Loaded(IHyDrawable3d *pDrawable);
@@ -74,7 +81,6 @@ public:
 
 	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut);
 	
-	static bool Node3dSortPredicate(const IHyDrawable3d *pInst1, const IHyDrawable3d *pInst2);
 	static bool Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2);
 };
 

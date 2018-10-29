@@ -18,6 +18,8 @@
 
 class IHyVisable3d : public IHyLoadable3d, public IHyVisable
 {
+	friend class HyEntity3d;
+
 protected:
 	float							m_fAlpha;
 	float							m_fCachedAlpha;

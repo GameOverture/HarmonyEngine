@@ -19,6 +19,8 @@ class HyStencil;
 
 class IHyNode3d : public IHyNode
 {
+	friend class HyEntity3d;
+
 protected:
 	HyEntity3d *				m_pParent;
 	glm::mat4					m_mtxCached;
@@ -36,6 +38,9 @@ public:
 	virtual ~IHyNode3d();
 
 	const IHyNode3d &operator=(const IHyNode3d &rhs);
+
+	void ParentDetach();
+	HyEntity3d *ParentGet() const;
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	const glm::mat4 &GetWorldTransform();

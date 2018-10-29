@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode3d.h"
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
+#include "Scene/HyScene.h"
 
 IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :	IHyNode(eNodeType),
 																pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
@@ -19,6 +20,9 @@ IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :	IHyNode(eNodeType)
 																scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	scale.Set(1.0f);
+
+	if(pParent)
+		HyScene::AddDeferredChildAppend(this, pParent);
 }
 
 IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :	IHyNode(copyRef),
@@ -50,6 +54,19 @@ const IHyNode3d &IHyNode3d::operator=(const IHyNode3d &rhs)
 	scale_pivot.Set(rhs.scale_pivot.Get());
 
 	return *this;
+}
+
+void IHyNode3d::ParentDetach()
+{
+	if(m_pParent == nullptr)
+		return;
+
+	m_pParent->ChildRemove(this);
+}
+
+HyEntity3d *IHyNode3d::ParentGet() const
+{
+	return m_pParent;
 }
 
 void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const

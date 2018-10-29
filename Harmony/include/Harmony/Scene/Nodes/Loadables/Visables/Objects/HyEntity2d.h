@@ -15,6 +15,8 @@
 
 class HyEntity2d : public IHyVisable2d
 {
+	friend class HyScene;
+
 protected:
 	std::vector<IHyNode2d *>		m_ChildList;
 
@@ -93,7 +95,7 @@ protected:
 	virtual void NodeUpdate() override final;
 	virtual void OnDataAcquired() override;
 
-	void SetNewChildAttributes(IHyNode2d &childInst);
+	void SetNewChildAttributes(IHyNode2d &childRef);
 
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 

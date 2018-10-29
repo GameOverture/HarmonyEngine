@@ -20,7 +20,118 @@ HyEntity3d::~HyEntity3d(void)
 	//	m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 }
 
+void HyEntity3d::ChildAppend(IHyNode3d &childRef)
+{
+	HyAssert(&childRef != this, "HyEntity3d::ChildAppend was passed a child that was itself!");
+
+	childRef.ParentDetach();
+	childRef.m_pParent = this;
+
+	m_ChildList.push_back(&childRef);
+	SetNewChildAttributes(childRef);
+}
+
+/*virtual*/ bool HyEntity3d::ChildInsert(IHyNode3d &insertBefore, IHyNode3d &childRef)
+{
+	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
+	{
+		if((*iter) == &insertBefore || 
+		   ((*iter)->GetType() == HYTYPE_Entity && static_cast<HyEntity3d *>(*iter)->ChildExists(insertBefore)))
+		{
+			childRef.ParentDetach();
+			childRef.m_pParent = this;
+
+			m_ChildList.insert(iter, &childRef);
+			SetNewChildAttributes(childRef);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool HyEntity3d::ChildExists(IHyNode3d &childRef)
+{
+	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
+	{
+		if((*iter) == &childRef ||
+		   ((*iter)->GetType() == HYTYPE_Entity && static_cast<HyEntity3d *>(*iter)->ChildExists(childRef)))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/*virtual*/ bool HyEntity3d::ChildRemove(IHyNode3d *pChild)
+{
+	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
+	{
+		if(*iter == pChild)
+		{
+			(*iter)->m_pParent = nullptr;
+			m_ChildList.erase(iter);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/*virtual*/ void HyEntity3d::ChildrenTransfer(HyEntity3d &newParent)
+{
+	while(m_ChildList.empty() == false)
+		newParent.ChildAppend(*m_ChildList[0]);
+}
+
+/*virtual*/ uint32 HyEntity3d::ChildCount()
+{
+	return static_cast<uint32>(m_ChildList.size());
+}
+
+/*virtual*/ IHyNode3d *HyEntity3d::ChildGet(uint32 uiIndex)
+{
+	HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size()), "HyEntity3d::ChildGet passed an invalid index");
+	return m_ChildList[uiIndex];
+}
+
+void HyEntity3d::ForEachChild(std::function<void(IHyNode3d *)> func)
+{
+	func(this);
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(m_ChildList[i]->GetType() == HYTYPE_Entity)
+			static_cast<HyEntity3d *>(m_ChildList[i])->ForEachChild(func);
+	}
+}
+
 /*virtual*/ void HyEntity3d::NodeUpdate() /*override final*/
 {
 	OnUpdate();
+}
+
+void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
+{
+	SetDirty(DIRTY_ALL);
+
+	childRef._SetEnabled(m_bEnabled, false);
+	childRef._SetPauseUpdate(m_bPauseOverride, false);
+
+	if(0 != (childRef.m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+	{
+		static_cast<IHyVisable3d &>(childRef)._SetCoordinateSystem(m_iCoordinateSystem, false);
+
+		if(m_pScissor != nullptr)
+			static_cast<IHyVisable3d &>(childRef)._SetScissor(m_pScissor, false);
+
+		//int32 iOrderValue = m_iDisplayOrder;
+		//for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		//{
+		//	if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+		//		iOrderValue = static_cast<IHyVisable3d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, false);
+		//}
+	}
 }

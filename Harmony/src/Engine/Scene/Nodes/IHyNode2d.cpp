@@ -23,11 +23,10 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 																scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	m_uiExplicitAndTypeFlags |= NODETYPE_Is2d;
-
-	if(m_pParent)
-		m_pParent->ChildAppend(*this);
-
 	scale.Set(1.0f);
+
+	if(pParent)
+		HyScene::AddDeferredChildAppend(this, pParent);
 }
 
 IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :	IHyNode(copyRef),
