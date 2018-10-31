@@ -13,6 +13,9 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
+class HyEntity2d;
+class HyEntity3d;
+
 class IHyLoadable
 {
 	friend class HyAssets;
@@ -37,15 +40,17 @@ public:
 
 	const IHyNodeData *AcquireData();
 
-	virtual bool IsLoaded() const;
+	bool IsLoaded() const;
 	virtual void Load();
 	virtual void Unload();
 
 	virtual bool IsLoadDataValid() { return true; }	// Optional public override for derived classes to indicate that its current state 
 
 protected:
+	virtual bool IsChildrenLoaded() const { return true; }// Required override for entities to properly determine whether they're loaded
+
 	// Optional overrides for derived classes
-	virtual void DrawLoadedUpdate() { }				// Invoked once after OnLoaded(), then once every frame (guarenteed to only be invoked if this instance is loaded)
+	virtual void LoadedUpdate() { }					// Invoked once after OnLoaded(), then once every frame (guarenteed to only be invoked if this instance is loaded)
 	virtual void OnDataAcquired() { }				// Invoked once on the first time this node's data is queried
 	virtual void OnLoaded() { }						// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnUnloaded() { }					// HyAssets invokes this instance's data has been erased
@@ -54,6 +59,7 @@ protected:
 
 private:
 	virtual HyType _LoadableGetType() = 0;
+	virtual IHyLoadable *_LoadableGetParentPtr() = 0;
 };
 
 #endif /* IHyLoadable_h__ */

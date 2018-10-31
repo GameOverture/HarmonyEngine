@@ -77,6 +77,7 @@ public:
 
 	void UpdatePhysics();
 	void UpdateNodes();
+	void UpdateChildAppends();
 	void PrepareRender(IHyRenderer &rendererRef);
 
 	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut);

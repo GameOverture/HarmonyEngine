@@ -27,7 +27,8 @@ public:
 	const IHyLoadable3d &operator=(const IHyLoadable3d &rhs);
 
 private:
-	virtual HyType _LoadableGetType() override;
+	virtual HyType _LoadableGetType() override final;
+	virtual IHyLoadable *_LoadableGetParentPtr() override final;
 };
 
 #endif /* IHyLoadable3d_h__ */

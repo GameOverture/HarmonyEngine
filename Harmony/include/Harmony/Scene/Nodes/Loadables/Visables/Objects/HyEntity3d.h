@@ -35,6 +35,7 @@ public:
 
 protected:
 	virtual void NodeUpdate() override final;
+	virtual bool IsChildrenLoaded() const override final;
 
 	void SetNewChildAttributes(IHyNode3d &childRef);
 

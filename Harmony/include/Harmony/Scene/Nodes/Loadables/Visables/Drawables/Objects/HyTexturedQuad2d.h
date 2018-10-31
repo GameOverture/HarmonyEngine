@@ -34,7 +34,7 @@ public:
 	const HyTexturedQuad2d &operator=(const HyTexturedQuad2d &rhs);
 	virtual HyTexturedQuad2d *Clone() const override;
 
-	virtual bool IsLoaded() const override;
+	//virtual bool IsLoaded() const override;
 
 	void SetTextureSource(int iX, int iY, int iWidth, int iHeight);
 

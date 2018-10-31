@@ -34,12 +34,17 @@ const IHyDrawable3d &IHyDrawable3d::operator=(const IHyDrawable3d &rhs)
 	return *this;
 }
 
+/*virtual*/ void IHyDrawable3d::NodeUpdate() /*override final*/
+{
+	OnUpdate();
+}
+
 /*virtual*/ bool IHyDrawable3d::IsValid() /*override final*/
 {
 	return m_bEnabled && OnIsValid();
 }
 
-/*virtual*/ void IHyDrawable3d::NodeUpdate() /*override final*/
+/*virtual*/ void IHyDrawable3d::LoadedUpdate() /*override final*/
 {
 	if(IsLoaded())
 	{

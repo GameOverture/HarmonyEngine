@@ -170,6 +170,11 @@ void HyScene::UpdateNodes()
 			sm_NodeList_PauseUpdate[i]->Update();
 	}
 
+	HY_PROFILE_END
+}
+
+void HyScene::UpdateChildAppends()
+{
 	while(sm_DeferredChildAppendQueue.empty() == false)
 	{
 		const std::pair<IHyNode *, IHyNode *> &pairRef = sm_DeferredChildAppendQueue.front();
@@ -180,8 +185,6 @@ void HyScene::UpdateNodes()
 
 		sm_DeferredChildAppendQueue.pop();
 	}
-
-	HY_PROFILE_END
 }
 
 // RENDER STATE BUFFER

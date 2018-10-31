@@ -70,10 +70,10 @@ const HyTexturedQuad2d &HyTexturedQuad2d::operator=(const HyTexturedQuad2d &rhs)
 	return HY_NEW HyTexturedQuad2d(*this);
 }
 
-/*virtual*/ bool HyTexturedQuad2d::IsLoaded() const /*override*/
-{
-	return m_bIsRaw || IHyDrawable2d::IsLoaded();
-}
+///*virtual*/ bool HyTexturedQuad2d::IsLoaded() const /*override*/
+//{
+//	return m_bIsRaw || IHyDrawable2d::IsLoaded();
+//}
 
 void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
 {

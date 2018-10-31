@@ -9,6 +9,8 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/IHyLoadable2d.h"
+#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
 
 IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
 																												IHyLoadable(szPrefix, szName)
@@ -33,7 +35,12 @@ const IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
 	return *this;
 }
 
-/*virtual*/ HyType IHyLoadable2d::_LoadableGetType() /*override*/
+/*virtual*/ HyType IHyLoadable2d::_LoadableGetType() /*override final*/
 {
 	return m_eTYPE;
+}
+
+/*virtual*/ IHyLoadable *IHyLoadable2d::_LoadableGetParentPtr() /*override final*/
+{
+	return m_pParent;
 }

@@ -29,11 +29,15 @@ public:
 	virtual IHyDrawable3d *Clone() const = 0;
 
 protected:
-	virtual bool IsValid() override final;
 	virtual void NodeUpdate() override final;
+	virtual bool IsValid() override final;
+	virtual void LoadedUpdate() override final;
 
 	virtual void OnLoaded() override;									// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnUnloaded() override;									// HyAssets invokes this instance's data has been erased
+
+	// Optional user overrides below
+	virtual void OnUpdate() { }
 	virtual bool OnIsValid() { return true; }
 
 #ifdef HY_PLATFORM_GUI

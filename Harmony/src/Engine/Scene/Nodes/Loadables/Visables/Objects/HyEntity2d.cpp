@@ -324,20 +324,6 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	return m_aabbCached;
 }
 
-/*virtual*/ bool HyEntity2d::IsLoaded() const /*override*/
-{
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
-		{
-			if(static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoadDataValid() != false && static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoaded() == false)
-				return false;
-		}
-	}
-
-	return true;
-}
-
 /*virtual*/ void HyEntity2d::Load() /*override*/
 {
 	// Load any attached children
@@ -427,6 +413,20 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 	}
 
 	OnUpdate();
+}
+
+/*virtual*/ bool HyEntity2d::IsChildrenLoaded() const /*override final*/
+{
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
+		{
+			if(static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoadDataValid() != false && static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoaded() == false)
+				return false;
+		}
+	}
+
+	return true;
 }
 
 /*virtual*/ void HyEntity2d::OnDataAcquired() /*override*/

@@ -72,19 +72,21 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 	return m_aabbCached;
 }
 
+/*virtual*/ void IHyDrawable2d::NodeUpdate() /*override final*/
+{
+	OnUpdate();
+}
+
 /*virtual*/ bool IHyDrawable2d::IsValid() /*override final*/
 {
 	return m_bEnabled && OnIsValid();
 }
 
-/*virtual*/ void IHyDrawable2d::NodeUpdate() /*override final*/
+/*virtual*/ void IHyDrawable2d::LoadedUpdate() /*override final*/
 {
-	if(IsLoaded())
-	{
-		// This update will set the appearance of the instance to its current state
-		DrawLoadedUpdate();
-		OnUpdateUniforms();
-	}
+	// This update will set the appearance of the instance to its current state
+	DrawLoadedUpdate();
+	OnUpdateUniforms();
 }
 
 /*virtual*/ void IHyDrawable2d::OnLoaded() /*override*/

@@ -87,12 +87,12 @@ public:
 
 	virtual const b2AABB &GetWorldAABB() override;
 
-	virtual bool IsLoaded() const override;
 	virtual void Load() override;
 	virtual void Unload() override;
 	
 protected:
 	virtual void NodeUpdate() override final;
+	virtual bool IsChildrenLoaded() const override final;
 	virtual void OnDataAcquired() override;
 
 	void SetNewChildAttributes(IHyNode2d &childRef);

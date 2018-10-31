@@ -74,20 +74,20 @@ const IHyNodeData *IHyLoadable::AcquireData()
 	return m_pData;
 }
 
-/*virtual*/ bool IHyLoadable::IsLoaded() const /*override*/
+bool IHyLoadable::IsLoaded() const
 {
 	return m_eLoadState == HYLOADSTATE_Loaded;
 }
 
-/*virtual*/ void IHyLoadable::Load() /*override*/
+/*virtual*/ void IHyLoadable::Load()
 {
-	HyAssert(sm_pHyAssets, "IHyLoadable2d::Load was invoked before engine has been initialized");
+	HyAssert(sm_pHyAssets, "IHyLoadable::Load was invoked before engine has been initialized");
 	sm_pHyAssets->LoadNodeData(this);
 }
 
-/*virtual*/ void IHyLoadable::Unload() /*override*/
+/*virtual*/ void IHyLoadable::Unload()
 {
-	HyAssert(sm_pHyAssets, "IHyLoadable2d::Unload was invoked before engine has been initialized");
+	HyAssert(sm_pHyAssets, "IHyLoadable::Unload was invoked before engine has been initialized");
 	sm_pHyAssets->RemoveNodeData(this);
 }
 

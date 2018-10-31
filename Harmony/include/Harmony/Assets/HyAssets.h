@@ -62,7 +62,6 @@ class HyAssets : public IHyThreadClass
 	std::vector<IHyLoadable *>									m_QueuedInstList;
 	std::vector<IHyLoadable *>									m_LoadedInstList;
 	std::vector<IHyLoadableData *>								m_ReloadDataList;
-	std::vector<IHyLoadable *>									m_QueuedEntityList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
 	std::queue<IHyLoadableData *>								m_Load_Prepare;
@@ -111,6 +110,7 @@ private:
 	void FinalizeData(IHyLoadableData *pData);
 
 	void SetAsLoaded(IHyLoadable *pLoadable);
+	void SetAsUnloaded(IHyLoadable *pLoadable);
 };
 
 #endif /* HyAssets_h__ */

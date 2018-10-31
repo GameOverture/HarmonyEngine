@@ -12,6 +12,8 @@
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
+#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
 #include "Assets/Nodes/HyEntityData.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
@@ -219,12 +221,10 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 	// Set the node's 'm_eLoadState' appropriately below to prevent additional Loads
 	if(pLoadable->_LoadableGetType() == HYTYPE_Entity)
 	{
-		if(pLoadable->IsLoaded())
+		if(pLoadable->IsChildrenLoaded())
 			SetAsLoaded(pLoadable);
-		else
-			m_QueuedEntityList.push_back(pLoadable);
 	}
-	if(bFullyLoaded == false)
+	else if(bFullyLoaded == false)
 	{
 		pLoadable->m_eLoadState = HYLOADSTATE_Queued;
 		m_QueuedInstList.push_back(pLoadable);
@@ -253,31 +253,7 @@ void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 		}
 	}
 
-	if(pLoadable->m_eLoadState == HYLOADSTATE_Queued)
-	{
-		for(auto it = m_QueuedInstList.begin(); it != m_QueuedInstList.end(); ++it)
-		{
-			if((*it) == pLoadable)
-			{
-				m_QueuedInstList.erase(it);
-				break;
-			}
-		}
-	}
-
-	// Remove from fully loaded list
-	for(auto it = m_LoadedInstList.begin(); it != m_LoadedInstList.end(); ++it)
-	{
-		if((*it) == pLoadable)
-		{
-			// TODO: Log about erasing instance
-			m_LoadedInstList.erase(it);
-			break;
-		}
-	}
-
-	pLoadable->m_eLoadState = HYLOADSTATE_Inactive;
-	pLoadable->OnUnloaded();
+	SetAsUnloaded(pLoadable);
 }
 
 bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
@@ -304,7 +280,7 @@ void HyAssets::Shutdown()
 	std::vector<IHyLoadable *> vReloadInsts;
 	vReloadInsts = m_LoadedInstList;
 
-	m_QueuedEntityList.clear();
+	//m_QueuedEntityList.clear();
 
 	for(uint32 i = 0; i < m_QueuedInstList.size(); ++i)
 		vReloadInsts.push_back(m_QueuedInstList[i]);
@@ -328,6 +304,9 @@ bool HyAssets::IsShutdown()
 
 void HyAssets::Update(IHyRenderer &rendererRef)
 {
+	for(uint32 i = 0; i < static_cast<uint32>(m_LoadedInstList.size()); ++i)
+		m_LoadedInstList[i]->LoadedUpdate();
+
 	// Check to see if we have any pending loads to make
 	if(m_Load_Prepare.empty() == false)
 	{
@@ -346,19 +325,19 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		}
 	}
 
-	if(m_QueuedEntityList.empty() == false)
-	{
-		for(auto iter = m_QueuedEntityList.begin(); iter != m_QueuedEntityList.end();)
-		{
-			if((*iter)->IsLoaded())
-			{
-				SetAsLoaded(*iter);
-				iter = m_QueuedEntityList.erase(iter);
-			}
-			else
-				++iter;
-		}
-	}
+	//if(m_QueuedEntityList.empty() == false)
+	//{
+	//	for(auto iter = m_QueuedEntityList.begin(); iter != m_QueuedEntityList.end();)
+	//	{
+	//		if((*iter)->IsChildrenLoaded())
+	//		{
+	//			SetAsLoaded(*iter);
+	//			iter = m_QueuedEntityList.erase(iter);
+	//		}
+	//		else
+	//			++iter;
+	//	}
+	//}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check to see if any loaded data (from the load thread) is ready to uploaded to graphics card
@@ -603,7 +582,7 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 				HyLogInfo("Custom Shader Loaded");
 			}
 
-			// TODO: Check if there's lots of overhead here checking queued list upon every loaded piece of data that comes through
+			// Check queued list upon every loaded piece of data that comes through
 			for(auto iter = m_QueuedInstList.begin(); iter != m_QueuedInstList.end(); /*++iter*/) // Increment is handled within loop
 			{
 				if(IsInstLoaded(*iter))
@@ -658,8 +637,43 @@ void HyAssets::SetAsLoaded(IHyLoadable *pLoadable)
 {
 	pLoadable->m_eLoadState = HYLOADSTATE_Loaded;
 	pLoadable->OnLoaded();
-	pLoadable->DrawLoadedUpdate();
+	pLoadable->LoadedUpdate();
 
-	if(pLoadable->_LoadableGetType() != HYTYPE_Entity)
-		m_LoadedInstList.push_back(pLoadable);
+	m_LoadedInstList.push_back(pLoadable);
+
+	IHyLoadable *pParent = pLoadable->_LoadableGetParentPtr();
+	if(pParent && pParent->IsChildrenLoaded())
+		SetAsLoaded(pParent);
+}
+
+void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
+{
+	if(pLoadable->m_eLoadState == HYLOADSTATE_Queued)
+	{
+		for(auto it = m_QueuedInstList.begin(); it != m_QueuedInstList.end(); ++it)
+		{
+			if((*it) == pLoadable)
+			{
+				m_QueuedInstList.erase(it);
+				break;
+			}
+		}
+	}
+
+	// Remove from fully loaded list
+	for(auto it = m_LoadedInstList.begin(); it != m_LoadedInstList.end(); ++it)
+	{
+		if((*it) == pLoadable)
+		{
+			// TODO: Log about erasing instance
+			m_LoadedInstList.erase(it);
+			break;
+		}
+	}
+
+	pLoadable->m_eLoadState = HYLOADSTATE_Inactive;
+	pLoadable->OnUnloaded();
+
+	if(pLoadable->_LoadableGetParentPtr())
+		SetAsUnloaded(pLoadable->_LoadableGetParentPtr());
 }

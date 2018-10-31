@@ -36,11 +36,15 @@ public:
 	virtual const b2AABB &GetWorldAABB() override;
 
 protected:
-	virtual bool IsValid() override final;
 	virtual void NodeUpdate() override final;
+	virtual bool IsValid() override final;
+	virtual void LoadedUpdate() override final;
 
 	virtual void OnLoaded() override;
 	virtual void OnUnloaded() override;
+
+	// Optional user overrides below
+	virtual void OnUpdate() { }
 	virtual bool OnIsValid() { return true; }
 	virtual void OnShapeSet(HyShape2d *pShape) { }
 	virtual void OnCalcBoundingVolume() { }

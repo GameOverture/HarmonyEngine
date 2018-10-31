@@ -113,6 +113,20 @@ void HyEntity3d::ForEachChild(std::function<void(IHyNode3d *)> func)
 	OnUpdate();
 }
 
+/*virtual*/ bool HyEntity3d::IsChildrenLoaded() const /*override final*/
+{
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
+		{
+			if(static_cast<IHyLoadable3d *>(m_ChildList[i])->IsLoadDataValid() != false && static_cast<IHyLoadable3d *>(m_ChildList[i])->IsLoaded() == false)
+				return false;
+		}
+	}
+
+	return true;
+}
+
 void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 {
 	SetDirty(DIRTY_ALL);
