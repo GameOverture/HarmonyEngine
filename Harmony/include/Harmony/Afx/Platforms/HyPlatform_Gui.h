@@ -19,8 +19,8 @@
 
 // Diagnostics assertion
 #if defined(HY_DEBUG)
-	#define HyAssert(condition, message) do { if((#condition) == false) int i = 0/*DebugBreak()*/; } while (false)
-	#define HyError(message) do { int i = 0/*DebugBreak()*/; } while (false)
+	#define HyAssert(condition, message) do { if((#condition) == false) __debugbreak(); } while (false)
+	#define HyError(message) do { __debugbreak(); } while (false)
 #else
 	#define HyAssert(condition, message) do { } while (false)
 	#define HyError(message) do { } while (false)

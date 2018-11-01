@@ -7,6 +7,7 @@
 *	Harmony Editor Tool License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Global.h"
 #include "PropertiesUndoCmd.h"
 
 PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel &modelRef,

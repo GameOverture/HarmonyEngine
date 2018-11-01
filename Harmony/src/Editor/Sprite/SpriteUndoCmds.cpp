@@ -7,8 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "SpriteUndoCmds.h"
-
 #include "SpriteTableView.h"
 #include "SpriteModels.h"
 

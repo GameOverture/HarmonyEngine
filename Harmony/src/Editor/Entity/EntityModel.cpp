@@ -7,8 +7,8 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "EntityModel.h"
 #include "Global.h"
+#include "EntityModel.h"
 
 #include <QVariant>
 

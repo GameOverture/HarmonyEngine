@@ -7,10 +7,9 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-
-#include "Global.h"
 #include "Harmony.h"
 #include "HarmonyWidget.h"
 #include "Project.h"
@@ -98,6 +97,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 			{
 				engineDir.setPath(pDlg->SelectedDir());
 				m_Settings.setValue("engineLocation", QVariant(pDlg->SelectedDir()));
+				setWindowState(Qt::WindowMaximized);
 			}
 			else
 			{
@@ -115,6 +115,7 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Restore workspace
 	ui->dockWidgetExplorer->show();
+	ui->dockWidgetAtlas->show();
 	ui->dockWidgetAudio->hide();
 	ui->dockWidgetProperties->hide();
 

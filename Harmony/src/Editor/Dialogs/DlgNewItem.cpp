@@ -7,10 +7,9 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "DlgNewItem.h"
 #include "ui_DlgNewItem.h"
-
-#include "Global.h"
 
 #include <QDirIterator>
 #include <QStringBuilder>
@@ -170,7 +169,7 @@ void DlgNewItem::ErrorCheck()
 		bool bFoundDup = false;
 		if(ui->chkNewPrefix->isChecked())
 		{
-			for(uint i = 0; i < m_PrefixStringList.size(); ++i)
+			for(uint32 i = 0; i < static_cast<uint32>(m_PrefixStringList.size()); ++i)
 			{
 				if(0 == sPrefix.compare(m_PrefixStringList[i], Qt::CaseInsensitive))
 				{

@@ -7,11 +7,11 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "IDraw.h"
 #include "ProjectItem.h"
 #include "IModel.h"
 #include "MainWindow.h"
-#include "Global.h"
 #include "Harmony.h"
 #include "HarmonyWidget.h"
 

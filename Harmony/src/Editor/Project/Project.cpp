@@ -7,12 +7,11 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "Project.h"
-
 #include "AtlasWidget.h"
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
-#include "Global.h"
 #include "ExplorerTreeWidget.h"
 #include "ProjectItemMimeData.h"
 
@@ -212,7 +211,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 				{
 					ProjectItem *pNewDataItem = new ProjectItem(*this, eType, pCurPrefixTreeItem, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
 
-					if(sCurPrefixPath == "+Hy/" && sPathPartList[iPathPartIndex] == "+HyFont")
+					if(sCurPrefixPath == HyGuiInternalPrefix && sPathPartList[iPathPartIndex] == "+HyFont")
 						m_bSystemFontFound = true;
 
 #ifdef RESAVE_ENTIRE_PROJECT

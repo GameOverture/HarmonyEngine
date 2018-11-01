@@ -10,6 +10,12 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include "Harmony/Afx/HyStdAfx.h"
+#ifdef HY_COMPILER_MSVC
+	#pragma warning ( push )
+	#pragma warning( disable: 4100 )
+#endif
+
 #include <QString>
 #include <QIcon>
 #include <QValidator>
@@ -24,7 +30,6 @@
 #include <QJsonArray>
 
 #include "WidgetOutputLog.h"
-
 #include "Harmony/HyEngine.h"
 #include "Harmony/Utilities/jsonxx.h"
 
@@ -32,6 +37,8 @@ class Project;
 
 #define HyOrganizationName "Game Overture"
 #define HyEditorToolName "Harmony Editor Tool"
+#define HyGuiInternalPrefix "+Hy/"
+
 //#define HYGUI_UseBinaryMetaFiles
 
 enum HyGuiItemType

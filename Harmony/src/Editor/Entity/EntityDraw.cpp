@@ -7,6 +7,7 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Global.h"
 #include "EntityDraw.h"
 
 EntityDraw::EntityDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp)
@@ -21,7 +22,7 @@ EntityDraw::EntityDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pP
 void EntityDraw::Sync()
 {
 	const QList<ProjectItem *> &primitiveListRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetPrimitiveList();
-	for(uint i = 0; i < primitiveListRef.size(); ++i)
+	for(uint32 i = 0; i < static_cast<uint32>(primitiveListRef.size()); ++i)
 	{
 
 	}

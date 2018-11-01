@@ -7,14 +7,13 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "AtlasModel.h"
-
 #include "Harmony.h"
 #include "Project.h"
 #include "AtlasWidget.h"
 #include "AtlasRepackThread.h"
 #include "MainWindow.h"
-#include "Global.h"
 #include "DlgAtlasGroupSettings.h"
 
 #include <QJsonDocument>

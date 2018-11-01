@@ -7,6 +7,7 @@
  *	Harmony Editor Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "PrefabWidget.h"
 #include "ui_PrefabWidget.h"
 

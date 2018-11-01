@@ -7,9 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#include "HarmonyConnection.h"
-
 #include "Global.h"
+#include "HarmonyConnection.h"
 
 #include <QDateTime>
 

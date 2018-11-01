@@ -96,7 +96,7 @@ void SmartBuffer::read(Socket* socket) {
 
         if(incomingBytes > freeBytes || !freeBytes) {
 
-            size_t newAllocSize = uMax((unsigned)(_allocSize * _reallocRatio), _usedSize + incomingBytes);
+            size_t newAllocSize = uMax((unsigned)(_allocSize * _reallocRatio), (unsigned int)(_usedSize + incomingBytes));
 
             void* newBuffer = realloc(_buffer, newAllocSize);
 

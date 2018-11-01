@@ -7,6 +7,7 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "IModelTreeItem.h"
 
 IModelTreeItem::IModelTreeItem() : m_pParentItem(nullptr)

@@ -7,12 +7,11 @@
  *	Harmony Editor Tool License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "DlgAtlasGroupSettings.h"
 #include "ui_DlgAtlasGroupSettings.h"
 
 #include <QMessageBox>
-
-#include "Global.h"
 
 DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObject packerSettingsObj, QWidget *parent) : QDialog(parent),
 																														ui(new Ui::DlgAtlasGroupSettings),

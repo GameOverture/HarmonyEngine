@@ -7,13 +7,12 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "FontUndoCmds.h"
-
 #include "ProjectItem.h"
 #include "FontWidget.h"
 #include "FontModels.h"
 #include "FontModelView.h"
-#include "Global.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

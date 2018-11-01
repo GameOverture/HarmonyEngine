@@ -7,10 +7,10 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "AudioWidgetState.h"
 #include "ui_AudioWidgetState.h"
 
-#include "Global.h"
 #include "AudioWidget.h"
 #include "AudioWidgetManager.h"
 

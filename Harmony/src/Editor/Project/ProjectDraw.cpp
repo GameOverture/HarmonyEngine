@@ -7,6 +7,7 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "ProjectDraw.h"
 #include "GlobalUndoCmds.h"
 

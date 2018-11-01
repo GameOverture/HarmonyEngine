@@ -7,10 +7,9 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Global.h"
 #include "WidgetVectorSpinBox.h"
 #include "ui_WidgetVectorSpinBox.h"
-
-#include "Global.h"
 
 WidgetVectorSpinBox::WidgetVectorSpinBox(QWidget *parent) : QWidget(parent),
 															ui(new Ui::WidgetVectorSpinBox)

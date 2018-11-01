@@ -7,9 +7,9 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "ExplorerItem.h"
 #include "SpriteWidget.h"
-#include "Global.h"
 #include "Project.h"
 #include "ExplorerTreeWidget.h"
 #include "Harmony/Utilities/HyStrManip.h"
@@ -51,7 +51,19 @@ ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidget
 	QVariant v; v.setValue(this);
 	m_pTreeItemPtr->setData(0, Qt::UserRole, v);
 
-	if(pParentTreeItem)
+	// GetPrefix() doesn't work until we attach a parent. Manually grab the prefix from 'm_sPath'
+	QStringList sPathParts = m_sPath.split('/');
+	QString sPrefix;
+	if(sPathParts.size() == 1)
+		sPrefix = sPathParts[0];
+	else
+	{
+		for(int32 i = 0; i < sPathParts.size() - 1; ++i)
+			sPrefix += sPathParts[i];
+	}
+	sPrefix += '/';
+
+	if(pParentTreeItem && sPrefix != HyGuiInternalPrefix)
 		pParentTreeItem->addChild(m_pTreeItemPtr);
 }
 

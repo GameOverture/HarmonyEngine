@@ -67,7 +67,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;$(QTDIR)\include;release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;..\..\include\Harmony;$(QTDIR)\include;release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -84,6 +84,8 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Global.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(QTDIR)\lib\qtmain.lib;shell32.lib;freetype-gl.lib;assimp.lib;AdvAPI32.lib;ole32.lib;$(QTDIR)\lib\Qt5OpenGL.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Network.lib;$(QTDIR)\lib\Qt5Core.lib;HyEngine_x64GuiRelease.lib;Qt5Gui.lib;Qt5Widgets.lib;Qt5Core.lib;Qt5Network.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -109,13 +111,13 @@
     <QtMoc>
       <QTDIR>$(QTDIR)</QTDIR>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
-      <Define>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;NDEBUG;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
+      <Define>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;NDEBUG;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB</Define>
       <CompilerFlavor>msvc</CompilerFlavor>
       <Include>$(Configuration)/moc_predefs.h</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <InputFile>%(FullPath)</InputFile>
       <DynamicSource>output</DynamicSource>
-      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;$(QTDIR)\include;release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork;%(AdditionalIncludeDirectories)</IncludePath>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;..\..\include\Harmony;$(QTDIR)\include;release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork;%(AdditionalIncludeDirectories)</IncludePath>
     </QtMoc>
     <QtRcc>
       <InitFuncName>HyEditor</InitFuncName>
@@ -139,7 +141,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;$(QTDIR)\include;debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;..\..\include\Harmony;$(QTDIR)\include;debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -156,6 +158,8 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Global.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(QTDIR)\lib\qtmaind.lib;shell32.lib;freetype-gl.lib;assimp.lib;AdvAPI32.lib;ole32.lib;$(QTDIR)\lib\Qt5OpenGLd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Networkd.lib;$(QTDIR)\lib\Qt5Cored.lib;HyEngine_x64GuiDebug.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5Cored.lib;Qt5Networkd.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -180,13 +184,13 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtMoc>
       <QTDIR>$(QTDIR)</QTDIR>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
-      <Define>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_KEYWORDS;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
+      <Define>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_KEYWORDS;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB</Define>
       <CompilerFlavor>msvc</CompilerFlavor>
       <Include>$(Configuration)/moc_predefs.h</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <InputFile>%(FullPath)</InputFile>
       <DynamicSource>output</DynamicSource>
-      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;$(QTDIR)\include;debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork;%(AdditionalIncludeDirectories)</IncludePath>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;..\..\include\Harmony;$(QTDIR)\include;debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork;%(AdditionalIncludeDirectories)</IncludePath>
     </QtMoc>
     <QtUic>
       <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
@@ -238,7 +242,10 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Font\FontUndoCmds.cpp" />
     <ClCompile Include="Font\FontWidget.cpp" />
     <ClCompile Include="Primitive\PrimitiveModel.cpp" />
-    <ClCompile Include="Shared\Global.cpp" />
+    <ClCompile Include="Shared\Global.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Harmony\Harmony.cpp" />
     <ClCompile Include="Harmony\HarmonyConnection.cpp" />
     <ClCompile Include="Harmony\HarmonyWidget.cpp" />
@@ -269,128 +276,233 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Widget\WidgetOutputLog.cpp" />
     <ClCompile Include="Widget\WidgetRangedSlider.cpp" />
     <ClCompile Include="Widget\WidgetVectorSpinBox.cpp" />
-    <ClCompile Include="_Dependencies\scriptum\imagecrop.cpp" />
-    <ClCompile Include="_Dependencies\scriptum\imagepacker.cpp" />
-    <ClCompile Include="_Dependencies\scriptum\imagesort.cpp" />
+    <ClCompile Include="_Dependencies\scriptum\imagecrop.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="_Dependencies\scriptum\imagepacker.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="_Dependencies\scriptum\imagesort.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="_Dependencies\scriptum\maxrects.cpp" />
-    <ClCompile Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.cpp" />
+    <ClCompile Include="_Dependencies\scriptum\maxrects.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h" />
     <ClInclude Include="Atlas\AtlasFrame.h" />
     <QtMoc Include="Atlas\AtlasModel.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Atlas\AtlasRepackThread.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Atlas\AtlasWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Audio\AudioDraw.h" />
     <QtMoc Include="Audio\AudioModelView.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Audio\AudioWave.h" />
     <QtMoc Include="Audio\AudioWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Audio\AudioWidgetBank.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Audio\AudioWidgetManager.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Audio\AudioWidgetState.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgAtlasGroupSettings.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgColorPicker.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgInputName.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgNewItem.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgNewProject.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgProjectSettings.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgSetEngineLocation.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Entity3d\Entity3d.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity3d/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity3d/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Entity\EntityDraw.h" />
     <QtMoc Include="Entity\EntityModel.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Entity\EntityTreeModel.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Entity\EntityUndoCmds.h" />
     <QtMoc Include="Entity\EntityWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Explorer\ExplorerItem.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Explorer\ExplorerTreeWidget.h" />
     <QtMoc Include="Explorer\ExplorerWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Font\FontDraw.h" />
     <QtMoc Include="Font\FontModelView.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Font\FontModels.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Font\FontUndoCmds.h" />
     <QtMoc Include="Font\FontWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Primitive\PrimitiveModel.h" />
     <ClInclude Include="Shared\Global.h" />
     <ClInclude Include="Shared\GlobalUndoCmds.h" />
     <ClInclude Include="Shared\GlobalWidgetMappers.h" />
     <QtMoc Include="Harmony\Harmony.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Harmony/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Harmony/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Harmony\HarmonyConnection.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Harmony/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Harmony/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Harmony\HarmonyWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Harmony/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Harmony/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Shared\IDraw.h" />
     <ClInclude Include="Shared\IModel.h" />
     <ClInclude Include="Shared\IModelTreeItem.h" />
     <QtMoc Include="MainWindow.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Prefab\PrefabDraw.h" />
     <ClInclude Include="Prefab\PrefabModel.h" />
     <QtMoc Include="Prefab\PrefabWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Prefab/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Prefab/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Project\Project.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Project\ProjectDraw.h" />
     <QtMoc Include="Project\ProjectItem.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Project\ProjectItemMimeData.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Shared\Properties\PropertiesTreeItem.h" />
     <QtMoc Include="Shared\Properties\PropertiesTreeModel.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Shared/Properties/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Shared/Properties/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Shared\Properties\PropertiesTreeView.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Shared/Properties/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Shared/Properties/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Shared\Properties\PropertiesUndoCmd.h" />
     <ClInclude Include="Sprite\SpriteDraw.h" />
     <QtMoc Include="Sprite\SpriteModels.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Sprite/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Sprite/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Sprite\SpriteTableView.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Sprite/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Sprite/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Sprite\SpriteUndoCmds.h" />
     <QtMoc Include="Sprite\SpriteWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Sprite/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Sprite/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Widget\WidgetColor.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Widget\WidgetGradientEditor.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Widget\WidgetLiveVarManager.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Widget\WidgetLiveVariable.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Widget\WidgetOutputLog.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Widget\WidgetRangedSlider.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Widget\WidgetVectorSpinBox.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Widget/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="_Dependencies\scriptum\imagepacker.h" />
     <ClInclude Include="_Dependencies\scriptum\maxrects.h" />
     <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../_Dependencies/QtWaitingSpinner/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../_Dependencies/QtWaitingSpinner/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

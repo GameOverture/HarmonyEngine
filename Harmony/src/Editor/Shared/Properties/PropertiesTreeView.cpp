@@ -7,9 +7,9 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Global.h"
 #include "PropertiesTreeView.h"
 #include "PropertiesTreeItem.h"
-#include "Global.h"
 #include "WidgetVectorSpinBox.h"
 #include "ProjectItem.h"
 #include "IModel.h"

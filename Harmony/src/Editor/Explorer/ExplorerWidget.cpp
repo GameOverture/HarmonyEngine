@@ -7,10 +7,9 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
+#include "Global.h"
 #include "ExplorerWidget.h"
 #include "ui_ExplorerWidget.h"
-
-#include "Global.h"
 #include "MainWindow.h"
 #include "Harmony.h"
 #include "Project.h"
@@ -294,8 +293,8 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sP
 	}
 
 	QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, eType, correspondingParentList);
-	if(importedFramesSet.empty() == false)
-		pProject->GetAtlasModel().Repack(pProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedFramesSet);
+	//if(importedFramesSet.empty() == false)
+	//	pProject->GetAtlasModel().Repack(pProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedFramesSet);
 
 	// Replace any image "id" with the newly imported frames' ids
 	if(pasteObj["src"].isArray())

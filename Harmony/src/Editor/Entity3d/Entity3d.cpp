@@ -1,3 +1,4 @@
+#include "Global.h"
 #include "Entity3d.h"
 #include "ui_Entity3d.h"
 
