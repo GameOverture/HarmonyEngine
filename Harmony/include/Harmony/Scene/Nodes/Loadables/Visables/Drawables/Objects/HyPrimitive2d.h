@@ -23,6 +23,7 @@ protected:
 
 	bool			m_bWireframe;
 	float			m_fLineThickness;
+	uint32			m_uiNumSegments;
 
 public:
 	HyPrimitive2d(HyEntity2d *pParent);
@@ -42,6 +43,9 @@ public:
 	float GetLineThickness();
 	void SetLineThickness(float fThickness);
 
+	uint32 GetNumCircleSegments();
+	void SetNumCircleSegments(uint32 uiNumSegments);
+
 	virtual bool IsLoadDataValid() override;
 
 protected:
@@ -55,7 +59,7 @@ private:
 	void SetData();
 
 	void SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices);
-	void SetAsCircle(glm::vec2 &ptCenter, float fRadius);
+	void SetAsCircle(glm::vec2 &ptCenter, float fRadius, uint32 uiSegments);
 	void SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices);
 };
 

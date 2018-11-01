@@ -17,7 +17,8 @@ HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Primiti
 													m_pVertBuffer(nullptr),
 													m_uiNumVerts(0),
 													m_bWireframe(false),
-													m_fLineThickness(1.0f)
+													m_fLineThickness(1.0f),
+													m_uiNumSegments(16)
 {
 	ClearData();
 }
@@ -88,6 +89,17 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 		return;
 
 	m_fLineThickness = fThickness;
+	SetData();
+}
+
+uint32 HyPrimitive2d::GetNumCircleSegments()
+{
+	return m_uiNumSegments;
+}
+
+void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
+{
+	m_uiNumSegments = uiNumSegments;
 	SetData();
 }
 
@@ -171,9 +183,7 @@ void HyPrimitive2d::SetData()
 	} break;
 
 	case HYSHAPE_Circle:
-		SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x,
-			static_cast<b2CircleShape *>(pb2Shape)->m_p.y),
-			static_cast<b2CircleShape *>(pb2Shape)->m_radius);
+		SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x, static_cast<b2CircleShape *>(pb2Shape)->m_p.y), static_cast<b2CircleShape *>(pb2Shape)->m_radius, m_uiNumSegments);
 		break;
 
 	case HYSHAPE_Polygon: {
@@ -294,9 +304,9 @@ void HyPrimitive2d::SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	//}
 }
 
-void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius)
+void HyPrimitive2d::SetAsCircle(glm::vec2 &ptCenter, float fRadius, uint32 uiSegments)
 {
-	const float32 k_segments = 16.0f;
+	const float32 k_segments = static_cast<float>(uiSegments);
 	const float32 k_increment = 2.0f * b2_pi / k_segments;
 	float32 sinInc = sinf(k_increment);
 	float32 cosInc = cosf(k_increment);
