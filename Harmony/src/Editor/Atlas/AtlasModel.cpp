@@ -216,11 +216,13 @@ AtlasModel::AtlasModel(Project *pProjOwner) :	m_pProjOwner(pProjOwner),
 			else
 				pNewFrame->ClearError(ATLASFRAMEERROR_CannotFindMetaImg);
 
-			if(pFrameParent)
-				pFrameParent->addChild(pNewFrame->GetTreeItem());
-			else
-				m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
-
+			if(pNewFrame->GetName().isEmpty() || pNewFrame->GetName()[0] != HyGuiInternalCharIndicator)
+			{
+				if(pFrameParent)
+					pFrameParent->addChild(pNewFrame->GetTreeItem());
+				else
+					m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
+			}
 		}
 	}
 	else
