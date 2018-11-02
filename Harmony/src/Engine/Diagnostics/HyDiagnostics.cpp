@@ -122,6 +122,7 @@ void HyDiagnostics::Show(uint32 uiDiagFlags, float fX /*= 0.0f*/, float fY /*= 0
 
 	m_DiagOutput.SetShowFlags(uiDiagFlags);
 	m_DiagOutput.pos.Set(fX, fY);
+	m_DiagOutput.UseWindowCoordinates(0);
 }
 
 uint32 HyDiagnostics::GetShowFlags()
