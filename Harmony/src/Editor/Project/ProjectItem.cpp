@@ -147,7 +147,6 @@ void ProjectItem::Save()
 	m_pUndoStack->setClean();
 
 	m_bExistencePendingSave = false;
-
 }
 
 bool ProjectItem::IsExistencePendingSave()

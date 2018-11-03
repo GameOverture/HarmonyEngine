@@ -203,6 +203,9 @@ MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
 	pSvnLoginLabel->setText("SVN Not Detected");
 	statusBar()->addPermanentWidget(pSvnLoginLabel);
 
+	// Manual connections (QtCreator used its black magic to generate these automatically back when I used it)
+	connect(ui->actionNewPrefix, SIGNAL(triggered(QAction*)), this, SLOT(on_actionNewPrefix_triggered));
+
 	HyGuiLog("Ready to go!", LOGTYPE_Normal);
 }
 
@@ -433,6 +436,11 @@ void MainWindow::on_actionCloseProject_triggered()
 {
 	Harmony::SetProject(nullptr);
 	ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
+}
+
+void MainWindow::on_actionNewPrefix_triggered()
+{
+	NewItem(ITEM_Prefix);
 }
 
 void MainWindow::on_actionNewAudio_triggered()
@@ -682,12 +690,12 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
 	if(pDlg->exec())
 	{
-		ui->explorer->AddNewItem(ui->explorer->GetCurProjSelected(),
-								 eItem,
-								 pDlg->GetPrefix(),
-								 pDlg->GetName(),
-								 true,
-								 pDlg->GetImportFile().isEmpty() ? QJsonValue() : QJsonValue(pDlg->GetImportFile()));
+		ui->explorer->AddItem(ui->explorer->GetCurProjSelected(),
+							  eItem,
+							  pDlg->GetPrefix(),
+							  pDlg->GetName(),
+							  true,
+							  pDlg->GetImportFile().isEmpty() ? QJsonValue() : QJsonValue(pDlg->GetImportFile()));
 	}
 
 	delete pDlg;

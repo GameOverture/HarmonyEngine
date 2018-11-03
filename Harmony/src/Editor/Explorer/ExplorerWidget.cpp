@@ -79,18 +79,18 @@ Project *ExplorerWidget::AddProject(const QString sNewProjectFilePath)
 	//pNewLoadThread->start();
 }
 
-ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue importValue)
+void ExplorerWidget::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue importValue)
 {
 	if(pProj == nullptr)
 	{
 		HyGuiLog("Could not find associated project for item: " % sPrefix % "/" % sName, LOGTYPE_Error);
-		return nullptr;
+		return;
 	}
 	
 	if(eNewItemType == ITEM_Project)
 	{
 		HyGuiLog("Do not use WidgetExplorer::AddItem for projects... use AddProjectItem instead", LOGTYPE_Error);
-		return nullptr;
+		return;
 	}
 
 	QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
@@ -121,29 +121,35 @@ ProjectItem *ExplorerWidget::AddNewItem(Project *pProj, HyGuiItemType eNewItemTy
 		}
 	}
 
-	ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, pParentTreeItem, sName, importValue, true);
-
-	pItem->SetTreeItemSubIcon(SUBICON_New);
-
-	if(bOpenAfterAdd)
+	if(eNewItemType == ITEM_Prefix)
 	{
-		QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
-		while(pExpandItem->parent() != nullptr)
+		/*ExplorerItem *pNewPrefixItem = */new ExplorerItem(ITEM_Prefix, sName, pParentTreeItem);
+		//pProj->SaveGameData(ITEM_Prefix, pNewPrefixItem->GetName(true), pNewPrefixItem->GetName(true));
+		//pProj->WriteGameData();
+	}
+	else
+	{
+		ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, pParentTreeItem, sName, importValue, true);
+		pItem->SetTreeItemSubIcon(SUBICON_New);
+
+		if(bOpenAfterAdd)
 		{
-			ui->treeWidget->expandItem(pExpandItem->parent());
-			pExpandItem = pExpandItem->parent();
+			QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
+			while(pExpandItem->parent() != nullptr)
+			{
+				ui->treeWidget->expandItem(pExpandItem->parent());
+				pExpandItem = pExpandItem->parent();
+			}
+
+			MainWindow::OpenItem(pItem);
 		}
-	
-		MainWindow::OpenItem(pItem);
+
+		// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
+		if(importValue.isNull() == false)
+			pItem->Save();
 	}
 
 	ui->treeWidget->sortItems(0, Qt::AscendingOrder);
-
-	// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
-	if(importValue.isNull() == false)
-		pItem->Save();
-
-	return pItem;
 }
 
 void ExplorerWidget::RemoveItem(ExplorerItem *pItem)
@@ -329,7 +335,7 @@ void ExplorerWidget::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sP
 	QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
 	QString sPrefix = sPrefixOverride.isEmpty() ? itemNameFileInfo.path() : sPrefixOverride;
 	QString sName = itemNameFileInfo.baseName();
-	ProjectItem *pNewItem = AddNewItem(pProject, ePasteItemType, sPrefix, sName, false, pasteObj["src"]);
+	AddItem(pProject, ePasteItemType, sPrefix, sName, false, pasteObj["src"]);
 }
 
 void ExplorerWidget::RecursiveRemoveItem(ExplorerItem *pItem)

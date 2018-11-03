@@ -23,10 +23,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
       <Extensions>qrc;*</Extensions>
@@ -41,437 +37,374 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Atlas">
+      <UniqueIdentifier>{6ecba3dd-e2f2-44b0-9b08-75a9ded8248f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{50a4285d-aebd-4761-b3c6-c30c67933f8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{0168d00c-b1bd-4cb3-b7cb-90db34177f75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{e2df854d-ad1a-4318-b2b7-470a63859c86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Explorer">
+      <UniqueIdentifier>{ccc15290-3da5-4c9c-a7c1-80f1c0595259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Font">
+      <UniqueIdentifier>{1da4e621-577a-45c1-bd9b-1451871db304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Harmony">
+      <UniqueIdentifier>{b0b302e9-83ae-4568-8033-4375c55b311e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Global">
+      <UniqueIdentifier>{c5f02b5c-b891-45f2-9f42-1a786b263634}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prefab">
+      <UniqueIdentifier>{a0e96959-a1c9-4c18-96df-7283215463b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Project">
+      <UniqueIdentifier>{f7392cf3-2e88-4305-ae53-7bf1cab4a32c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sprite">
+      <UniqueIdentifier>{f6971566-117c-4d32-b242-8f511520741c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Dependencies">
+      <UniqueIdentifier>{b2a1cd3f-073e-425b-bf98-b38fce8789d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Widgets">
+      <UniqueIdentifier>{071cfd87-10cb-4185-a547-fb5a8fc71b6e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Atlas\AtlasDraw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Atlas</Filter>
     </ClCompile>
     <ClCompile Include="Atlas\AtlasFrame.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Atlas</Filter>
     </ClCompile>
     <ClCompile Include="Atlas\AtlasModel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Atlas</Filter>
     </ClCompile>
     <ClCompile Include="Atlas\AtlasRepackThread.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Atlas</Filter>
     </ClCompile>
     <ClCompile Include="Atlas\AtlasWidget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Atlas</Filter>
     </ClCompile>
     <ClCompile Include="Audio\AudioDraw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Audio\AudioModelView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Audio\AudioWave.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Audio\AudioWidget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Audio\AudioWidgetBank.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Audio\AudioWidgetManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Audio\AudioWidgetState.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs\DlgAtlasGroupSettings.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs\DlgColorPicker.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs\DlgInputName.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs\DlgNewItem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs\DlgNewProject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs\DlgProjectSettings.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs\DlgSetEngineLocation.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="Entity3d\Entity3d.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="Entity\EntityDraw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="Entity\EntityModel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="Entity\EntityTreeModel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="Entity\EntityUndoCmds.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="Entity\EntityWidget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="Explorer\ExplorerItem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Explorer</Filter>
     </ClCompile>
     <ClCompile Include="Explorer\ExplorerTreeWidget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Explorer</Filter>
     </ClCompile>
     <ClCompile Include="Explorer\ExplorerWidget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Explorer</Filter>
     </ClCompile>
     <ClCompile Include="Font\FontDraw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Font\FontModelView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Font</Filter>
     </ClCompile>
     <ClCompile Include="Font\FontModels.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Font</Filter>
+    </ClCompile>
+    <ClCompile Include="Font\FontModelView.cpp">
+      <Filter>Font</Filter>
     </ClCompile>
     <ClCompile Include="Font\FontUndoCmds.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Font</Filter>
     </ClCompile>
     <ClCompile Include="Font\FontWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shared\Global.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Font</Filter>
     </ClCompile>
     <ClCompile Include="Harmony\Harmony.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Harmony</Filter>
     </ClCompile>
     <ClCompile Include="Harmony\HarmonyConnection.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Harmony</Filter>
     </ClCompile>
     <ClCompile Include="Harmony\HarmonyWidget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Harmony</Filter>
     </ClCompile>
     <ClCompile Include="Shared\IDraw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Global</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\Global.cpp">
+      <Filter>Global</Filter>
     </ClCompile>
     <ClCompile Include="Shared\IModel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Global</Filter>
     </ClCompile>
     <ClCompile Include="Shared\IModelTreeItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MainWindow.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Global</Filter>
     </ClCompile>
     <ClCompile Include="Prefab\PrefabDraw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Prefab</Filter>
     </ClCompile>
     <ClCompile Include="Prefab\PrefabModel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Prefab</Filter>
     </ClCompile>
     <ClCompile Include="Prefab\PrefabWidget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Prefab</Filter>
     </ClCompile>
     <ClCompile Include="Project\Project.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Project</Filter>
     </ClCompile>
     <ClCompile Include="Project\ProjectDraw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Project</Filter>
     </ClCompile>
     <ClCompile Include="Project\ProjectItem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Project</Filter>
     </ClCompile>
     <ClCompile Include="Project\ProjectItemMimeData.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Project</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeItem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Global</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Global</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Global</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesUndoCmd.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Global</Filter>
     </ClCompile>
     <ClCompile Include="Sprite\SpriteDraw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Sprite</Filter>
     </ClCompile>
     <ClCompile Include="Sprite\SpriteModels.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Sprite</Filter>
     </ClCompile>
     <ClCompile Include="Sprite\SpriteTableView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Sprite</Filter>
     </ClCompile>
     <ClCompile Include="Sprite\SpriteUndoCmds.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Sprite</Filter>
     </ClCompile>
     <ClCompile Include="Sprite\SpriteWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Widget\WidgetColor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Widget\WidgetGradientEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Widget\WidgetLiveVarManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Widget\WidgetLiveVariable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Widget\WidgetOutputLog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Widget\WidgetRangedSlider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Widget\WidgetVectorSpinBox.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Sprite</Filter>
     </ClCompile>
     <ClCompile Include="_Dependencies\scriptum\imagecrop.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>_Dependencies</Filter>
     </ClCompile>
     <ClCompile Include="_Dependencies\scriptum\imagepacker.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>_Dependencies</Filter>
     </ClCompile>
     <ClCompile Include="_Dependencies\scriptum\imagesort.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>_Dependencies</Filter>
     </ClCompile>
     <ClCompile Include="_Dependencies\scriptum\maxrects.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>_Dependencies</Filter>
     </ClCompile>
     <ClCompile Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>_Dependencies</Filter>
     </ClCompile>
-    <ClCompile Include="Primitive\PrimitiveModel.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Widget\WidgetColor.cpp">
+      <Filter>Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="Widget\WidgetGradientEditor.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetLiveVariable.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetLiveVarManager.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetOutputLog.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetRangedSlider.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget\WidgetVectorSpinBox.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="Primitive\PrimitiveModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Atlas\AtlasFrame.h">
-      <Filter>Header Files</Filter>
+      <Filter>Atlas</Filter>
     </ClInclude>
     <QtMoc Include="Atlas\AtlasModel.h">
-      <Filter>Header Files</Filter>
+      <Filter>Atlas</Filter>
     </QtMoc>
     <QtMoc Include="Atlas\AtlasRepackThread.h">
-      <Filter>Header Files</Filter>
+      <Filter>Atlas</Filter>
     </QtMoc>
-    <QtMoc Include="Atlas\AtlasWidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClInclude Include="Audio\AudioDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <QtMoc Include="Audio\AudioModelView.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClInclude Include="Audio\AudioWave.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <QtMoc Include="Audio\AudioWidget.h">
-      <Filter>Header Files</Filter>
+      <Filter>Audio</Filter>
     </QtMoc>
     <QtMoc Include="Audio\AudioWidgetBank.h">
-      <Filter>Header Files</Filter>
+      <Filter>Audio</Filter>
     </QtMoc>
     <QtMoc Include="Audio\AudioWidgetManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Audio</Filter>
     </QtMoc>
     <QtMoc Include="Audio\AudioWidgetState.h">
-      <Filter>Header Files</Filter>
+      <Filter>Audio</Filter>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgAtlasGroupSettings.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgColorPicker.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgInputName.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgNewItem.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgNewProject.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgProjectSettings.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgSetEngineLocation.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtMoc>
-    <QtMoc Include="Entity3d\Entity3d.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClInclude Include="Entity\EntityDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <QtMoc Include="Entity\EntityModel.h">
-      <Filter>Header Files</Filter>
+      <Filter>Entity</Filter>
     </QtMoc>
-    <QtMoc Include="Entity\EntityTreeModel.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClInclude Include="Entity\EntityUndoCmds.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <QtMoc Include="Entity\EntityWidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Explorer\ExplorerItem.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClInclude Include="Explorer\ExplorerTreeWidget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <QtMoc Include="Explorer\ExplorerWidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClInclude Include="Font\FontDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <QtMoc Include="Font\FontModelView.h">
-      <Filter>Header Files</Filter>
+      <Filter>Entity</Filter>
     </QtMoc>
     <QtMoc Include="Font\FontModels.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClInclude Include="Font\FontUndoCmds.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <QtMoc Include="Font\FontWidget.h">
-      <Filter>Header Files</Filter>
+      <Filter>Font</Filter>
     </QtMoc>
     <ClInclude Include="Shared\Global.h">
-      <Filter>Header Files</Filter>
+      <Filter>Global</Filter>
     </ClInclude>
     <ClInclude Include="Shared\GlobalUndoCmds.h">
-      <Filter>Header Files</Filter>
+      <Filter>Global</Filter>
     </ClInclude>
     <ClInclude Include="Shared\GlobalWidgetMappers.h">
-      <Filter>Header Files</Filter>
+      <Filter>Global</Filter>
     </ClInclude>
-    <QtMoc Include="Harmony\Harmony.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Harmony\HarmonyConnection.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Harmony\HarmonyWidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <ClInclude Include="Shared\IDraw.h">
-      <Filter>Header Files</Filter>
+      <Filter>Global</Filter>
     </ClInclude>
     <ClInclude Include="Shared\IModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Shared\IModelTreeItem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <QtMoc Include="MainWindow.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClInclude Include="Prefab\PrefabDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Prefab\PrefabModel.h">
-      <Filter>Header Files</Filter>
+      <Filter>Global</Filter>
     </ClInclude>
     <QtMoc Include="Prefab\PrefabWidget.h">
-      <Filter>Header Files</Filter>
+      <Filter>Prefab</Filter>
     </QtMoc>
     <QtMoc Include="Project\Project.h">
-      <Filter>Header Files</Filter>
+      <Filter>Project</Filter>
     </QtMoc>
-    <ClInclude Include="Project\ProjectDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <QtMoc Include="Project\ProjectItem.h">
-      <Filter>Header Files</Filter>
+      <Filter>Project</Filter>
     </QtMoc>
     <QtMoc Include="Project\ProjectItemMimeData.h">
-      <Filter>Header Files</Filter>
+      <Filter>Project</Filter>
     </QtMoc>
-    <ClInclude Include="Shared\Properties\PropertiesTreeItem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <QtMoc Include="Shared\Properties\PropertiesTreeModel.h">
-      <Filter>Header Files</Filter>
+      <Filter>Global</Filter>
     </QtMoc>
     <QtMoc Include="Shared\Properties\PropertiesTreeView.h">
-      <Filter>Header Files</Filter>
+      <Filter>Global</Filter>
     </QtMoc>
-    <ClInclude Include="Shared\Properties\PropertiesUndoCmd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite\SpriteDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <QtMoc Include="Sprite\SpriteModels.h">
-      <Filter>Header Files</Filter>
+      <Filter>Sprite</Filter>
     </QtMoc>
     <QtMoc Include="Sprite\SpriteTableView.h">
-      <Filter>Header Files</Filter>
+      <Filter>Sprite</Filter>
     </QtMoc>
-    <ClInclude Include="Sprite\SpriteUndoCmds.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <QtMoc Include="Sprite\SpriteWidget.h">
-      <Filter>Header Files</Filter>
+      <Filter>Sprite</Filter>
+    </QtMoc>
+    <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">
+      <Filter>_Dependencies</Filter>
     </QtMoc>
     <QtMoc Include="Widget\WidgetColor.h">
-      <Filter>Header Files</Filter>
+      <Filter>Widgets</Filter>
     </QtMoc>
     <QtMoc Include="Widget\WidgetGradientEditor.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Widget\WidgetLiveVarManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Widgets</Filter>
     </QtMoc>
     <QtMoc Include="Widget\WidgetLiveVariable.h">
-      <Filter>Header Files</Filter>
+      <Filter>Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="Widget\WidgetLiveVarManager.h">
+      <Filter>Widgets</Filter>
     </QtMoc>
     <QtMoc Include="Widget\WidgetOutputLog.h">
-      <Filter>Header Files</Filter>
+      <Filter>Widgets</Filter>
     </QtMoc>
     <QtMoc Include="Widget\WidgetRangedSlider.h">
-      <Filter>Header Files</Filter>
+      <Filter>Widgets</Filter>
     </QtMoc>
     <QtMoc Include="Widget\WidgetVectorSpinBox.h">
-      <Filter>Header Files</Filter>
+      <Filter>Widgets</Filter>
     </QtMoc>
-    <ClInclude Include="_Dependencies\scriptum\imagepacker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="_Dependencies\scriptum\maxrects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClInclude Include="Primitive\PrimitiveModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="Primitive\PrimitiveModel.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -1216,5 +1149,97 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HyEditor.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Atlas\AtlasFrame.h">
+      <Filter>Atlas</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioDraw.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioWave.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\EntityDraw.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\EntityUndoCmds.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Explorer\ExplorerTreeWidget.h">
+      <Filter>Explorer</Filter>
+    </ClInclude>
+    <ClInclude Include="Font\FontDraw.h">
+      <Filter>Font</Filter>
+    </ClInclude>
+    <ClInclude Include="Font\FontUndoCmds.h">
+      <Filter>Font</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\IModelTreeItem.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Prefab\PrefabDraw.h">
+      <Filter>Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="Prefab\PrefabModel.h">
+      <Filter>Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="Project\ProjectDraw.h">
+      <Filter>Project</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\Properties\PropertiesTreeItem.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\Properties\PropertiesUndoCmd.h">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite\SpriteDraw.h">
+      <Filter>Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite\SpriteUndoCmds.h">
+      <Filter>Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="_Dependencies\scriptum\imagepacker.h">
+      <Filter>_Dependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="_Dependencies\scriptum\maxrects.h">
+      <Filter>_Dependencies</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Atlas\AtlasWidget.h">
+      <Filter>Atlas</Filter>
+    </QtMoc>
+    <QtMoc Include="Audio\AudioModelView.h">
+      <Filter>Audio</Filter>
+    </QtMoc>
+    <QtMoc Include="Entity3d\Entity3d.h">
+      <Filter>Entity</Filter>
+    </QtMoc>
+    <QtMoc Include="Entity\EntityTreeModel.h">
+      <Filter>Entity</Filter>
+    </QtMoc>
+    <QtMoc Include="Explorer\ExplorerItem.h">
+      <Filter>Explorer</Filter>
+    </QtMoc>
+    <QtMoc Include="Explorer\ExplorerWidget.h">
+      <Filter>Explorer</Filter>
+    </QtMoc>
+    <QtMoc Include="Font\FontModelView.h">
+      <Filter>Font</Filter>
+    </QtMoc>
+    <QtMoc Include="Font\FontWidget.h">
+      <Filter>Font</Filter>
+    </QtMoc>
+    <QtMoc Include="Harmony\Harmony.h">
+      <Filter>Harmony</Filter>
+    </QtMoc>
+    <QtMoc Include="Harmony\HarmonyConnection.h">
+      <Filter>Harmony</Filter>
+    </QtMoc>
+    <QtMoc Include="Harmony\HarmonyWidget.h">
+      <Filter>Harmony</Filter>
+    </QtMoc>
+    <QtMoc Include="MainWindow.h" />
   </ItemGroup>
 </Project>

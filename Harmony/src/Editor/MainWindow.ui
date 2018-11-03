@@ -67,6 +67,8 @@
      <property name="title">
       <string>&amp;New Item</string>
      </property>
+     <addaction name="actionNewPrefix"/>
+     <addaction name="separator"/>
      <addaction name="actionNewAudio"/>
      <addaction name="actionNewParticle"/>
      <addaction name="actionNewSprite"/>
@@ -604,6 +606,18 @@
    </property>
    <property name="toolTip">
     <string>Add a new prefab from an imported 3d asset</string>
+   </property>
+  </action>
+  <action name="actionNewPrefix">
+   <property name="icon">
+    <iconset resource="res/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Prefix-New.png</normaloff>:/icons16x16/items/Prefix-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Prefix</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new Prefix which helps categorize all the items in the project</string>
    </property>
   </action>
  </widget>
