@@ -78,6 +78,7 @@ private:
 
 	HyRendererInterop &GetRenderer();
 
+	friend IHyApplication &		Hy_App();
 	friend float				Hy_UpdateStep();
 	friend double				Hy_UpdateStepDbl();
 	friend void					Hy_PauseGame(bool bPause);

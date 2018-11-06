@@ -92,6 +92,7 @@ public:
 	void AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut);
 	void LoadNodeData(IHyLoadable *pLoadable);
 	void RemoveNodeData(IHyLoadable *pLoadable);
+	void SetEntityLoaded(IHyLoadable *pLoadable);
 	bool IsInstLoaded(IHyLoadable *pLoadable);
 
 	void Shutdown();

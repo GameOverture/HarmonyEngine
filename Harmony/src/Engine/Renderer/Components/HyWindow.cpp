@@ -39,7 +39,7 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShow
 	m_vFramebufferSize = m_Info.vSize;
 
 #ifdef HY_PLATFORM_DESKTOP
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 	GLFWmonitor *pMonitorOwner = nullptr;

@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // QUADBATCH
 const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
-#version 430
+#version 330
 
 uniform mat4					u_mtxWorldToCamera;
 uniform mat4					u_mtxCameraToClip;
@@ -64,7 +64,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
-#version 430
+#version 330
 
 uniform sampler2D	u_Tex;
 
@@ -89,7 +89,7 @@ void main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PRIMITIVE
 const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(
-#version 430
+#version 330
 
 uniform mat4					u_mtxTransform;
 uniform mat4					u_mtxWorldToCamera;
@@ -107,7 +107,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
-#version 430
+#version 330
 
 uniform vec4	u_vColor;
 out vec4		out_vColor;
@@ -121,7 +121,7 @@ void main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // LINES2D
 const char * const szHYLINES2D_VERTEXSHADER = R"src(
-#version 430
+#version 330
 
 uniform float					u_fHalfWidth;
 uniform float					u_fFeatherAmt;
@@ -147,7 +147,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYLINES2D_FRAGMENTSHADER = R"src(
-#version 430
+#version 330
 
 uniform float		u_fHalfWidth;
 uniform float		u_fFeatherAmt;
@@ -174,7 +174,7 @@ void main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GLTF
 const char * const szHYGLTF_VERTEXSHADER = R"src(
-#version 430
+#version 330
 
 uniform mat4					u_mtxTransform;
 uniform mat4					u_mtxWorldToCamera;
@@ -198,7 +198,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYGLTF_FRAGMENTSHADER = R"src(
-#version 430
+#version 330
 
 uniform sampler2D	u_Tex;
 

@@ -185,6 +185,7 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 
 void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 {
+	HyAssert(pLoadable->_LoadableGetType() != HYTYPE_Entity, "HyAssets::LoadNodeData passed an entity");
 	if(pLoadable->m_eLoadState != HYLOADSTATE_Inactive || pLoadable->IsLoadDataValid() == false)
 		return;
 
@@ -219,24 +220,18 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 	}
 
 	// Set the node's 'm_eLoadState' appropriately below to prevent additional Loads
-	if(pLoadable->_LoadableGetType() == HYTYPE_Entity)
-	{
-		if(pLoadable->IsChildrenLoaded())
-			SetAsLoaded(pLoadable);
-	}
-	else if(bFullyLoaded == false)
+	if(bFullyLoaded)
+		SetAsLoaded(pLoadable);
+	else
 	{
 		pLoadable->m_eLoadState = HYLOADSTATE_Queued;
 		m_QueuedInstList.push_back(pLoadable);
-	}
-	else
-	{
-		SetAsLoaded(pLoadable);
 	}
 }
 
 void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 {
+	HyAssert(pLoadable->_LoadableGetType() != HYTYPE_Entity, "HyAssets::RemoveNodeData passed an entity");
 	if(pLoadable->m_eLoadState == HYLOADSTATE_Inactive)
 		return;
 
@@ -254,6 +249,25 @@ void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 	}
 
 	SetAsUnloaded(pLoadable);
+}
+
+void HyAssets::SetEntityLoaded(IHyLoadable *pLoadableEntity)
+{
+	if(pLoadableEntity == nullptr)
+		return;
+
+	HyAssert(pLoadableEntity->_LoadableGetType() == HYTYPE_Entity, "HyAssets::SetEntityLoaded was passed a node that wasn't an entity");
+
+	if(pLoadableEntity->IsLoaded())
+	{
+		if(pLoadableEntity->IsChildrenLoaded() == false)
+			SetAsUnloaded(pLoadableEntity);
+	}
+	else
+	{
+		if(pLoadableEntity->IsChildrenLoaded())
+			SetAsLoaded(pLoadableEntity);
+	}
 }
 
 bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
@@ -641,9 +655,7 @@ void HyAssets::SetAsLoaded(IHyLoadable *pLoadable)
 
 	m_LoadedInstList.push_back(pLoadable);
 
-	IHyLoadable *pParent = pLoadable->_LoadableGetParentPtr();
-	if(pParent && pParent->IsChildrenLoaded())
-		SetAsLoaded(pParent);
+	SetEntityLoaded(pLoadable->_LoadableGetParentPtr());
 }
 
 void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
@@ -674,6 +686,5 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	pLoadable->m_eLoadState = HYLOADSTATE_Inactive;
 	pLoadable->OnUnloaded();
 
-	if(pLoadable->_LoadableGetParentPtr())
-		SetAsUnloaded(pLoadable->_LoadableGetParentPtr());
+	SetEntityLoaded(pLoadable->_LoadableGetParentPtr());
 }

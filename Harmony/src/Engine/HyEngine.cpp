@@ -170,6 +170,12 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return m_Renderer;
 }
 
+/*friend*/ IHyApplication &Hy_App()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_App() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_AppRef;
+}
+
 /*friend*/ float Hy_UpdateStep()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_UpdateStep() was invoked before engine has been initialized.");
