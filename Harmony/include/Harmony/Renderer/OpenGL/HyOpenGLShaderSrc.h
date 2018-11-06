@@ -16,20 +16,30 @@
 // QUADBATCH
 const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
 #version 140
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 
 uniform mat4					u_mtxWorldToCamera;
 uniform mat4					u_mtxCameraToClip;
 
-layout(location = 0) in vec2	attr_vSize;
-layout(location = 1) in vec2	attr_vOffset;
-layout(location = 2) in vec4	attr_vTopTint;
-layout(location = 3) in vec4	attr_vBotTint;
-layout(location = 4) in vec2	attr_vUVcoord0;
-layout(location = 5) in vec2	attr_vUVcoord1;
-layout(location = 6) in vec2	attr_vUVcoord2;
-layout(location = 7) in vec2	attr_vUVcoord3;
-layout(location = 8) in mat4	attr_mtxLocalToWorld;
+//layout(location = 0) in vec2	attr_vSize;
+//layout(location = 1) in vec2	attr_vOffset;
+//layout(location = 2) in vec4	attr_vTopTint;
+//layout(location = 3) in vec4	attr_vBotTint;
+//layout(location = 4) in vec2	attr_vUVcoord0;
+//layout(location = 5) in vec2	attr_vUVcoord1;
+//layout(location = 6) in vec2	attr_vUVcoord2;
+//layout(location = 7) in vec2	attr_vUVcoord3;
+//layout(location = 8) in mat4	attr_mtxLocalToWorld;
+
+attribute vec2	attr_vSize;
+attribute vec2	attr_vOffset;
+attribute vec4	attr_vTopTint;
+attribute vec4	attr_vBotTint;
+attribute vec2	attr_vUVcoord0;
+attribute vec2	attr_vUVcoord1;
+attribute vec2	attr_vUVcoord2;
+attribute vec2	attr_vUVcoord3;
+attribute mat4	attr_mtxLocalToWorld;
 
 smooth out vec2					interp_vUV;
 smooth out vec4					interp_vColor;
@@ -66,7 +76,7 @@ void main()
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
 #version 140
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 
 uniform sampler2D	u_Tex;
 
@@ -92,14 +102,16 @@ void main()
 // PRIMITIVE
 const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(
 #version 140
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 
 uniform mat4					u_mtxTransform;
 uniform mat4					u_mtxWorldToCamera;
 uniform mat4					u_mtxCameraToClip;
 uniform vec4					u_vColor;
 
-layout(location = 0) in vec2	attr_vPosition;
+//layout(location = 0) in vec2	attr_vPosition;
+
+attribute vec2	attr_vPosition;
 
 void main()
 {
@@ -111,7 +123,7 @@ void main()
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
 #version 140
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 
 uniform vec4	u_vColor;
 out vec4		out_vColor;
@@ -126,7 +138,7 @@ void main()
 // LINES2D
 const char * const szHYLINES2D_VERTEXSHADER = R"src(
 #version 140
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 
 uniform float					u_fHalfWidth;
 uniform float					u_fFeatherAmt;
@@ -135,8 +147,11 @@ uniform mat4					u_mtxTransform;
 uniform mat4					u_mtxWorldToCamera;
 uniform mat4					u_mtxCameraToClip;
 
-layout(location = 0) in vec2	attr_vPosition;
-layout(location = 1) in vec2	attr_vNormal;
+//layout(location = 0) in vec2	attr_vPosition;
+//layout(location = 1) in vec2	attr_vNormal;
+
+attribute vec2	attr_vPosition;
+attribute vec2	attr_vNormal;
 
 out vec2						interp_vNormal;
 
@@ -153,7 +168,7 @@ void main()
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYLINES2D_FRAGMENTSHADER = R"src(
 #version 140
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 
 uniform float		u_fHalfWidth;
 uniform float		u_fFeatherAmt;
@@ -181,15 +196,19 @@ void main()
 // GLTF
 const char * const szHYGLTF_VERTEXSHADER = R"src(
 #version 140
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 
 uniform mat4					u_mtxTransform;
 uniform mat4					u_mtxWorldToCamera;
 uniform mat4					u_mtxCameraToClip;
 
-layout(location = 0) in vec3	attr_vPosition;
-layout(location = 1) in vec3	attr_vNormal;
-layout(location = 2) in vec2	attr_vUVcoord0;
+//layout(location = 0) in vec3	attr_vPosition;
+//layout(location = 1) in vec3	attr_vNormal;
+//layout(location = 2) in vec2	attr_vUVcoord0;
+
+attribute vec3	attr_vPosition;
+attribute vec3	attr_vNormal;
+attribute vec2	attr_vUVcoord0;
 
 smooth out vec2					interp_vUV;
 
@@ -206,7 +225,7 @@ void main()
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYGLTF_FRAGMENTSHADER = R"src(
 #version 140
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 
 uniform sampler2D	u_Tex;
 

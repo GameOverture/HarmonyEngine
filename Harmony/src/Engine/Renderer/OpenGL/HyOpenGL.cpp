@@ -340,7 +340,7 @@ HyOpenGL::~HyOpenGL(void)
 	CompileShader(pShader, HYSHADER_Vertex);
 	CompileShader(pShader, HYSHADER_Fragment);
 
-	// TODO: IS THIS NEEDED? 
+	// Explicitly binding vertex attributes here to support intel's incomplete OpenGL 3.1
 	for(uint32 i = 0; i < shaderVertexAttribListRef.size(); ++i)
 	{
 		//BindAttribLocation(i, );
