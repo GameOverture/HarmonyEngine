@@ -46,8 +46,8 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	if(m_WindowListRef.empty() == false)
 	{
 		SetCurrentWindow(0);
-		if(glewIsSupported("GL_VERSION_3_3") == false) {
-			HyError("At least OpenGL 3.3 must be supported");
+		if(glewIsSupported("GL_VERSION_3_1") == false) {
+			HyError("At least OpenGL 3.1 must be supported");
 		}
 	}
 	else
