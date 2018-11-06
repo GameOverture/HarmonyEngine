@@ -34,7 +34,7 @@ public:
 	void ForEachChild(std::function<void(IHyNode3d *)> func);
 
 protected:
-	virtual void NodeUpdate() override final;
+	virtual void Update() override final;
 	virtual bool IsChildrenLoaded() const override final;
 
 	void SetNewChildAttributes(IHyNode3d &childRef);

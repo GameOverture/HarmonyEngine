@@ -10,10 +10,12 @@
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
+#include "Scene/HyScene.h"
 #include "Renderer/IHyRenderer.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 #include "Assets/Nodes/HyEntityData.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
@@ -61,12 +63,13 @@ const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyAssets::HyAssets(std::string sDataDirPath) :	IHyThreadClass(),
-												m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
-												m_bInitialized(false),
-												m_pAtlases(nullptr),
-												m_uiNumAtlases(0),
-												m_pLoadedAtlasIndices(nullptr)
+HyAssets::HyAssets(HyScene &sceneRef, std::string sDataDirPath) :	IHyThreadClass(),
+																	m_SceneRef(sceneRef),
+																	m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
+																	m_bInitialized(false),
+																	m_pAtlases(nullptr),
+																	m_uiNumAtlases(0),
+																	m_pLoadedAtlasIndices(nullptr)
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
@@ -291,13 +294,13 @@ bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 // Unload everything
 void HyAssets::Shutdown()
 {
-	std::vector<IHyLoadable *> vReloadInsts;
-	vReloadInsts = m_LoadedInstList;
+	std::vector<IHyDrawable2d *> vReloadInsts;
+	m_SceneRef.CopyAllLoadedNodes(vReloadInsts);
 
 	//m_QueuedEntityList.clear();
 
 	for(uint32 i = 0; i < m_QueuedInstList.size(); ++i)
-		vReloadInsts.push_back(m_QueuedInstList[i]);
+		vReloadInsts.push_back(reinterpret_cast<IHyDrawable2d *>(m_QueuedInstList[i]));
 
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();
@@ -305,7 +308,16 @@ void HyAssets::Shutdown()
 
 bool HyAssets::IsShutdown()
 {
-	if(m_pLoadedAtlasIndices->IsEmpty())
+	bool bIsFullyUnloaded = false;
+	m_Mutex_SharedQueue.lock();
+	m_Mutex_RetrievalQueue.lock();
+	{
+		bIsFullyUnloaded = m_pLoadedAtlasIndices->IsEmpty() && m_Load_Prepare.empty() && m_Load_Shared.empty() && m_Load_Retrieval.empty();
+	}
+	m_Mutex_SharedQueue.unlock();
+	m_Mutex_RetrievalQueue.unlock();
+
+	if(bIsFullyUnloaded)
 	{
 		ThreadStop();
 		
@@ -318,9 +330,6 @@ bool HyAssets::IsShutdown()
 
 void HyAssets::Update(IHyRenderer &rendererRef)
 {
-	for(uint32 i = 0; i < static_cast<uint32>(m_LoadedInstList.size()); ++i)
-		m_LoadedInstList[i]->LoadedUpdate();
-
 	// Check to see if we have any pending loads to make
 	if(m_Load_Prepare.empty() == false)
 	{
@@ -338,20 +347,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 			ThreadContinue(true);
 		}
 	}
-
-	//if(m_QueuedEntityList.empty() == false)
-	//{
-	//	for(auto iter = m_QueuedEntityList.begin(); iter != m_QueuedEntityList.end();)
-	//	{
-	//		if((*iter)->IsChildrenLoaded())
-	//		{
-	//			SetAsLoaded(*iter);
-	//			iter = m_QueuedEntityList.erase(iter);
-	//		}
-	//		else
-	//			++iter;
-	//	}
-	//}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check to see if any loaded data (from the load thread) is ready to uploaded to graphics card
@@ -637,12 +632,12 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
 
-			if(pData->GetLoadableType() == HYLOADABLE_Atlas) {
-				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] deleted");
-			}
-			else {
-				HyLogInfo("Custom Shader deleted");
-			}
+			//if(pData->GetLoadableType() == HYLOADABLE_Atlas) {
+			//	HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] deleted");
+			//}
+			//else {
+			//	HyLogInfo("Custom Shader deleted");
+			//}
 		}
 	}
 }
@@ -651,9 +646,7 @@ void HyAssets::SetAsLoaded(IHyLoadable *pLoadable)
 {
 	pLoadable->m_eLoadState = HYLOADSTATE_Loaded;
 	pLoadable->OnLoaded();
-	pLoadable->LoadedUpdate();
-
-	m_LoadedInstList.push_back(pLoadable);
+	pLoadable->OnLoadedUpdate();
 
 	SetEntityLoaded(pLoadable->_LoadableGetParentPtr());
 }
@@ -669,17 +662,6 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 				m_QueuedInstList.erase(it);
 				break;
 			}
-		}
-	}
-
-	// Remove from fully loaded list
-	for(auto it = m_LoadedInstList.begin(); it != m_LoadedInstList.end(); ++it)
-	{
-		if((*it) == pLoadable)
-		{
-			// TODO: Log about erasing instance
-			m_LoadedInstList.erase(it);
-			break;
 		}
 	}
 

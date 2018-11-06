@@ -61,8 +61,7 @@ public:
 	virtual const b2AABB &GetWorldAABB();
 
 protected:
-	virtual void PhysicsUpdate() override final;
-	virtual void NodeUpdate() override = 0;
+	virtual void Update() override;
 };
 
 #endif /* IHyNode2d_h__ */

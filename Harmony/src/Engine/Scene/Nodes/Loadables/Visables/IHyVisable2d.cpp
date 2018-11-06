@@ -111,6 +111,11 @@ int32 IHyVisable2d::GetDisplayOrder() const
 	HyScene::SetInstOrderingDirty();
 }
 
+/*virtual*/ void IHyVisable2d::Update() /*override*/
+{
+	IHyLoadable2d::Update();
+}
+
 /*virtual*/ int32 IHyVisable2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)
 {
 	if(bIsOverriding)

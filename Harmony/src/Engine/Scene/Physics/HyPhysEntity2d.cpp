@@ -113,7 +113,7 @@ int32 HyPhysEntity2d::AddEdgeChainFixture(glm::vec2 *pVertices, uint32 uiNumVert
 	return static_cast<int32>(m_Fixtures.size() - 1);
 }
 
-/*virtual*/ void HyPhysEntity2d::Update()
+/*virtual*/ void HyPhysEntity2d::UpdatePhysLOL()
 {
 	b2Transform b2Trans = m_b2Body->GetTransform();
 

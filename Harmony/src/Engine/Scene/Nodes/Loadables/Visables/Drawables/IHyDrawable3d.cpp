@@ -34,24 +34,14 @@ const IHyDrawable3d &IHyDrawable3d::operator=(const IHyDrawable3d &rhs)
 	return *this;
 }
 
-/*virtual*/ void IHyDrawable3d::NodeUpdate() /*override final*/
+/*virtual*/ void IHyDrawable3d::Update() /*override final*/
 {
-	OnUpdate();
+	IHyVisable3d::Update();
 }
 
 /*virtual*/ bool IHyDrawable3d::IsValid() /*override final*/
 {
 	return m_bEnabled && OnIsValid();
-}
-
-/*virtual*/ void IHyDrawable3d::LoadedUpdate() /*override final*/
-{
-	if(IsLoaded())
-	{
-		// This update will set the appearance of the instance to its current state
-		DrawLoadedUpdate();
-		OnUpdateUniforms();
-	}
 }
 
 /*virtual*/ void IHyDrawable3d::OnLoaded() /*override*/

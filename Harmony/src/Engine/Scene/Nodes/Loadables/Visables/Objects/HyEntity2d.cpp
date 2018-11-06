@@ -354,8 +354,10 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 		sm_pHyAssets->SetEntityLoaded(this);
 }
 
-/*virtual*/ void HyEntity2d::NodeUpdate() /*override final*/
+/*virtual*/ void HyEntity2d::Update() /*override final*/
 {
+	IHyVisable2d::Update();
+
 	if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
 	{
 		glm::vec2 ptMousePt;

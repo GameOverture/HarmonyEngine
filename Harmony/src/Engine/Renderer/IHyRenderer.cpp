@@ -67,10 +67,7 @@ void IHyRenderer::PrepareBuffers()
 
 		const std::vector<IHyDrawable2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
-		{
-			instanceListRef[i]->OnUpdateUniforms();
 			AppendDrawable2d(0, *instanceListRef[i], HY_FULL_CAMERA_MASK);
-		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +77,8 @@ void IHyRenderer::PrepareBuffers()
 
 void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask)
 {
+	instanceRef.OnUpdateUniforms();
+
 	if(instanceRef.GetType() != HYTYPE_Prefab)
 	{
 		HyError("IHyRenderer::AppendDrawable3d - Unknown instance type");
@@ -92,6 +91,8 @@ void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCa
 
 void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask)
 {
+	instanceRef.OnUpdateUniforms();
+
 	uint32 uiNumInstances, uiNumVerticesPerInstance;
 	switch(instanceRef.GetType())
 	{

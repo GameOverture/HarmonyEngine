@@ -20,6 +20,7 @@
 #define HYASSETS_AtlasDir "Atlases/"
 #define HYASSETS_PrefabDir "Prefabs/"
 
+class HyScene;
 class IHyRenderer;
 class IHyLoadable;
 class IHyNodeData;
@@ -34,6 +35,7 @@ class HyGLTF;
 
 class HyAssets : public IHyThreadClass
 {
+	HyScene &													m_SceneRef;
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
 
@@ -60,7 +62,6 @@ class HyAssets : public IHyThreadClass
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
-	std::vector<IHyLoadable *>									m_LoadedInstList;
 	std::vector<IHyLoadableData *>								m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
@@ -75,7 +76,7 @@ class HyAssets : public IHyThreadClass
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public:
-	HyAssets(std::string sDataDirPath);
+	HyAssets(HyScene &sceneRef, std::string sDataDirPath);
 	virtual ~HyAssets();
 
 	const std::string &GetDataDir();

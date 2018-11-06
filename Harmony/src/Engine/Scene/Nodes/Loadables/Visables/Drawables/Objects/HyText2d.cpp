@@ -365,11 +365,6 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_LocalBoundingVolume.SetAsBox(m_fUsedPixelWidth * 0.5f, m_fUsedPixelHeight * 0.5f, ptCenter, rot.Get());
 }
 
-/*virtual*/ void HyText2d::DrawLoadedUpdate() /*override*/
-{
-	CalculateGlyphInfos();
-}
-
 /*virtual*/ void HyText2d::OnDataAcquired() /*override*/
 {
 	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
@@ -411,6 +406,11 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 		m_hTextureHandle = pTextData->GetAtlas()->GetTextureHandle();
 
 	MarkAsDirty();
+}
+
+/*virtual*/ void HyText2d::OnLoadedUpdate() /*override*/
+{
+	CalculateGlyphInfos();
 }
 
 /*virtual*/ void HyText2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)

@@ -46,7 +46,7 @@ public:
 	const glm::mat4 &GetWorldTransform();
 
 protected:
-	virtual void PhysicsUpdate() override;
+	virtual void Update() override;
 };
 
 #endif /* IHyNode3d_h__ */

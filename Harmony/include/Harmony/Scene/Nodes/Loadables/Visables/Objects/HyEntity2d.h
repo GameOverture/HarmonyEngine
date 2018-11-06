@@ -91,7 +91,7 @@ public:
 	virtual void Unload() override;
 	
 protected:
-	virtual void NodeUpdate() override final;
+	virtual void Update() override final;
 	virtual bool IsChildrenLoaded() const override final;
 	virtual void OnDataAcquired() override;
 

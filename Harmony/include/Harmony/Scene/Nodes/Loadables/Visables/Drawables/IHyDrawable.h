@@ -47,7 +47,6 @@ public:
 
 protected:
 	virtual bool IsValid() = 0;
-	virtual void DrawLoadedUpdate() { }			// Optional override for derived classes
 	virtual void OnUpdateUniforms() { }			// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) { }
 

@@ -81,6 +81,11 @@ const glm::vec3 &IHyVisable3d::CalculateTint()
 	return m_CachedTint;
 }
 
+/*virtual*/ void IHyVisable3d::Update() /*override*/
+{
+	IHyLoadable3d::Update();
+}
+
 void IHyVisable3d::CalculateColor()
 {
 	if(IsDirty(DIRTY_Color))

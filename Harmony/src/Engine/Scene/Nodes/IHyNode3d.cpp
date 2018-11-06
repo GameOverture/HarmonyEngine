@@ -108,6 +108,7 @@ const glm::mat4 &IHyNode3d::GetWorldTransform()
 	return m_mtxCached;
 }
 
-/*virtual*/ void IHyNode3d::PhysicsUpdate() /*override*/
+/*virtual*/ void IHyNode3d::Update() /*override*/
 {
+	IHyNode::Update();
 }

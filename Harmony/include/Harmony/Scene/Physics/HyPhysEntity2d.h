@@ -75,7 +75,7 @@ public:
 	int32 AddEdgeChainFixture(glm::vec2 *pVertices, uint32 uiNumVerts, bool bChainLoop, glm::vec2 vOffset = glm::vec2(0.0f), float fAngleOffset = 0.0f);
 
 private:
-	virtual void Update();
+	void UpdatePhysLOL();
 };
 
 #endif /* HyPhysEntity2d_h__ */

@@ -66,9 +66,6 @@ public:
 	virtual void GetCameraTransform(glm::mat4 &outMtx) override;
 
 	const b2AABB &GetWorldViewBounds();
-
-protected:
-	virtual void NodeUpdate() override;
 };
 
 class HyCamera3d final : public IHyNode3d, public IHyCamera
@@ -84,9 +81,6 @@ public:
 	virtual float GetZoom() const override;
 
 	virtual void GetCameraTransform(glm::mat4 &outMtx) override;
-
-protected:
-	virtual void NodeUpdate() override;
 };
 
 #endif /* HyCamera_h__ */

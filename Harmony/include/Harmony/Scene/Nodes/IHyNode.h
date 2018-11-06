@@ -86,8 +86,7 @@ public:
 	void SetTag(int64 iTag);
 
 protected:
-	virtual void PhysicsUpdate() = 0;
-	virtual void NodeUpdate() = 0;
+	virtual void Update();																// Only Scene will invoke this
 	
 	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
@@ -98,7 +97,6 @@ protected:
 
 private:
 	void InsertActiveTweenFloat(HyTweenFloat *pTweenFloat);								// Only HyTweenFloat will invoke this
-	void Update();																		// Only Scene will invoke this
 };
 
 #endif /* IHyNode_h__ */

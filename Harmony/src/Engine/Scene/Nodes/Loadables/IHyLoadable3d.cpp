@@ -34,6 +34,14 @@ const IHyLoadable3d &IHyLoadable3d::operator=(const IHyLoadable3d &rhs)
 	return *this;
 }
 
+/*virtual*/ void IHyLoadable3d::Update() /*override*/
+{
+	IHyNode3d::Update();
+
+	if(IsLoaded())
+		OnLoadedUpdate();
+}
+
 /*virtual*/ HyType IHyLoadable3d::_LoadableGetType() /*override final*/
 {
 	return m_eTYPE;
