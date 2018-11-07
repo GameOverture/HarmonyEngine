@@ -24,7 +24,7 @@
 bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
-std::queue<std::pair<IHyNode *, IHyNode *> > HyScene::sm_DeferredChildAppendQueue;
+std::deque<std::pair<IHyNode *, IHyNode *> > HyScene::sm_DeferredChildAppendDeque;
 
 HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
 															m_iPhysVelocityIterations(8),
@@ -63,6 +63,15 @@ HyScene::~HyScene(void)
 			break;
 		}
 	}
+
+	for(auto iter = sm_DeferredChildAppendDeque.begin(); iter != sm_DeferredChildAppendDeque.end(); ++iter)
+	{
+		if((*iter).first == pNode || (*iter).second == pNode)
+		{
+			sm_DeferredChildAppendDeque.erase(iter);
+			break;
+		}
+	}
 }
 
 /*static*/ void HyScene::AddNode_PauseUpdate(IHyNode *pNode)
@@ -86,13 +95,13 @@ HyScene::~HyScene(void)
 /*static*/ void HyScene::AddDeferredChildAppend(IHyNode2d *pChild, HyEntity2d *pParent)
 {
 	pParent->ChildAppend(*pChild);
-	sm_DeferredChildAppendQueue.push(std::pair<IHyNode *, IHyNode *>(pChild, pParent));
+	sm_DeferredChildAppendDeque.emplace_back(pChild, pParent);
 }
 
 /*static*/ void HyScene::AddDeferredChildAppend(IHyNode3d *pChild, HyEntity3d *pParent)
 {
 	pParent->ChildAppend(*pChild);
-	sm_DeferredChildAppendQueue.push(std::pair<IHyNode *, IHyNode *>(pChild, pParent));
+	sm_DeferredChildAppendDeque.emplace_back(pChild, pParent);
 }
 
 void HyScene::AddNode_Loaded(IHyDrawable2d *pDrawable)
@@ -175,15 +184,15 @@ void HyScene::UpdateNodes()
 
 void HyScene::UpdateChildAppends()
 {
-	while(sm_DeferredChildAppendQueue.empty() == false)
+	while(sm_DeferredChildAppendDeque.empty() == false)
 	{
-		const std::pair<IHyNode *, IHyNode *> &pairRef = sm_DeferredChildAppendQueue.front();
+		const std::pair<IHyNode *, IHyNode *> &pairRef = sm_DeferredChildAppendDeque.front();
 		if(pairRef.first->Is2D())
 			static_cast<HyEntity2d *>(pairRef.second)->SetNewChildAttributes(*static_cast<IHyNode2d *>(pairRef.first));
 		else
 			static_cast<HyEntity3d *>(pairRef.second)->SetNewChildAttributes(*static_cast<IHyNode3d *>(pairRef.first));
 
-		sm_DeferredChildAppendQueue.pop();
+		sm_DeferredChildAppendDeque.pop_front();
 	}
 }
 
