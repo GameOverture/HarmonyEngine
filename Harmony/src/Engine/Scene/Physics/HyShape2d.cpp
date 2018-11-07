@@ -217,13 +217,18 @@ void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
 		m_pOwnerInst->OnShapeSet(this);
 }
 
-void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight)
+void HyShape2d::SetAsBox(uint32 uiWidth, uint32 uiHeight)
+{
+	SetAsBox(static_cast<float>(uiWidth), static_cast<float>(uiHeight));
+}
+
+void HyShape2d::SetAsBox(float fWidth, float fHeight)
 {
 	m_eType = HYSHAPE_Polygon;
 
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
-	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight);
+	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fWidth * 0.5f, fHeight * 0.5f, b2Vec2(fWidth * 0.5f, fHeight * 0.5f), 0.0f);	// Offsets Box2d's center to bottom left
 
 	if(m_pOwnerInst)
 		m_pOwnerInst->OnShapeSet(this);

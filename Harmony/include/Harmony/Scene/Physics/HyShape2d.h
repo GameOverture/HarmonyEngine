@@ -60,8 +60,9 @@ public:
 	// may lead to poor stacking behavior in physics simulation.
 	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
 
-	// Build vertices to represent an axis-aligned box centered on the local origin.
-	void SetAsBox(float fHalfWidth, float fHalfHeight);
+	// Build vertices to represent an axis-aligned box
+	void SetAsBox(uint32 uiWidth, uint32 uiHeight);
+	void SetAsBox(float fWidth, float fHeight);
 
 	// Build vertices to represent an oriented box.
 	// ptBoxCenter is the center of the box in local coordinates.
