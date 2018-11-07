@@ -77,6 +77,8 @@ public:
 
 	// Returns true if the world point intersects within this bounding volume's world transformation
 	bool TestPoint(const glm::vec2 &ptWorldPointRef) const;
+
+	bool IsColliding(HyShape2d &shapeRef, b2WorldManifold &worldManifoldOut);
 };
 
 #endif /* HyShape2d_h__ */

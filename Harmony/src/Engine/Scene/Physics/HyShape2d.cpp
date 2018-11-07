@@ -263,3 +263,77 @@ bool HyShape2d::TestPoint(const glm::vec2 &ptWorldPointRef) const
 
 	return m_pShape && m_pShape->TestPoint(b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), b2Vec2(ptWorldPointRef.x, ptWorldPointRef.y));
 }
+
+bool HyShape2d::IsColliding(HyShape2d &shapeRef, b2WorldManifold &worldManifoldOut)
+{
+	glm::mat4 mtxWorld(1.0f);
+	if(m_pOwnerNode)
+		mtxWorld = m_pOwnerNode->GetWorldTransform();
+	b2Transform thisTransform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(glm::atan(mtxWorld[0][1], mtxWorld[0][0])));
+
+	mtxWorld = glm::mat4(1.0f);
+	if(shapeRef.m_pOwnerNode)
+		mtxWorld = shapeRef.m_pOwnerNode->GetWorldTransform();
+	b2Transform shapeTransform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(glm::atan(mtxWorld[0][1], mtxWorld[0][0])));
+
+	b2Manifold localManifold;
+
+	switch(m_eType)
+	{
+	case HYSHAPE_LineSegment:
+	case HYSHAPE_LineChain:
+	case HYSHAPE_LineLoop:
+		switch(shapeRef.GetType())
+		{
+		case HYSHAPE_LineSegment:
+		case HYSHAPE_LineChain:
+		case HYSHAPE_LineLoop:
+			HyError("HyShape2d::IsColliding - Line to Line collision is not supported");
+			return false;
+		case HYSHAPE_Circle:
+			b2CollideEdgeAndCircle(&localManifold, static_cast<b2EdgeShape *>(m_pShape), thisTransform, static_cast<b2CircleShape *>(shapeRef.GetB2Shape()), shapeTransform);
+			break;
+		case HYSHAPE_Polygon:
+			b2CollideEdgeAndPolygon(&localManifold, static_cast<b2EdgeShape *>(m_pShape), thisTransform, static_cast<b2PolygonShape *>(shapeRef.GetB2Shape()), shapeTransform);
+			break;
+		}
+		break;
+
+	case HYSHAPE_Circle:
+		switch(shapeRef.GetType())
+		{
+		case HYSHAPE_LineSegment:
+		case HYSHAPE_LineChain:
+		case HYSHAPE_LineLoop:
+			b2CollideEdgeAndCircle(&localManifold, static_cast<b2EdgeShape *>(shapeRef.GetB2Shape()), shapeTransform, static_cast<b2CircleShape *>(m_pShape), thisTransform);
+			return false;
+		case HYSHAPE_Circle:
+			b2CollideCircles(&localManifold, static_cast<b2CircleShape *>(m_pShape), thisTransform, static_cast<b2CircleShape *>(shapeRef.GetB2Shape()), shapeTransform);
+			break;
+		case HYSHAPE_Polygon:
+			b2CollidePolygonAndCircle(&localManifold, static_cast<b2PolygonShape *>(shapeRef.GetB2Shape()), shapeTransform, static_cast<b2CircleShape *>(m_pShape), thisTransform);
+			break;
+		}
+		break;
+
+	case HYSHAPE_Polygon:
+		switch(shapeRef.GetType())
+		{
+		case HYSHAPE_LineSegment:
+		case HYSHAPE_LineChain:
+		case HYSHAPE_LineLoop:
+			b2CollideEdgeAndPolygon(&localManifold, static_cast<b2EdgeShape *>(shapeRef.GetB2Shape()), shapeTransform, static_cast<b2PolygonShape *>(m_pShape), thisTransform);
+			break;
+		case HYSHAPE_Circle:
+			b2CollidePolygonAndCircle(&localManifold, static_cast<b2PolygonShape *>(m_pShape), thisTransform, static_cast<b2CircleShape *>(shapeRef.GetB2Shape()), shapeTransform);
+			break;
+		case HYSHAPE_Polygon:
+			b2CollidePolygons(&localManifold, static_cast<b2PolygonShape *>(m_pShape), thisTransform, static_cast<b2PolygonShape *>(shapeRef.GetB2Shape()), shapeTransform);
+			break;
+		}
+		break;
+	}
+
+	worldManifoldOut.Initialize(&localManifold, thisTransform, m_pShape->m_radius, shapeTransform, shapeRef.GetB2Shape()->m_radius);
+	return localManifold.pointCount != 0;
+}
