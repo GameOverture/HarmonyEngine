@@ -209,12 +209,13 @@ void HyEntity2d::ChildAppend(IHyNode2d &childRef)
 
 /*virtual*/ bool HyEntity2d::ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef)
 {
+	childRef.ParentDetach();
+
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
 		if((*iter) == &insertBefore || 
 		   ((*iter)->GetType() == HYTYPE_Entity && static_cast<HyEntity2d *>(*iter)->ChildExists(insertBefore)))
 		{
-			childRef.ParentDetach();
 			childRef.m_pParent = this;
 
 			m_ChildList.insert(iter, &childRef);
