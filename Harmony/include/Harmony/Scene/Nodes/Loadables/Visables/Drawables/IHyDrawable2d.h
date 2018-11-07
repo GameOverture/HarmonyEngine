@@ -18,7 +18,6 @@
 
 class IHyDrawable2d : public IHyVisable2d, public IHyDrawable
 {
-	friend class HyShape2d;
 	friend class HyScene;
 
 protected:
@@ -44,7 +43,6 @@ protected:
 
 	// Optional user overrides below
 	virtual bool OnIsValid() { return true; }
-	virtual void OnShapeSet(HyShape2d *pShape) { }
 	virtual void OnCalcBoundingVolume() { }
 
 #ifdef HY_PLATFORM_GUI

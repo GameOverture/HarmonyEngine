@@ -20,6 +20,7 @@ HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Primiti
 													m_fLineThickness(1.0f),
 													m_uiNumSegments(16)
 {
+	m_LocalBoundingVolume.SetOnChangedCallback(OnShapeSet);
 	ClearData();
 }
 
@@ -113,12 +114,10 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	return m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValid();
 }
 
-/*virtual*/ void HyPrimitive2d::OnShapeSet(HyShape2d *pShape) /*override*/
+/*static*/ void HyPrimitive2d::OnShapeSet(IHyNode2d *pOwnerNode, HyShape2d *pShape) /*override*/
 {
-	IHyDrawable2d::OnShapeSet(pShape);
-
-	if(pShape == &m_LocalBoundingVolume)
-		SetData();
+	HyPrimitive2d *pThis = static_cast<HyPrimitive2d *>(pOwnerNode);
+	pThis->SetData();
 }
 
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms()

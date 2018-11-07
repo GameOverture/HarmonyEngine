@@ -12,19 +12,23 @@
 
 #include "Afx/HyStdAfx.h"
 
-class IHyDrawable2d;
+class IHyNode2d;
+class HyShape2d;
+
+typedef std::function<void(IHyNode2d *pOwnerNode, HyShape2d *pShape)> HyShape2dChangedCallback;
 
 class HyShape2d
 {
-	IHyDrawable2d *					m_pOwnerInst;
+	IHyNode2d *						m_pOwnerNode;
+	HyShape2dChangedCallback		m_ChangedCallback;
 
 	HyShapeType						m_eType;
 	b2Shape *						m_pShape;
 
 public:
-	HyShape2d(IHyDrawable2d *pOwnerInst);
+	HyShape2d(IHyNode2d *pOwnerNode);
 	HyShape2d(const HyShape2d &copyRef) = delete;
-	HyShape2d(IHyDrawable2d *pOwnerInst, const HyShape2d &copyRef);
+	HyShape2d(IHyNode2d *pOwnerNode, const HyShape2d &copyRef);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
@@ -33,6 +37,8 @@ public:
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
 	const b2Shape *GetB2Shape() const;
 	b2Shape *GetB2Shape();
+
+	void SetOnChangedCallback(HyShape2dChangedCallback changedCallback);
 
 	bool IsValid() const;
 

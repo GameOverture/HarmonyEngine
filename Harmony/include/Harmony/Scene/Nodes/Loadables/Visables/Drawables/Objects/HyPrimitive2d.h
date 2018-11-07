@@ -50,7 +50,7 @@ public:
 
 protected:
 	virtual bool OnIsValid() override;
-	virtual void OnShapeSet(HyShape2d *pShape) override;
+	static void OnShapeSet(IHyNode2d *pOwnerNode, HyShape2d *pShape);
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 
