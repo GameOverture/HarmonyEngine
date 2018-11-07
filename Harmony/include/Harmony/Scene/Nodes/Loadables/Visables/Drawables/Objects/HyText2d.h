@@ -123,9 +123,9 @@ public:
 protected:
 	virtual bool OnIsValid() override;
 	virtual void OnCalcBoundingVolume() override;
-	virtual void DrawLoadedUpdate() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
+	virtual void OnLoadedUpdate() override;
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 
 private:

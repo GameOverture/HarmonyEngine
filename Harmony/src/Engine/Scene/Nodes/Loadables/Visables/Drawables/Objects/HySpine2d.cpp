@@ -177,8 +177,7 @@ void HySpine2d::AnimInitBlend(uint32 uiAnimIdFrom, uint32 uiAnimIdTo, float fInt
 //	//AnimSetState(m_uiNumAnims, m_bLooping);
 //}
 
-// Will only be called after it has been initialized by the Factory
-/*virtual*/ void HySpine2d::DrawLoadedUpdate() /*override*/
+/*virtual*/ void HySpine2d::OnLoadedUpdate() /*override*/
 {
 	// Update the time field used for attachments and such
 	spSkeleton_update(m_pSpineSkeleton, Hy_UpdateStep());

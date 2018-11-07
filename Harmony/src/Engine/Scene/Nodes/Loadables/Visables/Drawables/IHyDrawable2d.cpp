@@ -24,8 +24,8 @@ IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :	IHyVisable2d(copyRe
 
 IHyDrawable2d::~IHyDrawable2d()
 {
-	if(m_eLoadState != HYLOADSTATE_Inactive)
-		Unload();
+	ParentDetach();
+	Unload();
 }
 
 const IHyDrawable2d &IHyDrawable2d::operator=(const IHyDrawable2d &rhs)
@@ -72,21 +72,14 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 	return m_aabbCached;
 }
 
-/*virtual*/ void IHyDrawable2d::NodeUpdate() /*override final*/
+/*virtual*/ void IHyDrawable2d::Update() /*override final*/
 {
-	OnUpdate();
+	IHyVisable2d::Update();
 }
 
 /*virtual*/ bool IHyDrawable2d::IsValid() /*override final*/
 {
 	return m_bEnabled && OnIsValid();
-}
-
-/*virtual*/ void IHyDrawable2d::LoadedUpdate() /*override final*/
-{
-	// This update will set the appearance of the instance to its current state
-	DrawLoadedUpdate();
-	OnUpdateUniforms();
 }
 
 /*virtual*/ void IHyDrawable2d::OnLoaded() /*override*/

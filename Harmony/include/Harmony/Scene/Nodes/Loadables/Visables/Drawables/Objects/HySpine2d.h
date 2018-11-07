@@ -113,7 +113,7 @@ public:
 private:
 	//virtual void OnDataLoaded() override;
 
-	virtual void DrawLoadedUpdate() override;
+	virtual void OnLoadedUpdate() override;
 	
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 };

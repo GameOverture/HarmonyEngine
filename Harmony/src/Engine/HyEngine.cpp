@@ -45,7 +45,7 @@ HyEngine *		HyEngine::sm_pInstance = nullptr;
 // Private ctor() invoked from RunGame()
 HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
 												m_Scene(m_AppRef.m_WindowList),
-												m_Assets(m_AppRef.m_Init.sDataDir),
+												m_Assets(m_Scene, m_AppRef.m_Init.sDataDir),
 												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
 												m_Time(m_AppRef.m_Init.uiUpdateTickMs),
 												m_Diagnostics(m_AppRef.m_Init, m_Time, m_Assets, m_Scene),
@@ -84,7 +84,7 @@ HyEngine::~HyEngine()
 	{ }
 
 #ifndef HY_PLATFORM_GUI
-	// This return is temporarly here until thread cleanup is done properly
+	// This return is temporarly here until cleanup is done properly
 	return;
 #endif
 
@@ -94,6 +94,10 @@ HyEngine::~HyEngine()
 	sm_pInstance->Shutdown();
 	delete sm_pInstance;
 	sm_pInstance = nullptr;
+
+#ifdef HY_PLATFORM_DESKTOP
+	glfwTerminate();
+#endif
 
 	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler on Windows)
 #if defined(HY_DEBUG) && defined(_MSC_VER) && defined(HY_PLATFORM_WINDOWS)
@@ -168,6 +172,12 @@ bool HyEngine::PollPlatformApi()
 HyRendererInterop &HyEngine::GetRenderer()
 {
 	return m_Renderer;
+}
+
+/*friend*/ IHyApplication &Hy_App()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_App() was invoked before engine has been initialized.");
+	return HyEngine::sm_pInstance->m_AppRef;
 }
 
 /*friend*/ float Hy_UpdateStep()

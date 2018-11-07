@@ -35,6 +35,14 @@ const IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
 	return *this;
 }
 
+/*virtual*/ void IHyLoadable2d::Update() /*override*/
+{
+	IHyNode2d::Update();
+
+	if(IsLoaded())
+		OnLoadedUpdate();
+}
+
 /*virtual*/ HyType IHyLoadable2d::_LoadableGetType() /*override final*/
 {
 	return m_eTYPE;

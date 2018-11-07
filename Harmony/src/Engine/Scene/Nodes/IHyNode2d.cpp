@@ -196,8 +196,10 @@ void IHyNode2d::PhysicsBodyDef(b2BodyDef &defRefOut) const
 	return m_aabbCached;
 }
 
-/*virtual*/ void IHyNode2d::PhysicsUpdate() /*override*/
+/*virtual*/ void IHyNode2d::Update() /*override*/
 {
+	IHyNode::Update();
+
 	if(m_pPhysicsBody != nullptr && m_pPhysicsBody->IsActive())
 	{
 		pos.Set(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);

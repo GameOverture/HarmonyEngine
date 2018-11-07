@@ -249,6 +249,10 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 		{
 			(*iter)->m_pParent = nullptr;
 			m_ChildList.erase(iter);
+
+			if(sm_pHyAssets)
+				sm_pHyAssets->SetEntityLoaded(this);
+
 			return true;
 		}
 	}
@@ -333,23 +337,27 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 			static_cast<IHyLoadable2d *>(m_ChildList[i])->Load();
 	}
 
-	IHyLoadable::Load();
+	if(sm_pHyAssets)
+		sm_pHyAssets->SetEntityLoaded(this);
 }
 
 /*virtual*/ void HyEntity2d::Unload() /*override*/
 {
-	IHyLoadable::Unload();
-
 	// Unload any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
 			static_cast<IHyLoadable2d *>(m_ChildList[i])->Unload();
 	}
+
+	if(sm_pHyAssets)
+		sm_pHyAssets->SetEntityLoaded(this);
 }
 
-/*virtual*/ void HyEntity2d::NodeUpdate() /*override final*/
+/*virtual*/ void HyEntity2d::Update() /*override final*/
 {
+	IHyVisable2d::Update();
+
 	if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
 	{
 		glm::vec2 ptMousePt;
@@ -456,6 +464,9 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 				iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, false);
 		}
 	}
+
+	if(sm_pHyAssets)
+		sm_pHyAssets->SetEntityLoaded(this);
 }
 
 /*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)

@@ -91,10 +91,6 @@ const b2AABB &HyCamera2d::GetWorldViewBounds()
 //	return returnRect;
 //}
 
-/*virtual*/ void HyCamera2d::NodeUpdate()
-{
-}
-
 HyCamera3d::HyCamera3d(HyWindow *pWindow) : IHyNode3d(HYTYPE_Camera, nullptr),
 											IHyCamera(pWindow)
 { }
@@ -115,8 +111,4 @@ HyCamera3d::~HyCamera3d()
 /*virtual*/ void HyCamera3d::GetCameraTransform(glm::mat4 &outMtx) /*override*/
 {
 	outMtx = GetWorldTransform();
-}
-
-/*virtual*/ void HyCamera3d::NodeUpdate()
-{
 }

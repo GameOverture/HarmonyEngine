@@ -43,7 +43,7 @@ public:
 	const glm::vec3 &CalculateTint();
 
 protected:
-	virtual void NodeUpdate() = 0;
+	virtual void Update() override;
 
 private:
 	void CalculateColor();

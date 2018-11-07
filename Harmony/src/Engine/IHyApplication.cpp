@@ -15,7 +15,7 @@
 #ifdef HY_PLATFORM_DESKTOP
 void glfw_ErrorCallback(int iError, const char *szDescription)
 {
-	HyLogError("GLFW Error: " << iError << "\n" << szDescription);
+	HyLogError("GLFW Error " << iError << ": " << szDescription);
 }
 #endif
 
@@ -164,10 +164,6 @@ IHyApplication::IHyApplication(HarmonyInit &initStruct) :	m_pInputMaps(nullptr),
 
 IHyApplication::~IHyApplication()
 {
-#ifdef HY_PLATFORM_DESKTOP
-	glfwTerminate();
-#endif
-
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowList.size()); ++i)
 		delete m_WindowList[i];
 }

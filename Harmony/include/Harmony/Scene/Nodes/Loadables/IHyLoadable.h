@@ -50,9 +50,9 @@ protected:
 	virtual bool IsChildrenLoaded() const { return true; }// Required override for entities to properly determine whether they're loaded
 
 	// Optional overrides for derived classes
-	virtual void LoadedUpdate() { }					// Invoked once after OnLoaded(), then once every frame (guarenteed to only be invoked if this instance is loaded)
 	virtual void OnDataAcquired() { }				// Invoked once on the first time this node's data is queried
 	virtual void OnLoaded() { }						// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
+	virtual void OnLoadedUpdate() { }				// Invoked once after OnLoaded(), then once every frame (guarenteed to only be invoked if this instance is loaded)
 	virtual void OnUnloaded() { }					// HyAssets invokes this instance's data has been erased
 
 	const IHyNodeData *UncheckedGetData();			// Used internally when it's guaranteed that data has already been acquired for this instance

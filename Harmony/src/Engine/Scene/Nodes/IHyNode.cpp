@@ -113,6 +113,21 @@ void IHyNode::SetTag(int64 iTag)
 	m_iTag = iTag;
 }
 
+/*virtual*/ void IHyNode::Update()
+{
+	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.
+	for(std::vector<HyTweenFloat *>::iterator iter = m_ActiveTweenFloatsList.begin(); iter != m_ActiveTweenFloatsList.end();)
+	{
+		if((*iter)->UpdateFloat())
+		{
+			(*iter)->m_bAddedToOwnerUpdate = false;
+			iter = m_ActiveTweenFloatsList.erase(iter);
+		}
+		else
+			++iter;
+	}
+}
+
 /*virtual*/ void IHyNode::_SetEnabled(bool bEnabled, bool bIsOverriding)
 {
 	if(bIsOverriding)
@@ -166,25 +181,4 @@ void IHyNode::InsertActiveTweenFloat(HyTweenFloat *pTweenFloat)
 		pTweenFloat->m_bAddedToOwnerUpdate = true;
 		m_ActiveTweenFloatsList.push_back(pTweenFloat);
 	}
-}
-
-void IHyNode::Update()
-{
-	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.
-	for(std::vector<HyTweenFloat *>::iterator iter = m_ActiveTweenFloatsList.begin(); iter != m_ActiveTweenFloatsList.end();)
-	{
-		if((*iter)->UpdateFloat())
-		{
-			(*iter)->m_bAddedToOwnerUpdate = false;
-			iter = m_ActiveTweenFloatsList.erase(iter);
-		}
-		else
-			++iter;
-	}
-
-	PhysicsUpdate();
-
-	// TODO: Process the action queue
-
-	NodeUpdate();
 }

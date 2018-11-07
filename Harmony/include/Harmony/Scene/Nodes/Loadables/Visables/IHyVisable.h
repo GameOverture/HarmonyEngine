@@ -62,8 +62,6 @@ public:
 	virtual void UseWindowCoordinates(int32 iWindowIndex = 0);
 
 protected:
-	virtual void NodeUpdate() = 0;
-
 	// Internal Entity propagation function overrides
 	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding);
 	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding);

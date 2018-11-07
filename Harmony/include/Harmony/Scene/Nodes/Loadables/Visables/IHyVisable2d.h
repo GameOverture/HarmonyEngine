@@ -51,7 +51,7 @@ public:
 	virtual void SetDisplayOrder(int32 iOrderValue);
 
 protected:
-	virtual void NodeUpdate() = 0;
+	virtual void Update() override;
 
 	// Internal Entity propagation function overrides
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding);

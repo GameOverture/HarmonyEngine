@@ -46,8 +46,8 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	if(m_WindowListRef.empty() == false)
 	{
 		SetCurrentWindow(0);
-		if(glewIsSupported("GL_VERSION_3_3") == false) {
-			HyError("At least OpenGL 3.3 must be supported");
+		if(glewIsSupported("GL_VERSION_3_1") == false) {
+			HyError("At least OpenGL 3.1 must be supported");
 		}
 	}
 	else
@@ -340,7 +340,7 @@ HyOpenGL::~HyOpenGL(void)
 	CompileShader(pShader, HYSHADER_Vertex);
 	CompileShader(pShader, HYSHADER_Fragment);
 
-	// TODO: IS THIS NEEDED? 
+	// Explicitly binding vertex attributes here to support intel's incomplete OpenGL 3.1
 	for(uint32 i = 0; i < shaderVertexAttribListRef.size(); ++i)
 	{
 		//BindAttribLocation(i, );

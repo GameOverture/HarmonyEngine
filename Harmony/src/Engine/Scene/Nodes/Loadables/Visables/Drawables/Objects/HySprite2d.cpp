@@ -295,7 +295,39 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
 }
 
-/*virtual*/ void HySprite2d::DrawLoadedUpdate() /*override*/
+/*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
+{
+	const HySprite2dData *pData = static_cast<const HySprite2dData *>(UncheckedGetData());
+	uint32 uiNumStates = pData->GetNumStates();
+
+	while(m_AnimCtrlAttribList.size() > uiNumStates)
+		m_AnimCtrlAttribList.pop_back();
+
+	while(m_AnimCtrlAttribList.size() < uiNumStates)
+		m_AnimCtrlAttribList.push_back(0);
+
+	while(m_AnimCallbackList.size() < uiNumStates)
+		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(NullAnimCallback, nullptr));
+
+	for(uint32 i = 0; i < uiNumStates; ++i)
+	{
+		const HySprite2dData::AnimState &stateRef = pData->GetState(i);
+
+		if(stateRef.m_bLOOP)
+			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Loop;
+		if(stateRef.m_bBOUNCE)
+			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Bounce;
+		if(stateRef.m_bREVERSE)
+			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Reverse;
+
+		if(stateRef.m_uiNUMFRAMES == 0 || stateRef.GetFrame(0).IsValid() == false)
+			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Invalid;
+		else
+			m_AnimCtrlAttribList[i] &= ~ANIMCTRLATTRIB_Invalid;
+	}
+}
+
+/*virtual*/ void HySprite2d::OnLoadedUpdate() /*override*/
 {
 	if(m_bIsAnimPaused == false)
 		m_fElapsedFrameTime += Hy_UpdateStep() * m_fAnimPlayRate;
@@ -406,38 +438,6 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
 	m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
-}
-
-/*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
-{
-	const HySprite2dData *pData = static_cast<const HySprite2dData *>(UncheckedGetData());
-	uint32 uiNumStates = pData->GetNumStates();
-
-	while(m_AnimCtrlAttribList.size() > uiNumStates)
-		m_AnimCtrlAttribList.pop_back();
-
-	while(m_AnimCtrlAttribList.size() < uiNumStates)
-		m_AnimCtrlAttribList.push_back(0);
-
-	while(m_AnimCallbackList.size() < uiNumStates)
-		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(NullAnimCallback, nullptr));
-
-	for(uint32 i = 0; i < uiNumStates; ++i)
-	{
-		const HySprite2dData::AnimState &stateRef = pData->GetState(i);
-
-		if(stateRef.m_bLOOP)
-			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Loop;
-		if(stateRef.m_bBOUNCE)
-			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Bounce;
-		if(stateRef.m_bREVERSE)
-			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Reverse;
-
-		if(stateRef.m_uiNUMFRAMES == 0 || stateRef.GetFrame(0).IsValid() == false)
-			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Invalid;
-		else
-			m_AnimCtrlAttribList[i] &= ~ANIMCTRLATTRIB_Invalid;
-	}
 }
 
 /*virtual*/ void HySprite2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/

@@ -24,6 +24,9 @@ public:
 
 	const IHyLoadable2d &operator=(const IHyLoadable2d &rhs);
 
+protected:
+	virtual void Update() override;
+
 private:
 	virtual HyType _LoadableGetType() override final;
 	virtual IHyLoadable *_LoadableGetParentPtr() override final;

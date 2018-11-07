@@ -39,8 +39,8 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShow
 	m_vFramebufferSize = m_Info.vSize;
 
 #ifdef HY_PLATFORM_DESKTOP
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
 	GLFWmonitor *pMonitorOwner = nullptr;
 	switch(m_Info.eType)
@@ -68,7 +68,7 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShow
 							   hSharedContext);
 	if(m_hData == nullptr)
 	{
-		HyLogError("HyOpenGL_Desktop::Initialize() - glfwCreateWindow returned nullptr (At least OpenGL 3.3 is required, or window or OpenGL context creation failed)");
+		HyLogError("HyOpenGL_Desktop::Initialize() - glfwCreateWindow returned nullptr (At least OpenGL 3.1 is required, or window or OpenGL context creation failed)");
 		return;
 	}
 

@@ -108,8 +108,9 @@ void HyEntity3d::ForEachChild(std::function<void(IHyNode3d *)> func)
 	}
 }
 
-/*virtual*/ void HyEntity3d::NodeUpdate() /*override final*/
+/*virtual*/ void HyEntity3d::Update() /*override final*/
 {
+	IHyVisable3d::Update();
 	OnUpdate();
 }
 
