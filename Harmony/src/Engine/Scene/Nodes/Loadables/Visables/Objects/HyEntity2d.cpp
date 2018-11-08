@@ -459,10 +459,21 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 			static_cast<IHyVisable2d &>(childRef)._SetScissor(m_pScissor, false);
 
 		int32 iOrderValue = m_iDisplayOrder;
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		if((m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder) == 0)
 		{
-			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-				iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, false);
+			for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			{
+				if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+					iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, false);
+			}
+		}
+		else
+		{
+			for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
+			{
+				if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+					iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, false);
+			}
 		}
 	}
 
@@ -548,10 +559,21 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 
 	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_DisplayOrder))
 	{
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		if((m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder) == 0)
 		{
-			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-				iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bIsOverriding);
+			for(uint32 i = 0; i < m_ChildList.size(); ++i)
+			{
+				if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+					iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bIsOverriding);
+			}
+		}
+		else
+		{
+			for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
+			{
+				if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+					iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bIsOverriding);
+			}
 		}
 	}
 
