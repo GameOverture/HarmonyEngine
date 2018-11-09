@@ -67,7 +67,7 @@ public:
 	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
 
 	// Build vertices to represent an axis-aligned box
-	void SetAsBox(uint32 uiWidth, uint32 uiHeight);
+	void SetAsBox(int32 iWidth, int32 iHeight);
 	void SetAsBox(float fWidth, float fHeight);
 
 	// Build vertices to represent an oriented box.

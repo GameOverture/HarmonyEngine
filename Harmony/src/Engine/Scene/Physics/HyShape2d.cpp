@@ -224,9 +224,9 @@ void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
 		m_ChangedCallback(m_pOwnerNode, this);
 }
 
-void HyShape2d::SetAsBox(uint32 uiWidth, uint32 uiHeight)
+void HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)
 {
-	SetAsBox(static_cast<float>(uiWidth), static_cast<float>(uiHeight));
+	SetAsBox(static_cast<float>(iWidth), static_cast<float>(iHeight));
 }
 
 void HyShape2d::SetAsBox(float fWidth, float fHeight)
