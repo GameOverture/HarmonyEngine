@@ -632,12 +632,10 @@ void HyAssets::FinalizeData(IHyLoadableData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
 
-			//if(pData->GetLoadableType() == HYLOADABLE_Atlas) {
-			//	HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] deleted");
-			//}
-			//else {
-			//	HyLogInfo("Custom Shader deleted");
-			//}
+			if(pData->GetLoadableType() == HYLOADABLE_Atlas)
+				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] deleted")
+			else
+				HyLogInfo("Custom Shader deleted");
 		}
 	}
 }
