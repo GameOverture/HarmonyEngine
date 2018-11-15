@@ -33,12 +33,13 @@ void HyEntity3d::ChildAppend(IHyNode3d &childRef)
 
 /*virtual*/ bool HyEntity3d::ChildInsert(IHyNode3d &insertBefore, IHyNode3d &childRef)
 {
+	childRef.ParentDetach();
+
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
 		if((*iter) == &insertBefore || 
 		   ((*iter)->GetType() == HYTYPE_Entity && static_cast<HyEntity3d *>(*iter)->ChildExists(insertBefore)))
 		{
-			childRef.ParentDetach();
 			childRef.m_pParent = this;
 
 			m_ChildList.insert(iter, &childRef);
