@@ -132,22 +132,23 @@ void HyEntity3d::ForEachChild(std::function<void(IHyNode3d *)> func)
 void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 {
 	SetDirty(DIRTY_ALL);
-
 	childRef._SetEnabled(m_bEnabled, false);
 	childRef._SetPauseUpdate(m_bPauseOverride, false);
 
-	if(0 != (childRef.m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-	{
-		static_cast<IHyVisable3d &>(childRef)._SetCoordinateSystem(m_iCoordinateSystem, false);
+	if(childRef.GetExplicitAndTypeFlags() & NODETYPE_IsVisable)
+		SetupNewChild(*this, static_cast<IHyVisable3d &>(childRef));
+}
 
-		if(m_pScissor != nullptr)
-			static_cast<IHyVisable3d &>(childRef)._SetScissor(m_pScissor, false);
+/*virtual*/ void HyEntity3d::SetDirty(uint32 uiDirtyFlags)
+{
+	IHyNode3d::SetDirty(uiDirtyFlags);
 
-		//int32 iOrderValue = m_iDisplayOrder;
-		//for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		//{
-		//	if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-		//		iOrderValue = static_cast<IHyVisable3d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, false);
-		//}
-	}
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->SetDirty(uiDirtyFlags);
+}
+
+/*friend*/ void _CtorChildAppend(HyEntity3d &entityRef, IHyNode3d &childRef)
+{
+	entityRef.m_ChildList.push_back(&childRef);
+	entityRef.SetDirty(HyEntity3d::DIRTY_ALL);
 }

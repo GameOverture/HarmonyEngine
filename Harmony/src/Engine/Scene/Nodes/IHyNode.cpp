@@ -75,6 +75,11 @@ bool IHyNode::Is2D() const
 	return 0 != (m_uiExplicitAndTypeFlags & NODETYPE_Is2d);
 }
 
+uint32 IHyNode::GetExplicitAndTypeFlags() const
+{
+	return m_uiExplicitAndTypeFlags;
+}
+
 bool IHyNode::IsEnabled() const
 {
 	return m_bEnabled;
@@ -84,6 +89,11 @@ bool IHyNode::IsEnabled() const
 {
 	m_bEnabled = bEnabled;
 	m_uiExplicitAndTypeFlags |= EXPLICIT_Enabled;
+}
+
+bool IHyNode::IsPauseUpdate() const
+{
+	return m_bPauseOverride;
 }
 
 /*virtual*/ void IHyNode::SetPauseUpdate(bool bUpdateWhenPaused)

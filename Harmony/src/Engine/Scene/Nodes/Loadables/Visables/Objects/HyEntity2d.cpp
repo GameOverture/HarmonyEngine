@@ -204,6 +204,7 @@ void HyEntity2d::ChildAppend(IHyNode2d &childRef)
 	childRef.m_pParent = this;
 
 	m_ChildList.push_back(&childRef);
+
 	SetNewChildAttributes(childRef);
 }
 
@@ -251,9 +252,6 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 			(*iter)->m_pParent = nullptr;
 			m_ChildList.erase(iter);
 
-			if(sm_pHyAssets)
-				sm_pHyAssets->SetEntityLoaded(this);
-
 			return true;
 		}
 	}
@@ -300,6 +298,11 @@ bool HyEntity2d::EnableMouseInput(void *pUserParam /*= nullptr*/)
 void HyEntity2d::DisableMouseInput()
 {
 	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
+}
+
+bool HyEntity2d::IsReverseDisplayOrder() const
+{
+	return (m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder);
 }
 
 void HyEntity2d::ReverseDisplayOrder(bool bReverse)
@@ -447,35 +450,11 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	SetDirty(DIRTY_ALL);
-
 	childRef._SetEnabled(m_bEnabled, false);
 	childRef._SetPauseUpdate(m_bPauseOverride, false);
 
-	if(0 != (childRef.m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-	{
-		static_cast<IHyVisable2d &>(childRef)._SetCoordinateSystem(m_iCoordinateSystem, false);
-
-		if(m_pScissor != nullptr)
-			static_cast<IHyVisable2d &>(childRef)._SetScissor(m_pScissor, false);
-
-		int32 iOrderValue = m_iDisplayOrder;
-		if((m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder) == 0)
-		{
-			for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			{
-				if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-					iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, false);
-			}
-		}
-		else
-		{
-			for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
-			{
-				if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-					iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, false);
-			}
-		}
-	}
+	if(childRef.GetExplicitAndTypeFlags() & NODETYPE_IsVisable)
+		SetupNewChild(*this, static_cast<IHyVisable2d &>(childRef));
 
 	if(sm_pHyAssets)
 		sm_pHyAssets->SetEntityLoaded(this);
@@ -578,4 +557,10 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	}
 
 	return iOrderValue;
+}
+
+/*friend*/ void _CtorChildAppend(HyEntity2d &entityRef, IHyNode2d &childRef)
+{
+	entityRef.m_ChildList.push_back(&childRef);
+	entityRef.SetDirty(HyEntity2d::DIRTY_ALL);
 }

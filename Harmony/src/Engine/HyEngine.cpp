@@ -128,8 +128,6 @@ bool HyEngine::Update()
 			return false;
 		HY_PROFILE_END
 
-		m_Scene.UpdateChildAppends();
-
 		m_Assets.Update(m_Renderer);
 		m_Renderer.ProcessMsgs();
 

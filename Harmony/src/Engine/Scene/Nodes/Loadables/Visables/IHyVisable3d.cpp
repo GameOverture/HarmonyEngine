@@ -24,6 +24,9 @@ IHyVisable3d::IHyVisable3d(HyType eNodeType, const char *szPrefix, const char *s
 
 	tint.Set(1.0f);
 	m_CachedTint = tint.Get();
+
+	if(m_pParent)
+		SetupNewChild(*m_pParent, *this);
 }
 
 IHyVisable3d::IHyVisable3d(const IHyVisable3d &copyRef) :	IHyLoadable3d(copyRef),
@@ -116,4 +119,12 @@ void IHyVisable3d::CalculateColor()
 /*virtual*/ HyEntity3d *IHyVisable3d::_VisableGetParent3dPtr() /*override final*/
 {
 	return m_pParent;
+}
+
+/*friend*/ void SetupNewChild(HyEntity3d &parentRef, IHyVisable3d &childRef)
+{
+	childRef._SetCoordinateSystem(parentRef.GetCoordinateSystem(), false);
+
+	if(parentRef.IsScissorSet())
+		static_cast<IHyVisable3d &>(childRef)._SetScissor(parentRef.m_pScissor, false);
 }

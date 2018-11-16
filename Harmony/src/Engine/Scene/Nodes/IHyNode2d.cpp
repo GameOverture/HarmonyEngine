@@ -25,8 +25,8 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 	m_uiExplicitAndTypeFlags |= NODETYPE_Is2d;
 	scale.Set(1.0f);
 
-	if(pParent)
-		HyScene::AddDeferredChildAppend(this, pParent);
+	if(m_pParent)
+		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :	IHyNode(copyRef),
@@ -205,4 +205,12 @@ void IHyNode2d::PhysicsBodyDef(b2BodyDef &defRefOut) const
 		pos.Set(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
 		rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()));
 	}
+}
+
+/*friend*/ void _CtorSetupNewChild(HyEntity2d &parentRef, IHyNode2d &childRef)
+{
+	_CtorChildAppend(parentRef, childRef);
+
+	childRef._SetEnabled(parentRef.IsEnabled(), false);
+	childRef._SetPauseUpdate(parentRef.IsPauseUpdate(), false);
 }

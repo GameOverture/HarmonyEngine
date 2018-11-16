@@ -83,6 +83,7 @@ public:
 	bool EnableMouseInput(void *pUserParam = nullptr);
 	void DisableMouseInput();
 
+	bool IsReverseDisplayOrder() const;
 	void ReverseDisplayOrder(bool bReverse);
 
 	virtual const b2AABB &GetWorldAABB() override;
@@ -113,6 +114,8 @@ protected:
 	virtual void OnMouseDown(void *pUserParam) { }
 	virtual void OnMouseUp(void *pUserParam) { }
 	virtual void OnMouseClicked(void *pUserParam) { }
+
+	friend void _CtorChildAppend(HyEntity2d &entityRef, IHyNode2d &childRef);
 };
 
 #endif /* HyEntity2d_h__ */

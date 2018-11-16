@@ -86,6 +86,8 @@ public:
 	std::string						GetTitle();
 	void							SetTitle(const std::string &sTitle);
 
+	int32							GetWidth();
+	int32							GetHeight();
 	glm::ivec2						GetWindowSize();
 	void							SetWindowSize(glm::ivec2 vResolutionHint);
 

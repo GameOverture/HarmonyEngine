@@ -41,7 +41,6 @@ class HyScene
 	// TODO: Make tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
 	static std::vector<IHyNode *>						sm_NodeList_All;
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;		// List of nodes who will update when the game is paused
-	static std::deque<std::pair<IHyNode *, IHyNode *> >	sm_DeferredChildAppendDeque;	// pair = (child, parent) can be a pair for either 2d or 3d
 	bool												m_bPauseGame;
 
 	// List of nodes who can be drawn, and their graphics assets are fully loaded
@@ -60,9 +59,6 @@ public:
 	static void AddNode_PauseUpdate(IHyNode *pNode);
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
-	static void AddDeferredChildAppend(IHyNode2d *pChild, HyEntity2d *pParent);
-	static void AddDeferredChildAppend(IHyNode3d *pChild, HyEntity3d *pParent);
-
 	void AddNode_Loaded(IHyDrawable2d *pDrawable);
 	void AddNode_Loaded(IHyDrawable3d *pDrawable);
 	void RemoveNode_Loaded(const IHyDrawable2d *pDrawable);
@@ -77,7 +73,6 @@ public:
 
 	void UpdatePhysics();
 	void UpdateNodes();
-	void UpdateChildAppends();
 	void PrepareRender(IHyRenderer &rendererRef);
 
 	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut);

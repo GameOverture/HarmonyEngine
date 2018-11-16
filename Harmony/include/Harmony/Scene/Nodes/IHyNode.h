@@ -76,10 +76,12 @@ public:
 
 	HyType GetType() const;
 	bool Is2D() const;
+	uint32 GetExplicitAndTypeFlags() const;
 
 	bool IsEnabled() const;
 	virtual void SetEnabled(bool bEnabled);
 
+	bool IsPauseUpdate() const;
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused);
 
 	int64 GetTag() const;

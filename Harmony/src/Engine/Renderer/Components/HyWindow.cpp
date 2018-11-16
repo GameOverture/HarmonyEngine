@@ -125,6 +125,16 @@ void HyWindow::SetTitle(const std::string &sTitle)
 #endif
 }
 
+int32 HyWindow::GetWidth()
+{
+	return m_Info.vSize.x;
+}
+
+int32 HyWindow::GetHeight()
+{
+	return m_Info.vSize.y;
+}
+
 glm::ivec2 HyWindow::GetWindowSize()
 {
 	return m_Info.vSize;

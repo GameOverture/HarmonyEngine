@@ -47,6 +47,8 @@ public:
 
 protected:
 	virtual void Update() override;
+
+	friend void _CtorSetupNewChild(HyEntity3d &parentRef, IHyNode3d &childRef);
 };
 
 #endif /* IHyNode3d_h__ */

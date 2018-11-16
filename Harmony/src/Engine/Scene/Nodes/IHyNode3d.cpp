@@ -13,6 +13,7 @@
 #include "Scene/HyScene.h"
 
 IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :	IHyNode(eNodeType),
+																m_pParent(pParent),
 																pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 																rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 																rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
@@ -21,8 +22,8 @@ IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :	IHyNode(eNodeType)
 {
 	scale.Set(1.0f);
 
-	if(pParent)
-		HyScene::AddDeferredChildAppend(this, pParent);
+	if(m_pParent)
+		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :	IHyNode(copyRef),
@@ -111,4 +112,12 @@ const glm::mat4 &IHyNode3d::GetWorldTransform()
 /*virtual*/ void IHyNode3d::Update() /*override*/
 {
 	IHyNode::Update();
+}
+
+/*friend*/ void _CtorSetupNewChild(HyEntity3d &parentRef, IHyNode3d &childRef)
+{
+	_CtorChildAppend(parentRef, childRef);
+
+	childRef._SetEnabled(parentRef.IsEnabled(), false);
+	childRef._SetPauseUpdate(parentRef.IsPauseUpdate(), false);
 }

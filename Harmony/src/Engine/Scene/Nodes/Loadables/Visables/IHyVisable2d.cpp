@@ -29,6 +29,9 @@ IHyVisable2d::IHyVisable2d(HyType eNodeType, const char *szPrefix, const char *s
 	botColor.Set(1.0f);
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
+
+	if(m_pParent)
+		SetupNewChild(*m_pParent, *this);
 }
 
 IHyVisable2d::IHyVisable2d(const IHyVisable2d &copyRef) :	IHyLoadable2d(copyRef),
@@ -164,4 +167,30 @@ void IHyVisable2d::CalculateColor()
 /*virtual*/ HyEntity3d *IHyVisable2d::_VisableGetParent3dPtr() /*override final*/
 {
 	return nullptr;
+}
+
+/*friend*/ void SetupNewChild(HyEntity2d &parentRef, IHyVisable2d &childRef)
+{
+	childRef._SetCoordinateSystem(parentRef.GetCoordinateSystem(), false);
+
+	if(parentRef.IsScissorSet())
+		static_cast<IHyVisable2d &>(childRef)._SetScissor(parentRef.m_pScissor, false);
+
+	int32 iOrderValue = parentRef.GetDisplayOrder();
+	if(parentRef.IsReverseDisplayOrder() == false)
+	{
+		for(uint32 i = 0; i < parentRef.ChildCount(); ++i)
+		{
+			if(0 != (parentRef.ChildGet(i)->GetExplicitAndTypeFlags() & IHyVisable2d::NODETYPE_IsVisable))
+				iOrderValue = static_cast<IHyVisable2d *>(parentRef.ChildGet(i))->_SetDisplayOrder(iOrderValue, false);
+		}
+	}
+	else
+	{
+		for(int32 i = static_cast<int32>(parentRef.ChildCount()) - 1; i >= 0; --i)
+		{
+			if(0 != (parentRef.ChildGet(i)->GetExplicitAndTypeFlags() & IHyVisable2d::NODETYPE_IsVisable))
+				iOrderValue = static_cast<IHyVisable2d *>(parentRef.ChildGet(i))->_SetDisplayOrder(iOrderValue, false);
+		}
+	}
 }

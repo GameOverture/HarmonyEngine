@@ -39,8 +39,12 @@ protected:
 
 	void SetNewChildAttributes(IHyNode3d &childRef);
 
+	virtual void SetDirty(uint32 uiDirtyFlags) override;
+
 	// Optional user overrides below
 	virtual void OnUpdate() { }
+
+	friend void _CtorChildAppend(HyEntity3d &entityRef, IHyNode3d &childRef);
 };
 
 #endif /* HyEntity3d_h__ */

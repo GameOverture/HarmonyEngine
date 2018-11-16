@@ -62,6 +62,8 @@ public:
 
 protected:
 	virtual void Update() override;
+
+	friend void _CtorSetupNewChild(HyEntity2d &parentRef, IHyNode2d &childRef);
 };
 
 #endif /* IHyNode2d_h__ */

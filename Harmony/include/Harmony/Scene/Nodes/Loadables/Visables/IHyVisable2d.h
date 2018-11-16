@@ -62,6 +62,8 @@ private:
 	virtual IHyNode &_VisableGetNodeRef() override final;
 	virtual HyEntity2d *_VisableGetParent2dPtr() override final;
 	virtual HyEntity3d *_VisableGetParent3dPtr() override final;
+
+	friend void SetupNewChild(HyEntity2d &parentRef, IHyVisable2d &childRef);
 };
 
 #endif /* IHyVisable2d_h__ */
