@@ -23,6 +23,7 @@ class HyAtlas : public IHyLoadableData
 	const uint32							m_uiWIDTH;
 	const uint32							m_uiHEIGHT;
 	const HyTextureFormat					m_eTEXTURE_FORMAT;
+	const HyTextureFiltering				m_eTEXTURE_FILTERING;
 
 	HyTextureHandle							m_hTextureHandle;
 
@@ -46,7 +47,16 @@ class HyAtlas : public IHyLoadableData
 	std::mutex								m_Mutex_PixelData;
 
 public:
-	HyAtlas(std::string sFilePath, uint32 uiAtlasGroupId, uint32 uiIndexInGroup, uint32 uiMasterIndex, uint32 uiWidth, uint32 uiHeight, HyTextureFormat eTextureFormat, jsonxx::Array &srcFramesArrayRef);
+	HyAtlas(std::string sFilePath,
+			uint32 uiAtlasGroupId,
+			uint32 uiIndexInGroup,
+			uint32 uiMasterIndex,
+			uint32 uiWidth,
+			uint32 uiHeight,
+			HyTextureFormat eTextureFormat,
+			HyTextureFiltering eTextureFiltering,
+			jsonxx::Array &srcFramesArrayRef);
+
 	~HyAtlas();
 
 	uint32 GetAtlasGroupId() const;

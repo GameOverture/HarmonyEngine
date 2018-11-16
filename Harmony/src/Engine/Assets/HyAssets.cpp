@@ -421,6 +421,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 				sAtlasFilePath += szTmpBuffer;
 
 				uint32 uiTextureFormat = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureType"));
+				uint32 uiTextureFiltering = atlasGrpObj.has<jsonxx::Number>("textureFiltering") ? static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureFiltering")) : HYTEXFILTER_BILINEAR;
 
 				if(uiTextureFormat == HYTEXTURE_R8G8B8A8 || uiTextureFormat == HYTEXTURE_R8G8B8)
 					sAtlasFilePath += ".png";
@@ -428,13 +429,14 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 					sAtlasFilePath += ".dds";
 
 				new (pAtlasWriteLocation)HyAtlas(sAtlasFilePath,
-					uiAtlasGroupId,
-					j,
-					uiMasterIndex,
-					static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")),
-					static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")),
-					static_cast<HyTextureFormat>(uiTextureFormat),
-					texturesArray.get<jsonxx::Array>(j));
+												 uiAtlasGroupId,
+												 j,
+												 uiMasterIndex,
+												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")),
+												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")),
+												 static_cast<HyTextureFormat>(uiTextureFormat),
+												 static_cast<HyTextureFiltering>(uiTextureFiltering),
+												 texturesArray.get<jsonxx::Array>(j));
 
 				++pAtlasWriteLocation;
 				++uiMasterIndex;

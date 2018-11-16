@@ -19,6 +19,7 @@ HyAtlas::HyAtlas(std::string sFilePath,
 				 uint32 uiWidth,
 				 uint32 uiHeight,
 				 HyTextureFormat eTextureFormat,
+				 HyTextureFiltering eTextureFiltering,
 				 jsonxx::Array &srcFramesArrayRef) :	IHyLoadableData(HYLOADABLE_Atlas),
 														m_uiATLAS_GROUP_ID(uiAtlasGroupId),
 														m_uiINDEX_IN_GROUP(uiIndexInGroup),
@@ -27,6 +28,7 @@ HyAtlas::HyAtlas(std::string sFilePath,
 														m_uiWIDTH(uiWidth),
 														m_uiHEIGHT(uiHeight),
 														m_eTEXTURE_FORMAT(eTextureFormat),
+														m_eTEXTURE_FILTERING(eTextureFiltering),
 														m_hTextureHandle(0),
 														m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
 														m_pPixelData(nullptr),
@@ -146,7 +148,7 @@ void HyAtlas::OnRenderThread(IHyRenderer &rendererRef)
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
+		m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, m_eTEXTURE_FILTERING, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
 		DeletePixelData();
 	}
 	else // GetLoadableState() == HYLOADSTATE_Discarded

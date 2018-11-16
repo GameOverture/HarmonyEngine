@@ -83,7 +83,7 @@
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Number of Textures:</string>
+           <string>Num Textures:</string>
           </property>
          </widget>
         </item>
@@ -125,6 +125,20 @@
          <widget class="QLabel" name="lblTexType">
           <property name="text">
            <string>R8G8B8A8</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblTexFiltering">
+          <property name="text">
+           <string>Bilinear</string>
           </property>
          </widget>
         </item>

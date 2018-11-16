@@ -74,7 +74,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 			Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(m_pAtlasPreviewTexQuad->GetTextureHandle());
 	
 		// Upload texture to gfx api
-		pFtglAtlas->id = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HYTEXTURE_R8G8B8A8, 0, static_cast<uint32>(pFtglAtlas->width), static_cast<uint32>(pFtglAtlas->height), pAtlasPixelData, uiAtlasPixelDataSize, HYTEXTURE_R8G8B8A8);
+		pFtglAtlas->id = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HYTEXTURE_R8G8B8A8, HYTEXFILTER_BILINEAR, 0, static_cast<uint32>(pFtglAtlas->width), static_cast<uint32>(pFtglAtlas->height), pAtlasPixelData, uiAtlasPixelDataSize, HYTEXTURE_R8G8B8A8);
 	
 		// Create a (new) raw 'HyTexturedQuad2d' using a gfx api texture handle
 		delete m_pAtlasPreviewTexQuad;
