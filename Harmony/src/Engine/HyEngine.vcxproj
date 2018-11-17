@@ -143,6 +143,9 @@
     <ClCompile Include="Time\Watches\HyStopwatch.cpp" />
     <ClCompile Include="Time\Watches\HyTimer.cpp" />
     <ClCompile Include="Time\Watches\IHyTimeInst.cpp" />
+    <ClCompile Include="UI\HyInfoPanel.cpp" />
+    <ClCompile Include="UI\IHy9Slice.cpp" />
+    <ClCompile Include="UI\IHyButton.cpp" />
     <ClCompile Include="Utilities\Crc32.cpp" />
     <ClCompile Include="Utilities\HyBitManip.cpp" />
     <ClCompile Include="Utilities\HyFileIO.cpp" />
@@ -247,6 +250,9 @@
     <ClInclude Include="..\..\include\Harmony\Time\Watches\HyStopwatch.h" />
     <ClInclude Include="..\..\include\Harmony\Time\Watches\HyTimer.h" />
     <ClInclude Include="..\..\include\Harmony\Time\Watches\IHyTimeInst.h" />
+    <ClInclude Include="..\..\include\Harmony\UI\HyInfoPanel.h" />
+    <ClInclude Include="..\..\include\Harmony\UI\IHy9Slice.h" />
+    <ClInclude Include="..\..\include\Harmony\UI\IHyButton.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\Crc32.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyBitManip.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyFileIO.h" />

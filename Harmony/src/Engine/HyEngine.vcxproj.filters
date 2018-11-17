@@ -249,6 +249,15 @@
     <ClCompile Include="Afx\HyStdAfx.cpp">
       <Filter>Afx</Filter>
     </ClCompile>
+    <ClCompile Include="UI\HyInfoPanel.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\IHyButton.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\IHy9Slice.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -358,6 +367,9 @@
     </Filter>
     <Filter Include="Scene\Nodes\Loadables\Visables\Drawables\Objects">
       <UniqueIdentifier>{ca1bbbfe-7204-4cdd-b371-14774ec326cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{572d30f1-eded-49e8-ab47-e3367ed5cbde}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -665,6 +677,15 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyEntityData.h">
       <Filter>Assets\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\UI\HyInfoPanel.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\UI\IHyButton.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\UI\IHy9Slice.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
