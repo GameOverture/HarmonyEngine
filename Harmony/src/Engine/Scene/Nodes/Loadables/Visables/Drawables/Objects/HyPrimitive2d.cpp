@@ -13,20 +13,22 @@
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
-HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Primitive, nullptr, nullptr, pParent),
-													m_pVertBuffer(nullptr),
-													m_uiNumVerts(0),
-													m_bWireframe(false),
-													m_fLineThickness(1.0f),
-													m_uiNumSegments(16)
+HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_Primitive, nullptr, nullptr, pParent),
+	m_pVertBuffer(nullptr),
+	m_uiNumVerts(0),
+	m_bWireframe(false),
+	m_fLineThickness(1.0f),
+	m_uiNumSegments(16)
 {
 	m_LocalBoundingVolume.SetOnChangedCallback(OnShapeSet);
 	ClearData();
 }
 
-HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :	IHyDrawable2d(copyRef),
-																m_bWireframe(copyRef.m_bWireframe),
-																m_fLineThickness(copyRef.m_fLineThickness)
+HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
+	IHyDrawable2d(copyRef),
+	m_bWireframe(copyRef.m_bWireframe),
+	m_fLineThickness(copyRef.m_fLineThickness)
 {
 	// TODO: Check to see if this works
 	SetData();

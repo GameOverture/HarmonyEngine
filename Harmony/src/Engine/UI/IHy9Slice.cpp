@@ -11,33 +11,47 @@
 #include "UI/IHy9Slice.h"
 #include "HyEngine.h"
 
-IHy9Slice::IHy9Slice(glm::vec2 vDimensions, HyEntity2d *pParent) :
+IHy9Slice::IHy9Slice(glm::vec2 vFillDimensions, float fBorderThickness, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
-	m_vDIMENSIONS(vDimensions),
+	m_vFillDimensions(vFillDimensions),
+	m_fBorderThickness(fBorderThickness),
 	m_fElapsedTime(0.0f),
-	m_ePanelState(PANELSTATE_Hidden),
-	m_PanelFill(this),
-	m_PanelFrameOutline(this),
-	m_PanelFrame(this)
+	m_ePanelState(PANELSTATE_Hidden)
 {
-	glm::vec2 ptFrameVerts[4];
-	HySetVec(ptFrameVerts[0], 0.0f, 0.0f);
-	HySetVec(ptFrameVerts[1], 0.0f, m_vDIMENSIONS.y);
-	HySetVec(ptFrameVerts[2], m_vDIMENSIONS.x, m_vDIMENSIONS.y);
-	HySetVec(ptFrameVerts[3], m_vDIMENSIONS.x, 0.0f);
+	m_Fill.GetShape().SetAsBox(m_vFillDimensions.x, m_vFillDimensions.x);
+	ChildAppend(m_Fill);
 
-	m_PanelFill.GetShape().SetAsBox(ptFrameVerts[3].x - ptFrameVerts[0].x, ptFrameVerts[1].y - ptFrameVerts[0].y);
-	m_PanelFill.pos.Set(ptFrameVerts[0]);
-	m_PanelFill.alpha.Set(0.9f);
-	m_PanelFill.topColor.Set(0.0f, 0.0f, 0.0f);
+	m_Corners[LowerLeft].GetShape().SetAsCircle(m_fBorderThickness);
+	m_Corners[LowerLeft].pos.Set(0.0f, 0.0f);
+	ChildAppend(m_Corners[LowerLeft]);
 
-	m_PanelFrameOutline.GetShape().SetAsLineLoop(ptFrameVerts, 4);
-	m_PanelFrameOutline.SetLineThickness(8.0f);
-	m_PanelFrameOutline.topColor.Set(190.0f / 255.0f, 100.0f / 255.0f, 32.0f / 255.0f);
+	m_Corners[UpperLeft].GetShape().SetAsCircle(m_fBorderThickness);
+	m_Corners[UpperLeft].pos.Set(0.0f, m_vFillDimensions.y);
+	ChildAppend(m_Corners[LowerLeft]);
 
-	m_PanelFrame.GetShape().SetAsLineLoop(ptFrameVerts, 4);
-	m_PanelFrame.SetLineThickness(4.0f);
-	m_PanelFrame.topColor.Set(84.0f / 255.0f, 105.0f / 255.0f, 85.0f / 255.0f);
+	m_Corners[UpperRight].GetShape().SetAsCircle(m_fBorderThickness);
+	m_Corners[UpperRight].pos.Set(m_vFillDimensions.x, m_vFillDimensions.y);
+	ChildAppend(m_Corners[LowerLeft]);
+
+	m_Corners[LowerRight].GetShape().SetAsCircle(m_fBorderThickness);
+	m_Corners[LowerRight].pos.Set(m_vFillDimensions.x, 0.0f);
+	ChildAppend(m_Corners[LowerLeft]);
+
+	m_Horz[Upper].GetShape().SetAsBox(m_vFillDimensions.x, m_fBorderThickness);
+	m_Horz[Upper].pos.Set(0.0f, m_vFillDimensions.y);
+	ChildAppend(m_Horz[Upper]);
+
+	m_Horz[Lower].GetShape().SetAsBox(m_vFillDimensions.x, m_fBorderThickness);
+	m_Horz[Lower].pos.Set(0.0f, -m_fBorderThickness);
+	ChildAppend(m_Horz[Lower]);
+	
+	m_Vert[Left].GetShape().SetAsBox(m_fBorderThickness, m_vFillDimensions.y);
+	m_Vert[Left].pos.Set(m_vFillDimensions.x, 0.0f);
+	ChildAppend(m_Vert[Left]);
+
+	m_Vert[Right].GetShape().SetAsBox(m_fBorderThickness, m_vFillDimensions.y);
+	m_Vert[Right].pos.Set(-m_fBorderThickness, 0.0f);
+	ChildAppend(m_Vert[Right]);
 
 	UseWindowCoordinates();
 	SetEnabled(false);
@@ -47,14 +61,20 @@ IHy9Slice::~IHy9Slice()
 {
 }
 
-float IHy9Slice::GetWidth()
+float IHy9Slice::GetWidth(bool bIncludeBorders)
 {
-	return m_vDIMENSIONS.x;
+	if(bIncludeBorders)
+		return m_vFillDimensions.x + (m_fBorderThickness * 2.0f);
+	else
+		return m_vFillDimensions.x;
 }
 
-float IHy9Slice::GetHeight()
+float IHy9Slice::GetHeight(bool bIncludeBorders)
 {
-	return m_vDIMENSIONS.y;
+	if(bIncludeBorders)
+		return m_vFillDimensions.y + (m_fBorderThickness * 2.0f);
+	else
+		return m_vFillDimensions.y;
 }
 
 /*virtual*/ void IHy9Slice::Show()
@@ -86,7 +106,7 @@ bool IHy9Slice::IsShown()
 	return m_ePanelState == PANELSTATE_Shown;
 }
 
-/*virtual*/ void IHy9Slice::OnUpdate() /*override final*/
+/*virtual*/ void IHy9Slice::OnUpdate() /*override*/
 {
 	if(m_fElapsedTime > 0.0f)
 	{

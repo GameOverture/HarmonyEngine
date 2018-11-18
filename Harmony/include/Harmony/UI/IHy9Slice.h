@@ -16,29 +16,54 @@
 
 class IHy9Slice : public HyEntity2d
 {
-	const glm::vec2			m_vDIMENSIONS;
+	glm::vec2				m_vFillDimensions;
+	float					m_fBorderThickness;
 	float					m_fElapsedTime;
 
-	enum PanelState
+	enum SliceState
 	{
 		PANELSTATE_Hidden = 0,
 		PANELSTATE_Showing,
 		PANELSTATE_Shown,
 		PANELSTATE_Hiding
 	};
-	PanelState				m_ePanelState;
+	SliceState				m_ePanelState;
 
 protected:
-	HyPrimitive2d			m_PanelFill;
-	HyPrimitive2d			m_PanelFrameOutline;
-	HyPrimitive2d			m_PanelFrame;
+	enum SliceCorner
+	{	
+		LowerLeft = 0,
+		UpperLeft,
+		UpperRight,
+		LowerRight,
+		NumCorners
+	};
+
+	enum SliceHorz
+	{
+		Upper = 0,
+		Lower,
+		NumHorz
+	};
+
+	enum SliceVert
+	{
+		Left = 0,
+		Right,
+		NumVert
+	};
+
+	HyPrimitive2d			m_Fill;
+	HyPrimitive2d			m_Corners[NumCorners];
+	HyPrimitive2d			m_Horz[NumHorz];
+	HyPrimitive2d			m_Vert[NumVert];
 
 public:
-	IHy9Slice(glm::vec2 vDimensions, HyEntity2d *pParent);
+	IHy9Slice(glm::vec2 vFillDimensions, float fBorderThickness, HyEntity2d *pParent);
 	virtual ~IHy9Slice();
 
-	float GetWidth();
-	float GetHeight();
+	float GetWidth(bool bIncludeBorders);
+	float GetHeight(bool bIncludeBorders);
 
 	void Show();
 	void Hide();
@@ -52,7 +77,7 @@ public:
 	virtual void OnHidden() = 0;
 
 protected:
-	virtual void OnUpdate() override final;
+	virtual void OnUpdate() override;
 };
 
 #endif /* IHy9Slice_h__ */
