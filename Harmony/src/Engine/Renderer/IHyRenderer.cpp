@@ -119,7 +119,15 @@ void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCa
 	HyScreenRect<int32> scissorRect;
 	instanceRef.GetWorldScissor(scissorRect);
 
-	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, scissorRect, (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE, instanceRef.GetCoordinateSystem(), m_VertexBuffer.GetNumUsedBytes2d(), uiNumInstances, uiNumVerticesPerInstance);
+	m_RenderBuffer.AppendRenderState(uiId,
+									 instanceRef,
+									 uiCameraMask,
+									 scissorRect,
+									 (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
+									 instanceRef.GetCoordinateSystem(),
+									 m_VertexBuffer.GetNumUsedBytes2d(),
+									 uiNumInstances,
+									 uiNumVerticesPerInstance);
 	
 	instanceRef.AcquireData();
 	instanceRef.OnWriteVertexData(m_VertexBuffer);

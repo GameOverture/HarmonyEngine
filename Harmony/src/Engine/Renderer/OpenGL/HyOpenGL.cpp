@@ -523,6 +523,17 @@ HyOpenGL::~HyOpenGL(void)
 	glBindTexture(GL_TEXTURE_2D, hGLTexture);
 	HyErrorCheck_OpenGL("HyOpenGLShader::AddTexture", "glBindTexture");
 
+	if(bIsPixelDataCompressed == false)
+	{
+		glTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
+		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
+	}
+	else
+	{
+		glCompressedTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
+		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
+	}
+
 	switch(eTexFiltering)
 	{
 	case HYTEXFILTER_NEAREST:
@@ -551,8 +562,8 @@ HyOpenGL::~HyOpenGL(void)
 
 	case HYTEXFILTER_BILINEAR_MIPMAP: // Mipmaps not working
 		glEnable(GL_TEXTURE_2D);
-		glTexStorage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, uiWidth, uiHeight, eFormat, GL_UNSIGNED_BYTE, pPixelData);
+		//glTexStorage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight);
+		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, uiWidth, uiHeight, eFormat, GL_UNSIGNED_BYTE, pPixelData);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -573,17 +584,6 @@ HyOpenGL::~HyOpenGL(void)
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); //GL_REPEAT
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); //GL_REPEAT
-
-	if(bIsPixelDataCompressed == false)
-	{
-		glTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
-		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
-	}
-	else
-	{
-		glCompressedTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
-		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
-	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return hGLTexture;
@@ -724,7 +724,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 
 	//////////////////////////////////////////////////////////////////////////
 	// Set glViewport based on coordinate system
-	if(pCamera)// pRenderState->GetCoordinateSystem() < 0)
+	if(pCamera)
 	{
 		viewportRect = pCamera->GetViewport();
 		pCamera->GetCameraTransform(m_mtxView);

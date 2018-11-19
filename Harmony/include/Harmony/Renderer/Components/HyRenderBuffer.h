@@ -33,21 +33,17 @@ public:
 
 	struct State
 	{
-		const uint32				uiID;								// Used for debugging
+		const uint32				uiID;						// Used for debugging
 		const uint32				uiCAMERA_MASK;
 		const uint32				uiDATA_OFFSET;
-
 		const HyRenderMode			eRENDER_MODE;
 		const HyTextureHandle		hTEXTURE_0;
-
 		const HyShaderHandle		hSHADER;
 		const HyScreenRect<int32>	SCISSOR_RECT;
 		const HyStencilHandle		hSTENCIL;
-
-		const int32					iCOORDINATE_SYSTEM;				// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
-
+		const int32					iCOORDINATE_SYSTEM;			// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
 		const uint32				uiNUM_INSTANCES;
-		const uint32				uiNUM_VERTS_PER_INSTANCE;			// Or total number of vertices if single instance
+		const uint32				uiNUM_VERTS_PER_INSTANCE;	// Or total number of vertices if single instance
 
 		uint32						m_uiExDataSize;
 		
