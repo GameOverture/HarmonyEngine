@@ -541,15 +541,15 @@ HyOpenGL::~HyOpenGL(void)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		break;
 
-	case HYTEXFILTER_NEAREST_MIPMAP:// Mipmaps not working
-		glEnable(GL_TEXTURE_2D);
+	case HYTEXFILTER_NEAREST_MIPMAP:
+		glEnable(GL_TEXTURE_2D);	// An old ATI driver bug work-around requires glEnabled()
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		break;
 
-	case HYTEXFILTER_LINEAR_MIPMAP: // Mipmaps not working
-		glEnable(GL_TEXTURE_2D);
+	case HYTEXFILTER_LINEAR_MIPMAP:
+		glEnable(GL_TEXTURE_2D);	// An old ATI driver bug work-around requires glEnabled()
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -560,17 +560,15 @@ HyOpenGL::~HyOpenGL(void)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		break;
 
-	case HYTEXFILTER_BILINEAR_MIPMAP: // Mipmaps not working
-		glEnable(GL_TEXTURE_2D);
-		//glTexStorage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight);
-		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, uiWidth, uiHeight, eFormat, GL_UNSIGNED_BYTE, pPixelData);
+	case HYTEXFILTER_BILINEAR_MIPMAP:
+		glEnable(GL_TEXTURE_2D);	// An old ATI driver bug work-around requires glEnabled()
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		break;
 
-	case HYTEXFILTER_TRILINEAR: // Mipmaps not working
-		glEnable(GL_TEXTURE_2D);
+	case HYTEXFILTER_TRILINEAR:
+		glEnable(GL_TEXTURE_2D);	// An old ATI driver bug work-around requires glEnabled()
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
