@@ -365,7 +365,7 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 
 		affectedTextureIndexMap[m_pModel->GetAtlasGrpIndexFromAtlasGrpId(selectedFrameList[i]->GetAtlasGrpId())].insert(selectedFrameList[i]->GetTextureIndex());
 		
-		m_pModel->ReplaceFrame(selectedFrameList[i], fileInfo.fileName(), newImage, false);
+		m_pModel->ReplaceFrame(selectedFrameList[i], fileInfo.baseName(), newImage, false);
 	}
 
 	if(affectedTextureIndexMap.empty() == false)

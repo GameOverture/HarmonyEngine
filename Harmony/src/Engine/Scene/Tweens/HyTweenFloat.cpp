@@ -46,6 +46,15 @@ void HyTweenFloat::Set(float fValue)
 	StopTween();
 }
 
+void HyTweenFloat::Set(const HyTweenFloat &valueRef)
+{
+	if(m_fValueRef != valueRef.Get())
+		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+
+	m_fValueRef = valueRef.Get();
+	StopTween();
+}
+
 void HyTweenFloat::Offset(float fValue)
 {
 	if(fValue != 0.0f)

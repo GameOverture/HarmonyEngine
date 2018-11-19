@@ -17,40 +17,45 @@
 
 #define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Text, szPrefix, szName, pParent),
-																					m_bIsDirty(false),
-																					m_sRawString(""),
-																					m_uiCurFontState(0),
-																					m_vBoxDimensions(0.0f, 0.0f),
-																					m_fScaleBoxModifier(1.0f),
-																					m_uiBoxAttributes(0),
-																					m_eAlignment(HYALIGN_Left),
-																					m_bMonospacedDigits(false),
-																					m_pGlyphInfos(nullptr),
-																					m_uiNumReservedGlyphs(0),
-																					m_uiNumValidCharacters(0),
-																					m_fUsedPixelWidth(0.0f),
-																					m_fUsedPixelHeight(0.0f)
+HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :
+	IHyDrawable2d(HYTYPE_Text, szPrefix, szName, pParent),
+	m_bIsDirty(false),
+	m_sRawString(""),
+	m_uiCurFontState(0),
+	m_uiBoxAttributes(0),
+	m_vBoxDimensions(0.0f, 0.0f),
+	m_fScaleBoxModifier(1.0f),
+#ifdef HY_DEBUG
+	m_DebugBox(pParent),
+#endif
+	m_eAlignment(HYALIGN_Left),
+	m_bMonospacedDigits(false),
+	m_pGlyphInfos(nullptr),
+	m_uiNumReservedGlyphs(0),
+	m_uiNumValidCharacters(0),
+	m_fUsedPixelWidth(0.0f),
+	m_fUsedPixelHeight(0.0f)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
-HyText2d::HyText2d(const HyText2d &copyRef) :	IHyDrawable2d(copyRef),
-												m_bIsDirty(true),
-												m_sRawString(copyRef.m_sRawString),
-												m_Utf32CodeList(copyRef.m_Utf32CodeList),
-												m_uiCurFontState(copyRef.m_uiCurFontState),
-												m_uiBoxAttributes(copyRef.m_uiBoxAttributes),
-												m_vBoxDimensions(copyRef.m_vBoxDimensions),
-												m_fScaleBoxModifier(copyRef.m_fScaleBoxModifier),
-												m_eAlignment(copyRef.m_eAlignment),
-												m_bMonospacedDigits(copyRef.m_bMonospacedDigits),
-												m_pGlyphInfos(nullptr),
-												m_uiNumReservedGlyphs(copyRef.m_uiNumReservedGlyphs),
-												m_uiNumValidCharacters(copyRef.m_uiNumValidCharacters),
-												m_uiNumRenderQuads(copyRef.m_uiNumRenderQuads),
-												m_fUsedPixelWidth(copyRef.m_fUsedPixelWidth),
-												m_fUsedPixelHeight(copyRef.m_fUsedPixelHeight)
+HyText2d::HyText2d(const HyText2d &copyRef) :
+	IHyDrawable2d(copyRef),
+	m_bIsDirty(true),
+	m_sRawString(copyRef.m_sRawString),
+	m_Utf32CodeList(copyRef.m_Utf32CodeList),
+	m_uiCurFontState(copyRef.m_uiCurFontState),
+	m_uiBoxAttributes(copyRef.m_uiBoxAttributes),
+	m_vBoxDimensions(copyRef.m_vBoxDimensions),
+	m_fScaleBoxModifier(copyRef.m_fScaleBoxModifier),
+	m_eAlignment(copyRef.m_eAlignment),
+	m_bMonospacedDigits(copyRef.m_bMonospacedDigits),
+	m_pGlyphInfos(nullptr),
+	m_uiNumReservedGlyphs(copyRef.m_uiNumReservedGlyphs),
+	m_uiNumValidCharacters(copyRef.m_uiNumValidCharacters),
+	m_uiNumRenderQuads(copyRef.m_uiNumRenderQuads),
+	m_fUsedPixelWidth(copyRef.m_fUsedPixelWidth),
+	m_fUsedPixelHeight(copyRef.m_fUsedPixelHeight)
 {
 }
 
@@ -298,6 +303,10 @@ void HyText2d::SetAsLine()
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
+#ifdef HY_DEBUG
+	m_DebugBox.GetShape().SetAsNothing();
+#endif
+
 	MarkAsDirty();
 }
 
@@ -319,6 +328,13 @@ void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitW
 
 	m_uiBoxAttributes = iFlags;
 
+#ifdef HY_DEBUG
+	glm::vec2 ptVerts[4] = { glm::vec2(0.0f, -100.0f), glm::vec2(0.0f, 0.0f), glm::vec2(m_vBoxDimensions.x, 0.0f), glm::vec2(m_vBoxDimensions.x, -100.0f) };
+	m_DebugBox.GetShape().SetAsLineChain(ptVerts, 4);
+	m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
+	m_DebugBox.Load();
+#endif
+
 	MarkAsDirty();
 }
 
@@ -336,6 +352,13 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_vBoxDimensions.y = fHeight;
 
 	m_uiBoxAttributes = iFlags;
+
+#ifdef HY_DEBUG
+	m_DebugBox.GetShape().SetAsBox(fWidth, fHeight);
+	m_DebugBox.SetWireframe(true);
+	m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
+	m_DebugBox.Load();
+#endif
 
 	MarkAsDirty();
 }
@@ -410,6 +433,11 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 /*virtual*/ void HyText2d::OnLoadedUpdate() /*override*/
 {
+#ifdef HY_DEBUG
+	m_DebugBox.pos.Set(pos);
+	m_DebugBox.rot.Set(rot);
+	m_DebugBox.scale.Set(scale);
+#endif
 	CalculateGlyphInfos();
 }
 

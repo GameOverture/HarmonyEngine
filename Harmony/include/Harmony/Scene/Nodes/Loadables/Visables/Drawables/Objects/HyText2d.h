@@ -12,6 +12,7 @@
 
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 #include "Assets/Nodes/HyText2dData.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrimitive2d.h"
 
 class HyText2d : public IHyDrawable2d
 {
@@ -49,6 +50,9 @@ protected:
 	uint32				m_uiBoxAttributes;
 	glm::vec2			m_vBoxDimensions;
 	float				m_fScaleBoxModifier;
+#ifdef HY_DEBUG
+	HyPrimitive2d		m_DebugBox;
+#endif
 
 	HyAlign				m_eAlignment;
 	bool				m_bMonospacedDigits;

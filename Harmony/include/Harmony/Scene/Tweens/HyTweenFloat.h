@@ -44,6 +44,7 @@ public:
 
 	float Get() const;
 	void Set(float fValue);
+	void Set(const HyTweenFloat &valueRef);
 	void Offset(float fValue);
 
 	// Procedural transformation functions
