@@ -434,6 +434,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_DebugBox.pos.Set(pos);
 	m_DebugBox.rot.Set(rot);
 	m_DebugBox.scale.Set(scale);
+	m_DebugBox.UseWindowCoordinates(GetCoordinateSystem());
 #endif
 	CalculateGlyphInfos();
 }

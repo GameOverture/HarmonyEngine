@@ -57,7 +57,12 @@ const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const
 
 	auto iter = m_LookupIndexMap.find(sPath);
 	if(iter == m_LookupIndexMap.end())
+	{
+		if(sName.empty() == false)
+			HyLogError("Cannot find data for: " << sPrefix << "/" << sName);
+
 		return nullptr;
+	}
 
 	return &m_DataList[iter->second];
 }
