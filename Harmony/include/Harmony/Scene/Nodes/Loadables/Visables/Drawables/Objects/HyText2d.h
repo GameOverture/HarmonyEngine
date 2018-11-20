@@ -40,12 +40,10 @@ protected:
 
 	enum BoxAttributes
 	{
-		BOXATTRIB_IsColumn				= 1 << 0,
-		BOXATTRIB_CenterVertically		= 1 << 1,
-		BOXATTRIB_ExtendingBottom		= 1 << 2,
-		BOXATTRIB_SplitWordsToFit		= 1 << 3,
-		BOXATTRIB_IsScaleBox			= 1 << 4,
-		BOXATTRIB_FitWithinBounds		= 1 << 5,	// Whether any fancy glyph is allowed to hang outside the bounds
+		BOXATTRIB_IsColumn					= 1 << 0,
+		BOXATTRIB_ColumnSplitWordsToFit		= 1 << 3,
+		BOXATTRIB_IsScaleBox				= 1 << 4,
+		BOXATTRIB_ScaleBoxCenterVertically	= 1 << 1,
 	};
 	uint32				m_uiBoxAttributes;
 	glm::vec2			m_vBoxDimensions;
@@ -119,7 +117,7 @@ public:
 	const glm::vec2 &TextGetBox();
 
 	void SetAsLine();
-	void SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitWordsToFit = false);
+	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 	virtual bool IsLoadDataValid() override;

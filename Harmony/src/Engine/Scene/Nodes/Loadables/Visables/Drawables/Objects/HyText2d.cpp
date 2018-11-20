@@ -310,15 +310,12 @@ void HyText2d::SetAsLine()
 	MarkAsDirty();
 }
 
-void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitWordsToFit /*= false*/)
+void HyText2d::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 {
-	int32 iFlags = BOXATTRIB_IsColumn | BOXATTRIB_ExtendingBottom;
-
-	if(bMustFitWithinColumn)
-		iFlags |= BOXATTRIB_FitWithinBounds;
+	int32 iFlags = BOXATTRIB_IsColumn;
 
 	if(bSplitWordsToFit)
-		iFlags |= BOXATTRIB_SplitWordsToFit;
+		iFlags |= BOXATTRIB_ColumnSplitWordsToFit;
 	
 	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth)
 		return;
@@ -340,10 +337,10 @@ void HyText2d::SetAsColumn(float fWidth, bool bMustFitWithinColumn, bool bSplitW
 
 void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
-	int32 iFlags = BOXATTRIB_IsScaleBox | BOXATTRIB_FitWithinBounds;
+	int32 iFlags = BOXATTRIB_IsScaleBox;
 
 	if(bCenterVertically)
-		iFlags |= BOXATTRIB_CenterVertically;
+		iFlags |= BOXATTRIB_ScaleBoxCenterVertically;
 
 	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth && m_vBoxDimensions.y == fHeight)
 		return;
@@ -448,16 +445,15 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 
-	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
-
-	glm::mat4 mtxTransform = GetWorldTransform();
+	const uint32 uiNUMLAYERS = pData->GetNumLayers(m_uiCurFontState);
+	const glm::mat4 &mtxTransformRef = GetWorldTransform();
 
 	uint32 iOffsetIndex = 0;
-	for(int32 i = uiNumLayers - 1; i >= 0; --i)
+	for(int32 i = uiNUMLAYERS - 1; i >= 0; --i)
 	{
 		for(uint32 j = 0; j < m_uiNumValidCharacters; ++j, ++iOffsetIndex)
 		{
-			uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(j, uiNumLayers, i);
+			uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(j, uiNUMLAYERS, i);
 
 			if(m_Utf32CodeList[j] == '\n')
 				continue;
@@ -517,7 +513,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
 			//pWritePositionRef += sizeof(glm::vec2);
 
-			vertexBufferRef.AppendData2d(&mtxTransform, sizeof(glm::mat4));
+			vertexBufferRef.AppendData2d(&mtxTransformRef, sizeof(glm::mat4));
 			//*reinterpret_cast<glm::mat4 *>(pWritePositionRef) = mtxTransform;
 			//pWritePositionRef += sizeof(glm::mat4);
 		}
@@ -698,12 +694,12 @@ offsetCalculation:
 
 				// If drawing text within a box, and we advance past our width, determine if we should newline
 				if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) == 0 &&
-					(m_uiBoxAttributes & BOXATTRIB_IsColumn) != 0 &&
-					fCurLineWidth > m_vBoxDimensions.x)
+				   (m_uiBoxAttributes & BOXATTRIB_IsColumn) != 0 &&
+				   fCurLineWidth > m_vBoxDimensions.x)
 				{
 					// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
-					if((m_uiBoxAttributes & BOXATTRIB_SplitWordsToFit) != 0 ||
-						((m_uiBoxAttributes & BOXATTRIB_SplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
+					if((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) != 0 ||
+					   ((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
 					{
 						// Don't newline on ' ' characters
 						if(uiStrIndex != uiLastSpaceIndex)
@@ -717,18 +713,15 @@ offsetCalculation:
 
 			if(bFirstCharacterOnNewLine)
 			{
-				if(0 != (m_uiBoxAttributes & BOXATTRIB_FitWithinBounds))
+				// Handle whether any fancy glyph is hanging outside the bounds for every layer for this character
+				for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 				{
-					// Handle every layer for this character
-					for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
-					{
-						uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
-						m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x += (fFirstCharacterNudgeRightAmt * m_fScaleBoxModifier);
-						pWritePos[uiLayerIndex].x += (fFirstCharacterNudgeRightAmt * m_fScaleBoxModifier);
+					uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
+					m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x += (fFirstCharacterNudgeRightAmt * m_fScaleBoxModifier);
+					pWritePos[uiLayerIndex].x += (fFirstCharacterNudgeRightAmt * m_fScaleBoxModifier);
 
-						if(fCurLineWidth < pWritePos[uiLayerIndex].x)
-							fCurLineWidth = pWritePos[uiLayerIndex].x;
-					}
+					if(fCurLineWidth < pWritePos[uiLayerIndex].x)
+						fCurLineWidth = pWritePos[uiLayerIndex].x;
 				}
 
 				fFirstCharacterNudgeRightAmt = 0.0f;
@@ -813,7 +806,7 @@ offsetCalculation:
 
 	m_uiNumRenderQuads = ((m_uiNumValidCharacters - uiNumNewlineCharacters) * uiNUM_LAYERS);
 
-	// Fix each text line to match proper alignment (HYALIGN_Left is already set at this point)
+	// Fix each text line to match proper alignment (by default, HYALIGN_Left is already set at this point)
 	if(m_eAlignment != HYALIGN_Left)
 	{
 		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
@@ -905,12 +898,18 @@ offsetCalculation:
 			bScaleBoxModiferIsSet = true;
 			goto offsetCalculation;
 		}
-		else if(0 != (m_uiBoxAttributes & BOXATTRIB_CenterVertically))
+		else if(0 != (m_uiBoxAttributes & BOXATTRIB_ScaleBoxCenterVertically))
 		{
 			float fCenterNudgeAmt = (m_vBoxDimensions.y - m_fUsedPixelHeight) * 0.5f;
 			for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
 				m_pGlyphInfos[i].vOffset.y -= fCenterNudgeAmt;
 		}
+	}
+	else if(0 != (m_uiBoxAttributes & BOXATTRIB_IsColumn))	// Move column text to fit below its node position, which will extend downward from
+	{
+		float fTopLineNudgeAmt = vNewlineInfo[0].fUSED_HEIGHT;
+		for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
+			m_pGlyphInfos[i].vOffset.y -= fTopLineNudgeAmt;
 	}
 
 	delete[] pWritePos;
