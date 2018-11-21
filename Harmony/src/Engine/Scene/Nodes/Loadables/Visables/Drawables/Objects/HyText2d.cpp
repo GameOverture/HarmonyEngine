@@ -211,11 +211,17 @@ uint32 HyText2d::TextGetState()
 
 void HyText2d::TextSetState(uint32 uiStateIndex)
 {
-	if(m_uiCurFontState != uiStateIndex)
-		MarkAsDirty();
-	
-	//HyAssert(uiStateIndex < static_cast<HyText2dData *>(AcquireData())->GetNumStates(), "HyText2d::TextSetState set state to invalid index: " << uiStateIndex);
+	if(uiStateIndex >= static_cast<const HyText2dData *>(AcquireData())->GetNumStates())
+	{
+		HyLogWarning(m_sPrefix << "/" << m_sName << " (HyText2d) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HyText2dData *>(AcquireData())->GetNumStates() << "'");
+		return;
+	}
+
+	if(m_uiCurFontState == uiStateIndex)
+		return;
+
 	m_uiCurFontState = uiStateIndex;
+	MarkAsDirty();
 }
 
 uint32 HyText2d::TextGetNumLayers()
