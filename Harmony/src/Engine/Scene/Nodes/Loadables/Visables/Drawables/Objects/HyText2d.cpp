@@ -664,7 +664,7 @@ offsetCalculation:
 
 				float fAdvanceAmtX = glyphRef.fADVANCE_X;
 				float fAscender = static_cast<float>(glyphRef.iOFFSET_Y);
-				float fDecender = static_cast<float>(glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
+				float fDecender = HyClamp(static_cast<float>(glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y), 0.0f, pData->GetLineHeight(m_uiCurFontState));
 				float fOffsetX = static_cast<float>(glyphRef.iOFFSET_X);
 
 				if(m_bMonospacedDigits && m_Utf32CodeList[uiStrIndex] >= 48 && m_Utf32CodeList[uiStrIndex] <= 57)

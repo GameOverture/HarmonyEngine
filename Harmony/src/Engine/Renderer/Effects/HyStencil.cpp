@@ -24,12 +24,7 @@ HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount),
 
 HyStencil::~HyStencil()
 {
-}
-
-void HyStencil::Destroy()
-{
 	IHyRenderer::RemoveStencil(this);
-	delete this;
 }
 
 HyStencilHandle HyStencil::GetHandle() const
@@ -37,19 +32,19 @@ HyStencilHandle HyStencil::GetHandle() const
 	return m_hHANDLE;
 }
 
-void HyStencil::AddMask(IHyDrawable2d *pInstance)
+void HyStencil::AddMask(IHyDrawable2d &nodeRef)
 {
-	pInstance->Load();
-	m_MaskInstanceList.push_back(pInstance);
+	nodeRef.Load();
+	m_MaskInstanceList.push_back(&nodeRef);
 
 	m_bMaskIsReady = false;	// Will be set to 'true' in IHyRenderer::PrepareBuffers()
 }
 
-bool HyStencil::RemoveMask(IHyDrawable2d *pInstance)
+bool HyStencil::RemoveMask(IHyDrawable2d &nodeRef)
 {
 	for(auto it = m_MaskInstanceList.begin(); it != m_MaskInstanceList.end(); ++it)
 	{
-		if((*it) == pInstance)
+		if((*it) == &nodeRef)
 		{
 			m_MaskInstanceList.erase(it);
 			return true;

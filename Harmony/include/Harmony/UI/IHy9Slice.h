@@ -30,33 +30,43 @@ class IHy9Slice : public HyEntity2d
 	SliceState				m_ePanelState;
 
 protected:
-	enum SliceCorner
-	{	
-		LowerLeft = 0,
-		UpperLeft,
-		UpperRight,
-		LowerRight,
-		NumCorners
-	};
-
-	enum SliceHorz
+	class Border : public HyEntity2d
 	{
-		Upper = 0,
-		Lower,
-		NumHorz
-	};
+		enum SliceCorner
+		{	
+			LowerLeft = 0,
+			UpperLeft,
+			UpperRight,
+			LowerRight,
+			NumCorners
+		};
 
-	enum SliceVert
-	{
-		Left = 0,
-		Right,
-		NumVert
-	};
+		enum SliceHorz
+		{
+			Upper = 0,
+			Lower,
+			NumHorz
+		};
 
+		enum SliceVert
+		{
+			Left = 0,
+			Right,
+			NumVert
+		};
+
+		HyPrimitive2d			m_Corners[NumCorners];
+		HyPrimitive2d			m_Horz[NumHorz];
+		HyPrimitive2d			m_Vert[NumVert];
+
+		HyStencil				m_StencilForCorner;
+		HyStencil				m_StencilForEdges;
+
+	public:
+		Border(glm::vec2 vFillDimensions, float fBorderThickness, HyPrimitive2d &fillRef, HyEntity2d *pParent);
+	};
 	HyPrimitive2d			m_Fill;
-	HyPrimitive2d			m_Corners[NumCorners];
-	HyPrimitive2d			m_Horz[NumHorz];
-	HyPrimitive2d			m_Vert[NumVert];
+	Border					m_Border;
 
 public:
 	IHy9Slice(glm::vec2 vFillDimensions, float fBorderThickness, HyEntity2d *pParent);
@@ -64,6 +74,10 @@ public:
 
 	float GetWidth(bool bIncludeBorders);
 	float GetHeight(bool bIncludeBorders);
+	float GetBorderThickness();
+
+	HyEntity2d &GetBorder();
+	HyPrimitive2d &GetFill();
 
 	void Show();
 	void Hide();

@@ -37,15 +37,13 @@ class HyStencil
 
 public:
 	HyStencil();
-private: ~HyStencil();
-public:
-	void Destroy();
+	~HyStencil();
 
 	HyStencilHandle GetHandle() const;
 
 	// It's the user's responsibility to ensure added instances continue to be valid
-	void AddMask(IHyDrawable2d *pInstance);
-	bool RemoveMask(IHyDrawable2d *pInstance);
+	void AddMask(IHyDrawable2d &nodeRef);
+	bool RemoveMask(IHyDrawable2d &nodeRef);
 
 	bool IsMaskReady();
 
