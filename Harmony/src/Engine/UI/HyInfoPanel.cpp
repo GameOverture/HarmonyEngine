@@ -110,7 +110,7 @@ float HyInfoPanel::GetPanelHeight()
 	m_pText->SetAsScaleBox(static_cast<float>(iWidth), static_cast<float>(iHeight), true);
 }
 
-/*virtual*/ void HyInfoPanel::SetTextAlignment(HyAlign eAlignment)
+/*virtual*/ void HyInfoPanel::SetTextAlignment(HyTextAlign eAlignment)
 {
 	if(m_pText)
 		m_pText->TextSetAlignment(eAlignment);

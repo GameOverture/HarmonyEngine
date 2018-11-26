@@ -40,7 +40,7 @@ public:
 	virtual std::string GetStr();
 	virtual void SetStr(std::string sText);
 	virtual void SetTextLocation(int32 iOffsetX, int32 iOffsetY, int32 iWidth, int32 iHeight);
-	virtual void SetTextAlignment(HyAlign eAlignment);
+	virtual void SetTextAlignment(HyTextAlign eAlignment);
 	virtual glm::vec2 GetTextScaleBox();
 };
 

@@ -52,7 +52,7 @@ protected:
 	HyPrimitive2d		m_DebugBox;
 #endif
 
-	HyAlign				m_eAlignment;
+	HyTextAlign				m_eAlignment;
 	bool				m_bMonospacedDigits;
 
 	struct GlyphInfo
@@ -108,8 +108,8 @@ public:
 	void TextSetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
 	void TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
 
-	HyAlign TextGetAlignment();
-	void TextSetAlignment(HyAlign eAlignment);
+	HyTextAlign TextGetAlignment();
+	void TextSetAlignment(HyTextAlign eAlignment);
 
 	bool TextIsMonospacedDigits();
 	void TextSetMonospacedDigits(bool bSet);

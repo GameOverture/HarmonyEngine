@@ -97,7 +97,7 @@ enum HyAnimCtrl
 	HYANIMCTRL_DontBounce
 };
 
-enum HyAlign
+enum HyTextAlign
 {
 	HYALIGN_Left = 0,
 	HYALIGN_Center,

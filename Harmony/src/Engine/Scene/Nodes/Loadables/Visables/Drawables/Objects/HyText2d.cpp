@@ -272,12 +272,12 @@ void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
 }
 
-HyAlign HyText2d::TextGetAlignment()
+HyTextAlign HyText2d::TextGetAlignment()
 {
 	return m_eAlignment;
 }
 
-void HyText2d::TextSetAlignment(HyAlign eAlignment)
+void HyText2d::TextSetAlignment(HyTextAlign eAlignment)
 {
 	if(m_eAlignment != eAlignment)
 		MarkAsDirty();

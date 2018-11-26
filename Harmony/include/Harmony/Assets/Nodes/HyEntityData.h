@@ -39,7 +39,7 @@ class HyEntityData : public IHyNodeData
 				ScaleBox
 			};
 			Type	eType;
-			HyAlign	eAlignment;
+			HyTextAlign	eAlignment;
 			bool	bMonospacedDigits;
 		};
 
