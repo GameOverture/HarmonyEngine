@@ -116,23 +116,27 @@ HyPrimitive2d &IHy9Slice::GetFill()
 	return m_Fill;
 }
 
-/*virtual*/ void IHy9Slice::Show()
+/*virtual*/ bool IHy9Slice::Show()
 {
 	if(IsShown() || IsTransition())
-		return;
+		return false;
 
 	SetEnabled(true);
 	m_fElapsedTime = OnShow();
 	m_ePanelState = PANELSTATE_Showing;
+
+	return true;
 }
 
-/*virtual*/ void IHy9Slice::Hide()
+/*virtual*/ bool IHy9Slice::Hide()
 {
 	if(IsShown() == false || IsTransition())
-		return;
+		return false;
 
 	m_fElapsedTime = OnHide();
 	m_ePanelState = PANELSTATE_Hiding;
+
+	return true;
 }
 
 bool IHy9Slice::IsTransition()

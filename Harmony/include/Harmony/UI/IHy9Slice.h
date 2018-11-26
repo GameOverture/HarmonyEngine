@@ -79,8 +79,8 @@ public:
 	HyEntity2d &GetBorder();
 	HyPrimitive2d &GetFill();
 
-	void Show();
-	void Hide();
+	bool Show();
+	bool Hide();
 
 	bool IsTransition();
 	bool IsShown();
