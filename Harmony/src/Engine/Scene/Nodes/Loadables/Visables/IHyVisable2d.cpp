@@ -176,7 +176,7 @@ void IHyVisable2d::CalculateColor()
 	if(parentRef.IsScissorSet())
 		static_cast<IHyVisable2d &>(childRef)._SetScissor(parentRef.m_pScissor, false);
 
-	int32 iOrderValue = parentRef.GetDisplayOrder();
+	int32 iOrderValue = parentRef.GetDisplayOrder() + 1;
 	if(parentRef.IsReverseDisplayOrder() == false)
 	{
 		for(uint32 i = 0; i < parentRef.ChildCount(); ++i)
