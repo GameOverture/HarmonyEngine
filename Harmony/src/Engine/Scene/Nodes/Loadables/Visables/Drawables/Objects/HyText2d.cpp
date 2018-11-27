@@ -128,6 +128,18 @@ const std::string &HyText2d::TextGet() const
 	return m_sRawString;
 }
 
+float HyText2d::TextGetPixelWidth()
+{
+	CalculateGlyphInfos();
+	return m_fUsedPixelWidth;
+}
+
+float HyText2d::TextGetPixelHeight()
+{
+	CalculateGlyphInfos();
+	return m_fUsedPixelHeight;
+}
+
 uint32 HyText2d::TextGetNumCharacters() const
 {
 	return static_cast<uint32>(m_Utf32CodeList.size());
@@ -388,6 +400,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	}
 
 	// TODO: I don't trust this is accurate in all text types (SetAsLine, SetAsColumn, SetAsScaleBox) - needs testing
+	// TODO: Doesn't account for alignment
 	m_LocalBoundingVolume.SetAsBox(m_fUsedPixelWidth * 0.5f, m_fUsedPixelHeight * 0.5f, ptCenter, rot.Get());
 }
 

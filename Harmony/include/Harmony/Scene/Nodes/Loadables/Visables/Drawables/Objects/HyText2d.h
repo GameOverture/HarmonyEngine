@@ -85,6 +85,9 @@ public:
 	void TextSet(const std::string sText);
 	const std::string &TextGet() const;
 
+	float TextGetPixelWidth();
+	float TextGetPixelHeight();
+
 	uint32 TextGetNumCharacters() const;
 	uint32 TextGetNumShownCharacters() const;
 	uint32 GetNumRenderQuads() const;
