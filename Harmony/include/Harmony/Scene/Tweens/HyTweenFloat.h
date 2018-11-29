@@ -55,6 +55,9 @@ public:
 
 	void StopTween();
 
+	float GetTweenDestination() const;
+	float GetTweenRemainingDuration() const;
+
 	HyTweenFloat &operator=(const float &rhs);
 	HyTweenFloat &operator+=(const float &rhs);
 	HyTweenFloat &operator-=(const float &rhs);
