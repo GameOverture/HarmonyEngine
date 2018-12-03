@@ -17,8 +17,6 @@ class HyWindow;
 
 class HyInput
 {
-	friend class HyEngine;
-
 	const uint32				m_uiNUM_INPUT_MAPS;
 	HyInputMap *				m_pInputMaps;
 
@@ -60,7 +58,6 @@ public:
 private:
 	void Update();
 	HyInputMap *GetInputMapArray();
-	void InitCallbacks();
 
 #ifdef HY_PLATFORM_DESKTOP
 	friend void glfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);

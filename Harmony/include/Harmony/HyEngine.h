@@ -12,12 +12,12 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "IHyApplication.h"
+#include "Window/HyWindowManager.h"
 #include "Audio/IHyAudio.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Input/HyInput.h"
 #include "Time/HyTime.h"
-#include "Renderer/Components/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
@@ -35,15 +35,18 @@
 #include "UI/HyInfoPanel.h"
 #include "UI/IHyButton.h"
 #include "Utilities/HyMath.h"
-#include "Utilities/HyStrManip.h"
 #include "Utilities/HyImage.h"
+#include "Utilities/HyStrManip.h"
 
-class HyEngine
+class IHyEngine
 {
-	static HyEngine *			sm_pInstance;
+	static IHyEngine *			sm_pInstance;
 
 	// The order of these member declarations matter
-	IHyApplication &			m_AppRef;
+	const HarmonyInit			m_Init;
+
+	HyWindowManager				m_WindowManager;
+	HyConsoleInterop			m_Console;
 	
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
@@ -53,29 +56,20 @@ class HyEngine
 	HyInput						m_Input;
 
 	HyRendererInterop			m_Renderer;
-	
-
-// If HY_PLATFORM_GUI, make this ctor public as gui tool requires special usage.
-#ifdef HY_PLATFORM_GUI
-public:
-	static HyEngine *GuiCreate(IHyApplication &projectRef);
-	static void GuiDelete();
-#endif
-
-	// Otherwise, private ctor invoked from RunGame(), once.
-	HyEngine(IHyApplication &gameRef);
 
 public:
-	~HyEngine();
+	IHyEngine(HarmonyInit &initStruct);
+	~IHyEngine();
 
-	static void RunGame(IHyApplication *pDynamicallyAllocatedGame);
+	void RunGame();
+
+protected:
+	virtual bool OnUpdate() = 0;
 
 #ifndef HY_PLATFORM_GUI
 private:
 #endif
-	bool IsInitialized();
 	bool Update();
-	void Shutdown();
 
 	bool PollPlatformApi();
 

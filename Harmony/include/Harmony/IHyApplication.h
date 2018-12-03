@@ -14,27 +14,6 @@
 #include "Memory/HyMemoryHeap.h"
 #include "Input/HyInputMap.h"
 
-// Client supplies these initialization parameters to the engine
-struct HarmonyInit
-{
-	std::string				sProjectDir;
-
-	std::string				sGameName;
-	std::string				sDataDir;
-	uint32					uiNumWindows;
-	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
-	uint32					uiUpdateTickMs;
-	float					fPixelsPerMeter;
-	uint32					uiNumInputMappings;
-	uint16					uiDebugPort;
-	bool					bUseConsole;
-	bool					bShowCursor;
-	HyWindowInfo			consoleInfo;
-
-	HarmonyInit();
-	HarmonyInit(std::string sHyProjFileName);
-};
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class IHyApplication
 {
@@ -43,19 +22,13 @@ class IHyApplication
 #ifdef HY_PLATFORM_GUI
 protected:
 #endif
-	HarmonyInit						m_Init;
-
-	std::vector<HyWindow *>			m_WindowList;
-
-	HyInputMap *					m_pInputMaps;
-	HyConsoleInterop				m_Console;
 
 	virtual bool Initialize() = 0;
-	virtual bool Update() = 0;
+	
 	virtual void Shutdown() = 0;
 
 public:
-	IHyApplication(HarmonyInit &initStruct);
+	IHyApplication();
 	virtual ~IHyApplication();
 
 	std::string GameName() const;

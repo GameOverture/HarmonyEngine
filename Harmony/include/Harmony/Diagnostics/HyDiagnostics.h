@@ -37,7 +37,7 @@ class HyDiagnostics
 	friend class HyEngine;
 	friend class IHyRenderer;
 
-	HarmonyInit &				m_InitStructRef;
+	const HarmonyInit &			m_InitStructRef;
 	HyTime &					m_TimeRef;
 	HyAssets &					m_AssetsRef;
 	HyScene &					m_SceneRef;
@@ -65,7 +65,7 @@ class HyDiagnostics
 	HyDiagOutput				m_DiagOutput;
 
 public:
-	HyDiagnostics(HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef);
+	HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
 
 	void BootMessage();

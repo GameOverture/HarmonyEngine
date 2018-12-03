@@ -81,37 +81,37 @@ public:
 	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext);
 	~HyWindow(void);
 
-	uint32							GetIndex() const;
+	uint32								GetIndex() const;
 
-	std::string						GetTitle();
-	void							SetTitle(const std::string &sTitle);
+	std::string							GetTitle();
+	void								SetTitle(const std::string &sTitle);
 
-	int32							GetWidth();
-	int32							GetHeight();
-	glm::ivec2						GetWindowSize();
-	void							SetWindowSize(glm::ivec2 vResolutionHint);
+	int32								GetWidth();
+	int32								GetHeight();
+	glm::ivec2							GetWindowSize();
+	void								SetWindowSize(glm::ivec2 vResolutionHint);
 
-	glm::ivec2						GetFramebufferSize();
+	glm::ivec2							GetFramebufferSize();
 
-	glm::ivec2						GetLocation();
-	void							SetLocation(glm::ivec2 ptLocation);
+	glm::ivec2							GetLocation();
+	void								SetLocation(glm::ivec2 ptLocation);
 
-	HyCamera2d *					CreateCamera2d();
-	HyCamera3d *					CreateCamera3d();
+	HyCamera2d *						CreateCamera2d();
+	HyCamera3d *						CreateCamera3d();
 
-	uint32							GetNumCameras2d();
-	HyCamera2d *					GetCamera2d(uint32 uiIndex);
-	const std::vector<HyCamera2d *> &GetCamera2dList();
+	uint32								GetNumCameras2d();
+	HyCamera2d *						GetCamera2d(uint32 uiIndex);
+	const std::vector<HyCamera2d *> &	GetCamera2dList();
 
-	uint32							GetNumCameras3d();
-	HyCamera3d *					GetCamera3d(uint32 uiIndex);
+	uint32								GetNumCameras3d();
+	HyCamera3d *						GetCamera3d(uint32 uiIndex);
 
-	void							RemoveCamera(HyCamera2d *&pCam);
-	void							RemoveCamera(HyCamera3d *&pCam);
+	void								RemoveCamera(HyCamera2d *&pCam);
+	void								RemoveCamera(HyCamera3d *&pCam);
 
-	glm::vec2						ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
+	glm::vec2							ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
 
-	HyWindowHandle					GetHandle();
+	HyWindowHandle						GetHandle();
 
 #ifdef HY_PLATFORM_DESKTOP
 	// Returns the monitor this window is currently associated with.

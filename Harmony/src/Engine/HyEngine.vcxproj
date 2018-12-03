@@ -101,7 +101,6 @@
     <ClCompile Include="Renderer\Components\HyRenderBuffer.cpp" />
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp" />
     <ClCompile Include="Renderer\Components\HyVertexBuffer.cpp" />
-    <ClCompile Include="Renderer\Components\HyWindow.cpp" />
     <ClCompile Include="Renderer\Effects\HyShader.cpp" />
     <ClCompile Include="Renderer\Effects\HyStencil.cpp" />
     <ClCompile Include="Renderer\Effects\IHyFx.cpp" />
@@ -154,6 +153,8 @@
     <ClCompile Include="Utilities\HyVariant.cpp" />
     <ClCompile Include="Utilities\jasonxx.cc" />
     <ClCompile Include="Utilities\tiny_gltf.cpp" />
+    <ClCompile Include="Window\HyWindow.cpp" />
+    <ClCompile Include="Window\HyWindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Harmony\Afx\Compilers\HyCompiler.h" />
@@ -206,7 +207,6 @@
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyRenderBuffer.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyShaderUniforms.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyVertexBuffer.h" />
-    <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyWindow.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyShader.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyStencil.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\IHyFx.h" />
@@ -262,6 +262,8 @@
     <ClInclude Include="..\..\include\Harmony\Utilities\json.hpp" />
     <ClInclude Include="..\..\include\Harmony\Utilities\jsonxx.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\tiny_gltf.h" />
+    <ClInclude Include="..\..\include\Harmony\Window\HyWindow.h" />
+    <ClInclude Include="..\..\include\Harmony\Window\HyWindowManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B4471160-742A-4571-BCC5-3EF8163C10E1}</ProjectGuid>

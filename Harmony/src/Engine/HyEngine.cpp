@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 
-HyEngine *		HyEngine::sm_pInstance = nullptr;
+IHyEngine *IHyEngine::sm_pInstance = nullptr;
 
 #ifdef HY_PLATFORM_GUI
 	#define HyThrottleUpdate
@@ -42,58 +42,38 @@ HyEngine *		HyEngine::sm_pInstance = nullptr;
 	#define HyThrottleUpdate while(m_Time.ThrottleUpdate())
 #endif
 
-// Private ctor() invoked from RunGame()
-HyEngine::HyEngine(IHyApplication &appRef) :	m_AppRef(appRef),
-												m_Scene(m_AppRef.m_WindowList),
-												m_Assets(m_Scene, m_AppRef.m_Init.sDataDir),
-												m_GuiComms(m_AppRef.m_Init.uiDebugPort, m_Assets),
-												m_Time(m_AppRef.m_Init.uiUpdateTickMs),
-												m_Diagnostics(m_AppRef.m_Init, m_Time, m_Assets, m_Scene),
-												m_Input(m_AppRef.m_Init.uiNumInputMappings, m_AppRef.m_WindowList),
-												m_Renderer(m_Diagnostics, m_AppRef.m_WindowList)
-												//m_Audio(m_AppRef.m_WindowList)
+IHyEngine::IHyEngine(HarmonyInit &initStruct) :
+	m_Init(initStruct),
+	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
+	m_Console(initStruct.bUseConsole, initStruct.consoleInfo),
+	m_Scene(m_WindowManager.GetWindowList()),
+	m_Assets(m_Scene, m_Init.sDataDir),
+	m_GuiComms(m_Init.uiDebugPort, m_Assets),
+	m_Time(m_Init.uiUpdateTickMs),
+	m_Diagnostics(m_Init, m_Time, m_Assets, m_Scene),
+	m_Input(m_Init.uiNumInputMappings, m_WindowManager.GetWindowList()),
+	m_Renderer(m_Diagnostics, m_WindowManager.GetWindowList())
 {
-	HyAssert(sm_pInstance == nullptr, "HyEngine::RunGame() must instanciate the engine once per HyEngine::Shutdown(). HyEngine ptr already created");
+	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");
+	HyAssert(m_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
+
+	sm_pInstance = this;
 }
 
-HyEngine::~HyEngine()
+IHyEngine::~IHyEngine()
 {
-}
-
-/*static*/ void HyEngine::RunGame(IHyApplication *pGame)
-{
-	HyAssert(pGame, "HyEngine::RunGame was passed a nullptr");
-
-	sm_pInstance = HY_NEW HyEngine(*pGame);
-
-	pGame->SetInputMapPtr(sm_pInstance->m_Input.GetInputMapArray());
-	sm_pInstance->m_Input.InitCallbacks();
-
-	while(sm_pInstance->IsInitialized() == false)
-	{ }
-
-	sm_pInstance->m_Diagnostics.BootMessage();
-
-	if(pGame->Initialize() == false)
-		HyError("IApplication Initialize() failed");
-
-	sm_pInstance->m_Time.ResetDelta();
-
-	HyLogTitle("Starting Update Loop");
-	while(sm_pInstance->Update())
-	{ }
-
 #ifndef HY_PLATFORM_GUI
 	// This return is temporarly here until cleanup is done properly
 	return;
 #endif
 
-	pGame->Shutdown();
-	delete pGame;
-
-	sm_pInstance->Shutdown();
-	delete sm_pInstance;
-	sm_pInstance = nullptr;
+	// Unload any load-pending assets
+	m_Assets.Shutdown();
+	while(m_Assets.IsShutdown() == false)
+	{
+		m_Assets.Update(m_Renderer);
+		m_Renderer.ProcessMsgs();
+	}
 
 #ifdef HY_PLATFORM_DESKTOP
 	glfwTerminate();
@@ -103,17 +83,28 @@ HyEngine::~HyEngine()
 #if defined(HY_DEBUG) && defined(_MSC_VER) && defined(HY_PLATFORM_WINDOWS)
 	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
 #endif
+
+	sm_pInstance = nullptr;
 }
 
-bool HyEngine::IsInitialized()
+void IHyEngine::RunGame()
 {
-	if(m_Assets.IsInitialized() == false)
-		return false;
+	while(m_Assets.IsInitialized() == false)
+	{ }
 
-	return true;
+	m_Diagnostics.BootMessage();
+
+	if(pGame->Initialize() == false)
+		HyError("IApplication Initialize() failed");
+
+	sm_pInstance->m_Time.ResetDelta();
+
+	HyLogTitle("Starting Update Loop");
+	while(sm_pInstance->Update())
+	{ }
 }
 
-bool HyEngine::Update()
+bool IHyEngine::Update()
 {
 	m_Time.CalcTimeDelta();
 	m_Diagnostics.ApplyTimeDelta();
@@ -124,7 +115,7 @@ bool HyEngine::Update()
 		m_Scene.UpdateNodes();
 
 		HY_PROFILE_BEGIN(HYPROFILERSECTION_Update)
-		if(PollPlatformApi() == false || m_AppRef.Update() == false)
+		if(PollPlatformApi() == false || OnUpdate() == false)
 			return false;
 		HY_PROFILE_END
 
@@ -140,23 +131,12 @@ bool HyEngine::Update()
 	return true;
 }
 
-void HyEngine::Shutdown()
-{
-	// Unload any load-pending assets
-	m_Assets.Shutdown();
-	while(m_Assets.IsShutdown() == false)
-	{
-		m_Assets.Update(m_Renderer);
-		m_Renderer.ProcessMsgs();
-	}
-}
-
-bool HyEngine::PollPlatformApi()
+bool IHyEngine::PollPlatformApi()
 {
 #ifdef HY_PLATFORM_DESKTOP
-	for(uint32 i = 0; i < m_AppRef.GetNumWindows(); ++i)
+	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
 	{
-		if(glfwWindowShouldClose(m_AppRef.Window(i).GetHandle()))
+		if(glfwWindowShouldClose(Hy_Window(i).GetHandle()))
 			return false;
 	}
 

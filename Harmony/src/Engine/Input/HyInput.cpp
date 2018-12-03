@@ -108,6 +108,25 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 
 	HyAssert(m_WindowListRef.empty() == false, "HyInput::HyInput has a window list that is empty");
 	m_pMouseWindow = m_WindowListRef[0];
+
+#ifdef HY_PLATFORM_DESKTOP
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
+	{
+		glfwSetMouseButtonCallback(m_WindowListRef[i]->GetHandle(), glfw_MouseButtonCallback);
+		glfwSetCursorPosCallback(m_WindowListRef[i]->GetHandle(), glfw_CursorPosCallback);
+		glfwSetScrollCallback(m_WindowListRef[i]->GetHandle(), glfw_ScrollCallback);
+		glfwSetKeyCallback(m_WindowListRef[i]->GetHandle(), glfw_KeyCallback);
+		glfwSetCharCallback(m_WindowListRef[i]->GetHandle(), glfw_CharCallback);
+		glfwSetCharModsCallback(m_WindowListRef[i]->GetHandle(), glfw_CharModsCallback);
+	}
+
+	for(int32 i = HYJOYSTICK_0; i < HYNUM_JOYSTICK; ++i)
+	{
+		if(glfwJoystickPresent(i))
+			glfw_JoystickCallback(i, GLFW_CONNECTED);
+	}
+	glfwSetJoystickCallback(glfw_JoystickCallback);
+#endif
 }
 
 /*virtual*/ HyInput::~HyInput()
@@ -176,28 +195,6 @@ void HyInput::Update()
 HyInputMap *HyInput::GetInputMapArray()
 {
 	return m_pInputMaps;
-}
-
-void HyInput::InitCallbacks()
-{
-#ifdef HY_PLATFORM_DESKTOP
-	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
-	{
-		glfwSetMouseButtonCallback(m_WindowListRef[i]->GetHandle(), glfw_MouseButtonCallback);
-		glfwSetCursorPosCallback(m_WindowListRef[i]->GetHandle(), glfw_CursorPosCallback);
-		glfwSetScrollCallback(m_WindowListRef[i]->GetHandle(), glfw_ScrollCallback);
-		glfwSetKeyCallback(m_WindowListRef[i]->GetHandle(), glfw_KeyCallback);
-		glfwSetCharCallback(m_WindowListRef[i]->GetHandle(), glfw_CharCallback);
-		glfwSetCharModsCallback(m_WindowListRef[i]->GetHandle(), glfw_CharModsCallback);
-	}
-
-	for(int32 i = HYJOYSTICK_0; i < HYNUM_JOYSTICK; ++i)
-	{
-		if(glfwJoystickPresent(i))
-			glfw_JoystickCallback(i, GLFW_CONNECTED);
-	}
-	glfwSetJoystickCallback(glfw_JoystickCallback);
-#endif
 }
 
 #ifdef HY_PLATFORM_DESKTOP
