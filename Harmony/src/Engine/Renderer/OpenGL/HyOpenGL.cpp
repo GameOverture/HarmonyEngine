@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
 #include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
-#include "Renderer/Components/HyWindow.h"
+#include "Window/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Scene/Nodes/Objects/HyCamera.h"

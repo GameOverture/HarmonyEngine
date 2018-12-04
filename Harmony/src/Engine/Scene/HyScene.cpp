@@ -11,7 +11,7 @@
 #include "Scene/HyScene.h"
 #include "HyEngine.h"
 #include "Renderer/IHyRenderer.h"
-#include "Renderer/Components/HyWindow.h"
+#include "Window/HyWindow.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable3d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HySprite2d.h"

@@ -14,33 +14,33 @@
 #include "Memory/HyMemoryHeap.h"
 #include "Input/HyInputMap.h"
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class IHyApplication
-{
-	friend class HyEngine;
-
-#ifdef HY_PLATFORM_GUI
-protected:
-#endif
-
-	virtual bool Initialize() = 0;
-	
-	virtual void Shutdown() = 0;
-
-public:
-	IHyApplication();
-	virtual ~IHyApplication();
-
-	std::string GameName() const;
-	std::string DataDir() const;
-	bool IsShowCursor() const;
-
-	HyWindow &Window(uint32 uiIndex = 0);
-	uint32 GetNumWindows();
-	HyInputMap &Input(uint32 uiIndex = 0);
-
-private:
-	void SetInputMapPtr(HyInputMap *pInputMaps);
-};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//class IHyApplication
+//{
+//	friend class HyEngine;
+//
+//#ifdef HY_PLATFORM_GUI
+//protected:
+//#endif
+//
+//	virtual bool Initialize() = 0;
+//	
+//	virtual void Shutdown() = 0;
+//
+//public:
+//	IHyApplication();
+//	virtual ~IHyApplication();
+//
+//	std::string GameName() const;
+//	std::string DataDir() const;
+//	bool IsShowCursor() const;
+//
+//	HyWindow &Window(uint32 uiIndex = 0);
+//	uint32 GetNumWindows();
+//	HyInputMap &Input(uint32 uiIndex = 0);
+//
+//private:
+//	void SetInputMapPtr(HyInputMap *pInputMaps);
+//};
 
 #endif /* IHyApplication_h__ */

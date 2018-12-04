@@ -17,6 +17,8 @@ class HyWindow;
 
 class HyInput
 {
+	friend class IHyEngine;
+
 	const uint32				m_uiNUM_INPUT_MAPS;
 	HyInputMap *				m_pInputMaps;
 
@@ -36,20 +38,53 @@ public:
 	HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
 	~HyInput();
 
-	uint32 GetMouseWindowIndex() const;
-	glm::vec2 GetMousePos() const;
-	glm::vec2 GetWorldMousePos() const;
-	
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Mouse
+
 	// All clicks are guaranteed to be down for at least '1' frame, even if it is released before the next update.
 	// Clicks released and then pressed down again within one frame will not be detected.
 	bool IsMouseBtnDown(HyMouseBtn eBtn) const;
+	uint32 GetMouseWindowIndex() const;
+	glm::vec2 GetMousePos() const;
+	glm::vec2 GetWorldMousePos() const;
 
-	void StartRecording();
-	void StopRecording();
-	void SerializeRecording();
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Setup Button/Axis Mapping
 
-	void StartPlayback();
-	void StopPlayback();
+	// Categorize actions (game, UI, etc.) so the same physical button can be used for multiple mappings.
+	void SetActionCategory(int32 iActionId, uint8 uiCategory, uint32 uiMappingIndex = 0);
+
+	// Returns -1, or the mapping 'eBtn' used to be assigned to
+	int32 MapBtn(int32 iActionId, HyKeyboardBtn eBtn, uint32 uiMappingIndex = 0);
+	int32 MapBtn(int32 iActionId, HyMouseBtn eBtn, uint32 uiMappingIndex = 0);
+	int32 MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn, uint32 uiMappingIndex = 0);
+	int32 MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn, uint32 uiMappingIndex = 0);
+
+	bool MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex, uint32 uiMappingIndex = 0);
+	bool MapJoystickAxis(int32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f, uint32 uiMappingIndex = 0);
+
+	bool Unmap(int32 iActionId, uint32 uiMappingIndex = 0);
+	bool IsMapped(int32 iActionId, uint32 uiMappingIndex = 0) const;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Check for Input
+
+	bool IsActionDown(int32 iUserId, uint32 uiMappingIndex = 0) const;
+	bool IsActionReleased(int32 iUserId, uint32 uiMappingIndex = 0) const;	// Only true for a single frame upon button release
+	float GetAxis(int32 iUserId, uint32 uiMappingIndex = 0) const;
+	float GetAxisDelta(int32 iUserId, uint32 uiMappingIndex = 0) const;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Replay API
+
+	void RecordingStart();
+	void RecordingStop();
+
+	void PlaybackStart();
+	void PlaybackStop();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MISC
 
 	// Some touch screens do not send a 'MOUSE DOWN' message on initial touch, until you "drag" the cursor at least 1px or release the touch
 	// Enabling this hack will artificially send a 'MOUSE DOWN' message whenever the cursor position changes as touching/clicking is typically the only way to move the cursor
@@ -57,7 +92,6 @@ public:
 
 private:
 	void Update();
-	HyInputMap *GetInputMapArray();
 
 #ifdef HY_PLATFORM_DESKTOP
 	friend void glfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);

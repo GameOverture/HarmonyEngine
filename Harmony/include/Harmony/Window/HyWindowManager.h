@@ -21,6 +21,7 @@ public:
 	~HyWindowManager();
 
 	std::vector<HyWindow *> &GetWindowList();
+	HyWindow &GetWindow(uint32 uiWindowIndex);
 };
 
 #endif /* HyWindowManager_h__ */

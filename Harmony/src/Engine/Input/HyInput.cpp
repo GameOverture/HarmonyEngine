@@ -12,7 +12,7 @@
 #include "HyEngine.h"
 #include "Input/HyInput.h"
 #include "Input/HyInputMap.h"
-#include "Renderer/Components/HyWindow.h"
+#include "Window/HyWindow.h"
 
 #ifdef HY_PLATFORM_DESKTOP
 	void glfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods)
@@ -138,6 +138,11 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	delete[] pMemBuffer;
 }
 
+bool HyInput::IsMouseBtnDown(HyMouseBtn eBtn) const
+{
+	return 0 != ((m_uiMouseBtnFlags | m_uiMouseBtnFlags_Buffered) & (1 << eBtn));
+}
+
 uint32 HyInput::GetMouseWindowIndex() const
 {
 	return m_pMouseWindow->GetIndex();
@@ -153,28 +158,97 @@ glm::vec2 HyInput::GetWorldMousePos() const
 	return m_pMouseWindow->ConvertViewportCoordinateToWorldPos(m_ptMousePos);
 }
 
-bool HyInput::IsMouseBtnDown(HyMouseBtn eBtn) const
+void HyInput::SetActionCategory(int32 iActionId, uint8 uiCategory, uint32 uiMappingIndex /*= 0*/)
 {
-	return 0 != ((m_uiMouseBtnFlags | m_uiMouseBtnFlags_Buffered) & (1 << eBtn));
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	m_pInputMaps[uiMappingIndex].SetActionCategory(iActionId, uiCategory);
 }
 
-void HyInput::StartRecording()
+int32 HyInput::MapBtn(int32 iActionId, HyKeyboardBtn eBtn, uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].MapBtn(iActionId, eBtn);
+}
+
+int32 HyInput::MapBtn(int32 iActionId, HyMouseBtn eBtn, uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].MapBtn(iActionId, eBtn);
+}
+
+int32 HyInput::MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn, uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].MapAlternativeBtn(iActionId, eBtn);
+}
+
+int32 HyInput::MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn, uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].MapAlternativeBtn(iActionId, eBtn);
+}
+
+bool HyInput::MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex, uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].MapJoystickBtn(iActionId, eBtn, uiJoystickIndex);
+}
+
+bool HyInput::MapJoystickAxis(int32 iUserId, HyGamePadBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/, uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].MapJoystickAxis(iUserId, eAxis, fMin, fMax);
+}
+
+bool HyInput::Unmap(int32 iActionId, uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].Unmap(iActionId);
+}
+
+bool HyInput::IsMapped(int32 iActionId, uint32 uiMappingIndex /*= 0*/) const
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].IsMapped(iActionId);
+}
+
+bool HyInput::IsActionDown(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].IsActionDown(iUserId);
+}
+
+bool HyInput::IsActionReleased(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].IsActionReleased(iUserId);
+}
+
+float HyInput::GetAxis(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].GetAxis(iUserId);
+}
+
+float HyInput::GetAxisDelta(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified");
+	return m_pInputMaps[uiMappingIndex].GetAxisDelta(iUserId);
+}
+
+void HyInput::RecordingStart()
 {
 }
 
-void HyInput::StopRecording()
+void HyInput::RecordingStop()
 {
 }
 
-void HyInput::SerializeRecording()
+void HyInput::PlaybackStart()
 {
 }
 
-void HyInput::StartPlayback()
-{
-}
-
-void HyInput::StopPlayback()
+void HyInput::PlaybackStop()
 {
 }
 
@@ -190,11 +264,6 @@ void HyInput::Update()
 	
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 		m_pInputMaps[i].Update();
-}
-
-HyInputMap *HyInput::GetInputMapArray()
-{
-	return m_pInputMaps;
 }
 
 #ifdef HY_PLATFORM_DESKTOP

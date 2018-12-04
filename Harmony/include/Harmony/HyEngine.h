@@ -42,7 +42,7 @@ class IHyEngine
 {
 	static IHyEngine *			sm_pInstance;
 
-	// The order of these member declarations matter
+	// The order of these member declarations matter as some are used to initialize the others
 	const HarmonyInit			m_Init;
 
 	HyWindowManager				m_WindowManager;
@@ -61,24 +61,22 @@ public:
 	IHyEngine(HarmonyInit &initStruct);
 	~IHyEngine();
 
+	HyRendererInterop &GetRenderer();
+
 	void RunGame();
 
 protected:
 	virtual bool OnUpdate() = 0;
 
-#ifndef HY_PLATFORM_GUI
 private:
-#endif
 	bool Update();
-
 	bool PollPlatformApi();
 
-	HyRendererInterop &GetRenderer();
-
-	friend IHyApplication &		Hy_App();
+	friend const HarmonyInit &	Hy_Init();
 	friend float				Hy_UpdateStep();
 	friend double				Hy_UpdateStepDbl();
 	friend void					Hy_PauseGame(bool bPause);
+	friend HyWindow &			Hy_Window(uint32 uiWindowIndex = 0);
 	friend HyInput &			Hy_Input();
 	friend b2World &			Hy_Physics2d();
 	friend HyDiagnostics &		Hy_Diagnostics();

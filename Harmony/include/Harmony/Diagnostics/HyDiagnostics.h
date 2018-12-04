@@ -34,7 +34,7 @@ class HyScene;
 
 class HyDiagnostics
 {
-	friend class HyEngine;
+	friend class IHyEngine;
 	friend class IHyRenderer;
 
 	const HarmonyInit &			m_InitStructRef;
