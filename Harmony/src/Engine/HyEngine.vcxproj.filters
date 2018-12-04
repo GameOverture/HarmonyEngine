@@ -20,7 +20,6 @@
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="IHyApplication.cpp" />
     <ClCompile Include="Time\Watches\IHyTimeInst.cpp">
       <Filter>Time\Watches</Filter>
     </ClCompile>
@@ -440,7 +439,6 @@
     <ClInclude Include="..\..\include\Harmony\Renderer\OpenGL\HyOpenGL.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\IHyApplication.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>

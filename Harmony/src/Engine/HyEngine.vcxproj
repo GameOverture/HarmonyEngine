@@ -94,7 +94,6 @@
     <ClCompile Include="Diagnostics\Output\HyDiagOutput.cpp" />
     <ClCompile Include="Diagnostics\Output\HyProfiler.cpp" />
     <ClCompile Include="HyEngine.cpp" />
-    <ClCompile Include="IHyApplication.cpp" />
     <ClCompile Include="Input\HyInput.cpp" />
     <ClCompile Include="Input\HyInputMap.cpp" />
     <ClCompile Include="Memory\HyMemoryHeap.cpp" />
@@ -196,7 +195,6 @@
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Output\HyDiagOutput.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Output\HyProfiler.h" />
     <ClInclude Include="..\..\include\Harmony\HyEngine.h" />
-    <ClInclude Include="..\..\include\Harmony\IHyApplication.h" />
     <ClInclude Include="..\..\include\Harmony\Input\HyInput.h" />
     <ClInclude Include="..\..\include\Harmony\Input\HyInputKeys.h" />
     <ClInclude Include="..\..\include\Harmony\Input\HyInputMap.h" />

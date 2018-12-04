@@ -11,7 +11,6 @@
 #define HyEngine_h__
 
 #include "Afx/HyInteropAfx.h"
-#include "IHyApplication.h"
 #include "Window/HyWindowManager.h"
 #include "Audio/IHyAudio.h"
 #include "Diagnostics/HyDiagnostics.h"

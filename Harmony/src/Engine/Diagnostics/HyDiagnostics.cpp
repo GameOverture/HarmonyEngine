@@ -9,7 +9,6 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Diagnostics/HyDiagnostics.h"
-#include "IHyApplication.h"
 #include "Time/HyTime.h"
 #include "Assets/HyAssets.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
