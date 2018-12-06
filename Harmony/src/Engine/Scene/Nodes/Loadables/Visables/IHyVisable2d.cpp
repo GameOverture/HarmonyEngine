@@ -114,6 +114,15 @@ int32 IHyVisable2d::GetDisplayOrder() const
 	HyScene::SetInstOrderingDirty();
 }
 
+/*virtual*/ void IHyVisable2d::ResetDisplayOrder()
+{
+	m_uiExplicitAndTypeFlags &= ~EXPLICIT_DisplayOrder;
+	if(m_pParent)
+		m_pParent->SetChildrenDisplayOrder(false);
+
+	HyScene::SetInstOrderingDirty();
+}
+
 /*virtual*/ void IHyVisable2d::Update() /*override*/
 {
 	IHyLoadable2d::Update();

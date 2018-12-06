@@ -69,6 +69,7 @@ public:
 	
 	virtual void SetDisplayOrder(int32 iOrderValue) override;
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
+	virtual void ResetDisplayOrder() override;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void ChildAppend(IHyNode2d &childRef);
@@ -85,6 +86,7 @@ public:
 
 	bool IsReverseDisplayOrder() const;
 	void ReverseDisplayOrder(bool bReverse);
+	int32 SetChildrenDisplayOrder(bool bOverrideExplicitChildren);
 
 	virtual const b2AABB &GetWorldAABB() override;
 
