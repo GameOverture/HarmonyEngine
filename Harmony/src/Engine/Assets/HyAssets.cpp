@@ -314,13 +314,11 @@ void HyAssets::Shutdown()
 bool HyAssets::IsShutdown()
 {
 	bool bIsFullyUnloaded = false;
-	m_Mutex_SharedQueue.lock();
-	m_Mutex_RetrievalQueue.lock();
+	m_Mutex.lock();
 	{
 		bIsFullyUnloaded = m_pLoadedAtlasIndices->IsEmpty() && m_Load_Prepare.empty() && m_Load_Shared.empty() && m_Load_Retrieval.empty();
 	}
-	m_Mutex_SharedQueue.unlock();
-	m_Mutex_RetrievalQueue.unlock();
+	m_Mutex.unlock();
 
 	if(bIsFullyUnloaded)
 	{
@@ -339,7 +337,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	if(m_Load_Prepare.empty() == false)
 	{
 		// Copy load queue data into shared data
-		if(m_Mutex_SharedQueue.try_lock())
+		if(m_Mutex.try_lock())
 		{
 			while(m_Load_Prepare.empty() == false)
 			{
@@ -347,7 +345,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 				m_Load_Prepare.pop();
 			}
 		
-			m_Mutex_SharedQueue.unlock();
+			m_Mutex.unlock();
 
 			ThreadContinue(true);
 		}
@@ -355,7 +353,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check to see if any loaded data (from the load thread) is ready to uploaded to graphics card
-	if(m_Mutex_RetrievalQueue.try_lock())
+	if(m_Mutex.try_lock())
 	{
 		while(m_Load_Retrieval.empty() == false)
 		{
@@ -365,7 +363,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 			rendererRef.TxData(pData);
 		}
 	
-		m_Mutex_RetrievalQueue.unlock();
+		m_Mutex.unlock();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -496,7 +494,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
-	m_Mutex_SharedQueue.lock();
+	m_Mutex.lock();
 	{
 		while(m_Load_Shared.empty() == false)
 		{
@@ -504,7 +502,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 			m_Load_Shared.pop();
 		}
 	}
-	m_Mutex_SharedQueue.unlock();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Load everything that is enqueued (outside of any critical section)
@@ -514,10 +511,9 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Copy all the (loaded) IData ptrs to the retrieval vector
-		m_Mutex_RetrievalQueue.lock();
 		m_Load_Retrieval.push(dataList[i]);
-		m_Mutex_RetrievalQueue.unlock();
 	}
+	m_Mutex.unlock();
 }
 
 /*virtual*/ void HyAssets::OnThreadShutdown() /*override*/

@@ -12,35 +12,13 @@
 
 #include <stdio.h>
 
-IHyEngine *IHyEngine::sm_pInstance = nullptr;
-
 #ifdef HY_PLATFORM_GUI
 	#define HyThrottleUpdate
-
-	/*static*/ HyEngine *HyEngine::GuiCreate(IHyApplication &projectRef)
-	{
-		if(sm_pInstance != nullptr)
-			return nullptr;
-
-		sm_pInstance = HY_NEW HyEngine(projectRef);
-		return sm_pInstance;
-	}
-
-	/*static*/ void HyEngine::GuiDelete()
-	{
-		if(sm_pInstance)
-		{
-			sm_pInstance->m_AppRef.Shutdown();
-			sm_pInstance->Shutdown();
-		}
-
-		delete sm_pInstance;
-		sm_pInstance = nullptr;
-	}
-
 #else
 	#define HyThrottleUpdate while(m_Time.ThrottleUpdate())
 #endif
+
+IHyEngine *IHyEngine::sm_pInstance = nullptr;
 
 IHyEngine::IHyEngine(HarmonyInit &initStruct) :
 	m_Init(initStruct),
@@ -66,11 +44,6 @@ IHyEngine::IHyEngine(HarmonyInit &initStruct) :
 
 IHyEngine::~IHyEngine()
 {
-#ifndef HY_PLATFORM_GUI
-	// This return is temporarly here until cleanup is done properly
-	return;
-#endif
-
 	// Unload any load-pending assets
 	m_Assets.Shutdown();
 	while(m_Assets.IsShutdown() == false)
@@ -99,14 +72,10 @@ HyRendererInterop &IHyEngine::GetRenderer()
 void IHyEngine::RunGame()
 {
 	m_Diagnostics.BootMessage();
-
-	//if(pGame->Initialize() == false)
-	//	HyError("IApplication Initialize() failed");
-
-	sm_pInstance->m_Time.ResetDelta();
+	m_Time.ResetDelta();
 
 	HyLogTitle("Starting Update Loop");
-	while(sm_pInstance->Update())
+	while(Update())
 	{ }
 }
 

@@ -34,6 +34,8 @@ HyWindowManager::HyWindowManager(uint32 uiNumWindows, bool bShowCursor, const Hy
 
 HyWindowManager::~HyWindowManager()
 {
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowList.size()); ++i)
+		delete m_WindowList[i];
 }
 
 std::vector<HyWindow *> &HyWindowManager::GetWindowList()
