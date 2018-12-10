@@ -185,21 +185,5 @@ void IHyVisable2d::CalculateColor()
 	if(parentRef.IsScissorSet())
 		static_cast<IHyVisable2d &>(childRef)._SetScissor(parentRef.m_pScissor, false);
 
-	int32 iOrderValue = parentRef.GetDisplayOrder() + 1;
-	if(parentRef.IsReverseDisplayOrder() == false)
-	{
-		for(uint32 i = 0; i < parentRef.ChildCount(); ++i)
-		{
-			if(0 != (parentRef.ChildGet(i)->GetExplicitAndTypeFlags() & IHyVisable2d::NODETYPE_IsVisable))
-				iOrderValue = static_cast<IHyVisable2d *>(parentRef.ChildGet(i))->_SetDisplayOrder(iOrderValue, false);
-		}
-	}
-	else
-	{
-		for(int32 i = static_cast<int32>(parentRef.ChildCount()) - 1; i >= 0; --i)
-		{
-			if(0 != (parentRef.ChildGet(i)->GetExplicitAndTypeFlags() & IHyVisable2d::NODETYPE_IsVisable))
-				iOrderValue = static_cast<IHyVisable2d *>(parentRef.ChildGet(i))->_SetDisplayOrder(iOrderValue, false);
-		}
-	}
+	parentRef.SetChildrenDisplayOrder(false);
 }
