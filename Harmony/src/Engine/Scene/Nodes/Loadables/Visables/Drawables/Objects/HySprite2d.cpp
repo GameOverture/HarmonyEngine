@@ -14,12 +14,14 @@
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
-HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyDrawable2d(HYTYPE_Sprite, szPrefix, szName, pParent),
-																						m_bIsAnimPaused(false),
-																						m_fAnimPlayRate(1.0f),
-																						m_fElapsedFrameTime(0.0f),
-																						m_uiCurAnimState(0),
-																						m_uiCurFrame(0)
+HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :
+	IHyDrawable2d(HYTYPE_Sprite, szPrefix, szName, pParent),
+	m_bIsAnimPaused(false),
+	m_fAnimPlayRate(1.0f),
+	m_fElapsedFrameTime(0.0f),
+	m_uiCurAnimState(0),
+	m_uiCurFrame(0),
+	m_vCustomOffset(0, 0)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
@@ -266,10 +268,16 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * (bIncludeScaling ? scale.Y() : 1.0f);
 }
 
-const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
+void HySprite2d::SetUserOffset(int32 iOffsetX, int32 iOffsetY)
+{
+	m_vCustomOffset.x = iOffsetX;
+	m_vCustomOffset.x = iOffsetY;
+}
+
+glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 {
 	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-	return frameRef.vOFFSET;
+	return frameRef.vOFFSET + m_vCustomOffset;
 }
 
 /*virtual*/ bool HySprite2d::IsLoadDataValid() /*override*/
@@ -288,7 +296,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 
 /*virtual*/ void HySprite2d::OnCalcBoundingVolume() /*override*/
 {
-	glm::ivec2 vFrameOffset = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame).vOFFSET;
+	glm::ivec2 vFrameOffset = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame).vOFFSET + m_vCustomOffset;
 	float fHalfWidth = AnimGetCurFrameWidth(true) * 0.5f;
 	float fHalfHeight = AnimGetCurFrameHeight(true) * 0.5f;
 
@@ -449,7 +457,7 @@ const glm::ivec2 &HySprite2d::AnimGetCurFrameOffset()
 	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
 	//pWritePositionRef += sizeof(glm::vec2);
 
-	glm::vec2 vOffset(frameRef.vOFFSET.x, frameRef.vOFFSET.y);
+	glm::vec2 vOffset(frameRef.vOFFSET.x + m_vCustomOffset.x, frameRef.vOFFSET.y + m_vCustomOffset.y);
 	vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
 	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vOffset;
 	//pWritePositionRef += sizeof(glm::vec2);
