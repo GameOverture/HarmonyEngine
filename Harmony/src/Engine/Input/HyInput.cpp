@@ -120,11 +120,11 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 		glfwSetCharModsCallback(m_WindowListRef[i]->GetHandle(), glfw_CharModsCallback);
 	}
 
-	for(int32 i = HYJOYSTICK_0; i < HYNUM_JOYSTICK; ++i)
-	{
-		if(glfwJoystickPresent(i))
-			glfw_JoystickCallback(i, GLFW_CONNECTED);
-	}
+	//for(int32 i = HYJOYSTICK_0; i < HYNUM_JOYSTICK; ++i)
+	//{
+	//	if(glfwJoystickPresent(i))
+	//		glfw_JoystickCallback(i, GLFW_CONNECTED);
+	//}
 	glfwSetJoystickCallback(glfw_JoystickCallback);
 #endif
 }

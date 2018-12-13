@@ -271,7 +271,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 void HySprite2d::SetUserOffset(int32 iOffsetX, int32 iOffsetY)
 {
 	m_vCustomOffset.x = iOffsetX;
-	m_vCustomOffset.x = iOffsetY;
+	m_vCustomOffset.y = iOffsetY;
 }
 
 glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
