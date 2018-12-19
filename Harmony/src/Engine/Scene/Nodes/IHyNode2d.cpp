@@ -73,8 +73,9 @@ const IHyNode2d &IHyNode2d::operator=(const IHyNode2d &rhs)
 {
 	IHyNode::operator=(rhs);
 
-	if(rhs.m_pParent)
-		rhs.m_pParent->ChildAppend(*this);
+	// Copying the parent is not done by design
+	//if(rhs.m_pParent)
+	//	rhs.m_pParent->ChildAppend(*this);
 
 	m_mtxCached = rhs.m_mtxCached;
 	m_fRotation = rhs.m_fRotation;
