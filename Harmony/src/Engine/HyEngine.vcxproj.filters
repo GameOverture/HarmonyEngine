@@ -248,9 +248,6 @@
     <ClCompile Include="UI\HyInfoPanel.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="UI\IHyButton.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="UI\IHy9Slice.cpp">
       <Filter>UI</Filter>
     </ClCompile>
@@ -259,6 +256,9 @@
     </ClCompile>
     <ClCompile Include="Window\HyWindowManager.cpp">
       <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\HyButton.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -682,9 +682,6 @@
     <ClInclude Include="..\..\include\Harmony\UI\HyInfoPanel.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\UI\IHyButton.h">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\UI\IHy9Slice.h">
       <Filter>UI</Filter>
     </ClInclude>
@@ -693,6 +690,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Window\HyWindowManager.h">
       <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\UI\HyButton.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -32,7 +32,7 @@
 #include "Threading/IHyThreadClass.h"
 #include "UI/IHy9Slice.h"
 #include "UI/HyInfoPanel.h"
-#include "UI/IHyButton.h"
+#include "UI/HyButton.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyImage.h"
 #include "Utilities/HyStrManip.h"
