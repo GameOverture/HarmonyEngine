@@ -20,7 +20,6 @@
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp">
       <Filter>Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="IHyApplication.cpp" />
     <ClCompile Include="Time\Watches\IHyTimeInst.cpp">
       <Filter>Time\Watches</Filter>
     </ClCompile>
@@ -56,9 +55,6 @@
     </ClCompile>
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp">
       <Filter>Scene\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer\Components\HyWindow.cpp">
-      <Filter>Renderer\Components</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Physics\HyBox2dRuntime.cpp">
       <Filter>Scene\Physics</Filter>
@@ -252,10 +248,16 @@
     <ClCompile Include="UI\HyInfoPanel.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="UI\IHyButton.cpp">
+    <ClCompile Include="UI\IHy9Slice.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="UI\IHy9Slice.cpp">
+    <ClCompile Include="Window\HyWindow.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Window\HyWindowManager.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\HyButton.cpp">
       <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -371,6 +373,9 @@
     <Filter Include="UI">
       <UniqueIdentifier>{572d30f1-eded-49e8-ab47-e3367ed5cbde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Window">
+      <UniqueIdentifier>{241591ab-7a1d-4b3e-8070-a9eefe80d8dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Harmony\HyEngine.h" />
@@ -434,7 +439,6 @@
     <ClInclude Include="..\..\include\Harmony\Renderer\OpenGL\HyOpenGL.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\IHyApplication.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h">
       <Filter>Renderer\OpenGL</Filter>
     </ClInclude>
@@ -473,9 +477,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysEntity2d.h">
       <Filter>Scene\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyWindow.h">
-      <Filter>Renderer\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyBox2dRuntime.h">
       <Filter>Scene\Physics</Filter>
@@ -681,10 +682,16 @@
     <ClInclude Include="..\..\include\Harmony\UI\HyInfoPanel.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\UI\IHyButton.h">
+    <ClInclude Include="..\..\include\Harmony\UI\IHy9Slice.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\UI\IHy9Slice.h">
+    <ClInclude Include="..\..\include\Harmony\Window\HyWindow.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Window\HyWindowManager.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\UI\HyButton.h">
       <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>

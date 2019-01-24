@@ -113,12 +113,12 @@ void HyTweenFloat::StopTween()
 	m_fpTweenFinishedFunc = HyTween::NullTweenCallback;
 }
 
-float HyTweenFloat::GetTweenDestination()
+float HyTweenFloat::GetTweenDestination() const
 {
 	return m_fTarget;
 }
 
-float HyTweenFloat::GetTweenRemainingDuration()
+float HyTweenFloat::GetTweenRemainingDuration() const
 {
 	return m_fDuration - m_fElapsedTime;
 }

@@ -151,12 +151,12 @@ void HyTweenVec2::StopTween()
 	m_AnimFloatList[1].StopTween();
 }
 
-glm::vec2 HyTweenVec2::GetTweenDestination()
+glm::vec2 HyTweenVec2::GetTweenDestination() const
 {
 	return glm::vec2(m_AnimFloatList[0].GetTweenDestination(), m_AnimFloatList[1].GetTweenDestination());
 }
 
-float HyTweenVec2::GetTweenRemainingDuration()
+float HyTweenVec2::GetTweenRemainingDuration() const
 {
 	return m_AnimFloatList[0].GetTweenRemainingDuration();
 }

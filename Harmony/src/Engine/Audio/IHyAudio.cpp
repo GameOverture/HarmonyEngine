@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Audio/IHyAudio.h"
-#include "Renderer/Components/HyWindow.h"
+#include "Window/HyWindow.h"
 
 IHyAudio::IHyAudio(std::vector<HyWindow *> &windowListRef) :	m_WindowListRef(windowListRef)
 {

@@ -49,6 +49,7 @@ public:
 
 	int32 GetDisplayOrder() const;
 	virtual void SetDisplayOrder(int32 iOrderValue);
+	virtual void ResetDisplayOrder();
 
 protected:
 	virtual void Update() override;

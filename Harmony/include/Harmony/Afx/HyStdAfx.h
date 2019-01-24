@@ -245,4 +245,25 @@ struct HyWindowInfo
 	}
 };
 
+// Client supplies these initialization parameters to the engine
+struct HarmonyInit
+{
+	std::string				sProjectDir;
+
+	std::string				sGameName;
+	std::string				sDataDir;
+	uint32					uiNumWindows;
+	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
+	uint32					uiUpdateTickMs;
+	float					fPixelsPerMeter;
+	uint32					uiNumInputMappings;
+	uint16					uiDebugPort;
+	bool					bUseConsole;
+	bool					bShowCursor;
+	HyWindowInfo			consoleInfo;
+
+	HarmonyInit();
+	HarmonyInit(std::string sHyProjFileName);
+};
+
 #endif // HyStdAfx_h__

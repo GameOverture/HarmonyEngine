@@ -54,8 +54,9 @@ public:
 	//void Follow(float &fToFollow, float fOffsetAmt, HyTweenFinishedCallback tweenFinishedCallback = HyTween::NullTweenCallback);
 
 	void StopTween();
-	float GetTweenDestination();
-	float GetTweenRemainingDuration();
+
+	float GetTweenDestination() const;
+	float GetTweenRemainingDuration() const;
 
 	HyTweenFloat &operator=(const float &rhs);
 	HyTweenFloat &operator+=(const float &rhs);

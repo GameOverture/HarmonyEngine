@@ -11,7 +11,7 @@
 #include "Afx/HyInteropAfx.h"
 #include "Input/HyInputMap.h"
 #include "Input/HyInput.h"
-#include "Renderer/Components/HyWindow.h"
+#include "Window/HyWindow.h"
 
 HyInputMap::HyInputMap()
 {
@@ -189,11 +189,15 @@ bool HyInputMap::IsActionReleased(int32 iActionId) const
 
 float HyInputMap::GetAxis(int32 iUserId) const
 {
+	// TODO:
+	HyError("HyInputMap::GetAxis not implemented");
 	return 0.0f;
 }
 
 float HyInputMap::GetAxisDelta(int32 iUserId) const
 {
+	// TODO:
+	HyError("HyInputMap::GetAxisDelta not implemented");
 	return 0.0f;
 }
 

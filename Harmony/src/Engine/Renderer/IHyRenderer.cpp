@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "Renderer/IHyRenderer.h"
-#include "Renderer/Components/HyWindow.h"
+#include "Window/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 #include "Assets/Loadables/IHyLoadableData.h"

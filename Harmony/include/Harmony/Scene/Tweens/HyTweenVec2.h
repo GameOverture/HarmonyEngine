@@ -52,8 +52,8 @@ public:
 	bool IsTweening();
 	void StopTween();
 
-	glm::vec2 GetTweenDestination();
-	float GetTweenRemainingDuration();
+	glm::vec2 GetTweenDestination() const;
+	float GetTweenRemainingDuration() const;
 
 	HyTweenVec2 &operator+=(float rhs);
 	HyTweenVec2 &operator-=(float rhs);

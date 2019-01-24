@@ -9,28 +9,28 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Diagnostics/HyDiagnostics.h"
-#include "IHyApplication.h"
 #include "Time/HyTime.h"
 #include "Assets/HyAssets.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyText2d.h"
 #include "HyEngine.h"
 
-HyDiagnostics::HyDiagnostics(HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :	m_InitStructRef(initStruct),
-																													m_TimeRef(timeRef),
-																													m_AssetsRef(assetsRef),
-																													m_SceneRef(sceneRef),
-																													m_sPlatform("Unknown"),
-																													m_uiNumCpuCores(0),
-																													m_uiTotalMemBytes(0),
-																													m_sGfxApi("Unknown"),
-																													m_sVersion("Unknown"),
-																													m_sVendor("Unknown"),
-																													m_sRenderer("Unknown"),
-																													m_sShader("Unknown"),
-																													m_iMaxTextureSize(0),
-																													m_sCompressedTextures("Unknown"),
-																													m_bInitialMemCheckpointSet(false)
+HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :
+	m_InitStructRef(initStruct),
+	m_TimeRef(timeRef),
+	m_AssetsRef(assetsRef),
+	m_SceneRef(sceneRef),
+	m_sPlatform("Unknown"),
+	m_uiNumCpuCores(0),
+	m_uiTotalMemBytes(0),
+	m_sGfxApi("Unknown"),
+	m_sVersion("Unknown"),
+	m_sVendor("Unknown"),
+	m_sRenderer("Unknown"),
+	m_sShader("Unknown"),
+	m_iMaxTextureSize(0),
+	m_sCompressedTextures("Unknown"),
+	m_bInitialMemCheckpointSet(false)
 {
 #if defined(HY_PLATFORM_WINDOWS)
 	m_sPlatform = "Windows";

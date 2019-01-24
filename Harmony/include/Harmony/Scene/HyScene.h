@@ -81,4 +81,3 @@ public:
 };
 
 #endif /* HyScene_h__ */
-

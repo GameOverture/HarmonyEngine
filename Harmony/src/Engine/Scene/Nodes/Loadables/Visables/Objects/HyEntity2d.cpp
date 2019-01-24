@@ -14,17 +14,19 @@
 #include "Assets/Nodes/HyEntityData.h"
 #include "HyEngine.h"
 
-HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :	IHyVisable2d(HYTYPE_Entity, szPrefix, szName, pParent),
-																										m_uiAttributes(0),
-																										m_eMouseInputState(MOUSEINPUT_None),
-																										m_pMouseInputUserParam(nullptr)
+HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :
+	IHyVisable2d(HYTYPE_Entity, szPrefix, szName, pParent),
+	m_uiAttributes(0),
+	m_eMouseInputState(MOUSEINPUT_None),
+	m_pMouseInputUserParam(nullptr)
 {
 }
 
-HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :	IHyVisable2d(HYTYPE_Entity, nullptr, nullptr, pParent),
-															m_uiAttributes(0),
-															m_eMouseInputState(MOUSEINPUT_None),
-															m_pMouseInputUserParam(nullptr)
+HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
+	IHyVisable2d(HYTYPE_Entity, nullptr, nullptr, pParent),
+	m_uiAttributes(0),
+	m_eMouseInputState(MOUSEINPUT_None),
+	m_pMouseInputUserParam(nullptr)
 {
 }
 
@@ -177,22 +179,16 @@ void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex, bool bOverrideExplicit
 void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren)
 {
 	IHyVisable2d::SetDisplayOrder(iOrderValue);
+	SetChildrenDisplayOrder(bOverrideExplicitChildren);
+}
 
-	if((m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder) == 0)
+/*virtual*/ void HyEntity2d::ResetDisplayOrder() /*override*/
+{
+	IHyVisable2d::ResetDisplayOrder();
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		{
-			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-				iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
-		}
-	}
-	else
-	{
-		for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
-		{
-			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-				iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
-		}
+		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+			static_cast<IHyVisable2d *>(m_ChildList[i])->ResetDisplayOrder();
 	}
 }
 
@@ -313,6 +309,30 @@ void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 		m_uiAttributes &= ~ATTRIBFLAG_ReverseDisplayOrder;
 
 	SetDisplayOrder(m_iDisplayOrder, false);
+}
+
+int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
+{
+	int32 iOrderValue = m_iDisplayOrder + 1;
+
+	if((m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder) == 0)
+	{
+		for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		{
+			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+				iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+		}
+	}
+	else
+	{
+		for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
+		{
+			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
+				iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+		}
+	}
+
+	return iOrderValue;
 }
 
 /*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
@@ -537,24 +557,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	IHyVisable2d::_SetDisplayOrder(iOrderValue, bIsOverriding);
 
 	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_DisplayOrder))
-	{
-		if((m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder) == 0)
-		{
-			for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			{
-				if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-					iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bIsOverriding);
-			}
-		}
-		else
-		{
-			for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
-			{
-				if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsVisable))
-					iOrderValue = static_cast<IHyVisable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bIsOverriding);
-			}
-		}
-	}
+		iOrderValue = SetChildrenDisplayOrder(bIsOverriding);
 
 	return iOrderValue;
 }

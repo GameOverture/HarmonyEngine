@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Renderer/Components/HyWindow.h"
+#include "Window/HyWindow.h"
 
 #ifdef HY_PLATFORM_DESKTOP
 	void glfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
@@ -33,7 +33,9 @@
 	}
 #endif
 
-HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) :	m_uiINDEX(uiIndex)
+HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) :
+	m_uiINDEX(uiIndex),
+	m_hData(nullptr)
 {
 	m_Info = windowInfoRef;
 	m_vFramebufferSize = m_Info.vSize;
@@ -100,10 +102,9 @@ HyWindow::~HyWindow(void)
 	while(m_Cams3dList.empty() == false)
 		RemoveCamera(m_Cams3dList.back());
 
-#ifdef HY_PLATFORM_DESKTOP
-	glfwDestroyWindow(m_hData);
-	m_hData = nullptr;
-#endif
+//#ifdef HY_PLATFORM_DESKTOP
+//	glfwDestroyWindow(m_hData);
+//#endif
 }
 
 uint32 HyWindow::GetIndex() const

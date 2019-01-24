@@ -26,7 +26,7 @@ HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent
 	m_vBoxDimensions(0.0f, 0.0f),
 	m_fScaleBoxModifier(1.0f),
 #ifdef HY_DEBUG
-	m_DebugBox(pParent),
+	m_DebugBox(nullptr),
 #endif
 	m_eAlignment(HYALIGN_Left),
 	m_bMonospacedDigits(false),
@@ -450,10 +450,20 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 /*virtual*/ void HyText2d::OnLoadedUpdate() /*override*/
 {
 #ifdef HY_DEBUG
-	m_DebugBox.pos.Set(pos);
-	m_DebugBox.rot.Set(rot);
-	m_DebugBox.scale.Set(scale);
+	glm::vec3 ptWorldPos = GetWorldTransform()[3];
+	m_DebugBox.pos.Set(ptWorldPos.x, ptWorldPos.y);
+	float fRot = rot.Get();
+	glm::vec2 vScale = scale.Get();
+	if(m_pParent)
+	{
+		fRot += m_pParent->rot.Get();
+		vScale *= m_pParent->scale.Get();
+	}
+	m_DebugBox.rot.Set(fRot);
+	m_DebugBox.scale.Set(vScale);
 	m_DebugBox.UseWindowCoordinates(GetCoordinateSystem());
+	m_DebugBox.SetDisplayOrder(GetDisplayOrder());
+	m_DebugBox.SetEnabled(IsEnabled());
 #endif
 	CalculateGlyphInfos();
 }

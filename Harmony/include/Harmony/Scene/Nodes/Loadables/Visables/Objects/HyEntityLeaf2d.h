@@ -22,10 +22,10 @@ protected:
 	LEAF			m_Leaf;
 
 public:
-	HyEntityLeaf2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) : HyEntity2d(pParent),
-																					m_Leaf(szPrefix, szName, nullptr)
+	HyEntityLeaf2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :
+		HyEntity2d(pParent),
+		m_Leaf(szPrefix, szName, this)
 	{
-		ChildAppend(m_Leaf);
 	}
 
 	virtual ~HyEntityLeaf2d()

@@ -15,8 +15,6 @@
 
 class HyInputMap
 {
-	friend class HyInput;
-
 	struct ActionInfo
 	{
 		const int32	iID;
@@ -50,10 +48,10 @@ public:
 	HyInputMap();
 	~HyInputMap(void);
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup input
-	/////////////////////////
 
-	// Categorize actions (game, UI, etc.) so the same button can be used for multiple mappings.
+	// Categorize actions (game, UI, etc.) so the same physical button can be used for multiple mappings.
 	void SetActionCategory(int32 iActionId, uint8 uiCategory);
 
 	// Returns -1, or the mapping 'eBtn' used to be assigned to
@@ -71,17 +69,15 @@ public:
 	bool Unmap(int32 iActionId);
 	bool IsMapped(int32 iActionId) const;
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check input
-	/////////////////////////
 
 	bool IsActionDown(int32 iUserId) const;
 	bool IsActionReleased(int32 iUserId) const;	// Only true for a single frame upon button release
 	float GetAxis(int32 iUserId) const;
 	float GetAxisDelta(int32 iUserId) const;
 
-private:
 	void Update();
-
 	void ApplyInput(int32 iKey, HyBtnPressState ePressState);
 };
 

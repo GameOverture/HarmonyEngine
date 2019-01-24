@@ -46,6 +46,8 @@ protected:
 	// Optional callback invoked upon anim completion/loop
 	std::vector<std::pair<HySprite2dAnimFinishedCallback, void *> >	m_AnimCallbackList;
 
+	glm::ivec2				m_vCustomOffset;					// If set, every frame offsets by this amount (plus any offset it is created with in the Editor)
+
 public:
 	HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	HySprite2d(const HySprite2d &copyRef);
@@ -117,7 +119,8 @@ public:
 	float AnimGetCurFrameWidth(bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED width of the current frame
 	float AnimGetCurFrameHeight(bool bIncludScaling = true);	// Returns the ALPHA-CROPPED height of the current frame
 
-	const glm::ivec2 &AnimGetCurFrameOffset();
+	void SetUserOffset(int32 iOffsetX, int32 iOffsetY);
+	glm::ivec2 AnimGetCurFrameOffset();
 
 	virtual bool IsLoadDataValid() override;
 

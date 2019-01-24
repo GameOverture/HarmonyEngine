@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Objects/HyCamera.h"
-#include "Renderer/Components/HyWindow.h"
+#include "Window/HyWindow.h"
 
 IHyCamera::IHyCamera(HyWindow *pWindow) :	m_pWindowPtr(pWindow),
 											m_uiCullMaskBit(0)

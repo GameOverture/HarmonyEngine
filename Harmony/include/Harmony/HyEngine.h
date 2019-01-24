@@ -11,13 +11,12 @@
 #define HyEngine_h__
 
 #include "Afx/HyInteropAfx.h"
-#include "IHyApplication.h"
+#include "Window/HyWindowManager.h"
 #include "Audio/IHyAudio.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Input/HyInput.h"
 #include "Time/HyTime.h"
-#include "Renderer/Components/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
@@ -33,17 +32,20 @@
 #include "Threading/IHyThreadClass.h"
 #include "UI/IHy9Slice.h"
 #include "UI/HyInfoPanel.h"
-#include "UI/IHyButton.h"
+#include "UI/HyButton.h"
 #include "Utilities/HyMath.h"
-#include "Utilities/HyStrManip.h"
 #include "Utilities/HyImage.h"
+#include "Utilities/HyStrManip.h"
 
-class HyEngine
+class IHyEngine
 {
-	static HyEngine *			sm_pInstance;
+	static IHyEngine *			sm_pInstance;
 
-	// The order of these member declarations matter
-	IHyApplication &			m_AppRef;
+	// The order of these member declarations matter as some are used to initialize the others
+	const HarmonyInit			m_Init;
+
+	HyWindowManager				m_WindowManager;
+	HyConsoleInterop			m_Console;
 	
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
@@ -53,38 +55,27 @@ class HyEngine
 	HyInput						m_Input;
 
 	HyRendererInterop			m_Renderer;
-	
-
-// If HY_PLATFORM_GUI, make this ctor public as gui tool requires special usage.
-#ifdef HY_PLATFORM_GUI
-public:
-	static HyEngine *GuiCreate(IHyApplication &projectRef);
-	static void GuiDelete();
-#endif
-
-	// Otherwise, private ctor invoked from RunGame(), once.
-	HyEngine(IHyApplication &gameRef);
 
 public:
-	~HyEngine();
-
-	static void RunGame(IHyApplication *pDynamicallyAllocatedGame);
-
-#ifndef HY_PLATFORM_GUI
-private:
-#endif
-	bool IsInitialized();
-	bool Update();
-	void Shutdown();
-
-	bool PollPlatformApi();
+	IHyEngine(HarmonyInit &initStruct);
+	~IHyEngine();
 
 	HyRendererInterop &GetRenderer();
 
-	friend IHyApplication &		Hy_App();
+	void RunGame();
+
+protected:
+	virtual bool OnUpdate() = 0;
+
+private:
+	bool Update();
+	bool PollPlatformApi();
+
+	friend const HarmonyInit &	Hy_Init();
 	friend float				Hy_UpdateStep();
 	friend double				Hy_UpdateStepDbl();
 	friend void					Hy_PauseGame(bool bPause);
+	friend HyWindow &			Hy_Window(uint32 uiWindowIndex = 0);
 	friend HyInput &			Hy_Input();
 	friend b2World &			Hy_Physics2d();
 	friend HyDiagnostics &		Hy_Diagnostics();
