@@ -14,8 +14,8 @@
 
 #define HY_PI 3.141592f
 
-#define HyRadToDeg(radian) ((radian) * (180.0f / HY_PI))
-#define HyDegToRad(degree) ((degree) * (HY_PI / 180.0f))
+//#define HyRadToDeg(radian) ((radian) * (180.0f / HY_PI))
+//#define HyDegToRad(degree) ((degree) * (HY_PI / 180.0f))
 
 // maps unsigned 8 bits/channel to HYCOLOR
 #define HYCOLOR_ARGB(a,r,g,b) \

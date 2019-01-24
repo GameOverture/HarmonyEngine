@@ -176,12 +176,12 @@ void HyPrimitive2d::SetData()
 		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1);
 		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2);
 		SetAsLineChain(pointList.data(), 2);
-	} break;
+		break; }
 
 	case HYSHAPE_LineLoop:
 	case HYSHAPE_LineChain: {
 		SetAsLineChain(static_cast<b2ChainShape *>(pb2Shape)->m_vertices, static_cast<b2ChainShape *>(pb2Shape)->m_count);
-	} break;
+		break; }
 
 	case HYSHAPE_Circle:
 		SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x, static_cast<b2CircleShape *>(pb2Shape)->m_p.y), static_cast<b2CircleShape *>(pb2Shape)->m_radius, m_uiNumSegments);
@@ -204,7 +204,7 @@ void HyPrimitive2d::SetData()
 		}
 		else
 			SetAsPolygon(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<b2PolygonShape *>(pb2Shape)->m_count);
-	} break;
+		break; }
 
 	default:
 		HyLogError("HyPrimitive2d::SetData() - Unknown shape type: " << m_LocalBoundingVolume.GetType());

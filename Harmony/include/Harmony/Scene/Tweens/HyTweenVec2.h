@@ -50,6 +50,10 @@ public:
 	void TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, HyTweenUpdateFunc fpEase = HyTween::Linear, HyTweenFinishedCallback tweenFinishedCallback = HyTween::NullTweenCallback);
 	
 	bool IsTweening();
+	void StopTween();
+
+	glm::vec2 GetTweenDestination();
+	float GetTweenRemainingDuration();
 
 	HyTweenVec2 &operator+=(float rhs);
 	HyTweenVec2 &operator-=(float rhs);

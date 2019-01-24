@@ -145,6 +145,22 @@ bool HyTweenVec2::IsTweening()
 	return (m_AnimFloatList[0].IsTweening() || m_AnimFloatList[1].IsTweening());
 }
 
+void HyTweenVec2::StopTween()
+{
+	m_AnimFloatList[0].StopTween();
+	m_AnimFloatList[1].StopTween();
+}
+
+glm::vec2 HyTweenVec2::GetTweenDestination()
+{
+	return glm::vec2(m_AnimFloatList[0].GetTweenDestination(), m_AnimFloatList[1].GetTweenDestination());
+}
+
+float HyTweenVec2::GetTweenRemainingDuration()
+{
+	return m_AnimFloatList[0].GetTweenRemainingDuration();
+}
+
 HyTweenVec2 &HyTweenVec2::operator+=(float rhs)
 {
 	m_AnimFloatList[0] += rhs;
