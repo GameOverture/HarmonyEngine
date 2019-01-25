@@ -60,7 +60,7 @@ bool AtlasTreeItem::operator<(const QTreeWidgetItem &rhs) const
 
 AtlasWidget::AtlasWidget(QWidget *parent) :   QWidget(parent),
 											  m_pModel(nullptr),
-											  m_Draw(nullptr, nullptr),
+											  m_Draw(nullptr),
 											  ui(new Ui::AtlasWidget)
 {
 	ui->setupUi(this);
