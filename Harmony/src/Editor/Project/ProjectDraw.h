@@ -31,11 +31,11 @@ class ProjectDraw : public IDraw
 	HyShader *			m_pCheckerGridShader;
 
 public:
-	ProjectDraw(IHyApplication &hyApp);
+	ProjectDraw();
 	virtual ~ProjectDraw();
 	
-	virtual void OnShow(IHyApplication &hyApp) override;
-	virtual void OnHide(IHyApplication &hyApp) override;
+	virtual void OnShow() override;
+	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 };
 

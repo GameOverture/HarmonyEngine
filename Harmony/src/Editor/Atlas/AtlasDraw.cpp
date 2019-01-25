@@ -17,13 +17,14 @@
 
 #define DISPLAYORDER_AtlasSelectedFrames 1000
 
-AtlasDraw::AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp) :	IDraw(nullptr, *pHyApp),
-																		m_ModelRef(*pModelRef),
-																		m_bIsMouseOver(false),
-																		m_HoverBackground(this),
-																		m_HoverStrokeInner(nullptr),
-																		m_HoverStrokeOutter(nullptr),
-																		m_pHoverTexQuad(nullptr)
+AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
+	IDraw(nullptr),
+	m_ModelRef(*pModelRef),
+	m_bIsMouseOver(false),
+	m_HoverBackground(this),
+	m_HoverStrokeInner(nullptr),
+	m_HoverStrokeOutter(nullptr),
+	m_pHoverTexQuad(nullptr)
 {
 	m_HoverBackground.SetWireframe(false);
 	m_HoverBackground.GetShape().SetAsBox(100.0f, 100.0f);
@@ -107,14 +108,14 @@ void AtlasDraw::SetSelected(QList<QTreeWidgetItem *> selectedList)
 	}
 }
 
-void AtlasDraw::Update(IHyApplication &hyApp)
+void AtlasDraw::DrawUpdate()
 {
 	if(m_bIsMouseOver == false)
 		return;
 	
 	m_pCamera->SetZoom(1.0f);
 	m_pCamera->pos.Set(0.0f);
-	glm::vec2 vResolution(static_cast<float>(hyApp.Window().GetFramebufferSize().x), static_cast<float>(hyApp.Window().GetFramebufferSize().y));
+	glm::vec2 vResolution(static_cast<float>(Hy_Window().GetFramebufferSize().x), static_cast<float>(Hy_Window().GetFramebufferSize().y));
 
 	glm::vec2 ptPos(vResolution.x * -0.5f, vResolution.y * 0.5f);
 	float fCurMaxHeight = 0.0f;
@@ -176,7 +177,7 @@ void AtlasDraw::Update(IHyApplication &hyApp)
 	}
 }
 
-/*virtual*/ void AtlasDraw::OnShow(IHyApplication &hyApp) /*override*/
+/*virtual*/ void AtlasDraw::OnShow() /*override*/
 {
 	m_bIsMouseOver = true;
 	
@@ -191,7 +192,7 @@ void AtlasDraw::Update(IHyApplication &hyApp)
 	m_HoverStrokeOutter.SetEnabled(true);
 }
 
-/*virtual*/ void AtlasDraw::OnHide(IHyApplication &hyApp) /*override*/
+/*virtual*/ void AtlasDraw::OnHide() /*override*/
 {
 	m_bIsMouseOver = false;
 			

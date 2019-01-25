@@ -122,8 +122,9 @@ CheckerGrid::~CheckerGrid()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp),
-													m_CheckerGrid(20000.0f, 20000.0f, 25.0f, this)
+ProjectDraw::ProjectDraw() :
+	IDraw(nullptr),
+	m_CheckerGrid(20000.0f, 20000.0f, 25.0f, this)
 {
 	m_pCheckerGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
@@ -140,11 +141,11 @@ ProjectDraw::ProjectDraw(IHyApplication &hyApp) :   IDraw(nullptr, hyApp),
 {
 }
 
-/*virtual*/ void ProjectDraw::OnShow(IHyApplication &hyApp) /*override*/
+/*virtual*/ void ProjectDraw::OnShow() /*override*/
 {
 }
 
-/*virtual*/ void ProjectDraw::OnHide(IHyApplication &hyApp) /*override*/
+/*virtual*/ void ProjectDraw::OnHide() /*override*/
 {
 }
 

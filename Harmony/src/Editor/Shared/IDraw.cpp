@@ -22,15 +22,15 @@
 
 #define KEY_PanCamera Qt::Key_Space
 
-IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pProjItem),
-																m_HyAppRef(hyApp),
-																m_pCamera(nullptr),
-																m_primOriginHorz(this),
-																m_primOriginVert(this),
-																m_bPanCameraKeyDown(false),
-																m_bIsCameraPanning(false)
+IDraw::IDraw(ProjectItem *pProjItem) :
+	m_pProjItem(pProjItem),
+	m_pCamera(nullptr),
+	m_primOriginHorz(this),
+	m_primOriginVert(this),
+	m_bPanCameraKeyDown(false),
+	m_bIsCameraPanning(false)
 {
-	m_pCamera = m_HyAppRef.Window().CreateCamera2d();
+	m_pCamera = Hy_Window().CreateCamera2d();
 	m_pCamera->SetEnabled(false);
 
 	std::vector<glm::vec2> lineList(2, glm::vec2());
@@ -56,7 +56,7 @@ IDraw::IDraw(ProjectItem *pProjItem, IHyApplication &hyApp) :   m_pProjItem(pPro
 
 /*virtual*/ IDraw::~IDraw()
 {
-	m_HyAppRef.Window().RemoveCamera(m_pCamera);
+	Hy_Window().RemoveCamera(m_pCamera);
 }
 
 void IDraw::ApplyJsonData()
@@ -81,7 +81,7 @@ void IDraw::Show()
 	m_primOriginHorz.SetEnabled(true);
 	m_primOriginVert.SetEnabled(true);
 
-	OnShow(m_HyAppRef);
+	OnShow();
 }
 
 void IDraw::Hide()
@@ -91,7 +91,7 @@ void IDraw::Hide()
 	m_primOriginHorz.SetEnabled(false);
 	m_primOriginVert.SetEnabled(false);
 
-	OnHide(m_HyAppRef);
+	OnHide();
 }
 
 void IDraw::ResizeRenderer()

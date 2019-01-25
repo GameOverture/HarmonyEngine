@@ -21,7 +21,7 @@ class SpriteDraw : public IDraw
 
 
 public:
-	SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
+	SpriteDraw(ProjectItem *pProjItem);
 	virtual ~SpriteDraw();
 
 	void PlayAnim(quint32 uiFrameIndex);
@@ -36,8 +36,8 @@ public:
 
 protected:
 	virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
-	virtual void OnShow(IHyApplication &hyApp) override;
-	virtual void OnHide(IHyApplication &hyApp) override;
+	virtual void OnShow() override;
+	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 	
 	virtual void OnUpdate() override;

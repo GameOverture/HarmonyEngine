@@ -67,7 +67,11 @@ public:
 protected:
 	virtual bool OnUpdate() = 0;
 
+#ifdef HY_PLATFORM_GUI
+public:
+#else
 private:
+#endif
 	bool Update();
 	bool PollPlatformApi();
 

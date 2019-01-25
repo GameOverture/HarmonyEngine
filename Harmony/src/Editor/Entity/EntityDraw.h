@@ -16,15 +16,15 @@
 class EntityDraw : public IDraw
 {
 public:
-	EntityDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
+	EntityDraw(ProjectItem *pProjItem);
 	virtual ~EntityDraw();
 
 	void Sync();
 
 protected:
 	virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
-	virtual void OnShow(IHyApplication &hyApp) override;
-	virtual void OnHide(IHyApplication &hyApp) override;
+	virtual void OnShow() override;
+	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 };
 

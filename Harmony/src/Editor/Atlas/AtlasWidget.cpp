@@ -69,11 +69,12 @@ AtlasWidget::AtlasWidget(QWidget *parent) :   QWidget(parent),
 	HyGuiLog("WidgetAtlasManager::WidgetAtlasManager() invalid constructor used", LOGTYPE_Error);
 }
 
-AtlasWidget::AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *parent /*= 0*/) : QWidget(parent),
-																								ui(new Ui::AtlasWidget),
-																								m_pModel(pModel),
-																								m_Draw(pModel, pHyApp),
-																								m_pMouseHoverItem(nullptr)
+AtlasWidget::AtlasWidget(AtlasModel *pModel, QWidget *parent /*= 0*/) :
+	QWidget(parent),
+	ui(new Ui::AtlasWidget),
+	m_pModel(pModel),
+	m_Draw(pModel),
+	m_pMouseHoverItem(nullptr)
 {
 	ui->setupUi(this);
 
@@ -137,10 +138,10 @@ AtlasTreeWidget *AtlasWidget::GetFramesTreeWidget()
 	return ui->atlasList;
 }
 
-void AtlasWidget::DrawUpdate(IHyApplication &hyApp)
+void AtlasWidget::DrawUpdate()
 {
 	m_Draw.SetHover(ui->atlasList->itemAt(ui->atlasList->mapFromGlobal(QCursor::pos())));
-	m_Draw.Update(hyApp);
+	m_Draw.DrawUpdate();
 }
 
 void AtlasWidget::StashTreeWidgets()

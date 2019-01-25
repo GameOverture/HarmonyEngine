@@ -73,7 +73,7 @@ private:
 	void WidgetLoad();
 	void WidgetUnload();
 	
-	void DrawLoad(IHyApplication &hyApp);
+	void DrawLoad();
 	void DrawUnload();
 	void DrawShow();
 	void DrawHide();

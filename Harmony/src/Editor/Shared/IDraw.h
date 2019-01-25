@@ -20,7 +20,6 @@ class IDraw : public HyEntity2d
 {
 protected:
 	ProjectItem *       m_pProjItem;
-	IHyApplication &    m_HyAppRef;
 	HyCamera2d *        m_pCamera;
 
 	HyPrimitive2d       m_primOriginHorz;
@@ -31,7 +30,7 @@ protected:
 	QPointF             m_ptOldMousePos;
 
 public:
-	IDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
+	IDraw(ProjectItem *pProjItem);
 	virtual ~IDraw();
 	
 	void ApplyJsonData();
@@ -50,8 +49,8 @@ public:
 
 protected:
 	virtual void OnApplyJsonData(jsonxx::Value &valueRef) { }
-	virtual void OnShow(IHyApplication &hyApp) = 0;
-	virtual void OnHide(IHyApplication &hyApp) = 0;
+	virtual void OnShow() = 0;
+	virtual void OnHide() = 0;
 	virtual void OnResizeRenderer() = 0;
 };
 

@@ -83,7 +83,7 @@ Harmony::Harmony(MainWindow &mainWindowRef) :  QObject(&mainWindowRef),
 
 /*slot*/ void Harmony::HarmonyWidgetReady(HarmonyWidget *pWidget)
 {
-	m_pWidget->GetProject()->Initialize();
+	m_pWidget->GetProject()->HarmonyInitialize();
 
 	m_MainWindowRef.SetCurrentProject(m_pWidget->GetProject());
 	m_MainWindowRef.ClearLoading();

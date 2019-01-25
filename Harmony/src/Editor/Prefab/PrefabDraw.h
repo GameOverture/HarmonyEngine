@@ -16,10 +16,10 @@
 class PrefabDraw : public IDraw
 {
 public:
-	PrefabDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
+	PrefabDraw(ProjectItem *pProjItem);
 
-	virtual void OnShow(IHyApplication &hyApp) override;
-	virtual void OnHide(IHyApplication &hyApp) override;
+	virtual void OnShow() override;
+	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 };
 

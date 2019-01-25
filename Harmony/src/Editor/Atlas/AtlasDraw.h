@@ -36,16 +36,16 @@ class AtlasDraw : public IDraw
 	HyTexturedQuad2d *						m_pHoverTexQuad;
 
 public:
-	AtlasDraw(AtlasModel *pModelRef, IHyApplication *pHyApp);
+	AtlasDraw(AtlasModel *pModelRef);
 	virtual ~AtlasDraw();
 
 	void SetHover(QTreeWidgetItem *pHoverItem);
 	void SetSelected(QList<QTreeWidgetItem *> selectedList);
 
-	void Update(IHyApplication &hyApp);
+	void DrawUpdate();
 
-	virtual void OnShow(IHyApplication &hyApp) override;
-	virtual void OnHide(IHyApplication &hyApp) override;
+	virtual void OnShow() override;
+	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 };
 

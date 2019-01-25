@@ -16,9 +16,10 @@
 
 bool HarmonyWidget::sm_bHarmonyLoaded = false;
 
-HarmonyWidget::HarmonyWidget(Project *pProject) :   QOpenGLWidget(nullptr),
-													m_pProject(pProject),
-													m_pHyEngine(nullptr)
+HarmonyWidget::HarmonyWidget(Project *pProject) :
+	QOpenGLWidget(nullptr),
+	m_pProject(pProject),
+	m_pHyEngine(nullptr)
 {
 	m_pTimer = new QTimer(this);
 	connect(m_pTimer, SIGNAL(timeout()), this, SLOT(OnBootCheck()));
@@ -33,7 +34,7 @@ HarmonyWidget::HarmonyWidget(Project *pProject) :   QOpenGLWidget(nullptr),
 	m_pTimer->stop();
 
 	makeCurrent();
-	HyEngine::GuiDelete();
+	delete m_pHyEngine;
 	sm_bHarmonyLoaded = false;
 }
 
@@ -88,10 +89,10 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	HyGuiLog("Version: " % QString(reinterpret_cast<const char *>(glGetString(GL_VERSION))), LOGTYPE_Normal);
 	HyGuiLog("GLSL: " % QString(reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION))), LOGTYPE_Normal);
 
-	m_pHyEngine = HyEngine::GuiCreate(*m_pProject);
-
-	if(m_pHyEngine == nullptr)
-		HyGuiLog("HyEngine::GuiCreate returned nullptr", LOGTYPE_Error);
+	HarmonyInit initStruct;
+	initStruct.sGameName = m_pProject->GetGameName().toStdString();
+	initStruct.sDataDir = m_pProject->GetAssetsAbsPath().toStdString();
+	m_pHyEngine = new GuiHyEngine(initStruct, m_pProject);
 }
 
 /*virtual*/ void HarmonyWidget::paintGL() /*override*/
@@ -237,7 +238,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 void HarmonyWidget::OnBootCheck()
 {
-	if(m_pHyEngine && m_pHyEngine->IsInitialized())
+	if(m_pHyEngine /*&& m_pHyEngine->IsInitialized()*/)
 	{
 		Q_EMIT HarmonyWidgetReady(this);
 

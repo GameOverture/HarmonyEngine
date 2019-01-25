@@ -10,16 +10,16 @@
 #include "Global.h"
 #include "PrefabDraw.h"
 
-PrefabDraw::PrefabDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp)
+PrefabDraw::PrefabDraw(ProjectItem *pProjItem) : IDraw(pProjItem)
 {
 
 }
 
-/*virtual*/ void PrefabDraw::OnShow(IHyApplication &hyApp) /*override*/
+/*virtual*/ void PrefabDraw::OnShow() /*override*/
 {
 }
 
-/*virtual*/ void PrefabDraw::OnHide(IHyApplication &hyApp) /*override*/
+/*virtual*/ void PrefabDraw::OnHide() /*override*/
 {
 }
 

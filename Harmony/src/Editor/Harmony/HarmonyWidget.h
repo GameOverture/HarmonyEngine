@@ -20,13 +20,33 @@ class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
 {
 	Q_OBJECT
 
-	static bool                 sm_bHarmonyLoaded;
+	static bool					sm_bHarmonyLoaded;
+	Project *					m_pProject;
 
-	Project *                   m_pProject;
+	class GuiHyEngine : public IHyEngine
+	{
+		Project *				m_pProject;
 
-	HyEngine *                  m_pHyEngine;
+	public:
+		GuiHyEngine(HarmonyInit &initStruct, Project *pProject) :
+			IHyEngine(initStruct),
+			m_pProject(pProject)
+		{
+			m_pProject->HarmonyInitialize();
+		}
 
-	QTimer *                    m_pTimer;
+		~GuiHyEngine() {
+			m_pProject->HarmonyShutdown();
+		}
+
+	protected:
+		virtual bool OnUpdate() override {
+			return m_pProject->HarmonyUpdate();
+		}
+	};
+	GuiHyEngine *				m_pHyEngine;
+
+	QTimer *					m_pTimer;
 
 public:
 	HarmonyWidget(Project *pProject);

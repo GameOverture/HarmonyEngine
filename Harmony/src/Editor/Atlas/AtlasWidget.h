@@ -62,7 +62,7 @@ class AtlasWidget : public QWidget
 
 public:
 	explicit AtlasWidget(QWidget *parent = 0);
-	explicit AtlasWidget(AtlasModel *pModel, IHyApplication *pHyApp, QWidget *parent = 0);
+	explicit AtlasWidget(AtlasModel *pModel, QWidget *parent = 0);
 	~AtlasWidget();
 
 	quint32 GetSelectedAtlasGrpId();
@@ -70,7 +70,7 @@ public:
 	AtlasModel &GetData();
 	AtlasTreeWidget *GetFramesTreeWidget();
 
-	void DrawUpdate(IHyApplication &hyApp);
+	void DrawUpdate();
 
 	void StashTreeWidgets();
 	

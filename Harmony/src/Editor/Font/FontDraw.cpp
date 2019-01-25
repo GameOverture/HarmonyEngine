@@ -16,15 +16,16 @@
 
 #define PreviewOffsetY -2500.0f
 
-FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
-																	m_pPreviewTextCamera(nullptr),
-																	m_pAtlasPreviewTexQuad(nullptr),
-																	m_DrawAtlasOutline(this),
-																	m_DividerLine(this),
-																	m_PreviewOriginHorz(this),
-																	m_Text("", "+GuiPreview", this)
+FontDraw::FontDraw(ProjectItem *pProjItem) :
+	IDraw(pProjItem),
+	m_pPreviewTextCamera(nullptr),
+	m_pAtlasPreviewTexQuad(nullptr),
+	m_DrawAtlasOutline(this),
+	m_DividerLine(this),
+	m_PreviewOriginHorz(this),
+	m_Text("", "+GuiPreview", this)
 {
-	m_pPreviewTextCamera = m_HyAppRef.Window().CreateCamera2d();
+	m_pPreviewTextCamera = Hy_Window().CreateCamera2d();
 	m_pPreviewTextCamera->SetViewport(0.0f, 0.0f, 1.0f, 0.5f);
 	m_pPreviewTextCamera->pos.Set(0.0f, -2500.0f);
 	m_pPreviewTextCamera->SetEnabled(true);
@@ -38,7 +39,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 	m_DrawAtlasOutline.SetTint(1.0f, 0.0f, 0.0f);
 
 	m_DividerLine.GetShape().SetAsBox(10000.0f, 10.0f);
-	m_DividerLine.pos.Set(-5000.0f, hyApp.Window().GetFramebufferSize().y / 2 - 5.0f);
+	m_DividerLine.pos.Set(-5000.0f, Hy_Window().GetFramebufferSize().y / 2 - 5.0f);
 	m_DividerLine.SetTint(0.0f, 0.0f, 0.0f);
 	m_DividerLine.UseWindowCoordinates();
 
@@ -57,7 +58,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 /*virtual*/ FontDraw::~FontDraw()
 {
 	delete m_pAtlasPreviewTexQuad;
-	m_HyAppRef.Window().RemoveCamera(m_pPreviewTextCamera);
+	Hy_Window().RemoveCamera(m_pPreviewTextCamera);
 }
 
 /*virtual*/ void FontDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
@@ -88,7 +89,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 	
 		// Calculate the proper zoom amount to fit the whole atlas width (plus some extra margin) in preview window
 		float fExtraMargin = 25.0f;
-		float fZoomAmt = ((m_HyAppRef.Window().GetFramebufferSize().x * 100.0f) / (pFtglAtlas->width + (fExtraMargin * 2.0f))) / 100.0f;
+		float fZoomAmt = ((Hy_Window().GetFramebufferSize().x * 100.0f) / (pFtglAtlas->width + (fExtraMargin * 2.0f))) / 100.0f;
 		m_pCamera->SetZoom(fZoomAmt);
 	
 		const b2AABB &aabbWorldViewBounds = m_pCamera->GetWorldViewBounds();
@@ -100,7 +101,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 	m_Text.TextSet("1234567890");
 }
 
-/*virtual*/ void FontDraw::OnShow(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnShow()
 {
 	if(m_pAtlasPreviewTexQuad)
 		m_pAtlasPreviewTexQuad->SetEnabled(true);
@@ -114,7 +115,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 	m_Text.SetEnabled(true);
 }
 
-/*virtual*/ void FontDraw::OnHide(IHyApplication &hyApp)
+/*virtual*/ void FontDraw::OnHide()
 {
 	m_pPreviewTextCamera->SetEnabled(false);
 	m_PreviewOriginHorz.SetEnabled(false);
@@ -124,7 +125,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjI
 
 /*virtual*/ void FontDraw::OnResizeRenderer() /*override*/
 {
-	m_DividerLine.pos.Set(-5000.0f, m_HyAppRef.Window().GetFramebufferSize().y / 2 - 5.0f);
+	m_DividerLine.pos.Set(-5000.0f, Hy_Window().GetFramebufferSize().y / 2 - 5.0f);
 }
 
 /*virtual*/ void FontDraw::OnUpdate() /*override*/

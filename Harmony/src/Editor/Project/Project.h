@@ -40,26 +40,26 @@ protected:
 	virtual void dropEvent(QDropEvent *pEvent) override;
 };
 
-class Project : public ExplorerItem, public IHyApplication
+class Project : public ExplorerItem
 {
 	Q_OBJECT
 
-	ExplorerWidget *                                m_pWidget;
-	ProjectDraw *                                   m_pDraw;
-	DlgProjectSettings                              m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
+	ExplorerWidget *								m_pWidget;
+	ProjectDraw *									m_pDraw;
+	DlgProjectSettings								m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
-	AtlasModel *                                    m_pAtlasModel;
-	AtlasWidget *                                   m_pAtlasWidget;
+	AtlasModel *									m_pAtlasModel;
+	AtlasWidget *									m_pAtlasWidget;
 
-	AudioWidgetManager *                            m_pAudioMan;
-	ProjectTabBar *                                 m_pTabBar;
+	AudioWidgetManager *							m_pAudioMan;
+	ProjectTabBar *									m_pTabBar;
 
-	ProjectItem *                                   m_pCurOpenItem;
+	ProjectItem *									m_pCurOpenItem;
 
-	QJsonObject                                     m_SaveDataObj;
+	QJsonObject										m_SaveDataObj;
 
 	bool											m_bSystemFontFound;
-	bool                                            m_bHasError;
+	bool											m_bHasError;
 	
 public:
 	Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath);
@@ -116,10 +116,10 @@ public:
 
 	void ApplySaveEnables();
 
-	// IHyApplication overrides
-	virtual bool Initialize();
-	virtual bool Update();
-	virtual void Shutdown();
+	// IHyEngine
+	bool HarmonyInitialize();
+	bool HarmonyUpdate();
+	void HarmonyShutdown();
 
 public Q_SLOTS:
 	void OnTabBarCurrentChanged(int iIndex);

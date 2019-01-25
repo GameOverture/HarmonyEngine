@@ -27,8 +27,6 @@
 // Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
 //#define RESAVE_ENTIRE_PROJECT
 
-HarmonyInit g_DefaultInit;
-
 ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProjectOwner)
 {
 }
@@ -72,7 +70,6 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : ExplorerItem(ITEM_Project, sProjectFilePath, nullptr),
-																				IHyApplication(g_DefaultInit),
 																				m_pWidget(pProjWidget),
 																				m_pDraw(nullptr),
 																				m_DlgProjectSettings(sProjectFilePath),
@@ -90,8 +87,6 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 	}
 
 	m_pTreeItemPtr->setText(0, GetGameName());
-	m_Init.sGameName = GetGameName().toStdString();
-	m_Init.sDataDir = GetAssetsAbsPath().toStdString();
 
 	m_pTabBar = new ProjectTabBar(this);
 	m_pTabBar->setTabsClosable(true);
@@ -331,7 +326,7 @@ ExplorerWidget *Project::GetExplorerWidget()
 
 void Project::SetRenderSize(int iWidth, int iHeight)
 {
-	Window().SetWindowSize(glm::ivec2(iWidth, iHeight));
+	Hy_Window().SetWindowSize(glm::ivec2(iWidth, iHeight));
 
 	if(m_pTabBar && m_pTabBar->count() != 0)
 	{
@@ -551,7 +546,7 @@ void Project::OpenTab(ProjectItem *pItem)
 	if(bAlreadyLoaded == false)
 	{
 		m_pCurOpenItem->WidgetLoad();
-		m_pCurOpenItem->DrawLoad(*this);
+		m_pCurOpenItem->DrawLoad();
 
 		m_pTabBar->blockSignals(true);
 		int iIndex = m_pTabBar->addTab(m_pCurOpenItem->GetIcon(m_pCurOpenItem->IsExistencePendingSave() ? SUBICON_New : SUBICON_None), m_pCurOpenItem->GetName(false));
@@ -618,10 +613,9 @@ void Project::ApplySaveEnables()
 	MainWindow::ApplySaveEnables(bCurItemDirty, bAnyItemDirty);
 }
 
-// IHyApplication override
-/*virtual*/ bool Project::Initialize()
+bool Project::HarmonyInitialize()
 {
-	m_pDraw = new ProjectDraw(*this);
+	m_pDraw = new ProjectDraw();
 	m_pDraw->Load();
 
 	if(m_pAtlasWidget)
@@ -629,13 +623,13 @@ void Project::ApplySaveEnables()
 
 	delete m_pAtlasWidget;
 	delete m_pAudioMan;
-	m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, this, nullptr);
+	m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, nullptr);
 	m_pAudioMan = new AudioWidgetManager(this, nullptr);
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{
 		ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
-		pOpenItem->DrawLoad(*this);
+		pOpenItem->DrawLoad();
 	}
 
 	if(m_pTabBar->currentIndex() >= 0)
@@ -667,11 +661,11 @@ void Project::ApplySaveEnables()
 	return true;
 }
 
-// IHyApplication override
-/*virtual*/ bool Project::Update()
+// IHyEngine
+bool Project::HarmonyUpdate()
 {
 	if(m_pAtlasWidget)
-		m_pAtlasWidget->DrawUpdate(*this);
+		m_pAtlasWidget->DrawUpdate();
 
 	if(m_pTabBar->count() > 0)
 	{
@@ -684,8 +678,8 @@ void Project::ApplySaveEnables()
 	return true;
 }
 
-// IHyApplication override
-/*virtual*/ void Project::Shutdown()
+// IHyEngine
+void Project::HarmonyShutdown()
 {
 	delete m_pDraw;
 	m_pDraw = nullptr;

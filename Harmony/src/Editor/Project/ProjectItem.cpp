@@ -198,7 +198,7 @@ void ProjectItem::WidgetUnload()
 	m_pWidget = nullptr;
 }
 
-void ProjectItem::DrawLoad(IHyApplication &hyApp)
+void ProjectItem::DrawLoad()
 {
 	m_pModel->Refresh();
 	DrawUnload();
@@ -206,16 +206,16 @@ void ProjectItem::DrawLoad(IHyApplication &hyApp)
 	switch(m_eTYPE)
 	{
 	case ITEM_Sprite:
-		m_pDraw = new SpriteDraw(this, hyApp);
+		m_pDraw = new SpriteDraw(this);
 		break;
 	case ITEM_Font:
-		m_pDraw = new FontDraw(this, hyApp);
+		m_pDraw = new FontDraw(this);
 		break;
 	case ITEM_Entity:
-		m_pDraw = new EntityDraw(this, hyApp);
+		m_pDraw = new EntityDraw(this);
 		break;
 	case ITEM_Prefab:
-		m_pDraw = new PrefabDraw(this, hyApp);
+		m_pDraw = new PrefabDraw(this);
 		break;
 	default:
 		HyGuiLog("Unimplemented DrawLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);

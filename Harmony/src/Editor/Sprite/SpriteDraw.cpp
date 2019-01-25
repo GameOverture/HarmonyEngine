@@ -14,8 +14,9 @@
 
 #include <QKeyEvent>
 
-SpriteDraw::SpriteDraw(ProjectItem *pProjItem, IHyApplication &hyApp) : IDraw(pProjItem, hyApp),
-																		m_Sprite("", "+GuiPreview", this)
+SpriteDraw::SpriteDraw(ProjectItem *pProjItem) :
+	IDraw(pProjItem),
+	m_Sprite("", "+GuiPreview", this)
 {
 }
 
@@ -124,7 +125,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	m_Sprite.Load();
 }
 
-/*virtual*/ void SpriteDraw::OnShow(IHyApplication &hyApp) /*override*/
+/*virtual*/ void SpriteDraw::OnShow() /*override*/
 {
 	m_Sprite.SetEnabled(true);
 	
@@ -132,7 +133,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 //        m_pCurFrame->SetEnabled(true);
 }
 
-/*virtual*/ void SpriteDraw::OnHide(IHyApplication &hyApp) /*override*/
+/*virtual*/ void SpriteDraw::OnHide() /*override*/
 {
 	SetEnabled(false, true);
 }

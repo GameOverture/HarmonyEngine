@@ -26,14 +26,14 @@ class FontDraw : public IDraw
 	HyText2d                    m_Text;
 
 public:
-	FontDraw(ProjectItem *pProjItem, IHyApplication &hyApp);
+	FontDraw(ProjectItem *pProjItem);
 	virtual ~FontDraw();
 
 	virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
 
 protected:
-	virtual void OnShow(IHyApplication &hyApp) override;
-	virtual void OnHide(IHyApplication &hyApp) override;
+	virtual void OnShow() override;
+	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 	
 	virtual void OnUpdate() override;
