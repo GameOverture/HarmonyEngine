@@ -472,48 +472,48 @@ HyOpenGL::~HyOpenGL(void)
 	GLenum eInternalFormat = GL_RGBA;
 	switch(eDesiredFormat)
 	{
-		case HYTEXTURE_R8G8B8A8: {
-			eInternalFormat = GL_RGBA;
-		} break;
-		case HYTEXTURE_R8G8B8: {
-			eInternalFormat = GL_RGB;
-		} break;
-		case HYTEXTURE_RGB_DTX1: {
-			eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_RGB_DTX1)) ? GL_COMPRESSED_RGB_S3TC_DXT1_EXT : GL_COMPRESSED_RGB;
-		} break;
-		case HYTEXTURE_RGBA_DTX1: {
-			eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_RGBA_DTX1)) ? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : GL_COMPRESSED_RGBA;
-		} break;
-		case HYTEXTURE_DTX3: {
-			eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_DTX3)) ? GL_COMPRESSED_RGBA_S3TC_DXT3_EXT : GL_COMPRESSED_RGBA;
-		} break;
-		case HYTEXTURE_DTX5: {
-			eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_DTX5)) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGBA;
-		} break;
-		default: {
-			HyLogError("Unknown TextureFormat used for 'eDesiredFormat'");
-		} break;
+	case HYTEXTURE_R8G8B8A8: {
+		eInternalFormat = GL_RGBA;
+		break; }
+	case HYTEXTURE_R8G8B8: {
+		eInternalFormat = GL_RGB;
+		break; }
+	case HYTEXTURE_RGB_DTX1: {
+		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_RGB_DTX1)) ? GL_COMPRESSED_RGB_S3TC_DXT1_EXT : GL_COMPRESSED_RGB;
+		break; }
+	case HYTEXTURE_RGBA_DTX1: {
+		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_RGBA_DTX1)) ? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : GL_COMPRESSED_RGBA;
+		break; }
+	case HYTEXTURE_DTX3: {
+		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_DTX3)) ? GL_COMPRESSED_RGBA_S3TC_DXT3_EXT : GL_COMPRESSED_RGBA;
+		break; }
+	case HYTEXTURE_DTX5: {
+		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_DTX5)) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGBA;
+		break; }
+	default: {
+		HyLogError("Unknown TextureFormat used for 'eDesiredFormat'");
+		break; }
 	}
 
 	GLenum eFormat = GL_RGBA;
 	bool bIsPixelDataCompressed = false;
 	switch(ePixelDataFormat)
 	{
-		case HYTEXTURE_R8G8B8A8: {
-			eFormat = GL_RGBA;
-		} break;
-		case HYTEXTURE_R8G8B8: {
-			eFormat = GL_RGB;
-		} break;
-		case HYTEXTURE_RGB_DTX1:
-		case HYTEXTURE_RGBA_DTX1:
-		case HYTEXTURE_DTX3:
-		case HYTEXTURE_DTX5: {
-			bIsPixelDataCompressed = true;
-		} break;
-		default: {
-			HyLogError("Unknown TextureFormat used for 'ePixelDataFormat'");
-		} break;
+	case HYTEXTURE_R8G8B8A8: {
+		eFormat = GL_RGBA;
+		break; }
+	case HYTEXTURE_R8G8B8: {
+		eFormat = GL_RGB;
+		break; }
+	case HYTEXTURE_RGB_DTX1:
+	case HYTEXTURE_RGBA_DTX1:
+	case HYTEXTURE_DTX3:
+	case HYTEXTURE_DTX5: {
+		bIsPixelDataCompressed = true;
+		break; }
+	default: {
+		HyLogError("Unknown TextureFormat used for 'ePixelDataFormat'");
+		break; }
 	}
 
 	GLuint hGLTexture;
