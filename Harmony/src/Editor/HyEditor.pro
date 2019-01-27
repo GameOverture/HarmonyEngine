@@ -41,7 +41,6 @@ SOURCES += main.cpp \
     Entity/EntityModel.cpp \
     Entity/EntityWidget.cpp \
     Font/FontDraw.cpp \
-    Font/FontItem.cpp \
     Font/FontModels.cpp \
     Font/FontModelView.cpp \
     Font/FontUndoCmds.cpp \
@@ -82,7 +81,59 @@ SOURCES += main.cpp \
     Entity3d/Entity3d.cpp \
     Prefab/PrefabModel.cpp \
     Prefab/PrefabWidget.cpp \
-    Prefab/PrefabDraw.cpp
+    Prefab/PrefabDraw.cpp \
+    Dialogs/DlgAtlasGroupSettings.cpp \
+    Dialogs/DlgColorPicker.cpp \
+    Dialogs/DlgInputName.cpp \
+    Dialogs/DlgNewItem.cpp \
+    Dialogs/DlgNewProject.cpp \
+    Dialogs/DlgProjectSettings.cpp \
+    Dialogs/DlgSetEngineLocation.cpp \
+    Entity/EntityDraw.cpp \
+    Entity/EntityModel.cpp \
+    Entity/EntityTreeModel.cpp \
+    Entity/EntityUndoCmds.cpp \
+    Entity/EntityWidget.cpp \
+    Dialogs/DlgSetEngineLocation.cpp \
+    Explorer/ExplorerItem.cpp \
+    Explorer/ExplorerTreeWidget.cpp \
+    Explorer/ExplorerWidget.cpp \
+    Font/FontDraw.cpp \
+    Font/FontModels.cpp \
+    Font/FontModelView.cpp \
+    Font/FontUndoCmds.cpp \
+    Font/FontWidget.cpp \
+    Harmony/Harmony.cpp \
+    Harmony/HarmonyConnection.cpp \
+    Harmony/HarmonyWidget.cpp \
+    Prefab/PrefabDraw.cpp \
+    Prefab/PrefabModel.cpp \
+    Prefab/PrefabWidget.cpp \
+    Project/Project.cpp \
+    Project/ProjectDraw.cpp \
+    Project/ProjectItem.cpp \
+    Project/ProjectItemMimeData.cpp \
+    Shared/Global.cpp \
+    Shared/IDraw.cpp \
+    Shared/IModel.cpp \
+    Shared/IModelTreeItem.cpp \
+    Shared/Properties/PropertiesTreeItem.cpp \
+    Shared/Properties/PropertiesTreeModel.cpp \
+    Shared/Properties/PropertiesTreeView.cpp \
+    Shared/Properties/PropertiesUndoCmd.cpp \
+    Sprite/SpriteDraw.cpp \
+    Sprite/SpriteModels.cpp \
+    Sprite/SpriteTableView.cpp \
+    Sprite/SpriteUndoCmds.cpp \
+    Sprite/SpriteWidget.cpp \
+    Widget/WidgetColor.cpp \
+    Widget/WidgetGradientEditor.cpp \
+    Widget/WidgetLiveVariable.cpp \
+    Widget/WidgetLiveVarManager.cpp \
+    Widget/WidgetOutputLog.cpp \
+    Widget/WidgetRangedSlider.cpp \
+    Widget/WidgetVectorSpinBox.cpp \
+    Primitive/PrimitiveModel.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -111,7 +162,6 @@ HEADERS  += \
     Entity/EntityModel.h \
     Entity/EntityWidget.h \
     Font/FontDraw.h \
-    Font/FontItem.h \
     Font/FontModels.h \
     Font/FontModelView.h \
     Font/FontUndoCmds.h \
@@ -154,7 +204,71 @@ HEADERS  += \
     Entity3d/Entity3d.h \
     Prefab/PrefabModel.h \
     Prefab/PrefabWidget.h \
-    Prefab/PrefabDraw.h
+    Prefab/PrefabDraw.h \
+    Atlas/AtlasDraw.h \
+    Atlas/AtlasFrame.h \
+    Atlas/AtlasModel.h \
+    Atlas/AtlasRepackThread.h \
+    Atlas/AtlasWidget.h \
+    Dialogs/DlgAtlasGroupSettings.h \
+    Dialogs/DlgColorPicker.h \
+    Dialogs/DlgInputName.h \
+    Dialogs/DlgNewItem.h \
+    Dialogs/DlgNewProject.h \
+    Dialogs/DlgProjectSettings.h \
+    Dialogs/DlgSetEngineLocation.h \
+    Entity/EntityDraw.h \
+    Entity/EntityModel.h \
+    Entity/EntityTreeModel.h \
+    Entity/EntityUndoCmds.h \
+    Entity/EntityWidget.h \
+    Explorer/ExplorerItem.h \
+    Explorer/ExplorerTreeWidget.h \
+    Explorer/ExplorerWidget.h \
+    Font/FontDraw.h \
+    Font/FontModels.h \
+    Font/FontModelView.h \
+    Font/FontUndoCmds.h \
+    Font/FontWidget.h \
+    Harmony/Harmony.h \
+    Harmony/HarmonyConnection.h \
+    Harmony/HarmonyWidget.h \
+    Prefab/PrefabDraw.h \
+    Prefab/PrefabModel.h \
+    Prefab/PrefabWidget.h \
+    Project/Project.h \
+    Project/ProjectDraw.h \
+    Project/ProjectItem.h \
+    Project/ProjectItemMimeData.h \
+    Shared/Global.h \
+    Shared/GlobalUndoCmds.h \
+    Shared/GlobalWidgetMappers.h \
+    Shared/IDraw.h \
+    Shared/IModel.h \
+    Shared/IModelTreeItem.h \
+    Shared/Global.h \
+    Shared/GlobalUndoCmds.h \
+    Shared/GlobalWidgetMappers.h \
+    Shared/IDraw.h \
+    Shared/IModel.h \
+    Shared/IModelTreeItem.h \
+    Shared/Properties/PropertiesTreeItem.h \
+    Shared/Properties/PropertiesTreeModel.h \
+    Shared/Properties/PropertiesTreeView.h \
+    Shared/Properties/PropertiesUndoCmd.h \
+    Sprite/SpriteDraw.h \
+    Sprite/SpriteModels.h \
+    Sprite/SpriteTableView.h \
+    Sprite/SpriteUndoCmds.h \
+    Sprite/SpriteWidget.h \
+    Widget/WidgetColor.h \
+    Widget/WidgetGradientEditor.h \
+    Widget/WidgetLiveVariable.h \
+    Widget/WidgetLiveVarManager.h \
+    Widget/WidgetOutputLog.h \
+    Widget/WidgetRangedSlider.h \
+    Widget/WidgetVectorSpinBox.h \
+    Primitive/PrimitiveModel.h
 
 FORMS    += \
     MainWindow.ui \
@@ -185,7 +299,29 @@ FORMS    += \
     Widget/WidgetVectorSpinBox.ui \
     Explorer/ExplorerWidget.ui \
     Entity3d/Entity3d.ui \
-    Prefab/PrefabWidget.ui
+    Prefab/PrefabWidget.ui \
+    Entity/EntityCommon.ui \
+    Entity/EntityToolbox.ui \
+    Entity/EntityWidget.ui \
+    Entity/EntSpriteFrame.ui \
+    Dialogs/DlgAtlasGroupSettings.ui \
+    Dialogs/DlgColorPicker.ui \
+    Dialogs/DlgInputName.ui \
+    Dialogs/DlgNewItem.ui \
+    Dialogs/DlgNewProject.ui \
+    Dialogs/DlgProjectSettings.ui \
+    Dialogs/DlgSetEngineLocation.ui \
+    Explorer/ExplorerWidget.ui \
+    Font/FontWidget.ui \
+    Prefab/PrefabWidget.ui \
+    Sprite/SpriteWidget.ui \
+    Widget/WidgetColor.ui \
+    Widget/WidgetGradientEditor.ui \
+    Widget/WidgetLiveVariable.ui \
+    Widget/WidgetLiveVarManager.ui \
+    Widget/WidgetOutputLog.ui \
+    Widget/WidgetRangedSlider.ui \
+    Widget/WidgetVectorSpinBox.ui
 
 RESOURCES += \
 	res/HyEditor.qrc
@@ -203,11 +339,13 @@ INCLUDEPATH += "$$PWD/Harmony"
 INCLUDEPATH += "$$PWD/Project"
 INCLUDEPATH += "$$PWD/Sprite"
 INCLUDEPATH += "$$PWD/Prefab"
+INCLUDEPATH += "$$PWD/Primitive"
 INCLUDEPATH += "$$PWD/Widget"
 INCLUDEPATH += "$$PWD/Explorer"
 INCLUDEPATH += "$$PWD/Shared"
 INCLUDEPATH += "$$PWD/Shared/Properties"
 INCLUDEPATH += "$$PWD/../../include"
+INCLUDEPATH += "$$PWD/../../include/Harmony"
 DEPENDPATH += "$$PWD/../../include"
 
 win32-g++:CONFIG(release, debug|release): {

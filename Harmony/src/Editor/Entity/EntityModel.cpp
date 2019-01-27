@@ -217,6 +217,7 @@ bool EntityModel::InsertTreeItem(int iRow, EntityTreeItem *pItem, EntityTreeItem
 		return false;
 
 	m_TreeModel.InsertItem(iRow, pItem, pParentItem);
+    return true;
 }
 
 bool EntityModel::RemoveTreeItems(int iRow, int iCount, EntityTreeItem *pParentItem)
