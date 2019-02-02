@@ -86,7 +86,6 @@ void ExplorerWidget::AddItem(Project *pProj, HyGuiItemType eNewItemType, const Q
 		HyGuiLog("Could not find associated project for item: " % sPrefix % "/" % sName, LOGTYPE_Error);
 		return;
 	}
-	
 	if(eNewItemType == ITEM_Project)
 	{
 		HyGuiLog("Do not use WidgetExplorer::AddItem for projects... use AddProjectItem instead", LOGTYPE_Error);

@@ -63,7 +63,7 @@ ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidget
 	}
 	sPrefix += '/';
 
-	if(pParentTreeItem && sPrefix != HyGuiInternalPrefix)
+	if(pParentTreeItem && sPrefix.startsWith(HyGuiInternalPrefix) == false)
 		pParentTreeItem->addChild(m_pTreeItemPtr);
 }
 

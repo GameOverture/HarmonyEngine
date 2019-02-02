@@ -250,6 +250,9 @@ void HarmonyWidget::OnBootCheck()
 		m_pTimer->start(10);
 
 		makeCurrent();
+
+		m_pProject->GenerateSystemItems();
+
 		sm_bHarmonyLoaded = true;
 	}
 }

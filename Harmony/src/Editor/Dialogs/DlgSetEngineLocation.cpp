@@ -19,26 +19,6 @@ DlgSetEngineLocation::DlgSetEngineLocation(QWidget *parent) :
 {
 	ui->setupUi(this);
 	
-	//QString sTempDir = "C:/soft";
-
-
-	//QFileDialog *fd = new QFileDialog;
-
-//    fd->
-//    QTreeView *tree = fd->findChild <QTreeView*>();
-//    tree->setRootIsDecorated(true);
-//    tree->setItemsExpandable(true);
-//    fd->setFileMode(QFileDialog::Directory);
-//    fd->setOption(QFileDialog::ShowDirsOnly);
-//    fd->setViewMode(QFileDialog::Detail);
-//    int result = fd->exec();
-//    QString directory;
-//    if (result)
-//    {
-//        directory = fd->selectedFiles()[0];
-//        qDebug()<<directory;
-//    }
-	
 	m_pFileModel = new QFileSystemModel(this);
 	m_pFileModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
 	m_pFileModel->setRootPath(QDir::currentPath());
@@ -63,18 +43,18 @@ void DlgSetEngineLocation::on_listView_doubleClicked(const QModelIndex &index)
 	if(ui->buttonBox->button(QDialogButtonBox::Ok)->isEnabled() == false)
 		ui->listView->setRootIndex(index);
 	
-	QString sPath = m_pFileModel->fileInfo(index).absoluteFilePath();
-	ui->txtCurDirectory->setText(sPath);
+	m_DirPathUndoStack.push(new DlgSetEngineLocationUndoCmd(m_sDirPath, m_pFileModel->fileInfo(index).absoluteFilePath()));
+
+	ui->txtCurDirectory->setText(m_sDirPath);
 
 	ErrorCheck();
 }
 
 void DlgSetEngineLocation::on_txtCurDirectory_editingFinished()
 {
-	QString sPath = ui->txtCurDirectory->text();// m_pDirModel->fileInfo(index).absoluteFilePath();
-	ui->listView->setRootIndex(m_pFileModel->setRootPath(sPath));
-	
-	//ui->txtCurDirectory->setText(sPath);
+	m_DirPathUndoStack.push(new DlgSetEngineLocationUndoCmd(m_sDirPath, ui->txtCurDirectory->text()));
+
+	ui->listView->setRootIndex(m_pFileModel->setRootPath(m_sDirPath));
 
 	ErrorCheck();
 }
@@ -121,10 +101,49 @@ void DlgSetEngineLocation::ErrorCheck()
 	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
 }
 
-void DlgSetEngineLocation::on_listView_clicked(const QModelIndex &index)
+//void DlgSetEngineLocation::on_listView_clicked(const QModelIndex &index)
+//{
+//	QString sPath = m_pFileModel->fileInfo(index).absoluteFilePath();
+//	ui->txtCurDirectory->setText(sPath);
+//
+//	ErrorCheck();
+//}
+
+void DlgSetEngineLocation::on_btnBack_clicked()
 {
-	QString sPath = m_pFileModel->fileInfo(index).absoluteFilePath();
-	ui->txtCurDirectory->setText(sPath);
+	if(m_DirPathUndoStack.canUndo() == false)
+		return;
+
+	m_DirPathUndoStack.undo();
+
+	ui->txtCurDirectory->setText(m_sDirPath);
+	ui->listView->setRootIndex(m_pFileModel->setRootPath(m_sDirPath));
+
+	ErrorCheck();
+}
+
+void DlgSetEngineLocation::on_btnForward_clicked()
+{
+	if(m_DirPathUndoStack.canRedo() == false)
+		return;
+
+	m_DirPathUndoStack.redo();
+
+	ui->txtCurDirectory->setText(m_sDirPath);
+	ui->listView->setRootIndex(m_pFileModel->setRootPath(m_sDirPath));
+
+	ErrorCheck();
+}
+
+void DlgSetEngineLocation::on_btnUp_clicked()
+{
+	QDir dir(m_sDirPath);
+	if(dir.cdUp() == false)
+		return;
+
+	m_DirPathUndoStack.push(new DlgSetEngineLocationUndoCmd(m_sDirPath, dir.absolutePath()));
+	ui->listView->setRootIndex(m_pFileModel->setRootPath(m_sDirPath));
+	ui->txtCurDirectory->setText(m_sDirPath);
 
 	ErrorCheck();
 }

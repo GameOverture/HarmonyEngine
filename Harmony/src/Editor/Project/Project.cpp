@@ -206,7 +206,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 				{
 					ProjectItem *pNewDataItem = new ProjectItem(*this, eType, pCurPrefixTreeItem, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
 
-					if(sCurPrefixPath == HyGuiInternalPrefix && sPathPartList[iPathPartIndex] == "+HyFont")
+					if(sPathPartList[iPathPartIndex] == "+HyFont")
 						m_bSystemFontFound = true;
 
 #ifdef RESAVE_ENTIRE_PROJECT
@@ -235,6 +235,32 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 bool Project::HasError() const
 {
 	return m_bHasError;
+}
+
+void Project::GenerateSystemItems()
+{
+	if(m_bSystemFontFound == false)
+	{
+		QDir templateDataDir(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/");
+		QFile srcFile(templateDataDir.absoluteFilePath("src.json"));
+		if(!srcFile.open(QFile::ReadOnly))
+		{
+			HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
+			m_bHasError = true;
+		}
+		else
+		{
+			QByteArray sContents = srcFile.readAll();
+			srcFile.close();
+
+			QByteArray sBefore("[HyHarmonyTemplateDataDir]");
+			QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/").toLocal8Bit());
+			sContents.replace(sBefore, sAfter);
+			MainWindow::PasteItemSrc(sContents, this, QString());
+
+			m_bSystemFontFound = true;
+		}
+	}
 }
 
 void Project::ExecProjSettingsDlg()
@@ -634,29 +660,6 @@ bool Project::HarmonyInitialize()
 
 	if(m_pTabBar->currentIndex() >= 0)
 		m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawShow();
-
-	if(m_bSystemFontFound == false)
-	{
-		QDir templateDataDir(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/");
-		QFile srcFile(templateDataDir.absoluteFilePath("src.json"));
-		if(!srcFile.open(QFile::ReadOnly))
-		{
-			HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
-			m_bHasError = true;
-		}
-		else
-		{
-			QByteArray sContents = srcFile.readAll();
-			srcFile.close();
-
-			QByteArray sBefore("[HyHarmonyTemplateDataDir]");
-			QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/").toLocal8Bit());
-			sContents.replace(sBefore, sAfter);
-			MainWindow::PasteItemSrc(sContents, this, QString());
-
-			m_bSystemFontFound = true;
-		}
-	}
 
 	return true;
 }

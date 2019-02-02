@@ -48,21 +48,21 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QToolButton" name="toolButton">
+      <widget class="QToolButton" name="btnBack">
        <property name="text">
         <string>&lt;</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_2">
+      <widget class="QToolButton" name="btnForward">
        <property name="text">
         <string>&gt;</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_3">
+      <widget class="QToolButton" name="btnUp">
        <property name="text">
         <string>^</string>
        </property>
@@ -124,8 +124,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>257</x>
+     <y>498</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -140,8 +140,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>325</x>
+     <y>498</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -150,4 +150,9 @@
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>on_btnBack_clicked()</slot>
+  <slot>on_btnForward_clicked()</slot>
+  <slot>on_btnUp_clicked()</slot>
+ </slots>
 </ui>

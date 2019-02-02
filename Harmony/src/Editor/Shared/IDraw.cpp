@@ -56,7 +56,7 @@ IDraw::IDraw(ProjectItem *pProjItem) :
 
 /*virtual*/ IDraw::~IDraw()
 {
-	Hy_Window().RemoveCamera(m_pCamera);
+	//Hy_Window().RemoveCamera(m_pCamera); // Closing the whole application has trouble with this
 }
 
 void IDraw::ApplyJsonData()

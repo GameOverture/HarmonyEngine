@@ -66,6 +66,8 @@ public:
 	virtual ~Project();
 
 	bool HasError() const;
+
+	void GenerateSystemItems();
 	
 	void ExecProjSettingsDlg();
 
