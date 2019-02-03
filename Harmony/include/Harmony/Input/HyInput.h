@@ -17,7 +17,7 @@ class HyWindow;
 
 class HyInput
 {
-	friend class IHyEngine;
+	friend class HyEngine;
 
 	const uint32				m_uiNUM_INPUT_MAPS;
 	HyInputMap *				m_pInputMaps;

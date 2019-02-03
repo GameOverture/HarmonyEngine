@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 	HarmonyInit initStruct("%HY_CLASS%.hyproj");
 
 	%HY_CLASS% *pGame = new %HY_CLASS%(initStruct);
-	HyEngine::RunGame(pGame);
+	pGame->RunGame();
 
 	return 0;
 }

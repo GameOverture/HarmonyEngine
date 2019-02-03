@@ -23,13 +23,13 @@ class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
 	static bool					sm_bHarmonyLoaded;
 	Project *					m_pProject;
 
-	class GuiHyEngine : public IHyEngine
+	class GuiHyEngine : public HyEngine
 	{
 		Project *				m_pProject;
 
 	public:
 		GuiHyEngine(HarmonyInit &initStruct, Project *pProject) :
-			IHyEngine(initStruct),
+			HyEngine(initStruct),
 			m_pProject(pProject)
 		{
 			m_pProject->HarmonyInitialize();

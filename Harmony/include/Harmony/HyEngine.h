@@ -37,9 +37,9 @@
 #include "Utilities/HyImage.h"
 #include "Utilities/HyStrManip.h"
 
-class IHyEngine
+class HyEngine
 {
-	static IHyEngine *			sm_pInstance;
+	static HyEngine *			sm_pInstance;
 
 	// The order of these member declarations matter as some are used to initialize the others
 	const HarmonyInit			m_Init;
@@ -57,15 +57,15 @@ class IHyEngine
 	HyRendererInterop			m_Renderer;
 
 public:
-	IHyEngine(HarmonyInit &initStruct);
-	~IHyEngine();
+	HyEngine(HarmonyInit &initStruct);
+	~HyEngine();
 
 	HyRendererInterop &GetRenderer();
 
 	void RunGame();
 
 protected:
-	virtual bool OnUpdate() = 0;
+	virtual bool OnUpdate() { return true; }
 
 #ifdef HY_PLATFORM_GUI
 public:
