@@ -260,6 +260,9 @@
     <ClCompile Include="UI\HyButton.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities\HyRand.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -693,6 +696,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\UI\HyButton.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Utilities\HyRand.h">
+      <Filter>Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -148,6 +148,7 @@
     <ClCompile Include="Utilities\HyBitManip.cpp" />
     <ClCompile Include="Utilities\HyFileIO.cpp" />
     <ClCompile Include="Utilities\HyMath.cpp" />
+    <ClCompile Include="Utilities\HyRand.cpp" />
     <ClCompile Include="Utilities\HyStrManip.cpp" />
     <ClCompile Include="Utilities\HyVariant.cpp" />
     <ClCompile Include="Utilities\jasonxx.cc" />
@@ -255,6 +256,7 @@
     <ClInclude Include="..\..\include\Harmony\Utilities\HyBitManip.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyFileIO.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyMath.h" />
+    <ClInclude Include="..\..\include\Harmony\Utilities\HyRand.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyStrManip.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyVariant.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\json.hpp" />
