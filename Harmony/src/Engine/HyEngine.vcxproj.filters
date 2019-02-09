@@ -260,9 +260,6 @@
     <ClCompile Include="UI\HyButton.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\HyRand.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">

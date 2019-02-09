@@ -35,11 +35,12 @@
 
 /*static*/ MainWindow *MainWindow::sm_pInstance = nullptr;
 
-MainWindow::MainWindow(QWidget *pParent) :  QMainWindow(pParent),
-											ui(new Ui::MainWindow),
-											m_Harmony(*this),
-											m_eTheme(THEME_Lappy486),
-											m_Settings(HyOrganizationName, HyEditorToolName)
+MainWindow::MainWindow(QWidget *pParent) :
+	QMainWindow(pParent),
+	ui(new Ui::MainWindow),
+	m_Harmony(*this),
+	m_eTheme(THEME_Lappy486),
+	m_Settings(HyOrganizationName, HyEditorToolName)
 {
 	ui->setupUi(this);
 	sm_pInstance = this;

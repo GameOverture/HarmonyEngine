@@ -11,8 +11,6 @@
 #define HyCompiler_MSVC_h__
 
  // Data types
-typedef signed char			char8;
-typedef unsigned char		uchar8;
 typedef signed char			int8;
 typedef unsigned char		uint8;
 typedef signed short		int16;

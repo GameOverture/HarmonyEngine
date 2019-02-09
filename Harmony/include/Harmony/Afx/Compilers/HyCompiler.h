@@ -69,29 +69,27 @@
 template<typename T>
 struct hy_is_type_integer
 {
-	static constexpr bool value = std::is_same<T,              short>::value ||
-								  std::is_same<T,                int>::value ||
-								  std::is_same<T,               long>::value ||
-								  std::is_same<T,          long long>::value ||
-								  std::is_same<T,     unsigned short>::value ||
-								  std::is_same<T,       unsigned int>::value ||
-								  std::is_same<T,      unsigned long>::value ||
-								  std::is_same<T, unsigned long long>::value;
+	static constexpr bool value = std::is_same<T, int16>::value ||
+								  std::is_same<T, int32>::value ||
+								  std::is_same<T, int64>::value ||
+								  std::is_same<T, uint16>::value ||
+								  std::is_same<T, uint32>::value ||
+								  std::is_same<T, uint64>::value;
 };
 
 template<typename T>
 struct hy_is_type_real
 {
-	static constexpr bool value = std::is_same<T,       float>::value ||
-								  std::is_same<T,      double>::value ||
+	static constexpr bool value = std::is_same<T, float>::value ||
+								  std::is_same<T, double>::value ||
 								  std::is_same<T, long double>::value;
 };
 
 template<typename T>
 struct hy_is_type_byte
 {
-	static constexpr bool value = std::is_same<T,   signed char>::value ||
-								  std::is_same<T, unsigned char>::value;
+	static constexpr bool value = std::is_same<T, int8>::value ||
+								  std::is_same<T, uint8>::value;
 };
 
 template<typename T>

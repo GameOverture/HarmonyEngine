@@ -148,7 +148,6 @@
     <ClCompile Include="Utilities\HyBitManip.cpp" />
     <ClCompile Include="Utilities\HyFileIO.cpp" />
     <ClCompile Include="Utilities\HyMath.cpp" />
-    <ClCompile Include="Utilities\HyRand.cpp" />
     <ClCompile Include="Utilities\HyStrManip.cpp" />
     <ClCompile Include="Utilities\HyVariant.cpp" />
     <ClCompile Include="Utilities\jasonxx.cc" />
