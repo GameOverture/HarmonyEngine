@@ -228,8 +228,10 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : 
 
 /*virtual*/ Project::~Project()
 {
-	delete m_pDraw;
 	delete m_pAtlasWidget;
+
+	Harmony::OnProjectDestructor(this); // Order matters because this calls Project::HarmonyShutdown()
+	delete m_pDraw;
 }
 
 bool Project::HasError() const

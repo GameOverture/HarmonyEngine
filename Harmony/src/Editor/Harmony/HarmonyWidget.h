@@ -55,6 +55,7 @@ public:
 	Project *GetProject();
 
 	bool IsProject(Project *pProjectToTest);
+	void CloseProject();
 
 	void SetCursor(Qt::CursorShape eShape);
 	void RestoreCursor();

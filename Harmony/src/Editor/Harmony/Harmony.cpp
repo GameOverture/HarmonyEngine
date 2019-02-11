@@ -70,6 +70,12 @@ Harmony::Harmony(MainWindow &mainWindowRef) :  QObject(&mainWindowRef),
 	SetProject(pProject);
 }
 
+/*static*/ void Harmony::OnProjectDestructor(Project *pProject)
+{
+	if(sm_pInstance->m_pWidget->IsProject(pProject))
+		sm_pInstance->m_pWidget->CloseProject();
+}
+
 /*static*/ HarmonyWidget *Harmony::GetWidget(Project *pProject)
 {
 	if(sm_pInstance->m_pWidget->IsProject(pProject) == false)

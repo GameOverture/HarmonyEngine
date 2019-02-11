@@ -48,6 +48,13 @@ bool HarmonyWidget::IsProject(Project *pProjectToTest)
 	return m_pProject == pProjectToTest;
 }
 
+void HarmonyWidget::CloseProject()
+{
+	delete m_pHyEngine;
+	m_pHyEngine = nullptr;
+	m_pProject = nullptr;
+}
+
 void HarmonyWidget::SetCursor(Qt::CursorShape eShape)
 {
 	setCursor(eShape);
@@ -97,7 +104,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::paintGL() /*override*/
 {
-	if(sm_bHarmonyLoaded)
+	if(sm_bHarmonyLoaded && m_pProject)
 	{
 		if(m_pHyEngine->Update() == false)
 			HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);

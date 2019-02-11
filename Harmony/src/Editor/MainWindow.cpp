@@ -435,8 +435,8 @@ void MainWindow::on_actionOpenProject_triggered()
 
 void MainWindow::on_actionCloseProject_triggered()
 {
-	Harmony::SetProject(nullptr);
 	ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
+	Harmony::SetProject(nullptr);
 }
 
 void MainWindow::on_actionNewPrefix_triggered()

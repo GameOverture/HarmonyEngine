@@ -37,6 +37,8 @@ public:
 	static void SetProject(Project *pProject);
 	static void Reload(Project *pProject);
 
+	static void OnProjectDestructor(Project *pProject);
+
 	static HarmonyWidget *GetWidget(Project *pProject);
 
 private Q_SLOTS:
