@@ -77,9 +77,10 @@ bool IHyThreadClass::ThreadStop()
 			m_bAutoResetWaiting = false;
 			m_bWaitComplete = true;
 		}
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-		stateEvent.notify_one();
+		//std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
+
+	stateEvent.notify_one();
 	return true;
 }
 
