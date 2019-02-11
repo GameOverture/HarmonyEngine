@@ -21,37 +21,27 @@
 
 struct FontTypeface
 {
-	uint                uiReferenceCount;
+	uint					uiReferenceCount;
 
-	QString             sFontPath;
-	texture_font_t *    pTextureFont;
-	rendermode_t        eMode;
-	float               fSize;
-	float               fOutlineThickness;
+	QString					sFontPath;
+	texture_font_t *		pTextureFont;
+	rendermode_t			eMode;
+	float					fSize;
+	float					fOutlineThickness;
 
-	FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :   uiReferenceCount(0),
-																											sFontPath(sFontFilePath),
-																											pTextureFont(nullptr),
-																											eMode(eRenderMode),
-																											fSize(fSize),
-																											fOutlineThickness(fOutlineThickness)
+	FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :
+		uiReferenceCount(0),
+		sFontPath(sFontFilePath),
+		pTextureFont(nullptr),
+		eMode(eRenderMode),
+		fSize(fSize),
+		fOutlineThickness(fOutlineThickness)
 	{ }
 
 	~FontTypeface()
 	{
 		if(pTextureFont)
 			texture_font_delete(pTextureFont);
-	}
-
-	void SetFont(texture_font_t *pNewFont)
-	{
-		if(pTextureFont)
-			texture_font_delete(pTextureFont);
-
-		pTextureFont = pNewFont;
-		pTextureFont->size = fSize;
-		pTextureFont->rendermode = eMode;
-		pTextureFont->outline_thickness = fOutlineThickness;
 	}
 };
 
@@ -84,22 +74,15 @@ class FontModel : public IModel
 {
 	Q_OBJECT
 
-	QDir                        m_FontMetaDir;
+	QDir						m_FontMetaDir;
 
 	PropertiesTreeModel			m_TypeFacePropertiesModel;
-	
-//	CheckBoxMapper *            m_pChkMapper_09;
-//	CheckBoxMapper *            m_pChkMapper_AZ;
-//	CheckBoxMapper *            m_pChkMapper_az;
-//	CheckBoxMapper *            m_pChkMapper_Symbols;
-//	LineEditMapper *            m_pTxtMapper_AdditionalSymbols;
 
-	AtlasFrame *                m_pTrueAtlasFrame;
-
-	QString                     m_sAvailableTypefaceGlyphs;
+	AtlasFrame *				m_pTrueAtlasFrame;
 
 	QJsonArray                  m_TypefaceArray;
 
+	
 	QList<FontTypeface *>       m_MasterLayerList;
 
 	texture_atlas_t *           m_pFtglAtlas;
@@ -110,15 +93,11 @@ public:
 	FontModel(ProjectItem &itemRef, QJsonObject fontObj);
 	virtual ~FontModel();
 
+	QString GetAvailableTypefaceGlyphs() const;
+
 	QDir GetMetaDir();
 
 	PropertiesTreeModel *GetTypefaceModel();
-
-//	CheckBoxMapper *Get09Mapper();
-//	CheckBoxMapper *GetAZMapper();
-//	CheckBoxMapper *GetazMapper();
-//	CheckBoxMapper *GetSymbolsMapper();
-//	LineEditMapper *GetAdditionalSymbolsMapper();
 
 	QList<FontTypeface *> GetMasterStageList();
 

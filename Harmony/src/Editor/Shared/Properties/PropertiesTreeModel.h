@@ -52,7 +52,8 @@ public:
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 
-	// Editable:
+	// Edit data:
+	// This creates an Undo command to be pushed on the UndoStack
 	bool setData(const QModelIndex &index, const QVariant &value, int iRole = Qt::EditRole) override;
 
 	Qt::ItemFlags flags(const QModelIndex& index) const override;

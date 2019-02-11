@@ -157,49 +157,38 @@ float FontStateData::GetSize()
 #define FONTPROP_Symbols "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@"
 #define FONTPROP_AdditionalSyms "Additional glyphs"
 
-FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :   IModel(itemRef),
-																	m_FontMetaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_Font, true)),
-																	m_TypeFacePropertiesModel(itemRef, 0, QVariant(0)),
-																	m_pTrueAtlasFrame(nullptr),
-																	m_pFtglAtlas(nullptr),
-																	m_pSubAtlasPixelData(nullptr),
-																	m_uiSubAtlasBufferSize(0)
+FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :
+	IModel(itemRef),
+	m_FontMetaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_Font, true)),
+	m_TypeFacePropertiesModel(itemRef, 0, QVariant(0)),
+	m_pTrueAtlasFrame(nullptr),
+	m_pFtglAtlas(nullptr),
+	m_pSubAtlasPixelData(nullptr),
+	m_uiSubAtlasBufferSize(0)
 {
-	m_TypeFacePropertiesModel.AppendCategory("Atlas Info", HyGlobal::ItemColor(ITEM_Prefix));
-	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", FONTPROP_Dimensions, PropertiesDef(PROPERTIESTYPE_ivec2, QVariant(QPoint(0, 0))), "The required portion size needed to fit on an atlas", true);
-	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", FONTPROP_UsedPercent, PropertiesDef(PROPERTIESTYPE_double, QVariant(0.0)), "Percentage of the maximum size dimensions used", true);
+	bool b09 = true;
+	bool bAZ = true;
+	bool baz = true;
+	bool bSymbols = true;
+	QString sAdditional = "";
 
-	m_TypeFacePropertiesModel.AppendCategory("Uses Glyphs", HyGlobal::ItemColor(ITEM_Prefix));
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_09, PropertiesDef(PROPERTIESTYPE_bool, QVariant(Qt::Checked)), "Include numerical glyphs 0-9");
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_AZ, PropertiesDef(PROPERTIESTYPE_bool, QVariant(Qt::Checked)), "Include capital letter glyphs A-Z");
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_az, PropertiesDef(PROPERTIESTYPE_bool, QVariant(Qt::Checked)), "Include lowercase letter glyphs a-z");
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_Symbols, PropertiesDef(PROPERTIESTYPE_bool, QVariant(Qt::Checked)), "Include common punctuation and symbol glyphs");
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_AdditionalSyms, PropertiesDef(PROPERTIESTYPE_LineEdit, QVariant("")), "Include specified glyphs");
-
-//	m_pChkMapper_09 = new CheckBoxMapper(this);
-//	m_pChkMapper_AZ = new CheckBoxMapper(this);
-//	m_pChkMapper_az = new CheckBoxMapper(this);
-//	m_pChkMapper_Symbols = new CheckBoxMapper(this);
-//	m_pTxtMapper_AdditionalSymbols = new LineEditMapper(this);
-	
-	// If item's init value is defined, parse and initalize with it, otherwise make default empty font
+	// If item's init value is defined, parse and initialize with it, otherwise make default empty font
 	if(fontObj.empty() == false)
 	{
 		QJsonObject availGlyphsObj = fontObj["availableGlyphs"].toObject();
+		b09 = availGlyphsObj[FONTPROP_09].toBool();
+		bAZ = availGlyphsObj[FONTPROP_AZ].toBool();
+		baz = availGlyphsObj[FONTPROP_az].toBool();
+		bSymbols = availGlyphsObj["symbols"].toBool();
+		sAdditional = availGlyphsObj["additional"].toString();
 		
-//		m_pChkMapper_09->SetChecked(availGlyphsObj["0-9"].toBool());
-//		m_pChkMapper_AZ->SetChecked(availGlyphsObj["A-Z"].toBool());
-//		m_pChkMapper_az->SetChecked(availGlyphsObj["a-z"].toBool());
-//		m_pChkMapper_Symbols->SetChecked(availGlyphsObj["symbols"].toBool());
-//		m_pTxtMapper_AdditionalSymbols->SetString(availGlyphsObj["additional"].toString());
-		
+		int iAffectedFrameIndex = 0;
 		QList<quint32> idRequestList;
 		idRequestList.append(JSONOBJ_TOINT(fontObj, "id"));
-
-		int iAffectedFrameIndex = 0;
 		QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, idRequestList, iAffectedFrameIndex);
 		m_pTrueAtlasFrame = pRequestedList[0];
 
+		// Must set 'm_TypefaceArray' before any AppendState() call
 		m_TypefaceArray = fontObj["typefaceArray"].toArray();
 		
 		QJsonArray stateArray = fontObj["stateArray"].toArray();
@@ -210,12 +199,54 @@ FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :   IModel(itemR
 	{
 		AppendState<FontStateData>(QJsonObject());
 	}
+
+	m_TypeFacePropertiesModel.AppendCategory("Atlas Info", HyGlobal::ItemColor(ITEM_Prefix));
+	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", FONTPROP_Dimensions, PropertiesDef(PROPERTIESTYPE_ivec2, QVariant(QPoint(0, 0))), "The required portion size needed to fit on an atlas", true);
+	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", FONTPROP_UsedPercent, PropertiesDef(PROPERTIESTYPE_double, QVariant(0.0)), "Percentage of the maximum size dimensions used", true);
+
+	m_TypeFacePropertiesModel.AppendCategory("Uses Glyphs", HyGlobal::ItemColor(ITEM_Prefix));
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_09, PropertiesDef(PROPERTIESTYPE_bool, QVariant(b09 ? Qt::Checked : Qt::Unchecked)), "Include numerical glyphs 0-9");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_AZ, PropertiesDef(PROPERTIESTYPE_bool, QVariant(bAZ ? Qt::Checked : Qt::Unchecked)), "Include capital letter glyphs A-Z");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_az, PropertiesDef(PROPERTIESTYPE_bool, QVariant(baz ? Qt::Checked : Qt::Unchecked)), "Include lowercase letter glyphs a-z");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_Symbols, PropertiesDef(PROPERTIESTYPE_bool, QVariant(bSymbols ? Qt::Checked : Qt::Unchecked)), "Include common punctuation and symbol glyphs");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_AdditionalSyms, PropertiesDef(PROPERTIESTYPE_LineEdit, QVariant(sAdditional)), "Include specified glyphs");
 }
 
 /*virtual*/ FontModel::~FontModel()
 {
 	for(int i = 0; i < m_MasterLayerList.count(); ++i)
 		delete m_MasterLayerList[i];
+}
+
+QString FontModel::GetAvailableTypefaceGlyphs() const
+{
+	// Assemble glyph set
+	QString sAvailableTypefaceGlyphs;
+	sAvailableTypefaceGlyphs.clear();
+	sAvailableTypefaceGlyphs += ' ';
+
+	QVariant propValue;
+
+	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_09);
+	if(propValue.toInt() == Qt::Checked)
+		sAvailableTypefaceGlyphs += "0123456789";
+
+	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_az);
+	if(propValue.toInt() == Qt::Checked)
+		sAvailableTypefaceGlyphs += "abcdefghijklmnopqrstuvwxyz";
+
+	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_AZ);
+	if(propValue.toInt() == Qt::Checked)
+		sAvailableTypefaceGlyphs += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_Symbols);
+	if(propValue.toInt() == Qt::Checked)
+		sAvailableTypefaceGlyphs += FONTPROP_Symbols;
+
+	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_AdditionalSyms);
+	sAvailableTypefaceGlyphs += propValue.toString(); // May contain duplicates as stated in freetype-gl documentation
+
+	return sAvailableTypefaceGlyphs;
 }
 
 QDir FontModel::GetMetaDir()
@@ -227,31 +258,6 @@ PropertiesTreeModel *FontModel::GetTypefaceModel()
 {
 	return &m_TypeFacePropertiesModel;
 }
-
-//CheckBoxMapper *FontModel::Get09Mapper()
-//{
-//	return m_pChkMapper_09;
-//}
-
-//CheckBoxMapper *FontModel::GetAZMapper()
-//{
-//	return m_pChkMapper_AZ;
-//}
-
-//CheckBoxMapper *FontModel::GetazMapper()
-//{
-//	return m_pChkMapper_az;
-//}
-
-//CheckBoxMapper *FontModel::GetSymbolsMapper()
-//{
-//	return m_pChkMapper_Symbols;
-//}
-
-//LineEditMapper *FontModel::GetAdditionalSymbolsMapper()
-//{
-//	return m_pTxtMapper_AdditionalSymbols;
-//}
 
 QList<FontTypeface *> FontModel::GetMasterStageList()
 {
@@ -290,6 +296,9 @@ void FontModel::GeneratePreview()
 	bool bDoInitialShrink = true;
 	size_t iNumMissedGlyphs = 0;
 	int iNumPasses = 0;
+
+	QString sAvailableTypefaceGlyphs = GetAvailableTypefaceGlyphs();
+
 	do
 	{
 		iNumPasses++;
@@ -305,15 +314,22 @@ void FontModel::GeneratePreview()
 
 		for(int i = 0; i < m_MasterLayerList.count(); ++i)
 		{
-			texture_font_t *pFtglFont = texture_font_new_from_file(m_pFtglAtlas, m_MasterLayerList[i]->fSize, m_MasterLayerList[i]->sFontPath.toStdString().c_str());
-			if(pFtglFont == NULL)
+			if(m_MasterLayerList[i]->pTextureFont)
+				texture_font_delete(m_MasterLayerList[i]->pTextureFont);
+
+			// Applies texture font attributes like size, render mode, outline thickness
+			m_MasterLayerList[i]->pTextureFont = texture_font_new_from_file(m_pFtglAtlas, m_MasterLayerList[i]->fSize, m_MasterLayerList[i]->sFontPath.toStdString().c_str());
+			if(m_MasterLayerList[i]->pTextureFont == nullptr)
 			{
 				HyGuiLog("Could not create freetype font from: " % m_MasterLayerList[i]->sFontPath, LOGTYPE_Error);
 				return;
 			}
 
-			m_MasterLayerList[i]->SetFont(pFtglFont);   // Applies its attributes like size, render mode, outline thickness
-			iNumMissedGlyphs += texture_font_load_glyphs(pFtglFont, m_sAvailableTypefaceGlyphs.toUtf8().data());
+			m_MasterLayerList[i]->pTextureFont->size = m_MasterLayerList[i]->fSize;
+			m_MasterLayerList[i]->pTextureFont->rendermode = m_MasterLayerList[i]->eMode;
+			m_MasterLayerList[i]->pTextureFont->outline_thickness = m_MasterLayerList[i]->fOutlineThickness;
+
+			iNumMissedGlyphs += texture_font_load_glyphs(m_MasterLayerList[i]->pTextureFont, sAvailableTypefaceGlyphs.toUtf8().data());
 		}
 
 		if(iNumMissedGlyphs && curAtlasSize == atlasSize)
@@ -340,7 +356,7 @@ void FontModel::GeneratePreview()
 	else
 	{
 		HyGuiLog("Generated " % m_ItemRef.GetName(true) % " Preview", LOGTYPE_Info);
-		HyGuiLog(QString::number(m_MasterLayerList.count()) % " fonts with " % QString::number(m_sAvailableTypefaceGlyphs.size()) % " glyphs each (totaling " % QString::number(m_sAvailableTypefaceGlyphs.size() * m_MasterLayerList.count()) % ").", LOGTYPE_Normal);
+		HyGuiLog(QString::number(m_MasterLayerList.count()) % " fonts with " % QString::number(sAvailableTypefaceGlyphs.size()) % " glyphs each (totaling " % QString::number(sAvailableTypefaceGlyphs.size() * m_MasterLayerList.count()) % ").", LOGTYPE_Normal);
 		HyGuiLog("Font Atlas size: " % QString::number(m_pFtglAtlas->width) % "x" % QString::number(m_pFtglAtlas->height) % " (Utilizing " % QString::number(100.0*m_pFtglAtlas->used / (float)(m_pFtglAtlas->width*m_pFtglAtlas->height)) % "%) (Num Passes: " % QString::number(iNumPasses) % ")", LOGTYPE_Normal);
 	}
 
@@ -389,6 +405,7 @@ void FontModel::GeneratePreview()
 	}
 	else
 	{
+		// Copy font files into the font meta directory
 		for(int i = 0; i < m_MasterLayerList.count(); ++i)
 		{
 			QFileInfo tmpFontFile(m_MasterLayerList[i]->pTextureFont->filename);
@@ -431,6 +448,7 @@ void FontModel::GeneratePreview()
 	fontObj.insert("availableGlyphs", availableGlyphsObj);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	QString sAvailableTypefaceGlyphs = GetAvailableTypefaceGlyphs();
 	QJsonArray typefaceArray;
 	for(int i = 0; i < m_MasterLayerList.count(); ++i)
 	{
@@ -443,10 +461,10 @@ void FontModel::GeneratePreview()
 		stageObj.insert("outlineThickness", m_MasterLayerList[i]->fOutlineThickness);
 		
 		QJsonArray glyphsArray;
-		for(int j = 0; j < m_sAvailableTypefaceGlyphs.count(); ++j)
+		for(int j = 0; j < sAvailableTypefaceGlyphs.count(); ++j)
 		{
 			// NOTE: Assumes LITTLE ENDIAN
-			QString sSingleChar = m_sAvailableTypefaceGlyphs[j];
+			QString sSingleChar = sAvailableTypefaceGlyphs[j];
 			texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterLayerList[i]->pTextureFont, sSingleChar.toUtf8().data());
 
 			QJsonObject glyphInfoObj;
@@ -472,13 +490,13 @@ void FontModel::GeneratePreview()
 			}
 			
 			QJsonObject kerningInfoObj;
-			for(int k = 0; k < m_sAvailableTypefaceGlyphs.count(); ++k)
+			for(int k = 0; k < sAvailableTypefaceGlyphs.count(); ++k)
 			{
-				char cTmpChar = m_sAvailableTypefaceGlyphs.toStdString().c_str()[k];
+				char cTmpChar = sAvailableTypefaceGlyphs.toStdString().c_str()[k];
 				float fKerningAmt = texture_glyph_get_kerning(pGlyph, &cTmpChar);
 				
 				if(fKerningAmt != 0.0f)
-					kerningInfoObj.insert(QString(m_sAvailableTypefaceGlyphs[k]), fKerningAmt);
+					kerningInfoObj.insert(QString(sAvailableTypefaceGlyphs[k]), fKerningAmt);
 			}
 			glyphInfoObj.insert("kerning", kerningInfoObj);
 			
@@ -586,33 +604,7 @@ void FontModel::GeneratePreview()
 			m_MasterLayerList.removeAt(i);
 		}
 	}
-	
-	// Assemble glyph set
-	m_sAvailableTypefaceGlyphs.clear();
-	m_sAvailableTypefaceGlyphs += ' ';
 
-
-	QVariant propValue;
-
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_09);
-	if(propValue.toInt() == Qt::Checked)
-		m_sAvailableTypefaceGlyphs += "0123456789";
-
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_az);
-	if(propValue.toInt() == Qt::Checked)
-		m_sAvailableTypefaceGlyphs += "abcdefghijklmnopqrstuvwxyz";
-
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_AZ);
-	if(propValue.toInt() == Qt::Checked)
-		m_sAvailableTypefaceGlyphs += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_Symbols);
-	if(propValue.toInt() == Qt::Checked)
-		m_sAvailableTypefaceGlyphs += "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@";
-
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_AdditionalSyms);
-	m_sAvailableTypefaceGlyphs += propValue.toString(); // May contain duplicates as stated in freetype-gl documentation
-	
 	GeneratePreview();
 }
 

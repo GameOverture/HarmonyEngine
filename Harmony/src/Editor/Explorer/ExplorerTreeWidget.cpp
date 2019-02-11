@@ -71,8 +71,7 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 	{
 		QDrag *pDrag = new QDrag(m_pDraggedProjItem);
 		pDrag->setMimeData(new ProjectItemMimeData(m_pDraggedProjItem));
-
-		//pDrag->setPixmap(m_pDraggedProjItem->GetIcon(SUBICON_None).pixmap());
+		pDrag->setPixmap(m_pDraggedProjItem->GetIcon(SUBICON_None).pixmap(16, 16));
 
 		Qt::DropAction dropAction = pDrag->exec(Qt::CopyAction | Qt::MoveAction | Qt::LinkAction);
 
@@ -119,28 +118,28 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 
 /*virtual*/ void ExplorerTreeWidget::dropEvent(QDropEvent *pEvent) /*override*/
 {
-	if(pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE))
-	{
-		QByteArray dragDataSrc = pEvent->mimeData()->data(HYGUI_MIMETYPE);
-		QJsonDocument userDoc = QJsonDocument::fromJson(dragDataSrc);
+	//if(pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE))
+	//{
+	//	QByteArray dragDataSrc = pEvent->mimeData()->data(HYGUI_MIMETYPE);
+	//	QJsonDocument userDoc = QJsonDocument::fromJson(dragDataSrc);
 
-		Project &projRef = static_cast<ProjectItem *>(pEvent->source())->GetProject();
+	//	Project &projRef = static_cast<ProjectItem *>(pEvent->source())->GetProject();
 
-		QJsonObject dragObj = userDoc.object();
-		if(dragObj["project"].toString().toLower() != projRef.GetAbsPath().toLower())
-		{
-			pEvent->acceptProposedAction();
-			m_pOwnerWidget->PasteItemSrc(dragDataSrc, &projRef, static_cast<ProjectItem *>(pEvent->source())->GetPrefix());
-		}
-		else
-			pEvent->ignore();
-	}
-	//else
-	//	pEvent->ignore();
+	//	QJsonObject dragObj = userDoc.object();
+	//	if(dragObj["project"].toString().toLower() != projRef.GetAbsPath().toLower())
+	//	{
+	//		pEvent->acceptProposedAction();
+	//		m_pOwnerWidget->PasteItemSrc(dragDataSrc, &projRef, static_cast<ProjectItem *>(pEvent->source())->GetPrefix());
+	//	}
+	//	else
+	//		pEvent->ignore();
+	//}
+	////else
+	////	pEvent->ignore();
 
 
-	sortItems(0, Qt::AscendingOrder);
-	//m_pOwner->GetData().WriteMetaSettings();
+	//sortItems(0, Qt::AscendingOrder);
+	////m_pOwner->GetData().WriteMetaSettings();
 
-	QTreeWidget::dropEvent(pEvent);
+	//QTreeWidget::dropEvent(pEvent);
 }
