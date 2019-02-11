@@ -33,7 +33,7 @@ public:
 		return Range<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
 	}
 
-	// Generate a random integer value in a [min; max] range
+	// Generate a random value in a [min; max] range
 	template<typename T>
 	static typename std::enable_if<hy_is_type_integer<T>::value, T>::type Range(T min, T max)
 	{
@@ -43,7 +43,7 @@ public:
 		return std::uniform_int_distribution<T>{ max, min }(GetPseudoRandInstance());
 	}
 
-	// Generate a random float value in a [min; max] range
+	// Generate a random value in a [min; max] range
 	template<typename T>
 	static typename std::enable_if<hy_is_type_real<T>::value, T>::type Range(T min, T max)
 	{
@@ -53,7 +53,7 @@ public:
 		return std::uniform_real_distribution<T>{ max, min }(GetPseudoRandInstance());
 	}
 
-	// Generate a random byte number in a [min; max] range
+	// Generate a random value in a [min; max] range
 	template<typename T>
 	static typename std::enable_if<hy_is_type_byte<T>::value, T>::type Range(T min, T max)
 	{
@@ -62,7 +62,7 @@ public:
 		return static_cast<T>( Range<short_t>(min, max));
 	}
 
-	// Generate a random character in a [from; to] range (using std::uniform_int_distribution)
+	// Generate a random value in a [min; max] range
 	template<typename T>
 	static typename std::enable_if<hy_is_type_character<T>::value, T>::type Range(T min, T max)
 	{
