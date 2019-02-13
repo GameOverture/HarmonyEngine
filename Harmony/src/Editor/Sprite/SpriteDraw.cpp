@@ -16,8 +16,29 @@
 
 SpriteDraw::SpriteDraw(ProjectItem *pProjItem) :
 	IDraw(pProjItem),
-	m_Sprite("", "+GuiPreview", this)
+	m_Sprite("", "+GuiPreview", this),
+	m_primOriginHorz(this),
+	m_primOriginVert(this)
 {
+	std::vector<glm::vec2> lineList(2, glm::vec2());
+
+	lineList[0].x = -5000.0f;
+	lineList[0].y = 0.0f;
+	lineList[1].x = 5000.0f;
+	lineList[1].y = 0.0f;
+	m_primOriginHorz.SetLineThickness(2.0f);
+	m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
+	m_primOriginHorz.SetEnabled(false);
+	m_primOriginHorz.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+
+	lineList[0].x = 0.0f;
+	lineList[0].y = -5000.0f;
+	lineList[1].x = 0.0f;
+	lineList[1].y = 5000.0f;
+	m_primOriginVert.SetLineThickness(2.0f);
+	m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
+	m_primOriginVert.SetEnabled(false);
+	m_primOriginVert.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 }
 
 /*virtual*/ SpriteDraw::~SpriteDraw()
@@ -129,8 +150,8 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 {
 	m_Sprite.SetEnabled(true);
 	
-//    if(m_pCurFrame)
-//        m_pCurFrame->SetEnabled(true);
+	m_primOriginHorz.SetEnabled(true);
+	m_primOriginVert.SetEnabled(true);
 }
 
 /*virtual*/ void SpriteDraw::OnHide() /*override*/

@@ -15,7 +15,15 @@
 class IHyThreadClass
 {
 	std::thread					m_Thread;
-	std::atomic<HyThreadState>	m_eThreadState;
+
+	enum ThreadState
+	{
+		THREADSTATE_Inactive = 0,
+		THREADSTATE_Running,
+		THREADSTATE_ShouldExit,
+		THREADSTATE_HasExited
+	};
+	std::atomic<ThreadState>	m_eThreadState;
 
 	const uint32				m_uiTHROTTLE_MS;
 	bool						m_bWaitEnabled;

@@ -203,14 +203,6 @@ enum HyWindowType
 	HYWINDOW_BorderlessWindow
 };
 
-enum HyThreadState
-{
-	HYTHREADSTATE_Inactive = 0,
-	HYTHREADSTATE_Run,
-	HYTHREADSTATE_ShouldExit,
-	HYTHREADSTATE_HasExited
-};
-
 enum HyDiagFlag
 {
 	HYDIAG_NONE				= 0,

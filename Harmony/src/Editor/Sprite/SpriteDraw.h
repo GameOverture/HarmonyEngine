@@ -15,10 +15,12 @@
 
 class SpriteDraw : public IDraw
 {
-	HySprite2d                              m_Sprite;
+	HySprite2d				m_Sprite;
 
-	QPoint                                  m_vTranslateAmt;
+	QPoint					m_vTranslateAmt;
 
+	HyPrimitive2d			m_primOriginHorz;
+	HyPrimitive2d			m_primOriginVert;
 
 public:
 	SpriteDraw(ProjectItem *pProjItem);

@@ -552,7 +552,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 void HyText2d::MarkAsDirty()
 {
-	if(IsLoaded())
+	//if(IsLoaded())
 		m_bIsDirty = true;
 }
 

@@ -16,18 +16,22 @@
 
 class FontDraw : public IDraw
 {
-	HyCamera2d *                m_pPreviewTextCamera;
-	HyTexturedQuad2d *          m_pAtlasPreviewTexQuad;
-	HyPrimitive2d               m_DrawAtlasOutline;
+	HyCamera2d *				m_pPreviewTextCamera;
+	HyTexturedQuad2d *			m_pAtlasPreviewTexQuad;
+	HyPrimitive2d				m_DrawAtlasOutline;
 
-	HyPrimitive2d               m_DividerLine;
-	HyPrimitive2d               m_PreviewOriginHorz;
+	HyPrimitive2d				m_PreviewOriginHorz;
 
-	HyText2d                    m_Text;
+	HyText2d					m_Text;
+
+	float						m_fDividerLinePos;	// 0.0f -> 1.0f
+	HyPrimitive2d				m_DividerLine;
 
 public:
 	FontDraw(ProjectItem *pProjItem);
 	virtual ~FontDraw();
+
+	void SetPreviewText(std::string sText);
 
 	virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
 

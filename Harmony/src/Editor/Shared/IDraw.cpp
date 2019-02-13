@@ -25,38 +25,17 @@
 IDraw::IDraw(ProjectItem *pProjItem) :
 	m_pProjItem(pProjItem),
 	m_pCamera(nullptr),
-	m_primOriginHorz(this),
-	m_primOriginVert(this),
 	m_bPanCameraKeyDown(false),
 	m_bIsCameraPanning(false)
 {
 	m_pCamera = Hy_Window().CreateCamera2d();
 	m_pCamera->SetEnabled(false);
-
-	std::vector<glm::vec2> lineList(2, glm::vec2());
-
-	lineList[0].x = -5000.0f;
-	lineList[0].y = 0.0f;
-	lineList[1].x = 5000.0f;
-	lineList[1].y = 0.0f;
-	m_primOriginHorz.SetLineThickness(2.0f);
-	m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
-	m_primOriginHorz.SetEnabled(false);
-	m_primOriginHorz.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
-
-	lineList[0].x = 0.0f;
-	lineList[0].y = -5000.0f;
-	lineList[1].x = 0.0f;
-	lineList[1].y = 5000.0f;
-	m_primOriginVert.SetLineThickness(2.0f);
-	m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
-	m_primOriginVert.SetEnabled(false);
-	m_primOriginVert.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 }
 
 /*virtual*/ IDraw::~IDraw()
 {
-	Hy_Window().RemoveCamera(m_pCamera);
+	if(Hy_IsInitialized())
+		Hy_Window().RemoveCamera(m_pCamera);
 }
 
 void IDraw::ApplyJsonData()
@@ -78,18 +57,12 @@ void IDraw::Show()
 	m_pCamera->SetEnabled(true);
 	OnResizeRenderer();
 
-	m_primOriginHorz.SetEnabled(true);
-	m_primOriginVert.SetEnabled(true);
-
 	OnShow();
 }
 
 void IDraw::Hide()
 {
 	m_pCamera->SetEnabled(false);
-
-	m_primOriginHorz.SetEnabled(false);
-	m_primOriginVert.SetEnabled(false);
 
 	OnHide();
 }

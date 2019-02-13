@@ -13,7 +13,7 @@
 
 #include <chrono>
 
-IHyThreadClass::IHyThreadClass(uint32 uiUpdateThrottleMs /*= 0*/) :	m_eThreadState(HYTHREADSTATE_Inactive),
+IHyThreadClass::IHyThreadClass(uint32 uiUpdateThrottleMs /*= 0*/) :	m_eThreadState(THREADSTATE_Inactive),
 																	m_uiTHROTTLE_MS(uiUpdateThrottleMs),
 																	m_bWaitEnabled(false),
 																	m_bWaitComplete(false),
@@ -29,14 +29,13 @@ IHyThreadClass::IHyThreadClass(uint32 uiUpdateThrottleMs /*= 0*/) :	m_eThreadSta
 
 bool IHyThreadClass::ThreadStart()
 {
-	if(m_eThreadState != HYTHREADSTATE_Inactive && m_eThreadState != HYTHREADSTATE_HasExited)
+	if(m_eThreadState != THREADSTATE_Inactive && m_eThreadState != THREADSTATE_HasExited)
 	{
 		HyLogWarning("IHyThreadClass::ThreadStart failed becaused thread state is not inactive.");
 		return false;
 	}
 
 	ThreadJoin();
-	m_eThreadState = HYTHREADSTATE_Run;
 	m_Thread = std::thread(&IHyThreadClass::ThreadFunc, this);
 
 	return true;
@@ -62,15 +61,15 @@ void IHyThreadClass::ThreadContinue(bool bOnlyOneUpdate)
 
 bool IHyThreadClass::ThreadStop()
 {
-	if(m_eThreadState != HYTHREADSTATE_Run && m_eThreadState != HYTHREADSTATE_ShouldExit)
+	if(m_eThreadState != THREADSTATE_Running && m_eThreadState != THREADSTATE_ShouldExit)
 	{
 		//HyLogWarning("IHyThreadClass::ThreadStop failed becaused thread state is not running.");
 		return false;
 	}
 
-	if(m_eThreadState != HYTHREADSTATE_ShouldExit)
+	if(m_eThreadState != THREADSTATE_ShouldExit)
 	{
-		m_eThreadState = HYTHREADSTATE_ShouldExit;
+		m_eThreadState = THREADSTATE_ShouldExit;
 		//ThreadContinue(false);
 		{
 			std::lock_guard<std::mutex> lock(stateMutex);
@@ -86,7 +85,7 @@ bool IHyThreadClass::ThreadStop()
 
 bool IHyThreadClass::IsThreadFinished()
 {
-	if(m_eThreadState == HYTHREADSTATE_HasExited)
+	if(m_eThreadState == THREADSTATE_HasExited)
 	{
 		ThreadJoin();
 		return true;
@@ -104,8 +103,9 @@ void IHyThreadClass::ThreadJoin()
 /*static*/ void IHyThreadClass::ThreadFunc(IHyThreadClass *pThis)
 {
 	pThis->OnThreadInit();
+	pThis->m_eThreadState = THREADSTATE_Running;
 
-	while(pThis->m_eThreadState == HYTHREADSTATE_Run)
+	while(pThis->m_eThreadState == THREADSTATE_Running)
 	{
 		if(pThis->m_bWaitEnabled)
 		{
@@ -131,5 +131,5 @@ void IHyThreadClass::ThreadJoin()
 	}
 
 	pThis->OnThreadShutdown();
-	pThis->m_eThreadState = HYTHREADSTATE_HasExited;
+	pThis->m_eThreadState = THREADSTATE_HasExited;
 }

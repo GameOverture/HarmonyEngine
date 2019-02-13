@@ -76,6 +76,7 @@ private:
 	bool Update();
 	bool PollPlatformApi();
 
+	friend bool					Hy_IsInitialized();
 	friend const HarmonyInit &	Hy_Init();
 	friend float				Hy_UpdateStep();
 	friend double				Hy_UpdateStepDbl();
