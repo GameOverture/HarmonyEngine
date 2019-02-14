@@ -44,7 +44,7 @@ HyDiagOutput::~HyDiagOutput()
 void HyDiagOutput::SetShowFlags(uint32 uiDiagFlags)
 {
 	m_uiShowFlags = uiDiagFlags;
-	SetEnabled(m_uiShowFlags != 0);
+	SetVisible(m_uiShowFlags != 0);
 }
 
 uint32 HyDiagOutput::GetShowFlags()
@@ -62,7 +62,7 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 	
 	m_uiFrameCount++;
 
-	if(IsEnabled())
+	if(IsVisible())
 	{
 		std::stringstream ss;
 		ss.precision(3);

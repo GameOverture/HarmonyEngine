@@ -82,15 +82,15 @@ uint32 IHyNode::GetExplicitAndTypeFlags() const
 	return m_uiExplicitAndTypeFlags;
 }
 
-bool IHyNode::IsEnabled() const
+bool IHyNode::IsVisible() const
 {
 	return m_bEnabled;
 }
 
-/*virtual*/ void IHyNode::SetEnabled(bool bEnabled)
+/*virtual*/ void IHyNode::SetVisible(bool bEnabled)
 {
 	m_bEnabled = bEnabled;
-	m_uiExplicitAndTypeFlags |= EXPLICIT_Enabled;
+	m_uiExplicitAndTypeFlags |= EXPLICIT_Visible;
 }
 
 bool IHyNode::IsPauseUpdate() const
@@ -140,12 +140,12 @@ void IHyNode::SetTag(int64 iTag)
 	}
 }
 
-/*virtual*/ void IHyNode::_SetEnabled(bool bEnabled, bool bIsOverriding)
+/*virtual*/ void IHyNode::_SetVisible(bool bEnabled, bool bIsOverriding)
 {
 	if(bIsOverriding)
-		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Enabled;
+		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Visible;
 
-	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Enabled))
+	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Visible))
 		m_bEnabled = bEnabled;
 }
 

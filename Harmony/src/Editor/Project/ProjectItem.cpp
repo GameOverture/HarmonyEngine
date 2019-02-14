@@ -225,7 +225,7 @@ void ProjectItem::DrawLoad()
 
 	m_pDraw->ApplyJsonData();
 	m_pDraw->Load();
-	m_pDraw->SetEnabled(false, true);
+	m_pDraw->SetVisible(false, true);
 }
 
 void ProjectItem::DrawUnload()

@@ -29,7 +29,7 @@ IDraw::IDraw(ProjectItem *pProjItem) :
 	m_bIsCameraPanning(false)
 {
 	m_pCamera = Hy_Window().CreateCamera2d();
-	m_pCamera->SetEnabled(false);
+	m_pCamera->SetVisible(false);
 }
 
 /*virtual*/ IDraw::~IDraw()
@@ -54,7 +54,7 @@ void IDraw::ApplyJsonData()
 
 void IDraw::Show()
 {
-	m_pCamera->SetEnabled(true);
+	m_pCamera->SetVisible(true);
 	OnResizeRenderer();
 
 	OnShow();
@@ -62,7 +62,7 @@ void IDraw::Show()
 
 void IDraw::Hide()
 {
-	m_pCamera->SetEnabled(false);
+	m_pCamera->SetVisible(false);
 
 	OnHide();
 }

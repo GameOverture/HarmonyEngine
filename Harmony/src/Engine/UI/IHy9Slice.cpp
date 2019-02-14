@@ -78,7 +78,7 @@ IHy9Slice::IHy9Slice(glm::vec2 vFillDimensions, float fBorderThickness, HyEntity
 	m_Border.SetTint(45.0f / 255.0f, 45.0f / 255.0f, 48.0f / 255.0f);
 	m_Fill.SetTint(37.0f / 255.0f, 37.0f / 255.0f, 37.0f / 255.0f);
 	UseWindowCoordinates();
-	SetEnabled(false);
+	SetVisible(false);
 }
 
 IHy9Slice::~IHy9Slice()
@@ -121,7 +121,7 @@ HyPrimitive2d &IHy9Slice::GetFill()
 	if(IsShown() || IsTransition())
 		return false;
 
-	SetEnabled(true);
+	SetVisible(true);
 	m_fElapsedTime = OnShow();
 	m_ePanelState = PANELSTATE_Showing;
 
@@ -166,7 +166,7 @@ bool IHy9Slice::IsShown()
 
 	case PANELSTATE_Hiding:
 		m_ePanelState = PANELSTATE_Hidden;
-		SetEnabled(false);
+		SetVisible(false);
 		OnHidden();
 		break;
 	}

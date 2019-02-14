@@ -120,6 +120,6 @@ const glm::mat4 &IHyNode3d::GetWorldTransform()
 {
 	_CtorChildAppend(parentRef, childRef);
 
-	childRef._SetEnabled(parentRef.IsEnabled(), false);
+	childRef._SetVisible(parentRef.IsVisible(), false);
 	childRef._SetPauseUpdate(parentRef.IsPauseUpdate(), false);
 }
