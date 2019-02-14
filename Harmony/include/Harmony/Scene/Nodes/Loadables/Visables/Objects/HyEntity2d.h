@@ -43,8 +43,8 @@ public:
 	virtual ~HyEntity2d(void);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual void SetEnabled(bool bEnabled) override;
-	void SetEnabled(bool bEnabled, bool bOverrideExplicitChildren);
+	virtual void SetVisible(bool bEnabled) override;
+	void SetVisible(bool bEnabled, bool bOverrideExplicitChildren);
 
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused) override;
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
@@ -102,7 +102,7 @@ protected:
 
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 
-	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding) override final;
+	virtual void _SetVisible(bool bEnabled, bool bIsOverriding) override final;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
 	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding) override final;
 	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;

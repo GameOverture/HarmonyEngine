@@ -40,7 +40,7 @@ protected:
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
 	enum ExplicitFlags
 	{
-		EXPLICIT_Enabled			= 1 << 0,
+		EXPLICIT_Visible			= 1 << 0,
 		EXPLICIT_PauseUpdate		= 1 << 1,
 		EXPLICIT_Scissor			= 1 << 2,
 		EXPLICIT_Stencil			= 1 << 3,
@@ -78,8 +78,8 @@ public:
 	bool Is2D() const;
 	uint32 GetExplicitAndTypeFlags() const;
 
-	bool IsEnabled() const;
-	virtual void SetEnabled(bool bEnabled);
+	bool IsVisible() const;
+	virtual void SetVisible(bool bEnabled);
 
 	bool IsPauseUpdate() const;
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused);
@@ -90,7 +90,7 @@ public:
 protected:
 	virtual void Update();																// Only Scene will invoke this
 	
-	virtual void _SetEnabled(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
+	virtual void _SetVisible(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
 
 	virtual void SetDirty(uint32 uiDirtyFlags);

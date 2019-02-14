@@ -30,7 +30,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
 	m_HoverBackground.GetShape().SetAsBox(100.0f, 100.0f);
 	m_HoverBackground.SetTint(0.0f, 0.0f, 0.0f);
 	m_HoverBackground.SetDisplayOrder(DISPLAYORDER_AtlasHoverBG);
-	m_HoverBackground.SetEnabled(false);
+	m_HoverBackground.SetVisible(false);
 	m_HoverBackground.alpha.Set(0.65f);
 	m_HoverBackground.Load();
 	
@@ -39,7 +39,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
 	m_HoverStrokeInner.SetLineThickness(2.0f);
 	m_HoverStrokeInner.SetTint(1.0f, 0.0f, 0.0f);
 	m_HoverStrokeInner.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeInner);
-	m_HoverStrokeInner.SetEnabled(false);
+	m_HoverStrokeInner.SetVisible(false);
 	m_HoverStrokeInner.Load();
 	
 	m_HoverStrokeOutter.SetWireframe(true);
@@ -47,7 +47,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
 	m_HoverStrokeOutter.SetLineThickness(4.0f);
 	m_HoverStrokeOutter.SetTint(0.0f, 0.0f, 0.0f);
 	m_HoverStrokeOutter.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeOutter);
-	m_HoverStrokeOutter.SetEnabled(false);
+	m_HoverStrokeOutter.SetVisible(false);
 	m_HoverStrokeOutter.Load();
 	
 	for(int i = 0; i < m_ModelRef.GetNumAtlasGroups(); ++i)
@@ -89,7 +89,7 @@ void AtlasDraw::SetHover(QTreeWidgetItem *pHoverItem)
 	}
 	
 	if(m_pHoverTexQuad)
-		m_pHoverTexQuad->SetEnabled(false);
+		m_pHoverTexQuad->SetVisible(false);
 	
 	m_pHoverTexQuad = pNewHoverTexQuad;
 }
@@ -97,7 +97,7 @@ void AtlasDraw::SetHover(QTreeWidgetItem *pHoverItem)
 void AtlasDraw::SetSelected(QList<QTreeWidgetItem *> selectedList)
 {
 	for(int i = 0; i < m_SelectedTexQuadList.size(); ++i)
-		m_SelectedTexQuadList[i]->SetEnabled(false);
+		m_SelectedTexQuadList[i]->SetVisible(false);
 
 	m_SelectedTexQuadList.clear();
 	for(int i = 0; i < selectedList.size(); ++i)
@@ -136,7 +136,7 @@ void AtlasDraw::DrawUpdate()
 		}
 
 		m_SelectedTexQuadList[i]->Load();
-		m_SelectedTexQuadList[i]->SetEnabled(true);
+		m_SelectedTexQuadList[i]->SetVisible(true);
 		m_SelectedTexQuadList[i]->SetDisplayOrder(DISPLAYORDER_AtlasSelectedFrames);
 		m_SelectedTexQuadList[i]->pos.Tween(ptPos.x, ptPos.y - fCurMaxHeight, 0.1f, HyTween::QuadInOut);
 		
@@ -150,30 +150,30 @@ void AtlasDraw::DrawUpdate()
 	if(m_pHoverTexQuad)
 	{
 		m_pHoverTexQuad->Load();
-		m_pHoverTexQuad->SetEnabled(true);
+		m_pHoverTexQuad->SetVisible(true);
 		m_pHoverTexQuad->SetDisplayOrder(DISPLAYORDER_AtlasHoverFrame);
 		m_pHoverTexQuad->pos.Set(static_cast<float>(m_pHoverTexQuad->GetWidth()) * -0.5f, static_cast<float>(m_pHoverTexQuad->GetHeight()) * -0.5f);
 
-		m_HoverBackground.SetEnabled(true);
+		m_HoverBackground.SetVisible(true);
 		m_HoverBackground.SetWireframe(false);
 		m_HoverBackground.pos.Set((static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverBgExtend * 2.0f)) * -0.5f, (static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverBgExtend * 2.0f)) * -0.5f);
 		m_HoverBackground.GetShape().SetAsBox(static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverBgExtend * 2.0f), static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverBgExtend * 2.0f));
 		
-		m_HoverStrokeInner.SetEnabled(true);
+		m_HoverStrokeInner.SetVisible(true);
 		m_HoverStrokeInner.SetWireframe(true);
 		m_HoverStrokeInner.pos.Set((static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeInnerExtend * 2.0f)) * -0.5f, (static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeInnerExtend * 2.0f)) * -0.5f);
 		m_HoverStrokeInner.GetShape().SetAsBox(static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeInnerExtend * 2.0f), static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeInnerExtend * 2.0f));
 		
-		m_HoverStrokeOutter.SetEnabled(true);
+		m_HoverStrokeOutter.SetVisible(true);
 		m_HoverStrokeOutter.SetWireframe(true);
 		m_HoverStrokeOutter.pos.Set((static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeOutterExtend * 2.0f)) * -0.5f, (static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeOutterExtend * 2.0f)) * -0.5f);
 		m_HoverStrokeOutter.GetShape().SetAsBox(static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeOutterExtend * 2.0f), static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeOutterExtend * 2.0f));
 	}
 	else
 	{
-		m_HoverBackground.SetEnabled(false);
-		m_HoverStrokeInner.SetEnabled(false);
-		m_HoverStrokeOutter.SetEnabled(false);
+		m_HoverBackground.SetVisible(false);
+		m_HoverStrokeInner.SetVisible(false);
+		m_HoverStrokeOutter.SetVisible(false);
 	}
 }
 
@@ -182,14 +182,14 @@ void AtlasDraw::DrawUpdate()
 	m_bIsMouseOver = true;
 	
 	for(int i = 0; i < m_SelectedTexQuadList.size(); ++i)
-		m_SelectedTexQuadList[i]->SetEnabled(true);
+		m_SelectedTexQuadList[i]->SetVisible(true);
 	
 	if(m_pHoverTexQuad)
-		m_pHoverTexQuad->SetEnabled(true);
+		m_pHoverTexQuad->SetVisible(true);
 	
-	m_HoverBackground.SetEnabled(true);
-	m_HoverStrokeInner.SetEnabled(true);
-	m_HoverStrokeOutter.SetEnabled(true);
+	m_HoverBackground.SetVisible(true);
+	m_HoverStrokeInner.SetVisible(true);
+	m_HoverStrokeOutter.SetVisible(true);
 }
 
 /*virtual*/ void AtlasDraw::OnHide() /*override*/
@@ -197,14 +197,14 @@ void AtlasDraw::DrawUpdate()
 	m_bIsMouseOver = false;
 			
 	for(int i = 0; i < m_SelectedTexQuadList.size(); ++i)
-		m_SelectedTexQuadList[i]->SetEnabled(false);
+		m_SelectedTexQuadList[i]->SetVisible(false);
 	
 	if(m_pHoverTexQuad)
-		m_pHoverTexQuad->SetEnabled(false);
+		m_pHoverTexQuad->SetVisible(false);
 	
-	m_HoverBackground.SetEnabled(false);
-	m_HoverStrokeInner.SetEnabled(false);
-	m_HoverStrokeOutter.SetEnabled(false);
+	m_HoverBackground.SetVisible(false);
+	m_HoverStrokeInner.SetVisible(false);
+	m_HoverStrokeOutter.SetVisible(false);
 }
 
 /*virtual*/ void AtlasDraw::OnResizeRenderer() /*override*/

@@ -28,7 +28,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem) :
 {
 	m_pPreviewTextCamera = Hy_Window().CreateCamera2d();
 	m_pPreviewTextCamera->SetViewport(0.0f, 0.0f, 1.0f, m_fDividerLinePos);
-	m_pPreviewTextCamera->SetEnabled(true);
+	m_pPreviewTextCamera->SetVisible(true);
 
 	m_Text.pos.Set(0.0f, PreviewOffsetY);
 	m_Text.TextSetAlignment(HYALIGN_Center);
@@ -45,7 +45,7 @@ FontDraw::FontDraw(ProjectItem *pProjItem) :
 	m_PreviewOriginHorz.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 	m_PreviewOriginHorz.SetLineThickness(2.0f);
 	m_PreviewOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
-	m_PreviewOriginHorz.SetEnabled(false);
+	m_PreviewOriginHorz.SetVisible(false);
 
 	m_DividerLine.GetShape().SetAsBox(10000.0f, 10.0f);
 	m_DividerLine.pos.Set(-5000.0f, (Hy_Window().GetFramebufferSize().y * m_fDividerLinePos) - 5.0f);
@@ -88,7 +88,7 @@ void FontDraw::SetPreviewText(std::string sText)
 		m_pAtlasPreviewTexQuad = new HyTexturedQuad2d(pFtglAtlas->id, static_cast<uint32>(pFtglAtlas->width), static_cast<uint32>(pFtglAtlas->height), this);
 		m_pAtlasPreviewTexQuad->Load();
 		m_pAtlasPreviewTexQuad->SetTextureSource(0, 0, static_cast<uint32>(pFtglAtlas->width), static_cast<uint32>(pFtglAtlas->height));
-		m_pAtlasPreviewTexQuad->SetEnabled(true);
+		m_pAtlasPreviewTexQuad->SetVisible(true);
 
 		m_DrawAtlasOutline.SetWireframe(true);
 		m_DrawAtlasOutline.GetShape().SetAsBox(static_cast<int>(pFtglAtlas->width), static_cast<int>(pFtglAtlas->height));
@@ -110,23 +110,23 @@ void FontDraw::SetPreviewText(std::string sText)
 /*virtual*/ void FontDraw::OnShow()
 {
 	if(m_pAtlasPreviewTexQuad)
-		m_pAtlasPreviewTexQuad->SetEnabled(true);
+		m_pAtlasPreviewTexQuad->SetVisible(true);
 
-	m_DrawAtlasOutline.SetEnabled(true);
-	m_DividerLine.SetEnabled(true);
-	m_PreviewOriginHorz.SetEnabled(true);
+	m_DrawAtlasOutline.SetVisible(true);
+	m_DividerLine.SetVisible(true);
+	m_PreviewOriginHorz.SetVisible(true);
 	
-	m_pPreviewTextCamera->SetEnabled(true);
+	m_pPreviewTextCamera->SetVisible(true);
 
-	m_Text.SetEnabled(true);
+	m_Text.SetVisible(true);
 }
 
 /*virtual*/ void FontDraw::OnHide()
 {
-	m_pPreviewTextCamera->SetEnabled(false);
-	m_PreviewOriginHorz.SetEnabled(false);
-	m_Text.SetEnabled(false);
-	SetEnabled(false, true);
+	m_pPreviewTextCamera->SetVisible(false);
+	m_PreviewOriginHorz.SetVisible(false);
+	m_Text.SetVisible(false);
+	SetVisible(false, true);
 }
 
 /*virtual*/ void FontDraw::OnResizeRenderer() /*override*/

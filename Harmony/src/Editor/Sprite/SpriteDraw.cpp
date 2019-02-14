@@ -28,7 +28,7 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem) :
 	lineList[1].y = 0.0f;
 	m_primOriginHorz.SetLineThickness(2.0f);
 	m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
-	m_primOriginHorz.SetEnabled(false);
+	m_primOriginHorz.SetVisible(false);
 	m_primOriginHorz.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 
 	lineList[0].x = 0.0f;
@@ -37,7 +37,7 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem) :
 	lineList[1].y = 5000.0f;
 	m_primOriginVert.SetLineThickness(2.0f);
 	m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
-	m_primOriginVert.SetEnabled(false);
+	m_primOriginVert.SetVisible(false);
 	m_primOriginVert.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 }
 
@@ -148,15 +148,15 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnShow() /*override*/
 {
-	m_Sprite.SetEnabled(true);
+	m_Sprite.SetVisible(true);
 	
-	m_primOriginHorz.SetEnabled(true);
-	m_primOriginVert.SetEnabled(true);
+	m_primOriginHorz.SetVisible(true);
+	m_primOriginVert.SetVisible(true);
 }
 
 /*virtual*/ void SpriteDraw::OnHide() /*override*/
 {
-	SetEnabled(false, true);
+	SetVisible(false, true);
 }
 
 /*virtual*/ void SpriteDraw::OnResizeRenderer() /*override*/

@@ -52,7 +52,7 @@ public:
 			do 
 			{
 				++m_iter;
-			} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false);
+			} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsVisible() == false);
 
 			return *this;
 		}
@@ -62,7 +62,7 @@ public:
 			do 
 			{
 				++m_iter;
-			} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false);
+			} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsVisible() == false);
 
 			return *this;
 		}
@@ -72,7 +72,7 @@ public:
 		void Reset()
 		{
 			m_iter = m_CamsListRef.begin();
-			while(m_iter != m_CamsListRef.end() && (*m_iter)->IsEnabled() == false)
+			while(m_iter != m_CamsListRef.end() && (*m_iter)->IsVisible() == false)
 				++m_iter;
 		}
 	};

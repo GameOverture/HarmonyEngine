@@ -212,6 +212,6 @@ void IHyNode2d::PhysicsBodyDef(b2BodyDef &defRefOut) const
 {
 	_CtorChildAppend(parentRef, childRef);
 
-	childRef._SetEnabled(parentRef.IsEnabled(), false);
+	childRef._SetVisible(parentRef.IsVisible(), false);
 	childRef._SetPauseUpdate(parentRef.IsPauseUpdate(), false);
 }
