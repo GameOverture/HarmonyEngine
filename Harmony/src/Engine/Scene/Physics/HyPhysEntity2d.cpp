@@ -19,10 +19,10 @@ HyPhysEntity2d::HyPhysEntity2d(b2BodyType eBodyType) :
 	m_b2Body(NULL),
 	m_ptPrevPos(0.0f),
 	m_fPrevRotation(0.0f),
-	m_bEnabled(true)
+	m_bVisible(true)
 {
 	// Physics by default don't show as visible
-	//m_bEnabled = false;
+	//m_bVisible = false;
 }
 
 

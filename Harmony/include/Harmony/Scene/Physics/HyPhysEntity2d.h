@@ -21,7 +21,7 @@ class HyPhysEntity2d : public HyEntity2d
 	friend class HyScene;
 	static b2World *		sm_b2WorldRef;
 
-	bool					m_bEnabled;
+	bool					m_bVisible;
 
 	const b2BodyType		m_keBodyType;
 	b2Body *				m_b2Body;

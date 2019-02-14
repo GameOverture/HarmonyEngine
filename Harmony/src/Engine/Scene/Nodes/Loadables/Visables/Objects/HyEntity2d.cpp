@@ -43,7 +43,7 @@ HyEntity2d::~HyEntity2d(void)
 
 void HyEntity2d::SetVisible(bool bEnabled, bool bOverrideExplicitChildren)
 {
-	m_bEnabled = bEnabled;
+	m_bVisible = bEnabled;
 	m_uiExplicitAndTypeFlags |= EXPLICIT_Visible;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
@@ -470,7 +470,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	SetDirty(DIRTY_ALL);
-	childRef._SetVisible(m_bEnabled, false);
+	childRef._SetVisible(m_bVisible, false);
 	childRef._SetPauseUpdate(m_bPauseOverride, false);
 
 	if(childRef.GetExplicitAndTypeFlags() & NODETYPE_IsVisable)
@@ -495,7 +495,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Visible))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetVisible(m_bEnabled, bIsOverriding);
+			m_ChildList[i]->_SetVisible(m_bVisible, bIsOverriding);
 	}
 }
 

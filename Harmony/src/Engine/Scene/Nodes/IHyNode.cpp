@@ -16,7 +16,7 @@ IHyNode::IHyNode(HyType eNodeType) :
 	m_eTYPE(eNodeType),
 	m_uiDirtyFlags(0),
 	m_uiExplicitAndTypeFlags(0),
-	m_bEnabled(true),
+	m_bVisible(true),
 	m_bPauseOverride(false),
 	m_iTag(0)
 {
@@ -27,7 +27,7 @@ IHyNode::IHyNode(const IHyNode &copyRef) :
 	m_eTYPE(copyRef.m_eTYPE),
 	m_uiDirtyFlags(copyRef.m_uiDirtyFlags),
 	m_uiExplicitAndTypeFlags(copyRef.m_uiExplicitAndTypeFlags),
-	m_bEnabled(copyRef.m_bEnabled),
+	m_bVisible(copyRef.m_bVisible),
 	m_bPauseOverride(copyRef.m_bPauseOverride),
 	m_iTag(copyRef.m_iTag)
 {
@@ -51,7 +51,7 @@ const IHyNode &IHyNode::operator=(const IHyNode &rhs)
 
 	m_uiDirtyFlags = rhs.m_uiDirtyFlags;
 	m_uiExplicitAndTypeFlags = rhs.m_uiExplicitAndTypeFlags;
-	m_bEnabled = rhs.m_bEnabled;
+	m_bVisible = rhs.m_bVisible;
 
 	if(m_bPauseOverride != rhs.m_bPauseOverride)
 	{
@@ -84,12 +84,12 @@ uint32 IHyNode::GetExplicitAndTypeFlags() const
 
 bool IHyNode::IsVisible() const
 {
-	return m_bEnabled;
+	return m_bVisible;
 }
 
 /*virtual*/ void IHyNode::SetVisible(bool bEnabled)
 {
-	m_bEnabled = bEnabled;
+	m_bVisible = bEnabled;
 	m_uiExplicitAndTypeFlags |= EXPLICIT_Visible;
 }
 
@@ -146,7 +146,7 @@ void IHyNode::SetTag(int64 iTag)
 		m_uiExplicitAndTypeFlags &= ~EXPLICIT_Visible;
 
 	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Visible))
-		m_bEnabled = bEnabled;
+		m_bVisible = bEnabled;
 }
 
 /*virtual*/ void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)

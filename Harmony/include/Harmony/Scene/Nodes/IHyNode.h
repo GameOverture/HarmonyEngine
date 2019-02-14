@@ -58,7 +58,7 @@ protected:
 
 	std::vector<HyTweenFloat *>		m_ActiveTweenFloatsList;
 
-	bool							m_bEnabled;
+	bool							m_bVisible;
 	bool							m_bPauseOverride;	// Will continue to Update when game is paused
 
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)

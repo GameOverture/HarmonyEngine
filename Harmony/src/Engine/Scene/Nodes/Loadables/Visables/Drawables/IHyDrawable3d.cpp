@@ -43,7 +43,7 @@ const IHyDrawable3d &IHyDrawable3d::operator=(const IHyDrawable3d &rhs)
 
 /*virtual*/ bool IHyDrawable3d::IsValid() /*override final*/
 {
-	return m_bEnabled && OnIsValid();
+	return m_bVisible && OnIsValid();
 }
 
 /*virtual*/ void IHyDrawable3d::OnLoaded() /*override*/

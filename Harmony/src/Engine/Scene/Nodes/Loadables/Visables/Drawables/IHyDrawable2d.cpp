@@ -81,7 +81,7 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 
 /*virtual*/ bool IHyDrawable2d::IsValid() /*override final*/
 {
-	return m_bEnabled && OnIsValid();
+	return m_bVisible && OnIsValid();
 }
 
 /*virtual*/ void IHyDrawable2d::OnLoaded() /*override*/
