@@ -13,11 +13,12 @@
 
 #include <chrono>
 
-IHyThreadClass::IHyThreadClass(uint32 uiUpdateThrottleMs /*= 0*/) :	m_eThreadState(THREADSTATE_Inactive),
-																	m_uiTHROTTLE_MS(uiUpdateThrottleMs),
-																	m_bWaitEnabled(false),
-																	m_bWaitComplete(false),
-																	m_bAutoResetWaiting(false)
+IHyThreadClass::IHyThreadClass(uint32 uiUpdateThrottleMs /*= 0*/) :
+	m_eThreadState(THREADSTATE_Inactive),
+	m_uiTHROTTLE_MS(uiUpdateThrottleMs),
+	m_bWaitEnabled(false),
+	m_bWaitComplete(false),
+	m_bAutoResetWaiting(false)
 {
 }
 

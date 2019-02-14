@@ -10,8 +10,9 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
-IHyNodeData::IHyNodeData(const std::string &sPath) :	m_sPATH(sPath),
-														m_pGltf(nullptr)
+IHyNodeData::IHyNodeData(const std::string &sPath) :
+	m_sPATH(sPath),
+	m_pGltf(nullptr)
 { }
 
 /*virtual*/ IHyNodeData::~IHyNodeData(void)

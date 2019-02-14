@@ -16,11 +16,12 @@
 #define HYTIME_ThresholdWarningsEvery 25.0	// How often to print a warning
 #define HYTIME_ThresholdMaxReset 100.0		// Maximum threshold until we hard reset
 
-HyTime::HyTime(uint32 uiUpdateTickMs) :	m_dTotalElapsedTime(0.0),
-										m_dThrottledTime(0.0),
-										m_dSpiralOfDeathCounter(HYTIME_ThresholdWarningsEvery),
-										m_dPrevTime(0.0),
-										m_dCurDeltaTime(0.0)
+HyTime::HyTime(uint32 uiUpdateTickMs) :
+	m_dTotalElapsedTime(0.0),
+	m_dThrottledTime(0.0),
+	m_dSpiralOfDeathCounter(HYTIME_ThresholdWarningsEvery),
+	m_dPrevTime(0.0),
+	m_dCurDeltaTime(0.0)
 {
 	SetUpdateTickMs(uiUpdateTickMs);
 }

@@ -13,17 +13,18 @@
 
 #define HYDIAG_WIDTH 600.0f
 
-HyDiagOutput::HyDiagOutput() :	m_dFrameTime_Low(9999.0),
-								m_dFrameTime_High(0.0),
-								m_dFrameTime_Cumulative(0.0),
-								m_uiFrameCount(0),
-								m_txtLastFrameTime(HY_SYSTEM_FONT, this),
-								m_txtAvgFrame(HY_SYSTEM_FONT, this),
-								m_txtAvgFrameLow(HY_SYSTEM_FONT, this),
-								m_txtAvgFrameHigh(HY_SYSTEM_FONT, this),
-								m_txtFps(HY_SYSTEM_FONT, this),
-								m_txtMouse(HY_SYSTEM_FONT, this),
-								m_uiShowFlags(HYDIAG_NONE)
+HyDiagOutput::HyDiagOutput() :
+	m_dFrameTime_Low(9999.0),
+	m_dFrameTime_High(0.0),
+	m_dFrameTime_Cumulative(0.0),
+	m_uiFrameCount(0),
+	m_txtLastFrameTime(HY_SYSTEM_FONT, this),
+	m_txtAvgFrame(HY_SYSTEM_FONT, this),
+	m_txtAvgFrameLow(HY_SYSTEM_FONT, this),
+	m_txtAvgFrameHigh(HY_SYSTEM_FONT, this),
+	m_txtFps(HY_SYSTEM_FONT, this),
+	m_txtMouse(HY_SYSTEM_FONT, this),
+	m_uiShowFlags(HYDIAG_NONE)
 {
 	m_txtAvgFrame.pos.Y(-HY_SYSTEM_FONT_SIZE);
 	m_txtAvgFrameLow.pos.Y(-HY_SYSTEM_FONT_SIZE * 2.0f);

@@ -30,9 +30,10 @@
 //    Q_EMIT LoadFinished(pNewItemProject);
 //}
 
-ExplorerWidget::ExplorerWidget(QWidget *parent) :	QWidget(parent),
-													ui(new Ui::ExplorerWidget),
-													m_pNewItemMenuRef(nullptr)
+ExplorerWidget::ExplorerWidget(QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::ExplorerWidget),
+	m_pNewItemMenuRef(nullptr)
 {
 	ui->setupUi(this);
 	ui->treeWidget->SetOwner(this);

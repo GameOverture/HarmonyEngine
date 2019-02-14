@@ -19,7 +19,8 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontTableView::FontTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
+FontTableView::FontTableView(QWidget *pParent /*= 0*/) :
+	QTableView(pParent)
 {
 }
 
@@ -37,9 +38,10 @@ FontTableView::FontTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :   QStyledItemDelegate(pParent),
-																									m_pItem(pItem),
-																									m_pCmbStates(pCmbStates)
+FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :
+	QStyledItemDelegate(pParent),
+	m_pItem(pItem),
+	m_pCmbStates(pCmbStates)
 {
 }
 
@@ -150,7 +152,8 @@ FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *p
 
 int FontStateLayersModel::sm_iUniqueIdCounter = 0;
 
-FontStateLayersModel::FontStateLayersModel(QObject *parent) : QAbstractTableModel(parent)
+FontStateLayersModel::FontStateLayersModel(QObject *parent) :
+	QAbstractTableModel(parent)
 {
 	m_sRenderModeStringList.append("Normal");
 	m_sRenderModeStringList.append("Outline Edge");

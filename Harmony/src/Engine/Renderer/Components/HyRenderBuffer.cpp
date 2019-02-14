@@ -14,9 +14,10 @@
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable3d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 
-HyRenderBuffer::HyRenderBuffer() :	m_pBUFFER(HY_NEW uint8[HY_RENDERSTATE_BUFFER_SIZE]),
-									m_pCurWritePosition(m_pBUFFER),
-									m_pRenderStatesUserStartPos(nullptr)
+HyRenderBuffer::HyRenderBuffer() :
+	m_pBUFFER(HY_NEW uint8[HY_RENDERSTATE_BUFFER_SIZE]),
+	m_pCurWritePosition(m_pBUFFER),
+	m_pRenderStatesUserStartPos(nullptr)
 {
 #ifdef HY_DEBUG
 	memset(m_pBUFFER, 0, HY_RENDERSTATE_BUFFER_SIZE);

@@ -22,7 +22,8 @@
 #include <QDoubleSpinBox>
 #include <QLineEdit>
 
-PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) : QTreeView(pParent)
+PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) :
+	QTreeView(pParent)
 {
 	setItemDelegate(new PropertiesDelegate(this, this));
 
@@ -66,8 +67,9 @@ PropertiesTreeView::~PropertiesTreeView()
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
-																									m_pTableView(pTableView)
+PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *pParent /*= 0*/) :
+	QStyledItemDelegate(pParent),
+	m_pTableView(pTableView)
 {
 }
 

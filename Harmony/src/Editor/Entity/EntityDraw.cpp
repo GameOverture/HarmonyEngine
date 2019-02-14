@@ -10,9 +10,9 @@
 #include "Global.h"
 #include "EntityDraw.h"
 
-EntityDraw::EntityDraw(ProjectItem *pProjItem) : IDraw(pProjItem)
+EntityDraw::EntityDraw(ProjectItem *pProjItem) :
+	IDraw(pProjItem)
 {
-
 }
 
 /*virtual*/ EntityDraw::~EntityDraw()

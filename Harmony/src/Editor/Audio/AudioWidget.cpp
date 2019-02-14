@@ -18,10 +18,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-AudioWidget::AudioWidget(ProjectItem &itemRef, QWidget *parent) :   QWidget(parent),
-																	ui(new Ui::AudioWidget),
-																	m_ItemRef(itemRef),
-																	m_pCurAudioState(NULL)
+AudioWidget::AudioWidget(ProjectItem &itemRef, QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::AudioWidget),
+	m_ItemRef(itemRef),
+	m_pCurAudioState(nullptr)
 {
 	ui->setupUi(this);
 	

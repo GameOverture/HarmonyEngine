@@ -20,8 +20,9 @@
 #include <QJsonArray>
 #include <QLineEdit>
 
-AudioWidgetManager::AudioWidgetManager(QWidget *parent) :   QWidget(parent),
-															ui(new Ui::AudioWidgetManager)
+AudioWidgetManager::AudioWidgetManager(QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::AudioWidgetManager)
 {
 	ui->setupUi(this);
 	
@@ -29,11 +30,12 @@ AudioWidgetManager::AudioWidgetManager(QWidget *parent) :   QWidget(parent),
 	HyGuiLog("WidgetAudioManager::WidgetAudioManager() invalid constructor used", LOGTYPE_Error);
 }
 
-AudioWidgetManager::AudioWidgetManager(Project *pProjOwner, QWidget *parent) :  QWidget(parent),
-																					ui(new Ui::AudioWidgetManager),
-																					m_pProjOwner(pProjOwner),
-																					m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_Audio, true)),
-																					m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_Audio, true))
+AudioWidgetManager::AudioWidgetManager(Project *pProjOwner, QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::AudioWidgetManager),
+	m_pProjOwner(pProjOwner),
+	m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_Audio, true)),
+	m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_Audio, true))
 {
 	ui->setupUi(this);
 	while(ui->audioBanks->currentWidget())

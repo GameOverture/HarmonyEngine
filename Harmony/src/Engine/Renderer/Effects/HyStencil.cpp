@@ -14,10 +14,11 @@
 
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
-HyStencil::HyStencil() :	m_hHANDLE(++sm_hHandleCount),
-							m_pRenderStatePtr(nullptr),
-							m_eBehavior(HYSTENCILBEHAVIOR_Mask),
-							m_bMaskIsReady(false)
+HyStencil::HyStencil() :
+	m_hHANDLE(++sm_hHandleCount),
+	m_pRenderStatePtr(nullptr),
+	m_eBehavior(HYSTENCILBEHAVIOR_Mask),
+	m_bMaskIsReady(false)
 {
 	IHyRenderer::AddStencil(this);
 }

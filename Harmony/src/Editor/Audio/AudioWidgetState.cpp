@@ -16,10 +16,11 @@
 
 #include "GlobalUndoCmds.h"
 
-AudioWidgetState::AudioWidgetState(AudioWidget *pOwner, QList<QAction *> stateActionList, QWidget *parent) :    QWidget(parent),
-																												ui(new Ui::AudioWidgetState),
-																												m_pOwner(pOwner),
-																												m_sName("Unnamed")
+AudioWidgetState::AudioWidgetState(AudioWidget *pOwner, QList<QAction *> stateActionList, QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::AudioWidgetState),
+	m_pOwner(pOwner),
+	m_sName("Unnamed")
 {
 	ui->setupUi(this);
 	

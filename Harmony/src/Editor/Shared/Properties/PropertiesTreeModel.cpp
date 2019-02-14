@@ -11,10 +11,11 @@
 #include "PropertiesTreeModel.h"
 #include "PropertiesUndoCmd.h"
 
-PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant subState, QObject *parent) :	QAbstractItemModel(parent),
-																														m_ItemRef(itemRef),
-																														m_iSTATE_INDEX(iStateIndex),
-																														m_iSUBSTATE(subState)
+PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant subState, QObject *parent) :
+	QAbstractItemModel(parent),
+	m_ItemRef(itemRef),
+	m_iSTATE_INDEX(iStateIndex),
+	m_iSUBSTATE(subState)
 {
 	m_pRootItem = new PropertiesTreeItem("Root", this, PropertiesDef(), QColor(), "", true);
 }

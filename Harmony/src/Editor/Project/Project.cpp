@@ -27,7 +27,8 @@
 // Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
 //#define RESAVE_ENTIRE_PROJECT
 
-ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProjectOwner)
+ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
+	m_pProjectOwner(pProjectOwner)
 {
 }
 
@@ -69,16 +70,17 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :  m_pProjectOwner(pProject
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) : ExplorerItem(ITEM_Project, sProjectFilePath, nullptr),
-																				m_pWidget(pProjWidget),
-																				m_pDraw(nullptr),
-																				m_DlgProjectSettings(sProjectFilePath),
-																				m_pAtlasModel(nullptr),
-																				m_pAtlasWidget(nullptr),
-																				m_pAudioMan(nullptr),
-																				m_pTabBar(nullptr),
-																				m_pCurOpenItem(nullptr),
-																				m_bHasError(false)
+Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) :
+	ExplorerItem(ITEM_Project, sProjectFilePath, nullptr),
+	m_pWidget(pProjWidget),
+	m_pDraw(nullptr),
+	m_DlgProjectSettings(sProjectFilePath),
+	m_pAtlasModel(nullptr),
+	m_pAtlasWidget(nullptr),
+	m_pAudioMan(nullptr),
+	m_pTabBar(nullptr),
+	m_pCurOpenItem(nullptr),
+	m_bHasError(false)
 {
 	if(m_DlgProjectSettings.HasError())
 	{

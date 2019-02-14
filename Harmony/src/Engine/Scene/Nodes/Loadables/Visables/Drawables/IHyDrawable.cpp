@@ -13,16 +13,18 @@
 
 HyScene *IHyDrawable::sm_pScene = nullptr;
 
-IHyDrawable::IHyDrawable() :	m_hShader(HY_UNUSED_HANDLE),
-								m_eRenderMode(HYRENDERMODE_Unknown),
-								m_hTextureHandle(HY_UNUSED_HANDLE)
+IHyDrawable::IHyDrawable() :
+	m_hShader(HY_UNUSED_HANDLE),
+	m_eRenderMode(HYRENDERMODE_Unknown),
+	m_hTextureHandle(HY_UNUSED_HANDLE)
 {
 }
 
-IHyDrawable::IHyDrawable(const IHyDrawable &copyRef) :	m_hShader(copyRef.m_hShader),
-														m_eRenderMode(copyRef.m_eRenderMode),
-														m_hTextureHandle(copyRef.m_hTextureHandle),
-														m_ShaderUniforms(copyRef.m_ShaderUniforms)
+IHyDrawable::IHyDrawable(const IHyDrawable &copyRef) :
+	m_hShader(copyRef.m_hShader),
+	m_eRenderMode(copyRef.m_eRenderMode),
+	m_hTextureHandle(copyRef.m_hTextureHandle),
+	m_ShaderUniforms(copyRef.m_ShaderUniforms)
 {
 }
 

@@ -13,10 +13,11 @@
 #include "SpriteModels.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_OrderFrame::SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-																																									m_pSpriteTableView(pSpriteTableView),
-																																									m_iFrameIndex(iFrameIndex),
-																																									m_iFrameIndexDest(iFrameIndexDestination)
+SpriteUndoCmd_OrderFrame::SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_pSpriteTableView(pSpriteTableView),
+	m_iFrameIndex(iFrameIndex),
+	m_iFrameIndexDest(iFrameIndexDestination)
 {
 	if(m_iFrameIndex > m_iFrameIndexDest)
 		setText("Order Frame Upwards");
@@ -69,9 +70,10 @@ void SpriteUndoCmd_OrderFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_OffsetFrame::SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, bool bAddOffset, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-																																										m_pSpriteTableView(pSpriteTableView),
-																																										m_iFrameIndex(iIndex)
+SpriteUndoCmd_OffsetFrame::SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, bool bAddOffset, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_pSpriteTableView(pSpriteTableView),
+	m_iFrameIndex(iIndex)
 {
 
 	
@@ -132,10 +134,11 @@ void SpriteUndoCmd_OffsetFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_OffsetXFrame::SpriteUndoCmd_OffsetXFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
-																																													m_pSpriteTableView(pSpriteTableView),
-																																													m_iFrameIndex(iIndex),
-																																													m_NewOffsetList(newOffsetList)
+SpriteUndoCmd_OffsetXFrame::SpriteUndoCmd_OffsetXFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_pSpriteTableView(pSpriteTableView),
+	m_iFrameIndex(iIndex),
+	m_NewOffsetList(newOffsetList)
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -194,10 +197,11 @@ void SpriteUndoCmd_OffsetXFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_OffsetYFrame::SpriteUndoCmd_OffsetYFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
-																																													m_pSpriteTableView(pSpriteTableView),
-																																													m_iFrameIndex(iIndex),
-																																													m_NewOffsetList(newOffsetList)
+SpriteUndoCmd_OffsetYFrame::SpriteUndoCmd_OffsetYFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_pSpriteTableView(pSpriteTableView),
+	m_iFrameIndex(iIndex),
+	m_NewOffsetList(newOffsetList)
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -256,10 +260,11 @@ void SpriteUndoCmd_OffsetYFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_DurationFrame::SpriteUndoCmd_DurationFrame(SpriteTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent /*= 0*/) : QUndoCommand(pParent),
-																																											m_pSpriteTableView(pSpriteTableView),
-																																											m_iFrameIndex(iIndex),
-																																											m_fNewDuration(fDuration)
+SpriteUndoCmd_DurationFrame::SpriteUndoCmd_DurationFrame(SpriteTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_pSpriteTableView(pSpriteTableView),
+	m_iFrameIndex(iIndex),
+	m_fNewDuration(fDuration)
 {
 	setText("Modify Frame Duration");
 	

@@ -15,9 +15,10 @@
 #include "GlobalUndoCmds.h"
 #include "DlgInputName.h"
 
-EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
-																	ui(new Ui::EntityWidget),
-																	m_ItemRef(itemRef)
+EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::EntityWidget),
+	m_ItemRef(itemRef)
 {
 	ui->setupUi(this);
 

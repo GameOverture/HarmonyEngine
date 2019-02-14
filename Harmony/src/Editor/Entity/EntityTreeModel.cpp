@@ -11,7 +11,8 @@
 #include "EntityTreeModel.h"
 #include "EntityModel.h"
 
-EntityTreeItem::EntityTreeItem(ProjectItem *pItem) :	m_pItem(pItem)
+EntityTreeItem::EntityTreeItem(ProjectItem *pItem) :
+	m_pItem(pItem)
 {
 }
 
@@ -31,8 +32,9 @@ ProjectItem *EntityTreeItem::GetProjItem()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, QObject *parent) :  QAbstractItemModel(parent),
-																											m_pEntityModel(pEntityModel)
+EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, QObject *parent) :
+	QAbstractItemModel(parent),
+	m_pEntityModel(pEntityModel)
 {
 	m_pRootNode = new EntityTreeItem(nullptr);
 	m_pRootItem = new EntityTreeItem(&entityItemRef);

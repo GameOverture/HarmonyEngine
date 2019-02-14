@@ -12,15 +12,16 @@
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
 #include "HyEngine.h"
 
-IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType),
-																m_pParent(pParent),
-																m_fRotation(0.0f),
-																m_pPhysicsBody(nullptr),
-																pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-																rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-																rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-																scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-																scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
+	IHyNode(eNodeType),
+	m_pParent(pParent),
+	m_fRotation(0.0f),
+	m_pPhysicsBody(nullptr),
+	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	m_uiExplicitAndTypeFlags |= NODETYPE_Is2d;
 	scale.Set(1.0f);
@@ -29,17 +30,18 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :	IHyNode(eNodeType)
 		_CtorSetupNewChild(*m_pParent, *this);
 }
 
-IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :	IHyNode(copyRef),
-													m_pParent(copyRef.m_pParent),
-													m_mtxCached(copyRef.m_mtxCached),
-													m_fRotation(copyRef.m_fRotation),
-													m_pPhysicsBody(nullptr),
-													pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													m_aabbCached(copyRef.m_aabbCached)
+IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
+	IHyNode(copyRef),
+	m_pParent(copyRef.m_pParent),
+	m_mtxCached(copyRef.m_mtxCached),
+	m_fRotation(copyRef.m_fRotation),
+	m_pPhysicsBody(nullptr),
+	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	m_aabbCached(copyRef.m_aabbCached)
 {
 	if(copyRef.m_pParent)
 		copyRef.m_pParent->ChildAppend(*this);

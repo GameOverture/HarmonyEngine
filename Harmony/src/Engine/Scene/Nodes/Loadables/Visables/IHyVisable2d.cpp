@@ -15,13 +15,14 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyVisable2d::IHyVisable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyLoadable2d(eNodeType, szPrefix, szName, pParent),
-																												m_fAlpha(1.0f),
-																												m_fCachedAlpha(1.0f),
-																												m_iDisplayOrder(0),
-																												topColor(*this, DIRTY_Color),
-																												botColor(*this, DIRTY_Color),
-																												alpha(m_fAlpha, *this, DIRTY_Color)
+IHyVisable2d::IHyVisable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :
+	IHyLoadable2d(eNodeType, szPrefix, szName, pParent),
+	m_fAlpha(1.0f),
+	m_fCachedAlpha(1.0f),
+	m_iDisplayOrder(0),
+	topColor(*this, DIRTY_Color),
+	botColor(*this, DIRTY_Color),
+	alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	m_uiExplicitAndTypeFlags |= NODETYPE_IsVisable;
 
@@ -34,13 +35,14 @@ IHyVisable2d::IHyVisable2d(HyType eNodeType, const char *szPrefix, const char *s
 		SetupNewChild(*m_pParent, *this);
 }
 
-IHyVisable2d::IHyVisable2d(const IHyVisable2d &copyRef) :	IHyLoadable2d(copyRef),
-															IHyVisable(copyRef),
-															m_fAlpha(copyRef.m_fAlpha),
-															m_iDisplayOrder(copyRef.m_iDisplayOrder),
-															topColor(*this, DIRTY_Color),
-															botColor(*this, DIRTY_Color),
-															alpha(m_fAlpha, *this, DIRTY_Color)
+IHyVisable2d::IHyVisable2d(const IHyVisable2d &copyRef) :
+	IHyLoadable2d(copyRef),
+	IHyVisable(copyRef),
+	m_fAlpha(copyRef.m_fAlpha),
+	m_iDisplayOrder(copyRef.m_iDisplayOrder),
+	topColor(*this, DIRTY_Color),
+	botColor(*this, DIRTY_Color),
+	alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	topColor.Set(copyRef.topColor.Get());
 	botColor.Set(copyRef.botColor.Get());

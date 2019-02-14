@@ -11,21 +11,22 @@
 #include "PropertiesUndoCmd.h"
 
 PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel &modelRef,
-				  int iStateIndex,
-				  const QVariant &subState,
-				  PropertiesTreeItem &treeItemRef,
-				  const QModelIndex &index,
-				  const QVariant &newData,
-				  int iRole,
-				  QUndoCommand *pParent /*= 0*/) :	QUndoCommand(pParent),
-													m_ModelRef(modelRef),
-													m_iSTATE_INDEX(iStateIndex),
-													m_iSUBSTATE(subState),
-													m_TreeItemRef(treeItemRef),
-													m_Index(index),
-													m_NewData(newData),
-													m_OldData(m_TreeItemRef.GetData()),
-													m_iRole(iRole)
+									 int iStateIndex,
+									 const QVariant &subState,
+									 PropertiesTreeItem &treeItemRef,
+									 const QModelIndex &index,
+									 const QVariant &newData,
+									 int iRole,
+									 QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_ModelRef(modelRef),
+	m_iSTATE_INDEX(iStateIndex),
+	m_iSUBSTATE(subState),
+	m_TreeItemRef(treeItemRef),
+	m_Index(index),
+	m_NewData(newData),
+	m_OldData(m_TreeItemRef.GetData()),
+	m_iRole(iRole)
 {
 	setText(m_TreeItemRef.GetName());
 }

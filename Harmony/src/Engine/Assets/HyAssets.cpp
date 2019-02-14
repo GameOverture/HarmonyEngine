@@ -68,13 +68,14 @@ const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyAssets::HyAssets(HyScene &sceneRef, std::string sDataDirPath) :	IHyThreadClass(),
-																	m_SceneRef(sceneRef),
-																	m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
-																	m_bInitialized(false),
-																	m_pAtlases(nullptr),
-																	m_uiNumAtlases(0),
-																	m_pLoadedAtlasIndices(nullptr)
+HyAssets::HyAssets(HyScene &sceneRef, std::string sDataDirPath) :
+	IHyThreadClass(),
+	m_SceneRef(sceneRef),
+	m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
+	m_bInitialized(false),
+	m_pAtlases(nullptr),
+	m_uiNumAtlases(0),
+	m_pLoadedAtlasIndices(nullptr)
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();

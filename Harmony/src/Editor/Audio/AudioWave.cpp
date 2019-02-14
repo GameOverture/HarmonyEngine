@@ -10,14 +10,15 @@
 #include "Global.h"
 #include "AudioWave.h"
 
-AudioWave::AudioWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint uiErrors) :  m_uiWAVE_BANK_ID(uiWaveBankId),
-																																														m_uiChecksum(uiChecksum),
-																																														m_sName(sName),
-																																														m_uiFormatType(uiFormatType),
-																																														m_uiNumChannels(uiNumChannels),
-																																														m_uiBitsPerSample(uiBitsPerSample),
-																																														m_uiSamplesPerSec(uiSamplesPerSec),
-																																														m_uiErrors(uiErrors)
+AudioWave::AudioWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint uiErrors) :
+	m_uiWAVE_BANK_ID(uiWaveBankId),
+	m_uiChecksum(uiChecksum),
+	m_sName(sName),
+	m_uiFormatType(uiFormatType),
+	m_uiNumChannels(uiNumChannels),
+	m_uiBitsPerSample(uiBitsPerSample),
+	m_uiSamplesPerSec(uiSamplesPerSec),
+	m_uiErrors(uiErrors)
 {
 }
 

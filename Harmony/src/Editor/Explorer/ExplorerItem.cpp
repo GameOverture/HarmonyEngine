@@ -19,11 +19,14 @@
 #include <QJsonObject>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ExplorerTreeItem::ExplorerTreeItem(int type /*= Type*/) : QTreeWidgetItem(type)
+ExplorerTreeItem::ExplorerTreeItem(int type /*= Type*/) :
+	QTreeWidgetItem(type)
 { }
-ExplorerTreeItem::ExplorerTreeItem(ExplorerTreeWidget *pView, int type /*= Type*/) : QTreeWidgetItem(pView, type)
+ExplorerTreeItem::ExplorerTreeItem(ExplorerTreeWidget *pView, int type /*= Type*/) :
+	QTreeWidgetItem(pView, type)
 { }
-ExplorerTreeItem::ExplorerTreeItem(QTreeWidgetItem *parent, int type /*= Type*/) : QTreeWidgetItem(parent, type)
+ExplorerTreeItem::ExplorerTreeItem(QTreeWidgetItem *parent, int type /*= Type*/) :
+	QTreeWidgetItem(parent, type)
 { }
 
 bool ExplorerTreeItem::operator<(const QTreeWidgetItem &rhs) const
@@ -40,9 +43,10 @@ bool ExplorerTreeItem::operator<(const QTreeWidgetItem &rhs) const
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem) :	m_eTYPE(eType),
-																											m_sPath(HyStr::MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
-																											m_bIsProjectItem(false)
+ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem) :
+	m_eTYPE(eType),
+	m_sPath(HyStr::MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
+	m_bIsProjectItem(false)
 {
 	m_pTreeItemPtr = new ExplorerTreeItem();
 	m_pTreeItemPtr->setText(0, GetName(false));

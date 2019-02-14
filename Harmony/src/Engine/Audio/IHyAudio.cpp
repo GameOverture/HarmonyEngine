@@ -11,7 +11,8 @@
 #include "Audio/IHyAudio.h"
 #include "Window/HyWindow.h"
 
-IHyAudio::IHyAudio(std::vector<HyWindow *> &windowListRef) :	m_WindowListRef(windowListRef)
+IHyAudio::IHyAudio(std::vector<HyWindow *> &windowListRef) :
+	m_WindowListRef(windowListRef)
 {
 }
 

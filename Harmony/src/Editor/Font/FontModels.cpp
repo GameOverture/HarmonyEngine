@@ -17,7 +17,8 @@
 #include <QPainter>
 #include <QImageWriter>
 
-FontStateData::FontStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) : IStateData(iStateIndex, modelRef, stateObj["name"].toString())
+FontStateData::FontStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
+	IStateData(iStateIndex, modelRef, stateObj["name"].toString())
 {
 	m_pLayersModel = new FontStateLayersModel(&m_ModelRef);
 	m_pSbMapper_Size = new SpinBoxMapper(&m_ModelRef);

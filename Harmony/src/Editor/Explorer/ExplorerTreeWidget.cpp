@@ -18,9 +18,10 @@
 #include <QMouseEvent>
 #include <QApplication>
 
-ExplorerTreeWidget::ExplorerTreeWidget(QWidget *pParent) :  QTreeWidget(pParent),
-															m_pOwnerWidget(nullptr),
-															m_pDraggedProjItem(nullptr)
+ExplorerTreeWidget::ExplorerTreeWidget(QWidget *pParent) :
+	QTreeWidget(pParent),
+	m_pOwnerWidget(nullptr),
+	m_pDraggedProjItem(nullptr)
 {
 	setContextMenuPolicy(Qt::CustomContextMenu);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

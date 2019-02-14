@@ -17,7 +17,6 @@ IHyTimeInst::IHyTimeInst(void)
 {
 }
 
-
 IHyTimeInst::~IHyTimeInst(void)
 {
 	sm_pTime->RemoveTimeInst(this);
@@ -26,4 +25,3 @@ IHyTimeInst::~IHyTimeInst(void)
 void IHyTimeInst::Update(double dDelta)
 {
 }
-

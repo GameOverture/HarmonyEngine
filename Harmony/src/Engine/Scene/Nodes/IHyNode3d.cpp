@@ -12,13 +12,14 @@
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
 #include "Scene/HyScene.h"
 
-IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :	IHyNode(eNodeType),
-																m_pParent(pParent),
-																pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-																rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-																rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-																scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-																scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :
+	IHyNode(eNodeType),
+	m_pParent(pParent),
+	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	scale.Set(1.0f);
 
@@ -26,12 +27,13 @@ IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :	IHyNode(eNodeType)
 		_CtorSetupNewChild(*m_pParent, *this);
 }
 
-IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :	IHyNode(copyRef),
-													pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-													scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :
+	IHyNode(copyRef),
+	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	pos.Set(copyRef.pos.Get());
 	rot.Set(copyRef.rot.Get());

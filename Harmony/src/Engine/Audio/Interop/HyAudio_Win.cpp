@@ -56,9 +56,10 @@
 
 X3DAUDIO_HANDLE g_x3DInstance;
 
-HyAudio_Win::HyAudio_Win(std::vector<HyWindow *> &windowListRef) :	IHyAudio(windowListRef),
-																	m_pXAudio2(NULL),
-																	m_pMasterVoice(NULL)
+HyAudio_Win::HyAudio_Win(std::vector<HyWindow *> &windowListRef) :
+	IHyAudio(windowListRef),
+	m_pXAudio2(NULL),
+	m_pMasterVoice(NULL)
 {
 //	HRESULT hr = 0;
 //#ifndef HY_PLATFORM_GUI

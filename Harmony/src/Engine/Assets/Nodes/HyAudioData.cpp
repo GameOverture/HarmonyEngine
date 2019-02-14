@@ -11,7 +11,8 @@
 #include "Assets/Nodes/HyAudioData.h"
 
 
-HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) : IHyNodeData(sPath)
+HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :
+	IHyNodeData(sPath)
 {
 }
 

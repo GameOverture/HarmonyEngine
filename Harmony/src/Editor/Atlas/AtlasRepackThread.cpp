@@ -13,10 +13,11 @@
 #include <QPainter>
 #include <QImageWriter>
 
-AtlasRepackThread::AtlasRepackThread(AtlasGrp *pAtlasGrp, QList<int> textureIndexList, QList<AtlasFrame *> newFramesList, QDir metaDir) :	m_pAtlasGrp(pAtlasGrp),
-																																			m_TextureIndexList(textureIndexList),
-																																			m_NewFramesList(newFramesList),
-																																			m_MetaDir(metaDir)
+AtlasRepackThread::AtlasRepackThread(AtlasGrp *pAtlasGrp, QList<int> textureIndexList, QList<AtlasFrame *> newFramesList, QDir metaDir) :
+	m_pAtlasGrp(pAtlasGrp),
+	m_TextureIndexList(textureIndexList),
+	m_NewFramesList(newFramesList),
+	m_MetaDir(metaDir)
 {
 }
 

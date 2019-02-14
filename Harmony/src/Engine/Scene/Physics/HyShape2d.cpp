@@ -12,17 +12,19 @@
 #include "Scene/Nodes/IHyNode2d.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HyShape2d::HyShape2d(IHyNode2d *pOwnerNode) :	m_pOwnerNode(pOwnerNode),
-												m_ChangedCallback(nullptr),
-												m_eType(HYSHAPE_Unknown),
-												m_pShape(nullptr)
+HyShape2d::HyShape2d(IHyNode2d *pOwnerNode) :
+	m_pOwnerNode(pOwnerNode),
+	m_ChangedCallback(nullptr),
+	m_eType(HYSHAPE_Unknown),
+	m_pShape(nullptr)
 {
 }
 
-HyShape2d::HyShape2d(IHyNode2d *pOwnerNode, const HyShape2d &copyRef) :	m_pOwnerNode(pOwnerNode),
-																		m_ChangedCallback(nullptr),
-																		m_eType(HYSHAPE_Unknown),
-																		m_pShape(nullptr)
+HyShape2d::HyShape2d(IHyNode2d *pOwnerNode, const HyShape2d &copyRef) :
+	m_pOwnerNode(pOwnerNode),
+	m_ChangedCallback(nullptr),
+	m_eType(HYSHAPE_Unknown),
+	m_pShape(nullptr)
 {
 	operator=(copyRef);
 }

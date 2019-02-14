@@ -28,14 +28,16 @@ void DlgInputName::CtorInit(QString sDlgTitle, QString sCurName)
 	ui->lblName->setText("Name:");
 }
 
-DlgInputName::DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent /*= 0*/) :   QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-																									ui(new Ui::DlgInputName)
+DlgInputName::DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent /*= 0*/) :
+	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+	ui(new Ui::DlgInputName)
 {
 	CtorInit(sDlgTitle, sCurName);
 }
 
-DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerItem *pItem, QWidget *parent /*= 0*/) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-																							ui(new Ui::DlgInputName)
+DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerItem *pItem, QWidget *parent /*= 0*/) :
+	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+	ui(new Ui::DlgInputName)
 {
 	CtorInit(sDlgTitle, pItem->GetName(false));
 

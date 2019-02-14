@@ -10,7 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
 
-HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyVisable3d(HYTYPE_Entity, szPrefix, szName, pParent)
+HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :
+	IHyVisable3d(HYTYPE_Entity, szPrefix, szName, pParent)
 {
 }
 

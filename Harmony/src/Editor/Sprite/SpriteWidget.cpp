@@ -22,12 +22,13 @@
 #include <QJsonArray>
 #include <QAction>
 
-SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
-																	ui(new Ui::SpriteWidget),
-																	m_ItemRef(itemRef),
-																	m_bPlayActive(false),
-																	m_fElapsedTime(0.0),
-																	m_bIsBounced(false)
+SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::SpriteWidget),
+	m_ItemRef(itemRef),
+	m_bPlayActive(false),
+	m_fElapsedTime(0.0),
+	m_bIsBounced(false)
 {
 	ui->setupUi(this);
 	

@@ -14,7 +14,6 @@ HyTimer::HyTimer(void)
 {
 }
 
-
 HyTimer::~HyTimer(void)
 {
 }

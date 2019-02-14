@@ -16,10 +16,11 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefaultPrefix, QWidget *parent) :	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-																												ui(new Ui::DlgNewItem),
-																												m_pItemProject(pItemProject),
-																												m_eItemType(eItem)
+DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefaultPrefix, QWidget *parent) :
+	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+	ui(new Ui::DlgNewItem),
+	m_pItemProject(pItemProject),
+	m_eItemType(eItem)
 {
 	if(m_pItemProject == nullptr)
 		HyGuiLog("DlgNewItem::DlgNewItem was given a Project * that was nullptr", LOGTYPE_Error);

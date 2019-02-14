@@ -20,19 +20,20 @@ HyAtlas::HyAtlas(std::string sFilePath,
 				 uint32 uiHeight,
 				 HyTextureFormat eTextureFormat,
 				 HyTextureFiltering eTextureFiltering,
-				 jsonxx::Array &srcFramesArrayRef) :	IHyLoadableData(HYLOADABLE_Atlas),
-														m_uiATLAS_GROUP_ID(uiAtlasGroupId),
-														m_uiINDEX_IN_GROUP(uiIndexInGroup),
-														m_uiMASTER_INDEX(uiMasterIndex),
-														m_sFILE_PATH(sFilePath),
-														m_uiWIDTH(uiWidth),
-														m_uiHEIGHT(uiHeight),
-														m_eTEXTURE_FORMAT(eTextureFormat),
-														m_eTEXTURE_FILTERING(eTextureFiltering),
-														m_hTextureHandle(0),
-														m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
-														m_pPixelData(nullptr),
-														m_uiPixelDataSize(0)
+				 jsonxx::Array &srcFramesArrayRef) :
+	IHyLoadableData(HYLOADABLE_Atlas),
+	m_uiATLAS_GROUP_ID(uiAtlasGroupId),
+	m_uiINDEX_IN_GROUP(uiIndexInGroup),
+	m_uiMASTER_INDEX(uiMasterIndex),
+	m_sFILE_PATH(sFilePath),
+	m_uiWIDTH(uiWidth),
+	m_uiHEIGHT(uiHeight),
+	m_eTEXTURE_FORMAT(eTextureFormat),
+	m_eTEXTURE_FILTERING(eTextureFiltering),
+	m_hTextureHandle(0),
+	m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
+	m_pPixelData(nullptr),
+	m_uiPixelDataSize(0)
 {
 	m_pFrames = HY_NEW HyRectangle<int32>[m_uiNUM_FRAMES];
 

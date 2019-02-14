@@ -11,8 +11,9 @@
 #include "WidgetRangedSlider.h"
 #include "ui_WidgetRangedSlider.h"
 
-WidgetRangedSlider::WidgetRangedSlider(QWidget *parent) :   QWidget(parent),
-															ui(new Ui::WidgetRangedSlider)
+WidgetRangedSlider::WidgetRangedSlider(QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::WidgetRangedSlider)
 {
 	ui->setupUi(this);
 	

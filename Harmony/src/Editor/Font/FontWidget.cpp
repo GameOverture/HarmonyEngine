@@ -24,9 +24,10 @@
 #include <QMenu>
 #include <QColor>
 
-FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) : QWidget(parent),
-																ui(new Ui::FontWidget),
-																m_ItemRef(itemRef)
+FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::FontWidget),
+	m_ItemRef(itemRef)
 {
 	ui->setupUi(this);
 	

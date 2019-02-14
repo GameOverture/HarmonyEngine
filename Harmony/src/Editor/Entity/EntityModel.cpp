@@ -12,7 +12,8 @@
 
 #include <QVariant>
 
-EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) : IStateData(iStateIndex, modelRef, stateObj["name"].toString())
+EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
+	IStateData(iStateIndex, modelRef, stateObj["name"].toString())
 {
 	if(stateObj.empty() == false)
 	{
@@ -155,8 +156,9 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityModel::EntityModel(ProjectItem &itemRef, QJsonArray stateArray) : IModel(itemRef),
-																		m_TreeModel(this, itemRef)
+EntityModel::EntityModel(ProjectItem &itemRef, QJsonArray stateArray) :
+	IModel(itemRef),
+	m_TreeModel(this, itemRef)
 {
 	// If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
 	if(stateArray.empty() == false)

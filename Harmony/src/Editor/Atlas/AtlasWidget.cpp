@@ -29,7 +29,8 @@
 const float fTRANS_DUR = 0.5f;
 const int iPADDING = 2;
 
-AtlasTreeWidget::AtlasTreeWidget(QWidget *parent /*= Q_NULLPTR*/) : QTreeWidget(parent)
+AtlasTreeWidget::AtlasTreeWidget(QWidget *parent /*= Q_NULLPTR*/) :
+	QTreeWidget(parent)
 {
 }
 void AtlasTreeWidget::SetAtlasOwner(AtlasWidget *pOwner)
@@ -58,10 +59,11 @@ bool AtlasTreeItem::operator<(const QTreeWidgetItem &rhs) const
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AtlasWidget::AtlasWidget(QWidget *parent) :   QWidget(parent),
-											  m_pModel(nullptr),
-											  m_Draw(nullptr),
-											  ui(new Ui::AtlasWidget)
+AtlasWidget::AtlasWidget(QWidget *parent) :
+	QWidget(parent),
+	m_pModel(nullptr),
+	m_Draw(nullptr),
+	ui(new Ui::AtlasWidget)
 {
 	ui->setupUi(this);
 	

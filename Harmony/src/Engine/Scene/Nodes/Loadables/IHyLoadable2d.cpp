@@ -12,14 +12,16 @@
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
 
-IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyNode2d(eNodeType, pParent),
-																												IHyLoadable(szPrefix, szName)
+IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :
+	IHyNode2d(eNodeType, pParent),
+	IHyLoadable(szPrefix, szName)
 {
 	m_uiExplicitAndTypeFlags |= NODETYPE_IsLoadable;
 }
 
-IHyLoadable2d::IHyLoadable2d(const IHyLoadable2d &copyRef) :	IHyNode2d(copyRef),
-																IHyLoadable(copyRef)
+IHyLoadable2d::IHyLoadable2d(const IHyLoadable2d &copyRef) :
+	IHyNode2d(copyRef),
+	IHyLoadable(copyRef)
 {
 }
 

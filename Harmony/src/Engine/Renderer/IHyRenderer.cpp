@@ -19,13 +19,14 @@
 
 IHyRenderer *IHyRenderer::sm_pInstance = nullptr;
 
-IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :	m_DiagnosticsRef(diagnosticsRef),
-																									m_WindowListRef(windowListRef),
-																									m_VertexBuffer(*this),
-																									m_pCurWindow(nullptr),
-																									m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
-																									m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive)),
-																									m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
+IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :
+	m_DiagnosticsRef(diagnosticsRef),
+	m_WindowListRef(windowListRef),
+	m_VertexBuffer(*this),
+	m_pCurWindow(nullptr),
+	m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
+	m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive)),
+	m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
 {
 	HyAssert(sm_pInstance == nullptr, "IHyRenderer ctor called twice");
 	sm_pInstance = this;

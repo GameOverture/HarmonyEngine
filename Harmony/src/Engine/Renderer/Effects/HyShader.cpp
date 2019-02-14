@@ -13,11 +13,12 @@
 
 /*static*/ HyShaderHandle HyShader::sm_hHandleCount = 0;
 
-HyShader::HyShader(HyShaderProgramDefaults eDefaultsFrom) : IHyLoadableData(HYLOADABLE_Shader),
-															m_hHANDLE(++sm_hHandleCount),
-															m_eDEFAULTS_FROM(eDefaultsFrom),
-															m_bIsFinalized(false),
-															m_uiStride(0)
+HyShader::HyShader(HyShaderProgramDefaults eDefaultsFrom) :
+	IHyLoadableData(HYLOADABLE_Shader),
+	m_hHANDLE(++sm_hHandleCount),
+	m_eDEFAULTS_FROM(eDefaultsFrom),
+	m_bIsFinalized(false),
+	m_uiStride(0)
 {
 	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
 		m_sSourceCode[i].clear();

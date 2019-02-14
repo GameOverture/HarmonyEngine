@@ -13,7 +13,8 @@
 
 #include <QJsonArray>
 
-SpriteFramesModel::SpriteFramesModel(QObject *parent) : QAbstractTableModel(parent)
+SpriteFramesModel::SpriteFramesModel(QObject *parent) :
+	QAbstractTableModel(parent)
 {
 }
 
@@ -260,11 +261,12 @@ void SpriteFramesModel::Refresh()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) : IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
-																							m_pChkMapper_Loop(nullptr),
-																							m_pChkMapper_Reverse(nullptr),
-																							m_pChkMapper_Bounce(nullptr),
-																							m_pFramesModel(nullptr)
+SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
+	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
+	m_pChkMapper_Loop(nullptr),
+	m_pChkMapper_Reverse(nullptr),
+	m_pChkMapper_Bounce(nullptr),
+	m_pFramesModel(nullptr)
 {
 	m_pChkMapper_Loop = new CheckBoxMapper(&m_ModelRef);
 	m_pChkMapper_Reverse = new CheckBoxMapper(&m_ModelRef);

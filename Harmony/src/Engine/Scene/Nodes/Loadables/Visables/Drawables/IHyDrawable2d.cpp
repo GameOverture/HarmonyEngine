@@ -11,14 +11,16 @@
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
 #include "HyEngine.h"
 
-IHyDrawable2d::IHyDrawable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :	IHyVisable2d(eNodeType, szPrefix, szName, pParent),
-																												m_LocalBoundingVolume(this)
+IHyDrawable2d::IHyDrawable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :
+	IHyVisable2d(eNodeType, szPrefix, szName, pParent),
+	m_LocalBoundingVolume(this)
 {
 }
 
-IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :	IHyVisable2d(copyRef),
-																IHyDrawable(copyRef),
-																m_LocalBoundingVolume(this, copyRef.m_LocalBoundingVolume)
+IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :
+	IHyVisable2d(copyRef),
+	IHyDrawable(copyRef),
+	m_LocalBoundingVolume(this, copyRef.m_LocalBoundingVolume)
 {
 }
 

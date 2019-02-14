@@ -14,11 +14,12 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyVisable3d::IHyVisable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :	IHyLoadable3d(eNodeType, szPrefix, szName, pParent),
-																												m_fAlpha(1.0f),
-																												m_fCachedAlpha(1.0f),
-																												tint(*this, DIRTY_Color),
-																												alpha(m_fAlpha, *this, DIRTY_Color)
+IHyVisable3d::IHyVisable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :
+	IHyLoadable3d(eNodeType, szPrefix, szName, pParent),
+	m_fAlpha(1.0f),
+	m_fCachedAlpha(1.0f),
+	tint(*this, DIRTY_Color),
+	alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	m_uiExplicitAndTypeFlags |= NODETYPE_IsVisable;
 

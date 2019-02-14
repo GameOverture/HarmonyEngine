@@ -14,7 +14,6 @@ HyStopwatch::HyStopwatch(void)
 {
 }
 
-
 HyStopwatch::~HyStopwatch(void)
 {
 }

@@ -11,8 +11,9 @@
 #include "WidgetVectorSpinBox.h"
 #include "ui_WidgetVectorSpinBox.h"
 
-WidgetVectorSpinBox::WidgetVectorSpinBox(QWidget *parent) : QWidget(parent),
-															ui(new Ui::WidgetVectorSpinBox)
+WidgetVectorSpinBox::WidgetVectorSpinBox(QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::WidgetVectorSpinBox)
 {
 	ui->setupUi(this);
 
@@ -20,8 +21,9 @@ WidgetVectorSpinBox::WidgetVectorSpinBox(QWidget *parent) : QWidget(parent),
 	HyGuiLog("WidgetVectorSpinBox::WidgetVectorSpinBox() invalid constructor used", LOGTYPE_Error);
 }
 
-WidgetVectorSpinBox::WidgetVectorSpinBox(bool bIsIntVector, QWidget *parent) :  QWidget(parent),
-																				ui(new Ui::WidgetVectorSpinBox)
+WidgetVectorSpinBox::WidgetVectorSpinBox(bool bIsIntVector, QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::WidgetVectorSpinBox)
 {
 	ui->setupUi(this);
 

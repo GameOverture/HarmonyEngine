@@ -21,8 +21,9 @@
 #include <QTextCodec>
 #include <QUuid>
 
-DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :  QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-																			ui(new Ui::DlgNewProject)
+DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
+	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+	ui(new Ui::DlgNewProject)
 {
 	ui->setupUi(this);
 

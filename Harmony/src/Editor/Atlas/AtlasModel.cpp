@@ -78,9 +78,10 @@ bool AtlasModel::FrameLookup::DoesImageExist(quint32 uiChecksum)
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AtlasModel::AtlasModel(Project *pProjOwner) :	m_pProjOwner(pProjOwner),
-												m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true)),
-												m_RootDataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true))
+AtlasModel::AtlasModel(Project *pProjOwner) :
+	m_pProjOwner(pProjOwner),
+	m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true)),
+	m_RootDataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true))
 {
 	if(m_MetaDir.exists() == false)
 	{

@@ -12,9 +12,10 @@
 #include "AtlasModel.h"
 #include "Project.h"
 
-IStateData::IStateData(int iIndex, IModel &modelRef, QString sName) :   m_iINDEX(iIndex),
-																		m_ModelRef(modelRef),
-																		m_sName(sName)
+IStateData::IStateData(int iIndex, IModel &modelRef, QString sName) :
+	m_iINDEX(iIndex),
+	m_ModelRef(modelRef),
+	m_sName(sName)
 { }
 
 /*virtual*/ IStateData::~IStateData()
@@ -37,8 +38,9 @@ void IStateData::SetName(QString sNewName)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-IModel::IModel(ProjectItem &itemRef) :  QAbstractListModel(&itemRef),
-										m_ItemRef(itemRef)
+IModel::IModel(ProjectItem &itemRef) :
+	QAbstractListModel(&itemRef),
+	m_ItemRef(itemRef)
 {
 }
 

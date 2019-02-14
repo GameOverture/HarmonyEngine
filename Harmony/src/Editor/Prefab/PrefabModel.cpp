@@ -28,8 +28,9 @@ QString StdVectorIntsToQString(const std::vector<int> &vectorRef)
 	return sRetValue;
 }
 
-PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :	IModel(itemRef),
-																		m_PropertiesModel(itemRef, 0, 0, this)
+PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :
+	IModel(itemRef),
+	m_PropertiesModel(itemRef, 0, 0, this)
 {
 	// Ensure the destination directory exists (<DataDir>/Prefabs/<prefix>/)
 	QDir dataDir(itemRef.GetProject().GetAssetsAbsPath() % HyGlobal::ItemName(ITEM_Prefab, true));

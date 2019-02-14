@@ -12,7 +12,8 @@
 
 int32 HyAtlasIndices::sm_iIndexFlagsArraySize = -1;	// -1 indicates that this has not been initialized
 
-HyAtlasIndices::HyAtlasIndices() : m_pIndexFlags(nullptr)
+HyAtlasIndices::HyAtlasIndices() :
+	m_pIndexFlags(nullptr)
 {
 	HyAssert(sm_iIndexFlagsArraySize >= 0, "HyAtlasIndices was constructed before HyAtlasIndices::sm_iIndexFlagsArraySize has been set");
 	

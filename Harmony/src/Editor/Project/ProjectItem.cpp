@@ -35,13 +35,14 @@ ProjectItem::ProjectItem(Project &projRef,
 						 QTreeWidgetItem *pParentTreeItem,
 						 const QString sName,
 						 QJsonValue initValue,
-						 bool bIsPendingSave) : ExplorerItem(eType, sName, pParentTreeItem),
-												m_ProjectRef(projRef),
-												m_SaveValue(initValue),
-												m_bExistencePendingSave(bIsPendingSave),
-												m_pModel(nullptr),
-												m_pWidget(nullptr),
-												m_pDraw(nullptr)
+						 bool bIsPendingSave) :
+	ExplorerItem(eType, sName, pParentTreeItem),
+	m_ProjectRef(projRef),
+	m_SaveValue(initValue),
+	m_bExistencePendingSave(bIsPendingSave),
+	m_pModel(nullptr),
+	m_pWidget(nullptr),
+	m_pDraw(nullptr)
 {
 	m_bIsProjectItem = true;
 

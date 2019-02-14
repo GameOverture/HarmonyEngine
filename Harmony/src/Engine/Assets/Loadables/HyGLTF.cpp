@@ -16,8 +16,9 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/quaternion.hpp"
 
-HyGLTF::HyGLTF(const std::string &sIdentifier) :	IHyLoadableData(HYLOADABLE_GLTF),
-													m_sIDENTIFIER(sIdentifier)
+HyGLTF::HyGLTF(const std::string &sIdentifier) :
+	IHyLoadableData(HYLOADABLE_GLTF),
+	m_sIDENTIFIER(sIdentifier)
 {
 }
 

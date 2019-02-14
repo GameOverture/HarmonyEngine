@@ -13,7 +13,8 @@
 #include "Project.h"
 #include "IModel.h"
 
-ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) : m_pProjItem(pProjItem)
+ProjectItemMimeData::ProjectItemMimeData(ProjectItem *pProjItem) :
+	m_pProjItem(pProjItem)
 {
 	m_pProjItem->GetModel()->Refresh();
 	QJsonValue itemValue = m_pProjItem->GetModel()->GetJson();

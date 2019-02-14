@@ -13,17 +13,18 @@
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
-HyTweenFloat::HyTweenFloat(float &valueReference, IHyNode &ownerRef, uint32 uiDirtyFlags) :	m_fValueRef(valueReference),
-																							m_OwnerRef(ownerRef),
-																							m_uiDIRTY_FLAGS(uiDirtyFlags),
-																							m_fStart(0.0f),
-																							m_fTarget(0.0f),
-																							m_fDuration(0.0f),
-																							m_fElapsedTime(0.0f),
-																							m_fpTweenFunc(nullptr),
-																							m_fpBehaviorUpdate(nullptr),
-																							m_fpTweenFinishedFunc(HyTween::NullTweenCallback),
-																							m_bAddedToOwnerUpdate(false)
+HyTweenFloat::HyTweenFloat(float &valueReference, IHyNode &ownerRef, uint32 uiDirtyFlags) :
+	m_fValueRef(valueReference),
+	m_OwnerRef(ownerRef),
+	m_uiDIRTY_FLAGS(uiDirtyFlags),
+	m_fStart(0.0f),
+	m_fTarget(0.0f),
+	m_fDuration(0.0f),
+	m_fElapsedTime(0.0f),
+	m_fpTweenFunc(nullptr),
+	m_fpBehaviorUpdate(nullptr),
+	m_fpTweenFinishedFunc(HyTween::NullTweenCallback),
+	m_bAddedToOwnerUpdate(false)
 {
 }
 

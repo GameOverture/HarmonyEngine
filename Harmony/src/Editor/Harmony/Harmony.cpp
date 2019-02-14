@@ -14,10 +14,11 @@
 
 Harmony *Harmony::sm_pInstance = nullptr;
 
-Harmony::Harmony(MainWindow &mainWindowRef) :  QObject(&mainWindowRef),
-											   m_MainWindowRef(mainWindowRef),
-											   m_pWidget(new HarmonyWidget(nullptr)),
-											   m_Connection(this)
+Harmony::Harmony(MainWindow &mainWindowRef) :
+	QObject(&mainWindowRef),
+	m_MainWindowRef(mainWindowRef),
+	m_pWidget(new HarmonyWidget(nullptr)),
+	m_Connection(this)
 {
 	if(sm_pInstance != nullptr)
 		HyGuiLog("Harmony instance created when the static 'sm_pInstance' was not nullptr", LOGTYPE_Error);

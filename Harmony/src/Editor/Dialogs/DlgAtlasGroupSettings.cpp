@@ -13,10 +13,11 @@
 
 #include <QMessageBox>
 
-DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObject packerSettingsObj, QWidget *parent) : QDialog(parent),
-																														ui(new Ui::DlgAtlasGroupSettings),
-																														m_bAtlasGrpHasImages(bAtlasGrpHasImages),
-																														m_InitialPackerSettingsObj(packerSettingsObj)
+DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObject packerSettingsObj, QWidget *parent) :
+	QDialog(parent),
+	ui(new Ui::DlgAtlasGroupSettings),
+	m_bAtlasGrpHasImages(bAtlasGrpHasImages),
+	m_InitialPackerSettingsObj(packerSettingsObj)
 {
 	ui->setupUi(this);
 

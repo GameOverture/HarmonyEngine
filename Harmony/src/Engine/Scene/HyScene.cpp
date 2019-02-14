@@ -25,11 +25,12 @@ bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 
-HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :	m_b2World(b2Vec2(0.0f, -10.0f)),
-															m_iPhysVelocityIterations(8),
-															m_iPhysPositionIterations(3),
-															m_WindowListRef(WindowListRef),
-															m_bPauseGame(false)
+HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :
+	m_b2World(b2Vec2(0.0f, -10.0f)),
+	m_iPhysVelocityIterations(8),
+	m_iPhysPositionIterations(3),
+	m_WindowListRef(WindowListRef),
+	m_bPauseGame(false)
 {
 	IHyDrawable::sm_pScene = this;
 

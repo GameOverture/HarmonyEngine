@@ -11,12 +11,13 @@
 #include "Assets/Nodes/HyText2dData.h"
 #include "Renderer/IHyRenderer.h"
 
-HyText2dData::FontState::FontState(std::string sName, Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, jsonxx::Array layersArray) :	sNAME(sName),
-																																																fLINE_HEIGHT(fLineHeight),
-																																																fLINE_ASCENDER(fLineAcender),
-																																																fLINE_DESCENDER(fLineDescender),
-																																																fLEFT_SIDE_NUDGE_AMT(fLeftSideNudgeAmt),
-																																																uiNUM_LAYERS(static_cast<uint32>(layersArray.size()))
+HyText2dData::FontState::FontState(std::string sName, Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, jsonxx::Array layersArray) :
+	sNAME(sName),
+	fLINE_HEIGHT(fLineHeight),
+	fLINE_ASCENDER(fLineAcender),
+	fLINE_DESCENDER(fLineDescender),
+	fLEFT_SIDE_NUDGE_AMT(fLeftSideNudgeAmt),
+	uiNUM_LAYERS(static_cast<uint32>(layersArray.size()))
 {
 	pLayers = reinterpret_cast<Layer *>(HY_NEW unsigned char[sizeof(Layer) * uiNUM_LAYERS]);
 	Layer *pLayerWriteLocation = pLayers;
@@ -43,11 +44,12 @@ HyText2dData::FontState::~FontState()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(sPath),
-																												m_pTypefaces(nullptr),
-																												m_uiNumTypefaces(0),
-																												m_pFontStates(nullptr),
-																												m_uiNumStates(0)
+HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :
+	IHyNodeData(sPath),
+	m_pTypefaces(nullptr),
+	m_uiNumTypefaces(0),
+	m_pFontStates(nullptr),
+	m_uiNumStates(0)
 {
 	jsonxx::Object textObject = dataValueRef.get<jsonxx::Object>();
 

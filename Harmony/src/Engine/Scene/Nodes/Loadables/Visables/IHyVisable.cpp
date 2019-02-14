@@ -16,15 +16,17 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyVisable::IHyVisable() :	m_pScissor(nullptr),
-							m_hStencil(HY_UNUSED_HANDLE),
-							m_iCoordinateSystem(-1)
+IHyVisable::IHyVisable() :
+	m_pScissor(nullptr),
+	m_hStencil(HY_UNUSED_HANDLE),
+	m_iCoordinateSystem(-1)
 {
 }
 
-IHyVisable::IHyVisable(const IHyVisable &copyRef) :	m_pScissor(nullptr),
-													m_hStencil(copyRef.m_hStencil),
-													m_iCoordinateSystem(copyRef.m_iCoordinateSystem)
+IHyVisable::IHyVisable(const IHyVisable &copyRef) :
+	m_pScissor(nullptr),
+	m_hStencil(copyRef.m_hStencil),
+	m_iCoordinateSystem(copyRef.m_iCoordinateSystem)
 {
 	if(copyRef.m_pScissor)
 	{

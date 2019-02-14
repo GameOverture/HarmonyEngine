@@ -16,13 +16,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_AddLayer::FontUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, rendermode_t eRenderMode, int iSize, float fThickness, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-																																											m_ItemRef(itemRef),
-																																											m_iStateIndex(iStateIndex),
-																																											m_eRenderMode(eRenderMode),
-																																											m_iSize(iSize),
-																																											m_fThickness(fThickness),
-																																											m_iId(-1)
+FontUndoCmd_AddLayer::FontUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, rendermode_t eRenderMode, int iSize, float fThickness, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_eRenderMode(eRenderMode),
+	m_iSize(iSize),
+	m_fThickness(fThickness),
+	m_iId(-1)
 {
 	setText("Add Font Layer");
 }
@@ -53,10 +54,11 @@ void FontUndoCmd_AddLayer::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_RemoveLayer::FontUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, int iId, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-																																	m_ItemRef(itemRef),
-																																	m_iStateIndex(iStateIndex),
-																																	m_iId(iId)
+FontUndoCmd_RemoveLayer::FontUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, int iId, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_iId(iId)
 {
 	setText("Remove Font Layer");
 }
@@ -85,12 +87,13 @@ void FontUndoCmd_RemoveLayer::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_LayerRenderMode::FontUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-																																																m_ItemRef(itemRef),
-																																																m_iStateIndex(iStateIndex),
-																																																m_iLayerId(iLayerId),
-																																																m_ePrevRenderMode(ePrevMode),
-																																																m_eNewRenderMode(eNewMode)
+FontUndoCmd_LayerRenderMode::FontUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_iLayerId(iLayerId),
+	m_ePrevRenderMode(ePrevMode),
+	m_eNewRenderMode(eNewMode)
 {
 	setText("Stage Render Mode");
 }
@@ -119,12 +122,13 @@ void FontUndoCmd_LayerRenderMode::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_LayerOutlineThickness::FontUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) :   QUndoCommand(pParent),
-																																																		m_ItemRef(itemRef),
-																																																		m_iStateIndex(iStateIndex),
-																																																		m_iLayerId(iLayerId),
-																																																		m_fPrevThickness(fPrevThickness),
-																																																		m_fNewThickness(fNewThickness)
+FontUndoCmd_LayerOutlineThickness::FontUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_iLayerId(iLayerId),
+	m_fPrevThickness(fPrevThickness),
+	m_fNewThickness(fNewThickness)
 {
 	setText("Stage Outline Thickness");
 }
@@ -153,14 +157,15 @@ void FontUndoCmd_LayerOutlineThickness::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_LayerColors::FontUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent /*= 0*/) :    QUndoCommand(pParent),
-																																																							m_ItemRef(itemRef),
-																																																							m_iStateIndex(iStateIndex),
-																																																							m_iLayerId(iLayerId),
-																																																							m_PrevTopColor(prevTopColor),
-																																																							m_PrevBotColor(prevBotColor),
-																																																							m_NewTopColor(newTopColor),
-																																																							m_NewBotColor(newBotColor)
+FontUndoCmd_LayerColors::FontUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_iLayerId(iLayerId),
+	m_PrevTopColor(prevTopColor),
+	m_PrevBotColor(prevBotColor),
+	m_NewTopColor(newTopColor),
+	m_NewBotColor(newBotColor)
 {
 	setText("Set Layer Colors");
 }
@@ -189,12 +194,13 @@ void FontUndoCmd_LayerColors::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_LayerOrder::FontUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, FontTableView *pTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :  QUndoCommand(pParent),
-																																														m_ItemRef(itemRef),
-																																														m_iStateIndex(iStateIndex),
-																																														m_pFontTableView(pTableView),
-																																														m_iPrevRowIndex(iPrevRowIndex),
-																																														m_iNewRowIndex(iNewRowIndex)
+FontUndoCmd_LayerOrder::FontUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, FontTableView *pTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_pFontTableView(pTableView),
+	m_iPrevRowIndex(iPrevRowIndex),
+	m_iNewRowIndex(iNewRowIndex)
 {
 	if(m_iPrevRowIndex > m_iNewRowIndex)
 		setText("Order Layer Upwards");

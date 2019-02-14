@@ -11,8 +11,9 @@
 #include "Scene/Nodes/Objects/HyCamera.h"
 #include "Window/HyWindow.h"
 
-IHyCamera::IHyCamera(HyWindow *pWindow) :	m_pWindowPtr(pWindow),
-											m_uiCullMaskBit(0)
+IHyCamera::IHyCamera(HyWindow *pWindow) :
+	m_pWindowPtr(pWindow),
+	m_uiCullMaskBit(0)
 {
 	m_ViewportRect.left = m_ViewportRect.bottom = 0.0f;
 	m_ViewportRect.right = m_ViewportRect.top = 1.0f;
@@ -41,8 +42,9 @@ uint32 IHyCamera::GetCameraBitFlag()
 	return m_uiCullMaskBit;
 }
 
-HyCamera2d::HyCamera2d(HyWindow *pWindow) : IHyNode2d(HYTYPE_Camera, nullptr),
-											IHyCamera(pWindow)
+HyCamera2d::HyCamera2d(HyWindow *pWindow) :
+	IHyNode2d(HYTYPE_Camera, nullptr),
+	IHyCamera(pWindow)
 { }
 
 HyCamera2d::~HyCamera2d()
@@ -91,8 +93,9 @@ const b2AABB &HyCamera2d::GetWorldViewBounds()
 //	return returnRect;
 //}
 
-HyCamera3d::HyCamera3d(HyWindow *pWindow) : IHyNode3d(HYTYPE_Camera, nullptr),
-											IHyCamera(pWindow)
+HyCamera3d::HyCamera3d(HyWindow *pWindow) :
+	IHyNode3d(HYTYPE_Camera, nullptr),
+	IHyCamera(pWindow)
 { }
 
 HyCamera3d::~HyCamera3d()

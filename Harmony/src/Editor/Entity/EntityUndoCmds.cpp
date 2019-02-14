@@ -12,14 +12,15 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 
-EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, ProjectItem *pParameter, QUndoCommand *pParent /*= 0*/) :	QUndoCommand(pParent),
-																																	m_eCMD(eCMD),
-																																	m_EntityItemRef(entityItemRef),
-																																	m_pTreeItem(nullptr),
-																																	m_pWidget(static_cast<EntityWidget *>(entityItemRef.GetWidget())),
-																																	m_pModel(static_cast<EntityModel *>(entityItemRef.GetModel())),
-																																	m_pParentTreeItem(static_cast<EntityWidget *>(entityItemRef.GetWidget())->GetCurSelectedTreeItem()),
-																																	m_iRow(0)
+EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, ProjectItem *pParameter, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_eCMD(eCMD),
+	m_EntityItemRef(entityItemRef),
+	m_pTreeItem(nullptr),
+	m_pWidget(static_cast<EntityWidget *>(entityItemRef.GetWidget())),
+	m_pModel(static_cast<EntityModel *>(entityItemRef.GetModel())),
+	m_pParentTreeItem(static_cast<EntityWidget *>(entityItemRef.GetWidget())->GetCurSelectedTreeItem()),
+	m_iRow(0)
 {
 	if(m_EntityItemRef.GetType() != ITEM_Entity)
 		HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_EntityItemRef.GetType()) , LOGTYPE_Error);

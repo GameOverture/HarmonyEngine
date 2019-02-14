@@ -19,7 +19,8 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AudioBankTableView::AudioBankTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
+AudioBankTableView::AudioBankTableView(QWidget *pParent /*= 0*/) :
+	QTableView(pParent)
 {
 }
 
@@ -35,8 +36,9 @@ AudioBankTableView::AudioBankTableView(QWidget *pParent /*= 0*/) : QTableView(pP
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AudioBankTableModel::AudioBankTableModel(QObject *pParent) :  QAbstractTableModel(pParent),
-																m_sName("Unnamed")
+AudioBankTableModel::AudioBankTableModel(QObject *pParent) :
+	QAbstractTableModel(pParent),
+	m_sName("Unnamed")
 {
 }
 
@@ -150,8 +152,9 @@ void AudioBankTableModel::GetJsonObj(QJsonObject &audioBankObj)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AudioManagerStringListModel::AudioManagerStringListModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :  QStringListModel(pParent),
-																								m_AudioBanksRef(atlasGroupsRef)
+AudioManagerStringListModel::AudioManagerStringListModel(QStackedWidget &atlasGroupsRef, QObject *pParent) :
+	QStringListModel(pParent),
+	m_AudioBanksRef(atlasGroupsRef)
 { }
 
 /*virtual*/ QVariant AudioManagerStringListModel::data(const QModelIndex & index, int role /*= Qt::DisplayRole*/) const
@@ -174,7 +177,8 @@ AudioManagerStringListModel::AudioManagerStringListModel(QStackedWidget &atlasGr
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AudioCategoryDelegate::AudioCategoryDelegate(QObject *pParent /*= 0*/) :   QStyledItemDelegate(pParent)
+AudioCategoryDelegate::AudioCategoryDelegate(QObject *pParent /*= 0*/) :
+	QStyledItemDelegate(pParent)
 {
 }
 
@@ -221,8 +225,9 @@ AudioCategoryDelegate::AudioCategoryDelegate(QObject *pParent /*= 0*/) :   QStyl
 
 /////////////////////////////////////////////////
 
-AudioCategoryStringListModel::AudioCategoryStringListModel(QDir audioBankDir, QObject *pParent) :   QStringListModel(pParent),
-																							m_AudioBankDir(audioBankDir)
+AudioCategoryStringListModel::AudioCategoryStringListModel(QDir audioBankDir, QObject *pParent) :
+	QStringListModel(pParent),
+	m_AudioBankDir(audioBankDir)
 {
 	QJsonArray categoryArray;
 	bool bNoFileFound = true;

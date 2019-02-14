@@ -19,8 +19,9 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-AudioWidgetBank::AudioWidgetBank(QWidget *parent) : QWidget(parent),
-													ui(new Ui::AudioWidgetBank)
+AudioWidgetBank::AudioWidgetBank(QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::AudioWidgetBank)
 {
 	ui->setupUi(this);
 	
@@ -28,11 +29,12 @@ AudioWidgetBank::AudioWidgetBank(QWidget *parent) : QWidget(parent),
 	HyGuiLog("WidgetAudioBank::WidgetAudioBank() invalid constructor used", LOGTYPE_Error);
 }
 
-AudioWidgetBank::AudioWidgetBank(QDir metaDir, QDir dataDir, AudioWidgetManager *pManager, QWidget *pParent /*= 0*/) :  QWidget(pParent),
-																														ui(new Ui::AudioWidgetBank),
-																														m_pManager(pManager),
-																														m_MetaDir(metaDir),
-																														m_DataDir(dataDir)
+AudioWidgetBank::AudioWidgetBank(QDir metaDir, QDir dataDir, AudioWidgetManager *pManager, QWidget *pParent /*= 0*/) :
+	QWidget(pParent),
+	ui(new Ui::AudioWidgetBank),
+	m_pManager(pManager),
+	m_MetaDir(metaDir),
+	m_DataDir(dataDir)
 {
 	ui->setupUi(this);
 	

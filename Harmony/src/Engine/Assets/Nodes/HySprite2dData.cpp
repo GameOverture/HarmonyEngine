@@ -24,9 +24,10 @@ bool HySprite2dFrame::IsValid() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(sPath),
-																													m_pAnimStates(NULL),
-																													m_uiNumStates(0)
+HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :
+	IHyNodeData(sPath),
+	m_pAnimStates(nullptr),
+	m_uiNumStates(0)
 {
 	jsonxx::Array spriteStateArray = dataValueRef.get<jsonxx::Array>();
 
@@ -81,12 +82,13 @@ HySprite2dData::AnimState::AnimState(std::string sName,
 									 float fDuration,
 									 HyAtlasIndices &requiredAtlasIndicesRef,
 									 jsonxx::Array &frameArray,
-									 HyAssets &assetsRef) :	m_sNAME(sName),
-															m_bLOOP(bLoop),
-															m_bREVERSE(bReverse),
-															m_bBOUNCE(bBounce),
-															m_fDURATION(fDuration),
-															m_uiNUMFRAMES(frameArray.empty() ? 1 : static_cast<uint32>(frameArray.size()))	// Cannot have '0' frames
+									 HyAssets &assetsRef) :
+	m_sNAME(sName),
+	m_bLOOP(bLoop),
+	m_bREVERSE(bReverse),
+	m_bBOUNCE(bBounce),
+	m_fDURATION(fDuration),
+	m_uiNUMFRAMES(frameArray.empty() ? 1 : static_cast<uint32>(frameArray.size()))	// Cannot have '0' frames
 {
 	m_pFrames = reinterpret_cast<HySprite2dFrame *>(HY_NEW unsigned char[sizeof(HySprite2dFrame) * m_uiNUMFRAMES]);
 	HySprite2dFrame *pFrameWriteLocation = m_pFrames;

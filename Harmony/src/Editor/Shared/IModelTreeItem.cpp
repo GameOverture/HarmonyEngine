@@ -10,7 +10,8 @@
 #include "Global.h"
 #include "IModelTreeItem.h"
 
-IModelTreeItem::IModelTreeItem() : m_pParentItem(nullptr)
+IModelTreeItem::IModelTreeItem() :
+	m_pParentItem(nullptr)
 { }
 
 /*virtual*/ IModelTreeItem::~IModelTreeItem()

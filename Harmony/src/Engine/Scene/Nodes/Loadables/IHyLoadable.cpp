@@ -14,17 +14,19 @@
 
 /*static*/ HyAssets *IHyLoadable::sm_pHyAssets = nullptr;
 
-IHyLoadable::IHyLoadable(const char *szPrefix, const char *szName) :	m_eLoadState(HYLOADSTATE_Inactive),
-																		m_pData(nullptr),
-																		m_sName(szName ? szName : ""),
-																		m_sPrefix(szPrefix ? szPrefix : "")
+IHyLoadable::IHyLoadable(const char *szPrefix, const char *szName) :
+	m_eLoadState(HYLOADSTATE_Inactive),
+	m_pData(nullptr),
+	m_sName(szName ? szName : ""),
+	m_sPrefix(szPrefix ? szPrefix : "")
 {
 }
 
-IHyLoadable::IHyLoadable(const IHyLoadable &copyRef) :	m_eLoadState(HYLOADSTATE_Inactive),
-														m_pData(nullptr),
-														m_sName(copyRef.m_sName),
-														m_sPrefix(copyRef.m_sPrefix)
+IHyLoadable::IHyLoadable(const IHyLoadable &copyRef) :
+	m_eLoadState(HYLOADSTATE_Inactive),
+	m_pData(nullptr),
+	m_sName(copyRef.m_sName),
+	m_sPrefix(copyRef.m_sPrefix)
 {
 }
 

@@ -17,7 +17,8 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpriteTableView::SpriteTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
+SpriteTableView::SpriteTableView(QWidget *pParent /*= 0*/) :
+	QTableView(pParent)
 {
 }
 
@@ -36,9 +37,10 @@ SpriteTableView::SpriteTableView(QWidget *pParent /*= 0*/) : QTableView(pParent)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetSpriteDelegate::WidgetSpriteDelegate(ProjectItem *pItem, SpriteTableView *pTableView, QObject *pParent /*= 0*/) :  QStyledItemDelegate(pParent),
-																														 m_pItem(pItem),
-																														 m_pTableView(pTableView)
+WidgetSpriteDelegate::WidgetSpriteDelegate(ProjectItem *pItem, SpriteTableView *pTableView, QObject *pParent /*= 0*/) :
+	QStyledItemDelegate(pParent),
+	m_pItem(pItem),
+	m_pTableView(pTableView)
 {
 }
 
@@ -126,5 +128,3 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ProjectItem *pItem, SpriteTableView *
 {
 	pEditor->setGeometry(option.rect);
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

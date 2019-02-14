@@ -24,19 +24,20 @@ AtlasFrame::AtlasFrame(quint32 uiId,
 					   int iX,
 					   int iY,
 					   int iTextureIndex,
-					   uint uiErrors) : m_uiUNIQUE_ID(uiId),
-										m_eType(eType),
-										m_uiAtlasGrpId(uiAtlasGrpId),
-										m_pTreeWidgetItem(nullptr),
-										m_uiImageChecksum(uiChecksum),
-										m_sName(sN),
-										m_iWidth(iW),
-										m_iHeight(iH),
-										m_rAlphaCrop(rAlphaCrop),
-										m_iPosX(iX),
-										m_iPosY(iY),
-										m_iTextureIndex(iTextureIndex),
-										m_uiErrors(uiErrors)
+					   uint uiErrors) :
+	m_uiUNIQUE_ID(uiId),
+	m_eType(eType),
+	m_uiAtlasGrpId(uiAtlasGrpId),
+	m_pTreeWidgetItem(nullptr),
+	m_uiImageChecksum(uiChecksum),
+	m_sName(sN),
+	m_iWidth(iW),
+	m_iHeight(iH),
+	m_rAlphaCrop(rAlphaCrop),
+	m_iPosX(iX),
+	m_iPosY(iY),
+	m_iTextureIndex(iTextureIndex),
+	m_uiErrors(uiErrors)
 {
 }
 

@@ -48,10 +48,11 @@ QMap<QString, QJsonValue> DlgProjectSettings::sm_DefaultValues;
 	sm_DefaultValues["WindowInfoArray"] = windowInfoArray;
 }
 
-DlgProjectSettings::DlgProjectSettings(const QString sProjectFilePath, QWidget *parent) :   QDialog(parent),
-																							ui(new Ui::DlgProjectSettings),
-																							m_sPROJ_SETTINGS_FILE_PATH(sProjectFilePath),
-																							m_bHasError(false)
+DlgProjectSettings::DlgProjectSettings(const QString sProjectFilePath, QWidget *parent) :
+	QDialog(parent),
+	ui(new Ui::DlgProjectSettings),
+	m_sPROJ_SETTINGS_FILE_PATH(sProjectFilePath),
+	m_bHasError(false)
 {
 	ui->setupUi(this);
 

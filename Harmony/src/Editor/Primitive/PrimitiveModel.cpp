@@ -10,7 +10,8 @@
 #include "Global.h"
 #include "PrimitiveModel.h"
 
-PrimitiveModel::PrimitiveModel(ProjectItem &itemRef) : IModel(itemRef)
+PrimitiveModel::PrimitiveModel(ProjectItem &itemRef) :
+	IModel(itemRef)
 {
 }
 

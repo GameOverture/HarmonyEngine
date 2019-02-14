@@ -26,12 +26,13 @@ HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
-HySprite2d::HySprite2d(const HySprite2d &copyRef) :	IHyDrawable2d(copyRef),
-													m_bIsAnimPaused(copyRef.m_bIsAnimPaused),
-													m_fAnimPlayRate(copyRef.m_fAnimPlayRate),
-													m_fElapsedFrameTime(copyRef.m_fElapsedFrameTime),
-													m_uiCurAnimState(copyRef.m_uiCurAnimState),
-													m_uiCurFrame(copyRef.m_uiCurFrame)
+HySprite2d::HySprite2d(const HySprite2d &copyRef) :
+	IHyDrawable2d(copyRef),
+	m_bIsAnimPaused(copyRef.m_bIsAnimPaused),
+	m_fAnimPlayRate(copyRef.m_fAnimPlayRate),
+	m_fElapsedFrameTime(copyRef.m_fElapsedFrameTime),
+	m_uiCurAnimState(copyRef.m_uiCurAnimState),
+	m_uiCurFrame(copyRef.m_uiCurFrame)
 {
 	for(uint32 i = 0; i < static_cast<uint32>(copyRef.m_AnimCtrlAttribList.size()); ++i)
 		m_AnimCtrlAttribList.push_back(copyRef.m_AnimCtrlAttribList[i]);

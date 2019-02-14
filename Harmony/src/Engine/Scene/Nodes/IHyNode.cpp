@@ -12,22 +12,24 @@
 #include "Scene/HyScene.h"
 #include "Scene/Tweens/HyTweenFloat.h"
 
-IHyNode::IHyNode(HyType eNodeType) :	m_eTYPE(eNodeType),
-										m_uiDirtyFlags(0),
-										m_uiExplicitAndTypeFlags(0),
-										m_bEnabled(true),
-										m_bPauseOverride(false),
-										m_iTag(0)
+IHyNode::IHyNode(HyType eNodeType) :
+	m_eTYPE(eNodeType),
+	m_uiDirtyFlags(0),
+	m_uiExplicitAndTypeFlags(0),
+	m_bEnabled(true),
+	m_bPauseOverride(false),
+	m_iTag(0)
 {
 	HyScene::AddNode(this);
 }
 
-IHyNode::IHyNode(const IHyNode &copyRef) :	m_eTYPE(copyRef.m_eTYPE),
-											m_uiDirtyFlags(copyRef.m_uiDirtyFlags),
-											m_uiExplicitAndTypeFlags(copyRef.m_uiExplicitAndTypeFlags),
-											m_bEnabled(copyRef.m_bEnabled),
-											m_bPauseOverride(copyRef.m_bPauseOverride),
-											m_iTag(copyRef.m_iTag)
+IHyNode::IHyNode(const IHyNode &copyRef) :
+	m_eTYPE(copyRef.m_eTYPE),
+	m_uiDirtyFlags(copyRef.m_uiDirtyFlags),
+	m_uiExplicitAndTypeFlags(copyRef.m_uiExplicitAndTypeFlags),
+	m_bEnabled(copyRef.m_bEnabled),
+	m_bPauseOverride(copyRef.m_bPauseOverride),
+	m_iTag(copyRef.m_iTag)
 {
 	HyScene::AddNode(this);
 

@@ -12,11 +12,12 @@
 
 #include <QDateTime>
 
-HarmonyConnection::HarmonyConnection(QObject *parent) : QObject(parent),
-														m_Socket(this),
-														m_Address(QHostAddress::LocalHost),
-														m_uiPort(1313),
-														m_uiPacketSize(0)
+HarmonyConnection::HarmonyConnection(QObject *parent) :
+	QObject(parent),
+	m_Socket(this),
+	m_Address(QHostAddress::LocalHost),
+	m_uiPort(1313),
+	m_uiPacketSize(0)
 {
 	//m_Socket.connect(
 	//connect(m_pTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));

@@ -11,8 +11,9 @@
 #include "WidgetLiveVarManager.h"
 #include "ui_WidgetLiveVarManager.h"
 
-WidgetLiveVarManager::WidgetLiveVarManager(QWidget *parent) :   QWidget(parent),
-																ui(new Ui::WidgetLiveVarManager)
+WidgetLiveVarManager::WidgetLiveVarManager(QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::WidgetLiveVarManager)
 {
 	ui->setupUi(this);
 

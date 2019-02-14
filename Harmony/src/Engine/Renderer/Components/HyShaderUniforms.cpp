@@ -12,14 +12,16 @@
 #include "Utilities/Crc32.h"
 #include "Afx/HyInteropAfx.h"
 
-HyShaderUniforms::HyShaderUniforms() :	m_bDirty(true),
-										m_uiCrc32(0)
+HyShaderUniforms::HyShaderUniforms() :
+	m_bDirty(true),
+	m_uiCrc32(0)
 {
 }
 
-HyShaderUniforms::HyShaderUniforms(const HyShaderUniforms &copyRef) :	m_bDirty(copyRef.m_bDirty),
-																		m_uiCrc32(copyRef.m_uiCrc32),
-																		m_UniformList(copyRef.m_UniformList)
+HyShaderUniforms::HyShaderUniforms(const HyShaderUniforms &copyRef) :
+	m_bDirty(copyRef.m_bDirty),
+	m_uiCrc32(copyRef.m_uiCrc32),
+	m_UniformList(copyRef.m_UniformList)
 {
 }
 

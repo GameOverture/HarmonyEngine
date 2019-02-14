@@ -10,7 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyPrefabData.h"
 
-HyPrefabData::HyPrefabData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :	IHyNodeData(sPath)
+HyPrefabData::HyPrefabData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :
+	IHyNodeData(sPath)
 {
 	const jsonxx::Array &prefabArray = dataValueRef.get<jsonxx::Array>();
 
