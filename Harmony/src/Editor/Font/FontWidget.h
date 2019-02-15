@@ -15,6 +15,7 @@
 #include <QWidget>
 #include <QDir>
 #include <QJsonArray>
+#include <QTableView>
 
 #include "freetype-gl/freetype-gl.h"
 
@@ -25,11 +26,41 @@ class FontWidget;
 class FontItem;
 class FontStateLayersModel;
 
+struct FontTypeface;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class FontTableView : public QTableView
+{
+	Q_OBJECT
+
+public:
+	FontTableView(QWidget *pParent = 0);
+
+protected:
+	virtual void resizeEvent(QResizeEvent *pResizeEvent) override;
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class FontDelegate : public QStyledItemDelegate
+{
+	Q_OBJECT
+
+	ProjectItem *			m_pItem;
+	QComboBox *				m_pCmbStates;
+
+public:
+	FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *pParent = 0);
+
+	virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+	virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;
+	virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const override;
+	virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class FontWidget : public QWidget
 {
 	Q_OBJECT
 
-	ProjectItem &               m_ItemRef;
+	ProjectItem &			m_ItemRef;
 	
 public:
 	explicit FontWidget(ProjectItem &itemRef, QWidget *parent = 0);

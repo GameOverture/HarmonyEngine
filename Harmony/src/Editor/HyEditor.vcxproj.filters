@@ -160,9 +160,6 @@
     <ClCompile Include="Font\FontModels.cpp">
       <Filter>Font</Filter>
     </ClCompile>
-    <ClCompile Include="Font\FontModelView.cpp">
-      <Filter>Font</Filter>
-    </ClCompile>
     <ClCompile Include="Font\FontUndoCmds.cpp">
       <Filter>Font</Filter>
     </ClCompile>
@@ -1216,9 +1213,6 @@
     </QtMoc>
     <QtMoc Include="Explorer\ExplorerWidget.h">
       <Filter>Explorer</Filter>
-    </QtMoc>
-    <QtMoc Include="Font\FontModelView.h">
-      <Filter>Font</Filter>
     </QtMoc>
     <QtMoc Include="Font\FontWidget.h">
       <Filter>Font</Filter>

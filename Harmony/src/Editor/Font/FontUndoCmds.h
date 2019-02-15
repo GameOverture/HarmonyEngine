@@ -10,7 +10,9 @@
 #ifndef FONTUNDOCMDS_H
 #define FONTUNDOCMDS_H
 
-#include "FontModelView.h"
+#include "FontWidget.h"
+
+#include "freetype-gl/freetype-gl.h"
 
 #include <QUndoCommand>
 #include <QComboBox>

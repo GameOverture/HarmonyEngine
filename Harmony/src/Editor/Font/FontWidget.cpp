@@ -13,9 +13,9 @@
 #include "GlobalUndoCmds.h"
 #include "FontUndoCmds.h"
 #include "AtlasWidget.h"
-#include "FontModelView.h"
 #include "FontModels.h"
 #include "DlgInputName.h"
+#include "DlgColorPicker.h"
 
 #include <QDir>
 #include <QJsonDocument>
@@ -24,6 +24,138 @@
 #include <QMenu>
 #include <QColor>
 
+ //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+FontTableView::FontTableView(QWidget *pParent /*= 0*/) :
+	QTableView(pParent)
+{
+}
+
+/*virtual*/ void FontTableView::resizeEvent(QResizeEvent *pResizeEvent)
+{
+	int iWidth = pResizeEvent->size().width();
+
+	iWidth -= 144;
+	setColumnWidth(FontStateLayersModel::COLUMN_Type, iWidth);
+	setColumnWidth(FontStateLayersModel::COLUMN_Thickness, 64);
+	setColumnWidth(FontStateLayersModel::COLUMN_DefaultColor, 80);
+
+	QTableView::resizeEvent(pResizeEvent);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :
+	QStyledItemDelegate(pParent),
+	m_pItem(pItem),
+	m_pCmbStates(pCmbStates)
+{
+}
+
+/*virtual*/ QWidget* FontDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	QWidget *pReturnWidget = NULL;
+
+	const FontStateLayersModel *pFontModel = static_cast<const FontStateLayersModel *>(index.model());
+
+	switch(index.column())
+	{
+	case FontStateLayersModel::COLUMN_Type:
+		pReturnWidget = new QComboBox(pParent);
+		static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_NORMAL));
+		static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_OUTLINE_EDGE));
+		static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_OUTLINE_POSITIVE));
+		static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_OUTLINE_NEGATIVE));
+		static_cast<QComboBox *>(pReturnWidget)->addItem(pFontModel->GetRenderModeString(RENDER_SIGNED_DISTANCE_FIELD));
+		break;
+
+	case FontStateLayersModel::COLUMN_Thickness:
+		pReturnWidget = new QDoubleSpinBox(pParent);
+		static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(0.0, 4096.0);
+		break;
+
+	case FontStateLayersModel::COLUMN_DefaultColor:
+		DlgColorPicker *pDlg = new DlgColorPicker("Choose Font Layer Color", pFontModel->GetLayerTopColor(index.row()), pFontModel->GetLayerBotColor(index.row()), pParent);
+		if(pDlg->exec() == QDialog::Accepted)
+		{
+			QColor topColor, botColor;
+			if(pDlg->IsSolidColor())
+			{
+				topColor = pDlg->GetSolidColor();
+				botColor = pDlg->GetSolidColor();
+			}
+			else
+			{
+				topColor = pDlg->GetVgTopColor();
+				botColor = pDlg->GetVgBotColor();
+			}
+			m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerColors(*m_pItem,
+				m_pCmbStates->currentIndex(),
+				pFontModel->GetLayerId(index.row()),
+				pFontModel->GetLayerTopColor(index.row()),
+				pFontModel->GetLayerBotColor(index.row()),
+				topColor,
+				botColor));
+		}
+		break;
+	}
+
+	return pReturnWidget;
+}
+
+/*virtual*/ void FontDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
+{
+	const FontStateLayersModel *pFontModel = static_cast<const FontStateLayersModel *>(index.model());
+
+	switch(index.column())
+	{
+	case FontStateLayersModel::COLUMN_Type:
+		static_cast<QComboBox *>(pEditor)->setCurrentIndex(pFontModel->GetLayerRenderMode(index.row()));
+		break;
+
+	case FontStateLayersModel::COLUMN_Thickness:
+		static_cast<QDoubleSpinBox *>(pEditor)->setValue(pFontModel->GetLayerOutlineThickness(index.row()));
+		break;
+
+	case FontStateLayersModel::COLUMN_DefaultColor:
+		break;
+	}
+}
+
+/*virtual*/ void FontDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
+{
+	FontStateLayersModel *pFontModel = static_cast<FontStateLayersModel *>(pModel);
+
+	switch(index.column())
+	{
+	case FontStateLayersModel::COLUMN_Type:
+		m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerRenderMode(*m_pItem,
+			m_pCmbStates->currentIndex(),
+			pFontModel->GetLayerId(index.row()),
+			pFontModel->GetLayerRenderMode(index.row()),
+			static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
+		break;
+
+	case FontStateLayersModel::COLUMN_Thickness:
+		m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerOutlineThickness(*m_pItem,
+			m_pCmbStates->currentIndex(),
+			pFontModel->GetLayerId(index.row()),
+			pFontModel->GetLayerOutlineThickness(index.row()),
+			static_cast<QDoubleSpinBox *>(pEditor)->value()));
+		break;
+
+	case FontStateLayersModel::COLUMN_DefaultColor:
+		//m_pItemFont->GetUndoStack()->push(new ItemFontCmd_StageColor(m_pTableView, index.row(), static_cast<QDoubleSpinBox *>(pEditor)->value()));
+		break;
+	}
+}
+
+/*virtual*/ void FontDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	pEditor->setGeometry(option.rect);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::FontWidget),

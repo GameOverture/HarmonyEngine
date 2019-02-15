@@ -237,7 +237,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Explorer\ExplorerTreeWidget.cpp" />
     <ClCompile Include="Explorer\ExplorerWidget.cpp" />
     <ClCompile Include="Font\FontDraw.cpp" />
-    <ClCompile Include="Font\FontModelView.cpp" />
     <ClCompile Include="Font\FontModels.cpp" />
     <ClCompile Include="Font\FontUndoCmds.cpp" />
     <ClCompile Include="Font\FontWidget.cpp" />
@@ -391,10 +390,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Font\FontDraw.h" />
-    <QtMoc Include="Font\FontModelView.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
     <QtMoc Include="Font\FontModels.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
