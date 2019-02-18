@@ -14,13 +14,17 @@ class HyTime;
 
 class IHyTimeInst
 {
+	friend class HyTime;
+
+protected:
 	static HyTime *sm_pTime;
 
 public:
 	IHyTimeInst(void);
 	virtual ~IHyTimeInst(void);
 
-	void Update(double dDelta);
+protected:
+	virtual void Update(double dDelta) = 0;
 };
 
 #endif /* IHyTimeInst_h__ */

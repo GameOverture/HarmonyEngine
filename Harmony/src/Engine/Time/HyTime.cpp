@@ -23,13 +23,14 @@ HyTime::HyTime(uint32 uiUpdateTickMs) :
 	m_dPrevTime(0.0),
 	m_dCurDeltaTime(0.0)
 {
+	IHyTimeInst::sm_pTime = this;
 	SetUpdateTickMs(uiUpdateTickMs);
 }
 
 HyTime::~HyTime(void)
 {
-	while(m_TimeInstList.size() != 0)
-		RemoveTimeInst(m_TimeInstList[0]);
+	//while(m_TimeInstList.size() != 0)
+	//	RemoveTimeInst(m_TimeInstList[0]);
 }
 
 uint32 HyTime::GetUpdateTickMs()
@@ -51,14 +52,19 @@ void HyTime::SetUpdateTickMs(uint32 uiUpdateTickMs)
 	m_dThrottledTime = 0.0;
 }
 
-float HyTime::GetUpdateStepSeconds()
+float HyTime::GetUpdateStepSeconds() const
 {
 	return static_cast<float>(m_dCurDeltaTime);//return static_cast<float>(m_dUpdateTick_Seconds);
 }
 
-double HyTime::GetUpdateStepSecondsDbl()
+double HyTime::GetUpdateStepSecondsDbl() const
 {
 	return m_dCurDeltaTime;
+}
+
+double HyTime::GetTotalElapsedTime() const
+{
+	return m_dTotalElapsedTime;
 }
 
 void HyTime::SetCurDeltaTime()
@@ -79,10 +85,7 @@ void HyTime::CalcTimeDelta()
 	
 	m_dTotalElapsedTime += m_dCurDeltaTime;
 	m_dThrottledTime += m_dCurDeltaTime;
-}
 
-bool HyTime::ThrottleUpdate()
-{
 	// Update all timers
 	if(m_TimeInstList.empty() == false)
 	{
@@ -90,7 +93,10 @@ bool HyTime::ThrottleUpdate()
 		for(uint32 i = 0; i < uiNumTimers; i++)
 			m_TimeInstList[i]->Update(m_dCurDeltaTime);
 	}
+}
 
+bool HyTime::ThrottleUpdate()
+{
 	if(m_dThrottledTime >= m_dUpdateTick_Seconds)
 	{
 		m_dThrottledTime -= m_dUpdateTick_Seconds;
@@ -160,24 +166,24 @@ std::string HyTime::GetDateTime()
 #endif
 }
 
-void HyTime::AddTimeInst(IHyTimeInst *pTimeInst)
+/*friend*/ void HyAddTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst)
 {
 	if(pTimeInst == NULL)
 		return;
 
-	m_TimeInstList.push_back(pTimeInst);
+	timeRef.m_TimeInstList.push_back(pTimeInst);
 }
 
-void HyTime::RemoveTimeInst(IHyTimeInst *pTimeInst)
+/*friend*/ void HyRemoveTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst)
 {
 	if(pTimeInst == NULL)
 		return;
 
-	for(std::vector<IHyTimeInst*>::iterator it = m_TimeInstList.begin(); it != m_TimeInstList.end(); ++it)
+	for(std::vector<IHyTimeInst*>::iterator it = timeRef.m_TimeInstList.begin(); it != timeRef.m_TimeInstList.end(); ++it)
 	{
 		if((*it) == pTimeInst)
 		{
-			it = m_TimeInstList.erase(it);
+			it = timeRef.m_TimeInstList.erase(it);
 			break;
 		}
 	}

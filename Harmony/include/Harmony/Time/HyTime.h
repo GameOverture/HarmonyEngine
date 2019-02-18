@@ -41,8 +41,10 @@ public:
 	uint32 GetUpdateTickMs();
 	void SetUpdateTickMs(uint32 uiUpdateTickMs);
 
-	float GetUpdateStepSeconds();
-	double GetUpdateStepSecondsDbl();
+	float GetUpdateStepSeconds() const;
+	double GetUpdateStepSecondsDbl() const;
+
+	double GetTotalElapsedTime() const;
 
 	// Sets member variable 'm_dCurDeltaTime' to the delta seconds from its previous call (or from its initialization)
 	// Delta time is in seconds.
@@ -58,8 +60,8 @@ public:
 
 	std::string GetDateTime();
 
-	void AddTimeInst(IHyTimeInst *pTimeInst);
-	void RemoveTimeInst(IHyTimeInst *pTimeInst);
+	friend void HyAddTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst);
+	friend void HyRemoveTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst);
 };
 
 #endif /* HyTime_h__ */

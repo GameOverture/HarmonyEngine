@@ -11,17 +11,16 @@
 #include "Time/Watches/IHyTimeInst.h"
 #include "Time/HyTime.h"
 
-HyTime *IHyTimeInst::sm_pTime = NULL;
+HyTime *IHyTimeInst::sm_pTime = nullptr;
 
 IHyTimeInst::IHyTimeInst(void)
 {
+	HyAssert(sm_pTime, "IHyTimeInst was invoked before Engine was initialized (sm_pTime == nullptr)");
+	HyAddTimeInst(*sm_pTime, this);
 }
 
 IHyTimeInst::~IHyTimeInst(void)
 {
-	sm_pTime->RemoveTimeInst(this);
+	HyRemoveTimeInst(*sm_pTime, this);
 }
 
-void IHyTimeInst::Update(double dDelta)
-{
-}
