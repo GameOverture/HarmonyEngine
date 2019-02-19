@@ -16,15 +16,20 @@ class IHyTimeInst
 {
 	friend class HyTime;
 
+	static HyTime *	sm_pTime;
+
 protected:
-	static HyTime *sm_pTime;
+	bool			m_bEnabled;
+	double			m_dElapsedTime;
 
 public:
 	IHyTimeInst(void);
 	virtual ~IHyTimeInst(void);
 
-protected:
-	virtual void Update(double dDelta) = 0;
+	bool IsEnabled() const;
+
+private:
+	void Update(double dDelta);
 };
 
 #endif /* IHyTimeInst_h__ */

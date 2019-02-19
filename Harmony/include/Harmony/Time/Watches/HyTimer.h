@@ -14,9 +14,6 @@
 
 class HyTimer : public IHyTimeInst
 {
-	bool	m_bEnabled;
-
-	double	m_dCurDuration;
 	double	m_dTotalDuration;
 
 public:
@@ -32,9 +29,6 @@ public:
 
 	bool IsExpired() const;
 	double TimeLeft() const;
-
-protected:
-	virtual void Update(double dDelta) override;
 };
 
 #endif /* HyTimer_h__ */

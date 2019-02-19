@@ -29,8 +29,7 @@ HyTime::HyTime(uint32 uiUpdateTickMs) :
 
 HyTime::~HyTime(void)
 {
-	//while(m_TimeInstList.size() != 0)
-	//	RemoveTimeInst(m_TimeInstList[0]);
+	IHyTimeInst::sm_pTime = nullptr;
 }
 
 uint32 HyTime::GetUpdateTickMs()
@@ -91,7 +90,10 @@ void HyTime::CalcTimeDelta()
 	{
 		uint32 uiNumTimers = static_cast<uint32>(m_TimeInstList.size());
 		for(uint32 i = 0; i < uiNumTimers; i++)
-			m_TimeInstList[i]->Update(m_dCurDeltaTime);
+		{
+			if(m_TimeInstList[i]->IsEnabled())
+				m_TimeInstList[i]->Update(m_dCurDeltaTime);
+		}
 	}
 }
 
@@ -168,7 +170,7 @@ std::string HyTime::GetDateTime()
 
 /*friend*/ void HyAddTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst)
 {
-	if(pTimeInst == NULL)
+	if(pTimeInst == nullptr)
 		return;
 
 	timeRef.m_TimeInstList.push_back(pTimeInst);
@@ -176,7 +178,7 @@ std::string HyTime::GetDateTime()
 
 /*friend*/ void HyRemoveTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst)
 {
-	if(pTimeInst == NULL)
+	if(pTimeInst == nullptr)
 		return;
 
 	for(std::vector<IHyTimeInst*>::iterator it = timeRef.m_TimeInstList.begin(); it != timeRef.m_TimeInstList.end(); ++it)

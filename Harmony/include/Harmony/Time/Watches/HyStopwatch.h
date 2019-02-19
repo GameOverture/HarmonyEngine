@@ -17,6 +17,13 @@ class HyStopwatch : public IHyTimeInst
 public:
 	HyStopwatch(void);
 	virtual ~HyStopwatch(void);
+
+	double TimeElapsed() const;
+
+	void Start();
+	void Pause();
+
+	void Reset();
 };
 
 #endif /* HyStopwatch_h__ */

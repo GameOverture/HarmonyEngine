@@ -14,15 +14,13 @@
 #include "Utilities/HyMath.h"
 
 HyTimer::HyTimer(void) :
-	m_bEnabled(false),
-	m_dCurDuration(0.0),
+	IHyTimeInst(),
 	m_dTotalDuration(0.0)
 {
 }
 
 HyTimer::HyTimer(double dDuration) :
-	m_bEnabled(false),
-	m_dCurDuration(0.0),
+	IHyTimeInst(),
 	m_dTotalDuration(0.0)
 {
 	Init(dDuration);
@@ -40,7 +38,7 @@ void HyTimer::Init(double dDuration)
 		return;
 	}
 
-	m_dCurDuration = 0.0f;
+	m_dElapsedTime = 0.0f;
 	m_dTotalDuration = dDuration;
 	m_bEnabled = false;
 }
@@ -68,7 +66,7 @@ void HyTimer::Pause()
 
 bool HyTimer::IsExpired() const
 {
-	return m_bEnabled && m_dCurDuration >= m_dTotalDuration;
+	return m_bEnabled && m_dElapsedTime >= m_dTotalDuration;
 }
 
 double HyTimer::TimeLeft() const
@@ -76,11 +74,5 @@ double HyTimer::TimeLeft() const
 	if(IsExpired())
 		return 0.0f;
 	
-	return HyMax(m_dTotalDuration - m_dCurDuration, 0.0);
-}
-
-/*virtual*/ void HyTimer::Update(double dDelta) /*override*/
-{
-	if(m_bEnabled)
-		m_dCurDuration += dDelta;
+	return HyMax(m_dTotalDuration - m_dElapsedTime, 0.0);
 }

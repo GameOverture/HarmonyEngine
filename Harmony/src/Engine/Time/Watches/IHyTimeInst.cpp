@@ -10,10 +10,13 @@
 #include "Afx/HyStdAfx.h"
 #include "Time/Watches/IHyTimeInst.h"
 #include "Time/HyTime.h"
+#include "HyEngine.h"
 
 HyTime *IHyTimeInst::sm_pTime = nullptr;
 
-IHyTimeInst::IHyTimeInst(void)
+IHyTimeInst::IHyTimeInst(void) :
+	m_bEnabled(false),
+	m_dElapsedTime(0.0)
 {
 	HyAssert(sm_pTime, "IHyTimeInst was invoked before Engine was initialized (sm_pTime == nullptr)");
 	HyAddTimeInst(*sm_pTime, this);
@@ -21,6 +24,16 @@ IHyTimeInst::IHyTimeInst(void)
 
 IHyTimeInst::~IHyTimeInst(void)
 {
-	HyRemoveTimeInst(*sm_pTime, this);
+	if(Hy_IsInitialized())
+		HyRemoveTimeInst(*sm_pTime, this);
 }
 
+bool IHyTimeInst::IsEnabled() const
+{
+	return m_bEnabled;
+}
+
+void IHyTimeInst::Update(double dDelta)
+{
+	m_dElapsedTime += dDelta;
+}
