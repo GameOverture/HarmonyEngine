@@ -18,8 +18,6 @@ class ExplorerItem;
 
 class ExplorerItemMimeData : public QMimeData
 {
-	Q_OBJECT
-
 	ExplorerItem *			m_pExplorerItem;
 	QByteArray				m_Data;
 

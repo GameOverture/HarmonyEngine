@@ -48,8 +48,6 @@ public:
 	virtual void Rename(QString sNewName);
 
 	void LoadModel();
-	
-	Project &GetProject();
 
 	IModel *GetModel()                              { return m_pModel; }
 	QWidget *GetWidget()                            { return m_pWidget; }
