@@ -43,9 +43,10 @@ bool ExplorerTreeItem::operator<(const QTreeWidgetItem &rhs) const
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ExplorerItem::ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem) :
+ExplorerItem::ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem) :
 	m_eTYPE(eType),
 	m_sPath(HyStr::MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
+	m_ProjectRef(projectRef),
 	m_bIsProjectItem(false)
 {
 	m_pTreeItemPtr = new ExplorerTreeItem();
@@ -79,6 +80,11 @@ ExplorerItem::~ExplorerItem()
 HyGuiItemType ExplorerItem::GetType() const
 {
 	return m_eTYPE;
+}
+
+Project &ExplorerItem::GetProject() const
+{
+	return m_ProjectRef;
 }
 
 QTreeWidgetItem *ExplorerItem::GetTreeItem() const

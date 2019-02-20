@@ -42,7 +42,6 @@ SOURCES += main.cpp \
     Entity/EntityWidget.cpp \
     Font/FontDraw.cpp \
     Font/FontModels.cpp \
-    Font/FontModelView.cpp \
     Font/FontUndoCmds.cpp \
     Font/FontWidget.cpp \
     Project/Project.cpp \
@@ -96,11 +95,11 @@ SOURCES += main.cpp \
     Entity/EntityWidget.cpp \
     Dialogs/DlgSetEngineLocation.cpp \
     Explorer/ExplorerItem.cpp \
+    Explorer/ExplorerItemMimeData.cpp \
     Explorer/ExplorerTreeWidget.cpp \
     Explorer/ExplorerWidget.cpp \
     Font/FontDraw.cpp \
     Font/FontModels.cpp \
-    Font/FontModelView.cpp \
     Font/FontUndoCmds.cpp \
     Font/FontWidget.cpp \
     Harmony/Harmony.cpp \
@@ -112,7 +111,6 @@ SOURCES += main.cpp \
     Project/Project.cpp \
     Project/ProjectDraw.cpp \
     Project/ProjectItem.cpp \
-    Project/ProjectItemMimeData.cpp \
     Shared/Global.cpp \
     Shared/IDraw.cpp \
     Shared/IModel.cpp \
@@ -163,7 +161,6 @@ HEADERS  += \
     Entity/EntityWidget.h \
     Font/FontDraw.h \
     Font/FontModels.h \
-    Font/FontModelView.h \
     Font/FontUndoCmds.h \
     Font/FontWidget.h \
     Project/Project.h \
@@ -223,11 +220,11 @@ HEADERS  += \
     Entity/EntityUndoCmds.h \
     Entity/EntityWidget.h \
     Explorer/ExplorerItem.h \
+    Explorer/ExplorerItemMimeData.h \
     Explorer/ExplorerTreeWidget.h \
     Explorer/ExplorerWidget.h \
     Font/FontDraw.h \
     Font/FontModels.h \
-    Font/FontModelView.h \
     Font/FontUndoCmds.h \
     Font/FontWidget.h \
     Harmony/Harmony.h \
@@ -239,7 +236,6 @@ HEADERS  += \
     Project/Project.h \
     Project/ProjectDraw.h \
     Project/ProjectItem.h \
-    Project/ProjectItemMimeData.h \
     Shared/Global.h \
     Shared/GlobalUndoCmds.h \
     Shared/GlobalWidgetMappers.h \

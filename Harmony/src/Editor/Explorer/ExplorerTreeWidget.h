@@ -20,7 +20,7 @@ class ExplorerTreeWidget : public QTreeWidget
 {
 	ExplorerWidget *			m_pOwnerWidget;
 
-	ProjectItem *				m_pDraggedProjItem;
+	ExplorerItem *				m_pDraggedItem;
 	QPoint						m_ptDragStart;
 
 public:

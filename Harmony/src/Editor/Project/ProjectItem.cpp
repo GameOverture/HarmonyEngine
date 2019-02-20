@@ -36,8 +36,7 @@ ProjectItem::ProjectItem(Project &projRef,
 						 const QString sName,
 						 QJsonValue initValue,
 						 bool bIsPendingSave) :
-	ExplorerItem(eType, sName, pParentTreeItem),
-	m_ProjectRef(projRef),
+	ExplorerItem(projRef, eType, sName, pParentTreeItem),
 	m_SaveValue(initValue),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_pModel(nullptr),
@@ -67,7 +66,6 @@ ProjectItem::ProjectItem(Project &projRef,
 
 ProjectItem::~ProjectItem()
 {
-	
 }
 
 /*virtual*/ void ProjectItem::Rename(QString sNewName)
@@ -103,11 +101,6 @@ void ProjectItem::LoadModel()
 		HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
 	}
-}
-
-Project &ProjectItem::GetProject()
-{
-	return m_ProjectRef;
 }
 
 void ProjectItem::GiveMenuActions(QMenu *pMenu)

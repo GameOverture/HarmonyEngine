@@ -415,7 +415,7 @@
   <customwidget>
    <class>FontTableView</class>
    <extends>QTableView</extends>
-   <header>FontModelView.h</header>
+   <header>FontModels.h</header>
   </customwidget>
  </customwidgets>
  <resources>

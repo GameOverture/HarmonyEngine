@@ -13,7 +13,7 @@
 #include "MainWindow.h"
 #include "Harmony.h"
 #include "Project.h"
-#include "ProjectItemMimeData.h"
+#include "ExplorerItemMimeData.h"
 #include "ExplorerItem.h"
 #include "AtlasWidget.h"
 #include "IModel.h"
@@ -115,7 +115,7 @@ void ExplorerWidget::AddItem(Project *pProj, HyGuiItemType eNewItemType, const Q
 			if(bFound == false)
 			{
 				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
-				ExplorerItem *pPrefixItem = new ExplorerItem(ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
+				ExplorerItem *pPrefixItem = new ExplorerItem(*pProj, ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
 				pParentTreeItem = pPrefixItem->GetTreeItem();
 			}
 		}
@@ -123,7 +123,7 @@ void ExplorerWidget::AddItem(Project *pProj, HyGuiItemType eNewItemType, const Q
 
 	if(eNewItemType == ITEM_Prefix)
 	{
-		/*ExplorerItem *pNewPrefixItem = */new ExplorerItem(ITEM_Prefix, sName, pParentTreeItem);
+		/*ExplorerItem *pNewPrefixItem = */new ExplorerItem(*pProj, ITEM_Prefix, sName, pParentTreeItem);
 		//pProj->SaveGameData(ITEM_Prefix, pNewPrefixItem->GetName(true), pNewPrefixItem->GetName(true));
 		//pProj->WriteGameData();
 	}
@@ -578,7 +578,7 @@ void ExplorerWidget::on_actionCopyItem_triggered()
 	}
 
 	ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
-	ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(pProjItem);
+	ExplorerItemMimeData *pNewMimeData = new ExplorerItemMimeData(pProjItem);
 	QClipboard *pClipboard = QApplication::clipboard();
 	pClipboard->setMimeData(pNewMimeData);
 	//pClipboard->setText(pNewMimeData->data(HYGUI_MIMETYPE));

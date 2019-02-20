@@ -1,5 +1,5 @@
 /**************************************************************************
-*	ProjectItemMimeData.h
+*	ExplorerItemMimeData.h
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2018 Jason Knobler
@@ -7,25 +7,25 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef PROJECTITEMMIMEDATA_H
-#define PROJECTITEMMIMEDATA_H
+#ifndef ExplorerItemMimeData_H
+#define ExplorerItemMimeData_H
 
 #include <QMimeData>
 
 #define HYGUI_MIMETYPE "application/x-harmony"
 
-class ProjectItem;
+class ExplorerItem;
 
-class ProjectItemMimeData : public QMimeData
+class ExplorerItemMimeData : public QMimeData
 {
 	Q_OBJECT
 
-	ProjectItem *           m_pProjItem;
-	QByteArray              m_Data;
+	ExplorerItem *			m_pExplorerItem;
+	QByteArray				m_Data;
 
 public:
-	ProjectItemMimeData(ProjectItem *pProjItem);
-	virtual ~ProjectItemMimeData();
+	ExplorerItemMimeData(ExplorerItem *pExplorerItem);
+	virtual ~ExplorerItemMimeData();
 
 	virtual bool hasFormat(const QString &sMimeType) const override;
 	virtual QStringList formats() const override;
@@ -34,4 +34,4 @@ protected:
 	virtual QVariant retrieveData(const QString &mimeType, QVariant::Type type) const override;
 };
 
-#endif // PROJECTITEMMIMEDATA_H
+#endif // ExplorerItemMimeData_H

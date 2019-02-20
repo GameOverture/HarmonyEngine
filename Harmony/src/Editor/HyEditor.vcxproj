@@ -234,6 +234,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Entity\EntityUndoCmds.cpp" />
     <ClCompile Include="Entity\EntityWidget.cpp" />
     <ClCompile Include="Explorer\ExplorerItem.cpp" />
+    <ClCompile Include="Explorer\ExplorerItemMimeData.cpp" />
     <ClCompile Include="Explorer\ExplorerTreeWidget.cpp" />
     <ClCompile Include="Explorer\ExplorerWidget.cpp" />
     <ClCompile Include="Font\FontDraw.cpp" />
@@ -258,7 +259,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Project\Project.cpp" />
     <ClCompile Include="Project\ProjectDraw.cpp" />
     <ClCompile Include="Project\ProjectItem.cpp" />
-    <ClCompile Include="Project\ProjectItemMimeData.cpp" />
     <ClCompile Include="Shared\Properties\PropertiesTreeItem.cpp" />
     <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp" />
     <ClCompile Include="Shared\Properties\PropertiesTreeView.cpp" />
@@ -384,6 +384,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
+    <ClInclude Include="Explorer\ExplorerItemMimeData.h" />
     <ClInclude Include="Explorer\ExplorerTreeWidget.h" />
     <QtMoc Include="Explorer\ExplorerWidget.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
@@ -434,10 +435,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     </QtMoc>
     <ClInclude Include="Project\ProjectDraw.h" />
     <QtMoc Include="Project\ProjectItem.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
-    <QtMoc Include="Project\ProjectItemMimeData.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>

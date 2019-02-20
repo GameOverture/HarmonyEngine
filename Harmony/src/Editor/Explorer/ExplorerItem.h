@@ -37,15 +37,17 @@ protected:
 	const HyGuiItemType		m_eTYPE;
 	QString					m_sPath;
 
+	Project &				m_ProjectRef;
 	bool					m_bIsProjectItem;
 	
 	ExplorerTreeItem *		m_pTreeItemPtr;
 	
 public:
-	ExplorerItem(HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem);
+	ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem);
 	virtual ~ExplorerItem();
 
 	HyGuiItemType GetType() const;
+	Project &GetProject() const;
 	QTreeWidgetItem *GetTreeItem() const;
 
 	bool IsProjectItem() const;

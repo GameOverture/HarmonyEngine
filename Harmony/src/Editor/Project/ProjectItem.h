@@ -28,19 +28,18 @@ class ProjectItem : public ExplorerItem
 
 	friend class Project;
 
-	Project &               m_ProjectRef;
-	QJsonValue              m_SaveValue;
-	bool                    m_bExistencePendingSave;
+	QJsonValue				m_SaveValue;
+	bool					m_bExistencePendingSave;
 
 	// Loaded in constructor
-	IModel *                m_pModel;
-	QUndoStack *            m_pUndoStack;
-	QAction *               m_pActionUndo;
-	QAction *               m_pActionRedo;
+	IModel *				m_pModel;
+	QUndoStack *			m_pUndoStack;
+	QAction *				m_pActionUndo;
+	QAction *				m_pActionRedo;
 
 	// Loaded when item is opened
-	QWidget *               m_pWidget;
-	IDraw *                 m_pDraw;
+	QWidget *				m_pWidget;
+	IDraw *					m_pDraw;
 	
 public:
 	ProjectItem(Project &projRef, HyGuiItemType eType, QTreeWidgetItem *pParentTreeItem, const QString sName, QJsonValue initValue, bool bIsPendingSave);

@@ -13,7 +13,7 @@
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
 #include "ExplorerTreeWidget.h"
-#include "ProjectItemMimeData.h"
+#include "ExplorerItemMimeData.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -71,7 +71,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) :
-	ExplorerItem(ITEM_Project, sProjectFilePath, nullptr),
+	ExplorerItem(*this, ITEM_Project, sProjectFilePath, nullptr),
 	m_pWidget(pProjWidget),
 	m_pDraw(nullptr),
 	m_DlgProjectSettings(sProjectFilePath),
@@ -200,7 +200,7 @@ Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) :
 
 					if(bPrefixFound == false)
 					{
-						ExplorerItem *pNewPrefixItem = new ExplorerItem(ITEM_Prefix, sPathPartList[iPathPartIndex], pCurPrefixTreeItem);
+						ExplorerItem *pNewPrefixItem = new ExplorerItem(*this, ITEM_Prefix, sPathPartList[iPathPartIndex], pCurPrefixTreeItem);
 						pCurPrefixTreeItem = pNewPrefixItem->GetTreeItem();
 					}
 				}

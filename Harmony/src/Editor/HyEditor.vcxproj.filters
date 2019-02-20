@@ -205,9 +205,6 @@
     <ClCompile Include="Project\ProjectItem.cpp">
       <Filter>Project</Filter>
     </ClCompile>
-    <ClCompile Include="Project\ProjectItemMimeData.cpp">
-      <Filter>Project</Filter>
-    </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeItem.cpp">
       <Filter>Global</Filter>
     </ClCompile>
@@ -274,6 +271,9 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Primitive\PrimitiveModel.cpp" />
+    <ClCompile Include="Explorer\ExplorerItemMimeData.cpp">
+      <Filter>Explorer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
@@ -351,9 +351,6 @@
     <QtMoc Include="Project\ProjectItem.h">
       <Filter>Project</Filter>
     </QtMoc>
-    <QtMoc Include="Project\ProjectItemMimeData.h">
-      <Filter>Project</Filter>
-    </QtMoc>
     <QtMoc Include="Shared\Properties\PropertiesTreeModel.h">
       <Filter>Global</Filter>
     </QtMoc>
@@ -394,6 +391,9 @@
       <Filter>Widgets</Filter>
     </QtMoc>
     <ClInclude Include="Primitive\PrimitiveModel.h" />
+    <ClInclude Include="Explorer\ExplorerItemMimeData.h">
+      <Filter>Explorer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">

@@ -11,7 +11,7 @@
 #include "ExplorerTreeWidget.h"
 #include "ExplorerWidget.h"
 #include "ExplorerItem.h"
-#include "ProjectItemMimeData.h"
+#include "ExplorerItemMimeData.h"
 #include "Project.h"
 
 #include <QDrag>
@@ -21,7 +21,7 @@
 ExplorerTreeWidget::ExplorerTreeWidget(QWidget *pParent) :
 	QTreeWidget(pParent),
 	m_pOwnerWidget(nullptr),
-	m_pDraggedProjItem(nullptr)
+	m_pDraggedItem(nullptr)
 {
 	setContextMenuPolicy(Qt::CustomContextMenu);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -49,14 +49,11 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 		QTreeWidgetItem *pClickedTreeItem = itemAt(mapFromGlobal(QCursor::pos()));
 		if(pClickedTreeItem)
 		{
-			ExplorerItem *pExplorerItem = pClickedTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
-
-			if(pExplorerItem->IsProjectItem())
-			{
-				m_pDraggedProjItem = static_cast<ProjectItem *>(pExplorerItem);
-				m_ptDragStart = pEvent->pos();
-			}
+			m_pDraggedItem = pClickedTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
+			m_ptDragStart = pEvent->pos();
 		}
+		else
+			m_pDraggedItem = nullptr;
 	}
 
 	QTreeWidget::mousePressEvent(pEvent);
@@ -65,14 +62,14 @@ void ExplorerTreeWidget::SetOwner(ExplorerWidget *pOwner)
 /*virtual*/ void ExplorerTreeWidget::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
 	if((pEvent->buttons() & Qt::LeftButton) == 0)
-		m_pDraggedProjItem = nullptr;
+		m_pDraggedItem = nullptr;
 
-	if(m_pDraggedProjItem != nullptr &&
+	if(m_pDraggedItem != nullptr &&
 	   (pEvent->pos() - m_ptDragStart).manhattanLength() >= QApplication::startDragDistance())
 	{
-		QDrag *pDrag = new QDrag(m_pDraggedProjItem);
-		pDrag->setMimeData(new ProjectItemMimeData(m_pDraggedProjItem));
-		pDrag->setPixmap(m_pDraggedProjItem->GetIcon(SUBICON_None).pixmap(16, 16));
+		QDrag *pDrag = new QDrag(m_pDraggedItem);
+		pDrag->setMimeData(new ExplorerItemMimeData(m_pDraggedItem));
+		pDrag->setPixmap(m_pDraggedItem->GetIcon(SUBICON_None).pixmap(16, 16));
 
 		Qt::DropAction dropAction = pDrag->exec(Qt::CopyAction | Qt::MoveAction | Qt::LinkAction);
 

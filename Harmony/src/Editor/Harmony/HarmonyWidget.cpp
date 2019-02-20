@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Global.h"
 #include "HarmonyWidget.h"
-#include "ProjectItemMimeData.h"
+#include "ExplorerItemMimeData.h"
 #include "EntityModel.h"
 
 #include <QDragEnterEvent>
