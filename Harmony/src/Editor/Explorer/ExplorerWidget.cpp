@@ -38,6 +38,11 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :
 	ui->setupUi(this);
 	ui->treeWidget->SetOwner(this);
 
+	ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	ui->treeView->setDragEnabled(true);
+	ui->treeView->setAcceptDrops(true);
+	ui->treeView->setDropIndicatorShown(true);
+
 	setAcceptDrops(true);
 
 	ui->actionCopyItem->setEnabled(false);
@@ -54,113 +59,6 @@ ExplorerWidget::~ExplorerWidget()
 void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
 {
 	m_pNewItemMenuRef = pMenu;
-}
-
-Project *ExplorerWidget::AddProject(const QString sNewProjectFilePath)
-{
-	Project *pNewProject = new Project(this, sNewProjectFilePath);
-	if(pNewProject->HasError())
-	{
-		HyGuiLog("Project: " % pNewProject->GetAbsPath() % " had an error and will not be opened", LOGTYPE_Error);
-		delete pNewProject;
-		return nullptr;
-	}
-
-	ui->treeWidget->sortItems(0, Qt::AscendingOrder);
-	HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
-
-	return pNewProject;
-
-	// BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?.. fucking waste of time)
-	//
-	//MainWindow::StartLoading(MDI_Explorer);
-	//ExplorerLoadThread *pNewLoadThread = new ExplorerLoadThread(sNewProjectFilePath, this);
-	//connect(pNewLoadThread, &ExplorerLoadThread::LoadFinished, this, &DataExplorerWidget::OnProjectLoaded);
-	//connect(pNewLoadThread, &ExplorerLoadThread::finished, pNewLoadThread, &QObject::deleteLater);
-	//pNewLoadThread->start();
-}
-
-void ExplorerWidget::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue importValue)
-{
-	if(pProj == nullptr)
-	{
-		HyGuiLog("Could not find associated project for item: " % sPrefix % "/" % sName, LOGTYPE_Error);
-		return;
-	}
-	if(eNewItemType == ITEM_Project)
-	{
-		HyGuiLog("Do not use WidgetExplorer::AddItem for projects... use AddProjectItem instead", LOGTYPE_Error);
-		return;
-	}
-
-	QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
-
-	if(sPrefix.isEmpty() == false)
-	{
-		QStringList sPathSplitList = sPrefix.split(QChar('/'));
-		// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
-		for(int i = 0; i < sPathSplitList.size(); ++i)
-		{
-			bool bFound = false;
-			for(int j = 0; j < pParentTreeItem->childCount(); ++j)
-			{
-				if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
-				{
-					pParentTreeItem = pParentTreeItem->child(j);
-					bFound = true;
-					break;
-				}
-			}
-
-			if(bFound == false)
-			{
-				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
-				ExplorerItem *pPrefixItem = new ExplorerItem(*pProj, ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
-				pParentTreeItem = pPrefixItem->GetTreeItem();
-			}
-		}
-	}
-
-	if(eNewItemType == ITEM_Prefix)
-	{
-		/*ExplorerItem *pNewPrefixItem = */new ExplorerItem(*pProj, ITEM_Prefix, sName, pParentTreeItem);
-		//pProj->SaveGameData(ITEM_Prefix, pNewPrefixItem->GetName(true), pNewPrefixItem->GetName(true));
-		//pProj->WriteGameData();
-	}
-	else
-	{
-		ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, pParentTreeItem, sName, importValue, true);
-		pItem->SetTreeItemSubIcon(SUBICON_New);
-
-		if(bOpenAfterAdd)
-		{
-			QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
-			while(pExpandItem->parent() != nullptr)
-			{
-				ui->treeWidget->expandItem(pExpandItem->parent());
-				pExpandItem = pExpandItem->parent();
-			}
-
-			MainWindow::OpenItem(pItem);
-		}
-
-		// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
-		if(importValue.isNull() == false)
-			pItem->Save();
-	}
-
-	ui->treeWidget->sortItems(0, Qt::AscendingOrder);
-}
-
-void ExplorerWidget::RemoveItem(ExplorerItem *pItem)
-{
-	if(pItem == nullptr)
-		return;
-
-	ui->treeWidget->clearSelection();
-	ui->treeWidget->blockSignals(true);
-	RecursiveRemoveItem(pItem);
-	ui->treeWidget->blockSignals(false);
 }
 
 void ExplorerWidget::SelectItem(ExplorerItem *pItem)

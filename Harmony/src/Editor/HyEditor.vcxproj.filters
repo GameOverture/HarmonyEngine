@@ -274,6 +274,9 @@
     <ClCompile Include="Explorer\ExplorerItemMimeData.cpp">
       <Filter>Explorer</Filter>
     </ClCompile>
+    <ClCompile Include="Explorer\ExplorerModel.cpp">
+      <Filter>Explorer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
@@ -392,6 +395,9 @@
     </QtMoc>
     <ClInclude Include="Primitive\PrimitiveModel.h" />
     <ClInclude Include="Explorer\ExplorerItemMimeData.h">
+      <Filter>Explorer</Filter>
+    </ClInclude>
+    <ClInclude Include="Explorer\ExplorerModel.h">
       <Filter>Explorer</Filter>
     </ClInclude>
   </ItemGroup>

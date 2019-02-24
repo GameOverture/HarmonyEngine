@@ -235,6 +235,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Entity\EntityWidget.cpp" />
     <ClCompile Include="Explorer\ExplorerItem.cpp" />
     <ClCompile Include="Explorer\ExplorerItemMimeData.cpp" />
+    <ClCompile Include="Explorer\ExplorerModel.cpp" />
     <ClCompile Include="Explorer\ExplorerTreeWidget.cpp" />
     <ClCompile Include="Explorer\ExplorerWidget.cpp" />
     <ClCompile Include="Font\FontDraw.cpp" />
@@ -385,6 +386,12 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Explorer\ExplorerItemMimeData.h" />
+    <ClInclude Include="Explorer\ExplorerModel.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_KEYWORDS;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;NDEBUG;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
+    </ClInclude>
     <ClInclude Include="Explorer\ExplorerTreeWidget.h" />
     <QtMoc Include="Explorer\ExplorerWidget.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>

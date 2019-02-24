@@ -43,11 +43,6 @@ public:
 
 	void SetItemMenuPtr(QMenu *pMenu);
 	
-	Project *AddProject(const QString sNewProjectFilePath);
-
-	// If importValue doesn't equal null, then this new ProjectItem will be saved upon creation
-	void AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue importValue);
-	void RemoveItem(ExplorerItem *pItem);
 	void SelectItem(ExplorerItem *pItem);
 	
 	QStringList GetOpenProjectPaths();

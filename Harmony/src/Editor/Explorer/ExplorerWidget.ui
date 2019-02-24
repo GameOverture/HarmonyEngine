@@ -41,6 +41,9 @@
      </column>
     </widget>
    </item>
+   <item>
+    <widget class="QTreeView" name="treeView"/>
+   </item>
   </layout>
   <action name="actionRename">
    <property name="icon">
