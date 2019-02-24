@@ -25,6 +25,9 @@ public:
 	ExplorerItemMimeData(ExplorerItem *pExplorerItem);
 	virtual ~ExplorerItemMimeData();
 
+	HyGuiItemType GetType() const;
+	ExplorerItem *GetItem() const;
+
 	virtual bool hasFormat(const QString &sMimeType) const override;
 	virtual QStringList formats() const override;
 

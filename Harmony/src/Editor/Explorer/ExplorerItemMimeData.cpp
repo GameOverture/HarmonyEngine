@@ -72,6 +72,16 @@ ExplorerItemMimeData::ExplorerItemMimeData(ExplorerItem *pExplorerItem) :
 {
 }
 
+HyGuiItemType ExplorerItemMimeData::GetType() const
+{
+	return m_pExplorerItem->GetType();
+}
+
+ExplorerItem *ExplorerItemMimeData::GetItem() const
+{
+	return m_pExplorerItem;
+}
+
 /*virtual*/ bool ExplorerItemMimeData::hasFormat(const QString &sMimeType) const /*override*/
 {
 	if(HYGUI_MIMETYPE == sMimeType.toLower() || "application/json" == sMimeType.toLower())
