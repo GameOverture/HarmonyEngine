@@ -347,6 +347,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 	{
 		int32 iNumFrames = AnimGetNumFrames();
 		int32 iNextFrameIndex = static_cast<int32>(m_uiCurFrame);
+		bool bInvokeCallback = false;
 
 		if((uiAnimCtrlRef & ANIMCTRLATTRIB_Reverse) == 0)
 		{
@@ -355,7 +356,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 			if(iNextFrameIndex < 0)
 			{
 				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-					m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+					bInvokeCallback = true;
 
 				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 				{
@@ -378,7 +379,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 				else
 				{
 					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-						m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+						bInvokeCallback = true;
 
 					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 						iNextFrameIndex = 0;
@@ -404,7 +405,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 				else
 				{
 					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-						m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+						bInvokeCallback = true;
 
 					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 						iNextFrameIndex = iNumFrames - 1;
@@ -418,7 +419,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 			else if(iNextFrameIndex >= iNumFrames)
 			{
 				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-					m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+					bInvokeCallback = true;
 
 				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 				{
@@ -443,6 +444,9 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 		}
 
 		m_fElapsedFrameTime -= frameRef.fDURATION;
+
+		if(bInvokeCallback)
+			m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
 	}
 
 	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
