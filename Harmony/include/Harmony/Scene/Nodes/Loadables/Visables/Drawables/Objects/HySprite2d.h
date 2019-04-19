@@ -119,6 +119,9 @@ public:
 	float AnimGetCurFrameWidth(bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED width of the current frame
 	float AnimGetCurFrameHeight(bool bIncludScaling = true);	// Returns the ALPHA-CROPPED height of the current frame
 
+	float AnimGetMaxWidth(uint32 uiStateIndex, bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED width of the widest frame in this animation state
+	float AnimGetMaxHeight(uint32 uiStateIndex, bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED height of the tallest frame in this animation state
+
 	void SetUserOffset(int32 iOffsetX, int32 iOffsetY);
 	glm::ivec2 AnimGetCurFrameOffset();
 

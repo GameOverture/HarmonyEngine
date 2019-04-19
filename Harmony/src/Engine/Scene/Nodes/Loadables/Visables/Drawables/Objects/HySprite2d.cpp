@@ -289,6 +289,58 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
 }
 
+float HySprite2d::AnimGetMaxWidth(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
+{
+	const HySprite2dData *pData = static_cast<const HySprite2dData *>(AcquireData());
+
+	glm::vec3 vScale(1.0f);
+	if(bIncludeScaling)
+	{
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	}
+	
+	float fMaxWidth = 0.0f;
+	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
+	{
+		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
+		float fFrameWidth = frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * vScale.x;
+		if(fMaxWidth < fFrameWidth)
+			fMaxWidth = fFrameWidth;
+	}
+
+	return fMaxWidth;
+}
+
+float HySprite2d::AnimGetMaxHeight(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
+{
+	const HySprite2dData *pData = static_cast<const HySprite2dData *>(AcquireData());
+
+	glm::vec3 vScale(1.0f);
+	if(bIncludeScaling)
+	{
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	}
+
+	float fMaxHeight = 0.0f;
+	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
+	{
+		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
+		float fFrameHeight = frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
+		if(fMaxHeight < fFrameHeight)
+			fMaxHeight = fFrameHeight;
+	}
+
+	return fMaxHeight;
+}
+
 void HySprite2d::SetUserOffset(int32 iOffsetX, int32 iOffsetY)
 {
 	m_vCustomOffset.x = iOffsetX;
