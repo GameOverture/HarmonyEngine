@@ -257,7 +257,17 @@ float HySprite2d::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
-	return frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * (bIncludeScaling ? scale.X() : 1.0f);
+	glm::vec3 vScale(1.0f);
+	if(bIncludeScaling)
+	{
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	}
+
+	return frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * vScale.x;
 }
 
 float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
@@ -266,7 +276,17 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
-	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * (bIncludeScaling ? scale.Y() : 1.0f);
+	glm::vec3 vScale(1.0f);
+	if(bIncludeScaling)
+	{
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	}
+
+	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
 }
 
 void HySprite2d::SetUserOffset(int32 iOffsetX, int32 iOffsetY)
