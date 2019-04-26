@@ -257,7 +257,17 @@ float HySprite2d::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
-	return frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * (bIncludeScaling ? scale.X() : 1.0f);
+	glm::vec3 vScale(1.0f);
+	if(bIncludeScaling)
+	{
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	}
+
+	return frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * vScale.x;
 }
 
 float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
@@ -266,7 +276,69 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
-	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * (bIncludeScaling ? scale.Y() : 1.0f);
+	glm::vec3 vScale(1.0f);
+	if(bIncludeScaling)
+	{
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	}
+
+	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
+}
+
+float HySprite2d::AnimGetMaxWidth(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
+{
+	const HySprite2dData *pData = static_cast<const HySprite2dData *>(AcquireData());
+
+	glm::vec3 vScale(1.0f);
+	if(bIncludeScaling)
+	{
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	}
+	
+	float fMaxWidth = 0.0f;
+	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
+	{
+		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
+		float fFrameWidth = frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * vScale.x;
+		if(fMaxWidth < fFrameWidth)
+			fMaxWidth = fFrameWidth;
+	}
+
+	return fMaxWidth;
+}
+
+float HySprite2d::AnimGetMaxHeight(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
+{
+	const HySprite2dData *pData = static_cast<const HySprite2dData *>(AcquireData());
+
+	glm::vec3 vScale(1.0f);
+	if(bIncludeScaling)
+	{
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	}
+
+	float fMaxHeight = 0.0f;
+	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
+	{
+		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
+		float fFrameHeight = frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
+		if(fMaxHeight < fFrameHeight)
+			fMaxHeight = fFrameHeight;
+	}
+
+	return fMaxHeight;
 }
 
 void HySprite2d::SetUserOffset(int32 iOffsetX, int32 iOffsetY)
@@ -347,6 +419,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 	{
 		int32 iNumFrames = AnimGetNumFrames();
 		int32 iNextFrameIndex = static_cast<int32>(m_uiCurFrame);
+		bool bInvokeCallback = false;
 
 		if((uiAnimCtrlRef & ANIMCTRLATTRIB_Reverse) == 0)
 		{
@@ -355,7 +428,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 			if(iNextFrameIndex < 0)
 			{
 				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-					m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+					bInvokeCallback = true;
 
 				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 				{
@@ -378,7 +451,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 				else
 				{
 					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-						m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+						bInvokeCallback = true;
 
 					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 						iNextFrameIndex = 0;
@@ -404,7 +477,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 				else
 				{
 					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-						m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+						bInvokeCallback = true;
 
 					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 						iNextFrameIndex = iNumFrames - 1;
@@ -418,7 +491,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 			else if(iNextFrameIndex >= iNumFrames)
 			{
 				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-					m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
+					bInvokeCallback = true;
 
 				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
 				{
@@ -443,6 +516,9 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 		}
 
 		m_fElapsedFrameTime -= frameRef.fDURATION;
+
+		if(bInvokeCallback)
+			m_AnimCallbackList[m_uiCurAnimState].first(this, m_AnimCallbackList[m_uiCurAnimState].second);
 	}
 
 	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);

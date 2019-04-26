@@ -29,6 +29,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
+#include "glm/gtc/quaternion.hpp"
 
 // STL includes (TODO: to be replaced with EASTL)
 #include <string>

@@ -20,6 +20,9 @@ class HyWindow;
 
 class IHyCamera
 {
+	friend class HyScene;
+	friend class IHyRenderer;
+
 protected:
 	HyWindow *			m_pWindowPtr;
 	HyRectangle<float>	m_ViewportRect;	// Values are [0.0-1.0] representing percentages
@@ -45,6 +48,9 @@ public:
 	virtual void SetZoom(const float fZoom) = 0;
 	virtual float GetZoom() const = 0;
 
+	virtual void CameraShake(float fRadius) = 0;
+
+private:
 	void SetCullMaskBit(uint32 uiBit);
 	uint32 GetCameraBitFlag();
 };
@@ -55,32 +61,50 @@ class HyCamera2d final : public IHyNode2d, public IHyCamera
 
 	b2AABB		m_aabbViewBounds;
 
+	float		m_fCameraShakeRadius;
+	float		m_fCameraShakeAngle;
+	glm::vec2	m_ptCameraShakeCenter;
+
 private:
 	HyCamera2d(HyWindow *pWindow);
 	virtual ~HyCamera2d();
 	
 public:
+	virtual void GetCameraTransform(glm::mat4 &outMtx) override;
+
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
 
-	virtual void GetCameraTransform(glm::mat4 &outMtx) override;
+	virtual void CameraShake(float fRadius) override;
 
 	const b2AABB &GetWorldViewBounds();
+
+protected:
+	virtual void Update() override;
 };
 
 class HyCamera3d final : public IHyNode3d, public IHyCamera
 {
 	friend class HyWindow;
 
+	float		m_fCameraShakeRadius;
+	float		m_fCameraShakeAngle;
+	glm::vec3	m_ptCameraShakeCenter;
+
 protected:
 	HyCamera3d(HyWindow *pWindow);
 	virtual ~HyCamera3d();
 
 public:
+	virtual void GetCameraTransform(glm::mat4 &outMtx) override;
+
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
 
-	virtual void GetCameraTransform(glm::mat4 &outMtx) override;
+	virtual void CameraShake(float fRadius) override;
+
+protected:
+	virtual void Update() override;
 };
 
 #endif /* HyCamera_h__ */
