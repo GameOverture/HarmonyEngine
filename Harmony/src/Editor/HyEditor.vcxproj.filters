@@ -151,9 +151,6 @@
     <ClCompile Include="Explorer\ExplorerItem.cpp">
       <Filter>Explorer</Filter>
     </ClCompile>
-    <ClCompile Include="Explorer\ExplorerTreeWidget.cpp">
-      <Filter>Explorer</Filter>
-    </ClCompile>
     <ClCompile Include="Explorer\ExplorerWidget.cpp">
       <Filter>Explorer</Filter>
     </ClCompile>
@@ -1169,9 +1166,6 @@
     </ClInclude>
     <ClInclude Include="Entity\EntityUndoCmds.h">
       <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="Explorer\ExplorerTreeWidget.h">
-      <Filter>Explorer</Filter>
     </ClInclude>
     <ClInclude Include="Font\FontDraw.h">
       <Filter>Font</Filter>

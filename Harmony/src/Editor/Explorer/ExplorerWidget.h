@@ -45,18 +45,12 @@ public:
 	void SetItemMenuPtr(QMenu *pMenu);
 	
 	void SelectItem(ExplorerItem *pItem);
-	
-	QStringList GetOpenProjectPaths();
 
 	Project *GetCurProjSelected();
 	ExplorerItem *GetCurItemSelected();
 
-	ExplorerTreeWidget *GetTreeWidget();
-
 private:
 	Ui::ExplorerWidget *ui;
-
-	QTreeWidgetItem *GetSelectedTreeItem();
 	
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);

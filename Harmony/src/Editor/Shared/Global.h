@@ -206,8 +206,6 @@ public:
 
 	static QString GetTreeWidgetItemPath(const QTreeWidgetItem *pItem);
 
-	static Project *GetProjectFromItem(QTreeWidgetItem *pItem);
-
 	// Includes 'pParentItem' in returned list
 	static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem);
 

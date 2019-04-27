@@ -11,15 +11,17 @@ public:
 	ExplorerModel();
 	virtual ~ExplorerModel();
 
+	QStringList GetOpenProjectPaths();
+
 	Project *AddProject(const QString sNewProjectFilePath);
 
 	// If importValue doesn't equal null, then this new ProjectItem will be saved upon creation
 	void AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue importValue);
-	void RemoveItem(ExplorerItem *pItem);
 
 	void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
 
 	virtual Qt::DropActions supportedDropActions() const override;
+	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 	//virtual void OnSave() override;
@@ -30,6 +32,5 @@ public:
 	//virtual void Refresh() override;
 
 private:
-	void RecursiveRemoveItem(ExplorerItem *pItem);
 	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 };

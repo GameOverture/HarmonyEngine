@@ -37,7 +37,7 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :
 	m_pNewItemMenuRef(nullptr)
 {
 	ui->setupUi(this);
-	ui->treeWidget->SetOwner(this);
+	setAcceptDrops(true);
 
 	ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	ui->treeView->setDragEnabled(true);
@@ -45,12 +45,10 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :
 	ui->treeView->setDropIndicatorShown(true);
 	ui->treeView->setSortingEnabled(true);
 
-	setAcceptDrops(true);
-
 	ui->actionCopyItem->setEnabled(false);
 	ui->actionPasteItem->setEnabled(false);
 
-	connect(ui->treeWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
+	connect(ui->treeView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
 
 ExplorerWidget::~ExplorerWidget()
@@ -73,61 +71,34 @@ void ExplorerWidget::SelectItem(ExplorerItem *pItem)
 	if(pItem == nullptr)
 		return;
 
-	for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
-	{
-		QTreeWidgetItemIterator it(ui->treeWidget->topLevelItem(i));
-		while (*it)
-		{
-			(*it)->setSelected(false);
-			++it;
-		}
-	}
-	
-	pItem->GetTreeItem()->setSelected(true);
-}
-
-QStringList ExplorerWidget::GetOpenProjectPaths()
-{
-	QStringList sListOpenProjs;
-	sListOpenProjs.clear();
-	
-	for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
-	{
-		ExplorerItem *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<ExplorerItem *>();
-		Project *pItemProject = static_cast<Project *>(pItem);
-		sListOpenProjs.append(pItemProject->GetAbsPath());
-	}
-	
-	return sListOpenProjs;
+	QItemSelectionModel *pSelectionModel = ui->treeView->selectionModel();
+	pSelectionModel->select(static_cast<ExplorerModel *>(ui->treeView->model())->GetIndex(pItem), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
 Project *ExplorerWidget::GetCurProjSelected()
 {
-	return HyGlobal::GetProjectFromItem(GetSelectedTreeItem());
+	ExplorerItem *pCurSelected = GetCurItemSelected();
+	if(pCurSelected == nullptr)
+		return nullptr;
+
+	while(pCurSelected->GetType() != ITEM_Project)
+		pCurSelected = static_cast<ExplorerItem *>(pCurSelected->GetParent());
+
+	return static_cast<Project *>(pCurSelected);
 }
 
 ExplorerItem *ExplorerWidget::GetCurItemSelected()
 {
+	QItemSelectionModel *pSelectionModel = ui->treeView->selectionModel();
+	QModelIndexList selectedIndices = pSelectionModel->selectedIndexes();
+
+
 	QTreeWidgetItem *pCurItem = GetSelectedTreeItem();
 	if(pCurItem == nullptr)
 		return nullptr;
 	
 	QVariant v = pCurItem->data(0, Qt::UserRole);
 	return v.value<ExplorerItem *>();
-}
-
-ExplorerTreeWidget *ExplorerWidget::GetTreeWidget()
-{
-	return ui->treeWidget;
-}
-
-QTreeWidgetItem *ExplorerWidget::GetSelectedTreeItem()
-{
-	QTreeWidgetItem *pCurSelected = nullptr;
-	if(ui->treeWidget->selectedItems().empty() == false)
-		pCurSelected = ui->treeWidget->selectedItems()[0];  // Only single selection is allowed in explorer because two projects may be opened
-
-	return pCurSelected;
 }
 
 void ExplorerWidget::OnContextMenu(const QPoint &pos)

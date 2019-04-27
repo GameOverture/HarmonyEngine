@@ -27,21 +27,6 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="ExplorerTreeWidget" name="treeWidget">
-     <property name="animated">
-      <bool>true</bool>
-     </property>
-     <attribute name="headerVisible">
-      <bool>false</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string notr="true">1</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item>
     <widget class="QTreeView" name="treeView"/>
    </item>
   </layout>
@@ -102,13 +87,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ExplorerTreeWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>ExplorerTreeWidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../res/HyEditor.qrc"/>
  </resources>

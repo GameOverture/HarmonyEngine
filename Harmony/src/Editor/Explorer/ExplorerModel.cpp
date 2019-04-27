@@ -3,6 +3,7 @@
 #include "ExplorerItem.h"
 #include "Project/Project.h"
 #include "Project/ProjectItem.h"
+#include "Atlas/AtlasWidget.h"
 
 ExplorerModel::ExplorerModel() :
 	ITreeModel(new ExplorerItem(), nullptr)
@@ -12,6 +13,21 @@ ExplorerModel::ExplorerModel() :
 
 ExplorerModel::~ExplorerModel()
 {
+}
+
+QStringList ExplorerModel::GetOpenProjectPaths()
+{
+	QStringList sListOpenProjs;
+	sListOpenProjs.clear();
+
+	for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
+	{
+		ExplorerItem *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<ExplorerItem *>();
+		Project *pItemProject = static_cast<Project *>(pItem);
+		sListOpenProjs.append(pItemProject->GetAbsPath());
+	}
+
+	return sListOpenProjs;
 }
 
 Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
@@ -96,17 +112,6 @@ void ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QS
 	}
 
 	//ui->treeWidget->sortItems(0, Qt::AscendingOrder);
-}
-
-void ExplorerModel::RemoveItem(ExplorerItem *pItem)
-{
-	if(pItem == nullptr)
-		return;
-
-	ui->treeWidget->clearSelection();
-	ui->treeWidget->blockSignals(true);
-	RecursiveRemoveItem(pItem);
-	ui->treeWidget->blockSignals(false);
 }
 
 void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
@@ -236,6 +241,11 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
+/*virtual*/ int ExplorerModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
+{
+	return 1;
+}
+
 /*virtual*/ QVariant ExplorerModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const /*override*/
 {
 	ExplorerItem *pItem = static_cast<ExplorerItem *>(index.internalPointer());
@@ -293,21 +303,6 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 ///*virtual*/ void ExplorerModel::Refresh() /*override*/
 //{
 //}
-
-void ExplorerModel::RecursiveRemoveItem(ExplorerItem *pItem)
-{
-	if(pItem == nullptr)
-		return;
-
-	for(int i = 0; i < pItem->GetTreeItem()->childCount(); ++i)
-	{
-		QVariant v = pItem->GetTreeItem()->child(i)->data(0, Qt::UserRole);
-		RecursiveRemoveItem(v.value<ExplorerItem *>());
-	}
-
-	// Children are taken care of at this point, now remove self
-	delete pItem;
-}
 
 QJsonObject ExplorerModel::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)
 {

@@ -23,6 +23,11 @@ ITreeModel::ITreeModel(IModelTreeItem *pRootItem, QObject *parent) :
 	delete m_pRootItem;
 }
 
+QModelIndex ITreeModel::GetIndex(IModelTreeItem *pItem)
+{
+	return createIndex(pItem->GetRow(), 0, pItem);
+}
+
 /*virtual*/ QModelIndex ITreeModel::index(int iRow, int iColumn, const QModelIndex &parent) const /*override*/
 {
 	if(hasIndex(iRow, iColumn, parent) == false)
@@ -67,34 +72,6 @@ ITreeModel::ITreeModel(IModelTreeItem *pRootItem, QObject *parent) :
 	return pParentItem->GetNumChildren();
 }
 
-//// An insertRows() implementation must call beginInsertRows() before inserting new rows into the data structure, and endInsertRows() immediately afterwards.
-///*virtual*/ bool ITreeModel::insertRows(int iRow, int iCount, const QModelIndex &parentRef = QModelIndex()) /*override*/
-//{
-//	beginInsertRows(parentRef, iRow, iRow + iCount - 1);
-//	endInsertRows();
-//
-//	return false;
-//}
-//
-//// A removeRows() implementation must call beginRemoveRows() before the rows are removed from the data structure, and endRemoveRows() immediately afterwards.
-///*virtual*/ bool ITreeModel::removeRows(int iRow, int iCount, const QModelIndex &parentRef = QModelIndex()) /*override*/
-//{
-//	beginRemoveRows(parentRef, iRow, iRow + iCount);
-//	endRemoveRows();
-//
-//	return false;
-//}
-
-//// An insertColumns() implementation must call beginInsertColumns() before inserting new columns into the data structure, and endInsertColumns() immediately afterwards.
-///*virtual*/ bool ExplorerModel::insertColumns(int iColumn, int iCount, const QModelIndex &parentRef = QModelIndex()) /*override*/
-//{
-//}
-//
-//// A removeColumns() implementation must call beginRemoveColumns() before the columns are removed from the data structure, and endRemoveColumns() immediately afterwards.
-///*virtual*/ bool ExplorerModel::removeColumns(int iColumn, int iCount, const QModelIndex &parentRef = QModelIndex()) /*override*/
-//{
-//}
-
 void ITreeModel::InsertItem(int iRow, IModelTreeItem *pItem, IModelTreeItem *pParentItem)
 {
 	QList<IModelTreeItem *> itemList;
@@ -122,7 +99,27 @@ void ITreeModel::InsertItems(int iRow, QList<IModelTreeItem *> itemList, IModelT
 	endInsertRows();
 }
 
+void ITreeModel::RemoveItem(IModelTreeItem *pItem)
+{
+	if(pItem == nullptr)
+		return;
+
+	QModelIndex parentIndex = pItem->GetParent() ? createIndex(pItem->GetParent()->GetRow(), 0, pItem->GetParent()) : QModelIndex();
+	beginRemoveRows(parentIndex, pItem->GetRow(), pItem->GetRow());
+	RecursiveRemoveItem(pItem);
+	endRemoveRows();
+}
+
 bool ITreeModel::IsRoot(const QModelIndex &index) const
 {
 	return m_pRootItem == static_cast<IModelTreeItem *>(index.internalPointer());
+}
+
+void ITreeModel::RecursiveRemoveItem(IModelTreeItem *pItem)
+{
+	for(int i = 0; i < pItem->GetNumChildren(); ++i)
+		RemoveItem(pItem->GetChild(i));
+
+	// All children are taken care of at this point, safe to delete
+	delete pItem;
 }
