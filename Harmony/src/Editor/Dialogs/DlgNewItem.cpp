@@ -35,13 +35,10 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 	on_chkNewPrefix_stateChanged(ui->chkNewPrefix->isChecked() ? Qt::Checked : Qt::Unchecked);
 
 	m_PrefixStringList.clear();
-	QList<QTreeWidgetItem *> itemList = HyGlobal::RecursiveTreeChildren(pItemProject->GetTreeItem());
+	QList<IModelTreeItem *> itemList = pItemProject->GetChildren(true);
 	for(int i = 0; i < itemList.size(); ++i)
 	{
-		if(itemList[i] == pItemProject->GetTreeItem())
-			continue;
-
-		ExplorerItem *pItem = itemList[i]->data(0, Qt::UserRole).value<ExplorerItem *>();
+		ExplorerItem *pItem = static_cast<ExplorerItem *>(itemList[i]);
 		if(pItem->GetType() == ITEM_Prefix)
 			m_PrefixStringList.append(pItem->GetName(true));
 	}

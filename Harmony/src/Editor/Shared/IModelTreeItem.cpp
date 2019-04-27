@@ -31,6 +31,28 @@ IModelTreeItem *IModelTreeItem::GetChild(int iRow) const
 	return m_ChildList[iRow];
 }
 
+QList<IModelTreeItem *> IModelTreeItem::GetAllChildren(bool bRecusively)
+{
+	if(bRecusively == false)
+		return m_ChildList;
+
+	QStack<IModelTreeItem *> itemStack;
+	for(int i = 0; i < m_ChildList.size(); ++i)
+		itemStack.push(m_ChildList[i]);
+
+	QList<IModelTreeItem *> returnList;
+	while(!itemStack.isEmpty())
+	{
+		IModelTreeItem *pItem = itemStack.pop();
+		returnList.append(pItem);
+
+		for(int i = 0; i < pItem->GetNumChildren(); ++i)
+			itemStack.push(pItem->GetChild(i));
+	}
+
+	return returnList;
+}
+
 void IModelTreeItem::AppendChild(IModelTreeItem *pChild)
 {
 	InsertChild(m_ChildList.size(), pChild);

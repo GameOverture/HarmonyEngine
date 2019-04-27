@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "Harmony.h"
+#include "Explorer/ExplorerModel.h"
 #include "_Dependencies/QtWaitingSpinner/waitingspinnerwidget.h"
 
 #include <QMainWindow>

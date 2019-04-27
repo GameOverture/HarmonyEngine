@@ -26,7 +26,7 @@ public:
 
 	virtual QModelIndex index(int iRow, int iColumn, const QModelIndex &parent) const override;
 	virtual QModelIndex parent(const QModelIndex &index) const override;
-	virtual int rowCount(const QModelIndex &parentIndex) const override;
+	virtual int rowCount(const QModelIndex &parentIndex = QModelIndex()) const override;
 	//virtual bool insertRows(int iRow, int iCount, const QModelIndex &parentIndex = QModelIndex()) override;
 	//virtual bool removeRows(int iRow, int iCount, const QModelIndex &parentIndex = QModelIndex()) override;
 

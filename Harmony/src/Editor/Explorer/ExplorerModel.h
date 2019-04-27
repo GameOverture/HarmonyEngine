@@ -31,4 +31,5 @@ public:
 
 private:
 	void RecursiveRemoveItem(ExplorerItem *pItem);
+	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 };

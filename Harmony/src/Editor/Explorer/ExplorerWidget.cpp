@@ -121,28 +121,6 @@ ExplorerTreeWidget *ExplorerWidget::GetTreeWidget()
 	return ui->treeWidget;
 }
 
-QJsonObject ExplorerWidget::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)
-{
-	QStringList srcObjKeyList = srcObj.keys();
-	for(int j = 0; j < srcObjKeyList.size(); ++j)
-	{
-		if(srcObjKeyList[j] == "checksum")
-		{
-			for(auto iter = importedFrames.begin(); iter != importedFrames.end(); ++iter)
-			{
-				if((*iter)->GetImageChecksum() == JSONOBJ_TOINT(srcObj, "checksum"))
-				{
-					srcObj.insert("id", QJsonValue(static_cast<qint64>((*iter)->GetId())));
-					break;
-				}
-			}
-			break;
-		}
-	}
-
-	return srcObj;
-}
-
 QTreeWidgetItem *ExplorerWidget::GetSelectedTreeItem()
 {
 	QTreeWidgetItem *pCurSelected = nullptr;

@@ -56,8 +56,6 @@ public:
 private:
 	Ui::ExplorerWidget *ui;
 
-	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
-
 	QTreeWidgetItem *GetSelectedTreeItem();
 	
 private Q_SLOTS:

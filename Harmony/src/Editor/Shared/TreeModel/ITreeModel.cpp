@@ -56,7 +56,7 @@ ITreeModel::ITreeModel(IModelTreeItem *pRootItem, QObject *parent) :
 	return createIndex(pParentItem->GetRow(), 0, pParentItem);
 }
 
-/*virtual*/ int ITreeModel::rowCount(const QModelIndex &parentIndex) const /*override*/
+/*virtual*/ int ITreeModel::rowCount(const QModelIndex &parentIndex /*= QModelIndex()*/) const /*override*/
 {
 	const IModelTreeItem *pParentItem;
 	if(parentIndex.isValid() == false)

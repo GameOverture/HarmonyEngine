@@ -25,7 +25,7 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 		return nullptr;
 	}
 
-	InsertItem(0, pNewProject, &m_RootItem);
+	InsertItem(0, pNewProject, m_pRootItem);
 	return pNewProject;
 
 	// BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?)
@@ -59,11 +59,11 @@ void ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QS
 		for(int i = 0; i < sPathSplitList.size(); ++i)
 		{
 			bool bFound = false;
-			for(int j = 0; j < pParentItem->GetChildren().size(); ++j)
+			for(int j = 0; j < pParentItem->GetNumChildren(); ++j)
 			{
-				if(QString::compare(sPathSplitList[i], pParentItem->GetChildren()[j]->GetName(false), Qt::CaseInsensitive) == 0)
+				if(QString::compare(sPathSplitList[i], static_cast<ExplorerItem *>(pParentItem->GetChild(j))->GetName(false), Qt::CaseInsensitive) == 0)
 				{
-					pParentItem = pParentItem->GetChildren()[j];
+					pParentItem = static_cast<ExplorerItem *>(pParentItem->GetChild(j));
 					bFound = true;
 					break;
 				}
@@ -236,7 +236,7 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
-/*virtual*/ QVariant ExplorerModel::data(const QModelIndex &index, int role = Qt::DisplayRole) const /*override*/
+/*virtual*/ QVariant ExplorerModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const /*override*/
 {
 	ExplorerItem *pItem = static_cast<ExplorerItem *>(index.internalPointer());
 	if(pItem == nullptr)
@@ -307,4 +307,26 @@ void ExplorerModel::RecursiveRemoveItem(ExplorerItem *pItem)
 
 	// Children are taken care of at this point, now remove self
 	delete pItem;
+}
+
+QJsonObject ExplorerModel::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)
+{
+	QStringList srcObjKeyList = srcObj.keys();
+	for(int j = 0; j < srcObjKeyList.size(); ++j)
+	{
+		if(srcObjKeyList[j] == "checksum")
+		{
+			for(auto iter = importedFrames.begin(); iter != importedFrames.end(); ++iter)
+			{
+				if((*iter)->GetImageChecksum() == JSONOBJ_TOINT(srcObj, "checksum"))
+				{
+					srcObj.insert("id", QJsonValue(static_cast<qint64>((*iter)->GetId())));
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	return srcObj;
 }

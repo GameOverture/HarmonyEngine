@@ -26,6 +26,7 @@ public:
 
 	IModelTreeItem *GetParent();
 	IModelTreeItem *GetChild(int iRow) const;
+	QList<IModelTreeItem *> GetChildren(bool bRecusively);
 
 	void AppendChild(IModelTreeItem *pChild);
 	void InsertChild(int iIndex, IModelTreeItem *pChild);
