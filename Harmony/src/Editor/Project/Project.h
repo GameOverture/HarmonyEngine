@@ -44,7 +44,6 @@ class Project : public ExplorerItem
 {
 	Q_OBJECT
 
-	ExplorerWidget *								m_pWidget;
 	ProjectDraw *									m_pDraw;
 	DlgProjectSettings								m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
@@ -62,7 +61,7 @@ class Project : public ExplorerItem
 	bool											m_bHasError;
 	
 public:
-	Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath);
+	Project(const QString sProjectFilePath);
 	virtual ~Project();
 
 	bool HasError() const;
@@ -90,7 +89,6 @@ public:
 
 	ProjectTabBar *GetTabBar();
 
-	ExplorerWidget *GetExplorerWidget();
 	ProjectItem *GetCurrentOpenItem();
 
 	void SetRenderSize(int iWidth, int iHeight);

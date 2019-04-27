@@ -26,7 +26,6 @@ class ExplorerWidget;
 }
 
 class Project;
-class ProjectItem;
 class ExplorerTreeWidget;
 class ExplorerItem;
 class AtlasFrame;
@@ -40,6 +39,8 @@ class ExplorerWidget : public QWidget
 public:
 	explicit ExplorerWidget(QWidget *parent = 0);
 	~ExplorerWidget();
+
+	QTreeView *GetTreeView();
 
 	void SetItemMenuPtr(QMenu *pMenu);
 	

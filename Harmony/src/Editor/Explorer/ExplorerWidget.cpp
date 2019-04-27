@@ -15,6 +15,7 @@
 #include "Project.h"
 #include "ExplorerItemMimeData.h"
 #include "ExplorerItem.h"
+#include "ExplorerModel.h"
 #include "AtlasWidget.h"
 #include "IModel.h"
 #include "DlgInputName.h"
@@ -42,6 +43,7 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :
 	ui->treeView->setDragEnabled(true);
 	ui->treeView->setAcceptDrops(true);
 	ui->treeView->setDropIndicatorShown(true);
+	ui->treeView->setSortingEnabled(true);
 
 	setAcceptDrops(true);
 
@@ -54,6 +56,11 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :
 ExplorerWidget::~ExplorerWidget()
 {
 	delete ui;
+}
+
+QTreeView *ExplorerWidget::GetTreeView()
+{
+	return ui->treeView;
 }
 
 void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)

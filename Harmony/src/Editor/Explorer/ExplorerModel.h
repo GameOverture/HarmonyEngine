@@ -3,6 +3,9 @@
 
 #include <QAbstractItemModel>
 
+class ExplorerItem;
+class Project;
+
 class ExplorerModel : public QAbstractItemModel
 {
 

@@ -56,9 +56,6 @@
     <Filter Include="Prefab">
       <UniqueIdentifier>{a0e96959-a1c9-4c18-96df-7283215463b7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Project">
-      <UniqueIdentifier>{f7392cf3-2e88-4305-ae53-7bf1cab4a32c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sprite">
       <UniqueIdentifier>{f6971566-117c-4d32-b242-8f511520741c}</UniqueIdentifier>
     </Filter>
@@ -67,6 +64,9 @@
     </Filter>
     <Filter Include="Widgets">
       <UniqueIdentifier>{071cfd87-10cb-4185-a547-fb5a8fc71b6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Explorer\Project">
+      <UniqueIdentifier>{f7392cf3-2e88-4305-ae53-7bf1cab4a32c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -197,13 +197,13 @@
       <Filter>Prefab</Filter>
     </ClCompile>
     <ClCompile Include="Project\Project.cpp">
-      <Filter>Project</Filter>
+      <Filter>Explorer\Project</Filter>
     </ClCompile>
     <ClCompile Include="Project\ProjectDraw.cpp">
-      <Filter>Project</Filter>
+      <Filter>Explorer\Project</Filter>
     </ClCompile>
     <ClCompile Include="Project\ProjectItem.cpp">
-      <Filter>Project</Filter>
+      <Filter>Explorer\Project</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeItem.cpp">
       <Filter>Global</Filter>
@@ -349,10 +349,10 @@
       <Filter>Prefab</Filter>
     </QtMoc>
     <QtMoc Include="Project\Project.h">
-      <Filter>Project</Filter>
+      <Filter>Explorer\Project</Filter>
     </QtMoc>
     <QtMoc Include="Project\ProjectItem.h">
-      <Filter>Project</Filter>
+      <Filter>Explorer\Project</Filter>
     </QtMoc>
     <QtMoc Include="Shared\Properties\PropertiesTreeModel.h">
       <Filter>Global</Filter>
@@ -1180,7 +1180,7 @@
       <Filter>Prefab</Filter>
     </ClInclude>
     <ClInclude Include="Project\ProjectDraw.h">
-      <Filter>Project</Filter>
+      <Filter>Explorer\Project</Filter>
     </ClInclude>
     <ClInclude Include="Shared\Properties\PropertiesTreeItem.h">
       <Filter>Global</Filter>

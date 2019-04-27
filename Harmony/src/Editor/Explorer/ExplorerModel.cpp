@@ -1,7 +1,8 @@
 #include "Global.h"
 #include "ExplorerModel.h"
 #include "ExplorerItem.h"
-#include "ProjectItem.h"
+#include "Project/Project.h"
+#include "Project/ProjectItem.h"
 
 ExplorerModel::ExplorerModel()
 {
@@ -14,7 +15,7 @@ ExplorerModel::~ExplorerModel()
 
 Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 {
-	Project *pNewProject = new Project(this, sNewProjectFilePath);
+	Project *pNewProject = new Project(sNewProjectFilePath);
 	if(pNewProject->HasError())
 	{
 		HyGuiLog("Project: " % pNewProject->GetAbsPath() % " had an error and will not be opened", LOGTYPE_Error);
@@ -22,9 +23,7 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 		return nullptr;
 	}
 
-	ui->treeWidget->sortItems(0, Qt::AscendingOrder);
 	HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
-
 	return pNewProject;
 
 	// BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?.. fucking waste of time)
@@ -160,7 +159,7 @@ void ExplorerModel::RemoveItem(ExplorerItem *pItem)
 
 /*virtual*/ QModelIndex	ExplorerModel::index(int row, int column, const QModelIndex &parent = QModelIndex()) const /*override*/
 {
-	createIndex(
+	createIndex(row, column, 
 }
 
 // An insertRows() implementation must call beginInsertRows() before inserting new rows into the data structure, and endInsertRows() immediately afterwards.

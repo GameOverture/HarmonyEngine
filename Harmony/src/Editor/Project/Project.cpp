@@ -70,9 +70,8 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Project::Project(ExplorerWidget *pProjWidget, const QString sProjectFilePath) :
+Project::Project(const QString sProjectFilePath) :
 	ExplorerItem(*this, ITEM_Project, sProjectFilePath, nullptr),
-	m_pWidget(pProjWidget),
 	m_pDraw(nullptr),
 	m_DlgProjectSettings(sProjectFilePath),
 	m_pAtlasModel(nullptr),
@@ -347,11 +346,6 @@ ProjectTabBar *Project::GetTabBar()
 ProjectItem *Project::GetCurrentOpenItem()
 {
 	return m_pCurOpenItem;
-}
-
-ExplorerWidget *Project::GetExplorerWidget()
-{
-	return m_pWidget;
 }
 
 void Project::SetRenderSize(int iWidth, int iHeight)
