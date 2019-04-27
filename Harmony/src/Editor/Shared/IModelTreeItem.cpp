@@ -31,7 +31,7 @@ IModelTreeItem *IModelTreeItem::GetChild(int iRow) const
 	return m_ChildList[iRow];
 }
 
-QList<IModelTreeItem *> IModelTreeItem::GetAllChildren(bool bRecusively)
+QList<IModelTreeItem *> IModelTreeItem::GetChildren(bool bRecusively)
 {
 	if(bRecusively == false)
 		return m_ChildList;

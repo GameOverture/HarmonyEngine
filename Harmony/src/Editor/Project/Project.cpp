@@ -12,7 +12,6 @@
 #include "AtlasWidget.h"
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
-#include "ExplorerTreeWidget.h"
 #include "ExplorerItemMimeData.h"
 
 #include <QFile>
@@ -221,10 +220,6 @@ Project::Project(const QString sProjectFilePath) :
 #ifdef RESAVE_ENTIRE_PROJECT
 	SaveGameData();
 #endif
-
-	// Add project to the treewidget
-	pProjWidget->GetTreeWidget()->insertTopLevelItem(0, m_pTreeItemPtr);
-	pProjWidget->GetTreeWidget()->expandItem(m_pTreeItemPtr);
 }
 
 /*virtual*/ Project::~Project()

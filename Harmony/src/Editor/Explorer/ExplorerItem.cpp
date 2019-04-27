@@ -11,7 +11,6 @@
 #include "ExplorerItem.h"
 #include "SpriteWidget.h"
 #include "Project.h"
-#include "ExplorerTreeWidget.h"
 #include "Harmony/Utilities/HyStrManip.h"
 
 #include <QFileInfo>

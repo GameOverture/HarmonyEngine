@@ -10,6 +10,7 @@
 #ifndef IMODELTREEITEM_H
 #define IMODELTREEITEM_H
 
+#include "Global.h"
 #include <QAbstractItemModel>
 
 class IModelTreeItem : public QObject

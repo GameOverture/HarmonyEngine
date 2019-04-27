@@ -134,7 +134,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	{
 		QStringList sListOpenProjs = m_Settings.value("openProjs").toStringList();
 		for(int i = 0; i < sListOpenProjs.size(); ++i)
-			ui->explorer->AddProject(sListOpenProjs[i]);
+			m_ExplorerModel.AddProject(sListOpenProjs[i]);
 	}
 	m_Settings.endGroup();
 
@@ -303,7 +303,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 /*static*/ void MainWindow::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
 {
-	sm_pInstance->ui->explorer->PasteItemSrc(sSrc, pProject, sPrefixOverride);
+	sm_pInstance->m_ExplorerModel.PasteItemSrc(sSrc, pProject, sPrefixOverride);
 }
 
 /*static*/ void MainWindow::ApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty)
@@ -374,8 +374,8 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	Harmony::GetProject()->CloseTab(pItem);
 
-	if(pItem->IsExistencePendingSave() && pItem->GetTreeItem()->parent() != nullptr)
-		pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
+	if(pItem->IsExistencePendingSave())
+		sm_pInstance->m_ExplorerModel.RemoveItem(pItem);
 }
 
 /*virtual*/ void MainWindow::closeEvent(QCloseEvent *pEvent) /*override*/
@@ -412,7 +412,7 @@ void MainWindow::on_actionNewProject_triggered()
 			m_sDefaultProjectLocation = defaultProjDir.absolutePath();
 		}
 
-		ui->explorer->SelectItem(ui->explorer->AddProject(pDlg->GetProjFilePath()));
+		ui->explorer->SelectItem(m_ExplorerModel.AddProject(pDlg->GetProjFilePath()));
 		ui->explorer->GetCurProjSelected()->GetAtlasModel().RepackAll(0);
 	}
 	delete pDlg;
@@ -428,7 +428,7 @@ void MainWindow::on_actionOpenProject_triggered()
 
 	if(pDlg->exec() == QDialog::Accepted)
 	{
-		Project *pAddedProject = ui->explorer->AddProject(pDlg->selectedFiles()[0]);
+		Project *pAddedProject = m_ExplorerModel.AddProject(pDlg->selectedFiles()[0]);
 		if(pAddedProject)
 			m_sDefaultProjectLocation = pAddedProject->GetDirPath();
 	}
@@ -437,7 +437,7 @@ void MainWindow::on_actionOpenProject_triggered()
 
 void MainWindow::on_actionCloseProject_triggered()
 {
-	ui->explorer->RemoveItem(ui->explorer->GetCurProjSelected());
+	m_ExplorerModel.RemoveItem(ui->explorer->GetCurProjSelected());
 	Harmony::SetProject(nullptr);
 }
 
@@ -687,19 +687,20 @@ void MainWindow::on_actionTheme_Compe_triggered()
 
 void MainWindow::NewItem(HyGuiItemType eItem)
 {
-	ExplorerItem *pCurSelectedItem = ui->explorer->GetCurItemSelected();
+	ExplorerItem *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
 	QString sDefaultPrefix = pCurSelectedItem->GetType() == ITEM_Prefix ? pCurSelectedItem->GetName(true) : pCurSelectedItem->GetPrefix();
 
 	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
 	if(pDlg->exec())
 	{
-		ui->explorer->AddItem(ui->explorer->GetCurProjSelected(),
-							  eItem,
-							  pDlg->GetPrefix(),
-							  pDlg->GetName(),
-							  pDlg->GetImportFile().isEmpty() ? QJsonValue() : QJsonValue(pDlg->GetImportFile()));
+		ExplorerItem *pNewItem = m_ExplorerModel.AddItem(ui->explorer->GetCurProjSelected(),
+														 eItem,
+														 pDlg->GetPrefix(),
+														 pDlg->GetName(),
+														 pDlg->GetImportFile().isEmpty() ? QJsonValue() : QJsonValue(pDlg->GetImportFile()));
 
-		MainWindow::OpenItem(pItem);
+		if(pNewItem->IsProjectItem())
+			MainWindow::OpenItem(static_cast<ProjectItem *>(pNewItem));
 	}
 
 	delete pDlg;
@@ -716,7 +717,7 @@ void MainWindow::SaveSettings()
 
 	m_Settings.beginGroup("OpenData");
 	{
-		m_Settings.setValue("openProjs", QVariant(ui->explorer->GetOpenProjectPaths()));
+		m_Settings.setValue("openProjs", QVariant(m_ExplorerModel.GetOpenProjectPaths()));
 	}
 	m_Settings.endGroup();
 

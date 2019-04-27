@@ -25,6 +25,7 @@ public:
 	virtual ~ITreeModel();
 
 	QModelIndex GetIndex(IModelTreeItem *pItem);
+	void RemoveItem(IModelTreeItem *pItem);
 
 	virtual QModelIndex index(int iRow, int iColumn, const QModelIndex &parent) const override;
 	virtual QModelIndex parent(const QModelIndex &index) const override;
@@ -36,8 +37,6 @@ public:
 protected:
 	void InsertItem(int iRow, IModelTreeItem *pItem, IModelTreeItem *pParentItem);
 	void InsertItems(int iRow, QList<IModelTreeItem *> itemList, IModelTreeItem *pParentItem);
-
-	void RemoveItem(IModelTreeItem *pItem);
 
 	bool IsRoot(const QModelIndex &index) const;
 

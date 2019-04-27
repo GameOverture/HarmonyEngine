@@ -28,6 +28,18 @@ QModelIndex ITreeModel::GetIndex(IModelTreeItem *pItem)
 	return createIndex(pItem->GetRow(), 0, pItem);
 }
 
+void ITreeModel::RemoveItem(IModelTreeItem *pItem)
+{
+	if(pItem == nullptr)
+		return;
+
+	QModelIndex parentIndex = pItem->GetParent() ? createIndex(pItem->GetParent()->GetRow(), 0, pItem->GetParent()) : QModelIndex();
+	beginRemoveRows(parentIndex, pItem->GetRow(), pItem->GetRow());
+	RecursiveRemoveItem(pItem);
+	endRemoveRows();
+}
+
+
 /*virtual*/ QModelIndex ITreeModel::index(int iRow, int iColumn, const QModelIndex &parent) const /*override*/
 {
 	if(hasIndex(iRow, iColumn, parent) == false)
@@ -97,17 +109,6 @@ void ITreeModel::InsertItems(int iRow, QList<IModelTreeItem *> itemList, IModelT
 		pParent->InsertChild(iRow + i, itemList[i]);
 
 	endInsertRows();
-}
-
-void ITreeModel::RemoveItem(IModelTreeItem *pItem)
-{
-	if(pItem == nullptr)
-		return;
-
-	QModelIndex parentIndex = pItem->GetParent() ? createIndex(pItem->GetParent()->GetRow(), 0, pItem->GetParent()) : QModelIndex();
-	beginRemoveRows(parentIndex, pItem->GetRow(), pItem->GetRow());
-	RecursiveRemoveItem(pItem);
-	endRemoveRows();
 }
 
 bool ITreeModel::IsRoot(const QModelIndex &index) const

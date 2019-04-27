@@ -20,9 +20,9 @@ QStringList ExplorerModel::GetOpenProjectPaths()
 	QStringList sListOpenProjs;
 	sListOpenProjs.clear();
 
-	for(int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i)
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		ExplorerItem *pItem = ui->treeWidget->topLevelItem(i)->data(0, Qt::UserRole).value<ExplorerItem *>();
+		ExplorerItem *pItem = static_cast<ExplorerItem *>(m_pRootItem->GetChild(i));
 		Project *pItemProject = static_cast<Project *>(pItem);
 		sListOpenProjs.append(pItemProject->GetAbsPath());
 	}
@@ -53,17 +53,17 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 	//pNewLoadThread->start();
 }
 
-void ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue importValue)
+ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue importValue)
 {
 	if(pProj == nullptr)
 	{
 		HyGuiLog("Could not find associated project for item: " % sPrefix % "/" % sName, LOGTYPE_Error);
-		return;
+		return nullptr;
 	}
 	if(eNewItemType == ITEM_Project)
 	{
 		HyGuiLog("Do not use WidgetExplorer::AddItem for projects... use AddProjectItem instead", LOGTYPE_Error);
-		return;
+		return nullptr;
 	}
 
 	//QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
@@ -96,22 +96,23 @@ void ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QS
 		}
 	}
 
+	ExplorerItem *pNewItem = nullptr;
 	if(eNewItemType == ITEM_Prefix)
 	{
-		ExplorerItem *pNewPrefix = new ExplorerItem(*pProj, ITEM_Prefix, sName);
-		InsertItem(pParentItem->GetNumChildren(), pNewPrefix, pParentItem);
+		pNewItem = new ExplorerItem(*pProj, ITEM_Prefix, sName);
+		InsertItem(pParentItem->GetNumChildren(), pNewItem, pParentItem);
 	}
 	else
 	{
-		ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, sName, importValue, true);
-		InsertItem(pParentItem->GetNumChildren(), pItem, pParentItem);
+		pNewItem = new ProjectItem(*pProj, eNewItemType, sName, importValue, true);
+		InsertItem(pParentItem->GetNumChildren(), pNewItem, pParentItem);
 
 		// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
 		if(importValue.isNull() == false)
-			pItem->Save();
+			static_cast<ProjectItem *>(pNewItem)->Save();
 	}
 
-	//ui->treeWidget->sortItems(0, Qt::AscendingOrder);
+	return pNewItem;
 }
 
 void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
