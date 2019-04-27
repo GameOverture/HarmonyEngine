@@ -47,14 +47,15 @@ public:
 	void SelectItem(ExplorerItem *pItem);
 
 	Project *GetCurProjSelected();
-	ExplorerItem *GetCurItemSelected();
+	ExplorerItem *GetFirstSelectedItem();
+	QList<ExplorerItem *>GetSelectedItems();
 
 private:
 	Ui::ExplorerWidget *ui;
 	
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
-	void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
+	void on_treeView_itemDoubleClicked(QModelIndex index);
 	void on_treeWidget_itemSelectionChanged();
 
 	void on_actionRename_triggered();

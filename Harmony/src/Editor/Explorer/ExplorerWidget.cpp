@@ -39,7 +39,7 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :
 	ui->setupUi(this);
 	setAcceptDrops(true);
 
-	ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	ui->treeView->setSelectionMode(QAbstractItemView::SingleSelection);//ExtendedSelection);
 	ui->treeView->setDragEnabled(true);
 	ui->treeView->setAcceptDrops(true);
 	ui->treeView->setDropIndicatorShown(true);
@@ -77,7 +77,7 @@ void ExplorerWidget::SelectItem(ExplorerItem *pItem)
 
 Project *ExplorerWidget::GetCurProjSelected()
 {
-	ExplorerItem *pCurSelected = GetCurItemSelected();
+	ExplorerItem *pCurSelected = GetFirstSelectedItem();
 	if(pCurSelected == nullptr)
 		return nullptr;
 
@@ -87,35 +87,38 @@ Project *ExplorerWidget::GetCurProjSelected()
 	return static_cast<Project *>(pCurSelected);
 }
 
-ExplorerItem *ExplorerWidget::GetCurItemSelected()
+ExplorerItem *ExplorerWidget::GetFirstSelectedItem()
+{
+	QList<ExplorerItem *> itemList = GetSelectedItems();
+	if(itemList.empty())
+		return nullptr;
+
+	return itemList[0];
+}
+
+QList<ExplorerItem *> ExplorerWidget::GetSelectedItems()
 {
 	QItemSelectionModel *pSelectionModel = ui->treeView->selectionModel();
 	QModelIndexList selectedIndices = pSelectionModel->selectedIndexes();
 
-
-	QTreeWidgetItem *pCurItem = GetSelectedTreeItem();
-	if(pCurItem == nullptr)
-		return nullptr;
-	
-	QVariant v = pCurItem->data(0, Qt::UserRole);
-	return v.value<ExplorerItem *>();
+	QList<ExplorerItem *> retList;
+	for(int i = 0; i < selectedIndices.size(); ++i)
+		retList.push_back(static_cast<ExplorerItem *>(selectedIndices[i].internalPointer()));
 }
 
 void ExplorerWidget::OnContextMenu(const QPoint &pos)
 {
-	QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
-	QTreeWidgetItem *pTreeNode = ui->treeWidget->itemAt(pos);
+	QModelIndex index = ui->treeView->indexAt(pos);
 	
 	QMenu contextMenu;
-
-	if(pTreeNode == nullptr)
+	if(index.isValid() == false)
 	{
 		contextMenu.addAction(FINDACTION("actionNewProject"));
 		contextMenu.addAction(FINDACTION("actionOpenProject"));
 	}
 	else
 	{
-		ExplorerItem *pSelectedExplorerItem = pTreeNode->data(0, Qt::UserRole).value<ExplorerItem *>();
+		ExplorerItem *pSelectedExplorerItem = static_cast<ExplorerItem *>(index.internalPointer());
 		HyGuiItemType eSelectedItemType = pSelectedExplorerItem->GetType();
 		switch(eSelectedItemType)
 		{
@@ -159,21 +162,18 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		}
 	}
 	
-	contextMenu.exec(globalPos);
+	contextMenu.exec(ui->treeView->mapToGlobal(pos));
 }
 
-void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void ExplorerWidget::on_treeView_itemDoubleClicked(QModelIndex index)
 {
-	// setCurrentItem() required if this function is manually invoked. E.g. AddItem()
-	ui->treeWidget->setCurrentItem(item);
+	ExplorerItem *pItem = static_cast<ExplorerItem *>(index.internalPointer());
 	
-	ExplorerItem *pTreeVariantItem = item->data(0, Qt::UserRole).value<ExplorerItem *>();
-	
-	switch(pTreeVariantItem->GetType())
+	switch(pItem->GetType())
 	{
 	case ITEM_Project:
 	case ITEM_Prefix:
-		item->setExpanded(!item->isExpanded());
+		ui->treeView->setExpanded(index, !ui->treeView->isExpanded(index));
 		break;
 	
 	case ITEM_Audio:
@@ -184,17 +184,17 @@ void ExplorerWidget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int 
 	case ITEM_Shader:
 	case ITEM_Entity:
 	case ITEM_Prefab:
-		MainWindow::OpenItem(static_cast<ProjectItem *>(pTreeVariantItem));
+		MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
 		break;
 		
 	default:
-		HyGuiLog("ExplorerWidget::on_treeWidget_itemDoubleClicked was invoked on an unknown item type:" % QString::number(pTreeVariantItem->GetType()), LOGTYPE_Error);
+		HyGuiLog("ExplorerWidget::on_treeView_itemDoubleClicked was invoked on an unknown item type:" % QString::number(pItem->GetType()), LOGTYPE_Error);
 	}
 }
 
 void ExplorerWidget::on_treeWidget_itemSelectionChanged()
 {
-	QTreeWidgetItem *pCurSelected = GetSelectedTreeItem();
+	ExplorerItem *pCurSelected = GetFirstSelectedItem();
 	
 	bool bValidItem = (pCurSelected != nullptr);
 	FINDACTION("actionProjectSettings")->setEnabled(bValidItem);
@@ -212,8 +212,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
 
 	if(pCurSelected)
 	{
-		ExplorerItem *pTreeVariantItem = pCurSelected->data(0, Qt::UserRole).value<ExplorerItem *>();
-		switch(pTreeVariantItem->GetType())
+		switch(pCurSelected->GetType())
 		{
 		case ITEM_Audio:
 		case ITEM_Particles:
@@ -240,7 +239,7 @@ void ExplorerWidget::on_treeWidget_itemSelectionChanged()
 
 void ExplorerWidget::on_actionRename_triggered()
 {
-	ExplorerItem *pItem = GetCurItemSelected();
+	ExplorerItem *pItem = GetFirstSelectedItem();
 	
 	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pItem->GetType(), false), pItem->GetName(false));
 	if(pDlg->exec() == QDialog::Accepted)
@@ -251,7 +250,7 @@ void ExplorerWidget::on_actionRename_triggered()
 
 void ExplorerWidget::on_actionDeleteItem_triggered()
 {
-	ExplorerItem *pItem = GetCurItemSelected();
+	ExplorerItem *pItem = GetFirstSelectedItem();
 	
 	switch(pItem->GetType())
 	{
@@ -287,7 +286,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 
 void ExplorerWidget::on_actionCopyItem_triggered()
 {
-	ExplorerItem *pCurItemSelected = GetCurItemSelected();
+	ExplorerItem *pCurItemSelected = GetFirstSelectedItem();
 	if(pCurItemSelected == nullptr || pCurItemSelected->IsProjectItem() == false)
 	{
 		HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % (pCurItemSelected ? QString::number(pCurItemSelected->GetType()) : " nullptr"), LOGTYPE_Error);
