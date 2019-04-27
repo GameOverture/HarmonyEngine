@@ -264,6 +264,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp" />
     <ClCompile Include="Shared\Properties\PropertiesTreeView.cpp" />
     <ClCompile Include="Shared\Properties\PropertiesUndoCmd.cpp" />
+    <ClCompile Include="Shared\TreeModel\ITreeModel.cpp" />
     <ClCompile Include="Sprite\SpriteDraw.cpp" />
     <ClCompile Include="Sprite\SpriteModels.cpp" />
     <ClCompile Include="Sprite\SpriteTableView.cpp" />
@@ -384,6 +385,10 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtMoc Include="Explorer\ExplorerItem.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_KEYWORDS;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;NDEBUG;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
     </QtMoc>
     <ClInclude Include="Explorer\ExplorerItemMimeData.h" />
     <ClInclude Include="Explorer\ExplorerModel.h">
@@ -425,7 +430,12 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     </QtMoc>
     <ClInclude Include="Shared\IDraw.h" />
     <ClInclude Include="Shared\IModel.h" />
-    <ClInclude Include="Shared\IModelTreeItem.h" />
+    <QtMoc Include="Shared\IModelTreeItem.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_KEYWORDS;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;NDEBUG;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
+    </QtMoc>
     <QtMoc Include="MainWindow.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../%(Filename)%(Extension)</ForceInclude>
@@ -455,6 +465,12 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Shared/Properties/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Shared\Properties\PropertiesUndoCmd.h" />
+    <ClInclude Include="Shared\TreeModel\ITreeModel.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_KEYWORDS;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;NDEBUG;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
+    </ClInclude>
     <ClInclude Include="Sprite\SpriteDraw.h" />
     <QtMoc Include="Sprite\SpriteModels.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Sprite/%(Filename)%(Extension)</ForceInclude>

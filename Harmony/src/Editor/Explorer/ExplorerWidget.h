@@ -53,12 +53,8 @@ public:
 
 	ExplorerTreeWidget *GetTreeWidget();
 
-	void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
-
 private:
 	Ui::ExplorerWidget *ui;
-
-	void RecursiveRemoveItem(ExplorerItem *pItem);
 
 	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 

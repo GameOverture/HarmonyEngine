@@ -50,9 +50,6 @@
     <Filter Include="Harmony">
       <UniqueIdentifier>{b0b302e9-83ae-4568-8033-4375c55b311e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Global">
-      <UniqueIdentifier>{c5f02b5c-b891-45f2-9f42-1a786b263634}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Prefab">
       <UniqueIdentifier>{a0e96959-a1c9-4c18-96df-7283215463b7}</UniqueIdentifier>
     </Filter>
@@ -67,6 +64,12 @@
     </Filter>
     <Filter Include="Explorer\Project">
       <UniqueIdentifier>{f7392cf3-2e88-4305-ae53-7bf1cab4a32c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared">
+      <UniqueIdentifier>{c5f02b5c-b891-45f2-9f42-1a786b263634}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\TreeModel">
+      <UniqueIdentifier>{036a1f2e-1657-45a3-abd1-8b5b847ea97a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -176,16 +179,16 @@
       <Filter>Harmony</Filter>
     </ClCompile>
     <ClCompile Include="Shared\IDraw.cpp">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Global.cpp">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\IModel.cpp">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\IModelTreeItem.cpp">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Prefab\PrefabDraw.cpp">
       <Filter>Prefab</Filter>
@@ -206,16 +209,16 @@
       <Filter>Explorer\Project</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeItem.cpp">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeView.cpp">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesUndoCmd.cpp">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Sprite\SpriteDraw.cpp">
       <Filter>Sprite</Filter>
@@ -277,6 +280,9 @@
     <ClCompile Include="Explorer\ExplorerModel.cpp">
       <Filter>Explorer</Filter>
     </ClCompile>
+    <ClCompile Include="Shared\TreeModel\ITreeModel.cpp">
+      <Filter>Shared\TreeModel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
@@ -331,19 +337,19 @@
       <Filter>Font</Filter>
     </QtMoc>
     <ClInclude Include="Shared\Global.h">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\GlobalUndoCmds.h">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\GlobalWidgetMappers.h">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\IDraw.h">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\IModel.h">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClInclude>
     <QtMoc Include="Prefab\PrefabWidget.h">
       <Filter>Prefab</Filter>
@@ -355,10 +361,10 @@
       <Filter>Explorer\Project</Filter>
     </QtMoc>
     <QtMoc Include="Shared\Properties\PropertiesTreeModel.h">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </QtMoc>
     <QtMoc Include="Shared\Properties\PropertiesTreeView.h">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </QtMoc>
     <QtMoc Include="Sprite\SpriteModels.h">
       <Filter>Sprite</Filter>
@@ -399,6 +405,9 @@
     </ClInclude>
     <ClInclude Include="Explorer\ExplorerModel.h">
       <Filter>Explorer</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\TreeModel\ITreeModel.h">
+      <Filter>Shared\TreeModel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1170,9 +1179,6 @@
     <ClInclude Include="Font\FontUndoCmds.h">
       <Filter>Font</Filter>
     </ClInclude>
-    <ClInclude Include="Shared\IModelTreeItem.h">
-      <Filter>Global</Filter>
-    </ClInclude>
     <ClInclude Include="Prefab\PrefabDraw.h">
       <Filter>Prefab</Filter>
     </ClInclude>
@@ -1183,10 +1189,10 @@
       <Filter>Explorer\Project</Filter>
     </ClInclude>
     <ClInclude Include="Shared\Properties\PropertiesTreeItem.h">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\Properties\PropertiesUndoCmd.h">
-      <Filter>Global</Filter>
+      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="Sprite\SpriteDraw.h">
       <Filter>Sprite</Filter>
@@ -1214,9 +1220,6 @@
     <QtMoc Include="Entity\EntityTreeModel.h">
       <Filter>Entity</Filter>
     </QtMoc>
-    <QtMoc Include="Explorer\ExplorerItem.h">
-      <Filter>Explorer</Filter>
-    </QtMoc>
     <QtMoc Include="Explorer\ExplorerWidget.h">
       <Filter>Explorer</Filter>
     </QtMoc>
@@ -1233,5 +1236,11 @@
       <Filter>Harmony</Filter>
     </QtMoc>
     <QtMoc Include="MainWindow.h" />
+    <QtMoc Include="Explorer\ExplorerItem.h">
+      <Filter>Explorer</Filter>
+    </QtMoc>
+    <QtMoc Include="Shared\IModelTreeItem.h">
+      <Filter>Shared</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

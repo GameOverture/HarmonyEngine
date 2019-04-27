@@ -10,25 +10,24 @@
 #ifndef PROPERTIESTREEMODEL_H
 #define PROPERTIESTREEMODEL_H
 
+#include "Global.h"
 #include "PropertiesTreeView.h"
 #include "PropertiesTreeItem.h"
 #include "ProjectItem.h"
+#include "Shared/TreeModel/ITreeModel.h"
 
-#include <QAbstractItemModel>
-
-class PropertiesTreeModel : public QAbstractItemModel
+class PropertiesTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
-	ProjectItem &                               m_ItemRef;
-	const int                                   m_iSTATE_INDEX;
-	const QVariant                              m_iSUBSTATE;
+	ProjectItem &								m_ItemRef;
+	const int									m_iSTATE_INDEX;
+	const QVariant								m_iSUBSTATE;
 
-	PropertiesTreeItem *                        m_pRootItem;
-	QList<PropertiesTreeItem *>                 m_CategoryList;
+	QList<PropertiesTreeItem *>					m_CategoryList;
 
 public:
-	explicit PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant subState, QObject *parent = 0);
+	explicit PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant subState, QObject *parent = nullptr);
 	virtual ~PropertiesTreeModel();
 
 	ProjectItem &GetItem();
@@ -39,37 +38,17 @@ public:
 
 	void RefreshProperties();
 
-	// Header:
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	//bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
+	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+	virtual QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
+	virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-	// Basic functionality:
-	QModelIndex index(int iRow, int iColumn, const QModelIndex &parent = QModelIndex()) const override;
-	QModelIndex parent(const QModelIndex &index) const override;
-
-	int rowCount(const QModelIndex &parentIndex = QModelIndex()) const override;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
-	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
-
-	// Edit data:
 	// This creates an Undo command to be pushed on the UndoStack
-	bool setData(const QModelIndex &index, const QVariant &value, int iRole = Qt::EditRole) override;
-
-	Qt::ItemFlags flags(const QModelIndex& index) const override;
-
-	// Add data:
-	//bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-	//bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
-
-	// Remove data:
-	bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-	//bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
+	virtual bool setData(const QModelIndex &index, const QVariant &value, int iRole = Qt::EditRole) override;
 
 private:
 	PropertiesTreeItem *ValidateCategory(QString sCategoryName, QString sUniquePropertyName);
-	void InsertItem(int iRow, PropertiesTreeItem *pItem, PropertiesTreeItem *pParentItem);
-	void InsertItems(int iRow, QList<PropertiesTreeItem *> itemList, PropertiesTreeItem *pParentItem);
 };
 
 #endif // PROPERTIESTREEMODEL_H

@@ -12,8 +12,10 @@
 
 #include <QAbstractItemModel>
 
-class IModelTreeItem
+class IModelTreeItem : public QObject
 {
+	Q_OBJECT
+
 protected:
 	IModelTreeItem *            m_pParentItem;
 	QList<IModelTreeItem *>     m_ChildList;
@@ -23,7 +25,7 @@ public:
 	virtual ~IModelTreeItem();
 
 	IModelTreeItem *GetParent();
-	IModelTreeItem *GetChild(int iRow);
+	IModelTreeItem *GetChild(int iRow) const;
 
 	void AppendChild(IModelTreeItem *pChild);
 	void InsertChild(int iIndex, IModelTreeItem *pChild);

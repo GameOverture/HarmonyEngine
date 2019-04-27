@@ -697,8 +697,9 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 							  eItem,
 							  pDlg->GetPrefix(),
 							  pDlg->GetName(),
-							  true,
 							  pDlg->GetImportFile().isEmpty() ? QJsonValue() : QJsonValue(pDlg->GetImportFile()));
+
+		MainWindow::OpenItem(pItem);
 	}
 
 	delete pDlg;

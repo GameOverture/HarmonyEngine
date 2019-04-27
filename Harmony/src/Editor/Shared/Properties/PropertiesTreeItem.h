@@ -83,7 +83,6 @@ class PropertiesTreeItem : public IModelTreeItem
 protected:
 	const QString								m_sNAME;
 	const bool									m_bREAD_ONLY;
-	PropertiesTreeModel *						m_pTreeModel;
 
 	QVariant									m_Data;
 	PropertiesDef								m_DataDef;
@@ -92,7 +91,8 @@ protected:
 	QString										m_sToolTip;
 
 public:
-	explicit PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip, bool bReadOnly);
+	PropertiesTreeItem();
+	PropertiesTreeItem(QString sName, const PropertiesDef &propertiesDef, QColor color, QString sToolTip, bool bReadOnly);
 	virtual ~PropertiesTreeItem();
 
 	bool IsCategory() const;

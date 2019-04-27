@@ -11,6 +11,7 @@
 #include "IModelTreeItem.h"
 
 IModelTreeItem::IModelTreeItem() :
+	QObject(nullptr),
 	m_pParentItem(nullptr)
 { }
 
@@ -22,7 +23,7 @@ IModelTreeItem *IModelTreeItem::GetParent()
 	return m_pParentItem;
 }
 
-IModelTreeItem *IModelTreeItem::GetChild(int iRow)
+IModelTreeItem *IModelTreeItem::GetChild(int iRow) const
 {
 	if(iRow >= m_ChildList.size() || iRow < 0)
 		return nullptr;

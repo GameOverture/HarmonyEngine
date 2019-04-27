@@ -12,10 +12,14 @@
 #include "PropertiesTreeModel.h"
 #include "IModel.h"
 
-PropertiesTreeItem::PropertiesTreeItem(QString sName, PropertiesTreeModel *pTreeModel, const PropertiesDef &propertiesDef, QColor color, QString sToolTip, bool bReadOnly) :
+PropertiesTreeItem::PropertiesTreeItem() :
+	m_bREAD_ONLY(false)
+{
+}
+
+PropertiesTreeItem::PropertiesTreeItem(QString sName, const PropertiesDef &propertiesDef, QColor color, QString sToolTip, bool bReadOnly) :
 	m_sNAME(sName),
 	m_bREAD_ONLY(bReadOnly),
-	m_pTreeModel(pTreeModel),
 	m_DataDef(propertiesDef),
 	m_Color(color),
 	m_sToolTip(sToolTip)

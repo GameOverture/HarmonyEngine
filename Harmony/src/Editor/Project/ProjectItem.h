@@ -42,7 +42,7 @@ class ProjectItem : public ExplorerItem
 	IDraw *					m_pDraw;
 	
 public:
-	ProjectItem(Project &projRef, HyGuiItemType eType, QTreeWidgetItem *pParentTreeItem, const QString sName, QJsonValue initValue, bool bIsPendingSave);
+	ProjectItem(Project &projRef, HyGuiItemType eType, const QString sName, QJsonValue initValue, bool bIsPendingSave);
 	virtual ~ProjectItem();
 
 	virtual void Rename(QString sNewName);

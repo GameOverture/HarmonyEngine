@@ -32,11 +32,10 @@
 
 ProjectItem::ProjectItem(Project &projRef,
 						 HyGuiItemType eType,
-						 QTreeWidgetItem *pParentTreeItem,
 						 const QString sName,
 						 QJsonValue initValue,
 						 bool bIsPendingSave) :
-	ExplorerItem(projRef, eType, sName, pParentTreeItem),
+	ExplorerItem(projRef, eType, sName),
 	m_SaveValue(initValue),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_pModel(nullptr),

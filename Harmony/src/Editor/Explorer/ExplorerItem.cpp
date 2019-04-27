@@ -43,11 +43,17 @@
 //}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ExplorerItem::ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath, ExplorerItem *pParentItem) :
+ExplorerItem::ExplorerItem() :
+	m_eTYPE(ITEM_Unknown),
+	m_pProject(nullptr),
+	m_bIsProjectItem(false)
+{
+}
+
+ExplorerItem::ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath) :
 	m_eTYPE(eType),
 	m_sPath(HyStr::MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
-	m_pParent(pParentItem),
-	m_ProjectRef(projectRef),
+	m_pProject(&projectRef),
 	m_bIsProjectItem(false)
 {
 	// GetPrefix() doesn't work until we attach a parent. Manually grab the prefix from 'm_sPath'
@@ -61,9 +67,6 @@ ExplorerItem::ExplorerItem(Project &projectRef, HyGuiItemType eType, const QStri
 			sPrefix += sPathParts[i];
 	}
 	sPrefix += '/';
-
-	//if(pParentTreeItem && sPrefix.startsWith(HyGuiInternalPrefix) == false)
-	//	pParentTreeItem->addChild(m_pTreeItemPtr);
 }
 
 ExplorerItem::~ExplorerItem()
@@ -77,7 +80,7 @@ HyGuiItemType ExplorerItem::GetType() const
 
 Project &ExplorerItem::GetProject() const
 {
-	return m_ProjectRef;
+	return *m_pProject;
 }
 
 bool ExplorerItem::IsProjectItem() const
@@ -105,13 +108,13 @@ QString ExplorerItem::GetName(bool bWithPrefix) const
 QString ExplorerItem::GetPrefix() const
 {
 	QStringList sPrefixParts;
-	ExplorerItem *pParentTreeItem = m_pParent;
+	ExplorerItem *pParentTreeItem = static_cast<ExplorerItem *>(m_pParentItem);
 	while(pParentTreeItem)
 	{
 		if(pParentTreeItem->GetType() == ITEM_Prefix)
 			sPrefixParts.prepend(pParentTreeItem->GetName(false));
 
-		pParentTreeItem = pParentTreeItem->m_pParent;
+		pParentTreeItem = static_cast<ExplorerItem *>(pParentTreeItem->m_pParentItem);
 	}
 
 	QString sPrefix;
@@ -140,23 +143,22 @@ QIcon ExplorerItem::GetIcon(SubIcon eSubIcon) const
 	m_sPath = sNewName;
 	QString sNewPath = GetName(true);
 
-	m_ProjectRef.RenamePrefix(sOldPath, sNewPath);
+	m_pProject->RenamePrefix(sOldPath, sNewPath);
 }
 
-void ExplorerItem::SetTreeItemSubIcon(SubIcon eSubIcon)
+//QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs)
+//{
+//	out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
+//	return out;
+//}
+//
+//QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs)
+//{
+//	in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
+//	return in;
+//}
+
+/*virtual*/ QString ExplorerItem::GetToolTip() const /*override*/
 {
-	m_pTreeItemPtr->setIcon(0, GetIcon(eSubIcon));
+	return GetName(true);
 }
-
-QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs)
-{
-	out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
-	return out;
-}
-
-QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs)
-{
-	in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
-	return in;
-}
-

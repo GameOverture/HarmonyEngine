@@ -4,7 +4,8 @@
 #include "Project/Project.h"
 #include "Project/ProjectItem.h"
 
-ExplorerModel::ExplorerModel()
+ExplorerModel::ExplorerModel() :
+	ITreeModel(new ExplorerItem(), nullptr)
 {
 }
 
@@ -15,20 +16,19 @@ ExplorerModel::~ExplorerModel()
 
 Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 {
+	HyGuiLog("Opening project: " % sNewProjectFilePath, LOGTYPE_Info);
 	Project *pNewProject = new Project(sNewProjectFilePath);
 	if(pNewProject->HasError())
 	{
-		HyGuiLog("Project: " % pNewProject->GetAbsPath() % " had an error and will not be opened", LOGTYPE_Error);
+		HyGuiLog("Project: " % sNewProjectFilePath % " had an error and will not be opened", LOGTYPE_Error);
 		delete pNewProject;
 		return nullptr;
 	}
 
-	m_ProjectList.push_back(pNewProject);
-
-	HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
+	InsertItem(0, pNewProject, &m_RootItem);
 	return pNewProject;
 
-	// BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?.. fucking waste of time)
+	// BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?)
 	//
 	//MainWindow::StartLoading(MDI_Explorer);
 	//ExplorerLoadThread *pNewLoadThread = new ExplorerLoadThread(sNewProjectFilePath, this);
@@ -37,7 +37,7 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 	//pNewLoadThread->start();
 }
 
-void ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, bool bOpenAfterAdd, QJsonValue importValue)
+void ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue importValue)
 {
 	if(pProj == nullptr)
 	{
@@ -50,8 +50,8 @@ void ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QS
 		return;
 	}
 
-	QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
-
+	//QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
+	ExplorerItem *pParentItem = pProj;
 	if(sPrefix.isEmpty() == false)
 	{
 		QStringList sPathSplitList = sPrefix.split(QChar('/'));
@@ -59,11 +59,11 @@ void ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QS
 		for(int i = 0; i < sPathSplitList.size(); ++i)
 		{
 			bool bFound = false;
-			for(int j = 0; j < pParentTreeItem->childCount(); ++j)
+			for(int j = 0; j < pParentItem->GetChildren().size(); ++j)
 			{
-				if(QString::compare(sPathSplitList[i], pParentTreeItem->child(j)->text(0), Qt::CaseInsensitive) == 0)
+				if(QString::compare(sPathSplitList[i], pParentItem->GetChildren()[j]->GetName(false), Qt::CaseInsensitive) == 0)
 				{
-					pParentTreeItem = pParentTreeItem->child(j);
+					pParentItem = pParentItem->GetChildren()[j];
 					bFound = true;
 					break;
 				}
@@ -71,42 +71,31 @@ void ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QS
 
 			if(bFound == false)
 			{
-				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix TreeItem here and continue traversing down the tree
-				ExplorerItem *pPrefixItem = new ExplorerItem(*pProj, ITEM_Prefix, sPathSplitList[i], pParentTreeItem);
-				pParentTreeItem = pPrefixItem->GetTreeItem();
+				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix ExplorerItem here and continue traversing down the tree
+				ExplorerItem *pNewPrefixItem = new ExplorerItem(*pProj, ITEM_Prefix, sPathSplitList[i]);
+				InsertItem(pParentItem->GetNumChildren(), pNewPrefixItem, pParentItem);
+
+				pParentItem = pNewPrefixItem;
 			}
 		}
 	}
 
 	if(eNewItemType == ITEM_Prefix)
 	{
-		/*ExplorerItem *pNewPrefixItem = */new ExplorerItem(*pProj, ITEM_Prefix, sName, pParentTreeItem);
-		//pProj->SaveGameData(ITEM_Prefix, pNewPrefixItem->GetName(true), pNewPrefixItem->GetName(true));
-		//pProj->WriteGameData();
+		ExplorerItem *pNewPrefix = new ExplorerItem(*pProj, ITEM_Prefix, sName);
+		InsertItem(pParentItem->GetNumChildren(), pNewPrefix, pParentItem);
 	}
 	else
 	{
-		ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, pParentTreeItem, sName, importValue, true);
-		pItem->SetTreeItemSubIcon(SUBICON_New);
-
-		if(bOpenAfterAdd)
-		{
-			QTreeWidgetItem *pExpandItem = pItem->GetTreeItem();
-			while(pExpandItem->parent() != nullptr)
-			{
-				ui->treeWidget->expandItem(pExpandItem->parent());
-				pExpandItem = pExpandItem->parent();
-			}
-
-			MainWindow::OpenItem(pItem);
-		}
+		ProjectItem *pItem = new ProjectItem(*pProj, eNewItemType, sName, importValue, true);
+		InsertItem(pParentItem->GetNumChildren(), pItem, pParentItem);
 
 		// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
 		if(importValue.isNull() == false)
 			pItem->Save();
 	}
 
-	ui->treeWidget->sortItems(0, Qt::AscendingOrder);
+	//ui->treeWidget->sortItems(0, Qt::AscendingOrder);
 }
 
 void ExplorerModel::RemoveItem(ExplorerItem *pItem)
@@ -118,6 +107,128 @@ void ExplorerModel::RemoveItem(ExplorerItem *pItem)
 	ui->treeWidget->blockSignals(true);
 	RecursiveRemoveItem(pItem);
 	ui->treeWidget->blockSignals(false);
+}
+
+void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
+{
+	QDir metaDir(pProject->GetMetaDataAbsPath());
+	QDir metaTempDir = HyGlobal::PrepTempDir(pProject);
+
+	QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
+	QJsonObject pasteObj = pasteDoc.object();
+
+	if(pasteObj["project"].toString().toLower() == pProject->GetAbsPath().toLower())
+		return;
+
+	// Determine the pasted item type
+	HyGuiItemType ePasteItemType = ITEM_Unknown;
+	QString sItemType = pasteObj["itemType"].toString();
+	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+	for(int i = 0; i < typeList.size(); ++i)
+	{
+		if(sItemType == HyGlobal::ItemName(typeList[i], false))
+		{
+			ePasteItemType = typeList[i];
+			break;
+		}
+	}
+
+	// Import any missing fonts (.ttf)
+	if(ePasteItemType == ITEM_Font)
+	{
+		QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_Font, true));
+		QDir fontMetaDir(sFontMetaDir);
+		fontMetaDir.mkdir(".");
+
+		QJsonArray fontArray = pasteObj["fonts"].toArray();
+		for(int i = 0; i < fontArray.size(); ++i)
+		{
+			QFileInfo pasteFontFileInfo(fontArray[i].toString());
+
+			QString sAbsFilePath = pasteFontFileInfo.absoluteFilePath();
+			if(QFile::copy(sAbsFilePath, sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
+				HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+		}
+	}
+
+	// Copy images to meta-temp dir first
+	QJsonArray imageArray = pasteObj["images"].toArray();
+	for(int i = 0; i < imageArray.size(); ++i)
+	{
+		QJsonObject imageObj = imageArray[i].toObject();
+
+		if(pProject->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
+		{
+			QFileInfo pasteImageFileInfo(imageObj["uri"].toString());
+			QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
+		}
+	}
+	// Get string list of the copied images paths
+	QStringList importImageList;
+	QFileInfoList importFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+	for(int i = 0; i < importFileInfoList.size(); ++i)
+		importImageList.append(importFileInfoList[i].absoluteFilePath());
+
+	// Import images into the selected atlas group, or default one
+	quint32 uiAtlasGrpId = pProject->GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
+	if(pProject->GetAtlasWidget())
+		uiAtlasGrpId = pProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
+
+	// TODO: Create filters that match the source of the pasted images
+	QList<AtlasTreeItem *> correspondingParentList;
+	for(int i = 0; i < importImageList.size(); ++i)
+		correspondingParentList.push_back(nullptr);
+
+
+	// Repack this atlas group with imported images
+	HyGuiItemType eType;
+	switch(ePasteItemType)
+	{
+	case ITEM_Prefab: eType = ITEM_Prefab; break;
+	case ITEM_Font: eType = ITEM_Font; break;
+	default:
+		eType = ITEM_AtlasImage;
+		break;
+	}
+
+	QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, eType, correspondingParentList);
+	//if(importedFramesSet.empty() == false)
+	//	pProject->GetAtlasModel().Repack(pProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedFramesSet);
+
+	// Replace any image "id" with the newly imported frames' ids
+	if(pasteObj["src"].isArray())
+	{
+		QJsonArray srcArray = pasteObj["src"].toArray();
+		if(srcArray.empty() == false && srcArray[0].isObject() == false)
+			HyGuiLog("DataExplorerWidget::PasteItemSrc - src array isn't of QJsonObjects", LOGTYPE_Error);
+
+		// Copy everything into newSrcArray, while replacing "id" with proper value
+		QJsonArray newSrcArray;
+		for(int i = 0; i < srcArray.size(); ++i)
+		{
+			QJsonObject srcArrayObj = srcArray[i].toObject();
+
+			srcArrayObj = ReplaceIdWithProperValue(srcArrayObj, importedFramesSet);
+			newSrcArray.append(srcArrayObj);
+		}
+
+		pasteObj["src"] = newSrcArray;
+	}
+	else if(pasteObj["src"].isObject())
+	{
+		QJsonObject srcObj = pasteObj["src"].toObject();
+		srcObj = ReplaceIdWithProperValue(srcObj, importedFramesSet);
+
+		pasteObj["src"] = srcObj;
+	}
+	else
+		HyGuiLog("DataExplorerWidget::PasteItemSrc - src isn't an object or array", LOGTYPE_Error);
+
+	// Create a new project item representing the pasted item and save it
+	QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
+	QString sPrefix = sPrefixOverride.isEmpty() ? itemNameFileInfo.path() : sPrefixOverride;
+	QString sName = itemNameFileInfo.baseName();
+	AddItem(pProject, ePasteItemType, sPrefix, sName, pasteObj["src"]);
 }
 
 /*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/
@@ -142,7 +253,7 @@ void ExplorerModel::RemoveItem(ExplorerItem *pItem)
 		{
 			ProjectItem *pProjItem = static_cast<ProjectItem *>(pItem);
 			if(pProjItem->IsExistencePendingSave())
-				return QVariant(pItem->GetIcon(SUBICON_Pending));
+				return QVariant(pItem->GetIcon(SUBICON_Pending)); // SUBICON_New
 			else if(pProjItem->IsSaveClean() == false)
 				return QVariant(pItem->GetIcon(SUBICON_Dirty));
 		}
@@ -157,40 +268,6 @@ void ExplorerModel::RemoveItem(ExplorerItem *pItem)
 	default:
 		return QAbstractItemModel::data(index, role);
 	}
-}
-
-/*virtual*/ QModelIndex	ExplorerModel::index(int row, int column, const QModelIndex &parent = QModelIndex()) const /*override*/
-{
-	if(parent.isValid() == false)
-		return createIndex(row, column, m_ProjectList[row]);
-	else
-	{
-		ExplorerItem *pParentItem = static_cast<ExplorerItem *>(parent.internalPointer());
-		return createIndex(row, column, pParentItem->GetTreeItem m_ProjectList[row]);
-	}
-}
-
-// An insertRows() implementation must call beginInsertRows() before inserting new rows into the data structure, and endInsertRows() immediately afterwards.
-/*virtual*/ bool ExplorerModel::insertRows(int iRow, int iCount, const QModelIndex &parentRef = QModelIndex()) /*override*/
-{
-	beginInsertRows(parentRef, iRow, iRow + iCount - 1);
-
-	endInsertRows();
-}
-
-// An insertColumns() implementation must call beginInsertColumns() before inserting new columns into the data structure, and endInsertColumns() immediately afterwards.
-/*virtual*/ bool ExplorerModel::insertColumns(int iColumn, int iCount, const QModelIndex &parentRef = QModelIndex()) /*override*/
-{
-}
-
-// A removeRows() implementation must call beginRemoveRows() before the rows are removed from the data structure, and endRemoveRows() immediately afterwards.
-/*virtual*/ bool ExplorerModel::removeRows(int iRow, int iCount, const QModelIndex &parentRef = QModelIndex()) /*override*/
-{
-}
-
-// A removeColumns() implementation must call beginRemoveColumns() before the columns are removed from the data structure, and endRemoveColumns() immediately afterwards.
-/*virtual*/ bool ExplorerModel::removeColumns(int iColumn, int iCount, const QModelIndex &parentRef = QModelIndex()) /*override*/
-{
 }
 
 ///*virtual*/ void ExplorerModel::OnSave() /*override*/
@@ -216,3 +293,18 @@ void ExplorerModel::RemoveItem(ExplorerItem *pItem)
 ///*virtual*/ void ExplorerModel::Refresh() /*override*/
 //{
 //}
+
+void ExplorerModel::RecursiveRemoveItem(ExplorerItem *pItem)
+{
+	if(pItem == nullptr)
+		return;
+
+	for(int i = 0; i < pItem->GetTreeItem()->childCount(); ++i)
+	{
+		QVariant v = pItem->GetTreeItem()->child(i)->data(0, Qt::UserRole);
+		RecursiveRemoveItem(v.value<ExplorerItem *>());
+	}
+
+	// Children are taken care of at this point, now remove self
+	delete pItem;
+}

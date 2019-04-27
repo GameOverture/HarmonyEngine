@@ -14,6 +14,7 @@
 #include <QTreeWidget>
 
 #include "Global.h"
+#include "Shared/IModelTreeItem.h"
 
 //class ExplorerTreeWidget;
 //
@@ -29,20 +30,20 @@
 //};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class ExplorerItem : public QObject
+class ExplorerItem : public IModelTreeItem
 {
 	Q_OBJECT
 
 protected:
 	const HyGuiItemType		m_eTYPE;
 	QString					m_sPath;
-	ExplorerItem *			m_pParent;
 
-	Project &				m_ProjectRef;
+	Project *				m_pProject;
 	bool					m_bIsProjectItem;
 	
 public:
-	ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath, ExplorerItem *pParentItem);
+	ExplorerItem();
+	ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath);
 	virtual ~ExplorerItem();
 
 	HyGuiItemType GetType() const;
@@ -55,11 +56,12 @@ public:
 	QIcon GetIcon(SubIcon eSubIcon) const;
 
 	virtual void Rename(QString sNewName);
-	void SetTreeItemSubIcon(SubIcon eSubIcon);
-};
-Q_DECLARE_METATYPE(ExplorerItem *)
 
-QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs);
-QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs);
+	virtual QString GetToolTip() const override;
+};
+//Q_DECLARE_METATYPE(ExplorerItem *)
+//
+//QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs);
+//QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs);
 
 #endif // EXPLORERITEM_H
