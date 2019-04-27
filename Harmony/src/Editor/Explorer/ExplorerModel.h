@@ -8,6 +8,7 @@ class Project;
 
 class ExplorerModel : public QAbstractItemModel
 {
+	QList<Project *>	m_ProjectList;
 
 public:
 	ExplorerModel();

@@ -15,19 +15,19 @@
 
 #include "Global.h"
 
-class ExplorerTreeWidget;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class ExplorerTreeItem : public QTreeWidgetItem
-{
-public:
-	ExplorerTreeItem(int type = Type);
-	ExplorerTreeItem(ExplorerTreeWidget *pView, int type = Type);
-	ExplorerTreeItem(QTreeWidgetItem *parent, int type = Type);
-
-	bool operator<(const QTreeWidgetItem& other) const;
-};
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//class ExplorerTreeWidget;
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//class ExplorerTreeItem : public QTreeWidgetItem
+//{
+//public:
+//	ExplorerTreeItem(int type = Type);
+//	ExplorerTreeItem(ExplorerTreeWidget *pView, int type = Type);
+//	ExplorerTreeItem(QTreeWidgetItem *parent, int type = Type);
+//
+//	bool operator<(const QTreeWidgetItem& other) const;
+//};
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ExplorerItem : public QObject
 {
@@ -36,19 +36,17 @@ class ExplorerItem : public QObject
 protected:
 	const HyGuiItemType		m_eTYPE;
 	QString					m_sPath;
+	ExplorerItem *			m_pParent;
 
 	Project &				m_ProjectRef;
 	bool					m_bIsProjectItem;
 	
-	ExplorerTreeItem *		m_pTreeItemPtr;
-	
 public:
-	ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem);
+	ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath, ExplorerItem *pParentItem);
 	virtual ~ExplorerItem();
 
 	HyGuiItemType GetType() const;
 	Project &GetProject() const;
-	QTreeWidgetItem *GetTreeItem() const;
 
 	bool IsProjectItem() const;
 	

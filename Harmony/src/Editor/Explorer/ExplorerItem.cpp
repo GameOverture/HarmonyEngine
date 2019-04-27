@@ -18,44 +18,38 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ExplorerTreeItem::ExplorerTreeItem(int type /*= Type*/) :
-	QTreeWidgetItem(type)
-{ }
-ExplorerTreeItem::ExplorerTreeItem(ExplorerTreeWidget *pView, int type /*= Type*/) :
-	QTreeWidgetItem(pView, type)
-{ }
-ExplorerTreeItem::ExplorerTreeItem(QTreeWidgetItem *parent, int type /*= Type*/) :
-	QTreeWidgetItem(parent, type)
-{ }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//ExplorerTreeItem::ExplorerTreeItem(int type /*= Type*/) :
+//	QTreeWidgetItem(type)
+//{ }
+//ExplorerTreeItem::ExplorerTreeItem(ExplorerTreeWidget *pView, int type /*= Type*/) :
+//	QTreeWidgetItem(pView, type)
+//{ }
+//ExplorerTreeItem::ExplorerTreeItem(QTreeWidgetItem *parent, int type /*= Type*/) :
+//	QTreeWidgetItem(parent, type)
+//{ }
+//
+//bool ExplorerTreeItem::operator<(const QTreeWidgetItem &rhs) const
+//{
+//	ExplorerItem *pLeftItem = this->data(0, Qt::UserRole).value<ExplorerItem *>();
+//	ExplorerItem *pRightItem = rhs.data(0, Qt::UserRole).value<ExplorerItem *>();
+//
+//	if(pLeftItem->GetType() == ITEM_Prefix && pRightItem->GetType() != ITEM_Prefix)
+//		return true;
+//	if(pLeftItem->GetType() != ITEM_Prefix && pRightItem->GetType() == ITEM_Prefix)
+//		return false;
+//
+//	return this->text(0) < rhs.text(0);
+//}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool ExplorerTreeItem::operator<(const QTreeWidgetItem &rhs) const
-{
-	ExplorerItem *pLeftItem = this->data(0, Qt::UserRole).value<ExplorerItem *>();
-	ExplorerItem *pRightItem = rhs.data(0, Qt::UserRole).value<ExplorerItem *>();
-
-	if(pLeftItem->GetType() == ITEM_Prefix && pRightItem->GetType() != ITEM_Prefix)
-		return true;
-	if(pLeftItem->GetType() != ITEM_Prefix && pRightItem->GetType() == ITEM_Prefix)
-		return false;
-
-	return this->text(0) < rhs.text(0);
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-ExplorerItem::ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath, QTreeWidgetItem *pParentTreeItem) :
+ExplorerItem::ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath, ExplorerItem *pParentItem) :
 	m_eTYPE(eType),
 	m_sPath(HyStr::MakeStringProperPath(sPath.toStdString().c_str(), HyGlobal::ItemExt(m_eTYPE).toStdString().c_str(), false).c_str()),
+	m_pParent(pParentItem),
 	m_ProjectRef(projectRef),
 	m_bIsProjectItem(false)
 {
-	m_pTreeItemPtr = new ExplorerTreeItem();
-	m_pTreeItemPtr->setText(0, GetName(false));
-	m_pTreeItemPtr->setIcon(0, GetIcon(SUBICON_None));
-
-	QVariant v; v.setValue(this);
-	m_pTreeItemPtr->setData(0, Qt::UserRole, v);
-
 	// GetPrefix() doesn't work until we attach a parent. Manually grab the prefix from 'm_sPath'
 	QStringList sPathParts = m_sPath.split('/');
 	QString sPrefix;
@@ -68,13 +62,12 @@ ExplorerItem::ExplorerItem(Project &projectRef, HyGuiItemType eType, const QStri
 	}
 	sPrefix += '/';
 
-	if(pParentTreeItem && sPrefix.startsWith(HyGuiInternalPrefix) == false)
-		pParentTreeItem->addChild(m_pTreeItemPtr);
+	//if(pParentTreeItem && sPrefix.startsWith(HyGuiInternalPrefix) == false)
+	//	pParentTreeItem->addChild(m_pTreeItemPtr);
 }
 
 ExplorerItem::~ExplorerItem()
 {
-	delete m_pTreeItemPtr;
 }
 
 HyGuiItemType ExplorerItem::GetType() const
@@ -85,11 +78,6 @@ HyGuiItemType ExplorerItem::GetType() const
 Project &ExplorerItem::GetProject() const
 {
 	return m_ProjectRef;
-}
-
-QTreeWidgetItem *ExplorerItem::GetTreeItem() const
-{
-	return m_pTreeItemPtr;
 }
 
 bool ExplorerItem::IsProjectItem() const
@@ -117,14 +105,13 @@ QString ExplorerItem::GetName(bool bWithPrefix) const
 QString ExplorerItem::GetPrefix() const
 {
 	QStringList sPrefixParts;
-	QTreeWidgetItem *pParentTreeItem = m_pTreeItemPtr->parent();
+	ExplorerItem *pParentTreeItem = m_pParent;
 	while(pParentTreeItem)
 	{
-		ExplorerItem *pParentItem = pParentTreeItem->data(0, Qt::UserRole).value<ExplorerItem *>();
-		if(pParentItem->GetType() == ITEM_Prefix)
-			sPrefixParts.prepend(pParentTreeItem->text(0));
+		if(pParentTreeItem->GetType() == ITEM_Prefix)
+			sPrefixParts.prepend(pParentTreeItem->GetName(false));
 
-		pParentTreeItem = pParentTreeItem->parent();
+		pParentTreeItem = pParentTreeItem->m_pParent;
 	}
 
 	QString sPrefix;
@@ -151,10 +138,9 @@ QIcon ExplorerItem::GetIcon(SubIcon eSubIcon) const
 
 	QString sOldPath = GetName(true);
 	m_sPath = sNewName;
-	m_pTreeItemPtr->setText(0, GetName(false));
 	QString sNewPath = GetName(true);
 
-	HyGlobal::GetProjectFromItem(m_pTreeItemPtr)->RenamePrefix(sOldPath, sNewPath);
+	m_ProjectRef.RenamePrefix(sOldPath, sNewPath);
 }
 
 void ExplorerItem::SetTreeItemSubIcon(SubIcon eSubIcon)

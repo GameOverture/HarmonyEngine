@@ -296,6 +296,7 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 			{
 				pTabBar->setTabText(i, GetName(false));
 				pTabBar->setTabIcon(i, GetIcon(SUBICON_None));
+				ExplorerModel::dataChanged(
 				SetTreeItemSubIcon(SUBICON_None);
 			}
 			else

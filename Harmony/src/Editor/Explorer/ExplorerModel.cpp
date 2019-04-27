@@ -23,6 +23,8 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 		return nullptr;
 	}
 
+	m_ProjectList.push_back(pNewProject);
+
 	HyGuiLog("Opening project: " % pNewProject->GetAbsPath(), LOGTYPE_Info);
 	return pNewProject;
 
@@ -159,7 +161,13 @@ void ExplorerModel::RemoveItem(ExplorerItem *pItem)
 
 /*virtual*/ QModelIndex	ExplorerModel::index(int row, int column, const QModelIndex &parent = QModelIndex()) const /*override*/
 {
-	createIndex(row, column, 
+	if(parent.isValid() == false)
+		return createIndex(row, column, m_ProjectList[row]);
+	else
+	{
+		ExplorerItem *pParentItem = static_cast<ExplorerItem *>(parent.internalPointer());
+		return createIndex(row, column, pParentItem->GetTreeItem m_ProjectList[row]);
+	}
 }
 
 // An insertRows() implementation must call beginInsertRows() before inserting new rows into the data structure, and endInsertRows() immediately afterwards.
