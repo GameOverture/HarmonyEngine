@@ -55,8 +55,8 @@ private:
 	
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
-	void on_treeView_itemDoubleClicked(QModelIndex index);
-	void on_treeWidget_itemSelectionChanged();
+	void on_treeView_doubleClicked(QModelIndex index);
+	void on_treeView_clicked(QModelIndex index);
 
 	void on_actionRename_triggered();
 	

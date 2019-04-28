@@ -251,6 +251,11 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
+/*virtual*/ QVariant ExplorerModel::headerData(int iSection, Qt::Orientation orientation, int role) const /*override*/
+{
+	return QVariant();
+}
+
 /*virtual*/ int ExplorerModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
 {
 	return 1;

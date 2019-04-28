@@ -33,6 +33,7 @@ public:
 	void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
 
 	virtual Qt::DropActions supportedDropActions() const override;
+	virtual QVariant headerData(int iSection, Qt::Orientation orientation, int role) const override;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 

@@ -167,7 +167,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	contextMenu.exec(ui->treeView->mapToGlobal(pos));
 }
 
-void ExplorerWidget::on_treeView_itemDoubleClicked(QModelIndex index)
+void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 {
 	ExplorerItem *pItem = static_cast<ExplorerItem *>(index.internalPointer());
 	
@@ -194,9 +194,9 @@ void ExplorerWidget::on_treeView_itemDoubleClicked(QModelIndex index)
 	}
 }
 
-void ExplorerWidget::on_treeWidget_itemSelectionChanged()
+void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 {
-	ExplorerItem *pCurSelected = GetFirstSelectedItem();
+	ExplorerItem *pCurSelected = static_cast<ExplorerItem *>(index.internalPointer());
 	
 	bool bValidItem = (pCurSelected != nullptr);
 	FINDACTION("actionProjectSettings")->setEnabled(bValidItem);
