@@ -104,6 +104,8 @@ QList<ExplorerItem *> ExplorerWidget::GetSelectedItems()
 	QList<ExplorerItem *> retList;
 	for(int i = 0; i < selectedIndices.size(); ++i)
 		retList.push_back(static_cast<ExplorerItem *>(selectedIndices[i].internalPointer()));
+
+	return retList;
 }
 
 void ExplorerWidget::OnContextMenu(const QPoint &pos)
@@ -258,7 +260,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the prefix:\n" % pItem->GetName(true) % "\n\nAnd all of its contents? This action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
 			GetCurProjSelected()->DeletePrefixAndContents(pItem->GetName(true));
-			pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
+			static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem);
 		}
 		break;
 		
@@ -273,9 +275,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the " % HyGlobal::ItemName(pItem->GetType(), false) % ":\n" % pItem->GetName(true) % "?\n\nThis action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
 			static_cast<ProjectItem *>(pItem)->DeleteFromProject();
-			
-			if(pItem->GetTreeItem()->parent() != nullptr)
-				pItem->GetTreeItem()->parent()->removeChild(pItem->GetTreeItem());
+			static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem);
 		}
 		break;
 		
@@ -311,7 +311,7 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 	const QMimeData *pData = pClipboard->mimeData();
 
 	QString sPrefixOverride; // Leave uninitialized for no override
-	ExplorerItem *pCurSelected = GetCurItemSelected();
+	ExplorerItem *pCurSelected = GetFirstSelectedItem();
 	if(pCurSelected->GetType() != ITEM_Project)
 	{
 		if(pCurSelected->GetType() == ITEM_Prefix)
@@ -321,12 +321,12 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 	}
 
 	if(pData->hasFormat(HYGUI_MIMETYPE))
-		PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
+		static_cast<ExplorerModel *>(ui->treeView->model())->PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
 }
 
 void ExplorerWidget::on_actionOpen_triggered()
 {
-	ExplorerItem *pCurItemSelected = GetCurItemSelected();
+	ExplorerItem *pCurItemSelected = GetFirstSelectedItem();
 	if(pCurItemSelected->IsProjectItem())
 		MainWindow::OpenItem(static_cast<ProjectItem *>(pCurItemSelected));
 }

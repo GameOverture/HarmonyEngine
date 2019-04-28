@@ -400,12 +400,6 @@
     <ClInclude Include="Explorer\ExplorerItemMimeData.h">
       <Filter>Explorer</Filter>
     </ClInclude>
-    <ClInclude Include="Explorer\ExplorerModel.h">
-      <Filter>Explorer</Filter>
-    </ClInclude>
-    <ClInclude Include="Shared\TreeModel\ITreeModel.h">
-      <Filter>Shared\TreeModel</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -1235,6 +1229,12 @@
     </QtMoc>
     <QtMoc Include="Shared\IModelTreeItem.h">
       <Filter>Shared</Filter>
+    </QtMoc>
+    <QtMoc Include="Explorer\ExplorerModel.h">
+      <Filter>Explorer</Filter>
+    </QtMoc>
+    <QtMoc Include="Shared\TreeModel\ITreeModel.h">
+      <Filter>Shared\TreeModel</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

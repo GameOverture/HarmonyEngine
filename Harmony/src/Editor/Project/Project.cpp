@@ -70,7 +70,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Project::Project(const QString sProjectFilePath) :
-	ExplorerItem(*this, ITEM_Project, sProjectFilePath, nullptr),
+	ExplorerItem(*this, ITEM_Project, sProjectFilePath),
 	m_pDraw(nullptr),
 	m_DlgProjectSettings(sProjectFilePath),
 	m_pAtlasModel(nullptr),
@@ -85,8 +85,6 @@ Project::Project(const QString sProjectFilePath) :
 		m_bHasError = true;
 		return;
 	}
-
-	m_pTreeItemPtr->setText(0, GetGameName());
 
 	m_pTabBar = new ProjectTabBar(this);
 	m_pTabBar->setTabsClosable(true);
@@ -171,7 +169,7 @@ Project::Project(const QString sProjectFilePath) :
 			QString sCurPrefixPath = "";
 			QStringList sPathPartList = sItemPath.split("/");
 
-			QTreeWidgetItem *pCurPrefixTreeItem = m_pTreeItemPtr;
+			ExplorerItem *pCurPrefixTreeItem = this;
 
 			///////////////////////////////////////
 			/// PATH PARTS
@@ -186,11 +184,11 @@ Project::Project(const QString sProjectFilePath) :
 					sCurPrefixPath += sPathPartList[iPathPartIndex];
 
 					bool bPrefixFound = false;
-					for(int iChildIndex = 0; iChildIndex < pCurPrefixTreeItem->childCount(); ++iChildIndex)
+					for(int iChildIndex = 0; iChildIndex < pCurPrefixTreeItem->GetNumChildren(); ++iChildIndex)
 					{
-						if(sPathPartList[iPathPartIndex] == pCurPrefixTreeItem->child(iChildIndex)->text(0))
+						if(sPathPartList[iPathPartIndex] == static_cast<ExplorerItem *>(pCurPrefixTreeItem->GetChild(iChildIndex))->GetName(false))
 						{
-							pCurPrefixTreeItem = pCurPrefixTreeItem->child(iChildIndex);
+							pCurPrefixTreeItem = static_cast<ExplorerItem *>(pCurPrefixTreeItem->GetChild(iChildIndex));
 							bPrefixFound = true;
 							break;
 						}
@@ -198,13 +196,13 @@ Project::Project(const QString sProjectFilePath) :
 
 					if(bPrefixFound == false)
 					{
-						ExplorerItem *pNewPrefixItem = new ExplorerItem(*this, ITEM_Prefix, sPathPartList[iPathPartIndex], pCurPrefixTreeItem);
-						pCurPrefixTreeItem = pNewPrefixItem->GetTreeItem();
+						ExplorerItem *pNewPrefixItem = new ExplorerItem(*this, ITEM_Prefix, sPathPartList[iPathPartIndex]);
+						pCurPrefixTreeItem = pNewPrefixItem;
 					}
 				}
 				else // Last path part, so must be the actual data item
 				{
-					ProjectItem *pNewDataItem = new ProjectItem(*this, eType, pCurPrefixTreeItem, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
+					ProjectItem *pNewDataItem = new ProjectItem(*this, eType, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
 
 					if(sPathPartList[iPathPartIndex] == "+HyFont")
 						m_bSystemFontFound = true;

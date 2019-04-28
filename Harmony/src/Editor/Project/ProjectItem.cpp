@@ -71,10 +71,9 @@ ProjectItem::~ProjectItem()
 {
 	QString sOldPath = GetName(true);
 	m_sPath = sNewName;
-	m_pTreeItemPtr->setText(0, GetName(false));
 	QString sNewPath = GetName(true);
 
-	m_ProjectRef.RenameGameData(m_eTYPE, sOldPath, sNewPath, m_SaveValue);
+	m_pProject->RenameGameData(m_eTYPE, sOldPath, sNewPath, m_SaveValue);
 }
 
 void ProjectItem::LoadModel()
@@ -286,7 +285,7 @@ void ProjectItem::DeleteFromProject()
 
 void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 {
-	ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
+	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
 	for(int i = 0; i < pTabBar->count(); ++i)
 	{
 		if(pTabBar->tabData(i).value<ProjectItem *>() == this)
@@ -295,21 +294,21 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 			{
 				pTabBar->setTabText(i, GetName(false));
 				pTabBar->setTabIcon(i, GetIcon(SUBICON_None));
-				ExplorerModel::dataChanged(
-				SetTreeItemSubIcon(SUBICON_None);
+				//ExplorerModel::dataChanged(
+				//SetTreeItemSubIcon(SUBICON_None);
 			}
 			else
 			{
 				pTabBar->setTabText(i, GetName(false) + "*");
 				pTabBar->setTabIcon(i, GetIcon(SUBICON_Dirty));
-				SetTreeItemSubIcon(SUBICON_Dirty);
+				//SetTreeItemSubIcon(SUBICON_Dirty);
 			}
 
 			break;
 		}
 	}
 
-	m_ProjectRef.ApplySaveEnables();
+	m_pProject->ApplySaveEnables();
 }
 
 void ProjectItem::on_undoStack_indexChanged(int iIndex)

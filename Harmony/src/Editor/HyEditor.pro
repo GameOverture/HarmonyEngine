@@ -66,6 +66,7 @@ SOURCES += main.cpp \
     Shared/Properties/PropertiesTreeView.cpp \
     Shared/Properties/PropertiesTreeItem.cpp \
     Shared/Properties/PropertiesTreeModel.cpp \
+    Shared/TreeModel/ITreeModel.cpp \
     Widget/WidgetVectorSpinBox.cpp \
     Sprite/SpriteTableView.cpp \
     Explorer/ExplorerWidget.cpp \
@@ -189,6 +190,7 @@ HEADERS  += \
     Shared/Properties/PropertiesTreeView.h \
     Shared/Properties/PropertiesTreeItem.h \
     Shared/Properties/PropertiesTreeModel.h \
+    Shared/TreeModel/ITreeModel.h \
     Widget/WidgetVectorSpinBox.h \
     Sprite/SpriteTableView.h \
     Explorer/ExplorerWidget.h \

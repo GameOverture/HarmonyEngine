@@ -1,4 +1,15 @@
-#pragma once
+/**************************************************************************
+*	ExplorerModel.h
+*
+*	Harmony Engine - Editor Tool
+*	Copyright (c) 2019 Jason Knobler
+*
+*	Harmony Editor Tool License:
+*	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
+#ifndef EXPLORERMODEL_H
+#define EXPLORERMODEL_H
+
 #include "Global.h"
 #include "Shared/TreeModel/ITreeModel.h"
 #include "Explorer/ExplorerItem.h"
@@ -6,6 +17,7 @@
 
 class ExplorerModel : public ITreeModel
 {
+	Q_OBJECT
 
 public:
 	ExplorerModel();
@@ -34,3 +46,5 @@ public:
 private:
 	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 };
+
+#endif // EXPLORERMODEL_H

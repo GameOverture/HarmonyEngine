@@ -54,10 +54,10 @@ bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, QVariant c
 	def.eType = bCheckable ? PROPERTIESTYPE_CategoryChecked : PROPERTIESTYPE_Category;
 	def.delegateBuilder = commonDelegateBuilder;
 
-	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, def, color, sToolTip, !bCheckable);
+	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, def, color, sToolTip, !bCheckable);
 	pNewTreeItem->SetData(bStartChecked ? Qt::Checked : Qt::Unchecked);
 
-	InsertItem(m_CategoryList.size(), pNewTreeItem, &m_RootItem);
+	InsertItem(m_CategoryList.size(), pNewTreeItem, m_pRootItem);
 	m_CategoryList.push_back(pNewTreeItem);
 
 	return true;
@@ -69,7 +69,7 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, P
 	if(pCategoryTreeItem == nullptr)
 		return false;
 
-	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, this, defintion, pCategoryTreeItem->GetColor(), sToolTip, bReadOnly);
+	PropertiesTreeItem *pNewTreeItem = new PropertiesTreeItem(sName, defintion, pCategoryTreeItem->GetColor(), sToolTip, bReadOnly);
 	pNewTreeItem->SetData(defintion.defaultData);
 
 	InsertItem(pCategoryTreeItem->GetNumChildren(), pNewTreeItem, pCategoryTreeItem);

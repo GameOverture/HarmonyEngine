@@ -17,6 +17,8 @@
 
 class ITreeModel : public QAbstractItemModel
 {
+	Q_OBJECT
+
 protected:
 	IModelTreeItem *		m_pRootItem;
 

@@ -1,3 +1,12 @@
+/**************************************************************************
+*	ExplorerModel.cpp
+*
+*	Harmony Engine - Editor Tool
+*	Copyright (c) 2019 Jason Knobler
+*
+*	Harmony Editor Tool License:
+*	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
 #include "Global.h"
 #include "ExplorerModel.h"
 #include "ExplorerItem.h"
@@ -257,7 +266,10 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	{
 	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
 	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
-		return QVariant(pItem->GetName(false));
+		if(pItem->GetType() == ITEM_Project)
+			return QVariant(static_cast<Project *>(pItem)->GetGameName());
+		else
+			return QVariant(pItem->GetName(false));
 
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
 		if(pItem->IsProjectItem())
