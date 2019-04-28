@@ -281,7 +281,7 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 		{
 			ProjectItem *pProjItem = static_cast<ProjectItem *>(pItem);
 			if(pProjItem->IsExistencePendingSave())
-				return QVariant(pItem->GetIcon(SUBICON_Pending)); // SUBICON_New
+				return QVariant(pItem->GetIcon(SUBICON_New));
 			else if(pProjItem->IsSaveClean() == false)
 				return QVariant(pItem->GetIcon(SUBICON_Dirty));
 		}

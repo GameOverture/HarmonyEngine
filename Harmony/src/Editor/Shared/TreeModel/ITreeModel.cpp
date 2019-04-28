@@ -122,5 +122,6 @@ void ITreeModel::RecursiveRemoveItem(IModelTreeItem *pItem)
 		RemoveItem(pItem->GetChild(i));
 
 	// All children are taken care of at this point, safe to delete
+	pItem->GetParent()->RemoveChild(pItem->GetRow());
 	delete pItem;
 }
