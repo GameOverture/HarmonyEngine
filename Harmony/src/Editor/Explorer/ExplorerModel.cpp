@@ -289,7 +289,7 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 		return QVariant(pItem->GetName(true));
 
 	default:
-		return QAbstractItemModel::data(index, role);
+		return QVariant();
 	}
 }
 

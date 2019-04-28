@@ -22,6 +22,7 @@ SOURCES += main.cpp \
     Atlas/AtlasDraw.cpp \
     Atlas/AtlasFrame.cpp \
     Atlas/AtlasModel.cpp \
+    Atlas/AtlasRepackThread.cpp \
     Atlas/AtlasWidget.cpp \
     Audio/AudioDraw.cpp \
     Audio/AudioModelView.cpp \
@@ -39,65 +40,13 @@ SOURCES += main.cpp \
     Dialogs/DlgSetEngineLocation.cpp \
     Entity/EntityDraw.cpp \
     Entity/EntityModel.cpp \
-    Entity/EntityWidget.cpp \
-    Font/FontDraw.cpp \
-    Font/FontModels.cpp \
-    Font/FontUndoCmds.cpp \
-    Font/FontWidget.cpp \
-    Project/Project.cpp \
-    Project/ProjectDraw.cpp \
-    Project/ProjectItem.cpp \
-    Sprite/SpriteDraw.cpp \
-    Sprite/SpriteModels.cpp \
-    Sprite/SpriteUndoCmds.cpp \
-    Sprite/SpriteWidget.cpp \
-    Widget/WidgetColor.cpp \
-    Widget/WidgetGradientEditor.cpp \
-    Widget/WidgetLiveVariable.cpp \
-    Widget/WidgetLiveVarManager.cpp \
-    Widget/WidgetOutputLog.cpp \
-    Widget/WidgetRangedSlider.cpp \
     Entity/EntityTreeModel.cpp \
-    Project/ProjectItemMimeData.cpp \
     Entity/EntityUndoCmds.cpp \
-    Shared/Global.cpp \
-    Shared/IDraw.cpp \
-    Shared/IModel.cpp \
-    Shared/Properties/PropertiesTreeView.cpp \
-    Shared/Properties/PropertiesTreeItem.cpp \
-    Shared/Properties/PropertiesTreeModel.cpp \
-    Shared/TreeModel/ITreeModel.cpp \
-    Widget/WidgetVectorSpinBox.cpp \
-    Sprite/SpriteTableView.cpp \
-    Explorer/ExplorerWidget.cpp \
-    Explorer/ExplorerTreeWidget.cpp \
-    Harmony/Harmony.cpp \
-    Harmony/HarmonyConnection.cpp \
-    Harmony/HarmonyWidget.cpp \
-    Atlas/AtlasRepackThread.cpp \
-    Explorer/ExplorerItem.cpp \
-    Shared/Properties/PropertiesUndoCmd.cpp \
-    Shared/IModelTreeItem.cpp \
+    Entity/EntityWidget.cpp \
     Entity3d/Entity3d.cpp \
-    Prefab/PrefabModel.cpp \
-    Prefab/PrefabWidget.cpp \
-    Prefab/PrefabDraw.cpp \
-    Dialogs/DlgAtlasGroupSettings.cpp \
-    Dialogs/DlgColorPicker.cpp \
-    Dialogs/DlgInputName.cpp \
-    Dialogs/DlgNewItem.cpp \
-    Dialogs/DlgNewProject.cpp \
-    Dialogs/DlgProjectSettings.cpp \
-    Dialogs/DlgSetEngineLocation.cpp \
-    Entity/EntityDraw.cpp \
-    Entity/EntityModel.cpp \
-    Entity/EntityTreeModel.cpp \
-    Entity/EntityUndoCmds.cpp \
-    Entity/EntityWidget.cpp \
-    Dialogs/DlgSetEngineLocation.cpp \
     Explorer/ExplorerItem.cpp \
     Explorer/ExplorerItemMimeData.cpp \
-    Explorer/ExplorerTreeWidget.cpp \
+    Explorer/ExplorerModel.cpp \
     Explorer/ExplorerWidget.cpp \
     Font/FontDraw.cpp \
     Font/FontModels.cpp \
@@ -109,9 +58,22 @@ SOURCES += main.cpp \
     Prefab/PrefabDraw.cpp \
     Prefab/PrefabModel.cpp \
     Prefab/PrefabWidget.cpp \
+    Primitive/PrimitiveModel.cpp \
     Project/Project.cpp \
     Project/ProjectDraw.cpp \
     Project/ProjectItem.cpp \
+    Sprite/SpriteDraw.cpp \
+    Sprite/SpriteModels.cpp \
+    Sprite/SpriteUndoCmds.cpp \
+    Sprite/SpriteWidget.cpp \
+    Widget/WidgetColor.cpp \
+    Widget/WidgetGradientEditor.cpp \
+    Widget/WidgetLiveVariable.cpp \
+    Widget/WidgetLiveVarManager.cpp \
+    Widget/WidgetOutputLog.cpp \
+    Widget/WidgetRangedSlider.cpp \
+    Entity/EntityTreeModel.cpp \
+    Entity/EntityUndoCmds.cpp \
     Shared/Global.cpp \
     Shared/IDraw.cpp \
     Shared/IModel.cpp \
@@ -120,6 +82,7 @@ SOURCES += main.cpp \
     Shared/Properties/PropertiesTreeModel.cpp \
     Shared/Properties/PropertiesTreeView.cpp \
     Shared/Properties/PropertiesUndoCmd.cpp \
+    Shared/TreeModel/ITreeModel.cpp \
     Sprite/SpriteDraw.cpp \
     Sprite/SpriteModels.cpp \
     Sprite/SpriteTableView.cpp \
@@ -131,8 +94,7 @@ SOURCES += main.cpp \
     Widget/WidgetLiveVarManager.cpp \
     Widget/WidgetOutputLog.cpp \
     Widget/WidgetRangedSlider.cpp \
-    Widget/WidgetVectorSpinBox.cpp \
-    Primitive/PrimitiveModel.cpp
+    Widget/WidgetVectorSpinBox.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -142,6 +104,7 @@ HEADERS  += \
     Atlas/AtlasDraw.h \
     Atlas/AtlasFrame.h \
     Atlas/AtlasModel.h \
+    Atlas/AtlasRepackThread.h \
     Atlas/AtlasWidget.h \
     Audio/AudioDraw.h \
     Audio/AudioModelView.h \
@@ -159,71 +122,13 @@ HEADERS  += \
     Dialogs/DlgSetEngineLocation.h \
     Entity/EntityDraw.h \
     Entity/EntityModel.h \
-    Entity/EntityWidget.h \
-    Font/FontDraw.h \
-    Font/FontModels.h \
-    Font/FontUndoCmds.h \
-    Font/FontWidget.h \
-    Project/Project.h \
-    Project/ProjectDraw.h \
-    Project/ProjectItem.h \
-    Sprite/SpriteDraw.h \
-    Sprite/SpriteModels.h \
-    Sprite/SpriteUndoCmds.h \
-    Sprite/SpriteWidget.h \
-    Widget/WidgetColor.h \
-    Widget/WidgetGradientEditor.h \
-    Widget/WidgetLiveVariable.h \
-    Widget/WidgetLiveVarManager.h \
-    Widget/WidgetOutputLog.h \
-    Widget/WidgetRangedSlider.h \
     Entity/EntityTreeModel.h \
-    Project/ProjectItemMimeData.h \
-    Explorer/ExplorerTreeWidget.h \
     Entity/EntityUndoCmds.h \
-    Shared/Global.h \
-    Shared/GlobalUndoCmds.h \
-    Shared/GlobalWidgetMappers.h \
-    Shared/IDraw.h \
-    Shared/IModel.h \
-    Shared/IModelTreeItem.h \
-    Shared/Properties/PropertiesTreeView.h \
-    Shared/Properties/PropertiesTreeItem.h \
-    Shared/Properties/PropertiesTreeModel.h \
-    Shared/TreeModel/ITreeModel.h \
-    Widget/WidgetVectorSpinBox.h \
-    Sprite/SpriteTableView.h \
-    Explorer/ExplorerWidget.h \
-    Harmony/Harmony.h \
-    Harmony/HarmonyConnection.h \
-    Harmony/HarmonyWidget.h \
-    Atlas/AtlasRepackThread.h \
-    Explorer/ExplorerItem.h \
-    Shared/Properties/PropertiesUndoCmd.h \
+    Entity/EntityWidget.h \
     Entity3d/Entity3d.h \
-    Prefab/PrefabModel.h \
-    Prefab/PrefabWidget.h \
-    Prefab/PrefabDraw.h \
-    Atlas/AtlasDraw.h \
-    Atlas/AtlasFrame.h \
-    Atlas/AtlasModel.h \
-    Atlas/AtlasRepackThread.h \
-    Atlas/AtlasWidget.h \
-    Dialogs/DlgAtlasGroupSettings.h \
-    Dialogs/DlgColorPicker.h \
-    Dialogs/DlgInputName.h \
-    Dialogs/DlgNewItem.h \
-    Dialogs/DlgNewProject.h \
-    Dialogs/DlgProjectSettings.h \
-    Dialogs/DlgSetEngineLocation.h \
-    Entity/EntityDraw.h \
-    Entity/EntityModel.h \
-    Entity/EntityTreeModel.h \
-    Entity/EntityUndoCmds.h \
-    Entity/EntityWidget.h \
     Explorer/ExplorerItem.h \
     Explorer/ExplorerItemMimeData.h \
-    Explorer/ExplorerTreeWidget.h \
+    Explorer/ExplorerModel.h \
     Explorer/ExplorerWidget.h \
     Font/FontDraw.h \
     Font/FontModels.h \
@@ -235,6 +140,7 @@ HEADERS  += \
     Prefab/PrefabDraw.h \
     Prefab/PrefabModel.h \
     Prefab/PrefabWidget.h \
+    Primitive/PrimitiveModel.h \
     Project/Project.h \
     Project/ProjectDraw.h \
     Project/ProjectItem.h \
@@ -244,16 +150,10 @@ HEADERS  += \
     Shared/IDraw.h \
     Shared/IModel.h \
     Shared/IModelTreeItem.h \
-    Shared/Global.h \
-    Shared/GlobalUndoCmds.h \
-    Shared/GlobalWidgetMappers.h \
-    Shared/IDraw.h \
-    Shared/IModel.h \
-    Shared/IModelTreeItem.h \
     Shared/Properties/PropertiesTreeItem.h \
     Shared/Properties/PropertiesTreeModel.h \
     Shared/Properties/PropertiesTreeView.h \
-    Shared/Properties/PropertiesUndoCmd.h \
+    Shared/TreeModel/ITreeModel.h \
     Sprite/SpriteDraw.h \
     Sprite/SpriteModels.h \
     Sprite/SpriteTableView.h \
@@ -266,7 +166,6 @@ HEADERS  += \
     Widget/WidgetOutputLog.h \
     Widget/WidgetRangedSlider.h \
     Widget/WidgetVectorSpinBox.h \
-    Primitive/PrimitiveModel.h
 
 FORMS    += \
     MainWindow.ui \
@@ -282,33 +181,11 @@ FORMS    += \
     Dialogs/DlgNewProject.ui \
     Dialogs/DlgProjectSettings.ui \
     Dialogs/DlgSetEngineLocation.ui \
+    Entity/EntityCommon.ui \
+    Entity/EntityToolbox.ui \
     Entity/EntityWidget.ui \
     Entity/EntSpriteFrame.ui \
-    Font/FontWidget.ui \
-    Sprite/SpriteWidget.ui \
-    Widget/WidgetColor.ui \
-    Widget/WidgetGradientEditor.ui \
-    Widget/WidgetLiveVariable.ui \
-    Widget/WidgetLiveVarManager.ui \
-    Widget/WidgetOutputLog.ui \
-    Widget/WidgetRangedSlider.ui \
-    Entity/EntityToolbox.ui \
-    Entity/EntityCommon.ui \
-    Widget/WidgetVectorSpinBox.ui \
-    Explorer/ExplorerWidget.ui \
     Entity3d/Entity3d.ui \
-    Prefab/PrefabWidget.ui \
-    Entity/EntityCommon.ui \
-    Entity/EntityToolbox.ui \
-    Entity/EntityWidget.ui \
-    Entity/EntSpriteFrame.ui \
-    Dialogs/DlgAtlasGroupSettings.ui \
-    Dialogs/DlgColorPicker.ui \
-    Dialogs/DlgInputName.ui \
-    Dialogs/DlgNewItem.ui \
-    Dialogs/DlgNewProject.ui \
-    Dialogs/DlgProjectSettings.ui \
-    Dialogs/DlgSetEngineLocation.ui \
     Explorer/ExplorerWidget.ui \
     Font/FontWidget.ui \
     Prefab/PrefabWidget.ui \
@@ -342,6 +219,7 @@ INCLUDEPATH += "$$PWD/Widget"
 INCLUDEPATH += "$$PWD/Explorer"
 INCLUDEPATH += "$$PWD/Shared"
 INCLUDEPATH += "$$PWD/Shared/Properties"
+INCLUDEPATH += "$$PWD/Shared/TreeModel"
 INCLUDEPATH += "$$PWD/../../include"
 INCLUDEPATH += "$$PWD/../../include/Harmony"
 DEPENDPATH += "$$PWD/../../include"
