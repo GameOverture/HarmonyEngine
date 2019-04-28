@@ -44,6 +44,7 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :
 	ui->treeView->setAcceptDrops(true);
 	ui->treeView->setDropIndicatorShown(true);
 	ui->treeView->setSortingEnabled(true);
+	ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	ui->actionCopyItem->setEnabled(false);
 	ui->actionPasteItem->setEnabled(false);

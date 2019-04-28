@@ -24,6 +24,7 @@
 class AtlasWidget;
 class AudioWidgetManager;
 class Harmony;
+class ExplorerModel;
 
 class AtlasTreeItem;
 
@@ -63,6 +64,8 @@ class Project : public ExplorerItem
 public:
 	Project(const QString sProjectFilePath);
 	virtual ~Project();
+	
+	void InitExplorerModelData(ExplorerModel &modelRef);
 
 	bool HasError() const;
 

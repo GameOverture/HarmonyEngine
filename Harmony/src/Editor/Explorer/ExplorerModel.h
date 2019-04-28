@@ -28,7 +28,7 @@ public:
 	Project *AddProject(const QString sNewProjectFilePath);
 
 	// If importValue doesn't equal null, then this new ProjectItem will be saved upon creation
-	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue importValue);
+	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
 
 	void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
 

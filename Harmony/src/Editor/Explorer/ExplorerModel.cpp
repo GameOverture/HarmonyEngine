@@ -51,6 +51,8 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 	}
 
 	InsertItem(0, pNewProject, m_pRootItem);
+	pNewProject->InitExplorerModelData(*this);
+
 	return pNewProject;
 
 	// BELOW BREAKS QTABBAR and UNDOSTACK SIGNAL/SLOT CONNECTIONS (I guess because QObject must be created on main thread?)
@@ -62,7 +64,7 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 	//pNewLoadThread->start();
 }
 
-ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue importValue)
+ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave)
 {
 	if(pProj == nullptr)
 	{
@@ -113,12 +115,8 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 	}
 	else
 	{
-		pNewItem = new ProjectItem(*pProj, eNewItemType, sName, importValue, true);
+		pNewItem = new ProjectItem(*pProj, eNewItemType, sName, initValue, bIsPendingSave);
 		InsertItem(pParentItem->GetNumChildren(), pNewItem, pParentItem);
-
-		// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
-		if(importValue.isNull() == false)
-			static_cast<ProjectItem *>(pNewItem)->Save();
 	}
 
 	return pNewItem;
@@ -243,7 +241,9 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
 	QString sPrefix = sPrefixOverride.isEmpty() ? itemNameFileInfo.path() : sPrefixOverride;
 	QString sName = itemNameFileInfo.baseName();
-	AddItem(pProject, ePasteItemType, sPrefix, sName, pasteObj["src"]);
+	
+	ProjectItem *pImportedProjItem = static_cast<ProjectItem *>(AddItem(pProject, ePasteItemType, sPrefix, sName, pasteObj["src"], false));
+	pImportedProjItem->Save();
 }
 
 /*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/

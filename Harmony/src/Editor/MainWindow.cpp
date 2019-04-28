@@ -697,10 +697,17 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 														 eItem,
 														 pDlg->GetPrefix(),
 														 pDlg->GetName(),
-														 pDlg->GetImportFile().isEmpty() ? QJsonValue() : QJsonValue(pDlg->GetImportFile()));
+														 pDlg->GetImportFile().isEmpty() ? QJsonValue() : QJsonValue(pDlg->GetImportFile()),
+														 pDlg->GetImportFile().isEmpty()); // Blank items are pending save
 
 		if(pNewItem->IsProjectItem())
+		{
+			// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
+			if(pDlg->GetImportFile().isEmpty() == false)
+				static_cast<ProjectItem *>(pNewItem)->Save();
+
 			MainWindow::OpenItem(static_cast<ProjectItem *>(pNewItem));
+		}
 	}
 
 	delete pDlg;
