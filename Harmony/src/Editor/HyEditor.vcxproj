@@ -726,7 +726,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     </QtUic>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
     <None Include="res\icons16x16\items\Atlas-Close.png" />
     <None Include="res\icons16x16\items\Atlas-Delete.png" />
     <None Include="res\icons16x16\items\Atlas-Dirty.png" />

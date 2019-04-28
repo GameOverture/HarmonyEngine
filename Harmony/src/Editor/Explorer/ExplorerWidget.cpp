@@ -176,7 +176,7 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 	{
 	case ITEM_Project:
 	case ITEM_Prefix:
-		ui->treeView->setExpanded(index, !ui->treeView->isExpanded(index));
+		ui->treeView->isExpanded(index) ? ui->treeView->collapse(index) : ui->treeView->expand(index);
 		break;
 	
 	case ITEM_Audio:

@@ -28,6 +28,9 @@
    </property>
    <item>
     <widget class="QTreeView" name="treeView">
+     <property name="expandsOnDoubleClick">
+      <bool>false</bool>
+     </property>
      <attribute name="headerVisible">
       <bool>false</bool>
      </attribute>

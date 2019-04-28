@@ -1141,7 +1141,6 @@
     <None Include="res\icons16x16\view-properties.png">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HyEditor.rc" />

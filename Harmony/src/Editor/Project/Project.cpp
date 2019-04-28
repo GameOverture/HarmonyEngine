@@ -187,62 +187,13 @@ void Project::InitExplorerModelData(ExplorerModel &modelRef)
 				sName = sItemPath.right(sItemPath.length() - iSplitIndex - 1);
 			}
 
-			modelRef.AddItem(this, eType, sPrefix, sName, objsInSubDirIter.value(), false);
-
 			if(sName == "+HyFont")
 				m_bSystemFontFound = true;
 
+			modelRef.AddItem(this, eType, sPrefix, sName, objsInSubDirIter.value(), false);
 #ifdef RESAVE_ENTIRE_PROJECT
 			pNewDataItem->Save();
 #endif
-
-//			// Create prefix folder tree items if they don't exist, and finally adding the tree item for the data itself
-//			QString sCurPrefixPath = "";
-//			QStringList sPathPartList = sItemPath.split("/");
-//
-//			ExplorerItem *pCurPrefixTreeItem = this;
-//
-//			///////////////////////////////////////
-//			/// PATH PARTS
-//			for(int iPathPartIndex = 0; iPathPartIndex < sPathPartList.size(); ++iPathPartIndex)
-//			{
-//				if(iPathPartIndex != 0)
-//					sCurPrefixPath += "/";
-//
-//				// Not the last path part, must be a prefix
-//				if(iPathPartIndex != sPathPartList.size() - 1)
-//				{
-//					sCurPrefixPath += sPathPartList[iPathPartIndex];
-//
-//					bool bPrefixFound = false;
-//					for(int iChildIndex = 0; iChildIndex < pCurPrefixTreeItem->GetNumChildren(); ++iChildIndex)
-//					{
-//						if(sPathPartList[iPathPartIndex] == static_cast<ExplorerItem *>(pCurPrefixTreeItem->GetChild(iChildIndex))->GetName(false))
-//						{
-//							pCurPrefixTreeItem = static_cast<ExplorerItem *>(pCurPrefixTreeItem->GetChild(iChildIndex));
-//							bPrefixFound = true;
-//							break;
-//						}
-//					}
-//
-//					if(bPrefixFound == false)
-//					{
-//						ExplorerItem *pNewPrefixItem = new ExplorerItem(*this, ITEM_Prefix, sPathPartList[iPathPartIndex]);
-//						pCurPrefixTreeItem = pNewPrefixItem;
-//					}
-//				}
-//				else // Last path part, so must be the actual data item
-//				{
-//					ProjectItem *pNewDataItem = new ProjectItem(*this, eType, sPathPartList[iPathPartIndex], objsInSubDirIter.value(), false);
-//
-//					if(sPathPartList[iPathPartIndex] == "+HyFont")
-//						m_bSystemFontFound = true;
-//
-//#ifdef RESAVE_ENTIRE_PROJECT
-//					pNewDataItem->Save();
-//#endif
-//				}
-//			}
 		}
 	}
 
