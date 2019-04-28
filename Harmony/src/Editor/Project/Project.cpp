@@ -403,7 +403,7 @@ void Project::DeletePrefixAndContents(QString sPrefix)
 		{
 			QFileInfo itemInfo;
 			itemInfo.setFile(iter.key());
-			QString sCurPrefix = itemInfo.path() % "/";
+			QString sCurPrefix = itemInfo.path();
 
 			if(sCurPrefix == sPrefix)
 				DeleteGameData(eType, iter.key());
