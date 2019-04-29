@@ -11,7 +11,7 @@
 #define ITREEMODEL_H
 
 #include "Global.h"
-#include "Shared/TreeModel/ITreeModelItem.h"
+#include "Shared/TreeModel/TreeModelItem.h"
 
 #include <QAbstractItemModel>
 
@@ -20,14 +20,14 @@ class ITreeModel : public QAbstractItemModel
 	Q_OBJECT
 
 protected:
-	ITreeModelItem *		m_pRootItem;
+	TreeModelItem *		m_pRootItem;
 
 public:
-	ITreeModel(ITreeModelItem *pRootItem, QObject *parent);
+	ITreeModel(TreeModelItem *pRootItem, QObject *parent);
 	virtual ~ITreeModel();
 
-	QModelIndex GetIndex(ITreeModelItem *pItem);
-	void RemoveItem(ITreeModelItem *pItem);
+	QModelIndex GetIndex(TreeModelItem *pItem);
+	void RemoveItem(TreeModelItem *pItem);
 
 	virtual QModelIndex index(int iRow, int iColumn, const QModelIndex &parent) const override;
 	virtual QModelIndex parent(const QModelIndex &index) const override;
@@ -37,13 +37,13 @@ public:
 	virtual QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override = 0;
 
 protected:
-	void InsertItem(int iRow, ITreeModelItem *pItem, ITreeModelItem *pParentItem);
-	void InsertItems(int iRow, QList<ITreeModelItem *> itemList, ITreeModelItem *pParentItem);
+	void InsertItem(int iRow, TreeModelItem *pItem, TreeModelItem *pParentItem);
+	void InsertItems(int iRow, QList<TreeModelItem *> itemList, TreeModelItem *pParentItem);
 
 	bool IsRoot(const QModelIndex &index) const;
 
 private:
-	void RecursiveRemoveItem(ITreeModelItem *pItem);
+	void RecursiveRemoveItem(TreeModelItem *pItem);
 };
 
 #endif // ITREEMODEL_H

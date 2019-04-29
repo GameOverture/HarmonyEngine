@@ -10,7 +10,7 @@
 #ifndef PROPERTIESTREEITEM_H
 #define PROPERTIESTREEITEM_H
 
-#include "Shared/TreeModel/ITreeModelItem.h"
+#include "Shared/TreeModel/TreeModelItem.h"
 
 #include <QWidget>
 #include <QVariant>
@@ -78,7 +78,7 @@ struct PropertiesDef
 	{ }
 };
 
-class PropertiesTreeItem : public ITreeModelItem
+class PropertiesTreeItem : public TreeModelItem
 {
 protected:
 	const QString								m_sNAME;

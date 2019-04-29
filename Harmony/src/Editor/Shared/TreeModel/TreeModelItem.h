@@ -12,24 +12,24 @@
 
 #include "Global.h"
 
-class ITreeModelItem : public QObject
+class TreeModelItem : public QObject
 {
 	Q_OBJECT
 
 protected:
-	ITreeModelItem *            m_pParentItem;
-	QList<ITreeModelItem *>     m_ChildList;
+	TreeModelItem *            m_pParentItem;
+	QList<TreeModelItem *>     m_ChildList;
 
 public:
-	explicit ITreeModelItem();
-	virtual ~ITreeModelItem();
+	explicit TreeModelItem();
+	virtual ~TreeModelItem();
 
-	ITreeModelItem *GetParent();
-	ITreeModelItem *GetChild(int iRow) const;
-	QList<ITreeModelItem *> GetChildren(bool bRecusively);
+	TreeModelItem *GetParent();
+	TreeModelItem *GetChild(int iRow) const;
+	QList<TreeModelItem *> GetChildren(bool bRecusively);
 
-	void AppendChild(ITreeModelItem *pChild);
-	void InsertChild(int iIndex, ITreeModelItem *pChild);
+	void AppendChild(TreeModelItem *pChild);
+	void InsertChild(int iIndex, TreeModelItem *pChild);
 	void RemoveChild(int iIndex);
 
 	int GetNumChildren() const;
