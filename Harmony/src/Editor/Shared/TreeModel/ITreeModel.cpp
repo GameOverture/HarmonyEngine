@@ -9,13 +9,16 @@
 *************************************************************************/
 #include "Global.h"
 #include "ITreeModel.h"
+#include "TreeModelItem.h"
 
-ITreeModel::ITreeModel(TreeModelItem *pRootItem, QObject *parent) :
-	QAbstractItemModel(parent),
-	m_pRootItem(pRootItem)
+ITreeModel::ITreeModel(const QStringList &sHeaderList, QObject *pParent /*= nullptr*/) :
+	QAbstractItemModel(pParent)
 {
-	if(m_pRootItem == nullptr)
-		HyGuiLog("ITreeModel was constructed with a nullptr root item", LOGTYPE_Error);
+	QVector<QVariant> rootData;
+	for(int i = 0; i < sHeaderList.size(); ++i)
+		rootData << sHeaderList[i];
+
+	m_pRootItem = new TreeModelItem(rootData);
 }
 
 /*virtual*/ ITreeModel::~ITreeModel()
@@ -23,105 +26,137 @@ ITreeModel::ITreeModel(TreeModelItem *pRootItem, QObject *parent) :
 	delete m_pRootItem;
 }
 
-QModelIndex ITreeModel::GetIndex(TreeModelItem *pItem)
+/*virtual*/ QVariant ITreeModel::headerData(int iSection, Qt::Orientation orientation, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
-	return createIndex(pItem->GetRow(), 0, pItem);
+	if(orientation == Qt::Horizontal && iRole == Qt::DisplayRole)
+		return m_pRootItem->data(iSection);
+
+	return QVariant();
 }
 
-void ITreeModel::RemoveItem(TreeModelItem *pItem)
+/*virtual*/ QModelIndex ITreeModel::index(int iRow, int iColumn, const QModelIndex &parentRef /*= QModelIndex()*/) const /*override*/
 {
-	if(pItem == nullptr)
-		return;
-
-	QModelIndex parentIndex = pItem->GetParent() ? createIndex(pItem->GetParent()->GetRow(), 0, pItem->GetParent()) : QModelIndex();
-	beginRemoveRows(parentIndex, pItem->GetRow(), pItem->GetRow());
-	RecursiveRemoveItem(pItem);
-	endRemoveRows();
-}
-
-
-/*virtual*/ QModelIndex ITreeModel::index(int iRow, int iColumn, const QModelIndex &parent) const /*override*/
-{
-	if(hasIndex(iRow, iColumn, parent) == false)
+	if(parentRef.isValid() && parentRef.column() != 0)
 		return QModelIndex();
 
-	const TreeModelItem *pParentItem;
+	TreeModelItem *pParentItem = GetItem(parentRef);
 
-	if(parent.isValid() == false)
-		pParentItem = m_pRootItem;
-	else
-		pParentItem = static_cast<TreeModelItem *>(parent.internalPointer());
-
-	TreeModelItem *pChildItem = static_cast<TreeModelItem *>(pParentItem->GetChild(iRow));
+	TreeModelItem *pChildItem = pParentItem->child(iRow);
 	if(pChildItem)
 		return createIndex(iRow, iColumn, pChildItem);
 	else
 		return QModelIndex();
 }
 
-/*virtual*/ QModelIndex ITreeModel::parent(const QModelIndex &index) const /*override*/
+/*virtual*/ QModelIndex ITreeModel::parent(const QModelIndex &indexRef) const /*override*/
 {
-	if(index.isValid() == false)
+	if(indexRef.isValid() == false)
 		return QModelIndex();
 
-	TreeModelItem *pChildItem = static_cast<TreeModelItem *>(index.internalPointer());
-	TreeModelItem *pParentItem = static_cast<TreeModelItem *>(pChildItem->GetParent());
+	TreeModelItem *pChildItem = GetItem(indexRef);
+	TreeModelItem *pParentItem = pChildItem->parent();
 
-	if(pChildItem == m_pRootItem)// || pParentItem == m_pRootItem)
+	if(pParentItem == m_pRootItem)
 		return QModelIndex();
 
-	return createIndex(pParentItem->GetRow(), 0, pParentItem);
+	return createIndex(pParentItem->childNumber(), 0, pParentItem);
 }
 
-/*virtual*/ int ITreeModel::rowCount(const QModelIndex &parentIndex /*= QModelIndex()*/) const /*override*/
+/*virtual*/ int ITreeModel::rowCount(const QModelIndex &parentRef /*= QModelIndex()*/) const /*override*/
 {
-	const TreeModelItem *pParentItem;
-	if(parentIndex.isValid() == false)
-		pParentItem = m_pRootItem;
-	else
-		pParentItem = static_cast<TreeModelItem *>(parentIndex.internalPointer());
-
-	return pParentItem->GetNumChildren();
+	TreeModelItem *pParentItem = GetItem(parentRef);
+	return pParentItem->childCount();
 }
 
-void ITreeModel::InsertItem(int iRow, TreeModelItem *pItem, TreeModelItem *pParentItem)
+/*virtual*/ int ITreeModel::columnCount(const QModelIndex &parentRef /*= QModelIndex()*/) const /*override*/
 {
-	QList<TreeModelItem *> itemList;
-	itemList << pItem;
-	InsertItems(iRow, itemList, pParentItem);
+	return m_pRootItem->columnCount();
 }
 
-void ITreeModel::InsertItems(int iRow, QList<TreeModelItem *> itemList, TreeModelItem *pParentItem)
+/*virtual*/ bool ITreeModel::setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole /*= Qt::EditRole*/) /*override*/
 {
-	QModelIndex parentIndex = pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex();
+	if(iRole != Qt::EditRole)
+		return false;
 
-	TreeModelItem *pParent;
-	if(parentIndex.isValid() == false)
-		pParent = m_pRootItem;
-	else
-		pParent = static_cast<TreeModelItem *>(parentIndex.internalPointer());
+	TreeModelItem *pItem = GetItem(indexRef);
+	bool bResult = pItem->setData(indexRef.column(), valueRef);
 
-	iRow = HyClamp(iRow, 0, pParent->GetNumChildren());
+	if(bResult)
+		Q_EMIT dataChanged(indexRef, indexRef, {iRole});
 
-	beginInsertRows(parentIndex, iRow, iRow + itemList.size() - 1);
+	return bResult;
+}
 
-	for(int i = 0; i < itemList.size(); ++i)
-		pParent->InsertChild(iRow + i, itemList[i]);
+/*virtual*/ bool ITreeModel::setHeaderData(int iSection, Qt::Orientation eOrientation, const QVariant &valueRef, int iRole /*= Qt::EditRole*/) /*override*/
+{
+	if(iRole != Qt::EditRole || eOrientation != Qt::Horizontal)
+		return false;
 
+	bool bResult = m_pRootItem->setData(iSection, valueRef);
+
+	if(bResult)
+		Q_EMIT headerDataChanged(eOrientation, iSection, iSection);
+
+	return bResult;
+}
+
+/*virtual*/ bool ITreeModel::insertRows(int iPosition, int iRows, const QModelIndex &parentRef /*= QModelIndex()*/) /*override*/
+{
+	TreeModelItem *pParentItem = GetItem(parentRef);
+	bool bSuccess = false;
+
+	beginInsertRows(parentRef, iPosition, iPosition + iRows - 1);
+	bSuccess = pParentItem->insertChildren(iPosition, iRows, m_pRootItem->columnCount());
 	endInsertRows();
+
+	return bSuccess;
 }
 
-bool ITreeModel::IsRoot(const QModelIndex &index) const
+/*virtual*/ bool ITreeModel::removeRows(int iPosition, int iRows, const QModelIndex &parentRef /*= QModelIndex()*/) /*override*/
 {
-	return m_pRootItem == static_cast<TreeModelItem *>(index.internalPointer());
+	TreeModelItem *pParentItem = GetItem(parentRef);
+	bool bSuccess = true;
+
+	beginRemoveRows(parentRef, iPosition, iPosition + iRows - 1);
+	bSuccess = pParentItem->removeChildren(iPosition, iRows);
+	endRemoveRows();
+
+	return bSuccess;
 }
 
-void ITreeModel::RecursiveRemoveItem(TreeModelItem *pItem)
+/*virtual*/ bool ITreeModel::insertColumns(int iPosition, int iColumns, const QModelIndex &parentRef /*= QModelIndex()*/) /*override*/
 {
-	for(int i = 0; i < pItem->GetNumChildren(); ++i)
-		RemoveItem(pItem->GetChild(i));
+	bool bSuccess = false;
 
-	// All children are taken care of at this point, safe to delete
-	pItem->GetParent()->RemoveChild(pItem->GetRow());
-	delete pItem;
+	beginInsertColumns(parentRef, iPosition, iPosition + iColumns - 1);
+	bSuccess = m_pRootItem->insertColumns(iPosition, iColumns);
+	endInsertColumns();
+
+	return bSuccess;
+}
+
+/*virtual*/ bool ITreeModel::removeColumns(int iPosition, int iColumns, const QModelIndex &parentRef /*= QModelIndex()*/) /*override*/
+{
+	bool bSuccess = false;
+
+	beginRemoveColumns(parentRef, iPosition, iPosition + iColumns - 1);
+	bSuccess = m_pRootItem->removeColumns(iPosition, iColumns);
+	endRemoveColumns();
+
+	if(m_pRootItem->columnCount() == 0)
+		removeRows(0, rowCount());
+
+	return bSuccess;
+}
+
+TreeModelItem *ITreeModel::GetItem(const QModelIndex &indexRef) const
+{
+	if(indexRef.isValid())
+	{
+		TreeModelItem *pItem = static_cast<TreeModelItem *>(indexRef.internalPointer());
+		if(pItem)
+			return pItem;
+	}
+
+	return m_pRootItem;
 }

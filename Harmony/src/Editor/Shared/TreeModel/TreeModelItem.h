@@ -12,30 +12,32 @@
 
 #include "Global.h"
 
-class TreeModelItem : public QObject
+class TreeModelItem
 {
-	Q_OBJECT
+	TreeModelItem *				m_pParentItem;
+	QList<TreeModelItem *>		m_ChildList;
 
-protected:
-	TreeModelItem *            m_pParentItem;
-	QList<TreeModelItem *>     m_ChildList;
+	QVector<QVariant>			m_DataVec;
 
 public:
-	explicit TreeModelItem();
-	virtual ~TreeModelItem();
+	explicit TreeModelItem(const QVector<QVariant> &data, TreeModelItem *pParent = nullptr);
+	~TreeModelItem();
 
-	TreeModelItem *GetParent();
-	TreeModelItem *GetChild(int iRow) const;
-	QList<TreeModelItem *> GetChildren(bool bRecusively);
+	TreeModelItem *parent();
+	int childNumber() const;
 
-	void AppendChild(TreeModelItem *pChild);
-	void InsertChild(int iIndex, TreeModelItem *pChild);
-	void RemoveChild(int iIndex);
+	TreeModelItem *child(int iIndex);
+	int childCount() const;
+	int columnCount() const;
 
-	int GetNumChildren() const;
-	int GetRow() const;
+	QVariant data(int iColumn) const;
+	bool setData(int iColumn, const QVariant &valueRef);
 
-	virtual QString GetToolTip() const = 0;
+	bool insertChildren(int iPosition, int iCount, int iColumns);
+	bool insertColumns(int iPosition, int iColumns);
+
+	bool removeChildren(int iPosition, int iCount);
+	bool removeColumns(int iPosition, int iColumns);
 };
 
 #endif // IMODELTREEITEM_H

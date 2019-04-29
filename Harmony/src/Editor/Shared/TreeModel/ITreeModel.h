@@ -11,9 +11,10 @@
 #define ITREEMODEL_H
 
 #include "Global.h"
-#include "Shared/TreeModel/TreeModelItem.h"
 
 #include <QAbstractItemModel>
+
+class TreeModelItem;
 
 class ITreeModel : public QAbstractItemModel
 {
@@ -23,27 +24,30 @@ protected:
 	TreeModelItem *		m_pRootItem;
 
 public:
-	ITreeModel(TreeModelItem *pRootItem, QObject *parent);
+	ITreeModel(const QStringList &sHeaderList, QObject *pParent = nullptr);
 	virtual ~ITreeModel();
 
-	QModelIndex GetIndex(TreeModelItem *pItem);
-	void RemoveItem(TreeModelItem *pItem);
+	virtual QVariant headerData(int iSection, Qt::Orientation orientation, int iRole = Qt::DisplayRole) const override;
 
-	virtual QModelIndex index(int iRow, int iColumn, const QModelIndex &parent) const override;
-	virtual QModelIndex parent(const QModelIndex &index) const override;
-	virtual int rowCount(const QModelIndex &parentIndex = QModelIndex()) const override;
+	virtual QModelIndex index(int iRow, int iColumn, const QModelIndex &parentRef = QModelIndex()) const override;
+	virtual QModelIndex parent(const QModelIndex &indexRef) const override;
 
-	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override = 0;
-	virtual QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override = 0;
+	virtual int rowCount(const QModelIndex &parentRef = QModelIndex()) const override;
+	virtual int columnCount(const QModelIndex &parentRef = QModelIndex()) const override;
+	
+	virtual bool setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole = Qt::EditRole) override;
+	virtual bool setHeaderData(int iSection, Qt::Orientation eOrientation, const QVariant &valueRef, int iRole = Qt::EditRole) override;
 
-protected:
-	void InsertItem(int iRow, TreeModelItem *pItem, TreeModelItem *pParentItem);
-	void InsertItems(int iRow, QList<TreeModelItem *> itemList, TreeModelItem *pParentItem);
+	virtual bool insertRows(int iPosition, int iRows, const QModelIndex &parentRef = QModelIndex()) override;
+	virtual bool removeRows(int iPosition, int iRows, const QModelIndex &parentRef = QModelIndex()) override;
+	virtual bool insertColumns(int iPosition, int iColumns, const QModelIndex &parentRef = QModelIndex()) override;
+	virtual bool removeColumns(int iPosition, int iColumns, const QModelIndex &parentRef = QModelIndex()) override;
 
-	bool IsRoot(const QModelIndex &index) const;
+	virtual QVariant data(const QModelIndex &index, int role) const override = 0;
+	virtual Qt::ItemFlags flags(const QModelIndex &index) const override = 0;
 
 private:
-	void RecursiveRemoveItem(TreeModelItem *pItem);
+	TreeModelItem *GetItem(const QModelIndex &indexRef) const;
 };
 
 #endif // ITREEMODEL_H
