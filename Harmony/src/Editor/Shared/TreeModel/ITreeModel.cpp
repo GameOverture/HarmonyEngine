@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "ITreeModel.h"
 
-ITreeModel::ITreeModel(IModelTreeItem *pRootItem, QObject *parent) :
+ITreeModel::ITreeModel(ITreeModelItem *pRootItem, QObject *parent) :
 	QAbstractItemModel(parent),
 	m_pRootItem(pRootItem)
 {
@@ -23,12 +23,12 @@ ITreeModel::ITreeModel(IModelTreeItem *pRootItem, QObject *parent) :
 	delete m_pRootItem;
 }
 
-QModelIndex ITreeModel::GetIndex(IModelTreeItem *pItem)
+QModelIndex ITreeModel::GetIndex(ITreeModelItem *pItem)
 {
 	return createIndex(pItem->GetRow(), 0, pItem);
 }
 
-void ITreeModel::RemoveItem(IModelTreeItem *pItem)
+void ITreeModel::RemoveItem(ITreeModelItem *pItem)
 {
 	if(pItem == nullptr)
 		return;
@@ -45,14 +45,14 @@ void ITreeModel::RemoveItem(IModelTreeItem *pItem)
 	if(hasIndex(iRow, iColumn, parent) == false)
 		return QModelIndex();
 
-	const IModelTreeItem *pParentItem;
+	const ITreeModelItem *pParentItem;
 
 	if(parent.isValid() == false)
 		pParentItem = m_pRootItem;
 	else
-		pParentItem = static_cast<IModelTreeItem *>(parent.internalPointer());
+		pParentItem = static_cast<ITreeModelItem *>(parent.internalPointer());
 
-	IModelTreeItem *pChildItem = static_cast<IModelTreeItem *>(pParentItem->GetChild(iRow));
+	ITreeModelItem *pChildItem = static_cast<ITreeModelItem *>(pParentItem->GetChild(iRow));
 	if(pChildItem)
 		return createIndex(iRow, iColumn, pChildItem);
 	else
@@ -64,10 +64,10 @@ void ITreeModel::RemoveItem(IModelTreeItem *pItem)
 	if(index.isValid() == false)
 		return QModelIndex();
 
-	IModelTreeItem *pChildItem = static_cast<IModelTreeItem *>(index.internalPointer());
-	IModelTreeItem *pParentItem = static_cast<IModelTreeItem *>(pChildItem->GetParent());
+	ITreeModelItem *pChildItem = static_cast<ITreeModelItem *>(index.internalPointer());
+	ITreeModelItem *pParentItem = static_cast<ITreeModelItem *>(pChildItem->GetParent());
 
-	if(pParentItem == m_pRootItem)
+	if(pChildItem == m_pRootItem)// || pParentItem == m_pRootItem)
 		return QModelIndex();
 
 	return createIndex(pParentItem->GetRow(), 0, pParentItem);
@@ -75,31 +75,31 @@ void ITreeModel::RemoveItem(IModelTreeItem *pItem)
 
 /*virtual*/ int ITreeModel::rowCount(const QModelIndex &parentIndex /*= QModelIndex()*/) const /*override*/
 {
-	const IModelTreeItem *pParentItem;
+	const ITreeModelItem *pParentItem;
 	if(parentIndex.isValid() == false)
 		pParentItem = m_pRootItem;
 	else
-		pParentItem = static_cast<IModelTreeItem *>(parentIndex.internalPointer());
+		pParentItem = static_cast<ITreeModelItem *>(parentIndex.internalPointer());
 
 	return pParentItem->GetNumChildren();
 }
 
-void ITreeModel::InsertItem(int iRow, IModelTreeItem *pItem, IModelTreeItem *pParentItem)
+void ITreeModel::InsertItem(int iRow, ITreeModelItem *pItem, ITreeModelItem *pParentItem)
 {
-	QList<IModelTreeItem *> itemList;
+	QList<ITreeModelItem *> itemList;
 	itemList << pItem;
 	InsertItems(iRow, itemList, pParentItem);
 }
 
-void ITreeModel::InsertItems(int iRow, QList<IModelTreeItem *> itemList, IModelTreeItem *pParentItem)
+void ITreeModel::InsertItems(int iRow, QList<ITreeModelItem *> itemList, ITreeModelItem *pParentItem)
 {
 	QModelIndex parentIndex = pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex();
 
-	IModelTreeItem *pParent;
+	ITreeModelItem *pParent;
 	if(parentIndex.isValid() == false)
 		pParent = m_pRootItem;
 	else
-		pParent = static_cast<IModelTreeItem *>(parentIndex.internalPointer());
+		pParent = static_cast<ITreeModelItem *>(parentIndex.internalPointer());
 
 	iRow = HyClamp(iRow, 0, pParent->GetNumChildren());
 
@@ -113,10 +113,10 @@ void ITreeModel::InsertItems(int iRow, QList<IModelTreeItem *> itemList, IModelT
 
 bool ITreeModel::IsRoot(const QModelIndex &index) const
 {
-	return m_pRootItem == static_cast<IModelTreeItem *>(index.internalPointer());
+	return m_pRootItem == static_cast<ITreeModelItem *>(index.internalPointer());
 }
 
-void ITreeModel::RecursiveRemoveItem(IModelTreeItem *pItem)
+void ITreeModel::RecursiveRemoveItem(ITreeModelItem *pItem)
 {
 	for(int i = 0; i < pItem->GetNumChildren(); ++i)
 		RemoveItem(pItem->GetChild(i));

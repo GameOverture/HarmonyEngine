@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IModelTreeItem.cpp
+ *	ITreeModelItem.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2017 Jason Knobler
@@ -8,22 +8,22 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "IModelTreeItem.h"
+#include "ITreeModelItem.h"
 
-IModelTreeItem::IModelTreeItem() :
+ITreeModelItem::ITreeModelItem() :
 	QObject(nullptr),
 	m_pParentItem(nullptr)
 { }
 
-/*virtual*/ IModelTreeItem::~IModelTreeItem()
+/*virtual*/ ITreeModelItem::~ITreeModelItem()
 { }
 
-IModelTreeItem *IModelTreeItem::GetParent()
+ITreeModelItem *ITreeModelItem::GetParent()
 {
 	return m_pParentItem;
 }
 
-IModelTreeItem *IModelTreeItem::GetChild(int iRow) const
+ITreeModelItem *ITreeModelItem::GetChild(int iRow) const
 {
 	if(iRow >= m_ChildList.size() || iRow < 0)
 		return nullptr;
@@ -31,19 +31,19 @@ IModelTreeItem *IModelTreeItem::GetChild(int iRow) const
 	return m_ChildList[iRow];
 }
 
-QList<IModelTreeItem *> IModelTreeItem::GetChildren(bool bRecusively)
+QList<ITreeModelItem *> ITreeModelItem::GetChildren(bool bRecusively)
 {
 	if(bRecusively == false)
 		return m_ChildList;
 
-	QStack<IModelTreeItem *> itemStack;
+	QStack<ITreeModelItem *> itemStack;
 	for(int i = 0; i < m_ChildList.size(); ++i)
 		itemStack.push(m_ChildList[i]);
 
-	QList<IModelTreeItem *> returnList;
+	QList<ITreeModelItem *> returnList;
 	while(!itemStack.isEmpty())
 	{
-		IModelTreeItem *pItem = itemStack.pop();
+		ITreeModelItem *pItem = itemStack.pop();
 		returnList.append(pItem);
 
 		for(int i = 0; i < pItem->GetNumChildren(); ++i)
@@ -53,12 +53,12 @@ QList<IModelTreeItem *> IModelTreeItem::GetChildren(bool bRecusively)
 	return returnList;
 }
 
-void IModelTreeItem::AppendChild(IModelTreeItem *pChild)
+void ITreeModelItem::AppendChild(ITreeModelItem *pChild)
 {
 	InsertChild(m_ChildList.size(), pChild);
 }
 
-void IModelTreeItem::InsertChild(int iIndex, IModelTreeItem *pChild)
+void ITreeModelItem::InsertChild(int iIndex, ITreeModelItem *pChild)
 {
 	if(pChild->m_pParentItem == this)
 	{
@@ -72,21 +72,21 @@ void IModelTreeItem::InsertChild(int iIndex, IModelTreeItem *pChild)
 	m_ChildList.insert(iIndex, pChild);
 }
 
-void IModelTreeItem::RemoveChild(int iIndex)
+void ITreeModelItem::RemoveChild(int iIndex)
 {
 	m_ChildList[iIndex]->m_pParentItem = nullptr;
 	m_ChildList.removeAt(iIndex);
 }
 
-int IModelTreeItem::GetNumChildren() const
+int ITreeModelItem::GetNumChildren() const
 {
 	return m_ChildList.size();
 }
 
-int IModelTreeItem::GetRow() const
+int ITreeModelItem::GetRow() const
 {
 	if(m_pParentItem)
-		return m_pParentItem->m_ChildList.indexOf(const_cast<IModelTreeItem *>(this));
+		return m_pParentItem->m_ChildList.indexOf(const_cast<ITreeModelItem *>(this));
 
 	return 0;
 }

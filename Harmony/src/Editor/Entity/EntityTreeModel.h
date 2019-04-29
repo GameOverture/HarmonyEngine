@@ -13,14 +13,14 @@
 #include "ProjectItem.h"
 #include "GlobalWidgetMappers.h"
 #include "PropertiesTreeModel.h"
-#include "IModelTreeItem.h"
+#include "Shared/TreeModel/ITreeModelItem.h"
 
 #include <QAbstractItemModel>
 
 class EntityModel;
 class EntityTreeModel;
 
-class EntityTreeItem : public IModelTreeItem
+class EntityTreeItem : public ITreeModelItem
 {
 	ProjectItem *               m_pItem;
 

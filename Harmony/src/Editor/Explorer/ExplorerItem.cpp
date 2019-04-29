@@ -17,31 +17,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//ExplorerTreeItem::ExplorerTreeItem(int type /*= Type*/) :
-//	QTreeWidgetItem(type)
-//{ }
-//ExplorerTreeItem::ExplorerTreeItem(ExplorerTreeWidget *pView, int type /*= Type*/) :
-//	QTreeWidgetItem(pView, type)
-//{ }
-//ExplorerTreeItem::ExplorerTreeItem(QTreeWidgetItem *parent, int type /*= Type*/) :
-//	QTreeWidgetItem(parent, type)
-//{ }
-//
-//bool ExplorerTreeItem::operator<(const QTreeWidgetItem &rhs) const
-//{
-//	ExplorerItem *pLeftItem = this->data(0, Qt::UserRole).value<ExplorerItem *>();
-//	ExplorerItem *pRightItem = rhs.data(0, Qt::UserRole).value<ExplorerItem *>();
-//
-//	if(pLeftItem->GetType() == ITEM_Prefix && pRightItem->GetType() != ITEM_Prefix)
-//		return true;
-//	if(pLeftItem->GetType() != ITEM_Prefix && pRightItem->GetType() == ITEM_Prefix)
-//		return false;
-//
-//	return this->text(0) < rhs.text(0);
-//}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 ExplorerItem::ExplorerItem() :
 	m_eTYPE(ITEM_Unknown),
 	m_pProject(nullptr),

@@ -77,12 +77,12 @@ SOURCES += main.cpp \
     Shared/Global.cpp \
     Shared/IDraw.cpp \
     Shared/IModel.cpp \
-    Shared/IModelTreeItem.cpp \
     Shared/Properties/PropertiesTreeItem.cpp \
     Shared/Properties/PropertiesTreeModel.cpp \
     Shared/Properties/PropertiesTreeView.cpp \
     Shared/Properties/PropertiesUndoCmd.cpp \
     Shared/TreeModel/ITreeModel.cpp \
+    Shared/TreeModel/ITreeModelItem.cpp \
     Sprite/SpriteDraw.cpp \
     Sprite/SpriteModels.cpp \
     Sprite/SpriteTableView.cpp \
@@ -149,11 +149,11 @@ HEADERS  += \
     Shared/GlobalWidgetMappers.h \
     Shared/IDraw.h \
     Shared/IModel.h \
-    Shared/IModelTreeItem.h \
     Shared/Properties/PropertiesTreeItem.h \
     Shared/Properties/PropertiesTreeModel.h \
     Shared/Properties/PropertiesTreeView.h \
     Shared/TreeModel/ITreeModel.h \
+    Shared/TreeModel/ITreeModelItem.h \
     Sprite/SpriteDraw.h \
     Sprite/SpriteModels.h \
     Sprite/SpriteTableView.h \

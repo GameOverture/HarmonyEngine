@@ -35,7 +35,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 	on_chkNewPrefix_stateChanged(ui->chkNewPrefix->isChecked() ? Qt::Checked : Qt::Unchecked);
 
 	m_PrefixStringList.clear();
-	QList<IModelTreeItem *> itemList = pItemProject->GetChildren(true);
+	QList<ITreeModelItem *> itemList = pItemProject->GetChildren(true);
 	for(int i = 0; i < itemList.size(); ++i)
 	{
 		ExplorerItem *pItem = static_cast<ExplorerItem *>(itemList[i]);

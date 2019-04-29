@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IModelTreeItem.h
+*	ITreeModelItem.h
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2018 Jason Knobler
@@ -12,24 +12,24 @@
 
 #include "Global.h"
 
-class IModelTreeItem : public QObject
+class ITreeModelItem : public QObject
 {
 	Q_OBJECT
 
 protected:
-	IModelTreeItem *            m_pParentItem;
-	QList<IModelTreeItem *>     m_ChildList;
+	ITreeModelItem *            m_pParentItem;
+	QList<ITreeModelItem *>     m_ChildList;
 
 public:
-	explicit IModelTreeItem();
-	virtual ~IModelTreeItem();
+	explicit ITreeModelItem();
+	virtual ~ITreeModelItem();
 
-	IModelTreeItem *GetParent();
-	IModelTreeItem *GetChild(int iRow) const;
-	QList<IModelTreeItem *> GetChildren(bool bRecusively);
+	ITreeModelItem *GetParent();
+	ITreeModelItem *GetChild(int iRow) const;
+	QList<ITreeModelItem *> GetChildren(bool bRecusively);
 
-	void AppendChild(IModelTreeItem *pChild);
-	void InsertChild(int iIndex, IModelTreeItem *pChild);
+	void AppendChild(ITreeModelItem *pChild);
+	void InsertChild(int iIndex, ITreeModelItem *pChild);
 	void RemoveChild(int iIndex);
 
 	int GetNumChildren() const;

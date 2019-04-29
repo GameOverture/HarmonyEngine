@@ -14,23 +14,9 @@
 #include <QTreeWidget>
 
 #include "Global.h"
-#include "Shared/IModelTreeItem.h"
+#include "Shared/TreeModel/ITreeModelItem.h"
 
-//class ExplorerTreeWidget;
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//class ExplorerTreeItem : public QTreeWidgetItem
-//{
-//public:
-//	ExplorerTreeItem(int type = Type);
-//	ExplorerTreeItem(ExplorerTreeWidget *pView, int type = Type);
-//	ExplorerTreeItem(QTreeWidgetItem *parent, int type = Type);
-//
-//	bool operator<(const QTreeWidgetItem& other) const;
-//};
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class ExplorerItem : public IModelTreeItem
+class ExplorerItem : public ITreeModelItem
 {
 	Q_OBJECT
 

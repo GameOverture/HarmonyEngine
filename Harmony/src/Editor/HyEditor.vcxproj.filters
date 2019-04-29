@@ -184,9 +184,6 @@
     <ClCompile Include="Shared\IModel.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
-    <ClCompile Include="Shared\IModelTreeItem.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
     <ClCompile Include="Prefab\PrefabDraw.cpp">
       <Filter>Prefab</Filter>
     </ClCompile>
@@ -278,6 +275,9 @@
       <Filter>Explorer</Filter>
     </ClCompile>
     <ClCompile Include="Shared\TreeModel\ITreeModel.cpp">
+      <Filter>Shared\TreeModel</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\TreeModel\ITreeModelItem.cpp">
       <Filter>Shared\TreeModel</Filter>
     </ClCompile>
   </ItemGroup>
@@ -399,6 +399,9 @@
     <ClInclude Include="Primitive\PrimitiveModel.h" />
     <ClInclude Include="Explorer\ExplorerItemMimeData.h">
       <Filter>Explorer</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\TreeModel\ITreeModelItem.h">
+      <Filter>Shared\TreeModel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1233,8 +1236,8 @@
     <QtMoc Include="Shared\TreeModel\ITreeModel.h">
       <Filter>Shared\TreeModel</Filter>
     </QtMoc>
-    <QtMoc Include="Shared\IModelTreeItem.h">
-      <Filter>Shared</Filter>
+    <QtMoc Include="Shared\TreeModel\IModelTreeItem.h">
+      <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>
