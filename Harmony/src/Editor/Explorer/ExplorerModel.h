@@ -36,13 +36,7 @@ public:
 	virtual QVariant headerData(int iSection, Qt::Orientation orientation, int role) const override;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-	//virtual void OnSave() override;
-	//virtual QJsonObject PopStateAt(uint32 uiIndex) override;
-	//virtual QJsonValue GetJson() const override;
-	//virtual QList<AtlasFrame *> GetAtlasFrames() const override;
-	//virtual QStringList GetFontUrls() const override;
-	//virtual void Refresh() override;
+	//virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
 private:
 	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);

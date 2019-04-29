@@ -33,8 +33,8 @@ public:
 	virtual QModelIndex parent(const QModelIndex &index) const override;
 	virtual int rowCount(const QModelIndex &parentIndex = QModelIndex()) const override;
 
-    //virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override = 0;
-    //virtual QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override = 0;
+	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override = 0;
+	virtual QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override = 0;
 
 protected:
 	void InsertItem(int iRow, IModelTreeItem *pItem, IModelTreeItem *pParentItem);

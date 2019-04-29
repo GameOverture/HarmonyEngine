@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	HyGuiLog(HyEditorToolName, LOGTYPE_Title);
 	HyGuiLog("Initializing...", LOGTYPE_Normal);
 
-	ui->explorer->GetTreeView()->setModel(&m_ExplorerModel);
+	ui->explorer->SetModel(m_ExplorerModel);
 	
 	// TODO: Don't copy action pointers to other widgets, have function here that manipulates them instead
 	ui->explorer->addAction(ui->actionProjectSettings);

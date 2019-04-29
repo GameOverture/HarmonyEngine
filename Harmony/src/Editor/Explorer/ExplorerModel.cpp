@@ -298,28 +298,9 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	}
 }
 
-///*virtual*/ void ExplorerModel::OnSave() /*override*/
+///*virtual*/ Qt::ItemFlags ExplorerModel::flags(const QModelIndex& index) const /*override*/
 //{
-//}
 //
-///*virtual*/ QJsonObject ExplorerModel::PopStateAt(uint32 uiIndex) /*override*/
-//{
-//}
-//
-///*virtual*/ QJsonValue ExplorerModel::GetJson() const /*override*/
-//{
-//}
-//
-///*virtual*/ QList<AtlasFrame *> ExplorerModel::GetAtlasFrames() const /*override*/
-//{
-//}
-//
-///*virtual*/ QStringList ExplorerModel::GetFontUrls() const /*override*/
-//{
-//}
-//
-///*virtual*/ void ExplorerModel::Refresh() /*override*/
-//{
 //}
 
 QJsonObject ExplorerModel::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)

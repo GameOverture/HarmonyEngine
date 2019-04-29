@@ -25,6 +25,7 @@ namespace Ui {
 class ExplorerWidget;
 }
 
+class ExplorerModel;
 class Project;
 class ExplorerTreeWidget;
 class ExplorerItem;
@@ -40,7 +41,7 @@ public:
 	explicit ExplorerWidget(QWidget *parent = 0);
 	~ExplorerWidget();
 
-	QTreeView *GetTreeView();
+	void SetModel(ExplorerModel &modelRef);
 
 	void SetItemMenuPtr(QMenu *pMenu);
 	

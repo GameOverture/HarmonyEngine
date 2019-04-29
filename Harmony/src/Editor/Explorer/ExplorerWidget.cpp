@@ -23,6 +23,7 @@
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QClipboard>
+#include <QSortFilterProxyModel>
 
 ///*virtual*/ void DataExplorerLoadThread::run() /*override*/
 //{
@@ -43,7 +44,6 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :
 	ui->treeView->setDragEnabled(true);
 	ui->treeView->setAcceptDrops(true);
 	ui->treeView->setDropIndicatorShown(true);
-	ui->treeView->setSortingEnabled(true);
 	ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	ui->actionCopyItem->setEnabled(false);
@@ -57,9 +57,9 @@ ExplorerWidget::~ExplorerWidget()
 	delete ui;
 }
 
-QTreeView *ExplorerWidget::GetTreeView()
+void ExplorerWidget::SetModel(ExplorerModel &modelRef)
 {
-	return ui->treeView;
+	ui->treeView->setModel(&modelRef);
 }
 
 void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
