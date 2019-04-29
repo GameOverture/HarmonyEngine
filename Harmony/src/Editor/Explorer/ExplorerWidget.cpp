@@ -60,6 +60,13 @@ ExplorerWidget::~ExplorerWidget()
 void ExplorerWidget::SetModel(ExplorerModel &modelRef)
 {
 	ui->treeView->setModel(&modelRef);
+	return;
+
+
+	QSortFilterProxyModel *pProxyModel = new QSortFilterProxyModel(this);
+	pProxyModel->setSourceModel(&modelRef);
+
+	ui->treeView->setModel(pProxyModel);
 }
 
 void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)

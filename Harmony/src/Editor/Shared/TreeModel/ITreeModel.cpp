@@ -39,20 +39,19 @@ void ITreeModel::RemoveItem(ITreeModelItem *pItem)
 	endRemoveRows();
 }
 
-
 /*virtual*/ QModelIndex ITreeModel::index(int iRow, int iColumn, const QModelIndex &parent) const /*override*/
 {
 	if(hasIndex(iRow, iColumn, parent) == false)
 		return QModelIndex();
 
-	const ITreeModelItem *pParentItem;
+	ITreeModelItem *pParentItem;
 
 	if(parent.isValid() == false)
 		pParentItem = m_pRootItem;
 	else
 		pParentItem = static_cast<ITreeModelItem *>(parent.internalPointer());
 
-	ITreeModelItem *pChildItem = static_cast<ITreeModelItem *>(pParentItem->GetChild(iRow));
+	ITreeModelItem *pChildItem = pParentItem->GetChild(iRow);
 	if(pChildItem)
 		return createIndex(iRow, iColumn, pChildItem);
 	else
@@ -65,9 +64,9 @@ void ITreeModel::RemoveItem(ITreeModelItem *pItem)
 		return QModelIndex();
 
 	ITreeModelItem *pChildItem = static_cast<ITreeModelItem *>(index.internalPointer());
-	ITreeModelItem *pParentItem = static_cast<ITreeModelItem *>(pChildItem->GetParent());
+	ITreeModelItem *pParentItem = pChildItem->GetParent();
 
-	if(pChildItem == m_pRootItem)// || pParentItem == m_pRootItem)
+	if(pParentItem == m_pRootItem)
 		return QModelIndex();
 
 	return createIndex(pParentItem->GetRow(), 0, pParentItem);
@@ -75,7 +74,10 @@ void ITreeModel::RemoveItem(ITreeModelItem *pItem)
 
 /*virtual*/ int ITreeModel::rowCount(const QModelIndex &parentIndex /*= QModelIndex()*/) const /*override*/
 {
-	const ITreeModelItem *pParentItem;
+	if(parentIndex.column() > 0)
+		return 0;
+
+	ITreeModelItem *pParentItem;
 	if(parentIndex.isValid() == false)
 		pParentItem = m_pRootItem;
 	else
