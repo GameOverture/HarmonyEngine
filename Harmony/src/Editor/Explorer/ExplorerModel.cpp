@@ -15,7 +15,7 @@
 #include "Atlas/AtlasWidget.h"
 
 ExplorerModel::ExplorerModel() :
-	ITreeModel(new ExplorerItem(), nullptr)
+	ITreeModel(QStringList(), nullptr)
 {
 }
 
@@ -29,9 +29,9 @@ QStringList ExplorerModel::GetOpenProjectPaths()
 	QStringList sListOpenProjs;
 	sListOpenProjs.clear();
 
-	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	for(int i = 0; i < m_pRootItem->childCount(); ++i)
 	{
-		ExplorerItem *pItem = static_cast<ExplorerItem *>(m_pRootItem->GetChild(i));
+		ExplorerItem *pItem = m_pRootItem->child(i)->data(0).value<ExplorerItem *>();
 		Project *pItemProject = static_cast<Project *>(pItem);
 		sListOpenProjs.append(pItemProject->GetAbsPath());
 	}

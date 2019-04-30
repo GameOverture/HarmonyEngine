@@ -1,5 +1,5 @@
 /**************************************************************************
-*	ITreeModelItem.h
+*	TreeModelItem.h
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2018 Jason Knobler

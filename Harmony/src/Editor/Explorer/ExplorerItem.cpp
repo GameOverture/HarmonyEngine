@@ -120,19 +120,19 @@ QIcon ExplorerItem::GetIcon(SubIcon eSubIcon) const
 	m_pProject->RenamePrefix(sOldPath, sNewPath);
 }
 
-//QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs)
-//{
-//	out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
-//	return out;
-//}
-//
-//QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs)
-//{
-//	in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
-//	return in;
-//}
-
 /*virtual*/ QString ExplorerItem::GetToolTip() const /*override*/
 {
 	return GetName(true);
+}
+
+QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs)
+{
+	out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
+	return out;
+}
+
+QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs)
+{
+	in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
+	return in;
 }

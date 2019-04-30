@@ -109,7 +109,7 @@ public:
 
 	void SetData(const QVariant &newData);
 
-	virtual QString GetToolTip() const override;
+	QString GetToolTip() const;
 };
 
 #endif // PROPERTIESTREEITEM_H
