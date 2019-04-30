@@ -50,7 +50,16 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 		return nullptr;
 	}
 
-	InsertItem(0, pNewProject, m_pRootItem);
+	if(insertRows(m_pRootItem->childCount(), 1, createIndex(0, 0, m_pRootItem)) == false)
+	{
+		HyGuiLog("ExplorerModel::AddProject() - insertRows failed", LOGTYPE_Error);
+		return nullptr;
+	}
+	
+	QVariant v;
+	v.setValue<Project *>(pNewProject);
+	setData(index(m_pRootItem->childCount(), 0, createIndex(0, 0, m_pRootItem)), v);
+		
 	pNewProject->InitExplorerModelData(*this);
 
 	return pNewProject;
@@ -77,7 +86,6 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 		return nullptr;
 	}
 
-	//QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
 	ExplorerItem *pParentItem = pProj;
 	if(sPrefix.isEmpty() == false)
 	{
