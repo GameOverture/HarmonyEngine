@@ -76,14 +76,14 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, P
 	return true;
 }
 
-void PropertiesTreeModel::RefreshProperties()
-{
-	for(int i = 0; i < m_CategoryList.size(); ++i)
-	{
-		dataChanged(createIndex(0, 0, m_CategoryList[i]->GetChild(0)),
-					createIndex(m_CategoryList[i]->GetNumChildren() - 1, 1, m_CategoryList[i]->GetChild(m_CategoryList[i]->GetNumChildren() - 1)));
-	}
-}
+//void PropertiesTreeModel::RefreshProperties()
+//{
+//	for(int i = 0; i < m_CategoryList.size(); ++i)
+//	{
+//		dataChanged(createIndex(0, 0, m_CategoryList[i]->GetChild(0)),
+//					createIndex(m_CategoryList[i]->GetNumChildren() - 1, 1, m_CategoryList[i]->GetChild(m_CategoryList[i]->GetNumChildren() - 1)));
+//	}
+//}
 
 /*virtual*/ QVariant PropertiesTreeModel::headerData(int iSection, Qt::Orientation orientation, int role) const /*override*/
 {
@@ -212,6 +212,8 @@ void PropertiesTreeModel::RefreshProperties()
 
 /*virtual*/ bool PropertiesTreeModel::setData(const QModelIndex &index, const QVariant &value, int iRole) /*override*/
 {
+	ITreeModel::setData(index, value, iRole);
+
 	if(index.isValid() == false || IsRoot(index))
 		return false;
 

@@ -73,7 +73,7 @@ void ExplorerWidget::SelectItem(ExplorerItem *pItem)
 		return;
 
 	QItemSelectionModel *pSelectionModel = ui->treeView->selectionModel();
-	pSelectionModel->select(static_cast<ExplorerModel *>(ui->treeView->model())->GetIndex(pItem), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	pSelectionModel->select(static_cast<ExplorerModel *>(ui->treeView->model())->FindIndex<ExplorerItem>(pItem, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
 Project *ExplorerWidget::GetCurProjSelected()
@@ -261,7 +261,9 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the prefix:\n" % pItem->GetName(true) % "\n\nAnd all of its contents? This action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
 			GetCurProjSelected()->DeletePrefixAndContents(pItem->GetName(true));
-			static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem);
+
+			if(static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem) == false)
+				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % pItem->GetName(true), LOGTYPE_Error);
 		}
 		break;
 		
@@ -276,7 +278,9 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the " % HyGlobal::ItemName(pItem->GetType(), false) % ":\n" % pItem->GetName(true) % "?\n\nThis action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
 			static_cast<ProjectItem *>(pItem)->DeleteFromProject();
-			static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem);
+
+			if(static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem) == false)
+				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % pItem->GetName(true), LOGTYPE_Error);
 		}
 		break;
 		

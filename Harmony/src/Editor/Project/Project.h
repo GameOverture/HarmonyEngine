@@ -45,6 +45,8 @@ class Project : public ExplorerItem
 {
 	Q_OBJECT
 
+	ExplorerModel &									m_ModelRef;
+
 	ProjectDraw *									m_pDraw;
 	DlgProjectSettings								m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
@@ -62,10 +64,10 @@ class Project : public ExplorerItem
 	bool											m_bHasError;
 	
 public:
-	Project(const QString sProjectFilePath);
+	Project(const QString sProjectFilePath, ExplorerModel &modelRef);
 	virtual ~Project();
 	
-	void InitExplorerModelData(ExplorerModel &modelRef);
+	void LoadExplorerModel();
 
 	bool HasError() const;
 
@@ -86,6 +88,7 @@ public:
 	QString GetSourceAbsPath() const;
 	QString GetSourceRelPath() const;
 
+	ExplorerModel &GetExplorerModel();
 	AtlasModel &GetAtlasModel();
 	AtlasWidget *GetAtlasWidget();
 	AudioWidgetManager *GetAudioWidget();

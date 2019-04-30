@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	qRegisterMetaTypeStreamOperators<AtlasFrame *>("AtlasFrame *");
-	//qRegisterMetaTypeStreamOperators<ExplorerItem *>("ExplorerItem *");
+	qRegisterMetaTypeStreamOperators<ExplorerItem *>("ExplorerItem *");
 	//qRegisterMetaTypeStreamOperators<ProjectItem *>("ProjectItem *");
 
 	HyGlobal::Initialize();

@@ -78,7 +78,7 @@ struct PropertiesDef
 	{ }
 };
 
-class PropertiesTreeItem : public TreeModelItem
+class PropertiesTreeItem
 {
 protected:
 	const QString								m_sNAME;

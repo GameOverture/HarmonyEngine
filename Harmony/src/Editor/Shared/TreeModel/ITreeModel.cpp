@@ -80,7 +80,6 @@ ITreeModel::ITreeModel(const QStringList &sHeaderList, QObject *pParent /*= null
 
 	TreeModelItem *pItem = GetItem(indexRef);
 	bool bResult = pItem->setData(indexRef.column(), valueRef);
-
 	if(bResult)
 		Q_EMIT dataChanged(indexRef, indexRef, {iRole});
 
@@ -93,7 +92,6 @@ ITreeModel::ITreeModel(const QStringList &sHeaderList, QObject *pParent /*= null
 		return false;
 
 	bool bResult = m_pRootItem->setData(iSection, valueRef);
-
 	if(bResult)
 		Q_EMIT headerDataChanged(eOrientation, iSection, iSection);
 

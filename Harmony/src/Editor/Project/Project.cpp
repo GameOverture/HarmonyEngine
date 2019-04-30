@@ -70,8 +70,9 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Project::Project(const QString sProjectFilePath) :
+Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	ExplorerItem(*this, ITEM_Project, sProjectFilePath),
+	m_ModelRef(modelRef),
 	m_pDraw(nullptr),
 	m_DlgProjectSettings(sProjectFilePath),
 	m_pAtlasModel(nullptr),
@@ -109,7 +110,7 @@ Project::Project(const QString sProjectFilePath) :
 	delete m_pDraw;
 }
 
-void Project::InitExplorerModelData(ExplorerModel &modelRef)
+void Project::LoadExplorerModel()
 {
 	// Load game data items
 	QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
@@ -190,7 +191,7 @@ void Project::InitExplorerModelData(ExplorerModel &modelRef)
 			if(sName == "+HyFont")
 				m_bSystemFontFound = true;
 
-			modelRef.AddItem(this, eType, sPrefix, sName, objsInSubDirIter.value(), false);
+			m_ModelRef.AddItem(this, eType, sPrefix, sName, objsInSubDirIter.value(), false);
 #ifdef RESAVE_ENTIRE_PROJECT
 			pNewDataItem->Save();
 #endif
@@ -288,6 +289,11 @@ QString Project::GetSourceAbsPath() const
 QString Project::GetSourceRelPath() const
 {
 	return QDir::cleanPath(GetSettingsObj()["SourcePath"].toString()/*m_sRelativeSourceLocation*/) + '/';
+}
+
+ExplorerModel &Project::GetExplorerModel()
+{
+	return m_ModelRef;
 }
 
 AtlasModel &Project::GetAtlasModel()

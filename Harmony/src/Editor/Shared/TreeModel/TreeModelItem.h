@@ -27,6 +27,7 @@ public:
 	int childNumber() const;
 
 	TreeModelItem *child(int iIndex);
+	QVector<TreeModelItem *>GetChildren();
 	int childCount() const;
 	int columnCount() const;
 

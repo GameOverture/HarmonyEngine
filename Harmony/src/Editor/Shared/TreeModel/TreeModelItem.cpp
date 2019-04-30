@@ -38,6 +38,25 @@ TreeModelItem *TreeModelItem::child(int iIndex)
 	return m_ChildList.value(iIndex);
 }
 
+QVector<TreeModelItem *>TreeModelItem::GetChildren()
+{
+	QStack<TreeModelItem *> treeItemStack;
+	for(int i = 0; i < childCount(); ++i)
+		treeItemStack.push(child(i));
+
+	QVector<TreeModelItem *> returnVec;
+	while(!treeItemStack.isEmpty())
+	{
+		TreeModelItem *pItem = treeItemStack.pop();
+		returnVec.push_back(pItem);
+
+		for(int i = 0; i < pItem->childCount(); ++i)
+			treeItemStack.push(pItem->child(i));
+	}
+
+	return returnVec;
+}
+
 int TreeModelItem::childCount() const
 {
 	return m_ChildList.count();
@@ -55,7 +74,7 @@ QVariant TreeModelItem::data(int iColumn) const
 
 bool TreeModelItem::setData(int iColumn, const QVariant &valueRef)
 {
-	if(iColumn < 0 || iColumn >= m_DataVec.size())
+	if(iColumn < 0 || iColumn >= m_DataVec.size() || m_DataVec[iColumn] == valueRef)
 		return false;
 
 	m_DataVec[iColumn] = valueRef;

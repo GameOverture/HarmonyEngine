@@ -27,6 +27,29 @@ public:
 	ITreeModel(const QStringList &sHeaderList, QObject *pParent = nullptr);
 	virtual ~ITreeModel();
 
+	template<typename TYPE>
+	QModelIndex FindIndex(TYPE *pData, int iColumn)
+	{
+		if(iColumn >= m_pRootItem->columnCount())
+			return QModelIndex();
+
+		QStack<TreeModelItem *> treeItemStack;
+		for(int i = 0; i < m_pRootItem->childCount(); ++i)
+			treeItemStack.push(m_pRootItem->child(i));
+
+		while(!treeItemStack.isEmpty())
+		{
+			TreeModelItem *pItem = treeItemStack.pop();
+			if(pItem->data(iColumn).value<TYPE *>() == pData)
+				return createIndex(pItem->childNumber(), iColumn, &pItem);
+
+			for(int i = 0; i < pItem->childCount(); ++i)
+				treeItemStack.push(pItem->child(i));
+		}
+
+		return QModelIndex();
+	}
+
 	virtual QVariant headerData(int iSection, Qt::Orientation orientation, int iRole = Qt::DisplayRole) const override;
 
 	virtual QModelIndex index(int iRow, int iColumn, const QModelIndex &parentRef = QModelIndex()) const override;
