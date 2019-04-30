@@ -11,6 +11,7 @@
 #include "ExplorerItem.h"
 #include "SpriteWidget.h"
 #include "Project.h"
+#include "ExplorerModel.h"
 #include "Harmony/Utilities/HyStrManip.h"
 
 #include <QFileInfo>
@@ -81,23 +82,7 @@ QString ExplorerItem::GetName(bool bWithPrefix) const
 // Ends with a '/'
 QString ExplorerItem::GetPrefix() const
 {
-	QStringList sPrefixParts;
-	ExplorerItem *pParentTreeItem = static_cast<ExplorerItem *>(m_pParentItem);
-	while(pParentTreeItem)
-	{
-		if(pParentTreeItem->GetType() == ITEM_Prefix)
-			sPrefixParts.prepend(pParentTreeItem->GetName(false));
-
-		pParentTreeItem = static_cast<ExplorerItem *>(pParentTreeItem->m_pParentItem);
-	}
-
-	QString sPrefix;
-	for(int i = 0; i < sPrefixParts.size(); ++i)
-	{
-		sPrefix += sPrefixParts[i];
-		sPrefix += "/";
-	}
-	return sPrefix;
+	return m_pProject->GetExplorerModel().AssemblePrefix(const_cast<ExplorerItem *>(this));
 }
 
 QIcon ExplorerItem::GetIcon(SubIcon eSubIcon) const

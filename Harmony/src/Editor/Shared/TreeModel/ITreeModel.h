@@ -28,7 +28,7 @@ public:
 	virtual ~ITreeModel();
 
 	template<typename TYPE>
-	QModelIndex FindIndex(TYPE *pData, int iColumn)
+	QModelIndex FindIndex(TYPE dataInTreeItem, int iColumn)
 	{
 		if(iColumn >= m_pRootItem->columnCount())
 			return QModelIndex();
@@ -40,7 +40,7 @@ public:
 		while(!treeItemStack.isEmpty())
 		{
 			TreeModelItem *pItem = treeItemStack.pop();
-			if(pItem->data(iColumn).value<TYPE *>() == pData)
+			if(pItem->data(iColumn).value<TYPE>() == dataInTreeItem)
 				return createIndex(pItem->childNumber(), iColumn, &pItem);
 
 			for(int i = 0; i < pItem->childCount(); ++i)
@@ -69,7 +69,7 @@ public:
 	virtual QVariant data(const QModelIndex &index, int role) const override = 0;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override = 0;
 
-private:
+protected:
 	TreeModelItem *GetItem(const QModelIndex &indexRef) const;
 };
 

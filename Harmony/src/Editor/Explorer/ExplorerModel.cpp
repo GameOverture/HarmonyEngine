@@ -60,7 +60,7 @@ QStringList ExplorerModel::GetPrefixList(Project *pProject)
 Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 {
 	HyGuiLog("Opening project: " % sNewProjectFilePath, LOGTYPE_Info);
-	Project *pNewProject = new Project(sNewProjectFilePath);
+	Project *pNewProject = new Project(sNewProjectFilePath, *this);
 	if(pNewProject->HasError())
 	{
 		HyGuiLog("Project: " % sNewProjectFilePath % " had an error and will not be opened", LOGTYPE_Error);
@@ -69,8 +69,7 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 	}
 
 	InsertNewItem(pNewProject, m_pRootItem);
-
-	pNewProject->InitExplorerModelData(*this);
+	pNewProject->LoadExplorerModel();
 
 	return pNewProject;
 
@@ -135,7 +134,31 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 
 bool ExplorerModel::RemoveItem(ExplorerItem *pItem)
 {
+	HyError("not implemented");
+}
 
+QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem)
+{
+	QStringList sPrefixParts;
+
+	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0))->parent();
+	while(pTreeItem)
+	{
+		ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+		if(pItem->GetType() == ITEM_Prefix)
+			sPrefixParts.prepend(pItem->GetName(false));
+
+		pTreeItem = pTreeItem->parent();
+	}
+
+	QString sPrefix;
+	for(int i = 0; i < sPrefixParts.size(); ++i)
+	{
+		sPrefix += sPrefixParts[i];
+		sPrefix += "/";
+	}
+
+	return sPrefix;
 }
 
 void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)

@@ -73,7 +73,7 @@ void ExplorerWidget::SelectItem(ExplorerItem *pItem)
 		return;
 
 	QItemSelectionModel *pSelectionModel = ui->treeView->selectionModel();
-	pSelectionModel->select(static_cast<ExplorerModel *>(ui->treeView->model())->FindIndex<ExplorerItem>(pItem, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+	pSelectionModel->select(static_cast<ExplorerModel *>(ui->treeView->model())->FindIndex<ExplorerItem *>(pItem, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
 Project *ExplorerWidget::GetCurProjSelected()
@@ -83,7 +83,9 @@ Project *ExplorerWidget::GetCurProjSelected()
 		return nullptr;
 
 	while(pCurSelected->GetType() != ITEM_Project)
+	{
 		pCurSelected = static_cast<ExplorerItem *>(pCurSelected->GetParent());
+	}
 
 	return static_cast<Project *>(pCurSelected);
 }

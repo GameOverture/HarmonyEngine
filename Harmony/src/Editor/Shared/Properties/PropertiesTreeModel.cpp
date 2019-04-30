@@ -12,7 +12,7 @@
 #include "PropertiesUndoCmd.h"
 
 PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant subState, QObject *parent /*= nullptr*/) :
-	ITreeModel(new PropertiesTreeItem(), parent),
+	ITreeModel({ "Property", "Value" }, parent),
 	m_ItemRef(itemRef),
 	m_iSTATE_INDEX(iStateIndex),
 	m_iSUBSTATE(subState)
@@ -118,7 +118,7 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, P
 
 /*virtual*/ QVariant PropertiesTreeModel::data(const QModelIndex &index, int iRole) const /*override*/
 {
-	if(index.isValid() == false || IsRoot(index))
+	if(index.isValid() == false)
 		return QVariant();
 
 	PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());

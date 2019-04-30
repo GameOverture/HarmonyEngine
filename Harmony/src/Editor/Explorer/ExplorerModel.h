@@ -27,10 +27,10 @@ public:
 	QStringList GetPrefixList(Project *pProject);
 
 	Project *AddProject(const QString sNewProjectFilePath);
-
-	// If importValue doesn't equal null, then this new ProjectItem will be saved upon creation
 	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
 	bool RemoveItem(ExplorerItem *pItem);
+
+	QString AssemblePrefix(ExplorerItem *pItem);
 
 	void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
 
