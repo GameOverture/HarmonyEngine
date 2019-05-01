@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Global.h"
 #include "PropertiesTreeView.h"
-#include "PropertiesTreeItem.h"
+#include "PropertiesTreeModel.h"
 #include "WidgetVectorSpinBox.h"
 #include "ProjectItem.h"
 #include "IModel.h"
@@ -25,8 +25,6 @@
 PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) :
 	QTreeView(pParent)
 {
-	setItemDelegate(new PropertiesDelegate(this, this));
-
 	setIndentation(0);
 	setAnimated(true);
 	setColumnWidth(0, 200);
@@ -41,7 +39,7 @@ PropertiesTreeView::~PropertiesTreeView()
 /*virtual*/ void PropertiesTreeView::setModel(QAbstractItemModel *pModel) /*override*/
 {
 	QTreeView::setModel(pModel);
-
+	setItemDelegate(new PropertiesDelegate(this, this));
 	//connect(
 }
 
@@ -77,10 +75,8 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 {
 	QWidget *pReturnWidget = nullptr;
 
-	PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
-	const PropertiesDef &defRef = pTreeItem->GetDataDef();
-
-	switch(pTreeItem->GetType())
+	const PropertiesDef &propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyDefinition(index);
+	switch(propDefRef.eType)
 	{
 	case PROPERTIESTYPE_bool:
 		// Handled natively within tree model's CheckStateRole
@@ -89,121 +85,121 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_int:
 		pReturnWidget = new QSpinBox(pParent);
 
-		if(defRef.defaultData.isValid())
-			static_cast<QSpinBox *>(pReturnWidget)->setValue(defRef.defaultData.toInt());
-		if(defRef.minRange.isValid())
-			static_cast<QSpinBox *>(pReturnWidget)->setMinimum(defRef.minRange.toInt());
-		if(defRef.maxRange.isValid())
-			static_cast<QSpinBox *>(pReturnWidget)->setMaximum(defRef.maxRange.toInt());
-		if(defRef.stepAmt.isValid())
-			static_cast<QSpinBox *>(pReturnWidget)->setSingleStep(defRef.stepAmt.toInt());
-		if(defRef.sPrefix.isEmpty() == false)
-			static_cast<QSpinBox *>(pReturnWidget)->setPrefix(defRef.sPrefix);
-		if(defRef.sSuffix.isEmpty() == false)
-			static_cast<QSpinBox *>(pReturnWidget)->setSuffix(defRef.sSuffix);
+		if(propDefRef.defaultData.isValid())
+			static_cast<QSpinBox *>(pReturnWidget)->setValue(propDefRef.defaultData.toInt());
+		if(propDefRef.minRange.isValid())
+			static_cast<QSpinBox *>(pReturnWidget)->setMinimum(propDefRef.minRange.toInt());
+		if(propDefRef.maxRange.isValid())
+			static_cast<QSpinBox *>(pReturnWidget)->setMaximum(propDefRef.maxRange.toInt());
+		if(propDefRef.stepAmt.isValid())
+			static_cast<QSpinBox *>(pReturnWidget)->setSingleStep(propDefRef.stepAmt.toInt());
+		if(propDefRef.sPrefix.isEmpty() == false)
+			static_cast<QSpinBox *>(pReturnWidget)->setPrefix(propDefRef.sPrefix);
+		if(propDefRef.sSuffix.isEmpty() == false)
+			static_cast<QSpinBox *>(pReturnWidget)->setSuffix(propDefRef.sSuffix);
 		break;
 
 	case PROPERTIESTYPE_double:
 		pReturnWidget = new QDoubleSpinBox(pParent);
 
-		if(defRef.defaultData.isValid())
-			static_cast<QDoubleSpinBox *>(pReturnWidget)->setValue(defRef.defaultData.toDouble());
-		if(defRef.minRange.isValid())
-			static_cast<QDoubleSpinBox *>(pReturnWidget)->setMinimum(defRef.minRange.toDouble());
-		if(defRef.maxRange.isValid())
-			static_cast<QDoubleSpinBox *>(pReturnWidget)->setMaximum(defRef.maxRange.toDouble());
-		if(defRef.stepAmt.isValid())
-			static_cast<QDoubleSpinBox *>(pReturnWidget)->setSingleStep(defRef.stepAmt.toDouble());
-		if(defRef.sPrefix.isEmpty() == false)
-			static_cast<QDoubleSpinBox *>(pReturnWidget)->setPrefix(defRef.sPrefix);
-		if(defRef.sSuffix.isEmpty() == false)
-			static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix(defRef.sSuffix);
-		if(defRef.delegateBuilder.isValid())
-			static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(defRef.delegateBuilder.toInt());
+		if(propDefRef.defaultData.isValid())
+			static_cast<QDoubleSpinBox *>(pReturnWidget)->setValue(propDefRef.defaultData.toDouble());
+		if(propDefRef.minRange.isValid())
+			static_cast<QDoubleSpinBox *>(pReturnWidget)->setMinimum(propDefRef.minRange.toDouble());
+		if(propDefRef.maxRange.isValid())
+			static_cast<QDoubleSpinBox *>(pReturnWidget)->setMaximum(propDefRef.maxRange.toDouble());
+		if(propDefRef.stepAmt.isValid())
+			static_cast<QDoubleSpinBox *>(pReturnWidget)->setSingleStep(propDefRef.stepAmt.toDouble());
+		if(propDefRef.sPrefix.isEmpty() == false)
+			static_cast<QDoubleSpinBox *>(pReturnWidget)->setPrefix(propDefRef.sPrefix);
+		if(propDefRef.sSuffix.isEmpty() == false)
+			static_cast<QDoubleSpinBox *>(pReturnWidget)->setSuffix(propDefRef.sSuffix);
+		if(propDefRef.delegateBuilder.isValid())
+			static_cast<QDoubleSpinBox *>(pReturnWidget)->setDecimals(propDefRef.delegateBuilder.toInt());
 		break;
 
 	case PROPERTIESTYPE_ivec2:
 		pReturnWidget = new WidgetVectorSpinBox(true, pParent);
 
-		if(defRef.defaultData.isValid())
-			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(defRef.defaultData);
+		if(propDefRef.defaultData.isValid())
+			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_vec2:
 		pReturnWidget = new WidgetVectorSpinBox(false, pParent);
 
-		if(defRef.defaultData.isValid())
-			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(defRef.defaultData);
+		if(propDefRef.defaultData.isValid())
+			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
-	//case PROPERTIESTYPE_ivec3:
-	//	break;
+		//case PROPERTIESTYPE_ivec3:
+		//	break;
 
-	//case PROPERTIESTYPE_vec3:
-	//	break;
+		//case PROPERTIESTYPE_vec3:
+		//	break;
 
-	//case PROPERTIESTYPE_ivec4:
-	//	break;
+		//case PROPERTIESTYPE_ivec4:
+		//	break;
 
-	//case PROPERTIESTYPE_vec4:
-	//	break;
+		//case PROPERTIESTYPE_vec4:
+		//	break;
 
 	case PROPERTIESTYPE_LineEdit:
 		pReturnWidget = new QLineEdit(pParent);
 
-		if(defRef.defaultData.isValid())
-			static_cast<QLineEdit *>(pReturnWidget)->setText(defRef.defaultData.toString());
+		if(propDefRef.defaultData.isValid())
+			static_cast<QLineEdit *>(pReturnWidget)->setText(propDefRef.defaultData.toString());
 		break;
 
 	case PROPERTIESTYPE_ComboBox:
 		pReturnWidget = new QComboBox(pParent);
 
-		if(defRef.delegateBuilder.isValid())
-			static_cast<QComboBox *>(pReturnWidget)->addItems(defRef.delegateBuilder.toStringList());
-		if(defRef.defaultData.isValid())
-			static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(defRef.defaultData.toInt());
+		if(propDefRef.delegateBuilder.isValid())
+			static_cast<QComboBox *>(pReturnWidget)->addItems(propDefRef.delegateBuilder.toStringList());
+		if(propDefRef.defaultData.isValid())
+			static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(propDefRef.defaultData.toInt());
 		break;
 
 	case PROPERTIESTYPE_StatesComboBox:
 		pReturnWidget = new QComboBox(pParent);
 
-		if(defRef.delegateBuilder.isValid())
-			static_cast<QComboBox *>(pReturnWidget)->setModel(defRef.delegateBuilder.value<ProjectItem *>()->GetModel());
-		if(defRef.defaultData.isValid())
-			static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(defRef.defaultData.toInt());
+		if(propDefRef.delegateBuilder.isValid())
+			static_cast<QComboBox *>(pReturnWidget)->setModel(propDefRef.delegateBuilder.value<ProjectItem *>()->GetModel());
+		if(propDefRef.defaultData.isValid())
+			static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(propDefRef.defaultData.toInt());
 		break;
 
 	case PROPERTIESTYPE_Slider:
 		pReturnWidget = new QSlider(pParent);
 
-		if(defRef.defaultData.isValid())
-			static_cast<QSlider *>(pReturnWidget)->setValue(defRef.defaultData.toInt());
-		if(defRef.minRange.isValid())
-			static_cast<QSlider *>(pReturnWidget)->setMinimum(defRef.minRange.toInt());
-		if(defRef.maxRange.isValid())
-			static_cast<QSlider *>(pReturnWidget)->setMaximum(defRef.maxRange.toInt());
-		if(defRef.stepAmt.isValid())
-			static_cast<QSlider *>(pReturnWidget)->setSingleStep(defRef.stepAmt.toInt());
+		if(propDefRef.defaultData.isValid())
+			static_cast<QSlider *>(pReturnWidget)->setValue(propDefRef.defaultData.toInt());
+		if(propDefRef.minRange.isValid())
+			static_cast<QSlider *>(pReturnWidget)->setMinimum(propDefRef.minRange.toInt());
+		if(propDefRef.maxRange.isValid())
+			static_cast<QSlider *>(pReturnWidget)->setMaximum(propDefRef.maxRange.toInt());
+		if(propDefRef.stepAmt.isValid())
+			static_cast<QSlider *>(pReturnWidget)->setSingleStep(propDefRef.stepAmt.toInt());
 		break;
 
 	case PROPERTIESTYPE_SpriteFrames:
 		pReturnWidget = new QSlider(pParent);
 
-		if(defRef.delegateBuilder.isValid())
+		if(propDefRef.delegateBuilder.isValid())
 		{
-			SpriteModel *pModel = static_cast<SpriteModel *>(defRef.delegateBuilder.value<ProjectItem *>()->GetModel());
+			SpriteModel *pModel = static_cast<SpriteModel *>(propDefRef.delegateBuilder.value<ProjectItem *>()->GetModel());
 			static_cast<QSlider *>(pReturnWidget)->setMinimum(0);
 
 			// TODO: FIX ME
 			//static_cast<QSlider *>(pReturnWidget)->setMaximum(pModel->GetStateData(x)->GetFramesModel().rowCount());
 			static_cast<QSlider *>(pReturnWidget)->setSingleStep(1);
 		}
-		if(defRef.defaultData.isValid())
-			static_cast<QSlider *>(pReturnWidget)->setValue(defRef.defaultData.toInt());
+		if(propDefRef.defaultData.isValid())
+			static_cast<QSlider *>(pReturnWidget)->setValue(propDefRef.defaultData.toInt());
 		break;
 
 	default:
-		HyGuiLog("PropertiesDelegate::createEditor not implemented for type: " % QString::number(pTreeItem->GetType()), LOGTYPE_Error);
+		HyGuiLog("PropertiesDelegate::createEditor not implemented for type: " % QString::number(propDefRef.eType), LOGTYPE_Error);
 		break;
 	}
 
@@ -212,22 +208,22 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 /*virtual*/ void PropertiesDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
 {
-	PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
-
-	switch(pTreeItem->GetType())
+	const QVariant &propValue = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyValue(index);
+	const PropertiesDef &propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyDefinition(index);
+	switch(propDefRef.eType)
 	{
 	case PROPERTIESTYPE_bool:
 		// Handled natively within tree model's CheckStateRole
 		break;
 	case PROPERTIESTYPE_int:
-		static_cast<QSpinBox *>(pEditor)->setValue(pTreeItem->GetData().toInt());
+		static_cast<QSpinBox *>(pEditor)->setValue(propValue.toInt());
 		break;
 	case PROPERTIESTYPE_double:
-		static_cast<QDoubleSpinBox *>(pEditor)->setValue(pTreeItem->GetData().toDouble());
+		static_cast<QDoubleSpinBox *>(pEditor)->setValue(propValue.toDouble());
 		break;
 	case PROPERTIESTYPE_ivec2:
 	case PROPERTIESTYPE_vec2:
-		static_cast<WidgetVectorSpinBox *>(pEditor)->SetValue(pTreeItem->GetData());
+		static_cast<WidgetVectorSpinBox *>(pEditor)->SetValue(propValue);
 		break;
 	//case PROPERTIESTYPE_ivec3:
 	//case PROPERTIESTYPE_vec3:
@@ -235,24 +231,24 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	//case PROPERTIESTYPE_vec4:
 	//	break;
 	case PROPERTIESTYPE_LineEdit:
-		static_cast<QLineEdit *>(pEditor)->setText(pTreeItem->GetData().toString());
+		static_cast<QLineEdit *>(pEditor)->setText(propValue.toString());
 		break;
 	case PROPERTIESTYPE_ComboBox:
 	case PROPERTIESTYPE_StatesComboBox:
-		static_cast<QComboBox *>(pEditor)->setCurrentIndex(pTreeItem->GetData().toInt());
+		static_cast<QComboBox *>(pEditor)->setCurrentIndex(propValue.toInt());
 		break;
 	case PROPERTIESTYPE_Slider:
-		static_cast<QSlider *>(pEditor)->setValue(pTreeItem->GetData().toInt());
+		static_cast<QSlider *>(pEditor)->setValue(propValue.toInt());
 		break;
 	default:
-		HyGuiLog("PropertiesDelegate::setEditorData() Unsupported Delegate type:" % QString::number(pTreeItem->GetType()), LOGTYPE_Error);
+		HyGuiLog("PropertiesDelegate::setEditorData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
 	}
 }
 
 /*virtual*/ void PropertiesDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
 {
-	PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
-	switch(pTreeItem->GetType())
+	const PropertiesDef &propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyDefinition(index);
+	switch(propDefRef.eType)
 	{
 	case PROPERTIESTYPE_bool:
 		break;
@@ -282,7 +278,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		pModel->setData(index, static_cast<QSlider *>(pEditor)->value());
 		break;
 	default:
-		HyGuiLog("PropertiesDelegate::setModelData() Unsupported Delegate type:" % QString::number(pTreeItem->GetType()), LOGTYPE_Error);
+		HyGuiLog("PropertiesDelegate::setModelData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
 	}
 }
 

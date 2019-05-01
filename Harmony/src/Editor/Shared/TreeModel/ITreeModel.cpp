@@ -150,6 +150,14 @@ ITreeModel::ITreeModel(const QStringList &sHeaderList, QObject *pParent /*= null
 	return bSuccess;
 }
 
+/*virtual*/ QVariant ITreeModel::data(const QModelIndex &index, int role) const /*override*/
+{
+	if(role == Qt::UserRole)
+		return GetItem(index)->data(index.column());
+
+	return QVariant();
+}
+
 TreeModelItem *ITreeModel::GetItem(const QModelIndex &indexRef) const
 {
 	if(indexRef.isValid())

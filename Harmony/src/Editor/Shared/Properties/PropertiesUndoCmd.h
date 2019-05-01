@@ -18,7 +18,6 @@ class PropertiesUndoCmd : public QUndoCommand
 	PropertiesTreeModel &   m_ModelRef;
 	const int               m_iSTATE_INDEX;
 	const QVariant          m_iSUBSTATE;
-	PropertiesTreeItem &    m_TreeItemRef;
 	QModelIndex             m_Index;
 
 	QVariant                m_NewData;
@@ -30,7 +29,6 @@ public:
 	PropertiesUndoCmd(PropertiesTreeModel &modelRef,
 					  int iStateIndex,
 					  const QVariant &subState,
-					  PropertiesTreeItem &treeItemRef,
 					  const QModelIndex &index,
 					  const QVariant &newData,
 					  int iRole,

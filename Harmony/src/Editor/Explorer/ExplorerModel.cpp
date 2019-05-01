@@ -287,21 +287,6 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	pImportedProjItem->Save();
 }
 
-/*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/
-{
-	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
-}
-
-/*virtual*/ QVariant ExplorerModel::headerData(int iSection, Qt::Orientation orientation, int role) const /*override*/
-{
-	return QVariant();
-}
-
-/*virtual*/ int ExplorerModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
-{
-	return 1;
-}
-
 /*virtual*/ QVariant ExplorerModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const /*override*/
 {
 	ExplorerItem *pItem = static_cast<ExplorerItem *>(index.internalPointer());
@@ -344,6 +329,11 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	return QAbstractItemModel::flags(index);
 }
 
+/*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/
+{
+	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
+}
+
 bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
 {
 	iRow = (iRow == -1 ? pParentTreeItem->childCount() : iRow);
@@ -356,10 +346,7 @@ bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParent
 	QVariant v;
 	v.setValue<ExplorerItem *>(pNewItem);
 	if(setData(index(iRow, 0, createIndex(pParentTreeItem->childNumber(), 0, pParentTreeItem)), v) == false)
-	{
 		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
-		return false;
-	}
 
 	return true;
 }

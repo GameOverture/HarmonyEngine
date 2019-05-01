@@ -23,7 +23,7 @@ enum PropertiesType
 
 	PROPERTIESTYPE_bool,
 	PROPERTIESTYPE_int,
-	PROPERTIESTYPE_double,          // delegateBuilder [int] = QDoubleSpinBox's decimals value. Aka percision.
+	PROPERTIESTYPE_double,          // delegateBuilder [int] = QDoubleSpinBox's decimals value. Aka precision.
 	PROPERTIESTYPE_ivec2,
 	PROPERTIESTYPE_vec2,
 	PROPERTIESTYPE_ivec3,
@@ -39,37 +39,24 @@ enum PropertiesType
 
 struct PropertiesDef
 {
-	const PropertiesType						eTYPE;
-	const bool									bREAD_ONLY;
+	PropertiesType							eType;
+	bool									bReadOnly;
 
-	QColor										color;
-	QString										sToolTip;
+	QColor									color;
+	QString									sToolTip;
 
-	QVariant									defaultData;
-	QVariant									minRange;
-	QVariant									maxRange;
-	QVariant									stepAmt;
-	QString										sPrefix;
-	QString										sSuffix;
+	QVariant								defaultData;
+	QVariant								minRange;
+	QVariant								maxRange;
+	QVariant								stepAmt;
+	QString									sPrefix;
+	QString									sSuffix;
 
-	QVariant									delegateBuilder; // Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
+	QVariant								delegateBuilder; // Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
 
-	PropertiesDef(PropertiesType eType_, bool bReadOnly, QVariant defaultData_) :
-		eTYPE(eType_),
-		bREAD_ONLY(bReadOnly),
-		defaultData(defaultData_)
-	{ }
-	PropertiesDef(PropertiesType eType_, bool bReadOnly, QVariant defaultData_, QVariant minRange_, QVariant maxRange_, QVariant stepAmt_, QString sPrefix_, QString sSuffix_, QVariant delegateBuilder_ = QVariant()) :
-		eTYPE(eType_),
-		bREAD_ONLY(bReadOnly),
-		defaultData(defaultData_),
-		minRange(minRange_),
-		maxRange(maxRange_),
-		stepAmt(stepAmt_),
-		sPrefix(sPrefix_),
-		sSuffix(sSuffix_),
-		delegateBuilder(delegateBuilder_)
-	{ }
+	bool IsCategory() const {
+		return eType == PROPERTIESTYPE_Category || eType == PROPERTIESTYPE_CategoryChecked;
+	}
 };
 
 class PropertiesTreeModel : public ITreeModel
@@ -80,28 +67,44 @@ class PropertiesTreeModel : public ITreeModel
 	const int									m_iSTATE_INDEX;
 	const QVariant								m_iSUBSTATE;
 
-	QMap<TreeModelItem *, PropertiesDef *>		m_PropertyDefMap;
+	QMap<TreeModelItem *, PropertiesDef>		m_PropertyDefMap;
+
+	enum {
+		COLUMN_Name = 0,
+		COLUMN_Value = 1
+	};
 
 public:
 	explicit PropertiesTreeModel(ProjectItem &ownerRef, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
 	virtual ~PropertiesTreeModel();
 
 	ProjectItem &GetOwner();
-	//QVariant GetValue(QString sUniquePropertyName) const;
+	const PropertiesDef &GetPropertyDefinition(const QModelIndex &index) const;
+	const QVariant &GetPropertyValue(const QModelIndex &index) const;
 
 	bool AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
-	bool AppendProperty(QString sCategoryName, QString sName, PropertiesDef defintion, QString sToolTip, bool bReadOnly = false);
-
-	//void RefreshProperties();
+	bool AppendProperty(QString sCategoryName,
+						QString sName,
+						QColor color,
+						PropertiesType eType,
+						QVariant delegateBuilder = QVariant(),
+						bool bReadOnly = false,
+						QString sToolTip = QString(),
+						QVariant defaultData = QVariant(),
+						QVariant minRange = QVariant(),
+						QVariant maxRange = QVariant(),
+						QVariant stepAmt = QVariant(),
+						QString sPrefix = QString(),
+						QString sSuffix = QString());
 
 	virtual QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-	// This creates an Undo command to be pushed on the UndoStack
+	// This override creates an Undo command to be pushed on the UndoStack
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int iRole = Qt::EditRole) override;
 
 private:
-	PropertiesTreeItem *ValidateCategory(QString sCategoryName, QString sUniquePropertyName);
+	QString ConvertValueToString(TreeModelItem *pTreeItem) const;
 };
 
 #endif // PROPERTIESTREEMODEL_H
