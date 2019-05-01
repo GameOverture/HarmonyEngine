@@ -134,7 +134,9 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 
 bool ExplorerModel::RemoveItem(ExplorerItem *pItem)
 {
-	HyError("not implemented");
+	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0));
+	TreeModelItem *pParentTreeItem = pTreeItem->parent();
+	return removeRow(pTreeItem->childNumber(), createIndex(pParentTreeItem->childNumber(), 0, pParentTreeItem));
 }
 
 QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem)

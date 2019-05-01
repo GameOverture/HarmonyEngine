@@ -43,7 +43,7 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel &modelRef,
 	if(m_TreeItemRef.GetType() == PROPERTIESTYPE_CategoryChecked && m_TreeItemRef.GetNumChildren() != 0)
 		m_ModelRef.RefreshProperties();
 
-	m_ModelRef.GetItem().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
+	m_ModelRef.GetOwner().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
 }
 
 /*virtual*/ void PropertiesUndoCmd::undo() /*override*/
@@ -55,5 +55,5 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel &modelRef,
 	if(m_TreeItemRef.GetType() == PROPERTIESTYPE_CategoryChecked && m_TreeItemRef.GetNumChildren() != 0)
 		m_ModelRef.RefreshProperties();
 
-	m_ModelRef.GetItem().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
+	m_ModelRef.GetOwner().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
 }

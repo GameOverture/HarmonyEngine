@@ -11,9 +11,9 @@
 #include "PropertiesTreeModel.h"
 #include "PropertiesUndoCmd.h"
 
-PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, QVariant subState, QObject *parent /*= nullptr*/) :
-	ITreeModel({ "Property", "Value" }, parent),
-	m_ItemRef(itemRef),
+PropertiesTreeModel::PropertiesTreeModel(ProjectItem &ownerRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
+	ITreeModel({ "Property", "Value" }, pParent),
+	m_OwnerRef(ownerRef),
 	m_iSTATE_INDEX(iStateIndex),
 	m_iSUBSTATE(subState)
 {
@@ -23,24 +23,24 @@ PropertiesTreeModel::PropertiesTreeModel(ProjectItem &itemRef, int iStateIndex, 
 {
 }
 
-ProjectItem &PropertiesTreeModel::GetItem()
+ProjectItem &PropertiesTreeModel::GetOwner()
 {
-	return m_ItemRef;
+	return m_OwnerRef;
 }
 
-QVariant PropertiesTreeModel::GetValue(QString sUniquePropertyName) const
-{
-	for(int i = 0; i < m_CategoryList.size(); ++i)
-	{
-		for(int j = 0; j < m_CategoryList[i]->GetNumChildren(); ++j)
-		{
-			if(0 == static_cast<PropertiesTreeItem *>(m_CategoryList[i]->GetChild(j))->GetName().compare(sUniquePropertyName, Qt::CaseSensitive))
-				return static_cast<PropertiesTreeItem *>(m_CategoryList[i]->GetChild(j))->GetData();
-		}
-	}
-
-	return QVariant();
-}
+//QVariant PropertiesTreeModel::GetValue(QString sUniquePropertyName) const
+//{
+//	for(int i = 0; i < m_CategoryList.size(); ++i)
+//	{
+//		for(int j = 0; j < m_CategoryList[i]->GetNumChildren(); ++j)
+//		{
+//			if(0 == static_cast<PropertiesTreeItem *>(m_CategoryList[i]->GetChild(j))->GetName().compare(sUniquePropertyName, Qt::CaseSensitive))
+//				return static_cast<PropertiesTreeItem *>(m_CategoryList[i]->GetChild(j))->GetData();
+//		}
+//	}
+//
+//	return QVariant();
+//}
 
 bool PropertiesTreeModel::AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
 {
@@ -84,37 +84,6 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, P
 //					createIndex(m_CategoryList[i]->GetNumChildren() - 1, 1, m_CategoryList[i]->GetChild(m_CategoryList[i]->GetNumChildren() - 1)));
 //	}
 //}
-
-/*virtual*/ QVariant PropertiesTreeModel::headerData(int iSection, Qt::Orientation orientation, int role) const /*override*/
-{
-	if(role == Qt::TextAlignmentRole)
-		return Qt::AlignCenter;
-
-	if(role == Qt::DisplayRole)
-	{
-		if(iSection == 0)
-			return "Property";
-		else
-			return "Value";
-	}
-
-	return QVariant();
-}
-
-//bool PropertiesModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
-//{
-//    if (value != headerData(section, orientation, role)) {
-//        // FIXME: Implement me!
-//        Q_EMIT headerDataChanged(orientation, section, section);
-//        return true;
-//    }
-//    return false;
-//}
-
-/*virtual*/ int PropertiesTreeModel::columnCount(const QModelIndex &parent) const /*override*/
-{
-	return 2;
-}
 
 /*virtual*/ QVariant PropertiesTreeModel::data(const QModelIndex &index, int iRole) const /*override*/
 {
@@ -212,18 +181,12 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName, QString sName, P
 
 /*virtual*/ bool PropertiesTreeModel::setData(const QModelIndex &index, const QVariant &value, int iRole) /*override*/
 {
-	ITreeModel::setData(index, value, iRole);
-
-	if(index.isValid() == false || IsRoot(index))
-		return false;
-
-	if(data(index, iRole) != value)
+	if(ITreeModel::setData(index, value, iRole))
 	{
-		PropertiesTreeItem *pTreeItem = static_cast<PropertiesTreeItem *>(index.internalPointer());
+		TreeModelItem *pTreeItem = static_cast<TreeModelItem*>(index.internalPointer());
 
 		QUndoCommand *pCmd = new PropertiesUndoCmd(*this, m_iSTATE_INDEX, m_iSUBSTATE, *pTreeItem, index, value, iRole);
-		m_ItemRef.GetUndoStack()->push(pCmd);
-		//Q_EMIT dataChanged(index, index, QVector<int>() << iRole); <- Called within PropertiesUndoCmd's redo/undo
+		m_OwnerRef.GetUndoStack()->push(pCmd);
 
 		return true;
 	}

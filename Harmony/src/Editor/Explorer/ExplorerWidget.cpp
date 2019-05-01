@@ -82,12 +82,7 @@ Project *ExplorerWidget::GetCurProjSelected()
 	if(pCurSelected == nullptr)
 		return nullptr;
 
-	while(pCurSelected->GetType() != ITEM_Project)
-	{
-		pCurSelected = static_cast<ExplorerItem *>(pCurSelected->GetParent());
-	}
-
-	return static_cast<Project *>(pCurSelected);
+	return &pCurSelected->GetProject();
 }
 
 ExplorerItem *ExplorerWidget::GetFirstSelectedItem()

@@ -28,6 +28,9 @@ ITreeModel::ITreeModel(const QStringList &sHeaderList, QObject *pParent /*= null
 
 /*virtual*/ QVariant ITreeModel::headerData(int iSection, Qt::Orientation orientation, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
+	if(iRole == Qt::TextAlignmentRole)
+		return Qt::AlignCenter;
+
 	if(orientation == Qt::Horizontal && iRole == Qt::DisplayRole)
 		return m_pRootItem->data(iSection);
 

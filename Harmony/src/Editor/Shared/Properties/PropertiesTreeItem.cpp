@@ -18,11 +18,7 @@ PropertiesTreeItem::PropertiesTreeItem() :
 }
 
 PropertiesTreeItem::PropertiesTreeItem(QString sName, const PropertiesDef &propertiesDef, QColor color, QString sToolTip, bool bReadOnly) :
-	m_sNAME(sName),
-	m_bREAD_ONLY(bReadOnly),
-	m_DataDef(propertiesDef),
-	m_Color(color),
-	m_sToolTip(sToolTip)
+
 {
 }
 
