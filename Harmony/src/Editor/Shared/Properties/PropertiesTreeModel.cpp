@@ -36,10 +36,26 @@ ProjectItem &PropertiesTreeModel::GetOwner()
 	return m_OwnerRef;
 }
 
+int PropertiesTreeModel::GetStateIndex() const
+{
+	return m_iSTATE_INDEX;
+}
+
+const QVariant &PropertiesTreeModel::GetSubstate() const
+{
+	return m_iSUBSTATE;
+}
+
 const PropertiesDef &PropertiesTreeModel::GetPropertyDefinition(const QModelIndex &index) const
 {
 	TreeModelItem *pTreeItem = GetItem(index);
 	return m_PropertyDefMap[pTreeItem];
+}
+
+QString PropertiesTreeModel::GetPropertyName(const QModelIndex &index) const
+{
+	TreeModelItem *pTreeItem = GetItem(index);
+	return pTreeItem->data(COLUMN_Name).toString();
 }
 
 const QVariant &PropertiesTreeModel::GetPropertyValue(const QModelIndex &index) const
@@ -176,14 +192,15 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	return true;
 }
 
-//void PropertiesTreeModel::RefreshProperties()
-//{
-//	for(int i = 0; i < m_CategoryList.size(); ++i)
-//	{
-//		dataChanged(createIndex(0, 0, m_CategoryList[i]->GetChild(0)),
-//					createIndex(m_CategoryList[i]->GetNumChildren() - 1, 1, m_CategoryList[i]->GetChild(m_CategoryList[i]->GetNumChildren() - 1)));
-//	}
-//}
+void PropertiesTreeModel::RefreshCategory(const QModelIndex &index)
+{
+	TreeModelItem *pCategoryTreeItem = GetItem(index);
+	if(pCategoryTreeItem->childCount() > 0)
+	{
+		dataChanged(createIndex(0, COLUMN_Name, pCategoryTreeItem->child(0)),
+					createIndex(pCategoryTreeItem->childCount() - 1, COLUMN_Value, pCategoryTreeItem->child(pCategoryTreeItem->childCount() - 1)));
+	}
+}
 
 /*virtual*/ QVariant PropertiesTreeModel::data(const QModelIndex &index, int iRole) const /*override*/
 {
@@ -284,22 +301,6 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	}
 
 	return returnFlags;
-}
-
-/*virtual*/ bool PropertiesTreeModel::setData(const QModelIndex &index, const QVariant &value, int iRole) /*override*/
-{
-	QVariant oldData = data(index,
-	if(ITreeModel::setData(index, value, iRole))
-	{
-		TreeModelItem *pTreeItem = static_cast<TreeModelItem*>(index.internalPointer());
-
-		QUndoCommand *pCmd = new PropertiesUndoCmd(*this, m_iSTATE_INDEX, m_iSUBSTATE, *pTreeItem, index, value, iRole);
-		m_OwnerRef.GetUndoStack()->push(pCmd);
-
-		return true;
-	}
-
-	return false;
 }
 
 QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) const

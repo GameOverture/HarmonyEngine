@@ -10,23 +10,14 @@
 #include "Global.h"
 #include "PropertiesUndoCmd.h"
 
-PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel &modelRef,
-									 int iStateIndex,
-									 const QVariant &subState,
-									 const QModelIndex &index,
-									 const QVariant &newData,
-									 int iRole,
-									 QUndoCommand *pParent /*= 0*/) :
+PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
-	m_ModelRef(modelRef),
-	m_iSTATE_INDEX(iStateIndex),
-	m_iSUBSTATE(subState),
-	m_Index(index),
+	m_pModel(pModel),
+	m_ModelIndex(index),
 	m_NewData(newData),
-	m_OldData(m_TreeItemRef.GetData()),
-	m_iRole(iRole)
+	m_OldData(pModel->GetPropertyValue(index))
 {
-	setText(m_TreeItemRef.GetName());
+	setText(pModel->GetPropertyName(index));
 }
 
 /*virtual*/ PropertiesUndoCmd::~PropertiesUndoCmd()
@@ -34,24 +25,20 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel &modelRef,
 
 /*virtual*/ void PropertiesUndoCmd::redo() /*override*/
 {
-	m_TreeItemRef.SetData(m_NewData);
+	m_pModel->setData(m_ModelIndex, m_NewData);
+	
+	if(m_pModel->GetPropertyDefinition(m_ModelIndex).eType == PROPERTIESTYPE_CategoryChecked)
+		m_pModel->RefreshCategory(m_ModelIndex);
 
-	m_ModelRef.dataChanged(m_Index, m_Index, QVector<int>() << m_iRole);
-
-	if(m_TreeItemRef.GetType() == PROPERTIESTYPE_CategoryChecked && m_TreeItemRef.GetNumChildren() != 0)
-		m_ModelRef.RefreshProperties();
-
-	m_ModelRef.GetOwner().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
+	m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
 }
 
 /*virtual*/ void PropertiesUndoCmd::undo() /*override*/
 {
-	m_TreeItemRef.SetData(m_OldData);
+	m_pModel->setData(m_ModelIndex, m_OldData);
 
-	m_ModelRef.dataChanged(m_Index, m_Index, QVector<int>() << m_iRole);
+	if(m_pModel->GetPropertyDefinition(m_ModelIndex).eType == PROPERTIESTYPE_CategoryChecked)
+		m_pModel->RefreshCategory(m_ModelIndex);
 
-	if(m_TreeItemRef.GetType() == PROPERTIESTYPE_CategoryChecked && m_TreeItemRef.GetNumChildren() != 0)
-		m_ModelRef.RefreshProperties();
-
-	m_ModelRef.GetOwner().FocusWidgetState(m_iSTATE_INDEX, m_iSUBSTATE);
+	m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
 }

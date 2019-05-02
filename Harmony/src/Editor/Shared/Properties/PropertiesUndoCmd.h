@@ -15,26 +15,16 @@
 
 class PropertiesUndoCmd : public QUndoCommand
 {
-	PropertiesTreeModel &   m_ModelRef;
-	const int               m_iSTATE_INDEX;
-	const QVariant          m_iSUBSTATE;
-	QModelIndex             m_Index;
+	PropertiesTreeModel *	m_pModel;
+	QModelIndex				m_ModelIndex;
 
-	QVariant                m_NewData;
-	QVariant                m_OldData;
-
-	int                     m_iRole;
+	QVariant				m_NewData;
+	QVariant				m_OldData;
 
 public:
-	PropertiesUndoCmd(PropertiesTreeModel &modelRef,
-					  int iStateIndex,
-					  const QVariant &subState,
-					  const QModelIndex &index,
-					  const QVariant &newData,
-					  int iRole,
-					  QUndoCommand *pParent = 0);
-
+	PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent = nullptr);
 	virtual ~PropertiesUndoCmd();
+
 	virtual void redo() override;
 	virtual void undo() override;
 };

@@ -79,7 +79,10 @@ public:
 	virtual ~PropertiesTreeModel();
 
 	ProjectItem &GetOwner();
+	int GetStateIndex() const;
+	const QVariant &GetSubstate() const;
 	const PropertiesDef &GetPropertyDefinition(const QModelIndex &index) const;
+	QString GetPropertyName(const QModelIndex &index) const;
 	const QVariant &GetPropertyValue(const QModelIndex &index) const;
 
 	bool AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
@@ -97,11 +100,10 @@ public:
 						QString sPrefix = QString(),
 						QString sSuffix = QString());
 
+	void RefreshCategory(const QModelIndex &index);
+
 	virtual QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
-
-	// This override creates an Undo command to be pushed on the UndoStack
-	virtual bool setData(const QModelIndex &index, const QVariant &value, int iRole = Qt::EditRole) override;
 
 private:
 	QString ConvertValueToString(TreeModelItem *pTreeItem) const;

@@ -14,6 +14,7 @@
 #include "ProjectItem.h"
 #include "IModel.h"
 #include "SpriteModels.h"
+#include "PropertiesUndoCmd.h"
 
 #include <QPainter>
 #include <QHeaderView>
@@ -247,13 +248,16 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 /*virtual*/ void PropertiesDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
 {
-	const PropertiesDef &propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyDefinition(index);
+	PropertiesTreeModel *pPropertiesTreeModel = static_cast<PropertiesTreeModel *>(pModel);
+	QUndoCommand *pUndoCmd = nullptr;
+
+	const PropertiesDef &propDefRef = pPropertiesTreeModel->GetPropertyDefinition(index);
 	switch(propDefRef.eType)
 	{
 	case PROPERTIESTYPE_bool:
 		break;
 	case PROPERTIESTYPE_int:
-		pModel->setData(index, static_cast<QSpinBox *>(pEditor)->value());
+		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QSpinBox *>(pEditor)->value()));
 		break;
 	case PROPERTIESTYPE_double:
 		pModel->setData(index, static_cast<QDoubleSpinBox *>(pEditor)->value());
@@ -280,6 +284,9 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	default:
 		HyGuiLog("PropertiesDelegate::setModelData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
 	}
+
+	if(pUndoCmd)
+		pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
 }
 
 /*virtual*/ void PropertiesDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
