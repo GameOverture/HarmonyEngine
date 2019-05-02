@@ -15,7 +15,6 @@
 class ProjectItem;
 class EntityWidget;
 class EntityModel;
-class EntityTreeItem;
 
 enum EntityCmd
 {
@@ -25,18 +24,11 @@ enum EntityCmd
 
 class EntityUndoCmd : public QUndoCommand
 {
-	const EntityCmd     m_eCMD;
-	ProjectItem &       m_EntityItemRef;
-	EntityTreeItem *    m_pTreeItem;
-
-	EntityWidget *      m_pWidget;
-	EntityModel *       m_pModel;
-	EntityTreeItem *    m_pParentTreeItem;
-
-	int                 m_iRow;
+	const EntityCmd		m_eCMD;
+	ProjectItem &		m_EntityItemRef;
 
 public:
-	EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, ProjectItem *pParameter, QUndoCommand *pParent = 0);
+	EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, ExplorerItem *pParameter, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd();
 
 	virtual void redo() override;
