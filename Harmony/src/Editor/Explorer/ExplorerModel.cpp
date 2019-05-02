@@ -287,13 +287,17 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	pImportedProjItem->Save();
 }
 
-/*virtual*/ QVariant ExplorerModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const /*override*/
+/*virtual*/ QVariant ExplorerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
-	ExplorerItem *pItem = static_cast<ExplorerItem *>(index.internalPointer());
-	if(pItem == nullptr)
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
 		return QVariant();
 
-	switch(role)
+	if(iRole == Qt::UserRole)
+		return ITreeModel::data(indexRef, iRole);
+
+	ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+	switch(iRole)
 	{
 	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
 	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
@@ -314,7 +318,7 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 		return QVariant(pItem->GetIcon(SUBICON_None));
 
 	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
-		return QVariant();
+		return QVariant(pItem->GetName(true));
 
 	case Qt::StatusTipRole:		// The data displayed in the status bar. (QString)
 		return QVariant(pItem->GetName(true));
@@ -324,9 +328,9 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	}
 }
 
-/*virtual*/ Qt::ItemFlags ExplorerModel::flags(const QModelIndex& index) const /*override*/
+/*virtual*/ Qt::ItemFlags ExplorerModel::flags(const QModelIndex& indexRef) const /*override*/
 {
-	return QAbstractItemModel::flags(index);
+	return QAbstractItemModel::flags(indexRef);
 }
 
 /*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/

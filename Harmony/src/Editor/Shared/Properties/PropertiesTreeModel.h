@@ -42,7 +42,6 @@ struct PropertiesDef
 	PropertiesType							eType;
 	bool									bReadOnly;
 
-	QColor									color;
 	QString									sToolTip;
 
 	QVariant								defaultData;
@@ -54,8 +53,27 @@ struct PropertiesDef
 
 	QVariant								delegateBuilder; // Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
 
+	PropertiesDef()
+	{ }
+	PropertiesDef(PropertiesType type, bool readOnly, QString toolTip, QVariant defaultData_, QVariant minRange_, QVariant maxRange_, QVariant stepAmt_, QString prefix, QString suffix, QVariant delegateBuilder_) :
+		eType(type),
+		bReadOnly(readOnly),
+		sToolTip(toolTip),
+		defaultData(defaultData_),
+		minRange(minRange_),
+		maxRange(maxRange_),
+		stepAmt(stepAmt_),
+		sPrefix(prefix),
+		sSuffix(suffix),
+		delegateBuilder(delegateBuilder_)
+	{ }
+
 	bool IsCategory() const {
 		return eType == PROPERTIESTYPE_Category || eType == PROPERTIESTYPE_CategoryChecked;
+	}
+
+	QColor GetColor() const {
+		return IsCategory() ? QColor(33,33,33) : QColor(99,99,99);
 	}
 };
 
@@ -81,29 +99,29 @@ public:
 	ProjectItem &GetOwner();
 	int GetStateIndex() const;
 	const QVariant &GetSubstate() const;
-	const PropertiesDef &GetPropertyDefinition(const QModelIndex &index) const;
-	QString GetPropertyName(const QModelIndex &index) const;
-	const QVariant &GetPropertyValue(const QModelIndex &index) const;
+	const PropertiesDef &GetPropertyDefinition(const QModelIndex &indexRef) const;
+	QString GetPropertyName(const QModelIndex &indexRef) const;
+	const QVariant &GetPropertyValue(const QModelIndex &indexRef) const;
+	const QVariant &FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
 
-	bool AppendCategory(QString sName, QColor color, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
+	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName,
 						QString sName,
-						QColor color,
 						PropertiesType eType,
-						QVariant delegateBuilder = QVariant(),
-						bool bReadOnly = false,
-						QString sToolTip = QString(),
 						QVariant defaultData = QVariant(),
+						QString sToolTip = QString(),
+						bool bReadOnly = false,
 						QVariant minRange = QVariant(),
 						QVariant maxRange = QVariant(),
 						QVariant stepAmt = QVariant(),
 						QString sPrefix = QString(),
-						QString sSuffix = QString());
+						QString sSuffix = QString(),
+						QVariant delegateBuilder = QVariant());
 
-	void RefreshCategory(const QModelIndex &index);
+	void RefreshCategory(const QModelIndex &indexRef);
 
-	virtual QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
-	virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
+	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
 
 private:
 	QString ConvertValueToString(TreeModelItem *pTreeItem) const;

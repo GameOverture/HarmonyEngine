@@ -20,13 +20,13 @@
 
 class EntityStateData : public IStateData
 {
-	QMap<EntityTreeItem *, PropertiesTreeModel *>    m_PropertiesMap;
+	QMap<ExplorerItem *, PropertiesTreeModel *>    m_PropertiesMap;
 
 public:
 	EntityStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
 	virtual ~EntityStateData();
 
-	PropertiesTreeModel *GetPropertiesModel(EntityTreeItem *pTreeItem);
+	PropertiesTreeModel *GetPropertiesModel(ExplorerItem *pItem);
 	void GetStateInfo(QJsonObject &stateObjOut);
 
 	void Refresh();
@@ -35,7 +35,7 @@ public:
 	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
 
 private:
-	PropertiesTreeModel *AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, ProjectItem *pItemToAdd);
+	PropertiesTreeModel *AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, ExplorerItem *pItemToAdd);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
@@ -51,12 +51,10 @@ public:
 	virtual ~EntityModel();
 
 	//EntityTreeModel &GetTreeModel();
-	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, EntityTreeItem *pTreeItem);
+	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItem *pItem);
 
 	bool IsChildAddable(ProjectItem *pItem);
 	bool AddNewChild(ProjectItem *pItem);
-	bool InsertTreeItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem);
-	bool RemoveTreeItems(int iRow, int iCount, EntityTreeItem *pParentItem);
 
 	const QList<ProjectItem *> &GetPrimitiveList();
 	ProjectItem *CreateNewPrimitive();

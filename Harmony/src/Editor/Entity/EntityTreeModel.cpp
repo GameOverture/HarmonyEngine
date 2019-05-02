@@ -11,176 +11,69 @@
 #include "EntityTreeModel.h"
 #include "EntityModel.h"
 
-EntityTreeItem::EntityTreeItem(ProjectItem *pItem) :
-	m_pItem(pItem)
-{
-}
-
-EntityTreeItem::~EntityTreeItem()
-{
-}
-
-ProjectItem *EntityTreeItem::GetProjItem()
-{
-	return m_pItem;
-}
-
-/*virtual*/ QString EntityTreeItem::GetToolTip() const
-{
-	return QString();
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, QObject *parent) :
-	QAbstractItemModel(parent),
+EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, QObject *parent) :
+	ITreeModel(QStringList(), parent),
 	m_pEntityModel(pEntityModel)
 {
-	m_pRootNode = new EntityTreeItem(nullptr);
-	m_pRootItem = new EntityTreeItem(&entityItemRef);
-
-	InsertItem(0, m_pRootItem, m_pRootNode);
 }
 
 /*virtual*/ EntityTreeModel::~EntityTreeModel()
 {
-	delete m_pRootItem;
-	delete m_pRootNode;
 }
 
-ProjectItem *EntityTreeModel::GetRootItem()
+bool EntityTreeModel::AddProjectItem(ProjectItem *pProjectItem)
 {
-	return m_pRootItem->GetProjItem();
-}
-
-QModelIndex EntityTreeModel::index(int iRow, int iColumn, const QModelIndex &parent) const
-{
-	if(hasIndex(iRow, iColumn, parent) == false)
-		return QModelIndex();
-
-	EntityTreeItem *pParentItem;
-
-	if(parent.isValid() == false)
-		pParentItem = m_pRootNode;
-	else
-		pParentItem = static_cast<EntityTreeItem *>(parent.internalPointer());
-
-	EntityTreeItem *pChildItem = static_cast<EntityTreeItem *>(pParentItem->GetChild(iRow));
-	if(pChildItem)
-		return createIndex(iRow, iColumn, pChildItem);
-	else
-		return QModelIndex();
-}
-
-QModelIndex EntityTreeModel::parent(const QModelIndex &index) const
-{
-	if(index.isValid() == false)
-		return QModelIndex();
-
-	EntityTreeItem *pChildItem = static_cast<EntityTreeItem *>(index.internalPointer());
-	EntityTreeItem *pParentItem = static_cast<EntityTreeItem *>(pChildItem->GetParent());
-
-	if(pParentItem == m_pRootNode)
-		return QModelIndex();
-
-	return createIndex(pParentItem->GetRow(), 0, pParentItem);
-}
-
-int EntityTreeModel::rowCount(const QModelIndex &parentIndex) const
-{
-	// Only data in column '0' has rows
-	if(parentIndex.column() > 0)
-		return 0;
-
-	EntityTreeItem *pParentItem;
-	if(parentIndex.isValid() == false)
-		pParentItem = m_pRootNode;
-	else
-		pParentItem = static_cast<EntityTreeItem *>(parentIndex.internalPointer());
-
-	return pParentItem->GetNumChildren();
-}
-
-int EntityTreeModel::columnCount(const QModelIndex &parent) const
-{
-	return 1;
-}
-
-QVariant EntityTreeModel::data(const QModelIndex &index, int iRole /*= Qt::DisplayRole*/) const
-{
-	if(index.isValid() == false)
-		return QVariant();
-
-	EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
-
-	switch(iRole)
+	if(insertRow(m_pRootItem->childCount(), createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)) == false)
 	{
-	case Qt::DisplayRole:
-		return pTreeItem->GetProjItem()->GetName(false);
-	case Qt::DecorationRole:
-		return pTreeItem->GetProjItem()->GetIcon(SUBICON_None);
-	case Qt::ToolTipRole:
-		return pTreeItem->GetToolTip();
+		HyGuiLog("EntityTreeModel::AddProjectItem() - insertRow failed", LOGTYPE_Error);
+		return false;
 	}
 
-	return QVariant();
+	QVariant v;
+	v.setValue<ExplorerItem *>(pProjectItem);
+	if(setData(index(m_pRootItem->childCount() - 1, 0, createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)), v) == false)
+		HyGuiLog("EntityTreeModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 }
 
-void EntityTreeModel::AddItem(ProjectItem *pProjectItem)
+QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const
 {
-	EntityTreeItem *pNewTreeItem = new EntityTreeItem(pProjectItem);
-	InsertItem(m_pRootNode->GetNumChildren(), pNewTreeItem, m_pRootItem);
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
+		return QVariant();
+
+	if(iRole == Qt::UserRole)
+		return ITreeModel::data(indexRef, iRole);
+
+	ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+	switch(iRole)
+	{
+	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
+	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
+		return QVariant(pItem->GetName(false));
+
+	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
+		if(pItem->IsProjectItem())
+		{
+			ProjectItem *pProjItem = static_cast<ProjectItem *>(pItem);
+			if(pProjItem->IsExistencePendingSave())
+				return QVariant(pItem->GetIcon(SUBICON_New));
+			else if(pProjItem->IsSaveClean() == false)
+				return QVariant(pItem->GetIcon(SUBICON_Dirty));
+		}
+		return QVariant(pItem->GetIcon(SUBICON_None));
+
+	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
+		return QVariant(pItem->GetName(true));
+
+	case Qt::StatusTipRole:		// The data displayed in the status bar. (QString)
+		return QVariant(pItem->GetName(true));
+
+	default:
+		return QVariant();
+	}
 }
 
-void EntityTreeModel::InsertItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem)
+/*virtual*/ Qt::ItemFlags EntityTreeModel::flags(const QModelIndex &indexRef) const /*override*/
 {
-	QList<EntityTreeItem *> itemList;
-	itemList << pItem;
-	InsertItems(iRow, itemList, pParentItem);
-}
-
-void EntityTreeModel::InsertItems(int iRow, QList<EntityTreeItem *> itemList, EntityTreeItem *pParentItem)
-{
-	QModelIndex parentIndex = pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex();
-
-	EntityTreeItem *pParent;
-	if(parentIndex.isValid() == false)
-		pParent = m_pRootNode;
-	else
-		pParent = static_cast<EntityTreeItem *>(parentIndex.internalPointer());
-
-	iRow = HyClamp(iRow, 0, pParent->GetNumChildren());
-
-	beginInsertRows(parentIndex, iRow, iRow + itemList.size() - 1);
-
-	for(int i = 0; i < itemList.size(); ++i)
-		pParent->InsertChild(iRow + i, itemList[i]);
-
-	endInsertRows();
-}
-
-bool EntityTreeModel::RemoveItems(int iRow, int iCount, EntityTreeItem *pParentItem)
-{
-	return removeRows(iRow, iCount, pParentItem ? createIndex(pParentItem->GetRow(), 0, pParentItem) : QModelIndex());
-}
-
-bool EntityTreeModel::removeRows(int iRow, int iCount, const QModelIndex &parentIndex)
-{
-	EntityTreeItem *pParent;
-	if(parentIndex.isValid() == false)
-		pParent = m_pRootNode;
-	else
-		pParent = static_cast<EntityTreeItem *>(parentIndex.internalPointer());
-
-	if(pParent->GetNumChildren() < iRow + iCount)
-		return false;
-
-	beginRemoveRows(parentIndex, iRow, iRow + iCount - 1);
-
-	for(int i = 0; i < iCount; ++i)
-		pParent->RemoveChild(iRow);
-
-	endRemoveRows();
-
-	return true;
+	return QAbstractItemModel::flags(indexRef);
 }

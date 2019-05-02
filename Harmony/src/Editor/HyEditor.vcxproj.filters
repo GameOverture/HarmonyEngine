@@ -202,9 +202,6 @@
     <ClCompile Include="Project\ProjectItem.cpp">
       <Filter>Explorer\Project</Filter>
     </ClCompile>
-    <ClCompile Include="Shared\Properties\PropertiesTreeItem.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
@@ -1178,9 +1175,6 @@
     </ClInclude>
     <ClInclude Include="Project\ProjectDraw.h">
       <Filter>Explorer\Project</Filter>
-    </ClInclude>
-    <ClInclude Include="Shared\Properties\PropertiesTreeItem.h">
-      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\Properties\PropertiesUndoCmd.h">
       <Filter>Shared</Filter>

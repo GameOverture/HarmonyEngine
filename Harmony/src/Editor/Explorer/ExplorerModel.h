@@ -34,8 +34,8 @@ public:
 
 	void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
 
-	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-	virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
+	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
 	virtual Qt::DropActions supportedDropActions() const override;
 
 private:

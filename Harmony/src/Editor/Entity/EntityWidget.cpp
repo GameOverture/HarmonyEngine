@@ -106,8 +106,8 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 
 		// Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
 		EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-		EntityTreeItem *pTreeItem = reinterpret_cast<EntityTreeItem *>(subState.toULongLong());
-		if(pTreeItem == nullptr)
+		ProjectItem *pProjectItem = reinterpret_cast<EntityTreeItem *>(subState.toULongLong());
+		if(pProjectItem == nullptr)
 		{
 			ui->lblSelectedItemIcon->setVisible(false);
 			ui->lblSelectedItemText->setVisible(false);
@@ -117,9 +117,9 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 		else
 		{
 			ui->lblSelectedItemIcon->setVisible(true);
-			ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetProjItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+			ui->lblSelectedItemIcon->setPixmap(pProjectItem->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
 			ui->lblSelectedItemText->setVisible(true);
-			ui->lblSelectedItemText->setText(pTreeItem->GetProjItem()->GetName(false) % " Properties");
+			ui->lblSelectedItemText->setText(pProjectItem->GetName(false) % " Properties");
 
 			PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem);
 			ui->propertyTree->setModel(pPropertiesModel);

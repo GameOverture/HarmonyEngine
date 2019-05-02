@@ -13,59 +13,26 @@
 #include "ProjectItem.h"
 #include "GlobalWidgetMappers.h"
 #include "PropertiesTreeModel.h"
-#include "Shared/TreeModel/TreeModelItem.h"
+#include "Shared/TreeModel/ITreeModel.h"
 
 #include <QAbstractItemModel>
 
 class EntityModel;
-class EntityTreeModel;
 
-class EntityTreeItem : public TreeModelItem
-{
-	ProjectItem *               m_pItem;
-
-
-public:
-	explicit EntityTreeItem(ProjectItem *pItem);
-	virtual ~EntityTreeItem();
-
-	ProjectItem *GetProjItem();
-
-	QString GetToolTip() const;
-};
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class EntityTreeModel : public QAbstractItemModel
+class EntityTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
-	EntityModel *               m_pEntityModel;
-	EntityTreeItem *            m_pRootNode;
-	EntityTreeItem *            m_pRootItem;
+	EntityModel *				m_pEntityModel;
 
 public:
-	explicit EntityTreeModel(EntityModel *pEntityModel, ProjectItem &entityItemRef, QObject *parent = nullptr);
+	explicit EntityTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
 	virtual ~EntityTreeModel();
 
-	ProjectItem *GetRootItem();
-
-	// Basic functionality:
-	QModelIndex index(int iRow, int iColumn, const QModelIndex &parent = QModelIndex()) const override;
-	QModelIndex parent(const QModelIndex &index) const override;
-
-	int rowCount(const QModelIndex &parentIndex = QModelIndex()) const override;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+	bool AddProjectItem(ProjectItem *pProjectItem);
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
-
-	void AddItem(ProjectItem *pProjectItem);
-
-	void InsertItem(int iRow, EntityTreeItem *pItem, EntityTreeItem *pParentItem);
-	void InsertItems(int iRow, QList<EntityTreeItem *> itemList, EntityTreeItem *pParentItem);
-
-	bool RemoveItems(int iRow, int iCount, EntityTreeItem *pParentItem);
-	bool removeRows(int iRow, int iCount, const QModelIndex &parentIndex = QModelIndex()) override;
+	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 };
 
 #endif // ENTITYTREEMODEL_H
