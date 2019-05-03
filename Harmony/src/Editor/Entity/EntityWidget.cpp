@@ -64,14 +64,6 @@ EntityModel *EntityWidget::GetEntityModel()
 	return static_cast<EntityModel *>(m_ItemRef.GetModel());
 }
 
-EntityTreeItem *EntityWidget::GetCurSelectedTreeItem()
-{
-	QModelIndex curIndex = ui->childrenTree->currentIndex();
-	return static_cast<EntityTreeItem *>(curIndex.internalPointer());
-
-	//return static_cast<EntityTreeItem *>(GetEntityModel()->GetTreeModel().index(curIndex.row(), curIndex.column(), curIndex.parent()).internalPointer());
-}
-
 void EntityWidget::OnGiveMenuActions(QMenu *pMenu)
 {
 //    pMenu->addAction(ui->actionAddState);
@@ -96,6 +88,15 @@ int EntityWidget::GetNumStates() const
 	return ui->cmbStates->count();
 }
 
+ExplorerItem *EntityWidget::GetSelectedChild()
+{
+	QModelIndexList selectedIndices = ui->childrenTree->selectionModel()->selectedIndexes();
+	if(selectedIndices.empty())
+		return nullptr;
+
+	static_cast<EntityTreeModel *>(ui->childrenTree->model())-> selectedIndices[0].
+}
+
 void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 {
 	if(iStateIndex >= 0)
@@ -106,8 +107,8 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 
 		// Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
 		EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-		ProjectItem *pProjectItem = reinterpret_cast<EntityTreeItem *>(subState.toULongLong());
-		if(pProjectItem == nullptr)
+		ExplorerItem *pSubStateItem = subState.value<ExplorerItem *>();
+		if(pSubStateItem == nullptr)
 		{
 			ui->lblSelectedItemIcon->setVisible(false);
 			ui->lblSelectedItemText->setVisible(false);
@@ -117,11 +118,11 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 		else
 		{
 			ui->lblSelectedItemIcon->setVisible(true);
-			ui->lblSelectedItemIcon->setPixmap(pProjectItem->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+			ui->lblSelectedItemIcon->setPixmap(pSubStateItem->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
 			ui->lblSelectedItemText->setVisible(true);
-			ui->lblSelectedItemText->setText(pProjectItem->GetName(false) % " Properties");
+			ui->lblSelectedItemText->setText(pSubStateItem->GetName(false) % " Properties");
 
-			PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem);
+			PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pSubStateItem);
 			ui->propertyTree->setModel(pPropertiesModel);
 
 			// Expand the top level nodes (the properties' categories)

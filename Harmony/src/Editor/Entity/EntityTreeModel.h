@@ -29,7 +29,10 @@ public:
 	explicit EntityTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
 	virtual ~EntityTreeModel();
 
-	bool AddProjectItem(ProjectItem *pProjectItem);
+	bool AddChildItem(ExplorerItem *pItem);
+	bool RemoveChild(ExplorerItem *pItem);
+
+
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;

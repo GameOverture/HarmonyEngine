@@ -21,18 +21,33 @@ EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, QObject *parent) :
 {
 }
 
-bool EntityTreeModel::AddProjectItem(ProjectItem *pProjectItem)
+bool EntityTreeModel::AddChildItem(ExplorerItem *pItem)
 {
+	if(pItem == nullptr || &m_pEntityModel->GetItem() == pItem)
+		return false;
+
+	if(pItem->GetType() == ITEM_Entity)
+	{
+		// TODO: Ensure that this child entity doesn't contain this as child
+	}
+
 	if(insertRow(m_pRootItem->childCount(), createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)) == false)
 	{
-		HyGuiLog("EntityTreeModel::AddProjectItem() - insertRow failed", LOGTYPE_Error);
+		HyGuiLog("EntityTreeModel::AddChildItem() - insertRow failed", LOGTYPE_Error);
 		return false;
 	}
 
 	QVariant v;
-	v.setValue<ExplorerItem *>(pProjectItem);
+	v.setValue<ExplorerItem *>(pItem);
 	if(setData(index(m_pRootItem->childCount() - 1, 0, createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)), v) == false)
-		HyGuiLog("EntityTreeModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+		HyGuiLog("EntityTreeModel::AddChildItem() - setData failed", LOGTYPE_Error);
+}
+
+bool EntityTreeModel::RemoveChild(ExplorerItem *pItem)
+{
+	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0));
+	TreeModelItem *pParentTreeItem = pTreeItem->parent();
+	return removeRow(pTreeItem->childNumber(), createIndex(pParentTreeItem->childNumber(), 0, pParentTreeItem));
 }
 
 QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const

@@ -147,11 +147,6 @@ EntityModel::EntityModel(ProjectItem &itemRef, QJsonArray stateArray) :
 {
 }
 
-//EntityTreeModel &EntityModel::GetTreeModel()
-//{
-//	return m_TreeModel;
-//}
-
 PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerItem *pItem)
 {
 	if(iStateIndex < 0)
@@ -161,27 +156,14 @@ PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerIt
 	return pPropertiesModel;
 }
 
-bool EntityModel::IsChildAddable(ProjectItem *pItem)
+bool EntityModel::AddNewChild(ExplorerItem *pItem)
 {
-	if(pItem == nullptr || &m_ItemRef == pItem)
-		return false;
-
-	if(pItem->GetType() == ITEM_Entity)
-	{
-		// TODO: Ensure that this child entity doesn't contain this as child
-	}
-
-	return true;
+	return m_TreeModel.AddChildItem(pItem);
 }
 
-bool EntityModel::AddNewChild(ProjectItem *pItem)
+bool EntityModel::RemoveChild(ExplorerItem *pItem)
 {
-	if(IsChildAddable(pItem) == false)
-		return false;
-
-	m_TreeModel.AddProjectItem(pItem);
-
-	return true;
+	return m_TreeModel.RemoveChild(pItem);
 }
 
 const QList<ProjectItem *> &EntityModel::GetPrimitiveList()
