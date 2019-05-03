@@ -15,7 +15,7 @@
 #include "Atlas/AtlasWidget.h"
 
 ExplorerModel::ExplorerModel() :
-	ITreeModel(QStringList(), nullptr)
+	ITreeModel(1, QStringList(), nullptr)
 {
 }
 
@@ -139,12 +139,12 @@ bool ExplorerModel::RemoveItem(ExplorerItem *pItem)
 	return removeRow(pTreeItem->childNumber(), createIndex(pParentTreeItem->childNumber(), 0, pParentTreeItem));
 }
 
-QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem)
+QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem) const
 {
 	QStringList sPrefixParts;
 
 	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0))->parent();
-	while(pTreeItem)
+	while(pTreeItem && pTreeItem != m_pRootItem)
 	{
 		ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
 		if(pItem->GetType() == ITEM_Prefix)

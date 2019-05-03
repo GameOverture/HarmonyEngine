@@ -139,9 +139,9 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	   static_cast<ProjectItem *>(pEvent->source()) != pCurOpenTabItem &&
 	   pCurOpenTabItem->GetType() == ITEM_Entity)
 	{
-		EntityModel *pEntModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel());
+		EntityTreeModel &childTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetChildrenModel();
 
-		if(pEntModel->IsChildAddable(static_cast<ProjectItem *>(pEvent->source())))
+		if(childTreeModel.IsItemValid(static_cast<ExplorerItem *>(pEvent->source()), false))
 			pEvent->acceptProposedAction();
 		else
 			pEvent->ignore();

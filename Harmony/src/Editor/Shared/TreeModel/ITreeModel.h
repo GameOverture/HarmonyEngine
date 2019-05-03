@@ -24,11 +24,11 @@ protected:
 	TreeModelItem *		m_pRootItem;
 
 public:
-	ITreeModel(const QStringList &sHeaderList, QObject *pParent = nullptr);
+	ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject *pParent = nullptr);
 	virtual ~ITreeModel();
 
 	template<typename TYPE>
-	QModelIndex FindIndex(TYPE dataInTreeItem, int iColumn)
+	QModelIndex FindIndex(TYPE dataInTreeItem, int iColumn) const
 	{
 		if(iColumn >= m_pRootItem->columnCount())
 			return QModelIndex();

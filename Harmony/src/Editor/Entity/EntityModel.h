@@ -49,6 +49,7 @@ public:
 	EntityModel(ProjectItem &itemRef, QJsonArray stateArray);
 	virtual ~EntityModel();
 
+	EntityTreeModel &GetChildrenModel();
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItem *pItem);
 
 	bool AddNewChild(ExplorerItem *pItem);

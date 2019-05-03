@@ -11,12 +11,20 @@
 #include "ITreeModel.h"
 #include "TreeModelItem.h"
 
-ITreeModel::ITreeModel(const QStringList &sHeaderList, QObject *pParent /*= nullptr*/) :
+ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject *pParent /*= nullptr*/) :
 	QAbstractItemModel(pParent)
 {
+	if(iNumColumns <= 0)
+		HyGuiLog("Cannot create a ITreeModel with columns <= 0", LOGTYPE_Error);
+
 	QVector<QVariant> rootData;
-	for(int i = 0; i < sHeaderList.size(); ++i)
-		rootData << sHeaderList[i];
+	for(int i = 0; i < iNumColumns; ++i)
+	{
+		if(i < sHeaderList.size())
+			rootData << sHeaderList[i];
+		else
+			rootData << "";
+	}
 
 	m_pRootItem = new TreeModelItem(rootData);
 }

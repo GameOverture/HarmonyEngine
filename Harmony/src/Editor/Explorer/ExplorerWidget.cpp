@@ -101,7 +101,10 @@ QList<ExplorerItem *> ExplorerWidget::GetSelectedItems()
 
 	QList<ExplorerItem *> retList;
 	for(int i = 0; i < selectedIndices.size(); ++i)
-		retList.push_back(static_cast<ExplorerItem *>(selectedIndices[i].internalPointer()));
+	{
+		ExplorerItem *pItem = ui->treeView->model()->data(selectedIndices[i], Qt::UserRole).value<ExplorerItem *>();
+		retList.push_back(pItem);
+	}
 
 	return retList;
 }
@@ -167,8 +170,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 
 void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 {
-	ExplorerItem *pItem = static_cast<ExplorerItem *>(index.internalPointer());
-	
+	ExplorerItem *pItem = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
 	switch(pItem->GetType())
 	{
 	case ITEM_Project:
@@ -194,8 +196,7 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 
 void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 {
-	ExplorerItem *pCurSelected = static_cast<ExplorerItem *>(index.internalPointer());
-	
+	ExplorerItem *pCurSelected = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
 	bool bValidItem = (pCurSelected != nullptr);
 	FINDACTION("actionProjectSettings")->setEnabled(bValidItem);
 	FINDACTION("actionCloseProject")->setEnabled(bValidItem);

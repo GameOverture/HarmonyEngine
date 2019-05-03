@@ -20,7 +20,7 @@
 #include <QLineEdit>
 
 PropertiesTreeModel::PropertiesTreeModel(ProjectItem &ownerRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
-	ITreeModel({ "Property", "Value" }, pParent),
+	ITreeModel(2, { "Property", "Value" }, pParent),
 	m_OwnerRef(ownerRef),
 	m_iSTATE_INDEX(iStateIndex),
 	m_iSUBSTATE(subState)

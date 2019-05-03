@@ -12,7 +12,7 @@
 #include "EntityModel.h"
 
 EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, QObject *parent) :
-	ITreeModel(QStringList(), parent),
+	ITreeModel(1, QStringList(), parent),
 	m_pEntityModel(pEntityModel)
 {
 }
@@ -21,15 +21,34 @@ EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, QObject *parent) :
 {
 }
 
-bool EntityTreeModel::AddChildItem(ExplorerItem *pItem)
+bool EntityTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const
 {
-	if(pItem == nullptr || &m_pEntityModel->GetItem() == pItem)
+	if(pItem == nullptr)
+	{
+		if(bShowDialogsOnFail)
+			HyGuiLog("Entity tried to add a null item", LOGTYPE_Info);
 		return false;
-
+	}
+	if(&m_pEntityModel->GetItem() == pItem)
+	{
+		if(bShowDialogsOnFail)
+			HyGuiLog("Entity cannot add itself as a child", LOGTYPE_Info);
+		return false;
+	}
 	if(pItem->GetType() == ITEM_Entity)
 	{
 		// TODO: Ensure that this child entity doesn't contain this as child
+		if(bShowDialogsOnFail)
+			HyGuiLog(pItem->GetName(false) % " is invalid to be added. This Entity contains itself as a child", LOGTYPE_Info);
+
+		return false;
 	}
+}
+
+bool EntityTreeModel::AddChildItem(ExplorerItem *pItem)
+{
+	if(IsItemValid(pItem, false) == false)
+		return false;
 
 	if(insertRow(m_pRootItem->childCount(), createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)) == false)
 	{

@@ -147,6 +147,11 @@ EntityModel::EntityModel(ProjectItem &itemRef, QJsonArray stateArray) :
 {
 }
 
+EntityTreeModel &EntityModel::GetChildrenModel()
+{
+	return m_TreeModel;
+}
+
 PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerItem *pItem)
 {
 	if(iStateIndex < 0)
