@@ -235,7 +235,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	ui->actionPasteItem->setEnabled(pMimeData && pMimeData->hasFormat(HYGUI_MIMETYPE));
 	
 	if(bValidItem)
-		Harmony::SetProject(GetCurProjSelected());
+		Harmony::SetProject(&pCurSelected->GetProject());
 }
 
 void ExplorerWidget::on_actionRename_triggered()
