@@ -620,6 +620,18 @@
     <string>Create a new Prefix which helps categorize all the items in the project</string>
    </property>
   </action>
+  <action name="actionLoadProject">
+   <property name="icon">
+    <iconset resource="res/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Project-Pending.png</normaloff>:/icons16x16/items/Project-Pending.png</iconset>
+   </property>
+   <property name="text">
+    <string>Load Project</string>
+   </property>
+   <property name="toolTip">
+    <string>Unloads the backend harmony engine instance, and loads a new harmony instance with this project's assets.</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

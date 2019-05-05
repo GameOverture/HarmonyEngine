@@ -71,7 +71,7 @@
 	sm_sSubIconNames[SUBICON_Delete] = "-Delete";
 	sm_sSubIconNames[SUBICON_Settings] = "-Settings";
 	sm_sSubIconNames[SUBICON_Warning] = "-Warning";
-	sm_sSubIconNames[SUBICON_Pending] = "-Pending";
+	sm_sSubIconNames[SUBICON_Activated] = "-Pending";
 
 	for(int i = 0; i < NUMTYPES; ++i)
 	{

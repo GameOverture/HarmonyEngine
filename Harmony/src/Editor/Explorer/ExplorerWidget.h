@@ -45,7 +45,6 @@ public:
 
 	void SetItemMenuPtr(QMenu *pMenu);
 
-	Project *GetCurProjSelected();
 	ExplorerItem *GetFirstSelectedItem();
 	QList<ExplorerItem *>GetSelectedItems();
 

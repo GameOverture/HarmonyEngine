@@ -193,7 +193,7 @@ void EntityWidget::on_actionInsertPhysicsBody_triggered()
 
 void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
 {
-	//EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
+	//EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer()); <--- deprecated
 	//FocusState(ui->cmbStates->currentIndex(), QVariant(reinterpret_cast<qulonglong>(pTreeItem)));
 
 //    ui->toolBox->setVisible(true);

@@ -67,15 +67,6 @@ void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
 	m_pNewItemMenuRef = pMenu;
 }
 
-Project *ExplorerWidget::GetCurProjSelected()
-{
-	ExplorerItem *pCurSelected = GetFirstSelectedItem();
-	if(pCurSelected == nullptr)
-		return nullptr;
-
-	return &pCurSelected->GetProject();
-}
-
 ExplorerItem *ExplorerWidget::GetFirstSelectedItem()
 {
 	QList<ExplorerItem *> itemList = GetSelectedItems();
@@ -112,16 +103,19 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else
 	{
-		ExplorerItem *pSelectedExplorerItem = static_cast<ExplorerItem *>(index.internalPointer());
+		ExplorerItem *pSelectedExplorerItem = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
 		HyGuiItemType eSelectedItemType = pSelectedExplorerItem->GetType();
 		switch(eSelectedItemType)
 		{
-		case ITEM_Project: {
-			contextMenu.addMenu(m_pNewItemMenuRef);
+		case ITEM_Project:
+			if(Harmony::GetProject() != pSelectedExplorerItem)
+				contextMenu.addAction(FINDACTION("actionLoadProject"));
+			else
+				contextMenu.addMenu(m_pNewItemMenuRef);
 			contextMenu.addSeparator();
 			contextMenu.addAction(FINDACTION("actionCloseProject"));
 			contextMenu.addAction(FINDACTION("actionProjectSettings"));
-			break; }
+			break;
 		case ITEM_Audio:
 		case ITEM_Particles:
 		case ITEM_Font:
@@ -225,7 +219,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	const QMimeData *pMimeData = pClipboard->mimeData();
 	ui->actionPasteItem->setEnabled(pMimeData && pMimeData->hasFormat(HYGUI_MIMETYPE));
 	
-	if(bValidItem)
+	if(Harmony::GetProject() == nullptr && bValidItem)
 		Harmony::SetProject(&pCurSelected->GetProject());
 }
 
@@ -249,7 +243,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 	case ITEM_Prefix:
 		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the prefix:\n" % pItem->GetName(true) % "\n\nAnd all of its contents? This action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
-			GetCurProjSelected()->DeletePrefixAndContents(pItem->GetName(true));
+			pItem->GetProject().DeletePrefixAndContents(pItem->GetName(true));
 
 			if(static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem) == false)
 				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % pItem->GetName(true), LOGTYPE_Error);
@@ -299,7 +293,7 @@ void ExplorerWidget::on_actionCopyItem_triggered()
 
 void ExplorerWidget::on_actionPasteItem_triggered()
 {
-	Project *pCurProj = GetCurProjSelected();
+	Project *pCurProj = &GetFirstSelectedItem()->GetProject();
 
 	QClipboard *pClipboard = QApplication::clipboard();
 	const QMimeData *pData = pClipboard->mimeData();
