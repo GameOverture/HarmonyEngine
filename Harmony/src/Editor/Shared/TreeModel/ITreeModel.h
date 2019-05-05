@@ -41,7 +41,7 @@ public:
 		{
 			TreeModelItem *pItem = treeItemStack.pop();
 			if(pItem->data(iColumn).value<TYPE>() == dataInTreeItem)
-				return createIndex(pItem->childNumber(), iColumn, &pItem);
+				return createIndex(pItem->childNumber(), iColumn, pItem);
 
 			for(int i = 0; i < pItem->childCount(); ++i)
 				treeItemStack.push(pItem->child(i));
