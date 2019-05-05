@@ -67,15 +67,6 @@ void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
 	m_pNewItemMenuRef = pMenu;
 }
 
-void ExplorerWidget::SelectItem(ExplorerItem *pItem)
-{
-	if(pItem == nullptr)
-		return;
-
-	QItemSelectionModel *pSelectionModel = ui->treeView->selectionModel();
-	pSelectionModel->select(static_cast<ExplorerModel *>(ui->treeView->model())->FindIndex<ExplorerItem *>(pItem, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-}
-
 Project *ExplorerWidget::GetCurProjSelected()
 {
 	ExplorerItem *pCurSelected = GetFirstSelectedItem();

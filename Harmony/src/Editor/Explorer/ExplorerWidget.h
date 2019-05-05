@@ -44,8 +44,6 @@ public:
 	void SetModel(ExplorerModel &modelRef);
 
 	void SetItemMenuPtr(QMenu *pMenu);
-	
-	void SelectItem(ExplorerItem *pItem);
 
 	Project *GetCurProjSelected();
 	ExplorerItem *GetFirstSelectedItem();

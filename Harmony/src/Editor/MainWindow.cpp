@@ -319,8 +319,6 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	Harmony::GetProject()->OpenTab(pItem);
 
-	sm_pInstance->ui->explorer->SelectItem(pItem);
-
 	// Setup the item properties docking window to be the current item
 	QString sWindowTitle = pItem->GetName(true) % " Properties";
 
@@ -412,8 +410,9 @@ void MainWindow::on_actionNewProject_triggered()
 			m_sDefaultProjectLocation = defaultProjDir.absolutePath();
 		}
 
-		ui->explorer->SelectItem(m_ExplorerModel.AddProject(pDlg->GetProjFilePath()));
-		ui->explorer->GetCurProjSelected()->GetAtlasModel().RepackAll(0);
+		m_ExplorerModel.AddProject(pDlg->GetProjFilePath());
+		//ui->explorer->SelectItem();
+		//ui->explorer->GetCurProjSelected()->GetAtlasModel().RepackAll(0);
 	}
 	delete pDlg;
 }
