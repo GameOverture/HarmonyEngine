@@ -124,16 +124,21 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Shader:
 		case ITEM_Entity:
 		case ITEM_Prefab:
-			ui->actionOpen->setText("Open " % pSelectedExplorerItem->GetName(false));
-			ui->actionOpen->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_None));
-			contextMenu.addAction(ui->actionOpen);
+			if(Harmony::GetProject() != &pSelectedExplorerItem->GetProject())
+				contextMenu.addAction(FINDACTION("actionLoadProject"));
+			else
+			{
+				ui->actionOpen->setText("Open " % pSelectedExplorerItem->GetName(false));
+				ui->actionOpen->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_None));
+				contextMenu.addAction(ui->actionOpen);
+			}
 			contextMenu.addSeparator();
 			contextMenu.addAction(ui->actionCopyItem);
 			contextMenu.addAction(ui->actionPasteItem);
 			contextMenu.addSeparator();
 			// Fall through
 		case ITEM_Prefix:
-			if(eSelectedItemType == ITEM_Prefix)
+			if(eSelectedItemType == ITEM_Prefix && Harmony::GetProject() == &pSelectedExplorerItem->GetProject())
 			{
 				contextMenu.addMenu(m_pNewItemMenuRef);
 				contextMenu.addSeparator();

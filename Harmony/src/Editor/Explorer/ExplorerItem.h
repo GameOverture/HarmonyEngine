@@ -14,7 +14,6 @@
 #include <QTreeWidget>
 
 #include "Global.h"
-#include "Shared/TreeModel/TreeModelItem.h"
 
 class ExplorerItem : public QObject
 {

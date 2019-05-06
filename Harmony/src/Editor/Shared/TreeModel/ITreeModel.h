@@ -11,10 +11,9 @@
 #define ITREEMODEL_H
 
 #include "Global.h"
+#include "Shared/TreeModel/TreeModelItem.h"
 
 #include <QAbstractItemModel>
-
-class TreeModelItem;
 
 class ITreeModel : public QAbstractItemModel
 {
