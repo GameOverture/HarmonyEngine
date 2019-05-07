@@ -412,26 +412,20 @@ void MainWindow::on_actionNewProject_triggered()
 		}
 
 		m_ExplorerModel.AddProject(pDlg->GetProjFilePath());
-		//ui->explorer->SelectItem();
-		//ui->explorer->GetCurProjSelected()->GetAtlasModel().RepackAll(0);
 	}
 	delete pDlg;
 }
 
 void MainWindow::on_actionOpenProject_triggered()
 {
-	//DlgSetEngineLocation *pDlg = new DlgSetEngineLocation(this);
 	QFileDialog *pDlg = new QFileDialog();
 	pDlg->setNameFilter(tr("Harmony Project File (*.hyproj)"));
 	pDlg->setModal(true);
-    pDlg->setDirectory(m_sDefaultProjectLocation);
+	pDlg->setDirectory(m_sDefaultProjectLocation);
 
 	if(pDlg->exec() == QDialog::Accepted)
-	{
-		Project *pAddedProject = m_ExplorerModel.AddProject(pDlg->selectedFiles()[0]);
-		if(pAddedProject)
-			m_sDefaultProjectLocation = pAddedProject->GetDirPath();
-	}
+		m_ExplorerModel.AddProject(pDlg->selectedFiles()[0]);
+
 	delete pDlg;
 }
 

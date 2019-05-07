@@ -339,8 +339,10 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 
 bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
 {
+	QModelIndex parentIndex = FindIndex<ExplorerItem *>(pParentTreeItem->data(0).value<ExplorerItem *>(), 0);
 	iRow = (iRow == -1 ? pParentTreeItem->childCount() : iRow);
-	if(insertRow(iRow, createIndex(pParentTreeItem->childNumber(), 0, pParentTreeItem)) == false)
+
+	if(insertRow(iRow, parentIndex) == false)
 	{
 		HyGuiLog("ExplorerModel::InsertNewItem() - insertRow failed", LOGTYPE_Error);
 		return false;
@@ -348,7 +350,7 @@ bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParent
 
 	QVariant v;
 	v.setValue<ExplorerItem *>(pNewItem);
-	if(setData(index(iRow, 0, createIndex(pParentTreeItem->childNumber(), 0, pParentTreeItem)), v) == false)
+	if(setData(index(iRow, 0, parentIndex), v) == false)
 		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 
 	return true;
