@@ -45,11 +45,11 @@ public:
 	ProjectItem &GetItem();
 	EntityModel *GetEntityModel();
 
-	EntityTreeItem *GetCurSelectedTreeItem();
-
 	void OnGiveMenuActions(QMenu *pMenu);
 	EntityStateData *GetCurStateData();
 	int GetNumStates() const;
+
+	ExplorerItem *GetSelectedChild();
 
 	void FocusState(int iStateIndex, QVariant subState);
 	void UpdateActions();

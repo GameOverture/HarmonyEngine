@@ -15,7 +15,7 @@
 #include "Atlas/AtlasWidget.h"
 
 ExplorerModel::ExplorerModel() :
-	ITreeModel(new ExplorerItem(), nullptr)
+	ITreeModel(1, QStringList(), nullptr)
 {
 }
 
@@ -29,9 +29,9 @@ QStringList ExplorerModel::GetOpenProjectPaths()
 	QStringList sListOpenProjs;
 	sListOpenProjs.clear();
 
-	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	for(int i = 0; i < m_pRootItem->childCount(); ++i)
 	{
-		ExplorerItem *pItem = static_cast<ExplorerItem *>(m_pRootItem->GetChild(i));
+		ExplorerItem *pItem = m_pRootItem->child(i)->data(0).value<ExplorerItem *>();
 		Project *pItemProject = static_cast<Project *>(pItem);
 		sListOpenProjs.append(pItemProject->GetAbsPath());
 	}
@@ -39,10 +39,28 @@ QStringList ExplorerModel::GetOpenProjectPaths()
 	return sListOpenProjs;
 }
 
+QStringList ExplorerModel::GetPrefixList(Project *pProject)
+{
+	TreeModelItem *pProjectTreeItem = FindProjectTreeItem(pProject);
+	if(pProjectTreeItem == nullptr)
+		return QStringList();
+
+	QStringList sReturnPrefixList;
+	QVector<TreeModelItem *> childrenVec = pProjectTreeItem->GetChildren();
+	for(int i = 0; i < childrenVec.size(); ++i)
+	{
+		ExplorerItem *pItem = childrenVec[i]->data(0).value<ExplorerItem *>();
+		if(pItem->GetType() == ITEM_Prefix)
+			sReturnPrefixList.append(pItem->GetName(true));
+	}
+
+	return sReturnPrefixList;
+}
+
 Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 {
 	HyGuiLog("Opening project: " % sNewProjectFilePath, LOGTYPE_Info);
-	Project *pNewProject = new Project(sNewProjectFilePath);
+	Project *pNewProject = new Project(sNewProjectFilePath, *this);
 	if(pNewProject->HasError())
 	{
 		HyGuiLog("Project: " % sNewProjectFilePath % " had an error and will not be opened", LOGTYPE_Error);
@@ -50,8 +68,8 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 		return nullptr;
 	}
 
-	InsertItem(0, pNewProject, m_pRootItem);
-	pNewProject->InitExplorerModelData(*this);
+	InsertNewItem(pNewProject, m_pRootItem);
+	pNewProject->LoadExplorerModel();
 
 	return pNewProject;
 
@@ -77,8 +95,7 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 		return nullptr;
 	}
 
-	//QTreeWidgetItem *pParentTreeItem = pProj->GetTreeItem();
-	ExplorerItem *pParentItem = pProj;
+	TreeModelItem *pCurTreeItem = FindProjectTreeItem(pProj);
 	if(sPrefix.isEmpty() == false)
 	{
 		QStringList sPathSplitList = sPrefix.split(QChar('/'));
@@ -86,11 +103,11 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 		for(int i = 0; i < sPathSplitList.size(); ++i)
 		{
 			bool bFound = false;
-			for(int j = 0; j < pParentItem->GetNumChildren(); ++j)
+			for(int j = 0; j < pCurTreeItem->childCount(); ++j)
 			{
-				if(QString::compare(sPathSplitList[i], static_cast<ExplorerItem *>(pParentItem->GetChild(j))->GetName(false), Qt::CaseInsensitive) == 0)
+				if(QString::compare(sPathSplitList[i], pCurTreeItem->child(j)->data(0).value<ExplorerItem *>()->GetName(false), Qt::CaseInsensitive) == 0)
 				{
-					pParentItem = static_cast<ExplorerItem *>(pParentItem->GetChild(j));
+					pCurTreeItem = pCurTreeItem->child(j);
 					bFound = true;
 					break;
 				}
@@ -99,27 +116,50 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 			if(bFound == false)
 			{
 				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix ExplorerItem here and continue traversing down the tree
-				ExplorerItem *pNewPrefixItem = new ExplorerItem(*pProj, ITEM_Prefix, sPathSplitList[i]);
-				InsertItem(pParentItem->GetNumChildren(), pNewPrefixItem, pParentItem);
-
-				pParentItem = pNewPrefixItem;
+				InsertNewItem(new ExplorerItem(*pProj, ITEM_Prefix, sPathSplitList[i]), pCurTreeItem);
+				pCurTreeItem = pCurTreeItem->child(pCurTreeItem->childCount() - 1);
 			}
 		}
 	}
 
 	ExplorerItem *pNewItem = nullptr;
 	if(eNewItemType == ITEM_Prefix)
-	{
 		pNewItem = new ExplorerItem(*pProj, ITEM_Prefix, sName);
-		InsertItem(pParentItem->GetNumChildren(), pNewItem, pParentItem);
-	}
 	else
-	{
 		pNewItem = new ProjectItem(*pProj, eNewItemType, sName, initValue, bIsPendingSave);
-		InsertItem(pParentItem->GetNumChildren(), pNewItem, pParentItem);
+
+	InsertNewItem(pNewItem, pCurTreeItem);
+	return pNewItem;
+}
+
+bool ExplorerModel::RemoveItem(ExplorerItem *pItem)
+{
+	QModelIndex index = FindIndex<ExplorerItem *>(pItem, 0);
+	return removeRow(index.row(), index.parent());
+}
+
+QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem) const
+{
+	QStringList sPrefixParts;
+
+	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0))->parent();
+	while(pTreeItem && pTreeItem != m_pRootItem)
+	{
+		ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+		if(pItem->GetType() == ITEM_Prefix)
+			sPrefixParts.prepend(pItem->GetName(false));
+
+		pTreeItem = pTreeItem->parent();
 	}
 
-	return pNewItem;
+	QString sPrefix;
+	for(int i = 0; i < sPrefixParts.size(); ++i)
+	{
+		sPrefix += sPrefixParts[i];
+		sPrefix += "/";
+	}
+
+	return sPrefix;
 }
 
 void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
@@ -246,28 +286,17 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	pImportedProjItem->Save();
 }
 
-/*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/
+/*virtual*/ QVariant ExplorerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
-	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
-}
-
-/*virtual*/ QVariant ExplorerModel::headerData(int iSection, Qt::Orientation orientation, int role) const /*override*/
-{
-	return QVariant();
-}
-
-/*virtual*/ int ExplorerModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
-{
-	return 1;
-}
-
-/*virtual*/ QVariant ExplorerModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const /*override*/
-{
-	ExplorerItem *pItem = static_cast<ExplorerItem *>(index.internalPointer());
-	if(pItem == nullptr)
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
 		return QVariant();
 
-	switch(role)
+	if(iRole == Qt::UserRole)
+		return ITreeModel::data(indexRef, iRole);
+
+	ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+	switch(iRole)
 	{
 	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
 	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
@@ -288,7 +317,7 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 		return QVariant(pItem->GetIcon(SUBICON_None));
 
 	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
-		return QVariant();
+		return QVariant(pItem->GetName(true));
 
 	case Qt::StatusTipRole:		// The data displayed in the status bar. (QString)
 		return QVariant(pItem->GetName(true));
@@ -298,10 +327,45 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	}
 }
 
-///*virtual*/ Qt::ItemFlags ExplorerModel::flags(const QModelIndex& index) const /*override*/
-//{
-//
-//}
+/*virtual*/ Qt::ItemFlags ExplorerModel::flags(const QModelIndex& indexRef) const /*override*/
+{
+	return QAbstractItemModel::flags(indexRef);
+}
+
+/*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/
+{
+	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
+}
+
+bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
+{
+	QModelIndex parentIndex = FindIndex<ExplorerItem *>(pParentTreeItem->data(0).value<ExplorerItem *>(), 0);
+	iRow = (iRow == -1 ? pParentTreeItem->childCount() : iRow);
+
+	if(insertRow(iRow, parentIndex) == false)
+	{
+		HyGuiLog("ExplorerModel::InsertNewItem() - insertRow failed", LOGTYPE_Error);
+		return false;
+	}
+
+	QVariant v;
+	v.setValue<ExplorerItem *>(pNewItem);
+	if(setData(index(iRow, 0, parentIndex), v) == false)
+		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+
+	return true;
+}
+
+TreeModelItem *ExplorerModel::FindProjectTreeItem(Project *pProject)
+{
+	for(int i = 0; i < m_pRootItem->childCount(); ++i)
+	{
+		if(m_pRootItem->child(i)->data(0).value<Project *>() == pProject)
+			return m_pRootItem->child(i);
+	}
+
+	return nullptr;
+}
 
 QJsonObject ExplorerModel::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)
 {

@@ -64,14 +64,6 @@ EntityModel *EntityWidget::GetEntityModel()
 	return static_cast<EntityModel *>(m_ItemRef.GetModel());
 }
 
-EntityTreeItem *EntityWidget::GetCurSelectedTreeItem()
-{
-	QModelIndex curIndex = ui->childrenTree->currentIndex();
-	return static_cast<EntityTreeItem *>(curIndex.internalPointer());
-
-	//return static_cast<EntityTreeItem *>(GetEntityModel()->GetTreeModel().index(curIndex.row(), curIndex.column(), curIndex.parent()).internalPointer());
-}
-
 void EntityWidget::OnGiveMenuActions(QMenu *pMenu)
 {
 //    pMenu->addAction(ui->actionAddState);
@@ -96,6 +88,15 @@ int EntityWidget::GetNumStates() const
 	return ui->cmbStates->count();
 }
 
+ExplorerItem *EntityWidget::GetSelectedChild()
+{
+	QModelIndexList selectedIndices = ui->childrenTree->selectionModel()->selectedIndexes();
+	if(selectedIndices.empty())
+		return nullptr;
+
+	return ui->childrenTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItem *>();
+}
+
 void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 {
 	if(iStateIndex >= 0)
@@ -106,8 +107,8 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 
 		// Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
 		EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-		EntityTreeItem *pTreeItem = reinterpret_cast<EntityTreeItem *>(subState.toULongLong());
-		if(pTreeItem == nullptr)
+		ExplorerItem *pSubStateItem = subState.value<ExplorerItem *>();
+		if(pSubStateItem == nullptr)
 		{
 			ui->lblSelectedItemIcon->setVisible(false);
 			ui->lblSelectedItemText->setVisible(false);
@@ -117,11 +118,11 @@ void EntityWidget::FocusState(int iStateIndex, QVariant subState)
 		else
 		{
 			ui->lblSelectedItemIcon->setVisible(true);
-			ui->lblSelectedItemIcon->setPixmap(pTreeItem->GetProjItem()->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+			ui->lblSelectedItemIcon->setPixmap(pSubStateItem->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
 			ui->lblSelectedItemText->setVisible(true);
-			ui->lblSelectedItemText->setText(pTreeItem->GetProjItem()->GetName(false) % " Properties");
+			ui->lblSelectedItemText->setText(pSubStateItem->GetName(false) % " Properties");
 
-			PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pTreeItem);
+			PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pSubStateItem);
 			ui->propertyTree->setModel(pPropertiesModel);
 
 			// Expand the top level nodes (the properties' categories)
@@ -144,12 +145,8 @@ void EntityWidget::UpdateActions()
 	ExplorerItem *pExplorerItem = nullptr;//m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
 	ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
 
-	EntityTreeItem *pSelectedItem = GetCurSelectedTreeItem();
-	ProjectItem *pSelectedProjItem = pSelectedItem ? pSelectedItem->GetProjItem() : nullptr;
-	bool bFrameIsSelected = pSelectedProjItem && pSelectedProjItem->GetType() == ITEM_Entity;
+	bool bFrameIsSelected = true;
 	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
-
-	bFrameIsSelected = pSelectedProjItem;
 	ui->actionAddScissorBox->setEnabled(bFrameIsSelected);
 	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
 	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
@@ -157,38 +154,28 @@ void EntityWidget::UpdateActions()
 
 void EntityWidget::on_actionAddSelectedChild_triggered()
 {
-	if(GetCurSelectedTreeItem() == nullptr)
-	{
-		HyGuiLog("Currently selected entity tree item is nullptr. Cannot add child.", LOGTYPE_Error);
-		return;
-	}
-
-	ExplorerItem *pExplorerItem = nullptr;//m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
-	if(pExplorerItem == nullptr || pExplorerItem->IsProjectItem() == false)
+	ExplorerItem *pHighlightedExplorerItem = nullptr;//m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
+	if(pHighlightedExplorerItem == nullptr)
 	{
 		HyGuiLog("Currently selected item in Explorer is not a ProjectItem. Cannot add child to entity.", LOGTYPE_Error);
 		return;
 	}
 
-	ProjectItem *pItem = static_cast<ProjectItem *>(pExplorerItem);
 	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->childrenTree->model());
-	if(pItem == pTreeModel->GetRootItem())
-	{
-		HyGuiLog("Entities cannot add themselves as a child.", LOGTYPE_Info);
+	if(pTreeModel->IsItemValid(pHighlightedExplorerItem, true) == false)
 		return;
-	}
-
-	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChild, m_ItemRef, pItem);
+	
+	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChild, m_ItemRef, pHighlightedExplorerItem);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPrimitive_triggered()
 {
-	if(GetCurSelectedTreeItem() == nullptr)
-	{
-		HyGuiLog("Currently selected entity tree item is nullptr. Cannot add primitive.", LOGTYPE_Error);
-		return;
-	}
+	//if(GetCurSelectedTreeItem() == nullptr)
+	//{
+	//	HyGuiLog("Currently selected entity tree item is nullptr. Cannot add primitive.", LOGTYPE_Error);
+	//	return;
+	//}
 
 	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, static_cast<EntityModel *>(m_ItemRef.GetModel())->CreateNewPrimitive());
 	m_ItemRef.GetUndoStack()->push(pCmd);
@@ -206,8 +193,8 @@ void EntityWidget::on_actionInsertPhysicsBody_triggered()
 
 void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
 {
-	EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer());
-	FocusState(ui->cmbStates->currentIndex(), QVariant(reinterpret_cast<qulonglong>(pTreeItem)));
+	//EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer()); <--- deprecated
+	//FocusState(ui->cmbStates->currentIndex(), QVariant(reinterpret_cast<qulonglong>(pTreeItem)));
 
 //    ui->toolBox->setVisible(true);
 //    ui->toolBoxLine->setVisible(true);

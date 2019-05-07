@@ -14,9 +14,8 @@
 #include <QTreeWidget>
 
 #include "Global.h"
-#include "Shared/TreeModel/ITreeModelItem.h"
 
-class ExplorerItem : public ITreeModelItem
+class ExplorerItem : public QObject
 {
 	Q_OBJECT
 
@@ -38,16 +37,16 @@ public:
 	bool IsProjectItem() const;
 	
 	QString GetName(bool bWithPrefix) const;
-	QString GetPrefix() const;				// Ends with a '/'
+	QString GetPrefix() const; // Ends with a '/'
 	QIcon GetIcon(SubIcon eSubIcon) const;
 
 	virtual void Rename(QString sNewName);
 
-	virtual QString GetToolTip() const override;
+	QString GetToolTip() const;
 };
-//Q_DECLARE_METATYPE(ExplorerItem *)
-//
-//QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs);
-//QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs);
+Q_DECLARE_METATYPE(ExplorerItem *)
+
+QDataStream &operator<<(QDataStream &out, ExplorerItem *const &rhs);
+QDataStream &operator>>(QDataStream &in, ExplorerItem *rhs);
 
 #endif // EXPLORERITEM_H

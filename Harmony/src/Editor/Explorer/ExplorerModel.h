@@ -24,21 +24,23 @@ public:
 	virtual ~ExplorerModel();
 
 	QStringList GetOpenProjectPaths();
+	QStringList GetPrefixList(Project *pProject);
 
 	Project *AddProject(const QString sNewProjectFilePath);
-
-	// If importValue doesn't equal null, then this new ProjectItem will be saved upon creation
 	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
+	bool RemoveItem(ExplorerItem *pItem);
+
+	QString AssemblePrefix(ExplorerItem *pItem) const;
 
 	void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
 
+	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
+	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
 	virtual Qt::DropActions supportedDropActions() const override;
-	virtual QVariant headerData(int iSection, Qt::Orientation orientation, int role) const override;
-	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-	//virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
 private:
+	bool InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
+	TreeModelItem *FindProjectTreeItem(Project *pProject);
 	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 };
 

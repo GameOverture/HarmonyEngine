@@ -325,7 +325,7 @@ bool HyAssets::IsShutdown()
 	{
 		ThreadStop();
 		
-		if(IsThreadFinished())
+		if(IsThreadFinished()) // TODO: This is failing and getting stuck
 			return true;
 	}
 

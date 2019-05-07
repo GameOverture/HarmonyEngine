@@ -114,7 +114,7 @@ enum SubIcon
 	SUBICON_Delete,
 	SUBICON_Settings,
 	SUBICON_Warning,
-	SUBICON_Pending,
+	SUBICON_Activated,
 
 	NUM_SUBICONS
 };

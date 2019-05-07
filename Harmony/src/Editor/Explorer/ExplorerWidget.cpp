@@ -74,27 +74,6 @@ void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
 	m_pNewItemMenuRef = pMenu;
 }
 
-void ExplorerWidget::SelectItem(ExplorerItem *pItem)
-{
-	if(pItem == nullptr)
-		return;
-
-	QItemSelectionModel *pSelectionModel = ui->treeView->selectionModel();
-	pSelectionModel->select(static_cast<ExplorerModel *>(ui->treeView->model())->GetIndex(pItem), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-}
-
-Project *ExplorerWidget::GetCurProjSelected()
-{
-	ExplorerItem *pCurSelected = GetFirstSelectedItem();
-	if(pCurSelected == nullptr)
-		return nullptr;
-
-	while(pCurSelected->GetType() != ITEM_Project)
-		pCurSelected = static_cast<ExplorerItem *>(pCurSelected->GetParent());
-
-	return static_cast<Project *>(pCurSelected);
-}
-
 ExplorerItem *ExplorerWidget::GetFirstSelectedItem()
 {
 	QList<ExplorerItem *> itemList = GetSelectedItems();
@@ -111,7 +90,10 @@ QList<ExplorerItem *> ExplorerWidget::GetSelectedItems()
 
 	QList<ExplorerItem *> retList;
 	for(int i = 0; i < selectedIndices.size(); ++i)
-		retList.push_back(static_cast<ExplorerItem *>(selectedIndices[i].internalPointer()));
+	{
+		ExplorerItem *pItem = ui->treeView->model()->data(selectedIndices[i], Qt::UserRole).value<ExplorerItem *>();
+		retList.push_back(pItem);
+	}
 
 	return retList;
 }
@@ -128,16 +110,19 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else
 	{
-		ExplorerItem *pSelectedExplorerItem = static_cast<ExplorerItem *>(index.internalPointer());
+		ExplorerItem *pSelectedExplorerItem = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
 		HyGuiItemType eSelectedItemType = pSelectedExplorerItem->GetType();
 		switch(eSelectedItemType)
 		{
-		case ITEM_Project: {
-			contextMenu.addMenu(m_pNewItemMenuRef);
+		case ITEM_Project:
+			if(Harmony::GetProject() != pSelectedExplorerItem)
+				contextMenu.addAction(FINDACTION("actionLoadProject"));
+			else
+				contextMenu.addMenu(m_pNewItemMenuRef);
 			contextMenu.addSeparator();
 			contextMenu.addAction(FINDACTION("actionCloseProject"));
 			contextMenu.addAction(FINDACTION("actionProjectSettings"));
-			break; }
+			break;
 		case ITEM_Audio:
 		case ITEM_Particles:
 		case ITEM_Font:
@@ -146,16 +131,21 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Shader:
 		case ITEM_Entity:
 		case ITEM_Prefab:
-			ui->actionOpen->setText("Open " % pSelectedExplorerItem->GetName(false));
-			ui->actionOpen->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_None));
-			contextMenu.addAction(ui->actionOpen);
+			if(Harmony::GetProject() != &pSelectedExplorerItem->GetProject())
+				contextMenu.addAction(FINDACTION("actionLoadProject"));
+			else
+			{
+				ui->actionOpen->setText("Open " % pSelectedExplorerItem->GetName(false));
+				ui->actionOpen->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_None));
+				contextMenu.addAction(ui->actionOpen);
+			}
 			contextMenu.addSeparator();
 			contextMenu.addAction(ui->actionCopyItem);
 			contextMenu.addAction(ui->actionPasteItem);
 			contextMenu.addSeparator();
 			// Fall through
 		case ITEM_Prefix:
-			if(eSelectedItemType == ITEM_Prefix)
+			if(eSelectedItemType == ITEM_Prefix && Harmony::GetProject() == &pSelectedExplorerItem->GetProject())
 			{
 				contextMenu.addMenu(m_pNewItemMenuRef);
 				contextMenu.addSeparator();
@@ -177,8 +167,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 
 void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 {
-	ExplorerItem *pItem = static_cast<ExplorerItem *>(index.internalPointer());
-	
+	ExplorerItem *pItem = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
 	switch(pItem->GetType())
 	{
 	case ITEM_Project:
@@ -204,8 +193,7 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 
 void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 {
-	ExplorerItem *pCurSelected = static_cast<ExplorerItem *>(index.internalPointer());
-	
+	ExplorerItem *pCurSelected = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
 	bool bValidItem = (pCurSelected != nullptr);
 	FINDACTION("actionProjectSettings")->setEnabled(bValidItem);
 	FINDACTION("actionCloseProject")->setEnabled(bValidItem);
@@ -243,8 +231,8 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	const QMimeData *pMimeData = pClipboard->mimeData();
 	ui->actionPasteItem->setEnabled(pMimeData && pMimeData->hasFormat(HYGUI_MIMETYPE));
 	
-	if(bValidItem)
-		Harmony::SetProject(GetCurProjSelected());
+	if(Harmony::GetProject() == nullptr && bValidItem)
+		Harmony::SetProject(&pCurSelected->GetProject());
 }
 
 void ExplorerWidget::on_actionRename_triggered()
@@ -267,8 +255,10 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 	case ITEM_Prefix:
 		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the prefix:\n" % pItem->GetName(true) % "\n\nAnd all of its contents? This action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
-			GetCurProjSelected()->DeletePrefixAndContents(pItem->GetName(true));
-			static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem);
+			pItem->GetProject().DeletePrefixAndContents(pItem->GetName(true));
+
+			if(static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem) == false)
+				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % pItem->GetName(true), LOGTYPE_Error);
 		}
 		break;
 		
@@ -283,7 +273,9 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the " % HyGlobal::ItemName(pItem->GetType(), false) % ":\n" % pItem->GetName(true) % "?\n\nThis action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
 		{
 			static_cast<ProjectItem *>(pItem)->DeleteFromProject();
-			static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem);
+
+			if(static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem) == false)
+				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % pItem->GetName(true), LOGTYPE_Error);
 		}
 		break;
 		
@@ -313,7 +305,7 @@ void ExplorerWidget::on_actionCopyItem_triggered()
 
 void ExplorerWidget::on_actionPasteItem_triggered()
 {
-	Project *pCurProj = GetCurProjSelected();
+	Project *pCurProj = &GetFirstSelectedItem()->GetProject();
 
 	QClipboard *pClipboard = QApplication::clipboard();
 	const QMimeData *pData = pClipboard->mimeData();

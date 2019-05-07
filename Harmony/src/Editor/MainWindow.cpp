@@ -76,6 +76,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionRemove);
 	ui->explorer->addAction(ui->actionRename);
 	ui->explorer->addAction(ui->actionLaunchIDE);
+	ui->explorer->addAction(ui->actionLoadProject);
 
 	ui->explorer->SetItemMenuPtr(ui->menu_New_Item);
 	
@@ -319,8 +320,6 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	Harmony::GetProject()->OpenTab(pItem);
 
-	sm_pInstance->ui->explorer->SelectItem(pItem);
-
 	// Setup the item properties docking window to be the current item
 	QString sWindowTitle = pItem->GetName(true) % " Properties";
 
@@ -412,33 +411,32 @@ void MainWindow::on_actionNewProject_triggered()
 			m_sDefaultProjectLocation = defaultProjDir.absolutePath();
 		}
 
-		ui->explorer->SelectItem(m_ExplorerModel.AddProject(pDlg->GetProjFilePath()));
-		ui->explorer->GetCurProjSelected()->GetAtlasModel().RepackAll(0);
+		m_ExplorerModel.AddProject(pDlg->GetProjFilePath());
 	}
 	delete pDlg;
 }
 
 void MainWindow::on_actionOpenProject_triggered()
 {
-	//DlgSetEngineLocation *pDlg = new DlgSetEngineLocation(this);
 	QFileDialog *pDlg = new QFileDialog();
 	pDlg->setNameFilter(tr("Harmony Project File (*.hyproj)"));
 	pDlg->setModal(true);
-    pDlg->setDirectory(m_sDefaultProjectLocation);
+	pDlg->setDirectory(m_sDefaultProjectLocation);
 
 	if(pDlg->exec() == QDialog::Accepted)
-	{
-		Project *pAddedProject = m_ExplorerModel.AddProject(pDlg->selectedFiles()[0]);
-		if(pAddedProject)
-			m_sDefaultProjectLocation = pAddedProject->GetDirPath();
-	}
+		m_ExplorerModel.AddProject(pDlg->selectedFiles()[0]);
+
 	delete pDlg;
 }
 
 void MainWindow::on_actionCloseProject_triggered()
 {
-	m_ExplorerModel.RemoveItem(ui->explorer->GetCurProjSelected());
-	Harmony::SetProject(nullptr);
+	Project *pProj = &ui->explorer->GetFirstSelectedItem()->GetProject();
+	bool bClearCurrentProject = Harmony::GetProject() == pProj;
+	m_ExplorerModel.RemoveItem(pProj);
+
+	if(bClearCurrentProject)
+		Harmony::SetProject(nullptr);
 }
 
 void MainWindow::on_actionNewPrefix_triggered()
@@ -543,13 +541,19 @@ void MainWindow::on_menu_View_aboutToShow()
 
 void MainWindow::on_actionLaunchIDE_triggered()
 {
+	if(Harmony::GetProject() == nullptr)
+	{
+		HyGuiLog("on_actionLaunchIDE_triggered invoked with no loaded project", LOGTYPE_Error);
+		return;
+	}
+
 	QStringList sFilterList;
 
 #if defined(Q_OS_WIN)
 	sFilterList << "*.sln";
 #endif
 
-	QDir srcDir(ui->explorer->GetCurProjSelected()->GetSourceAbsPath());
+	QDir srcDir(Harmony::GetProject()->GetSourceAbsPath());
 	srcDir.setNameFilters(sFilterList);
 	QFileInfoList ideFileInfoList = srcDir.entryInfoList();
 
@@ -669,10 +673,10 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionProjectSettings_triggered()
 {
-	if(ui->explorer->GetCurProjSelected() == nullptr)
+	if(Harmony::GetProject() == nullptr)
 		return;
 
-	ui->explorer->GetCurProjSelected()->ExecProjSettingsDlg();
+	Harmony::GetProject()->ExecProjSettingsDlg();
 }
 
 void MainWindow::on_actionTheme_Lappy486_triggered()
@@ -685,15 +689,34 @@ void MainWindow::on_actionTheme_Compe_triggered()
 	SelectTheme(THEME_Compe);
 }
 
+void MainWindow::on_actionLoadProject_triggered()
+{
+	ExplorerItem *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
+	if(pCurSelectedItem->GetType() != ITEM_Project)
+	{
+		HyGuiLog("on_actionLoadProject_triggered was triggered when a Project item was not selected in the Explorer", LOGTYPE_Warning);
+		return;
+	}
+	m_Harmony.SetProject(static_cast<Project *>(pCurSelectedItem));
+}
+
 void MainWindow::NewItem(HyGuiItemType eItem)
 {
 	ExplorerItem *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
+	Project *pProj = Harmony::GetProject();
+
+	if(pProj != &pCurSelectedItem->GetProject())
+	{
+		HyGuiLog("Current project does not equal the selected item's project", LOGTYPE_Error);
+		return;
+	}
+
 	QString sDefaultPrefix = pCurSelectedItem->GetType() == ITEM_Prefix ? pCurSelectedItem->GetName(true) : pCurSelectedItem->GetPrefix();
 
 	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
 	if(pDlg->exec())
 	{
-		ExplorerItem *pNewItem = m_ExplorerModel.AddItem(ui->explorer->GetCurProjSelected(),
+		ExplorerItem *pNewItem = m_ExplorerModel.AddItem(pProj,
 														 eItem,
 														 pDlg->GetPrefix(),
 														 pDlg->GetName(),

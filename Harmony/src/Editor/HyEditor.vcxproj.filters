@@ -202,9 +202,6 @@
     <ClCompile Include="Project\ProjectItem.cpp">
       <Filter>Explorer\Project</Filter>
     </ClCompile>
-    <ClCompile Include="Shared\Properties\PropertiesTreeItem.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
@@ -277,7 +274,7 @@
     <ClCompile Include="Shared\TreeModel\ITreeModel.cpp">
       <Filter>Shared\TreeModel</Filter>
     </ClCompile>
-    <ClCompile Include="Shared\TreeModel\ITreeModelItem.cpp">
+    <ClCompile Include="Shared\TreeModel\TreeModelItem.cpp">
       <Filter>Shared\TreeModel</Filter>
     </ClCompile>
   </ItemGroup>
@@ -400,7 +397,7 @@
     <ClInclude Include="Explorer\ExplorerItemMimeData.h">
       <Filter>Explorer</Filter>
     </ClInclude>
-    <ClInclude Include="Shared\TreeModel\ITreeModelItem.h">
+    <ClInclude Include="Shared\TreeModel\TreeModelItem.h">
       <Filter>Shared\TreeModel</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1179,9 +1176,6 @@
     <ClInclude Include="Project\ProjectDraw.h">
       <Filter>Explorer\Project</Filter>
     </ClInclude>
-    <ClInclude Include="Shared\Properties\PropertiesTreeItem.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
     <ClInclude Include="Shared\Properties\PropertiesUndoCmd.h">
       <Filter>Shared</Filter>
     </ClInclude>
@@ -1235,9 +1229,6 @@
     </QtMoc>
     <QtMoc Include="Shared\TreeModel\ITreeModel.h">
       <Filter>Shared\TreeModel</Filter>
-    </QtMoc>
-    <QtMoc Include="Shared\TreeModel\IModelTreeItem.h">
-      <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

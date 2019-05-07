@@ -547,16 +547,16 @@ FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :
 		AppendState<FontStateData>(QJsonObject());
 	}
 
-	m_TypeFacePropertiesModel.AppendCategory("Atlas Info", HyGlobal::ItemColor(ITEM_Prefix));
-	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", FONTPROP_Dimensions, PropertiesDef(PROPERTIESTYPE_ivec2, QVariant(QPoint(0, 0))), "The required portion size needed to fit on an atlas", true);
-	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", FONTPROP_UsedPercent, PropertiesDef(PROPERTIESTYPE_double, QVariant(0.0)), "Percentage of the maximum size dimensions used", true);
+	m_TypeFacePropertiesModel.AppendCategory("Atlas Info");
+	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", FONTPROP_Dimensions, PROPERTIESTYPE_ivec2, QPoint(0, 0), "The required portion size needed to fit on an atlas", true);
+	m_TypeFacePropertiesModel.AppendProperty("Atlas Info", FONTPROP_UsedPercent, PROPERTIESTYPE_double, 0.0, "Percentage of the maximum size dimensions used", true);
 
 	m_TypeFacePropertiesModel.AppendCategory("Uses Glyphs", HyGlobal::ItemColor(ITEM_Prefix));
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_09, PropertiesDef(PROPERTIESTYPE_bool, QVariant(b09 ? Qt::Checked : Qt::Unchecked)), "Include numerical glyphs 0-9");
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_AZ, PropertiesDef(PROPERTIESTYPE_bool, QVariant(bAZ ? Qt::Checked : Qt::Unchecked)), "Include capital letter glyphs A-Z");
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_az, PropertiesDef(PROPERTIESTYPE_bool, QVariant(baz ? Qt::Checked : Qt::Unchecked)), "Include lowercase letter glyphs a-z");
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_Symbols, PropertiesDef(PROPERTIESTYPE_bool, QVariant(bSymbols ? Qt::Checked : Qt::Unchecked)), "Include common punctuation and symbol glyphs");
-	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_AdditionalSyms, PropertiesDef(PROPERTIESTYPE_LineEdit, QVariant(sAdditional)), "Include specified glyphs");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_09, PROPERTIESTYPE_bool, QVariant(b09 ? Qt::Checked : Qt::Unchecked), "Include numerical glyphs 0-9");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_AZ, PROPERTIESTYPE_bool, QVariant(bAZ ? Qt::Checked : Qt::Unchecked), "Include capital letter glyphs A-Z");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_az, PROPERTIESTYPE_bool, QVariant(baz ? Qt::Checked : Qt::Unchecked), "Include lowercase letter glyphs a-z");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_Symbols, PROPERTIESTYPE_bool, QVariant(bSymbols ? Qt::Checked : Qt::Unchecked), "Include common punctuation and symbol glyphs");
+	m_TypeFacePropertiesModel.AppendProperty("Uses Glyphs", FONTPROP_AdditionalSyms, PROPERTIESTYPE_LineEdit, QVariant(sAdditional), "Include specified glyphs");
 }
 
 /*virtual*/ FontModel::~FontModel()
@@ -574,23 +574,23 @@ QString FontModel::GetAvailableTypefaceGlyphs() const
 
 	QVariant propValue;
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_09);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_09);
 	if(propValue.toInt() == Qt::Checked)
 		sAvailableTypefaceGlyphs += "0123456789";
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_az);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_az);
 	if(propValue.toInt() == Qt::Checked)
 		sAvailableTypefaceGlyphs += "abcdefghijklmnopqrstuvwxyz";
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_AZ);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_AZ);
 	if(propValue.toInt() == Qt::Checked)
 		sAvailableTypefaceGlyphs += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_Symbols);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_Symbols);
 	if(propValue.toInt() == Qt::Checked)
 		sAvailableTypefaceGlyphs += FONTPROP_Symbols;
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_AdditionalSyms);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_AdditionalSyms);
 	sAvailableTypefaceGlyphs += propValue.toString(); // May contain duplicates as stated in freetype-gl documentation
 
 	return sAvailableTypefaceGlyphs;
@@ -777,19 +777,19 @@ void FontModel::GeneratePreview()
 	QJsonObject availableGlyphsObj;
 	QVariant propValue;
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_09);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_09);
 	availableGlyphsObj.insert("0-9", static_cast<bool>(propValue.toInt() == Qt::Checked));
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_az);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_az);
 	availableGlyphsObj.insert("a-z", static_cast<bool>(propValue.toInt() == Qt::Checked));
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_AZ);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_AZ);
 	availableGlyphsObj.insert("A-Z", static_cast<bool>(propValue.toInt() == Qt::Checked));
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_Symbols);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_Symbols);
 	availableGlyphsObj.insert("symbols", static_cast<bool>(propValue.toInt() == Qt::Checked));
 
-	propValue = m_TypeFacePropertiesModel.GetValue(FONTPROP_AdditionalSyms);
+	propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_AdditionalSyms);
 	availableGlyphsObj.insert("additional", propValue.toString());
 
 	fontObj.insert("availableGlyphs", availableGlyphsObj);

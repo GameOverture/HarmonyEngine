@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "DlgNewItem.h"
 #include "ui_DlgNewItem.h"
+#include "ExplorerModel.h"
 
 #include <QDirIterator>
 #include <QStringBuilder>
@@ -34,14 +35,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 	ui->txtPrefix->setValidator(HyGlobal::FilePathValidator());
 	on_chkNewPrefix_stateChanged(ui->chkNewPrefix->isChecked() ? Qt::Checked : Qt::Unchecked);
 
-	m_PrefixStringList.clear();
-	QList<ITreeModelItem *> itemList = pItemProject->GetChildren(true);
-	for(int i = 0; i < itemList.size(); ++i)
-	{
-		ExplorerItem *pItem = static_cast<ExplorerItem *>(itemList[i]);
-		if(pItem->GetType() == ITEM_Prefix)
-			m_PrefixStringList.append(pItem->GetName(true));
-	}
+	m_PrefixStringList = pItemProject->GetExplorerModel().GetPrefixList(pItemProject);
 
 	qSort(m_PrefixStringList.begin(), m_PrefixStringList.end());
 	m_PrefixStringList.prepend(QString("<no prefix>"));
