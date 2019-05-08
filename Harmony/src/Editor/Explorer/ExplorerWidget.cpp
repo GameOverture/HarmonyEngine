@@ -23,7 +23,31 @@
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QClipboard>
-#include <QSortFilterProxyModel>
+
+ExplorerProxyModel::ExplorerProxyModel(QObject *pParent /*= nullptr*/) :
+	QSortFilterProxyModel(pParent)
+{ }
+
+/*virtual*/ bool ExplorerProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const /*override*/
+{
+	ExplorerItem *pLeftItem = sourceModel()->data(left, Qt::UserRole).value<ExplorerItem *>();
+	ExplorerItem *pRightItem = sourceModel()->data(right, Qt::UserRole).value<ExplorerItem *>();
+
+	if((pLeftItem == nullptr && pRightItem == nullptr) || (pLeftItem == nullptr && pRightItem != nullptr))
+		return false;
+	if(pLeftItem != nullptr && pRightItem == nullptr)
+		return true;
+
+	if(pLeftItem->GetType() == ITEM_Prefix && pRightItem->GetType() != ITEM_Prefix)
+		return true;
+	if(pLeftItem->GetType() != ITEM_Prefix && pRightItem->GetType() == ITEM_Prefix)
+		return false;
+	 
+	if(pLeftItem->GetType() != pRightItem->GetType())
+		return pLeftItem->GetType() < pRightItem->GetType();
+
+	return QString::localeAwareCompare(pLeftItem->GetName(false), pRightItem->GetName(false)) < 0;
+}
 
 ///*virtual*/ void DataExplorerLoadThread::run() /*override*/
 //{
@@ -32,8 +56,8 @@
 //    Q_EMIT LoadFinished(pNewItemProject);
 //}
 
-ExplorerWidget::ExplorerWidget(QWidget *parent) :
-	QWidget(parent),
+ExplorerWidget::ExplorerWidget(QWidget *pParent) :
+	QWidget(pParent),
 	ui(new Ui::ExplorerWidget),
 	m_pNewItemMenuRef(nullptr)
 {
@@ -44,6 +68,8 @@ ExplorerWidget::ExplorerWidget(QWidget *parent) :
 	ui->treeView->setDragEnabled(true);
 	ui->treeView->setAcceptDrops(true);
 	ui->treeView->setDropIndicatorShown(true);
+	ui->treeView->setSortingEnabled(true);
+	ui->treeView->sortByColumn(0, Qt::AscendingOrder);
 	ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	ui->actionCopyItem->setEnabled(false);
@@ -59,12 +85,11 @@ ExplorerWidget::~ExplorerWidget()
 
 void ExplorerWidget::SetModel(ExplorerModel &modelRef)
 {
-	ui->treeView->setModel(&modelRef);
-	return;
-
-
-	QSortFilterProxyModel *pProxyModel = new QSortFilterProxyModel(this);
+	ExplorerProxyModel *pProxyModel = new ExplorerProxyModel(this);
+	pProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	pProxyModel->setSourceModel(&modelRef);
+
+	//pProxyModel->setFilterRegExp(QRegExp("[^\+]"));
 
 	ui->treeView->setModel(pProxyModel);
 }

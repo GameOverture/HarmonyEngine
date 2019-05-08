@@ -17,6 +17,7 @@
 #include <QTreeWidget>
 #include <QMenu>
 #include <QThread>
+#include <QSortFilterProxyModel>
 
 #include <vector>
 using std::vector;
@@ -27,9 +28,14 @@ class ExplorerWidget;
 
 class ExplorerModel;
 class Project;
-class ExplorerTreeWidget;
 class ExplorerItem;
-class AtlasFrame;
+
+class ExplorerProxyModel : public QSortFilterProxyModel
+{
+public:
+	ExplorerProxyModel(QObject *pParent = nullptr);
+	virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+};
 
 class ExplorerWidget : public QWidget
 {
@@ -38,7 +44,7 @@ class ExplorerWidget : public QWidget
 	QMenu *					m_pNewItemMenuRef;
 
 public:
-	explicit ExplorerWidget(QWidget *parent = 0);
+	explicit ExplorerWidget(QWidget *pParent = 0);
 	~ExplorerWidget();
 
 	void SetModel(ExplorerModel &modelRef);
