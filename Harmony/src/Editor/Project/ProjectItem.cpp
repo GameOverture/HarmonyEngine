@@ -294,15 +294,15 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 			{
 				pTabBar->setTabText(i, GetName(false));
 				pTabBar->setTabIcon(i, GetIcon(SUBICON_None));
-				//ExplorerModel::dataChanged(
-				//SetTreeItemSubIcon(SUBICON_None);
 			}
 			else
 			{
 				pTabBar->setTabText(i, GetName(false) + "*");
 				pTabBar->setTabIcon(i, GetIcon(SUBICON_Dirty));
-				//SetTreeItemSubIcon(SUBICON_Dirty);
 			}
+
+			QModelIndex index = m_pProject->GetExplorerModel().FindIndex<ProjectItem *>(this, 0);
+			m_pProject->GetExplorerModel().dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
 
 			break;
 		}

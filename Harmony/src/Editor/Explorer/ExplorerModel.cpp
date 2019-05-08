@@ -13,6 +13,7 @@
 #include "Project/Project.h"
 #include "Project/ProjectItem.h"
 #include "Atlas/AtlasWidget.h"
+#include "Harmony/Harmony.h"
 
 ExplorerModel::ExplorerModel() :
 	ITreeModel(1, QStringList(), nullptr)
@@ -306,6 +307,8 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 			return QVariant(pItem->GetName(false));
 
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
+		if(pItem->GetType() == ITEM_Project && Harmony::GetProject() == pItem)
+			return QVariant(pItem->GetIcon(SUBICON_Activated));
 		if(pItem->IsProjectItem())
 		{
 			ProjectItem *pProjItem = static_cast<ProjectItem *>(pItem);
