@@ -297,6 +297,9 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 		return ITreeModel::data(indexRef, iRole);
 
 	ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+	if(pItem == nullptr)
+		return QVariant();
+
 	switch(iRole)
 	{
 	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)

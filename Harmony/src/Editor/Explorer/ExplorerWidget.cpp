@@ -89,7 +89,8 @@ void ExplorerWidget::SetModel(ExplorerModel &modelRef)
 	pProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	pProxyModel->setSourceModel(&modelRef);
 
-	//pProxyModel->setFilterRegExp(QRegExp("[^\+]"));
+	pProxyModel->setFilterRegExp(QRegExp("^[^+]*$", Qt::CaseInsensitive));
+	pProxyModel->setFilterKeyColumn(0);
 
 	ui->treeView->setModel(pProxyModel);
 }
