@@ -176,38 +176,49 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Shader:
 		case ITEM_Entity:
 		case ITEM_Prefab:
-			if(Harmony::GetProject() != &pContextExplorerItem->GetProject())
-				contextMenu.addAction(FINDACTION("actionLoadProject"));
-			else
-			{
-				if(selectedItems.count() > 1)
-				{
-					ui->actionOpen->setText("Open Selected Items");
-					ui->actionOpen->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
-				}
-				else
-				{
-					ui->actionOpen->setText("Open " % pContextExplorerItem->GetName(false));
-					ui->actionOpen->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_None));
-				}
-				contextMenu.addAction(ui->actionOpen);
-			}
-			contextMenu.addSeparator();
-			break;
 		case ITEM_Prefix:
 			if(Harmony::GetProject() != &pContextExplorerItem->GetProject())
+			{
 				contextMenu.addAction(FINDACTION("actionLoadProject"));
+				contextMenu.addSeparator();
+			}
 			else
 			{
+				if(selectedItems.count() > 0)
+				{
+					if(selectedItems.count() > 1)
+					{
+						ui->actionOpen->setText("Open Selected Items");
+						ui->actionOpen->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
+					}
+					else
+					{
+						ui->actionOpen->setText("Open " % pContextExplorerItem->GetName(false));
+						ui->actionOpen->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_None));
+					}
+					contextMenu.addAction(ui->actionOpen);
+					contextMenu.addSeparator();
+				}
+				
 				contextMenu.addMenu(m_pNewItemMenuRef);
 				contextMenu.addSeparator();
 			}
-			contextMenu.addAction(ui->actionRename);
+			
+			if(selectedItems.count() + selectedPrefixes.count() == 1)
+				contextMenu.addAction(ui->actionRename);
 			contextMenu.addAction(ui->actionCopyItem);
 			contextMenu.addAction(ui->actionPasteItem);
 			contextMenu.addSeparator();
-			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_Delete));
-			ui->actionDeleteItem->setText("Delete " % pContextExplorerItem->GetName(false));
+			if(selectedItems.count() + selectedPrefixes.count() == 1)
+			{
+				ui->actionDeleteItem->setText("Delete " % pContextExplorerItem->GetName(false));
+				ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_Delete));
+			}
+			else
+			{
+				ui->actionDeleteItem->setText("Delete Selected Items");
+				ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_Delete));
+			}
 			contextMenu.addAction(ui->actionDeleteItem);
 			break;
 

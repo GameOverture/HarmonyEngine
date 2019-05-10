@@ -72,9 +72,6 @@ private Q_SLOTS:
 	void on_actionPasteItem_triggered();
 
 	void on_actionOpen_triggered();
-
-Q_SIGNALS:
-	void LoadItemProject();
 };
 
 #endif // DATAEXPLORERWIDGET_H
