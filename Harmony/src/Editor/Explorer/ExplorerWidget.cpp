@@ -64,7 +64,7 @@ ExplorerWidget::ExplorerWidget(QWidget *pParent) :
 	ui->setupUi(this);
 	setAcceptDrops(true);
 
-	ui->treeView->setSelectionMode(QAbstractItemView::SingleSelection);//ExtendedSelection);
+	ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	ui->treeView->setDragEnabled(true);
 	ui->treeView->setAcceptDrops(true);
 	ui->treeView->setDropIndicatorShown(true);
@@ -95,6 +95,14 @@ void ExplorerWidget::SetModel(ExplorerModel &modelRef)
 	ui->treeView->setModel(pProxyModel);
 }
 
+ExplorerModel *ExplorerWidget::GetModel()
+{
+	if(ui->treeView->model() == nullptr)
+		return nullptr;
+
+	return static_cast<ExplorerModel *>(static_cast<ExplorerProxyModel *>(ui->treeView->model())->sourceModel());
+}
+
 void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
 {
 	m_pNewItemMenuRef = pMenu;
@@ -102,26 +110,35 @@ void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
 
 ExplorerItem *ExplorerWidget::GetFirstSelectedItem()
 {
-	QList<ExplorerItem *> itemList = GetSelectedItems();
-	if(itemList.empty())
+	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	GetSelectedItems(selectedItems, selectedPrefixes);
+
+	if(selectedItems.empty())
 		return nullptr;
 
-	return itemList[0];
+	return selectedItems[0];
 }
 
-QList<ExplorerItem *> ExplorerWidget::GetSelectedItems()
+void ExplorerWidget::GetSelectedItems(QList<ExplorerItem *> &selectedItemsOut, QList<ExplorerItem *> &selectedPrefixesOut)
 {
-	QItemSelectionModel *pSelectionModel = ui->treeView->selectionModel();
-	QModelIndexList selectedIndices = pSelectionModel->selectedIndexes();
+	selectedItemsOut.clear();
+	selectedPrefixesOut.clear();
 
-	QList<ExplorerItem *> retList;
+	QItemSelection selectedItems = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapSelectionToSource(ui->treeView->selectionModel()->selection());
+	QModelIndexList selectedIndices = selectedItems.indexes();
 	for(int i = 0; i < selectedIndices.size(); ++i)
-	{
-		ExplorerItem *pItem = ui->treeView->model()->data(selectedIndices[i], Qt::UserRole).value<ExplorerItem *>();
-		retList.push_back(pItem);
-	}
+		selectedItemsOut += GetModel()->GetItemsRecursively(selectedIndices[i]);
+	
+	// Poor man's unique only algorithm
+	selectedItemsOut = selectedItemsOut.toSet().toList();
 
-	return retList;
+	for(int i = 0; i < selectedItemsOut.size();)
+	{
+		if(selectedItemsOut[i]->GetType() == ITEM_Prefix)
+			selectedPrefixesOut.push_back(selectedItemsOut.takeAt(i));
+		else
+			++i;
+	}
 }
 
 void ExplorerWidget::OnContextMenu(const QPoint &pos)
@@ -136,12 +153,14 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else
 	{
-		ExplorerItem *pSelectedExplorerItem = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
-		HyGuiItemType eSelectedItemType = pSelectedExplorerItem->GetType();
-		switch(eSelectedItemType)
+		QList<ExplorerItem *> selectedItems, selectedPrefixes;
+		GetSelectedItems(selectedItems, selectedPrefixes);
+
+		ExplorerItem *pContextExplorerItem = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
+		switch(pContextExplorerItem->GetType())
 		{
 		case ITEM_Project:
-			if(Harmony::GetProject() != pSelectedExplorerItem)
+			if(Harmony::GetProject() != pContextExplorerItem)
 				contextMenu.addAction(FINDACTION("actionLoadProject"));
 			else
 				contextMenu.addMenu(m_pNewItemMenuRef);
@@ -157,28 +176,38 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Shader:
 		case ITEM_Entity:
 		case ITEM_Prefab:
-			if(Harmony::GetProject() != &pSelectedExplorerItem->GetProject())
+			if(Harmony::GetProject() != &pContextExplorerItem->GetProject())
 				contextMenu.addAction(FINDACTION("actionLoadProject"));
 			else
 			{
-				ui->actionOpen->setText("Open " % pSelectedExplorerItem->GetName(false));
-				ui->actionOpen->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_None));
+				if(selectedItems.count() > 1)
+				{
+					ui->actionOpen->setText("Open Selected Items");
+					ui->actionOpen->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
+				}
+				else
+				{
+					ui->actionOpen->setText("Open " % pContextExplorerItem->GetName(false));
+					ui->actionOpen->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_None));
+				}
 				contextMenu.addAction(ui->actionOpen);
 			}
 			contextMenu.addSeparator();
-			contextMenu.addAction(ui->actionCopyItem);
-			contextMenu.addAction(ui->actionPasteItem);
-			contextMenu.addSeparator();
-			// Fall through
+			break;
 		case ITEM_Prefix:
-			if(eSelectedItemType == ITEM_Prefix && Harmony::GetProject() == &pSelectedExplorerItem->GetProject())
+			if(Harmony::GetProject() != &pContextExplorerItem->GetProject())
+				contextMenu.addAction(FINDACTION("actionLoadProject"));
+			else
 			{
 				contextMenu.addMenu(m_pNewItemMenuRef);
 				contextMenu.addSeparator();
 			}
 			contextMenu.addAction(ui->actionRename);
-			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(eSelectedItemType, SUBICON_Delete));
-			ui->actionDeleteItem->setText("Delete " % pSelectedExplorerItem->GetName(false));
+			contextMenu.addAction(ui->actionCopyItem);
+			contextMenu.addAction(ui->actionPasteItem);
+			contextMenu.addSeparator();
+			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_Delete));
+			ui->actionDeleteItem->setText("Delete " % pContextExplorerItem->GetName(false));
 			contextMenu.addAction(ui->actionDeleteItem);
 			break;
 
@@ -283,7 +312,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		{
 			pItem->GetProject().DeletePrefixAndContents(pItem->GetName(true));
 
-			if(static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem) == false)
+			if(GetModel()->RemoveItem(pItem) == false)
 				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % pItem->GetName(true), LOGTYPE_Error);
 		}
 		break;
@@ -300,7 +329,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		{
 			static_cast<ProjectItem *>(pItem)->DeleteFromProject();
 
-			if(static_cast<ExplorerModel *>(ui->treeView->model())->RemoveItem(pItem) == false)
+			if(GetModel()->RemoveItem(pItem) == false)
 				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % pItem->GetName(true), LOGTYPE_Error);
 		}
 		break;
@@ -347,7 +376,7 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 	}
 
 	if(pData->hasFormat(HYGUI_MIMETYPE))
-		static_cast<ExplorerModel *>(ui->treeView->model())->PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
+		GetModel()->PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
 }
 
 void ExplorerWidget::on_actionOpen_triggered()

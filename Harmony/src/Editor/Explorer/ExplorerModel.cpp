@@ -58,6 +58,24 @@ QStringList ExplorerModel::GetPrefixList(Project *pProject)
 	return sReturnPrefixList;
 }
 
+QList<ExplorerItem *> ExplorerModel::GetItemsRecursively(const QModelIndex &indexRef)
+{
+	QList<ExplorerItem *> returnList;
+	
+	QStack<TreeModelItem *> treeItemStack;
+	treeItemStack.push(static_cast<TreeModelItem *>(indexRef.internalPointer()));
+	while(!treeItemStack.isEmpty())
+	{
+		TreeModelItem *pItem = treeItemStack.pop();
+		returnList.push_back(pItem->data(0).value<ExplorerItem *>());
+
+		for(int i = 0; i < pItem->childCount(); ++i)
+			treeItemStack.push(pItem->child(i));
+	}
+
+	return returnList;
+}
+
 Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 {
 	HyGuiLog("Opening project: " % sNewProjectFilePath, LOGTYPE_Info);

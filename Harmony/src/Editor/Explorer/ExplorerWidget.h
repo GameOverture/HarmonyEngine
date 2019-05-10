@@ -48,11 +48,12 @@ public:
 	~ExplorerWidget();
 
 	void SetModel(ExplorerModel &modelRef);
+	ExplorerModel *GetModel();
 
 	void SetItemMenuPtr(QMenu *pMenu);
 
 	ExplorerItem *GetFirstSelectedItem();
-	QList<ExplorerItem *>GetSelectedItems();
+	void GetSelectedItems(QList<ExplorerItem *> &selectedItemsOut, QList<ExplorerItem *> &selectedPrefixesOut);
 
 private:
 	Ui::ExplorerWidget *ui;
