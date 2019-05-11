@@ -41,16 +41,12 @@ class ExplorerWidget : public QWidget
 {
 	Q_OBJECT
 
-	QMenu *					m_pNewItemMenuRef;
-
 public:
 	explicit ExplorerWidget(QWidget *pParent = 0);
 	~ExplorerWidget();
 
 	void SetModel(ExplorerModel &modelRef);
 	ExplorerModel *GetModel();
-
-	void SetItemMenuPtr(QMenu *pMenu);
 
 	ExplorerItem *GetFirstSelectedItem();
 	void GetSelectedItems(QList<ExplorerItem *> &selectedItemsOut, QList<ExplorerItem *> &selectedPrefixesOut);

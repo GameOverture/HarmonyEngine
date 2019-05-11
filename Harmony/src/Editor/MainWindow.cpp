@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionCloseProject);
 	ui->explorer->addAction(ui->actionCopy);
 	ui->explorer->addAction(ui->actionNewProject);
+	ui->explorer->addAction(ui->actionNewPrefix);
 	ui->explorer->addAction(ui->actionNewAudio);
 	ui->explorer->addAction(ui->actionNewParticle);
 	ui->explorer->addAction(ui->actionNewFont);
@@ -77,11 +78,9 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionRename);
 	ui->explorer->addAction(ui->actionLaunchIDE);
 	ui->explorer->addAction(ui->actionLoadProject);
-
-	ui->explorer->SetItemMenuPtr(ui->menu_New_Item);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// FIRST RUN CHECK - Ensure Harmony Engine propject location has been specified
+	// FIRST RUN CHECK - Ensure Harmony Engine project location has been specified
 	HyGuiLog("Checking required initialization parameters...", LOGTYPE_Normal);
 	m_Settings.beginGroup("RequiredParams");
 	{
@@ -375,6 +374,11 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	if(pItem->IsExistencePendingSave())
 		sm_pInstance->m_ExplorerModel.RemoveItem(pItem);
+}
+
+/*static*/ QMenu *MainWindow::GetNewItemMenu()
+{
+	return sm_pInstance->ui->menu_New_Item;
 }
 
 /*virtual*/ void MainWindow::closeEvent(QCloseEvent *pEvent) /*override*/

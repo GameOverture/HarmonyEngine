@@ -71,6 +71,8 @@ public:
 	static void OpenItem(ProjectItem *pItem);
 	static void CloseItem(ProjectItem *pItem);
 
+	static QMenu *GetNewItemMenu();
+
 protected:
 	virtual void closeEvent(QCloseEvent *pEvent) override;
 

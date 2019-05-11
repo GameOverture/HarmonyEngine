@@ -22,10 +22,9 @@
 #include <QJsonArray>
 #include <QAction>
 
-SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *parent) :
-	QWidget(parent),
+SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *pParent) :
+	IWidget(itemRef, pParent),
 	ui(new Ui::SpriteWidget),
-	m_ItemRef(itemRef),
 	m_bPlayActive(false),
 	m_fElapsedTime(0.0),
 	m_bIsBounced(false)
@@ -62,12 +61,7 @@ SpriteWidget::~SpriteWidget()
 	delete ui;
 }
 
-ProjectItem &SpriteWidget::GetItem()
-{
-	return m_ItemRef;
-}
-
-void SpriteWidget::OnGiveMenuActions(QMenu *pMenu)
+/*virtual*/ void SpriteWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
 	pMenu->addAction(ui->actionAddState);
 	pMenu->addAction(ui->actionRemoveState);

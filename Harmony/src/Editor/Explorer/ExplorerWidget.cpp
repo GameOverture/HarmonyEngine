@@ -58,8 +58,7 @@ ExplorerProxyModel::ExplorerProxyModel(QObject *pParent /*= nullptr*/) :
 
 ExplorerWidget::ExplorerWidget(QWidget *pParent) :
 	QWidget(pParent),
-	ui(new Ui::ExplorerWidget),
-	m_pNewItemMenuRef(nullptr)
+	ui(new Ui::ExplorerWidget)
 {
 	ui->setupUi(this);
 	setAcceptDrops(true);
@@ -101,11 +100,6 @@ ExplorerModel *ExplorerWidget::GetModel()
 		return nullptr;
 
 	return static_cast<ExplorerModel *>(static_cast<ExplorerProxyModel *>(ui->treeView->model())->sourceModel());
-}
-
-void ExplorerWidget::SetItemMenuPtr(QMenu *pMenu)
-{
-	m_pNewItemMenuRef = pMenu;
 }
 
 ExplorerItem *ExplorerWidget::GetFirstSelectedItem()
@@ -163,7 +157,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			if(Harmony::GetProject() != pContextExplorerItem)
 				contextMenu.addAction(FINDACTION("actionLoadProject"));
 			else
-				contextMenu.addMenu(m_pNewItemMenuRef);
+				contextMenu.addMenu(MainWindow::GetNewItemMenu());
 			contextMenu.addSeparator();
 			contextMenu.addAction(FINDACTION("actionCloseProject"));
 			contextMenu.addAction(FINDACTION("actionProjectSettings"));
@@ -200,7 +194,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 					contextMenu.addSeparator();
 				}
 				
-				contextMenu.addMenu(m_pNewItemMenuRef);
+				contextMenu.addMenu(MainWindow::GetNewItemMenu());
 				contextMenu.addSeparator();
 			}
 			
@@ -263,6 +257,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	bool bValidItem = (pCurSelected != nullptr);
 	FINDACTION("actionProjectSettings")->setEnabled(bValidItem);
 	FINDACTION("actionCloseProject")->setEnabled(bValidItem);
+	FINDACTION("actionNewPrefix")->setEnabled(bValidItem);
 	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
 	FINDACTION("actionNewFont")->setEnabled(bValidItem);

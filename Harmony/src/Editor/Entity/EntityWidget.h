@@ -11,6 +11,7 @@
 #define ENTITYWIDGET_H
 
 #include "EntityModel.h"
+#include "IWidget.h"
 
 #include <QWidget>
 
@@ -18,7 +19,7 @@ namespace Ui {
 class EntityWidget;
 }
 
-class EntityWidget : public QWidget
+class EntityWidget : public IWidget
 {
 	Q_OBJECT
 
@@ -36,22 +37,19 @@ class EntityWidget : public QWidget
 		NUMSTACKED
 	};
 
-	ProjectItem &               m_ItemRef;
-
 public:
-	explicit EntityWidget(ProjectItem &itemRef, QWidget *parent = 0);
+	explicit EntityWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
 	~EntityWidget();
 
-	ProjectItem &GetItem();
 	EntityModel *GetEntityModel();
 
-	void OnGiveMenuActions(QMenu *pMenu);
+	virtual void OnGiveMenuActions(QMenu *pMenu) override;
 	EntityStateData *GetCurStateData();
 	int GetNumStates() const;
 
 	ExplorerItem *GetSelectedChild();
 
-	void FocusState(int iStateIndex, QVariant subState);
+	virtual void FocusState(int iStateIndex, QVariant subState) override;
 	void UpdateActions();
 
 private Q_SLOTS:

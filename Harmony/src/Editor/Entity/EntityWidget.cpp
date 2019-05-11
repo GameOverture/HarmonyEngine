@@ -15,10 +15,9 @@
 #include "GlobalUndoCmds.h"
 #include "DlgInputName.h"
 
-EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::EntityWidget),
-	m_ItemRef(itemRef)
+EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
+	IWidget(itemRef, pParent),
+	ui(new Ui::EntityWidget)
 {
 	ui->setupUi(this);
 
@@ -54,17 +53,12 @@ EntityWidget::~EntityWidget()
 	delete ui;
 }
 
-ProjectItem &EntityWidget::GetItem()
-{
-	return m_ItemRef;
-}
-
 EntityModel *EntityWidget::GetEntityModel()
 {
 	return static_cast<EntityModel *>(m_ItemRef.GetModel());
 }
 
-void EntityWidget::OnGiveMenuActions(QMenu *pMenu)
+/*virtual*/ void EntityWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
 //    pMenu->addAction(ui->actionAddState);
 //    pMenu->addAction(ui->actionRemoveState);
@@ -97,7 +91,7 @@ ExplorerItem *EntityWidget::GetSelectedChild()
 	return ui->childrenTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItem *>();
 }
 
-void EntityWidget::FocusState(int iStateIndex, QVariant subState)
+/*virtual*/ void EntityWidget::FocusState(int iStateIndex, QVariant subState) /*override*/
 {
 	if(iStateIndex >= 0)
 	{

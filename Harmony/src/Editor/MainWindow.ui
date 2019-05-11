@@ -609,6 +609,9 @@
    </property>
   </action>
   <action name="actionNewPrefix">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Prefix-New.png</normaloff>:/icons16x16/items/Prefix-New.png</iconset>

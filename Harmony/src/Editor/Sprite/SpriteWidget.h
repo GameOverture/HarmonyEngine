@@ -12,6 +12,7 @@
 
 #include "AtlasFrame.h"
 #include "SpriteModels.h"
+#include "IWidget.h"
 
 #include <QWidget>
 #include <QMenu>
@@ -23,24 +24,19 @@ class SpriteWidget;
 
 class AtlasWidget;
 
-class SpriteWidget : public QWidget
+class SpriteWidget : public IWidget
 {
 	Q_OBJECT
-	
-	ProjectItem &           m_ItemRef;
 
 	bool                    m_bPlayActive;
 	float                   m_fElapsedTime;
 	bool                    m_bIsBounced;
 
 public:
-	explicit SpriteWidget(ProjectItem &itemRef, QWidget *parent = 0);
+	explicit SpriteWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
 	~SpriteWidget();
 	
-	ProjectItem &GetItem();
-	
-	void OnGiveMenuActions(QMenu *pMenu);
-	void GetSaveInfo(QJsonArray &spriteStateArrayRef);
+	virtual void OnGiveMenuActions(QMenu *pMenu) override;
 	
 	bool IsPlayingAnim();
 

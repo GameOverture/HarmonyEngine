@@ -107,25 +107,7 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 	pMenu->addAction(m_pActionRedo);
 	pMenu->addSeparator();
 
-	QJsonValue saveValue;
-	switch(m_eTYPE)
-	{
-	case ITEM_Sprite:
-		static_cast<SpriteWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
-		break;
-	case ITEM_Font:
-		static_cast<FontWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
-		break;
-	case ITEM_Entity:
-		static_cast<EntityWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
-		break;
-	case ITEM_Prefab:
-		static_cast<PrefabWidget *>(m_pWidget)->OnGiveMenuActions(pMenu);
-		break;
-	default:
-		HyGuiLog("Unimplemented item GiveMenuActions(): " % QString::number(m_eTYPE), LOGTYPE_Error);
-		break;
-	}
+	m_pWidget->OnGiveMenuActions(pMenu);
 }
 
 void ProjectItem::Save()
@@ -250,25 +232,8 @@ void ProjectItem::FocusWidgetState(int iStateIndex, QVariant subState)
 	if(m_pWidget == nullptr)
 		return;
 
-	switch(m_eTYPE)
-	{
-	case ITEM_Sprite:
-		static_cast<SpriteWidget *>(m_pWidget)->FocusState(iStateIndex, subState);
-		break;
-	case ITEM_Font:
-		static_cast<FontWidget *>(m_pWidget)->FocusState(iStateIndex, subState);
-		break;
-	case ITEM_Entity:
-		static_cast<EntityWidget *>(m_pWidget)->FocusState(iStateIndex, subState);
-		break;
-	case ITEM_Prefab:
-		static_cast<PrefabWidget *>(m_pWidget)->FocusState(iStateIndex, subState);
-		break;
-	default:
-		HyGuiLog("Unimplemented ProjectItem::FocusWidgetState() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
-		break;
-	}
-
+	m_pWidget->FocusState(iStateIndex, subState);
+	
 	// This refreshes any changed values done programmatically
 	m_pWidget->repaint();
 }

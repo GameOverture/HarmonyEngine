@@ -12,6 +12,7 @@
 
 #include "ExplorerItem.h"
 #include "IDraw.h"
+#include "IWidget.h"
 
 #include <QUndoStack>
 #include <QJsonObject>
@@ -38,7 +39,7 @@ class ProjectItem : public ExplorerItem
 	QAction *				m_pActionRedo;
 
 	// Loaded when item is opened
-	QWidget *				m_pWidget;
+	IWidget *				m_pWidget;
 	IDraw *					m_pDraw;
 	
 public:
@@ -50,7 +51,7 @@ public:
 	void LoadModel();
 
 	IModel *GetModel()                              { return m_pModel; }
-	QWidget *GetWidget()                            { return m_pWidget; }
+	IWidget *GetWidget()                            { return m_pWidget; }
 	IDraw *GetDraw()                                { return m_pDraw; }
 	QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
 	

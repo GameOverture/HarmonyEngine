@@ -10,6 +10,7 @@
 #ifndef PREFABWIDGET_H
 #define PREFABWIDGET_H
 
+#include "IWidget.h"
 #include "PrefabModel.h"
 
 #include <QWidget>
@@ -18,19 +19,16 @@ namespace Ui {
 class PrefabWidget;
 }
 
-class PrefabWidget : public QWidget
+class PrefabWidget : public IWidget
 {
     Q_OBJECT
 
-	ProjectItem &           m_ItemRef;
-
 public:
-	explicit PrefabWidget(ProjectItem &itemRef, QWidget *parent = 0);
+	explicit PrefabWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
 	~PrefabWidget();
 
-	void OnGiveMenuActions(QMenu *pMenu);
-
-	void FocusState(int iStateIndex, QVariant subState);
+	virtual void OnGiveMenuActions(QMenu *pMenu) override;
+	virtual void FocusState(int iStateIndex, QVariant subState) override;
 
 private:
 	Ui::PrefabWidget *ui;

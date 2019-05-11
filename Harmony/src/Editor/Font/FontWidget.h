@@ -56,19 +56,15 @@ public:
 	virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class FontWidget : public QWidget
+class FontWidget : public IWidget
 {
 	Q_OBJECT
-
-	ProjectItem &			m_ItemRef;
 	
 public:
-	explicit FontWidget(ProjectItem &itemRef, QWidget *parent = 0);
+	explicit FontWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
 	~FontWidget();
 
-	ProjectItem &GetItem();
-
-	void OnGiveMenuActions(QMenu *pMenu);
+	virtual void OnGiveMenuActions(QMenu *pMenu) override;
 
 	void OnUpdate();
 	
@@ -76,7 +72,7 @@ public:
 
 	QComboBox *GetCmbStates();
 	
-	void FocusState(int iStateIndex, QVariant subState);
+	virtual void FocusState(int iStateIndex, QVariant subState) override;
 
 	void UpdateActions();
 

@@ -156,10 +156,9 @@ FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *p
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-FontWidget::FontWidget(ProjectItem &itemRef, QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::FontWidget),
-	m_ItemRef(itemRef)
+FontWidget::FontWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
+	IWidget(itemRef, pParent),
+	ui(new Ui::FontWidget)
 {
 	ui->setupUi(this);
 	
@@ -208,12 +207,7 @@ FontWidget::~FontWidget()
 	delete ui;
 }
 
-ProjectItem &FontWidget::GetItem()
-{
-	return m_ItemRef;
-}
-
-void FontWidget::OnGiveMenuActions(QMenu *pMenu)
+/*virtual*/ void FontWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
 	pMenu->addAction(ui->actionAddState);
 	pMenu->addAction(ui->actionRemoveState);
@@ -237,7 +231,7 @@ QComboBox *FontWidget::GetCmbStates()
 	return ui->cmbStates;
 }
 
-void FontWidget::FocusState(int iStateIndex, QVariant subState)
+/*virtual*/ void FontWidget::FocusState(int iStateIndex, QVariant subState) /*override*/
 {
 	if(iStateIndex >= 0)
 	{
