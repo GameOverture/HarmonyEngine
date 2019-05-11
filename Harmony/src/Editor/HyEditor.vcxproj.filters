@@ -277,8 +277,8 @@
     <ClCompile Include="Shared\TreeModel\TreeModelItem.cpp">
       <Filter>Shared\TreeModel</Filter>
     </ClCompile>
-    <ClCompile Include="IWidget.cpp">
-      <Filter>Generated Files</Filter>
+    <ClCompile Include="Shared\IWidget.cpp">
+      <Filter>Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -403,8 +403,8 @@
     <ClInclude Include="Shared\TreeModel\TreeModelItem.h">
       <Filter>Shared\TreeModel</Filter>
     </ClInclude>
-    <ClInclude Include="IWidget.h">
-      <Filter>Generated Files</Filter>
+    <ClInclude Include="Shared\IWidget.h">
+      <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
