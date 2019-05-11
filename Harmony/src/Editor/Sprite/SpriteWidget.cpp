@@ -30,12 +30,11 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *pParent) :
 	m_bIsBounced(false)
 {
 	ui->setupUi(this);
+
+	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
+	layout()->removeItem(ui->verticalLayout);
+	layout()->addItem(ui->verticalLayout);
 	
-	ui->btnAddState->setDefaultAction(ui->actionAddState);
-	ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
-	ui->btnRenameState->setDefaultAction(ui->actionRenameState);
-	ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
-	ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
 	ui->btnAddFrames->setDefaultAction(ui->actionImportFrames);
 	ui->btnRemoveFrame->setDefaultAction(ui->actionRemoveFrames);
 	ui->btnOrderFrameUp->setDefaultAction(ui->actionOrderFrameUpwards);
@@ -43,9 +42,6 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *pParent) :
 	ui->btnPlay->setDefaultAction(ui->actionPlay);
 	ui->btnFirstFrame->setDefaultAction(ui->actionFirstFrame);
 	ui->btnLastFrame->setDefaultAction(ui->actionLastFrame);
-	
-	ui->cmbStates->clear();
-	ui->cmbStates->setModel(m_ItemRef.GetModel());
 
 	//ui->framesView->setModel(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(0)->pFramesModel);
 	ui->framesView->setItemDelegate(new WidgetSpriteDelegate(&m_ItemRef, ui->framesView, this));
@@ -84,6 +80,48 @@ SpriteWidget::~SpriteWidget()
 	pMenu->addAction(ui->actionApplyToAll);
 }
 
+/*virtual*/ void SpriteWidget::OnUpdateActions() /*override*/
+{
+	int iCurNumFrames = static_cast<SpriteStateData *>(GetCurStateData())->GetFramesModel()->rowCount();
+	bool bFrameIsSelected = iCurNumFrames > 0 && ui->framesView->currentIndex().row() >= 0;
+
+	ui->actionAlignCenterHorizontal->setEnabled(bFrameIsSelected);
+	ui->actionAlignCenterVertical->setEnabled(bFrameIsSelected);
+	ui->actionAlignUp->setEnabled(bFrameIsSelected);
+	ui->actionAlignDown->setEnabled(bFrameIsSelected);
+	ui->actionAlignLeft->setEnabled(bFrameIsSelected);
+	ui->actionAlignRight->setEnabled(bFrameIsSelected);
+
+	ui->actionOrderFrameUpwards->setEnabled(ui->framesView->currentIndex().row() != 0 && iCurNumFrames > 1);
+	ui->actionOrderFrameDownwards->setEnabled(ui->framesView->currentIndex().row() != iCurNumFrames - 1 && iCurNumFrames > 1);
+	ui->actionRemoveFrames->setEnabled(bFrameIsSelected);
+}
+
+/*virtual*/ void SpriteWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
+{
+	// Set the model of 'iStateIndex'
+	SpriteStateData *pCurStateData = static_cast<SpriteStateData *>(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+	ui->framesView->setModel(pCurStateData->GetFramesModel());
+
+	QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
+	connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+		this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
+
+	pCurStateData->GetLoopMapper()->AddCheckBoxMapping(ui->chkLoop);
+	pCurStateData->GetReverseMapper()->AddCheckBoxMapping(ui->chkReverse);
+	pCurStateData->GetBounceMapper()->AddCheckBoxMapping(ui->chkBounce);
+
+	// iSubStateIndex represents which row to select
+	if(subState.toInt() >= 0 && ui->framesView->model()->rowCount() > 0)
+	{
+		int iRowToSelect = subState.toInt();
+		if(iRowToSelect < ui->framesView->model()->rowCount())
+			ui->framesView->selectRow(iRowToSelect);
+		else
+			ui->framesView->selectRow(0);
+	}
+}
+
 bool SpriteWidget::IsPlayingAnim()
 {
 	return m_bPlayActive;
@@ -102,63 +140,8 @@ void SpriteWidget::StopPlayingAnim()
 
 void SpriteWidget::GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut)
 {
-	iStateIndexOut = ui->cmbStates->currentIndex();
+	iStateIndexOut = GetCurStateIndex();
 	iFrameIndexOut = ui->framesView->currentIndex().row();
-}
-
-void SpriteWidget::FocusState(int iStateIndex, QVariant subState)
-{
-	if(iStateIndex >= 0)
-	{
-		ui->cmbStates->blockSignals(true);
-		ui->cmbStates->setCurrentIndex(iStateIndex);
-		ui->cmbStates->blockSignals(false);
-
-		// Set the model of 'iStateIndex'
-		SpriteStateData *pCurStateData = static_cast<SpriteStateData *>(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-		ui->framesView->setModel(pCurStateData->GetFramesModel());
-
-		QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
-		connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-				this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
-
-		pCurStateData->GetLoopMapper()->AddCheckBoxMapping(ui->chkLoop);
-		pCurStateData->GetReverseMapper()->AddCheckBoxMapping(ui->chkReverse);
-		pCurStateData->GetBounceMapper()->AddCheckBoxMapping(ui->chkBounce);
-
-		// iSubStateIndex represents which row to select
-		if(subState.toInt() >= 0 && ui->framesView->model()->rowCount() > 0)
-		{
-			int iRowToSelect = subState.toInt();
-			if(iRowToSelect < ui->framesView->model()->rowCount())
-				ui->framesView->selectRow(iRowToSelect);
-			else
-				ui->framesView->selectRow(0);
-		}
-	}
-	
-	UpdateActions();
-}
-
-void SpriteWidget::UpdateActions()
-{
-	ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
-	ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
-	ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
-	
-	int iCurNumFrames = GetCurStateData()->GetFramesModel()->rowCount();
-	bool bFrameIsSelected = iCurNumFrames > 0 && ui->framesView->currentIndex().row() >= 0;
-	
-	ui->actionAlignCenterHorizontal->setEnabled(bFrameIsSelected);
-	ui->actionAlignCenterVertical->setEnabled(bFrameIsSelected);
-	ui->actionAlignUp->setEnabled(bFrameIsSelected);
-	ui->actionAlignDown->setEnabled(bFrameIsSelected);
-	ui->actionAlignLeft->setEnabled(bFrameIsSelected);
-	ui->actionAlignRight->setEnabled(bFrameIsSelected);
-
-	ui->actionOrderFrameUpwards->setEnabled(ui->framesView->currentIndex().row() != 0 && iCurNumFrames > 1);
-	ui->actionOrderFrameDownwards->setEnabled(ui->framesView->currentIndex().row() != iCurNumFrames - 1 && iCurNumFrames > 1);
-	ui->actionRemoveFrames->setEnabled(bFrameIsSelected);
 }
 
 void SpriteWidget::ApplyTransform(QPoint &vTransformAmtRef)
@@ -167,58 +150,12 @@ void SpriteWidget::ApplyTransform(QPoint &vTransformAmtRef)
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-SpriteStateData *SpriteWidget::GetCurStateData()
-{
-	return static_cast<SpriteStateData *>(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex()));
-}
-
 void SpriteWidget::on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
 {
 	if(m_ItemRef.GetDraw())
-		static_cast<SpriteDraw *>(m_ItemRef.GetDraw())->SetFrame(ui->cmbStates->currentIndex(), ui->framesView->currentIndex().row());
+		static_cast<SpriteDraw *>(m_ItemRef.GetDraw())->SetFrame(GetCurStateIndex(), ui->framesView->currentIndex().row());
 
 	UpdateActions();
-}
-
-void SpriteWidget::on_actionAddState_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_AddState<SpriteStateData>("Add Sprite State", m_ItemRef, nullptr);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void SpriteWidget::on_actionRemoveState_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_RemoveState<SpriteStateData>("Remove Sprite State", m_ItemRef, ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void SpriteWidget::on_actionRenameState_triggered()
-{
-	DlgInputName *pDlg = new DlgInputName("Rename Sprite State", GetCurStateData()->GetName());
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		QUndoCommand *pCmd = new UndoCmd_RenameState("Rename Sprite State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
-		m_ItemRef.GetUndoStack()->push(pCmd);
-	}
-	
-	delete pDlg;
-}
-
-void SpriteWidget::on_actionOrderStateBackwards_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift Sprite State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void SpriteWidget::on_actionOrderStateForwards_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift Sprite State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void SpriteWidget::on_cmbStates_currentIndexChanged(int index)
-{
-	FocusState(index, 0);
 }
 
 void SpriteWidget::on_actionAlignLeft_triggered()
@@ -355,7 +292,7 @@ void SpriteWidget::on_actionAlignCenterHorizontal_triggered()
 
 void SpriteWidget::on_actionImportFrames_triggered()
 {
-	QUndoCommand *pCmd = new UndoCmd_AddFrames("Add Frames", m_ItemRef, ui->cmbStates->currentIndex());
+	QUndoCommand *pCmd = new UndoCmd_AddFrames("Add Frames", m_ItemRef, GetCurStateIndex());
 	GetItem().GetUndoStack()->push(pCmd);
 }
 
@@ -363,7 +300,7 @@ void SpriteWidget::on_actionRemoveFrames_triggered()
 {
 	QUndoCommand *pCmd = new UndoCmd_DeleteFrame("Remove Frame",
 															  m_ItemRef,
-															  ui->cmbStates->currentIndex(),
+															  GetCurStateIndex(),
 															  static_cast<SpriteFramesModel *>(ui->framesView->model())->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame);
 	GetItem().GetUndoStack()->push(pCmd);
 }
@@ -408,19 +345,19 @@ void SpriteWidget::on_actionLastFrame_triggered()
 
 void SpriteWidget::on_chkReverse_clicked()
 {
-	QUndoCommand *pCmd = new UndoCmd_CheckBox(ui->chkReverse->text(), GetItem(), GetCurStateData()->GetReverseMapper(), ui->cmbStates->currentIndex());
+	QUndoCommand *pCmd = new UndoCmd_CheckBox(ui->chkReverse->text(), GetItem(), static_cast<SpriteStateData *>(GetCurStateData())->GetReverseMapper(), GetCurStateIndex());
 	GetItem().GetUndoStack()->push(pCmd);
 }
 
 void SpriteWidget::on_chkLoop_clicked()
 {
-	QUndoCommand *pCmd = new UndoCmd_CheckBox(ui->chkLoop->text(), GetItem(), GetCurStateData()->GetLoopMapper(), ui->cmbStates->currentIndex());
+	QUndoCommand *pCmd = new UndoCmd_CheckBox(ui->chkLoop->text(), GetItem(), static_cast<SpriteStateData *>(GetCurStateData())->GetLoopMapper(), GetCurStateIndex());
 	GetItem().GetUndoStack()->push(pCmd);
 }
 
 void SpriteWidget::on_chkBounce_clicked()
 {
-	QUndoCommand *pCmd = new UndoCmd_CheckBox(ui->chkBounce->text(), GetItem(), GetCurStateData()->GetBounceMapper(), ui->cmbStates->currentIndex());
+	QUndoCommand *pCmd = new UndoCmd_CheckBox(ui->chkBounce->text(), GetItem(), static_cast<SpriteStateData *>(GetCurStateData())->GetBounceMapper(), GetCurStateIndex());
 	GetItem().GetUndoStack()->push(pCmd);
 }
 

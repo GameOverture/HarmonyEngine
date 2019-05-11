@@ -41,16 +41,11 @@ public:
 	explicit EntityWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
 	~EntityWidget();
 
-	EntityModel *GetEntityModel();
-
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;
-	EntityStateData *GetCurStateData();
-	int GetNumStates() const;
+	virtual void OnUpdateActions() override;
+	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
 	ExplorerItem *GetSelectedChild();
-
-	virtual void FocusState(int iStateIndex, QVariant subState) override;
-	void UpdateActions();
 
 private Q_SLOTS:
 	void on_actionAddSelectedChild_triggered();
@@ -59,12 +54,6 @@ private Q_SLOTS:
 	void on_actionInsertPhysicsBody_triggered();
 
 	void on_childrenTree_clicked(const QModelIndex &index);
-
-	void on_actionRenameState_triggered();
-	void on_actionAddState_triggered();
-	void on_actionRemoveState_triggered();
-	void on_actionOrderStateBackwards_triggered();
-	void on_actionOrderStateForwards_triggered();
 
 private:
 	Ui::EntityWidget *ui;

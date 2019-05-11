@@ -29,6 +29,10 @@ PrefabWidget::~PrefabWidget()
 {
 }
 
-/*virtual*/ void PrefabWidget::FocusState(int iStateIndex, QVariant subState) /*override*/
+/*virtual*/ void PrefabWidget::OnUpdateActions() /*override*/
+{
+}
+
+/*virtual*/ void PrefabWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
 }

@@ -28,44 +28,28 @@ class SpriteWidget : public IWidget
 {
 	Q_OBJECT
 
-	bool                    m_bPlayActive;
-	float                   m_fElapsedTime;
-	bool                    m_bIsBounced;
+	bool					m_bPlayActive;
+	float					m_fElapsedTime;
+	bool					m_bIsBounced;
 
 public:
 	explicit SpriteWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
 	~SpriteWidget();
 	
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;
-	
+	virtual void OnUpdateActions() override;
+	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
+
 	bool IsPlayingAnim();
 
 	void SetSelectedFrame(int iFrameIndex);
 	void StopPlayingAnim();
 	void GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut);
 
-	void FocusState(int iStateIndex, QVariant subState);
-	void UpdateActions();
-
 	void ApplyTransform(QPoint &vTransformAmtRef);
-
-private:
-	SpriteStateData *GetCurStateData();
 	
 private Q_SLOTS:
 	void on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);
-
-	void on_actionAddState_triggered();
-	
-	void on_actionRemoveState_triggered();
-	
-	void on_actionRenameState_triggered();
-	
-	void on_actionOrderStateBackwards_triggered();
-	
-	void on_actionOrderStateForwards_triggered();
-	
-	void on_cmbStates_currentIndexChanged(int index);
 
 	void on_actionAlignLeft_triggered();
 	

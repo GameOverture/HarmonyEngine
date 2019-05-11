@@ -59,15 +59,15 @@ void AudioWidgetState::UpdateActions()
 	ui->radInstFail->setEnabled(ui->chkLimitInst->isChecked());
 	ui->radInstQueue->setEnabled(ui->chkLimitInst->isChecked());
 	
-	QComboBox *pCmbStates = m_pOwner->GetCmbStates();
-	for(int i = 0; i < pCmbStates->count(); ++i)
-	{
-		if(pCmbStates->itemData(i).value<AudioWidgetState *>() == this)
-		{
-			pCmbStates->setCurrentIndex(i);
-			break;
-		}
-	}
+//	QComboBox *pCmbStates = m_pOwner->GetCmbStates();
+//	for(int i = 0; i < pCmbStates->count(); ++i)
+//	{
+//		if(pCmbStates->itemData(i).value<AudioWidgetState *>() == this)
+//		{
+//			pCmbStates->setCurrentIndex(i);
+//			break;
+//		}
+//	}
 }
 
 void AudioWidgetState::on_cmbCategory_currentIndexChanged(int index)

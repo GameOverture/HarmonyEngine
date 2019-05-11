@@ -45,10 +45,9 @@ class FontDelegate : public QStyledItemDelegate
 	Q_OBJECT
 
 	ProjectItem *			m_pItem;
-	QComboBox *				m_pCmbStates;
 
 public:
-	FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *pParent = 0);
+	FontDelegate(ProjectItem *pItem, QObject *pParent = nullptr);
 
 	virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 	virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;
@@ -65,32 +64,10 @@ public:
 	~FontWidget();
 
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;
-
-	void OnUpdate();
-	
-	QString GetFullItemName();
-
-	QComboBox *GetCmbStates();
-	
-	virtual void FocusState(int iStateIndex, QVariant subState) override;
-
-	void UpdateActions();
-
-	FontStateData *GetCurStateData();
-	int GetSelectedStageId();
+	virtual void OnUpdateActions() override;
+	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
 private Q_SLOTS:
-	void on_cmbStates_currentIndexChanged(int index);
-
-	void on_actionAddState_triggered();
-
-	void on_actionRemoveState_triggered();
-	
-	void on_actionRenameState_triggered();
-	
-	void on_actionOrderStateBackwards_triggered();
-	
-	void on_actionOrderStateForwards_triggered();
 	
 	void on_actionAddLayer_triggered();
 	
@@ -108,6 +85,8 @@ private Q_SLOTS:
 	
 private:
 	Ui::FontWidget *ui;
+
+	int GetSelectedStageId();
 };
 
 #endif // FONTWIDGET_H

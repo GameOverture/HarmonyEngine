@@ -21,19 +21,14 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/)
 {
 	ui->setupUi(this);
 
-	ui->btnAddState->setDefaultAction(ui->actionAddState);
-	ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
-	ui->btnRenameState->setDefaultAction(ui->actionRenameState);
-	ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
-	ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
+	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
+	layout()->removeItem(ui->verticalLayout);
+	layout()->addItem(ui->verticalLayout);
 
 	ui->btnAddChild->setDefaultAction(ui->actionAddSelectedChild);
 	ui->btnAddChildPrimitive->setDefaultAction(ui->actionAddPrimitive);
 	ui->btnInsertBoundingVolume->setDefaultAction(ui->actionInsertBoundingVolume);
 	ui->btnInsertPhysics->setDefaultAction(ui->actionInsertPhysicsBody);
-
-	ui->cmbStates->clear();
-	ui->cmbStates->setModel(m_ItemRef.GetModel());
 
 	ui->childrenTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	ui->childrenTree->setDragEnabled(true);
@@ -53,33 +48,60 @@ EntityWidget::~EntityWidget()
 	delete ui;
 }
 
-EntityModel *EntityWidget::GetEntityModel()
-{
-	return static_cast<EntityModel *>(m_ItemRef.GetModel());
-}
-
 /*virtual*/ void EntityWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
-//    pMenu->addAction(ui->actionAddState);
-//    pMenu->addAction(ui->actionRemoveState);
-//    pMenu->addAction(ui->actionRenameState);
-//    pMenu->addAction(ui->actionOrderStateBackwards);
-//    pMenu->addAction(ui->actionOrderStateForwards);
-//    pMenu->addSeparator();
-//    pMenu->addAction(ui->actionAddLayer);
-//    pMenu->addAction(ui->actionRemoveLayer);
-//    pMenu->addAction(ui->actionOrderLayerUpwards);
-//    pMenu->addAction(ui->actionOrderLayerDownwards);
+	//    pMenu->addAction(ui->actionAddState);
+	//    pMenu->addAction(ui->actionRemoveState);
+	//    pMenu->addAction(ui->actionRenameState);
+	//    pMenu->addAction(ui->actionOrderStateBackwards);
+	//    pMenu->addAction(ui->actionOrderStateForwards);
+	//    pMenu->addSeparator();
+	//    pMenu->addAction(ui->actionAddLayer);
+	//    pMenu->addAction(ui->actionRemoveLayer);
+	//    pMenu->addAction(ui->actionOrderLayerUpwards);
+	//    pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
-EntityStateData *EntityWidget::GetCurStateData()
+/*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
 {
-	return static_cast<EntityStateData *>(GetEntityModel()->GetStateData(ui->cmbStates->currentIndex()));
+	ExplorerItem *pExplorerItem = nullptr;//m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
+	ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
+
+	bool bFrameIsSelected = true;
+	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
+	ui->actionAddScissorBox->setEnabled(bFrameIsSelected);
+	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
+	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
 }
 
-int EntityWidget::GetNumStates() const
+/*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
-	return ui->cmbStates->count();
+	// Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
+	EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+	ExplorerItem *pSubStateItem = subState.value<ExplorerItem *>();
+	if(pSubStateItem == nullptr)
+	{
+		ui->lblSelectedItemIcon->setVisible(false);
+		ui->lblSelectedItemText->setVisible(false);
+
+		ui->propertyTree->setModel(nullptr);
+	}
+	else
+	{
+		ui->lblSelectedItemIcon->setVisible(true);
+		ui->lblSelectedItemIcon->setPixmap(pSubStateItem->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+		ui->lblSelectedItemText->setVisible(true);
+		ui->lblSelectedItemText->setText(pSubStateItem->GetName(false) % " Properties");
+
+		PropertiesTreeModel *pPropertiesModel = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetPropertiesModel(GetCurStateIndex(), pSubStateItem);
+		ui->propertyTree->setModel(pPropertiesModel);
+
+		// Expand the top level nodes (the properties' categories)
+		QModelIndex rootIndex = ui->propertyTree->rootIndex();
+		ui->propertyTree->expand(rootIndex);
+		for(int i = 0; i < pPropertiesModel->rowCount(); ++i)
+			ui->propertyTree->expand(pPropertiesModel->index(i, 0, rootIndex));
+	}
 }
 
 ExplorerItem *EntityWidget::GetSelectedChild()
@@ -89,61 +111,6 @@ ExplorerItem *EntityWidget::GetSelectedChild()
 		return nullptr;
 
 	return ui->childrenTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItem *>();
-}
-
-/*virtual*/ void EntityWidget::FocusState(int iStateIndex, QVariant subState) /*override*/
-{
-	if(iStateIndex >= 0)
-	{
-		ui->cmbStates->blockSignals(true);
-		ui->cmbStates->setCurrentIndex(iStateIndex);
-		ui->cmbStates->blockSignals(false);
-
-		// Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
-		EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-		ExplorerItem *pSubStateItem = subState.value<ExplorerItem *>();
-		if(pSubStateItem == nullptr)
-		{
-			ui->lblSelectedItemIcon->setVisible(false);
-			ui->lblSelectedItemText->setVisible(false);
-
-			ui->propertyTree->setModel(nullptr);
-		}
-		else
-		{
-			ui->lblSelectedItemIcon->setVisible(true);
-			ui->lblSelectedItemIcon->setPixmap(pSubStateItem->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
-			ui->lblSelectedItemText->setVisible(true);
-			ui->lblSelectedItemText->setText(pSubStateItem->GetName(false) % " Properties");
-
-			PropertiesTreeModel *pPropertiesModel = GetEntityModel()->GetPropertiesModel(ui->cmbStates->currentIndex(), pSubStateItem);
-			ui->propertyTree->setModel(pPropertiesModel);
-
-			// Expand the top level nodes (the properties' categories)
-			QModelIndex rootIndex = ui->propertyTree->rootIndex();
-			ui->propertyTree->expand(rootIndex);
-			for(int i = 0; i < pPropertiesModel->rowCount(); ++i)
-				ui->propertyTree->expand(pPropertiesModel->index(i, 0, rootIndex));
-		}
-	}
-
-	UpdateActions();
-}
-
-void EntityWidget::UpdateActions()
-{
-	ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
-	ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
-	ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
-
-	ExplorerItem *pExplorerItem = nullptr;//m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
-	ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
-
-	bool bFrameIsSelected = true;
-	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
-	ui->actionAddScissorBox->setEnabled(bFrameIsSelected);
-	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
-	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
 }
 
 void EntityWidget::on_actionAddSelectedChild_triggered()
@@ -232,42 +199,4 @@ void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
 //        HyGuiLog("Unsupported Entity childrenTree clicked", LOGTYPE_Error);
 //        break;
 //    }
-
-
-}
-
-void EntityWidget::on_actionRenameState_triggered()
-{
-	DlgInputName *pDlg = new DlgInputName("Rename Entity State", GetCurStateData()->GetName());
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		QUndoCommand *pCmd = new UndoCmd_RenameState("Rename Entity State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
-		m_ItemRef.GetUndoStack()->push(pCmd);
-	}
-
-	delete pDlg;
-}
-
-void EntityWidget::on_actionAddState_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_AddState<EntityStateData>("Add Entity State", m_ItemRef, nullptr);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionRemoveState_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_RemoveState<EntityStateData>("Remove Entity State", m_ItemRef, ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionOrderStateBackwards_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift Entity State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionOrderStateForwards_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift Entity State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
 }

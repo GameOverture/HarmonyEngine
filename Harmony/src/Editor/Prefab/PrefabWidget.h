@@ -21,14 +21,15 @@ class PrefabWidget;
 
 class PrefabWidget : public IWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit PrefabWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
 	~PrefabWidget();
 
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;
-	virtual void FocusState(int iStateIndex, QVariant subState) override;
+	virtual void OnUpdateActions() override;
+	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
 private:
 	Ui::PrefabWidget *ui;

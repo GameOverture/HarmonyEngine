@@ -28,6 +28,34 @@ QString StdVectorIntsToQString(const std::vector<int> &vectorRef)
 	return sRetValue;
 }
 
+PrefabStateData::PrefabStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
+	IStateData(iStateIndex, modelRef, stateObj["name"].toString())
+{
+}
+
+/*virtual*/ PrefabStateData::~PrefabStateData()
+{
+}
+
+void PrefabStateData::GetStateInfo(QJsonObject &stateObjOut)
+{
+}
+
+void PrefabStateData::Refresh()
+{
+}
+
+/*virtual*/ int PrefabStateData::AddFrame(AtlasFrame *pFrame) /*override*/
+{
+	return 0;
+}
+
+/*virtual*/ void PrefabStateData::RelinquishFrame(AtlasFrame *pFrame) /*override*/
+{
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 PrefabModel::PrefabModel(ProjectItem &itemRef, QJsonValue initValue) :
 	IModel(itemRef),
 	m_PropertiesModel(itemRef, 0, 0, this)

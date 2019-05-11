@@ -15,6 +15,20 @@
 
 #include <QObject>
 
+class PrefabStateData : public IStateData
+{
+public:
+	PrefabStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
+	virtual ~PrefabStateData();
+
+	void GetStateInfo(QJsonObject &stateObjOut);
+
+	void Refresh();
+
+	virtual int AddFrame(AtlasFrame *pFrame) override;
+	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class PrefabModel : public IModel
 {
 	QList<quint32>			m_ChecksumList;

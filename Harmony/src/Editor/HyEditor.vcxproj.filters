@@ -590,6 +590,9 @@
     <QtUic Include="Widget\WidgetVectorSpinBox.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="Shared\IWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\icons16x16\items\Atlas-Close.png">

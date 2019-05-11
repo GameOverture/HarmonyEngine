@@ -77,12 +77,12 @@ SOURCES += main.cpp \
     Shared/Global.cpp \
     Shared/IDraw.cpp \
     Shared/IModel.cpp \
-    Shared/Properties/PropertiesTreeItem.cpp \
+    Shared/IWidget.cpp \
     Shared/Properties/PropertiesTreeModel.cpp \
     Shared/Properties/PropertiesTreeView.cpp \
     Shared/Properties/PropertiesUndoCmd.cpp \
     Shared/TreeModel/ITreeModel.cpp \
-    Shared/TreeModel/ITreeModelItem.cpp \
+    Shared/TreeModel/TreeModelItem.cpp \
     Sprite/SpriteDraw.cpp \
     Sprite/SpriteModels.cpp \
     Sprite/SpriteTableView.cpp \
@@ -149,11 +149,11 @@ HEADERS  += \
     Shared/GlobalWidgetMappers.h \
     Shared/IDraw.h \
     Shared/IModel.h \
-    Shared/Properties/PropertiesTreeItem.h \
+    Shared/IWidget.h \
     Shared/Properties/PropertiesTreeModel.h \
     Shared/Properties/PropertiesTreeView.h \
     Shared/TreeModel/ITreeModel.h \
-    Shared/TreeModel/ITreeModelItem.h \
+    Shared/TreeModel/TreeModelItem.h \
     Sprite/SpriteDraw.h \
     Sprite/SpriteModels.h \
     Sprite/SpriteTableView.h \
@@ -165,7 +165,7 @@ HEADERS  += \
     Widget/WidgetLiveVarManager.h \
     Widget/WidgetOutputLog.h \
     Widget/WidgetRangedSlider.h \
-    Widget/WidgetVectorSpinBox.h \
+    Widget/WidgetVectorSpinBox.h
 
 FORMS    += \
     MainWindow.ui \
@@ -189,6 +189,7 @@ FORMS    += \
     Explorer/ExplorerWidget.ui \
     Font/FontWidget.ui \
     Prefab/PrefabWidget.ui \
+    Shared/IWidget.ui \
     Sprite/SpriteWidget.ui \
     Widget/WidgetColor.ui \
     Widget/WidgetGradientEditor.ui \

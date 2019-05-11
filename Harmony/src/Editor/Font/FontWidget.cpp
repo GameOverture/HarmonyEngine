@@ -45,16 +45,15 @@ FontTableView::FontTableView(QWidget *pParent /*= 0*/) :
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *pParent /*= 0*/) :
+FontDelegate::FontDelegate(ProjectItem *pItem, QObject *pParent /*= nullptr*/) :
 	QStyledItemDelegate(pParent),
-	m_pItem(pItem),
-	m_pCmbStates(pCmbStates)
+	m_pItem(pItem)
 {
 }
 
 /*virtual*/ QWidget* FontDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	QWidget *pReturnWidget = NULL;
+	QWidget *pReturnWidget = nullptr;
 
 	const FontStateLayersModel *pFontModel = static_cast<const FontStateLayersModel *>(index.model());
 
@@ -90,7 +89,7 @@ FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *p
 				botColor = pDlg->GetVgBotColor();
 			}
 			m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerColors(*m_pItem,
-				m_pCmbStates->currentIndex(),
+				m_pItem->GetWidget()->GetCurStateIndex(),
 				pFontModel->GetLayerId(index.row()),
 				pFontModel->GetLayerTopColor(index.row()),
 				pFontModel->GetLayerBotColor(index.row()),
@@ -130,18 +129,18 @@ FontDelegate::FontDelegate(ProjectItem *pItem, QComboBox *pCmbStates, QObject *p
 	{
 	case FontStateLayersModel::COLUMN_Type:
 		m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerRenderMode(*m_pItem,
-			m_pCmbStates->currentIndex(),
-			pFontModel->GetLayerId(index.row()),
-			pFontModel->GetLayerRenderMode(index.row()),
-			static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
+									  m_pItem->GetWidget()->GetCurStateIndex(),
+									  pFontModel->GetLayerId(index.row()),
+									  pFontModel->GetLayerRenderMode(index.row()),
+									  static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
 		break;
 
 	case FontStateLayersModel::COLUMN_Thickness:
 		m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerOutlineThickness(*m_pItem,
-			m_pCmbStates->currentIndex(),
-			pFontModel->GetLayerId(index.row()),
-			pFontModel->GetLayerOutlineThickness(index.row()),
-			static_cast<QDoubleSpinBox *>(pEditor)->value()));
+									  m_pItem->GetWidget()->GetCurStateIndex(),
+									  pFontModel->GetLayerId(index.row()),
+									  pFontModel->GetLayerOutlineThickness(index.row()),
+									  static_cast<QDoubleSpinBox *>(pEditor)->value()));
 		break;
 
 	case FontStateLayersModel::COLUMN_DefaultColor:
@@ -161,12 +160,10 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
 	ui(new Ui::FontWidget)
 {
 	ui->setupUi(this);
-	
-	ui->btnAddState->setDefaultAction(ui->actionAddState);
-	ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
-	ui->btnRenameState->setDefaultAction(ui->actionRenameState);
-	ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
-	ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
+
+	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
+	layout()->removeItem(ui->verticalLayout);
+	layout()->addItem(ui->verticalLayout);
 
 	ui->btnAddLayer->setDefaultAction(ui->actionAddLayer);
 	ui->btnRemoveLayer->setDefaultAction(ui->actionRemoveLayer);
@@ -174,14 +171,9 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
 	ui->btnOrderLayerDown->setDefaultAction(ui->actionOrderLayerDownwards);
 
 	ui->layersTableView->resize(ui->layersTableView->size());
-	ui->layersTableView->setItemDelegate(new FontDelegate(&m_ItemRef, ui->cmbStates, this));
+	ui->layersTableView->setItemDelegate(new FontDelegate(&m_ItemRef, this));
 	QItemSelectionModel *pSelModel = ui->layersTableView->selectionModel();
 	connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
-
-	ui->cmbStates->blockSignals(true);
-	ui->cmbStates->clear();
-	ui->cmbStates->setModel(m_ItemRef.GetModel());
-	ui->cmbStates->blockSignals(false);
 	
 	ui->cmbRenderMode->clear();
 	ui->cmbRenderMode->addItem("Normal", QVariant(static_cast<int>(RENDER_NORMAL)));
@@ -221,122 +213,37 @@ FontWidget::~FontWidget()
 	pMenu->addAction(ui->actionOrderLayerDownwards);
 }
 
-QString FontWidget::GetFullItemName()
+/*virtual*/ void FontWidget::OnUpdateActions() /*override*/
 {
-	return m_ItemRef.GetName(true);
-}
-
-QComboBox *FontWidget::GetCmbStates()
-{
-	return ui->cmbStates;
-}
-
-/*virtual*/ void FontWidget::FocusState(int iStateIndex, QVariant subState) /*override*/
-{
-	if(iStateIndex >= 0)
-	{
-		ui->cmbStates->blockSignals(true);
-		ui->cmbStates->setCurrentIndex(iStateIndex);
-		ui->cmbStates->blockSignals(false);
-
-		// Set the model of 'iStateIndex'
-		FontStateData *pCurStateData = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
-		ui->layersTableView->setModel(pCurStateData->GetFontLayersModel());
-		pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
-		pCurStateData->GetFontMapper()->AddComboBoxMapping(ui->cmbFontList);
-
-		// subState represents the ID of the row to select
-		if(subState.toInt() >= 0)
-		{
-			if(subState.toInt() >= ui->layersTableView->model()->rowCount() &&
-			   ui->layersTableView->model()->rowCount() > 0)
-			{
-				ui->layersTableView->selectRow(0);
-			}
-			else
-				ui->layersTableView->selectRow(subState.toInt());
-		}
-	}
-
-	UpdateActions();
-}
-
-void FontWidget::UpdateActions()
-{
-	ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
-	ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
-	ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
-
 	bool bFrameIsSelected = ui->layersTableView->model()->rowCount() > 0 && ui->layersTableView->currentIndex().row() >= 0;
 	ui->actionOrderLayerUpwards->setEnabled(bFrameIsSelected && ui->layersTableView->currentIndex().row() != 0);
 	ui->actionOrderLayerDownwards->setEnabled(bFrameIsSelected && ui->layersTableView->currentIndex().row() != ui->layersTableView->model()->rowCount() - 1);
 }
 
-FontStateData *FontWidget::GetCurStateData()
+/*virtual*/ void FontWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
-	return static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(ui->cmbStates->currentIndex()));
-}
+	// Set the model of 'iStateIndex'
+	FontStateData *pCurStateData = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+	ui->layersTableView->setModel(pCurStateData->GetFontLayersModel());
+	pCurStateData->GetSizeMapper()->AddSpinBoxMapping(ui->sbSize);
+	pCurStateData->GetFontMapper()->AddComboBoxMapping(ui->cmbFontList);
 
-int FontWidget::GetSelectedStageId()
-{
-	int iRowIndex = ui->layersTableView->currentIndex().row();
-
-	if(ui->layersTableView->model()->rowCount() == 0 ||
-	   iRowIndex < 0 ||
-	   iRowIndex >= ui->layersTableView->model()->rowCount())
+	// subState represents the ID of the row to select
+	if(subState.toInt() >= 0)
 	{
-		return -1;
+		if(subState.toInt() >= ui->layersTableView->model()->rowCount() && ui->layersTableView->model()->rowCount() > 0)
+			ui->layersTableView->selectRow(0);
+		else
+			ui->layersTableView->selectRow(subState.toInt());
 	}
-
-	return static_cast<FontStateLayersModel *>(ui->layersTableView->model())->GetLayerId(iRowIndex);
-}
-
-void FontWidget::on_cmbStates_currentIndexChanged(int index)
-{
-	FocusState(index, -1);
-}
-
-void FontWidget::on_actionAddState_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_AddState<FontStateData>("Add Font State", m_ItemRef);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void FontWidget::on_actionRemoveState_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_RemoveState<FontStateData>("Remove Font State", m_ItemRef, ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void FontWidget::on_actionRenameState_triggered()
-{
-	DlgInputName *pDlg = new DlgInputName("Rename Font State", GetCurStateData()->GetName());
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		QUndoCommand *pCmd = new UndoCmd_RenameState("Rename Font State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
-		m_ItemRef.GetUndoStack()->push(pCmd);
-	}
-	delete pDlg;
-}
-
-void FontWidget::on_actionOrderStateBackwards_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift Font State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void FontWidget::on_actionOrderStateForwards_triggered()
-{
-	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift Font State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
-	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void FontWidget::on_actionAddLayer_triggered()
 {
 	QUndoCommand *pCmd = new FontUndoCmd_AddLayer(m_ItemRef,
-												  ui->cmbStates->currentIndex(),
+												  GetCurStateIndex(),
 												  static_cast<ftgl::rendermode_t>(ui->cmbRenderMode->currentData().toInt()),
-												  GetCurStateData()->GetSizeMapper()->GetValue(),
+												  static_cast<FontStateData *>(GetCurStateData())->GetSizeMapper()->GetValue(),
 												  ui->sbThickness->value());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
@@ -347,14 +254,14 @@ void FontWidget::on_actionRemoveLayer_triggered()
 	if(iSelectedId == -1)
 		return;
 
-	QUndoCommand *pCmd = new FontUndoCmd_RemoveLayer(m_ItemRef, ui->cmbStates->currentIndex(), iSelectedId);
+	QUndoCommand *pCmd = new FontUndoCmd_RemoveLayer(m_ItemRef, GetCurStateIndex(), iSelectedId);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void FontWidget::on_actionOrderLayerDownwards_triggered()
 {
 	QUndoCommand *pCmd = new FontUndoCmd_LayerOrder(m_ItemRef,
-													ui->cmbStates->currentIndex(),
+													GetCurStateIndex(),
 													ui->layersTableView,
 													ui->layersTableView->currentIndex().row(),
 													ui->layersTableView->currentIndex().row() + 1);
@@ -364,7 +271,7 @@ void FontWidget::on_actionOrderLayerDownwards_triggered()
 void FontWidget::on_actionOrderLayerUpwards_triggered()
 {
 	QUndoCommand *pCmd = new FontUndoCmd_LayerOrder(m_ItemRef,
-													ui->cmbStates->currentIndex(),
+													GetCurStateIndex(),
 													ui->layersTableView,
 													ui->layersTableView->currentIndex().row(),
 													ui->layersTableView->currentIndex().row() - 1);
@@ -394,20 +301,35 @@ void FontWidget::on_cmbRenderMode_currentIndexChanged(int index)
 
 void FontWidget::on_sbSize_editingFinished()
 {
-	if(ui->sbSize->value() == GetCurStateData()->GetSizeMapper()->GetValue())
+	if(ui->sbSize->value() == static_cast<FontStateData *>(GetCurStateData())->GetSizeMapper()->GetValue())
 		return;
 	
 	QUndoCommand *pCmd = new UndoCmd_SpinBox("Font Size",
 												   m_ItemRef,
-												   GetCurStateData()->GetSizeMapper(),
-												   ui->cmbStates->currentIndex(),
+												   static_cast<FontStateData *>(GetCurStateData())->GetSizeMapper(),
+												   GetCurStateIndex(),
 												   ui->sbSize->value(),
-												   GetCurStateData()->GetSizeMapper()->GetValue());
+												   static_cast<FontStateData *>(GetCurStateData())->GetSizeMapper()->GetValue());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void FontWidget::on_cmbFontList_currentIndexChanged(int index)
 {
-	QUndoCommand *pCmd = new UndoCmd_ComboBox("Font Selection", m_ItemRef, GetCurStateData()->GetFontMapper(), ui->cmbStates->currentIndex(), GetCurStateData()->GetFontMapper()->currentIndex(), index);
+	QUndoCommand *pCmd = new UndoCmd_ComboBox("Font Selection", m_ItemRef, static_cast<FontStateData *>(GetCurStateData())->GetFontMapper(), GetCurStateIndex(), static_cast<FontStateData *>(GetCurStateData())->GetFontMapper()->currentIndex(), index);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
+
+int FontWidget::GetSelectedStageId()
+{
+	int iRowIndex = ui->layersTableView->currentIndex().row();
+
+	if(ui->layersTableView->model()->rowCount() == 0 ||
+		iRowIndex < 0 ||
+		iRowIndex >= ui->layersTableView->model()->rowCount())
+	{
+		return -1;
+	}
+
+	return static_cast<FontStateLayersModel *>(ui->layersTableView->model())->GetLayerId(iRowIndex);
+}
+

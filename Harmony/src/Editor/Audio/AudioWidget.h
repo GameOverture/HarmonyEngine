@@ -12,44 +12,29 @@
 
 #include "AudioWidgetState.h"
 #include "ProjectItem.h"
-
-#include <QWidget>
+#include "IWidget.h"
 
 namespace Ui {
 class AudioWidget;
 }
 
-class AudioWidget : public QWidget
+class AudioWidget : public IWidget
 {
 	Q_OBJECT
 	
-	ProjectItem &           m_ItemRef;
 	AudioWidgetState *      m_pCurAudioState;
 
 	QList<QAction *>        m_StateActionsList;
 	
 public:
-	explicit AudioWidget(ProjectItem &itemRef, QWidget *parent = 0);
+	explicit AudioWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/);
 	~AudioWidget();
 	
-	ProjectItem &GetItem();
-	
-	QComboBox *GetCmbStates();
-	
-	void UpdateActions();
+	virtual void OnGiveMenuActions(QMenu *pMenu) override;
+	virtual void OnUpdateActions() override;
+	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 	
 private Q_SLOTS:
-	void on_actionAddState_triggered();
-
-	void on_actionRemoveState_triggered();
-
-	void on_actionRenameState_triggered();
-
-	void on_actionOrderStateBackwards_triggered();
-
-	void on_actionOrderStateForwards_triggered();
-
-	void on_cmbStates_currentIndexChanged(int index);
 
 private:
 	Ui::AudioWidget *ui;

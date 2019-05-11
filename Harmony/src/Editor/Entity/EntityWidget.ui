@@ -13,161 +13,24 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QLabel" name="lblEntityStates">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Entity States:</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QComboBox" name="cmbStates">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QToolButton" name="btnAddState">
-       <property name="text">
-        <string>...</string>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Children:</string>
        </property>
-       <property name="arrowType">
-        <enum>Qt::NoArrow</enum>
-       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QTreeView" name="childrenTree">
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
       </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnRemoveState">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnRenameState">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnOrderStateBack">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnOrderStateForward">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_8">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <layout class="QHBoxLayout" name="ChildrenToolbar">
-       <item>
-        <widget class="QToolButton" name="btnAddChild">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="btnAddChildPrimitive">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="btnInsertBoundingVolume">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="btnInsertPhysics">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="btnAddScissor">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
      </item>
      <item>
       <widget class="QSplitter" name="splitter">
@@ -177,11 +40,6 @@
        <property name="childrenCollapsible">
         <bool>false</bool>
        </property>
-       <widget class="QTreeView" name="childrenTree">
-        <attribute name="headerVisible">
-         <bool>false</bool>
-        </attribute>
-       </widget>
        <widget class="QFrame" name="SelectedItemFrame">
         <property name="frameShape">
          <enum>QFrame::Box</enum>
@@ -284,6 +142,65 @@
         </layout>
        </widget>
       </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="ChildrenToolbar">
+       <item>
+        <widget class="QToolButton" name="btnAddChild">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="btnAddChildPrimitive">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="btnInsertBoundingVolume">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="btnInsertPhysics">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="btnAddScissor">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
