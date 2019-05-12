@@ -68,6 +68,8 @@ public:
 	virtual QVariant data(const QModelIndex &index, int role) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override = 0;
 
+	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) = 0;
+
 protected:
 	TreeModelItem *GetItem(const QModelIndex &indexRef) const;
 };

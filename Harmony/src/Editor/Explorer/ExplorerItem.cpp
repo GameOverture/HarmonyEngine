@@ -102,7 +102,19 @@ QIcon ExplorerItem::GetIcon(SubIcon eSubIcon) const
 	m_sPath = sNewName;
 	QString sNewPath = GetName(true);
 
-	m_pProject->RenamePrefix(sOldPath, sNewPath);
+	if(m_pProject)
+		m_pProject->RenamePrefix(sOldPath, sNewPath);
+}
+
+/*virtual*/ void ExplorerItem::DeleteFromProject()
+{
+	if(m_pProject)
+	{
+		if(m_eTYPE == ITEM_Prefix)
+			m_pProject->DeletePrefixAndContents(GetName(true));
+		else if(IsProjectItem())
+			m_pProject->DeleteGameData(m_eTYPE, GetName(true));
+	}
 }
 
 /*virtual*/ QString ExplorerItem::GetToolTip() const /*override*/

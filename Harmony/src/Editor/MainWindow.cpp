@@ -696,12 +696,7 @@ void MainWindow::on_actionTheme_Compe_triggered()
 void MainWindow::on_actionLoadProject_triggered()
 {
 	ExplorerItem *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
-	if(pCurSelectedItem->GetType() != ITEM_Project)
-	{
-		HyGuiLog("on_actionLoadProject_triggered was triggered when a Project item was not selected in the Explorer", LOGTYPE_Warning);
-		return;
-	}
-	m_Harmony.SetProject(static_cast<Project *>(pCurSelectedItem));
+	m_Harmony.SetProject(&pCurSelectedItem->GetProject());
 }
 
 void MainWindow::NewItem(HyGuiItemType eItem)

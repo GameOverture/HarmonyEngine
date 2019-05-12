@@ -41,6 +41,7 @@ public:
 	QIcon GetIcon(SubIcon eSubIcon) const;
 
 	virtual void Rename(QString sNewName);
+	virtual void DeleteFromProject();
 
 	QString GetToolTip() const;
 };

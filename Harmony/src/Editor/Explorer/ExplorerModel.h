@@ -39,6 +39,8 @@ public:
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
 	virtual Qt::DropActions supportedDropActions() const override;
 
+	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
+
 private:
 	bool InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
 	TreeModelItem *FindProjectTreeItem(Project *pProject);

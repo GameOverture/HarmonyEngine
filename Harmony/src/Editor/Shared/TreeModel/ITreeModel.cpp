@@ -127,7 +127,15 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 	bool bSuccess = true;
 
 	beginRemoveRows(parentRef, iPosition, iPosition + iRows - 1);
-	bSuccess = pParentItem->removeChildren(iPosition, iRows);
+
+	if(pParentItem->isRemoveValid(iPosition, iRows))
+	{
+		for(int i = 0; i < iRows; ++i)
+			OnTreeModelItemRemoved(pParentItem->child(iPosition + i));
+
+		bSuccess = pParentItem->removeChildren(iPosition, iRows);
+	}
+
 	endRemoveRows();
 
 	return bSuccess;

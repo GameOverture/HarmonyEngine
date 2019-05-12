@@ -94,7 +94,7 @@ void ExplorerWidget::SetModel(ExplorerModel &modelRef)
 	ui->treeView->setModel(pProxyModel);
 }
 
-ExplorerModel *ExplorerWidget::GetModel()
+ExplorerModel *ExplorerWidget::GetSourceModel()
 {
 	if(ui->treeView->model() == nullptr)
 		return nullptr;
@@ -104,13 +104,11 @@ ExplorerModel *ExplorerWidget::GetModel()
 
 ExplorerItem *ExplorerWidget::GetFirstSelectedItem()
 {
-	QList<ExplorerItem *> selectedItems, selectedPrefixes;
-	GetSelectedItems(selectedItems, selectedPrefixes);
-
-	if(selectedItems.empty())
+	QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
+	if(curIndex.isValid() == false)
 		return nullptr;
 
-	return selectedItems[0];
+	return GetSourceModel()->data(curIndex, Qt::UserRole).value<ExplorerItem *>();
 }
 
 void ExplorerWidget::GetSelectedItems(QList<ExplorerItem *> &selectedItemsOut, QList<ExplorerItem *> &selectedPrefixesOut)
@@ -121,7 +119,7 @@ void ExplorerWidget::GetSelectedItems(QList<ExplorerItem *> &selectedItemsOut, Q
 	QItemSelection selectedItems = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapSelectionToSource(ui->treeView->selectionModel()->selection());
 	QModelIndexList selectedIndices = selectedItems.indexes();
 	for(int i = 0; i < selectedIndices.size(); ++i)
-		selectedItemsOut += GetModel()->GetItemsRecursively(selectedIndices[i]);
+		selectedItemsOut += GetSourceModel()->GetItemsRecursively(selectedIndices[i]);
 	
 	// Poor man's unique only algorithm
 	selectedItemsOut = selectedItemsOut.toSet().toList();
@@ -299,6 +297,11 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 void ExplorerWidget::on_actionRename_triggered()
 {
 	ExplorerItem *pItem = GetFirstSelectedItem();
+	if(pItem == nullptr)
+	{
+		HyGuiLog("on_actionRename_triggered() was invoked on a nullptr ExplorerItem *", LOGTYPE_Error);
+		return;
+	}
 	
 	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pItem->GetType(), false), pItem->GetName(false));
 	if(pDlg->exec() == QDialog::Accepted)
@@ -309,39 +312,44 @@ void ExplorerWidget::on_actionRename_triggered()
 
 void ExplorerWidget::on_actionDeleteItem_triggered()
 {
-	ExplorerItem *pItem = GetFirstSelectedItem();
-	
-	switch(pItem->GetType())
+	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	GetSelectedItems(selectedItems, selectedPrefixes);
+	if(selectedItems.size() + selectedPrefixes.size() == 0)
 	{
-	case ITEM_Prefix:
-		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the prefix:\n" % pItem->GetName(true) % "\n\nAnd all of its contents? This action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
-		{
-			pItem->GetProject().DeletePrefixAndContents(pItem->GetName(true));
+		HyGuiLog("on_actionDeleteItem_triggered() was invoked on nothing selected", LOGTYPE_Error);
+		return;
+	}
 
-			if(GetModel()->RemoveItem(pItem) == false)
-				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % pItem->GetName(true), LOGTYPE_Error);
-		}
-		break;
-		
-	case ITEM_Audio:
-	case ITEM_Particles:
-	case ITEM_Font:
-	case ITEM_Spine:
-	case ITEM_Sprite:
-	case ITEM_Shader:
-	case ITEM_Entity:
-	case ITEM_Prefab:
-		if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete the " % HyGlobal::ItemName(pItem->GetType(), false) % ":\n" % pItem->GetName(true) % "?\n\nThis action cannot be undone.", QMessageBox::Yes, QMessageBox::No))
+	QString sDeleteMsg = "Do you want to delete the ";
+	if(selectedItems.size() == 1)
+		sDeleteMsg += HyGlobal::ItemName(selectedItems[0]->GetType(), false) % ":\n" % selectedItems[0]->GetName(true) % "?";
+	else if(selectedItems.size() == 0)
+	{
+		sDeleteMsg += QString("Prefix") % (selectedPrefixes.size() > 1 ? "es" : "") % ":\n";
+		for(int i = 0; i < selectedPrefixes.size(); ++i)
+			sDeleteMsg += selectedPrefixes[i]->GetName(true) % "\n";
+	}
+	else
+	{
+		sDeleteMsg += "following items:\n";
+		for(int i = 0; i < selectedItems.size(); ++i)
+			sDeleteMsg += selectedItems[i]->GetName(true) % "\n";
+	}
+	
+	sDeleteMsg +="\n\nThis action cannot be undone.";
+	if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", sDeleteMsg, QMessageBox::Yes, QMessageBox::No))
+	{
+		for(int i = 0; i < selectedItems.size(); ++i)
 		{
-			static_cast<ProjectItem *>(pItem)->DeleteFromProject();
-
-			if(GetModel()->RemoveItem(pItem) == false)
-				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % pItem->GetName(true), LOGTYPE_Error);
+			if(GetSourceModel()->RemoveItem(selectedItems[i]) == false)
+				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % selectedItems[i]->GetName(true), LOGTYPE_Error);
 		}
-		break;
-		
-	default:
-		HyGuiLog("ExplorerWidget::on_actionDeleteItem_triggered was invoked on an non-item/prefix:" % QString::number(pItem->GetType()), LOGTYPE_Error);
+
+		for(int i = 0; i < selectedPrefixes.size(); ++i)
+		{
+			if(GetSourceModel()->RemoveItem(selectedItems[i]) == false)
+				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % selectedItems[i]->GetName(true), LOGTYPE_Error);
+		}
 	}
 }
 
@@ -382,12 +390,27 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 	}
 
 	if(pData->hasFormat(HYGUI_MIMETYPE))
-		GetModel()->PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
+		GetSourceModel()->PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
 }
 
 void ExplorerWidget::on_actionOpen_triggered()
 {
-	ExplorerItem *pCurItemSelected = GetFirstSelectedItem();
-	if(pCurItemSelected->IsProjectItem())
-		MainWindow::OpenItem(static_cast<ProjectItem *>(pCurItemSelected));
+	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	GetSelectedItems(selectedItems, selectedPrefixes);
+	if(selectedItems.size() == 0)
+	{
+		HyGuiLog("on_actionOpen_triggered() was invoked on no item selected", LOGTYPE_Error);
+		return;
+	}
+
+	for(int i = 0; i < selectedItems.size(); ++i)
+	{
+		if(selectedItems[i]->IsProjectItem())
+		{
+			if(Harmony::GetProject() == &selectedItems[i]->GetProject())
+				MainWindow::OpenItem(static_cast<ProjectItem *>(selectedItems[i]));
+			else
+				HyGuiLog("Cannot open item '" % selectedItems[i]->GetName(true) % "' because it doesn't belong to the currently active project.", LOGTYPE_Normal);
+		}
+	}
 }

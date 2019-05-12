@@ -361,6 +361,12 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
+/*virtual*/ void ExplorerModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*override*/
+{
+	ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+	pItem->DeleteFromProject();
+}
+
 bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
 {
 	QModelIndex parentIndex = FindIndex<ExplorerItem *>(pParentTreeItem->data(0).value<ExplorerItem *>(), 0);

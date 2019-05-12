@@ -111,3 +111,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 {
 	return QAbstractItemModel::flags(indexRef);
 }
+
+/*virtual*/ void EntityTreeModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*override*/
+{
+}

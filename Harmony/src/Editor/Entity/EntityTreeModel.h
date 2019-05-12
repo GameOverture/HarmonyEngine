@@ -36,6 +36,8 @@ public:
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
 };
 
 #endif // ENTITYTREEMODEL_H

@@ -109,9 +109,15 @@ bool TreeModelItem::insertColumns(int iPosition, int iColumns)
 	return true;
 }
 
-bool TreeModelItem::removeChildren(int iPosition, int iCount)
+bool TreeModelItem::isRemoveValid(int iPosition, int iCount)
 {
 	if(iPosition < 0 || iPosition + iCount > m_ChildList.size())
+		return false;
+	return true;
+}
+bool TreeModelItem::removeChildren(int iPosition, int iCount)
+{
+	if(isRemoveValid(iPosition, iCount) == false)
 		return false;
 
 	for(int i = 0; i < iCount; ++i)

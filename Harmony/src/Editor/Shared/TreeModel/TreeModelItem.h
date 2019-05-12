@@ -36,7 +36,8 @@ public:
 
 	bool insertChildren(int iPosition, int iCount, int iColumns);
 	bool insertColumns(int iPosition, int iColumns);
-
+	
+	bool isRemoveValid(int iPosition, int iCount);
 	bool removeChildren(int iPosition, int iCount);
 	bool removeColumns(int iPosition, int iColumns);
 };

@@ -123,6 +123,8 @@ public:
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
 
+	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
+
 private:
 	QString ConvertValueToString(TreeModelItem *pTreeItem) const;
 };

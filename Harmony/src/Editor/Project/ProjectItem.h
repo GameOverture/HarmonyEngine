@@ -65,7 +65,7 @@ public:
 
 	void FocusWidgetState(int iStateIndex, QVariant subState);
 	
-	void DeleteFromProject();
+	virtual void DeleteFromProject() override;
 	
 private:
 	void WidgetLoad();

@@ -294,6 +294,10 @@ void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
 	return returnFlags;
 }
 
+/*virtual*/ void PropertiesTreeModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*PropertiesTreeModel*/
+{
+}
+
 QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) const
 {
 	const PropertiesDef &propDefRef = m_PropertyDefMap[pTreeItem];
