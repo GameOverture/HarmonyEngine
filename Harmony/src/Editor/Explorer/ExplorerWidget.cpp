@@ -64,17 +64,17 @@ ExplorerWidget::ExplorerWidget(QWidget *pParent) :
 	setAcceptDrops(true);
 
 	ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	ui->treeView->setDragDropMode(QAbstractItemView::DragDrop);
 	ui->treeView->setDragEnabled(true);
 	ui->treeView->setAcceptDrops(true);
 	ui->treeView->setDropIndicatorShown(true);
 	ui->treeView->setSortingEnabled(true);
 	ui->treeView->sortByColumn(0, Qt::AscendingOrder);
 	ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui->treeView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 
 	ui->actionCopyItem->setEnabled(false);
 	ui->actionPasteItem->setEnabled(false);
-
-	connect(ui->treeView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
 
 ExplorerWidget::~ExplorerWidget()
@@ -135,10 +135,11 @@ void ExplorerWidget::GetSelectedItems(QList<ExplorerItem *> &selectedItemsOut, Q
 
 void ExplorerWidget::OnContextMenu(const QPoint &pos)
 {
-	QModelIndex index = ui->treeView->indexAt(pos);
+	ExplorerItem *pContextExplorerItem = GetFirstSelectedItem();//ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
+	//QModelIndex index = ui->treeView->indexAt(pos);
 	
 	QMenu contextMenu;
-	if(index.isValid() == false)
+	if(pContextExplorerItem == nullptr)
 	{
 		contextMenu.addAction(FINDACTION("actionNewProject"));
 		contextMenu.addAction(FINDACTION("actionOpenProject"));
@@ -148,7 +149,6 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		QList<ExplorerItem *> selectedItems, selectedPrefixes;
 		GetSelectedItems(selectedItems, selectedPrefixes);
 
-		ExplorerItem *pContextExplorerItem = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
 		switch(pContextExplorerItem->GetType())
 		{
 		case ITEM_Project:
