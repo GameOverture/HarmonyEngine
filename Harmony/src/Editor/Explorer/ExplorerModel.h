@@ -37,7 +37,11 @@ public:
 
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
+	virtual Qt::DropActions supportedDragActions() const override;
 	virtual Qt::DropActions supportedDropActions() const override;
+	virtual QMimeData *mimeData(const QModelIndexList &indexes) const override;
+	virtual QStringList mimeTypes() const override;
+	virtual bool dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) override;
 
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
 

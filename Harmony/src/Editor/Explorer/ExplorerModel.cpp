@@ -353,12 +353,35 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPr
 
 /*virtual*/ Qt::ItemFlags ExplorerModel::flags(const QModelIndex& indexRef) const /*override*/
 {
-	return QAbstractItemModel::flags(indexRef);
+	ExplorerItem *pItem = GetItem(indexRef)->data(0).value<ExplorerItem *>();
+
+	if(indexRef.isValid() == false || pItem == nullptr)
+		return QAbstractItemModel::flags(indexRef);
+
+	return QAbstractItemModel::flags(indexRef) | Qt::ItemIsDropEnabled | (pItem->GetType() == ITEM_Project ? 0 : Qt::ItemIsDragEnabled);
+}
+
+/*virtual*/ Qt::DropActions ExplorerModel::supportedDragActions() const /*override*/
+{
+	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
 /*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/
 {
-	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
+	return Qt::CopyAction | Qt::MoveAction;
+}
+
+/*virtual*/ QMimeData *ExplorerModel::mimeData(const QModelIndexList &indexes) const /*override*/
+{
+
+}
+
+/*virtual*/ QStringList ExplorerModel::mimeTypes() const /*override*/
+{
+}
+
+/*virtual*/ bool ExplorerModel::dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) /*override*/
+{
 }
 
 /*virtual*/ void ExplorerModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*override*/
