@@ -234,7 +234,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Entity\EntityUndoCmds.cpp" />
     <ClCompile Include="Entity\EntityWidget.cpp" />
     <ClCompile Include="Explorer\ExplorerItem.cpp" />
-    <ClCompile Include="Explorer\ExplorerItemMimeData.cpp" />
     <ClCompile Include="Explorer\ExplorerModel.cpp" />
     <ClCompile Include="Explorer\ExplorerWidget.cpp" />
     <ClCompile Include="Font\FontDraw.cpp" />
@@ -242,6 +241,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Font\FontUndoCmds.cpp" />
     <ClCompile Include="Font\FontWidget.cpp" />
     <ClCompile Include="Primitive\PrimitiveModel.cpp" />
+    <ClCompile Include="Project\ProjectItemMimeData.cpp" />
     <ClCompile Include="Shared\Global.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -429,7 +429,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_USE_QSTRINGBUILDER;HY_PLATFORM_GUI;QT_NO_DEBUG;QT_NO_KEYWORDS;NDEBUG;QT_GUI_LIB;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NETWORK_LIB;%(PreprocessorDefinitions)</Define>
     </QtMoc>
-    <ClInclude Include="Explorer\ExplorerItemMimeData.h" />
     <QtMoc Include="Explorer\ExplorerModel.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
@@ -457,6 +456,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;..\..\include\Harmony;C:\Soft\Qt\5.12.0\msvc2017_64\include;release;\include;C:\Soft\Qt\5.12.0\msvc2017_64\mkspecs\win32-msvc;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtGui;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtANGLE;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtWidgets;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtCore;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtNetwork;%(AdditionalIncludeDirectories)</IncludePath>
     </QtMoc>
     <ClInclude Include="Primitive\PrimitiveModel.h" />
+    <ClInclude Include="Project\ProjectItemMimeData.h" />
     <ClInclude Include="Shared\Global.h" />
     <ClInclude Include="Shared\GlobalUndoCmds.h" />
     <ClInclude Include="Shared\GlobalWidgetMappers.h" />

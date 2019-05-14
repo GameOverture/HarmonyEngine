@@ -13,7 +13,7 @@
 #include "MainWindow.h"
 #include "Harmony.h"
 #include "Project.h"
-#include "ExplorerItemMimeData.h"
+#include "ProjectItemMimeData.h"
 #include "ExplorerItem.h"
 #include "ExplorerModel.h"
 #include "AtlasWidget.h"
@@ -355,42 +355,35 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 
 void ExplorerWidget::on_actionCopyItem_triggered()
 {
-	ExplorerItem *pCurItemSelected = GetFirstSelectedItem();
-	if(pCurItemSelected == nullptr || pCurItemSelected->IsProjectItem() == false)
+	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	GetSelectedItems(selectedItems, selectedPrefixes);
+
+	if(selectedItems.empty())
 	{
-		HyGuiLog("ExplorerWidget::on_actionCutItem_triggered - Unsupported item:" % (pCurItemSelected ? QString::number(pCurItemSelected->GetType()) : " nullptr"), LOGTYPE_Error);
+		HyGuiLog("ExplorerWidget::on_actionCopyItem_triggered - empty or unsupported item", LOGTYPE_Error);
 		return;
 	}
 
-	ProjectItem *pProjItem = static_cast<ProjectItem *>(pCurItemSelected);
-	ExplorerItemMimeData *pNewMimeData = new ExplorerItemMimeData(pProjItem);
+	ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(selectedItems);
 	QClipboard *pClipboard = QApplication::clipboard();
 	pClipboard->setMimeData(pNewMimeData);
-	//pClipboard->setText(pNewMimeData->data(HYGUI_MIMETYPE));
 
-	HyGuiLog("Copied " % HyGlobal::ItemName(pCurItemSelected->GetType(), false) % " item (" % pProjItem->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
+	for(int i = 0; i < selectedItems.size(); ++i)
+	{
+		if(selectedItems[i]->IsProjectItem())
+			HyGuiLog("Copied " % HyGlobal::ItemName(selectedItems[i]->GetType(), false) % " item (" % selectedItems[i]->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
+	}
+
 	ui->actionPasteItem->setEnabled(true);
 }
 
 void ExplorerWidget::on_actionPasteItem_triggered()
 {
-	Project *pCurProj = &GetFirstSelectedItem()->GetProject();
-
 	QClipboard *pClipboard = QApplication::clipboard();
-	const QMimeData *pData = pClipboard->mimeData();
+	const QMimeData *pMimeData = pClipboard->mimeData();
 
-	QString sPrefixOverride; // Leave uninitialized for no override
-	ExplorerItem *pCurSelected = GetFirstSelectedItem();
-	if(pCurSelected->GetType() != ITEM_Project)
-	{
-		if(pCurSelected->GetType() == ITEM_Prefix)
-			sPrefixOverride = pCurSelected->GetName(true);
-		else
-			sPrefixOverride = pCurSelected->GetPrefix();
-	}
-
-	if(pData->hasFormat(HYGUI_MIMETYPE))
-		GetSourceModel()->PasteItemSrc(pData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
+	if(pMimeData->hasFormat(HYGUI_MIMETYPE))
+		GetSourceModel()->PasteItemSrc(pMimeData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
 }
 
 void ExplorerWidget::on_actionOpen_triggered()

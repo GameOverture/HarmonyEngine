@@ -265,9 +265,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Primitive\PrimitiveModel.cpp" />
-    <ClCompile Include="Explorer\ExplorerItemMimeData.cpp">
-      <Filter>Explorer</Filter>
-    </ClCompile>
     <ClCompile Include="Explorer\ExplorerModel.cpp">
       <Filter>Explorer</Filter>
     </ClCompile>
@@ -279,6 +276,9 @@
     </ClCompile>
     <ClCompile Include="Shared\IWidget.cpp">
       <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="Project\ProjectItemMimeData.cpp">
+      <Filter>Explorer\Project</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -397,14 +397,11 @@
       <Filter>Widgets</Filter>
     </QtMoc>
     <ClInclude Include="Primitive\PrimitiveModel.h" />
-    <ClInclude Include="Explorer\ExplorerItemMimeData.h">
-      <Filter>Explorer</Filter>
-    </ClInclude>
     <ClInclude Include="Shared\TreeModel\TreeModelItem.h">
       <Filter>Shared\TreeModel</Filter>
     </ClInclude>
-    <ClInclude Include="Shared\IWidget.h">
-      <Filter>Shared</Filter>
+    <ClInclude Include="Project\ProjectItemMimeData.h">
+      <Filter>Explorer\Project</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1238,6 +1235,9 @@
     </QtMoc>
     <QtMoc Include="Shared\TreeModel\ITreeModel.h">
       <Filter>Shared\TreeModel</Filter>
+    </QtMoc>
+    <QtMoc Include="Shared\IWidget.h">
+      <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

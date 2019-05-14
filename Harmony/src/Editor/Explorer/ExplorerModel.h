@@ -33,7 +33,7 @@ public:
 
 	QString AssemblePrefix(ExplorerItem *pItem) const;
 
-	void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
+	void PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef);
 
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;

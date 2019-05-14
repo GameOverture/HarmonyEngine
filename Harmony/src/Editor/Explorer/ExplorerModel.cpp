@@ -181,7 +181,7 @@ QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem) const
 	return sPrefix;
 }
 
-void ExplorerModel::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
+void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 {
 	QDir metaDir(pProject->GetMetaDataAbsPath());
 	QDir metaTempDir = HyGlobal::PrepTempDir(pProject);
