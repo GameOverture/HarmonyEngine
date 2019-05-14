@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Global.h"
 #include "HarmonyWidget.h"
-#include "ExplorerItemMimeData.h"
+#include "ProjectItemMimeData.h"
 #include "EntityModel.h"
 
 #include <QDragEnterEvent>
@@ -257,8 +257,6 @@ void HarmonyWidget::OnBootCheck()
 		m_pTimer->start(10);
 
 		makeCurrent();
-
-		m_pProject->GenerateSystemItems();
 
 		sm_bHarmonyLoaded = true;
 	}

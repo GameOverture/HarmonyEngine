@@ -12,7 +12,7 @@
 #include "AtlasWidget.h"
 #include "AudioWidgetManager.h"
 #include "MainWindow.h"
-#include "ExplorerItemMimeData.h"
+#include "ProjectItemMimeData.h"
 #include "ExplorerModel.h"
 
 #include <QFile>
@@ -145,7 +145,7 @@ void Project::LoadExplorerModel()
 		WriteGameData();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	m_bSystemFontFound = false;
+	bool bSystemFontFound = false;
 
 	// Initialize the project by processing each type
 	for(auto typeIterator = m_SaveDataObj.begin(); typeIterator != m_SaveDataObj.end(); ++typeIterator)
@@ -189,7 +189,7 @@ void Project::LoadExplorerModel()
 			}
 
 			if(sName == "+HyFont")
-				m_bSystemFontFound = true;
+				bSystemFontFound = true;
 
 			m_ModelRef.AddItem(this, eType, sPrefix, sName, objsInSubDirIter.value(), false);
 #ifdef RESAVE_ENTIRE_PROJECT
@@ -201,16 +201,8 @@ void Project::LoadExplorerModel()
 #ifdef RESAVE_ENTIRE_PROJECT
 	SaveGameData();
 #endif
-}
 
-bool Project::HasError() const
-{
-	return m_bHasError;
-}
-
-void Project::GenerateSystemItems()
-{
-	if(m_bSystemFontFound == false)
+	if(bSystemFontFound == false)
 	{
 		QDir templateDataDir(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/");
 		QFile srcFile(templateDataDir.absoluteFilePath("src.json"));
@@ -227,11 +219,15 @@ void Project::GenerateSystemItems()
 			QByteArray sBefore("[HyHarmonyTemplateDataDir]");
 			QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/").toLocal8Bit());
 			sContents.replace(sBefore, sAfter);
-			MainWindow::PasteItemSrc(sContents, this, QString());
 
-			m_bSystemFontFound = true;
+			m_ModelRef.PasteItemSrc(sContents, m_ModelRef.FindIndex<ExplorerItem *>(this, 0));
 		}
 	}
+}
+
+bool Project::HasError() const
+{
+	return m_bHasError;
 }
 
 void Project::ExecProjSettingsDlg()

@@ -14,7 +14,7 @@
 
 #define HYGUI_MIMETYPE "application/x-harmony"
 
-class ProjectItem;
+class ExplorerItem;
 
 class ProjectItemMimeData : public QMimeData
 {

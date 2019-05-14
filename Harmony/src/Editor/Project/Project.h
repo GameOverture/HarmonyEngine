@@ -60,7 +60,6 @@ class Project : public ExplorerItem
 
 	QJsonObject										m_SaveDataObj;
 
-	bool											m_bSystemFontFound;
 	bool											m_bHasError;
 	
 public:
@@ -70,8 +69,6 @@ public:
 	void LoadExplorerModel();
 
 	bool HasError() const;
-
-	void GenerateSystemItems();
 	
 	void ExecProjSettingsDlg();
 

@@ -65,8 +65,6 @@ public:
 
 	static QString EngineSrcLocation();
 
-	static void PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride);
-
 	static void ApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty);
 	static void OpenItem(ProjectItem *pItem);
 	static void CloseItem(ProjectItem *pItem);

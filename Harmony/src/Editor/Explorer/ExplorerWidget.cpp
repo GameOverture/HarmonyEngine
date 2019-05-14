@@ -383,7 +383,11 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 	const QMimeData *pMimeData = pClipboard->mimeData();
 
 	if(pMimeData->hasFormat(HYGUI_MIMETYPE))
-		GetSourceModel()->PasteItemSrc(pMimeData->data(HYGUI_MIMETYPE), pCurProj, sPrefixOverride);
+	{
+		QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
+		if(curIndex.isValid())
+			GetSourceModel()->PasteItemSrc(pMimeData->data(HYGUI_MIMETYPE), curIndex);
+	}
 }
 
 void ExplorerWidget::on_actionOpen_triggered()

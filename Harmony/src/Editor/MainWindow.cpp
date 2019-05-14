@@ -301,11 +301,6 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	return sm_pInstance->m_sEnginePath;
 }
 
-/*static*/ void MainWindow::PasteItemSrc(QByteArray sSrc, Project *pProject, QString sPrefixOverride)
-{
-	sm_pInstance->m_ExplorerModel.PasteItemSrc(sSrc, pProject, sPrefixOverride);
-}
-
 /*static*/ void MainWindow::ApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty)
 {
 	sm_pInstance->ui->actionSave->setEnabled(bCurItemDirty);
