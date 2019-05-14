@@ -226,10 +226,13 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			QString sItemPath = pasteObj["itemName"].toString();
 			QModelIndex sourceParentIndex = FindIndexByItemPath(sItemPath);
 
-			beginMoveRows();
+			// TODO: move item to new prefix within project
+			beginMoveRows(sourceParentIndex, );
 			endMoveRows();
-			return;
+			continue;
 		}
+
+		// TODO: import this item
 
 		// Determine the pasted item type
 		HyGuiItemType ePasteItemType = ITEM_Unknown;
