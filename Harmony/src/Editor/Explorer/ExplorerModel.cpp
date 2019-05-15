@@ -184,167 +184,182 @@ QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem) const
 
 void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 {
-	TreeModelItem *pTreeItem = GetItem(indexRef);
-	if(pTreeItem == m_pRootItem)
+	// Error check destination index 'indexRef'
+	TreeModelItem *pDestTreeItem = GetItem(indexRef);
+	if(pDestTreeItem == m_pRootItem)
 	{
 		HyGuiLog("ExplorerModel::PasteItemSrc tried to paste into the root item", LOGTYPE_Error);
 		return;
 	}
-
-	ExplorerItem *pPasteDestinationItem = pTreeItem->data(0).value<ExplorerItem *>();
-	if(pPasteDestinationItem == nullptr)
+	ExplorerItem *pDestItem = pDestTreeItem->data(0).value<ExplorerItem *>();
+	if(pDestItem == nullptr)
 	{
 		HyGuiLog("ExplorerModel::PasteItemSrc failed to get the ExplorerItem that is being pasted into", LOGTYPE_Error);
 		return;
 	}
 
-	if(pPasteDestinationItem->GetType() != ITEM_Prefix && pPasteDestinationItem->GetType() != ITEM_Project)
+	// If the destination isn't a prefix or a project, go up one parent and it should be.
+	if(pDestItem->GetType() != ITEM_Prefix && pDestItem->GetType() != ITEM_Project)
 	{
-		pTreeItem = pTreeItem->parent();
-		pPasteDestinationItem = pTreeItem->data(0).value<ExplorerItem *>();
-		if(pPasteDestinationItem == nullptr || (pPasteDestinationItem->GetType() != ITEM_Prefix && pPasteDestinationItem->GetType() != ITEM_Project))
+		pDestTreeItem = pDestTreeItem->parent();
+		pDestItem = pDestTreeItem->data(0).value<ExplorerItem *>();
+		if(pDestItem == nullptr || (pDestItem->GetType() != ITEM_Prefix && pDestItem->GetType() != ITEM_Project))
 		{
 			HyGuiLog("ExplorerModel::PasteItemSrc failed to get the ExplorerItem that is being pasted into", LOGTYPE_Error);
 			return;
 		}
 	}
 
-	Project *pProject = &pPasteDestinationItem->GetProject();
+	// Destination is known, get project information
+	Project *pDestProject = &pDestItem->GetProject();
+	QDir metaDir(pDestProject->GetMetaDataAbsPath());
+	QDir metaTempDir = HyGlobal::PrepTempDir(pDestProject);
 
-	QDir metaDir(pProject->GetMetaDataAbsPath());
-	QDir metaTempDir = HyGlobal::PrepTempDir(pProject);
-
+	// Parse 'sSrc' for paste information
 	QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
-	
 	QJsonArray pasteArray = pasteDoc.array();
 	for(int iPasteIndex = 0; iPasteIndex < pasteArray.size(); ++iPasteIndex)
 	{
 		QJsonObject pasteObj = pasteArray[iPasteIndex].toObject();
 
-		if(pasteObj["project"].toString().toLower() == pProject->GetAbsPath().toLower())
+		// If paste item is already in the destination project, move it to new location
+		if(pasteObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
 		{
 			QString sItemPath = pasteObj["itemName"].toString();
-			QModelIndex sourceParentIndex = FindIndexByItemPath(sItemPath);
+			QModelIndex sourceIndex = FindIndexByItemPath(pDestProject, sItemPath);
+			TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
+			ExplorerItem *pSourceItem = pSourceTreeItem->data(0).value<ExplorerItem *>();
 
-			// TODO: move item to new prefix within project
-			beginMoveRows(sourceParentIndex, );
+			// Move paste item to new prefix location within project
+			beginMoveRows(sourceIndex.parent(), pSourceTreeItem->childNumber(), pSourceTreeItem->childNumber(), FindIndex<ExplorerItem *>(pDestItem, 0), 0);
+			
+			pSourceTreeItem->parent()->removeChildren(pSourceTreeItem->childNumber(), 1);
+			pDestTreeItem->insertChildren(0, 1, pDestTreeItem->columnCount());
+			
+			QVariant v;
+			v.setValue<ExplorerItem *>(pSourceItem);
+			pDestTreeItem->child(0)->setData(0, v);
+
+			pSourceItem->Rename(pDestItem->GetName(true) % "/" % pSourceItem->GetName(false));
+
 			endMoveRows();
+
 			continue;
 		}
 
-		// TODO: import this item
+		// TODO: Paste item's assets needs to be imported
 
-		// Determine the pasted item type
-		HyGuiItemType ePasteItemType = ITEM_Unknown;
-		QString sItemType = pasteObj["itemType"].toString();
-		QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
-		for(int i = 0; i < typeList.size(); ++i)
-		{
-			if(sItemType == HyGlobal::ItemName(typeList[i], false))
-			{
-				ePasteItemType = typeList[i];
-				break;
-			}
-		}
+		//// Determine the pasted item type
+		//HyGuiItemType ePasteItemType = ITEM_Unknown;
+		//QString sItemType = pasteObj["itemType"].toString();
+		//QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+		//for(int i = 0; i < typeList.size(); ++i)
+		//{
+		//	if(sItemType == HyGlobal::ItemName(typeList[i], false))
+		//	{
+		//		ePasteItemType = typeList[i];
+		//		break;
+		//	}
+		//}
 
-		// Import any missing fonts (.ttf)
-		if(ePasteItemType == ITEM_Font)
-		{
-			QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_Font, true));
-			QDir fontMetaDir(sFontMetaDir);
-			fontMetaDir.mkdir(".");
+		//// Import any missing fonts (.ttf)
+		//if(ePasteItemType == ITEM_Font)
+		//{
+		//	QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_Font, true));
+		//	QDir fontMetaDir(sFontMetaDir);
+		//	fontMetaDir.mkdir(".");
 
-			QJsonArray fontArray = pasteObj["fonts"].toArray();
-			for(int i = 0; i < fontArray.size(); ++i)
-			{
-				QFileInfo pasteFontFileInfo(fontArray[i].toString());
+		//	QJsonArray fontArray = pasteObj["fonts"].toArray();
+		//	for(int i = 0; i < fontArray.size(); ++i)
+		//	{
+		//		QFileInfo pasteFontFileInfo(fontArray[i].toString());
 
-				QString sAbsFilePath = pasteFontFileInfo.absoluteFilePath();
-				if(QFile::copy(sAbsFilePath, sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
-					HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
-			}
-		}
+		//		QString sAbsFilePath = pasteFontFileInfo.absoluteFilePath();
+		//		if(QFile::copy(sAbsFilePath, sFontMetaDir % "/" % pasteFontFileInfo.fileName()))
+		//			HyGuiLog("Paste Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+		//	}
+		//}
 
-		// Copy images to meta-temp dir first
-		QJsonArray imageArray = pasteObj["images"].toArray();
-		for(int i = 0; i < imageArray.size(); ++i)
-		{
-			QJsonObject imageObj = imageArray[i].toObject();
+		//// Copy images to meta-temp dir first
+		//QJsonArray imageArray = pasteObj["images"].toArray();
+		//for(int i = 0; i < imageArray.size(); ++i)
+		//{
+		//	QJsonObject imageObj = imageArray[i].toObject();
 
-			if(pProject->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
-			{
-				QFileInfo pasteImageFileInfo(imageObj["uri"].toString());
-				QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
-			}
-		}
-		// Get string list of the copied images paths
-		QStringList importImageList;
-		QFileInfoList importFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-		for(int i = 0; i < importFileInfoList.size(); ++i)
-			importImageList.append(importFileInfoList[i].absoluteFilePath());
+		//	if(pDestProject->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
+		//	{
+		//		QFileInfo pasteImageFileInfo(imageObj["uri"].toString());
+		//		QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
+		//	}
+		//}
+		//// Get string list of the copied images paths
+		//QStringList importImageList;
+		//QFileInfoList importFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+		//for(int i = 0; i < importFileInfoList.size(); ++i)
+		//	importImageList.append(importFileInfoList[i].absoluteFilePath());
 
-		// Import images into the selected atlas group, or default one
-		quint32 uiAtlasGrpId = pProject->GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
-		if(pProject->GetAtlasWidget())
-			uiAtlasGrpId = pProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
+		//// Import images into the selected atlas group, or default one
+		//quint32 uiAtlasGrpId = pDestProject->GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
+		//if(pDestProject->GetAtlasWidget())
+		//	uiAtlasGrpId = pDestProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
 
-		// TODO: Create filters that match the source of the pasted images
-		QList<AtlasTreeItem *> correspondingParentList;
-		for(int i = 0; i < importImageList.size(); ++i)
-			correspondingParentList.push_back(nullptr);
+		//// TODO: Create filters that match the source of the pasted images
+		//QList<AtlasTreeItem *> correspondingParentList;
+		//for(int i = 0; i < importImageList.size(); ++i)
+		//	correspondingParentList.push_back(nullptr);
 
 
-		// Repack this atlas group with imported images
-		HyGuiItemType eType;
-		switch(ePasteItemType)
-		{
-		case ITEM_Prefab: eType = ITEM_Prefab; break;
-		case ITEM_Font: eType = ITEM_Font; break;
-		default:
-			eType = ITEM_AtlasImage;
-			break;
-		}
+		//// Repack this atlas group with imported images
+		//HyGuiItemType eType;
+		//switch(ePasteItemType)
+		//{
+		//case ITEM_Prefab: eType = ITEM_Prefab; break;
+		//case ITEM_Font: eType = ITEM_Font; break;
+		//default:
+		//	eType = ITEM_AtlasImage;
+		//	break;
+		//}
 
-		QSet<AtlasFrame *> importedFramesSet = pProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, eType, correspondingParentList);
-		//if(importedFramesSet.empty() == false)
-		//	pProject->GetAtlasModel().Repack(pProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedFramesSet);
+		//QSet<AtlasFrame *> importedFramesSet = pDestProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, eType, correspondingParentList);
+		////if(importedFramesSet.empty() == false)
+		////	pProject->GetAtlasModel().Repack(pProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedFramesSet);
 
-		// Replace any image "id" with the newly imported frames' ids
-		if(pasteObj["src"].isArray())
-		{
-			QJsonArray srcArray = pasteObj["src"].toArray();
-			if(srcArray.empty() == false && srcArray[0].isObject() == false)
-				HyGuiLog("DataExplorerWidget::PasteItemSrc - src array isn't of QJsonObjects", LOGTYPE_Error);
+		//// Replace any image "id" with the newly imported frames' ids
+		//if(pasteObj["src"].isArray())
+		//{
+		//	QJsonArray srcArray = pasteObj["src"].toArray();
+		//	if(srcArray.empty() == false && srcArray[0].isObject() == false)
+		//		HyGuiLog("DataExplorerWidget::PasteItemSrc - src array isn't of QJsonObjects", LOGTYPE_Error);
 
-			// Copy everything into newSrcArray, while replacing "id" with proper value
-			QJsonArray newSrcArray;
-			for(int i = 0; i < srcArray.size(); ++i)
-			{
-				QJsonObject srcArrayObj = srcArray[i].toObject();
+		//	// Copy everything into newSrcArray, while replacing "id" with proper value
+		//	QJsonArray newSrcArray;
+		//	for(int i = 0; i < srcArray.size(); ++i)
+		//	{
+		//		QJsonObject srcArrayObj = srcArray[i].toObject();
 
-				srcArrayObj = ReplaceIdWithProperValue(srcArrayObj, importedFramesSet);
-				newSrcArray.append(srcArrayObj);
-			}
+		//		srcArrayObj = ReplaceIdWithProperValue(srcArrayObj, importedFramesSet);
+		//		newSrcArray.append(srcArrayObj);
+		//	}
 
-			pasteObj["src"] = newSrcArray;
-		}
-		else if(pasteObj["src"].isObject())
-		{
-			QJsonObject srcObj = pasteObj["src"].toObject();
-			srcObj = ReplaceIdWithProperValue(srcObj, importedFramesSet);
+		//	pasteObj["src"] = newSrcArray;
+		//}
+		//else if(pasteObj["src"].isObject())
+		//{
+		//	QJsonObject srcObj = pasteObj["src"].toObject();
+		//	srcObj = ReplaceIdWithProperValue(srcObj, importedFramesSet);
 
-			pasteObj["src"] = srcObj;
-		}
-		else
-			HyGuiLog("DataExplorerWidget::PasteItemSrc - src isn't an object or array", LOGTYPE_Error);
+		//	pasteObj["src"] = srcObj;
+		//}
+		//else
+		//	HyGuiLog("DataExplorerWidget::PasteItemSrc - src isn't an object or array", LOGTYPE_Error);
 
-		// Create a new project item representing the pasted item and save it
-		QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
-		QString sPrefix = sPrefixOverride.isEmpty() ? itemNameFileInfo.path() : sPrefixOverride;
-		QString sName = itemNameFileInfo.baseName();
+		//// Create a new project item representing the pasted item and save it
+		//QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
+		//QString sPrefix = sPrefixOverride.isEmpty() ? itemNameFileInfo.path() : sPrefixOverride;
+		//QString sName = itemNameFileInfo.baseName();
 	
-		ProjectItem *pImportedProjItem = static_cast<ProjectItem *>(AddItem(pProject, ePasteItemType, sPrefix, sName, pasteObj["src"], false));
-		pImportedProjItem->Save();
+		//ProjectItem *pImportedProjItem = static_cast<ProjectItem *>(AddItem(pDestProject, ePasteItemType, sPrefix, sName, pasteObj["src"], false));
+		//pImportedProjItem->Save();
 	}
 }
 
@@ -435,6 +450,11 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 	return QStringList() << HYGUI_MIMETYPE;
 }
 
+/*virtual*/ bool ExplorerModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
+{
+	return QAbstractItemModel::canDropMimeData(pData, eAction, iRow, iColumn, parentRef);
+}
+
 /*virtual*/ bool ExplorerModel::dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) /*override*/
 {
 	if(eAction == Qt::IgnoreAction)
@@ -480,9 +500,38 @@ TreeModelItem *ExplorerModel::FindProjectTreeItem(Project *pProject)
 	return nullptr;
 }
 
-QModelIndex ExplorerModel::FindIndexByItemPath(QString sPath)
+QModelIndex ExplorerModel::FindIndexByItemPath(Project *pProject, QString sPath)
 {
+	TreeModelItem *pCurTreeItem = FindProjectTreeItem(pProject);
+	if(pCurTreeItem == nullptr)
+		return QModelIndex();
 
+	QStringList sPathSplitList = sPath.split(QChar('/'));
+	// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
+	for(int i = 0; i < sPathSplitList.size(); ++i)
+	{
+		bool bFound = false;
+		for(int j = 0; j < pCurTreeItem->childCount(); ++j)
+		{
+			if(QString::compare(sPathSplitList[i], pCurTreeItem->child(j)->data(0).value<ExplorerItem *>()->GetName(false), Qt::CaseInsensitive) == 0)
+			{
+				if(i == sPathSplitList.size() - 1)
+				{
+					ExplorerItem *pItem = pCurTreeItem->child(j)->data(0).value<ExplorerItem *>();
+					return FindIndex<ExplorerItem *>(pItem, 0);
+				}
+
+				pCurTreeItem = pCurTreeItem->child(j);
+				bFound = true;
+				break;
+			}
+		}
+
+		if(bFound == false)
+			return QModelIndex();
+	}
+
+	return QModelIndex();
 }
 
 QJsonObject ExplorerModel::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)

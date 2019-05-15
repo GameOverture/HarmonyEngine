@@ -41,6 +41,7 @@ public:
 	virtual Qt::DropActions supportedDropActions() const override;
 	virtual QMimeData *mimeData(const QModelIndexList &indexes) const override;
 	virtual QStringList mimeTypes() const override;
+	virtual bool canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const override;
 	virtual bool dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) override;
 
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
@@ -48,7 +49,7 @@ public:
 private:
 	bool InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
 	TreeModelItem *FindProjectTreeItem(Project *pProject);
-	QModelIndex FindIndexByItemPath(QString sPath);
+	QModelIndex FindIndexByItemPath(Project *pProject, QString sPath);
 	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 };
 
