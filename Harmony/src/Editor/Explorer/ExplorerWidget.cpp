@@ -56,6 +56,54 @@ ExplorerProxyModel::ExplorerProxyModel(QObject *pParent /*= nullptr*/) :
 //    Q_EMIT LoadFinished(pNewItemProject);
 //}
 
+
+
+//void QAbstractItemView::startDrag(Qt::DropActions supportedActions)
+//{
+//	qDebug() << "QAbstractItemView::startDrag; begin";
+//	QModelIndexList indexes = selectedIndexes();
+//	QList<QPersistentModelIndex> persistentIndexes;
+//
+//	if (indexes.count() > 0) {
+//		QMimeData *data = model()->mimeData(indexes);
+//		if (!data)
+//			return;
+//		for (int i = 0; i<indexes.count(); i++){
+//			QModelIndex idx = indexes.at(i);
+//			qDebug() << "\tDragged item to delete" << i << " is: \"" << idx.data(NODE_TITLE).toString() << "\"";
+//			qDebug() << "Row is: " << idx.row();
+//			persistentIndexes.append(QPersistentModelIndex(idx));
+//		}
+//
+//		QPixmap pixmap = indexes.first().data(Qt::DecorationRole).value<QPixmap>();
+//		QDrag *drag = new QDrag(this);
+//		drag->setPixmap(pixmap);
+//		drag->setMimeData(data);
+//		drag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
+//
+//		Qt::DropAction defaultDropAction = Qt::IgnoreAction;
+//		if (supportedActions & Qt::MoveAction && dragDropMode() != QAbstractItemView::InternalMove)
+//			defaultDropAction = Qt::MoveAction; //was Qt::CopyAction THIS WAS THE CULPRIT!
+//
+//		if ( drag->exec(supportedActions, defaultDropAction) == Qt::MoveAction ){
+//			//when we get here any copying done in dropMimeData has messed up our selected indexes
+//			//that's why we use persistent indexes
+//			for (int i = 0; i<indexes.count(); i++){
+//				QPersistentModelIndex idx = persistentIndexes.at(i);
+//				qDebug() << "\tDragged item to delete" << i << " is: " << idx.data(NODE_TITLE).toString();
+//				qDebug() << "Row is: " << idx.row();
+//				if (idx.isValid()){ //the item is not top level
+//					model()->removeRow(idx.row(), idx.parent());
+//				}
+//				else{
+//					model()->removeRow(idx.row(), QModelIndex());
+//				}
+//			}
+//		}
+//	}
+//}
+
+
 ExplorerWidget::ExplorerWidget(QWidget *pParent) :
 	QWidget(pParent),
 	ui(new Ui::ExplorerWidget)

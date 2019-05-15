@@ -185,30 +185,14 @@ QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem) const
 void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 {
 	// Error check destination index 'indexRef'
-	TreeModelItem *pDestTreeItem = GetItem(indexRef);
-	if(pDestTreeItem == m_pRootItem)
+	TreeModelItem *pDestTreeItem = FindPrefixTreeItem(indexRef);
+	if(pDestTreeItem == nullptr)
 	{
-		HyGuiLog("ExplorerModel::PasteItemSrc tried to paste into the root item", LOGTYPE_Error);
-		return;
-	}
-	ExplorerItem *pDestItem = pDestTreeItem->data(0).value<ExplorerItem *>();
-	if(pDestItem == nullptr)
-	{
-		HyGuiLog("ExplorerModel::PasteItemSrc failed to get the ExplorerItem that is being pasted into", LOGTYPE_Error);
+		HyGuiLog("ExplorerModel::PasteItemSrc failed to get the TreeModelItem from index that was passed in", LOGTYPE_Error);
 		return;
 	}
 
-	// If the destination isn't a prefix or a project, go up one parent and it should be.
-	if(pDestItem->GetType() != ITEM_Prefix && pDestItem->GetType() != ITEM_Project)
-	{
-		pDestTreeItem = pDestTreeItem->parent();
-		pDestItem = pDestTreeItem->data(0).value<ExplorerItem *>();
-		if(pDestItem == nullptr || (pDestItem->GetType() != ITEM_Prefix && pDestItem->GetType() != ITEM_Project))
-		{
-			HyGuiLog("ExplorerModel::PasteItemSrc failed to get the ExplorerItem that is being pasted into", LOGTYPE_Error);
-			return;
-		}
-	}
+	ExplorerItem *pDestItem = pDestTreeItem->data(0).value<ExplorerItem *>();
 
 	// Destination is known, get project information
 	Project *pDestProject = &pDestItem->GetProject();
@@ -452,7 +436,51 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 /*virtual*/ bool ExplorerModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
 {
-	return QAbstractItemModel::canDropMimeData(pData, eAction, iRow, iColumn, parentRef);
+	if(pData->hasFormat(HYGUI_MIMETYPE) == false)
+		return false;
+
+	HyGuiLog("canDropMimeData() invoked: " % QString(eAction), LOGTYPE_Normal);
+
+	TreeModelItem *pParentTreeItem = FindPrefixTreeItem(parentRef);
+	if(pParentTreeItem == nullptr)
+		return false;
+
+	ExplorerItem *pDestItem = pParentTreeItem->data(0).value<ExplorerItem *>();
+	Project &destProjectRef = pDestItem->GetProject();
+	
+	QJsonArray srcArray = QJsonDocument::fromJson(pData->data(HYGUI_MIMETYPE)).array();
+	for(int i = 0; i < srcArray.size(); ++i)
+	{
+		QJsonObject srcObj = srcArray[i].toObject();
+
+		// If this source object already apart of the project, ensure it's not being dropped in the same location
+		if(destProjectRef.GetAbsPath().compare(srcObj["project"].toString(), Qt::CaseInsensitive) == 0)
+		{
+			QString sSrcPath = srcObj["itemName"].toString();
+			int iSplitIndex = sSrcPath.lastIndexOf('/');
+
+			bool bLocationMatch = false;
+			if(iSplitIndex == -1 && pDestItem->GetPrefix().isEmpty())
+				bLocationMatch = true;
+			else
+			{
+				QString sSrcPrefix = sSrcPath.left(iSplitIndex + 1);
+				QString sDestPrefix = pDestItem->GetPrefix();
+				if(sSrcPrefix.compare(sDestPrefix, Qt::CaseInsensitive) == 0)
+					bLocationMatch = true;
+			}
+
+			if(bLocationMatch == false)
+			{
+				if(eAction == Qt::MoveAction)
+					return true;
+			}
+		}
+		else if(eAction == Qt::CopyAction)
+			return true;
+	}
+
+	return false;//QAbstractItemModel::canDropMimeData(pData, eAction, iRow, iColumn, parentRef);
 }
 
 /*virtual*/ bool ExplorerModel::dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) /*override*/
@@ -498,6 +526,29 @@ TreeModelItem *ExplorerModel::FindProjectTreeItem(Project *pProject)
 	}
 
 	return nullptr;
+}
+
+TreeModelItem *ExplorerModel::FindPrefixTreeItem(const QModelIndex &indexRef) const
+{
+	// Error check destination index 'indexRef'
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
+		return nullptr;
+
+	ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+	if(pItem == nullptr)
+		return nullptr;
+
+	// If the explorer item isn't a prefix or a project, go up one parent then and it should be.
+	if(pItem->GetType() != ITEM_Prefix && pItem->GetType() != ITEM_Project)
+	{
+		pTreeItem = pTreeItem->parent();
+		pItem = pTreeItem->data(0).value<ExplorerItem *>();
+		if(pItem == nullptr || (pItem->GetType() != ITEM_Prefix && pItem->GetType() != ITEM_Project))
+			return nullptr;
+	}
+
+	return pTreeItem;
 }
 
 QModelIndex ExplorerModel::FindIndexByItemPath(Project *pProject, QString sPath)

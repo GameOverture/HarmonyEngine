@@ -49,6 +49,7 @@ public:
 private:
 	bool InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
 	TreeModelItem *FindProjectTreeItem(Project *pProject);
+	TreeModelItem *FindPrefixTreeItem(const QModelIndex &indexRef) const;
 	QModelIndex FindIndexByItemPath(Project *pProject, QString sPath);
 	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 };
