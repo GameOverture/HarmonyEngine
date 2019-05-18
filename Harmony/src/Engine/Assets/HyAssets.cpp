@@ -457,6 +457,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	m_pLoadedAtlasIndices = HY_NEW HyAtlasIndices();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef HY_PLATFORM_GUI
 	std::string sGameDataFilePath(m_sDATADIR);
 	sGameDataFilePath += HYASSETS_DataFile;
 	std::string sGameDataFileContents;
@@ -465,6 +466,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	jsonxx::Object gameDataObj;
 	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
 	HyAssert(bGameDataParsed, "Could not parse game data");
+
 
 	if(gameDataObj.has<jsonxx::Object>("Prefabs"))
 	{
@@ -475,8 +477,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 		m_PrefabFactory.Init(prefabObj, *this);
 	}
-
-#ifndef HY_PLATFORM_GUI
 	if(gameDataObj.has<jsonxx::Object>("Fonts"))
 		m_FontFactory.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
 	if(gameDataObj.has<jsonxx::Object>("Sprites"))
