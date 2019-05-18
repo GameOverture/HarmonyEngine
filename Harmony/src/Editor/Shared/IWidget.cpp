@@ -39,6 +39,13 @@ IWidget::IWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
 	ui->btnRenameState->setDefaultAction(ui->actionRenameState);
 	ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
 	ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
+
+	connect(ui->cmbStates, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCurrentIndexChanged(int)));
+	connect(ui->actionAddState, &QAction::triggered, this, &IWidget::OnAddStateTriggered);
+	connect(ui->actionRemoveState, &QAction::triggered, this, &IWidget::OnRemoveStateTriggered);
+	connect(ui->actionRenameState, &QAction::triggered, this, &IWidget::OnRenameStateTriggered);
+	connect(ui->actionOrderStateBackwards, &QAction::triggered, this, &IWidget::OnOrderStateBackwardsTriggered);
+	connect(ui->actionOrderStateForwards, &QAction::triggered, this, &IWidget::OnOrderStateForwardsTriggered);
 }
 
 IWidget::~IWidget()
@@ -84,12 +91,12 @@ IStateData *IWidget::GetCurStateData()
 	return m_ItemRef.GetModel()->GetStateData(ui->cmbStates->currentIndex());
 }
 
-void IWidget::on_cmbStates_currentIndexChanged(int index)
+void IWidget::OnCurrentIndexChanged(int index)
 {
 	FocusState(index, -1);
 }
 
-void IWidget::on_actionAddState_triggered()
+void IWidget::OnAddStateTriggered()
 {
 	QUndoCommand *pCmd = nullptr;
 
@@ -116,7 +123,7 @@ void IWidget::on_actionAddState_triggered()
 		m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-void IWidget::on_actionRemoveState_triggered()
+void IWidget::OnRemoveStateTriggered()
 {
 	QUndoCommand *pCmd = nullptr;
 
@@ -143,7 +150,7 @@ void IWidget::on_actionRemoveState_triggered()
 		m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-void IWidget::on_actionRenameState_triggered()
+void IWidget::OnRenameStateTriggered()
 {
 	DlgInputName *pDlg = new DlgInputName("Rename Font State", GetCurStateData()->GetName());
 	if(pDlg->exec() == QDialog::Accepted)
@@ -154,13 +161,13 @@ void IWidget::on_actionRenameState_triggered()
 	delete pDlg;
 }
 
-void IWidget::on_actionOrderStateBackwards_triggered()
+void IWidget::OnOrderStateBackwardsTriggered()
 {
 	QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift Font State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-void IWidget::on_actionOrderStateForwards_triggered()
+void IWidget::OnOrderStateForwardsTriggered()
 {
 	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift Font State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
 	m_ItemRef.GetUndoStack()->push(pCmd);

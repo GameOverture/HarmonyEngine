@@ -59,12 +59,6 @@ SpriteWidget::~SpriteWidget()
 
 /*virtual*/ void SpriteWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
-	pMenu->addAction(ui->actionAddState);
-	pMenu->addAction(ui->actionRemoveState);
-	pMenu->addAction(ui->actionRenameState);
-	pMenu->addAction(ui->actionOrderStateBackwards);
-	pMenu->addAction(ui->actionOrderStateForwards);
-	pMenu->addSeparator();
 	pMenu->addAction(ui->actionImportFrames);
 	pMenu->addAction(ui->actionRemoveFrames);
 	pMenu->addAction(ui->actionOrderFrameUpwards);

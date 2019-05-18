@@ -184,66 +184,6 @@
     </layout>
    </item>
   </layout>
-  <action name="actionAddState">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
-   </property>
-   <property name="text">
-    <string>Add New Font State</string>
-   </property>
-   <property name="toolTip">
-    <string>Add a new state to this font</string>
-   </property>
-  </action>
-  <action name="actionRemoveState">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
-   </property>
-   <property name="text">
-    <string>Remove Font State</string>
-   </property>
-   <property name="toolTip">
-    <string>Remove the currently selected stage from the font</string>
-   </property>
-  </action>
-  <action name="actionRenameState">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rename State</string>
-   </property>
-   <property name="toolTip">
-    <string>Rename the currently selected font state</string>
-   </property>
-  </action>
-  <action name="actionOrderStateBackwards">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
-   </property>
-   <property name="text">
-    <string>Order State &amp;Backwards</string>
-   </property>
-   <property name="toolTip">
-    <string>Shift the index of the current state back by 1</string>
-   </property>
-  </action>
-  <action name="actionOrderStateForwards">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
-   </property>
-   <property name="text">
-    <string>Order State For&amp;wards</string>
-   </property>
-   <property name="toolTip">
-    <string>Shift the index of the current state forward by 1</string>
-   </property>
-  </action>
   <action name="actionAddLayer">
    <property name="icon">
     <iconset resource="../res/HyEditor.qrc">

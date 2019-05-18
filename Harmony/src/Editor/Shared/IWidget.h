@@ -43,17 +43,17 @@ public:
 	virtual void OnFocusState(int iStateIndex, QVariant subState) = 0;
 
 private Q_SLOTS:
-	void on_cmbStates_currentIndexChanged(int index);
+	void OnCurrentIndexChanged(int index);
 
-	void on_actionAddState_triggered();
+	void OnAddStateTriggered();
 
-	void on_actionRemoveState_triggered();
+	void OnRemoveStateTriggered();
 
-	void on_actionRenameState_triggered();
+	void OnRenameStateTriggered();
 
-	void on_actionOrderStateBackwards_triggered();
+	void OnOrderStateBackwardsTriggered();
 
-	void on_actionOrderStateForwards_triggered();
+	void OnOrderStateForwardsTriggered();
 
 private:
 	Ui::IWidget *ui;

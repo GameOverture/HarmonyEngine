@@ -48,7 +48,7 @@ public:
 	void undo() override
 	{
 		static_cast<IModel *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
-		m_ItemRef.FocusWidgetState(m_iIndex, -1);
+		m_ItemRef.FocusWidgetState(m_iIndex - 1, -1);
 	}
 };
 

@@ -206,9 +206,6 @@ MainWindow::MainWindow(QWidget *pParent) :
 	pSvnLoginLabel->setText("SVN Not Detected");
 	statusBar()->addPermanentWidget(pSvnLoginLabel);
 
-	// Manual connections (QtCreator used its black magic to generate these automatically back when I used it)
-	connect(ui->actionNewPrefix, SIGNAL(triggered(QAction*)), this, SLOT(on_actionNewPrefix_triggered));
-
 	HyGuiLog("Ready to go!", LOGTYPE_Normal);
 }
 

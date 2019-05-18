@@ -205,66 +205,6 @@
     </layout>
    </item>
   </layout>
-  <action name="actionRenameState">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Rename State</string>
-   </property>
-   <property name="toolTip">
-    <string>Rename state</string>
-   </property>
-  </action>
-  <action name="actionAddState">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Add State</string>
-   </property>
-   <property name="toolTip">
-    <string>Add a new state for this entity</string>
-   </property>
-  </action>
-  <action name="actionRemoveState">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
-   </property>
-   <property name="text">
-    <string>Remo&amp;ve State</string>
-   </property>
-   <property name="toolTip">
-    <string>Remove the currently selected state</string>
-   </property>
-  </action>
-  <action name="actionOrderStateBackwards">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
-   </property>
-   <property name="text">
-    <string>Order State &amp;Backwards</string>
-   </property>
-   <property name="toolTip">
-    <string>Shift the index of the current state back by 1</string>
-   </property>
-  </action>
-  <action name="actionOrderStateForwards">
-   <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
-   </property>
-   <property name="text">
-    <string>Order State For&amp;wards</string>
-   </property>
-   <property name="toolTip">
-    <string>Shift the index of the current state forward by 1</string>
-   </property>
-  </action>
   <action name="actionAddPrimitive">
    <property name="icon">
     <iconset resource="../res/HyEditor.qrc">
