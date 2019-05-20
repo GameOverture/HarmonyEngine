@@ -67,15 +67,6 @@ ProjectItem::~ProjectItem()
 {
 }
 
-/*virtual*/ void ProjectItem::Rename(QString sNewName)
-{
-	QString sOldPath = GetName(true);
-	m_sPath = sNewName;
-	QString sNewPath = GetName(true);
-
-	m_pProject->RenameGameData(m_eTYPE, sOldPath, sNewPath, m_SaveValue);
-}
-
 void ProjectItem::LoadModel()
 {
 	switch(m_eTYPE)

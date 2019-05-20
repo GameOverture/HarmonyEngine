@@ -23,6 +23,7 @@
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QClipboard>
+#include <QDrag>
 
 ExplorerProxyModel::ExplorerProxyModel(QObject *pParent /*= nullptr*/) :
 	QSortFilterProxyModel(pParent)
@@ -56,52 +57,65 @@ ExplorerProxyModel::ExplorerProxyModel(QObject *pParent /*= nullptr*/) :
 //    Q_EMIT LoadFinished(pNewItemProject);
 //}
 
+ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
+	QTreeView(pParent)
+{ }
 
+/*virtual*/ void ExplorerTreeView::startDrag(Qt::DropActions supportedActions) /*override*/
+{
+	HyGuiLog("QTreeView::startDrag()", LOGTYPE_Normal);
 
-//void QAbstractItemView::startDrag(Qt::DropActions supportedActions)
-//{
-//	qDebug() << "QAbstractItemView::startDrag; begin";
-//	QModelIndexList indexes = selectedIndexes();
-//	QList<QPersistentModelIndex> persistentIndexes;
-//
-//	if (indexes.count() > 0) {
-//		QMimeData *data = model()->mimeData(indexes);
-//		if (!data)
-//			return;
-//		for (int i = 0; i<indexes.count(); i++){
-//			QModelIndex idx = indexes.at(i);
-//			qDebug() << "\tDragged item to delete" << i << " is: \"" << idx.data(NODE_TITLE).toString() << "\"";
-//			qDebug() << "Row is: " << idx.row();
-//			persistentIndexes.append(QPersistentModelIndex(idx));
-//		}
-//
-//		QPixmap pixmap = indexes.first().data(Qt::DecorationRole).value<QPixmap>();
-//		QDrag *drag = new QDrag(this);
-//		drag->setPixmap(pixmap);
-//		drag->setMimeData(data);
-//		drag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
-//
-//		Qt::DropAction defaultDropAction = Qt::IgnoreAction;
-//		if (supportedActions & Qt::MoveAction && dragDropMode() != QAbstractItemView::InternalMove)
-//			defaultDropAction = Qt::MoveAction; //was Qt::CopyAction THIS WAS THE CULPRIT!
-//
-//		if ( drag->exec(supportedActions, defaultDropAction) == Qt::MoveAction ){
-//			//when we get here any copying done in dropMimeData has messed up our selected indexes
-//			//that's why we use persistent indexes
-//			for (int i = 0; i<indexes.count(); i++){
-//				QPersistentModelIndex idx = persistentIndexes.at(i);
-//				qDebug() << "\tDragged item to delete" << i << " is: " << idx.data(NODE_TITLE).toString();
-//				qDebug() << "Row is: " << idx.row();
-//				if (idx.isValid()){ //the item is not top level
-//					model()->removeRow(idx.row(), idx.parent());
-//				}
-//				else{
-//					model()->removeRow(idx.row(), QModelIndex());
-//				}
-//			}
-//		}
-//	}
-//}
+	//qDebug() << "QAbstractItemView::startDrag; begin";
+	QModelIndexList indexes = selectedIndexes();
+	if(indexes.empty())
+		return;
+
+	QMimeData *pMimeData = model()->mimeData(indexes);
+	if(pMimeData == nullptr)
+		return;
+
+	//qDebug() << "\tDragged item to delete" << i << " is: \"" << idx.data(NODE_TITLE).toString() << "\"";
+	//qDebug() << "Row is: " << idx.row();
+	QList<QPersistentModelIndex> persistentIndexes;
+	for (int i = 0; i<indexes.count(); i++)
+		persistentIndexes.append(QPersistentModelIndex(indexes.at(i)));
+
+	QPixmap pixmap = indexes.first().data(Qt::DecorationRole).value<QPixmap>();
+	QDrag *pDrag = new QDrag(this);
+	pDrag->setPixmap(pixmap);
+	pDrag->setMimeData(pMimeData);
+	pDrag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
+
+	Qt::DropAction eDropAction = pDrag->exec(supportedActions);
+	if(eDropAction != Qt::MoveAction)
+	{
+		supportedActions &= ~Qt::MoveAction;
+		eDropAction = pDrag->exec(supportedActions);
+	}
+
+	//Qt::DropAction defaultDropAction = Qt::IgnoreAction;
+	//if(supportedActions & Qt::MoveAction || dragDropMode() == QAbstractItemView::InternalMove)
+	//	defaultDropAction = Qt::MoveAction; // was Qt::CopyAction THIS WAS THE CULPRIT!
+	//else if(supportedActions & Qt::CopyAction)
+	//	defaultDropAction = Qt::CopyAction;
+
+	//if(pDrag->exec(supportedActions, defaultDropAction) == Qt::MoveAction)
+	//{
+	//	//when we get here any copying done in dropMimeData has messed up our selected indexes
+	//	//that's why we use persistent indexes
+	//	for (int i = 0; i<indexes.count(); i++){
+	//		QPersistentModelIndex idx = persistentIndexes.at(i);
+	//		qDebug() << "\tDragged item to delete" << i << " is: " << idx.data(NODE_TITLE).toString();
+	//		qDebug() << "Row is: " << idx.row();
+	//		if (idx.isValid()){ //the item is not top level
+	//			model()->removeRow(idx.row(), idx.parent());
+	//		}
+	//		else{
+	//			model()->removeRow(idx.row(), QModelIndex());
+	//		}
+	//	}
+	//}
+}
 
 
 ExplorerWidget::ExplorerWidget(QWidget *pParent) :

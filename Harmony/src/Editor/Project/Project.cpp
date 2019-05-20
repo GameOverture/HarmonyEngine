@@ -71,7 +71,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
-	ExplorerItem(*this, ITEM_Project, sProjectFilePath),
+	ExplorerItem(*this, ITEM_Project, HyStr::MakeStringProperPath(sProjectFilePath.toStdString().c_str(), HyGlobal::ItemExt(ITEM_Project).toStdString().c_str(), false).c_str()),
 	m_ModelRef(modelRef),
 	m_pDraw(nullptr),
 	m_DlgProjectSettings(sProjectFilePath),
@@ -118,7 +118,7 @@ void Project::LoadExplorerModel()
 	{
 		if(!dataFile.open(QIODevice::ReadOnly))
 		{
-			HyGuiLog("ItemProject::ItemProject() could not open " % m_sPath % "'s " % HYGUIPATH_DataFile % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
+			HyGuiLog("ItemProject::ItemProject() could not open " % m_sName % "'s " % HYGUIPATH_DataFile % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
 			m_bHasError = true;
 			return;
 		}
@@ -243,7 +243,7 @@ QJsonObject Project::GetSettingsObj() const
 
 QString Project::GetDirPath() const
 {
-	QFileInfo file(m_sPath);
+	QFileInfo file(m_sName);
 	return file.dir().absolutePath() + '/';
 }
 
@@ -254,7 +254,7 @@ QString Project::GetGameName() const
 
 QString Project::GetAbsPath() const
 {
-	return m_sPath;
+	return m_sName;
 }
 
 QString Project::GetAssetsAbsPath() const
@@ -413,7 +413,7 @@ void Project::DeletePrefixAndContents(QString sPrefix)
 	}
 }
 
-void Project::RenameGameData(HyGuiItemType eType, QString sOldPath, QString sNewPath, QJsonValue itemVal)
+void Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
 	if(m_SaveDataObj.contains(sItemTypeName) == false) {

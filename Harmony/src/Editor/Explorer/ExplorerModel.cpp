@@ -182,14 +182,14 @@ QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem) const
 	return sPrefix;
 }
 
-void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
+bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 {
 	// Error check destination index 'indexRef'
 	TreeModelItem *pDestTreeItem = FindPrefixTreeItem(indexRef);
 	if(pDestTreeItem == nullptr)
 	{
 		HyGuiLog("ExplorerModel::PasteItemSrc failed to get the TreeModelItem from index that was passed in", LOGTYPE_Error);
-		return;
+		return false;
 	}
 
 	ExplorerItem *pDestItem = pDestTreeItem->data(0).value<ExplorerItem *>();
@@ -216,6 +216,8 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 			// Move paste item to new prefix location within project
 			beginMoveRows(sourceIndex.parent(), pSourceTreeItem->childNumber(), pSourceTreeItem->childNumber(), FindIndex<ExplorerItem *>(pDestItem, 0), 0);
+
+			pSourceItem->Rename(pDestItem->GetName(true) % "/" % pSourceItem->GetName(false));
 			
 			pSourceTreeItem->parent()->removeChildren(pSourceTreeItem->childNumber(), 1);
 			pDestTreeItem->insertChildren(0, 1, pDestTreeItem->columnCount());
@@ -223,8 +225,6 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			QVariant v;
 			v.setValue<ExplorerItem *>(pSourceItem);
 			pDestTreeItem->child(0)->setData(0, v);
-
-			pSourceItem->Rename(pDestItem->GetName(true) % "/" % pSourceItem->GetName(false));
 
 			endMoveRows();
 
@@ -345,6 +345,8 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		//ProjectItem *pImportedProjItem = static_cast<ProjectItem *>(AddItem(pDestProject, ePasteItemType, sPrefix, sName, pasteObj["src"], false));
 		//pImportedProjItem->Save();
 	}
+
+	return true;
 }
 
 /*virtual*/ QVariant ExplorerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/
@@ -405,16 +407,19 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 /*virtual*/ Qt::DropActions ExplorerModel::supportedDragActions() const /*override*/
 {
+	HyGuiLog("supportedDragActions()", LOGTYPE_Normal);
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
 /*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/
 {
+	HyGuiLog("supportedDropActions()", LOGTYPE_Normal);
 	return Qt::CopyAction | Qt::MoveAction;
 }
 
 /*virtual*/ QMimeData *ExplorerModel::mimeData(const QModelIndexList &indexes) const /*override*/
 {
+	HyGuiLog("mimeData()", LOGTYPE_Normal);
 	QList<ExplorerItem *> itemList;
 	for(int i = 0; i < indexes.size(); ++i)
 	{
@@ -431,15 +436,16 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 /*virtual*/ QStringList ExplorerModel::mimeTypes() const /*override*/
 {
+	HyGuiLog("mimeTypes()", LOGTYPE_Normal);
 	return QStringList() << HYGUI_MIMETYPE;
 }
 
 /*virtual*/ bool ExplorerModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
 {
+	HyGuiLog("canDropMimeData() invoked: " % QString::number(eAction), LOGTYPE_Normal);
+
 	if(pData->hasFormat(HYGUI_MIMETYPE) == false)
 		return false;
-
-	HyGuiLog("canDropMimeData() invoked: " % QString(eAction), LOGTYPE_Normal);
 
 	TreeModelItem *pParentTreeItem = FindPrefixTreeItem(parentRef);
 	if(pParentTreeItem == nullptr)
@@ -485,11 +491,11 @@ void ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 /*virtual*/ bool ExplorerModel::dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) /*override*/
 {
+	HyGuiLog("dropMimeData() invoked: " % QString::number(eAction), LOGTYPE_Normal);
 	if(eAction == Qt::IgnoreAction)
 		return true;
 
-	// TODO:
-	return false;
+	return PasteItemSrc(pData->data(HYGUI_MIMETYPE), parentRef);
 }
 
 /*virtual*/ void ExplorerModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*override*/

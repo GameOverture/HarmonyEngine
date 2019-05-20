@@ -101,7 +101,7 @@ public:
 	void DeleteGameData(HyGuiItemType eType, QString sPath);
 	void DeletePrefixAndContents(QString sPrefix);
 
-	void RenameGameData(HyGuiItemType eType, QString sOldPath, QString sNewPath, QJsonValue itemVal);
+	void RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath);
 	void RenamePrefix(QString sOldPath, QString sNewPath);
 	void RefreshNamesOnTabs();
 

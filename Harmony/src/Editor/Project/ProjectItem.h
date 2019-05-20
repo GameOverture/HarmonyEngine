@@ -46,8 +46,6 @@ public:
 	ProjectItem(Project &projRef, HyGuiItemType eType, const QString sName, QJsonValue initValue, bool bIsPendingSave);
 	virtual ~ProjectItem();
 
-	virtual void Rename(QString sNewName);
-
 	void LoadModel();
 
 	IModel *GetModel()                              { return m_pModel; }

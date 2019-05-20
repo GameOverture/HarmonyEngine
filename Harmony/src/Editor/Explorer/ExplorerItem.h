@@ -21,14 +21,14 @@ class ExplorerItem : public QObject
 
 protected:
 	const HyGuiItemType		m_eTYPE;
-	QString					m_sPath;
+	QString					m_sName;
 
 	Project *				m_pProject;
 	bool					m_bIsProjectItem;
 	
 public:
 	ExplorerItem();
-	ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sPath);
+	ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sName);
 	virtual ~ExplorerItem();
 
 	HyGuiItemType GetType() const;
@@ -40,7 +40,8 @@ public:
 	QString GetPrefix() const; // Ends with a '/'
 	QIcon GetIcon(SubIcon eSubIcon) const;
 
-	virtual void Rename(QString sNewName);
+	void Rename(QString sNewName);
+	void Rename(QString sNewPrefix, QString sNewName);
 	virtual void DeleteFromProject();
 
 	QString GetToolTip() const;
