@@ -65,6 +65,8 @@ class Project : public ExplorerItem
 public:
 	Project(const QString sProjectFilePath, ExplorerModel &modelRef);
 	virtual ~Project();
+
+	virtual QString GetName(bool bWithPrefix) const override;
 	
 	void LoadExplorerModel();
 
@@ -101,8 +103,8 @@ public:
 	void DeleteGameData(HyGuiItemType eType, QString sPath);
 	void DeletePrefixAndContents(QString sPrefix);
 
-	void RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath);
-	void RenamePrefix(QString sOldPath, QString sNewPath);
+	QString RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath);
+	QString RenamePrefix(QString sOldPath, QString sNewPath);
 	void RefreshNamesOnTabs();
 
 	void WriteGameData();

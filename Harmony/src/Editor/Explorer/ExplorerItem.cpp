@@ -50,23 +50,11 @@ bool ExplorerItem::IsProjectItem() const
 	return m_bIsProjectItem;
 }
 
-QString ExplorerItem::GetName(bool bWithPrefix) const
+/*virtual*/ QString ExplorerItem::GetName(bool bWithPrefix) const
 {
-	QString sPrefix;
-	if(bWithPrefix)
-		sPrefix = GetPrefix();
-	
-	// NOTE: We must remove the extension because dir items use "/", which doesn't work with QFileInfo::baseName()
-	//QString sPathWithoutExt = m_sName;
-	//sPathWithoutExt.truncate(m_sName.size() - HyGlobal::ItemExt(m_eTYPE).size());
-	QFileInfo itemInfo;
-	itemInfo.setFile(m_sName);
-	QString sName = sPrefix % itemInfo.baseName();
-	
-	return sName;
+	return bWithPrefix ? GetPrefix() % m_sName : m_sName;
 }
 
-// Ends with a '/'
 QString ExplorerItem::GetPrefix() const
 {
 	return m_pProject->GetExplorerModel().AssemblePrefix(const_cast<ExplorerItem *>(this));
@@ -79,20 +67,7 @@ QIcon ExplorerItem::GetIcon(SubIcon eSubIcon) const
 
 void ExplorerItem::Rename(QString sNewName)
 {
-	if(m_pProject == nullptr)
-	{
-		HyGuiLog("ExplorerItem::Rename invoked with nullptr Project", LOGTYPE_Error);
-		return;
-	}
-
-	QString sOldPath = GetName(true);
-	m_sName = sNewName;
-	QString sNewPath = GetName(true);
-
-	if(m_eTYPE != ITEM_Prefix)
-		m_pProject->RenamePrefix(sOldPath, sNewPath);
-	else
-		m_pProject->RenameItem(m_eTYPE, sOldPath, sNewPath);
+	Rename(GetPrefix(), sNewName);
 }
 
 void ExplorerItem::Rename(QString sNewPrefix, QString sNewName)
@@ -103,14 +78,16 @@ void ExplorerItem::Rename(QString sNewPrefix, QString sNewName)
 		return;
 	}
 
-	QString sOldPath = GetName(true);
-	m_sName = sNewName;
-	QString sNewPath = sNewPrefix % "/" % GetName(true);
+	if(sNewPrefix.isEmpty() == false && sNewPrefix[sNewPrefix.length() - 1] != '/')
+		sNewPrefix += '/';
 
-	if(m_eTYPE != ITEM_Prefix)
-		m_pProject->RenamePrefix(sOldPath, sNewPath);
+	QString sOldPath = GetName(true);
+	QString sNewPath = sNewPrefix % sNewName;
+
+	if(m_eTYPE == ITEM_Prefix)
+		m_sName = m_pProject->RenamePrefix(sOldPath, sNewPath);
 	else
-		m_pProject->RenameItem(m_eTYPE, sOldPath, sNewPath);
+		m_sName = m_pProject->RenameItem(m_eTYPE, sOldPath, sNewPath);
 }
 
 /*virtual*/ void ExplorerItem::DeleteFromProject()

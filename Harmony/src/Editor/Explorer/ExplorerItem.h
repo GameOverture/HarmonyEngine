@@ -36,8 +36,8 @@ public:
 
 	bool IsProjectItem() const;
 	
-	QString GetName(bool bWithPrefix) const;
-	QString GetPrefix() const; // Ends with a '/'
+	virtual QString GetName(bool bWithPrefix) const;
+	QString GetPrefix() const;
 	QIcon GetIcon(SubIcon eSubIcon) const;
 
 	void Rename(QString sNewName);

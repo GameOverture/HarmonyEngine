@@ -217,7 +217,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			// Move paste item to new prefix location within project
 			beginMoveRows(sourceIndex.parent(), pSourceTreeItem->childNumber(), pSourceTreeItem->childNumber(), FindIndex<ExplorerItem *>(pDestItem, 0), 0);
 
-			pSourceItem->Rename(pDestItem->GetName(true) % "/" % pSourceItem->GetName(false));
+			pSourceItem->Rename(pDestItem->GetName(true), pSourceItem->GetName(false));
 			
 			pSourceTreeItem->parent()->removeChildren(pSourceTreeItem->childNumber(), 1);
 			pDestTreeItem->insertChildren(0, 1, pDestTreeItem->columnCount());
@@ -459,28 +459,31 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 	{
 		QJsonObject srcObj = srcArray[i].toObject();
 
-		// If this source object already apart of the project, ensure it's not being dropped in the same location
+		// If this source object already apart of the project, then only move actions are valid. Otherwise only copy actions are valid.
 		if(destProjectRef.GetAbsPath().compare(srcObj["project"].toString(), Qt::CaseInsensitive) == 0)
 		{
-			QString sSrcPath = srcObj["itemName"].toString();
-			int iSplitIndex = sSrcPath.lastIndexOf('/');
+			if(eAction == Qt::MoveAction)
+				return true;
 
-			bool bLocationMatch = false;
-			if(iSplitIndex == -1 && pDestItem->GetPrefix().isEmpty())
-				bLocationMatch = true;
-			else
-			{
-				QString sSrcPrefix = sSrcPath.left(iSplitIndex + 1);
-				QString sDestPrefix = pDestItem->GetPrefix();
-				if(sSrcPrefix.compare(sDestPrefix, Qt::CaseInsensitive) == 0)
-					bLocationMatch = true;
-			}
+			//QString sSrcPath = srcObj["itemName"].toString();
+			//int iSplitIndex = sSrcPath.lastIndexOf('/');
 
-			if(bLocationMatch == false)
-			{
-				if(eAction == Qt::MoveAction)
-					return true;
-			}
+			//bool bLocationMatch = false;
+			//if(iSplitIndex == -1 && pDestItem->GetType() == ITEM_Project)
+			//	bLocationMatch = true;
+			//else
+			//{
+			//	QString sSrcPrefix = sSrcPath.left(iSplitIndex + 1);
+			//	QString sDestPrefix = pDestItem->GetPrefix();
+			//	if(sSrcPrefix.compare(sDestPrefix, Qt::CaseInsensitive) == 0)
+			//		bLocationMatch = true;
+			//}
+
+			//if(bLocationMatch == false)
+			//{
+			//	if(eAction == Qt::MoveAction)
+			//		return true;
+			//}
 		}
 		else if(eAction == Qt::CopyAction)
 			return true;
@@ -491,7 +494,6 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 /*virtual*/ bool ExplorerModel::dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) /*override*/
 {
-	HyGuiLog("dropMimeData() invoked: " % QString::number(eAction), LOGTYPE_Normal);
 	if(eAction == Qt::IgnoreAction)
 		return true;
 

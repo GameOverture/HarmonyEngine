@@ -110,6 +110,11 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	delete m_pDraw;
 }
 
+/*virtual*/ QString Project::GetName(bool bWithPrefix) const /*override*/
+{
+	return "";
+}
+
 void Project::LoadExplorerModel()
 {
 	// Load game data items
@@ -413,29 +418,77 @@ void Project::DeletePrefixAndContents(QString sPrefix)
 	}
 }
 
-void Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath)
+QString Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath)
 {
+	if(eType == ITEM_Prefix)
+	{
+		HyGuiLog("Project::RenameItem invoked on a Prefix", LOGTYPE_Error);
+		return sOldPath.section('/', -1);
+	}
+
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
-	if(m_SaveDataObj.contains(sItemTypeName) == false) {
-		HyGuiLog("Could not find item type: " % sItemTypeName % " within ItemProject::RenameGameData", LOGTYPE_Error);
+	if(m_SaveDataObj.contains(sItemTypeName) == false)
+	{
+		HyGuiLog("Project::RenameItem could not find item type: " % sItemTypeName, LOGTYPE_Error);
+		return sOldPath.section('/', -1);
 	}
 
 	QJsonObject subDirObj = m_SaveDataObj[sItemTypeName].toObject();
+	
+	QJsonValue itemVal = subDirObj[sOldPath];
 	subDirObj.remove(sOldPath);
-	subDirObj.insert(sNewPath, itemVal);
+
+	// Ensure there are no name conflicts
+	QString sUniqueNewPath = sNewPath;
+	int iConflictCount = 0;
+	bool bConflicts = false;
+	do
+	{
+		bConflicts = false;
+		for(auto iter = subDirObj.begin(); iter != subDirObj.end(); ++iter)
+		{
+			if(sUniqueNewPath.compare(iter.key(), Qt::CaseInsensitive) == 0)
+			{
+				sUniqueNewPath = sNewPath;
+				sUniqueNewPath += "_Copy";
+				if(iConflictCount++ > 0)
+					sUniqueNewPath += QString::number(iConflictCount);
+
+				bConflicts = true;
+				break;
+			}
+		}
+	} while(bConflicts);
+
+	subDirObj.insert(sUniqueNewPath, itemVal);
 
 	m_SaveDataObj.remove(sItemTypeName);
 	m_SaveDataObj.insert(sItemTypeName, subDirObj);
 
 	RefreshNamesOnTabs();
 	WriteGameData();
+
+	return sUniqueNewPath.section('/', -1);
 }
 
-void Project::RenamePrefix(QString sOldPath, QString sNewPath)
+QString Project::RenamePrefix(QString sOldPath, QString sNewPath)
 {
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 	for(auto itemTypeIter = m_SaveDataObj.begin(); itemTypeIter != m_SaveDataObj.end(); ++itemTypeIter)
 	{
+		QJsonObject itemTypeObj = itemTypeIter.value().toObject();
+		for(auto iter = itemTypeObj.begin(); iter != itemTypeObj.end(); ++iter)
+		{
+			if(iter.key().startsWith(sOldPath, Qt::CaseInsensitive))
+			{
+				QString sNewKey = iter.key();
+				sNewKey.replace(sOldPath, sNewPath, Qt::CaseInsensitive);
+				QJsonValue data = iter.value();
+				itemTypeObj.remove(iter.key());
+				itemTypeObj.insert(sNewKey, data);
+			}
+		}
+
 		HyGuiItemType eType = ITEM_Unknown;
 		for(int i = 0; i < typeList.size(); ++i)
 		{
@@ -448,19 +501,6 @@ void Project::RenamePrefix(QString sOldPath, QString sNewPath)
 		if(eType == ITEM_Unknown)
 			HyGuiLog("RenamePrefix bad", LOGTYPE_Error);
 
-		QJsonObject itemTypeObj = itemTypeIter.value().toObject();
-		for(auto iter = itemTypeObj.begin(); iter != itemTypeObj.end(); ++iter)
-		{
-			if(iter.key().startsWith(sOldPath, Qt::CaseInsensitive))
-			{
-				QString sNewKey = iter.key();
-				sNewKey.replace(sOldPath, sNewPath);
-				QJsonValue data = iter.value();
-				itemTypeObj.remove(iter.key());
-				itemTypeObj.insert(sNewKey, data);
-			}
-		}
-
 		QString sItemTypeName = HyGlobal::ItemName(eType, true);
 		if(m_SaveDataObj.contains(sItemTypeName) == false) {
 			HyGuiLog("Could not find item type: " % sItemTypeName % " within ItemProject::RenamePrefix", LOGTYPE_Error);
@@ -472,6 +512,8 @@ void Project::RenamePrefix(QString sOldPath, QString sNewPath)
 
 	RefreshNamesOnTabs();
 	WriteGameData();
+
+	return sNewPath.section('/', -1);
 }
 
 void Project::RefreshNamesOnTabs()
