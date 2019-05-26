@@ -82,11 +82,11 @@ ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
 	pDrag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
 
 	Qt::DropAction eDropAction = pDrag->exec(supportedActions);
-	if(eDropAction != Qt::MoveAction)
-	{
-		supportedActions &= ~Qt::MoveAction;
-		eDropAction = pDrag->exec(supportedActions);
-	}
+	//if(eDropAction != Qt::MoveAction)
+	//{
+	//	supportedActions &= ~Qt::MoveAction;
+	//	eDropAction = pDrag->exec(supportedActions);
+	//}
 
 	//Qt::DropAction defaultDropAction = Qt::IgnoreAction;
 	//if(supportedActions & Qt::MoveAction || dragDropMode() == QAbstractItemView::InternalMove)

@@ -460,6 +460,9 @@ QString Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewP
 		}
 	} while(bConflicts);
 
+	if(iConflictCount > 0)
+		HyGuiLog("Item was renamed to avoid conflict: " % sUniqueNewPath, LOGTYPE_Info);
+
 	subDirObj.insert(sUniqueNewPath, itemVal);
 
 	m_SaveDataObj.remove(sItemTypeName);

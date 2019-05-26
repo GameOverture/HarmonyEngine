@@ -356,7 +356,7 @@ void AtlasModel::WriteMetaSettings()
 		}
 	}
 
-	// Assemble the offical QJsonObject for the write
+	// Assemble the official QJsonObject for the write
 	QJsonObject settingsObj;
 	settingsObj.insert("frames", frameArray);
 	settingsObj.insert("groups", groupsArray);
@@ -615,7 +615,10 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiA
 		newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
 
 		if(pParent == nullptr)
-			m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+		{
+			if(m_pProjOwner->GetAtlasWidget())
+				m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+		}
 		else
 		{
 			if(pParent->data(0, Qt::UserRole).toString() != HYTREEWIDGETITEM_IsFilter)
