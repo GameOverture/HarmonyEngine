@@ -63,9 +63,6 @@ ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
 
 /*virtual*/ void ExplorerTreeView::startDrag(Qt::DropActions supportedActions) /*override*/
 {
-	HyGuiLog("QTreeView::startDrag()", LOGTYPE_Normal);
-
-	//qDebug() << "QAbstractItemView::startDrag; begin";
 	QModelIndexList indexes = selectedIndexes();
 	if(indexes.empty())
 		return;
@@ -74,8 +71,6 @@ ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
 	if(pMimeData == nullptr)
 		return;
 
-	//qDebug() << "\tDragged item to delete" << i << " is: \"" << idx.data(NODE_TITLE).toString() << "\"";
-	//qDebug() << "Row is: " << idx.row();
 	QList<QPersistentModelIndex> persistentIndexes;
 	for (int i = 0; i<indexes.count(); i++)
 		persistentIndexes.append(QPersistentModelIndex(indexes.at(i)));

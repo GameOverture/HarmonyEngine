@@ -407,19 +407,16 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 /*virtual*/ Qt::DropActions ExplorerModel::supportedDragActions() const /*override*/
 {
-	HyGuiLog("supportedDragActions()", LOGTYPE_Normal);
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
 /*virtual*/ Qt::DropActions ExplorerModel::supportedDropActions() const /*override*/
 {
-	HyGuiLog("supportedDropActions()", LOGTYPE_Normal);
 	return Qt::CopyAction | Qt::MoveAction;
 }
 
 /*virtual*/ QMimeData *ExplorerModel::mimeData(const QModelIndexList &indexes) const /*override*/
 {
-	HyGuiLog("mimeData()", LOGTYPE_Normal);
 	QList<ExplorerItem *> itemList;
 	for(int i = 0; i < indexes.size(); ++i)
 	{
@@ -436,16 +433,16 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 /*virtual*/ QStringList ExplorerModel::mimeTypes() const /*override*/
 {
-	HyGuiLog("mimeTypes()", LOGTYPE_Normal);
 	return QStringList() << HYGUI_MIMETYPE;
 }
 
 /*virtual*/ bool ExplorerModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
 {
-	HyGuiLog("canDropMimeData() invoked: " % QString::number(eAction), LOGTYPE_Normal);
-
 	if(pData->hasFormat(HYGUI_MIMETYPE) == false)
 		return false;
+
+	if(iRow == -1 && iColumn == -1)
+		HyGuiLog("-1 gogogog", LOGTYPE_Normal);
 
 	TreeModelItem *pParentTreeItem = FindPrefixTreeItem(parentRef);
 	if(pParentTreeItem == nullptr)
