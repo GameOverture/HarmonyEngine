@@ -14,6 +14,7 @@
 #include "ProjectItem.h"
 #include "EntityTreeModel.h"
 #include "GlobalWidgetMappers.h"
+#include "ProjectItemMimeData.h"
 
 #include <QObject>
 #include <QJsonArray>
@@ -52,7 +53,7 @@ public:
 	EntityTreeModel &GetChildrenModel();
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItem *pItem);
 
-	bool AddNewChild(ExplorerItem *pItem);
+	void AddNewChildren(const ProjectItemMimeData *pMimeData);
 	bool RemoveChild(ExplorerItem *pItem);
 
 	const QList<ProjectItem *> &GetPrimitiveList();

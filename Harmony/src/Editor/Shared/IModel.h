@@ -21,9 +21,9 @@ class IModel;
 class IStateData
 {
 protected:
-	const int       m_iINDEX;
-	IModel &        m_ModelRef;
-	QString         m_sName;
+	const int					m_iINDEX;
+	IModel &					m_ModelRef;
+	QString						m_sName;
 	
 public:
 	IStateData(int iIndex, IModel &modelRef, QString sName);
@@ -41,8 +41,8 @@ public:
 class IModel : public QAbstractListModel
 {
 protected:
-	ProjectItem &               m_ItemRef;
-	QList<IStateData *>         m_StateList;
+	ProjectItem &				m_ItemRef;
+	QList<IStateData *>			m_StateList;
 	
 public:
 	IModel(ProjectItem &itemRef);

@@ -134,10 +134,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
 	ProjectItem *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
 
-	if(pCurOpenTabItem &&
-	   pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
-	   static_cast<ProjectItem *>(pEvent->source()) != pCurOpenTabItem &&
-	   pCurOpenTabItem->GetType() == ITEM_Entity)
+	if(pCurOpenTabItem && pCurOpenTabItem->GetType() == ITEM_Entity && pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE))
 	{
 		EntityTreeModel &childTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetChildrenModel();
 
@@ -164,7 +161,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	   pCurOpenTabItem->GetType() == ITEM_Entity)
 	{
 		EntityModel *pEntModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel());
-		pEntModel->AddNewChild(static_cast<ProjectItem *>(pEvent->source()));
+		pEntModel->AddNewChildren(static_cast<const ProjectItemMimeData *>(pEvent->mimeData()));
 
 		pEvent->setDropAction(Qt::LinkAction);
 		pEvent->accept();

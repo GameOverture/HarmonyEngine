@@ -42,7 +42,7 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, Explore
 	switch(m_eCMD)
 	{
 	case ENTITYCMD_AddNewChild:
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChild(m_pParameter);
+		//static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChild(m_pParameter);
 		break;
 	case ENTITYCMD_AddPrimitive:
 		break;

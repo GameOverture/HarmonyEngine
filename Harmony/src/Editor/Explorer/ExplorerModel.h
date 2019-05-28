@@ -26,6 +26,7 @@ public:
 	QStringList GetOpenProjectPaths();
 	QStringList GetPrefixList(Project *pProject);
 	QList<ExplorerItem *> GetItemsRecursively(const QModelIndex &indexRef);
+	ExplorerItem *FindItemByItemPath(Project *pProject, QString sPath);
 
 	Project *AddProject(const QString sNewProjectFilePath);
 	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);

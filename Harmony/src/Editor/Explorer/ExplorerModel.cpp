@@ -77,6 +77,16 @@ QList<ExplorerItem *> ExplorerModel::GetItemsRecursively(const QModelIndex &inde
 	return returnList;
 }
 
+
+ExplorerItem *ExplorerModel::FindItemByItemPath(Project *pProject, QString sPath)
+{
+	QModelIndex sourceIndex = FindIndexByItemPath(pProject, sPath);
+	TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
+	
+	return pSourceTreeItem->data(0).value<ExplorerItem *>();
+}
+
+
 Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 {
 	HyGuiLog("Opening project: " % sNewProjectFilePath, LOGTYPE_Info);
