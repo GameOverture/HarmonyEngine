@@ -13,21 +13,18 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
-#include "spine/spine.h"
-#include "spine/extension.h"
-
 class HyAssets;
 
 class HySpine2dData : public IHyNodeData
 {
-	spAtlas *				m_SpineAtlasData;
-	spSkeletonData *		m_SpineSkeletonData;
+	//spAtlas *				m_SpineAtlasData;
+	//spSkeletonData *		m_SpineSkeletonData;
 
 public:
 	HySpine2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HySpine2dData();
 
-	spSkeletonData *GetSkeletonData()								{ return m_SpineSkeletonData; }
+	//spSkeletonData *GetSkeletonData()								{ return m_SpineSkeletonData; }
 
 	// Sets every combination of animation blend to this amount
 	void AnimInitBlend(float fInterpDur);

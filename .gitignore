@@ -8,6 +8,7 @@ ipch/
 build-HyEditor-*/
 .vs/
 GeneratedFiles/
+3rdParty/
 
 *.exe
 *.ilk

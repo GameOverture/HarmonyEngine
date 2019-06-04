@@ -411,7 +411,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;opengl32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
@@ -439,7 +439,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;opengl32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
@@ -467,7 +467,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
@@ -497,7 +497,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
@@ -530,7 +530,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;opengl32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
@@ -557,7 +557,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;opengl32.lib;glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
@@ -584,7 +584,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x86</AdditionalLibraryDirectories>
@@ -613,7 +613,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;spine-c.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>box2d.lib;glew.lib;netLink.lib;soil2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib\$(Platform)_$(Configuration)\;%DXSDK_DIR%\Lib\x64</AdditionalLibraryDirectories>
