@@ -251,7 +251,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			continue;
 		}
 
-#if 0
+#if 1
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Pasted item's assets needs to be imported into this project
 

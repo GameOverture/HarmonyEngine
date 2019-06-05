@@ -491,7 +491,8 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage 
 void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)
 {
 	QSet<int> textureIndexToReplaceSet;
-	textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
+	if(pFrame->GetTextureIndex() >= 0)
+		textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
 
 	// First remove the frame from the map
 	if(m_FrameLookup.RemoveLookup(pFrame))

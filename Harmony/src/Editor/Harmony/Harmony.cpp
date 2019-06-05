@@ -63,7 +63,7 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 {
 	if(sm_pInstance->m_pWidget->IsProject(pProject) == false)
 	{
-		HyGuiLog("Harmony::Reload passed a project that is not the currently set project", LOGTYPE_Error);
+		MainWindow::ClearLoading();
 		return;
 	}
 
