@@ -13,7 +13,7 @@
 #include "Afx/HyInteropAfx.h"
 #include "Assets/Nodes/HyAudioData.h"
 
-class HyAudio2d : public IHyAudioInstInterop
+class HyAudio2d// : public IHyAudioInstInterop
 {
 	HyAudioData *						m_pDataPtr;
 
