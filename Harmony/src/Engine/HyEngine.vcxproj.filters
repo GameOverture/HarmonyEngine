@@ -260,6 +260,9 @@
     <ClCompile Include="UI\HyButton.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="Audio\Interop\HyAudio_FMOD.cpp">
+      <Filter>Audio\Interop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -696,6 +699,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Utilities\HyRand.h">
       <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Audio\Interop\HyAudio_FMOD.h">
+      <Filter>Audio\Interop</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

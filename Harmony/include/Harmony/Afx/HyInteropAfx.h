@@ -22,6 +22,10 @@ typedef HyOpenGL HyRendererInterop;
 	typedef void *HyWindowHandle;
 #endif
 
+#if defined(HY_FMOD)
+	typedef 
+#endif
+
 #if defined(HY_PLATFORM_GUI)
 	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
 	typedef HyConsole_Gui HyConsoleInterop;
