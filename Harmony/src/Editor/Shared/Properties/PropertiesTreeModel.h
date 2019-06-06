@@ -101,8 +101,8 @@ public:
 	const QVariant &GetSubstate() const;
 	const PropertiesDef &GetPropertyDefinition(const QModelIndex &indexRef) const;
 	QString GetPropertyName(const QModelIndex &indexRef) const;
-	const QVariant &GetPropertyValue(const QModelIndex &indexRef) const;
-	const QVariant &FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
+	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
+	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
 
 	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName,

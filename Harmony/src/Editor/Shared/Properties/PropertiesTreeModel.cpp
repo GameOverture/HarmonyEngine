@@ -58,13 +58,13 @@ QString PropertiesTreeModel::GetPropertyName(const QModelIndex &indexRef) const
 	return pTreeItem->data(COLUMN_Name).toString();
 }
 
-const QVariant &PropertiesTreeModel::GetPropertyValue(const QModelIndex &indexRef) const
+QVariant PropertiesTreeModel::GetPropertyValue(const QModelIndex &indexRef) const
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
 	return pTreeItem->data(COLUMN_Value);
 }
 
-const QVariant &PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString sPropertyName) const
+QVariant PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString sPropertyName) const
 {
 	for(int i = 0; i < m_pRootItem->childCount(); ++i)
 	{

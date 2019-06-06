@@ -260,11 +260,11 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QSpinBox *>(pEditor)->value()));
 		break;
 	case PROPERTIESTYPE_double:
-		pModel->setData(index, static_cast<QDoubleSpinBox *>(pEditor)->value());
+		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QDoubleSpinBox *>(pEditor)->value()));
 		break;
 	case PROPERTIESTYPE_ivec2:
 	case PROPERTIESTYPE_vec2:
-		pModel->setData(index, static_cast<WidgetVectorSpinBox *>(pEditor)->GetValue());
+		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<WidgetVectorSpinBox *>(pEditor)->GetValue()));
 		break;
 	//case PROPERTIESTYPE_ivec3:
 	//case PROPERTIESTYPE_vec3:
@@ -272,14 +272,14 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	//case PROPERTIESTYPE_vec4:
 	//	break;
 	case PROPERTIESTYPE_LineEdit:
-		pModel->setData(index, static_cast<QLineEdit *>(pEditor)->text());
+		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QLineEdit *>(pEditor)->text()));
 		break;
 	case PROPERTIESTYPE_ComboBox:
 	case PROPERTIESTYPE_StatesComboBox:
-		pModel->setData(index, static_cast<QComboBox *>(pEditor)->currentIndex());
+		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QComboBox *>(pEditor)->currentIndex()));
 		break;
 	case PROPERTIESTYPE_Slider:
-		pModel->setData(index, static_cast<QSlider *>(pEditor)->value());
+		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QSlider *>(pEditor)->value()));
 		break;
 	default:
 		HyGuiLog("PropertiesDelegate::setModelData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
