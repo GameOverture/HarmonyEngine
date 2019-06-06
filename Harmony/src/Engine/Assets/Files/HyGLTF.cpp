@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Loadables/HyGLTF.h"
+#include "Assets/Files/HyGLTF.h"
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "HyEngine.h"
@@ -17,7 +17,7 @@
 #include "glm/gtx/quaternion.hpp"
 
 HyGLTF::HyGLTF(const std::string &sIdentifier) :
-	IHyLoadableData(HYLOADABLE_GLTF),
+	IHyFileData(HYLOADABLE_GLTF),
 	m_sIDENTIFIER(sIdentifier)
 {
 }

@@ -13,7 +13,7 @@
 #include "Window/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
-#include "Assets/Loadables/IHyLoadableData.h"
+#include "Assets/Files/IHyFileData.h"
 #include "Assets/Nodes/HyPrefabData.h"
 #include "HyEngine.h"
 
@@ -141,12 +141,12 @@ HyVertexBufferHandle IHyRenderer::AppendVertexData3d(const uint8 *pData, uint32 
 	return hReturnHandle;
 }
 
-void IHyRenderer::TxData(IHyLoadableData *pData)
+void IHyRenderer::TxData(IHyFileData *pData)
 {
 	m_RxDataQueue.push(pData);
 }
 
-std::queue<IHyLoadableData *> &IHyRenderer::RxData()
+std::queue<IHyFileData *> &IHyRenderer::RxData()
 {
 	return m_TxDataQueue;
 }
@@ -188,7 +188,7 @@ void IHyRenderer::ProcessMsgs()
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
 	while(m_RxDataQueue.empty() == false)
 	{
-		IHyLoadableData *pData = m_RxDataQueue.front();
+		IHyFileData *pData = m_RxDataQueue.front();
 		m_RxDataQueue.pop();
 
 		pData->OnRenderThread(*this);

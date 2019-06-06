@@ -11,10 +11,10 @@
 #define HyGLTF_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Loadables/IHyLoadableData.h"
+#include "Assets/Files/IHyFileData.h"
 #include "Renderer/Components/HyRenderBuffer.h"
 
-class HyGLTF : public IHyLoadableData
+class HyGLTF : public IHyFileData
 {
 	const std::string					m_sIDENTIFIER;
 	tinygltf::Model						m_AssetData;

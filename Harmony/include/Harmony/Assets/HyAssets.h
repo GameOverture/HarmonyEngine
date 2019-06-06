@@ -11,9 +11,8 @@
 #define HyAssets_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Loadables/HyAtlas.h"
-#include "Assets/Loadables/HyAtlasIndices.h"
-#include "Assets/Loadables/HyGLTF.h"
+#include "Assets/Files/HyAtlas.h"
+#include "Assets/Files/HyGLTF.h"
 #include "Threading/IHyThreadClass.h"
 
 #define HYASSETS_DataFile "data.json"
@@ -62,12 +61,12 @@ class HyAssets : public IHyThreadClass
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
-	std::vector<IHyLoadableData *>								m_ReloadDataList;
+	std::vector<IHyFileData *>								m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
-	std::queue<IHyLoadableData *>								m_Load_Prepare;
-	std::queue<IHyLoadableData *>								m_Load_Shared;
-	std::queue<IHyLoadableData *>								m_Load_Retrieval;
+	std::queue<IHyFileData *>								m_Load_Prepare;
+	std::queue<IHyFileData *>								m_Load_Shared;
+	std::queue<IHyFileData *>								m_Load_Retrieval;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Thread control
@@ -106,9 +105,9 @@ protected:
 	virtual void OnThreadShutdown() override;
 
 private:
-	void QueueData(IHyLoadableData *pData);
-	void DequeData(IHyLoadableData *pData);
-	void FinalizeData(IHyLoadableData *pData);
+	void QueueData(IHyFileData *pData);
+	void DequeData(IHyFileData *pData);
+	void FinalizeData(IHyFileData *pData);
 
 	void SetAsLoaded(IHyLoadable *pLoadable);
 	void SetAsUnloaded(IHyLoadable *pLoadable);

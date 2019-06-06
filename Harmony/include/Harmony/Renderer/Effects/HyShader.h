@@ -11,7 +11,7 @@
 #define HyShader_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Loadables/IHyLoadableData.h"
+#include "Assets/Files/IHyFileData.h"
 
 struct HyShaderVertexAttribute
 {
@@ -21,7 +21,7 @@ struct HyShaderVertexAttribute
 	uint32						uiInstanceDivisor;
 };
 
-class HyShader : public IHyLoadableData
+class HyShader : public IHyFileData
 {
 	friend class IHyRenderer;
 

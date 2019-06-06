@@ -32,9 +32,6 @@
     <ClCompile Include="Scene\HyScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\HyFileIO.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\Crc32.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -118,12 +115,6 @@
     </ClCompile>
     <ClCompile Include="Diagnostics\GuiComms\HyLiveVarManager.cpp">
       <Filter>Diagnostics\GuiComms</Filter>
-    </ClCompile>
-    <ClCompile Include="Assets\Loadables\HyAtlas.cpp">
-      <Filter>Assets\Loadables</Filter>
-    </ClCompile>
-    <ClCompile Include="Assets\Loadables\HyAtlasIndices.cpp">
-      <Filter>Assets\Loadables</Filter>
     </ClCompile>
     <ClCompile Include="Diagnostics\Output\HyDiagOutput.cpp">
       <Filter>Diagnostics\Output</Filter>
@@ -227,9 +218,6 @@
     <ClCompile Include="Scene\Nodes\Loadables\Visables\Drawables\Objects\HyTexturedQuad2d.cpp">
       <Filter>Scene\Nodes\Loadables\Visables\Drawables\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Assets\Loadables\HyGLTF.cpp">
-      <Filter>Assets\Loadables</Filter>
-    </ClCompile>
     <ClCompile Include="Utilities\tiny_gltf.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -262,6 +250,15 @@
     </ClCompile>
     <ClCompile Include="Audio\Interop\HyAudio_FMOD.cpp">
       <Filter>Audio\Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Files\HyAtlas.cpp">
+      <Filter>Assets\Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Files\HyGLTF.cpp">
+      <Filter>Assets\Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Files\HyFileIO.cpp">
+      <Filter>Assets\Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -331,9 +328,6 @@
     <Filter Include="Assets\Nodes">
       <UniqueIdentifier>{309961b9-5220-4e8f-a0c1-5c9ca9f7e731}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Assets\Loadables">
-      <UniqueIdentifier>{846e1724-4c9c-40c4-b6bb-3ca33bc2ff3e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene\Tweens">
       <UniqueIdentifier>{86c28654-7313-4a8e-b418-a60556fb4fd7}</UniqueIdentifier>
     </Filter>
@@ -378,6 +372,9 @@
     </Filter>
     <Filter Include="Window">
       <UniqueIdentifier>{241591ab-7a1d-4b3e-8070-a9eefe80d8dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Files">
+      <UniqueIdentifier>{846e1724-4c9c-40c4-b6bb-3ca33bc2ff3e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -457,9 +454,6 @@
     <ClInclude Include="..\..\include\Harmony\Scene\HyScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Utilities\HyFileIO.h">
-      <Filter>Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Utilities\HyVariant.h">
       <Filter>Utilities</Filter>
     </ClInclude>
@@ -489,9 +483,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Assets\HyAssets.h">
       <Filter>Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Assets\Loadables\IHyLoadableData.h">
-      <Filter>Assets\Loadables</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyAudioData.h">
       <Filter>Assets\Nodes</Filter>
@@ -546,12 +537,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\Interop\HyConsole_Win.h">
       <Filter>Diagnostics\Console\Interop</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Assets\Loadables\HyAtlas.h">
-      <Filter>Assets\Loadables</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Assets\Loadables\HyAtlasIndices.h">
-      <Filter>Assets\Loadables</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Output\HyDiagOutput.h">
       <Filter>Diagnostics\Output</Filter>
@@ -670,9 +655,6 @@
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Visables\Drawables\Objects\HyTexturedQuad2d.h">
       <Filter>Scene\Nodes\Loadables\Visables\Drawables\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Assets\Loadables\HyGLTF.h">
-      <Filter>Assets\Loadables</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyVertexBuffer.h">
       <Filter>Renderer\Components</Filter>
     </ClInclude>
@@ -702,6 +684,18 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Audio\Interop\HyAudio_FMOD.h">
       <Filter>Audio\Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\HyAtlas.h">
+      <Filter>Assets\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\HyGLTF.h">
+      <Filter>Assets\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\IHyFileData.h">
+      <Filter>Assets\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\HyFileIO.h">
+      <Filter>Assets\Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

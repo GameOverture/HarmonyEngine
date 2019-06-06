@@ -358,7 +358,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	{
 		while(m_Load_Retrieval.empty() == false)
 		{
-			IHyLoadableData *pData = m_Load_Retrieval.front();
+			IHyFileData *pData = m_Load_Retrieval.front();
 			m_Load_Retrieval.pop();
 
 			rendererRef.TxData(pData);
@@ -369,10 +369,10 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Grab and process any returning data from the renderer
-	std::queue<IHyLoadableData *> &rxDataQueueRef = rendererRef.RxData();
+	std::queue<IHyFileData *> &rxDataQueueRef = rendererRef.RxData();
 	while(rxDataQueueRef.empty() == false)
 	{
-		IHyLoadableData *pData = rxDataQueueRef.front();
+		IHyFileData *pData = rxDataQueueRef.front();
 		rxDataQueueRef.pop();
 
 		FinalizeData(pData);
@@ -491,7 +491,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 /*virtual*/ void HyAssets::OnThreadUpdate() /*override*/
 {
-	std::vector<IHyLoadableData *>	dataList;
+	std::vector<IHyFileData *>	dataList;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
@@ -521,7 +521,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 {
 }
 
-void HyAssets::QueueData(IHyLoadableData *pData)
+void HyAssets::QueueData(IHyFileData *pData)
 {
 	if(pData->m_uiRefCount == 0)
 	{
@@ -537,7 +537,7 @@ void HyAssets::QueueData(IHyLoadableData *pData)
 	pData->m_uiRefCount++;
 }
 
-void HyAssets::DequeData(IHyLoadableData *pData)
+void HyAssets::DequeData(IHyFileData *pData)
 {
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Inactive, "Trying to DequeData that is HYLOADSTATE_Inactive");
 	HyAssert(pData->m_uiRefCount > 0, "Tried to decrement a '0' reference");
@@ -566,7 +566,7 @@ void HyAssets::DequeData(IHyLoadableData *pData)
 	}
 }
 
-void HyAssets::FinalizeData(IHyLoadableData *pData)
+void HyAssets::FinalizeData(IHyFileData *pData)
 {
 	// TODO: this for now...
 	if(pData->GetLoadableType() == HYLOADABLE_Shader)

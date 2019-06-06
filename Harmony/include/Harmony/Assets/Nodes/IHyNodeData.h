@@ -11,7 +11,7 @@
 #define IHyNodeData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Loadables/HyAtlasIndices.h"
+#include "Assets/Files/HyAtlas.h"
 
 // Forward declarations
 class IHyRenderer;

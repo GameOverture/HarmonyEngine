@@ -53,25 +53,10 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GuiRelease|x64'">Afx/HyStdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Afx/HyStdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Assets\Files\HyAtlas.cpp" />
+    <ClCompile Include="Assets\Files\HyFileIO.cpp" />
+    <ClCompile Include="Assets\Files\HyGLTF.cpp" />
     <ClCompile Include="Assets\HyAssets.cpp" />
-    <ClCompile Include="Assets\Loadables\HyAtlas.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IntrinsicFunctions>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GuiDebug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GuiRelease|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GuiDebug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GuiRelease|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Assets\Loadables\HyAtlasIndices.cpp" />
-    <ClCompile Include="Assets\Loadables\HyGLTF.cpp" />
     <ClCompile Include="Assets\Nodes\HyAudioData.cpp" />
     <ClCompile Include="Assets\Nodes\HyEntityData.cpp" />
     <ClCompile Include="Assets\Nodes\HyPrefabData.cpp" />
@@ -147,7 +132,6 @@
     <ClCompile Include="UI\HyButton.cpp" />
     <ClCompile Include="Utilities\Crc32.cpp" />
     <ClCompile Include="Utilities\HyBitManip.cpp" />
-    <ClCompile Include="Utilities\HyFileIO.cpp" />
     <ClCompile Include="Utilities\HyMath.cpp" />
     <ClCompile Include="Utilities\HyStrManip.cpp" />
     <ClCompile Include="Utilities\HyVariant.cpp" />
@@ -169,11 +153,11 @@
     <ClInclude Include="..\..\include\Harmony\Afx\Platforms\HyPlatform_OSX.h" />
     <ClInclude Include="..\..\include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="..\..\include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\HyAtlas.h" />
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\HyFileIO.h" />
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\HyGLTF.h" />
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\IHyFileData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\HyAssets.h" />
-    <ClInclude Include="..\..\include\Harmony\Assets\Loadables\HyAtlas.h" />
-    <ClInclude Include="..\..\include\Harmony\Assets\Loadables\HyAtlasIndices.h" />
-    <ClInclude Include="..\..\include\Harmony\Assets\Loadables\HyGLTF.h" />
-    <ClInclude Include="..\..\include\Harmony\Assets\Loadables\IHyLoadableData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyAudioData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyEntityData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyPrefabData.h" />
@@ -255,7 +239,6 @@
     <ClInclude Include="..\..\include\Harmony\UI\HyButton.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\Crc32.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyBitManip.h" />
-    <ClInclude Include="..\..\include\Harmony\Utilities\HyFileIO.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyMath.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyRand.h" />
     <ClInclude Include="..\..\include\Harmony\Utilities\HyStrManip.h" />

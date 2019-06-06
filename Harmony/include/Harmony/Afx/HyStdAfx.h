@@ -20,7 +20,7 @@
 #include "Utilities/tiny_gltf.h"
 
 #include "Utilities/jsonxx.h"
-#include "Utilities/HyFileIO.h"
+#include "Assets/Files/HyFileIO.h"
 #include "Box2D/Box2D.h"
 
 //#define GLM_SWIZZLE

@@ -12,10 +12,11 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Assets/Nodes/HyAudioData.h"
+#include "Scene/Nodes/Loadables/IHyLoadable2d.h"
 
-class HyAudio2d// : public IHyAudioInstInterop
+class HyAudio2d : public IHyLoadable2d
 {
-	HyAudioData *						m_pDataPtr;
+	HyAudioData *	m_pDataPtr;
 
 	enum CueType
 	{
@@ -27,7 +28,7 @@ class HyAudio2d// : public IHyAudioInstInterop
 	CueType		m_eCueType;
 
 public:
-	HyAudio2d();
+	HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	virtual ~HyAudio2d(void);
 };
 

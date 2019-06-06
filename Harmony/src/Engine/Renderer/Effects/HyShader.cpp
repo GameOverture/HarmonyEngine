@@ -14,7 +14,7 @@
 /*static*/ HyShaderHandle HyShader::sm_hHandleCount = 0;
 
 HyShader::HyShader(HyShaderProgramDefaults eDefaultsFrom) :
-	IHyLoadableData(HYLOADABLE_Shader),
+	IHyFileData(HYLOADABLE_Shader),
 	m_hHANDLE(++sm_hHandleCount),
 	m_eDEFAULTS_FROM(eDefaultsFrom),
 	m_bIsFinalized(false),

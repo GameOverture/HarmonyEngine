@@ -10,3 +10,11 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
 
+HyAudio2d::HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :
+	IHyLoadable2d(HYTYPE_Sound, szPrefix, szName, pParent)
+{
+}
+
+/*virtual*/ HyAudio2d::~HyAudio2d(void)
+{
+}

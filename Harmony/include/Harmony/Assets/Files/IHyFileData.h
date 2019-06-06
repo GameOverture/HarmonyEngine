@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyLoadableData.h
+*	IHyFileData.h
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -14,7 +14,7 @@
 
 class IHyRenderer;
 
-class IHyLoadableData
+class IHyFileData
 {
 	friend class HyAssets;
 
@@ -24,7 +24,7 @@ class IHyLoadableData
 	uint32							m_uiRefCount;
 
 public:
-	IHyLoadableData(HyLoadableType eType) :	m_eLOADABLE_TYPE(eType),
+	IHyFileData(HyLoadableType eType) :	m_eLOADABLE_TYPE(eType),
 											m_eLoadState(HYLOADSTATE_Inactive),
 											m_uiRefCount(0)
 	{ }

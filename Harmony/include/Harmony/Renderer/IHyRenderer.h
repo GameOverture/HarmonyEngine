@@ -23,7 +23,7 @@ class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
 class IHyCamera;
-class IHyLoadableData;
+class IHyFileData;
 
 class IHyRenderer
 {
@@ -40,8 +40,8 @@ protected:
 	HyWindow *										m_pCurWindow;
 	
 	// Message queues (transfer and receive)
-	std::queue<IHyLoadableData *>					m_TxDataQueue;
-	std::queue<IHyLoadableData *>					m_RxDataQueue;
+	std::queue<IHyFileData *>					m_TxDataQueue;
+	std::queue<IHyFileData *>					m_RxDataQueue;
 	
 	// Effects containers
 	std::map<HyShaderHandle, HyShader *>			m_ShaderMap;
@@ -64,8 +64,8 @@ public:
 
 	HyVertexBufferHandle AppendVertexData3d(const uint8 *pData, uint32 uiSize);
 
-	void TxData(IHyLoadableData *pData);
-	std::queue<IHyLoadableData *> &RxData();
+	void TxData(IHyFileData *pData);
+	std::queue<IHyFileData *> &RxData();
 
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
 
