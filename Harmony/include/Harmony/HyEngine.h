@@ -12,7 +12,6 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Window/HyWindowManager.h"
-#include "Audio/IHyAudio.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Input/HyInput.h"

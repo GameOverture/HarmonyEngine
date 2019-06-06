@@ -85,7 +85,7 @@ HyAtlas::HyAtlas(std::string sFilePath,
 				 HyTextureFormat eTextureFormat,
 				 HyTextureFiltering eTextureFiltering,
 				 jsonxx::Array &srcFramesArrayRef) :
-	IHyFileData(HYLOADABLE_Atlas),
+	IHyFileData(HYFILE_Atlas),
 	m_uiATLAS_GROUP_ID(uiAtlasGroupId),
 	m_uiINDEX_IN_GROUP(uiIndexInGroup),
 	m_uiMASTER_INDEX(uiMasterIndex),

@@ -15,10 +15,9 @@
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
 
-class HySound;
-
 class HyAudioData : public IHyNodeData
 {
+	
 public:
 	HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);

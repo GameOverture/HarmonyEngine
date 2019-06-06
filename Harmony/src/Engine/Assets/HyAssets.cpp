@@ -177,6 +177,8 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 	case HYTYPE_Prefab:
 		pDataOut = m_PrefabFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
+	case HYTYPE_Audio:
+		break;
 	case HYTYPE_TexturedQuad:
 		if(pLoadable->GetName() != "raw")
 		{
@@ -549,7 +551,7 @@ void HyAssets::DequeData(IHyFileData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Discarded;
 
-			if(pData->GetLoadableType() == HYLOADABLE_Atlas)
+			if(pData->GetLoadableType() == HYFILE_Atlas)
 				m_pLoadedAtlasIndices->Clear(static_cast<HyAtlas *>(pData)->GetMasterIndex());
 
 			m_Load_Prepare.push(pData);
@@ -569,7 +571,7 @@ void HyAssets::DequeData(IHyFileData *pData)
 void HyAssets::FinalizeData(IHyFileData *pData)
 {
 	// TODO: this for now...
-	if(pData->GetLoadableType() == HYLOADABLE_Shader)
+	if(pData->GetLoadableType() == HYFILE_Shader)
 		return;
 
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Inactive, "HyAssets::FinalizeData was passed data that was HYLOADSTATE_Inactive");
@@ -586,7 +588,7 @@ void HyAssets::FinalizeData(IHyFileData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Loaded;
 
-			if(pData->GetLoadableType() == HYLOADABLE_Atlas)
+			if(pData->GetLoadableType() == HYFILE_Atlas)
 			{
 				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] loaded");
 				m_pLoadedAtlasIndices->Set(static_cast<HyAtlas *>(pData)->GetMasterIndex());
@@ -617,7 +619,7 @@ void HyAssets::FinalizeData(IHyFileData *pData)
 			{
 				pData->m_eLoadState = HYLOADSTATE_Queued;
 
-				if(pData->GetLoadableType() == HYLOADABLE_Atlas) {
+				if(pData->GetLoadableType() == HYFILE_Atlas) {
 					HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] reloading");
 				}
 				else {
@@ -636,7 +638,7 @@ void HyAssets::FinalizeData(IHyFileData *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
 
-			if(pData->GetLoadableType() == HYLOADABLE_Atlas)
+			if(pData->GetLoadableType() == HYFILE_Atlas)
 				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] deleted")
 			else
 				HyLogInfo("Custom Shader deleted");

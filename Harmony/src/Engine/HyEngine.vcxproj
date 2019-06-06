@@ -65,11 +65,6 @@
     <ClCompile Include="Assets\Nodes\HyText2dData.cpp" />
     <ClCompile Include="Assets\Nodes\HyTexturedQuad2dData.cpp" />
     <ClCompile Include="Assets\Nodes\IHyNodeData.cpp" />
-    <ClCompile Include="Audio\IHyAudio.cpp" />
-    <ClCompile Include="Audio\IHyAudioInst.cpp" />
-    <ClCompile Include="Audio\Interop\HyAudio_FMOD.cpp" />
-    <ClCompile Include="Audio\Interop\HyAudio_Win.cpp" />
-    <ClCompile Include="Audio\Interop\IHyAudioInst_Win.cpp" />
     <ClCompile Include="Diagnostics\Console\HyConsole.cpp" />
     <ClCompile Include="Diagnostics\Console\Interop\HyConsole_Gui.cpp" />
     <ClCompile Include="Diagnostics\Console\Interop\HyConsole_Win.cpp" />
@@ -167,10 +162,7 @@
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyTexturedQuad2dData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\IHyNodeData.h" />
     <ClInclude Include="..\..\include\Harmony\Audio\IHyAudio.h" />
-    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioInst.h" />
-    <ClInclude Include="..\..\include\Harmony\Audio\Interop\HyAudio_FMOD.h" />
-    <ClInclude Include="..\..\include\Harmony\Audio\Interop\HyAudio_Win.h" />
-    <ClInclude Include="..\..\include\Harmony\Audio\Interop\IHyAudioInst_Win.h" />
+    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioData.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\HyConsole.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\Interop\HyConsole_Gui.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\Interop\HyConsole_Win.h" />

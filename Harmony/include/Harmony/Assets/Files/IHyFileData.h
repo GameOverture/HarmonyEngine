@@ -18,19 +18,20 @@ class IHyFileData
 {
 	friend class HyAssets;
 
-	const HyLoadableType			m_eLOADABLE_TYPE;
+	const HyFileType				m_eLOADABLE_TYPE;
 
-	HyLoadState						m_eLoadState;
-	uint32							m_uiRefCount;
+	HyLoadState							m_eLoadState;
+	uint32								m_uiRefCount;
 
 public:
-	IHyFileData(HyLoadableType eType) :	m_eLOADABLE_TYPE(eType),
-											m_eLoadState(HYLOADSTATE_Inactive),
-											m_uiRefCount(0)
+	IHyFileData(HyFileType eType) :
+		m_eLOADABLE_TYPE(eType),
+		m_eLoadState(HYLOADSTATE_Inactive),
+		m_uiRefCount(0)
 	{ }
 
-	HyLoadableType GetLoadableType()							{ return m_eLOADABLE_TYPE; }
-	HyLoadState GetLoadableState()								{ return m_eLoadState; }
+	HyFileType GetLoadableType()	{ return m_eLOADABLE_TYPE; }
+	HyLoadState GetLoadableState()		{ return m_eLoadState; }
 
 	virtual void OnLoadThread() = 0;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;

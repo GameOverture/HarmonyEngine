@@ -16,8 +16,6 @@
 
 class HyAudio2d : public IHyLoadable2d
 {
-	HyAudioData *	m_pDataPtr;
-
 	enum CueType
 	{
 		SNDCUETYPE_Unknown = -1,
@@ -30,6 +28,14 @@ class HyAudio2d : public IHyLoadable2d
 public:
 	HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	virtual ~HyAudio2d(void);
+
+	void Play();
+	void Stop();
+
+	float GetPitch();
+	void SetPitch(float fPitch);
+
+	void SetReverb();
 };
 
 #endif /* HyAudio2d_h__ */

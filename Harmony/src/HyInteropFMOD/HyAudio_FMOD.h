@@ -1,19 +1,16 @@
 /**************************************************************************
 *	HyAudio_FMOD.h
-*
+*	
 *	Harmony Engine
 *	Copyright (c) 2019 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyAudio_FMOD_h__
-#define HyAudio_FMOD_h__
+#include "stdafx.h"
 
-#include "Afx/HyStdAfx.h"
-
-#if defined(HY_FMOD)
-#include "Audio/IHyAudio.h"
+#include "Harmony/Audio/IHyAudio.h"
+#include "Harmony/Audio/IHyAudioData.h"
 
 #include "3rdParty/FMOD/fmod_studio.hpp"
 #include "3rdParty/FMOD/fmod.hpp"
@@ -29,8 +26,13 @@ class HyAudio_FMOD : public IHyAudio
 public:
 	HyAudio_FMOD();
 	virtual ~HyAudio_FMOD();
+
+	virtual void OnUpdate() override;
 };
 
-#endif // HY_FMOD
-
-#endif /* HyAudio_FMOD_h__ */
+class HyAudioData_FMOD : public IHyAudioData
+{
+public:
+	HyAudioData_FMOD();
+	virtual ~HyAudioData_FMOD();
+};

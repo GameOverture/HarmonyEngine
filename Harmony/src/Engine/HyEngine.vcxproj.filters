@@ -38,18 +38,6 @@
     <ClCompile Include="Utilities\HyVariant.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="Audio\IHyAudio.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\Interop\HyAudio_Win.cpp">
-      <Filter>Audio\Interop</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\Interop\IHyAudioInst_Win.cpp">
-      <Filter>Audio\Interop</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\IHyAudioInst.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
@@ -248,9 +236,6 @@
     <ClCompile Include="UI\HyButton.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="Audio\Interop\HyAudio_FMOD.cpp">
-      <Filter>Audio\Interop</Filter>
-    </ClCompile>
     <ClCompile Include="Assets\Files\HyAtlas.cpp">
       <Filter>Assets\Files</Filter>
     </ClCompile>
@@ -312,9 +297,6 @@
     </Filter>
     <Filter Include="Assets">
       <UniqueIdentifier>{e2b21351-8df2-464a-9b03-dde1640d06dc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Audio\Interop">
-      <UniqueIdentifier>{c81ee2e9-8305-4502-b6de-fcfe0745cad4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene\Nodes">
       <UniqueIdentifier>{05dc02a1-ad5c-4fde-a87a-a678278e5571}</UniqueIdentifier>
@@ -461,15 +443,6 @@
       <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Audio\IHyAudio.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Audio\Interop\HyAudio_Win.h">
-      <Filter>Audio\Interop</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Audio\Interop\IHyAudioInst_Win.h">
-      <Filter>Audio\Interop</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioInst.h">
       <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysEntity2d.h">
@@ -682,9 +655,6 @@
     <ClInclude Include="..\..\include\Harmony\Utilities\HyRand.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Audio\Interop\HyAudio_FMOD.h">
-      <Filter>Audio\Interop</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Assets\Files\HyAtlas.h">
       <Filter>Assets\Files</Filter>
     </ClInclude>
@@ -696,6 +666,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Assets\Files\HyFileIO.h">
       <Filter>Assets\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioData.h">
+      <Filter>Audio</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

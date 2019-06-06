@@ -184,7 +184,7 @@ void HyDiagnostics::DumpNodeUsage()
 	std::vector<IHyDrawable2d *> loadedNodesList;
 	m_SceneRef.CopyAllLoadedNodes(loadedNodesList);
 
-	uint32 uiNumSound2d = 0;
+	uint32 uiNumAudio = 0;
 	uint32 uiNumParticles2d = 0;
 	uint32 uiNumSprite2d = 0;
 	uint32 uiNumSpine2d = 0;
@@ -196,19 +196,19 @@ void HyDiagnostics::DumpNodeUsage()
 	{
 		switch(loadedNodesList[i]->GetType())
 		{
-		case HYTYPE_Sound:		uiNumSound2d++;			break;
-		case HYTYPE_Particles:	uiNumParticles2d++;		break;
-		case HYTYPE_Sprite:		uiNumSprite2d++;		break;
-		case HYTYPE_Spine:		uiNumSpine2d++;			break;
+		case HYTYPE_Audio:			uiNumAudio++;			break;
+		case HYTYPE_Particles:		uiNumParticles2d++;		break;
+		case HYTYPE_Sprite:			uiNumSprite2d++;		break;
+		case HYTYPE_Spine:			uiNumSpine2d++;			break;
 		case HYTYPE_TexturedQuad:	uiNumTextureQuad2d++;	break;
-		case HYTYPE_Primitive:	uiNumPrimitive2d++;		break;
+		case HYTYPE_Primitive:		uiNumPrimitive2d++;		break;
 		case HYTYPE_Text:			uiNumText2d++;			break;
-		case HYTYPE_Prefab:		uiNumPrefab3d++;		break;
+		case HYTYPE_Prefab:			uiNumPrefab3d++;		break;
 		}
 	}
 
 	HyLogSection("Loaded Node Usage");
-	HyLog("Sound Nodes:        " << uiNumSound2d);
+	HyLog("Sound Nodes:        " << uiNumAudio);
 	HyLog("Particle Nodes:     " << uiNumParticles2d);
 	HyLog("Sprite Nodes:       " << uiNumSprite2d);
 	HyLog("Spine Nodes:        " << uiNumSpine2d);

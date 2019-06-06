@@ -17,7 +17,7 @@
 #include "glm/gtx/quaternion.hpp"
 
 HyGLTF::HyGLTF(const std::string &sIdentifier) :
-	IHyFileData(HYLOADABLE_GLTF),
+	IHyFileData(HYFILE_GLTF),
 	m_sIDENTIFIER(sIdentifier)
 {
 }

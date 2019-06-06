@@ -1,19 +1,20 @@
 /**************************************************************************
-*	IHyAudioInst.cpp
-*
+*	IHyAudioData.h
+*	
 *	Harmony Engine
-*	Copyright (c) 2016 Jason Knobler
+*	Copyright (c) 2019 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Afx/HyStdAfx.h"
-#include "Audio/IHyAudioInst.h"
+#ifndef IHyAudioData_h__
+#define IHyAudioData_h__
 
-IHyAudioInst::IHyAudioInst()
+class IHyAudioData
 {
-}
+public:
+	IHyAudioData() { }
+	virtual ~IHyAudioData(void) { }
+};
 
-IHyAudioInst::~IHyAudioInst()
-{
-}
+#endif /* IHyAudioData_h__ */

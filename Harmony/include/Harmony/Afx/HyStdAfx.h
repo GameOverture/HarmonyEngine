@@ -55,7 +55,7 @@ enum HyType
 {
 	HYTYPE_Unknown = 0,
 
-	HYTYPE_Sound,
+	HYTYPE_Audio,
 	HYTYPE_Particles,
 	HYTYPE_Sprite,
 	HYTYPE_Spine,
@@ -80,11 +80,11 @@ enum HyShapeType
 	HYNUM_SHAPE
 };
 
-enum HyLoadableType
+enum HyFileType
 {
-	HYLOADABLE_Atlas = 0,
-	HYLOADABLE_Shader,
-	HYLOADABLE_GLTF
+	HYFILE_Atlas = 0,
+	HYFILE_Shader,
+	HYFILE_GLTF
 };
 
 enum HyAnimCtrl
