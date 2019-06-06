@@ -18,6 +18,7 @@
 #define HYASSETS_DataFile "data.json"
 #define HYASSETS_AtlasDir "Atlases/"
 #define HYASSETS_PrefabDir "Prefabs/"
+#define HYASSETS_AudioDir "Audio/"
 
 class HyScene;
 class IHyRenderer;
@@ -61,12 +62,12 @@ class HyAssets : public IHyThreadClass
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
-	std::vector<IHyFileData *>								m_ReloadDataList;
+	std::vector<IHyFileData *>									m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
-	std::queue<IHyFileData *>								m_Load_Prepare;
-	std::queue<IHyFileData *>								m_Load_Shared;
-	std::queue<IHyFileData *>								m_Load_Retrieval;
+	std::queue<IHyFileData *>									m_Load_Prepare;
+	std::queue<IHyFileData *>									m_Load_Shared;
+	std::queue<IHyFileData *>									m_Load_Retrieval;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Thread control

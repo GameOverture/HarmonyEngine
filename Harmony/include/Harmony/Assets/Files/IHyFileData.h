@@ -20,8 +20,8 @@ class IHyFileData
 
 	const HyFileType				m_eLOADABLE_TYPE;
 
-	HyLoadState							m_eLoadState;
-	uint32								m_uiRefCount;
+	HyLoadState						m_eLoadState;
+	uint32							m_uiRefCount;
 
 public:
 	IHyFileData(HyFileType eType) :
@@ -31,7 +31,7 @@ public:
 	{ }
 
 	HyFileType GetLoadableType()	{ return m_eLOADABLE_TYPE; }
-	HyLoadState GetLoadableState()		{ return m_eLoadState; }
+	HyLoadState GetLoadableState()	{ return m_eLoadState; }
 
 	virtual void OnLoadThread() = 0;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;

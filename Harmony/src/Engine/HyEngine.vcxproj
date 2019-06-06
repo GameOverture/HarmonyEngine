@@ -54,6 +54,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Afx/HyStdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Assets\Files\HyAtlas.cpp" />
+    <ClCompile Include="Assets\Files\HyAudioBank.cpp" />
     <ClCompile Include="Assets\Files\HyFileIO.cpp" />
     <ClCompile Include="Assets\Files\HyGLTF.cpp" />
     <ClCompile Include="Assets\HyAssets.cpp" />
@@ -83,7 +84,6 @@
     <ClCompile Include="Renderer\Components\HyVertexBuffer.cpp" />
     <ClCompile Include="Renderer\Effects\HyShader.cpp" />
     <ClCompile Include="Renderer\Effects\HyStencil.cpp" />
-    <ClCompile Include="Renderer\Effects\IHyFx.cpp" />
     <ClCompile Include="Renderer\IHyRenderer.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp" />
     <ClCompile Include="Scene\HyScene.cpp" />
@@ -149,6 +149,7 @@
     <ClInclude Include="..\..\include\Harmony\Afx\Platforms\HyPlatform_Unix.h" />
     <ClInclude Include="..\..\include\Harmony\Afx\Platforms\HyPlatform_Windows.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Files\HyAtlas.h" />
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\HyAudioBank.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Files\HyFileIO.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Files\HyGLTF.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Files\IHyFileData.h" />
@@ -162,7 +163,7 @@
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\HyTexturedQuad2dData.h" />
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\IHyNodeData.h" />
     <ClInclude Include="..\..\include\Harmony\Audio\IHyAudio.h" />
-    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioData.h" />
+    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioBank.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\HyConsole.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\Interop\HyConsole_Gui.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\Interop\HyConsole_Win.h" />
@@ -185,7 +186,6 @@
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyVertexBuffer.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyShader.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyStencil.h" />
-    <ClInclude Include="..\..\include\Harmony\Renderer\Effects\IHyFx.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\IHyRenderer.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />

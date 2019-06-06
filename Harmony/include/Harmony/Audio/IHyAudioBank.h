@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyAudioData.h
+*	IHyAudioBank.h
 *	
 *	Harmony Engine
 *	Copyright (c) 2019 Jason Knobler
@@ -7,14 +7,18 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IHyAudioData_h__
-#define IHyAudioData_h__
+#ifndef IHyAudioBank_h__
+#define IHyAudioBank_h__
 
-class IHyAudioData
+#include <string>
+
+class IHyAudioBank
 {
 public:
-	IHyAudioData() { }
-	virtual ~IHyAudioData(void) { }
+	IHyAudioBank() = default;
+	virtual ~IHyAudioBank(void) = default;
+
+	virtual bool Load(std::string sFilePath) = 0;
 };
 
-#endif /* IHyAudioData_h__ */
+#endif /* IHyAudioBank_h__ */

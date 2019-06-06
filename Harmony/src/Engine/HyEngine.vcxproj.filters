@@ -134,9 +134,6 @@
     <ClCompile Include="Renderer\Effects\HyStencil.cpp">
       <Filter>Renderer\Effects</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Effects\IHyFx.cpp">
-      <Filter>Renderer\Effects</Filter>
-    </ClCompile>
     <ClCompile Include="Threading\IHyThreadClass.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
@@ -243,6 +240,9 @@
       <Filter>Assets\Files</Filter>
     </ClCompile>
     <ClCompile Include="Assets\Files\HyFileIO.cpp">
+      <Filter>Assets\Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Files\HyAudioBank.cpp">
       <Filter>Assets\Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -544,9 +544,6 @@
     <ClInclude Include="..\..\include\Harmony\Renderer\Effects\HyStencil.h">
       <Filter>Renderer\Effects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Renderer\Effects\IHyFx.h">
-      <Filter>Renderer\Effects</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Threading\IHyThreadClass.h">
       <Filter>Threading</Filter>
     </ClInclude>
@@ -667,8 +664,11 @@
     <ClInclude Include="..\..\include\Harmony\Assets\Files\HyFileIO.h">
       <Filter>Assets\Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioData.h">
+    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioBank.h">
       <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Assets\Files\HyAudioBank.h">
+      <Filter>Assets\Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -84,7 +84,8 @@ enum HyFileType
 {
 	HYFILE_Atlas = 0,
 	HYFILE_Shader,
-	HYFILE_GLTF
+	HYFILE_GLTF,
+	HYFILE_AudioBank
 };
 
 enum HyAnimCtrl
