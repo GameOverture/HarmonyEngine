@@ -670,5 +670,8 @@
     <ClInclude Include="..\..\include\Harmony\Assets\Files\HyAudioBank.h">
       <Filter>Assets\Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioInst.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

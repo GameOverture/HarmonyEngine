@@ -13,9 +13,12 @@
 #include "Afx/HyInteropAfx.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Scene/Nodes/Loadables/IHyLoadable2d.h"
+#include "Audio/IHyAudioInst.h"
 
 class HyAudio2d : public IHyLoadable2d
 {
+	IHyAudioInst *		m_pInternal;
+
 	enum CueType
 	{
 		SNDCUETYPE_Unknown = -1,

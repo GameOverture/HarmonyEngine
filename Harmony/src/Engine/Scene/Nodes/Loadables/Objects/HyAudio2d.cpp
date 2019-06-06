@@ -21,21 +21,25 @@ HyAudio2d::HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pPare
 
 void HyAudio2d::Play()
 {
+	m_pInternal->Play();
 }
 
 void HyAudio2d::Stop()
 {
+	m_pInternal->Stop();
 }
 
 float HyAudio2d::GetPitch()
 {
-	return 0.0f;
+	return m_pInternal->GetPitch();
 }
 
 void HyAudio2d::SetPitch(float fPitch)
 {
+	m_pInternal->SetPitch(fPitch);
 }
 
 void HyAudio2d::SetReverb()
 {
+	m_pInternal->SetReverb();
 }

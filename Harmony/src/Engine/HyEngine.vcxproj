@@ -164,6 +164,7 @@
     <ClInclude Include="..\..\include\Harmony\Assets\Nodes\IHyNodeData.h" />
     <ClInclude Include="..\..\include\Harmony\Audio\IHyAudio.h" />
     <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioBank.h" />
+    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioInst.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\HyConsole.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\Interop\HyConsole_Gui.h" />
     <ClInclude Include="..\..\include\Harmony\Diagnostics\Console\Interop\HyConsole_Win.h" />
