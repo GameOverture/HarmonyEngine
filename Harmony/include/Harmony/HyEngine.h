@@ -14,6 +14,7 @@
 #include "Window/HyWindowManager.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
+#include "Audio/HyAudio.h"
 #include "Input/HyInput.h"
 #include "Time/HyTime.h"
 #include "Renderer/Effects/HyStencil.h"
@@ -47,6 +48,7 @@ class HyEngine
 	HyWindowManager				m_WindowManager;
 	HyConsoleInterop			m_Console;
 	
+	HyAudio						m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
 	HyGuiComms					m_GuiComms;
