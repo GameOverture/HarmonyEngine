@@ -245,6 +245,9 @@
     <ClCompile Include="Assets\Files\HyAudioBank.cpp">
       <Filter>Assets\Files</Filter>
     </ClCompile>
+    <ClCompile Include="Audio\HyAudioHarness.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -671,6 +674,9 @@
       <Filter>Assets\Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioInst.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Audio\HyAudioHarness.h">
       <Filter>Audio</Filter>
     </ClInclude>
   </ItemGroup>
