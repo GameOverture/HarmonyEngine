@@ -20,7 +20,7 @@ SpriteFramesModel::SpriteFramesModel(QObject *parent) :
 
 int SpriteFramesModel::Add(AtlasFrame *pFrame)
 {
-	SpriteFrame *pFrameToInsert = NULL;
+	SpriteFrame *pFrameToInsert = nullptr;
 
 	// See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
 	QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameIdMap.find(pFrame->GetId());
@@ -150,7 +150,7 @@ QJsonArray SpriteFramesModel::GetFramesInfo(float &fTotalDurationRef)
 SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 {
 	if(iIndex < 0)
-		return NULL;
+		return nullptr;
 
 	return m_FramesList[iIndex];
 }

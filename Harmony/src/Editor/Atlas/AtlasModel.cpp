@@ -145,7 +145,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 		QList<AtlasTreeItem *> atlasFiltersTreeItemList(m_TopLevelTreeItemList);
 		for(int i = 0; i < m_TopLevelTreeItemList.size(); ++i)
 		{
-			AtlasTreeItem *pParentFilter = NULL;
+			AtlasTreeItem *pParentFilter = nullptr;
 
 			QString sFilterPath = m_TopLevelTreeItemList[i]->data(0, Qt::UserRole).toString();
 			sFilterPath.truncate(sFilterPath.lastIndexOf("/"));
@@ -199,7 +199,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 												frameObj["errors"].toInt(0));
 
 			QString sFilterPath = frameObj["filter"].toString();
-			AtlasTreeItem *pFrameParent = NULL;
+			AtlasTreeItem *pFrameParent = nullptr;
 			if(sFilterPath != "")
 			{
 				for(int j = 0; j < atlasFiltersTreeItemList.size(); ++j)
@@ -527,7 +527,7 @@ QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem)
 	for(int i = 0; i < selectedItems.size(); ++i)
 	{
 		AtlasFrame *pFrame = selectedItems[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-		if(pFrame == NULL)
+		if(pFrame == nullptr)
 			continue;
 
 		frameRequestList.append(pFrame);

@@ -41,9 +41,9 @@ DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerItem *pItem, QWidget
 {
 	CtorInit(sDlgTitle, pItem->GetName(false));
 
-	if(pItem == NULL)
+	if(pItem == nullptr)
 	{
-		HyGuiLog("DlgInputName recieved a NULL Item pointer", LOGTYPE_Error);
+		HyGuiLog("DlgInputName recieved a nullptr Item pointer", LOGTYPE_Error);
 		return;
 	}
 	

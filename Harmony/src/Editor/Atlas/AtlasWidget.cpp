@@ -184,7 +184,7 @@ void AtlasWidget::RefreshInfo()
 {
 	QWidget::resizeEvent(event);
 
-	if(ui->atlasList == NULL)
+	if(ui->atlasList == nullptr)
 		return;
 
 	int iTotalWidth = ui->atlasList->size().width();
@@ -422,7 +422,7 @@ void AtlasWidget::OnContextMenu(const QPoint &pos)
 	QMenu contextMenu;
 	QMenu atlasGrpMenu;
 	
-	if(pTreeNode == NULL)
+	if(pTreeNode == nullptr)
 	{
 		contextMenu.addAction(ui->actionImportImages);
 		contextMenu.addAction(ui->actionImportDirectory);

@@ -245,7 +245,7 @@
     <ClCompile Include="Assets\Files\HyAudioBank.cpp">
       <Filter>Assets\Files</Filter>
     </ClCompile>
-    <ClCompile Include="Audio\HyAudioHarness.cpp">
+    <ClCompile Include="Audio\HyAudio.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
   </ItemGroup>
@@ -361,6 +361,9 @@
     <Filter Include="Assets\Files">
       <UniqueIdentifier>{846e1724-4c9c-40c4-b6bb-3ca33bc2ff3e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Audio\Harness">
+      <UniqueIdentifier>{5290acd0-81ee-40ca-a466-fa434a20dc57}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Harmony\HyEngine.h" />
@@ -444,9 +447,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Utilities\Crc32.h">
       <Filter>Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudio.h">
-      <Filter>Audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysEntity2d.h">
       <Filter>Scene\Physics</Filter>
@@ -667,17 +667,20 @@
     <ClInclude Include="..\..\include\Harmony\Assets\Files\HyFileIO.h">
       <Filter>Assets\Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioBank.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Assets\Files\HyAudioBank.h">
       <Filter>Assets\Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Audio\IHyAudioInst.h">
+    <ClInclude Include="..\..\include\Harmony\Audio\HyAudio.h">
       <Filter>Audio</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Audio\HyAudioHarness.h">
-      <Filter>Audio</Filter>
+    <ClInclude Include="..\..\include\Harmony\Audio\Harness\IHyAudio.h">
+      <Filter>Audio\Harness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Audio\Harness\IHyAudioBank.h">
+      <Filter>Audio\Harness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Audio\Harness\IHyAudioInst.h">
+      <Filter>Audio\Harness</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -25,4 +25,19 @@ public:
 	virtual void SetReverb() = 0;
 };
 
+class HyAudioInst_Null : public IHyAudioInst
+{
+public:
+	HyAudioInst_Null() = default;
+	virtual ~HyAudioInst_Null() = default;
+
+	virtual void Play() override { }
+	virtual void Stop() override { }
+
+	virtual float GetPitch() override { return 0.0f; }
+	virtual void SetPitch(float fPitch) override { }
+
+	virtual void SetReverb() override { }
+};
+
 #endif /* IHyAudioInst_h__ */

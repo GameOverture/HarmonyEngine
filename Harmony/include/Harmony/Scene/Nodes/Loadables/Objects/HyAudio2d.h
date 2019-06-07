@@ -13,7 +13,7 @@
 #include "Afx/HyInteropAfx.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Scene/Nodes/Loadables/IHyLoadable2d.h"
-#include "Audio/IHyAudioInst.h"
+#include "Audio/Harness/IHyAudioInst.h"
 
 class HyAudio2d : public IHyLoadable2d
 {

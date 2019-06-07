@@ -399,7 +399,7 @@ QAction *FindAction(QList<QAction *> list, QString sName)
 			return list[i];
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 char *QStringToCharPtr(QString sString)

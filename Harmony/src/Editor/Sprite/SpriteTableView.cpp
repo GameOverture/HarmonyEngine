@@ -46,7 +46,7 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ProjectItem *pItem, SpriteTableView *
 
 /*virtual*/ QWidget *WidgetSpriteDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	QWidget *pReturnWidget = NULL;
+	QWidget *pReturnWidget = nullptr;
 
 	switch(index.column())
 	{

@@ -19,6 +19,12 @@ void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+__declspec (dllexport) IHyAudio *CreateHyAudio_FMOD()
+{
+	IHyAudio *pNewAudio = new HyAudio_FMOD();
+	return pNewAudio;
+}
+
 HyAudio_FMOD::HyAudio_FMOD() :
 	m_pSystem(nullptr)
 {
@@ -38,6 +44,11 @@ HyAudio_FMOD::HyAudio_FMOD() :
 	ERRCHECK(m_pSystem->release());
 }
 
+Studio::System *HyAudio_FMOD::GetSystem() const
+{
+	return m_pSystem;
+}
+
 /*virtual*/ void HyAudio_FMOD::OnUpdate() /*override*/
 {
 	ERRCHECK(m_pSystem->update());
@@ -45,6 +56,12 @@ HyAudio_FMOD::HyAudio_FMOD() :
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+__declspec (dllexport) IHyAudioBank *CreateHyAudioBank_FMOD(IHyAudio *pAudio)
+{
+	IHyAudioBank *pNewAudio = new HyAudioBank_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem());
+	return pNewAudio;
+}
+
 HyAudioBank_FMOD::HyAudioBank_FMOD(Studio::System *pSystemRef) :
 	m_pSystemRef(pSystemRef),
 	m_pBank(nullptr)
@@ -60,4 +77,41 @@ HyAudioBank_FMOD::HyAudioBank_FMOD(Studio::System *pSystemRef) :
 {
 	ERRCHECK(m_pSystemRef->loadBankFile(sFilePath.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &m_pBank));
 	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+__declspec (dllexport) IHyAudioInst *CreateHyAudioInst_FMOD(IHyAudio *pAudio)
+{
+	IHyAudioInst *pNewAudio = new HyAudioInst_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem());
+	return pNewAudio;
+}
+
+HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef)
+{
+}
+
+/*virtual*/ HyAudioInst_FMOD::~HyAudioInst_FMOD()
+{
+}
+
+/*virtual*/ void HyAudioInst_FMOD::Play() /*override*/
+{
+}
+
+/*virtual*/ void HyAudioInst_FMOD::Stop() /*override*/
+{
+}
+
+/*virtual*/ float HyAudioInst_FMOD::GetPitch() /*override*/
+{
+	return 0.0f;
+}
+
+/*virtual*/ void HyAudioInst_FMOD::SetPitch(float fPitch) /*override*/
+{
+}
+
+/*virtual*/ void HyAudioInst_FMOD::SetReverb() /*override*/
+{
 }

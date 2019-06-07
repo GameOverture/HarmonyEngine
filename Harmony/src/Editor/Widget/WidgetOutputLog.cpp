@@ -14,7 +14,7 @@
 #include <QStringBuilder>
 #include <QMessageBox>
 
-WidgetOutputLog *WidgetOutputLog::sm_pInstance = NULL;
+WidgetOutputLog *WidgetOutputLog::sm_pInstance = nullptr;
 
 /*static*/ const QString WidgetOutputLog::sm_ksNormalHtml = "<font color=\"White\">";
 /*static*/ const QString WidgetOutputLog::sm_ksWarningHtml = "<font color=\"Yellow\">";
@@ -27,7 +27,7 @@ WidgetOutputLog::WidgetOutputLog(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::WidgetOutputLog)
 {
-	Q_ASSERT(sm_pInstance == NULL);
+	Q_ASSERT(sm_pInstance == nullptr);
 
 	ui->setupUi(this);
 

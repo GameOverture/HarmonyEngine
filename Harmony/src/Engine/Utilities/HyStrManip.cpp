@@ -15,7 +15,7 @@ namespace HyStr
 	// Takes the dst char ptr and dynamically allocates the size of src and copies its contents.
 	void DynamicStringCopy(char *&dst, const char *src)
 	{
-		dst = NULL;
+		dst = nullptr;
 		size_t iStrSize = strlen(src) + 1; // +1 for NULL terminator
 		dst = HY_NEW char[iStrSize];
 		strcpy(dst, src);

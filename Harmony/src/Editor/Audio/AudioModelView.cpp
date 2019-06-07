@@ -192,7 +192,7 @@ AudioCategoryDelegate::AudioCategoryDelegate(QObject *pParent /*= 0*/) :
 		if(index.row() == 0)
 		{
 			HyGuiLog("You cannot edit the \"Default\" category", LOGTYPE_Warning);
-			return NULL;//pLineEdit->setReadOnly(true); // Don't allow changing of "Default"
+			return nullptr;//pLineEdit->setReadOnly(true); // Don't allow changing of "Default"
 		}
 
 		return pLineEdit;

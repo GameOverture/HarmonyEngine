@@ -108,7 +108,7 @@ Project *AudioWidgetManager::GetItemProject()
 
 AudioWave *AudioWidgetManager::CreateWave(uint uiWaveBankId, quint32 uiChecksum, QString sName, uint16 uiFormatType, uint16 uiNumChannels, uint16 uiBitsPerSample, uint32 uiSamplesPerSec, uint32 uiErrors)
 {
-	AudioWave *pNewWave = NULL;
+	AudioWave *pNewWave = nullptr;
 
 	if(m_DependencyMap.contains(uiChecksum))
 	{

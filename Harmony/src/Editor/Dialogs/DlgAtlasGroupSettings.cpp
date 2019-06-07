@@ -185,7 +185,7 @@ void DlgAtlasGroupSettings::on_btnTexSize16384_clicked()
 		// check if it is ok or not
 		if(IsSettingsDirty() && m_bAtlasGrpHasImages)
 		{
-			if(QMessageBox::Ok == QMessageBox::warning(NULL, QString("Save Atlas Group Settings?"), QString("By modifying the Atlas Group settings, it is required to regenerate the entire Atlas Group."), QMessageBox::Ok, QMessageBox::Cancel))
+			if(QMessageBox::Ok == QMessageBox::warning(nullptr, QString("Save Atlas Group Settings?"), QString("By modifying the Atlas Group settings, it is required to regenerate the entire Atlas Group."), QMessageBox::Ok, QMessageBox::Cancel))
 				QDialog::done(r);
 			else
 				return;

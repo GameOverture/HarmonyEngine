@@ -21,4 +21,14 @@ public:
 	virtual bool Load(std::string sFilePath) = 0;
 };
 
+class HyAudioBank_Null : public IHyAudioBank
+{
+public:
+	HyAudioBank_Null() = default;
+	virtual ~HyAudioBank_Null() = default;
+
+	virtual bool Load(std::string sFilePath) override
+	{ return true; }
+};
+
 #endif /* IHyAudioBank_h__ */

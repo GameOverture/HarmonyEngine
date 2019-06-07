@@ -219,7 +219,7 @@ const uint32_t FOURCC_XMA_SEEK      = 'kees';
 const RIFFChunk *FindChunk(const uint8_t *pData, uint32 uiDataSize, uint32_t uiTagToFind)
 {
 	if(uiDataSize == 0)
-		return NULL;
+		return nullptr;
 
 	const uint8_t *pCurrentPtr = pData;
 	const uint8_t *pEndOfData = pData + uiDataSize;
@@ -234,7 +234,7 @@ const RIFFChunk *FindChunk(const uint8_t *pData, uint32 uiDataSize, uint32_t uiT
 		pCurrentPtr += offset;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //--------------------------------------------------------------------------------------

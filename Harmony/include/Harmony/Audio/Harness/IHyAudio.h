@@ -13,10 +13,20 @@
 class IHyAudio
 {
 public:
-	IHyAudio() { }
-	virtual ~IHyAudio(void) { }
+	IHyAudio() = default;
+	virtual ~IHyAudio(void) = default;
 
 	virtual void OnUpdate() = 0;
+};
+
+class HyAudio_Null : public IHyAudio
+{
+public:
+	HyAudio_Null() = default;
+	virtual ~HyAudio_Null() = default;
+
+	virtual void OnUpdate() override
+	{ }
 };
 
 #endif /* IHyAudio_h__ */

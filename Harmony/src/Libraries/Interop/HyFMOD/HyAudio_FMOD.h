@@ -9,8 +9,9 @@
 *************************************************************************/
 #include "stdafx.h"
 
-#include "Harmony/Audio/IHyAudio.h"
-#include "Harmony/Audio/IHyAudioBank.h"
+#include "Harmony/Audio/Harness/IHyAudio.h"
+#include "Harmony/Audio/Harness/IHyAudioBank.h"
+#include "Harmony/Audio/Harness/IHyAudioInst.h"
 
 #include "3rdParty/FMOD/fmod_studio.hpp"
 #include "3rdParty/FMOD/fmod.hpp"
@@ -31,6 +32,8 @@ public:
 	HyAudio_FMOD();
 	virtual ~HyAudio_FMOD();
 
+	Studio::System *GetSystem() const;
+
 	virtual void OnUpdate() override;
 };
 
@@ -46,4 +49,25 @@ public:
 	virtual ~HyAudioBank_FMOD();
 
 	virtual bool Load(std::string sFilePath) override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class HyAudioInst_FMOD : public IHyAudioInst
+{
+	Studio::System *			m_pSystemRef;
+	Studio::EventDescription *	m_pDesc;
+	Studio::EventInstance *		m_pInst;
+
+public:
+	HyAudioInst_FMOD(Studio::System *pSystemRef);
+	virtual ~HyAudioInst_FMOD();
+
+	virtual void Play() override;
+	virtual void Stop() override;
+
+	virtual float GetPitch() override;
+	virtual void SetPitch(float fPitch) override;
+
+	virtual void SetReverb() override;
 };
