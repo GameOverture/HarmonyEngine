@@ -19,20 +19,11 @@ class HyAudio2d : public IHyLoadable2d
 {
 	IHyAudioInst *		m_pInternal;
 
-	enum CueType
-	{
-		SNDCUETYPE_Unknown = -1,
-		SNDCUETYPE_Single = 0,
-		SNDCUETYPE_WeightTable = 1,
-		SNDCUETYPE_Cycle = 2,
-	};
-	CueType		m_eCueType;
-
 public:
 	HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	virtual ~HyAudio2d(void);
 
-	void Play();
+	void Start();
 	void Stop();
 
 	float GetPitch();

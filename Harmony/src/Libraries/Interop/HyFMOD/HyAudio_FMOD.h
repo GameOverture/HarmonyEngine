@@ -26,7 +26,10 @@ void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class HyAudio_FMOD : public IHyAudio
 {
-	Studio::System *		m_pSystem;
+	Studio::System *			m_pSystem;
+
+	Studio::Bank *				m_pMasterBank;
+	Studio::Bank *				m_pMasterStringsBank;
 
 public:
 	HyAudio_FMOD();
@@ -41,8 +44,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class HyAudioBank_FMOD : public IHyAudioBank
 {
-	Studio::System *		m_pSystemRef;
-	Studio::Bank *			m_pBank;
+	Studio::System *			m_pSystemRef;
+	Studio::Bank *				m_pBank;
 
 public:
 	HyAudioBank_FMOD(Studio::System *pSystemRef);
@@ -60,14 +63,28 @@ class HyAudioInst_FMOD : public IHyAudioInst
 	Studio::EventInstance *		m_pInst;
 
 public:
-	HyAudioInst_FMOD(Studio::System *pSystemRef);
+	HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPath);
 	virtual ~HyAudioInst_FMOD();
 
-	virtual void Play() override;
-	virtual void Stop() override;
+	virtual void PlayOneShot() override;
+	virtual void Start() override;
+	virtual void Stop(HyAudioStop eStopType = HYAUDIOSTOP_AllowFadeOut) override;
 
-	virtual float GetPitch() override;
+	virtual bool IsPaused() const override;
+	virtual void SetPause(bool bPause) override;
+
+	virtual float GetVolume(float *fFinalVolumeOut = nullptr) const override;
+	virtual void SetVolume(float fVolume) override;
+
+	virtual float GetPitch(float *fFinalPitchOut = nullptr) const override;
 	virtual void SetPitch(float fPitch) override;
 
-	virtual void SetReverb() override;
+	virtual int GetTimelinePosition() const override;
+	virtual void SetTimelinePosition(int iPosition) override;
+
+	virtual float GetParam(const char *szParam, float *fFinalValueOut = nullptr) const override;
+	virtual void SetParam(const char *szParam, float fValue) override;
+
+	virtual float GetReverb(int iIndex) const override;
+	virtual void SetReverb(int iIndex, float fLevel) override;
 };

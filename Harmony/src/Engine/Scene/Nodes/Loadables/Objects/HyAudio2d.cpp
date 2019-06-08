@@ -19,9 +19,9 @@ HyAudio2d::HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pPare
 {
 }
 
-void HyAudio2d::Play()
+void HyAudio2d::Start()
 {
-	m_pInternal->Play();
+	m_pInternal->Start();
 }
 
 void HyAudio2d::Stop()
@@ -41,5 +41,5 @@ void HyAudio2d::SetPitch(float fPitch)
 
 void HyAudio2d::SetReverb()
 {
-	m_pInternal->SetReverb();
+	//m_pInternal->SetReverb();
 }
