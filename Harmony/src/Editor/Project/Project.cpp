@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "Project.h"
 #include "AtlasWidget.h"
-#include "AudioWidgetManager.h"
+#include "AudioAssetsWidget.h"
 #include "MainWindow.h"
 #include "ProjectItemMimeData.h"
 #include "ExplorerModel.h"
@@ -322,7 +322,7 @@ void Project::SetAudioModel(QJsonObject audioObj)
 	WriteGameData();
 }
 
-AudioWidgetManager *Project::GetAudioWidget()
+AudioAssetsWidget *Project::GetAudioWidget()
 {
 	return m_pAudioMan;
 }
@@ -677,7 +677,7 @@ bool Project::HarmonyInitialize()
 	delete m_pAtlasWidget;
 	delete m_pAudioMan;
 	m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, nullptr);
-	m_pAudioMan = new AudioWidgetManager(this, nullptr);
+	m_pAudioMan = new AudioAssetsWidget(this, nullptr);
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{

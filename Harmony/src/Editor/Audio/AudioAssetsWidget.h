@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AudioWidgetManager.h
+ *	AudioAssetsWidget.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef AUDIOWIDGETMANAGER_H
-#define AUDIOWIDGETMANAGER_H
+#ifndef AUDIOASSETSWIDGET_H
+#define AUDIOASSETSWIDGET_H
 
 #include "Project.h"
 
@@ -18,19 +18,19 @@
 #include <QTcpServer>
 
 namespace Ui {
-class AudioWidgetManager;
+class AudioAssetsWidget;
 }
 
-class AudioWidgetManager : public QWidget
+class AudioAssetsWidget : public QWidget
 {
 	Q_OBJECT
 	
 	Project *						m_pProjOwner;
 
 public:
-	explicit AudioWidgetManager(QWidget *parent = 0);
-	explicit AudioWidgetManager(Project *pProjOwner, QWidget *parent = 0);
-	~AudioWidgetManager();
+	explicit AudioAssetsWidget(QWidget *parent = 0);
+	explicit AudioAssetsWidget(Project *pProjOwner, QWidget *parent = 0);
+	~AudioAssetsWidget();
 
 	Project *GetItemProject();
 
@@ -43,7 +43,7 @@ public Q_SLOTS:
 	//void OnError(QAbstractSocket::SocketError socketError);
 	
 private:
-	Ui::AudioWidgetManager *ui;
+	Ui::AudioAssetsWidget *ui;
 };
 
-#endif // AUDIOWIDGETMANAGER_H
+#endif // AUDIOASSETSWIDGET_H

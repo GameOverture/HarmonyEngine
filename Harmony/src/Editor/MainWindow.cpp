@@ -20,7 +20,7 @@
 #include "DlgProjectSettings.h"
 #include "ExplorerWidget.h"
 #include "AtlasWidget.h"
-#include "AudioWidgetManager.h"
+#include "AudioAssetsWidget.h"
 
 #include <QFileDialog>
 #include <QShowEvent>

@@ -6,11 +6,6 @@
       <Extensions>ui</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
-    <Filter Include="Form Files">
-      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
-      <Extensions>ui</Extensions>
-      <ParseFiles>false</ParseFiles>
-    </Filter>
     <Filter Include="Generated Files">
       <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
@@ -87,9 +82,6 @@
     </ClCompile>
     <ClCompile Include="Atlas\AtlasWidget.cpp">
       <Filter>Atlas</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\AudioWidgetManager.cpp">
-      <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs\DlgAtlasGroupSettings.cpp">
       <Filter>Dialogs</Filter>
@@ -262,6 +254,12 @@
     <ClCompile Include="Project\ProjectItemMimeData.cpp">
       <Filter>Explorer\Project</Filter>
     </ClCompile>
+    <ClCompile Include="Audio\AudioAssetsWidget.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioWidget.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
@@ -272,9 +270,6 @@
     </QtMoc>
     <QtMoc Include="Atlas\AtlasRepackThread.h">
       <Filter>Atlas</Filter>
-    </QtMoc>
-    <QtMoc Include="Audio\AudioWidgetManager.h">
-      <Filter>Audio</Filter>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgAtlasGroupSettings.h">
       <Filter>Dialogs</Filter>
@@ -342,9 +337,6 @@
     <QtMoc Include="Sprite\SpriteTableView.h">
       <Filter>Sprite</Filter>
     </QtMoc>
-    <QtMoc Include="Sprite\SpriteWidget.h">
-      <Filter>Sprite</Filter>
-    </QtMoc>
     <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">
       <Filter>_Dependencies</Filter>
     </QtMoc>
@@ -385,15 +377,6 @@
       <Filter>Generated Files</Filter>
     </CustomBuild>
     <ClInclude Include="ui_AtlasWidget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_AudioWidgetBank.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_AudioWidgetManager.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_AudioWidgetState.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="ui_DlgAtlasGroupSettings.h">
@@ -470,92 +453,87 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="Audio\AudioAssetsWidget.ui">
+      <Filter>Audio</Filter>
+    </QtUic>
     <QtUic Include="Atlas\AtlasWidget.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Atlas</Filter>
     </QtUic>
-    <QtUic Include="Audio\AudioWidgetBank.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Audio\AudioWidgetManager.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Audio\AudioWidgetState.ui">
-      <Filter>Form Files</Filter>
+    <QtUic Include="Audio\AudioWidget.ui">
+      <Filter>Audio</Filter>
     </QtUic>
     <QtUic Include="Dialogs\DlgAtlasGroupSettings.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtUic>
     <QtUic Include="Dialogs\DlgColorPicker.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtUic>
     <QtUic Include="Dialogs\DlgInputName.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtUic>
     <QtUic Include="Dialogs\DlgNewItem.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtUic>
     <QtUic Include="Dialogs\DlgNewProject.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtUic>
     <QtUic Include="Dialogs\DlgProjectSettings.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtUic>
     <QtUic Include="Dialogs\DlgSetEngineLocation.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Entity\EntSpriteFrame.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Dialogs</Filter>
     </QtUic>
     <QtUic Include="Entity3d\Entity3d.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Entity</Filter>
     </QtUic>
     <QtUic Include="Entity\EntityCommon.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Entity</Filter>
     </QtUic>
     <QtUic Include="Entity\EntityToolbox.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Entity</Filter>
     </QtUic>
     <QtUic Include="Entity\EntityWidget.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Entity</Filter>
+    </QtUic>
+    <QtUic Include="Entity\EntSpriteFrame.ui">
+      <Filter>Entity</Filter>
     </QtUic>
     <QtUic Include="Explorer\ExplorerWidget.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Explorer</Filter>
     </QtUic>
     <QtUic Include="Font\FontWidget.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Font</Filter>
     </QtUic>
-    <QtUic Include="MainWindow.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
+    <QtUic Include="MainWindow.ui" />
     <QtUic Include="Prefab\PrefabWidget.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Prefab</Filter>
     </QtUic>
     <QtUic Include="Sprite\SpriteWidget.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Widget\WidgetColor.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Widget\WidgetGradientEditor.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Widget\WidgetLiveVarManager.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Widget\WidgetLiveVariable.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Widget\WidgetOutputLog.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Widget\WidgetRangedSlider.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Widget\WidgetVectorSpinBox.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Sprite</Filter>
     </QtUic>
     <QtUic Include="Shared\IWidget.ui">
-      <Filter>Form Files</Filter>
+      <Filter>Widgets</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetColor.ui">
+      <Filter>Widgets</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetGradientEditor.ui">
+      <Filter>Widgets</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetLiveVariable.ui">
+      <Filter>Widgets</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetLiveVarManager.ui">
+      <Filter>Widgets</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetOutputLog.ui">
+      <Filter>Widgets</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetRangedSlider.ui">
+      <Filter>Widgets</Filter>
+    </QtUic>
+    <QtUic Include="Widget\WidgetVectorSpinBox.ui">
+      <Filter>Widgets</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -1196,6 +1174,15 @@
     </QtMoc>
     <QtMoc Include="Shared\IWidget.h">
       <Filter>Shared</Filter>
+    </QtMoc>
+    <QtMoc Include="Audio\AudioAssetsWidget.h">
+      <Filter>Audio</Filter>
+    </QtMoc>
+    <QtMoc Include="Audio\AudioWidget.h">
+      <Filter>Audio</Filter>
+    </QtMoc>
+    <QtMoc Include="Sprite\SpriteWidget.h">
+      <Filter>Sprite</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

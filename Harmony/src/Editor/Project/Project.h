@@ -22,7 +22,7 @@
 
 // Forward declaration
 class AtlasWidget;
-class AudioWidgetManager;
+class AudioAssetsWidget;
 class Harmony;
 class ExplorerModel;
 
@@ -53,7 +53,7 @@ class Project : public ExplorerItem
 	AtlasModel *									m_pAtlasModel;
 	AtlasWidget *									m_pAtlasWidget;
 
-	AudioWidgetManager *							m_pAudioMan;
+	AudioAssetsWidget *							m_pAudioMan;
 
 	ProjectTabBar *									m_pTabBar;
 	ProjectItem *									m_pCurOpenItem;
@@ -92,7 +92,7 @@ public:
 	AtlasWidget *GetAtlasWidget();
 
 	void SetAudioModel(QJsonObject audioObj);
-	AudioWidgetManager *GetAudioWidget();
+	AudioAssetsWidget *GetAudioWidget();
 
 	ProjectTabBar *GetTabBar();
 

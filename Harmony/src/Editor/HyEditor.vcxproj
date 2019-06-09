@@ -213,7 +213,8 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Atlas\AtlasModel.cpp" />
     <ClCompile Include="Atlas\AtlasRepackThread.cpp" />
     <ClCompile Include="Atlas\AtlasWidget.cpp" />
-    <ClCompile Include="Audio\AudioWidgetManager.cpp" />
+    <ClCompile Include="Audio\AudioAssetsWidget.cpp" />
+    <ClCompile Include="Audio\AudioWidget.cpp" />
     <ClCompile Include="Dialogs\DlgAtlasGroupSettings.cpp" />
     <ClCompile Include="Dialogs\DlgColorPicker.cpp" />
     <ClCompile Include="Dialogs\DlgInputName.cpp" />
@@ -309,7 +310,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
-    <QtMoc Include="Audio\AudioWidgetManager.h">
+    <QtMoc Include="Audio\AudioAssetsWidget.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
@@ -344,6 +345,10 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtMoc Include="Entity3d\Entity3d.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity3d/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity3d/%(Filename)%(Extension)</ForceInclude>
+    </QtMoc>
+    <QtMoc Include="Audio\AudioWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Entity\EntityDraw.h" />
     <QtMoc Include="Entity\EntityModel.h">
@@ -523,9 +528,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       </AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="ui_AtlasWidget.h" />
-    <ClInclude Include="ui_AudioWidgetBank.h" />
-    <ClInclude Include="ui_AudioWidgetManager.h" />
-    <ClInclude Include="ui_AudioWidgetState.h" />
     <ClInclude Include="ui_DlgAtlasGroupSettings.h" />
     <ClInclude Include="ui_DlgColorPicker.h" />
     <ClInclude Include="ui_DlgInputName.h" />
@@ -554,12 +556,8 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
   <ItemGroup>
     <QtUic Include="Atlas\AtlasWidget.ui">
     </QtUic>
-    <QtUic Include="Audio\AudioWidgetBank.ui">
-    </QtUic>
-    <QtUic Include="Audio\AudioWidgetManager.ui">
-    </QtUic>
-    <QtUic Include="Audio\AudioWidgetState.ui">
-    </QtUic>
+    <QtUic Include="Audio\AudioAssetsWidget.ui" />
+    <QtUic Include="Audio\AudioWidget.ui" />
     <QtUic Include="Dialogs\DlgAtlasGroupSettings.ui">
     </QtUic>
     <QtUic Include="Dialogs\DlgColorPicker.ui">

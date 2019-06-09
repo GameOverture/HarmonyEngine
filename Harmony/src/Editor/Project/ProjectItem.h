@@ -18,7 +18,7 @@
 #include <QJsonObject>
 
 class AtlasWidget;
-class AudioWidgetManager;
+class AudioAssetsWidget;
 class Project;
 class AtlasFrame;
 class IModel;

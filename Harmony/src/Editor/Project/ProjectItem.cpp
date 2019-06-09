@@ -11,7 +11,7 @@
 #include "ProjectItem.h"
 #include "MainWindow.h"
 #include "AtlasWidget.h"
-#include "AudioWidgetManager.h"
+#include "AudioAssetsWidget.h"
 #include "AtlasFrame.h"
 #include "IModel.h"
 #include "SpriteWidget.h"

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AudioWidgetManager.cpp
+ *	AudioAssetsWidget.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -8,8 +8,8 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "AudioWidgetManager.h"
-#include "ui_AudioWidgetManager.h"
+#include "AudioAssetsWidget.h"
+#include "ui_AudioAssetsWidget.h"
 
 #include "DlgInputName.h"
 
@@ -20,9 +20,9 @@
 #include <QLineEdit>
 #include <QProgressDialog>
 
-AudioWidgetManager::AudioWidgetManager(QWidget *parent) :
+AudioAssetsWidget::AudioAssetsWidget(QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::AudioWidgetManager)
+	ui(new Ui::AudioAssetsWidget)
 {
 	ui->setupUi(this);
 	
@@ -30,9 +30,9 @@ AudioWidgetManager::AudioWidgetManager(QWidget *parent) :
 	HyGuiLog("WidgetAudioManager::WidgetAudioManager() invalid constructor used", LOGTYPE_Error);
 }
 
-AudioWidgetManager::AudioWidgetManager(Project *pProjOwner, QWidget *parent) :
+AudioAssetsWidget::AudioAssetsWidget(Project *pProjOwner, QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::AudioWidgetManager),
+	ui(new Ui::AudioAssetsWidget),
 	m_pProjOwner(pProjOwner)
 {
 	ui->setupUi(this);
@@ -43,17 +43,17 @@ AudioWidgetManager::AudioWidgetManager(Project *pProjOwner, QWidget *parent) :
 	//connect(&m_Socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnError(QAbstractSocket::SocketError)));
 }
 
-AudioWidgetManager::~AudioWidgetManager()
+AudioAssetsWidget::~AudioAssetsWidget()
 {
 	delete ui;
 }
 
-Project *AudioWidgetManager::GetItemProject()
+Project *AudioAssetsWidget::GetItemProject()
 {
 	return m_pProjOwner;
 }
 
-void AudioWidgetManager::on_btnScanAudio_pressed()
+void AudioAssetsWidget::on_btnScanAudio_pressed()
 {
 	HyGuiLog("Connecting to FMOD Studio", LOGTYPE_Title);
 
@@ -208,11 +208,11 @@ void AudioWidgetManager::on_btnScanAudio_pressed()
 	socket.abort();
 }
 
-void AudioWidgetManager::on_AudioMiddleware_currentIndexChanged(int index)
+void AudioAssetsWidget::on_AudioMiddleware_currentIndexChanged(int index)
 {
 }
 
-//void AudioWidgetManager::ReadData()
+//void AudioAssetsWidget::ReadData()
 //{
 //	QDataStream in(&m_Socket);
 //	//in.setVersion(QDataStream::Qt_4_0);
@@ -223,7 +223,7 @@ void AudioWidgetManager::on_AudioMiddleware_currentIndexChanged(int index)
 //	HyGuiLog("Read: " % sMessage, LOGTYPE_Info);
 //}
 
-//void AudioWidgetManager::OnError(QAbstractSocket::SocketError socketError)
+//void AudioAssetsWidget::OnError(QAbstractSocket::SocketError socketError)
 //{
 //	switch(socketError)
 //	{
