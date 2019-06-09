@@ -26,11 +26,6 @@ class AudioWidgetManager : public QWidget
 	Q_OBJECT
 	
 	Project *						m_pProjOwner;
-	
-	QDir							m_MetaDir;
-	QDir							m_DataDir;
-
-	QTcpSocket						m_Socket;
 
 public:
 	explicit AudioWidgetManager(QWidget *parent = 0);
@@ -44,8 +39,8 @@ public Q_SLOTS:
 
 	void on_AudioMiddleware_currentIndexChanged(int index);
 
-	void ReadData();
-	void OnError(QAbstractSocket::SocketError socketError);
+	//void ReadData();
+	//void OnError(QAbstractSocket::SocketError socketError);
 	
 private:
 	Ui::AudioWidgetManager *ui;

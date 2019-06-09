@@ -22,8 +22,7 @@
 
 AudioWidgetManager::AudioWidgetManager(QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::AudioWidgetManager),
-	m_Socket(this)
+	ui(new Ui::AudioWidgetManager)
 {
 	ui->setupUi(this);
 	
@@ -34,16 +33,14 @@ AudioWidgetManager::AudioWidgetManager(QWidget *parent) :
 AudioWidgetManager::AudioWidgetManager(Project *pProjOwner, QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::AudioWidgetManager),
-	m_pProjOwner(pProjOwner),
-	m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_Audio, true)),
-	m_DataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_Audio, true))
+	m_pProjOwner(pProjOwner)
 {
 	ui->setupUi(this);
 
 	ui->cmbAudioMiddleware;
 
-	connect(&m_Socket, SIGNAL(readyRead()), this, SLOT(ReadData()));
-	connect(&m_Socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnError(QAbstractSocket::SocketError)));
+	//connect(&m_Socket, SIGNAL(readyRead()), this, SLOT(ReadData()));
+	//connect(&m_Socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnError(QAbstractSocket::SocketError)));
 }
 
 AudioWidgetManager::~AudioWidgetManager()
@@ -58,69 +55,97 @@ Project *AudioWidgetManager::GetItemProject()
 
 void AudioWidgetManager::on_btnScanAudio_pressed()
 {
+	HyGuiLog("Connecting to FMOD Studio", LOGTYPE_Title);
+
 	enum FMODStep
 	{
 		FMODSTEP_Start = 0,
-		FMODSTEP_DeleteGuidFile,
+		FMODSTEP_DeletingGuidFile,
 		FMODSTEP_Connecting,
-		FMODSTEP_ExportGuids,
-		FMODSTEP_ReadBankNames,
-		FMODSTEP_RequestMetaData,
+		FMODSTEP_ExportingGuids,
+		FMODSTEP_FlushingResponse,
+		FMODSTEP_SendingQuery,
+		FMODSTEP_ReadingResponse,
 
 		NUM_FMODSTEPS
 	};
 
-	QFile guidFile(m_DataDir.filePath("GUIDs.txt"));
-	QFile metaFile(m_MetaDir.filePath("HyOutput.txt"));
-	m_Socket.abort();
+	QDir dataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_Audio, true));
+	QFile guidFile(dataDir.filePath("GUIDs.txt"));
 
-	QProgressDialog audioScanDlg("Scanning for audio information", "Abort", 0, NUM_FMODSTEPS, this);
-	audioScanDlg.setWindowModality(Qt::WindowModal);
-	audioScanDlg.setMinimumDuration(0);
+	QTcpSocket socket(this);
+	QByteArray socketResponse;
 
-	int iAudioScanStep = FMODSTEP_Start;
-	while(iAudioScanStep != NUM_FMODSTEPS)
+	QProgressDialog progressDlg("Connecting to FMOD Studio...", "", FMODSTEP_Start, NUM_FMODSTEPS, this);
+	progressDlg.setWindowTitle("Connecting");
+	progressDlg.setCancelButton(nullptr);
+	progressDlg.setWindowModality(Qt::WindowModal);
+	progressDlg.setMinimumDuration(0);
+
+	int iProgressStep = FMODSTEP_Start;
+	while(iProgressStep != NUM_FMODSTEPS)
 	{
-		switch(iAudioScanStep)
-		{
-		case FMODSTEP_Start:
-			iAudioScanStep = FMODSTEP_DeleteGuidFile;
+		progressDlg.setValue(iProgressStep);
+		if(progressDlg.wasCanceled())
 			break;
 
-		case FMODSTEP_DeleteGuidFile:
+		switch(iProgressStep)
+		{
+		case FMODSTEP_Start:
+			iProgressStep = FMODSTEP_DeletingGuidFile;
+			break;
+
+		case FMODSTEP_DeletingGuidFile:
 			if(guidFile.exists())
 				guidFile.remove();
 			else
 			{
-				m_Socket.connectToHost("127.0.0.1", 3663);
-				iAudioScanStep = FMODSTEP_Connecting;
+				socket.connectToHost("127.0.0.1", 3663);
+				iProgressStep = FMODSTEP_Connecting;
 			}
 			break;
 
 		case FMODSTEP_Connecting:
-			if(m_Socket.state() == QAbstractSocket::ConnectedState)
+			if(socket.waitForConnected(3000))
 			{
-				// studio.project.save(); studio.project.build(); 
-				QString sSource = "studio.project.exportGUIDs();";
-				m_Socket.write(sSource.toUtf8());
-				iAudioScanStep = FMODSTEP_ExportGuids;
+				QString sSource = "studio.project.save(); studio.project.build(); studio.project.exportGUIDs();";
+				socket.write(sSource.toUtf8());
+
+				iProgressStep = FMODSTEP_ExportingGuids;
+			}
+			else
+			{
+				HyGuiLog("Could not establish connection to FMOD Studio", LOGTYPE_Warning);
+				iProgressStep = NUM_FMODSTEPS;
 			}
 			break;
 				
-		case FMODSTEP_ExportGuids:
+		case FMODSTEP_ExportingGuids:
 			if(guidFile.exists())
 			{
 				if(guidFile.open(QIODevice::ReadOnly))
-					iAudioScanStep = FMODSTEP_ReadBankNames;
+					iProgressStep = FMODSTEP_FlushingResponse;
 				else
 				{
 					HyGuiLog(guidFile.errorString(), LOGTYPE_Error);
-					iAudioScanStep = NUM_FMODSTEPS;
+					iProgressStep = NUM_FMODSTEPS;
 				}
 			}
 			break;
+
+		case FMODSTEP_FlushingResponse: {
+			char buffer[50];
+			qint64 iNumBytesRead = socket.read(buffer, 50);
+			socketResponse.append(buffer, iNumBytesRead);
+
+			if(iNumBytesRead == 0 && !socket.waitForReadyRead(1000))
+			{
+				socketResponse.clear();
+				iProgressStep = FMODSTEP_SendingQuery;
+			}
+			break; }
 				
-		case FMODSTEP_ReadBankNames: {
+		case FMODSTEP_SendingQuery: {
 			QStringList sBankNames;
 			QTextStream in(&guidFile);
 			while(!in.atEnd())
@@ -132,75 +157,76 @@ void AudioWidgetManager::on_btnScanAudio_pressed()
 			}
 			guidFile.close();
 
-			QString sSource = "var sStr;";
+			QString sSource;
+			sSource += "var eventMap = {};";
 			for(int i = 0; i < sBankNames.size(); ++i)
 			{
-				sSource += "sStr += \":" % sBankNames[i] % ":\";";
-				sSource += "var eventsArray = studio.project.lookup(\"" % sBankNames[i] % ").events;";
-				sSource += "for (i = 0; i < eventsArray.length; i++) {";
-				sSource += "	sStr += eventsArray[i].getPath();";
-				sSource += "	sStr += \"|\";";
+				sSource += "{";
+				sSource += "    var bankObj = studio.project.lookup(\"" % sBankNames[i] % "\");";
+				sSource += "    if(bankObj != undefined) {";
+				sSource += "        var eventsArray = bankObj.events;";
+				sSource += "        for(i = 0; i < eventsArray.length; i++)";
+				sSource += "            eventMap[eventsArray[i].getPath()] = \"" % sBankNames[i] % "\";";
+				sSource += "    }";
 				sSource += "}";
 			}
+			sSource += "JSON.stringify(eventMap);";
 
-			sSource += "var file = system.getFile(\"" % metaFile.fileName() % "\");";
-			sSource += "if(file.open(system.openMode.WriteOnly)) {";
-			sSource += "	file.writeText(sStr);";
-			sSource += "}";
-			sSource += "file.close();";
-
-			m_Socket.write(sSource.toUtf8());
-			iAudioScanStep = FMODSTEP_RequestMetaData;
+			socket.write(sSource.toUtf8());
+			iProgressStep = FMODSTEP_ReadingResponse;
 			break; }
 
-		case FMODSTEP_RequestMetaData:
-			if(metaFile.exists())
-				iAudioScanStep = NUM_FMODSTEPS;
-			break;
-		}
+		case FMODSTEP_ReadingResponse: {
+			char buffer[50];
+			qint64 iNumBytesRead = socket.read(buffer, 50);
+			socketResponse.append(buffer, iNumBytesRead);
 
-		audioScanDlg.setValue(iAudioScanStep);
-		if(audioScanDlg.wasCanceled())
-			break;
+			if(iNumBytesRead == 0 && !socket.waitForReadyRead(1000))
+			{
+				HyGuiLog(socketResponse, LOGTYPE_Normal);
+				iProgressStep = NUM_FMODSTEPS;
+			}
+			break; }
+		}
 	}
 
-	audioScanDlg.setValue(NUM_FMODSTEPS);
-	m_Socket.abort();
+	progressDlg.setValue(NUM_FMODSTEPS);
+	socket.abort();
 }
 
 void AudioWidgetManager::on_AudioMiddleware_currentIndexChanged(int index)
 {
 }
 
-void AudioWidgetManager::ReadData()
-{
-	QDataStream in(&m_Socket);
-	in.setVersion(QDataStream::Qt_4_0);
+//void AudioWidgetManager::ReadData()
+//{
+//	QDataStream in(&m_Socket);
+//	//in.setVersion(QDataStream::Qt_4_0);
+//
+//	QString sMessage;
+//	in >> sMessage;
+//
+//	HyGuiLog("Read: " % sMessage, LOGTYPE_Info);
+//}
 
-	QString sMessage;
-	in >> sMessage;
-
-	HyGuiLog("Read: " % sMessage, LOGTYPE_Info);
-}
-
-void AudioWidgetManager::OnError(QAbstractSocket::SocketError socketError)
-{
-	switch(socketError)
-	{
-	case QAbstractSocket::RemoteHostClosedError:
-		HyGuiLog("The game debugger connection has been lost", LOGTYPE_Info);
-		break;
-
-	case QAbstractSocket::HostNotFoundError:
-		HyGuiLog("FMOD Studio at [127.0.0.1:3663] was not found", LOGTYPE_Error);
-		break;
-
-	case QAbstractSocket::ConnectionRefusedError:
-		HyGuiLog("FMOD Studio at [127.0.0.1:3663] has refused the connection", LOGTYPE_Error);
-		break;
-
-	default:
-		HyGuiLog("Audio FMOD Socket Error: " % m_Socket.errorString(), LOGTYPE_Error);
-		break;
-	}
-}
+//void AudioWidgetManager::OnError(QAbstractSocket::SocketError socketError)
+//{
+//	switch(socketError)
+//	{
+//	case QAbstractSocket::RemoteHostClosedError:
+//		HyGuiLog("The game debugger connection has been lost", LOGTYPE_Info);
+//		break;
+//
+//	case QAbstractSocket::HostNotFoundError:
+//		HyGuiLog("FMOD Studio at [127.0.0.1:3663] was not found", LOGTYPE_Error);
+//		break;
+//
+//	case QAbstractSocket::ConnectionRefusedError:
+//		HyGuiLog("FMOD Studio at [127.0.0.1:3663] has refused the connection", LOGTYPE_Error);
+//		break;
+//
+//	default:
+//		HyGuiLog("Audio FMOD Socket Error: " % m_Socket.errorString(), LOGTYPE_Error);
+//		break;
+//	}
+//}
