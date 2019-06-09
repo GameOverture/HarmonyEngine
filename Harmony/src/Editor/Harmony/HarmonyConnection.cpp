@@ -40,7 +40,7 @@ void HarmonyConnection::Connect()
 	m_Socket.connectToHost(m_Address, m_uiPort);
 }
 
-void HarmonyConnection::Write(eHyPacketType eType, quint32 uiSize, void *pData)
+void HarmonyConnection::Write(HyPacketType eType, quint32 uiSize, void *pData)
 {
 	QByteArray packetData;
 	

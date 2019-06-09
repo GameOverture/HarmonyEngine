@@ -56,7 +56,7 @@ public:
 
 	void ProcessMessage(HyGuiMessage &msgRef);
 
-	static void Broadcast(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy);
+	static void Broadcast(HyPacketType eType, uint32 uiDataSize, const void *pDataToCopy);
 	//static void Log(const char *szMessage, uint32 uiType);
 
 

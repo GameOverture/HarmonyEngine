@@ -69,13 +69,12 @@
      </property>
      <addaction name="actionNewPrefix"/>
      <addaction name="separator"/>
-     <addaction name="actionNewAudio"/>
-     <addaction name="actionNewParticle"/>
      <addaction name="actionNewSprite"/>
      <addaction name="actionNewFont"/>
-     <addaction name="actionNewEntity"/>
-     <addaction name="separator"/>
+     <addaction name="actionNewParticle"/>
      <addaction name="actionNewPrefab"/>
+     <addaction name="separator"/>
+     <addaction name="actionNewEntity"/>
      <addaction name="actionNewEntity3d"/>
     </widget>
     <addaction name="actionNewProject"/>

@@ -213,13 +213,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Atlas\AtlasModel.cpp" />
     <ClCompile Include="Atlas\AtlasRepackThread.cpp" />
     <ClCompile Include="Atlas\AtlasWidget.cpp" />
-    <ClCompile Include="Audio\AudioDraw.cpp" />
-    <ClCompile Include="Audio\AudioModelView.cpp" />
-    <ClCompile Include="Audio\AudioWave.cpp" />
-    <ClCompile Include="Audio\AudioWidget.cpp" />
-    <ClCompile Include="Audio\AudioWidgetBank.cpp" />
     <ClCompile Include="Audio\AudioWidgetManager.cpp" />
-    <ClCompile Include="Audio\AudioWidgetState.cpp" />
     <ClCompile Include="Dialogs\DlgAtlasGroupSettings.cpp" />
     <ClCompile Include="Dialogs\DlgColorPicker.cpp" />
     <ClCompile Include="Dialogs\DlgInputName.cpp" />
@@ -315,25 +309,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Atlas/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
-    <ClInclude Include="Audio\AudioDraw.h" />
-    <QtMoc Include="Audio\AudioModelView.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
-    <ClInclude Include="Audio\AudioWave.h" />
-    <QtMoc Include="Audio\AudioWidget.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
-    <QtMoc Include="Audio\AudioWidgetBank.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
     <QtMoc Include="Audio\AudioWidgetManager.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
-    <QtMoc Include="Audio\AudioWidgetState.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>

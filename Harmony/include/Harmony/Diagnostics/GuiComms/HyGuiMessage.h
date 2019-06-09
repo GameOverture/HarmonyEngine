@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 
-enum eHyPacketType
+enum HyPacketType
 {
 	HYPACKET_LogNormal = 0,
 	HYPACKET_LogWarning,
@@ -40,10 +40,10 @@ private:
 
 public:
 	HyGuiMessage();
-	HyGuiMessage(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy);
+	HyGuiMessage(HyPacketType eType, uint32 uiDataSize, const void *pDataToCopy);
 	virtual ~HyGuiMessage();
 
-	eHyPacketType			GetType() const;
+	HyPacketType			GetType() const;
 
 	const unsigned char *	GetData() const;
 	unsigned char *			GetData();

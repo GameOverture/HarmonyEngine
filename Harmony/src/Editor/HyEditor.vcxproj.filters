@@ -88,25 +88,7 @@
     <ClCompile Include="Atlas\AtlasWidget.cpp">
       <Filter>Atlas</Filter>
     </ClCompile>
-    <ClCompile Include="Audio\AudioDraw.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\AudioModelView.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\AudioWave.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\AudioWidget.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\AudioWidgetBank.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
     <ClCompile Include="Audio\AudioWidgetManager.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\AudioWidgetState.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs\DlgAtlasGroupSettings.cpp">
@@ -291,16 +273,7 @@
     <QtMoc Include="Atlas\AtlasRepackThread.h">
       <Filter>Atlas</Filter>
     </QtMoc>
-    <QtMoc Include="Audio\AudioWidget.h">
-      <Filter>Audio</Filter>
-    </QtMoc>
-    <QtMoc Include="Audio\AudioWidgetBank.h">
-      <Filter>Audio</Filter>
-    </QtMoc>
     <QtMoc Include="Audio\AudioWidgetManager.h">
-      <Filter>Audio</Filter>
-    </QtMoc>
-    <QtMoc Include="Audio\AudioWidgetState.h">
       <Filter>Audio</Filter>
     </QtMoc>
     <QtMoc Include="Dialogs\DlgAtlasGroupSettings.h">
@@ -1155,12 +1128,6 @@
     <ClInclude Include="Atlas\AtlasFrame.h">
       <Filter>Atlas</Filter>
     </ClInclude>
-    <ClInclude Include="Audio\AudioDraw.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Audio\AudioWave.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
     <ClInclude Include="Entity\EntityDraw.h">
       <Filter>Entity</Filter>
     </ClInclude>
@@ -1201,9 +1168,6 @@
   <ItemGroup>
     <QtMoc Include="Atlas\AtlasWidget.h">
       <Filter>Atlas</Filter>
-    </QtMoc>
-    <QtMoc Include="Audio\AudioModelView.h">
-      <Filter>Audio</Filter>
     </QtMoc>
     <QtMoc Include="Entity3d\Entity3d.h">
       <Filter>Entity</Filter>

@@ -35,7 +35,7 @@ public:
 
 	void Connect();
 
-	void Write(eHyPacketType eType, quint32 uiSize, void *pData);
+	void Write(HyPacketType eType, quint32 uiSize, void *pData);
 	
 	void WriteReloadPacket(QStringList &sPaths);
 	

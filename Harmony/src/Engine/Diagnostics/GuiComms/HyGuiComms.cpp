@@ -101,7 +101,7 @@ void HyGuiComms::ProcessMessage(HyGuiMessage &msgRef)
 	}
 }
 
-/*static*/ void HyGuiComms::Broadcast(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy)
+/*static*/ void HyGuiComms::Broadcast(HyPacketType eType, uint32 uiDataSize, const void *pDataToCopy)
 {
 	if(sm_pInstance->participants_.empty())
 		return;
@@ -114,7 +114,7 @@ void HyGuiComms::ProcessMessage(HyGuiMessage &msgRef)
 
 //void HyGuiComms::Log(const char *szMessage, uint32 uiLevel)
 //{
-//	sm_pInstance->Broadcast(static_cast<eHyPacketType>(uiLevel), static_cast<uint32>(strlen(szMessage)), szMessage);
+//	sm_pInstance->Broadcast(static_cast<HyPacketType>(uiLevel), static_cast<uint32>(strlen(szMessage)), szMessage);
 //}
 
 #endif

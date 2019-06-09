@@ -14,7 +14,7 @@ HyGuiMessage::HyGuiMessage()
 {
 }
 
-HyGuiMessage::HyGuiMessage(eHyPacketType eType, uint32 uiDataSize, const void *pDataToCopy)
+HyGuiMessage::HyGuiMessage(HyPacketType eType, uint32 uiDataSize, const void *pDataToCopy)
 {
 	unsigned char *pCurWritePos = &m_pData[0];
 	
@@ -31,10 +31,10 @@ HyGuiMessage::~HyGuiMessage()
 {
 }
 
-eHyPacketType HyGuiMessage::GetType() const
+HyPacketType HyGuiMessage::GetType() const
 {
 	uint32 uiType = *reinterpret_cast<const uint32 *>(&m_pData[0]);
-	return static_cast<eHyPacketType>(uiType);
+	return static_cast<HyPacketType>(uiType);
 }
 
 const unsigned char *HyGuiMessage::GetData() const
