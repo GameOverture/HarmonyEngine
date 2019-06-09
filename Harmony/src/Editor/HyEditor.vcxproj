@@ -523,7 +523,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       </AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="ui_AtlasWidget.h" />
-    <ClInclude Include="ui_AudioWidget.h" />
     <ClInclude Include="ui_AudioWidgetBank.h" />
     <ClInclude Include="ui_AudioWidgetManager.h" />
     <ClInclude Include="ui_AudioWidgetState.h" />
@@ -554,8 +553,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Atlas\AtlasWidget.ui">
-    </QtUic>
-    <QtUic Include="Audio\AudioWidget.ui">
     </QtUic>
     <QtUic Include="Audio\AudioWidgetBank.ui">
     </QtUic>

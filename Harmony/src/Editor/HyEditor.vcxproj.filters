@@ -387,9 +387,6 @@
     <ClInclude Include="ui_AtlasWidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="ui_AudioWidget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="ui_AudioWidgetBank.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -474,9 +471,6 @@
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Atlas\AtlasWidget.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Audio\AudioWidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Audio\AudioWidgetBank.ui">

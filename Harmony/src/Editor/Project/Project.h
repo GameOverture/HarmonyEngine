@@ -54,8 +54,8 @@ class Project : public ExplorerItem
 	AtlasWidget *									m_pAtlasWidget;
 
 	AudioWidgetManager *							m_pAudioMan;
-	ProjectTabBar *									m_pTabBar;
 
+	ProjectTabBar *									m_pTabBar;
 	ProjectItem *									m_pCurOpenItem;
 
 	QJsonObject										m_SaveDataObj;
@@ -90,6 +90,8 @@ public:
 	ExplorerModel &GetExplorerModel();
 	AtlasModel &GetAtlasModel();
 	AtlasWidget *GetAtlasWidget();
+
+	void SetAudioModel(QJsonObject audioObj);
 	AudioWidgetManager *GetAudioWidget();
 
 	ProjectTabBar *GetTabBar();

@@ -307,6 +307,21 @@ AtlasWidget *Project::GetAtlasWidget()
 	return m_pAtlasWidget;
 }
 
+void Project::SetAudioModel(QJsonObject audioObj)
+{
+	QString sItemTypeName = HyGlobal::ItemName(ITEM_Audio, true);
+	if(m_SaveDataObj.contains(sItemTypeName) == false)
+	{
+		HyGuiLog("Project::SetAudioModel could not find item type: " % sItemTypeName, LOGTYPE_Error);
+		return;
+	}
+
+	m_SaveDataObj.remove(sItemTypeName);
+	m_SaveDataObj.insert(sItemTypeName, audioObj);
+
+	WriteGameData();
+}
+
 AudioWidgetManager *Project::GetAudioWidget()
 {
 	return m_pAudioMan;
@@ -341,7 +356,7 @@ void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVa
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
 	if(m_SaveDataObj.contains(sItemTypeName) == false) {
-		HyGuiLog("Could not find item type: " % sItemTypeName % " within ItemProject::SaveGameData", LOGTYPE_Error);
+		HyGuiLog("Project::SaveGameData could not find item type: " % sItemTypeName, LOGTYPE_Error);
 	}
 
 	QJsonObject subDirObj = m_SaveDataObj[sItemTypeName].toObject();
@@ -361,7 +376,7 @@ void Project::DeleteGameData(HyGuiItemType eType, QString sPath)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
 	if(m_SaveDataObj.contains(sItemTypeName) == false) {
-		HyGuiLog("Could not find item type: " % sItemTypeName % " within ItemProject::DeleteGameData", LOGTYPE_Error);
+		HyGuiLog("Project::DeleteGameData could not find item type: " % sItemTypeName, LOGTYPE_Error);
 	}
 
 	QJsonObject subDirObj = m_SaveDataObj[sItemTypeName].toObject();

@@ -184,6 +184,20 @@ void AudioWidgetManager::on_btnScanAudio_pressed()
 			if(iNumBytesRead == 0 && !socket.waitForReadyRead(1000))
 			{
 				HyGuiLog(socketResponse, LOGTYPE_Normal);
+				socketResponse.replace("out():", "");
+				socketResponse.replace("event:/", "");
+				socketResponse.replace("bank:/", "");
+				socketResponse.remove(socketResponse.lastIndexOf('}') + 1, socketResponse.length() - socketResponse.lastIndexOf('}'));
+				socketResponse = socketResponse.trimmed();
+				
+				QJsonParseError error;
+				QJsonDocument audioDoc = QJsonDocument::fromJson(socketResponse, &error);
+				if(audioDoc.isObject())
+				{
+					QJsonObject newAudioModel = audioDoc.object();
+					m_pProjOwner->SetAudioModel(newAudioModel);
+				}
+
 				iProgressStep = NUM_FMODSTEPS;
 			}
 			break; }
