@@ -265,6 +265,9 @@
     <ClCompile Include="Primitive\PrimitiveModel.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="Audio\AudioModel.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
@@ -374,6 +377,9 @@
     </ClInclude>
     <ClInclude Include="Primitive\PrimitiveModel.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio\AudioModel.h">
+      <Filter>Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -12,6 +12,7 @@
 #include "MainWindow.h"
 #include "AtlasWidget.h"
 #include "AudioAssetsWidget.h"
+#include "AudioModel.h"
 #include "AtlasFrame.h"
 #include "IModel.h"
 #include "SpriteWidget.h"
@@ -83,6 +84,9 @@ void ProjectItem::LoadModel()
 		break;
 	case ITEM_Primitive:
 		m_pModel = new PrimitiveModel(*this);
+		break;
+	case ITEM_Audio:
+		m_pModel = new AudioModel(*this);
 		break;
 	default:
 		HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);

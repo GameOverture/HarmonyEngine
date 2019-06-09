@@ -53,7 +53,7 @@ class Project : public ExplorerItem
 	AtlasModel *									m_pAtlasModel;
 	AtlasWidget *									m_pAtlasWidget;
 
-	AudioAssetsWidget *							m_pAudioMan;
+	AudioAssetsWidget *								m_pAudioMan;
 
 	ProjectTabBar *									m_pTabBar;
 	ProjectItem *									m_pCurOpenItem;
