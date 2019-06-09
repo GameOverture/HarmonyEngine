@@ -66,6 +66,9 @@
     <Filter Include="Shared\TreeModel">
       <UniqueIdentifier>{036a1f2e-1657-45a3-abd1-8b5b847ea97a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Primitives">
+      <UniqueIdentifier>{a6d41676-c168-46b2-bf14-af51c2007091}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Atlas\AtlasDraw.cpp">
@@ -238,7 +241,6 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="Primitive\PrimitiveModel.cpp" />
     <ClCompile Include="Explorer\ExplorerModel.cpp">
       <Filter>Explorer</Filter>
     </ClCompile>
@@ -259,6 +261,9 @@
     </ClCompile>
     <ClCompile Include="Audio\AudioWidget.cpp">
       <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Primitive\PrimitiveModel.cpp">
+      <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -361,12 +366,14 @@
     <QtMoc Include="Widget\WidgetVectorSpinBox.h">
       <Filter>Widgets</Filter>
     </QtMoc>
-    <ClInclude Include="Primitive\PrimitiveModel.h" />
     <ClInclude Include="Shared\TreeModel\TreeModelItem.h">
       <Filter>Shared\TreeModel</Filter>
     </ClInclude>
     <ClInclude Include="Project\ProjectItemMimeData.h">
       <Filter>Explorer\Project</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitive\PrimitiveModel.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
