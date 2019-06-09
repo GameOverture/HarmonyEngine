@@ -10,12 +10,9 @@
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
-#include "Scene/HyScene.h"
-#include "Renderer/IHyRenderer.h"
-#include "Scene/Nodes/Loadables/IHyLoadable.h"
-#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
-#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
-#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
+#include "Assets/Files/HyAtlas.h"
+#include "Assets/Files/HyGLTF.h"
+#include "Assets/Files/HyAudioBank.h"
 #include "Assets/Nodes/HyEntityData.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
@@ -23,6 +20,12 @@
 #include "Assets/Nodes/HyText2dData.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 #include "Assets/Nodes/HyPrefabData.h"
+#include "Scene/HyScene.h"
+#include "Scene/Nodes/Loadables/IHyLoadable.h"
+#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
+#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
+#include "Renderer/IHyRenderer.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyStrManip.h"
 #include "Diagnostics/Console/HyConsole.h"
@@ -161,6 +164,11 @@ HyGLTF *HyAssets::GetGltf(const std::string &sIdentifier)
 	return nullptr;
 }
 
+HyAudioBank *HyAssets::GetAudioBank(const std::string &sBankPath)
+{
+	return nullptr;
+}
+
 void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut)
 {
 	switch(pLoadable->_LoadableGetType())
@@ -220,12 +228,21 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 			}
 		}
 
-		if(pLoadable->UncheckedGetData()->GetGltf())
+		HyGLTF *pGltf = pLoadable->UncheckedGetData()->GetGltf();
+		if(pGltf)
 		{
-			HyGLTF *pGltf = pLoadable->UncheckedGetData()->GetGltf();
 			QueueData(pGltf);
 
 			if(pGltf->GetLoadableState() != HYLOADSTATE_Loaded)
+				bFullyLoaded = false;
+		}
+
+		HyAudioBank *pAudioBank = nullptr;
+		if(pAudioBank)
+		{
+			QueueData(pAudioBank);
+
+			if(pAudioBank->GetLoadableState() != HYLOADSTATE_Loaded)
 				bFullyLoaded = false;
 		}
 	}
@@ -469,7 +486,8 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
 	HyAssert(bGameDataParsed, "Could not parse game data");
 
-
+	if(gameDataObj.has<jsonxx::Object>("Audio"))
+		m_AudioFactory.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
 	if(gameDataObj.has<jsonxx::Object>("Prefabs"))
 	{
 		const jsonxx::Object &prefabObj = gameDataObj.get<jsonxx::Object>("Prefabs");

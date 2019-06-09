@@ -13,7 +13,7 @@
 #include "Window/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
-#include "Assets/Files/IHyFileData.h"
+#include "Assets/Files/HyGLTF.h"
 #include "Assets/Nodes/HyPrefabData.h"
 #include "HyEngine.h"
 

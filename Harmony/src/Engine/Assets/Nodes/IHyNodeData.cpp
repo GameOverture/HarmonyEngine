@@ -12,7 +12,8 @@
 
 IHyNodeData::IHyNodeData(const std::string &sPath) :
 	m_sPATH(sPath),
-	m_pGltf(nullptr)
+	m_pGltf(nullptr),
+	m_pAudioBank(nullptr)
 { }
 
 /*virtual*/ IHyNodeData::~IHyNodeData(void)
@@ -31,4 +32,9 @@ const HyAtlasIndices &IHyNodeData::GetRequiredAtlasIndices() const
 HyGLTF *IHyNodeData::GetGltf() const
 {
 	return m_pGltf;
+}
+
+HyAudioBank *IHyNodeData::GetAudioBank() const
+{
+	return m_pAudioBank;
 }

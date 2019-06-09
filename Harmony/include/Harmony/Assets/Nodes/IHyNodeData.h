@@ -13,9 +13,9 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/HyAtlas.h"
 
-// Forward declarations
 class IHyRenderer;
 class HyGLTF;
+class HyAudioBank;
 
 class IHyNodeData
 {
@@ -24,6 +24,7 @@ class IHyNodeData
 protected:
 	HyAtlasIndices					m_RequiredAtlasIndices;
 	HyGLTF *						m_pGltf;
+	HyAudioBank *					m_pAudioBank;
 
 public:
 	IHyNodeData(const std::string &sPath);
@@ -32,6 +33,8 @@ public:
 	const std::string &GetPath() const;
 	const HyAtlasIndices &GetRequiredAtlasIndices() const;
 	HyGLTF *GetGltf() const;
+	HyAudioBank *GetAudioBank() const;
+
 };
 
 #endif /* IHyNodeData_h__ */

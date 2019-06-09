@@ -30,17 +30,25 @@ HyAudio_FMOD::HyAudio_FMOD() :
 {
 	ERRCHECK(Studio::System::create(&m_pSystem));
 
-	//System *pCoreSystem = nullptr;
-	//ERRCHECK(m_pSystem->getCoreSystem(&pCoreSystem));
-	//ERRCHECK(pCoreSystem->setSoftwareFormat(0, FMOD_SPEAKERMODE_5POINT1, 0));
+	////////////////////////////////////////////////////////////////////////////////////////
+	// TODO: Make this configurable
+	System *pCoreSystem = nullptr;
+	ERRCHECK(m_pSystem->getCoreSystem(&pCoreSystem));
+	ERRCHECK(pCoreSystem->setSoftwareFormat(0, FMOD_SPEAKERMODE_5POINT1, 0));
 
-	ERRCHECK(m_pSystem->initialize(1024, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr));
-	ERRCHECK(m_pSystem->loadBankFile("Master Bank.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &m_pMasterBank));
-	ERRCHECK(m_pSystem->loadBankFile("Master Bank.strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &m_pMasterStringsBank));
+	const int iMAX_CHANNELS = 1024;
+	////////////////////////////////////////////////////////////////////////////////////////
+
+	ERRCHECK(m_pSystem->initialize(iMAX_CHANNELS, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr));
+	ERRCHECK(m_pSystem->loadBankFile("Master.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &m_pMasterBank));
+	ERRCHECK(m_pSystem->loadBankFile("Master.strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &m_pMasterStringsBank));
 }
 
 /*virtual*/ HyAudio_FMOD::~HyAudio_FMOD()
 {
+	ERRCHECK(m_pMasterStringsBank->unload());
+	ERRCHECK(m_pMasterBank->unload());
+
 	ERRCHECK(m_pSystem->release());
 }
 

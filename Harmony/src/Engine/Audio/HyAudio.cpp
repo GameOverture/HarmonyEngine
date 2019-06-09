@@ -19,6 +19,7 @@ IHyAudio *			HyAudio::sm_pInternal = nullptr;
 HyAudio::HyAudio()
 {
 #if defined(HY_PLATFORM_WINDOWS)
+	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 	HMODULE hModule = LoadLibraryA("HyFMOD.dll");
 	if(hModule != nullptr)
 	{
@@ -37,6 +38,7 @@ HyAudio::HyAudio()
 			sm_fpCreateHyAudio = nullptr;
 			sm_fpCreateHyAudioBank = nullptr;
 			FreeLibrary(hModule);
+			CoUninitialize();
 		}
 	}
 #endif
@@ -49,6 +51,7 @@ HyAudio::HyAudio()
 HyAudio::~HyAudio()
 {
 	delete sm_pInternal;
+	sm_pInternal = nullptr;
 }
 
 /*static*/ IHyAudioBank *HyAudio::CreateAudioBank()

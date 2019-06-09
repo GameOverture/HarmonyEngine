@@ -11,9 +11,8 @@
 #define HyAssets_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Files/HyAtlas.h"
-#include "Assets/Files/HyGLTF.h"
 #include "Threading/IHyThreadClass.h"
+#include "Utilities/HyMath.h"
 
 #define HYASSETS_DataFile "data.json"
 #define HYASSETS_AtlasDir "Atlases/"
@@ -23,6 +22,7 @@
 class HyScene;
 class IHyRenderer;
 class IHyLoadable;
+class IHyFileData;
 class IHyNodeData;
 class HyEntityData;
 class HyAudioData;
@@ -31,7 +31,10 @@ class HySpine2dData;
 class HyText2dData;
 class HyTexturedQuad2dData;
 class HyPrefabData;
+class HyAtlas;
+class HyAtlasIndices;
 class HyGLTF;
+class HyAudioBank;
 
 class HyAssets : public IHyThreadClass
 {
@@ -44,6 +47,7 @@ class HyAssets : public IHyThreadClass
 	HyAtlasIndices *											m_pLoadedAtlasIndices;
 
 	std::map<std::string, HyGLTF *>								m_GltfMap;
+	std::map<std::string, HyAudioBank *>						m_AudioBankMap;
 
 	template<typename tData>
 	class Factory
@@ -55,6 +59,7 @@ class HyAssets : public IHyThreadClass
 		void Init(const jsonxx::Object &subDirObjRef, HyAssets &assetsRef);
 		const tData *GetData(const std::string &sPrefix, const std::string &sName) const;
 	};
+	Factory<HyAudioData>										m_AudioFactory;
 	Factory<HyEntityData>										m_EntityFactory;
 	Factory<HySprite2dData>										m_SpriteFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
@@ -88,6 +93,8 @@ public:
 	HyAtlasIndices *GetLoadedAtlases();
 
 	HyGLTF *GetGltf(const std::string &sIdentifier);
+
+	HyAudioBank *GetAudioBank(const std::string &sBankPath);
 
 	void AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut);
 	void LoadNodeData(IHyLoadable *pLoadable);
