@@ -127,17 +127,16 @@ enum Theme
 	NUMTHEMES
 };
 
-#define HYTREEWIDGETITEM_IsFilter               "HyTreeFilter"
+#define HYTREEWIDGETITEM_IsFilter				"HyTreeFilter"
 
 //#define HYDEFAULT_PrefixChar                    '+' // Names prefixed with a '+' are engine defaults that are automatically added to project
 #define HYGUI_ImportPrefix						"HY_IMPORT:"
 
-#define HYGUIPATH_DataFile                      "data.json"
-#define HYGUIPATH_TempDir                       "temp/"
-#define HYGUIPATH_TemplateDir                   "src/Editor/_Templates/"
-#define HYGUIPATH_DataAtlases                   "atlas.json"
-#define HYGUIPATH_MetaSettings                  "atlas.hygui"
-#define HYGUIPATH_DataAudioCategories           "categories.json"
+#define HYGUIPATH_DataFile						"data.json"
+#define HYGUIPATH_TempDir						"temp/"
+#define HYGUIPATH_TemplateDir					"src/Editor/_Templates/"
+#define HYGUIPATH_DataAtlases					"atlas.json"
+#define HYGUIPATH_MetaSettings					"atlas.hygui"
 
 QAction *FindAction(QList<QAction *> list, QString sName);
 #define FINDACTION(str) FindAction(this->actions(), str)
