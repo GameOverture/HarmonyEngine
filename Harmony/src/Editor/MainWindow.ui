@@ -229,12 +229,12 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidgetAtlas">
+  <widget class="QDockWidget" name="dockWidgetAssets">
    <property name="mouseTracking">
     <bool>false</bool>
    </property>
    <property name="windowTitle">
-    <string>Atlas Manager</string>
+    <string>Asset Manager</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -253,30 +253,23 @@
      <property name="bottomMargin">
       <number>2</number>
      </property>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="dockWidgetAudio">
-   <property name="windowTitle">
-    <string>Audio Manager</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="audioContents">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
+     <item>
+      <widget class="QTabWidget" name="tabWidgetAssetManager">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabAtlases">
+        <attribute name="title">
+         <string>Atlases</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="tabAudio">
+        <attribute name="title">
+         <string>Audio</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>

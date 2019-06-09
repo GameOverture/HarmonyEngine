@@ -118,8 +118,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Restore workspace
 	ui->dockWidgetExplorer->show();
-	ui->dockWidgetAtlas->show();
-	ui->dockWidgetAudio->hide();
+	ui->dockWidgetAssets->show();
 	ui->dockWidgetProperties->hide();
 
 	HyGuiLog("Recovering previously opened session...", LOGTYPE_Normal);
@@ -170,8 +169,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Status bar (and loading indication) initialization
 	// Create a loading spinner per docking window. The number of docking windows is predefined and their widgets are contextually replaced to what project/item is active.
-	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetAtlas));
-	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetAudio));
+	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetAssets));
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetExplorer));
 	//m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetOutputLog));   // No need
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetProperties));
@@ -228,8 +226,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 {
 	if(pProject == nullptr)
 	{
-		ui->dockWidgetAtlas->setWidget(nullptr);
-		ui->dockWidgetAudio->setWidget(nullptr);
+		ui->tabWidgetAssetManager->clear();
 		return;
 	}
 
@@ -251,11 +248,9 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	}
 
 	// Project manager widgets
-	ui->dockWidgetAtlas->setWidget(pProject->GetAtlasWidget());
-	ui->dockWidgetAtlas->widget()->show();
-
-	ui->dockWidgetAudio->setWidget(pProject->GetAudioWidget());
-	ui->dockWidgetAudio->widget()->show();
+	ui->tabWidgetAssetManager->clear();
+	ui->tabWidgetAssetManager->addTab(pProject->GetAtlasWidget(), HyGlobal::ItemIcon(ITEM_AtlasImage, SUBICON_None), "Atlases");
+	ui->tabWidgetAssetManager->addTab(pProject->GetAudioWidget(), HyGlobal::ItemIcon(ITEM_Audio, SUBICON_None), "Audio");
 }
 
 /*static*/ void MainWindow::SetLoading(QString sMsg, int iPercentComplete)
