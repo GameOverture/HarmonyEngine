@@ -10,6 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Audio/HyAudio.h"
 #include "Diagnostics/Console/HyConsole.h"
+#include "Assets/HyAssets.h"
+#include "HyEngine.h"
 
 fpCreateHyAudio		HyAudio::sm_fpCreateHyAudio = nullptr;
 fpCreateHyAudioBank	HyAudio::sm_fpCreateHyAudioBank = nullptr;
@@ -31,6 +33,16 @@ HyAudio::HyAudio()
 		{
 			HyLogInfo("FMOD audio library detected");
 			sm_pInternal = sm_fpCreateHyAudio();
+
+			// Load master banks
+			IHyAudioBank *pMasterBank = CreateAudioBank();
+			IHyAudioBank *pMasterSoundBank = CreateAudioBank();
+
+			std::string sFilePath = Hy_DataDir() + HYASSETS_AudioDir + "Desktop/Master.bank";
+			pMasterBank->Load(sFilePath);
+
+			sFilePath = Hy_DataDir() + HYASSETS_AudioDir + "Desktop/Master.strings.bank";
+			pMasterSoundBank->Load(sFilePath);
 		}
 		else
 		{
@@ -60,4 +72,12 @@ HyAudio::~HyAudio()
 		return sm_fpCreateHyAudioBank(sm_pInternal);
 
 	return HY_NEW HyAudioBank_Null();
+}
+
+/*static*/ IHyAudioInst *HyAudio::CreateAudioInst(const char *szPath)
+{
+	if(sm_fpCreateHyAudioInst)
+		return sm_fpCreateHyAudioInst(sm_pInternal, szPath);
+
+	return HY_NEW HyAudioInst_Null();
 }

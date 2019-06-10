@@ -35,7 +35,7 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");
 	HyAssert(m_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 
-	// Cleanup: decide whether to block 
+	// TODO Cleanup: decide whether to block 
 	while(m_Assets.IsInitialized() == false)
 	{
 	}

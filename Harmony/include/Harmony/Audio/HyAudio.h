@@ -17,7 +17,7 @@
 
 using fpCreateHyAudio = IHyAudio *(*)();
 using fpCreateHyAudioBank = IHyAudioBank *(*)(IHyAudio *);
-using fpCreateHyAudioInst = IHyAudioInst *(*)(IHyAudio *);
+using fpCreateHyAudioInst = IHyAudioInst *(*)(IHyAudio *, const char *);
 
 class HyAudio
 {
@@ -32,6 +32,7 @@ public:
 	~HyAudio();
 
 	static IHyAudioBank *CreateAudioBank();
+	static IHyAudioInst *CreateAudioInst(const char *szPath);
 };
 
 #endif /* HyAudio_h__ */

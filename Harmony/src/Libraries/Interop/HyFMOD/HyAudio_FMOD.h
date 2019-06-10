@@ -28,9 +28,6 @@ class HyAudio_FMOD : public IHyAudio
 {
 	Studio::System *			m_pSystem;
 
-	Studio::Bank *				m_pMasterBank;
-	Studio::Bank *				m_pMasterStringsBank;
-
 public:
 	HyAudio_FMOD();
 	virtual ~HyAudio_FMOD();

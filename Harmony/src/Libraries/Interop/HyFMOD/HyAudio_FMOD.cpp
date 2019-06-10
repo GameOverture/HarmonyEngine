@@ -13,8 +13,8 @@
 
 void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line)
 {
-	//if(result != FMOD_OK)
-	//	HyError(file << "(" << line << "): FMOD error " << result << " - " << FMOD_ErrorString(result));
+	if(result != FMOD_OK)
+		MessageBoxA(NULL, FMOD_ErrorString(result), "Harmony FMOD Error!", MB_ICONERROR);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,15 +40,10 @@ HyAudio_FMOD::HyAudio_FMOD() :
 	////////////////////////////////////////////////////////////////////////////////////////
 
 	ERRCHECK(m_pSystem->initialize(iMAX_CHANNELS, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr));
-	ERRCHECK(m_pSystem->loadBankFile("Master.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &m_pMasterBank));
-	ERRCHECK(m_pSystem->loadBankFile("Master.strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &m_pMasterStringsBank));
 }
 
 /*virtual*/ HyAudio_FMOD::~HyAudio_FMOD()
 {
-	ERRCHECK(m_pMasterStringsBank->unload());
-	ERRCHECK(m_pMasterBank->unload());
-
 	ERRCHECK(m_pSystem->release());
 }
 
@@ -100,7 +95,9 @@ HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPat
 	m_pDesc(nullptr),
 	m_pInst(nullptr)
 {
-	ERRCHECK(m_pSystemRef->getEvent("event:/Weapons/Explosion", &m_pDesc));
+	std::string sEventPath = "event:/";
+	sEventPath += szPath;
+	ERRCHECK(m_pSystemRef->getEvent(sEventPath.c_str(), &m_pDesc));
 	ERRCHECK(m_pDesc->createInstance(&m_pInst));
 }
 

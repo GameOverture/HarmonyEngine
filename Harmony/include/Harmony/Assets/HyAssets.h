@@ -22,12 +22,6 @@
 #define HYASSETS_PrefabDir "Prefabs/"
 #define HYASSETS_AudioDir "Audio/"
 
-#if defined(HY_PLATFORM_WINDOWS)
-	#define HYASSETS_AudioDirPlatform "Desktop/"
-#else
-	#define HYASSETS_AudioDirPlatform ""
-#endif
-
 class HyScene;
 class IHyRenderer;
 class IHyLoadable;

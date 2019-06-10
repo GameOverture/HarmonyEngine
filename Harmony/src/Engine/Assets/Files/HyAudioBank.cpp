@@ -11,22 +11,25 @@
 #include "Assets/Files/HyAudioBank.h"
 #include "HyEngine.h"
 
-HyAudioBank::HyAudioBank(const std::string &sFileName, const jsonxx::Object &initObj) :
+HyAudioBank::HyAudioBank(const std::string &sNameId, const jsonxx::Object &initObj) :
 	IHyFileData(HYFILE_AudioBank),
-	m_sFILENAME(sFileName)
+	m_sNAME_ID(sNameId),
+	m_sPATH(initObj.get<jsonxx::String>("filePath")),
+	m_bIS_MASTER(initObj.get<jsonxx::Boolean>("master"))
 {
-	//const jsonxx::Value &initVal
+	m_pInternal = HyAudio::CreateAudioBank();
 }
 
 HyAudioBank::~HyAudioBank()
 {
+	delete m_pInternal;
 }
 
 /*virtual*/ void HyAudioBank::OnLoadThread() /*override*/
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		std::string sFilePath = Hy_DataDir() + HYASSETS_AudioDir + HYASSETS_AudioDirPlatform + m_sFILENAME;
+		std::string sFilePath = Hy_DataDir() + HYASSETS_AudioDir + m_sPATH;
 		if(m_pInternal->Load(sFilePath) == false)
 		{
 			HyLogError("HyAudioBank::OnLoadThread() failed");
