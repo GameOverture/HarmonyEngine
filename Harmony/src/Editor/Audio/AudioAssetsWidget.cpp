@@ -37,7 +37,7 @@ AudioAssetsWidget::AudioAssetsWidget(Project *pProjOwner, QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	ui->cmbAudioMiddleware;
+	ui->cmbAudioMiddleware->insertItem(0, "FMOD");
 
 	//connect(&m_Socket, SIGNAL(readyRead()), this, SLOT(ReadData()));
 	//connect(&m_Socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnError(QAbstractSocket::SocketError)));
