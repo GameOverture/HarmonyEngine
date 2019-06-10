@@ -10,6 +10,36 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/HyFileIO.h"
 
+//void HyFindFilesRecursively(const char *szDirPath, const std::string &sExtension, std::vector<std::string> &filesFoundOut)
+//{
+//	transform(sExtension.begin(), sExtension.end(), sExtension.begin(), ::tolower);
+//
+//	QFileInfoList list = dirEntry.entryInfoList();
+//	QStack<QFileInfoList> dirStack;
+//	dirStack.push(list);
+//
+//	while(dirStack.isEmpty() == false)
+//	{
+//		list = dirStack.pop();
+//		for(int i = 0; i < list.count(); i++)
+//		{
+//			QFileInfo info = list[i];
+//
+//			if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
+//			{
+//				QDir subDir(info.filePath());
+//				QFileInfoList subList = subDir.entryInfoList();
+//
+//				dirStack.push(subList);
+//			}
+//			else if(info.suffix().toLower() == sExt)
+//			{
+//				appendList.push_back(info.filePath());
+//			}
+//		}
+//	}
+//}
+
 char *HyReadTextFile(const char *szFilePath, int *pLengthOut)
 {
 	char *pData;

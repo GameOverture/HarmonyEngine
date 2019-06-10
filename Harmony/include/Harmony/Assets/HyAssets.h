@@ -15,9 +15,18 @@
 #include "Utilities/HyMath.h"
 
 #define HYASSETS_DataFile "data.json"
+#define HYASSETS_AtlasFile "atlas.json"
+#define HYASSETS_AudioFile "audio.json"
+
 #define HYASSETS_AtlasDir "Atlases/"
 #define HYASSETS_PrefabDir "Prefabs/"
 #define HYASSETS_AudioDir "Audio/"
+
+#if defined(HY_PLATFORM_WINDOWS)
+	#define HYASSETS_AudioDirPlatform "Desktop/"
+#else
+	#define HYASSETS_AudioDirPlatform ""
+#endif
 
 class HyScene;
 class IHyRenderer;
@@ -46,8 +55,8 @@ class HyAssets : public IHyThreadClass
 	uint32														m_uiNumAtlases;
 	HyAtlasIndices *											m_pLoadedAtlasIndices;
 
-	std::map<std::string, HyGLTF *>								m_GltfMap;
 	std::map<std::string, HyAudioBank *>						m_AudioBankMap;
+	std::map<std::string, HyGLTF *>								m_GltfMap;
 
 	template<typename tData>
 	class Factory
@@ -94,7 +103,7 @@ public:
 
 	HyGLTF *GetGltf(const std::string &sIdentifier);
 
-	HyAudioBank *GetAudioBank(const std::string &sBankPath);
+	HyAudioBank *GetAudioBank(const std::string &sBankName);
 
 	void AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut);
 	void LoadNodeData(IHyLoadable *pLoadable);

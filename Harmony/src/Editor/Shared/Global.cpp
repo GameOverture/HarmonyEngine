@@ -311,6 +311,8 @@
 
 /*static*/ void HyGlobal::RecursiveFindFileOfExt(QString sExt, QStringList &appendList, QDir dirEntry)
 {
+	if(sExt.startsWith('.'))
+		sExt.remove(0, 1);
 	sExt = sExt.toLower();
 
 	QFileInfoList list = dirEntry.entryInfoList();
@@ -323,6 +325,10 @@
 		for(int i = 0; i < list.count(); i++)
 		{
 			QFileInfo info = list[i];
+			bool bIsDir = info.isDir();
+			QString sFileName = info.fileName();
+			QString sFilePath = info.filePath();
+			QString sSuffix = info.suffix().toLower();
 
 			if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
 			{

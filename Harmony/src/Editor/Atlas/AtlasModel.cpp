@@ -699,7 +699,7 @@ void AtlasModel::SaveData()
 	QJsonDocument atlasInfoDoc;
 	atlasInfoDoc.setArray(atlasGrpArray);
 
-	QFile atlasInfoFile(m_RootDataDir.absolutePath() % "/" % HYGUIPATH_DataAtlases);
+	QFile atlasInfoFile(m_RootDataDir.absolutePath() % "/" % HYASSETS_AtlasFile);
 	if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
 	   HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
 	}

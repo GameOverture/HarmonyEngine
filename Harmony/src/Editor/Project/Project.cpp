@@ -118,12 +118,12 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 void Project::LoadExplorerModel()
 {
 	// Load game data items
-	QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
+	QFile dataFile(GetAssetsAbsPath() % HYASSETS_DataFile);
 	if(dataFile.exists())
 	{
 		if(!dataFile.open(QIODevice::ReadOnly))
 		{
-			HyGuiLog("ItemProject::ItemProject() could not open " % m_sName % "'s " % HYGUIPATH_DataFile % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
+			HyGuiLog("ItemProject::ItemProject() could not open " % m_sName % "'s " % HYASSETS_DataFile % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
 			m_bHasError = true;
 			return;
 		}
@@ -545,9 +545,9 @@ void Project::RefreshNamesOnTabs()
 
 void Project::WriteGameData()
 {
-	QFile dataFile(GetAssetsAbsPath() % HYGUIPATH_DataFile);
+	QFile dataFile(GetAssetsAbsPath() % HYASSETS_DataFile);
 	if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
-	   HyGuiLog(QString("Couldn't open ") % HYGUIPATH_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
+	   HyGuiLog(QString("Couldn't open ") % HYASSETS_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
 	}
 	else
 	{
@@ -556,7 +556,7 @@ void Project::WriteGameData()
 		qint64 iBytesWritten = dataFile.write(userDoc.toJson());
 		if(0 == iBytesWritten || -1 == iBytesWritten)
 		{
-			HyGuiLog(QString("Could not write to ") % HYGUIPATH_DataFile % " file: " % dataFile.errorString(), LOGTYPE_Error);
+			HyGuiLog(QString("Could not write to ") % HYASSETS_DataFile % " file: " % dataFile.errorString(), LOGTYPE_Error);
 		}
 
 		dataFile.close();

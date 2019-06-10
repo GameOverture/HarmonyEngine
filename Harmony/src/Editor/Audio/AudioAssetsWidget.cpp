@@ -108,7 +108,8 @@ void AudioAssetsWidget::on_btnScanAudio_pressed()
 		case FMODSTEP_Connecting:
 			if(socket.waitForConnected(3000))
 			{
-				QString sSource = "studio.project.save(); studio.project.build(); studio.project.exportGUIDs();";
+				//  studio.project.build();
+				QString sSource = "studio.project.save(); studio.project.exportGUIDs();";
 				socket.write(sSource.toUtf8());
 
 				iProgressStep = FMODSTEP_ExportingGuids;
@@ -146,27 +147,27 @@ void AudioAssetsWidget::on_btnScanAudio_pressed()
 			break; }
 				
 		case FMODSTEP_SendingQuery: {
-			QStringList sBankNames;
+			m_sBankNameList.clear();
 			QTextStream in(&guidFile);
 			while(!in.atEnd())
 			{
 				QString sLine = in.readLine();
 
 				if(sLine.contains("bank:/", Qt::CaseInsensitive))
-					sBankNames.append(sLine.right(sLine.length() - sLine.indexOf("bank:/")));
+					m_sBankNameList.append(sLine.right(sLine.length() - sLine.indexOf("bank:/")));
 			}
 			guidFile.close();
 
 			QString sSource;
 			sSource += "var eventMap = {};";
-			for(int i = 0; i < sBankNames.size(); ++i)
+			for(int i = 0; i < m_sBankNameList.size(); ++i)
 			{
 				sSource += "{";
-				sSource += "    var bankObj = studio.project.lookup(\"" % sBankNames[i] % "\");";
+				sSource += "    var bankObj = studio.project.lookup(\"" % m_sBankNameList[i] % "\");";
 				sSource += "    if(bankObj != undefined) {";
 				sSource += "        var eventsArray = bankObj.events;";
 				sSource += "        for(i = 0; i < eventsArray.length; i++)";
-				sSource += "            eventMap[eventsArray[i].getPath()] = \"" % sBankNames[i] % "\";";
+				sSource += "            eventMap[eventsArray[i].getPath()] = \"" % m_sBankNameList[i] % "\";";
 				sSource += "    }";
 				sSource += "}";
 			}
@@ -184,19 +185,110 @@ void AudioAssetsWidget::on_btnScanAudio_pressed()
 			if(iNumBytesRead == 0 && !socket.waitForReadyRead(1000))
 			{
 				HyGuiLog(socketResponse, LOGTYPE_Normal);
+
+				// Prep response to pristine json syntax
 				socketResponse.replace("out():", "");
 				socketResponse.replace("event:/", "");
 				socketResponse.replace("bank:/", "");
 				socketResponse.remove(socketResponse.lastIndexOf('}') + 1, socketResponse.length() - socketResponse.lastIndexOf('}'));
 				socketResponse = socketResponse.trimmed();
 				
+				// Set the "Audio" portion of the data.json file
 				QJsonParseError error;
 				QJsonDocument audioDoc = QJsonDocument::fromJson(socketResponse, &error);
-				if(audioDoc.isObject())
+				if(error.error != QJsonParseError::NoError)
 				{
-					QJsonObject newAudioModel = audioDoc.object();
-					m_pProjOwner->SetAudioModel(newAudioModel);
+					HyGuiLog("FMOD parsing response error:" % error.errorString(), LOGTYPE_Error);
+					iProgressStep = NUM_FMODSTEPS;
+					break;
 				}
+
+				m_pProjOwner->SetAudioModel(audioDoc.object());
+				
+				// Write out separate audio.json soundbank file
+				QFile soundBanksFile(dataDir.absoluteFilePath(HYASSETS_AudioFile));
+				if(soundBanksFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+				{
+					HyGuiLog(QString("Couldn't open ") % HYASSETS_AudioFile % " for writing: " % soundBanksFile.errorString(), LOGTYPE_Error);
+					iProgressStep = NUM_FMODSTEPS;
+					break;
+				}
+
+				// Find full paths to sound banks
+				QStringList sAbsBankFilePathList;
+				HyGlobal::RecursiveFindFileOfExt(".bank", sAbsBankFilePathList, dataDir);
+
+				int iMasterStringsBankIndex = -1;
+				for(int i = 0; i < sAbsBankFilePathList.size(); ++i)
+				{
+					if(sAbsBankFilePathList[i].contains("strings.bank", Qt::CaseInsensitive))
+					{
+						iMasterStringsBankIndex = i;
+						break;
+					}
+				}
+				if(iMasterStringsBankIndex == -1)
+					HyGuiLog("Did not find master string bank", LOGTYPE_Error);
+
+				int iMasterBankIndex = -1;
+				QString sMasterBankPath = sAbsBankFilePathList[iMasterStringsBankIndex];
+				sMasterBankPath.replace(".strings.bank", ".bank", Qt::CaseInsensitive);
+				for(int i = 0; i < sAbsBankFilePathList.size(); ++i)
+				{
+					if(i == iMasterStringsBankIndex)
+						continue;
+					if(sAbsBankFilePathList[i].compare(sMasterBankPath, Qt::CaseInsensitive) == 0)
+					{
+						iMasterBankIndex = i;
+						break;
+					}
+				}
+				if(iMasterBankIndex == -1)
+					HyGuiLog("Did not find master bank", LOGTYPE_Error);
+
+				QJsonObject soundBanksObj;
+				for(int i = 0; i < sAbsBankFilePathList.size(); ++i)
+				{
+					QString sBankName = "";
+					QString sPath = "";
+					for(int j = 0; j < m_sBankNameList.size(); ++j)
+					{
+						QString sTestBankName = m_sBankNameList[j];
+						sTestBankName.replace("bank:/", "");
+						QFileInfo sBankFileInfo(sTestBankName);
+
+						// Match with full "path" first, then try just the base name since folder structure may vary on FMOD output.
+						if(sAbsBankFilePathList[i].contains(sTestBankName, Qt::CaseInsensitive))
+						{
+							sBankName = sTestBankName;
+							sPath = sAbsBankFilePathList[i];
+							break;
+						}
+						else if(sBankName == "" && sAbsBankFilePathList[i].contains(sBankFileInfo.baseName(), Qt::CaseInsensitive))
+						{
+							sBankName = sTestBankName;
+							sPath = sAbsBankFilePathList[i];
+						}
+					}
+
+					sPath = dataDir.relativeFilePath(sPath);
+
+					QJsonObject sndBankObj;
+					sndBankObj.insert("master", i == iMasterStringsBankIndex || i == iMasterBankIndex);
+					sndBankObj.insert("filePath", sPath);
+
+					if(soundBanksObj.contains(sBankName) == false)
+						soundBanksObj.insert(sBankName, sndBankObj);
+					else
+						soundBanksObj.insert(sBankName % ".strings", sndBankObj);
+				}
+
+				QJsonDocument soundBanksDoc;
+				soundBanksDoc.setObject(soundBanksObj);
+				qint64 iBytesWritten = soundBanksFile.write(soundBanksDoc.toJson());
+				if(0 == iBytesWritten || -1 == iBytesWritten)
+					HyGuiLog(QString("Could not write to ") % HYASSETS_AudioFile % " file: " % soundBanksFile.errorString(), LOGTYPE_Error);
+				soundBanksFile.close();
 
 				iProgressStep = NUM_FMODSTEPS;
 			}

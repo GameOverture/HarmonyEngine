@@ -26,6 +26,7 @@ class AudioAssetsWidget : public QWidget
 	Q_OBJECT
 	
 	Project *						m_pProjOwner;
+	QStringList						m_sBankNameList;
 
 public:
 	explicit AudioAssetsWidget(QWidget *parent = 0);

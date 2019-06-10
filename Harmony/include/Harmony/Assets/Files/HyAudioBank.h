@@ -20,7 +20,7 @@ class HyAudioBank : public IHyFileData
 	IHyAudioBank *			m_pInternal;
 
 public:
-	HyAudioBank(const std::string &sFileName);
+	HyAudioBank(const std::string &sFileName, const jsonxx::Object &initObj);
 	virtual ~HyAudioBank();
 
 	virtual void OnLoadThread() override;

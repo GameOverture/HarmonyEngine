@@ -30,6 +30,12 @@
 #include "Utilities/HyStrManip.h"
 #include "Diagnostics/Console/HyConsole.h"
 
+#include <fstream>
+#include <iostream>
+#include <filesystem>
+namespace fs = std::experimental::filesystem;
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Nested class Factory
 template<typename tData>
@@ -101,6 +107,10 @@ HyAssets::~HyAssets()
 		delete iter->second;
 	m_GltfMap.clear();
 
+	for(auto iter = m_AudioBankMap.begin(); iter != m_AudioBankMap.end(); ++iter)
+		delete iter->second;
+	m_AudioBankMap.clear();
+
 	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
 		delete iter->second;
 
@@ -164,8 +174,12 @@ HyGLTF *HyAssets::GetGltf(const std::string &sIdentifier)
 	return nullptr;
 }
 
-HyAudioBank *HyAssets::GetAudioBank(const std::string &sBankPath)
+HyAudioBank *HyAssets::GetAudioBank(const std::string &sBankName)
 {
+	auto iter = m_AudioBankMap.find(sBankName);
+	if(iter != m_AudioBankMap.end())
+		return iter->second;
+
 	return nullptr;
 }
 
@@ -237,7 +251,7 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 				bFullyLoaded = false;
 		}
 
-		HyAudioBank *pAudioBank = nullptr;
+		HyAudioBank *pAudioBank = pLoadable->UncheckedGetData()->GetAudioBank();
 		if(pAudioBank)
 		{
 			QueueData(pAudioBank);
@@ -402,8 +416,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 {
 	HyLog("Assets are initializing...");
 
-	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir);
-	sAtlasInfoFilePath += "atlas.json";
+	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir + HYASSETS_AtlasFile);
 	std::string sAtlasInfoFileContents;
 	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
 
@@ -474,6 +487,18 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		HyAtlasIndices::sm_iIndexFlagsArraySize++;
 
 	m_pLoadedAtlasIndices = HY_NEW HyAtlasIndices();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	std::string sAudioFilePath(m_sDATADIR + HYASSETS_AudioDir + HYASSETS_AudioFile);
+	std::string sAudioFileContents;
+	HyReadTextFile(sAudioFilePath.c_str(), sAudioFileContents);
+	jsonxx::Object audioObj;
+	if(audioObj.parse(sAudioFileContents))
+	{
+		for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
+			m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(iter->first, iter->second->get<jsonxx::Object>());
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef HY_PLATFORM_GUI

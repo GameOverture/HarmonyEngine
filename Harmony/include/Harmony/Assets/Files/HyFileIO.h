@@ -13,6 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include <fstream>
 
+//void HyFindFilesRecursively(const char *szDirPath, const std::string &sExtension, std::vector<std::string> &filesFoundOut);
+
 char *HyReadTextFile(const char *szFilePath, int *pLengthOut);
 
 void HyReadTextFile(const char *szFilePath, std::string &sContentsOut);
