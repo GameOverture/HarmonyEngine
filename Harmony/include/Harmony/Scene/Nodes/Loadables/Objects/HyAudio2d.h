@@ -30,6 +30,9 @@ public:
 	void SetPitch(float fPitch);
 
 	void SetReverb();
+
+protected:
+	virtual void OnLoaded() override;
 };
 
 #endif /* HyAudio2d_h__ */

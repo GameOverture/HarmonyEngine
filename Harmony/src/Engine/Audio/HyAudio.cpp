@@ -34,15 +34,15 @@ HyAudio::HyAudio()
 			HyLogInfo("FMOD audio library detected");
 			sm_pInternal = sm_fpCreateHyAudio();
 
-			// Load master banks
-			IHyAudioBank *pMasterBank = CreateAudioBank();
-			IHyAudioBank *pMasterSoundBank = CreateAudioBank();
+			//// Load master banks
+			//IHyAudioBank *pMasterBank = CreateAudioBank();
+			//IHyAudioBank *pMasterSoundBank = CreateAudioBank();
 
-			std::string sFilePath = Hy_DataDir() + HYASSETS_AudioDir + "Desktop/Master.bank";
-			pMasterBank->Load(sFilePath);
+			//std::string sFilePath = Hy_DataDir() + HYASSETS_AudioDir + "Desktop/Master.bank";
+			//pMasterBank->Load(sFilePath);
 
-			sFilePath = Hy_DataDir() + HYASSETS_AudioDir + "Desktop/Master.strings.bank";
-			pMasterSoundBank->Load(sFilePath);
+			//sFilePath = Hy_DataDir() + HYASSETS_AudioDir + "Desktop/Master.strings.bank";
+			//pMasterSoundBank->Load(sFilePath);
 		}
 		else
 		{

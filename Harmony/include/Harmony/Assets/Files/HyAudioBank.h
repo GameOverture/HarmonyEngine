@@ -26,6 +26,8 @@ public:
 	HyAudioBank(const std::string &sNameId, const jsonxx::Object &initObj);
 	virtual ~HyAudioBank();
 
+	bool IsMaster() const;
+
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 };

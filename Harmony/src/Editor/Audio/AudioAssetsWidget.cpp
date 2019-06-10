@@ -55,6 +55,16 @@ Project *AudioAssetsWidget::GetItemProject()
 
 void AudioAssetsWidget::on_btnScanAudio_pressed()
 {
+	SetupForFMOD();
+//	m_pProjOwner->
+}
+
+void AudioAssetsWidget::on_AudioMiddleware_currentIndexChanged(int index)
+{
+}
+
+void AudioAssetsWidget::SetupForFMOD()
+{
 	HyGuiLog("Connecting to FMOD Studio", LOGTYPE_Title);
 
 	enum FMODStep
@@ -120,7 +130,7 @@ void AudioAssetsWidget::on_btnScanAudio_pressed()
 				iProgressStep = NUM_FMODSTEPS;
 			}
 			break;
-				
+
 		case FMODSTEP_ExportingGuids:
 			if(guidFile.exists())
 			{
@@ -145,7 +155,7 @@ void AudioAssetsWidget::on_btnScanAudio_pressed()
 				iProgressStep = FMODSTEP_SendingQuery;
 			}
 			break; }
-				
+
 		case FMODSTEP_SendingQuery: {
 			m_sBankNameList.clear();
 			QTextStream in(&guidFile);
@@ -166,8 +176,12 @@ void AudioAssetsWidget::on_btnScanAudio_pressed()
 				sSource += "    var bankObj = studio.project.lookup(\"" % m_sBankNameList[i] % "\");";
 				sSource += "    if(bankObj != undefined) {";
 				sSource += "        var eventsArray = bankObj.events;";
-				sSource += "        for(i = 0; i < eventsArray.length; i++)";
-				sSource += "            eventMap[eventsArray[i].getPath()] = \"" % m_sBankNameList[i] % "\";";
+				sSource += "        for(i = 0; i < eventsArray.length; i++) {";
+				sSource += "            var eventObj = {};";
+				sSource += "            eventObj[\"bank\"] = \"" % m_sBankNameList[i] % "\";";
+				sSource += "            eventObj[\"guid\"] = eventsArray[i].id;";
+				sSource += "            eventMap[eventsArray[i].getPath()] = eventObj;";
+				sSource += "        }";
 				sSource += "    }";
 				sSource += "}";
 			}
@@ -192,7 +206,7 @@ void AudioAssetsWidget::on_btnScanAudio_pressed()
 				socketResponse.replace("bank:/", "");
 				socketResponse.remove(socketResponse.lastIndexOf('}') + 1, socketResponse.length() - socketResponse.lastIndexOf('}'));
 				socketResponse = socketResponse.trimmed();
-				
+
 				// Set the "Audio" portion of the data.json file
 				QJsonParseError error;
 				QJsonDocument audioDoc = QJsonDocument::fromJson(socketResponse, &error);
@@ -204,7 +218,7 @@ void AudioAssetsWidget::on_btnScanAudio_pressed()
 				}
 
 				m_pProjOwner->SetAudioModel(audioDoc.object());
-				
+
 				// Write out separate audio.json soundbank file
 				QFile soundBanksFile(dataDir.absoluteFilePath(HYASSETS_AudioFile));
 				if(soundBanksFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -299,40 +313,3 @@ void AudioAssetsWidget::on_btnScanAudio_pressed()
 	progressDlg.setValue(NUM_FMODSTEPS);
 	socket.abort();
 }
-
-void AudioAssetsWidget::on_AudioMiddleware_currentIndexChanged(int index)
-{
-}
-
-//void AudioAssetsWidget::ReadData()
-//{
-//	QDataStream in(&m_Socket);
-//	//in.setVersion(QDataStream::Qt_4_0);
-//
-//	QString sMessage;
-//	in >> sMessage;
-//
-//	HyGuiLog("Read: " % sMessage, LOGTYPE_Info);
-//}
-
-//void AudioAssetsWidget::OnError(QAbstractSocket::SocketError socketError)
-//{
-//	switch(socketError)
-//	{
-//	case QAbstractSocket::RemoteHostClosedError:
-//		HyGuiLog("The game debugger connection has been lost", LOGTYPE_Info);
-//		break;
-//
-//	case QAbstractSocket::HostNotFoundError:
-//		HyGuiLog("FMOD Studio at [127.0.0.1:3663] was not found", LOGTYPE_Error);
-//		break;
-//
-//	case QAbstractSocket::ConnectionRefusedError:
-//		HyGuiLog("FMOD Studio at [127.0.0.1:3663] has refused the connection", LOGTYPE_Error);
-//		break;
-//
-//	default:
-//		HyGuiLog("Audio FMOD Socket Error: " % m_Socket.errorString(), LOGTYPE_Error);
-//		break;
-//	}
-//}

@@ -200,6 +200,7 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		pDataOut = m_PrefabFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
 	case HYTYPE_Audio:
+		pDataOut = m_AudioFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
 	case HYTYPE_TexturedQuad:
 		if(pLoadable->GetName() != "raw")
@@ -497,7 +498,11 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	if(audioObj.parse(sAudioFileContents))
 	{
 		for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
+		{
 			m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(iter->first, iter->second->get<jsonxx::Object>());
+			if(m_AudioBankMap[iter->first]->IsMaster())
+				m_AudioBankMap[iter->first]->OnLoadThread();
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

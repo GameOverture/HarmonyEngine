@@ -50,3 +50,8 @@ void HyAudio2d::SetReverb()
 {
 	//m_pInternal->SetReverb();
 }
+
+/*virtual*/ void HyAudio2d::OnLoaded() /*override*/
+{
+	m_pInternal->OnLoaded();
+}

@@ -17,7 +17,7 @@
 
 using fpCreateHyAudio = IHyAudio *(*)();
 using fpCreateHyAudioBank = IHyAudioBank *(*)(IHyAudio *);
-using fpCreateHyAudioInst = IHyAudioInst *(*)(IHyAudio *, const char *);
+using fpCreateHyAudioInst = IHyAudioInst *(*)(IHyAudio *, const char guid[16]);
 
 class HyAudio
 {

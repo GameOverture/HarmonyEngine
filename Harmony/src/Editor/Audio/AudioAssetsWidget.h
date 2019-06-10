@@ -39,12 +39,11 @@ public Q_SLOTS:
 	void on_btnScanAudio_pressed();
 
 	void on_AudioMiddleware_currentIndexChanged(int index);
-
-	//void ReadData();
-	//void OnError(QAbstractSocket::SocketError socketError);
 	
 private:
 	Ui::AudioAssetsWidget *ui;
+
+	void SetupForFMOD();
 };
 
 #endif // AUDIOASSETSWIDGET_H

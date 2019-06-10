@@ -25,6 +25,11 @@ HyAudioBank::~HyAudioBank()
 	delete m_pInternal;
 }
 
+bool HyAudioBank::IsMaster() const
+{
+	return m_bIS_MASTER;
+}
+
 /*virtual*/ void HyAudioBank::OnLoadThread() /*override*/
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)

@@ -56,12 +56,16 @@ public:
 class HyAudioInst_FMOD : public IHyAudioInst
 {
 	Studio::System *			m_pSystemRef;
+	FMOD_GUID					m_GUID;
+
 	Studio::EventDescription *	m_pDesc;
 	Studio::EventInstance *		m_pInst;
 
 public:
-	HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPath);
+	HyAudioInst_FMOD(Studio::System *pSystemRef, const char guid[16]);
 	virtual ~HyAudioInst_FMOD();
+
+	virtual void OnLoaded() override;
 
 	virtual void PlayOneShot() override;
 	virtual void Start() override;

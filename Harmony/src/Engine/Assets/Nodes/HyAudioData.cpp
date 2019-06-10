@@ -14,7 +14,8 @@
 HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :
 	IHyNodeData(sPath)
 {
-	m_pAudioBank = assetsRef.GetAudioBank(dataValueRef.get<jsonxx::String>());
+	const jsonxx::Object &audioObj = dataValueRef.get<jsonxx::Object>();
+	m_pAudioBank = assetsRef.GetAudioBank(audioObj.get<jsonxx::String>("bank"));
 }
 
 HyAudioData::~HyAudioData(void)

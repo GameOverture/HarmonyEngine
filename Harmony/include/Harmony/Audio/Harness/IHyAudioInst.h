@@ -22,6 +22,8 @@ public:
 	IHyAudioInst() = default;
 	virtual ~IHyAudioInst(void) = default;
 
+	virtual void OnLoaded() = 0;
+
 	virtual void PlayOneShot() = 0;
 	virtual void Start() = 0;
 	virtual void Stop(HyAudioStop eStopType = HYAUDIOSTOP_AllowFadeOut) = 0;
@@ -51,21 +53,23 @@ public:
 	HyAudioInst_Null() = default;
 	virtual ~HyAudioInst_Null() = default;
 
+	virtual void OnLoaded() override { }
+
 	virtual void PlayOneShot() override { }
 	virtual void Start() override { }
-	virtual void Stop(HyAudioStop eStopType = HYAUDIOSTOP_AllowFadeOut) { }
+	virtual void Stop(HyAudioStop eStopType = HYAUDIOSTOP_AllowFadeOut) override { }
 
-	virtual bool IsPaused() const { return false; }
-	virtual void SetPause(bool bPause) { }
+	virtual bool IsPaused() const override { return false; }
+	virtual void SetPause(bool bPause) override { }
 
-	virtual float GetVolume(float *fFinalVolumeOut = nullptr) const { return 0.0f; }
-	virtual void SetVolume(float fVolume) { }
+	virtual float GetVolume(float *fFinalVolumeOut = nullptr) const override { return 0.0f; }
+	virtual void SetVolume(float fVolume) override { }
 
-	virtual float GetPitch(float *fFinalPitchOut = nullptr) const { return 0.0f; }
-	virtual void SetPitch(float fPitch) { }
+	virtual float GetPitch(float *fFinalPitchOut = nullptr) const override { return 0.0f; }
+	virtual void SetPitch(float fPitch) override { }
 
-	virtual int GetTimelinePosition() const { return 0; }
-	virtual void SetTimelinePosition(int iPosition) { }
+	virtual int GetTimelinePosition() const override { return 0; }
+	virtual void SetTimelinePosition(int iPosition) override { }
 
 	virtual float GetParam(const char *szParam, float *fFinalValueOut = nullptr) const override { return 0.0f; }
 	virtual void SetParam(const char *szParam, float fValue) override { }

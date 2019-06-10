@@ -74,13 +74,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\..\..\lib\3rdParty\$(Platform)</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)_Debug</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\..\..\lib\3rdParty\$(Platform)</OutDir>
     <IntDir>obj\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)_Debug</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

@@ -17,7 +17,7 @@
 
 class HyAudioData : public IHyNodeData
 {
-	//HyAudioBank
+	
 public:
 	HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);

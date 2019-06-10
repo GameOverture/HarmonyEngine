@@ -14,15 +14,24 @@
 void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line)
 {
 	if(result != FMOD_OK)
-		MessageBoxA(NULL, FMOD_ErrorString(result), "Harmony FMOD Error!", MB_ICONERROR);
+	{
+		std::string sError = "(" + std::to_string(line) + ") ";
+		sError += file; 
+		sError += "\n\n";
+		sError += FMOD_ErrorString(result);
+		MessageBoxA(nullptr, sError.c_str(), "Harmony FMOD Error!", MB_ICONERROR);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-__declspec (dllexport) IHyAudio *CreateHyAudio_FMOD()
+extern "C"
 {
-	IHyAudio *pNewAudio = new HyAudio_FMOD();
-	return pNewAudio;
+	__declspec (dllexport) IHyAudio *CreateHyAudio_FMOD()
+	{
+		IHyAudio *pNewAudio = new HyAudio_FMOD();
+		return pNewAudio;
+	}
 }
 
 HyAudio_FMOD::HyAudio_FMOD() :
@@ -59,10 +68,13 @@ Studio::System *HyAudio_FMOD::GetSystem() const
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-__declspec (dllexport) IHyAudioBank *CreateHyAudioBank_FMOD(IHyAudio *pAudio)
+extern "C"
 {
-	IHyAudioBank *pNewAudio = new HyAudioBank_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem());
-	return pNewAudio;
+	__declspec (dllexport) IHyAudioBank *CreateHyAudioBank_FMOD(IHyAudio *pAudio)
+	{
+		IHyAudioBank *pNewAudio = new HyAudioBank_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem());
+		return pNewAudio;
+	}
 }
 
 HyAudioBank_FMOD::HyAudioBank_FMOD(Studio::System *pSystemRef) :
@@ -84,29 +96,40 @@ HyAudioBank_FMOD::HyAudioBank_FMOD(Studio::System *pSystemRef) :
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-__declspec (dllexport) IHyAudioInst *CreateHyAudioInst_FMOD(IHyAudio *pAudio, const char *szPath)
+extern "C"
 {
-	IHyAudioInst *pNewAudio = new HyAudioInst_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem(), szPath);
-	return pNewAudio;
+	__declspec (dllexport) IHyAudioInst *CreateHyAudioInst_FMOD(IHyAudio *pAudio, const char guid[16])
+	{
+		IHyAudioInst *pNewAudio = new HyAudioInst_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem(), guid);
+		return pNewAudio;
+	}
 }
 
-HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPath) :
+HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char guid[16]) :
 	m_pSystemRef(pSystemRef),
 	m_pDesc(nullptr),
 	m_pInst(nullptr)
 {
-	std::string sEventPath = "event:/";
-	sEventPath += szPath;
-	ERRCHECK(m_pSystemRef->getEvent(sEventPath.c_str(), &m_pDesc));
-	ERRCHECK(m_pDesc->createInstance(&m_pInst));
+	m_GUID.Data1
 }
 
 /*virtual*/ HyAudioInst_FMOD::~HyAudioInst_FMOD()
 {
 }
 
+/*virtual*/ void HyAudioInst_FMOD::OnLoaded() /*override*/
+{
+	std::string sEventPath = "event:/";
+	sEventPath += m_sPATH;
+	ERRCHECK(m_pSystemRef->getEventByID(sEventPath.c_str(), &m_pDesc));
+	ERRCHECK(m_pDesc->createInstance(&m_pInst));
+}
+
 /*virtual*/ void HyAudioInst_FMOD::PlayOneShot() /*override*/
 {
+	if(m_pDesc == nullptr)
+		return;
+
 	Studio::EventInstance *pOneShotInstance = nullptr;
 	ERRCHECK(m_pDesc->createInstance(&pOneShotInstance));
 	ERRCHECK(pOneShotInstance->start());
@@ -117,16 +140,21 @@ HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPat
 
 /*virtual*/ void HyAudioInst_FMOD::Start() /*override*/
 {
-	ERRCHECK(m_pInst->start());
+	if(m_pInst)
+		ERRCHECK(m_pInst->start());
 }
 
 /*virtual*/ void HyAudioInst_FMOD::Stop(HyAudioStop eStopType /*= HYAUDIOSTOP_AllowFadeOut*/) /*override*/
-{	
-	ERRCHECK(m_pInst->stop(eStopType == HYAUDIOSTOP_AllowFadeOut ? FMOD_STUDIO_STOP_ALLOWFADEOUT : FMOD_STUDIO_STOP_IMMEDIATE));
+{
+	if(m_pInst)
+		ERRCHECK(m_pInst->stop(eStopType == HYAUDIOSTOP_AllowFadeOut ? FMOD_STUDIO_STOP_ALLOWFADEOUT : FMOD_STUDIO_STOP_IMMEDIATE));
 }
 
 /*virtual*/ bool HyAudioInst_FMOD::IsPaused() const /*override*/
 {
+	if(m_pInst == nullptr)
+		return false;
+
 	bool bIsPaused = false;
 	ERRCHECK(m_pInst->getPaused(&bIsPaused));
 	return bIsPaused;
@@ -134,11 +162,15 @@ HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPat
 
 /*virtual*/ void HyAudioInst_FMOD::SetPause(bool bPause) /*override*/
 {
-	ERRCHECK(m_pInst->setPaused(bPause));
+	if(m_pInst)
+		ERRCHECK(m_pInst->setPaused(bPause));
 }
 
 /*virtual*/ float HyAudioInst_FMOD::GetVolume(float *fFinalVolumeOut /*= nullptr*/) const /*override*/
 {
+	if(m_pInst == nullptr)
+		return false;
+
 	float fVolume = 0.0f;
 	ERRCHECK(m_pInst->getVolume(&fVolume, fFinalVolumeOut));
 	return fVolume;
@@ -146,11 +178,15 @@ HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPat
 
 /*virtual*/ void HyAudioInst_FMOD::SetVolume(float fVolume) /*override*/
 {
-	ERRCHECK(m_pInst->setVolume(fVolume));
+	if(m_pInst)
+		ERRCHECK(m_pInst->setVolume(fVolume));
 }
 
 /*virtual*/ float HyAudioInst_FMOD::GetPitch(float *fFinalPitchOut /*= nullptr*/) const /*override*/
 {
+	if(m_pInst == nullptr)
+		return false;
+
 	float fPitch = 0.0f;
 	ERRCHECK(m_pInst->getPitch(&fPitch, fFinalPitchOut));
 	return fPitch;
@@ -158,11 +194,15 @@ HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPat
 
 /*virtual*/ void HyAudioInst_FMOD::SetPitch(float fPitch) /*override*/
 {
-	ERRCHECK(m_pInst->setPitch(fPitch));
+	if(m_pInst)
+		ERRCHECK(m_pInst->setPitch(fPitch));
 }
 
 /*virtual*/ int HyAudioInst_FMOD::GetTimelinePosition() const /*override*/
 {
+	if(m_pInst == nullptr)
+		return false;
+
 	int iPosition = 0;
 	ERRCHECK(m_pInst->getTimelinePosition(&iPosition));
 	return iPosition;
@@ -170,11 +210,15 @@ HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPat
 
 /*virtual*/ void HyAudioInst_FMOD::SetTimelinePosition(int iPosition) /*override*/
 {
-	ERRCHECK(m_pInst->setTimelinePosition(iPosition));
+	if(m_pInst)
+		ERRCHECK(m_pInst->setTimelinePosition(iPosition));
 }
 
 /*virtual*/ float HyAudioInst_FMOD::GetParam(const char *szParam, float *fFinalValueOut /*= nullptr*/) const /*override*/
 {
+	if(m_pInst == nullptr)
+		return false;
+
 	float fValue = 0.0f;
 	ERRCHECK(m_pInst->getParameterByName(szParam, &fValue, fFinalValueOut));
 	return fValue;
@@ -182,11 +226,15 @@ HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPat
 
 /*virtual*/ void HyAudioInst_FMOD::SetParam(const char *szParam, float fValue) /*override*/
 {
-	ERRCHECK(m_pInst->setParameterByName(szParam, fValue));
+	if(m_pInst)
+		ERRCHECK(m_pInst->setParameterByName(szParam, fValue));
 }
 
 /*virtual*/ float HyAudioInst_FMOD::GetReverb(int iIndex) const /*override*/
 {
+	if(m_pInst == nullptr)
+		return false;
+
 	float fReverb = 0.0f;
 	ERRCHECK(m_pInst->getReverbLevel(iIndex, &fReverb));
 	return fReverb;
@@ -194,5 +242,6 @@ HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPat
 
 /*virtual*/ void HyAudioInst_FMOD::SetReverb(int iIndex, float fLevel) /*override*/
 {
-	ERRCHECK(m_pInst->setReverbLevel(iIndex, fLevel));
+	if(m_pInst)
+		ERRCHECK(m_pInst->setReverbLevel(iIndex, fLevel));
 }
