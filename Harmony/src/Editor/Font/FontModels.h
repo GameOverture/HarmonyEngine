@@ -26,17 +26,17 @@ class FontStateLayersModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
-		struct FontLayer
+	struct FontLayer
 	{
-		const int           iUNIQUE_ID;
-		FontTypeface *      pReference;
+		const int					iUNIQUE_ID;
+		FontTypeface *				pReference;
 
-		rendermode_t        eMode;
-		int                 iSize;
-		float               fOutlineThickness;
+		rendermode_t				eMode;
+		int							iSize;
+		float						fOutlineThickness;
 
-		glm::vec4           vTopColor;
-		glm::vec4           vBotColor;
+		glm::vec4					vTopColor;
+		glm::vec4					vBotColor;
 
 		FontLayer(int iUniqueId, rendermode_t eRenderMode, int iSize, float fOutlineThickness) :    iUNIQUE_ID(iUniqueId),
 			pReference(nullptr),
@@ -46,11 +46,11 @@ class FontStateLayersModel : public QAbstractTableModel
 		{ }
 	};
 
-	static int                      sm_iUniqueIdCounter;
-	QList<FontLayer *>              m_LayerList;
-	QList<QPair<int, FontLayer *> > m_RemovedLayerList; // QPair = <rowIndex, fontPtr>
+	static int						sm_iUniqueIdCounter;
+	QList<FontLayer *>				m_LayerList;
+	QList<QPair<int, FontLayer *> >	m_RemovedLayerList;
 
-	QStringList                     m_sRenderModeStringList;
+	QStringList						m_sRenderModeStringList;
 
 public:
 	enum eColumn
