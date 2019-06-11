@@ -18,12 +18,11 @@
 	#include <Objbase.h>
 #endif
 
-fpCreateHyAudio		HyAudio::sm_fpCreateHyAudio = nullptr;
-fpCreateHyAudioBank	HyAudio::sm_fpCreateHyAudioBank = nullptr;
-fpCreateHyAudioInst HyAudio::sm_fpCreateHyAudioInst = nullptr;
-IHyAudio *			HyAudio::sm_pInternal = nullptr;
-
-HyAudio::HyAudio(std::string sDataDir)
+HyAudio::HyAudio(std::string sDataDir) : 
+	m_fpAllocateHyAudio(nullptr),
+	m_fpAllocateHyAudioBank(nullptr),
+	m_fpAllocateHyAudioInst(nullptr),
+	m_pInternal(nullptr)
 {
 	sDataDir = HyStr::MakeStringProperPath(sDataDir.c_str(), "/", true);
 
@@ -32,29 +31,30 @@ HyAudio::HyAudio(std::string sDataDir)
 	HMODULE hModule = LoadLibraryA("HyFMOD.dll");
 	if(hModule != nullptr)
 	{
-		sm_fpCreateHyAudio = (fpCreateHyAudio)::GetProcAddress(hModule, "CreateHyAudio_FMOD");
-		sm_fpCreateHyAudioBank = (fpCreateHyAudioBank)::GetProcAddress(hModule, "CreateHyAudioBank_FMOD");
-		sm_fpCreateHyAudioInst = (fpCreateHyAudioInst)::GetProcAddress(hModule, "CreateHyAudioInst_FMOD");
+		m_fpAllocateHyAudio = (fpAllocateHyAudio)::GetProcAddress(hModule, "AllocateHyAudio_FMOD");
+		m_fpAllocateHyAudioBank = (fpAllocateHyAudioBank)::GetProcAddress(hModule, "AllocateHyAudioBank_FMOD");
+		m_fpAllocateHyAudioInst = (fpAllocateHyAudioInst)::GetProcAddress(hModule, "AllocateHyAudioInst_FMOD");
 		
-		if(sm_fpCreateHyAudio != nullptr && sm_fpCreateHyAudioBank != nullptr && sm_fpCreateHyAudioInst != nullptr)
+		if(m_fpAllocateHyAudio != nullptr && m_fpAllocateHyAudioBank != nullptr && m_fpAllocateHyAudioInst != nullptr)
 		{
 			HyLogInfo("FMOD audio library detected");
-			sm_pInternal = sm_fpCreateHyAudio();
+			m_pInternal = m_fpAllocateHyAudio();
 		}
 		else
 		{
 			HyLogError("A GetProcAddress() has failed in the FMOD module");
-			sm_fpCreateHyAudio = nullptr;
-			sm_fpCreateHyAudioBank = nullptr;
-			sm_fpCreateHyAudioInst = nullptr;
+			m_fpAllocateHyAudio = nullptr;
+			m_fpAllocateHyAudioBank = nullptr;
+			m_fpAllocateHyAudioInst = nullptr;
 			FreeLibrary(hModule);
 		}
 	}
 #endif
-	if(sm_pInternal == nullptr)
+
+	if(m_pInternal == nullptr)
 	{
 		HyLogInfo("No audio library detected");
-		sm_pInternal = HY_NEW HyAudio_Null();
+		m_pInternal = HY_NEW HyAudio_Null();
 	}
 
 	// Create HyAudioBank objects to represent every sound bank file
@@ -64,7 +64,7 @@ HyAudio::HyAudio(std::string sDataDir)
 	if(audioObj.parse(sAudioFileContents))
 	{
 		for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
-			m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(sDataDir, iter->first, iter->second->get<jsonxx::Object>());
+			m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(sDataDir, iter->first, iter->second->get<jsonxx::Object>(), AllocateAudioBank());
 	}
 }
 
@@ -73,26 +73,18 @@ HyAudio::~HyAudio()
 	for(auto iter = m_AudioBankMap.begin(); iter != m_AudioBankMap.end(); ++iter)
 		delete iter->second;
 
-	delete sm_pInternal;
-	sm_pInternal = nullptr;
+	delete m_pInternal;
+	m_pInternal = nullptr;
 
 #if defined(HY_PLATFORM_WINDOWS)
 	CoUninitialize();
 #endif
 }
 
-/*static*/ IHyAudioBank *HyAudio::AllocateAudioBank()
+IHyAudioInst *HyAudio::AllocateAudioInst(const char *szPath)
 {
-	if(sm_fpCreateHyAudioBank)
-		return sm_fpCreateHyAudioBank(sm_pInternal);
-
-	return HY_NEW HyAudioBank_Null();
-}
-
-/*static*/ IHyAudioInst *HyAudio::AllocateAudioInst(const char *szPath)
-{
-	if(sm_fpCreateHyAudioInst)
-		return sm_fpCreateHyAudioInst(sm_pInternal, szPath);
+	if(m_fpAllocateHyAudioInst)
+		return m_fpAllocateHyAudioInst(m_pInternal, szPath);
 
 	return HY_NEW HyAudioInst_Null();
 }
@@ -108,5 +100,13 @@ HyAudioBank *HyAudio::GetAudioBank(const std::string &sBankName)
 
 void HyAudio::Update()
 {
-	sm_pInternal->OnUpdate();
+	m_pInternal->OnUpdate();
+}
+
+IHyAudioBank *HyAudio::AllocateAudioBank()
+{
+	if(m_fpAllocateHyAudioBank)
+		return m_fpAllocateHyAudioBank(m_pInternal);
+
+	return HY_NEW HyAudioBank_Null();
 }

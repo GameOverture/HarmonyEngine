@@ -11,13 +11,14 @@
 #include "Assets/Files/HyAudioBank.h"
 #include "HyEngine.h"
 
-HyAudioBank::HyAudioBank(const std::string &sDataDir, const std::string &sNameId, const jsonxx::Object &initObj) :
+HyAudioBank::HyAudioBank(const std::string &sDataDir, const std::string &sNameId, const jsonxx::Object &initObj, IHyAudioBank *pInternal) :
 	IHyFileData(HYFILE_AudioBank),
 	m_sNAME_ID(sNameId),
 	m_sPATH(initObj.get<jsonxx::String>("filePath")),
-	m_bIS_MASTER(initObj.get<jsonxx::Boolean>("master"))
+	m_bIS_MASTER(initObj.get<jsonxx::Boolean>("master")),
+	m_pInternal(pInternal)
 {
-	m_pInternal = HyAudio::AllocateAudioBank();
+	HyAssert(m_pInternal != nullptr, "HyAudioBank received a nullptr for its internal interface");
 
 	if(m_bIS_MASTER)
 	{

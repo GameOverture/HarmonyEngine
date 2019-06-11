@@ -17,28 +17,30 @@
 
 class HyAudioBank;
 
-using fpCreateHyAudio = IHyAudio *(*)();
-using fpCreateHyAudioBank = IHyAudioBank *(*)(IHyAudio *);
-using fpCreateHyAudioInst = IHyAudioInst *(*)(IHyAudio *, const char *);
-
 class HyAudio
 {
-	static fpCreateHyAudio					sm_fpCreateHyAudio;
-	static fpCreateHyAudioBank				sm_fpCreateHyAudioBank;
-	static fpCreateHyAudioInst				sm_fpCreateHyAudioInst;
-	
-	static IHyAudio *						sm_pInternal;
+	using fpAllocateHyAudio					= IHyAudio *(*)();
+	using fpAllocateHyAudioBank				= IHyAudioBank *(*)(IHyAudio *);
+	using fpAllocateHyAudioInst				= IHyAudioInst *(*)(IHyAudio *, const char *);
+
+	fpAllocateHyAudio						m_fpAllocateHyAudio;
+	fpAllocateHyAudioBank					m_fpAllocateHyAudioBank;
+	fpAllocateHyAudioInst					m_fpAllocateHyAudioInst;
+	IHyAudio *								m_pInternal;
+
 	std::map<std::string, HyAudioBank *>	m_AudioBankMap;
 
 public:
 	HyAudio(std::string sDataDir);
 	~HyAudio();
 
-	static IHyAudioBank *AllocateAudioBank();
-	static IHyAudioInst *AllocateAudioInst(const char *szPath);
-
+	IHyAudioInst *AllocateAudioInst(const char *szPath);
 	HyAudioBank *GetAudioBank(const std::string &sBankName);
+
 	void Update();
+
+private:
+	IHyAudioBank *AllocateAudioBank();
 };
 
 #endif /* HyAudio_h__ */

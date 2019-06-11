@@ -14,13 +14,17 @@
 
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
+#include "Audio/Harness/IHyAudioInst.h"
 
 class HyAudioData : public IHyNodeData
 {
-	
+	HyAudio &		m_AudioRef;
+
 public:
 	HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
+
+	IHyAudioInst *AllocateNewInstance() const;
 };
 
 #endif /* HyAudioData_h__ */

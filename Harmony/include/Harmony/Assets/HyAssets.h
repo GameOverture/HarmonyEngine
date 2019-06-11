@@ -90,6 +90,8 @@ public:
 	const std::string &GetDataDir();
 	bool IsInitialized();
 
+	HyAudio &GetAudioRef();
+
 	HyAtlas *GetAtlas(uint32 uiMasterIndex);
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 	HyAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
@@ -97,8 +99,6 @@ public:
 	HyAtlasIndices *GetLoadedAtlases();
 
 	HyGLTF *GetGltf(const std::string &sIdentifier);
-
-	HyAudioBank *GetAudioBank(const std::string &sBankName);
 
 	void AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut);
 	void LoadNodeData(IHyLoadable *pLoadable);

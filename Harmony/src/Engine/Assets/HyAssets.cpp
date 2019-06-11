@@ -125,6 +125,11 @@ bool HyAssets::IsInitialized()
 	return m_bInitialized;
 }
 
+HyAudio &HyAssets::GetAudioRef()
+{
+	return m_AudioRef;
+}
+
 HyAtlas *HyAssets::GetAtlas(uint32 uiMasterIndex)
 {
 	HyAssert(uiMasterIndex < m_uiNumAtlases, "HyAssets::GetAtlas was given an invalid index: " << uiMasterIndex);
@@ -170,11 +175,6 @@ HyGLTF *HyAssets::GetGltf(const std::string &sIdentifier)
 		return iter->second;
 
 	return nullptr;
-}
-
-HyAudioBank *HyAssets::GetAudioBank(const std::string &sBankName)
-{
-	return m_AudioRef.GetAudioBank(sBankName);
 }
 
 void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut)

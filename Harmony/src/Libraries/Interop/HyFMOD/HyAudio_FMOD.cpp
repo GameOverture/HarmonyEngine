@@ -27,7 +27,7 @@ void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern "C"
 {
-	__declspec (dllexport) IHyAudio *CreateHyAudio_FMOD()
+	__declspec (dllexport) IHyAudio *AllocateHyAudio_FMOD()
 	{
 		IHyAudio *pNewAudio = new HyAudio_FMOD();
 		return pNewAudio;
@@ -70,7 +70,7 @@ Studio::System *HyAudio_FMOD::GetSystem() const
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern "C"
 {
-	__declspec (dllexport) IHyAudioBank *CreateHyAudioBank_FMOD(IHyAudio *pAudio)
+	__declspec (dllexport) IHyAudioBank *AllocateHyAudioBank_FMOD(IHyAudio *pAudio)
 	{
 		IHyAudioBank *pNewAudio = new HyAudioBank_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem());
 		return pNewAudio;
@@ -99,7 +99,7 @@ HyAudioBank_FMOD::HyAudioBank_FMOD(Studio::System *pSystemRef) :
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern "C"
 {
-	__declspec (dllexport) IHyAudioInst *CreateHyAudioInst_FMOD(IHyAudio *pAudio, const char *szPath)
+	__declspec (dllexport) IHyAudioInst *AllocateHyAudioInst_FMOD(IHyAudio *pAudio, const char *szPath)
 	{
 		IHyAudioInst *pNewAudio = new HyAudioInst_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem(), szPath);
 		return pNewAudio;

@@ -29,9 +29,10 @@ public:
 	float GetPitch();
 	void SetPitch(float fPitch);
 
-	void SetReverb();
+	void SetReverb(int iIndex, float fLevel);
 
 protected:
+	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
 };
 
