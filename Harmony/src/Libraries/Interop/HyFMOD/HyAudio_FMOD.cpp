@@ -85,7 +85,8 @@ HyAudioBank_FMOD::HyAudioBank_FMOD(Studio::System *pSystemRef) :
 
 /*virtual*/ HyAudioBank_FMOD::~HyAudioBank_FMOD()
 {
-	ERRCHECK(m_pBank->unload());
+	if(m_pBank)
+		ERRCHECK(m_pBank->unload());
 }
 
 /*virtual*/ bool HyAudioBank_FMOD::Load(std::string sFilePath) /*override*/
@@ -98,19 +99,19 @@ HyAudioBank_FMOD::HyAudioBank_FMOD(Studio::System *pSystemRef) :
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern "C"
 {
-	__declspec (dllexport) IHyAudioInst *CreateHyAudioInst_FMOD(IHyAudio *pAudio, const char guid[16])
+	__declspec (dllexport) IHyAudioInst *CreateHyAudioInst_FMOD(IHyAudio *pAudio, const char *szPath)
 	{
-		IHyAudioInst *pNewAudio = new HyAudioInst_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem(), guid);
+		IHyAudioInst *pNewAudio = new HyAudioInst_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem(), szPath);
 		return pNewAudio;
 	}
 }
 
-HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char guid[16]) :
+HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char *szPath) :
 	m_pSystemRef(pSystemRef),
 	m_pDesc(nullptr),
-	m_pInst(nullptr)
+	m_pInst(nullptr),
+	m_sPATH(szPath)
 {
-	m_GUID.Data1
 }
 
 /*virtual*/ HyAudioInst_FMOD::~HyAudioInst_FMOD()
@@ -121,7 +122,7 @@ HyAudioInst_FMOD::HyAudioInst_FMOD(Studio::System *pSystemRef, const char guid[1
 {
 	std::string sEventPath = "event:/";
 	sEventPath += m_sPATH;
-	ERRCHECK(m_pSystemRef->getEventByID(sEventPath.c_str(), &m_pDesc));
+	ERRCHECK(m_pSystemRef->getEvent(sEventPath.c_str(), &m_pDesc));
 	ERRCHECK(m_pDesc->createInstance(&m_pInst));
 }
 

@@ -56,7 +56,7 @@ public:
 class HyAudioInst_FMOD : public IHyAudioInst
 {
 	Studio::System *			m_pSystemRef;
-	FMOD_GUID					m_GUID;
+	const std::string			m_sPATH;
 
 	Studio::EventDescription *	m_pDesc;
 	Studio::EventInstance *		m_pInst;

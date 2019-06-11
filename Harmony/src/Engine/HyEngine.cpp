@@ -24,8 +24,9 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 	m_Init(initStruct),
 	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Console(initStruct.bUseConsole, initStruct.consoleInfo),
+	m_Audio(m_Init.sDataDir),
 	m_Scene(m_WindowManager.GetWindowList()),
-	m_Assets(m_Scene, m_Init.sDataDir),
+	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
 	m_GuiComms(m_Init.uiDebugPort, m_Assets),
 	m_Time(m_Init.uiUpdateTickMs),
 	m_Diagnostics(m_Init, m_Time, m_Assets, m_Scene),
@@ -94,6 +95,8 @@ bool HyEngine::Update()
 		if(PollPlatformApi() == false || OnUpdate() == false)
 			return false;
 		HY_PROFILE_END
+
+		m_Audio.Update();
 
 		m_Assets.Update(m_Renderer);
 		m_Renderer.ProcessMsgs();

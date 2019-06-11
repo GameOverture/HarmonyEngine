@@ -23,7 +23,7 @@ class HyAudioBank : public IHyFileData
 	IHyAudioBank *			m_pInternal;
 
 public:
-	HyAudioBank(const std::string &sNameId, const jsonxx::Object &initObj);
+	HyAudioBank(const std::string &sDataDir, const std::string &sNameId, const jsonxx::Object &initObj);
 	virtual ~HyAudioBank();
 
 	bool IsMaster() const;

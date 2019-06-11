@@ -15,24 +15,30 @@
 #include "Audio/Harness/IHyAudioBank.h"
 #include "Audio/Harness/IHyAudioInst.h"
 
+class HyAudioBank;
+
 using fpCreateHyAudio = IHyAudio *(*)();
 using fpCreateHyAudioBank = IHyAudioBank *(*)(IHyAudio *);
-using fpCreateHyAudioInst = IHyAudioInst *(*)(IHyAudio *, const char guid[16]);
+using fpCreateHyAudioInst = IHyAudioInst *(*)(IHyAudio *, const char *);
 
 class HyAudio
 {
-	static fpCreateHyAudio		sm_fpCreateHyAudio;
-	static fpCreateHyAudioBank	sm_fpCreateHyAudioBank;
-	static fpCreateHyAudioInst	sm_fpCreateHyAudioInst;
+	static fpCreateHyAudio					sm_fpCreateHyAudio;
+	static fpCreateHyAudioBank				sm_fpCreateHyAudioBank;
+	static fpCreateHyAudioInst				sm_fpCreateHyAudioInst;
 	
-	static IHyAudio *			sm_pInternal;
+	static IHyAudio *						sm_pInternal;
+	std::map<std::string, HyAudioBank *>	m_AudioBankMap;
 
 public:
-	HyAudio();
+	HyAudio(std::string sDataDir);
 	~HyAudio();
 
-	static IHyAudioBank *CreateAudioBank();
-	static IHyAudioInst *CreateAudioInst(const char *szPath);
+	static IHyAudioBank *AllocateAudioBank();
+	static IHyAudioInst *AllocateAudioInst(const char *szPath);
+
+	HyAudioBank *GetAudioBank(const std::string &sBankName);
+	void Update();
 };
 
 #endif /* HyAudio_h__ */

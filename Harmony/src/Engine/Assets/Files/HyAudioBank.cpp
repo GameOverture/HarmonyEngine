@@ -11,13 +11,19 @@
 #include "Assets/Files/HyAudioBank.h"
 #include "HyEngine.h"
 
-HyAudioBank::HyAudioBank(const std::string &sNameId, const jsonxx::Object &initObj) :
+HyAudioBank::HyAudioBank(const std::string &sDataDir, const std::string &sNameId, const jsonxx::Object &initObj) :
 	IHyFileData(HYFILE_AudioBank),
 	m_sNAME_ID(sNameId),
 	m_sPATH(initObj.get<jsonxx::String>("filePath")),
 	m_bIS_MASTER(initObj.get<jsonxx::Boolean>("master"))
 {
-	m_pInternal = HyAudio::CreateAudioBank();
+	m_pInternal = HyAudio::AllocateAudioBank();
+
+	if(m_bIS_MASTER)
+	{
+		if(m_pInternal->Load(sDataDir + HYASSETS_AudioDir + m_sPATH) == false)
+			HyLogError("HyAudioBank internal Load() failed on master bank: " << m_sPATH);
+	}
 }
 
 HyAudioBank::~HyAudioBank()
