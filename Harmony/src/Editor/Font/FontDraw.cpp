@@ -72,7 +72,7 @@ void FontDraw::SetPreviewText(std::string sText)
 	texture_atlas_t *pFtglAtlas = static_cast<FontModel *>(m_pProjItem->GetModel())->GetFtglAtlas();
 	unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPreviewPixelData();
 	uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPreviewPixelDataSize();
-	if(pFtglAtlas == nullptr || pAtlasPixelData == nullptr)
+	if(pFtglAtlas == nullptr || pAtlasPixelData == nullptr || Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer() == nullptr)
 		return;
 
 	if(pFtglAtlas->id == 0)
