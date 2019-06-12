@@ -1,11 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Form Files">
-      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
-      <Extensions>ui</Extensions>
-      <ParseFiles>false</ParseFiles>
-    </Filter>
     <Filter Include="Generated Files">
       <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
@@ -68,6 +63,9 @@
     </Filter>
     <Filter Include="Primitives">
       <UniqueIdentifier>{a6d41676-c168-46b2-bf14-af51c2007091}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text">
+      <UniqueIdentifier>{beb0de44-59d0-4108-8902-ec2f4959b63d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -267,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="Audio\AudioModel.cpp">
       <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Text\TextWidget.cpp">
+      <Filter>Text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -547,6 +548,9 @@
     </QtUic>
     <QtUic Include="Widget\WidgetVectorSpinBox.ui">
       <Filter>Widgets</Filter>
+    </QtUic>
+    <QtUic Include="Text\TextWidget.ui">
+      <Filter>Text</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -1196,6 +1200,9 @@
     </QtMoc>
     <QtMoc Include="Sprite\SpriteWidget.h">
       <Filter>Sprite</Filter>
+    </QtMoc>
+    <QtMoc Include="Text\TextWidget.h">
+      <Filter>Text</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

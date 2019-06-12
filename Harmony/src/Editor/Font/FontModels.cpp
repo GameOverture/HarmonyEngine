@@ -747,9 +747,8 @@ void FontModel::GeneratePreview()
 
 /*virtual*/ QJsonValue FontModel::GetJson() const /*override*/
 {
-	if(m_FontMetaDir.mkpath(".") == false) {
+	if(m_FontMetaDir.mkpath(".") == false)
 		HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
-	}
 	else
 	{
 		// Copy font files into the font meta directory
