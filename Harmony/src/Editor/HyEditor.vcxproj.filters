@@ -269,6 +269,12 @@
     <ClCompile Include="Text\TextWidget.cpp">
       <Filter>Text</Filter>
     </ClCompile>
+    <ClCompile Include="Text\TextDraw.cpp">
+      <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Text\TextModel.cpp">
+      <Filter>Text</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
@@ -381,6 +387,9 @@
     </ClInclude>
     <ClInclude Include="Audio\AudioModel.h">
       <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Text\TextDraw.h">
+      <Filter>Text</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1202,6 +1211,9 @@
       <Filter>Sprite</Filter>
     </QtMoc>
     <QtMoc Include="Text\TextWidget.h">
+      <Filter>Text</Filter>
+    </QtMoc>
+    <QtMoc Include="Text\TextModel.h">
       <Filter>Text</Filter>
     </QtMoc>
   </ItemGroup>

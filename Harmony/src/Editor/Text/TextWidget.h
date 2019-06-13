@@ -1,16 +1,34 @@
-#pragma once
+/**************************************************************************
+*	TextWidget.h
+*
+*	Harmony Engine - Editor Tool
+*	Copyright (c) 2016 Jason Knobler
+*
+*	Harmony Editor Tool License:
+*	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
+#ifndef TEXTWIDGET_H
+#define TEXTWIDGET_H
+
+#include "TextModel.h"
 
 #include <QWidget>
 #include "ui_TextWidget.h"
 
-class TextWidget : public QWidget
+class TextWidget : public IWidget
 {
 	Q_OBJECT
 
 public:
-	TextWidget(QWidget *parent = Q_NULLPTR);
+	TextWidget(ProjectItem &itemRef, QWidget *parent = nullptr);
 	~TextWidget();
+
+	virtual void OnGiveMenuActions(QMenu *pMenu) override;
+	virtual void OnUpdateActions() override;
+	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
 private:
 	Ui::TextWidget ui;
 };
+
+#endif /* TEXTWIDGET_H */

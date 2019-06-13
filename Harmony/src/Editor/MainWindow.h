@@ -87,6 +87,7 @@ private Q_SLOTS:
 	void on_actionNewParticle_triggered();
 	void on_actionNewSprite_triggered();
 	void on_actionNewFont_triggered();
+	void on_actionNewText_triggered();
     void on_actionNewEntity3d_triggered();
     void on_actionNewPrefab_triggered();
 

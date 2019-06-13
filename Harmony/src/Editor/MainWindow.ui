@@ -627,6 +627,18 @@
     <string>Unloads the backend harmony engine instance, and loads a new harmony instance with this project's assets.</string>
    </property>
   </action>
+  <action name="actionNewText">
+   <property name="icon">
+    <iconset resource="res/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Font-New.png</normaloff>:/icons16x16/items/Font-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new Text instance</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

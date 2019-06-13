@@ -460,6 +460,11 @@ void MainWindow::on_actionNewFont_triggered()
 	NewItem(ITEM_Font);
 }
 
+void MainWindow::on_actionNewText_triggered()
+{
+	NewItem(ITEM_Font);
+}
+
 void MainWindow::on_actionNewPrefab_triggered()
 {
 	NewItem(ITEM_Prefab);
@@ -711,7 +716,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 
 		if(pNewItem->IsProjectItem())
 		{
-			// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
+			// New items that are considered "imported" should be saved immediately since they have direct references into an asset manager
 			if(pDlg->GetImportFile().isEmpty() == false)
 				static_cast<ProjectItem *>(pNewItem)->Save();
 

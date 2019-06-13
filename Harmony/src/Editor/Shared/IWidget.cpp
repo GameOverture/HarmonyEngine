@@ -106,7 +106,7 @@ void IWidget::OnAddStateTriggered()
 		pCmd = new UndoCmd_AddState<SpriteStateData>("Add Sprite State", m_ItemRef);
 		break;
 	case ITEM_Font:
-		pCmd = new UndoCmd_AddState<FontStateData>("Add Font State", m_ItemRef);
+		pCmd = new UndoCmd_AddState<FontStateData>("Add Text State", m_ItemRef);
 		break;
 	case ITEM_Entity:
 		pCmd = new UndoCmd_AddState<EntityStateData>("Add Entity State", m_ItemRef);
@@ -133,7 +133,7 @@ void IWidget::OnRemoveStateTriggered()
 		pCmd = new UndoCmd_RemoveState<SpriteStateData>("Remove Sprite State", m_ItemRef, ui->cmbStates->currentIndex());
 		break;
 	case ITEM_Font:
-		pCmd = new UndoCmd_RemoveState<FontStateData>("Remove Font State", m_ItemRef, ui->cmbStates->currentIndex());
+		pCmd = new UndoCmd_RemoveState<FontStateData>("Remove Text State", m_ItemRef, ui->cmbStates->currentIndex());
 		break;
 	case ITEM_Entity:
 		pCmd = new UndoCmd_RemoveState<EntityStateData>("Remove Entity State", m_ItemRef, ui->cmbStates->currentIndex());

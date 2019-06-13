@@ -17,8 +17,8 @@
 #include "IModel.h"
 #include "SpriteWidget.h"
 #include "SpriteDraw.h"
-#include "FontWidget.h"
-#include "FontDraw.h"
+#include "TextWidget.h"
+#include "TextDraw.h"
 #include "PrefabWidget.h"
 #include "PrefabDraw.h"
 #include "EntityWidget.h"
@@ -74,7 +74,7 @@ void ProjectItem::LoadModel()
 		m_pModel = new SpriteModel(*this, m_SaveValue.toArray());
 		break;
 	case ITEM_Font:
-		m_pModel = new FontModel(*this, m_SaveValue.toObject());
+		m_pModel = new TextModel(*this, m_SaveValue.toObject());
 		break;
 	case ITEM_Entity:
 		m_pModel = new EntityModel(*this, m_SaveValue.toArray());
@@ -145,7 +145,7 @@ void ProjectItem::WidgetLoad()
 		m_pWidget = new SpriteWidget(*this);
 		break;
 	case ITEM_Font:
-		m_pWidget = new FontWidget(*this);
+		m_pWidget = new TextWidget(*this);
 		break;
 	case ITEM_Entity:
 		m_pWidget = new EntityWidget(*this);
@@ -176,7 +176,7 @@ void ProjectItem::DrawLoad()
 		m_pDraw = new SpriteDraw(this);
 		break;
 	case ITEM_Font:
-		m_pDraw = new FontDraw(this);
+		m_pDraw = new TextDraw(this);
 		break;
 	case ITEM_Entity:
 		m_pDraw = new EntityDraw(this);

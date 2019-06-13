@@ -109,8 +109,8 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 		case ITEM_Font: {
 			QVariant var;
 			var.setValue<ExplorerItem *>(pItemToAdd);
-			pNewPropertiesModel->AppendCategory("Font", var);
-			pNewPropertiesModel->AppendProperty("Font", "State", PROPERTIESTYPE_StatesComboBox, 0, "The font state to be displayed", false, QVariant(), QVariant(), QVariant(), "", "", var);
+			pNewPropertiesModel->AppendCategory("Text", var);
+			pNewPropertiesModel->AppendProperty("Text", "State", PROPERTIESTYPE_StatesComboBox, 0, "The text state to be displayed", false, QVariant(), QVariant(), QVariant(), "", "", var);
 			} break;
 
 		case ITEM_Sprite: {
