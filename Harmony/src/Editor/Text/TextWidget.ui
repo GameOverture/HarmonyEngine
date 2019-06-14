@@ -53,7 +53,7 @@
      <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
-        <string>Text Layers</string>
+        <string>Assemble Text Layers</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="spacing">
@@ -210,7 +210,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="PropertiesTreeView" name="typefaceProperties"/>
+         <widget class="PropertiesTreeView" name="glyphsTreeView"/>
         </item>
        </layout>
       </widget>

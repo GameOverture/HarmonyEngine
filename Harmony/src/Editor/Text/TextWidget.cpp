@@ -64,6 +64,10 @@ TextWidget::TextWidget(ProjectItem &itemRef, QWidget *parent) :
 	ui.cmbSize->setValidator(HyGlobal::NumbersValidator());
 	ui.cmbSize->clear();
 	ui.cmbSize->insertItems(0, sSizeList);
+
+	ui.layersTableView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex()));
+
+	ui.glyphsTreeView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetGlyphsModel());
 }
 
 TextWidget::~TextWidget()
@@ -80,6 +84,7 @@ TextWidget::~TextWidget()
 
 /*virtual*/ void TextWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
+	ui.layersTableView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(iStateIndex));
 }
 
 void TextWidget::on_cmbFont_currentIndexChanged(int index)

@@ -21,12 +21,18 @@
 #define FONTPROP_AdditionalSyms "Additional glyphs"
 
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
-	IStateData(iStateIndex, modelRef, stateObj["name"].toString())
+	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
+	m_LayersModel(&m_ModelRef)
 {
 }
 
 /*virtual*/ TextStateData::~TextStateData()
 {
+}
+
+TextLayersModel &TextStateData::GetLayersModel()
+{
+	return m_LayersModel;
 }
 
 /*virtual*/ int TextStateData::AddFrame(AtlasFrame *pFrame) /*override*/
@@ -41,13 +47,100 @@ TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stat
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
-	IModel(itemRef)
+	IModel(itemRef),
+	m_GlyphsModel(itemRef, 0, 0, this),
+	m_pAtlasFrame(nullptr)
 {
+	bool b09 = true;
+	bool bAZ = true;
+	bool baz = true;
+	bool bSymbols = true;
+	QString sAdditional = "";
 
+	// If item's init value is defined, parse and initialize with it, otherwise make default empty font
+	if(fontObj.empty() == false)
+	{
+		QJsonObject availGlyphsObj = fontObj["availableGlyphs"].toObject();
+		b09 = availGlyphsObj[FONTPROP_09].toBool();
+		bAZ = availGlyphsObj[FONTPROP_AZ].toBool();
+		baz = availGlyphsObj[FONTPROP_az].toBool();
+		bSymbols = availGlyphsObj["symbols"].toBool();
+		sAdditional = availGlyphsObj["additional"].toString();
+
+		int iAffectedFrameIndex = 0;
+		QList<quint32> idRequestList;
+		idRequestList.append(JSONOBJ_TOINT(fontObj, "id"));
+		QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, idRequestList, iAffectedFrameIndex);
+		if(pRequestedList.size() == 1)
+			m_pAtlasFrame = pRequestedList[0];
+		else
+			HyGuiLog("More than one frame returned for a font", LOGTYPE_Error);
+
+		// Must set 'm_TypefaceArray' before any AppendState() call
+		m_TypefaceArray = fontObj["typefaceArray"].toArray();
+
+		QJsonArray stateArray = fontObj["stateArray"].toArray();
+		for(int i = 0; i < stateArray.size(); ++i)
+		{
+			QJsonObject stateObj = stateArray[i].toObject();
+			
+			AppendState<TextStateData>(stateObj);
+			if(stateObj.empty() == false)
+			{
+				QJsonArray layerArray = stateObj["layers"].toArray();
+				for(int j = 0; j < layerArray.size(); ++j)
+				{
+					QJsonObject layerObj = layerArray.at(j).toObject();
+					QJsonObject typefaceObj = m_TypefaceArray.at(layerObj["typefaceIndex"].toInt()).toObject();
+
+					//if(j == 0) // Only need to set the state's font and size once
+					//{
+					//	m_pCmbMapper_Fonts->SetIndex(typefaceObj["font"].toString());
+					//	m_pSbMapper_Size->SetValue(typefaceObj["size"].toDouble());
+					//}
+
+					QColor topColor, botColor;
+					topColor.setRgbF(layerObj["topR"].toDouble(), layerObj["topG"].toDouble(), layerObj["topB"].toDouble());
+					botColor.setRgbF(layerObj["botR"].toDouble(), layerObj["botG"].toDouble(), layerObj["botB"].toDouble());
+
+					TextLayersModel &layersModelRef = static_cast<TextStateData *>(m_StateList[m_StateList.size() - 1])->GetLayersModel();
+					int iLayerId = layersModelRef.AddNewLayer(static_cast<rendermode_t>(typefaceObj["mode"].toInt()), typefaceObj["size"].toInt(), typefaceObj["outlineThickness"].toDouble());
+					layersModelRef.SetLayerColors(iLayerId, topColor, botColor);
+				}
+			}
+		}
+	}
+	else
+	{
+		AppendState<TextStateData>(QJsonObject());
+	}
+
+	m_GlyphsModel.AppendCategory("Uses Glyphs", HyGlobal::ItemColor(ITEM_Prefix));
+	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_09, PROPERTIESTYPE_bool, QVariant(b09 ? Qt::Checked : Qt::Unchecked), "Include numerical glyphs 0-9");
+	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_AZ, PROPERTIESTYPE_bool, QVariant(bAZ ? Qt::Checked : Qt::Unchecked), "Include capital letter glyphs A-Z");
+	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_az, PROPERTIESTYPE_bool, QVariant(baz ? Qt::Checked : Qt::Unchecked), "Include lowercase letter glyphs a-z");
+	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_Symbols, PROPERTIESTYPE_bool, QVariant(bSymbols ? Qt::Checked : Qt::Unchecked), "Include common punctuation and symbol glyphs");
+	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_AdditionalSyms, PROPERTIESTYPE_LineEdit, QVariant(sAdditional), "Include specified glyphs");
+	m_GlyphsModel.AppendCategory("Atlas Info");
+	m_GlyphsModel.AppendProperty("Atlas Info", FONTPROP_Dimensions, PROPERTIESTYPE_ivec2, QPoint(0, 0), "The required portion size needed to fit on an atlas", true);
+	m_GlyphsModel.AppendProperty("Atlas Info", FONTPROP_UsedPercent, PROPERTIESTYPE_double, 0.0, "Percentage of the maximum size dimensions used", true);
 }
 
 /*virtual*/ TextModel::~TextModel()
 {
+}
+
+TextLayersModel *TextModel::GetLayersModel(uint uiIndex)
+{
+	if(uiIndex < m_StateList.size())
+		return &static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel();
+
+	return nullptr;
+}
+
+PropertiesTreeModel *TextModel::GetGlyphsModel()
+{
+	return &m_GlyphsModel;
 }
 
 /*virtual*/ void TextModel::OnSave() /*override*/
