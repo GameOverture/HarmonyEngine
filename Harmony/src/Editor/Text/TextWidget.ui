@@ -210,7 +210,11 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="PropertiesTreeView" name="glyphsTreeView"/>
+         <widget class="PropertiesTreeView" name="glyphsTreeView">
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+         </widget>
         </item>
        </layout>
       </widget>
