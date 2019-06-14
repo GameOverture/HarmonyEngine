@@ -67,6 +67,9 @@
     <Filter Include="Text">
       <UniqueIdentifier>{beb0de44-59d0-4108-8902-ec2f4959b63d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Text\SubWidgets">
+      <UniqueIdentifier>{6f458767-1abc-4ace-bf9a-2f359a441dde}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Atlas\AtlasDraw.cpp">
@@ -274,6 +277,12 @@
     </ClCompile>
     <ClCompile Include="Text\TextModel.cpp">
       <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Text\SubWidgets\TextLayersModel.cpp">
+      <Filter>Text\SubWidgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Text\SubWidgets\TextLayersWidget.cpp">
+      <Filter>Text\SubWidgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1215,6 +1224,12 @@
     </QtMoc>
     <QtMoc Include="Text\TextModel.h">
       <Filter>Text</Filter>
+    </QtMoc>
+    <QtMoc Include="Text\SubWidgets\TextLayersModel.h">
+      <Filter>Text\SubWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="Text\SubWidgets\TextLayersWidget.h">
+      <Filter>Text\SubWidgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

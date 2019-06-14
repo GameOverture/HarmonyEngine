@@ -135,6 +135,7 @@ enum Theme
 #define HYGUIPATH_TempDir						"temp/"
 #define HYGUIPATH_TemplateDir					"src/Editor/_Templates/"
 #define HYGUIPATH_MetaSettings					"atlas.hygui"
+#define HYMETA_FontsDir							"Fonts/"
 
 QAction *FindAction(QList<QAction *> list, QString sName);
 #define FINDACTION(str) FindAction(this->actions(), str)
@@ -153,22 +154,23 @@ QByteArray JsonValueToSrc(QJsonValue value);
 
 class HyGlobal
 {
-	static QString                  sm_sItemNames[NUMTYPES];
-	static QString                  sm_sItemNamesPlural[NUMTYPES];
-	static QString                  sm_sSubIconNames[NUM_SUBICONS];
+	static QString														sm_sItemNames[NUMTYPES];
+	static QString														sm_sItemNamesPlural[NUMTYPES];
+	static QString														sm_sSubIconNames[NUM_SUBICONS];
 
-	static QIcon                    sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
-	static QColor                   sm_ItemColors[NUMTYPES];
+	static QIcon														sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
+	static QColor														sm_ItemColors[NUMTYPES];
 
-	static QString                  sm_Themes[NUMTHEMES];
+	static QString														sm_Themes[NUMTHEMES];
 
-	static QRegExpValidator *       sm_pCodeNameValidator;
-	static QRegExpValidator *       sm_pFreeFormValidator;
-	static QRegExpValidator *       sm_pFileNameValidator;
-	static QRegExpValidator *       sm_pFilePathValidator;
-	static QRegExpValidator *       sm_pVector2dValidator;
+	static QRegExpValidator *											sm_pCodeNameValidator;
+	static QRegExpValidator *											sm_pFreeFormValidator;
+	static QRegExpValidator *											sm_pFileNameValidator;
+	static QRegExpValidator *											sm_pFilePathValidator;
+	static QRegExpValidator *											sm_pNumbersValidator;
+	static QRegExpValidator *											sm_pVector2dValidator;
 
-	static QString                  sm_ErrorStrings[NUMATLASFRAMEERROR];
+	static QString														sm_ErrorStrings[NUMATLASFRAMEERROR];
 
 public:
 	static void Initialize();
@@ -179,17 +181,18 @@ public:
 	static QStringList GetTypeNameList();
 	static QString AtlasTextureTypeString(HyTextureFormat eType);
 
-	static const QString ItemName(HyGuiItemType eItem, bool bPlural)    { return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
+	static const QString ItemName(HyGuiItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString ItemExt(HyGuiItemType eItem);
-	static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)  { return sm_ItemIcons[eItm][eSubIcon]; }
-	static const QColor ItemColor(HyGuiItemType eItem)                  { return sm_ItemColors[eItem]; }
-	static const QString ThemeString(Theme eTheme)                      { return sm_Themes[eTheme]; }
+	static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)	{ return sm_ItemIcons[eItm][eSubIcon]; }
+	static const QColor ItemColor(HyGuiItemType eItem)					{ return sm_ItemColors[eItem]; }
+	static const QString ThemeString(Theme eTheme)						{ return sm_Themes[eTheme]; }
 
-	static const QRegExpValidator *CodeNameValidator()                  { return sm_pCodeNameValidator; }
-	static const QRegExpValidator *FreeFormValidator()                  { return sm_pFreeFormValidator; }
-	static const QRegExpValidator *FileNameValidator()                  { return sm_pFileNameValidator; }
-	static const QRegExpValidator *FilePathValidator()                  { return sm_pFilePathValidator; }
-	static const QRegExpValidator *Vector2dValidator()                  { return sm_pVector2dValidator; }
+	static const QRegExpValidator *CodeNameValidator()					{ return sm_pCodeNameValidator; }
+	static const QRegExpValidator *FreeFormValidator()					{ return sm_pFreeFormValidator; }
+	static const QRegExpValidator *FileNameValidator()					{ return sm_pFileNameValidator; }
+	static const QRegExpValidator *FilePathValidator()					{ return sm_pFilePathValidator; }
+	static const QRegExpValidator *NumbersValidator()					{ return sm_pNumbersValidator; }
+	static const QRegExpValidator *Vector2dValidator()					{ return sm_pVector2dValidator; }
 
 	static const QString GetGuiFrameErrors(uint uiErrorFlags);
 

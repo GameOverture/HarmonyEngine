@@ -23,10 +23,10 @@ FontStateLayersModel::FontStateLayersModel(QObject *parent) :
 	QAbstractTableModel(parent)
 {
 	m_sRenderModeStringList.append("Fill");
-	m_sRenderModeStringList.append("Outline");
-	m_sRenderModeStringList.append("Outline+Fill");
+	m_sRenderModeStringList.append("Outline Edge");
+	m_sRenderModeStringList.append("Outline Edge+Fill");
 	m_sRenderModeStringList.append("Inner");
-	m_sRenderModeStringList.append("Shadow");
+	m_sRenderModeStringList.append("Signed Dist Field");
 }
 
 /*virtual*/ FontStateLayersModel::~FontStateLayersModel()

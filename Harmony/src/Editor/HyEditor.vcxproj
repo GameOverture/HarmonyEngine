@@ -267,6 +267,8 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Sprite\SpriteTableView.cpp" />
     <ClCompile Include="Sprite\SpriteUndoCmds.cpp" />
     <ClCompile Include="Sprite\SpriteWidget.cpp" />
+    <ClCompile Include="Text\SubWidgets\TextLayersModel.cpp" />
+    <ClCompile Include="Text\SubWidgets\TextLayersWidget.cpp" />
     <ClCompile Include="Text\TextDraw.cpp" />
     <ClCompile Include="Text\TextModel.cpp" />
     <ClCompile Include="Text\TextWidget.cpp" />
@@ -500,10 +502,19 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
+    <QtMoc Include="Text\SubWidgets\TextLayersModel.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Text/SubWidgets/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/SubWidgets/%(Filename)%(Extension)</ForceInclude>
+    </QtMoc>
+    <QtMoc Include="Text\SubWidgets\TextLayersWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Text/SubWidgets/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/SubWidgets/%(Filename)%(Extension)</ForceInclude>
+    </QtMoc>
     <ClInclude Include="Text\TextDraw.h" />
     <QtMoc Include="Text\TextModel.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>    </QtMoc>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>
+    </QtMoc>
     <ClInclude Include="_Dependencies\scriptum\imagepacker.h" />
     <ClInclude Include="_Dependencies\scriptum\maxrects.h" />
     <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">

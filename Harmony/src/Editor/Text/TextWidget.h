@@ -13,11 +13,15 @@
 #include "TextModel.h"
 
 #include <QWidget>
+#include <QTableView>
+#include <QStandardItemModel>
 #include "ui_TextWidget.h"
 
 class TextWidget : public IWidget
 {
 	Q_OBJECT
+
+	QStandardItemModel		m_FontListModel;
 
 public:
 	TextWidget(ProjectItem &itemRef, QWidget *parent = nullptr);
@@ -27,8 +31,13 @@ public:
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
+private Q_SLOTS:
+	void on_cmbFont_currentIndexChanged(int index);
+
 private:
 	Ui::TextWidget ui;
+
+	void ScanMetaFontDir();
 };
 
-#endif /* TEXTWIDGET_H */
+#endif // TEXTWIDGET_H

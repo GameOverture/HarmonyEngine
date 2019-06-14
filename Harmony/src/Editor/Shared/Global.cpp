@@ -23,6 +23,7 @@
 /*static*/ QRegExpValidator *HyGlobal::sm_pFreeFormValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = nullptr;
+/*static*/ QRegExpValidator *HyGlobal::sm_pNumbersValidator  = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pVector2dValidator = nullptr;
 
 /*static*/ QString HyGlobal::sm_ErrorStrings[NUMATLASFRAMEERROR];
@@ -106,6 +107,7 @@
 	sm_pFreeFormValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-\\s]*"));
 	sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-]*"));
 	sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_\\-]*"));
+	sm_pNumbersValidator  = new QRegExpValidator(QRegExp("[0-9]*"));
 	sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));
 
 	sm_ErrorStrings[ATLASFRAMEERROR_CannotFindMetaImg] = "Cannot find source meta-image";
