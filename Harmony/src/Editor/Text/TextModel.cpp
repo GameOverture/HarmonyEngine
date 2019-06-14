@@ -22,12 +22,20 @@
 
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
 	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
+	m_sFontName(""),
+	m_uiSize(0),
 	m_LayersModel(&m_ModelRef)
 {
 }
 
 /*virtual*/ TextStateData::~TextStateData()
 {
+}
+
+void TextStateData::SetInfo(QString sFontName, uint uiSize)
+{
+	m_sFontName = sFontName;
+	m_uiSize = uiSize;
 }
 
 TextLayersModel &TextStateData::GetLayersModel()
@@ -51,6 +59,8 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 	m_GlyphsModel(itemRef, 0, 0, this),
 	m_pAtlasFrame(nullptr)
 {
+	m_FontsWidgetMapper.setModel(m_ItemRef.GetProject().GetFontListModel());
+
 	bool b09 = true;
 	bool bAZ = true;
 	bool baz = true;
@@ -76,9 +86,8 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 		else
 			HyGuiLog("More than one frame returned for a font", LOGTYPE_Error);
 
-		// Must set 'm_TypefaceArray' before any AppendState() call
-		m_TypefaceArray = fontObj["typefaceArray"].toArray();
 
+		QJsonArray typefaceArray = fontObj["typefaceArray"].toArray();
 		QJsonArray stateArray = fontObj["stateArray"].toArray();
 		for(int i = 0; i < stateArray.size(); ++i)
 		{
@@ -88,16 +97,14 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 			if(stateObj.empty() == false)
 			{
 				QJsonArray layerArray = stateObj["layers"].toArray();
+
+				if(layerArray.isEmpty() == false)
+					static_cast<TextStateData *>(m_StateList[m_StateList.size() - 1])->SetInfo(layerArray.at(0).toObject()["font"].toString(), layerArray.at(0).toObject()["size"].toInt());
+				
 				for(int j = 0; j < layerArray.size(); ++j)
 				{
 					QJsonObject layerObj = layerArray.at(j).toObject();
-					QJsonObject typefaceObj = m_TypefaceArray.at(layerObj["typefaceIndex"].toInt()).toObject();
-
-					//if(j == 0) // Only need to set the state's font and size once
-					//{
-					//	m_pCmbMapper_Fonts->SetIndex(typefaceObj["font"].toString());
-					//	m_pSbMapper_Size->SetValue(typefaceObj["size"].toDouble());
-					//}
+					QJsonObject typefaceObj = typefaceArray.at(layerObj["typefaceIndex"].toInt()).toObject();
 
 					QColor topColor, botColor;
 					topColor.setRgbF(layerObj["topR"].toDouble(), layerObj["topG"].toDouble(), layerObj["topB"].toDouble());
@@ -128,6 +135,12 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 
 /*virtual*/ TextModel::~TextModel()
 {
+}
+
+void TextModel::MapFontComboBox(QComboBox *pComboBox)
+{
+	pComboBox->setModel(m_FontsWidgetMapper.model());
+	m_FontsWidgetMapper.addMapping(pComboBox, 0);
 }
 
 TextLayersModel *TextModel::GetLayersModel(uint uiIndex)
@@ -164,12 +177,43 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	//}
 }
 
-/*virtual*/ QJsonObject TextModel::PopStateAt(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject TextModel::GetStateJson(uint32 uiIndex) /*override*/
 {
-	QJsonObject retObj;
-	//static_cast<TextStateData *>(m_StateList[uiIndex])->GetStateInfo(retObj);
+	TextLayersModel &layersModelRef = static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel();
 
-	return retObj;
+	QJsonObject stateObjOut;
+	stateObjOut.insert("name", m_StateList[uiIndex]->GetName());
+	stateObjOut.insert("lineHeight", layersModelRef.GetLineHeight());
+	stateObjOut.insert("lineAscender", layersModelRef.GetLineAscender());
+	stateObjOut.insert("lineDescender", layersModelRef.GetLineDescender());
+	stateObjOut.insert("leftSideNudgeAmt", 0);//layersModelRef.GetLeftSideNudgeAmt(m_sAvailableTypefaceGlyphs));
+
+	QJsonArray layersArray;
+	for(int j = 0; j < layersModelRef.rowCount(); ++j)
+	{
+		QJsonObject layerObj;
+
+		int iIndex = 0;
+		QList<FontTypeface *> masterStageList = static_cast<FontModel &>(m_ModelRef).GetMasterStageList();
+		FontTypeface *pFontStage = layersModelRef.GetStageRef(j);
+		for(; iIndex < masterStageList.count(); ++iIndex)
+		{
+			if(masterStageList[iIndex] == pFontStage)
+				break;
+		}
+		layerObj.insert("typefaceIndex", iIndex);
+		layerObj.insert("topR", layersModelRef.GetLayerTopColor(j).redF());
+		layerObj.insert("topG", layersModelRef.GetLayerTopColor(j).greenF());
+		layerObj.insert("topB", layersModelRef.GetLayerTopColor(j).blueF());
+		layerObj.insert("botR", layersModelRef.GetLayerBotColor(j).redF());
+		layerObj.insert("botG", layersModelRef.GetLayerBotColor(j).greenF());
+		layerObj.insert("botB", layersModelRef.GetLayerBotColor(j).blueF());
+
+		layersArray.append(layerObj);
+	}
+	stateObjOut.insert("layers", layersArray);
+
+	return stateObjOut;
 }
 
 /*virtual*/ QJsonValue TextModel::GetJson() const /*override*/

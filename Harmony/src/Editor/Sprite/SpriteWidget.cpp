@@ -48,8 +48,6 @@ SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *pParent) :
 	QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
 	connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
 			this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
-
-	FocusState(0, -1);
 }
 
 SpriteWidget::~SpriteWidget()

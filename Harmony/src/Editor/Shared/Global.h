@@ -137,6 +137,8 @@ enum Theme
 #define HYGUIPATH_MetaSettings					"atlas.hygui"
 #define HYMETA_FontsDir							"Fonts/"
 
+#define HYMETA_FontFilterList					{"*.ttf", "*.otf"}
+
 QAction *FindAction(QList<QAction *> list, QString sName);
 #define FINDACTION(str) FindAction(this->actions(), str)
 

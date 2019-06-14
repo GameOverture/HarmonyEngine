@@ -62,11 +62,13 @@ public:
 	QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut);
 	void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
 	void RelinquishAllFrames();
+
+	QJsonObject PopState(uint32 uiIndex);
 	
-	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	
 	template<typename STATEDATA>
 	int AppendState(QJsonObject stateObj)
@@ -92,7 +94,7 @@ public:
 	}
 	
 	virtual void OnSave() = 0;
-	virtual QJsonObject PopStateAt(uint32 uiIndex) = 0;
+	virtual QJsonObject GetStateJson(uint32 uiIndex) = 0;
 	virtual QJsonValue GetJson() const = 0;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;
 	virtual QStringList GetFontUrls() const = 0;

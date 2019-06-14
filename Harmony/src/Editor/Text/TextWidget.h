@@ -14,14 +14,11 @@
 
 #include <QWidget>
 #include <QTableView>
-#include <QStandardItemModel>
 #include "ui_TextWidget.h"
 
 class TextWidget : public IWidget
 {
 	Q_OBJECT
-
-	QStandardItemModel		m_FontListModel;
 
 public:
 	TextWidget(ProjectItem &itemRef, QWidget *parent = nullptr);
@@ -36,8 +33,6 @@ private Q_SLOTS:
 
 private:
 	Ui::TextWidget ui;
-
-	void ScanMetaFontDir();
 };
 
 #endif // TEXTWIDGET_H

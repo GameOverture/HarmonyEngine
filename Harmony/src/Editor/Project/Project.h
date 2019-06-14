@@ -19,6 +19,7 @@
 
 #include <QQueue>
 #include <QJsonObject>
+#include <QStandardItemModel>
 
 // Forward declaration
 class AtlasWidget;
@@ -52,6 +53,8 @@ class Project : public ExplorerItem
 
 	AtlasModel *									m_pAtlasModel;
 	AtlasWidget *									m_pAtlasWidget;
+
+	QStandardItemModel								m_FontListModel;
 
 	AudioAssetsWidget *								m_pAudioMan;
 
@@ -94,6 +97,8 @@ public:
 	void SetAudioModel(QJsonObject audioObj);
 	AudioAssetsWidget *GetAudioWidget();
 
+	QStandardItemModel *GetFontListModel();
+
 	ProjectTabBar *GetTabBar();
 
 	ProjectItem *GetCurrentOpenItem();
@@ -132,6 +137,9 @@ public Q_SLOTS:
 	void OnTabBarCurrentChanged(int iIndex);
 
 	void OnCloseTab(int iIndex);
+
+private:
+	void ScanMetaFontDir();
 };
 
 #endif // PROJECT_H

@@ -189,9 +189,6 @@ FontWidget::FontWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
 //	static_cast<FontModel *>(m_ItemRef.GetModel())->GetAdditionalSymbolsMapper()->AddLineEditMapping(ui->txtAdditionalSymbols);
 
 	ui->typefaceProperties->setModel(static_cast<FontModel *>(m_ItemRef.GetModel())->GetTypefaceModel());
-
-	// ...set models
-	FocusState(0, -1);
 }
 
 FontWidget::~FontWidget()

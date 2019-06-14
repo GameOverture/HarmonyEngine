@@ -157,6 +157,8 @@ void ProjectItem::WidgetLoad()
 		HyGuiLog("Unimplemented WidgetLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
 	}
+
+	m_pWidget->FocusState(0, -1);
 }
 
 void ProjectItem::WidgetUnload()

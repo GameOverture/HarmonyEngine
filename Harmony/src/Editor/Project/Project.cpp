@@ -23,6 +23,7 @@
 #include <QDirIterator>
 #include <QTreeWidgetItemIterator>
 #include <QMessageBox>
+#include <QStandardPaths>
 
 // Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
 //#define RESAVE_ENTIRE_PROJECT
@@ -100,6 +101,32 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	m_pAtlasModel = new AtlasModel(this);
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	QStringList sFilterList(HYMETA_FontFilterList);
+	QMap<QString,QString> fontsMap;
+
+	QStringList sSystemFontPaths = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
+	for(int i = 0; i < sSystemFontPaths.count(); ++i)
+	{
+		QDir fontDir(sSystemFontPaths[i]);
+		QFileInfoList fontFileInfoList = fontDir.entryInfoList(sFilterList);
+
+		for(int i = 0; i < fontFileInfoList.count(); ++i)
+			fontsMap[fontFileInfoList[i].fileName()] = fontFileInfoList[i].absoluteFilePath();
+	}
+
+	int iRow = 0;
+	for(auto iter = fontsMap.begin(); iter != fontsMap.end(); ++iter, ++iRow)
+	{
+		QStandardItem *pFontItem = new QStandardItem(iter.key());
+		pFontItem->setData(iter.value());
+
+		m_FontListModel.setItem(iRow, pFontItem);
+	}
+
+	ScanMetaFontDir();
 }
 
 /*virtual*/ Project::~Project()
@@ -325,6 +352,11 @@ void Project::SetAudioModel(QJsonObject audioObj)
 AudioAssetsWidget *Project::GetAudioWidget()
 {
 	return m_pAudioMan;
+}
+
+QStandardItemModel *Project::GetFontListModel()
+{
+	return &m_FontListModel;
 }
 
 ProjectTabBar *Project::GetTabBar()
@@ -731,4 +763,33 @@ void Project::OnCloseTab(int iIndex)
 {
 	ProjectItem *pItem = m_pTabBar->tabData(iIndex).value<ProjectItem *>();
 	MainWindow::CloseItem(pItem);
+}
+
+void Project::ScanMetaFontDir()
+{
+	QStringList sFilterList(HYMETA_FontFilterList);
+	QDir metaDir(GetMetaDataAbsPath() % HYMETA_FontsDir);
+	QFileInfoList metaFontFileInfoList = metaDir.entryInfoList(sFilterList);
+
+	QMap<QString,QString> metaFontsMap;
+	for(int i = 0; i < metaFontFileInfoList.count(); ++i)
+	{
+		auto foundItemList = m_FontListModel.findItems(metaFontFileInfoList[i].fileName());
+		while(foundItemList.empty() == false)
+		{
+			// Remove the font since we're gonna add it again as a meta dir font
+			m_FontListModel.removeRow(foundItemList[0]->index().row(), foundItemList[0]->index().parent());
+			foundItemList = m_FontListModel.findItems(metaFontFileInfoList[i].fileName());
+		};
+
+		metaFontsMap[metaFontFileInfoList[i].fileName()] = metaFontFileInfoList[i].absoluteFilePath();
+	}
+
+	for(auto iter = metaFontsMap.begin(); iter != metaFontsMap.end(); ++iter)
+	{
+		QStandardItem *pFontItem = new QStandardItem(HyGlobal::ItemIcon(ITEM_Font, SUBICON_None), iter.key());
+		pFontItem->setData(iter.value());
+
+		m_FontListModel.setItem(0, pFontItem);
+	}
 }
