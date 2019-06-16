@@ -287,7 +287,7 @@
     <ClCompile Include="Text\SubWidgets\TextFontManager.cpp">
       <Filter>Text\SubWidgets</Filter>
     </ClCompile>
-    <ClCompile Include="Text\TextUndoCmd.cpp">
+    <ClCompile Include="Text\TextUndoCmds.cpp">
       <Filter>Text</Filter>
     </ClCompile>
   </ItemGroup>
@@ -409,7 +409,7 @@
     <ClInclude Include="Text\SubWidgets\TextFontManager.h">
       <Filter>Text\SubWidgets</Filter>
     </ClInclude>
-    <ClInclude Include="Text\TextUndoCmd.h">
+    <ClInclude Include="Text\TextUndoCmds.h">
       <Filter>Text</Filter>
     </ClInclude>
   </ItemGroup>

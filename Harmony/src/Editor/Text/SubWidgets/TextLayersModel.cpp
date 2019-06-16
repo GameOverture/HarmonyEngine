@@ -57,9 +57,9 @@ QJsonArray TextLayersModel::GetLayersArray()
 	return layersArray;
 }
 
-TextFontHandle TextLayersModel::AddNewLayer(QString sFontName, rendermode_t eRenderMode, int iSize, float fOutlineThickness)
+TextFontHandle TextLayersModel::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness)
 {
-	TextFontHandle hReturnHandle = m_FontManagerRef.AcquireFont(sFontName, eRenderMode, iSize, fOutlineThickness);
+	TextFontHandle hReturnHandle = m_FontManagerRef.AcquireFont(sFontName, eRenderMode, fSize, fOutlineThickness);
 	Layer *pLayer = new Layer(hReturnHandle);
 
 	int iRowIndex = m_LayerList.count();

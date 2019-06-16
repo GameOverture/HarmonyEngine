@@ -1,5 +1,5 @@
 /**************************************************************************
- *	TextUndoCmd.cpp
+ *	TextUndoCmds.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2019 Jason Knobler
@@ -8,114 +8,52 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "TextUndoCmd.h"
+#include "TextUndoCmds.h"
 #include "ProjectItem.h"
 #include "FontWidget.h"
 #include "TextModel.h"
 
-TextUndoCmd::TextUndoCmd(TextCmd eCmd, ProjectItem &itemRef, int iStateIndex, TextFontHandle hFont, QUndoCommand *pParent /*= nullptr*/) :
-	QUndoCommand(pParent),
-	m_eCMD(eCmd),
-	m_ItemRef(itemRef),
-	m_iStateIndex(iStateIndex),
-	m_hFont(hFont)
-{
-	switch(eCmd)
-	{
-	case TEXTCMD_AddLayer:			setText("Add Text Layer");		break;
-	case TEXTCMD_RemoveLayer:		setText("Remove Text Layer");	break;
-	case TEXTCMD_LayerMode:			setText("Text Render Mode");	break;
-	case TEXTCMD_LayerThickness:	setText("Layer Thickness");		break;
-	case TEXTCMD_LayerColors:		setText("Layer Colors");		break;
-	case TEXTCMD_LayerOrder:		setText("Layer Order");			break;
-	}
-}
-
-/*virtual*/ TextUndoCmd::~TextUndoCmd()
-{
-}
-
-void TextUndoCmd::redo()
-{
-	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
-
-	switch(m_eCMD)
-	{
-	case TEXTCMD_AddLayer:
-		if(m_hFont == TEXTFONTHANDLE_NotUsed)
-			m_hFont = pModel->AddNewLayer(m_eRenderMode, m_iSize, m_fThickness);
-		else
-			pModel->ReAddLayer(m_hFont);
-
-		m_ItemRef.FocusWidgetState(m_iStateIndex, m_iId);
-		break;
-	case TEXTCMD_RemoveLayer:
-		break;
-	}
-
-	if(m_iId == -1)
-		m_iId = pModel->AddNewLayer(m_eRenderMode, m_iSize, m_fThickness);
-	else
-		pModel->ReAddLayer(m_iId);
-
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iId);
-}
-
-void TextUndoCmd::undo()
-{
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
-	pModel->RemoveLayer(m_iId);
-
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iId);
-}
-
-
-
-
-
-
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_AddLayer::FontUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, rendermode_t eRenderMode, int iSize, float fThickness, QUndoCommand *pParent /*= 0*/) :
+TextUndoCmd_AddLayer::TextUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, QString sFontName, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
+	m_sFontName(sFontName),
 	m_eRenderMode(eRenderMode),
-	m_iSize(iSize),
+	m_fSize(fSize),
 	m_fThickness(fThickness),
-	m_iId(-1)
+	m_hFont(TEXTFONTHANDLE_NotUsed)
 {
-	setText("Add Font Layer");
+	setText("Add Text Layer");
 }
 
-/*virtual*/ FontUndoCmd_AddLayer::~FontUndoCmd_AddLayer()
+/*virtual*/ TextUndoCmd_AddLayer::~TextUndoCmd_AddLayer()
 {
 }
 
-void FontUndoCmd_AddLayer::redo()
+void TextUndoCmd_AddLayer::redo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
-	if(m_iId == -1)
-		m_iId = pModel->AddNewLayer(m_eRenderMode, m_iSize, m_fThickness);
+	if(m_hFont == TEXTFONTHANDLE_NotUsed)
+		m_hFont = pModel->AddNewLayer(m_sFontName, m_eRenderMode, m_fSize, m_fThickness);
 	else
-		pModel->ReAddLayer(m_iId);
+		pModel->ReAddLayer(m_hFont);
 
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iId);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hFont);
 }
 
-void FontUndoCmd_AddLayer::undo()
+void TextUndoCmd_AddLayer::undo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
-	pModel->RemoveLayer(m_iId);
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->RemoveLayer(m_hFont);
 	
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iId);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hFont);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FontUndoCmd_RemoveLayer::FontUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, int iId, QUndoCommand *pParent /*= 0*/) :
@@ -149,6 +87,7 @@ void FontUndoCmd_RemoveLayer::undo()
 	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iId);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FontUndoCmd_LayerRenderMode::FontUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :
@@ -185,6 +124,7 @@ void FontUndoCmd_LayerRenderMode::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FontUndoCmd_LayerOutlineThickness::FontUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) :
 	QUndoCommand(pParent),
@@ -219,6 +159,7 @@ void FontUndoCmd_LayerOutlineThickness::undo()
 	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FontUndoCmd_LayerColors::FontUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent /*= 0*/) :
@@ -256,6 +197,7 @@ void FontUndoCmd_LayerColors::undo()
 	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FontUndoCmd_LayerOrder::FontUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, FontTableView *pTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :

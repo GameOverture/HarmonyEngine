@@ -1,5 +1,5 @@
 /**************************************************************************
- *	TextUndoCmd.h
+ *	TextUndoCmds.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2019 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef TEXTUNDOCMD_H
-#define TEXTUNDOCMD_H
+#ifndef TEXTUNDOCMDS_H
+#define TEXTUNDOCMDS_H
 
 #include "FontWidget.h"
 #include "SubWidgets/TextFontManager.h"
@@ -18,46 +18,21 @@
 #include <QUndoCommand>
 #include <QComboBox>
 
-enum TextCmd
-{
-	TEXTCMD_AddLayer = 0,
-	TEXTCMD_RemoveLayer,
-	TEXTCMD_LayerMode,
-	TEXTCMD_LayerThickness,
-	TEXTCMD_LayerColors,
-	TEXTCMD_LayerOrder
-};
-
-class TextUndoCmd : public QUndoCommand
-{
-	const TextCmd		m_eCMD;
-	ProjectItem &		m_ItemRef;
-	int					m_iStateIndex;
-
-	TextFontHandle		m_hFont;
-
-public:
-	TextUndoCmd(TextCmd eCmd, ProjectItem &itemRef, int iStateIndex, TextFontHandle hFont = TEXTFONTHANDLE_NotUsed, QUndoCommand *pParent = nullptr);
-	virtual ~TextUndoCmd();
-
-	void redo() override;
-	void undo() override;
-};
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class FontUndoCmd_AddLayer : public QUndoCommand
+class TextUndoCmd_AddLayer : public QUndoCommand
 {
-	ProjectItem &           m_ItemRef;
-	int                     m_iStateIndex;
+	ProjectItem &			m_ItemRef;
+	int						m_iStateIndex;
 
-	rendermode_t            m_eRenderMode;
-	int                     m_iSize;
-	float                   m_fThickness;
-	int                     m_iId;
+	QString					m_sFontName;
+	rendermode_t			m_eRenderMode;
+	float					m_fSize;
+	float					m_fThickness;
+	TextFontHandle			m_hFont;
 
 public:
-	FontUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, rendermode_t eRenderMode, int iSize, float fThickness, QUndoCommand *pParent = 0);
-	virtual ~FontUndoCmd_AddLayer();
+	TextUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, QString sFontName, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = nullptr);
+	virtual ~TextUndoCmd_AddLayer();
 
 	void redo() override;
 	void undo() override;
@@ -148,4 +123,4 @@ public:
 	void undo() override;
 };
 
-#endif // TEXTUNDOCMD_H
+#endif // TEXTUNDOCMDS_H

@@ -72,7 +72,7 @@ public:
 	QJsonObject GetAvailableGlyphsObject() const;
 	QJsonArray GetFontArray() const;
 
-	TextFontHandle AcquireFont(QString sFontName, rendermode_t eRenderMode, int iSize, float fOutlineThickness);
+	TextFontHandle AcquireFont(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
 
 	PropertiesTreeModel *GetGlyphsModel();
 

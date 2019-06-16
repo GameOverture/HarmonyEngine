@@ -57,7 +57,7 @@ public:
 
 	QJsonArray GetLayersArray();
 
-	TextFontHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, int iSize, float fOutlineThickness);
+	TextFontHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
 	void RemoveLayer(TextFontHandle hHandle);
 	void ReAddLayer(TextFontHandle hHandle);
 

@@ -88,7 +88,7 @@ QJsonArray TextFontManager::GetFontArray() const
 	return m_FontArray;
 }
 
-TextFontIndex TextFontManager::AcquireFont(QString sFontName, rendermode_t eRenderMode, int iSize, float fOutlineThickness)
+TextFontHandle TextFontManager::AcquireFont(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness)
 {
 	for(int i = 0; i < m_FontList.size(); ++i)
 	{
