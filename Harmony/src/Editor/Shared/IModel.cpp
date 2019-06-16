@@ -58,7 +58,7 @@ const ProjectItem &IModel::GetItem() const
 	return m_ItemRef;
 }
 
-int IModel::GetNumStates()
+int IModel::GetNumStates() const
 {
 	return m_StateList.size();
 }

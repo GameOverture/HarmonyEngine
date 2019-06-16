@@ -15,7 +15,7 @@
 #include "EntityTreeModel.h"
 #include "GlobalWidgetMappers.h"
 #include "ProjectItemMimeData.h"
-#include "freetype-gl/freetype-gl.h"
+#include "TextFontManager.h"
 
 #include <QObject>
 #include <QJsonArray>
@@ -24,57 +24,23 @@ class TextLayersModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
-	struct FontTypeface
+	TextFontManager &				m_FontManagerRef;
+
+	struct Layer
 	{
-		uint					uiReferenceCount;
+		uint						m_uiFontIndex;
+		glm::vec4					m_vBotColor;
+		glm::vec4					m_vTopColor;
 
-		QString					sFontPath;
-		texture_font_t *		pTextureFont;
-		rendermode_t			eMode;
-		float					fSize;
-		float					fOutlineThickness;
-
-		FontTypeface(QString sFontFilePath, rendermode_t eRenderMode, float fSize, float fOutlineThickness) :
-			uiReferenceCount(0),
-			sFontPath(sFontFilePath),
-			pTextureFont(nullptr),
-			eMode(eRenderMode),
-			fSize(fSize),
-			fOutlineThickness(fOutlineThickness)
-		{ }
-
-		~FontTypeface()
-		{
-			if(pTextureFont)
-				texture_font_delete(pTextureFont);
-		}
-	};
-
-	struct FontLayer
-	{
-		const int					iUNIQUE_ID;
-		FontTypeface *				pReference;
-
-		rendermode_t				eMode;
-		int							iSize;
-		float						fOutlineThickness;
-
-		glm::vec4					vTopColor;
-		glm::vec4					vBotColor;
-
-		FontLayer(int iUniqueId, rendermode_t eRenderMode, int iSize, float fOutlineThickness) :    iUNIQUE_ID(iUniqueId),
-			pReference(nullptr),
-			eMode(eRenderMode),
-			iSize(iSize),
-			fOutlineThickness(fOutlineThickness)
+		Layer(uint uiFontIndex, glm::vec4 vBotColor, glm::vec4 vTopColor) :
+			m_uiFontIndex(uiFontIndex),
+			m_vBotColor(vBotColor),
+			m_vTopColor(vTopColor)
 		{ }
 	};
 
-	static int						sm_iUniqueIdCounter;
-	QList<FontLayer *>				m_LayerList;
-	QList<QPair<int, FontLayer *> >	m_RemovedLayerList;
-
-	QStringList						m_sRenderModeStringList;
+	QList<Layer *>					m_LayerList;
+	QList<QPair<int, Layer *> >		m_RemovedLayerList;
 
 public:
 	enum eColumn
@@ -86,17 +52,17 @@ public:
 		NUMCOLUMNS
 	};
 
-	TextLayersModel(QObject *parent);
+	TextLayersModel(QJsonArray layerArray, TextFontManager &fontManagerRef, QObject *parent);
 	virtual ~TextLayersModel();
 
-	QString GetRenderModeString(rendermode_t eMode) const;
+	QJsonArray GetLayersArray();
 
-	int AddNewLayer(rendermode_t eRenderMode, int iSize, float fOutlineThickness);
-	void RemoveLayer(int iId);
-	void ReAddLayer(int iId);
+	TextFontHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, int iSize, float fOutlineThickness);
+	void RemoveLayer(TextFontHandle hHandle);
+	void ReAddLayer(TextFontHandle hHandle);
 
 	int GetLayerId(int iRowIndex) const;
-	FontTypeface *GetStageRef(int iRowIndex);
+	//FontTypeface *GetStageRef(int iRowIndex);
 
 	rendermode_t GetLayerRenderMode(int iRowIndex) const;
 	void SetLayerRenderMode(int iId, rendermode_t eMode);
@@ -108,17 +74,18 @@ public:
 	QColor GetLayerBotColor(int iRowIndex) const;
 	void SetLayerColors(int iId, QColor topColor, QColor botColor);
 
-	float GetLineHeight();
-	float GetLineAscender();
-	float GetLineDescender();
-	float GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs);
-
 	void MoveRowUp(int iIndex);
 	void MoveRowDown(int iIndex);
 
 	void SetFontSize(int iSize);
 
-	void SetFontStageReference(int iRowIndex, FontTypeface *pStageRef);
+	//void SetFontStageReference(int iRowIndex, FontTypeface *pStageRef);
+
+	// Must generate final texture atlas/fonts before these are valid
+	float GetLineHeight();
+	float GetLineAscender();
+	float GetLineDescender();
+	float GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;

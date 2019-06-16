@@ -413,7 +413,7 @@ SpriteModel::SpriteModel(ProjectItem &itemRef, QJsonArray stateArray) : IModel(i
 {
 }
 
-QJsonObject SpriteModel::GetStateJson(uint32 uiIndex) /*override*/
+QJsonObject SpriteModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	QJsonObject retStateObj;
 	retStateObj.insert("name", m_StateList[uiIndex]->GetName());

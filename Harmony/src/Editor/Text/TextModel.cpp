@@ -12,19 +12,13 @@
 #include "Project.h"
 #include "ExplorerModel.h"
 
-#define FONTPROP_Dimensions "Dimensions"
-#define FONTPROP_UsedPercent "Used Percent"
-#define FONTPROP_09 "0-9"
-#define FONTPROP_AZ "A-Z"
-#define FONTPROP_az "a-z"
-#define FONTPROP_Symbols "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@"
-#define FONTPROP_AdditionalSyms "Additional glyphs"
-
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
 	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
-	m_sFontName(""),
-	m_uiSize(0),
-	m_LayersModel(&m_ModelRef)
+	m_LayersModel(stateObj["layers"].toArray(), static_cast<TextModel &>(modelRef).GetFontManager(), &modelRef),
+	m_fLeftSideNudgeAmt(stateObj["leftSideNudgeAmt"].toDouble()),
+	m_fLineAscender(stateObj["lineAscender"].toDouble()),
+	m_fLineDescender(stateObj["lineDescender"].toDouble()),
+	m_fLineHeight(stateObj["lineHeight"].toDouble())
 {
 }
 
@@ -32,15 +26,17 @@ TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stat
 {
 }
 
-void TextStateData::SetInfo(QString sFontName, uint uiSize)
-{
-	m_sFontName = sFontName;
-	m_uiSize = uiSize;
-}
-
 TextLayersModel &TextStateData::GetLayersModel()
 {
 	return m_LayersModel;
+}
+
+void TextStateData::GetMiscInfo(float &fLeftSideNudgeAmtOut, float &fLineAscenderOut, float &fLineDescenderOut, float &fLineHeightOut)
+{
+	fLeftSideNudgeAmtOut = m_fLeftSideNudgeAmt;
+	fLineAscenderOut = m_fLineAscender;
+	fLineDescenderOut = m_fLineDescender;
+	fLineHeightOut = m_fLineHeight;
 }
 
 /*virtual*/ int TextStateData::AddFrame(AtlasFrame *pFrame) /*override*/
@@ -56,27 +52,22 @@ TextLayersModel &TextStateData::GetLayersModel()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 	IModel(itemRef),
-	m_GlyphsModel(itemRef, 0, 0, this),
+	m_FontManager(itemRef, fontObj["availableGlyphs"].toObject(), fontObj["typefaceArray"].toArray()),
 	m_pAtlasFrame(nullptr)
 {
 	m_FontsWidgetMapper.setModel(m_ItemRef.GetProject().GetFontListModel());
 
-	bool b09 = true;
-	bool bAZ = true;
-	bool baz = true;
-	bool bSymbols = true;
-	QString sAdditional = "";
-
 	// If item's init value is defined, parse and initialize with it, otherwise make default empty font
 	if(fontObj.empty() == false)
 	{
-		QJsonObject availGlyphsObj = fontObj["availableGlyphs"].toObject();
-		b09 = availGlyphsObj[FONTPROP_09].toBool();
-		bAZ = availGlyphsObj[FONTPROP_AZ].toBool();
-		baz = availGlyphsObj[FONTPROP_az].toBool();
-		bSymbols = availGlyphsObj["symbols"].toBool();
-		sAdditional = availGlyphsObj["additional"].toString();
+		QJsonArray stateArray = fontObj["stateArray"].toArray();
+		for(int i = 0; i < stateArray.size(); ++i)
+		{
+			QJsonObject stateObj = stateArray[i].toObject();
+			AppendState<TextStateData>(stateObj);
+		}
 
+		// Find existing AtlasFrame * to assign to 'm_pAtlasFrame'
 		int iAffectedFrameIndex = 0;
 		QList<quint32> idRequestList;
 		idRequestList.append(JSONOBJ_TOINT(fontObj, "id"));
@@ -85,52 +76,11 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 			m_pAtlasFrame = pRequestedList[0];
 		else
 			HyGuiLog("More than one frame returned for a font", LOGTYPE_Error);
-
-
-		QJsonArray typefaceArray = fontObj["typefaceArray"].toArray();
-		QJsonArray stateArray = fontObj["stateArray"].toArray();
-		for(int i = 0; i < stateArray.size(); ++i)
-		{
-			QJsonObject stateObj = stateArray[i].toObject();
-			
-			AppendState<TextStateData>(stateObj);
-			if(stateObj.empty() == false)
-			{
-				QJsonArray layerArray = stateObj["layers"].toArray();
-
-				if(layerArray.isEmpty() == false)
-					static_cast<TextStateData *>(m_StateList[m_StateList.size() - 1])->SetInfo(layerArray.at(0).toObject()["font"].toString(), layerArray.at(0).toObject()["size"].toInt());
-				
-				for(int j = 0; j < layerArray.size(); ++j)
-				{
-					QJsonObject layerObj = layerArray.at(j).toObject();
-					QJsonObject typefaceObj = typefaceArray.at(layerObj["typefaceIndex"].toInt()).toObject();
-
-					QColor topColor, botColor;
-					topColor.setRgbF(layerObj["topR"].toDouble(), layerObj["topG"].toDouble(), layerObj["topB"].toDouble());
-					botColor.setRgbF(layerObj["botR"].toDouble(), layerObj["botG"].toDouble(), layerObj["botB"].toDouble());
-
-					TextLayersModel &layersModelRef = static_cast<TextStateData *>(m_StateList[m_StateList.size() - 1])->GetLayersModel();
-					int iLayerId = layersModelRef.AddNewLayer(static_cast<rendermode_t>(typefaceObj["mode"].toInt()), typefaceObj["size"].toInt(), typefaceObj["outlineThickness"].toDouble());
-					layersModelRef.SetLayerColors(iLayerId, topColor, botColor);
-				}
-			}
-		}
 	}
 	else
 	{
 		AppendState<TextStateData>(QJsonObject());
 	}
-
-	m_GlyphsModel.AppendCategory("Uses Glyphs", HyGlobal::ItemColor(ITEM_Prefix));
-	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_09, PROPERTIESTYPE_bool, QVariant(b09 ? Qt::Checked : Qt::Unchecked), "Include numerical glyphs 0-9");
-	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_AZ, PROPERTIESTYPE_bool, QVariant(bAZ ? Qt::Checked : Qt::Unchecked), "Include capital letter glyphs A-Z");
-	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_az, PROPERTIESTYPE_bool, QVariant(baz ? Qt::Checked : Qt::Unchecked), "Include lowercase letter glyphs a-z");
-	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_Symbols, PROPERTIESTYPE_bool, QVariant(bSymbols ? Qt::Checked : Qt::Unchecked), "Include common punctuation and symbol glyphs");
-	m_GlyphsModel.AppendProperty("Uses Glyphs", FONTPROP_AdditionalSyms, PROPERTIESTYPE_LineEdit, QVariant(sAdditional), "Include specified glyphs");
-	m_GlyphsModel.AppendCategory("Atlas Info");
-	m_GlyphsModel.AppendProperty("Atlas Info", FONTPROP_Dimensions, PROPERTIESTYPE_ivec2, QPoint(0, 0), "The required portion size needed to fit on an atlas", true);
-	m_GlyphsModel.AppendProperty("Atlas Info", FONTPROP_UsedPercent, PROPERTIESTYPE_double, 0.0, "Percentage of the maximum size dimensions used", true);
 }
 
 /*virtual*/ TextModel::~TextModel()
@@ -143,6 +93,11 @@ void TextModel::MapFontComboBox(QComboBox *pComboBox)
 	m_FontsWidgetMapper.addMapping(pComboBox, 0);
 }
 
+TextFontManager &TextModel::GetFontManager()
+{
+	return m_FontManager;
+}
+
 TextLayersModel *TextModel::GetLayersModel(uint uiIndex)
 {
 	if(uiIndex < m_StateList.size())
@@ -153,7 +108,7 @@ TextLayersModel *TextModel::GetLayersModel(uint uiIndex)
 
 PropertiesTreeModel *TextModel::GetGlyphsModel()
 {
-	return &m_GlyphsModel;
+	return m_FontManager.GetGlyphsModel();
 }
 
 /*virtual*/ void TextModel::OnSave() /*override*/
@@ -177,40 +132,19 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	//}
 }
 
-/*virtual*/ QJsonObject TextModel::GetStateJson(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject TextModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
-	TextLayersModel &layersModelRef = static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel();
+	float fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight;
+	static_cast<TextStateData *>(m_StateList[uiIndex])->GetMiscInfo(fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight);
 
 	QJsonObject stateObjOut;
 	stateObjOut.insert("name", m_StateList[uiIndex]->GetName());
-	stateObjOut.insert("lineHeight", layersModelRef.GetLineHeight());
-	stateObjOut.insert("lineAscender", layersModelRef.GetLineAscender());
-	stateObjOut.insert("lineDescender", layersModelRef.GetLineDescender());
-	stateObjOut.insert("leftSideNudgeAmt", 0);//layersModelRef.GetLeftSideNudgeAmt(m_sAvailableTypefaceGlyphs));
+	stateObjOut.insert("leftSideNudgeAmt", fLeftSideNudgeAmt);//layersModelRef.GetLeftSideNudgeAmt(m_sAvailableTypefaceGlyphs));
+	stateObjOut.insert("lineAscender", fLineAscender);
+	stateObjOut.insert("lineDescender", fLineDescender);
+	stateObjOut.insert("lineHeight", fLineHeight);
 
-	QJsonArray layersArray;
-	for(int j = 0; j < layersModelRef.rowCount(); ++j)
-	{
-		QJsonObject layerObj;
-
-		int iIndex = 0;
-		QList<FontTypeface *> masterStageList = static_cast<FontModel &>(m_ModelRef).GetMasterStageList();
-		FontTypeface *pFontStage = layersModelRef.GetStageRef(j);
-		for(; iIndex < masterStageList.count(); ++iIndex)
-		{
-			if(masterStageList[iIndex] == pFontStage)
-				break;
-		}
-		layerObj.insert("typefaceIndex", iIndex);
-		layerObj.insert("topR", layersModelRef.GetLayerTopColor(j).redF());
-		layerObj.insert("topG", layersModelRef.GetLayerTopColor(j).greenF());
-		layerObj.insert("topB", layersModelRef.GetLayerTopColor(j).blueF());
-		layerObj.insert("botR", layersModelRef.GetLayerBotColor(j).redF());
-		layerObj.insert("botG", layersModelRef.GetLayerBotColor(j).greenF());
-		layerObj.insert("botB", layersModelRef.GetLayerBotColor(j).blueF());
-
-		layersArray.append(layerObj);
-	}
+	QJsonArray layersArray = static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel().GetLayersArray();
 	stateObjOut.insert("layers", layersArray);
 
 	return stateObjOut;
@@ -220,103 +154,22 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 {
 	QJsonObject textObj;
 
-	//textObj.insert("checksum", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetImageChecksum())));
-	//textObj.insert("id", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pTrueAtlasFrame->GetId())));
+	QJsonObject availableGlyphsObj = m_FontManager.GetAvailableGlyphsObject();
+	textObj.insert("availableGlyphs", availableGlyphsObj);
 
-	//textObj.insert("subAtlasWidth", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(m_pTrueAtlasFrame->GetSize().width()));
-	//textObj.insert("subAtlasHeight", m_pTrueAtlasFrame == nullptr ? 0 : QJsonValue(m_pTrueAtlasFrame->GetSize().height()));
+	textObj.insert("checksum", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetImageChecksum())));
+	textObj.insert("id", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetId())));
 
-	//QJsonObject availableGlyphsObj;
-	//QVariant propValue;
+	QJsonArray stateArray;
+	for(int i = 0; i < GetNumStates(); ++i)
+		stateArray.append(GetStateJson(i));
+	textObj.insert("stateArray", stateArray);
 
-	//propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_09);
-	//availableGlyphsObj.insert("0-9", static_cast<bool>(propValue.toInt() == Qt::Checked));
+	textObj.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? 0 : QJsonValue(m_pAtlasFrame->GetSize().width()));
+	textObj.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? 0 : QJsonValue(m_pAtlasFrame->GetSize().height()));
 
-	//propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_az);
-	//availableGlyphsObj.insert("a-z", static_cast<bool>(propValue.toInt() == Qt::Checked));
-
-	//propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_AZ);
-	//availableGlyphsObj.insert("A-Z", static_cast<bool>(propValue.toInt() == Qt::Checked));
-
-	//propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_Symbols);
-	//availableGlyphsObj.insert("symbols", static_cast<bool>(propValue.toInt() == Qt::Checked));
-
-	//propValue = m_TypeFacePropertiesModel.FindPropertyValue("Uses Glyphs", FONTPROP_AdditionalSyms);
-	//availableGlyphsObj.insert("additional", propValue.toString());
-
-	//textObj.insert("availableGlyphs", availableGlyphsObj);
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//QString sAvailableTypefaceGlyphs = GetAvailableTypefaceGlyphs();
-	//QJsonArray typefaceArray;
-	//for(int i = 0; i < m_MasterLayerList.count(); ++i)
-	//{
-	//	QJsonObject stageObj;
-	//	QFileInfo fontFileInfo(m_MasterLayerList[i]->pTextureFont->filename);
-
-	//	stageObj.insert("font", fontFileInfo.fileName());
-	//	stageObj.insert("size", m_MasterLayerList[i]->fSize);
-	//	stageObj.insert("mode", m_MasterLayerList[i]->eMode);
-	//	stageObj.insert("outlineThickness", m_MasterLayerList[i]->fOutlineThickness);
-
-	//	QJsonArray glyphsArray;
-	//	for(int j = 0; j < sAvailableTypefaceGlyphs.count(); ++j)
-	//	{
-	//		// NOTE: Assumes LITTLE ENDIAN
-	//		QString sSingleChar = sAvailableTypefaceGlyphs[j];
-	//		texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterLayerList[i]->pTextureFont, sSingleChar.toUtf8().data());
-
-	//		QJsonObject glyphInfoObj;
-	//		if(pGlyph == nullptr)
-	//		{
-	//			HyGuiLog("Could not find glyph: '" % sSingleChar % "'\nPlace a breakpoint and walk into texture_font_get_glyph() below before continuing", LOGTYPE_Error);
-
-	//			pGlyph = texture_font_get_glyph(m_MasterLayerList[i]->pTextureFont, sSingleChar.toUtf8().data());
-	//		}
-	//		else
-	//		{
-	//			glyphInfoObj.insert("code", QJsonValue(static_cast<qint64>(pGlyph->codepoint)));
-	//			glyphInfoObj.insert("advance_x", pGlyph->advance_x);
-	//			glyphInfoObj.insert("advance_y", pGlyph->advance_y);
-	//			glyphInfoObj.insert("width", static_cast<int>(pGlyph->width));
-	//			glyphInfoObj.insert("height", static_cast<int>(pGlyph->height));
-	//			glyphInfoObj.insert("offset_x", pGlyph->offset_x);
-	//			glyphInfoObj.insert("offset_y", pGlyph->offset_y);
-	//			glyphInfoObj.insert("left", pGlyph->s0);
-	//			glyphInfoObj.insert("top", pGlyph->t0);
-	//			glyphInfoObj.insert("right", pGlyph->s1);
-	//			glyphInfoObj.insert("bottom", pGlyph->t1);
-	//		}
-
-	//		QJsonObject kerningInfoObj;
-	//		for(int k = 0; k < sAvailableTypefaceGlyphs.count(); ++k)
-	//		{
-	//			char cTmpChar = sAvailableTypefaceGlyphs.toStdString().c_str()[k];
-	//			float fKerningAmt = texture_glyph_get_kerning(pGlyph, &cTmpChar);
-
-	//			if(fKerningAmt != 0.0f)
-	//				kerningInfoObj.insert(QString(sAvailableTypefaceGlyphs[k]), fKerningAmt);
-	//		}
-	//		glyphInfoObj.insert("kerning", kerningInfoObj);
-
-	//		glyphsArray.append(glyphInfoObj);
-	//	}
-	//	stageObj.insert("glyphs", glyphsArray);
-
-	//	typefaceArray.append(QJsonValue(stageObj));
-	//}
-	//textObj.insert("typefaceArray", typefaceArray);
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//QJsonArray stateArray;
-	//for(int i = 0; i < m_StateList.size(); ++i)
-	//{
-	//	QJsonObject stateObj;
-	//	static_cast<TextStateData *>(m_StateList[i])->GetStateInfo(stateObj);
-
-	//	stateArray.append(stateObj);
-	//}
-	//textObj.insert("stateArray", stateArray);
+	QJsonArray fontArray = m_FontManager.GetFontArray();
+	textObj.insert("typefaceArray", fontArray);
 
 	return textObj;
 }
@@ -324,8 +177,8 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 /*virtual*/ QList<AtlasFrame *> TextModel::GetAtlasFrames() const /*override*/
 {
 	QList<AtlasFrame *> retAtlasFrameList;
-	//if(m_pTrueAtlasFrame)
-	//	retAtlasFrameList.push_back(m_pTrueAtlasFrame);
+	if(m_pAtlasFrame)
+		retAtlasFrameList.push_back(m_pAtlasFrame);
 
 	return retAtlasFrameList;
 }

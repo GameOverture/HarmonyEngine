@@ -737,7 +737,7 @@ void FontModel::GeneratePreview()
 	}
 }
 
-/*virtual*/ QJsonObject FontModel::PopStateAt(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject FontModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	QJsonObject retObj;
 	static_cast<FontStateData *>(m_StateList[uiIndex])->GetStateInfo(retObj);

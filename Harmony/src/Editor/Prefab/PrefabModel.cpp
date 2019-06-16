@@ -335,7 +335,7 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 {
 }
 
-/*virtual*/ QJsonObject PrefabModel::PopStateAt(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject PrefabModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QJsonObject();
 }

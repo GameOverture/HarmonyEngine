@@ -23,7 +23,7 @@ AudioModel::~AudioModel()
 {
 }
 
-/*virtual*/ QJsonObject AudioModel::PopStateAt(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject AudioModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QJsonObject();
 }

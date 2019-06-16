@@ -51,7 +51,7 @@ public:
 	ProjectItem &GetItem();
 	const ProjectItem &GetItem() const;
 	
-	int GetNumStates();
+	int GetNumStates() const;
 	IStateData *GetStateData(int iStateIndex);
 	
 	QString SetStateName(int iStateIndex, QString sNewName);
@@ -94,7 +94,7 @@ public:
 	}
 	
 	virtual void OnSave() = 0;
-	virtual QJsonObject GetStateJson(uint32 uiIndex) = 0;
+	virtual QJsonObject GetStateJson(uint32 uiIndex) const = 0;
 	virtual QJsonValue GetJson() const = 0;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;
 	virtual QStringList GetFontUrls() const = 0;

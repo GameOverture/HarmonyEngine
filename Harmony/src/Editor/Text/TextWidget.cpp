@@ -60,5 +60,14 @@ TextWidget::~TextWidget()
 
 void TextWidget::on_cmbFont_currentIndexChanged(int index)
 {
-	
+}
+
+void TextWidget::on_actionAddFill_triggered()
+{
+	QUndoCommand *pCmd = new FontUndoCmd_AddLayer(m_ItemRef,
+												  GetCurStateIndex(),
+												  static_cast<ftgl::rendermode_t>(ui->cmbRenderMode->currentData().toInt()),
+												  static_cast<FontStateData *>(GetCurStateData())->GetSizeMapper()->GetValue(),
+												  ui->sbThickness->value());
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }

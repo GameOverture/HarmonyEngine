@@ -217,7 +217,7 @@ void EntityModel::SetWidget(QTreeView *pTreeView)
 {
 }
 
-/*virtual*/ QJsonObject EntityModel::PopStateAt(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject EntityModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QJsonObject();
 }

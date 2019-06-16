@@ -12,62 +12,83 @@
 #include "Project.h"
 #include "ExplorerModel.h"
 
-
-int TextLayersModel::sm_iUniqueIdCounter = 0;
-
-TextLayersModel::TextLayersModel(QObject *parent) :
-	QAbstractTableModel(parent)
+TextLayersModel::TextLayersModel(QJsonArray layerArray, TextFontManager &fontManagerRef, QObject *parent) :
+	QAbstractTableModel(parent),
+	m_FontManagerRef(fontManagerRef)
 {
-	m_sRenderModeStringList.append("Fill");
-	m_sRenderModeStringList.append("Outline Edge");
-	m_sRenderModeStringList.append("Outline Edge+Fill");
-	m_sRenderModeStringList.append("Inner");
-	m_sRenderModeStringList.append("Signed Dist Field");
+	for(int i = 0; i < layerArray.size(); ++i)
+	{
+		QJsonObject layerObj = layerArray[i].toObject();
+
+		glm::vec4 vBotColor;
+		vBotColor.r = layerObj["botR"].toDouble();
+		vBotColor.g = layerObj["botG"].toDouble();
+		vBotColor.b = layerObj["botB"].toDouble();
+		glm::vec4 vTopColor;
+		vTopColor.r = layerObj["topR"].toDouble();
+		vTopColor.g = layerObj["topG"].toDouble();
+		vTopColor.b = layerObj["topB"].toDouble();
+
+		m_LayerList.append(new Layer(layerObj["typefaceIndex"].toInt(), vBotColor, vTopColor));
+	}
 }
 
 /*virtual*/ TextLayersModel::~TextLayersModel()
 {
 }
 
-
-QString TextLayersModel::GetRenderModeString(rendermode_t eMode) const
+QJsonArray TextLayersModel::GetLayersArray()
 {
-	return m_sRenderModeStringList[eMode];
+	QJsonArray layersArray;
+	for(int i = 0; i < m_LayerList.size(); ++i)
+	{
+		QJsonObject layerObj;
+		layerObj.insert("typefaceIndex", static_cast<int>(m_LayerList[i]->m_uiFontIndex));
+		layerObj.insert("botR", m_LayerList[i]->m_vBotColor.r);
+		layerObj.insert("botG", m_LayerList[i]->m_vBotColor.g);
+		layerObj.insert("botB", m_LayerList[i]->m_vBotColor.b);
+		layerObj.insert("topR", m_LayerList[i]->m_vTopColor.r);
+		layerObj.insert("topG", m_LayerList[i]->m_vTopColor.g);
+		layerObj.insert("topB", m_LayerList[i]->m_vTopColor.b);
+
+		layersArray.append(layerObj);
+	}
+
+	return layersArray;
 }
 
-int TextLayersModel::AddNewLayer(rendermode_t eRenderMode, int iSize, float fOutlineThickness)
+TextFontHandle TextLayersModel::AddNewLayer(QString sFontName, rendermode_t eRenderMode, int iSize, float fOutlineThickness)
 {
-	sm_iUniqueIdCounter++;
+	TextFontHandle hReturnHandle = m_FontManagerRef.AcquireFont(sFontName, eRenderMode, iSize, fOutlineThickness);
+	Layer *pLayer = new Layer(hReturnHandle);
 
 	int iRowIndex = m_LayerList.count();
-	FontLayer *pLayer = new FontLayer(sm_iUniqueIdCounter, eRenderMode, iSize, fOutlineThickness);
-
 	beginInsertRows(QModelIndex(), iRowIndex, iRowIndex);
 	m_LayerList.append(pLayer);
 	endInsertRows();
 
-	return pLayer->iUNIQUE_ID;
+	return hReturnHandle;
 }
 
-void TextLayersModel::RemoveLayer(int iId)
+void TextLayersModel::RemoveLayer(TextFontHandle hHandle)
 {
 	for(int i = 0; i < m_LayerList.count(); ++i)
 	{
-		if(m_LayerList[i]->iUNIQUE_ID == iId)
+		if(m_LayerList[i]->m_hFont == hHandle)
 		{
 			beginRemoveRows(QModelIndex(), i, i);
-			m_RemovedLayerList.append(QPair<int, FontLayer *>(i, m_LayerList[i]));
+			m_RemovedLayerList.append(QPair<int, Layer *>(i, m_LayerList[i]));
 			m_LayerList.removeAt(i);
 			endRemoveRows();
 		}
 	}
 }
 
-void TextLayersModel::ReAddLayer(int iId)
+void TextLayersModel::ReAddLayer(TextFontHandle hHandle)
 {
 	for(int i = 0; i < m_RemovedLayerList.count(); ++i)
 	{
-		if(m_RemovedLayerList[i].second->iUNIQUE_ID == iId)
+		if(m_RemovedLayerList[i].second->m_hFont == hHandle)
 		{
 			beginInsertRows(QModelIndex(), m_RemovedLayerList[i].first, m_RemovedLayerList[i].first);
 			m_LayerList.insert(m_RemovedLayerList[i].first, m_RemovedLayerList[i].second);
@@ -144,6 +165,35 @@ void TextLayersModel::SetLayerColors(int iId, QColor topColor, QColor botColor)
 	}
 }
 
+void TextLayersModel::MoveRowUp(int iIndex)
+{
+	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
+		return;
+
+	m_LayerList.swap(iIndex, iIndex - 1);
+	endMoveRows();
+}
+
+void TextLayersModel::MoveRowDown(int iIndex)
+{
+	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
+		return;
+
+	m_LayerList.swap(iIndex, iIndex + 1);
+	endMoveRows();
+}
+
+void TextLayersModel::SetFontSize(int iSize)
+{
+	for(int i = 0; i < m_LayerList.count(); ++i)
+		m_LayerList[i]->iSize = iSize;
+}
+
+//void TextLayersModel::SetFontStageReference(int iRowIndex, FontTypeface *pStageRef)
+//{
+//	m_LayerList[iRowIndex]->pReference = pStageRef;
+//}
+
 float TextLayersModel::GetLineHeight()
 {
 	float fHeight = 0.0f;
@@ -204,35 +254,6 @@ float TextLayersModel::GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs)
 	return fLeftSideNudgeAmt;
 }
 
-void TextLayersModel::MoveRowUp(int iIndex)
-{
-	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
-		return;
-
-	m_LayerList.swap(iIndex, iIndex - 1);
-	endMoveRows();
-}
-
-void TextLayersModel::MoveRowDown(int iIndex)
-{
-	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
-		return;
-
-	m_LayerList.swap(iIndex, iIndex + 1);
-	endMoveRows();
-}
-
-void TextLayersModel::SetFontSize(int iSize)
-{
-	for(int i = 0; i < m_LayerList.count(); ++i)
-		m_LayerList[i]->iSize = iSize;
-}
-
-void TextLayersModel::SetFontStageReference(int iRowIndex, FontTypeface *pStageRef)
-{
-	m_LayerList[iRowIndex]->pReference = pStageRef;
-}
-
 /*virtual*/ int TextLayersModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
 	return m_LayerList.count();
@@ -284,9 +305,24 @@ void TextLayersModel::SetFontStageReference(int iRowIndex, FontTypeface *pStageR
 		switch(index.column())
 		{
 		case COLUMN_Type:
-			return GetRenderModeString(pLayer->eMode);
+			switch(pLayer->eMode)
+			{
+			case RENDER_NORMAL:
+				return "Fill";
+			case RENDER_OUTLINE_EDGE:
+				return "Outline Edge";
+			case RENDER_OUTLINE_POSITIVE:
+				return "Outline Edge+Fill";
+			case RENDER_OUTLINE_NEGATIVE:
+				return "Inner";
+			case RENDER_SIGNED_DISTANCE_FIELD:
+				return "Signed Dist Field";
+			}
+			return "Unknown";
+
 		case COLUMN_Thickness:
 			return QString::number(GetLayerOutlineThickness(index.row()), 'g', 2);
+
 		case COLUMN_DefaultColor:
 			return "";
 		}

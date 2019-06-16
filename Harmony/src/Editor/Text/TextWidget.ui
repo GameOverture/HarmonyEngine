@@ -222,6 +222,14 @@
     </layout>
    </item>
   </layout>
+  <action name="actionAddFill">
+   <property name="text">
+    <string>Add Fill</string>
+   </property>
+   <property name="toolTip">
+    <string>Append a fill layer</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

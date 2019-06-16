@@ -23,7 +23,7 @@ PrimitiveModel::~PrimitiveModel()
 {
 }
 
-/*virtual*/ QJsonObject PrimitiveModel::PopStateAt(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject PrimitiveModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QJsonObject();
 }
