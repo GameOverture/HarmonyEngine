@@ -10,7 +10,6 @@
 #ifndef TEXTUNDOCMDS_H
 #define TEXTUNDOCMDS_H
 
-#include "FontWidget.h"
 #include "SubWidgets/TextFontManager.h"
 
 #include "freetype-gl/freetype-gl.h"
@@ -38,32 +37,32 @@ public:
 	void undo() override;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class FontUndoCmd_RemoveLayer : public QUndoCommand
+class TextUndoCmd_RemoveLayer : public QUndoCommand
 {
-	ProjectItem &           m_ItemRef;
-	int                     m_iStateIndex;
+	ProjectItem &			m_ItemRef;
+	int						m_iStateIndex;
 
-	int                     m_iId;
+	TextFontHandle			m_hFont;
 
 public:
-	FontUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, int iId, QUndoCommand *pParent = 0);
-	virtual ~FontUndoCmd_RemoveLayer();
+	TextUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, TextFontHandle hFont, QUndoCommand *pParent = nullptr);
+	virtual ~TextUndoCmd_RemoveLayer();
 
 	void redo() override;
 	void undo() override;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class FontUndoCmd_LayerRenderMode : public QUndoCommand
+class TextUndoCmd_LayerRenderMode : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
-	int                 m_iStateIndex;
+	ProjectItem &			m_ItemRef;
+	int						m_iStateIndex;
 
-	int                 m_iLayerId;
-	rendermode_t        m_ePrevRenderMode;
-	rendermode_t        m_eNewRenderMode;
+	int						m_iLayerId;
+	rendermode_t			m_ePrevRenderMode;
+	rendermode_t			m_eNewRenderMode;
 
 public:
-	FontUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = 0);
+	FontUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = nullptr);
 	virtual ~FontUndoCmd_LayerRenderMode();
 
 	void redo() override;

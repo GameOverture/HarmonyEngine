@@ -75,7 +75,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="btnAddSignedDistanceField">
+           <widget class="QToolButton" name="btnAddSDF">
             <property name="toolTip">
              <string>Add a Signed Distance Field layer</string>
             </property>
@@ -147,7 +147,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="sbThickness"/>
+            <widget class="QDoubleSpinBox" name="sbThickness">
+             <property name="minimum">
+              <double>0.250000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>99.989999999999995</double>
+             </property>
+             <property name="singleStep">
+              <double>0.250000000000000</double>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -228,6 +238,62 @@
    </property>
    <property name="toolTip">
     <string>Append a fill layer</string>
+   </property>
+  </action>
+  <action name="actionAddSDF">
+   <property name="text">
+    <string>Add SDF</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a signed distance field layer</string>
+   </property>
+  </action>
+  <action name="actionAddEdge">
+   <property name="text">
+    <string>Add Edge Outline</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a standard outline</string>
+   </property>
+  </action>
+  <action name="actionAddEdgeFill">
+   <property name="text">
+    <string>Add Filled Edge Outline</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a standard outline that is filled in</string>
+   </property>
+  </action>
+  <action name="actionAddInner">
+   <property name="text">
+    <string>Add Inner</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds an inner outline</string>
+   </property>
+  </action>
+  <action name="actionRemoveLayer">
+   <property name="text">
+    <string>Remove Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected text layer</string>
+   </property>
+  </action>
+  <action name="actionOrderLayerUp">
+   <property name="text">
+    <string>Order Layer Up</string>
+   </property>
+   <property name="toolTip">
+    <string>Shifts the currently selected text layer upwards (earlier in render)</string>
+   </property>
+  </action>
+  <action name="actionOrderLayerDown">
+   <property name="text">
+    <string>Order Layer Down</string>
+   </property>
+   <property name="toolTip">
+    <string>Shifts the currently selected text layer downwards (later in render)</string>
    </property>
   </action>
  </widget>

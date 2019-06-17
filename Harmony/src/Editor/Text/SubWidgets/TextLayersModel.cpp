@@ -59,8 +59,10 @@ QJsonArray TextLayersModel::GetLayersArray()
 
 TextFontHandle TextLayersModel::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness)
 {
+	// Prep manip fonts
+
 	TextFontHandle hReturnHandle = m_FontManagerRef.AcquireFont(sFontName, eRenderMode, fSize, fOutlineThickness);
-	Layer *pLayer = new Layer(hReturnHandle);
+	Layer *pLayer = new Layer( hReturnHandle);
 
 	int iRowIndex = m_LayerList.count();
 	beginInsertRows(QModelIndex(), iRowIndex, iRowIndex);

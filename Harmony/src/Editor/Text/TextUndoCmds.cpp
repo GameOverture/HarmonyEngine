@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "TextUndoCmds.h"
 #include "ProjectItem.h"
-#include "FontWidget.h"
 #include "TextModel.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,35 +55,35 @@ void TextUndoCmd_AddLayer::undo()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FontUndoCmd_RemoveLayer::FontUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, int iId, QUndoCommand *pParent /*= 0*/) :
+TextUndoCmd_RemoveLayer::TextUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, TextFontHandle hFont, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
-	m_iId(iId)
+	m_hFont(hFont)
 {
-	setText("Remove Font Layer");
+	setText("Remove Text Layer");
 }
 
-/*virtual*/ FontUndoCmd_RemoveLayer::~FontUndoCmd_RemoveLayer()
+/*virtual*/ TextUndoCmd_RemoveLayer::~TextUndoCmd_RemoveLayer()
 {
 }
 
-void FontUndoCmd_RemoveLayer::redo()
+void TextUndoCmd_RemoveLayer::redo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
-	pModel->RemoveLayer(m_iId);
+	pModel->RemoveLayer(m_hFont);
 	
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iId);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hFont);
 }
 
-void FontUndoCmd_RemoveLayer::undo()
+void TextUndoCmd_RemoveLayer::undo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
-	pModel->ReAddLayer(m_iId);
+	pModel->ReAddLayer(m_hFont);
 	
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iId);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hFont);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +106,7 @@ FontUndoCmd_LayerRenderMode::FontUndoCmd_LayerRenderMode(ProjectItem &itemRef, i
 
 void FontUndoCmd_LayerRenderMode::redo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
 	pModel->SetLayerRenderMode(m_iLayerId, m_eNewRenderMode);
 	
@@ -116,7 +115,7 @@ void FontUndoCmd_LayerRenderMode::redo()
 
 void FontUndoCmd_LayerRenderMode::undo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
 	pModel->SetLayerRenderMode(m_iLayerId, m_ePrevRenderMode);
 	
@@ -143,7 +142,7 @@ FontUndoCmd_LayerOutlineThickness::FontUndoCmd_LayerOutlineThickness(ProjectItem
 
 void FontUndoCmd_LayerOutlineThickness::redo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
 	pModel->SetLayerOutlineThickness(m_iLayerId, m_fNewThickness);
 	
@@ -152,7 +151,7 @@ void FontUndoCmd_LayerOutlineThickness::redo()
 
 void FontUndoCmd_LayerOutlineThickness::undo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
 	pModel->SetLayerOutlineThickness(m_iLayerId, m_fPrevThickness);
 	
@@ -181,7 +180,7 @@ FontUndoCmd_LayerColors::FontUndoCmd_LayerColors(ProjectItem &itemRef, int iStat
 
 void FontUndoCmd_LayerColors::redo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 
 	pModel->SetLayerColors(m_iLayerId, m_NewTopColor, m_NewBotColor);
 
@@ -190,7 +189,7 @@ void FontUndoCmd_LayerColors::redo()
 
 void FontUndoCmd_LayerColors::undo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 
 	pModel->SetLayerColors(m_iLayerId, m_PrevTopColor, m_PrevBotColor);
 
@@ -220,7 +219,7 @@ FontUndoCmd_LayerOrder::FontUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateI
 
 void FontUndoCmd_LayerOrder::redo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
 	int iOffset = m_iNewRowIndex - m_iPrevRowIndex;
 	if(iOffset > 0)
@@ -233,7 +232,7 @@ void FontUndoCmd_LayerOrder::redo()
 
 void FontUndoCmd_LayerOrder::undo()
 {
-	FontStateLayersModel *pModel = static_cast<FontStateData *>(static_cast<FontModel *>(m_ItemRef.GetModel())->GetStateData(m_iStateIndex))->GetFontLayersModel();
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
 	int iOffset = m_iPrevRowIndex - m_iNewRowIndex;
 	if(iOffset > 0)

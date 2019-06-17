@@ -28,17 +28,19 @@ class TextLayersModel : public QAbstractTableModel
 
 	struct Layer
 	{
+		TextFontHandle				m_hFont;
+
 		uint						m_uiFontIndex;
 		glm::vec4					m_vBotColor;
 		glm::vec4					m_vTopColor;
 
 		Layer(uint uiFontIndex, glm::vec4 vBotColor, glm::vec4 vTopColor) :
+			m_hFont(TEXTFONTHANDLE_NotUsed),
 			m_uiFontIndex(uiFontIndex),
 			m_vBotColor(vBotColor),
 			m_vTopColor(vTopColor)
 		{ }
 	};
-
 	QList<Layer *>					m_LayerList;
 	QList<QPair<int, Layer *> >		m_RemovedLayerList;
 
