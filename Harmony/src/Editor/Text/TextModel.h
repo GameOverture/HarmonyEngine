@@ -23,12 +23,13 @@
 
 class TextStateData : public IStateData
 {
-	TextLayersModel			m_LayersModel;
+	static TextLayersModelId	sm_hHandleCount;
+	TextLayersModel				m_LayersModel;
 
-	float					m_fLeftSideNudgeAmt;
-	float					m_fLineAscender;
-	float					m_fLineDescender;
-	float					m_fLineHeight;
+	float						m_fLeftSideNudgeAmt;
+	float						m_fLineAscender;
+	float						m_fLineDescender;
+	float						m_fLineHeight;
 
 public:
 	TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
@@ -45,9 +46,9 @@ class TextModel : public IModel
 {
 	Q_OBJECT
 
-	TextFontManager			m_FontManager;
-	AtlasFrame *			m_pAtlasFrame;
-	QDataWidgetMapper		m_FontsWidgetMapper;
+	TextFontManager				m_FontManager;
+	AtlasFrame *				m_pAtlasFrame;
+	QDataWidgetMapper			m_FontsWidgetMapper;
 
 public:
 	TextModel(ProjectItem &itemRef, QJsonObject fontObj);

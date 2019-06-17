@@ -69,57 +69,57 @@ public:
 	void undo() override;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class FontUndoCmd_LayerOutlineThickness : public QUndoCommand
-{
-	ProjectItem &       m_ItemRef;
-	int                 m_iStateIndex;
-
-	int                 m_iLayerId;
-	float               m_fPrevThickness;
-	float               m_fNewThickness;
-
-public:
-	FontUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = 0);
-	virtual ~FontUndoCmd_LayerOutlineThickness();
-
-	void redo() override;
-	void undo() override;
-};
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class FontUndoCmd_LayerColors : public QUndoCommand
-{
-	ProjectItem &       m_ItemRef;
-	int                 m_iStateIndex;
-
-	int                 m_iLayerId;
-	QColor              m_PrevTopColor;
-	QColor              m_PrevBotColor;
-	QColor              m_NewTopColor;
-	QColor              m_NewBotColor;
-
-public:
-	FontUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent = 0);
-	virtual ~FontUndoCmd_LayerColors();
-
-	void redo() override;
-	void undo() override;
-};
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class FontUndoCmd_LayerOrder : public QUndoCommand
-{
-	ProjectItem &       m_ItemRef;
-	int                 m_iStateIndex;
-
-	FontTableView *     m_pFontTableView;
-	int                 m_iPrevRowIndex;
-	int                 m_iNewRowIndex;
-
-public:
-	FontUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, FontTableView *pTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent = 0);
-	virtual ~FontUndoCmd_LayerOrder();
-
-	void redo() override;
-	void undo() override;
-};
+//class TextUndoCmd_LayerOutlineThickness : public QUndoCommand
+//{
+//	ProjectItem &       m_ItemRef;
+//	int                 m_iStateIndex;
+//
+//	int                 m_iLayerId;
+//	float               m_fPrevThickness;
+//	float               m_fNewThickness;
+//
+//public:
+//	TextUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = 0);
+//	virtual ~TextUndoCmd_LayerOutlineThickness();
+//
+//	void redo() override;
+//	void undo() override;
+//};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//class TextUndoCmd_LayerColors : public QUndoCommand
+//{
+//	ProjectItem &       m_ItemRef;
+//	int                 m_iStateIndex;
+//
+//	int                 m_iLayerId;
+//	QColor              m_PrevTopColor;
+//	QColor              m_PrevBotColor;
+//	QColor              m_NewTopColor;
+//	QColor              m_NewBotColor;
+//
+//public:
+//	TextUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent = 0);
+//	virtual ~TextUndoCmd_LayerColors();
+//
+//	void redo() override;
+//	void undo() override;
+//};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//class TextUndoCmd_LayerOrder : public QUndoCommand
+//{
+//	ProjectItem &       m_ItemRef;
+//	int                 m_iStateIndex;
+//
+//	FontTableView *     m_pFontTableView;
+//	int                 m_iPrevRowIndex;
+//	int                 m_iNewRowIndex;
+//
+//public:
+//	TextUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, FontTableView *pTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent = 0);
+//	virtual ~TextUndoCmd_LayerOrder();
+//
+//	void redo() override;
+//	void undo() override;
+//};
 
 #endif // TEXTUNDOCMDS_H

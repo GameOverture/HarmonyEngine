@@ -7,8 +7,8 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IMODELTREEITEM_H
-#define IMODELTREEITEM_H
+#ifndef TREEMODELITEM_H
+#define TREEMODELITEM_H
 
 #include "Global.h"
 
@@ -42,4 +42,4 @@ public:
 	bool removeColumns(int iPosition, int iColumns);
 };
 
-#endif // IMODELTREEITEM_H
+#endif // TREEMODELITEM_H

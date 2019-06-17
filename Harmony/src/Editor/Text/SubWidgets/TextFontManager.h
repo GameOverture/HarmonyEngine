@@ -15,24 +15,30 @@
 
 #include <QFileInfo>
 
+typedef int TextLayerHandle;
 typedef int TextFontHandle;
-#define TEXTFONTHANDLE_NotUsed -1
+#define TEXTHANDLE_NotUsed -1
 
 class TextFontManager
 {
 	PropertiesTreeModel		m_GlyphsModel;
+
+	// NOTE: 'm_FontArray' is always kept up to date with any modifications. All non-glyph accessors utilize 'm_FontArray' when
+	//       returning data. This "copy" of data is required so that not every Text model would need to generate a 'texture_atlas_t' and 'texture_font_t's
 	QJsonArray				m_FontArray;
 
-	texture_atlas_t *		m_pAtlas;
+	QMap<TextLayerHandle, QPair<TextFontHandle, uint>>	m_LayerToFontMap;
 
-	class TextFont
+	texture_atlas_t *		m_pPreviewAtlas;
+
+	class PreviewFont
 	{
 		QFileInfo			m_FontFileInfo;
 		texture_font_t *	m_pTextureFont;
 		size_t				m_uiMissedGlyphs;
 
 	public:
-		TextFont(texture_atlas_t *pFtglAtlas, QString sGlyphs, QString sFontFilePath, float fSize, float fThickness, rendermode_t eMode) :
+		PreviewFont(texture_atlas_t *pFtglAtlas, QString sGlyphs, QString sFontFilePath, float fSize, float fThickness, rendermode_t eMode) :
 			m_FontFileInfo(sFontFilePath),
 			m_pTextureFont(nullptr),
 			m_uiMissedGlyphs(0)
@@ -50,12 +56,12 @@ class TextFontManager
 
 			m_uiMissedGlyphs = texture_font_load_glyphs(m_pTextureFont, sGlyphs.toUtf8().data());
 		}
-		~TextFont()
+		~PreviewFont()
 		{
 			texture_font_delete(m_pTextureFont);
 		}
 
-		//bool (const TextFont &rightRef)
+		//bool (const PreviewFont &rightRef)
 		//{
 		//	return m_FontFileInfo.baseName().compare(rightRef.m_FontFileInfo.baseName(), Qt::CaseInsensitive) == 0 &&
 		//		m_pTextureFont->size == rightRef.m_pTextureFont->size &&
@@ -63,16 +69,23 @@ class TextFontManager
 		//		m_pTextureFont->rendermode == rightRef.m_pTextureFont->rendermode;
 		//}
 	};
-	QList<TextFont *>		m_FontList;
+	QList<PreviewFont *>		m_PreviewFontList;
 
 public:
 	TextFontManager(ProjectItem &itemRef, QJsonObject availableGlyphsObj, QJsonArray fontArray);
 	~TextFontManager();
 
+	TextFontHandle RegisterLayer(TextLayerHandle hLayerModel, uint uiFontIndex);
+
 	QJsonObject GetAvailableGlyphsObject() const;
 	QJsonArray GetFontArray() const;
 
+
+	rendermode_t GetRenderMode(uint uiFontIndex);
+	float GetOutlineThickness(uint uiFontIndex);
+
 	TextFontHandle AcquireFont(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
+
 
 	PropertiesTreeModel *GetGlyphsModel();
 

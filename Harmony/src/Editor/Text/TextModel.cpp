@@ -12,9 +12,11 @@
 #include "Project.h"
 #include "ExplorerModel.h"
 
+TextLayersModelId TextStateData::sm_hHandleCount = 0;
+
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
 	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
-	m_LayersModel(stateObj["layers"].toArray(), static_cast<TextModel &>(modelRef).GetFontManager(), &modelRef),
+	m_LayersModel(sm_hHandleCount, stateObj["layers"].toArray(), static_cast<TextModel &>(modelRef).GetFontManager(), &modelRef),
 	m_fLeftSideNudgeAmt(stateObj["leftSideNudgeAmt"].toDouble()),
 	m_fLineAscender(stateObj["lineAscender"].toDouble()),
 	m_fLineDescender(stateObj["lineDescender"].toDouble()),

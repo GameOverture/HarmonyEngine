@@ -25,7 +25,7 @@ TextLayersWidget::TextLayersWidget(QWidget *pParent /*= nullptr*/) :
 	iWidth -= 144;
 	setColumnWidth(TextLayersModel::COLUMN_Type, iWidth);
 	setColumnWidth(TextLayersModel::COLUMN_Thickness, 64);
-	setColumnWidth(TextLayersModel::COLUMN_DefaultColor, 80);
+	setColumnWidth(TextLayersModel::COLUMN_Color, 80);
 
 	QTableView::resizeEvent(pResizeEvent);
 }
