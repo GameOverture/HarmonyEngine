@@ -62,8 +62,8 @@ class TextUndoCmd_LayerRenderMode : public QUndoCommand
 	rendermode_t			m_eNewRenderMode;
 
 public:
-	FontUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = nullptr);
-	virtual ~FontUndoCmd_LayerRenderMode();
+	TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = nullptr);
+	virtual ~TextUndoCmd_LayerRenderMode();
 
 	void redo() override;
 	void undo() override;
