@@ -12,11 +12,9 @@
 #include "Project.h"
 #include "ExplorerModel.h"
 
-TextLayersModelId TextStateData::sm_hHandleCount = 0;
-
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
 	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
-	m_LayersModel(sm_hHandleCount, stateObj["layers"].toArray(), static_cast<TextModel &>(modelRef).GetFontManager(), &modelRef),
+	m_LayersModel(static_cast<TextModel &>(modelRef).GetFontManager(), static_cast<TextModel &>(modelRef).GetFontManager().RegisterLayers(stateObj["layers"].toArray()), &modelRef),
 	m_fLeftSideNudgeAmt(stateObj["leftSideNudgeAmt"].toDouble()),
 	m_fLineAscender(stateObj["lineAscender"].toDouble()),
 	m_fLineDescender(stateObj["lineDescender"].toDouble()),
@@ -156,7 +154,20 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 {
 	QJsonObject textObj;
 
-	QJsonObject availableGlyphsObj = m_FontManager.GetAvailableGlyphsObject();
+	const PropertiesTreeModel *pGlyphsModel = m_FontManager.GetGlyphsModel();
+
+	QJsonObject availableGlyphsObj;
+	QVariant propValue;
+	propValue = pGlyphsModel->FindPropertyValue("Uses Glyphs", TEXTPROP_09);
+	availableGlyphsObj.insert("0-9", static_cast<bool>(propValue.toInt() == Qt::Checked));
+	propValue = pGlyphsModel->FindPropertyValue("Uses Glyphs", TEXTPROP_az);
+	availableGlyphsObj.insert("a-z", static_cast<bool>(propValue.toInt() == Qt::Checked));
+	propValue = pGlyphsModel->FindPropertyValue("Uses Glyphs", TEXTPROP_AZ);
+	availableGlyphsObj.insert("A-Z", static_cast<bool>(propValue.toInt() == Qt::Checked));
+	propValue = pGlyphsModel->FindPropertyValue("Uses Glyphs", TEXTPROP_Symbols);
+	availableGlyphsObj.insert("symbols", static_cast<bool>(propValue.toInt() == Qt::Checked));
+	propValue = pGlyphsModel->FindPropertyValue("Uses Glyphs", TEXTPROP_AdditionalSyms);
+	availableGlyphsObj.insert("additional", propValue.toString());
 	textObj.insert("availableGlyphs", availableGlyphsObj);
 
 	textObj.insert("checksum", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetImageChecksum())));

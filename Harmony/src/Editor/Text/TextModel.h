@@ -21,9 +21,16 @@
 #include <QObject>
 #include <QJsonArray>
 
+#define TEXTPROP_Dimensions "Dimensions"
+#define TEXTPROP_UsedPercent "Used Percent"
+#define TEXTPROP_09 "0-9"
+#define TEXTPROP_AZ "A-Z"
+#define TEXTPROP_az "a-z"
+#define TEXTPROP_Symbols "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@"
+#define TEXTPROP_AdditionalSyms "Additional glyphs"
+
 class TextStateData : public IStateData
 {
-	static TextLayersModelId	sm_hHandleCount;
 	TextLayersModel				m_LayersModel;
 
 	float						m_fLeftSideNudgeAmt;

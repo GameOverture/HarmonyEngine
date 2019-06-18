@@ -37,7 +37,7 @@ void TextUndoCmd_AddLayer::redo()
 	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
 	if(m_hFont == TEXTHANDLE_NotUsed)
-		m_hFont = pModel->AddNewLayer(m_sFontName, m_eRenderMode, m_fSize, m_fThickness);
+		m_hFont = pModel->AddNewLayer(m_sFontName, m_eRenderMode, m_fThickness, m_fSize);
 	else
 		pModel->ReAddLayer(m_hFont);
 

@@ -9,16 +9,12 @@
 *************************************************************************/
 #include "Global.h"
 #include "TextFontManager.h"
+#include "TextModel.h"
 #include "Project.h"
 
-#define TEXTPROP_Dimensions "Dimensions"
-#define TEXTPROP_UsedPercent "Used Percent"
-#define TEXTPROP_09 "0-9"
-#define TEXTPROP_AZ "A-Z"
-#define TEXTPROP_az "a-z"
-#define TEXTPROP_Symbols "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@"
-#define TEXTPROP_AdditionalSyms "Additional glyphs"
 #define TEXTFONTMANAGER_AtlasSize 2048, 2048
+
+TextLayerHandle TextFontManager::sm_hHandleCount = 0;
 
 TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsObj, QJsonArray fontArray) :
 	m_FontArray(fontArray),
@@ -54,38 +50,50 @@ TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsOb
 
 TextFontManager::~TextFontManager()
 {
+	for(auto iter = m_LayerMap.begin(); iter != m_LayerMap.end(); ++iter)
+		delete iter.value();
+
 	for(int i = 0; i < m_PreviewFontList.size(); ++i)
 		delete m_PreviewFontList[i];
 
 	texture_atlas_delete(m_pPreviewAtlas);
 }
 
-TextFontHandle TextFontManager::RegisterLayer(TextLayerHandle hLayer, uint uiFontIndex)
+PropertiesTreeModel *TextFontManager::GetGlyphsModel()
 {
-
+	return &m_GlyphsModel;
 }
 
-QJsonObject TextFontManager::GetAvailableGlyphsObject() const
+const PropertiesTreeModel *TextFontManager::GetGlyphsModel() const
 {
-	QJsonObject availableGlyphsObj;
-	QVariant propValue;
+	return &m_GlyphsModel;
+}
 
-	propValue = m_GlyphsModel.FindPropertyValue("Uses Glyphs", TEXTPROP_09);
-	availableGlyphsObj.insert("0-9", static_cast<bool>(propValue.toInt() == Qt::Checked));
+QList<TextLayerHandle> TextFontManager::RegisterLayers(QJsonArray layerArray)
+{
+	QList<TextLayerHandle> retLayerHandleList;
+	for(int i = 0; i < layerArray.size(); ++i)
+	{
+		QJsonObject layerObj = layerArray[i].toObject();
 
-	propValue = m_GlyphsModel.FindPropertyValue("Uses Glyphs", TEXTPROP_az);
-	availableGlyphsObj.insert("a-z", static_cast<bool>(propValue.toInt() == Qt::Checked));
+		glm::vec4 vBotColor;
+		vBotColor.r = layerObj["botR"].toDouble();
+		vBotColor.g = layerObj["botG"].toDouble();
+		vBotColor.b = layerObj["botB"].toDouble();
+		glm::vec4 vTopColor;
+		vTopColor.r = layerObj["topR"].toDouble();
+		vTopColor.g = layerObj["topG"].toDouble();
+		vTopColor.b = layerObj["topB"].toDouble();
 
-	propValue = m_GlyphsModel.FindPropertyValue("Uses Glyphs", TEXTPROP_AZ);
-	availableGlyphsObj.insert("A-Z", static_cast<bool>(propValue.toInt() == Qt::Checked));
+		uint32 uiFontIndex = layerObj["typefaceIndex"].toInt();
 
-	propValue = m_GlyphsModel.FindPropertyValue("Uses Glyphs", TEXTPROP_Symbols);
-	availableGlyphsObj.insert("symbols", static_cast<bool>(propValue.toInt() == Qt::Checked));
+		TextLayerHandle hNewLayer = ++sm_hHandleCount;
+		m_LayerMap[hNewLayer] = new Layer(hNewLayer, uiFontIndex, vBotColor, vTopColor);
 
-	propValue = m_GlyphsModel.FindPropertyValue("Uses Glyphs", TEXTPROP_AdditionalSyms);
-	availableGlyphsObj.insert("additional", propValue.toString());
+		retLayerHandleList.append(hNewLayer);
+	}
 
-	return availableGlyphsObj;
+	return retLayerHandleList;
 }
 
 QJsonArray TextFontManager::GetFontArray() const
@@ -117,98 +125,144 @@ float TextFontManager::GetOutlineThickness(uint uiFontIndex)
 	return static_cast<float>(fontObj["outlineThickness"].toDouble());
 }
 
-TextFontHandle TextFontManager::AcquireFont(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness)
+TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
-	for(int i = 0; i < m_PreviewFontList.size(); ++i)
+	// If font already exists, don't generate preview
+	for(int i = 0; i < m_FontArray.size(); ++i)
 	{
-		//m_PreviewFontList[i]
-	}
-}
+		QJsonObject fontObj = m_FontArray[i].toObject();
+		
+		if(fontObj["font"].toString().compare(sFontName, Qt::CaseInsensitive) == 0 &&
+			fontObj["mode"].toInt() == eRenderMode &&
+			HyCompareFloat(fontObj["outlineThickness"].toDouble(), static_cast<double>(fOutlineThickness)) &&
+			HyCompareFloat(fontObj["size"].toDouble(), static_cast<double>(fSize)))
+		{
+			TextLayerHandle hNewLayer = ++sm_hHandleCount;
+			m_LayerMap[hNewLayer] = new Layer(hNewLayer, i, glm::vec3(0.0f), glm::vec3(0.0f));
 
-PropertiesTreeModel *TextFontManager::GetGlyphsModel()
-{
-	return &m_GlyphsModel;
+			return hNewLayer;
+		}
+	}
+
+	PrepPreview();
+	{
+		QList<QStandardItem *> foundFontList = m_GlyphsModel.GetOwner().GetProject().GetFontListModel()->findItems(sFontName);
+		if(foundFontList.size() == 1)
+		{
+			PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
+														   GetAvailableTypefaceGlyphs(),
+														   foundFontList[0]->data().toString(),
+														   fSize,
+														   fOutlineThickness,
+														   eRenderMode);
+			if(pNewPreviewFont->GetMissedGlyphs() != 0)
+				HyGuiLog("PrepPreview could not create all preview fonts", LOGTYPE_Error);
+
+			m_PreviewFontList.append(pNewPreviewFont);
+		}
+	}
+	RegenFontArray();
 }
 
 void TextFontManager::PrepPreview()
 {
-	QStandardItemModel *pFontListModel = m_GlyphsModel.GetOwner().GetProject().GetFontListModel();
-	QString sAvailGlyphs = GetAvailableTypefaceGlyphs();
-	m_pPreviewAtlas = texture_atlas_new(TEXTFONTMANAGER_AtlasSize, 1);
-	for(int i = 0; i < m_FontArray.size(); ++i)
+	if(m_pPreviewAtlas == nullptr)
 	{
-		QJsonObject fontObj = m_FontArray[i].toObject();
+		m_pPreviewAtlas = texture_atlas_new(TEXTFONTMANAGER_AtlasSize, 1);
 
-		QList<QStandardItem *> foundFontList = pFontListModel->findItems(fontObj["font"].toString());
-		if(foundFontList.size() == 1)
-			m_PreviewFontList.append(new PreviewFont(m_pPreviewAtlas,
-				sAvailGlyphs,
-				foundFontList[0]->data().toString(),
-				fontObj["size"].toDouble(),
-				fontObj["outlineThickness"].toDouble(),
-				static_cast<rendermode_t>(fontObj["mode"].toInt())));
+		QString sAvailGlyphs = GetAvailableTypefaceGlyphs();
+		QStandardItemModel *pFontListModel = m_GlyphsModel.GetOwner().GetProject().GetFontListModel();
+
+		if(m_PreviewFontList.isEmpty() == false)
+		{
+			HyGuiLog("PrepPreview has uncleared fonts in 'm_PreviewFontList'", LOGTYPE_Error);
+			m_PreviewFontList.clear();
+		}
+		for(int i = 0; i < m_FontArray.size(); ++i)
+		{
+			QJsonObject fontObj = m_FontArray[i].toObject();
+
+			QList<QStandardItem *> foundFontList = pFontListModel->findItems(fontObj["font"].toString());
+			if(foundFontList.size() == 1)
+			{
+				PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
+																sAvailGlyphs,
+																foundFontList[0]->data().toString(),
+																fontObj["size"].toDouble(),
+																fontObj["outlineThickness"].toDouble(),
+																static_cast<rendermode_t>(fontObj["mode"].toInt()));
+				if(pNewPreviewFont->GetMissedGlyphs() != 0)
+					HyGuiLog("PrepPreview could not create all preview fonts", LOGTYPE_Error);
+
+				m_PreviewFontList.append(pNewPreviewFont);
+			}
+		}
 	}
 }
 
 void TextFontManager::RegenFontArray()
 {
+	QString sAvailGlyphs = GetAvailableTypefaceGlyphs();
+
 	QJsonArray fontArray;
-	//for(int i = 0; i < m_MasterLayerList.count(); ++i)
-	//{
-	//	QJsonObject stageObj;
-	//	QFileInfo fontFileInfo(m_MasterLayerList[i]->pTextureFont->filename);
+	for(int i = 0; i < m_PreviewFontList.count(); ++i)
+	{
+		texture_font_t *pFtglFont = m_PreviewFontList[i]->GetTextureFont();
 
-	//	stageObj.insert("font", fontFileInfo.fileName());
-	//	stageObj.insert("size", m_MasterLayerList[i]->fSize);
-	//	stageObj.insert("mode", m_MasterLayerList[i]->eMode);
-	//	stageObj.insert("outlineThickness", m_MasterLayerList[i]->fOutlineThickness);
+		QJsonObject stageObj;
+		QFileInfo fontFileInfo(pFtglFont->filename);
 
-	//	QJsonArray glyphsArray;
-	//	for(int j = 0; j < sAvailableTypefaceGlyphs.count(); ++j)
-	//	{
-	//		// NOTE: Assumes LITTLE ENDIAN
-	//		QString sSingleChar = sAvailableTypefaceGlyphs[j];
-	//		texture_glyph_t *pGlyph = texture_font_get_glyph(m_MasterLayerList[i]->pTextureFont, sSingleChar.toUtf8().data());
+		stageObj.insert("font", fontFileInfo.fileName());
+		stageObj.insert("size", pFtglFont->size);
+		stageObj.insert("mode", pFtglFont->rendermode);
+		stageObj.insert("outlineThickness", pFtglFont->outline_thickness);
 
-	//		QJsonObject glyphInfoObj;
-	//		if(pGlyph == nullptr)
-	//		{
-	//			HyGuiLog("Could not find glyph: '" % sSingleChar % "'\nPlace a breakpoint and walk into texture_font_get_glyph() below before continuing", LOGTYPE_Error);
+		QJsonArray glyphsArray;
+		for(int j = 0; j < sAvailGlyphs.count(); ++j)
+		{
+			// NOTE: Assumes LITTLE ENDIAN
+			QString sSingleChar = sAvailGlyphs[j];
+			texture_glyph_t *pGlyph = texture_font_get_glyph(pFtglFont, sSingleChar.toUtf8().data());
 
-	//			pGlyph = texture_font_get_glyph(m_MasterLayerList[i]->pTextureFont, sSingleChar.toUtf8().data());
-	//		}
-	//		else
-	//		{
-	//			glyphInfoObj.insert("code", QJsonValue(static_cast<qint64>(pGlyph->codepoint)));
-	//			glyphInfoObj.insert("advance_x", pGlyph->advance_x);
-	//			glyphInfoObj.insert("advance_y", pGlyph->advance_y);
-	//			glyphInfoObj.insert("width", static_cast<int>(pGlyph->width));
-	//			glyphInfoObj.insert("height", static_cast<int>(pGlyph->height));
-	//			glyphInfoObj.insert("offset_x", pGlyph->offset_x);
-	//			glyphInfoObj.insert("offset_y", pGlyph->offset_y);
-	//			glyphInfoObj.insert("left", pGlyph->s0);
-	//			glyphInfoObj.insert("top", pGlyph->t0);
-	//			glyphInfoObj.insert("right", pGlyph->s1);
-	//			glyphInfoObj.insert("bottom", pGlyph->t1);
-	//		}
+			QJsonObject glyphInfoObj;
+			if(pGlyph == nullptr)
+			{
+				HyGuiLog("Could not find glyph: '" % sSingleChar % "'\nPlace a breakpoint and walk into texture_font_get_glyph() below before continuing", LOGTYPE_Error);
+				pGlyph = texture_font_get_glyph(pFtglFont, sSingleChar.toUtf8().data());
+			}
+			else
+			{
+				glyphInfoObj.insert("code", QJsonValue(static_cast<qint64>(pGlyph->codepoint)));
+				glyphInfoObj.insert("advance_x", pGlyph->advance_x);
+				glyphInfoObj.insert("advance_y", pGlyph->advance_y);
+				glyphInfoObj.insert("width", static_cast<int>(pGlyph->width));
+				glyphInfoObj.insert("height", static_cast<int>(pGlyph->height));
+				glyphInfoObj.insert("offset_x", pGlyph->offset_x);
+				glyphInfoObj.insert("offset_y", pGlyph->offset_y);
+				glyphInfoObj.insert("left", pGlyph->s0);
+				glyphInfoObj.insert("top", pGlyph->t0);
+				glyphInfoObj.insert("right", pGlyph->s1);
+				glyphInfoObj.insert("bottom", pGlyph->t1);
+			}
 
-	//		QJsonObject kerningInfoObj;
-	//		for(int k = 0; k < sAvailableTypefaceGlyphs.count(); ++k)
-	//		{
-	//			char cTmpChar = sAvailableTypefaceGlyphs.toStdString().c_str()[k];
-	//			float fKerningAmt = texture_glyph_get_kerning(pGlyph, &cTmpChar);
+#if 0		// Not using kerning data
+			QJsonObject kerningInfoObj;
+			for(int k = 0; k < sAvailableTypefaceGlyphs.count(); ++k)
+			{
+				char cTmpChar = sAvailableTypefaceGlyphs.toStdString().c_str()[k];
+				float fKerningAmt = texture_glyph_get_kerning(pGlyph, &cTmpChar);
 
-	//			if(fKerningAmt != 0.0f)
-	//				kerningInfoObj.insert(QString(sAvailableTypefaceGlyphs[k]), fKerningAmt);
-	//		}
-	//		glyphInfoObj.insert("kerning", kerningInfoObj);
+				if(fKerningAmt != 0.0f)
+					kerningInfoObj.insert(QString(sAvailableTypefaceGlyphs[k]), fKerningAmt);
+			}
+			glyphInfoObj.insert("kerning", kerningInfoObj);
+#endif
+			glyphsArray.append(glyphInfoObj);
+		}
+		stageObj.insert("glyphs", glyphsArray);
 
-	//		glyphsArray.append(glyphInfoObj);
-	//	}
-	//	stageObj.insert("glyphs", glyphsArray);
-
-	//	fontArray.append(QJsonValue(stageObj));
-	//}
+		fontArray.append(QJsonValue(stageObj));
+	}
 
 	m_FontArray = fontArray;
 }

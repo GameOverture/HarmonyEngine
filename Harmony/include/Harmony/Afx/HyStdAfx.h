@@ -132,7 +132,7 @@ enum HyTextureFormat
 	HYTEXTURE_DTX3,
 	HYTEXTURE_DTX5,
 
-	HYNUMTEXTUREFORMATS
+	HYNUM_TEXTUREFORMATS
 };
 
 enum HyTextureFiltering
@@ -171,7 +171,7 @@ enum HyShaderType
 	HYSHADER_TessControl,
 	HYSHADER_TessEvaluation,
 
-	HYNUMSHADERTYPES
+	HYNUM_SHADERTYPES
 };
 
 enum class HyShaderVariable : uint32

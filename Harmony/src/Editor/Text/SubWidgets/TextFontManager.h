@@ -16,30 +16,42 @@
 #include <QFileInfo>
 
 typedef int TextLayerHandle;
-typedef int TextFontHandle;
-#define TEXTHANDLE_NotUsed -1
 
 class TextFontManager
 {
-	PropertiesTreeModel		m_GlyphsModel;
+	static TextLayerHandle			sm_hHandleCount;
+	PropertiesTreeModel				m_GlyphsModel;
 
-	// NOTE: 'm_FontArray' is always kept up to date with any modifications. All non-glyph accessors utilize 'm_FontArray' when
-	//       returning data. This "copy" of data is required so that not every Text model would need to generate a 'texture_atlas_t' and 'texture_font_t's
-	QJsonArray				m_FontArray;
+	// NOTE: 'm_FontArray' must always be kept up to date with any modifications. All layer-queried accessors utilize 'm_FontArray' when
+	//       returning data. If any data changes then the generated preview 'texture_atlas_t'/'texture_font_t' must be used to create a new 'm_FontArray'
+	QJsonArray						m_FontArray;
 
-	QMap<TextLayerHandle, QPair<TextFontHandle, uint>>	m_LayerToFontMap;
+	struct Layer
+	{
+		const TextLayerHandle		m_hUNIQUE_ID;
 
-	texture_atlas_t *		m_pPreviewAtlas;
+		uint						m_uiFontIndex;
+		glm::vec3					m_vBotColor;
+		glm::vec3					m_vTopColor;
+
+		Layer(TextLayerHandle m_hUniqueId, uint uiFontIndex, glm::vec3 vBotColor, glm::vec3 vTopColor) :
+			m_hUNIQUE_ID(m_hUniqueId),
+			m_uiFontIndex(uiFontIndex),
+			m_vBotColor(vBotColor),
+			m_vTopColor(vTopColor)
+		{ }
+	};
+	QMap<TextLayerHandle, Layer *>	m_LayerMap;
+
+	texture_atlas_t *				m_pPreviewAtlas;
 
 	class PreviewFont
 	{
-		QFileInfo			m_FontFileInfo;
-		texture_font_t *	m_pTextureFont;
-		size_t				m_uiMissedGlyphs;
+		texture_font_t *			m_pTextureFont;
+		size_t						m_uiMissedGlyphs;
 
 	public:
 		PreviewFont(texture_atlas_t *pFtglAtlas, QString sGlyphs, QString sFontFilePath, float fSize, float fThickness, rendermode_t eMode) :
-			m_FontFileInfo(sFontFilePath),
 			m_pTextureFont(nullptr),
 			m_uiMissedGlyphs(0)
 		{
@@ -61,6 +73,14 @@ class TextFontManager
 			texture_font_delete(m_pTextureFont);
 		}
 
+		texture_font_t *GetTextureFont() {
+			return m_pTextureFont;
+		}
+
+		size_t GetMissedGlyphs() {
+			return m_uiMissedGlyphs;
+		}
+
 		//bool (const PreviewFont &rightRef)
 		//{
 		//	return m_FontFileInfo.baseName().compare(rightRef.m_FontFileInfo.baseName(), Qt::CaseInsensitive) == 0 &&
@@ -75,19 +95,16 @@ public:
 	TextFontManager(ProjectItem &itemRef, QJsonObject availableGlyphsObj, QJsonArray fontArray);
 	~TextFontManager();
 
-	TextFontHandle RegisterLayer(TextLayerHandle hLayerModel, uint uiFontIndex);
+	PropertiesTreeModel *GetGlyphsModel();
+	const PropertiesTreeModel *GetGlyphsModel() const;
 
-	QJsonObject GetAvailableGlyphsObject() const;
+	QList<TextLayerHandle> RegisterLayers(QJsonArray layerArray);
 	QJsonArray GetFontArray() const;
-
 
 	rendermode_t GetRenderMode(uint uiFontIndex);
 	float GetOutlineThickness(uint uiFontIndex);
 
-	TextFontHandle AcquireFont(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
-
-
-	PropertiesTreeModel *GetGlyphsModel();
+	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 
 private:
 	void PrepPreview();

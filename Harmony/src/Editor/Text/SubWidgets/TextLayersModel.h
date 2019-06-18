@@ -24,8 +24,6 @@ class TextLayersModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
-	static TextLayerHandle			sm_hHandleCount;
-
 	enum Column
 	{
 		COLUMN_Type = 0,
@@ -35,37 +33,20 @@ class TextLayersModel : public QAbstractTableModel
 		NUMCOLUMNS
 	};
 
-	TextFontManager &				m_FontManagerRef;
+	TextFontManager &					m_FontManagerRef;
 
-	struct Layer
-	{
-		const TextLayerHandle		m_hUNIQUE_ID;
-		TextFontHandle				m_hFont;
-
-		uint						m_uiFontIndex;
-		glm::vec4					m_vBotColor;
-		glm::vec4					m_vTopColor;
-
-		Layer(TextLayerHandle m_hUniqueId, uint uiFontIndex, glm::vec4 vBotColor, glm::vec4 vTopColor) :
-			m_hUNIQUE_ID(m_hUniqueId),
-			m_hFont(TEXTHANDLE_NotUsed),
-			m_uiFontIndex(uiFontIndex),
-			m_vBotColor(vBotColor),
-			m_vTopColor(vTopColor)
-		{ }
-	};
-	QList<Layer *>					m_LayerList;
-	QList<QPair<int, Layer *> >		m_RemovedLayerList;
+	QList<TextLayerHandle>				m_LayerList;
+	QList<QPair<int, TextLayerHandle> >	m_RemovedLayerList;
 
 public:
-	TextLayersModel(QJsonArray layerArray, TextFontManager &fontManagerRef, QObject *parent);
+	TextLayersModel(TextFontManager &fontManagerRef, const QList<TextLayerHandle> &layerList, QObject *pParent);
 	virtual ~TextLayersModel();
 
 	QJsonArray GetLayersArray();
 
-	TextFontHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness);
-	void RemoveLayer(TextFontHandle hHandle);
-	void ReAddLayer(TextFontHandle hHandle);
+	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
+	void RemoveLayer(TextLayerHandle hHandle);
+	void ReAddLayer(TextLayerHandle hHandle);
 
 	//int GetLayerId(int iRowIndex) const;
 	////FontTypeface *GetStageRef(int iRowIndex);

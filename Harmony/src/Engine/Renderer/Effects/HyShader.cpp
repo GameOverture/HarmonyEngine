@@ -20,7 +20,7 @@ HyShader::HyShader(HyShaderProgramDefaults eDefaultsFrom) :
 	m_bIsFinalized(false),
 	m_uiStride(0)
 {
-	for(int i = 0; i < HYNUMSHADERTYPES; ++i)
+	for(int i = 0; i < HYNUM_SHADERTYPES; ++i)
 		m_sSourceCode[i].clear();
 }
 

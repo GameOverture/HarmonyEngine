@@ -12,32 +12,11 @@
 #include "Project.h"
 #include "ExplorerModel.h"
 
-TextLayerHandle TextLayersModel::sm_hHandleCount = 0;
-
-TextLayersModel::TextLayersModel(QJsonArray layerArray, TextFontManager &fontManagerRef, QObject *parent) :
-	QAbstractTableModel(parent),
-	m_FontManagerRef(fontManagerRef)
+TextLayersModel::TextLayersModel(TextFontManager &fontManagerRef, const QList<TextLayerHandle> &layerList, QObject *pParent) :
+	QAbstractTableModel(pParent),
+	m_FontManagerRef(fontManagerRef),
+	m_LayerList(layerList)
 {
-	for(int i = 0; i < layerArray.size(); ++i)
-	{
-		QJsonObject layerObj = layerArray[i].toObject();
-
-		glm::vec4 vBotColor;
-		vBotColor.r = layerObj["botR"].toDouble();
-		vBotColor.g = layerObj["botG"].toDouble();
-		vBotColor.b = layerObj["botB"].toDouble();
-		glm::vec4 vTopColor;
-		vTopColor.r = layerObj["topR"].toDouble();
-		vTopColor.g = layerObj["topG"].toDouble();
-		vTopColor.b = layerObj["topB"].toDouble();
-
-		uint32 uiFontIndex = layerObj["typefaceIndex"].toInt();
-		Layer *pNewLayer = new Layer(sm_hHandleCount++, uiFontIndex, vBotColor, vTopColor);
-
-		pNewLayer->m_hFont = m_FontManagerRef.RegisterLayer(pNewLayer->m_hUNIQUE_ID, uiFontIndex);
-
-		m_LayerList.append(pNewLayer);
-	}
 }
 
 /*virtual*/ TextLayersModel::~TextLayersModel()
@@ -64,11 +43,9 @@ QJsonArray TextLayersModel::GetLayersArray()
 	return layersArray;
 }
 
-TextFontHandle TextLayersModel::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fSize, float fOutlineThickness)
+TextLayerHandle TextLayersModel::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
-	// Prep manip fonts
-
-	TextFontHandle hReturnHandle = m_FontManagerRef.AcquireFont(sFontName, eRenderMode, fSize, fOutlineThickness);
+	TextLayerHandle hReturnHandle = m_FontManagerRef.AddNewLayer(sFontName, eRenderMode, fOutlineThickness, fSize);
 	Layer *pLayer = new Layer( hReturnHandle);
 
 	int iRowIndex = m_LayerList.count();
@@ -79,7 +56,7 @@ TextFontHandle TextLayersModel::AddNewLayer(QString sFontName, rendermode_t eRen
 	return hReturnHandle;
 }
 
-void TextLayersModel::RemoveLayer(TextFontHandle hHandle)
+void TextLayersModel::RemoveLayer(TextLayerHandle hHandle)
 {
 	for(int i = 0; i < m_LayerList.count(); ++i)
 	{
@@ -93,7 +70,7 @@ void TextLayersModel::RemoveLayer(TextFontHandle hHandle)
 	}
 }
 
-void TextLayersModel::ReAddLayer(TextFontHandle hHandle)
+void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 {
 	for(int i = 0; i < m_RemovedLayerList.count(); ++i)
 	{

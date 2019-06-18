@@ -38,7 +38,7 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObjec
 	ui->sbTextureHeight->setValue(m_InitialPackerSettingsObj["sbTextureHeight"].toInt());
 	ui->cmbHeuristic->setCurrentIndex(m_InitialPackerSettingsObj["cmbHeuristic"].toInt());
 	
-	for(int i = 0; i < HYNUMTEXTUREFORMATS; ++i)
+	for(int i = 0; i < HYNUM_TEXTUREFORMATS; ++i)
 		ui->cmbTextureType->addItem(HyGlobal::AtlasTextureTypeString(static_cast<HyTextureFormat>(i)));
 	
 	ui->cmbTextureType->setCurrentIndex(m_InitialPackerSettingsObj["textureType"].toInt());
