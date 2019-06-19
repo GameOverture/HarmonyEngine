@@ -107,19 +107,17 @@ TextUndoCmd_LayerRenderMode::TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, i
 void TextUndoCmd_LayerRenderMode::redo()
 {
 	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->setData(pModel->GetIndex(m_hLayer, TextLayersModel::COLUMN_Mode), m_eNewRenderMode);
 	
-	pModel->setData(m_hLayer, m_eNewRenderMode);
-	
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
 }
 
 void TextUndoCmd_LayerRenderMode::undo()
 {
 	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->setData(pModel->GetIndex(m_hLayer, TextLayersModel::COLUMN_Mode), m_ePrevRenderMode);
 	
-	pModel->SetLayerRenderMode(m_hLayer, m_ePrevRenderMode);
-	
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

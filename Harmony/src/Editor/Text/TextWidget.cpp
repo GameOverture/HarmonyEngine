@@ -80,7 +80,7 @@ TextWidget::~TextWidget()
 void TextWidget::on_cmbFont_currentIndexChanged(int index)
 {
 }
-//,
+
 //RENDER_OUTLINE_EDGE,
 //RENDER_OUTLINE_POSITIVE,
 //RENDER_OUTLINE_NEGATIVE,

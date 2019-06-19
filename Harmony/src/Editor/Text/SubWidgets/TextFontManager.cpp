@@ -101,6 +101,31 @@ QJsonArray TextFontManager::GetFontArray() const
 	return m_FontArray;
 }
 
+uint TextFontManager::GetFontIndex(TextLayerHandle hLayer)
+{
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
+	{
+		HyGuiLog("TextFontManager::GetFontIndex passed an invalid handle", LOGTYPE_Error);
+		return 0;
+	}
+
+	return iter.value()->m_uiFontIndex;
+}
+
+QString TextFontManager::GetFontName(TextLayerHandle hLayer)
+{
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
+	{
+		HyGuiLog("TextFontManager::GetFontName passed an invalid handle", LOGTYPE_Error);
+		return QString();
+	}
+
+	QJsonObject fontObj = m_FontArray.at(iter.value()->m_uiFontIndex).toObject();
+	return fontObj["font"].toString();
+}
+
 rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer)
 {
 	auto iter = m_LayerMap.find(hLayer);
@@ -110,7 +135,7 @@ rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer)
 		return RENDER_NORMAL;
 	}
 
-	QJsonObject fontObj = m_FontArray.at[iter.value()->m_uiFontIndex].toObject();
+	QJsonObject fontObj = m_FontArray.at(iter.value()->m_uiFontIndex).toObject();
 	return static_cast<rendermode_t>(fontObj["mode"].toInt());
 }
 
@@ -123,11 +148,24 @@ float TextFontManager::GetOutlineThickness(TextLayerHandle hLayer)
 		return 0.0f;
 	}
 
-	QJsonObject fontObj = m_FontArray.at[iter.value()->m_uiFontIndex].toObject();
+	QJsonObject fontObj = m_FontArray.at(iter.value()->m_uiFontIndex).toObject();
 	return static_cast<float>(fontObj["outlineThickness"].toDouble());
 }
 
-void TextFontManager::GetColor(TextLayerHandle hLayer, glm::vec3 &vTopColorOut, glm::vec3 vBotColorOut)
+float TextFontManager::GetSize(TextLayerHandle hLayer)
+{
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
+	{
+		HyGuiLog("TextFontManager::GetSize passed an invalid handle", LOGTYPE_Error);
+		return 0.0f;
+	}
+
+	QJsonObject fontObj = m_FontArray.at(iter.value()->m_uiFontIndex).toObject();
+	return static_cast<float>(fontObj["size"].toDouble());
+}
+
+void TextFontManager::GetColor(TextLayerHandle hLayer, glm::vec3 &vTopColorOut, glm::vec3 &vBotColorOut)
 {
 	auto iter = m_LayerMap.find(hLayer);
 	if(iter == m_LayerMap.end())
@@ -145,45 +183,83 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 	TextLayerHandle hNewLayer = HY_UNUSED_HANDLE;
 
 	// If font already exists, don't generate preview
-	for(int i = 0; i < m_FontArray.size(); ++i)
+	int iFontIndex = DoesFontExist(sFontName, eRenderMode, fOutlineThickness, fSize);
+	if(iFontIndex >= 0)
 	{
-		QJsonObject fontObj = m_FontArray[i].toObject();
-		
-		if(fontObj["font"].toString().compare(sFontName, Qt::CaseInsensitive) == 0 &&
-			fontObj["mode"].toInt() == eRenderMode &&
-			HyCompareFloat(fontObj["outlineThickness"].toDouble(), static_cast<double>(fOutlineThickness)) &&
-			HyCompareFloat(fontObj["size"].toDouble(), static_cast<double>(fSize)))
-		{
-			hNewLayer = ++sm_hHandleCount;
-			m_LayerMap[hNewLayer] = new Layer(hNewLayer, i, glm::vec3(0.0f), glm::vec3(0.0f));
+		hNewLayer = ++sm_hHandleCount;
+		m_LayerMap[hNewLayer] = new Layer(hNewLayer, iFontIndex, glm::vec3(0.0f), glm::vec3(0.0f));
 
-			return hNewLayer;
-		}
+		return hNewLayer;
 	}
 
 	PrepPreview();
 	{
-		QList<QStandardItem *> foundFontList = m_GlyphsModel.GetOwner().GetProject().GetFontListModel()->findItems(sFontName);
-		if(foundFontList.size() == 1)
+		int iNewFontIndex = CreatePreviewFont(sFontName, eRenderMode, fOutlineThickness, fSize);
+		if(iNewFontIndex >= 0)
 		{
-			PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
-														   GetAvailableTypefaceGlyphs(),
-														   foundFontList[0]->data().toString(),
-														   fSize,
-														   fOutlineThickness,
-														   eRenderMode);
-			if(pNewPreviewFont->GetMissedGlyphs() != 0)
-				HyGuiLog("PrepPreview could not create all preview fonts", LOGTYPE_Error);
-
-			m_PreviewFontList.append(pNewPreviewFont);
-
 			hNewLayer = ++sm_hHandleCount;
-			m_LayerMap[hNewLayer] = new Layer(hNewLayer, m_PreviewFontList.size() - 1, glm::vec3(0.0f), glm::vec3(0.0f));
+			m_LayerMap[hNewLayer] = new Layer(hNewLayer, iNewFontIndex, glm::vec3(0.0f), glm::vec3(0.0f));
 		}
 	}
 	RegenFontArray();
 
 	return hNewLayer;
+}
+
+void TextFontManager::SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode)
+{
+	// If font already exists, don't generate preview
+	int iFontIndex = DoesFontExist(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
+	if(iFontIndex >= 0)
+	{
+		m_LayerMap[hLayer]->m_uiFontIndex = iFontIndex;
+		return;
+	}
+
+	PrepPreview();
+	{
+		int iNewFontIndex = CreatePreviewFont(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
+		if(iNewFontIndex >= 0)
+			m_LayerMap[hLayer]->m_uiFontIndex = iNewFontIndex;
+	}
+	RegenFontArray();
+}
+
+void TextFontManager::SetOutlineThickness(TextLayerHandle hLayer, float fThickness)
+{
+	// If font already exists, don't generate preview
+	int iFontIndex = DoesFontExist(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
+	if(iFontIndex >= 0)
+	{
+		m_LayerMap[hLayer]->m_uiFontIndex = iFontIndex;
+		return;
+	}
+
+	PrepPreview();
+	{
+		int iNewFontIndex = CreatePreviewFont(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
+		if(iNewFontIndex >= 0)
+			m_LayerMap[hLayer]->m_uiFontIndex = iNewFontIndex;
+	}
+	RegenFontArray();
+}
+
+int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize) const
+{
+	for(int i = 0; i < m_FontArray.size(); ++i)
+	{
+		QJsonObject fontObj = m_FontArray[i].toObject();
+
+		if(fontObj["font"].toString().compare(sFontName, Qt::CaseInsensitive) == 0 &&
+		   fontObj["mode"].toInt() == eRenderMode &&
+		   HyCompareFloat(fontObj["outlineThickness"].toDouble(), static_cast<double>(fOutlineThickness)) &&
+		   HyCompareFloat(fontObj["size"].toDouble(), static_cast<double>(fSize)))
+		{
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 void TextFontManager::PrepPreview()
@@ -192,39 +268,46 @@ void TextFontManager::PrepPreview()
 	{
 		m_pPreviewAtlas = texture_atlas_new(TEXTFONTMANAGER_AtlasSize, 1);
 
-		QString sAvailGlyphs = GetAvailableTypefaceGlyphs();
-		QStandardItemModel *pFontListModel = m_GlyphsModel.GetOwner().GetProject().GetFontListModel();
-
 		if(m_PreviewFontList.isEmpty() == false)
 		{
 			HyGuiLog("PrepPreview has uncleared fonts in 'm_PreviewFontList'", LOGTYPE_Error);
 			m_PreviewFontList.clear();
 		}
+
 		for(int i = 0; i < m_FontArray.size(); ++i)
 		{
 			QJsonObject fontObj = m_FontArray[i].toObject();
-
-			QList<QStandardItem *> foundFontList = pFontListModel->findItems(fontObj["font"].toString());
-			if(foundFontList.size() == 1)
-			{
-				PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
-																sAvailGlyphs,
-																foundFontList[0]->data().toString(),
-																fontObj["size"].toDouble(),
-																fontObj["outlineThickness"].toDouble(),
-																static_cast<rendermode_t>(fontObj["mode"].toInt()));
-				if(pNewPreviewFont->GetMissedGlyphs() != 0)
-					HyGuiLog("PrepPreview could not create all preview fonts", LOGTYPE_Error);
-
-				m_PreviewFontList.append(pNewPreviewFont);
-			}
+			CreatePreviewFont(fontObj["font"].toString(), static_cast<rendermode_t>(fontObj["mode"].toInt()), fontObj["outlineThickness"].toDouble(), fontObj["size"].toDouble());
 		}
 	}
+}
+
+int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
+{
+	QList<QStandardItem *> foundFontList = m_GlyphsModel.GetOwner().GetProject().GetFontListModel()->findItems(sFontName);
+	if(foundFontList.size() == 1)
+	{
+		PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
+													   GetAvailableTypefaceGlyphs(),
+													   foundFontList[0]->data().toString(),
+													   fSize,
+													   fOutlineThickness,
+													   eRenderMode);
+		if(pNewPreviewFont->GetMissedGlyphs() != 0)
+			HyGuiLog("CreatePreviewFont could not create preview fonts. Missed '" % QString::number(pNewPreviewFont->GetMissedGlyphs()) % "' glyphs", LOGTYPE_Error);
+
+		m_PreviewFontList.append(pNewPreviewFont);
+		return m_PreviewFontList.size() - 1;
+	}
+
+	return -1;
 }
 
 void TextFontManager::RegenFontArray()
 {
 	QString sAvailGlyphs = GetAvailableTypefaceGlyphs();
+
+	CleanUnusedFonts();
 
 	QJsonArray fontArray;
 	for(int i = 0; i < m_PreviewFontList.count(); ++i)
@@ -287,6 +370,37 @@ void TextFontManager::RegenFontArray()
 	}
 
 	m_FontArray = fontArray;
+}
+
+void TextFontManager::CleanUnusedFonts()
+{
+	int iFontIndex = 0;
+	for(auto iter = m_PreviewFontList.begin(); iter != m_PreviewFontList.end(); ++iter, ++iFontIndex)
+	{
+		bool bFontUsed = false;
+		for(int i = 0; i < m_LayerMap.size(); ++i)
+		{
+			if(m_LayerMap[i]->m_uiFontIndex == iFontIndex)
+			{
+				bFontUsed = true;
+				break;
+			}
+		}
+
+		if(bFontUsed == false)
+		{
+			iter = m_PreviewFontList.erase(iter);
+
+			// If a font gets erased, layer font indexes may become offset. Fix below
+			for(int i = 0; i < m_LayerMap.size(); ++i)
+			{
+				if(m_LayerMap[i]->m_uiFontIndex > iFontIndex)
+					m_LayerMap[i]->m_uiFontIndex--;
+			}
+
+			iFontIndex--; // Subtract one here to account for the erased font
+		}
+	}
 }
 
 QString TextFontManager::GetAvailableTypefaceGlyphs() const

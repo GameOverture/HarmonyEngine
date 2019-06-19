@@ -24,6 +24,7 @@ class TextLayersModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
+public:
 	enum Column
 	{
 		COLUMN_Mode = 0,
@@ -32,6 +33,7 @@ class TextLayersModel : public QAbstractTableModel
 
 		NUMCOLUMNS
 	};
+private:
 
 	TextFontManager &					m_FontManagerRef;
 
@@ -47,20 +49,6 @@ public:
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 	void RemoveLayer(TextLayerHandle hHandle);
 	void ReAddLayer(TextLayerHandle hHandle);
-
-	//int GetLayerId(int iRowIndex) const;
-	////FontTypeface *GetStageRef(int iRowIndex);
-
-	//rendermode_t GetLayerRenderMode(int iRowIndex) const;
-	//void SetLayerRenderMode(int iId, rendermode_t eMode);
-
-	//float GetLayerOutlineThickness(int iRowIndex) const;
-	//void SetLayerOutlineThickness(int iId, float fThickness);
-
-	//QColor GetLayerTopColor(int iRowIndex) const;
-	//QColor GetLayerBotColor(int iRowIndex) const;
-	//void SetLayerColors(int iId, QColor topColor, QColor botColor);
-
 	//void MoveRowUp(int iIndex);
 	//void MoveRowDown(int iIndex);
 

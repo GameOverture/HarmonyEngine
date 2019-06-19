@@ -43,8 +43,6 @@ class TextFontManager
 	};
 	QMap<TextLayerHandle, Layer *>	m_LayerMap;
 
-	texture_atlas_t *				m_pPreviewAtlas;
-
 	class PreviewFont
 	{
 		texture_font_t *			m_pTextureFont;
@@ -68,28 +66,18 @@ class TextFontManager
 
 			m_uiMissedGlyphs = texture_font_load_glyphs(m_pTextureFont, sGlyphs.toUtf8().data());
 		}
-		~PreviewFont()
-		{
+		~PreviewFont() {
 			texture_font_delete(m_pTextureFont);
 		}
-
 		texture_font_t *GetTextureFont() {
 			return m_pTextureFont;
 		}
-
 		size_t GetMissedGlyphs() {
 			return m_uiMissedGlyphs;
 		}
-
-		//bool (const PreviewFont &rightRef)
-		//{
-		//	return m_FontFileInfo.baseName().compare(rightRef.m_FontFileInfo.baseName(), Qt::CaseInsensitive) == 0 &&
-		//		m_pTextureFont->size == rightRef.m_pTextureFont->size &&
-		//		m_pTextureFont->outline_thickness == rightRef.m_pTextureFont->outline_thickness &&
-		//		m_pTextureFont->rendermode == rightRef.m_pTextureFont->rendermode;
-		//}
 	};
-	QList<PreviewFont *>		m_PreviewFontList;
+	QList<PreviewFont *>			m_PreviewFontList;
+	texture_atlas_t *				m_pPreviewAtlas;
 
 public:
 	TextFontManager(ProjectItem &itemRef, QJsonObject availableGlyphsObj, QJsonArray fontArray);
@@ -101,15 +89,23 @@ public:
 	QList<TextLayerHandle> RegisterLayers(QJsonArray layerArray);
 	QJsonArray GetFontArray() const;
 
+	uint GetFontIndex(TextLayerHandle hLayer);
+	QString GetFontName(TextLayerHandle hLayer);
 	rendermode_t GetRenderMode(TextLayerHandle hLayer);
 	float GetOutlineThickness(TextLayerHandle hLayer);
+	float GetSize(TextLayerHandle hLayer);
 	void GetColor(TextLayerHandle hLayer, glm::vec3 &vTopColorOut, glm::vec3 &vBotColorOut);
 
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
+	void SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode);
+	void SetOutlineThickness(TextLayerHandle hLayer, float fThickness);
 
 private:
+	int DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize) const;
 	void PrepPreview();
+	int CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 	void RegenFontArray();
+	void CleanUnusedFonts();
 	QString GetAvailableTypefaceGlyphs() const;
 };
 

@@ -29,13 +29,17 @@ QJsonArray TextLayersModel::GetLayersArray()
 	for(int i = 0; i < m_LayerList.size(); ++i)
 	{
 		QJsonObject layerObj;
-		layerObj.insert("typefaceIndex", static_cast<int>(m_LayerList[i]->m_uiFontIndex));
-		layerObj.insert("botR", m_LayerList[i]->m_vBotColor.r);
-		layerObj.insert("botG", m_LayerList[i]->m_vBotColor.g);
-		layerObj.insert("botB", m_LayerList[i]->m_vBotColor.b);
-		layerObj.insert("topR", m_LayerList[i]->m_vTopColor.r);
-		layerObj.insert("topG", m_LayerList[i]->m_vTopColor.g);
-		layerObj.insert("topB", m_LayerList[i]->m_vTopColor.b);
+
+		glm::vec3 vBotColor, vTopColor;
+		m_FontManagerRef.GetColor(m_LayerList[i], vBotColor, vTopColor);
+
+		layerObj.insert("typefaceIndex", static_cast<int>(m_FontManagerRef.GetFontIndex(m_LayerList[i])));
+		layerObj.insert("botR", vBotColor.r);
+		layerObj.insert("botG", vBotColor.g);
+		layerObj.insert("botB", vBotColor.b);
+		layerObj.insert("topR", vTopColor.r);
+		layerObj.insert("topG", vTopColor.g);
+		layerObj.insert("topB", vTopColor.b);
 
 		layersArray.append(layerObj);
 	}
@@ -88,73 +92,6 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 	}
 }
 
-//int TextLayersModel::GetLayerId(int iRowIndex) const
-//{
-//	return m_LayerList[iRowIndex]->iUNIQUE_ID;
-//}
-//
-//TextLayersModel::FontTypeface *TextLayersModel::GetStageRef(int iRowIndex)
-//{
-//	return m_LayerList[iRowIndex]->pReference;
-//}
-//
-//rendermode_t TextLayersModel::GetLayerRenderMode(int iRowIndex) const
-//{
-//	return m_LayerList[iRowIndex]->eMode;
-//}
-//
-//void TextLayersModel::SetLayerRenderMode(int iId, rendermode_t eMode)
-//{
-//	for(int i = 0; i < m_LayerList.count(); ++i)
-//	{
-//		if(m_LayerList[i]->iUNIQUE_ID == iId)
-//		{
-//			m_LayerList[i]->eMode = eMode;
-//			dataChanged(createIndex(i, COLUMN_Mode), createIndex(i, COLUMN_Mode));
-//		}
-//	}
-//}
-//
-//float TextLayersModel::GetLayerOutlineThickness(int iRowIndex) const
-//{
-//	return m_LayerList[iRowIndex]->fOutlineThickness;
-//}
-//
-//void TextLayersModel::SetLayerOutlineThickness(int iId, float fThickness)
-//{
-//	for(int i = 0; i < m_LayerList.count(); ++i)
-//	{
-//		if(m_LayerList[i]->iUNIQUE_ID == iId)
-//		{
-//			m_LayerList[i]->fOutlineThickness = fThickness;
-//			dataChanged(createIndex(i, COLUMN_Thickness), createIndex(i, COLUMN_Thickness));
-//		}
-//	}
-//}
-//
-//QColor TextLayersModel::GetLayerTopColor(int iRowIndex) const
-//{
-//	return QColor(m_LayerList[iRowIndex]->vTopColor.x * 255.0f, m_LayerList[iRowIndex]->vTopColor.y * 255.0f, m_LayerList[iRowIndex]->vTopColor.z * 255.0f);
-//}
-//
-//QColor TextLayersModel::GetLayerBotColor(int iRowIndex) const
-//{
-//	return QColor(m_LayerList[iRowIndex]->vBotColor.x * 255.0f, m_LayerList[iRowIndex]->vBotColor.y * 255.0f, m_LayerList[iRowIndex]->vBotColor.z * 255.0f);
-//}
-//
-//void TextLayersModel::SetLayerColors(int iId, QColor topColor, QColor botColor)
-//{
-//	for(int i = 0; i < m_LayerList.count(); ++i)
-//	{
-//		if(m_LayerList[i]->iUNIQUE_ID == iId)
-//		{
-//			m_LayerList[i]->vTopColor = glm::vec4(topColor.redF(), topColor.greenF(), topColor.blueF(), 1.0f);
-//			m_LayerList[i]->vBotColor = glm::vec4(botColor.redF(), botColor.greenF(), botColor.blueF(), 1.0f);
-//			dataChanged(createIndex(i, COLUMN_Color), createIndex(i, COLUMN_Color));
-//		}
-//	}
-//}
-//
 //void TextLayersModel::MoveRowUp(int iIndex)
 //{
 //	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
@@ -376,13 +313,13 @@ QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol)
 		switch(indexRef.column())
 		{
 		case COLUMN_Mode:
-			pFrame->m_vOffset.setX(value.toInt());
+			m_FontManagerRef.SetRenderMode(hLayer, static_cast<rendermode_t>(valueRef.toInt()));
 			break;
 		case COLUMN_Thickness:
-			pFrame->m_vOffset.setY(value.toInt());
+			m_FontManagerRef.SetOutlineThickness(hLayer, valueRef.toFloat());
 			break;
 		case COLUMN_Color:
-			pFrame->m_fDuration = value.toFloat();
+			
 			break;
 		}
 
