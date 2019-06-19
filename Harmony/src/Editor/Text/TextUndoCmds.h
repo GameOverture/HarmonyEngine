@@ -27,7 +27,7 @@ class TextUndoCmd_AddLayer : public QUndoCommand
 	rendermode_t			m_eRenderMode;
 	float					m_fSize;
 	float					m_fThickness;
-	TextFontHandle			m_hFont;
+	TextLayerHandle			m_hLayer;
 
 public:
 	TextUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, QString sFontName, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = nullptr);
@@ -42,10 +42,10 @@ class TextUndoCmd_RemoveLayer : public QUndoCommand
 	ProjectItem &			m_ItemRef;
 	int						m_iStateIndex;
 
-	TextFontHandle			m_hFont;
+	TextLayerHandle			m_hLayer;
 
 public:
-	TextUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, TextFontHandle hFont, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_RemoveLayer();
 
 	void redo() override;
@@ -57,12 +57,12 @@ class TextUndoCmd_LayerRenderMode : public QUndoCommand
 	ProjectItem &			m_ItemRef;
 	int						m_iStateIndex;
 
-	int						m_iLayerId;
+	TextLayerHandle			m_hLayer;
 	rendermode_t			m_ePrevRenderMode;
 	rendermode_t			m_eNewRenderMode;
 
 public:
-	TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_LayerRenderMode();
 
 	void redo() override;

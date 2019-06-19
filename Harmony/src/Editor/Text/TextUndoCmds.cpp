@@ -23,7 +23,7 @@ TextUndoCmd_AddLayer::TextUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex
 	m_eRenderMode(eRenderMode),
 	m_fSize(fSize),
 	m_fThickness(fThickness),
-	m_hFont(TEXTHANDLE_NotUsed)
+	m_hLayer(HY_UNUSED_HANDLE)
 {
 	setText("Add Text Layer");
 }
@@ -36,30 +36,30 @@ void TextUndoCmd_AddLayer::redo()
 {
 	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
-	if(m_hFont == TEXTHANDLE_NotUsed)
-		m_hFont = pModel->AddNewLayer(m_sFontName, m_eRenderMode, m_fThickness, m_fSize);
+	if(m_hLayer == HY_UNUSED_HANDLE)
+		m_hLayer = pModel->AddNewLayer(m_sFontName, m_eRenderMode, m_fThickness, m_fSize);
 	else
-		pModel->ReAddLayer(m_hFont);
+		pModel->ReAddLayer(m_hLayer);
 
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hFont);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
 }
 
 void TextUndoCmd_AddLayer::undo()
 {
 	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
-	pModel->RemoveLayer(m_hFont);
+	pModel->RemoveLayer(m_hLayer);
 	
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hFont);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextUndoCmd_RemoveLayer::TextUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, TextFontHandle hFont, QUndoCommand *pParent /*= nullptr*/) :
+TextUndoCmd_RemoveLayer::TextUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
-	m_hFont(hFont)
+	m_hLayer(hLayer)
 {
 	setText("Remove Text Layer");
 }
@@ -72,28 +72,28 @@ void TextUndoCmd_RemoveLayer::redo()
 {
 	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
-	pModel->RemoveLayer(m_hFont);
+	pModel->RemoveLayer(m_hLayer);
 	
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hFont);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
 }
 
 void TextUndoCmd_RemoveLayer::undo()
 {
 	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
-	pModel->ReAddLayer(m_hFont);
+	pModel->ReAddLayer(m_hLayer);
 	
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hFont);
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextUndoCmd_LayerRenderMode::TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, int iLayerId, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :
+TextUndoCmd_LayerRenderMode::TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
-	m_iLayerId(iLayerId),
+	m_hLayer(hLayer),
 	m_ePrevRenderMode(ePrevMode),
 	m_eNewRenderMode(eNewMode)
 {
@@ -108,7 +108,7 @@ void TextUndoCmd_LayerRenderMode::redo()
 {
 	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
-	pModel->SetLayerRenderMode(m_iLayerId, m_eNewRenderMode);
+	pModel->setData(m_hLayer, m_eNewRenderMode);
 	
 	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
 }
@@ -117,7 +117,7 @@ void TextUndoCmd_LayerRenderMode::undo()
 {
 	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
 	
-	pModel->SetLayerRenderMode(m_iLayerId, m_ePrevRenderMode);
+	pModel->SetLayerRenderMode(m_hLayer, m_ePrevRenderMode);
 	
 	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
 }

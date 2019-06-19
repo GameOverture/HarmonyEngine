@@ -101,8 +101,9 @@ public:
 	QList<TextLayerHandle> RegisterLayers(QJsonArray layerArray);
 	QJsonArray GetFontArray() const;
 
-	rendermode_t GetRenderMode(uint uiFontIndex);
-	float GetOutlineThickness(uint uiFontIndex);
+	rendermode_t GetRenderMode(TextLayerHandle hLayer);
+	float GetOutlineThickness(TextLayerHandle hLayer);
+	void GetColor(TextLayerHandle hLayer, glm::vec3 &vTopColorOut, glm::vec3 &vBotColorOut);
 
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 

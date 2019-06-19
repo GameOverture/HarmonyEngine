@@ -26,7 +26,7 @@ class TextLayersModel : public QAbstractTableModel
 
 	enum Column
 	{
-		COLUMN_Type = 0,
+		COLUMN_Mode = 0,
 		COLUMN_Thickness,
 		COLUMN_Color,
 
@@ -73,6 +73,8 @@ public:
 	//float GetLineAscender();
 	//float GetLineDescender();
 	//float GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs);
+
+	QModelIndex GetIndex(TextLayerHandle hLayer, Column eCol);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;

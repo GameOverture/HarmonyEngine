@@ -45,25 +45,29 @@ QJsonArray TextLayersModel::GetLayersArray()
 
 TextLayerHandle TextLayersModel::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
-	TextLayerHandle hReturnHandle = m_FontManagerRef.AddNewLayer(sFontName, eRenderMode, fOutlineThickness, fSize);
-	Layer *pLayer = new Layer( hReturnHandle);
+	TextLayerHandle hNewLayer = m_FontManagerRef.AddNewLayer(sFontName, eRenderMode, fOutlineThickness, fSize);
+	if(hNewLayer == HY_UNUSED_HANDLE)
+	{
+		HyGuiLog("TextFontManager::AddNewLayer failed to return valid handle", LOGTYPE_Error);
+		return HY_UNUSED_HANDLE;
+	}
 
 	int iRowIndex = m_LayerList.count();
 	beginInsertRows(QModelIndex(), iRowIndex, iRowIndex);
-	m_LayerList.append(pLayer);
+	m_LayerList.append(hNewLayer);
 	endInsertRows();
 
-	return hReturnHandle;
+	return hNewLayer;
 }
 
 void TextLayersModel::RemoveLayer(TextLayerHandle hHandle)
 {
 	for(int i = 0; i < m_LayerList.count(); ++i)
 	{
-		if(m_LayerList[i]->m_hFont == hHandle)
+		if(m_LayerList[i] == hHandle)
 		{
 			beginRemoveRows(QModelIndex(), i, i);
-			m_RemovedLayerList.append(QPair<int, Layer *>(i, m_LayerList[i]));
+			m_RemovedLayerList.append(QPair<int, TextLayerHandle>(i, m_LayerList[i]));
 			m_LayerList.removeAt(i);
 			endRemoveRows();
 		}
@@ -74,7 +78,7 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 {
 	for(int i = 0; i < m_RemovedLayerList.count(); ++i)
 	{
-		if(m_RemovedLayerList[i].second->m_hFont == hHandle)
+		if(m_RemovedLayerList[i].second == hHandle)
 		{
 			beginInsertRows(QModelIndex(), m_RemovedLayerList[i].first, m_RemovedLayerList[i].first);
 			m_LayerList.insert(m_RemovedLayerList[i].first, m_RemovedLayerList[i].second);
@@ -106,7 +110,7 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 //		if(m_LayerList[i]->iUNIQUE_ID == iId)
 //		{
 //			m_LayerList[i]->eMode = eMode;
-//			dataChanged(createIndex(i, COLUMN_Type), createIndex(i, COLUMN_Type));
+//			dataChanged(createIndex(i, COLUMN_Mode), createIndex(i, COLUMN_Mode));
 //		}
 //	}
 //}
@@ -240,6 +244,17 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 //	return fLeftSideNudgeAmt;
 //}
 
+QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol)
+{
+	for(int i = 0; i < m_LayerList.size(); ++i)
+	{
+		if(m_LayerList[i] == hLayer)
+			return createIndex(i, eCol);
+	}
+
+	return QModelIndex();
+}
+
 /*virtual*/ int TextLayersModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
 	return m_LayerList.count();
@@ -252,18 +267,21 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 
 /*virtual*/ QVariant TextLayersModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const
 {
-	Layer *pLayer = m_LayerList[indexRef.row()];
+	TextLayerHandle hLayer = m_LayerList[indexRef.row()];
 
-	if(iRole == Qt::TextAlignmentRole && indexRef.column() != COLUMN_Type)
+	if(iRole == Qt::TextAlignmentRole && indexRef.column() != COLUMN_Mode)
 		return Qt::AlignCenter;
 
 	if(indexRef.column() == COLUMN_Color)
 	{
+		glm::vec3 vTopColor, vBotColor;
+		m_FontManagerRef.GetColor(hLayer, vTopColor, vBotColor);
+
 		if(iRole == Qt::BackgroundRole)
 		{
 			QLinearGradient gradient(0, 0, 0, 25.0f);
-			gradient.setColorAt(0.0, QColor(pLayer->m_vTopColor.x * 255.0f, pLayer->m_vTopColor.y * 255.0f, pLayer->m_vTopColor.z * 255.0f));
-			gradient.setColorAt(1.0, QColor(pLayer->m_vBotColor.x * 255.0f, pLayer->m_vBotColor.y * 255.0f, pLayer->m_vBotColor.z * 255.0f));
+			gradient.setColorAt(0.0, QColor(vTopColor.x * 255.0f, vTopColor.y * 255.0f, vTopColor.z * 255.0f));
+			gradient.setColorAt(1.0, QColor(vBotColor.x * 255.0f, vBotColor.y * 255.0f, vBotColor.z * 255.0f));
 
 			QBrush bgColorBrush(gradient);
 			return QVariant(bgColorBrush);
@@ -271,7 +289,7 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 		else if(iRole == Qt::ForegroundRole)
 		{
 			// Counting the perceptive luminance - human eye favors green color
-			double a = 1 - ( 0.299 * pLayer->m_vTopColor.x + 0.587 * pLayer->m_vTopColor.y + 0.114 * pLayer->m_vTopColor.z)/255;
+			double a = 1 - ( 0.299 * vTopColor.x + 0.587 * vTopColor.y + 0.114 * vTopColor.z)/255;
 
 			if (a < 0.5)
 			{
@@ -290,8 +308,8 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 	{
 		switch(indexRef.column())
 		{
-		case COLUMN_Type:
-			switch(m_FontManagerRef.GetRenderMode(pLayer->m_uiFontIndex))
+		case COLUMN_Mode:
+			switch(m_FontManagerRef.GetRenderMode(hLayer))
 			{
 			case RENDER_NORMAL:
 				return "Fill";
@@ -307,7 +325,7 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 			return "Unknown";
 
 		case COLUMN_Thickness:
-			switch(m_FontManagerRef.GetRenderMode(pLayer->m_uiFontIndex))
+			switch(m_FontManagerRef.GetRenderMode(hLayer))
 			{
 			case RENDER_NORMAL:
 			case RENDER_SIGNED_DISTANCE_FIELD:
@@ -315,7 +333,7 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 			case RENDER_OUTLINE_EDGE:
 			case RENDER_OUTLINE_POSITIVE:
 			case RENDER_OUTLINE_NEGATIVE:
-				return QString::number(m_FontManagerRef.GetOutlineThickness(pLayer->m_uiFontIndex), 'g', 2);
+				return QString::number(m_FontManagerRef.GetOutlineThickness(hLayer), 'g', 2);
 			}
 
 		case COLUMN_Color:
@@ -334,7 +352,7 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 		{
 			switch(iIndex)
 			{
-			case COLUMN_Type:
+			case COLUMN_Mode:
 				return QString("Type");
 			case COLUMN_Thickness:
 				return QString("Thickness");
@@ -351,13 +369,13 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 
 /*virtual*/ bool TextLayersModel::setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole /*= Qt::EditRole*/)
 {
-	Layer *pLayer = m_LayerList[indexRef.row()];
+	TextLayerHandle hLayer = m_LayerList[indexRef.row()];
 
 	if(iRole == Qt::EditRole)
 	{
 		switch(indexRef.column())
 		{
-		case COLUMN_Type:
+		case COLUMN_Mode:
 			pFrame->m_vOffset.setX(value.toInt());
 			break;
 		case COLUMN_Thickness:

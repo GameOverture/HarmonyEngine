@@ -101,32 +101,49 @@ QJsonArray TextFontManager::GetFontArray() const
 	return m_FontArray;
 }
 
-rendermode_t TextFontManager::GetRenderMode(uint uiFontIndex)
+rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer)
 {
-	if(uiFontIndex >= m_FontArray.size())
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
 	{
-		HyGuiLog("TextFontManager::GetRenderMode passed an index outside 'm_FontArray's bounds", LOGTYPE_Error);
+		HyGuiLog("TextFontManager::GetRenderMode passed an invalid handle", LOGTYPE_Error);
 		return RENDER_NORMAL;
 	}
 
-	QJsonObject fontObj = m_FontArray.at[uiFontIndex].toObject();
+	QJsonObject fontObj = m_FontArray.at[iter.value()->m_uiFontIndex].toObject();
 	return static_cast<rendermode_t>(fontObj["mode"].toInt());
 }
 
-float TextFontManager::GetOutlineThickness(uint uiFontIndex)
+float TextFontManager::GetOutlineThickness(TextLayerHandle hLayer)
 {
-	if(uiFontIndex >= m_FontArray.size())
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
 	{
-		HyGuiLog("TextFontManager::GetOutlineThickness passed an index outside 'm_FontArray's bounds", LOGTYPE_Error);
-		return RENDER_NORMAL;
+		HyGuiLog("TextFontManager::GetOutlineThickness passed an invalid handle", LOGTYPE_Error);
+		return 0.0f;
 	}
 
-	QJsonObject fontObj = m_FontArray.at[uiFontIndex].toObject();
+	QJsonObject fontObj = m_FontArray.at[iter.value()->m_uiFontIndex].toObject();
 	return static_cast<float>(fontObj["outlineThickness"].toDouble());
+}
+
+void TextFontManager::GetColor(TextLayerHandle hLayer, glm::vec3 &vTopColorOut, glm::vec3 vBotColorOut)
+{
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
+	{
+		HyGuiLog("TextFontManager::GetColor passed an invalid handle", LOGTYPE_Error);
+		return;
+	}
+
+	vTopColorOut = iter.value()->m_vTopColor;
+	vBotColorOut = iter.value()->m_vBotColor;
 }
 
 TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
+	TextLayerHandle hNewLayer = HY_UNUSED_HANDLE;
+
 	// If font already exists, don't generate preview
 	for(int i = 0; i < m_FontArray.size(); ++i)
 	{
@@ -137,7 +154,7 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 			HyCompareFloat(fontObj["outlineThickness"].toDouble(), static_cast<double>(fOutlineThickness)) &&
 			HyCompareFloat(fontObj["size"].toDouble(), static_cast<double>(fSize)))
 		{
-			TextLayerHandle hNewLayer = ++sm_hHandleCount;
+			hNewLayer = ++sm_hHandleCount;
 			m_LayerMap[hNewLayer] = new Layer(hNewLayer, i, glm::vec3(0.0f), glm::vec3(0.0f));
 
 			return hNewLayer;
@@ -159,9 +176,14 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 				HyGuiLog("PrepPreview could not create all preview fonts", LOGTYPE_Error);
 
 			m_PreviewFontList.append(pNewPreviewFont);
+
+			hNewLayer = ++sm_hHandleCount;
+			m_LayerMap[hNewLayer] = new Layer(hNewLayer, m_PreviewFontList.size() - 1, glm::vec3(0.0f), glm::vec3(0.0f));
 		}
 	}
 	RegenFontArray();
+
+	return hNewLayer;
 }
 
 void TextFontManager::PrepPreview()

@@ -23,7 +23,7 @@ TextLayersWidget::TextLayersWidget(QWidget *pParent /*= nullptr*/) :
 	int iWidth = pResizeEvent->size().width();
 
 	iWidth -= 144;
-	setColumnWidth(TextLayersModel::COLUMN_Type, iWidth);
+	setColumnWidth(TextLayersModel::COLUMN_Mode, iWidth);
 	setColumnWidth(TextLayersModel::COLUMN_Thickness, 64);
 	setColumnWidth(TextLayersModel::COLUMN_Color, 80);
 
