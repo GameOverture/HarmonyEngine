@@ -23,6 +23,11 @@ TextLayersModel::TextLayersModel(TextFontManager &fontManagerRef, const QList<Te
 {
 }
 
+TextFontManager &TextLayersModel::GetFontManager()
+{
+	return m_FontManagerRef;
+}
+
 QJsonArray TextLayersModel::GetLayersArray()
 {
 	QJsonArray layersArray;
@@ -241,7 +246,7 @@ QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol)
 		}
 	}
 
-	if(iRole == Qt::DisplayRole || iRole == Qt::EditRole)
+	if(iRole == Qt::DisplayRole)
 	{
 		switch(indexRef.column())
 		{
@@ -275,6 +280,20 @@ QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol)
 
 		case COLUMN_Color:
 			return "";
+		}
+	}
+	else if(iRole == Qt::EditRole)
+	{
+		switch(indexRef.column())
+		{
+		case COLUMN_Mode:
+			return m_FontManagerRef.GetRenderMode(hLayer);
+			
+		case COLUMN_Thickness:
+			return m_FontManagerRef.GetOutlineThickness(hLayer);
+
+		case COLUMN_Color:
+			return QVariant();
 		}
 	}
 

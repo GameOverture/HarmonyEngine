@@ -23,4 +23,19 @@ protected:
 	virtual void resizeEvent(QResizeEvent *pResizeEvent) override;
 };
 
+class TextLayersDelegate : public QStyledItemDelegate
+{
+	Q_OBJECT
+
+	ProjectItem *			m_pItem;
+
+public:
+	TextLayersDelegate(ProjectItem *pItem, QObject *pParent = nullptr);
+
+	virtual QWidget *createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+	virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;
+	virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pItemModel, const QModelIndex &index) const override;
+	virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+};
+
 #endif // TEXTLAYERSWIDGET_H

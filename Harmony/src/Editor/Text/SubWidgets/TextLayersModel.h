@@ -44,6 +44,7 @@ public:
 	TextLayersModel(TextFontManager &fontManagerRef, const QList<TextLayerHandle> &layerList, QObject *pParent);
 	virtual ~TextLayersModel();
 
+	TextFontManager &GetFontManager();
 	QJsonArray GetLayersArray();
 
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
