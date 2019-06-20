@@ -291,7 +291,7 @@ void TextFontManager::PrepPreview()
 
 int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
-	QList<QStandardItem *> foundFontList = m_GlyphsModel.GetOwner().GetProject().GetFontListModel()->findItems(sFontName, Qt::MatchContains); broken;
+	QList<QStandardItem *> foundFontList = m_GlyphsModel.GetOwner().GetProject().GetFontListModel()->findItems(sFontName, Qt::MatchContains);
 	if(foundFontList.size() == 1)
 	{
 		PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
