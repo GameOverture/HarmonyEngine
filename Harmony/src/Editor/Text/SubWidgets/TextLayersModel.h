@@ -45,13 +45,14 @@ public:
 	virtual ~TextLayersModel();
 
 	TextFontManager &GetFontManager();
+	const TextFontManager &GetFontManager() const;
 	QJsonArray GetLayersArray();
 
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 	void RemoveLayer(TextLayerHandle hHandle);
 	void ReAddLayer(TextLayerHandle hHandle);
-	//void MoveRowUp(int iIndex);
-	//void MoveRowDown(int iIndex);
+	void MoveRowUp(int iIndex);
+	void MoveRowDown(int iIndex);
 
 	//void SetFontSize(int iSize);
 
@@ -63,7 +64,8 @@ public:
 	//float GetLineDescender();
 	//float GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs);
 
-	QModelIndex GetIndex(TextLayerHandle hLayer, Column eCol);
+	QModelIndex GetIndex(TextLayerHandle hLayer, Column eCol) const;
+	TextLayerHandle GetHandle(const QModelIndex &indexRef) const;
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;

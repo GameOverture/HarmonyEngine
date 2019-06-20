@@ -10,6 +10,7 @@
 #include "global.h"
 #include "TextLayersWidget.h"
 #include "TextLayersModel.h"
+#include "TextUndoCmds.h"
 #include "DlgColorPicker.h"
 
 #include <QResizeEvent>
@@ -41,10 +42,6 @@ TextLayersDelegate::TextLayersDelegate(ProjectItem *pItem, QObject *pParent /*= 
 {
 	QWidget *pReturnWidget = nullptr;
 
-	const TextLayersModel *pModel = static_cast<const TextLayersModel *>(index.model());
-
-	pModel->Get
-
 	switch(index.column())
 	{
 	case TextLayersModel::COLUMN_Mode:
@@ -56,35 +53,46 @@ TextLayersDelegate::TextLayersDelegate(ProjectItem *pItem, QObject *pParent /*= 
 		static_cast<QComboBox *>(pReturnWidget)->addItem("Signed Dist Field"); // RENDER_SIGNED_DISTANCE_FIELD
 		break;
 
-	case TextLayersModel::COLUMN_Thickness:
-		pReturnWidget = new QDoubleSpinBox(pParent);
-		static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(0.0, 4096.0);
-		break;
+	case TextLayersModel::COLUMN_Thickness: {
+		const TextLayersModel *pModel = static_cast<const TextLayersModel *>(index.model());
+		rendermode_t eMode = pModel->GetFontManager().GetRenderMode(pModel->GetHandle(index));
+		if(eMode != RENDER_NORMAL && eMode != RENDER_SIGNED_DISTANCE_FIELD)
+		{
+			pReturnWidget = new QDoubleSpinBox(pParent);
+			static_cast<QDoubleSpinBox *>(pReturnWidget)->setRange(0.0, 4096.0);
+		}
+		break; }
 
-	case TextLayersModel::COLUMN_Color:
-		DlgColorPicker *pDlg = new DlgColorPicker("Choose Font Layer Color", pModel->GetFontManager().GetColor( pFontModel->GetLayerTopColor(index.row()), pFontModel->GetLayerBotColor(index.row()), pParent);
+	case TextLayersModel::COLUMN_Color: {
+		const TextLayersModel *pModel = static_cast<const TextLayersModel *>(index.model());
+		TextLayerHandle hLayer = pModel->GetHandle(index);
+		QColor topColor, botColor;
+		pModel->GetFontManager().GetColor(hLayer, topColor, botColor);
+
+		DlgColorPicker *pDlg = new DlgColorPicker("Choose Font Layer Color", topColor, botColor, pParent);
 		if(pDlg->exec() == QDialog::Accepted)
 		{
-			QColor topColor, botColor;
+			QColor newTopColor, newBotColor;
 			if(pDlg->IsSolidColor())
 			{
-				topColor = pDlg->GetSolidColor();
-				botColor = pDlg->GetSolidColor();
+				newTopColor = pDlg->GetSolidColor();
+				newBotColor = pDlg->GetSolidColor();
 			}
 			else
 			{
-				topColor = pDlg->GetVgTopColor();
-				botColor = pDlg->GetVgBotColor();
+				newTopColor = pDlg->GetVgTopColor();
+				newBotColor = pDlg->GetVgBotColor();
 			}
-			m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerColors(*m_pItem,
-				m_pItem->GetWidget()->GetCurStateIndex(),
-				pFontModel->GetLayerId(index.row()),
-				pFontModel->GetLayerTopColor(index.row()),
-				pFontModel->GetLayerBotColor(index.row()),
-				topColor,
-				botColor));
+
+			m_pItem->GetUndoStack()->push(new TextUndoCmd_LayerColors(*m_pItem,
+																	  m_pItem->GetWidget()->GetCurStateIndex(),
+																	  hLayer,
+																	  topColor,
+																	  botColor,
+																	  newTopColor,
+																	  newBotColor));
 		}
-		break;
+		break; }
 	}
 
 	return pReturnWidget;
@@ -112,23 +120,30 @@ TextLayersDelegate::TextLayersDelegate(ProjectItem *pItem, QObject *pParent /*= 
 /*virtual*/ void TextLayersDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pItemModel, const QModelIndex &index) const /*override*/
 {
 	TextLayersModel *pModel = static_cast<TextLayersModel *>(pItemModel);
+	TextLayerHandle hLayer = pModel->GetHandle(index);
 
 	switch(index.column())
 	{
 	case TextLayersModel::COLUMN_Mode:
-		m_pItem->GetUndoStack()->push(new TextUndoCmd_LayerRenderMode(*m_pItem,
-																	  m_pItem->GetWidget()->GetCurStateIndex(),
-																	  pFontModel->GetLayerId(index.row()),
-																	  pFontModel->GetLayerRenderMode(index.row()),
-																	  static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
+		if(pModel->GetFontManager().GetRenderMode(hLayer) != static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex()))
+		{
+			m_pItem->GetUndoStack()->push(new TextUndoCmd_LayerRenderMode(*m_pItem,
+																		  m_pItem->GetWidget()->GetCurStateIndex(),
+																		  hLayer,
+																		  pModel->GetFontManager().GetRenderMode(hLayer),
+																		  static_cast<rendermode_t>(static_cast<QComboBox *>(pEditor)->currentIndex())));
+		}
 		break;
 
 	case TextLayersModel::COLUMN_Thickness:
-		m_pItem->GetUndoStack()->push(new FontUndoCmd_LayerOutlineThickness(*m_pItem,
-			m_pItem->GetWidget()->GetCurStateIndex(),
-			pFontModel->GetLayerId(index.row()),
-			pFontModel->GetLayerOutlineThickness(index.row()),
-			static_cast<QDoubleSpinBox *>(pEditor)->value()));
+		if(HyCompareFloat(static_cast<double>(pModel->GetFontManager().GetOutlineThickness(hLayer)), static_cast<QDoubleSpinBox *>(pEditor)->value()) == false)
+		{
+			m_pItem->GetUndoStack()->push(new TextUndoCmd_LayerOutlineThickness(*m_pItem,
+																				m_pItem->GetWidget()->GetCurStateIndex(),
+																				hLayer,
+																				pModel->GetFontManager().GetOutlineThickness(hLayer),
+																				static_cast<QDoubleSpinBox *>(pEditor)->value()));
+		}
 		break;
 
 	case TextLayersModel::COLUMN_Color:

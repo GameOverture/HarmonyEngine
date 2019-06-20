@@ -28,6 +28,11 @@ TextFontManager &TextLayersModel::GetFontManager()
 	return m_FontManagerRef;
 }
 
+const TextFontManager &TextLayersModel::GetFontManager() const
+{
+	return m_FontManagerRef;
+}
+
 QJsonArray TextLayersModel::GetLayersArray()
 {
 	QJsonArray layersArray;
@@ -35,16 +40,16 @@ QJsonArray TextLayersModel::GetLayersArray()
 	{
 		QJsonObject layerObj;
 
-		glm::vec3 vBotColor, vTopColor;
-		m_FontManagerRef.GetColor(m_LayerList[i], vBotColor, vTopColor);
+		QColor topColor, botColor;
+		m_FontManagerRef.GetColor(m_LayerList[i], topColor, botColor);
 
 		layerObj.insert("typefaceIndex", static_cast<int>(m_FontManagerRef.GetFontIndex(m_LayerList[i])));
-		layerObj.insert("botR", vBotColor.r);
-		layerObj.insert("botG", vBotColor.g);
-		layerObj.insert("botB", vBotColor.b);
-		layerObj.insert("topR", vTopColor.r);
-		layerObj.insert("topG", vTopColor.g);
-		layerObj.insert("topB", vTopColor.b);
+		layerObj.insert("botR", botColor.redF());
+		layerObj.insert("botG", botColor.greenF());
+		layerObj.insert("botB", botColor.blueF());
+		layerObj.insert("topR", topColor.redF());
+		layerObj.insert("topG", topColor.greenF());
+		layerObj.insert("topB", topColor.blueF());
 
 		layersArray.append(layerObj);
 	}
@@ -97,24 +102,24 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 	}
 }
 
-//void TextLayersModel::MoveRowUp(int iIndex)
-//{
-//	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
-//		return;
-//
-//	m_LayerList.swap(iIndex, iIndex - 1);
-//	endMoveRows();
-//}
-//
-//void TextLayersModel::MoveRowDown(int iIndex)
-//{
-//	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
-//		return;
-//
-//	m_LayerList.swap(iIndex, iIndex + 1);
-//	endMoveRows();
-//}
-//
+void TextLayersModel::MoveRowUp(int iIndex)
+{
+	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
+		return;
+
+	m_LayerList.swap(iIndex, iIndex - 1);
+	endMoveRows();
+}
+
+void TextLayersModel::MoveRowDown(int iIndex)
+{
+	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)
+		return;
+
+	m_LayerList.swap(iIndex, iIndex + 1);
+	endMoveRows();
+}
+
 //void TextLayersModel::SetFontSize(int iSize)
 //{
 //	for(int i = 0; i < m_LayerList.count(); ++i)
@@ -186,7 +191,7 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 //	return fLeftSideNudgeAmt;
 //}
 
-QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol)
+QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol) const
 {
 	for(int i = 0; i < m_LayerList.size(); ++i)
 	{
@@ -195,6 +200,11 @@ QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol)
 	}
 
 	return QModelIndex();
+}
+
+TextLayerHandle TextLayersModel::GetHandle(const QModelIndex &indexRef) const
+{
+	return m_LayerList[indexRef.row()];
 }
 
 /*virtual*/ int TextLayersModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
@@ -216,14 +226,14 @@ QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol)
 
 	if(indexRef.column() == COLUMN_Color)
 	{
-		glm::vec3 vTopColor, vBotColor;
-		m_FontManagerRef.GetColor(hLayer, vTopColor, vBotColor);
+		QColor topColor, botColor;
+		m_FontManagerRef.GetColor(hLayer, topColor, botColor);
 
 		if(iRole == Qt::BackgroundRole)
 		{
 			QLinearGradient gradient(0, 0, 0, 25.0f);
-			gradient.setColorAt(0.0, QColor(vTopColor.x * 255.0f, vTopColor.y * 255.0f, vTopColor.z * 255.0f));
-			gradient.setColorAt(1.0, QColor(vBotColor.x * 255.0f, vBotColor.y * 255.0f, vBotColor.z * 255.0f));
+			gradient.setColorAt(0.0, topColor);
+			gradient.setColorAt(1.0, botColor);
 
 			QBrush bgColorBrush(gradient);
 			return QVariant(bgColorBrush);
@@ -231,7 +241,7 @@ QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol)
 		else if(iRole == Qt::ForegroundRole)
 		{
 			// Counting the perceptive luminance - human eye favors green color
-			double a = 1 - ( 0.299 * vTopColor.x + 0.587 * vTopColor.y + 0.114 * vTopColor.z)/255;
+			double a = 1 - ( 0.299 * topColor.redF() + 0.587 * topColor.greenF() + 0.114 * topColor.blueF())/255;
 
 			if (a < 0.5)
 			{

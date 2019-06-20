@@ -56,7 +56,8 @@ TextFontManager::~TextFontManager()
 	for(int i = 0; i < m_PreviewFontList.size(); ++i)
 		delete m_PreviewFontList[i];
 
-	texture_atlas_delete(m_pPreviewAtlas);
+	if(m_pPreviewAtlas != nullptr)
+		texture_atlas_delete(m_pPreviewAtlas);
 }
 
 PropertiesTreeModel *TextFontManager::GetGlyphsModel()
@@ -76,19 +77,19 @@ QList<TextLayerHandle> TextFontManager::RegisterLayers(QJsonArray layerArray)
 	{
 		QJsonObject layerObj = layerArray[i].toObject();
 
-		glm::vec4 vBotColor;
-		vBotColor.r = layerObj["botR"].toDouble();
-		vBotColor.g = layerObj["botG"].toDouble();
-		vBotColor.b = layerObj["botB"].toDouble();
-		glm::vec4 vTopColor;
-		vTopColor.r = layerObj["topR"].toDouble();
-		vTopColor.g = layerObj["topG"].toDouble();
-		vTopColor.b = layerObj["topB"].toDouble();
+		QColor botColor;
+		botColor.setRedF(layerObj["botR"].toDouble());
+		botColor.setGreenF(layerObj["botG"].toDouble());
+		botColor.setBlueF(layerObj["botB"].toDouble());
+		QColor topColor;
+		topColor.setRedF(layerObj["topR"].toDouble());
+		topColor.setGreenF(layerObj["topG"].toDouble());
+		topColor.setBlueF(layerObj["topB"].toDouble());
 
 		uint32 uiFontIndex = layerObj["typefaceIndex"].toInt();
 
 		TextLayerHandle hNewLayer = ++sm_hHandleCount;
-		m_LayerMap[hNewLayer] = new Layer(hNewLayer, uiFontIndex, vBotColor, vTopColor);
+		m_LayerMap[hNewLayer] = new Layer(hNewLayer, uiFontIndex, botColor, topColor);
 
 		retLayerHandleList.append(hNewLayer);
 	}
@@ -101,7 +102,7 @@ QJsonArray TextFontManager::GetFontArray() const
 	return m_FontArray;
 }
 
-uint TextFontManager::GetFontIndex(TextLayerHandle hLayer)
+uint TextFontManager::GetFontIndex(TextLayerHandle hLayer) const
 {
 	auto iter = m_LayerMap.find(hLayer);
 	if(iter == m_LayerMap.end())
@@ -113,7 +114,7 @@ uint TextFontManager::GetFontIndex(TextLayerHandle hLayer)
 	return iter.value()->m_uiFontIndex;
 }
 
-QString TextFontManager::GetFontName(TextLayerHandle hLayer)
+QString TextFontManager::GetFontName(TextLayerHandle hLayer) const
 {
 	auto iter = m_LayerMap.find(hLayer);
 	if(iter == m_LayerMap.end())
@@ -126,7 +127,7 @@ QString TextFontManager::GetFontName(TextLayerHandle hLayer)
 	return fontObj["font"].toString();
 }
 
-rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer)
+rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer) const
 {
 	auto iter = m_LayerMap.find(hLayer);
 	if(iter == m_LayerMap.end())
@@ -139,7 +140,7 @@ rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer)
 	return static_cast<rendermode_t>(fontObj["mode"].toInt());
 }
 
-float TextFontManager::GetOutlineThickness(TextLayerHandle hLayer)
+float TextFontManager::GetOutlineThickness(TextLayerHandle hLayer) const
 {
 	auto iter = m_LayerMap.find(hLayer);
 	if(iter == m_LayerMap.end())
@@ -152,7 +153,7 @@ float TextFontManager::GetOutlineThickness(TextLayerHandle hLayer)
 	return static_cast<float>(fontObj["outlineThickness"].toDouble());
 }
 
-float TextFontManager::GetSize(TextLayerHandle hLayer)
+float TextFontManager::GetSize(TextLayerHandle hLayer) const
 {
 	auto iter = m_LayerMap.find(hLayer);
 	if(iter == m_LayerMap.end())
@@ -165,7 +166,7 @@ float TextFontManager::GetSize(TextLayerHandle hLayer)
 	return static_cast<float>(fontObj["size"].toDouble());
 }
 
-void TextFontManager::GetColor(TextLayerHandle hLayer, glm::vec3 &vTopColorOut, glm::vec3 &vBotColorOut)
+void TextFontManager::GetColor(TextLayerHandle hLayer, QColor &topColorOut, QColor &botColorOut) const
 {
 	auto iter = m_LayerMap.find(hLayer);
 	if(iter == m_LayerMap.end())
@@ -174,8 +175,8 @@ void TextFontManager::GetColor(TextLayerHandle hLayer, glm::vec3 &vTopColorOut, 
 		return;
 	}
 
-	vTopColorOut = iter.value()->m_vTopColor;
-	vBotColorOut = iter.value()->m_vBotColor;
+	topColorOut = iter.value()->m_TopColor;
+	botColorOut = iter.value()->m_BotColor;
 }
 
 TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
@@ -187,7 +188,7 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 	if(iFontIndex >= 0)
 	{
 		hNewLayer = ++sm_hHandleCount;
-		m_LayerMap[hNewLayer] = new Layer(hNewLayer, iFontIndex, glm::vec3(0.0f), glm::vec3(0.0f));
+		m_LayerMap[hNewLayer] = new Layer(hNewLayer, iFontIndex, QColor(Qt::black), QColor(Qt::black));
 
 		return hNewLayer;
 	}
@@ -198,7 +199,7 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 		if(iNewFontIndex >= 0)
 		{
 			hNewLayer = ++sm_hHandleCount;
-			m_LayerMap[hNewLayer] = new Layer(hNewLayer, iNewFontIndex, glm::vec3(0.0f), glm::vec3(0.0f));
+			m_LayerMap[hNewLayer] = new Layer(hNewLayer, iNewFontIndex, QColor(Qt::black), QColor(Qt::black));
 		}
 	}
 	RegenFontArray();
@@ -244,6 +245,12 @@ void TextFontManager::SetOutlineThickness(TextLayerHandle hLayer, float fThickne
 	RegenFontArray();
 }
 
+void TextFontManager::SetColors(TextLayerHandle hLayer, const QColor &topColor, const QColor &botColor)
+{
+	m_LayerMap[hLayer]->m_TopColor = topColor;
+	m_LayerMap[hLayer]->m_BotColor = botColor;
+}
+
 int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize) const
 {
 	for(int i = 0; i < m_FontArray.size(); ++i)
@@ -284,7 +291,7 @@ void TextFontManager::PrepPreview()
 
 int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
-	QList<QStandardItem *> foundFontList = m_GlyphsModel.GetOwner().GetProject().GetFontListModel()->findItems(sFontName);
+	QList<QStandardItem *> foundFontList = m_GlyphsModel.GetOwner().GetProject().GetFontListModel()->findItems(sFontName, Qt::MatchContains);
 	if(foundFontList.size() == 1)
 	{
 		PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,

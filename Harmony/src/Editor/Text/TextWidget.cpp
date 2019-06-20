@@ -48,6 +48,12 @@ TextWidget::TextWidget(ProjectItem &itemRef, QWidget *parent) :
 	ui.cmbSize->insertItems(0, sSizeList);
 
 	ui.layersTableView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex()));
+	ui.layersTableView->resize(ui.layersTableView->size());
+	ui.layersTableView->setItemDelegate(new TextLayersDelegate(&m_ItemRef, this));
+	QItemSelectionModel *pSelModel = ui.layersTableView->selectionModel();
+	//connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
+
+
 	ui.glyphsTreeView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetGlyphsModel());
 }
 

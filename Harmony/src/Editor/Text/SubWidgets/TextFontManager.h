@@ -31,14 +31,14 @@ class TextFontManager
 		const TextLayerHandle		m_hUNIQUE_ID;
 
 		uint						m_uiFontIndex;
-		glm::vec3					m_vBotColor;
-		glm::vec3					m_vTopColor;
+		QColor						m_BotColor;
+		QColor						m_TopColor;
 
-		Layer(TextLayerHandle m_hUniqueId, uint uiFontIndex, glm::vec3 vBotColor, glm::vec3 vTopColor) :
+		Layer(TextLayerHandle m_hUniqueId, uint uiFontIndex, QColor botColor, QColor topColor) :
 			m_hUNIQUE_ID(m_hUniqueId),
 			m_uiFontIndex(uiFontIndex),
-			m_vBotColor(vBotColor),
-			m_vTopColor(vTopColor)
+			m_BotColor(botColor),
+			m_TopColor(topColor)
 		{ }
 	};
 	QMap<TextLayerHandle, Layer *>	m_LayerMap;
@@ -89,16 +89,17 @@ public:
 	QList<TextLayerHandle> RegisterLayers(QJsonArray layerArray);
 	QJsonArray GetFontArray() const;
 
-	uint GetFontIndex(TextLayerHandle hLayer);
-	QString GetFontName(TextLayerHandle hLayer);
-	rendermode_t GetRenderMode(TextLayerHandle hLayer);
-	float GetOutlineThickness(TextLayerHandle hLayer);
-	float GetSize(TextLayerHandle hLayer);
-	void GetColor(TextLayerHandle hLayer, glm::vec3 &vTopColorOut, glm::vec3 &vBotColorOut);
+	uint GetFontIndex(TextLayerHandle hLayer) const;
+	QString GetFontName(TextLayerHandle hLayer) const;
+	rendermode_t GetRenderMode(TextLayerHandle hLayer) const;
+	float GetOutlineThickness(TextLayerHandle hLayer) const;
+	float GetSize(TextLayerHandle hLayer) const;
+	void GetColor(TextLayerHandle hLayer, QColor &topColorOut, QColor &botColorOut) const;
 
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 	void SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode);
 	void SetOutlineThickness(TextLayerHandle hLayer, float fThickness);
+	void SetColors(TextLayerHandle hLayer, const QColor &topColor, const QColor &botColor);
 
 private:
 	int DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize) const;

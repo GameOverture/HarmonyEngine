@@ -123,121 +123,116 @@ void TextUndoCmd_LayerRenderMode::undo()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//FontUndoCmd_LayerOutlineThickness::FontUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, int iLayerId, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= 0*/) :
-//	QUndoCommand(pParent),
-//	m_ItemRef(itemRef),
-//	m_iStateIndex(iStateIndex),
-//	m_iLayerId(iLayerId),
-//	m_fPrevThickness(fPrevThickness),
-//	m_fNewThickness(fNewThickness)
-//{
-//	setText("Stage Outline Thickness");
-//}
-//
-///*virtual*/ FontUndoCmd_LayerOutlineThickness::~FontUndoCmd_LayerOutlineThickness()
-//{
-//}
-//
-//void FontUndoCmd_LayerOutlineThickness::redo()
-//{
-//	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
-//	
-//	pModel->SetLayerOutlineThickness(m_iLayerId, m_fNewThickness);
-//	
-//	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
-//}
-//
-//void FontUndoCmd_LayerOutlineThickness::undo()
-//{
-//	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
-//	
-//	pModel->SetLayerOutlineThickness(m_iLayerId, m_fPrevThickness);
-//	
-//	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
-//}
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//FontUndoCmd_LayerColors::FontUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, int iLayerId, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent /*= 0*/) :
-//	QUndoCommand(pParent),
-//	m_ItemRef(itemRef),
-//	m_iStateIndex(iStateIndex),
-//	m_iLayerId(iLayerId),
-//	m_PrevTopColor(prevTopColor),
-//	m_PrevBotColor(prevBotColor),
-//	m_NewTopColor(newTopColor),
-//	m_NewBotColor(newBotColor)
-//{
-//	setText("Set Layer Colors");
-//}
-//
-///*virtual*/ FontUndoCmd_LayerColors::~FontUndoCmd_LayerColors()
-//{
-//}
-//
-//void FontUndoCmd_LayerColors::redo()
-//{
-//	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
-//
-//	pModel->SetLayerColors(m_iLayerId, m_NewTopColor, m_NewBotColor);
-//
-//	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
-//}
-//
-//void FontUndoCmd_LayerColors::undo()
-//{
-//	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
-//
-//	pModel->SetLayerColors(m_iLayerId, m_PrevTopColor, m_PrevBotColor);
-//
-//	m_ItemRef.FocusWidgetState(m_iStateIndex, m_iLayerId);
-//}
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//FontUndoCmd_LayerOrder::FontUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, FontTableView *pTableView, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :
-//	QUndoCommand(pParent),
-//	m_ItemRef(itemRef),
-//	m_iStateIndex(iStateIndex),
-//	m_pFontTableView(pTableView),
-//	m_iPrevRowIndex(iPrevRowIndex),
-//	m_iNewRowIndex(iNewRowIndex)
-//{
-//	if(m_iPrevRowIndex > m_iNewRowIndex)
-//		setText("Order Layer Upwards");
-//	else
-//		setText("Order Layer Downwards");
-//}
-//
-///*virtual*/ FontUndoCmd_LayerOrder::~FontUndoCmd_LayerOrder()
-//{
-//}
-//
-//void FontUndoCmd_LayerOrder::redo()
-//{
-//	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
-//	
-//	int iOffset = m_iNewRowIndex - m_iPrevRowIndex;
-//	if(iOffset > 0)
-//		pModel->MoveRowDown(m_iPrevRowIndex);
-//	else
-//		pModel->MoveRowUp(m_iPrevRowIndex);
-//		
-//	m_ItemRef.FocusWidgetState(m_iStateIndex, pModel->GetLayerId(m_iNewRowIndex));
-//}
-//
-//void FontUndoCmd_LayerOrder::undo()
-//{
-//	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
-//	
-//	int iOffset = m_iPrevRowIndex - m_iNewRowIndex;
-//	if(iOffset > 0)
-//		pModel->MoveRowDown(m_iNewRowIndex);
-//	else
-//		pModel->MoveRowUp(m_iNewRowIndex);
-//	
-//	m_ItemRef.FocusWidgetState(m_iStateIndex, pModel->GetLayerId(m_iPrevRowIndex));
-//}
-//
+TextUndoCmd_LayerOutlineThickness::TextUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_hLayer(hLayer),
+	m_fPrevThickness(fPrevThickness),
+	m_fNewThickness(fNewThickness)
+{
+	setText("Stage Outline Thickness");
+}
+
+/*virtual*/ TextUndoCmd_LayerOutlineThickness::~TextUndoCmd_LayerOutlineThickness()
+{
+}
+
+void TextUndoCmd_LayerOutlineThickness::redo()
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->setData(pModel->GetIndex(m_hLayer, TextLayersModel::COLUMN_Thickness), m_fNewThickness);
+
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
+}
+
+void TextUndoCmd_LayerOutlineThickness::undo()
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->setData(pModel->GetIndex(m_hLayer, TextLayersModel::COLUMN_Thickness), m_fPrevThickness);
+
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TextUndoCmd_LayerColors::TextUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_hLayer(hLayer),
+	m_PrevTopColor(prevTopColor),
+	m_PrevBotColor(prevBotColor),
+	m_NewTopColor(newTopColor),
+	m_NewBotColor(newBotColor)
+{
+	setText("Set Layer Colors");
+}
+
+/*virtual*/ TextUndoCmd_LayerColors::~TextUndoCmd_LayerColors()
+{
+}
+
+void TextUndoCmd_LayerColors::redo()
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->GetFontManager().SetColors(m_hLayer, m_NewTopColor, m_NewBotColor);
+
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
+}
+
+void TextUndoCmd_LayerColors::undo()
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->GetFontManager().SetColors(m_hLayer, m_PrevTopColor, m_PrevBotColor);
+
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TextUndoCmd_LayerOrder::TextUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_hLayer(hLayer),
+	m_iPrevRowIndex(iPrevRowIndex),
+	m_iNewRowIndex(iNewRowIndex)
+{
+	if(m_iPrevRowIndex > m_iNewRowIndex)
+		setText("Order Layer Upwards");
+	else
+		setText("Order Layer Downwards");
+}
+
+/*virtual*/ TextUndoCmd_LayerOrder::~TextUndoCmd_LayerOrder()
+{
+}
+
+void TextUndoCmd_LayerOrder::redo()
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	
+	int iOffset = m_iNewRowIndex - m_iPrevRowIndex;
+	if(iOffset > 0)
+		pModel->MoveRowDown(m_iPrevRowIndex);
+	else
+		pModel->MoveRowUp(m_iPrevRowIndex);
+		
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
+}
+
+void TextUndoCmd_LayerOrder::undo()
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	
+	int iOffset = m_iPrevRowIndex - m_iNewRowIndex;
+	if(iOffset > 0)
+		pModel->MoveRowDown(m_iNewRowIndex);
+	else
+		pModel->MoveRowUp(m_iNewRowIndex);
+	
+	m_ItemRef.FocusWidgetState(m_iStateIndex, m_hLayer);
+}
