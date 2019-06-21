@@ -291,20 +291,24 @@ void TextFontManager::PrepPreview()
 
 int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
-	QList<QStandardItem *> foundFontList = m_GlyphsModel.GetOwner().GetProject().GetFontListModel()->findItems(sFontName, Qt::MatchContains); broken;
-	if(foundFontList.size() == 1)
+	QStandardItemModel *pProjectFontsModel = m_GlyphsModel.GetOwner().GetProject().GetFontListModel();
+	int iNumFonts = pProjectFontsModel->rowCount();
+	for(int i = 0; i < iNumFonts; ++i)
 	{
-		PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
-													   GetAvailableTypefaceGlyphs(),
-													   foundFontList[0]->data().toString(),
-													   fSize,
-													   fOutlineThickness,
-													   eRenderMode);
-		if(pNewPreviewFont->GetMissedGlyphs() != 0)
-			HyGuiLog("CreatePreviewFont could not create preview fonts. Missed '" % QString::number(pNewPreviewFont->GetMissedGlyphs()) % "' glyphs", LOGTYPE_Error);
+		if(pProjectFontsModel->item(i)->text().compare(sFontName, Qt::CaseInsensitive) == 0)
+		{
+			PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
+															GetAvailableTypefaceGlyphs(),
+															pProjectFontsModel->item(i)->data().toString(),
+															fSize,
+															fOutlineThickness,
+															eRenderMode);
+			if(pNewPreviewFont->GetMissedGlyphs() != 0)
+				HyGuiLog("CreatePreviewFont could not create preview fonts. Missed '" % QString::number(pNewPreviewFont->GetMissedGlyphs()) % "' glyphs", LOGTYPE_Error);
 
-		m_PreviewFontList.append(pNewPreviewFont);
-		return m_PreviewFontList.size() - 1;
+			m_PreviewFontList.append(pNewPreviewFont);
+			return m_PreviewFontList.size() - 1;
+		}
 	}
 
 	return -1;
