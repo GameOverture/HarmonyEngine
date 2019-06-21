@@ -14,10 +14,13 @@
 
 class TextDraw : public IDraw
 {
+	HyText2d		m_Text;
+
 public:
 	TextDraw(ProjectItem *pProjItem);
 	virtual ~TextDraw();
 
+	virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;

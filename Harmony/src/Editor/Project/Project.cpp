@@ -775,16 +775,16 @@ void Project::ScanMetaFontDir()
 	QMap<QString,QString> metaFontsMap;
 	for(int i = 0; i < metaFontFileInfoList.count(); ++i)
 	{
-		QString metaFontFileName = metaFontFileInfoList[i].fileName();
-		int iNumFonts = m_FontListModel.rowCount();
-		for(int j = 0; j < iNumFonts; ++j)
-		{
-			if(m_FontListModel.item(j)->text().compare(metaFontFileName, Qt::CaseInsensitive) == 0)
-			{
-				m_FontListModel.removeRow(m_FontListModel.item(j)->row()); // Remove the font since we're gonna add it again as a meta dir font
-				break;
-			}
-		}
+		//QString metaFontFileName = metaFontFileInfoList[i].fileName();
+		//int iNumFonts = m_FontListModel.rowCount();
+		//for(int j = 0; j < iNumFonts; ++j)
+		//{
+		//	if(m_FontListModel.item(j)->text().compare(metaFontFileName, Qt::CaseInsensitive) == 0)
+		//	{
+		//		m_FontListModel.removeRow(m_FontListModel.item(j)->row()); // Remove the font since we're gonna add it again as a meta dir font
+		//		break;
+		//	}
+		//}
 
 		metaFontsMap[metaFontFileInfoList[i].fileName()] = metaFontFileInfoList[i].absoluteFilePath();
 	}

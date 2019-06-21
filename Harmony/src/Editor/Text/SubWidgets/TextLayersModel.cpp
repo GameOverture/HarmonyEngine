@@ -360,7 +360,11 @@ TextLayerHandle TextLayersModel::GetHandle(const QModelIndex &indexRef) const
 	return true;
 }
 
-/*virtual*/ Qt::ItemFlags TextLayersModel::flags(const QModelIndex & index) const
+/*virtual*/ Qt::ItemFlags TextLayersModel::flags(const QModelIndex &indexRef) const
 {
-	return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+	Qt::ItemFlags eFlags = Qt::ItemIsEditable | Qt::ItemIsEnabled;
+	if(indexRef.column() != COLUMN_Color)
+		eFlags |= Qt::ItemIsSelectable;
+
+	return eFlags;
 }

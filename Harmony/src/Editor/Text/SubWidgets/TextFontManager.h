@@ -104,7 +104,7 @@ public:
 private:
 	int DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize) const;
 	void PrepPreview();
-	int CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
+	int CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize, bool bAllowRepack);
 	void RegenFontArray();
 	void CleanUnusedFonts();
 	QString GetAvailableTypefaceGlyphs() const;

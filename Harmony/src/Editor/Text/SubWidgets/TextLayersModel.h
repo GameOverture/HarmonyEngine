@@ -72,7 +72,7 @@ public:
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	virtual bool setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole = Qt::EditRole) override;
-	virtual Qt::ItemFlags flags(const QModelIndex & index) const override;
+	virtual Qt::ItemFlags flags(const QModelIndex &indexRef) const override;
 };
 
 #endif // TEXTLAYERSMODEL_H
