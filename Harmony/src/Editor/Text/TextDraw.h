@@ -14,7 +14,8 @@
 
 class TextDraw : public IDraw
 {
-	HyText2d		m_Text;
+	HyText2d			m_Text;
+	HyTextureHandle		m_hTexture;
 
 public:
 	TextDraw(ProjectItem *pProjItem);

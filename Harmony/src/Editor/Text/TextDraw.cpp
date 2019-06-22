@@ -10,10 +10,14 @@
 #include "Global.h"
 #include "TextDraw.h"
 #include "ProjectItem.h"
+#include "TextModel.h"
+#include "Harmony.h"
+#include "HarmonyWidget.h"
 
 TextDraw::TextDraw(ProjectItem *pProjItem) :
 	IDraw(pProjItem),
-	m_Text("", "+GuiPreview", this)
+	m_Text("", "+GuiPreview", this),
+	m_hTexture(HY_UNUSED_HANDLE)
 {
 	m_Text.TextSet("The quick brown fox jumped over the lazy dog.");
 }
@@ -24,29 +28,25 @@ TextDraw::~TextDraw()
 
 /*virtual*/ void TextDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
 {
-	texture_atlas_t *pFtglAtlas = static_cast<FontModel *>(m_pProjItem->GetModel())->GetFtglAtlas();
-	unsigned char *pAtlasPixelData = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPreviewPixelData();
-	uint uiAtlasPixelDataSize = static_cast<FontModel *>(m_pProjItem->GetModel())->GetAtlasPreviewPixelDataSize();
-	if(pFtglAtlas == nullptr || pAtlasPixelData == nullptr || Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer() == nullptr)
+	uint uiAtlasPixelDataSize = 0;
+	QSize atlasDimensions;
+	unsigned char *pAtlasPixelData = static_cast<TextModel *>(m_pProjItem->GetModel())->GetFontManager().GenerateAtlas(uiAtlasPixelDataSize, atlasDimensions);
+	if(pAtlasPixelData == nullptr || Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer() == nullptr)
 		return;
 
-	if(pFtglAtlas->id == 0)
-	{
-		if(pFtglAtlas->id != HY_UNUSED_HANDLE)
-			Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(pFtglAtlas->id);
+	if(m_hTexture != HY_UNUSED_HANDLE)
+		Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(m_hTexture);
 
-		// Upload texture to gfx api
-		pFtglAtlas->id = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HYTEXTURE_R8G8B8A8,
-																										  HYTEXFILTER_BILINEAR,
-																										  0,
-																										  static_cast<uint32>(pFtglAtlas->width),
-																										  static_cast<uint32>(pFtglAtlas->height),
-																										  pAtlasPixelData,
-																										  uiAtlasPixelDataSize,
-																										  HYTEXTURE_R8G8B8A8);
-	}
-
-	m_Text.GuiOverrideData<HyText2dData>(valueRef, pFtglAtlas->id);
+	// Upload texture to gfx api
+	m_hTexture = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HYTEXTURE_R8G8B8A8,
+																								  HYTEXFILTER_BILINEAR,
+																								  0,
+																								  atlasDimensions.width(),
+																								  atlasDimensions.height(),
+																								  pAtlasPixelData,
+																								  uiAtlasPixelDataSize,
+																								  HYTEXTURE_R8G8B8A8);
+	m_Text.GuiOverrideData<HyText2dData>(valueRef, m_hTexture);
 	m_Text.TextSet("The quick brown fox jumped over the lazy dog.");
 }
 

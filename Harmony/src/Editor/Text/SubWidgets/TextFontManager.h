@@ -16,6 +16,7 @@
 #include <QFileInfo>
 
 typedef int TextLayerHandle;
+#define TextUnusedHandle -1
 
 class TextFontManager
 {
@@ -30,13 +31,13 @@ class TextFontManager
 	{
 		const TextLayerHandle		m_hUNIQUE_ID;
 
-		uint						m_uiFontIndex;
+		int							m_iFontIndex;
 		QColor						m_BotColor;
 		QColor						m_TopColor;
 
-		Layer(TextLayerHandle m_hUniqueId, uint uiFontIndex, QColor botColor, QColor topColor) :
+		Layer(TextLayerHandle m_hUniqueId, int iFontIndex, QColor botColor, QColor topColor) :
 			m_hUNIQUE_ID(m_hUniqueId),
-			m_uiFontIndex(uiFontIndex),
+			m_iFontIndex(iFontIndex),
 			m_BotColor(botColor),
 			m_TopColor(topColor)
 		{ }
@@ -77,7 +78,12 @@ class TextFontManager
 		}
 	};
 	QList<PreviewFont *>			m_PreviewFontList;
+
 	texture_atlas_t *				m_pPreviewAtlas;
+	unsigned char *					m_pPreviewAtlasPixelData;
+	uint							m_uiPreviewAtlasBufferSize;
+	uint							m_uiPreviewAtlasDimension;
+	bool							m_bPreviewInitalized;
 
 public:
 	TextFontManager(ProjectItem &itemRef, QJsonObject availableGlyphsObj, QJsonArray fontArray);
@@ -101,10 +107,10 @@ public:
 	void SetOutlineThickness(TextLayerHandle hLayer, float fThickness);
 	void SetColors(TextLayerHandle hLayer, const QColor &topColor, const QColor &botColor);
 
+	unsigned char *GenerateAtlas(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut);
+
 private:
-	int DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize) const;
-	void PrepPreview();
-	int CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize, bool bAllowRepack);
+	int CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 	void RegenFontArray();
 	void CleanUnusedFonts();
 	QString GetAvailableTypefaceGlyphs() const;
