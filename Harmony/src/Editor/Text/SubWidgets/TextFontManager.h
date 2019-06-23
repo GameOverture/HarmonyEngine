@@ -16,7 +16,7 @@
 #include <QFileInfo>
 
 typedef int TextLayerHandle;
-#define TextUnusedHandle -1
+#define TextUnusedHandle static_cast<TextLayerHandle>(-1)
 
 class TextFontManager
 {
@@ -83,7 +83,6 @@ class TextFontManager
 	unsigned char *					m_pPreviewAtlasPixelData;
 	uint							m_uiPreviewAtlasBufferSize;
 	uint							m_uiPreviewAtlasDimension;
-	bool							m_bPreviewInitalized;
 
 public:
 	TextFontManager(ProjectItem &itemRef, QJsonObject availableGlyphsObj, QJsonArray fontArray);
@@ -110,9 +109,14 @@ public:
 	unsigned char *GenerateAtlas(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut);
 
 private:
+	int DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 	int CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
+
+	int InitAtlas();
+	void ClearAndEmbiggenAtlas();
+
 	void RegenFontArray();
-	void CleanUnusedFonts();
+
 	QString GetAvailableTypefaceGlyphs() const;
 };
 

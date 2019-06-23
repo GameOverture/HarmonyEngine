@@ -12,6 +12,7 @@
 #include "TextModel.h"
 #include "Project.h"
 
+#define TEXTFONTERROR_Success 0
 #define TEXTFONTERROR_Unknown -1
 #define TEXTFONTERROR_AtlasFull -2
 #define TEXTFONTERROR_FontNotFound -3
@@ -24,8 +25,7 @@ TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsOb
 	m_pPreviewAtlas(nullptr),
 	m_pPreviewAtlasPixelData(nullptr),
 	m_uiPreviewAtlasBufferSize(0),
-	m_uiPreviewAtlasDimension(2048),
-	m_bPreviewInitalized(false)
+	m_uiPreviewAtlasDimension(2048)
 {
 	bool b09 = true;
 	bool bAZ = true;
@@ -189,17 +189,19 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 {
 	TextLayerHandle hNewLayer = HY_UNUSED_HANDLE;
 
-	int iFontIndex = CreatePreviewFont(sFontName, eRenderMode, fOutlineThickness, fSize);
-	if(iFontIndex >= 0)
+	int iFontIndex = DoesFontExist(sFontName, eRenderMode, fOutlineThickness, fSize);
+	if(iFontIndex < 0)
+		iFontIndex = CreatePreviewFont(sFontName, eRenderMode, fOutlineThickness, fSize);
+	if(iFontIndex < 0)
 	{
-		hNewLayer = ++sm_hHandleCount;
-		m_LayerMap[hNewLayer] = new Layer(hNewLayer, iFontIndex, QColor(Qt::black), QColor(Qt::black));
-
-		return hNewLayer;
+		HyGuiLog("TextFontManager::AddNewLayer failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
+		return TextUnusedHandle;
 	}
 	
-	RegenFontArray();
+	hNewLayer = ++sm_hHandleCount;
+	m_LayerMap[hNewLayer] = new Layer(hNewLayer, iFontIndex, QColor(Qt::black), QColor(Qt::black));
 
+	RegenFontArray();
 	return hNewLayer;
 }
 
@@ -210,8 +212,13 @@ void TextFontManager::SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode)
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
 	if(iFontIndex < 0)
 		iFontIndex = CreatePreviewFont(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
+	if(iFontIndex < 0)
+	{
+		HyGuiLog("TextFontManager::SetRenderMode failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
+		return;
+	}
 
-	m_LayerMap[hLayer]->m_iFontIndex = iFontIndex;	
+	m_LayerMap[hLayer]->m_iFontIndex = iFontIndex;
 	RegenFontArray();
 }
 
@@ -222,6 +229,11 @@ void TextFontManager::SetOutlineThickness(TextLayerHandle hLayer, float fThickne
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
 	if(iFontIndex < 0)
 		iFontIndex = CreatePreviewFont(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
+	if(iFontIndex < 0)
+	{
+		HyGuiLog("TextFontManager::SetOutlineThickness failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
+		return;
+	}
 	
 	m_LayerMap[hLayer]->m_iFontIndex = iFontIndex;
 	RegenFontArray();
@@ -235,28 +247,25 @@ void TextFontManager::SetColors(TextLayerHandle hLayer, const QColor &topColor, 
 
 unsigned char *TextFontManager::GenerateAtlas(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut)
 {
-	if(m_pPreviewAtlas == nullptr)
-		return nullptr;
+	InitAtlas();
 
 	// Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
 	memset(m_pPreviewAtlasPixelData, 0xFF, m_uiPreviewAtlasBufferSize);
 
 	// Overwriting alpha channel
-	uint uiNumPixels = static_cast<uint>(TEXTFONTMANAGER_AtlasSize * TEXTFONTMANAGER_AtlasSize);
+	uint uiNumPixels = static_cast<uint>(m_uiPreviewAtlasDimension * m_uiPreviewAtlasDimension);
 	for(uint i = 0; i < uiNumPixels; ++i)
 		m_pPreviewAtlasPixelData[i*4+3] = m_pPreviewAtlas->data[i];
 
-
 	uiAtlasPixelDataSizeOut = m_uiPreviewAtlasBufferSize;
-	atlasDimensionsOut.setWidth(TEXTFONTMANAGER_AtlasSize);
-	atlasDimensionsOut.setHeight(TEXTFONTMANAGER_AtlasSize);
+	atlasDimensionsOut.setWidth(m_uiPreviewAtlasDimension);
+	atlasDimensionsOut.setHeight(m_uiPreviewAtlasDimension);
 
 	return m_pPreviewAtlasPixelData;
 }
 
-int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
+int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Checks for existing font in JSON array (m_FontArray)
 	for(int i = 0; i < m_FontArray.size(); ++i)
 	{
@@ -270,34 +279,11 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 			return i;
 		}
 	}
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Construct an atlas for preview fonts if required
-	if(m_pPreviewAtlasPixelData == nullptr)
-	{
-		if(m_pPreviewAtlas == nullptr)
-			m_pPreviewAtlas = texture_atlas_new(m_uiPreviewAtlasDimension, m_uiPreviewAtlasDimension, 1);
-
-		m_uiPreviewAtlasBufferSize = static_cast<uint>(m_uiPreviewAtlasDimension * m_uiPreviewAtlasDimension * 4);
-		m_pPreviewAtlasPixelData = new unsigned char[m_uiPreviewAtlasBufferSize];
-
-		// This creates the preview fonts of the already existing fonts in 'm_FontArray'
-		for(int i = 0; i < m_FontArray.size(); ++i)
-		{
-			QJsonObject fontObj = m_FontArray[i].toObject();
-			switch(CreatePreviewFont(fontObj["font"].toString(), static_cast<rendermode_t>(fontObj["mode"].toInt()), fontObj["outlineThickness"].toDouble(), fontObj["size"].toDouble()))
-			{
-			case TEXTFONTERROR_AtlasFull:
-				i = -1; // Atlas has been enlarged, start loop over at '0'
-				break;
-
-			case TEXTFONTERROR_FontNotFound:
-				return TEXTFONTERROR_FontNotFound;
-			}
-		}
-
-		m_bPreviewInitalized = true;
-	}
+int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
+{
+	InitAtlas();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Get font path
@@ -319,47 +305,105 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Allocate new font onto atlas
 	PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
-													GetAvailableTypefaceGlyphs(),
-													sFontPath,
-													fSize,
-													fOutlineThickness,
-													eRenderMode);
-	if(pNewPreviewFont->GetMissedGlyphs() == 0)
+												   GetAvailableTypefaceGlyphs(),
+												   sFontPath,
+												   fSize,
+												   fOutlineThickness,
+												   eRenderMode);
+	if(pNewPreviewFont->GetMissedGlyphs() > 0)
 	{
-		m_PreviewFontList.append(pNewPreviewFont);
-		return m_PreviewFontList.size() - 1;
+		HyGuiLog("Font preview could not fit '" % QString::number(pNewPreviewFont->GetMissedGlyphs()) % "' glyphs on atlas.", LOGTYPE_Info);
+		delete pNewPreviewFont;
+		ClearAndEmbiggenAtlas();
+
+		// Try it all again
+		return CreatePreviewFont(sFontName, eRenderMode, fOutlineThickness, fSize);
 	}
 
-	HyGuiLog("Font preview could not fit '" % QString::number(pNewPreviewFont->GetMissedGlyphs()) % "' glyphs on atlas. Removing unused fonts from preview atlas and regenerating.", LOGTYPE_Info);
-	delete pNewPreviewFont;
+	m_PreviewFontList.append(pNewPreviewFont);
+	return m_PreviewFontList.size() - 1;
+}
 
+int TextFontManager::InitAtlas()
+{
+	if(m_pPreviewAtlasPixelData != nullptr)
+		return TEXTFONTERROR_Success;
+
+	if(m_pPreviewAtlas == nullptr)
+		m_pPreviewAtlas = texture_atlas_new(m_uiPreviewAtlasDimension, m_uiPreviewAtlasDimension, 1);
+
+	m_uiPreviewAtlasBufferSize = static_cast<uint>(m_uiPreviewAtlasDimension * m_uiPreviewAtlasDimension * 4);
+	m_pPreviewAtlasPixelData = new unsigned char[m_uiPreviewAtlasBufferSize];
+
+	// This creates the preview fonts of the already existing fonts in 'm_FontArray'
+	for(int i = 0; i < m_FontArray.size(); ++i)
+	{
+		QJsonObject fontObj = m_FontArray[i].toObject();
+		switch(CreatePreviewFont(fontObj["font"].toString(), static_cast<rendermode_t>(fontObj["mode"].toInt()), fontObj["outlineThickness"].toDouble(), fontObj["size"].toDouble()))
+		{
+		case TEXTFONTERROR_AtlasFull:
+			ClearAndEmbiggenAtlas();
+			i = -1; // Atlas has been enlarged, start loop over at '0', which will also recreate the atlas
+			break;
+
+		case TEXTFONTERROR_FontNotFound:
+			return TEXTFONTERROR_FontNotFound;
+		}
+	}
+
+	return TEXTFONTERROR_Success;
+}
+
+void TextFontManager::ClearAndEmbiggenAtlas()
+{
 	for(int i = 0; i < m_PreviewFontList.size(); ++i)
 		delete m_PreviewFontList[i];
 	m_PreviewFontList.clear();
 
 	texture_atlas_clear(m_pPreviewAtlas);
-	PrepPreview();
+	delete [] m_pPreviewAtlasPixelData;
+	m_pPreviewAtlasPixelData = nullptr;
+	m_uiPreviewAtlasBufferSize = 0;
 
-	// Attempt two
-	pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
-										GetAvailableTypefaceGlyphs(),
-										sFontPath,
-										fSize,
-										fOutlineThickness,
-										eRenderMode);
-
-	if(pNewPreviewFont->GetMissedGlyphs() != 0)
-	{
-		HyGuiLog("TextFontManager::CreatePreviewFont could not fit all required font layers on atlas, even after repacking", LOGTYPE_Error);
-		return -1;
-	}
+	m_uiPreviewAtlasDimension += 1024;
+	HyGuiLog("Preview font's atlas has been embiggened to: " % QString::number(m_uiPreviewAtlasDimension), LOGTYPE_Info);
 }
 
 void TextFontManager::RegenFontArray()
 {
-	QString sAvailGlyphs = GetAvailableTypefaceGlyphs();
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Cleanup unused fonts
+	int iFontIndex = 0;
+	for(auto iter = m_PreviewFontList.begin(); iter != m_PreviewFontList.end(); ++iter, ++iFontIndex)
+	{
+		bool bFontUsed = false;
+		for(auto iterLayer = m_LayerMap.begin(); iterLayer != m_LayerMap.end(); ++iterLayer)
+		{
+			if(iterLayer.value()->m_iFontIndex == iFontIndex)
+			{
+				bFontUsed = true;
+				break;
+			}
+		}
 
-	CleanUnusedFonts();
+		if(bFontUsed == false)
+		{
+			iter = m_PreviewFontList.erase(iter);
+
+			// If a font gets erased, layer font indexes may become offset. Fix below
+			for(auto iterLayer = m_LayerMap.begin(); iterLayer != m_LayerMap.end(); ++iterLayer)
+			{
+				if(iterLayer.value()->m_iFontIndex > iFontIndex)
+					iterLayer.value()->m_iFontIndex--;
+			}
+
+			iFontIndex--; // Subtract one here to account for the erased font
+		}
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Create JSON Array to replace 'm_FontArray'
+	QString sAvailGlyphs = GetAvailableTypefaceGlyphs();
 
 	QJsonArray fontArray;
 	for(int i = 0; i < m_PreviewFontList.count(); ++i)
@@ -422,37 +466,6 @@ void TextFontManager::RegenFontArray()
 	}
 
 	m_FontArray = fontArray;
-}
-
-void TextFontManager::CleanUnusedFonts()
-{
-	int iFontIndex = 0;
-	for(auto iter = m_PreviewFontList.begin(); iter != m_PreviewFontList.end(); ++iter, ++iFontIndex)
-	{
-		bool bFontUsed = false;
-		for(auto iterLayer = m_LayerMap.begin(); iterLayer != m_LayerMap.end(); ++iterLayer)
-		{
-			if(iterLayer.value()->m_iFontIndex == iFontIndex)
-			{
-				bFontUsed = true;
-				break;
-			}
-		}
-
-		if(bFontUsed == false)
-		{
-			iter = m_PreviewFontList.erase(iter);
-
-			// If a font gets erased, layer font indexes may become offset. Fix below
-			for(auto iterLayer = m_LayerMap.begin(); iterLayer != m_LayerMap.end(); ++iterLayer)
-			{
-				if(iterLayer.value()->m_iFontIndex > iFontIndex)
-					iterLayer.value()->m_iFontIndex--;
-			}
-
-			iFontIndex--; // Subtract one here to account for the erased font
-		}
-	}
 }
 
 QString TextFontManager::GetAvailableTypefaceGlyphs() const
