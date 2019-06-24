@@ -16,7 +16,7 @@
 #include "GlobalUndoCmds.h"
 #include "DlgInputName.h"
 #include "SpriteModels.h"
-#include "FontModels.h"
+#include "TextModel.h"
 #include "EntityModel.h"
 #include "PrefabModel.h"
 
@@ -105,8 +105,8 @@ void IWidget::OnAddStateTriggered()
 	case ITEM_Sprite:
 		pCmd = new UndoCmd_AddState<SpriteStateData>("Add Sprite State", m_ItemRef);
 		break;
-	case ITEM_Font:
-		pCmd = new UndoCmd_AddState<FontStateData>("Add Text State", m_ItemRef);
+	case ITEM_Text:
+		pCmd = new UndoCmd_AddState<TextStateData>("Add Text State", m_ItemRef);
 		break;
 	case ITEM_Entity:
 		pCmd = new UndoCmd_AddState<EntityStateData>("Add Entity State", m_ItemRef);
@@ -132,8 +132,8 @@ void IWidget::OnRemoveStateTriggered()
 	case ITEM_Sprite:
 		pCmd = new UndoCmd_RemoveState<SpriteStateData>("Remove Sprite State", m_ItemRef, ui->cmbStates->currentIndex());
 		break;
-	case ITEM_Font:
-		pCmd = new UndoCmd_RemoveState<FontStateData>("Remove Text State", m_ItemRef, ui->cmbStates->currentIndex());
+	case ITEM_Text:
+		pCmd = new UndoCmd_RemoveState<TextStateData>("Remove Text State", m_ItemRef, ui->cmbStates->currentIndex());
 		break;
 	case ITEM_Entity:
 		pCmd = new UndoCmd_RemoveState<EntityStateData>("Remove Entity State", m_ItemRef, ui->cmbStates->currentIndex());
@@ -152,10 +152,10 @@ void IWidget::OnRemoveStateTriggered()
 
 void IWidget::OnRenameStateTriggered()
 {
-	DlgInputName *pDlg = new DlgInputName("Rename Font State", GetCurStateData()->GetName());
+	DlgInputName *pDlg = new DlgInputName("Rename State", GetCurStateData()->GetName());
 	if(pDlg->exec() == QDialog::Accepted)
 	{
-		QUndoCommand *pCmd = new UndoCmd_RenameState("Rename Font State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
+		QUndoCommand *pCmd = new UndoCmd_RenameState("Rename State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
 		m_ItemRef.GetUndoStack()->push(pCmd);
 	}
 	delete pDlg;
@@ -163,12 +163,12 @@ void IWidget::OnRenameStateTriggered()
 
 void IWidget::OnOrderStateBackwardsTriggered()
 {
-	QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift Font State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
+	QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void IWidget::OnOrderStateForwardsTriggered()
 {
-	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift Font State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
+	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }

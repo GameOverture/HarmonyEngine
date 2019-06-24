@@ -48,29 +48,9 @@ TextWidget::TextWidget(ProjectItem &itemRef, QWidget *parent) :
 	ui.cmbSize->clear();
 	ui.cmbSize->insertItems(0, sSizeList);
 
-	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
-	ui.layersTableView->setModel(pTextLayerModel);
-	ui.layersTableView->resize(ui.layersTableView->size());
 	ui.layersTableView->setItemDelegate(new TextLayersDelegate(&m_ItemRef, this));
 	QItemSelectionModel *pSelModel = ui.layersTableView->selectionModel();
 	//connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
-
-	
-	QString sFontName = pTextLayerModel->GetFont();
-	
-	int iNumFonts = pProjectFontsModel->rowCount();
-	QString sFontPath;
-	for(int i = 0; i < iNumFonts; ++i)
-	{
-		QString sTest = pProjectFontsModel->item(i)->text();
-		if(pProjectFontsModel->item(i)->text().compare(sFontName, Qt::CaseInsensitive) == 0)
-		{
-			ui.cmbFont->setCurrentIndex(i);
-			break;
-		}
-	}
-	ui.cmbSize->setCurrentText(QString::number(static_cast<int>(pTextLayerModel->GetFontSize())));
-
 
 	ui.glyphsTreeView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetGlyphsModel());
 }
@@ -98,7 +78,26 @@ TextWidget::~TextWidget()
 
 /*virtual*/ void TextWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
-	ui.layersTableView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(iStateIndex));
+	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
+	if(pTextLayerModel)
+	{
+		ui.layersTableView->setModel(pTextLayerModel);
+		ui.layersTableView->resize(ui.layersTableView->size());
+
+		QStandardItemModel *pProjectFontsModel = m_ItemRef.GetProject().GetFontListModel();
+		QString sFontName = pTextLayerModel->GetFont();
+		int iNumFonts = pProjectFontsModel->rowCount();
+		for(int i = 0; i < iNumFonts; ++i)
+		{
+			QString sTest = pProjectFontsModel->item(i)->text();
+			if(pProjectFontsModel->item(i)->text().compare(sFontName, Qt::CaseInsensitive) == 0)
+			{
+				ui.cmbFont->setCurrentIndex(i);
+				break;
+			}
+		}
+		ui.cmbSize->setCurrentText(QString::number(static_cast<int>(pTextLayerModel->GetFontSize())));
+	}
 }
 
 void TextWidget::on_cmbFont_currentIndexChanged(int index)

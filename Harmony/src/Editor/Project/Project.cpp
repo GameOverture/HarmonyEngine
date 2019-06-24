@@ -791,7 +791,7 @@ void Project::ScanMetaFontDir()
 
 	for(auto iter = metaFontsMap.begin(); iter != metaFontsMap.end(); ++iter)
 	{
-		QStandardItem *pFontItem = new QStandardItem(HyGlobal::ItemIcon(ITEM_Font, SUBICON_None), iter.key());
+		QStandardItem *pFontItem = new QStandardItem(HyGlobal::ItemIcon(ITEM_Text, SUBICON_None), iter.key());
 		pFontItem->setData(iter.value());
 
 		m_FontListModel.setItem(0, pFontItem);

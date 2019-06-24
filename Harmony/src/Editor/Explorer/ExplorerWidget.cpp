@@ -219,7 +219,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			break;
 		case ITEM_Audio:
 		case ITEM_Particles:
-		case ITEM_Font:
+		case ITEM_Text:
 		case ITEM_Spine:
 		case ITEM_Sprite:
 		case ITEM_Shader:
@@ -292,7 +292,7 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 	
 	case ITEM_Audio:
 	case ITEM_Particles:
-	case ITEM_Font:
+	case ITEM_Text:
 	case ITEM_Spine:
 	case ITEM_Sprite:
 	case ITEM_Shader:
@@ -315,7 +315,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	FINDACTION("actionNewPrefix")->setEnabled(bValidItem);
 	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
-	FINDACTION("actionNewFont")->setEnabled(bValidItem);
+	FINDACTION("actionNewText")->setEnabled(bValidItem);
 	FINDACTION("actionNewSprite")->setEnabled(bValidItem);
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
 	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
@@ -330,7 +330,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 		{
 		case ITEM_Audio:
 		case ITEM_Particles:
-		case ITEM_Font:
+		case ITEM_Text:
 		case ITEM_Spine:
 		case ITEM_Sprite:
 		case ITEM_Shader:

@@ -106,7 +106,7 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 			pNewPropertiesModel->AppendCategory("Textured Quad");
 			break;
 
-		case ITEM_Font: {
+		case ITEM_Text: {
 			QVariant var;
 			var.setValue<ExplorerItem *>(pItemToAdd);
 			pNewPropertiesModel->AppendCategory("Text", var);

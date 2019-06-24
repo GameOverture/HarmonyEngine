@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionNewPrefix);
 	ui->explorer->addAction(ui->actionNewAudio);
 	ui->explorer->addAction(ui->actionNewParticle);
-	ui->explorer->addAction(ui->actionNewFont);
+	ui->explorer->addAction(ui->actionNewText);
 	ui->explorer->addAction(ui->actionNewSprite);
 	ui->explorer->addAction(ui->actionNewEntity);
 	ui->explorer->addAction(ui->actionNewPrefab);
@@ -455,14 +455,9 @@ void MainWindow::on_actionNewSprite_triggered()
 	NewItem(ITEM_Sprite);
 }
 
-void MainWindow::on_actionNewFont_triggered()
-{
-	NewItem(ITEM_Font);
-}
-
 void MainWindow::on_actionNewText_triggered()
 {
-	NewItem(ITEM_Font);
+	NewItem(ITEM_Text);
 }
 
 void MainWindow::on_actionNewPrefab_triggered()

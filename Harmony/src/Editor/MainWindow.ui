@@ -70,7 +70,7 @@
      <addaction name="actionNewPrefix"/>
      <addaction name="separator"/>
      <addaction name="actionNewSprite"/>
-     <addaction name="actionNewFont"/>
+     <addaction name="actionNewText"/>
      <addaction name="actionNewParticle"/>
      <addaction name="actionNewPrefab"/>
      <addaction name="separator"/>
@@ -434,21 +434,6 @@
     <string>F2</string>
    </property>
   </action>
-  <action name="actionNewFont">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="res/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/Font-New.png</normaloff>:/icons16x16/items/Font-New.png</iconset>
-   </property>
-   <property name="text">
-    <string>New Font</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N, Ctrl+F</string>
-   </property>
-  </action>
   <action name="actionNewParticle">
    <property name="enabled">
     <bool>false</bool>
@@ -628,6 +613,9 @@
    </property>
   </action>
   <action name="actionNewText">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Font-New.png</normaloff>:/icons16x16/items/Font-New.png</iconset>
@@ -637,6 +625,9 @@
    </property>
    <property name="toolTip">
     <string>Create a new Text instance</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+T</string>
    </property>
   </action>
  </widget>

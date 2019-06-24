@@ -53,7 +53,7 @@ enum HyGuiItemType
 	ITEM_Primitive,
 	ITEM_Audio,
 	ITEM_Particles,
-	ITEM_Font,
+	ITEM_Text,
 	ITEM_Spine,
 	ITEM_Sprite,
 	ITEM_Shader,

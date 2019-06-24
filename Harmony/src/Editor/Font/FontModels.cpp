@@ -506,7 +506,7 @@ float FontStateData::GetSize()
 
 FontModel::FontModel(ProjectItem &itemRef, QJsonObject fontObj) :
 	IModel(itemRef),
-	m_FontMetaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_Font, true)),
+	m_FontMetaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_Text, true)),
 	m_TypeFacePropertiesModel(itemRef, 0, QVariant(0)),
 	m_pTrueAtlasFrame(nullptr),
 	m_pFtglAtlas(nullptr),
@@ -733,7 +733,7 @@ void FontModel::GeneratePreview()
 		if(m_ItemRef.GetProject().GetAtlasWidget())
 			uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedAtlasGrpId());
 
-		m_pTrueAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasGrpIndex, ITEM_Font);
+		m_pTrueAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasGrpIndex, ITEM_Text);
 	}
 }
 

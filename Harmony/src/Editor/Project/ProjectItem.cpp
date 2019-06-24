@@ -73,7 +73,7 @@ void ProjectItem::LoadModel()
 	case ITEM_Sprite:
 		m_pModel = new SpriteModel(*this, m_SaveValue.toArray());
 		break;
-	case ITEM_Font:
+	case ITEM_Text:
 		m_pModel = new TextModel(*this, m_SaveValue.toObject());
 		break;
 	case ITEM_Entity:
@@ -144,7 +144,7 @@ void ProjectItem::WidgetLoad()
 	case ITEM_Sprite:
 		m_pWidget = new SpriteWidget(*this);
 		break;
-	case ITEM_Font:
+	case ITEM_Text:
 		m_pWidget = new TextWidget(*this);
 		break;
 	case ITEM_Entity:
@@ -177,7 +177,7 @@ void ProjectItem::DrawLoad()
 	case ITEM_Sprite:
 		m_pDraw = new SpriteDraw(this);
 		break;
-	case ITEM_Font:
+	case ITEM_Text:
 		m_pDraw = new TextDraw(this);
 		break;
 	case ITEM_Entity:
