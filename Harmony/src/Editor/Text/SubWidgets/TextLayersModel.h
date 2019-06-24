@@ -54,7 +54,11 @@ public:
 	void MoveRowUp(int iIndex);
 	void MoveRowDown(int iIndex);
 
-	//void SetFontSize(int iSize);
+	QString GetFont() const;
+	void SetFont(QString sFontName);
+
+	float GetFontSize() const;
+	void SetFontSize(float fSize);
 
 	////void SetFontStageReference(int iRowIndex, FontTypeface *pStageRef);
 

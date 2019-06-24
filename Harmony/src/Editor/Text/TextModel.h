@@ -55,13 +55,10 @@ class TextModel : public IModel
 
 	TextFontManager				m_FontManager;
 	AtlasFrame *				m_pAtlasFrame;
-	QDataWidgetMapper			m_FontsWidgetMapper;
 
 public:
 	TextModel(ProjectItem &itemRef, QJsonObject fontObj);
 	virtual ~TextModel();
-
-	void MapFontComboBox(QComboBox *pComboBox);
 
 	TextFontManager &GetFontManager();
 	TextLayersModel *GetLayersModel(uint uiIndex);

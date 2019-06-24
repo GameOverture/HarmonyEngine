@@ -55,8 +55,6 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 	m_FontManager(itemRef, fontObj["availableGlyphs"].toObject(), fontObj["typefaceArray"].toArray()),
 	m_pAtlasFrame(nullptr)
 {
-	m_FontsWidgetMapper.setModel(m_ItemRef.GetProject().GetFontListModel());
-
 	// If item's init value is defined, parse and initialize with it, otherwise make default empty font
 	if(fontObj.empty() == false)
 	{
@@ -85,12 +83,6 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 
 /*virtual*/ TextModel::~TextModel()
 {
-}
-
-void TextModel::MapFontComboBox(QComboBox *pComboBox)
-{
-	pComboBox->setModel(m_FontsWidgetMapper.model());
-	m_FontsWidgetMapper.addMapping(pComboBox, 0);
 }
 
 TextFontManager &TextModel::GetFontManager()

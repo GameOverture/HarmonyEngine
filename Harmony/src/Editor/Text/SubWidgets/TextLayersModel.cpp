@@ -120,6 +120,30 @@ void TextLayersModel::MoveRowDown(int iIndex)
 	endMoveRows();
 }
 
+QString TextLayersModel::GetFont() const
+{
+	if(m_LayerList.empty())
+		return QString();
+
+	return m_FontManagerRef.GetFontName(m_LayerList[0]);
+}
+
+void TextLayersModel::SetFont(QString sFontName)
+{
+}
+
+float TextLayersModel::GetFontSize() const
+{
+	if(m_LayerList.empty())
+		return 0.0f;
+
+	return m_FontManagerRef.GetSize(m_LayerList[0]);
+}
+
+void TextLayersModel::SetFontSize(float fSize)
+{
+}
+
 //void TextLayersModel::SetFontSize(int iSize)
 //{
 //	for(int i = 0; i < m_LayerList.count(); ++i)
