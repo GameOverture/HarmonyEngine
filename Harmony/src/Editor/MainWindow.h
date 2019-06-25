@@ -108,7 +108,7 @@ private Q_SLOTS:
 
 	void on_actionTheme_Compe_triggered();
 
-	void on_actionLoadProject_triggered();
+	void on_actionActivateProject_triggered();
 
 
 private:

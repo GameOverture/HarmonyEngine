@@ -54,14 +54,6 @@
         <file>icons16x16/items/Audio-Open.png</file>
         <file>icons16x16/items/Audio-Settings.png</file>
         <file>icons16x16/items/Audio-Warning.png</file>
-        <file>icons16x16/items/Font.png</file>
-        <file>icons16x16/items/Font-Close.png</file>
-        <file>icons16x16/items/Font-Delete.png</file>
-        <file>icons16x16/items/Font-Dirty.png</file>
-        <file>icons16x16/items/Font-New.png</file>
-        <file>icons16x16/items/Font-Open.png</file>
-        <file>icons16x16/items/Font-Settings.png</file>
-        <file>icons16x16/items/Font-Warning.png</file>
         <file>icons16x16/items/Particles.png</file>
         <file>icons16x16/items/Particles-Close.png</file>
         <file>icons16x16/items/Particles-Delete.png</file>
@@ -114,7 +106,6 @@
         <file>icons16x16/sprite-alignVertCenter.png</file>
         <file>icons16x16/items/Atlas-Pending.png</file>
         <file>icons16x16/items/Audio-Pending.png</file>
-        <file>icons16x16/items/Font-Pending.png</file>
         <file>icons16x16/items/Particles-Pending.png</file>
         <file>icons16x16/items/Physics.png</file>
         <file>icons16x16/items/Physics-Close.png</file>
@@ -184,5 +175,14 @@
         <file>icons16x16/items/Prefab-Pending.png</file>
         <file>icons16x16/items/Prefab-Settings.png</file>
         <file>icons16x16/items/Prefab-Warning.png</file>
+        <file>icons16x16/items/Text.png</file>
+        <file>icons16x16/items/Text-Close.png</file>
+        <file>icons16x16/items/Text-Delete.png</file>
+        <file>icons16x16/items/Text-Dirty.png</file>
+        <file>icons16x16/items/Text-New.png</file>
+        <file>icons16x16/items/Text-Open.png</file>
+        <file>icons16x16/items/Text-Pending.png</file>
+        <file>icons16x16/items/Text-Settings.png</file>
+        <file>icons16x16/items/Text-Warning.png</file>
     </qresource>
 </RCC>

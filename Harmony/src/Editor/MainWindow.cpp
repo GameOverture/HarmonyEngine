@@ -77,7 +77,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionRemove);
 	ui->explorer->addAction(ui->actionRename);
 	ui->explorer->addAction(ui->actionLaunchIDE);
-	ui->explorer->addAction(ui->actionLoadProject);
+	ui->explorer->addAction(ui->actionActivateProject);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// FIRST RUN CHECK - Ensure Harmony Engine project location has been specified
@@ -303,6 +303,12 @@ void MainWindow::SetCurrentProject(Project *pProject)
 {
 	if(pItem == nullptr || pItem->GetType() == ITEM_Project)
 		return;
+
+	if(Harmony::GetProject() != &pItem->GetProject())
+	{
+		HyGuiLog("Cannot open '" % pItem->GetName(true) % "' because its current project is not activated.", LOGTYPE_Normal);
+		return;
+	}
 
 	Harmony::GetProject()->OpenTab(pItem);
 
@@ -680,7 +686,7 @@ void MainWindow::on_actionTheme_Compe_triggered()
 	SelectTheme(THEME_Compe);
 }
 
-void MainWindow::on_actionLoadProject_triggered()
+void MainWindow::on_actionActivateProject_triggered()
 {
 	ExplorerItem *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
 	m_Harmony.SetProject(&pCurSelectedItem->GetProject());

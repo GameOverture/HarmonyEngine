@@ -210,7 +210,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		{
 		case ITEM_Project:
 			if(Harmony::GetProject() != pContextExplorerItem)
-				contextMenu.addAction(FINDACTION("actionLoadProject"));
+				contextMenu.addAction(FINDACTION("actionActivateProject"));
 			else
 				contextMenu.addMenu(MainWindow::GetNewItemMenu());
 			contextMenu.addSeparator();
@@ -228,7 +228,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Prefix:
 			if(Harmony::GetProject() != &pContextExplorerItem->GetProject())
 			{
-				contextMenu.addAction(FINDACTION("actionLoadProject"));
+				contextMenu.addAction(FINDACTION("actionActivateProject"));
 				contextMenu.addSeparator();
 			}
 			else
