@@ -118,3 +118,53 @@ void TextWidget::on_actionAddFill_triggered()
 												  0.0f);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
+
+void TextWidget::on_actionRemoveLayer_triggered()
+{
+	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
+	if(pTextLayerModel == nullptr)
+		return;
+
+	TextLayerHandle hLayer = pTextLayerModel->GetHandle(ui.layersTableView->currentIndex());
+	if(hLayer == HY_UNUSED_HANDLE)
+		return;
+
+	QUndoCommand *pCmd = new TextUndoCmd_RemoveLayer(m_ItemRef, GetCurStateIndex(), hLayer);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void TextWidget::on_actionOrderLayerDown_triggered()
+{
+	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
+	if(pTextLayerModel == nullptr)
+		return;
+
+	TextLayerHandle hLayer = pTextLayerModel->GetHandle(ui.layersTableView->currentIndex());
+	if(hLayer == HY_UNUSED_HANDLE)
+		return;
+
+	QUndoCommand *pCmd = new TextUndoCmd_LayerOrder(m_ItemRef,
+													GetCurStateIndex(),
+													hLayer,
+													ui.layersTableView->currentIndex().row(),
+													ui.layersTableView->currentIndex().row() + 1);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void TextWidget::on_actionOrderLayerUp_triggered()
+{
+	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
+	if(pTextLayerModel == nullptr)
+		return;
+
+	TextLayerHandle hLayer = pTextLayerModel->GetHandle(ui.layersTableView->currentIndex());
+	if(hLayer == HY_UNUSED_HANDLE)
+		return;
+
+	QUndoCommand *pCmd = new TextUndoCmd_LayerOrder(m_ItemRef,
+													GetCurStateIndex(),
+													hLayer,
+													ui.layersTableView->currentIndex().row(),
+													ui.layersTableView->currentIndex().row() - 1);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}

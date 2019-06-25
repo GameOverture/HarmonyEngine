@@ -17,9 +17,14 @@
 TextDraw::TextDraw(ProjectItem *pProjItem) :
 	IDraw(pProjItem),
 	m_Text("", "+GuiPreview", this),
+	m_Test(this),
 	m_hTexture(HY_UNUSED_HANDLE)
 {
 	m_Text.TextSet("The quick brown fox jumped over the lazy dog.");
+
+	m_Test.GetShape().SetAsBox(100, 100);
+	m_Test.SetWireframe(false);
+	m_Test.SetDisplayOrder(9999999);
 }
 
 TextDraw::~TextDraw()
@@ -53,11 +58,12 @@ TextDraw::~TextDraw()
 /*virtual*/ void TextDraw::OnShow() /*override*/
 {
 	m_Text.SetVisible(true);
+	m_Test.SetVisible(true);
 }
 
 /*virtual*/ void TextDraw::OnHide() /*override*/
 {
-	m_Text.SetVisible(false);
+	SetVisible(false, true);
 }
 
 /*virtual*/ void TextDraw::OnResizeRenderer() /*override*/

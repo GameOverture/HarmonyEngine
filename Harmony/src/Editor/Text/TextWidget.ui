@@ -273,6 +273,10 @@
    </property>
   </action>
   <action name="actionRemoveLayer">
+   <property name="icon">
+    <iconset resource="../res/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
    <property name="text">
     <string>Remove Layer</string>
    </property>
@@ -281,6 +285,10 @@
    </property>
   </action>
   <action name="actionOrderLayerUp">
+   <property name="icon">
+    <iconset resource="../res/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+   </property>
    <property name="text">
     <string>Order Layer Up</string>
    </property>
@@ -289,6 +297,10 @@
    </property>
   </action>
   <action name="actionOrderLayerDown">
+   <property name="icon">
+    <iconset resource="../res/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+   </property>
    <property name="text">
     <string>Order Layer Down</string>
    </property>
@@ -310,6 +322,8 @@
    <header>Text/SubWidgets/TextLayersWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../res/HyEditor.qrc"/>
+ </resources>
  <connections/>
 </ui>

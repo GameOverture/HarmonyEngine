@@ -17,6 +17,8 @@ class TextDraw : public IDraw
 	HyText2d			m_Text;
 	HyTextureHandle		m_hTexture;
 
+	HyPrimitive2d		m_Test;
+
 public:
 	TextDraw(ProjectItem *pProjItem);
 	virtual ~TextDraw();

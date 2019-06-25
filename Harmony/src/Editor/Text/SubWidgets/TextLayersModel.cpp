@@ -228,7 +228,10 @@ QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol) const
 
 TextLayerHandle TextLayersModel::GetHandle(const QModelIndex &indexRef) const
 {
-	return m_LayerList[indexRef.row()];
+	if(indexRef.isValid())
+		return m_LayerList[indexRef.row()];
+
+	return HY_UNUSED_HANDLE;
 }
 
 /*virtual*/ int TextLayersModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
