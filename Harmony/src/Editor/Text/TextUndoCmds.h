@@ -52,6 +52,40 @@ public:
 	void undo() override;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TextUndoCmd_FontChange : public QUndoCommand
+{
+	ProjectItem &			m_ItemRef;
+	int						m_iStateIndex;
+
+	TextLayerHandle			m_hLayer;
+	QString					m_sPrevFont;
+	QString					m_sNewFont;
+
+public:
+	TextUndoCmd_FontChange(ProjectItem &itemRef, int iStateIndex, QString sNewFont, QUndoCommand *pParent = nullptr);
+	virtual ~TextUndoCmd_FontChange();
+
+	void redo() override;
+	void undo() override;
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TextUndoCmd_FontSizeChange : public QUndoCommand
+{
+	ProjectItem &			m_ItemRef;
+	int						m_iStateIndex;
+
+	TextLayerHandle			m_hLayer;
+	float					m_fPrevSize;
+	float					m_fNewSize;
+
+public:
+	TextUndoCmd_FontSizeChange(ProjectItem &itemRef, int iStateIndex, float fNewSize, QUndoCommand *pParent = nullptr);
+	virtual ~TextUndoCmd_FontSizeChange();
+
+	void redo() override;
+	void undo() override;
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextUndoCmd_LayerRenderMode : public QUndoCommand
 {
 	ProjectItem &			m_ItemRef;

@@ -130,6 +130,8 @@ QString TextLayersModel::GetFont() const
 
 void TextLayersModel::SetFont(QString sFontName)
 {
+	for(int i = 0; i < m_LayerList.size(); ++i)
+		m_FontManagerRef.SetFont(m_LayerList[i], sFontName);
 }
 
 float TextLayersModel::GetFontSize() const
@@ -142,19 +144,10 @@ float TextLayersModel::GetFontSize() const
 
 void TextLayersModel::SetFontSize(float fSize)
 {
+	for(int i = 0; i < m_LayerList.size(); ++i)
+		m_FontManagerRef.SetFontSize(m_LayerList[i], fSize);
 }
 
-//void TextLayersModel::SetFontSize(int iSize)
-//{
-//	for(int i = 0; i < m_LayerList.count(); ++i)
-//		m_LayerList[i]->iSize = iSize;
-//}
-//
-////void TextLayersModel::SetFontStageReference(int iRowIndex, FontTypeface *pStageRef)
-////{
-////	m_LayerList[iRowIndex]->pReference = pStageRef;
-////}
-//
 //float TextLayersModel::GetLineHeight()
 //{
 //	float fHeight = 0.0f;

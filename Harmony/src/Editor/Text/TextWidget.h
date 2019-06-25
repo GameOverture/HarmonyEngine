@@ -30,6 +30,7 @@ public:
 
 private Q_SLOTS:
 	void on_cmbFont_currentIndexChanged(int index);
+	void on_cmbSize_currentIndexChanged(int index);
 
 	void on_actionAddFill_triggered();
 

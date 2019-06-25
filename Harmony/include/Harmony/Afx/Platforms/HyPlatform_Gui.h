@@ -19,8 +19,15 @@
 
 // Diagnostics assertion
 #if defined(HY_DEBUG)
-	#define HyAssert(condition, message) do { if((#condition) == false) __debugbreak(); } while (false)
-	#define HyError(message) do { __debugbreak(); } while (false)
+	#define HyAssert(condition, message) \
+		do { \
+			if(!(condition)) { \
+			std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
+			<< " line " << __LINE__ << ": " << message << std::endl; \
+			std::terminate(); \
+			} \
+		} while (false)
+	#define HyError(message) abort();
 #else
 	#define HyAssert(condition, message) do { } while (false)
 	#define HyError(message) do { } while (false)

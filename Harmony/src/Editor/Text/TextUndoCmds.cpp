@@ -88,8 +88,72 @@ void TextUndoCmd_RemoveLayer::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TextUndoCmd_FontChange::TextUndoCmd_FontChange(ProjectItem &itemRef, int iStateIndex, QString sNewFont, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_sPrevFont(static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex)->GetFont()),
+	m_sNewFont(sNewFont)
+{
+	setText("Change Font");
+}
 
-TextUndoCmd_LayerRenderMode::TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= 0*/) :
+/*virtual*/ TextUndoCmd_FontChange::~TextUndoCmd_FontChange()
+{
+}
+
+void TextUndoCmd_FontChange::redo() /*override*/
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->SetFont(m_sNewFont);
+
+	m_ItemRef.FocusWidgetState(m_iStateIndex, -1);
+}
+
+void TextUndoCmd_FontChange::undo() /*override*/
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->SetFont(m_sPrevFont);
+
+	m_ItemRef.FocusWidgetState(m_iStateIndex, -1);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TextUndoCmd_FontSizeChange::TextUndoCmd_FontSizeChange(ProjectItem &itemRef, int iStateIndex, float fNewSize, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_ItemRef(itemRef),
+	m_iStateIndex(iStateIndex),
+	m_fPrevSize(static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex)->GetFontSize()),
+	m_fNewSize(fNewSize)
+{
+	setText("Change Font Size");
+}
+/*virtual*/ TextUndoCmd_FontSizeChange::~TextUndoCmd_FontSizeChange()
+{
+}
+
+void TextUndoCmd_FontSizeChange::redo() /*override*/
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->SetFontSize(m_fNewSize);
+
+	m_ItemRef.FocusWidgetState(m_iStateIndex, -1);
+}
+
+void TextUndoCmd_FontSizeChange::undo() /*override*/
+{
+	TextLayersModel *pModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(m_iStateIndex);
+	pModel->SetFontSize(m_fPrevSize);
+
+	m_ItemRef.FocusWidgetState(m_iStateIndex, -1);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TextUndoCmd_LayerRenderMode::TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),

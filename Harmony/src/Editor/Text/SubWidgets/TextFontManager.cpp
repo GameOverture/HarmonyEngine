@@ -205,6 +205,40 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 	return hNewLayer;
 }
 
+void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)
+{
+	m_LayerMap[hLayer]->m_iFontIndex = TextUnusedHandle;
+
+	int iFontIndex = DoesFontExist(sFontName, GetRenderMode(hLayer), GetOutlineThickness(hLayer), GetSize(hLayer));
+	if(iFontIndex < 0)
+		iFontIndex = CreatePreviewFont(sFontName, GetRenderMode(hLayer), GetOutlineThickness(hLayer), GetSize(hLayer));
+	if(iFontIndex < 0)
+	{
+		HyGuiLog("TextFontManager::SetFont failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
+		return;
+	}
+
+	m_LayerMap[hLayer]->m_iFontIndex = iFontIndex;
+	RegenFontArray();
+}
+
+void TextFontManager::SetFontSize(TextLayerHandle hLayer, float fSize)
+{
+	m_LayerMap[hLayer]->m_iFontIndex = TextUnusedHandle;
+
+	int iFontIndex = DoesFontExist(GetFontName(hLayer), GetRenderMode(hLayer), GetOutlineThickness(hLayer), fSize);
+	if(iFontIndex < 0)
+		iFontIndex = CreatePreviewFont(GetFontName(hLayer), GetRenderMode(hLayer), GetOutlineThickness(hLayer), fSize);
+	if(iFontIndex < 0)
+	{
+		HyGuiLog("TextFontManager::SetFontSize failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
+		return;
+	}
+
+	m_LayerMap[hLayer]->m_iFontIndex = iFontIndex;
+	RegenFontArray();
+}
+
 void TextFontManager::SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode)
 {
 	m_LayerMap[hLayer]->m_iFontIndex = TextUnusedHandle;

@@ -50,15 +50,16 @@ void TextStateData::GetMiscInfo(float &fLeftSideNudgeAmtOut, float &fLineAscende
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
+TextModel::TextModel(ProjectItem &itemRef, QJsonObject textObj) :
 	IModel(itemRef),
-	m_FontManager(itemRef, fontObj["availableGlyphs"].toObject(), fontObj["typefaceArray"].toArray()),
 	m_pAtlasFrame(nullptr)
 {
 	// If item's init value is defined, parse and initialize with it, otherwise make default empty font
-	if(fontObj.empty() == false)
+	if(textObj.empty() == false)
 	{
-		QJsonArray stateArray = fontObj["stateArray"].toArray();
+		m_pFontManager = new TextFontManager(m_ItemRef, textObj["availableGlyphs"].toObject(), textObj["typefaceArray"].toArray());
+
+		QJsonArray stateArray = textObj["stateArray"].toArray();
 		for(int i = 0; i < stateArray.size(); ++i)
 		{
 			QJsonObject stateObj = stateArray[i].toObject();
@@ -68,7 +69,7 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 		// Find existing AtlasFrame * to assign to 'm_pAtlasFrame'
 		int iAffectedFrameIndex = 0;
 		QList<quint32> idRequestList;
-		idRequestList.append(JSONOBJ_TOINT(fontObj, "id"));
+		idRequestList.append(JSONOBJ_TOINT(textObj, "id"));
 		QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, idRequestList, iAffectedFrameIndex);
 		if(pRequestedList.size() == 1)
 			m_pAtlasFrame = pRequestedList[0];
@@ -77,17 +78,19 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject fontObj) :
 	}
 	else
 	{
+		m_pFontManager = new TextFontManager(m_ItemRef, QJsonObject(), QJsonArray());
 		AppendState<TextStateData>(QJsonObject());
 	}
 }
 
 /*virtual*/ TextModel::~TextModel()
 {
+	delete m_pFontManager;
 }
 
 TextFontManager &TextModel::GetFontManager()
 {
-	return m_FontManager;
+	return *m_pFontManager;
 }
 
 TextLayersModel *TextModel::GetLayersModel(uint uiIndex)
@@ -100,7 +103,7 @@ TextLayersModel *TextModel::GetLayersModel(uint uiIndex)
 
 PropertiesTreeModel *TextModel::GetGlyphsModel()
 {
-	return m_FontManager.GetGlyphsModel();
+	return m_pFontManager->GetGlyphsModel();
 }
 
 /*virtual*/ void TextModel::OnSave() /*override*/
@@ -146,7 +149,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 {
 	QJsonObject textObj;
 
-	const PropertiesTreeModel *pGlyphsModel = m_FontManager.GetGlyphsModel();
+	const PropertiesTreeModel *pGlyphsModel = m_pFontManager->GetGlyphsModel();
 
 	QJsonObject availableGlyphsObj;
 	QVariant propValue;
@@ -173,7 +176,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	textObj.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? 0 : QJsonValue(m_pAtlasFrame->GetSize().width()));
 	textObj.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? 0 : QJsonValue(m_pAtlasFrame->GetSize().height()));
 
-	QJsonArray fontArray = m_FontManager.GetFontArray();
+	QJsonArray fontArray = m_pFontManager->GetFontArray();
 	textObj.insert("typefaceArray", fontArray);
 
 	return textObj;

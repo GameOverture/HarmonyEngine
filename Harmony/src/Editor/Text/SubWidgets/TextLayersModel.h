@@ -60,8 +60,6 @@ public:
 	float GetFontSize() const;
 	void SetFontSize(float fSize);
 
-	////void SetFontStageReference(int iRowIndex, FontTypeface *pStageRef);
-
 	//// Must generate final texture atlas/fonts before these are valid
 	//float GetLineHeight();
 	//float GetLineAscender();

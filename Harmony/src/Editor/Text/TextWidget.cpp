@@ -47,6 +47,7 @@ TextWidget::TextWidget(ProjectItem &itemRef, QWidget *parent) :
 	ui.cmbSize->setValidator(HyGlobal::NumbersValidator());
 	ui.cmbSize->clear();
 	ui.cmbSize->insertItems(0, sSizeList);
+	ui.cmbSize->setCurrentIndex(sizeList.size() / 2);
 
 	ui.layersTableView->setItemDelegate(new TextLayersDelegate(&m_ItemRef, this));
 	QItemSelectionModel *pSelModel = ui.layersTableView->selectionModel();
@@ -102,6 +103,31 @@ TextWidget::~TextWidget()
 
 void TextWidget::on_cmbFont_currentIndexChanged(int index)
 {
+	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
+	if(pTextLayerModel == nullptr)
+		return;
+
+	QUndoCommand *pCmd = new TextUndoCmd_FontChange(m_ItemRef,
+													GetCurStateIndex(),
+													ui.cmbFont->currentText());
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void TextWidget::on_cmbSize_currentIndexChanged(int index)
+{
+	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
+	if(pTextLayerModel == nullptr)
+		return;
+
+	bool bParsed = false;
+	float fSize = ui.cmbSize->currentText().toFloat(&bParsed);
+	if(bParsed)
+		pTextLayerModel->SetFontSize(fSize);
+
+	QUndoCommand *pCmd = new TextUndoCmd_FontSizeChange(m_ItemRef,
+														GetCurStateIndex(),
+														fSize);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 //RENDER_OUTLINE_EDGE,

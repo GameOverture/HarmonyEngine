@@ -102,6 +102,8 @@ public:
 	void GetColor(TextLayerHandle hLayer, QColor &topColorOut, QColor &botColorOut) const;
 
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
+	void SetFont(TextLayerHandle hLayer, QString sFontName);
+	void SetFontSize(TextLayerHandle hLayer, float fSize);
 	void SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode);
 	void SetOutlineThickness(TextLayerHandle hLayer, float fThickness);
 	void SetColors(TextLayerHandle hLayer, const QColor &topColor, const QColor &botColor);

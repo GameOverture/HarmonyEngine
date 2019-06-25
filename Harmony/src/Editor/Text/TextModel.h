@@ -53,11 +53,11 @@ class TextModel : public IModel
 {
 	Q_OBJECT
 
-	TextFontManager				m_FontManager;
+	TextFontManager *			m_pFontManager;
 	AtlasFrame *				m_pAtlasFrame;
 
 public:
-	TextModel(ProjectItem &itemRef, QJsonObject fontObj);
+	TextModel(ProjectItem &itemRef, QJsonObject textObj);
 	virtual ~TextModel();
 
 	TextFontManager &GetFontManager();
