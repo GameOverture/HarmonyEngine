@@ -52,7 +52,7 @@ QStringList ExplorerModel::GetPrefixList(Project *pProject)
 	for(int i = 0; i < childrenVec.size(); ++i)
 	{
 		ExplorerItem *pItem = childrenVec[i]->data(0).value<ExplorerItem *>();
-		if(pItem->GetType() == ITEM_Prefix)
+		if(pItem->GetType() == ITEM_Prefix && pItem->GetName(true)[0] != HyGuiInternalCharIndicator)
 			sReturnPrefixList.append(pItem->GetName(true));
 	}
 
