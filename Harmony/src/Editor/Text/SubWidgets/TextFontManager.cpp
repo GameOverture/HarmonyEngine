@@ -25,7 +25,7 @@ TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsOb
 	m_pPreviewAtlas(nullptr),
 	m_pPreviewAtlasPixelData(nullptr),
 	m_uiPreviewAtlasBufferSize(0),
-	m_uiPreviewAtlasDimension(2048),
+	m_uiPreviewAtlasDimension(1024),
 	m_bPreviewAtlasPixelDataInitialized(false)
 {
 	bool b09 = true;
@@ -336,6 +336,7 @@ int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, 
 int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
 	InitAtlas();
+	m_bPreviewAtlasPixelDataInitialized = false;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Get font path
@@ -386,7 +387,6 @@ int TextFontManager::InitAtlas()
 
 	m_uiPreviewAtlasBufferSize = static_cast<uint>(m_uiPreviewAtlasDimension * m_uiPreviewAtlasDimension * 4);
 	m_pPreviewAtlasPixelData = new unsigned char[m_uiPreviewAtlasBufferSize];
-	m_bPreviewAtlasPixelDataInitialized = false;
 
 	// This creates the preview fonts of the already existing fonts in 'm_FontArray'
 	for(int i = 0; i < m_FontArray.size(); ++i)
