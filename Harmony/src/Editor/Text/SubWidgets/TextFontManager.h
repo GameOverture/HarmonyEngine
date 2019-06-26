@@ -82,6 +82,7 @@ class TextFontManager
 	unsigned char *					m_pPreviewAtlasPixelData;
 	uint							m_uiPreviewAtlasBufferSize;
 	uint							m_uiPreviewAtlasDimension;
+	bool							m_bPreviewAtlasPixelDataInitialized;
 
 public:
 	TextFontManager(ProjectItem &itemRef, QJsonObject availableGlyphsObj, QJsonArray fontArray);
@@ -95,6 +96,7 @@ public:
 
 	int GetFontIndex(TextLayerHandle hLayer) const;
 	QString GetFontName(TextLayerHandle hLayer) const;
+	QString GetFontPath(TextLayerHandle hLayer) const;
 	rendermode_t GetRenderMode(TextLayerHandle hLayer) const;
 	float GetOutlineThickness(TextLayerHandle hLayer) const;
 	float GetSize(TextLayerHandle hLayer) const;
@@ -107,8 +109,7 @@ public:
 	void SetOutlineThickness(TextLayerHandle hLayer, float fThickness);
 	void SetColors(TextLayerHandle hLayer, const QColor &topColor, const QColor &botColor);
 
-	unsigned char *GenerateAtlas(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut);
-	int GetAtlasDimensions();
+	unsigned char *GetAtlasInfo(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut);
 
 private:
 	int DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);

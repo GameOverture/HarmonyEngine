@@ -19,10 +19,6 @@ PrimitiveModel::~PrimitiveModel()
 {
 }
 
-/*virtual*/ void PrimitiveModel::OnSave() /*override*/
-{
-}
-
 /*virtual*/ QJsonObject PrimitiveModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QJsonObject();
@@ -41,8 +37,4 @@ PrimitiveModel::~PrimitiveModel()
 /*virtual*/ QStringList PrimitiveModel::GetFontUrls() const /*override*/
 {
 	return QStringList();
-}
-
-/*virtual*/ void PrimitiveModel::Refresh() /*override*/
-{
 }

@@ -55,6 +55,7 @@ public:
 	void MoveRowDown(int iIndex);
 
 	QString GetFont() const;
+	QString GetFontPath() const;
 	void SetFont(QString sFontName);
 
 	float GetFontSize() const;

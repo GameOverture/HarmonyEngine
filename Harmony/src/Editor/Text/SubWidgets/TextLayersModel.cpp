@@ -128,6 +128,14 @@ QString TextLayersModel::GetFont() const
 	return m_FontManagerRef.GetFontName(m_LayerList[0]);
 }
 
+QString TextLayersModel::GetFontPath() const
+{
+	if(m_LayerList.empty())
+		return QString();
+
+	return m_FontManagerRef.GetFontPath(m_LayerList[0]);
+}
+
 void TextLayersModel::SetFont(QString sFontName)
 {
 	for(int i = 0; i < m_LayerList.size(); ++i)

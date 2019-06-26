@@ -105,8 +105,6 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 
 void ProjectItem::Save()
 {
-	m_pModel->Refresh();
-
 	m_pModel->OnSave();
 	m_SaveValue = m_pModel->GetJson();
 
@@ -136,7 +134,6 @@ void ProjectItem::DiscardChanges()
 
 void ProjectItem::WidgetLoad()
 {
-	m_pModel->Refresh();
 	WidgetUnload();
 	
 	switch(m_eTYPE)
@@ -169,7 +166,6 @@ void ProjectItem::WidgetUnload()
 
 void ProjectItem::DrawLoad()
 {
-	m_pModel->Refresh();
 	DrawUnload();
 
 	switch(m_eTYPE)
@@ -279,7 +275,6 @@ void ProjectItem::on_undoStack_indexChanged(int iIndex)
 		return;
 	}
 	
-	m_pModel->Refresh();
 	m_pDraw->ApplyJsonData();
 }
 

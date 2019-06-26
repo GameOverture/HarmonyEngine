@@ -11,6 +11,7 @@
 #include "TextModel.h"
 #include "Project.h"
 #include "ExplorerModel.h"
+#include "AtlasWidget.h"
 
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
 	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
@@ -108,23 +109,43 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 /*virtual*/ void TextModel::OnSave() /*override*/
 {
-	//if(m_FontMetaDir.mkpath(".") == false)
-	//	HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
-	//else
-	//{
-	//	// Copy font files into the font meta directory
-	//	for(int i = 0; i < m_MasterLayerList.count(); ++i)
-	//	{
-	//		QFileInfo tmpFontFile(m_MasterLayerList[i]->pTextureFont->filename);
-	//		QFileInfo metaFontFile(m_FontMetaDir.absoluteFilePath(tmpFontFile.fileName()));
+	QDir metaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_Text, true));
+	if(metaDir.mkpath(".") == false)
+		HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
+	else
+	{
+		// Copy font files into the font meta directory
+		for(int i = 0; i < m_StateList.size(); ++i)
+		{
+			TextLayersModel *pLayersModel = GetLayersModel(i);
 
-	//		if(metaFontFile.exists() == false)
-	//		{
-	//			if(QFile::copy(tmpFontFile.absoluteFilePath(), metaFontFile.absoluteFilePath()) == false)
-	//				HyGuiLog("Could not copy font file (" % tmpFontFile.filePath() % ") to the meta directory", LOGTYPE_Error);
-	//		}
-	//	}
-	//}
+			QFileInfo tmpFontFile(pLayersModel->GetFontPath());
+			QFileInfo metaFontFile(metaDir.absoluteFilePath(tmpFontFile.fileName()));
+
+			if(metaFontFile.exists() == false)
+			{
+				if(QFile::copy(tmpFontFile.absoluteFilePath(), metaFontFile.absoluteFilePath()) == false)
+					HyGuiLog("Could not copy font file (" % tmpFontFile.filePath() % ") to the meta directory", LOGTYPE_Error);
+			}
+		}
+	}
+
+	uint uiAtlasPixelDataSizeOut;
+	QSize atlasDimensionsOut;
+	unsigned char *pPixelData = m_pFontManager->GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
+
+	QImage fontAtlasImage(pPixelData, atlasDimensionsOut.width(), atlasDimensionsOut.height(), QImage::Format_RGBA8888);
+
+	if(m_pAtlasFrame)
+		m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
+	else
+	{
+		quint32 uiAtlasGrpIndex = 0;
+		if(m_ItemRef.GetProject().GetAtlasWidget())
+			uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedAtlasGrpId());
+
+		m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasGrpIndex, ITEM_Text);
+	}
 }
 
 /*virtual*/ QJsonObject TextModel::GetStateJson(uint32 uiIndex) const /*override*/
@@ -173,8 +194,11 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 		stateArray.append(GetStateJson(i));
 	textObj.insert("stateArray", stateArray);
 
-	textObj.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? m_pFontManager->GetAtlasDimensions() : QJsonValue(m_pAtlasFrame->GetSize().width()));
-	textObj.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? m_pFontManager->GetAtlasDimensions() : QJsonValue(m_pAtlasFrame->GetSize().height()));
+	uint uiAtlasPixelDataSizeOut; QSize atlasDimensionsOut;
+	unsigned char *pPixelData = m_pFontManager->GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
+
+	textObj.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? atlasDimensionsOut.width() : QJsonValue(m_pAtlasFrame->GetSize().width()));
+	textObj.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? atlasDimensionsOut.height() : QJsonValue(m_pAtlasFrame->GetSize().height()));
 
 	QJsonArray fontArray = m_pFontManager->GetFontArray();
 	textObj.insert("typefaceArray", fontArray);
@@ -202,8 +226,4 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 	//fontUrlList.removeDuplicates();
 	return fontUrlList;
-}
-
-/*virtual*/ void TextModel::Refresh() /*override*/
-{
 }

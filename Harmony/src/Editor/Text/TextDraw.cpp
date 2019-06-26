@@ -31,7 +31,7 @@ TextDraw::~TextDraw()
 {
 	uint uiAtlasPixelDataSize = 0;
 	QSize atlasDimensions;
-	unsigned char *pAtlasPixelData = static_cast<TextModel *>(m_pProjItem->GetModel())->GetFontManager().GenerateAtlas(uiAtlasPixelDataSize, atlasDimensions);
+	unsigned char *pAtlasPixelData = static_cast<TextModel *>(m_pProjItem->GetModel())->GetFontManager().GetAtlasInfo(uiAtlasPixelDataSize, atlasDimensions);
 	if(pAtlasPixelData == nullptr || Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer() == nullptr)
 		return;
 

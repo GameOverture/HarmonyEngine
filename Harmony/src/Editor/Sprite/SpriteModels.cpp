@@ -409,10 +409,6 @@ SpriteModel::SpriteModel(ProjectItem &itemRef, QJsonArray stateArray) : IModel(i
 {
 }
 
-/*virtual*/ void SpriteModel::OnSave() /*override*/
-{
-}
-
 QJsonObject SpriteModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	QJsonObject retStateObj;
@@ -459,8 +455,8 @@ QJsonObject SpriteModel::GetStateJson(uint32 uiIndex) const /*override*/
 	return QStringList();
 }
 
-/*virtual*/ void SpriteModel::Refresh() /*override*/
-{
-	for(int i = 0; i < m_StateList.size(); ++i)
-		static_cast<SpriteStateData *>(m_StateList[i])->Refresh();
-}
+///*virtual*/ void SpriteModel::Refresh() /*override*/
+//{
+//	for(int i = 0; i < m_StateList.size(); ++i)
+//		static_cast<SpriteStateData *>(m_StateList[i])->Refresh();
+//}

@@ -25,7 +25,8 @@ TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsOb
 	m_pPreviewAtlas(nullptr),
 	m_pPreviewAtlasPixelData(nullptr),
 	m_uiPreviewAtlasBufferSize(0),
-	m_uiPreviewAtlasDimension(2048)
+	m_uiPreviewAtlasDimension(2048),
+	m_bPreviewAtlasPixelDataInitialized(false)
 {
 	bool b09 = true;
 	bool bAZ = true;
@@ -133,6 +134,19 @@ QString TextFontManager::GetFontName(TextLayerHandle hLayer) const
 	QJsonObject fontObj = m_FontArray.at(iter.value()->m_iFontIndex).toObject();
 	QString sFontName = fontObj["font"].toString();
 	return sFontName;
+}
+
+QString TextFontManager::GetFontPath(TextLayerHandle hLayer) const
+{
+	int iFontIndex = GetFontIndex(hLayer);
+
+	if(iFontIndex >= m_PreviewFontList.size())
+	{
+		HyGuiLog("TextFontManager::GetFontPath failed because 'm_PreviewFontList' has not been generated", LOGTYPE_Error);
+		return QString();
+	}
+
+	return QString(m_PreviewFontList[iFontIndex]->GetTextureFont()->filename);
 }
 
 rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer) const
@@ -276,28 +290,28 @@ void TextFontManager::SetColors(TextLayerHandle hLayer, const QColor &topColor, 
 	m_LayerMap[hLayer]->m_BotColor = botColor;
 }
 
-unsigned char *TextFontManager::GenerateAtlas(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut)
+unsigned char *TextFontManager::GetAtlasInfo(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut)
 {
 	InitAtlas();
 
-	// Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
-	memset(m_pPreviewAtlasPixelData, 0xFF, m_uiPreviewAtlasBufferSize);
+	if(m_bPreviewAtlasPixelDataInitialized == false)
+	{
+		// Make a fully white texture in 'pBuffer', then using the single channel from 'texture_atlas_t', overwrite the alpha channel
+		memset(m_pPreviewAtlasPixelData, 0xFF, m_uiPreviewAtlasBufferSize);
 
-	// Overwriting alpha channel
-	uint uiNumPixels = static_cast<uint>(m_uiPreviewAtlasDimension * m_uiPreviewAtlasDimension);
-	for(uint i = 0; i < uiNumPixels; ++i)
-		m_pPreviewAtlasPixelData[i*4+3] = m_pPreviewAtlas->data[i];
+		// Overwriting alpha channel
+		uint uiNumPixels = static_cast<uint>(m_uiPreviewAtlasDimension * m_uiPreviewAtlasDimension);
+		for(uint i = 0; i < uiNumPixels; ++i)
+			m_pPreviewAtlasPixelData[i*4+3] = m_pPreviewAtlas->data[i];
+
+		m_bPreviewAtlasPixelDataInitialized = true;
+	}
 
 	uiAtlasPixelDataSizeOut = m_uiPreviewAtlasBufferSize;
 	atlasDimensionsOut.setWidth(m_uiPreviewAtlasDimension);
 	atlasDimensionsOut.setHeight(m_uiPreviewAtlasDimension);
 
 	return m_pPreviewAtlasPixelData;
-}
-
-int TextFontManager::GetAtlasDimensions()
-{
-	return m_uiPreviewAtlasDimension;
 }
 
 int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
@@ -372,6 +386,7 @@ int TextFontManager::InitAtlas()
 
 	m_uiPreviewAtlasBufferSize = static_cast<uint>(m_uiPreviewAtlasDimension * m_uiPreviewAtlasDimension * 4);
 	m_pPreviewAtlasPixelData = new unsigned char[m_uiPreviewAtlasBufferSize];
+	m_bPreviewAtlasPixelDataInitialized = false;
 
 	// This creates the preview fonts of the already existing fonts in 'm_FontArray'
 	for(int i = 0; i < m_FontArray.size(); ++i)

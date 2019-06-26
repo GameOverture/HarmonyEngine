@@ -213,10 +213,6 @@ void EntityModel::SetWidget(QTreeView *pTreeView)
 	pTreeView->setModel(&m_TreeModel);
 }
 
-/*virtual*/ void EntityModel::OnSave() /*override*/
-{
-}
-
 /*virtual*/ QJsonObject EntityModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QJsonObject();
@@ -235,8 +231,4 @@ void EntityModel::SetWidget(QTreeView *pTreeView)
 /*virtual*/ QStringList EntityModel::GetFontUrls() const /*override*/
 {
 	return QStringList();
-}
-
-/*virtual*/ void EntityModel::Refresh() /*override*/
-{
 }

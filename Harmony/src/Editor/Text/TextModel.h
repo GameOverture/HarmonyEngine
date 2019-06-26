@@ -69,7 +69,6 @@ public:
 	virtual QJsonValue GetJson() const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
 	virtual QStringList GetFontUrls() const override;
-	virtual void Refresh() override;
 };
 
 #endif // TEXTMODEL_H

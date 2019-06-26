@@ -93,12 +93,11 @@ public:
 		dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 	}
 	
-	virtual void OnSave() = 0;
+	virtual void OnSave() { }
 	virtual QJsonObject GetStateJson(uint32 uiIndex) const = 0;
 	virtual QJsonValue GetJson() const = 0;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;
 	virtual QStringList GetFontUrls() const = 0;
-	virtual void Refresh() = 0;
 };
 
 #endif // IMODEL_H

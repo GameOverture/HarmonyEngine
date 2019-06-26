@@ -721,21 +721,21 @@ void FontModel::GeneratePreview()
 	m_pFtglAtlas->id = 0;
 }
 
-/*virtual*/ void FontModel::OnSave() /*override*/
-{
-	QImage fontAtlasImage(m_pSubAtlasPixelData, static_cast<int>(m_pFtglAtlas->width), static_cast<int>(m_pFtglAtlas->height), QImage::Format_RGBA8888);
-
-	if(m_pTrueAtlasFrame)
-		m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
-	else
-	{
-		quint32 uiAtlasGrpIndex = 0;
-		if(m_ItemRef.GetProject().GetAtlasWidget())
-			uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedAtlasGrpId());
-
-		m_pTrueAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasGrpIndex, ITEM_Text);
-	}
-}
+///*virtual*/ void FontModel::OnSave() /*override*/
+//{
+//	QImage fontAtlasImage(m_pSubAtlasPixelData, static_cast<int>(m_pFtglAtlas->width), static_cast<int>(m_pFtglAtlas->height), QImage::Format_RGBA8888);
+//
+//	if(m_pTrueAtlasFrame)
+//		m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pTrueAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
+//	else
+//	{
+//		quint32 uiAtlasGrpIndex = 0;
+//		if(m_ItemRef.GetProject().GetAtlasWidget())
+//			uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedAtlasGrpId());
+//
+//		m_pTrueAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasGrpIndex, ITEM_Text);
+//	}
+//}
 
 /*virtual*/ QJsonObject FontModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
@@ -890,69 +890,69 @@ void FontModel::GeneratePreview()
 	return fontUrlList;
 }
 
-/*virtual*/ void FontModel::Refresh() /*override*/
-{
-	// Clear all references counts and re-determine which stages are being used
-	for(int i = 0; i < m_MasterLayerList.count(); ++i)
-		m_MasterLayerList[i]->uiReferenceCount = 0;
-
-	// Each font state will utilize 1 or more layers from the master list. Mark those layers by incrementing their uiReferenceCount
-	for(int i = 0; i < m_StateList.size(); ++i)
-	{
-		FontStateData *pFontState = static_cast<FontStateData *>(m_StateList[i]);
-		FontStateLayersModel *pLayersModel = pFontState->GetFontLayersModel();
-
-		// Iterating each layer of this font
-		for(int j = 0; j < pLayersModel->rowCount(); ++j)
-		{
-			bool bMatched = false;
-
-			// Find the match in the master list
-			for(int k = 0; k < m_MasterLayerList.count(); ++k)
-			{
-				if(m_MasterLayerList[k]->pTextureFont == nullptr)
-					continue;
-
-				QFileInfo stageFontPath(m_MasterLayerList[k]->pTextureFont->filename);
-				QFileInfo stateFontPath(pFontState->GetFontFilePath());
-
-				if(QString::compare(stageFontPath.fileName(), stateFontPath.fileName(), Qt::CaseInsensitive) == 0 &&
-				   m_MasterLayerList[k]->eMode == pLayersModel->GetLayerRenderMode(j) &&
-				   m_MasterLayerList[k]->fSize == pFontState->GetSize() &&
-				   m_MasterLayerList[k]->fOutlineThickness == pLayersModel->GetLayerOutlineThickness(j))
-				{
-					// Match found, incrementing reference
-					m_MasterLayerList[k]->uiReferenceCount++;
-
-					pLayersModel->SetFontStageReference(j, m_MasterLayerList[k]);
-					bMatched = true;
-					break;
-				}
-			}
-
-			// Could not find a match, so adding a new layer to 'm_MasterLayerList'
-			if(bMatched == false)
-			{
-				m_MasterLayerList.append(new FontTypeface(pFontState->GetFontFilePath(), pLayersModel->GetLayerRenderMode(j), pFontState->GetSize(), pLayersModel->GetLayerOutlineThickness(j)));
-				m_MasterLayerList[m_MasterLayerList.count() - 1]->uiReferenceCount = 1;
-
-				pLayersModel->SetFontStageReference(j, m_MasterLayerList[m_MasterLayerList.count() - 1]);
-			}
-		}
-	}
-
-	// Delete any layer that is no longer used
-	for(int i = 0; i < m_MasterLayerList.count(); ++i)
-	{
-		if(m_MasterLayerList[i]->uiReferenceCount == 0)
-		{
-			delete m_MasterLayerList[i];
-			m_MasterLayerList.removeAt(i);
-		}
-	}
-
-	GeneratePreview();
-}
+///*virtual*/ void FontModel::Refresh() /*override*/
+//{
+//	// Clear all references counts and re-determine which stages are being used
+//	for(int i = 0; i < m_MasterLayerList.count(); ++i)
+//		m_MasterLayerList[i]->uiReferenceCount = 0;
+//
+//	// Each font state will utilize 1 or more layers from the master list. Mark those layers by incrementing their uiReferenceCount
+//	for(int i = 0; i < m_StateList.size(); ++i)
+//	{
+//		FontStateData *pFontState = static_cast<FontStateData *>(m_StateList[i]);
+//		FontStateLayersModel *pLayersModel = pFontState->GetFontLayersModel();
+//
+//		// Iterating each layer of this font
+//		for(int j = 0; j < pLayersModel->rowCount(); ++j)
+//		{
+//			bool bMatched = false;
+//
+//			// Find the match in the master list
+//			for(int k = 0; k < m_MasterLayerList.count(); ++k)
+//			{
+//				if(m_MasterLayerList[k]->pTextureFont == nullptr)
+//					continue;
+//
+//				QFileInfo stageFontPath(m_MasterLayerList[k]->pTextureFont->filename);
+//				QFileInfo stateFontPath(pFontState->GetFontFilePath());
+//
+//				if(QString::compare(stageFontPath.fileName(), stateFontPath.fileName(), Qt::CaseInsensitive) == 0 &&
+//				   m_MasterLayerList[k]->eMode == pLayersModel->GetLayerRenderMode(j) &&
+//				   m_MasterLayerList[k]->fSize == pFontState->GetSize() &&
+//				   m_MasterLayerList[k]->fOutlineThickness == pLayersModel->GetLayerOutlineThickness(j))
+//				{
+//					// Match found, incrementing reference
+//					m_MasterLayerList[k]->uiReferenceCount++;
+//
+//					pLayersModel->SetFontStageReference(j, m_MasterLayerList[k]);
+//					bMatched = true;
+//					break;
+//				}
+//			}
+//
+//			// Could not find a match, so adding a new layer to 'm_MasterLayerList'
+//			if(bMatched == false)
+//			{
+//				m_MasterLayerList.append(new FontTypeface(pFontState->GetFontFilePath(), pLayersModel->GetLayerRenderMode(j), pFontState->GetSize(), pLayersModel->GetLayerOutlineThickness(j)));
+//				m_MasterLayerList[m_MasterLayerList.count() - 1]->uiReferenceCount = 1;
+//
+//				pLayersModel->SetFontStageReference(j, m_MasterLayerList[m_MasterLayerList.count() - 1]);
+//			}
+//		}
+//	}
+//
+//	// Delete any layer that is no longer used
+//	for(int i = 0; i < m_MasterLayerList.count(); ++i)
+//	{
+//		if(m_MasterLayerList[i]->uiReferenceCount == 0)
+//		{
+//			delete m_MasterLayerList[i];
+//			m_MasterLayerList.removeAt(i);
+//		}
+//	}
+//
+//	GeneratePreview();
+//}
 
 // TODO: Fix this implementation
 QSize FontModel::GetAtlasGrpSize()
