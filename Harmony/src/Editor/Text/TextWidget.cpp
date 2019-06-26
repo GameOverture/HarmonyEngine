@@ -34,7 +34,9 @@ TextWidget::TextWidget(ProjectItem &itemRef, QWidget *parent) :
 	ui.btnOrderLayerDown->setDefaultAction(ui.actionOrderLayerDown);
 
 	QStandardItemModel *pProjectFontsModel = m_ItemRef.GetProject().GetFontListModel();
+	ui.cmbFont->blockSignals(true);
 	ui.cmbFont->setModel(pProjectFontsModel);
+	ui.cmbFont->blockSignals(false);
 
 	// Set font size combobox with the standard sizes.
 	QFontDatabase fontDatabase;
@@ -43,11 +45,13 @@ TextWidget::TextWidget(ProjectItem &itemRef, QWidget *parent) :
 	for(int i = 0; i < sizeList.size(); ++i)
 		sSizeList.append(QString::number(sizeList[i]));
 
+	ui.cmbSize->blockSignals(true);
 	ui.cmbSize->setFixedSize(64, 20);
 	ui.cmbSize->setValidator(HyGlobal::NumbersValidator());
 	ui.cmbSize->clear();
 	ui.cmbSize->insertItems(0, sSizeList);
 	ui.cmbSize->setCurrentIndex(sizeList.size() / 2);
+	ui.cmbSize->blockSignals(false);
 
 	ui.layersTableView->setItemDelegate(new TextLayersDelegate(&m_ItemRef, this));
 	QItemSelectionModel *pSelModel = ui.layersTableView->selectionModel();
@@ -93,7 +97,9 @@ TextWidget::~TextWidget()
 			QString sTest = pProjectFontsModel->item(i)->text();
 			if(pProjectFontsModel->item(i)->text().compare(sFontName, Qt::CaseInsensitive) == 0)
 			{
+				ui.cmbFont->blockSignals(true);
 				ui.cmbFont->setCurrentIndex(i);
+				ui.cmbFont->blockSignals(false);
 				break;
 			}
 		}
@@ -105,6 +111,9 @@ void TextWidget::on_cmbFont_currentIndexChanged(int index)
 {
 	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
 	if(pTextLayerModel == nullptr)
+		return;
+
+	if(pTextLayerModel->GetFont().compare(ui.cmbFont->currentText(), Qt::CaseInsensitive) == 0)
 		return;
 
 	QUndoCommand *pCmd = new TextUndoCmd_FontChange(m_ItemRef,
@@ -121,8 +130,8 @@ void TextWidget::on_cmbSize_currentIndexChanged(int index)
 
 	bool bParsed = false;
 	float fSize = ui.cmbSize->currentText().toFloat(&bParsed);
-	if(bParsed)
-		pTextLayerModel->SetFontSize(fSize);
+	if(bParsed == false || pTextLayerModel->GetFontSize() == fSize)
+		return;
 
 	QUndoCommand *pCmd = new TextUndoCmd_FontSizeChange(m_ItemRef,
 														GetCurStateIndex(),
@@ -130,16 +139,56 @@ void TextWidget::on_cmbSize_currentIndexChanged(int index)
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-//RENDER_OUTLINE_EDGE,
-//RENDER_OUTLINE_POSITIVE,
-//RENDER_OUTLINE_NEGATIVE,
-//RENDER_SIGNED_DISTANCE_FIELD
 void TextWidget::on_actionAddFill_triggered()
 {
 	QUndoCommand *pCmd = new TextUndoCmd_AddLayer(m_ItemRef,
 												  GetCurStateIndex(),
 												  ui.cmbFont->currentText(),
 												  RENDER_NORMAL,
+												  ui.cmbSize->currentText().toFloat(),
+												  0.0f);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void TextWidget::on_actionAddSDF_triggered()
+{
+	QUndoCommand *pCmd = new TextUndoCmd_AddLayer(m_ItemRef,
+												  GetCurStateIndex(),
+												  ui.cmbFont->currentText(),
+												  RENDER_SIGNED_DISTANCE_FIELD,
+												  ui.cmbSize->currentText().toFloat(),
+												  0.0f);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void TextWidget::on_actionAddEdge_triggered()
+{
+	QUndoCommand *pCmd = new TextUndoCmd_AddLayer(m_ItemRef,
+												  GetCurStateIndex(),
+												  ui.cmbFont->currentText(),
+												  RENDER_OUTLINE_EDGE,
+												  ui.cmbSize->currentText().toFloat(),
+												  0.0f);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void TextWidget::on_actionAddEdgeFill_triggered()
+{
+	QUndoCommand *pCmd = new TextUndoCmd_AddLayer(m_ItemRef,
+												  GetCurStateIndex(),
+												  ui.cmbFont->currentText(),
+												  RENDER_OUTLINE_POSITIVE,
+												  ui.cmbSize->currentText().toFloat(),
+												  0.0f);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void TextWidget::on_actionAddInner_triggered()
+{
+	QUndoCommand *pCmd = new TextUndoCmd_AddLayer(m_ItemRef,
+												  GetCurStateIndex(),
+												  ui.cmbFont->currentText(),
+												  RENDER_OUTLINE_NEGATIVE,
 												  ui.cmbSize->currentText().toFloat(),
 												  0.0f);
 	m_ItemRef.GetUndoStack()->push(pCmd);

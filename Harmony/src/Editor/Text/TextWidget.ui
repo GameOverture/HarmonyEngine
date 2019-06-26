@@ -89,7 +89,7 @@
         <item>
          <widget class="QGroupBox" name="groupBox_2">
           <property name="title">
-           <string>Add Outline</string>
+           <string/>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <property name="spacing">
@@ -99,7 +99,7 @@
             <number>2</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="rightMargin">
             <number>2</number>
@@ -250,7 +250,7 @@
   </action>
   <action name="actionAddEdge">
    <property name="text">
-    <string>Add Edge Outline</string>
+    <string>Add Outline</string>
    </property>
    <property name="toolTip">
     <string>Add a standard outline</string>
@@ -258,7 +258,7 @@
   </action>
   <action name="actionAddEdgeFill">
    <property name="text">
-    <string>Add Filled Edge Outline</string>
+    <string>Add Fill+Outline</string>
    </property>
    <property name="toolTip">
     <string>Adds a standard outline that is filled in</string>

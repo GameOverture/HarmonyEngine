@@ -33,6 +33,10 @@ private Q_SLOTS:
 	void on_cmbSize_currentIndexChanged(int index);
 
 	void on_actionAddFill_triggered();
+	void on_actionAddSDF_triggered();
+	void on_actionAddEdge_triggered();
+	void on_actionAddEdgeFill_triggered();
+	void on_actionAddInner_triggered();
 
 	void on_actionRemoveLayer_triggered();
 	void on_actionOrderLayerDown_triggered();
