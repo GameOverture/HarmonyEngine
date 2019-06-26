@@ -704,7 +704,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 	}
 
 	QString sDefaultPrefix = pCurSelectedItem->GetType() == ITEM_Prefix ? pCurSelectedItem->GetName(true) : pCurSelectedItem->GetPrefix();
-	if(sDefaultPrefix[sDefaultPrefix.size() - 1] == '/')
+	if(sDefaultPrefix.isEmpty() == false && sDefaultPrefix[sDefaultPrefix.size() - 1] == '/')
 		sDefaultPrefix = sDefaultPrefix.left(sDefaultPrefix.size() - 1);
 
 	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
