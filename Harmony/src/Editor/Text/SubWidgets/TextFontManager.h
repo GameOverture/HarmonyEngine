@@ -16,7 +16,6 @@
 #include <QFileInfo>
 
 typedef int TextLayerHandle;
-#define TextUnusedHandle static_cast<TextLayerHandle>(-1)
 
 class TextFontManager
 {
@@ -94,7 +93,7 @@ public:
 	QList<TextLayerHandle> RegisterLayers(QJsonArray layerArray);
 	QJsonArray GetFontArray() const;
 
-	uint GetFontIndex(TextLayerHandle hLayer) const;
+	int GetFontIndex(TextLayerHandle hLayer) const;
 	QString GetFontName(TextLayerHandle hLayer) const;
 	rendermode_t GetRenderMode(TextLayerHandle hLayer) const;
 	float GetOutlineThickness(TextLayerHandle hLayer) const;

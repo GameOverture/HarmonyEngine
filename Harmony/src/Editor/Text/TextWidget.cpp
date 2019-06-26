@@ -58,6 +58,12 @@ TextWidget::TextWidget(ProjectItem &itemRef, QWidget *parent) :
 	//connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
 	ui.glyphsTreeView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetGlyphsModel());
+
+
+	//QPalette p =  ui.grpOutlines->palette();
+	//p.setColor(QPalette::Window, Qt::red);
+	//p.setColor(QPalette::Highlight, Qt::red);
+	//ui.grpOutlines->setPalette(p);
 }
 
 TextWidget::~TextWidget()
@@ -168,7 +174,7 @@ void TextWidget::on_actionAddEdge_triggered()
 												  ui.cmbFont->currentText(),
 												  RENDER_OUTLINE_EDGE,
 												  ui.cmbSize->currentText().toFloat(),
-												  0.0f);
+												  ui.sbThickness->value());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
@@ -179,7 +185,7 @@ void TextWidget::on_actionAddEdgeFill_triggered()
 												  ui.cmbFont->currentText(),
 												  RENDER_OUTLINE_POSITIVE,
 												  ui.cmbSize->currentText().toFloat(),
-												  0.0f);
+												  ui.sbThickness->value());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
@@ -190,7 +196,7 @@ void TextWidget::on_actionAddInner_triggered()
 												  ui.cmbFont->currentText(),
 												  RENDER_OUTLINE_NEGATIVE,
 												  ui.cmbSize->currentText().toFloat(),
-												  0.0f);
+												  ui.sbThickness->value());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

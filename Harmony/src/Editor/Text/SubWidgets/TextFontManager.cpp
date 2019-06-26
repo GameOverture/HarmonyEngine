@@ -108,7 +108,7 @@ QJsonArray TextFontManager::GetFontArray() const
 	return m_FontArray;
 }
 
-uint TextFontManager::GetFontIndex(TextLayerHandle hLayer) const
+int TextFontManager::GetFontIndex(TextLayerHandle hLayer) const
 {
 	auto iter = m_LayerMap.find(hLayer);
 	if(iter == m_LayerMap.end())
@@ -117,7 +117,8 @@ uint TextFontManager::GetFontIndex(TextLayerHandle hLayer) const
 		return 0;
 	}
 
-	return iter.value()->m_iFontIndex;
+	int iIndex = iter.value()->m_iFontIndex;
+	return iIndex;
 }
 
 QString TextFontManager::GetFontName(TextLayerHandle hLayer) const
@@ -130,7 +131,8 @@ QString TextFontManager::GetFontName(TextLayerHandle hLayer) const
 	}
 
 	QJsonObject fontObj = m_FontArray.at(iter.value()->m_iFontIndex).toObject();
-	return fontObj["font"].toString();
+	QString sFontName = fontObj["font"].toString();
+	return sFontName;
 }
 
 rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer) const
@@ -143,7 +145,8 @@ rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer) const
 	}
 
 	QJsonObject fontObj = m_FontArray.at(iter.value()->m_iFontIndex).toObject();
-	return static_cast<rendermode_t>(fontObj["mode"].toInt());
+	rendermode_t eMode = static_cast<rendermode_t>(fontObj["mode"].toInt());
+	return eMode;
 }
 
 float TextFontManager::GetOutlineThickness(TextLayerHandle hLayer) const
@@ -156,7 +159,8 @@ float TextFontManager::GetOutlineThickness(TextLayerHandle hLayer) const
 	}
 
 	QJsonObject fontObj = m_FontArray.at(iter.value()->m_iFontIndex).toObject();
-	return static_cast<float>(fontObj["outlineThickness"].toDouble());
+	float fThickness = static_cast<float>(fontObj["outlineThickness"].toDouble());
+	return fThickness;
 }
 
 float TextFontManager::GetSize(TextLayerHandle hLayer) const
@@ -169,7 +173,8 @@ float TextFontManager::GetSize(TextLayerHandle hLayer) const
 	}
 
 	QJsonObject fontObj = m_FontArray.at(iter.value()->m_iFontIndex).toObject();
-	return static_cast<float>(fontObj["size"].toDouble());
+	float fSize = static_cast<float>(fontObj["size"].toDouble());
+	return fSize;
 }
 
 void TextFontManager::GetColor(TextLayerHandle hLayer, QColor &topColorOut, QColor &botColorOut) const
@@ -195,7 +200,7 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 	if(iFontIndex < 0)
 	{
 		HyGuiLog("TextFontManager::AddNewLayer failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
-		return TextUnusedHandle;
+		return hNewLayer;
 	}
 	
 	hNewLayer = ++sm_hHandleCount;
@@ -207,8 +212,6 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 
 void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)
 {
-	m_LayerMap[hLayer]->m_iFontIndex = TextUnusedHandle;
-
 	int iFontIndex = DoesFontExist(sFontName, GetRenderMode(hLayer), GetOutlineThickness(hLayer), GetSize(hLayer));
 	if(iFontIndex < 0)
 		iFontIndex = CreatePreviewFont(sFontName, GetRenderMode(hLayer), GetOutlineThickness(hLayer), GetSize(hLayer));
@@ -224,8 +227,6 @@ void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)
 
 void TextFontManager::SetFontSize(TextLayerHandle hLayer, float fSize)
 {
-	m_LayerMap[hLayer]->m_iFontIndex = TextUnusedHandle;
-
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), GetRenderMode(hLayer), GetOutlineThickness(hLayer), fSize);
 	if(iFontIndex < 0)
 		iFontIndex = CreatePreviewFont(GetFontName(hLayer), GetRenderMode(hLayer), GetOutlineThickness(hLayer), fSize);
@@ -241,8 +242,6 @@ void TextFontManager::SetFontSize(TextLayerHandle hLayer, float fSize)
 
 void TextFontManager::SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode)
 {
-	m_LayerMap[hLayer]->m_iFontIndex = TextUnusedHandle;
-
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
 	if(iFontIndex < 0)
 		iFontIndex = CreatePreviewFont(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
@@ -258,8 +257,6 @@ void TextFontManager::SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode)
 
 void TextFontManager::SetOutlineThickness(TextLayerHandle hLayer, float fThickness)
 {
-	m_LayerMap[hLayer]->m_iFontIndex = TextUnusedHandle;
-
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
 	if(iFontIndex < 0)
 		iFontIndex = CreatePreviewFont(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
@@ -313,6 +310,8 @@ int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, 
 			return i;
 		}
 	}
+
+	return -1;
 }
 
 int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)

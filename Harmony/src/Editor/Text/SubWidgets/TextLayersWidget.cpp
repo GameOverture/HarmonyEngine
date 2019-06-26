@@ -47,8 +47,8 @@ TextLayersDelegate::TextLayersDelegate(ProjectItem *pItem, QObject *pParent /*= 
 	case TextLayersModel::COLUMN_Mode:
 		pReturnWidget = new QComboBox(pParent);
 		static_cast<QComboBox *>(pReturnWidget)->addItem("Fill"); // RENDER_NORMAL
-		static_cast<QComboBox *>(pReturnWidget)->addItem("Outline Edge"); // RENDER_OUTLINE_EDGE
-		static_cast<QComboBox *>(pReturnWidget)->addItem("Outline Edge+Fill"); // RENDER_OUTLINE_POSITIVE
+		static_cast<QComboBox *>(pReturnWidget)->addItem("Outline"); // RENDER_OUTLINE_EDGE
+		static_cast<QComboBox *>(pReturnWidget)->addItem("Fill + Outline"); // RENDER_OUTLINE_POSITIVE
 		static_cast<QComboBox *>(pReturnWidget)->addItem("Inner"); // RENDER_OUTLINE_NEGATIVE
 		static_cast<QComboBox *>(pReturnWidget)->addItem("Signed Dist Field"); // RENDER_SIGNED_DISTANCE_FIELD
 		break;

@@ -44,7 +44,7 @@
           </sizepolicy>
          </property>
          <property name="editable">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -87,7 +87,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_2">
+         <widget class="QGroupBox" name="grpOutlines">
           <property name="title">
            <string/>
           </property>
@@ -156,6 +156,9 @@
              </property>
              <property name="singleStep">
               <double>0.250000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
              </property>
             </widget>
            </item>
