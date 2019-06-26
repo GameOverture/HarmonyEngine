@@ -173,8 +173,8 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 		stateArray.append(GetStateJson(i));
 	textObj.insert("stateArray", stateArray);
 
-	textObj.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? 0 : QJsonValue(m_pAtlasFrame->GetSize().width()));
-	textObj.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? 0 : QJsonValue(m_pAtlasFrame->GetSize().height()));
+	textObj.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? m_pFontManager->GetAtlasDimensions() : QJsonValue(m_pAtlasFrame->GetSize().width()));
+	textObj.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? m_pFontManager->GetAtlasDimensions() : QJsonValue(m_pAtlasFrame->GetSize().height()));
 
 	QJsonArray fontArray = m_pFontManager->GetFontArray();
 	textObj.insert("typefaceArray", fontArray);

@@ -60,8 +60,6 @@ struct HyText2dGlyphInfo
 
 	const HyRectangle<float>	rSRC_RECT;
 
-	std::map<uint32, float>		kerningMap;
-
 	HyText2dGlyphInfo(uint32 uiWidth,
 					  uint32 uiHeight,
 					  int iOffsetX,
@@ -71,16 +69,15 @@ struct HyText2dGlyphInfo
 					  float fSrcLeft,
 					  float fSrcTop,
 					  float fSrcRight,
-					  float fSrcBot,
-					  jsonxx::Object &kerningObj) :	uiWIDTH(uiWidth),
-													uiHEIGHT(uiHeight),
-													iOFFSET_X(iOffsetX),
-													iOFFSET_Y(iOffsetY),
-													fADVANCE_X(fAdvanceX),
-													fADVANCE_Y(fAdvanceY),
-													rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot)
+					  float fSrcBot) :
+		uiWIDTH(uiWidth),
+		uiHEIGHT(uiHeight),
+		iOFFSET_X(iOffsetX),
+		iOFFSET_Y(iOffsetY),
+		fADVANCE_X(fAdvanceX),
+		fADVANCE_Y(fAdvanceY),
+		rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot)
 	{
-		kerningMap;
 	}
 };
 

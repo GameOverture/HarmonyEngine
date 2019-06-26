@@ -108,6 +108,7 @@ public:
 	void SetColors(TextLayerHandle hLayer, const QColor &topColor, const QColor &botColor);
 
 	unsigned char *GenerateAtlas(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut);
+	int GetAtlasDimensions();
 
 private:
 	int DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);

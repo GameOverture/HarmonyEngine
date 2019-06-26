@@ -295,6 +295,11 @@ unsigned char *TextFontManager::GenerateAtlas(uint &uiAtlasPixelDataSizeOut, QSi
 	return m_pPreviewAtlasPixelData;
 }
 
+int TextFontManager::GetAtlasDimensions()
+{
+	return m_uiPreviewAtlasDimension;
+}
+
 int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
 	// Checks for existing font in JSON array (m_FontArray)

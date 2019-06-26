@@ -120,8 +120,7 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataVa
 																											  fLeftUv,
 																											  fTopUv,
 																											  fRightUv,
-																											  fBottomUv,
-																											  glyphObj.get<jsonxx::Object>("kerning"));
+																											  fBottomUv);
 		}
 	}
 
