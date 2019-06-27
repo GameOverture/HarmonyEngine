@@ -61,6 +61,12 @@ int32 HyHalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptP
 bool HyTestPointAABB(const b2AABB &aabb, const glm::vec2 &pt);
 
 template <typename T>
+bool HyCompareFloat(T lhs, T rhs)
+{
+	return trunc(1000. * lhs) == trunc(1000. * rhs);
+}
+
+template <typename T>
 T HyRound(T num)
 {
 	return (num - floor(num) >= 0.5) ? ceil(num) : floor(num);

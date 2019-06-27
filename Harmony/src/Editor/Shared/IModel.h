@@ -51,7 +51,7 @@ public:
 	ProjectItem &GetItem();
 	const ProjectItem &GetItem() const;
 	
-	int GetNumStates();
+	int GetNumStates() const;
 	IStateData *GetStateData(int iStateIndex);
 	
 	QString SetStateName(int iStateIndex, QString sNewName);
@@ -62,11 +62,13 @@ public:
 	QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut);
 	void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
 	void RelinquishAllFrames();
+
+	QJsonObject PopState(uint32 uiIndex);
 	
-	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	
 	template<typename STATEDATA>
 	int AppendState(QJsonObject stateObj)
@@ -91,12 +93,11 @@ public:
 		dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 	}
 	
-	virtual void OnSave() = 0;
-	virtual QJsonObject PopStateAt(uint32 uiIndex) = 0;
+	virtual bool OnSave() { return true; }
+	virtual QJsonObject GetStateJson(uint32 uiIndex) const = 0;
 	virtual QJsonValue GetJson() const = 0;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;
 	virtual QStringList GetFontUrls() const = 0;
-	virtual void Refresh() = 0;
 };
 
 #endif // IMODEL_H

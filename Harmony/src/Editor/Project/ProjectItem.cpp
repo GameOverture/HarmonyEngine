@@ -17,8 +17,8 @@
 #include "IModel.h"
 #include "SpriteWidget.h"
 #include "SpriteDraw.h"
-#include "FontWidget.h"
-#include "FontDraw.h"
+#include "TextWidget.h"
+#include "TextDraw.h"
 #include "PrefabWidget.h"
 #include "PrefabDraw.h"
 #include "EntityWidget.h"
@@ -73,8 +73,8 @@ void ProjectItem::LoadModel()
 	case ITEM_Sprite:
 		m_pModel = new SpriteModel(*this, m_SaveValue.toArray());
 		break;
-	case ITEM_Font:
-		m_pModel = new FontModel(*this, m_SaveValue.toObject());
+	case ITEM_Text:
+		m_pModel = new TextModel(*this, m_SaveValue.toObject());
 		break;
 	case ITEM_Entity:
 		m_pModel = new EntityModel(*this, m_SaveValue.toArray());
@@ -105,9 +105,12 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 
 void ProjectItem::Save()
 {
-	m_pModel->Refresh();
+	if(m_pModel->OnSave() == false)
+	{
+		HyGuiLog(GetName(true) % " failed to save.", LOGTYPE_Warning);
+		return;
+	}
 
-	m_pModel->OnSave();
 	m_SaveValue = m_pModel->GetJson();
 
 	GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
@@ -136,7 +139,6 @@ void ProjectItem::DiscardChanges()
 
 void ProjectItem::WidgetLoad()
 {
-	m_pModel->Refresh();
 	WidgetUnload();
 	
 	switch(m_eTYPE)
@@ -144,8 +146,8 @@ void ProjectItem::WidgetLoad()
 	case ITEM_Sprite:
 		m_pWidget = new SpriteWidget(*this);
 		break;
-	case ITEM_Font:
-		m_pWidget = new FontWidget(*this);
+	case ITEM_Text:
+		m_pWidget = new TextWidget(*this);
 		break;
 	case ITEM_Entity:
 		m_pWidget = new EntityWidget(*this);
@@ -157,6 +159,8 @@ void ProjectItem::WidgetLoad()
 		HyGuiLog("Unimplemented WidgetLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
 	}
+
+	m_pWidget->FocusState(0, -1);
 }
 
 void ProjectItem::WidgetUnload()
@@ -167,7 +171,6 @@ void ProjectItem::WidgetUnload()
 
 void ProjectItem::DrawLoad()
 {
-	m_pModel->Refresh();
 	DrawUnload();
 
 	switch(m_eTYPE)
@@ -175,8 +178,8 @@ void ProjectItem::DrawLoad()
 	case ITEM_Sprite:
 		m_pDraw = new SpriteDraw(this);
 		break;
-	case ITEM_Font:
-		m_pDraw = new FontDraw(this);
+	case ITEM_Text:
+		m_pDraw = new TextDraw(this);
 		break;
 	case ITEM_Entity:
 		m_pDraw = new EntityDraw(this);
@@ -277,7 +280,6 @@ void ProjectItem::on_undoStack_indexChanged(int iIndex)
 		return;
 	}
 	
-	m_pModel->Refresh();
 	m_pDraw->ApplyJsonData();
 }
 

@@ -86,7 +86,7 @@ private Q_SLOTS:
 	void on_actionNewEntity_triggered();
 	void on_actionNewParticle_triggered();
 	void on_actionNewSprite_triggered();
-	void on_actionNewFont_triggered();
+	void on_actionNewText_triggered();
     void on_actionNewEntity3d_triggered();
     void on_actionNewPrefab_triggered();
 
@@ -108,7 +108,7 @@ private Q_SLOTS:
 
 	void on_actionTheme_Compe_triggered();
 
-	void on_actionLoadProject_triggered();
+	void on_actionActivateProject_triggered();
 
 
 private:

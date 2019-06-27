@@ -6,33 +6,311 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>293</width>
+    <width>244</width>
     <height>490</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>TextWidget</string>
   </property>
-  <widget class="PropertiesTreeView" name="typefaceProperties">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>160</y>
-     <width>280</width>
-     <height>308</height>
-    </rect>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Font:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="cmbFont">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="cmbSize">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Assemble Text Layers</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="spacing">
+         <number>2</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QToolButton" name="btnAddFill">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Add Fill</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnAddSDF">
+            <property name="toolTip">
+             <string>Add a Signed Distance Field layer</string>
+            </property>
+            <property name="text">
+             <string>Add SDF</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="grpOutlines">
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <property name="leftMargin">
+            <number>2</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>2</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QToolButton" name="btnAddEdge">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Edge</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddEdgeFill">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Edge + Fill</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddInner">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Inner</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="sbThickness">
+             <property name="minimum">
+              <double>0.250000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>99.989999999999995</double>
+             </property>
+             <property name="singleStep">
+              <double>0.250000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="TextLayersWidget" name="layersTableView">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectItems</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QToolButton" name="btnRemoveLayer">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnOrderLayerUp">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnOrderLayerDown">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="title">
+        <string>Glyphs/Characters</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="PropertiesTreeView" name="glyphsTreeView">
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+  <action name="actionAddFill">
+   <property name="text">
+    <string>Add Fill</string>
    </property>
-  </widget>
-  <widget class="QFontComboBox" name="fontComboBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>191</width>
-     <height>22</height>
-    </rect>
+   <property name="toolTip">
+    <string>Append a fill layer</string>
    </property>
-  </widget>
+  </action>
+  <action name="actionAddSDF">
+   <property name="text">
+    <string>Add SDF</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a signed distance field layer</string>
+   </property>
+  </action>
+  <action name="actionAddEdge">
+   <property name="text">
+    <string>Add Outline</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a standard outline</string>
+   </property>
+  </action>
+  <action name="actionAddEdgeFill">
+   <property name="text">
+    <string>Add Fill+Outline</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a standard outline that is filled in</string>
+   </property>
+  </action>
+  <action name="actionAddInner">
+   <property name="text">
+    <string>Add Inner</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds an inner outline</string>
+   </property>
+  </action>
+  <action name="actionRemoveLayer">
+   <property name="icon">
+    <iconset resource="../res/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected text layer</string>
+   </property>
+  </action>
+  <action name="actionOrderLayerUp">
+   <property name="icon">
+    <iconset resource="../res/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Layer Up</string>
+   </property>
+   <property name="toolTip">
+    <string>Shifts the currently selected text layer upwards (earlier in render)</string>
+   </property>
+  </action>
+  <action name="actionOrderLayerDown">
+   <property name="icon">
+    <iconset resource="../res/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Layer Down</string>
+   </property>
+   <property name="toolTip">
+    <string>Shifts the currently selected text layer downwards (later in render)</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -41,7 +319,14 @@
    <extends>QTreeView</extends>
    <header>PropertiesTreeView.h</header>
   </customwidget>
+  <customwidget>
+   <class>TextLayersWidget</class>
+   <extends>QTableView</extends>
+   <header>Text/SubWidgets/TextLayersWidget.h</header>
+  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../res/HyEditor.qrc"/>
+ </resources>
  <connections/>
 </ui>

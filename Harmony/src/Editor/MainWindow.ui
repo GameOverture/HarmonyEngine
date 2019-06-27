@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1009</width>
-    <height>758</height>
+    <width>455</width>
+    <height>433</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1009</width>
+     <width>455</width>
      <height>21</height>
     </rect>
    </property>
@@ -70,7 +70,7 @@
      <addaction name="actionNewPrefix"/>
      <addaction name="separator"/>
      <addaction name="actionNewSprite"/>
-     <addaction name="actionNewFont"/>
+     <addaction name="actionNewText"/>
      <addaction name="actionNewParticle"/>
      <addaction name="actionNewPrefab"/>
      <addaction name="separator"/>
@@ -434,21 +434,6 @@
     <string>F2</string>
    </property>
   </action>
-  <action name="actionNewFont">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="res/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/Font-New.png</normaloff>:/icons16x16/items/Font-New.png</iconset>
-   </property>
-   <property name="text">
-    <string>New Font</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N, Ctrl+F</string>
-   </property>
-  </action>
   <action name="actionNewParticle">
    <property name="enabled">
     <bool>false</bool>
@@ -615,16 +600,34 @@
     <string>Create a new Prefix which helps categorize all the items in the project</string>
    </property>
   </action>
-  <action name="actionLoadProject">
+  <action name="actionActivateProject">
    <property name="icon">
     <iconset resource="res/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Project-Pending.png</normaloff>:/icons16x16/items/Project-Pending.png</iconset>
    </property>
    <property name="text">
-    <string>Load Project</string>
+    <string>Activate Project</string>
    </property>
    <property name="toolTip">
-    <string>Unloads the backend harmony engine instance, and loads a new harmony instance with this project's assets.</string>
+    <string>Unloads any currently activated backend harmony engine instance, and loads a new harmony instance initialized with this project's assets.</string>
+   </property>
+  </action>
+  <action name="actionNewText">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Text-New.png</normaloff>:/icons16x16/items/Text-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new Text instance</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+T</string>
    </property>
   </action>
  </widget>

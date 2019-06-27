@@ -210,7 +210,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		{
 		case ITEM_Project:
 			if(Harmony::GetProject() != pContextExplorerItem)
-				contextMenu.addAction(FINDACTION("actionLoadProject"));
+				contextMenu.addAction(FINDACTION("actionActivateProject"));
 			else
 				contextMenu.addMenu(MainWindow::GetNewItemMenu());
 			contextMenu.addSeparator();
@@ -219,7 +219,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			break;
 		case ITEM_Audio:
 		case ITEM_Particles:
-		case ITEM_Font:
+		case ITEM_Text:
 		case ITEM_Spine:
 		case ITEM_Sprite:
 		case ITEM_Shader:
@@ -228,7 +228,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Prefix:
 			if(Harmony::GetProject() != &pContextExplorerItem->GetProject())
 			{
-				contextMenu.addAction(FINDACTION("actionLoadProject"));
+				contextMenu.addAction(FINDACTION("actionActivateProject"));
 				contextMenu.addSeparator();
 			}
 			else
@@ -292,7 +292,7 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 	
 	case ITEM_Audio:
 	case ITEM_Particles:
-	case ITEM_Font:
+	case ITEM_Text:
 	case ITEM_Spine:
 	case ITEM_Sprite:
 	case ITEM_Shader:
@@ -315,7 +315,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	FINDACTION("actionNewPrefix")->setEnabled(bValidItem);
 	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
-	FINDACTION("actionNewFont")->setEnabled(bValidItem);
+	FINDACTION("actionNewText")->setEnabled(bValidItem);
 	FINDACTION("actionNewSprite")->setEnabled(bValidItem);
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
 	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
@@ -330,7 +330,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 		{
 		case ITEM_Audio:
 		case ITEM_Particles:
-		case ITEM_Font:
+		case ITEM_Text:
 		case ITEM_Spine:
 		case ITEM_Sprite:
 		case ITEM_Shader:

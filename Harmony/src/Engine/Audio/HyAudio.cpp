@@ -57,14 +57,18 @@ HyAudio::HyAudio(std::string sDataDir) :
 		m_pInternal = HY_NEW HyAudio_Null();
 	}
 
-	// Create HyAudioBank objects to represent every sound bank file
-	std::string sAudioFileContents;
-	HyReadTextFile(std::string(sDataDir + HYASSETS_AudioDir + HYASSETS_AudioFile).c_str(), sAudioFileContents);
-	jsonxx::Object audioObj;
-	if(audioObj.parse(sAudioFileContents))
+	std::string sAudioFilePath = sDataDir + HYASSETS_AudioDir + HYASSETS_AudioFile;
+	if(HyFileExists(sAudioFilePath))
 	{
-		for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
-			m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(sDataDir, iter->first, iter->second->get<jsonxx::Object>(), AllocateAudioBank());
+		// Create HyAudioBank objects to represent every sound bank file
+		std::string sAudioFileContents;
+		HyReadTextFile(sAudioFilePath.c_str(), sAudioFileContents);
+		jsonxx::Object audioObj;
+		if(audioObj.parse(sAudioFileContents))
+		{
+			for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
+				m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(sDataDir, iter->first, iter->second->get<jsonxx::Object>(), AllocateAudioBank());
+		}
 	}
 }
 

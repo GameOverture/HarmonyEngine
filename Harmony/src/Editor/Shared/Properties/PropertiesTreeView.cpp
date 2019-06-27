@@ -29,8 +29,6 @@ PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) :
 	setIndentation(0);
 	setAnimated(true);
 	setColumnWidth(0, 200);
-
-	expandAll();
 }
 
 PropertiesTreeView::~PropertiesTreeView()
@@ -41,7 +39,8 @@ PropertiesTreeView::~PropertiesTreeView()
 {
 	QTreeView::setModel(pModel);
 	setItemDelegate(new PropertiesDelegate(this, this));
-	//connect(
+
+	expandAll();
 }
 
 /*virtual*/ void PropertiesTreeView::paintEvent(QPaintEvent *pEvent) /*override*/
@@ -72,7 +71,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 {
 }
 
-/*virtual*/ QWidget *PropertiesDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+/*virtual*/ QWidget *PropertiesDelegate::createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const /*override*/
 {
 	QWidget *pReturnWidget = nullptr;
 
@@ -207,7 +206,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	return pReturnWidget;
 }
 
-/*virtual*/ void PropertiesDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const
+/*virtual*/ void PropertiesDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const /*override*/
 {
 	const QVariant &propValue = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyValue(index);
 	const PropertiesDef &propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyDefinition(index);
@@ -246,25 +245,27 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	}
 }
 
-/*virtual*/ void PropertiesDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const
+/*virtual*/ void PropertiesDelegate::setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const /*override*/
 {
 	PropertiesTreeModel *pPropertiesTreeModel = static_cast<PropertiesTreeModel *>(pModel);
+
 	QUndoCommand *pUndoCmd = nullptr;
 
 	const PropertiesDef &propDefRef = pPropertiesTreeModel->GetPropertyDefinition(index);
+	QVariant newValue;
 	switch(propDefRef.eType)
 	{
 	case PROPERTIESTYPE_bool:
 		break;
 	case PROPERTIESTYPE_int:
-		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QSpinBox *>(pEditor)->value()));
+		newValue = QVariant(static_cast<QSpinBox *>(pEditor)->value());
 		break;
 	case PROPERTIESTYPE_double:
-		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QDoubleSpinBox *>(pEditor)->value()));
+		newValue = QVariant(static_cast<QDoubleSpinBox *>(pEditor)->value());
 		break;
 	case PROPERTIESTYPE_ivec2:
 	case PROPERTIESTYPE_vec2:
-		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<WidgetVectorSpinBox *>(pEditor)->GetValue()));
+		newValue = QVariant(static_cast<WidgetVectorSpinBox *>(pEditor)->GetValue());
 		break;
 	//case PROPERTIESTYPE_ivec3:
 	//case PROPERTIESTYPE_vec3:
@@ -272,24 +273,28 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	//case PROPERTIESTYPE_vec4:
 	//	break;
 	case PROPERTIESTYPE_LineEdit:
-		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QLineEdit *>(pEditor)->text()));
+		newValue = QVariant(static_cast<QLineEdit *>(pEditor)->text());
 		break;
 	case PROPERTIESTYPE_ComboBox:
 	case PROPERTIESTYPE_StatesComboBox:
-		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QComboBox *>(pEditor)->currentIndex()));
+		newValue = QVariant(static_cast<QComboBox *>(pEditor)->currentIndex());
 		break;
 	case PROPERTIESTYPE_Slider:
-		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, QVariant(static_cast<QSlider *>(pEditor)->value()));
+		newValue = QVariant(static_cast<QSlider *>(pEditor)->value());
 		break;
 	default:
 		HyGuiLog("PropertiesDelegate::setModelData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
 	}
 
-	if(pUndoCmd)
+	const QVariant &origValue = pPropertiesTreeModel->GetPropertyValue(index);
+	if(origValue != newValue)
+	{
+		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, newValue);
 		pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
+	}
 }
 
-/*virtual*/ void PropertiesDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+/*virtual*/ void PropertiesDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const /*override*/
 {
 	pEditor->setGeometry(option.rect);
 }

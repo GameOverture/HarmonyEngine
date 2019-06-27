@@ -180,9 +180,11 @@ glm::vec2 HyText2d::TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
 	CalculateGlyphInfos();
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
-	const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
+	const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
+	if(pGlyphRef == nullptr)
+		return glm::vec2(0.0f);
 
-	glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
+	glm::vec2 vSize(pGlyphRef->uiWIDTH, pGlyphRef->uiHEIGHT);
 	vSize *= m_fScaleBoxModifier;
 	return vSize;
 }
@@ -488,9 +490,11 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 			if(m_Utf32CodeList[j] == '\n')
 				continue;
 
-			const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, i, m_Utf32CodeList[j]);
+			const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiCurFontState, i, m_Utf32CodeList[j]);
+			if(pGlyphRef == nullptr)
+				continue;
 
-			glm::vec2 vSize(glyphRef.uiWIDTH, glyphRef.uiHEIGHT);
+			glm::vec2 vSize(pGlyphRef->uiWIDTH, pGlyphRef->uiHEIGHT);
 			vSize *= m_fScaleBoxModifier;
 			vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
 			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
@@ -519,26 +523,26 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 			glm::vec2 vUV;
 
-			vUV.x = glyphRef.rSRC_RECT.right;//1.0f;
-			vUV.y = glyphRef.rSRC_RECT.top;//1.0f;
+			vUV.x = pGlyphRef->rSRC_RECT.right;//1.0f;
+			vUV.y = pGlyphRef->rSRC_RECT.top;//1.0f;
 			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
 			//pWritePositionRef += sizeof(glm::vec2);
 
-			vUV.x = glyphRef.rSRC_RECT.left;//0.0f;
-			vUV.y = glyphRef.rSRC_RECT.top;//1.0f;
+			vUV.x = pGlyphRef->rSRC_RECT.left;//0.0f;
+			vUV.y = pGlyphRef->rSRC_RECT.top;//1.0f;
 			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
 			//pWritePositionRef += sizeof(glm::vec2);
 
-			vUV.x = glyphRef.rSRC_RECT.right;//1.0f;
-			vUV.y = glyphRef.rSRC_RECT.bottom;//0.0f;
+			vUV.x = pGlyphRef->rSRC_RECT.right;//1.0f;
+			vUV.y = pGlyphRef->rSRC_RECT.bottom;//0.0f;
 			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
 			//pWritePositionRef += sizeof(glm::vec2);
 
-			vUV.x = glyphRef.rSRC_RECT.left;//0.0f;
-			vUV.y = glyphRef.rSRC_RECT.bottom;//0.0f;
+			vUV.x = pGlyphRef->rSRC_RECT.left;//0.0f;
+			vUV.y = pGlyphRef->rSRC_RECT.bottom;//0.0f;
 			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
 			//pWritePositionRef += sizeof(glm::vec2);
@@ -603,15 +607,18 @@ void HyText2d::CalculateGlyphInfos()
 			// UTF-32 value of '48' == zero (...and '57' == nine)
 			for(uint32 iDigit = 48; iDigit < 58; ++iDigit)
 			{
-				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, iDigit);
-				if(pMonospaceWidths[uiLayerIndex] < glyphRef.fADVANCE_X)
-					pMonospaceWidths[uiLayerIndex] = glyphRef.fADVANCE_X;
+				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, iDigit);
+				if(pGlyphRef)
+				{
+					if(pMonospaceWidths[uiLayerIndex] < pGlyphRef->fADVANCE_X)
+						pMonospaceWidths[uiLayerIndex] = pGlyphRef->fADVANCE_X;
 
-				if(pMonospaceAscender[uiLayerIndex] < glyphRef.iOFFSET_Y)
-					pMonospaceAscender[uiLayerIndex] = static_cast<float>(glyphRef.iOFFSET_Y);
+					if(pMonospaceAscender[uiLayerIndex] < pGlyphRef->iOFFSET_Y)
+						pMonospaceAscender[uiLayerIndex] = static_cast<float>(pGlyphRef->iOFFSET_Y);
 
-				if(pMonospaceDecender[uiLayerIndex] < (glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y))
-					pMonospaceDecender[uiLayerIndex] = static_cast<float>(glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y);
+					if(pMonospaceDecender[uiLayerIndex] < (pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y))
+						pMonospaceDecender[uiLayerIndex] = static_cast<float>(pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y);
+				}
 			}
 		}
 	}
@@ -677,13 +684,15 @@ offsetCalculation:
 			{
 				uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
 
-				const HyText2dGlyphInfo &glyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
+				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
+				if(pGlyphRef == nullptr)
+					break;
 
 				float fKerning = 0.0f;
 				if(bFirstCharacterOnNewLine)
 				{
-					if(glyphRef.iOFFSET_X < 0 && fFirstCharacterNudgeRightAmt < abs(glyphRef.iOFFSET_X))
-						fFirstCharacterNudgeRightAmt = static_cast<float>(abs(glyphRef.iOFFSET_X));
+					if(pGlyphRef->iOFFSET_X < 0 && fFirstCharacterNudgeRightAmt < abs(pGlyphRef->iOFFSET_X))
+						fFirstCharacterNudgeRightAmt = static_cast<float>(abs(pGlyphRef->iOFFSET_X));
 				}
 				else
 				{
@@ -691,10 +700,10 @@ offsetCalculation:
 					fKerning = 0.0f;
 				}
 
-				float fAdvanceAmtX = glyphRef.fADVANCE_X;
-				float fAscender = static_cast<float>(glyphRef.iOFFSET_Y);
-				float fDecender = HyClamp(static_cast<float>(glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y), 0.0f, pData->GetLineHeight(m_uiCurFontState));
-				float fOffsetX = static_cast<float>(glyphRef.iOFFSET_X);
+				float fAdvanceAmtX = pGlyphRef->fADVANCE_X;
+				float fAscender = static_cast<float>(pGlyphRef->iOFFSET_Y);
+				float fDecender = HyClamp(static_cast<float>(pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(m_uiCurFontState));
+				float fOffsetX = static_cast<float>(pGlyphRef->iOFFSET_X);
 
 				if(m_bMonospacedDigits && m_Utf32CodeList[uiStrIndex] >= 48 && m_Utf32CodeList[uiStrIndex] <= 57)
 				{
@@ -702,11 +711,11 @@ offsetCalculation:
 					fAscender = pMonospaceAscender[uiLayerIndex];
 					fDecender = pMonospaceDecender[uiLayerIndex];
 
-					fOffsetX += (fAdvanceAmtX - glyphRef.fADVANCE_X) * 0.5f;	// This will center monospaced digits (horizontally) within their alloted space
+					fOffsetX += (fAdvanceAmtX - pGlyphRef->fADVANCE_X) * 0.5f;	// This will center monospaced digits (horizontally) within their alloted space
 				}
 
 				m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x = pWritePos[uiLayerIndex].x + ((fKerning + fOffsetX) * m_fScaleBoxModifier);
-				m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.y = pWritePos[uiLayerIndex].y - ((glyphRef.uiHEIGHT - glyphRef.iOFFSET_Y) * m_fScaleBoxModifier);
+				m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.y = pWritePos[uiLayerIndex].y - ((pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y) * m_fScaleBoxModifier);
 
 				if(fLastCharWidth < pWritePos[uiLayerIndex].x)
 					fLastCharWidth = pWritePos[uiLayerIndex].x;

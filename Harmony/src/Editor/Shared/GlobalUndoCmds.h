@@ -30,8 +30,9 @@ class UndoCmd_AddState : public QUndoCommand
 	int                 m_iIndex;
 
 public:
-	UndoCmd_AddState(QString sText, ProjectItem &itemRef, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
-																						m_ItemRef(itemRef)
+	UndoCmd_AddState(QString sText, ProjectItem &itemRef, QUndoCommand *pParent = nullptr) :
+		QUndoCommand(pParent),
+		m_ItemRef(itemRef)
 	{
 		setText(sText);
 	}
@@ -47,7 +48,7 @@ public:
 	
 	void undo() override
 	{
-		static_cast<IModel *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
+		static_cast<IModel *>(m_ItemRef.GetModel())->PopState(m_iIndex);
 		m_ItemRef.FocusWidgetState(m_iIndex - 1, -1);
 	}
 };
@@ -61,9 +62,10 @@ class UndoCmd_RemoveState : public QUndoCommand
 	QJsonObject         m_PoppedStateObj;
 
 public:
-	UndoCmd_RemoveState(QString sText, ProjectItem &itemRef, int iIndex, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
-																										m_ItemRef(itemRef),
-																										m_iIndex(iIndex)
+	UndoCmd_RemoveState(QString sText, ProjectItem &itemRef, int iIndex, QUndoCommand *pParent = nullptr) :
+		QUndoCommand(pParent),
+		m_ItemRef(itemRef),
+		m_iIndex(iIndex)
 	{
 		setText(sText);
 	}
@@ -73,7 +75,7 @@ public:
 
 	void redo() override
 	{
-		m_PoppedStateObj = static_cast<IModel *>(m_ItemRef.GetModel())->PopStateAt(m_iIndex);
+		m_PoppedStateObj = static_cast<IModel *>(m_ItemRef.GetModel())->PopState(m_iIndex);
 		m_ItemRef.FocusWidgetState(0, -1);
 	}
 	
@@ -94,10 +96,11 @@ class UndoCmd_RenameState : public QUndoCommand
 	QString             m_sOldName;
 
 public:
-	UndoCmd_RenameState(QString sText, ProjectItem &itemRef, QString sNewName, int iIndex, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
-																														m_ItemRef(itemRef),
-																														m_iIndex(iIndex),
-																														m_sNewName(sNewName)
+	UndoCmd_RenameState(QString sText, ProjectItem &itemRef, QString sNewName, int iIndex, QUndoCommand *pParent = nullptr) :
+		QUndoCommand(pParent),
+		m_ItemRef(itemRef),
+		m_iIndex(iIndex),
+		m_sNewName(sNewName)
 	{
 		setText(sText);
 	}
@@ -125,9 +128,10 @@ class UndoCmd_MoveStateBack : public QUndoCommand
 	int                 m_iStateIndex;
 
 public:
-	UndoCmd_MoveStateBack(QString sText, ProjectItem &itemRef, int iStateIndex, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
-																												m_ItemRef(itemRef),
-																												m_iStateIndex(iStateIndex)
+	UndoCmd_MoveStateBack(QString sText, ProjectItem &itemRef, int iStateIndex, QUndoCommand *pParent = nullptr) :
+		QUndoCommand(pParent),
+		m_ItemRef(itemRef),
+		m_iStateIndex(iStateIndex)
 	{
 		setText(sText);
 	}
@@ -159,9 +163,10 @@ class UndoCmd_MoveStateForward : public QUndoCommand
 	int                 m_iStateIndex;
 
 public:
-	UndoCmd_MoveStateForward(QString sText, ProjectItem &itemRef, int iStateIndex, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
-																												m_ItemRef(itemRef),
-																												m_iStateIndex(iStateIndex)
+	UndoCmd_MoveStateForward(QString sText, ProjectItem &itemRef, int iStateIndex, QUndoCommand *pParent = nullptr) :
+		QUndoCommand(pParent),
+		m_ItemRef(itemRef),
+		m_iStateIndex(iStateIndex)
 	{
 		setText(sText);
 	}
@@ -197,12 +202,13 @@ class UndoCmd_ComboBox : public QUndoCommand
 	int                 m_iNewValue;
 	
 public:
-	UndoCmd_ComboBox(QString sText, ProjectItem &itemRef, ComboBoxMapper *pMapper, int iStateIndex, int iPrevValue, int iNewValue, QUndoCommand *pParent = 0) : QUndoCommand(pParent),
-																																								m_ItemRef(itemRef),
-																																								m_pMapper(pMapper),
-																																								m_iStateIndex(iStateIndex),
-																																								m_iPrevValue(iPrevValue),
-																																								m_iNewValue(iNewValue)
+	UndoCmd_ComboBox(QString sText, ProjectItem &itemRef, ComboBoxMapper *pMapper, int iStateIndex, int iPrevValue, int iNewValue, QUndoCommand *pParent = nullptr) :
+		QUndoCommand(pParent),
+		m_ItemRef(itemRef),
+		m_pMapper(pMapper),
+		m_iStateIndex(iStateIndex),
+		m_iPrevValue(iPrevValue),
+		m_iNewValue(iNewValue)
 	{
 		setText(sText);
 	}

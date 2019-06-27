@@ -19,11 +19,7 @@ AudioModel::~AudioModel()
 {
 }
 
-/*virtual*/ void AudioModel::OnSave() /*override*/
-{
-}
-
-/*virtual*/ QJsonObject AudioModel::PopStateAt(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject AudioModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QJsonObject();
 }
@@ -41,8 +37,4 @@ AudioModel::~AudioModel()
 /*virtual*/ QStringList AudioModel::GetFontUrls() const /*override*/
 {
 	return QStringList();
-}
-
-/*virtual*/ void AudioModel::Refresh() /*override*/
-{
 }

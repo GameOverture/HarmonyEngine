@@ -60,28 +60,12 @@ void IHyThreadClass::ThreadContinue(bool bOnlyOneUpdate)
 	stateEvent.notify_one();
 }
 
-bool IHyThreadClass::ThreadStop()
+void IHyThreadClass::ThreadStop()
 {
-	if(m_eThreadState != THREADSTATE_Running && m_eThreadState != THREADSTATE_ShouldExit)
-	{
-		//HyLogWarning("IHyThreadClass::ThreadStop failed becaused thread state is not running.");
-		return false;
-	}
-
-	if(m_eThreadState != THREADSTATE_ShouldExit)
-	{
+	if(m_eThreadState != THREADSTATE_ShouldExit && m_eThreadState != THREADSTATE_HasExited)
 		m_eThreadState = THREADSTATE_ShouldExit;
-		//ThreadContinue(false);
-		{
-			std::lock_guard<std::mutex> lock(stateMutex);
-			m_bAutoResetWaiting = false;
-			m_bWaitComplete = true;
-		}
-		//std::this_thread::sleep_for(std::chrono::seconds(1));
-	}
 
-	stateEvent.notify_one();
-	return true;
+	ThreadContinue(false);
 }
 
 bool IHyThreadClass::IsThreadFinished()

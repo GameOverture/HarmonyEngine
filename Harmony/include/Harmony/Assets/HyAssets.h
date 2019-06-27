@@ -67,7 +67,7 @@ class HyAssets : public IHyThreadClass
 	Factory<HyEntityData>										m_EntityFactory;
 	Factory<HySprite2dData>										m_SpriteFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
-	Factory<HyText2dData>										m_FontFactory;
+	Factory<HyText2dData>										m_TextFactory;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;

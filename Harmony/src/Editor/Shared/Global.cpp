@@ -23,6 +23,7 @@
 /*static*/ QRegExpValidator *HyGlobal::sm_pFreeFormValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = nullptr;
+/*static*/ QRegExpValidator *HyGlobal::sm_pNumbersValidator  = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pVector2dValidator = nullptr;
 
 /*static*/ QString HyGlobal::sm_ErrorStrings[NUMATLASFRAMEERROR];
@@ -36,7 +37,7 @@
 	sm_sItemNames[ITEM_Primitive] = "Primitive";
 	sm_sItemNames[ITEM_Audio] = "Audio";
 	sm_sItemNames[ITEM_Particles] = "Particles";
-	sm_sItemNames[ITEM_Font] = "Font";
+	sm_sItemNames[ITEM_Text] = "Text";
 	sm_sItemNames[ITEM_Spine] = "Spine";
 	sm_sItemNames[ITEM_Sprite] = "Sprite";
 	sm_sItemNames[ITEM_Shader] = "Shader";
@@ -53,7 +54,7 @@
 	sm_sItemNamesPlural[ITEM_Primitive] = "Primitives";
 	sm_sItemNamesPlural[ITEM_Audio] = "Audio";
 	sm_sItemNamesPlural[ITEM_Particles] = "Particles";
-	sm_sItemNamesPlural[ITEM_Font] = "Fonts";
+	sm_sItemNamesPlural[ITEM_Text] = "Texts";
 	sm_sItemNamesPlural[ITEM_Spine] = "Spine";
 	sm_sItemNamesPlural[ITEM_Sprite] = "Sprites";
 	sm_sItemNamesPlural[ITEM_Shader] = "Shaders";
@@ -89,7 +90,7 @@
 	sm_ItemColors[ITEM_Primitive] = QColor(101, 233, 235);
 	sm_ItemColors[ITEM_Audio] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Particles] = QColor(218, 0, 0);
-	sm_ItemColors[ITEM_Font] = QColor(179, 179, 179);
+	sm_ItemColors[ITEM_Text] = QColor(179, 179, 179);
 	sm_ItemColors[ITEM_Spine] = QColor(209, 159, 223);
 	sm_ItemColors[ITEM_Sprite] = QColor(129, 166, 225);
 	sm_ItemColors[ITEM_Shader] = QColor(225, 151, 97);
@@ -106,6 +107,7 @@
 	sm_pFreeFormValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-\\s]*"));
 	sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-]*"));
 	sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_\\-]*"));
+	sm_pNumbersValidator  = new QRegExpValidator(QRegExp("[0-9]*"));
 	sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));
 
 	sm_ErrorStrings[ATLASFRAMEERROR_CannotFindMetaImg] = "Cannot find source meta-image";
@@ -121,7 +123,7 @@
 	case ATLASITEM_Image:
 		return ITEM_AtlasImage;
 	case ATLASITEM_Font:
-		return ITEM_Font;
+		return ITEM_Text;
 	case ATLASITEM_Spine:
 		return ITEM_Spine;
 	case ATLASITEM_Prefab:
@@ -141,7 +143,7 @@
 		return ATLASITEM_Filter;
 	case ITEM_AtlasImage:
 		return ATLASITEM_Image;
-	case ITEM_Font:
+	case ITEM_Text:
 		return ATLASITEM_Font;
 	case ITEM_Spine:
 		return ATLASITEM_Spine;
@@ -165,7 +167,7 @@
 	list.append(ITEM_Primitive);
 	list.append(ITEM_Audio);
 	list.append(ITEM_Particles);
-	list.append(ITEM_Font);
+	list.append(ITEM_Text);
 	list.append(ITEM_Spine);
 	list.append(ITEM_Sprite);
 	list.append(ITEM_Shader);

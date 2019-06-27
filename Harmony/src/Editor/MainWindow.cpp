@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionNewPrefix);
 	ui->explorer->addAction(ui->actionNewAudio);
 	ui->explorer->addAction(ui->actionNewParticle);
-	ui->explorer->addAction(ui->actionNewFont);
+	ui->explorer->addAction(ui->actionNewText);
 	ui->explorer->addAction(ui->actionNewSprite);
 	ui->explorer->addAction(ui->actionNewEntity);
 	ui->explorer->addAction(ui->actionNewPrefab);
@@ -77,7 +77,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionRemove);
 	ui->explorer->addAction(ui->actionRename);
 	ui->explorer->addAction(ui->actionLaunchIDE);
-	ui->explorer->addAction(ui->actionLoadProject);
+	ui->explorer->addAction(ui->actionActivateProject);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// FIRST RUN CHECK - Ensure Harmony Engine project location has been specified
@@ -304,6 +304,12 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	if(pItem == nullptr || pItem->GetType() == ITEM_Project)
 		return;
 
+	if(Harmony::GetProject() != &pItem->GetProject())
+	{
+		HyGuiLog("Cannot open '" % pItem->GetName(true) % "' because its current project is not activated.", LOGTYPE_Normal);
+		return;
+	}
+
 	Harmony::GetProject()->OpenTab(pItem);
 
 	// Setup the item properties docking window to be the current item
@@ -455,9 +461,9 @@ void MainWindow::on_actionNewSprite_triggered()
 	NewItem(ITEM_Sprite);
 }
 
-void MainWindow::on_actionNewFont_triggered()
+void MainWindow::on_actionNewText_triggered()
 {
-	NewItem(ITEM_Font);
+	NewItem(ITEM_Text);
 }
 
 void MainWindow::on_actionNewPrefab_triggered()
@@ -680,7 +686,7 @@ void MainWindow::on_actionTheme_Compe_triggered()
 	SelectTheme(THEME_Compe);
 }
 
-void MainWindow::on_actionLoadProject_triggered()
+void MainWindow::on_actionActivateProject_triggered()
 {
 	ExplorerItem *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
 	m_Harmony.SetProject(&pCurSelectedItem->GetProject());
@@ -698,6 +704,8 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 	}
 
 	QString sDefaultPrefix = pCurSelectedItem->GetType() == ITEM_Prefix ? pCurSelectedItem->GetName(true) : pCurSelectedItem->GetPrefix();
+	if(sDefaultPrefix.isEmpty() == false && sDefaultPrefix[sDefaultPrefix.size() - 1] == '/')
+		sDefaultPrefix = sDefaultPrefix.left(sDefaultPrefix.size() - 1);
 
 	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
 	if(pDlg->exec())
@@ -711,7 +719,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 
 		if(pNewItem->IsProjectItem())
 		{
-			// New items that are considered "imported" should be saved immediately since they have direct references into the atlas manager
+			// New items that are considered "imported" should be saved immediately since they have direct references into an asset manager
 			if(pDlg->GetImportFile().isEmpty() == false)
 				static_cast<ProjectItem *>(pNewItem)->Save();
 

@@ -188,7 +188,7 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
 	case HYTYPE_Text:
-		pDataOut = m_FontFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+		pDataOut = m_TextFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
 	case HYTYPE_Prefab:
 		pDataOut = m_PrefabFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
@@ -505,8 +505,8 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 		m_PrefabFactory.Init(prefabObj, *this);
 	}
-	if(gameDataObj.has<jsonxx::Object>("Fonts"))
-		m_FontFactory.Init(gameDataObj.get<jsonxx::Object>("Fonts"), *this);
+	if(gameDataObj.has<jsonxx::Object>("Texts"))
+		m_TextFactory.Init(gameDataObj.get<jsonxx::Object>("Texts"), *this);
 	if(gameDataObj.has<jsonxx::Object>("Sprites"))
 		m_SpriteFactory.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
 	if(gameDataObj.has<jsonxx::Object>("Prefabs"))

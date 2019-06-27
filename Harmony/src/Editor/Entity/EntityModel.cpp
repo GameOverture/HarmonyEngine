@@ -106,11 +106,11 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 			pNewPropertiesModel->AppendCategory("Textured Quad");
 			break;
 
-		case ITEM_Font: {
+		case ITEM_Text: {
 			QVariant var;
 			var.setValue<ExplorerItem *>(pItemToAdd);
-			pNewPropertiesModel->AppendCategory("Font", var);
-			pNewPropertiesModel->AppendProperty("Font", "State", PROPERTIESTYPE_StatesComboBox, 0, "The font state to be displayed", false, QVariant(), QVariant(), QVariant(), "", "", var);
+			pNewPropertiesModel->AppendCategory("Text", var);
+			pNewPropertiesModel->AppendProperty("Text", "State", PROPERTIESTYPE_StatesComboBox, 0, "The text state to be displayed", false, QVariant(), QVariant(), QVariant(), "", "", var);
 			} break;
 
 		case ITEM_Sprite: {
@@ -213,11 +213,7 @@ void EntityModel::SetWidget(QTreeView *pTreeView)
 	pTreeView->setModel(&m_TreeModel);
 }
 
-/*virtual*/ void EntityModel::OnSave() /*override*/
-{
-}
-
-/*virtual*/ QJsonObject EntityModel::PopStateAt(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject EntityModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QJsonObject();
 }
@@ -235,8 +231,4 @@ void EntityModel::SetWidget(QTreeView *pTreeView)
 /*virtual*/ QStringList EntityModel::GetFontUrls() const /*override*/
 {
 	return QStringList();
-}
-
-/*virtual*/ void EntityModel::Refresh() /*override*/
-{
 }

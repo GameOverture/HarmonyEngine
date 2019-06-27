@@ -39,7 +39,7 @@ public:
 	bool ThreadStart();
 	void ThreadWait();
 	void ThreadContinue(bool bOnlyOneUpdate);
-	bool ThreadStop();
+	void ThreadStop();
 
 	bool IsThreadFinished();
 	void ThreadJoin();

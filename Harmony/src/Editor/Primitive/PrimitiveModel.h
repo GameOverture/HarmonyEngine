@@ -17,12 +17,10 @@ public:
 	PrimitiveModel(ProjectItem &itemRef);
 	virtual ~PrimitiveModel();
 
-	virtual void OnSave() override;
-	virtual QJsonObject PopStateAt(uint32 uiIndex) override;
+	virtual QJsonObject GetStateJson(uint32 uiIndex) const override;
 	virtual QJsonValue GetJson() const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
 	virtual QStringList GetFontUrls() const override;
-	virtual void Refresh() override;
 };
 
 #endif // PRIMITIVEMODEL_H

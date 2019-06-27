@@ -15,10 +15,10 @@
 
 struct HyShaderVertexAttribute
 {
-	std::string					sName;
-	HyShaderVariable			eVarType;
-	bool						bNormalized;
-	uint32						uiInstanceDivisor;
+	std::string								sName;
+	HyShaderVariable						eVarType;
+	bool									bNormalized;
+	uint32									uiInstanceDivisor;
 };
 
 class HyShader : public IHyFileData
@@ -30,7 +30,7 @@ class HyShader : public IHyFileData
 	const HyShaderProgramDefaults			m_eDEFAULTS_FROM;
 
 	bool									m_bIsFinalized;
-	std::string								m_sSourceCode[HYNUMSHADERTYPES];
+	std::string								m_sSourceCode[HYNUM_SHADERTYPES];
 
 	std::vector<HyShaderVertexAttribute>	m_VertexAttributeList;
 	size_t									m_uiStride;

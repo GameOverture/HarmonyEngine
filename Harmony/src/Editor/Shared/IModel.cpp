@@ -58,7 +58,7 @@ const ProjectItem &IModel::GetItem() const
 	return m_ItemRef;
 }
 
-int IModel::GetNumStates()
+int IModel::GetNumStates() const
 {
 	return m_StateList.size();
 }
@@ -148,12 +148,27 @@ void IModel::RelinquishAllFrames()
 	m_ItemRef.GetProject().GetAtlasModel().RelinquishFrames(&m_ItemRef, GetAtlasFrames());
 }
 
-/*virtual*/ int IModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
+QJsonObject IModel::PopState(uint32 uiIndex)
+{
+	QJsonObject retObj = GetStateJson(uiIndex);
+
+	beginRemoveRows(QModelIndex(), uiIndex, uiIndex);
+	m_StateList.removeAt(uiIndex);
+	endRemoveRows();
+
+	QVector<int> roleList;
+	roleList.append(Qt::DisplayRole);
+	dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
+
+	return retObj;
+}
+
+/*virtual*/ int IModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
 {
 	return m_StateList.size();
 }
 
-/*virtual*/ QVariant IModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant IModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const /*override*/
 {
 	if (role == Qt::TextAlignmentRole)
 		return Qt::AlignLeft;
@@ -164,12 +179,12 @@ void IModel::RelinquishAllFrames()
 	return QVariant();
 }
 
-/*virtual*/ bool IModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
+/*virtual*/ bool IModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/) /*override*/
 {
 	return QAbstractItemModel::setData(index, value, role);
 }
 
-/*virtual*/ QVariant IModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant IModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const /*override*/
 {
 	return (iIndex == 0) ? QVariant(QString("State Names")) : QVariant();
 }

@@ -23,7 +23,6 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItem *> &itemListRef)
 			continue;
 
 		ProjectItem *pProjectItem = static_cast<ProjectItem *>(itemListRef[i]);
-		pProjectItem->GetModel()->Refresh();
 
 		QJsonObject clipboardObj;
 

@@ -395,7 +395,7 @@ void SpriteStateData::Refresh()
 
 SpriteModel::SpriteModel(ProjectItem &itemRef, QJsonArray stateArray) : IModel(itemRef)
 {
-	// If item's init value is defined, parse and initalize with it, otherwise make default empty sprite
+	// If item's init value is defined, parse and initialize with it, otherwise make default empty sprite
 	if(stateArray.empty() == false)
 	{
 		for(int i = 0; i < stateArray.size(); ++i)
@@ -409,11 +409,7 @@ SpriteModel::SpriteModel(ProjectItem &itemRef, QJsonArray stateArray) : IModel(i
 {
 }
 
-/*virtual*/ void SpriteModel::OnSave() /*override*/
-{
-}
-
-QJsonObject SpriteModel::PopStateAt(uint32 uiIndex) /*override*/
+QJsonObject SpriteModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	QJsonObject retStateObj;
 	retStateObj.insert("name", m_StateList[uiIndex]->GetName());
@@ -425,14 +421,6 @@ QJsonObject SpriteModel::PopStateAt(uint32 uiIndex) /*override*/
 	QJsonArray framesArray = static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetFramesModel()->GetFramesInfo(fTotalDuration);
 	retStateObj.insert("frames", framesArray);
 	retStateObj.insert("duration", fTotalDuration);
-
-	beginRemoveRows(QModelIndex(), uiIndex, uiIndex);
-	m_StateList.removeAt(uiIndex);
-	endRemoveRows();
-
-	QVector<int> roleList;
-	roleList.append(Qt::DisplayRole);
-	dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 
 	return retStateObj;
 }
@@ -467,8 +455,8 @@ QJsonObject SpriteModel::PopStateAt(uint32 uiIndex) /*override*/
 	return QStringList();
 }
 
-/*virtual*/ void SpriteModel::Refresh() /*override*/
-{
-	for(int i = 0; i < m_StateList.size(); ++i)
-		static_cast<SpriteStateData *>(m_StateList[i])->Refresh();
-}
+///*virtual*/ void SpriteModel::Refresh() /*override*/
+//{
+//	for(int i = 0; i < m_StateList.size(); ++i)
+//		static_cast<SpriteStateData *>(m_StateList[i])->Refresh();
+//}

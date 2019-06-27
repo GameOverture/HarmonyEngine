@@ -34,10 +34,10 @@ class PropertiesDelegate : public QStyledItemDelegate
 public:
 	PropertiesDelegate(PropertiesTreeView *pTableView, QObject *pParent = 0);
 
-	virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-	virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;
-	virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const;
-	virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+	virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;
+	virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const override;
+	virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
 #endif // PROPERTIESTREEVIEW_H

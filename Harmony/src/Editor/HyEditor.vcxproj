@@ -232,10 +232,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Explorer\ExplorerItem.cpp" />
     <ClCompile Include="Explorer\ExplorerModel.cpp" />
     <ClCompile Include="Explorer\ExplorerWidget.cpp" />
-    <ClCompile Include="Font\FontDraw.cpp" />
-    <ClCompile Include="Font\FontModels.cpp" />
-    <ClCompile Include="Font\FontUndoCmds.cpp" />
-    <ClCompile Include="Font\FontWidget.cpp" />
     <ClCompile Include="Primitive\PrimitiveModel.cpp" />
     <ClCompile Include="Project\ProjectItemMimeData.cpp" />
     <ClCompile Include="Shared\Global.cpp">
@@ -267,6 +263,12 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Sprite\SpriteTableView.cpp" />
     <ClCompile Include="Sprite\SpriteUndoCmds.cpp" />
     <ClCompile Include="Sprite\SpriteWidget.cpp" />
+    <ClCompile Include="Text\SubWidgets\TextFontManager.cpp" />
+    <ClCompile Include="Text\SubWidgets\TextLayersModel.cpp" />
+    <ClCompile Include="Text\SubWidgets\TextLayersWidget.cpp" />
+    <ClCompile Include="Text\TextDraw.cpp" />
+    <ClCompile Include="Text\TextModel.cpp" />
+    <ClCompile Include="Text\TextUndoCmds.cpp" />
     <ClCompile Include="Text\TextWidget.cpp" />
     <ClCompile Include="Widget\WidgetColor.cpp" />
     <ClCompile Include="Widget\WidgetGradientEditor.cpp" />
@@ -357,6 +359,8 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtMoc Include="Entity\EntityModel.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\Text;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtNetwork</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\Text;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtNetwork</IncludePath>
     </QtMoc>
     <QtMoc Include="Entity\EntityTreeModel.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
@@ -378,16 +382,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtMoc Include="Explorer\ExplorerWidget.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
-    <ClInclude Include="Font\FontDraw.h" />
-    <QtMoc Include="Font\FontModels.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
-    <ClInclude Include="Font\FontUndoCmds.h" />
-    <QtMoc Include="Font\FontWidget.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Primitive\PrimitiveModel.h" />
     <ClInclude Include="Project\ProjectItemMimeData.h" />
@@ -496,6 +490,21 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
+    <QtMoc Include="Text\SubWidgets\TextLayersModel.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Text/SubWidgets/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/SubWidgets/%(Filename)%(Extension)</ForceInclude>
+    </QtMoc>
+    <QtMoc Include="Text\SubWidgets\TextLayersWidget.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Text/SubWidgets/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/SubWidgets/%(Filename)%(Extension)</ForceInclude>
+    </QtMoc>
+    <ClInclude Include="Text\SubWidgets\TextFontManager.h" />
+    <ClInclude Include="Text\TextDraw.h" />
+    <QtMoc Include="Text\TextModel.h">
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>
+      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>
+    </QtMoc>
+    <ClInclude Include="Text\TextUndoCmds.h" />
     <ClInclude Include="_Dependencies\scriptum\imagepacker.h" />
     <ClInclude Include="_Dependencies\scriptum\maxrects.h" />
     <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">
@@ -504,36 +513,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="debug\moc_predefs.h.cbt">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zi -MDd -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;debug\moc_predefs.h</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generate moc_predefs.h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\moc_predefs.h;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Performing Custom Build Tools</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </AdditionalInputs>
-    </CustomBuild>
-    <CustomBuild Include="release\moc_predefs.h.cbt">
-      <FileType>Document</FileType>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -O2 -MD -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;release\moc_predefs.h</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generate moc_predefs.h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\moc_predefs.h;%(Outputs)</Outputs>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Performing Custom Build Tools</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </AdditionalInputs>
-    </CustomBuild>
     <ClInclude Include="ui_AtlasWidget.h" />
     <ClInclude Include="ui_DlgAtlasGroupSettings.h" />
     <ClInclude Include="ui_DlgColorPicker.h" />
@@ -548,7 +527,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClInclude Include="ui_EntityToolbox.h" />
     <ClInclude Include="ui_EntityWidget.h" />
     <ClInclude Include="ui_ExplorerWidget.h" />
-    <ClInclude Include="ui_FontWidget.h" />
     <ClInclude Include="ui_MainWindow.h" />
     <ClInclude Include="ui_PrefabWidget.h" />
     <ClInclude Include="ui_SpriteWidget.h" />
@@ -590,8 +568,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtUic Include="Entity\EntityWidget.ui">
     </QtUic>
     <QtUic Include="Explorer\ExplorerWidget.ui">
-    </QtUic>
-    <QtUic Include="Font\FontWidget.ui">
     </QtUic>
     <QtUic Include="MainWindow.ui">
     </QtUic>

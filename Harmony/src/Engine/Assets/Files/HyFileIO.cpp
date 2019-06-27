@@ -10,6 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/HyFileIO.h"
 
+#include <experimental/filesystem>
+
 //void HyFindFilesRecursively(const char *szDirPath, const std::string &sExtension, std::vector<std::string> &filesFoundOut)
 //{
 //	transform(sExtension.begin(), sExtension.end(), sExtension.begin(), ::tolower);
@@ -91,6 +93,5 @@ void WriteTextFile(const char *szFilePath, const char *szContentBuffer)
 
 bool HyFileExists(const std::string &sFilePath)
 {
-	// TODO: implement
-	return true;
+	return std::experimental::filesystem::exists(sFilePath);
 }

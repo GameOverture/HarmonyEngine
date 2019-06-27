@@ -39,8 +39,6 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/)
 	pEntityModel->SetWidget(ui->childrenTree);
 
 	on_childrenTree_clicked(QModelIndex());
-
-	FocusState(0, QVariant(static_cast<qulonglong>(0)));
 }
 
 EntityWidget::~EntityWidget()

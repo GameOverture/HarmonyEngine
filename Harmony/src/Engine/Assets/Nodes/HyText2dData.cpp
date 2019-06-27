@@ -86,15 +86,15 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataVa
 	float fSubAtlasWidth = uiFullAtlasWidth * (rSubAtlasUVRect.right - rSubAtlasUVRect.left);
 	float fSubAtlasHeight = uiFullAtlasHeight * (rSubAtlasUVRect.bottom - rSubAtlasUVRect.top);
 	
-	jsonxx::Array typefaceArray = textObject.get<jsonxx::Array>("typefaceArray");
-	m_uiNumTypefaces = static_cast<uint32>(typefaceArray.size());
+	jsonxx::Array fontArray = textObject.get<jsonxx::Array>("fontArray");
+	m_uiNumTypefaces = static_cast<uint32>(fontArray.size());
 	
 	m_pTypefaces = HY_NEW Typeface[m_uiNumTypefaces];
 	for (uint32 i = 0; i < m_uiNumTypefaces; ++i)
 	{
 		Typeface &curTypeface = m_pTypefaces[i];
 
-		jsonxx::Object typefaceObj = typefaceArray.get<jsonxx::Object>(i);
+		jsonxx::Object typefaceObj = fontArray.get<jsonxx::Object>(i);
 		jsonxx::Array glyphsArray = typefaceObj.get<jsonxx::Array>("glyphs");
 		
 		uint32 uiNumGlyphs = static_cast<uint32>(glyphsArray.size());
@@ -120,8 +120,7 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Value &dataVa
 																											  fLeftUv,
 																											  fTopUv,
 																											  fRightUv,
-																											  fBottomUv,
-																											  glyphObj.get<jsonxx::Object>("kerning"));
+																											  fBottomUv);
 		}
 	}
 
@@ -168,10 +167,13 @@ uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex) const
 	return m_pFontStates[uiStateIndex].uiNUM_LAYERS;
 }
 
-const HyText2dGlyphInfo &HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const
+const HyText2dGlyphInfo *HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const
 {
-	HyAssert(m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiUtf32Code) != m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end(), "HyText2d tried to draw a glyph (UTF-32: " << uiUtf32Code << ") that wasn't exported");
-	return *m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.at(uiUtf32Code);
+	auto iter = m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiUtf32Code);
+	if(iter == m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end())
+		return nullptr;
+
+	return iter->second;
 }
 
 const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const

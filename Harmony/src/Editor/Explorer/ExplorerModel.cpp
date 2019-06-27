@@ -52,7 +52,7 @@ QStringList ExplorerModel::GetPrefixList(Project *pProject)
 	for(int i = 0; i < childrenVec.size(); ++i)
 	{
 		ExplorerItem *pItem = childrenVec[i]->data(0).value<ExplorerItem *>();
-		if(pItem->GetType() == ITEM_Prefix)
+		if(pItem->GetType() == ITEM_Prefix && pItem->GetName(true)[0] != HyGuiInternalCharIndicator)
 			sReturnPrefixList.append(pItem->GetName(true));
 	}
 
@@ -269,9 +269,9 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		}
 
 		// Import any missing fonts (.ttf)
-		if(ePasteItemType == ITEM_Font)
+		if(ePasteItemType == ITEM_Text)
 		{
-			QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_Font, true));
+			QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_Text, true));
 			QDir fontMetaDir(sFontMetaDir);
 			fontMetaDir.mkdir(".");
 
@@ -320,7 +320,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		switch(ePasteItemType)
 		{
 		case ITEM_Prefab: eType = ITEM_Prefab; break;
-		case ITEM_Font: eType = ITEM_Font; break;
+		case ITEM_Text: eType = ITEM_Text; break;
 		default:
 			eType = ITEM_AtlasImage;
 			break;

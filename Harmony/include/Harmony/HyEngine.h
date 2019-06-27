@@ -78,7 +78,7 @@ private:
 	bool PollPlatformApi();
 
 	friend bool					Hy_IsInitialized();
-	friend const HarmonyInit &	Hy_Init();
+	friend const HarmonyInit &	Hy_Init(); // TODO: Rename this to 'Hy_InitValues' within LG Slotframework
 	friend float				Hy_UpdateStep();
 	friend double				Hy_UpdateStepDbl();
 	friend void					Hy_PauseGame(bool bPause);

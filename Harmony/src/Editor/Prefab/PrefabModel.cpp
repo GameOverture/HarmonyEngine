@@ -331,11 +331,7 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 //	CopyNodesWithMeshes( node.mChildren[a], parent, transform);
 //}
 
-/*virtual*/ void PrefabModel::OnSave() /*override*/
-{
-}
-
-/*virtual*/ QJsonObject PrefabModel::PopStateAt(uint32 uiIndex) /*override*/
+/*virtual*/ QJsonObject PrefabModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QJsonObject();
 }
@@ -357,10 +353,6 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 /*virtual*/ QStringList PrefabModel::GetFontUrls() const /*override*/
 {
 	return QStringList();
-}
-
-/*virtual*/ void PrefabModel::Refresh() /*override*/
-{
 }
 
 void PrefabModel::AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip)
