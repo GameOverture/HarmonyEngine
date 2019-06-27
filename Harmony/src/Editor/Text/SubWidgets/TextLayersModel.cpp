@@ -23,6 +23,11 @@ TextLayersModel::TextLayersModel(TextFontManager &fontManagerRef, const QList<Te
 {
 }
 
+bool TextLayersModel::IsEmpty() const
+{
+	return m_LayerList.empty();
+}
+
 TextFontManager &TextLayersModel::GetFontManager()
 {
 	return m_FontManagerRef;

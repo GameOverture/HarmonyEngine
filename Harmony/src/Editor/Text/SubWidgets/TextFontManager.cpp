@@ -413,7 +413,9 @@ void TextFontManager::ClearAndEmbiggenAtlas()
 		delete m_PreviewFontList[i];
 	m_PreviewFontList.clear();
 
-	texture_atlas_clear(m_pPreviewAtlas);
+	texture_atlas_delete(m_pPreviewAtlas);
+	m_pPreviewAtlas = nullptr;
+
 	delete [] m_pPreviewAtlasPixelData;
 	m_pPreviewAtlasPixelData = nullptr;
 	m_uiPreviewAtlasBufferSize = 0;

@@ -44,6 +44,8 @@ public:
 	TextLayersModel(TextFontManager &fontManagerRef, const QList<TextLayerHandle> &layerList, QObject *pParent);
 	virtual ~TextLayersModel();
 
+	bool IsEmpty() const;
+
 	TextFontManager &GetFontManager();
 	const TextFontManager &GetFontManager() const;
 	QJsonArray GetLayersArray();

@@ -114,17 +114,20 @@ TextWidget::~TextWidget()
 				break;
 			}
 		}
-		ui.cmbSize->setCurrentText(QString::number(static_cast<int>(pTextLayerModel->GetFontSize())));
 
-		if(ui.cmbSize->currentText() == "0")
-			ui.cmbSize->setCurrentText("24");
+		if(pTextLayerModel->IsEmpty() == false)
+		{
+			ui.cmbSize->setCurrentText(QString::number(static_cast<int>(pTextLayerModel->GetFontSize())));
+			if(ui.cmbSize->currentText() == "0")
+				ui.cmbSize->setCurrentText("24");
+		}
 	}
 }
 
 void TextWidget::on_cmbFont_currentIndexChanged(int index)
 {
 	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
-	if(pTextLayerModel == nullptr)
+	if(pTextLayerModel == nullptr || pTextLayerModel->IsEmpty())
 		return;
 
 	if(pTextLayerModel->GetFont().compare(ui.cmbFont->currentText(), Qt::CaseInsensitive) == 0)
@@ -139,7 +142,7 @@ void TextWidget::on_cmbFont_currentIndexChanged(int index)
 void TextWidget::on_cmbSize_currentIndexChanged(int index)
 {
 	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
-	if(pTextLayerModel == nullptr)
+	if(pTextLayerModel == nullptr || pTextLayerModel->IsEmpty())
 		return;
 
 	bool bParsed = false;
