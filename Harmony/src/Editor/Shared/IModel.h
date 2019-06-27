@@ -93,7 +93,7 @@ public:
 		dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 	}
 	
-	virtual void OnSave() { }
+	virtual bool OnSave() { return true; }
 	virtual QJsonObject GetStateJson(uint32 uiIndex) const = 0;
 	virtual QJsonValue GetJson() const = 0;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;

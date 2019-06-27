@@ -64,7 +64,7 @@ public:
 	TextLayersModel *GetLayersModel(uint uiIndex);
 	PropertiesTreeModel *GetGlyphsModel();
 
-	virtual void OnSave() override;
+	virtual bool OnSave() override;
 	virtual QJsonObject GetStateJson(uint32 uiIndex) const override;
 	virtual QJsonValue GetJson() const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;

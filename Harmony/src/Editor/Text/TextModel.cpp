@@ -107,8 +107,23 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	return m_pFontManager->GetGlyphsModel();
 }
 
-/*virtual*/ void TextModel::OnSave() /*override*/
+/*virtual*/ bool TextModel::OnSave() /*override*/
 {
+	m_pFontManager->GenerateOptimizedAtlas();
+
+	uint uiAtlasGrpIndex = 0;
+	if(m_pAtlasFrame != nullptr)
+		uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_pAtlasFrame->GetAtlasGrpId());
+	QSize maxAtlasSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
+
+	QSize atlasDimensionsOut; uint uiAtlasPixelDataSizeOut;
+	unsigned char *pPixelData = m_pFontManager->GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
+	if(atlasDimensionsOut.width() > maxAtlasSize.width() || atlasDimensionsOut.height() > maxAtlasSize.height())
+	{
+		HyGuiLog("Could not save because this Text's subatlas is larger than what can fit on the specified Atlas Group", LOGTYPE_Warning);
+		return false;
+	}
+
 	QDir metaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_Text, true));
 	if(metaDir.mkpath(".") == false)
 		HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
@@ -129,10 +144,6 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 			}
 		}
 	}
-
-	uint uiAtlasPixelDataSizeOut;
-	QSize atlasDimensionsOut;
-	unsigned char *pPixelData = m_pFontManager->GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
 
 	QImage fontAtlasImage(pPixelData, atlasDimensionsOut.width(), atlasDimensionsOut.height(), QImage::Format_RGBA8888);
 

@@ -17,6 +17,9 @@
 #define TEXTFONTERROR_AtlasFull -2
 #define TEXTFONTERROR_FontNotFound -3
 
+#define FONTMANAGER_PreviewGrowSize 1024
+#define FONTMANAGER_OptimizedGrowSize 25
+
 TextLayerHandle TextFontManager::sm_hHandleCount = 0;
 
 TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsObj, QJsonArray fontArray) :
@@ -25,7 +28,8 @@ TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsOb
 	m_pPreviewAtlas(nullptr),
 	m_pPreviewAtlasPixelData(nullptr),
 	m_uiPreviewAtlasBufferSize(0),
-	m_uiPreviewAtlasDimension(1024),
+	m_uiPreviewAtlasGrowSize(FONTMANAGER_PreviewGrowSize),
+	m_uiPreviewAtlasDimension(m_uiPreviewAtlasGrowSize),
 	m_bPreviewAtlasPixelDataInitialized(false)
 {
 	bool b09 = true;
@@ -290,6 +294,22 @@ void TextFontManager::SetColors(TextLayerHandle hLayer, const QColor &topColor, 
 	m_LayerMap[hLayer]->m_BotColor = botColor;
 }
 
+void TextFontManager::GenerateOptimizedAtlas()
+{
+	InitAtlas();
+	{
+		m_uiPreviewAtlasGrowSize = FONTMANAGER_OptimizedGrowSize;
+		m_uiPreviewAtlasDimension = sqrt(static_cast<double>(m_pPreviewAtlas->used));
+		ClearAndEmbiggenAtlas();
+	}
+	InitAtlas();
+
+	m_bPreviewAtlasPixelDataInitialized = false;
+	m_uiPreviewAtlasGrowSize = FONTMANAGER_PreviewGrowSize;
+
+	RegenFontArray();
+}
+
 unsigned char *TextFontManager::GetAtlasInfo(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut)
 {
 	InitAtlas();
@@ -420,7 +440,7 @@ void TextFontManager::ClearAndEmbiggenAtlas()
 	m_pPreviewAtlasPixelData = nullptr;
 	m_uiPreviewAtlasBufferSize = 0;
 
-	m_uiPreviewAtlasDimension += 1024;
+	m_uiPreviewAtlasDimension += m_uiPreviewAtlasGrowSize;
 	HyGuiLog("Preview font's atlas has been embiggened to: " % QString::number(m_uiPreviewAtlasDimension), LOGTYPE_Info);
 }
 
@@ -429,7 +449,7 @@ void TextFontManager::RegenFontArray()
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Cleanup unused fonts
 	int iFontIndex = 0;
-	for(auto iter = m_PreviewFontList.begin(); iter != m_PreviewFontList.end(); ++iter, ++iFontIndex)
+	for(auto iter = m_PreviewFontList.begin(); iter != m_PreviewFontList.end(); ++iFontIndex)
 	{
 		bool bFontUsed = false;
 		for(auto iterLayer = m_LayerMap.begin(); iterLayer != m_LayerMap.end(); ++iterLayer)
@@ -454,6 +474,8 @@ void TextFontManager::RegenFontArray()
 
 			iFontIndex--; // Subtract one here to account for the erased font
 		}
+		else
+			++iter;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////

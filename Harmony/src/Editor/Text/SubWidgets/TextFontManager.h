@@ -81,6 +81,7 @@ class TextFontManager
 	texture_atlas_t *				m_pPreviewAtlas;
 	unsigned char *					m_pPreviewAtlasPixelData;
 	uint							m_uiPreviewAtlasBufferSize;
+	uint							m_uiPreviewAtlasGrowSize;
 	uint							m_uiPreviewAtlasDimension;
 	bool							m_bPreviewAtlasPixelDataInitialized;
 
@@ -109,6 +110,7 @@ public:
 	void SetOutlineThickness(TextLayerHandle hLayer, float fThickness);
 	void SetColors(TextLayerHandle hLayer, const QColor &topColor, const QColor &botColor);
 
+	void GenerateOptimizedAtlas();
 	unsigned char *GetAtlasInfo(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut);
 
 private:

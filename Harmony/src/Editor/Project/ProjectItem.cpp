@@ -105,7 +105,12 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 
 void ProjectItem::Save()
 {
-	m_pModel->OnSave();
+	if(m_pModel->OnSave() == false)
+	{
+		HyGuiLog(GetName(true) % " failed to save.", LOGTYPE_Warning);
+		return;
+	}
+
 	m_SaveValue = m_pModel->GetJson();
 
 	GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
