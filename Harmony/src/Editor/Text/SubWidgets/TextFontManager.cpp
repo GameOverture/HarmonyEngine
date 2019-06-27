@@ -324,6 +324,7 @@ unsigned char *TextFontManager::GetAtlasInfo(uint &uiAtlasPixelDataSizeOut, QSiz
 		for(uint i = 0; i < uiNumPixels; ++i)
 			m_pPreviewAtlasPixelData[i*4+3] = m_pPreviewAtlas->data[i];
 
+		RegenFontArray();
 		m_bPreviewAtlasPixelDataInitialized = true;
 	}
 
