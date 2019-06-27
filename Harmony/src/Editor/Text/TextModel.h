@@ -29,6 +29,8 @@
 #define TEXTPROP_Symbols "!\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@"
 #define TEXTPROP_AdditionalSyms "Additional glyphs"
 
+#define TEXTGLYPHS_SubStateId -5 // Some negative value that indicates the Glyphs property changed (gets sent to TextWidget::FocusState)
+
 class TextStateData : public IStateData
 {
 	TextLayersModel				m_LayersModel;

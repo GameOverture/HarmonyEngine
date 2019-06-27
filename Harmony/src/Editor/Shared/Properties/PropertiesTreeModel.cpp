@@ -193,6 +193,21 @@ void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
 	}
 }
 
+/*virtual*/ bool PropertiesTreeModel::setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole /*= Qt::EditRole*/) /*override*/
+{
+	if(iRole != Qt::CheckStateRole)
+		return ITreeModel::setData(indexRef, valueRef, iRole);
+
+	const QVariant &origValue = GetPropertyValue(indexRef);
+	if(origValue != valueRef)
+	{
+		PropertiesUndoCmd *pUndoCmd = new PropertiesUndoCmd(this, indexRef, valueRef);
+		GetOwner().GetUndoStack()->push(pUndoCmd);
+	}
+
+	return false; // Return false because another setData() will be invoked via the UndoCmd, which actually changes the data
+}
+
 /*virtual*/ QVariant PropertiesTreeModel::data(const QModelIndex &indexRef, int iRole) const /*override*/
 {
 	if(indexRef.isValid() == false)

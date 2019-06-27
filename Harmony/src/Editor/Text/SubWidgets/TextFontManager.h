@@ -110,6 +110,7 @@ public:
 	void SetOutlineThickness(TextLayerHandle hLayer, float fThickness);
 	void SetColors(TextLayerHandle hLayer, const QColor &topColor, const QColor &botColor);
 
+	void RegenAtlas();
 	void GenerateOptimizedAtlas();
 	unsigned char *GetAtlasInfo(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut);
 

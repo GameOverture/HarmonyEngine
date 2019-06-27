@@ -24,7 +24,7 @@ TextLayerHandle TextFontManager::sm_hHandleCount = 0;
 
 TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsObj, QJsonArray fontArray) :
 	m_FontArray(fontArray),
-	m_GlyphsModel(itemRef, 0, 0, nullptr),
+	m_GlyphsModel(itemRef, 0, TEXTGLYPHS_SubStateId, nullptr),
 	m_pPreviewAtlas(nullptr),
 	m_pPreviewAtlasPixelData(nullptr),
 	m_uiPreviewAtlasBufferSize(0),
@@ -292,6 +292,17 @@ void TextFontManager::SetColors(TextLayerHandle hLayer, const QColor &topColor, 
 {
 	m_LayerMap[hLayer]->m_TopColor = topColor;
 	m_LayerMap[hLayer]->m_BotColor = botColor;
+}
+
+void TextFontManager::RegenAtlas()
+{
+	m_uiPreviewAtlasGrowSize = 0;
+	ClearAndEmbiggenAtlas();
+
+	m_uiPreviewAtlasGrowSize = FONTMANAGER_PreviewGrowSize;
+	InitAtlas();
+
+	RegenFontArray();
 }
 
 void TextFontManager::GenerateOptimizedAtlas()

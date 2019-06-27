@@ -58,7 +58,7 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject textObj) :
 	// If item's init value is defined, parse and initialize with it, otherwise make default empty font
 	if(textObj.empty() == false)
 	{
-		m_pFontManager = new TextFontManager(m_ItemRef, textObj["availableGlyphs"].toObject(), textObj["typefaceArray"].toArray());
+		m_pFontManager = new TextFontManager(m_ItemRef, textObj["availableGlyphs"].toObject(), textObj["fontArray"].toArray());
 
 		QJsonArray stateArray = textObj["stateArray"].toArray();
 		for(int i = 0; i < stateArray.size(); ++i)
@@ -212,7 +212,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	textObj.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? atlasDimensionsOut.height() : QJsonValue(m_pAtlasFrame->GetSize().height()));
 
 	QJsonArray fontArray = m_pFontManager->GetFontArray();
-	textObj.insert("typefaceArray", fontArray);
+	textObj.insert("fontArray", fontArray);
 
 	return textObj;
 }

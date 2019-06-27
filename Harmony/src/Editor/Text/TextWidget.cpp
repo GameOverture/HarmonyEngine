@@ -121,6 +121,11 @@ TextWidget::~TextWidget()
 			if(ui.cmbSize->currentText() == "0")
 				ui.cmbSize->setCurrentText("24");
 		}
+
+		if(TEXTGLYPHS_SubStateId == subState)
+		{
+			static_cast<TextModel *>(m_ItemRef.GetModel())->GetFontManager().RegenAtlas();
+		}
 	}
 }
 

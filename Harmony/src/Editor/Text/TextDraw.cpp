@@ -19,7 +19,7 @@ TextDraw::TextDraw(ProjectItem *pProjItem) :
 	m_Text("", "+GuiPreview", this),
 	m_hTexture(HY_UNUSED_HANDLE)
 {
-	m_Text.TextSet("The quick brown fox jumped over the lazy dog.");
+	m_Text.TextSet("The Quick Brown Fox Jumped Over The Lazy Dog!? 1234567890");
 	m_Text.TextSetAlignment(HYALIGN_Center);
 }
 
@@ -53,7 +53,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 																								  uiAtlasPixelDataSize,
 																								  HYTEXTURE_R8G8B8A8);
 	m_Text.GuiOverrideData<HyText2dData>(valueRef, m_hTexture);
-	m_Text.TextSet("The quick brown fox jumped over the lazy dog.");
+	m_Text.TextSet("The Quick Brown Fox Jumped Over The Lazy Dog!? 1234567890");
 }
 
 /*virtual*/ void TextDraw::OnShow() /*override*/

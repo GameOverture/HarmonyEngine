@@ -86,7 +86,7 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 
 /*virtual*/ bool ITreeModel::setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole /*= Qt::EditRole*/) /*override*/
 {
-	if(iRole != Qt::EditRole)
+	if(iRole != Qt::EditRole && iRole != Qt::CheckStateRole)
 		return false;
 
 	TreeModelItem *pItem = GetItem(indexRef);
