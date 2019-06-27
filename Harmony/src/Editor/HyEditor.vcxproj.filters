@@ -34,9 +34,6 @@
     <Filter Include="Explorer">
       <UniqueIdentifier>{ccc15290-3da5-4c9c-a7c1-80f1c0595259}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Font">
-      <UniqueIdentifier>{1da4e621-577a-45c1-bd9b-1451871db304}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Harmony">
       <UniqueIdentifier>{b0b302e9-83ae-4568-8033-4375c55b311e}</UniqueIdentifier>
     </Filter>
@@ -131,18 +128,6 @@
     </ClCompile>
     <ClCompile Include="Explorer\ExplorerWidget.cpp">
       <Filter>Explorer</Filter>
-    </ClCompile>
-    <ClCompile Include="Font\FontDraw.cpp">
-      <Filter>Font</Filter>
-    </ClCompile>
-    <ClCompile Include="Font\FontModels.cpp">
-      <Filter>Font</Filter>
-    </ClCompile>
-    <ClCompile Include="Font\FontUndoCmds.cpp">
-      <Filter>Font</Filter>
-    </ClCompile>
-    <ClCompile Include="Font\FontWidget.cpp">
-      <Filter>Font</Filter>
     </ClCompile>
     <ClCompile Include="Harmony\Harmony.cpp">
       <Filter>Harmony</Filter>
@@ -328,9 +313,6 @@
     <QtMoc Include="Entity\EntityWidget.h">
       <Filter>Entity</Filter>
     </QtMoc>
-    <QtMoc Include="Font\FontModels.h">
-      <Filter>Font</Filter>
-    </QtMoc>
     <ClInclude Include="Shared\Global.h">
       <Filter>Shared</Filter>
     </ClInclude>
@@ -456,9 +438,6 @@
     <ClInclude Include="ui_ExplorerWidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="ui_FontWidget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="ui_MainWindow.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -538,9 +517,6 @@
     </QtUic>
     <QtUic Include="Explorer\ExplorerWidget.ui">
       <Filter>Explorer</Filter>
-    </QtUic>
-    <QtUic Include="Font\FontWidget.ui">
-      <Filter>Font</Filter>
     </QtUic>
     <QtUic Include="MainWindow.ui" />
     <QtUic Include="Prefab\PrefabWidget.ui">
@@ -1147,12 +1123,6 @@
     <ClInclude Include="Entity\EntityUndoCmds.h">
       <Filter>Entity</Filter>
     </ClInclude>
-    <ClInclude Include="Font\FontDraw.h">
-      <Filter>Font</Filter>
-    </ClInclude>
-    <ClInclude Include="Font\FontUndoCmds.h">
-      <Filter>Font</Filter>
-    </ClInclude>
     <ClInclude Include="Prefab\PrefabDraw.h">
       <Filter>Prefab</Filter>
     </ClInclude>
@@ -1190,9 +1160,6 @@
     </QtMoc>
     <QtMoc Include="Explorer\ExplorerWidget.h">
       <Filter>Explorer</Filter>
-    </QtMoc>
-    <QtMoc Include="Font\FontWidget.h">
-      <Filter>Font</Filter>
     </QtMoc>
     <QtMoc Include="Harmony\Harmony.h">
       <Filter>Harmony</Filter>

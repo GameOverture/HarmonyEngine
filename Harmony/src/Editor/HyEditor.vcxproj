@@ -232,10 +232,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Explorer\ExplorerItem.cpp" />
     <ClCompile Include="Explorer\ExplorerModel.cpp" />
     <ClCompile Include="Explorer\ExplorerWidget.cpp" />
-    <ClCompile Include="Font\FontDraw.cpp" />
-    <ClCompile Include="Font\FontModels.cpp" />
-    <ClCompile Include="Font\FontUndoCmds.cpp" />
-    <ClCompile Include="Font\FontWidget.cpp" />
     <ClCompile Include="Primitive\PrimitiveModel.cpp" />
     <ClCompile Include="Project\ProjectItemMimeData.cpp" />
     <ClCompile Include="Shared\Global.cpp">
@@ -387,16 +383,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
-    <ClInclude Include="Font\FontDraw.h" />
-    <QtMoc Include="Font\FontModels.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
-    <ClInclude Include="Font\FontUndoCmds.h" />
-    <QtMoc Include="Font\FontWidget.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Font/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
     <ClInclude Include="Primitive\PrimitiveModel.h" />
     <ClInclude Include="Project\ProjectItemMimeData.h" />
     <ClInclude Include="Shared\Global.h" />
@@ -541,7 +527,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClInclude Include="ui_EntityToolbox.h" />
     <ClInclude Include="ui_EntityWidget.h" />
     <ClInclude Include="ui_ExplorerWidget.h" />
-    <ClInclude Include="ui_FontWidget.h" />
     <ClInclude Include="ui_MainWindow.h" />
     <ClInclude Include="ui_PrefabWidget.h" />
     <ClInclude Include="ui_SpriteWidget.h" />
@@ -583,8 +568,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtUic Include="Entity\EntityWidget.ui">
     </QtUic>
     <QtUic Include="Explorer\ExplorerWidget.ui">
-    </QtUic>
-    <QtUic Include="Font\FontWidget.ui">
     </QtUic>
     <QtUic Include="MainWindow.ui">
     </QtUic>
