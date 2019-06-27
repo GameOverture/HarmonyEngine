@@ -115,6 +115,9 @@ TextWidget::~TextWidget()
 			}
 		}
 		ui.cmbSize->setCurrentText(QString::number(static_cast<int>(pTextLayerModel->GetFontSize())));
+
+		if(ui.cmbSize->currentText() == "0")
+			ui.cmbSize->setCurrentText("24");
 	}
 }
 
