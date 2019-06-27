@@ -27,6 +27,11 @@ TextDraw::~TextDraw()
 {
 }
 
+void TextDraw::SetTextState(uint uiStateIndex)
+{
+	m_Text.TextSetState(uiStateIndex);
+}
+
 /*virtual*/ void TextDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
 {
 	uint uiAtlasPixelDataSize = 0;

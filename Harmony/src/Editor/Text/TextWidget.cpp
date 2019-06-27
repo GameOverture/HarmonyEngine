@@ -11,6 +11,7 @@
 #include "TextWidget.h"
 #include "Project.h"
 #include "TextUndoCmds.h"
+#include "TextDraw.h"
 
 #include <QComboBox>
 #include <QFontDatabase>
@@ -89,6 +90,10 @@ TextWidget::~TextWidget()
 
 /*virtual*/ void TextWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
+	TextDraw *pDraw = static_cast<TextDraw *>(m_ItemRef.GetDraw());
+	if(pDraw)
+		pDraw->SetTextState(iStateIndex);
+
 	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
 	if(pTextLayerModel)
 	{

@@ -21,6 +21,8 @@ public:
 	TextDraw(ProjectItem *pProjItem);
 	virtual ~TextDraw();
 
+	void SetTextState(uint uiStateIndex);
+
 	virtual void OnApplyJsonData(jsonxx::Value &valueRef) override;
 	virtual void OnShow() override;
 	virtual void OnHide() override;
