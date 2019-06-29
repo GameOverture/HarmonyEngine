@@ -488,8 +488,24 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 /*virtual*/ void ExplorerModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*override*/
 {
 	ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
-	pItem->DeleteFromProject();
+	
+	if(pItem->GetType() != ITEM_Project)
+		pItem->DeleteFromProject();
 }
+
+//void ExplorerModel::CloseProject(TreeModelItem *pProjectTreeItem)
+//{
+//	QStack<TreeModelItem *> treeItemStack;
+//	QVector<TreeModelItem *> childrenVec = pProjectTreeItem->GetChildren();
+//	for(int i = 0; i < childrenVec.size(); ++i)
+//	{
+//		ExplorerItem *pItem = childrenVec[i]->data(0).value<ExplorerItem *>();
+//		delete pItem;
+//	}
+//
+//	ExplorerItem *pProject = pProjectTreeItem->data(0).value<ExplorerItem *>();
+//	delete pProject;
+//}
 
 bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
 {

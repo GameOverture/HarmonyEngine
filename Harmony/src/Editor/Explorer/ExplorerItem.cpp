@@ -92,13 +92,13 @@ void ExplorerItem::Rename(QString sNewPrefix, QString sNewName)
 
 /*virtual*/ void ExplorerItem::DeleteFromProject()
 {
-	if(m_pProject)
-	{
-		if(m_eTYPE == ITEM_Prefix)
-			m_pProject->DeletePrefixAndContents(GetName(true));
-		else if(IsProjectItem())
-			m_pProject->DeleteGameData(m_eTYPE, GetName(true));
-	}
+	if(m_pProject == nullptr)
+		return;
+
+	if(m_eTYPE == ITEM_Prefix)
+		m_pProject->DeletePrefixAndContents(GetName(true));
+	else if(IsProjectItem())
+		m_pProject->DeleteGameData(m_eTYPE, GetName(true));
 }
 
 /*virtual*/ QString ExplorerItem::GetToolTip() const /*override*/

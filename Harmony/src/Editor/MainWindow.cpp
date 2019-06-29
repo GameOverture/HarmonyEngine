@@ -384,6 +384,10 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	}
 
 	SaveSettings();
+
+	delete Harmony::GetProject();
+	Harmony::SetProject(nullptr);
+
 	QMainWindow::closeEvent(pEvent);
 }
 

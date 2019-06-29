@@ -64,6 +64,10 @@ ProjectItem::ProjectItem(Project &projRef,
 
 ProjectItem::~ProjectItem()
 {
+	DrawUnload();
+	WidgetUnload();
+	delete m_pModel;
+	delete m_pUndoStack;
 }
 
 void ProjectItem::LoadModel()

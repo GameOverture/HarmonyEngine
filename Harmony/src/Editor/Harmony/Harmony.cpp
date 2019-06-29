@@ -28,6 +28,7 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 
 /*virtual*/ Harmony::~Harmony()
 {
+	delete m_pWidget;
 }
 
 /*static*/ Project *Harmony::GetProject()

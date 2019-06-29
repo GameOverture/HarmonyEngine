@@ -32,6 +32,7 @@ public:
 	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
 	bool RemoveItem(ExplorerItem *pItem);
 
+
 	QString AssemblePrefix(ExplorerItem *pItem) const;
 
 	bool PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef);
