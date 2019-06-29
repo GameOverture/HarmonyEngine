@@ -124,7 +124,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 		return false;
 	}
 
-	QDir metaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_Text, true));
+	QDir metaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HYMETA_FontsDir);
 	if(metaDir.mkpath(".") == false)
 		HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
 	else
