@@ -57,7 +57,7 @@ HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Value &da
 
 	unsigned char *pAnimStatesBuffer = reinterpret_cast<unsigned char *>(m_pAnimStates);
 	delete[] pAnimStatesBuffer;
-	pAnimStatesBuffer = NULL;
+	pAnimStatesBuffer = nullptr;
 }
 
 uint32 HySprite2dData::GetNumStates() const
