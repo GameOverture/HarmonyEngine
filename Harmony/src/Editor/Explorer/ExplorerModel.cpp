@@ -216,6 +216,11 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		uiAtlasGrpId = pDestProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
 
 	// Parse 'sSrc' for paste information
+
+
+	// TODO: Fix below! ------------------------
+
+
 	QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
 	QJsonArray pasteArray = pasteDoc.array();
 	for(int iPasteIndex = 0; iPasteIndex < pasteArray.size(); ++iPasteIndex)
