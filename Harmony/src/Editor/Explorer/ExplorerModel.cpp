@@ -221,6 +221,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 	// TODO: Fix below! ------------------------
 
 
+
 	QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
 	QJsonArray pasteArray = pasteDoc.array();
 	for(int iPasteIndex = 0; iPasteIndex < pasteArray.size(); ++iPasteIndex)
