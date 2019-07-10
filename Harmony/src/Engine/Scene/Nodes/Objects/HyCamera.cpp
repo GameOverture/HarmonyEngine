@@ -12,20 +12,27 @@
 #include "Window/HyWindow.h"
 #include "Utilities/HyRand.h"
 
-IHyCamera::IHyCamera(HyWindow *pWindow) :
+template<typename NODETYPE>
+IHyCamera<NODETYPE>::IHyCamera(HyWindow *pWindow) :
+	NODETYPE(HYTYPE_Camera, nullptr),
 	m_pWindowPtr(pWindow),
-	m_uiCullMaskBit(0)
+	m_uiCullMaskBit(0),
+	m_fCameraShakeRadius(0.0f),
+	m_fCameraShakeAngle(0.0f),
+	m_ptCameraShakeCenter(0.0f)
 {
 	m_ViewportRect.left = m_ViewportRect.bottom = 0.0f;
 	m_ViewportRect.right = m_ViewportRect.top = 1.0f;
 }
 
-IHyCamera::~IHyCamera()
+template<typename NODETYPE>
+IHyCamera<NODETYPE>::~IHyCamera()
 {
 }
 
 // All values are [0.0 - 1.0] representing percentages of the entire game window
-void IHyCamera::SetViewport(float fPosX, float fPosY, float fWidth, float fHeight)
+template<typename NODETYPE>
+void IHyCamera<NODETYPE>::SetViewport(float fPosX, float fPosY, float fWidth, float fHeight)
 {
 	m_ViewportRect.left = fPosX;
 	m_ViewportRect.bottom = fPosY;
@@ -33,32 +40,54 @@ void IHyCamera::SetViewport(float fPosX, float fPosY, float fWidth, float fHeigh
 	m_ViewportRect.top = m_ViewportRect.bottom + fHeight;
 }
 
-void IHyCamera::SetCullMaskBit(uint32 uiBit)
+template<typename NODETYPE>
+bool IHyCamera<NODETYPE>::IsCameraShake()
 {
-	m_uiCullMaskBit = uiBit;
+	return m_fCameraShakeRadius != 0.0f;
 }
 
-uint32 IHyCamera::GetCameraBitFlag()
+template<typename NODETYPE>
+void IHyCamera<NODETYPE>::CameraShake(float fRadius)
 {
-	return m_uiCullMaskBit;
+	if(IsCameraShake())
+		m_ptCameraShakeCenter = pos.Get();
+
+	fRadius = HyMax(fRadius, 2.5f);
+
+	m_fCameraShakeRadius = fRadius;
+	m_fCameraShakeAngle = HyRand::Range(0.0f, 360.0f);
+}
+
+template<typename NODETYPE>
+/*virtual*/ void IHyCamera<NODETYPE>::Update() /*override*/
+{
+	NODETYPE::Update();
+
+	if(m_fCameraShakeRadius > 0.0f)
+	{
+		m_fCameraShakeRadius *= 0.9f;
+		if(m_fCameraShakeRadius <= 2.0f)
+		{
+			// End camera shake
+			m_fCameraShakeRadius = 0.0f;
+			NODETYPE::pos.Set(m_ptCameraShakeCenter);
+		}
+		else
+		{
+			m_fCameraShakeAngle += (180.0f - m_fCameraShakeRadius) + HyRand::Range(0.0f, 60.0f); // Adjust angle 
+			glm::vec3 vOffset(sin(m_fCameraShakeAngle) * m_fCameraShakeRadius , cos(m_fCameraShakeAngle) * m_fCameraShakeRadius, 0.0f); // Create offset 2d vector
+			NODETYPE::pos.Set(m_ptCameraShakeCenter + vOffset); // Set center of viewport
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 HyCamera2d::HyCamera2d(HyWindow *pWindow) :
-	IHyNode2d(HYTYPE_Camera, nullptr),
-	IHyCamera(pWindow),
-	m_fCameraShakeRadius(0.0f),
-	m_fCameraShakeAngle(0.0f),
-	m_ptCameraShakeCenter(0.0f)
+	IHyCamera<IHyNode2d>(pWindow)
 { }
 
 HyCamera2d::~HyCamera2d()
 { }
-
-/*virtual*/ void HyCamera2d::GetCameraTransform(glm::mat4 &outMtx) /*override*/
-{
-	outMtx = GetWorldTransform();
-}
 
 /*virtual*/ void HyCamera2d::SetZoom(const float fZoom)
 {
@@ -68,15 +97,6 @@ HyCamera2d::~HyCamera2d()
 /*virtual*/ float HyCamera2d::GetZoom() const
 {
 	return scale.Get().x;
-}
-
-void HyCamera2d::CameraShake(float fRadius)
-{
-	fRadius = HyMax(fRadius, 2.5f);
-
-	m_fCameraShakeRadius = fRadius;
-	m_fCameraShakeAngle = HyRand::Range(0.0f, 360.0f);
-	m_ptCameraShakeCenter = pos.Get();
 }
 
 const b2AABB &HyCamera2d::GetWorldViewBounds()
@@ -90,44 +110,13 @@ const b2AABB &HyCamera2d::GetWorldViewBounds()
 	return m_aabbViewBounds;
 }
 
-/*virtual*/ void HyCamera2d::Update() /*override*/
-{
-	IHyNode2d::Update();
-	
-	if(m_fCameraShakeRadius > 0.0f)
-	{
-		m_fCameraShakeRadius *= 0.9f;
-		if(m_fCameraShakeRadius <= 2.0f)
-		{
-			// End camera shake
-			m_fCameraShakeRadius = 0.0f;
-			pos.Set(m_ptCameraShakeCenter);
-		}
-		else
-		{
-			m_fCameraShakeAngle += (180.0f - m_fCameraShakeRadius) + HyRand::Range(0.0f, 60.0f); // Adjust angle 
-			glm::vec2 vOffset(sin(m_fCameraShakeAngle) * m_fCameraShakeRadius , cos(m_fCameraShakeAngle) * m_fCameraShakeRadius); // Create offset 2d vector
-			pos.Set(m_ptCameraShakeCenter + vOffset); // Set center of viewport
-		}
-	}
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 HyCamera3d::HyCamera3d(HyWindow *pWindow) :
-	IHyNode3d(HYTYPE_Camera, nullptr),
-	IHyCamera(pWindow),
-	m_fCameraShakeRadius(0.0f),
-	m_fCameraShakeAngle(0.0f),
-	m_ptCameraShakeCenter(0.0f)
+	IHyCamera<IHyNode3d>(pWindow)
 { }
 
 HyCamera3d::~HyCamera3d()
 { }
-
-/*virtual*/ void HyCamera3d::GetCameraTransform(glm::mat4 &outMtx) /*override*/
-{
-	outMtx = GetWorldTransform();
-}
 
 /*virtual*/ void HyCamera3d::SetZoom(const float fZoom)
 {
@@ -137,35 +126,4 @@ HyCamera3d::~HyCamera3d()
 /*virtual*/ float HyCamera3d::GetZoom() const
 {
 	return scale.Get().z;
-}
-
-/*virtual*/ void HyCamera3d::CameraShake(float fRadius) /*override*/
-{
-	fRadius = HyMax(fRadius, 2.5f);
-
-	m_fCameraShakeRadius = fRadius;
-	m_fCameraShakeAngle = HyRand::Range(0.0f, 360.0f);
-	m_ptCameraShakeCenter = pos.Get();
-}
-
-/*virtual*/ void HyCamera3d::Update() /*override*/
-{
-	IHyNode3d::Update();
-
-	if(m_fCameraShakeRadius > 0.0f)
-	{
-		m_fCameraShakeRadius *= 0.9f;
-		if(m_fCameraShakeRadius <= 2.0f)
-		{
-			// End camera shake
-			m_fCameraShakeRadius = 0.0f;
-			pos.Set(m_ptCameraShakeCenter);
-		}
-		else
-		{
-			m_fCameraShakeAngle += (180.0f - m_fCameraShakeRadius) + HyRand::Range(0.0f, 60.0f); // Adjust angle 
-			glm::vec3 vOffset(sin(m_fCameraShakeAngle) * m_fCameraShakeRadius , cos(m_fCameraShakeAngle) * m_fCameraShakeRadius, 0.0f); // Create offset 2d vector
-			pos.Set(m_ptCameraShakeCenter + vOffset); // Set center of viewport
-		}
-	}
 }

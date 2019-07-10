@@ -168,7 +168,7 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glBlendFunc");
 }
 
-/*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCamera) /*override*/
+/*virtual*/ void HyOpenGL::DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera) /*override*/
 {
 	//////////////////////////////////////////////////////////////////////////
 	// Setup stencil buffer if required
@@ -716,7 +716,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glAttachShader");
 }
 
-void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCamera)
+void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera)
 {
 	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
 	HyRectangle<float> viewportRect;
@@ -726,7 +726,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCam
 	if(pCamera)
 	{
 		viewportRect = pCamera->GetViewport();
-		pCamera->GetCameraTransform(m_mtxView);
+		m_mtxView = pCamera->GetWorldTransform();
 
 		// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly somewhere here or in the shader)
 		m_mtxView[3].x *= -1;

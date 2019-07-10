@@ -14,6 +14,7 @@
 #include "Renderer/Components/HyRenderBuffer.h"
 #include "Renderer/Components/HyVertexBuffer.h"
 #include "Renderer/Effects/HyShader.h"
+#include "Scene/Nodes/Objects/HyCamera.h"
 
 class HyStencil;
 class HyPortal2d;
@@ -22,7 +23,6 @@ class IHyDrawable2d;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
-class IHyCamera;
 class IHyFileData;
 
 class IHyRenderer
@@ -89,7 +89,7 @@ public:
 	virtual void Begin_3d() = 0;
 	virtual void DrawRenderState_3d(HyRenderBuffer::State *pRenderState) = 0;
 	virtual void Begin_2d() = 0;
-	virtual void DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera *pCamera) = 0;
+	virtual void DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera) = 0;
 	virtual void FinishRender() = 0;
 	virtual void UploadShader(HyShaderProgramDefaults eDefaultsFrom, HyShader *pShader) = 0;
 	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) = 0;
