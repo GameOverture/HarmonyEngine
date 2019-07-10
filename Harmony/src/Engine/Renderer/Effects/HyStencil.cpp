@@ -35,6 +35,7 @@ HyStencilHandle HyStencil::GetHandle() const
 
 void HyStencil::AddMask(IHyDrawable2d &nodeRef)
 {
+	nodeRef.SetVisible(false);
 	nodeRef.Load();
 	m_MaskInstanceList.push_back(&nodeRef);
 
