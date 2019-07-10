@@ -216,19 +216,13 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		uiAtlasGrpId = pDestProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
 
 	// Parse 'sSrc' for paste information
-
-
-	// TODO: Fix below! ------------------------
-
-
-
 	QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
 	QJsonArray pasteArray = pasteDoc.array();
 	for(int iPasteIndex = 0; iPasteIndex < pasteArray.size(); ++iPasteIndex)
 	{
 		QJsonObject pasteObj = pasteArray[iPasteIndex].toObject();
 
-		// If paste item is already in the destination project, move it to new location
+		// If paste item is already in the destination project, just simply move it to new location
 		if(pasteObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
 		{
 			QString sItemPath = pasteObj["itemName"].toString();
@@ -277,7 +271,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		// Import any missing fonts (.ttf)
 		if(ePasteItemType == ITEM_Text)
 		{
-			QString sFontMetaDir = metaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_Text, true));
+			QString sFontMetaDir = metaDir.absoluteFilePath(HYMETA_FontsDir);
 			QDir fontMetaDir(sFontMetaDir);
 			fontMetaDir.mkdir(".");
 
@@ -296,6 +290,8 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 						HyGuiLog("Paste failed to imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Error);
 				}
 			}
+
+			pDestProject->ScanMetaFontDir();
 		}
 		// Copy images to meta-temp dir first
 		QJsonArray imageArray = pasteObj["images"].toArray();

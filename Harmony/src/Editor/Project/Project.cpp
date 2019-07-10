@@ -117,14 +117,12 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 			fontsMap[fontFileInfoList[i].fileName()] = fontFileInfoList[i].absoluteFilePath();
 	}
 
-	int iRow = 0;
-	for(auto iter = fontsMap.begin(); iter != fontsMap.end(); ++iter, ++iRow)
+	for(auto iter = fontsMap.begin(); iter != fontsMap.end(); ++iter)
 	{
 		QStandardItem *pFontItem = new QStandardItem(iter.key());
 		pFontItem->setData(iter.value());
 
 		m_FontListModel.appendRow(pFontItem);
-		//m_FontListModel.setItem(iRow, pFontItem);
 	}
 
 	ScanMetaFontDir();
@@ -358,6 +356,27 @@ AudioAssetsWidget *Project::GetAudioWidget()
 QStandardItemModel *Project::GetFontListModel()
 {
 	return &m_FontListModel;
+}
+
+void Project::ScanMetaFontDir()
+{
+	QStringList sFilterList(HYMETA_FontFilterList);
+	QDir metaDir(GetMetaDataAbsPath() % HYMETA_FontsDir);
+	QFileInfoList metaFontFileInfoList = metaDir.entryInfoList(sFilterList);
+
+	QMap<QString,QString> metaFontsMap;
+	for(int i = 0; i < metaFontFileInfoList.count(); ++i)
+		metaFontsMap[metaFontFileInfoList[i].fileName()] = metaFontFileInfoList[i].absoluteFilePath();
+
+	for(auto iter = metaFontsMap.begin(); iter != metaFontsMap.end(); ++iter)
+	{
+		QStandardItem *pFontItem = new QStandardItem(HyGlobal::ItemIcon(ITEM_Text, SUBICON_None), iter.key());
+		pFontItem->setData(iter.value());
+
+		// TODO: Prepend this item, not append
+		m_FontListModel.appendRow(pFontItem);
+		//m_FontListModel.setItem(0, pFontItem);
+	}
 }
 
 ProjectTabBar *Project::GetTabBar()
@@ -764,38 +783,4 @@ void Project::OnCloseTab(int iIndex)
 {
 	ProjectItem *pItem = m_pTabBar->tabData(iIndex).value<ProjectItem *>();
 	MainWindow::CloseItem(pItem);
-}
-
-void Project::ScanMetaFontDir()
-{
-	QStringList sFilterList(HYMETA_FontFilterList);
-	QDir metaDir(GetMetaDataAbsPath() % HYMETA_FontsDir);
-	QFileInfoList metaFontFileInfoList = metaDir.entryInfoList(sFilterList);
-
-	QMap<QString,QString> metaFontsMap;
-	for(int i = 0; i < metaFontFileInfoList.count(); ++i)
-	{
-		//QString metaFontFileName = metaFontFileInfoList[i].fileName();
-		//int iNumFonts = m_FontListModel.rowCount();
-		//for(int j = 0; j < iNumFonts; ++j)
-		//{
-		//	if(m_FontListModel.item(j)->text().compare(metaFontFileName, Qt::CaseInsensitive) == 0)
-		//	{
-		//		m_FontListModel.removeRow(m_FontListModel.item(j)->row()); // Remove the font since we're gonna add it again as a meta dir font
-		//		break;
-		//	}
-		//}
-
-		metaFontsMap[metaFontFileInfoList[i].fileName()] = metaFontFileInfoList[i].absoluteFilePath();
-	}
-
-	for(auto iter = metaFontsMap.begin(); iter != metaFontsMap.end(); ++iter)
-	{
-		QStandardItem *pFontItem = new QStandardItem(HyGlobal::ItemIcon(ITEM_Text, SUBICON_None), iter.key());
-		pFontItem->setData(iter.value());
-
-		// TODO: Prepend this item, not append
-		m_FontListModel.appendRow(pFontItem);
-		//m_FontListModel.setItem(0, pFontItem);
-	}
 }

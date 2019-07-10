@@ -98,6 +98,7 @@ public:
 	AudioAssetsWidget *GetAudioWidget();
 
 	QStandardItemModel *GetFontListModel();
+	void ScanMetaFontDir();
 
 	ProjectTabBar *GetTabBar();
 
@@ -137,9 +138,6 @@ public Q_SLOTS:
 	void OnTabBarCurrentChanged(int iIndex);
 
 	void OnCloseTab(int iIndex);
-
-private:
-	void ScanMetaFontDir();
 };
 
 #endif // PROJECT_H

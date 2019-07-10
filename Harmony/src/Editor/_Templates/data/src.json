@@ -1,6 +1,6 @@
 [
 	{
-		"project": "+HyDefault",
+		"project": "+HyInternal",
 		"fonts": [
 			"[HyHarmonyTemplateDataDir]PressStart2P.ttf"
 		],
@@ -11,8 +11,8 @@
 				"uri": "[HyHarmonyTemplateDataDir]+HyFont.png"
 			}
 		],
-		"itemName": "+Hy/+HyFont",
-		"itemType": "Font",
+		"itemName": "+HyInternal/+HyFont",
+		"itemType": "Text",
 		"src": {
 			"availableGlyphs": {
 				"0-9": true,
