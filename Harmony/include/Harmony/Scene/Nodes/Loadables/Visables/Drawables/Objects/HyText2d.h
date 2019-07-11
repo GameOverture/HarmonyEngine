@@ -41,9 +41,10 @@ protected:
 	enum BoxAttributes
 	{
 		BOXATTRIB_IsColumn					= 1 << 0,
-		BOXATTRIB_ColumnSplitWordsToFit		= 1 << 3,
-		BOXATTRIB_IsScaleBox				= 1 << 4,
-		BOXATTRIB_ScaleBoxCenterVertically	= 1 << 1,
+		BOXATTRIB_IsVertical				= 1 << 1,
+		BOXATTRIB_ColumnSplitWordsToFit		= 1 << 2,
+		BOXATTRIB_IsScaleBox				= 1 << 3,
+		BOXATTRIB_ScaleBoxCenterVertically	= 1 << 4,
 	};
 	uint32				m_uiBoxAttributes;
 	glm::vec2			m_vBoxDimensions;
@@ -122,6 +123,7 @@ public:
 	void SetAsLine();
 	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
+	void SetAsVertical();
 
 	virtual bool IsLoadDataValid() override;
 

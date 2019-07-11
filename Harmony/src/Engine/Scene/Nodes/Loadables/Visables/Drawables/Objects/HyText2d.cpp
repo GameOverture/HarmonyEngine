@@ -380,6 +380,19 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	MarkAsDirty();
 }
 
+void HyText2d::SetAsVertical()
+{
+	m_uiBoxAttributes = BOXATTRIB_IsVertical;
+	m_vBoxDimensions.x = 0.0f;
+	m_vBoxDimensions.y = 0.0f;
+
+#ifdef HY_DEBUG
+	m_DebugBox.GetShape().SetAsNothing();
+#endif
+
+	MarkAsDirty();
+}
+
 /*virtual*/ bool HyText2d::IsLoadDataValid() /*override*/
 {
 	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
@@ -731,20 +744,25 @@ offsetCalculation:
 				if(fCurLineDecender < (fDecender * m_fScaleBoxModifier))
 					fCurLineDecender = (fDecender * m_fScaleBoxModifier);
 
-				// If drawing text within a box, and we advance past our width, determine if we should newline
-				if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) == 0 &&
-				   (m_uiBoxAttributes & BOXATTRIB_IsColumn) != 0 &&
-				   fCurLineWidth > m_vBoxDimensions.x)
+				if((m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
+					bDoNewline = true;
+				else
 				{
-					// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
-					if((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) != 0 ||
-					   ((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
+					// If drawing text within a box, and we advance past our width, determine if we should newline
+					if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) == 0 &&
+					   (m_uiBoxAttributes & BOXATTRIB_IsColumn) != 0 &&
+					   fCurLineWidth > m_vBoxDimensions.x)
 					{
-						// Don't newline on ' ' characters
-						if(uiStrIndex != uiLastSpaceIndex)
+						// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
+						if((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) != 0 ||
+						   ((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
 						{
-							bDoNewline = true;
-							break;
+							// Don't newline on ' ' characters
+							if(uiStrIndex != uiLastSpaceIndex)
+							{
+								bDoNewline = true;
+								break;
+							}
 						}
 					}
 				}
@@ -795,7 +813,7 @@ offsetCalculation:
 
 		if(bDoNewline)
 		{
-			if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
+			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) == 0 && uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
 			{
 				// Text box is too small to fit a single character
 				m_uiNumValidCharacters = 0;
@@ -811,7 +829,7 @@ offsetCalculation:
 			}
 
 			// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
-			if(uiNewlineIndex != uiLastSpaceIndex)
+			if(uiNewlineIndex != uiLastSpaceIndex || (m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
 			{
 				uiStrIndex = uiLastSpaceIndex;
 				fCurLineWidth = fLastSpaceWidth;
