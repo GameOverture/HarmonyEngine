@@ -81,9 +81,11 @@ const PropertiesTreeModel *TextFontManager::GetGlyphsModel() const
 	return &m_GlyphsModel;
 }
 
-QList<TextLayerHandle> TextFontManager::RegisterLayers(QJsonArray layerArray)
+QList<TextLayerHandle> TextFontManager::RegisterLayers(QJsonObject stateObj)
 {
 	QList<TextLayerHandle> retLayerHandleList;
+
+	QJsonArray layerArray = stateObj["layers"].toArray();
 	for(int i = 0; i < layerArray.size(); ++i)
 	{
 		QJsonObject layerObj = layerArray[i].toObject();
@@ -100,7 +102,15 @@ QList<TextLayerHandle> TextFontManager::RegisterLayers(QJsonArray layerArray)
 		uint32 uiFontIndex = layerObj["typefaceIndex"].toInt();
 
 		TextLayerHandle hNewLayer = ++sm_hHandleCount;
-		m_LayerMap[hNewLayer] = new Layer(hNewLayer, uiFontIndex, botColor, topColor);
+
+		m_LayerMap[hNewLayer] = new Layer(hNewLayer,
+										  uiFontIndex,
+										  botColor,
+										  topColor,
+										  stateObj["leftSideNudgeAmt"].toDouble(),
+										  stateObj["lineAscender"].toDouble(),
+										  stateObj["lineDescender"].toDouble(),
+										  stateObj["lineHeight"].toDouble());
 
 		retLayerHandleList.append(hNewLayer);
 	}
@@ -208,6 +218,54 @@ void TextFontManager::GetColor(TextLayerHandle hLayer, QColor &topColorOut, QCol
 	botColorOut = iter.value()->m_BotColor;
 }
 
+float TextFontManager::GetLineHeight(TextLayerHandle hLayer) const
+{
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
+	{
+		HyGuiLog("TextFontManager::GetLineHeight passed an invalid handle", LOGTYPE_Error);
+		return 0.0f;
+	}
+
+	return iter.value()->m_fLineHeight;
+}
+
+float TextFontManager::GetLineAscender(TextLayerHandle hLayer) const
+{
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
+	{
+		HyGuiLog("TextFontManager::GetLineAscender passed an invalid handle", LOGTYPE_Error);
+		return 0.0f;
+	}
+
+	return iter.value()->m_fLineAscender;
+}
+
+float TextFontManager::GetLineDescender(TextLayerHandle hLayer) const
+{
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
+	{
+		HyGuiLog("TextFontManager::GetLineDescender passed an invalid handle", LOGTYPE_Error);
+		return 0.0f;
+	}
+
+	return iter.value()->m_fLineDescender;
+}
+
+float TextFontManager::GetLeftSideNudgeAmt(TextLayerHandle hLayer) const
+{
+	auto iter = m_LayerMap.find(hLayer);
+	if(iter == m_LayerMap.end())
+	{
+		HyGuiLog("TextFontManager::GetLeftSideNudgeAmt passed an invalid handle", LOGTYPE_Error);
+		return 0.0f;
+	}
+
+	return iter.value()->m_fLeftSideNudgeAmt;
+}
+
 TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
 	TextLayerHandle hNewLayer = HY_UNUSED_HANDLE;
@@ -222,7 +280,7 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 	}
 	
 	hNewLayer = ++sm_hHandleCount;
-	m_LayerMap[hNewLayer] = new Layer(hNewLayer, iFontIndex, QColor(Qt::black), QColor(Qt::black));
+	m_LayerMap[hNewLayer] = new Layer(hNewLayer, iFontIndex, QColor(Qt::black), QColor(Qt::black), 0.0f, 0.0f, 0.0f, 0.0f);
 
 	RegenFontArray();
 	return hNewLayer;
@@ -389,8 +447,9 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Allocate new font onto atlas
+	QString sAvailableTypefaceGlyphs = GetAvailableTypefaceGlyphs();
 	PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
-												   GetAvailableTypefaceGlyphs(),
+												   sAvailableTypefaceGlyphs,
 												   sFontPath,
 												   fSize,
 												   fOutlineThickness,
@@ -406,7 +465,31 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 	}
 
 	m_PreviewFontList.append(pNewPreviewFont);
-	return m_PreviewFontList.size() - 1;
+
+	int iFontIndex = m_PreviewFontList.size() - 1;
+	for(auto iter = m_LayerMap.begin(); iter != m_LayerMap.end(); ++iter)
+	{
+		if(iter.value()->m_iFontIndex == iFontIndex)
+		{
+			iter.value()->m_fLineHeight = pNewPreviewFont->GetTextureFont()->height;
+			iter.value()->m_fLineAscender = pNewPreviewFont->GetTextureFont()->ascender;
+			iter.value()->m_fLineDescender = pNewPreviewFont->GetTextureFont()->descender;
+
+			for(int j = 0; j < sAvailableTypefaceGlyphs.count(); ++j)
+			{
+				// NOTE: Assumes LITTLE ENDIAN
+				QString sSingleChar = sAvailableTypefaceGlyphs[j];
+				texture_glyph_t *pGlyph = texture_font_get_glyph(pNewPreviewFont->GetTextureFont(), sSingleChar.toUtf8().data());
+
+				// Only keep track of negative offset_x's
+				if(pGlyph->offset_x < 0 && iter.value()->m_fLeftSideNudgeAmt < abs(pGlyph->offset_x))
+					iter.value()->m_fLeftSideNudgeAmt = abs(pGlyph->offset_x);
+			}
+			break;
+		}
+	}
+
+	return iFontIndex;
 }
 
 int TextFontManager::InitAtlas()

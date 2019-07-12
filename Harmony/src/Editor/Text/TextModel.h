@@ -33,19 +33,13 @@
 
 class TextStateData : public IStateData
 {
-	TextLayersModel				m_LayersModel;
-
-	float						m_fLeftSideNudgeAmt;
-	float						m_fLineAscender;
-	float						m_fLineDescender;
-	float						m_fLineHeight;
+	TextLayersModel			m_LayersModel;
 
 public:
 	TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
 	virtual ~TextStateData();
 
 	TextLayersModel &GetLayersModel();
-	void GetMiscInfo(float &fLeftSideNudgeAmtOut, float &fLineAscenderOut, float &fLineDescenderOut, float &fLineHeightOut);
 
 	virtual int AddFrame(AtlasFrame *pFrame) override;
 	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
@@ -55,15 +49,15 @@ class TextModel : public IModel
 {
 	Q_OBJECT
 
-	TextFontManager *			m_pFontManager;
-	AtlasFrame *				m_pAtlasFrame;
+	TextFontManager *		m_pFontManager;
+	AtlasFrame *			m_pAtlasFrame;
 
 public:
 	TextModel(ProjectItem &itemRef, QJsonObject textObj);
 	virtual ~TextModel();
 
 	TextFontManager &GetFontManager();
-	TextLayersModel *GetLayersModel(uint uiIndex);
+	TextLayersModel *GetLayersModel(uint uiIndex) const;
 	PropertiesTreeModel *GetGlyphsModel();
 
 	virtual bool OnSave() override;

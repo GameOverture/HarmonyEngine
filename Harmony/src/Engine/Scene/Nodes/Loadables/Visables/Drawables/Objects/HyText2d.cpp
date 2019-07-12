@@ -744,31 +744,37 @@ offsetCalculation:
 				if(fCurLineDecender < (fDecender * m_fScaleBoxModifier))
 					fCurLineDecender = (fDecender * m_fScaleBoxModifier);
 
-				if((m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
-					bDoNewline = true;
-				else
+				// If drawing text within a box, and we advance past our width, determine if we should newline
+				if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) == 0 &&
+					(m_uiBoxAttributes & BOXATTRIB_IsColumn) != 0 &&
+					fCurLineWidth > m_vBoxDimensions.x)
 				{
-					// If drawing text within a box, and we advance past our width, determine if we should newline
-					if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) == 0 &&
-					   (m_uiBoxAttributes & BOXATTRIB_IsColumn) != 0 &&
-					   fCurLineWidth > m_vBoxDimensions.x)
+					// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
+					if((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) != 0 ||
+						((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
 					{
-						// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
-						if((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) != 0 ||
-						   ((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
+						// Don't newline on ' ' characters
+						if(uiStrIndex != uiLastSpaceIndex)
 						{
-							// Don't newline on ' ' characters
-							if(uiStrIndex != uiLastSpaceIndex)
-							{
-								bDoNewline = true;
-								break;
-							}
+							bDoNewline = true;
+							break;
 						}
 					}
 				}
 			}
 
-			if(bFirstCharacterOnNewLine)
+			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
+			{
+				for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
+				{
+					uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
+					m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x -= pWritePos[uiLayerIndex].x * 0.5f;
+
+					pWritePos[uiLayerIndex].x = 0.0f;
+					pWritePos[uiLayerIndex].y -= fCurLineAscender;
+				}
+			}
+			else if(bFirstCharacterOnNewLine)
 			{
 				// Handle whether any fancy glyph is hanging outside the bounds for every layer for this character
 				for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
@@ -787,10 +793,9 @@ offsetCalculation:
 		}
 
 		// If this is the first line, and we're a BOXATTRIB_ScaleBox, then place text snug against the top of the bounds box
-		if(bFirstLine &&
-			(bDoNewline || uiStrIndex == (uiSTR_SIZE - 1)))
+		if(bFirstLine && (bDoNewline || uiStrIndex == (uiSTR_SIZE - 1)))
 		{
-			if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
+			if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) != 0)
 			{
 				for(int32 iFirstLineStrIndex = static_cast<int32>(uiStrIndex); iFirstLineStrIndex >= 0; --iFirstLineStrIndex)
 				{
@@ -813,7 +818,7 @@ offsetCalculation:
 
 		if(bDoNewline)
 		{
-			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) == 0 && uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
+			if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
 			{
 				// Text box is too small to fit a single character
 				m_uiNumValidCharacters = 0;
@@ -829,7 +834,7 @@ offsetCalculation:
 			}
 
 			// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
-			if(uiNewlineIndex != uiLastSpaceIndex || (m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
+			if(uiNewlineIndex != uiLastSpaceIndex)
 			{
 				uiStrIndex = uiLastSpaceIndex;
 				fCurLineWidth = fLastSpaceWidth;

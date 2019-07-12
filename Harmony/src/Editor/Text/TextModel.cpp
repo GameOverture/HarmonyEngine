@@ -15,11 +15,7 @@
 
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
 	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
-	m_LayersModel(static_cast<TextModel &>(modelRef).GetFontManager(), static_cast<TextModel &>(modelRef).GetFontManager().RegisterLayers(stateObj["layers"].toArray()), &modelRef),
-	m_fLeftSideNudgeAmt(stateObj["leftSideNudgeAmt"].toDouble()),
-	m_fLineAscender(stateObj["lineAscender"].toDouble()),
-	m_fLineDescender(stateObj["lineDescender"].toDouble()),
-	m_fLineHeight(stateObj["lineHeight"].toDouble())
+	m_LayersModel(static_cast<TextModel &>(modelRef).GetFontManager(), static_cast<TextModel &>(modelRef).GetFontManager().RegisterLayers(stateObj), &modelRef)
 {
 }
 
@@ -30,14 +26,6 @@ TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stat
 TextLayersModel &TextStateData::GetLayersModel()
 {
 	return m_LayersModel;
-}
-
-void TextStateData::GetMiscInfo(float &fLeftSideNudgeAmtOut, float &fLineAscenderOut, float &fLineDescenderOut, float &fLineHeightOut)
-{
-	fLeftSideNudgeAmtOut = m_fLeftSideNudgeAmt;
-	fLineAscenderOut = m_fLineAscender;
-	fLineDescenderOut = m_fLineDescender;
-	fLineHeightOut = m_fLineHeight;
 }
 
 /*virtual*/ int TextStateData::AddFrame(AtlasFrame *pFrame) /*override*/
@@ -94,7 +82,7 @@ TextFontManager &TextModel::GetFontManager()
 	return *m_pFontManager;
 }
 
-TextLayersModel *TextModel::GetLayersModel(uint uiIndex)
+TextLayersModel *TextModel::GetLayersModel(uint uiIndex) const
 {
 	if(uiIndex < m_StateList.size())
 		return &static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel();
@@ -162,7 +150,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 /*virtual*/ QJsonObject TextModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	float fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight;
-	static_cast<TextStateData *>(m_StateList[uiIndex])->GetMiscInfo(fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight);
+	GetLayersModel(uiIndex)->GetMiscInfo(fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight);
 
 	QJsonObject stateObjOut;
 	stateObjOut.insert("name", m_StateList[uiIndex]->GetName());

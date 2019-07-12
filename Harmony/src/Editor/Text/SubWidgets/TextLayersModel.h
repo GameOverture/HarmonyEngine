@@ -48,7 +48,9 @@ public:
 
 	TextFontManager &GetFontManager();
 	const TextFontManager &GetFontManager() const;
-	QJsonArray GetLayersArray();
+	QJsonArray GetLayersArray() const;
+	
+	void GetMiscInfo(float &fLeftSideNudgeAmtOut, float &fLineAscenderOut, float &fLineDescenderOut, float &fLineHeightOut) const;
 
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 	void RemoveLayer(TextLayerHandle hHandle);
@@ -62,12 +64,6 @@ public:
 
 	float GetFontSize() const;
 	void SetFontSize(float fSize);
-
-	//// Must generate final texture atlas/fonts before these are valid
-	//float GetLineHeight();
-	//float GetLineAscender();
-	//float GetLineDescender();
-	//float GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs);
 
 	QModelIndex GetIndex(TextLayerHandle hLayer, Column eCol) const;
 	TextLayerHandle GetHandle(const QModelIndex &indexRef) const;

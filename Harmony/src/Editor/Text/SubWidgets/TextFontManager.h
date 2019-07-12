@@ -34,11 +34,20 @@ class TextFontManager
 		QColor						m_BotColor;
 		QColor						m_TopColor;
 
-		Layer(TextLayerHandle m_hUniqueId, int iFontIndex, QColor botColor, QColor topColor) :
+		float						m_fLeftSideNudgeAmt;
+		float						m_fLineAscender;
+		float						m_fLineDescender;
+		float						m_fLineHeight;
+
+		Layer(TextLayerHandle m_hUniqueId, int iFontIndex, QColor botColor, QColor topColor, float fLeftSideNudgeAmt, float fLineAscender, float fLineDescender, float fLineHeight) :
 			m_hUNIQUE_ID(m_hUniqueId),
 			m_iFontIndex(iFontIndex),
 			m_BotColor(botColor),
-			m_TopColor(topColor)
+			m_TopColor(topColor),
+			m_fLeftSideNudgeAmt(fLeftSideNudgeAmt),
+			m_fLineAscender(fLineAscender),
+			m_fLineDescender(fLineDescender),
+			m_fLineHeight(fLineHeight)
 		{ }
 	};
 	QMap<TextLayerHandle, Layer *>	m_LayerMap;
@@ -92,7 +101,7 @@ public:
 	PropertiesTreeModel *GetGlyphsModel();
 	const PropertiesTreeModel *GetGlyphsModel() const;
 
-	QList<TextLayerHandle> RegisterLayers(QJsonArray layerArray);
+	QList<TextLayerHandle> RegisterLayers(QJsonObject stateObj);
 	QJsonArray GetFontArray() const;
 
 	int GetFontIndex(TextLayerHandle hLayer) const;
@@ -102,6 +111,11 @@ public:
 	float GetOutlineThickness(TextLayerHandle hLayer) const;
 	float GetSize(TextLayerHandle hLayer) const;
 	void GetColor(TextLayerHandle hLayer, QColor &topColorOut, QColor &botColorOut) const;
+
+	float GetLineHeight(TextLayerHandle hLayer) const;
+	float GetLineAscender(TextLayerHandle hLayer) const;
+	float GetLineDescender(TextLayerHandle hLayer) const;
+	float GetLeftSideNudgeAmt(TextLayerHandle hLayer) const;
 
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 	void SetFont(TextLayerHandle hLayer, QString sFontName);

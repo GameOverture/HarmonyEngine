@@ -62,7 +62,7 @@ public:
 	}
 
 	bool IsCameraShake() {
-		return m_fCameraShakeRadius != 0.0f;
+		return m_fCameraShakeRadius > 0.0f;
 	}
 
 	void CameraShake(float fRadius)
@@ -84,7 +84,7 @@ protected:
 	{
 		NODETYPE::Update();
 
-		if(m_fCameraShakeRadius > 0.0f)
+		if(IsCameraShake())
 		{
 			m_fCameraShakeRadius *= 0.9f;
 			if(m_fCameraShakeRadius <= 2.0f)

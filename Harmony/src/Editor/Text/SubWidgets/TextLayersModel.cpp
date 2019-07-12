@@ -38,7 +38,7 @@ const TextFontManager &TextLayersModel::GetFontManager() const
 	return m_FontManagerRef;
 }
 
-QJsonArray TextLayersModel::GetLayersArray()
+QJsonArray TextLayersModel::GetLayersArray() const
 {
 	QJsonArray layersArray;
 	for(int i = 0; i < m_LayerList.size(); ++i)
@@ -60,6 +60,37 @@ QJsonArray TextLayersModel::GetLayersArray()
 	}
 
 	return layersArray;
+}
+
+void TextLayersModel::GetMiscInfo(float &fLeftSideNudgeAmtOut, float &fLineAscenderOut, float &fLineDescenderOut, float &fLineHeightOut) const
+{
+	fLineHeightOut = 0.0f;
+	for(int i = 0; i < m_LayerList.count(); ++i)
+	{
+		if(fLineHeightOut < m_FontManagerRef.GetLineHeight(m_LayerList[i]))
+			fLineHeightOut = m_FontManagerRef.GetLineHeight(m_LayerList[i]);
+	}
+
+	fLineAscenderOut = 0.0f;
+	for(int i = 0; i < m_LayerList.count(); ++i)
+	{
+		if(fLineAscenderOut < abs(m_FontManagerRef.GetLineAscender(m_LayerList[i])))
+			fLineAscenderOut = abs(m_FontManagerRef.GetLineAscender(m_LayerList[i]));
+	}
+
+	fLineDescenderOut = 0.0f;
+	for(int i = 0; i < m_LayerList.count(); ++i)
+	{
+		if(fLineDescenderOut < abs(m_FontManagerRef.GetLineDescender(m_LayerList[i])))
+			fLineDescenderOut = abs(m_FontManagerRef.GetLineDescender(m_LayerList[i]));
+	}
+
+	fLeftSideNudgeAmtOut = 0.0f;
+	for(int i = 0; i < m_LayerList.count(); ++i)
+	{
+		if(fLeftSideNudgeAmtOut < abs(m_FontManagerRef.GetLeftSideNudgeAmt(m_LayerList[i])))
+			fLeftSideNudgeAmtOut = abs(m_FontManagerRef.GetLeftSideNudgeAmt(m_LayerList[i]));
+	}
 }
 
 TextLayerHandle TextLayersModel::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
@@ -160,66 +191,6 @@ void TextLayersModel::SetFontSize(float fSize)
 	for(int i = 0; i < m_LayerList.size(); ++i)
 		m_FontManagerRef.SetFontSize(m_LayerList[i], fSize);
 }
-
-//float TextLayersModel::GetLineHeight()
-//{
-//	float fHeight = 0.0f;
-//
-//	for(int i = 0; i < m_LayerList.count(); ++i)
-//	{
-//		if(fHeight < m_LayerList[i]->pReference->pTextureFont->height)
-//			fHeight = m_LayerList[i]->pReference->pTextureFont->height;
-//	}
-//
-//	return fHeight;
-//}
-//
-//float TextLayersModel::GetLineAscender()
-//{
-//	float fAscender = 0.0f;
-//
-//	for(int i = 0; i < m_LayerList.count(); ++i)
-//	{
-//		if(fAscender < abs(m_LayerList[i]->pReference->pTextureFont->ascender))
-//			fAscender = abs(m_LayerList[i]->pReference->pTextureFont->ascender);
-//	}
-//
-//	return fAscender;
-//}
-//
-//float TextLayersModel::GetLineDescender()
-//{
-//	float fDescender = 0.0f;
-//
-//	for(int i = 0; i < m_LayerList.count(); ++i)
-//	{
-//		if(fDescender < abs(m_LayerList[i]->pReference->pTextureFont->descender))
-//			fDescender = abs(m_LayerList[i]->pReference->pTextureFont->descender);
-//	}
-//
-//	return fDescender;
-//}
-//
-//float TextLayersModel::GetLeftSideNudgeAmt(QString sAvailableTypefaceGlyphs)
-//{
-//	float fLeftSideNudgeAmt = 0.0f;
-//
-//	for(int i = 0; i < m_LayerList.count(); ++i)
-//	{
-//		for(int j = 0; j < sAvailableTypefaceGlyphs.count(); ++j)
-//		{
-//			// NOTE: Assumes LITTLE ENDIAN
-//			QString sSingleChar = sAvailableTypefaceGlyphs[j];
-//			texture_glyph_t *pGlyph = texture_font_get_glyph(m_LayerList[i]->pReference->pTextureFont, sSingleChar.toUtf8().data());
-//
-//			// Only keep track of negative offset_x's
-//			if(pGlyph->offset_x < 0 && fLeftSideNudgeAmt < abs(pGlyph->offset_x))
-//				fLeftSideNudgeAmt = abs(pGlyph->offset_x);
-//		}
-//	}
-//
-//	return fLeftSideNudgeAmt;
-//}
 
 QModelIndex TextLayersModel::GetIndex(TextLayerHandle hLayer, Column eCol) const
 {
