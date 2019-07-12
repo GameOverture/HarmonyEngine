@@ -40,6 +40,28 @@ void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW)
 	vecOut.x = iX; vecOut.y = iY; vecOut.z = iZ; vecOut.w = iW;
 }
 
+void HyCopyVec(glm::vec2 &destRef, const glm::vec2 &srcRef)
+{
+	destRef = srcRef;
+}
+
+void HyCopyVec(glm::vec3 &destRef, const glm::vec3 &srcRef)
+{
+	destRef = srcRef;
+}
+
+void HyCopyVec(glm::vec2 &destRef, const glm::vec3 &srcRef)
+{
+	destRef.x = srcRef.x;
+	destRef.y = srcRef.y;
+}
+
+void HyCopyVec(glm::vec3 &destRef, const glm::vec2 &srcRef)
+{
+	destRef.x = srcRef.x;
+	destRef.y = srcRef.y;
+}
+
 bool HyTestPointAABB(const b2AABB &aabb, const glm::vec2 &pt)
 {
 	return (aabb.IsValid() &&

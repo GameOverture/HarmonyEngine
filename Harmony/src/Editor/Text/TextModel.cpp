@@ -166,7 +166,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 	QJsonObject stateObjOut;
 	stateObjOut.insert("name", m_StateList[uiIndex]->GetName());
-	stateObjOut.insert("leftSideNudgeAmt", fLeftSideNudgeAmt);//layersModelRef.GetLeftSideNudgeAmt(m_sAvailableTypefaceGlyphs));
+	stateObjOut.insert("leftSideNudgeAmt", fLeftSideNudgeAmt);
 	stateObjOut.insert("lineAscender", fLineAscender);
 	stateObjOut.insert("lineDescender", fLineDescender);
 	stateObjOut.insert("lineHeight", fLineHeight);

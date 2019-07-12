@@ -33,6 +33,11 @@ void HySetVec(glm::ivec2 &vecOut, int32 iX, int32 iY);
 void HySetVec(glm::ivec3 &vecOut, int32 iX, int32 iY, int32 iZ);
 void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW);
 
+void HyCopyVec(glm::vec2 &destRef, const glm::vec2 &srcRef);
+void HyCopyVec(glm::vec3 &destRef, const glm::vec3 &srcRef);
+void HyCopyVec(glm::vec2 &destRef, const glm::vec3 &srcRef);
+void HyCopyVec(glm::vec3 &destRef, const glm::vec2 &srcRef);
+
 template <typename VEC>
 int32 HyHalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptPointOnPlane)
 {

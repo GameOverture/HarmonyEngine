@@ -682,5 +682,8 @@
     <ClInclude Include="..\..\include\Harmony\Audio\Harness\IHyAudioInst.h">
       <Filter>Audio\Harness</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Objects\IHyCamera.h">
+      <Filter>Scene\Nodes\Objects</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

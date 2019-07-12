@@ -216,6 +216,7 @@
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Visables\Objects\HyEntity3d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Visables\Objects\HyEntityLeaf2d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Objects\HyCamera.h" />
+    <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Objects\IHyCamera.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyBox2dRuntime.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyDebugPhys2d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysEntity2d.h" />
