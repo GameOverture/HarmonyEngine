@@ -67,7 +67,7 @@ public:
 
 	void CameraShake(float fRadius)
 	{
-		if(IsCameraShake())
+		if(IsCameraShake() == false)
 			HyCopyVec(m_ptCameraShakeCenter, pos.Get());
 
 		fRadius = HyMax(fRadius, 2.5f);
