@@ -187,5 +187,8 @@ void IHyVisable2d::CalculateColor()
 	if(parentRef.IsScissorSet())
 		static_cast<IHyVisable2d &>(childRef)._SetScissor(parentRef.m_pScissor, false);
 
+	if(parentRef.IsStencilSet())
+		static_cast<IHyVisable2d &>(childRef)._SetStencil(parentRef.m_hStencil, false);
+
 	parentRef.SetChildrenDisplayOrder(false);
 }
