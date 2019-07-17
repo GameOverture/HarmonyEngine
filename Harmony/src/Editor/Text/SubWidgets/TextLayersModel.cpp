@@ -74,15 +74,15 @@ void TextLayersModel::GetMiscInfo(float &fLeftSideNudgeAmtOut, float &fLineAscen
 	fLineAscenderOut = 0.0f;
 	for(int i = 0; i < m_LayerList.count(); ++i)
 	{
-		if(fLineAscenderOut < abs(m_FontManagerRef.GetLineAscender(m_LayerList[i])))
-			fLineAscenderOut = abs(m_FontManagerRef.GetLineAscender(m_LayerList[i]));
+		if(fLineAscenderOut < m_FontManagerRef.GetLineAscender(m_LayerList[i]))
+			fLineAscenderOut = m_FontManagerRef.GetLineAscender(m_LayerList[i]);
 	}
 
 	fLineDescenderOut = 0.0f;
 	for(int i = 0; i < m_LayerList.count(); ++i)
 	{
-		if(fLineDescenderOut < abs(m_FontManagerRef.GetLineDescender(m_LayerList[i])))
-			fLineDescenderOut = abs(m_FontManagerRef.GetLineDescender(m_LayerList[i]));
+		if(fLineDescenderOut > m_FontManagerRef.GetLineDescender(m_LayerList[i]))
+			fLineDescenderOut = m_FontManagerRef.GetLineDescender(m_LayerList[i]);
 	}
 
 	fLeftSideNudgeAmtOut = 0.0f;

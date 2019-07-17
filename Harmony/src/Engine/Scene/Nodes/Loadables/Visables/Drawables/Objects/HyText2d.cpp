@@ -771,7 +771,7 @@ offsetCalculation:
 					m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x -= pWritePos[uiLayerIndex].x * 0.5f;
 
 					pWritePos[uiLayerIndex].x = 0.0f;
-					pWritePos[uiLayerIndex].y -= fCurLineAscender;
+					pWritePos[uiLayerIndex].y -= fCurLineAscender + fCurLineDecender;
 				}
 			}
 			else if(bFirstCharacterOnNewLine)
