@@ -19,6 +19,8 @@ namespace HyStr
 
 	std::string MakeStringProperPath(const char *szPath, const char *szExtension, bool bMakeLowercase);
 
+	bool Compare(const std::string &sFirst, const std::string &sSecond, bool bCaseSensitive = false);
+
 	// Trim whitespace from start (in place)
 	void TrimLeft(std::string &sStrOut);
 

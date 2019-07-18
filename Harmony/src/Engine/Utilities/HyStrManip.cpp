@@ -85,6 +85,14 @@ namespace HyStr
 		return sPath;
 	}
 
+	bool Compare(const std::string &sFirst, const std::string &sSecond, bool bCaseSensitive /*= false*/)
+	{
+		if(bCaseSensitive)
+			return std::equal(sFirst.begin(), sFirst.end(), sSecond.begin(), sSecond.end(), [](char a, char b) { return tolower(a) == tolower(b); });
+
+		return sFirst == sSecond;
+	}
+
 	// Trim whitespace from start (in place)
 	void TrimLeft(std::string &sStrOut)
 	{
