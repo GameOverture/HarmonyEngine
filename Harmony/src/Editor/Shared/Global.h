@@ -37,7 +37,6 @@ class Project;
 
 #define HyOrganizationName "Game Overture"
 #define HyEditorToolName "Harmony Editor Tool"
-#define HyGuiInternalPrefix "+Hy"
 #define HyGuiInternalCharIndicator '+'
 
 //#define HYGUI_UseBinaryMetaFiles
