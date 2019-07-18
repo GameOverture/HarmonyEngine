@@ -773,6 +773,8 @@ offsetCalculation:
 					pWritePos[uiLayerIndex].x = 0.0f;
 					pWritePos[uiLayerIndex].y -= fCurLineAscender + fCurLineDecender;
 				}
+
+				fLastSpaceWidth = fLastCharWidth = fCurLineWidth = fCurLineAscender = fCurLineDecender = 0.0f;	// Reset these because it's essentially a new line
 			}
 			else if(bFirstCharacterOnNewLine)
 			{
