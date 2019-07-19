@@ -209,16 +209,18 @@ enum HyDiagFlag
 {
 	HYDIAG_NONE				= 0,
 
-	HYDIAG_FrameTimeMs		= 1 << 0,
+	HYDIAG_LastFrameTime		= 1 << 0,
 	HYDIAG_AvgFrameTimes	= 1 << 1,
 	HYDIAG_Fps				= 1 << 2,
-	HYDIAG_FRAMETIMES		= (HYDIAG_FrameTimeMs | HYDIAG_AvgFrameTimes | HYDIAG_Fps),
+	HYDIAG_FRAMETIMES		= (HYDIAG_LastFrameTime | HYDIAG_AvgFrameTimes | HYDIAG_Fps),
 
 	HYDIAG_ProfilerGraph	= 1 << 3,
 	HYDIAG_ProfilerText		= 1 << 4,
 	HYDIAG_PROFILER			= (HYDIAG_ProfilerGraph | HYDIAG_ProfilerText),
+
+	HYDIAG_Mouse			= 1 << 5,
 	
-	HYDIAG_ALL				= (HYDIAG_FRAMETIMES | HYDIAG_PROFILER)
+	HYDIAG_ALL				= (HYDIAG_FRAMETIMES | HYDIAG_PROFILER | HYDIAG_Mouse)
 };
 
 struct HyWindowInfo

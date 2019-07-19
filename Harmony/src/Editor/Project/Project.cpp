@@ -219,7 +219,7 @@ void Project::LoadExplorerModel()
 				sName = sItemPath.right(sItemPath.length() - iSplitIndex - 1);
 			}
 
-			if(sName == "+HyFont")
+			if(sPrefix == "+HyInternal" && sName == "+SystemText")
 				bSystemFontFound = true;
 
 			m_ModelRef.AddItem(this, eType, sPrefix, sName, objsInSubDirIter.value(), false);

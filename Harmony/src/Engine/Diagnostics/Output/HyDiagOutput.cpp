@@ -26,13 +26,6 @@ HyDiagOutput::HyDiagOutput() :
 	m_txtMouse(HY_SYSTEM_FONT, this),
 	m_uiShowFlags(HYDIAG_NONE)
 {
-	m_txtAvgFrame.pos.Y(-HY_SYSTEM_FONT_SIZE);
-	m_txtAvgFrameLow.pos.Y(-HY_SYSTEM_FONT_SIZE * 2.0f);
-	m_txtAvgFrameHigh.pos.Y(-HY_SYSTEM_FONT_SIZE * 3.0f);
-	m_txtFps.pos.Y(-HY_SYSTEM_FONT_SIZE * 4.0f);
-	
-	m_txtMouse.pos.Y(-HY_SYSTEM_FONT_SIZE * 5.0f);
-
 	SetDisplayOrder(HY_SYSTEM_FONT_DISPLAYORDER);
 	SetShowFlags(HYDIAG_NONE);
 }
@@ -64,32 +57,55 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 
 	if(IsVisible())
 	{
+		float fOffsetY = -HY_SYSTEM_FONT_SIZE;
+
 		std::stringstream ss;
 		ss.precision(3);
-		ss << "Cur : " << dTimeDelta << "ms";
-		m_txtLastFrameTime.TextSet(ss.str());
+
+		if((m_uiShowFlags & HYDIAG_LastFrameTime) != 0)
+		{
+			ss << "Cur : " << dTimeDelta << "ms";
+			m_txtLastFrameTime.TextSet(ss.str());
+
+			m_txtLastFrameTime.pos.Y(fOffsetY);
+			fOffsetY -= HY_SYSTEM_FONT_SIZE;
+		}
 
 		if(m_dFrameTime_Cumulative >= 1.0)
 		{
-			ss.str("");
-			ss.clear();
-			ss << "Avg : " << static_cast<double>(m_dFrameTime_Cumulative / m_uiFrameCount) * 1000.0 << "ms";
-			m_txtAvgFrame.TextSet(ss.str());
+			if((m_uiShowFlags & HYDIAG_AvgFrameTimes) != 0)
+			{
+				ss.str("");
+				ss.clear();
+				ss << "Avg : " << static_cast<double>(m_dFrameTime_Cumulative / m_uiFrameCount) * 1000.0 << "ms";
+				m_txtAvgFrame.TextSet(ss.str());
+				m_txtAvgFrame.pos.Y(fOffsetY);
+				fOffsetY -= HY_SYSTEM_FONT_SIZE;
 
-			ss.str("");
-			ss.clear();
-			ss << "Low : " << m_dFrameTime_Low << "ms";
-			m_txtAvgFrameLow.TextSet(ss.str());
+				ss.str("");
+				ss.clear();
+				ss << "Low : " << m_dFrameTime_Low << "ms";
+				m_txtAvgFrameLow.TextSet(ss.str());
+				m_txtAvgFrameLow.pos.Y(fOffsetY);
+				fOffsetY -= HY_SYSTEM_FONT_SIZE;
 
-			ss.str("");
-			ss.clear();
-			ss << "High: " << m_dFrameTime_High << "ms";
-			m_txtAvgFrameHigh.TextSet(ss.str());
+				ss.str("");
+				ss.clear();
+				ss << "High: " << m_dFrameTime_High << "ms";
+				m_txtAvgFrameHigh.TextSet(ss.str());
+				m_txtAvgFrameHigh.pos.Y(fOffsetY);
+				fOffsetY -= HY_SYSTEM_FONT_SIZE;
+			}
 
-			ss.str("");
-			ss.clear();
-			ss << "FPS : " << m_uiFrameCount;
-			m_txtFps.TextSet(ss.str());
+			if((m_uiShowFlags & HYDIAG_Fps) != 0)
+			{
+				ss.str("");
+				ss.clear();
+				ss << "FPS : " << m_uiFrameCount;
+				m_txtFps.TextSet(ss.str());
+				m_txtFps.pos.Y(fOffsetY);
+				fOffsetY -= HY_SYSTEM_FONT_SIZE;
+			}
 
 			// Collect a new sample
 			m_dFrameTime_Low = 9999.0;	// Any large value that should be greater than any single frame time
@@ -98,11 +114,17 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 			m_uiFrameCount = 0;
 		}
 
-		HyInput &inputRef = Hy_Input();
-		glm::vec2 ptMousePos = inputRef.GetWorldMousePos();
-		if(inputRef.IsMouseBtnDown(HYMOUSE_BtnLeft))
-			m_txtMouse.TextSet("MOUSE DOWN\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
-		else
-			m_txtMouse.TextSet("MOUSE UP\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
+		if((m_uiShowFlags & HYDIAG_Mouse) != 0)
+		{
+			HyInput &inputRef = Hy_Input();
+			glm::vec2 ptMousePos = inputRef.GetWorldMousePos();
+			if(inputRef.IsMouseBtnDown(HYMOUSE_BtnLeft))
+				m_txtMouse.TextSet("MOUSE DOWN\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
+			else
+				m_txtMouse.TextSet("MOUSE UP\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
+
+			m_txtMouse.pos.Y(fOffsetY);
+			fOffsetY -= HY_SYSTEM_FONT_SIZE;
+		}
 	}
 }

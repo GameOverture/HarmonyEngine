@@ -16,7 +16,7 @@
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyText2d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrimitive2d.h"
 
-#define HY_SYSTEM_FONT "+HyInternal", "+HyFont"
+#define HY_SYSTEM_FONT "+HyInternal", "+SystemText"
 #define HY_SYSTEM_FONT_SIZE 16.0f
 #define HY_SYSTEM_FONT_DISPLAYORDER 0x7FFFFF00
 
@@ -32,7 +32,6 @@ class HyDiagOutput : public HyEntity2d
 	HyText2d				m_txtAvgFrameLow;
 	HyText2d				m_txtAvgFrameHigh;
 	HyText2d				m_txtFps;
-
 	HyText2d				m_txtMouse;
 
 	uint32					m_uiShowFlags;

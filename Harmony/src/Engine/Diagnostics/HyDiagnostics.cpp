@@ -115,13 +115,13 @@ void HyDiagnostics::BootMessage()
 	HyLog("");
 }
 
-void HyDiagnostics::Show(uint32 uiDiagFlags, float fX /*= 0.0f*/, float fY /*= 0.0f*/)
+void HyDiagnostics::Show(uint32 uiDiagFlags)
 {
 	if(uiDiagFlags != 0 && m_DiagOutput.IsLoaded() == false)
 		m_DiagOutput.Load();
 
 	m_DiagOutput.SetShowFlags(uiDiagFlags);
-	m_DiagOutput.pos.Set(fX, fY);
+	m_DiagOutput.pos.Set(5, Hy_Window().GetHeight() - 5);
 	m_DiagOutput.UseWindowCoordinates(0);
 }
 
