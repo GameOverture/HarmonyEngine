@@ -14,7 +14,6 @@
 
 HyShape2d::HyShape2d(IHyNode2d *pOwnerNode) :
 	m_pOwnerNode(pOwnerNode),
-	m_ChangedCallback(nullptr),
 	m_eType(HYSHAPE_Unknown),
 	m_pShape(nullptr)
 {
@@ -22,7 +21,6 @@ HyShape2d::HyShape2d(IHyNode2d *pOwnerNode) :
 
 HyShape2d::HyShape2d(IHyNode2d *pOwnerNode, const HyShape2d &copyRef) :
 	m_pOwnerNode(pOwnerNode),
-	m_ChangedCallback(nullptr),
 	m_eType(HYSHAPE_Unknown),
 	m_pShape(nullptr)
 {
@@ -125,11 +123,6 @@ b2Shape *HyShape2d::GetB2Shape()
 	return m_pShape;
 }
 
-void HyShape2d::SetOnChangedCallback(HyShape2dChangedCallback changedCallback)
-{
-	m_ChangedCallback = changedCallback;
-}
-
 bool HyShape2d::IsValid() const
 {
 	return m_pShape != nullptr && m_eType != HYSHAPE_Unknown;
@@ -141,9 +134,6 @@ void HyShape2d::SetAsNothing()
 
 	delete m_pShape;
 	m_pShape = nullptr;
-
-	if(m_ChangedCallback)
-		m_ChangedCallback(m_pOwnerNode, this);
 }
 
 void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
@@ -153,9 +143,6 @@ void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
 	delete m_pShape;
 	m_pShape = HY_NEW b2EdgeShape();
 	static_cast<b2EdgeShape *>(m_pShape)->Set(b2Vec2(pt1.x, pt1.y), b2Vec2(pt2.x, pt2.y));
-
-	if(m_ChangedCallback)
-		m_ChangedCallback(m_pOwnerNode, this);
 }
 
 void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -170,9 +157,6 @@ void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	delete m_pShape;
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(&vertList[0], uiNumVerts);
-
-	if(m_ChangedCallback)
-		m_ChangedCallback(m_pOwnerNode, this);
 }
 
 void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -187,9 +171,6 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	delete m_pShape;
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts);
-
-	if(m_ChangedCallback)
-		m_ChangedCallback(m_pOwnerNode, this);
 }
 
 void HyShape2d::SetAsCircle(float fRadius)
@@ -205,9 +186,6 @@ void HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
 	m_pShape = HY_NEW b2CircleShape();
 	static_cast<b2CircleShape *>(m_pShape)->m_p.Set(ptCenter.x, ptCenter.y);
 	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
-
-	if(m_ChangedCallback)
-		m_ChangedCallback(m_pOwnerNode, this);
 }
 
 void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
@@ -221,9 +199,6 @@ void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->Set(&vertList[0], uiCount);
-
-	if(m_ChangedCallback)
-		m_ChangedCallback(m_pOwnerNode, this);
 }
 
 void HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)
@@ -238,9 +213,6 @@ void HyShape2d::SetAsBox(float fWidth, float fHeight)
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fWidth * 0.5f, fHeight * 0.5f, b2Vec2(fWidth * 0.5f, fHeight * 0.5f), 0.0f);	// Offsets Box2d's center to bottom left
-
-	if(m_ChangedCallback)
-		m_ChangedCallback(m_pOwnerNode, this);
 }
 
 void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
@@ -250,9 +222,6 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(ptBoxCenter.x, ptBoxCenter.y), glm::radians(fRotDeg));
-
-	if(m_ChangedCallback)
-		m_ChangedCallback(m_pOwnerNode, this);
 }
 
 bool HyShape2d::TestPoint(const glm::vec2 &ptWorldPointRef) const

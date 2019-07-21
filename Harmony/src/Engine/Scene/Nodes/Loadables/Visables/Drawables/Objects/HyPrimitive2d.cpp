@@ -21,7 +21,6 @@ HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
 	m_fLineThickness(1.0f),
 	m_uiNumSegments(16)
 {
-	m_LocalBoundingVolume.SetOnChangedCallback(OnShapeSet);
 	ClearData();
 }
 
@@ -56,10 +55,64 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	return HY_NEW HyPrimitive2d(*this);
 }
 
-HyShape2d &HyPrimitive2d::GetShape()
+void HyPrimitive2d::SetAsNothing()
 {
-	// The bounding volume in HyPrimitive2d also doubles as the actual shape and type of this primitive
-	return m_LocalBoundingVolume;
+	m_LocalBoundingVolume.SetAsNothing();
+	SetData();
+}
+
+void HyPrimitive2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
+{
+	m_LocalBoundingVolume.SetAsLineSegment(pt1, pt2);
+	SetData();
+}
+
+void HyPrimitive2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
+{
+	m_LocalBoundingVolume.SetAsLineLoop(pVertices, uiNumVerts);
+	SetData();
+}
+
+void HyPrimitive2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
+{
+	m_LocalBoundingVolume.SetAsLineChain(pVertices, uiNumVerts);
+	SetData();
+}
+
+void HyPrimitive2d::SetAsCircle(float fRadius)
+{
+	m_LocalBoundingVolume.SetAsCircle(fRadius);
+	SetData();
+}
+
+void HyPrimitive2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
+{
+	m_LocalBoundingVolume.SetAsCircle(ptCenter, fRadius);
+	SetData();
+}
+
+void HyPrimitive2d::SetAsPolygon(const glm::vec2 *pVertices, uint32 uiNumVerts)
+{
+	m_LocalBoundingVolume.SetAsPolygon(pVertices, uiNumVerts);
+	SetData();
+}
+
+void HyPrimitive2d::SetAsBox(int32 iWidth, int32 iHeight)
+{
+	m_LocalBoundingVolume.SetAsBox(iWidth, iHeight);
+	SetData();
+}
+
+void HyPrimitive2d::SetAsBox(float fWidth, float fHeight)
+{
+	m_LocalBoundingVolume.SetAsBox(fWidth, fHeight);
+	SetData();
+}
+
+void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
+{
+	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, ptBoxCenter, fRotDeg);
+	SetData();
 }
 
 uint32 HyPrimitive2d::GetNumVerts() const
@@ -114,12 +167,6 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 /*virtual*/ bool HyPrimitive2d::OnIsValid() /*override*/
 {
 	return m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValid();
-}
-
-/*static*/ void HyPrimitive2d::OnShapeSet(IHyNode2d *pOwnerNode, HyShape2d *pShape) /*override*/
-{
-	HyPrimitive2d *pThis = static_cast<HyPrimitive2d *>(pOwnerNode);
-	pThis->SetData();
 }
 
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms()

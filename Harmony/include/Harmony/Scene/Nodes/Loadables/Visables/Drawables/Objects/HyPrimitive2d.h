@@ -33,7 +33,38 @@ public:
 	const HyPrimitive2d &operator=(const HyPrimitive2d &rhs);
 	virtual HyPrimitive2d *Clone() const;
 
-	HyShape2d &GetShape();
+	void SetAsNothing();
+
+	// Set as an isolated edge.
+	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);
+
+	// Set as a line loop. This automatically connects last vertex to the first.
+	// Passed in parameters are copied, and understood to be local coordinates
+	void SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts);
+
+	// Set as a line chain with isolated end vertices. Passed in parameters are 
+	// copied, and understood to be local coordinates
+	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts);
+
+	// Set as a circle with the specified center and radius
+	void SetAsCircle(float fRadius);
+	void SetAsCircle(const glm::vec2 &ptCenter, float fRadius);
+
+	// Set as a convex hull from the given array of local points.
+	// uiNumVerts must be in the range [3, b2_maxPolygonVertices].
+	// The points may be re-ordered, even if they form a convex polygon
+	// Collinear points are handled but not removed. Collinear points
+	// may lead to poor stacking behavior in physics simulation.
+	void SetAsPolygon(const glm::vec2 *pVertices, uint32 uiNumVerts);
+
+	// Build vertices to represent an axis-aligned box
+	void SetAsBox(int32 iWidth, int32 iHeight);
+	void SetAsBox(float fWidth, float fHeight);
+
+	// Build vertices to represent an oriented box.
+	// ptBoxCenter is the center of the box in local coordinates.
+	// fRot the rotation of the box in local coordinates.
+	void SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
 	uint32 GetNumVerts() const;
 
@@ -50,7 +81,6 @@ public:
 
 protected:
 	virtual bool OnIsValid() override;
-	static void OnShapeSet(IHyNode2d *pOwnerNode, HyShape2d *pShape);
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 

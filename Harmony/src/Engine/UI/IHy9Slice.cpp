@@ -13,35 +13,35 @@
 
 IHy9Slice::Border::Border(glm::vec2 vFillDimensions, float fBorderThickness, HyPrimitive2d &fillRef, HyEntity2d *pParent)
 {
-	m_Corners[LowerLeft].GetShape().SetAsCircle(fBorderThickness);
+	m_Corners[LowerLeft].SetAsCircle(fBorderThickness);
 	m_Corners[LowerLeft].pos.Set(0.0f, 0.0f);
 	ChildAppend(m_Corners[LowerLeft]);
 
-	m_Corners[UpperLeft].GetShape().SetAsCircle(fBorderThickness);
+	m_Corners[UpperLeft].SetAsCircle(fBorderThickness);
 	m_Corners[UpperLeft].pos.Set(0.0f, vFillDimensions.y);
 	ChildAppend(m_Corners[UpperLeft]);
 
-	m_Corners[UpperRight].GetShape().SetAsCircle(fBorderThickness);
+	m_Corners[UpperRight].SetAsCircle(fBorderThickness);
 	m_Corners[UpperRight].pos.Set(vFillDimensions.x, vFillDimensions.y);
 	ChildAppend(m_Corners[UpperRight]);
 
-	m_Corners[LowerRight].GetShape().SetAsCircle(fBorderThickness);
+	m_Corners[LowerRight].SetAsCircle(fBorderThickness);
 	m_Corners[LowerRight].pos.Set(vFillDimensions.x, 0.0f);
 	ChildAppend(m_Corners[LowerRight]);
 
-	m_Horz[Upper].GetShape().SetAsBox(vFillDimensions.x, fBorderThickness);
+	m_Horz[Upper].SetAsBox(vFillDimensions.x, fBorderThickness);
 	m_Horz[Upper].pos.Set(0.0f, vFillDimensions.y);
 	ChildAppend(m_Horz[Upper]);
 
-	m_Horz[Lower].GetShape().SetAsBox(vFillDimensions.x, fBorderThickness);
+	m_Horz[Lower].SetAsBox(vFillDimensions.x, fBorderThickness);
 	m_Horz[Lower].pos.Set(0.0f, -fBorderThickness);
 	ChildAppend(m_Horz[Lower]);
 	
-	m_Vert[Left].GetShape().SetAsBox(fBorderThickness, vFillDimensions.y);
+	m_Vert[Left].SetAsBox(fBorderThickness, vFillDimensions.y);
 	m_Vert[Left].pos.Set(vFillDimensions.x, 0.0f);
 	ChildAppend(m_Vert[Left]);
 
-	m_Vert[Right].GetShape().SetAsBox(fBorderThickness, vFillDimensions.y);
+	m_Vert[Right].SetAsBox(fBorderThickness, vFillDimensions.y);
 	m_Vert[Right].pos.Set(-fBorderThickness, 0.0f);
 	ChildAppend(m_Vert[Right]);
 
@@ -72,7 +72,7 @@ IHy9Slice::IHy9Slice(glm::vec2 vFillDimensions, float fBorderThickness, HyEntity
 {
 	ChildAppend(m_Border);
 
-	m_Fill.GetShape().SetAsBox(m_vFillDimensions.x, m_vFillDimensions.y);
+	m_Fill.SetAsBox(m_vFillDimensions.x, m_vFillDimensions.y);
 	ChildAppend(m_Fill);
 
 	m_Border.SetTint(45.0f / 255.0f, 45.0f / 255.0f, 48.0f / 255.0f);

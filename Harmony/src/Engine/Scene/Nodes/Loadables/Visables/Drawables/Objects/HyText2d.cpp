@@ -324,7 +324,7 @@ void HyText2d::SetAsLine()
 	m_vBoxDimensions.y = 0.0f;
 
 #ifdef HY_DEBUG
-	m_DebugBox.GetShape().SetAsNothing();
+	m_DebugBox.SetAsNothing();
 #endif
 
 	MarkAsDirty();
@@ -347,7 +347,7 @@ void HyText2d::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 
 #ifdef HY_DEBUG
 	glm::vec2 ptVerts[4] = { glm::vec2(0.0f, -100.0f), glm::vec2(0.0f, 0.0f), glm::vec2(m_vBoxDimensions.x, 0.0f), glm::vec2(m_vBoxDimensions.x, -100.0f) };
-	m_DebugBox.GetShape().SetAsLineChain(ptVerts, 4);
+	m_DebugBox.SetAsLineChain(ptVerts, 4);
 	m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
 	m_DebugBox.Load();
 #endif
@@ -371,7 +371,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 	m_uiBoxAttributes = iFlags;
 
 #ifdef HY_DEBUG
-	m_DebugBox.GetShape().SetAsBox(fWidth, fHeight);
+	m_DebugBox.SetAsBox(fWidth, fHeight);
 	m_DebugBox.SetWireframe(true);
 	m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
 	m_DebugBox.Load();
@@ -387,7 +387,7 @@ void HyText2d::SetAsVertical()
 	m_vBoxDimensions.y = 0.0f;
 
 #ifdef HY_DEBUG
-	m_DebugBox.GetShape().SetAsNothing();
+	m_DebugBox.SetAsNothing();
 #endif
 
 	MarkAsDirty();
