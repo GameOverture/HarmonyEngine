@@ -29,7 +29,7 @@ void HyDebugPhys2d::Reset()
 }
 
 /// Draw a closed polygon provided in CCW order.
-/*virtual*/ void HyDebugPhys2d::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
+/*virtual*/ void HyDebugPhys2d::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) /*override*/
 {
 	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
@@ -41,7 +41,7 @@ void HyDebugPhys2d::Reset()
 }
 
 /// Draw a solid closed polygon provided in CCW order.
-/*virtual*/ void HyDebugPhys2d::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
+/*virtual*/ void HyDebugPhys2d::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) /*override*/
 {
 	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
@@ -53,7 +53,7 @@ void HyDebugPhys2d::Reset()
 }
 
 /// Draw a circle.
-/*virtual*/ void HyDebugPhys2d::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
+/*virtual*/ void HyDebugPhys2d::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color) /*override*/
 {
 	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
@@ -66,7 +66,7 @@ void HyDebugPhys2d::Reset()
 }
 
 /// Draw a solid circle.
-/*virtual*/ void HyDebugPhys2d::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
+/*virtual*/ void HyDebugPhys2d::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color) /*override*/
 {
 	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
@@ -79,7 +79,7 @@ void HyDebugPhys2d::Reset()
 }
 
 /// Draw a line segment.
-/*virtual*/ void HyDebugPhys2d::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
+/*virtual*/ void HyDebugPhys2d::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) /*override*/
 {
 	//HyEntity2d *pNewEnt = HY_NEW HyEntity2d();
 	//HyPrimitive2d *pInst = pNewEnt->SetPrimitive();
@@ -96,6 +96,10 @@ void HyDebugPhys2d::Reset()
 
 /// Draw a transform. Choose your own length scale.
 /// @param xf a transform.
-/*virtual*/ void HyDebugPhys2d::DrawTransform(const b2Transform& xf)
+/*virtual*/ void HyDebugPhys2d::DrawTransform(const b2Transform& xf) /*override*/
+{
+}
+
+/*virtual*/ void HyDebugPhys2d::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color) /*override*/
 {
 }

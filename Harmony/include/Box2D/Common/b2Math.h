@@ -19,31 +19,13 @@
 #ifndef B2_MATH_H
 #define B2_MATH_H
 
-#include <Box2D/Common/b2Settings.h>
+#include "Box2D/Common/b2Settings.h"
 #include <math.h>
 
 /// This function is used to ensure that a floating point number is not a NaN or infinity.
 inline bool b2IsValid(float32 x)
 {
-	int32 ix = *reinterpret_cast<int32*>(&x);
-	return (ix & 0x7f800000) != 0x7f800000;
-}
-
-/// This is a approximate yet fast inverse square-root.
-inline float32 b2InvSqrt(float32 x)
-{
-	union
-	{
-		float32 x;
-		int32 i;
-	} convert;
-
-	convert.x = x;
-	float32 xhalf = 0.5f * x;
-	convert.i = 0x5f3759df - (convert.i >> 1);
-	x = convert.x;
-	x = x * (1.5f - xhalf * x * x);
-	return x;
+	return isfinite(x);
 }
 
 #define	b2Sqrt(x)	sqrtf(x)
@@ -56,7 +38,7 @@ struct b2Vec2
 	b2Vec2() {}
 
 	/// Construct using coordinates.
-	b2Vec2(float32 x, float32 y) : x(x), y(y) {}
+	b2Vec2(float32 xIn, float32 yIn) : x(xIn), y(yIn) {}
 
 	/// Set this vector to all zeros.
 	void SetZero() { x = 0.0f; y = 0.0f; }
@@ -147,7 +129,7 @@ struct b2Vec3
 	b2Vec3() {}
 
 	/// Construct using coordinates.
-	b2Vec3(float32 x, float32 y, float32 z) : x(x), y(y), z(z) {}
+	b2Vec3(float32 xIn, float32 yIn, float32 zIn) : x(xIn), y(yIn), z(zIn) {}
 
 	/// Set this vector to all zeros.
 	void SetZero() { x = 0.0f; y = 0.0f; z = 0.0f; }
@@ -462,6 +444,11 @@ inline b2Vec2 operator * (float32 s, const b2Vec2& a)
 inline bool operator == (const b2Vec2& a, const b2Vec2& b)
 {
 	return a.x == b.x && a.y == b.y;
+}
+
+inline bool operator != (const b2Vec2& a, const b2Vec2& b)
+{
+	return a.x != b.x || a.y != b.y;
 }
 
 inline float32 b2Distance(const b2Vec2& a, const b2Vec2& b)
