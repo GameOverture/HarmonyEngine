@@ -27,7 +27,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
 	m_pHoverTexQuad(nullptr)
 {
 	m_HoverBackground.SetWireframe(false);
-	m_HoverBackground.GetShape().SetAsBox(100.0f, 100.0f);
+	m_HoverBackground.SetAsBox(100.0f, 100.0f);
 	m_HoverBackground.SetTint(0.0f, 0.0f, 0.0f);
 	m_HoverBackground.SetDisplayOrder(DISPLAYORDER_AtlasHoverBG);
 	m_HoverBackground.SetVisible(false);
@@ -35,7 +35,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
 	m_HoverBackground.Load();
 	
 	m_HoverStrokeInner.SetWireframe(true);
-	m_HoverStrokeInner.GetShape().SetAsBox(100.0f, 100.0f);
+	m_HoverStrokeInner.SetAsBox(100.0f, 100.0f);
 	m_HoverStrokeInner.SetLineThickness(2.0f);
 	m_HoverStrokeInner.SetTint(1.0f, 0.0f, 0.0f);
 	m_HoverStrokeInner.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeInner);
@@ -43,7 +43,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
 	m_HoverStrokeInner.Load();
 	
 	m_HoverStrokeOutter.SetWireframe(true);
-	m_HoverStrokeOutter.GetShape().SetAsBox(100.0f, 100.0f);
+	m_HoverStrokeOutter.SetAsBox(100.0f, 100.0f);
 	m_HoverStrokeOutter.SetLineThickness(4.0f);
 	m_HoverStrokeOutter.SetTint(0.0f, 0.0f, 0.0f);
 	m_HoverStrokeOutter.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeOutter);
@@ -157,17 +157,17 @@ void AtlasDraw::DrawUpdate()
 		m_HoverBackground.SetVisible(true);
 		m_HoverBackground.SetWireframe(false);
 		m_HoverBackground.pos.Set((static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverBgExtend * 2.0f)) * -0.5f, (static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverBgExtend * 2.0f)) * -0.5f);
-		m_HoverBackground.GetShape().SetAsBox(static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverBgExtend * 2.0f), static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverBgExtend * 2.0f));
+		m_HoverBackground.SetAsBox(static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverBgExtend * 2.0f), static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverBgExtend * 2.0f));
 		
 		m_HoverStrokeInner.SetVisible(true);
 		m_HoverStrokeInner.SetWireframe(true);
 		m_HoverStrokeInner.pos.Set((static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeInnerExtend * 2.0f)) * -0.5f, (static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeInnerExtend * 2.0f)) * -0.5f);
-		m_HoverStrokeInner.GetShape().SetAsBox(static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeInnerExtend * 2.0f), static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeInnerExtend * 2.0f));
+		m_HoverStrokeInner.SetAsBox(static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeInnerExtend * 2.0f), static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeInnerExtend * 2.0f));
 		
 		m_HoverStrokeOutter.SetVisible(true);
 		m_HoverStrokeOutter.SetWireframe(true);
 		m_HoverStrokeOutter.pos.Set((static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeOutterExtend * 2.0f)) * -0.5f, (static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeOutterExtend * 2.0f)) * -0.5f);
-		m_HoverStrokeOutter.GetShape().SetAsBox(static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeOutterExtend * 2.0f), static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeOutterExtend * 2.0f));
+		m_HoverStrokeOutter.SetAsBox(static_cast<float>(m_pHoverTexQuad->GetWidth()) + (fHoverStrokeOutterExtend * 2.0f), static_cast<float>(m_pHoverTexQuad->GetHeight()) + (fHoverStrokeOutterExtend * 2.0f));
 	}
 	else
 	{

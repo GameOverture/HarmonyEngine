@@ -29,7 +29,7 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem) :
 	m_primOriginHorz.SetLineThickness(2.0f);
 	m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
 	m_primOriginHorz.SetVisible(false);
-	m_primOriginHorz.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+	m_primOriginHorz.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 
 	lineList[0].x = 0.0f;
 	lineList[0].y = -5000.0f;
@@ -38,7 +38,7 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem) :
 	m_primOriginVert.SetLineThickness(2.0f);
 	m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
 	m_primOriginVert.SetVisible(false);
-	m_primOriginVert.GetShape().SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+	m_primOriginVert.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 }
 
 /*virtual*/ SpriteDraw::~SpriteDraw()

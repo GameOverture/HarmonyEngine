@@ -59,7 +59,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize, HyEntity2
 	m_vDIMENSIONS(fWidth, fHeight),
 	m_fGridSize(fGridSize)
 {
-	GetShape().SetAsBox(m_vDIMENSIONS.x, m_vDIMENSIONS.y);
+	SetAsBox(m_vDIMENSIONS.x, m_vDIMENSIONS.y);
 	pos.Set(m_vDIMENSIONS.x * -0.5f, m_vDIMENSIONS.y * -0.5f);
 }
 
