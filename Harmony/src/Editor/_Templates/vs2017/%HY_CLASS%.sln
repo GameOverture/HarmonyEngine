@@ -20,10 +20,12 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		%HY_GUID%.Debug|Win32.ActiveCfg = Debug|Win32
 		%HY_GUID%.Debug|Win32.Build.0 = Debug|Win32
-		%HY_GUID%.Debug|x64.ActiveCfg = Debug|Win32
+		%HY_GUID%.Debug|x64.ActiveCfg = Debug|x64
+		%HY_GUID%.Debug|x64.Build.0 = Debug|x64
 		%HY_GUID%.Release|Win32.ActiveCfg = Release|Win32
 		%HY_GUID%.Release|Win32.Build.0 = Release|Win32
-		%HY_GUID%.Release|x64.ActiveCfg = Release|Win32
+		%HY_GUID%.Release|x64.ActiveCfg = Release|x64
+		%HY_GUID%.Release|x64.Build.0 = Release|x64
 		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Debug|Win32.Build.0 = Debug|Win32
 		{B4471160-742A-4571-BCC5-3EF8163C10E1}.Debug|x64.ActiveCfg = Debug|x64

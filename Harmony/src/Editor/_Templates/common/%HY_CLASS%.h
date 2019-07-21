@@ -1,4 +1,5 @@
-#pragma once
+#ifndef %HY_CLASS%_h__
+#define %HY_CLASS%_h__
 
 #include "Harmony/HyEngine.h"
 
@@ -12,3 +13,5 @@ public:
 
 	virtual bool OnUpdate() override;
 };
+
+#endif // %HY_CLASS%_h__
