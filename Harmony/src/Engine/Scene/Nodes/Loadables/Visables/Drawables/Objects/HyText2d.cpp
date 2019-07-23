@@ -414,8 +414,6 @@ void HyText2d::SetAsVertical()
 		ptCenter.y = TextGetBox().y * 0.5f;
 	}
 
-	// TODO: I don't trust this is accurate in all text types (SetAsLine, SetAsColumn, SetAsScaleBox) - needs testing
-	// TODO: Doesn't account for alignment
 	m_LocalBoundingVolume.SetAsBox(m_fUsedPixelWidth * 0.5f, m_fUsedPixelHeight * 0.5f, ptCenter, rot.Get());
 }
 
@@ -655,9 +653,10 @@ offsetCalculation:
 		{ }
 	};
 	std::vector<LineInfo> vNewlineInfo;
-	float fLastSpaceWidth = 0.0f;
+	float fLastSpacePosX = 0.0f;
 	float fLastCharWidth = 0.0f;
 	float fCurLineWidth = 0.0f;
+	float fCurLineHeight = 0.0f;
 	float fCurLineAscender = 0.0f;
 	float fCurLineDecender = 0.0f;	// Stored as positive value
 
@@ -677,7 +676,7 @@ offsetCalculation:
 		if(m_Utf32CodeList[uiStrIndex] == 32)	// 32 = ' ' character
 		{
 			uiLastSpaceIndex = uiStrIndex;
-			fLastSpaceWidth = fCurLineWidth;
+			fLastSpacePosX = fCurLineWidth;
 		}
 
 		if(m_Utf32CodeList[uiStrIndex] == '\n')
@@ -738,6 +737,9 @@ offsetCalculation:
 				if(fCurLineWidth < pWritePos[uiLayerIndex].x)
 					fCurLineWidth = pWritePos[uiLayerIndex].x;
 
+				if(fCurLineHeight < static_cast<float>(pGlyphRef->uiHEIGHT))
+					fCurLineHeight = static_cast<float>(pGlyphRef->uiHEIGHT);
+
 				if(fCurLineAscender < (fAscender * m_fScaleBoxModifier))
 					fCurLineAscender = (fAscender * m_fScaleBoxModifier);
 
@@ -765,16 +767,7 @@ offsetCalculation:
 
 			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
 			{
-				for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
-				{
-					uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
-					m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x -= pWritePos[uiLayerIndex].x * 0.5f;
-
-					pWritePos[uiLayerIndex].x = 0.0f;
-					pWritePos[uiLayerIndex].y -= fCurLineAscender + fCurLineDecender;
-				}
-
-				fLastSpaceWidth = fLastCharWidth = fCurLineWidth = fCurLineAscender = fCurLineDecender = 0.0f;	// Reset these because it's essentially a new line
+				bDoNewline = true;
 			}
 			else if(bFirstCharacterOnNewLine)
 			{
@@ -820,7 +813,11 @@ offsetCalculation:
 
 		if(bDoNewline)
 		{
-			if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
+			float fNewLineOffset = (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier);
+
+			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
+				fNewLineOffset = fCurLineHeight;
+			else if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
 			{
 				// Text box is too small to fit a single character
 				m_uiNumValidCharacters = 0;
@@ -832,24 +829,27 @@ offsetCalculation:
 			for(uint32 i = 0; i < uiNUM_LAYERS; ++i)
 			{
 				pWritePos[i].x = 0.0f;
-				pWritePos[i].y -= (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier);
+				pWritePos[i].y -= fNewLineOffset;
 			}
 
-			// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
-			if(uiNewlineIndex != uiLastSpaceIndex)
+			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) == 0)
 			{
-				uiStrIndex = uiLastSpaceIndex;
-				fCurLineWidth = fLastSpaceWidth;
-			}
-			else // Splitting mid-word, go back one character to place on newline
-			{
-				--uiStrIndex;
-				fCurLineWidth = fLastCharWidth;
+				// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
+				if(uiNewlineIndex != uiLastSpaceIndex)
+				{
+					uiStrIndex = uiLastSpaceIndex;
+					fCurLineWidth = fLastSpacePosX;
+				}
+				else // Splitting mid-word, go back one character to place on newline
+				{
+					--uiStrIndex;
+					fCurLineWidth = fLastCharWidth;
+				}
 			}
 
 			// Push back this line of text's info, and initialize for the next
-			vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));
-			fLastSpaceWidth = 0.0f;
+			vNewlineInfo.push_back(LineInfo(fCurLineWidth, fCurLineHeight, uiNewlineIndex));
+			fLastSpacePosX = 0.0f;
 			fLastCharWidth = 0.0f;
 			fCurLineWidth = 0.0f;
 			fCurLineAscender = 0.0f;
