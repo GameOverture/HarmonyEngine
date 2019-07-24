@@ -62,7 +62,7 @@ public:
 	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren);
 
 	virtual void UseCameraCoordinates() override;
-	void UseCameraCoordinates(bool bOverrideExplicitChildren = false);
+	void UseCameraCoordinates(bool bOverrideExplicitChildren);
 
 	virtual void UseWindowCoordinates(int32 iWindowIndex = 0) override;
 	void UseWindowCoordinates(int32 iWindowIndex, bool bOverrideExplicitChildren);

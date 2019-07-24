@@ -144,7 +144,7 @@ void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChil
 	UseCameraCoordinates(false);
 }
 
-void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren /*= false*/)
+void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren)
 {
 	IHyVisable2d::UseCameraCoordinates();
 
