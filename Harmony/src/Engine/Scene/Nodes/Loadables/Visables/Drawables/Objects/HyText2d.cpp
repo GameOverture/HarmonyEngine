@@ -128,16 +128,16 @@ const std::string &HyText2d::TextGet() const
 	return m_sRawString;
 }
 
-float HyText2d::TextGetPixelWidth()
+float HyText2d::TextGetPixelWidth(bool bIncludeScaling /*= true*/)
 {
 	CalculateGlyphInfos();
-	return m_fUsedPixelWidth;
+	return m_fUsedPixelWidth * (bIncludeScaling ? scale.X() : 1.0f);
 }
 
-float HyText2d::TextGetPixelHeight()
+float HyText2d::TextGetPixelHeight(bool bIncludeScaling /*= true*/)
 {
 	CalculateGlyphInfos();
-	return m_fUsedPixelHeight;
+	return m_fUsedPixelHeight * (bIncludeScaling ? scale.Y() : 1.0f);
 }
 
 uint32 HyText2d::TextGetNumCharacters() const
