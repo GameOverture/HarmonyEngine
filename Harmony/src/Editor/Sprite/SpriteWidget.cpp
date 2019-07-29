@@ -112,6 +112,9 @@ SpriteWidget::~SpriteWidget()
 		else
 			ui->framesView->selectRow(0);
 	}
+
+	if(ui->framesView->currentIndex().isValid() == false && ui->framesView->model()->rowCount() > 0)
+		ui->framesView->selectRow(0);
 }
 
 bool SpriteWidget::IsPlayingAnim()
