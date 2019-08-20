@@ -30,13 +30,13 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/)
 	ui->btnInsertBoundingVolume->setDefaultAction(ui->actionInsertBoundingVolume);
 	ui->btnInsertPhysics->setDefaultAction(ui->actionInsertPhysicsBody);
 
-	ui->childrenTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	ui->childrenTree->setDragEnabled(true);
-	ui->childrenTree->setDropIndicatorShown(true);
-	ui->childrenTree->setDragDropMode(QAbstractItemView::InternalMove);
+	ui->nodeTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	ui->nodeTree->setDragEnabled(true);
+	ui->nodeTree->setDropIndicatorShown(true);
+	ui->nodeTree->setDragDropMode(QAbstractItemView::InternalMove);
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
-	pEntityModel->SetWidget(ui->childrenTree);
+	pEntityModel->SetWidget(ui->nodeTree);
 
 	on_childrenTree_clicked(QModelIndex());
 }
@@ -102,13 +102,13 @@ EntityWidget::~EntityWidget()
 	}
 }
 
-ExplorerItem *EntityWidget::GetSelectedChild()
+ExplorerItem *EntityWidget::GetSelectedNode()
 {
-	QModelIndexList selectedIndices = ui->childrenTree->selectionModel()->selectedIndexes();
+	QModelIndexList selectedIndices = ui->nodeTree->selectionModel()->selectedIndexes();
 	if(selectedIndices.empty())
 		return nullptr;
 
-	return ui->childrenTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItem *>();
+	return ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItem *>();
 }
 
 void EntityWidget::on_actionAddSelectedChild_triggered()
@@ -120,7 +120,7 @@ void EntityWidget::on_actionAddSelectedChild_triggered()
 		return;
 	}
 
-	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->childrenTree->model());
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
 	if(pTreeModel->IsItemValid(pHighlightedExplorerItem, true) == false)
 		return;
 	

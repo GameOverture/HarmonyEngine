@@ -45,7 +45,7 @@ public:
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
-	ExplorerItem *GetSelectedChild();
+	ExplorerItem *GetSelectedNode();
 
 private Q_SLOTS:
 	void on_actionAddSelectedChild_triggered();
