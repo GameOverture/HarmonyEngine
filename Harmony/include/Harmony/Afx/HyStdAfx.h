@@ -91,8 +91,9 @@ enum HyFileType
 enum HyAnimCtrl
 {
 	HYANIMCTRL_Play = 0,
-	HYANIMCTRL_ReversePlay,
 	HYANIMCTRL_Reset,
+	HYANIMCTRL_Reverse,
+	HYANIMCTRL_DontReverse,
 	HYANIMCTRL_Loop,
 	HYANIMCTRL_DontLoop,
 	HYANIMCTRL_Bounce,

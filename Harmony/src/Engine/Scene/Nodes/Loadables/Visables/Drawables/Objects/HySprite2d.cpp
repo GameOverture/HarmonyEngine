@@ -85,12 +85,6 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 	{
 	case HYANIMCTRL_Play:
 		m_bIsAnimPaused = false;
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Reverse;
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Finished;
-		break;
-	case HYANIMCTRL_ReversePlay:
-		m_bIsAnimPaused = false;
-		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Reverse;
 		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Finished;
 		break;
 	case HYANIMCTRL_Reset:
@@ -100,6 +94,13 @@ void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
 			AnimSetFrame(static_cast<const HySprite2dData *>(AcquireData())->GetState(uiAnimState).m_uiNUMFRAMES - 1);
 		else
 			AnimSetFrame(0);
+		break;
+
+	case HYANIMCTRL_Reverse:
+		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Reverse;
+		break;
+	case HYANIMCTRL_DontReverse:
+		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Reverse;
 		break;
 	case HYANIMCTRL_Loop:
 		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Loop;
