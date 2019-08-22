@@ -14,7 +14,7 @@
 #include "Scene/Nodes/IHyNode2d.h"
 #include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 #include "Scene/Nodes/Loadables/Visables/IHyVisable.h"
-#include "Scene/Tweens/HyTweenVec3.h"
+#include "Scene/AnimFloats/HyAnimVec3.h"
 
 class IHyVisable3d : public IHyLoadable3d, public IHyVisable
 {
@@ -26,8 +26,8 @@ protected:
 	glm::vec3						m_CachedTint;
 	
 public:
-	HyTweenVec3						tint;
-	HyTweenFloat					alpha;
+	HyAnimVec3						tint;
+	HyAnimFloat						alpha;
 
 public:
 	IHyVisable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent);

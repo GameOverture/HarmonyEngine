@@ -87,6 +87,10 @@
     <ClCompile Include="Renderer\Effects\HyStencil.cpp" />
     <ClCompile Include="Renderer\IHyRenderer.cpp" />
     <ClCompile Include="Renderer\OpenGL\HyOpenGL.cpp" />
+    <ClCompile Include="Scene\AnimFloats\HyAnimFloat.cpp" />
+    <ClCompile Include="Scene\AnimFloats\HyAnimVec2.cpp" />
+    <ClCompile Include="Scene\AnimFloats\HyAnimVec3.cpp" />
+    <ClCompile Include="Scene\AnimFloats\HyTweenFuncs.cpp" />
     <ClCompile Include="Scene\HyScene.cpp" />
     <ClCompile Include="Scene\Nodes\IHyNode.cpp" />
     <ClCompile Include="Scene\Nodes\IHyNode2d.cpp" />
@@ -114,10 +118,6 @@
     <ClCompile Include="Scene\Physics\HyDebugPhys2d.cpp" />
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp" />
     <ClCompile Include="Scene\Physics\HyShape2d.cpp" />
-    <ClCompile Include="Scene\Tweens\HyTweenFloat.cpp" />
-    <ClCompile Include="Scene\Tweens\HyTweenFuncs.cpp" />
-    <ClCompile Include="Scene\Tweens\HyTweenVec2.cpp" />
-    <ClCompile Include="Scene\Tweens\HyTweenVec3.cpp" />
     <ClCompile Include="Threading\IHyThreadClass.cpp" />
     <ClCompile Include="Time\HyTime.cpp" />
     <ClCompile Include="Time\Watches\HyStopwatch.cpp" />
@@ -192,6 +192,10 @@
     <ClInclude Include="..\..\include\Harmony\Renderer\IHyRenderer.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\OpenGL\HyOpenGL.h" />
     <ClInclude Include="..\..\include\Harmony\Renderer\OpenGL\HyOpenGLShaderSrc.h" />
+    <ClInclude Include="..\..\include\Harmony\Scene\AnimFloats\HyAnimFloat.h" />
+    <ClInclude Include="..\..\include\Harmony\Scene\AnimFloats\HyAnimVec2.h" />
+    <ClInclude Include="..\..\include\Harmony\Scene\AnimFloats\HyAnimVec3.h" />
+    <ClInclude Include="..\..\include\Harmony\Scene\AnimFloats\HyTweenFuncs.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\HyScene.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\IHyNode.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\IHyNode2d.h" />
@@ -221,10 +225,6 @@
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyDebugPhys2d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysEntity2d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyShape2d.h" />
-    <ClInclude Include="..\..\include\Harmony\Scene\Tweens\HyTweenFloat.h" />
-    <ClInclude Include="..\..\include\Harmony\Scene\Tweens\HyTweenFuncs.h" />
-    <ClInclude Include="..\..\include\Harmony\Scene\Tweens\HyTweenVec2.h" />
-    <ClInclude Include="..\..\include\Harmony\Scene\Tweens\HyTweenVec3.h" />
     <ClInclude Include="..\..\include\Harmony\Threading\IHyThreadClass.h" />
     <ClInclude Include="..\..\include\Harmony\Time\HyTime.h" />
     <ClInclude Include="..\..\include\Harmony\Time\Watches\HyStopwatch.h" />

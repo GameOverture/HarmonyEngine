@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode2d.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
-#include "Scene/Tweens/HyTweenVec3.h"
+#include "Scene/AnimFloats/HyAnimVec3.h"
 
 class IHyLoadable2d : public IHyNode2d, public IHyLoadable
 {

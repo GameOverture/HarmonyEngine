@@ -71,18 +71,6 @@
     <ClCompile Include="Renderer\Components\HyShaderUniforms.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Tweens\HyTweenFloat.cpp">
-      <Filter>Scene\Tweens</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Tweens\HyTweenFuncs.cpp">
-      <Filter>Scene\Tweens</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Tweens\HyTweenVec2.cpp">
-      <Filter>Scene\Tweens</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Tweens\HyTweenVec3.cpp">
-      <Filter>Scene\Tweens</Filter>
-    </ClCompile>
     <ClCompile Include="Diagnostics\HyDiagnostics.cpp">
       <Filter>Diagnostics</Filter>
     </ClCompile>
@@ -248,6 +236,18 @@
     <ClCompile Include="Audio\HyAudio.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\AnimFloats\HyAnimFloat.cpp">
+      <Filter>Scene\AnimFloats</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\AnimFloats\HyAnimVec2.cpp">
+      <Filter>Scene\AnimFloats</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\AnimFloats\HyAnimVec3.cpp">
+      <Filter>Scene\AnimFloats</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\AnimFloats\HyTweenFuncs.cpp">
+      <Filter>Scene\AnimFloats</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -313,9 +313,6 @@
     <Filter Include="Assets\Nodes">
       <UniqueIdentifier>{309961b9-5220-4e8f-a0c1-5c9ca9f7e731}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene\Tweens">
-      <UniqueIdentifier>{86c28654-7313-4a8e-b418-a60556fb4fd7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Diagnostics\Console">
       <UniqueIdentifier>{2fcf7fcc-f5bc-46bf-bd87-6c3ad00610e3}</UniqueIdentifier>
     </Filter>
@@ -363,6 +360,9 @@
     </Filter>
     <Filter Include="Audio\Harness">
       <UniqueIdentifier>{5290acd0-81ee-40ca-a466-fa434a20dc57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\AnimFloats">
+      <UniqueIdentifier>{3ec20adb-6a37-4b15-9a9f-ac04d66404a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -480,18 +480,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Renderer\Components\HyShaderUniforms.h">
       <Filter>Renderer\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Tweens\HyTweenFloat.h">
-      <Filter>Scene\Tweens</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Tweens\HyTweenFuncs.h">
-      <Filter>Scene\Tweens</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Tweens\HyTweenVec2.h">
-      <Filter>Scene\Tweens</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Tweens\HyTweenVec3.h">
-      <Filter>Scene\Tweens</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Diagnostics\GuiComms\HyGuiComms.h">
       <Filter>Diagnostics\GuiComms</Filter>
@@ -684,6 +672,18 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Objects\IHyCamera.h">
       <Filter>Scene\Nodes\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\AnimFloats\HyAnimFloat.h">
+      <Filter>Scene\AnimFloats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\AnimFloats\HyAnimVec2.h">
+      <Filter>Scene\AnimFloats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\AnimFloats\HyAnimVec3.h">
+      <Filter>Scene\AnimFloats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\AnimFloats\HyTweenFuncs.h">
+      <Filter>Scene\AnimFloats</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

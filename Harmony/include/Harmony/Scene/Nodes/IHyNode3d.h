@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
-#include "Scene/Tweens/HyTweenVec3.h"
+#include "Scene/AnimFloats/HyAnimVec3.h"
 
 class HyEntity3d;
 class HyStencil;
@@ -26,11 +26,11 @@ protected:
 	glm::mat4					m_mtxCached;
 
 public:
-	HyTweenVec3					pos;
-	HyTweenVec3					rot;
-	HyTweenVec3					rot_pivot;
-	HyTweenVec3					scale;
-	HyTweenVec3					scale_pivot;
+	HyAnimVec3					pos;
+	HyAnimVec3					rot;
+	HyAnimVec3					rot_pivot;
+	HyAnimVec3					scale;
+	HyAnimVec3					scale_pivot;
 
 public:
 	IHyNode3d(HyType eNodeType, HyEntity3d *pParent);

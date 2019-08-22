@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
 #include "Scene/HyScene.h"
-#include "Scene/Tweens/HyTweenFloat.h"
+#include "Scene/AnimFloats/HyAnimFloat.h"
 
 IHyNode::IHyNode(HyType eNodeType) :
 	m_eTYPE(eNodeType),
@@ -128,12 +128,12 @@ void IHyNode::SetTag(int64 iTag)
 /*virtual*/ void IHyNode::Update()
 {
 	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.
-	for(std::vector<HyTweenFloat *>::iterator iter = m_ActiveTweenFloatsList.begin(); iter != m_ActiveTweenFloatsList.end();)
+	for(std::vector<HyAnimFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end();)
 	{
 		if((*iter)->UpdateFloat())
 		{
 			(*iter)->m_bAddedToOwnerUpdate = false;
-			iter = m_ActiveTweenFloatsList.erase(iter);
+			iter = m_ActiveAnimFloatsList.erase(iter);
 		}
 		else
 			++iter;
@@ -186,11 +186,11 @@ void IHyNode::ClearDirty(NodeDirtyFlag eDirtyType)
 	m_uiDirtyFlags &= ~eDirtyType;
 }
 
-void IHyNode::InsertActiveTweenFloat(HyTweenFloat *pTweenFloat)
+void IHyNode::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
 {
-	if(pTweenFloat->m_bAddedToOwnerUpdate == false)
+	if(pAnimFloat->m_bAddedToOwnerUpdate == false)
 	{
-		pTweenFloat->m_bAddedToOwnerUpdate = true;
-		m_ActiveTweenFloatsList.push_back(pTweenFloat);
+		pAnimFloat->m_bAddedToOwnerUpdate = true;
+		m_ActiveAnimFloatsList.push_back(pAnimFloat);
 	}
 }

@@ -14,7 +14,7 @@
 #include "Scene/Nodes/IHyNode3d.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
 #include "Assets/Nodes/IHyNodeData.h"
-#include "Scene/Tweens/HyTweenVec3.h"
+#include "Scene/AnimFloats/HyAnimVec3.h"
 #include "Utilities/HyMath.h"
 
 class IHyLoadable3d : public IHyNode3d, public IHyLoadable

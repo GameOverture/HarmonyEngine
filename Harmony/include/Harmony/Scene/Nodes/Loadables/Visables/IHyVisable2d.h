@@ -14,7 +14,7 @@
 #include "Scene/Nodes/IHyNode2d.h"
 #include "Scene/Nodes/Loadables/IHyLoadable2d.h"
 #include "Scene/Nodes/Loadables/Visables/IHyVisable.h"
-#include "Scene/Tweens/HyTweenVec3.h"
+#include "Scene/AnimFloats/HyAnimVec3.h"
 
 class IHyVisable2d : public IHyLoadable2d, public IHyVisable
 {
@@ -29,9 +29,9 @@ protected:
 	int32							m_iDisplayOrder;		// Higher values are displayed front-most
 
 public:
-	HyTweenVec3						topColor;
-	HyTweenVec3						botColor;
-	HyTweenFloat					alpha;
+	HyAnimVec3						topColor;
+	HyAnimVec3						botColor;
+	HyAnimFloat						alpha;
 
 public:
 	IHyVisable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent);

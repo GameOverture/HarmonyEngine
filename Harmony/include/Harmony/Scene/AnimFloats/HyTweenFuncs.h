@@ -16,7 +16,7 @@
 
 class IHyNode;
 
-typedef float (*HyTweenUpdateFunc)(float);
+using HyTweenFunc = std::function<float(float)>;
 
 class HyTween
 {
@@ -113,9 +113,5 @@ public:
 
 	// Back in and out
 	static float BackInOut(float fRatio);
-
-	// Default (do-nothing) callback when tween finishes
-	static void NullTweenCallback(IHyNode *)
-	{ }
 };
 #endif /* HyTweenFuncs_h__ */

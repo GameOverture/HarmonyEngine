@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
-#include "Scene/Tweens/HyTweenVec2.h"
+#include "Scene/AnimFloats/HyAnimVec2.h"
 #include "Scene/Physics/HyShape2d.h"
 #include "Utilities/HyMath.h"
 
@@ -29,17 +29,17 @@ protected:
 	HyEntity2d *					m_pParent;
 
 	glm::mat4						m_mtxCached;
-	float							m_fRotation;		// Reference value used in 'rot' HyTweenFloat
+	float							m_fRotation;		// Reference value used in 'rot' HyAnimFloat
 
 	b2Body *						m_pPhysicsBody;
 	b2AABB							m_aabbCached;
 
 public:
-	HyTweenVec2						pos;
-	HyTweenFloat					rot;
-	HyTweenVec2						rot_pivot;
-	HyTweenVec2						scale;
-	HyTweenVec2						scale_pivot;
+	HyAnimVec2						pos;
+	HyAnimFloat						rot;
+	HyAnimVec2						rot_pivot;
+	HyAnimVec2						scale;
+	HyAnimVec2						scale_pivot;
 
 public:
 	IHyNode2d(HyType eNodeType, HyEntity2d *pParent);

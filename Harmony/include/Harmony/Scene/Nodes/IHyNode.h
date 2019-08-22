@@ -12,13 +12,13 @@
 
 #include "Afx/HyStdAfx.h"
 
-class HyTweenFloat;
+class HyAnimFloat;
 
 class IHyNode
 {
 	friend class HyScene;
 	friend class HyEntity2d;
-	friend class HyTweenFloat;
+	friend class HyAnimFloat;
 	friend class IHyVisable;
 
 protected:
@@ -56,7 +56,7 @@ protected:
 	};
 	uint32							m_uiExplicitAndTypeFlags;
 
-	std::vector<HyTweenFloat *>		m_ActiveTweenFloatsList;
+	std::vector<HyAnimFloat *>		m_ActiveAnimFloatsList;
 
 	bool							m_bVisible;
 	bool							m_bPauseOverride;	// Will continue to Update when game is paused
@@ -98,7 +98,7 @@ protected:
 	void ClearDirty(NodeDirtyFlag eDirtyType);
 
 private:
-	void InsertActiveTweenFloat(HyTweenFloat *pTweenFloat);								// Only HyTweenFloat will invoke this
+	void InsertActiveAnimFloat(HyAnimFloat *pAnimFloat);								// Only HyAnimFloat will invoke this
 };
 
 #endif /* IHyNode_h__ */
