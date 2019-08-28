@@ -136,6 +136,16 @@ int32 HyWindow::GetHeight()
 	return m_Info.vSize.y;
 }
 
+float HyWindow::GetWidthF()
+{
+	return static_cast<float>(m_Info.vSize.x);
+}
+
+float HyWindow::GetHeightF()
+{
+	return static_cast<float>(m_Info.vSize.y);
+}
+
 glm::ivec2 HyWindow::GetWindowSize()
 {
 	return m_Info.vSize;

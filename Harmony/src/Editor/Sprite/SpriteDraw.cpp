@@ -47,11 +47,13 @@ SpriteDraw::SpriteDraw(ProjectItem *pProjItem) :
 
 void SpriteDraw::PlayAnim(quint32 uiFrameIndex)
 {
-	m_Sprite.AnimCtrl(HYANIMCTRL_Reset);
 	if(m_Sprite.AnimIsReverse())
-		m_Sprite.AnimCtrl(HYANIMCTRL_ReversePlay);
+		m_Sprite.AnimCtrl(HYANIMCTRL_Reverse);
 	else
-		m_Sprite.AnimCtrl(HYANIMCTRL_Play);
+		m_Sprite.AnimCtrl(HYANIMCTRL_DontReverse);
+
+	m_Sprite.AnimCtrl(HYANIMCTRL_Reset);
+	m_Sprite.AnimCtrl(HYANIMCTRL_Play);
 	m_Sprite.AnimSetFrame(uiFrameIndex);
 }
 
