@@ -141,7 +141,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 			m_TopLevelTreeItemList.append(pNewTreeItem);
 		}
 
-		// Then place the filters correctly as a parent heirarchy using the path string stored in their data
+		// Then place the filters correctly as a parent hierarchy using the path string stored in their data
 		QList<AtlasTreeItem *> atlasFiltersTreeItemList(m_TopLevelTreeItemList);
 		for(int i = 0; i < m_TopLevelTreeItemList.size(); ++i)
 		{
@@ -177,17 +177,10 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 		{
 			QJsonObject frameObj = frameArray[i].toObject();
 
-			// TODO: Put this in parameter list, once snow white updated
-			quint32 uiAtlasGrpId;
-			if(false == frameObj.contains("atlasGrpId"))
-				uiAtlasGrpId = 0; // 0 == Default
-			else
-				uiAtlasGrpId = JSONOBJ_TOINT(frameObj, "atlasGrpId");
-
 			QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
 			AtlasFrame *pNewFrame = CreateFrame(JSONOBJ_TOINT(frameObj, "id"),
 												JSONOBJ_TOINT(frameObj, "checksum"),
-												uiAtlasGrpId,
+												JSONOBJ_TOINT(frameObj, "atlasGrpId"),
 												frameObj["name"].toString(),
 												rAlphaCrop,
 												static_cast<AtlasItemType>(frameObj["type"].toInt()),
@@ -224,6 +217,13 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 				else
 					m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
 			}
+		}
+
+		QJsonArray expandedArray = settingsObj["expanded"].toArray();
+		if(expandedArray.isEmpty() == false)
+		{
+			for(int i = 0; i < atlasFiltersTreeItemList.size(); ++i)
+				atlasFiltersTreeItemList[i]->setExpanded(expandedArray[i].toBool());
 		}
 	}
 	else
@@ -322,6 +322,7 @@ void AtlasModel::WriteMetaSettings()
 	}
 
 	QJsonArray filtersArray;
+	QJsonArray expandedArray;
 	if(m_pProjOwner->GetAtlasWidget())
 	{
 		QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget());
@@ -331,6 +332,7 @@ void AtlasModel::WriteMetaSettings()
 			{
 				QString sFilterPath = HyGlobal::GetTreeWidgetItemPath(*iter);
 				filtersArray.append(QJsonValue(sFilterPath));
+				expandedArray.append((*iter)->isExpanded());
 			}
 
 			++iter;
@@ -353,6 +355,7 @@ void AtlasModel::WriteMetaSettings()
 
 			QJsonObject settingsObj = settingsDoc.object();
 			filtersArray = settingsObj["filters"].toArray();
+			expandedArray = settingsObj["expanded"].toArray();
 		}
 	}
 
@@ -363,6 +366,7 @@ void AtlasModel::WriteMetaSettings()
 	settingsObj.insert("startFrameId", QJsonValue(static_cast<qint64>(m_uiNextFrameId)));
 	settingsObj.insert("startAtlasId", QJsonValue(static_cast<qint64>(m_uiNextAtlasId)));
 	settingsObj.insert("filters", filtersArray);
+	settingsObj.insert("expanded", expandedArray);
 
 	QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
 	if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))

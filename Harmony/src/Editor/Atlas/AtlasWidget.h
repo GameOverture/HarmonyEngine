@@ -55,10 +55,10 @@ class AtlasWidget : public QWidget
 
 	friend class WidgetAtlasGroup;
 
-	AtlasModel *                    m_pModel;
-	AtlasDraw                       m_Draw;
+	AtlasModel *					m_pModel;
+	AtlasDraw						m_Draw;
 
-	QTreeWidgetItem *               m_pMouseHoverItem;
+	QTreeWidgetItem *				m_pMouseHoverItem;
 
 public:
 	explicit AtlasWidget(QWidget *parent = 0);

@@ -114,8 +114,6 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, QWidget *parent /*= 0*/) :
 
 	RefreshInfo();
 
-	ui->atlasList->collapseAll();
-
 	ui->atlasList->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->atlasList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
