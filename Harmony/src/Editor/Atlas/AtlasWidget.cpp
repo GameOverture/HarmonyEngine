@@ -111,11 +111,17 @@ AtlasWidget::AtlasWidget(AtlasModel *pModel, QWidget *parent /*= 0*/) :
 	ui->atlasList->sortByColumn(0, Qt::AscendingOrder);
 	ui->atlasList->setSortingEnabled(true);
 	ui->atlasList->sortItems(0, Qt::AscendingOrder);
-
-	RefreshInfo();
-
 	ui->atlasList->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->atlasList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
+
+	//QJsonArray expandedArray = settingsObj["expanded"].toArray();
+	//if(expandedArray.isEmpty() == false)
+	//{
+	//	for(int i = 0; i < atlasFiltersTreeItemList.size(); ++i)
+	//		atlasFiltersTreeItemList[i]->setExpanded(expandedArray[i].toBool());
+	//}
+	
+	RefreshInfo();
 }
 
 AtlasWidget::~AtlasWidget()

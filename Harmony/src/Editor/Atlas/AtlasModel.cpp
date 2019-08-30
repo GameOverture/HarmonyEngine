@@ -218,13 +218,6 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 					m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
 			}
 		}
-
-		QJsonArray expandedArray = settingsObj["expanded"].toArray();
-		if(expandedArray.isEmpty() == false)
-		{
-			for(int i = 0; i < atlasFiltersTreeItemList.size(); ++i)
-				atlasFiltersTreeItemList[i]->setExpanded(expandedArray[i].toBool());
-		}
 	}
 	else
 	{
