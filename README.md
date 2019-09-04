@@ -15,9 +15,9 @@ Self-contained, zero dependency static library.
 
 TBD
 
-Designer Tool
+Editor Tool
 -------------
-A WYSIWYG editor that allows you to visually design sprite animations, fonts, particles, shaders, and more.
+A WYSIWYG GUI application that allows you to visually design sprite animations, fonts, particles, shaders, and more.
 Or by using any combination of above, create complex animation hierarchies and apply physics.
 
 Quickly setup new projects. Designer Tool will create and populate a new workspace containing all initially necessary assets and code projects.
