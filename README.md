@@ -20,6 +20,6 @@ Editor Tool
 A WYSIWYG GUI application that allows you to visually design sprite animations, fonts, particles, shaders, and more.
 Or by using any combination of above, create complex animation hierarchies and apply physics.
 
-Quickly setup new projects. Designer Tool will create and populate a new workspace containing all initially necessary assets and code projects.
+Quickly setup new projects. The Editor creates and populates a new workspace containing all initially necessary assets and code projects.
 
 TBD
