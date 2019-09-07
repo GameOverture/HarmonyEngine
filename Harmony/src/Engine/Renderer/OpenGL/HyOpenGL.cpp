@@ -962,7 +962,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	size_t uiOffset = 0;
 	for(size_t i = 0; i < shaderVertexAttribListRef.size(); ++i)
 	{
-		// TODO: Cache the attribute location instead of finding it everytime
+		// TODO: Cache the attribute location instead of finding it every time
 		GLuint uiLocation = glGetAttribLocation(hGlHandle, shaderVertexAttribListRef[i].sName.c_str());
 
 		switch(shaderVertexAttribListRef[i].eVarType)
@@ -1075,22 +1075,8 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Everything is prepared, do the drawing
-	if(pRenderState->uiNUM_INSTANCES > 1)
-	{
-		glDrawArraysInstanced(eDrawMode, 0, pRenderState->uiNUM_VERTS_PER_INSTANCE, pRenderState->uiNUM_INSTANCES);
-		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArraysInstanced");
-	}
-	else
-	{
-		uint32 uiStartVertex = 0;
-		for(uint32 i = 0; i < pRenderState->uiNUM_INSTANCES; ++i)
-		{
-			glDrawArrays(eDrawMode, uiStartVertex, pRenderState->uiNUM_VERTS_PER_INSTANCE);
-			HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArrays");
-
-			uiStartVertex += pRenderState->uiNUM_VERTS_PER_INSTANCE;
-		}
-	}
+	glDrawArraysInstanced(eDrawMode, 0, pRenderState->uiNUM_VERTS_PER_INSTANCE, pRenderState->uiNUM_INSTANCES);
+	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArraysInstanced");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Reset OpenGL states

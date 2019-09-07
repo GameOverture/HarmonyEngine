@@ -150,8 +150,9 @@ uint32 HyText2d::TextGetNumShownCharacters() const
 	return m_uiNumValidCharacters;
 }
 
-uint32 HyText2d::GetNumRenderQuads() const
+uint32 HyText2d::GetNumRenderQuads()
 {
+	CalculateGlyphInfos();
 	return m_uiNumRenderQuads;
 }
 
