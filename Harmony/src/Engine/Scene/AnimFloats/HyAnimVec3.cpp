@@ -202,6 +202,14 @@ HyAnimVec3 &HyAnimVec3::operator/=(float rhs)
 	return *this;
 }
 
+HyAnimVec3 &HyAnimVec3::operator=(const HyAnimVec3 &rhs)
+{
+	m_AnimFloatList[0] = rhs[0];
+	m_AnimFloatList[1] = rhs[1];
+	m_AnimFloatList[2] = rhs[2];
+
+	return *this;
+}
 
 HyAnimVec3 &HyAnimVec3::operator+=(const HyAnimVec3 &rhs)
 {
@@ -236,6 +244,15 @@ HyAnimVec3 &HyAnimVec3::operator/=(const HyAnimVec3 &rhs)
 	m_AnimFloatList[1] /= rhs[1];
 	m_AnimFloatList[2] /= rhs[2];
 	
+	return *this;
+}
+
+HyAnimVec3 &HyAnimVec3::operator=(const glm::vec3 &rhs)
+{
+	m_AnimFloatList[0] = rhs[0];
+	m_AnimFloatList[1] = rhs[1];
+	m_AnimFloatList[2] = rhs[2];
+
 	return *this;
 }
 

@@ -40,6 +40,7 @@ class HyAnimFloat
 
 public:
 	HyAnimFloat(float &valueReference, IHyNode &ownerRef, uint32 uiDirtyFlags);
+	HyAnimFloat(const HyAnimFloat &) = delete;
 	~HyAnimFloat(void);
 
 	float Get() const;
@@ -65,6 +66,7 @@ public:
 	HyAnimFloat &operator*=(const float &rhs);
 	HyAnimFloat &operator/=(const float &rhs);
 
+	HyAnimFloat &operator=(const HyAnimFloat &rhs);
 	HyAnimFloat &operator+=(const HyAnimFloat &rhs);
 	HyAnimFloat &operator-=(const HyAnimFloat &rhs);
 	HyAnimFloat &operator*=(const HyAnimFloat &rhs);
