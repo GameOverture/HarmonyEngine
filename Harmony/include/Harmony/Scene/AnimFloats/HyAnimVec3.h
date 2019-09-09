@@ -16,11 +16,12 @@
 class HyAnimVec3
 {
 	glm::vec3					m_vValue;
-	std::vector<HyAnimFloat>	m_AnimFloatList;
+	HyAnimFloat *				m_AnimFloatList;
 
 public:
 	HyAnimVec3(IHyNode &ownerRef, uint32 uiDirtyFlags);
 	HyAnimVec3(const HyAnimVec3 &) = delete;
+	HyAnimVec3(HyAnimVec3 &&) = delete;
 	~HyAnimVec3();
 
 	const glm::vec3 &Get() const;
