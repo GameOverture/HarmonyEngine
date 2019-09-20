@@ -116,6 +116,11 @@ public:
 		return std::bernoulli_distribution{ dProbability }(GetPseudoRandInstance());
 	}
 
+	static std::mt19937 &GetRng()
+	{
+		return GetPseudoRandInstance();
+	}
+
 private:
 	static std::mt19937 &GetPseudoRandInstance()
 	{
