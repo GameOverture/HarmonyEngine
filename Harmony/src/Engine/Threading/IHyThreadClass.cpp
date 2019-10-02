@@ -39,6 +39,13 @@ bool IHyThreadClass::ThreadStart()
 	ThreadJoin();
 	m_Thread = std::thread(&IHyThreadClass::ThreadFunc, this);
 
+//	void *hNativeThread = m_Thread.native_handle();
+//#ifdef HY_PLATFORM_WINDOWS
+//	THREAD_PRIORITY_BELOW_NORMAL
+//	SetThreadPriority(hNativeThread, 
+//#else
+//#endif
+
 	return true;
 }
 

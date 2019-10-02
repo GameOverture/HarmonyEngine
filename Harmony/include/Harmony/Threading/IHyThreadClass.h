@@ -14,8 +14,10 @@
 
 class IHyThreadClass
 {
+protected:
 	std::thread					m_Thread;
 
+private:
 	enum ThreadState
 	{
 		THREADSTATE_Inactive = 0,

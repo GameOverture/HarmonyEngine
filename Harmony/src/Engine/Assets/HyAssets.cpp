@@ -411,6 +411,16 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 {
 	HyLog("Assets are initializing...");
 
+#ifdef HY_PLATFORM_WINDOWS
+	SetThreadPriority(m_Thread.native_handle(), THREAD_MODE_BACKGROUND_BEGIN);
+#else
+	sched_param sch;
+	int policy; 
+	pthread_getschedparam(m_Thread.native_handle(), &policy, &sch);
+	sch.sched_priority = xx; // Don't know what value here
+	pthread_setschedparam(m_Thread.native_handle(), SCHED_FIFO, &sch);
+#endif
+
 	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir + HYASSETS_AtlasFile);
 	std::string sAtlasInfoFileContents;
 	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
