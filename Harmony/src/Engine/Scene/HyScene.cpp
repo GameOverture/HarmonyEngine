@@ -197,11 +197,11 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	}
 
 	// Apply culling of any instance that is outside of any camera bounds
-	uint32 uiCullMask = 0;
+	uint32 uiCullMask = HY_FULL_CAMERA_MASK;// 0;
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_LoadedDrawable2d.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_LoadedDrawable2d[i]->IsValid() == false || CalculateCameraMask(*m_NodeList_LoadedDrawable2d[i], uiCullMask) == false)
+		if(m_NodeList_LoadedDrawable2d[i]->IsValid() == false)// || CalculateCameraMask(*m_NodeList_LoadedDrawable2d[i], uiCullMask) == false)
 			continue;
 
 		rendererRef.AppendDrawable2d(i, *m_NodeList_LoadedDrawable2d[i], uiCullMask);
