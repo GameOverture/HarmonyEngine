@@ -411,8 +411,9 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 {
 	HyLog("Assets are initializing...");
 
-#ifdef HY_PLATFORM_WINDOWS
+#if defined(HY_PLATFORM_WINDOWS)
 	SetThreadPriority(m_Thread.native_handle(), THREAD_MODE_BACKGROUND_BEGIN);
+#elif defined(HY_PLATFORM_GUI_WIN)
 #else
 	sched_param sch;
 	int policy; 

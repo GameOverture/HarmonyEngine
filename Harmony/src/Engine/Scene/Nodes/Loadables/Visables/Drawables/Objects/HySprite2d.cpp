@@ -287,7 +287,7 @@ float HySprite2d::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
 		glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
 	}
 
-	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
+	return ((frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight()) /*+ frameRef.vOFFSET.x*/) * vScale.y;
 }
 
 float HySprite2d::AnimGetMaxWidth(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
