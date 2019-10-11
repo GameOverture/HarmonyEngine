@@ -50,7 +50,7 @@ public:
 	void Offset(float fValue);
 
 	// Procedural transformation functions
-	bool IsAnimating();
+	bool IsAnimating() const;
 	void Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
 	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
 
@@ -58,8 +58,8 @@ public:
 
 	void StopAnim();
 
-	float GetTweenDestination() const;
-	float GetTweenRemainingDuration() const;
+	float GetAnimDestination() const;
+	float GetAnimRemainingDuration() const;
 
 	HyAnimFloat &operator=(const float &rhs);
 	HyAnimFloat &operator+=(const float &rhs);

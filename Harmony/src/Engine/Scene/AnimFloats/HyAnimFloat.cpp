@@ -64,7 +64,7 @@ void HyAnimFloat::Offset(float fValue)
 	StopAnim();
 }
 
-bool HyAnimFloat::IsAnimating()
+bool HyAnimFloat::IsAnimating() const
 {
 	return m_bAddedToOwnerUpdate;
 }
@@ -124,12 +124,12 @@ void HyAnimFloat::StopAnim()
 	m_fpAnimFinishedFunc = NullFinishedCallback;
 }
 
-float HyAnimFloat::GetTweenDestination() const
+float HyAnimFloat::GetAnimDestination() const
 {
-	return m_fTarget;
+	return IsAnimating() ? m_fTarget : m_fValueRef;
 }
 
-float HyAnimFloat::GetTweenRemainingDuration() const
+float HyAnimFloat::GetAnimRemainingDuration() const
 {
 	return m_fDuration - m_fElapsedTime;
 }
