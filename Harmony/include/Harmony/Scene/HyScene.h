@@ -75,7 +75,7 @@ public:
 	void UpdateNodes();
 	void PrepareRender(IHyRenderer &rendererRef);
 
-	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut);
+	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut) const;
 	
 	static bool Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2);
 };

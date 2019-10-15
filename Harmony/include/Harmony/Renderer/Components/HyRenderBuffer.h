@@ -27,58 +27,58 @@ class HyRenderBuffer
 public:
 	struct Header
 	{
-		uint32		uiNum3dRenderStates;
-		uint32		uiNum2dRenderStates;
+		uint32									uiNum3dRenderStates;
+		uint32									uiNum2dRenderStates;
 	};
 
 	struct State
 	{
-		const uint32				uiID;						// Used for debugging
-		const uint32				uiCAMERA_MASK;
-		const uint32				uiDATA_OFFSET;
-		const HyRenderMode			eRENDER_MODE;
-		const HyTextureHandle		hTEXTURE_0;
-		const HyShaderHandle		hSHADER;
-		const HyScreenRect<int32>	SCISSOR_RECT;
-		const HyStencilHandle		hSTENCIL;
-		const int32					iCOORDINATE_SYSTEM;			// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
-		const uint32				uiNUM_INSTANCES;
-		const uint32				uiNUM_VERTS_PER_INSTANCE;	// Or total number of vertices if single instance
+		const uint32							uiID;						// Used for debugging
+		const uint32							uiCAMERA_MASK;
+		const uint32							uiDATA_OFFSET;
+		const HyRenderMode						eRENDER_MODE;
+		const HyTextureHandle					hTEXTURE_0;
+		const HyShaderHandle					hSHADER;
+		const HyScreenRect<int32>				SCISSOR_RECT;
+		const HyStencilHandle					hSTENCIL;
+		const int32								iCOORDINATE_SYSTEM;			// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
+		const uint32							uiNUM_INSTANCES;
+		const uint32							uiNUM_VERTS_PER_INSTANCE;	// Or total number of vertices if single instance
 
-		uint32						m_uiExDataSize;
+		uint32									m_uiExDataSize;
 		
 		State(uint32 uiId,
-					uint32 uiCameraMask,
-					uint32 uiDataOffset,
-					HyRenderMode eRenderMode,
-					HyTextureHandle hTexture,
-					HyShaderHandle hShader,
-					HyScreenRect<int32> &scissorRect,
-					HyStencilHandle hStencil,
-					int32 iCoordinateSystem,
-					uint32 uiNumInstances,
-					uint32 uiNumVerticesPerInstance) :	uiID(uiId),
-														uiCAMERA_MASK(uiCameraMask),
-														uiDATA_OFFSET(uiDataOffset),
-														eRENDER_MODE(eRenderMode),
-														hTEXTURE_0(hTexture),
-														hSHADER(hShader),
-														SCISSOR_RECT(scissorRect),
-														hSTENCIL(hStencil),
-														iCOORDINATE_SYSTEM(iCoordinateSystem),
-														uiNUM_INSTANCES(uiNumInstances),
-														uiNUM_VERTS_PER_INSTANCE(uiNumVerticesPerInstance),
-														m_uiExDataSize(0)
+			uint32 uiCameraMask,
+			uint32 uiDataOffset,
+			HyRenderMode eRenderMode,
+			HyTextureHandle hTexture,
+			HyShaderHandle hShader,
+			HyScreenRect<int32> &scissorRect,
+			HyStencilHandle hStencil,
+			int32 iCoordinateSystem,
+			uint32 uiNumInstances,
+			uint32 uiNumVerticesPerInstance) :	uiID(uiId),
+												uiCAMERA_MASK(uiCameraMask),
+												uiDATA_OFFSET(uiDataOffset),
+												eRENDER_MODE(eRenderMode),
+												hTEXTURE_0(hTexture),
+												hSHADER(hShader),
+												SCISSOR_RECT(scissorRect),
+												hSTENCIL(hStencil),
+												iCOORDINATE_SYSTEM(iCoordinateSystem),
+												uiNUM_INSTANCES(uiNumInstances),
+												uiNUM_VERTS_PER_INSTANCE(uiNumVerticesPerInstance),
+												m_uiExDataSize(0)
 		{
 			HyAssert(hSHADER != HY_UNUSED_HANDLE, "HyRenderBuffer::State was assigned a null shader");
 		}
 	};
 
 private:
-	uint8 * const									m_pBUFFER;
-	uint8 *											m_pCurWritePosition;
+	uint8 * const								m_pBUFFER;
+	uint8 *										m_pCurWritePosition;
 
-	uint8 *											m_pRenderStatesUserStartPos;
+	uint8 *										m_pRenderStatesUserStartPos;
 
 public:
 	HyRenderBuffer();
