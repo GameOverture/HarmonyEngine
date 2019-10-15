@@ -517,59 +517,37 @@ void HyText2d::SetAsVertical()
 			glm::vec2 vSize(pGlyphRef->uiWIDTH, pGlyphRef->uiHEIGHT);
 			vSize *= m_fScaleBoxModifier;
 			vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
-			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
-			//pWritePositionRef += sizeof(glm::vec2);
 
 			vertexBufferRef.AppendData2d(&m_pGlyphInfos[uiGlyphOffsetIndex].vOffset, sizeof(glm::vec2));
-			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
-			//pWritePositionRef += sizeof(glm::vec2);
 
 			vertexBufferRef.AppendData2d(&m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get(), sizeof(glm::vec3));
-			//*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get();
-			//pWritePositionRef += sizeof(glm::vec3);
 
 			float fAlpha = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
 			vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
-			//*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
-			//pWritePositionRef += sizeof(float);
 
 			vertexBufferRef.AppendData2d(&m_StateColors[m_uiCurFontState]->m_LayerColors[i]->botColor.Get(), sizeof(glm::vec3));
-			//*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = m_StateColors[m_uiCurFontState]->m_LayerColors[i]->botColor.Get();
-			//pWritePositionRef += sizeof(glm::vec3);
 
 			vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
-			//*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
-			//pWritePositionRef += sizeof(float);
 
 			glm::vec2 vUV;
 
 			vUV.x = pGlyphRef->rSRC_RECT.right;//1.0f;
 			vUV.y = pGlyphRef->rSRC_RECT.top;//1.0f;
 			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
-			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-			//pWritePositionRef += sizeof(glm::vec2);
 
 			vUV.x = pGlyphRef->rSRC_RECT.left;//0.0f;
 			vUV.y = pGlyphRef->rSRC_RECT.top;//1.0f;
 			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
-			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-			//pWritePositionRef += sizeof(glm::vec2);
 
 			vUV.x = pGlyphRef->rSRC_RECT.right;//1.0f;
 			vUV.y = pGlyphRef->rSRC_RECT.bottom;//0.0f;
 			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
-			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-			//pWritePositionRef += sizeof(glm::vec2);
 
 			vUV.x = pGlyphRef->rSRC_RECT.left;//0.0f;
 			vUV.y = pGlyphRef->rSRC_RECT.bottom;//0.0f;
 			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
-			//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-			//pWritePositionRef += sizeof(glm::vec2);
 
 			vertexBufferRef.AppendData2d(&mtxTransformRef, sizeof(glm::mat4));
-			//*reinterpret_cast<glm::mat4 *>(pWritePositionRef) = mtxTransform;
-			//pWritePositionRef += sizeof(glm::mat4);
 		}
 	}
 }
@@ -990,5 +968,6 @@ offsetCalculation:
 	delete[] pMonospaceAscender;
 	delete[] pMonospaceDecender;
 
+	SetDirty(DIRTY_BoundingVolume);
 	m_bIsDirty = false;
 }

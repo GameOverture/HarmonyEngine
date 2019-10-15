@@ -358,9 +358,6 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 {
 	AcquireData();
 	return m_pData != nullptr;
-
-	//const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(0, 0);
-	//return frameRef.pAtlas != nullptr;
 }
 
 /*virtual*/ bool HySprite2d::OnIsValid() /*override*/
@@ -374,7 +371,7 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 	float fHalfWidth = AnimGetCurFrameWidth(true) * 0.5f;
 	float fHalfHeight = AnimGetCurFrameHeight(true) * 0.5f;
 
-	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
+	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), rot.Get());
 }
 
 /*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
@@ -532,60 +529,38 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 
 	glm::vec2 vSize(frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth(), frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight());
 	vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
-	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
-	//pWritePositionRef += sizeof(glm::vec2);
 
 	glm::vec2 vOffset(frameRef.vOFFSET.x + m_vCustomOffset.x, frameRef.vOFFSET.y + m_vCustomOffset.y);
 	vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
-	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vOffset;
-	//pWritePositionRef += sizeof(glm::vec2);
 
 	vertexBufferRef.AppendData2d(&CalculateTopTint(), sizeof(glm::vec3));
-	//*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = CalculateTopTint();
-	//pWritePositionRef += sizeof(glm::vec3);
 
 	float fAlpha = CalculateAlpha();
 	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
-	//*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha();
-	//pWritePositionRef += sizeof(float);
 
 	vertexBufferRef.AppendData2d(&CalculateBotTint(), sizeof(glm::vec3));
-	//*reinterpret_cast<glm::vec3 *>(pWritePositionRef) = CalculateBotTint();
-	//pWritePositionRef += sizeof(glm::vec3);
 
 	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
-	//*reinterpret_cast<float *>(pWritePositionRef) = CalculateAlpha();
-	//pWritePositionRef += sizeof(float);
 
 	glm::vec2 vUV;
 
 	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
 	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
-	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-	//pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
 	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
-	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-	//pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
 	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
-	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-	//pWritePositionRef += sizeof(glm::vec2);
 
 	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
 	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
-	//*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-	//pWritePositionRef += sizeof(glm::vec2);
 
 	vertexBufferRef.AppendData2d(&GetWorldTransform(), sizeof(glm::mat4));
-	//GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pWritePositionRef));
-	//pWritePositionRef += sizeof(glm::mat4);
 }
 
 /*static*/ void HySprite2d::NullAnimCallback(HySprite2d *pSelf, void *pParam)

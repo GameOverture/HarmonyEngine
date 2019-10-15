@@ -94,7 +94,7 @@ protected:
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
 
 	virtual void SetDirty(uint32 uiDirtyFlags);
-	bool IsDirty(NodeDirtyFlag eDirtyType);
+	bool IsDirty(NodeDirtyFlag eDirtyType) const;
 	void ClearDirty(NodeDirtyFlag eDirtyType);
 
 private:

@@ -196,7 +196,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		sm_bInst2dOrderingDirty = false;
 	}
 
-	// Apply culling of any instance that is outside of any camera bounds
+	// Only draw instances that are within the enabled cameras' frustums
 	uint32 uiCameraMask = 0; // HY_FULL_CAMERA_MASK
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_LoadedDrawable2d.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)

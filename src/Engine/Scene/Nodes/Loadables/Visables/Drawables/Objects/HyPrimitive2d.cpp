@@ -194,8 +194,6 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 /*virtual*/ void HyPrimitive2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
 {
 	vertexBufferRef.AppendData2d(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
-	//memcpy(pWritePositionRef, m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
-	//pWritePositionRef += m_uiNumVerts * sizeof(glm::vec2);
 }
 
 void HyPrimitive2d::ClearData()

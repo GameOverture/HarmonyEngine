@@ -173,10 +173,16 @@ void IHyNode::SetTag(int64 iTag)
 
 /*virtual*/ void IHyNode::SetDirty(uint32 uiDirtyFlags)
 {
+	// Special cases
+	if((uiDirtyFlags & DIRTY_BoundingVolume) != 0)
+		uiDirtyFlags |= DIRTY_WorldAABB;
+	if((uiDirtyFlags & DIRTY_Transform) != 0)
+		uiDirtyFlags |= DIRTY_WorldAABB;
+
 	m_uiDirtyFlags |= uiDirtyFlags;
 }
 
-bool IHyNode::IsDirty(NodeDirtyFlag eDirtyType)
+bool IHyNode::IsDirty(NodeDirtyFlag eDirtyType) const
 {
 	return ((m_uiDirtyFlags & eDirtyType) != 0);
 }
