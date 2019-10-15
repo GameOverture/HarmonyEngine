@@ -88,8 +88,8 @@ public:
 
 	int32								GetWidth();
 	int32								GetHeight();
-	float								GetWidthF();
-	float								GetHeightF();
+	float								GetWidthF(float fPercent = 1.0f);
+	float								GetHeightF(float fPercent = 1.0f);
 	glm::ivec2							GetWindowSize();
 	void								SetWindowSize(glm::ivec2 vResolutionHint);
 

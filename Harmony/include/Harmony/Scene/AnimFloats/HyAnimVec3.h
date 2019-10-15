@@ -55,6 +55,9 @@ public:
 	bool IsAnimating();
 	void StopAnim();
 
+	glm::vec3 GetAnimDestination() const;
+	float GetAnimRemainingDuration() const;
+
 	HyAnimVec3 &operator+=(float rhs);
 	HyAnimVec3 &operator-=(float rhs);
 	HyAnimVec3 &operator*=(float rhs);

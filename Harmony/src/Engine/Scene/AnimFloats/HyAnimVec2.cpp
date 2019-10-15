@@ -180,14 +180,14 @@ void HyAnimVec2::StopAnim()
 	m_AnimFloatList[1].StopAnim();
 }
 
-glm::vec2 HyAnimVec2::GetTweenDestination() const
+glm::vec2 HyAnimVec2::GetAnimDestination() const
 {
-	return glm::vec2(m_AnimFloatList[0].GetTweenDestination(), m_AnimFloatList[1].GetTweenDestination());
+	return glm::vec2(m_AnimFloatList[0].GetAnimDestination(), m_AnimFloatList[1].GetAnimDestination());
 }
 
-float HyAnimVec2::GetTweenRemainingDuration() const
+float HyAnimVec2::GetAnimRemainingDuration() const
 {
-	return m_AnimFloatList[0].GetTweenRemainingDuration();
+	return m_AnimFloatList[0].GetAnimRemainingDuration();
 }
 
 HyAnimVec2 &HyAnimVec2::operator+=(float rhs)

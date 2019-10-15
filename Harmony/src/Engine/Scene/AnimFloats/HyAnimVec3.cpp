@@ -174,6 +174,16 @@ bool HyAnimVec3::IsAnimating()
 	return (m_AnimFloatList[0].IsAnimating() || m_AnimFloatList[1].IsAnimating() || m_AnimFloatList[2].IsAnimating());
 }
 
+glm::vec3 HyAnimVec3::GetAnimDestination() const
+{
+	return glm::vec3(m_AnimFloatList[0].GetAnimDestination(), m_AnimFloatList[1].GetAnimDestination(), m_AnimFloatList[2].GetAnimDestination());
+}
+
+float HyAnimVec3::GetAnimRemainingDuration() const
+{
+	return m_AnimFloatList[0].GetAnimRemainingDuration();
+}
+
 HyAnimVec3 &HyAnimVec3::operator+=(float rhs)
 {
 	m_AnimFloatList[0] += rhs;

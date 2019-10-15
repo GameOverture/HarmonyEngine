@@ -58,8 +58,8 @@ public:
 	bool IsAnimating();
 	void StopAnim();
 
-	glm::vec2 GetTweenDestination() const;
-	float GetTweenRemainingDuration() const;
+	glm::vec2 GetAnimDestination() const;
+	float GetAnimRemainingDuration() const;
 
 	HyAnimVec2 &operator+=(float rhs);
 	HyAnimVec2 &operator-=(float rhs);
