@@ -136,7 +136,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 	if(pCurOpenTabItem && pCurOpenTabItem->GetType() == ITEM_Entity && pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE))
 	{
-		EntityTreeModel &childTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetChildrenModel();
+		EntityNodeTreeModel &childTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetChildrenModel();
 
 		if(childTreeModel.IsItemValid(static_cast<ExplorerItem *>(pEvent->source()), false))
 			pEvent->acceptProposedAction();

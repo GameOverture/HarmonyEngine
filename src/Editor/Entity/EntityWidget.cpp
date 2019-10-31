@@ -36,7 +36,7 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/)
 	ui->nodeTree->setDragDropMode(QAbstractItemView::InternalMove);
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
-	pEntityModel->SetWidget(ui->nodeTree);
+	ui->nodeTree->setModel(&pEntityModel->GetChildrenModel());
 
 	on_childrenTree_clicked(QModelIndex());
 }
@@ -120,7 +120,7 @@ void EntityWidget::on_actionAddSelectedChild_triggered()
 		return;
 	}
 
-	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+	EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
 	if(pTreeModel->IsItemValid(pHighlightedExplorerItem, true) == false)
 		return;
 	

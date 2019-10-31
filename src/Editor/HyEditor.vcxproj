@@ -226,7 +226,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Entity3d\Entity3d.cpp" />
     <ClCompile Include="Entity\EntityDraw.cpp" />
     <ClCompile Include="Entity\EntityModel.cpp" />
-    <ClCompile Include="Entity\EntityTreeModel.cpp" />
+    <ClCompile Include="Entity\EntityNodeTreeModel.cpp" />
     <ClCompile Include="Entity\EntityUndoCmds.cpp" />
     <ClCompile Include="Entity\EntityWidget.cpp" />
     <ClCompile Include="Explorer\ExplorerItem.cpp" />
@@ -362,7 +362,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\Text;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtNetwork</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\Text;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtNetwork</IncludePath>
     </QtMoc>
-    <QtMoc Include="Entity\EntityTreeModel.h">
+    <QtMoc Include="Entity\EntityNodeTreeModel.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>

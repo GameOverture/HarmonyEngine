@@ -1,5 +1,5 @@
 /**************************************************************************
-*	EntityTreeModel.h
+*	EntityNodeTreeModel.h
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2018 Jason Knobler
@@ -19,15 +19,15 @@
 
 class EntityModel;
 
-class EntityTreeModel : public ITreeModel
+class EntityNodeTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
 	EntityModel *				m_pEntityModel;
 
 public:
-	explicit EntityTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
-	virtual ~EntityTreeModel();
+	explicit EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
+	virtual ~EntityNodeTreeModel();
 
 	bool IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const;
 
