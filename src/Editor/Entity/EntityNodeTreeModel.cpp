@@ -1,5 +1,5 @@
 /**************************************************************************
-*	EntityTreeModel.cpp
+*	EntityNodeTreeModel.cpp
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2018 Jason Knobler
@@ -8,20 +8,20 @@
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Global.h"
-#include "EntityTreeModel.h"
+#include "EntityNodeTreeModel.h"
 #include "EntityModel.h"
 
-EntityTreeModel::EntityTreeModel(EntityModel *pEntityModel, QObject *parent) :
+EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent) :
 	ITreeModel(1, QStringList(), parent),
 	m_pEntityModel(pEntityModel)
 {
 }
 
-/*virtual*/ EntityTreeModel::~EntityTreeModel()
+/*virtual*/ EntityNodeTreeModel::~EntityNodeTreeModel()
 {
 }
 
-bool EntityTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const
+bool EntityNodeTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const
 {
 	if(pItem == nullptr)
 	{
@@ -45,31 +45,31 @@ bool EntityTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) 
 	}
 }
 
-bool EntityTreeModel::AddChildItem(ExplorerItem *pItem)
+bool EntityNodeTreeModel::AddChildItem(ExplorerItem *pItem)
 {
 	if(IsItemValid(pItem, false) == false)
 		return false;
 
 	if(insertRow(m_pRootItem->childCount(), createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)) == false)
 	{
-		HyGuiLog("EntityTreeModel::AddChildItem() - insertRow failed", LOGTYPE_Error);
+		HyGuiLog("EntityNodeTreeModel::AddChildItem() - insertRow failed", LOGTYPE_Error);
 		return false;
 	}
 
 	QVariant v;
 	v.setValue<ExplorerItem *>(pItem);
 	if(setData(index(m_pRootItem->childCount() - 1, 0, createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)), v) == false)
-		HyGuiLog("EntityTreeModel::AddChildItem() - setData failed", LOGTYPE_Error);
+		HyGuiLog("EntityNodeTreeModel::AddChildItem() - setData failed", LOGTYPE_Error);
 }
 
-bool EntityTreeModel::RemoveChild(ExplorerItem *pItem)
+bool EntityNodeTreeModel::RemoveChild(ExplorerItem *pItem)
 {
 	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0));
 	TreeModelItem *pParentTreeItem = pTreeItem->parent();
 	return removeRow(pTreeItem->childNumber(), createIndex(pParentTreeItem->childNumber(), 0, pParentTreeItem));
 }
 
-QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const
+QVariant EntityNodeTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
 	if(pTreeItem == m_pRootItem)
@@ -107,11 +107,11 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 	}
 }
 
-/*virtual*/ Qt::ItemFlags EntityTreeModel::flags(const QModelIndex &indexRef) const /*override*/
+/*virtual*/ Qt::ItemFlags EntityNodeTreeModel::flags(const QModelIndex &indexRef) const /*override*/
 {
 	return QAbstractItemModel::flags(indexRef);
 }
 
-/*virtual*/ void EntityTreeModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*override*/
+/*virtual*/ void EntityNodeTreeModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*override*/
 {
 }

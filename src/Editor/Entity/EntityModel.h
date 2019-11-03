@@ -12,7 +12,7 @@
 
 #include "IModel.h"
 #include "ProjectItem.h"
-#include "EntityTreeModel.h"
+#include "EntityNodeTreeModel.h"
 #include "GlobalWidgetMappers.h"
 #include "ProjectItemMimeData.h"
 
@@ -43,14 +43,14 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	EntityTreeModel			m_TreeModel;
-	QList<ProjectItem *>	m_PrimitiveList;
+	EntityNodeTreeModel			m_TreeModel;
+	QList<ProjectItem *>		m_PrimitiveList;
 
 public:
 	EntityModel(ProjectItem &itemRef, QJsonArray stateArray);
 	virtual ~EntityModel();
 
-	EntityTreeModel &GetChildrenModel();
+	EntityNodeTreeModel &GetChildrenModel();
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItem *pItem);
 
 	void AddNewChildren(const ProjectItemMimeData *pMimeData);
@@ -58,8 +58,6 @@ public:
 
 	const QList<ProjectItem *> &GetPrimitiveList();
 	ProjectItem *CreateNewPrimitive();
-
-	void SetWidget(QTreeView *pTreeView);
 
 	virtual QJsonObject GetStateJson(uint32 uiIndex) const override;
 	virtual QJsonValue GetJson() const override;

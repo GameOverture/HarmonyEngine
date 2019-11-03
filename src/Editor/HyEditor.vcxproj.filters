@@ -114,9 +114,6 @@
     <ClCompile Include="Entity\EntityModel.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
-    <ClCompile Include="Entity\EntityTreeModel.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
     <ClCompile Include="Entity\EntityUndoCmds.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
@@ -274,6 +271,9 @@
     </ClCompile>
     <ClCompile Include="Text\TextUndoCmds.cpp">
       <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\EntityNodeTreeModel.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1155,9 +1155,6 @@
     <QtMoc Include="Entity3d\Entity3d.h">
       <Filter>Entity</Filter>
     </QtMoc>
-    <QtMoc Include="Entity\EntityTreeModel.h">
-      <Filter>Entity</Filter>
-    </QtMoc>
     <QtMoc Include="Explorer\ExplorerWidget.h">
       <Filter>Explorer</Filter>
     </QtMoc>
@@ -1203,6 +1200,9 @@
     </QtMoc>
     <QtMoc Include="Text\SubWidgets\TextLayersWidget.h">
       <Filter>Text\SubWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="Entity\EntityNodeTreeModel.h">
+      <Filter>Entity</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

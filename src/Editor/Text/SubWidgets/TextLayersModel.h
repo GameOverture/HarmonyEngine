@@ -12,7 +12,6 @@
 
 #include "IModel.h"
 #include "ProjectItem.h"
-#include "EntityTreeModel.h"
 #include "GlobalWidgetMappers.h"
 #include "ProjectItemMimeData.h"
 #include "TextFontManager.h"

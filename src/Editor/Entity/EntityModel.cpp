@@ -149,7 +149,7 @@ EntityModel::EntityModel(ProjectItem &itemRef, QJsonArray stateArray) :
 {
 }
 
-EntityTreeModel &EntityModel::GetChildrenModel()
+EntityNodeTreeModel &EntityModel::GetChildrenModel()
 {
 	return m_TreeModel;
 }
@@ -206,11 +206,6 @@ ProjectItem *EntityModel::CreateNewPrimitive()
 	m_PrimitiveList.push_back(pNewPrimitiveItem);
 
 	return pNewPrimitiveItem;
-}
-
-void EntityModel::SetWidget(QTreeView *pTreeView)
-{
-	pTreeView->setModel(&m_TreeModel);
 }
 
 /*virtual*/ QJsonObject EntityModel::GetStateJson(uint32 uiIndex) const /*override*/
