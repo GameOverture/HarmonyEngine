@@ -16,7 +16,10 @@
 
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_STB_IMAGE_WRITE
-//#define TINYGLTF_NOEXCEPTION
+#ifdef HY_PLATFORM_GUI
+	#define TINYGLTF_NO_FS
+#endif
+#define TINYGLTF_NOEXCEPTION
 #include "Utilities/tiny_gltf.h"
 
 #include "Utilities/jsonxx.h"

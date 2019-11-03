@@ -191,9 +191,6 @@
     <ClCompile Include="Scene\Nodes\Loadables\Visables\Drawables\Objects\HyTexturedQuad2d.cpp">
       <Filter>Scene\Nodes\Loadables\Visables\Drawables\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Utilities\tiny_gltf.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Components\HyVertexBuffer.cpp">
       <Filter>Renderer\Components</Filter>
     </ClCompile>
@@ -247,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="Scene\AnimFloats\HyTweenFuncs.cpp">
       <Filter>Scene\AnimFloats</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\tiny_gltf.cpp">
+      <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

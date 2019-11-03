@@ -4,7 +4,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2015 - 2018 Syoyo Fujita, Aurélien Chatelain and many
+// Copyright (c) 2015 - 2019 Syoyo Fujita, Aurélien Chatelain and many
 // contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,6 +26,18 @@
 // THE SOFTWARE.
 
 // Version:
+//  - v2.4.1 Fix some glTF object class does not have `extensions` and/or
+//  `extras` property.
+//  - v2.4.0 Experimental RapidJSON and C++14 support(Thanks to @jrkoone).
+//  - v2.3.1 Set default value of minFilter and magFilter in Sampler to -1.
+//  - v2.3.0 Modified Material representation according to glTF 2.0 schema
+//           (and introduced TextureInfo class)
+//           Change the behavior of `Value::IsNumber`. It return true either the
+//           value is int or real.
+//  - v2.2.0 Add loading 16bit PNG support. Add Sparse accessor support(Thanks
+//  to @Ybalrid)
+//  - v2.1.0 Add draco compression.
+//  - v2.0.1 Add comparsion feature(Thanks to @Selmar).
 //  - v2.0.0 glTF 2.0!.
 //
 // Tiny glTF loader is using following third party libraries:
@@ -40,16 +52,46 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <string>
 #include <vector>
+
+#ifndef TINYGLTF_USE_CPP14
+#include <functional>
+#endif
+
+#ifdef __ANDROID__
+#ifdef TINYGLTF_ANDROID_LOAD_FROM_ASSETS
+#include <android/asset_manager.h>
+#endif
+#endif
+
+#ifdef __GNUC__
+#if (__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ <= 8))
+#define TINYGLTF_NOEXCEPT
+#else
+#define TINYGLTF_NOEXCEPT noexcept
+#endif
+#else
+#define TINYGLTF_NOEXCEPT noexcept
+#endif
+
+#define DEFAULT_METHODS(x)             \
+  ~x() = default;                      \
+  x(const x &) = default;              \
+  x(x &&) TINYGLTF_NOEXCEPT = default; \
+  x &operator=(const x &) = default;   \
+  x &operator=(x &&) TINYGLTF_NOEXCEPT = default;
 
 namespace tinygltf {
 
 #define TINYGLTF_MODE_POINTS (0)
 #define TINYGLTF_MODE_LINE (1)
 #define TINYGLTF_MODE_LINE_LOOP (2)
+#define TINYGLTF_MODE_LINE_STRIP (3)
 #define TINYGLTF_MODE_TRIANGLES (4)
 #define TINYGLTF_MODE_TRIANGLE_STRIP (5)
 #define TINYGLTF_MODE_TRIANGLE_FAN (6)
@@ -134,9 +176,18 @@ namespace tinygltf {
 #define TINYGLTF_SHADER_TYPE_VERTEX_SHADER (35633)
 #define TINYGLTF_SHADER_TYPE_FRAGMENT_SHADER (35632)
 
+#define TINYGLTF_DOUBLE_EPS (1.e-12)
+#define TINYGLTF_DOUBLE_EQUAL(a, b) (std::fabs((b) - (a)) < TINYGLTF_DOUBLE_EPS)
+
+#ifdef __ANDROID__
+#ifdef TINYGLTF_ANDROID_LOAD_FROM_ASSETS
+AAssetManager *asset_manager = nullptr;
+#endif
+#endif
+
 typedef enum {
   NULL_TYPE = 0,
-  NUMBER_TYPE = 1,
+  REAL_TYPE = 1,
   INT_TYPE = 2,
   BOOL_TYPE = 3,
   STRING_TYPE = 4,
@@ -168,7 +219,7 @@ static inline int32_t GetComponentSizeInBytes(uint32_t componentType) {
   }
 }
 
-static inline int32_t GetTypeSizeInBytes(uint32_t ty) {
+static inline int32_t GetNumComponentsInType(uint32_t ty) {
   if (ty == TINYGLTF_TYPE_SCALAR) {
     return 1;
   } else if (ty == TINYGLTF_TYPE_VEC2) {
@@ -189,6 +240,11 @@ static inline int32_t GetTypeSizeInBytes(uint32_t ty) {
   }
 }
 
+// TODO(syoyo): Move these functions to TinyGLTF class
+bool IsDataURI(const std::string &in);
+bool DecodeDataURI(std::vector<unsigned char> *out, std::string &mime_type,
+                   const std::string &in, size_t reqBytes, bool checkSize);
+
 #ifdef __clang__
 #pragma clang diagnostic push
 // Suppress warning for : static Value null_value
@@ -203,24 +259,39 @@ class Value {
   typedef std::vector<Value> Array;
   typedef std::map<std::string, Value> Object;
 
-  Value() : type_(NULL_TYPE) {}
+  Value()
+      : type_(NULL_TYPE),
+        int_value_(0),
+        real_value_(0.0),
+        boolean_value_(false) {}
 
   explicit Value(bool b) : type_(BOOL_TYPE) { boolean_value_ = b; }
-  explicit Value(int i) : type_(INT_TYPE) { int_value_ = i; }
-  explicit Value(double n) : type_(NUMBER_TYPE) { number_value_ = n; }
+  explicit Value(int i) : type_(INT_TYPE) {
+    int_value_ = i;
+    real_value_ = i;
+  }
+  explicit Value(double n) : type_(REAL_TYPE) { real_value_ = n; }
   explicit Value(const std::string &s) : type_(STRING_TYPE) {
     string_value_ = s;
   }
+  explicit Value(std::string &&s)
+      : type_(STRING_TYPE), string_value_(std::move(s)) {}
   explicit Value(const unsigned char *p, size_t n) : type_(BINARY_TYPE) {
     binary_value_.resize(n);
     memcpy(binary_value_.data(), p, n);
   }
-  explicit Value(const Array &a) : type_(ARRAY_TYPE) {
-    array_value_ = Array(a);
-  }
-  explicit Value(const Object &o) : type_(OBJECT_TYPE) {
-    object_value_ = Object(o);
-  }
+  explicit Value(std::vector<unsigned char> &&v) noexcept
+      : type_(BINARY_TYPE),
+        binary_value_(std::move(v)) {}
+  explicit Value(const Array &a) : type_(ARRAY_TYPE) { array_value_ = a; }
+  explicit Value(Array &&a) noexcept : type_(ARRAY_TYPE),
+                                       array_value_(std::move(a)) {}
+
+  explicit Value(const Object &o) : type_(OBJECT_TYPE) { object_value_ = o; }
+  explicit Value(Object &&o) noexcept : type_(OBJECT_TYPE),
+                                        object_value_(std::move(o)) {}
+
+  DEFAULT_METHODS(Value)
 
   char Type() const { return static_cast<const char>(type_); }
 
@@ -228,7 +299,9 @@ class Value {
 
   bool IsInt() const { return (type_ == INT_TYPE); }
 
-  bool IsNumber() const { return (type_ == NUMBER_TYPE); }
+  bool IsNumber() const { return (type_ == REAL_TYPE) || (type_ == INT_TYPE); }
+
+  bool IsReal() const { return (type_ == REAL_TYPE); }
 
   bool IsString() const { return (type_ == STRING_TYPE); }
 
@@ -237,6 +310,24 @@ class Value {
   bool IsArray() const { return (type_ == ARRAY_TYPE); }
 
   bool IsObject() const { return (type_ == OBJECT_TYPE); }
+
+  // Use this function if you want to have number value as double.
+  double GetNumberAsDouble() const {
+    if (type_ == INT_TYPE) {
+      return double(int_value_);
+    } else {
+      return real_value_;
+    }
+  }
+
+  // Use this function if you want to have number value as int.
+  double GetNumberAsInt() const {
+    if (type_ == REAL_TYPE) {
+      return int(real_value_);
+    } else {
+      return int_value_;
+    }
+  }
 
   // Accessor
   template <typename T>
@@ -289,16 +380,18 @@ class Value {
 
   size_t Size() const { return (IsArray() ? ArrayLen() : Keys().size()); }
 
- protected:
-  int type_;
+  bool operator==(const tinygltf::Value &other) const;
 
-  int int_value_;
-  double number_value_;
+ protected:
+  int type_ = NULL_TYPE;
+
+  int int_value_ = 0;
+  double real_value_ = 0.0;
   std::string string_value_;
   std::vector<unsigned char> binary_value_;
   Array array_value_;
   Object object_value_;
-  bool boolean_value_;
+  bool boolean_value_ = false;
 };
 
 #ifdef __clang__
@@ -315,7 +408,7 @@ class Value {
     return var;                                   \
   }
 TINYGLTF_VALUE_GET(bool, boolean_value_)
-TINYGLTF_VALUE_GET(double, number_value_)
+TINYGLTF_VALUE_GET(double, real_value_)
 TINYGLTF_VALUE_GET(int, int_value_)
 TINYGLTF_VALUE_GET(std::string, string_value_)
 TINYGLTF_VALUE_GET(std::vector<unsigned char>, binary_value_)
@@ -332,13 +425,16 @@ TINYGLTF_VALUE_GET(Value::Object, object_value_)
 /// Agregate object for representing a color
 using ColorValue = std::array<double, 4>;
 
+// === legacy interface ====
+// TODO(syoyo): Deprecate `Parameter` class.
 struct Parameter {
-  bool bool_value;
+  bool bool_value = false;
   bool has_number_value = false;
   std::string string_value;
   std::vector<double> number_array;
   std::map<std::string, double> json_double_value;
-  double number_value;
+  double number_value = 0.0;
+
   // context sensitive methods. depending the type of the Parameter you are
   // accessing, these are either valid or not
   // If this parameter represent a texture map in a material, will return the
@@ -355,6 +451,42 @@ struct Parameter {
     return -1;
   }
 
+  /// Return the index of a texture coordinate set if this Parameter is a
+  /// texture map. Returned value is only valid if the parameter represent a
+  /// texture from a material
+  int TextureTexCoord() const {
+    const auto it = json_double_value.find("texCoord");
+    if (it != std::end(json_double_value)) {
+      return int(it->second);
+    }
+    // As per the spec, if texCoord is ommited, this parameter is 0
+    return 0;
+  }
+
+  /// Return the scale of a texture if this Parameter is a normal texture map.
+  /// Returned value is only valid if the parameter represent a normal texture
+  /// from a material
+  double TextureScale() const {
+    const auto it = json_double_value.find("scale");
+    if (it != std::end(json_double_value)) {
+      return it->second;
+    }
+    // As per the spec, if scale is ommited, this paramter is 1
+    return 1;
+  }
+
+  /// Return the strength of a texture if this Parameter is a an occlusion map.
+  /// Returned value is only valid if the parameter represent an occlusion map
+  /// from a material
+  double TextureStrength() const {
+    const auto it = json_double_value.find("strength");
+    if (it != std::end(json_double_value)) {
+      return it->second;
+    }
+    // As per the spec, if strenghth is ommited, this parameter is 1
+    return 1;
+  }
+
   /// Material factor, like the roughness or metalness of a material
   /// Returned value is only valid if the parameter represent a texture from a
   /// material
@@ -369,6 +501,10 @@ struct Parameter {
          number_array[0], number_array[1], number_array[2],
          (number_array.size() > 3 ? number_array[3] : 1.0)}};
   }
+
+  Parameter() = default;
+  DEFAULT_METHODS(Parameter)
+  bool operator==(const Parameter &) const;
 };
 
 #ifdef __clang__
@@ -389,18 +525,32 @@ struct AnimationChannel {
   std::string target_path;  // required in ["translation", "rotation", "scale",
                             // "weights"]
   Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 
   AnimationChannel() : sampler(-1), target_node(-1) {}
+  DEFAULT_METHODS(AnimationChannel)
+  bool operator==(const AnimationChannel &) const;
 };
 
 struct AnimationSampler {
   int input;                  // required
   int output;                 // required
-  std::string interpolation;  // in ["LINEAR", "STEP", "CATMULLROMSPLINE",
-                              // "CUBICSPLINE"], default "LINEAR"
+  std::string interpolation;  // "LINEAR", "STEP","CUBICSPLINE" or user defined
+                              // string. default "LINEAR"
   Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 
   AnimationSampler() : input(-1), output(-1), interpolation("LINEAR") {}
+  DEFAULT_METHODS(AnimationSampler)
+  bool operator==(const AnimationSampler &) const;
 };
 
 struct Animation {
@@ -408,6 +558,15 @@ struct Animation {
   std::vector<AnimationChannel> channels;
   std::vector<AnimationSampler> samplers;
   Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  Animation() = default;
+  DEFAULT_METHODS(Animation)
+  bool operator==(const Animation &) const;
 };
 
 struct Skin {
@@ -416,28 +575,54 @@ struct Skin {
   int skeleton;             // The index of the node used as a skeleton root
   std::vector<int> joints;  // Indices of skeleton nodes
 
+  Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
   Skin() {
     inverseBindMatrices = -1;
     skeleton = -1;
   }
+  DEFAULT_METHODS(Skin)
+  bool operator==(const Skin &) const;
 };
 
 struct Sampler {
   std::string name;
-  int minFilter;  // ["NEAREST", "LINEAR", "NEAREST_MIPMAP_LINEAR",
-                  // "LINEAR_MIPMAP_NEAREST", "NEAREST_MIPMAP_LINEAR",
-                  // "LINEAR_MIPMAP_LINEAR"]
-  int magFilter;  // ["NEAREST", "LINEAR"]
-  int wrapS;      // ["CLAMP_TO_EDGE", "MIRRORED_REPEAT", "REPEAT"], default
-                  // "REPEAT"
-  int wrapT;      // ["CLAMP_TO_EDGE", "MIRRORED_REPEAT", "REPEAT"], default
-                  // "REPEAT"
-  int wrapR;      // TinyGLTF extension
+  // glTF 2.0 spec does not define default value for `minFilter` and
+  // `magFilter`. Set -1 in TinyGLTF(issue #186)
+  int minFilter =
+      -1;  // optional. -1 = no filter defined. ["NEAREST", "LINEAR",
+           // "NEAREST_MIPMAP_LINEAR", "LINEAR_MIPMAP_NEAREST",
+           // "NEAREST_MIPMAP_LINEAR", "LINEAR_MIPMAP_LINEAR"]
+  int magFilter =
+      -1;  // optional. -1 = no filter defined. ["NEAREST", "LINEAR"]
+  int wrapS =
+      TINYGLTF_TEXTURE_WRAP_REPEAT;  // ["CLAMP_TO_EDGE", "MIRRORED_REPEAT",
+                                     // "REPEAT"], default "REPEAT"
+  int wrapT =
+      TINYGLTF_TEXTURE_WRAP_REPEAT;  // ["CLAMP_TO_EDGE", "MIRRORED_REPEAT",
+                                     // "REPEAT"], default "REPEAT"
+  int wrapR = TINYGLTF_TEXTURE_WRAP_REPEAT;  // TinyGLTF extension
+
   Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 
   Sampler()
-      : wrapS(TINYGLTF_TEXTURE_WRAP_REPEAT),
-        wrapT(TINYGLTF_TEXTURE_WRAP_REPEAT) {}
+      : minFilter(-1),
+        magFilter(-1),
+        wrapS(TINYGLTF_TEXTURE_WRAP_REPEAT),
+        wrapT(TINYGLTF_TEXTURE_WRAP_REPEAT),
+        wrapR(TINYGLTF_TEXTURE_WRAP_REPEAT) {}
+  DEFAULT_METHODS(Sampler)
+  bool operator==(const Sampler &) const;
 };
 
 struct Image {
@@ -445,23 +630,134 @@ struct Image {
   int width;
   int height;
   int component;
+  int bits;        // bit depth per channel. 8(byte), 16 or 32.
+  int pixel_type;  // pixel type(TINYGLTF_COMPONENT_TYPE_***). usually
+                   // UBYTE(bits = 8) or USHORT(bits = 16)
   std::vector<unsigned char> image;
   int bufferView;        // (required if no uri)
   std::string mimeType;  // (required if no uri) ["image/jpeg", "image/png",
                          // "image/bmp", "image/gif"]
   std::string uri;       // (required if no mimeType)
   Value extras;
+  ExtensionMap extensions;
 
-  Image() { bufferView = -1; }
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  // When this flag is true, data is stored to `image` in as-is format(e.g. jpeg
+  // compressed for "image/jpeg" mime) This feature is good if you use custom
+  // image loader function. (e.g. delayed decoding of images for faster glTF
+  // parsing) Default parser for Image does not provide as-is loading feature at
+  // the moment. (You can manipulate this by providing your own LoadImageData
+  // function)
+  bool as_is;
+
+  Image() : as_is(false) {
+    bufferView = -1;
+    width = -1;
+    height = -1;
+    component = -1;
+  }
+  DEFAULT_METHODS(Image)
+
+  bool operator==(const Image &) const;
 };
 
 struct Texture {
+  std::string name;
+
   int sampler;
-  int source;  // Required (not specified in the spec ?)
+  int source;
   Value extras;
   ExtensionMap extensions;
 
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
   Texture() : sampler(-1), source(-1) {}
+  DEFAULT_METHODS(Texture)
+
+  bool operator==(const Texture &) const;
+};
+
+struct TextureInfo {
+  int index = -1;  // required.
+  int texCoord;    // The set index of texture's TEXCOORD attribute used for
+                   // texture coordinate mapping.
+
+  Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  TextureInfo() : index(-1), texCoord(0) {}
+  DEFAULT_METHODS(TextureInfo)
+  bool operator==(const TextureInfo &) const;
+};
+
+struct NormalTextureInfo {
+  int index = -1;  // required
+  int texCoord;    // The set index of texture's TEXCOORD attribute used for
+                   // texture coordinate mapping.
+  double scale;    // scaledNormal = normalize((<sampled normal texture value>
+                   // * 2.0 - 1.0) * vec3(<normal scale>, <normal scale>, 1.0))
+
+  Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  NormalTextureInfo() : index(-1), texCoord(0), scale(1.0) {}
+  DEFAULT_METHODS(NormalTextureInfo)
+  bool operator==(const NormalTextureInfo &) const;
+};
+
+struct OcclusionTextureInfo {
+  int index = -1;   // required
+  int texCoord;     // The set index of texture's TEXCOORD attribute used for
+                    // texture coordinate mapping.
+  double strength;  // occludedColor = lerp(color, color * <sampled occlusion
+                    // texture value>, <occlusion strength>)
+
+  Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  OcclusionTextureInfo() : index(-1), texCoord(0), strength(1.0) {}
+  DEFAULT_METHODS(OcclusionTextureInfo)
+  bool operator==(const OcclusionTextureInfo &) const;
+};
+
+// pbrMetallicRoughness class defined in glTF 2.0 spec.
+struct PbrMetallicRoughness {
+  std::vector<double> baseColorFactor;  // len = 4. default [1,1,1,1]
+  TextureInfo baseColorTexture;
+  double metallicFactor;   // default 1
+  double roughnessFactor;  // default 1
+  TextureInfo metallicRoughnessTexture;
+
+  Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  PbrMetallicRoughness()
+      : baseColorFactor(std::vector<double>{1.0, 1.0, 1.0, 1.0}),
+        metallicFactor(1.0),
+        roughnessFactor(1.0) {}
+  DEFAULT_METHODS(PbrMetallicRoughness)
+  bool operator==(const PbrMetallicRoughness &) const;
 };
 
 // Each extension should be stored in a ParameterMap.
@@ -470,11 +766,33 @@ struct Texture {
 struct Material {
   std::string name;
 
-  ParameterMap values;            // PBR metal/roughness workflow
-  ParameterMap additionalValues;  // normal/occlusion/emissive values
+  std::vector<double> emissiveFactor;  // length 3. default [0, 0, 0]
+  std::string alphaMode;               // default "OPAQUE"
+  double alphaCutoff;                  // default 0.5
+  bool doubleSided;                    // default false;
+
+  PbrMetallicRoughness pbrMetallicRoughness;
+
+  NormalTextureInfo normalTexture;
+  OcclusionTextureInfo occlusionTexture;
+  TextureInfo emissiveTexture;
+
+  // For backward compatibility
+  // TODO(syoyo): Remove `values` and `additionalValues` in the next release.
+  ParameterMap values;
+  ParameterMap additionalValues;
 
   ExtensionMap extensions;
   Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  Material() : alphaMode("OPAQUE"), alphaCutoff(0.5), doubleSided(false) {}
+  DEFAULT_METHODS(Material)
+
+  bool operator==(const Material &) const;
 };
 
 struct BufferView {
@@ -486,8 +804,17 @@ struct BufferView {
                       // understood to be tightly packed
   int target;         // ["ARRAY_BUFFER", "ELEMENT_ARRAY_BUFFER"]
   Value extras;
+  ExtensionMap extensions;
 
-  BufferView() : byteOffset(0), byteStride(0) {}
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  bool dracoDecoded;  // Flag indicating this has been draco decoded
+
+  BufferView() : byteOffset(0), byteStride(0), dracoDecoded(false) {}
+  DEFAULT_METHODS(BufferView)
+  bool operator==(const BufferView &) const;
 };
 
 struct Accessor {
@@ -495,16 +822,33 @@ struct Accessor {
                    // are not supported
   std::string name;
   size_t byteOffset;
-  bool normalized;    // optinal.
+  bool normalized;    // optional.
   int componentType;  // (required) One of TINYGLTF_COMPONENT_TYPE_***
   size_t count;       // required
   int type;           // (required) One of TINYGLTF_TYPE_***   ..
   Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 
   std::vector<double> minValues;  // optional
   std::vector<double> maxValues;  // optional
 
-  // TODO(syoyo): "sparse"
+  struct {
+    int count;
+    bool isSparse;
+    struct {
+      int byteOffset;
+      int bufferView;
+      int componentType;  // a TINYGLTF_COMPONENT_TYPE_ value
+    } indices;
+    struct {
+      int bufferView;
+      int byteOffset;
+    } values;
+  } sparse;
 
   ///
   /// Utility function to compute byteStride for a given bufferView object.
@@ -519,12 +863,12 @@ struct Accessor {
         return -1;
       }
 
-      int typeSizeInBytes = GetTypeSizeInBytes(static_cast<uint32_t>(type));
-      if (typeSizeInBytes <= 0) {
+      int numComponents = GetNumComponentsInType(static_cast<uint32_t>(type));
+      if (numComponents <= 0) {
         return -1;
       }
 
-      return componentSizeInBytes * typeSizeInBytes;
+      return componentSizeInBytes * numComponents;
     } else {
       // Check if byteStride is a mulple of the size of the accessor's component
       // type.
@@ -540,39 +884,56 @@ struct Accessor {
       return static_cast<int>(bufferViewObject.byteStride);
     }
 
-    return 0;
+    // unreachable return 0;
   }
 
-  Accessor() { bufferView = -1; }
+  Accessor() {
+    bufferView = -1;
+    sparse.isSparse = false;
+  }
+  DEFAULT_METHODS(Accessor)
+  bool operator==(const tinygltf::Accessor &) const;
 };
 
 struct PerspectiveCamera {
-  float aspectRatio;  // min > 0
-  float yfov;         // required. min > 0
-  float zfar;         // min > 0
-  float znear;        // required. min > 0
+  double aspectRatio;  // min > 0
+  double yfov;         // required. min > 0
+  double zfar;         // min > 0
+  double znear;        // required. min > 0
 
   PerspectiveCamera()
-      : aspectRatio(0.0f),
-        yfov(0.0f),
-        zfar(0.0f)  // 0 = use infinite projecton matrix
+      : aspectRatio(0.0),
+        yfov(0.0),
+        zfar(0.0)  // 0 = use infinite projecton matrix
         ,
-        znear(0.0f) {}
+        znear(0.0) {}
+  DEFAULT_METHODS(PerspectiveCamera)
+  bool operator==(const PerspectiveCamera &) const;
 
   ExtensionMap extensions;
   Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 };
 
 struct OrthographicCamera {
-  float xmag;   // required. must not be zero.
-  float ymag;   // required. must not be zero.
-  float zfar;   // required. `zfar` must be greater than `znear`.
-  float znear;  // required
+  double xmag;   // required. must not be zero.
+  double ymag;   // required. must not be zero.
+  double zfar;   // required. `zfar` must be greater than `znear`.
+  double znear;  // required
 
-  OrthographicCamera() : xmag(0.0f), ymag(0.0f), zfar(0.0f), znear(0.0f) {}
+  OrthographicCamera() : xmag(0.0), ymag(0.0), zfar(0.0), znear(0.0) {}
+  DEFAULT_METHODS(OrthographicCamera)
+  bool operator==(const OrthographicCamera &) const;
 
   ExtensionMap extensions;
   Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 };
 
 struct Camera {
@@ -583,9 +944,15 @@ struct Camera {
   OrthographicCamera orthographic;
 
   Camera() {}
+  DEFAULT_METHODS(Camera)
+  bool operator==(const Camera &) const;
 
   ExtensionMap extensions;
   Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 };
 
 struct Primitive {
@@ -601,45 +968,44 @@ struct Primitive {
   // where each target is a dict with attribues in ["POSITION, "NORMAL",
   // "TANGENT"] pointing
   // to their corresponding accessors
+  ExtensionMap extensions;
   Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 
   Primitive() {
     material = -1;
     indices = -1;
   }
+  DEFAULT_METHODS(Primitive)
+  bool operator==(const Primitive &) const;
 };
 
 struct Mesh {
   std::string name;
   std::vector<Primitive> primitives;
   std::vector<double> weights;  // weights to be applied to the Morph Targets
-  std::vector<std::map<std::string, int> > targets;
   ExtensionMap extensions;
   Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  Mesh() = default;
+  DEFAULT_METHODS(Mesh)
+  bool operator==(const Mesh &) const;
 };
 
 class Node {
  public:
   Node() : camera(-1), skin(-1), mesh(-1) {}
 
-  Node(const Node &rhs) {
-    camera = rhs.camera;
+  DEFAULT_METHODS(Node)
 
-    name = rhs.name;
-    skin = rhs.skin;
-    mesh = rhs.mesh;
-    children = rhs.children;
-    rotation = rhs.rotation;
-    scale = rhs.scale;
-    translation = rhs.translation;
-    matrix = rhs.matrix;
-    weights = rhs.weights;
-
-    extensions = rhs.extensions;
-    extras = rhs.extras;
-  }
-
-  ~Node() {}
+  bool operator==(const Node &) const;
 
   int camera;  // the index of the camera referenced by this node
 
@@ -655,6 +1021,10 @@ class Node {
 
   ExtensionMap extensions;
   Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 };
 
 struct Buffer {
@@ -663,6 +1033,15 @@ struct Buffer {
   std::string
       uri;  // considered as required here but not in the spec (need to clarify)
   Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  Buffer() = default;
+  DEFAULT_METHODS(Buffer)
+  bool operator==(const Buffer &) const;
 };
 
 struct Asset {
@@ -672,6 +1051,14 @@ struct Asset {
   std::string copyright;
   ExtensionMap extensions;
   Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  Asset() = default;
+  DEFAULT_METHODS(Asset)
+  bool operator==(const Asset &) const;
 };
 
 struct Scene {
@@ -680,18 +1067,59 @@ struct Scene {
 
   ExtensionMap extensions;
   Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
+
+  Scene() = default;
+  DEFAULT_METHODS(Scene)
+  bool operator==(const Scene &) const;
+};
+
+struct SpotLight {
+  double innerConeAngle;
+  double outerConeAngle;
+
+  SpotLight() : innerConeAngle(0.0), outerConeAngle(0.7853981634) {}
+  DEFAULT_METHODS(SpotLight)
+  bool operator==(const SpotLight &) const;
+
+  ExtensionMap extensions;
+  Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 };
 
 struct Light {
   std::string name;
   std::vector<double> color;
+  double intensity;
   std::string type;
+  double range;
+  SpotLight spot;
+
+  Light() : intensity(1.0), range(0.0) {}
+  DEFAULT_METHODS(Light)
+
+  bool operator==(const Light &) const;
+
+  ExtensionMap extensions;
+  Value extras;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 };
 
 class Model {
  public:
-  Model() {}
-  ~Model() {}
+  Model() = default;
+  DEFAULT_METHODS(Model)
+
+  bool operator==(const Model &) const;
 
   std::vector<Accessor> accessors;
   std::vector<Animation> animations;
@@ -707,7 +1135,6 @@ class Model {
   std::vector<Camera> cameras;
   std::vector<Scene> scenes;
   std::vector<Light> lights;
-  ExtensionMap extensions;
 
   int defaultScene;
   std::vector<std::string> extensionsUsed;
@@ -716,23 +1143,30 @@ class Model {
   Asset asset;
 
   Value extras;
+  ExtensionMap extensions;
+
+  // Filled when SetStoreOriginalJSONForExtrasAndExtensions is enabled.
+  std::string extras_json_string;
+  std::string extensions_json_string;
 };
 
 enum SectionCheck {
   NO_REQUIRE = 0x00,
-  REQUIRE_SCENE = 0x01,
-  REQUIRE_SCENES = 0x02,
-  REQUIRE_NODES = 0x04,
-  REQUIRE_ACCESSORS = 0x08,
-  REQUIRE_BUFFERS = 0x10,
-  REQUIRE_BUFFER_VIEWS = 0x20,
-  REQUIRE_ALL = 0x3f
+  REQUIRE_VERSION = 0x01,
+  REQUIRE_SCENE = 0x02,
+  REQUIRE_SCENES = 0x04,
+  REQUIRE_NODES = 0x08,
+  REQUIRE_ACCESSORS = 0x10,
+  REQUIRE_BUFFERS = 0x20,
+  REQUIRE_BUFFER_VIEWS = 0x40,
+  REQUIRE_ALL = 0x7f
 };
 
 ///
 /// LoadImageDataFunction type. Signature for custom image loading callbacks.
 ///
-typedef bool (*LoadImageDataFunction)(Image *, std::string *, int, int,
+typedef bool (*LoadImageDataFunction)(Image *, const int, std::string *,
+                                      std::string *, int, int,
                                       const unsigned char *, int, void *);
 
 ///
@@ -743,9 +1177,9 @@ typedef bool (*WriteImageDataFunction)(const std::string *, const std::string *,
 
 #ifndef TINYGLTF_NO_STB_IMAGE
 // Declaration of default image loader callback
-bool LoadImageData(Image *image, std::string *err, int req_width,
-                   int req_height, const unsigned char *bytes, int size,
-                   void *);
+bool LoadImageData(Image *image, const int image_idx, std::string *err,
+                   std::string *warn, int req_width, int req_height,
+                   const unsigned char *bytes, int size, void *);
 #endif
 
 #ifndef TINYGLTF_NO_STB_IMAGE_WRITE
@@ -757,28 +1191,24 @@ bool WriteImageData(const std::string *basepath, const std::string *filename,
 ///
 /// FilExistsFunction type. Signature for custom filesystem callbacks.
 ///
-typedef bool (*FileExistsFunction)(const std::string &abs_filename,
-                                   void *);
+typedef bool (*FileExistsFunction)(const std::string &abs_filename, void *);
 
 ///
 /// ExpandFilePathFunction type. Signature for custom filesystem callbacks.
 ///
-typedef std::string (*ExpandFilePathFunction)(const std::string &,
-                                              void *);
+typedef std::string (*ExpandFilePathFunction)(const std::string &, void *);
 
 ///
 /// ReadWholeFileFunction type. Signature for custom filesystem callbacks.
 ///
 typedef bool (*ReadWholeFileFunction)(std::vector<unsigned char> *,
-                                      std::string *,
-                                      const std::string &,
+                                      std::string *, const std::string &,
                                       void *);
 
 ///
 /// WriteWholeFileFunction type. Signature for custom filesystem callbacks.
 ///
-typedef bool (*WriteWholeFileFunction)(std::string *,
-                                       const std::string &,
+typedef bool (*WriteWholeFileFunction)(std::string *, const std::string &,
                                        const std::vector<unsigned char> &,
                                        void *);
 
@@ -786,35 +1216,32 @@ typedef bool (*WriteWholeFileFunction)(std::string *,
 /// A structure containing all required filesystem callbacks and a pointer to
 /// their user data.
 ///
-struct FsCallbacks
-{
-    FileExistsFunction FileExists;
-    ExpandFilePathFunction ExpandFilePath;
-    ReadWholeFileFunction ReadWholeFile;
-    WriteWholeFileFunction WriteWholeFile;
+struct FsCallbacks {
+  FileExistsFunction FileExists;
+  ExpandFilePathFunction ExpandFilePath;
+  ReadWholeFileFunction ReadWholeFile;
+  WriteWholeFileFunction WriteWholeFile;
 
-    void* user_data; // An argument that is passed to all fs callbacks
+  void *user_data;  // An argument that is passed to all fs callbacks
 };
 
 #ifndef TINYGLTF_NO_FS
 // Declaration of default filesystem callbacks
 
-bool FileExists(const std::string &abs_filename,
-                void *);
+bool FileExists(const std::string &abs_filename, void *);
 
-std::string ExpandFilePath(const std::string &filepath,
-                           void *);
+std::string ExpandFilePath(const std::string &filepath, void *);
 
 bool ReadWholeFile(std::vector<unsigned char> *out, std::string *err,
-                   const std::string &filepath,
-                   void *);
+                   const std::string &filepath, void *);
 
-bool WriteWholeFile(std::string *err,
-                    const std::string &filepath,
-                    const std::vector<unsigned char> &contents,
-                    void *);
+bool WriteWholeFile(std::string *err, const std::string &filepath,
+                    const std::vector<unsigned char> &contents, void *);
 #endif
 
+///
+/// glTF Parser/Serialier context.
+///
 class TinyGLTF {
  public:
 #ifdef __clang__
@@ -832,47 +1259,57 @@ class TinyGLTF {
 
   ///
   /// Loads glTF ASCII asset from a file.
+  /// Set warning message to `warn` for example it fails to load asserts.
   /// Returns false and set error string to `err` if there's an error.
   ///
-  bool LoadASCIIFromFile(Model *model, std::string *err,
+  bool LoadASCIIFromFile(Model *model, std::string *err, std::string *warn,
                          const std::string &filename,
-                         unsigned int check_sections = REQUIRE_ALL);
+                         unsigned int check_sections = REQUIRE_VERSION);
 
   ///
   /// Loads glTF ASCII asset from string(memory).
   /// `length` = strlen(str);
+  /// Set warning message to `warn` for example it fails to load asserts.
   /// Returns false and set error string to `err` if there's an error.
   ///
-  bool LoadASCIIFromString(Model *model, std::string *err, const char *str,
-                           const unsigned int length,
+  bool LoadASCIIFromString(Model *model, std::string *err, std::string *warn,
+                           const char *str, const unsigned int length,
                            const std::string &base_dir,
-                           unsigned int check_sections = REQUIRE_ALL);
+                           unsigned int check_sections = REQUIRE_VERSION);
 
   ///
   /// Loads glTF binary asset from a file.
+  /// Set warning message to `warn` for example it fails to load asserts.
   /// Returns false and set error string to `err` if there's an error.
   ///
-  bool LoadBinaryFromFile(Model *model, std::string *err,
+  bool LoadBinaryFromFile(Model *model, std::string *err, std::string *warn,
                           const std::string &filename,
-                          unsigned int check_sections = REQUIRE_ALL);
+                          unsigned int check_sections = REQUIRE_VERSION);
 
   ///
   /// Loads glTF binary asset from memory.
   /// `length` = strlen(str);
+  /// Set warning message to `warn` for example it fails to load asserts.
   /// Returns false and set error string to `err` if there's an error.
   ///
-  bool LoadBinaryFromMemory(Model *model, std::string *err,
+  bool LoadBinaryFromMemory(Model *model, std::string *err, std::string *warn,
                             const unsigned char *bytes,
                             const unsigned int length,
                             const std::string &base_dir = "",
-                            unsigned int check_sections = REQUIRE_ALL);
+                            unsigned int check_sections = REQUIRE_VERSION);
+
+  ///
+  /// Write glTF to stream, buffers and images will be embeded
+  ///
+  bool WriteGltfSceneToStream(Model *model, std::ostream &stream,
+                              bool prettyPrint, bool writeBinary);
 
   ///
   /// Write glTF to file.
   ///
   bool WriteGltfSceneToFile(Model *model, const std::string &filename,
-                            bool embedImages,
-                            bool embedBuffers /*, bool writeBinary*/);
+                            bool embedImages, bool embedBuffers,
+                            bool prettyPrint, bool writeBinary);
 
   ///
   /// Set callback to use for loading image data
@@ -889,54 +1326,81 @@ class TinyGLTF {
   ///
   void SetFsCallbacks(FsCallbacks callbacks);
 
+  ///
+  /// Set serializing default values(default = false).
+  /// When true, default values are force serialized to .glTF.
+  /// This may be helpfull if you want to serialize a full description of glTF
+  /// data.
+  ///
+  /// TODO(LTE): Supply parsing option as function arguments to
+  /// `LoadASCIIFromFile()` and others, not by a class method
+  ///
+  void SetSerializeDefaultValues(const bool enabled) {
+    serialize_default_values_ = enabled;
+  }
+
+  bool GetSerializeDefaultValues() const { return serialize_default_values_; }
+
+  ///
+  /// Store original JSON string for `extras` and `extensions`.
+  /// This feature will be useful when the user want to reconstruct custom data
+  /// structure from JSON string.
+  ///
+  void SetStoreOriginalJSONForExtrasAndExtensions(const bool enabled) {
+    store_original_json_for_extras_and_extensions_ = enabled;
+  }
+
+  bool GetStoreOriginalJSONForExtrasAndExtensions() const {
+    return store_original_json_for_extras_and_extensions_;
+  }
+
  private:
   ///
   /// Loads glTF asset from string(memory).
   /// `length` = strlen(str);
+  /// Set warning message to `warn` for example it fails to load asserts
   /// Returns false and set error string to `err` if there's an error.
   ///
-  bool LoadFromString(Model *model, std::string *err, const char *str,
-                      const unsigned int length, const std::string &base_dir,
-                      unsigned int check_sections);
+  bool LoadFromString(Model *model, std::string *err, std::string *warn,
+                      const char *str, const unsigned int length,
+                      const std::string &base_dir, unsigned int check_sections);
 
-  const unsigned char *bin_data_;
-  size_t bin_size_;
-  bool is_binary_;
+  const unsigned char *bin_data_ = nullptr;
+  size_t bin_size_ = 0;
+  bool is_binary_ = false;
+
+  bool serialize_default_values_ = false;  ///< Serialize default values?
+
+  bool store_original_json_for_extras_and_extensions_ = false;
 
   FsCallbacks fs = {
 #ifndef TINYGLTF_NO_FS
-    &tinygltf::FileExists,
-    &tinygltf::ExpandFilePath,
-    &tinygltf::ReadWholeFile,
-    &tinygltf::WriteWholeFile,
+      &tinygltf::FileExists, &tinygltf::ExpandFilePath,
+      &tinygltf::ReadWholeFile, &tinygltf::WriteWholeFile,
 
-    nullptr  // Fs callback user data
+      nullptr  // Fs callback user data
 #else
-    nullptr,
-    nullptr,
-    nullptr,
-    nullptr,
+      nullptr, nullptr, nullptr, nullptr,
 
-    nullptr  // Fs callback user data
+      nullptr  // Fs callback user data
 #endif
   };
 
   LoadImageDataFunction LoadImageData =
 #ifndef TINYGLTF_NO_STB_IMAGE
-    &tinygltf::LoadImageData;
+      &tinygltf::LoadImageData;
 #else
-    nullptr;
+      nullptr;
 #endif
-    void *load_image_user_data_ = reinterpret_cast<void *>(&fs);
+  void *load_image_user_data_ = reinterpret_cast<void *>(&fs);
 
   WriteImageDataFunction WriteImageData =
 #ifndef TINYGLTF_NO_STB_IMAGE_WRITE
-    &tinygltf::WriteImageData;
+      &tinygltf::WriteImageData;
 #else
-     nullptr;
+      nullptr;
 #endif
   void *write_image_user_data_ = reinterpret_cast<void *>(&fs);
-
 };
 
 #ifdef __clang__

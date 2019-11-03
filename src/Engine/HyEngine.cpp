@@ -216,7 +216,7 @@ bool HyEngine::PollPlatformApi()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DataDir() was invoked before engine has been initialized.");
 
-	char *pBuffer;
+	char *pBuffer = nullptr;
 
 	// Get the current working directory:
 #if defined(HY_PLATFORM_WINDOWS)

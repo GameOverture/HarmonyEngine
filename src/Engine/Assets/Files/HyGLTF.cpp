@@ -37,8 +37,9 @@ void HyGLTF::OnLoadThread()
 	{
 		tinygltf::TinyGLTF loader;
 		std::string sError;
+		std::string sWarning;
 		std::string sFilePath = Hy_DataDir() + HYASSETS_PrefabDir + m_sIDENTIFIER + ".gltf";
-		bool bLoadSuccess = loader.LoadASCIIFromFile(&m_AssetData, &sError, sFilePath);
+		bool bLoadSuccess = loader.LoadASCIIFromFile(&m_AssetData, &sError, &sWarning, sFilePath);
 		if(bLoadSuccess == false)
 		{
 			HyLogError("HyGLTF::OnLoadThread failed: " << sError.c_str());
