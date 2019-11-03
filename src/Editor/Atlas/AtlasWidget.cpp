@@ -59,8 +59,8 @@ bool AtlasTreeItem::operator<(const QTreeWidgetItem &rhs) const
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AtlasWidget::AtlasWidget(QWidget *parent) :
-	QWidget(parent),
+AtlasWidget::AtlasWidget(QWidget *pParent) :
+	QWidget(pParent),
 	m_pModel(nullptr),
 	m_Draw(nullptr),
 	ui(new Ui::AtlasWidget)
@@ -68,11 +68,11 @@ AtlasWidget::AtlasWidget(QWidget *parent) :
 	ui->setupUi(this);
 	
 	// NOTE: THIS CONSTRUCTOR IS INVALID TO USE. IT EXISTS FOR QT TO ALLOW Q_OBJECT TO WORK
-	HyGuiLog("WidgetAtlasManager::WidgetAtlasManager() invalid constructor used", LOGTYPE_Error);
+	HyGuiLog("AtlasWidget::AtlasWidget() invalid constructor used", LOGTYPE_Error);
 }
 
-AtlasWidget::AtlasWidget(AtlasModel *pModel, QWidget *parent /*= 0*/) :
-	QWidget(parent),
+AtlasWidget::AtlasWidget(AtlasModel *pModel, QWidget *pParent /*= nullptr*/) :
+	QWidget(pParent),
 	ui(new Ui::AtlasWidget),
 	m_pModel(pModel),
 	m_Draw(pModel),

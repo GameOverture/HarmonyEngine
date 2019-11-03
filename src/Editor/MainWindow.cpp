@@ -20,6 +20,7 @@
 #include "DlgProjectSettings.h"
 #include "ExplorerWidget.h"
 #include "AtlasWidget.h"
+#include "GltfWidget.h"
 #include "AudioAssetsWidget.h"
 
 #include <QFileDialog>
@@ -171,7 +172,6 @@ MainWindow::MainWindow(QWidget *pParent) :
 	// Create a loading spinner per docking window. The number of docking windows is predefined and their widgets are contextually replaced to what project/item is active.
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetAssets));
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetExplorer));
-	//m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetOutputLog));   // No need
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetProperties));
 
 	for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
@@ -250,6 +250,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	// Project manager widgets
 	ui->tabWidgetAssetManager->clear();
 	ui->tabWidgetAssetManager->addTab(pProject->GetAtlasWidget(), HyGlobal::ItemIcon(ITEM_AtlasImage, SUBICON_None), "Atlases");
+	ui->tabWidgetAssetManager->addTab(pProject->GetGltfWidget(), HyGlobal::ItemIcon(ITEM_Prefab, SUBICON_None), "Models");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAudioWidget(), HyGlobal::ItemIcon(ITEM_Audio, SUBICON_None), "Audio");
 }
 

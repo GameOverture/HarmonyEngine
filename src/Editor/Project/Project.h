@@ -13,7 +13,6 @@
 #include "ExplorerWidget.h"
 #include "ProjectDraw.h"
 #include "ProjectItem.h"
-#include "AtlasModel.h"
 #include "ExplorerItem.h"
 #include "DlgProjectSettings.h"
 
@@ -22,7 +21,10 @@
 #include <QStandardItemModel>
 
 // Forward declaration
+class AtlasModel;
 class AtlasWidget;
+class GltfModel;
+class GltfWidget;
 class AudioAssetsWidget;
 class Harmony;
 class ExplorerModel;
@@ -54,9 +56,12 @@ class Project : public ExplorerItem
 	AtlasModel *									m_pAtlasModel;
 	AtlasWidget *									m_pAtlasWidget;
 
+	GltfModel *										m_pGltfModel;
+	GltfWidget *									m_pGltfWidget;
+
 	QStandardItemModel								m_FontListModel;
 
-	AudioAssetsWidget *								m_pAudioMan;
+	AudioAssetsWidget *								m_pAudioWidget;
 
 	ProjectTabBar *									m_pTabBar;
 	ProjectItem *									m_pCurOpenItem;
@@ -93,6 +98,9 @@ public:
 	ExplorerModel &GetExplorerModel();
 	AtlasModel &GetAtlasModel();
 	AtlasWidget *GetAtlasWidget();
+
+	GltfModel *GetGltfModel();
+	GltfWidget *GetGltfWidget();
 
 	void SetAudioModel(QJsonObject audioObj);
 	AudioAssetsWidget *GetAudioWidget();

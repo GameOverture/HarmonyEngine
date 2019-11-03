@@ -12,6 +12,7 @@
 #include "ProjectItem.h"
 #include "Project.h"
 #include "IModel.h"
+#include "AtlasFrame.h"
 
 ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItem *> &itemListRef)
 {

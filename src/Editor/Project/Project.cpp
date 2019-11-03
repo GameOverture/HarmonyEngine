@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "Project.h"
 #include "AtlasWidget.h"
+#include "GltfWidget.h"
 #include "AudioAssetsWidget.h"
 #include "MainWindow.h"
 #include "ProjectItemMimeData.h"
@@ -78,7 +79,9 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	m_DlgProjectSettings(sProjectFilePath),
 	m_pAtlasModel(nullptr),
 	m_pAtlasWidget(nullptr),
-	m_pAudioMan(nullptr),
+	m_pGltfModel(nullptr),
+	m_pGltfWidget(nullptr),
+	m_pAudioWidget(nullptr),
 	m_pTabBar(nullptr),
 	m_pCurOpenItem(nullptr),
 	m_bHasError(false)
@@ -101,6 +104,7 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	m_pAtlasModel = new AtlasModel(this);
+	m_pGltfModel = new GltfModel(this);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -131,6 +135,7 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 /*virtual*/ Project::~Project()
 {
 	delete m_pAtlasWidget;
+	delete m_pGltfWidget;
 
 	Harmony::OnProjectDestructor(this); // Order matters because this calls Project::HarmonyShutdown()
 	delete m_pDraw;
@@ -333,6 +338,16 @@ AtlasWidget *Project::GetAtlasWidget()
 	return m_pAtlasWidget;
 }
 
+GltfModel *Project::GetGltfModel()
+{
+	return m_pGltfModel;
+}
+
+GltfWidget *Project::GetGltfWidget()
+{
+	return m_pGltfWidget;
+}
+
 void Project::SetAudioModel(QJsonObject audioObj)
 {
 	QString sItemTypeName = HyGlobal::ItemName(ITEM_Audio, true);
@@ -350,7 +365,7 @@ void Project::SetAudioModel(QJsonObject audioObj)
 
 AudioAssetsWidget *Project::GetAudioWidget()
 {
-	return m_pAudioMan;
+	return m_pAudioWidget;
 }
 
 QStandardItemModel *Project::GetFontListModel()
@@ -727,9 +742,11 @@ bool Project::HarmonyInitialize()
 		m_pAtlasWidget->StashTreeWidgets();
 
 	delete m_pAtlasWidget;
-	delete m_pAudioMan;
+	delete m_pGltfWidget;
+	delete m_pAudioWidget;
 	m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, nullptr);
-	m_pAudioMan = new AudioAssetsWidget(this, nullptr);
+	m_pGltfWidget = new GltfWidget(m_pGltfModel, nullptr);
+	m_pAudioWidget = new AudioAssetsWidget(this, nullptr);
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{

@@ -67,6 +67,9 @@
     <Filter Include="Text\SubWidgets">
       <UniqueIdentifier>{6f458767-1abc-4ace-bf9a-2f359a441dde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Gltf">
+      <UniqueIdentifier>{adccb82e-cfb8-4000-9796-543586966074}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Atlas\AtlasDraw.cpp">
@@ -274,6 +277,12 @@
     </ClCompile>
     <ClCompile Include="Entity\EntityNodeTreeModel.cpp">
       <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Gltf\GltfWidget.cpp">
+      <Filter>Gltf</Filter>
+    </ClCompile>
+    <ClCompile Include="Gltf\GltfModel.cpp">
+      <Filter>Gltf</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -551,6 +560,9 @@
     </QtUic>
     <QtUic Include="Text\TextWidget.ui">
       <Filter>Text</Filter>
+    </QtUic>
+    <QtUic Include="Gltf\GltfWidget.ui">
+      <Filter>Gltf</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -1203,6 +1215,12 @@
     </QtMoc>
     <QtMoc Include="Entity\EntityNodeTreeModel.h">
       <Filter>Entity</Filter>
+    </QtMoc>
+    <QtMoc Include="Gltf\GltfWidget.h">
+      <Filter>Gltf</Filter>
+    </QtMoc>
+    <QtMoc Include="Gltf\GltfModel.h">
+      <Filter>Gltf</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

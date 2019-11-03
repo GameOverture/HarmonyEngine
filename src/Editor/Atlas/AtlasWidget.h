@@ -61,8 +61,8 @@ class AtlasWidget : public QWidget
 	QTreeWidgetItem *				m_pMouseHoverItem;
 
 public:
-	explicit AtlasWidget(QWidget *parent = 0);
-	explicit AtlasWidget(AtlasModel *pModel, QWidget *parent = 0);
+	explicit AtlasWidget(QWidget *pParent = nullptr);
+	explicit AtlasWidget(AtlasModel *pModel, QWidget *parent = nullptr);
 	~AtlasWidget();
 
 	quint32 GetSelectedAtlasGrpId();
