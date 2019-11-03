@@ -56,10 +56,11 @@ HyEngine::~HyEngine()
 	}
 
 #ifdef HY_PLATFORM_DESKTOP
-	glfwTerminate();
+	glfwTerminate(); // TODO: this is leaking 304 bytes of memory on my machine
 #endif
 
 	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler on Windows)
+	// _CrtSetBreakAlloc(18); // set memory-allocation breakpoints in code
 #if defined(HY_DEBUG) && defined(_MSC_VER) && defined(HY_PLATFORM_WINDOWS)
 	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -72,7 +73,7 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return m_Renderer;
 }
 
-void HyEngine::RunGame()
+int32 HyEngine::RunGame()
 {
 	m_Diagnostics.BootMessage();
 	m_Time.ResetDelta();
@@ -80,6 +81,8 @@ void HyEngine::RunGame()
 	HyLogTitle("Starting Update Loop");
 	while(Update())
 	{ }
+
+	return 0;
 }
 
 bool HyEngine::Update()
@@ -132,9 +135,9 @@ bool HyEngine::PollPlatformApi()
 	return HyEngine::sm_pInstance != nullptr;
 }
 
-/*friend*/ const HarmonyInit &Hy_Init()
+/*friend*/ const HarmonyInit &Hy_InitValues()
 {
-	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Init() was invoked before engine has been initialized.");
+	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_InitValues() was invoked before engine has been initialized.");
 	return HyEngine::sm_pInstance->m_Init;
 }
 
@@ -213,15 +216,20 @@ bool HyEngine::PollPlatformApi()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DataDir() was invoked before engine has been initialized.");
 
-	char szBuffer[FILENAME_MAX];
+	char *pBuffer;
 
+	// Get the current working directory:
 #if defined(HY_PLATFORM_WINDOWS)
-	_getcwd(szBuffer, FILENAME_MAX);
+	pBuffer = _getcwd(nullptr, 0);
+	HyAssert(pBuffer, "_getcwd error");
 #elif defined(HY_PLATFORM_LINUX)
-	getcwd(szBuffer, FILENAME_MAX);
+	pBuffer = getcwd(nullptr, 0);
+	HyAssert(pBuffer, "getcwd error");
 #endif
 
-	std::string sAbsDataDir(szBuffer);
+	std::string sAbsDataDir(pBuffer);
+	free(pBuffer);
+
 	sAbsDataDir += "/";
 	sAbsDataDir += HyEngine::sm_pInstance->m_Assets.GetDataDir();
 	sAbsDataDir = HyStr::MakeStringProperPath(sAbsDataDir.c_str(), "/", false);

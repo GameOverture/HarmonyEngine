@@ -42,12 +42,11 @@ class HyEngine
 {
 	static HyEngine *			sm_pInstance;
 
-	// The order of these member declarations matter as some are used to initialize the others
+	// The order of these member declarations matter as some are used to initialize each other
 	const HarmonyInit			m_Init;
 
 	HyWindowManager				m_WindowManager;
 	HyConsoleInterop			m_Console;
-	
 	HyAudio						m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
@@ -55,7 +54,6 @@ class HyEngine
 	HyTime						m_Time;
 	HyDiagnostics				m_Diagnostics;
 	HyInput						m_Input;
-
 	HyRendererInterop			m_Renderer;
 
 public:
@@ -64,9 +62,10 @@ public:
 
 	HyRendererInterop &GetRenderer();
 
-	void RunGame();
+	int32 RunGame();
 
 protected:
+	// Derived game class overrides
 	virtual bool OnUpdate() { return true; }
 
 #ifdef HY_PLATFORM_GUI
@@ -78,7 +77,7 @@ private:
 	bool PollPlatformApi();
 
 	friend bool					Hy_IsInitialized();
-	friend const HarmonyInit &	Hy_Init(); // TODO: Rename this to 'Hy_InitValues' within LG Slotframework
+	friend const HarmonyInit &	Hy_InitValues();
 	friend float				Hy_UpdateStep();
 	friend double				Hy_UpdateStepDbl();
 	friend void					Hy_PauseGame(bool bPause);
