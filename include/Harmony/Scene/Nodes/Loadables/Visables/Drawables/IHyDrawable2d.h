@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Visables/IHyVisable2d.h"
 #include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable.h"
+#include "Scene/Physics/HyShape2d.h"
 #include "Renderer/Effects/HyShader.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 
