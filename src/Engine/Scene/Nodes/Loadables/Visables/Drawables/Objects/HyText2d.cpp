@@ -472,16 +472,15 @@ void HyText2d::SetAsVertical()
 /*virtual*/ void HyText2d::OnLoadedUpdate() /*override*/
 {
 #ifdef HY_DEBUG
-	glm::vec3 ptWorldPos = GetWorldTransform()[3];
-	m_DebugBox.pos.Set(ptWorldPos.x, ptWorldPos.y);
-	float fRot = rot.Get();
-	glm::vec2 vScale = scale.Get();
-	if(m_pParent)
-	{
-		fRot += m_pParent->rot.Get();
-		vScale *= m_pParent->scale.Get();
-	}
-	m_DebugBox.rot.Set(fRot);
+	glm::vec3 vScale(1.0f);
+	glm::quat quatRot;
+	glm::vec3 ptTranslation;
+	glm::vec3 vSkew;
+	glm::vec4 vPerspective;
+	glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+
+	m_DebugBox.pos.Set(ptTranslation);
+	m_DebugBox.rot.Set(rot.Get()); // TODO: This is wrong! Needs World transform's amount of rotation
 	m_DebugBox.scale.Set(vScale);
 	m_DebugBox.UseWindowCoordinates(GetCoordinateSystem());
 	m_DebugBox.SetDisplayOrder(GetDisplayOrder());
