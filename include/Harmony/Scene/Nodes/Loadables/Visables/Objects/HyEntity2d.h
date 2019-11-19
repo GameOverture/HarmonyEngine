@@ -37,6 +37,8 @@ protected:
 	MouseInputState					m_eMouseInputState;
 	void *							m_pMouseInputUserParam;
 
+	b2Body *						m_pPhysicsBody;
+
 public:
 	HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -81,8 +83,11 @@ public:
 	virtual IHyNode2d *ChildGet(uint32 uiIndex);
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
-	bool EnableMouseInput(void *pUserParam = nullptr);
+	void EnableMouseInput(void *pUserParam = nullptr);
 	void DisableMouseInput();
+
+	void EnablePhysics(b2BodyDef &bodyDefOut);
+	void DisablePhysics();
 
 	bool IsReverseDisplayOrder() const;
 	void ReverseDisplayOrder(bool bReverse);

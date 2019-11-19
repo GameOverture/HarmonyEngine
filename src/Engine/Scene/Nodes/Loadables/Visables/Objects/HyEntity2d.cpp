@@ -18,7 +18,8 @@ HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 	IHyVisable2d(HYTYPE_Entity, szPrefix, szName, pParent),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
-	m_pMouseInputUserParam(nullptr)
+	m_pMouseInputUserParam(nullptr),
+	m_pPhysicsBody(nullptr)
 {
 }
 
@@ -26,7 +27,8 @@ HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyVisable2d(HYTYPE_Entity, nullptr, nullptr, pParent),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
-	m_pMouseInputUserParam(nullptr)
+	m_pMouseInputUserParam(nullptr),
+	m_pPhysicsBody(nullptr)
 {
 }
 
@@ -34,6 +36,8 @@ HyEntity2d::~HyEntity2d(void)
 {
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
+
+	DisablePhysics();
 }
 
 /*virtual*/ void HyEntity2d::SetVisible(bool bEnabled) /*override*/
@@ -283,17 +287,38 @@ void HyEntity2d::ForEachChild(std::function<void(IHyNode2d *)> func)
 	}
 }
 
-bool HyEntity2d::EnableMouseInput(void *pUserParam /*= nullptr*/)
+void HyEntity2d::EnableMouseInput(void *pUserParam /*= nullptr*/)
 {
 	m_pMouseInputUserParam = pUserParam;
 	m_uiAttributes |= ATTRIBFLAG_MouseInput;
-
-	return true;
 }
 
 void HyEntity2d::DisableMouseInput()
 {
 	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
+}
+
+void HyEntity2d::EnablePhysics(b2BodyDef &bodyDefOut)
+{
+	b2World &worldRef = Hy_Physics2d();
+
+	if(m_pPhysicsBody)
+		worldRef.DestroyBody(m_pPhysicsBody);
+
+	bodyDefOut.userData = this;
+	bodyDefOut.position.Set(pos.X(), pos.Y());
+	bodyDefOut.angle = rot.Get();
+
+	m_pPhysicsBody = worldRef.CreateBody(&bodyDefOut);
+}
+
+void HyEntity2d::DisablePhysics()
+{
+	if(m_pPhysicsBody)
+	{
+		Hy_Physics2d().DestroyBody(m_pPhysicsBody);
+		m_pPhysicsBody = nullptr;
+	}
 }
 
 bool HyEntity2d::IsReverseDisplayOrder() const
@@ -337,19 +362,19 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 /*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
 {
-	m_aabbCached.lowerBound = m_aabbCached.upperBound = b2Vec2(0.0f, 0.0f);
+	m_AABB.lowerBound = m_AABB.upperBound = b2Vec2(0.0f, 0.0f);
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(m_ChildList[i]->GetWorldAABB().IsValid() == false)
 			continue;
 
 		if(i == 0)
-			m_aabbCached = m_ChildList[i]->GetWorldAABB();
+			m_AABB = m_ChildList[i]->GetWorldAABB();
 		else
-			m_aabbCached.Combine(m_ChildList[i]->GetWorldAABB());
+			m_AABB.Combine(m_ChildList[i]->GetWorldAABB());
 	}
 
-	return m_aabbCached;
+	return m_AABB;
 }
 
 /*virtual*/ void HyEntity2d::Load() /*override*/
@@ -442,6 +467,12 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 			}
 			break;
 		}
+	}
+
+	if(m_pPhysicsBody != nullptr && m_pPhysicsBody->IsActive())
+	{
+		pos.Set(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
+		rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()));
 	}
 
 	OnUpdate();

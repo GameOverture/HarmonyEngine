@@ -13,13 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode.h"
 #include "Scene/AnimFloats/HyAnimVec2.h"
-#include "Scene/Physics/HyShape2d.h"
-#include "Utilities/HyMath.h"
-
-#include <functional>
-
-class HyEntity2d;
-class HyStencil;
 
 class IHyNode2d : public IHyNode
 {
@@ -31,8 +24,7 @@ protected:
 	glm::mat4						m_mtxCached;
 	float							m_fRotation;		// Reference value used in 'rot' HyAnimFloat
 
-	b2Body *						m_pPhysicsBody;
-	b2AABB							m_aabbCached;
+	b2AABB							m_AABB;
 
 public:
 	HyAnimVec2						pos;
@@ -54,15 +46,9 @@ public:
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	const glm::mat4 &GetWorldTransform();
 
-	void PhysicsInit(b2BodyDef &bodyDefOut);
-	b2Body *PhysicsBody();
-	void PhysicsBodyDef(b2BodyDef &defRefOut) const;
-
 	virtual const b2AABB &GetWorldAABB();
 
-protected:
-	virtual void Update() override;
-
+private:
 	friend void _CtorSetupNewChild(HyEntity2d &parentRef, IHyNode2d &childRef);
 };
 
