@@ -15,64 +15,28 @@
 #include "AtlasFrame.h"
 #include "_Dependencies/scriptum/imagepacker.h"
 
-struct AtlasGrp
-{
-	QDir                                        m_DataDir;
-
-	QJsonObject                                 m_PackerSettings;
-	ImagePacker                                 m_Packer;
-	QList<AtlasFrame *>                         m_FrameList;
-
-	AtlasGrp(QString sAbsDataDirPath) : m_DataDir(sAbsDataDirPath)
-	{ }
-
-	quint32 GetId()
-	{
-		return JSONOBJ_TOINT(m_PackerSettings, "atlasGrpId");
-	}
-
-	QFileInfoList GetExistingTextureInfoList()
-	{
-		return m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-	}
-
-	void SetPackerSettings()
-	{
-		m_Packer.sortOrder = m_PackerSettings["cmbSortOrder"].toInt();// m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
-		m_Packer.border.t = m_PackerSettings["sbFrameMarginTop"].toInt();// m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
-		m_Packer.border.l = m_PackerSettings["sbFrameMarginLeft"].toInt();// m_iFrameMarginLeft;//ui->sbFrameMarginLeft->value();
-		m_Packer.border.r = m_PackerSettings["sbFrameMarginRight"].toInt();// m_iFrameMarginRight;//ui->sbFrameMarginRight->value();
-		m_Packer.border.b = m_PackerSettings["sbFrameMarginBottom"].toInt();// m_iFrameMarginBottom;//ui->sbFrameMarginBottom->value();
-		m_Packer.extrude = m_PackerSettings["extrude"].toInt();// m_iExtrude;//ui->extrude->value();
-		m_Packer.merge = m_PackerSettings["chkMerge"].toBool();// m_bMerge;//ui->chkMerge->isChecked();
-		m_Packer.square = m_PackerSettings["chkSquare"].toBool();// m_bSquare;//ui->chkSquare->isChecked();
-		m_Packer.autosize = m_PackerSettings["chkAutosize"].toBool();// m_bAutoSize;//ui->chkAutosize->isChecked();
-		m_Packer.minFillRate = m_PackerSettings["minFillRate"].toInt();// m_iFillRate;//ui->minFillRate->value();
-		m_Packer.mergeBF = false;
-		m_Packer.rotate = ImagePacker::NEVER;
-	}
-};
+struct AtlasGrp;
 
 class AtlasModel : public QAbstractListModel
 {
 	Q_OBJECT
 
-	Project *                                       m_pProjOwner;
+	Project *										m_pProjOwner;
 
-	quint32                                         m_uiNextFrameId;
-	quint32                                         m_uiNextAtlasId;
+	quint32											m_uiNextFrameId;
+	quint32											m_uiNextAtlasId;
 
-	QDir                                            m_MetaDir;
-	QDir                                            m_RootDataDir;
+	QDir											m_MetaDir;
+	QDir											m_RootDataDir;
 
-	QList<AtlasGrp *>                               m_AtlasGrpList;
+	QList<AtlasGrp *>								m_AtlasGrpList;
 
-	QList<AtlasTreeItem *>                          m_TopLevelTreeItemList;
+	QList<AtlasTreeItem *>							m_TopLevelTreeItemList;
 	
 	class FrameLookup
 	{
-		QMap<quint32, AtlasFrame *>                 m_FrameIdMap;
-		QMap<quint32, QList<AtlasFrame *> >         m_FrameChecksumMap;
+		QMap<quint32, AtlasFrame *>					m_FrameIdMap;
+		QMap<quint32, QList<AtlasFrame *> >			m_FrameChecksumMap;
 		
 	public:
 		void AddLookup(AtlasFrame *pFrame);
@@ -81,7 +45,7 @@ class AtlasModel : public QAbstractListModel
 		QList<AtlasFrame *> FindByChecksum(quint32 uiChecksum);
 		bool DoesImageExist(quint32 uiChecksum);
 	};
-	FrameLookup                                     m_FrameLookup;
+	FrameLookup										m_FrameLookup;
 
 public:
 	AtlasModel(Project *pProjOwner);
@@ -151,6 +115,44 @@ protected:
 private Q_SLOTS:
 	void OnLoadUpdate(QString sMsg, int iPercComplete);
 	void OnRepackFinished();
+};
+
+struct AtlasGrp
+{
+	QDir										m_DataDir;
+
+	QJsonObject									m_PackerSettings;
+	ImagePacker									m_Packer;
+	QList<AtlasFrame *>							m_FrameList;
+
+	AtlasGrp(QString sAbsDataDirPath) : m_DataDir(sAbsDataDirPath)
+	{ }
+
+	quint32 GetId()
+	{
+		return JSONOBJ_TOINT(m_PackerSettings, "atlasGrpId");
+	}
+
+	QFileInfoList GetExistingTextureInfoList()
+	{
+		return m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+	}
+
+	void SetPackerSettings()
+	{
+		m_Packer.sortOrder = m_PackerSettings["cmbSortOrder"].toInt();// m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
+		m_Packer.border.t = m_PackerSettings["sbFrameMarginTop"].toInt();// m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
+		m_Packer.border.l = m_PackerSettings["sbFrameMarginLeft"].toInt();// m_iFrameMarginLeft;//ui->sbFrameMarginLeft->value();
+		m_Packer.border.r = m_PackerSettings["sbFrameMarginRight"].toInt();// m_iFrameMarginRight;//ui->sbFrameMarginRight->value();
+		m_Packer.border.b = m_PackerSettings["sbFrameMarginBottom"].toInt();// m_iFrameMarginBottom;//ui->sbFrameMarginBottom->value();
+		m_Packer.extrude = m_PackerSettings["extrude"].toInt();// m_iExtrude;//ui->extrude->value();
+		m_Packer.merge = m_PackerSettings["chkMerge"].toBool();// m_bMerge;//ui->chkMerge->isChecked();
+		m_Packer.square = m_PackerSettings["chkSquare"].toBool();// m_bSquare;//ui->chkSquare->isChecked();
+		m_Packer.autosize = m_PackerSettings["chkAutosize"].toBool();// m_bAutoSize;//ui->chkAutosize->isChecked();
+		m_Packer.minFillRate = m_PackerSettings["minFillRate"].toInt();// m_iFillRate;//ui->minFillRate->value();
+		m_Packer.mergeBF = false;
+		m_Packer.rotate = ImagePacker::NEVER;
+	}
 };
 
 #endif // ATLASMODEL_H

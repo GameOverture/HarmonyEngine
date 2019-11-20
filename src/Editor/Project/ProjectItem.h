@@ -16,6 +16,7 @@
 
 #include <QUndoStack>
 #include <QJsonObject>
+#include <QUuid>
 
 class AtlasWidget;
 class AudioAssetsWidget;
@@ -28,6 +29,8 @@ class ProjectItem : public ExplorerItem
 	Q_OBJECT
 
 	friend class Project;
+
+	QUuid					m_GUID;
 
 	QJsonValue				m_SaveValue;
 	bool					m_bExistencePendingSave;

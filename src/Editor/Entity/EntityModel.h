@@ -46,6 +46,19 @@ class EntityModel : public IModel
 	EntityNodeTreeModel			m_TreeModel;
 	QList<ProjectItem *>		m_PrimitiveList;
 
+	class DependencyLookup
+	{
+		QMap<QString, ProjectItem *>		m_ItemMap;
+
+	public:
+		void AddDependency(ProjectItem *pItem);
+		bool RemoveDependency(ProjectItem *pItem);  // Returns true if no remaining duplicates exist
+		ProjectItem *FindById(quint32 uiId);
+		QList<AtlasFrame *> FindByChecksum(quint32 uiChecksum);
+		bool DoesImageExist(quint32 uiChecksum);
+	};
+	DependencyLookup								m_Dependencies;
+
 public:
 	EntityModel(ProjectItem &itemRef, QJsonArray stateArray);
 	virtual ~EntityModel();
