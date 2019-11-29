@@ -53,9 +53,7 @@ class EntityModel : public IModel
 	public:
 		void AddDependency(ProjectItem *pItem);
 		bool RemoveDependency(ProjectItem *pItem);  // Returns true if no remaining duplicates exist
-		ProjectItem *FindById(quint32 uiId);
-		QList<AtlasFrame *> FindByChecksum(quint32 uiChecksum);
-		bool DoesImageExist(quint32 uiChecksum);
+		ProjectItem *FindByGuid(QUuid guid);
 	};
 	DependencyLookup								m_Dependencies;
 

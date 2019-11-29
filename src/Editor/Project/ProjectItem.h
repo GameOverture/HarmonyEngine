@@ -30,8 +30,6 @@ class ProjectItem : public ExplorerItem
 
 	friend class Project;
 
-	QUuid					m_GUID;
-
 	QJsonValue				m_SaveValue;
 	bool					m_bExistencePendingSave;
 
