@@ -49,10 +49,10 @@ public:
 
 	void LoadModel();
 
-	IModel *GetModel()                              { return m_pModel; }
-	IWidget *GetWidget()                            { return m_pWidget; }
-	IDraw *GetDraw()                                { return m_pDraw; }
-	QUndoStack *GetUndoStack()                      { return m_pUndoStack; }
+	IModel *GetModel();
+	IWidget *GetWidget();
+	IDraw *GetDraw();
+	QUndoStack *GetUndoStack();
 	
 	void GiveMenuActions(QMenu *pMenu);
 	void Save();

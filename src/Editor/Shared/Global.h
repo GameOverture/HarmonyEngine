@@ -133,7 +133,8 @@ enum Theme
 
 #define HYGUIPATH_TempDir						"temp/"
 #define HYGUIPATH_TemplateDir					"src/Editor/_Templates/"
-#define HYGUIPATH_MetaSettings					"atlas.hygui"
+#define HYMETA_AtlasFile						"atlas.hygui"
+#define HYMETA_DataFile							"data.hygui"
 #define HYMETA_FontsDir							"Fonts/"
 
 #define HYMETA_FontFilterList					{"*.ttf", "*.otf"}

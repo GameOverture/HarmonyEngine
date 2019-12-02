@@ -94,11 +94,11 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 		m_RootDataDir.mkpath(m_RootDataDir.absolutePath());
 	}
 
-	QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HYMETA_AtlasFile));
 	if(settingsFile.exists())
 	{
 		if(!settingsFile.open(QIODevice::ReadOnly))
-			HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaSettings, LOGTYPE_Error);
+			HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYMETA_AtlasFile, LOGTYPE_Error);
 
 #ifdef HYGUI_UseBinaryMetaFiles
 		QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
@@ -333,11 +333,11 @@ void AtlasModel::WriteMetaSettings()
 	}
 	else
 	{
-		QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+		QFile settingsFile(m_MetaDir.absoluteFilePath(HYMETA_AtlasFile));
 		if(settingsFile.exists())
 		{
 			if(!settingsFile.open(QIODevice::ReadOnly))
-				HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYGUIPATH_MetaSettings, LOGTYPE_Error);
+				HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYMETA_AtlasFile, LOGTYPE_Error);
 
 #ifdef HYGUI_UseBinaryMetaFiles
 			QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
@@ -361,7 +361,7 @@ void AtlasModel::WriteMetaSettings()
 	settingsObj.insert("filters", filtersArray);
 	settingsObj.insert("expanded", expandedArray);
 
-	QFile settingsFile(m_MetaDir.absoluteFilePath(HYGUIPATH_MetaSettings));
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HYMETA_AtlasFile));
 	if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 	   HyGuiLog("Couldn't open atlas settings file for writing", LOGTYPE_Error);

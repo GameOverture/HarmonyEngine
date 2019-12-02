@@ -98,6 +98,26 @@ void ProjectItem::LoadModel()
 	}
 }
 
+IModel *ProjectItem::GetModel()
+{
+	return m_pModel;
+}
+
+IWidget *ProjectItem::GetWidget()
+{
+	return m_pWidget;
+}
+
+IDraw *ProjectItem::GetDraw()
+{
+	return m_pDraw;
+}
+
+QUndoStack *ProjectItem::GetUndoStack()
+{
+	return m_pUndoStack;
+}
+
 void ProjectItem::GiveMenuActions(QMenu *pMenu)
 {
 	pMenu->addAction(m_pActionUndo);

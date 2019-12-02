@@ -238,6 +238,8 @@ void Project::LoadExplorerModel()
 	SaveGameData();
 #endif
 
+
+
 	if(bSystemFontFound == false)
 	{
 		QDir templateDataDir(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/");
@@ -614,7 +616,7 @@ void Project::WriteGameData()
 {
 	QFile dataFile(GetAssetsAbsPath() % HYASSETS_DataFile);
 	if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
-	   HyGuiLog(QString("Couldn't open ") % HYASSETS_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
+		HyGuiLog(QString("Couldn't open ") % HYASSETS_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
 	}
 	else
 	{
@@ -627,6 +629,29 @@ void Project::WriteGameData()
 		}
 
 		dataFile.close();
+	}
+}
+
+void Project::WriteMetaData()
+{
+	QFile metaFile(GetMetaDataAbsPath() % HYMETA_DataFile);
+	if(!metaFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+		HyGuiLog(QString("Couldn't open ") % HYMETA_DataFile % " for writing: " % metaFile.errorString(), LOGTYPE_Error);
+	else
+	{
+		QJsonDocument metaDoc;
+		metaDoc.setObject(m_MetaDataObj);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+		qint64 iBytesWritten = metaFile.write(metaDoc.toBinaryData());
+#else
+		qint64 iBytesWritten = metaFile.write(metaDoc.toJson());
+#endif
+		if(0 == iBytesWritten || -1 == iBytesWritten) {
+			HyGuiLog("Could not write to meta data file: " % metaFile.errorString(), LOGTYPE_Error);
+		}
+
+		metaFile.close();
 	}
 }
 

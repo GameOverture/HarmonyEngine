@@ -33,7 +33,7 @@ class AtlasTreeItem;
 
 class ProjectTabBar : public QTabBar
 {
-	Project *           m_pProjectOwner;
+	Project *										m_pProjectOwner;
 
 public:
 	ProjectTabBar(Project *pProjectOwner);
@@ -67,6 +67,7 @@ class Project : public ExplorerItem
 	ProjectItem *									m_pCurOpenItem;
 
 	QJsonObject										m_SaveDataObj;
+	QJsonObject										m_MetaDataObj;
 
 	bool											m_bHasError;
 	
@@ -124,6 +125,7 @@ public:
 	void RefreshNamesOnTabs();
 
 	void WriteGameData();
+	void WriteMetaData();
 
 	QJsonObject GetSavedItemsObj(HyGuiItemType eType);
 
