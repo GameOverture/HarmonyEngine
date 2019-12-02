@@ -116,9 +116,10 @@ public:
 	void SetRenderSize(int iWidth, int iHeight);
 
 	void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal);
-	
 	void DeleteGameData(HyGuiItemType eType, QString sPath);
 	void DeletePrefixAndContents(QString sPrefix);
+
+	bool RegisterMetaData(ProjectItem *pProjectItem);
 
 	QString RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath);
 	QString RenamePrefix(QString sOldPath, QString sNewPath);
