@@ -154,7 +154,7 @@ void Project::LoadExplorerModel()
 	{
 		if(!dataFile.open(QIODevice::ReadOnly))
 		{
-			HyGuiLog("ItemProject::ItemProject() could not open " % m_sName % "'s " % HYASSETS_DataFile % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
+			HyGuiLog("Project::LoadExplorerModel() could not open " % m_sName % "'s " % HYASSETS_DataFile % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
 			m_bHasError = true;
 			return;
 		}
@@ -164,7 +164,6 @@ void Project::LoadExplorerModel()
 
 		m_SaveDataObj = userDoc.object();
 	}
-
 	// Ensure save object has all the valid types in map
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 	for(int i = 0; i < typeList.size(); ++i)
@@ -181,7 +180,26 @@ void Project::LoadExplorerModel()
 		WriteGameData();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Load meta data
+	QFile metaFile(GetMetaDataAbsPath() % HYMETA_DataFile);
+	if(metaFile.exists())
+	{
+		if(!metaFile.open(QIODevice::ReadOnly))
+		{
+			HyGuiLog("Project::LoadExplorerModel() could not open " % m_sName % "'s " % HYMETA_DataFile % " meta file for project: " % metaFile.errorString(), LOGTYPE_Error);
+			m_bHasError = true;
+			return;
+		}
+
+		QJsonDocument metaDoc = QJsonDocument::fromJson(metaFile.readAll());
+		metaFile.close();
+
+		m_MetaDataObj = metaDoc.object();
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	bool bSystemFontFound = false;
+	bool bItemsRegisteredInMeta = false;
 
 	// Initialize the project by processing each type
 	for(auto typeIterator = m_SaveDataObj.begin(); typeIterator != m_SaveDataObj.end(); ++typeIterator)
@@ -206,10 +224,10 @@ void Project::LoadExplorerModel()
 		QJsonObject subDirObj = typeIterator.value().toObject();
 
 		///////////////////////////////////////
-		/// ITEMS IN SUBDIR
-		for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
+		// ITEMS WITHIN TYPE
+		for(auto objsInTypeIter = subDirObj.begin(); objsInTypeIter != subDirObj.end(); ++objsInTypeIter)
 		{
-			QString sItemPath = objsInSubDirIter.key();
+			QString sItemPath = objsInTypeIter.key();
 
 			QString sPrefix, sName;
 			int iSplitIndex = sItemPath.lastIndexOf('/');
@@ -227,18 +245,26 @@ void Project::LoadExplorerModel()
 			if(sPrefix == "+HyInternal" && sName == "+SystemText")
 				bSystemFontFound = true;
 
-			m_ModelRef.AddItem(this, eType, sPrefix, sName, objsInSubDirIter.value(), false);
+			ExplorerItem *pNewDataItem = m_ModelRef.AddItem(this, eType, sPrefix, sName, objsInTypeIter.value(), false);
+
+			// Ensure meta file contains an entry for every project item
+			if(pNewDataItem->IsProjectItem())
+			{
+				if(RegisterMetaData(static_cast<ProjectItem *>(pNewDataItem)))
+				{
+					HyGuiLog("Registered new item into meta database: " % pNewDataItem->GetName(true), LOGTYPE_Info);
+					bItemsRegisteredInMeta = true;
+				}
+			}
+
 #ifdef RESAVE_ENTIRE_PROJECT
 			pNewDataItem->Save();
 #endif
 		}
 	}
 
-#ifdef RESAVE_ENTIRE_PROJECT
-	SaveGameData();
-#endif
-
-
+	if(metaFile.exists() == false || bItemsRegisteredInMeta)
+		WriteMetaData();
 
 	if(bSystemFontFound == false)
 	{
@@ -261,6 +287,10 @@ void Project::LoadExplorerModel()
 			m_ModelRef.PasteItemSrc(sContents, m_ModelRef.FindIndex<ExplorerItem *>(this, 0));
 		}
 	}
+
+#ifdef RESAVE_ENTIRE_PROJECT
+	SaveGameData();
+#endif
 }
 
 bool Project::HasError() const
@@ -502,6 +532,18 @@ void Project::DeletePrefixAndContents(QString sPrefix)
 	}
 }
 
+bool Project::RegisterMetaData(ProjectItem *pProjectItem)
+{
+	QString sMetaNameFull = HyGlobal::ItemName(pProjectItem->GetType(), true) % "/" % pProjectItem->GetName(true);
+	if(m_MetaDataObj.find(sMetaNameFull) == m_MetaDataObj.end())
+	{
+		m_MetaDataObj.insert(sMetaNameFull, QUuid::createUuid().toString());
+		return true;
+	}
+
+	return false;
+}
+
 QString Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath)
 {
 	if(eType == ITEM_Prefix)
@@ -635,7 +677,7 @@ void Project::WriteGameData()
 void Project::WriteMetaData()
 {
 	QFile metaFile(GetMetaDataAbsPath() % HYMETA_DataFile);
-	if(!metaFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+	if(metaFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 		HyGuiLog(QString("Couldn't open ") % HYMETA_DataFile % " for writing: " % metaFile.errorString(), LOGTYPE_Error);
 	else
 	{
