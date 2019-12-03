@@ -537,7 +537,11 @@ bool Project::RegisterMetaData(ProjectItem *pProjectItem)
 	QString sMetaNameFull = HyGlobal::ItemName(pProjectItem->GetType(), true) % "/" % pProjectItem->GetName(true);
 	if(m_MetaDataObj.find(sMetaNameFull) == m_MetaDataObj.end())
 	{
-		m_MetaDataObj.insert(sMetaNameFull, QUuid::createUuid().toString());
+		QJsonObject metaItemObj;
+		metaItemObj.insert("UUID", QUuid::createUuid().toString());
+		metaItemObj.insert("CameraPos", QJsonArray { 0, 0 });
+		metaItemObj.insert("CameraZoom", 1.0);
+		m_MetaDataObj.insert(sMetaNameFull, metaItemObj);
 		return true;
 	}
 
