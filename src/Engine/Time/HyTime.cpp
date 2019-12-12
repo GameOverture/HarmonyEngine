@@ -147,7 +147,7 @@ std::string HyTime::GetDateTime()
 		HyLogError("Invalid argument to _localtime64_s.");
 	}
 
-	if(newtime.tm_hour > 12)	// Set up extension.
+	if(newtime.tm_hour >= 12)	// Set up extension.
 		strcpy_s(am_pm, sizeof(am_pm), "PM");
 	if(newtime.tm_hour > 12)	// Convert from 24-hour
 		newtime.tm_hour -= 12;	// to 12-hour clock.
