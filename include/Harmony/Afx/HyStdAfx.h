@@ -210,6 +210,16 @@ enum HyWindowType
 	HYWINDOW_BorderlessWindow
 };
 
+
+enum HyThreadPriority
+{
+	HYTHREAD_Lowest = -2,
+	HYTHREAD_BelowNormal = -1,
+	HYTHREAD_Normal = 0,
+	HYTHREAD_AboveNormal,
+	HYTHREAD_Highest
+};
+
 enum HyDiagFlag
 {
 	HYDIAG_NONE				= 0,
