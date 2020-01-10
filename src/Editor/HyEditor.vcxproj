@@ -226,7 +226,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Entity3d\Entity3d.cpp" />
     <ClCompile Include="Entity\EntityDraw.cpp" />
     <ClCompile Include="Entity\EntityModel.cpp" />
-    <ClCompile Include="Entity\EntityNodeTreeModel.cpp" />
     <ClCompile Include="Entity\EntityUndoCmds.cpp" />
     <ClCompile Include="Entity\EntityWidget.cpp" />
     <ClCompile Include="Explorer\ExplorerItem.cpp" />
@@ -359,10 +358,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClInclude Include="Audio\AudioModel.h" />
     <ClInclude Include="Entity\EntityDraw.h" />
     <QtMoc Include="Entity\EntityModel.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
-    <QtMoc Include="Entity\EntityNodeTreeModel.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
