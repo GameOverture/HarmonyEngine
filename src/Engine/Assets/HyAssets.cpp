@@ -79,7 +79,7 @@ const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 HyAssets::HyAssets(HyAudio &audioRef, HyScene &sceneRef, std::string sDataDirPath) :
-	IHyThreadClass(),
+	IHyThreadClass(HYTHREAD_Lowest),
 	m_AudioRef(audioRef),
 	m_SceneRef(sceneRef),
 	m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),

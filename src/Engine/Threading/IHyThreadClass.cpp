@@ -13,7 +13,8 @@
 
 #include <chrono>
 
-IHyThreadClass::IHyThreadClass(uint32 uiUpdateThrottleMs /*= 0*/) :
+IHyThreadClass::IHyThreadClass(HyThreadPriority ePriority /*= HYTHREAD_Normal*/, uint32 uiUpdateThrottleMs /*= 0*/) :
+	m_ePriority(ePriority),
 	m_eThreadState(THREADSTATE_Inactive),
 	m_uiTHROTTLE_MS(uiUpdateThrottleMs),
 	m_bWaitEnabled(false),
@@ -39,12 +40,28 @@ bool IHyThreadClass::ThreadStart()
 	ThreadJoin();
 	m_Thread = std::thread(&IHyThreadClass::ThreadFunc, this);
 
-//	void *hNativeThread = m_Thread.native_handle();
-//#ifdef HY_PLATFORM_WINDOWS
-//	THREAD_PRIORITY_BELOW_NORMAL
-//	SetThreadPriority(hNativeThread, 
-//#else
-//#endif
+	if(m_ePriority != HYTHREAD_Normal)
+	{
+#ifdef HY_PLATFORM_WINDOWS
+		int iPriority = THREAD_PRIORITY_NORMAL;
+		switch(m_ePriority)
+		{
+		case HYTHREAD_Lowest:		iPriority = THREAD_PRIORITY_LOWEST;			break;
+		case HYTHREAD_BelowNormal:	iPriority = THREAD_PRIORITY_BELOW_NORMAL;	break;
+		case HYTHREAD_AboveNormal:	iPriority = THREAD_PRIORITY_ABOVE_NORMAL;	break;
+		case HYTHREAD_Highest:		iPriority = THREAD_PRIORITY_HIGHEST;		break;
+		}
+		if(false == SetThreadPriority(m_Thread.native_handle(), iPriority))
+			HyLogWarning("Failed to set Thread scheduling : " << GetLastError());
+#else
+		sch_params.sched_priority = priority;
+		if(pthread_setschedparam(th.native_handle(), policy, &sch_params))
+		{
+			HyLogWarning("Failed to set Thread scheduling : " << std::strerror(errno));
+			return false;
+		}
+#endif
+	}
 
 	return true;
 }

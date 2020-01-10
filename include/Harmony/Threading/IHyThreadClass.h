@@ -18,6 +18,7 @@ protected:
 	std::thread					m_Thread;
 
 private:
+	HyThreadPriority			m_ePriority;
 	enum ThreadState
 	{
 		THREADSTATE_Inactive = 0,
@@ -35,7 +36,7 @@ private:
 	std::condition_variable		stateEvent;
 
 public:
-	IHyThreadClass(uint32 uiUpdateThrottleMs = 0);	// In milliseconds
+	IHyThreadClass(HyThreadPriority ePriority = HYTHREAD_Normal, uint32 uiUpdateThrottleMs = 0);
 	virtual ~IHyThreadClass();
 
 	bool ThreadStart();
