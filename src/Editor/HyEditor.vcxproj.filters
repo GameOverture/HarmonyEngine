@@ -275,9 +275,6 @@
     <ClCompile Include="Text\TextUndoCmds.cpp">
       <Filter>Text</Filter>
     </ClCompile>
-    <ClCompile Include="Entity\EntityNodeTreeModel.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
     <ClCompile Include="Gltf\GltfWidget.cpp">
       <Filter>Gltf</Filter>
     </ClCompile>
@@ -1212,9 +1209,6 @@
     </QtMoc>
     <QtMoc Include="Text\SubWidgets\TextLayersWidget.h">
       <Filter>Text\SubWidgets</Filter>
-    </QtMoc>
-    <QtMoc Include="Entity\EntityNodeTreeModel.h">
-      <Filter>Entity</Filter>
     </QtMoc>
     <QtMoc Include="Gltf\GltfWidget.h">
       <Filter>Gltf</Filter>

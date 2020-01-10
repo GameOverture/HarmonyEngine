@@ -12,16 +12,42 @@
 
 #include "IModel.h"
 #include "ProjectItem.h"
-#include "EntityNodeTreeModel.h"
 #include "GlobalWidgetMappers.h"
 #include "ProjectItemMimeData.h"
+#include "PropertiesTreeModel.h"
+#include "Shared/TreeModel/ITreeModel.h"
 
 #include <QObject>
 #include <QJsonArray>
 
+class EntityModel;
+
+class EntityNodeTreeModel : public ITreeModel
+{
+	Q_OBJECT
+
+	EntityModel *									m_pEntityModel;
+
+	TreeModelItem *									m_pSelfNode;
+
+public:
+	explicit EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
+	virtual ~EntityNodeTreeModel();
+
+	bool IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const;
+
+	bool AddChildItem(ExplorerItem *pItem);
+	bool RemoveChild(ExplorerItem *pItem);
+
+	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
+	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
+};
+
 class EntityStateData : public IStateData
 {
-	QMap<ExplorerItem *, PropertiesTreeModel *>    m_PropertiesMap;
+	QMap<ExplorerItem *, PropertiesTreeModel *>		m_PropertiesMap;
 
 public:
 	EntityStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);

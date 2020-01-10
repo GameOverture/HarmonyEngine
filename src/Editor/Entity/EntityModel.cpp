@@ -14,6 +14,119 @@
 
 #include <QVariant>
 
+EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent) :
+	ITreeModel(1, QStringList(), parent),
+	m_pEntityModel(pEntityModel)
+{
+	if(insertRow(0) == false)
+	{
+		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - insertRow failed", LOGTYPE_Error);
+	}
+}
+
+/*virtual*/ EntityNodeTreeModel::~EntityNodeTreeModel()
+{
+}
+
+bool EntityNodeTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const
+{
+	if(pItem == nullptr)
+	{
+		if(bShowDialogsOnFail)
+			HyGuiLog("Entity tried to add a null item", LOGTYPE_Info);
+		return false;
+	}
+	if(&m_pEntityModel->GetItem() == pItem)
+	{
+		if(bShowDialogsOnFail)
+			HyGuiLog("Entity cannot add itself as a child", LOGTYPE_Info);
+		return false;
+	}
+	if(pItem->GetType() == ITEM_Entity)
+	{
+		// TODO: Ensure that this child entity doesn't contain this as child
+		if(bShowDialogsOnFail)
+			HyGuiLog(pItem->GetName(false) % " is invalid to be added. This Entity contains itself as a child", LOGTYPE_Info);
+
+		return false;
+	}
+}
+
+bool EntityNodeTreeModel::AddChildItem(ExplorerItem *pItem)
+{
+	if(IsItemValid(pItem, false) == false)
+		return false;
+
+	if(insertRow(m_pRootItem->childCount(), createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)) == false)
+	{
+		HyGuiLog("EntityNodeTreeModel::AddChildItem() - insertRow failed", LOGTYPE_Error);
+		return false;
+	}
+
+	QVariant v;
+	v.setValue<ExplorerItem *>(pItem);
+	if(setData(index(m_pRootItem->childCount() - 1, 0, createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)), v) == false)
+		HyGuiLog("EntityNodeTreeModel::AddChildItem() - setData failed", LOGTYPE_Error);
+}
+
+bool EntityNodeTreeModel::RemoveChild(ExplorerItem *pItem)
+{
+	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0));
+	TreeModelItem *pParentTreeItem = pTreeItem->parent();
+	return removeRow(pTreeItem->childNumber(), createIndex(pParentTreeItem->childNumber(), 0, pParentTreeItem));
+}
+
+QVariant EntityNodeTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const
+{
+	if(indexRef.row() == 0 && indexRef.parent().isValid() == false)
+	{
+	}
+
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
+		return QVariant();
+
+	if(iRole == Qt::UserRole)
+		return ITreeModel::data(indexRef, iRole);
+
+	ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+	switch(iRole)
+	{
+	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
+	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
+		return QVariant(pItem->GetName(false));
+
+	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
+		if(pItem->IsProjectItem())
+		{
+			ProjectItem *pProjItem = static_cast<ProjectItem *>(pItem);
+			if(pProjItem->IsExistencePendingSave())
+				return QVariant(pItem->GetIcon(SUBICON_New));
+			else if(pProjItem->IsSaveClean() == false)
+				return QVariant(pItem->GetIcon(SUBICON_Dirty));
+		}
+		return QVariant(pItem->GetIcon(SUBICON_None));
+
+	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
+		return QVariant(pItem->GetName(true));
+
+	case Qt::StatusTipRole:		// The data displayed in the status bar. (QString)
+		return QVariant(pItem->GetName(true));
+
+	default:
+		return QVariant();
+	}
+}
+
+/*virtual*/ Qt::ItemFlags EntityNodeTreeModel::flags(const QModelIndex &indexRef) const /*override*/
+{
+	return QAbstractItemModel::flags(indexRef);
+}
+
+/*virtual*/ void EntityNodeTreeModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*override*/
+{
+}
+
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
 	IStateData(iStateIndex, modelRef, stateObj["name"].toString())
 {
