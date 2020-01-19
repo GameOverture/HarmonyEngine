@@ -341,7 +341,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		int iDlgReturn = QMessageBox::question(nullptr, "Save Changes", pItem->GetName(true) % " has unsaved changes. Do you want to save before closing?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
 		if(iDlgReturn == QMessageBox::Save)
-			pItem->Save();
+			pItem->Save(true);
 		else if(iDlgReturn == QMessageBox::Discard)
 			pItem->DiscardChanges();
 		else if(iDlgReturn == QMessageBox::Cancel)
@@ -504,7 +504,7 @@ void MainWindow::on_actionSave_triggered()
 
 	QVariant v = pTabBar->tabData(iIndex);
 	ProjectItem *pItem = v.value<ProjectItem *>();
-	pItem->Save();
+	pItem->Save(true);
 
 	HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
 }
@@ -518,15 +518,20 @@ void MainWindow::on_actionSaveAll_triggered()
 		return;
 	}
 
+	QList<ProjectItem *> dirtyItemList;
+
 	ProjectTabBar *pTabBar = pCurProject->GetTabBar();
 	for(int i = 0; i < pTabBar->count(); ++i)
 	{
 		ProjectItem *pItem = pTabBar->tabData(i).value<ProjectItem *>();
 		if(pItem->IsSaveClean() == false)
-		{
-			pItem->Save();
-			HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
-		}
+			dirtyItemList.append(pItem);
+	}
+
+	for(int i = 0; i < dirtyItemList.size(); ++i)
+	{
+		dirtyItemList[i]->Save(i == (dirtyItemList.size() - 1));
+		HyGuiLog(dirtyItemList[i]->GetName(true) % " was saved", LOGTYPE_Normal);
 	}
 }
 
@@ -730,7 +735,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 		{
 			// New items that are considered "imported" should be saved immediately since they have direct references into an asset manager
 			if(pDlg->GetImportFile().isEmpty() == false)
-				static_cast<ProjectItem *>(pNewItem)->Save();
+				static_cast<ProjectItem *>(pNewItem)->Save(true);
 
 			MainWindow::OpenItem(static_cast<ProjectItem *>(pNewItem));
 		}

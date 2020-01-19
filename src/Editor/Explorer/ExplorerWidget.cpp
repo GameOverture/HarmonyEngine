@@ -253,8 +253,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 				contextMenu.addSeparator();
 			}
 			
-			if(selectedItems.count() + selectedPrefixes.count() == 1)
-				contextMenu.addAction(ui->actionRename);
+			contextMenu.addAction(ui->actionRename);
 			contextMenu.addAction(ui->actionCopyItem);
 			contextMenu.addAction(ui->actionPasteItem);
 			contextMenu.addSeparator();

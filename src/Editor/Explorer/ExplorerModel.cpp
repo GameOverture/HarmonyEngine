@@ -366,7 +366,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		QString sName = itemNameFileInfo.baseName();
 	
 		ProjectItem *pImportedProjItem = static_cast<ProjectItem *>(AddItem(pDestProject, ePasteItemType, sPrefix, sName, pasteObj["src"], false));
-		pImportedProjItem->Save();
+		pImportedProjItem->Save(true);
 #endif
 	}
 

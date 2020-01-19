@@ -55,7 +55,7 @@ public:
 	QUndoStack *GetUndoStack();
 	
 	void GiveMenuActions(QMenu *pMenu);
-	void Save();
+	void Save(bool bWriteToDisk);
 	bool IsExistencePendingSave();
 	bool IsSaveClean();
 	void DiscardChanges();

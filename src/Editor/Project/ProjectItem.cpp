@@ -127,7 +127,7 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 	m_pWidget->OnGiveMenuActions(pMenu);
 }
 
-void ProjectItem::Save()
+void ProjectItem::Save(bool bWriteToDisk)
 {
 	if(m_pModel->OnSave() == false)
 	{
@@ -137,7 +137,7 @@ void ProjectItem::Save()
 
 	m_SaveValue = m_pModel->GetJson();
 
-	GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue);
+	GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue, bWriteToDisk);
 	m_pUndoStack->setClean();
 
 	m_bExistencePendingSave = false;

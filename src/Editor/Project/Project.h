@@ -82,7 +82,6 @@ public:
 	bool HasError() const;
 	
 	void ExecProjSettingsDlg();
-
 	QJsonObject GetSettingsObj() const;
 
 	QString GetDirPath() const;
@@ -110,23 +109,16 @@ public:
 	void ScanMetaFontDir();
 
 	ProjectTabBar *GetTabBar();
-
 	ProjectItem *GetCurrentOpenItem();
 
 	void SetRenderSize(int iWidth, int iHeight);
 
-	void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal);
-	void DeleteGameData(HyGuiItemType eType, QString sPath);
-	void DeletePrefixAndContents(QString sPrefix);
-
-	bool RegisterMetaData(ProjectItem *pProjectItem);
+	void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal, bool bWriteToDisk);
+	void DeleteGameData(HyGuiItemType eType, QString sPath, bool bWriteToDisk);
+	void DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk);
 
 	QString RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath);
 	QString RenamePrefix(QString sOldPath, QString sNewPath);
-	void RefreshNamesOnTabs();
-
-	void WriteGameData();
-	void WriteMetaData();
 
 	QJsonObject GetSavedItemsObj(HyGuiItemType eType);
 
@@ -147,8 +139,19 @@ public:
 
 public Q_SLOTS:
 	void OnTabBarCurrentChanged(int iIndex);
-
 	void OnCloseTab(int iIndex);
+
+private:
+	void WriteGameData();
+	void WriteMetaData();
+
+	bool LoadDataObj(QString sFilePath, QJsonObject &dataObjRef);	// Return 'true' if the data obj should save to disk
+	void DeleteItemInDataObj(HyGuiItemType eType, QString sPath, QJsonObject &dataObjRef);
+	void RenameItemInDataObj(HyGuiItemType eType, QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);
+	void RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);
+
+	void RefreshNamesOnTabs();
+	bool RegisterMetaData(ProjectItem *pProjectItem);
 };
 
 #endif // PROJECT_H

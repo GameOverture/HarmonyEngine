@@ -385,7 +385,7 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 	
 	// Resave all affected items that had a replaced atlas frame
 	for(int i = 0; i < affectedItemList.size(); ++i)
-		affectedItemList[i]->Save();
+		affectedItemList[i]->Save(i == (affectedItemList.size() - 1));
 }
 
 void AtlasWidget::on_atlasList_itemSelectionChanged()
