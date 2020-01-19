@@ -414,6 +414,7 @@ void MainWindow::on_actionNewProject_triggered()
 		}
 
 		m_ExplorerModel.AddProject(pDlg->GetProjFilePath());
+		SaveSettings();
 	}
 	delete pDlg;
 }
@@ -426,7 +427,10 @@ void MainWindow::on_actionOpenProject_triggered()
 	pDlg->setDirectory(m_sDefaultProjectLocation);
 
 	if(pDlg->exec() == QDialog::Accepted)
+	{
 		m_ExplorerModel.AddProject(pDlg->selectedFiles()[0]);
+		SaveSettings();
+	}
 
 	delete pDlg;
 }

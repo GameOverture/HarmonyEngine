@@ -40,6 +40,7 @@ bool IHyThreadClass::ThreadStart()
 	ThreadJoin();
 	m_Thread = std::thread(&IHyThreadClass::ThreadFunc, this);
 
+#ifndef HY_PLATFORM_GUI
 	if(m_ePriority != HYTHREAD_Normal)
 	{
 #ifdef HY_PLATFORM_WINDOWS
@@ -62,6 +63,7 @@ bool IHyThreadClass::ThreadStart()
 		}
 #endif
 	}
+#endif
 
 	return true;
 }

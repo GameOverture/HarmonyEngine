@@ -148,7 +148,8 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 void Project::LoadExplorerModel()
 {
-	// Load game data items
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// LOAD GAME DATA
 	QFile dataFile(GetAssetsAbsPath() % HYASSETS_DataFile);
 	if(dataFile.exists())
 	{
@@ -180,7 +181,7 @@ void Project::LoadExplorerModel()
 		WriteGameData();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Load meta data
+	// LOAD META DATA
 	QFile metaFile(GetMetaDataAbsPath() % HYMETA_DataFile);
 	if(metaFile.exists())
 	{
