@@ -87,7 +87,7 @@ void AtlasFrame::SetAtlasGrpId(quint32 uiNewAtlasGrpId)
 {
 	m_uiAtlasGrpId = uiNewAtlasGrpId;
 	if(m_pTreeWidgetItem)
-		m_pTreeWidgetItem->setText(1, "Id:" % QString::number(uiNewAtlasGrpId));
+		m_pTreeWidgetItem->setText(1, "Grp:" % QString::number(uiNewAtlasGrpId));
 }
 
 quint32 AtlasFrame::GetImageChecksum()
