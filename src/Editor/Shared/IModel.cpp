@@ -106,7 +106,7 @@ void IModel::MoveStateForward(int iStateIndex)
 	dataChanged(createIndex(iStateIndex, 0), createIndex(iStateIndex, 0), roleList);
 }
 
-QList<AtlasFrame *> IModel::RequestFramesById(IStateData *pState, QList<quint32> requestList, int &iAffectedFrameIndexOut)
+QList<AtlasFrame *> IModel::RequestFramesByUuid(IStateData *pState, QList<QUuid> requestList, int &iAffectedFrameIndexOut)
 {
 	QList<AtlasFrame *> returnedAtlasFramesList = m_ItemRef.GetProject().GetAtlasModel().RequestFramesById(&m_ItemRef, requestList);
 	

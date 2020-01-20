@@ -13,7 +13,7 @@
 
 #include "AtlasWidget.h"
 
-AtlasFrame::AtlasFrame(quint32 uiId,
+AtlasFrame::AtlasFrame(QUuid uuid,
 					   quint32 uiChecksum,
 					   quint32 uiAtlasGrpId,
 					   QString sN,
@@ -25,7 +25,7 @@ AtlasFrame::AtlasFrame(quint32 uiId,
 					   int iY,
 					   int iTextureIndex,
 					   uint uiErrors) :
-	m_uiUNIQUE_ID(uiId),
+	m_UNIQUE_ID(uuid),
 	m_eType(eType),
 	m_uiAtlasGrpId(uiAtlasGrpId),
 	m_pTreeWidgetItem(nullptr),
@@ -73,9 +73,9 @@ AtlasTreeItem *AtlasFrame::GetTreeItem()
 	return m_pTreeWidgetItem;
 }
 
-quint32 AtlasFrame::GetId()
+QUuid AtlasFrame::GetId()
 {
-	return m_uiUNIQUE_ID;
+	return m_UNIQUE_ID;
 }
 
 quint32 AtlasFrame::GetAtlasGrpId()
@@ -178,7 +178,7 @@ QString AtlasFrame::ConstructImageFileName()
 
 void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
 {
-	frameObj.insert("id", QJsonValue(static_cast<qint64>(GetId())));
+	frameObj.insert("frameUUID", GetId().toString(QUuid::WithoutBraces));
 	frameObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(GetAtlasGrpId())));
 	frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetImageChecksum())));
 	frameObj.insert("name", QJsonValue(GetName()));

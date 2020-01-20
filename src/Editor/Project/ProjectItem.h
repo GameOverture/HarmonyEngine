@@ -31,6 +31,7 @@ class ProjectItem : public ExplorerItem
 	friend class Project;
 
 	QJsonValue				m_SaveValue;
+	QJsonValue				m_MetaValue;
 	bool					m_bExistencePendingSave;
 
 	// Loaded in constructor
@@ -44,7 +45,7 @@ class ProjectItem : public ExplorerItem
 	IDraw *					m_pDraw;
 	
 public:
-	ProjectItem(Project &projRef, HyGuiItemType eType, const QString sName, QJsonValue initValue, bool bIsPendingSave);
+	ProjectItem(Project &projRef, HyGuiItemType eType, const QString sName, QJsonValue initSaveValue, QJsonValue initMetaValue, bool bIsPendingSave);
 	virtual ~ProjectItem();
 
 	void LoadModel();

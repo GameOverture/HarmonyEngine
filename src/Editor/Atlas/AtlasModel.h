@@ -23,7 +23,6 @@ class AtlasModel : public QAbstractListModel
 
 	Project *										m_pProjOwner;
 
-	quint32											m_uiNextFrameId;
 	quint32											m_uiNextAtlasId;
 
 	QDir											m_MetaDir;
@@ -71,7 +70,7 @@ public:
 	void WriteMetaSettings();
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	AtlasFrame *CreateFrame(quint32 uiId, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
+	AtlasFrame *CreateFrame(QUuid uuid, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
 	void RemoveFrame(AtlasFrame *pFrame);
 	
 	bool TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId);

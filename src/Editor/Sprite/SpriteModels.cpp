@@ -136,7 +136,6 @@ QJsonArray SpriteFramesModel::GetFramesInfo(float &fTotalDurationRef)
 		fTotalDurationRef += m_FramesList[i]->m_fDuration;
 
 		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetImageChecksum())));
-		frameObj.insert("id", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetId())));
 		frameObj.insert("duration", m_FramesList[i]->m_fDuration);
 		frameObj.insert("offsetX", m_FramesList[i]->m_vOffset.x());
 		frameObj.insert("offsetY", m_FramesList[i]->m_vOffset.y());
@@ -281,15 +280,15 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject 
 
 		QJsonArray spriteFrameArray = stateObj["frames"].toArray();
 
-		QList<quint32> idRequestList;
+		QList<QUuid> uuidRequestList;
 		for(int i = 0; i < spriteFrameArray.size(); ++i)
 		{
 			QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
-			idRequestList.append(JSONOBJ_TOINT(spriteFrameObj, "id"));
+			uuidRequestList.append(QUuid(spriteFrameObj["id"].toString())); uuid
 		}
 
 		int iAffectedFrameIndex = 0;
-		QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesById(this, idRequestList, iAffectedFrameIndex);
+		QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesByUuid(this, uuidRequestList, iAffectedFrameIndex);
 		
 		if(spriteFrameArray.size() != requestedAtlasFramesList.size())
 			HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
@@ -354,7 +353,7 @@ void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
 		frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
 		frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + ((pSpriteFrame->m_pFrame->GetSize().height() - 1) - pSpriteFrame->m_pFrame->GetCrop().bottom()))); // -1 on height because it's NOT zero based like everything else
 		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetImageChecksum())));
-		frameObj.insert("id", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetId())));
+		frameObj.insert("id", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetId()))); uuid;
 
 		frameArray.append(frameObj);
 	}

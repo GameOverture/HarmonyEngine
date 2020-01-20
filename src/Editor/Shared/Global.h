@@ -146,8 +146,6 @@ QAction *FindAction(QList<QAction *> list, QString sName);
 
 #define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
 
-#define ATLASFRAMEID_NotSet 0xFFFFFFFF
-
 char *QStringToCharPtr(QString sString);
 
 QString PointToQString(QPointF ptPoint);

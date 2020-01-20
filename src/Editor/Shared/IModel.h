@@ -58,7 +58,7 @@ public:
 	void MoveStateBack(int iStateIndex);
 	void MoveStateForward(int iStateIndex);
 	
-	QList<AtlasFrame *> RequestFramesById(IStateData *pState, QList<quint32> requestList, int &iAffectedFrameIndexOut);
+	QList<AtlasFrame *> RequestFramesByUuid(IStateData *pState, QList<QUuid> requestList, int &iAffectedFrameIndexOut);
 	QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut);
 	void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
 	void RelinquishAllFrames();

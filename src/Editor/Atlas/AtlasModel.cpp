@@ -178,7 +178,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 			QJsonObject frameObj = frameArray[i].toObject();
 
 			QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-			AtlasFrame *pNewFrame = CreateFrame(JSONOBJ_TOINT(frameObj, "id"),
+			AtlasFrame *pNewFrame = CreateFrame(QUuid(frameObj["frameUUID"].toString()),
 												JSONOBJ_TOINT(frameObj, "checksum"),
 												JSONOBJ_TOINT(frameObj, "atlasGrpId"),
 												frameObj["name"].toString(),
@@ -383,15 +383,9 @@ void AtlasModel::WriteMetaSettings()
 	}
 }
 
-AtlasFrame *AtlasModel::CreateFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors)
+AtlasFrame *AtlasModel::CreateFrame(QUuid uuid, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors)
 {
-	if(uiId == ATLASFRAMEID_NotSet)
-	{
-		uiId = m_uiNextFrameId;
-		m_uiNextFrameId++;
-	}
-
-	AtlasFrame *pNewFrame = new AtlasFrame(uiId, uiChecksum, uiAtlasGrpId, sN, rAlphaCrop, eFrameType, iW, iH, iX, iY, iTextureIndex, uiErrors);
+	AtlasFrame *pNewFrame = new AtlasFrame(uuid, uiChecksum, uiAtlasGrpId, sN, rAlphaCrop, eFrameType, iW, iH, iX, iY, iTextureIndex, uiErrors);
 
 	m_FrameLookup.AddLookup(pNewFrame);
 	
@@ -710,39 +704,6 @@ void AtlasModel::SaveData()
 		atlasInfoFile.close();
 	}
 }
-
-//void AtlasModel::GetAtlasInfoForGameData(QJsonObject &atlasObjOut)
-//{
-//    atlasObjOut.insert("id", m_DataDir.dirName().toInt());
-//    atlasObjOut.insert("width", m_PackerSettings["sbTextureWidth"].toInt());
-//    atlasObjOut.insert("height", m_PackerSettings["sbTextureHeight"].toInt());
-//    atlasObjOut.insert("num8BitClrChannels", 4);   // TODO: Actually make this configurable?
-
-//    QJsonArray textureArray;
-//    QList<QJsonArray> frameArrayList;
-//    for(int i = 0; i < m_FrameList.size(); ++i)
-//    {
-//        if(m_FrameList[i]->GetTextureIndex() < 0)
-//            continue;
-
-//        while(frameArrayList.empty() || frameArrayList.size() <= m_FrameList[i]->GetTextureIndex())
-//            frameArrayList.append(QJsonArray());
-
-//        QJsonObject frameObj;
-//        frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FrameList[i]->GetImageChecksum())));
-//        frameObj.insert("left", QJsonValue(m_FrameList[i]->GetX()));
-//        frameObj.insert("top", QJsonValue(m_FrameList[i]->GetY()));
-//        frameObj.insert("right", QJsonValue(m_FrameList[i]->GetX() + m_FrameList[i]->GetCrop().width()));
-//        frameObj.insert("bottom", QJsonValue(m_FrameList[i]->GetY() + m_FrameList[i]->GetCrop().height()));
-
-//        frameArrayList[m_FrameList[i]->GetTextureIndex()].append(frameObj);
-//    }
-
-//    for(int i = 0; i < frameArrayList.size(); ++i)
-//        textureArray.append(frameArrayList[i]);
-
-//    atlasObjOut.insert("textures", textureArray);
-//}
 
 uint AtlasModel::CreateNewAtlasGrp(QString sName)
 {

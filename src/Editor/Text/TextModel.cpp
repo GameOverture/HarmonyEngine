@@ -58,7 +58,7 @@ TextModel::TextModel(ProjectItem &itemRef, QJsonObject textObj) :
 		// Find existing AtlasFrame * to assign to 'm_pAtlasFrame'
 		int iAffectedFrameIndex = 0;
 		QList<quint32> idRequestList;
-		idRequestList.append(JSONOBJ_TOINT(textObj, "id"));
+		idRequestList.append(JSONOBJ_TOINT(textObj, "id")); uuid;
 		QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, idRequestList, iAffectedFrameIndex);
 		if(pRequestedList.size() == 1)
 			m_pAtlasFrame = pRequestedList[0];
@@ -186,7 +186,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	textObj.insert("availableGlyphs", availableGlyphsObj);
 
 	textObj.insert("checksum", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetImageChecksum())));
-	textObj.insert("id", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetId())));
+	textObj.insert("id", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetId()))); uuid;
 
 	QJsonArray stateArray;
 	for(int i = 0; i < GetNumStates(); ++i)

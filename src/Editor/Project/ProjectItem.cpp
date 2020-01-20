@@ -32,10 +32,12 @@
 ProjectItem::ProjectItem(Project &projRef,
 						 HyGuiItemType eType,
 						 const QString sName,
-						 QJsonValue initValue,
+						 QJsonValue initSaveValue,
+						 QJsonValue initMetaValue,
 						 bool bIsPendingSave) :
 	ExplorerItem(projRef, eType, sName),
-	m_SaveValue(initValue),
+	m_SaveValue(initSaveValue),
+	m_MetaValue(initMetaValue),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_pModel(nullptr),
 	m_pWidget(nullptr),
@@ -75,13 +77,13 @@ void ProjectItem::LoadModel()
 	switch(m_eTYPE)
 	{
 	case ITEM_Sprite:
-		m_pModel = new SpriteModel(*this, m_SaveValue.toArray());
+		m_pModel = new SpriteModel(*this, m_SaveValue.toArray(), m_MetaValue.toArray());
 		break;
 	case ITEM_Text:
-		m_pModel = new TextModel(*this, m_SaveValue.toObject());
+		m_pModel = new TextModel(*this, m_SaveValue.toObject(), m_MetaValue.toObject());
 		break;
 	case ITEM_Entity:
-		m_pModel = new EntityModel(*this, m_SaveValue.toArray());
+		m_pModel = new EntityModel(*this, m_SaveValue.toArray(), m_MetaValue.toArray());
 		break;
 	case ITEM_Prefab:
 		m_pModel = new PrefabModel(*this, m_SaveValue);
@@ -136,8 +138,9 @@ void ProjectItem::Save(bool bWriteToDisk)
 	}
 
 	m_SaveValue = m_pModel->GetJson();
+	m_MetaValue = m_pModel->GetMetaJson();
 
-	GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue, bWriteToDisk);
+	GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue, m_MetaValue, bWriteToDisk);
 	m_pUndoStack->setClean();
 
 	m_bExistencePendingSave = false;

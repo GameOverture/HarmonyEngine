@@ -23,7 +23,7 @@ class AtlasFrame
 {
 	friend class AtlasModel;
 	
-	const quint32						m_uiUNIQUE_ID;
+	const QUuid							m_UNIQUE_ID;
 	AtlasItemType						m_eType;
 	
 	quint32								m_uiAtlasGrpId;
@@ -46,13 +46,13 @@ class AtlasFrame
 	uint								m_uiErrors; // '0' when there is no error
 
 	// Private ctor as WidgetAtlasManager should only construct these
-	AtlasFrame(quint32 uiId, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
+	AtlasFrame(QUuid uuid, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
 	~AtlasFrame();
 	
 public:
 	AtlasTreeItem *GetTreeItem();
 
-	quint32 GetId();
+	QUuid GetId();
 	
 	quint32 GetAtlasGrpId();
 	void SetAtlasGrpId(quint32 uiNewAtlasGrpId);
