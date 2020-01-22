@@ -271,6 +271,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Text\TextModel.cpp" />
     <ClCompile Include="Text\TextUndoCmds.cpp" />
     <ClCompile Include="Text\TextWidget.cpp" />
+    <ClCompile Include="VersionPatcher.cpp" />
     <ClCompile Include="Widget\WidgetColor.cpp" />
     <ClCompile Include="Widget\WidgetGradientEditor.cpp" />
     <ClCompile Include="Widget\WidgetLiveVarManager.cpp" />
@@ -508,6 +509,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Text/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Text\TextUndoCmds.h" />
+    <ClInclude Include="VersionPatcher.h" />
     <ClInclude Include="_Dependencies\scriptum\imagepacker.h" />
     <ClInclude Include="_Dependencies\scriptum\maxrects.h" />
     <QtMoc Include="_Dependencies\QtWaitingSpinner\waitingspinnerwidget.h">

@@ -15,6 +15,7 @@
 #include "MainWindow.h"
 #include "ProjectItemMimeData.h"
 #include "ExplorerModel.h"
+#include "VersionPatcher.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -86,6 +87,8 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	m_pCurOpenItem(nullptr),
 	m_bHasError(false)
 {
+	VersionPatcher::Run(this);
+
 	if(m_DlgProjectSettings.HasError())
 	{
 		m_bHasError = true;

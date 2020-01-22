@@ -281,6 +281,9 @@
     <ClCompile Include="Gltf\GltfModel.cpp">
       <Filter>Gltf</Filter>
     </ClCompile>
+    <ClCompile Include="VersionPatcher.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
@@ -399,6 +402,9 @@
     </ClInclude>
     <ClInclude Include="Text\TextUndoCmds.h">
       <Filter>Text</Filter>
+    </ClInclude>
+    <ClInclude Include="VersionPatcher.h">
+      <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -109,7 +109,6 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 
 		QJsonObject settingsObj = settingsDoc.object();
 
-		m_uiNextFrameId = JSONOBJ_TOINT(settingsObj, "startFrameId");
 		m_uiNextAtlasId = JSONOBJ_TOINT(settingsObj, "startAtlasId");
 		
 		QJsonArray atlasGrpArray = settingsObj["groups"].toArray();
@@ -221,9 +220,7 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 	}
 	else
 	{
-		m_uiNextFrameId = 0;
 		m_uiNextAtlasId = 0;
-		
 		CreateNewAtlasGrp("Default");
 	}
 }
@@ -356,7 +353,6 @@ void AtlasModel::WriteMetaSettings()
 	QJsonObject settingsObj;
 	settingsObj.insert("frames", frameArray);
 	settingsObj.insert("groups", groupsArray);
-	settingsObj.insert("startFrameId", QJsonValue(static_cast<qint64>(m_uiNextFrameId)));
 	settingsObj.insert("startAtlasId", QJsonValue(static_cast<qint64>(m_uiNextAtlasId)));
 	settingsObj.insert("filters", filtersArray);
 	settingsObj.insert("expanded", expandedArray);
@@ -690,7 +686,7 @@ void AtlasModel::SaveData()
 	QJsonDocument atlasInfoDoc;
 	atlasInfoDoc.setArray(atlasGrpArray);
 
-	QFile atlasInfoFile(m_RootDataDir.absolutePath() % "/" % HYASSETS_AtlasFile);
+	QFile atlasInfoFile(m_RootDataDir.absoluteFilePath(HYASSETS_AtlasFile));
 	if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
 	   HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
 	}
