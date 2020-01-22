@@ -123,7 +123,29 @@
 		dataItemsFile.close();
 		return false;
 	}
+	QJsonDocument dataItemsDoc = QJsonDocument::fromJson(dataItemsFile.readAll());
+	QJsonObject dataItemsObj = dataItemsDoc.object();
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	QDir metaItemsDir(pProj->GetMetaDataAbsPath());
+	QFile metaItemsFile(metaItemsDir.absoluteFilePath(HYMETA_DataFile));
+	if(metaItemsFile.open(QIODevice::ReadWrite) == false)
+	{
+		HyGuiLog(QString("Couldn't open ") % HYMETA_DataFile % " for reading/writing: " % metaItemsFile.errorString(), LOGTYPE_Error);
+
+		dataItemsFile.close();
+		metaItemsFile.close();
+		return false;
+	}
+	QJsonDocument metaItemsDoc;
+#ifdef HYGUI_UseBinaryMetaFiles
+	metaItemsDoc = QJsonDocument::fromBinaryData(metaItemsFile.readAll());
+#else
+	metaItemsDoc = QJsonDocument::fromJson(metaItemsFile.readAll());
+#endif
+	QJsonObject metaItemsObj = metaItemsDoc.object();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QDir metaAtlasDir(pProj->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true));
 	QFile metaAtlasFile(metaAtlasDir.absoluteFilePath(HYMETA_AtlasFile));
 	if(metaAtlasFile.open(QIODevice::ReadWrite) == false)
@@ -131,39 +153,77 @@
 		HyGuiLog(QString("Couldn't open ") % HYMETA_AtlasFile % " for reading/writing: " % metaAtlasFile.errorString(), LOGTYPE_Error);
 
 		dataItemsFile.close();
+		metaItemsFile.close();
 		metaAtlasFile.close();
 		return false;
 	}
-	
-	QJsonDocument dataItemsDoc = QJsonDocument::fromJson(dataItemsFile.readAll());
-	QJsonObject dataItemsObj = dataItemsDoc.object();
-
-	QJsonObject dataItemsSpritesObj = dataItemsObj["Sprites"].toObject();
-	QStringList sSpritesKeysList = dataItemsSpritesObj.keys();
-	for(int i = 0; i < sSpritesKeysList.size(); ++i)
-	{
-
-	}
-
 	QJsonDocument metaAtlasDoc;
 #ifdef HYGUI_UseBinaryMetaFiles
 	metaAtlasDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
 #else
 	metaAtlasDoc = QJsonDocument::fromJson(metaAtlasFile.readAll());
 #endif
-
 	QJsonObject metaAtlasObj = metaAtlasDoc.object();
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// lambda function that will fix 'data.json' and 'data.hygui' for every atlas frame
+	std::function<void(QJsonObject &, QJsonObject &, quint32, QUuid)> fpDataItemsReplace =
+		[](QJsonObject &dataItemsObjRef, QJsonObject &metaItemsObjRef, quint32 uiId, QUuid uuid)
+	{
+		// Data Items
+		QJsonObject dataItemsSpritesObj = dataItemsObjRef["Sprites"].toObject();
+		QStringList sSpritesKeysList = dataItemsSpritesObj.keys();
+		for(int i = 0; i < sSpritesKeysList.size(); ++i)
+		{
+			QJsonArray spriteStateArray = dataItemsSpritesObj[sSpritesKeysList[i]].toArray();
+			for(int j = 0; j < spriteStateArray.size(); ++j)
+			{
+				QJsonObject spriteStateObj = spriteStateArray[j].toObject();
+				
+				QJsonArray spriteStateFramesArray = spriteStateObj["frames"].toArray();
+				for(int k = 0; k < spriteStateFramesArray.size(); ++k)
+				{
+					QJsonObject frameObj = spriteStateFramesArray[k].toObject();
+					if(JSONOBJ_TOINT(frameObj, "id") == uiId)
+					{
+						// Meta Items
+						QJsonObject metaItemsSpritesObj = metaItemsObjRef["Sprites"].toObject();
+						QJsonObject metaSpriteObj = metaItemsSpritesObj[sSpritesKeysList[i]].toObject();
+
+
+						metaItemsObjRef.remove("Sprites");
+						metaItemsObjRef.insert("Sprites", metaItemsSpritesObj);
+					}
+				}
+
+			}
+		}
+		dataItemsObjRef.remove("Sprites");
+		dataItemsObjRef.insert("Sprites", dataItemsSpritesObj);
+
+		
+	};
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Iterate through every frame within 'atlas.hygui' and fix, and also fix the other files
 	QJsonArray framesArray = metaAtlasObj["frames"].toArray();
 	for(int i = 0; i < framesArray.size(); ++i)
 	{
 		QJsonObject frameObj = framesArray[i].toObject();
+		
 		quint32 uiId = JSONOBJ_TOINT(frameObj, "id");
+		QUuid uuid = QUuid::createUuid();
 
+		// Invoke above lambda function that fixes the other files with this information
+		fpDataItemsReplace(dataItemsObj, metaItemsObj, uiId, uuid);
 
+		frameObj.remove("id");
+		frameObj.insert("frameUUID", uuid.toString(QUuid::WithoutBraces));
 
-		frameObj.insert("frameUUID", QUuid::createUuid().toString(QUuid::WithoutBraces));
+		framesArray[i] = frameObj;
 	}
-
+	metaAtlasObj.remove("frames");
+	metaAtlasObj.insert("frames", framesArray);
 
 	QJsonDocument userDoc;
 	userDoc.setObject(m_SaveDataObj);
