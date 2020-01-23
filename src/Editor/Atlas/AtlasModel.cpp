@@ -56,9 +56,9 @@ bool AtlasModel::FrameLookup::RemoveLookup(AtlasFrame *pFrame)  // Returns true 
 	
 	return false;
 }
-AtlasFrame *AtlasModel::FrameLookup::FindById(quint32 uiId)
+AtlasFrame *AtlasModel::FrameLookup::FindById(QUuid uuid)
 {
-	auto iter = m_FrameIdMap.find(uiId);
+	auto iter = m_FrameIdMap.find(uuid);
 	if(iter == m_FrameIdMap.end())
 		return nullptr;
 	else
@@ -526,7 +526,7 @@ QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem)
 	return RequestFrames(pItem, frameRequestList);
 }
 
-QList<AtlasFrame *> AtlasModel::RequestFramesById(ProjectItem *pItem, QList<quint32> requestList)
+QList<AtlasFrame *> AtlasModel::RequestFramesById(ProjectItem *pItem, QList<QUuid> requestList)
 {
 	if(requestList.empty())
 		return QList<AtlasFrame *>();

@@ -315,7 +315,7 @@ const QList<ProjectItem *> &EntityModel::GetPrimitiveList()
 
 ProjectItem *EntityModel::CreateNewPrimitive()
 {
-	ProjectItem *pNewPrimitiveItem = new ProjectItem(m_ItemRef.GetProject(), ITEM_Primitive, "Primitive", QJsonValue(), false);
+	ProjectItem *pNewPrimitiveItem = new ProjectItem(m_ItemRef.GetProject(), ITEM_Primitive, "Primitive", QJsonValue(), QJsonValue(), false);
 	m_PrimitiveList.push_back(pNewPrimitiveItem);
 
 	return pNewPrimitiveItem;

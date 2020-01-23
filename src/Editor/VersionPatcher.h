@@ -10,4 +10,6 @@ private:
 
 	static void Patch_0to1(QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef);
 	static void Patch_1to2(QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef);
+
+	static void RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta);
 };

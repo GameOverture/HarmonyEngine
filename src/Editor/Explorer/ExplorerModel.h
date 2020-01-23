@@ -52,7 +52,6 @@ private:
 	TreeModelItem *FindProjectTreeItem(Project *pProject);
 	TreeModelItem *FindPrefixTreeItem(const QModelIndex &indexRef) const;
 	QModelIndex FindIndexByItemPath(Project *pProject, QString sPath);
-	QJsonObject ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames);
 };
 
 #endif // EXPLORERMODEL_H

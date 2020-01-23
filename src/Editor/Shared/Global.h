@@ -39,6 +39,8 @@ class Project;
 #define HyEditorToolName "Harmony Editor Tool"
 #define HyGuiInternalCharIndicator '+'
 
+#define HYGUI_FILE_VERSION 2
+
 //#define HYGUI_UseBinaryMetaFiles
 
 enum HyGuiItemType

@@ -20,41 +20,43 @@
 	QJsonDocument dataAtlasDoc;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Setup each file's directory
 	QDir metaDir(pProj->GetMetaDataAbsPath());
 	if(metaDir.exists() == false)
 	{
 		HyGuiLog("Meta directory is missing, recreating", LOGTYPE_Info);
 		metaDir.mkpath(metaDir.absolutePath());
 	}
-	uiMetaItemsVersion = GetFileVersion(metaDir.absoluteFilePath(HYMETA_DataFile), metaItemsDoc, true);
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	QDir dataDir(pProj->GetAssetsAbsPath());
 	if(dataDir.exists() == false)
 	{
 		HyGuiLog("Data directory is missing, recreating", LOGTYPE_Info);
 		dataDir.mkpath(dataDir.absolutePath());
 	}
-	uiDataItemsVersion = GetFileVersion(dataDir.absoluteFilePath(HYASSETS_DataFile), dataItemsDoc, true);
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	QDir metaAtlasDir(pProj->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true));
 	if(metaAtlasDir.exists() == false)
 	{
 		HyGuiLog("Meta atlas directory is missing, recreating", LOGTYPE_Info);
 		metaAtlasDir.mkpath(metaAtlasDir.absolutePath());
 	}
-	uiMetaAtlasVersion = GetFileVersion(metaAtlasDir.absoluteFilePath(HYMETA_AtlasFile), metaAtlasDoc, true);
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	QDir dataAtlasDir(pProj->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true));
 	if(dataAtlasDir.exists() == false)
 	{
 		HyGuiLog("Data atlas directory is missing, recreating", LOGTYPE_Info);
 		dataAtlasDir.mkpath(dataAtlasDir.absolutePath());
 	}
-	uiDataAtlasVersion = GetFileVersion(dataAtlasDir.absoluteFilePath(HYASSETS_AtlasFile), dataAtlasDoc, false);
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Reach each file for its file version
+	uiMetaItemsVersion = GetFileVersion(metaDir.absoluteFilePath(HYMETA_DataFile), metaItemsDoc, true);
+	uiDataItemsVersion = GetFileVersion(dataDir.absoluteFilePath(HYASSETS_DataFile), dataItemsDoc, false);
+	uiMetaAtlasVersion = GetFileVersion(metaAtlasDir.absoluteFilePath(HYMETA_AtlasFile), metaAtlasDoc, true);
+	uiDataAtlasVersion = GetFileVersion(dataAtlasDir.absoluteFilePath(HYASSETS_AtlasFile), dataAtlasDoc, false);
+	
+	// -1 means file is missing (or didn't open)
 	if(uiMetaItemsVersion == -1 || uiDataItemsVersion == -1 || uiMetaAtlasVersion == -1 || uiDataAtlasVersion == -1)
 	{
 		HyGuiLog("Missing files between assets and meta. Skipping Version Patcher", LOGTYPE_Warning);
@@ -67,20 +69,38 @@
 	   iFileVersion != uiDataAtlasVersion)
 	{
 		HyGuiLog("Mismatching versions found between files (assets and meta)", LOGTYPE_Error);
+		return;
 	}
 
-	// Note: Each patch 'falls through' each case statement
-	switch(iFileVersion)
+	if(iFileVersion > HYGUI_FILE_VERSION)
 	{
-	case 0:
-		Patch_0to1(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
-	case 1:
-		Patch_1to2(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
-	case 2:
-		break; // current version
+		HyGuiLog("File versions (" % QString(iFileVersion) % ") are from a future editor and may not be compatible.\nCurrent Editor file version: " % QString::number(HYGUI_FILE_VERSION), LOGTYPE_Error);
+		return;
+	}
 
-	default:
-		HyGuiLog("File version unknown: " % QString::number(iFileVersion), LOGTYPE_Error);
+	// Upgrade files if necessary
+	if(iFileVersion < HYGUI_FILE_VERSION)
+	{
+		// Note: Each patch 'falls through' each case statement
+		switch(iFileVersion)
+		{
+		case 0:
+			Patch_0to1(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+		case 1:
+			Patch_1to2(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+		case 2:
+			// current version
+			static_assert(HYGUI_FILE_VERSION == 2, "Improper file version set in VersionPatcher");
+			break;
+
+		default:
+			HyGuiLog("File version unknown: " % QString::number(iFileVersion), LOGTYPE_Error);
+		}
+
+		RewriteFile(metaDir.absoluteFilePath(HYMETA_DataFile), metaItemsDoc, true);
+		RewriteFile(dataDir.absoluteFilePath(HYASSETS_DataFile), dataItemsDoc, false);
+		RewriteFile(metaAtlasDir.absoluteFilePath(HYMETA_AtlasFile), metaAtlasDoc, true);
+		RewriteFile(dataAtlasDir.absoluteFilePath(HYASSETS_AtlasFile), dataAtlasDoc, false);
 	}
 }
 
@@ -121,9 +141,10 @@
 /*static*/ void VersionPatcher::Patch_0to1(QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
 {
 	QJsonObject metaItemsObj = metaItemsDocRef.object();
-	QJsonObject metaSpritesObj = metaItemsObj["Sprites"].toObject();
-
 	QJsonObject dataItemsObj = dataItemsDocRef.object();
+
+	// Sprites
+	QJsonObject metaSpritesObj = metaItemsObj["Sprites"].toObject();
 	QJsonObject dataSpritesObj = dataItemsObj["Sprites"].toObject();
 
 	QStringList sSpritesKeysList = dataSpritesObj.keys();
@@ -135,19 +156,15 @@
 		QJsonArray dataSpriteStatesArray = dataSpritesObj[sSpritesKeysList[i]].toArray();
 		for(int j = 0; j < dataSpriteStatesArray.size(); ++j)
 		{
-			QJsonArray newMetaSpriteStateFramesArray;
-
 			QJsonObject dataSpriteStateObj = dataSpriteStatesArray[j].toObject();
-			QString sStateName = dataSpriteStateObj["name"].toString();
 
+			QJsonArray newMetaSpriteStateFramesArray;
 			QJsonArray dataSpriteStateFramesArray = dataSpriteStateObj["frames"].toArray();
 			for(int k = 0; k < dataSpriteStateFramesArray.size(); ++k)
-			{
 				newMetaSpriteStateFramesArray.append(dataSpriteStateFramesArray[i].toObject()["id"].toInt());
-			}
 
 			QJsonObject newMetaSpriteStateObj;
-			newMetaSpriteStateObj.insert("name", sStateName);
+			newMetaSpriteStateObj.insert("name", dataSpriteStateObj["name"].toString());
 			newMetaSpriteStateObj.insert("frames", newMetaSpriteStateFramesArray);
 			newMetaSpriteStatesArray.append(newMetaSpriteStateObj);
 		}
@@ -159,11 +176,41 @@
 	metaItemsObj["Sprites"] = metaSpritesObj;
 	dataItemsObj["Sprites"] = dataSpritesObj;
 
+	// Texts
+	QJsonObject metaTextsObj = metaItemsObj["Texts"].toObject();
+	QJsonObject dataTextsObj = dataItemsObj["Texts"].toObject();
+
+	QStringList sTextsKeysList = dataTextsObj.keys();
+	for(int i = 0; i < sTextsKeysList.size(); ++i)
+	{
+		QJsonObject metaTextObj = metaTextsObj[sTextsKeysList[i]].toObject();
+		QJsonObject dataTextObj = dataTextsObj[sTextsKeysList[i]].toObject();
+
+		metaTextObj.insert("availableGlyphs", dataTextObj["availableGlyphs"].toObject());
+		metaTextObj.insert("id", dataTextObj["id"].toInt());
+		dataTextObj.remove("availableGlyphs");
+		dataTextObj.remove("id");
+
+		metaTextsObj[sTextsKeysList[i]] = metaTextObj;
+		dataTextsObj[sTextsKeysList[i]] = dataTextObj;
+	}
+
+	metaItemsObj["Texts"] = metaTextsObj;
+	dataItemsObj["Texts"] = dataTextsObj;
+
+	// Replace manipulated object of metaItemsDocRef and dataItemsDocRef and add _fileVersion
+	metaItemsObj.insert("_fileVersion", 1);
 	metaItemsDocRef.setObject(metaItemsObj);
+
+	dataItemsObj.insert("_fileVersion", 1);
 	dataItemsDocRef.setObject(dataItemsObj);
 
+	// Add _fileVersion to 'metaAtlasDocRef'
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	metaAtlasObj.insert("_fileVersion", 1);
+	metaAtlasDocRef.setObject(metaAtlasObj);
 
-	// Convert 'dataAtlasDocRef' from an atlas to object
+	// Convert 'dataAtlasDocRef' from an atlas to object and add _fileVersion
 	QJsonArray atlasArray = dataAtlasDocRef.array();
 	QJsonObject dataAtlasObj;
 	dataAtlasObj.insert("_fileVersion", 1);
@@ -173,69 +220,55 @@
 
 /*static*/ void VersionPatcher::Patch_1to2(QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
 {
+	QJsonObject metaItemsObj = metaItemsDocRef.object();
 	QJsonObject dataItemsObj = dataItemsDocRef.object();
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	QJsonObject metaItemsObj = metaItemsDoc.object();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	QDir metaAtlasDir(pProj->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true));
-	QFile metaAtlasFile(metaAtlasDir.absoluteFilePath(HYMETA_AtlasFile));
-	if(metaAtlasFile.open(QIODevice::ReadWrite) == false)
+	// lambda function that will fix 'data.hygui' for every atlas frame
+	std::function<void(QJsonObject &, quint32, QUuid)> fpDataItemsReplace =
+		[](QJsonObject &metaItemsObjRef, quint32 uiId, QUuid uuid)
 	{
-		HyGuiLog(QString("Couldn't open ") % HYMETA_AtlasFile % " for reading/writing: " % metaAtlasFile.errorString(), LOGTYPE_Error);
-
-		dataItemsFile.close();
-		metaItemsFile.close();
-		metaAtlasFile.close();
-		return false;
-	}
-	QJsonDocument metaAtlasDoc;
-#ifdef HYGUI_UseBinaryMetaFiles
-	metaAtlasDoc = QJsonDocument::fromBinaryData(metaAtlasFile.readAll());
-#else
-	metaAtlasDoc = QJsonDocument::fromJson(metaAtlasFile.readAll());
-#endif
-	QJsonObject metaAtlasObj = metaAtlasDoc.object();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// lambda function that will fix 'data.json' and 'data.hygui' for every atlas frame
-	std::function<void(QJsonObject &, QJsonObject &, quint32, QUuid)> fpDataItemsReplace =
-		[](QJsonObject &dataItemsObjRef, QJsonObject &metaItemsObjRef, quint32 uiId, QUuid uuid)
-	{
-		// Data Items
-		QJsonObject dataItemsSpritesObj = dataItemsObjRef["Sprites"].toObject();
-		QStringList sSpritesKeysList = dataItemsSpritesObj.keys();
+		// Sprites
+		QJsonObject metaItemsSpritesObj = metaItemsObjRef["Sprites"].toObject();
+		QStringList sSpritesKeysList = metaItemsSpritesObj.keys();
 		for(int i = 0; i < sSpritesKeysList.size(); ++i)
 		{
-			QJsonArray spriteStateArray = dataItemsSpritesObj[sSpritesKeysList[i]].toArray();
-			for(int j = 0; j < spriteStateArray.size(); ++j)
+			QJsonObject metaSpriteObj = metaItemsSpritesObj[sSpritesKeysList[i]].toObject();
+			QJsonArray metaSpriteStatesArray = metaSpriteObj["states"].toArray();
+			for(int j = 0; j < metaSpriteStatesArray.size(); ++j)
 			{
-				QJsonObject spriteStateObj = spriteStateArray[j].toObject();
+				QJsonObject metaSpriteStateObj = metaSpriteStatesArray[j].toObject();
 
-				QJsonArray spriteStateFramesArray = spriteStateObj["frames"].toArray();
+				QJsonArray spriteStateFramesArray = metaSpriteStateObj["frames"].toArray();
 				for(int k = 0; k < spriteStateFramesArray.size(); ++k)
 				{
-					QJsonObject frameObj = spriteStateFramesArray[k].toObject();
-					if(JSONOBJ_TOINT(frameObj, "id") == uiId)
-					{
-						// Meta Items
-						QJsonObject metaItemsSpritesObj = metaItemsObjRef["Sprites"].toObject();
-						QJsonObject metaSpriteObj = metaItemsSpritesObj[sSpritesKeysList[i]].toObject();
-
-
-						metaItemsObjRef.remove("Sprites");
-						metaItemsObjRef.insert("Sprites", metaItemsSpritesObj);
-					}
+					if(spriteStateFramesArray[k].isDouble() && spriteStateFramesArray[k].toInt() == uiId)
+						spriteStateFramesArray[k] = QJsonValue(uuid.toString(QUuid::WithoutBraces));
 				}
 
+				metaSpriteStateObj["frames"] = spriteStateFramesArray;
 			}
+
+			metaSpriteObj["states"] = metaSpriteStatesArray;
+			metaItemsSpritesObj[sSpritesKeysList[i]] = metaSpriteObj;
 		}
-		dataItemsObjRef.remove("Sprites");
-		dataItemsObjRef.insert("Sprites", dataItemsSpritesObj);
+		metaItemsObjRef["Sprites"] = metaItemsSpritesObj;
 
-
+		// Texts
+		QJsonObject metaItemsTextsObj = metaItemsObjRef["Texts"].toObject();
+		QStringList sTextsKeysList = metaItemsTextsObj.keys();
+		for(int i = 0; i < sTextsKeysList.size(); ++i)
+		{
+			QJsonObject metaTextObj = metaItemsTextsObj[sTextsKeysList[i]].toObject();
+			if(metaTextObj["id"].isDouble() && metaTextObj["id"].toInt() == uiId)
+			{
+				metaTextObj.remove("id");
+				metaTextObj.insert("frameUUID", QJsonValue(uuid.toString(QUuid::WithoutBraces)));
+			}
+			metaItemsTextsObj[sTextsKeysList[i]] = metaTextObj;
+		}
+		metaItemsObjRef["Texts"] = metaItemsTextsObj;
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,8 +281,8 @@
 		quint32 uiId = JSONOBJ_TOINT(frameObj, "id");
 		QUuid uuid = QUuid::createUuid();
 
-		// Invoke above lambda function that fixes the other files with this information
-		fpDataItemsReplace(dataItemsObj, metaItemsObj, uiId, uuid);
+		// Invoke above lambda function that fixes the meta items file with this information
+		fpDataItemsReplace(metaItemsObj, uiId, uuid);
 
 		frameObj.remove("id");
 		frameObj.insert("frameUUID", uuid.toString(QUuid::WithoutBraces));
@@ -259,11 +292,44 @@
 	metaAtlasObj.remove("frames");
 	metaAtlasObj.insert("frames", framesArray);
 
-	QJsonDocument userDoc;
-	userDoc.setObject(m_SaveDataObj);
-	qint64 iBytesWritten = dataFile.write(userDoc.toJson());
-	if(0 == iBytesWritten || -1 == iBytesWritten)
+	// Finalize
+	metaItemsObj["_fileVersion"] = 2;
+	metaItemsDocRef.setObject(metaItemsObj);
+
+	dataItemsObj["_fileVersion"] = 2;
+	dataItemsDocRef.setObject(dataItemsObj);
+
+	metaAtlasObj["_fileVersion"] = 2;
+	metaAtlasDocRef.setObject(metaAtlasObj);
+
+	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
+	dataAtlasObj["_fileVersion"] = 2;
+	dataAtlasDocRef.setObject(dataAtlasObj);
+}
+
+/*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)
+{
+	QFile dataFile(sFilePath);
+	if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+		HyGuiLog(QString("Couldn't open ") % HYASSETS_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
+	else
 	{
-		HyGuiLog(QString("Could not write to ") % HYASSETS_DataFile % " file: " % dataFile.errorString(), LOGTYPE_Error);
+		qint64 iBytesWritten = 0;
+
+		if(bIsMeta)
+		{
+#ifdef HYGUI_UseBinaryMetaFiles
+			iBytesWritten = dataFile.write(fileDocRef.toBinaryData());
+#else
+			iBytesWritten = dataFile.write(fileDocRef.toJson());
+#endif
+		}
+		else
+			iBytesWritten = dataFile.write(fileDocRef.toJson());
+
+		if(0 == iBytesWritten || -1 == iBytesWritten)
+			HyGuiLog(QString("Could not write to ") % sFilePath % ": " % dataFile.errorString(), LOGTYPE_Error);
+
+		dataFile.close();
 	}
 }

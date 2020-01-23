@@ -34,13 +34,13 @@ class AtlasModel : public QAbstractListModel
 	
 	class FrameLookup
 	{
-		QMap<quint32, AtlasFrame *>					m_FrameIdMap;
+		QMap<QUuid, AtlasFrame *>					m_FrameIdMap;
 		QMap<quint32, QList<AtlasFrame *> >			m_FrameChecksumMap;
 		
 	public:
 		void AddLookup(AtlasFrame *pFrame);
 		bool RemoveLookup(AtlasFrame *pFrame);  // Returns true if no remaining duplicates exist
-		AtlasFrame *FindById(quint32 uiId);
+		AtlasFrame *FindById(QUuid uuid);
 		QList<AtlasFrame *> FindByChecksum(quint32 uiChecksum);
 		bool DoesImageExist(quint32 uiChecksum);
 	};
@@ -80,7 +80,7 @@ public:
 
 	QList<AtlasFrame *> RequestFrames(ProjectItem *pItem);
 	QList<AtlasFrame *> RequestFrames(ProjectItem *pItem, QList<AtlasFrame *> requestList);
-	QList<AtlasFrame *> RequestFramesById(ProjectItem *pItem, QList<quint32> requestList);
+	QList<AtlasFrame *> RequestFramesById(ProjectItem *pItem, QList<QUuid> requestList);
 
 	void RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinquishList);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////

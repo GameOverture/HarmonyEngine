@@ -23,7 +23,7 @@ int SpriteFramesModel::Add(AtlasFrame *pFrame)
 	SpriteFrame *pFrameToInsert = nullptr;
 
 	// See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
-	QMap<quint32, SpriteFrame *>::iterator iter = m_RemovedFrameIdMap.find(pFrame->GetId());
+	QMap<QUuid, SpriteFrame *>::iterator iter = m_RemovedFrameIdMap.find(pFrame->GetId());
 	if(iter == m_RemovedFrameIdMap.end())
 		pFrameToInsert = new SpriteFrame(pFrame, m_FramesList.count());
 	else

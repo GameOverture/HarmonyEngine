@@ -67,7 +67,7 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
 			pNewTexQuad->SetTextureSource(frameList[j]->GetX(), frameList[j]->GetY(), frameList[j]->GetCrop().width(), frameList[j]->GetCrop().height());
 			pNewTexQuad->SetDisplayOrder(DISPLAYORDER_AtlasSelectedFrames);
 			
-			m_MasterList[uiTextureIndex]->m_TexQuadIdMap.insert(frameList[j]->GetId(), pNewTexQuad);
+			m_MasterList[uiTextureIndex]->m_FrameUuidMap.insert(frameList[j]->GetId(), pNewTexQuad);
 		}
 	}
 }
@@ -85,7 +85,7 @@ void AtlasDraw::SetHover(QTreeWidgetItem *pHoverItem)
 	{
 		AtlasFrame *pFrame = pHoverItem->data(0, Qt::UserRole).value<AtlasFrame *>();
 		if(pFrame)
-			pNewHoverTexQuad = m_MasterList[pFrame->GetTextureIndex()]->m_TexQuadIdMap[pFrame->GetId()];
+			pNewHoverTexQuad = m_MasterList[pFrame->GetTextureIndex()]->m_FrameUuidMap[pFrame->GetId()];
 	}
 	
 	if(m_pHoverTexQuad)
@@ -104,7 +104,7 @@ void AtlasDraw::SetSelected(QList<QTreeWidgetItem *> selectedList)
 	{
 		AtlasFrame *pFrame = selectedList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
 		if(pFrame)
-			m_SelectedTexQuadList.append(m_MasterList[pFrame->GetTextureIndex()]->m_TexQuadIdMap[pFrame->GetId()]);
+			m_SelectedTexQuadList.append(m_MasterList[pFrame->GetTextureIndex()]->m_FrameUuidMap[pFrame->GetId()]);
 	}
 }
 

@@ -331,34 +331,34 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		QSet<AtlasFrame *> newImportedImagesSet = pDestProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, eType, correspondingParentList);
 		importedImageSet += newImportedImagesSet;
 
-		// Replace any image "id" with the newly imported frames' ids
-		if(pasteObj["src"].isArray())
-		{
-			QJsonArray srcArray = pasteObj["src"].toArray();
-			if(srcArray.empty() == false && srcArray[0].isObject() == false)
-				HyGuiLog("DataExplorerWidget::PasteItemSrc - src array isn't of QJsonObjects", LOGTYPE_Error);
+		//// Replace any image "id" with the newly imported frames' ids
+		//if(pasteObj["src"].isArray())
+		//{
+		//	QJsonArray srcArray = pasteObj["src"].toArray();
+		//	if(srcArray.empty() == false && srcArray[0].isObject() == false)
+		//		HyGuiLog("DataExplorerWidget::PasteItemSrc - src array isn't of QJsonObjects", LOGTYPE_Error);
 
-			// Copy everything into newSrcArray, while replacing "id" with proper value
-			QJsonArray newSrcArray;
-			for(int i = 0; i < srcArray.size(); ++i)
-			{
-				QJsonObject srcArrayObj = srcArray[i].toObject();
+		//	// Copy everything into newSrcArray, while replacing "id" with proper value
+		//	QJsonArray newSrcArray;
+		//	for(int i = 0; i < srcArray.size(); ++i)
+		//	{
+		//		QJsonObject srcArrayObj = srcArray[i].toObject();
 
-				srcArrayObj = ReplaceIdWithProperValue(srcArrayObj, importedImageSet);
-				newSrcArray.append(srcArrayObj);
-			}
+		//		srcArrayObj = ReplaceIdWithProperValue(srcArrayObj, importedImageSet);
+		//		newSrcArray.append(srcArrayObj);
+		//	}
 
-			pasteObj["src"] = newSrcArray;
-		}
-		else if(pasteObj["src"].isObject())
-		{
-			QJsonObject srcObj = pasteObj["src"].toObject();
-			srcObj = ReplaceIdWithProperValue(srcObj, importedImageSet);
+		//	pasteObj["src"] = newSrcArray;
+		//}
+		//else if(pasteObj["src"].isObject())
+		//{
+		//	QJsonObject srcObj = pasteObj["src"].toObject();
+		//	srcObj = ReplaceIdWithProperValue(srcObj, importedImageSet);
 
-			pasteObj["src"] = srcObj;
-		}
-		else
-			HyGuiLog("DataExplorerWidget::PasteItemSrc - src isn't an object or array", LOGTYPE_Error);
+		//	pasteObj["src"] = srcObj;
+		//}
+		//else
+		//	HyGuiLog("DataExplorerWidget::PasteItemSrc - src isn't an object or array", LOGTYPE_Error);
 
 		// Create a new project item representing the pasted item and save it
 		QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
@@ -594,26 +594,4 @@ QModelIndex ExplorerModel::FindIndexByItemPath(Project *pProject, QString sPath)
 	}
 
 	return QModelIndex();
-}
-
-QJsonObject ExplorerModel::ReplaceIdWithProperValue(QJsonObject srcObj, QSet<AtlasFrame *> importedFrames)
-{
-	QStringList srcObjKeyList = srcObj.keys();
-	for(int j = 0; j < srcObjKeyList.size(); ++j)
-	{
-		if(srcObjKeyList[j] == "checksum")
-		{
-			for(auto iter = importedFrames.begin(); iter != importedFrames.end(); ++iter)
-			{
-				if((*iter)->GetImageChecksum() == JSONOBJ_TOINT(srcObj, "checksum"))
-				{
-					srcObj.insert("id", QJsonValue(static_cast<qint64>((*iter)->GetId())));
-					break;
-				}
-			}
-			break;
-		}
-	}
-
-	return srcObj;
 }
