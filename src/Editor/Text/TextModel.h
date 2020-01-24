@@ -52,7 +52,7 @@ class TextModel : public IModel
 	AtlasFrame *			m_pAtlasFrame;
 
 public:
-	TextModel(ProjectItem &itemRef, QJsonObject textObj);
+	TextModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef);
 	virtual ~TextModel();
 
 	TextFontManager &GetFontManager();

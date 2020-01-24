@@ -348,22 +348,22 @@ void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
 		SpriteFrame *pSpriteFrame = m_pFramesModel->GetFrameAt(i);
 
 		QJsonObject frameObj;
+		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetImageChecksum())));
 		frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
-		fTotalDuration += pSpriteFrame->m_fDuration;
+		frameObj.insert("id", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetId()))); uuid;
 		frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
 		frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + ((pSpriteFrame->m_pFrame->GetSize().height() - 1) - pSpriteFrame->m_pFrame->GetCrop().bottom()))); // -1 on height because it's NOT zero based like everything else
-		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetImageChecksum())));
-		frameObj.insert("id", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetId()))); uuid;
+		fTotalDuration += pSpriteFrame->m_fDuration;
 
 		frameArray.append(frameObj);
 	}
 
-	stateObjOut.insert("name", QJsonValue(GetName()));
-	stateObjOut.insert("loop", m_pChkMapper_Loop->IsChecked());
-	stateObjOut.insert("reverse", m_pChkMapper_Reverse->IsChecked());
 	stateObjOut.insert("bounce", m_pChkMapper_Bounce->IsChecked());
 	stateObjOut.insert("duration", QJsonValue(fTotalDuration));
 	stateObjOut.insert("frames", QJsonValue(frameArray));
+	stateObjOut.insert("loop", m_pChkMapper_Loop->IsChecked());
+	stateObjOut.insert("name", QJsonValue(GetName()));
+	stateObjOut.insert("reverse", m_pChkMapper_Reverse->IsChecked());
 }
 
 QSet<AtlasFrame *> SpriteStateData::GetAtlasFrames()
@@ -392,7 +392,8 @@ void SpriteStateData::Refresh()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpriteModel::SpriteModel(ProjectItem &itemRef, QJsonArray stateArray) : IModel(itemRef)
+SpriteModel::SpriteModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef) :
+	IModel(itemRef)
 {
 	// If item's init value is defined, parse and initialize with it, otherwise make default empty sprite
 	if(stateArray.empty() == false)

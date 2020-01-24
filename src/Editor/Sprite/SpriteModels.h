@@ -121,7 +121,7 @@ class SpriteModel : public IModel
 	Q_OBJECT
 
 public:
-	SpriteModel(ProjectItem &itemRef, QJsonArray stateArray);
+	SpriteModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef);
 	virtual ~SpriteModel();
 	
 	virtual QJsonObject GetStateJson(uint32 uiIndex) const override;

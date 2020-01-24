@@ -244,7 +244,7 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityModel::EntityModel(ProjectItem &itemRef, QJsonArray stateArray) :
+EntityModel::EntityModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef) :
 	IModel(itemRef),
 	m_TreeModel(this, this)
 {

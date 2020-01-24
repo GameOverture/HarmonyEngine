@@ -35,7 +35,7 @@ class PrefabModel : public IModel
 	PropertiesTreeModel		m_PropertiesModel;
 
 public:
-	PrefabModel(ProjectItem &itemRef, QJsonValue initValue);
+	PrefabModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef);
 
 	PropertiesTreeModel &GetPropertiesModel();
 

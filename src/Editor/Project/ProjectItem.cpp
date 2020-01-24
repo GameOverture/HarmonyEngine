@@ -32,12 +32,10 @@
 ProjectItem::ProjectItem(Project &projRef,
 						 HyGuiItemType eType,
 						 const QString sName,
-						 QJsonValue initSaveValue,
-						 QJsonValue initMetaValue,
+						 ItemFileData initFileData,
 						 bool bIsPendingSave) :
 	ExplorerItem(projRef, eType, sName),
-	m_SaveValue(initSaveValue),
-	m_MetaValue(initMetaValue),
+	m_ItemFileData(initFileData),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_pModel(nullptr),
 	m_pWidget(nullptr),
@@ -77,16 +75,16 @@ void ProjectItem::LoadModel()
 	switch(m_eTYPE)
 	{
 	case ITEM_Sprite:
-		m_pModel = new SpriteModel(*this, m_SaveValue.toArray(), m_MetaValue.toArray());
+		m_pModel = new SpriteModel(*this, m_ItemFileData);
 		break;
 	case ITEM_Text:
-		m_pModel = new TextModel(*this, m_SaveValue.toObject(), m_MetaValue.toObject());
+		m_pModel = new TextModel(*this, m_ItemFileData);
 		break;
 	case ITEM_Entity:
-		m_pModel = new EntityModel(*this, m_SaveValue.toArray(), m_MetaValue.toArray());
+		m_pModel = new EntityModel(*this, m_ItemFileData);
 		break;
 	case ITEM_Prefab:
-		m_pModel = new PrefabModel(*this, m_SaveValue);
+		m_pModel = new PrefabModel(*this, m_ItemFileData);
 		break;
 	case ITEM_Primitive:
 		m_pModel = new PrimitiveModel(*this);

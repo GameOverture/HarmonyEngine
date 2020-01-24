@@ -84,7 +84,7 @@ class EntityModel : public IModel
 	DependencyLookup								m_Dependencies;
 
 public:
-	EntityModel(ProjectItem &itemRef, QJsonArray stateArray);
+	EntityModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef);
 	virtual ~EntityModel();
 
 	EntityNodeTreeModel &GetChildrenModel();

@@ -169,7 +169,11 @@
 			newMetaSpriteStatesArray.append(newMetaSpriteStateObj);
 		}
 
-		metaSpriteObj.insert("states", newMetaSpriteStatesArray);
+		QJsonObject newDataSpriteObj;
+		newDataSpriteObj.insert("stateArray", dataSpriteStatesArray);
+		dataSpritesObj[sSpritesKeysList[i]] = newDataSpriteObj;
+
+		metaSpriteObj.insert("stateArray", newMetaSpriteStatesArray);
 		metaSpritesObj[sSpritesKeysList[i]] = metaSpriteObj;
 	}
 
@@ -186,6 +190,17 @@
 		QJsonObject metaTextObj = metaTextsObj[sTextsKeysList[i]].toObject();
 		QJsonObject dataTextObj = dataTextsObj[sTextsKeysList[i]].toObject();
 
+		// Create a meta 'stateArray'
+		QJsonArray metaTextStateArray;
+		QJsonArray dataTextStateArray = dataTextObj["stateArray"].toArray();
+		for(int j = 0; j < dataTextStateArray.size(); ++j)
+		{
+			QJsonObject metaTextStateObj;
+			metaTextStateObj.insert("name", dataTextStateArray[j].toObject()["name"].toString());
+			metaTextStateArray.append(metaTextStateObj);
+		}
+
+		metaTextObj.insert("stateArray", metaTextStateArray);
 		metaTextObj.insert("availableGlyphs", dataTextObj["availableGlyphs"].toObject());
 		metaTextObj.insert("id", dataTextObj["id"].toInt());
 		dataTextObj.remove("availableGlyphs");
@@ -220,10 +235,6 @@
 
 /*static*/ void VersionPatcher::Patch_1to2(QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
 {
-	QJsonObject metaItemsObj = metaItemsDocRef.object();
-	QJsonObject dataItemsObj = dataItemsDocRef.object();
-	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// lambda function that will fix 'data.hygui' for every atlas frame
 	std::function<void(QJsonObject &, quint32, QUuid)> fpDataItemsReplace =
@@ -273,6 +284,8 @@
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Iterate through every frame within 'atlas.hygui' and fix, and also fix the other files
+	QJsonObject metaItemsObj = metaItemsDocRef.object();
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
 	QJsonArray framesArray = metaAtlasObj["frames"].toArray();
 	for(int i = 0; i < framesArray.size(); ++i)
 	{
@@ -296,6 +309,7 @@
 	metaItemsObj["_fileVersion"] = 2;
 	metaItemsDocRef.setObject(metaItemsObj);
 
+	QJsonObject dataItemsObj = dataItemsDocRef.object();
 	dataItemsObj["_fileVersion"] = 2;
 	dataItemsDocRef.setObject(dataItemsObj);
 
