@@ -16,7 +16,7 @@
 class EntityDraw : public IDraw
 {
 public:
-	EntityDraw(ProjectItem *pProjItem);
+	EntityDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~EntityDraw();
 
 	void Sync();

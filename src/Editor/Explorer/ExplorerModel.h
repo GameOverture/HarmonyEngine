@@ -29,7 +29,7 @@ public:
 	ExplorerItem *FindItemByItemPath(Project *pProject, QString sPath);
 
 	Project *AddProject(const QString sNewProjectFilePath);
-	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave);
+	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, FileDataPair initItemFileData, bool bIsPendingSave);
 	bool RemoveItem(ExplorerItem *pItem);
 
 	QString AssemblePrefix(ExplorerItem *pItem) const;

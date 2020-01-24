@@ -12,10 +12,10 @@
 #include "AtlasModel.h"
 #include "Project.h"
 
-IStateData::IStateData(int iIndex, IModel &modelRef, QString sName) :
+IStateData::IStateData(int iIndex, IModel &modelRef, FileDataPair stateFileData) :
 	m_iINDEX(iIndex),
 	m_ModelRef(modelRef),
-	m_sName(sName)
+	m_sName(stateFileData.m_Meta["name"].toString())
 { }
 
 /*virtual*/ IStateData::~IStateData()
@@ -38,9 +38,10 @@ void IStateData::SetName(QString sNewName)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-IModel::IModel(ProjectItem &itemRef) :
+IModel::IModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
 	QAbstractListModel(&itemRef),
-	m_ItemRef(itemRef)
+	m_ItemRef(itemRef),
+	m_UUID(itemFileDataRef.m_Meta["UUID"].toString())
 {
 }
 
@@ -148,9 +149,9 @@ void IModel::RelinquishAllFrames()
 	m_ItemRef.GetProject().GetAtlasModel().RelinquishFrames(&m_ItemRef, GetAtlasFrames());
 }
 
-QJsonObject IModel::PopState(uint32 uiIndex)
+FileDataPair IModel::PopState(uint32 uiIndex)
 {
-	QJsonObject retObj = GetStateJson(uiIndex);
+	FileDataPair retObj = GetStateFileData(uiIndex);
 
 	beginRemoveRows(QModelIndex(), uiIndex, uiIndex);
 	m_StateList.removeAt(uiIndex);
@@ -161,6 +162,42 @@ QJsonObject IModel::PopState(uint32 uiIndex)
 	dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 
 	return retObj;
+}
+
+FileDataPair IModel::GenerateFileData()
+{
+	FileDataPair fileData;
+
+	// Assemble stateArray
+	QJsonArray metaStateArray;
+	QJsonArray dataStateArray;
+	for(int i = 0; i < GetNumStates(); ++i)
+	{
+		FileDataPair stateFileData = GetStateFileData(i);
+		metaStateArray.append(stateFileData.m_Meta);
+		dataStateArray.append(stateFileData.m_Data);
+	}
+	fileData.m_Meta["stateArray"] = metaStateArray;
+	fileData.m_Data["stateArray"] = dataStateArray;
+
+	// Replace camera data if a draw instance is instantiated
+	if(m_pDraw)
+	{
+		QJsonArray cameraPosArray;
+		cameraPosArray.append(m_pDraw->GetCamera()->pos.X());
+		cameraPosArray.append(m_pDraw->GetCamera()->pos.Y());
+		m_ItemFileData.m_Meta["CameraPos"] = cameraPosArray;
+		m_ItemFileData.m_Meta["CameraZoom"] = m_pDraw->GetCamera()->GetZoom();
+	}
+
+	// Assemble item specific data
+	if(m_pModel->InsertItemSpecificData(m_ItemFileData) == false)
+	{
+		HyGuiLog(GetName(true) % " failed to save.", LOGTYPE_Warning);
+
+		m_ItemFileData = bckup;
+		return;
+	}
 }
 
 /*virtual*/ int IModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/

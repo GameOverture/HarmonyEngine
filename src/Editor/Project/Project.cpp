@@ -151,10 +151,10 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 void Project::LoadExplorerModel()
 {
-	if(LoadDataObj(GetAssetsAbsPath() % HYASSETS_DataFile, m_SaveDataObj))
+	if(LoadDataObj(GetAssetsAbsPath() % HYASSETS_DataFile, m_ProjectFileData.m_Data))
 		WriteGameData();
 
-	if(LoadDataObj(GetMetaDataAbsPath() % HYMETA_DataFile, m_MetaDataObj))
+	if(LoadDataObj(GetMetaDataAbsPath() % HYMETA_DataFile, m_ProjectFileData.m_Meta))
 		WriteMetaData();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +162,7 @@ void Project::LoadExplorerModel()
 	bool bItemsRegisteredInMeta = false;
 
 	// Initialize the project by processing each type
-	for(auto typeIterator = m_SaveDataObj.begin(); typeIterator != m_SaveDataObj.end(); ++typeIterator)
+	for(auto typeIterator = m_ProjectFileData.m_Data.begin(); typeIterator != m_ProjectFileData.m_Data.end(); ++typeIterator)
 	{
 		QString sKey = typeIterator.key();
 
@@ -263,7 +263,7 @@ void Project::WriteGameData()
 	else
 	{
 		QJsonDocument userDoc;
-		userDoc.setObject(m_SaveDataObj);
+		userDoc.setObject(m_ProjectFileData.m_Data);
 		qint64 iBytesWritten = dataFile.write(userDoc.toJson());
 		if(0 == iBytesWritten || -1 == iBytesWritten)
 		{
@@ -282,7 +282,7 @@ void Project::WriteMetaData()
 	else
 	{
 		QJsonDocument metaDoc;
-		metaDoc.setObject(m_MetaDataObj);
+		metaDoc.setObject(m_ProjectFileData.m_Meta);
 
 #ifdef HYGUI_UseBinaryMetaFiles
 		qint64 iBytesWritten = metaFile.write(metaDoc.toBinaryData());
@@ -424,14 +424,14 @@ GltfWidget *Project::GetGltfWidget()
 void Project::SetAudioModel(QJsonObject audioObj)
 {
 	QString sItemTypeName = HyGlobal::ItemName(ITEM_Audio, true);
-	if(m_MetaDataObj.contains(sItemTypeName) == false)
+	if(m_ProjectFileData.m_Meta.contains(sItemTypeName) == false)
 	{
 		HyGuiLog("Project::SetAudioModel could not find item type: " % sItemTypeName, LOGTYPE_Error);
 		return;
 	}
 
-	m_MetaDataObj.remove(sItemTypeName);
-	m_MetaDataObj.insert(sItemTypeName, audioObj);
+	m_ProjectFileData.m_Meta.remove(sItemTypeName);
+	m_ProjectFileData.m_Meta.insert(sItemTypeName, audioObj);
 
 	WriteMetaData();
 }
@@ -492,20 +492,24 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 	}
 }
 
-void Project::SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal, bool bWriteToDisk)
+void Project::SaveGameData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
-	if(m_SaveDataObj.contains(sItemTypeName) == false) {
+	if(m_ProjectFileData.m_Data.contains(sItemTypeName) == false) {
 		HyGuiLog("Project::SaveGameData could not find item type: " % sItemTypeName, LOGTYPE_Error);
 	}
 
-	QJsonObject subDirObj = m_SaveDataObj[sItemTypeName].toObject();
+	QJsonObject metaItemTypeObj = m_ProjectFileData.m_Meta[sItemTypeName].toObject();
+	metaItemTypeObj.remove(sPath);
+	metaItemTypeObj.insert(sPath, itemFileDataRef.m_Meta);
+	m_ProjectFileData.m_Meta.remove(sItemTypeName);
+	m_ProjectFileData.m_Meta.insert(sItemTypeName, metaItemTypeObj);
 
-	subDirObj.remove(sPath);
-	subDirObj.insert(sPath, itemVal);
-
-	m_SaveDataObj.remove(sItemTypeName);
-	m_SaveDataObj.insert(sItemTypeName, subDirObj);
+	QJsonObject dataItemTypeObj = m_ProjectFileData.m_Data[sItemTypeName].toObject();
+	dataItemTypeObj.remove(sPath);
+	dataItemTypeObj.insert(sPath, itemFileDataRef.m_Data);
+	m_ProjectFileData.m_Data.remove(sItemTypeName);
+	m_ProjectFileData.m_Data.insert(sItemTypeName, dataItemTypeObj);
 
 	if(bWriteToDisk)
 		WriteGameData();

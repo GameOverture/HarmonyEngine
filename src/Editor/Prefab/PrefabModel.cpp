@@ -28,8 +28,8 @@ QString StdVectorIntsToQString(const std::vector<int> &vectorRef)
 	return sRetValue;
 }
 
-PrefabStateData::PrefabStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
-	IStateData(iStateIndex, modelRef, stateObj["name"].toString())
+PrefabStateData::PrefabStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
+	IStateData(iStateIndex, modelRef, stateFileData)
 {
 }
 
@@ -56,8 +56,8 @@ void PrefabStateData::Refresh()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-PrefabModel::PrefabModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef) :
-	IModel(itemRef),
+PrefabModel::PrefabModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
+	IModel(itemRef, itemFileDataRef),
 	m_PropertiesModel(itemRef, 0, 0, this)
 {
 	// Ensure the destination directory exists (<DataDir>/Prefabs/<prefix>/)
@@ -333,18 +333,20 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 //	CopyNodesWithMeshes( node.mChildren[a], parent, transform);
 //}
 
-/*virtual*/ QJsonObject PrefabModel::GetStateJson(uint32 uiIndex) const /*override*/
+/*virtual*/ bool PrefabModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	return QJsonObject();
+	//QJsonArray prefabArray;
+	//for(int i = 0; i < m_ChecksumList.size(); ++i)
+	//	prefabArray.append(QJsonValue(static_cast<qint64>(m_ChecksumList[i])));
+
+	//return prefabArray;
+
+	return true;
 }
 
-/*virtual*/ QJsonValue PrefabModel::GetJson() const /*override*/
+/*virtual*/ FileDataPair PrefabModel::GetStateFileData(uint32 uiIndex) const /*override*/
 {
-	QJsonArray prefabArray;
-	for(int i = 0; i < m_ChecksumList.size(); ++i)
-		prefabArray.append(QJsonValue(static_cast<qint64>(m_ChecksumList[i])));
-	
-	return prefabArray;
+	return FileDataPair();
 }
 
 /*virtual*/ QList<AtlasFrame *> PrefabModel::GetAtlasFrames() const /*override*/

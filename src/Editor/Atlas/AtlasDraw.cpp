@@ -18,7 +18,7 @@
 #define DISPLAYORDER_AtlasSelectedFrames 1000
 
 AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
-	IDraw(nullptr),
+	IDraw(nullptr, FileDataPair()),
 	m_ModelRef(*pModelRef),
 	m_bIsMouseOver(false),
 	m_HoverBackground(this),

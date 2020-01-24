@@ -31,7 +31,7 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItem *> &itemListRef)
 		clipboardObj.insert("project", pProjectItem->GetProject().GetAbsPath());
 		clipboardObj.insert("itemType", HyGlobal::ItemName(pProjectItem->GetType(), false));
 		clipboardObj.insert("itemName", pProjectItem->GetName(true));
-		clipboardObj.insert("src", pProjectItem->GetModel()->GetJson());
+		clipboardObj.insert("metaObj", pProjectItem->GetModel()->GetJson());
 
 		// IMAGE INFO
 		QList<AtlasFrame *> atlasFrameList = pProjectItem->GetModel()->GetAtlasFrames();

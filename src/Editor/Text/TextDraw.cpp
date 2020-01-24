@@ -14,8 +14,8 @@
 #include "Harmony.h"
 #include "HarmonyWidget.h"
 
-TextDraw::TextDraw(ProjectItem *pProjItem) :
-	IDraw(pProjItem),
+TextDraw::TextDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef) :
+	IDraw(pProjItem, initFileDataRef),
 	m_Text("", "+GuiPreview", this),
 	m_hTexture(HY_UNUSED_HANDLE)
 {

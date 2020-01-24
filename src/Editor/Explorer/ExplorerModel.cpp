@@ -112,7 +112,7 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 	//pNewLoadThread->start();
 }
 
-ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, QJsonValue initValue, bool bIsPendingSave)
+ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, FileDataPair initItemFileData, bool bIsPendingSave)
 {
 	if(pProj == nullptr)
 	{
@@ -156,7 +156,7 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 	if(eNewItemType == ITEM_Prefix)
 		pNewItem = new ExplorerItem(*pProj, ITEM_Prefix, sName);
 	else
-		pNewItem = new ProjectItem(*pProj, eNewItemType, sName, initValue, bIsPendingSave);
+		pNewItem = new ProjectItem(*pProj, eNewItemType, sName, initFileData, bIsPendingSave);
 
 	InsertNewItem(pNewItem, pCurTreeItem);
 	return pNewItem;
@@ -362,10 +362,15 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 		// Create a new project item representing the pasted item and save it
 		QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
-		QString sPrefix = itemNameFileInfo.path();
-		QString sName = itemNameFileInfo.baseName();
-	
-		ProjectItem *pImportedProjItem = static_cast<ProjectItem *>(AddItem(pDestProject, ePasteItemType, sPrefix, sName, pasteObj["src"], false));
+		FileDataPair initFileItemData;
+		initFileItemData.m_Meta = pasteObj["metaObj"].toObject();
+		initFileItemData.m_Data = pasteObj["dataObj"].toObject();
+		ProjectItem *pImportedProjItem = static_cast<ProjectItem *>(AddItem(pDestProject,
+																			ePasteItemType,
+																			itemNameFileInfo.path(),
+																			itemNameFileInfo.baseName(),
+																			initFileItemData,
+																			false));
 		pImportedProjItem->Save(true);
 #endif
 	}

@@ -18,7 +18,7 @@
 class PrefabStateData : public IStateData
 {
 public:
-	PrefabStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
+	PrefabStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~PrefabStateData();
 
 	void GetStateInfo(QJsonObject &stateObjOut);
@@ -35,12 +35,12 @@ class PrefabModel : public IModel
 	PropertiesTreeModel		m_PropertiesModel;
 
 public:
-	PrefabModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef);
+	PrefabModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
 
 	PropertiesTreeModel &GetPropertiesModel();
 
-	virtual QJsonObject GetStateJson(uint32 uiIndex) const override;
-	virtual QJsonValue GetJson() const override;
+	virtual bool InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
+	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
 	virtual QStringList GetFontUrls() const override;
 

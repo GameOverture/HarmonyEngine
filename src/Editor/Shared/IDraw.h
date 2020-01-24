@@ -19,16 +19,18 @@ class ProjectItem;
 class IDraw : public HyEntity2d
 {
 protected:
-	ProjectItem *       m_pProjItem;
-	HyCamera2d *        m_pCamera;
+	ProjectItem *		m_pProjItem;
+	HyCamera2d *		m_pCamera;
 
-	bool                m_bPanCameraKeyDown;
-	bool                m_bIsCameraPanning;
-	QPointF             m_ptOldMousePos;
+	bool				m_bPanCameraKeyDown;
+	bool				m_bIsCameraPanning;
+	QPointF				m_ptOldMousePos;
 
 public:
-	IDraw(ProjectItem *pProjItem);
+	IDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~IDraw();
+
+	HyCamera2d *GetCamera();
 	
 	void ApplyJsonData();
 

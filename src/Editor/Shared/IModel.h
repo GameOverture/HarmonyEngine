@@ -26,7 +26,7 @@ protected:
 	QString						m_sName;
 	
 public:
-	IStateData(int iIndex, IModel &modelRef, QString sName);
+	IStateData(int iIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~IStateData();
 
 	int GetIndex() const;
@@ -42,11 +42,40 @@ class IModel : public QAbstractListModel
 {
 protected:
 	ProjectItem &				m_ItemRef;
+	const QUuid					m_UUID;
+
 	QList<IStateData *>			m_StateList;
 	
 public:
-	IModel(ProjectItem &itemRef);
+	IModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~IModel();
+
+	template<typename STATEDATA>
+	void InitStates(const FileDataPair &itemFileDataRef)
+	{
+		QJsonArray metaStateArray = itemFileDataRef.m_Meta["stateArray"].toArray();
+		QJsonArray dataStateArray = itemFileDataRef.m_Data["stateArray"].toArray();
+
+		assert(metaStateArray.size() == dataStateArray.size());
+
+		// If item's init value is defined, parse and initialize with it, otherwise make default empty sprite
+		if(metaStateArray.empty() == false)
+		{
+			for(int i = 0; i < metaStateArray.size(); ++i)
+			{
+				FileDataPair stateFileData;
+				stateFileData.m_Meta = metaStateArray[i].toObject();
+				stateFileData.m_Data = dataStateArray[i].toObject();
+				AppendState<STATEDATA>(stateFileData);
+			}
+		}
+		else
+		{
+			FileDataPair newStateFileData;
+			newStateFileData.m_Meta["name"] = "";
+			AppendState<STATEDATA>(newStateFileData);
+		}
+	}
 
 	ProjectItem &GetItem();
 	const ProjectItem &GetItem() const;
@@ -63,7 +92,8 @@ public:
 	void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
 	void RelinquishAllFrames();
 
-	QJsonObject PopState(uint32 uiIndex);
+	FileDataPair PopState(uint32 uiIndex);
+	FileDataPair GenerateFileData();
 	
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -71,18 +101,18 @@ public:
 	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	
 	template<typename STATEDATA>
-	int AppendState(QJsonObject stateObj)
+	int AppendState(FileDataPair stateFileData)
 	{
 		int iIndex = m_StateList.size();
-		InsertState<STATEDATA>(iIndex, stateObj);
+		InsertState<STATEDATA>(iIndex, stateFileData);
 	
 		return iIndex;
 	}
 	
 	template<typename STATEDATA>
-	void InsertState(int iStateIndex, QJsonObject stateObj)
+	void InsertState(int iStateIndex, FileDataPair stateFileData)
 	{
-		STATEDATA *pNewState = new STATEDATA(iStateIndex, *this, stateObj);
+		STATEDATA *pNewState = new STATEDATA(iStateIndex, *this, stateFileData);
 	
 		beginInsertRows(QModelIndex(), iStateIndex, iStateIndex);
 		m_StateList.insert(iStateIndex, pNewState);
@@ -92,10 +122,9 @@ public:
 		roleList.append(Qt::DisplayRole);
 		dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 	}
-	
-	virtual bool OnSave() { return true; }
-	virtual QJsonObject GetStateJson(uint32 uiIndex) const = 0;
-	virtual QJsonValue GetJson() const = 0;
+
+	virtual bool InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
+	virtual FileDataPair GetStateFileData(uint32 uiIndex) const = 0;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;
 	virtual QStringList GetFontUrls() const = 0;
 };

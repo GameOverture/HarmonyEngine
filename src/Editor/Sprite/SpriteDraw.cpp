@@ -14,8 +14,8 @@
 
 #include <QKeyEvent>
 
-SpriteDraw::SpriteDraw(ProjectItem *pProjItem) :
-	IDraw(pProjItem),
+SpriteDraw::SpriteDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef) :
+	IDraw(pProjItem, initFileDataRef),
 	m_Sprite("", "+GuiPreview", this),
 	m_primOriginHorz(this),
 	m_primOriginVert(this)

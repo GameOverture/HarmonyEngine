@@ -13,9 +13,9 @@
 #include "ExplorerModel.h"
 #include "AtlasWidget.h"
 
-TextStateData::TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
-	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
-	m_LayersModel(static_cast<TextModel &>(modelRef).GetFontManager(), static_cast<TextModel &>(modelRef).GetFontManager().RegisterLayers(stateObj), &modelRef)
+TextStateData::TextStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
+	IStateData(iStateIndex, modelRef, stateFileData),
+	m_LayersModel(static_cast<TextModel &>(modelRef).GetFontManager(), static_cast<TextModel &>(modelRef).GetFontManager().RegisterLayers(stateFileData.m_Data), &modelRef)
 {
 }
 
@@ -39,47 +39,31 @@ TextLayersModel &TextStateData::GetLayersModel()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TextModel::TextModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef) :
-	IModel(itemRef),
+TextModel::TextModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
+	IModel(itemRef, itemFileDataRef),
+	m_FontManager(m_ItemRef, itemFileDataRef.m_Meta["availableGlyphs"].toObject(), itemFileDataRef.m_Data["fontArray"].toArray()),
 	m_pAtlasFrame(nullptr)
 {
-	// If item's init value is defined, parse and initialize with it, otherwise make default empty font
-	if(textObj.empty() == false)
-	{
-		m_pFontManager = new TextFontManager(m_ItemRef, textObj["availableGlyphs"].toObject(), textObj["fontArray"].toArray());
-
-		QJsonArray stateArray = textObj["stateArray"].toArray();
-		for(int i = 0; i < stateArray.size(); ++i)
-		{
-			QJsonObject stateObj = stateArray[i].toObject();
-			AppendState<TextStateData>(stateObj);
-		}
-
-		// Find existing AtlasFrame * to assign to 'm_pAtlasFrame'
-		int iAffectedFrameIndex = 0;
-		QList<quint32> idRequestList;
-		idRequestList.append(JSONOBJ_TOINT(textObj, "id")); uuid;
-		QList<AtlasFrame *> pRequestedList = RequestFramesById(nullptr, idRequestList, iAffectedFrameIndex);
-		if(pRequestedList.size() == 1)
-			m_pAtlasFrame = pRequestedList[0];
-		else
-			HyGuiLog("More than one frame returned for a font", LOGTYPE_Error);
-	}
+	InitStates<TextStateData>(itemFileDataRef);
+		
+	// Find existing AtlasFrame * to assign to 'm_pAtlasFrame'
+	int iAffectedFrameIndex = 0;
+	QList<QUuid> uuidRequestList;
+	uuidRequestList.append(QUuid(itemFileDataRef.m_Meta["frameUUID"].toString()));
+	QList<AtlasFrame *> pRequestedList = RequestFramesByUuid(nullptr, uuidRequestList, iAffectedFrameIndex);
+	if(pRequestedList.size() == 1)
+		m_pAtlasFrame = pRequestedList[0];
 	else
-	{
-		m_pFontManager = new TextFontManager(m_ItemRef, QJsonObject(), QJsonArray());
-		AppendState<TextStateData>(QJsonObject());
-	}
+		HyGuiLog("More than one frame returned for a font", LOGTYPE_Error);
 }
 
 /*virtual*/ TextModel::~TextModel()
 {
-	delete m_pFontManager;
 }
 
 TextFontManager &TextModel::GetFontManager()
 {
-	return *m_pFontManager;
+	return m_FontManager;
 }
 
 TextLayersModel *TextModel::GetLayersModel(uint uiIndex) const
@@ -92,12 +76,12 @@ TextLayersModel *TextModel::GetLayersModel(uint uiIndex) const
 
 PropertiesTreeModel *TextModel::GetGlyphsModel()
 {
-	return m_pFontManager->GetGlyphsModel();
+	return m_FontManager.GetGlyphsModel();
 }
 
 /*virtual*/ bool TextModel::OnSave() /*override*/
 {
-	m_pFontManager->GenerateOptimizedAtlas();
+	m_FontManager.GenerateOptimizedAtlas();
 
 	uint uiAtlasGrpIndex = 0;
 	if(m_pAtlasFrame != nullptr)
@@ -105,7 +89,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	QSize maxAtlasSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
 
 	QSize atlasDimensionsOut; uint uiAtlasPixelDataSizeOut;
-	unsigned char *pPixelData = m_pFontManager->GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
+	unsigned char *pPixelData = m_FontManager.GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
 	if(atlasDimensionsOut.width() > maxAtlasSize.width() || atlasDimensionsOut.height() > maxAtlasSize.height())
 	{
 		HyGuiLog("Could not save because this Text's subatlas is larger than what can fit on the specified Atlas Group", LOGTYPE_Warning);
@@ -147,29 +131,9 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	}
 }
 
-/*virtual*/ QJsonObject TextModel::GetStateJson(uint32 uiIndex) const /*override*/
+/*virtual*/ bool TextModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	float fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight;
-	GetLayersModel(uiIndex)->GetMiscInfo(fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight);
-
-	QJsonObject stateObjOut;
-	stateObjOut.insert("name", m_StateList[uiIndex]->GetName());
-	stateObjOut.insert("leftSideNudgeAmt", fLeftSideNudgeAmt);
-	stateObjOut.insert("lineAscender", fLineAscender);
-	stateObjOut.insert("lineDescender", fLineDescender);
-	stateObjOut.insert("lineHeight", fLineHeight);
-
-	QJsonArray layersArray = static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel().GetLayersArray();
-	stateObjOut.insert("layers", layersArray);
-
-	return stateObjOut;
-}
-
-/*virtual*/ QJsonValue TextModel::GetJson() const /*override*/
-{
-	QJsonObject textObj;
-
-	const PropertiesTreeModel *pGlyphsModel = m_pFontManager->GetGlyphsModel();
+	const PropertiesTreeModel *pGlyphsModel = m_FontManager.GetGlyphsModel();
 
 	QJsonObject availableGlyphsObj;
 	QVariant propValue;
@@ -183,26 +147,37 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	availableGlyphsObj.insert("symbols", static_cast<bool>(propValue.toInt() == Qt::Checked));
 	propValue = pGlyphsModel->FindPropertyValue("Uses Glyphs", TEXTPROP_AdditionalSyms);
 	availableGlyphsObj.insert("additional", propValue.toString());
-	textObj.insert("availableGlyphs", availableGlyphsObj);
+	
+	itemSpecificFileDataOut.m_Meta["availableGlyphs"] = availableGlyphsObj;
 
-	textObj.insert("checksum", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetImageChecksum())));
-	textObj.insert("id", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetId()))); uuid;
-
-	QJsonArray stateArray;
-	for(int i = 0; i < GetNumStates(); ++i)
-		stateArray.append(GetStateJson(i));
-	textObj.insert("stateArray", stateArray);
+	itemSpecificFileDataOut.m_Data.insert("checksum", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetImageChecksum())));
+	itemSpecificFileDataOut.m_Meta.insert("frameUUID", m_pAtlasFrame == nullptr ? 0 : m_pAtlasFrame->GetId().toString());
 
 	uint uiAtlasPixelDataSizeOut; QSize atlasDimensionsOut;
-	unsigned char *pPixelData = m_pFontManager->GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
+	unsigned char *pPixelData = m_FontManager.GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
+	itemSpecificFileDataOut.m_Data.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? atlasDimensionsOut.width() : QJsonValue(m_pAtlasFrame->GetSize().width()));
+	itemSpecificFileDataOut.m_Data.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? atlasDimensionsOut.height() : QJsonValue(m_pAtlasFrame->GetSize().height()));
 
-	textObj.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? atlasDimensionsOut.width() : QJsonValue(m_pAtlasFrame->GetSize().width()));
-	textObj.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? atlasDimensionsOut.height() : QJsonValue(m_pAtlasFrame->GetSize().height()));
+	QJsonArray fontArray = m_FontManager.GetFontArray();
+	itemSpecificFileDataOut.m_Data.insert("fontArray", fontArray);
+}
 
-	QJsonArray fontArray = m_pFontManager->GetFontArray();
-	textObj.insert("fontArray", fontArray);
+/*virtual*/ FileDataPair TextModel::GetStateFileData(uint32 uiIndex) const /*override*/
+{
+	FileDataPair stateFileData;
+	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
 
-	return textObj;
+	float fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight;
+	GetLayersModel(uiIndex)->GetMiscInfo(fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight);
+	stateFileData.m_Data.insert("leftSideNudgeAmt", fLeftSideNudgeAmt);
+	stateFileData.m_Data.insert("lineAscender", fLineAscender);
+	stateFileData.m_Data.insert("lineDescender", fLineDescender);
+	stateFileData.m_Data.insert("lineHeight", fLineHeight);
+
+	QJsonArray layersArray = static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel().GetLayersArray();
+	stateFileData.m_Data.insert("layers", layersArray);
+
+	return stateFileData;
 }
 
 /*virtual*/ QList<AtlasFrame *> TextModel::GetAtlasFrames() const /*override*/

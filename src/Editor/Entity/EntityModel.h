@@ -84,7 +84,7 @@ class EntityModel : public IModel
 	DependencyLookup								m_Dependencies;
 
 public:
-	EntityModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef);
+	EntityModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
 	EntityNodeTreeModel &GetChildrenModel();

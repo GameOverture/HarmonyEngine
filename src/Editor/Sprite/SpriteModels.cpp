@@ -154,11 +154,6 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 	return m_FramesList[iIndex];
 }
 
-void SpriteFramesModel::Refresh()
-{
-	dataChanged(createIndex(0, 0), createIndex(m_FramesList.count() - 1, NUMCOLUMNS - 1));
-}
-
 /*virtual*/ int SpriteFramesModel::rowCount(const QModelIndex & /*parent*/) const
 {
    return m_FramesList.count();
@@ -260,8 +255,8 @@ void SpriteFramesModel::Refresh()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
-	IStateData(iStateIndex, modelRef, stateObj["name"].toString()),
+SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
+	IStateData(iStateIndex, modelRef, stateFileData),
 	m_pChkMapper_Loop(nullptr),
 	m_pChkMapper_Reverse(nullptr),
 	m_pChkMapper_Bounce(nullptr),
@@ -272,19 +267,19 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject 
 	m_pChkMapper_Bounce = new CheckBoxMapper(&m_ModelRef);
 	m_pFramesModel = new SpriteFramesModel(&m_ModelRef);
 
-	if(stateObj.empty() == false)
+	if(stateFileData.m_Data.empty() == false)
 	{
-		m_pChkMapper_Loop->SetChecked(stateObj["loop"].toBool());
-		m_pChkMapper_Reverse->SetChecked(stateObj["reverse"].toBool());
-		m_pChkMapper_Bounce->SetChecked(stateObj["bounce"].toBool());
+		m_pChkMapper_Loop->SetChecked(stateFileData.m_Data["loop"].toBool());
+		m_pChkMapper_Reverse->SetChecked(stateFileData.m_Data["reverse"].toBool());
+		m_pChkMapper_Bounce->SetChecked(stateFileData.m_Data["bounce"].toBool());
 
-		QJsonArray spriteFrameArray = stateObj["frames"].toArray();
+		QJsonArray spriteFrameArray = stateFileData.m_Data["frames"].toArray();
 
 		QList<QUuid> uuidRequestList;
 		for(int i = 0; i < spriteFrameArray.size(); ++i)
 		{
 			QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
-			uuidRequestList.append(QUuid(spriteFrameObj["id"].toString())); uuid
+			uuidRequestList.append(QUuid(spriteFrameObj["frameUUID"].toString()));
 		}
 
 		int iAffectedFrameIndex = 0;
@@ -339,32 +334,32 @@ SpriteFramesModel *SpriteStateData::GetFramesModel()
 	return m_pFramesModel;
 }
 
-void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
-{
-	QJsonArray frameArray;
-	float fTotalDuration = 0.0f;
-	for(int i = 0; i < m_pFramesModel->rowCount(); ++i)
-	{
-		SpriteFrame *pSpriteFrame = m_pFramesModel->GetFrameAt(i);
-
-		QJsonObject frameObj;
-		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetImageChecksum())));
-		frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
-		frameObj.insert("id", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetId()))); uuid;
-		frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
-		frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + ((pSpriteFrame->m_pFrame->GetSize().height() - 1) - pSpriteFrame->m_pFrame->GetCrop().bottom()))); // -1 on height because it's NOT zero based like everything else
-		fTotalDuration += pSpriteFrame->m_fDuration;
-
-		frameArray.append(frameObj);
-	}
-
-	stateObjOut.insert("bounce", m_pChkMapper_Bounce->IsChecked());
-	stateObjOut.insert("duration", QJsonValue(fTotalDuration));
-	stateObjOut.insert("frames", QJsonValue(frameArray));
-	stateObjOut.insert("loop", m_pChkMapper_Loop->IsChecked());
-	stateObjOut.insert("name", QJsonValue(GetName()));
-	stateObjOut.insert("reverse", m_pChkMapper_Reverse->IsChecked());
-}
+//void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
+//{
+//	QJsonArray frameArray;
+//	float fTotalDuration = 0.0f;
+//	for(int i = 0; i < m_pFramesModel->rowCount(); ++i)
+//	{
+//		SpriteFrame *pSpriteFrame = m_pFramesModel->GetFrameAt(i);
+//
+//		QJsonObject frameObj;
+//		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetImageChecksum())));
+//		frameObj.insert("duration", QJsonValue(pSpriteFrame->m_fDuration));
+//		frameObj.insert("id", QJsonValue(static_cast<qint64>(pSpriteFrame->m_pFrame->GetId()))); uuid;
+//		frameObj.insert("offsetX", QJsonValue(pSpriteFrame->m_vOffset.x() + pSpriteFrame->m_pFrame->GetCrop().left()));
+//		frameObj.insert("offsetY", QJsonValue(pSpriteFrame->m_vOffset.y() + ((pSpriteFrame->m_pFrame->GetSize().height() - 1) - pSpriteFrame->m_pFrame->GetCrop().bottom()))); // -1 on height because it's NOT zero based like everything else
+//		fTotalDuration += pSpriteFrame->m_fDuration;
+//
+//		frameArray.append(frameObj);
+//	}
+//
+//	stateObjOut.insert("bounce", m_pChkMapper_Bounce->IsChecked());
+//	stateObjOut.insert("duration", QJsonValue(fTotalDuration));
+//	stateObjOut.insert("frames", QJsonValue(frameArray));
+//	stateObjOut.insert("loop", m_pChkMapper_Loop->IsChecked());
+//	stateObjOut.insert("name", QJsonValue(GetName()));
+//	stateObjOut.insert("reverse", m_pChkMapper_Reverse->IsChecked());
+//}
 
 QSet<AtlasFrame *> SpriteStateData::GetAtlasFrames()
 {
@@ -373,11 +368,6 @@ QSet<AtlasFrame *> SpriteStateData::GetAtlasFrames()
 		atlasSet.insert(m_pFramesModel->GetFrameAt(i)->m_pFrame);
 
 	return atlasSet;
-}
-
-void SpriteStateData::Refresh()
-{
-	m_pFramesModel->Refresh();
 }
 
 /*virtual*/ int SpriteStateData::AddFrame(AtlasFrame *pFrame)
@@ -392,50 +382,37 @@ void SpriteStateData::Refresh()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpriteModel::SpriteModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef) :
-	IModel(itemRef)
+SpriteModel::SpriteModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
+	IModel(itemRef, itemFileDataRef)
 {
-	// If item's init value is defined, parse and initialize with it, otherwise make default empty sprite
-	if(stateArray.empty() == false)
-	{
-		for(int i = 0; i < stateArray.size(); ++i)
-			AppendState<SpriteStateData>(stateArray[i].toObject());
-	}
-	else
-		AppendState<SpriteStateData>(QJsonObject());
+	InitStates<SpriteStateData>(itemFileDataRef);
 }
 
 /*virtual*/ SpriteModel::~SpriteModel()
 {
 }
 
-QJsonObject SpriteModel::GetStateJson(uint32 uiIndex) const /*override*/
+/*virtual*/ bool SpriteModel::InsertItemSpecificData(FileDataPair &itemFileDataOut) /*override*/
 {
-	QJsonObject retStateObj;
-	retStateObj.insert("name", m_StateList[uiIndex]->GetName());
-	retStateObj.insert("loop", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetLoopMapper()->currentIndex());
-	retStateObj.insert("reverse", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetReverseMapper()->currentIndex());
-	retStateObj.insert("bounce", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetBounceMapper()->currentIndex());
+	return true;
+}
+
+/*virtual*/ FileDataPair SpriteModel::GetStateFileData(uint32 uiIndex) const /*override*/
+{
+	FileDataPair stateFileData;
+
+	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
+
+	stateFileData.m_Data.insert("loop", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetLoopMapper()->currentIndex());
+	stateFileData.m_Data.insert("reverse", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetReverseMapper()->currentIndex());
+	stateFileData.m_Data.insert("bounce", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetBounceMapper()->currentIndex());
 
 	float fTotalDuration = 0.0f;
 	QJsonArray framesArray = static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetFramesModel()->GetFramesInfo(fTotalDuration);
-	retStateObj.insert("frames", framesArray);
-	retStateObj.insert("duration", fTotalDuration);
+	stateFileData.m_Data.insert("frames", framesArray);
+	stateFileData.m_Data.insert("duration", fTotalDuration);
 
-	return retStateObj;
-}
-
-/*virtual*/ QJsonValue SpriteModel::GetJson() const /*override*/
-{
-	QJsonArray retArray;
-	for(int i = 0; i < m_StateList.size(); ++i)
-	{
-		QJsonObject spriteState;
-		static_cast<SpriteStateData *>(m_StateList[i])->GetStateInfo(spriteState);
-		retArray.append(spriteState);
-	}
-
-	return retArray;
+	return stateFileData;
 }
 
 /*virtual*/ QList<AtlasFrame *> SpriteModel::GetAtlasFrames() const /*override*/
@@ -454,9 +431,3 @@ QJsonObject SpriteModel::GetStateJson(uint32 uiIndex) const /*override*/
 {
 	return QStringList();
 }
-
-///*virtual*/ void SpriteModel::Refresh() /*override*/
-//{
-//	for(int i = 0; i < m_StateList.size(); ++i)
-//		static_cast<SpriteStateData *>(m_StateList[i])->Refresh();
-//}

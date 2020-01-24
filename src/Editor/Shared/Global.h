@@ -154,10 +154,10 @@ QString PointToQString(QPointF ptPoint);
 QPointF StringToPoint(QString sPoint);
 QByteArray JsonValueToSrc(QJsonValue value);
 
-struct ItemFileData
+struct FileDataPair
 {
-	QJsonValue	m_Data;
-	QJsonValue	m_Meta;
+	QJsonObject	m_Data;
+	QJsonObject	m_Meta;
 };
 
 class HyGlobal

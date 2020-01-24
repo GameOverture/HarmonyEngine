@@ -22,13 +22,16 @@
 
 #define KEY_PanCamera Qt::Key_Space
 
-IDraw::IDraw(ProjectItem *pProjItem) :
+IDraw::IDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef) :
 	m_pProjItem(pProjItem),
 	m_pCamera(nullptr),
 	m_bPanCameraKeyDown(false),
 	m_bIsCameraPanning(false)
 {
 	m_pCamera = Hy_Window().CreateCamera2d();
+	m_pCamera->pos.Set(initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[0].toDouble()) : 0.0f,
+					   initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[1].toDouble()) : 0.0f);
+	m_pCamera->SetZoom(static_cast<float>(initFileDataRef.m_Meta["CameraZoom"].toDouble()));
 	m_pCamera->SetVisible(false);
 }
 
@@ -36,6 +39,11 @@ IDraw::IDraw(ProjectItem *pProjItem) :
 {
 	if(Hy_IsInitialized())
 		Hy_Window().RemoveCamera(m_pCamera);
+}
+
+HyCamera2d *IDraw::GetCamera()
+{
+	return m_pCamera;
 }
 
 void IDraw::ApplyJsonData()

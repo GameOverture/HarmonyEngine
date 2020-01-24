@@ -10,8 +10,8 @@
 #include "Global.h"
 #include "PrimitiveModel.h"
 
-PrimitiveModel::PrimitiveModel(ProjectItem &itemRef) :
-	IModel(itemRef)
+PrimitiveModel::PrimitiveModel(ProjectItem &itemRef, FileDataPair &itemFileDataRef) :
+	IModel(itemRef, itemFileDataRef)
 {
 }
 
@@ -19,14 +19,14 @@ PrimitiveModel::~PrimitiveModel()
 {
 }
 
-/*virtual*/ QJsonObject PrimitiveModel::GetStateJson(uint32 uiIndex) const /*override*/
+/*virtual*/ bool PrimitiveModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	return QJsonObject();
+	return true;
 }
 
-/*virtual*/ QJsonValue PrimitiveModel::GetJson() const /*override*/
+/*virtual*/ FileDataPair PrimitiveModel::GetStateFileData(uint32 uiIndex) const /*override*/
 {
-	return QJsonValue();
+	return FileDataPair();
 }
 
 /*virtual*/ QList<AtlasFrame *> PrimitiveModel::GetAtlasFrames() const /*override*/

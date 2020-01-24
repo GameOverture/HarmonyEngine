@@ -244,8 +244,8 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityModel::EntityModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef) :
-	IModel(itemRef),
+EntityModel::EntityModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
+	IModel(itemRef, itemFileDataRef),
 	m_TreeModel(this, this)
 {
 	// If item's init value is defined, parse and initialize with it, otherwise make default empty sprite

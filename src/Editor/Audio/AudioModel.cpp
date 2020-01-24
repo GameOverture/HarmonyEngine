@@ -10,8 +10,8 @@
 #include "Global.h"
 #include "AudioModel.h"
 
-AudioModel::AudioModel(ProjectItem &itemRef) :
-	IModel(itemRef)
+AudioModel::AudioModel(ProjectItem &itemRef, FileDataPair &itemFileDataRef) :
+	IModel(itemRef, itemFileDataRef)
 {
 }
 
@@ -19,14 +19,14 @@ AudioModel::~AudioModel()
 {
 }
 
-/*virtual*/ QJsonObject AudioModel::GetStateJson(uint32 uiIndex) const /*override*/
+/*virtual*/ bool AudioModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	return QJsonObject();
+	return true;
 }
 
-/*virtual*/ QJsonValue AudioModel::GetJson() const /*override*/
+/*virtual*/ FileDataPair AudioModel::GetStateFileData(uint32 uiIndex) const /*override*/
 {
-	return QJsonValue();
+	return FileDataPair();
 }
 
 /*virtual*/ QList<AtlasFrame *> AudioModel::GetAtlasFrames() const /*override*/

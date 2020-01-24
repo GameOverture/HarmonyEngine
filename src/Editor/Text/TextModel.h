@@ -35,7 +35,7 @@ class TextStateData : public IStateData
 	TextLayersModel			m_LayersModel;
 
 public:
-	TextStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
+	TextStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~TextStateData();
 
 	TextLayersModel &GetLayersModel();
@@ -48,11 +48,11 @@ class TextModel : public IModel
 {
 	Q_OBJECT
 
-	TextFontManager *		m_pFontManager;
+	TextFontManager 		m_FontManager;
 	AtlasFrame *			m_pAtlasFrame;
 
 public:
-	TextModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef);
+	TextModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~TextModel();
 
 	TextFontManager &GetFontManager();
@@ -60,8 +60,9 @@ public:
 	PropertiesTreeModel *GetGlyphsModel();
 
 	virtual bool OnSave() override;
-	virtual QJsonObject GetStateJson(uint32 uiIndex) const override;
-	virtual QJsonValue GetJson() const override;
+
+	virtual bool InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
+	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
 	virtual QStringList GetFontUrls() const override;
 };

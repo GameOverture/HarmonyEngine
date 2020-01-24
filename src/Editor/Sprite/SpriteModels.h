@@ -77,8 +77,6 @@ public:
 	QJsonArray GetFramesInfo(float &fTotalDurationRef);
 	SpriteFrame *GetFrameAt(int iIndex);
 
-	void Refresh();
-
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -98,7 +96,7 @@ class SpriteStateData : public IStateData
 	SpriteFramesModel * m_pFramesModel;
 
 public:
-	SpriteStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
+	SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~SpriteStateData();
 	
 	CheckBoxMapper *GetLoopMapper();
@@ -106,11 +104,9 @@ public:
 	CheckBoxMapper *GetBounceMapper();
 	SpriteFramesModel *GetFramesModel();
 
-	void GetStateInfo(QJsonObject &stateObjOut);
+	//void GetStateInfo(QJsonObject &stateObjOut);
 
 	QSet<AtlasFrame *> GetAtlasFrames();
-
-	void Refresh();
 	
 	virtual int AddFrame(AtlasFrame *pFrame) override;
 	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
@@ -121,11 +117,11 @@ class SpriteModel : public IModel
 	Q_OBJECT
 
 public:
-	SpriteModel(ProjectItem &itemRef, ItemFileData &itemFileDataRef);
+	SpriteModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~SpriteModel();
 	
-	virtual QJsonObject GetStateJson(uint32 uiIndex) const override;
-	virtual QJsonValue GetJson() const override;
+	virtual bool InsertItemSpecificData(FileDataPair &itemFileDataOut) override;
+	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
 	virtual QStringList GetFontUrls() const override;
 };

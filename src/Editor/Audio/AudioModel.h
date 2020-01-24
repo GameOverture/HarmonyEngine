@@ -14,11 +14,11 @@
 class AudioModel : public IModel
 {
 public:
-	AudioModel(ProjectItem &itemRef);
+	AudioModel(ProjectItem &itemRef, FileDataPair &itemFileDataRef);
 	virtual ~AudioModel();
 
-	virtual QJsonObject GetStateJson(uint32 uiIndex) const override;
-	virtual QJsonValue GetJson() const override;
+	virtual bool InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
+	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
 	virtual QStringList GetFontUrls() const override;
 };

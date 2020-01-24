@@ -66,8 +66,7 @@ class Project : public ExplorerItem
 	ProjectTabBar *									m_pTabBar;
 	ProjectItem *									m_pCurOpenItem;
 
-	QJsonObject										m_SaveDataObj;
-	QJsonObject										m_MetaDataObj;
+	FileDataPair									m_ProjectFileData;
 
 	bool											m_bHasError;
 	
@@ -113,7 +112,7 @@ public:
 
 	void SetRenderSize(int iWidth, int iHeight);
 
-	void SaveGameData(HyGuiItemType eType, QString sPath, QJsonValue itemVal, bool bWriteToDisk);
+	void SaveGameData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
 	void DeleteGameData(HyGuiItemType eType, QString sPath, bool bWriteToDisk);
 	void DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk);
 

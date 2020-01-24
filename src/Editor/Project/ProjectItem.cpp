@@ -32,10 +32,10 @@
 ProjectItem::ProjectItem(Project &projRef,
 						 HyGuiItemType eType,
 						 const QString sName,
-						 ItemFileData initFileData,
+						 const FileDataPair &initFileDataRef,
 						 bool bIsPendingSave) :
 	ExplorerItem(projRef, eType, sName),
-	m_ItemFileData(initFileData),
+	m_ItemFileData(initFileDataRef),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_pModel(nullptr),
 	m_pWidget(nullptr),
@@ -129,16 +129,10 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 
 void ProjectItem::Save(bool bWriteToDisk)
 {
-	if(m_pModel->OnSave() == false)
-	{
-		HyGuiLog(GetName(true) % " failed to save.", LOGTYPE_Warning);
-		return;
-	}
+	FileDataPair bckup = m_ItemFileData;
+	m_ItemFileData = m_pModel->GenerateFileData(m_pDraw);
 
-	m_SaveValue = m_pModel->GetJson();
-	m_MetaValue = m_pModel->GetMetaJson();
-
-	GetProject().SaveGameData(m_eTYPE, GetName(true), m_SaveValue, m_MetaValue, bWriteToDisk);
+	GetProject().SaveGameData(m_eTYPE, GetName(true), m_ItemFileData, bWriteToDisk);
 	m_pUndoStack->setClean();
 
 	m_bExistencePendingSave = false;
@@ -201,16 +195,16 @@ void ProjectItem::DrawLoad()
 	switch(m_eTYPE)
 	{
 	case ITEM_Sprite:
-		m_pDraw = new SpriteDraw(this);
+		m_pDraw = new SpriteDraw(this, m_ItemFileData);
 		break;
 	case ITEM_Text:
-		m_pDraw = new TextDraw(this);
+		m_pDraw = new TextDraw(this, m_ItemFileData);
 		break;
 	case ITEM_Entity:
-		m_pDraw = new EntityDraw(this);
+		m_pDraw = new EntityDraw(this, m_ItemFileData);
 		break;
 	case ITEM_Prefab:
-		m_pDraw = new PrefabDraw(this);
+		m_pDraw = new PrefabDraw(this, m_ItemFileData);
 		break;
 	default:
 		HyGuiLog("Unimplemented DrawLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);

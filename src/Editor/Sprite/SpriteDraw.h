@@ -23,7 +23,7 @@ class SpriteDraw : public IDraw
 	HyPrimitive2d			m_primOriginVert;
 
 public:
-	SpriteDraw(ProjectItem *pProjItem);
+	SpriteDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~SpriteDraw();
 
 	void PlayAnim(quint32 uiFrameIndex);

@@ -10,8 +10,8 @@
 #include "Global.h"
 #include "PrefabDraw.h"
 
-PrefabDraw::PrefabDraw(ProjectItem *pProjItem) :
-	IDraw(pProjItem)
+PrefabDraw::PrefabDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef) :
+	IDraw(pProjItem, initFileDataRef)
 {
 }
 
