@@ -112,8 +112,8 @@ public:
 
 	void SetRenderSize(int iWidth, int iHeight);
 
-	void SaveGameData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
-	void DeleteGameData(HyGuiItemType eType, QString sPath, bool bWriteToDisk);
+	void SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
+	void DeleteItemData(HyGuiItemType eType, QString sPath, bool bWriteToDisk);
 	void DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk);
 
 	QString RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath);
@@ -150,7 +150,6 @@ private:
 	void RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);
 
 	void RefreshNamesOnTabs();
-	bool RegisterMetaData(ProjectItem *pProjectItem);
 };
 
 #endif // PROJECT_H

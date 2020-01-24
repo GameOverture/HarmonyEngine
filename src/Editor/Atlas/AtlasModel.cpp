@@ -465,7 +465,7 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage 
 	Repack(uiAtlasGrpIndex, QSet<int>(), newFrameSet);
 
 	// This retrieves the newly created AtlasFrame and links it to its ProjectItem
-	QList<quint32> idList;
+	QList<QUuid> idList;
 	idList.append(pFrame->GetId());
 	QList<AtlasFrame *> returnList = RequestFramesById(pItem, idList);
 

@@ -77,7 +77,6 @@ QList<ExplorerItem *> ExplorerModel::GetItemsRecursively(const QModelIndex &inde
 	return returnList;
 }
 
-
 ExplorerItem *ExplorerModel::FindItemByItemPath(Project *pProject, QString sPath)
 {
 	QModelIndex sourceIndex = FindIndexByItemPath(pProject, sPath);
@@ -86,6 +85,25 @@ ExplorerItem *ExplorerModel::FindItemByItemPath(Project *pProject, QString sPath
 	return pSourceTreeItem->data(0).value<ExplorerItem *>();
 }
 
+FileDataPair ExplorerModel::GenerateNewItemFileData(QString sImportPath = "")
+{
+	FileDataPair newItemFileData;
+	newItemFileData.m_Meta["stateArray"] = QJsonArray();
+	newItemFileData.m_Data["stateArray"] = QJsonArray();
+
+	QJsonArray cameraPosArray;
+	cameraPosArray.append(0);
+	cameraPosArray.append(0);
+	newItemFileData.m_Meta["CameraPos"] = cameraPosArray;
+	newItemFileData.m_Meta["CameraZoom"] = 1;
+
+	newItemFileData.m_Meta["UUID"] = QUuid::createUuid().toString();
+
+	if(IsItemFileDataValid(newItemFileData) == false)
+		HyGuiLog("ExplorerModel::GenerateNewItemFileData - IsItemFileDataValid return false", LOGTYPE_Error);
+
+	return newItemFileData;
+}
 
 Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 {
@@ -122,6 +140,11 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 	if(eNewItemType == ITEM_Project)
 	{
 		HyGuiLog("Do not use WidgetExplorer::AddItem for projects... use AddProjectItem instead", LOGTYPE_Error);
+		return nullptr;
+	}
+	if(IsItemFileDataValid(initItemFileData) == false)
+	{
+		HyGuiLog("ExplorerModel::AddItem was passed an invalid FileDataPair", LOGTYPE_Error);
 		return nullptr;
 	}
 
@@ -513,6 +536,32 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 //	ExplorerItem *pProject = pProjectTreeItem->data(0).value<ExplorerItem *>();
 //	delete pProject;
 //}
+
+bool ExplorerModel::IsItemFileDataValid(const FileDataPair &itemfileDataRef)
+{
+	std::function<bool(const QJsonArray &)> fpMetaStateArrayCheck = [](const QJsonArray &metaStateArrayRef)->bool
+	{
+		for(int i = 0; i < metaStateArrayRef.size(); ++i)
+		{
+			if(metaStateArrayRef[i].isObject() == false ||
+			   metaStateArrayRef[i].toObject().contains("name") == false ||
+			   metaStateArrayRef[i].toObject()["name"].isString() == false)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	return (itemfileDataRef.m_Meta.contains("stateArray") && itemfileDataRef.m_Meta["stateArray"].isArray() &&
+			itemfileDataRef.m_Data.contains("stateArray") && itemfileDataRef.m_Meta["stateArray"].isArray() &&
+			itemfileDataRef.m_Meta["stateArray"].toArray().count() == itemfileDataRef.m_Data["stateArray"].toArray().count() &&
+			fpMetaStateArrayCheck(itemfileDataRef.m_Meta["stateArray"].toArray()) &&
+			itemfileDataRef.m_Meta.contains("CameraPos") && itemfileDataRef.m_Meta["CameraPos"].isArray() &&
+			itemfileDataRef.m_Meta.contains("CameraZoom") && itemfileDataRef.m_Meta["CameraZoom"].isDouble() &&
+			itemfileDataRef.m_Meta.contains("UUID") && itemfileDataRef.m_Meta["UUID"].isString());
+}
 
 bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
 {

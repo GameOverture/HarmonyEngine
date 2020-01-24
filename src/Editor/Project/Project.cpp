@@ -27,9 +27,6 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 
-// Keep this commented out unless you want the entire project to save every item upon boot (used if 'Data.json' layout has changed and needs to propagate all its changes)
-//#define RESAVE_ENTIRE_PROJECT
-
 ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 	m_pProjectOwner(pProjectOwner)
 {
@@ -151,44 +148,63 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 void Project::LoadExplorerModel()
 {
-	if(LoadDataObj(GetAssetsAbsPath() % HYASSETS_DataFile, m_ProjectFileData.m_Data))
-		WriteGameData();
-
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Initialize 'm_ProjectFileData' from the project files on disk
 	if(LoadDataObj(GetMetaDataAbsPath() % HYMETA_DataFile, m_ProjectFileData.m_Meta))
 		WriteMetaData();
 
+	if(LoadDataObj(GetAssetsAbsPath() % HYASSETS_DataFile, m_ProjectFileData.m_Data))
+		WriteGameData();
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	bool bSystemFontFound = false;
-	bool bItemsRegisteredInMeta = false;
 
-	// Initialize the project by processing each type
-	for(auto typeIterator = m_ProjectFileData.m_Data.begin(); typeIterator != m_ProjectFileData.m_Data.end(); ++typeIterator)
+	QStringList sItemTypeList = m_ProjectFileData.m_Data.keys();
+	for(int i = 0; i < sItemTypeList.size(); ++i)
 	{
-		QString sKey = typeIterator.key();
+		if(m_ProjectFileData.m_Meta.contains(sItemTypeList[i]) == false ||
+		   m_ProjectFileData.m_Data.contains(sItemTypeList[i]) == false)
+		{
+			HyGuiLog("Missing " % sItemTypeList[i] % " between data and meta", LOGTYPE_Error);
+			continue;
+		}
 
-		HyGuiItemType eType = ITEM_Unknown;
+		// Determine which enum type of 'HyGuiItemType'
+		HyGuiItemType eItemType = ITEM_Unknown;
 		QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 		for(int i = 0; i < typeList.size(); ++i)
 		{
-
-			if(sKey == HyGlobal::ItemName(typeList[i], true))
+			if(sItemTypeList[i] == HyGlobal::ItemName(typeList[i], true))
 			{
-				eType = typeList[i];
+				eItemType = typeList[i];
 				break;
 			}
 		}
-
-		if(eType == ITEM_Unknown)
-			HyGuiLog("Project ctor eType == TYPE_Unknown", LOGTYPE_Error);
-
-		// Get the current (type) iterator, and iterate through its objects (items) within
-		QJsonObject subDirObj = typeIterator.value().toObject();
-
-		///////////////////////////////////////
-		// ITEMS WITHIN TYPE
-		for(auto objsInTypeIter = subDirObj.begin(); objsInTypeIter != subDirObj.end(); ++objsInTypeIter)
+		if(eItemType == ITEM_Unknown)
 		{
-			QString sItemPath = objsInTypeIter.key();
+			HyGuiLog("Project ctor eType == TYPE_Unknown", LOGTYPE_Error);
+			continue;
+		}
+
+		QJsonObject metaItemsOfType = m_ProjectFileData.m_Meta[sItemTypeList[i]].toObject();
+		QJsonObject dataItemsOfType = m_ProjectFileData.m_Data[sItemTypeList[i]].toObject();
+
+		// Process every item within current type 'eItemType'
+		QStringList sItemsList = dataItemsOfType.keys();
+		for(int j = 0; j < sItemsList.size(); ++j)
+		{
+			QString sItemPath = sItemsList[j];
+
+			if(metaItemsOfType.contains(sItemPath) == false ||
+			   dataItemsOfType.contains(sItemPath) == false)
+			{
+				HyGuiLog("Missing " % sItemPath % " between data and meta", LOGTYPE_Error);
+				continue;
+			}
+
+			FileDataPair itemFileData;
+			itemFileData.m_Meta = metaItemsOfType[sItemPath].toObject();
+			itemFileData.m_Data = dataItemsOfType[sItemPath].toObject();
 
 			QString sPrefix, sName;
 			int iSplitIndex = sItemPath.lastIndexOf('/');
@@ -206,26 +222,9 @@ void Project::LoadExplorerModel()
 			if(sPrefix == "+HyInternal" && sName == "+SystemText")
 				bSystemFontFound = true;
 
-			ExplorerItem *pNewDataItem = m_ModelRef.AddItem(this, eType, sPrefix, sName, objsInTypeIter.value(), false);
-
-			// Ensure meta file contains an entry for every project item
-			if(pNewDataItem->IsProjectItem())
-			{
-				if(RegisterMetaData(static_cast<ProjectItem *>(pNewDataItem)))
-				{
-					HyGuiLog("Registered new item into meta database: " % pNewDataItem->GetName(true), LOGTYPE_Info);
-					bItemsRegisteredInMeta = true;
-				}
-
-#ifdef RESAVE_ENTIRE_PROJECT
-				static_cast<ProjectItem *>(pNewDataItem)->Save(false);
-#endif
-			}
+			m_ModelRef.AddItem(this, eItemType, sPrefix, sName, itemFileData, false);
 		}
 	}
-
-	if(bItemsRegisteredInMeta)
-		WriteMetaData();
 
 	if(bSystemFontFound == false)
 	{
@@ -248,18 +247,13 @@ void Project::LoadExplorerModel()
 			m_ModelRef.PasteItemSrc(sContents, m_ModelRef.FindIndex<ExplorerItem *>(this, 0));
 		}
 	}
-
-#ifdef RESAVE_ENTIRE_PROJECT
-	WriteGameData();
-#endif
 }
 
 void Project::WriteGameData()
 {
 	QFile dataFile(GetAssetsAbsPath() % HYASSETS_DataFile);
-	if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
+	if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 		HyGuiLog(QString("Couldn't open ") % HYASSETS_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
-	}
 	else
 	{
 		QJsonDocument userDoc;
@@ -295,43 +289,6 @@ void Project::WriteMetaData()
 
 		metaFile.close();
 	}
-}
-
-bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
-{
-	QFile dataFile(sFilePath);
-	if(dataFile.exists())
-	{
-		if(!dataFile.open(QIODevice::ReadOnly))
-		{
-			HyGuiLog("Project::LoadExplorerModel() could not open " % m_sName % "'s " % QFileInfo(sFilePath).fileName() % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
-			m_bHasError = true;
-			return false; // Don't write with invalid object
-		}
-
-		QJsonDocument userDoc = QJsonDocument::fromJson(dataFile.readAll());
-		dataFile.close();
-
-		dataObjRef = userDoc.object();
-	}
-
-	// Ensure save object has all the valid types in map
-	bool bTypeNotFound = false;
-	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
-	for(int i = 0; i < typeList.size(); ++i)
-	{
-		if(typeList[i] == ITEM_Project || typeList[i] == ITEM_Prefix || typeList[i] == ITEM_Filter || typeList[i] == ITEM_AtlasImage)
-			continue;
-
-		QString sTypeName = HyGlobal::ItemName(typeList[i], true);
-		if(dataObjRef.contains(sTypeName) == false)
-		{
-			bTypeNotFound = true;
-			dataObjRef.insert(sTypeName, QJsonObject());
-		}
-	}
-
-	return dataFile.exists() == false || bTypeNotFound;
 }
 
 bool Project::HasError() const
@@ -492,11 +449,11 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 	}
 }
 
-void Project::SaveGameData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk)
+void Project::SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
 	if(m_ProjectFileData.m_Data.contains(sItemTypeName) == false) {
-		HyGuiLog("Project::SaveGameData could not find item type: " % sItemTypeName, LOGTYPE_Error);
+		HyGuiLog("Project::SaveItemData could not find item type: " % sItemTypeName, LOGTYPE_Error);
 	}
 
 	QJsonObject metaItemTypeObj = m_ProjectFileData.m_Meta[sItemTypeName].toObject();
@@ -515,15 +472,15 @@ void Project::SaveGameData(HyGuiItemType eType, QString sPath, const FileDataPai
 		WriteGameData();
 }
 
-void Project::DeleteGameData(HyGuiItemType eType, QString sPath, bool bWriteToDisk)
+void Project::DeleteItemData(HyGuiItemType eType, QString sPath, bool bWriteToDisk)
 {
-	DeleteItemInDataObj(eType, sPath, m_SaveDataObj);
-	DeleteItemInDataObj(eType, sPath, m_MetaDataObj);
+	DeleteItemInDataObj(eType, sPath, m_ProjectFileData.m_Meta);
+	DeleteItemInDataObj(eType, sPath, m_ProjectFileData.m_Data);
 
 	if(bWriteToDisk)
 	{
-		WriteGameData();
 		WriteMetaData();
+		WriteGameData();
 	}
 	
 	// If open, make sure to close as it's been deleted from project
@@ -541,18 +498,55 @@ void Project::DeleteGameData(HyGuiItemType eType, QString sPath, bool bWriteToDi
 	}
 }
 
+bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
+{
+	QFile dataFile(sFilePath);
+	if(dataFile.exists())
+	{
+		if(!dataFile.open(QIODevice::ReadOnly))
+		{
+			HyGuiLog("Project::LoadExplorerModel() could not open " % m_sName % "'s " % QFileInfo(sFilePath).fileName() % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
+			m_bHasError = true;
+			return false; // Don't write with invalid object
+		}
+
+		QJsonDocument userDoc = QJsonDocument::fromJson(dataFile.readAll());
+		dataFile.close();
+
+		dataObjRef = userDoc.object();
+	}
+
+	// Ensure save object has all the valid types in map
+	bool bTypeNotFound = false;
+	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+	for(int i = 0; i < typeList.size(); ++i)
+	{
+		if(typeList[i] == ITEM_Project || typeList[i] == ITEM_Prefix || typeList[i] == ITEM_Filter || typeList[i] == ITEM_AtlasImage)
+			continue;
+
+		QString sTypeName = HyGlobal::ItemName(typeList[i], true);
+		if(dataObjRef.contains(sTypeName) == false)
+		{
+			bTypeNotFound = true;
+			dataObjRef.insert(sTypeName, QJsonObject());
+		}
+	}
+
+	return dataFile.exists() == false || bTypeNotFound;
+}
+
 void Project::DeleteItemInDataObj(HyGuiItemType eType, QString sPath, QJsonObject &dataObjRef)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
-	if(dataObjRef.contains(sItemTypeName) == false) {
+	if(dataObjRef.contains(sItemTypeName) == false)
 		HyGuiLog("Project::DeleteItemInDataObj could not find item type: " % sItemTypeName, LOGTYPE_Error);
-	}
 
-	QJsonObject subDirObj = dataObjRef[sItemTypeName].toObject();
-	subDirObj.remove(sPath);
+	QJsonObject itemTypeObject = dataObjRef[sItemTypeName].toObject();
+	if(itemTypeObject.contains(sPath) == false)
+		HyGuiLog("Project::DeleteItemInDataObj could not find item: " % sPath, LOGTYPE_Error);
 
-	dataObjRef.remove(sItemTypeName);
-	dataObjRef.insert(sItemTypeName, subDirObj);
+	itemTypeObject.remove(sPath);
+	dataObjRef[sItemTypeName] = itemTypeObject;
 }
 
 void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
@@ -560,7 +554,7 @@ void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
 	bool bItemsDeleted = false;
 
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
-	for(auto itemTypeIter = m_SaveDataObj.begin(); itemTypeIter != m_SaveDataObj.end(); ++itemTypeIter)
+	for(auto itemTypeIter = m_ProjectFileData.m_Data.begin(); itemTypeIter != m_ProjectFileData.m_Data.end(); ++itemTypeIter)
 	{
 		HyGuiItemType eType = ITEM_Unknown;
 		for(int i = 0; i < typeList.size(); ++i)
@@ -583,7 +577,7 @@ void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
 
 			if(sCurPrefix == sPrefix)
 			{
-				DeleteGameData(eType, iter.key(), false);
+				DeleteItemData(eType, iter.key(), false);
 				bItemsDeleted = true;
 			}
 		}
@@ -923,31 +917,31 @@ void Project::RefreshNamesOnTabs()
 	MainWindow::OpenItem(m_pCurOpenItem);
 }
 
-bool Project::RegisterMetaData(ProjectItem *pProjectItem)
-{
-	QString sItemTypeName = HyGlobal::ItemName(pProjectItem->GetType(), true);
-	auto iter = m_MetaDataObj.find(sItemTypeName);
-	if(iter->isUndefined() || iter->isObject() == false)
-	{
-		HyGuiLog("RegisterMetaData could not find item type: " % sItemTypeName, LOGTYPE_Error);
-		return false;
-	}
-
-	QJsonObject typeObj = m_MetaDataObj[sItemTypeName].toObject();
-
-	if(typeObj.find(pProjectItem->GetName(true)) == typeObj.end())
-	{
-		QJsonObject metaItemObj;
-		metaItemObj.insert("UUID", QUuid::createUuid().toString());
-		metaItemObj.insert("CameraPos", QJsonArray { 0, 0 });
-		metaItemObj.insert("CameraZoom", 1.0);
-
-		typeObj.insert(pProjectItem->GetName(true), metaItemObj);
-
-		m_MetaDataObj.remove(sItemTypeName);
-		m_MetaDataObj.insert(sItemTypeName, typeObj);
-		return true;
-	}
-
-	return false;
-}
+//bool Project::RegisterMetaData(ProjectItem *pProjectItem)
+//{
+//	QString sItemTypeName = HyGlobal::ItemName(pProjectItem->GetType(), true);
+//	auto iter = m_MetaDataObj.find(sItemTypeName);
+//	if(iter->isUndefined() || iter->isObject() == false)
+//	{
+//		HyGuiLog("RegisterMetaData could not find item type: " % sItemTypeName, LOGTYPE_Error);
+//		return false;
+//	}
+//
+//	QJsonObject typeObj = m_MetaDataObj[sItemTypeName].toObject();
+//
+//	if(typeObj.find(pProjectItem->GetName(true)) == typeObj.end())
+//	{
+//		QJsonObject metaItemObj;
+//		metaItemObj.insert("UUID", QUuid::createUuid().toString());
+//		metaItemObj.insert("CameraPos", QJsonArray { 0, 0 });
+//		metaItemObj.insert("CameraZoom", 1.0);
+//
+//		typeObj.insert(pProjectItem->GetName(true), metaItemObj);
+//
+//		m_MetaDataObj.remove(sItemTypeName);
+//		m_MetaDataObj.insert(sItemTypeName, typeObj);
+//		return true;
+//	}
+//
+//	return false;
+//}

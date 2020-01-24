@@ -59,7 +59,7 @@ public:
 	TextLayersModel *GetLayersModel(uint uiIndex) const;
 	PropertiesTreeModel *GetGlyphsModel();
 
-	virtual bool OnSave() override;
+	virtual bool OnSave();
 
 	virtual bool InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;

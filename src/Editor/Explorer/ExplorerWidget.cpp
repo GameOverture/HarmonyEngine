@@ -145,6 +145,7 @@ void ExplorerWidget::SetModel(ExplorerModel &modelRef)
 	pProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	pProxyModel->setSourceModel(&modelRef);
 
+	// Don't display anything that starts with '+'
 	pProxyModel->setFilterRegExp(QRegExp("^[^+]*$", Qt::CaseInsensitive));
 	pProxyModel->setFilterKeyColumn(0);
 

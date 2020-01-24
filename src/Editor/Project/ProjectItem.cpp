@@ -132,7 +132,7 @@ void ProjectItem::Save(bool bWriteToDisk)
 	FileDataPair bckup = m_ItemFileData;
 	m_ItemFileData = m_pModel->GenerateFileData(m_pDraw);
 
-	GetProject().SaveGameData(m_eTYPE, GetName(true), m_ItemFileData, bWriteToDisk);
+	GetProject().SaveItemData(m_eTYPE, GetName(true), m_ItemFileData, bWriteToDisk);
 	m_pUndoStack->setClean();
 
 	m_bExistencePendingSave = false;

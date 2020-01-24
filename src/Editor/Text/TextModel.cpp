@@ -47,14 +47,17 @@ TextModel::TextModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) 
 	InitStates<TextStateData>(itemFileDataRef);
 		
 	// Find existing AtlasFrame * to assign to 'm_pAtlasFrame'
-	int iAffectedFrameIndex = 0;
-	QList<QUuid> uuidRequestList;
-	uuidRequestList.append(QUuid(itemFileDataRef.m_Meta["frameUUID"].toString()));
-	QList<AtlasFrame *> pRequestedList = RequestFramesByUuid(nullptr, uuidRequestList, iAffectedFrameIndex);
-	if(pRequestedList.size() == 1)
-		m_pAtlasFrame = pRequestedList[0];
-	else
-		HyGuiLog("More than one frame returned for a font", LOGTYPE_Error);
+	if(itemFileDataRef.m_Meta.contains("frameUUID"))
+	{
+		int iAffectedFrameIndex = 0;
+		QList<QUuid> uuidRequestList;
+		uuidRequestList.append(QUuid(itemFileDataRef.m_Meta["frameUUID"].toString()));
+		QList<AtlasFrame *> pRequestedList = RequestFramesByUuid(nullptr, uuidRequestList, iAffectedFrameIndex);
+		if(pRequestedList.size() == 1)
+			m_pAtlasFrame = pRequestedList[0];
+		else
+			HyGuiLog("More than one frame returned for a font", LOGTYPE_Error);
+	}
 }
 
 /*virtual*/ TextModel::~TextModel()
@@ -160,6 +163,8 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 	QJsonArray fontArray = m_FontManager.GetFontArray();
 	itemSpecificFileDataOut.m_Data.insert("fontArray", fontArray);
+
+	return true;
 }
 
 /*virtual*/ FileDataPair TextModel::GetStateFileData(uint32 uiIndex) const /*override*/

@@ -98,7 +98,7 @@ void ExplorerItem::Rename(QString sNewPrefix, QString sNewName)
 	if(m_eTYPE == ITEM_Prefix)
 		m_pProject->DeletePrefixAndContents(GetName(true), true);
 	else if(IsProjectItem())
-		m_pProject->DeleteGameData(m_eTYPE, GetName(true), true);
+		m_pProject->DeleteItemData(m_eTYPE, GetName(true), true);
 }
 
 /*virtual*/ QString ExplorerItem::GetToolTip() const /*override*/
