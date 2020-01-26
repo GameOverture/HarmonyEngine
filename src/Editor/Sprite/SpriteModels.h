@@ -104,7 +104,7 @@ public:
 	CheckBoxMapper *GetBounceMapper();
 	SpriteFramesModel *GetFramesModel();
 
-	//void GetStateInfo(QJsonObject &stateObjOut);
+	//void GetStateFileData(FileDataPair &stateFileDataOut);
 
 	QSet<AtlasFrame *> GetAtlasFrames();
 	

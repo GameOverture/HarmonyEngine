@@ -37,10 +37,6 @@ PrefabStateData::PrefabStateData(int iStateIndex, IModel &modelRef, FileDataPair
 {
 }
 
-void PrefabStateData::GetStateInfo(QJsonObject &stateObjOut)
-{
-}
-
 void PrefabStateData::Refresh()
 {
 }

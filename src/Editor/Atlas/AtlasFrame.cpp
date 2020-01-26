@@ -73,7 +73,7 @@ AtlasTreeItem *AtlasFrame::GetTreeItem()
 	return m_pTreeWidgetItem;
 }
 
-QUuid AtlasFrame::GetId()
+QUuid AtlasFrame::GetId() const
 {
 	return m_UNIQUE_ID;
 }

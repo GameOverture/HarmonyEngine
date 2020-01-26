@@ -137,8 +137,8 @@ QJsonArray SpriteFramesModel::GetFramesInfo(float &fTotalDurationRef)
 
 		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetImageChecksum())));
 		frameObj.insert("duration", m_FramesList[i]->m_fDuration);
-		frameObj.insert("offsetX", m_FramesList[i]->m_vOffset.x());
-		frameObj.insert("offsetY", m_FramesList[i]->m_vOffset.y());
+		frameObj.insert("offsetX", m_FramesList[i]->m_vOffset.x() + m_FramesList[i]->m_pFrame->GetCrop().left());
+		frameObj.insert("offsetY", m_FramesList[i]->m_vOffset.y() + ((m_FramesList[i]->m_pFrame->GetSize().height() - 1) - m_FramesList[i]->m_pFrame->GetCrop().bottom())); // -1 on height because it's NOT zero based like everything else);
 
 		framesArray.append(frameObj);
 	}
@@ -323,8 +323,10 @@ SpriteFramesModel *SpriteStateData::GetFramesModel()
 	return m_pFramesModel;
 }
 
-//void SpriteStateData::GetStateInfo(QJsonObject &stateObjOut)
+//void SpriteStateData::GetStateFileData(FileDataPair &stateFileDataOut)
 //{
+//	stateFileDataOut
+//
 //	QJsonArray frameArray;
 //	float fTotalDuration = 0.0f;
 //	for(int i = 0; i < m_pFramesModel->rowCount(); ++i)
@@ -389,14 +391,22 @@ SpriteModel::SpriteModel(ProjectItem &itemRef, const FileDataPair &itemFileDataR
 {
 	FileDataPair stateFileData;
 
-	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
+	SpriteStateData *pState = static_cast<SpriteStateData *>(m_StateList[uiIndex]);
 
-	stateFileData.m_Data.insert("loop", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetLoopMapper()->currentIndex());
-	stateFileData.m_Data.insert("reverse", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetReverseMapper()->currentIndex());
-	stateFileData.m_Data.insert("bounce", static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetBounceMapper()->currentIndex());
+	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
+	QJsonArray frameIdsArray;
+
+	QList<AtlasFrame *> frameList = pState->GetAtlasFrames().toList();
+	for(int i = 0; i < frameList.size(); ++i)
+		frameIdsArray.append(frameList[i]->GetId().toString(QUuid::WithoutBraces));
+	stateFileData.m_Meta.insert("frameIds", frameIdsArray);
+
+	stateFileData.m_Data.insert("loop", pState->GetLoopMapper()->IsChecked());
+	stateFileData.m_Data.insert("reverse", pState->GetReverseMapper()->IsChecked());
+	stateFileData.m_Data.insert("bounce", pState->GetBounceMapper()->IsChecked());
 
 	float fTotalDuration = 0.0f;
-	QJsonArray framesArray = static_cast<SpriteStateData *>(m_StateList[uiIndex])->GetFramesModel()->GetFramesInfo(fTotalDuration);
+	QJsonArray framesArray = pState->GetFramesModel()->GetFramesInfo(fTotalDuration);
 	stateFileData.m_Data.insert("frames", framesArray);
 	stateFileData.m_Data.insert("duration", fTotalDuration);
 

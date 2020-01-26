@@ -52,7 +52,7 @@ class AtlasFrame
 public:
 	AtlasTreeItem *GetTreeItem();
 
-	QUuid GetId();
+	QUuid GetId() const;
 	
 	quint32 GetAtlasGrpId();
 	void SetAtlasGrpId(quint32 uiNewAtlasGrpId);

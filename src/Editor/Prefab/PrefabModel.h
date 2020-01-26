@@ -21,8 +21,6 @@ public:
 	PrefabStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~PrefabStateData();
 
-	void GetStateInfo(QJsonObject &stateObjOut);
-
 	void Refresh();
 
 	virtual int AddFrame(AtlasFrame *pFrame) override;

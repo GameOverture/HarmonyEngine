@@ -54,7 +54,6 @@ public:
 	virtual ~EntityStateData();
 
 	PropertiesTreeModel *GetPropertiesModel(ExplorerItem *pItem);
-	void GetStateInfo(QJsonObject &stateObjOut);
 
 	void Refresh();
 
