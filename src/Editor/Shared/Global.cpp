@@ -437,7 +437,7 @@ FileDataPair HyGlobal::GenerateNewItemFileData(QString sImportPath /*= ""*/)
 	newItemFileData.m_Meta["CameraPos"] = cameraPosArray;
 	newItemFileData.m_Meta["CameraZoom"] = 1;
 
-	newItemFileData.m_Meta["UUID"] = QUuid::createUuid().toString();
+	newItemFileData.m_Meta["UUID"] = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	if(IsItemFileDataValid(newItemFileData) == false)
 		HyGuiLog("ExplorerModel::GenerateNewItemFileData - IsItemFileDataValid return false", LOGTYPE_Error);

@@ -161,7 +161,7 @@
 			QJsonArray newMetaSpriteStateFramesArray;
 			QJsonArray dataSpriteStateFramesArray = dataSpriteStateObj["frames"].toArray();
 			for(int k = 0; k < dataSpriteStateFramesArray.size(); ++k)
-				newMetaSpriteStateFramesArray.append(dataSpriteStateFramesArray[i].toObject()["id"].toInt());
+				newMetaSpriteStateFramesArray.append(dataSpriteStateFramesArray[k].toObject()["id"].toInt());
 
 			QJsonObject newMetaSpriteStateObj;
 			newMetaSpriteStateObj.insert("name", dataSpriteStateObj["name"].toString());
@@ -246,7 +246,7 @@
 		for(int i = 0; i < sSpritesKeysList.size(); ++i)
 		{
 			QJsonObject metaSpriteObj = metaItemsSpritesObj[sSpritesKeysList[i]].toObject();
-			QJsonArray metaSpriteStatesArray = metaSpriteObj["states"].toArray();
+			QJsonArray metaSpriteStatesArray = metaSpriteObj["stateArray"].toArray();
 			for(int j = 0; j < metaSpriteStatesArray.size(); ++j)
 			{
 				QJsonObject metaSpriteStateObj = metaSpriteStatesArray[j].toObject();
@@ -261,7 +261,7 @@
 				metaSpriteStateObj["frames"] = spriteStateFramesArray;
 			}
 
-			metaSpriteObj["states"] = metaSpriteStatesArray;
+			metaSpriteObj["stateArray"] = metaSpriteStatesArray;
 			metaItemsSpritesObj[sSpritesKeysList[i]] = metaSpriteObj;
 		}
 		metaItemsObjRef["Sprites"] = metaItemsSpritesObj;
