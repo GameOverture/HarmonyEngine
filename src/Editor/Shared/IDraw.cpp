@@ -29,9 +29,12 @@ IDraw::IDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef) :
 	m_bIsCameraPanning(false)
 {
 	m_pCamera = Hy_Window().CreateCamera2d();
-	m_pCamera->pos.Set(initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[0].toDouble()) : 0.0f,
-					   initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[1].toDouble()) : 0.0f);
-	m_pCamera->SetZoom(static_cast<float>(initFileDataRef.m_Meta["CameraZoom"].toDouble()));
+	if(HyGlobal::IsItemFileDataValid(initFileDataRef))
+	{
+		m_pCamera->pos.Set(initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[0].toDouble()) : 0.0f,
+						   initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[1].toDouble()) : 0.0f);
+		m_pCamera->SetZoom(static_cast<float>(initFileDataRef.m_Meta["CameraZoom"].toDouble()));
+	}
 	m_pCamera->SetVisible(false);
 }
 
@@ -51,13 +54,14 @@ void IDraw::ApplyJsonData()
 	if(m_pProjItem == nullptr)
 		return;
 
-	QJsonValue valueData = m_pProjItem->GetModel()->GetJson();
-	QByteArray src = JsonValueToSrc(valueData);
+	FileDataPair itemFileData;
+	m_pProjItem->GetLatestFileData(itemFileData);
+	QByteArray src = JsonValueToSrc(itemFileData.m_Data);
 
-	jsonxx::Value newValue;
-	newValue.parse(src.toStdString());
+	jsonxx::Object itemDataObj;
+	itemDataObj.parse(src.toStdString());
 
-	OnApplyJsonData(newValue);
+	OnApplyJsonData(itemDataObj);
 }
 
 void IDraw::Show()

@@ -134,7 +134,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	}
 }
 
-/*virtual*/ bool TextModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
+/*virtual*/ void TextModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
 	const PropertiesTreeModel *pGlyphsModel = m_FontManager.GetGlyphsModel();
 
@@ -163,8 +163,6 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 	QJsonArray fontArray = m_FontManager.GetFontArray();
 	itemSpecificFileDataOut.m_Data.insert("fontArray", fontArray);
-
-	return true;
 }
 
 /*virtual*/ FileDataPair TextModel::GetStateFileData(uint32 uiIndex) const /*override*/

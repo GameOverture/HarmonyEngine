@@ -50,7 +50,7 @@ class EntityStateData : public IStateData
 	QMap<ExplorerItem *, PropertiesTreeModel *>		m_PropertiesMap;
 
 public:
-	EntityStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj);
+	EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~EntityStateData();
 
 	PropertiesTreeModel *GetPropertiesModel(ExplorerItem *pItem);
@@ -96,8 +96,8 @@ public:
 	const QList<ProjectItem *> &GetPrimitiveList();
 	ProjectItem *CreateNewPrimitive();
 
-	virtual QJsonObject GetStateJson(uint32 uiIndex) const override;
-	virtual QJsonValue GetJson() const override;
+	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
+	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
 	virtual QStringList GetFontUrls() const override;
 };

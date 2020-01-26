@@ -215,6 +215,9 @@ public:
 	static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem);
 
 	static QDir PrepTempDir(Project *pProject);
+
+	static bool IsItemFileDataValid(const FileDataPair &itemfileDataRef);
+	static FileDataPair GenerateNewItemFileData(QString sImportPath = "");
 };
 
 struct SortTreeWidgetsPredicate

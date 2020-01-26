@@ -93,7 +93,6 @@ public:
 	void RelinquishAllFrames();
 
 	FileDataPair PopState(uint32 uiIndex);
-	FileDataPair GenerateFileData();
 	
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -123,7 +122,7 @@ public:
 		dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 	}
 
-	virtual bool InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
+	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const = 0;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;
 	virtual QStringList GetFontUrls() const = 0;

@@ -32,10 +32,10 @@
 ProjectItem::ProjectItem(Project &projRef,
 						 HyGuiItemType eType,
 						 const QString sName,
-						 const FileDataPair &initFileDataRef,
+						 const FileDataPair &initItemFileDataRef,
 						 bool bIsPendingSave) :
 	ExplorerItem(projRef, eType, sName),
-	m_ItemFileData(initFileDataRef),
+	m_ItemFileData(initItemFileDataRef),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_pModel(nullptr),
 	m_pWidget(nullptr),
@@ -87,10 +87,10 @@ void ProjectItem::LoadModel()
 		m_pModel = new PrefabModel(*this, m_ItemFileData);
 		break;
 	case ITEM_Primitive:
-		m_pModel = new PrimitiveModel(*this);
+		m_pModel = new PrimitiveModel(*this, m_ItemFileData);
 		break;
 	case ITEM_Audio:
-		m_pModel = new AudioModel(*this);
+		m_pModel = new AudioModel(*this, m_ItemFileData);
 		break;
 	default:
 		HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);
@@ -127,14 +127,44 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 	m_pWidget->OnGiveMenuActions(pMenu);
 }
 
+void ProjectItem::GetLatestFileData(FileDataPair &itemFileDataOut) const
+{
+	itemFileDataOut = m_ItemFileData;
+
+	// Assemble stateArray
+	QJsonArray metaStateArray;
+	QJsonArray dataStateArray;
+	for(int i = 0; i < m_pModel->GetNumStates(); ++i)
+	{
+		FileDataPair stateFileData = m_pModel->GetStateFileData(i);
+		metaStateArray.append(stateFileData.m_Meta);
+		dataStateArray.append(stateFileData.m_Data);
+	}
+	itemFileDataOut.m_Meta["stateArray"] = metaStateArray;
+	itemFileDataOut.m_Data["stateArray"] = dataStateArray;
+
+	// Replace camera data if a draw instance is instantiated
+	if(m_pDraw)
+	{
+		QJsonArray cameraPosArray;
+		cameraPosArray.append(m_pDraw->GetCamera()->pos.X());
+		cameraPosArray.append(m_pDraw->GetCamera()->pos.Y());
+		itemFileDataOut.m_Meta["CameraPos"] = cameraPosArray;
+		itemFileDataOut.m_Meta["CameraZoom"] = m_pDraw->GetCamera()->GetZoom();
+	}
+
+	// Assemble item specific data
+	m_pModel->InsertItemSpecificData(itemFileDataOut);
+}
+
 void ProjectItem::Save(bool bWriteToDisk)
 {
-	FileDataPair bckup = m_ItemFileData;
-	m_ItemFileData = m_pModel->GenerateFileData(m_pDraw);
+	GetLatestFileData(m_ItemFileData);
 
+	// Register the item's file data into the project
 	GetProject().SaveItemData(m_eTYPE, GetName(true), m_ItemFileData, bWriteToDisk);
+	
 	m_pUndoStack->setClean();
-
 	m_bExistencePendingSave = false;
 }
 

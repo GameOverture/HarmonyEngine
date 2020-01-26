@@ -729,7 +729,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 														 eItem,
 														 pDlg->GetPrefix(),
 														 pDlg->GetName(),
-														 m_ExplorerModel.GenerateNewItemFileData(pDlg->GetImportFile()),
+														 HyGlobal::GenerateNewItemFileData(pDlg->GetImportFile()),
 														 pDlg->GetImportFile().isEmpty()); // Blank items are pending save
 
 		if(pNewItem->IsProjectItem())

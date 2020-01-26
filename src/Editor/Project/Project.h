@@ -119,7 +119,7 @@ public:
 	QString RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath);
 	QString RenamePrefix(QString sOldPath, QString sNewPath);
 
-	QJsonObject GetSavedItemsObj(HyGuiItemType eType);
+	bool DoesItemExist(HyGuiItemType eType, QString sPath);
 
 	// These tab functions are only called from MainWindow
 	void OpenTab(ProjectItem *pItem);

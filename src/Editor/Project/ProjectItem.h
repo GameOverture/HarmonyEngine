@@ -44,7 +44,7 @@ class ProjectItem : public ExplorerItem
 	IDraw *					m_pDraw;
 	
 public:
-	ProjectItem(Project &projRef, HyGuiItemType eType, const QString sName, const FileDataPair &initFileDataRef, bool bIsPendingSave);
+	ProjectItem(Project &projRef, HyGuiItemType eType, const QString sName, const FileDataPair &initItemFileDataRef, bool bIsPendingSave);
 	virtual ~ProjectItem();
 
 	void LoadModel();
@@ -55,6 +55,7 @@ public:
 	QUndoStack *GetUndoStack();
 	
 	void GiveMenuActions(QMenu *pMenu);
+	void GetLatestFileData(FileDataPair &itemFileDataOut) const;
 	void Save(bool bWriteToDisk);
 	bool IsExistencePendingSave();
 	bool IsSaveClean();

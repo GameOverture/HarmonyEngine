@@ -127,16 +127,9 @@ QVariant EntityNodeTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt
 {
 }
 
-EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, QJsonObject stateObj) :
-	IStateData(iStateIndex, modelRef, stateObj["name"].toString())
+EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
+	IStateData(iStateIndex, modelRef, stateFileData)
 {
-	if(stateObj.empty() == false)
-	{
-	}
-	else
-	{
-
-	}
 }
 
 /*virtual*/ EntityStateData::~EntityStateData()
@@ -248,14 +241,7 @@ EntityModel::EntityModel(ProjectItem &itemRef, const FileDataPair &itemFileDataR
 	IModel(itemRef, itemFileDataRef),
 	m_TreeModel(this, this)
 {
-	// If item's init value is defined, parse and initialize with it, otherwise make default empty sprite
-	if(stateArray.empty() == false)
-	{
-		for(int i = 0; i < stateArray.size(); ++i)
-			AppendState<EntityStateData>(stateArray[i].toObject());
-	}
-	else
-		AppendState<EntityStateData>(QJsonObject());
+	InitStates<EntityStateData>(itemFileDataRef);
 }
 
 /*virtual*/ EntityModel::~EntityModel()
@@ -315,20 +301,19 @@ const QList<ProjectItem *> &EntityModel::GetPrimitiveList()
 
 ProjectItem *EntityModel::CreateNewPrimitive()
 {
-	ProjectItem *pNewPrimitiveItem = new ProjectItem(m_ItemRef.GetProject(), ITEM_Primitive, "Primitive", QJsonValue(), QJsonValue(), false);
+	ProjectItem *pNewPrimitiveItem = new ProjectItem(m_ItemRef.GetProject(), ITEM_Primitive, "Primitive", FileDataPair(), false);
 	m_PrimitiveList.push_back(pNewPrimitiveItem);
 
 	return pNewPrimitiveItem;
 }
 
-/*virtual*/ QJsonObject EntityModel::GetStateJson(uint32 uiIndex) const /*override*/
+/*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	return QJsonObject();
 }
 
-/*virtual*/ QJsonValue EntityModel::GetJson() const /*override*/
+/*virtual*/ FileDataPair EntityModel::GetStateFileData(uint32 uiIndex) const /*override*/
 {
-	return QJsonValue();
+	return FileDataPair();
 }
 
 /*virtual*/ QList<AtlasFrame *> EntityModel::GetAtlasFrames() const /*override*/

@@ -24,12 +24,12 @@ bool HySprite2dFrame::IsValid() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :
+HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_pAnimStates(nullptr),
 	m_uiNumStates(0)
 {
-	jsonxx::Array spriteStateArray = dataValueRef.get<jsonxx::Array>();
+	jsonxx::Array spriteStateArray = itemDataObjRef.get<jsonxx::Array>("stateArray");
 
 	m_uiNumStates = static_cast<uint32>(spriteStateArray.size());
 	m_pAnimStates = reinterpret_cast<AnimState *>(HY_NEW unsigned char[sizeof(AnimState) * m_uiNumStates]);

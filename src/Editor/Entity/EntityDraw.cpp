@@ -28,7 +28,7 @@ void EntityDraw::Sync()
 	}
 }
 
-/*virtual*/ void EntityDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
+/*virtual*/ void EntityDraw::OnApplyJsonData(jsonxx::Object &itemDataObjRef) /*override*/
 {
 }
 

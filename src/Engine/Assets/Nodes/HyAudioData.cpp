@@ -11,12 +11,11 @@
 #include "Assets/Nodes/HyAudioData.h"
 #include "Audio/HyAudio.h"
 
-HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef) :
+HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_AudioRef(assetsRef.GetAudioRef())
 {
-	const jsonxx::Object &audioObj = dataValueRef.get<jsonxx::Object>();
-	m_pAudioBank = m_AudioRef.GetAudioBank(audioObj.get<jsonxx::String>("bank"));
+	m_pAudioBank = m_AudioRef.GetAudioBank(itemDataObjRef.get<jsonxx::String>("bank"));
 }
 
 HyAudioData::~HyAudioData(void)

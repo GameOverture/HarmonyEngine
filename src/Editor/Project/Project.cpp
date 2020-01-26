@@ -599,19 +599,19 @@ QString Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewP
 	}
 
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
-	if(m_SaveDataObj.contains(sItemTypeName) == false)
+	if(m_ProjectFileData.m_Data.contains(sItemTypeName) == false)
 	{
 		HyGuiLog("Project::RenameItemInDataObj could not find item type: " % sItemTypeName, LOGTYPE_Error);
 		return sOldPath.section('/', -1);
 	}
-	QJsonObject itemTypeDataObj = m_SaveDataObj[sItemTypeName].toObject();
+	QJsonObject itemTypeDataObj = m_ProjectFileData.m_Data[sItemTypeName].toObject();
 
-	if(m_MetaDataObj.contains(sItemTypeName) == false)
+	if(m_ProjectFileData.m_Meta.contains(sItemTypeName) == false)
 	{
 		HyGuiLog("Project::RenameItemInDataObj could not find item type (in meta): " % sItemTypeName, LOGTYPE_Error);
 		return sOldPath.section('/', -1);
 	}
-	QJsonObject itemTypeMetaObj = m_MetaDataObj[sItemTypeName].toObject();
+	QJsonObject itemTypeMetaObj = m_ProjectFileData.m_Meta[sItemTypeName].toObject();
 
 	// Ensure there are no name conflicts
 	QString sUniqueNewPath = sNewPath;
@@ -654,8 +654,8 @@ QString Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewP
 	if(iConflictCount > 0)
 		HyGuiLog("Item was renamed to avoid conflict: " % sUniqueNewPath, LOGTYPE_Info);
 
-	RenameItemInDataObj(eType, sOldPath, sUniqueNewPath, m_SaveDataObj);
-	RenameItemInDataObj(eType, sOldPath, sUniqueNewPath, m_MetaDataObj);
+	RenameItemInDataObj(eType, sOldPath, sUniqueNewPath, m_ProjectFileData.m_Meta);
+	RenameItemInDataObj(eType, sOldPath, sUniqueNewPath, m_ProjectFileData.m_Data);
 
 	RefreshNamesOnTabs();
 	WriteGameData();
@@ -666,8 +666,8 @@ QString Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewP
 
 QString Project::RenamePrefix(QString sOldPath, QString sNewPath)
 {
-	RenamePrefixInDataObj(sOldPath, sNewPath, m_SaveDataObj);
-	RenamePrefixInDataObj(sOldPath, sNewPath, m_MetaDataObj);
+	RenamePrefixInDataObj(sOldPath, sNewPath, m_ProjectFileData.m_Meta);
+	RenamePrefixInDataObj(sOldPath, sNewPath, m_ProjectFileData.m_Data);
 
 	RefreshNamesOnTabs();
 	WriteGameData();
@@ -676,9 +676,17 @@ QString Project::RenamePrefix(QString sOldPath, QString sNewPath)
 	return sNewPath.section('/', -1);
 }
 
-QJsonObject Project::GetSavedItemsObj(HyGuiItemType eType)
+bool Project::DoesItemExist(HyGuiItemType eType, QString sPath)
 {
-	return m_SaveDataObj[HyGlobal::ItemName(eType, true)].toObject();
+	QJsonObject subDirObj = m_ProjectFileData.m_Data;
+	for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
+	{
+		QString sItemPath = objsInSubDirIter.key();
+		if(0 == sPath.compare(sItemPath, Qt::CaseInsensitive))
+			return true;
+	}
+
+	return false;
 }
 
 void Project::OpenTab(ProjectItem *pItem)

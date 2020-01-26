@@ -19,9 +19,8 @@ AudioModel::~AudioModel()
 {
 }
 
-/*virtual*/ bool AudioModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
+/*virtual*/ void AudioModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	return true;
 }
 
 /*virtual*/ FileDataPair AudioModel::GetStateFileData(uint32 uiIndex) const /*override*/

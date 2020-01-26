@@ -47,7 +47,7 @@ public:
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent);
 
 protected:
-	virtual void OnApplyJsonData(jsonxx::Value &valueRef) { }
+	virtual void OnApplyJsonData(jsonxx::Object &itemDataObjRef) { }
 	virtual void OnShow() = 0;
 	virtual void OnHide() = 0;
 	virtual void OnResizeRenderer() = 0;

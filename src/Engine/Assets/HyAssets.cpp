@@ -50,7 +50,7 @@ void HyAssets::Factory<tData>::Init(const jsonxx::Object &subDirObjRef, HyAssets
 		std::string sPath = HyStr::MakeStringProperPath(iter->first.c_str(), nullptr, true);
 		m_LookupIndexMap.insert(std::make_pair(sPath, i));
 
-		m_DataList.emplace_back(iter->first, subDirObjRef.get<jsonxx::Value>(iter->first), assetsRef);
+		m_DataList.emplace_back(iter->first, subDirObjRef.get<jsonxx::Object>(iter->first), assetsRef);
 	}
 }
 

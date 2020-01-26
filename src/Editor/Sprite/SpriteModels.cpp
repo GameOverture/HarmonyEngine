@@ -267,42 +267,33 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair
 	m_pChkMapper_Bounce = new CheckBoxMapper(&m_ModelRef);
 	m_pFramesModel = new SpriteFramesModel(&m_ModelRef);
 
-	if(stateFileData.m_Data.empty() == false)
+	m_pChkMapper_Loop->SetChecked(stateFileData.m_Data["loop"].toBool(false));
+	m_pChkMapper_Reverse->SetChecked(stateFileData.m_Data["reverse"].toBool(false));
+	m_pChkMapper_Bounce->SetChecked(stateFileData.m_Data["bounce"].toBool(false));
+
+	QJsonArray spriteFrameArray = stateFileData.m_Data["frames"].toArray();
+
+	QList<QUuid> uuidRequestList;
+	for(int i = 0; i < spriteFrameArray.size(); ++i)
 	{
-		m_pChkMapper_Loop->SetChecked(stateFileData.m_Data["loop"].toBool());
-		m_pChkMapper_Reverse->SetChecked(stateFileData.m_Data["reverse"].toBool());
-		m_pChkMapper_Bounce->SetChecked(stateFileData.m_Data["bounce"].toBool());
-
-		QJsonArray spriteFrameArray = stateFileData.m_Data["frames"].toArray();
-
-		QList<QUuid> uuidRequestList;
-		for(int i = 0; i < spriteFrameArray.size(); ++i)
-		{
-			QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
-			uuidRequestList.append(QUuid(spriteFrameObj["frameUUID"].toString()));
-		}
-
-		int iAffectedFrameIndex = 0;
-		QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesByUuid(this, uuidRequestList, iAffectedFrameIndex);
-		
-		if(spriteFrameArray.size() != requestedAtlasFramesList.size())
-			HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
-
-		for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
-		{
-			QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
-			QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[i]->GetCrop().left(),
-						   spriteFrameObj["offsetY"].toInt() - ((requestedAtlasFramesList[i]->GetSize().height() - 1) - requestedAtlasFramesList[i]->GetCrop().bottom()));  // -1 on height because it's NOT zero based like everything else
-
-			m_pFramesModel->SetFrameOffset(i, vOffset);
-			m_pFramesModel->DurationFrame(i, spriteFrameObj["duration"].toDouble());
-		}
+		QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
+		uuidRequestList.append(QUuid(spriteFrameObj["frameUUID"].toString()));
 	}
-	else
+
+	int iAffectedFrameIndex = 0;
+	QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesByUuid(this, uuidRequestList, iAffectedFrameIndex);
+		
+	if(spriteFrameArray.size() != requestedAtlasFramesList.size())
+		HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
+
+	for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
 	{
-		m_pChkMapper_Loop->SetChecked(false);
-		m_pChkMapper_Reverse->SetChecked(false);
-		m_pChkMapper_Bounce->SetChecked(false);
+		QJsonObject spriteFrameObj = spriteFrameArray[i].toObject();
+		QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[i]->GetCrop().left(),
+						spriteFrameObj["offsetY"].toInt() - ((requestedAtlasFramesList[i]->GetSize().height() - 1) - requestedAtlasFramesList[i]->GetCrop().bottom()));  // -1 on height because it's NOT zero based like everything else
+
+		m_pFramesModel->SetFrameOffset(i, vOffset);
+		m_pFramesModel->DurationFrame(i, spriteFrameObj["duration"].toDouble());
 	}
 }
 
@@ -392,9 +383,8 @@ SpriteModel::SpriteModel(ProjectItem &itemRef, const FileDataPair &itemFileDataR
 {
 }
 
-/*virtual*/ bool SpriteModel::InsertItemSpecificData(FileDataPair &itemFileDataOut) /*override*/
+/*virtual*/ void SpriteModel::InsertItemSpecificData(FileDataPair &itemFileDataOut) /*override*/
 {
-	return true;
 }
 
 /*virtual*/ FileDataPair SpriteModel::GetStateFileData(uint32 uiIndex) const /*override*/

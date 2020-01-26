@@ -126,7 +126,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	IDraw::OnMouseMoveEvent(pEvent);
 }
 
-/*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Value &valueRef) /*override*/
+/*virtual*/ void SpriteDraw::OnApplyJsonData(jsonxx::Object &itemDataObjRef) /*override*/
 {
 	if(m_Sprite.AcquireData() != nullptr)
 	{
@@ -139,7 +139,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		}
 	}
 
-	m_Sprite.GuiOverrideData<HySprite2dData>(valueRef, HY_UNUSED_HANDLE);
+	m_Sprite.GuiOverrideData<HySprite2dData>(itemDataObjRef, HY_UNUSED_HANDLE);
 	m_Sprite.AnimCtrl(HYANIMCTRL_Reset);
 	
 	SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());

@@ -28,8 +28,6 @@ public:
 	QList<ExplorerItem *> GetItemsRecursively(const QModelIndex &indexRef);
 	ExplorerItem *FindItemByItemPath(Project *pProject, QString sPath);
 
-	FileDataPair GenerateNewItemFileData(QString sImportPath = "");
-
 	Project *AddProject(const QString sNewProjectFilePath);
 	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, FileDataPair initItemFileData, bool bIsPendingSave);
 	bool RemoveItem(ExplorerItem *pItem);
@@ -50,7 +48,6 @@ public:
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
 
 private:
-	bool IsItemFileDataValid(const FileDataPair &itemfileDataRef);
 	bool InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
 	TreeModelItem *FindProjectTreeItem(Project *pProject);
 	TreeModelItem *FindPrefixTreeItem(const QModelIndex &indexRef) const;

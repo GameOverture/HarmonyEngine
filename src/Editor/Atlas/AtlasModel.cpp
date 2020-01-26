@@ -538,7 +538,7 @@ QList<AtlasFrame *> AtlasModel::RequestFramesById(ProjectItem *pItem, QList<QUui
 		if(pFoundFrame == nullptr)
 		{
 			// TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
-			HyGuiLog("Cannot find image with id: " % QString::number(requestList[i]) % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
+			HyGuiLog("Cannot find image with UUID: " % requestList[i].toString() % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
 		}
 		else
 		{
@@ -597,7 +597,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiA
 	if(eAtlasItemType == ATLASITEM_Image) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		rAlphaCrop = ImagePacker::crop(newImage);
 
-	AtlasFrame *pNewFrame = CreateFrame(ATLASFRAMEID_NotSet, uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, eAtlasItemType, newImage.width(), newImage.height(), -1, -1, -1, 0);
+	AtlasFrame *pNewFrame = CreateFrame(QUuid::createUuid(), uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, eAtlasItemType, newImage.width(), newImage.height(), -1, -1, -1, 0);
 	if(pNewFrame)
 	{
 		newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));

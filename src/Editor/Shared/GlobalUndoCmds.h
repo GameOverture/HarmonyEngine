@@ -42,7 +42,7 @@ public:
 
 	void redo() override
 	{
-		m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState<STATEDATA>(QJsonObject());
+		m_iIndex = static_cast<IModel *>(m_ItemRef.GetModel())->AppendState<STATEDATA>(FileDataPair());
 		m_ItemRef.FocusWidgetState(m_iIndex, -1);
 	}
 	
@@ -59,7 +59,7 @@ class UndoCmd_RemoveState : public QUndoCommand
 {
 	ProjectItem &       m_ItemRef;
 	int                 m_iIndex;
-	QJsonObject         m_PoppedStateObj;
+	FileDataPair        m_PoppedState;
 
 public:
 	UndoCmd_RemoveState(QString sText, ProjectItem &itemRef, int iIndex, QUndoCommand *pParent = nullptr) :
@@ -75,13 +75,13 @@ public:
 
 	void redo() override
 	{
-		m_PoppedStateObj = static_cast<IModel *>(m_ItemRef.GetModel())->PopState(m_iIndex);
+		m_PoppedState = static_cast<IModel *>(m_ItemRef.GetModel())->PopState(m_iIndex);
 		m_ItemRef.FocusWidgetState(0, -1);
 	}
 	
 	void undo() override
 	{
-		static_cast<IModel *>(m_ItemRef.GetModel())->InsertState<STATEDATA>(m_iIndex, m_PoppedStateObj);
+		static_cast<IModel *>(m_ItemRef.GetModel())->InsertState<STATEDATA>(m_iIndex, m_PoppedState);
 		m_ItemRef.FocusWidgetState(m_iIndex, -1);
 	}
 };

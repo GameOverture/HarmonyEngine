@@ -122,7 +122,7 @@ class HyText2dData : public IHyNodeData
 	uint32							m_uiNumStates;
 
 public:
-	HyText2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
+	HyText2dData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef);
 	virtual ~HyText2dData();
 
 	uint32 GetNumStates() const;

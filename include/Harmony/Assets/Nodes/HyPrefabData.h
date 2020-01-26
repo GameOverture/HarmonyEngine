@@ -20,7 +20,7 @@ class HyPrefabData : public IHyNodeData
 	std::vector<std::pair<HyAtlas *, HyRectangle<float> > >		m_UvRectList;
 
 public:
-	HyPrefabData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
+	HyPrefabData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef);
 	virtual ~HyPrefabData(void);
 };
 

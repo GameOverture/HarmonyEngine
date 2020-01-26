@@ -84,7 +84,7 @@ QString DlgNewItem::GetPrefix()
 QString DlgNewItem::GetImportFile()
 {
 	if(ui->grpImport->isHidden() == false)
-		return HYGUI_ImportPrefix % ui->txtImport->text();
+		return ui->txtImport->text();
 	else
 		return QString();
 }
@@ -178,17 +178,7 @@ void DlgNewItem::ErrorCheck()
 		}
 
 		QString sNewItemPath = sPrefix % '/' % ui->txtName->text();
-		QJsonObject subDirObj = m_pItemProject->GetSavedItemsObj(m_eItemType);
-		for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
-		{
-			QString sItemPath = objsInSubDirIter.key();
-			if(0 == sNewItemPath.compare(sItemPath, Qt::CaseInsensitive))
-			{
-				bFoundDup = true;
-				break;
-			}
-		}
-		if(bFoundDup)
+		if(m_pItemProject->DoesItemExist(m_eItemType, sNewItemPath))
 		{
 			ui->lblError->setText("Error: An item with this name at this prefix already exists.");
 			bIsError = true;

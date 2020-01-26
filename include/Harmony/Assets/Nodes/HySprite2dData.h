@@ -44,7 +44,7 @@ struct HySprite2dFrame
 class HySprite2dData : public IHyNodeData
 {
 public:
-	HySprite2dData(const std::string &sPath, const jsonxx::Value &dataValueRef, HyAssets &assetsRef);
+	HySprite2dData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef);
 	virtual ~HySprite2dData();
 
 	class AnimState

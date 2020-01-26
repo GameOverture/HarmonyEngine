@@ -19,9 +19,8 @@ PrimitiveModel::~PrimitiveModel()
 {
 }
 
-/*virtual*/ bool PrimitiveModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
+/*virtual*/ void PrimitiveModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	return true;
 }
 
 /*virtual*/ FileDataPair PrimitiveModel::GetStateFileData(uint32 uiIndex) const /*override*/

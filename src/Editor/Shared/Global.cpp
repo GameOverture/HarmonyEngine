@@ -399,6 +399,52 @@
 	return metaTempDir;
 }
 
+bool HyGlobal::IsItemFileDataValid(const FileDataPair &itemfileDataRef)
+{
+	std::function<bool(const QJsonArray &)> fpMetaStateArrayCheck = [](const QJsonArray &metaStateArrayRef)->bool
+	{
+		for(int i = 0; i < metaStateArrayRef.size(); ++i)
+		{
+			if(metaStateArrayRef[i].isObject() == false ||
+				metaStateArrayRef[i].toObject().contains("name") == false ||
+				metaStateArrayRef[i].toObject()["name"].isString() == false)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	return (itemfileDataRef.m_Meta.contains("stateArray") && itemfileDataRef.m_Meta["stateArray"].isArray() &&
+		itemfileDataRef.m_Data.contains("stateArray") && itemfileDataRef.m_Meta["stateArray"].isArray() &&
+		itemfileDataRef.m_Meta["stateArray"].toArray().count() == itemfileDataRef.m_Data["stateArray"].toArray().count() &&
+		fpMetaStateArrayCheck(itemfileDataRef.m_Meta["stateArray"].toArray()) &&
+		itemfileDataRef.m_Meta.contains("CameraPos") && itemfileDataRef.m_Meta["CameraPos"].isArray() &&
+		itemfileDataRef.m_Meta.contains("CameraZoom") && itemfileDataRef.m_Meta["CameraZoom"].isDouble() &&
+		itemfileDataRef.m_Meta.contains("UUID") && itemfileDataRef.m_Meta["UUID"].isString());
+}
+
+FileDataPair HyGlobal::GenerateNewItemFileData(QString sImportPath /*= ""*/)
+{
+	FileDataPair newItemFileData;
+	newItemFileData.m_Meta["stateArray"] = QJsonArray();
+	newItemFileData.m_Data["stateArray"] = QJsonArray();
+
+	QJsonArray cameraPosArray;
+	cameraPosArray.append(0);
+	cameraPosArray.append(0);
+	newItemFileData.m_Meta["CameraPos"] = cameraPosArray;
+	newItemFileData.m_Meta["CameraZoom"] = 1;
+
+	newItemFileData.m_Meta["UUID"] = QUuid::createUuid().toString();
+
+	if(IsItemFileDataValid(newItemFileData) == false)
+		HyGuiLog("ExplorerModel::GenerateNewItemFileData - IsItemFileDataValid return false", LOGTYPE_Error);
+
+	return newItemFileData;
+}
+
 QAction *FindAction(QList<QAction *> list, QString sName)
 {
 	for(int i = 0; i < list.size(); ++i)
