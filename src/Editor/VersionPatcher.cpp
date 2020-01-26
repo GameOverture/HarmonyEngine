@@ -161,12 +161,22 @@
 			QJsonArray newMetaSpriteStateFramesArray;
 			QJsonArray dataSpriteStateFramesArray = dataSpriteStateObj["frames"].toArray();
 			for(int k = 0; k < dataSpriteStateFramesArray.size(); ++k)
-				newMetaSpriteStateFramesArray.append(dataSpriteStateFramesArray[k].toObject()["id"].toInt());
+			{
+				QJsonObject dataSpriteFrameObj = dataSpriteStateFramesArray[k].toObject();
+				newMetaSpriteStateFramesArray.append(dataSpriteFrameObj["id"].toInt());
+
+				dataSpriteFrameObj.remove("id");
+				dataSpriteStateFramesArray[k] = dataSpriteFrameObj;
+			}
 
 			QJsonObject newMetaSpriteStateObj;
 			newMetaSpriteStateObj.insert("name", dataSpriteStateObj["name"].toString());
 			newMetaSpriteStateObj.insert("frameIds", newMetaSpriteStateFramesArray);
 			newMetaSpriteStatesArray.append(newMetaSpriteStateObj);
+
+			dataSpriteStateObj["frames"] = dataSpriteStateFramesArray;
+			dataSpriteStateObj.remove("name");
+			dataSpriteStatesArray[j] = dataSpriteStateObj;
 		}
 
 		QJsonObject newDataSpriteObj;

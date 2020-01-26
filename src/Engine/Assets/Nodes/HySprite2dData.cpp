@@ -39,8 +39,7 @@ HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Object &i
 	{
 		jsonxx::Object spriteStateObj = spriteStateArray.get<jsonxx::Object>(i);
 
-		new (pAnimStateWriteLocation)AnimState(spriteStateObj.get<jsonxx::String>("name"),
-											   spriteStateObj.get<jsonxx::Boolean>("loop"),
+		new (pAnimStateWriteLocation)AnimState(spriteStateObj.get<jsonxx::Boolean>("loop"),
 											   spriteStateObj.get<jsonxx::Boolean>("reverse"),
 											   spriteStateObj.get<jsonxx::Boolean>("bounce"),
 											   static_cast<float>(spriteStateObj.get<jsonxx::Number>("duration")),
@@ -75,15 +74,13 @@ const HySprite2dFrame &HySprite2dData::GetFrame(uint32 uiAnimStateIndex, uint32 
 	return m_pAnimStates[uiAnimStateIndex].GetFrame(uiFrameIndex);
 }
 
-HySprite2dData::AnimState::AnimState(std::string sName,
-									 bool bLoop,
+HySprite2dData::AnimState::AnimState(bool bLoop,
 									 bool bReverse,
 									 bool bBounce,
 									 float fDuration,
 									 HyAtlasIndices &requiredAtlasIndicesRef,
 									 jsonxx::Array &frameArray,
 									 HyAssets &assetsRef) :
-	m_sNAME(sName),
 	m_bLOOP(bLoop),
 	m_bREVERSE(bReverse),
 	m_bBOUNCE(bBounce),
