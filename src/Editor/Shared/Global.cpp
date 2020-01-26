@@ -445,6 +445,35 @@ FileDataPair HyGlobal::GenerateNewItemFileData(QString sImportPath /*= ""*/)
 	return newItemFileData;
 }
 
+void HyGlobal::ModifyJsonObject(QJsonObject &objRef, const QString &path, const QJsonValue &newValue)
+{
+	const int indexOfDot = path.indexOf('.');
+	const QString propertyName = path.left(indexOfDot);
+	const QString subPath = indexOfDot>0 ? path.mid(indexOfDot+1) : QString();
+
+	QJsonValue subValue = objRef[propertyName];
+
+	if(subPath.isEmpty())
+		subValue = newValue;
+	else
+	{
+		QJsonObject obj = subValue.toObject();
+		ModifyJsonObject(obj, subPath, newValue);
+		subValue = obj;
+	}
+
+	objRef[propertyName] = subValue;
+}
+
+void HyGlobal::ModifyJsonObject(QJsonDocument &docRef, const QString &sPath, const QJsonValue &newValue)
+{
+	QJsonObject obj = docRef.object();
+	ModifyJsonObject(obj, sPath, newValue);
+
+	docRef = QJsonDocument(obj);
+}
+
+
 QAction *FindAction(QList<QAction *> list, QString sName)
 {
 	for(int i = 0; i < list.size(); ++i)

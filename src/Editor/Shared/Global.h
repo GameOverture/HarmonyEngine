@@ -218,6 +218,9 @@ public:
 
 	static bool IsItemFileDataValid(const FileDataPair &itemfileDataRef);
 	static FileDataPair GenerateNewItemFileData(QString sImportPath = "");
+
+	static void ModifyJsonObject(QJsonObject &objRef, const QString &path, const QJsonValue &newValue);
+	static void ModifyJsonObject(QJsonDocument &docRef, const QString &sPath, const QJsonValue &newValue);
 };
 
 struct SortTreeWidgetsPredicate

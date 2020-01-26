@@ -129,10 +129,10 @@
 			return 0;
 
 		QJsonObject fileObj = fileDocOut.object();
-		if(fileObj.keys().contains("_fileVersion") == false)
+		if(fileObj.keys().contains("$fileVersion") == false)
 			return 0;
 		else
-			return fileObj["_fileVersion"].toInt();
+			return fileObj["$fileVersion"].toInt();
 	}
 	else
 		return -1;
@@ -165,7 +165,7 @@
 
 			QJsonObject newMetaSpriteStateObj;
 			newMetaSpriteStateObj.insert("name", dataSpriteStateObj["name"].toString());
-			newMetaSpriteStateObj.insert("frames", newMetaSpriteStateFramesArray);
+			newMetaSpriteStateObj.insert("frameIds", newMetaSpriteStateFramesArray);
 			newMetaSpriteStatesArray.append(newMetaSpriteStateObj);
 		}
 
@@ -213,22 +213,22 @@
 	metaItemsObj["Texts"] = metaTextsObj;
 	dataItemsObj["Texts"] = dataTextsObj;
 
-	// Replace manipulated object of metaItemsDocRef and dataItemsDocRef and add _fileVersion
-	metaItemsObj.insert("_fileVersion", 1);
+	// Replace manipulated object of metaItemsDocRef and dataItemsDocRef and add $fileVersion
+	metaItemsObj.insert("$fileVersion", 1);
 	metaItemsDocRef.setObject(metaItemsObj);
 
-	dataItemsObj.insert("_fileVersion", 1);
+	dataItemsObj.insert("$fileVersion", 1);
 	dataItemsDocRef.setObject(dataItemsObj);
 
-	// Add _fileVersion to 'metaAtlasDocRef'
+	// Add $fileVersion to 'metaAtlasDocRef'
 	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
-	metaAtlasObj.insert("_fileVersion", 1);
+	metaAtlasObj.insert("$fileVersion", 1);
 	metaAtlasDocRef.setObject(metaAtlasObj);
 
-	// Convert 'dataAtlasDocRef' from an atlas to object and add _fileVersion
+	// Convert 'dataAtlasDocRef' from an atlas to object and add $fileVersion
 	QJsonArray atlasArray = dataAtlasDocRef.array();
 	QJsonObject dataAtlasObj;
-	dataAtlasObj.insert("_fileVersion", 1);
+	dataAtlasObj.insert("$fileVersion", 1);
 	dataAtlasObj.insert("atlasGroups", atlasArray);
 	dataAtlasDocRef.setObject(dataAtlasObj);
 }
@@ -238,46 +238,47 @@
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// lambda function that will fix 'data.hygui' for every atlas frame
 	std::function<void(QJsonObject &, quint32, QUuid)> fpDataItemsReplace =
-		[](QJsonObject &metaItemsObjRef, quint32 uiId, QUuid uuid)
+		[=](QJsonObject &metaItemsObjRef, quint32 uiId, QUuid uuid)
 	{
 		// Sprites
 		QJsonObject metaItemsSpritesObj = metaItemsObjRef["Sprites"].toObject();
 		QStringList sSpritesKeysList = metaItemsSpritesObj.keys();
-		for(int i = 0; i < sSpritesKeysList.size(); ++i)
+		for(int iKeyIndex = 0; iKeyIndex < sSpritesKeysList.size(); ++iKeyIndex)
 		{
-			QJsonObject metaSpriteObj = metaItemsSpritesObj[sSpritesKeysList[i]].toObject();
+			QJsonObject metaSpriteObj = metaItemsSpritesObj[sSpritesKeysList[iKeyIndex]].toObject();
 			QJsonArray metaSpriteStatesArray = metaSpriteObj["stateArray"].toArray();
-			for(int j = 0; j < metaSpriteStatesArray.size(); ++j)
+			for(int iStateIndex = 0; iStateIndex < metaSpriteStatesArray.size(); ++iStateIndex)
 			{
-				QJsonObject metaSpriteStateObj = metaSpriteStatesArray[j].toObject();
+				QJsonObject metaSpriteStateObj = metaSpriteStatesArray[iStateIndex].toObject();
 
-				QJsonArray spriteStateFramesArray = metaSpriteStateObj["frames"].toArray();
-				for(int k = 0; k < spriteStateFramesArray.size(); ++k)
+				QJsonArray spriteStateFramesArray = metaSpriteStateObj["frameIds"].toArray();
+				for(int iFrameIndex = 0; iFrameIndex < spriteStateFramesArray.size(); ++iFrameIndex)
 				{
-					if(spriteStateFramesArray[k].isDouble() && spriteStateFramesArray[k].toInt() == uiId)
-						spriteStateFramesArray[k] = QJsonValue(uuid.toString(QUuid::WithoutBraces));
+					if(spriteStateFramesArray[iFrameIndex].isDouble() && spriteStateFramesArray[iFrameIndex].toInt() == uiId)
+						spriteStateFramesArray[iFrameIndex] = uuid.toString(QUuid::WithoutBraces);
 				}
+				metaSpriteStateObj["frameIds"] = spriteStateFramesArray;
 
-				metaSpriteStateObj["frames"] = spriteStateFramesArray;
+				metaSpriteStatesArray[iStateIndex] = metaSpriteStateObj;
 			}
 
 			metaSpriteObj["stateArray"] = metaSpriteStatesArray;
-			metaItemsSpritesObj[sSpritesKeysList[i]] = metaSpriteObj;
+			metaItemsSpritesObj[sSpritesKeysList[iKeyIndex]] = metaSpriteObj;
 		}
 		metaItemsObjRef["Sprites"] = metaItemsSpritesObj;
 
 		// Texts
 		QJsonObject metaItemsTextsObj = metaItemsObjRef["Texts"].toObject();
 		QStringList sTextsKeysList = metaItemsTextsObj.keys();
-		for(int i = 0; i < sTextsKeysList.size(); ++i)
+		for(int iKeyIndex = 0; iKeyIndex < sTextsKeysList.size(); ++iKeyIndex)
 		{
-			QJsonObject metaTextObj = metaItemsTextsObj[sTextsKeysList[i]].toObject();
+			QJsonObject metaTextObj = metaItemsTextsObj[sTextsKeysList[iKeyIndex]].toObject();
 			if(metaTextObj["id"].isDouble() && metaTextObj["id"].toInt() == uiId)
 			{
 				metaTextObj.remove("id");
-				metaTextObj.insert("frameUUID", QJsonValue(uuid.toString(QUuid::WithoutBraces)));
+				metaTextObj.insert("frameUUID", uuid.toString(QUuid::WithoutBraces));
 			}
-			metaItemsTextsObj[sTextsKeysList[i]] = metaTextObj;
+			metaItemsTextsObj[sTextsKeysList[iKeyIndex]] = metaTextObj;
 		}
 		metaItemsObjRef["Texts"] = metaItemsTextsObj;
 	};
@@ -306,18 +307,18 @@
 	metaAtlasObj.insert("frames", framesArray);
 
 	// Finalize
-	metaItemsObj["_fileVersion"] = 2;
+	metaItemsObj["$fileVersion"] = 2;
 	metaItemsDocRef.setObject(metaItemsObj);
 
 	QJsonObject dataItemsObj = dataItemsDocRef.object();
-	dataItemsObj["_fileVersion"] = 2;
+	dataItemsObj["$fileVersion"] = 2;
 	dataItemsDocRef.setObject(dataItemsObj);
 
-	metaAtlasObj["_fileVersion"] = 2;
+	metaAtlasObj["$fileVersion"] = 2;
 	metaAtlasDocRef.setObject(metaAtlasObj);
 
 	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
-	dataAtlasObj["_fileVersion"] = 2;
+	dataAtlasObj["$fileVersion"] = 2;
 	dataAtlasDocRef.setObject(dataAtlasObj);
 }
 

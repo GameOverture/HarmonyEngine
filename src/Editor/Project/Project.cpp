@@ -162,6 +162,9 @@ void Project::LoadExplorerModel()
 	QStringList sItemTypeList = m_ProjectFileData.m_Data.keys();
 	for(int i = 0; i < sItemTypeList.size(); ++i)
 	{
+		if(sItemTypeList[i] == "$fileVersion")
+			continue;
+
 		if(m_ProjectFileData.m_Meta.contains(sItemTypeList[i]) == false ||
 		   m_ProjectFileData.m_Data.contains(sItemTypeList[i]) == false)
 		{
@@ -172,11 +175,11 @@ void Project::LoadExplorerModel()
 		// Determine which enum type of 'HyGuiItemType'
 		HyGuiItemType eItemType = ITEM_Unknown;
 		QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
-		for(int i = 0; i < typeList.size(); ++i)
+		for(int j = 0; j < typeList.size(); ++j)
 		{
-			if(sItemTypeList[i] == HyGlobal::ItemName(typeList[i], true))
+			if(sItemTypeList[i] == HyGlobal::ItemName(typeList[j], true))
 			{
-				eItemType = typeList[i];
+				eItemType = typeList[j];
 				break;
 			}
 		}
@@ -521,7 +524,7 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 	for(int i = 0; i < typeList.size(); ++i)
 	{
-		if(typeList[i] == ITEM_Project || typeList[i] == ITEM_Prefix || typeList[i] == ITEM_Filter || typeList[i] == ITEM_AtlasImage)
+		if(typeList[i] == ITEM_Project || typeList[i] == ITEM_Filter || typeList[i] == ITEM_AtlasImage)
 			continue;
 
 		QString sTypeName = HyGlobal::ItemName(typeList[i], true);
@@ -676,7 +679,7 @@ QString Project::RenamePrefix(QString sOldPath, QString sNewPath)
 	return sNewPath.section('/', -1);
 }
 
-bool Project::DoesItemExist(HyGuiItemType eType, QString sPath)
+bool Project::DoesItemExist(HyGuiItemType eType, QString sPath) const
 {
 	QJsonObject subDirObj = m_ProjectFileData.m_Data;
 	for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)

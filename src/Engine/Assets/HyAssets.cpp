@@ -426,9 +426,11 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	std::string sAtlasInfoFileContents;
 	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
 
-	jsonxx::Array atlasGrpArray;
-	if(atlasGrpArray.parse(sAtlasInfoFileContents))
+	jsonxx::Object atlasFileObj;
+	if(atlasFileObj.parse(sAtlasInfoFileContents))
 	{
+		jsonxx::Array atlasGrpArray = atlasFileObj.get<jsonxx::Array>("atlasGroups");
+
 		// Iterate through each atlas group and determine how many textures total there are between all groups
 		m_uiNumAtlases = 0;
 		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
