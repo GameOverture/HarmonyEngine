@@ -120,6 +120,7 @@ public:
 	SpriteModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~SpriteModel();
 	
+	virtual bool OnSave() override { return true; }
 	virtual void InsertItemSpecificData(FileDataPair &itemFileDataOut) override;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;

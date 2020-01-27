@@ -341,7 +341,10 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		int iDlgReturn = QMessageBox::question(nullptr, "Save Changes", pItem->GetName(true) % " has unsaved changes. Do you want to save before closing?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
 		if(iDlgReturn == QMessageBox::Save)
-			pItem->Save(true);
+		{
+			if(pItem->Save(true) == false)
+				return;
+		}
 		else if(iDlgReturn == QMessageBox::Discard)
 			pItem->DiscardChanges();
 		else if(iDlgReturn == QMessageBox::Cancel)
@@ -504,9 +507,11 @@ void MainWindow::on_actionSave_triggered()
 
 	QVariant v = pTabBar->tabData(iIndex);
 	ProjectItem *pItem = v.value<ProjectItem *>();
-	pItem->Save(true);
-
-	HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
+	
+	if(pItem->Save(true))
+		HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
+	else
+		HyGuiLog(pItem->GetName(true) % " was NOT saved", LOGTYPE_Warning);
 }
 
 void MainWindow::on_actionSaveAll_triggered()
@@ -530,8 +535,10 @@ void MainWindow::on_actionSaveAll_triggered()
 
 	for(int i = 0; i < dirtyItemList.size(); ++i)
 	{
-		dirtyItemList[i]->Save(i == (dirtyItemList.size() - 1));
-		HyGuiLog(dirtyItemList[i]->GetName(true) % " was saved", LOGTYPE_Normal);
+		if(dirtyItemList[i]->Save(i == (dirtyItemList.size() - 1)))
+			HyGuiLog(dirtyItemList[i]->GetName(true) % " was saved", LOGTYPE_Normal);
+		else
+			HyGuiLog(dirtyItemList[i]->GetName(true) % " did NOT save", LOGTYPE_Warning);
 	}
 }
 
@@ -734,9 +741,9 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 
 		if(pNewItem->IsProjectItem())
 		{
-			// New items that are considered "imported" should be saved immediately since they have direct references into an asset manager
-			if(pDlg->GetImportFile().isEmpty() == false)
-				static_cast<ProjectItem *>(pNewItem)->Save(true);
+			//// New items that are considered "imported" should be saved immediately since they have direct references into an asset manager
+			//if(pDlg->GetImportFile().isEmpty() == false)
+			//	static_cast<ProjectItem *>(pNewItem)->Save(true);
 
 			MainWindow::OpenItem(static_cast<ProjectItem *>(pNewItem));
 		}

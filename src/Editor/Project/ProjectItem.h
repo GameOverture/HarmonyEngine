@@ -56,7 +56,7 @@ public:
 	
 	void GiveMenuActions(QMenu *pMenu);
 	void GetLatestFileData(FileDataPair &itemFileDataOut) const;
-	void Save(bool bWriteToDisk);
+	bool Save(bool bWriteToDisk);
 	bool IsExistencePendingSave();
 	bool IsSaveClean();
 	void DiscardChanges();

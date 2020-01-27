@@ -385,7 +385,10 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 	
 	// Resave all affected items that had a replaced atlas frame
 	for(int i = 0; i < affectedItemList.size(); ++i)
-		affectedItemList[i]->Save(i == (affectedItemList.size() - 1));
+	{
+		if(affectedItemList[i]->Save(i == (affectedItemList.size() - 1)) == false)
+			HyGuiLog(affectedItemList[i]->GetName(true) % " failed to save its new atlas frame", LOGTYPE_Error);
+	}
 }
 
 void AtlasWidget::on_atlasList_itemSelectionChanged()

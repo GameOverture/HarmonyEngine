@@ -95,7 +95,6 @@ class HyText2dData : public IHyNodeData
 
 	struct FontState
 	{
-		const std::string			sNAME;
 		const uint32				uiNUM_LAYERS;
 		const float					fLINE_HEIGHT;
 		const float					fLINE_ASCENDER;
@@ -115,7 +114,7 @@ class HyText2dData : public IHyNodeData
 		};
 		Layer *						pLayers;
 
-		FontState(std::string sName, Typeface *pTypefaces, float fLineGap, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, jsonxx::Array layersArray);
+		FontState(Typeface *pTypefaces, float fLineGap, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, jsonxx::Array layersArray);
 		~FontState();
 	};
 	FontState *						m_pFontStates;

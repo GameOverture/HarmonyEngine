@@ -351,11 +351,12 @@ void AtlasModel::WriteMetaSettings()
 
 	// Assemble the official QJsonObject for the write
 	QJsonObject settingsObj;
+	settingsObj.insert("$fileVersion", HYGUI_FILE_VERSION);
+	settingsObj.insert("expanded", expandedArray);
+	settingsObj.insert("filters", filtersArray);
 	settingsObj.insert("frames", frameArray);
 	settingsObj.insert("groups", groupsArray);
 	settingsObj.insert("startAtlasId", QJsonValue(static_cast<qint64>(m_uiNextAtlasId)));
-	settingsObj.insert("filters", filtersArray);
-	settingsObj.insert("expanded", expandedArray);
 
 	QFile settingsFile(m_MetaDir.absoluteFilePath(HYMETA_AtlasFile));
 	if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -680,22 +681,22 @@ void AtlasModel::SaveData()
 
 		atlasGrpArray.append(atlasGrpObj);
 	}
-	
-	//GetAtlasInfoForGameData(atlasObj);
 
+	QJsonObject atlasInfoObj;
+	atlasInfoObj.insert("$fileVersion", HYGUI_FILE_VERSION);
+	atlasInfoObj.insert("atlasGroups", atlasGrpArray);
+	
 	QJsonDocument atlasInfoDoc;
-	atlasInfoDoc.setArray(atlasGrpArray);
+	atlasInfoDoc.setObject(atlasInfoObj);
 
 	QFile atlasInfoFile(m_RootDataDir.absoluteFilePath(HYASSETS_AtlasFile));
-	if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
-	   HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
-	}
+	if(atlasInfoFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+		HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
 	else
 	{
 		qint64 iBytesWritten = atlasInfoFile.write(atlasInfoDoc.toJson());
-		if(0 == iBytesWritten || -1 == iBytesWritten) {
+		if(0 == iBytesWritten || -1 == iBytesWritten)
 			HyGuiLog("Could not write to atlas settings file: " % atlasInfoFile.errorString(), LOGTYPE_Error);
-		}
 
 		atlasInfoFile.close();
 	}

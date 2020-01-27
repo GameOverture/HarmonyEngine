@@ -122,6 +122,7 @@ public:
 		dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 	}
 
+	virtual bool OnSave() = 0;	// Prepares item for saving
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const = 0;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;

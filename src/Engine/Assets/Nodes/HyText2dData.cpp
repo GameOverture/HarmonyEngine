@@ -11,8 +11,7 @@
 #include "Assets/Nodes/HyText2dData.h"
 #include "Renderer/IHyRenderer.h"
 
-HyText2dData::FontState::FontState(std::string sName, Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, jsonxx::Array layersArray) :
-	sNAME(sName),
+HyText2dData::FontState::FontState(Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, jsonxx::Array layersArray) :
 	fLINE_HEIGHT(fLineHeight),
 	fLINE_ASCENDER(fLineAcender),
 	fLINE_DESCENDER(fLineDescender),
@@ -130,8 +129,7 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Object &itemD
 	for (uint32 i = 0; i < stateArray.size(); ++i, ++pStateWriteLocation)
 	{
 		jsonxx::Object stateObj = stateArray.get<jsonxx::Object>(i);
-		new (pStateWriteLocation)FontState(stateObj.get<jsonxx::String>("name"),
-										   m_pTypefaces,
+		new (pStateWriteLocation)FontState(m_pTypefaces,
 										   static_cast<float>(stateObj.get<jsonxx::Number>("lineHeight")),
 										   static_cast<float>(stateObj.get<jsonxx::Number>("lineAscender")),
 										   static_cast<float>(stateObj.get<jsonxx::Number>("lineDescender")),

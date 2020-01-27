@@ -374,7 +374,9 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 																			itemNameFileInfo.baseName(),
 																			initFileItemData,
 																			false));
-		pImportedProjItem->Save(true);
+		
+		if(pImportedProjItem->Save(true) == false)
+			return false;
 #endif
 	}
 

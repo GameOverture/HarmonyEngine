@@ -157,8 +157,11 @@ void ProjectItem::GetLatestFileData(FileDataPair &itemFileDataOut) const
 	m_pModel->InsertItemSpecificData(itemFileDataOut);
 }
 
-void ProjectItem::Save(bool bWriteToDisk)
+bool ProjectItem::Save(bool bWriteToDisk)
 {
+	if(m_pModel->OnSave() == false)
+		return false;
+
 	GetLatestFileData(m_ItemFileData);
 
 	// Register the item's file data into the project
@@ -166,6 +169,8 @@ void ProjectItem::Save(bool bWriteToDisk)
 	
 	m_pUndoStack->setClean();
 	m_bExistencePendingSave = false;
+
+	return true;
 }
 
 bool ProjectItem::IsExistencePendingSave()

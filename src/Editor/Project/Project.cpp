@@ -472,7 +472,10 @@ void Project::SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPai
 	m_ProjectFileData.m_Data.insert(sItemTypeName, dataItemTypeObj);
 
 	if(bWriteToDisk)
+	{
+		WriteMetaData();
 		WriteGameData();
+	}
 }
 
 void Project::DeleteItemData(HyGuiItemType eType, QString sPath, bool bWriteToDisk)
@@ -588,8 +591,8 @@ void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
 
 	if(bWriteToDisk && bItemsDeleted)
 	{
-		WriteGameData();
 		WriteMetaData();
+		WriteGameData();
 	}
 }
 
