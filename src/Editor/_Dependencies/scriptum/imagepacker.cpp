@@ -174,7 +174,7 @@ void ImagePacker::pack(int heur, int w, int h)
 
     if(areaBuf && !missingImages)
     {
-        // Don't crop atlases since we require them to be of specified dimentions /JJK
+        // Don't crop atlases since we require them to be of specified dimensions /JJK
         //
         //CropLastImage(heur, w, h, false);
     }

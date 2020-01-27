@@ -288,6 +288,17 @@ QSize AtlasModel::GetAtlasDimensions(uint uiAtlasGrpIndex)
 	return QSize(iWidth, iHeight);
 }
 
+QSize AtlasModel::GetAtlasMargins(uint uiAtlasGrpIndex)
+{
+	int iWidth = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginLeft"].toInt();
+	iWidth +=    m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginRight"].toInt();
+
+	int iHeight = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginBottom"].toInt();
+	iHeight +=    m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginTop"].toInt();
+
+	return QSize(iWidth, iHeight);
+}
+
 HyTextureFormat AtlasModel::GetAtlasTextureType(uint uiAtlasGrpIndex)
 {
 	return static_cast<HyTextureFormat>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
@@ -574,7 +585,10 @@ void AtlasModel::RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinq
 QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId, HyGuiItemType eType, QList<AtlasTreeItem *> correspondingParentList)
 {
 	if(correspondingParentList.size() != sImportImgList.size())
+	{
 		HyGuiLog("AtlasModel::ImportImages was passed a correspondingParentList that isn't the same size as the sImportImgList", LOGTYPE_Error);
+		return QSet<AtlasFrame *>(); // indicates error
+	}
 
 	QSet<AtlasFrame *> returnSet;
 	for(int i = 0; i < sImportImgList.size(); ++i)
@@ -586,38 +600,6 @@ QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 
 	}
 
 	return returnSet;
-}
-
-AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType, AtlasTreeItem *pParent)
-{
-	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
-
-	AtlasItemType eAtlasItemType = HyGlobal::GetAtlasItemFromItem(eType);
-
-	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
-	if(eAtlasItemType == ATLASITEM_Image) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
-		rAlphaCrop = ImagePacker::crop(newImage);
-
-	AtlasFrame *pNewFrame = CreateFrame(QUuid::createUuid(), uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, eAtlasItemType, newImage.width(), newImage.height(), -1, -1, -1, 0);
-	if(pNewFrame)
-	{
-		newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
-
-		if(pParent == nullptr)
-		{
-			if(m_pProjOwner->GetAtlasWidget())
-				m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
-		}
-		else
-		{
-			if(pParent->data(0, Qt::UserRole).toString() != HYTREEWIDGETITEM_IsFilter)
-				HyGuiLog("AtlasModel::ImportImage was passed parent that wasn't a filter", LOGTYPE_Error);
-
-			pParent->addChild(pNewFrame->GetTreeItem());
-		}
-	}
-
-	return pNewFrame;
 }
 
 AtlasTreeItem *AtlasModel::CreateFilter(QString sName, AtlasTreeItem *pParent)
@@ -872,4 +854,36 @@ void AtlasModel::SaveAndReloadHarmony()
 /*slot*/ void AtlasModel::OnRepackFinished()
 {
 	SaveAndReloadHarmony();
+}
+
+AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType, AtlasTreeItem *pParent)
+{
+	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
+
+	AtlasItemType eAtlasItemType = HyGlobal::GetAtlasItemFromItem(eType);
+
+	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
+	if(eAtlasItemType == ATLASITEM_Image) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
+		rAlphaCrop = ImagePacker::crop(newImage);
+
+	AtlasFrame *pNewFrame = CreateFrame(QUuid::createUuid(), uiChecksum, uiAtlasGrpId, sName, rAlphaCrop, eAtlasItemType, newImage.width(), newImage.height(), -1, -1, -1, 0);
+	if(pNewFrame)
+	{
+		newImage.save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName()));
+
+		if(pParent == nullptr)
+		{
+			if(m_pProjOwner->GetAtlasWidget())
+				m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->addTopLevelItem(pNewFrame->GetTreeItem());
+		}
+		else
+		{
+			if(pParent->data(0, Qt::UserRole).toString() != HYTREEWIDGETITEM_IsFilter)
+				HyGuiLog("AtlasModel::ImportImage was passed parent that wasn't a filter", LOGTYPE_Error);
+
+			pParent->addChild(pNewFrame->GetTreeItem());
+		}
+	}
+
+	return pNewFrame;
 }

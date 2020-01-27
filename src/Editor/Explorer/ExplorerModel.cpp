@@ -332,6 +332,13 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		}
 
 		QSet<AtlasFrame *> newImportedImagesSet = pDestProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, eType, correspondingParentList);
+		if(newImportedImagesSet.empty())
+		{
+			HyGuiLog("Failed to paste item - its image(s) could not import.", LOGTYPE_Warning);
+			return false;
+		}
+
+
 		importedImageSet += newImportedImagesSet;
 
 		//// Replace any image "id" with the newly imported frames' ids

@@ -136,6 +136,7 @@ enum Theme
 #define HYMETA_DataFile							"data.hygui"
 #define HYMETA_FontsDir							"Fonts/"
 
+#define HYMETA_ImageFilterList					{"*.png", "*.*"}
 #define HYMETA_FontFilterList					{"*.ttf", "*.otf"}
 
 QAction *FindAction(QList<QAction *> list, QString sName);

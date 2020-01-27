@@ -65,6 +65,7 @@ public:
 
 	int GetNumTextures(uint uiAtlasGrpIndex);
 	QSize GetAtlasDimensions(uint uiAtlasGrpIndex);
+	QSize GetAtlasMargins(uint uiAtlasGrpIndex);
 	HyTextureFormat GetAtlasTextureType(uint uiAtlasGrpIndex);
 
 	void WriteMetaSettings();
@@ -86,7 +87,6 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	QSet<AtlasFrame *> ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId, HyGuiItemType eType, QList<AtlasTreeItem *> correspondingParentList);
-	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType, AtlasTreeItem *pParent);
 
 	AtlasTreeItem *CreateFilter(QString sName, AtlasTreeItem *pParent);
 
@@ -114,6 +114,10 @@ protected:
 private Q_SLOTS:
 	void OnLoadUpdate(QString sMsg, int iPercComplete);
 	void OnRepackFinished();
+
+private:
+	// Does not error check
+	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType, AtlasTreeItem *pParent);
 };
 
 struct AtlasGrp
