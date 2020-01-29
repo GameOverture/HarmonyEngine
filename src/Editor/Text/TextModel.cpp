@@ -58,6 +58,9 @@ TextModel::TextModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) 
 		else
 			HyGuiLog("More than one frame returned for a font", LOGTYPE_Error);
 	}
+
+	if(m_pAtlasFrame)
+		m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetAtlasGrpId());
 }
 
 /*virtual*/ TextModel::~TextModel()
@@ -85,46 +88,21 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 /*virtual*/ bool TextModel::OnSave() /*override*/
 {
 	m_FontManager.GenerateOptimizedAtlas();
-
-	uint uiAtlasGrpIndex = 0;
-	if(m_pAtlasFrame != nullptr)
-		uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_pAtlasFrame->GetAtlasGrpId());
-	QSize maxAtlasSize = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
-
 	QSize atlasDimensionsOut; uint uiAtlasPixelDataSizeOut;
 	unsigned char *pPixelData = m_FontManager.GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
-	if(atlasDimensionsOut.width() > maxAtlasSize.width() || atlasDimensionsOut.height() > maxAtlasSize.height())
-	{
-		HyGuiLog("Could not save because this Text's subatlas is larger than what can fit on the specified Atlas Group", LOGTYPE_Warning);
-		return false;
-	}
-
-	QDir metaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HYMETA_FontsDir);
-	if(metaDir.mkpath(".") == false)
-		HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
-	else
-	{
-		// Copy font files into the font meta directory
-		for(int i = 0; i < m_StateList.size(); ++i)
-		{
-			TextLayersModel *pLayersModel = GetLayersModel(i);
-
-			QFileInfo tmpFontFile(pLayersModel->GetFontPath());
-			QFileInfo metaFontFile(metaDir.absoluteFilePath(tmpFontFile.fileName()));
-
-			if(metaFontFile.exists() == false)
-			{
-				if(QFile::copy(tmpFontFile.absoluteFilePath(), metaFontFile.absoluteFilePath()) == false)
-					HyGuiLog("Could not copy font file (" % tmpFontFile.filePath() % ") to the meta directory", LOGTYPE_Error);
-			}
-		}
-	}
 
 	QImage fontAtlasImage(pPixelData, atlasDimensionsOut.width(), atlasDimensionsOut.height(), QImage::Format_RGBA8888);
 
+	// If an atlas group has not been established (first time saving) then choose whichever 
+	m_FontManager.GetGlyphsModel()->FindPropertyValue("Atlas Info", TEXTPROP_AtlasGroup);
 	quint32 uiAtlasGrpIndex = 0;
-	if(m_ItemRef.GetProject().GetAtlasWidget())
-		uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedAtlasGrpId());
+	if(m_pAtlasFrame == nullptr)
+	{
+		if(m_ItemRef.GetProject().GetAtlasWidget())
+			uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedAtlasGrpId());
+	}
+	else
+		uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(m_pAtlasFrame->GetAtlasGrpId());
 
 	// Ensure newly generated font sub-atlas will fit in atlas group dimensions
 	QSize atlasDimensions = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
@@ -141,6 +119,30 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 		m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
 	else
 		m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasGrpIndex, ITEM_Text);
+
+	if(m_pAtlasFrame)
+		m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetAtlasGrpId());
+
+	// Copy font files into the font meta directory
+	QDir metaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HYMETA_FontsDir);
+	if(metaDir.mkpath("."))
+	{
+		for(int i = 0; i < m_StateList.size(); ++i)
+		{
+			TextLayersModel *pLayersModel = GetLayersModel(i);
+
+			QFileInfo tmpFontFile(pLayersModel->GetFontPath());
+			QFileInfo metaFontFile(metaDir.absoluteFilePath(tmpFontFile.fileName()));
+
+			if(metaFontFile.exists() == false)
+			{
+				if(QFile::copy(tmpFontFile.absoluteFilePath(), metaFontFile.absoluteFilePath()) == false)
+					HyGuiLog("Could not copy font file (" % tmpFontFile.filePath() % ") to the meta directory", LOGTYPE_Error);
+			}
+		}
+	}
+	else
+		HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
 
 	return true;
 }
