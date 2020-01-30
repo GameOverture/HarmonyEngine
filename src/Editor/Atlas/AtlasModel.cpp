@@ -123,6 +123,8 @@ AtlasModel::AtlasModel(Project *pProjOwner) :
 		}
 		//m_PackerSettings = settingsObj["settings"].toObject();
 
+		m_ExpandedFiltersArray = settingsObj["expanded"].toArray();
+
 		// Create all the filter items first, storing their actual path in their data (for now)
 		QJsonArray filtersArray = settingsObj["filters"].toArray();
 		for(int i = 0; i < filtersArray.size(); ++i)
@@ -323,6 +325,11 @@ bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasS
 	return true;
 }
 
+QJsonArray AtlasModel::GetExpandedFiltersArray()
+{
+	return m_ExpandedFiltersArray;
+}
+
 void AtlasModel::WriteMetaSettings()
 {
 	// Assemble array with all the frames from every group
@@ -342,7 +349,7 @@ void AtlasModel::WriteMetaSettings()
 	}
 
 	QJsonArray filtersArray;
-	QJsonArray expandedArray;
+	m_ExpandedFiltersArray = QJsonArray();
 	if(m_pProjOwner->GetAtlasWidget())
 	{
 		QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget());
@@ -352,7 +359,7 @@ void AtlasModel::WriteMetaSettings()
 			{
 				QString sFilterPath = HyGlobal::GetTreeWidgetItemPath(*iter);
 				filtersArray.append(QJsonValue(sFilterPath));
-				expandedArray.append((*iter)->isExpanded());
+				m_ExpandedFiltersArray.append((*iter)->isExpanded());
 			}
 
 			++iter;
@@ -375,14 +382,14 @@ void AtlasModel::WriteMetaSettings()
 
 			QJsonObject settingsObj = settingsDoc.object();
 			filtersArray = settingsObj["filters"].toArray();
-			expandedArray = settingsObj["expanded"].toArray();
+			m_ExpandedFiltersArray = settingsObj["expanded"].toArray();
 		}
 	}
 
 	// Assemble the official QJsonObject for the write
 	QJsonObject settingsObj;
 	settingsObj.insert("$fileVersion", HYGUI_FILE_VERSION);
-	settingsObj.insert("expanded", expandedArray);
+	settingsObj.insert("expanded", m_ExpandedFiltersArray);
 	settingsObj.insert("filters", filtersArray);
 	settingsObj.insert("frames", frameArray);
 	settingsObj.insert("groups", groupsArray);

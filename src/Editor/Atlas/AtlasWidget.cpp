@@ -170,6 +170,23 @@ void AtlasWidget::RefreshInfo()
 	ui->lblTexType->setText(HyGlobal::AtlasTextureTypeString(m_pModel->GetAtlasTextureType(uiAtlasGrpIndex)));
 	
 	ui->actionRemoveGroup->setEnabled(uiAtlasGrpIndex != 0);
+
+	// Restore expanded filters if they have been reloaded
+	QJsonArray expandedFilterArray = m_pModel->GetExpandedFiltersArray();
+	uint uiFilterIndex = 0;
+	QTreeWidgetItemIterator iter(ui->atlasList);
+	while(*iter)
+	{
+		if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
+		{
+			if(expandedFilterArray.at(uiFilterIndex).toBool())
+				(*iter)->setExpanded(true);
+
+			++uiFilterIndex;
+		}
+
+		++iter;
+	}
 }
 
 /*virtual*/ void AtlasWidget::enterEvent(QEvent *pEvent) /*override*/

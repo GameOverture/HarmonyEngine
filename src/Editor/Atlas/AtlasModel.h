@@ -29,6 +29,8 @@ class AtlasModel : public QAbstractListModel
 	QDir											m_RootDataDir;
 
 	QList<AtlasGrp *>								m_AtlasGrpList;
+	
+	QJsonArray										m_ExpandedFiltersArray;
 
 	QList<AtlasTreeItem *>							m_TopLevelTreeItemList;
 	
@@ -70,6 +72,8 @@ public:
 	bool IsImageValid(QImage &image, quint32 uiAtlasGrpId);
 	bool IsImageValid(int iWidth, int iHeight, quint32 uiAtlasGrpId);
 	bool IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings);
+
+	QJsonArray GetExpandedFiltersArray();
 
 	void WriteMetaSettings();
 
