@@ -214,6 +214,7 @@ bool AtlasWidget::DoAtlasGroupSettingsDlg()
 		{
 			if(m_pModel->IsImageValid(frameList[i]->GetSize().width(), frameList[i]->GetSize().height(), newPackerSettings) == false)
 			{
+				HyGuiLog("Could not save atlas group settings because image '" % frameList[i]->GetName() % "' will no longer fit on the atlas", LOGTYPE_Warning);
 				bPackIsValid = false;
 				break;
 			}
