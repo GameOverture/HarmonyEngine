@@ -82,6 +82,27 @@ QVariant PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString s
 	return QVariant();
 }
 
+void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
+{
+	for(int i = 0; i < m_pRootItem->childCount(); ++i)
+	{
+		if(0 == m_pRootItem->child(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->child(i);
+			for(int j = 0; j < pCategoryTreeItem->childCount(); ++j)
+			{
+				if(0 == pCategoryTreeItem->child(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+				{
+					if(setData(createIndex(pCategoryTreeItem->child(j)->childNumber(), COLUMN_Value, pCategoryTreeItem->child(j)), valueRef) == false)
+						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
+
+					return;
+				}
+			}
+		}
+	}
+}
+
 bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
 {
 	// All category names must be unique

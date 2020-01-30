@@ -118,6 +118,7 @@ public:
 	float GetLeftSideNudgeAmt(TextLayerHandle hLayer) const;
 
 	TextLayerHandle AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
+	void SetAtlasGroup(quint32 uiAtlasGroupId);
 	void SetFont(TextLayerHandle hLayer, QString sFontName);
 	void SetFontSize(TextLayerHandle hLayer, float fSize);
 	void SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode);

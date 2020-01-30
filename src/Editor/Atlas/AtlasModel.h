@@ -67,6 +67,10 @@ public:
 	QSize GetAtlasDimensions(uint uiAtlasGrpIndex);
 	HyTextureFormat GetAtlasTextureType(uint uiAtlasGrpIndex);
 
+	bool IsImageValid(QImage &image, quint32 uiAtlasGrpId);
+	bool IsImageValid(int iWidth, int iHeight, quint32 uiAtlasGrpId);
+	bool IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings);
+
 	void WriteMetaSettings();
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +80,7 @@ public:
 	bool TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId);
 
 	AtlasFrame *GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType);
-	void ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
+	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
 	QList<AtlasFrame *> RequestFrames(ProjectItem *pItem);
 	QList<AtlasFrame *> RequestFrames(ProjectItem *pItem, QList<AtlasFrame *> requestList);
@@ -86,7 +90,6 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	QSet<AtlasFrame *> ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId, HyGuiItemType eType, QList<AtlasTreeItem *> correspondingParentList);
-	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType, AtlasTreeItem *pParent);
 
 	AtlasTreeItem *CreateFilter(QString sName, AtlasTreeItem *pParent);
 
@@ -114,6 +117,10 @@ protected:
 private Q_SLOTS:
 	void OnLoadUpdate(QString sMsg, int iPercComplete);
 	void OnRepackFinished();
+
+private:
+	// Does not error check
+	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiAtlasGrpId, HyGuiItemType eType, AtlasTreeItem *pParent);
 };
 
 struct AtlasGrp

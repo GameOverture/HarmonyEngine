@@ -103,6 +103,8 @@ public:
 	QString GetPropertyName(const QModelIndex &indexRef) const;
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
+	
+	void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
 
 	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName,
