@@ -115,12 +115,17 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 	// Apply newly generated font sub-atlas
 	if(m_pAtlasFrame)
-		m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true);
+	{
+		if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true) == false)
+			return false;
+	}
 	else
 		m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasGrpIndex, ITEM_Text);
 
 	if(m_pAtlasFrame)
 		m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetAtlasGrpId());
+	else
+		return false;
 
 	// Copy font files into the font meta directory
 	QDir metaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HYMETA_FontsDir);

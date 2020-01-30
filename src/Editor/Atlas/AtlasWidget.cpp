@@ -198,22 +198,38 @@ void AtlasWidget::RefreshInfo()
 bool AtlasWidget::DoAtlasGroupSettingsDlg()
 {
 	bool bAccepted = false;
-	bool bAtlasGrpHasImages = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex()).size() > 0;
+	QList<AtlasFrame *> frameList = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex());
+	
+	bool bAtlasGrpHasImages = frameList.size() > 0;
 
 	DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bAtlasGrpHasImages, m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
 	if(QDialog::Accepted == pDlg->exec())
 	{
+		// Ensure that all current images in atlas group aren't larger than the new atlas itself
 		QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
 		pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
 
-		m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
+		bool bPackIsValid = true;
+		for(int i = 0; i < frameList.size(); ++i)
+		{
+			if(m_pModel->IsImageValid(frameList[i]->GetSize().width(), frameList[i]->GetSize().height(), newPackerSettings) == false)
+			{
+				bPackIsValid = false;
+				break;
+			}
+		}
 
-		if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
-			m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
-		else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
-			m_pModel->WriteMetaSettings();
+		if(bPackIsValid)
+		{
+			m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
 
-		bAccepted = true;
+			if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
+				m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
+			else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
+				m_pModel->WriteMetaSettings();
+
+			bAccepted = true;
+		}
 	}
 
 	delete pDlg;

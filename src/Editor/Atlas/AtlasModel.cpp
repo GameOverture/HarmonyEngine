@@ -301,17 +301,21 @@ bool AtlasModel::IsImageValid(QImage &image, quint32 uiAtlasGrpId)
 bool AtlasModel::IsImageValid(int iWidth, int iHeight, quint32 uiAtlasGrpId)
 {
 	int uiAtlasGrpIndex = GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId);
+	return IsImageValid(iWidth, iHeight, m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings);
+}
 
-	int iMarginWidth = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginLeft"].toInt();
-	iMarginWidth +=    m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginRight"].toInt();
-
-	int iMarginHeight = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginBottom"].toInt();
-	iMarginHeight +=    m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginTop"].toInt();
+bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings)
+{
+	int iMarginWidth =  atlasSettings["sbFrameMarginLeft"].toInt();
+	iMarginWidth +=     atlasSettings["sbFrameMarginRight"].toInt();
+	int iMarginHeight = atlasSettings["sbFrameMarginBottom"].toInt();
+	iMarginHeight +=    atlasSettings["sbFrameMarginTop"].toInt();
 
 	QSize atlasMargins(iMarginWidth, iMarginHeight);
-	QSize atlasDimensions = GetAtlasDimensions(GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId));
+	QSize atlasDimensions(atlasSettings["sbTextureWidth"].toInt(), atlasSettings["sbTextureHeight"].toInt());
+
 	if(iWidth >= (atlasDimensions.width() - atlasMargins.width()) ||
-	   iHeight >= (atlasDimensions.height() - atlasMargins.height()))
+		iHeight >= (atlasDimensions.height() - atlasMargins.height()))
 	{
 		return false;
 	}
@@ -484,6 +488,9 @@ bool AtlasModel::TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId)
 
 AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType)
 {
+	if(IsImageValid(newImage, m_AtlasGrpList[uiAtlasGrpIndex]->GetId()) == false)
+		return nullptr;
+
 	// This will also create a meta image
 	AtlasFrame *pFrame = ImportImage(sName, newImage, m_AtlasGrpList[uiAtlasGrpIndex]->GetId(), eType, nullptr);
 
@@ -502,8 +509,11 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage 
 	return nullptr;
 }
 
-void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)
+bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)
 {
+	if(IsImageValid(newImage, pFrame->GetAtlasGrpId()) == false)
+		return false;
+
 	QSet<int> textureIndexToReplaceSet;
 	if(pFrame->GetTextureIndex() >= 0)
 		textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
@@ -524,6 +534,8 @@ void AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		uint uiAtlasGrpIndex = GetAtlasGrpIndexFromAtlasGrpId(pFrame->GetAtlasGrpId());
 		Repack(uiAtlasGrpIndex, textureIndexToReplaceSet, QSet<AtlasFrame *>());
 	}
+
+	return true;
 }
 
 QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem)
@@ -621,7 +633,7 @@ QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 
 			for(int j = 0; j < newImageList.size(); ++j)
 				delete newImageList[j];
 
-			return QSet<AtlasFrame *>();
+			return QSet<AtlasFrame *>(); // indicates error
 		}
 	}
 
