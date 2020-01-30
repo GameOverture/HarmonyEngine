@@ -11,6 +11,7 @@
 #include "TextFontManager.h"
 #include "TextModel.h"
 #include "Project.h"
+#include "AtlasModel.h"
 
 #define TEXTFONTERROR_Success 0
 #define TEXTFONTERROR_Unknown -1
@@ -55,6 +56,7 @@ TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsOb
 	m_GlyphsModel.AppendProperty("Uses Glyphs", TEXTPROP_Symbols, PROPERTIESTYPE_bool, QVariant(bSymbols ? Qt::Checked : Qt::Unchecked), "Include common punctuation and symbol glyphs");
 	m_GlyphsModel.AppendProperty("Uses Glyphs", TEXTPROP_AdditionalSyms, PROPERTIESTYPE_LineEdit, QVariant(sAdditional), "Include specified glyphs");
 	m_GlyphsModel.AppendCategory("Atlas Info");
+	m_GlyphsModel.AppendProperty("Atlas Info", TEXTPROP_AtlasGroup, PROPERTIESTYPE_LineEdit, "", "The atlas group the font sub atlas will reside in", true);
 	m_GlyphsModel.AppendProperty("Atlas Info", TEXTPROP_Dimensions, PROPERTIESTYPE_ivec2, QPoint(0, 0), "The required portion size needed to fit on an atlas", true);
 	m_GlyphsModel.AppendProperty("Atlas Info", TEXTPROP_UsedPercent, PROPERTIESTYPE_double, 0.0, "Percentage of the maximum size dimensions used", true);
 }
@@ -284,6 +286,12 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 
 	RegenFontArray();
 	return hNewLayer;
+}
+
+void TextFontManager::SetAtlasGroup(quint32 uiAtlasGroupId)
+{
+	AtlasModel &atlasModelRef = m_GlyphsModel.GetOwner().GetProject().GetAtlasModel();
+	m_GlyphsModel.SetPropertyValue("Atlas Info", TEXTPROP_AtlasGroup, atlasModelRef.GetAtlasGroupName(atlasModelRef.GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGroupId)));
 }
 
 void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)

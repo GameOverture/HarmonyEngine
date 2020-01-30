@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QJsonArray>
 
+#define TEXTPROP_AtlasGroup "Atlas Group"
 #define TEXTPROP_Dimensions "Dimensions"
 #define TEXTPROP_UsedPercent "Used Percent"
 #define TEXTPROP_09 "0-9"
