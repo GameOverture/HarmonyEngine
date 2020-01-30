@@ -106,11 +106,10 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 	// Ensure newly generated font sub-atlas will fit in atlas group dimensions
 	QSize atlasDimensions = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
-	QSize atlasMargins = m_ItemRef.GetProject().GetAtlasModel().GetAtlasMargins(uiAtlasGrpIndex);
-	if(fontAtlasImage.width() >= (atlasDimensions.width() - atlasMargins.width()) ||
-		fontAtlasImage.height() >= (atlasDimensions.height() - atlasMargins.height()))
+	quint32 uiNewAtlasGrpId = m_ItemRef.GetProject().GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(uiAtlasGrpIndex);
+	if(m_ItemRef.GetProject().GetAtlasModel().IsImageValid(fontAtlasImage, uiNewAtlasGrpId) == false)
 	{
-		HyGuiLog("Cannot generate text sub-atlas for " % m_ItemRef.GetName(true) % " because it will not fit in atlas group '" % QString::number(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedAtlasGrpId()) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
+		HyGuiLog("Cannot generate text sub-atlas for " % m_ItemRef.GetName(true) % " because it will not fit in atlas group '" % QString::number(uiNewAtlasGrpId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
 		return false;
 	}
 

@@ -288,20 +288,35 @@ QSize AtlasModel::GetAtlasDimensions(uint uiAtlasGrpIndex)
 	return QSize(iWidth, iHeight);
 }
 
-QSize AtlasModel::GetAtlasMargins(uint uiAtlasGrpIndex)
-{
-	int iWidth = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginLeft"].toInt();
-	iWidth +=    m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginRight"].toInt();
-
-	int iHeight = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginBottom"].toInt();
-	iHeight +=    m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginTop"].toInt();
-
-	return QSize(iWidth, iHeight);
-}
-
 HyTextureFormat AtlasModel::GetAtlasTextureType(uint uiAtlasGrpIndex)
 {
 	return static_cast<HyTextureFormat>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
+}
+
+bool AtlasModel::IsImageValid(QImage &image, quint32 uiAtlasGrpId)
+{
+	return IsImageValid(image.width(), image.height(), uiAtlasGrpId);
+}
+
+bool AtlasModel::IsImageValid(int iWidth, int iHeight, quint32 uiAtlasGrpId)
+{
+	int uiAtlasGrpIndex = GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId);
+
+	int iMarginWidth = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginLeft"].toInt();
+	iMarginWidth +=    m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginRight"].toInt();
+
+	int iMarginHeight = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginBottom"].toInt();
+	iMarginHeight +=    m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbFrameMarginTop"].toInt();
+
+	QSize atlasMargins(iMarginWidth, iMarginHeight);
+	QSize atlasDimensions = GetAtlasDimensions(GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId));
+	if(iWidth >= (atlasDimensions.width() - atlasMargins.width()) ||
+	   iHeight >= (atlasDimensions.height() - atlasMargins.height()))
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void AtlasModel::WriteMetaSettings()
@@ -590,14 +605,32 @@ QSet<AtlasFrame *> AtlasModel::ImportImages(QStringList sImportImgList, quint32 
 		return QSet<AtlasFrame *>(); // indicates error
 	}
 
-	QSet<AtlasFrame *> returnSet;
+	QList<QImage *> newImageList;
 	for(int i = 0; i < sImportImgList.size(); ++i)
 	{
 		QFileInfo fileInfo(sImportImgList[i]);
-		QImage newImage(fileInfo.absoluteFilePath());
 
-		returnSet.insert(ImportImage(fileInfo.baseName(), newImage, uiAtlasGrpId, eType, correspondingParentList[i]));
+		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
+		newImageList.push_back(pNewImage);
+
+		QSize atlasDimensions = GetAtlasDimensions(GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId));
+		if(IsImageValid(*pNewImage, uiAtlasGrpId) == false)
+		{
+			HyGuiLog("Importing image " % fileInfo.fileName() % " will not fit in atlas group '" % QString::number(uiAtlasGrpId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
+
+			for(int j = 0; j < newImageList.size(); ++j)
+				delete newImageList[j];
+
+			return QSet<AtlasFrame *>();
+		}
 	}
+
+	QSet<AtlasFrame *> returnSet;
+	for(int i = 0; i < newImageList.size(); ++i)
+		returnSet.insert(ImportImage(QFileInfo(sImportImgList[i]).baseName(), *newImageList[i], uiAtlasGrpId, eType, correspondingParentList[i]));
+
+	for(int j = 0; j < newImageList.size(); ++j)
+		delete newImageList[j];
 
 	return returnSet;
 }

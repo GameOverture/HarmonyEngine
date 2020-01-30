@@ -368,9 +368,7 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 		QFileInfo fileInfo(sImportImgList[i]);
 		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
 		QSize atlasDimensions = m_pModel->GetAtlasDimensions(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(selectedFrameList[i]->GetAtlasGrpId()));
-		QSize atlasMargins = m_pModel->GetAtlasMargins(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(selectedFrameList[i]->GetAtlasGrpId()));
-		if(pNewImage->width() >= (atlasDimensions.width() - atlasMargins.width()) ||
-		   pNewImage->height() >= (atlasDimensions.height() - atlasMargins.height()))
+		if(m_pModel->IsImageValid(*pNewImage, selectedFrameList[i]->GetAtlasGrpId()) == false)
 		{
 			HyGuiLog("Replacement image " % fileInfo.fileName() % " will not fit in atlas group '" % QString::number(selectedFrameList[i]->GetAtlasGrpId()) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
 
@@ -587,9 +585,7 @@ void AtlasWidget::on_actionAtlasGrpTransfer_triggered(QAction *pAction)
 			continue;
 
 		QSize atlasDimensions = m_pModel->GetAtlasDimensions(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(uiNewAtlasGrpId));
-		QSize atlasMargins = m_pModel->GetAtlasMargins(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(uiNewAtlasGrpId));
-		if(pFrame->GetSize().width() >= (atlasDimensions.width() - atlasMargins.width()) ||
-			pFrame->GetSize().height() >= (atlasDimensions.height() - atlasMargins.height()))
+		if(m_pModel->IsImageValid(pFrame->GetSize().width(), pFrame->GetSize().height(), uiNewAtlasGrpId) == false)
 		{
 			HyGuiLog("Cannot transfer image " % pFrame->GetName() % " because it will not fit in atlas group '" % QString::number(uiNewAtlasGrpId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
 			return;

@@ -65,8 +65,10 @@ public:
 
 	int GetNumTextures(uint uiAtlasGrpIndex);
 	QSize GetAtlasDimensions(uint uiAtlasGrpIndex);
-	QSize GetAtlasMargins(uint uiAtlasGrpIndex);
 	HyTextureFormat GetAtlasTextureType(uint uiAtlasGrpIndex);
+
+	bool IsImageValid(QImage &image, quint32 uiAtlasGrpId);
+	bool IsImageValid(int iWidth, int iHeight, quint32 uiAtlasGrpId);
 
 	void WriteMetaSettings();
 
