@@ -352,13 +352,13 @@ SpriteFramesModel *SpriteStateData::GetFramesModel()
 //	stateObjOut.insert("reverse", m_pChkMapper_Reverse->IsChecked());
 //}
 
-QSet<AtlasFrame *> SpriteStateData::GetAtlasFrames()
+QList<AtlasFrame *> SpriteStateData::GetAtlasFrames() const
 {
-	QSet<AtlasFrame *> atlasSet;
+	QList<AtlasFrame *> atlasList;
 	for(int i = 0; i < m_pFramesModel->rowCount(); ++i)
-		atlasSet.insert(m_pFramesModel->GetFrameAt(i)->m_pFrame);
+		atlasList.push_back(m_pFramesModel->GetFrameAt(i)->m_pFrame);
 
-	return atlasSet;
+	return atlasList;
 }
 
 /*virtual*/ int SpriteStateData::AddFrame(AtlasFrame *pFrame)
@@ -396,7 +396,7 @@ SpriteModel::SpriteModel(ProjectItem &itemRef, const FileDataPair &itemFileDataR
 	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
 	QJsonArray frameIdsArray;
 
-	QList<AtlasFrame *> frameList = pState->GetAtlasFrames().toList();
+	QList<AtlasFrame *> frameList = pState->GetAtlasFrames();
 	for(int i = 0; i < frameList.size(); ++i)
 		frameIdsArray.append(frameList[i]->GetId().toString(QUuid::WithoutBraces));
 	stateFileData.m_Meta.insert("frameIds", frameIdsArray);
@@ -418,8 +418,8 @@ SpriteModel::SpriteModel(ProjectItem &itemRef, const FileDataPair &itemFileDataR
 	QList<AtlasFrame *> retAtlasFrameList;
 	for(int i = 0; i < m_StateList.size(); ++i)
 	{
-		QSet<AtlasFrame *> atlasFrameSet = static_cast<SpriteStateData *>(m_StateList[i])->GetAtlasFrames();
-		retAtlasFrameList += atlasFrameSet.toList();
+		QList<AtlasFrame *> atlasFrameList = static_cast<SpriteStateData *>(m_StateList[i])->GetAtlasFrames();
+		retAtlasFrameList += atlasFrameList;
 	}
 
 	return retAtlasFrameList;

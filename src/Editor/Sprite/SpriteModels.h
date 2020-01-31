@@ -106,7 +106,7 @@ public:
 
 	//void GetStateFileData(FileDataPair &stateFileDataOut);
 
-	QSet<AtlasFrame *> GetAtlasFrames();
+	QList<AtlasFrame *> GetAtlasFrames() const;
 	
 	virtual int AddFrame(AtlasFrame *pFrame) override;
 	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
