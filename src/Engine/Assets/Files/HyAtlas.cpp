@@ -192,11 +192,11 @@ void HyAtlas::OnLoadThread()
 			return;
 		}
 
-		int iWidth, iHeight, iNum8bitClrChannels;
+		int iWidth, iHeight, iNum8bitClrChannels; // out variables
 
 		if(m_sFILE_PATH[m_sFILE_PATH.size() - 1] == 'g')
 		{
-			m_pPixelData = SOIL_load_image(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);// stbi_load(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 0);
+			m_pPixelData = SOIL_load_image(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);
 			m_uiPixelDataSize = iWidth * iHeight * 4;
 		}
 		else

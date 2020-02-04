@@ -19,7 +19,8 @@
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :
 	IHyRenderer(diagnosticsRef, windowListRef),
 	m_mtxView(1.0f),
-	m_mtxProj(1.0f)
+	m_mtxProj(1.0f),
+	m_hPBO(0)
 {
 	HyLog("OpenGL is initializing...");
 
@@ -52,7 +53,17 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		}
 	}
 	else
-		HyLog("No windows created to render to");	
+		HyLog("No windows created to render to");
+
+	// Check for PBO hardware support
+	if(GLEW_EXT_pixel_buffer_object)
+	{
+		glGenBuffers(1, &m_hPBO);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_hPBO);
+		//glBufferData(GL_PIXEL_UNPACK_BUFFER, DATA_SIZE, nullptr, GL_STREAM_DRAW); // glBufferData() with nullptr reserves only memory space.
+
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+	}
 
 	GLint iMaxTextureSize = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &iMaxTextureSize);
@@ -113,6 +124,8 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 
 HyOpenGL::~HyOpenGL(void)
 {
+	if(m_hPBO != 0)
+		glDeleteBuffers(1, &m_hPBO);
 }
 
 /*virtual*/ void HyOpenGL::SetCurrentWindow(uint32 uiIndex)
@@ -470,6 +483,9 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ uint32 HyOpenGL::AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) /*override*/
 {
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_hPBO);
+	glBufferSubData(GL_UNPACK_BUFFER, size, pData);
+
 	GLenum eInternalFormat = GL_RGBA;
 	switch(eDesiredFormat)
 	{
@@ -525,7 +541,7 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGLShader::AddTexture", "glBindTexture");
 
 	if(bIsPixelDataCompressed == false)
-	{
+	{ 
 		glTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
 	}
@@ -955,9 +971,6 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	HyAssert(pShader, "HyShader not found for render state: " << pRenderState->uiID);
 
 	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
-
-	// TODO: if OpenGL 4.3 is available
-	//glBindVertexBuffer(QUADBATCH, m_hVBO2d, uiDataOffset, 132);
 
 	size_t uiOffset = 0;
 	for(size_t i = 0; i < shaderVertexAttribListRef.size(); ++i)

@@ -25,11 +25,10 @@ protected:
 	glm::mat4										m_mtxView;
 	glm::mat4										m_mtxProj;
 
-	//GLuint											m_hVBO3d;
-	//bool											m_bVBO3dDirty;
+	GLuint											m_hPBO; // IDs of PBO
 
-	/////////// 2D MEMBERS ////////////////////
-	//GLuint											m_hVBO2d;
+	//GLuint										m_hVBO3d;
+	//bool											m_bVBO3dDirty;
 
 public:
 	HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
