@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Renderer/IHyRenderer.h"
 
+#define HY_NUM_PBO 10
 #define HyErrorCheck_OpenGL(funcLoc, funcName) { GLenum eError = glGetError(); HyAssert(eError == GL_NO_ERROR, "HyOpenGL error in " << funcLoc << " on function " << funcName << ": " << eError); }
 
 class HyOpenGL : public IHyRenderer
@@ -25,7 +26,17 @@ protected:
 	glm::mat4										m_mtxView;
 	glm::mat4										m_mtxProj;
 
-	GLuint											m_hPBO; // IDs of PBO
+	enum PboState
+	{
+		PBO_Free = 0,
+		PBO_Mapped,
+		PBO_Full,
+		PBO_Pending3,	// Pending frames to give GPU time to finish its usage with the PBO
+		PBO_Pending2,
+		PBO_Pending1
+	};
+	GLuint *										m_pPboHandles;
+	PboState *										m_pPboStates;
 
 	//GLuint										m_hVBO3d;
 	//bool											m_bVBO3dDirty;

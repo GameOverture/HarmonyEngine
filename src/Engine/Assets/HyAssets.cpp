@@ -370,7 +370,12 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		{
 			while(m_Load_Prepare.empty() == false)
 			{
-				m_Load_Shared.push(m_Load_Prepare.front());
+				// 
+				IHyFileData *pFileData = m_Load_Prepare.front();
+
+
+
+				m_Load_Shared.push(pFileData);
 				m_Load_Prepare.pop();
 			}
 		
@@ -537,12 +542,10 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
 	m_Mutex.lock();
+	while(m_Load_Shared.empty() == false)
 	{
-		while(m_Load_Shared.empty() == false)
-		{
-			dataList.push_back(m_Load_Shared.front());
-			m_Load_Shared.pop();
-		}
+		dataList.push_back(m_Load_Shared.front());
+		m_Load_Shared.pop();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
