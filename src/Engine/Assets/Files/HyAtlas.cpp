@@ -192,15 +192,20 @@ void HyAtlas::OnLoadThread()
 			return;
 		}
 
-		int iWidth, iHeight, iNum8bitClrChannels; // out variables
-
 		if(m_sFILE_PATH[m_sFILE_PATH.size() - 1] == 'g')
 		{
+			int iWidth, iHeight, iNum8bitClrChannels; // out variables
 			m_pPixelData = SOIL_load_image(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);
 			m_uiPixelDataSize = iWidth * iHeight * 4;
 		}
 		else
 			m_pPixelData = SOIL_load_DDS(m_sFILE_PATH.c_str(), &m_uiPixelDataSize, 0);
+
+		// Use PBO/DMA transfer if available
+		if(m_pGfxApiPixelBuffer)
+		{
+			memcpy(m_pGfxApiPixelBuffer, m_pPixelData, m_uiPixelDataSize);
+		}
 
 		HyAssert(m_pPixelData != nullptr, "HyAtlas failed to load image data");
 	}
@@ -213,7 +218,7 @@ void HyAtlas::OnRenderThread(IHyRenderer &rendererRef)
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, m_eTEXTURE_FILTERING, 0, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
+		m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, m_eTEXTURE_FILTERING, 0, m_uiWIDTH, m_uiHEIGHT, m_hGfxApiPbo, m_hGfxApiPbo != 0 ? nullptr : m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
 		DeletePixelData();
 	}
 	else // GetLoadableState() == HYLOADSTATE_Discarded

@@ -40,8 +40,8 @@ protected:
 	HyWindow *										m_pCurWindow;
 	
 	// Message queues (transfer and receive)
-	std::queue<IHyFileData *>					m_TxDataQueue;
-	std::queue<IHyFileData *>					m_RxDataQueue;
+	std::queue<IHyFileData *>						m_TxDataQueue;
+	std::queue<IHyFileData *>						m_RxDataQueue;
 	
 	// Effects containers
 	std::map<HyShaderHandle, HyShader *>			m_ShaderMap;
@@ -72,7 +72,7 @@ public:
 	HyShaderHandle GetDefaultShaderHandle(HyType eType);
 	
 	uint32 GetNumWindows();
-	virtual void SetCurrentWindow(uint32 uiIndex);
+	void SetCurrentWindow(uint32 uiIndex);
 	
 	void ProcessMsgs();
 	void Render();
@@ -92,10 +92,11 @@ public:
 	virtual void DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera) = 0;
 	virtual void FinishRender() = 0;
 	virtual void UploadShader(HyShaderProgramDefaults eDefaultsFrom, HyShader *pShader) = 0;
-	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) = 0;
+	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, uint32 hPBO, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) = 0;
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 	virtual uint32 GenerateVertexBuffer() = 0;	// Returns the graphics API handle to a new vertex buffer in the form of a uint32
+	virtual uint8 *GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) = 0;
 };
 
 #endif /* IHyRenderer_h__ */

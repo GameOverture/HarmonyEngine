@@ -257,9 +257,13 @@ void IHyRenderer::Render()
 	HY_PROFILE_END
 }
 
-/*virtual*/ void IHyRenderer::SetCurrentWindow(uint32 uiIndex)
+void IHyRenderer::SetCurrentWindow(uint32 uiIndex)
 {
 	m_pCurWindow = m_WindowListRef[uiIndex];
+
+#ifdef HY_PLATFORM_DESKTOP
+	glfwMakeContextCurrent(m_pCurWindow->GetHandle());
+#endif
 }
 
 /*static*/ HyShader *IHyRenderer::FindShader(HyShaderHandle hHandle)
