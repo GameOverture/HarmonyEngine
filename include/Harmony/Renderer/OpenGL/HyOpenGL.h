@@ -30,7 +30,6 @@ protected:
 	{
 		PBO_Free = 0,
 		PBO_Mapped,
-		PBO_Full,
 		PBO_Pending3,	// Pending frames to give GPU time to finish its usage with the PBO
 		PBO_Pending2,
 		PBO_Pending1
@@ -45,8 +44,6 @@ public:
 	HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~HyOpenGL(void);
 
-	virtual void SetCurrentWindow(uint32 uiIndex);
-
 	virtual void StartRender() override;
 	
 	virtual void Begin_3d() override;
@@ -58,10 +55,11 @@ public:
 	virtual void FinishRender() override;
 
 	virtual void UploadShader(HyShaderProgramDefaults eDefaultsFrom, HyShader *pShader) override;
-	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) override;
+	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, uint32 hPBO, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) override;
 	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) override;
 	virtual uint32 GenerateVertexBuffer() override;
+	virtual uint8 *GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) override;
 
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);

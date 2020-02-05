@@ -370,10 +370,12 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		{
 			while(m_Load_Prepare.empty() == false)
 			{
-				// 
 				IHyFileData *pFileData = m_Load_Prepare.front();
-
-
+				if(pFileData->GetLoadableType() == HYFILE_Atlas)
+				{
+					uint32 uiBufferSize = static_cast<HyAtlas *>(pFileData)->GetWidth() * static_cast<HyAtlas *>(pFileData)->GetHeight() * 4;
+					pFileData->m_pGfxApiPixelBuffer = rendererRef.GetPixelBufferPtr(uiBufferSize, pFileData->m_hGfxApiPbo);
+				}
 
 				m_Load_Shared.push(pFileData);
 				m_Load_Prepare.pop();
@@ -547,17 +549,18 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		dataList.push_back(m_Load_Shared.front());
 		m_Load_Shared.pop();
 	}
+	m_Mutex.unlock();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Load everything that is enqueued (outside of any critical section)
 	for(uint32 i = 0; i < dataList.size(); ++i)
-	{
 		dataList[i]->OnLoadThread();
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Copy all the (loaded) IData ptrs to the retrieval vector
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Copy all the (loaded) IData ptrs to the retrieval vector
+	m_Mutex.lock();
+	for(uint32 i = 0; i < dataList.size(); ++i)
 		m_Load_Retrieval.push(dataList[i]);
-	}
 	m_Mutex.unlock();
 }
 

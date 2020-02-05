@@ -132,19 +132,23 @@ HyOpenGL::~HyOpenGL(void)
 	delete [] m_pPboStates;
 }
 
-/*virtual*/ void HyOpenGL::SetCurrentWindow(uint32 uiIndex)
-{
-	IHyRenderer::SetCurrentWindow(uiIndex);
-
-#ifdef HY_PLATFORM_DESKTOP
-	glfwMakeContextCurrent(m_pCurWindow->GetHandle());
-#endif
-}
-
 /*virtual*/ void HyOpenGL::StartRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	HyErrorCheck_OpenGL("HyOpenGL:StartRender", "glClear");
+
+	if(m_pPboHandles)
+	{
+		for(uint32 i = 0; i < HY_NUM_PBO; ++i)
+		{
+			if(m_pPboStates[i] == PBO_Pending3)
+				m_pPboStates[i] = PBO_Pending2;
+			if(m_pPboStates[i] == PBO_Pending2)
+				m_pPboStates[i] = PBO_Pending1;
+			if(m_pPboStates[i] == PBO_Pending1)
+				m_pPboStates[i] = PBO_Free;
+		}
+	}
 }
 
 /*virtual*/ void HyOpenGL::Begin_3d()
@@ -485,11 +489,8 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////
 }
 
-/*virtual*/ uint32 HyOpenGL::AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) /*override*/
+/*virtual*/ uint32 HyOpenGL::AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, uint32 hPBO, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) /*override*/
 {
-	//glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_hPBO);
-	//glBufferSubData(GL_UNPACK_BUFFER, size, pData);
-
 	GLenum eInternalFormat = GL_RGBA;
 	switch(eDesiredFormat)
 	{
@@ -544,6 +545,12 @@ HyOpenGL::~HyOpenGL(void)
 	glBindTexture(GL_TEXTURE_2D, hGLTexture);
 	HyErrorCheck_OpenGL("HyOpenGLShader::AddTexture", "glBindTexture");
 
+	if(hPBO != 0)
+	{
+		HyAssert(pPixelData == nullptr, "AddTexture() has a valid PBO handle as well as pixel data");
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, hPBO);
+	}
+
 	if(bIsPixelDataCompressed == false)
 	{ 
 		glTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
@@ -553,6 +560,16 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		glCompressedTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
+	}
+
+	if(hPBO != 0)
+	{
+		for(uint32 i = 0; i < HY_NUM_PBO; ++i)
+		{
+			if(m_pPboHandles[i] == hPBO)
+				m_pPboStates[i] = PBO_Pending3;
+		}
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 	}
 
 	switch(eTexFiltering)
@@ -682,6 +699,33 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glGenBuffers");
 
 	return hVBO;
+}
+
+/*virtual*/ uint8 *HyOpenGL::GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) /*override*/
+{
+	hPboOut = 0;
+
+	if(m_pPboHandles == nullptr)
+		return nullptr;
+
+	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
+	{
+		if(m_pPboStates[i] == PBO_Free)
+		{
+			m_pPboStates[i] = PBO_Mapped;
+
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pPboHandles[i]);
+			glBufferData(GL_PIXEL_UNPACK_BUFFER, uiMaxBufferSize, nullptr, GL_STREAM_DRAW); // Reserve size
+
+			uint8 *pMappedPtr = static_cast<uint8 *>(glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY));
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+
+			hPboOut = m_pPboHandles[i];
+			return pMappedPtr;
+		}
+	}
+
+	return nullptr;
 }
 
 void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
