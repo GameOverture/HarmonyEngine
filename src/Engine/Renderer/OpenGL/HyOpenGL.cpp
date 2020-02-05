@@ -703,6 +703,8 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ uint8 *HyOpenGL::GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) /*override*/
 {
+	hPboOut = 0;
+
 	if(m_pPboHandles == nullptr)
 		return nullptr;
 
