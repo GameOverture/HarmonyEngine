@@ -49,6 +49,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 																								  0,
 																								  atlasDimensions.width(),
 																								  atlasDimensions.height(),
+																								  0,
 																								  pAtlasPixelData,
 																								  uiAtlasPixelDataSize,
 																								  HYTEXTURE_R8G8B8A8);
