@@ -57,14 +57,14 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		HyLog("No windows created to render to");
 
 	// Check for PBO hardware support
-	if(GLEW_EXT_pixel_buffer_object)
-	{
-		glGenBuffers(HY_NUM_PBO, m_pPboHandles);
+	//if(GLEW_EXT_pixel_buffer_object)
+	//{
+	//	glGenBuffers(HY_NUM_PBO, m_pPboHandles);
 
-		m_pPboStates = HY_NEW PboState[HY_NUM_PBO];
-		for(uint32 i = 0; i < HY_NUM_PBO; ++i)
-			m_pPboStates[i] = PBO_Free;
-	}
+	//	m_pPboStates = HY_NEW PboState[HY_NUM_PBO];
+	//	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
+	//		m_pPboStates[i] = PBO_Free;
+	//}
 
 	GLint iMaxTextureSize = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &iMaxTextureSize);
