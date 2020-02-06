@@ -373,7 +373,8 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 				IHyFileData *pFileData = m_Load_Prepare.front();
 				if(pFileData->GetLoadableType() == HYFILE_Atlas)
 				{
-					uint32 uiBufferSize = static_cast<HyAtlas *>(pFileData)->GetWidth() * static_cast<HyAtlas *>(pFileData)->GetHeight() * 4;
+					HyAtlas *pAtlas = static_cast<HyAtlas *>(pFileData);
+					uint32 uiBufferSize = pAtlas->GetWidth() * pAtlas->GetHeight() * 4;
 					pFileData->m_pGfxApiPixelBuffer = rendererRef.GetPixelBufferPtr(uiBufferSize, pFileData->m_hGfxApiPbo);
 				}
 
