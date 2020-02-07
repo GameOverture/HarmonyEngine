@@ -367,7 +367,9 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 
 /*virtual*/ void HySprite2d::OnCalcBoundingVolume() /*override*/
 {
-	glm::ivec2 vFrameOffset = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame).vOFFSET + m_vCustomOffset;
+	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame).vOFFSET + m_vCustomOffset;
+	vFrameOffset *= scale.Get();
+
 	float fHalfWidth = AnimGetCurFrameWidth(true) * 0.5f;
 	float fHalfHeight = AnimGetCurFrameHeight(true) * 0.5f;
 

@@ -59,7 +59,9 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	// Check for PBO hardware support
 	//if(GLEW_EXT_pixel_buffer_object)
 	//{
+	//	m_pPboHandles = HY_NEW GLuint[HY_NUM_PBO];
 	//	glGenBuffers(HY_NUM_PBO, m_pPboHandles);
+	//	HyErrorCheck_OpenGL("HyOpenGL::HyOpenGL", "glGenBuffers");
 
 	//	m_pPboStates = HY_NEW PboState[HY_NUM_PBO];
 	//	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
@@ -118,6 +120,8 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 					reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)),
 					iMaxTextureSize,
 					sCompressedTextureFormats);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);		// 4-byte pixel alignment
 
 	// 2D vertex buffer setup
 	m_VertexBuffer.Initialize2d();
@@ -549,11 +553,13 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		HyAssert(pPixelData == nullptr, "AddTexture() has a valid PBO handle as well as pixel data");
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, hPBO);
+		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glBindBuffer");
 	}
-
+	
 	if(bIsPixelDataCompressed == false)
 	{ 
 		glTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
+		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, uiWidth, uiHeight, eFormat, GL_UNSIGNED_BYTE, 0);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
 	}
 	else
@@ -569,7 +575,7 @@ HyOpenGL::~HyOpenGL(void)
 			if(m_pPboHandles[i] == hPBO)
 				m_pPboStates[i] = PBO_Pending3;
 		}
-		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+		//glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 	}
 
 	switch(eTexFiltering)
@@ -715,9 +721,13 @@ HyOpenGL::~HyOpenGL(void)
 			m_pPboStates[i] = PBO_Mapped;
 
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pPboHandles[i]);
+			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glBindBuffer");
 			glBufferData(GL_PIXEL_UNPACK_BUFFER, uiMaxBufferSize, nullptr, GL_STREAM_DRAW); // Reserve size
+			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glBufferData");
 
 			uint8 *pMappedPtr = static_cast<uint8 *>(glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY));
+			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glMapBuffer");
+
 			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
 			hPboOut = m_pPboHandles[i];
