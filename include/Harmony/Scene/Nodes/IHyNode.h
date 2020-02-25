@@ -64,7 +64,9 @@ protected:
 
 	std::vector<HyAnimFloat *>		m_ActiveAnimFloatsList;
 
+#ifdef HY_ENABLE_USER_TAGS
 	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
+#endif
 
 	// Don't allow move semantics since pointers to these nodes are stored in things like HyScene, and those pointers would become invalid
 	IHyNode(IHyNode &&moveRef) HY_NOEXCEPT = delete;
@@ -87,8 +89,10 @@ public:
 	bool IsPauseUpdate() const;
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused);
 
+#ifdef HY_ENABLE_USER_TAGS
 	int64 GetTag() const;
 	void SetTag(int64 iTag);
+#endif
 
 protected:
 	virtual void Update();																// Only Scene will invoke this

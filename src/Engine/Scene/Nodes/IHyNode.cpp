@@ -14,8 +14,10 @@
 
 IHyNode::IHyNode(HyType eNodeType) :
 	m_eTYPE(eNodeType),
-	m_uiFlags(SETTING_IsVisible), // All other flags are initialized to '0'
-	m_iTag(0)
+	m_uiFlags(SETTING_IsVisible) // All other flags are initialized to '0'
+#ifdef HY_ENABLE_USER_TAGS
+	, m_iTag(0)
+#endif
 {
 	m_uiFlags |= SETTING_IsRegistered;
 	HyScene::AddNode(this);
@@ -23,8 +25,10 @@ IHyNode::IHyNode(HyType eNodeType) :
 
 IHyNode::IHyNode(const IHyNode &copyRef) :
 	m_eTYPE(copyRef.m_eTYPE),
-	m_uiFlags(copyRef.m_uiFlags),
-	m_iTag(copyRef.m_iTag)
+	m_uiFlags(copyRef.m_uiFlags)
+#ifdef HY_ENABLE_USER_TAGS
+	, m_iTag(copyRef.m_iTag)
+#endif
 {
 	HyScene::AddNode(this);
 
@@ -117,6 +121,7 @@ bool IHyNode::IsPauseUpdate() const
 	m_uiFlags |= EXPLICIT_PauseUpdate;
 }
 
+#ifdef HY_ENABLE_USER_TAGS
 int64 IHyNode::GetTag() const
 {
 	return m_iTag;
@@ -126,6 +131,7 @@ void IHyNode::SetTag(int64 iTag)
 {
 	m_iTag = iTag;
 }
+#endif
 
 /*virtual*/ void IHyNode::Update()
 {
