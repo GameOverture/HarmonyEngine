@@ -81,7 +81,7 @@ const HyShape2d &IHyInstance2d::GetLocalBoundingVolume()
 
 /*virtual*/ bool IHyInstance2d::IsValid() /*override final*/
 {
-	return m_bVisible && OnIsValid();
+	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) && OnIsValid();
 }
 
 /*virtual*/ void IHyInstance2d::OnLoaded() /*override*/

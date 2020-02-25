@@ -24,7 +24,7 @@ IHyDrawable2d::IHyDrawable2d(HyType eNodeType, const char *szPrefix, const char 
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiExplicitAndTypeFlags |= NODETYPE_IsDrawable;
+	m_uiFlags |= NODETYPE_IsDrawable;
 
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
@@ -111,14 +111,14 @@ int32 IHyDrawable2d::GetDisplayOrder() const
 /*virtual*/ void IHyDrawable2d::SetDisplayOrder(int32 iOrderValue)
 {
 	m_iDisplayOrder = iOrderValue;
-	m_uiExplicitAndTypeFlags |= EXPLICIT_DisplayOrder;
+	m_uiFlags |= EXPLICIT_DisplayOrder;
 
 	HyScene::SetInstOrderingDirty();
 }
 
 /*virtual*/ void IHyDrawable2d::ResetDisplayOrder()
 {
-	m_uiExplicitAndTypeFlags &= ~EXPLICIT_DisplayOrder;
+	m_uiFlags &= ~EXPLICIT_DisplayOrder;
 
 	HyEntity2d *pRootParent = m_pParent;
 	while(pRootParent)
@@ -144,9 +144,9 @@ int32 IHyDrawable2d::GetDisplayOrder() const
 /*virtual*/ int32 IHyDrawable2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)
 {
 	if(bIsOverriding)
-		m_uiExplicitAndTypeFlags &= ~EXPLICIT_DisplayOrder;
+		m_uiFlags &= ~EXPLICIT_DisplayOrder;
 
-	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_DisplayOrder))
+	if(0 == (m_uiFlags & EXPLICIT_DisplayOrder))
 	{
 		m_iDisplayOrder = iOrderValue;
 		iOrderValue += 1;

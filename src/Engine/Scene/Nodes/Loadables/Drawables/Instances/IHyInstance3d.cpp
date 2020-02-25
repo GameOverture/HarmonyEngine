@@ -43,7 +43,7 @@ const IHyInstance3d &IHyInstance3d::operator=(const IHyInstance3d &rhs)
 
 /*virtual*/ bool IHyInstance3d::IsValid() /*override final*/
 {
-	return m_bVisible && OnIsValid();
+	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) && OnIsValid();
 }
 
 /*virtual*/ void IHyInstance3d::OnLoaded() /*override*/

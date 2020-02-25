@@ -15,7 +15,7 @@ IHyLoadable3d::IHyLoadable3d(HyType eNodeType, const char *szPrefix, const char 
 	IHyNode3d(eNodeType, pParent),
 	IHyLoadable(szPrefix, szName)
 {
-	m_uiExplicitAndTypeFlags |= NODETYPE_IsLoadable;
+	m_uiFlags |= NODETYPE_IsLoadable;
 }
 
 IHyLoadable3d::IHyLoadable3d(const IHyLoadable3d &copyRef) :

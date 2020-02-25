@@ -22,7 +22,7 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
-	m_uiExplicitAndTypeFlags |= NODETYPE_Is2d;
+	m_uiFlags |= NODETYPE_Is2d;
 	scale.Set(1.0f);
 
 	if(m_pParent)
