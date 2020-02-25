@@ -50,6 +50,8 @@ bool EntityNodeTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFa
 
 		return false;
 	}
+
+	return true;
 }
 
 bool EntityNodeTreeModel::AddChildItem(ExplorerItem *pItem)
@@ -66,7 +68,12 @@ bool EntityNodeTreeModel::AddChildItem(ExplorerItem *pItem)
 	QVariant v;
 	v.setValue<ExplorerItem *>(pItem);
 	if(setData(index(m_pRootItem->childCount() - 1, 0, createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)), v) == false)
+	{
 		HyGuiLog("EntityNodeTreeModel::AddChildItem() - setData failed", LOGTYPE_Error);
+		return false;
+	}
+
+	return true;
 }
 
 bool EntityNodeTreeModel::RemoveChild(ExplorerItem *pItem)

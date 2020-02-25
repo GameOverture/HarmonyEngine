@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Renderer/IHyRenderer.h"
-#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
 
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
@@ -33,7 +33,7 @@ HyStencilHandle HyStencil::GetHandle() const
 	return m_hHANDLE;
 }
 
-void HyStencil::AddMask(IHyDrawable2d &nodeRef)
+void HyStencil::AddMask(IHyInstance2d &nodeRef)
 {
 	nodeRef.SetVisible(false);
 	nodeRef.Load();
@@ -42,7 +42,7 @@ void HyStencil::AddMask(IHyDrawable2d &nodeRef)
 	m_bMaskIsReady = false;	// Will be set to 'true' in IHyRenderer::PrepareBuffers()
 }
 
-bool HyStencil::RemoveMask(IHyDrawable2d &nodeRef)
+bool HyStencil::RemoveMask(IHyInstance2d &nodeRef)
 {
 	for(auto it = m_MaskInstanceList.begin(); it != m_MaskInstanceList.end(); ++it)
 	{
@@ -76,7 +76,7 @@ void HyStencil::SetAsInvertedMask()
 	m_eBehavior = HYSTENCILBEHAVIOR_InvertedMask;
 }
 
-const std::vector<IHyDrawable2d *> &HyStencil::GetInstanceList() const
+const std::vector<IHyInstance2d *> &HyStencil::GetInstanceList() const
 {
 	return m_MaskInstanceList;
 }

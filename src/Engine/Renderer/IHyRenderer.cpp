@@ -12,7 +12,7 @@
 #include "Renderer/IHyRenderer.h"
 #include "Window/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Scene/Nodes/Loadables/Visables/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
 #include "Assets/Files/HyGLTF.h"
 #include "Assets/Nodes/HyPrefabData.h"
 #include "HyEngine.h"
@@ -66,7 +66,7 @@ void IHyRenderer::PrepareBuffers()
 
 		pStencil->SetRenderStatePtr(m_RenderBuffer.GetCurWritePosPtr());
 
-		const std::vector<IHyDrawable2d *> &instanceListRef = pStencil->GetInstanceList();
+		const std::vector<IHyInstance2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
 			AppendDrawable2d(0, *instanceListRef[i], HY_FULL_CAMERA_MASK);
 	}
@@ -76,7 +76,7 @@ void IHyRenderer::PrepareBuffers()
 	m_RenderBuffer.CreateRenderHeader();
 }
 
-void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask)
+void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyInstance3d &instanceRef, HyCameraMask uiCameraMask)
 {
 	instanceRef.OnUpdateUniforms();
 
@@ -90,7 +90,7 @@ void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCa
 	pData->GetGltf()->AppendRenderStates(m_RenderBuffer);
 }
 
-void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask)
+void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyInstance2d &instanceRef, HyCameraMask uiCameraMask)
 {
 	instanceRef.OnUpdateUniforms();
 

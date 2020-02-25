@@ -322,7 +322,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	// Remove all the actions in the "Edit" menu, and replace it with the current item's actions
 	QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
-	for(uint i = 0; i < editActionList.size(); ++i)
+	for(int i = 0; i < editActionList.size(); ++i)
 		sm_pInstance->ui->mainToolBar->removeAction(editActionList[i]);
 
 	sm_pInstance->ui->menu_Edit->clear();
@@ -359,7 +359,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		sm_pInstance->ui->dockWidgetProperties->hide();
 
 		QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
-		for(uint i = 0; i < editActionList.size(); ++i)
+		for(int i = 0; i < editActionList.size(); ++i)
 			sm_pInstance->ui->mainToolBar->removeAction(editActionList[i]);
 
 		sm_pInstance->ui->menu_Edit->clear();

@@ -187,7 +187,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 		if(propDefRef.delegateBuilder.isValid())
 		{
-			SpriteModel *pModel = static_cast<SpriteModel *>(propDefRef.delegateBuilder.value<ProjectItem *>()->GetModel());
+			//SpriteModel *pModel = static_cast<SpriteModel *>(propDefRef.delegateBuilder.value<ProjectItem *>()->GetModel());
 			static_cast<QSlider *>(pReturnWidget)->setMinimum(0);
 
 			// TODO: FIX ME

@@ -20,8 +20,8 @@ class IHyNode2d;
 class IHyNode3d;
 class HyEntity2d;
 class HyEntity3d;
-class IHyDrawable2d;
-class IHyDrawable3d;
+class IHyInstance2d;
+class IHyInstance3d;
 class HyWindow;
 class IHyRenderer;
 
@@ -44,8 +44,8 @@ class HyScene
 	bool												m_bPauseGame;
 
 	// List of nodes who can be drawn, and their graphics assets are fully loaded
-	std::vector<IHyDrawable2d *>						m_NodeList_LoadedDrawable2d;
-	std::vector<IHyDrawable3d *>						m_NodeList_LoadedDrawable3d;
+	std::vector<IHyInstance2d *>						m_NodeList_LoadedDrawable2d;
+	std::vector<IHyInstance3d *>						m_NodeList_LoadedDrawable3d;
 
 public:
 	HyScene(std::vector<HyWindow *> &WindowListRef);
@@ -59,12 +59,12 @@ public:
 	static void AddNode_PauseUpdate(IHyNode *pNode);
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
-	void AddNode_Loaded(IHyDrawable2d *pDrawable);
-	void AddNode_Loaded(IHyDrawable3d *pDrawable);
-	void RemoveNode_Loaded(const IHyDrawable2d *pDrawable);
-	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
+	void AddNode_Loaded(IHyInstance2d *pDrawable);
+	void AddNode_Loaded(IHyInstance3d *pDrawable);
+	void RemoveNode_Loaded(const IHyInstance2d *pDrawable);
+	void RemoveNode_Loaded(const IHyInstance3d *pDrawable);
 
-	void CopyAllLoadedNodes(std::vector<IHyDrawable2d *> &nodeListOut);
+	void CopyAllLoadedNodes(std::vector<IHyInstance2d *> &nodeListOut);
 
 	b2World &GetPhysics2d();
 	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
@@ -75,9 +75,9 @@ public:
 	void UpdateNodes();
 	void PrepareRender(IHyRenderer &rendererRef);
 
-	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut) const;
+	bool CalculateCameraMask(/*const*/ IHyInstance2d &instanceRef, uint32 &uiCameraMaskOut) const;
 	
-	static bool Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2);
+	static bool Node2dSortPredicate(const IHyInstance2d *pInst1, const IHyInstance2d *pInst2);
 };
 
 #endif /* HyScene_h__ */

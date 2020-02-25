@@ -81,7 +81,7 @@ ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
 	pDrag->setMimeData(pMimeData);
 	pDrag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
 
-	Qt::DropAction eDropAction = pDrag->exec(supportedActions);
+	//Qt::DropAction eDropAction = pDrag->exec(supportedActions);
 	//if(eDropAction != Qt::MoveAction)
 	//{
 	//	supportedActions &= ~Qt::MoveAction;

@@ -11,7 +11,7 @@
 QRect ImagePacker::crop(const QImage &img)
 {
     int j, w, h, x, y;
-    QRgb pix;
+    //QRgb pix;
     //QImage im;
     bool t;
     //crop all
@@ -87,7 +87,7 @@ QRect ImagePacker::crop(const QImage &img)
         for(j = x; j < w; j++)
             CMP(j, h - 1, CROP_THRESHOLD)
         }
-found_by_color:
+//found_by_color:
     w = w - x;
     h = h - y;
     if(w < 0)

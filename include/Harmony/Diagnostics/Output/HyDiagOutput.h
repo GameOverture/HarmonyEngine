@@ -12,9 +12,9 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Diagnostics/Output/HyProfiler.h"
-#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
-#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyText2d.h"
-#include "Scene/Nodes/Loadables/Visables/Drawables/Objects/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.h"
+#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
 
 #define HY_SYSTEM_FONT "+HyInternal", "+SystemText"
 #define HY_SYSTEM_FONT_SIZE 16.0f

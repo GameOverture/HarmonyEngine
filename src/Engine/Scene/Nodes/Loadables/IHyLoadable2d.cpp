@@ -9,8 +9,8 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/IHyLoadable2d.h"
-#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity2d.h"
-#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
+#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
 IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :
 	IHyNode2d(eNodeType, pParent),

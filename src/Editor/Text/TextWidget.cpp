@@ -55,7 +55,7 @@ TextWidget::TextWidget(ProjectItem &itemRef, QWidget *parent) :
 	ui.cmbSize->blockSignals(false);
 
 	ui.layersTableView->setItemDelegate(new TextLayersDelegate(&m_ItemRef, this));
-	QItemSelectionModel *pSelModel = ui.layersTableView->selectionModel();
+	//QItemSelectionModel *pSelModel = ui.layersTableView->selectionModel();
 	//connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
 	ui.glyphsTreeView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetGlyphsModel());

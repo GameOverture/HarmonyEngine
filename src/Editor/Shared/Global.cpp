@@ -327,7 +327,6 @@
 		for(int i = 0; i < list.count(); i++)
 		{
 			QFileInfo info = list[i];
-			bool bIsDir = info.isDir();
 			QString sFileName = info.fileName();
 			QString sFilePath = info.filePath();
 			QString sSuffix = info.suffix().toLower();

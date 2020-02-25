@@ -1,0 +1,74 @@
+/**************************************************************************
+*	IHyDrawable.cpp
+*
+*	Harmony Engine
+*	Copyright (c) 2017 Jason Knobler
+*
+*	Harmony License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
+#include "Afx/HyStdAfx.h"
+#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance.h"
+#include "HyEngine.h"
+
+HyScene *IHyInstance::sm_pScene = nullptr;
+
+IHyInstance::IHyInstance() :
+	m_hShader(HY_UNUSED_HANDLE),
+	m_eRenderMode(HYRENDERMODE_Unknown),
+	m_hTextureHandle(HY_UNUSED_HANDLE)
+{
+}
+
+IHyInstance::IHyInstance(const IHyInstance &copyRef) :
+	m_hShader(copyRef.m_hShader),
+	m_eRenderMode(copyRef.m_eRenderMode),
+	m_hTextureHandle(copyRef.m_hTextureHandle),
+	m_ShaderUniforms(copyRef.m_ShaderUniforms)
+{
+}
+
+IHyInstance::~IHyInstance()
+{
+}
+
+const IHyInstance &IHyInstance::operator=(const IHyInstance &rhs)
+{
+	m_hShader = rhs.m_hShader;
+	m_eRenderMode = rhs.m_eRenderMode;
+	m_hTextureHandle = rhs.m_hTextureHandle;
+	m_ShaderUniforms = m_ShaderUniforms;
+
+	return *this;
+}
+
+HyRenderMode IHyInstance::GetRenderMode() const
+{
+	return m_eRenderMode;
+}
+
+HyTextureHandle IHyInstance::GetTextureHandle() const
+{
+	return m_hTextureHandle;
+}
+
+void IHyInstance::SetShader(HyShader *pShader)
+{
+	if(pShader)
+	{
+		HyAssert(pShader->IsFinalized(), "IHyInstance::SetShader tried to set a non-finalized shader");
+		m_hShader = pShader->GetHandle();
+	}
+	else
+		m_hShader = Hy_DefaultShaderHandle(_DrawableGetNodeRef().GetType());
+}
+
+HyShaderHandle IHyInstance::GetShaderHandle()
+{
+	return m_hShader;
+}
+
+const HyShaderUniforms &IHyInstance::GetShaderUniforms() const
+{
+	return m_ShaderUniforms;
+}

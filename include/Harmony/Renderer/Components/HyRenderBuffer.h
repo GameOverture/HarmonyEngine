@@ -19,7 +19,7 @@ typedef uint32 HyCameraMask;
 
 #define HY_RENDERSTATE_BUFFER_SIZE ((1024 * 1024) * 1)	// 1MB
 
-class IHyDrawable;
+class IHyInstance;
 class HyShaderUniforms;
 
 class HyRenderBuffer
@@ -88,7 +88,7 @@ public:
 	HyRenderBuffer::State *GetCurWritePosPtr();
 
 	void Reset();
-	void AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, HyCameraMask uiCameraMask, HyScreenRect<int32> &scissorRectRef, HyStencilHandle hStencil, int32 iCoordinateSystem, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance);
+	void AppendRenderState(uint32 uiId, IHyInstance &instanceRef, HyCameraMask uiCameraMask, HyScreenRect<int32> &scissorRectRef, HyStencilHandle hStencil, int32 iCoordinateSystem, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance);
 	void CreateRenderHeader();
 
 private:

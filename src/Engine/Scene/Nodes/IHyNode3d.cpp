@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode3d.h"
-#include "Scene/Nodes/Loadables/Visables/Objects/HyEntity3d.h"
+#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 #include "Scene/HyScene.h"
 
 IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :

@@ -19,7 +19,7 @@ class IHyNode
 	friend class HyScene;
 	friend class HyEntity2d;
 	friend class HyAnimFloat;
-	friend class IHyVisable;
+	friend class IHyDrawable;
 
 protected:
 	const HyType					m_eTYPE;

@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Renderer/Components/HyRenderBuffer.h"
 
-class IHyDrawable2d;
+class IHyInstance2d;
 
 enum HyStencilBehavior
 {
@@ -29,7 +29,7 @@ class HyStencil
 	const HyStencilHandle			m_hHANDLE;
 
 	// TODO: Support 3d drawables too
-	std::vector<IHyDrawable2d *>	m_MaskInstanceList;
+	std::vector<IHyInstance2d *>	m_MaskInstanceList;
 	bool							m_bMaskIsReady;
 	HyRenderBuffer::State *			m_pRenderStatePtr;
 
@@ -42,8 +42,8 @@ public:
 	HyStencilHandle GetHandle() const;
 
 	// It's the user's responsibility to ensure added instances continue to be valid
-	void AddMask(IHyDrawable2d &nodeRef);
-	bool RemoveMask(IHyDrawable2d &nodeRef);
+	void AddMask(IHyInstance2d &nodeRef);
+	bool RemoveMask(IHyInstance2d &nodeRef);
 
 	bool IsMaskReady();
 
@@ -52,7 +52,7 @@ public:
 	void SetAsMask();
 	void SetAsInvertedMask();
 
-	const std::vector<IHyDrawable2d *> &GetInstanceList() const;
+	const std::vector<IHyInstance2d *> &GetInstanceList() const;
 	HyRenderBuffer::State *GetRenderStatePtr() const;
 
 private:

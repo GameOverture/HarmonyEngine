@@ -75,7 +75,6 @@ EntityWidget::~EntityWidget()
 /*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
 	// Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
-	EntityStateData *pCurStateData = static_cast<EntityStateData *>(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
 	ExplorerItem *pSubStateItem = subState.value<ExplorerItem *>();
 	if(pSubStateItem == nullptr)
 	{
