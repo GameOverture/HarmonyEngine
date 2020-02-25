@@ -47,7 +47,7 @@ const IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
 
 /*virtual*/ HyType IHyLoadable2d::_LoadableGetType() /*override final*/
 {
-	return m_eTYPE;
+	return GetType();
 }
 
 /*virtual*/ IHyLoadable *IHyLoadable2d::_LoadableGetParentPtr() /*override final*/

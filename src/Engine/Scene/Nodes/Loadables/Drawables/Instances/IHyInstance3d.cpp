@@ -49,7 +49,7 @@ const IHyInstance3d &IHyInstance3d::operator=(const IHyInstance3d &rhs)
 /*virtual*/ void IHyInstance3d::OnLoaded() /*override*/
 {
 	if(m_hShader == HY_UNUSED_HANDLE)
-		m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
+		m_hShader = Hy_DefaultShaderHandle(GetType());
 
 	sm_pScene->AddNode_Loaded(this);
 }

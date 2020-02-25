@@ -46,7 +46,7 @@ const IHyLoadable3d &IHyLoadable3d::operator=(const IHyLoadable3d &rhs)
 
 /*virtual*/ HyType IHyLoadable3d::_LoadableGetType() /*override final*/
 {
-	return m_eTYPE;
+	return GetType();
 }
 
 /*virtual*/ IHyLoadable *IHyLoadable3d::_LoadableGetParentPtr() /*override final*/

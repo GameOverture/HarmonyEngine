@@ -72,6 +72,7 @@ enum HyType
 	HYTYPE_Prefab,
 	HYTYPE_Entity,
 	HYTYPE_Camera
+	// NOTE: Cannot exceed 15 types due to IHyNode only reserving 4 bits to store this value
 };
 
 enum HyShapeType

@@ -13,8 +13,7 @@
 #include "Scene/AnimFloats/HyAnimFloat.h"
 
 IHyNode::IHyNode(HyType eNodeType) :
-	m_eTYPE(eNodeType),
-	m_uiFlags(SETTING_IsVisible) // All other flags are initialized to '0'
+	m_uiFlags(static_cast<uint32>(eNodeType) | SETTING_IsVisible)
 #ifdef HY_ENABLE_USER_TAGS
 	, m_iTag(0)
 #endif
@@ -24,7 +23,6 @@ IHyNode::IHyNode(HyType eNodeType) :
 }
 
 IHyNode::IHyNode(const IHyNode &copyRef) :
-	m_eTYPE(copyRef.m_eTYPE),
 	m_uiFlags(copyRef.m_uiFlags)
 #ifdef HY_ENABLE_USER_TAGS
 	, m_iTag(copyRef.m_iTag)
@@ -46,7 +44,7 @@ IHyNode::IHyNode(const IHyNode &copyRef) :
 
 const IHyNode &IHyNode::operator=(const IHyNode &rhs)
 {
-	HyAssert(m_eTYPE == rhs.m_eTYPE, "IHyNode::operator= cannot assign from a different HyType");
+	HyAssert(GetType() == rhs.GetType(), "IHyNode::operator= cannot assign from a different HyType");
 
 	//m_uiFlags = rhs.m_uiFlags;
 	//m_bVisible = rhs.m_bVisible;
@@ -67,7 +65,7 @@ const IHyNode &IHyNode::operator=(const IHyNode &rhs)
 
 HyType IHyNode::GetType() const
 {
-	return m_eTYPE;
+	return static_cast<HyType>(m_uiFlags & NODETYPE_HyType);
 }
 
 bool IHyNode::Is2D() const
