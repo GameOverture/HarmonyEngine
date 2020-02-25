@@ -43,6 +43,8 @@ protected:
 	{
 		m_ViewportRect.left = m_ViewportRect.bottom = 0.0f;
 		m_ViewportRect.right = m_ViewportRect.top = 1.0f;
+
+		SetRegistered(true);
 	}
 
 	IHyCamera(const IHyCamera &copyRef) = delete;

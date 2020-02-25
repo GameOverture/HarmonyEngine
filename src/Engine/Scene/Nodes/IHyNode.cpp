@@ -18,47 +18,91 @@ IHyNode::IHyNode(HyType eNodeType) :
 	, m_iTag(0)
 #endif
 {
-	m_uiFlags |= SETTING_IsRegistered;
-	HyScene::AddNode(this);
+	SetRegistered(true);
 }
 
 IHyNode::IHyNode(const IHyNode &copyRef) :
-	m_uiFlags(copyRef.m_uiFlags)
+	m_uiFlags(0),
 #ifdef HY_ENABLE_USER_TAGS
-	, m_iTag(copyRef.m_iTag)
+	m_iTag(copyRef.m_iTag)
 #endif
 {
-	HyScene::AddNode(this);
+	if(copyRef.IsRegistered())
+		SetRegistered(true);
 
-	if(0 != (m_uiFlags & SETTING_IsPauseUpdate))
-		HyScene::AddNode_PauseUpdate(this);
+	if(copyRef.IsPauseUpdate())
+		SetPauseUpdate(true);
+
+	m_uiFlags = copyRef.m_uiFlags;
+
+	// MOVE TODO: Account for m_ActiveAnimFloatsList
+}
+
+IHyNode::IHyNode(IHyNode &&donor) :
+	m_uiFlags(0),
+	m_ActiveAnimFloatsList(std::move(donor.m_ActiveAnimFloatsList))
+#ifdef HY_ENABLE_USER_TAGS
+	, m_iTag(donor.m_iTag)
+#endif
+{
+	if(donor.IsRegistered())
+	{
+		donor.SetRegistered(false);
+		SetRegistered(true);
+	}
+
+	if(donor.IsPauseUpdate())
+	{
+		donor.SetPauseUpdate(false);
+		SetPauseUpdate(true);
+	}
+
+	m_uiFlags = donor.m_uiFlags;
 }
 
 /*virtual*/ IHyNode::~IHyNode()
 {
-	if(0 != (m_uiFlags & SETTING_IsPauseUpdate))
-		HyScene::RemoveNode_PauseUpdate(this);
-
-	HyScene::RemoveNode(this);
+	SetPauseUpdate(false);
+	SetRegistered(false);
 }
 
-const IHyNode &IHyNode::operator=(const IHyNode &rhs)
+IHyNode &IHyNode::operator=(const IHyNode &rhs)
 {
 	HyAssert(GetType() == rhs.GetType(), "IHyNode::operator= cannot assign from a different HyType");
 
-	//m_uiFlags = rhs.m_uiFlags;
-	//m_bVisible = rhs.m_bVisible;
+	SetRegistered(rhs.IsRegistered());
+	SetPauseUpdate(rhs.IsPauseUpdate());
 
-	//if(m_bPauseOverride != rhs.m_bPauseOverride)
-	//{
-	//	m_bPauseOverride = rhs.m_bPauseOverride;
-	//	if(m_bPauseOverride)
-	//		HyScene::AddNode_PauseUpdate(this);
-	//	else
-	//		HyScene::RemoveNode_PauseUpdate(this);
-	//}
-	//
-	//m_iTag = rhs.m_iTag;
+	m_uiFlags = rhs.m_uiFlags;
+
+#ifdef HY_ENABLE_USER_TAGS
+	m_iTag = rhs.m_iTag;
+#endif
+
+	return *this;
+}
+
+IHyNode &IHyNode::operator=(IHyNode &&donor)
+{
+	m_ActiveAnimFloatsList = std::move(donor.m_ActiveAnimFloatsList);
+
+	if(donor.IsRegistered())
+	{
+		donor.SetRegistered(false);
+		SetRegistered(true);
+	}
+
+	if(donor.IsPauseUpdate())
+	{
+		donor.SetPauseUpdate(false);
+		SetPauseUpdate(true);
+	}
+
+	m_uiFlags = donor.m_uiFlags;
+
+#ifdef HY_ENABLE_USER_TAGS
+	m_iTag = donor.m_iTag;
+#endif
 
 	return *this;
 }
@@ -97,19 +141,20 @@ bool IHyNode::IsPauseUpdate() const
 {
 	if(bUpdateWhenPaused)
 	{
-		if(0 == (m_uiFlags & SETTING_IsPauseUpdate))
+		if(IsPauseUpdate() == false)
+		{
+			m_uiFlags |= SETTING_IsPauseUpdate;
 			HyScene::AddNode_PauseUpdate(this);
+		}
 	}
 	else
 	{
-		if(0 != (m_uiFlags & SETTING_IsPauseUpdate))
+		if(IsPauseUpdate())
+		{
+			m_uiFlags &= ~SETTING_IsPauseUpdate;
 			HyScene::RemoveNode_PauseUpdate(this);
+		}
 	}
-
-	if(bUpdateWhenPaused)
-		m_uiFlags |= SETTING_IsPauseUpdate;
-	else
-		m_uiFlags &= ~SETTING_IsPauseUpdate;
 
 	m_uiFlags |= EXPLICIT_PauseUpdate;
 }
@@ -129,6 +174,31 @@ void IHyNode::SetTag(int64 iTag)
 uint32 IHyNode::GetInternalFlags() const
 {
 	return m_uiFlags;
+}
+
+bool IHyNode::IsRegistered() const
+{
+	return 0 != (m_uiFlags & SETTING_IsRegistered);
+}
+
+void IHyNode::SetRegistered(bool bRegister)
+{
+	if(bRegister)
+	{
+		if(IsRegistered() == false)
+		{
+			m_uiFlags |= SETTING_IsRegistered;
+			HyScene::AddNode(this);
+		}
+	}
+	else
+	{
+		if(IsRegistered())
+		{
+			m_uiFlags &= ~SETTING_IsRegistered;
+			HyScene::RemoveNode(this);
+		}
+	}
 }
 
 /*virtual*/ void IHyNode::Update()

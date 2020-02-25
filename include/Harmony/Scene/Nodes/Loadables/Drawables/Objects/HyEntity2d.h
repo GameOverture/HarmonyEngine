@@ -40,8 +40,8 @@ protected:
 	b2Body *						m_pPhysicsBody;
 
 public:
-	HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	HyEntity2d(HyEntity2d *pParent = nullptr);
+	HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	virtual ~HyEntity2d(void);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -14,15 +14,6 @@
 #include "Assets/Nodes/HyEntityData.h"
 #include "HyEngine.h"
 
-HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Entity, szPrefix, szName, pParent),
-	m_uiAttributes(0),
-	m_eMouseInputState(MOUSEINPUT_None),
-	m_pMouseInputUserParam(nullptr),
-	m_pPhysicsBody(nullptr)
-{
-}
-
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_Entity, nullptr, nullptr, pParent),
 	m_uiAttributes(0),
@@ -30,6 +21,17 @@ HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	m_pMouseInputUserParam(nullptr),
 	m_pPhysicsBody(nullptr)
 {
+	SetRegistered(true);
+}
+
+HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_Entity, szPrefix, szName, pParent),
+	m_uiAttributes(0),
+	m_eMouseInputState(MOUSEINPUT_None),
+	m_pMouseInputUserParam(nullptr),
+	m_pPhysicsBody(nullptr)
+{
+	SetRegistered(true);
 }
 
 HyEntity2d::~HyEntity2d(void)
