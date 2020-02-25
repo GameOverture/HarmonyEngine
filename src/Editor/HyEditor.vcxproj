@@ -88,7 +88,7 @@
       <PrecompiledHeaderFile>Global.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>qtmain.lib;shell32.lib;freetype-gl.lib;assimp.lib;AdvAPI32.lib;ole32.lib;Qt5OpenGL.lib;Qt5Widgets.lib;HyEngine_x64GuiRelease.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Network.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;freetype-gl.lib;AdvAPI32.lib;ole32.lib;Qt5OpenGL.lib;Qt5Widgets.lib;HyEngine_x64GuiRelease.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Network.lib;qtmain.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;..\..\bin;..\..\lib\x64_Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
@@ -162,7 +162,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <PrecompiledHeaderFile>Global.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>qtmaind.lib;shell32.lib;freetype-gl.lib;assimp.lib;AdvAPI32.lib;ole32.lib;Qt5OpenGLd.lib;Qt5Widgetsd.lib;HyEngine_x64GuiDebug.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Networkd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;freetype-gl.lib;AdvAPI32.lib;ole32.lib;Qt5OpenGLd.lib;Qt5Widgetsd.lib;HyEngine_x64GuiDebug.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Networkd.lib;qtmaind.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;..\..\bin;..\..\lib\x64_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>

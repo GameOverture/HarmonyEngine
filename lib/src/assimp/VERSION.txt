@@ -1,1 +1,0 @@
-pulled from master branch (https://github.com/assimp/assimp) on 7/5/2018
