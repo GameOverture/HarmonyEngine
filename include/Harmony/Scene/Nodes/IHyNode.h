@@ -22,7 +22,7 @@ class IHyNode
 	friend class IHyDrawable;
 
 protected:
-	// These flags describe this Node's C++ object type and are set upon construction, and are immutable
+	// These flags describe this Node's C++ object type and are set upon construction, and are then immutable
 	enum TypeFlag
 	{
 		NODETYPE_HyType				= 0xF,		// First 4 bits are reserved for the HyType
@@ -75,12 +75,10 @@ public:
 	IHyNode(HyType eNodeType);
 	IHyNode(const IHyNode &copyRef);
 	virtual ~IHyNode();
-
 	const IHyNode &operator=(const IHyNode &rhs);
 
 	HyType GetType() const;
 	bool Is2D() const;
-	uint32 GetExplicitAndTypeFlags() const;
 
 	bool IsVisible() const;
 	virtual void SetVisible(bool bEnabled);
@@ -94,6 +92,8 @@ public:
 #endif
 
 protected:
+	uint32 GetInternalFlags() const;
+
 	virtual void Update();																// Only Scene will invoke this
 	
 	virtual void _SetVisible(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this

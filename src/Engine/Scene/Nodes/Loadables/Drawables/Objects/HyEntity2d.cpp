@@ -512,7 +512,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	childRef._SetVisible(IsVisible(), false);
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
-	if(childRef.GetExplicitAndTypeFlags() & NODETYPE_IsDrawable)
+	if(childRef.GetInternalFlags() & NODETYPE_IsDrawable)
 		SetupNewChild(*this, static_cast<IHyDrawable2d &>(childRef));
 
 	if(sm_pHyAssets)

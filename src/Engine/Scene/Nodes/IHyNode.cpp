@@ -73,11 +73,6 @@ bool IHyNode::Is2D() const
 	return 0 != (m_uiFlags & NODETYPE_Is2d);
 }
 
-uint32 IHyNode::GetExplicitAndTypeFlags() const
-{
-	return m_uiFlags;
-}
-
 bool IHyNode::IsVisible() const
 {
 	return 0 != (m_uiFlags & SETTING_IsVisible);
@@ -130,6 +125,11 @@ void IHyNode::SetTag(int64 iTag)
 	m_iTag = iTag;
 }
 #endif
+
+uint32 IHyNode::GetInternalFlags() const
+{
+	return m_uiFlags;
+}
 
 /*virtual*/ void IHyNode::Update()
 {
