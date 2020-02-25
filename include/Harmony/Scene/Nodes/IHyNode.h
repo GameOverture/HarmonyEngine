@@ -24,6 +24,7 @@ class IHyNode
 protected:
 	const HyType					m_eTYPE;
 
+	// These flags get set by HyAnimFloat's when their corresponding respective values are manipulated
 	enum NodeDirtyFlag
 	{
 		DIRTY_BoundingVolume		= 1 << 0,
@@ -34,25 +35,24 @@ protected:
 
 		DIRTY_ALL =					DIRTY_BoundingVolume | DIRTY_WorldAABB | DIRTY_Transform | DIRTY_Color | DIRTY_Scissor
 	};
-	uint32							m_uiDirtyFlags;
 
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
-	enum ExplicitFlags
+	enum ExplicitFlags // NOTE: continue the bits in NodeDirtyFlag (stored in same 32bit member)
 	{
-		EXPLICIT_Visible			= 1 << 0,
-		EXPLICIT_PauseUpdate		= 1 << 1,
-		EXPLICIT_Scissor			= 1 << 2,
-		EXPLICIT_Stencil			= 1 << 3,
-		EXPLICIT_DisplayOrder		= 1 << 4,
-		EXPLICIT_CoordinateSystem	= 1 << 5,
+		EXPLICIT_Visible			= 1 << 5,
+		EXPLICIT_PauseUpdate		= 1 << 6,
+		EXPLICIT_Scissor			= 1 << 7,
+		EXPLICIT_Stencil			= 1 << 8,
+		EXPLICIT_DisplayOrder		= 1 << 9,
+		EXPLICIT_CoordinateSystem	= 1 << 10,
 	};
+
 	enum NodeTypeFlags // NOTE: continue the bits in ExplicitFlags (stored in same 32bit member)
 	{
-		NODETYPE_Is2d				= 1 << 6,
-		NODETYPE_IsLoadable			= 1 << 7,
-		NODETYPE_IsDrawable			= 1 << 8,
-		NODETYPE_IsVisable			= 1 << 9,
+		NODETYPE_Is2d				= 1 << 11,
+		NODETYPE_IsLoadable			= 1 << 12,
+		NODETYPE_IsDrawable			= 1 << 13,
 	};
 	uint32							m_uiExplicitAndTypeFlags;
 

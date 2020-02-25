@@ -21,7 +21,7 @@ IHyDrawable3d::IHyDrawable3d(HyType eNodeType, const char *szPrefix, const char 
 	tint(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiExplicitAndTypeFlags |= NODETYPE_IsVisable;
+	m_uiExplicitAndTypeFlags |= NODETYPE_IsDrawable;
 
 	tint.Set(1.0f);
 	m_CachedTint = tint.Get();

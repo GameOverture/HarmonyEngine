@@ -99,7 +99,7 @@ public:
 	ProjectItem &GetOwner();
 	int GetStateIndex() const;
 	const QVariant &GetSubstate() const;
-	const PropertiesDef &GetPropertyDefinition(const QModelIndex &indexRef) const;
+	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
 	QString GetPropertyName(const QModelIndex &indexRef) const;
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;

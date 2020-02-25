@@ -46,7 +46,7 @@ const QVariant &PropertiesTreeModel::GetSubstate() const
 	return m_iSUBSTATE;
 }
 
-const PropertiesDef &PropertiesTreeModel::GetPropertyDefinition(const QModelIndex &indexRef) const
+const PropertiesDef PropertiesTreeModel::GetPropertyDefinition(const QModelIndex &indexRef) const
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
 	return m_PropertyDefMap[pTreeItem];

@@ -173,8 +173,9 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	itemSpecificFileDataOut.m_Data.insert("checksum", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetImageChecksum())));
 	itemSpecificFileDataOut.m_Meta.insert("frameUUID", m_pAtlasFrame == nullptr ? 0 : m_pAtlasFrame->GetId().toString());
 
-	uint uiAtlasPixelDataSizeOut; QSize atlasDimensionsOut;
+	//uint uiAtlasPixelDataSizeOut;
 	//unsigned char *pPixelData = m_FontManager.GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
+	QSize atlasDimensionsOut;
 	itemSpecificFileDataOut.m_Data.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? atlasDimensionsOut.width() : QJsonValue(m_pAtlasFrame->GetSize().width()));
 	itemSpecificFileDataOut.m_Data.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? atlasDimensionsOut.height() : QJsonValue(m_pAtlasFrame->GetSize().height()));
 

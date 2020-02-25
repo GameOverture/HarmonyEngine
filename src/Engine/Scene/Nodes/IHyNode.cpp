@@ -14,7 +14,6 @@
 
 IHyNode::IHyNode(HyType eNodeType) :
 	m_eTYPE(eNodeType),
-	m_uiDirtyFlags(0),
 	m_uiExplicitAndTypeFlags(0),
 	m_bVisible(true),
 	m_bPauseOverride(false),
@@ -25,7 +24,6 @@ IHyNode::IHyNode(HyType eNodeType) :
 
 IHyNode::IHyNode(const IHyNode &copyRef) :
 	m_eTYPE(copyRef.m_eTYPE),
-	m_uiDirtyFlags(copyRef.m_uiDirtyFlags),
 	m_uiExplicitAndTypeFlags(copyRef.m_uiExplicitAndTypeFlags),
 	m_bVisible(copyRef.m_bVisible),
 	m_bPauseOverride(copyRef.m_bPauseOverride),
@@ -49,7 +47,6 @@ const IHyNode &IHyNode::operator=(const IHyNode &rhs)
 {
 	HyAssert(m_eTYPE == rhs.m_eTYPE, "IHyNode::operator= cannot assign from a different HyType");
 
-	m_uiDirtyFlags = rhs.m_uiDirtyFlags;
 	m_uiExplicitAndTypeFlags = rhs.m_uiExplicitAndTypeFlags;
 	m_bVisible = rhs.m_bVisible;
 
@@ -173,23 +170,25 @@ void IHyNode::SetTag(int64 iTag)
 
 /*virtual*/ void IHyNode::SetDirty(uint32 uiDirtyFlags)
 {
+	HyAssert((uiDirtyFlags & ~DIRTY_ALL) == 0, "IHyNode::SetDirty was passed flags that are not apart of the NodeDirtyFlag enum");
+
 	// Special cases
 	if((uiDirtyFlags & DIRTY_BoundingVolume) != 0)
 		uiDirtyFlags |= DIRTY_WorldAABB;
 	if((uiDirtyFlags & DIRTY_Transform) != 0)
 		uiDirtyFlags |= DIRTY_WorldAABB;
 
-	m_uiDirtyFlags |= uiDirtyFlags;
+	m_uiExplicitAndTypeFlags |= uiDirtyFlags;
 }
 
 bool IHyNode::IsDirty(NodeDirtyFlag eDirtyType) const
 {
-	return ((m_uiDirtyFlags & eDirtyType) != 0);
+	return ((m_uiExplicitAndTypeFlags & eDirtyType) != 0);
 }
 
 void IHyNode::ClearDirty(NodeDirtyFlag eDirtyType)
 {
-	m_uiDirtyFlags &= ~eDirtyType;
+	m_uiExplicitAndTypeFlags &= ~eDirtyType;
 }
 
 void IHyNode::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)

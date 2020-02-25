@@ -24,7 +24,7 @@ IHyDrawable2d::IHyDrawable2d(HyType eNodeType, const char *szPrefix, const char 
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiExplicitAndTypeFlags |= NODETYPE_IsVisable;
+	m_uiExplicitAndTypeFlags |= NODETYPE_IsDrawable;
 
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);

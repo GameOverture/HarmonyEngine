@@ -136,7 +136,7 @@ void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 	childRef._SetVisible(m_bVisible, false);
 	childRef._SetPauseUpdate(m_bPauseOverride, false);
 
-	if(childRef.GetExplicitAndTypeFlags() & NODETYPE_IsVisable)
+	if(childRef.GetExplicitAndTypeFlags() & NODETYPE_IsDrawable)
 		SetupNewChild(*this, static_cast<IHyDrawable3d &>(childRef));
 }
 
