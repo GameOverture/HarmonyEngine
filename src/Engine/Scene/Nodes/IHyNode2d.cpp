@@ -34,21 +34,49 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	m_pParent(copyRef.m_pParent),
 	m_mtxCached(copyRef.m_mtxCached),
 	m_fRotation(copyRef.m_fRotation),
+	m_WorldAABB(copyRef.m_WorldAABB),
 	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
 	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	m_AABB(copyRef.m_AABB)
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
 {
-	if(copyRef.m_pParent)
-		copyRef.m_pParent->ChildAppend(*this);
+	m_uiFlags |= NODETYPE_Is2d;
 
-	pos.Set(copyRef.pos.Get());
-	rot.Set(copyRef.rot.Get());
-	rot_pivot.Set(copyRef.rot_pivot.Get());
-	scale.Set(copyRef.scale.Get());
-	scale_pivot.Set(copyRef.scale_pivot.Get());
+	pos = copyRef.pos;
+	rot = copyRef.rot;
+	rot_pivot = copyRef.rot_pivot;
+	scale = copyRef.scale;
+	scale_pivot = copyRef.scale_pivot;
+
+	if(m_pParent)
+		_CtorSetupNewChild(*m_pParent, *this);
+}
+
+IHyNode2d::IHyNode2d(IHyNode2d &&donor) :
+	IHyNode(std::move(donor)),
+	m_pParent(donor.ParentGet()),
+	m_mtxCached(std::move(donor.m_mtxCached)),
+	m_fRotation(donor.m_fRotation),
+	m_WorldAABB(std::move(donor.m_WorldAABB)),
+	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+{
+	m_uiFlags |= NODETYPE_Is2d;
+
+	pos = std::move(donor.pos);
+	rot = std::move(donor.rot);
+	rot_pivot = std::move(donor.rot_pivot);
+	scale = std::move(donor.scale);
+	scale_pivot = std::move(donor.scale_pivot);
+
+	donor.ParentDetach();
+
+	if(m_pParent)
+		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 /*virtual*/ IHyNode2d::~IHyNode2d()
@@ -56,13 +84,9 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	ParentDetach();
 }
 
-const IHyNode2d &IHyNode2d::operator=(const IHyNode2d &rhs)
+IHyNode2d &IHyNode2d::operator=(const IHyNode2d &rhs)
 {
 	IHyNode::operator=(rhs);
-
-	// Copying the parent is not done by design
-	//if(rhs.m_pParent)
-	//	rhs.m_pParent->ChildAppend(*this);
 
 	m_mtxCached = rhs.m_mtxCached;
 	m_fRotation = rhs.m_fRotation;
@@ -72,6 +96,27 @@ const IHyNode2d &IHyNode2d::operator=(const IHyNode2d &rhs)
 	rot_pivot.Set(rhs.rot_pivot.Get());
 	scale.Set(rhs.scale.Get());
 	scale_pivot.Set(rhs.scale_pivot.Get());
+
+	if(rhs.m_pParent)
+		rhs.m_pParent->ChildAppend(*this);
+
+	return *this;
+}
+
+IHyNode2d &IHyNode2d::operator=(IHyNode2d &&donor)
+{
+	IHyNode::operator=(std::move(donor));
+
+	pos = std::move(donor.pos);
+	rot = std::move(donor.rot);
+	rot_pivot = std::move(donor.rot_pivot);
+	scale = std::move(donor.scale);
+	scale_pivot = std::move(donor.scale_pivot);
+
+	if(donor.m_pParent)
+		donor.m_pParent->ChildAppend(*this);
+
+	donor.ParentDetach();
 
 	return *this;
 }
@@ -134,7 +179,7 @@ const glm::mat4 &IHyNode2d::GetWorldTransform()
 
 /*virtual*/ const b2AABB &IHyNode2d::GetWorldAABB()
 {
-	return m_AABB;
+	return m_WorldAABB;
 }
 
 /*friend*/ void _CtorSetupNewChild(HyEntity2d &parentRef, IHyNode2d &childRef)

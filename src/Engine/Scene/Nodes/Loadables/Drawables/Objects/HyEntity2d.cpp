@@ -372,19 +372,19 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 /*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
 {
-	m_AABB.lowerBound = m_AABB.upperBound = b2Vec2(0.0f, 0.0f);
+	m_WorldAABB.lowerBound = m_WorldAABB.upperBound = b2Vec2(0.0f, 0.0f);
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(m_ChildList[i]->GetWorldAABB().IsValid() == false)
 			continue;
 
 		if(i == 0)
-			m_AABB = m_ChildList[i]->GetWorldAABB();
+			m_WorldAABB = m_ChildList[i]->GetWorldAABB();
 		else
-			m_AABB.Combine(m_ChildList[i]->GetWorldAABB());
+			m_WorldAABB.Combine(m_ChildList[i]->GetWorldAABB());
 	}
 
-	return m_AABB;
+	return m_WorldAABB;
 }
 
 /*virtual*/ void HyEntity2d::Load() /*override*/

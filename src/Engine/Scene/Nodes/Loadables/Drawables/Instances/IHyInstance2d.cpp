@@ -36,7 +36,7 @@ const IHyInstance2d &IHyInstance2d::operator=(const IHyInstance2d &rhs)
 	IHyInstance::operator=(rhs);
 	
 	m_LocalBoundingVolume = rhs.m_LocalBoundingVolume;
-	m_AABB = rhs.m_AABB;
+	m_WorldAABB = rhs.m_WorldAABB;
 
 	return *this;
 }
@@ -61,17 +61,17 @@ const HyShape2d &IHyInstance2d::GetLocalBoundingVolume()
 
 		GetLocalBoundingVolume(); // This will update BV if it's dirty
 		if(m_LocalBoundingVolume.IsValid() && m_LocalBoundingVolume.GetB2Shape())
-			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_AABB, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
+			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_WorldAABB, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
 		else
 		{
-			m_AABB.lowerBound.SetZero();
-			m_AABB.upperBound.SetZero();
+			m_WorldAABB.lowerBound.SetZero();
+			m_WorldAABB.upperBound.SetZero();
 		}
 
 		ClearDirty(DIRTY_WorldAABB);
 	}
 
-	return m_AABB;
+	return m_WorldAABB;
 }
 
 /*virtual*/ void IHyInstance2d::Update() /*override final*/

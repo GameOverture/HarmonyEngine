@@ -24,7 +24,7 @@ protected:
 	glm::mat4						m_mtxCached;
 	float							m_fRotation;		// Reference value used in 'rot' HyAnimFloat
 
-	b2AABB							m_AABB;
+	b2AABB							m_WorldAABB;
 
 public:
 	HyAnimVec2						pos;
@@ -36,9 +36,11 @@ public:
 public:
 	IHyNode2d(HyType eNodeType, HyEntity2d *pParent);
 	IHyNode2d(const IHyNode2d &copyRef);
+	IHyNode2d(IHyNode2d &&donor);
 	virtual ~IHyNode2d();
 
-	const IHyNode2d &operator=(const IHyNode2d &rhs);
+	IHyNode2d &operator=(const IHyNode2d &rhs);
+	IHyNode2d &operator=(IHyNode2d &&donor);
 
 	void ParentDetach();
 	HyEntity2d *ParentGet() const;
