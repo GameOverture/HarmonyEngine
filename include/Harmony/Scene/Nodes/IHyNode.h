@@ -94,7 +94,6 @@ protected:
 	uint32 GetInternalFlags() const;
 
 	bool IsRegistered() const;
-	void SetRegistered(bool bRegister);
 
 	virtual void Update();																// Only Scene will invoke this
 	
@@ -106,6 +105,7 @@ protected:
 	void ClearDirty(DirtyFlag eDirtyType);
 
 private:
+	void SetRegistered(bool bRegister);
 	void InsertActiveAnimFloat(HyAnimFloat *pAnimFloat);								// Only HyAnimFloat will invoke this
 };
 

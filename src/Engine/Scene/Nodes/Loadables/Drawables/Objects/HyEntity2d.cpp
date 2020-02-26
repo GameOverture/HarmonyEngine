@@ -21,7 +21,6 @@ HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	m_pMouseInputUserParam(nullptr),
 	m_pPhysicsBody(nullptr)
 {
-	SetRegistered(true);
 }
 
 HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :
@@ -31,7 +30,6 @@ HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 	m_pMouseInputUserParam(nullptr),
 	m_pPhysicsBody(nullptr)
 {
-	SetRegistered(true);
 }
 
 HyEntity2d::~HyEntity2d(void)

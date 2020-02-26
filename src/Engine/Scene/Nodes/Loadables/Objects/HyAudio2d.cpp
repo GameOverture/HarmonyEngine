@@ -16,7 +16,6 @@ HyAudio2d::HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pPare
 	IHyLoadable2d(HYTYPE_Audio, szPrefix, szName, pParent),
 	m_pInternal(nullptr)
 {
-	SetRegistered(true);
 }
 
 /*virtual*/ HyAudio2d::~HyAudio2d(void)

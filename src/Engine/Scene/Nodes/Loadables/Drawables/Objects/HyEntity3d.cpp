@@ -13,7 +13,6 @@
 HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :
 	IHyDrawable3d(HYTYPE_Entity, szPrefix, szName, pParent)
 {
-	SetRegistered(true);
 }
 
 HyEntity3d::~HyEntity3d(void)

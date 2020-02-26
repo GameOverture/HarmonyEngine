@@ -181,26 +181,6 @@ bool IHyNode::IsRegistered() const
 	return 0 != (m_uiFlags & SETTING_IsRegistered);
 }
 
-void IHyNode::SetRegistered(bool bRegister)
-{
-	if(bRegister)
-	{
-		if(IsRegistered() == false)
-		{
-			m_uiFlags |= SETTING_IsRegistered;
-			HyScene::AddNode(this);
-		}
-	}
-	else
-	{
-		if(IsRegistered())
-		{
-			m_uiFlags &= ~SETTING_IsRegistered;
-			HyScene::RemoveNode(this);
-		}
-	}
-}
-
 /*virtual*/ void IHyNode::Update()
 {
 	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.
@@ -276,6 +256,26 @@ bool IHyNode::IsDirty(DirtyFlag eDirtyType) const
 void IHyNode::ClearDirty(DirtyFlag eDirtyType)
 {
 	m_uiFlags &= ~eDirtyType;
+}
+
+void IHyNode::SetRegistered(bool bRegister)
+{
+	if(bRegister)
+	{
+		if(IsRegistered() == false)
+		{
+			m_uiFlags |= SETTING_IsRegistered;
+			HyScene::AddNode(this);
+		}
+	}
+	else
+	{
+		if(IsRegistered())
+		{
+			m_uiFlags &= ~SETTING_IsRegistered;
+			HyScene::RemoveNode(this);
+		}
+	}
 }
 
 void IHyNode::InsertActiveAnimFloat(HyAnimFloat *pAnimFloat)
