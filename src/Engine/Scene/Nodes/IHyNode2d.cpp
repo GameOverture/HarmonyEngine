@@ -87,15 +87,12 @@ IHyNode2d::IHyNode2d(IHyNode2d &&donor) :
 IHyNode2d &IHyNode2d::operator=(const IHyNode2d &rhs)
 {
 	IHyNode::operator=(rhs);
-
-	m_mtxCached = rhs.m_mtxCached;
-	m_fRotation = rhs.m_fRotation;
 	
-	pos.Set(rhs.pos.Get());
-	rot.Set(rhs.rot.Get());
-	rot_pivot.Set(rhs.rot_pivot.Get());
-	scale.Set(rhs.scale.Get());
-	scale_pivot.Set(rhs.scale_pivot.Get());
+	pos = rhs.pos;
+	rot = rhs.rot; // This will set 'm_fRotation'
+	rot_pivot = rhs.rot_pivot;
+	scale = rhs.scale;
+	scale_pivot = rhs.scale_pivot;
 
 	if(rhs.m_pParent)
 		rhs.m_pParent->ChildAppend(*this);
@@ -108,7 +105,7 @@ IHyNode2d &IHyNode2d::operator=(IHyNode2d &&donor)
 	IHyNode::operator=(std::move(donor));
 
 	pos = std::move(donor.pos);
-	rot = std::move(donor.rot);
+	rot = std::move(donor.rot); // This will set 'm_fRotation'
 	rot_pivot = std::move(donor.rot_pivot);
 	scale = std::move(donor.scale);
 	scale_pivot = std::move(donor.scale_pivot);

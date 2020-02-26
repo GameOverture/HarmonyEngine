@@ -42,19 +42,66 @@ IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :
 	scale_pivot.Set(copyRef.scale_pivot.Get());
 }
 
+IHyNode3d::IHyNode3d(IHyNode3d &&donor) :
+	IHyNode(std::move(donor)),
+	m_pParent(donor.ParentGet()),
+	m_mtxCached(std::move(donor.m_mtxCached)),
+	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+{
+	m_uiFlags |= NODETYPE_Is2d;
+
+	pos = std::move(donor.pos);
+	rot = std::move(donor.rot);
+	rot_pivot = std::move(donor.rot_pivot);
+	scale = std::move(donor.scale);
+	scale_pivot = std::move(donor.scale_pivot);
+
+	donor.ParentDetach();
+
+	if(m_pParent)
+		_CtorSetupNewChild(*m_pParent, *this);
+}
+
 IHyNode3d::~IHyNode3d()
 {
 }
 
-const IHyNode3d &IHyNode3d::operator=(const IHyNode3d &rhs)
+IHyNode3d &IHyNode3d::operator=(const IHyNode3d &rhs)
 {
 	IHyNode::operator=(rhs);
 
-	pos.Set(rhs.pos.Get());
-	rot.Set(rhs.rot.Get());
-	rot_pivot.Set(rhs.rot_pivot.Get());
-	scale.Set(rhs.scale.Get());
-	scale_pivot.Set(rhs.scale_pivot.Get());
+	m_mtxCached = rhs.m_mtxCached;
+
+	pos = rhs.pos;
+	rot = rhs.rot;
+	rot_pivot = rhs.rot_pivot;
+	scale = rhs.scale;
+	scale_pivot = rhs.scale_pivot;
+
+	if(rhs.m_pParent)
+		rhs.m_pParent->ChildAppend(*this);
+
+	return *this;
+}
+
+IHyNode3d &IHyNode3d::operator=(IHyNode3d &&donor)
+{
+	IHyNode::operator=(std::move(donor));
+	
+	pos = std::move(donor.pos);
+	rot = std::move(donor.rot);
+	rot_pivot = std::move(donor.rot_pivot);
+	scale = std::move(donor.scale);
+	scale_pivot = std::move(donor.scale_pivot);
+
+	if(donor.m_pParent)
+		donor.m_pParent->ChildAppend(*this);
+
+	donor.ParentDetach();
 
 	return *this;
 }
