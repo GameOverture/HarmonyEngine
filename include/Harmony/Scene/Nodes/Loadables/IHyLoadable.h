@@ -31,9 +31,11 @@ protected:
 public:
 	IHyLoadable(const char *szPrefix, const char *szName);
 	IHyLoadable(const IHyLoadable &copyRef);
+	IHyLoadable(IHyLoadable &&donor);
 	virtual ~IHyLoadable();
 
-	const IHyLoadable &operator=(const IHyLoadable &rhs);
+	IHyLoadable &operator=(const IHyLoadable &rhs);
+	IHyLoadable &operator=(IHyLoadable &&donor);
 
 	const std::string &GetName() const;
 	const std::string &GetPrefix() const;

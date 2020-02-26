@@ -20,7 +20,7 @@ class HyAudio2d : public IHyLoadable2d
 	IHyAudioInst *		m_pInternal;
 
 public:
-	HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
+	HyAudio2d(const char *szPrefix = nullptr, const char *szName = nullptr, HyEntity2d *pParent = nullptr);
 	virtual ~HyAudio2d(void);
 
 	void Start();

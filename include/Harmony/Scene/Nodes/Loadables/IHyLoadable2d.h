@@ -20,9 +20,11 @@ class IHyLoadable2d : public IHyNode2d, public IHyLoadable
 public:
 	IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	IHyLoadable2d(const IHyLoadable2d &copyRef);
+	IHyLoadable2d(IHyLoadable2d &&donor);
 	virtual ~IHyLoadable2d();
 
-	const IHyLoadable2d &operator=(const IHyLoadable2d &rhs);
+	IHyLoadable2d &operator=(const IHyLoadable2d &rhs);
+	IHyLoadable2d &operator=(IHyLoadable2d &&donor);
 
 protected:
 	virtual void Update() override;

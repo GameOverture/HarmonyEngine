@@ -22,9 +22,11 @@ class IHyLoadable3d : public IHyNode3d, public IHyLoadable
 public:
 	IHyLoadable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent);
 	IHyLoadable3d(const IHyLoadable3d &copyRef);
+	IHyLoadable3d(IHyLoadable3d &&donor);
 	virtual ~IHyLoadable3d();
 
-	const IHyLoadable3d &operator=(const IHyLoadable3d &rhs);
+	IHyLoadable3d &operator=(const IHyLoadable3d &rhs);
+	IHyLoadable3d &operator=(IHyLoadable3d &&donor);
 
 protected:
 	virtual void Update() override;

@@ -24,14 +24,28 @@ IHyLoadable3d::IHyLoadable3d(const IHyLoadable3d &copyRef) :
 {
 }
 
+IHyLoadable3d::IHyLoadable3d(IHyLoadable3d &&donor) :
+	IHyNode3d(std::move(donor)),
+	IHyLoadable(std::move(donor))
+{
+}
+
 IHyLoadable3d::~IHyLoadable3d()
 {
 }
 
-const IHyLoadable3d &IHyLoadable3d::operator=(const IHyLoadable3d &rhs)
+IHyLoadable3d &IHyLoadable3d::operator=(const IHyLoadable3d &rhs)
 {
 	IHyNode3d::operator=(rhs);
 	IHyLoadable::operator=(rhs);
+
+	return *this;
+}
+
+IHyLoadable3d &IHyLoadable3d::operator=(IHyLoadable3d &&donor)
+{
+	IHyNode3d::operator=(std::move(donor));
+	IHyLoadable::operator=(std::move(donor));
 
 	return *this;
 }

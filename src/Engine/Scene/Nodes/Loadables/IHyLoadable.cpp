@@ -24,17 +24,25 @@ IHyLoadable::IHyLoadable(const char *szPrefix, const char *szName) :
 
 IHyLoadable::IHyLoadable(const IHyLoadable &copyRef) :
 	m_eLoadState(HYLOADSTATE_Inactive),
-	m_pData(nullptr),
+	m_pData(copyRef.m_pData),
 	m_sName(copyRef.m_sName),
 	m_sPrefix(copyRef.m_sPrefix)
 {
 }
 
-IHyLoadable::~IHyLoadable()
+IHyLoadable::IHyLoadable(IHyLoadable &&donor) :
+	m_eLoadState(HYLOADSTATE_Inactive),
+	m_pData(std::move(donor.m_pData)),
+	m_sName(std::move(donor.m_sName)),
+	m_sPrefix(std::move(donor.m_sPrefix))
 {
 }
 
-const IHyLoadable &IHyLoadable::operator=(const IHyLoadable &rhs)
+/*virtual*/ IHyLoadable::~IHyLoadable()
+{
+}
+
+IHyLoadable &IHyLoadable::operator=(const IHyLoadable &rhs)
 {
 	if(m_sPrefix != rhs.m_sPrefix || m_sName != rhs.m_sName)
 	{
@@ -48,6 +56,27 @@ const IHyLoadable &IHyLoadable::operator=(const IHyLoadable &rhs)
 
 	if(rhs.IsLoaded())
 		Load();
+
+	return *this;
+}
+
+IHyLoadable &IHyLoadable::operator=(IHyLoadable &&donor)
+{
+	if(m_sPrefix != donor.m_sPrefix || m_sName != donor.m_sName)
+	{
+		if(m_eLoadState != HYLOADSTATE_Inactive)
+			Unload();
+
+		m_sPrefix = std::move(donor.m_sPrefix);
+		m_sName = std::move(donor.m_sName);
+		m_pData = nullptr;			// Ensures virtual OnDataAcquired() is invoked when the below Load() is invoked
+	}
+
+	if(donor.IsLoaded())
+	{
+		Load();
+		donor.Unload();
+	}
 
 	return *this;
 }

@@ -25,14 +25,28 @@ IHyLoadable2d::IHyLoadable2d(const IHyLoadable2d &copyRef) :
 {
 }
 
+IHyLoadable2d::IHyLoadable2d(IHyLoadable2d &&donor) :
+	IHyNode2d(std::move(donor)),
+	IHyLoadable(std::move(donor))
+{
+}
+
 IHyLoadable2d::~IHyLoadable2d()
 {
 }
 
-const IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
+IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
 {
 	IHyNode2d::operator=(rhs);
 	IHyLoadable::operator=(rhs);
+
+	return *this;
+}
+
+IHyLoadable2d &IHyLoadable2d::operator=(IHyLoadable2d &&donor)
+{
+	IHyNode2d::operator=(std::move(donor));
+	IHyLoadable::operator=(std::move(donor));
 
 	return *this;
 }
