@@ -22,21 +22,25 @@ class IHyLoadable
 
 protected:
 	static HyAssets *				sm_pHyAssets;
+	
 	HyLoadState						m_eLoadState;
-
 	const IHyNodeData *				m_pData;
 	std::string						m_sName;
 	std::string						m_sPrefix;
 
 public:
-	IHyLoadable(const char *szPrefix, const char *szName);
+	IHyLoadable(std::string sPrefix, std::string sName);
 	IHyLoadable(const IHyLoadable &copyRef);
+	IHyLoadable(IHyLoadable &&donor);
 	virtual ~IHyLoadable();
 
-	const IHyLoadable &operator=(const IHyLoadable &rhs);
+	IHyLoadable &operator=(const IHyLoadable &rhs);
+	IHyLoadable &operator=(IHyLoadable &&donor);
 
 	const std::string &GetName() const;
 	const std::string &GetPrefix() const;
+
+	void Reinitialize(std::string sPrefix, std::string sName);
 
 	const IHyNodeData *AcquireData();
 

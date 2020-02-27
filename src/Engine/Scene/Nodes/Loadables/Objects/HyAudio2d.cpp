@@ -12,8 +12,8 @@
 #include "Audio/HyAudio.h"
 #include "Assets/Nodes/HyAudioData.h"
 
-HyAudio2d::HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :
-	IHyLoadable2d(HYTYPE_Audio, szPrefix, szName, pParent),
+HyAudio2d::HyAudio2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
+	IHyLoadable2d(HYTYPE_Audio, sPrefix, sName, pParent),
 	m_pInternal(nullptr)
 {
 }

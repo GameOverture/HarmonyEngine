@@ -17,8 +17,8 @@
 
 #define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
-HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :
-	IHyInstance2d(HYTYPE_Text, szPrefix, szName, pParent),
+HyText2d::HyText2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
+	IHyInstance2d(HYTYPE_Text, sPrefix, sName, pParent),
 	m_bIsDirty(false),
 	m_sRawString(""),
 	m_uiCurFontState(0),
@@ -94,11 +94,6 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	m_fUsedPixelHeight = rhs.m_fUsedPixelHeight;
 
 	return *this;
-}
-
-/*virtual*/ HyText2d *HyText2d::Clone() const
-{
-	return HY_NEW HyText2d(*this);
 }
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'

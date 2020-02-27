@@ -54,6 +54,10 @@ typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
 typedef uint32 HyVertexBufferHandle;
 
+// Tags aren't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
+// They increase the memory footprint of every node/instance by 8 bytes
+#define HY_ENABLE_USER_TAGS
+
 enum HyType
 {
 	HYTYPE_Unknown = 0,
@@ -68,6 +72,7 @@ enum HyType
 	HYTYPE_Prefab,
 	HYTYPE_Entity,
 	HYTYPE_Camera
+	// NOTE: Cannot exceed 15 types due to IHyNode only reserving 4 bits to store this value
 };
 
 enum HyShapeType

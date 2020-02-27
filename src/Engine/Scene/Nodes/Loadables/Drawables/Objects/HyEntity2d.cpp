@@ -14,8 +14,8 @@
 #include "Assets/Nodes/HyEntityData.h"
 #include "HyEngine.h"
 
-HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Entity, szPrefix, szName, pParent),
+HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_Entity, "", "", pParent),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
 	m_pMouseInputUserParam(nullptr),
@@ -23,12 +23,22 @@ HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pPa
 {
 }
 
-HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Entity, nullptr, nullptr, pParent),
+HyEntity2d::HyEntity2d(std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+	IHyDrawable2d(HYTYPE_Entity, sPrefix, sName, pParent),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
 	m_pMouseInputUserParam(nullptr),
 	m_pPhysicsBody(nullptr)
+{
+}
+
+HyEntity2d::HyEntity2d(HyEntity2d &&donor) :
+	IHyDrawable2d(std::move(donor)),
+	m_ChildList(std::move(donor.m_ChildList)),
+	m_uiAttributes(std::move(donor.m_uiAttributes)),
+	m_eMouseInputState(std::move(donor.m_eMouseInputState)),
+	m_pMouseInputUserParam(std::move(donor.m_pMouseInputUserParam)),
+	m_pPhysicsBody(std::move(m_pPhysicsBody))
 {
 }
 
@@ -40,6 +50,19 @@ HyEntity2d::~HyEntity2d(void)
 	DisablePhysics();
 }
 
+HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor)
+{
+	IHyDrawable2d::operator=(std::move(donor));
+
+	m_ChildList = std::move(donor.m_ChildList);
+	m_uiAttributes = std::move(donor.m_uiAttributes);
+	m_eMouseInputState = std::move(donor.m_eMouseInputState);
+	m_pMouseInputUserParam = std::move(donor.m_pMouseInputUserParam);
+	m_pPhysicsBody = std::move(m_pPhysicsBody);
+
+	return *this;
+}
+
 /*virtual*/ void HyEntity2d::SetVisible(bool bEnabled) /*override*/
 {
 	SetVisible(bEnabled, false);
@@ -47,8 +70,12 @@ HyEntity2d::~HyEntity2d(void)
 
 void HyEntity2d::SetVisible(bool bEnabled, bool bOverrideExplicitChildren)
 {
-	m_bVisible = bEnabled;
-	m_uiExplicitAndTypeFlags |= EXPLICIT_Visible;
+	if(bEnabled)
+		m_uiFlags |= SETTING_IsVisible;
+	else
+		m_uiFlags &= ~SETTING_IsVisible;
+
+	m_uiFlags |= EXPLICIT_Visible;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->_SetVisible(bEnabled, bOverrideExplicitChildren);
@@ -63,20 +90,24 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 {
 	if(bUpdateWhenPaused)
 	{
-		if(m_bPauseOverride == false)
+		if(0 == (m_uiFlags & SETTING_IsPauseUpdate)) // false
 			HyScene::AddNode_PauseUpdate(this);
 	}
 	else
 	{
-		if(m_bPauseOverride == true)
+		if(0 != (m_uiFlags & SETTING_IsPauseUpdate)) // true
 			HyScene::RemoveNode_PauseUpdate(this);
 	}
 
-	m_bPauseOverride = bUpdateWhenPaused;
-	m_uiExplicitAndTypeFlags |= EXPLICIT_PauseUpdate;
+	if(bUpdateWhenPaused)
+		m_uiFlags |= SETTING_IsPauseUpdate;
+	else
+		m_uiFlags &= ~SETTING_IsPauseUpdate;
+
+	m_uiFlags |= EXPLICIT_PauseUpdate;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bOverrideExplicitChildren);
+		m_ChildList[i]->_SetPauseUpdate(IsPauseUpdate(), bOverrideExplicitChildren);
 }
 
 /*virtual*/ void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight) /*override*/
@@ -90,7 +121,7 @@ void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 			static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bOverrideExplicitChildren);
 	}
 }
@@ -106,7 +137,7 @@ void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChil
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 			static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bOverrideExplicitChildren);
 	}
 }
@@ -122,7 +153,7 @@ void HyEntity2d::SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 			static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetStencil(m_hStencil, bOverrideExplicitChildren);
 	}
 }
@@ -138,7 +169,7 @@ void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChil
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 			static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetStencil(m_hStencil, bOverrideExplicitChildren);
 	}
 }
@@ -154,7 +185,7 @@ void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 			static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetCoordinateSystem(m_iCoordinateSystem, bOverrideExplicitChildren);
 	}
 }
@@ -170,7 +201,7 @@ void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex, bool bOverrideExplicit
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 			static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetCoordinateSystem(iWindowIndex, bOverrideExplicitChildren);
 	}
 }
@@ -191,7 +222,7 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	IHyDrawable2d::ResetDisplayOrder();
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 			static_cast<IHyDrawable2d *>(m_ChildList[i])->ResetDisplayOrder();
 	}
 }
@@ -344,7 +375,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 				iOrderValue = static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 		}
 	}
@@ -352,7 +383,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	{
 		for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
 		{
-			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 				iOrderValue = static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 		}
 	}
@@ -362,19 +393,19 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 /*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
 {
-	m_AABB.lowerBound = m_AABB.upperBound = b2Vec2(0.0f, 0.0f);
+	m_WorldAABB.lowerBound = m_WorldAABB.upperBound = b2Vec2(0.0f, 0.0f);
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(m_ChildList[i]->GetWorldAABB().IsValid() == false)
 			continue;
 
 		if(i == 0)
-			m_AABB = m_ChildList[i]->GetWorldAABB();
+			m_WorldAABB = m_ChildList[i]->GetWorldAABB();
 		else
-			m_AABB.Combine(m_ChildList[i]->GetWorldAABB());
+			m_WorldAABB.Combine(m_ChildList[i]->GetWorldAABB());
 	}
 
-	return m_AABB;
+	return m_WorldAABB;
 }
 
 /*virtual*/ void HyEntity2d::Load() /*override*/
@@ -382,7 +413,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	// Load any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsLoadable))
 			static_cast<IHyLoadable2d *>(m_ChildList[i])->Load();
 	}
 
@@ -395,7 +426,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	// Unload any attached children
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsLoadable))
 			static_cast<IHyLoadable2d *>(m_ChildList[i])->Unload();
 	}
 
@@ -482,7 +513,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 {
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsLoadable))
 		{
 			if(static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoadDataValid() != false && static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoaded() == false)
 				return false;
@@ -501,11 +532,11 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	SetDirty(DIRTY_ALL);
-	childRef._SetVisible(m_bVisible, false);
-	childRef._SetPauseUpdate(m_bPauseOverride, false);
+	childRef._SetVisible(IsVisible(), false);
+	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
-	if(childRef.GetExplicitAndTypeFlags() & NODETYPE_IsDrawable)
-		SetupNewChild(*this, static_cast<IHyDrawable2d &>(childRef));
+	if(childRef.GetInternalFlags() & NODETYPE_IsDrawable)
+		_CtorSetupNewChild(*this, static_cast<IHyDrawable2d &>(childRef));
 
 	if(sm_pHyAssets)
 		sm_pHyAssets->SetEntityLoaded(this);
@@ -523,10 +554,10 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	IHyNode::_SetVisible(bEnabled, bIsOverriding);
 
-	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Visible))
+	if(0 == (m_uiFlags & EXPLICIT_Visible))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetVisible(m_bVisible, bIsOverriding);
+			m_ChildList[i]->_SetVisible(IsVisible(), bIsOverriding);
 	}
 }
 
@@ -534,10 +565,10 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	IHyNode::_SetPauseUpdate(bUpdateWhenPaused, bIsOverriding);
 
-	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_PauseUpdate))
+	if(0 == (m_uiFlags & EXPLICIT_PauseUpdate))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetPauseUpdate(m_bPauseOverride, bIsOverriding);
+			m_ChildList[i]->_SetPauseUpdate(IsPauseUpdate(), bIsOverriding);
 	}
 }
 
@@ -545,11 +576,11 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	IHyDrawable2d::_SetScissor(pParentScissor, bIsOverriding);
 	
-	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Scissor))
+	if(0 == (m_uiFlags & EXPLICIT_Scissor))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 				static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bIsOverriding);
 		}
 	}
@@ -559,11 +590,11 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	IHyDrawable2d::_SetStencil(hHandle, bIsOverriding);
 
-	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_Stencil))
+	if(0 == (m_uiFlags & EXPLICIT_Stencil))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 				static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetStencil(m_hStencil, bIsOverriding);
 		}
 	}
@@ -573,11 +604,11 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	IHyDrawable2d::_SetCoordinateSystem(iWindowIndex, bIsOverriding);
 
-	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_CoordinateSystem))
+	if(0 == (m_uiFlags & EXPLICIT_CoordinateSystem))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
 				static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetCoordinateSystem(iWindowIndex, bIsOverriding);
 		}
 	}
@@ -587,7 +618,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	IHyDrawable2d::_SetDisplayOrder(iOrderValue, bIsOverriding);
 
-	if(0 == (m_uiExplicitAndTypeFlags & EXPLICIT_DisplayOrder))
+	if(0 == (m_uiFlags & EXPLICIT_DisplayOrder))
 		iOrderValue = SetChildrenDisplayOrder(bIsOverriding);
 
 	return iOrderValue;

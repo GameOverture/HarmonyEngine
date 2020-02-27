@@ -42,9 +42,11 @@ protected:
 public:
 	IHyDrawable();
 	IHyDrawable(const IHyDrawable &copyRef);
+	IHyDrawable(IHyDrawable &&donor);
 	virtual ~IHyDrawable();
 
-	const IHyDrawable &operator=(const IHyDrawable &rhs);
+	IHyDrawable &operator=(const IHyDrawable &rhs);
+	IHyDrawable &operator=(IHyDrawable &&donor);
 
 	bool IsScissorSet() const;
 	void GetLocalScissor(HyScreenRect<int32> &scissorOut) const;

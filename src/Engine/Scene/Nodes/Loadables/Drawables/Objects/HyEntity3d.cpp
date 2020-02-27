@@ -10,8 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :
-	IHyDrawable3d(HYTYPE_Entity, szPrefix, szName, pParent)
+HyEntity3d::HyEntity3d(std::string sPrefix, std::string sName, HyEntity3d *pParent) :
+	IHyDrawable3d(HYTYPE_Entity, sPrefix, sName, pParent)
 {
 }
 
@@ -120,7 +120,7 @@ void HyEntity3d::ForEachChild(std::function<void(IHyNode3d *)> func)
 {
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiExplicitAndTypeFlags & NODETYPE_IsLoadable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsLoadable))
 		{
 			if(static_cast<IHyLoadable3d *>(m_ChildList[i])->IsLoadDataValid() != false && static_cast<IHyLoadable3d *>(m_ChildList[i])->IsLoaded() == false)
 				return false;
@@ -133,11 +133,11 @@ void HyEntity3d::ForEachChild(std::function<void(IHyNode3d *)> func)
 void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 {
 	SetDirty(DIRTY_ALL);
-	childRef._SetVisible(m_bVisible, false);
-	childRef._SetPauseUpdate(m_bPauseOverride, false);
+	childRef._SetVisible(IsVisible(), false);
+	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
-	if(childRef.GetExplicitAndTypeFlags() & NODETYPE_IsDrawable)
-		SetupNewChild(*this, static_cast<IHyDrawable3d &>(childRef));
+	if(childRef.GetInternalFlags() & NODETYPE_IsDrawable)
+		_CtorSetupNewChild(*this, static_cast<IHyDrawable3d &>(childRef));
 }
 
 /*virtual*/ void HyEntity3d::SetDirty(uint32 uiDirtyFlags)

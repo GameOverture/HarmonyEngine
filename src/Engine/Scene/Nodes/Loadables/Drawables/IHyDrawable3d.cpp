@@ -14,31 +14,46 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyDrawable3d::IHyDrawable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :
-	IHyLoadable3d(eNodeType, szPrefix, szName, pParent),
+IHyDrawable3d::IHyDrawable3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
+	IHyLoadable3d(eNodeType, sPrefix, sName, pParent),
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	tint(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiExplicitAndTypeFlags |= NODETYPE_IsDrawable;
+	m_uiFlags |= NODETYPE_IsDrawable;
 
 	tint.Set(1.0f);
-	m_CachedTint = tint.Get();
 
 	if(m_pParent)
-		SetupNewChild(*m_pParent, *this);
+		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyDrawable3d::IHyDrawable3d(const IHyDrawable3d &copyRef) :
 	IHyLoadable3d(copyRef),
 	IHyDrawable(copyRef),
-	m_fAlpha(copyRef.m_fAlpha),
 	tint(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	tint.Set(copyRef.tint.Get());
-	alpha.Set(copyRef.alpha.Get());
+	m_uiFlags |= NODETYPE_IsDrawable;
+
+	tint = copyRef.tint;
+	alpha = copyRef.alpha;
+
+	if(m_pParent)
+		_CtorSetupNewChild(*m_pParent, *this);
+}
+
+IHyDrawable3d::IHyDrawable3d(IHyDrawable3d &&donor) :
+	IHyLoadable3d(std::move(donor)),
+	IHyDrawable(std::move(donor)),
+	tint(*this, DIRTY_Color),
+	alpha(m_fAlpha, *this, DIRTY_Color)
+{
+	m_uiFlags |= NODETYPE_IsDrawable;
+
+	tint = std::move(donor.tint);
+	alpha = std::move(donor.alpha);
 
 	CalculateColor();
 }
@@ -47,15 +62,26 @@ IHyDrawable3d::~IHyDrawable3d()
 {
 }
 
-const IHyDrawable3d &IHyDrawable3d::operator=(const IHyDrawable3d &rhs)
+IHyDrawable3d &IHyDrawable3d::operator=(const IHyDrawable3d &rhs)
 {
 	IHyLoadable3d::operator=(rhs);
 	IHyDrawable::operator=(rhs);
 
-	m_fAlpha = rhs.m_fAlpha;
-
 	tint.Set(rhs.tint.Get());
 	alpha.Set(rhs.alpha.Get());
+
+	CalculateColor();
+
+	return *this;
+}
+
+IHyDrawable3d &IHyDrawable3d::operator=(IHyDrawable3d &&donor)
+{
+	IHyLoadable3d::operator=(std::move(donor));
+	IHyDrawable::operator=(std::move(donor));
+
+	tint = std::move(donor.tint);
+	alpha = std::move(donor.alpha);
 
 	CalculateColor();
 
@@ -123,7 +149,7 @@ void IHyDrawable3d::CalculateColor()
 	return m_pParent;
 }
 
-/*friend*/ void SetupNewChild(HyEntity3d &parentRef, IHyDrawable3d &childRef)
+/*friend*/ void _CtorSetupNewChild(HyEntity3d &parentRef, IHyDrawable3d &childRef)
 {
 	childRef._SetCoordinateSystem(parentRef.GetCoordinateSystem(), false);
 

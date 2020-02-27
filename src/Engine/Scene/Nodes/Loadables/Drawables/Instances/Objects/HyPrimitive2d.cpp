@@ -14,7 +14,7 @@
 #include "Utilities/HyMath.h"
 
 HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyInstance2d(HYTYPE_Primitive, nullptr, nullptr, pParent),
+	IHyInstance2d(HYTYPE_Primitive, "", "", pParent),
 	m_pVertBuffer(nullptr),
 	m_uiNumVerts(0),
 	m_bWireframe(false),
@@ -48,11 +48,6 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	SetData();
 
 	return *this;
-}
-
-/*virtual*/ HyPrimitive2d *HyPrimitive2d::Clone() const
-{
-	return HY_NEW HyPrimitive2d(*this);
 }
 
 void HyPrimitive2d::SetAsNothing()

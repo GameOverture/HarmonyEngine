@@ -11,8 +11,8 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
 #include "HyEngine.h"
 
-IHyInstance2d::IHyInstance2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :
-	IHyDrawable2d(eNodeType, szPrefix, szName, pParent),
+IHyInstance2d::IHyInstance2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+	IHyDrawable2d(eNodeType, sPrefix, sName, pParent),
 	m_LocalBoundingVolume(this)
 {
 }
@@ -24,19 +24,35 @@ IHyInstance2d::IHyInstance2d(const IHyInstance2d &copyRef) :
 {
 }
 
+IHyInstance2d::IHyInstance2d(IHyInstance2d &&donor) :
+	IHyDrawable2d(std::move(donor)),
+	IHyInstance(std::move(donor)),
+	m_LocalBoundingVolume(this, std::move(donor.m_LocalBoundingVolume))
+{
+}
+
 IHyInstance2d::~IHyInstance2d()
 {
 	ParentDetach();
 	Unload();
 }
 
-const IHyInstance2d &IHyInstance2d::operator=(const IHyInstance2d &rhs)
+IHyInstance2d &IHyInstance2d::operator=(const IHyInstance2d &rhs)
 {
 	IHyDrawable2d::operator=(rhs);
 	IHyInstance::operator=(rhs);
 	
 	m_LocalBoundingVolume = rhs.m_LocalBoundingVolume;
-	m_AABB = rhs.m_AABB;
+
+	return *this;
+}
+
+IHyInstance2d &IHyInstance2d::operator=(IHyInstance2d &&donor)
+{
+	IHyDrawable2d::operator=(std::move(donor));
+	IHyInstance::operator=(std::move(donor));
+
+	m_LocalBoundingVolume = std::move(donor.m_LocalBoundingVolume);
 
 	return *this;
 }
@@ -61,17 +77,17 @@ const HyShape2d &IHyInstance2d::GetLocalBoundingVolume()
 
 		GetLocalBoundingVolume(); // This will update BV if it's dirty
 		if(m_LocalBoundingVolume.IsValid() && m_LocalBoundingVolume.GetB2Shape())
-			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_AABB, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
+			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_WorldAABB, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
 		else
 		{
-			m_AABB.lowerBound.SetZero();
-			m_AABB.upperBound.SetZero();
+			m_WorldAABB.lowerBound.SetZero();
+			m_WorldAABB.upperBound.SetZero();
 		}
 
 		ClearDirty(DIRTY_WorldAABB);
 	}
 
-	return m_AABB;
+	return m_WorldAABB;
 }
 
 /*virtual*/ void IHyInstance2d::Update() /*override final*/
@@ -81,13 +97,13 @@ const HyShape2d &IHyInstance2d::GetLocalBoundingVolume()
 
 /*virtual*/ bool IHyInstance2d::IsValid() /*override final*/
 {
-	return m_bVisible && OnIsValid();
+	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) && OnIsValid();
 }
 
 /*virtual*/ void IHyInstance2d::OnLoaded() /*override*/
 {
 	if(m_hShader == HY_UNUSED_HANDLE)
-		m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
+		m_hShader = Hy_DefaultShaderHandle(GetType());
 
 	sm_pScene->AddNode_Loaded(this);
 }

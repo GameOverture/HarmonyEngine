@@ -21,7 +21,7 @@ protected:
 	std::vector<IHyNode3d *>		m_ChildList;
 
 public:
-	HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent);
+	HyEntity3d(std::string sPrefix, std::string sName, HyEntity3d *pParent);
 	virtual ~HyEntity3d(void);
 
 	void ChildAppend(IHyNode3d &childRef);

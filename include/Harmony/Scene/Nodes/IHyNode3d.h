@@ -35,9 +35,11 @@ public:
 public:
 	IHyNode3d(HyType eNodeType, HyEntity3d *pParent);
 	IHyNode3d(const IHyNode3d &copyRef);
+	IHyNode3d(IHyNode3d &&donor);
 	virtual ~IHyNode3d();
 
-	const IHyNode3d &operator=(const IHyNode3d &rhs);
+	IHyNode3d &operator=(const IHyNode3d &rhs);
+	IHyNode3d &operator=(IHyNode3d &&donor);
 
 	void ParentDetach();
 	HyEntity3d *ParentGet() const;

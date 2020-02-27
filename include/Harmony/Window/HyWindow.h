@@ -35,14 +35,16 @@ public:
 		std::vector<HyCamera2d *>::const_iterator	m_iter;
 
 	public:
-		CameraIterator2d(const std::vector<HyCamera2d *> &camListRef) :	m_CamsListRef(camListRef),
-																		m_iter(m_CamsListRef.begin())
+		CameraIterator2d(const std::vector<HyCamera2d *> &camListRef) :
+			m_CamsListRef(camListRef),
+			m_iter(m_CamsListRef.begin())
 		{
 			Reset();
 		}
 
-		CameraIterator2d(CameraIterator2d &iterRef) :	m_CamsListRef(iterRef.m_CamsListRef),
-														m_iter(m_CamsListRef.begin())
+		CameraIterator2d(CameraIterator2d &iterRef) :
+			m_CamsListRef(iterRef.m_CamsListRef),
+			m_iter(m_CamsListRef.begin())
 		{
 			Reset();
 		}

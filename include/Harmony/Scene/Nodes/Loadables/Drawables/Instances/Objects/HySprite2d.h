@@ -49,12 +49,11 @@ protected:
 	glm::ivec2				m_vCustomOffset;					// If set, every frame offsets by this amount (plus any offset it is created with in the Editor)
 
 public:
-	HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
+	HySprite2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);
 	HySprite2d(const HySprite2d &copyRef);
 	virtual ~HySprite2d(void);
 
 	const HySprite2d &operator=(const HySprite2d &rhs);
-	virtual HySprite2d *Clone() const;
 
 	//--------------------------------------------------------------------------------------
 	// Set how to playback the animation on the current (or specified) state/animation.

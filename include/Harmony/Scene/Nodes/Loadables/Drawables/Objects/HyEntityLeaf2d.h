@@ -22,9 +22,9 @@ protected:
 	LEAF			m_Leaf;
 
 public:
-	HyEntityLeaf2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :
+	HyEntityLeaf2d(std::string sPrefix, std::string sName, HyEntity2d *pParent) :
 		HyEntity2d(pParent),
-		m_Leaf(szPrefix, szName, this)
+		m_Leaf(sPrefix, sName, this)
 	{
 	}
 

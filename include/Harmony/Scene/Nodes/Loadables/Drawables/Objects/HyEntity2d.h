@@ -20,7 +20,6 @@ class HyEntity2d : public IHyDrawable2d
 protected:
 	std::vector<IHyNode2d *>		m_ChildList;
 
-	// TODO: Change these attributes to be "Updatable components" that can attach to any specific entity.
 	enum Attributes
 	{
 		ATTRIBFLAG_MouseInput				= 1 << 1,
@@ -40,9 +39,13 @@ protected:
 	b2Body *						m_pPhysicsBody;
 
 public:
-	HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	HyEntity2d(HyEntity2d *pParent = nullptr);
+	HyEntity2d(std::string sPrefix, std::string sName, HyEntity2d *pParent);
+	HyEntity2d(const HyEntity2d &) = delete;
+	HyEntity2d(HyEntity2d &&donor);
 	virtual ~HyEntity2d(void);
+
+	HyEntity2d &operator=(HyEntity2d &&donor);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	virtual void SetVisible(bool bEnabled) override;

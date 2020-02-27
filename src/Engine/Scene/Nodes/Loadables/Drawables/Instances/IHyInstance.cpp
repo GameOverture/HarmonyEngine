@@ -28,16 +28,34 @@ IHyInstance::IHyInstance(const IHyInstance &copyRef) :
 {
 }
 
+IHyInstance::IHyInstance(IHyInstance &&donor) :
+	m_hShader(std::move(donor.m_hShader)),
+	m_eRenderMode(std::move(donor.m_eRenderMode)),
+	m_hTextureHandle(std::move(donor.m_hTextureHandle)),
+	m_ShaderUniforms(std::move(donor.m_ShaderUniforms))
+{
+}
+
 IHyInstance::~IHyInstance()
 {
 }
 
-const IHyInstance &IHyInstance::operator=(const IHyInstance &rhs)
+IHyInstance &IHyInstance::operator=(const IHyInstance &rhs)
 {
 	m_hShader = rhs.m_hShader;
 	m_eRenderMode = rhs.m_eRenderMode;
 	m_hTextureHandle = rhs.m_hTextureHandle;
 	m_ShaderUniforms = m_ShaderUniforms;
+
+	return *this;
+}
+
+IHyInstance &IHyInstance::operator=(IHyInstance &&donor)
+{
+	m_hShader = std::move(donor.m_hShader);
+	m_eRenderMode = std::move(donor.m_eRenderMode);
+	m_hTextureHandle = std::move(donor.m_hTextureHandle);
+	m_ShaderUniforms = std::move(donor.m_ShaderUniforms);
 
 	return *this;
 }

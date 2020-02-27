@@ -14,8 +14,8 @@
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
-HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :
-	IHyInstance2d(HYTYPE_Sprite, szPrefix, szName, pParent),
+HySprite2d::HySprite2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
+	IHyInstance2d(HYTYPE_Sprite, sPrefix, sName, pParent),
 	m_bIsAnimPaused(false),
 	m_fAnimPlayRate(1.0f),
 	m_fElapsedFrameTime(0.0f),
@@ -64,11 +64,6 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(rhs.m_AnimCallbackList[i].first, rhs.m_AnimCallbackList[i].second));
 
 	return *this;
-}
-
-/*virtual*/ HySprite2d *HySprite2d::Clone() const
-{
-	return HY_NEW HySprite2d(*this);
 }
 
 void HySprite2d::AnimCtrl(HyAnimCtrl eAnimCtrl)

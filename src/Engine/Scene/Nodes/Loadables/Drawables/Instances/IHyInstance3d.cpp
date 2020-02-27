@@ -11,8 +11,8 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance3d.h"
 #include "HyEngine.h"
 
-IHyInstance3d::IHyInstance3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :
-	IHyDrawable3d(eNodeType, szPrefix, szName, pParent)
+IHyInstance3d::IHyInstance3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
+	IHyDrawable3d(eNodeType, sPrefix, sName, pParent)
 {
 }
 
@@ -22,16 +22,30 @@ IHyInstance3d::IHyInstance3d(const IHyInstance3d &copyRef) :
 {
 }
 
+IHyInstance3d::IHyInstance3d(IHyInstance3d &&donor) :
+	IHyDrawable3d(std::move(donor)),
+	IHyInstance(std::move(donor))
+{
+}
+
 IHyInstance3d::~IHyInstance3d()
 {
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		Unload();
 }
 
-const IHyInstance3d &IHyInstance3d::operator=(const IHyInstance3d &rhs)
+IHyInstance3d &IHyInstance3d::operator=(const IHyInstance3d &rhs)
 {
 	IHyLoadable3d::operator=(rhs);
 	IHyInstance::operator=(rhs);
+
+	return *this;
+}
+
+IHyInstance3d &IHyInstance3d::operator=(IHyInstance3d &&donor)
+{
+	IHyLoadable3d::operator=(std::move(donor));
+	IHyInstance::operator=(std::move(donor));
 
 	return *this;
 }
@@ -43,13 +57,13 @@ const IHyInstance3d &IHyInstance3d::operator=(const IHyInstance3d &rhs)
 
 /*virtual*/ bool IHyInstance3d::IsValid() /*override final*/
 {
-	return m_bVisible && OnIsValid();
+	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) && OnIsValid();
 }
 
 /*virtual*/ void IHyInstance3d::OnLoaded() /*override*/
 {
 	if(m_hShader == HY_UNUSED_HANDLE)
-		m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
+		m_hShader = Hy_DefaultShaderHandle(GetType());
 
 	sm_pScene->AddNode_Loaded(this);
 }

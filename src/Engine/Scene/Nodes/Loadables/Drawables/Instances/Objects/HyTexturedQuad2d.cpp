@@ -68,16 +68,6 @@ const HyTexturedQuad2d &HyTexturedQuad2d::operator=(const HyTexturedQuad2d &rhs)
 	return *this;
 }
 
-/*virtual*/ HyTexturedQuad2d *HyTexturedQuad2d::Clone() const /*override*/
-{
-	return HY_NEW HyTexturedQuad2d(*this);
-}
-
-///*virtual*/ bool HyTexturedQuad2d::IsLoaded() const /*override*/
-//{
-//	return m_bIsRaw || IHyInstance2d::IsLoaded();
-//}
-
 void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
 {
 	float fX = static_cast<float>(iX);

@@ -12,11 +12,11 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :
+IHyLoadable2d::IHyLoadable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
 	IHyNode2d(eNodeType, pParent),
-	IHyLoadable(szPrefix, szName)
+	IHyLoadable(sPrefix, sName)
 {
-	m_uiExplicitAndTypeFlags |= NODETYPE_IsLoadable;
+	m_uiFlags |= NODETYPE_IsLoadable;
 }
 
 IHyLoadable2d::IHyLoadable2d(const IHyLoadable2d &copyRef) :
@@ -25,14 +25,28 @@ IHyLoadable2d::IHyLoadable2d(const IHyLoadable2d &copyRef) :
 {
 }
 
+IHyLoadable2d::IHyLoadable2d(IHyLoadable2d &&donor) :
+	IHyNode2d(std::move(donor)),
+	IHyLoadable(std::move(donor))
+{
+}
+
 IHyLoadable2d::~IHyLoadable2d()
 {
 }
 
-const IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
+IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
 {
 	IHyNode2d::operator=(rhs);
 	IHyLoadable::operator=(rhs);
+
+	return *this;
+}
+
+IHyLoadable2d &IHyLoadable2d::operator=(IHyLoadable2d &&donor)
+{
+	IHyNode2d::operator=(std::move(donor));
+	IHyLoadable::operator=(std::move(donor));
 
 	return *this;
 }
@@ -47,7 +61,7 @@ const IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)
 
 /*virtual*/ HyType IHyLoadable2d::_LoadableGetType() /*override final*/
 {
-	return m_eTYPE;
+	return GetType();
 }
 
 /*virtual*/ IHyLoadable *IHyLoadable2d::_LoadableGetParentPtr() /*override final*/

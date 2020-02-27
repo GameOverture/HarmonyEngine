@@ -31,7 +31,6 @@ public:
 	virtual ~HyPrimitive2d(void);
 
 	const HyPrimitive2d &operator=(const HyPrimitive2d &rhs);
-	virtual HyPrimitive2d *Clone() const;
 
 	void SetAsNothing();
 
