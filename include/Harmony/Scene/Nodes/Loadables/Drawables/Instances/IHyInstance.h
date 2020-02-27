@@ -33,9 +33,11 @@ protected:
 public:
 	IHyInstance();
 	IHyInstance(const IHyInstance &copyRef);
+	IHyInstance(IHyInstance &&donor);
 	virtual ~IHyInstance();
 
-	const IHyInstance &operator=(const IHyInstance &rhs);
+	IHyInstance &operator=(const IHyInstance &rhs);
+	IHyInstance &operator=(IHyInstance &&donor);
 
 	HyRenderMode GetRenderMode() const;
 	HyTextureHandle GetTextureHandle() const;

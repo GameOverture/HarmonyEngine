@@ -30,11 +30,13 @@ public:
 	HyAnimFloat						alpha;
 
 public:
-	IHyDrawable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent);
+	IHyDrawable3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent);
 	IHyDrawable3d(const IHyDrawable3d &copyRef);
+	IHyDrawable3d(IHyDrawable3d &&donor);
 	virtual ~IHyDrawable3d();
 
-	const IHyDrawable3d &operator=(const IHyDrawable3d &rhs);
+	IHyDrawable3d &operator=(const IHyDrawable3d &rhs);
+	IHyDrawable3d &operator=(IHyDrawable3d &&donor);
 
 	void SetTint(float fR, float fG, float fB);
 	void SetTint(uint32 uiColor);
@@ -52,7 +54,7 @@ private:
 	virtual HyEntity2d *_VisableGetParent2dPtr() override final;
 	virtual HyEntity3d *_VisableGetParent3dPtr() override final;
 
-	friend void SetupNewChild(HyEntity3d &parentRef, IHyDrawable3d &childRef);
+	friend void _CtorSetupNewChild(HyEntity3d &parentRef, IHyDrawable3d &childRef);
 };
 
 #endif /* IHyDrawable3d_h__ */

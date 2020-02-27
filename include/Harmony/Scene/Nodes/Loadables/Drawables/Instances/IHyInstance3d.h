@@ -21,12 +21,13 @@ class IHyInstance3d : public IHyDrawable3d, public IHyInstance
 	friend class HyScene;
 
 public:
-	IHyInstance3d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity3d *pParent);
+	IHyInstance3d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity3d *pParent);
 	IHyInstance3d(const IHyInstance3d &copyRef);
+	IHyInstance3d(IHyInstance3d &&donor);
 	virtual ~IHyInstance3d();
 
-	const IHyInstance3d &operator=(const IHyInstance3d &rhs);
-	virtual IHyInstance3d *Clone() const = 0;
+	IHyInstance3d &operator=(const IHyInstance3d &rhs);
+	IHyInstance3d &operator=(IHyInstance3d &&donor);
 
 protected:
 	virtual void Update() override final;

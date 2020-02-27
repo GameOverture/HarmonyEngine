@@ -43,9 +43,12 @@ class HyShaderUniforms
 public:
 	HyShaderUniforms();
 	HyShaderUniforms(const HyShaderUniforms &copyRef);
+	HyShaderUniforms(HyShaderUniforms &&donor);
 	~HyShaderUniforms();
 
 	HyShaderUniforms &operator=(const HyShaderUniforms &rhs);
+	HyShaderUniforms &operator=(HyShaderUniforms &&donor);
+
 	bool operator==(HyShaderUniforms &rhs);
 
 	uint32 GetCrc32();

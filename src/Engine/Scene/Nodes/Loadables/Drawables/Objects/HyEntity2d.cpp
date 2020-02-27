@@ -23,12 +23,22 @@ HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyEntity2d::HyEntity2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Entity, szPrefix, szName, pParent),
+HyEntity2d::HyEntity2d(std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+	IHyDrawable2d(HYTYPE_Entity, sPrefix, sName, pParent),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
 	m_pMouseInputUserParam(nullptr),
 	m_pPhysicsBody(nullptr)
+{
+}
+
+HyEntity2d::HyEntity2d(HyEntity2d &&donor) :
+	IHyDrawable2d(std::move(donor)),
+	m_ChildList(std::move(donor.m_ChildList)),
+	m_uiAttributes(std::move(donor.m_uiAttributes)),
+	m_eMouseInputState(std::move(donor.m_eMouseInputState)),
+	m_pMouseInputUserParam(std::move(donor.m_pMouseInputUserParam)),
+	m_pPhysicsBody(std::move(m_pPhysicsBody))
 {
 }
 
@@ -38,6 +48,19 @@ HyEntity2d::~HyEntity2d(void)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
 	DisablePhysics();
+}
+
+HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor)
+{
+	IHyDrawable2d::operator=(std::move(donor));
+
+	m_ChildList = std::move(donor.m_ChildList);
+	m_uiAttributes = std::move(donor.m_uiAttributes);
+	m_eMouseInputState = std::move(donor.m_eMouseInputState);
+	m_pMouseInputUserParam = std::move(donor.m_pMouseInputUserParam);
+	m_pPhysicsBody = std::move(m_pPhysicsBody);
+
+	return *this;
 }
 
 /*virtual*/ void HyEntity2d::SetVisible(bool bEnabled) /*override*/
@@ -513,7 +536,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsDrawable)
-		SetupNewChild(*this, static_cast<IHyDrawable2d &>(childRef));
+		_CtorSetupNewChild(*this, static_cast<IHyDrawable2d &>(childRef));
 
 	if(sm_pHyAssets)
 		sm_pHyAssets->SetEntityLoaded(this);

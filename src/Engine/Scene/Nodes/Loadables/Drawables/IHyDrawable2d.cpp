@@ -15,8 +15,8 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyDrawable2d::IHyDrawable2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :
-	IHyLoadable2d(eNodeType, szPrefix, szName, pParent),
+IHyDrawable2d::IHyDrawable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+	IHyLoadable2d(eNodeType, sPrefix, sName, pParent),
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	m_iDisplayOrder(0),
@@ -28,44 +28,86 @@ IHyDrawable2d::IHyDrawable2d(HyType eNodeType, const char *szPrefix, const char 
 
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
+
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
 
 	if(m_pParent)
-		SetupNewChild(*m_pParent, *this);
+		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :
 	IHyLoadable2d(copyRef),
 	IHyDrawable(copyRef),
-	m_fAlpha(copyRef.m_fAlpha),
 	m_iDisplayOrder(copyRef.m_iDisplayOrder),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	topColor.Set(copyRef.topColor.Get());
-	botColor.Set(copyRef.botColor.Get());
-	alpha.Set(copyRef.alpha.Get());
+	m_uiFlags |= NODETYPE_IsDrawable;
 
-	CalculateColor();
+	topColor = copyRef.topColor;
+	botColor = copyRef.botColor;
+	alpha = copyRef.alpha;
+
+	m_CachedTopColor = topColor.Get();
+	m_CachedBotColor = botColor.Get();
+
+	if(m_pParent)
+		_CtorSetupNewChild(*m_pParent, *this);
+}
+
+IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) :
+	IHyLoadable2d(std::move(donor)),
+	IHyDrawable(std::move(donor)),
+	m_iDisplayOrder(std::move(donor.m_iDisplayOrder)),
+	topColor(*this, DIRTY_Color),
+	botColor(*this, DIRTY_Color),
+	alpha(m_fAlpha, *this, DIRTY_Color)
+{
+	m_uiFlags |= NODETYPE_IsDrawable;
+
+	topColor = std::move(donor.topColor);
+	botColor = std::move(donor.botColor);
+	alpha = std::move(donor.alpha);
+
+	m_CachedTopColor = topColor.Get();
+	m_CachedBotColor = botColor.Get();
+
+	if(m_pParent)
+		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyDrawable2d::~IHyDrawable2d()
 {
 }
 
-const IHyDrawable2d &IHyDrawable2d::operator=(const IHyDrawable2d &rhs)
+IHyDrawable2d &IHyDrawable2d::operator=(const IHyDrawable2d &rhs)
 {
 	IHyLoadable2d::operator=(rhs);
 	IHyDrawable::operator=(rhs);
 
-	m_fAlpha = rhs.m_fAlpha;
 	m_iDisplayOrder = rhs.m_iDisplayOrder;
 
-	topColor.Set(rhs.topColor.Get());
-	botColor.Set(rhs.botColor.Get());
-	alpha.Set(rhs.alpha.Get());
+	topColor = rhs.topColor;
+	botColor = rhs.botColor;
+	alpha = rhs.alpha;
+
+	CalculateColor();
+
+	return *this;
+}
+
+IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor)
+{
+	IHyLoadable2d::operator=(std::move(donor));
+	IHyDrawable::operator=(std::move(donor));
+
+	m_iDisplayOrder = std::move(donor.m_iDisplayOrder);
+
+	topColor = std::move(donor.topColor);
+	botColor = std::move(donor.botColor);
+	alpha = std::move(donor.alpha);
 
 	CalculateColor();
 
@@ -191,7 +233,7 @@ void IHyDrawable2d::CalculateColor()
 	return nullptr;
 }
 
-/*friend*/ void SetupNewChild(HyEntity2d &parentRef, IHyDrawable2d &childRef)
+/*friend*/ void _CtorSetupNewChild(HyEntity2d &parentRef, IHyDrawable2d &childRef)
 {
 	childRef._SetCoordinateSystem(parentRef.GetCoordinateSystem(), false);
 

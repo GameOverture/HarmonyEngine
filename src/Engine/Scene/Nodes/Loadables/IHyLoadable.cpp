@@ -14,11 +14,11 @@
 
 /*static*/ HyAssets *IHyLoadable::sm_pHyAssets = nullptr;
 
-IHyLoadable::IHyLoadable(const char *szPrefix, const char *szName) :
+IHyLoadable::IHyLoadable(std::string sPrefix, std::string sName) :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(nullptr),
-	m_sName(szName ? szName : ""),
-	m_sPrefix(szPrefix ? szPrefix : "")
+	m_sName(sName),
+	m_sPrefix(sPrefix)
 {
 }
 
@@ -89,6 +89,11 @@ const std::string &IHyLoadable::GetName() const
 const std::string &IHyLoadable::GetPrefix() const
 {
 	return m_sPrefix;
+}
+
+void IHyLoadable::Reinitialize(std::string sPrefix, std::string sName)
+{
+
 }
 
 const IHyNodeData *IHyLoadable::AcquireData()

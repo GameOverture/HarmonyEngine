@@ -13,8 +13,8 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
 #include "Scene/HyScene.h"
 
-//HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent) :
-//	IHyDrawable2d(HYTYPE_Spine, szPrefix, szName, pParent),
+//HySpine2d::HySpine2d(std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+//	IHyDrawable2d(HYTYPE_Spine, sPrefix, sName, pParent),
 //	m_pSpineSkeleton(NULL),
 //	m_ppSpineAnims(NULL),
 //	m_ppAnimStates(NULL),
@@ -54,11 +54,6 @@
 //	HyError("HySpine2d::operator= implement me!");
 //
 //	return *this;
-//}
-//
-///*virtual*/ HySpine2d *HySpine2d::Clone() const
-//{
-//	return HY_NEW HySpine2d(*this);
 //}
 //
 ////uint32 HySpine2d::GetTextureId()

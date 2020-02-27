@@ -11,8 +11,8 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
 #include "HyEngine.h"
 
-IHyInstance2d::IHyInstance2d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity2d *pParent) :
-	IHyDrawable2d(eNodeType, szPrefix, szName, pParent),
+IHyInstance2d::IHyInstance2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+	IHyDrawable2d(eNodeType, sPrefix, sName, pParent),
 	m_LocalBoundingVolume(this)
 {
 }
@@ -24,19 +24,35 @@ IHyInstance2d::IHyInstance2d(const IHyInstance2d &copyRef) :
 {
 }
 
+IHyInstance2d::IHyInstance2d(IHyInstance2d &&donor) :
+	IHyDrawable2d(std::move(donor)),
+	IHyInstance(std::move(donor)),
+	m_LocalBoundingVolume(this, std::move(donor.m_LocalBoundingVolume))
+{
+}
+
 IHyInstance2d::~IHyInstance2d()
 {
 	ParentDetach();
 	Unload();
 }
 
-const IHyInstance2d &IHyInstance2d::operator=(const IHyInstance2d &rhs)
+IHyInstance2d &IHyInstance2d::operator=(const IHyInstance2d &rhs)
 {
 	IHyDrawable2d::operator=(rhs);
 	IHyInstance::operator=(rhs);
 	
 	m_LocalBoundingVolume = rhs.m_LocalBoundingVolume;
-	m_WorldAABB = rhs.m_WorldAABB;
+
+	return *this;
+}
+
+IHyInstance2d &IHyInstance2d::operator=(IHyInstance2d &&donor)
+{
+	IHyDrawable2d::operator=(std::move(donor));
+	IHyInstance::operator=(std::move(donor));
+
+	m_LocalBoundingVolume = std::move(donor.m_LocalBoundingVolume);
 
 	return *this;
 }

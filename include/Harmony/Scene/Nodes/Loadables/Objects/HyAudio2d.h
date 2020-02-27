@@ -20,8 +20,11 @@ class HyAudio2d : public IHyLoadable2d
 	IHyAudioInst *		m_pInternal;
 
 public:
-	HyAudio2d(const char *szPrefix = nullptr, const char *szName = nullptr, HyEntity2d *pParent = nullptr);
+	HyAudio2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);
+	// TODO: copy ctor and move ctor
 	virtual ~HyAudio2d(void);
+
+	// TODO: assignment operator and move operator
 
 	void Start();
 	void Stop();

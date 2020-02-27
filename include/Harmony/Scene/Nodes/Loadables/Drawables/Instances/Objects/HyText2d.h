@@ -75,12 +75,11 @@ protected:
 	float				m_fUsedPixelHeight;
 
 public:
-	HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
+	HyText2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);
 	HyText2d(const HyText2d &copyRef);
 	virtual ~HyText2d(void);
 
 	const HyText2d &operator=(const HyText2d &rhs);
-	virtual HyText2d *Clone() const;
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
 	void TextSet(const std::string sText);

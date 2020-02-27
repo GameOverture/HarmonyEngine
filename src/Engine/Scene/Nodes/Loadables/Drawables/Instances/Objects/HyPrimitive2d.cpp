@@ -50,11 +50,6 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	return *this;
 }
 
-/*virtual*/ HyPrimitive2d *HyPrimitive2d::Clone() const
-{
-	return HY_NEW HyPrimitive2d(*this);
-}
-
 void HyPrimitive2d::SetAsNothing()
 {
 	m_LocalBoundingVolume.SetAsNothing();

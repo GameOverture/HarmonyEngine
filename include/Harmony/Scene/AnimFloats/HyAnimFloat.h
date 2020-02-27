@@ -40,8 +40,8 @@ class HyAnimFloat
 
 public:
 	HyAnimFloat(float &valueReference, IHyNode &ownerRef, uint32 uiDirtyFlags);
-	HyAnimFloat(HyAnimFloat &&) = delete;
 	HyAnimFloat(const HyAnimFloat &) = delete;
+	HyAnimFloat(HyAnimFloat &&) = delete;
 	~HyAnimFloat(void);
 
 	float Get() const;

@@ -16,11 +16,9 @@
 class HyPrefab3d : public IHyInstance3d
 {
 public:
-	HyPrefab3d(const char *szPrefix, const char *szName, HyEntity3d *pParent);
+	HyPrefab3d(std::string sPrefix = "", std::string sName = "", HyEntity3d *pParent = nullptr);
 	HyPrefab3d(const HyPrefab3d &copyRef);
 	virtual ~HyPrefab3d();
-
-	virtual HyPrefab3d *Clone() const override;
 };
 
 #endif /* HyPrefab3d_h__ */

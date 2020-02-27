@@ -11,9 +11,9 @@
 #include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-IHyLoadable3d::IHyLoadable3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :
+IHyLoadable3d::IHyLoadable3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
 	IHyNode3d(eNodeType, pParent),
-	IHyLoadable(szPrefix, szName)
+	IHyLoadable(sPrefix, sName)
 {
 	m_uiFlags |= NODETYPE_IsLoadable;
 }

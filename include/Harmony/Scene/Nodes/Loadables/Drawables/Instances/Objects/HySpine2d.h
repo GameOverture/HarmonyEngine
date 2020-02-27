@@ -32,12 +32,11 @@ class HySpine2d : public IHyInstance2d
 //	bool					m_bLooping;
 //
 //public:
-//	HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent);
+//	HySpine2d(std::string sPrefix, std::string sName, HyEntity2d *pParent);
 //	HySpine2d(const HySpine2d &copyRef);
 //	virtual ~HySpine2d(void);
 //
 //	const HySpine2d &operator=(const HySpine2d &rhs);
-//	virtual HySpine2d *Clone() const;
 //
 //	spSkeleton *GetSkeleton()		{ return m_pSpineSkeleton; }
 //

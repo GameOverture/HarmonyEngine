@@ -10,8 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-HyEntity3d::HyEntity3d(const char *szPrefix, const char *szName, HyEntity3d *pParent) :
-	IHyDrawable3d(HYTYPE_Entity, szPrefix, szName, pParent)
+HyEntity3d::HyEntity3d(std::string sPrefix, std::string sName, HyEntity3d *pParent) :
+	IHyDrawable3d(HYTYPE_Entity, sPrefix, sName, pParent)
 {
 }
 
@@ -137,7 +137,7 @@ void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsDrawable)
-		SetupNewChild(*this, static_cast<IHyDrawable3d &>(childRef));
+		_CtorSetupNewChild(*this, static_cast<IHyDrawable3d &>(childRef));
 }
 
 /*virtual*/ void HyEntity3d::SetDirty(uint32 uiDirtyFlags)

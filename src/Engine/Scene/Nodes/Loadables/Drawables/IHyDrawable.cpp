@@ -36,12 +36,19 @@ IHyDrawable::IHyDrawable(const IHyDrawable &copyRef) :
 	}
 }
 
+IHyDrawable::IHyDrawable(IHyDrawable &&donor) :
+	m_pScissor(std::move(donor.m_pScissor)),
+	m_hStencil(std::move(donor.m_hStencil)),
+	m_iCoordinateSystem(std::move(donor.m_iCoordinateSystem))
+{
+}
+
 IHyDrawable::~IHyDrawable()
 {
 	delete m_pScissor;
 }
 
-const IHyDrawable &IHyDrawable::operator=(const IHyDrawable &rhs)
+IHyDrawable &IHyDrawable::operator=(const IHyDrawable &rhs)
 {
 	delete m_pScissor;
 	m_pScissor = nullptr;
@@ -54,6 +61,17 @@ const IHyDrawable &IHyDrawable::operator=(const IHyDrawable &rhs)
 
 	m_hStencil = rhs.m_hStencil;
 	m_iCoordinateSystem = rhs.m_iCoordinateSystem;
+
+	return *this;
+}
+
+IHyDrawable &IHyDrawable::operator=(IHyDrawable &&donor)
+{
+	delete m_pScissor;
+	m_pScissor = std::move(donor.m_pScissor);
+	
+	m_hStencil = std::move(donor.m_hStencil);
+	m_iCoordinateSystem = std::move(donor.m_iCoordinateSystem);
 
 	return *this;
 }

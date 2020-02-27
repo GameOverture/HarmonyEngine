@@ -11,8 +11,8 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance3d.h"
 #include "HyEngine.h"
 
-IHyInstance3d::IHyInstance3d(HyType eNodeType, const char *szPrefix, const char *szName, HyEntity3d *pParent) :
-	IHyDrawable3d(eNodeType, szPrefix, szName, pParent)
+IHyInstance3d::IHyInstance3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
+	IHyDrawable3d(eNodeType, sPrefix, sName, pParent)
 {
 }
 
@@ -22,16 +22,30 @@ IHyInstance3d::IHyInstance3d(const IHyInstance3d &copyRef) :
 {
 }
 
+IHyInstance3d::IHyInstance3d(IHyInstance3d &&donor) :
+	IHyDrawable3d(std::move(donor)),
+	IHyInstance(std::move(donor))
+{
+}
+
 IHyInstance3d::~IHyInstance3d()
 {
 	if(m_eLoadState != HYLOADSTATE_Inactive)
 		Unload();
 }
 
-const IHyInstance3d &IHyInstance3d::operator=(const IHyInstance3d &rhs)
+IHyInstance3d &IHyInstance3d::operator=(const IHyInstance3d &rhs)
 {
 	IHyLoadable3d::operator=(rhs);
 	IHyInstance::operator=(rhs);
+
+	return *this;
+}
+
+IHyInstance3d &IHyInstance3d::operator=(IHyInstance3d &&donor)
+{
+	IHyLoadable3d::operator=(std::move(donor));
+	IHyInstance::operator=(std::move(donor));
 
 	return *this;
 }

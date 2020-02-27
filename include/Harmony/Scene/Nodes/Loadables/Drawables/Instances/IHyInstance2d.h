@@ -25,12 +25,13 @@ protected:
 	HyShape2d						m_LocalBoundingVolume;
 
 public:
-	IHyInstance2d(HyType eInstType, const char *szPrefix, const char *szName, HyEntity2d *pParent);
+	IHyInstance2d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
 	IHyInstance2d(const IHyInstance2d &copyRef);
+	IHyInstance2d(IHyInstance2d &&donor);
 	virtual ~IHyInstance2d();
 
-	const IHyInstance2d &operator=(const IHyInstance2d &rhs);
-	virtual IHyInstance2d *Clone() const = 0;
+	IHyInstance2d &operator=(const IHyInstance2d &rhs);
+	IHyInstance2d &operator=(IHyInstance2d &&donor);
 
 	const HyShape2d &GetLocalBoundingVolume();
 	virtual const b2AABB &GetWorldAABB() override;
