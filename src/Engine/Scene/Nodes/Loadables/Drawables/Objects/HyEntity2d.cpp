@@ -15,7 +15,7 @@
 #include "HyEngine.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Entity, nullptr, nullptr, pParent),
+	IHyDrawable2d(HYTYPE_Entity, "", "", pParent),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
 	m_pMouseInputUserParam(nullptr),

@@ -14,7 +14,7 @@
 #include "Utilities/HyMath.h"
 
 HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyInstance2d(HYTYPE_Primitive, nullptr, nullptr, pParent),
+	IHyInstance2d(HYTYPE_Primitive, "", "", pParent),
 	m_pVertBuffer(nullptr),
 	m_uiNumVerts(0),
 	m_bWireframe(false),
