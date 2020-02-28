@@ -91,9 +91,20 @@ const std::string &IHyLoadable::GetPrefix() const
 	return m_sPrefix;
 }
 
-void IHyLoadable::Reinitialize(std::string sPrefix, std::string sName)
+void IHyLoadable::_Reinitialize(std::string sPrefix, std::string sName)
 {
+	if(m_sPrefix == sPrefix && m_sName == sName)
+		return;
 
+	bool bWasLoaded = IsLoaded();
+	if(bWasLoaded)
+		Unload();
+
+	m_sPrefix = sPrefix;
+	m_sName = sName;
+
+	if(bWasLoaded)
+		Load();
 }
 
 const IHyNodeData *IHyLoadable::AcquireData()
