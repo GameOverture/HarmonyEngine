@@ -57,7 +57,7 @@ public:
 		OnDataAcquired();
 
 		if(m_hShader == HY_UNUSED_HANDLE)
-			m_hShader = Hy_DefaultShaderHandle(m_eTYPE);
+			m_hShader = Hy_DefaultShaderHandle(GetType());
 
 		if(hTextureHandle != HY_UNUSED_HANDLE)
 			m_hTextureHandle = hTextureHandle;
