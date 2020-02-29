@@ -35,7 +35,7 @@ public:
 
 	bool IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const;
 
-	bool AddChildItem(ExplorerItem *pItem);
+	bool InsertNewChild(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem = nullptr, int iRow = -1);
 	bool RemoveChild(ExplorerItem *pItem);
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;

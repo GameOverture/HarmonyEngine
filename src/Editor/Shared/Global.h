@@ -185,6 +185,7 @@ public:
 	static AtlasItemType GetAtlasItemFromItem(HyGuiItemType eItem);
 	static QList<HyGuiItemType> GetTypeList();
 	static QStringList GetTypeNameList();
+	static HyGuiItemType GetTypeFromString(QString sType);
 	static QString AtlasTextureTypeString(HyTextureFormat eType);
 
 	static const QString ItemName(HyGuiItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }

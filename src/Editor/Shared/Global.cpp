@@ -194,6 +194,18 @@
 	return list;
 }
 
+/*static*/ HyGuiItemType HyGlobal::GetTypeFromString(QString sType)
+{
+	QStringList sTypeList = GetTypeNameList();
+	for(int i = 0; i < sTypeList.size(); ++i)
+	{
+		if(sType.compare(sTypeList[i], Qt::CaseInsensitive) == 0)
+			return GetTypeList()[i];
+	}
+
+	return ITEM_Unknown;
+}
+
 /*static*/ QString HyGlobal::AtlasTextureTypeString(HyTextureFormat eType)
 {
 	switch(eType)

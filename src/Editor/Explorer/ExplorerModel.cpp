@@ -77,9 +77,9 @@ QList<ExplorerItem *> ExplorerModel::GetItemsRecursively(const QModelIndex &inde
 	return returnList;
 }
 
-ExplorerItem *ExplorerModel::FindItemByItemPath(Project *pProject, QString sPath)
+ExplorerItem *ExplorerModel::FindItemByItemPath(Project *pProject, QString sPath, HyGuiItemType eType)
 {
-	QModelIndex sourceIndex = FindIndexByItemPath(pProject, sPath);
+	QModelIndex sourceIndex = FindIndexByItemPath(pProject, sPath, eType);
 	TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
 	
 	return pSourceTreeItem->data(0).value<ExplorerItem *>();
@@ -229,7 +229,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		if(pasteObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
 		{
 			QString sItemPath = pasteObj["itemName"].toString();
-			QModelIndex sourceIndex = FindIndexByItemPath(pDestProject, sItemPath);
+			QModelIndex sourceIndex = FindIndexByItemPath(pDestProject, sItemPath, HyGlobal::GetTypeFromString(pasteObj["itemType"].toString()));
 			TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
 			ExplorerItem *pSourceItem = pSourceTreeItem->data(0).value<ExplorerItem *>();
 
@@ -258,18 +258,17 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Pasted item's assets needs to be imported into this project
 
-		// Determine the pasted item type
-		HyGuiItemType ePasteItemType = ITEM_Unknown;
-		QString sItemType = pasteObj["itemType"].toString();
-		QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
-		for(int i = 0; i < typeList.size(); ++i)
-		{
-			if(sItemType == HyGlobal::ItemName(typeList[i], false))
-			{
-				ePasteItemType = typeList[i];
-				break;
-			}
-		}
+		HyGuiItemType ePasteItemType = HyGlobal::GetTypeFromString(pasteObj["itemType"].toString());
+		//QString sItemType = pasteObj["itemType"].toString();
+		//QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+		//for(int i = 0; i < typeList.size(); ++i)
+		//{
+		//	if(sItemType == HyGlobal::ItemName(typeList[i], false))
+		//	{
+		//		ePasteItemType = typeList[i];
+		//		break;
+		//	}
+		//}
 
 		// Import any missing fonts (.ttf)
 		if(ePasteItemType == ITEM_Text)
@@ -579,14 +578,14 @@ TreeModelItem *ExplorerModel::FindPrefixTreeItem(const QModelIndex &indexRef) co
 	return pTreeItem;
 }
 
-QModelIndex ExplorerModel::FindIndexByItemPath(Project *pProject, QString sPath)
+QModelIndex ExplorerModel::FindIndexByItemPath(Project *pProject, QString sPath, HyGuiItemType eType)
 {
 	TreeModelItem *pCurTreeItem = FindProjectTreeItem(pProject);
 	if(pCurTreeItem == nullptr)
 		return QModelIndex();
 
 	QStringList sPathSplitList = sPath.split(QChar('/'));
-	// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
+	// Traverse down the tree
 	for(int i = 0; i < sPathSplitList.size(); ++i)
 	{
 		bool bFound = false;
@@ -597,7 +596,10 @@ QModelIndex ExplorerModel::FindIndexByItemPath(Project *pProject, QString sPath)
 				if(i == sPathSplitList.size() - 1)
 				{
 					ExplorerItem *pItem = pCurTreeItem->child(j)->data(0).value<ExplorerItem *>();
-					return FindIndex<ExplorerItem *>(pItem, 0);
+					if(pItem->GetType() == eType)
+						return FindIndex<ExplorerItem *>(pItem, 0);
+					else
+						continue;
 				}
 
 				pCurTreeItem = pCurTreeItem->child(j);

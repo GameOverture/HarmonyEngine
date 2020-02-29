@@ -132,26 +132,25 @@ void EntityWidget::on_actionAddSelectedChild_triggered()
 		return;
 	}
 
+	QList<QVariant> validItemList;
 	for(auto pItem : selectedItems)
 	{
 		EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
 		if(pTreeModel->IsItemValid(pItem, true) == false)
 			continue;
 	
-		QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChild, m_ItemRef, pItem);
-		m_ItemRef.GetUndoStack()->push(pCmd);
+		QVariant v;
+		v.setValue<ExplorerItem *>(pItem);
+		validItemList.push_back(v);
 	}
+
+	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChildren, m_ItemRef, validItemList);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPrimitive_triggered()
 {
-	//if(GetCurSelectedTreeItem() == nullptr)
-	//{
-	//	HyGuiLog("Currently selected entity tree item is nullptr. Cannot add primitive.", LOGTYPE_Error);
-	//	return;
-	//}
-
-	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, static_cast<EntityModel *>(m_ItemRef.GetModel())->CreateNewPrimitive());
+	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, QVariantList());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
