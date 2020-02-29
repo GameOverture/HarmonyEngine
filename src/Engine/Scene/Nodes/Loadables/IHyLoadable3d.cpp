@@ -50,6 +50,24 @@ IHyLoadable3d &IHyLoadable3d::operator=(IHyLoadable3d &&donor)
 	return *this;
 }
 
+void IHyLoadable3d::Reinitialize(std::string sPrefix, std::string sName)
+{
+	IHyLoadable::_Reinitialize(sPrefix, sName);
+}
+
+void IHyLoadable3d::Reinitialize(std::string sPrefix, std::string sName, HyEntity3d *pParent)
+{
+	IHyLoadable::_Reinitialize(sPrefix, sName);
+
+	if(m_pParent != pParent)
+	{
+		if(pParent != nullptr)
+			pParent->ChildAppend(*this);
+		else
+			ParentDetach();
+	}
+}
+
 /*virtual*/ void IHyLoadable3d::Update() /*override*/
 {
 	IHyNode3d::Update();

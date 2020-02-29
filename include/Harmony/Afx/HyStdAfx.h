@@ -122,7 +122,8 @@ enum HyButtonState
 	HYBUTTONSTATE_Down,
 	HYBUTTONSTATE_Disabled,
 	HYBUTTONSTATE_Selected,
-	HYBUTTONSTATE_DisabledSelected
+	HYBUTTONSTATE_DisabledSelected,
+	HYBUTTONSTATE_Hover
 };
 
 enum HyLoadState

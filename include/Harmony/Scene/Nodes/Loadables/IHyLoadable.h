@@ -40,8 +40,6 @@ public:
 	const std::string &GetName() const;
 	const std::string &GetPrefix() const;
 
-	void Reinitialize(std::string sPrefix, std::string sName);
-
 	const IHyNodeData *AcquireData();
 
 	bool IsLoaded() const;
@@ -51,6 +49,8 @@ public:
 	virtual bool IsLoadDataValid() { return true; }	// Optional public override for derived classes to indicate that its current state 
 
 protected:
+	void _Reinitialize(std::string sPrefix, std::string sName);
+
 	virtual bool IsChildrenLoaded() const { return true; }// Required override for entities to properly determine whether they're loaded
 
 	// Optional overrides for derived classes

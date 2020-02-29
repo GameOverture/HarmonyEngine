@@ -28,6 +28,9 @@ public:
 	IHyLoadable3d &operator=(const IHyLoadable3d &rhs);
 	IHyLoadable3d &operator=(IHyLoadable3d &&donor);
 
+	void Reinitialize(std::string sPrefix, std::string sName);
+	void Reinitialize(std::string sPrefix, std::string sName, HyEntity3d *pParent);
+
 protected:
 	virtual void Update() override;
 

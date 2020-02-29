@@ -51,6 +51,24 @@ IHyLoadable2d &IHyLoadable2d::operator=(IHyLoadable2d &&donor)
 	return *this;
 }
 
+void IHyLoadable2d::Reinitialize(std::string sPrefix, std::string sName)
+{
+	IHyLoadable::_Reinitialize(sPrefix, sName);
+}
+
+void IHyLoadable2d::Reinitialize(std::string sPrefix, std::string sName, HyEntity2d *pParent)
+{
+	IHyLoadable::_Reinitialize(sPrefix, sName);
+
+	if(m_pParent != pParent)
+	{
+		if(pParent != nullptr)
+			pParent->ChildAppend(*this);
+		else
+			ParentDetach();
+	}
+}
+
 /*virtual*/ void IHyLoadable2d::Update() /*override*/
 {
 	IHyNode2d::Update();
