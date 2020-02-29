@@ -26,9 +26,8 @@ class EntityNodeTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
-	EntityModel *									m_pEntityModel;
-
-	TreeModelItem *									m_pSelfNode;
+	EntityModel *										m_pEntityModel;
+	TreeModelItem *										m_pSelfNode;
 
 public:
 	explicit EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
@@ -47,7 +46,7 @@ public:
 
 class EntityStateData : public IStateData
 {
-	QMap<ExplorerItem *, PropertiesTreeModel *>		m_PropertiesMap;
+	QMap<ExplorerItem *, PropertiesTreeModel *>			m_PropertiesMap;
 
 public:
 	EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
@@ -68,19 +67,19 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	EntityNodeTreeModel			m_TreeModel;
-	QList<ProjectItem *>		m_PrimitiveList;
+	EntityNodeTreeModel									m_TreeModel;
+	QList<ProjectItem *>								m_PrimitiveList;
 
 	class DependencyLookup
 	{
-		QMap<QString, ProjectItem *>		m_ItemMap;
+		QMap<QString, ProjectItem *>					m_ItemMap;
 
 	public:
 		void AddDependency(ProjectItem *pItem);
 		bool RemoveDependency(ProjectItem *pItem);  // Returns true if no remaining duplicates exist
 		ProjectItem *FindByGuid(QUuid guid);
 	};
-	DependencyLookup								m_Dependencies;
+	DependencyLookup									m_Dependencies;
 
 public:
 	EntityModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);

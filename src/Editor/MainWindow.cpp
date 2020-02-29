@@ -120,6 +120,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	// Restore workspace
 	ui->dockWidgetExplorer->show();
 	ui->dockWidgetAssets->show();
+	ui->dockWidgetProperties->setWidget(nullptr);
 	ui->dockWidgetProperties->hide();
 
 	HyGuiLog("Recovering previously opened session...", LOGTYPE_Normal);
@@ -356,6 +357,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	{
 		pItem->BlockAllWidgetSignals(true);
 
+		sm_pInstance->ui->dockWidgetProperties->setWindowTitle("Item Properties");
 		sm_pInstance->ui->dockWidgetProperties->hide();
 
 		QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
@@ -376,6 +378,16 @@ void MainWindow::SetCurrentProject(Project *pProject)
 /*static*/ QMenu *MainWindow::GetNewItemMenu()
 {
 	return sm_pInstance->ui->menu_New_Item;
+}
+
+/*static*/ ExplorerWidget *MainWindow::GetExplorer()
+{
+	return sm_pInstance->ui->explorer;
+}
+
+/*static*/ IWidget *MainWindow::GetItemProperties()
+{
+	return static_cast<IWidget *>(sm_pInstance->ui->dockWidgetProperties->widget());
 }
 
 /*virtual*/ void MainWindow::closeEvent(QCloseEvent *pEvent) /*override*/

@@ -81,12 +81,12 @@ ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
 	pDrag->setMimeData(pMimeData);
 	pDrag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
 
-	//Qt::DropAction eDropAction = pDrag->exec(supportedActions);
-	//if(eDropAction != Qt::MoveAction)
-	//{
-	//	supportedActions &= ~Qt::MoveAction;
-	//	eDropAction = pDrag->exec(supportedActions);
-	//}
+	Qt::DropAction eDropAction = pDrag->exec(supportedActions);
+	if(eDropAction != Qt::MoveAction)
+	{
+		supportedActions &= ~Qt::MoveAction;
+		eDropAction = pDrag->exec(supportedActions);
+	}
 
 	//Qt::DropAction defaultDropAction = Qt::IgnoreAction;
 	//if(supportedActions & Qt::MoveAction || dragDropMode() == QAbstractItemView::InternalMove)
@@ -349,6 +349,10 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	
 	if(Harmony::GetProject() == nullptr && bValidItem)
 		Harmony::SetProject(&pCurSelected->GetProject());
+
+	IWidget *pItemProperties = MainWindow::GetItemProperties();
+	if(pItemProperties)
+		pItemProperties->UpdateActions();
 }
 
 void ExplorerWidget::on_actionRename_triggered()

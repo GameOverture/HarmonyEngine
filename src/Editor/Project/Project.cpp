@@ -259,6 +259,8 @@ void Project::WriteGameData()
 		HyGuiLog(QString("Couldn't open ") % HYASSETS_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
 	else
 	{
+		m_ProjectFileData.m_Data.insert("$fileVersion", HYGUI_FILE_VERSION);
+
 		QJsonDocument userDoc;
 		userDoc.setObject(m_ProjectFileData.m_Data);
 		qint64 iBytesWritten = dataFile.write(userDoc.toJson());
@@ -278,6 +280,8 @@ void Project::WriteMetaData()
 		HyGuiLog(QString("Couldn't open ") % HYMETA_DataFile % " for writing: " % metaFile.errorString(), LOGTYPE_Error);
 	else
 	{
+		m_ProjectFileData.m_Meta.insert("$fileVersion", HYGUI_FILE_VERSION);
+
 		QJsonDocument metaDoc;
 		metaDoc.setObject(m_ProjectFileData.m_Meta);
 

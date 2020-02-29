@@ -18,10 +18,18 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 	ITreeModel(1, QStringList(), parent),
 	m_pEntityModel(pEntityModel)
 {
-	if(insertRow(0) == false)
+	// Insert self as root node
+	QModelIndex parentIndex = FindIndex<ExplorerItem *>(m_pRootItem->data(0).value<ExplorerItem *>(), 0);
+	int iRow = m_pRootItem->childCount();
+	if(insertRow(iRow, parentIndex) == false)
 	{
-		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - insertRow failed", LOGTYPE_Error);
+		HyGuiLog("ExplorerModel::InsertNewItem() - insertRow failed", LOGTYPE_Error);
+		return;
 	}
+	QVariant v;
+	v.setValue<ProjectItem *>(&pEntityModel->GetItem());
+	if(setData(index(iRow, 0, parentIndex), v) == false)
+		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 }
 
 /*virtual*/ EntityNodeTreeModel::~EntityNodeTreeModel()
@@ -320,7 +328,12 @@ ProjectItem *EntityModel::CreateNewPrimitive()
 
 /*virtual*/ FileDataPair EntityModel::GetStateFileData(uint32 uiIndex) const /*override*/
 {
-	return FileDataPair();
+	FileDataPair stateFileData;
+	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
+
+	//stateFileData.m_Data.insert("something", );
+
+	return stateFileData;
 }
 
 /*virtual*/ QList<AtlasFrame *> EntityModel::GetAtlasFrames() const /*override*/
