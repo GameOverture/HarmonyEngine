@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyBox2dRuntime.h"
-#include "Scene/Physics/HyDebugPhys2d.h"
+#include "Scene/Physics/HyDrawPhys2d.h"
 
 // Forward declarations
 class IHyNode;
@@ -33,7 +33,8 @@ class HyScene
 	b2World												m_b2World;
 	int32												m_iPhysVelocityIterations;
 	int32												m_iPhysPositionIterations;
-	HyDebugPhys2d										m_DrawPhys2d;
+
+	HyDrawPhys2d										m_DrawPhys2d;
 	HyBox2dRuntime										m_Phys2dContactListener;
 
 	std::vector<HyWindow *> &							m_WindowListRef;
@@ -67,7 +68,7 @@ public:
 	void CopyAllLoadedNodes(std::vector<IHyInstance2d *> &nodeListOut);
 
 	b2World &GetPhysics2d();
-	void DebugDrawPhysics2d(bool bDraw)					{ m_DrawPhys2d.SetDrawEnabled(bDraw); }
+	void SetDrawPhys2d(bool bDebugDraw);
 
 	void SetPause(bool bPause);
 

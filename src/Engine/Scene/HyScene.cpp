@@ -34,10 +34,7 @@ HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :
 {
 	IHyInstance::sm_pScene = this;
 
-	m_b2World.SetDebugDraw(&m_DrawPhys2d);
 	m_b2World.SetContactListener(&m_Phys2dContactListener);
-	
-	m_DrawPhys2d.SetFlags(b2Draw::e_shapeBit);// | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
 
 	// Link HyScene to all classes that access it
 	HyPhysEntity2d::sm_b2WorldRef = &m_b2World;
@@ -130,6 +127,11 @@ b2World &HyScene::GetPhysics2d()
 	return m_b2World;
 }
 
+void HyScene::SetDrawPhys2d(bool bDebugDraw)
+{
+	m_DrawPhys2d.SetDrawEnabled(bDebugDraw);
+}
+
 void HyScene::SetPause(bool bPause)
 {
 	m_bPauseGame = bPause;
@@ -140,6 +142,7 @@ void HyScene::SetPause(bool bPause)
 void HyScene::UpdatePhysics()
 {
 	HY_PROFILE_BEGIN(HYPROFILERSECTION_Physics)
+		m_DrawPhys2d.GetDrawList().clear();
 		m_b2World.Step(Hy_UpdateStep(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 	HY_PROFILE_END
 }
@@ -206,9 +209,19 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 
 		rendererRef.AppendDrawable2d(i, *m_NodeList_LoadedDrawable2d[i], uiCameraMask);
 	}
+	
+	// Debug physics draws
+	std::vector<HyPrimitive2d> &physDrawListRef = m_DrawPhys2d.GetDrawList();
+	for(uint32 i = 0; i < static_cast<uint32>(physDrawListRef.size()); ++i)
+	{
+		if(CalculateCameraMask(physDrawListRef[i], uiCameraMask) == false)
+			continue;
+
+		rendererRef.AppendDrawable2d(i, physDrawListRef[i], uiCameraMask);
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// SetCullMaskBit for each camera
+	// SetCullMaskBit for each enabled camera
 	uint32 iBit = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{

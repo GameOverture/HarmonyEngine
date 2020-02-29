@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyDebugPhys2d.h
+ *	HyDrawPhys2d.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,28 +7,28 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HyDebugPhys2d_h__
-#define HyDebugPhys2d_h__
+#ifndef HyDrawPhys2d_h__
+#define HyDrawPhys2d_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
 
 // forward declaration
 class HyEntity2d;
 
-class HyDebugPhys2d : public b2Draw
+class HyDrawPhys2d : public b2Draw
 {
-	bool					m_bDrawEnabled;
-
-	//vector<HyEntity2d *>	m_vDrawInsts;
+	bool						m_bDrawEnabled;
+	std::vector<HyPrimitive2d>	m_DrawList;
 
 public:
-	HyDebugPhys2d(void);
-	virtual ~HyDebugPhys2d(void);
+	HyDrawPhys2d();
+	virtual ~HyDrawPhys2d(void);
 
 	void SetDrawEnabled(bool bEnable)			{ m_bDrawEnabled = bEnable; }
 	bool IsDrawEnabled()						{ return m_bDrawEnabled; }
 
-	void Reset();
+	std::vector<HyPrimitive2d> &GetDrawList();
 
 	//size_t GetNumPhysDraws()					{ return m_vDrawInsts.size(); }
 	//HyEntity2d *GetInstPtr(int32 iIndex)		{ return m_vDrawInsts[iIndex]; }
@@ -56,4 +56,4 @@ public:
 	virtual void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color) override;
 };
 
-#endif /* HyDebugPhys2d_h__ */
+#endif /* HyDrawPhys2d_h__ */
