@@ -18,10 +18,18 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 	ITreeModel(1, QStringList(), parent),
 	m_pEntityModel(pEntityModel)
 {
-	if(insertRow(0) == false)
+	// Insert self as root node
+	QModelIndex parentIndex = FindIndex<ExplorerItem *>(m_pRootItem->data(0).value<ExplorerItem *>(), 0);
+	int iRow = m_pRootItem->childCount();
+	if(insertRow(iRow, parentIndex) == false)
 	{
-		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - insertRow failed", LOGTYPE_Error);
+		HyGuiLog("ExplorerModel::InsertNewItem() - insertRow failed", LOGTYPE_Error);
+		return;
 	}
+	QVariant v;
+	v.setValue<ProjectItem *>(&pEntityModel->GetItem());
+	if(setData(index(iRow, 0, parentIndex), v) == false)
+		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 }
 
 /*virtual*/ EntityNodeTreeModel::~EntityNodeTreeModel()
@@ -54,24 +62,24 @@ bool EntityNodeTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFa
 	return true;
 }
 
-bool EntityNodeTreeModel::AddChildItem(ExplorerItem *pItem)
+bool EntityNodeTreeModel::InsertNewChild(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem /*= nullptr*/, int iRow /*= -1*/)
 {
-	if(IsItemValid(pItem, false) == false)
-		return false;
+	if(pParentTreeItem == nullptr)
+		pParentTreeItem = GetItem(FindIndex<ExplorerItem *>(&m_pEntityModel->GetItem(), 0));
 
-	if(insertRow(m_pRootItem->childCount(), createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)) == false)
+	QModelIndex parentIndex = FindIndex<ExplorerItem *>(pParentTreeItem->data(0).value<ExplorerItem *>(), 0);
+	iRow = (iRow == -1 ? pParentTreeItem->childCount() : iRow);
+
+	if(insertRow(iRow, parentIndex) == false)
 	{
-		HyGuiLog("EntityNodeTreeModel::AddChildItem() - insertRow failed", LOGTYPE_Error);
+		HyGuiLog("ExplorerModel::InsertNewItem() - insertRow failed", LOGTYPE_Error);
 		return false;
 	}
 
 	QVariant v;
-	v.setValue<ExplorerItem *>(pItem);
-	if(setData(index(m_pRootItem->childCount() - 1, 0, createIndex(m_pRootItem->childNumber(), 0, m_pRootItem)), v) == false)
-	{
-		HyGuiLog("EntityNodeTreeModel::AddChildItem() - setData failed", LOGTYPE_Error);
-		return false;
-	}
+	v.setValue<ExplorerItem *>(pNewItem);
+	if(setData(index(iRow, 0, parentIndex), v) == false)
+		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 
 	return true;
 }
@@ -286,9 +294,9 @@ void EntityModel::AddNewChildren(const ProjectItemMimeData *pMimeData)
 		if(itemObj["project"].toString().toLower() == pProject->GetAbsPath().toLower())
 		{
 			QString sItemPath = itemObj["itemName"].toString();
-			ExplorerItem *pItem = pProject->GetExplorerModel().FindItemByItemPath(pProject, sItemPath);
+			ExplorerItem *pItem = pProject->GetExplorerModel().FindItemByItemPath(pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
 
-			m_TreeModel.AddChildItem(pItem);
+			m_TreeModel.InsertNewChild(pItem);
 			continue;
 		}
 		else
@@ -320,7 +328,12 @@ ProjectItem *EntityModel::CreateNewPrimitive()
 
 /*virtual*/ FileDataPair EntityModel::GetStateFileData(uint32 uiIndex) const /*override*/
 {
-	return FileDataPair();
+	FileDataPair stateFileData;
+	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
+
+	//stateFileData.m_Data.insert("something", );
+
+	return stateFileData;
 }
 
 /*virtual*/ QList<AtlasFrame *> EntityModel::GetAtlasFrames() const /*override*/

@@ -17,7 +17,7 @@ class ExplorerItem;
 
 enum EntityCmd
 {
-	ENTITYCMD_AddNewChild = 0,
+	ENTITYCMD_AddNewChildren = 0,
 	ENTITYCMD_AddPrimitive,
 };
 
@@ -25,10 +25,10 @@ class EntityUndoCmd : public QUndoCommand
 {
 	const EntityCmd		m_eCMD;
 	ProjectItem &		m_EntityItemRef;
-	ExplorerItem *		m_pParameter;
+	QList<QVariant>		m_ParameterList;
 
 public:
-	EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, ExplorerItem *pParameter, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<QVariant> parameterList, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd();
 
 	virtual void redo() override;

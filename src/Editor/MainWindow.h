@@ -71,6 +71,9 @@ public:
 
 	static QMenu *GetNewItemMenu();
 
+	static ExplorerWidget *GetExplorer();
+	static IWidget *GetItemProperties();
+
 protected:
 	virtual void closeEvent(QCloseEvent *pEvent) override;
 

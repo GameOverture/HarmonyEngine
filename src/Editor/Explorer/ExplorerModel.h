@@ -26,7 +26,7 @@ public:
 	QStringList GetOpenProjectPaths();
 	QStringList GetPrefixList(Project *pProject);
 	QList<ExplorerItem *> GetItemsRecursively(const QModelIndex &indexRef);
-	ExplorerItem *FindItemByItemPath(Project *pProject, QString sPath);
+	ExplorerItem *FindItemByItemPath(Project *pProject, QString sPath, HyGuiItemType eType);
 
 	Project *AddProject(const QString sNewProjectFilePath);
 	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, FileDataPair initItemFileData, bool bIsPendingSave);
@@ -51,7 +51,7 @@ private:
 	bool InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
 	TreeModelItem *FindProjectTreeItem(Project *pProject);
 	TreeModelItem *FindPrefixTreeItem(const QModelIndex &indexRef) const;
-	QModelIndex FindIndexByItemPath(Project *pProject, QString sPath);
+	QModelIndex FindIndexByItemPath(Project *pProject, QString sPath, HyGuiItemType eType);
 };
 
 #endif // EXPLORERMODEL_H

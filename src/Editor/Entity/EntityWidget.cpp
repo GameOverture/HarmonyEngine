@@ -14,6 +14,7 @@
 #include "EntityUndoCmds.h"
 #include "GlobalUndoCmds.h"
 #include "DlgInputName.h"
+#include "MainWindow.h"
 
 EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
@@ -62,8 +63,19 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
 {
-	ExplorerItem *pExplorerItem = nullptr;//m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
-	ui->actionAddSelectedChild->setEnabled(pExplorerItem && pExplorerItem->IsProjectItem());
+	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	MainWindow::GetExplorer()->GetSelectedItems(selectedItems, selectedPrefixes);
+	bool bEnableAddNodeBtn = false;
+	EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
+	for(auto pItem : selectedItems)
+	{
+		if(pTreeModel->IsItemValid(pItem, true))
+		{
+			bEnableAddNodeBtn = true;
+			break;
+		}
+	}
+	ui->actionAddSelectedChild->setEnabled(bEnableAddNodeBtn);
 
 	bool bFrameIsSelected = true;
 	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
@@ -112,30 +124,33 @@ ExplorerItem *EntityWidget::GetSelectedNode()
 
 void EntityWidget::on_actionAddSelectedChild_triggered()
 {
-	ExplorerItem *pHighlightedExplorerItem = nullptr;//m_ItemRef.GetProject().GetExplorerWidget()->GetCurItemSelected();
-	if(pHighlightedExplorerItem == nullptr)
+	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	MainWindow::GetExplorer()->GetSelectedItems(selectedItems, selectedPrefixes);
+	if(selectedItems.empty())
 	{
-		HyGuiLog("Currently selected item in Explorer is not a ProjectItem. Cannot add child to entity.", LOGTYPE_Error);
+		HyGuiLog("Currently selected item(s) in Explorer is/are not a ProjectItem. Cannot add node(s) to entity.", LOGTYPE_Error);
 		return;
 	}
 
-	EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
-	if(pTreeModel->IsItemValid(pHighlightedExplorerItem, true) == false)
-		return;
+	QList<QVariant> validItemList;
+	for(auto pItem : selectedItems)
+	{
+		EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
+		if(pTreeModel->IsItemValid(pItem, true) == false)
+			continue;
 	
-	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChild, m_ItemRef, pHighlightedExplorerItem);
+		QVariant v;
+		v.setValue<ExplorerItem *>(pItem);
+		validItemList.push_back(v);
+	}
+
+	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChildren, m_ItemRef, validItemList);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPrimitive_triggered()
 {
-	//if(GetCurSelectedTreeItem() == nullptr)
-	//{
-	//	HyGuiLog("Currently selected entity tree item is nullptr. Cannot add primitive.", LOGTYPE_Error);
-	//	return;
-	//}
-
-	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, static_cast<EntityModel *>(m_ItemRef.GetModel())->CreateNewPrimitive());
+	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, QVariantList());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

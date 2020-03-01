@@ -12,10 +12,10 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 
-EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, ExplorerItem *pParameter, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<QVariant> parameterList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_eCMD(eCMD),
-	m_pParameter(pParameter),
+	m_ParameterList(parameterList),
 	m_EntityItemRef(entityItemRef)
 {
 	if(m_EntityItemRef.GetType() != ITEM_Entity)
@@ -23,8 +23,8 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, Explore
 
 	switch(m_eCMD)
 	{
-	case ENTITYCMD_AddNewChild:
-		setText("Add New Child");
+	case ENTITYCMD_AddNewChildren:
+		setText("Add New Child Node(s)");
 		break;
 
 	case ENTITYCMD_AddPrimitive:
@@ -41,9 +41,15 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, Explore
 {
 	switch(m_eCMD)
 	{
-	case ENTITYCMD_AddNewChild:
-		//static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChild(m_pParameter);
-		break;
+	case ENTITYCMD_AddNewChildren: {
+		QList<ExplorerItem *> itemList;
+		for(auto param : m_ParameterList)
+			itemList.push_back(param.value<ExplorerItem *>());
+
+		ProjectItemMimeData mimeData(itemList);
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChildren(&mimeData);
+		break; }
+
 	case ENTITYCMD_AddPrimitive:
 		break;
 	}
@@ -53,9 +59,12 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, Explore
 {
 	switch(m_eCMD)
 	{
-	case ENTITYCMD_AddNewChild:
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(m_pParameter);
-		break;
+	case ENTITYCMD_AddNewChildren: {
+		for(auto param : m_ParameterList)
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(param.value<ExplorerItem *>());
+		
+		break; }
+
 	case ENTITYCMD_AddPrimitive:
 		break;
 	}

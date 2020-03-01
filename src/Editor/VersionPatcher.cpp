@@ -59,7 +59,7 @@
 	// -1 means file is missing (or didn't open)
 	if(uiMetaItemsVersion == -1 || uiDataItemsVersion == -1 || uiMetaAtlasVersion == -1 || uiDataAtlasVersion == -1)
 	{
-		HyGuiLog("Missing files between assets and meta. Skipping Version Patcher", LOGTYPE_Warning);
+		HyGuiLog("Missing files between assets and meta. Skipping Version Patcher", LOGTYPE_Info);
 		return;
 	}
 
