@@ -502,8 +502,12 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 	if(m_pPhysicsBody != nullptr && m_pPhysicsBody->IsActive())
 	{
-		pos.Set(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
-		rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()));
+		pos.SetWithoutDirty(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
+		rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()), false);
+
+		// Manually dirty transform flags without
+		uint32 uiDirtyFlags = DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB;
+		ApplyDirty(uiDirtyFlags);
 	}
 
 	OnUpdate();
@@ -543,6 +547,15 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 }
 
 /*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
+{
+	// Transform dirty flag gets set by user calls. Physics updates internally without dirtying
+	if(m_pPhysicsBody && (uiDirtyFlags & DIRTY_Transform) != 0)
+		m_pPhysicsBody->SetTransform(b2Vec2(pos.X(), pos.Y()), glm::radians(rot.Get()));
+
+	ApplyDirty(uiDirtyFlags);
+}
+
+void HyEntity2d::ApplyDirty(uint32 uiDirtyFlags)
 {
 	IHyNode2d::SetDirty(uiDirtyFlags);
 

@@ -138,11 +138,16 @@ void HyShape2d::SetAsNothing()
 
 void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
 {
+	SetAsLineSegment(b2Vec2(pt1.x, pt1.y), b2Vec2(pt2.x, pt2.y));
+}
+
+void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
+{
 	m_eType = HYSHAPE_LineSegment;
 
 	delete m_pShape;
 	m_pShape = HY_NEW b2EdgeShape();
-	static_cast<b2EdgeShape *>(m_pShape)->Set(b2Vec2(pt1.x, pt1.y), b2Vec2(pt2.x, pt2.y));
+	static_cast<b2EdgeShape *>(m_pShape)->Set(pt1, pt2);
 }
 
 void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -180,25 +185,35 @@ void HyShape2d::SetAsCircle(float fRadius)
 
 void HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
 {
+	SetAsCircle(b2Vec2(ptCenter.x, ptCenter.y), fRadius);
+}
+
+void HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
+{
 	m_eType = HYSHAPE_Circle;
 
 	delete m_pShape;
 	m_pShape = HY_NEW b2CircleShape();
-	static_cast<b2CircleShape *>(m_pShape)->m_p.Set(ptCenter.x, ptCenter.y);
+	static_cast<b2CircleShape *>(m_pShape)->m_p = center;
 	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
 }
 
 void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
 {
-	m_eType = HYSHAPE_Polygon;
-
 	std::vector<b2Vec2> vertList;
 	for(uint32 i = 0; i < uiCount; ++i)
 		vertList.push_back(b2Vec2(pPointArray[i].x, pPointArray[i].y));
 
+	SetAsPolygon(vertList.data(), static_cast<uint32>(vertList.size()));
+}
+
+void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
+{
+	m_eType = HYSHAPE_Polygon;
+
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
-	static_cast<b2PolygonShape *>(m_pShape)->Set(&vertList[0], uiCount);
+	static_cast<b2PolygonShape *>(m_pShape)->Set(pPointArray, uiCount);
 }
 
 void HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)

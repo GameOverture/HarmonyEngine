@@ -37,9 +37,9 @@ float HyAnimFloat::Get() const
 	return m_fValueRef;
 }
 
-void HyAnimFloat::Set(float fValue)
+void HyAnimFloat::Set(float fValue, bool bMarkDirty /*= true*/)
 {
-	if(m_fValueRef != fValue)
+	if(bMarkDirty && m_fValueRef != fValue)
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
 
 	m_fValueRef = fValue;
