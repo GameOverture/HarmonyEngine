@@ -114,6 +114,12 @@ void HyAnimVec2::Set(const HyAnimVec2 &srcVec)
 	m_AnimFloatList[1].Set(srcVec[1]);
 }
 
+void HyAnimVec2::SetWithoutDirty(float fX, float fY)
+{
+	m_AnimFloatList[0].Set(fX, false);
+	m_AnimFloatList[1].Set(fY, false);
+}
+
 void HyAnimVec2::Offset(float fX, float fY)
 {
 	m_AnimFloatList[0] += fX;

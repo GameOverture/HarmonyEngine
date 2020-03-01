@@ -45,7 +45,7 @@ public:
 	~HyAnimFloat(void);
 
 	float Get() const;
-	void Set(float fValue);
+	void Set(float fValue, bool bMarkDirty = true);
 	void Set(const HyAnimFloat &valueRef);
 	void Offset(float fValue);
 
