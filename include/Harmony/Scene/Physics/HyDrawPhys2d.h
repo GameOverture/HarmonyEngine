@@ -2,7 +2,7 @@
  *	HyDrawPhys2d.h
  *	
  *	Harmony Engine
- *	Copyright (c) 2013 Jason Knobler
+ *	Copyright (c) 2020 Jason Knobler
  *
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -13,25 +13,15 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
 
-// forward declaration
-class HyEntity2d;
-
 class HyDrawPhys2d : public b2Draw
 {
-	bool						m_bDrawEnabled;
 	std::vector<HyPrimitive2d>	m_DrawList;
 
 public:
 	HyDrawPhys2d();
 	virtual ~HyDrawPhys2d(void);
 
-	void SetDrawEnabled(bool bEnable)			{ m_bDrawEnabled = bEnable; }
-	bool IsDrawEnabled()						{ return m_bDrawEnabled; }
-
 	std::vector<HyPrimitive2d> &GetDrawList();
-
-	//size_t GetNumPhysDraws()					{ return m_vDrawInsts.size(); }
-	//HyEntity2d *GetInstPtr(int32 iIndex)		{ return m_vDrawInsts[iIndex]; }
 
 	// Draw a closed polygon provided in CCW order.
 	virtual void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;

@@ -240,20 +240,22 @@ bool IHyNode::IsRegistered() const
 	HyAssert((uiDirtyFlags & ~DIRTY_ALL) == 0, "IHyNode::SetDirty was passed flags that are not apart of the DirtyFlag enum");
 
 	// Special cases
-	if((uiDirtyFlags & (DIRTY_BoundingVolume | DIRTY_Transform)) != 0)
+	if((uiDirtyFlags & (DIRTY_BoundingVolume | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale)) != 0)
 		uiDirtyFlags |= DIRTY_WorldAABB;
 
 	m_uiFlags |= uiDirtyFlags;
 }
 
-bool IHyNode::IsDirty(DirtyFlag eDirtyType) const
+bool IHyNode::IsDirty(uint32 uiDirtyFlags) const
 {
-	return ((m_uiFlags & eDirtyType) != 0);
+	HyAssert((uiDirtyFlags & ~DIRTY_ALL) == 0, "IHyNode::IsDirty was passed flags that are not apart of the DirtyFlag enum");
+	return ((m_uiFlags & uiDirtyFlags) != 0);
 }
 
-void IHyNode::ClearDirty(DirtyFlag eDirtyType)
+void IHyNode::ClearDirty(uint32 uiDirtyFlags)
 {
-	m_uiFlags &= ~eDirtyType;
+	HyAssert((uiDirtyFlags & ~DIRTY_ALL) == 0, "IHyNode::ClearDirty was passed flags that are not apart of the DirtyFlag enum");
+	m_uiFlags &= ~uiDirtyFlags;
 }
 
 void IHyNode::SetRegistered(bool bRegister)

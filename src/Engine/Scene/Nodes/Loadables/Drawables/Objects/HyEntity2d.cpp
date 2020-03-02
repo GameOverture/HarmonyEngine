@@ -14,6 +14,8 @@
 #include "Assets/Nodes/HyEntityData.h"
 #include "HyEngine.h"
 
+/*static*/ float HyEntity2d::sm_fPhysPpmConversion = 0.0f;
+
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_Entity, "", "", pParent),
 	m_uiAttributes(0),
@@ -346,7 +348,8 @@ void HyEntity2d::DisableMouseInput()
 	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
 }
 
-void HyEntity2d::PhysInit(HyPhysicsType eType,
+void HyEntity2d::PhysInit(HyPhysicsGrid &physGridRef,
+						  HyPhysicsType eType,
 						  bool bIsEnabled /*= true*/,
 						  bool bIsFixedRotation /*= false*/,
 						  bool bIsCcd /*= false*/,
@@ -354,10 +357,7 @@ void HyEntity2d::PhysInit(HyPhysicsType eType,
 						  bool bAllowSleep /*= true*/,
 						  float fGravityScale /*= 1.0f*/)
 {
-	b2World &worldRef = Hy_Physics2d();
-
-	if(m_pPhysicsBody)
-		worldRef.DestroyBody(m_pPhysicsBody);
+	PhysRelease();
 
 	b2BodyDef bodyDef;
 	bodyDef.userData = this;
@@ -372,7 +372,7 @@ void HyEntity2d::PhysInit(HyPhysicsType eType,
 	bodyDef.allowSleep = bAllowSleep;
 	bodyDef.gravityScale = fGravityScale;
 
-	m_pPhysicsBody = worldRef.CreateBody(&bodyDef);
+	m_pPhysicsBody = physGridRef.CreateBody(&bodyDef);
 }
 
 HyPhysicsType HyEntity2d::PhysGetType() const
@@ -394,7 +394,12 @@ bool HyEntity2d::PhysIsEnabled() const
 void HyEntity2d::PhysSetEnabled(bool bEnable)
 {
 	if(m_pPhysicsBody)
+	{
+		if(bEnable)
+			m_pPhysicsBody->SetTransform(b2Vec2(pos.X(), pos.Y()), glm::radians(rot.Get()));
+
 		m_pPhysicsBody->SetActive(bEnable);
+	}
 }
 
 bool HyEntity2d::PhysIsFixedRotation() const
@@ -452,11 +457,107 @@ void HyEntity2d::PhysSetGravityScale(float fGravityScale)
 		m_pPhysicsBody->SetGravityScale(fGravityScale);
 }
 
+glm::vec2 HyEntity2d::PhysWorldCenterMass() const
+{
+	if(m_pPhysicsBody)
+		return glm::vec2(m_pPhysicsBody->GetWorldCenter().x, m_pPhysicsBody->GetWorldCenter().y);
+
+	return glm::vec2();
+}
+
+glm::vec2 HyEntity2d::PhysLocalCenterMass() const
+{
+	if(m_pPhysicsBody)
+		return glm::vec2(m_pPhysicsBody->GetLocalCenter().x, m_pPhysicsBody->GetLocalCenter().y);
+
+	return glm::vec2();
+}
+
+glm::vec2 HyEntity2d::PhysGetLinearVelocity() const
+{
+	if(m_pPhysicsBody)
+		return glm::vec2(m_pPhysicsBody->GetLinearVelocity().x, m_pPhysicsBody->GetLinearVelocity().y);
+
+	return glm::vec2();
+}
+
+void HyEntity2d::PhysSetLinearVelocity(glm::vec2 vVelocity)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetLinearVelocity(b2Vec2(vVelocity.x, vVelocity.y));
+}
+
+float HyEntity2d::PhysGetAngularVelocity() const
+{
+	if(m_pPhysicsBody)
+		return m_pPhysicsBody->GetAngularVelocity();
+
+	return 0.0f;
+}
+
+void HyEntity2d::PhysSetAngularVelocity(float fOmega)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetAngularVelocity(fOmega);
+}
+
+void HyEntity2d::PhysApplyForce(const glm::vec2 &vForce, const glm::vec2 &ptPoint, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyForce(b2Vec2(vForce.x, vForce.y), b2Vec2(ptPoint.x, ptPoint.y), bWake);
+}
+
+void HyEntity2d::PhysApplyForceToCenter(const glm::vec2 &vForce, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyForceToCenter(b2Vec2(vForce.x, vForce.y), bWake);
+}
+
+void HyEntity2d::PhysApplyTorque(float fTorque, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyTorque(fTorque, bWake);
+}
+
+void HyEntity2d::PhysApplyLinearImpulse(const glm::vec2 &vImpulse, const glm::vec2 &ptPoint, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyLinearImpulse(b2Vec2(vImpulse.x, vImpulse.y), b2Vec2(ptPoint.x, ptPoint.y), bWake);
+}
+
+void HyEntity2d::PhysApplyLinearImpulseToCenter(const glm::vec2 &vImpulse, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyLinearImpulseToCenter(b2Vec2(vImpulse.x, vImpulse.y), bWake);
+}
+
+void HyEntity2d::PhysApplyAngularImpulse(float fImpulse, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyAngularImpulse(fImpulse, bWake);
+}
+
+float HyEntity2d::PhysGetMass() const
+{
+	if(m_pPhysicsBody)
+		return m_pPhysicsBody->GetMass();
+
+	return 0.0f;
+}
+
+float HyEntity2d::PhysGetInertia() const
+{
+	if(m_pPhysicsBody)
+		return m_pPhysicsBody->GetInertia();
+
+	return 0.0f;
+}
+
 void HyEntity2d::PhysRelease()
 {
 	if(m_pPhysicsBody)
 	{
-		Hy_Physics2d().DestroyBody(m_pPhysicsBody);
+		m_pPhysicsBody->GetWorld()->DestroyBody(m_pPhysicsBody);
 		m_pPhysicsBody = nullptr;
 	}
 }
@@ -596,30 +697,12 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	{
 		if(m_pPhysicsBody->IsActive())
 		{
-			if(pos.IsAnimating() || rot.IsAnimating())
-			{
-				m_pPhysicsBody->SetTransform(b2Vec2(pos.X(), pos.Y()), glm::radians(rot.Get()));
+			pos.SetWithoutDirty(m_pPhysicsBody->GetPosition().x * Hy_InitValues().fPixelsPerMeter, m_pPhysicsBody->GetPosition().y * Hy_InitValues().fPixelsPerMeter);
+			rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()), false);
 
-				m_pPhysicsBody->SetTransform(m_pPhysicsBody->GetPosition(), glm::radians(rot.Get()));
-			}
-
-			if(m_pPhysicsBody->IsFixedRotation())
-			{
-
-			}
-			else
-			{
-			}
+			// Manually dirty transform flags without invoking the actual callback SetDirty() so the physics body doesn't get set over again
+			ApplyDirty(DIRTY_Position | DIRTY_Rotation);
 		}
-		else
-		{
-		}
-		pos.SetWithoutDirty(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
-		rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()), false);
-
-		// Manually dirty transform flags without
-		uint32 uiDirtyFlags = DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB;
-		//ApplyDirty(uiDirtyFlags);
 	}
 
 	OnUpdate();
@@ -659,6 +742,22 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 }
 
 /*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
+{
+	if(m_pPhysicsBody)
+	{
+		uint32 uiTransformFlags = (uiDirtyFlags & (DIRTY_Position | DIRTY_Rotation));
+		if((DIRTY_Position | DIRTY_Rotation) == uiTransformFlags)
+			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * sm_fPhysPpmConversion, pos.Y() * sm_fPhysPpmConversion), glm::radians(rot.Get()));
+		else if(DIRTY_Position == uiTransformFlags)
+			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * sm_fPhysPpmConversion, pos.Y() * sm_fPhysPpmConversion), m_pPhysicsBody->GetAngle());
+		else if(DIRTY_Rotation == uiTransformFlags)
+			m_pPhysicsBody->SetTransform(m_pPhysicsBody->GetPosition(), glm::radians(rot.Get()));
+	}
+
+	ApplyDirty(uiDirtyFlags);
+}
+
+void HyEntity2d::ApplyDirty(uint32 uiDirtyFlags)
 {
 	IHyNode2d::SetDirty(uiDirtyFlags);
 

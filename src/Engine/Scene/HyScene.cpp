@@ -25,19 +25,12 @@ bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 
-HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :
-	m_b2World(b2Vec2(0.0f, -10.0f)),
-	m_iPhysVelocityIterations(8),
-	m_iPhysPositionIterations(3),
+HyScene::HyScene(std::vector<HyWindow *> &WindowListRef, float fPixelsPerMeter) :
 	m_WindowListRef(WindowListRef),
 	m_bPauseGame(false)
 {
 	IHyInstance::sm_pScene = this;
-
-	m_b2World.SetContactListener(&m_Phys2dContactListener);
-
-	// Link HyScene to all classes that access it
-	HyPhysEntity2d::sm_b2WorldRef = &m_b2World;
+	HyEntity2d::sm_fPhysPpmConversion = 1 / fPixelsPerMeter;
 }
 
 HyScene::~HyScene(void)
@@ -122,16 +115,6 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyInstance2d *> &nodeListOut)
 	nodeListOut = m_NodeList_LoadedDrawable2d;
 }
 
-b2World &HyScene::GetPhysics2d()
-{
-	return m_b2World;
-}
-
-void HyScene::SetDrawPhys2d(bool bDebugDraw)
-{
-	m_DrawPhys2d.SetDrawEnabled(bDebugDraw);
-}
-
 void HyScene::SetPause(bool bPause)
 {
 	m_bPauseGame = bPause;
@@ -142,8 +125,8 @@ void HyScene::SetPause(bool bPause)
 void HyScene::UpdatePhysics()
 {
 	HY_PROFILE_BEGIN(HYPROFILERSECTION_Physics)
-		m_DrawPhys2d.GetDrawList().clear();
-		m_b2World.Step(Hy_UpdateStep(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	for(auto physGrid : m_PhysicsGridList)
+		physGrid->Update();
 	HY_PROFILE_END
 }
 
@@ -211,13 +194,16 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	}
 	
 	// Debug physics draws
-	std::vector<HyPrimitive2d> &physDrawListRef = m_DrawPhys2d.GetDrawList();
-	for(uint32 i = 0; i < static_cast<uint32>(physDrawListRef.size()); ++i)
+	for(auto physGrid : m_PhysicsGridList)
 	{
-		if(CalculateCameraMask(physDrawListRef[i], uiCameraMask) == false)
-			continue;
+		std::vector<HyPrimitive2d> &physDrawListRef = physGrid->GetDebugDrawList();
+		for(uint32 i = 0; i < static_cast<uint32>(physDrawListRef.size()); ++i)
+		{
+			if(CalculateCameraMask(physDrawListRef[i], uiCameraMask) == false)
+				continue;
 
-		rendererRef.AppendDrawable2d(i, physDrawListRef[i], uiCameraMask);
+			rendererRef.AppendDrawable2d(i, physDrawListRef[i], uiCameraMask);
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

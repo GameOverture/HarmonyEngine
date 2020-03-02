@@ -26,7 +26,7 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Console(initStruct.bUseConsole, initStruct.consoleInfo),
 	m_Audio(m_Init.sDataDir),
-	m_Scene(m_WindowManager.GetWindowList()),
+	m_Scene(m_WindowManager.GetWindowList(), initStruct.fPixelsPerMeter),
 	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
 	m_GuiComms(m_Init.uiDebugPort, m_Assets),
 	m_Time(m_Init.uiUpdateTickMs),
@@ -169,12 +169,6 @@ bool HyEngine::PollPlatformApi()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Input() was invoked before engine has been initialized.");
 	return HyEngine::sm_pInstance->m_Input;
-}
-
-/*friend*/ b2World &Hy_Physics2d()
-{
-	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Physics2d() was invoked before engine has been initialized.");
-	return HyEngine::sm_pInstance->m_Scene.GetPhysics2d();
 }
 
 /*friend*/ HyDiagnostics &Hy_Diagnostics()

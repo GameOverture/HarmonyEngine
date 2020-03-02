@@ -2,7 +2,7 @@
  *	HyDrawPhys2d.cpp
  *	
  *	Harmony Engine
- *	Copyright (c) 2013 Jason Knobler
+ *	Copyright (c) 2020 Jason Knobler
  *
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -11,8 +11,7 @@
 #include "Scene/Physics/HyDrawPhys2d.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
 
-HyDrawPhys2d::HyDrawPhys2d() :
-	m_bDrawEnabled(false)
+HyDrawPhys2d::HyDrawPhys2d()
 {
 }
 

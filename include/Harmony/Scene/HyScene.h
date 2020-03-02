@@ -11,6 +11,7 @@
 #define HyScene_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Scene/Physics/HyPhysicsGrid.h"
 #include "Scene/Physics/HyBox2dRuntime.h"
 #include "Scene/Physics/HyDrawPhys2d.h"
 
@@ -30,13 +31,6 @@ class HyScene
 {
 	static bool											sm_bInst2dOrderingDirty;
 
-	b2World												m_b2World;
-	int32												m_iPhysVelocityIterations;
-	int32												m_iPhysPositionIterations;
-
-	HyDrawPhys2d										m_DrawPhys2d;
-	HyBox2dRuntime										m_Phys2dContactListener;
-
 	std::vector<HyWindow *> &							m_WindowListRef;
 
 	// TODO: Make tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
@@ -48,8 +42,10 @@ class HyScene
 	std::vector<IHyInstance2d *>						m_NodeList_LoadedDrawable2d;
 	std::vector<IHyInstance3d *>						m_NodeList_LoadedDrawable3d;
 
+	std::vector<HyPhysicsGrid *>						m_PhysicsGridList;
+
 public:
-	HyScene(std::vector<HyWindow *> &WindowListRef);
+	HyScene(std::vector<HyWindow *> &WindowListRef, float fPixelsPerMeter);
 	~HyScene(void);
 
 	static void SetInstOrderingDirty()					{ sm_bInst2dOrderingDirty = true; }
@@ -66,9 +62,6 @@ public:
 	void RemoveNode_Loaded(const IHyInstance3d *pDrawable);
 
 	void CopyAllLoadedNodes(std::vector<IHyInstance2d *> &nodeListOut);
-
-	b2World &GetPhysics2d();
-	void SetDrawPhys2d(bool bDebugDraw);
 
 	void SetPause(bool bPause);
 

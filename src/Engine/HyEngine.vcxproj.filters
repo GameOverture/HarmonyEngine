@@ -248,6 +248,9 @@
     <ClCompile Include="Scene\Physics\HyDrawPhys2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Physics\HyPhysicsGrid.cpp">
+      <Filter>Scene\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -683,6 +686,9 @@
       <Filter>Scene\Nodes\Loadables\Drawables\Instances\Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyDrawPhys2d.h">
+      <Filter>Scene\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysicsGrid.h">
       <Filter>Scene\Physics</Filter>
     </ClInclude>
   </ItemGroup>

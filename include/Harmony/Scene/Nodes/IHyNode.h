@@ -35,29 +35,31 @@ protected:
 	{
 		DIRTY_BoundingVolume		= 1 << 7,
 		DIRTY_WorldAABB				= 1 << 8,
-		DIRTY_Transform				= 1 << 9,
-		DIRTY_Color					= 1 << 10,
-		DIRTY_Scissor				= 1 << 11,
+		DIRTY_Position				= 1 << 9,
+		DIRTY_Rotation				= 1 << 10,
+		DIRTY_Scale					= 1 << 11,
+		DIRTY_Color					= 1 << 12,
+		DIRTY_Scissor				= 1 << 13,
 
-		DIRTY_ALL =					DIRTY_BoundingVolume | DIRTY_WorldAABB | DIRTY_Transform | DIRTY_Color | DIRTY_Scissor
+		DIRTY_ALL =					DIRTY_BoundingVolume | DIRTY_WorldAABB | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale | DIRTY_Color | DIRTY_Scissor
 	};
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
 	enum ExplicitFlag // NOTE: continue the bits in DirtyFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		EXPLICIT_Visible			= 1 << 12,
-		EXPLICIT_PauseUpdate		= 1 << 13,
-		EXPLICIT_Scissor			= 1 << 14,
-		EXPLICIT_Stencil			= 1 << 15,
-		EXPLICIT_DisplayOrder		= 1 << 16,
-		EXPLICIT_CoordinateSystem	= 1 << 17,
+		EXPLICIT_Visible			= 1 << 14,
+		EXPLICIT_PauseUpdate		= 1 << 15,
+		EXPLICIT_Scissor			= 1 << 16,
+		EXPLICIT_Stencil			= 1 << 17,
+		EXPLICIT_DisplayOrder		= 1 << 18,
+		EXPLICIT_CoordinateSystem	= 1 << 19,
 	};
 	// Various boolean values for node stored in these flags for smaller memory footprint
 	enum SettingFlag // NOTE: continue the bits in ExplicitFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		SETTING_IsRegistered		= 1 << 18,
-		SETTING_IsVisible			= 1 << 19,
-		SETTING_IsPauseUpdate		= 1 << 20,
+		SETTING_IsRegistered		= 1 << 20,
+		SETTING_IsVisible			= 1 << 21,
+		SETTING_IsPauseUpdate		= 1 << 22,
 	};
 	uint32							m_uiFlags;
 
@@ -101,8 +103,8 @@ protected:
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
 
 	virtual void SetDirty(uint32 uiDirtyFlags);
-	bool IsDirty(DirtyFlag eDirtyType) const;
-	void ClearDirty(DirtyFlag eDirtyType);
+	bool IsDirty(uint32 uiDirtyFlags) const;
+	void ClearDirty(uint32 uiDirtyFlags);
 
 private:
 	void SetRegistered(bool bRegister);

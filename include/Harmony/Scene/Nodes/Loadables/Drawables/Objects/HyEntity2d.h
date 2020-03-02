@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
+#include "Scene/Physics/HyPhysicsGrid.h"
 
 class HyEntity2d : public IHyDrawable2d
 {
@@ -37,6 +38,7 @@ protected:
 	void *							m_pMouseInputUserParam;
 
 	b2Body *						m_pPhysicsBody;
+	static float					sm_fPhysPpmConversion;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -97,7 +99,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PHYSICS
-	void PhysInit(HyPhysicsType eType,
+	void PhysInit(HyPhysicsGrid &physGridRef,
+				  HyPhysicsType eType,
 				  bool bIsEnabled = true,
 				  bool bIsFixedRotation = false,
 				  bool bIsCcd = false,
@@ -122,7 +125,7 @@ public:
 
 	glm::vec2 PhysWorldCenterMass() const;
 	glm::vec2 PhysLocalCenterMass() const;
-	const glm::vec2 PhysGetLinearVelocity() const;
+	glm::vec2 PhysGetLinearVelocity() const;
 	void PhysSetLinearVelocity(glm::vec2 vVelocity);
 	float PhysGetAngularVelocity() const;
 	void PhysSetAngularVelocity(float fOmega);
@@ -154,6 +157,7 @@ protected:
 	void SetNewChildAttributes(IHyNode2d &childRef);
 
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
+	void ApplyDirty(uint32 uiDirtyFlags);
 
 	virtual void _SetVisible(bool bEnabled, bool bIsOverriding) override final;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
