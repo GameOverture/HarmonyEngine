@@ -47,7 +47,7 @@ HyEntity2d::~HyEntity2d(void)
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
-	DisablePhysics();
+	PhysRelease();
 }
 
 HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor)
@@ -227,6 +227,23 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	}
 }
 
+/*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
+{
+	m_WorldAABB.lowerBound = m_WorldAABB.upperBound = b2Vec2(0.0f, 0.0f);
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(m_ChildList[i]->GetWorldAABB().IsValid() == false)
+			continue;
+
+		if(i == 0)
+			m_WorldAABB = m_ChildList[i]->GetWorldAABB();
+		else
+			m_WorldAABB.Combine(m_ChildList[i]->GetWorldAABB());
+	}
+
+	return m_WorldAABB;
+}
+
 void HyEntity2d::ChildAppend(IHyNode2d &childRef)
 {
 	HyAssert(&childRef != this, "HyEntity2d::ChildAppend was passed a child that was itself!");
@@ -329,21 +346,113 @@ void HyEntity2d::DisableMouseInput()
 	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
 }
 
-void HyEntity2d::EnablePhysics(b2BodyDef &bodyDefOut)
+void HyEntity2d::PhysInit(HyPhysicsType eType,
+						  bool bIsEnabled /*= true*/,
+						  bool bIsFixedRotation /*= false*/,
+						  bool bIsCcd /*= false*/,
+						  bool bIsAwake /*= true*/,
+						  bool bAllowSleep /*= true*/,
+						  float fGravityScale /*= 1.0f*/)
 {
 	b2World &worldRef = Hy_Physics2d();
 
 	if(m_pPhysicsBody)
 		worldRef.DestroyBody(m_pPhysicsBody);
 
-	bodyDefOut.userData = this;
-	bodyDefOut.position.Set(pos.X(), pos.Y());
-	bodyDefOut.angle = rot.Get();
+	b2BodyDef bodyDef;
+	bodyDef.userData = this;
+	bodyDef.position.Set(pos.X(), pos.Y());
+	bodyDef.angle = rot.Get();
 
-	m_pPhysicsBody = worldRef.CreateBody(&bodyDefOut);
+	bodyDef.type = static_cast<b2BodyType>(eType); // static_assert guarantees this to match
+	bodyDef.active = bIsEnabled;
+	bodyDef.fixedRotation = bIsFixedRotation;
+	bodyDef.bullet = bIsCcd;
+	bodyDef.awake = bIsAwake;
+	bodyDef.allowSleep = bAllowSleep;
+	bodyDef.gravityScale = fGravityScale;
+
+	m_pPhysicsBody = worldRef.CreateBody(&bodyDef);
 }
 
-void HyEntity2d::DisablePhysics()
+HyPhysicsType HyEntity2d::PhysGetType() const
+{
+	return m_pPhysicsBody ? static_cast<HyPhysicsType>(m_pPhysicsBody->GetType()) : HYPHYS_Unknown;
+}
+
+void HyEntity2d::PhysSetType(HyPhysicsType eType)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetType(static_cast<b2BodyType>(eType)); // static_assert guarantees this to match
+}
+
+bool HyEntity2d::PhysIsEnabled() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsActive();
+}
+
+void HyEntity2d::PhysSetEnabled(bool bEnable)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetActive(bEnable);
+}
+
+bool HyEntity2d::PhysIsFixedRotation() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsFixedRotation();
+}
+
+void HyEntity2d::PhysSetFixedRotation(bool bFixedRot)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetFixedRotation(bFixedRot);
+}
+
+bool HyEntity2d::PhysIsCcd() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsBullet();
+}
+
+void HyEntity2d::PhysSetCcd(bool bContinuousCollisionDetection)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetBullet(bContinuousCollisionDetection);
+}
+
+bool HyEntity2d::PhysIsAwake() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsAwake();
+}
+
+void HyEntity2d::PhysSetAwake(bool bAwake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetAwake(bAwake);
+}
+
+bool HyEntity2d::PhysIsSleepingAllowed() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsSleepingAllowed();
+}
+
+void HyEntity2d::PhysSetSleepingAllowed(bool bAllowSleep)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetSleepingAllowed(bAllowSleep);
+}
+
+float HyEntity2d::PhysGetGravityScale() const
+{
+	return m_pPhysicsBody ? m_pPhysicsBody->GetGravityScale() : 0.0f;
+}
+
+void HyEntity2d::PhysSetGravityScale(float fGravityScale)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetGravityScale(fGravityScale);
+}
+
+void HyEntity2d::PhysRelease()
 {
 	if(m_pPhysicsBody)
 	{
@@ -389,23 +498,6 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	}
 
 	return iOrderValue;
-}
-
-/*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
-{
-	m_WorldAABB.lowerBound = m_WorldAABB.upperBound = b2Vec2(0.0f, 0.0f);
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(m_ChildList[i]->GetWorldAABB().IsValid() == false)
-			continue;
-
-		if(i == 0)
-			m_WorldAABB = m_ChildList[i]->GetWorldAABB();
-		else
-			m_WorldAABB.Combine(m_ChildList[i]->GetWorldAABB());
-	}
-
-	return m_WorldAABB;
 }
 
 /*virtual*/ void HyEntity2d::Load() /*override*/
@@ -500,14 +592,34 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		}
 	}
 
-	if(m_pPhysicsBody != nullptr && m_pPhysicsBody->IsActive())
+	if(m_pPhysicsBody != nullptr)
 	{
+		if(m_pPhysicsBody->IsActive())
+		{
+			if(pos.IsAnimating() || rot.IsAnimating())
+			{
+				m_pPhysicsBody->SetTransform(b2Vec2(pos.X(), pos.Y()), glm::radians(rot.Get()));
+
+				m_pPhysicsBody->SetTransform(m_pPhysicsBody->GetPosition(), glm::radians(rot.Get()));
+			}
+
+			if(m_pPhysicsBody->IsFixedRotation())
+			{
+
+			}
+			else
+			{
+			}
+		}
+		else
+		{
+		}
 		pos.SetWithoutDirty(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
 		rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()), false);
 
 		// Manually dirty transform flags without
 		uint32 uiDirtyFlags = DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB;
-		ApplyDirty(uiDirtyFlags);
+		//ApplyDirty(uiDirtyFlags);
 	}
 
 	OnUpdate();
@@ -547,15 +659,6 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 }
 
 /*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
-{
-	// Transform dirty flag gets set by user calls. Physics updates internally without dirtying
-	if(m_pPhysicsBody && (uiDirtyFlags & DIRTY_Transform) != 0)
-		m_pPhysicsBody->SetTransform(b2Vec2(pos.X(), pos.Y()), glm::radians(rot.Get()));
-
-	ApplyDirty(uiDirtyFlags);
-}
-
-void HyEntity2d::ApplyDirty(uint32 uiDirtyFlags)
 {
 	IHyNode2d::SetDirty(uiDirtyFlags);
 

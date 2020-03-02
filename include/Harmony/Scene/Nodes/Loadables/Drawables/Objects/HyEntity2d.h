@@ -23,7 +23,7 @@ protected:
 	enum Attributes
 	{
 		ATTRIBFLAG_MouseInput				= 1 << 1,
-		ATTRIBFLAG_ReverseDisplayOrder		= 1 << 2
+		ATTRIBFLAG_ReverseDisplayOrder		= 1 << 2,
 	};
 	uint32							m_uiAttributes;
 
@@ -48,6 +48,7 @@ public:
 	HyEntity2d &operator=(HyEntity2d &&donor);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// OVERRIDES + OVERLOADS
 	virtual void SetVisible(bool bEnabled) override;
 	void SetVisible(bool bEnabled, bool bOverrideExplicitChildren);
 
@@ -75,8 +76,11 @@ public:
 	virtual void SetDisplayOrder(int32 iOrderValue) override;
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 	virtual void ResetDisplayOrder() override;
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	virtual const b2AABB &GetWorldAABB() override;
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// CHILDREN NODES
 	void ChildAppend(IHyNode2d &childRef);
 	virtual bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);
 	bool ChildExists(IHyNode2d &childRef);
@@ -86,17 +90,58 @@ public:
 	virtual IHyNode2d *ChildGet(uint32 uiIndex);
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MOUSE BUTTON INPUT
 	void EnableMouseInput(void *pUserParam = nullptr);
 	void DisableMouseInput();
 
-	void EnablePhysics(b2BodyDef &bodyDefOut);
-	void DisablePhysics();
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PHYSICS
+	void PhysInit(HyPhysicsType eType,
+				  bool bIsEnabled = true,
+				  bool bIsFixedRotation = false,
+				  bool bIsCcd = false,
+				  bool bIsAwake = true,
+				  bool bAllowSleep = true,
+				  float fGravityScale = 1.0f);
 
+	HyPhysicsType PhysGetType() const;
+	void PhysSetType(HyPhysicsType eType);
+	bool PhysIsEnabled() const;
+	void PhysSetEnabled(bool bEnable);
+	bool PhysIsFixedRotation() const;
+	void PhysSetFixedRotation(bool bFixedRot);
+	bool PhysIsCcd() const;
+	void PhysSetCcd(bool bContinuousCollisionDetection);
+	bool PhysIsAwake() const;
+	void PhysSetAwake(bool bAwake);
+	bool PhysIsSleepingAllowed() const;
+	void PhysSetSleepingAllowed(bool bAllowSleep);
+	float PhysGetGravityScale() const;
+	void PhysSetGravityScale(float fGravityScale);
+
+	glm::vec2 PhysWorldCenterMass() const;
+	glm::vec2 PhysLocalCenterMass() const;
+	const glm::vec2 PhysGetLinearVelocity() const;
+	void PhysSetLinearVelocity(glm::vec2 vVelocity);
+	float PhysGetAngularVelocity() const;
+	void PhysSetAngularVelocity(float fOmega);
+	void PhysApplyForce(const glm::vec2 &vForce, const glm::vec2 &ptPoint, bool bWake);
+	void PhysApplyForceToCenter(const glm::vec2 &vForce, bool bWake);
+	void PhysApplyTorque(float fTorque, bool bWake);
+	void PhysApplyLinearImpulse(const glm::vec2 &vImpulse, const glm::vec2 &ptPoint, bool bWake);
+	void PhysApplyLinearImpulseToCenter(const glm::vec2 &vImpulse, bool bWake);
+	void PhysApplyAngularImpulse(float fImpulse, bool bWake);
+	float PhysGetMass() const;
+	float PhysGetInertia() const;
+
+	void PhysRelease();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// DISPLAY ORDER
 	bool IsReverseDisplayOrder() const;
 	void ReverseDisplayOrder(bool bReverse);
 	int32 SetChildrenDisplayOrder(bool bOverrideExplicitChildren);
-
-	virtual const b2AABB &GetWorldAABB() override;
 
 	virtual void Load() override;
 	virtual void Unload() override;
@@ -109,7 +154,6 @@ protected:
 	void SetNewChildAttributes(IHyNode2d &childRef);
 
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
-	void ApplyDirty(uint32 uiDirtyFlags);
 
 	virtual void _SetVisible(bool bEnabled, bool bIsOverriding) override final;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;

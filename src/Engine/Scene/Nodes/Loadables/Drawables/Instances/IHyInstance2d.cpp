@@ -13,21 +13,24 @@
 
 IHyInstance2d::IHyInstance2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
 	IHyDrawable2d(eNodeType, sPrefix, sName, pParent),
-	m_LocalBoundingVolume(this)
+	m_LocalBoundingVolume(this),
+	m_pPhysicsFixture(nullptr)
 {
 }
 
 IHyInstance2d::IHyInstance2d(const IHyInstance2d &copyRef) :
 	IHyDrawable2d(copyRef),
 	IHyInstance(copyRef),
-	m_LocalBoundingVolume(this, copyRef.m_LocalBoundingVolume)
+	m_LocalBoundingVolume(this, copyRef.m_LocalBoundingVolume),
+	m_pPhysicsFixture(nullptr)
 {
 }
 
 IHyInstance2d::IHyInstance2d(IHyInstance2d &&donor) :
 	IHyDrawable2d(std::move(donor)),
 	IHyInstance(std::move(donor)),
-	m_LocalBoundingVolume(this, std::move(donor.m_LocalBoundingVolume))
+	m_LocalBoundingVolume(this, std::move(donor.m_LocalBoundingVolume)),
+	m_pPhysicsFixture(std::move(m_pPhysicsFixture))
 {
 }
 

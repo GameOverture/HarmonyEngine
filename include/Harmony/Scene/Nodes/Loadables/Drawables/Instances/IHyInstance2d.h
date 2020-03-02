@@ -23,6 +23,7 @@ class IHyInstance2d : public IHyDrawable2d, public IHyInstance
 
 protected:
 	HyShape2d						m_LocalBoundingVolume;
+	b2Fixture *						m_pPhysicsFixture;
 
 public:
 	IHyInstance2d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity2d *pParent);

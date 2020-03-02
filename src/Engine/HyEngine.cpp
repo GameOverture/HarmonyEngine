@@ -92,8 +92,8 @@ bool HyEngine::Update()
 
 	//HyThrottleUpdate
 	{
-		m_Scene.UpdatePhysics();
 		m_Scene.UpdateNodes();
+		m_Scene.UpdatePhysics();
 
 		HY_PROFILE_BEGIN(HYPROFILERSECTION_Update)
 		if(PollPlatformApi() == false || OnUpdate() == false)
