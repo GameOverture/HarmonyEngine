@@ -13,20 +13,21 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
 #include "Scene/Physics/HyPhysicsGrid.h"
+#include "Scene/Physics/HyPhysicsCollider.h"
 
 class HyEntity2d : public IHyDrawable2d
 {
 	friend class HyScene;
 
 protected:
-	std::vector<IHyNode2d *>		m_ChildList;
+	std::vector<IHyNode2d *>				m_ChildList;
 
 	enum Attributes
 	{
 		ATTRIBFLAG_MouseInput				= 1 << 1,
 		ATTRIBFLAG_ReverseDisplayOrder		= 1 << 2,
 	};
-	uint32							m_uiAttributes;
+	uint32									m_uiAttributes;
 
 	enum MouseInputState
 	{
@@ -34,11 +35,11 @@ protected:
 		MOUSEINPUT_Hover,
 		MOUSEINPUT_Down
 	};
-	MouseInputState					m_eMouseInputState;
-	void *							m_pMouseInputUserParam;
+	MouseInputState							m_eMouseInputState;
+	void *									m_pMouseInputUserParam;
 
-	b2Body *						m_pPhysicsBody;
-	static float					sm_fPhysPpmConversion;
+	b2Body *								m_pPhysicsBody;
+	std::vector<b2Fixture *>				m_pPhysicsColliders;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -137,6 +138,9 @@ public:
 	void PhysApplyAngularImpulse(float fImpulse, bool bWake);
 	float PhysGetMass() const;
 	float PhysGetInertia() const;
+
+	std::unique_ptr<HyPhysicsCollider> PhysAddCollider(const HyShape2d &shapeRef, float fDensity);
+	void PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider);
 
 	void PhysRelease();
 

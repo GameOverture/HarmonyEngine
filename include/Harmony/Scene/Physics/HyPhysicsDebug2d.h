@@ -13,13 +13,13 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
 
-class HyDrawPhys2d : public b2Draw
+class HyPhysicsDebug2d : public b2Draw
 {
 	std::vector<HyPrimitive2d>	m_DrawList;
 
 public:
-	HyDrawPhys2d();
-	virtual ~HyDrawPhys2d(void);
+	HyPhysicsDebug2d();
+	virtual ~HyPhysicsDebug2d(void);
 
 	std::vector<HyPrimitive2d> &GetDrawList();
 

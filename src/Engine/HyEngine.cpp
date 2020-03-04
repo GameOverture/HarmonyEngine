@@ -26,7 +26,7 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Console(initStruct.bUseConsole, initStruct.consoleInfo),
 	m_Audio(m_Init.sDataDir),
-	m_Scene(m_WindowManager.GetWindowList(), initStruct.fPixelsPerMeter),
+	m_Scene(m_WindowManager.GetWindowList()),
 	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
 	m_GuiComms(m_Init.uiDebugPort, m_Assets),
 	m_Time(m_Init.uiUpdateTickMs),
@@ -35,7 +35,6 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 	m_Renderer(m_Diagnostics, m_WindowManager.GetWindowList())
 {
 	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");
-	HyAssert(m_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 
 	// TODO Cleanup: decide whether to block 
 	while(m_Assets.IsInitialized() == false)

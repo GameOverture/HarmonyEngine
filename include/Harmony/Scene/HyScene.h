@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyPhysicsGrid.h"
 #include "Scene/Physics/HyBox2dRuntime.h"
-#include "Scene/Physics/HyDrawPhys2d.h"
+#include "Scene/Physics/HyPhysicsDebug2d.h"
 
 // Forward declarations
 class IHyNode;
@@ -38,23 +38,26 @@ class HyScene
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;		// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
 
+	static std::vector<HyPhysicsGrid *>					sm_PhysicsGridList;
+
 	// List of nodes who can be drawn, and their graphics assets are fully loaded
 	std::vector<IHyInstance2d *>						m_NodeList_LoadedDrawable2d;
 	std::vector<IHyInstance3d *>						m_NodeList_LoadedDrawable3d;
 
-	std::vector<HyPhysicsGrid *>						m_PhysicsGridList;
-
 public:
-	HyScene(std::vector<HyWindow *> &WindowListRef, float fPixelsPerMeter);
+	HyScene(std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
-	static void SetInstOrderingDirty()					{ sm_bInst2dOrderingDirty = true; }
+	static void SetInstOrderingDirty();
 	
 	static void AddNode(IHyNode *pNode);
 	static void RemoveNode(IHyNode *pNode);
 
 	static void AddNode_PauseUpdate(IHyNode *pNode);
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
+
+	static void AddPhysicsGrid(HyPhysicsGrid *pPhysGrid);
+	static void RemovePhysicsGrid(HyPhysicsGrid *pPhysGrid);
 
 	void AddNode_Loaded(IHyInstance2d *pDrawable);
 	void AddNode_Loaded(IHyInstance3d *pDrawable);

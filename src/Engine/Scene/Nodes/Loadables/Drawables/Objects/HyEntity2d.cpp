@@ -14,8 +14,6 @@
 #include "Assets/Nodes/HyEntityData.h"
 #include "HyEngine.h"
 
-/*static*/ float HyEntity2d::sm_fPhysPpmConversion = 0.0f;
-
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_Entity, "", "", pParent),
 	m_uiAttributes(0),
@@ -545,6 +543,22 @@ float HyEntity2d::PhysGetMass() const
 	return 0.0f;
 }
 
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity)
+{
+	if(m_pPhysicsBody == nullptr || shapeRef.IsValid() == false)
+		return nullptr;
+
+	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody->CreateFixture(shapeRef.GetB2Shape(), fDensity));
+}
+
+void HyEntity2d::PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->DestroyFixture(pCollider->GetFixture());
+
+	pCollider.release();
+}
+
 float HyEntity2d::PhysGetInertia() const
 {
 	if(m_pPhysicsBody)
@@ -697,7 +711,8 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	{
 		if(m_pPhysicsBody->IsActive())
 		{
-			pos.SetWithoutDirty(m_pPhysicsBody->GetPosition().x * Hy_InitValues().fPixelsPerMeter, m_pPhysicsBody->GetPosition().y * Hy_InitValues().fPixelsPerMeter);
+			float fPixelsPerMeter = static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter();
+			pos.SetWithoutDirty(m_pPhysicsBody->GetPosition().x * fPixelsPerMeter, m_pPhysicsBody->GetPosition().y * fPixelsPerMeter);
 			rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()), false);
 
 			// Manually dirty transform flags without invoking the actual callback SetDirty() so the physics body doesn't get set over again
@@ -745,11 +760,13 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	if(m_pPhysicsBody)
 	{
+		float fPpmInverse = static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+
 		uint32 uiTransformFlags = (uiDirtyFlags & (DIRTY_Position | DIRTY_Rotation));
 		if((DIRTY_Position | DIRTY_Rotation) == uiTransformFlags)
-			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * sm_fPhysPpmConversion, pos.Y() * sm_fPhysPpmConversion), glm::radians(rot.Get()));
+			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * fPpmInverse, pos.Y() * fPpmInverse), glm::radians(rot.Get()));
 		else if(DIRTY_Position == uiTransformFlags)
-			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * sm_fPhysPpmConversion, pos.Y() * sm_fPhysPpmConversion), m_pPhysicsBody->GetAngle());
+			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * fPpmInverse, pos.Y() * fPpmInverse), m_pPhysicsBody->GetAngle());
 		else if(DIRTY_Rotation == uiTransformFlags)
 			m_pPhysicsBody->SetTransform(m_pPhysicsBody->GetPosition(), glm::radians(rot.Get()));
 	}

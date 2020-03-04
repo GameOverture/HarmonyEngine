@@ -24,17 +24,22 @@
 bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
+std::vector<HyPhysicsGrid *> HyScene::sm_PhysicsGridList;
 
-HyScene::HyScene(std::vector<HyWindow *> &WindowListRef, float fPixelsPerMeter) :
+HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :
 	m_WindowListRef(WindowListRef),
 	m_bPauseGame(false)
 {
 	IHyInstance::sm_pScene = this;
-	HyEntity2d::sm_fPhysPpmConversion = 1 / fPixelsPerMeter;
 }
 
 HyScene::~HyScene(void)
 {
+}
+
+/*static*/ void HyScene::SetInstOrderingDirty()
+{
+	sm_bInst2dOrderingDirty = true;
 }
 
 /*static*/ void HyScene::AddNode(IHyNode *pNode)
@@ -68,6 +73,24 @@ HyScene::~HyScene(void)
 		{
 			// TODO: Log about erasing Node
 			sm_NodeList_PauseUpdate.erase(it);
+			break;
+		}
+	}
+}
+
+/*static*/ void HyScene::AddPhysicsGrid(HyPhysicsGrid *pPhysGrid)
+{
+	sm_PhysicsGridList.push_back(pPhysGrid);
+}
+
+/*static*/ void HyScene::RemovePhysicsGrid(HyPhysicsGrid *pPhysGrid)
+{
+	for(auto it = sm_PhysicsGridList.begin(); it != sm_PhysicsGridList.end(); ++it)
+	{
+		if((*it) == pPhysGrid)
+		{
+			//HyLog("Remove Physics Grid: " << pNode->GetType());
+			sm_PhysicsGridList.erase(it);
 			break;
 		}
 	}
@@ -125,7 +148,7 @@ void HyScene::SetPause(bool bPause)
 void HyScene::UpdatePhysics()
 {
 	HY_PROFILE_BEGIN(HYPROFILERSECTION_Physics)
-	for(auto physGrid : m_PhysicsGridList)
+	for(auto physGrid : sm_PhysicsGridList)
 		physGrid->Update();
 	HY_PROFILE_END
 }
@@ -194,7 +217,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	}
 	
 	// Debug physics draws
-	for(auto physGrid : m_PhysicsGridList)
+	for(auto physGrid : sm_PhysicsGridList)
 	{
 		std::vector<HyPrimitive2d> &physDrawListRef = physGrid->GetDebugDrawList();
 		for(uint32 i = 0; i < static_cast<uint32>(physDrawListRef.size()); ++i)

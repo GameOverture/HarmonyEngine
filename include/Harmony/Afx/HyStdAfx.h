@@ -281,7 +281,6 @@ struct HarmonyInit
 	uint32					uiNumWindows;
 	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
 	uint32					uiUpdateTickMs;
-	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
 	uint16					uiDebugPort;
 	bool					bUseConsole;

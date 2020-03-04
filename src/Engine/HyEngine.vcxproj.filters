@@ -245,10 +245,13 @@
     <ClCompile Include="Scene\Nodes\Loadables\Drawables\Instances\Objects\HyTexturedQuad2d.cpp">
       <Filter>Scene\Nodes\Loadables\Drawables\Instances\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Physics\HyDrawPhys2d.cpp">
+    <ClCompile Include="Scene\Physics\HyPhysicsGrid.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Physics\HyPhysicsGrid.cpp">
+    <ClCompile Include="Scene\Physics\HyPhysicsCollider.cpp">
+      <Filter>Scene\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Physics\HyPhysicsDebug2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -685,10 +688,13 @@
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Loadables\Drawables\Instances\Objects\HyTexturedQuad2d.h">
       <Filter>Scene\Nodes\Loadables\Drawables\Instances\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyDrawPhys2d.h">
+    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysicsGrid.h">
       <Filter>Scene\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysicsGrid.h">
+    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysicsCollider.h">
+      <Filter>Scene\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysicsDebug2d.h">
       <Filter>Scene\Physics</Filter>
     </ClInclude>
   </ItemGroup>

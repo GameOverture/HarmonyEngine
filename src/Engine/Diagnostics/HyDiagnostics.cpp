@@ -91,7 +91,6 @@ void HyDiagnostics::BootMessage()
 	HyLog("");
 	HyLogTitle(sGameTitle << "\n\t" << Hy_DateTime());
 	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
-	HyLog("Pixels/Meter:     " << m_InitStructRef.fPixelsPerMeter);
 	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMappings);
 	
 	HyLogSection("Platform");
