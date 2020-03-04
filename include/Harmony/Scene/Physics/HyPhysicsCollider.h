@@ -11,6 +11,7 @@
 #define HyPhysicsCollider_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Scene/Physics/HyShape2d.h"
 
 class HyPhysicsCollider
 {
@@ -19,7 +20,7 @@ class HyPhysicsCollider
 	b2Fixture *		m_pFixture;
 
 public:
-	HyPhysicsCollider(b2Fixture *pFixture);
+	HyPhysicsCollider(b2Body *pBody, const HyShape2d &shapeRef, float fDensity, bool bIsSensor);
 	~HyPhysicsCollider();
 
 private:

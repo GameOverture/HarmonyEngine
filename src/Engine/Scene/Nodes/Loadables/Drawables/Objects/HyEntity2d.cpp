@@ -548,7 +548,7 @@ std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCollider(const HyShape2d &
 	if(m_pPhysicsBody == nullptr || shapeRef.IsValid() == false)
 		return nullptr;
 
-	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody->CreateFixture(shapeRef.GetB2Shape(), fDensity));
+	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, shapeRef, fDensity, false);
 }
 
 void HyEntity2d::PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider)

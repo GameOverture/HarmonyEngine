@@ -120,6 +120,67 @@ b2Shape *HyShape2d::GetB2Shape()
 	return m_pShape;
 }
 
+b2Shape *HyShape2d::ClonePpmShape(float fPpmInverse) const
+{
+	b2Shape *pCloneB2Shape = nullptr;
+	std::vector<b2Vec2> vertList;
+
+	switch(m_eType)
+	{
+	case HYSHAPE_LineSegment:
+		pCloneB2Shape = HY_NEW b2EdgeShape();
+		vertList.emplace_back(static_cast<b2EdgeShape *>(m_pShape)->m_vertex1.x * fPpmInverse,
+							  static_cast<b2EdgeShape *>(m_pShape)->m_vertex1.y * fPpmInverse);
+		vertList.emplace_back(static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.x * fPpmInverse,
+							  static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.y * fPpmInverse);
+
+		static_cast<b2EdgeShape *>(pCloneB2Shape)->Set(vertList[0], vertList[1]);
+		break;
+
+	case HYSHAPE_LineChain:
+		pCloneB2Shape = HY_NEW b2ChainShape();
+		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count; ++i)
+		{
+			vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x * fPpmInverse,
+				static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y * fPpmInverse);
+		}
+
+		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(&vertList[0], static_cast<b2ChainShape *>(m_pShape)->m_count);
+		break;
+
+	case HYSHAPE_LineLoop:
+		pCloneB2Shape = HY_NEW b2ChainShape();
+		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count; ++i)
+		{
+			vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x * fPpmInverse,
+								  static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y * fPpmInverse);
+		}
+
+		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateLoop(&vertList[0], static_cast<b2ChainShape *>(m_pShape)->m_count);
+		break;
+
+	case HYSHAPE_Circle:
+		pCloneB2Shape = HY_NEW b2CircleShape();
+		static_cast<b2CircleShape *>(pCloneB2Shape)->m_p.Set(static_cast<b2CircleShape *>(m_pShape)->m_p.x * fPpmInverse,
+															 static_cast<b2CircleShape *>(m_pShape)->m_p.y * fPpmInverse);
+		static_cast<b2CircleShape *>(pCloneB2Shape)->m_radius = static_cast<b2CircleShape *>(m_pShape)->m_radius * fPpmInverse;
+		break;
+
+	case HYSHAPE_Polygon:
+		pCloneB2Shape = HY_NEW b2PolygonShape();
+		for(int32 i = 0; i < static_cast<b2PolygonShape *>(m_pShape)->m_count; ++i)
+		{
+			vertList.emplace_back(static_cast<b2PolygonShape *>(m_pShape)->m_vertices[i].x * fPpmInverse,
+								  static_cast<b2PolygonShape *>(m_pShape)->m_vertices[i].y * fPpmInverse);
+		}
+
+		static_cast<b2PolygonShape *>(pCloneB2Shape)->Set(vertList.data(), static_cast<b2PolygonShape *>(m_pShape)->m_count);
+		break;
+	}
+
+	return pCloneB2Shape;
+}
+
 bool HyShape2d::IsValid() const
 {
 	return m_pShape != nullptr && m_eType != HYSHAPE_Unknown;
@@ -206,6 +267,8 @@ void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
 
 void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
 {
+	HyAssert(uiCount <= b2_maxPolygonVertices, "HyShape2d::SetAsPolygon took too many vertices. Max is " << uiCount);
+
 	m_eType = HYSHAPE_Polygon;
 
 	delete m_pShape;

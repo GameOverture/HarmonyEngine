@@ -26,8 +26,10 @@ public:
 
 	HyShapeType GetType() const;
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
+	
 	const b2Shape *GetB2Shape() const;
 	b2Shape *GetB2Shape();
+	b2Shape *ClonePpmShape(float fPpmInverse) const;
 
 	bool IsValid() const;
 
@@ -57,7 +59,6 @@ public:
 	// may lead to poor stacking behavior in physics simulation.
 	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
 	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
-
 
 	// Build vertices to represent an axis-aligned box
 	void SetAsBox(int32 iWidth, int32 iHeight);
