@@ -15,10 +15,11 @@
 
 class HyPhysicsDebug2d : public b2Draw
 {
+	const float					m_fPIXELS_PER_METER;
 	std::vector<HyPrimitive2d>	m_DrawList;
 
 public:
-	HyPhysicsDebug2d();
+	HyPhysicsDebug2d(float fPixelsPerMeter);
 	virtual ~HyPhysicsDebug2d(void);
 
 	std::vector<HyPrimitive2d> &GetDrawList();

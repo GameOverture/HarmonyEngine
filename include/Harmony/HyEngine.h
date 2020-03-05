@@ -85,7 +85,6 @@ private:
 	friend HyInput &			Hy_Input();
 	friend HyDiagnostics &		Hy_Diagnostics();
 	friend HyShaderHandle		Hy_DefaultShaderHandle(HyType eType);
-	friend bool					Hy_IsDrawInst(HyType eType);
 	friend std::string			Hy_DateTime();
 	friend std::string			Hy_DataDir();
 };

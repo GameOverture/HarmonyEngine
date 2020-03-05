@@ -16,10 +16,14 @@ HyPhysicsGrid::HyPhysicsGrid(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*/, f
 	m_fPixelsPerMeter(fPixelsPerMeter),
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
 	m_iPhysVelocityIterations(iVelocityIterations),
-	m_iPhysPositionIterations(iPositionIterations)
+	m_iPhysPositionIterations(iPositionIterations),
+	m_DrawPhys2d(fPixelsPerMeter)
 {
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	SetContactListener(&m_Phys2dContactListener);
+	SetDebugDraw(&m_DrawPhys2d);
+
+	m_DrawPhys2d.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
 
 	HyScene::AddPhysicsGrid(this);
 }

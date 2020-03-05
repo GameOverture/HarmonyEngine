@@ -16,14 +16,14 @@
 
 class HyPhysicsGrid : public b2World
 {
-	int32			m_iPhysVelocityIterations;
-	int32			m_iPhysPositionIterations;
+	float				m_fPixelsPerMeter;
+	float				m_fPpmInverse;
+
+	int32				m_iPhysVelocityIterations;
+	int32				m_iPhysPositionIterations;
 
 	HyPhysicsDebug2d	m_DrawPhys2d;
-	HyBox2dRuntime	m_Phys2dContactListener;
-
-	float			m_fPixelsPerMeter;
-	float			m_fPpmInverse;
+	HyBox2dRuntime		m_Phys2dContactListener;
 
 public:
 	HyPhysicsGrid(glm::vec2 vGravity = glm::vec2(0.0f, -10.0f), float fPixelsPerMeter = 80.0f, int32 iVelocityIterations = 8, int32 iPositionIterations = 3);

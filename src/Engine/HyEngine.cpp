@@ -182,23 +182,6 @@ bool HyEngine::PollPlatformApi()
 	return HyEngine::sm_pInstance->m_Renderer.GetDefaultShaderHandle(eType);
 }
 
-/*friend*/ bool Hy_IsDrawInst(HyType eType)
-{
-	switch(eType)
-	{
-	case HYTYPE_Particles:
-	case HYTYPE_Sprite:
-	case HYTYPE_Spine:
-	case HYTYPE_TexturedQuad:
-	case HYTYPE_Primitive:
-	case HYTYPE_Text:
-	case HYTYPE_Prefab:
-		return true;
-	}
-
-	return false;
-}
-
 /*friend*/ std::string Hy_DateTime()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DateTime() was invoked before engine has been initialized.");

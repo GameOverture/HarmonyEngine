@@ -26,6 +26,8 @@ HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
 
 HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
 	IHyInstance2d(copyRef),
+	m_pVertBuffer(nullptr),
+	m_uiNumVerts(0),
 	m_bWireframe(copyRef.m_bWireframe),
 	m_fLineThickness(copyRef.m_fLineThickness)
 {
