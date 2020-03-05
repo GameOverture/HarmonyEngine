@@ -20,7 +20,7 @@ class HyPhysicsCollider
 	b2Fixture *		m_pFixture;
 
 public:
-	HyPhysicsCollider(b2Body *pBody, const HyShape2d &shapeRef, float fDensity, bool bIsSensor);
+	HyPhysicsCollider(b2Body *pBody, const b2Shape *pb2PpmShape, float fDensity, float fFriction, float fRestitution, bool bIsSensor);
 	~HyPhysicsCollider();
 
 private:

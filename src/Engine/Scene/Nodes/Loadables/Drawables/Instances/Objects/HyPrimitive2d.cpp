@@ -14,20 +14,13 @@
 #include "Utilities/HyMath.h"
 
 HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyInstance2d(HYTYPE_Primitive, "", "", pParent),
-	m_pVertBuffer(nullptr),
-	m_uiNumVerts(0),
-	m_bWireframe(false),
-	m_fLineThickness(1.0f),
-	m_uiNumSegments(16)
+	IHyInstance2d(HYTYPE_Primitive, "", "", pParent)
 {
 	ClearData();
 }
 
 HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
 	IHyInstance2d(copyRef),
-	m_pVertBuffer(nullptr),
-	m_uiNumVerts(0),
 	m_bWireframe(copyRef.m_bWireframe),
 	m_fLineThickness(copyRef.m_fLineThickness)
 {

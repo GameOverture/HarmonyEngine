@@ -359,7 +359,7 @@ void HyEntity2d::PhysInit(HyPhysicsGrid &physGridRef,
 
 	b2BodyDef bodyDef;
 	bodyDef.userData = this;
-	bodyDef.position.Set(pos.X(), pos.Y());
+	bodyDef.position.Set(pos.X() * physGridRef.GetPpmInverse(), pos.Y() * physGridRef.GetPpmInverse());
 	bodyDef.angle = rot.Get();
 
 	bodyDef.type = static_cast<b2BodyType>(eType); // static_assert guarantees this to match
@@ -543,12 +543,34 @@ float HyEntity2d::PhysGetMass() const
 	return 0.0f;
 }
 
-std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity)
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor)
 {
 	if(m_pPhysicsBody == nullptr || shapeRef.IsValid() == false)
 		return nullptr;
 
-	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, shapeRef, fDensity, false);
+	b2Shape *pPpmShape = shapeRef.ClonePpmShape(static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse());
+	std::unique_ptr<HyPhysicsCollider> pCollider = std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, pPpmShape, fDensity, fFriction, fRestitution, bIsSensor);
+	delete pPpmShape;
+
+	return pCollider;
+}
+
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor)
+{
+	return PhysAddCircleCollider(glm::vec2(0.0f, 0.0), fRadius, fDensity, fFriction, fRestitution, bIsSensor);
+}
+
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor)
+{
+	if(m_pPhysicsBody == nullptr || fRadius <= 0.0f)
+		return nullptr;
+
+	float fPpmInverse = static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+	b2CircleShape circleShape;
+	circleShape.m_p.x = ptCenter.x * fPpmInverse;
+	circleShape.m_p.y = ptCenter.y * fPpmInverse;
+	circleShape.m_radius = fRadius * fPpmInverse;
+	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, &circleShape, fDensity, fFriction, fRestitution, bIsSensor);
 }
 
 void HyEntity2d::PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider)
@@ -707,6 +729,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		}
 	}
 
+	// TODO: Fix this
 	if(m_pPhysicsBody != nullptr)
 	{
 		if(m_pPhysicsBody->IsActive())

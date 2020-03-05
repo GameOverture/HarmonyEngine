@@ -139,7 +139,13 @@ public:
 	float PhysGetMass() const;
 	float PhysGetInertia() const;
 
-	std::unique_ptr<HyPhysicsCollider> PhysAddCollider(const HyShape2d &shapeRef, float fDensity);
+	// fFriction : The friction coefficient, usually in the range [0,1].
+	// fRestitution : (elasticity) usually in the range [0,1].
+	// fDensity : usually in kg/m^2.
+	// bIsSensor : Is a sensor shape collects contact information but never generates a collision response.
+	std::unique_ptr<HyPhysicsCollider> PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor);
+	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor);
+	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor);
 	void PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider);
 
 	void PhysRelease();

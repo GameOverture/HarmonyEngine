@@ -23,31 +23,31 @@ HyBox2dRuntime::~HyBox2dRuntime(void)
 /// Called when two fixtures begin to touch.
 /*virtual*/ void HyBox2dRuntime::BeginContact(b2Contact* contact)
 {
-	if(contact->GetFixtureA()->GetBody()->GetType() == b2_dynamicBody)
-	{
-		if(contact->GetFixtureB()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureB()->GetBody()->GetType() == b2_staticBody)
-			reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureA()->GetUserData())->SetGrounded();
-	}
-	else if(contact->GetFixtureB()->GetBody()->GetType() == b2_dynamicBody)
-	{
-		if(contact->GetFixtureA()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureA()->GetBody()->GetType() == b2_staticBody)
-			reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureB()->GetUserData())->SetGrounded();
-	}
+	//if(contact->GetFixtureA()->GetBody()->GetType() == b2_dynamicBody)
+	//{
+	//	if(contact->GetFixtureB()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureB()->GetBody()->GetType() == b2_staticBody)
+	//		reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureA()->GetUserData())->SetGrounded();
+	//}
+	//else if(contact->GetFixtureB()->GetBody()->GetType() == b2_dynamicBody)
+	//{
+	//	if(contact->GetFixtureA()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureA()->GetBody()->GetType() == b2_staticBody)
+	//		reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureB()->GetUserData())->SetGrounded();
+	//}
 }
 
 /// Called when two fixtures cease to touch.
 /*virtual*/ void HyBox2dRuntime::EndContact(b2Contact* contact)
 {
-	if(contact->GetFixtureA()->GetBody()->GetType() == b2_dynamicBody)
-	{
-		if(contact->GetFixtureB()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureB()->GetBody()->GetType() == b2_staticBody)
-			reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureA()->GetUserData())->UnsetGrounded();
-	}
-	else if(contact->GetFixtureB()->GetBody()->GetType() == b2_dynamicBody)
-	{
-		if(contact->GetFixtureA()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureA()->GetBody()->GetType() == b2_staticBody)
-			reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureB()->GetUserData())->UnsetGrounded();
-	}
+	//if(contact->GetFixtureA()->GetBody()->GetType() == b2_dynamicBody)
+	//{
+	//	if(contact->GetFixtureB()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureB()->GetBody()->GetType() == b2_staticBody)
+	//		reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureA()->GetUserData())->UnsetGrounded();
+	//}
+	//else if(contact->GetFixtureB()->GetBody()->GetType() == b2_dynamicBody)
+	//{
+	//	if(contact->GetFixtureA()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureA()->GetBody()->GetType() == b2_staticBody)
+	//		reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureB()->GetUserData())->UnsetGrounded();
+	//}
 }
 
 /// This is called after a contact is updated. This allows you to inspect a
