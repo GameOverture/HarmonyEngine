@@ -12,27 +12,24 @@
 
 #include "Afx/HyStdAfx.h"
 
-class IHyNode2d;
-
 class HyShape2d
 {
-	IHyNode2d *						m_pOwnerNode;
-
 	HyShapeType						m_eType;
 	b2Shape *						m_pShape;
 
 public:
-	HyShape2d(IHyNode2d *pOwnerNode);
-	HyShape2d(const HyShape2d &copyRef) = delete;
-	HyShape2d(IHyNode2d *pOwnerNode, const HyShape2d &copyRef);
+	HyShape2d();
+	HyShape2d(const HyShape2d &copyRef);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
 
 	HyShapeType GetType() const;
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
+	
 	const b2Shape *GetB2Shape() const;
 	b2Shape *GetB2Shape();
+	b2Shape *ClonePpmShape(float fPpmInverse) const;
 
 	bool IsValid() const;
 
@@ -63,7 +60,6 @@ public:
 	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
 	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
 
-
 	// Build vertices to represent an axis-aligned box
 	void SetAsBox(int32 iWidth, int32 iHeight);
 	void SetAsBox(float fWidth, float fHeight);
@@ -73,10 +69,8 @@ public:
 	// fRot the rotation of the box in local coordinates.
 	void SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
-	// Returns true if the world point intersects within this bounding volume's world transformation
-	bool TestPoint(const glm::vec2 &ptWorldPointRef) const;
-
-	bool IsColliding(HyShape2d &shapeRef, b2WorldManifold &worldManifoldOut);
+	bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const;
+	bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;
 };
 
 #endif /* HyShape2d_h__ */

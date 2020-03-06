@@ -11,8 +11,9 @@
 #define HyScene_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Scene/Physics/HyPhysicsGrid.h"
 #include "Scene/Physics/HyBox2dRuntime.h"
-#include "Scene/Physics/HyDrawPhys2d.h"
+#include "Scene/Physics/HyPhysicsDebug2d.h"
 
 // Forward declarations
 class IHyNode;
@@ -30,19 +31,14 @@ class HyScene
 {
 	static bool											sm_bInst2dOrderingDirty;
 
-	b2World												m_b2World;
-	int32												m_iPhysVelocityIterations;
-	int32												m_iPhysPositionIterations;
-
-	HyDrawPhys2d										m_DrawPhys2d;
-	HyBox2dRuntime										m_Phys2dContactListener;
-
 	std::vector<HyWindow *> &							m_WindowListRef;
 
 	// TODO: Make tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
 	static std::vector<IHyNode *>						sm_NodeList_All;
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;		// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
+
+	static std::vector<HyPhysicsGrid *>					sm_PhysicsGridList;
 
 	// List of nodes who can be drawn, and their graphics assets are fully loaded
 	std::vector<IHyInstance2d *>						m_NodeList_LoadedDrawable2d;
@@ -52,7 +48,7 @@ public:
 	HyScene(std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
-	static void SetInstOrderingDirty()					{ sm_bInst2dOrderingDirty = true; }
+	static void SetInstOrderingDirty();
 	
 	static void AddNode(IHyNode *pNode);
 	static void RemoveNode(IHyNode *pNode);
@@ -60,15 +56,15 @@ public:
 	static void AddNode_PauseUpdate(IHyNode *pNode);
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
+	static void AddPhysicsGrid(HyPhysicsGrid *pPhysGrid);
+	static void RemovePhysicsGrid(HyPhysicsGrid *pPhysGrid);
+
 	void AddNode_Loaded(IHyInstance2d *pDrawable);
 	void AddNode_Loaded(IHyInstance3d *pDrawable);
 	void RemoveNode_Loaded(const IHyInstance2d *pDrawable);
 	void RemoveNode_Loaded(const IHyInstance3d *pDrawable);
 
 	void CopyAllLoadedNodes(std::vector<IHyInstance2d *> &nodeListOut);
-
-	b2World &GetPhysics2d();
-	void SetDrawPhys2d(bool bDebugDraw);
 
 	void SetPause(bool bPause);
 

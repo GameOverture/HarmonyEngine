@@ -115,8 +115,10 @@
     <ClCompile Include="Scene\Nodes\Loadables\Objects\HyAudio2d.cpp" />
     <ClCompile Include="Scene\Nodes\Objects\HyCamera.cpp" />
     <ClCompile Include="Scene\Physics\HyBox2dRuntime.cpp" />
-    <ClCompile Include="Scene\Physics\HyDrawPhys2d.cpp" />
+    <ClCompile Include="Scene\Physics\HyPhysicsDebug2d.cpp" />
     <ClCompile Include="Scene\Physics\HyPhysEntity2d.cpp" />
+    <ClCompile Include="Scene\Physics\HyPhysicsCollider.cpp" />
+    <ClCompile Include="Scene\Physics\HyPhysicsGrid.cpp" />
     <ClCompile Include="Scene\Physics\HyShape2d.cpp" />
     <ClCompile Include="Threading\IHyThreadClass.cpp" />
     <ClCompile Include="Time\HyTime.cpp" />
@@ -222,8 +224,10 @@
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Objects\HyCamera.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Nodes\Objects\IHyCamera.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyBox2dRuntime.h" />
-    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyDrawPhys2d.h" />
+    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysicsDebug2d.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysEntity2d.h" />
+    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysicsCollider.h" />
+    <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysicsGrid.h" />
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyShape2d.h" />
     <ClInclude Include="..\..\include\Harmony\Threading\IHyThreadClass.h" />
     <ClInclude Include="..\..\include\Harmony\Time\HyTime.h" />

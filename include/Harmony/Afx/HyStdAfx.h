@@ -88,6 +88,15 @@ enum HyShapeType
 	HYNUM_SHAPE
 };
 
+enum HyPhysicsType
+{
+	HYPHYS_Unknown = -1,
+	HYPHYS_Static = 0,
+	HYPHYS_Kinematic,
+	HYPHYS_Dynamic
+};
+static_assert(HYPHYS_Static == b2_staticBody && HYPHYS_Kinematic == b2_kinematicBody && HYPHYS_Dynamic == b2_dynamicBody, "Harmony and Box2d types don't match!");
+
 enum HyFileType
 {
 	HYFILE_Atlas = 0,
@@ -272,7 +281,6 @@ struct HarmonyInit
 	uint32					uiNumWindows;
 	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
 	uint32					uiUpdateTickMs;
-	float					fPixelsPerMeter;
 	uint32					uiNumInputMappings;
 	uint16					uiDebugPort;
 	bool					bUseConsole;

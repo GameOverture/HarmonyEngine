@@ -24,24 +24,22 @@
 bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
+std::vector<HyPhysicsGrid *> HyScene::sm_PhysicsGridList;
 
 HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :
-	m_b2World(b2Vec2(0.0f, -10.0f)),
-	m_iPhysVelocityIterations(8),
-	m_iPhysPositionIterations(3),
 	m_WindowListRef(WindowListRef),
 	m_bPauseGame(false)
 {
 	IHyInstance::sm_pScene = this;
-
-	m_b2World.SetContactListener(&m_Phys2dContactListener);
-
-	// Link HyScene to all classes that access it
-	HyPhysEntity2d::sm_b2WorldRef = &m_b2World;
 }
 
 HyScene::~HyScene(void)
 {
+}
+
+/*static*/ void HyScene::SetInstOrderingDirty()
+{
+	sm_bInst2dOrderingDirty = true;
 }
 
 /*static*/ void HyScene::AddNode(IHyNode *pNode)
@@ -75,6 +73,24 @@ HyScene::~HyScene(void)
 		{
 			// TODO: Log about erasing Node
 			sm_NodeList_PauseUpdate.erase(it);
+			break;
+		}
+	}
+}
+
+/*static*/ void HyScene::AddPhysicsGrid(HyPhysicsGrid *pPhysGrid)
+{
+	sm_PhysicsGridList.push_back(pPhysGrid);
+}
+
+/*static*/ void HyScene::RemovePhysicsGrid(HyPhysicsGrid *pPhysGrid)
+{
+	for(auto it = sm_PhysicsGridList.begin(); it != sm_PhysicsGridList.end(); ++it)
+	{
+		if((*it) == pPhysGrid)
+		{
+			//HyLog("Remove Physics Grid: " << pNode->GetType());
+			sm_PhysicsGridList.erase(it);
 			break;
 		}
 	}
@@ -122,16 +138,6 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyInstance2d *> &nodeListOut)
 	nodeListOut = m_NodeList_LoadedDrawable2d;
 }
 
-b2World &HyScene::GetPhysics2d()
-{
-	return m_b2World;
-}
-
-void HyScene::SetDrawPhys2d(bool bDebugDraw)
-{
-	m_DrawPhys2d.SetDrawEnabled(bDebugDraw);
-}
-
 void HyScene::SetPause(bool bPause)
 {
 	m_bPauseGame = bPause;
@@ -142,8 +148,8 @@ void HyScene::SetPause(bool bPause)
 void HyScene::UpdatePhysics()
 {
 	HY_PROFILE_BEGIN(HYPROFILERSECTION_Physics)
-		m_DrawPhys2d.GetDrawList().clear();
-		m_b2World.Step(Hy_UpdateStep(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	for(auto physGrid : sm_PhysicsGridList)
+		physGrid->Update();
 	HY_PROFILE_END
 }
 
@@ -211,13 +217,17 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	}
 	
 	// Debug physics draws
-	std::vector<HyPrimitive2d> &physDrawListRef = m_DrawPhys2d.GetDrawList();
-	for(uint32 i = 0; i < static_cast<uint32>(physDrawListRef.size()); ++i)
+	for(auto physGrid : sm_PhysicsGridList)
 	{
-		if(CalculateCameraMask(physDrawListRef[i], uiCameraMask) == false)
-			continue;
+		std::vector<HyPrimitive2d> &physDrawListRef = physGrid->GetDebugDrawList();
+		for(uint32 i = 0; i < static_cast<uint32>(physDrawListRef.size()); ++i)
+		{
+			if(CalculateCameraMask(physDrawListRef[i], uiCameraMask) == false)
+				continue;
 
-		rendererRef.AppendDrawable2d(i, physDrawListRef[i], uiCameraMask);
+			physDrawListRef[i].Load();
+			rendererRef.AppendDrawable2d(i, physDrawListRef[i], uiCameraMask);
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

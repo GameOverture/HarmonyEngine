@@ -47,7 +47,7 @@ HyEntity2d::~HyEntity2d(void)
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
-	DisablePhysics();
+	PhysRelease();
 }
 
 HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor)
@@ -227,6 +227,23 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	}
 }
 
+/*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
+{
+	m_WorldAABB.lowerBound = m_WorldAABB.upperBound = b2Vec2(0.0f, 0.0f);
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(m_ChildList[i]->GetWorldAABB().IsValid() == false)
+			continue;
+
+		if(i == 0)
+			m_WorldAABB = m_ChildList[i]->GetWorldAABB();
+		else
+			m_WorldAABB.Combine(m_ChildList[i]->GetWorldAABB());
+	}
+
+	return m_WorldAABB;
+}
+
 void HyEntity2d::ChildAppend(IHyNode2d &childRef)
 {
 	HyAssert(&childRef != this, "HyEntity2d::ChildAppend was passed a child that was itself!");
@@ -329,25 +346,254 @@ void HyEntity2d::DisableMouseInput()
 	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
 }
 
-void HyEntity2d::EnablePhysics(b2BodyDef &bodyDefOut)
+void HyEntity2d::PhysInit(HyPhysicsGrid &physGridRef,
+						  HyPhysicsType eType,
+						  bool bIsEnabled /*= true*/,
+						  bool bIsFixedRotation /*= false*/,
+						  bool bIsCcd /*= false*/,
+						  bool bIsAwake /*= true*/,
+						  bool bAllowSleep /*= true*/,
+						  float fGravityScale /*= 1.0f*/)
 {
-	b2World &worldRef = Hy_Physics2d();
+	PhysRelease();
 
-	if(m_pPhysicsBody)
-		worldRef.DestroyBody(m_pPhysicsBody);
+	b2BodyDef bodyDef;
+	bodyDef.userData = this;
+	bodyDef.position.Set(pos.X() * physGridRef.GetPpmInverse(), pos.Y() * physGridRef.GetPpmInverse());
+	bodyDef.angle = rot.Get();
 
-	bodyDefOut.userData = this;
-	bodyDefOut.position.Set(pos.X(), pos.Y());
-	bodyDefOut.angle = rot.Get();
+	bodyDef.type = static_cast<b2BodyType>(eType); // static_assert guarantees this to match
+	bodyDef.active = bIsEnabled;
+	bodyDef.fixedRotation = bIsFixedRotation;
+	bodyDef.bullet = bIsCcd;
+	bodyDef.awake = bIsAwake;
+	bodyDef.allowSleep = bAllowSleep;
+	bodyDef.gravityScale = fGravityScale;
 
-	m_pPhysicsBody = worldRef.CreateBody(&bodyDefOut);
+	m_pPhysicsBody = physGridRef.CreateBody(&bodyDef);
 }
 
-void HyEntity2d::DisablePhysics()
+HyPhysicsType HyEntity2d::PhysGetType() const
+{
+	return m_pPhysicsBody ? static_cast<HyPhysicsType>(m_pPhysicsBody->GetType()) : HYPHYS_Unknown;
+}
+
+void HyEntity2d::PhysSetType(HyPhysicsType eType)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetType(static_cast<b2BodyType>(eType)); // static_assert guarantees this to match
+}
+
+bool HyEntity2d::PhysIsEnabled() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsActive();
+}
+
+void HyEntity2d::PhysSetEnabled(bool bEnable)
 {
 	if(m_pPhysicsBody)
 	{
-		Hy_Physics2d().DestroyBody(m_pPhysicsBody);
+		if(bEnable)
+			m_pPhysicsBody->SetTransform(b2Vec2(pos.X(), pos.Y()), glm::radians(rot.Get()));
+
+		m_pPhysicsBody->SetActive(bEnable);
+	}
+}
+
+bool HyEntity2d::PhysIsFixedRotation() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsFixedRotation();
+}
+
+void HyEntity2d::PhysSetFixedRotation(bool bFixedRot)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetFixedRotation(bFixedRot);
+}
+
+bool HyEntity2d::PhysIsCcd() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsBullet();
+}
+
+void HyEntity2d::PhysSetCcd(bool bContinuousCollisionDetection)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetBullet(bContinuousCollisionDetection);
+}
+
+bool HyEntity2d::PhysIsAwake() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsAwake();
+}
+
+void HyEntity2d::PhysSetAwake(bool bAwake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetAwake(bAwake);
+}
+
+bool HyEntity2d::PhysIsSleepingAllowed() const
+{
+	return m_pPhysicsBody && m_pPhysicsBody->IsSleepingAllowed();
+}
+
+void HyEntity2d::PhysSetSleepingAllowed(bool bAllowSleep)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetSleepingAllowed(bAllowSleep);
+}
+
+float HyEntity2d::PhysGetGravityScale() const
+{
+	return m_pPhysicsBody ? m_pPhysicsBody->GetGravityScale() : 0.0f;
+}
+
+void HyEntity2d::PhysSetGravityScale(float fGravityScale)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetGravityScale(fGravityScale);
+}
+
+glm::vec2 HyEntity2d::PhysWorldCenterMass() const
+{
+	if(m_pPhysicsBody)
+		return glm::vec2(m_pPhysicsBody->GetWorldCenter().x, m_pPhysicsBody->GetWorldCenter().y);
+
+	return glm::vec2();
+}
+
+glm::vec2 HyEntity2d::PhysLocalCenterMass() const
+{
+	if(m_pPhysicsBody)
+		return glm::vec2(m_pPhysicsBody->GetLocalCenter().x, m_pPhysicsBody->GetLocalCenter().y);
+
+	return glm::vec2();
+}
+
+glm::vec2 HyEntity2d::PhysGetLinearVelocity() const
+{
+	if(m_pPhysicsBody)
+		return glm::vec2(m_pPhysicsBody->GetLinearVelocity().x, m_pPhysicsBody->GetLinearVelocity().y);
+
+	return glm::vec2();
+}
+
+void HyEntity2d::PhysSetLinearVelocity(glm::vec2 vVelocity)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetLinearVelocity(b2Vec2(vVelocity.x, vVelocity.y));
+}
+
+float HyEntity2d::PhysGetAngularVelocity() const
+{
+	if(m_pPhysicsBody)
+		return m_pPhysicsBody->GetAngularVelocity();
+
+	return 0.0f;
+}
+
+void HyEntity2d::PhysSetAngularVelocity(float fOmega)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->SetAngularVelocity(fOmega);
+}
+
+void HyEntity2d::PhysApplyForce(const glm::vec2 &vForce, const glm::vec2 &ptPoint, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyForce(b2Vec2(vForce.x, vForce.y), b2Vec2(ptPoint.x, ptPoint.y), bWake);
+}
+
+void HyEntity2d::PhysApplyForceToCenter(const glm::vec2 &vForce, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyForceToCenter(b2Vec2(vForce.x, vForce.y), bWake);
+}
+
+void HyEntity2d::PhysApplyTorque(float fTorque, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyTorque(fTorque, bWake);
+}
+
+void HyEntity2d::PhysApplyLinearImpulse(const glm::vec2 &vImpulse, const glm::vec2 &ptPoint, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyLinearImpulse(b2Vec2(vImpulse.x, vImpulse.y), b2Vec2(ptPoint.x, ptPoint.y), bWake);
+}
+
+void HyEntity2d::PhysApplyLinearImpulseToCenter(const glm::vec2 &vImpulse, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyLinearImpulseToCenter(b2Vec2(vImpulse.x, vImpulse.y), bWake);
+}
+
+void HyEntity2d::PhysApplyAngularImpulse(float fImpulse, bool bWake)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->ApplyAngularImpulse(fImpulse, bWake);
+}
+
+float HyEntity2d::PhysGetMass() const
+{
+	if(m_pPhysicsBody)
+		return m_pPhysicsBody->GetMass();
+
+	return 0.0f;
+}
+
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor)
+{
+	if(m_pPhysicsBody == nullptr || shapeRef.IsValid() == false)
+		return nullptr;
+
+	b2Shape *pPpmShape = shapeRef.ClonePpmShape(static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse());
+	std::unique_ptr<HyPhysicsCollider> pCollider = std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, pPpmShape, fDensity, fFriction, fRestitution, bIsSensor);
+	delete pPpmShape;
+
+	return pCollider;
+}
+
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor)
+{
+	return PhysAddCircleCollider(glm::vec2(0.0f, 0.0), fRadius, fDensity, fFriction, fRestitution, bIsSensor);
+}
+
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor)
+{
+	if(m_pPhysicsBody == nullptr || fRadius <= 0.0f)
+		return nullptr;
+
+	float fPpmInverse = static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+	b2CircleShape circleShape;
+	circleShape.m_p.x = ptCenter.x * fPpmInverse;
+	circleShape.m_p.y = ptCenter.y * fPpmInverse;
+	circleShape.m_radius = fRadius * fPpmInverse;
+	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, &circleShape, fDensity, fFriction, fRestitution, bIsSensor);
+}
+
+void HyEntity2d::PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider)
+{
+	if(m_pPhysicsBody)
+		m_pPhysicsBody->DestroyFixture(pCollider->GetFixture());
+
+	pCollider.release();
+}
+
+float HyEntity2d::PhysGetInertia() const
+{
+	if(m_pPhysicsBody)
+		return m_pPhysicsBody->GetInertia();
+
+	return 0.0f;
+}
+
+void HyEntity2d::PhysRelease()
+{
+	if(m_pPhysicsBody)
+	{
+		m_pPhysicsBody->GetWorld()->DestroyBody(m_pPhysicsBody);
 		m_pPhysicsBody = nullptr;
 	}
 }
@@ -389,23 +635,6 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	}
 
 	return iOrderValue;
-}
-
-/*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
-{
-	m_WorldAABB.lowerBound = m_WorldAABB.upperBound = b2Vec2(0.0f, 0.0f);
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(m_ChildList[i]->GetWorldAABB().IsValid() == false)
-			continue;
-
-		if(i == 0)
-			m_WorldAABB = m_ChildList[i]->GetWorldAABB();
-		else
-			m_WorldAABB.Combine(m_ChildList[i]->GetWorldAABB());
-	}
-
-	return m_WorldAABB;
 }
 
 /*virtual*/ void HyEntity2d::Load() /*override*/
@@ -500,14 +729,20 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		}
 	}
 
-	if(m_pPhysicsBody != nullptr && m_pPhysicsBody->IsActive())
+	// TODO: Fix this
+	if(m_pPhysicsBody != nullptr)
 	{
-		pos.SetWithoutDirty(m_pPhysicsBody->GetPosition().x, m_pPhysicsBody->GetPosition().y);
-		rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()), false);
+		if(m_pPhysicsBody->IsActive())
+		{
+			if(pos.IsAnimating() == false)
+			{
+				pos.GetAnimFloat(0).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().x * static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
+				pos.GetAnimFloat(1).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().y * static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
+			}
 
-		// Manually dirty transform flags without
-		uint32 uiDirtyFlags = DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB;
-		ApplyDirty(uiDirtyFlags);
+			if(rot.IsAnimating() == false)
+				rot.Updater([&](float fUnused) { return glm::degrees(m_pPhysicsBody->GetAngle()); });
+		}
 	}
 
 	OnUpdate();
@@ -548,16 +783,22 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 
 /*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
 {
-	// Transform dirty flag gets set by user calls. Physics updates internally without dirtying
-	if(m_pPhysicsBody && (uiDirtyFlags & DIRTY_Transform) != 0)
-		m_pPhysicsBody->SetTransform(b2Vec2(pos.X(), pos.Y()), glm::radians(rot.Get()));
-
-	ApplyDirty(uiDirtyFlags);
-}
-
-void HyEntity2d::ApplyDirty(uint32 uiDirtyFlags)
-{
 	IHyNode2d::SetDirty(uiDirtyFlags);
+
+	if(m_pPhysicsBody && (uiDirtyFlags & IHyNode::DIRTY_FromUpdater) == 0)
+	{
+		float fPpmInverse = static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+
+		uint32 uiTransformFlags = (uiDirtyFlags & (DIRTY_Position | DIRTY_Rotation));
+		if((DIRTY_Position | DIRTY_Rotation) == uiTransformFlags)
+			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * fPpmInverse, pos.Y() * fPpmInverse), glm::radians(rot.Get()));
+		else if(DIRTY_Position == uiTransformFlags)
+			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * fPpmInverse, pos.Y() * fPpmInverse), m_pPhysicsBody->GetAngle());
+		else if(DIRTY_Rotation == uiTransformFlags)
+			m_pPhysicsBody->SetTransform(m_pPhysicsBody->GetPosition(), glm::radians(rot.Get()));
+
+		ClearDirty(IHyNode::DIRTY_FromUpdater);
+	}
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->SetDirty(uiDirtyFlags);

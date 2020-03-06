@@ -16,11 +16,11 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 	IHyNode(eNodeType),
 	m_pParent(pParent),
 	m_fRotation(0.0f),
-	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 	scale.Set(1.0f);
@@ -35,11 +35,11 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	m_mtxCached(copyRef.m_mtxCached),
 	m_fRotation(copyRef.m_fRotation),
 	m_WorldAABB(copyRef.m_WorldAABB),
-	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -59,11 +59,11 @@ IHyNode2d::IHyNode2d(IHyNode2d &&donor) :
 	m_mtxCached(std::move(donor.m_mtxCached)),
 	m_fRotation(donor.m_fRotation),
 	m_WorldAABB(std::move(donor.m_WorldAABB)),
-	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_WorldAABB)
+	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
+	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -154,7 +154,7 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &outMtx) const
 
 const glm::mat4 &IHyNode2d::GetWorldTransform()
 {
-	if(IsDirty(DIRTY_Transform))
+	if(IsDirty(DIRTY_Position | DIRTY_Rotation | DIRTY_Scale))
 	{
 		if(m_pParent)
 		{
@@ -168,7 +168,7 @@ const glm::mat4 &IHyNode2d::GetWorldTransform()
 		else
 			GetLocalTransform(m_mtxCached);
 
-		ClearDirty(DIRTY_Transform);
+		ClearDirty(DIRTY_Position | DIRTY_Rotation | DIRTY_Scale);
 	}
 
 	return m_mtxCached;

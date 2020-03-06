@@ -37,9 +37,9 @@ float HyAnimFloat::Get() const
 	return m_fValueRef;
 }
 
-void HyAnimFloat::Set(float fValue, bool bMarkDirty /*= true*/)
+void HyAnimFloat::Set(float fValue)
 {
-	if(bMarkDirty && m_fValueRef != fValue)
+	if(m_fValueRef != fValue)
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
 
 	m_fValueRef = fValue;
@@ -114,6 +114,17 @@ void HyAnimFloat::Proc(float fSeconds, std::function<float(float)> fpProcFunc, H
 	m_fElapsedTime = 0.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::_Proc;
 	m_fpAnimFinishedFunc = fpFinishedCallback;
+
+	m_OwnerRef.InsertActiveAnimFloat(this);
+}
+
+void HyAnimFloat::Updater(std::function<float(float)> fpUpdaterFunc)
+{
+	m_fDuration = 0.0f;
+	m_fpAnimFunc = fpUpdaterFunc;
+	m_fElapsedTime = 0.0f;
+	m_fpBehaviorUpdate = &HyAnimFloat::_Updater;
+	m_fpAnimFinishedFunc = nullptr;
 
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
@@ -291,4 +302,14 @@ bool HyAnimFloat::_Proc()
 	m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
 
 	return m_fElapsedTime == m_fDuration;
+}
+
+bool HyAnimFloat::_Updater()
+{
+	m_fElapsedTime += Hy_UpdateStep();
+
+	m_fValueRef = m_fpAnimFunc(m_fElapsedTime);
+	m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS | IHyNode::DIRTY_FromUpdater);
+
+	return false;
 }

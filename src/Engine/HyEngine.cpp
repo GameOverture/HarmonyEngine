@@ -35,7 +35,6 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 	m_Renderer(m_Diagnostics, m_WindowManager.GetWindowList())
 {
 	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");
-	HyAssert(m_Init.fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 
 	// TODO Cleanup: decide whether to block 
 	while(m_Assets.IsInitialized() == false)
@@ -92,8 +91,8 @@ bool HyEngine::Update()
 
 	//HyThrottleUpdate
 	{
-		m_Scene.UpdatePhysics();
 		m_Scene.UpdateNodes();
+		m_Scene.UpdatePhysics();
 
 		HY_PROFILE_BEGIN(HYPROFILERSECTION_Update)
 		if(PollPlatformApi() == false || OnUpdate() == false)
@@ -171,12 +170,6 @@ bool HyEngine::PollPlatformApi()
 	return HyEngine::sm_pInstance->m_Input;
 }
 
-/*friend*/ b2World &Hy_Physics2d()
-{
-	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Physics2d() was invoked before engine has been initialized.");
-	return HyEngine::sm_pInstance->m_Scene.GetPhysics2d();
-}
-
 /*friend*/ HyDiagnostics &Hy_Diagnostics()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Diagnostics() was invoked before engine has been initialized.");
@@ -187,23 +180,6 @@ bool HyEngine::PollPlatformApi()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_DefaultShaderHandle() was invoked before engine has been initialized.");
 	return HyEngine::sm_pInstance->m_Renderer.GetDefaultShaderHandle(eType);
-}
-
-/*friend*/ bool Hy_IsDrawInst(HyType eType)
-{
-	switch(eType)
-	{
-	case HYTYPE_Particles:
-	case HYTYPE_Sprite:
-	case HYTYPE_Spine:
-	case HYTYPE_TexturedQuad:
-	case HYTYPE_Primitive:
-	case HYTYPE_Text:
-	case HYTYPE_Prefab:
-		return true;
-	}
-
-	return false;
 }
 
 /*friend*/ std::string Hy_DateTime()
