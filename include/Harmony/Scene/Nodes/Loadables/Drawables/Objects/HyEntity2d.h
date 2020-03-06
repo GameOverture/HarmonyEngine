@@ -39,7 +39,6 @@ protected:
 	void *									m_pMouseInputUserParam;
 
 	b2Body *								m_pPhysicsBody;
-	std::vector<b2Fixture *>				m_pPhysicsColliders;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);

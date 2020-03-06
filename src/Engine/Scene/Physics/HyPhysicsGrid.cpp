@@ -21,9 +21,9 @@ HyPhysicsGrid::HyPhysicsGrid(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*/, f
 {
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	SetContactListener(&m_Phys2dContactListener);
-	SetDebugDraw(&m_DrawPhys2d);
+	//SetDebugDraw(&m_DrawPhys2d);
 
-	m_DrawPhys2d.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+	//m_DrawPhys2d.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
 
 	HyScene::AddPhysicsGrid(this);
 }
@@ -35,8 +35,8 @@ HyPhysicsGrid::~HyPhysicsGrid()
 
 void HyPhysicsGrid::Update()
 {
-	m_DrawPhys2d.GetDrawList().clear();
-	DrawDebugData();
+	//m_DrawPhys2d.GetDrawList().clear();
+	//DrawDebugData();
 
 	Step(Hy_UpdateStep(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 }
