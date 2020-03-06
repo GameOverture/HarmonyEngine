@@ -33,33 +33,34 @@ protected:
 	// These flags get set by HyAnimFloat's when their corresponding respective values are manipulated
 	enum DirtyFlag // NOTE: continue the bits in TypeFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		DIRTY_BoundingVolume		= 1 << 7,
-		DIRTY_WorldAABB				= 1 << 8,
-		DIRTY_Position				= 1 << 9,
-		DIRTY_Rotation				= 1 << 10,
-		DIRTY_Scale					= 1 << 11,
-		DIRTY_Color					= 1 << 12,
-		DIRTY_Scissor				= 1 << 13,
+		DIRTY_FromUpdater			= 1 << 7,
+		DIRTY_BoundingVolume		= 1 << 8,
+		DIRTY_WorldAABB				= 1 << 9,
+		DIRTY_Position				= 1 << 10,
+		DIRTY_Rotation				= 1 << 11,
+		DIRTY_Scale					= 1 << 12,
+		DIRTY_Color					= 1 << 13,
+		DIRTY_Scissor				= 1 << 14,
 
-		DIRTY_ALL =					DIRTY_BoundingVolume | DIRTY_WorldAABB | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale | DIRTY_Color | DIRTY_Scissor
+		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_BoundingVolume | DIRTY_WorldAABB | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale | DIRTY_Color | DIRTY_Scissor
 	};
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
 	enum ExplicitFlag // NOTE: continue the bits in DirtyFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		EXPLICIT_Visible			= 1 << 14,
-		EXPLICIT_PauseUpdate		= 1 << 15,
-		EXPLICIT_Scissor			= 1 << 16,
-		EXPLICIT_Stencil			= 1 << 17,
-		EXPLICIT_DisplayOrder		= 1 << 18,
-		EXPLICIT_CoordinateSystem	= 1 << 19,
+		EXPLICIT_Visible			= 1 << 15,
+		EXPLICIT_PauseUpdate		= 1 << 16,
+		EXPLICIT_Scissor			= 1 << 17,
+		EXPLICIT_Stencil			= 1 << 18,
+		EXPLICIT_DisplayOrder		= 1 << 19,
+		EXPLICIT_CoordinateSystem	= 1 << 20,
 	};
 	// Various boolean values for node stored in these flags for smaller memory footprint
 	enum SettingFlag // NOTE: continue the bits in ExplicitFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		SETTING_IsRegistered		= 1 << 20,
-		SETTING_IsVisible			= 1 << 21,
-		SETTING_IsPauseUpdate		= 1 << 22,
+		SETTING_IsRegistered		= 1 << 21,
+		SETTING_IsVisible			= 1 << 22,
+		SETTING_IsPauseUpdate		= 1 << 23,
 	};
 	uint32							m_uiFlags;
 

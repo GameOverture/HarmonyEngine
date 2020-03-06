@@ -33,6 +33,11 @@ const glm::vec2 &HyAnimVec2::Get() const
 	return m_vValue;
 }
 
+HyAnimFloat &HyAnimVec2::GetAnimFloat(uint32 uiIndex)
+{
+	return m_AnimFloatList[uiIndex];
+}
+
 const glm::vec3 HyAnimVec2::Extrapolate() const
 {
 	return glm::vec3(m_vValue.x, m_vValue.y, 0.0f);
@@ -112,12 +117,6 @@ void HyAnimVec2::Set(const HyAnimVec2 &srcVec)
 {
 	m_AnimFloatList[0].Set(srcVec[0]);
 	m_AnimFloatList[1].Set(srcVec[1]);
-}
-
-void HyAnimVec2::SetWithoutDirty(float fX, float fY)
-{
-	m_AnimFloatList[0].Set(fX, false);
-	m_AnimFloatList[1].Set(fY, false);
 }
 
 void HyAnimVec2::Offset(float fX, float fY)

@@ -25,6 +25,7 @@ public:
 	~HyAnimVec2();
 
 	const glm::vec2 &Get() const;
+	HyAnimFloat &GetAnimFloat(uint32 uiIndex);
 	const glm::vec3 Extrapolate() const;
 
 	float X() const;
@@ -42,7 +43,6 @@ public:
 	void Set(const glm::vec3 &srcVec);
 	void Set(const glm::ivec2 &srcVec);
 	void Set(const HyAnimVec2 &srcVec);
-	void SetWithoutDirty(float fX, float fY);
 
 	void Offset(float fX, float fY);
 	void Offset(const glm::vec2 &srcVec);

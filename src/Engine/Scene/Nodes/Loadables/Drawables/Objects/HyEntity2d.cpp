@@ -734,12 +734,14 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	{
 		if(m_pPhysicsBody->IsActive())
 		{
-			float fPixelsPerMeter = static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter();
-			pos.SetWithoutDirty(m_pPhysicsBody->GetPosition().x * fPixelsPerMeter, m_pPhysicsBody->GetPosition().y * fPixelsPerMeter);
-			rot.Set(glm::degrees(m_pPhysicsBody->GetAngle()), false);
+			if(pos.IsAnimating() == false)
+			{
+				pos.GetAnimFloat(0).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().x * static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
+				pos.GetAnimFloat(1).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().y * static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
+			}
 
-			// Manually dirty transform flags without invoking the actual callback SetDirty() so the physics body doesn't get set over again
-			ApplyDirty(DIRTY_Position | DIRTY_Rotation);
+			if(rot.IsAnimating() == false)
+				rot.Updater([&](float fUnused) { return glm::degrees(m_pPhysicsBody->GetAngle()); });
 		}
 	}
 
@@ -781,7 +783,9 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 
 /*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
 {
-	if(m_pPhysicsBody)
+	IHyNode2d::SetDirty(uiDirtyFlags);
+
+	if(m_pPhysicsBody && (uiDirtyFlags & IHyNode::DIRTY_FromUpdater) == 0)
 	{
 		float fPpmInverse = static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
 
@@ -792,14 +796,9 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * fPpmInverse, pos.Y() * fPpmInverse), m_pPhysicsBody->GetAngle());
 		else if(DIRTY_Rotation == uiTransformFlags)
 			m_pPhysicsBody->SetTransform(m_pPhysicsBody->GetPosition(), glm::radians(rot.Get()));
+
+		ClearDirty(IHyNode::DIRTY_FromUpdater);
 	}
-
-	ApplyDirty(uiDirtyFlags);
-}
-
-void HyEntity2d::ApplyDirty(uint32 uiDirtyFlags)
-{
-	IHyNode2d::SetDirty(uiDirtyFlags);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->SetDirty(uiDirtyFlags);

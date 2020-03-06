@@ -45,7 +45,7 @@ public:
 	~HyAnimFloat(void);
 
 	float Get() const;
-	void Set(float fValue, bool bMarkDirty = true);
+	void Set(float fValue);
 	void Set(const HyAnimFloat &valueRef);
 	void Offset(float fValue);
 
@@ -55,6 +55,8 @@ public:
 	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
 
 	void Proc(float fSeconds, std::function<float(float)> fpProcFunc, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
+
+	void Updater(std::function<float(float)> fpUpdaterFunc);
 
 	void StopAnim();
 
@@ -82,6 +84,7 @@ private:
 	//////////////////////////////////////////////////////////////////////////
 	bool _Tween();
 	bool _Proc();
+	bool _Updater();
 
 public:
 	// Default (do-nothing) callback when tween finishes

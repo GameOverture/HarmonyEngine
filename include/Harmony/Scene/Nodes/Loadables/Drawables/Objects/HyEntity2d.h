@@ -167,7 +167,6 @@ protected:
 	void SetNewChildAttributes(IHyNode2d &childRef);
 
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
-	void ApplyDirty(uint32 uiDirtyFlags);
 
 	virtual void _SetVisible(bool bEnabled, bool bIsOverriding) override final;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
