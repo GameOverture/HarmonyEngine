@@ -167,7 +167,10 @@ const HyText2dGlyphInfo *HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLa
 {
 	auto iter = m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiUtf32Code);
 	if(iter == m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end())
+	{
+		HyError("Missing glyph " << uiUtf32Code << " ('" << static_cast<char>(uiUtf32Code) << "') in Text instance: " << GetPath());
 		return nullptr;
+	}
 
 	return iter->second;
 }
