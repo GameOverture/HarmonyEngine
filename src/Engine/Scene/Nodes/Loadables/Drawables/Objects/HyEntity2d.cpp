@@ -543,24 +543,24 @@ float HyEntity2d::PhysGetMass() const
 	return 0.0f;
 }
 
-std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor)
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
 {
 	if(m_pPhysicsBody == nullptr || shapeRef.IsValid() == false)
 		return nullptr;
 
 	b2Shape *pPpmShape = shapeRef.ClonePpmShape(static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse());
-	std::unique_ptr<HyPhysicsCollider> pCollider = std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, pPpmShape, fDensity, fFriction, fRestitution, bIsSensor);
+	std::unique_ptr<HyPhysicsCollider> pCollider = std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, pPpmShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
 	delete pPpmShape;
 
 	return pCollider;
 }
 
-std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor)
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
 {
-	return PhysAddCircleCollider(glm::vec2(0.0f, 0.0), fRadius, fDensity, fFriction, fRestitution, bIsSensor);
+	return PhysAddCircleCollider(glm::vec2(0.0f, 0.0), fRadius, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
 }
 
-std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor)
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
 {
 	if(m_pPhysicsBody == nullptr || fRadius <= 0.0f)
 		return nullptr;
@@ -570,7 +570,7 @@ std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(const glm::
 	circleShape.m_p.x = ptCenter.x * fPpmInverse;
 	circleShape.m_p.y = ptCenter.y * fPpmInverse;
 	circleShape.m_radius = fRadius * fPpmInverse;
-	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, &circleShape, fDensity, fFriction, fRestitution, bIsSensor);
+	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, &circleShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
 }
 
 void HyEntity2d::PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider)
