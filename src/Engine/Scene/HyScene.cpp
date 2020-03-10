@@ -24,7 +24,7 @@
 bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
-std::vector<HyPhysicsGrid *> HyScene::sm_PhysicsGridList;
+std::vector<HyPhysicsGrid2d *> HyScene::sm_PhysicsGridList;
 
 HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :
 	m_WindowListRef(WindowListRef),
@@ -78,12 +78,12 @@ HyScene::~HyScene(void)
 	}
 }
 
-/*static*/ void HyScene::AddPhysicsGrid(HyPhysicsGrid *pPhysGrid)
+/*static*/ void HyScene::AddPhysicsGrid(HyPhysicsGrid2d *pPhysGrid)
 {
 	sm_PhysicsGridList.push_back(pPhysGrid);
 }
 
-/*static*/ void HyScene::RemovePhysicsGrid(HyPhysicsGrid *pPhysGrid)
+/*static*/ void HyScene::RemovePhysicsGrid(HyPhysicsGrid2d *pPhysGrid)
 {
 	for(auto it = sm_PhysicsGridList.begin(); it != sm_PhysicsGridList.end(); ++it)
 	{

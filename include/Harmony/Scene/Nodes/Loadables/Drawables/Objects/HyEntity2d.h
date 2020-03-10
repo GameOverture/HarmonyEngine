@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
-#include "Scene/Physics/HyPhysicsGrid.h"
+#include "Scene/Physics/HyPhysicsGrid2d.h"
 #include "Scene/Physics/HyPhysicsCollider.h"
 
 class HyEntity2d : public IHyDrawable2d
@@ -99,7 +99,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PHYSICS
-	void PhysInit(HyPhysicsGrid &physGridRef,
+	void PhysInit(HyPhysicsGrid2d &physGridRef,
 				  HyPhysicsType eType,
 				  bool bIsEnabled = true,
 				  bool bIsFixedRotation = false,
@@ -145,6 +145,7 @@ public:
 	std::unique_ptr<HyPhysicsCollider> PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
 	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
 	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
+	std::unique_ptr<HyPhysicsCollider> PhysAddLineChainCollider(const glm::vec2 *pVerts, uint32 uiNumVerts, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
 	void PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider);
 
 	void PhysRelease();

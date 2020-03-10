@@ -346,7 +346,7 @@ void HyEntity2d::DisableMouseInput()
 	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
 }
 
-void HyEntity2d::PhysInit(HyPhysicsGrid &physGridRef,
+void HyEntity2d::PhysInit(HyPhysicsGrid2d &physGridRef,
 						  HyPhysicsType eType,
 						  bool bIsEnabled /*= true*/,
 						  bool bIsFixedRotation /*= false*/,
@@ -548,7 +548,7 @@ std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCollider(const HyShape2d &
 	if(m_pPhysicsBody == nullptr || shapeRef.IsValid() == false)
 		return nullptr;
 
-	b2Shape *pPpmShape = shapeRef.ClonePpmShape(static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse());
+	b2Shape *pPpmShape = shapeRef.ClonePpmShape(static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse());
 	std::unique_ptr<HyPhysicsCollider> pCollider = std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, pPpmShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
 	delete pPpmShape;
 
@@ -565,12 +565,27 @@ std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCircleCollider(const glm::
 	if(m_pPhysicsBody == nullptr || fRadius <= 0.0f)
 		return nullptr;
 
-	float fPpmInverse = static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+	float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
 	b2CircleShape circleShape;
 	circleShape.m_p.x = ptCenter.x * fPpmInverse;
 	circleShape.m_p.y = ptCenter.y * fPpmInverse;
 	circleShape.m_radius = fRadius * fPpmInverse;
 	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, &circleShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
+}
+
+std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddLineChainCollider(const glm::vec2 *pVerts, uint32 uiNumVerts, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
+{
+	if(m_pPhysicsBody == nullptr || pVerts == nullptr || uiNumVerts == 0)
+		return nullptr;
+
+	float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+	std::vector<b2Vec2> vertList;
+	for(uint32 i = 0; i < uiNumVerts; ++i)
+		vertList.emplace_back(pVerts[i].x * fPpmInverse, pVerts[i].y * fPpmInverse);
+
+	b2ChainShape chainShape;
+	chainShape.CreateChain(vertList.data(), uiNumVerts);
+	return std::make_unique<HyPhysicsCollider>(m_pPhysicsBody, &chainShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
 }
 
 void HyEntity2d::PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider)
@@ -736,8 +751,8 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		{
 			if(pos.IsAnimating() == false)
 			{
-				pos.GetAnimFloat(0).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().x * static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
-				pos.GetAnimFloat(1).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().y * static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
+				pos.GetAnimFloat(0).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().x * static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
+				pos.GetAnimFloat(1).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().y * static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
 			}
 
 			if(rot.IsAnimating() == false)
@@ -787,7 +802,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 
 	if(m_pPhysicsBody && (uiDirtyFlags & IHyNode::DIRTY_FromUpdater) == 0)
 	{
-		float fPpmInverse = static_cast<HyPhysicsGrid *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+		float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
 
 		uint32 uiTransformFlags = (uiDirtyFlags & (DIRTY_Position | DIRTY_Rotation));
 		if((DIRTY_Position | DIRTY_Rotation) == uiTransformFlags)

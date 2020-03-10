@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Scene/Physics/HyPhysicsGrid.h"
+#include "Scene/Physics/HyPhysicsGrid2d.h"
 #include "Scene/Physics/HyPhysicsCollider.h"
 
 HyPhysicsCollider::HyPhysicsCollider(b2Body *pBody, const b2Shape *pb2PpmShape, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter) :
