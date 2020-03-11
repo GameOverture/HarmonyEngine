@@ -35,6 +35,7 @@ public:
 	float GetPixelsPerMeter();
 	float GetPpmInverse();
 
+	bool IsDebugDraw();
 	void DebugDraw(bool bEnableDebugDraw);
 };
 

@@ -57,6 +57,11 @@ float HyPhysicsGrid2d::GetPpmInverse()
 	return m_fPpmInverse;
 }
 
+bool HyPhysicsGrid2d::IsDebugDraw()
+{
+	return m_DrawPhys2d.GetFlags() != 0;
+}
+
 void HyPhysicsGrid2d::DebugDraw(bool bEnableDebugDraw)
 {
 	if(bEnableDebugDraw)
