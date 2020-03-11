@@ -394,7 +394,12 @@ void HyEntity2d::PhysSetEnabled(bool bEnable)
 	if(m_pPhysicsBody)
 	{
 		if(bEnable)
-			m_pPhysicsBody->SetTransform(b2Vec2(pos.X(), pos.Y()), glm::radians(rot.Get()));
+		{
+			float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+			m_pPhysicsBody->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+			m_pPhysicsBody->SetAngularVelocity(0.0f);
+			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * fPpmInverse, pos.Y() * fPpmInverse), glm::radians(rot.Get()));
+		}
 
 		m_pPhysicsBody->SetActive(bEnable);
 	}
@@ -473,7 +478,7 @@ glm::vec2 HyEntity2d::PhysLocalCenterMass() const
 
 glm::vec2 HyEntity2d::PhysGetLinearVelocity() const
 {
-	if(m_pPhysicsBody)
+	if(m_pPhysicsBody && m_pPhysicsBody->IsActive())
 		return glm::vec2(m_pPhysicsBody->GetLinearVelocity().x, m_pPhysicsBody->GetLinearVelocity().y);
 
 	return glm::vec2();

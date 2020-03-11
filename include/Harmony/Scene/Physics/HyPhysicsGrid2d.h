@@ -34,6 +34,8 @@ public:
 
 	float GetPixelsPerMeter();
 	float GetPpmInverse();
+
+	void DebugDraw(bool bEnableDebugDraw);
 };
 
 #endif /* HyPhysicsGrid_h__ */
