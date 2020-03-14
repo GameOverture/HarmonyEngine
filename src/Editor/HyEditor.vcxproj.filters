@@ -108,9 +108,6 @@
     <ClCompile Include="Dialogs\DlgSetEngineLocation.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="Entity3d\Entity3d.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
     <ClCompile Include="Entity\EntityDraw.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
@@ -432,12 +429,6 @@
     <ClInclude Include="ui_DlgSetEngineLocation.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="ui_Entity3d.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ui_EntityCommon.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="ui_EntityToolbox.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -508,12 +499,6 @@
     </QtUic>
     <QtUic Include="Dialogs\DlgSetEngineLocation.ui">
       <Filter>Dialogs</Filter>
-    </QtUic>
-    <QtUic Include="Entity3d\Entity3d.ui">
-      <Filter>Entity</Filter>
-    </QtUic>
-    <QtUic Include="Entity\EntityCommon.ui">
-      <Filter>Entity</Filter>
     </QtUic>
     <QtUic Include="Entity\EntityToolbox.ui">
       <Filter>Entity</Filter>
@@ -1160,9 +1145,6 @@
   <ItemGroup>
     <QtMoc Include="Atlas\AtlasWidget.h">
       <Filter>Atlas</Filter>
-    </QtMoc>
-    <QtMoc Include="Entity3d\Entity3d.h">
-      <Filter>Entity</Filter>
     </QtMoc>
     <QtMoc Include="Explorer\ExplorerWidget.h">
       <Filter>Explorer</Filter>

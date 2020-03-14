@@ -223,7 +223,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Dialogs\DlgNewProject.cpp" />
     <ClCompile Include="Dialogs\DlgProjectSettings.cpp" />
     <ClCompile Include="Dialogs\DlgSetEngineLocation.cpp" />
-    <ClCompile Include="Entity3d\Entity3d.cpp" />
     <ClCompile Include="Entity\EntityDraw.cpp" />
     <ClCompile Include="Entity\EntityModel.cpp" />
     <ClCompile Include="Entity\EntityUndoCmds.cpp" />
@@ -347,10 +346,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtMoc Include="Dialogs\DlgSetEngineLocation.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Dialogs/%(Filename)%(Extension)</ForceInclude>
-    </QtMoc>
-    <QtMoc Include="Entity3d\Entity3d.h">
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity3d/%(Filename)%(Extension)</ForceInclude>
-      <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity3d/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <QtMoc Include="Audio\AudioWidget.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Audio/%(Filename)%(Extension)</ForceInclude>
@@ -526,8 +521,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClInclude Include="ui_DlgNewProject.h" />
     <ClInclude Include="ui_DlgProjectSettings.h" />
     <ClInclude Include="ui_DlgSetEngineLocation.h" />
-    <ClInclude Include="ui_Entity3d.h" />
-    <ClInclude Include="ui_EntityCommon.h" />
     <ClInclude Include="ui_EntityToolbox.h" />
     <ClInclude Include="ui_EntityWidget.h" />
     <ClInclude Include="ui_ExplorerWidget.h" />
@@ -560,10 +553,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtUic Include="Dialogs\DlgProjectSettings.ui">
     </QtUic>
     <QtUic Include="Dialogs\DlgSetEngineLocation.ui">
-    </QtUic>
-    <QtUic Include="Entity3d\Entity3d.ui">
-    </QtUic>
-    <QtUic Include="Entity\EntityCommon.ui">
     </QtUic>
     <QtUic Include="Entity\EntityToolbox.ui">
     </QtUic>
