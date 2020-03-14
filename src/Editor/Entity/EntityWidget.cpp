@@ -38,8 +38,6 @@ EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/)
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
 	ui->nodeTree->setModel(&pEntityModel->GetChildrenModel());
-
-	on_childrenTree_clicked(QModelIndex());
 }
 
 EntityWidget::~EntityWidget()
@@ -82,12 +80,9 @@ EntityWidget::~EntityWidget()
 	ui->actionAddScissorBox->setEnabled(bFrameIsSelected);
 	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
 	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
-}
 
-/*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
-{
-	// Get EntityStateData from 'iStateIndex', and select the correct EntityTreeItem using 'iSubStateIndex' as the key
-	ExplorerItem *pSubStateItem = subState.value<ExplorerItem *>();
+
+	ExplorerItem *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetChildrenModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<ExplorerItem *>();
 	if(pSubStateItem == nullptr)
 	{
 		ui->lblSelectedItemIcon->setVisible(false);
@@ -111,6 +106,11 @@ EntityWidget::~EntityWidget()
 		for(int i = 0; i < pPropertiesModel->rowCount(); ++i)
 			ui->propertyTree->expand(pPropertiesModel->index(i, 0, rootIndex));
 	}
+}
+
+/*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
+{
+	
 }
 
 ExplorerItem *EntityWidget::GetSelectedNode()
@@ -164,51 +164,7 @@ void EntityWidget::on_actionInsertPhysicsBody_triggered()
 
 }
 
-void EntityWidget::on_childrenTree_clicked(const QModelIndex &index)
+void EntityWidget::on_nodeTree_clicked(QModelIndex index)
 {
-	//EntityTreeItem *pTreeItem = static_cast<EntityTreeItem *>(index.internalPointer()); <--- deprecated
-	//FocusState(ui->cmbStates->currentIndex(), QVariant(reinterpret_cast<qulonglong>(pTreeItem)));
-
-//    ui->toolBox->setVisible(true);
-//    ui->toolBoxLine->setVisible(true);
-
-////    pTreeItem->GetData(0).m_PosX;
-////    pTreeItem->GetData(0).m_PosY;
-////    pTreeItem->GetData(0).m_ScaleX;
-////    pTreeItem->GetData(0).m_ScaleY;
-////    pTreeItem->GetData(0).m_Rotation;
-
-////    pTreeItem->GetData(0).m_Enabled;
-////    pTreeItem->GetData(0).m_UpdateWhilePaused;
-////    pTreeItem->GetData(0).m_Tag;
-////    pTreeItem->GetData(0).m_DisplayOrder;
-//    //ui->sbTransformX-
-
-//    switch(pTreeItem->GetItem()->GetType())
-//    {
-//    case ITEM_Sprite:
-//        ui->stackedWidget->setCurrentIndex(STACKED_Sprite);
-//        break;
-//    case ITEM_Entity:
-//        ui->stackedWidget->setCurrentIndex(STACKED_Entity);
-//        break;
-//    case ITEM_Font:
-//        ui->stackedWidget->setCurrentIndex(STACKED_Font);
-//        break;
-//    case ITEM_AtlasImage:
-//        ui->stackedWidget->setCurrentIndex(STACKED_TexturedQuad);
-//        break;
-//    case ITEM_Audio:
-//    case ITEM_Particles:
-//    case ITEM_Spine:
-//    case ITEM_Shader:
-//    case ITEM_BoundingVolume:
-//        ui->stackedWidget->setCurrentIndex(STACKED_BoundingVolume);
-//        break;
-//    case ITEM_Physics:
-//        ui->stackedWidget->setCurrentIndex(STACKED_Physics);
-//        break;
-//        HyGuiLog("Unsupported Entity childrenTree clicked", LOGTYPE_Error);
-//        break;
-//    }
+	UpdateActions();
 }

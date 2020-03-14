@@ -22,6 +22,7 @@ class ProjectItemMimeData : public QMimeData
 
 public:
 	ProjectItemMimeData(QList<ExplorerItem *> &itemListRef);
+	ProjectItemMimeData(const QVariant &data);
 	virtual ~ProjectItemMimeData();
 
 	virtual bool hasFormat(const QString &sMimeType) const override;

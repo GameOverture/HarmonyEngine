@@ -65,6 +65,12 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItem *> &itemListRef)
 	setData(HYGUI_MIMETYPE, m_Data);
 }
 
+ProjectItemMimeData::ProjectItemMimeData(const QVariant &data) :
+	m_Data(data.value<QByteArray>())
+{
+	setData(HYGUI_MIMETYPE, m_Data);
+}
+
 /*virtual*/ ProjectItemMimeData::~ProjectItemMimeData()
 { }
 

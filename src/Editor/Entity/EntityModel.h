@@ -43,7 +43,7 @@ public:
 
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
 };
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityStateData : public IStateData
 {
 	QMap<ExplorerItem *, PropertiesTreeModel *>			m_PropertiesMap;
@@ -88,7 +88,7 @@ public:
 	EntityNodeTreeModel &GetChildrenModel();
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItem *pItem);
 
-	void AddNewChildren(const ProjectItemMimeData *pMimeData);
+	void AddNewChildren(QList<ExplorerItem *> itemList);
 	bool RemoveChild(ExplorerItem *pItem);
 
 	const QList<ProjectItem *> &GetPrimitiveList();

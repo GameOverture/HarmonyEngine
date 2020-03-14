@@ -186,17 +186,7 @@
           </layout>
          </item>
          <item>
-          <widget class="PropertiesTreeView" name="propertyTree">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="alternatingRowColors">
-            <bool>true</bool>
-           </property>
-          </widget>
+          <widget class="QTreeView" name="propertyTree"/>
          </item>
         </layout>
        </widget>
@@ -262,13 +252,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>PropertiesTreeView</class>
-   <extends>QTreeView</extends>
-   <header>PropertiesTreeView.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../res/HyEditor.qrc"/>
  </resources>

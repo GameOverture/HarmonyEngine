@@ -9,8 +9,10 @@
 *************************************************************************/
 #include "Global.h"
 #include "HarmonyWidget.h"
+#include "ExplorerModel.h"
 #include "ProjectItemMimeData.h"
 #include "EntityModel.h"
+#include "EntityUndoCmds.h"
 
 #include <QDragEnterEvent>
 
@@ -160,8 +162,34 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	   static_cast<ProjectItem *>(pEvent->source()) != pCurOpenTabItem &&
 	   pCurOpenTabItem->GetType() == ITEM_Entity)
 	{
-		EntityModel *pEntModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel());
-		pEntModel->AddNewChildren(static_cast<const ProjectItemMimeData *>(pEvent->mimeData()));
+		QList<QVariant> validItemList;
+		// Parse mime data source for project item array
+		QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HYGUI_MIMETYPE));
+		QJsonArray itemArray = doc.array();
+		for(int iIndex = 0; iIndex < itemArray.size(); ++iIndex)
+		{
+			QJsonObject itemObj = itemArray[iIndex].toObject();
+
+			// Ensure this item is apart of this project
+			if(itemObj["project"].toString().toLower() == m_pProject->GetAbsPath().toLower())
+			{
+				QString sItemPath = itemObj["itemName"].toString();
+				ExplorerItem *pItem = m_pProject->GetExplorerModel().FindItemByItemPath(m_pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
+
+				EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetChildrenModel();
+				if(entityTreeModelRef.IsItemValid(pItem, true) == false)
+					continue;
+
+				QVariant v;
+				v.setValue<ExplorerItem *>(pItem);
+				validItemList.push_back(v);
+			}
+			else
+				HyGuiLog("Item " % itemObj["itemName"].toString() % " is not apart of the entity's project and cannot be added.", LOGTYPE_Info);
+		}
+
+		QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChildren, *pCurOpenTabItem, validItemList);
+		pCurOpenTabItem->GetUndoStack()->push(pCmd);
 
 		pEvent->setDropAction(Qt::LinkAction);
 		pEvent->accept();

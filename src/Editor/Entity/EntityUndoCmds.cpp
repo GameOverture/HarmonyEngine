@@ -16,7 +16,8 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<Q
 	QUndoCommand(pParent),
 	m_eCMD(eCMD),
 	m_ParameterList(parameterList),
-	m_EntityItemRef(entityItemRef)
+	m_EntityItemRef(entityItemRef),
+	m_iStateIndex(-1)
 {
 	if(m_EntityItemRef.GetType() != ITEM_Entity)
 		HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_EntityItemRef.GetType()) , LOGTYPE_Error);
@@ -31,6 +32,9 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<Q
 		setText("Add Primitive");
 		break;
 	}
+
+	if(entityItemRef.GetWidget())
+		m_iStateIndex = entityItemRef.GetWidget()->GetCurStateIndex();
 }
 
 /*virtual*/ EntityUndoCmd::~EntityUndoCmd()
@@ -46,13 +50,14 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<Q
 		for(auto param : m_ParameterList)
 			itemList.push_back(param.value<ExplorerItem *>());
 
-		ProjectItemMimeData mimeData(itemList);
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChildren(&mimeData);
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChildren(itemList);
 		break; }
 
 	case ENTITYCMD_AddPrimitive:
 		break;
 	}
+
+	m_EntityItemRef.FocusWidgetState(m_iStateIndex, -1);
 }
 
 /*virtual*/ void EntityUndoCmd::undo() /*override*/
@@ -62,10 +67,11 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<Q
 	case ENTITYCMD_AddNewChildren: {
 		for(auto param : m_ParameterList)
 			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(param.value<ExplorerItem *>());
-		
 		break; }
 
 	case ENTITYCMD_AddPrimitive:
 		break;
 	}
+
+	m_EntityItemRef.FocusWidgetState(m_iStateIndex, -1);
 }

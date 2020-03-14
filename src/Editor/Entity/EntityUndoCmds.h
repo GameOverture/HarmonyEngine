@@ -26,6 +26,7 @@ class EntityUndoCmd : public QUndoCommand
 	const EntityCmd		m_eCMD;
 	ProjectItem &		m_EntityItemRef;
 	QList<QVariant>		m_ParameterList;
+	int					m_iStateIndex;
 
 public:
 	EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<QVariant> parameterList, QUndoCommand *pParent = nullptr);

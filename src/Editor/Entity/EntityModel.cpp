@@ -277,31 +277,10 @@ PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerIt
 	return pPropertiesModel;
 }
 
-void EntityModel::AddNewChildren(const ProjectItemMimeData *pMimeData)
+void EntityModel::AddNewChildren(QList<ExplorerItem *> itemList)
 {
-	QByteArray sSrc = pMimeData->data(HYGUI_MIMETYPE);
-
-	Project *pProject = &GetItem().GetProject();
-
-	// Parse 'sSrc' for project item array
-	QJsonDocument doc = QJsonDocument::fromJson(sSrc);
-	QJsonArray itemArray = doc.array();
-	for(int iIndex = 0; iIndex < itemArray.size(); ++iIndex)
-	{
-		QJsonObject itemObj = itemArray[iIndex].toObject();
-
-		// Ensure this item is apart of this project
-		if(itemObj["project"].toString().toLower() == pProject->GetAbsPath().toLower())
-		{
-			QString sItemPath = itemObj["itemName"].toString();
-			ExplorerItem *pItem = pProject->GetExplorerModel().FindItemByItemPath(pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
-
-			m_TreeModel.InsertNewChild(pItem);
-			continue;
-		}
-		else
-			HyGuiLog("Item " % itemObj["itemName"].toString() % " is not apart of the entity's project and cannot be added.", LOGTYPE_Info);
-	}
+	for(auto item : itemList)
+		m_TreeModel.InsertNewChild(item);
 }
 
 bool EntityModel::RemoveChild(ExplorerItem *pItem)
