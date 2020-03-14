@@ -723,7 +723,18 @@ void MainWindow::on_actionTheme_Compe_triggered()
 void MainWindow::on_actionActivateProject_triggered()
 {
 	ExplorerItem *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
+	
+	bool bNewProject = Harmony::GetProject() != &pCurSelectedItem->GetProject();
+	if(bNewProject)
+	{
+		sm_pInstance->ui->dockWidgetProperties->setWindowTitle("Item Properties");
+		sm_pInstance->ui->dockWidgetProperties->setWidget(nullptr);
+	}
+
 	m_Harmony.SetProject(&pCurSelectedItem->GetProject());
+
+	if(Harmony::GetProject() && bNewProject && Harmony::GetProject()->GetCurrentOpenItem())
+		OpenItem(Harmony::GetProject()->GetCurrentOpenItem());
 }
 
 void MainWindow::NewItem(HyGuiItemType eItem)
