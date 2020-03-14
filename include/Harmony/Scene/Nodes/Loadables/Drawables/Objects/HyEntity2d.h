@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
-#include "Scene/Physics/HyPhysicsGrid.h"
+#include "Scene/Physics/HyPhysicsGrid2d.h"
 #include "Scene/Physics/HyPhysicsCollider.h"
 
 class HyEntity2d : public IHyDrawable2d
@@ -39,7 +39,6 @@ protected:
 	void *									m_pMouseInputUserParam;
 
 	b2Body *								m_pPhysicsBody;
-	std::vector<b2Fixture *>				m_pPhysicsColliders;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -100,7 +99,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PHYSICS
-	void PhysInit(HyPhysicsGrid &physGridRef,
+	void PhysInit(HyPhysicsGrid2d &physGridRef,
 				  HyPhysicsType eType,
 				  bool bIsEnabled = true,
 				  bool bIsFixedRotation = false,
@@ -143,9 +142,10 @@ public:
 	// fRestitution : (elasticity) usually in the range [0,1].
 	// fDensity : usually in kg/m^2.
 	// bIsSensor : Is a sensor shape collects contact information but never generates a collision response.
-	std::unique_ptr<HyPhysicsCollider> PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor);
-	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor);
-	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor);
+	std::unique_ptr<HyPhysicsCollider> PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
+	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
+	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
+	std::unique_ptr<HyPhysicsCollider> PhysAddLineChainCollider(const glm::vec2 *pVerts, uint32 uiNumVerts, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
 	void PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider);
 
 	void PhysRelease();
