@@ -432,9 +432,6 @@
     <ClInclude Include="ui_DlgSetEngineLocation.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="ui_EntSpriteFrame.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="ui_Entity3d.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -522,9 +519,6 @@
       <Filter>Entity</Filter>
     </QtUic>
     <QtUic Include="Entity\EntityWidget.ui">
-      <Filter>Entity</Filter>
-    </QtUic>
-    <QtUic Include="Entity\EntSpriteFrame.ui">
       <Filter>Entity</Filter>
     </QtUic>
     <QtUic Include="Explorer\ExplorerWidget.ui">

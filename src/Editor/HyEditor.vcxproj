@@ -526,7 +526,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClInclude Include="ui_DlgNewProject.h" />
     <ClInclude Include="ui_DlgProjectSettings.h" />
     <ClInclude Include="ui_DlgSetEngineLocation.h" />
-    <ClInclude Include="ui_EntSpriteFrame.h" />
     <ClInclude Include="ui_Entity3d.h" />
     <ClInclude Include="ui_EntityCommon.h" />
     <ClInclude Include="ui_EntityToolbox.h" />
@@ -561,8 +560,6 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <QtUic Include="Dialogs\DlgProjectSettings.ui">
     </QtUic>
     <QtUic Include="Dialogs\DlgSetEngineLocation.ui">
-    </QtUic>
-    <QtUic Include="Entity\EntSpriteFrame.ui">
     </QtUic>
     <QtUic Include="Entity3d\Entity3d.ui">
     </QtUic>
