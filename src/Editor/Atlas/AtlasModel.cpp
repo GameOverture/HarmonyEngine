@@ -357,9 +357,13 @@ void AtlasModel::WriteMetaSettings()
 		{
 			if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
 			{
+				QTreeWidgetItem *pTreeWidgetItem = *iter;
+				QString sFilterName = pTreeWidgetItem->text(0);
+				bool bExpanded = pTreeWidgetItem->isExpanded();
+
 				QString sFilterPath = HyGlobal::GetTreeWidgetItemPath(*iter);
 				filtersArray.append(QJsonValue(sFilterPath));
-				m_ExpandedFiltersArray.append((*iter)->isExpanded());
+				m_ExpandedFiltersArray.append(bExpanded);
 			}
 
 			++iter;
@@ -887,6 +891,9 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 void AtlasModel::SaveAndReloadHarmony()
 {
 	WriteMetaSettings();
+
+	if(GetProjOwner() && GetProjOwner()->GetAtlasWidget())
+		GetProjOwner()->GetAtlasWidget()->RefreshInfo();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// REGENERATE THE ATLAS DATA INFO FILE (HARMONY EXPORT)

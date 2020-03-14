@@ -181,6 +181,8 @@ void AtlasWidget::RefreshInfo()
 		{
 			if(expandedFilterArray.at(uiFilterIndex).toBool())
 				(*iter)->setExpanded(true);
+			else
+				(*iter)->setExpanded(false);
 
 			++uiFilterIndex;
 		}
@@ -308,9 +310,6 @@ void AtlasWidget::on_actionDeleteImages_triggered()
 	// Make sure to just delete children filters first or else it will crash, so process 'selectedFilterList' backwards
 	for(int i = selectedFilterList.size() - 1; i >= 0; --i)
 		delete selectedFilterList[i];
-	
-	m_pModel->WriteMetaSettings();
-	RefreshInfo();
 }
 
 void AtlasWidget::on_actionReplaceImages_triggered()
@@ -434,8 +433,6 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
 			m_pModel->Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
 	}
-	
-	RefreshInfo();
 	
 	// Resave all affected items that had a replaced atlas frame
 	for(int i = 0; i < affectedItemList.size(); ++i)
@@ -650,8 +647,6 @@ void AtlasWidget::on_actionAtlasGrpTransfer_triggered(QAction *pAction)
 	
 	// Repack new affected atlas group
 	m_pModel->Repack(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(uiNewAtlasGrpId), QSet<int>(), framesGoingToNewAtlasGrpSet);
-	
-	RefreshInfo();
 }
 
 void AtlasWidget::on_actionImportImages_triggered()
@@ -691,8 +686,6 @@ void AtlasWidget::on_actionImportImages_triggered()
 						 QSet<int>(),
 						 importedImagesSet);
 	}
-
-	RefreshInfo();
 }
 
 void AtlasWidget::on_actionImportDirectory_triggered()
@@ -763,8 +756,6 @@ void AtlasWidget::on_actionImportDirectory_triggered()
 						 QSet<int>(),
 						 importedImagesSet);
 	}
-
-	RefreshInfo();
 }
 
 void AtlasWidget::on_actionAddFilter_triggered()

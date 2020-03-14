@@ -210,6 +210,8 @@ MainWindow::MainWindow(QWidget *pParent) :
 
 MainWindow::~MainWindow()
 {
+	//if(Harmony::GetProject())
+	//	delete Harmony::GetProject()->GetAtlasWidget();
 	delete ui;
 }
 
