@@ -13,7 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/HyInfoPanel.h"
 
-typedef std::function<void(HyInfoPanel *pSelf)> HyButtonClickedCallback;
+class HyButton;
+typedef std::function<void(HyButton *pSelf)> HyButtonClickedCallback;
 
 class HyButton : public HyInfoPanel
 {
