@@ -17,12 +17,19 @@ typedef std::function<void(HyInfoPanel *pSelf, void *pParam)> HyButtonClickedCal
 
 class HyButton : public HyInfoPanel
 {
-	HyButtonClickedCallback		m_fpButtonClickedCallback;
-	void *						m_pCallbackParam;
+	HyButtonClickedCallback		m_fpButtonClickedCallback = nullptr;
+	void *						m_pCallbackParam = nullptr;
 
 public:
+	HyButton(HyEntity2d *pParent = nullptr);
+	HyButton(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent);
+	HyButton(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent);
 	HyButton(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent);
 	virtual ~HyButton();
+
+	virtual void Init(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent) override;
+	virtual void Init(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) override;
+	virtual void Init(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) override;
 
 	void SetAsSelected(bool bInvokeButtonClicked);
 	void SetAsDisabled();
