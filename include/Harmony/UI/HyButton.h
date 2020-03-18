@@ -13,12 +13,11 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/HyInfoPanel.h"
 
-typedef std::function<void(HyInfoPanel *pSelf, void *pParam)> HyButtonClickedCallback;
+typedef std::function<void(HyInfoPanel *pSelf)> HyButtonClickedCallback;
 
 class HyButton : public HyInfoPanel
 {
 	HyButtonClickedCallback		m_fpButtonClickedCallback = nullptr;
-	void *						m_pCallbackParam = nullptr;
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
@@ -34,13 +33,13 @@ public:
 	void SetAsSelected(bool bInvokeButtonClicked);
 	void SetAsDisabled();
 
-	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr);
+	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack);
 
 private:
-	virtual void OnMouseDown(void *pUserParam) override final;
-	virtual void OnMouseUp(void *pUserParam) override final;
-	virtual void OnMouseLeave(void *pUserParam) override final;
-	virtual void OnMouseClicked(void *pUserParam) override final;
+	virtual void OnMouseDown() override final;
+	virtual void OnMouseUp() override final;
+	virtual void OnMouseLeave() override final;
+	virtual void OnMouseClicked() override final;
 };
 
 #endif /* HyButton_h__ */

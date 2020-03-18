@@ -36,7 +36,6 @@ protected:
 		MOUSEINPUT_Down
 	};
 	MouseInputState							m_eMouseInputState;
-	void *									m_pMouseInputUserParam;
 
 	b2Body *								m_pPhysicsBody;
 
@@ -94,7 +93,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// MOUSE BUTTON INPUT
-	void EnableMouseInput(void *pUserParam = nullptr);
+	void EnableMouseInput();
 	void DisableMouseInput();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,11 +176,11 @@ protected:
 
 	// Optional user overrides below
 	virtual void OnUpdate() { }
-	virtual void OnMouseEnter(void *pUserParam) { }
-	virtual void OnMouseLeave(void *pUserParam) { }
-	virtual void OnMouseDown(void *pUserParam) { }
-	virtual void OnMouseUp(void *pUserParam) { }
-	virtual void OnMouseClicked(void *pUserParam) { }
+	virtual void OnMouseEnter() { }
+	virtual void OnMouseLeave() { }
+	virtual void OnMouseDown() { }
+	virtual void OnMouseUp() { }
+	virtual void OnMouseClicked() { }
 
 	friend void _CtorChildAppend(HyEntity2d &entityRef, IHyNode2d &childRef);
 };

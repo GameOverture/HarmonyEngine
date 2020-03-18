@@ -12,31 +12,27 @@
 
 HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 	HyInfoPanel(pParent),
-	m_fpButtonClickedCallback(nullptr),
-	m_pCallbackParam(nullptr)
+	m_fpButtonClickedCallback(nullptr)
 {
 }
 
 HyButton::HyButton(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent) :
 	HyInfoPanel(nullptr),
-	m_fpButtonClickedCallback(nullptr),
-	m_pCallbackParam(nullptr)
+	m_fpButtonClickedCallback(nullptr)
 {
 	Init(szPanelPrefix, szPanelName, pParent);
 }
 
 HyButton::HyButton(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) :
 	HyInfoPanel(nullptr),
-	m_fpButtonClickedCallback(nullptr),
-	m_pCallbackParam(nullptr)
+	m_fpButtonClickedCallback(nullptr)
 {
 	Init(szTextPrefix, szTextName, iTextDimensionsX, iTextDimensionsY, pParent);
 }
 
 HyButton::HyButton(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) :
 	HyInfoPanel(nullptr),
-	m_fpButtonClickedCallback(nullptr),
-	m_pCallbackParam(nullptr)
+	m_fpButtonClickedCallback(nullptr)
 {
 	Init(szPanelPrefix, szPanelName, szTextPrefix, szTextName, iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY, pParent);
 }
@@ -68,7 +64,7 @@ HyButton::HyButton(const char *szPanelPrefix, const char *szPanelName, const cha
 void HyButton::SetAsSelected(bool bInvokeButtonClicked)
 {
 	if(bInvokeButtonClicked)
-		OnMouseClicked(m_pCallbackParam);
+		OnMouseClicked();
 	else
 		m_pPanel->AnimSetState(HYBUTTONSTATE_Selected);
 }
@@ -78,32 +74,31 @@ void HyButton::SetAsDisabled()
 	m_pPanel->AnimSetState(HYBUTTONSTATE_Disabled);
 }
 
-void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/)
+void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack)
 {
 	m_fpButtonClickedCallback = fpCallBack;
-	m_pCallbackParam = pParam;
 }
 
-/*virtual*/ void HyButton::OnMouseDown(void *pUserParam) /*override final*/
+/*virtual*/ void HyButton::OnMouseDown() /*override final*/
 {
 	if(m_pPanel->AnimGetState() != HYBUTTONSTATE_Selected && m_pPanel->AnimGetState() != HYBUTTONSTATE_Disabled)
 		m_pPanel->AnimSetState(HYBUTTONSTATE_Down);
 }
 
-/*virtual*/ void HyButton::OnMouseUp(void *pUserParam) /*override final*/
+/*virtual*/ void HyButton::OnMouseUp() /*override final*/
 {
 	if(m_pPanel->AnimGetState() != HYBUTTONSTATE_Selected && m_pPanel->AnimGetState() != HYBUTTONSTATE_Disabled)
 		m_pPanel->AnimSetState(HYBUTTONSTATE_Pressable);
 }
 
-/*virtual*/ void HyButton::OnMouseLeave(void *pUserParam) /*override final*/
+/*virtual*/ void HyButton::OnMouseLeave() /*override final*/
 {
 	if(m_pPanel->AnimGetState() != HYBUTTONSTATE_Selected && m_pPanel->AnimGetState() != HYBUTTONSTATE_Disabled)
 		m_pPanel->AnimSetState(HYBUTTONSTATE_Pressable);
 }
 
-/*virtual*/ void HyButton::OnMouseClicked(void *pUserParam) /*override final*/
+/*virtual*/ void HyButton::OnMouseClicked() /*override final*/
 {
 	if(m_fpButtonClickedCallback)
-		m_fpButtonClickedCallback(this, m_pCallbackParam);
+		m_fpButtonClickedCallback(this);
 }
