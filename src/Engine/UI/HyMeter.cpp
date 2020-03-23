@@ -161,7 +161,7 @@ void HyMeter::TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float f
 	m_SpinText.m_pSpinText_Padded->TextSetLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
-void HyMeter::TextSetState(UINT uiAnimState)
+void HyMeter::TextSetState(uint32 uiAnimState)
 {
 	if(m_pText == nullptr)
 		return;

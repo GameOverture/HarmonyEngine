@@ -98,7 +98,7 @@ public:
 
 	void TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 
-	void TextSetState(UINT uiAnimState);
+	void TextSetState(uint32 uiAnimState);
 
 	virtual std::string GetStr() override;
 	virtual void SetStr(std::string sText) override;
