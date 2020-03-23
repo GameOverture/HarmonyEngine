@@ -26,9 +26,15 @@ protected:
 	glm::ivec2				m_vTextOffset;
 
 public:
-	HyInfoPanel(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent);
+	HyInfoPanel(HyEntity2d *pParent = nullptr);
 	HyInfoPanel(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent);
+	HyInfoPanel(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent);
+	HyInfoPanel(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent);
 	virtual ~HyInfoPanel();
+
+	virtual void Init(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent);
+	virtual void Init(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent);
+	virtual void Init(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent);
 
 	HySprite2d *GetPanelPtr();
 	HyText2d *GetTextPtr();
