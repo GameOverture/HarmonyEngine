@@ -37,7 +37,7 @@ public:
 
 	PropertiesTreeModel &GetPropertiesModel();
 
-	virtual bool OnSave() override { return true; }
+	virtual bool OnPrepSave() override { return true; }
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;

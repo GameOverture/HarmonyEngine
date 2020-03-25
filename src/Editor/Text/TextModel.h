@@ -60,7 +60,7 @@ public:
 	TextLayersModel *GetLayersModel(uint uiIndex) const;
 	PropertiesTreeModel *GetGlyphsModel();
 
-	virtual bool OnSave() override;
+	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;

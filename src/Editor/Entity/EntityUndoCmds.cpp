@@ -46,9 +46,14 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<Q
 	switch(m_eCMD)
 	{
 	case ENTITYCMD_AddNewChildren: {
-		QList<ExplorerItem *> itemList;
+		QList<ProjectItem *> itemList;
 		for(auto param : m_ParameterList)
-			itemList.push_back(param.value<ExplorerItem *>());
+		{
+			if(param.value<ExplorerItem *>()->IsProjectItem())
+				itemList.push_back(static_cast<ProjectItem *>(param.value<ExplorerItem *>()));
+			else
+				HyGuiLog("EntityUndoCmd::redo had item that wasn't a project item", LOGTYPE_Warning);
+		}
 
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChildren(itemList);
 		break; }
@@ -66,7 +71,12 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<Q
 	{
 	case ENTITYCMD_AddNewChildren: {
 		for(auto param : m_ParameterList)
-			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(param.value<ExplorerItem *>());
+		{
+			if(param.value<ExplorerItem *>()->IsProjectItem())
+				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(static_cast<ProjectItem *>(param.value<ExplorerItem *>()));
+			else
+				HyGuiLog("EntityUndoCmd::undo had item that wasn't a project item", LOGTYPE_Warning);
+		}
 		break; }
 
 	case ENTITYCMD_AddPrimitive:

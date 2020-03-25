@@ -159,7 +159,7 @@ void ProjectItem::GetLatestFileData(FileDataPair &itemFileDataOut) const
 
 bool ProjectItem::Save(bool bWriteToDisk)
 {
-	if(m_pModel->OnSave() == false)
+	if(m_pModel->OnPrepSave() == false)
 		return false;
 
 	GetLatestFileData(m_ItemFileData);

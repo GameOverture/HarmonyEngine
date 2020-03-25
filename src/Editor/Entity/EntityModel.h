@@ -34,9 +34,10 @@ public:
 	virtual ~EntityNodeTreeModel();
 
 	bool IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const;
+	bool IsItemValid(ProjectItem *pItem, bool bShowDialogsOnFail) const;
 
-	bool InsertNewChild(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem = nullptr, int iRow = -1);
-	bool RemoveChild(ExplorerItem *pItem);
+	bool InsertNewChild(ProjectItem *pNewItem, TreeModelItem *pParentTreeItem = nullptr, int iRow = -1);
+	bool RemoveChild(ProjectItem *pItem);
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -75,9 +76,9 @@ class EntityModel : public IModel
 		QMap<QString, ProjectItem *>					m_ItemMap;
 
 	public:
-		void AddDependency(ProjectItem *pItem);
-		bool RemoveDependency(ProjectItem *pItem);  // Returns true if no remaining duplicates exist
-		ProjectItem *FindByGuid(QUuid guid);
+		void AddDependency(ProjectItem *pItem)			{ m_ItemMap[pItem->GetModel()->GetUuid().toString(QUuid::WithoutBraces)] = pItem; }
+		void RemoveDependency(ProjectItem *pItem)		{ m_ItemMap.remove(pItem->GetModel()->GetUuid().toString(QUuid::WithoutBraces)); }
+		ProjectItem *FindByGuid(QUuid uuid)				{ return m_ItemMap.contains(uuid.toString(QUuid::WithoutBraces)) ? m_ItemMap[uuid.toString(QUuid::WithoutBraces)] : nullptr; }
 	};
 	DependencyLookup									m_Dependencies;
 
@@ -88,13 +89,13 @@ public:
 	EntityNodeTreeModel &GetChildrenModel();
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItem *pItem);
 
-	void AddNewChildren(QList<ExplorerItem *> itemList);
-	bool RemoveChild(ExplorerItem *pItem);
+	void AddNewChildren(QList<ProjectItem *> itemList);
+	bool RemoveChild(ProjectItem *pItem);
 
 	const QList<ProjectItem *> &GetPrimitiveList();
 	ProjectItem *CreateNewPrimitive();
 
-	virtual bool OnSave() override { return true; }
+	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const override;

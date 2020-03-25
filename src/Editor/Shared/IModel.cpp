@@ -59,6 +59,11 @@ const ProjectItem &IModel::GetItem() const
 	return m_ItemRef;
 }
 
+const QUuid &IModel::GetUuid() const
+{
+	return m_UUID;
+}
+
 int IModel::GetNumStates() const
 {
 	return m_StateList.size();

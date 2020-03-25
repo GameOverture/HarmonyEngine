@@ -85,7 +85,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	return m_FontManager.GetGlyphsModel();
 }
 
-/*virtual*/ bool TextModel::OnSave() /*override*/
+/*virtual*/ bool TextModel::OnPrepSave() /*override*/
 {
 	m_FontManager.GenerateOptimizedAtlas();
 	QSize atlasDimensionsOut; uint uiAtlasPixelDataSizeOut;

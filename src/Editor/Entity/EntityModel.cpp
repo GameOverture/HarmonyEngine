@@ -38,6 +38,14 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 
 bool EntityNodeTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const
 {
+	if(pItem->IsProjectItem())
+		return IsItemValid(static_cast<ProjectItem *>(pItem), bShowDialogsOnFail);
+	
+	return false;
+}
+
+bool EntityNodeTreeModel::IsItemValid(ProjectItem *pItem, bool bShowDialogsOnFail) const
+{
 	if(pItem == nullptr)
 	{
 		if(bShowDialogsOnFail)
@@ -62,7 +70,7 @@ bool EntityNodeTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFa
 	return true;
 }
 
-bool EntityNodeTreeModel::InsertNewChild(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem /*= nullptr*/, int iRow /*= -1*/)
+bool EntityNodeTreeModel::InsertNewChild(ProjectItem *pNewItem, TreeModelItem *pParentTreeItem /*= nullptr*/, int iRow /*= -1*/)
 {
 	if(pParentTreeItem == nullptr)
 		pParentTreeItem = GetItem(FindIndex<ExplorerItem *>(&m_pEntityModel->GetItem(), 0));
@@ -84,7 +92,7 @@ bool EntityNodeTreeModel::InsertNewChild(ExplorerItem *pNewItem, TreeModelItem *
 	return true;
 }
 
-bool EntityNodeTreeModel::RemoveChild(ExplorerItem *pItem)
+bool EntityNodeTreeModel::RemoveChild(ProjectItem *pItem)
 {
 	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0));
 	TreeModelItem *pParentTreeItem = pTreeItem->parent();
@@ -277,14 +285,18 @@ PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerIt
 	return pPropertiesModel;
 }
 
-void EntityModel::AddNewChildren(QList<ExplorerItem *> itemList)
+void EntityModel::AddNewChildren(QList<ProjectItem *> itemList)
 {
 	for(auto item : itemList)
+	{
+		m_Dependencies.AddDependency(item);
 		m_TreeModel.InsertNewChild(item);
+	}
 }
 
-bool EntityModel::RemoveChild(ExplorerItem *pItem)
+bool EntityModel::RemoveChild(ProjectItem *pItem)
 {
+	m_Dependencies.RemoveDependency(pItem);
 	return m_TreeModel.RemoveChild(pItem);
 }
 
@@ -299,6 +311,11 @@ ProjectItem *EntityModel::CreateNewPrimitive()
 	m_PrimitiveList.push_back(pNewPrimitiveItem);
 
 	return pNewPrimitiveItem;
+}
+
+/*virtual*/ bool EntityModel::OnPrepSave() /*override*/
+{
+	return true;
 }
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/

@@ -79,6 +79,8 @@ public:
 
 	ProjectItem &GetItem();
 	const ProjectItem &GetItem() const;
+
+	const QUuid &GetUuid() const;
 	
 	int GetNumStates() const;
 	IStateData *GetStateData(int iStateIndex);
@@ -122,7 +124,7 @@ public:
 		dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 	}
 
-	virtual bool OnSave() = 0;	// Prepares item for saving
+	virtual bool OnPrepSave() = 0;	// Prepares item for saving, and returns if valid
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const = 0;
 	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;
