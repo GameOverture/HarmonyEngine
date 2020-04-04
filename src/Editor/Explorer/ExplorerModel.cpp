@@ -31,9 +31,9 @@ QStringList ExplorerModel::GetOpenProjectPaths()
 	QStringList sListOpenProjs;
 	sListOpenProjs.clear();
 
-	for(int i = 0; i < m_pRootItem->childCount(); ++i)
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		ExplorerItem *pItem = m_pRootItem->child(i)->data(0).value<ExplorerItem *>();
+		ExplorerItem *pItem = m_pRootItem->GetChild(i)->data(0).value<ExplorerItem *>();
 		Project *pItemProject = static_cast<Project *>(pItem);
 		sListOpenProjs.append(pItemProject->GetAbsPath());
 	}
@@ -70,8 +70,8 @@ QList<ExplorerItem *> ExplorerModel::GetItemsRecursively(const QModelIndex &inde
 		TreeModelItem *pItem = treeItemStack.pop();
 		returnList.push_back(pItem->data(0).value<ExplorerItem *>());
 
-		for(int i = 0; i < pItem->childCount(); ++i)
-			treeItemStack.push(pItem->child(i));
+		for(int i = 0; i < pItem->GetNumChildren(); ++i)
+			treeItemStack.push(pItem->GetChild(i));
 	}
 
 	return returnList;
@@ -136,11 +136,11 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 		for(int i = 0; i < sPathSplitList.size(); ++i)
 		{
 			bool bFound = false;
-			for(int j = 0; j < pCurTreeItem->childCount(); ++j)
+			for(int j = 0; j < pCurTreeItem->GetNumChildren(); ++j)
 			{
-				if(QString::compare(sPathSplitList[i], pCurTreeItem->child(j)->data(0).value<ExplorerItem *>()->GetName(false), Qt::CaseInsensitive) == 0)
+				if(QString::compare(sPathSplitList[i], pCurTreeItem->GetChild(j)->data(0).value<ExplorerItem *>()->GetName(false), Qt::CaseInsensitive) == 0)
 				{
-					pCurTreeItem = pCurTreeItem->child(j);
+					pCurTreeItem = pCurTreeItem->GetChild(j);
 					bFound = true;
 					break;
 				}
@@ -150,7 +150,7 @@ ExplorerItem *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemType,
 			{
 				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix ExplorerItem here and continue traversing down the tree
 				InsertNewItem(new ExplorerItem(*pProj, ITEM_Prefix, sPathSplitList[i]), pCurTreeItem);
-				pCurTreeItem = pCurTreeItem->child(pCurTreeItem->childCount() - 1);
+				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
 			}
 		}
 	}
@@ -175,14 +175,14 @@ QString ExplorerModel::AssemblePrefix(ExplorerItem *pItem) const
 {
 	QStringList sPrefixParts;
 
-	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0))->parent();
+	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0))->GetParent();
 	while(pTreeItem && pTreeItem != m_pRootItem)
 	{
 		ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
 		if(pItem->GetType() == ITEM_Prefix)
 			sPrefixParts.prepend(pItem->GetName(false));
 
-		pTreeItem = pTreeItem->parent();
+		pTreeItem = pTreeItem->GetParent();
 	}
 
 	QString sPrefix;
@@ -237,16 +237,16 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			QModelIndex destIndex = FindIndex<ExplorerItem *>(pDestItem, 0);
 			if(sourceIndex.parent() != destIndex)
 			{
-				beginMoveRows(sourceIndex.parent(), pSourceTreeItem->childNumber(), pSourceTreeItem->childNumber(), destIndex, 0);
+				beginMoveRows(sourceIndex.parent(), pSourceTreeItem->GetIndex(), pSourceTreeItem->GetIndex(), destIndex, 0);
 
 				pSourceItem->Rename(pDestItem->GetName(true), pSourceItem->GetName(false));
 			
-				pSourceTreeItem->parent()->removeChildren(pSourceTreeItem->childNumber(), 1);
-				pDestTreeItem->insertChildren(0, 1, pDestTreeItem->columnCount());
+				pSourceTreeItem->GetParent()->RemoveChildren(pSourceTreeItem->GetIndex(), 1);
+				pDestTreeItem->InsertChildren(0, 1, pDestTreeItem->columnCount());
 			
 				QVariant v;
 				v.setValue<ExplorerItem *>(pSourceItem);
-				pDestTreeItem->child(0)->setData(0, v);
+				pDestTreeItem->GetChild(0)->SetData(0, v);
 
 				endMoveRows();
 			}
@@ -528,7 +528,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
 {
 	QModelIndex parentIndex = FindIndex<ExplorerItem *>(pParentTreeItem->data(0).value<ExplorerItem *>(), 0);
-	iRow = (iRow == -1 ? pParentTreeItem->childCount() : iRow);
+	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 
 	if(insertRow(iRow, parentIndex) == false)
 	{
@@ -546,10 +546,10 @@ bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParent
 
 TreeModelItem *ExplorerModel::FindProjectTreeItem(Project *pProject)
 {
-	for(int i = 0; i < m_pRootItem->childCount(); ++i)
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(m_pRootItem->child(i)->data(0).value<Project *>() == pProject)
-			return m_pRootItem->child(i);
+		if(m_pRootItem->GetChild(i)->data(0).value<Project *>() == pProject)
+			return m_pRootItem->GetChild(i);
 	}
 
 	return nullptr;
@@ -569,7 +569,7 @@ TreeModelItem *ExplorerModel::FindPrefixTreeItem(const QModelIndex &indexRef) co
 	// If the explorer item isn't a prefix or a project, go up one parent then and it should be.
 	if(pItem->GetType() != ITEM_Prefix && pItem->GetType() != ITEM_Project)
 	{
-		pTreeItem = pTreeItem->parent();
+		pTreeItem = pTreeItem->GetParent();
 		pItem = pTreeItem->data(0).value<ExplorerItem *>();
 		if(pItem == nullptr || (pItem->GetType() != ITEM_Prefix && pItem->GetType() != ITEM_Project))
 			return nullptr;
@@ -589,20 +589,20 @@ QModelIndex ExplorerModel::FindIndexByItemPath(Project *pProject, QString sPath,
 	for(int i = 0; i < sPathSplitList.size(); ++i)
 	{
 		bool bFound = false;
-		for(int j = 0; j < pCurTreeItem->childCount(); ++j)
+		for(int j = 0; j < pCurTreeItem->GetNumChildren(); ++j)
 		{
-			if(QString::compare(sPathSplitList[i], pCurTreeItem->child(j)->data(0).value<ExplorerItem *>()->GetName(false), Qt::CaseInsensitive) == 0)
+			if(QString::compare(sPathSplitList[i], pCurTreeItem->GetChild(j)->data(0).value<ExplorerItem *>()->GetName(false), Qt::CaseInsensitive) == 0)
 			{
 				if(i == sPathSplitList.size() - 1)
 				{
-					ExplorerItem *pItem = pCurTreeItem->child(j)->data(0).value<ExplorerItem *>();
+					ExplorerItem *pItem = pCurTreeItem->GetChild(j)->data(0).value<ExplorerItem *>();
 					if(pItem->GetType() == eType)
 						return FindIndex<ExplorerItem *>(pItem, 0);
 					else
 						continue;
 				}
 
-				pCurTreeItem = pCurTreeItem->child(j);
+				pCurTreeItem = pCurTreeItem->GetChild(j);
 				bFound = true;
 				break;
 			}

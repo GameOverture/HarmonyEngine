@@ -66,15 +66,15 @@ QVariant PropertiesTreeModel::GetPropertyValue(const QModelIndex &indexRef) cons
 
 QVariant PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString sPropertyName) const
 {
-	for(int i = 0; i < m_pRootItem->childCount(); ++i)
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->child(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
-			TreeModelItem *pCategoryTreeItem = m_pRootItem->child(i);
-			for(int j = 0; j < pCategoryTreeItem->childCount(); ++j)
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 			{
-				if(0 == pCategoryTreeItem->child(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
-					return pCategoryTreeItem->child(j)->data(COLUMN_Value);
+				if(0 == pCategoryTreeItem->GetChild(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+					return pCategoryTreeItem->GetChild(j)->data(COLUMN_Value);
 			}
 		}
 	}
@@ -84,16 +84,16 @@ QVariant PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString s
 
 void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
 {
-	for(int i = 0; i < m_pRootItem->childCount(); ++i)
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->child(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
-			TreeModelItem *pCategoryTreeItem = m_pRootItem->child(i);
-			for(int j = 0; j < pCategoryTreeItem->childCount(); ++j)
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 			{
-				if(0 == pCategoryTreeItem->child(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+				if(0 == pCategoryTreeItem->GetChild(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
 				{
-					if(setData(createIndex(pCategoryTreeItem->child(j)->childNumber(), COLUMN_Value, pCategoryTreeItem->child(j)), valueRef, Qt::UserRole) == false)
+					if(setData(createIndex(pCategoryTreeItem->GetChild(j)->GetIndex(), COLUMN_Value, pCategoryTreeItem->GetChild(j)), valueRef, Qt::UserRole) == false)
 						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
 
 					return;
@@ -106,27 +106,27 @@ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPrope
 bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
 {
 	// All category names must be unique
-	for(int i = 0; i < m_pRootItem->childCount(); ++i)
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->child(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 			return false;
 	}
 
 	// Create the row inside the model
-	QModelIndex rootParentIndex = createIndex(m_pRootItem->childNumber(), 0, m_pRootItem);
-	if(insertRow(m_pRootItem->childCount(), rootParentIndex) == false)
+	QModelIndex rootParentIndex = createIndex(m_pRootItem->GetIndex(), 0, m_pRootItem);
+	if(insertRow(m_pRootItem->GetNumChildren(), rootParentIndex) == false)
 	{
 		HyGuiLog("PropertiesTreeModel::AppendCategory() - insertRow failed", LOGTYPE_Error);
 		return false;
 	}
 
 	// Set data in the property's name column
-	TreeModelItem *pNewlyAddedTreeItem = m_pRootItem->child(m_pRootItem->childCount() - 1);
-	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Name, rootParentIndex), QVariant(sCategoryName), Qt::UserRole) == false)
+	TreeModelItem *pNewlyAddedTreeItem = m_pRootItem->GetChild(m_pRootItem->GetNumChildren() - 1);
+	if(setData(index(pNewlyAddedTreeItem->GetIndex(), COLUMN_Name, rootParentIndex), QVariant(sCategoryName), Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendCategory() - setData failed", LOGTYPE_Error);
 
 	// Set data in the property's value column
-	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Value, rootParentIndex), QVariant(bStartChecked ? Qt::Checked : Qt::Unchecked), Qt::UserRole) == false)
+	if(setData(index(pNewlyAddedTreeItem->GetIndex(), COLUMN_Value, rootParentIndex), QVariant(bStartChecked ? Qt::Checked : Qt::Unchecked), Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendCategory() - setData failed", LOGTYPE_Error);
 
 	// Link this property definition to the proper TreeModelItem using 'm_PropertyDefMap'
@@ -156,11 +156,11 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 {
 	// Find category to add property to
 	TreeModelItem *pCategoryTreeItem = nullptr;
-	for(int i = 0; i < m_pRootItem->childCount(); ++i)
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->child(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
-			pCategoryTreeItem = m_pRootItem->child(i);
+			pCategoryTreeItem = m_pRootItem->GetChild(i);
 			break;
 		}
 	}
@@ -171,9 +171,9 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	}
 
 	// Now ensure that no property with this name already exists
-	for(int i = 0; i < pCategoryTreeItem->childCount(); ++i)
+	for(int i = 0; i < pCategoryTreeItem->GetNumChildren(); ++i)
 	{
-		if(0 == pCategoryTreeItem->child(i)->data(COLUMN_Name).toString().compare(sName, Qt::CaseSensitive))
+		if(0 == pCategoryTreeItem->GetChild(i)->data(COLUMN_Name).toString().compare(sName, Qt::CaseSensitive))
 		{
 			HyGuiLog("PropertiesTreeModel::AppendProperty() - Property with the name: " % sName % " already exists", LOGTYPE_Error);
 			return false;
@@ -181,20 +181,20 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	}
 
 	// Create the row inside the model
-	QModelIndex categoryParentIndex = createIndex(pCategoryTreeItem->childNumber(), 0, pCategoryTreeItem);
-	if(insertRow(pCategoryTreeItem->childCount(), categoryParentIndex) == false)
+	QModelIndex categoryParentIndex = createIndex(pCategoryTreeItem->GetIndex(), 0, pCategoryTreeItem);
+	if(insertRow(pCategoryTreeItem->GetNumChildren(), categoryParentIndex) == false)
 	{
 		HyGuiLog("PropertiesTreeModel::AppendCategory() - insertRow failed", LOGTYPE_Error);
 		return false;
 	}
 
 	// Set data in the property's name column
-	TreeModelItem *pNewlyAddedTreeItem = pCategoryTreeItem->child(pCategoryTreeItem->childCount() - 1);
-	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Name, categoryParentIndex), QVariant(sName), Qt::UserRole) == false)
+	TreeModelItem *pNewlyAddedTreeItem = pCategoryTreeItem->GetChild(pCategoryTreeItem->GetNumChildren() - 1);
+	if(setData(index(pNewlyAddedTreeItem->GetIndex(), COLUMN_Name, categoryParentIndex), QVariant(sName), Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendProperty() - setData failed", LOGTYPE_Error);
 
 	// Set data in the property's value column
-	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Value, categoryParentIndex), defaultData, Qt::UserRole) == false)
+	if(setData(index(pNewlyAddedTreeItem->GetIndex(), COLUMN_Value, categoryParentIndex), defaultData, Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendProperty() - setData failed", LOGTYPE_Error);
 
 	// Link this property definition to the proper TreeModelItem using 'm_PropertyDefMap'
@@ -207,10 +207,10 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
 {
 	TreeModelItem *pCategoryTreeItem = GetItem(indexRef);
-	if(pCategoryTreeItem->childCount() > 0)
+	if(pCategoryTreeItem->GetNumChildren() > 0)
 	{
-		dataChanged(createIndex(0, COLUMN_Name, pCategoryTreeItem->child(0)),
-					createIndex(pCategoryTreeItem->childCount() - 1, COLUMN_Value, pCategoryTreeItem->child(pCategoryTreeItem->childCount() - 1)));
+		dataChanged(createIndex(0, COLUMN_Name, pCategoryTreeItem->GetChild(0)),
+					createIndex(pCategoryTreeItem->GetNumChildren() - 1, COLUMN_Value, pCategoryTreeItem->GetChild(pCategoryTreeItem->GetNumChildren() - 1)));
 	}
 }
 
@@ -260,7 +260,7 @@ void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
 		if(propDefRef.IsCategory())
 			return QBrush(propDefRef.GetColor());
 		else
-			return QBrush((0 == (pTreeItem->childNumber() & 1)) ? propDefRef.GetColor() : propDefRef.GetColor().lighter());
+			return QBrush((0 == (pTreeItem->GetIndex() & 1)) ? propDefRef.GetColor() : propDefRef.GetColor().lighter());
 
 	case Qt::ForegroundRole:
 		if(propDefRef.IsCategory())
@@ -305,7 +305,7 @@ void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
 	}
 	else
 	{
-		TreeModelItem *pCategoryTreeItem = pTreeItem->parent();
+		TreeModelItem *pCategoryTreeItem = pTreeItem->GetParent();
 		const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
 
 		if(categoryPropDefRef.IsCategory() == false)

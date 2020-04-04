@@ -22,7 +22,10 @@ ExplorerItem::ExplorerItem() :
 	m_eTYPE(ITEM_Unknown),
 	m_pProject(nullptr),
 	m_bIsProjectItem(false)
-{ }
+{
+	// I think a default ctor is required for QObject to work?
+	HyGuiLog("Invalid ExplorerItem ctor used", LOGTYPE_Error);
+}
 
 ExplorerItem::ExplorerItem(Project &projectRef, HyGuiItemType eType, const QString sName) :
 	m_eTYPE(eType),

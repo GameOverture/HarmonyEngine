@@ -23,23 +23,23 @@ public:
 	explicit TreeModelItem(const QVector<QVariant> &data, TreeModelItem *pParent = nullptr);
 	~TreeModelItem();
 
-	TreeModelItem *parent();
-	int childNumber() const;
+	TreeModelItem *GetParent();
+	int GetIndex() const;
 
-	TreeModelItem *child(int iIndex);
+	TreeModelItem *GetChild(int iIndex);
 	QVector<TreeModelItem *>GetChildren();
-	int childCount() const;
+	int GetNumChildren() const;
 	int columnCount() const;
 
 	QVariant data(int iColumn) const;
-	bool setData(int iColumn, const QVariant &valueRef);
+	bool SetData(int iColumn, const QVariant &valueRef);
 
-	bool insertChildren(int iPosition, int iCount, int iColumns);
-	bool insertColumns(int iPosition, int iColumns);
+	bool InsertChildren(int iPosition, int iCount, int iColumns);
+	bool InsertColumns(int iPosition, int iColumns);
 	
-	bool isRemoveValid(int iPosition, int iCount);
-	bool removeChildren(int iPosition, int iCount);
-	bool removeColumns(int iPosition, int iColumns);
+	bool IsRemoveValid(int iPosition, int iCount);
+	bool RemoveChildren(int iPosition, int iCount);
+	bool RemoveColumns(int iPosition, int iColumns);
 };
 
 #endif // TREEMODELITEM_H

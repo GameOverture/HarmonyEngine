@@ -20,7 +20,7 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 {
 	// Insert self as root node
 	QModelIndex parentIndex = FindIndex<ExplorerItem *>(m_pRootItem->data(0).value<ExplorerItem *>(), 0);
-	int iRow = m_pRootItem->childCount();
+	int iRow = m_pRootItem->GetNumChildren();
 	if(insertRow(iRow, parentIndex) == false)
 	{
 		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - insertRow failed", LOGTYPE_Error);
@@ -76,7 +76,7 @@ bool EntityNodeTreeModel::InsertNewChild(ProjectItem *pNewItem, TreeModelItem *p
 		pParentTreeItem = GetItem(FindIndex<ExplorerItem *>(&m_pEntityModel->GetItem(), 0));
 
 	QModelIndex parentIndex = FindIndex<ExplorerItem *>(pParentTreeItem->data(0).value<ExplorerItem *>(), 0);
-	iRow = (iRow == -1 ? pParentTreeItem->childCount() : iRow);
+	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 
 	if(insertRow(iRow, parentIndex) == false)
 	{
@@ -95,8 +95,8 @@ bool EntityNodeTreeModel::InsertNewChild(ProjectItem *pNewItem, TreeModelItem *p
 bool EntityNodeTreeModel::RemoveChild(ProjectItem *pItem)
 {
 	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0));
-	TreeModelItem *pParentTreeItem = pTreeItem->parent();
-	return removeRow(pTreeItem->childNumber(), createIndex(pParentTreeItem->childNumber(), 0, pParentTreeItem));
+	TreeModelItem *pParentTreeItem = pTreeItem->GetParent();
+	return removeRow(pTreeItem->GetIndex(), createIndex(pParentTreeItem->GetIndex(), 0, pParentTreeItem));
 }
 
 QVariant EntityNodeTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const

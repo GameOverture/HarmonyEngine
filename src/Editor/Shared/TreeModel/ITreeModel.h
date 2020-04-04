@@ -33,17 +33,17 @@ public:
 			return QModelIndex();
 
 		QStack<TreeModelItem *> treeItemStack;
-		for(int i = 0; i < m_pRootItem->childCount(); ++i)
-			treeItemStack.push(m_pRootItem->child(i));
+		for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+			treeItemStack.push(m_pRootItem->GetChild(i));
 
 		while(!treeItemStack.isEmpty())
 		{
 			TreeModelItem *pItem = treeItemStack.pop();
 			if(pItem->data(iColumn).value<TYPE>() == dataInTreeItem)
-				return createIndex(pItem->childNumber(), iColumn, pItem);
+				return createIndex(pItem->GetIndex(), iColumn, pItem);
 
-			for(int i = 0; i < pItem->childCount(); ++i)
-				treeItemStack.push(pItem->child(i));
+			for(int i = 0; i < pItem->GetNumChildren(); ++i)
+				treeItemStack.push(pItem->GetChild(i));
 		}
 
 		return QModelIndex();

@@ -52,7 +52,7 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 
 	TreeModelItem *pParentItem = GetItem(parentRef);
 
-	TreeModelItem *pChildItem = pParentItem->child(iRow);
+	TreeModelItem *pChildItem = pParentItem->GetChild(iRow);
 	if(pChildItem)
 		return createIndex(iRow, iColumn, pChildItem);
 	else
@@ -65,18 +65,18 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 		return QModelIndex();
 
 	TreeModelItem *pChildItem = GetItem(indexRef);
-	TreeModelItem *pParentItem = pChildItem->parent();
+	TreeModelItem *pParentItem = pChildItem->GetParent();
 
 	if(pParentItem == m_pRootItem)
 		return QModelIndex();
 
-	return createIndex(pParentItem->childNumber(), 0, pParentItem);
+	return createIndex(pParentItem->GetIndex(), 0, pParentItem);
 }
 
 /*virtual*/ int ITreeModel::rowCount(const QModelIndex &parentRef /*= QModelIndex()*/) const /*override*/
 {
 	TreeModelItem *pParentItem = GetItem(parentRef);
-	return pParentItem->childCount();
+	return pParentItem->GetNumChildren();
 }
 
 /*virtual*/ int ITreeModel::columnCount(const QModelIndex &parentRef /*= QModelIndex()*/) const /*override*/
@@ -93,7 +93,7 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 	}
 
 	TreeModelItem *pItem = GetItem(indexRef);
-	bool bResult = pItem->setData(indexRef.column(), valueRef);
+	bool bResult = pItem->SetData(indexRef.column(), valueRef);
 	if(bResult)
 		Q_EMIT dataChanged(indexRef, indexRef, {iRole});
 
@@ -105,7 +105,7 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 	if(iRole != Qt::EditRole || eOrientation != Qt::Horizontal)
 		return false;
 
-	bool bResult = m_pRootItem->setData(iSection, valueRef);
+	bool bResult = m_pRootItem->SetData(iSection, valueRef);
 	if(bResult)
 		Q_EMIT headerDataChanged(eOrientation, iSection, iSection);
 
@@ -118,7 +118,7 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 	bool bSuccess = false;
 
 	beginInsertRows(parentRef, iPosition, iPosition + iRows - 1);
-	bSuccess = pParentItem->insertChildren(iPosition, iRows, m_pRootItem->columnCount());
+	bSuccess = pParentItem->InsertChildren(iPosition, iRows, m_pRootItem->columnCount());
 	endInsertRows();
 
 	return bSuccess;
@@ -131,12 +131,12 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 
 	beginRemoveRows(parentRef, iPosition, iPosition + iRows - 1);
 
-	if(pParentItem->isRemoveValid(iPosition, iRows))
+	if(pParentItem->IsRemoveValid(iPosition, iRows))
 	{
 		for(int i = 0; i < iRows; ++i)
-			OnTreeModelItemRemoved(pParentItem->child(iPosition + i));
+			OnTreeModelItemRemoved(pParentItem->GetChild(iPosition + i));
 
-		bSuccess = pParentItem->removeChildren(iPosition, iRows);
+		bSuccess = pParentItem->RemoveChildren(iPosition, iRows);
 	}
 
 	endRemoveRows();
@@ -149,7 +149,7 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 	bool bSuccess = false;
 
 	beginInsertColumns(parentRef, iPosition, iPosition + iColumns - 1);
-	bSuccess = m_pRootItem->insertColumns(iPosition, iColumns);
+	bSuccess = m_pRootItem->InsertColumns(iPosition, iColumns);
 	endInsertColumns();
 
 	return bSuccess;
@@ -160,7 +160,7 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 	bool bSuccess = false;
 
 	beginRemoveColumns(parentRef, iPosition, iPosition + iColumns - 1);
-	bSuccess = m_pRootItem->removeColumns(iPosition, iColumns);
+	bSuccess = m_pRootItem->RemoveColumns(iPosition, iColumns);
 	endRemoveColumns();
 
 	if(m_pRootItem->columnCount() == 0)
