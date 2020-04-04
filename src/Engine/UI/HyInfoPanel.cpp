@@ -10,29 +10,68 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/HyInfoPanel.h"
 
-HyInfoPanel::HyInfoPanel(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) :
+HyInfoPanel::HyInfoPanel(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
-	m_pPanel(szPanelName != nullptr ? HY_NEW HySprite2d(szPanelPrefix, szPanelName, this) : nullptr),
-	m_pText(szTextName != nullptr ? HY_NEW HyText2d(szTextPrefix, szTextName, this) : nullptr)
+	m_pPanel(nullptr),
+	m_pText(nullptr)
 {
-	if(m_pText)
-	{
-		m_pText->TextSetAlignment(HYALIGN_Center);
-		SetTextLocation(iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY);
-	}
 }
 
 HyInfoPanel::HyInfoPanel(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent) :
-	HyEntity2d(pParent),
-	m_pPanel(szPanelName != nullptr ? HY_NEW HySprite2d(szPanelPrefix, szPanelName, this) : nullptr),
+	HyEntity2d(nullptr),
+	m_pPanel(nullptr),
 	m_pText(nullptr)
 {
+	Init(szPanelPrefix, szPanelName, pParent);
+}
+
+HyInfoPanel::HyInfoPanel(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) :
+	HyEntity2d(nullptr),
+	m_pPanel(nullptr),
+	m_pText(nullptr)
+{
+	Init(szTextPrefix, szTextName, iTextDimensionsX, iTextDimensionsY, pParent);
+}
+
+HyInfoPanel::HyInfoPanel(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) :
+	HyEntity2d(nullptr),
+	m_pPanel(nullptr),
+	m_pText(nullptr)
+{
+	Init(szPanelPrefix, szPanelName, szTextPrefix, szTextName, iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY, pParent);
 }
 
 HyInfoPanel::~HyInfoPanel()
 {
 	delete m_pPanel;
 	delete m_pText;
+}
+
+/*virtual*/ void HyInfoPanel::Init(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent)
+{
+	Init(szPanelPrefix, szPanelName, nullptr, nullptr, 0, 0, 0, 0, pParent);
+}
+
+/*virtual*/ void HyInfoPanel::Init(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent)
+{
+	Init(nullptr, nullptr, szTextPrefix, szTextName, 0, 0, iTextDimensionsX, iTextDimensionsY, pParent);
+}
+
+/*virtual*/ void HyInfoPanel::Init(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent)
+{
+	delete m_pPanel;
+	delete m_pText;
+
+	m_pPanel = szPanelName != nullptr ? HY_NEW HySprite2d(szPanelPrefix, szPanelName, this) : nullptr;
+	m_pText = szTextName != nullptr ? HY_NEW HyText2d(szTextPrefix, szTextName, this) : nullptr;
+
+	if(m_pText)
+	{
+		m_pText->TextSetAlignment(HYALIGN_Center);
+		SetTextLocation(iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY);
+	}
+
+	Reinitialize("", "", pParent);
 }
 
 HySprite2d *HyInfoPanel::GetPanelPtr()

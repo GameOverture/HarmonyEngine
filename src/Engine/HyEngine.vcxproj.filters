@@ -254,6 +254,9 @@
     <ClCompile Include="Scene\Physics\HyPhysicsGrid2d.cpp">
       <Filter>Scene\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="UI\HyMeter.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -696,6 +699,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\Harmony\Scene\Physics\HyPhysicsGrid2d.h">
       <Filter>Scene\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Harmony\UI\HyMeter.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

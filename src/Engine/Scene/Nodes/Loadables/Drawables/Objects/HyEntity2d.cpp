@@ -18,7 +18,6 @@ HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_Entity, "", "", pParent),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
-	m_pMouseInputUserParam(nullptr),
 	m_pPhysicsBody(nullptr)
 {
 }
@@ -27,7 +26,6 @@ HyEntity2d::HyEntity2d(std::string sPrefix, std::string sName, HyEntity2d *pPare
 	IHyDrawable2d(HYTYPE_Entity, sPrefix, sName, pParent),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
-	m_pMouseInputUserParam(nullptr),
 	m_pPhysicsBody(nullptr)
 {
 }
@@ -37,7 +35,6 @@ HyEntity2d::HyEntity2d(HyEntity2d &&donor) :
 	m_ChildList(std::move(donor.m_ChildList)),
 	m_uiAttributes(std::move(donor.m_uiAttributes)),
 	m_eMouseInputState(std::move(donor.m_eMouseInputState)),
-	m_pMouseInputUserParam(std::move(donor.m_pMouseInputUserParam)),
 	m_pPhysicsBody(std::move(m_pPhysicsBody))
 {
 }
@@ -57,7 +54,6 @@ HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor)
 	m_ChildList = std::move(donor.m_ChildList);
 	m_uiAttributes = std::move(donor.m_uiAttributes);
 	m_eMouseInputState = std::move(donor.m_eMouseInputState);
-	m_pMouseInputUserParam = std::move(donor.m_pMouseInputUserParam);
 	m_pPhysicsBody = std::move(m_pPhysicsBody);
 
 	return *this;
@@ -335,9 +331,8 @@ void HyEntity2d::ForEachChild(std::function<void(IHyNode2d *)> func)
 	}
 }
 
-void HyEntity2d::EnableMouseInput(void *pUserParam /*= nullptr*/)
+void HyEntity2d::EnableMouseInput()
 {
-	m_pMouseInputUserParam = pUserParam;
 	m_uiAttributes |= ATTRIBFLAG_MouseInput;
 }
 
@@ -710,12 +705,12 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 			if(bMouseInBounds)
 			{
 				m_eMouseInputState = MOUSEINPUT_Hover;
-				OnMouseEnter(m_pMouseInputUserParam);
+				OnMouseEnter();
 
 				if(bLeftClickDown)
 				{
 					m_eMouseInputState = MOUSEINPUT_Down;
-					OnMouseDown(m_pMouseInputUserParam);
+					OnMouseDown();
 				}
 			}
 			break;
@@ -724,12 +719,12 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 			if(bMouseInBounds == false)
 			{
 				m_eMouseInputState = MOUSEINPUT_None;
-				OnMouseLeave(m_pMouseInputUserParam);
+				OnMouseLeave();
 			}
 			else if(bLeftClickDown)
 			{
 				m_eMouseInputState = MOUSEINPUT_Down;
-				OnMouseDown(m_pMouseInputUserParam);
+				OnMouseDown();
 			}
 			break;
 
@@ -737,13 +732,13 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 			if(bMouseInBounds == false)
 			{
 				m_eMouseInputState = MOUSEINPUT_None;
-				OnMouseLeave(m_pMouseInputUserParam);
+				OnMouseLeave();
 			}
 			else if(bLeftClickDown == false)
 			{
 				m_eMouseInputState = MOUSEINPUT_Hover;
-				OnMouseUp(m_pMouseInputUserParam);
-				OnMouseClicked(m_pMouseInputUserParam);
+				OnMouseUp();
+				OnMouseClicked();
 			}
 			break;
 		}
