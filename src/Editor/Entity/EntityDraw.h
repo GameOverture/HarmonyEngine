@@ -15,6 +15,9 @@
 
 class EntityDraw : public IDraw
 {
+	HyPrimitive2d			m_primOriginHorz;
+	HyPrimitive2d			m_primOriginVert;
+
 public:
 	EntityDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~EntityDraw();
