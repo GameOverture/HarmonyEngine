@@ -67,7 +67,7 @@ EntityWidget::~EntityWidget()
 	EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
 	for(auto pItem : selectedItems)
 	{
-		if(pTreeModel->IsItemValid(pItem, true))
+		if(pTreeModel->IsItemValid(pItem, false))
 		{
 			bEnableAddNodeBtn = true;
 			break;

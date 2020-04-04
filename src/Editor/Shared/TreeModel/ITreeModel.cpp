@@ -86,15 +86,18 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 
 /*virtual*/ bool ITreeModel::setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole /*= Qt::EditRole*/) /*override*/
 {
-	if(iRole != Qt::EditRole && iRole != Qt::CheckStateRole)
+	if(indexRef.isValid() == false || iRole != Qt::UserRole)
+	{
+		HyLogError("Default ITreeModel::setData() was invoked with invalid index or role. Other role types should be implemented in derived classes");
 		return false;
+	}
 
 	TreeModelItem *pItem = GetItem(indexRef);
 	bool bResult = pItem->setData(indexRef.column(), valueRef);
 	if(bResult)
 		Q_EMIT dataChanged(indexRef, indexRef, {iRole});
 
-	return bResult;
+	return true;
 }
 
 /*virtual*/ bool ITreeModel::setHeaderData(int iSection, Qt::Orientation eOrientation, const QVariant &valueRef, int iRole /*= Qt::EditRole*/) /*override*/
@@ -166,12 +169,18 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 	return bSuccess;
 }
 
-/*virtual*/ QVariant ITreeModel::data(const QModelIndex &index, int role) const /*override*/
+/*virtual*/ QVariant ITreeModel::data(const QModelIndex &indexRef, int role) const /*override*/
 {
-	if(role == Qt::UserRole)
-		return GetItem(index)->data(index.column());
+	if(indexRef.isValid() == false)
+		return QVariant();
 
-	return QVariant();
+	if(role != Qt::UserRole)
+	{
+		HyLogError("Default ITreeModel::data() was invoked with invalid role. Other role types should be implemented in derived classes");
+		return QVariant();
+	}
+
+	return GetItem(indexRef)->data(indexRef.column());
 }
 
 TreeModelItem *ITreeModel::GetItem(const QModelIndex &indexRef) const

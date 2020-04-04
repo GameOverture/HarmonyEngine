@@ -93,7 +93,7 @@ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPrope
 			{
 				if(0 == pCategoryTreeItem->child(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
 				{
-					if(setData(createIndex(pCategoryTreeItem->child(j)->childNumber(), COLUMN_Value, pCategoryTreeItem->child(j)), valueRef) == false)
+					if(setData(createIndex(pCategoryTreeItem->child(j)->childNumber(), COLUMN_Value, pCategoryTreeItem->child(j)), valueRef, Qt::UserRole) == false)
 						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
 
 					return;
@@ -122,11 +122,11 @@ bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonD
 
 	// Set data in the property's name column
 	TreeModelItem *pNewlyAddedTreeItem = m_pRootItem->child(m_pRootItem->childCount() - 1);
-	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Name, rootParentIndex), QVariant(sCategoryName)) == false)
+	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Name, rootParentIndex), QVariant(sCategoryName), Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendCategory() - setData failed", LOGTYPE_Error);
 
 	// Set data in the property's value column
-	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Value, rootParentIndex), QVariant(bStartChecked ? Qt::Checked : Qt::Unchecked)) == false)
+	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Value, rootParentIndex), QVariant(bStartChecked ? Qt::Checked : Qt::Unchecked), Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendCategory() - setData failed", LOGTYPE_Error);
 
 	// Link this property definition to the proper TreeModelItem using 'm_PropertyDefMap'
@@ -190,11 +190,11 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 
 	// Set data in the property's name column
 	TreeModelItem *pNewlyAddedTreeItem = pCategoryTreeItem->child(pCategoryTreeItem->childCount() - 1);
-	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Name, categoryParentIndex), QVariant(sName)) == false)
+	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Name, categoryParentIndex), QVariant(sName), Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendProperty() - setData failed", LOGTYPE_Error);
 
 	// Set data in the property's value column
-	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Value, categoryParentIndex), defaultData) == false)
+	if(setData(index(pNewlyAddedTreeItem->childNumber(), COLUMN_Value, categoryParentIndex), defaultData, Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendProperty() - setData failed", LOGTYPE_Error);
 
 	// Link this property definition to the proper TreeModelItem using 'm_PropertyDefMap'
@@ -216,7 +216,7 @@ void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
 
 /*virtual*/ bool PropertiesTreeModel::setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole /*= Qt::EditRole*/) /*override*/
 {
-	if(iRole != Qt::CheckStateRole)
+	if(iRole == Qt::UserRole)
 		return ITreeModel::setData(indexRef, valueRef, iRole);
 
 	const QVariant &origValue = GetPropertyValue(indexRef);
@@ -249,8 +249,9 @@ void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
 			return ConvertValueToString(pTreeItem);
 
 	case Qt::TextAlignmentRole:
-		if(propDefRef.IsCategory())
-			return Qt::AlignHCenter;
+		return Qt::AlignLeft;
+		//if(propDefRef.IsCategory())
+		//	return Qt::AlignHCenter;
 
 	case Qt::ToolTipRole:
 		return propDefRef.sToolTip;

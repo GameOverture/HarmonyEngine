@@ -25,20 +25,26 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 
 /*virtual*/ void PropertiesUndoCmd::redo() /*override*/
 {
-	m_pModel->setData(m_ModelIndex, m_NewData);
-	
 	if(m_pModel->GetPropertyDefinition(m_ModelIndex).eType == PROPERTIESTYPE_CategoryChecked)
+	{
+		m_pModel->setData(m_pModel->index(m_ModelIndex.row(), 1/*COLUMN_Value*/, m_ModelIndex.parent()), m_NewData, Qt::UserRole);
 		m_pModel->RefreshCategory(m_ModelIndex);
+	}
+	else
+		m_pModel->setData(m_ModelIndex, m_NewData, Qt::UserRole);
 
 	m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
 }
 
 /*virtual*/ void PropertiesUndoCmd::undo() /*override*/
 {
-	m_pModel->setData(m_ModelIndex, m_OldData);
-
 	if(m_pModel->GetPropertyDefinition(m_ModelIndex).eType == PROPERTIESTYPE_CategoryChecked)
+	{
+		m_pModel->setData(m_pModel->index(m_ModelIndex.row(), 1/*COLUMN_Value*/, m_ModelIndex.parent()), m_OldData, Qt::UserRole);
 		m_pModel->RefreshCategory(m_ModelIndex);
+	}
+	else
+		m_pModel->setData(m_ModelIndex, m_OldData, Qt::UserRole);
 
 	m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
 }

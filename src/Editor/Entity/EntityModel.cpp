@@ -23,13 +23,13 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 	int iRow = m_pRootItem->childCount();
 	if(insertRow(iRow, parentIndex) == false)
 	{
-		HyGuiLog("ExplorerModel::InsertNewItem() - insertRow failed", LOGTYPE_Error);
+		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
 	QVariant v;
 	v.setValue<ProjectItem *>(&pEntityModel->GetItem());
-	if(setData(index(iRow, 0, parentIndex), v) == false)
-		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
+		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - setData failed", LOGTYPE_Error);
 }
 
 /*virtual*/ EntityNodeTreeModel::~EntityNodeTreeModel()
@@ -80,13 +80,13 @@ bool EntityNodeTreeModel::InsertNewChild(ProjectItem *pNewItem, TreeModelItem *p
 
 	if(insertRow(iRow, parentIndex) == false)
 	{
-		HyGuiLog("ExplorerModel::InsertNewItem() - insertRow failed", LOGTYPE_Error);
+		HyGuiLog("EntityNodeTreeModel::InsertNewChild() - insertRow failed", LOGTYPE_Error);
 		return false;
 	}
 
 	QVariant v;
 	v.setValue<ExplorerItem *>(pNewItem);
-	if(setData(index(iRow, 0, parentIndex), v) == false)
+	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
 		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 
 	return true;

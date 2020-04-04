@@ -93,6 +93,9 @@
      </item>
      <item>
       <widget class="QSplitter" name="splitter">
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>

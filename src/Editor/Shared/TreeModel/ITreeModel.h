@@ -65,8 +65,9 @@ public:
 	virtual bool insertColumns(int iPosition, int iColumns, const QModelIndex &parentRef = QModelIndex()) override;
 	virtual bool removeColumns(int iPosition, int iColumns, const QModelIndex &parentRef = QModelIndex()) override;
 
-	virtual QVariant data(const QModelIndex &index, int role) const override;
-	virtual Qt::ItemFlags flags(const QModelIndex &index) const override = 0;
+	// Default implementation for UserRole
+	virtual QVariant data(const QModelIndex &indexRef, int role) const override;
+	virtual Qt::ItemFlags flags(const QModelIndex &indexRef) const override = 0;
 
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) = 0;
 

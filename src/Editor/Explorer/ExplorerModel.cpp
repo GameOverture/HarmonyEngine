@@ -538,7 +538,7 @@ bool ExplorerModel::InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParent
 
 	QVariant v;
 	v.setValue<ExplorerItem *>(pNewItem);
-	if(setData(index(iRow, 0, parentIndex), v) == false)
+	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
 		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 
 	return true;
