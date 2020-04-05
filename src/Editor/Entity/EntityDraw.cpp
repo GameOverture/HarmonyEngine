@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "EntityDraw.h"
 
-EntityDraw::EntityDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef) :
+EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
 	m_primOriginHorz(this),
 	m_primOriginVert(this)
@@ -42,7 +42,7 @@ EntityDraw::EntityDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataR
 
 void EntityDraw::Sync()
 {
-	const QList<ProjectItem *> &primitiveListRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetPrimitiveList();
+	const QList<ProjectItemData *> &primitiveListRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetPrimitiveList();
 	for(uint32 i = 0; i < static_cast<uint32>(primitiveListRef.size()); ++i)
 	{
 

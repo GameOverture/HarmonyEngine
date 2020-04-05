@@ -29,7 +29,7 @@ class MainWindow;
 
 class HarmonyWidget;
 class Project;
-class ProjectItem;
+class ProjectItemData;
 
 class MainWindow : public QMainWindow
 {
@@ -66,8 +66,8 @@ public:
 	static QString EngineSrcLocation();
 
 	static void ApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty);
-	static void OpenItem(ProjectItem *pItem);
-	static void CloseItem(ProjectItem *pItem);
+	static void OpenItem(ProjectItemData *pItem);
+	static void CloseItem(ProjectItemData *pItem);
 
 	static QMenu *GetNewItemMenu();
 

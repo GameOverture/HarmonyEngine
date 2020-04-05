@@ -373,7 +373,7 @@ QList<AtlasFrame *> SpriteStateData::GetAtlasFrames() const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SpriteModel::SpriteModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
+SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef)
 {
 	InitStates<SpriteStateData>(itemFileDataRef);

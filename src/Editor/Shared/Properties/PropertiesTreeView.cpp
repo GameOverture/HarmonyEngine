@@ -11,7 +11,7 @@
 #include "PropertiesTreeView.h"
 #include "PropertiesTreeModel.h"
 #include "WidgetVectorSpinBox.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "IModel.h"
 #include "SpriteModels.h"
 #include "PropertiesUndoCmd.h"
@@ -164,7 +164,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		pReturnWidget = new QComboBox(pParent);
 
 		if(propDefRef.delegateBuilder.isValid())
-			static_cast<QComboBox *>(pReturnWidget)->setModel(propDefRef.delegateBuilder.value<ProjectItem *>()->GetModel());
+			static_cast<QComboBox *>(pReturnWidget)->setModel(propDefRef.delegateBuilder.value<ProjectItemData *>()->GetModel());
 		if(propDefRef.defaultData.isValid())
 			static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(propDefRef.defaultData.toInt());
 		break;
@@ -187,7 +187,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 		if(propDefRef.delegateBuilder.isValid())
 		{
-			//SpriteModel *pModel = static_cast<SpriteModel *>(propDefRef.delegateBuilder.value<ProjectItem *>()->GetModel());
+			//SpriteModel *pModel = static_cast<SpriteModel *>(propDefRef.delegateBuilder.value<ProjectItemData *>()->GetModel());
 			static_cast<QSlider *>(pReturnWidget)->setMinimum(0);
 
 			// TODO: FIX ME

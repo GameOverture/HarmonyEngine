@@ -11,7 +11,7 @@
 #include "PrefabWidget.h"
 #include "ui_PrefabWidget.h"
 
-PrefabWidget::PrefabWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
+PrefabWidget::PrefabWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
 	ui(new Ui::PrefabWidget)
 {

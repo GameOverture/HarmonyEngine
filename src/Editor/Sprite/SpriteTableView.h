@@ -36,11 +36,11 @@ class WidgetSpriteDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT
 
-	ProjectItem *         m_pItem;
+	ProjectItemData *         m_pItem;
 	SpriteTableView *     m_pTableView;
 
 public:
-	WidgetSpriteDelegate(ProjectItem *pItem, SpriteTableView *pTableView, QObject *pParent = 0);
+	WidgetSpriteDelegate(ProjectItemData *pItem, SpriteTableView *pTableView, QObject *pParent = 0);
 
 	virtual QWidget* createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 	virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;

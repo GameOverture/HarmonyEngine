@@ -120,9 +120,6 @@
     <ClCompile Include="Entity\EntityWidget.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
-    <ClCompile Include="Explorer\ExplorerItem.cpp">
-      <Filter>Explorer</Filter>
-    </ClCompile>
     <ClCompile Include="Explorer\ExplorerWidget.cpp">
       <Filter>Explorer</Filter>
     </ClCompile>
@@ -157,9 +154,6 @@
       <Filter>Explorer\Project</Filter>
     </ClCompile>
     <ClCompile Include="Project\ProjectDraw.cpp">
-      <Filter>Explorer\Project</Filter>
-    </ClCompile>
-    <ClCompile Include="Project\ProjectItem.cpp">
       <Filter>Explorer\Project</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp">
@@ -281,6 +275,15 @@
     <ClCompile Include="VersionPatcher.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
+    <ClCompile Include="Shared\TreeModel\TreeModelItemData.cpp">
+      <Filter>Shared\TreeModel</Filter>
+    </ClCompile>
+    <ClCompile Include="Explorer\ExplorerItemData.cpp">
+      <Filter>Explorer</Filter>
+    </ClCompile>
+    <ClCompile Include="Project\ProjectItemData.cpp">
+      <Filter>Explorer\Project</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atlas\AtlasDraw.h">
@@ -338,9 +341,6 @@
       <Filter>Prefab</Filter>
     </QtMoc>
     <QtMoc Include="Project\Project.h">
-      <Filter>Explorer\Project</Filter>
-    </QtMoc>
-    <QtMoc Include="Project\ProjectItem.h">
       <Filter>Explorer\Project</Filter>
     </QtMoc>
     <QtMoc Include="Shared\Properties\PropertiesTreeModel.h">
@@ -1159,9 +1159,6 @@
       <Filter>Harmony</Filter>
     </QtMoc>
     <QtMoc Include="MainWindow.h" />
-    <QtMoc Include="Explorer\ExplorerItem.h">
-      <Filter>Explorer</Filter>
-    </QtMoc>
     <QtMoc Include="Explorer\ExplorerModel.h">
       <Filter>Explorer</Filter>
     </QtMoc>
@@ -1197,6 +1194,15 @@
     </QtMoc>
     <QtMoc Include="Gltf\GltfModel.h">
       <Filter>Gltf</Filter>
+    </QtMoc>
+    <QtMoc Include="Shared\TreeModel\TreeModelItemData.h">
+      <Filter>Shared\TreeModel</Filter>
+    </QtMoc>
+    <QtMoc Include="Explorer\ExplorerItemData.h">
+      <Filter>Explorer</Filter>
+    </QtMoc>
+    <QtMoc Include="Project\ProjectItemData.h">
+      <Filter>Explorer\Project</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

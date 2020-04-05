@@ -83,14 +83,14 @@ public:
 	
 	bool TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId);
 
-	AtlasFrame *GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType);
+	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType);
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
-	QList<AtlasFrame *> RequestFrames(ProjectItem *pItem);
-	QList<AtlasFrame *> RequestFrames(ProjectItem *pItem, QList<AtlasFrame *> requestList);
-	QList<AtlasFrame *> RequestFramesById(ProjectItem *pItem, QList<QUuid> requestList);
+	QList<AtlasFrame *> RequestFrames(ProjectItemData *pItem);
+	QList<AtlasFrame *> RequestFrames(ProjectItemData *pItem, QList<AtlasFrame *> requestList);
+	QList<AtlasFrame *> RequestFramesById(ProjectItemData *pItem, QList<QUuid> requestList);
 
-	void RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinquishList);
+	void RelinquishFrames(ProjectItemData *pItem, QList<AtlasFrame *> relinquishList);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	QSet<AtlasFrame *> ImportImages(QStringList sImportImgList, quint32 uiAtlasGrpId, HyGuiItemType eType, QList<AtlasTreeItem *> correspondingParentList);

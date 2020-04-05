@@ -12,7 +12,7 @@
 
 #include "Global.h"
 #include "PropertiesTreeView.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "Shared/TreeModel/ITreeModel.h"
 
 enum PropertiesType
@@ -32,7 +32,7 @@ enum PropertiesType
 	PROPERTIESTYPE_vec4,
 	PROPERTIESTYPE_LineEdit,
 	PROPERTIESTYPE_ComboBox,        // delegateBuilder [QStringList] = QComboBox's selection list
-	PROPERTIESTYPE_StatesComboBox,  // delegateBuilder [ProjectItem *] = A pointer to the ProjectItem that owns this property
+	PROPERTIESTYPE_StatesComboBox,  // delegateBuilder [ProjectItemData *] = A pointer to the ProjectItemData that owns this property
 	PROPERTIESTYPE_Slider,
 	PROPERTIESTYPE_SpriteFrames
 };
@@ -81,7 +81,7 @@ class PropertiesTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
-	ProjectItem &								m_OwnerRef;
+	ProjectItemData &								m_OwnerRef;
 	const int									m_iSTATE_INDEX;
 	const QVariant								m_iSUBSTATE;
 
@@ -93,10 +93,10 @@ class PropertiesTreeModel : public ITreeModel
 	};
 
 public:
-	explicit PropertiesTreeModel(ProjectItem &ownerRef, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
+	explicit PropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
 	virtual ~PropertiesTreeModel();
 
-	ProjectItem &GetOwner();
+	ProjectItemData &GetOwner();
 	int GetStateIndex() const;
 	const QVariant &GetSubstate() const;
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;

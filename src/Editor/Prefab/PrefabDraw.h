@@ -16,7 +16,7 @@
 class PrefabDraw : public IDraw
 {
 public:
-	PrefabDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef);
+	PrefabDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 
 	virtual void OnShow() override;
 	virtual void OnHide() override;

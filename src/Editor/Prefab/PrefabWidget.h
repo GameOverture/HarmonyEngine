@@ -24,7 +24,7 @@ class PrefabWidget : public IWidget
 	Q_OBJECT
 
 public:
-	explicit PrefabWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
+	explicit PrefabWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~PrefabWidget();
 
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;

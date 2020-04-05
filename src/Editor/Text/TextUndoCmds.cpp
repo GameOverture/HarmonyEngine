@@ -9,13 +9,13 @@
  *************************************************************************/
 #include "Global.h"
 #include "TextUndoCmds.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "TextModel.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextUndoCmd_AddLayer::TextUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, QString sFontName, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent /*= nullptr*/) :
+TextUndoCmd_AddLayer::TextUndoCmd_AddLayer(ProjectItemData &itemRef, int iStateIndex, QString sFontName, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
@@ -55,7 +55,7 @@ void TextUndoCmd_AddLayer::undo()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextUndoCmd_RemoveLayer::TextUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, QUndoCommand *pParent /*= nullptr*/) :
+TextUndoCmd_RemoveLayer::TextUndoCmd_RemoveLayer(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
@@ -88,7 +88,7 @@ void TextUndoCmd_RemoveLayer::undo()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TextUndoCmd_FontChange::TextUndoCmd_FontChange(ProjectItem &itemRef, int iStateIndex, QString sNewFont, QUndoCommand *pParent /*= nullptr*/) :
+TextUndoCmd_FontChange::TextUndoCmd_FontChange(ProjectItemData &itemRef, int iStateIndex, QString sNewFont, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
@@ -121,7 +121,7 @@ void TextUndoCmd_FontChange::undo() /*override*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextUndoCmd_FontSizeChange::TextUndoCmd_FontSizeChange(ProjectItem &itemRef, int iStateIndex, float fNewSize, QUndoCommand *pParent /*= nullptr*/) :
+TextUndoCmd_FontSizeChange::TextUndoCmd_FontSizeChange(ProjectItemData &itemRef, int iStateIndex, float fNewSize, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
@@ -153,7 +153,7 @@ void TextUndoCmd_FontSizeChange::undo() /*override*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextUndoCmd_LayerRenderMode::TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= nullptr*/) :
+TextUndoCmd_LayerRenderMode::TextUndoCmd_LayerRenderMode(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
@@ -187,7 +187,7 @@ void TextUndoCmd_LayerRenderMode::undo()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextUndoCmd_LayerOutlineThickness::TextUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= nullptr*/) :
+TextUndoCmd_LayerOutlineThickness::TextUndoCmd_LayerOutlineThickness(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, float fPrevThickness, float fNewThickness, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
@@ -221,7 +221,7 @@ void TextUndoCmd_LayerOutlineThickness::undo()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextUndoCmd_LayerColors::TextUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent /*= nullptr*/) :
+TextUndoCmd_LayerColors::TextUndoCmd_LayerColors(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),
@@ -257,7 +257,7 @@ void TextUndoCmd_LayerColors::undo()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TextUndoCmd_LayerOrder::TextUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :
+TextUndoCmd_LayerOrder::TextUndoCmd_LayerOrder(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent /*= 0*/) :
 	QUndoCommand(pParent),
 	m_ItemRef(itemRef),
 	m_iStateIndex(iStateIndex),

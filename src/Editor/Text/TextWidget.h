@@ -21,7 +21,7 @@ class TextWidget : public IWidget
 	Q_OBJECT
 
 public:
-	TextWidget(ProjectItem &itemRef, QWidget *parent = nullptr);
+	TextWidget(ProjectItemData &itemRef, QWidget *parent = nullptr);
 	~TextWidget();
 
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;

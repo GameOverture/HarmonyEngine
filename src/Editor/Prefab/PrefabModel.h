@@ -33,7 +33,7 @@ class PrefabModel : public IModel
 	PropertiesTreeModel		m_PropertiesModel;
 
 public:
-	PrefabModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
+	PrefabModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 
 	PropertiesTreeModel &GetPropertiesModel();
 

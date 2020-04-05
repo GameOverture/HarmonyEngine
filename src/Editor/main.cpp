@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "MainWindow.h"
 #include "AtlasFrame.h"
+#include "Shared/TreeModel/TreeModelItemData.h"
 #include "DlgProjectSettings.h"
 
 #include <QApplication>
@@ -19,8 +20,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	qRegisterMetaTypeStreamOperators<AtlasFrame *>("AtlasFrame *");
-	qRegisterMetaTypeStreamOperators<ExplorerItem *>("ExplorerItem *");
-	//qRegisterMetaTypeStreamOperators<ProjectItem *>("ProjectItem *");
+	qRegisterMetaTypeStreamOperators<TreeModelItemData *>("TreeModelItemData *");
 
 	HyGlobal::Initialize();
 	DlgProjectSettings::InitDefaultValues();

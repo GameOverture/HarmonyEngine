@@ -12,7 +12,7 @@
 #include "ui_AtlasWidget.h"
 #include "Project.h"
 #include "SpriteWidget.h"
-#include "ExplorerItem.h"
+#include "ExplorerItemData.h"
 
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -271,11 +271,11 @@ void AtlasWidget::on_actionDeleteImages_triggered()
 	for(int i = 0; i < selectedFrameList.count(); ++i)
 	{
 		AtlasFrame *pFrame = selectedFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-		QSet<ProjectItem *> sLinks = pFrame->GetLinks();
+		QSet<ProjectItemData *> sLinks = pFrame->GetLinks();
 		if(sLinks.empty() == false)
 		{
 			QString sMessage = "'" % pFrame->GetName() % "' image cannot be deleted because it is in use by the following items: \n\n";
-			for(QSet<ProjectItem *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+			for(QSet<ProjectItemData *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
 				sMessage.append(HyGlobal::ItemName((*LinksIter)->GetType(), true) % "/" % (*LinksIter)->GetName(true) % "\n");
 
 			HyGuiLog(sMessage, LOGTYPE_Warning);
@@ -328,24 +328,24 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 	ProjectTabBar *pTabBar = m_pModel->GetProjOwner()->GetTabBar();
 	
 	// Keep track of any linked/referenced items as they will need to be re-saved after image replacement
-	QList<ProjectItem *> affectedItemList;
+	QList<ProjectItemData *> affectedItemList;
 	for(int i = 0; i < selectedTreeItemFrameList.count(); ++i)
 	{
 		AtlasFrame *pFrame = selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-		QSet<ProjectItem *> sLinks = pFrame->GetLinks();
+		QSet<ProjectItemData *> sLinks = pFrame->GetLinks();
 		
 		if(sLinks.empty() == false)
 		{
-			for(QSet<ProjectItem *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
+			for(QSet<ProjectItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
 			{
-				ProjectItem *pLinkedItem = *linksIter;
+				ProjectItemData *pLinkedItem = *linksIter;
 				affectedItemList.append(pLinkedItem);
 				
 				// Abort if any of these linked items are currently opened & unsaved
 				for(int i = 0; i < pTabBar->count(); ++i)
 				{
 					QVariant v = pTabBar->tabData(i);
-					ProjectItem *pOpenItem = v.value<ProjectItem *>();
+					ProjectItemData *pOpenItem = v.value<ProjectItemData *>();
 					
 					if(pLinkedItem == pOpenItem && pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
 					{

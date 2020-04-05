@@ -19,7 +19,7 @@
 #include <QJsonArray>
 #include <QAction>
 
-AudioWidget::AudioWidget(ProjectItem &itemRef, QWidget *pParent) :
+AudioWidget::AudioWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	IWidget(itemRef, pParent),
 	ui(new Ui::AudioWidget)
 {

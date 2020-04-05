@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ProjectItem.h
+ *	ProjectItemData.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -7,10 +7,10 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef PROJECTITEM_H
-#define PROJECTITEM_H
+#ifndef PROJECTITEMDATA_H
+#define PROJECTITEMDATA_H
 
-#include "ExplorerItem.h"
+#include "ExplorerItemData.h"
 #include "IDraw.h"
 #include "IWidget.h"
 
@@ -24,7 +24,7 @@ class Project;
 class AtlasFrame;
 class IModel;
 
-class ProjectItem : public ExplorerItem
+class ProjectItemData : public ExplorerItemData
 {
 	Q_OBJECT
 
@@ -44,8 +44,8 @@ class ProjectItem : public ExplorerItem
 	IDraw *					m_pDraw;
 	
 public:
-	ProjectItem(Project &projRef, HyGuiItemType eType, const QString sName, const FileDataPair &initItemFileDataRef, bool bIsPendingSave);
-	virtual ~ProjectItem();
+	ProjectItemData(Project &projRef, HyGuiItemType eType, const QString sName, const FileDataPair &initItemFileDataRef, bool bIsPendingSave);
+	virtual ~ProjectItemData();
 
 	void LoadModel();
 
@@ -81,6 +81,5 @@ private Q_SLOTS:
 	void on_undoStack_indexChanged(int iIndex);
 	
 };
-Q_DECLARE_METATYPE(ProjectItem *)
 
-#endif // PROJECTITEM_H
+#endif // PROJECTITEMDATA_H

@@ -38,7 +38,7 @@ void IStateData::SetName(QString sNewName)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-IModel::IModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
+IModel::IModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	QAbstractListModel(&itemRef),
 	m_ItemRef(itemRef),
 	m_UUID(itemFileDataRef.m_Meta["UUID"].toString())
@@ -49,12 +49,12 @@ IModel::IModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
 {
 }
 
-ProjectItem &IModel::GetItem()
+ProjectItemData &IModel::GetItem()
 {
 	return m_ItemRef;
 }
 
-const ProjectItem &IModel::GetItem() const
+const ProjectItemData &IModel::GetItem() const
 {
 	return m_ItemRef;
 }

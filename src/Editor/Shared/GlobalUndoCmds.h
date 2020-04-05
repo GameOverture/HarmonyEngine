@@ -11,7 +11,7 @@
 #define UNDOCMDS
 
 #include "Global.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "Project.h"
 #include "IModel.h"
 #include "GlobalWidgetMappers.h"
@@ -26,11 +26,11 @@
 template <typename STATEDATA>
 class UndoCmd_AddState : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
+	ProjectItemData &       m_ItemRef;
 	int                 m_iIndex;
 
 public:
-	UndoCmd_AddState(QString sText, ProjectItem &itemRef, QUndoCommand *pParent = nullptr) :
+	UndoCmd_AddState(QString sText, ProjectItemData &itemRef, QUndoCommand *pParent = nullptr) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef)
 	{
@@ -57,12 +57,12 @@ public:
 template <typename STATEDATA>
 class UndoCmd_RemoveState : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
+	ProjectItemData &       m_ItemRef;
 	int                 m_iIndex;
 	FileDataPair        m_PoppedState;
 
 public:
-	UndoCmd_RemoveState(QString sText, ProjectItem &itemRef, int iIndex, QUndoCommand *pParent = nullptr) :
+	UndoCmd_RemoveState(QString sText, ProjectItemData &itemRef, int iIndex, QUndoCommand *pParent = nullptr) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
 		m_iIndex(iIndex)
@@ -89,14 +89,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_RenameState : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
+	ProjectItemData &       m_ItemRef;
 	int                 m_iIndex;
 
 	QString             m_sNewName;
 	QString             m_sOldName;
 
 public:
-	UndoCmd_RenameState(QString sText, ProjectItem &itemRef, QString sNewName, int iIndex, QUndoCommand *pParent = nullptr) :
+	UndoCmd_RenameState(QString sText, ProjectItemData &itemRef, QString sNewName, int iIndex, QUndoCommand *pParent = nullptr) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
 		m_iIndex(iIndex),
@@ -124,11 +124,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_MoveStateBack : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
+	ProjectItemData &       m_ItemRef;
 	int                 m_iStateIndex;
 
 public:
-	UndoCmd_MoveStateBack(QString sText, ProjectItem &itemRef, int iStateIndex, QUndoCommand *pParent = nullptr) :
+	UndoCmd_MoveStateBack(QString sText, ProjectItemData &itemRef, int iStateIndex, QUndoCommand *pParent = nullptr) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
 		m_iStateIndex(iStateIndex)
@@ -159,11 +159,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_MoveStateForward : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
+	ProjectItemData &       m_ItemRef;
 	int                 m_iStateIndex;
 
 public:
-	UndoCmd_MoveStateForward(QString sText, ProjectItem &itemRef, int iStateIndex, QUndoCommand *pParent = nullptr) :
+	UndoCmd_MoveStateForward(QString sText, ProjectItemData &itemRef, int iStateIndex, QUndoCommand *pParent = nullptr) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
 		m_iStateIndex(iStateIndex)
@@ -194,7 +194,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_ComboBox : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
+	ProjectItemData &       m_ItemRef;
 	ComboBoxMapper *    m_pMapper;
 	int                 m_iStateIndex;
 
@@ -202,7 +202,7 @@ class UndoCmd_ComboBox : public QUndoCommand
 	int                 m_iNewValue;
 	
 public:
-	UndoCmd_ComboBox(QString sText, ProjectItem &itemRef, ComboBoxMapper *pMapper, int iStateIndex, int iPrevValue, int iNewValue, QUndoCommand *pParent = nullptr) :
+	UndoCmd_ComboBox(QString sText, ProjectItemData &itemRef, ComboBoxMapper *pMapper, int iStateIndex, int iPrevValue, int iNewValue, QUndoCommand *pParent = nullptr) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
 		m_pMapper(pMapper),
@@ -232,14 +232,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_CheckBox : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
+	ProjectItemData &       m_ItemRef;
 	CheckBoxMapper *    m_pMapper;
 	int                 m_iStateIndex;
 
 	bool                m_bNewValue;
 
 public:
-	UndoCmd_CheckBox(QString sText, ProjectItem &itemRef, CheckBoxMapper *pMapper, int iStateIndex, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+	UndoCmd_CheckBox(QString sText, ProjectItemData &itemRef, CheckBoxMapper *pMapper, int iStateIndex, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
 																																	m_ItemRef(itemRef),
 																																	m_pMapper(pMapper),
 																																	m_iStateIndex(iStateIndex),
@@ -267,7 +267,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_SpinBox : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
+	ProjectItemData &       m_ItemRef;
 	SpinBoxMapper *     m_pMapper;
 	int                 m_iStateIndex;
 
@@ -275,7 +275,7 @@ class UndoCmd_SpinBox : public QUndoCommand
 	int                 m_iOld;
 
 public:
-	UndoCmd_SpinBox(QString sText, ProjectItem &itemRef, SpinBoxMapper *pMapper, int iStateIndex, int iNew, int iOld, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
+	UndoCmd_SpinBox(QString sText, ProjectItemData &itemRef, SpinBoxMapper *pMapper, int iStateIndex, int iNew, int iOld, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
 																																					m_ItemRef(itemRef),
 																																					m_pMapper(pMapper),
 																																					m_iStateIndex(iStateIndex),
@@ -304,7 +304,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_DoubleSpinBox : public QUndoCommand
 {
-	ProjectItem &           m_ItemRef;
+	ProjectItemData &           m_ItemRef;
 	DoubleSpinBoxMapper *   m_pMapper;
 	int                     m_iStateIndex;
 
@@ -312,7 +312,7 @@ class UndoCmd_DoubleSpinBox : public QUndoCommand
 	double                  m_dOld;
 
 public:
-	UndoCmd_DoubleSpinBox(QString sText, ProjectItem &itemRef, DoubleSpinBoxMapper *pMapper, int iStateIndex, double dNew, double dOld, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+	UndoCmd_DoubleSpinBox(QString sText, ProjectItemData &itemRef, DoubleSpinBoxMapper *pMapper, int iStateIndex, double dNew, double dOld, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
 																																										m_ItemRef(itemRef),
 																																										m_pMapper(pMapper),
 																																										m_iStateIndex(iStateIndex),
@@ -341,7 +341,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_LineEdit : public QUndoCommand
 {
-	ProjectItem &       m_ItemRef;
+	ProjectItemData &       m_ItemRef;
 	LineEditMapper *    m_pMapper;
 	int                 m_iStateIndex;
 
@@ -349,7 +349,7 @@ class UndoCmd_LineEdit : public QUndoCommand
 	QString             m_sOld;
 
 public:
-	UndoCmd_LineEdit(QString sText, ProjectItem &itemRef, LineEditMapper *pMapper, int iStateIndex, QString sNew, QString sOld, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+	UndoCmd_LineEdit(QString sText, ProjectItemData &itemRef, LineEditMapper *pMapper, int iStateIndex, QString sNew, QString sOld, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
 																																								m_ItemRef(itemRef),
 																																								m_pMapper(pMapper),
 																																								m_iStateIndex(iStateIndex),
@@ -425,13 +425,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_AddFrames : public QUndoCommand
 {
-	ProjectItem &           m_ItemRef;
+	ProjectItemData &           m_ItemRef;
 	int                     m_iStateIndex;
 
 	QList<AtlasFrame *>     m_Frames;
 	
 public:
-	UndoCmd_AddFrames(QString sText, ProjectItem &itemRef, int iStateIndex, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
+	UndoCmd_AddFrames(QString sText, ProjectItemData &itemRef, int iStateIndex, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
 																											m_ItemRef(itemRef),
 																											m_iStateIndex(iStateIndex)
 	{
@@ -459,13 +459,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_DeleteFrame : public QUndoCommand
 {
-	ProjectItem &           m_ItemRef;
+	ProjectItemData &           m_ItemRef;
 	int                     m_iStateIndex;
 
 	QList<AtlasFrame *>     m_Frames;
 
 public:
-	UndoCmd_DeleteFrame(QString sText, ProjectItem &itemRef, int iStateIndex, AtlasFrame *pFrame, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
+	UndoCmd_DeleteFrame(QString sText, ProjectItemData &itemRef, int iStateIndex, AtlasFrame *pFrame, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
 																																m_ItemRef(itemRef),
 																																m_iStateIndex(iStateIndex)
 	{

@@ -12,8 +12,8 @@
 
 #include "ExplorerWidget.h"
 #include "ProjectDraw.h"
-#include "ProjectItem.h"
-#include "ExplorerItem.h"
+#include "ProjectItemData.h"
+#include "ExplorerItemData.h"
 #include "DlgProjectSettings.h"
 
 #include <QQueue>
@@ -44,7 +44,7 @@ protected:
 	virtual void dropEvent(QDropEvent *pEvent) override;
 };
 
-class Project : public ExplorerItem
+class Project : public ExplorerItemData
 {
 	Q_OBJECT
 
@@ -64,7 +64,7 @@ class Project : public ExplorerItem
 	AudioAssetsWidget *								m_pAudioWidget;
 
 	ProjectTabBar *									m_pTabBar;
-	ProjectItem *									m_pCurOpenItem;
+	ProjectItemData *									m_pCurOpenItem;
 
 	FileDataPair									m_ProjectFileData;
 
@@ -108,7 +108,7 @@ public:
 	void ScanMetaFontDir();
 
 	ProjectTabBar *GetTabBar();
-	ProjectItem *GetCurrentOpenItem();
+	ProjectItemData *GetCurrentOpenItem();
 
 	void SetRenderSize(int iWidth, int iHeight);
 
@@ -122,8 +122,8 @@ public:
 	bool DoesItemExist(HyGuiItemType eType, QString sPath) const;
 
 	// These tab functions are only called from MainWindow
-	void OpenTab(ProjectItem *pItem);
-	void CloseTab(ProjectItem *pItem);
+	void OpenTab(ProjectItemData *pItem);
+	void CloseTab(ProjectItemData *pItem);
 	bool CloseAllTabs();
 
 	// This is called in Harmony during a reload project

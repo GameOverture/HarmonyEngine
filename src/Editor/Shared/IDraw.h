@@ -14,12 +14,12 @@
 
 #include <QWidget>
 
-class ProjectItem;
+class ProjectItemData;
 
 class IDraw : public HyEntity2d
 {
 protected:
-	ProjectItem *		m_pProjItem;
+	ProjectItemData *		m_pProjItem;
 	HyCamera2d *		m_pCamera;
 
 	bool				m_bPanCameraKeyDown;
@@ -27,7 +27,7 @@ protected:
 	QPointF				m_ptOldMousePos;
 
 public:
-	IDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef);
+	IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~IDraw();
 
 	HyCamera2d *GetCamera();

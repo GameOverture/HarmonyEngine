@@ -37,7 +37,7 @@ SpriteTableView::SpriteTableView(QWidget *pParent /*= 0*/) :
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-WidgetSpriteDelegate::WidgetSpriteDelegate(ProjectItem *pItem, SpriteTableView *pTableView, QObject *pParent /*= 0*/) :
+WidgetSpriteDelegate::WidgetSpriteDelegate(ProjectItemData *pItem, SpriteTableView *pTableView, QObject *pParent /*= 0*/) :
 	QStyledItemDelegate(pParent),
 	m_pItem(pItem),
 	m_pTableView(pTableView)

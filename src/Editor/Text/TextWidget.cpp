@@ -16,7 +16,7 @@
 #include <QComboBox>
 #include <QFontDatabase>
 
-TextWidget::TextWidget(ProjectItem &itemRef, QWidget *parent) :
+TextWidget::TextWidget(ProjectItemData &itemRef, QWidget *parent) :
 	IWidget(itemRef, parent)
 {
 	ui.setupUi(this);

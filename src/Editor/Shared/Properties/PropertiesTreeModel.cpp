@@ -19,7 +19,7 @@
 #include <QDoubleSpinBox>
 #include <QLineEdit>
 
-PropertiesTreeModel::PropertiesTreeModel(ProjectItem &ownerRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
+PropertiesTreeModel::PropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
 	ITreeModel(2, { "Property", "Value" }, pParent),
 	m_OwnerRef(ownerRef),
 	m_iSTATE_INDEX(iStateIndex),
@@ -31,7 +31,7 @@ PropertiesTreeModel::PropertiesTreeModel(ProjectItem &ownerRef, int iStateIndex,
 {
 }
 
-ProjectItem &PropertiesTreeModel::GetOwner()
+ProjectItemData &PropertiesTreeModel::GetOwner()
 {
 	return m_OwnerRef;
 }
@@ -387,7 +387,7 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 		break;
 	case PROPERTIESTYPE_StatesComboBox: {
 		QComboBox tmpComboBox(nullptr);
-		tmpComboBox.setModel(propDefRef.delegateBuilder.value<ProjectItem *>()->GetModel());
+		tmpComboBox.setModel(propDefRef.delegateBuilder.value<ProjectItemData *>()->GetModel());
 		sRetStr += tmpComboBox.itemText(treeItemValue.toInt());
 	} break;
 

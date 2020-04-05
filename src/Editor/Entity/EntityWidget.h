@@ -38,14 +38,14 @@ class EntityWidget : public IWidget
 	};
 
 public:
-	explicit EntityWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
+	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~EntityWidget();
 
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
-	ExplorerItem *GetSelectedNode();
+	ExplorerItemData *GetSelectedNode();
 
 private Q_SLOTS:
 	void on_nodeTree_clicked(QModelIndex);

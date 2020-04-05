@@ -134,13 +134,13 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		return;
 
 	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
-	ProjectItem *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
+	ProjectItemData *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItemData *>();
 
 	if(pCurOpenTabItem && pCurOpenTabItem->GetType() == ITEM_Entity && pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE))
 	{
 		EntityNodeTreeModel &childTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetChildrenModel();
 
-		if(childTreeModel.IsItemValid(static_cast<ProjectItem *>(pEvent->source()), false))
+		if(childTreeModel.IsItemValid(static_cast<ProjectItemData *>(pEvent->source()), false))
 			pEvent->acceptProposedAction();
 		else
 			pEvent->ignore();
@@ -155,11 +155,11 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		return;
 
 	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
-	ProjectItem *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItem *>();
+	ProjectItemData *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItemData *>();
 
 	if(pCurOpenTabItem &&
 	   pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
-	   static_cast<ProjectItem *>(pEvent->source()) != pCurOpenTabItem &&
+	   static_cast<ProjectItemData *>(pEvent->source()) != pCurOpenTabItem &&
 	   pCurOpenTabItem->GetType() == ITEM_Entity)
 	{
 		QList<QVariant> validItemList;
@@ -174,14 +174,14 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 			if(itemObj["project"].toString().toLower() == m_pProject->GetAbsPath().toLower())
 			{
 				QString sItemPath = itemObj["itemName"].toString();
-				ExplorerItem *pItem = m_pProject->GetExplorerModel().FindItemByItemPath(m_pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
+				ExplorerItemData *pItem = m_pProject->GetExplorerModel().FindItemByItemPath(m_pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
 
 				EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetChildrenModel();
 				if(entityTreeModelRef.IsItemValid(pItem, true) == false)
 					continue;
 
 				QVariant v;
-				v.setValue<ExplorerItem *>(pItem);
+				v.setValue<ExplorerItemData *>(pItem);
 				validItemList.push_back(v);
 			}
 			else
@@ -201,7 +201,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	if(m_pProject == nullptr)
 		return;
 
-	ProjectItem *pCurItem = m_pProject->GetCurrentOpenItem();
+	ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
 	if(pCurItem == nullptr)
 		return;
 
@@ -213,7 +213,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	if(m_pProject == nullptr)
 		return;
 
-	ProjectItem *pCurItem = m_pProject->GetCurrentOpenItem();
+	ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
 	if(pCurItem == nullptr)
 		return;
 
@@ -225,7 +225,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	if(m_pProject == nullptr)
 		return;
 
-	ProjectItem *pCurItem = m_pProject->GetCurrentOpenItem();
+	ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
 	if(pCurItem == nullptr)
 		return;
 
@@ -237,7 +237,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	if(m_pProject == nullptr)
 		return;
 
-	ProjectItem *pCurItem = m_pProject->GetCurrentOpenItem();
+	ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
 	if(pCurItem == nullptr)
 		return;
 
@@ -249,7 +249,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	if(m_pProject == nullptr)
 		return;
 
-	ProjectItem *pCurItem = m_pProject->GetCurrentOpenItem();
+	ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
 	if(pCurItem == nullptr)
 		return;
 
@@ -261,7 +261,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	if(m_pProject == nullptr)
 		return;
 
-	ProjectItem *pCurItem = m_pProject->GetCurrentOpenItem();
+	ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
 	if(pCurItem == nullptr)
 		return;
 

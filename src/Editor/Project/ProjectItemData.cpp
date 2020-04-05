@@ -1,5 +1,5 @@
 /**************************************************************************
- *	ProjectItem.cpp
+ *	ProjectItemData.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -8,7 +8,7 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "MainWindow.h"
 #include "AtlasWidget.h"
 #include "AudioAssetsWidget.h"
@@ -29,12 +29,12 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
-ProjectItem::ProjectItem(Project &projRef,
+ProjectItemData::ProjectItemData(Project &projRef,
 						 HyGuiItemType eType,
 						 const QString sName,
 						 const FileDataPair &initItemFileDataRef,
 						 bool bIsPendingSave) :
-	ExplorerItem(projRef, eType, sName),
+	ExplorerItemData(projRef, eType, sName),
 	m_ItemFileData(initItemFileDataRef),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_pModel(nullptr),
@@ -62,7 +62,7 @@ ProjectItem::ProjectItem(Project &projRef,
 	connect(m_pUndoStack, SIGNAL(indexChanged(int)), this, SLOT(on_undoStack_indexChanged(int)));
 }
 
-ProjectItem::~ProjectItem()
+ProjectItemData::~ProjectItemData()
 {
 	DrawUnload();
 	WidgetUnload();
@@ -70,7 +70,7 @@ ProjectItem::~ProjectItem()
 	delete m_pUndoStack;
 }
 
-void ProjectItem::LoadModel()
+void ProjectItemData::LoadModel()
 {
 	switch(m_eTYPE)
 	{
@@ -98,27 +98,27 @@ void ProjectItem::LoadModel()
 	}
 }
 
-IModel *ProjectItem::GetModel()
+IModel *ProjectItemData::GetModel()
 {
 	return m_pModel;
 }
 
-IWidget *ProjectItem::GetWidget()
+IWidget *ProjectItemData::GetWidget()
 {
 	return m_pWidget;
 }
 
-IDraw *ProjectItem::GetDraw()
+IDraw *ProjectItemData::GetDraw()
 {
 	return m_pDraw;
 }
 
-QUndoStack *ProjectItem::GetUndoStack()
+QUndoStack *ProjectItemData::GetUndoStack()
 {
 	return m_pUndoStack;
 }
 
-void ProjectItem::GiveMenuActions(QMenu *pMenu)
+void ProjectItemData::GiveMenuActions(QMenu *pMenu)
 {
 	pMenu->addAction(m_pActionUndo);
 	pMenu->addAction(m_pActionRedo);
@@ -127,7 +127,7 @@ void ProjectItem::GiveMenuActions(QMenu *pMenu)
 	m_pWidget->OnGiveMenuActions(pMenu);
 }
 
-void ProjectItem::GetLatestFileData(FileDataPair &itemFileDataOut) const
+void ProjectItemData::GetLatestFileData(FileDataPair &itemFileDataOut) const
 {
 	itemFileDataOut = m_ItemFileData;
 
@@ -157,7 +157,7 @@ void ProjectItem::GetLatestFileData(FileDataPair &itemFileDataOut) const
 	m_pModel->InsertItemSpecificData(itemFileDataOut);
 }
 
-bool ProjectItem::Save(bool bWriteToDisk)
+bool ProjectItemData::Save(bool bWriteToDisk)
 {
 	if(m_pModel->OnPrepSave() == false)
 		return false;
@@ -173,17 +173,17 @@ bool ProjectItem::Save(bool bWriteToDisk)
 	return true;
 }
 
-bool ProjectItem::IsExistencePendingSave()
+bool ProjectItemData::IsExistencePendingSave()
 {
 	return m_bExistencePendingSave;
 }
 
-bool ProjectItem::IsSaveClean()
+bool ProjectItemData::IsSaveClean()
 {
 	return m_pUndoStack->isClean() && m_bExistencePendingSave == false;
 }
 
-void ProjectItem::DiscardChanges()
+void ProjectItemData::DiscardChanges()
 {
 	m_pUndoStack->clear();
 
@@ -191,7 +191,7 @@ void ProjectItem::DiscardChanges()
 	LoadModel();
 }
 
-void ProjectItem::WidgetLoad()
+void ProjectItemData::WidgetLoad()
 {
 	WidgetUnload();
 	
@@ -217,13 +217,13 @@ void ProjectItem::WidgetLoad()
 	m_pWidget->FocusState(0, -1);
 }
 
-void ProjectItem::WidgetUnload()
+void ProjectItemData::WidgetUnload()
 {
 	delete m_pWidget;
 	m_pWidget = nullptr;
 }
 
-void ProjectItem::DrawLoad()
+void ProjectItemData::DrawLoad()
 {
 	DrawUnload();
 
@@ -251,23 +251,23 @@ void ProjectItem::DrawLoad()
 	m_pDraw->SetVisible(false, true);
 }
 
-void ProjectItem::DrawUnload()
+void ProjectItemData::DrawUnload()
 {
 	delete m_pDraw;
 	m_pDraw = nullptr;
 }
 
-void ProjectItem::DrawShow()
+void ProjectItemData::DrawShow()
 {
 	m_pDraw->Show();
 }
 
-void ProjectItem::DrawHide()
+void ProjectItemData::DrawHide()
 {
 	m_pDraw->Hide();
 }
 
-void ProjectItem::BlockAllWidgetSignals(bool bBlock)
+void ProjectItemData::BlockAllWidgetSignals(bool bBlock)
 {
 	if(m_pWidget == nullptr)
 		return;
@@ -277,7 +277,7 @@ void ProjectItem::BlockAllWidgetSignals(bool bBlock)
 		(*iter)->blockSignals(bBlock);
 }
 
-void ProjectItem::FocusWidgetState(int iStateIndex, QVariant subState)
+void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)
 {
 	if(m_pWidget == nullptr)
 		return;
@@ -288,22 +288,22 @@ void ProjectItem::FocusWidgetState(int iStateIndex, QVariant subState)
 	m_pWidget->repaint();
 }
 
-/*virtual*/ void ProjectItem::DeleteFromProject() /*override*/
+/*virtual*/ void ProjectItemData::DeleteFromProject() /*override*/
 {
 	m_pUndoStack->setClean();
 
 	// Unlinks all dependencies
 	m_pModel->RelinquishAllFrames();
 
-	ExplorerItem::DeleteFromProject();
+	ExplorerItemData::DeleteFromProject();
 }
 
-void ProjectItem::on_undoStack_cleanChanged(bool bClean)
+void ProjectItemData::on_undoStack_cleanChanged(bool bClean)
 {
 	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
 	for(int i = 0; i < pTabBar->count(); ++i)
 	{
-		if(pTabBar->tabData(i).value<ProjectItem *>() == this)
+		if(pTabBar->tabData(i).value<ProjectItemData *>() == this)
 		{
 			if(bClean)
 			{
@@ -316,7 +316,7 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 				pTabBar->setTabIcon(i, GetIcon(SUBICON_Dirty));
 			}
 
-			QModelIndex index = m_pProject->GetExplorerModel().FindIndex<ProjectItem *>(this, 0);
+			QModelIndex index = m_pProject->GetExplorerModel().FindIndex<ProjectItemData *>(this, 0);
 			m_pProject->GetExplorerModel().dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
 
 			break;
@@ -326,7 +326,7 @@ void ProjectItem::on_undoStack_cleanChanged(bool bClean)
 	m_pProject->ApplySaveEnables();
 }
 
-void ProjectItem::on_undoStack_indexChanged(int iIndex)
+void ProjectItemData::on_undoStack_indexChanged(int iIndex)
 {
 	if(m_pDraw == nullptr)
 	{

@@ -52,7 +52,7 @@ void PrefabStateData::Refresh()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-PrefabModel::PrefabModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
+PrefabModel::PrefabModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_PropertiesModel(itemRef, 0, 0, this)
 {

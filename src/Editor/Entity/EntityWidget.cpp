@@ -16,7 +16,7 @@
 #include "DlgInputName.h"
 #include "MainWindow.h"
 
-EntityWidget::EntityWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
+EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
 	ui(new Ui::EntityWidget)
 {
@@ -61,7 +61,7 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
 {
-	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
 	MainWindow::GetExplorer()->GetSelectedItems(selectedItems, selectedPrefixes);
 	bool bEnableAddNodeBtn = false;
 	EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
@@ -82,7 +82,7 @@ EntityWidget::~EntityWidget()
 	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
 
 
-	ExplorerItem *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetChildrenModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<ExplorerItem *>();
+	ExplorerItemData *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetChildrenModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<ExplorerItemData *>();
 	if(pSubStateItem == nullptr)
 	{
 		ui->lblSelectedItemIcon->setVisible(false);
@@ -113,22 +113,22 @@ EntityWidget::~EntityWidget()
 	
 }
 
-ExplorerItem *EntityWidget::GetSelectedNode()
+ExplorerItemData *EntityWidget::GetSelectedNode()
 {
 	QModelIndexList selectedIndices = ui->nodeTree->selectionModel()->selectedIndexes();
 	if(selectedIndices.empty())
 		return nullptr;
 
-	return ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItem *>();
+	return ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItemData *>();
 }
 
 void EntityWidget::on_actionAddSelectedChild_triggered()
 {
-	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
 	MainWindow::GetExplorer()->GetSelectedItems(selectedItems, selectedPrefixes);
 	if(selectedItems.empty())
 	{
-		HyGuiLog("Currently selected item(s) in Explorer is/are not a ProjectItem. Cannot add node(s) to entity.", LOGTYPE_Error);
+		HyGuiLog("Currently selected item(s) in Explorer is/are not a ProjectItemData. Cannot add node(s) to entity.", LOGTYPE_Error);
 		return;
 	}
 
@@ -140,7 +140,7 @@ void EntityWidget::on_actionAddSelectedChild_triggered()
 			continue;
 	
 		QVariant v;
-		v.setValue<ExplorerItem *>(pItem);
+		v.setValue<ExplorerItemData *>(pItem);
 		validItemList.push_back(v);
 	}
 

@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextUndoCmd_AddLayer : public QUndoCommand
 {
-	ProjectItem &			m_ItemRef;
+	ProjectItemData &			m_ItemRef;
 	int						m_iStateIndex;
 
 	QString					m_sFontName;
@@ -30,7 +30,7 @@ class TextUndoCmd_AddLayer : public QUndoCommand
 	TextLayerHandle			m_hLayer;
 
 public:
-	TextUndoCmd_AddLayer(ProjectItem &itemRef, int iStateIndex, QString sFontName, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_AddLayer(ProjectItemData &itemRef, int iStateIndex, QString sFontName, rendermode_t eRenderMode, float fSize, float fThickness, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_AddLayer();
 
 	void redo() override;
@@ -39,13 +39,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextUndoCmd_RemoveLayer : public QUndoCommand
 {
-	ProjectItem &			m_ItemRef;
+	ProjectItemData &			m_ItemRef;
 	int						m_iStateIndex;
 
 	TextLayerHandle			m_hLayer;
 
 public:
-	TextUndoCmd_RemoveLayer(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_RemoveLayer(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_RemoveLayer();
 
 	void redo() override;
@@ -54,7 +54,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextUndoCmd_FontChange : public QUndoCommand
 {
-	ProjectItem &			m_ItemRef;
+	ProjectItemData &			m_ItemRef;
 	int						m_iStateIndex;
 
 	TextLayerHandle			m_hLayer;
@@ -62,7 +62,7 @@ class TextUndoCmd_FontChange : public QUndoCommand
 	QString					m_sNewFont;
 
 public:
-	TextUndoCmd_FontChange(ProjectItem &itemRef, int iStateIndex, QString sNewFont, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_FontChange(ProjectItemData &itemRef, int iStateIndex, QString sNewFont, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_FontChange();
 
 	void redo() override;
@@ -71,7 +71,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextUndoCmd_FontSizeChange : public QUndoCommand
 {
-	ProjectItem &			m_ItemRef;
+	ProjectItemData &			m_ItemRef;
 	int						m_iStateIndex;
 
 	TextLayerHandle			m_hLayer;
@@ -79,7 +79,7 @@ class TextUndoCmd_FontSizeChange : public QUndoCommand
 	float					m_fNewSize;
 
 public:
-	TextUndoCmd_FontSizeChange(ProjectItem &itemRef, int iStateIndex, float fNewSize, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_FontSizeChange(ProjectItemData &itemRef, int iStateIndex, float fNewSize, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_FontSizeChange();
 
 	void redo() override;
@@ -88,7 +88,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextUndoCmd_LayerRenderMode : public QUndoCommand
 {
-	ProjectItem &			m_ItemRef;
+	ProjectItemData &			m_ItemRef;
 	int						m_iStateIndex;
 
 	TextLayerHandle			m_hLayer;
@@ -96,7 +96,7 @@ class TextUndoCmd_LayerRenderMode : public QUndoCommand
 	rendermode_t			m_eNewRenderMode;
 
 public:
-	TextUndoCmd_LayerRenderMode(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_LayerRenderMode(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, rendermode_t ePrevMode, rendermode_t eNewMode, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_LayerRenderMode();
 
 	void redo() override;
@@ -105,7 +105,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextUndoCmd_LayerOutlineThickness : public QUndoCommand
 {
-	ProjectItem &			m_ItemRef;
+	ProjectItemData &			m_ItemRef;
 	int						m_iStateIndex;
 
 	TextLayerHandle			m_hLayer;
@@ -113,7 +113,7 @@ class TextUndoCmd_LayerOutlineThickness : public QUndoCommand
 	float					m_fNewThickness;
 
 public:
-	TextUndoCmd_LayerOutlineThickness(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_LayerOutlineThickness(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, float fPrevThickness, float fNewThickness, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_LayerOutlineThickness();
 
 	void redo() override;
@@ -122,7 +122,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextUndoCmd_LayerColors : public QUndoCommand
 {
-	ProjectItem &			m_ItemRef;
+	ProjectItemData &			m_ItemRef;
 	int						m_iStateIndex;
 
 	TextLayerHandle			m_hLayer;
@@ -132,7 +132,7 @@ class TextUndoCmd_LayerColors : public QUndoCommand
 	QColor					m_NewBotColor;
 
 public:
-	TextUndoCmd_LayerColors(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_LayerColors(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, QColor prevTopColor, QColor prevBotColor, QColor newTopColor, QColor newBotColor, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_LayerColors();
 
 	void redo() override;
@@ -141,7 +141,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextUndoCmd_LayerOrder : public QUndoCommand
 {
-	ProjectItem &			m_ItemRef;
+	ProjectItemData &			m_ItemRef;
 	int						m_iStateIndex;
 
 	TextLayerHandle			m_hLayer;
@@ -149,7 +149,7 @@ class TextUndoCmd_LayerOrder : public QUndoCommand
 	int						m_iNewRowIndex;
 
 public:
-	TextUndoCmd_LayerOrder(ProjectItem &itemRef, int iStateIndex, TextLayerHandle hLayer, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent = nullptr);
+	TextUndoCmd_LayerOrder(ProjectItemData &itemRef, int iStateIndex, TextLayerHandle hLayer, int iPrevRowIndex, int iNewRowIndex, QUndoCommand *pParent = nullptr);
 	virtual ~TextUndoCmd_LayerOrder();
 
 	void redo() override;

@@ -14,7 +14,7 @@
 class PrimitiveModel : public IModel
 {
 public:
-	PrimitiveModel(ProjectItem &itemRef, FileDataPair &itemFileDataRef);
+	PrimitiveModel(ProjectItemData &itemRef, FileDataPair &itemFileDataRef);
 	virtual ~PrimitiveModel();
 
 	virtual bool OnPrepSave() override { return true; }

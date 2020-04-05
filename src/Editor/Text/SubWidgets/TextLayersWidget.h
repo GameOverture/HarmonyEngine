@@ -10,7 +10,7 @@
 #ifndef TEXTLAYERSWIDGET_H
 #define TEXTLAYERSWIDGET_H
 
-#include "Project/ProjectItem.h"
+#include "Project/ProjectItemData.h"
 
 #include <QTableView>
 #include <QStyledItemDelegate>
@@ -32,10 +32,10 @@ class TextLayersDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT
 
-	ProjectItem *			m_pItem;
+	ProjectItemData *			m_pItem;
 
 public:
-	TextLayersDelegate(ProjectItem *pItem, QObject *pParent = nullptr);
+	TextLayersDelegate(ProjectItemData *pItem, QObject *pParent = nullptr);
 
 	virtual QWidget *createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 	virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const override;

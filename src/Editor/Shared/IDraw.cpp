@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "IDraw.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "IModel.h"
 #include "MainWindow.h"
 #include "Harmony.h"
@@ -22,7 +22,7 @@
 
 #define KEY_PanCamera Qt::Key_Space
 
-IDraw::IDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef) :
+IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_pProjItem(pProjItem),
 	m_pCamera(nullptr),
 	m_bPanCameraKeyDown(false),

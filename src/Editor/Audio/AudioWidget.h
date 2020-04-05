@@ -26,7 +26,7 @@ class AudioWidget : public IWidget
 	Q_OBJECT
 
 public:
-	explicit AudioWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
+	explicit AudioWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~AudioWidget();
 
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;

@@ -32,7 +32,7 @@ TextLayersWidget::TextLayersWidget(QWidget *pParent /*= nullptr*/) :
 	QTableView::resizeEvent(pResizeEvent);
 }
 
-TextLayersDelegate::TextLayersDelegate(ProjectItem *pItem, QObject *pParent /*= nullptr*/) :
+TextLayersDelegate::TextLayersDelegate(ProjectItemData *pItem, QObject *pParent /*= nullptr*/) :
 	QStyledItemDelegate(pParent),
 	m_pItem(pItem)
 {

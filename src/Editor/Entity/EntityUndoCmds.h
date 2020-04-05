@@ -12,8 +12,8 @@
 
 #include <QUndoCommand>
 
-class ProjectItem;
-class ExplorerItem;
+class ProjectItemData;
+class ExplorerItemData;
 
 enum EntityCmd
 {
@@ -24,12 +24,12 @@ enum EntityCmd
 class EntityUndoCmd : public QUndoCommand
 {
 	const EntityCmd		m_eCMD;
-	ProjectItem &		m_EntityItemRef;
+	ProjectItemData &		m_EntityItemRef;
 	QList<QVariant>		m_ParameterList;
 	int					m_iStateIndex;
 
 public:
-	EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<QVariant> parameterList, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd(EntityCmd eCMD, ProjectItemData &entityItemRef, QList<QVariant> parameterList, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd();
 
 	virtual void redo() override;

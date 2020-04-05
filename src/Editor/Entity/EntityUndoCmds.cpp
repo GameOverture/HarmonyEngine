@@ -12,7 +12,7 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 
-EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<QVariant> parameterList, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItemData &entityItemRef, QList<QVariant> parameterList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_eCMD(eCMD),
 	m_ParameterList(parameterList),
@@ -46,11 +46,11 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<Q
 	switch(m_eCMD)
 	{
 	case ENTITYCMD_AddNewChildren: {
-		QList<ProjectItem *> itemList;
+		QList<ProjectItemData *> itemList;
 		for(auto param : m_ParameterList)
 		{
-			if(param.value<ExplorerItem *>()->IsProjectItem())
-				itemList.push_back(static_cast<ProjectItem *>(param.value<ExplorerItem *>()));
+			if(param.value<ExplorerItemData *>()->IsProjectItem())
+				itemList.push_back(static_cast<ProjectItemData *>(param.value<ExplorerItemData *>()));
 			else
 				HyGuiLog("EntityUndoCmd::redo had item that wasn't a project item", LOGTYPE_Warning);
 		}
@@ -72,8 +72,8 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItem &entityItemRef, QList<Q
 	case ENTITYCMD_AddNewChildren: {
 		for(auto param : m_ParameterList)
 		{
-			if(param.value<ExplorerItem *>()->IsProjectItem())
-				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(static_cast<ProjectItem *>(param.value<ExplorerItem *>()));
+			if(param.value<ExplorerItemData *>()->IsProjectItem())
+				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(static_cast<ProjectItemData *>(param.value<ExplorerItemData *>()));
 			else
 				HyGuiLog("EntityUndoCmd::undo had item that wasn't a project item", LOGTYPE_Warning);
 		}

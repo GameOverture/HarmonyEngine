@@ -14,7 +14,7 @@
 #include "Harmony.h"
 #include "Project.h"
 #include "ProjectItemMimeData.h"
-#include "ExplorerItem.h"
+#include "ExplorerItemData.h"
 #include "ExplorerModel.h"
 #include "AtlasWidget.h"
 #include "IModel.h"
@@ -31,8 +31,8 @@ ExplorerProxyModel::ExplorerProxyModel(QObject *pParent /*= nullptr*/) :
 
 /*virtual*/ bool ExplorerProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const /*override*/
 {
-	ExplorerItem *pLeftItem = sourceModel()->data(left, Qt::UserRole).value<ExplorerItem *>();
-	ExplorerItem *pRightItem = sourceModel()->data(right, Qt::UserRole).value<ExplorerItem *>();
+	ExplorerItemData *pLeftItem = sourceModel()->data(left, Qt::UserRole).value<ExplorerItemData *>();
+	ExplorerItemData *pRightItem = sourceModel()->data(right, Qt::UserRole).value<ExplorerItemData *>();
 
 	if((pLeftItem == nullptr && pRightItem == nullptr) || (pLeftItem == nullptr && pRightItem != nullptr))
 		return false;
@@ -160,16 +160,16 @@ ExplorerModel *ExplorerWidget::GetSourceModel()
 	return static_cast<ExplorerModel *>(static_cast<ExplorerProxyModel *>(ui->treeView->model())->sourceModel());
 }
 
-ExplorerItem *ExplorerWidget::GetFirstSelectedItem()
+ExplorerItemData *ExplorerWidget::GetFirstSelectedItem()
 {
 	QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
 	if(curIndex.isValid() == false)
 		return nullptr;
 
-	return GetSourceModel()->data(curIndex, Qt::UserRole).value<ExplorerItem *>();
+	return GetSourceModel()->data(curIndex, Qt::UserRole).value<ExplorerItemData *>();
 }
 
-void ExplorerWidget::GetSelectedItems(QList<ExplorerItem *> &selectedItemsOut, QList<ExplorerItem *> &selectedPrefixesOut)
+void ExplorerWidget::GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut)
 {
 	selectedItemsOut.clear();
 	selectedPrefixesOut.clear();
@@ -193,7 +193,7 @@ void ExplorerWidget::GetSelectedItems(QList<ExplorerItem *> &selectedItemsOut, Q
 
 void ExplorerWidget::OnContextMenu(const QPoint &pos)
 {
-	ExplorerItem *pContextExplorerItem = GetFirstSelectedItem();//ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
+	ExplorerItemData *pContextExplorerItem = GetFirstSelectedItem();//ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItemData *>();
 	//QModelIndex index = ui->treeView->indexAt(pos);
 	
 	QMenu contextMenu;
@@ -204,7 +204,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else
 	{
-		QList<ExplorerItem *> selectedItems, selectedPrefixes;
+		QList<ExplorerItemData *> selectedItems, selectedPrefixes;
 		GetSelectedItems(selectedItems, selectedPrefixes);
 
 		switch(pContextExplorerItem->GetType())
@@ -272,7 +272,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			break;
 
 		default: {
-			HyGuiLog("ExplorerWidget::OnContextMenu - Unknown ExplorerItem type", LOGTYPE_Error);
+			HyGuiLog("ExplorerWidget::OnContextMenu - Unknown TreeModelItemData type", LOGTYPE_Error);
 			} break;
 		}
 	}
@@ -282,7 +282,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 
 void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 {
-	ExplorerItem *pItem = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
+	ExplorerItemData *pItem = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItemData *>();
 	switch(pItem->GetType())
 	{
 	case ITEM_Project:
@@ -298,7 +298,7 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 	case ITEM_Shader:
 	case ITEM_Entity:
 	case ITEM_Prefab:
-		MainWindow::OpenItem(static_cast<ProjectItem *>(pItem));
+		MainWindow::OpenItem(static_cast<ProjectItemData *>(pItem));
 		break;
 		
 	default:
@@ -308,7 +308,7 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 
 void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 {
-	ExplorerItem *pCurSelected = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItem *>();
+	ExplorerItemData *pCurSelected = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItemData *>();
 	bool bValidItem = (pCurSelected != nullptr);
 	FINDACTION("actionProjectSettings")->setEnabled(bValidItem);
 	FINDACTION("actionCloseProject")->setEnabled(bValidItem);
@@ -357,10 +357,10 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 
 void ExplorerWidget::on_actionRename_triggered()
 {
-	ExplorerItem *pItem = GetFirstSelectedItem();
+	ExplorerItemData *pItem = GetFirstSelectedItem();
 	if(pItem == nullptr)
 	{
-		HyGuiLog("on_actionRename_triggered() was invoked on a nullptr ExplorerItem *", LOGTYPE_Error);
+		HyGuiLog("on_actionRename_triggered() was invoked on a nullptr ExplorerItemData *", LOGTYPE_Error);
 		return;
 	}
 	
@@ -373,7 +373,7 @@ void ExplorerWidget::on_actionRename_triggered()
 
 void ExplorerWidget::on_actionDeleteItem_triggered()
 {
-	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
 	GetSelectedItems(selectedItems, selectedPrefixes);
 	if(selectedItems.size() + selectedPrefixes.size() == 0)
 	{
@@ -416,7 +416,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 
 void ExplorerWidget::on_actionCopyItem_triggered()
 {
-	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
 	GetSelectedItems(selectedItems, selectedPrefixes);
 
 	if(selectedItems.empty())
@@ -453,7 +453,7 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 
 void ExplorerWidget::on_actionOpen_triggered()
 {
-	QList<ExplorerItem *> selectedItems, selectedPrefixes;
+	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
 	GetSelectedItems(selectedItems, selectedPrefixes);
 	if(selectedItems.size() == 0)
 	{
@@ -466,7 +466,7 @@ void ExplorerWidget::on_actionOpen_triggered()
 		if(selectedItems[i]->IsProjectItem())
 		{
 			if(Harmony::GetProject() == &selectedItems[i]->GetProject())
-				MainWindow::OpenItem(static_cast<ProjectItem *>(selectedItems[i]));
+				MainWindow::OpenItem(static_cast<ProjectItemData *>(selectedItems[i]));
 			else
 				HyGuiLog("Cannot open item '" % selectedItems[i]->GetName(true) % "' because it doesn't belong to the currently active project.", LOGTYPE_Normal);
 		}

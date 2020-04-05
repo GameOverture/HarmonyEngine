@@ -22,7 +22,7 @@
 #include <QJsonArray>
 #include <QAction>
 
-SpriteWidget::SpriteWidget(ProjectItem &itemRef, QWidget *pParent) :
+SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	IWidget(itemRef, pParent),
 	ui(new Ui::SpriteWidget),
 	m_bPlayActive(false),

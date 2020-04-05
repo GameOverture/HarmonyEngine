@@ -95,7 +95,7 @@ class TextFontManager
 	bool							m_bPreviewAtlasPixelDataInitialized;
 
 public:
-	TextFontManager(ProjectItem &itemRef, QJsonObject availableGlyphsObj, QJsonArray fontArray);
+	TextFontManager(ProjectItemData &itemRef, QJsonObject availableGlyphsObj, QJsonArray fontArray);
 	~TextFontManager();
 
 	PropertiesTreeModel *GetGlyphsModel();

@@ -18,7 +18,7 @@ class TextDraw : public IDraw
 	HyTextureHandle		m_hTexture;
 
 public:
-	TextDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef);
+	TextDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~TextDraw();
 
 	void SetTextState(uint uiStateIndex);

@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "AudioModel.h"
 
-AudioModel::AudioModel(ProjectItem &itemRef, FileDataPair &itemFileDataRef) :
+AudioModel::AudioModel(ProjectItemData &itemRef, FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef)
 {
 }

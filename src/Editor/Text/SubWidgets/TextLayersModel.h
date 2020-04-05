@@ -11,7 +11,7 @@
 #define TEXTLAYERSMODEL_H
 
 #include "IModel.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "GlobalWidgetMappers.h"
 #include "ProjectItemMimeData.h"
 #include "TextFontManager.h"

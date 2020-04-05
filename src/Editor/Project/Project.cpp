@@ -59,7 +59,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 			return;
 		}
 
-		ProjectItem *pProjItem = static_cast<ProjectItem *>(pEvent->source());
+		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pEvent->source());
 		MainWindow::OpenItem(pProjItem);
 
 		pEvent->acceptProposedAction();
@@ -71,7 +71,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
-	ExplorerItem(*this, ITEM_Project, HyStr::MakeStringProperPath(sProjectFilePath.toStdString().c_str(), HyGlobal::ItemExt(ITEM_Project).toStdString().c_str(), false).c_str()),
+	ExplorerItemData(*this, ITEM_Project, HyStr::MakeStringProperPath(sProjectFilePath.toStdString().c_str(), HyGlobal::ItemExt(ITEM_Project).toStdString().c_str(), false).c_str()),
 	m_ModelRef(modelRef),
 	m_pDraw(nullptr),
 	m_DlgProjectSettings(sProjectFilePath),
@@ -247,7 +247,7 @@ void Project::LoadExplorerModel()
 			QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % HYGUIPATH_TemplateDir % "data/").toLocal8Bit());
 			sContents.replace(sBefore, sAfter);
 
-			m_ModelRef.PasteItemSrc(sContents, m_ModelRef.FindIndex<ExplorerItem *>(this, 0));
+			m_ModelRef.PasteItemSrc(sContents, m_ModelRef.FindIndex<ExplorerItemData *>(this, 0));
 		}
 	}
 }
@@ -316,7 +316,7 @@ QJsonObject Project::GetSettingsObj() const
 
 QString Project::GetDirPath() const
 {
-	QFileInfo file(m_sName);
+	QFileInfo file(m_sText);
 	return file.dir().absolutePath() + '/';
 }
 
@@ -327,7 +327,7 @@ QString Project::GetGameName() const
 
 QString Project::GetAbsPath() const
 {
-	return m_sName;
+	return m_sText;
 }
 
 QString Project::GetAssetsAbsPath() const
@@ -436,7 +436,7 @@ ProjectTabBar *Project::GetTabBar()
 	return m_pTabBar;
 }
 
-ProjectItem *Project::GetCurrentOpenItem()
+ProjectItemData *Project::GetCurrentOpenItem()
 {
 	return m_pCurOpenItem;
 }
@@ -449,7 +449,7 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 	{
 		if(m_pTabBar->currentIndex() >= 0)
 		{
-			IDraw *pDraw = m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->GetDraw();
+			IDraw *pDraw = m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItemData *>()->GetDraw();
 			if(pDraw)
 				pDraw->ResizeRenderer();
 		}
@@ -497,11 +497,11 @@ void Project::DeleteItemData(HyGuiItemType eType, QString sPath, bool bWriteToDi
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{
 		QVariant v = m_pTabBar->tabData(i);
-		ProjectItem *pItem = v.value<ProjectItem *>();
+		ProjectItemData *pItem = v.value<ProjectItemData *>();
 		
 		if(pItem->GetName(true) == sPath)
 		{
-			ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+			ProjectItemData *pItem = m_pTabBar->tabData(i).value<ProjectItemData *>();
 			MainWindow::CloseItem(pItem);
 			break;
 		}
@@ -515,7 +515,7 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 	{
 		if(!dataFile.open(QIODevice::ReadOnly))
 		{
-			HyGuiLog("Project::LoadExplorerModel() could not open " % m_sName % "'s " % QFileInfo(sFilePath).fileName() % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
+			HyGuiLog("Project::LoadExplorerModel() could not open " % m_sText % "'s " % QFileInfo(sFilePath).fileName() % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
 			m_bHasError = true;
 			return false; // Don't write with invalid object
 		}
@@ -699,7 +699,7 @@ bool Project::DoesItemExist(HyGuiItemType eType, QString sPath) const
 	return false;
 }
 
-void Project::OpenTab(ProjectItem *pItem)
+void Project::OpenTab(ProjectItemData *pItem)
 {
 	if(m_pCurOpenItem == pItem)
 		return;
@@ -713,7 +713,7 @@ void Project::OpenTab(ProjectItem *pItem)
 	// Search for existing tab
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{
-		if(m_pTabBar->tabData(i).value<ProjectItem *>() == m_pCurOpenItem)
+		if(m_pTabBar->tabData(i).value<ProjectItemData *>() == m_pCurOpenItem)
 		{
 			bAlreadyLoaded = true;
 
@@ -746,7 +746,7 @@ void Project::OpenTab(ProjectItem *pItem)
 	ApplySaveEnables();
 }
 
-void Project::CloseTab(ProjectItem *pItem)
+void Project::CloseTab(ProjectItemData *pItem)
 {
 	pItem->WidgetUnload();
 	pItem->DrawUnload();
@@ -756,7 +756,7 @@ void Project::CloseTab(ProjectItem *pItem)
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{
-		if(m_pTabBar->tabData(i).value<ProjectItem *>() == pItem)
+		if(m_pTabBar->tabData(i).value<ProjectItemData *>() == pItem)
 		{
 			m_pTabBar->removeTab(i);
 			break;
@@ -776,7 +776,7 @@ bool Project::CloseAllTabs()
 void Project::UnloadAllTabs()
 {
 	for(int i = 0; i < m_pTabBar->count(); ++i)
-		m_pTabBar->tabData(i).value<ProjectItem *>()->DrawUnload();
+		m_pTabBar->tabData(i).value<ProjectItemData *>()->DrawUnload();
 }
 
 void Project::ApplySaveEnables()
@@ -785,7 +785,7 @@ void Project::ApplySaveEnables()
 	bool bAnyItemDirty = false;
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{
-		ProjectItem *pItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+		ProjectItemData *pItem = m_pTabBar->tabData(i).value<ProjectItemData *>();
 		if(pItem->IsSaveClean() == false)
 		{
 			bAnyItemDirty = true;
@@ -814,12 +814,12 @@ bool Project::HarmonyInitialize()
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{
-		ProjectItem *pOpenItem = m_pTabBar->tabData(i).value<ProjectItem *>();
+		ProjectItemData *pOpenItem = m_pTabBar->tabData(i).value<ProjectItemData *>();
 		pOpenItem->DrawLoad();
 	}
 
 	if(m_pTabBar->currentIndex() >= 0)
-		m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->DrawShow();
+		m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItemData *>()->DrawShow();
 
 	return true;
 }
@@ -833,7 +833,7 @@ bool Project::HarmonyUpdate()
 	if(m_pTabBar->count() > 0)
 	{
 		m_pDraw->Hide();
-		//m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItem *>()->WidgetUpdate(*this);
+		//m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItemData *>()->WidgetUpdate(*this);
 	}
 	else
 		m_pDraw->Show();
@@ -855,14 +855,14 @@ void Project::OnTabBarCurrentChanged(int iIndex)
 
 	int iCurIndex = m_pTabBar->currentIndex();
 	QVariant v = m_pTabBar->tabData(iCurIndex);
-	ProjectItem *pItem = v.value<ProjectItem *>();
+	ProjectItemData *pItem = v.value<ProjectItemData *>();
 
 	MainWindow::OpenItem(pItem);
 }
 
 void Project::OnCloseTab(int iIndex)
 {
-	ProjectItem *pItem = m_pTabBar->tabData(iIndex).value<ProjectItem *>();
+	ProjectItemData *pItem = m_pTabBar->tabData(iIndex).value<ProjectItemData *>();
 	MainWindow::CloseItem(pItem);
 }
 
@@ -929,7 +929,7 @@ void Project::RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObj
 void Project::RefreshNamesOnTabs()
 {
 	for(int i = 0; i < m_pTabBar->count(); ++i)
-		m_pTabBar->setTabText(i, m_pTabBar->tabData(i).value<ProjectItem *>()->GetName(false));
+		m_pTabBar->setTabText(i, m_pTabBar->tabData(i).value<ProjectItemData *>()->GetName(false));
 
 	// By opening the already open item, it will refresh its name
 	MainWindow::OpenItem(m_pCurOpenItem);

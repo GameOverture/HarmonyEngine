@@ -12,7 +12,7 @@
 
 #include "Global.h"
 #include "Shared/TreeModel/ITreeModel.h"
-#include "Explorer/ExplorerItem.h"
+#include "Explorer/ExplorerItemData.h"
 #include "Project/Project.h"
 
 class ExplorerModel : public ITreeModel
@@ -25,14 +25,14 @@ public:
 
 	QStringList GetOpenProjectPaths();
 	QStringList GetPrefixList(Project *pProject);
-	QList<ExplorerItem *> GetItemsRecursively(const QModelIndex &indexRef);
-	ExplorerItem *FindItemByItemPath(Project *pProject, QString sPath, HyGuiItemType eType);
+	QList<ExplorerItemData *> GetItemsRecursively(const QModelIndex &indexRef);
+	ExplorerItemData *FindItemByItemPath(Project *pProject, QString sPath, HyGuiItemType eType);
 
 	Project *AddProject(const QString sNewProjectFilePath);
-	ExplorerItem *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, FileDataPair initItemFileData, bool bIsPendingSave);
-	bool RemoveItem(ExplorerItem *pItem);
+	ExplorerItemData *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, FileDataPair initItemFileData, bool bIsPendingSave);
+	bool RemoveItem(ExplorerItemData *pItem);
 
-	QString AssemblePrefix(ExplorerItem *pItem) const;
+	QString AssemblePrefix(ExplorerItemData *pItem) const;
 
 	bool PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef);
 
@@ -48,7 +48,7 @@ public:
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
 
 private:
-	bool InsertNewItem(ExplorerItem *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
+	bool InsertNewItem(ExplorerItemData *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
 	TreeModelItem *FindProjectTreeItem(Project *pProject);
 	TreeModelItem *FindPrefixTreeItem(const QModelIndex &indexRef) const;
 	QModelIndex FindIndexByItemPath(Project *pProject, QString sPath, HyGuiItemType eType);

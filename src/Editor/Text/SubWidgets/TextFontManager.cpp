@@ -23,7 +23,7 @@
 
 TextLayerHandle TextFontManager::sm_hHandleCount = 0;
 
-TextFontManager::TextFontManager(ProjectItem &itemRef, QJsonObject availGlyphsObj, QJsonArray fontArray) :
+TextFontManager::TextFontManager(ProjectItemData &itemRef, QJsonObject availGlyphsObj, QJsonArray fontArray) :
 	m_FontArray(fontArray),
 	m_GlyphsModel(itemRef, 0, TEXTGLYPHS_SubStateId, nullptr),
 	m_pPreviewAtlas(nullptr),

@@ -9,12 +9,12 @@
 *************************************************************************/
 #include "Global.h"
 #include "ProjectItemMimeData.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "Project.h"
 #include "IModel.h"
 #include "AtlasFrame.h"
 
-ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItem *> &itemListRef)
+ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 {
 	QJsonArray clipboardArray;
 
@@ -23,7 +23,7 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItem *> &itemListRef)
 		if(itemListRef[i]->IsProjectItem() == false)
 			continue;
 
-		ProjectItem *pProjectItem = static_cast<ProjectItem *>(itemListRef[i]);
+		ProjectItemData *pProjectItem = static_cast<ProjectItemData *>(itemListRef[i]);
 
 		QJsonObject clipboardObj;
 

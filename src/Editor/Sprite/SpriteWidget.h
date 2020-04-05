@@ -33,7 +33,7 @@ class SpriteWidget : public IWidget
 	bool					m_bIsBounced;
 
 public:
-	explicit SpriteWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
+	explicit SpriteWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~SpriteWidget();
 	
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;

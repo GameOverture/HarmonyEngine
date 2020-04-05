@@ -10,7 +10,7 @@
 #ifndef IMODEL_H
 #define IMODEL_H
 
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 
 #include <QAbstractListModel>
 #include <QStringListModel>
@@ -41,13 +41,13 @@ public:
 class IModel : public QAbstractListModel
 {
 protected:
-	ProjectItem &				m_ItemRef;
+	ProjectItemData &				m_ItemRef;
 	const QUuid					m_UUID;
 
 	QList<IStateData *>			m_StateList;
 	
 public:
-	IModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
+	IModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~IModel();
 
 	template<typename STATEDATA>
@@ -77,8 +77,8 @@ public:
 		}
 	}
 
-	ProjectItem &GetItem();
-	const ProjectItem &GetItem() const;
+	ProjectItemData &GetItem();
+	const ProjectItemData &GetItem() const;
 
 	const QUuid &GetUuid() const;
 	

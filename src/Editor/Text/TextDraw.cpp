@@ -9,12 +9,12 @@
 *************************************************************************/
 #include "Global.h"
 #include "TextDraw.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "TextModel.h"
 #include "Harmony.h"
 #include "HarmonyWidget.h"
 
-TextDraw::TextDraw(ProjectItem *pProjItem, const FileDataPair &initFileDataRef) :
+TextDraw::TextDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
 	m_Text("", "+GuiPreview", this),
 	m_hTexture(HY_UNUSED_HANDLE)

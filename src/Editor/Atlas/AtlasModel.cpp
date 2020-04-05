@@ -497,7 +497,7 @@ bool AtlasModel::TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId)
 	return bValid;
 }
 
-AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType)
+AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType)
 {
 	if(IsImageValid(newImage, m_AtlasGrpList[uiAtlasGrpIndex]->GetId()) == false)
 		return nullptr;
@@ -509,7 +509,7 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItem *pItem, QString sName, QImage 
 	newFrameSet.insert(pFrame);
 	Repack(uiAtlasGrpIndex, QSet<int>(), newFrameSet);
 
-	// This retrieves the newly created AtlasFrame and links it to its ProjectItem
+	// This retrieves the newly created AtlasFrame and links it to its ProjectItemData
 	QList<QUuid> idList;
 	idList.append(pFrame->GetId());
 	QList<AtlasFrame *> returnList = RequestFramesById(pItem, idList);
@@ -549,7 +549,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	return true;
 }
 
-QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem)
+QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItemData *pItem)
 {
 	QList<QTreeWidgetItem *> selectedItems;
 	if(m_pProjOwner->GetAtlasWidget())
@@ -576,7 +576,7 @@ QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem)
 	return RequestFrames(pItem, frameRequestList);
 }
 
-QList<AtlasFrame *> AtlasModel::RequestFramesById(ProjectItem *pItem, QList<QUuid> requestList)
+QList<AtlasFrame *> AtlasModel::RequestFramesById(ProjectItemData *pItem, QList<QUuid> requestList)
 {
 	if(requestList.empty())
 		return QList<AtlasFrame *>();
@@ -599,7 +599,7 @@ QList<AtlasFrame *> AtlasModel::RequestFramesById(ProjectItem *pItem, QList<QUui
 	return RequestFrames(pItem, frameRequestList);
 }
 
-QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem, QList<AtlasFrame *> requestList)
+QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItemData *pItem, QList<AtlasFrame *> requestList)
 {
 	if(requestList.empty())
 		return RequestFrames(pItem);
@@ -614,7 +614,7 @@ QList<AtlasFrame *> AtlasModel::RequestFrames(ProjectItem *pItem, QList<AtlasFra
 	return returnList;
 }
 
-void AtlasModel::RelinquishFrames(ProjectItem *pItem, QList<AtlasFrame *> relinquishList)
+void AtlasModel::RelinquishFrames(ProjectItemData *pItem, QList<AtlasFrame *> relinquishList)
 {
 	for(int i = 0; i < relinquishList.size(); ++i)
 		relinquishList[i]->m_DependencySet.remove(pItem);

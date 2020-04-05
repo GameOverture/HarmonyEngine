@@ -28,7 +28,7 @@ class ExplorerWidget;
 
 class ExplorerModel;
 class Project;
-class ExplorerItem;
+class ExplorerItemData;
 
 class ExplorerProxyModel : public QSortFilterProxyModel
 {
@@ -59,8 +59,8 @@ public:
 	void SetModel(ExplorerModel &modelRef);
 	ExplorerModel *GetSourceModel();
 
-	ExplorerItem *GetFirstSelectedItem();
-	void GetSelectedItems(QList<ExplorerItem *> &selectedItemsOut, QList<ExplorerItem *> &selectedPrefixesOut);
+	ExplorerItemData *GetFirstSelectedItem();
+	void GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut);
 
 private:
 	Ui::ExplorerWidget *ui;

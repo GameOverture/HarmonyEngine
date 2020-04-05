@@ -227,7 +227,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Entity\EntityModel.cpp" />
     <ClCompile Include="Entity\EntityUndoCmds.cpp" />
     <ClCompile Include="Entity\EntityWidget.cpp" />
-    <ClCompile Include="Explorer\ExplorerItem.cpp" />
+    <ClCompile Include="Explorer\ExplorerItemData.cpp" />
     <ClCompile Include="Explorer\ExplorerModel.cpp" />
     <ClCompile Include="Explorer\ExplorerWidget.cpp" />
     <ClCompile Include="Gltf\GltfModel.cpp" />
@@ -249,7 +249,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
     <ClCompile Include="Prefab\PrefabWidget.cpp" />
     <ClCompile Include="Project\Project.cpp" />
     <ClCompile Include="Project\ProjectDraw.cpp" />
-    <ClCompile Include="Project\ProjectItem.cpp" />
+    <ClCompile Include="Project\ProjectItemData.cpp" />
     <ClCompile Include="Shared\IWidget.cpp" />
     <ClCompile Include="Shared\Properties\PropertiesTreeModel.cpp" />
     <ClCompile Include="Shared\Properties\PropertiesTreeView.cpp" />
@@ -258,6 +258,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Shared\TreeModel\TreeModelItem.cpp" />
+    <ClCompile Include="Shared\TreeModel\TreeModelItemData.cpp" />
     <ClCompile Include="Sprite\SpriteDraw.cpp" />
     <ClCompile Include="Sprite\SpriteModels.cpp" />
     <ClCompile Include="Sprite\SpriteTableView.cpp" />
@@ -362,7 +363,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Entity/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
-    <QtMoc Include="Explorer\ExplorerItem.h">
+    <QtMoc Include="Explorer\ExplorerItemData.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Explorer/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
@@ -416,7 +417,7 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
     <ClInclude Include="Project\ProjectDraw.h" />
-    <QtMoc Include="Project\ProjectItem.h">
+    <QtMoc Include="Project\ProjectItemData.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Global.h;../../Project/%(Filename)%(Extension)</ForceInclude>
     </QtMoc>
@@ -443,6 +444,10 @@ $(QTDIR)\bin\windeployqt.exe "$(OutDir)$(TargetName)\$(TargetName)$(TargetExt)"<
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;..\..\include\Harmony;C:\Soft\Qt\5.12.0\msvc2017_64\include;debug;\include;C:\Soft\Qt\5.12.0\msvc2017_64\mkspecs\win32-msvc;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtGui;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtANGLE;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtWidgets;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtCore;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtNetwork;%(AdditionalIncludeDirectories)</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;Atlas;Audio;Dialogs;Entity;Font;Harmony;Project;Sprite;Prefab;Primitive;Widget;Explorer;Shared;Shared\Properties;..\..\include;..\..\include\Harmony;C:\Soft\Qt\5.12.0\msvc2017_64\include;release;\include;C:\Soft\Qt\5.12.0\msvc2017_64\mkspecs\win32-msvc;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtGui;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtANGLE;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtWidgets;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtCore;C:\Soft\Qt\5.12.0\msvc2017_64\include\QtNetwork;%(AdditionalIncludeDirectories)</IncludePath>
     </ClInclude>
+    <QtMoc Include="Shared\TreeModel\TreeModelItemData.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Gltf;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\Text;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtNetwork</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;.\Atlas;.\Audio;.\Dialogs;.\Entity;.\Font;.\Gltf;.\Harmony;.\Project;.\Sprite;.\Prefab;.\Primitive;.\Widget;.\Explorer;.\Shared;.\Shared\Properties;.\Text;.\..\..\include;.\..\..\include\Harmony;$(QTDIR)\include;.\release;\include;$(QTDIR)\mkspecs\win32-msvc;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtNetwork</IncludePath>
+    </QtMoc>
     <ClInclude Include="Sprite\SpriteDraw.h" />
     <QtMoc Include="Sprite\SpriteModels.h">
       <ForceInclude Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Global.h;../../Sprite/%(Filename)%(Extension)</ForceInclude>

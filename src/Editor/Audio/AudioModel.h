@@ -14,7 +14,7 @@
 class AudioModel : public IModel
 {
 public:
-	AudioModel(ProjectItem &itemRef, FileDataPair &itemFileDataRef);
+	AudioModel(ProjectItemData &itemRef, FileDataPair &itemFileDataRef);
 	virtual ~AudioModel();
 
 	virtual bool OnPrepSave() override { return true; }

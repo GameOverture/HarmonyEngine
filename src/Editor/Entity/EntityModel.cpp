@@ -19,7 +19,7 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 	m_pEntityModel(pEntityModel)
 {
 	// Insert self as root node
-	QModelIndex parentIndex = FindIndex<ExplorerItem *>(m_pRootItem->data(0).value<ExplorerItem *>(), 0);
+	QModelIndex parentIndex = FindIndex<ExplorerItemData *>(m_pRootItem->data(0).value<ExplorerItemData *>(), 0);
 	int iRow = m_pRootItem->GetNumChildren();
 	if(insertRow(iRow, parentIndex) == false)
 	{
@@ -27,7 +27,7 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 		return;
 	}
 	QVariant v;
-	v.setValue<ProjectItem *>(&pEntityModel->GetItem());
+	v.setValue<ProjectItemData *>(&pEntityModel->GetItem());
 	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
 		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - setData failed", LOGTYPE_Error);
 }
@@ -36,15 +36,15 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 {
 }
 
-bool EntityNodeTreeModel::IsItemValid(ExplorerItem *pItem, bool bShowDialogsOnFail) const
+bool EntityNodeTreeModel::IsItemValid(ExplorerItemData *pItem, bool bShowDialogsOnFail) const
 {
 	if(pItem->IsProjectItem())
-		return IsItemValid(static_cast<ProjectItem *>(pItem), bShowDialogsOnFail);
+		return IsItemValid(static_cast<ProjectItemData *>(pItem), bShowDialogsOnFail);
 	
 	return false;
 }
 
-bool EntityNodeTreeModel::IsItemValid(ProjectItem *pItem, bool bShowDialogsOnFail) const
+bool EntityNodeTreeModel::IsItemValid(ProjectItemData *pItem, bool bShowDialogsOnFail) const
 {
 	if(pItem == nullptr)
 	{
@@ -70,12 +70,12 @@ bool EntityNodeTreeModel::IsItemValid(ProjectItem *pItem, bool bShowDialogsOnFai
 	return true;
 }
 
-bool EntityNodeTreeModel::InsertNewChild(ProjectItem *pNewItem, TreeModelItem *pParentTreeItem /*= nullptr*/, int iRow /*= -1*/)
+bool EntityNodeTreeModel::InsertNewChild(ProjectItemData *pNewItem, TreeModelItem *pParentTreeItem /*= nullptr*/, int iRow /*= -1*/)
 {
 	if(pParentTreeItem == nullptr)
-		pParentTreeItem = GetItem(FindIndex<ExplorerItem *>(&m_pEntityModel->GetItem(), 0));
+		pParentTreeItem = GetItem(FindIndex<ExplorerItemData *>(&m_pEntityModel->GetItem(), 0));
 
-	QModelIndex parentIndex = FindIndex<ExplorerItem *>(pParentTreeItem->data(0).value<ExplorerItem *>(), 0);
+	QModelIndex parentIndex = FindIndex<ExplorerItemData *>(pParentTreeItem->data(0).value<ExplorerItemData *>(), 0);
 	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 
 	if(insertRow(iRow, parentIndex) == false)
@@ -85,16 +85,16 @@ bool EntityNodeTreeModel::InsertNewChild(ProjectItem *pNewItem, TreeModelItem *p
 	}
 
 	QVariant v;
-	v.setValue<ExplorerItem *>(pNewItem);
+	v.setValue<ExplorerItemData *>(pNewItem);
 	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
 		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 
 	return true;
 }
 
-bool EntityNodeTreeModel::RemoveChild(ProjectItem *pItem)
+bool EntityNodeTreeModel::RemoveChild(ProjectItemData *pItem)
 {
-	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItem *>(pItem, 0));
+	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItemData *>(pItem, 0));
 	TreeModelItem *pParentTreeItem = pTreeItem->GetParent();
 	return removeRow(pTreeItem->GetIndex(), createIndex(pParentTreeItem->GetIndex(), 0, pParentTreeItem));
 }
@@ -112,7 +112,7 @@ QVariant EntityNodeTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt
 	if(iRole == Qt::UserRole)
 		return ITreeModel::data(indexRef, iRole);
 
-	ExplorerItem *pItem = pTreeItem->data(0).value<ExplorerItem *>();
+	ExplorerItemData *pItem = pTreeItem->data(0).value<ExplorerItemData *>();
 	switch(iRole)
 	{
 	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
@@ -122,7 +122,7 @@ QVariant EntityNodeTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
 		if(pItem->IsProjectItem())
 		{
-			ProjectItem *pProjItem = static_cast<ProjectItem *>(pItem);
+			ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pItem);
 			if(pProjItem->IsExistencePendingSave())
 				return QVariant(pItem->GetIcon(SUBICON_New));
 			else if(pProjItem->IsSaveClean() == false)
@@ -166,7 +166,7 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 	m_PropertiesMap.clear();
 }
 
-PropertiesTreeModel *EntityStateData::GetPropertiesModel(ExplorerItem *pItem)
+PropertiesTreeModel *EntityStateData::GetPropertiesModel(ExplorerItemData *pItem)
 {
 	if(pItem == nullptr)
 	{
@@ -192,7 +192,7 @@ PropertiesTreeModel *EntityStateData::GetPropertiesModel(ExplorerItem *pItem)
 {
 }
 
-PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entityItemRef, QVariant &subState, ExplorerItem *pItemToAdd)
+PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItemData &entityItemRef, QVariant &subState, ExplorerItemData *pItemToAdd)
 {
 	// Default ranges
 	const int iRANGE = 16777215;        // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
@@ -237,14 +237,14 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 
 		case ITEM_Text: {
 			QVariant var;
-			var.setValue<ExplorerItem *>(pItemToAdd);
+			var.setValue<ExplorerItemData *>(pItemToAdd);
 			pNewPropertiesModel->AppendCategory("Text", var);
 			pNewPropertiesModel->AppendProperty("Text", "State", PROPERTIESTYPE_StatesComboBox, 0, "The text state to be displayed", false, QVariant(), QVariant(), QVariant(), "", "", var);
 			} break;
 
 		case ITEM_Sprite: {
 			QVariant var;
-			var.setValue<ExplorerItem *>(pItemToAdd);
+			var.setValue<ExplorerItemData *>(pItemToAdd);
 			pNewPropertiesModel->AppendCategory("Sprite", var);
 			pNewPropertiesModel->AppendProperty("Sprite", "State", PROPERTIESTYPE_StatesComboBox, 0, "The sprite state to be displayed", false, QVariant(), QVariant(), QVariant(), "", "", var);
 			pNewPropertiesModel->AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on");
@@ -260,7 +260,7 @@ PropertiesTreeModel *EntityStateData::AllocNewPropertiesModel(ProjectItem &entit
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityModel::EntityModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef) :
+EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_TreeModel(this, this)
 {
@@ -276,7 +276,7 @@ EntityNodeTreeModel &EntityModel::GetChildrenModel()
 	return m_TreeModel;
 }
 
-PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerItem *pItem)
+PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerItemData *pItem)
 {
 	if(iStateIndex < 0)
 		return nullptr;
@@ -285,7 +285,7 @@ PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerIt
 	return pPropertiesModel;
 }
 
-void EntityModel::AddNewChildren(QList<ProjectItem *> itemList)
+void EntityModel::AddNewChildren(QList<ProjectItemData *> itemList)
 {
 	for(auto item : itemList)
 	{
@@ -294,20 +294,20 @@ void EntityModel::AddNewChildren(QList<ProjectItem *> itemList)
 	}
 }
 
-bool EntityModel::RemoveChild(ProjectItem *pItem)
+bool EntityModel::RemoveChild(ProjectItemData *pItem)
 {
 	m_Dependencies.RemoveDependency(pItem);
 	return m_TreeModel.RemoveChild(pItem);
 }
 
-const QList<ProjectItem *> &EntityModel::GetPrimitiveList()
+const QList<ProjectItemData *> &EntityModel::GetPrimitiveList()
 {
 	return m_PrimitiveList;
 }
 
-ProjectItem *EntityModel::CreateNewPrimitive()
+ProjectItemData *EntityModel::CreateNewPrimitive()
 {
-	ProjectItem *pNewPrimitiveItem = new ProjectItem(m_ItemRef.GetProject(), ITEM_Primitive, "Primitive", FileDataPair(), false);
+	ProjectItemData *pNewPrimitiveItem = new ProjectItemData(m_ItemRef.GetProject(), ITEM_Primitive, "Primitive", FileDataPair(), false);
 	m_PrimitiveList.push_back(pNewPrimitiveItem);
 
 	return pNewPrimitiveItem;

@@ -303,7 +303,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	sm_pInstance->ui->actionSaveAll->setEnabled(bAnyItemDirty);
 }
 
-/*static*/ void MainWindow::OpenItem(ProjectItem *pItem)
+/*static*/ void MainWindow::OpenItem(ProjectItemData *pItem)
 {
 	if(pItem == nullptr || pItem->GetType() == ITEM_Project)
 		return;
@@ -334,7 +334,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->ui->menu_Edit->actions());
 }
 
-/*static*/ void MainWindow::CloseItem(ProjectItem *pItem)
+/*static*/ void MainWindow::CloseItem(ProjectItemData *pItem)
 {
 	if(pItem == nullptr || pItem->GetType() == ITEM_Project)
 		return;
@@ -520,7 +520,7 @@ void MainWindow::on_actionSave_triggered()
 	}
 
 	QVariant v = pTabBar->tabData(iIndex);
-	ProjectItem *pItem = v.value<ProjectItem *>();
+	ProjectItemData *pItem = v.value<ProjectItemData *>();
 	
 	if(pItem->Save(true))
 		HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
@@ -537,12 +537,12 @@ void MainWindow::on_actionSaveAll_triggered()
 		return;
 	}
 
-	QList<ProjectItem *> dirtyItemList;
+	QList<ProjectItemData *> dirtyItemList;
 
 	ProjectTabBar *pTabBar = pCurProject->GetTabBar();
 	for(int i = 0; i < pTabBar->count(); ++i)
 	{
-		ProjectItem *pItem = pTabBar->tabData(i).value<ProjectItem *>();
+		ProjectItemData *pItem = pTabBar->tabData(i).value<ProjectItemData *>();
 		if(pItem->IsSaveClean() == false)
 			dirtyItemList.append(pItem);
 	}
@@ -724,7 +724,7 @@ void MainWindow::on_actionTheme_Compe_triggered()
 
 void MainWindow::on_actionActivateProject_triggered()
 {
-	ExplorerItem *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
+	ExplorerItemData *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
 	
 	bool bNewProject = Harmony::GetProject() != &pCurSelectedItem->GetProject();
 	if(bNewProject)
@@ -741,7 +741,7 @@ void MainWindow::on_actionActivateProject_triggered()
 
 void MainWindow::NewItem(HyGuiItemType eItem)
 {
-	ExplorerItem *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
+	ExplorerItemData *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
 	Project *pProj = Harmony::GetProject();
 
 	if(pProj != &pCurSelectedItem->GetProject())
@@ -757,7 +757,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
 	if(pDlg->exec())
 	{
-		ExplorerItem *pNewItem = m_ExplorerModel.AddItem(pProj,
+		ExplorerItemData *pNewItem = m_ExplorerModel.AddItem(pProj,
 														 eItem,
 														 pDlg->GetPrefix(),
 														 pDlg->GetName(),
@@ -768,9 +768,9 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 		{
 			//// New items that are considered "imported" should be saved immediately since they have direct references into an asset manager
 			//if(pDlg->GetImportFile().isEmpty() == false)
-			//	static_cast<ProjectItem *>(pNewItem)->Save(true);
+			//	static_cast<ProjectItemData *>(pNewItem)->Save(true);
 
-			MainWindow::OpenItem(static_cast<ProjectItem *>(pNewItem));
+			MainWindow::OpenItem(static_cast<ProjectItemData *>(pNewItem));
 		}
 	}
 

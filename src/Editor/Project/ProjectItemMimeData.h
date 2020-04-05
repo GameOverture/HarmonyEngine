@@ -14,14 +14,14 @@
 
 #define HYGUI_MIMETYPE "application/x-harmony"
 
-class ExplorerItem;
+class ExplorerItemData;
 
 class ProjectItemMimeData : public QMimeData
 {
 	QByteArray				m_Data;
 
 public:
-	ProjectItemMimeData(QList<ExplorerItem *> &itemListRef);
+	ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef);
 	ProjectItemMimeData(const QVariant &data);
 	virtual ~ProjectItemMimeData();
 

@@ -18,20 +18,20 @@ class IWidget;
 }
 
 class IStateData;
-class ProjectItem;
+class ProjectItemData;
 
 class IWidget : public QWidget
 {
 	Q_OBJECT
 
 protected:
-	ProjectItem &			m_ItemRef;
+	ProjectItemData &			m_ItemRef;
 
 public:
-	explicit IWidget(ProjectItem &itemRef, QWidget *pParent = nullptr);
+	explicit IWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~IWidget();
 
-	ProjectItem &GetItem();
+	ProjectItemData &GetItem();
 
 	int GetCurStateIndex();
 	IStateData *GetCurStateData();

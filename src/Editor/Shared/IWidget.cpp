@@ -11,7 +11,7 @@
 #include "IWidget.h"
 #include "ui_IWidget.h"
 
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "IModel.h"
 #include "GlobalUndoCmds.h"
 #include "DlgInputName.h"
@@ -22,7 +22,7 @@
 
 #include <QUndoCommand>
 
-IWidget::IWidget(ProjectItem &itemRef, QWidget *pParent /*= nullptr*/) :
+IWidget::IWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::IWidget),
 	m_ItemRef(itemRef)
@@ -53,7 +53,7 @@ IWidget::~IWidget()
     delete ui;
 }
 
-ProjectItem &IWidget::GetItem()
+ProjectItemData &IWidget::GetItem()
 {
 	return m_ItemRef;
 }

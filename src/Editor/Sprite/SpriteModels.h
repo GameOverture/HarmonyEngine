@@ -117,7 +117,7 @@ class SpriteModel : public IModel
 	Q_OBJECT
 
 public:
-	SpriteModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
+	SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~SpriteModel();
 	
 	virtual bool OnPrepSave() override { return true; }

@@ -11,7 +11,7 @@
 #define TEXTMODEL_H
 
 #include "IModel.h"
-#include "ProjectItem.h"
+#include "ProjectItemData.h"
 #include "GlobalWidgetMappers.h"
 #include "ProjectItemMimeData.h"
 #include "SubWidgets/TextFontManager.h"
@@ -53,7 +53,7 @@ class TextModel : public IModel
 	AtlasFrame *			m_pAtlasFrame;
 
 public:
-	TextModel(ProjectItem &itemRef, const FileDataPair &itemFileDataRef);
+	TextModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~TextModel();
 
 	TextFontManager &GetFontManager();
