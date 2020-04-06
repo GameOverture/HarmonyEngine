@@ -41,7 +41,7 @@ class AtlasFrame
 	int									m_iPosX;
 	int									m_iPosY;
 
-	QSet<ProjectItemData *>					m_DependencySet;
+	QSet<ProjectItemData *>				m_DependencySet;
 
 	uint								m_uiErrors; // '0' when there is no error
 

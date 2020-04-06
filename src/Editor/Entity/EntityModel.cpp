@@ -27,7 +27,7 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 		return;
 	}
 	QVariant v;
-	v.setValue<ProjectItemData *>(&pEntityModel->GetItem());
+	v.setValue<TreeModelItemData *>(&pEntityModel->GetItem());
 	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
 		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - setData failed", LOGTYPE_Error);
 }
@@ -36,33 +36,25 @@ EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *par
 {
 }
 
-bool EntityNodeTreeModel::IsItemValid(ExplorerItemData *pItem, bool bShowDialogsOnFail) const
-{
-	if(pItem->IsProjectItem())
-		return IsItemValid(static_cast<ProjectItemData *>(pItem), bShowDialogsOnFail);
-	
-	return false;
-}
-
-bool EntityNodeTreeModel::IsItemValid(ProjectItemData *pItem, bool bShowDialogsOnFail) const
+bool EntityNodeTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const
 {
 	if(pItem == nullptr)
 	{
 		if(bShowDialogsOnFail)
-			HyGuiLog("Entity tried to add a null item", LOGTYPE_Info);
+			HyGuiLog("Entity tried to add a null item", LOGTYPE_Error);
 		return false;
 	}
 	if(&m_pEntityModel->GetItem() == pItem)
 	{
 		if(bShowDialogsOnFail)
-			HyGuiLog("Entity cannot add itself as a child", LOGTYPE_Info);
+			HyGuiLog("Entity cannot add itself as a child", LOGTYPE_Error);
 		return false;
 	}
 	if(pItem->GetType() == ITEM_Entity)
 	{
 		// TODO: Ensure that this child entity doesn't contain this as child
 		if(bShowDialogsOnFail)
-			HyGuiLog(pItem->GetName(false) % " is invalid to be added. This Entity contains itself as a child", LOGTYPE_Info);
+			HyGuiLog(pItem->GetText() % " is invalid to be added. This Entity contains itself as a child", LOGTYPE_Error);
 
 		return false;
 	}
@@ -70,12 +62,12 @@ bool EntityNodeTreeModel::IsItemValid(ProjectItemData *pItem, bool bShowDialogsO
 	return true;
 }
 
-bool EntityNodeTreeModel::InsertNewChild(ProjectItemData *pNewItem, TreeModelItem *pParentTreeItem /*= nullptr*/, int iRow /*= -1*/)
+bool EntityNodeTreeModel::InsertNewChild(TreeModelItemData *pNewItem, TreeModelItem *pParentTreeItem /*= nullptr*/, int iRow /*= -1*/)
 {
 	if(pParentTreeItem == nullptr)
-		pParentTreeItem = GetItem(FindIndex<ExplorerItemData *>(&m_pEntityModel->GetItem(), 0));
+		pParentTreeItem = GetItem(FindIndex<TreeModelItemData *>(&m_pEntityModel->GetItem(), 0));
 
-	QModelIndex parentIndex = FindIndex<ExplorerItemData *>(pParentTreeItem->data(0).value<ExplorerItemData *>(), 0);
+	QModelIndex parentIndex = FindIndex<TreeModelItemData *>(pParentTreeItem->data(0).value<TreeModelItemData *>(), 0);
 	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 
 	if(insertRow(iRow, parentIndex) == false)
@@ -85,16 +77,16 @@ bool EntityNodeTreeModel::InsertNewChild(ProjectItemData *pNewItem, TreeModelIte
 	}
 
 	QVariant v;
-	v.setValue<ExplorerItemData *>(pNewItem);
+	v.setValue<TreeModelItemData *>(pNewItem);
 	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
 		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 
 	return true;
 }
 
-bool EntityNodeTreeModel::RemoveChild(ProjectItemData *pItem)
+bool EntityNodeTreeModel::RemoveChild(TreeModelItemData *pItem)
 {
-	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItemData *>(pItem, 0));
+	TreeModelItem *pTreeItem = GetItem(FindIndex<TreeModelItemData *>(pItem, 0));
 	TreeModelItem *pParentTreeItem = pTreeItem->GetParent();
 	return removeRow(pTreeItem->GetIndex(), createIndex(pParentTreeItem->GetIndex(), 0, pParentTreeItem));
 }
@@ -271,7 +263,7 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 {
 }
 
-EntityNodeTreeModel &EntityModel::GetChildrenModel()
+EntityNodeTreeModel &EntityModel::GetNodeTreeModel()
 {
 	return m_TreeModel;
 }
@@ -285,7 +277,7 @@ PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerIt
 	return pPropertiesModel;
 }
 
-void EntityModel::AddNewChildren(QList<ProjectItemData *> itemList)
+void EntityModel::AddNewChildren(QList<TreeModelItemData *> itemList)
 {
 	for(auto item : itemList)
 	{
@@ -294,23 +286,10 @@ void EntityModel::AddNewChildren(QList<ProjectItemData *> itemList)
 	}
 }
 
-bool EntityModel::RemoveChild(ProjectItemData *pItem)
+bool EntityModel::RemoveChild(TreeModelItemData *pItem)
 {
 	m_Dependencies.RemoveDependency(pItem);
 	return m_TreeModel.RemoveChild(pItem);
-}
-
-const QList<ProjectItemData *> &EntityModel::GetPrimitiveList()
-{
-	return m_PrimitiveList;
-}
-
-ProjectItemData *EntityModel::CreateNewPrimitive()
-{
-	ProjectItemData *pNewPrimitiveItem = new ProjectItemData(m_ItemRef.GetProject(), ITEM_Primitive, "Primitive", FileDataPair(), false);
-	m_PrimitiveList.push_back(pNewPrimitiveItem);
-
-	return pNewPrimitiveItem;
 }
 
 /*virtual*/ bool EntityModel::OnPrepSave() /*override*/

@@ -332,8 +332,8 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 	for(int i = 0; i < selectedTreeItemFrameList.count(); ++i)
 	{
 		AtlasFrame *pFrame = selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-		QSet<ProjectItemData *> sLinks = pFrame->GetLinks();
 		
+		QSet<ProjectItemData *> sLinks = pFrame->GetLinks();
 		if(sLinks.empty() == false)
 		{
 			for(QSet<ProjectItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)

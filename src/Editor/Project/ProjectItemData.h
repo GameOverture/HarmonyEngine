@@ -27,7 +27,7 @@ class IModel;
 class ProjectItemData : public ExplorerItemData
 {
 	Q_OBJECT
-
+	friend class ExplorerModel;
 	friend class Project;
 
 	FileDataPair			m_ItemFileData;
@@ -43,8 +43,8 @@ class ProjectItemData : public ExplorerItemData
 	IWidget *				m_pWidget;
 	IDraw *					m_pDraw;
 	
-public:
 	ProjectItemData(Project &projRef, HyGuiItemType eType, const QString sName, const FileDataPair &initItemFileDataRef, bool bIsPendingSave);
+public:
 	virtual ~ProjectItemData();
 
 	void LoadModel();

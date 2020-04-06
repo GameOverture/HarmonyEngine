@@ -24,7 +24,7 @@ enum EntityCmd
 class EntityUndoCmd : public QUndoCommand
 {
 	const EntityCmd		m_eCMD;
-	ProjectItemData &		m_EntityItemRef;
+	ProjectItemData &	m_EntityItemRef;
 	QList<QVariant>		m_ParameterList;
 	int					m_iStateIndex;
 

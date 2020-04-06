@@ -19,13 +19,14 @@
 class ExplorerItemData : public TreeModelItemData
 {
 	Q_OBJECT
+	friend class ExplorerModel;
 
 protected:
 	Project *				m_pProject;
 	bool					m_bIsProjectItem;
 	
-public:
 	ExplorerItemData(Project &projectRef, HyGuiItemType eType, const QString sName);
+public:
 	virtual ~ExplorerItemData();
 
 	Project &GetProject() const;

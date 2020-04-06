@@ -131,6 +131,7 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemT
 	TreeModelItem *pCurTreeItem = FindProjectTreeItem(pProj);
 	if(sPrefix.isEmpty() == false)
 	{
+
 		QStringList sPathSplitList = sPrefix.split(QChar('/'));
 		// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
 		for(int i = 0; i < sPathSplitList.size(); ++i)

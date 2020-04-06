@@ -46,13 +46,11 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItemData &entityItemRef, QLi
 	switch(m_eCMD)
 	{
 	case ENTITYCMD_AddNewChildren: {
-		QList<ProjectItemData *> itemList;
+		QList<TreeModelItemData *> itemList;
 		for(auto param : m_ParameterList)
 		{
-			if(param.value<ExplorerItemData *>()->IsProjectItem())
-				itemList.push_back(static_cast<ProjectItemData *>(param.value<ExplorerItemData *>()));
-			else
-				HyGuiLog("EntityUndoCmd::redo had item that wasn't a project item", LOGTYPE_Warning);
+			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<TreeModelItemData *>(), true))
+				itemList.push_back(param.value<TreeModelItemData *>());
 		}
 
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChildren(itemList);
@@ -72,10 +70,8 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItemData &entityItemRef, QLi
 	case ENTITYCMD_AddNewChildren: {
 		for(auto param : m_ParameterList)
 		{
-			if(param.value<ExplorerItemData *>()->IsProjectItem())
-				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(static_cast<ProjectItemData *>(param.value<ExplorerItemData *>()));
-			else
-				HyGuiLog("EntityUndoCmd::undo had item that wasn't a project item", LOGTYPE_Warning);
+			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<TreeModelItemData *>(), true))
+				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(param.value<TreeModelItemData *>());
 		}
 		break; }
 

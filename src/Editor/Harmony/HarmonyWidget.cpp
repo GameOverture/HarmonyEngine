@@ -138,7 +138,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 	if(pCurOpenTabItem && pCurOpenTabItem->GetType() == ITEM_Entity && pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE))
 	{
-		EntityNodeTreeModel &childTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetChildrenModel();
+		EntityNodeTreeModel &childTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
 
 		if(childTreeModel.IsItemValid(static_cast<ProjectItemData *>(pEvent->source()), false))
 			pEvent->acceptProposedAction();
@@ -176,7 +176,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 				QString sItemPath = itemObj["itemName"].toString();
 				ExplorerItemData *pItem = m_pProject->GetExplorerModel().FindItemByItemPath(m_pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
 
-				EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetChildrenModel();
+				EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
 				if(entityTreeModelRef.IsItemValid(pItem, true) == false)
 					continue;
 

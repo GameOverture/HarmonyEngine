@@ -37,7 +37,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->nodeTree->setDragDropMode(QAbstractItemView::InternalMove);
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
-	ui->nodeTree->setModel(&pEntityModel->GetChildrenModel());
+	ui->nodeTree->setModel(&pEntityModel->GetNodeTreeModel());
 }
 
 EntityWidget::~EntityWidget()
@@ -82,7 +82,7 @@ EntityWidget::~EntityWidget()
 	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
 
 
-	ExplorerItemData *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetChildrenModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<ExplorerItemData *>();
+	ExplorerItemData *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<ExplorerItemData *>();
 	if(pSubStateItem == nullptr)
 	{
 		ui->lblSelectedItemIcon->setVisible(false);

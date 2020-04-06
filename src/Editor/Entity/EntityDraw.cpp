@@ -40,14 +40,14 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 }
 
-void EntityDraw::Sync()
-{
-	const QList<ProjectItemData *> &primitiveListRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetPrimitiveList();
-	for(uint32 i = 0; i < static_cast<uint32>(primitiveListRef.size()); ++i)
-	{
-
-	}
-}
+//void EntityDraw::Sync()
+//{
+//	const QList<ProjectItemData *> &primitiveListRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetPrimitiveList();
+//	for(uint32 i = 0; i < static_cast<uint32>(primitiveListRef.size()); ++i)
+//	{
+//
+//	}
+//}
 
 /*virtual*/ void EntityDraw::OnApplyJsonData(jsonxx::Object &itemDataObjRef) /*override*/
 {

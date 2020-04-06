@@ -32,11 +32,9 @@ public:
 	explicit EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
 	virtual ~EntityNodeTreeModel();
 
-	bool IsItemValid(ExplorerItemData *pItem, bool bShowDialogsOnFail) const;
-	bool IsItemValid(ProjectItemData *pItem, bool bShowDialogsOnFail) const;
-
-	bool InsertNewChild(ProjectItemData *pNewItem, TreeModelItem *pParentTreeItem = nullptr, int iRow = -1);
-	bool RemoveChild(ProjectItemData *pItem);
+	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
+	bool InsertNewChild(TreeModelItemData *pNewItem, TreeModelItem *pParentTreeItem = nullptr, int iRow = -1);
+	bool RemoveChild(TreeModelItemData *pItem);
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -54,8 +52,6 @@ public:
 
 	PropertiesTreeModel *GetPropertiesModel(ExplorerItemData *pItem);
 
-	void Refresh();
-
 	virtual int AddFrame(AtlasFrame *pFrame) override;
 	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
 
@@ -67,32 +63,17 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	EntityNodeTreeModel									m_TreeModel;
-	QList<ProjectItemData *>								m_PrimitiveList;
-
-	class DependencyLookup
-	{
-		QMap<QString, ProjectItemData *>					m_ItemMap;
-
-	public:
-		void AddDependency(ProjectItemData *pItem)			{ m_ItemMap[pItem->GetModel()->GetUuid().toString(QUuid::WithoutBraces)] = pItem; }
-		void RemoveDependency(ProjectItemData *pItem)		{ m_ItemMap.remove(pItem->GetModel()->GetUuid().toString(QUuid::WithoutBraces)); }
-		ProjectItemData *FindByGuid(QUuid uuid)				{ return m_ItemMap.contains(uuid.toString(QUuid::WithoutBraces)) ? m_ItemMap[uuid.toString(QUuid::WithoutBraces)] : nullptr; }
-	};
-	DependencyLookup									m_Dependencies;
+	EntityNodeTreeModel										m_TreeModel;
 
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
-	EntityNodeTreeModel &GetChildrenModel();
+	EntityNodeTreeModel &GetNodeTreeModel();
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItemData *pItem);
 
-	void AddNewChildren(QList<ProjectItemData *> itemList);
-	bool RemoveChild(ProjectItemData *pItem);
-
-	const QList<ProjectItemData *> &GetPrimitiveList();
-	ProjectItemData *CreateNewPrimitive();
+	void AddNewChildren(QList<TreeModelItemData *> itemList);
+	bool RemoveChild(TreeModelItemData *pItem);
 
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;

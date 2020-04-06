@@ -22,7 +22,7 @@ public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~EntityDraw();
 
-	void Sync();
+	//void Sync();
 
 protected:
 	virtual void OnApplyJsonData(jsonxx::Object &itemDataObjRef) override;
