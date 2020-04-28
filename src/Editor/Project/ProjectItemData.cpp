@@ -98,6 +98,11 @@ void ProjectItemData::LoadModel()
 	}
 }
 
+QUuid ProjectItemData::GetUuid() const
+{
+	return m_pModel->GetUuid();
+}
+
 IModel *ProjectItemData::GetModel()
 {
 	return m_pModel;

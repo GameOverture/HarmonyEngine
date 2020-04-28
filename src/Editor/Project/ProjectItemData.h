@@ -49,6 +49,7 @@ public:
 
 	void LoadModel();
 
+	QUuid GetUuid() const;
 	IModel *GetModel();
 	IWidget *GetWidget();
 	IDraw *GetDraw();

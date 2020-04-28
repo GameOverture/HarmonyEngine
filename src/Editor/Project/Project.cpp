@@ -699,6 +699,47 @@ bool Project::DoesItemExist(HyGuiItemType eType, QString sPath) const
 	return false;
 }
 
+QList<ProjectItemData *> Project::RegisterItemsById(ProjectItemData *pItemOwner, QList<QUuid> requestList)
+{
+	QList<ProjectItemData *> itemList;
+	for(auto uuid : requestList)
+		itemList.append(m_ModelRef.FindByUuid(uuid));
+
+	return RegisterItems(pItemOwner, itemList);
+}
+
+QList<ProjectItemData *> Project::RegisterItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList)
+{
+	for(auto item : requestList)
+	{
+		if(m_ItemOwnerMap.contains(item) == false)
+			m_ItemOwnerMap[item] = QSet<ProjectItemData *>();
+
+		m_ItemOwnerMap[item].insert(pItemOwner);
+	}
+
+	return requestList;
+}
+
+void Project::RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> relinquishList)
+{
+	for(auto item : relinquishList)
+	{
+		if(m_ItemOwnerMap.contains(item) == false)
+			continue;
+
+		m_ItemOwnerMap[item].remove(pItemOwner);
+	}
+}
+
+QList<ProjectItemData *> Project::GetItemOwners(ProjectItemData *pItem)
+{
+	if(m_ItemOwnerMap.contains(pItem) == false)
+		return QList<ProjectItemData *>();
+
+	return m_ItemOwnerMap[pItem].toList();
+}
+
 void Project::OpenTab(ProjectItemData *pItem)
 {
 	if(m_pCurOpenItem == pItem)

@@ -18,7 +18,8 @@
 #include <QJsonObject>
 
 TreeModelItemData::TreeModelItemData() :
-	m_eTYPE(ITEM_Unknown)
+	m_eTYPE(ITEM_Unknown),
+	m_bIsProjectItem(false)
 {
 	// I think a default ctor is required for QObject to work?
 	HyGuiLog("Invalid TreeModelItemData ctor used", LOGTYPE_Error);
@@ -26,7 +27,8 @@ TreeModelItemData::TreeModelItemData() :
 
 TreeModelItemData::TreeModelItemData(HyGuiItemType eType, const QString sText) :
 	m_eTYPE(eType),
-	m_sText(sText)
+	m_sText(sText),
+	m_bIsProjectItem(false)
 { }
 
 /*virtual*/ TreeModelItemData::~TreeModelItemData()
@@ -46,6 +48,11 @@ QString TreeModelItemData::GetText() const
 QIcon TreeModelItemData::GetIcon(SubIcon eSubIcon) const
 {
 	return HyGlobal::ItemIcon(m_eTYPE, eSubIcon);
+}
+
+bool TreeModelItemData::IsProjectItem() const
+{
+	return m_bIsProjectItem;
 }
 
 QDataStream &operator<<(QDataStream &out, TreeModelItemData *const &rhs)

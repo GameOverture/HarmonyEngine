@@ -384,10 +384,11 @@ class UndoCmd_RadioToggle : public QUndoCommand
 	QRadioButton *      m_pPrevRadBtnToggle;
 	
 public:
-	UndoCmd_RadioToggle(QString sText, OWNER *pOwner, QRadioButton *pNewRadBtnToggle, QRadioButton *pPrevRadBtnToggle, QUndoCommand *pParent = 0) :   QUndoCommand(pParent),
-																																							m_pOwner(pOwner),
-																																							m_pNewRadBtnToggle(pNewRadBtnToggle),
-																																							m_pPrevRadBtnToggle(pPrevRadBtnToggle)
+	UndoCmd_RadioToggle(QString sText, OWNER *pOwner, QRadioButton *pNewRadBtnToggle, QRadioButton *pPrevRadBtnToggle, QUndoCommand *pParent = 0) :
+		QUndoCommand(pParent),
+		m_pOwner(pOwner),
+		m_pNewRadBtnToggle(pNewRadBtnToggle),
+		m_pPrevRadBtnToggle(pPrevRadBtnToggle)
 	{
 		setText(sText);
 	}
@@ -431,9 +432,10 @@ class UndoCmd_AddFrames : public QUndoCommand
 	QList<AtlasFrame *>     m_Frames;
 	
 public:
-	UndoCmd_AddFrames(QString sText, ProjectItemData &itemRef, int iStateIndex, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
-																											m_ItemRef(itemRef),
-																											m_iStateIndex(iStateIndex)
+	UndoCmd_AddFrames(QString sText, ProjectItemData &itemRef, int iStateIndex, QUndoCommand *pParent = 0) :
+		QUndoCommand(pParent),
+		m_ItemRef(itemRef),
+		m_iStateIndex(iStateIndex)
 	{
 		setText(sText);
 		m_Frames.clear();
@@ -459,15 +461,16 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_DeleteFrame : public QUndoCommand
 {
-	ProjectItemData &           m_ItemRef;
-	int                     m_iStateIndex;
+	ProjectItemData &			m_ItemRef;
+	int							m_iStateIndex;
 
-	QList<AtlasFrame *>     m_Frames;
+	QList<AtlasFrame *>			m_Frames;
 
 public:
-	UndoCmd_DeleteFrame(QString sText, ProjectItemData &itemRef, int iStateIndex, AtlasFrame *pFrame, QUndoCommand *pParent = 0) :  QUndoCommand(pParent),
-																																m_ItemRef(itemRef),
-																																m_iStateIndex(iStateIndex)
+	UndoCmd_DeleteFrame(QString sText, ProjectItemData &itemRef, int iStateIndex, AtlasFrame *pFrame, QUndoCommand *pParent = 0) :
+		QUndoCommand(pParent),
+		m_ItemRef(itemRef),
+		m_iStateIndex(iStateIndex)
 	{
 		setText(sText);
 		m_Frames.append(pFrame);

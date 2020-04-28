@@ -19,6 +19,8 @@ class ExplorerModel : public ITreeModel
 {
 	Q_OBJECT
 
+	QMap<QUuid, ProjectItemData *>		m_ItemUuidMap;
+
 public:
 	ExplorerModel();
 	virtual ~ExplorerModel();
@@ -35,6 +37,8 @@ public:
 	QString AssemblePrefix(ExplorerItemData *pItem) const;
 
 	bool PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef);
+
+	ProjectItemData *FindByUuid(QUuid uuid);
 
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;

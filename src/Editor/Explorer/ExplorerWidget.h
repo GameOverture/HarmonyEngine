@@ -57,7 +57,7 @@ public:
 	~ExplorerWidget();
 
 	void SetModel(ExplorerModel &modelRef);
-	ExplorerModel *GetSourceModel();
+	ExplorerModel *GetExplorerModel();
 
 	ExplorerItemData *GetFirstSelectedItem();
 	void GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut);

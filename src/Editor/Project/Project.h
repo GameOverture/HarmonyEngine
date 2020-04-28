@@ -48,27 +48,29 @@ class Project : public ExplorerItemData
 {
 	Q_OBJECT
 
-	ExplorerModel &									m_ModelRef;
+	ExplorerModel &										m_ModelRef;
 
-	ProjectDraw *									m_pDraw;
-	DlgProjectSettings								m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
+	ProjectDraw *										m_pDraw;
+	DlgProjectSettings									m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
-	AtlasModel *									m_pAtlasModel;
-	AtlasWidget *									m_pAtlasWidget;
+	AtlasModel *										m_pAtlasModel;
+	AtlasWidget *										m_pAtlasWidget;
 
-	GltfModel *										m_pGltfModel;
-	GltfWidget *									m_pGltfWidget;
+	GltfModel *											m_pGltfModel;
+	GltfWidget *										m_pGltfWidget;
 
-	QStandardItemModel								m_FontListModel;
+	QStandardItemModel									m_FontListModel;
 
-	AudioAssetsWidget *								m_pAudioWidget;
+	AudioAssetsWidget *									m_pAudioWidget;
 
-	ProjectTabBar *									m_pTabBar;
+	ProjectTabBar *										m_pTabBar;
 	ProjectItemData *									m_pCurOpenItem;
 
-	FileDataPair									m_ProjectFileData;
+	FileDataPair										m_ProjectFileData;
 
-	bool											m_bHasError;
+	QMap<ProjectItemData *, QSet<ProjectItemData *>>	m_ItemOwnerMap;
+
+	bool												m_bHasError;
 	
 public:
 	Project(const QString sProjectFilePath, ExplorerModel &modelRef);
@@ -120,6 +122,12 @@ public:
 	QString RenamePrefix(QString sOldPath, QString sNewPath);
 
 	bool DoesItemExist(HyGuiItemType eType, QString sPath) const;
+
+	// Dependency links between items
+	QList<ProjectItemData *> RegisterItemsById(ProjectItemData *pItemOwner, QList<QUuid> requestList);
+	QList<ProjectItemData *> RegisterItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList);
+	void RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> relinquishList);
+	QList<ProjectItemData *> GetItemOwners(ProjectItemData *pItem);
 
 	// These tab functions are only called from MainWindow
 	void OpenTab(ProjectItemData *pItem);

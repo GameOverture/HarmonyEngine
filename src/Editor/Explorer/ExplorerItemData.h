@@ -23,15 +23,12 @@ class ExplorerItemData : public TreeModelItemData
 
 protected:
 	Project *				m_pProject;
-	bool					m_bIsProjectItem;
 	
 	ExplorerItemData(Project &projectRef, HyGuiItemType eType, const QString sName);
 public:
 	virtual ~ExplorerItemData();
 
 	Project &GetProject() const;
-
-	bool IsProjectItem() const;
 	
 	virtual QString GetName(bool bWithPrefix) const;
 	QString GetPrefix() const;

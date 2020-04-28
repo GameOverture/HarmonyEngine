@@ -20,8 +20,7 @@
 
 ExplorerItemData::ExplorerItemData(Project &projectRef, HyGuiItemType eType, const QString sName) :
 	TreeModelItemData(eType, sName),
-	m_pProject(&projectRef),
-	m_bIsProjectItem(false)
+	m_pProject(&projectRef)
 { }
 
 ExplorerItemData::~ExplorerItemData()
@@ -31,11 +30,6 @@ ExplorerItemData::~ExplorerItemData()
 Project &ExplorerItemData::GetProject() const
 {
 	return *m_pProject;
-}
-
-bool ExplorerItemData::IsProjectItem() const
-{
-	return m_bIsProjectItem;
 }
 
 /*virtual*/ QString ExplorerItemData::GetName(bool bWithPrefix) const

@@ -152,7 +152,7 @@ void ExplorerWidget::SetModel(ExplorerModel &modelRef)
 	ui->treeView->setModel(pProxyModel);
 }
 
-ExplorerModel *ExplorerWidget::GetSourceModel()
+ExplorerModel *ExplorerWidget::GetExplorerModel()
 {
 	if(ui->treeView->model() == nullptr)
 		return nullptr;
@@ -166,7 +166,7 @@ ExplorerItemData *ExplorerWidget::GetFirstSelectedItem()
 	if(curIndex.isValid() == false)
 		return nullptr;
 
-	return GetSourceModel()->data(curIndex, Qt::UserRole).value<ExplorerItemData *>();
+	return GetExplorerModel()->data(curIndex, Qt::UserRole).value<ExplorerItemData *>();
 }
 
 void ExplorerWidget::GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut)
@@ -177,7 +177,7 @@ void ExplorerWidget::GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOu
 	QItemSelection selectedItems = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapSelectionToSource(ui->treeView->selectionModel()->selection());
 	QModelIndexList selectedIndices = selectedItems.indexes();
 	for(int i = 0; i < selectedIndices.size(); ++i)
-		selectedItemsOut += GetSourceModel()->GetItemsRecursively(selectedIndices[i]);
+		selectedItemsOut += GetExplorerModel()->GetItemsRecursively(selectedIndices[i]);
 	
 	// Poor man's unique only algorithm
 	selectedItemsOut = selectedItemsOut.toSet().toList();
@@ -381,6 +381,26 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		return;
 	}
 
+	// Check for dependencies
+	for(int32 i = 0; i < selectedItems.size(); ++i)
+	{
+		if(selectedItems[i]->IsProjectItem())
+		{
+			ProjectItemData *pProjItem = static_cast<ProjectItemData *>(selectedItems[i]);
+
+			auto itemOwners = pProjItem->GetProject().GetItemOwners(pProjItem);
+			if(itemOwners.empty() == false)
+			{
+				QString sMessage = "'" % selectedItems[i]->GetName(true) % "' cannot be deleted because it is in use by the following items: \n\n";
+				for(auto itemOwner : itemOwners)
+					sMessage.append(HyGlobal::ItemName(itemOwner->GetType(), true) % "/" % itemOwner->GetName(true) % "\n");
+
+				HyGuiLog(sMessage, LOGTYPE_Warning);
+				return;
+			}
+		}
+	}
+
 	QString sDeleteMsg = "Do you want to delete the ";
 	if(selectedItems.size() == 1)
 		sDeleteMsg += HyGlobal::ItemName(selectedItems[0]->GetType(), false) % ":\n" % selectedItems[0]->GetName(true) % "?";
@@ -402,13 +422,13 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 	{
 		for(int i = 0; i < selectedItems.size(); ++i)
 		{
-			if(GetSourceModel()->RemoveItem(selectedItems[i]) == false)
+			if(GetExplorerModel()->RemoveItem(selectedItems[i]) == false)
 				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % selectedItems[i]->GetName(true), LOGTYPE_Error);
 		}
 
 		for(int i = 0; i < selectedPrefixes.size(); ++i)
 		{
-			if(GetSourceModel()->RemoveItem(selectedItems[i]) == false)
+			if(GetExplorerModel()->RemoveItem(selectedItems[i]) == false)
 				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % selectedItems[i]->GetName(true), LOGTYPE_Error);
 		}
 	}
@@ -447,7 +467,7 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 	{
 		QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
 		if(curIndex.isValid())
-			GetSourceModel()->PasteItemSrc(pMimeData->data(HYGUI_MIMETYPE), curIndex);
+			GetExplorerModel()->PasteItemSrc(pMimeData->data(HYGUI_MIMETYPE), curIndex);
 	}
 }
 

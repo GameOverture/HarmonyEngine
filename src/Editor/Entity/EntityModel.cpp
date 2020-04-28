@@ -281,14 +281,26 @@ void EntityModel::AddNewChildren(QList<TreeModelItemData *> itemList)
 {
 	for(auto item : itemList)
 	{
-		m_Dependencies.AddDependency(item);
+		if(item->IsProjectItem())
+		{
+			QList<ProjectItemData *> list;
+			list << static_cast<ProjectItemData *>(item);
+			m_ItemRef.GetProject().RegisterItems(&m_ItemRef, list);
+		}
+
 		m_TreeModel.InsertNewChild(item);
 	}
 }
 
 bool EntityModel::RemoveChild(TreeModelItemData *pItem)
 {
-	m_Dependencies.RemoveDependency(pItem);
+	if(pItem->IsProjectItem())
+	{
+		QList<ProjectItemData *> list;
+		list << static_cast<ProjectItemData *>(pItem);
+		m_ItemRef.GetProject().RelinquishItems(&m_ItemRef, list);
+	}
+
 	return m_TreeModel.RemoveChild(pItem);
 }
 

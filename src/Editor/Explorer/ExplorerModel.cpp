@@ -393,6 +393,11 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 	return true;
 }
 
+ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid)
+{
+	return m_ItemUuidMap[uuid];
+}
+
 /*virtual*/ QVariant ExplorerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
@@ -541,6 +546,9 @@ bool ExplorerModel::InsertNewItem(ExplorerItemData *pNewItem, TreeModelItem *pPa
 	v.setValue<ExplorerItemData *>(pNewItem);
 	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
 		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+
+	if(pNewItem->IsProjectItem())
+		m_ItemUuidMap[static_cast<ProjectItemData *>(pNewItem)->GetUuid()] = static_cast<ProjectItemData *>(pNewItem);
 
 	return true;
 }
