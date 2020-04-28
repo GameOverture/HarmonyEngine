@@ -140,7 +140,7 @@ void EntityWidget::on_actionAddSelectedChild_triggered()
 			continue;
 	
 		QVariant v;
-		v.setValue<ExplorerItemData *>(pItem);
+		v.setValue<TreeModelItemData *>(pItem);
 		validItemList.push_back(v);
 	}
 
