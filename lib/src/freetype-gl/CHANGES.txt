@@ -1,7 +1,0 @@
-src\freetype-gl\src\mat4.c
-Line 40:
-Added my own 'M_PI' since whatever was trying to include it doesn't exist on my system
-
-src\freetype-gl\src\texture-font.c
-Line 601:
-Increasing padding to '2' to avoid sampling other glyphs in atlas when using bi-linear filtering and scaling
