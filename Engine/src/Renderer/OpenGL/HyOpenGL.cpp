@@ -32,6 +32,16 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	{
 		SetCurrentWindow(i);
 
+
+#if defined(HY_PLATFORM_DESKTOP)
+		// Load all OpenGL functions using the glfw loader function
+		// If you use SDL you can use: https://wiki.libsdl.org/SDL_GL_GetProcAddress
+		if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+			HyError("gladLoadGLLoader failed to initialize OpenGL context with GLFW");
+		}
+#endif
+
+
 		//glewExperimental = GL_TRUE;	// This is required for GLFW to work
 		//GLenum err = glewInit();
 		//if(err != GLEW_OK) {
@@ -433,8 +443,8 @@ HyOpenGL::~HyOpenGL(void)
 				glEnableVertexAttribArray(uiLocation + 0);
 				glEnableVertexAttribArray(uiLocation + 1);
 
-				glVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 			else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::mat3)
 			{
@@ -442,9 +452,9 @@ HyOpenGL::~HyOpenGL(void)
 				glEnableVertexAttribArray(uiLocation + 1);
 				glEnableVertexAttribArray(uiLocation + 2);
 
-				glVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 			else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::mat4)
 			{
@@ -453,18 +463,18 @@ HyOpenGL::~HyOpenGL(void)
 				glEnableVertexAttribArray(uiLocation + 2);
 				glEnableVertexAttribArray(uiLocation + 3);
 
-				glVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisor(uiLocation + 3, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation + 3, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 			else
 			{
 				glEnableVertexAttribArray(uiLocation);
-				glVertexAttribDivisor(uiLocation, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				glVertexAttribDivisorARB(uiLocation, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 
-			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glEnableVertexAttribArray or glVertexAttribDivisor");
+			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glEnableVertexAttribArray or glVertexAttribDivisorARB");
 		}
 
 		glBindVertexArray(0);

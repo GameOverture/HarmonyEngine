@@ -212,9 +212,7 @@ set_target_properties(HyEngine PROPERTIES
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO)
 
-target_compile_definitions(HyEngine PRIVATE HY_PLATFORM_GUI)
-
-target_link_libraries(HyEngine PUBLIC box2d soil2)
+target_link_libraries(HyEngine PUBLIC box2d soil2 glfw)
 
 target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
 
