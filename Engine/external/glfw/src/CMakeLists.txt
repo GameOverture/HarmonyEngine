@@ -1,6 +1,6 @@
 
-add_library(glfw "../../../include/GLFW/glfw3.h"
-                 "../../../include/GLFW/glfw3native.h"
+add_library(glfw "${GLFW_SOURCE_DIR}/include/GLFW/glfw3.h"
+                 "${GLFW_SOURCE_DIR}/include/GLFW/glfw3native.h"
                  internal.h mappings.h context.c init.c input.c monitor.c
                  vulkan.c window.c)
 
@@ -82,27 +82,22 @@ target_compile_definitions(glfw PRIVATE _GLFW_USE_CONFIG_H)
 target_sources(glfw PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/glfw_config.h")
 
 set_target_properties(glfw PROPERTIES
-                      OUTPUT_NAME glfw#${GLFW_LIB_NAME}
-                      VERSION 3.3#VERSION ${GLFW_VERSION_MAJOR}.${GLFW_VERSION_MINOR}
-                      SOVERSION 3#${GLFW_VERSION_MAJOR}
+                      OUTPUT_NAME ${GLFW_LIB_NAME}
+                      VERSION ${GLFW_VERSION_MAJOR}.${GLFW_VERSION_MINOR}
+                      SOVERSION ${GLFW_VERSION_MAJOR}
                       POSITION_INDEPENDENT_CODE ON
                       C_STANDARD 99
                       C_EXTENSIONS OFF
                       DEFINE_SYMBOL _GLFW_BUILD_DLL
                       FOLDER "Engine Libs")
 
-#target_include_directories(glfw PUBLIC
-#                           "$<BUILD_INTERFACE:${GLFW_SOURCE_DIR}/include>"
-#                           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-#target_include_directories(glfw PRIVATE
-#                           "${GLFW_SOURCE_DIR}/src"
-#                           "${GLFW_BINARY_DIR}/src"
-#                           ${glfw_INCLUDE_DIRS})
-
 target_include_directories(glfw PUBLIC
-                           "${CMAKE_CURRENT_BINARY_DIR}"
-						   "${CMAKE_CURRENT_SOURCE_DIR}/../../../include")
-						   
+                           "$<BUILD_INTERFACE:${GLFW_SOURCE_DIR}/include>"
+                           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+target_include_directories(glfw PRIVATE
+                           "${GLFW_SOURCE_DIR}/src"
+                           "${GLFW_BINARY_DIR}/src"
+                           ${glfw_INCLUDE_DIRS})
 target_link_libraries(glfw PRIVATE Threads::Threads ${glfw_LIBRARIES})
 
 if (APPLE)

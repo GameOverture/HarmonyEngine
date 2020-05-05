@@ -98,7 +98,7 @@ inline HyMemoryAPI_Windows::HyMemoryAPI_Windows(void)
 
 inline void *HyMemoryAPI_Windows::IsSmallBlock(void *ptr) const
 {
-	void *pageStart = (void*)(reinterpret_cast<uint64>(ptr) & ~(kSmlPageSize-1));  // assume all small pages are aligned to their own size addresses, or better
+	void *pageStart = (void*)(reinterpret_cast<uint64_t>(ptr) & ~(kSmlPageSize-1));  // assume all small pages are aligned to their own size addresses, or better
 
 	if (m_SmallPages.find(pageStart) != m_SmallPages.end())
 		return pageStart;
@@ -108,7 +108,7 @@ inline void *HyMemoryAPI_Windows::IsSmallBlock(void *ptr) const
 
 inline void *HyMemoryAPI_Windows::IsMediumBlock(void *ptr) const
 {
-	void *pageStart = (void*)(reinterpret_cast<uint64>(ptr) & ~(kMedPageSize-1));  // assume all medium pages are aligned to their own size addresses, or better
+	void *pageStart = (void*)(reinterpret_cast<uint64_t>(ptr) & ~(kMedPageSize-1));  // assume all medium pages are aligned to their own size addresses, or better
 	
 	if(m_MediumPages.find(pageStart) != m_MediumPages.end())
 		return pageStart;

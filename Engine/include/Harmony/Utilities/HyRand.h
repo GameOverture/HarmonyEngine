@@ -20,10 +20,10 @@ struct hy_is_type_integer
 {
 	static constexpr bool value = std::is_same<T, int16>::value ||
 		std::is_same<T, int32>::value ||
-		std::is_same<T, int64>::value ||
+		std::is_same<T, int64_t>::value ||
 		std::is_same<T, uint16>::value ||
 		std::is_same<T, uint32>::value ||
-		std::is_same<T, uint64>::value;
+		std::is_same<T, uint64_t>::value;
 };
 
 template<typename T>
@@ -58,10 +58,11 @@ public:
 		GetPseudoRandInstance().seed(seedValue);
 	}
 
-	static void Reseed(const std::seed_seq &seedSeqValueRef)
-	{
-		GetPseudoRandInstance().seed(seedSeqValueRef);
-	}
+	// NOTE: This function not working with GCC (MinGW)
+	//static void Reseed(const std::seed_seq &seedSeqValueRef)
+	//{
+	//	GetPseudoRandInstance().seed(seedSeqValueRef);
+	//}
 
 	// Generate a random value based on template parameter
 	template<typename T>

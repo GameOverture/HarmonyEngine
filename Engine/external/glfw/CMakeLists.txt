@@ -1,6 +1,6 @@
-#cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.1)
 
-#project(GLFW VERSION 3.4.0 LANGUAGES C)
+project(GLFW VERSION 3.4.0 LANGUAGES C)
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 OFF)
 
@@ -12,7 +12,7 @@ if (POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW)
 endif()
 
-#set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
     set(GLFW_STANDALONE TRUE)
@@ -42,7 +42,6 @@ include(CMakeDependentOption)
 #                       "UNIX;NOT APPLE" OFF)
 #cmake_dependent_option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" ON
 #                       "MSVC" OFF)
-
 set(GLFW_USE_OSMESA OFF)
 set(GLFW_USE_HYBRID_HPG OFF)
 set(GLFW_USE_WAYLAND OFF)

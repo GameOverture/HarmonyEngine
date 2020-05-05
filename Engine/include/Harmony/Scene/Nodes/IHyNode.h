@@ -67,7 +67,7 @@ protected:
 	std::vector<HyAnimFloat *>		m_ActiveAnimFloatsList;
 
 #ifdef HY_ENABLE_USER_TAGS
-	int64							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
+	int64_t							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 #endif
 
 public:
@@ -89,8 +89,8 @@ public:
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused);
 
 #ifdef HY_ENABLE_USER_TAGS
-	int64 GetTag() const;
-	void SetTag(int64 iTag);
+	int64_t GetTag() const;
+	void SetTag(int64_t iTag);
 #endif
 
 protected:

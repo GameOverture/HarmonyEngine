@@ -15,6 +15,8 @@
 #include "Utilities/HyRand.h"
 
 class HyWindow;
+class HyScene;
+class IHyRenderer;
 
 template<typename NODETYPE>
 class IHyCamera : public NODETYPE
@@ -68,7 +70,7 @@ public:
 	void CameraShake(float fRadius)
 	{
 		if(IsCameraShake() == false)
-			HyCopyVec(m_ptCameraShakeCenter, pos.Get());
+			HyCopyVec(m_ptCameraShakeCenter, NODETYPE::pos.Get());
 
 		fRadius = HyMax(fRadius, 2.5f);
 
@@ -91,13 +93,13 @@ protected:
 			{
 				// End camera shake
 				m_fCameraShakeRadius = 0.0f;
-				pos.Set(m_ptCameraShakeCenter);
+				NODETYPE::pos.Set(m_ptCameraShakeCenter);
 			}
 			else
 			{
 				m_fCameraShakeAngle += (180.0f - m_fCameraShakeRadius) + HyRand::Range(0.0f, 60.0f); // Adjust angle 
 				glm::vec3 vOffset(sin(m_fCameraShakeAngle) * m_fCameraShakeRadius , cos(m_fCameraShakeAngle) * m_fCameraShakeRadius, 0.0f); // Create offset 2d vector
-				pos.Set(m_ptCameraShakeCenter + vOffset); // Set center of viewport
+				NODETYPE::pos.Set(m_ptCameraShakeCenter + vOffset); // Set center of viewport
 			}
 		}
 	}

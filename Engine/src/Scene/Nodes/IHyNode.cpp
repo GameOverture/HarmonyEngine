@@ -160,12 +160,12 @@ bool IHyNode::IsPauseUpdate() const
 }
 
 #ifdef HY_ENABLE_USER_TAGS
-int64 IHyNode::GetTag() const
+int64_t IHyNode::GetTag() const
 {
 	return m_iTag;
 }
 
-void IHyNode::SetTag(int64 iTag)
+void IHyNode::SetTag(int64_t iTag)
 {
 	m_iTag = iTag;
 }

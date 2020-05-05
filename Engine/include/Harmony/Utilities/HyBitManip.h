@@ -17,11 +17,11 @@
 
 namespace HyBitManip
 {
-	inline uint32 GetHighInt(uint64 uiValue)
+	inline uint32 GetHighInt(uint64_t uiValue)
 	{
 		return (uiValue & 0xFFFFFFFF00000000) >> 32;
 	}
-	inline uint32 GetLowInt(uint64 uiValue)
+	inline uint32 GetLowInt(uint64_t uiValue)
 	{
 		return (uiValue & 0x00000000FFFFFFFF);
 	}

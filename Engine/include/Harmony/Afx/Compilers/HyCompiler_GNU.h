@@ -15,10 +15,23 @@
 
 #define HY_INLINE					__inline__
 
-#if __has_feature(cxx_noexcept)
-	#define HY_NOEXCEPT noexcept
+#ifdef DEBUG
+	#define HY_DEBUG
 #else
+	#define HY_RELEASE
+#endif
+
+//#if __has_feature(cxx_noexcept)
+//	#define HY_NOEXCEPT noexcept
+//#else
 	#define HY_NOEXCEPT
+//#endif
+
+
+#if UINTPTR_MAX == 0xffffffff
+	#define HY_ENV_32
+#else
+	#define HY_ENV_64
 #endif
 
 #endif /* HyCompiler_GNU_h__ */

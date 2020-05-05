@@ -10,6 +10,7 @@
 #ifndef HyConsole_h__
 #define HyConsole_h__
 
+#include <mutex>
 #include "Afx/HyStdAfx.h"
 
 class HyConsole

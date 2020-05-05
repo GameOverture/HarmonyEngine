@@ -13,13 +13,13 @@
 // Read Time-Stamp Counter
 #if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_GUI_WIN)
 #include <intrin.h>
-uint64 HyReadTsc() { return __rdtsc(); }
+uint64_t HyReadTsc() { return __rdtsc(); }
 #else
-uint64 HyReadTsc()
+uint64_t HyReadTsc()
 {
 	uint32 lo, hi;
 	__asm__ __volatile__("rdtsc" : "=a" (lo), "=d" (hi));
-	return ((uint64)hi << 32) | lo;
+	return ((uint64_t)hi << 32) | lo;
 }
 #endif
 
@@ -35,7 +35,7 @@ void HyProfiler::NewFrame()
 {
 	HyAssert(m_SectionStack.empty(), "HyProfiler::NewFrame was invoked without clearing its m_SectionStack");
 
-	memset(m_uiSectionTicks, 0, sizeof(uint64) * HYNUM_PROFILERSECTION);
+	memset(m_uiSectionTicks, 0, sizeof(uint64_t) * HYNUM_PROFILERSECTION);
 	m_eCurrentSection = HYPROFILERSECTION_None;
 }
 

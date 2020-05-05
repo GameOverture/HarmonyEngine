@@ -1,6 +1,6 @@
 add_subdirectory(external/box2d)
-add_subdirectory(external/glfw)
 add_subdirectory(external/soil2)
+add_subdirectory(external/glfw)
 
 set(HYENGINE_SOURCE_FILES
 	src/HyEngine.cpp

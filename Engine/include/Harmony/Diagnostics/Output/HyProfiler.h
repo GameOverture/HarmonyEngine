@@ -33,11 +33,11 @@ enum HyProfilerSection
 
 class HyProfiler : public HyEntity2d
 {
-	uint64							m_uiSectionTicks[HYNUM_PROFILERSECTION];
+	uint64_t							m_uiSectionTicks[HYNUM_PROFILERSECTION];
 	HyProfilerSection				m_eCurrentSection;
 
 	std::stack<HyProfilerSection>	m_SectionStack;
-	uint64							m_uiTotalTicks;
+	uint64_t							m_uiTotalTicks;
 
 public:
 	HyProfiler();

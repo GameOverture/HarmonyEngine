@@ -18,15 +18,15 @@
 	#define HY_PLATFORM_DESKTOP
 #endif
 
-#if defined(HY_PLATFORM_32BIT)	// 32 bit environment
-	typedef int32 intx;
-	typedef uint32 uintx;
-#elif defined(HY_PLATFORM_64BIT) // 64 bit environment
-	typedef int64 intx;
-	typedef uint64 uintx;
-#else
-	#error Unspecified cpu architecture
-#endif
+//#if defined(HY_PLATFORM_32BIT)	// 32 bit environment
+//	typedef int32 intx;
+//	typedef uint32 uintx;
+//#elif defined(HY_PLATFORM_64BIT) // 64 bit environment
+//	typedef int64_t intx;
+//	typedef uint64_t uintx;
+//#else
+//	#error Unspecified cpu architecture
+//#endif
 
 //-----------------------------------------------------------------------------------------
 // Endian - Don't use these functions directly, use the #define's below 'em

@@ -49,8 +49,8 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	MEMORYSTATUSEX meminfo = {};
 	meminfo.dwLength = sizeof(MEMORYSTATUSEX);
 	GlobalMemoryStatusEx(&meminfo);
-	m_uiTotalMemBytes = static_cast<uint64>(meminfo.ullTotalPhys);
-	m_uiVirtualMemBytes = static_cast<uint64>(meminfo.ullTotalVirtual);
+	m_uiTotalMemBytes = static_cast<uint64_t>(meminfo.ullTotalPhys);
+	m_uiVirtualMemBytes = static_cast<uint64_t>(meminfo.ullTotalVirtual);
 
 #elif defined(HY_PLATFORM_OSX)
 	// Set info
@@ -229,7 +229,7 @@ void HyDiagnostics::DumpMemoryUsage()
 		HyLogError("HyDiagnostics::DumpMemoryUsage - GetProcessMemoryInfo() failed and returned error: " << GetLastError());
 		return;
 	}
-	uint64 uiUsedMem = static_cast<uint64>(memCounter.WorkingSetSize);
+	uint64_t uiUsedMem = static_cast<uint64_t>(memCounter.WorkingSetSize);
 
 	HyLog("Working set memory: " << (static_cast<double>(uiUsedMem) / 1024.0 / 1024.0) << " MB (" << (static_cast<float>(uiUsedMem) / static_cast<float>(m_uiVirtualMemBytes)) * 100.0f << "%)");
 	HyLog("Available Memory:   " << (m_uiVirtualMemBytes / 1024 / 1024) << " MB");

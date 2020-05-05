@@ -14,6 +14,8 @@
 #include "Scene/Nodes/IHyNode.h"
 #include "Scene/AnimFloats/HyAnimVec2.h"
 
+class HyEntity2d;
+
 class IHyNode2d : public IHyNode
 {
 	friend class HyEntity2d;
