@@ -13,7 +13,7 @@
 #include "Afx/Platforms/HyPlatAfx.h"
 
 #if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
-	#include "GL/glew.h"
+	#include <glad/glad.h>
 	#include <GLFW/glfw3.h>
 	#define HY_PLATFORM_DESKTOP
 #endif

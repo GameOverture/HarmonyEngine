@@ -10,7 +10,7 @@
 #ifndef HyPlatform_Gui_h__
 #define HyPlatform_Gui_h__
 
-#include "GL/glew.h"
+#include <glad/glad.h>
 
 #define HY_GUI_DATAOVERRIDE "+HyGuiOverride"
 #define HY_MAXWINDOWS 1

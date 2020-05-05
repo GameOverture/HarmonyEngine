@@ -25,6 +25,7 @@ set(SOIL2_HEADER_FILES
 
 add_library(soil2 STATIC ${SOIL2_SOURCE_FILES} ${SOIL2_HEADER_FILES})
 target_include_directories(soil2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../include/soil2")
+target_include_directories(soil2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../include")
 target_include_directories(soil2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 set_target_properties(soil2 PROPERTIES
 	CXX_STANDARD 11

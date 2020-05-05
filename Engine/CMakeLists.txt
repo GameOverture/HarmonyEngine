@@ -81,6 +81,7 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/HyMeter.cpp
 	src/UI/IHy9Slice.cpp
 	src/Utilities/Crc32.cpp
+	src/Utilities/glad.cpp
 	src/Utilities/HyBitManip.cpp
 	src/Utilities/HyImage.cpp
 	src/Utilities/HyMath.cpp

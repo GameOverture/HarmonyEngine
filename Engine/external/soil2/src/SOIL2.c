@@ -66,7 +66,10 @@
 	#define APIENTRY GL_APIENTRY
 #else
 
-#if defined( __WIN32__ ) || defined( _WIN32 ) || defined( WIN32 )
+#define HARMONY_USE_GLAD
+#if defined(HARMONY_USE_GLAD)
+	#include "glad/glad.h"
+#elif defined( __WIN32__ ) || defined( _WIN32 ) || defined( WIN32 )
 	#define SOIL_PLATFORM_WIN32
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>

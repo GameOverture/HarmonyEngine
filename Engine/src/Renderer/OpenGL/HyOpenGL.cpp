@@ -32,16 +32,22 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	{
 		SetCurrentWindow(i);
 
-		glewExperimental = GL_TRUE;	// This is required for GLFW to work
-		GLenum err = glewInit();
-		if(err != GLEW_OK) {
-			HyError("glewInit() failed: " << err);
+		//glewExperimental = GL_TRUE;	// This is required for GLFW to work
+		//GLenum err = glewInit();
+		//if(err != GLEW_OK) {
+		//	HyError("glewInit() failed: " << err);
+		//}
+		//else {
+		//	// Flush the OpenGL error state, as glew is known to bork it
+		//	while(GL_NO_ERROR != glGetError());
+		//}
+		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
+		
+		if(!gladLoadGL())
+		{
+			HyError("glad failed to initalize");
 		}
-		else {
-			// Flush the OpenGL error state, as glew is known to bork it
-			while(GL_NO_ERROR != glGetError());
-		}
-		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
+		//HyLog("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	}
@@ -49,9 +55,9 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	if(m_WindowListRef.empty() == false)
 	{
 		SetCurrentWindow(0);
-		if(glewIsSupported("GL_VERSION_3_1") == false) {
-			HyError("At least OpenGL 3.1 must be supported");
-		}
+		//if(glewIsSupported("GL_VERSION_3_1") == false) {
+		//	HyError("At least OpenGL 3.1 must be supported");
+		//}
 	}
 	else
 		HyLog("No windows created to render to");
@@ -746,7 +752,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 	{
 	case HYSHADER_Vertex:			iShaderHandle = glCreateShader(GL_VERTEX_SHADER);				break;
 	case HYSHADER_Fragment:			iShaderHandle = glCreateShader(GL_FRAGMENT_SHADER);				break;
-	case HYSHADER_Geometry:			iShaderHandle = glCreateShader(GL_GEOMETRY_SHADER);				break;
+	//case HYSHADER_Geometry:			iShaderHandle = glCreateShader(GL_GEOMETRY_SHADER);				break;
 	case HYSHADER_TessControl:		iShaderHandle = glCreateShader(GL_TESS_CONTROL_SHADER);			break;
 	case HYSHADER_TessEvaluation:	iShaderHandle = glCreateShader(GL_TESS_EVALUATION_SHADER);		break;
 	default:

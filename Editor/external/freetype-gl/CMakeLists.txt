@@ -34,7 +34,7 @@ endif()
 #option(freetype-gl_BUILD_TESTS "Build the tests" ON)
 
 set(freetype-gl_WITH_GLEW OFF)
-set(freetype-gl_WITH_GLAD OFF)
+set(freetype-gl_WITH_GLAD ON)
 set(freetype-gl_USE_VAO OFF)
 set(freetype-gl_BUILD_DEMOS OFF)
 set(freetype-gl_BUILD_APIDOC OFF)

@@ -35,7 +35,7 @@
 #define __FREETYPE_GL_H__
 
 /* Mandatory */
-#include "opengl.h"
+#include <glad/glad.h>//#include "opengl.h"
 #include "vec234.h"
 #include "vector.h"
 #include "texture-atlas.h"

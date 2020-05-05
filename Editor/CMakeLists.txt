@@ -8,7 +8,6 @@ if(Qt5_DIR)
 	find_package(Qt5 COMPONENTS Core Gui Network Widgets REQUIRED)
 
 	set(HYEDITOR_SOURCE_FILES
-		data/HyEditor.qrc
 		src/main.cpp
 		src/MainWindow.cpp
 		src/VersionPatcher.cpp
@@ -195,7 +194,7 @@ if(Qt5_DIR)
 	include_directories(${Qt5Widgets_INCLUDES})
 	add_definitions(${Qt5Widgets_DEFINITIONS})
 
-	add_executable(HyEditor ${HYEDITOR_SOURCE_FILES})
+	add_executable(HyEditor ${HYEDITOR_SOURCE_FILES} data/HyEditor.qrc)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Atlas")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Audio")
@@ -246,7 +245,7 @@ if(Qt5_DIR)
 	endif ()
 
 	# Sets up filters for VS
-	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${HYEDITOR_SOURCE_FILES})
+	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${HYEDITOR_SOURCE_FILES})
 else()
 	message(WARNING "Required variable Qt5_DIR. Specify cmake Qt5 directory -Example- C:/Qt/5.12.0/msvc2017_64/lib/cmake/Qt5")
 endif()
