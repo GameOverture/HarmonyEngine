@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 
+extern HyWindow & Hy_Window(uint32 uiWindowIndex);
 
 #ifdef HY_PLATFORM_GUI
 	#define HyThrottleUpdate

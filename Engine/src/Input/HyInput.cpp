@@ -14,6 +14,8 @@
 #include "Input/HyInputMap.h"
 #include "Window/HyWindow.h"
 
+extern HyInput &Hy_Input();
+
 #ifdef HY_PLATFORM_DESKTOP
 	void glfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods)
 	{

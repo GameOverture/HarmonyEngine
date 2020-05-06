@@ -16,6 +16,8 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/quaternion.hpp"
 
+extern std::string Hy_DataDir();
+
 HyGLTF::HyGLTF(const std::string &sIdentifier) :
 	IHyFileData(HYFILE_GLTF),
 	m_sIDENTIFIER(sIdentifier)

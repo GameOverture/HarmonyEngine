@@ -13,6 +13,8 @@
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
+extern float Hy_UpdateStep();
+
 HyAnimFloat::HyAnimFloat(float &valueReference, IHyNode &ownerRef, uint32 uiDirtyFlags) :
 	m_fValueRef(valueReference),
 	m_OwnerRef(ownerRef),

@@ -30,4 +30,4 @@ typedef HyOpenGL HyRendererInterop;
 	typedef HyConsole_Win HyConsoleInterop;
 #endif
 
-#endif HyInteropAfx_h__
+#endif /* HyInteropAfx_h__ */

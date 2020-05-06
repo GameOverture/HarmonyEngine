@@ -33,9 +33,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <filesystem>
-namespace fs = std::experimental::filesystem;
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Nested class Factory
@@ -419,15 +416,15 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 {
 	HyLog("Assets are initializing...");
 
-#if defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_PLATFORM_WINDOWS) && defined(HY_COMPILER_MSVC)
 	SetThreadPriority(m_Thread.native_handle(), THREAD_MODE_BACKGROUND_BEGIN);
 #elif defined(HY_PLATFORM_GUI_WIN)
-#else
-	sched_param sch;
-	int policy; 
-	pthread_getschedparam(m_Thread.native_handle(), &policy, &sch);
-	sch.sched_priority = xx; // Don't know what value here
-	pthread_setschedparam(m_Thread.native_handle(), SCHED_FIFO, &sch);
+#else // POSIX threads
+	//sched_param sch;
+	//int policy; 
+	//pthread_getschedparam(m_Thread.native_handle(), &policy, &sch);
+	//sch.sched_priority = xx; // Don't know what value here
+	//pthread_setschedparam(m_Thread.native_handle(), SCHED_FIFO, &sch);
 #endif
 
 	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir + HYASSETS_AtlasFile);

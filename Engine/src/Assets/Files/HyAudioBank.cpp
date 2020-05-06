@@ -11,6 +11,8 @@
 #include "Assets/Files/HyAudioBank.h"
 #include "HyEngine.h"
 
+extern std::string Hy_DataDir();
+
 HyAudioBank::HyAudioBank(const std::string &sDataDir, const std::string &sNameId, const jsonxx::Object &initObj, IHyAudioBank *pInternal) :
 	IHyFileData(HYFILE_AudioBank),
 	m_sNAME_ID(sNameId),

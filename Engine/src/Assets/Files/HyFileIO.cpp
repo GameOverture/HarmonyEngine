@@ -9,8 +9,11 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/HyFileIO.h"
+#include "Diagnostics/Console/HyConsole.h"
 
-#include <experimental/filesystem>
+#if defined(HY_COMPILER_MSVC)
+	#include <experimental/filesystem>
+#endif
 
 //void HyFindFilesRecursively(const char *szDirPath, const std::string &sExtension, std::vector<std::string> &filesFoundOut)
 //{
@@ -93,5 +96,10 @@ void WriteTextFile(const char *szFilePath, const char *szContentBuffer)
 
 bool HyFileExists(const std::string &sFilePath)
 {
+#if defined(HY_COMPILER_MSVC)
 	return std::experimental::filesystem::exists(sFilePath);
+#else // TODO: fix for GCC, etc.
+	HyLogWarning("HyFileExists() not implemented for this build configuration. Returning 'true'")
+	return true;
+#endif
 }

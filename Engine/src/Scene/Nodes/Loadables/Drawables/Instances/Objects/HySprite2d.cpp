@@ -14,6 +14,8 @@
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
+extern float Hy_UpdateStep();
+
 HySprite2d::HySprite2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
 	IHyInstance2d(HYTYPE_Sprite, sPrefix, sName, pParent),
 	m_bIsAnimPaused(false),

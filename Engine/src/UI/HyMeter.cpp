@@ -11,6 +11,8 @@
 #include "UI/HyMeter.h"
 #include "HyEngine.h"
 
+extern float Hy_UpdateStep();
+
 HyMeter::HyMeter(HyEntity2d *pParent /*= nullptr*/) :
 	HyInfoPanel(pParent),
 	m_SpinText(this)

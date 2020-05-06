@@ -11,6 +11,8 @@
 #include "UI/IHy9Slice.h"
 #include "HyEngine.h"
 
+extern float Hy_UpdateStep();
+
 IHy9Slice::Border::Border(glm::vec2 vFillDimensions, float fBorderThickness, HyPrimitive2d &fillRef, HyEntity2d *pParent)
 {
 	m_Corners[LowerLeft].SetAsCircle(fBorderThickness);

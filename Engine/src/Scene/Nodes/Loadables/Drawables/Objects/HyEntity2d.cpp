@@ -14,6 +14,8 @@
 #include "Assets/Nodes/HyEntityData.h"
 #include "HyEngine.h"
 
+extern HyInput &Hy_Input();
+
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_Entity, "", "", pParent),
 	m_uiAttributes(0),

@@ -11,6 +11,8 @@
 #include "Diagnostics/Output/HyDiagOutput.h"
 #include "HyEngine.h"
 
+extern HyInput &Hy_Input();
+
 #define HYDIAG_WIDTH 600.0f
 
 HyDiagOutput::HyDiagOutput() :

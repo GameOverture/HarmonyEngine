@@ -15,6 +15,9 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.h"
 #include "HyEngine.h"
 
+extern std::string Hy_DateTime();
+extern HyWindow &Hy_Window(uint32 uiWindowIndex /*= 0*/);
+
 HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :
 	m_InitStructRef(initStruct),
 	m_TimeRef(timeRef),

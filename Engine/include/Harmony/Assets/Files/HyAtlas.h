@@ -14,6 +14,8 @@
 #include "Assets/Files/IHyFileData.h"
 #include "Utilities/HyMath.h"
 
+class HyAssets;
+
  // NOTE: Can't use std::bitset because the number of bits needed is not known at compile time
 class HyAtlasIndices
 {

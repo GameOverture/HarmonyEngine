@@ -12,6 +12,8 @@
 #include "Time/HyTime.h"
 #include "HyEngine.h"
 
+extern bool Hy_IsInitialized();
+
 HyTime *IHyTimeInst::sm_pTime = nullptr;
 
 IHyTimeInst::IHyTimeInst(void) :

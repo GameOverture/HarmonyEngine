@@ -82,7 +82,7 @@ private:
 	friend float				Hy_UpdateStep();
 	friend double				Hy_UpdateStepDbl();
 	friend void					Hy_PauseGame(bool bPause);
-	friend HyWindow &			Hy_Window(uint32 uiWindowIndex = 0);
+	friend HyWindow &			Hy_Window(uint32 uiWindowIndex = 0u);
 	friend HyInput &			Hy_Input();
 	friend HyDiagnostics &		Hy_Diagnostics();
 	friend HyShaderHandle		Hy_DefaultShaderHandle(HyType eType);

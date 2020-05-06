@@ -48,6 +48,10 @@
 //
 #include "Afx/HyStdAfx.h"
 
+#ifndef HY_COMPILER_MSVC
+	#undef _WIN32 // GCC compiler on windows fails with this defined -JJK
+#endif
+
 #include <algorithm>
 //#include <cassert>
 #ifndef TINYGLTF_NO_FS

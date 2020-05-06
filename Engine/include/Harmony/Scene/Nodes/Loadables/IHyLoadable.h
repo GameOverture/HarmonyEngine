@@ -15,6 +15,7 @@
 
 class HyEntity2d;
 class HyEntity3d;
+class HyAssets;
 
 class IHyLoadable
 {

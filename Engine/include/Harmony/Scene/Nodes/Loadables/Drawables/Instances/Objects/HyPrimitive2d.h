@@ -91,7 +91,7 @@ private:
 	void SetData();
 
 	void _SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices);
-	void _SetAsCircle(glm::vec2 &ptCenter, float fRadius, uint32 uiSegments);
+	void _SetAsCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSegments);
 	void _SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices);
 };
 

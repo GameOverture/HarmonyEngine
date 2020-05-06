@@ -11,6 +11,8 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance.h"
 #include "HyEngine.h"
 
+extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
+
 HyScene *IHyInstance::sm_pScene = nullptr;
 
 IHyInstance::IHyInstance() :

@@ -18,8 +18,10 @@ class HyTime;
 class HyAssets;
 class HyScene;
 
-// Comment this out to disable profiler
-#define HYSETTING_ProfilerEnabled
+#if defined(HY_COMPILER_MSVC)
+	// Comment this out to disable profiler
+	#define HYSETTING_ProfilerEnabled
+#endif
 
 #ifdef HY_PLATFORM_GUI
 	#undef HYSETTING_ProfilerEnabled

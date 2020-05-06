@@ -11,6 +11,8 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance3d.h"
 #include "HyEngine.h"
 
+extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
+
 IHyInstance3d::IHyInstance3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
 	IHyDrawable3d(eNodeType, sPrefix, sName, pParent)
 {

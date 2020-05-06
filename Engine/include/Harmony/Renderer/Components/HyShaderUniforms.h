@@ -35,7 +35,7 @@ class HyShaderUniforms
 		void SetName(const char *szName)
 		{ 
 			HyAssert(strlen(szName) < HY_SHADER_UNIFORM_NAME_LENGTH, "UniformBuffer::SetName() took a name greater than 'HY_SHADER_UNIFORM_NAME_LENGTH'");
-			strcpy_s(reinterpret_cast<char *>(m_pData + sizeof(uint32)), HY_SHADER_UNIFORM_NAME_LENGTH, szName);
+			strcpy(reinterpret_cast<char *>(m_pData + sizeof(uint32)), szName);
 		}
 	};
 	std::vector<UniformBuffer>	m_UniformList;

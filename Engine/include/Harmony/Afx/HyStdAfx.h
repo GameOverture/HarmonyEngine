@@ -47,6 +47,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <future>
+#include <memory>
 
 #define HY_UNUSED_HANDLE 0
 typedef uint32 HyTextureHandle;

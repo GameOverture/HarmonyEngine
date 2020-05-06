@@ -237,7 +237,7 @@ void HyPrimitive2d::SetData()
 		break; }
 
 	case HYSHAPE_Circle:
-		_SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x, static_cast<b2CircleShape *>(pb2Shape)->m_p.y), static_cast<b2CircleShape *>(pb2Shape)->m_radius, m_uiNumSegments);
+		_SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x, static_cast<b2CircleShape *>(pb2Shape)->m_p.y), pb2Shape->m_radius, m_uiNumSegments);
 		break;
 
 	case HYSHAPE_Polygon: {
@@ -358,7 +358,7 @@ void HyPrimitive2d::_SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	//}
 }
 
-void HyPrimitive2d::_SetAsCircle(glm::vec2 &ptCenter, float fRadius, uint32 uiSegments)
+void HyPrimitive2d::_SetAsCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSegments)
 {
 	const float k_segments = static_cast<float>(uiSegments);
 	const float k_increment = 2.0f * b2_pi / k_segments;

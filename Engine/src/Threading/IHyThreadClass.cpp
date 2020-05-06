@@ -43,7 +43,7 @@ bool IHyThreadClass::ThreadStart()
 #ifndef HY_PLATFORM_GUI
 	if(m_ePriority != HYTHREAD_Normal)
 	{
-#ifdef HY_PLATFORM_WINDOWS
+	#if defined(HY_COMPILER_MSVC)
 		int iPriority = THREAD_PRIORITY_NORMAL;
 		switch(m_ePriority)
 		{
@@ -54,14 +54,14 @@ bool IHyThreadClass::ThreadStart()
 		}
 		if(false == SetThreadPriority(m_Thread.native_handle(), iPriority))
 			HyLogWarning("Failed to set Thread scheduling : " << GetLastError());
-#else
-		sch_params.sched_priority = priority;
-		if(pthread_setschedparam(th.native_handle(), policy, &sch_params))
-		{
-			HyLogWarning("Failed to set Thread scheduling : " << std::strerror(errno));
-			return false;
-		}
-#endif
+	#else // POSIX threads
+		//sch_params.sched_priority = priority;
+		//if(pthread_setschedparam(th.native_handle(), policy, &sch_params))
+		//{
+		//	HyLogWarning("Failed to set Thread scheduling : " << std::strerror(errno));
+		//	return false;
+		//}
+	#endif
 	}
 #endif
 

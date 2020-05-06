@@ -30,7 +30,6 @@ set(HYENGINE_SOURCE_FILES
 	src/Diagnostics/Output/HyProfiler.cpp
 	src/Input/HyInput.cpp
 	src/Input/HyInputMap.cpp
-	src/Memory/HyMemoryHeap.cpp
 	src/Renderer/IHyRenderer.cpp
 	src/Renderer/Components/HyRenderBuffer.cpp
 	src/Renderer/Components/HyShaderUniforms.cpp
@@ -136,10 +135,6 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Input/HyInput.h
 	include/Harmony/Input/HyInputKeys.h
 	include/Harmony/Input/HyInputMap.h
-	include/Harmony/Memory/HyMemoryHeap.h
-	include/Harmony/Memory/Interop/HyMemAPI_Windows.h
-	include/Harmony/Memory/PageTypes/HyMedHeapPage.h
-	include/Harmony/Memory/PageTypes/HySmlHeapPage.h
 	include/Harmony/Renderer/IHyRenderer.h
 	include/Harmony/Renderer/Components/HyRenderBuffer.h
 	include/Harmony/Renderer/Components/HyShaderUniforms.h
@@ -208,9 +203,15 @@ add_library(HyEngine STATIC ${HYENGINE_SOURCE_FILES} ${HYENGINE_HEADER_FILES})
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony")
 set_target_properties(HyEngine PROPERTIES
-	CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO)
+	CXX_STANDARD 14
+	CXX_STANDARD_REQUIRED YES
+	CXX_EXTENSIONS NO)
+
+if (MSVC)
+	target_compile_definitions(HyEngine PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
+
+target_compile_definitions(HyEngine PRIVATE TINYGLTF_USE_CPP14)
 
 target_link_libraries(HyEngine PUBLIC box2d soil2 glfw)
 
