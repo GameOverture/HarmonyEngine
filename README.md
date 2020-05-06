@@ -1,7 +1,7 @@
 HarmonyEngine
 =============
 
-Cross-platform multi-threaded OpenGL renderer that combines the best open-source libraries available under one unified work flow. 
+Cross-platform multi-threaded engine that combines the best open-source libraries available under one unified work flow. 
 
 **Disclaimer:** This is a very much work in progress and not ready for public consumption.
 
