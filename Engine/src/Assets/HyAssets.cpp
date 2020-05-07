@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
+#include "Assets/Files/HyFileIO.h"
 #include "Assets/Files/HyAtlas.h"
 #include "Assets/Files/HyGLTF.h"
 #include "Assets/Files/HyAudioBank.h"

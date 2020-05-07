@@ -14,6 +14,18 @@
 #include "Assets/Files/IHyFileData.h"
 #include "Renderer/Components/HyRenderBuffer.h"
 
+#include "rapidjson/document.h"
+
+#define TINYGLTF_NO_STB_IMAGE
+#define TINYGLTF_NO_STB_IMAGE_WRITE
+#ifdef HY_PLATFORM_GUI
+	#define TINYGLTF_NO_FS
+#endif
+#define TINYGLTF_NOEXCEPTION
+#define TINYGLTF_USE_CPP14
+#define TINYGLTF_USE_RAPIDJSON
+#include "tinygltf/tiny_gltf.h"
+
 class HyGLTF : public IHyFileData
 {
 	const std::string					m_sIDENTIFIER;

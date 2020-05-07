@@ -18,6 +18,8 @@ if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
     set(GLFW_STANDALONE TRUE)
 endif()
 
+# HARMONY MOD - We don't want any extras, just the library
+#
 #option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 #option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" ${GLFW_STANDALONE})
 #option(GLFW_BUILD_TESTS "Build the GLFW test programs" ${GLFW_STANDALONE})
@@ -34,6 +36,8 @@ set(GLFW_VULKAN_STATIC OFF)
 include(GNUInstallDirs)
 include(CMakeDependentOption)
 
+# HARMONY MOD - We don't want any extras, just the library
+#
 #cmake_dependent_option(GLFW_USE_OSMESA "Use OSMesa for offscreen context creation" OFF
 #                       "UNIX" OFF)
 #cmake_dependent_option(GLFW_USE_HYBRID_HPG "Force use of high-performance GPU on hybrid systems" OFF

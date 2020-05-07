@@ -8,9 +8,10 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_subdirectory(Engine)
 add_subdirectory(Editor)
 
+# Build engine as GUI/Editor mode
 target_compile_definitions(HyEngine PRIVATE HY_PLATFORM_GUI)
 
-# default startup project for Visual Studio
+# Default startup project for Visual Studio will be the editor
 if (MSVC)
 	set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT HyEditor)
 endif()

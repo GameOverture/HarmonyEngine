@@ -12,6 +12,7 @@
 
 #include "IModel.h"
 #include "PropertiesTreeModel.h"
+#include "Harmony/Assets/Files/HyGLTF.h"
 
 #include <QObject>
 
@@ -44,7 +45,7 @@ public:
 	virtual QStringList GetFontUrls() const override;
 
 private:
-	void AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip);
+	//void AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip);
 };
 
 #endif // PREFABMODEL_H

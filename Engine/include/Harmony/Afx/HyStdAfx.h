@@ -14,17 +14,8 @@
 #include "Compilers/HyCompiler.h"
 #include "Platforms/HyPlatform.h"
 
-#define TINYGLTF_NO_STB_IMAGE
-#define TINYGLTF_NO_STB_IMAGE_WRITE
-#ifdef HY_PLATFORM_GUI
-	#define TINYGLTF_NO_FS
-#endif
-#define TINYGLTF_NOEXCEPTION
-#define TINYGLTF_USE_CPP14
-#include "Utilities/tiny_gltf.h"
-
 #include "Utilities/jsonxx.h"
-#include "Assets/Files/HyFileIO.h"
+
 #include "Box2D/Box2D.h"
 
 //#define GLM_SWIZZLE
@@ -36,6 +27,7 @@
 #include "glm/gtc/quaternion.hpp"
 
 // STL includes (TODO: to be replaced with EASTL)
+#include <iostream>
 #include <string>
 #include <algorithm>
 #include <vector>

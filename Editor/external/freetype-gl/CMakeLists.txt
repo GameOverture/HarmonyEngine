@@ -159,7 +159,8 @@ set_target_properties(freetype-gl PROPERTIES FOLDER "Editor Libs")
 
 target_include_directories(freetype-gl PUBLIC
 						   "${CMAKE_CURRENT_SOURCE_DIR}/../../include"
-						   "${CMAKE_CURRENT_SOURCE_DIR}/../../../Engine/include")
+						   "${CMAKE_CURRENT_SOURCE_DIR}/../../../Engine/include"
+						   "${CMAKE_CURRENT_SOURCE_DIR}/../../../Engine/external/glad/include")
 
 target_link_libraries(freetype-gl freetype)
 

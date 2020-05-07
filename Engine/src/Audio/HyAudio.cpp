@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Audio/HyAudio.h"
+#include "Assets/Files/HyFileIO.h"
 #include "Assets/Files/HyAudioBank.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/HyAssets.h"

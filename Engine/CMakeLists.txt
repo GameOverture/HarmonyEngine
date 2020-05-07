@@ -1,6 +1,7 @@
 add_subdirectory(external/box2d)
-add_subdirectory(external/soil2)
+add_subdirectory(external/glad)
 add_subdirectory(external/glfw)
+add_subdirectory(external/soil2)
 
 set(HYENGINE_SOURCE_FILES
 	src/HyEngine.cpp
@@ -79,15 +80,13 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/HyInfoPanel.cpp
 	src/UI/HyMeter.cpp
 	src/UI/IHy9Slice.cpp
+	src/Utilities/jasonxx.cpp
 	src/Utilities/Crc32.cpp
-	src/Utilities/glad.cpp
 	src/Utilities/HyBitManip.cpp
 	src/Utilities/HyImage.cpp
 	src/Utilities/HyMath.cpp
 	src/Utilities/HyStrManip.cpp
 	src/Utilities/HyVariant.cpp
-	src/Utilities/jasonxx.cc
-	src/Utilities/tiny_gltf.cpp
 	src/Window/HyWindow.cpp
 	src/Window/HyWindowManager.cpp)
 
@@ -187,6 +186,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/HyInfoPanel.h
 	include/Harmony/UI/HyMeter.h
 	include/Harmony/UI/IHy9Slice.h
+	include/Harmony/Utilities/jsonxx.h
 	include/Harmony/Utilities/Crc32.h
 	include/Harmony/Utilities/HyBitManip.h
 	include/Harmony/Utilities/HyImage.h
@@ -194,14 +194,16 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Utilities/HyRand.h
 	include/Harmony/Utilities/HyStrManip.h
 	include/Harmony/Utilities/HyVariant.h
-	include/Harmony/Utilities/jsonxx.h
-	include/Harmony/Utilities/tiny_gltf.h
 	include/Harmony/Window/HyWindow.h
 	include/Harmony/Window/HyWindowManager.h)
 
-add_library(HyEngine STATIC ${HYENGINE_SOURCE_FILES} ${HYENGINE_HEADER_FILES})
+add_library(HyEngine STATIC ${HYENGINE_SOURCE_FILES} ${HYENGINE_HEADER_FILES} include/tinygltf/tiny_gltf.h)
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony")
+target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/include")
+target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include")
+target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include")
+target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/soil2/include")
 set_target_properties(HyEngine PROPERTIES
 	CXX_STANDARD 14
 	CXX_STANDARD_REQUIRED YES
@@ -211,7 +213,7 @@ if (MSVC)
 	target_compile_definitions(HyEngine PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 
-target_link_libraries(HyEngine PUBLIC box2d soil2 glfw)
+target_link_libraries(HyEngine PUBLIC glad box2d soil2 glfw)
 
 target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
 

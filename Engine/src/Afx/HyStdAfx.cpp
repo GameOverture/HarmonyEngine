@@ -11,6 +11,7 @@
 // This cpp module includes HyStdAfx.h to create the precompiled header
 #include "Afx/HyStdAfx.h"
 #include "Utilities/HyStrManip.h"
+#include "Assets/Files/HyFileIO.h"
 
 HarmonyInit::HarmonyInit()
 {

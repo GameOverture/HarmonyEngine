@@ -353,17 +353,17 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 	return QStringList();
 }
 
-void PrefabModel::AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip)
-{
-	switch(valueRef.Type())
-	{
-	case tinygltf::NULL_TYPE:	/*m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PropertiesDef(PROPERTIESTYPE_LineEdit, "NULL TYPE"), sToolTip, true);*/ break;
-	case tinygltf::REAL_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_double, valueRef.Get<double>(), sToolTip, true); break;
-	case tinygltf::INT_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_int, valueRef.Get<int>(), sToolTip, true); break;
-	case tinygltf::BOOL_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_bool, valueRef.Get<bool>(), sToolTip, true); break;
-	case tinygltf::STRING_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_LineEdit, QString(valueRef.Get<std::string>().c_str()), sToolTip, true); break;
-	case tinygltf::ARRAY_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_LineEdit, "<array type>", sToolTip, true); break;
-	case tinygltf::BINARY_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_LineEdit, "<binary type>", sToolTip, true); break;
-	case tinygltf::OBJECT_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_LineEdit, "<object type>", sToolTip, true); break;
-	}
-}
+//void PrefabModel::AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip)
+//{
+//	switch(valueRef.Type())
+//	{
+//	case tinygltf::NULL_TYPE:	/*m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PropertiesDef(PROPERTIESTYPE_LineEdit, "NULL TYPE"), sToolTip, true);*/ break;
+//	case tinygltf::REAL_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_double, valueRef.Get<double>(), sToolTip, true); break;
+//	case tinygltf::INT_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_int, valueRef.Get<int>(), sToolTip, true); break;
+//	case tinygltf::BOOL_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_bool, valueRef.Get<bool>(), sToolTip, true); break;
+//	case tinygltf::STRING_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_LineEdit, QString(valueRef.Get<std::string>().c_str()), sToolTip, true); break;
+//	case tinygltf::ARRAY_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_LineEdit, "<array type>", sToolTip, true); break;
+//	case tinygltf::BINARY_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_LineEdit, "<binary type>", sToolTip, true); break;
+//	case tinygltf::OBJECT_TYPE:	m_PropertiesModel.AppendProperty(sCategoryName, sPropertyName, PROPERTIESTYPE_LineEdit, "<object type>", sToolTip, true); break;
+//	}
+//}
