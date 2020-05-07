@@ -211,8 +211,6 @@ if (MSVC)
 	target_compile_definitions(HyEngine PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 
-target_compile_definitions(HyEngine PRIVATE TINYGLTF_USE_CPP14)
-
 target_link_libraries(HyEngine PUBLIC box2d soil2 glfw)
 
 target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")

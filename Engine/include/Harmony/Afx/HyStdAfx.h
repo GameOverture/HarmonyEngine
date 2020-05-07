@@ -20,6 +20,7 @@
 	#define TINYGLTF_NO_FS
 #endif
 #define TINYGLTF_NOEXCEPTION
+#define TINYGLTF_USE_CPP14
 #include "Utilities/tiny_gltf.h"
 
 #include "Utilities/jsonxx.h"
