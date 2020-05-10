@@ -12,18 +12,15 @@
 
 #define WIN32_LEAN_AND_MEAN 
 #include <Windows.h>
-#include <Psapi.h>							// Used in HyDiagnostics for memory leak detection
-#include <direct.h>							// Used to get current working directory
+#include <Psapi.h>			// Used in HyDiagnostics for memory leak detection
+#include <direct.h>			// Used to get current working directory
+
+#define NOMINMAX			// This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
 
 #define HY_MAXWINDOWS 6
+#define HY_ENDIAN_LITTLE	// All x86 and x86-64 machines are little-endian.
 
-// All x86 and x86-64 machines are little-endian.
-#define HY_ENDIAN_LITTLE
-
-// This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
-#define NOMINMAX
-
-#ifdef HY_DEBUG
+#if defined(HY_DEBUG) && defined(HY_COMPILER_MSVC)
 	#define _CRTDBG_MAP_ALLOC
 	#include <stdlib.h>
 	#include <crtdbg.h>
@@ -40,8 +37,8 @@
 #if defined(HY_DEBUG)
 	#define HyAssert(condition, message) \
 		do { \
-			if(!(condition)) \
-			{	std::stringstream ss; \
+			if(!(condition)) { \
+				std::stringstream ss; \
 				ss << "Assertion (" #condition ") failed.\n\n" << __FILE__ \
 				<< "\nLine: " << __LINE__ << "\n\n" << message << std::endl; \
 				int iRetVal = MessageBoxA(NULL, ss.str().c_str(), "Harmony Engine Assert!", MB_ICONERROR | MB_ABORTRETRYIGNORE | MB_DEFBUTTON2); \

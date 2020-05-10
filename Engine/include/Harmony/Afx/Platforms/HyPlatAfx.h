@@ -16,23 +16,20 @@
 	#define HY_PLATFORM_32BIT
 #endif
 
-#ifdef HY_PLATFORM_GUI	// Runs on Qt framework
+#if defined(HY_CONFIG_GUI)
+	#define HY_PLATFORM_GUI
 	#include "HyPlatform_Gui.h"
+#elif (defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__))
+	#define HY_PLATFORM_WINDOWS
+	#include "HyPlatform_Windows.h"
+#elif ((defined(__APPLE__) && defined(__MACH__)) || defined(__APPLE_CC__))
+	#define HY_PLATFORM_OSX
+	#include "HyPlatform_OSX.h"
+#elif defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
+	#define HY_PLATFORM_LINUX
+	#include "HyPlatform_Unix.h"
 #else
-	#if (defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__))
-		#define HY_PLATFORM_WINDOWS
-		#include "HyPlatform_Windows.h"
-	#elif ((defined(__APPLE__) && defined(__MACH__)) || defined(__APPLE_CC__))
-		#if ((defined(__APPLE__) && defined(__MACH__))
-			#define HY_PLATFORM_OSX
-			#include "HyPlatform_OSX.h"
-		#endif
-	#elif defined(__linux) || defined(__linux__) || defined(__gnu_linux__)
-		#define HY_PLATFORM_LINUX
-		#include "HyPlatform_Unix.h"
-	#else
-		#define HY_PLATFORM_UNKNOWN
-	#endif
+	#define HY_PLATFORM_UNKNOWN
 #endif
 
 #endif /* HyPlatAfx_h__ */

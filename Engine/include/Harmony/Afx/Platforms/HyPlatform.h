@@ -12,63 +12,45 @@
 
 #include "Afx/Platforms/HyPlatAfx.h"
 
+#include <glad/glad.h>
+
+ //-----------------------------------------------------------------------------------------
+ // Desktop Windowing - GLFW handles API for creating windows, contexts and surfaces, receiving input and events
+ //-----------------------------------------------------------------------------------------
 #if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
-	#include <glad/glad.h>
+	#define GLFW_INCLUDE_NONE
 	#include <GLFW/glfw3.h>
+
 	#define HY_PLATFORM_DESKTOP
 #endif
-
-//#if defined(HY_PLATFORM_32BIT)	// 32 bit environment
-//	typedef int32 intx;
-//	typedef uint32 uintx;
-//#elif defined(HY_PLATFORM_64BIT) // 64 bit environment
-//	typedef int64_t intx;
-//	typedef uint64_t uintx;
-//#else
-//	#error Unspecified cpu architecture
-//#endif
 
 //-----------------------------------------------------------------------------------------
 // Endian - Don't use these functions directly, use the #define's below 'em
 //-----------------------------------------------------------------------------------------
-HY_INLINE uint16 EndianSwap16(uint16 var)
+HY_INLINE uint16 HyInternal_EndianSwap16__(uint16 var)
 {
 	return (uint16)((((var)&0xff)<<8) | ( ((var)>>8)&0xff));
 }
 
-HY_INLINE uint32 EndianSwap32(uint32 var)
+HY_INLINE uint32 HyInternal_EndianSwap32__(uint32 var)
 {
 	return ((((var)&0xff)<<24) | ((((var)>>8)&0xff)<<16) |
 		((((var)>>16)&0xff)<<8) | ((((var)>>24)&0xff)) );
 }
 
 #if defined(HY_ENDIAN_LITTLE)
-	#define EndianToBig16(_v)          EndianSwap16(_v)
-	#define EndianToLittle16(_v)
-	#define EndianToBig32(_v)          EndianSwap32(_v)
-	#define EndianToLittle32(_v)
+	#define Hy_EndianToBig16(_v)	HyInternal_EndianSwap16__(_v)
+	#define Hy_EndianToLittle16(_v)
+	#define Hy_EndianToBig32(_v)	HyInternal_EndianSwap32__(_v)
+	#define Hy_EndianToLittle32(_v)
 #elif defined(HY_ENDIAN_BIG)
-	#define EndianToBig16(_v)
-	#define EndianToLittle16(_v)       EndianSwap16(_v)
-	#define EndianToBig32(_v)
-	#define EndianToLittle32(_v)       EndianSwap32(_v)
+	#define Hy_EndianToBig16(_v)
+	#define Hy_EndianToLittle16(_v)	HyInternal_EndianSwap16__(_v)
+	#define Hy_EndianToBig32(_v)
+	#define Hy_EndianToLittle32(_v)	HyInternal_EndianSwap32__(_v)
 #else
 	#error No Endian is set.
 #endif
-
-////-----------------------------------------------------------------------------------------
-//// Alignment
-////-----------------------------------------------------------------------------------------
-//#define sgxAlign(_v, _align)   (((tMEMSIZE)(_v)+(_align)-1 ) & \
-//	(~((_align)-1)))
-//#define sgxAlignUp(_v, _align) (sgxAlign((_v), (_align)) + (_align))
-//
-//#define sgxAlign4(_v)      sgxAlign(_v,4)
-//#define sgxAlign16(_v)     sgxAlign(_v,16)
-//#define sgxAlign32(_v)     sgxAlign(_v,32)
-//#define sgxAlign128(_v)    sgxAlign(_v,128)
-//
-//#define sgxIsAligned(_v, _align) (((tMEMSIZE)(_v)&((_align)-1)) == 0)
 
 //-----------------------------------------------------------------------------------------
 // Misc

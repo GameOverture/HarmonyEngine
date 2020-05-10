@@ -10,12 +10,28 @@
 #ifndef HyPlatform_Unix_h__
 #define HyPlatform_Unix_h__
 
-#include <unistd.h>					// Used to get current working directory
+#include <unistd.h>			// Used to get current working directory
 
-// Memory related
-#define HY_MEMPLAT //HyMemoryAPI_Windows
+#define HY_MAXWINDOWS 6
+#define HY_ENDIAN_LITTLE	// All x86 and x86-64 machines are little-endian.
 
-//#define HyGetTickCount()				((uint)::UnixInternal::UnixGetTickCount())
+#define HY_NEW new
+
+// Diagnostics assertion
+#if defined(HY_DEBUG)
+	#define HyAssert(condition, message) \
+		do { \
+			if(!(condition)) { \
+				std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
+				<< " line " << __LINE__ << ": " << message << std::endl; \
+				std::terminate(); \
+			} \
+		} while (false)
+	#define HyError(message) abort();
+#else
+	#define HyAssert(condition, message) do { } while (false)
+	#define HyError(message) do { } while (false)
+#endif
 
 
 #endif /* HyPlatform_Unix_h__ */

@@ -11,16 +11,9 @@
 #include "Diagnostics/Output/HyProfiler.h"
 
 // Read Time-Stamp Counter
-#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_GUI_WIN)
-#include <intrin.h>
-uint64_t HyReadTsc() { return __rdtsc(); }
-#else
-uint64_t HyReadTsc()
-{
-	uint32 lo, hi;
-	__asm__ __volatile__("rdtsc" : "=a" (lo), "=d" (hi));
-	return ((uint64_t)hi << 32) | lo;
-}
+#if defined(HY_PLATFORM_WINDOWS) && defined(HY_COMPILER_MSVC)
+	#include <intrin.h>
+	uint64_t HyReadTsc() { return __rdtsc(); }
 #endif
 
 HyProfiler::HyProfiler()

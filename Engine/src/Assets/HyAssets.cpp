@@ -419,13 +419,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 #if defined(HY_PLATFORM_WINDOWS) && defined(HY_COMPILER_MSVC)
 	SetThreadPriority(m_Thread.native_handle(), THREAD_MODE_BACKGROUND_BEGIN);
-#elif defined(HY_PLATFORM_GUI_WIN)
-#else // POSIX threads
-	//sched_param sch;
-	//int policy; 
-	//pthread_getschedparam(m_Thread.native_handle(), &policy, &sch);
-	//sch.sched_priority = xx; // Don't know what value here
-	//pthread_setschedparam(m_Thread.native_handle(), SCHED_FIFO, &sch);
 #endif
 
 	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir + HYASSETS_AtlasFile);
