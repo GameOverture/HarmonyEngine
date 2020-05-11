@@ -450,7 +450,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 			uint32 uiAtlasGroupId = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("atlasGrpId"));
 
 			std::string sRootAtlasFilePath = m_sDATADIR + HYASSETS_AtlasDir;
-			sprintf_s(szTmpBuffer, sizeof(szTmpBuffer), "%05d", uiAtlasGroupId);
+			sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
 			sRootAtlasFilePath += szTmpBuffer;
 			sRootAtlasFilePath += "/";
 
