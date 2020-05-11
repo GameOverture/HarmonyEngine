@@ -23,11 +23,16 @@ typedef HyOpenGL HyRendererInterop;
 #endif
 
 #if defined(HY_PLATFORM_GUI)
+	// TODO: Ideally send Harmony log output to the editor's output window
 	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
 	typedef HyConsole_Gui HyConsoleInterop;
 #elif defined(HY_PLATFORM_WINDOWS)
 	#include "Diagnostics/Console/Interop/HyConsole_Win.h"
 	typedef HyConsole_Win HyConsoleInterop;
+#elif defined(HY_PLATFORM_LINUX)
+	// TODO: Give this proper implementation
+	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
+	typedef HyConsole_Gui HyConsoleInterop;
 #endif
 
 #endif /* HyInteropAfx_h__ */
