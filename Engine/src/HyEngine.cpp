@@ -163,12 +163,6 @@ bool HyEngine::PollPlatformApi()
 	HyEngine::sm_pInstance->m_Scene.SetPause(bPause);
 }
 
-/*friend*/ HyWindow &Hy_Window(uint32 uiWindowIndex /*= 0*/)
-{
-	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Window() was invoked before engine has been initialized.");
-	return HyEngine::sm_pInstance->m_WindowManager.GetWindow(uiWindowIndex);
-}
-
 /*friend*/ HyInput &Hy_Input()
 {
 	HyAssert(HyEngine::sm_pInstance != nullptr, "Hy_Input() was invoked before engine has been initialized.");
