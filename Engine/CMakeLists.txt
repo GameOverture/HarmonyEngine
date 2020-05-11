@@ -1,7 +1,10 @@
 add_subdirectory(external/box2d)
 add_subdirectory(external/glad)
-add_subdirectory(external/glfw)
 add_subdirectory(external/soil2)
+
+if(HarmonyBuild_Emscripten EQUAL OFF)
+	add_subdirectory(external/glfw)
+endif()
 
 set(HYENGINE_SOURCE_FILES
 	src/HyEngine.cpp
@@ -202,18 +205,24 @@ target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony")
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/include")
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include")
-target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include")
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/soil2/include")
 set_target_properties(HyEngine PROPERTIES
 	CXX_STANDARD 14
 	CXX_STANDARD_REQUIRED YES
 	CXX_EXTENSIONS NO)
 
+target_link_libraries(HyEngine PUBLIC glad box2d soil2)
+
+if(HarmonyBuild_Emscripten)
+	target_compile_definitions(HyEngine PRIVATE HY_CONFIG_BROWSER)
+else()
+	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include")
+	target_link_libraries(HyEngine PUBLIC glfw)
+endif()
+
 if (MSVC)
 	target_compile_definitions(HyEngine PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
-
-target_link_libraries(HyEngine PUBLIC glad box2d soil2 glfw)
 
 target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
 
