@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "%HY_CLASS%.h"
 
+extern HyWindow &Hy_Window();
+extern HyInput &Hy_Input();
+
 %HY_CLASS%::%HY_CLASS%(HarmonyInit &initStruct) :
 	HyEngine(initStruct),
 	m_pCamera(Hy_Window().CreateCamera2d())
