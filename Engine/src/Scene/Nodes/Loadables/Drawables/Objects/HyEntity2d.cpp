@@ -37,7 +37,7 @@ HyEntity2d::HyEntity2d(HyEntity2d &&donor) :
 	m_ChildList(std::move(donor.m_ChildList)),
 	m_uiAttributes(std::move(donor.m_uiAttributes)),
 	m_eMouseInputState(std::move(donor.m_eMouseInputState)),
-	m_pPhysicsBody(std::move(m_pPhysicsBody))
+	m_pPhysicsBody(std::move(donor.m_pPhysicsBody))
 {
 }
 

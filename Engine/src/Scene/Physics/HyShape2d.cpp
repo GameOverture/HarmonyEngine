@@ -176,6 +176,10 @@ b2Shape *HyShape2d::ClonePpmShape(float fPpmInverse) const
 
 		static_cast<b2PolygonShape *>(pCloneB2Shape)->Set(vertList.data(), static_cast<b2PolygonShape *>(m_pShape)->m_count);
 		break;
+
+	default:
+		HyError("Unhandled shape type used in HyShape2d::ClonePpmShape");
+		break;
 	}
 
 	return pCloneB2Shape;
@@ -329,6 +333,10 @@ bool HyShape2d::IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &
 		case HYSHAPE_Polygon:
 			b2CollideEdgeAndPolygon(&localManifold, static_cast<const b2EdgeShape *>(m_pShape), selfTransform, static_cast<const b2PolygonShape *>(testShape.GetB2Shape()), testTransform);
 			break;
+
+		default:
+			HyError("Unhandled shape type of test shape in HyShape2d::IsColliding");
+			break;
 		}
 		break;
 
@@ -345,6 +353,10 @@ bool HyShape2d::IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &
 			break;
 		case HYSHAPE_Polygon:
 			b2CollidePolygonAndCircle(&localManifold, static_cast<const b2PolygonShape *>(testShape.GetB2Shape()), testTransform, static_cast<const b2CircleShape *>(m_pShape), selfTransform);
+			break;
+
+		default:
+			HyError("Unhandled shape type of test shape in HyShape2d::IsColliding");
 			break;
 		}
 		break;
@@ -363,7 +375,15 @@ bool HyShape2d::IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &
 		case HYSHAPE_Polygon:
 			b2CollidePolygons(&localManifold, static_cast<const b2PolygonShape *>(m_pShape), selfTransform, static_cast<const b2PolygonShape *>(testShape.GetB2Shape()), testTransform);
 			break;
+
+		default:
+			HyError("Unhandled shape type of test shape in HyShape2d::IsColliding");
+			break;
 		}
+		break;
+
+	default:
+		HyError("Unhandled shape type of self in HyShape2d::IsColliding");
 		break;
 	}
 

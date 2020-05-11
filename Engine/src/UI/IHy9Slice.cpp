@@ -171,6 +171,9 @@ bool IHy9Slice::IsShown()
 		SetVisible(false);
 		OnHidden();
 		break;
+
+	default:
+		break;
 	}
 
 	m_fElapsedTime = 0.0f;

@@ -206,6 +206,9 @@ void HyDiagnostics::DumpNodeUsage()
 		case HYTYPE_Primitive:		uiNumPrimitive2d++;		break;
 		case HYTYPE_Text:			uiNumText2d++;			break;
 		case HYTYPE_Prefab:			uiNumPrefab3d++;		break;
+
+		default:
+			break;
 		}
 	}
 

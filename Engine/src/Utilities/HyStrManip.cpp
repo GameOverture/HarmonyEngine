@@ -146,7 +146,7 @@ namespace HyStr
 		uint32 uiHash = 5381;
 		int c;
 
-		while(c = *szStr++)
+		while((c = *szStr++))
 			uiHash = ((uiHash << 5) + uiHash) + c; /* hash * 33 + c */
 
 		return uiHash;

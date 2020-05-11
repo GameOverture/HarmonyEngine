@@ -47,7 +47,7 @@ IHyInstance &IHyInstance::operator=(const IHyInstance &rhs)
 	m_hShader = rhs.m_hShader;
 	m_eRenderMode = rhs.m_eRenderMode;
 	m_hTextureHandle = rhs.m_hTextureHandle;
-	m_ShaderUniforms = m_ShaderUniforms;
+	m_ShaderUniforms = rhs.m_ShaderUniforms;
 
 	return *this;
 }

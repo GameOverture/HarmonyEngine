@@ -206,6 +206,10 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 			pDataOut = m_Quad2d[key];
 		}
 		break;
+
+	default:
+		HyError("Unhandled node type within HyAssets::AcquireNodeData");
+		break;
 	}
 }
 
@@ -332,7 +336,7 @@ void HyAssets::Shutdown()
 	//m_QueuedEntityList.clear();
 
 	for(uint32 i = 0; i < m_QueuedInstList.size(); ++i)
-		vReloadInsts.push_back(reinterpret_cast<IHyInstance2d *>(m_QueuedInstList[i]));
+		vReloadInsts.push_back(static_cast<IHyInstance2d *>(m_QueuedInstList[i]));
 
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();
