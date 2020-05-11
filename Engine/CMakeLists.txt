@@ -2,7 +2,7 @@ add_subdirectory(external/box2d)
 add_subdirectory(external/glad)
 add_subdirectory(external/soil2)
 
-if(HYBUILD_Emscripten EQUAL OFF)
+if(NOT HYBUILD_Emscripten)
 	add_subdirectory(external/glfw)
 endif()
 
