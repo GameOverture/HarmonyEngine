@@ -16,7 +16,7 @@
 #include "HyEngine.h"
 
 extern std::string Hy_DateTime();
-extern HyWindow &Hy_Window(uint32 uiWindowIndex /*= 0*/);
+extern HyWindow &Hy_Window(uint32 uiWindowIndex);
 
 HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :
 	m_InitStructRef(initStruct),
