@@ -346,7 +346,7 @@ void HyMeter::FormatDigits()
 	m_SpinText.SetVisible(m_pText->IsVisible() && m_bSpinDigits);
 }
 
-void HyMeter::OnUpdate()
+/*virtual*/ void HyMeter::OnUpdate() /*override*/
 {
 	if(m_iCurValue == m_iTargetValue || m_pText == nullptr)
 		return;

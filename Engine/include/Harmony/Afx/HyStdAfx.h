@@ -93,7 +93,7 @@ enum HyPhysicsType
 	HYPHYS_Kinematic,
 	HYPHYS_Dynamic
 };
-static_assert(HYPHYS_Static == b2_staticBody && HYPHYS_Kinematic == b2_kinematicBody && HYPHYS_Dynamic == b2_dynamicBody, "Harmony and Box2d types don't match!");
+static_assert((int)HYPHYS_Static == (int)b2_staticBody && (int)HYPHYS_Kinematic == (int)b2_kinematicBody && (int)HYPHYS_Dynamic == (int)b2_dynamicBody, "Harmony and Box2d types don't match!");
 
 enum HyFileType
 {

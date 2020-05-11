@@ -33,6 +33,10 @@ typedef HyOpenGL HyRendererInterop;
 	// TODO: Give this proper implementation
 	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
 	typedef HyConsole_Gui HyConsoleInterop;
+#elif defined(HY_PLATFORM_BROWSER)
+	// TODO: Give this proper implementation
+	#include "Diagnostics/Console/Interop/HyConsole_Gui.h"
+	typedef HyConsole_Gui HyConsoleInterop;
 #endif
 
 #endif /* HyInteropAfx_h__ */

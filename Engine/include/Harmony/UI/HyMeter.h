@@ -77,7 +77,7 @@ public:
 	virtual ~HyMeter();
 
 	virtual void Init(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent) override;
-	virtual void Init(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) ;
+	virtual void Init(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) override;
 	virtual void Init(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) override;
 
 	int32 GetValue();
@@ -110,7 +110,7 @@ private:
 	std::string FormatString(int32 iValue);
 	void FormatDigits();
 
-	void OnUpdate();
+	virtual void OnUpdate() override;
 };
 
 #endif /* HyMeter_h__ */
