@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-
-# set the project name
 project(Harmony VERSION 1.0)
-
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+set(HYBUILD_Emscripten OFF)
 
 add_subdirectory(Engine)
 add_subdirectory(Editor)

@@ -2,7 +2,7 @@ add_subdirectory(external/box2d)
 add_subdirectory(external/glad)
 add_subdirectory(external/soil2)
 
-if(HarmonyBuild_Emscripten EQUAL OFF)
+if(HYBUILD_Emscripten EQUAL OFF)
 	add_subdirectory(external/glfw)
 endif()
 
@@ -213,8 +213,8 @@ set_target_properties(HyEngine PROPERTIES
 
 target_link_libraries(HyEngine PUBLIC glad box2d soil2)
 
-if(HarmonyBuild_Emscripten)
-	target_compile_definitions(HyEngine PRIVATE HY_CONFIG_BROWSER)
+if(HYBUILD_Emscripten)
+	target_compile_definitions(HyEngine PRIVATE HY_CONFIG_EMSCRIPTEN)
 else()
 	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include")
 	target_link_libraries(HyEngine PUBLIC glfw)

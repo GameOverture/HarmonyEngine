@@ -16,7 +16,7 @@
 	#define HY_PLATFORM_32BIT
 #endif
 
-#if defined(HY_CONFIG_BROWSER)
+#if defined(HY_CONFIG_EMSCRIPTEN)
 	#define HY_CONFIG_SINGLETHREAD
 	#define HY_PLATFORM_BROWSER
 	#include "HyPlatform_Unix.h"

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-
 project(%HY_CLASS% VERSION 1.0)
-
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+option(HYBUILD_Emscripten "Build game for web browsers" OFF)
 
 add_subdirectory("%HY_HARMONYDIR%Engine" "Engine")
 
@@ -20,9 +20,18 @@ set_target_properties(%HY_CLASS% PROPERTIES
 	CXX_EXTENSIONS NO)
 
 target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/include")
-target_link_libraries(%HY_CLASS% PUBLIC HyEngine)
+target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/box2d/include")
+target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/glad/include")
+target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/soil2/include")
 
-target_precompile_headers(%HY_CLASS% PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/%HY_SRCDIR%/pch.h")
+if(HYBUILD_Emscripten)
+	target_compile_definitions(%HY_CLASS% PRIVATE HY_CONFIG_EMSCRIPTEN)
+else()
+	target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/glfw/include")
+	target_precompile_headers(%HY_CLASS% PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/%HY_SRCDIR%/pch.h")
+endif()
+
+target_link_libraries(%HY_CLASS% PUBLIC HyEngine)
 
 if (MSVC)
 	set_property(TARGET %HY_CLASS% PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
