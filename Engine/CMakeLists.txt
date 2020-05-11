@@ -218,13 +218,13 @@ if(HarmonyBuild_Emscripten)
 else()
 	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include")
 	target_link_libraries(HyEngine PUBLIC glfw)
+	target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
 endif()
 
 if (MSVC)
 	target_compile_definitions(HyEngine PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 
-target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
 
 # Sets up filters for VS
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${HYENGINE_SOURCE_FILES})
