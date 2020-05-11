@@ -16,7 +16,11 @@
 	#define HY_PLATFORM_32BIT
 #endif
 
-#if defined(HY_CONFIG_GUI)
+#if defined(HY_CONFIG_BROWSER)
+	#define HY_CONFIG_SINGLETHREAD
+	#define HY_PLATFORM_BROWSER
+	#include "HyPlatform_Unix.h"
+#elif defined(HY_CONFIG_GUI)
 	#define HY_PLATFORM_GUI
 	#include "HyPlatform_Gui.h"
 #elif (defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__))
