@@ -13,6 +13,10 @@
 
 #include <chrono>
 
+#ifdef HY_CONFIG_SINGLETHREAD
+std::vector<IHyThreadClass *>	IHyThreadClass::sm_SingleThreadUpdater;
+#endif
+
 IHyThreadClass::IHyThreadClass(HyThreadPriority ePriority /*= HYTHREAD_Normal*/, uint32 uiUpdateThrottleMs /*= 0*/) :
 	m_ePriority(ePriority),
 	m_eThreadState(THREADSTATE_Inactive),
@@ -38,6 +42,12 @@ bool IHyThreadClass::ThreadStart()
 	}
 
 	ThreadJoin();
+
+#ifdef HY_CONFIG_SINGLETHREAD
+	OnThreadInit();
+	IHyThreadClass::sm_SingleThreadUpdater.push_back(this);
+	m_eThreadState = THREADSTATE_Running;
+#else
 	m_Thread = std::thread(&IHyThreadClass::ThreadFunc, this);
 
 #ifndef HY_PLATFORM_GUI
@@ -65,25 +75,30 @@ bool IHyThreadClass::ThreadStart()
 	}
 #endif
 
+#endif
 	return true;
 }
 
 void IHyThreadClass::ThreadWait()
 {
+#ifndef HY_CONFIG_SINGLETHREAD
 	std::lock_guard<std::mutex> lock(stateMutex);
 	m_bWaitEnabled = true;
 	m_bWaitComplete = false;
 	stateEvent.notify_one();
+#endif
 }
 
 void IHyThreadClass::ThreadContinue(bool bOnlyOneUpdate)
 {
+#ifndef HY_CONFIG_SINGLETHREAD
 	{
 		std::lock_guard<std::mutex> lock(stateMutex);
 		m_bWaitComplete = true;
 		m_bAutoResetWaiting = bOnlyOneUpdate;
 	}
 	stateEvent.notify_one();
+#endif
 }
 
 void IHyThreadClass::ThreadStop()
@@ -107,10 +122,13 @@ bool IHyThreadClass::IsThreadFinished()
 
 void IHyThreadClass::ThreadJoin()
 {
+#ifndef HY_CONFIG_SINGLETHREAD
 	if(m_Thread.joinable())
 		m_Thread.join();
+#endif
 }
 
+#ifndef HY_CONFIG_SINGLETHREAD
 /*static*/ void IHyThreadClass::ThreadFunc(IHyThreadClass *pThis)
 {
 	pThis->OnThreadInit();
@@ -144,3 +162,4 @@ void IHyThreadClass::ThreadJoin()
 	pThis->OnThreadShutdown();
 	pThis->m_eThreadState = THREADSTATE_HasExited;
 }
+#endif

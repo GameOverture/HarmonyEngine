@@ -10,6 +10,10 @@
 #ifndef HyStdAfx_h__
 #define HyStdAfx_h__
 
+// TODO: test remove this
+#define HY_CONFIG_SINGLETHREAD
+
+
 // Order of these #includes matter!
 #include "Compilers/HyCompiler.h"
 #include "Platforms/HyPlatform.h"

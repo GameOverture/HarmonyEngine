@@ -14,8 +14,29 @@
 
 class IHyThreadClass
 {
+#ifdef HY_CONFIG_SINGLETHREAD
+public:
+	static std::vector<IHyThreadClass *>	sm_SingleThreadUpdater;
+	static void SingleThreadUpdate() {
+		for(auto fauxThread : IHyThreadClass::sm_SingleThreadUpdater)
+			fauxThread->OnThreadUpdate();
+	}
+protected:
+	struct HyNullMutex {
+		void lock() { }
+		void unlock() { }
+		bool try_lock() { return true; }
+	};
+	HyNullMutex					m_Mutex;
+#else
 protected:
 	std::thread					m_Thread;
+	std::mutex					m_Mutex;
+
+private:
+	std::mutex					stateMutex;
+	std::condition_variable		stateEvent;
+#endif
 
 private:
 	HyThreadPriority			m_ePriority;
@@ -32,8 +53,6 @@ private:
 	bool						m_bWaitEnabled;
 	bool						m_bWaitComplete;
 	bool						m_bAutoResetWaiting;
-	std::mutex					stateMutex;
-	std::condition_variable		stateEvent;
 
 public:
 	IHyThreadClass(HyThreadPriority ePriority = HYTHREAD_Normal, uint32 uiUpdateThrottleMs = 0);
@@ -52,8 +71,10 @@ protected:
 	virtual void OnThreadUpdate() = 0;
 	virtual void OnThreadShutdown() = 0;
 
+#ifndef HY_CONFIG_SINGLETHREAD
 private:
 	static void ThreadFunc(IHyThreadClass *pThis);
+#endif
 };
 
 #endif /* IHyThreadClass_h__ */

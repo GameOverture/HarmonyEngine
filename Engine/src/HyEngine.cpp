@@ -92,6 +92,10 @@ bool HyEngine::Update()
 
 	//HyThrottleUpdate
 	{
+#ifdef HY_CONFIG_SINGLETHREAD
+		IHyThreadClass::SingleThreadUpdate();
+#endif
+
 		m_Scene.UpdateNodes();
 		m_Scene.UpdatePhysics();
 
