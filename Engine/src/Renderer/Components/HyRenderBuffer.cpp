@@ -95,7 +95,7 @@ void HyRenderBuffer::AppendShaderUniforms(const HyShaderUniforms &shaderUniformR
 	{
 		const char *szUniformName = shaderUniformRef.GetName(i);
 		uint32 uiStrLen = static_cast<uint32>(strlen(szUniformName) + 1);
-		strncpy_s(reinterpret_cast<char *>(m_pCurWritePosition), uiStrLen, szUniformName, HY_SHADER_UNIFORM_NAME_LENGTH);
+		strncpy(reinterpret_cast<char *>(m_pCurWritePosition), szUniformName, HY_SHADER_UNIFORM_NAME_LENGTH);
 		m_pCurWritePosition += uiStrLen;
 
 		HyShaderVariable eVariableType = shaderUniformRef.GetVariableType(i);
