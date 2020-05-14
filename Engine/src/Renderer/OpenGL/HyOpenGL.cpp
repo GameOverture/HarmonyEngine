@@ -57,6 +57,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		{
 			HyError("glad failed to initalize");
 		}
+		HyLog("glad initalized");
 		//HyLog("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
