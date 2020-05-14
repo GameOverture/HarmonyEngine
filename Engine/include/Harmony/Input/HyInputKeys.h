@@ -17,7 +17,7 @@
 
 enum HyBtnPressState
 {
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	HYBTN_Release	= GLFW_RELEASE,
 	HYBTN_Press		= GLFW_PRESS,
 	HYBTN_Repeat	= GLFW_REPEAT
@@ -30,7 +30,7 @@ enum HyBtnPressState
 
 enum HyKeyboardBtn
 {
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	HYKEY_Unassigned		= -2,
 	HYKEY_Unknown			= GLFW_KEY_UNKNOWN,
 
@@ -293,7 +293,7 @@ enum HyKeyboardBtn
 
 enum HyMouseBtn
 {
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	HYMOUSE_Btn1			= GLFW_MOUSE_BUTTON_1,
 	HYMOUSE_Btn2			= GLFW_MOUSE_BUTTON_2,
 	HYMOUSE_Btn3			= GLFW_MOUSE_BUTTON_3,
@@ -332,7 +332,7 @@ enum HyMouseBtn
 
 enum HyGamePadBtn
 {
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	HYPAD_A					= GLFW_GAMEPAD_BUTTON_A,
 	HYPAD_B					= GLFW_GAMEPAD_BUTTON_B,
 	HYPAD_X					= GLFW_GAMEPAD_BUTTON_X,
@@ -379,7 +379,7 @@ enum HyGamePadBtn
 
 enum HyJoystick
 {
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	HYJOYSTICK_0			= GLFW_JOYSTICK_1,
 	HYJOYSTICK_1			= GLFW_JOYSTICK_2,
 	HYJOYSTICK_2			= GLFW_JOYSTICK_3,

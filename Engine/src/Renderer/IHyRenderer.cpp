@@ -261,7 +261,7 @@ void IHyRenderer::SetCurrentWindow(uint32 uiIndex)
 {
 	m_pCurWindow = m_WindowListRef[uiIndex];
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	glfwMakeContextCurrent(m_pCurWindow->GetHandle());
 #endif
 }

@@ -93,7 +93,7 @@ public:
 private:
 	void Update();
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	friend void glfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);
 	friend void glfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY);
 	friend void glfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY);

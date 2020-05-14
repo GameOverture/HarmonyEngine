@@ -16,7 +16,7 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 typedef HyOpenGL HyRendererInterop;
 
-#if defined(HY_PLATFORM_DESKTOP)
+#if defined(HY_USE_GLFW)
 	typedef GLFWwindow *HyWindowHandle;
 #else
 	typedef void *HyWindowHandle;

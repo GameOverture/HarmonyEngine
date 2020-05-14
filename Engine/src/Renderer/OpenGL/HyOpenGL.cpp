@@ -32,14 +32,26 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	{
 		SetCurrentWindow(i);
 
-#if defined(HY_PLATFORM_DESKTOP)
+#if defined(HY_USE_GLFW)
 		// Load all OpenGL functions using the glfw loader function
 		// If you use SDL you can use: https://wiki.libsdl.org/SDL_GL_GetProcAddress
 		if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
 			HyError("gladLoadGLLoader failed to initialize OpenGL context with GLFW");
 		}
 #endif
-#ifndef HY_PLATFORM_BROWSER
+
+#ifdef HY_PLATFORM_BROWSER
+		//glewExperimental = GL_TRUE;	// This is required for GLFW to work
+		//GLenum err = glewInit();
+		//if(err != GLEW_OK) {
+		//	HyError("glewInit() failed: " << err);
+		//}
+		//else {
+		//	// Flush the OpenGL error state, as glew is known to bork it
+		//	while(GL_NO_ERROR != glGetError());
+		//}
+		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
+#else
 		if(!gladLoadGL()) {
 			HyError("glad failed to initalize");
 		}
@@ -244,7 +256,7 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::FinishRender()
 {
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	glfwSwapInterval(0);
 	// This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
 	glfwSwapBuffers(m_pCurWindow->GetHandle());

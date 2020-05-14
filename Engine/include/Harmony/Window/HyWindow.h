@@ -117,7 +117,7 @@ public:
 
 	HyWindowHandle						GetHandle();
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	// Returns the monitor this window is currently associated with.
 	// (Determined by the monitor closest to window's center)
 	GLFWmonitor *					GetGlfwMonitor();

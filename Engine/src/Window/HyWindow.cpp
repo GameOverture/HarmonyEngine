@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Window/HyWindow.h"
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	void glfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
 	{
 		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
@@ -40,7 +40,7 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShow
 	m_Info = windowInfoRef;
 	m_vFramebufferSize = m_Info.vSize;
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
@@ -102,7 +102,7 @@ HyWindow::~HyWindow(void)
 	while(m_Cams3dList.empty() == false)
 		RemoveCamera(m_Cams3dList.back());
 
-//#ifdef HY_PLATFORM_DESKTOP
+//#ifdef HY_USE_GLFW
 //	glfwDestroyWindow(m_hData);
 //#endif
 }
@@ -121,7 +121,7 @@ void HyWindow::SetTitle(const std::string &sTitle)
 {
 	m_Info.sName = sTitle;
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	glfwSetWindowTitle(m_hData, m_Info.sName.c_str());
 #endif
 }
@@ -155,7 +155,7 @@ void HyWindow::SetWindowSize(glm::ivec2 vResolutionHint)
 {
 	m_Info.vSize = vResolutionHint;
 	
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	glfwSetWindowSize(m_hData, m_Info.vSize.x, m_Info.vSize.y);
 #elif defined(HY_PLATFORM_GUI)
 	m_vFramebufferSize = m_Info.vSize;
@@ -176,7 +176,7 @@ void HyWindow::SetLocation(glm::ivec2 ptLocation)
 {
 	m_Info.ptLocation = ptLocation;
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
 #endif
 }
@@ -310,7 +310,7 @@ HyWindowHandle HyWindow::GetHandle()
 	return m_hData;
 }
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 GLFWmonitor *HyWindow::GetGlfwMonitor()
 {
 	GLFWmonitor *pClosestMonitor = nullptr;

@@ -13,6 +13,9 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
+#include <GL/glfw.h>
+#define HY_USE_GLFW
+
 #define HY_MAXWINDOWS 1
 #define HY_ENDIAN_LITTLE
 

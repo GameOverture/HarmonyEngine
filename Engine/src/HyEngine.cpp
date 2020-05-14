@@ -55,7 +55,7 @@ HyEngine::~HyEngine()
 		m_Renderer.ProcessMsgs();
 	}
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	glfwTerminate(); // TODO: this is leaking 304 bytes of memory on my machine
 #endif
 
@@ -131,7 +131,7 @@ bool HyEngine::Update()
 
 bool HyEngine::PollPlatformApi()
 {
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
 	{
 		if(glfwWindowShouldClose(Hy_Window(i).GetHandle()))

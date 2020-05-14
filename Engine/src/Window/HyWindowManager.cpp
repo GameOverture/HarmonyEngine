@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Window/HyWindowManager.h"
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 void glfw_ErrorCallback(int iError, const char *szDescription)
 {
 	HyLogError("GLFW Error " << iError << ": " << szDescription);
@@ -19,7 +19,7 @@ void glfw_ErrorCallback(int iError, const char *szDescription)
 
 HyWindowManager::HyWindowManager(uint32 uiNumWindows, bool bShowCursor, const HyWindowInfo windowInfos[HY_MAXWINDOWS])
 {
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	// Setup error callback before glfwInit to catch anything that might go wrong with glfwInit
 	glfwSetErrorCallback(glfw_ErrorCallback);
 

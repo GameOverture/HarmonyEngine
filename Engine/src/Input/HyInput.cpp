@@ -16,7 +16,7 @@
 
 extern HyInput &Hy_Input();
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	void glfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods)
 	{
 		HyInput &inputRef = Hy_Input();
@@ -112,7 +112,7 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	HyAssert(m_WindowListRef.empty() == false, "HyInput::HyInput has a window list that is empty");
 	m_pMouseWindow = m_WindowListRef[0];
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		glfwSetMouseButtonCallback(m_WindowListRef[i]->GetHandle(), glfw_MouseButtonCallback);
@@ -269,7 +269,7 @@ void HyInput::Update()
 		m_pInputMaps[i].Update();
 }
 
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
 {
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)

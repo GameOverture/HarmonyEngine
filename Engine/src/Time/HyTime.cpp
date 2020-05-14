@@ -68,7 +68,7 @@ double HyTime::GetTotalElapsedTime() const
 
 void HyTime::SetCurDeltaTime()
 {
-#ifdef HY_PLATFORM_DESKTOP
+#ifdef HY_USE_GLFW
 	double dCurTime = glfwGetTime();
 
 	m_dCurDeltaTime = dCurTime - m_dPrevTime;
