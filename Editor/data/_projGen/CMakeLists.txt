@@ -25,7 +25,7 @@ target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/gla
 target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/soil2/include")
 
 if(HYBUILD_Emscripten)
-	target_compile_definitions(%HY_CLASS% PRIVATE HY_CONFIG_EMSCRIPTEN)
+	set_target_properties(%HY_CLASS% PROPERTIES LINK_FLAGS "-o NewGame.html --preload-file ../data")
 else()
 	target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/glfw/include")
 	target_precompile_headers(%HY_CLASS% PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/%HY_SRCDIR%/pch.h")

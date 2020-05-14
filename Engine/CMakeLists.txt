@@ -213,9 +213,7 @@ set_target_properties(HyEngine PROPERTIES
 
 target_link_libraries(HyEngine PUBLIC glad box2d soil2)
 
-if(HYBUILD_Emscripten)
-	target_compile_definitions(HyEngine PRIVATE HY_CONFIG_EMSCRIPTEN)
-else()
+if(NOT HYBUILD_Emscripten)
 	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include")
 	target_link_libraries(HyEngine PUBLIC glfw)
 	target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
