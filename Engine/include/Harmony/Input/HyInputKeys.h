@@ -332,7 +332,7 @@ enum HyMouseBtn
 
 enum HyGamePadBtn
 {
-#ifdef HY_USE_GLFW
+#if defined(HY_USE_GLFW) && !defined(HY_PLATFORM_BROWSER)
 	HYPAD_A					= GLFW_GAMEPAD_BUTTON_A,
 	HYPAD_B					= GLFW_GAMEPAD_BUTTON_B,
 	HYPAD_X					= GLFW_GAMEPAD_BUTTON_X,
