@@ -11,6 +11,7 @@
 #define HyPlatform_Browser_h__
 
 #include <emscripten.h>
+#include <emscripten/html5.h>
 
 #define HY_MAXWINDOWS 1
 #define HY_ENDIAN_LITTLE
