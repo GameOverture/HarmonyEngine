@@ -32,7 +32,6 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	{
 		SetCurrentWindow(i);
 
-
 #if defined(HY_PLATFORM_DESKTOP)
 		// Load all OpenGL functions using the glfw loader function
 		// If you use SDL you can use: https://wiki.libsdl.org/SDL_GL_GetProcAddress
@@ -40,36 +39,18 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 			HyError("gladLoadGLLoader failed to initialize OpenGL context with GLFW");
 		}
 #endif
-
-
-		//glewExperimental = GL_TRUE;	// This is required for GLFW to work
-		//GLenum err = glewInit();
-		//if(err != GLEW_OK) {
-		//	HyError("glewInit() failed: " << err);
-		//}
-		//else {
-		//	// Flush the OpenGL error state, as glew is known to bork it
-		//	while(GL_NO_ERROR != glGetError());
-		//}
-		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
-		
-		if(!gladLoadGL())
-		{
+#ifndef HY_PLATFORM_BROWSER
+		if(!gladLoadGL()) {
 			HyError("glad failed to initalize");
 		}
 		HyLog("glad initalized");
-		//HyLog("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
+#endif
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	}
 
 	if(m_WindowListRef.empty() == false)
-	{
 		SetCurrentWindow(0);
-		//if(glewIsSupported("GL_VERSION_3_1") == false) {
-		//	HyError("At least OpenGL 3.1 must be supported");
-		//}
-	}
 	else
 		HyLog("No windows created to render to");
 

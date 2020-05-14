@@ -36,4 +36,10 @@
 	#define HY_PLATFORM_UNKNOWN
 #endif
 
+#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
+	#define GLFW_INCLUDE_NONE
+	#include <GLFW/glfw3.h>
+	#define HY_PLATFORM_DESKTOP
+#endif
+
 #endif /* HyPlatAfx_h__ */

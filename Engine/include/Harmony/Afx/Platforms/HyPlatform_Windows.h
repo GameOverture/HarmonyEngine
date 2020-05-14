@@ -15,6 +15,8 @@
 #include <Psapi.h>			// Used in HyDiagnostics for memory leak detection
 #include <direct.h>			// Used to get current working directory
 
+#include <glad/glad.h>
+
 #define NOMINMAX			// This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
 
 #define HY_MAXWINDOWS 6

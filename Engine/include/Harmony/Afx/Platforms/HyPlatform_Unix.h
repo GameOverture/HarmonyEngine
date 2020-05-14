@@ -11,6 +11,7 @@
 #define HyPlatform_Unix_h__
 
 #include <unistd.h>			// Used to get current working directory
+#include <glad/glad.h>
 
 #define HY_MAXWINDOWS 6
 #define HY_ENDIAN_LITTLE	// All x86 and x86-64 machines are little-endian.

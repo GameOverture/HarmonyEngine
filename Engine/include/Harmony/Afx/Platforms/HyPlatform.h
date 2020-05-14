@@ -12,18 +12,6 @@
 
 #include "Afx/Platforms/HyPlatAfx.h"
 
-#include <glad/glad.h>
-
- //-----------------------------------------------------------------------------------------
- // Desktop Windowing - GLFW handles API for creating windows, contexts and surfaces, receiving input and events
- //-----------------------------------------------------------------------------------------
-#if defined(HY_PLATFORM_WINDOWS) || defined(HY_PLATFORM_OSX) || defined(HY_PLATFORM_LINUX)
-	#define GLFW_INCLUDE_NONE
-	#include <GLFW/glfw3.h>
-
-	#define HY_PLATFORM_DESKTOP
-#endif
-
 //-----------------------------------------------------------------------------------------
 // Endian - Don't use these functions directly, use the #define's below 'em
 //-----------------------------------------------------------------------------------------
