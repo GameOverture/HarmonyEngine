@@ -36,7 +36,8 @@
 
 /*static*/ float HyTween::QuadInOut(float fRatio)
 {
-	return fRatio <= 0.5f ? fRatio * fRatio * 2.0f : 1.0f - (--fRatio) * fRatio * 2.0f;
+	return fRatio < 0.5 ? 2.0f * fRatio * fRatio : 1.0f - pow(-2.0f * fRatio + 2.0f, 2.0f) / 2.0f;
+	//return fRatio <= 0.5f ? fRatio * fRatio * 2.0f : 1.0f - (--fRatio) * fRatio * 2.0f;
 }
 
 /*static*/ float HyTween::CubeIn(float fRatio)
@@ -46,12 +47,14 @@
 
 /*static*/ float HyTween::CubeOut(float fRatio)
 {
-	return 1.0f + (--fRatio) * fRatio * fRatio;
+	return 1.0f - pow(1.0f - fRatio, 3.0f);
+	//return 1.0f + (--fRatio) * fRatio * fRatio;
 }
 
 /*static*/ float HyTween::CubeInOut(float fRatio)
 {
-	return fRatio <= 0.5f ? fRatio * fRatio * fRatio * 4.0f : 1.0f + (--fRatio) * fRatio * fRatio * 4.0f;
+	return fRatio < 0.5f ? 4.0f * fRatio * fRatio * fRatio : 1.0f - pow(-2.0f * fRatio + 2.0f, 3.0f) / 2.0f;
+	//return fRatio <= 0.5f ? fRatio * fRatio * fRatio * 4.0f : 1.0f + (--fRatio) * fRatio * fRatio * 4.0f;
 }
 
 /*static*/ float HyTween::QuartIn(float fRatio)
@@ -61,12 +64,14 @@
 
 /*static*/ float HyTween::QuartOut(float fRatio)
 {
-	return 1.0f - (--fRatio) * fRatio * fRatio * fRatio;
+	return 1.0f - pow(1.0f - fRatio, 4.0f);
+	//return 1.0f - (--fRatio) * fRatio * fRatio * fRatio;
 }
 
 /*static*/ float HyTween::QuartInOut(float fRatio)
 {
-	return fRatio <= 0.5f ? fRatio * fRatio * fRatio * fRatio * 8.0f : (1.0f - (fRatio = fRatio * 2.0f - 2.0f) * fRatio * fRatio * fRatio) / 2.0f + 0.5f;
+	return fRatio < 0.5f ? 8.0f * fRatio * fRatio * fRatio * fRatio : 1.0f - pow(-2.0f * fRatio + 2.0f, 4.0f) / 2.0f;
+	//return fRatio <= 0.5f ? fRatio * fRatio * fRatio * fRatio * 8.0f : (1.0f - (fRatio = fRatio * 2.0f - 2.0f) * fRatio * fRatio * fRatio) / 2.0f + 0.5f;
 }
 
 /*static*/ float HyTween::QuintIn(float fRatio)
@@ -76,12 +81,14 @@
 
 /*static*/ float HyTween::QuintOut(float fRatio)
 {
-	return (fRatio = fRatio - 1.0f) * fRatio * fRatio * fRatio * fRatio + 1.0f;
+	return 1.0f - pow(1.0f - fRatio, 5.0f);
+	//return (fRatio = fRatio - 1.0f) * fRatio * fRatio * fRatio * fRatio + 1.0f;
 }
 
 /*static*/ float HyTween::QuintInOut(float fRatio)
 {
-	return ((fRatio *= 2.0f) < 1.0f) ? (fRatio * fRatio * fRatio * fRatio * fRatio) / 2.0f : ((fRatio -= 2.0f) * fRatio * fRatio * fRatio * fRatio + 2.0f) / 2.0f;
+	return fRatio < 0.5f ? 16.0f * fRatio * fRatio * fRatio * fRatio * fRatio : 1.0f - pow(-2.0f * fRatio + 2.0f, 5.0f) / 2.0f;
+	//return ((fRatio *= 2.0f) < 1.0f) ? (fRatio * fRatio * fRatio * fRatio * fRatio) / 2.0f : ((fRatio -= 2.0f) * fRatio * fRatio * fRatio * fRatio + 2.0f) / 2.0f;
 }
 
 /*static*/ float HyTween::SineIn(float fRatio)
@@ -170,7 +177,8 @@
 
 /*static*/ float HyTween::BackOut(float fRatio)
 {
-	return 1.0f - (--fRatio) * (fRatio)* (-2.70158f * fRatio - 1.70158f);
+	return 1.0f + 2.70158f * pow(fRatio - 1.0f, 3.0f) + 1.70158f * pow(fRatio - 1.0f, 2.0f);
+	//return 1.0f - (--fRatio) * (fRatio)* (-2.70158f * fRatio - 1.70158f);
 }
 
 /*static*/ float HyTween::BackInOut(float fRatio)
