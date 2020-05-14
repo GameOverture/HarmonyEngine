@@ -73,14 +73,25 @@ HyRendererInterop &HyEngine::GetRenderer()
 	return m_Renderer;
 }
 
+#ifdef HY_PLATFORM_BROWSER
+EM_BOOL FrameIter(double time, void *pUserData)
+{
+	return reinterpret_cast<HyEngine *>(pUserData)->Update();
+}
+#endif
+
 int32 HyEngine::RunGame()
 {
 	m_Diagnostics.BootMessage();
 	m_Time.ResetDelta();
 
+#ifndef HY_PLATFORM_BROWSER
 	HyLogTitle("Starting Update Loop");
 	while(Update())
 	{ }
+#else
+	emscripten_request_animation_frame_loop(FrameIter, this);
+#endif
 
 	return 0;
 }
