@@ -69,7 +69,7 @@ protected:
 	// Derived game class overrides
 	virtual bool OnUpdate() { return true; }
 
-#ifdef HY_PLATFORM_GUI
+#if defined(HY_PLATFORM_GUI) || defined(HY_PLATFORM_BROWSER)
 public:
 #else
 private:
