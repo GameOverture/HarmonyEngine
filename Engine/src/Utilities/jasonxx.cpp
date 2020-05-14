@@ -26,8 +26,9 @@
 #include <cassert>
 void jsonxx::assertion( const char *file, int line, const char *expression, bool result ) {
 	if( !result ) {
-		fprintf( stderr, "[JSONXX] expression '%s' failed at %s:%d -> ", expression, file, line );
-		assert( 0 );
+		HyError("[JSONXX] expression '" << expression << "' failed at " << file << ":" << line);
+		//fprintf( stderr, "[JSONXX] expression '%s' failed at %s:%d -> ", expression, file, line );
+		//assert( 0 );
 	}
 }
 #if defined(JSONXX_REENABLE_NDEBUG)
