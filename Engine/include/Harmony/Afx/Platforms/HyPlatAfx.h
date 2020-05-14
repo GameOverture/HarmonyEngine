@@ -22,7 +22,7 @@
 #elif defined(__EMSCRIPTEN__)
 	#define HY_CONFIG_SINGLETHREAD
 	#define HY_PLATFORM_BROWSER
-	#include "HyPlatform_Unix.h"
+	#include "HyPlatform_Browser.h"
 #elif (defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__))
 	#define HY_PLATFORM_WINDOWS
 	#include "HyPlatform_Windows.h"

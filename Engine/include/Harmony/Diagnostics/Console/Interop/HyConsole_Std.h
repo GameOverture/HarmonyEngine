@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyConsole_Gui.h
+*	HyConsole_Std.h
 *
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
@@ -12,11 +12,11 @@
 
 #include "Diagnostics/Console/HyConsole.h"
 
-class HyConsole_Gui : public HyConsole
+class HyConsole_Std : public HyConsole
 {
 public:
-	HyConsole_Gui(bool bCreateConsole, HyWindowInfo &consoleInfo);
-	virtual ~HyConsole_Gui();
+	HyConsole_Std(bool bCreateConsole, HyWindowInfo &consoleInfo);
+	virtual ~HyConsole_Std();
 
 	virtual void Log(std::ostream &os, const char *szMsg, LogType eType);
 };

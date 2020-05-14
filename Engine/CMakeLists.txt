@@ -103,6 +103,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Afx/Compilers/HyCompiler_MWerks.h
 	include/Harmony/Afx/Platforms/HyPlatAfx.h
 	include/Harmony/Afx/Platforms/HyPlatform.h
+	include/Harmony/Afx/Platforms/HyPlatform_Browser.h
 	include/Harmony/Afx/Platforms/HyPlatform_Gui.h
 	include/Harmony/Afx/Platforms/HyPlatform_OSX.h
 	include/Harmony/Afx/Platforms/HyPlatform_Unix.h
