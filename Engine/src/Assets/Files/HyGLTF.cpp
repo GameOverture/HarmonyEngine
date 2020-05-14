@@ -101,97 +101,97 @@ void HyGLTF::TraverseNode(const tinygltf::Node &nodeRef, glm::mat4 transformMtx)
 
 void HyGLTF::ProcessNode(const tinygltf::Node &nodeRef, glm::mat4 &transformMtxRef)
 {
-	if(nodeRef.matrix.empty() == false)
-	{
-		glm::mat4 mtx;
-		memcpy(glm::value_ptr(mtx), &nodeRef.matrix[0], sizeof(glm::mat4));
+	//if(nodeRef.matrix.empty() == false)
+	//{
+	//	glm::mat4 mtx;
+	//	memcpy(glm::value_ptr(mtx), &nodeRef.matrix[0], sizeof(glm::mat4));
 
-		transformMtxRef *= mtx;
-	}
-	else if(!nodeRef.translation.empty() || !nodeRef.rotation.empty() || !nodeRef.scale.empty())
-	{
-		glm::vec3 vTranslation(0.0f);
-		glm::quat quaternion(0.0f, 0.0f, 0.0f, 0.0f);
-		glm::vec3 vScale(1.0f);
+	//	transformMtxRef *= mtx;
+	//}
+	//else if(!nodeRef.translation.empty() || !nodeRef.rotation.empty() || !nodeRef.scale.empty())
+	//{
+	//	glm::vec3 vTranslation(0.0f);
+	//	glm::quat quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+	//	glm::vec3 vScale(1.0f);
 
-		if(nodeRef.translation.size() != 0)
-			memcpy(glm::value_ptr(vTranslation), &nodeRef.translation[0], sizeof(glm::vec3));
-		if(nodeRef.rotation.size() != 0)
-			memcpy(glm::value_ptr(quaternion), &nodeRef.rotation[0], sizeof(glm::quat));
-		if(nodeRef.scale.size() != 0)
-			memcpy(glm::value_ptr(vScale), &nodeRef.scale[0], sizeof(glm::vec3));
+	//	if(nodeRef.translation.size() != 0)
+	//		memcpy(glm::value_ptr(vTranslation), &nodeRef.translation[0], sizeof(glm::vec3));
+	//	if(nodeRef.rotation.size() != 0)
+	//		memcpy(glm::value_ptr(quaternion), &nodeRef.rotation[0], sizeof(glm::quat));
+	//	if(nodeRef.scale.size() != 0)
+	//		memcpy(glm::value_ptr(vScale), &nodeRef.scale[0], sizeof(glm::vec3));
 
-		glm::mat4 transformMtx;
-		glm::translate(transformMtx, vTranslation);
+	//	glm::mat4 transformMtx;
+	//	glm::translate(transformMtx, vTranslation);
 
-		glm::mat4 rotationMtx;
-		rotationMtx = glm::toMat4(quaternion);
+	//	glm::mat4 rotationMtx;
+	//	rotationMtx = glm::toMat4(quaternion);
 
-		glm::mat4 scaleMtx;
-		glm::scale(scaleMtx, vTranslation);
+	//	glm::mat4 scaleMtx;
+	//	glm::scale(scaleMtx, vTranslation);
 
-		transformMtxRef *= (transformMtx * rotationMtx * scaleMtx);
-	}
+	//	transformMtxRef *= (transformMtx * rotationMtx * scaleMtx);
+	//}
 
-	if(nodeRef.mesh >= 0)
-	{
-		const tinygltf::Mesh &meshRef = m_AssetData.meshes[nodeRef.mesh];
-		for(uint32 i = 0; i < meshRef.primitives.size(); ++i)
-		{
-			const std::map<std::string, int> &attribMapRef = meshRef.primitives[i].attributes;
+	//if(nodeRef.mesh >= 0)
+	//{
+	//	const tinygltf::Mesh &meshRef = m_AssetData.meshes[nodeRef.mesh];
+	//	for(uint32 i = 0; i < meshRef.primitives.size(); ++i)
+	//	{
+	//		const std::map<std::string, int> &attribMapRef = meshRef.primitives[i].attributes;
 
-			if(attribMapRef.find("POSITION") != attribMapRef.end())
-			{
-				int iAccessorIndex = attribMapRef.at("POSITION");
-				const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
+	//		if(attribMapRef.find("POSITION") != attribMapRef.end())
+	//		{
+	//			int iAccessorIndex = attribMapRef.at("POSITION");
+	//			const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
 
-				size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
-				uiBufferOffset += bufferViewRef.byteOffset;
-				uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
-				glVertexAttribPointer(VA_Position, 3, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
-			}
-			else
-				HyError("glTF asset wanted to render a primitive that did not have a POSITION attribute");
+	//			size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
+	//			uiBufferOffset += bufferViewRef.byteOffset;
+	//			uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
+	//			glVertexAttribPointer(VA_Position, 3, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
+	//		}
+	//		else
+	//			HyError("glTF asset wanted to render a primitive that did not have a POSITION attribute");
 
-			if(attribMapRef.find("NORMAL") != attribMapRef.end())
-			{
-				int iAccessorIndex = attribMapRef.at("NORMAL");
-				const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
+	//		if(attribMapRef.find("NORMAL") != attribMapRef.end())
+	//		{
+	//			int iAccessorIndex = attribMapRef.at("NORMAL");
+	//			const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
 
-				size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
-				uiBufferOffset += bufferViewRef.byteOffset;
-				uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
-				glVertexAttribPointer(VA_Normal, 3, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
-			}
-			else
-				HyError("glTF asset wanted to render a primitive that did not have a NORMAL attribute (they should had been generated when initially importing the asset)");
+	//			size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
+	//			uiBufferOffset += bufferViewRef.byteOffset;
+	//			uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
+	//			glVertexAttribPointer(VA_Normal, 3, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
+	//		}
+	//		else
+	//			HyError("glTF asset wanted to render a primitive that did not have a NORMAL attribute (they should had been generated when initially importing the asset)");
 
-			if(attribMapRef.find("TANGENT") != attribMapRef.end())
-			{
-				int iAccessorIndex = attribMapRef.at("TANGENT");
-				const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
+	//		if(attribMapRef.find("TANGENT") != attribMapRef.end())
+	//		{
+	//			int iAccessorIndex = attribMapRef.at("TANGENT");
+	//			const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
 
-				size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
-				uiBufferOffset += bufferViewRef.byteOffset;
-				uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
-				glVertexAttribPointer(VA_Tangent, 4, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
-			}
-			else
-				HyError("glTF asset wanted to render a primitive that did not have a TANGENT attribute (they should had been generated when initially importing the asset)");
+	//			size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
+	//			uiBufferOffset += bufferViewRef.byteOffset;
+	//			uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
+	//			glVertexAttribPointer(VA_Tangent, 4, m_AssetData.accessors[iAccessorIndex].componentType, GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
+	//		}
+	//		else
+	//			HyError("glTF asset wanted to render a primitive that did not have a TANGENT attribute (they should had been generated when initially importing the asset)");
 
-			if(attribMapRef.find("TEXCOORD_0") != attribMapRef.end())
-			{
-				int iAccessorIndex = attribMapRef.at("TEXCOORD_0");
-				const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
+	//		if(attribMapRef.find("TEXCOORD_0") != attribMapRef.end())
+	//		{
+	//			int iAccessorIndex = attribMapRef.at("TEXCOORD_0");
+	//			const tinygltf::BufferView &bufferViewRef = m_AssetData.bufferViews[m_AssetData.accessors[iAccessorIndex].bufferView];
 
-				size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
-				uiBufferOffset += bufferViewRef.byteOffset;
-				uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
-				
-				glVertexAttribPointer(VA_UV, 2, m_AssetData.accessors[iAccessorIndex].componentType, m_AssetData.accessors[iAccessorIndex].componentType != GL_FLOAT ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
-			}
-			else
-				HyError("glTF asset wanted to render a primitive that did not have a TEXCOORD_0 attribute (they should had been generated when initially importing the asset)");
-		}
-	}
+	//			size_t uiBufferOffset = 0;// m_BufferOffsetHandleList[bufferViewRef.buffer];
+	//			uiBufferOffset += bufferViewRef.byteOffset;
+	//			uiBufferOffset += m_AssetData.accessors[iAccessorIndex].byteOffset;
+	//			
+	//			glVertexAttribPointer(VA_UV, 2, m_AssetData.accessors[iAccessorIndex].componentType, m_AssetData.accessors[iAccessorIndex].componentType != GL_FLOAT ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(bufferViewRef.byteStride), reinterpret_cast<void *>(uiBufferOffset));
+	//		}
+	//		else
+	//			HyError("glTF asset wanted to render a primitive that did not have a TEXCOORD_0 attribute (they should had been generated when initially importing the asset)");
+	//	}
+	//}
 }
