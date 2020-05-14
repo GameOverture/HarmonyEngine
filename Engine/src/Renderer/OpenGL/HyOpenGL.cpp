@@ -32,7 +32,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	{
 		SetCurrentWindow(i);
 
-#if defined(HY_USE_GLFW)
+#if defined(HY_USE_GLFW) && defined(HY_USE_GLAD)
 		// Load all OpenGL functions using the glfw loader function
 		// If you use SDL you can use: https://wiki.libsdl.org/SDL_GL_GetProcAddress
 		if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
@@ -40,7 +40,12 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		}
 #endif
 
-#ifdef HY_PLATFORM_BROWSER
+#if defined(HY_USE_GLAD)
+		if(!gladLoadGL()) {
+			HyError("glad failed to initalize");
+		}
+		HyLog("glad initalized");
+#else
 		//glewExperimental = GL_TRUE;	// This is required for GLFW to work
 		//GLenum err = glewInit();
 		//if(err != GLEW_OK) {
@@ -51,11 +56,6 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		//	while(GL_NO_ERROR != glGetError());
 		//}
 		//HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
-#else
-		if(!gladLoadGL()) {
-			HyError("glad failed to initalize");
-		}
-		HyLog("glad initalized");
 #endif
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);

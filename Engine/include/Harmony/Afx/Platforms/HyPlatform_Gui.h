@@ -11,6 +11,7 @@
 #define HyPlatform_Gui_h__
 
 #include <glad/glad.h>
+#define HY_USE_GLAD
 
 #define HY_GUI_DATAOVERRIDE "+HyGuiOverride"
 #define HY_MAXWINDOWS 1
