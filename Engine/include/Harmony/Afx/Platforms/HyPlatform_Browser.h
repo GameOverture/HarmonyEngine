@@ -13,7 +13,7 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 #define HY_USE_GLFW
 
 #define HY_MAXWINDOWS 1
