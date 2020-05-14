@@ -52,51 +52,51 @@ void HyGLTF::OnLoadThread()
 
 void HyGLTF::OnRenderThread(IHyRenderer &rendererRef)
 {
-	if(GetLoadableState() == HYLOADSTATE_Queued)
-	{
-		//rendererRef.
+	//if(GetLoadableState() == HYLOADSTATE_Queued)
+	//{
+	//	//rendererRef.
 
-		for(uint32 i = 0; i < static_cast<uint32>(m_AssetData.buffers.size()); ++i)
-			m_BufferOffsetHandleList.push_back(rendererRef.AppendVertexData3d(&m_AssetData.buffers[i].data[0], static_cast<uint32>(m_AssetData.buffers[i].data.size())));
-	}
-	else // GetLoadableState() == HYLOADSTATE_Discarded
-	{
-		//rendererRef.RemoveVertexData3d(
-	}
+	//	for(uint32 i = 0; i < static_cast<uint32>(m_AssetData.buffers.size()); ++i)
+	//		m_BufferOffsetHandleList.push_back(rendererRef.AppendVertexData3d(&m_AssetData.buffers[i].data[0], static_cast<uint32>(m_AssetData.buffers[i].data.size())));
+	//}
+	//else // GetLoadableState() == HYLOADSTATE_Discarded
+	//{
+	//	//rendererRef.RemoveVertexData3d(
+	//}
 }
 
 void HyGLTF::AppendRenderStates(HyRenderBuffer &renderBufferRef, int32 iSceneIndex /*= -1*/)
 {
-	glGenVertexArrays(1, &m_hVao);
-	glBindVertexArray(m_hVao);
-	
+	//glGenVertexArrays(1, &m_hVao);
+	//glBindVertexArray(m_hVao);
+	//
 
-	if(iSceneIndex < 0)
-	{
-		if(m_AssetData.defaultScene < 0)
-		{
-			HyLogWarning("IHyRenderer::AppendDrawable3d - default scene is not specified");
-			return;
-		}
+	//if(iSceneIndex < 0)
+	//{
+	//	if(m_AssetData.defaultScene < 0)
+	//	{
+	//		HyLogWarning("IHyRenderer::AppendDrawable3d - default scene is not specified");
+	//		return;
+	//	}
 
-		iSceneIndex = m_AssetData.defaultScene;
-	}
+	//	iSceneIndex = m_AssetData.defaultScene;
+	//}
 
-	for(uint32 i = 0; i < m_AssetData.scenes[iSceneIndex].nodes.size(); ++i)
-	{
-		int iNodeIndex = m_AssetData.scenes[iSceneIndex].nodes[i];
-		
-		glm::mat4 transformMtx(1.0f);
-		TraverseNode(m_AssetData.nodes[iNodeIndex], transformMtx);
-	}
+	//for(uint32 i = 0; i < m_AssetData.scenes[iSceneIndex].nodes.size(); ++i)
+	//{
+	//	int iNodeIndex = m_AssetData.scenes[iSceneIndex].nodes[i];
+	//	
+	//	glm::mat4 transformMtx(1.0f);
+	//	TraverseNode(m_AssetData.nodes[iNodeIndex], transformMtx);
+	//}
 }
 
 void HyGLTF::TraverseNode(const tinygltf::Node &nodeRef, glm::mat4 transformMtx)
 {
-	ProcessNode(nodeRef, transformMtx);
+	//ProcessNode(nodeRef, transformMtx);
 
-	for(uint32 i = 0; i < nodeRef.children.size(); ++i)
-		TraverseNode(m_AssetData.nodes[nodeRef.children[i]], transformMtx);
+	//for(uint32 i = 0; i < nodeRef.children.size(); ++i)
+	//	TraverseNode(m_AssetData.nodes[nodeRef.children[i]], transformMtx);
 }
 
 void HyGLTF::ProcessNode(const tinygltf::Node &nodeRef, glm::mat4 &transformMtxRef)
