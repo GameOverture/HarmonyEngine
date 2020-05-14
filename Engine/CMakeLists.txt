@@ -25,7 +25,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Audio/HyAudio.cpp
 	src/Diagnostics/HyDiagnostics.cpp
 	src/Diagnostics/Console/HyConsole.cpp
-	src/Diagnostics/Console/Interop/HyConsole_Gui.cpp
+	src/Diagnostics/Console/Interop/HyConsole_Std.cpp
 	src/Diagnostics/Console/Interop/HyConsole_Win.cpp
 	src/Diagnostics/GuiComms/HyGuiComms.cpp
 	src/Diagnostics/GuiComms/HyGuiMessage.cpp
@@ -128,7 +128,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Audio/Harness/IHyAudioInst.h
 	include/Harmony/Diagnostics/HyDiagnostics.h
 	include/Harmony/Diagnostics/Console/HyConsole.h
-	include/Harmony/Diagnostics/Console/Interop/HyConsole_Gui.h
+	include/Harmony/Diagnostics/Console/Interop/HyConsole_Std.h
 	include/Harmony/Diagnostics/Console/Interop/HyConsole_Win.h
 	include/Harmony/Diagnostics/GuiComms/HyGuiComms.h
 	include/Harmony/Diagnostics/GuiComms/HyGuiMessage.h
