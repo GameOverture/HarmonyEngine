@@ -120,7 +120,10 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 		glfwSetScrollCallback(m_WindowListRef[i]->GetHandle(), glfw_ScrollCallback);
 		glfwSetKeyCallback(m_WindowListRef[i]->GetHandle(), glfw_KeyCallback);
 		glfwSetCharCallback(m_WindowListRef[i]->GetHandle(), glfw_CharCallback);
+
+#ifndef HY_PLATFORM_BROWSER
 		glfwSetCharModsCallback(m_WindowListRef[i]->GetHandle(), glfw_CharModsCallback);
+#endif
 	}
 
 	//for(int32 i = HYJOYSTICK_0; i < HYNUM_JOYSTICK; ++i)
