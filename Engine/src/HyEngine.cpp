@@ -78,7 +78,7 @@ HyRendererInterop &HyEngine::GetRenderer()
 #ifdef HY_PLATFORM_BROWSER
 	EM_BOOL HyInternal_BrowserFrameIter__(double time, void *pUserData)
 	{
-		return reinterpret_cast<HyEngine *>(pUserData)->Update();
+		//return reinterpret_cast<HyEngine *>(pUserData)->Update();
 	}
 #endif
 
