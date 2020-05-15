@@ -76,9 +76,9 @@ HyRendererInterop &HyEngine::GetRenderer()
 }
 
 #ifdef HY_PLATFORM_BROWSER
-	int HyInternal_BrowserFrameIter__(void *pUserData)
+	void HyInternal_BrowserFrameIter__(void *pUserData)
 	{
-		return reinterpret_cast<HyEngine *>(pUserData)->Update();
+		reinterpret_cast<HyEngine *>(pUserData)->Update();
 	}
 #endif
 
