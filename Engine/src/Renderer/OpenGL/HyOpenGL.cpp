@@ -52,7 +52,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		}
 		HyLog("glad initalized");
 #else
-		glewExperimental = GL_TRUE;	// This is required for GLFW to work
+		//glewExperimental = GL_TRUE;	// This is required for GLFW to work
 		GLenum err = glewInit();
 		if(err != GLEW_OK) {
 			HyError("glewInit() failed: " << err);
@@ -62,9 +62,11 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 			while(GL_NO_ERROR != glGetError());
 		}
 		HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glewInit");
+		HyLog("glew initalized");
 #endif
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+		HyLog("clearing to Harmony grey");
 	}
 
 	if(m_WindowListRef.empty() == false)
