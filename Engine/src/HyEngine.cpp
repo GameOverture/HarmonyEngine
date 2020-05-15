@@ -93,7 +93,7 @@ int32 HyEngine::RunGame()
 	{ }
 #else
 	HyLogTitle("Starting emscripten_request_animation_frame_loop");
-	emscripten_request_animation_frame_loop(HyInternal_BrowserFrameIter__, this);
+	emscripten_set_main_loop_arg(HyInternal_BrowserFrameIter__, this, 0, true);
 #endif
 
 	return 0;

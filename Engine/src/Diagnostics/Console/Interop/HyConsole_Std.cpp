@@ -44,14 +44,14 @@ HyConsole_Std::~HyConsole_Std()
 		//GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &coninfo);
 
 		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE);
-		for(int i = 0; i < 20/*coninfo.dwSize.X*/; i++)
+		for(int i = 0; i < 50/*coninfo.dwSize.X*/; i++)
 			os << "~";
-
+		os << std::endl;
 		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		os << '\t' << szMsg << std::endl;
 
 		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE);
-		for(int i = 0; i < 20/*coninfo.dwSize.X*/; i++)
+		for(int i = 0; i < 50/*coninfo.dwSize.X*/; i++)
 			os << "~";
 		break; }
 
