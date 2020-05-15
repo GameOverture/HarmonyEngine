@@ -10,10 +10,8 @@
 #ifndef HyPlatform_Browser_h__
 #define HyPlatform_Browser_h__
 
-#include <glad/glad.h>
-#define HY_USE_GLAD
+#include <GL/glew.h>
 
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #define HY_USE_GLFW
 
