@@ -23,6 +23,9 @@ HyTime::HyTime(uint32 uiUpdateTickMs) :
 	m_dPrevTime(0.0),
 	m_dCurDeltaTime(0.0)
 {
+	// TODO: REMOVE THIS TEST ABORT
+	abort();
+
 	IHyTimeInst::sm_pTime = this;
 	SetUpdateTickMs(uiUpdateTickMs);
 }
