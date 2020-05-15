@@ -98,8 +98,8 @@ bool HyFileExists(const std::string &sFilePath)
 {
 #if defined(HY_COMPILER_MSVC)
 	return std::experimental::filesystem::exists(sFilePath);
-#else // TODO: fix for GCC, etc.
-	HyLogWarning("HyFileExists() not implemented for this build configuration. Returning 'true'")
-	return true;
+#else
+	std::ifstream infile(sFilePath.c_str());
+	return infile.good();
 #endif
 }
