@@ -82,8 +82,10 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShow
 	glfwSetWindowUserPointer(m_hData, this);
 	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
 
+#ifndef HY_PLATFORM_BROWSER
 	if(bShowCursor == false)
 		glfwSetInputMode(m_hData, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+#endif
 
 	glfwShowWindow(m_hData);
 

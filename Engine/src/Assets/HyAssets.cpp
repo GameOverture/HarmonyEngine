@@ -421,6 +421,9 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 {
 	HyLog("Assets are initializing...");
 
+	// TODO: REMOVE THIS TEST ABORT
+	abort();
+
 #if defined(HY_PLATFORM_WINDOWS) && defined(HY_COMPILER_MSVC) && !defined(HY_CONFIG_SINGLETHREAD)
 	SetThreadPriority(m_Thread.native_handle(), THREAD_MODE_BACKGROUND_BEGIN);
 #endif
