@@ -40,12 +40,11 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 
 	// Get number of CPUs
 	SYSTEM_INFO sysinfo;
-#if defined(HY_ENV_32)
-	GetSystemInfo(&sysinfo);
-#else
-	GetNativeSystemInfo(&sysinfo);
-#endif
-
+	#if defined(HY_ENV_32)
+		GetSystemInfo(&sysinfo);
+	#else
+		GetNativeSystemInfo(&sysinfo);
+	#endif
 	m_uiNumCpuCores = sysinfo.dwNumberOfProcessors;
 
 	// Get total memory size
@@ -56,8 +55,11 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	m_uiVirtualMemBytes = static_cast<uint64_t>(meminfo.ullTotalVirtual);
 
 #elif defined(HY_PLATFORM_OSX)
-	// Set info
 	m_sPlatform = "Mac OSX";
+#elif defined(HY_PLATFORM_LINUX)
+	m_sPlatform = "Linux";
+#elif defined(HY_PLATFORM_BROWSER)
+	m_sPlatform = "Browser";
 #endif
 
 	// Confirm endian-ness with what is defined
@@ -66,7 +68,6 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 		uint32 i;
 		char c[4];
 	} bint = { 0x01020304 };
-
 #if defined(HY_ENDIAN_LITTLE)
 	if(bint.c[0] == 1) {
 		HyError("HY_ENDIAN_LITTLE was defined but did not pass calculation test");

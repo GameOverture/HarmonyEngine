@@ -37,10 +37,12 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 {
 	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");
 
+#ifndef HY_CONFIG_SINGLETHREAD
 	// TODO Cleanup: decide whether to block 
 	while(m_Assets.IsInitialized() == false)
 	{
 	}
+#endif
 
 	sm_pInstance = this;
 }
@@ -74,10 +76,10 @@ HyRendererInterop &HyEngine::GetRenderer()
 }
 
 #ifdef HY_PLATFORM_BROWSER
-EM_BOOL FrameIter(double time, void *pUserData)
-{
-	return reinterpret_cast<HyEngine *>(pUserData)->Update();
-}
+	EM_BOOL HyInternal_BrowserFrameIter__(double time, void *pUserData)
+	{
+		return reinterpret_cast<HyEngine *>(pUserData)->Update();
+	}
 #endif
 
 int32 HyEngine::RunGame()
@@ -90,7 +92,8 @@ int32 HyEngine::RunGame()
 	while(Update())
 	{ }
 #else
-	emscripten_request_animation_frame_loop(FrameIter, this);
+	HyLogTitle("Starting emscripten_request_animation_frame_loop");
+	emscripten_request_animation_frame_loop(HyInternal_BrowserFrameIter__, this);
 #endif
 
 	return 0;
