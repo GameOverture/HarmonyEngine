@@ -52,7 +52,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		}
 		HyLog("glad initalized");
 #else
-		//glewExperimental = GL_TRUE;	// This is required for GLFW to work
+		glewExperimental = GL_TRUE;	// This is required for GLFW to work
 		GLenum err = glewInit();
 		if(err != GLEW_OK) {
 			HyError("glewInit() failed: " << err);
@@ -730,6 +730,7 @@ HyOpenGL::~HyOpenGL(void)
 	if(m_pPboHandles == nullptr)
 		return nullptr;
 
+#ifndef HY_PLATFORM_BROWSER
 	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
 	{
 		if(m_pPboStates[i] == PBO_Free)
@@ -750,6 +751,7 @@ HyOpenGL::~HyOpenGL(void)
 			return pMappedPtr;
 		}
 	}
+#endif
 
 	return nullptr;
 }
@@ -1070,10 +1072,6 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			glVertexAttribPointer(uiLocation, 1, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(GLfloat);
 			break;
-		case HyShaderVariable::double64:
-			glVertexAttribLPointer(uiLocation, 1, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
-			uiOffset += sizeof(GLdouble);
-			break;
 		case HyShaderVariable::bvec2:
 			glVertexAttribPointer(uiLocation, 2, GL_BYTE, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::bvec2);
@@ -1110,6 +1108,11 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			glVertexAttribPointer(uiLocation, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
 			break;
+#ifndef HY_PLATFORM_BROWSER
+		case HyShaderVariable::double64:
+			glVertexAttribLPointer(uiLocation, 1, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			uiOffset += sizeof(GLdouble);
+			break;
 		case HyShaderVariable::dvec2:
 			glVertexAttribLPointer(uiLocation, 2, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::dvec2);
@@ -1122,6 +1125,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			glVertexAttribLPointer(uiLocation, 4, GL_DOUBLE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::dvec4);
 			break;
+#endif
 		case HyShaderVariable::mat3:
 			glVertexAttribPointer(uiLocation, 3, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec3);
@@ -1139,6 +1143,10 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			uiOffset += sizeof(glm::vec4);
 			glVertexAttribPointer(uiLocation + 3, 4, GL_FLOAT, GL_FALSE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
 			uiOffset += sizeof(glm::vec4);
+			break;
+
+		default:
+			HyError("Unsupported HyShaderVariable '" << shaderVertexAttribListRef[i].eVarType << "' for this platform");
 			break;
 		}
 
