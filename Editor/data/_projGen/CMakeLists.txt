@@ -25,7 +25,8 @@ target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/gla
 target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/soil2/include")
 
 if(HYBUILD_Emscripten)
-	set_target_properties(%HY_CLASS% PROPERTIES LINK_FLAGS "-o NewGame.html --preload-file ../data")
+	set_target_properties(%HY_CLASS% PROPERTIES LINK_FLAGS "-s MAX_WEBGL_VERSION=2 --preload-file ../data")
+	set(CMAKE_EXECUTABLE_SUFFIX ".html")
 else()
 	target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/glfw/include")
 	target_precompile_headers(%HY_CLASS% PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/%HY_SRCDIR%/pch.h")

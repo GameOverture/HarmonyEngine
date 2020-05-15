@@ -34,10 +34,16 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 
 #if defined(HY_USE_GLFW) && defined(HY_USE_GLAD)
 		// Load all OpenGL functions using the glfw loader function
-		// If you use SDL you can use: https://wiki.libsdl.org/SDL_GL_GetProcAddress
+		// If you use SDL you can use: https://wiki.libsdl.org/SDL_GL_GetProcAddres
+	#if defined(HY_PLATFORM_BROWSER)
+		if(!gladLoadGLES2Loader((GLADloadproc) glfwGetProcAddress)) {
+			HyError("gladLoadGLES2Loader failed to initialize GLES2 context with GLFW");
+		}
+	#else
 		if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
 			HyError("gladLoadGLLoader failed to initialize OpenGL context with GLFW");
 		}
+	#endif
 #endif
 
 #if defined(HY_USE_GLAD)
