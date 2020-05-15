@@ -263,7 +263,6 @@ void IHyRenderer::SetCurrentWindow(uint32 uiIndex)
 
 #ifdef HY_USE_GLFW
 	glfwMakeContextCurrent(m_pCurWindow->GetHandle());
-	HyLog("REMOVE ME: glfwMakeContextCurrent() was invoked");
 #endif
 }
 
