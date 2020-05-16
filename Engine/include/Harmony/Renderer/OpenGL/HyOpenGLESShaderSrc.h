@@ -43,20 +43,20 @@ layout(location = 8) in mat4	attr_mtxLocalToWorld;
 smooth out vec2					interp_vUV;
 smooth out vec4					interp_vColor;
 
-vec2 g_vPOSITION[] = vec2[4](vec2(1.0f, 1.0f),
-							 vec2(0.0f, 1.0f),
-							 vec2(1.0f, 0.0f),
-							 vec2(0.0f, 0.0f));
+const vec2 g_vPOSITION[] = vec2[4](vec2(1.0f, 1.0f),
+								   vec2(0.0f, 1.0f),
+								   vec2(1.0f, 0.0f),
+								   vec2(0.0f, 0.0f));
 
-vec2 g_vUVCOORDS[] = vec2[4](attr_vUVcoord0,
-							 attr_vUVcoord1,
-							 attr_vUVcoord2,
-							 attr_vUVcoord3);
+const vec2 g_vUVCOORDS[] = vec2[4](attr_vUVcoord0,
+								   attr_vUVcoord1,
+								   attr_vUVcoord2,
+								   attr_vUVcoord3);
 
-vec4 g_vCOLORS[] = vec4[4](attr_vTopTint,
-						   attr_vTopTint,
-						   attr_vBotTint,
-						   attr_vBotTint);
+const vec4 g_vCOLORS[] = vec4[4](attr_vTopTint,
+								 attr_vTopTint,
+								 attr_vBotTint,
+								 attr_vBotTint);
 
 void main()
 {
