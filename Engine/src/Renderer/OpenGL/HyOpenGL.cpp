@@ -9,7 +9,11 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
-#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
+#ifndef HY_PLATFORM_BROWSER
+	#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
+#else
+	#include "Renderer/OpenGL/HyOpenGLESShaderSrc.h"
+#endif
 #include "Window/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Diagnostics/Console/HyConsole.h"

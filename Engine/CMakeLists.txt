@@ -145,6 +145,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Renderer/Effects/HyShader.h
 	include/Harmony/Renderer/Effects/HyStencil.h
 	include/Harmony/Renderer/OpenGL/HyOpenGL.h
+	include/Harmony/Renderer/OpenGL/HyOpenGLESShaderSrc.h
 	include/Harmony/Renderer/OpenGL/HyOpenGLShaderSrc.h
 	include/Harmony/Scene/HyScene.h
 	include/Harmony/Scene/AnimFloats/HyAnimFloat.h
