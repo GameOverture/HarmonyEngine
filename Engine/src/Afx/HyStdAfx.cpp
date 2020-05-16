@@ -29,8 +29,8 @@ HarmonyInit::HarmonyInit()
 	{
 		windowInfo[i].sName = "Window: " + std::to_string(i);
 		windowInfo[i].eType = HYWINDOW_WindowedFixed;
-		windowInfo[i].vSize.x = 512;
-		windowInfo[i].vSize.y = 256;
+		windowInfo[i].vSize.x = 1280;
+		windowInfo[i].vSize.y = 756;
 		windowInfo[i].ptLocation.x = i * windowInfo[i].vSize.x;
 		windowInfo[i].ptLocation.y = 0;
 	}

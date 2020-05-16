@@ -228,7 +228,7 @@ void HyDiagnostics::DumpMemoryUsage()
 {
 	HyLogSection("Memory Usage");
 
-#if defined(HY_COMPILER_MSVC)
+#if defined(HY_COMPILER_MSVC) && defined(HY_PLATFORM_WINDOWS)
 	PROCESS_MEMORY_COUNTERS memCounter;
 	BOOL bResult = GetProcessMemoryInfo(GetCurrentProcess(), &memCounter, sizeof(memCounter));
 	if(bResult == false)

@@ -8,7 +8,7 @@ add_subdirectory(Engine)
 add_subdirectory(Editor)
 
 # Build engine as GUI/Editor mode
-target_compile_definitions(HyEngine PRIVATE HY_CONFIG_GUI)
+target_compile_definitions(HyEngine PRIVATE HY_USE_QT)
 
 # Default startup project for Visual Studio will be the editor
 if (MSVC)

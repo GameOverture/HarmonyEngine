@@ -16,7 +16,7 @@
 	#define HY_PLATFORM_32BIT
 #endif
 
-#if defined(HY_CONFIG_GUI)
+#if defined(HY_USE_QT)
 	#define HY_PLATFORM_GUI
 	#include "HyPlatform_Gui.h"
 #elif defined(__EMSCRIPTEN__)
