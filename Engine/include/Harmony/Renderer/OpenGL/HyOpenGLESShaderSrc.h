@@ -14,8 +14,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // QUADBATCH
-const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
-#version 300 es
+const char * const szHYQUADBATCH_VERTEXSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
 uniform mat4					u_mtxWorldToCamera;
@@ -74,8 +73,7 @@ void main()
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
-const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
-#version 300 es
+const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
 uniform sampler2D	u_Tex;
@@ -100,8 +98,7 @@ void main()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PRIMITIVE
-const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(
-#version 300 es
+const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
 uniform mat4					u_mtxTransform;
@@ -121,8 +118,7 @@ void main()
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
-const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
-#version 300 es
+const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
 uniform vec4	u_vColor;
@@ -136,8 +132,7 @@ void main()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // LINES2D
-const char * const szHYLINES2D_VERTEXSHADER = R"src(
-#version 300 es
+const char * const szHYLINES2D_VERTEXSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
 uniform float					u_fHalfWidth;
@@ -166,8 +161,7 @@ void main()
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
-const char * const szHYLINES2D_FRAGMENTSHADER = R"src(
-#version 300 es
+const char * const szHYLINES2D_FRAGMENTSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
 uniform float		u_fHalfWidth;
@@ -194,8 +188,7 @@ void main()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GLTF
-const char * const szHYGLTF_VERTEXSHADER = R"src(
-#version 300 es
+const char * const szHYGLTF_VERTEXSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
 uniform mat4					u_mtxTransform;
@@ -223,8 +216,7 @@ void main()
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
-const char * const szHYGLTF_FRAGMENTSHADER = R"src(
-#version 300 es
+const char * const szHYGLTF_FRAGMENTSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
 uniform sampler2D	u_Tex;
