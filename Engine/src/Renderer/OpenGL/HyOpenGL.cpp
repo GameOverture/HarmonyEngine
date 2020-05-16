@@ -414,6 +414,7 @@ HyOpenGL::~HyOpenGL(void)
 			GLint written = 0;
 			glGetProgramInfoLog(hGLShaderProg, iLength, &written, szlog);
 
+			HyLogError("Shader program failed to link!\n" << szlog);
 			HyError("Shader program failed to link!\n" << szlog);
 			delete [] szlog;	// Not that this matters
 		}
@@ -799,6 +800,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 			GLint written = 0;
 			glGetShaderInfoLog(iShaderHandle, iLength, &written, szlog);
 
+			HyLogError(szlog);
 			HyError(szlog);
 			delete [] szlog;	// Not that this matters
 		}
