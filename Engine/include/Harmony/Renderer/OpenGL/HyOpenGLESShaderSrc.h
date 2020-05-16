@@ -48,18 +48,18 @@ const vec2 g_vPOSITION[] = vec2[4](vec2(1.0f, 1.0f),
 								   vec2(1.0f, 0.0f),
 								   vec2(0.0f, 0.0f));
 
-const vec2 g_vUVCOORDS[] = vec2[4](attr_vUVcoord0,
-								   attr_vUVcoord1,
-								   attr_vUVcoord2,
-								   attr_vUVcoord3);
-
-const vec4 g_vCOLORS[] = vec4[4](attr_vTopTint,
-								 attr_vTopTint,
-								 attr_vBotTint,
-								 attr_vBotTint);
-
 void main()
 {
+	vec2 g_vUVCOORDS[] = vec2[4](attr_vUVcoord0,
+								 attr_vUVcoord1,
+								 attr_vUVcoord2,
+								 attr_vUVcoord3);
+
+	vec4 g_vCOLORS[] = vec4[4](attr_vTopTint,
+							   attr_vTopTint,
+							   attr_vBotTint,
+							   attr_vBotTint);
+
 	interp_vUV = g_vUVCOORDS[gl_VertexID];
 	interp_vColor = g_vCOLORS[gl_VertexID];
 
