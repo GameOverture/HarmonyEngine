@@ -17,6 +17,8 @@
 const char * const szHYQUADBATCH_VERTEXSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
+precision mediump float;
+
 uniform mat4					u_mtxWorldToCamera;
 uniform mat4					u_mtxCameraToClip;
 
@@ -103,6 +105,8 @@ void main()
 const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
+precision mediump float;
+
 uniform mat4					u_mtxTransform;
 uniform mat4					u_mtxWorldToCamera;
 uniform mat4					u_mtxCameraToClip;
@@ -138,6 +142,8 @@ void main()
 // LINES2D
 const char * const szHYLINES2D_VERTEXSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
+
+precision mediump float;
 
 uniform float					u_fHalfWidth;
 uniform float					u_fFeatherAmt;
@@ -196,6 +202,8 @@ void main()
 // GLTF
 const char * const szHYGLTF_VERTEXSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
+
+precision mediump float;
 
 uniform mat4					u_mtxTransform;
 uniform mat4					u_mtxWorldToCamera;
