@@ -76,6 +76,8 @@ void main()
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
+precision mediump float;
+
 uniform sampler2D	u_Tex;
 
 smooth in vec2		interp_vUV;
@@ -121,6 +123,8 @@ void main()
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
 
+precision mediump float;
+
 uniform vec4	u_vColor;
 out vec4		out_vColor;
 
@@ -163,6 +167,8 @@ void main()
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYLINES2D_FRAGMENTSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
+
+precision mediump float;
 
 uniform float		u_fHalfWidth;
 uniform float		u_fFeatherAmt;
@@ -218,6 +224,8 @@ void main()
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYGLTF_FRAGMENTSHADER = R"src(#version 300 es
 //#extension GL_ARB_explicit_attrib_location : enable
+
+precision mediump float;
 
 uniform sampler2D	u_Tex;
 
