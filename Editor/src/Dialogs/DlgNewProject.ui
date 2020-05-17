@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>583</width>
-    <height>469</height>
+    <height>365</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -105,6 +105,44 @@
       <string>Advanced</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
+      <item row="9" column="0">
+       <widget class="QLineEdit" name="txtSrcDirName">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>145</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>src</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLineEdit" name="txtMetaDataDirName">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>145</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>_metaData</string>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="sizePolicy">
@@ -143,22 +181,8 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="2">
-       <widget class="QPushButton" name="btnBrowseMetaData">
-        <property name="text">
-         <string>Browse...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="11" column="2">
-       <widget class="QPushButton" name="btnBrowseBuild">
-        <property name="text">
-         <string>Browse...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="txtRelativeAssetsLocation">
+      <item row="9" column="1">
+       <widget class="QLineEdit" name="txtRelativeSrcLocation">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -167,13 +191,6 @@
         </property>
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Game assets relative location:</string>
         </property>
        </widget>
       </item>
@@ -196,22 +213,10 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLineEdit" name="txtMetaDataDirName">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>145</width>
-          <height>0</height>
-         </size>
-        </property>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="btnBrowseMetaData">
         <property name="text">
-         <string>_metaData</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>
@@ -229,22 +234,37 @@
         </property>
        </widget>
       </item>
-      <item row="10" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>145</width>
-          <height>0</height>
-         </size>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="txtRelativeAssetsLocation">
+        <property name="enabled">
+         <bool>false</bool>
         </property>
         <property name="text">
-         <string>Build dir name:</string>
+         <string>./</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Source code relative location:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="2">
+       <widget class="QPushButton" name="btnBrowseSrc">
+        <property name="text">
+         <string>Browse...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Game assets relative location:</string>
         </property>
        </widget>
       </item>
@@ -258,45 +278,6 @@
         </property>
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="10" column="1">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Build relative location:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="11" column="1">
-       <widget class="QLineEdit" name="txtRelativeBuildLocation">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>./</string>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="11" column="0">
-       <widget class="QLineEdit" name="txtBuildDirName">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>145</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>build</string>
         </property>
        </widget>
       </item>
@@ -319,52 +300,6 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="0">
-       <widget class="QLineEdit" name="txtSrcDirName">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>145</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>src</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>Source code relative location:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="1">
-       <widget class="QLineEdit" name="txtRelativeSrcLocation">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>./</string>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="2">
-       <widget class="QPushButton" name="btnBrowseSrc">
-        <property name="text">
-         <string>Browse...</string>
-        </property>
-       </widget>
-      </item>
      </layout>
      <zorder>label</zorder>
      <zorder>label_5</zorder>
@@ -376,35 +311,11 @@
      <zorder>txtMetaDataDirName</zorder>
      <zorder>txtRelativeMetaDataLocation</zorder>
      <zorder>btnBrowseMetaData</zorder>
-     <zorder>label_3</zorder>
-     <zorder>label_7</zorder>
-     <zorder>txtBuildDirName</zorder>
-     <zorder>txtRelativeBuildLocation</zorder>
-     <zorder>btnBrowseBuild</zorder>
      <zorder>label_8</zorder>
      <zorder>txtSrcDirName</zorder>
      <zorder>label_9</zorder>
      <zorder>txtRelativeSrcLocation</zorder>
      <zorder>btnBrowseSrc</zorder>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Development Environment(s):</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QCheckBox" name="chkVs2017">
-        <property name="text">
-         <string>Visual Studio 2017</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item>
@@ -457,9 +368,6 @@
   <tabstop>txtMetaDataDirName</tabstop>
   <tabstop>txtRelativeMetaDataLocation</tabstop>
   <tabstop>btnBrowseMetaData</tabstop>
-  <tabstop>txtBuildDirName</tabstop>
-  <tabstop>txtRelativeBuildLocation</tabstop>
-  <tabstop>btnBrowseBuild</tabstop>
  </tabstops>
  <resources/>
  <connections>

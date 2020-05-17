@@ -23,7 +23,6 @@ class DlgNewProject : public QDialog
 	QString					m_sAbsoluteAssetsDirLocation;		// Just the absolute location of where the assets directory resides, not the directory itself
 	QString					m_sAbsoluteMetaDataDirLocation;		// Just the absolute location of where the meta-data directory resides, not the directory itself
 	QString					m_sAbsoluteSrcDirLocation;			// Just the absolute location of where the source directory resides, not the directory itself
-	QString					m_sAbsoluteBuildDirLocation;		// Just the absolute location of where the build directory resides, not the directory itself
 
 public:
 	explicit DlgNewProject(QString &sDefaultLocation, QWidget *parent = 0);
@@ -52,8 +51,6 @@ private Q_SLOTS:
 	void on_btnBrowseMetaData_clicked();
 	
 	void on_btnBrowseSrc_clicked();
-
-	void on_btnBrowseBuild_clicked();
 
 	void on_chkCreateGameDir_clicked();
 	

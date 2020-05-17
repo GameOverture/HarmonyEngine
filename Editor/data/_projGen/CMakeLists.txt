@@ -25,7 +25,7 @@ target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/gla
 target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/soil2/include")
 
 if(HYBUILD_Emscripten)
-	set_target_properties(%HY_CLASS% PROPERTIES LINK_FLAGS "-s MAX_WEBGL_VERSION=2 --preload-file ../data")
+	set_target_properties(%HY_CLASS% PROPERTIES LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s USE_GLFW=3 -s MAX_WEBGL_VERSION=2 --no-heap-copy --preload-file %HY_CLASS%.hyproj --preload-file %HY_DATADIR%")
 	set(CMAKE_EXECUTABLE_SUFFIX ".html")
 else()
 	target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/glfw/include")

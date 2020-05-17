@@ -33,7 +33,6 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 	ui->txtAssetsDirName->blockSignals(true);
 	ui->txtMetaDataDirName->blockSignals(true);
 	ui->txtSrcDirName->blockSignals(true);
-	ui->txtBuildDirName->blockSignals(true);
 	{
 		ui->txtTitleName->setText("New Game");
 		ui->txtTitleName->setFocus();
@@ -48,7 +47,6 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 		ui->txtAssetsDirName->setValidator(HyGlobal::FileNameValidator());
 		ui->txtMetaDataDirName->setValidator(HyGlobal::FileNameValidator());
 		ui->txtSrcDirName->setValidator(HyGlobal::FileNameValidator());
-		ui->txtBuildDirName->setValidator(HyGlobal::FileNameValidator());
 
 		on_txtTitleName_textChanged("New Game");
 	}
@@ -58,9 +56,8 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 	ui->txtAssetsDirName->blockSignals(false);
 	ui->txtMetaDataDirName->blockSignals(false);
 	ui->txtSrcDirName->blockSignals(false);
-	ui->txtBuildDirName->blockSignals(false);
 	
-	m_sAbsoluteAssetsDirLocation = m_sAbsoluteMetaDataDirLocation = m_sAbsoluteSrcDirLocation = m_sAbsoluteBuildDirLocation = GetProjDirPath();
+	m_sAbsoluteAssetsDirLocation = m_sAbsoluteMetaDataDirLocation = m_sAbsoluteSrcDirLocation = GetProjDirPath();
 	SetRelativePaths();
 
 	ErrorCheck();
@@ -119,11 +116,6 @@ void DlgNewProject::on_buttonBox_accepted()
 	buildDir.cd(ui->txtRelativeSrcLocation->text());
 	QDir srcDir(buildDir);
 
-	// BUILD
-	buildDir.setPath(GetProjDirPath());
-	buildDir.mkdir(ui->txtRelativeBuildLocation->text());
-	buildDir.cd(ui->txtRelativeBuildLocation->text());
-
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// Insert the minimum required fields for settings file. The project's DlgProjectSettings will fill in the rest of the defaults
 	QJsonObject jsonObj;
@@ -132,7 +124,6 @@ void DlgNewProject::on_buttonBox_accepted()
 	jsonObj.insert("DataPath", QString(ui->txtRelativeAssetsLocation->text() + "/"));
 	jsonObj.insert("MetaDataPath", QString(ui->txtRelativeMetaDataLocation->text() + "/"));
 	jsonObj.insert("SourcePath", QString(ui->txtRelativeSrcLocation->text() + "/"));
-	jsonObj.insert("BuildPath", QString(ui->txtRelativeBuildLocation->text() + "/"));
 
 	QFile newProjectFile(GetProjFilePath());
 	if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -198,6 +189,7 @@ void DlgNewProject::on_buttonBox_accepted()
 		sContents.replace("%HY_CLASS%", ui->txtClassName->text());
 		sContents.replace("%HY_SRCDIR%", QDir(GetProjDirPath()).relativeFilePath(srcDir.absolutePath()));
 		sContents.replace("%HY_HARMONYDIR%", MainWindow::EngineSrcLocation());
+		sContents.replace("%HY_DATADIR%", ui->txtRelativeAssetsLocation->text());
 
 		if(!file.open(QFile::WriteOnly))
 		{
@@ -265,11 +257,11 @@ void DlgNewProject::UpdateAbsoluteDirLocations()
 	sMetaDataDir.remove(iIndex, sMetaDataDir.length() - iIndex);
 	m_sAbsoluteMetaDataDirLocation = sMetaDataDir;
 
-	QString sSourceDir(QDir::cleanPath(sProjDirPath % "/" % ui->txtRelativeBuildLocation->text()));
+	QString sSourceDir(QDir::cleanPath(sProjDirPath % "/" % ui->txtRelativeSrcLocation->text()));
 	sSourceDir.replace('\\', '/');
 	iIndex = sSourceDir.lastIndexOf('/');
 	sSourceDir.remove(iIndex, sSourceDir.length() - iIndex);
-	m_sAbsoluteBuildDirLocation = sSourceDir;
+	m_sAbsoluteSrcDirLocation = sSourceDir;
 
 	// SetRelativePaths should technically already be correct, but we do need the ErrorCheck() call within
 	SetRelativePaths();
@@ -282,7 +274,6 @@ void DlgNewProject::SetRelativePaths()
 	ui->txtRelativeAssetsLocation->setText(rootLocation.relativeFilePath(QDir::cleanPath(m_sAbsoluteAssetsDirLocation % "/" % ui->txtAssetsDirName->text())));
 	ui->txtRelativeMetaDataLocation->setText(rootLocation.relativeFilePath(QDir::cleanPath(m_sAbsoluteMetaDataDirLocation % "/" % ui->txtMetaDataDirName->text())));
 	ui->txtRelativeSrcLocation->setText(rootLocation.relativeFilePath(QDir::cleanPath(m_sAbsoluteSrcDirLocation % "/" % ui->txtSrcDirName->text())));
-	ui->txtRelativeBuildLocation->setText(rootLocation.relativeFilePath(QDir::cleanPath(m_sAbsoluteBuildDirLocation % "/" % ui->txtBuildDirName->text())));
 
 	ErrorCheck();
 }
@@ -361,29 +352,6 @@ void DlgNewProject::ErrorCheck()
 			break;
 		}
 		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		QDir buildDirLocation(m_sAbsoluteBuildDirLocation);
-
-		if(QDir::isRelativePath(rootDir.relativeFilePath(m_sAbsoluteBuildDirLocation)) == false &&
-		   buildDirLocation.exists() == false)
-		{
-			ui->lblError->setText("Error: 'build' location (relative to project) does not exist.");
-			bIsError = true;
-			break;
-		}
-		if(ui->txtBuildDirName->text().isEmpty())
-		{
-			ui->lblError->setText("Error: 'build' directory name cannot be blank");
-			bIsError = true;
-			break;
-		}
-		if(buildDirLocation.exists(ui->txtBuildDirName->text()))
-		{
-			ui->lblError->setText("Error: A directory at the 'build' location already has the name: " + ui->txtBuildDirName->text());
-			bIsError = true;
-			break;
-		}
-		
 	}while(false);
 
 	if(bIsError)
@@ -448,24 +416,6 @@ void DlgNewProject::on_btnBrowseSrc_clicked()
 	if(pDlg->exec() == QDialog::Accepted)
 	{
 		m_sAbsoluteSrcDirLocation = pDlg->selectedFiles()[0];
-		SetRelativePaths();
-	}
-}
-
-void DlgNewProject::on_btnBrowseBuild_clicked()
-{
-	QFileDialog *pDlg = new QFileDialog(this, "Choose where this game's build directory will be *created* at");
-	pDlg->setDirectory(m_sAbsoluteBuildDirLocation);
-	pDlg->setFileMode(QFileDialog::Directory);
-	pDlg->setOption(QFileDialog::ShowDirsOnly, true);
-
-	pDlg->setViewMode(QFileDialog::Detail);
-	pDlg->setWindowModality( Qt::ApplicationModal );
-	pDlg->setModal(true);
-
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		m_sAbsoluteBuildDirLocation = pDlg->selectedFiles()[0];
 		SetRelativePaths();
 	}
 }
