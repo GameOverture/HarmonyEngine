@@ -209,15 +209,15 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include/Harmony")
 
-	target_compile_definitions(HyEditor PRIVATE HY_PLATFORM_GUI)
+	target_compile_definitions(HyEditor PRIVATE HY_USE_QT)
 	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets)
 
 	set_target_properties(HyEditor PROPERTIES
-		CXX_STANDARD 14
+		CXX_STANDARD 11
 		CXX_STANDARD_REQUIRED YES
 		CXX_EXTENSIONS NO)
 
-	target_compile_definitions(HyEditor PRIVATE HY_USE_QT QT_USE_QSTRINGBUILDER QT_NO_KEYWORDS)
+	target_compile_definitions(HyEditor PRIVATE QT_USE_QSTRINGBUILDER QT_NO_KEYWORDS)
 	target_precompile_headers(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Global.h")
 
 	# Setup windeployqt
