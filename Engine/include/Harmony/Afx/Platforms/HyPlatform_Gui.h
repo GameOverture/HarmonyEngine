@@ -29,7 +29,7 @@
 				std::terminate(); \
 			} \
 		} while (false)
-	#define HyError(message) abort();
+	#define HyError(message) std::cerr << message; abort();
 #else
 	#define HyAssert(condition, message) do { } while (false)
 	#define HyError(message) do { } while (false)

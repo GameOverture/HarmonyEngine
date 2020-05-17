@@ -208,7 +208,6 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		break;
 
 	default:
-		HyError("Unhandled node type within HyAssets::AcquireNodeData");
 		break;
 	}
 }
