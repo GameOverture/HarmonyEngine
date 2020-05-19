@@ -18,7 +18,7 @@ HarmonyInit::HarmonyInit()
 	sProjectDir = ".";
 
 	sGameName = "Untitled Game";
-	sDataDir = "/data";
+	sDataDir = "data";
 	uiUpdateTickMs = 0;
 	bShowCursor = true;
 	uiNumInputMappings = 1;
