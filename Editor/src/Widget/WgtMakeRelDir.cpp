@@ -75,17 +75,12 @@ QString WgtMakeRelDir::GetError()
 
 		QDir parentDir(m_sAbsParentDirPath);
 		QDir newDir(parentDir.absolutePath() + "/" + ui->txtDirName->text());
-
-		if(parentDir.exists() == false)
+		if(parentDir.exists() && newDir.exists() && newDir.isEmpty() == false)
 		{
-			sError = "Error: " % m_sTitle % " directory's parent location does not exist.";
+			sError = "Error: " % m_sTitle % " directory does not point to an empty folder.";
 			break;
 		}
-		if(newDir.exists() && parentDir.isEmpty() == false)
-		{
-			sError = "Error: The specified " % m_sTitle % " directory exists and is not empty.";
-			break;
-		}
+		
 	} while(false);
 
 	return sError;
