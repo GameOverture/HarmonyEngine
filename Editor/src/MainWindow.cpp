@@ -16,6 +16,7 @@
 #include "DlgSetEngineLocation.h"
 #include "DlgNewProject.h"
 #include "DlgNewItem.h"
+#include "DlgNewBuild.h"
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
 #include "ExplorerWidget.h"
@@ -579,105 +580,114 @@ void MainWindow::on_actionLaunchIDE_triggered()
 		return;
 	}
 
-	QStringList sFilterList;
-
-#if defined(Q_OS_WIN)
-	sFilterList << "*.sln";
-#endif
-
-	QDir srcDir(Harmony::GetProject()->GetSourceAbsPath());
-	srcDir.setNameFilters(sFilterList);
-	QFileInfoList ideFileInfoList = srcDir.entryInfoList();
-
-	if(ideFileInfoList.empty())
+	DlgNewBuild *pDlg = new DlgNewBuild(*Harmony::GetProject(), this);
+	if(pDlg->exec())
 	{
-		HyGuiLog("Could not find appropriate IDE file to launch", LOGTYPE_Error);
-		return;
+		
 	}
+	delete pDlg;
 
-#if defined(Q_OS_WIN)
-	bool bUseVs2017 = false;
-	bool bUseVs2015 = false;
-	bool bUseVs2013 = false;
+	//Harmony::GetProject()->RunCMakeGui();
 
-	QSettings windowsRegEntryVS2017("HKEY_CLASSES_ROOT\\VisualStudio.DTE.15.0", QSettings::NativeFormat);
-	if(windowsRegEntryVS2017.childKeys().empty() == false)
-		bUseVs2017 = true;
-
-	QSettings windowsRegEntryVS2015("HKEY_CLASSES_ROOT\\VisualStudio.DTE.14.0", QSettings::NativeFormat);
-	if(windowsRegEntryVS2015.childKeys().empty() == false)
-		bUseVs2015 = true;
-
-	QSettings windowsRegEntryVS2013("HKEY_CLASSES_ROOT\\VisualStudio.DTE.12.0", QSettings::NativeFormat);
-	if(windowsRegEntryVS2013.childKeys().empty() == false)
-		bUseVs2013 = true;
-
-	// Use the newest version
-	if(bUseVs2017)
-		bUseVs2013 = bUseVs2015 = false;
-	else if(bUseVs2015)
-		bUseVs2013 = false;
-	else if(bUseVs2013 == false) {
-		HyGuiLog("No appropriate IDE was detected on this machine.", LOGTYPE_Error);
-	}
-
-	for(int i = 0; i < ideFileInfoList.size(); ++i)
-	{
-		QFile file(ideFileInfoList[i].absoluteFilePath());
-		if(file.open(QFile::ReadOnly))
-		{
-			QTextStream in(&file);
-			QString line;
-			do
-			{
-				line = in.readLine();
-
-				if(line.contains("# Visual Studio 15", Qt::CaseSensitive))
-				{
-					if(bUseVs2017)
-					{
-						file.close();
-						if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
-							HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
-						return;
-					}
-					else
-						break;
-				}
-
-				if(line.contains("# Visual Studio 14", Qt::CaseSensitive))
-				{
-					if(bUseVs2015)
-					{
-						file.close();
-						if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
-							HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
-						return;
-					}
-					else
-						break;
-				}
-
-				if(line.contains("# Visual Studio 2013", Qt::CaseSensitive))
-				{
-					if(bUseVs2013)
-					{
-						file.close();
-						if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
-							HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
-						return;
-					}
-					else
-						break;
-				}
-			} while (!line.isNull());
-
-			file.close();
-		}
-	}
-#endif
-
-	QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
+//	QStringList sFilterList;
+//
+//#if defined(Q_OS_WIN)
+//	sFilterList << "*.sln";
+//#endif
+//
+//	QDir srcDir(Harmony::GetProject()->GetSourceAbsPath());
+//	srcDir.setNameFilters(sFilterList);
+//	QFileInfoList ideFileInfoList = srcDir.entryInfoList();
+//
+//	if(ideFileInfoList.empty())
+//	{
+//		HyGuiLog("Could not find appropriate IDE file to launch", LOGTYPE_Error);
+//		return;
+//	}
+//
+//#if defined(Q_OS_WIN)
+//	bool bUseVs2017 = false;
+//	bool bUseVs2015 = false;
+//	bool bUseVs2013 = false;
+//
+//	QSettings windowsRegEntryVS2017("HKEY_CLASSES_ROOT\\VisualStudio.DTE.15.0", QSettings::NativeFormat);
+//	if(windowsRegEntryVS2017.childKeys().empty() == false)
+//		bUseVs2017 = true;
+//
+//	QSettings windowsRegEntryVS2015("HKEY_CLASSES_ROOT\\VisualStudio.DTE.14.0", QSettings::NativeFormat);
+//	if(windowsRegEntryVS2015.childKeys().empty() == false)
+//		bUseVs2015 = true;
+//
+//	QSettings windowsRegEntryVS2013("HKEY_CLASSES_ROOT\\VisualStudio.DTE.12.0", QSettings::NativeFormat);
+//	if(windowsRegEntryVS2013.childKeys().empty() == false)
+//		bUseVs2013 = true;
+//
+//	// Use the newest version
+//	if(bUseVs2017)
+//		bUseVs2013 = bUseVs2015 = false;
+//	else if(bUseVs2015)
+//		bUseVs2013 = false;
+//	else if(bUseVs2013 == false) {
+//		HyGuiLog("No appropriate IDE was detected on this machine.", LOGTYPE_Error);
+//	}
+//
+//	for(int i = 0; i < ideFileInfoList.size(); ++i)
+//	{
+//		QFile file(ideFileInfoList[i].absoluteFilePath());
+//		if(file.open(QFile::ReadOnly))
+//		{
+//			QTextStream in(&file);
+//			QString line;
+//			do
+//			{
+//				line = in.readLine();
+//
+//				if(line.contains("# Visual Studio 15", Qt::CaseSensitive))
+//				{
+//					if(bUseVs2017)
+//					{
+//						file.close();
+//						if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
+//							HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
+//						return;
+//					}
+//					else
+//						break;
+//				}
+//
+//				if(line.contains("# Visual Studio 14", Qt::CaseSensitive))
+//				{
+//					if(bUseVs2015)
+//					{
+//						file.close();
+//						if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
+//							HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
+//						return;
+//					}
+//					else
+//						break;
+//				}
+//
+//				if(line.contains("# Visual Studio 2013", Qt::CaseSensitive))
+//				{
+//					if(bUseVs2013)
+//					{
+//						file.close();
+//						if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
+//							HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
+//						return;
+//					}
+//					else
+//						break;
+//				}
+//			} while (!line.isNull());
+//
+//			file.close();
+//		}
+//	}
+//#endif
+//
+//	QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
 }
 
 void MainWindow::on_actionConnect_triggered()

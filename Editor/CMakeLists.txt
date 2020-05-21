@@ -37,6 +37,7 @@ if(Qt5_DIR)
 		src/Dialogs/DlgAtlasGroupSettings.cpp
 		src/Dialogs/DlgColorPicker.cpp
 		src/Dialogs/DlgInputName.cpp
+		src/Dialogs/DlgNewBuild.cpp
 		src/Dialogs/DlgNewItem.cpp
 		src/Dialogs/DlgNewProject.cpp
 		src/Dialogs/DlgProjectSettings.cpp
@@ -44,6 +45,7 @@ if(Qt5_DIR)
 		src/Dialogs/DlgAtlasGroupSettings.h
 		src/Dialogs/DlgColorPicker.h
 		src/Dialogs/DlgInputName.h
+		src/Dialogs/DlgNewBuild.h
 		src/Dialogs/DlgNewItem.h
 		src/Dialogs/DlgNewProject.h
 		src/Dialogs/DlgProjectSettings.h
@@ -51,6 +53,7 @@ if(Qt5_DIR)
 		src/Dialogs/DlgAtlasGroupSettings.ui
 		src/Dialogs/DlgColorPicker.ui
 		src/Dialogs/DlgInputName.ui
+		src/Dialogs/DlgNewBuild.ui
 		src/Dialogs/DlgNewItem.ui
 		src/Dialogs/DlgNewProject.ui
 		src/Dialogs/DlgProjectSettings.ui
@@ -149,6 +152,9 @@ if(Qt5_DIR)
 		src/Text/SubWidgets/TextFontManager.h
 		src/Text/SubWidgets/TextLayersModel.h
 		src/Text/SubWidgets/TextLayersWidget.h
+		src/Widget/WgtMakeRelDir.cpp
+		src/Widget/WgtMakeRelDir.h
+		src/Widget/WgtMakeRelDir.ui
 		src/Widget/WidgetColor.cpp
 		src/Widget/WidgetGradientEditor.cpp
 		src/Widget/WidgetLiveVariable.cpp

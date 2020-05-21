@@ -30,9 +30,6 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 	ui->txtTitleName->blockSignals(true);
 	ui->txtClassName->blockSignals(true);
 	ui->txtGameLocation->blockSignals(true);
-	ui->txtAssetsDirName->blockSignals(true);
-	ui->txtMetaDataDirName->blockSignals(true);
-	ui->txtSrcDirName->blockSignals(true);
 	{
 		ui->txtTitleName->setText("New Game");
 		ui->txtTitleName->setFocus();
@@ -44,22 +41,18 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 
 		ui->txtGameLocation->setText(sDefaultLocation);
 
-		ui->txtAssetsDirName->setValidator(HyGlobal::FileNameValidator());
-		ui->txtMetaDataDirName->setValidator(HyGlobal::FileNameValidator());
-		ui->txtSrcDirName->setValidator(HyGlobal::FileNameValidator());
-
 		on_txtTitleName_textChanged("New Game");
 	}
 	ui->txtTitleName->blockSignals(false);
 	ui->txtClassName->blockSignals(false);
 	ui->txtGameLocation->blockSignals(false);
-	ui->txtAssetsDirName->blockSignals(false);
-	ui->txtMetaDataDirName->blockSignals(false);
-	ui->txtSrcDirName->blockSignals(false);
 	
-	m_sAbsoluteAssetsDirLocation = m_sAbsoluteMetaDataDirLocation = m_sAbsoluteSrcDirLocation = GetProjDirPath();
-	SetRelativePaths();
+	UpdateProjectDir();
 
+	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
+	connect(ui->wgtDataDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
+	connect(ui->wgtMetaDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
+	connect(ui->wgtSrcDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	ErrorCheck();
 }
 
@@ -99,21 +92,21 @@ void DlgNewProject::on_buttonBox_accepted()
 	// Create workspace file tree
 	//
 	// DATA
-	buildDir.mkdir(ui->txtRelativeAssetsLocation->text());
-	buildDir.cd(ui->txtRelativeAssetsLocation->text());
+	buildDir.mkdir(ui->wgtDataDir->GetRelPath());
+	buildDir.cd(ui->wgtDataDir->GetRelPath());
 	buildDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
 	buildDir.mkdir(HyGlobal::ItemName(ITEM_Audio, true));
 
 	// META-DATA
 	buildDir.setPath(GetProjDirPath());
-	buildDir.mkdir(ui->txtRelativeMetaDataLocation->text());
-	buildDir.cd(ui->txtRelativeMetaDataLocation->text());
+	buildDir.mkdir(ui->wgtMetaDir->GetRelPath());
+	buildDir.cd(ui->wgtMetaDir->GetRelPath());
 	buildDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
 
 	// SOURCE
 	buildDir.setPath(GetProjDirPath());
-	buildDir.mkdir(ui->txtRelativeSrcLocation->text());
-	buildDir.cd(ui->txtRelativeSrcLocation->text());
+	buildDir.mkdir(ui->wgtSrcDir->GetRelPath());
+	buildDir.cd(ui->wgtSrcDir->GetRelPath());
 	QDir srcDir(buildDir);
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,9 +114,9 @@ void DlgNewProject::on_buttonBox_accepted()
 	QJsonObject jsonObj;
 	jsonObj.insert("GameName", ui->txtTitleName->text());
 	jsonObj.insert("ClassName", ui->txtClassName->text());
-	jsonObj.insert("DataPath", QString(ui->txtRelativeAssetsLocation->text() + "/"));
-	jsonObj.insert("MetaDataPath", QString(ui->txtRelativeMetaDataLocation->text() + "/"));
-	jsonObj.insert("SourcePath", QString(ui->txtRelativeSrcLocation->text() + "/"));
+	jsonObj.insert("DataPath", QString(ui->wgtDataDir->GetRelPath() + "/"));
+	jsonObj.insert("MetaDataPath", QString(ui->wgtMetaDir->GetRelPath() + "/"));
+	jsonObj.insert("SourcePath", QString(ui->wgtSrcDir->GetRelPath() + "/"));
 
 	QFile newProjectFile(GetProjFilePath());
 	if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -187,9 +180,10 @@ void DlgNewProject::on_buttonBox_accepted()
 
 		sContents.replace("%HY_TITLE%", ui->txtTitleName->text());
 		sContents.replace("%HY_CLASS%", ui->txtClassName->text());
+		sContents.replace("%HY_PROJDIR%", GetProjDirPath());
 		sContents.replace("%HY_SRCDIR%", QDir(GetProjDirPath()).relativeFilePath(srcDir.absolutePath()));
 		sContents.replace("%HY_HARMONYDIR%", MainWindow::EngineSrcLocation());
-		sContents.replace("%HY_DATADIR%", ui->txtRelativeAssetsLocation->text());
+		sContents.replace("%HY_RELDATADIR%", ui->wgtDataDir->GetRelPath());
 
 		if(!file.open(QFile::WriteOnly))
 		{
@@ -221,7 +215,7 @@ void DlgNewProject::on_btnBrowse_clicked()
 
 void DlgNewProject::on_txtGameLocation_textChanged(const QString &arg1)
 {
-	UpdateAbsoluteDirLocations();
+	UpdateProjectDir();
 }
 
 void DlgNewProject::on_txtTitleName_textChanged(const QString &arg1)
@@ -235,47 +229,19 @@ void DlgNewProject::on_txtTitleName_textChanged(const QString &arg1)
 		ui->txtClassName->setText(sFixedForClass);
 
 	ui->lblAppendHint->setText("Appends \"/" % ui->txtClassName->text() % "/\" to above");
-	UpdateAbsoluteDirLocations();
+	UpdateProjectDir();
 }
 
-void DlgNewProject::UpdateAbsoluteDirLocations()
+void DlgNewProject::on_chkCreateGameDir_clicked()
 {
-	// Update the asset/meta/src directories in attempt to stay relative to new directory
-	QString sProjDirPath = GetProjDirPath();
-
-	int iIndex = 0;
-
-	QString sAssetsDir(QDir::cleanPath(sProjDirPath % "/" % ui->txtRelativeAssetsLocation->text()));
-	sAssetsDir.replace('\\', '/');
-	iIndex = sAssetsDir.lastIndexOf('/');
-	sAssetsDir.remove(iIndex, sAssetsDir.length() - iIndex);
-	m_sAbsoluteAssetsDirLocation = sAssetsDir;
-
-	QString sMetaDataDir(QDir::cleanPath(sProjDirPath % "/" % ui->txtRelativeMetaDataLocation->text()));
-	sMetaDataDir.replace('\\', '/');
-	iIndex = sMetaDataDir.lastIndexOf('/');
-	sMetaDataDir.remove(iIndex, sMetaDataDir.length() - iIndex);
-	m_sAbsoluteMetaDataDirLocation = sMetaDataDir;
-
-	QString sSourceDir(QDir::cleanPath(sProjDirPath % "/" % ui->txtRelativeSrcLocation->text()));
-	sSourceDir.replace('\\', '/');
-	iIndex = sSourceDir.lastIndexOf('/');
-	sSourceDir.remove(iIndex, sSourceDir.length() - iIndex);
-	m_sAbsoluteSrcDirLocation = sSourceDir;
-
-	// SetRelativePaths should technically already be correct, but we do need the ErrorCheck() call within
-	SetRelativePaths();
+	UpdateProjectDir();
 }
 
-void DlgNewProject::SetRelativePaths()
+void DlgNewProject::UpdateProjectDir()
 {
-	QDir rootLocation(GetProjDirPath());
-	
-	ui->txtRelativeAssetsLocation->setText(rootLocation.relativeFilePath(QDir::cleanPath(m_sAbsoluteAssetsDirLocation % "/" % ui->txtAssetsDirName->text())));
-	ui->txtRelativeMetaDataLocation->setText(rootLocation.relativeFilePath(QDir::cleanPath(m_sAbsoluteMetaDataDirLocation % "/" % ui->txtMetaDataDirName->text())));
-	ui->txtRelativeSrcLocation->setText(rootLocation.relativeFilePath(QDir::cleanPath(m_sAbsoluteSrcDirLocation % "/" % ui->txtSrcDirName->text())));
-
-	ErrorCheck();
+	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath());
+	ui->wgtMetaDir->Setup("Meta-Data", "_metaData", GetProjDirPath());
+	ui->wgtSrcDir->Setup("Source", "src", GetProjDirPath());
 }
 
 void DlgNewProject::ErrorCheck()
@@ -303,139 +269,36 @@ void DlgNewProject::ErrorCheck()
 			bIsError = true;
 			break;
 		}
-		
+
 		QDir rootDir(GetProjDirPath());
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		QDir assetsDirLocation(m_sAbsoluteAssetsDirLocation);
+		QString sError;
+		sError = ui->wgtDataDir->GetError();
+		if(sError.isEmpty() == false)
+		{
+			ui->lblError->setText(sError);
+			bIsError = true;
+			break;
+		}
 
-		if(QDir::isRelativePath(rootDir.relativeFilePath(m_sAbsoluteAssetsDirLocation)) == false &&
-		   assetsDirLocation.exists() == false)
+		sError = ui->wgtMetaDir->GetError();
+		if(sError.isEmpty() == false)
 		{
-			ui->lblError->setText("Error: Assets location (relative to project) does not exist.");
+			ui->lblError->setText(sError);
 			bIsError = true;
 			break;
 		}
-		if(ui->txtAssetsDirName->text().isEmpty())
-		{
-			ui->lblError->setText("Error: Assets directory name cannot be blank");
-			bIsError = true;
-			break;
-		}
-		if(assetsDirLocation.exists(ui->txtAssetsDirName->text()))
-		{
-			ui->lblError->setText("Error: A directory at the assets location already has the name: " + ui->txtAssetsDirName->text());
-			bIsError = true;
-			break;
-		}
-		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		QDir metaDataDirLocation(m_sAbsoluteMetaDataDirLocation);
 
-		if(QDir::isRelativePath(rootDir.relativeFilePath(m_sAbsoluteMetaDataDirLocation)) == false &&
-		   metaDataDirLocation.exists() == false)
+		sError = ui->wgtSrcDir->GetError();
+		if(sError.isEmpty() == false)
 		{
-			ui->lblError->setText("Error: Meta-data location (relative to project) does not exist.");
+			ui->lblError->setText(sError);
 			bIsError = true;
 			break;
 		}
-		if(ui->txtMetaDataDirName->text().isEmpty())
-		{
-			ui->lblError->setText("Error: Meta-data directory name cannot be blank");
-			bIsError = true;
-			break;
-		}
-		if(metaDataDirLocation.exists(ui->txtMetaDataDirName->text()))
-		{
-			ui->lblError->setText("Error: A directory at the meta-data location already has the name: " + ui->txtMetaDataDirName->text());
-			bIsError = true;
-			break;
-		}
-		
 	}while(false);
 
-	if(bIsError)
-		ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
-	else
-	{
-		ui->lblError->setStyleSheet("QLabel { color : black; }");
-		ui->lblError->setText(GetProjFilePath() + "is a valid project workspace.");
-	}
 	ui->lblError->setVisible(bIsError);
 	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
-}
-
-
-void DlgNewProject::on_btnBrowseAssets_clicked()
-{
-	QFileDialog *pDlg = new QFileDialog(this, "Choose where this game's assets directory will be *created* at");
-	pDlg->setDirectory(m_sAbsoluteAssetsDirLocation);
-	pDlg->setFileMode(QFileDialog::Directory);
-	pDlg->setOption(QFileDialog::ShowDirsOnly, true);
-
-	pDlg->setViewMode(QFileDialog::Detail);
-	pDlg->setWindowModality( Qt::ApplicationModal );
-	pDlg->setModal(true);
-
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		m_sAbsoluteAssetsDirLocation = pDlg->selectedFiles()[0];
-		SetRelativePaths();
-	}
-}
-
-void DlgNewProject::on_btnBrowseMetaData_clicked()
-{
-	QFileDialog *pDlg = new QFileDialog(this, "Choose where this game's meta-data directory will be *created* at");
-	pDlg->setDirectory(m_sAbsoluteMetaDataDirLocation);
-	pDlg->setFileMode(QFileDialog::Directory);
-	pDlg->setOption(QFileDialog::ShowDirsOnly, true);
-
-	pDlg->setViewMode(QFileDialog::Detail);
-	pDlg->setWindowModality( Qt::ApplicationModal );
-	pDlg->setModal(true);
-
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		m_sAbsoluteMetaDataDirLocation = pDlg->selectedFiles()[0];
-		SetRelativePaths();
-	}
-}
-
-void DlgNewProject::on_btnBrowseSrc_clicked()
-{
-	QFileDialog *pDlg = new QFileDialog(this, "Choose where this game's source code directory will be *created* at");
-	pDlg->setDirectory(m_sAbsoluteSrcDirLocation);
-	pDlg->setFileMode(QFileDialog::Directory);
-	pDlg->setOption(QFileDialog::ShowDirsOnly, true);
-
-	pDlg->setViewMode(QFileDialog::Detail);
-	pDlg->setWindowModality( Qt::ApplicationModal );
-	pDlg->setModal(true);
-
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		m_sAbsoluteSrcDirLocation = pDlg->selectedFiles()[0];
-		SetRelativePaths();
-	}
-}
-
-void DlgNewProject::on_chkCreateGameDir_clicked()
-{
-	UpdateAbsoluteDirLocations();
-}
-
-void DlgNewProject::on_txtAssetsDirName_textChanged(const QString &arg1)
-{
-	SetRelativePaths();
-}
-
-void DlgNewProject::on_txtMetaDataDirName_textChanged(const QString &arg1)
-{
-	SetRelativePaths();
-}
-
-void DlgNewProject::on_txtSourceDirName_textChanged(const QString &arg1)
-{
-	SetRelativePaths();
 }

@@ -26,6 +26,7 @@
 #include <QTreeWidgetItemIterator>
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <QProcess>
 
 ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 	m_pProjectOwner(pProjectOwner)
@@ -846,6 +847,20 @@ void Project::ApplySaveEnables()
 	}
 
 	MainWindow::ApplySaveEnables(bCurItemDirty, bAnyItemDirty);
+}
+
+void Project::RunCMakeGui()
+{
+#if defined(Q_OS_WIN)
+	QString sCMakeApp = "cmake-gui.exe";
+	QStringList sArgList;
+	sArgList << "-S" << GetDirPath() << "-B" << QDir::cleanPath(GetDirPath()+QDir::separator()+"build");
+
+	QProcess *pCMakeProcess = new QProcess(this);
+	pCMakeProcess->start(sCMakeApp, sArgList);
+#else
+	HyGuiLog("RunCMake not implemented for this platform", LOGTYPE_Warning);
+#endif
 }
 
 bool Project::HarmonyInitialize()

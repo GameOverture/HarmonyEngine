@@ -141,6 +141,8 @@ public:
 
 	void ApplySaveEnables();
 
+	void RunCMakeGui();
+
 	// IHyEngine
 	bool HarmonyInitialize();
 	bool HarmonyUpdate();
