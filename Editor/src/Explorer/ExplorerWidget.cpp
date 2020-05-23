@@ -322,7 +322,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	FINDACTION("actionNewEntity")->setEnabled(bValidItem);
 	FINDACTION("actionNewPrefab")->setEnabled(bValidItem);
 	FINDACTION("actionNewEntity3d")->setEnabled(bValidItem);
-	FINDACTION("actionLaunchIDE")->setEnabled(bValidItem);
+	FINDACTION("actionNewBuild")->setEnabled(bValidItem);
 
 	if(pCurSelected)
 	{

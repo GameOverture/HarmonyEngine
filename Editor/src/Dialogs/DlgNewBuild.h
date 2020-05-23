@@ -21,14 +21,37 @@ class DlgNewBuild : public QDialog
 	Q_OBJECT
 
 	Project &				m_ProjectRef;
+	QString					m_sCMakeHelp;
+	bool					m_bCMakeFound;
+
+	enum PlatformPage
+	{
+		PLAT_Desktop = 0,
+		PLAT_Browser
+	};
 
 public:
 	explicit DlgNewBuild(Project &projectRef, QWidget *parent = 0);
 	~DlgNewBuild();
 
+	QString GetCMakeGenerator() const;
+
 private Q_SLOTS:
 
 	void on_buttonBox_accepted();
+
+	void on_radDesktop_clicked();
+	void on_radBrowser_clicked();
+
+	void on_radCMake_clicked();
+	void on_radCMakeGui_clicked();
+
+	void on_cmbCMake_currentIndexChanged(int iIndex);
+
+	void on_btnCMakeHelp_clicked();
+
+	void on_txtEmscriptenSdk_textChanged(const QString &arg1);
+	void on_btnEmscriptenSdkBrowse_clicked();
 
 private:
 	Ui::DlgNewBuild *ui;

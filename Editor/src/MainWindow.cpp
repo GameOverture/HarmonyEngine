@@ -34,6 +34,7 @@
 #include <QDate>
 #include <QLabel>
 #include <QShortcut>
+#include <QProcess>
 
 /*static*/ MainWindow *MainWindow::sm_pInstance = nullptr;
 
@@ -78,7 +79,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionPaste);
 	ui->explorer->addAction(ui->actionRemove);
 	ui->explorer->addAction(ui->actionRename);
-	ui->explorer->addAction(ui->actionLaunchIDE);
+	ui->explorer->addAction(ui->actionNewBuild);
 	ui->explorer->addAction(ui->actionActivateProject);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -572,18 +573,23 @@ void MainWindow::on_menu_View_aboutToShow()
 	ui->menu_View->addActions(pPopupMenu->actions());
 }
 
-void MainWindow::on_actionLaunchIDE_triggered()
+void MainWindow::on_actionNewBuild_triggered()
 {
 	if(Harmony::GetProject() == nullptr)
 	{
-		HyGuiLog("on_actionLaunchIDE_triggered invoked with no loaded project", LOGTYPE_Error);
+		HyGuiLog("on_actionNewBuild_triggered invoked with no loaded project", LOGTYPE_Error);
 		return;
 	}
 
 	DlgNewBuild *pDlg = new DlgNewBuild(*Harmony::GetProject(), this);
 	if(pDlg->exec())
 	{
-		
+		QString sCMakeApp = "cmake";
+		QStringList sArgList;
+		sArgList << "-G" << pDlg->GetCMakeGenerator();
+		QProcess *pCMakeProcess = new QProcess(this);
+		pCMakeProcess->start(sCMakeApp, sArgList);
+		pCMakeProcess->waitForFinished();
 	}
 	delete pDlg;
 

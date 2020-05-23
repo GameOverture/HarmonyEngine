@@ -98,7 +98,7 @@ private Q_SLOTS:
 
 	void on_menu_View_aboutToShow();
 	
-	void on_actionLaunchIDE_triggered();
+	void on_actionNewBuild_triggered();
 	void on_actionConnect_triggered();
 	
 	void on_actionAbout_triggered();

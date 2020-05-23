@@ -184,5 +184,11 @@
         <file>icons16x16/items/Text-Pending.png</file>
         <file>icons16x16/items/Text-Settings.png</file>
         <file>icons16x16/items/Text-Warning.png</file>
+        <file>icons16x16/items/Build.png</file>
+        <file>icons16x16/items/Build-Delete.png</file>
+        <file>icons16x16/items/Build-New.png</file>
+        <file>icons16x16/items/Build-Pending.png</file>
+        <file>icons16x16/items/Build-Settings.png</file>
+        <file>icons16x16/items/Build-Warning.png</file>
     </qresource>
 </RCC>
