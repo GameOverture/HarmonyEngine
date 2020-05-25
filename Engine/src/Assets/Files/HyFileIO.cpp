@@ -11,10 +11,6 @@
 #include "Assets/Files/HyFileIO.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-#if defined(HY_COMPILER_MSVC)
-	#include <experimental/filesystem>
-#endif
-
 //void HyFindFilesRecursively(const char *szDirPath, const std::string &sExtension, std::vector<std::string> &filesFoundOut)
 //{
 //	transform(sExtension.begin(), sExtension.end(), sExtension.begin(), ::tolower);
@@ -96,10 +92,6 @@ void WriteTextFile(const char *szFilePath, const char *szContentBuffer)
 
 bool HyFileExists(const std::string &sFilePath)
 {
-#if defined(HY_COMPILER_MSVC)
-	return std::experimental::filesystem::exists(sFilePath);
-#else
 	std::ifstream infile(sFilePath.c_str());
 	return infile.good();
-#endif
 }
