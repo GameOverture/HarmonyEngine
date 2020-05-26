@@ -32,6 +32,7 @@ public:
 	void Setup(QString sTitle, QString sDefaultName, QString sAbsProjectPath);
 
 	QString GetRelPath() const;
+	QString GetAbsPath() const;
 
 	void Refresh();
 	QString GetError();

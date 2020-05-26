@@ -34,7 +34,8 @@ public:
 	explicit DlgNewBuild(Project &projectRef, QWidget *parent = 0);
 	~DlgNewBuild();
 
-	QString GetCMakeGenerator() const;
+	QString GetProc() const;
+	QStringList GetProcOptions() const;
 
 private Q_SLOTS:
 

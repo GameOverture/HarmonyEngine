@@ -50,6 +50,11 @@ QString WgtMakeRelDir::GetRelPath() const
 	return ui->txtRelativePath->text() % "/" % ui->txtDirName->text();
 }
 
+QString WgtMakeRelDir::GetAbsPath() const
+{
+	return m_sAbsParentDirPath % "/" % ui->txtDirName->text();
+}
+
 void WgtMakeRelDir::Refresh()
 {
 	QDir projDir(m_sAbsProjPath);

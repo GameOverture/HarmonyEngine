@@ -131,6 +131,7 @@ enum Theme
 #define HYTREEWIDGETITEM_IsFilter				"HyTreeFilter"
 
 #define HYGUIPATH_TempDir						"temp/"
+#define HYGUIPATH_EditorDataDir					"Editor/data/"
 #define HYGUIPATH_ProjGenDir					"Editor/data/_projGen/"
 #define HYMETA_AtlasFile						"atlas.hygui"
 #define HYMETA_DataFile							"data.hygui"

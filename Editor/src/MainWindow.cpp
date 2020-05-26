@@ -420,6 +420,18 @@ void MainWindow::OnCtrlTab()
 //    //pTabBar
 }
 
+void MainWindow::OnProcessStdOut()
+{
+	QProcess *p = (QProcess *)sender();
+	HyGuiLog(p->readAllStandardOutput(), LOGTYPE_Normal);
+}
+
+void MainWindow::OnProcessErrorOut()
+{
+	QProcess *p = (QProcess *)sender();
+	HyGuiLog(p->readAllStandardError(), LOGTYPE_Error);
+}
+
 void MainWindow::on_actionNewProject_triggered()
 {
 	DlgNewProject *pDlg = new DlgNewProject(m_sDefaultProjectLocation, this);
@@ -584,12 +596,10 @@ void MainWindow::on_actionNewBuild_triggered()
 	DlgNewBuild *pDlg = new DlgNewBuild(*Harmony::GetProject(), this);
 	if(pDlg->exec())
 	{
-		QString sCMakeApp = "cmake";
-		QStringList sArgList;
-		sArgList << "-G" << pDlg->GetCMakeGenerator();
-		QProcess *pCMakeProcess = new QProcess(this);
-		pCMakeProcess->start(sCMakeApp, sArgList);
-		pCMakeProcess->waitForFinished();
+		QProcess *pBuildProcess = new QProcess(this);
+		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
+		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
+		pBuildProcess->start(pDlg->GetProc(), pDlg->GetProcOptions());
 	}
 	delete pDlg;
 

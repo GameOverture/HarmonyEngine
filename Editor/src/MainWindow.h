@@ -79,6 +79,8 @@ protected:
 
 private Q_SLOTS:
 	void OnCtrlTab();
+	void OnProcessStdOut();
+	void OnProcessErrorOut();
 
 	void on_actionNewProject_triggered();
 	void on_actionOpenProject_triggered();

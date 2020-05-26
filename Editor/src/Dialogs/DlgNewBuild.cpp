@@ -11,6 +11,7 @@
 #include "DlgNewBuild.h"
 #include "ui_DlgNewBuild.h"
 #include "Project.h"
+#include "MainWindow.h"
 
 #include <QDir>
 #include <QFileDialog>
@@ -43,8 +44,14 @@ DlgNewBuild::DlgNewBuild(Project &projectRef, QWidget *parent) :
 		m_bCMakeFound = true;
 
 		m_sCMakeHelp = pCMakeProcess->readAllStandardOutput();
+		
+		// Isolate the generators in --help
 		QString sCMakeGeneratorOutput = m_sCMakeHelp;
 		sCMakeGeneratorOutput = sCMakeGeneratorOutput.remove(0, sCMakeGeneratorOutput.indexOf(QRegularExpression("^Generators", QRegularExpression::MultilineOption)));
+
+		// Isolate the options in --help
+		m_sCMakeHelp = m_sCMakeHelp.remove(0, m_sCMakeHelp.indexOf(QRegularExpression("^Options", QRegularExpression::MultilineOption)));
+		m_sCMakeHelp.chop(m_sCMakeHelp.size() - m_sCMakeHelp.indexOf(QRegularExpression("^Generators", QRegularExpression::MultilineOption)));
 
 		// Use regular expressions to find generators with the --help output
 		QStringList sGeneratorList;
@@ -86,9 +93,47 @@ DlgNewBuild::~DlgNewBuild()
 	delete ui;
 }
 
-QString DlgNewBuild::GetCMakeGenerator() const
+QString DlgNewBuild::GetProc() const
 {
-	return ui->cmbCMake->currentText();
+	if(ui->radDesktop->isChecked())
+		return "cmake";
+	else if(ui->radBrowser->isChecked())
+	{
+#ifdef Q_OS_WIN
+		return MainWindow::EngineSrcLocation() % HYGUIPATH_EditorDataDir % "embuild.bat";
+#else
+		HyGuiLog("DlgNewBuild::GetProc() not implemented on this platform", LOGTYPE_Error);
+#endif
+	}
+
+	return QString();
+}
+
+QStringList DlgNewBuild::GetProcOptions() const
+{
+	if(ui->radDesktop->isChecked())
+	{
+		return QStringList()	<< "-G"
+								<< ui->cmbCMake->currentText()
+								<< ui->txtCMakeOptions->text().split(' ', QString::SkipEmptyParts)
+								<< "-S"
+								<< m_ProjectRef.GetDirPath()
+								<< "-B"
+								<< ui->wgtBuildDir->GetAbsPath();
+	}
+	else if(ui->radBrowser->isChecked())
+	{
+		QDir buildDir(ui->wgtBuildDir->GetAbsPath());
+		QString sFormattedPath = buildDir.absolutePath();
+#ifdef Q_OS_WIN
+		sFormattedPath.replace("/", "\\");	// batch file requires Windows native directory separators
+#endif
+		return QStringList()	<< sFormattedPath
+								<< QDir::cleanPath(ui->txtEmscriptenSdk->text())
+								<< buildDir.relativeFilePath(m_ProjectRef.GetDirPath());
+	}
+
+	return QStringList();
 }
 
 void DlgNewBuild::on_buttonBox_accepted()
