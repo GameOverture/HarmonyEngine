@@ -7,7 +7,8 @@ Cross-platform multi-threaded engine that combines the best open-source librarie
 
 Getting Started:
 ----------------
-TBD
+1. Clone this repository
+2. Download and execute the CMake Installer. Make sure to set the PATH variable during installation
 
 Harmony Library
 ---------------
