@@ -83,7 +83,7 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 #else
 	if(bint.c[0] != 1) {
 		HyError("HY_ENDIAN_BIG was defined but did not pass calculation test");
-}
+	}
 #endif
 }
 
