@@ -20,7 +20,6 @@ HyTime::HyTime(uint32 uiUpdateTickMs) :
 	m_dTotalElapsedTime(0.0),
 	m_dThrottledTime(0.0),
 	m_dSpiralOfDeathCounter(HYTIME_ThresholdWarningsEvery),
-	m_dPrevTime(0.0),
 	m_dCurDeltaTime(0.0)
 {
 	IHyTimeInst::sm_pTime = this;
@@ -32,28 +31,21 @@ HyTime::~HyTime(void)
 	IHyTimeInst::sm_pTime = nullptr;
 }
 
-uint32 HyTime::GetUpdateTickMs()
-{
-	return m_uiUpdateTickMs;
-}
-
 void HyTime::SetUpdateTickMs(uint32 uiUpdateTickMs)
 {
 	if(uiUpdateTickMs == 0)
 	{
-		HyLogInfo("HyTime::SetUpdateTickMs was passed '0', using default 16 instead.");
+		HyLogInfo("HyTime::SetUpdateTickMs was passed '0', using non-throttled, variable updating.");
 		uiUpdateTickMs = 20;
 	}
 
-	m_uiUpdateTickMs = uiUpdateTickMs;
-	m_dUpdateTick_Seconds = (1.0 / static_cast<double>(m_uiUpdateTickMs)* 1000.0) / 1000.0;
-
+	m_dUpdateTick_Seconds = (1.0 / static_cast<double>(uiUpdateTickMs) * 1000.0) / 1000.0;
 	m_dThrottledTime = 0.0;
 }
 
 float HyTime::GetUpdateStepSeconds() const
 {
-	return static_cast<float>(m_dCurDeltaTime);//return static_cast<float>(m_dUpdateTick_Seconds);
+	return static_cast<float>(m_dCurDeltaTime);
 }
 
 double HyTime::GetUpdateStepSecondsDbl() const
@@ -68,11 +60,11 @@ double HyTime::GetTotalElapsedTime() const
 
 void HyTime::SetCurDeltaTime()
 {
-#ifdef HY_USE_GLFW
-	double dCurTime = glfwGetTime();
+#ifdef HY_USE_SDL2
+	m_uiPrev = m_uiCur;
+	m_uiCur = SDL_GetPerformanceCounter();
 
-	m_dCurDeltaTime = dCurTime - m_dPrevTime;
-	m_dPrevTime = dCurTime;
+	m_dCurDeltaTime = static_cast<double>(m_uiCur - m_uiPrev) / static_cast<double>(SDL_GetPerformanceFrequency());
 #else
 	m_dCurDeltaTime = 0.0166667;
 #endif

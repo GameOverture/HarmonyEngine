@@ -104,12 +104,12 @@ bool HyEngine::Update()
 	m_Time.CalcTimeDelta();
 	m_Diagnostics.ApplyTimeDelta();
 
-	//HyThrottleUpdate
-	{
 #ifdef HY_CONFIG_SINGLETHREAD
-		IHyThreadClass::SingleThreadUpdate();
+	IHyThreadClass::SingleThreadUpdate();
 #endif
 
+	//HyThrottleUpdate
+	{
 		m_Scene.UpdateNodes();
 		m_Scene.UpdatePhysics();
 
