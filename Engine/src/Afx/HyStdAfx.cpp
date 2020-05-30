@@ -10,8 +10,7 @@
 
 // This cpp module includes HyStdAfx.h to create the precompiled header
 #include "Afx/HyStdAfx.h"
-#include "Utilities/HyStrManip.h"
-#include "Assets/Files/HyFileIO.h"
+#include "Utilities/HyIO.h"
 
 HarmonyInit::HarmonyInit()
 {
@@ -46,10 +45,10 @@ HarmonyInit::HarmonyInit()
 
 HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 {
-	sHyProjFileName = HyStr::MakeStringProperPath(sHyProjFileName.c_str(), ".hyproj", false);
+	sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj", false);
 
 	std::string sProjFileContents;
-	HyReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
+	HyIO::ReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
 	
 	jsonxx::Object projObject;
 	projObject.parse(sProjFileContents);
@@ -58,9 +57,9 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	{
 		sProjectDir = projObject.get<jsonxx::String>("AdjustWorkingDirectory");
 		sHyProjFileName = sProjectDir + "/" + sHyProjFileName;
-		sHyProjFileName = HyStr::MakeStringProperPath(sHyProjFileName.c_str(), ".hyproj", false);
+		sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj", false);
 
-		HyReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
+		HyIO::ReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
 		projObject.parse(sProjFileContents);
 
 		sDataDir = sProjectDir + "/" + projObject.get<jsonxx::String>("DataPath");
@@ -71,8 +70,8 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		sDataDir = projObject.get<jsonxx::String>("DataPath");
 	}
 
-	sProjectDir = HyStr::MakeStringProperPath(sProjectDir.c_str(), "", true);
-	sDataDir = HyStr::MakeStringProperPath(sDataDir.c_str(), "", true);
+	sProjectDir = HyIO::CleanPath(sProjectDir.c_str(), "", true);
+	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "", true);
 	
 	sGameName				= projObject.get<jsonxx::String>("GameName");
 	uiUpdateTickMs			= static_cast<uint32>(projObject.get<jsonxx::Number>("UpdateFpsCap")); // TODO: Change name

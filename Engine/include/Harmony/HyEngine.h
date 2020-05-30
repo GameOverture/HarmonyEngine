@@ -36,7 +36,7 @@
 #include "UI/HyMeter.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyImage.h"
-#include "Utilities/HyStrManip.h"
+#include "Utilities/HyIO.h"
 #include "Utilities/HyRand.h"
 
 class HyEngine

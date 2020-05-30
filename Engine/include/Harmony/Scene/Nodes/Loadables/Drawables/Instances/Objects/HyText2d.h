@@ -138,6 +138,9 @@ protected:
 private:
 	void MarkAsDirty();
 	void CalculateGlyphInfos();
+
+	// Converts a given UTF-8 encoded character (array) to its UTF-32 LE equivalent
+	uint32 HyUtf8_to_Utf32(const char *pChar, uint32 &uiNumBytesUsedRef);
 };
 
 #endif /* HyText2d_h__ */

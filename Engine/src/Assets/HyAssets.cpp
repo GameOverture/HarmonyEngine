@@ -10,7 +10,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
-#include "Assets/Files/HyFileIO.h"
 #include "Assets/Files/HyAtlas.h"
 #include "Assets/Files/HyGLTF.h"
 #include "Assets/Files/HyAudioBank.h"
@@ -28,8 +27,8 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
 #include "Renderer/IHyRenderer.h"
+#include "Utilities/HyIO.h"
 #include "Utilities/HyMath.h"
-#include "Utilities/HyStrManip.h"
 #include "Diagnostics/Console/HyConsole.h"
 
 #include <fstream>
@@ -45,7 +44,7 @@ void HyAssets::Factory<tData>::Init(const jsonxx::Object &subDirObjRef, HyAssets
 	uint32 i = 0;
 	for(auto iter = subDirObjRef.kv_map().begin(); iter != subDirObjRef.kv_map().end(); ++iter, ++i)
 	{
-		std::string sPath = HyStr::MakeStringProperPath(iter->first.c_str(), nullptr, true);
+		std::string sPath = HyIO::CleanPath(iter->first.c_str(), nullptr, true);
 		m_LookupIndexMap.insert(std::make_pair(sPath, i));
 
 		m_DataList.emplace_back(iter->first, subDirObjRef.get<jsonxx::Object>(iter->first), assetsRef);
@@ -58,10 +57,10 @@ const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const
 	std::string sPath;
 
 	if(sPrefix.empty() == false)
-		sPath += HyStr::MakeStringProperPath(sPrefix.c_str(), "/", true);
+		sPath += HyIO::CleanPath(sPrefix.c_str(), "/", true);
 
 	sPath += sName;
-	sPath = HyStr::MakeStringProperPath(sPath.c_str(), nullptr, true);
+	sPath = HyIO::CleanPath(sPath.c_str(), nullptr, true);
 
 	auto iter = m_LookupIndexMap.find(sPath);
 	if(iter == m_LookupIndexMap.end())
@@ -80,7 +79,7 @@ HyAssets::HyAssets(HyAudio &audioRef, HyScene &sceneRef, std::string sDataDirPat
 	IHyThreadClass(HYTHREAD_Lowest),
 	m_AudioRef(audioRef),
 	m_SceneRef(sceneRef),
-	m_sDATADIR(HyStr::MakeStringProperPath(sDataDirPath.c_str(), "/", true)),
+	m_sDATADIR(HyIO::CleanPath(sDataDirPath.c_str(), "/", true)),
 	m_bInitialized(false),
 	m_pAtlases(nullptr),
 	m_uiNumAtlases(0),
@@ -426,7 +425,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir + HYASSETS_AtlasFile);
 	std::string sAtlasInfoFileContents;
-	HyReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
+	HyIO::ReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
 
 	jsonxx::Object atlasFileObj;
 	if(atlasFileObj.parse(sAtlasInfoFileContents))
@@ -503,7 +502,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	std::string sGameDataFilePath(m_sDATADIR);
 	sGameDataFilePath += HYASSETS_DataFile;
 	std::string sGameDataFileContents;
-	HyReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);
+	HyIO::ReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);
 
 	jsonxx::Object gameDataObj;
 	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);

@@ -12,7 +12,6 @@
 #include "SpriteWidget.h"
 #include "Project.h"
 #include "ExplorerModel.h"
-#include "Harmony/Utilities/HyStrManip.h"
 
 #include <QFileInfo>
 #include <QJsonDocument>

@@ -9,10 +9,10 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Audio/HyAudio.h"
-#include "Assets/Files/HyFileIO.h"
 #include "Assets/Files/HyAudioBank.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/HyAssets.h"
+#include "Utilities/HyIO.h"
 #include "HyEngine.h"
 
 #if defined(HY_PLATFORM_WINDOWS)
@@ -25,7 +25,7 @@ HyAudio::HyAudio(std::string sDataDir) :
 	m_fpAllocateHyAudioInst(nullptr),
 	m_pInternal(nullptr)
 {
-	sDataDir = HyStr::MakeStringProperPath(sDataDir.c_str(), "/", true);
+	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "/", true);
 
 #if defined(HY_PLATFORM_WINDOWS)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -59,11 +59,11 @@ HyAudio::HyAudio(std::string sDataDir) :
 	}
 
 	std::string sAudioFilePath = sDataDir + HYASSETS_AudioDir + HYASSETS_AudioFile;
-	if(HyFileExists(sAudioFilePath))
+	if(HyIO::FileExists(sAudioFilePath))
 	{
 		// Create HyAudioBank objects to represent every sound bank file
 		std::string sAudioFileContents;
-		HyReadTextFile(sAudioFilePath.c_str(), sAudioFileContents);
+		HyIO::ReadTextFile(sAudioFilePath.c_str(), sAudioFileContents);
 		jsonxx::Object audioObj;
 		if(audioObj.parse(sAudioFileContents))
 		{

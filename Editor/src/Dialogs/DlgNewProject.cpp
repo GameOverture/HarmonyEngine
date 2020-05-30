@@ -11,7 +11,6 @@
 #include "DlgNewProject.h"
 #include "ui_DlgNewProject.h"
 #include "MainWindow.h"
-#include "Harmony/Utilities/HyStrManip.h"
 
 #include <QDir>
 #include <QFileDialog>

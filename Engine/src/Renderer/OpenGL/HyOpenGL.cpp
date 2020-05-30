@@ -22,7 +22,6 @@
 
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :
 	IHyRenderer(diagnosticsRef, windowListRef),
-	m_Context(nullptr),
 	m_mtxView(1.0f),
 	m_mtxProj(1.0f),
 	m_pPboHandles(nullptr),
@@ -30,9 +29,12 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 {
 	HyLog("OpenGL is initializing...");
 
+#if defined(HY_USE_SDL2)
+	m_Context = nullptr;
 	// Create the context with the first window, and share it between any other windows
 	if(m_WindowListRef.empty() == false)
 		m_Context = SDL_GL_CreateContext(m_WindowListRef[0]->GetInterop());
+#endif
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 		m_VaoMapList.push_back(std::map<HyShaderHandle, GLuint>());

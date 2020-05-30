@@ -250,7 +250,7 @@ bool HyEngine::PollPlatformApi()
 
 	sAbsDataDir += "/";
 	sAbsDataDir += HyEngine::sm_pInstance->m_Assets.GetDataDir();
-	sAbsDataDir = HyStr::MakeStringProperPath(sAbsDataDir.c_str(), "/", false);
+	sAbsDataDir = HyIO::CleanPath(sAbsDataDir.c_str(), "/", false);
 	
 	return sAbsDataDir;
 }

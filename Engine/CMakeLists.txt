@@ -26,7 +26,6 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/HyAssets.cpp
 	src/Assets/Files/HyAtlas.cpp
 	src/Assets/Files/HyAudioBank.cpp
-	src/Assets/Files/HyFileIO.cpp
 	src/Assets/Files/HyGLTF.cpp
 	src/Assets/Nodes/HyAudioData.cpp
 	src/Assets/Nodes/HyEntityData.cpp
@@ -99,11 +98,8 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/IHy9Slice.cpp
 	src/Utilities/jasonxx.cpp
 	src/Utilities/Crc32.cpp
-	src/Utilities/HyBitManip.cpp
-	src/Utilities/HyImage.cpp
+	src/Utilities/HyIO.cpp
 	src/Utilities/HyMath.cpp
-	src/Utilities/HyStrManip.cpp
-	src/Utilities/HyVariant.cpp
 	src/Window/HyWindow.cpp
 	src/Window/HyWindowManager.cpp)
 
@@ -125,7 +121,6 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Assets/HyAssets.h
 	include/Harmony/Assets/Files/HyAtlas.h
 	include/Harmony/Assets/Files/HyAudioBank.h
-	include/Harmony/Assets/Files/HyFileIO.h
 	include/Harmony/Assets/Files/HyGLTF.h
 	include/Harmony/Assets/Files/IHyFileData.h
 	include/Harmony/Assets/Nodes/HyAudioData.h
@@ -207,12 +202,9 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/IHy9Slice.h
 	include/Harmony/Utilities/jsonxx.h
 	include/Harmony/Utilities/Crc32.h
-	include/Harmony/Utilities/HyBitManip.h
-	include/Harmony/Utilities/HyImage.h
+	include/Harmony/Utilities/HyIO.h
 	include/Harmony/Utilities/HyMath.h
 	include/Harmony/Utilities/HyRand.h
-	include/Harmony/Utilities/HyStrManip.h
-	include/Harmony/Utilities/HyVariant.h
 	include/Harmony/Window/HyWindow.h
 	include/Harmony/Window/HyWindowManager.h)
 

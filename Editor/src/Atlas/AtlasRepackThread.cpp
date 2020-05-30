@@ -10,6 +10,8 @@
 #include "Global.h"
 #include "AtlasRepackThread.h"
 
+#include "soil2/SOIL2.h"
+
 #include <QPainter>
 #include <QImageWriter>
 

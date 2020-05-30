@@ -10,7 +10,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
-#include "Utilities/HyStrManip.h"
 #include "Diagnostics/Console/HyConsole.h"
 
 #include <iostream>
@@ -111,7 +110,7 @@ void HyText2d::TextSet(const std::string sText)
 	uint32 uiNumBytesUsed = 0;
 	for(uint32 i = 0; i < m_sRawString.size(); i += uiNumBytesUsed)
 	{
-		m_Utf32CodeList.push_back(HyStr::HyUtf8_to_Utf32(&m_sRawString[i], uiNumBytesUsed));
+		m_Utf32CodeList.push_back(HyUtf8_to_Utf32(&m_sRawString[i], uiNumBytesUsed));
 		HyAssert(uiNumBytesUsed > 0, "HyText2d::TextSet failed to convert utf8 -> utf32");
 	}
 
@@ -964,4 +963,46 @@ offsetCalculation:
 
 	SetDirty(DIRTY_BoundingVolume);
 	m_bIsDirty = false;
+}
+
+// Converts a given UTF-8 encoded character (array) to its UTF-32 LE equivalent
+uint32 HyText2d::HyUtf8_to_Utf32(const char *pChar, uint32 &uiNumBytesUsedRef)
+{
+	uint32 uiResult = -1;
+	uiNumBytesUsedRef = 0;
+
+	if(!pChar)
+		return uiResult;
+
+	if((pChar[0] & 0x80) == 0x0)
+	{
+		uiNumBytesUsedRef = 1;
+		uiResult = pChar[0];
+	}
+
+	if((pChar[0] & 0xC0) == 0xC0)
+	{
+		uiNumBytesUsedRef = 2;
+		uiResult = ((pChar[0] & 0x3F) << 6) | (pChar[1] & 0x3F);
+	}
+
+	if((pChar[0] & 0xE0) == 0xE0)
+	{
+		uiNumBytesUsedRef = 3;
+		uiResult = ((pChar[0] & 0x1F) << (6 + 6)) | ((pChar[1] & 0x3F) << 6) | (pChar[2] & 0x3F);
+	}
+
+	if((pChar[0] & 0xF0) == 0xF0)
+	{
+		uiNumBytesUsedRef = 4;
+		uiResult = ((pChar[0] & 0x0F) << (6 + 6 + 6)) | ((pChar[1] & 0x3F) << (6 + 6)) | ((pChar[2] & 0x3F) << 6) | (pChar[3] & 0x3F);
+	}
+
+	if((pChar[0] & 0xF8) == 0xF8)
+	{
+		uiNumBytesUsedRef = 5;
+		uiResult = ((pChar[0] & 0x07) << (6 + 6 + 6 + 6)) | ((pChar[1] & 0x3F) << (6 + 6 + 6)) | ((pChar[2] & 0x3F) << (6 + 6)) | ((pChar[3] & 0x3F) << 6) | (pChar[4] & 0x3F);
+	}
+
+	return uiResult;
 }

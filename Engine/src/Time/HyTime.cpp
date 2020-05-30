@@ -76,7 +76,7 @@ void HyTime::CalcTimeDelta()
 	
 	m_dTotalElapsedTime += m_dCurDeltaTime;
 	m_dThrottledTime += m_dCurDeltaTime;
-
+	 
 	// Update all timers
 	if(m_TimeInstList.empty() == false)
 	{
