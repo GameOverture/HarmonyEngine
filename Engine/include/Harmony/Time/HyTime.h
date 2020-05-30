@@ -21,7 +21,7 @@ class HyDiagnostics;
 
 class HyTime
 {
-	uint32						m_dUpdateTick_Seconds;		// Non-zero value when a 'ThrottledUpdate' is desired
+	double						m_dUpdateTick_Seconds;		// Non-zero value when a 'ThrottledUpdate' is desired
 
 	std::vector<IHyTimeInst *>	m_TimeInstList;
 

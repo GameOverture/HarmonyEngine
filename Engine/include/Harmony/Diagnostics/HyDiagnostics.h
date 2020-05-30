@@ -46,8 +46,9 @@ class HyDiagnostics
 
 	std::string					m_sPlatform;
 	uint32						m_uiNumCpuCores;
-	uint64_t						m_uiTotalMemBytes;
-	uint64_t						m_uiVirtualMemBytes;
+	uint32						m_uiL1CacheSizeBytes;
+	uint64_t					m_uiTotalMemBytes;
+	uint64_t					m_uiVirtualMemBytes;
 
 	std::string					m_sGfxApi;
 	std::string					m_sVersion;

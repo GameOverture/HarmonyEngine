@@ -25,7 +25,9 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	m_SceneRef(sceneRef),
 	m_sPlatform("Unknown"),
 	m_uiNumCpuCores(0),
+	m_uiL1CacheSizeBytes(0),
 	m_uiTotalMemBytes(0),
+	m_uiVirtualMemBytes(0),
 	m_sGfxApi("Unknown"),
 	m_sVersion("Unknown"),
 	m_sVendor("Unknown"),
@@ -35,7 +37,13 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	m_sCompressedTextures("Unknown"),
 	m_bInitialMemCheckpointSet(false)
 {
-#if defined(HY_PLATFORM_WINDOWS)
+#ifdef HY_USE_SDL2
+	m_sPlatform = SDL_GetPlatform();
+	m_uiNumCpuCores = SDL_GetCPUCount();
+	m_uiL1CacheSizeBytes = SDL_GetCPUCacheLineSize();
+	m_uiTotalMemBytes = static_cast<uint64_t>(SDL_GetSystemRAM()) * 1024;
+
+#elif defined(HY_PLATFORM_WINDOWS)
 	m_sPlatform = "Windows";
 
 	// Get number of CPUs
@@ -98,10 +106,24 @@ void HyDiagnostics::BootMessage()
 	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMappings);
 	
 	HyLogSection("Platform");
+
 	HyLog(m_sPlatform);
-	HyLog("Num CPU Cores:    " << m_uiNumCpuCores);
+	if(m_uiNumCpuCores != 0) {
+		HyLog("Num CPU Cores:    " << m_uiNumCpuCores);
+	}
+	else {
+		HyLog("Num CPU Cores:    unknown");
+	}
+	if(m_uiL1CacheSizeBytes != 0) {
+		HyLog("CPU L1 Cache:     " << m_uiL1CacheSizeBytes << " bytes")
+	}
+	else {
+		HyLog("CPU L1 Cache:     unknown");
+	}
 	HyLog("System Memory:    " << (m_uiTotalMemBytes / 1024 / 1024) << " MB");
-	HyLog("Available Memory: " << (m_uiVirtualMemBytes / 1024 / 1024) << " MB");
+	if(m_uiVirtualMemBytes != 0) {
+		HyLog("Available Memory: " << (m_uiVirtualMemBytes / 1024 / 1024) << " MB");
+	}
 #if defined(HY_ENDIAN_LITTLE)
 	HyLog("Endian:           " << "Little");
 #else
@@ -109,6 +131,7 @@ void HyDiagnostics::BootMessage()
 #endif
 
 	HyLogSection(m_sGfxApi);
+
 	HyLog("Version:          " << m_sVersion);
 	HyLog("Vendor:           " << m_sVendor);
 	HyLog("Renderer:         " << m_sRenderer);
