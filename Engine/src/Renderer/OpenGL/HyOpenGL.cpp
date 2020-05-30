@@ -22,12 +22,17 @@
 
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :
 	IHyRenderer(diagnosticsRef, windowListRef),
+	m_Context(nullptr),
 	m_mtxView(1.0f),
 	m_mtxProj(1.0f),
 	m_pPboHandles(nullptr),
 	m_pPboStates(nullptr)
 {
 	HyLog("OpenGL is initializing...");
+
+	// Create the context with the first window, and share it between any other windows
+	if(m_WindowListRef.empty() == false)
+		m_Context = SDL_GL_CreateContext(m_WindowListRef[0]->GetInterop());
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 		m_VaoMapList.push_back(std::map<HyShaderHandle, GLuint>());
@@ -36,27 +41,28 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	{
 		SetCurrentWindow(i);
 
-#if defined(HY_USE_GLFW) && defined(HY_USE_GLAD)
-		// Load all OpenGL functions using the glfw loader function
-		// If you use SDL you can use: https://wiki.libsdl.org/SDL_GL_GetProcAddres
-	#if defined(HY_PLATFORM_BROWSER)
-		if(!gladLoadGLES2Loader((GLADloadproc) glfwGetProcAddress)) {
-			HyError("gladLoadGLES2Loader failed to initialize GLES2 context with GLFW");
-		}
-	#else
-		if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-			HyError("gladLoadGLLoader failed to initialize OpenGL context with GLFW");
-		}
-	#endif
+#if defined(HY_USE_SDL2)
+		// Prep GL extensions with GLAD+SDL2
+		#if defined(HY_USE_GLAD)
+			#if defined(HY_PLATFORM_BROWSER)
+				if(!gladLoadGLES2Loader((GLADloadproc) SDL_GL_GetProcAddress)) {
+					HyError("gladLoadGLES2Loader failed to initialize GLES2 context with SDL2");
+				}
+			#else
+				if(!gladLoadGLLoader((GLADloadproc) SDL_GL_GetProcAddress)) {
+					HyError("gladLoadGLLoader failed to initialize OpenGL context with SDL2");
+				}
+			#endif
+		#endif
 #endif
 
+		// Load GL extensions with either GLAD or GLEW
 #if defined(HY_USE_GLAD)
 		if(!gladLoadGL()) {
 			HyError("glad failed to initalize");
 		}
 		HyLog("glad initalized");
 #else
-		//glewExperimental = GL_TRUE;	// This is required for GLFW to work
 		GLenum err = glewInit();
 		if(err != GLEW_OK) {
 			HyError("glewInit() failed: " << err);
@@ -156,6 +162,19 @@ HyOpenGL::~HyOpenGL(void)
 
 	delete [] m_pPboHandles;
 	delete [] m_pPboStates;
+
+#if defined(HY_USE_SDL2)
+	SDL_GL_DeleteContext(m_Context);
+#endif
+}
+
+/*virtual*/ void HyOpenGL::SetCurrentWindow(uint32 uiIndex) /*override*/
+{
+	IHyRenderer::SetCurrentWindow(uiIndex);
+
+#ifdef HY_USE_SDL2
+	SDL_GL_MakeCurrent(m_pCurWindow->GetInterop(), m_Context);
+#endif
 }
 
 /*virtual*/ void HyOpenGL::StartRender()
@@ -268,10 +287,8 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::FinishRender()
 {
-#ifdef HY_USE_GLFW
-	glfwSwapInterval(0);
-	// This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
-	glfwSwapBuffers(m_pCurWindow->GetHandle());
+#ifdef HY_USE_SDL2
+	SDL_GL_SwapWindow(m_pCurWindow->GetInterop());
 #endif
 }
 

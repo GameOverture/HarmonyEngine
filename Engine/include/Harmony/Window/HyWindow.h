@@ -13,12 +13,15 @@
 #include "Afx/HyInteropAfx.h"
 #include "Scene/Nodes/Objects/HyCamera.h"
 
+class HyInput;
+
 class HyWindow
 {
 	friend class IHyRenderer;
 	friend class HyScene;
 
 	const uint32							m_uiINDEX;
+	uint32									m_uiId;
 
 	HyWindowInfo							m_Info;
 	glm::ivec2								m_vFramebufferSize;
@@ -26,7 +29,7 @@ class HyWindow
 	std::vector<HyCamera2d *>				m_Cams2dList;
 	std::vector<HyCamera3d *>				m_Cams3dList;
 
-	HyWindowHandle							m_hData;
+	HyWindowInteropPtr						m_pData;
 
 public:
 	class CameraIterator2d
@@ -51,7 +54,7 @@ public:
 
 		CameraIterator2d &operator++()	// Prefix increment operator
 		{
-			do 
+			do
 			{
 				++m_iter;
 			} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsVisible() == false);
@@ -59,15 +62,15 @@ public:
 			return *this;
 		}
 
-		CameraIterator2d operator++(int)	// Postfix increment operator
-		{
-			do 
-			{
-				++m_iter;
-			} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsVisible() == false);
+		//CameraIterator2d operator++(int)	// Postfix increment operator
+		//{
+		//	do 
+		//	{
+		//		++m_iter;
+		//	} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsVisible() == false);
 
-			return *this;
-		}
+		//	return *this;
+		//}
 
 		bool IsEnd()		{ return m_iter == m_CamsListRef.end(); }
 		HyCamera2d *Get()	{ return *m_iter; }
@@ -80,10 +83,11 @@ public:
 	};
 
 public:
-	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext);
+	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef);
 	~HyWindow(void);
 
 	uint32								GetIndex() const;
+	uint32								GetId() const;
 
 	std::string							GetTitle();
 	void								SetTitle(const std::string &sTitle);
@@ -115,19 +119,13 @@ public:
 
 	glm::vec2							ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
 
-	HyWindowHandle						GetHandle();
+	HyWindowInteropPtr						GetInterop();
 
-#ifdef HY_USE_GLFW
-	// Returns the monitor this window is currently associated with.
-	// (Determined by the monitor closest to window's center)
-	GLFWmonitor *					GetGlfwMonitor();
+	bool								IsFullScreen();
+	void								SetFullScreen(bool bFullScreen);
 
-	bool							IsFullScreen();
-	void							SetFullScreen(bool bFullScreen);
-
-	friend void glfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
-	friend void glfw_FramebufferSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
-	friend void glfw_WindowPosCallback(GLFWwindow *pWindow, int32 iX, int32 iY);
+#ifdef HY_USE_SDL2
+	void DoEvent(const SDL_Event &eventRef, HyInput &inputRef);
 #endif
 };
 

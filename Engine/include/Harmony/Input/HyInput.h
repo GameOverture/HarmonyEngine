@@ -18,6 +18,7 @@ class HyWindow;
 class HyInput
 {
 	friend class HyEngine;
+	friend class HyWindow;
 
 	const uint32				m_uiNUM_INPUT_MAPS;
 	HyInputMap *				m_pInputMaps;
@@ -91,19 +92,15 @@ public:
 	void EnableTouchScreenHack(bool bEnable);
 
 private:
-	void Update();
-
-#ifdef HY_USE_GLFW
-	friend void glfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);
-	friend void glfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY);
-	friend void glfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY);
-	friend void glfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods);
-	friend void glfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint);
-	friend void glfw_CharModsCallback(GLFWwindow *pWindow, uint32 uiCodepoint, int32 iMods);
-	friend void glfw_JoystickCallback(int32 iJoyId, int32 iEvent);
-
-	void OnGlfwKey(int32 iKey, int32 iAction);
+#ifdef HY_USE_SDL2
+	void DoKeyDownEvent(const SDL_Event &eventRef);
+	void DoKeyUpEvent(const SDL_Event &eventRef);
+	void DoMouseDownEvent(const SDL_Event &eventRef);
+	void DoMouseUpEvent(const SDL_Event &eventRef);
+	void DoMouseMoveEvent(const SDL_Event &eventRef);
+	void SetMouseWindow(HyWindow *pWindow);
 #endif
+	void Update();
 };
 
 #endif /* HyInput_h__ */

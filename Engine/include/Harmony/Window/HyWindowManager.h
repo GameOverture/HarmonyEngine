@@ -22,6 +22,10 @@ public:
 
 	std::vector<HyWindow *> &GetWindowList();
 	HyWindow &GetWindow(uint32 uiWindowIndex);
+
+#ifdef HY_USE_SDL2
+	void DoEvent(const SDL_Event &eventRef, HyInput &inputRef);
+#endif
 };
 
 #endif /* HyWindowManager_h__ */

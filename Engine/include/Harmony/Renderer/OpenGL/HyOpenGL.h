@@ -19,6 +19,10 @@
 class HyOpenGL : public IHyRenderer
 {
 protected:
+#if defined(HY_USE_SDL2)
+	SDL_GLContext									m_Context;
+#endif
+
 	// VAO's cannot be shared between windows (aka OpenGL contexts), so there is a std::map<> for each window
 	std::vector<std::map<HyShaderHandle, GLuint> >	m_VaoMapList;
 	std::map<HyShaderHandle, GLuint>				m_GLShaderMap;
@@ -43,6 +47,8 @@ protected:
 public:
 	HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~HyOpenGL(void);
+
+	virtual void SetCurrentWindow(uint32 uiIndex) override;
 
 	virtual void StartRender() override;
 	

@@ -15,9 +15,8 @@
 #include <glad/glad.h>
 #define HY_USE_GLAD
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#define HY_USE_GLFW
+#include <SDL.h>
+#define HY_USE_SDL2
 
 #define HY_MAXWINDOWS 6
 #define HY_ENDIAN_LITTLE	// All x86 and x86-64 machines are little-endian.

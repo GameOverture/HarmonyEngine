@@ -58,6 +58,8 @@ public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
 
+	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
+
 	void PrepareBuffers();
 	void AppendDrawable3d(uint32 uiId, IHyInstance3d &instanceRef, HyCameraMask uiCameraMask);
 	void AppendDrawable2d(uint32 uiId, IHyInstance2d &instanceRef, HyCameraMask uiCameraMask);
@@ -67,23 +69,13 @@ public:
 	void TxData(IHyFileData *pData);
 	std::queue<IHyFileData *> &RxData();
 
-	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
-
 	HyShaderHandle GetDefaultShaderHandle(HyType eType);
 	
 	uint32 GetNumWindows();
-	void SetCurrentWindow(uint32 uiIndex);
+	virtual void SetCurrentWindow(uint32 uiIndex);
 	
 	void ProcessMsgs();
 	void Render();
-
-	static HyShader *FindShader(HyShaderHandle hHandle);
-	static void AddShader(HyShader *pShader);
-	static void RemoveShader(HyShader *pShader);
-
-	static HyStencil *FindStencil(HyStencilHandle hHandle);
-	static void AddStencil(HyStencil *pStencil);
-	static void RemoveStencil(HyStencil *pStencil);
 
 	virtual void StartRender() = 0;
 	virtual void Begin_3d() = 0;
@@ -97,6 +89,14 @@ public:
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 	virtual uint32 GenerateVertexBuffer() = 0;	// Returns the graphics API handle to a new vertex buffer in the form of a uint32
 	virtual uint8 *GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) = 0;
+
+	static HyShader *FindShader(HyShaderHandle hHandle);
+	static void AddShader(HyShader *pShader);
+	static void RemoveShader(HyShader *pShader);
+
+	static HyStencil *FindStencil(HyStencilHandle hHandle);
+	static void AddStencil(HyStencil *pStencil);
+	static void RemoveStencil(HyStencil *pStencil);
 };
 
 #endif /* IHyRenderer_h__ */

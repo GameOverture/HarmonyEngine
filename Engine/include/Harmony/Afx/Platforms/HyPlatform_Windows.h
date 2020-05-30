@@ -18,9 +18,8 @@
 #include <glad/glad.h>
 #define HY_USE_GLAD
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#define HY_USE_GLFW
+#include <SDL.h>
+#define HY_USE_SDL2
 
 #define NOMINMAX			// This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
 

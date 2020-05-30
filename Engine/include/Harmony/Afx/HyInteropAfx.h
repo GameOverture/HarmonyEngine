@@ -16,10 +16,10 @@
 #include "Renderer/OpenGL/HyOpenGL.h"
 typedef HyOpenGL HyRendererInterop;
 
-#if defined(HY_USE_GLFW)
-	typedef GLFWwindow *HyWindowHandle;
+#if defined(HY_USE_SDL2)
+	typedef SDL_Window *HyWindowInteropPtr;
 #else
-	typedef void *HyWindowHandle;
+	typedef void *HyWindowInteropPtr;
 #endif
 
 #if defined(HY_PLATFORM_GUI)

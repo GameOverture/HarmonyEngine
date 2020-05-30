@@ -12,8 +12,8 @@
 
 #include <GL/glew.h>
 
-#include <GLFW/glfw3.h>
-#define HY_USE_GLFW
+#include <SDL/SDL.h>
+#define HY_USE_SDL2
 
 #include <emscripten.h>
 #include <emscripten/html5.h>

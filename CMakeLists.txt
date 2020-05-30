@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(Harmony VERSION 1.0)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(HYBUILD_Emscripten OFF)
+set(HYBUILD_Emscripten OFF) # TODO: Test using if(NOT EMSCRIPTEN)
+set(HYBUILD_Qt ON)
 
 add_subdirectory(Engine)
 add_subdirectory(Editor)

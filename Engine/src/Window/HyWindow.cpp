@@ -9,13 +9,12 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Window/HyWindow.h"
+#include "Input/HyInput.h"
 
 #ifdef HY_USE_GLFW
 	void glfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
 	{
-		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
-		pHyWindow->m_Info.vSize.x = iWidth;
-		pHyWindow->m_Info.vSize.y = iHeight;
+		
 	}
 
 	void glfw_FramebufferSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
@@ -24,75 +23,55 @@
 		pHyWindow->m_vFramebufferSize.x = iWidth;
 		pHyWindow->m_vFramebufferSize.y = iHeight;
 	}
-
-	void glfw_WindowPosCallback(GLFWwindow *pWindow, int32 iX, int32 iY)
-	{
-		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
-		pHyWindow->m_Info.ptLocation.x = iX;
-		pHyWindow->m_Info.ptLocation.y = iY;
-	}
 #endif
 
-HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowHandle hSharedContext) :
+HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef) :
 	m_uiINDEX(uiIndex),
-	m_hData(nullptr)
+	m_uiId(m_uiINDEX),
+	m_pData(nullptr)
 {
 	m_Info = windowInfoRef;
 	m_vFramebufferSize = m_Info.vSize;
 
-#ifdef HY_USE_GLFW
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+#ifdef HY_USE_SDL2
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	GLFWmonitor *pMonitorOwner = nullptr;
+	uint32 uiWindowFlags = SDL_WINDOW_OPENGL;
 	switch(m_Info.eType)
 	{
 	case HYWINDOW_WindowedSizeable:
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+		uiWindowFlags |= SDL_WINDOW_RESIZABLE;
 		break;
 	case HYWINDOW_WindowedFixed:
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 		break;
 	case HYWINDOW_BorderlessWindow:
-		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+		uiWindowFlags |= SDL_WINDOW_BORDERLESS;
 		break;
 	case HYWINDOW_FullScreen:
-		pMonitorOwner = GetGlfwMonitor();
+		uiWindowFlags |= SDL_WINDOW_FULLSCREEN;
 		break;
 	}
-	
-	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);		// Will be shown after positioned
 
-	m_hData = glfwCreateWindow(static_cast<int32>(m_Info.vSize.x),
-							   static_cast<int32>(m_Info.vSize.y),
-							   m_Info.sName.c_str(),
-							   pMonitorOwner,
-							   hSharedContext);
-	if(m_hData == nullptr)
-	{
-		HyLogError("HyOpenGL_Desktop::Initialize() - glfwCreateWindow returned nullptr (At least OpenGL 3.1 is required, or window or OpenGL context creation failed)");
-		return;
+	m_pData = SDL_CreateWindow(m_Info.sName.c_str(),
+							   m_Info.ptLocation.x, m_Info.ptLocation.y,//SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+							   static_cast<int32>(m_Info.vSize.x), static_cast<int32>(m_Info.vSize.y),
+							   uiWindowFlags);
+	if(m_pData == nullptr) {
+		HyLogError("SDL_CreateWindow failed: " << SDL_GetError());
 	}
 
 	int32 iFrameBufferX, iFrameBufferY;
-	glfwGetFramebufferSize(m_hData, &iFrameBufferX, &iFrameBufferY);
+	SDL_GL_GetDrawableSize(m_pData, &iFrameBufferX, &iFrameBufferY);
 	m_vFramebufferSize.x = iFrameBufferX;
 	m_vFramebufferSize.y = iFrameBufferY;
 
-	glfwSetWindowUserPointer(m_hData, this);
-	glfwSetWindowPos(m_hData, m_Info.ptLocation.x, m_Info.ptLocation.y);
+	m_uiId = SDL_GetWindowID(m_pData);
 
-#ifndef HY_PLATFORM_BROWSER
-	if(bShowCursor == false)
-		glfwSetInputMode(m_hData, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-#endif
-
-	glfwShowWindow(m_hData);
-
-	// Set callbacks
-	glfwSetWindowSizeCallback(m_hData, glfw_WindowSizeCallback);
-	glfwSetFramebufferSizeCallback(m_hData, glfw_FramebufferSizeCallback);
-	glfwSetWindowPosCallback(m_hData, glfw_WindowPosCallback);
+	//SDL_SetWindowData(m_pData, "class", this);
 #endif
 }
 
@@ -112,6 +91,11 @@ HyWindow::~HyWindow(void)
 uint32 HyWindow::GetIndex() const
 {
 	return m_uiINDEX;
+}
+
+uint32 HyWindow::GetId() const
+{
+	return m_uiId;
 }
 
 std::string HyWindow::GetTitle()
@@ -307,50 +291,95 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 	return ptWorldPos;
 }
 
-HyWindowHandle HyWindow::GetHandle()
+HyWindowInteropPtr HyWindow::GetInterop()
 {
-	return m_hData;
-}
-
-#ifdef HY_USE_GLFW
-GLFWmonitor *HyWindow::GetGlfwMonitor()
-{
-	GLFWmonitor *pClosestMonitor = nullptr;
-
-	glm::vec2 ptWindowCenter = glm::vec2(m_Info.ptLocation.x, m_Info.ptLocation.y) + (glm::vec2(m_Info.vSize.x, m_Info.vSize.y) / 2.0f);
-	float fClosestDist = 999999999.0f;
-
-	int iNumMonitors;
-	GLFWmonitor **ppMonitors = glfwGetMonitors(&iNumMonitors);
-	for(int i = 0; i < iNumMonitors; ++i)
-	{
-		int32 iX, iY;
-		glfwGetMonitorPos(ppMonitors[i], &iX, &iY);
-		const GLFWvidmode *pVidMode = glfwGetVideoMode(ppMonitors[i]);
-
-		glm::vec2 ptMonitorCenter = glm::vec2(iX, iY) + (glm::vec2(pVidMode->width, pVidMode->height) / 2.0f);
-
-		float fDist = glm::distance(ptWindowCenter, ptMonitorCenter);
-		if(fClosestDist > fDist)
-		{
-			pClosestMonitor = ppMonitors[i];
-			fClosestDist = fDist;
-		}
-	}
-
-	return pClosestMonitor;
+	return m_pData;
 }
 
 bool HyWindow::IsFullScreen()
 {
-	return glfwGetWindowMonitor(m_hData) != nullptr;
+#ifdef HY_USE_SDL2
+	SDL_DisplayMode windowMode, desktopMode;
+	SDL_GetWindowDisplayMode(m_pData, &windowMode);
+	SDL_GetDesktopDisplayMode(0, &desktopMode);
+
+	return (windowMode.h == desktopMode.h && windowMode.w == desktopMode.w);
+#else
+	HyLogWarning("HyWindow::IsFullScreen is not implemented for this build configuration");
+	return false;
+#endif
 }
 
 void HyWindow::SetFullScreen(bool bFullScreen)
 {
-	if(bFullScreen)
-		glfwSetWindowMonitor(m_hData, GetGlfwMonitor(), m_Info.ptLocation.x, m_Info.ptLocation.y, m_Info.vSize.x, m_Info.vSize.y, GLFW_DONT_CARE);
-	else
-		glfwSetWindowMonitor(m_hData, nullptr, m_Info.ptLocation.x, m_Info.ptLocation.y, m_Info.vSize.x, m_Info.vSize.y, GLFW_DONT_CARE);
+#ifdef HY_USE_SDL2
+	SDL_SetWindowFullscreen(m_pData, bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+#else
+	HyLogWarning("HyWindow::SetFullScreen is not implemented for this build configuration");
+#endif
+}
+
+#ifdef HY_USE_SDL2
+void HyWindow::DoEvent(const SDL_Event &eventRef, HyInput &inputRef)
+{
+	switch(eventRef.window.event)
+	{
+	case SDL_WINDOWEVENT_SHOWN:
+		HyLog("Window " << m_uiId << " shown");
+		break;
+	case SDL_WINDOWEVENT_HIDDEN:
+		HyLog("Window " << m_uiId << " hidden");
+		break;
+	case SDL_WINDOWEVENT_EXPOSED:
+		// Indicates to be redrawn
+		break;
+	case SDL_WINDOWEVENT_MOVED:
+		m_Info.ptLocation.x = eventRef.window.data1;
+		m_Info.ptLocation.y = eventRef.window.data2;
+		break;
+	case SDL_WINDOWEVENT_RESIZED:
+		// External event, i.e. the user or the window manager
+		break;
+	case SDL_WINDOWEVENT_SIZE_CHANGED:
+		m_Info.vSize.x = eventRef.window.data1;
+		m_Info.vSize.y = eventRef.window.data2;
+		break;
+	case SDL_WINDOWEVENT_MINIMIZED:
+		HyLog("Window " << m_uiId << " minimized");
+		break;
+	case SDL_WINDOWEVENT_MAXIMIZED:
+		HyLog("Window " << m_uiId << " maximized");
+		break;
+	case SDL_WINDOWEVENT_RESTORED:
+		HyLog("Window " << m_uiId << " restored");
+		break;
+	case SDL_WINDOWEVENT_ENTER:
+		HyLog("Mouse entered window " << m_uiId);
+		inputRef.SetMouseWindow(this);
+		break;
+	case SDL_WINDOWEVENT_LEAVE:
+		HyLog("Mouse left window " << m_uiId);
+		break;
+	case SDL_WINDOWEVENT_FOCUS_GAINED:
+		HyLog("Window " << m_uiId << " gained keyboard focus");
+		break;
+	case SDL_WINDOWEVENT_FOCUS_LOST:
+		HyLog("Window " << m_uiId << " lost keyboard focus");
+		break;
+	case SDL_WINDOWEVENT_CLOSE:
+		HyLog("Window " << m_uiId << " closed", m_uiId);
+		break;
+#if SDL_VERSION_ATLEAST(2, 0, 5)
+	case SDL_WINDOWEVENT_TAKE_FOCUS:
+		HyLog("Window " << m_uiId << " is offered a focus");
+		break;
+	case SDL_WINDOWEVENT_HIT_TEST:
+		HyLog("Window " << m_uiId << " has a special hit test");
+		break;
+#endif
+	default:
+		HyLogError("Window " << m_uiId << " got unknown event " << eventRef.window.event);
+		break;
+	}
 }
 #endif

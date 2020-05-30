@@ -57,8 +57,8 @@ HyEngine::~HyEngine()
 		m_Renderer.ProcessMsgs();
 	}
 
-#ifdef HY_USE_GLFW
-	glfwTerminate(); // TODO: this is leaking 304 bytes of memory on my machine
+#ifdef HY_USE_SDL2
+	SDL_Quit();
 #endif
 
 	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler on Windows)
@@ -134,16 +134,34 @@ bool HyEngine::Update()
 
 bool HyEngine::PollPlatformApi()
 {
-#ifdef HY_USE_GLFW
-	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
+#ifdef HY_USE_SDL2
+	while(SDL_PollEvent(&m_SdlEvent))
 	{
-		if(glfwWindowShouldClose(Hy_Window(i).GetHandle()))
+		switch(m_SdlEvent.type)
+		{
+		case SDL_QUIT:
 			return false;
+		case SDL_WINDOWEVENT:
+			m_WindowManager.DoEvent(m_SdlEvent, m_Input);
+			break;
+		case SDL_KEYDOWN:
+			m_Input.DoKeyDownEvent(m_SdlEvent);
+			break;
+		case SDL_KEYUP:
+			m_Input.DoKeyUpEvent(m_SdlEvent);
+			break;
+		case SDL_MOUSEMOTION:
+			m_Input.DoMouseMoveEvent(m_SdlEvent);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			m_Input.DoMouseDownEvent(m_SdlEvent);
+			break;
+		case SDL_MOUSEBUTTONUP:
+			m_Input.DoMouseUpEvent(m_SdlEvent);
+			break;
+		}
 	}
-
-	glfwPollEvents();
 #endif
-
 	m_Input.Update();
 	return true;
 }

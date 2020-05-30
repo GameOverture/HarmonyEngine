@@ -3,6 +3,7 @@ project(%HY_CLASS% VERSION 1.0)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(HYBUILD_Emscripten "Build game for web browsers" OFF)
+set(HYBUILD_Qt OFF)
 
 add_subdirectory("%HY_HARMONYDIR%Engine" "Engine")
 
@@ -38,6 +39,10 @@ else()
 endif()
 
 target_link_libraries(%HY_CLASS% PUBLIC HyEngine)
+
+if(TARGET uninstall)
+	set_target_properties(uninstall PROPERTIES FOLDER "Engine Libs")
+endif()
 
 if (MSVC)
 	set_property(TARGET %HY_CLASS% PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
