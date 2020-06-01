@@ -953,8 +953,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	for(uint32 i = 0; i < uiNumUniforms; ++i)
 	{
 		const char *szUniformName = pExBuffer;
-		size_t uiStrLen = strlen(szUniformName) + 1;	// +1 for NULL terminator
-		pExBuffer += uiStrLen;
+		pExBuffer += HY_SHADER_UNIFORM_NAME_LENGTH;
 
 		iUniLocation = glGetUniformLocation(hGlHandle, szUniformName);
 		HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");

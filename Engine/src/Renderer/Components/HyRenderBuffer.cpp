@@ -13,6 +13,7 @@
 #include "Renderer/IHyRenderer.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance3d.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
+#include "Diagnostics/Console/HyConsole.h"
 
 HyRenderBuffer::HyRenderBuffer() :
 	m_pBUFFER(HY_NEW uint8[HY_RENDERSTATE_BUFFER_SIZE]),
@@ -94,36 +95,35 @@ void HyRenderBuffer::AppendShaderUniforms(const HyShaderUniforms &shaderUniformR
 	for(uint32 i = 0; i < uiNumUniforms; ++i)
 	{
 		const char *szUniformName = shaderUniformRef.GetName(i);
-		uint32 uiStrLen = static_cast<uint32>(strlen(szUniformName) + 1);
 		strncpy(reinterpret_cast<char *>(m_pCurWritePosition), szUniformName, HY_SHADER_UNIFORM_NAME_LENGTH);
-		m_pCurWritePosition += uiStrLen;
+		m_pCurWritePosition += HY_SHADER_UNIFORM_NAME_LENGTH; // += strlen may cause bad alignment fault
 
 		HyShaderVariable eVariableType = shaderUniformRef.GetVariableType(i);
-		*reinterpret_cast<HyShaderVariable *>(m_pCurWritePosition) = eVariableType;
-		m_pCurWritePosition += sizeof(HyShaderVariable);
+		*reinterpret_cast<int32 *>(m_pCurWritePosition) = static_cast<int32>(eVariableType);
+		m_pCurWritePosition += sizeof(int32);
 
 		uint32 uiDataSize = 0;
 		switch(eVariableType)
 		{
-		case HyShaderVariable::boolean:	uiDataSize = sizeof(bool);			break;
+		case HyShaderVariable::boolean:		uiDataSize = sizeof(bool);			break;
 		case HyShaderVariable::int32:		uiDataSize = sizeof(int32);			break;
-		case HyShaderVariable::uint32:	uiDataSize = sizeof(uint32);		break;
-		case HyShaderVariable::float32:	uiDataSize = sizeof(float);			break;
+		case HyShaderVariable::uint32:		uiDataSize = sizeof(uint32);		break;
+		case HyShaderVariable::float32:		uiDataSize = sizeof(float);			break;
 		case HyShaderVariable::double64:	uiDataSize = sizeof(double);		break;
-		case HyShaderVariable::bvec2:	uiDataSize = sizeof(glm::bvec2);	break;
-		case HyShaderVariable::bvec3:	uiDataSize = sizeof(glm::bvec3);	break;
-		case HyShaderVariable::bvec4:	uiDataSize = sizeof(glm::bvec4);	break;
-		case HyShaderVariable::ivec2:	uiDataSize = sizeof(glm::ivec2);	break;
-		case HyShaderVariable::ivec3:	uiDataSize = sizeof(glm::ivec3);	break;
-		case HyShaderVariable::ivec4:	uiDataSize = sizeof(glm::ivec4);	break;
-		case HyShaderVariable::vec2:	uiDataSize = sizeof(glm::vec2);		break;
-		case HyShaderVariable::vec3:	uiDataSize = sizeof(glm::vec3);		break;
-		case HyShaderVariable::vec4:	uiDataSize = sizeof(glm::vec4);		break;
-		case HyShaderVariable::dvec2:	uiDataSize = sizeof(glm::dvec2);	break;
-		case HyShaderVariable::dvec3:	uiDataSize = sizeof(glm::dvec3);	break;
-		case HyShaderVariable::dvec4:	uiDataSize = sizeof(glm::dvec4);	break;
-		case HyShaderVariable::mat3:	uiDataSize = sizeof(glm::mat3);		break;
-		case HyShaderVariable::mat4:	uiDataSize = sizeof(glm::mat4);		break;
+		case HyShaderVariable::bvec2:		uiDataSize = sizeof(glm::bvec2);	break;
+		case HyShaderVariable::bvec3:		uiDataSize = sizeof(glm::bvec3);	break;
+		case HyShaderVariable::bvec4:		uiDataSize = sizeof(glm::bvec4);	break;
+		case HyShaderVariable::ivec2:		uiDataSize = sizeof(glm::ivec2);	break;
+		case HyShaderVariable::ivec3:		uiDataSize = sizeof(glm::ivec3);	break;
+		case HyShaderVariable::ivec4:		uiDataSize = sizeof(glm::ivec4);	break;
+		case HyShaderVariable::vec2:		uiDataSize = sizeof(glm::vec2);		break;
+		case HyShaderVariable::vec3:		uiDataSize = sizeof(glm::vec3);		break;
+		case HyShaderVariable::vec4:		uiDataSize = sizeof(glm::vec4);		break;
+		case HyShaderVariable::dvec2:		uiDataSize = sizeof(glm::dvec2);	break;
+		case HyShaderVariable::dvec3:		uiDataSize = sizeof(glm::dvec3);	break;
+		case HyShaderVariable::dvec4:		uiDataSize = sizeof(glm::dvec4);	break;
+		case HyShaderVariable::mat3:		uiDataSize = sizeof(glm::mat3);		break;
+		case HyShaderVariable::mat4:		uiDataSize = sizeof(glm::mat4);		break;
 		}
 		memcpy(m_pCurWritePosition, shaderUniformRef.GetData(i), uiDataSize);
 		m_pCurWritePosition += uiDataSize;
