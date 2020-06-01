@@ -25,7 +25,7 @@ target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/soi
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	message(STATUS "Building for ${CMAKE_SYSTEM_NAME} target system")
-	set(EM_LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s USE_SDL=2 -s USE_WEBGL2=1 --no-heap-copy --preload-file %HY_PROJDIR%%HY_RELDATADIR%@%HY_RELDATADIR% --preload-file %HY_PROJDIR%%HY_CLASS%.hyproj@%HY_CLASS%.hyproj")
+	set(EM_LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2 -s USE_SDL=2 --no-heap-copy --preload-file %HY_PROJDIR%%HY_RELDATADIR%@%HY_RELDATADIR% --preload-file %HY_PROJDIR%%HY_CLASS%.hyproj@%HY_CLASS%.hyproj")
 	if(HYBUILD_DebugEmscripten)
 		message(STATUS "Building for DEBUG")
 		set(CMAKE_BUILD_TYPE Debug)

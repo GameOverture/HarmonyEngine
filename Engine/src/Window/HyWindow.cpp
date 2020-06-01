@@ -37,12 +37,12 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef) :
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-#ifndef HY_PLATFORM_BROWSER // SDL_GL_CONTEXT_PROFILE_MASK and SDL_GL_CONTEXT_PROFILE_CORE not supported by Emscripten's SDL2
+#ifndef HY_PLATFORM_BROWSER
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-#else
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+#else // Browsers set version for OpenGL ES 3.0 (ES is implicit with Emscripten? SDL_GL_CONTEXT_PROFILE_MASK not available in Emscripten's SDL2)
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
 

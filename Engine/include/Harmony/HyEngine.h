@@ -46,8 +46,8 @@ class HyEngine
 	// The order of these member declarations matter as some are used to initialize each other
 	const HarmonyInit			m_Init;
 
-	HyWindowManager				m_WindowManager;
 	HyConsoleInterop			m_Console;
+	HyWindowManager				m_WindowManager;
 	HyAudio						m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;

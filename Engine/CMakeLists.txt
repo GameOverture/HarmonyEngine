@@ -4,6 +4,7 @@ add_subdirectory(external/soil2)
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	add_subdirectory(external/glad)
 	#add_subdirectory(external/glfw)
+	
 	if(NOT HYBUILD_Qt)
 		add_subdirectory(external/SDL2)
 		include_directories(external/SDL2/include)
@@ -14,9 +15,6 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 		if(SDL_STATIC)
 			set_target_properties(SDL2-static PROPERTIES FOLDER "Engine Libs")
 		endif()
-		
-		#find_package(SDL2 REQUIRED)
-		#include_directories(${SDL2_INCLUDE_DIR})
 	endif()
 endif()
 
@@ -224,7 +222,6 @@ target_link_libraries(HyEngine PUBLIC box2d soil2)
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include")
 	#target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include")
-	
 	target_link_libraries(HyEngine PUBLIC glad) #glfw
 	target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
 	

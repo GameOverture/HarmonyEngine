@@ -14,7 +14,7 @@
 HyWindowManager::HyWindowManager(uint32 uiNumWindows, bool bShowCursor, const HyWindowInfo windowInfos[HY_MAXWINDOWS])
 {
 #ifdef HY_USE_SDL2
-	if(SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0)
+	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 		HyLogError(SDL_GetError());
 
 	SDL_ShowCursor(bShowCursor ? SDL_ENABLE : SDL_DISABLE);

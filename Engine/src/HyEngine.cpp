@@ -24,8 +24,8 @@ HyEngine *HyEngine::sm_pInstance = nullptr;
 
 HyEngine::HyEngine(HarmonyInit &initStruct) :
 	m_Init(initStruct),
-	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Console(initStruct.bUseConsole, initStruct.consoleInfo),
+	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Audio(m_Init.sDataDir),
 	m_Scene(m_WindowManager.GetWindowList()),
 	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
