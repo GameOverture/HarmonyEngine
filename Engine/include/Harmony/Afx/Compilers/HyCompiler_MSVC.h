@@ -10,8 +10,6 @@
 #ifndef HyCompiler_MSVC_h__
 #define HyCompiler_MSVC_h__
 
-
-
 #ifdef _DEBUG
 	#define HY_DEBUG
 #else

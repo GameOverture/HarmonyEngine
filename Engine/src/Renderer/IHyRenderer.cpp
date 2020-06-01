@@ -260,7 +260,6 @@ void IHyRenderer::Render()
 /*virtual*/ void IHyRenderer::SetCurrentWindow(uint32 uiIndex)
 {
 	m_pCurWindow = m_WindowListRef[uiIndex];
-
 }
 
 /*static*/ HyShader *IHyRenderer::FindShader(HyShaderHandle hHandle)

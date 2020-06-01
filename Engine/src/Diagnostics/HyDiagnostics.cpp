@@ -23,6 +23,7 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	m_TimeRef(timeRef),
 	m_AssetsRef(assetsRef),
 	m_SceneRef(sceneRef),
+	m_sCompiler("Unknown"),
 	m_sPlatform("Unknown"),
 	m_uiNumCpuCores(0),
 	m_uiL1CacheSizeBytes(0),
@@ -37,11 +38,22 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	m_sCompressedTextures("Unknown"),
 	m_bInitialMemCheckpointSet(false)
 {
+#if defined(HY_COMPILER_MSVC)
+	m_sCompiler = "MSVC";
+#elif defined(HY_COMPILER_MWERKS)
+	m_sCompiler = "MWERKS";
+#elif defined(HY_COMPILER_GNU)
+	m_sCompiler = "GNU";
+#endif
+
 #ifdef HY_USE_SDL2
 	m_sPlatform = SDL_GetPlatform();
 	m_uiNumCpuCores = SDL_GetCPUCount();
 	m_uiL1CacheSizeBytes = SDL_GetCPUCacheLineSize();
+
+#ifndef HY_PLATFORM_BROWSER // Not supported with SDL2's Emscripten
 	m_uiTotalMemBytes = static_cast<uint64_t>(SDL_GetSystemRAM()) * 1024;
+#endif
 
 #elif defined(HY_PLATFORM_WINDOWS)
 	m_sPlatform = "Windows";
@@ -102,6 +114,7 @@ void HyDiagnostics::BootMessage()
 
 	HyLog("");
 	HyLogTitle(sGameTitle << "\n\t" << Hy_DateTime());
+	HyLog("Compiler:         " << m_sCompiler);
 	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
 	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMappings);
 	

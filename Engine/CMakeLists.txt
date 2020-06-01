@@ -1,7 +1,7 @@
 add_subdirectory(external/box2d)
 add_subdirectory(external/soil2)
 
-if(NOT HYBUILD_Emscripten)
+if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	add_subdirectory(external/glad)
 	#add_subdirectory(external/glfw)
 	if(NOT HYBUILD_Qt)
@@ -221,7 +221,7 @@ target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external
 
 target_link_libraries(HyEngine PUBLIC box2d soil2)
 
-if(NOT HYBUILD_Emscripten)
+if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include")
 	#target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include")
 	

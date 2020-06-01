@@ -34,11 +34,17 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef) :
 	m_vFramebufferSize = m_Info.vSize;
 
 #ifdef HY_USE_SDL2
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+#ifndef HY_PLATFORM_BROWSER // SDL_GL_CONTEXT_PROFILE_MASK and SDL_GL_CONTEXT_PROFILE_CORE not supported by Emscripten's SDL2
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#else
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#endif
 
 	uint32 uiWindowFlags = SDL_WINDOW_OPENGL;
 	switch(m_Info.eType)
@@ -65,7 +71,13 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef) :
 	}
 
 	int32 iFrameBufferX, iFrameBufferY;
+#ifndef HY_PLATFORM_BROWSER // SDL_GL_GetDrawableSize not supported with Emscripten's SDL2
 	SDL_GL_GetDrawableSize(m_pData, &iFrameBufferX, &iFrameBufferY);
+#else
+	iFrameBufferX = m_Info.vSize.x;
+	iFrameBufferY = m_Info.vSize.y;
+#endif
+
 	m_vFramebufferSize.x = iFrameBufferX;
 	m_vFramebufferSize.y = iFrameBufferY;
 
@@ -312,7 +324,7 @@ bool HyWindow::IsFullScreen()
 
 void HyWindow::SetFullScreen(bool bFullScreen)
 {
-#ifdef HY_USE_SDL2
+#if defined(HY_USE_SDL2) && !defined(HY_PLATFORM_BROWSER) // SDL_SetWindowFullscreen not supported with Emscripten's SDL2
 	SDL_SetWindowFullscreen(m_pData, bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
 #else
 	HyLogWarning("HyWindow::SetFullScreen is not implemented for this build configuration");
@@ -367,7 +379,7 @@ void HyWindow::DoEvent(const SDL_Event &eventRef, HyInput &inputRef)
 		HyLog("Window " << m_uiId << " lost keyboard focus");
 		break;
 	case SDL_WINDOWEVENT_CLOSE:
-		HyLog("Window " << m_uiId << " closed", m_uiId);
+		HyLog("Window " << m_uiId << " closed");
 		break;
 #if SDL_VERSION_ATLEAST(2, 0, 5)
 	case SDL_WINDOWEVENT_TAKE_FOCUS:

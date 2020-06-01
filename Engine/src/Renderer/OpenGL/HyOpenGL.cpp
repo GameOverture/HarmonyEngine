@@ -31,9 +31,18 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 
 #if defined(HY_USE_SDL2)
 	m_Context = nullptr;
+
 	// Create the context with the first window, and share it between any other windows
 	if(m_WindowListRef.empty() == false)
+	{
 		m_Context = SDL_GL_CreateContext(m_WindowListRef[0]->GetInterop());
+		if(m_Context) {
+			HyLog("SDL_GL_CreateContext passed");
+		}
+		else {
+			HyLog("SDL_GL_CreateContext failed");
+		}
+	}
 #endif
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
@@ -66,6 +75,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		HyLog("glad initalized");
 #else
 		GLenum err = glewInit();
+
 		if(err != GLEW_OK) {
 			HyError("glewInit() failed: " << err);
 		}
@@ -174,7 +184,7 @@ HyOpenGL::~HyOpenGL(void)
 {
 	IHyRenderer::SetCurrentWindow(uiIndex);
 
-#ifdef HY_USE_SDL2
+#if defined(HY_USE_SDL2)
 	SDL_GL_MakeCurrent(m_pCurWindow->GetInterop(), m_Context);
 #endif
 }
@@ -361,6 +371,8 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Error check attribute list
 #ifdef HY_DEBUG
+	HyLog("DEBUG: Compiling shader: " << pShader->GetHandle());
+
 	GLint iMaxVertexAttribs;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &iMaxVertexAttribs);
 
@@ -424,6 +436,8 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGLShader::Link", "glLinkProgram");
 
 #ifdef HY_DEBUG
+	HyLog("DEBUG: Linking shader: " << pShader->GetHandle());
+
 	GLint status = 0;
 	glGetProgramiv(hGLShaderProg, GL_LINK_STATUS, &status);
 	if(GL_FALSE == status)

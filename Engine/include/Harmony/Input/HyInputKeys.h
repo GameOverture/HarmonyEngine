@@ -470,7 +470,7 @@ enum HyMouseBtn
 
 enum HyGamePadBtn
 {
-#ifdef HY_USE_SDL2
+#if defined(HY_USE_SDL2) && !defined(HY_PLATFORM_BROWSER) // Not supported with Emscripten's SDL2
 	HYPAD_A					= SDL_CONTROLLER_BUTTON_A,
 	HYPAD_B					= SDL_CONTROLLER_BUTTON_B,
 	HYPAD_X					= SDL_CONTROLLER_BUTTON_X,
@@ -486,7 +486,7 @@ enum HyGamePadBtn
 	HYPAD_DpadRight			= SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
 	HYPAD_DpadUp			= SDL_CONTROLLER_BUTTON_DPAD_UP,
 	HYPAD_DpadDown			= SDL_CONTROLLER_BUTTON_DPAD_DOWN,
-#elif HY_USE_GLFW
+#elif defined(HY_USE_GLFW) && !defined(HY_PLATFORM_BROWSER) // Not supported with Emscripten's GLFW
 	HYPAD_A					= GLFW_GAMEPAD_BUTTON_A,
 	HYPAD_B					= GLFW_GAMEPAD_BUTTON_B,
 	HYPAD_X					= GLFW_GAMEPAD_BUTTON_X,

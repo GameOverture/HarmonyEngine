@@ -44,6 +44,7 @@ class HyDiagnostics
 	HyAssets &					m_AssetsRef;
 	HyScene &					m_SceneRef;
 
+	std::string					m_sCompiler;
 	std::string					m_sPlatform;
 	uint32						m_uiNumCpuCores;
 	uint32						m_uiL1CacheSizeBytes;
