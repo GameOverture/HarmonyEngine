@@ -14,7 +14,7 @@
 #include "Assets/HyAssets.h"
 #include "Renderer/Components/HyVertexBuffer.h"
 
-#define HY_SHADER_UNIFORM_NAME_LENGTH		32	// includes the NULL terminator
+#define HY_SHADER_UNIFORM_NAME_LENGTH		16	// includes the NULL terminator
 #define HY_SHADER_UNIFORM_BUFFER_LENGTH		(sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH + sizeof(glm::mat4))
 
 class HyShaderUniforms
@@ -34,7 +34,7 @@ class HyShaderUniforms
 		void SetVariableType(HyShaderVariable eType)	{ *reinterpret_cast<HyShaderVariable *>(m_pData) = eType; }
 		void SetName(const char *szName)
 		{ 
-			HyAssert(strlen(szName) < HY_SHADER_UNIFORM_NAME_LENGTH, "UniformBuffer::SetName() took a name greater than 'HY_SHADER_UNIFORM_NAME_LENGTH'");
+			HyAssert(strlen(szName) < HY_SHADER_UNIFORM_NAME_LENGTH, "UniformBuffer::SetName() took a name >= to 'HY_SHADER_UNIFORM_NAME_LENGTH'");
 			strcpy(reinterpret_cast<char *>(m_pData + sizeof(uint32)), szName);
 		}
 	};

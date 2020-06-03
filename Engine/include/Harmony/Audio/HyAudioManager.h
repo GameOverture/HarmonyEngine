@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyAudio.h
+*	HyAudioManager.h
 *
 *	Harmony Engine
 *	Copyright (c) 2019 Jason Knobler
@@ -7,8 +7,8 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyAudio_h__
-#define HyAudio_h__
+#ifndef HyAudioManager_h__
+#define HyAudioManager_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Audio/Harness/IHyAudio.h"
@@ -17,7 +17,7 @@
 
 class HyAudioBank;
 
-class HyAudio
+class HyAudioManager
 {
 	using fpAllocateHyAudio					= IHyAudio *(*)();
 	using fpAllocateHyAudioBank				= IHyAudioBank *(*)(IHyAudio *);
@@ -31,8 +31,8 @@ class HyAudio
 	std::map<std::string, HyAudioBank *>	m_AudioBankMap;
 
 public:
-	HyAudio(std::string sDataDir);
-	~HyAudio();
+	HyAudioManager(std::string sDataDir);
+	~HyAudioManager();
 
 	IHyAudioInst *AllocateAudioInst(const char *szPath);
 	HyAudioBank *GetAudioBank(const std::string &sBankName);

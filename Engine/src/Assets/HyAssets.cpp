@@ -20,7 +20,7 @@
 #include "Assets/Nodes/HyText2dData.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 #include "Assets/Nodes/HyPrefabData.h"
-#include "Audio/HyAudio.h"
+#include "Audio/HyAudioManager.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
@@ -75,7 +75,7 @@ const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyAssets::HyAssets(HyAudio &audioRef, HyScene &sceneRef, std::string sDataDirPath) :
+HyAssets::HyAssets(HyAudioManager &audioRef, HyScene &sceneRef, std::string sDataDirPath) :
 	IHyThreadClass(HYTHREAD_Lowest),
 	m_AudioRef(audioRef),
 	m_SceneRef(sceneRef),
@@ -122,7 +122,7 @@ bool HyAssets::IsInitialized()
 	return m_bInitialized;
 }
 
-HyAudio &HyAssets::GetAudioRef()
+HyAudioManager &HyAssets::GetAudioRef()
 {
 	return m_AudioRef;
 }

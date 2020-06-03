@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyAudioData.h"
-#include "Audio/HyAudio.h"
+#include "Audio/HyAudioManager.h"
 
 HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef) :
 	IHyNodeData(sPath),

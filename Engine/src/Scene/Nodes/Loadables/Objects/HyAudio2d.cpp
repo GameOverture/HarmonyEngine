@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
-#include "Audio/HyAudio.h"
+#include "Audio/HyAudioManager.h"
 #include "Assets/Nodes/HyAudioData.h"
 
 HyAudio2d::HyAudio2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
