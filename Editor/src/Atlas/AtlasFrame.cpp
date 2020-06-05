@@ -15,8 +15,8 @@
 
 AtlasFrame::AtlasFrame(QUuid uuid,
 					   quint32 uiChecksum,
-					   quint32 uiAtlasGrpId,
-					   QString sN,
+					   quint32 uiBankId,
+					   QString sName,
 					   QRect rAlphaCrop,
 					   AtlasItemType eType,
 					   int iW,
@@ -25,19 +25,14 @@ AtlasFrame::AtlasFrame(QUuid uuid,
 					   int iY,
 					   int iTextureIndex,
 					   uint uiErrors) :
-	m_UNIQUE_ID(uuid),
+	AssetItemData(uuid, uiChecksum, uiBankId, sName, uiErrors),
 	m_eType(eType),
-	m_uiAtlasGrpId(uiAtlasGrpId),
-	m_pTreeWidgetItem(nullptr),
-	m_uiImageChecksum(uiChecksum),
-	m_sName(sN),
 	m_iWidth(iW),
 	m_iHeight(iH),
 	m_rAlphaCrop(rAlphaCrop),
 	m_iPosX(iX),
 	m_iPosY(iY),
-	m_iTextureIndex(iTextureIndex),
-	m_uiErrors(uiErrors)
+	m_iTextureIndex(iTextureIndex)
 {
 }
 
@@ -45,66 +40,35 @@ AtlasFrame::~AtlasFrame()
 {
 }
 
-AtlasTreeItem *AtlasFrame::GetTreeItem()
-{
-	if(m_pTreeWidgetItem)
-		return m_pTreeWidgetItem;
+//AtlasTreeItem *AtlasFrame::GetTreeItem()
+//{
+//	if(m_pTreeWidgetItem)
+//		return m_pTreeWidgetItem;
+//
+//	m_pTreeWidgetItem = new AtlasTreeItem((QTreeWidgetItem *)nullptr, QTreeWidgetItem::Type);
+//	m_pTreeWidgetItem->setText(0, GetName());
+//
+//	if(m_iTextureIndex >= 0)
+//	{
+//		m_pTreeWidgetItem->setText(1, "Id:" % QString::number(m_uiAtlasGrpId));
+//		ClearError(ATLASFRAMEERROR_CouldNotPack);
+//	}
+//	else
+//	{
+//		m_pTreeWidgetItem->setText(1, "Invalid");
+//		SetError(ATLASFRAMEERROR_CouldNotPack);
+//	}
+//
+//	UpdateTreeItemIconAndToolTip();
+//
+//	QVariant v; v.setValue(this);
+//	m_pTreeWidgetItem->setData(0, Qt::UserRole, v);
+//	m_pTreeWidgetItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+//
+//	return m_pTreeWidgetItem;
+//}
 
-	m_pTreeWidgetItem = new AtlasTreeItem((QTreeWidgetItem *)nullptr, QTreeWidgetItem::Type);
-	m_pTreeWidgetItem->setText(0, GetName());
 
-	if(m_iTextureIndex >= 0)
-	{
-		m_pTreeWidgetItem->setText(1, "Id:" % QString::number(m_uiAtlasGrpId));
-		ClearError(ATLASFRAMEERROR_CouldNotPack);
-	}
-	else
-	{
-		m_pTreeWidgetItem->setText(1, "Invalid");
-		SetError(ATLASFRAMEERROR_CouldNotPack);
-	}
-
-	UpdateTreeItemIconAndToolTip();
-
-	QVariant v; v.setValue(this);
-	m_pTreeWidgetItem->setData(0, Qt::UserRole, v);
-	m_pTreeWidgetItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-
-	return m_pTreeWidgetItem;
-}
-
-QUuid AtlasFrame::GetId() const
-{
-	return m_UNIQUE_ID;
-}
-
-quint32 AtlasFrame::GetAtlasGrpId()
-{
-	return m_uiAtlasGrpId;
-}
-
-void AtlasFrame::SetAtlasGrpId(quint32 uiNewAtlasGrpId)
-{
-	m_uiAtlasGrpId = uiNewAtlasGrpId;
-	if(m_pTreeWidgetItem)
-		m_pTreeWidgetItem->setText(1, "Grp:" % QString::number(uiNewAtlasGrpId));
-}
-
-quint32 AtlasFrame::GetImageChecksum()
-{
-	return m_uiImageChecksum;
-}
-
-QString AtlasFrame::GetName()
-{
-	return m_sName;
-}
-
-void AtlasFrame::SetName(QString sNewName)
-{
-	m_sName = sNewName;
-	m_pTreeWidgetItem->setText(0, m_sName);
-}
 
 QSize AtlasFrame::GetSize()
 {
@@ -119,11 +83,6 @@ QRect AtlasFrame::GetCrop()
 QPoint AtlasFrame::GetPosition()
 {
 	return QPoint(m_iPosX, m_iPosY);
-}
-
-QSet<ProjectItemData *> AtlasFrame::GetLinks()
-{
-	return m_DependencySet;
 }
 
 AtlasItemType AtlasFrame::GetType()
@@ -156,31 +115,22 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 	{
 		ClearError(ATLASFRAMEERROR_CouldNotPack);
 
-		if(m_pTreeWidgetItem)
-			m_pTreeWidgetItem->setText(1, "Id:" % QString::number(m_uiAtlasGrpId));
+		//if(m_pTreeWidgetItem)
+		//	m_pTreeWidgetItem->setText(1, "Id:" % QString::number(m_uiAtlasGrpId));
 	}
 	else
 	{
 		SetError(ATLASFRAMEERROR_CouldNotPack);
-		if(m_pTreeWidgetItem)
-			m_pTreeWidgetItem->setText(1, "Invalid");
+		//if(m_pTreeWidgetItem)
+		//	m_pTreeWidgetItem->setText(1, "Invalid");
 	}
-}
-
-QString AtlasFrame::ConstructImageFileName()
-{
-	QString sMetaImgName;
-	sMetaImgName = sMetaImgName.sprintf("%010u", m_uiImageChecksum);
-	sMetaImgName += ".png";
-
-	return sMetaImgName;
 }
 
 void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
 {
-	frameObj.insert("frameUUID", GetId().toString(QUuid::WithoutBraces));
-	frameObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(GetAtlasGrpId())));
-	frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetImageChecksum())));
+	frameObj.insert("frameUUID", GetUuid().toString(QUuid::WithoutBraces));
+	frameObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(GetBankId())));
+	frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetChecksum())));
 	frameObj.insert("name", QJsonValue(GetName()));
 	frameObj.insert("width", QJsonValue(GetSize().width()));
 	frameObj.insert("height", QJsonValue(GetSize().height()));
@@ -212,41 +162,21 @@ void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
 	frameObj.insert("filter", QJsonValue(sFilterPath));
 }
 
-void AtlasFrame::SetError(AtlasFrameError eError)
-{
-	if(eError == ATLASFRAMEERROR_CannotFindMetaImg)
-		HyGuiLog(m_sName % " - GUIFRAMEERROR_CannotFindMetaImg", LOGTYPE_Error);
-			
-	m_uiErrors |= (1 << eError);
-	
-	UpdateTreeItemIconAndToolTip();
-}
 
-void AtlasFrame::ClearError(AtlasFrameError eError)
-{
-	m_uiErrors &= ~(1 << eError);
 
-	UpdateTreeItemIconAndToolTip();
-}
-
-uint AtlasFrame::GetErrors()
-{
-	return m_uiErrors;
-}
-
-void AtlasFrame::UpdateTreeItemIconAndToolTip()
-{
-	if(m_pTreeWidgetItem)
-	{
-		// Duplicates are not considered and error so don't mark the icon as a warning (if only error)
-		if(m_uiErrors == 0)
-			m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(HyGlobal::GetItemFromAtlasItem(m_eType), SUBICON_None));
-		else
-			m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(HyGlobal::GetItemFromAtlasItem(m_eType), SUBICON_Warning));
-		
-		m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
-	}
-}
+//void AtlasFrame::UpdateTreeItemIconAndToolTip()
+//{
+//	if(m_pTreeWidgetItem)
+//	{
+//		// Duplicates are not considered and error so don't mark the icon as a warning (if only error)
+//		if(m_uiErrors == 0)
+//			m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(HyGlobal::GetItemFromAtlasItem(m_eType), SUBICON_None));
+//		else
+//			m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(HyGlobal::GetItemFromAtlasItem(m_eType), SUBICON_Warning));
+//		
+//		m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
+//	}
+//}
 
 bool AtlasFrame::DeleteMetaImage(QDir metaDir)
 {
@@ -278,15 +208,15 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	if(newImage.save(metaDir.path() % "/" % ConstructImageFileName()) == false)
 		HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
 }
-
-QDataStream &operator<<(QDataStream &out, AtlasFrame *const &rhs)
-{
-	out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
-	return out;
-}
-
-QDataStream &operator>>(QDataStream &in, AtlasFrame *rhs)
-{
-	in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
-	return in;
-}
+//
+//QDataStream &operator<<(QDataStream &out, AtlasFrame *const &rhs)
+//{
+//	out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
+//	return out;
+//}
+//
+//QDataStream &operator>>(QDataStream &in, AtlasFrame *rhs)
+//{
+//	in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
+//	return in;
+//}

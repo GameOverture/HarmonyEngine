@@ -21,278 +21,100 @@
 #include <QJsonArray>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void AtlasModel::FrameLookup::AddLookup(AtlasFrame *pFrame)
-{
-	m_FrameIdMap[pFrame->GetId()] = pFrame;
-
-	uint32 uiChecksum = pFrame->GetImageChecksum();
-	
-	if(m_FrameChecksumMap.contains(uiChecksum))
-	{
-		m_FrameChecksumMap.find(uiChecksum).value().append(pFrame);
-		HyGuiLog("'" % pFrame->GetName() % "' is a duplicate of '" % m_FrameChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_FrameChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
-	}
-	else
-	{
-		QList<AtlasFrame *> newFrameList;
-		newFrameList.append(pFrame);
-		m_FrameChecksumMap[uiChecksum] = newFrameList;
-	}
-}
-bool AtlasModel::FrameLookup::RemoveLookup(AtlasFrame *pFrame)  // Returns true if no remaining duplicates exist
-{
-	m_FrameIdMap.remove(pFrame->GetId());
-
-	auto iter = m_FrameChecksumMap.find(pFrame->GetImageChecksum());
-	if(iter == m_FrameChecksumMap.end())
-		HyGuiLog("AtlasModel::RemoveLookup could not find frame", LOGTYPE_Error);
-	
-	iter.value().removeOne(pFrame);
-	if(iter.value().size() == 0)
-	{
-		m_FrameChecksumMap.remove(pFrame->GetImageChecksum());
-		return true;
-	}
-	
-	return false;
-}
-AtlasFrame *AtlasModel::FrameLookup::FindById(QUuid uuid)
-{
-	auto iter = m_FrameIdMap.find(uuid);
-	if(iter == m_FrameIdMap.end())
-		return nullptr;
-	else
-		return iter.value();
-}
-QList<AtlasFrame *> AtlasModel::FrameLookup::FindByChecksum(quint32 uiChecksum)
-{
-	auto iter = m_FrameChecksumMap.find(uiChecksum);
-	if(iter == m_FrameChecksumMap.end())
-		return QList<AtlasFrame *>();
-	else
-		return iter.value();
-}
-bool AtlasModel::FrameLookup::DoesImageExist(quint32 uiChecksum)
-{
-	return m_FrameChecksumMap.contains(uiChecksum);
-}
+//void AtlasModel::FrameLookup::AddLookup(AtlasFrame *pFrame)
+//{
+//	m_FrameIdMap[pFrame->GetId()] = pFrame;
+//
+//	uint32 uiChecksum = pFrame->GetImageChecksum();
+//	
+//	if(m_FrameChecksumMap.contains(uiChecksum))
+//	{
+//		m_FrameChecksumMap.find(uiChecksum).value().append(pFrame);
+//		HyGuiLog("'" % pFrame->GetName() % "' is a duplicate of '" % m_FrameChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_FrameChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
+//	}
+//	else
+//	{
+//		QList<AtlasFrame *> newFrameList;
+//		newFrameList.append(pFrame);
+//		m_FrameChecksumMap[uiChecksum] = newFrameList;
+//	}
+//}
+//bool AtlasModel::FrameLookup::RemoveLookup(AtlasFrame *pFrame)  // Returns true if no remaining duplicates exist
+//{
+//	m_FrameIdMap.remove(pFrame->GetId());
+//
+//	auto iter = m_FrameChecksumMap.find(pFrame->GetImageChecksum());
+//	if(iter == m_FrameChecksumMap.end())
+//		HyGuiLog("AtlasModel::RemoveLookup could not find frame", LOGTYPE_Error);
+//	
+//	iter.value().removeOne(pFrame);
+//	if(iter.value().size() == 0)
+//	{
+//		m_FrameChecksumMap.remove(pFrame->GetImageChecksum());
+//		return true;
+//	}
+//	
+//	return false;
+//}
+//AtlasFrame *AtlasModel::FrameLookup::FindById(QUuid uuid)
+//{
+//	auto iter = m_FrameIdMap.find(uuid);
+//	if(iter == m_FrameIdMap.end())
+//		return nullptr;
+//	else
+//		return iter.value();
+//}
+//QList<AtlasFrame *> AtlasModel::FrameLookup::FindByChecksum(quint32 uiChecksum)
+//{
+//	auto iter = m_FrameChecksumMap.find(uiChecksum);
+//	if(iter == m_FrameChecksumMap.end())
+//		return QList<AtlasFrame *>();
+//	else
+//		return iter.value();
+//}
+//bool AtlasModel::FrameLookup::DoesImageExist(quint32 uiChecksum)
+//{
+//	return m_FrameChecksumMap.contains(uiChecksum);
+//}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AtlasModel::AtlasModel(Project *pProjOwner) :
-	m_pProjOwner(pProjOwner),
-	m_MetaDir(m_pProjOwner->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true)),
-	m_RootDataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true))
+AtlasModel::AtlasModel(Project &projRef) :
+	IManagerModel(projRef, ITEM_AtlasImage)
 {
-	if(m_MetaDir.exists() == false)
-	{
-		HyGuiLog("Meta atlas directory is missing, recreating", LOGTYPE_Info);
-		m_MetaDir.mkpath(m_MetaDir.absolutePath());
-	}
-	if(m_RootDataDir.exists() == false)
-	{
-		HyGuiLog("Data atlas directory is missing, recreating", LOGTYPE_Info);
-		m_RootDataDir.mkpath(m_RootDataDir.absolutePath());
-	}
 
-	QFile settingsFile(m_MetaDir.absoluteFilePath(HYMETA_AtlasFile));
-	if(settingsFile.exists())
-	{
-		if(!settingsFile.open(QIODevice::ReadOnly))
-			HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYMETA_AtlasFile, LOGTYPE_Error);
-
-#ifdef HYGUI_UseBinaryMetaFiles
-		QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
-#else
-		QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
-#endif
-		settingsFile.close();
-
-		QJsonObject settingsObj = settingsDoc.object();
-
-		m_uiNextAtlasId = JSONOBJ_TOINT(settingsObj, "startAtlasId");
-		
-		QJsonArray atlasGrpArray = settingsObj["groups"].toArray();
-		for(int i = 0; i < atlasGrpArray.size(); ++i)
-		{
-			AtlasGrp *pNewAtlasGrp = new AtlasGrp(m_RootDataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(atlasGrpArray[i].toObject()["atlasGrpId"].toInt())));
-			pNewAtlasGrp->m_PackerSettings = atlasGrpArray[i].toObject();
-			
-			m_AtlasGrpList.push_back(pNewAtlasGrp);
-			
-			m_RootDataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewAtlasGrp->GetId()));
-		}
-		//m_PackerSettings = settingsObj["settings"].toObject();
-
-		m_ExpandedFiltersArray = settingsObj["expanded"].toArray();
-
-		// Create all the filter items first, storing their actual path in their data (for now)
-		QJsonArray filtersArray = settingsObj["filters"].toArray();
-		for(int i = 0; i < filtersArray.size(); ++i)
-		{
-			QDir filterPathDir(filtersArray.at(i).toString());
-
-			AtlasTreeItem *pNewTreeItem = new AtlasTreeItem((QTreeWidgetItem *)nullptr, QTreeWidgetItem::Type);
-
-			pNewTreeItem->setText(0, filterPathDir.dirName());
-			pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Filter, SUBICON_None));
-
-			QVariant v(QString(filterPathDir.absolutePath()));
-			pNewTreeItem->setData(0, Qt::UserRole, v);
-
-			m_TopLevelTreeItemList.append(pNewTreeItem);
-		}
-
-		// Then place the filters correctly as a parent hierarchy using the path string stored in their data
-		QList<AtlasTreeItem *> atlasFiltersTreeItemList(m_TopLevelTreeItemList);
-		for(int i = 0; i < m_TopLevelTreeItemList.size(); ++i)
-		{
-			AtlasTreeItem *pParentFilter = nullptr;
-
-			QString sFilterPath = m_TopLevelTreeItemList[i]->data(0, Qt::UserRole).toString();
-			sFilterPath.truncate(sFilterPath.lastIndexOf("/"));
-			if(sFilterPath != "")
-			{
-				for(int j = 0; j < atlasFiltersTreeItemList.size(); ++j)
-				{
-					if(atlasFiltersTreeItemList[j]->data(0, Qt::UserRole).toString() == sFilterPath)
-					{
-						pParentFilter = atlasFiltersTreeItemList[j];
-						break;
-					}
-				}
-			}
-
-			if(pParentFilter)
-			{
-				pParentFilter->addChild(m_TopLevelTreeItemList.takeAt(i));
-				i = -1;
-			}
-		}
-
-		// Finally go through all the filters and set the data string to the 'HYTREEWIDGETITEM_IsFilter' value to identify this QTreeWidgetItem as a filter
-		for(int i = 0; i < atlasFiltersTreeItemList.size(); ++i)
-			atlasFiltersTreeItemList[i]->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
-
-		QJsonArray frameArray = settingsObj["frames"].toArray();
-		for(int i = 0; i < frameArray.size(); ++i)
-		{
-			QJsonObject frameObj = frameArray[i].toObject();
-
-			QRect rAlphaCrop(QPoint(frameObj["cropLeft"].toInt(), frameObj["cropTop"].toInt()), QPoint(frameObj["cropRight"].toInt(), frameObj["cropBottom"].toInt()));
-			AtlasFrame *pNewFrame = CreateFrame(QUuid(frameObj["frameUUID"].toString()),
-												JSONOBJ_TOINT(frameObj, "checksum"),
-												JSONOBJ_TOINT(frameObj, "atlasGrpId"),
-												frameObj["name"].toString(),
-												rAlphaCrop,
-												static_cast<AtlasItemType>(frameObj["type"].toInt()),
-												frameObj["width"].toInt(),
-												frameObj["height"].toInt(),
-												frameObj["x"].toInt(),
-												frameObj["y"].toInt(),
-												frameObj["textureIndex"].toInt(),
-												frameObj["errors"].toInt(0));
-
-			QString sFilterPath = frameObj["filter"].toString();
-			AtlasTreeItem *pFrameParent = nullptr;
-			if(sFilterPath != "")
-			{
-				for(int j = 0; j < atlasFiltersTreeItemList.size(); ++j)
-				{
-					if(atlasFiltersTreeItemList[j]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter && HyGlobal::GetTreeWidgetItemPath(atlasFiltersTreeItemList[j]) == sFilterPath)
-					{
-						pFrameParent = atlasFiltersTreeItemList[j];
-						break;
-					}
-				}
-			}
-
-			if(QFile::exists(m_MetaDir.absoluteFilePath(pNewFrame->ConstructImageFileName())) == false)
-				pNewFrame->SetError(ATLASFRAMEERROR_CannotFindMetaImg);
-			else
-				pNewFrame->ClearError(ATLASFRAMEERROR_CannotFindMetaImg);
-
-			if(pNewFrame->GetName().isEmpty() || pNewFrame->GetName()[0] != HyGuiInternalCharIndicator)
-			{
-				if(pFrameParent)
-					pFrameParent->addChild(pNewFrame->GetTreeItem());
-				else
-					m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
-			}
-		}
-	}
-	else
-	{
-		m_uiNextAtlasId = 0;
-		CreateNewAtlasGrp("Default");
-	}
 }
 
 /*virtual*/ AtlasModel::~AtlasModel()
 {
-	for(int i = 0; i < m_AtlasGrpList.size(); ++i)
-	{
-		QList<AtlasFrame *> &atlasFramesRef = m_AtlasGrpList[i]->m_FrameList;
-		for(int j = 0; j < atlasFramesRef.size(); ++j)
-			delete atlasFramesRef[j];
-	}
+
 }
 
-Project *AtlasModel::GetProjOwner()
+//void AtlasModel::StashTreeWidgets(QList<AtlasTreeItem *> treeItemList)
+//{
+//	m_TopLevelTreeItemList = treeItemList;
+//}
+//
+//QList<AtlasTreeItem *> AtlasModel::GetTopLevelTreeItemList()
+//{
+//	return m_TopLevelTreeItemList;
+//}
+
+int AtlasModel::GetNumTextures(uint uiBankIndex)
 {
-	return m_pProjOwner;
+	return m_AtlasGrpList[uiBankIndex]->GetExistingTextureInfoList().size();
 }
 
-int AtlasModel::GetNumAtlasGroups()
+QSize AtlasModel::GetAtlasDimensions(uint uiBankIndex)
 {
-	return m_AtlasGrpList.size();
-}
-
-QString AtlasModel::GetAtlasGroupName(uint uiAtlasGrpIndex)
-{
-	return m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["txtName"].toString();
-}
-
-QList<AtlasFrame *> AtlasModel::GetFrames(uint uiAtlasGrpIndex)
-{
-	return m_AtlasGrpList[uiAtlasGrpIndex]->m_FrameList;
-}
-
-QJsonObject AtlasModel::GetPackerSettings(uint uiAtlasGrpIndex)
-{
-	return m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings;
-}
-
-void AtlasModel::SetPackerSettings(uint uiAtlasGrpIndex, QJsonObject newPackerSettingsObj)
-{
-	m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings = newPackerSettingsObj;
-}
-
-void AtlasModel::StashTreeWidgets(QList<AtlasTreeItem *> treeItemList)
-{
-	m_TopLevelTreeItemList = treeItemList;
-}
-
-QList<AtlasTreeItem *> AtlasModel::GetTopLevelTreeItemList()
-{
-	return m_TopLevelTreeItemList;
-}
-
-int AtlasModel::GetNumTextures(uint uiAtlasGrpIndex)
-{
-	return m_AtlasGrpList[uiAtlasGrpIndex]->GetExistingTextureInfoList().size();
-}
-
-QSize AtlasModel::GetAtlasDimensions(uint uiAtlasGrpIndex)
-{
-	int iWidth = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbTextureWidth"].toInt();
-	int iHeight = m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["sbTextureHeight"].toInt();
+	int iWidth = m_BanksModel.GetBank(uiBankIndex)->m_Settings["sbTextureWidth"].toInt();
+	int iHeight = m_BanksModel.GetBank(uiBankIndex)->m_Settings["sbTextureHeight"].toInt();
 	
 	return QSize(iWidth, iHeight);
 }
 
-HyTextureFormat AtlasModel::GetAtlasTextureType(uint uiAtlasGrpIndex)
+HyTextureFormat AtlasModel::GetAtlasTextureType(uint uiBankIndex)
 {
-	return static_cast<HyTextureFormat>(m_AtlasGrpList[uiAtlasGrpIndex]->m_PackerSettings["textureType"].toInt());
+	return static_cast<HyTextureFormat>(m_BanksModel.GetBank(uiBankIndex)->m_Settings["textureType"].toInt());
 }
 
 bool AtlasModel::IsImageValid(QImage &image, quint32 uiAtlasGrpId)
@@ -323,11 +145,6 @@ bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasS
 	}
 
 	return true;
-}
-
-QJsonArray AtlasModel::GetExpandedFiltersArray()
-{
-	return m_ExpandedFiltersArray;
 }
 
 void AtlasModel::WriteMetaSettings()
@@ -421,81 +238,11 @@ void AtlasModel::WriteMetaSettings()
 	}
 }
 
-AtlasFrame *AtlasModel::CreateFrame(QUuid uuid, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors)
-{
-	AtlasFrame *pNewFrame = new AtlasFrame(uuid, uiChecksum, uiAtlasGrpId, sN, rAlphaCrop, eFrameType, iW, iH, iX, iY, iTextureIndex, uiErrors);
+//AtlasFrame *AtlasModel::CreateFrame(QUuid uuid, quint32 uiChecksum, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors)
+//{
+//
+//}
 
-	m_FrameLookup.AddLookup(pNewFrame);
-	
-	for(int i = 0; i < m_AtlasGrpList.size(); ++i)
-	{
-		if(m_AtlasGrpList[i]->m_PackerSettings.contains("atlasGrpId") == false) {
-			HyGuiLog("AtlasModel::CreateFrame could not find atlasGrpId", LOGTYPE_Error);
-		}
-		else if(pNewFrame->GetAtlasGrpId() == m_AtlasGrpList[i]->GetId())
-		{
-			m_AtlasGrpList[i]->m_FrameList.append(pNewFrame);
-			break;
-		}
-	}
-	
-	return pNewFrame;
-}
-
-void AtlasModel::RemoveFrame(AtlasFrame *pFrame)
-{
-	if(m_FrameLookup.RemoveLookup(pFrame))
-		pFrame->DeleteMetaImage(m_MetaDir);
-	
-	for(int i = 0; i < m_AtlasGrpList.size(); ++i)
-	{
-		if(m_AtlasGrpList[i]->m_PackerSettings.contains("atlasGrpId") == false) {
-			HyGuiLog("AtlasModel::RemoveFrame could not find atlasGrpId", LOGTYPE_Error);
-		}
-		else if(pFrame->GetAtlasGrpId() == m_AtlasGrpList[i]->GetId())
-		{
-			m_AtlasGrpList[i]->m_FrameList.removeOne(pFrame);
-			break;
-		}
-	}
-
-	delete pFrame;
-}
-
-bool AtlasModel::TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId)
-{
-	if(uiNewAtlasGrpId == pFrame->GetAtlasGrpId())
-		return false;
-	
-	bool bValid = false;
-	for(int i = 0; i < m_AtlasGrpList.size(); ++i)
-	{
-		if(pFrame->GetAtlasGrpId() == m_AtlasGrpList[i]->GetId())
-		{
-			m_AtlasGrpList[i]->m_FrameList.removeOne(pFrame);
-			bValid = true;
-			break;
-		}
-	}
-	
-	if(bValid == false)
-		return false;
-	
-	bValid = false;
-	for(int i = 0; i < m_AtlasGrpList.size(); ++i)
-	{
-		if(uiNewAtlasGrpId == m_AtlasGrpList[i]->GetId())
-		{
-			pFrame->SetAtlasGrpId(uiNewAtlasGrpId);
-			
-			m_AtlasGrpList[i]->m_FrameList.append(pFrame);
-			bValid = true;
-			break;
-		}
-	}
-	
-	return bValid;
-}
 
 AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType)
 {
@@ -886,6 +633,28 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 /*virtual*/ QVariant AtlasModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
 	return QVariant();
+}
+
+/*virtual*/ AssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
+{
+	QRect rAlphaCrop(QPoint(metaObj["cropLeft"].toInt(), metaObj["cropTop"].toInt()),
+					 QPoint(metaObj["cropRight"].toInt(), metaObj["cropBottom"].toInt()));
+
+
+	AtlasFrame *pNewFrame = new AtlasFrame(QUuid(metaObj["frameUUID"].toString()),
+										   JSONOBJ_TOINT(metaObj, "checksum"),
+										   JSONOBJ_TOINT(metaObj, "atlasGrpId"),
+										   metaObj["name"].toString(),
+										   rAlphaCrop,
+										   static_cast<AtlasItemType>(metaObj["type"].toInt()),
+										   metaObj["width"].toInt(),
+										   metaObj["height"].toInt(),
+										   metaObj["x"].toInt(),
+										   metaObj["y"].toInt(),
+										   metaObj["textureIndex"].toInt(),
+										   metaObj["errors"].toInt(0));
+
+	return pNewFrame;
 }
 
 void AtlasModel::SaveAndReloadHarmony()

@@ -10,79 +10,33 @@
 #ifndef ATLASMODEL_H
 #define ATLASMODEL_H
 
-#include <QAbstractListModel>
+#include "IManagerModel.h"
 
 #include "AtlasFrame.h"
 #include "_Dependencies/scriptum/imagepacker.h"
 
-struct AtlasGrp;
-
-class AtlasModel : public QAbstractListModel
+class AtlasModel : public IManagerModel
 {
 	Q_OBJECT
 
-	Project *										m_pProjOwner;
-
-	quint32											m_uiNextAtlasId;
-
-	QDir											m_MetaDir;
-	QDir											m_RootDataDir;
-
-	QList<AtlasGrp *>								m_AtlasGrpList;
-	
-	QJsonArray										m_ExpandedFiltersArray;
-
-	QList<AtlasTreeItem *>							m_TopLevelTreeItemList;
-	
-	class FrameLookup
-	{
-		QMap<QUuid, AtlasFrame *>					m_FrameIdMap;
-		QMap<quint32, QList<AtlasFrame *> >			m_FrameChecksumMap;
-		
-	public:
-		void AddLookup(AtlasFrame *pFrame);
-		bool RemoveLookup(AtlasFrame *pFrame);  // Returns true if no remaining duplicates exist
-		AtlasFrame *FindById(QUuid uuid);
-		QList<AtlasFrame *> FindByChecksum(quint32 uiChecksum);
-		bool DoesImageExist(quint32 uiChecksum);
-	};
-	FrameLookup										m_FrameLookup;
-
 public:
-	AtlasModel(Project *pProjOwner);
+	AtlasModel(Project &projRef);
 	virtual ~AtlasModel();
-	
-	Project *GetProjOwner();
 
-	int GetNumAtlasGroups();
-	QString GetAtlasGroupName(uint uiAtlasGrpIndex);
-	
-	QList<AtlasFrame *> GetFrames(uint uiAtlasGrpIndex);
+	//void StashTreeWidgets(QList<AtlasTreeItem *> treeItemList);
+	//QList<AtlasTreeItem *> GetTopLevelTreeItemList();
 
-	QJsonObject GetPackerSettings(uint uiAtlasGrpIndex);
-	void SetPackerSettings(uint uiAtlasGrpIndex, QJsonObject newPackerSettingsObj);
-
-	void StashTreeWidgets(QList<AtlasTreeItem *> treeItemList);
-	QList<AtlasTreeItem *> GetTopLevelTreeItemList();
-
-	int GetNumTextures(uint uiAtlasGrpIndex);
-	QSize GetAtlasDimensions(uint uiAtlasGrpIndex);
-	HyTextureFormat GetAtlasTextureType(uint uiAtlasGrpIndex);
+	int GetNumTextures(uint uiBankIndex);
+	QSize GetAtlasDimensions(uint uiBankIndex);
+	HyTextureFormat GetAtlasTextureType(uint uiBankIndex);
 
 	bool IsImageValid(QImage &image, quint32 uiAtlasGrpId);
 	bool IsImageValid(int iWidth, int iHeight, quint32 uiAtlasGrpId);
 	bool IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings);
 
-	QJsonArray GetExpandedFiltersArray();
-
 	void WriteMetaSettings();
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	AtlasFrame *CreateFrame(QUuid uuid, quint32 uiCRC, quint32 uiAtlasGrpId, QString sN, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
-	void RemoveFrame(AtlasFrame *pFrame);
-	
-	bool TransferFrame(AtlasFrame *pFrame, quint32 uiNewAtlasGrpId);
-
 	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType);
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
@@ -116,6 +70,8 @@ public:
 	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
 protected:
+	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
+
 	void SaveAndReloadHarmony();
 
 private Q_SLOTS:

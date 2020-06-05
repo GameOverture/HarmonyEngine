@@ -51,6 +51,10 @@
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Reach each file for its file version
+
+	// Old #define's below that are no longer used
+	const QString HYMETA_AtlasFile = "atlas.hygui";
+
 	uiMetaItemsVersion = GetFileVersion(metaDir.absoluteFilePath(HYMETA_DataFile), metaItemsDoc, true);
 	uiDataItemsVersion = GetFileVersion(dataDir.absoluteFilePath(HYASSETS_DataFile), dataItemsDoc, false);
 	uiMetaAtlasVersion = GetFileVersion(metaAtlasDir.absoluteFilePath(HYMETA_AtlasFile), metaAtlasDoc, true);

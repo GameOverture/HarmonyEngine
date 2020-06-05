@@ -133,7 +133,10 @@ enum Theme
 #define HYGUIPATH_TempDir						"temp/"
 #define HYGUIPATH_EditorDataDir					"Editor/data/"
 #define HYGUIPATH_ProjGenDir					"Editor/data/_projGen/"
-#define HYMETA_AtlasFile						"atlas.hygui"
+
+#define HYGUIPATH_MetaExt						".hygui"
+#define HYGUIPATH_DataExt						".json"
+
 #define HYMETA_DataFile							"data.hygui"
 #define HYMETA_FontsDir							"Fonts/"
 
