@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Audio/Harness/SDL2/HyAudioInst_SDL2.h"
 
+#if defined(HY_USE_SDL2)
 HyAudioInst_SDL2::HyAudioInst_SDL2()
 {
 }
@@ -86,3 +87,4 @@ HyAudioInst_SDL2::HyAudioInst_SDL2()
 /*virtual*/ void HyAudioInst_SDL2::SetReverb(int iIndex, float fLevel) /*override*/
 {
 }
+#endif // defined(HY_USE_SDL2)

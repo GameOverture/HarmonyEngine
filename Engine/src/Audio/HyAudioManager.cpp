@@ -34,6 +34,8 @@ HyAudioManager::HyAudioManager(std::string sDataDir) :
 #elif defined(HY_PLATFORM_WINDOWS)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 	HMODULE hModule = LoadLibraryA("HyFMOD.dll");
+#else
+	void *hModule = nullptr;
 #endif
 	if(hModule != nullptr)
 	{

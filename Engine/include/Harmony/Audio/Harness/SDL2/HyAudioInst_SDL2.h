@@ -12,6 +12,7 @@
 
 #include "Audio/Harness/IHyAudioInst.h"
 
+#if defined(HY_USE_SDL2)
 class HyAudioInst_SDL2 : public IHyAudioInst
 {
 	uint32_t length;
@@ -55,5 +56,6 @@ public:
 	virtual float GetReverb(int iIndex) const override;
 	virtual void SetReverb(int iIndex, float fLevel) override;
 };
+#endif // defined(HY_USE_SDL2)
 
 #endif /* HyAudioInst_SDL2_h__ */

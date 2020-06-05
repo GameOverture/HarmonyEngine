@@ -450,7 +450,7 @@ void AtlasModel::RemoveFrame(AtlasFrame *pFrame)
 	for(int i = 0; i < m_AtlasGrpList.size(); ++i)
 	{
 		if(m_AtlasGrpList[i]->m_PackerSettings.contains("atlasGrpId") == false) {
-			HyGuiLog("AtlasModel::CreateFrame could not find atlasGrpId", LOGTYPE_Error);
+			HyGuiLog("AtlasModel::RemoveFrame could not find atlasGrpId", LOGTYPE_Error);
 		}
 		else if(pFrame->GetAtlasGrpId() == m_AtlasGrpList[i]->GetId())
 		{

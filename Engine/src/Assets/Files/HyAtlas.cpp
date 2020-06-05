@@ -123,7 +123,7 @@ HyAtlas::~HyAtlas()
 uint32 HyAtlas::GetAtlasGroupId() const
 {
 	return m_uiATLAS_GROUP_ID;
-}
+} 
 
 uint32 HyAtlas::GetIndexInGroup() const
 {

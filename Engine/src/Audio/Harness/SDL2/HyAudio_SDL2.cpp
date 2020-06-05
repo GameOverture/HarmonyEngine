@@ -19,16 +19,18 @@ HyAudio_SDL2::HyAudio_SDL2()
 	for(uint32 i = 0; i < iNumDevices; ++i)
 		m_sDeviceList.push_back(SDL_GetAudioDeviceName(i, 0));
 
-	m_Spec.freq = 48000;							/* Frequency of the file */
-	m_Spec.format = AUDIO_S16LSB;					/* SDL_AudioFormat of files, such as s16 little endian */
-	m_Spec.channels = 2;							/* 1 mono, 2 stereo, 4 quad, 6 (5.1) */
-	m_Spec.samples = 4096;							/* Specifies a unit of audio data to be used at a time. Must be a power of 2 */
+	m_Spec.freq = 48000;							// 44100 or 48000
+#if defined(HY_ENDIAN_LITTLE)
+	m_Spec.format = AUDIO_F32LSB;
+#else
+	m_Spec.format = AUDIO_F32MSB;
+#endif
+	m_Spec.channels = 2;							// 1 mono, 2 stereo, 4 quad, 6 (5.1)
+	m_Spec.samples = 4096;							// Specifies a unit of audio data to be used at a time. Must be a power of 2
 	m_Spec.callback = HyAudio_SDL2::OnCallback;
 	m_Spec.userdata = nullptr;
 
-	/* Flags OR'd together, which specify how SDL should behave when a device cannot offer a specific feature
-	* If flag is set, SDL will change the format in the actual audio file structure (as opposed to gDevice->want)
-	*
+	/*
 	* Note: If you're having issues with Emscripten / EMCC play around with these flags
 	*
 	* 0                                    Allow no changes
@@ -59,15 +61,15 @@ const char *HyAudio_SDL2::GetAudioDriver()
 {
 }
 
-/*static*/ void HyAudio_SDL2::OnCallback(void* pUserData, uint8_t* pStream, int32 iLen)
+/*static*/ void HyAudio_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)
 {
-	//Audio* audio = (Audio*)userdata;
-	//Audio* previous = audio;
+	//Audio *audio = (Audio *)userdata;
+	//Audio *previous = audio;
 	//int tempLength;
 	//uint8_t music = 0;
 
 	///* Silence the main buffer */
-	//SDL_memset(stream, 0, len);
+	//SDL_memset(pStream, 0, iLen);
 
 	///* First one is place holder */
 	//audio = audio->next;
@@ -96,10 +98,10 @@ const char *HyAudio_SDL2::GetAudioDriver()
 	//		}
 	//		else
 	//		{
-	//			tempLength = ((uint32_t)len > audio->length) ? audio->length : (uint32_t)len;
+	//			tempLength = ((uint32_t)iLen > audio->length) ? audio->length : (uint32_t)iLen;
 	//		}
 
-	//		SDL_MixAudioFormat(stream, audio->buffer, AUDIO_FORMAT, tempLength, audio->volume);
+	//		SDL_MixAudioFormat(pStream, audio->buffer, AUDIO_FORMAT, tempLength, audio->volume);
 
 	//		audio->buffer += tempLength;
 	//		audio->length -= tempLength;

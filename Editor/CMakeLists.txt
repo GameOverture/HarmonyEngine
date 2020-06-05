@@ -104,16 +104,21 @@ if(Qt5_DIR)
 		src/Project/ProjectItemData.h
 		src/Project/ProjectItemMimeData.h
 		src/Shared/Global.cpp
-		src/Shared/IDraw.cpp
-		src/Shared/IModel.cpp
-		src/Shared/IWidget.cpp
 		src/Shared/Global.h
 		src/Shared/GlobalUndoCmds.h
 		src/Shared/GlobalWidgetMappers.h
-		src/Shared/IDraw.h
-		src/Shared/IModel.h
-		src/Shared/IWidget.h
-		src/Shared/IWidget.ui
+		src/Shared/Item/IDraw.cpp
+		src/Shared/Item/IModel.cpp
+		src/Shared/Item/IWidget.cpp
+		src/Shared/Item/IDraw.h
+		src/Shared/Item/IModel.h
+		src/Shared/Item/IWidget.h
+		src/Shared/Item/IWidget.ui
+		src/Shared/Manager/IManagerModel.cpp
+		src/Shared/Manager/IManagerModel.h
+		src/Shared/Manager/IManagerWidget.cpp
+		src/Shared/Manager/IManagerWidget.h
+		src/Shared/Manager/IManagerWidget.ui
 		src/Shared/Properties/PropertiesTreeModel.cpp
 		src/Shared/Properties/PropertiesTreeView.cpp
 		src/Shared/Properties/PropertiesUndoCmd.cpp
@@ -210,6 +215,8 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gltf")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Item")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Manager")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Properties")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/TreeModel")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include")

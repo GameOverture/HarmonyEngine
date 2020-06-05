@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>244</width>
+    <width>246</width>
     <height>490</height>
    </rect>
   </property>
@@ -277,7 +277,7 @@
   </action>
   <action name="actionRemoveLayer">
    <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
+    <iconset resource="../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -289,7 +289,7 @@
   </action>
   <action name="actionOrderLayerUp">
    <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
+    <iconset resource="../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
    </property>
    <property name="text">
@@ -301,7 +301,7 @@
   </action>
   <action name="actionOrderLayerDown">
    <property name="icon">
-    <iconset resource="../res/HyEditor.qrc">
+    <iconset resource="../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
    </property>
    <property name="text">
@@ -326,7 +326,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../res/HyEditor.qrc"/>
+  <include location="../../data/HyEditor.qrc"/>
  </resources>
  <connections/>
 </ui>
