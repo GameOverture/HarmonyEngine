@@ -21,7 +21,7 @@ class TreeModelItemData : public QObject
 
 protected:
 	const HyGuiItemType		m_eTYPE;
-	QString					m_sText;
+	QString					m_sName;
 	bool					m_bIsProjectItem;
 
 public:
@@ -31,6 +31,7 @@ public:
 
 	HyGuiItemType GetType() const;
 	QString GetText() const;
+	void SetText(QString sText);
 	QIcon GetIcon(SubIcon eSubIcon) const;
 
 	bool IsProjectItem() const;

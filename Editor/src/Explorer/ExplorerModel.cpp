@@ -59,24 +59,6 @@ QStringList ExplorerModel::GetPrefixList(Project *pProject)
 	return sReturnPrefixList;
 }
 
-QList<ExplorerItemData *> ExplorerModel::GetItemsRecursively(const QModelIndex &indexRef)
-{
-	QList<ExplorerItemData *> returnList;
-	
-	QStack<TreeModelItem *> treeItemStack;
-	treeItemStack.push(static_cast<TreeModelItem *>(indexRef.internalPointer()));
-	while(!treeItemStack.isEmpty())
-	{
-		TreeModelItem *pItem = treeItemStack.pop();
-		returnList.push_back(pItem->data(0).value<ExplorerItemData *>());
-
-		for(int i = 0; i < pItem->GetNumChildren(); ++i)
-			treeItemStack.push(pItem->GetChild(i));
-	}
-
-	return returnList;
-}
-
 ExplorerItemData *ExplorerModel::FindItemByItemPath(Project *pProject, QString sPath, HyGuiItemType eType)
 {
 	QModelIndex sourceIndex = FindIndexByItemPath(pProject, sPath, eType);

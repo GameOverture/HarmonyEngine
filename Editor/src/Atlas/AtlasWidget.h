@@ -56,7 +56,7 @@ class AtlasWidget : public QWidget
 	friend class WidgetAtlasGroup;
 
 	AtlasModel *					m_pModel;
-	AtlasDraw						m_Draw;
+	
 
 	QTreeWidgetItem *				m_pMouseHoverItem;
 
@@ -65,23 +65,11 @@ public:
 	explicit AtlasWidget(AtlasModel *pModel, QWidget *parent = nullptr);
 	~AtlasWidget();
 
-	quint32 GetSelectedAtlasGrpId();
-
-	AtlasModel &GetData();
-	AtlasTreeWidget *GetFramesTreeWidget();
-
 	void DrawUpdate();
 
 	void StashTreeWidgets();
 	
-	void RefreshInfo();
 	
-protected:
-	virtual void enterEvent(QEvent *pEvent) override;
-	virtual void leaveEvent(QEvent *pEvent) override;
-	virtual void resizeEvent(QResizeEvent *event) override;
-
-	bool DoAtlasGroupSettingsDlg();
 
 private Q_SLOTS:
 	void on_actionDeleteImages_triggered();
@@ -89,8 +77,6 @@ private Q_SLOTS:
 	void on_actionReplaceImages_triggered();
 
 	void on_atlasList_itemSelectionChanged();
-
-	void OnContextMenu(const QPoint &pos);
 
 	void on_actionRename_triggered();
 
@@ -112,8 +98,6 @@ private Q_SLOTS:
 
 private:
 	Ui::AtlasWidget *ui;
-
-	void GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
 };
 
 #endif // ATLASWIDGET_H

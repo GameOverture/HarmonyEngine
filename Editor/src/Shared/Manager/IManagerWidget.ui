@@ -184,7 +184,7 @@
     <string>Delete</string>
    </property>
    <property name="toolTip">
-    <string>Removes the selected image(s) from the atlas manager. All affected textures will be regenerated.</string>
+    <string>Removes the selected asset(s). All affected banks will be regenerated.</string>
    </property>
   </action>
   <action name="actionReplaceAssets">
@@ -193,10 +193,10 @@
      <normaloff>:/icons16x16/atlas-replaceFrame.png</normaloff>:/icons16x16/atlas-replaceFrame.png</iconset>
    </property>
    <property name="text">
-    <string>Replace Images</string>
+    <string>Replace Assets</string>
    </property>
    <property name="toolTip">
-    <string>Replace the selected frame(s) from the atlas manager. All affected textures will be regnerated.</string>
+    <string>Replace the selected assets(s). All affected banks will be regnerated.</string>
    </property>
   </action>
   <action name="actionAddFilter">
@@ -208,7 +208,7 @@
     <string>Add Filter</string>
    </property>
    <property name="toolTip">
-    <string>Insert a new filter to organize images</string>
+    <string>Insert a new filter to organize imported assets</string>
    </property>
   </action>
   <action name="actionRename">
@@ -220,7 +220,7 @@
     <string>Rename</string>
    </property>
    <property name="toolTip">
-    <string>Renames the selected filter or frame</string>
+    <string>Renames the selected filter or asset</string>
    </property>
   </action>
   <action name="actionAddBank">
@@ -229,10 +229,10 @@
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
-    <string>Add Atlas Group</string>
+    <string>Add Bank</string>
    </property>
    <property name="toolTip">
-    <string>Creates a new atlas group</string>
+    <string>Creates a new asset bank</string>
    </property>
   </action>
   <action name="actionRemoveBank">
@@ -241,10 +241,10 @@
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
-    <string>Remove Atlas Group</string>
+    <string>Remove Bank</string>
    </property>
    <property name="toolTip">
-    <string>Removes the currently selected atlas group.</string>
+    <string>Removes the currently selected bank.</string>
    </property>
   </action>
   <action name="actionImportAssets">
@@ -253,10 +253,10 @@
      <normaloff>:/icons16x16/items/Atlas-New.png</normaloff>:/icons16x16/items/Atlas-New.png</iconset>
    </property>
    <property name="text">
-    <string>Import Images</string>
+    <string>Import Assets</string>
    </property>
    <property name="toolTip">
-    <string>Import 1 or more images from a single directory</string>
+    <string>Import 1 or more assets from a single directory</string>
    </property>
   </action>
   <action name="actionImportDirectory">
@@ -265,10 +265,10 @@
      <normaloff>:/icons16x16/items/Atlas-Open.png</normaloff>:/icons16x16/items/Atlas-Open.png</iconset>
    </property>
    <property name="text">
-    <string>Import Image Directory</string>
+    <string>Import Asset Directory</string>
    </property>
    <property name="toolTip">
-    <string>Imports all images found recursively from a start directory</string>
+    <string>Imports all assets found recursively from a start directory</string>
    </property>
   </action>
   <action name="actionBankSettings">
@@ -277,10 +277,10 @@
      <normaloff>:/icons16x16/generic-settings.png</normaloff>:/icons16x16/generic-settings.png</iconset>
    </property>
    <property name="text">
-    <string>Atlas Group Settings</string>
+    <string>Bank Settings</string>
    </property>
    <property name="toolTip">
-    <string>Change packing options and texture type for the currently selected atlas group</string>
+    <string>Change asset bank options and for the currently selected bank</string>
    </property>
   </action>
  </widget>

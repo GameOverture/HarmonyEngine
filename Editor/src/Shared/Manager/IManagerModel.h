@@ -16,42 +16,43 @@
 
 #include <QUuid>
 
+struct BankData
+{
+	QString									m_sAbsPath;
+	QJsonObject								m_Settings;
+	QList<AssetItemData *>					m_AssetList;
+
+	BankData(QString sAbsDataDirPath, QJsonObject settingsObj) :
+		m_sAbsPath(sAbsDataDirPath),
+		m_Settings(settingsObj)
+	{ }
+
+	~BankData()
+	{
+		for(int i = 0; i < m_AssetList.size(); ++i)
+			delete m_AssetList[i];
+	}
+
+	quint32 GetId() const {
+		// TODO: rename to bankId
+		if(m_Settings.contains("atlasGrpId") == false) {
+			HyGuiLog("BankData::GetId could not find 'bankId' in bank's settings", LOGTYPE_Error);
+		}
+		// TODO: rename to bankId
+		return m_Settings["atlasGrpId"].toInt();
+	}
+
+	QString GetName() const {
+		// TODO: rename to bankName
+		return m_Settings["txtName"].toString();
+	}
+};
+
 class IManagerModel : public ITreeModel
 {
 	Q_OBJECT
 
 protected:
-	struct BankData
-	{
-		QString									m_sAbsPath;
-		QJsonObject								m_Settings;
-		QList<AssetItemData *>					m_AssetList;
-
-		BankData(QString sAbsDataDirPath, QJsonObject settingsObj) :
-			m_sAbsPath(sAbsDataDirPath),
-			m_Settings(settingsObj)
-		{ }
-
-		~BankData()
-		{
-			for(int i = 0; i < m_AssetList.size(); ++i)
-				delete m_AssetList[i];
-		}
-
-		quint32 GetId() const {
-			// TODO: rename to bankId
-			if(m_Settings.contains("atlasGrpId") == false) {
-				HyGuiLog("BankData::GetId could not find 'bankId' in bank's settings", LOGTYPE_Error);
-			}
-			// TODO: rename to bankId
-			return m_Settings["atlasGrpId"].toInt();
-		}
-
-		QString GetName() const {
-			// TODO: rename to bankName
-			return m_Settings["txtName"].toString();
-		}
-	};
 	class BanksModel : public QAbstractListModel
 	{
 		IManagerModel &							m_ModelRef;
@@ -150,6 +151,12 @@ public:
 	QString GetBankName(uint uiBankIndex);
 	QJsonObject GetBankSettings(uint uiBankIndex);
 	void SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj);
+	QList<AssetItemData *> GetBankAssets(uint uiBankIndex);
+
+	void RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
+	void ReplaceAssets(QList<AssetItemData *> assetsList);
+	void Rename(TreeModelItemData *pItem, QString sNewName);
+	bool TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId);
 
 	QJsonArray GetExpandedFiltersArray();
 	QString AssembleFilter(const AssetItemData *pAsset) const;
@@ -161,8 +168,8 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//AssetItemData *CreateAsset(QUuid uuid, quint32 uiCRC, int32 uiBankId, QString sName);//, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
-	void RemoveAsset(AssetItemData *pAsset);
-	bool TransferAsset(AssetItemData *pAsset, uint uiNewBankId);
+	
+	
 
 	//QList<AssetItemData *> RequestAssets(ProjectItemData *pItem);
 	QList<AssetItemData *> RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList);
@@ -173,7 +180,7 @@ public:
 	QSet<AssetItemData *> ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItem *> correspondingParentList);
 	bool CreateNewFilter(QString sName, TreeModelItem *pParent);
 
-	uint CreateNewBank(QString sName);
+	void CreateNewBank(QString sName);
 	void RemoveBank(quint32 uiBankId);
 
 	uint GetBankIndexFromBankId(quint32 uiBankId);
@@ -182,12 +189,22 @@ public:
 	void SaveMeta();
 	void SaveRuntime(); // Saves meta, outputs runtime assets, and reloads Harmony in the editor
 
+	virtual QString OnBankInfo(uint uiBankIndex) = 0;
+	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;
+
 protected:
+	void DeleteAsset(AssetItemData *pAsset);
+	void MoveAsset(AssetItemData *pAsset, quint32 uiNewBankId);
+
 	virtual void OnCreateBank(BankData &newBankRef) = 0;
 	virtual void OnDeleteBank(BankData &bankToBeDeleted) = 0;
 	
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 	virtual AssetItemData *OnAllocateAssetData(QString sFilePath, quint32 uiBankId, HyGuiItemType eType) = 0;
+
+	virtual bool OnRemoveAssets(QList<AssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
+	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) = 0;
+	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) = 0; // Must call MoveAsset() on each asset
 
 	virtual QJsonObject GetSaveJson() = 0;
 

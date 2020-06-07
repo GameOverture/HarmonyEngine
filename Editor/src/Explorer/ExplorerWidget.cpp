@@ -177,7 +177,11 @@ void ExplorerWidget::GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOu
 	QItemSelection selectedItems = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapSelectionToSource(ui->treeView->selectionModel()->selection());
 	QModelIndexList selectedIndices = selectedItems.indexes();
 	for(int i = 0; i < selectedIndices.size(); ++i)
-		selectedItemsOut += GetExplorerModel()->GetItemsRecursively(selectedIndices[i]);
+	{
+		QList<TreeModelItemData *> itemsList = GetExplorerModel()->GetItemsRecursively(selectedIndices[i]);
+		for(auto item : itemsList)
+			selectedItemsOut += static_cast<ExplorerItemData *>(item);
+	}
 	
 	// Poor man's unique only algorithm
 	selectedItemsOut = selectedItemsOut.toSet().toList();

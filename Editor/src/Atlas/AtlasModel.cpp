@@ -215,7 +215,7 @@ void AtlasModel::RepackAll(uint uiAtlasGrpIndex)
 	if(textureIndexSet.empty() == false)
 		Repack(uiAtlasGrpIndex, textureIndexSet, QSet<AtlasFrame *>());
 	else
-		SaveAndReloadHarmony();
+		SaveRuntime();
 }
 
 void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
@@ -250,6 +250,58 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 	pWorkerThread->start();
 }
 
+/*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
+{
+	QString sInfo = "Num Textures: " % QString::number(GetNumTextures(uiBankIndex)) % " | " %
+		"(" % QString::number(GetAtlasDimensions(uiBankIndex).width()) % "x" % QString::number(GetAtlasDimensions(uiBankIndex).height()) % ")" % " | " %
+		HyGlobal::AtlasTextureTypeString(GetAtlasTextureType(uiBankIndex));
+
+	return sInfo;
+}
+
+/*virtual*/ bool AtlasModel::OnBankSettingsDlg(uint uiBankIndex) /*override*/
+{
+	QList<AssetItemData *> assetList = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
+	bool bBankHasAssets = assetList.size() > 0;
+	bool bAccepted = false;
+	DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bBankHasAssets, m_BanksModel.GetBank(uiBankIndex)->m_Settings);
+	if(QDialog::Accepted == pDlg->exec())
+	{
+		// Ensure that all current images in atlas group aren't larger than the new atlas itself
+		QJsonObject newPackerSettings;
+		pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
+	
+		bool bPackIsValid = true;
+		for(int i = 0; i < assetList.size(); ++i)
+		{
+			AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
+			if(IsImageValid(pFrame->GetSize().width(), pFrame->GetSize().height(), newPackerSettings) == false)
+			{
+				HyGuiLog("Could not save atlas bank settings because image '" % assetList[i]->GetName() % "' will no longer fit on the atlas", LOGTYPE_Warning);
+				bPackIsValid = false;
+				break;
+			}
+		}
+	
+		if(bPackIsValid)
+		{
+			m_BanksModel.GetBank(uiBankIndex)->m_Settings = newPackerSettings;
+	
+			if(pDlg->IsSettingsDirty() && bBankHasAssets)
+				RepackAll(uiBankIndex);
+			else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
+				SaveMeta();
+	
+			bAccepted = true;
+		}
+	}
+	
+	delete pDlg;
+	//RefreshInfo();
+	
+	return bAccepted;
+}
+
 /*virtual*/ void AtlasModel::OnCreateBank(BankData &newBankRef) /*override*/
 {
 	m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(newBankRef.GetId()));
@@ -265,14 +317,15 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 	QRect rAlphaCrop(QPoint(metaObj["cropLeft"].toInt(), metaObj["cropTop"].toInt()),
 					 QPoint(metaObj["cropRight"].toInt(), metaObj["cropBottom"].toInt()));
 
+	
 
 	AtlasFrame *pNewFrame = new AtlasFrame(*this,
+										   HyGlobal::GetItemFromAtlasItem(static_cast<AtlasItemType>(metaObj["type"].toInt())),
 										   QUuid(metaObj["frameUUID"].toString()),
 										   JSONOBJ_TOINT(metaObj, "checksum"),
 										   JSONOBJ_TOINT(metaObj, "atlasGrpId"),
 										   metaObj["name"].toString(),
 										   rAlphaCrop,
-										   static_cast<AtlasItemType>(metaObj["type"].toInt()),
 										   metaObj["width"].toInt(),
 										   metaObj["height"].toInt(),
 										   metaObj["x"].toInt(),
@@ -315,12 +368,12 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 		rAlphaCrop = ImagePacker::crop(*pNewImage);
 
 	AtlasFrame *pNewFrame = new AtlasFrame(*this,
+										   eType,
 										   QUuid::createUuid(),
 										   uiChecksum,
 										   uiBankId,
 										   fileInfo.baseName(),
 										   rAlphaCrop,
-										   eAtlasItemType,
 										   pNewImage->width(),
 										   pNewImage->height(),
 										   -1,
@@ -334,36 +387,142 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 	return pNewFrame;
 }
 
+/*virtual*/ bool AtlasModel::OnRemoveAssets(QList<AssetItemData *> assetList) /*override*/
+{
+	QMap<uint, QSet<int> > affectedTextureIndexMap;
+	for(int i = 0; i < assetList.count(); ++i)
+	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
+		affectedTextureIndexMap[GetBankIndexFromBankId(pFrame->GetBankId())].insert(pFrame->GetTextureIndex());
+
+		DeleteAsset(pFrame);
+	}
+
+	if(affectedTextureIndexMap.empty() == false)
+	{
+		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
+			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
+	}
+}
+
+/*virtual*/ bool AtlasModel::OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) /*override*/
+{
+	// Ensure all new replacement images will fit on the specified atlas
+	QList<QImage *> newReplacementImageList;
+	for(int i = 0; i < assetList.count(); ++i)
+	{
+		QFileInfo fileInfo(sImportAssetList[i]);
+		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
+		QSize atlasDimensions = GetAtlasDimensions(GetBankIndexFromBankId(assetList[i]->GetBankId()));
+		if(IsImageValid(*pNewImage, assetList[i]->GetBankId()) == false)
+		{
+			HyGuiLog("Replacement image " % fileInfo.fileName() % " will not fit in atlas group '" % QString::number(assetList[i]->GetBankId()) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
+
+			for(int j = 0; j < newReplacementImageList.size(); ++j)
+				delete newReplacementImageList[j];
+
+			return;
+		}
+
+		newReplacementImageList.push_back(pNewImage);
+	}
+
+	QMap<uint, QSet<int> > affectedTextureIndexMap;
+	for(int i = 0; i < assetList.count(); ++i)
+	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
+		HyGuiLog("Replacing: " % pFrame->GetName() % " -> " % sImportAssetList[i], LOGTYPE_Info);
+
+		affectedTextureIndexMap[GetBankIndexFromBankId(pFrame->GetBankId())].insert(pFrame->GetTextureIndex());
+
+		QFileInfo fileInfo(sImportAssetList[i]);
+		ReplaceFrame(pFrame, fileInfo.baseName(), *newReplacementImageList[i], false);
+	}
+
+	for(int j = 0; j < newReplacementImageList.size(); ++j)
+		delete newReplacementImageList[j];
+
+	if(affectedTextureIndexMap.empty() == false)
+	{
+		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
+			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
+	}
+}
+
+/*virtual*/ bool AtlasModel::OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
+{
+	// Ensure all transferred assets (images) can fit on new atlas
+	for(int i = 0; i < assetsList.count(); ++i)
+	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetsList[i]);
+		if(pFrame->GetBankId() == uiNewBankId)
+			continue;
+
+		QSize atlasDimensions = GetAtlasDimensions(GetBankIndexFromBankId(uiNewBankId));
+		if(IsImageValid(pFrame->GetSize().width(), pFrame->GetSize().height(), uiNewBankId) == false)
+		{
+			HyGuiLog("Cannot transfer image " % pFrame->GetName() % " because it will not fit in atlas group '" % QString::number(uiNewBankId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
+			return false;
+		}
+	}
+
+	QMap<uint, QSet<int> > affectedTextureIndexMap; // old
+	QSet<AtlasFrame *> framesGoingToNewAtlasGrpSet; // new
+
+	for(int i = 0; i < assetsList.count(); ++i)
+	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetsList[i]);
+		if(pFrame->GetBankId() == uiNewBankId)
+			continue;
+
+		affectedTextureIndexMap[GetBankIndexFromBankId(pFrame->GetBankId())].insert(pFrame->GetTextureIndex());
+		framesGoingToNewAtlasGrpSet.insert(pFrame);
+
+		MoveAsset(pFrame, uiNewBankId);
+	}
+
+	// Repack all old affected atlas groups
+	if(affectedTextureIndexMap.empty() == false)
+	{
+		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
+			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
+	}
+
+	// Repack new affected atlas group
+	Repack(GetBankIndexFromBankId(uiNewBankId), QSet<int>(), framesGoingToNewAtlasGrpSet);
+}
+
 /*virtual*/ QJsonObject AtlasModel::GetSaveJson() /*override*/
 {
 	QJsonArray atlasGrpArray;
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
 	{
 		QJsonObject atlasGrpObj;
-		atlasGrpObj.insert("width", m_AtlasGrpList[i]->m_PackerSettings["sbTextureWidth"].toInt());
-		atlasGrpObj.insert("height", m_AtlasGrpList[i]->m_PackerSettings["sbTextureHeight"].toInt());
-		atlasGrpObj.insert("atlasGrpId", m_AtlasGrpList[i]->m_PackerSettings["atlasGrpId"].toInt());
-		atlasGrpObj.insert("textureType", m_AtlasGrpList[i]->m_PackerSettings["textureType"].toInt());
+		atlasGrpObj.insert("width", m_BanksModel.GetBank(i)->m_Settings["sbTextureWidth"].toInt());
+		atlasGrpObj.insert("height", m_BanksModel.GetBank(i)->m_Settings["sbTextureHeight"].toInt());
+		atlasGrpObj.insert("atlasGrpId", m_BanksModel.GetBank(i)->m_Settings["atlasGrpId"].toInt());
+		atlasGrpObj.insert("textureType", m_BanksModel.GetBank(i)->m_Settings["textureType"].toInt());
 
 		QJsonArray textureArray;
 		QList<QJsonArray> frameArrayList;
-		QList<AtlasFrame *> &atlasGrpFrameListRef = m_AtlasGrpList[i]->m_FrameList;
+		QList<AssetItemData *> &atlasGrpFrameListRef = m_BanksModel.GetBank(i)->m_AssetList;
 		for(int i = 0; i < atlasGrpFrameListRef.size(); ++i)
 		{
-			if(atlasGrpFrameListRef[i]->GetTextureIndex() < 0)
+			AtlasFrame *pAtlasFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[i]);
+			if(pAtlasFrame->GetTextureIndex() < 0)
 				continue;
 
-			while(frameArrayList.empty() || frameArrayList.size() <= atlasGrpFrameListRef[i]->GetTextureIndex())
+			while(frameArrayList.empty() || frameArrayList.size() <= pAtlasFrame->GetTextureIndex())
 				frameArrayList.append(QJsonArray());
 
 			QJsonObject frameObj;
-			frameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasGrpFrameListRef[i]->GetImageChecksum())));
-			frameObj.insert("left", QJsonValue(atlasGrpFrameListRef[i]->GetX()));
-			frameObj.insert("top", QJsonValue(atlasGrpFrameListRef[i]->GetY()));
-			frameObj.insert("right", QJsonValue(atlasGrpFrameListRef[i]->GetX() + atlasGrpFrameListRef[i]->GetCrop().width()));
-			frameObj.insert("bottom", QJsonValue(atlasGrpFrameListRef[i]->GetY() + atlasGrpFrameListRef[i]->GetCrop().height()));
+			frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pAtlasFrame->GetChecksum())));
+			frameObj.insert("left", QJsonValue(pAtlasFrame->GetX()));
+			frameObj.insert("top", QJsonValue(pAtlasFrame->GetY()));
+			frameObj.insert("right", QJsonValue(pAtlasFrame->GetX() + pAtlasFrame->GetCrop().width()));
+			frameObj.insert("bottom", QJsonValue(pAtlasFrame->GetY() + pAtlasFrame->GetCrop().height()));
 
-			frameArrayList[atlasGrpFrameListRef[i]->GetTextureIndex()].append(frameObj);
+			frameArrayList[pAtlasFrame->GetTextureIndex()].append(frameObj);
 		}
 
 		for(int i = 0; i < frameArrayList.size(); ++i)
@@ -388,5 +547,5 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 
 /*slot*/ void AtlasModel::OnRepackFinished()
 {
-	SaveAndReloadHarmony();
+	SaveRuntime();
 }

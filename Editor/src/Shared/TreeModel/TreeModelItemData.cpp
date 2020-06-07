@@ -26,7 +26,7 @@ TreeModelItemData::TreeModelItemData() :
 
 TreeModelItemData::TreeModelItemData(HyGuiItemType eType, const QString sText) :
 	m_eTYPE(eType),
-	m_sText(sText),
+	m_sName(sText),
 	m_bIsProjectItem(false)
 { }
 
@@ -41,7 +41,12 @@ HyGuiItemType TreeModelItemData::GetType() const
 
 QString TreeModelItemData::GetText() const
 {
-	return m_sText;
+	return m_sName;
+}
+
+void TreeModelItemData::SetText(QString sText)
+{
+	m_sName = sText;
 }
 
 QIcon TreeModelItemData::GetIcon(SubIcon eSubIcon) const

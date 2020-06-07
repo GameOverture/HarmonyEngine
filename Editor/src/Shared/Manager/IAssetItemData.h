@@ -25,14 +25,13 @@ protected:
 	const QUuid							m_UNIQUE_ID;
 	quint32								m_uiChecksum;
 	quint32								m_uiBankId;
-	QString								m_sName;
 	QString								m_sMetaFileExt; // includes period
 
 	QSet<ProjectItemData *>				m_DependencySet;
 	uint								m_uiErrors;
 
 public:
-	AssetItemData(IManagerModel &modelRef, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors);
+	AssetItemData(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors);
 
 	const QUuid &GetUuid();
 	quint32 GetChecksum();
@@ -41,7 +40,7 @@ public:
 
 	QString GetFilter() const;
 	QString GetName() const;
-	void SetName(QString sNewName);
+	QString GetMetaFileExt() const;
 
 	QSet<ProjectItemData *> GetLinks();
 	void InsertLink(ProjectItemData *pProjItem);

@@ -128,7 +128,7 @@ enum Theme
 	NUMTHEMES
 };
 
-#define HYTREEWIDGETITEM_IsFilter				"HyTreeFilter"
+//#define HYTREEWIDGETITEM_IsFilter				"HyTreeFilter"
 
 #define HYGUIPATH_TempDir						"temp/"
 #define HYGUIPATH_EditorDataDir					"Editor/data/"

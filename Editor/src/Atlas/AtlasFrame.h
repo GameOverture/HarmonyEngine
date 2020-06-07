@@ -18,14 +18,8 @@
 #include <QJsonObject>
 #include <QDataStream>
 
-//class AtlasTreeItem;
-
 class AtlasFrame : public AssetItemData
 {
-	//friend class AtlasModel;
-	
-	AtlasItemType						m_eType;
-
 	int									m_iWidth;
 	int									m_iHeight;
 	QRect								m_rAlphaCrop;
@@ -36,7 +30,7 @@ class AtlasFrame : public AssetItemData
 	int									m_iPosY;
 
 public:
-	AtlasFrame(IManagerModel &modelRef, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QRect rAlphaCrop, AtlasItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
+	AtlasFrame(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QRect rAlphaCrop, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
 	~AtlasFrame();
 
 	//AtlasTreeItem *GetTreeItem();

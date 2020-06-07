@@ -27,7 +27,6 @@ public:
 
 	QStringList GetOpenProjectPaths();
 	QStringList GetPrefixList(Project *pProject);
-	QList<ExplorerItemData *> GetItemsRecursively(const QModelIndex &indexRef);
 	ExplorerItemData *FindItemByItemPath(Project *pProject, QString sPath, HyGuiItemType eType);
 
 	Project *AddProject(const QString sNewProjectFilePath);

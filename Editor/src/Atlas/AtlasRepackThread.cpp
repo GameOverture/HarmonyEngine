@@ -15,8 +15,8 @@
 #include <QPainter>
 #include <QImageWriter>
 
-AtlasRepackThread::AtlasRepackThread(AtlasGrp *pAtlasGrp, QList<int> textureIndexList, QList<AtlasFrame *> newFramesList, QDir metaDir) :
-	m_pAtlasGrp(pAtlasGrp),
+AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<int> textureIndexList, QList<AtlasFrame *> newFramesList, QDir metaDir) :
+	m_BankRef(bankRef),
 	m_TextureIndexList(textureIndexList),
 	m_NewFramesList(newFramesList),
 	m_MetaDir(metaDir)
@@ -27,36 +27,40 @@ AtlasRepackThread::AtlasRepackThread(AtlasGrp *pAtlasGrp, QList<int> textureInde
 {
 }
 
-
 /*virtual*/ void AtlasRepackThread::run() /*override*/
 {
+	m_Packer.clear();
+
 	// Repack the affected frames and determine how many textures this repack took
-	m_pAtlasGrp->m_Packer.clear();
 	for(int i = 0; i < m_NewFramesList.size(); ++i)
 	{
-		m_pAtlasGrp->m_Packer.addItem(m_NewFramesList[i]->GetSize(),
-									  m_NewFramesList[i]->GetCrop(),
-									  m_NewFramesList[i]->GetImageChecksum(),
-									  m_NewFramesList[i],
-									  m_MetaDir.absoluteFilePath(m_NewFramesList[i]->ConstructImageFileName()));
+		m_Packer.addItem(m_NewFramesList[i]->GetSize(),
+						 m_NewFramesList[i]->GetCrop(),
+						 m_NewFramesList[i]->GetChecksum(),
+						 m_NewFramesList[i],
+						 m_MetaDir.absoluteFilePath(m_NewFramesList[i]->ConstructMetaFileName()));
 	}
-	m_pAtlasGrp->SetPackerSettings();
-	m_pAtlasGrp->m_Packer.pack(m_pAtlasGrp->m_PackerSettings["cmbHeuristic"].toInt(),
-							   m_pAtlasGrp->m_PackerSettings["sbTextureWidth"].toInt(),
-							   m_pAtlasGrp->m_PackerSettings["sbTextureHeight"].toInt());
+	
+	SetPackerSettings();
+
+	m_Packer.pack(m_BankRef.m_Settings["cmbHeuristic"].toInt(),
+				  m_BankRef.m_Settings["sbTextureWidth"].toInt(),
+				  m_BankRef.m_Settings["sbTextureHeight"].toInt());
 
 	// Subtract '1' from the number of new textures because we want to ensure the last generated (and likely least filled) texture is last
-	int iNumNewTextures = m_pAtlasGrp->m_Packer.bins.size() - 1;
+	int iNumNewTextures = m_Packer.bins.size() - 1;
+
+	QDir runtimeBankDir(m_BankRef.m_sAbsPath);
 
 	// Delete the old textures
 	for(int i = 0; i < m_TextureIndexList.size(); ++i)
 	{
-		QFile::remove(m_pAtlasGrp->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_TextureIndexList[i]) % ".png"));
-		QFile::remove(m_pAtlasGrp->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_TextureIndexList[i]) % ".dds"));
+		QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_TextureIndexList[i]) % ".png"));
+		QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_TextureIndexList[i]) % ".dds"));
 	}
 
 	// Grab 'existingTexturesInfoList' after deleting obsolete textures
-	QFileInfoList existingTexturesInfoList = m_pAtlasGrp->GetExistingTextureInfoList();
+	QFileInfoList existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 
 	// Using our stock of newly generated textures, fill in any gaps in the texture array. If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
 	int iTotalNumTextures = iNumNewTextures + existingTexturesInfoList.size();
@@ -102,18 +106,19 @@ AtlasRepackThread::AtlasRepackThread(AtlasGrp *pAtlasGrp, QList<int> textureInde
 					if(iExistingTextureIndex == iNextAvailableFoundIndex)
 					{
 						// Texture found, start migrating its frames
-						QList<AtlasFrame *> &atlasGrpFrameListRef = m_pAtlasGrp->m_FrameList;
+						QList<AssetItemData *> &atlasGrpFrameListRef = m_BankRef.m_AssetList;
 						for(int j = 0; j < atlasGrpFrameListRef.size(); ++j)
 						{
-							if(atlasGrpFrameListRef[j]->GetTextureIndex() == iExistingTextureIndex)
-								atlasGrpFrameListRef[j]->UpdateInfoFromPacker(iCurrentIndex, atlasGrpFrameListRef[j]->GetX(), atlasGrpFrameListRef[j]->GetY());
+							AtlasFrame *pFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[j]);
+							if(pFrame->GetTextureIndex() == iExistingTextureIndex)
+								pFrame->UpdateInfoFromPacker(iCurrentIndex, pFrame->GetX(), pFrame->GetY());
 						}
 
 						// Rename the texture file to be the new index
-						QFile::rename(existingTexturesInfoList[i].absoluteFilePath(), m_pAtlasGrp->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iCurrentIndex) % "." % existingTexturesInfoList[i].completeSuffix()));
+						QFile::rename(existingTexturesInfoList[i].absoluteFilePath(), runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iCurrentIndex) % "." % existingTexturesInfoList[i].completeSuffix()));
 
 						// Regrab 'existingTexturesInfoList' after renaming a texture
-						existingTexturesInfoList = m_pAtlasGrp->GetExistingTextureInfoList();
+						existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 
 						bHandled = true;
 						break;
@@ -125,13 +130,13 @@ AtlasRepackThread::AtlasRepackThread(AtlasGrp *pAtlasGrp, QList<int> textureInde
 	}
 
 	// Place the last generated texture at the end of the array
-	if(m_pAtlasGrp->m_Packer.bins.empty() == false)
-		ConstructAtlasTexture(m_pAtlasGrp->m_Packer.bins.size() - 1, iCurrentIndex);
+	if(m_Packer.bins.empty() == false)
+		ConstructAtlasTexture(m_Packer.bins.size() - 1, iCurrentIndex);
 
 	// Assign all the duplicate frames
-	for(int i = 0; i < m_pAtlasGrp->m_Packer.images.size(); ++i)
+	for(int i = 0; i < m_Packer.images.size(); ++i)
 	{
-		inputImage &imgInfoRef = m_pAtlasGrp->m_Packer.images[i];
+		inputImage &imgInfoRef = m_Packer.images[i];
 		if(imgInfoRef.duplicateId != nullptr)
 		{
 			AtlasFrame *pFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.id);
@@ -146,21 +151,21 @@ AtlasRepackThread::AtlasRepackThread(AtlasGrp *pAtlasGrp, QList<int> textureInde
 
 void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTextureIndex)
 {
-	if(m_pAtlasGrp->m_PackerSettings["sbTextureWidth"].toInt() != m_pAtlasGrp->m_Packer.bins[iPackerBinIndex].width() ||
-	   m_pAtlasGrp->m_PackerSettings["sbTextureHeight"].toInt() != m_pAtlasGrp->m_Packer.bins[iPackerBinIndex].height())
+	if(m_BankRef.m_Settings["sbTextureWidth"].toInt() != m_Packer.bins[iPackerBinIndex].width() ||
+	   m_BankRef.m_Settings["sbTextureHeight"].toInt() != m_Packer.bins[iPackerBinIndex].height())
 	{
 		HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimensions", LOGTYPE_Error);
 	}
 
-	QImage newTexture(m_pAtlasGrp->m_PackerSettings["sbTextureWidth"].toInt(), m_pAtlasGrp->m_PackerSettings["sbTextureHeight"].toInt(), QImage::Format_ARGB32);
+	QImage newTexture(m_BankRef.m_Settings["sbTextureWidth"].toInt(), m_BankRef.m_Settings["sbTextureHeight"].toInt(), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
 
 	QPainter p(&newTexture);
 
 	// Iterate through the images that were packed, and update their corresponding AtlasFrame. Then draw them to the blank textures
-	for(int i = 0; i < m_pAtlasGrp->m_Packer.images.size(); ++i)
+	for(int i = 0; i < m_Packer.images.size(); ++i)
 	{
-		inputImage &imgInfoRef = m_pAtlasGrp->m_Packer.images[i];
+		inputImage &imgInfoRef = m_Packer.images[i];
 		AtlasFrame *pFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.id);
 		bool bValidToDraw = true;
 
@@ -182,14 +187,14 @@ void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTe
 			continue;
 
 		pFrame->UpdateInfoFromPacker(iActualTextureIndex,
-									 imgInfoRef.pos.x() + m_pAtlasGrp->m_Packer.border.l,
-									 imgInfoRef.pos.y() + m_pAtlasGrp->m_Packer.border.t);
+									 imgInfoRef.pos.x() + m_Packer.border.l,
+									 imgInfoRef.pos.y() + m_Packer.border.t);
 
 		QImage imgFrame(imgInfoRef.path);
 
 		QSize size;
 		QRect crop;
-		if(!m_pAtlasGrp->m_Packer.cropThreshold)
+		if(!m_Packer.cropThreshold)
 		{
 			size = imgInfoRef.size;
 			crop = QRect(0, 0, size.width(), size.height());
@@ -262,17 +267,19 @@ void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTe
 	QImage *pTexture = static_cast<QImage *>(p.device());
 	HyTextureFormat eTextureType = static_cast<HyTextureFormat>(m_pAtlasGrp->m_PackerSettings["textureType"].toInt());
 
+	QDir runtimeBankDir(m_BankRef.m_sAbsPath);
+
 	switch(eTextureType)
 	{
 		case HYTEXTURE_R8G8B8A8: {
-			if(false == pTexture->save(m_pAtlasGrp->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png"))) {
+			if(false == pTexture->save(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png"))) {
 				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
 			}
 		} break;
 
 		case HYTEXTURE_DTX5: {
 			QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGBA8888);
-			if(0 == SOIL_save_image_quality(m_pAtlasGrp->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
+			if(0 == SOIL_save_image_quality(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
 											SOIL_SAVE_TYPE_DDS,
 											imgProperlyFormatted.width(),
 											imgProperlyFormatted.height(),
@@ -286,7 +293,7 @@ void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTe
 
 		case HYTEXTURE_RGB_DTX1: {
 			QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGB888);
-			if(0 == SOIL_save_image_quality(m_pAtlasGrp->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
+			if(0 == SOIL_save_image_quality(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
 											SOIL_SAVE_TYPE_DDS,
 											imgProperlyFormatted.width(),
 											imgProperlyFormatted.height(),
@@ -300,7 +307,7 @@ void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTe
 
 		case HYTEXTURE_RGBA_DTX1: {
 			QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGBA8888);
-			if(0 == SOIL_save_image_quality(m_pAtlasGrp->m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
+			if(0 == SOIL_save_image_quality(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
 											SOIL_SAVE_TYPE_DDS,
 											imgProperlyFormatted.width(),
 											imgProperlyFormatted.height(),
@@ -316,4 +323,20 @@ void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTe
 			HyGuiLog("AtlasModel::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(eTextureType), LOGTYPE_Error);
 		} break;
 	}
+}
+
+void AtlasRepackThread::SetPackerSettings()
+{
+	m_Packer.sortOrder = m_BankRef.m_Settings["cmbSortOrder"].toInt();// m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
+	m_Packer.border.t = m_BankRef.m_Settings["sbFrameMarginTop"].toInt();// m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
+	m_Packer.border.l = m_BankRef.m_Settings["sbFrameMarginLeft"].toInt();// m_iFrameMarginLeft;//ui->sbFrameMarginLeft->value();
+	m_Packer.border.r = m_BankRef.m_Settings["sbFrameMarginRight"].toInt();// m_iFrameMarginRight;//ui->sbFrameMarginRight->value();
+	m_Packer.border.b = m_BankRef.m_Settings["sbFrameMarginBottom"].toInt();// m_iFrameMarginBottom;//ui->sbFrameMarginBottom->value();
+	m_Packer.extrude = m_BankRef.m_Settings["extrude"].toInt();// m_iExtrude;//ui->extrude->value();
+	m_Packer.merge = m_BankRef.m_Settings["chkMerge"].toBool();// m_bMerge;//ui->chkMerge->isChecked();
+	m_Packer.square = m_BankRef.m_Settings["chkSquare"].toBool();// m_bSquare;//ui->chkSquare->isChecked();
+	m_Packer.autosize = m_BankRef.m_Settings["chkAutosize"].toBool();// m_bAutoSize;//ui->chkAutosize->isChecked();
+	m_Packer.minFillRate = m_BankRef.m_Settings["minFillRate"].toInt();// m_iFillRate;//ui->minFillRate->value();
+	m_Packer.mergeBF = false;
+	m_Packer.rotate = ImagePacker::NEVER;
 }

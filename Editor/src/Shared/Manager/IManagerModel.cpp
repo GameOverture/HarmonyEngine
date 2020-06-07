@@ -12,6 +12,10 @@
 #include "Project.h"
 #include "DlgAtlasGroupSettings.h"
 #include "Harmony.h"
+#include "MainWindow.h"
+
+#include <QMessageBox>
+#include <QFileDialog>
 
 IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 	ITreeModel(2, QStringList(), nullptr),
@@ -193,6 +197,145 @@ void IManagerModel::SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj
 	m_BanksModel.GetBank(uiBankIndex)->m_Settings = newSettingsObj;
 }
 
+QList<AssetItemData *> IManagerModel::GetBankAssets(uint uiBankIndex)
+{
+	return m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
+}
+
+void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList)
+{
+	// First loop through and check to see if any links are present, and abort if dependecies are found
+	for(int i = 0; i < assetsList.count(); ++i)
+	{
+		QSet<ProjectItemData *> sLinks = assetsList[i]->GetLinks();
+		if(sLinks.empty() == false)
+		{
+			QString sMessage = "'" % assetsList[i]->GetName() % "' asset cannot be deleted because it is in use by the following items: \n\n";
+			for(QSet<ProjectItemData *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
+				sMessage.append(HyGlobal::ItemName((*LinksIter)->GetType(), true) % "/" % (*LinksIter)->GetName(true) % "\n");
+
+			HyGuiLog(sMessage, LOGTYPE_Warning);
+			return;
+		}
+	}
+
+	// No dependencies found, resume with deleting
+	if(assetsList.size() > 0)
+	{
+		if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete " % QString::number(assetsList.size()) % " asset(s)?", QMessageBox::Yes, QMessageBox::No))
+			return;
+	}
+
+	for(int i = 0; i < assetsList.size(); ++i)
+	{
+		QModelIndex index = FindIndex<AssetItemData *>(assetsList[i], 0);
+		if(removeRow(index.row(), index.parent()) == false)
+			HyGuiLog("IManagerModel::removeRow returned false on: " % assetsList[i]->GetName(), LOGTYPE_Error);
+	}
+	for(int i = 0; i < filtersList.size(); ++i)
+	{
+		QModelIndex index = FindIndex<TreeModelItemData *>(filtersList[i], 0);
+		if(removeRow(index.row(), index.parent()) == false)
+			HyGuiLog("IManagerModel::removeRow returned false on: " % filtersList[i]->GetText(), LOGTYPE_Error);
+	}
+
+	OnRemoveAssets(assetsList);
+}
+
+void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList)
+{
+	ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
+
+	// Keep track of any linked/referenced items as they will need to be re-saved after image replacement
+	QList<ProjectItemData *> affectedItemList;
+	for(int i = 0; i < assetsList.count(); ++i)
+	{
+		QSet<ProjectItemData *> sLinks = assetsList[i]->GetLinks();
+		if(sLinks.empty() == false)
+		{
+			for(QSet<ProjectItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
+			{
+				ProjectItemData *pLinkedItem = *linksIter;
+				affectedItemList.append(pLinkedItem);
+
+				// Abort if any of these linked items are currently opened & unsaved
+				for(int i = 0; i < pTabBar->count(); ++i)
+				{
+					QVariant v = pTabBar->tabData(i);
+					ProjectItemData *pOpenItem = v.value<ProjectItemData *>();
+
+					if(pLinkedItem == pOpenItem && pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
+					{
+						QString sMessage = "'" % assetsList[i]->GetName() % "' image cannot be replaced because an item that references it is currently opened and unsaved:\n" % pOpenItem->GetName(true);
+						HyGuiLog(sMessage, LOGTYPE_Warning);
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	QFileDialog dlg(MainWindow::GetInstance());
+	dlg.setDirectory("");
+
+	if(assetsList.count() == 1)
+	{
+		dlg.setFileMode(QFileDialog::ExistingFile);
+		dlg.setWindowTitle("Select an asset as the replacement");
+	}
+	else
+	{
+		dlg.setFileMode(QFileDialog::ExistingFiles);
+		dlg.setWindowTitle("Select " % QString::number(assetsList.count()) % " assets as replacements");
+	}
+	dlg.setWindowModality(Qt::ApplicationModal);
+	dlg.setModal(true);
+	QStringList sFilterList = { "*" % assetsList[0]->GetMetaFileExt(), "*.*"};
+	dlg.setNameFilters(sFilterList);
+
+	QStringList sImportAssetList;
+	do
+	{
+		if(dlg.exec() == QDialog::Rejected)
+			return;
+
+		sImportAssetList = dlg.selectedFiles();
+
+		if(sImportAssetList.count() != assetsList.count())
+			HyGuiLog("You must select " % QString::number(assetsList.count()) % " assets", LOGTYPE_Warning);
+	}
+	while(sImportAssetList.count() != assetsList.count());
+
+	OnReplaceAssets(sImportAssetList, assetsList);
+
+	// Resave all affected items that had a replaced atlas frame
+	for(int i = 0; i < affectedItemList.size(); ++i)
+	{
+		if(affectedItemList[i]->Save(i == (affectedItemList.size() - 1)) == false)
+			HyGuiLog(affectedItemList[i]->GetName(true) % " failed to save its new atlas frame", LOGTYPE_Error);
+	}
+}
+
+void IManagerModel::Rename(TreeModelItemData *pItem, QString sNewName)
+{
+	pItem->SetText(sNewName);
+	SaveMeta();
+}
+
+bool IManagerModel::TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId)
+{
+	// Remove any assets that are already in the specified bank
+	for(int i = 0; i < assetsList.size();)
+	{
+		if(assetsList[i]->GetBankId() == uiNewBankId)
+			assetsList.removeAt(i);
+		else
+			++i;
+	}
+
+	return OnMoveAssets(assetsList, uiNewBankId);
+}
+
 QJsonArray IManagerModel::GetExpandedFiltersArray()
 {
 	return m_ExpandedFiltersArray;
@@ -261,58 +404,6 @@ QList<AssetItemData *> IManagerModel::FindByChecksum(quint32 uiChecksum)
 bool IManagerModel::DoesAssetExist(quint32 uiChecksum)
 {
 	return m_AssetChecksumMap.contains(uiChecksum);
-}
-
-void IManagerModel::RemoveAsset(AssetItemData *pAsset)
-{
-	if(RemoveLookup(pAsset))
-		pAsset->DeleteMetaFile();
-
-	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
-	{
-		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
-		{
-			m_BanksModel.GetBank(i)->m_AssetList.removeOne(pAsset);
-			break;
-		}
-	}
-
-	delete pAsset;
-}
-
-bool IManagerModel::TransferAsset(AssetItemData *pAsset, uint uiNewBankId)
-{
-	if(uiNewBankId == pAsset->GetBankId())
-		return false;
-
-	bool bValid = false;
-	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
-	{
-		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
-		{
-			m_BanksModel.GetBank(i)->m_AssetList.removeOne(pAsset);
-			bValid = true;
-			break;
-		}
-	}
-
-	if(bValid == false)
-		return false;
-
-	bValid = false;
-	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
-	{
-		if(uiNewBankId == m_BanksModel.GetBank(i)->GetId())
-		{
-			pAsset->SetBankId(uiNewBankId);
-
-			m_BanksModel.GetBank(i)->m_AssetList.append(pAsset);
-			bValid = true;
-			break;
-		}
-	}
-
-	return bValid;
 }
 
 //QList<AssetItemData *> IManagerModel::RequestAssets(ProjectItemData *pItem)
@@ -423,7 +514,7 @@ bool IManagerModel::CreateNewFilter(QString sName, TreeModelItem *pParent)
 	return false;
 }
 
-uint IManagerModel::CreateNewBank(QString sName)
+void IManagerModel::CreateNewBank(QString sName)
 {
 	//AtlasGrp *pNewAtlasGrp = new AtlasGrp());
 	QJsonObject bankObj = DlgAtlasGroupSettings::GenerateDefaultSettingsObj();
@@ -437,8 +528,6 @@ uint IManagerModel::CreateNewBank(QString sName)
 
 	m_uiNextBankId++;
 	SaveMeta();
-
-	return static_cast<uint>(m_BanksModel.rowCount() - 1);
 }
 
 void IManagerModel::RemoveBank(quint32 uiBankId)
@@ -607,6 +696,45 @@ void IManagerModel::SaveRuntime()
 	}
 
 	Harmony::Reload(&m_ProjectRef);
+}
+
+void IManagerModel::DeleteAsset(AssetItemData *pAsset)
+{
+	if(RemoveLookup(pAsset))
+		pAsset->DeleteMetaFile();
+
+	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
+	{
+		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
+		{
+			m_BanksModel.GetBank(i)->m_AssetList.removeOne(pAsset);
+			break;
+		}
+	}
+
+	delete pAsset;
+}
+
+void IManagerModel::MoveAsset(AssetItemData *pAsset, quint32 uiNewBankId)
+{
+	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
+	{
+		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
+		{
+			m_BanksModel.GetBank(i)->m_AssetList.removeOne(pAsset);
+			break;
+		}
+	}
+
+	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
+	{
+		if(uiNewBankId == m_BanksModel.GetBank(i)->GetId())
+		{
+			pAsset->SetBankId(uiNewBankId);
+			m_BanksModel.GetBank(i)->m_AssetList.append(pAsset);
+			break;
+		}
+	}
 }
 
 AssetItemData *IManagerModel::CreateAssetTreeItem(const QString sPrefix, const QString sName, QJsonObject metaObj)

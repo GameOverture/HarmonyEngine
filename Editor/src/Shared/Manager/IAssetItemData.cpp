@@ -11,12 +11,12 @@
 #include "IAssetItemData.h"
 #include "IManagerModel.h"
 
-AssetItemData::AssetItemData(IManagerModel &modelRef, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors) :
+AssetItemData::AssetItemData(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors) :
+	TreeModelItemData(eType, sName),
 	m_ModelRef(modelRef),
 	m_UNIQUE_ID(uuid),
 	m_uiChecksum(uiChecksum),
 	m_uiBankId(uiBankId),
-	m_sName(sName),
 	m_sMetaFileExt(sMetaFileExt),
 	m_uiErrors(uiErrors) // '0' when there is no error
 {
@@ -51,9 +51,10 @@ QString AssetItemData::GetName() const
 {
 	return m_sName;
 }
-void AssetItemData::SetName(QString sNewName)
+
+QString AssetItemData::GetMetaFileExt() const
 {
-	m_sName = sNewName;
+	return m_sMetaFileExt;
 }
 
 QSet<ProjectItemData *> AssetItemData::GetLinks()

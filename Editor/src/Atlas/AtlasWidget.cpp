@@ -129,21 +129,6 @@ AtlasWidget::~AtlasWidget()
 	delete ui;
 }
 
-quint32 AtlasWidget::GetSelectedAtlasGrpId()
-{
-	return m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(ui->cmbAtlasGroups->currentIndex());
-}
-
-AtlasModel &AtlasWidget::GetData()
-{
-	return *m_pModel;
-}
-
-AtlasTreeWidget *AtlasWidget::GetFramesTreeWidget()
-{
-	return ui->atlasList;
-}
-
 void AtlasWidget::DrawUpdate()
 {
 	m_Draw.SetHover(ui->atlasList->itemAt(ui->atlasList->mapFromGlobal(QCursor::pos())));
@@ -161,492 +146,57 @@ void AtlasWidget::StashTreeWidgets()
 	m_pModel->StashTreeWidgets(stashedTreeItemList);
 }
 
-void AtlasWidget::RefreshInfo()
-{
-	uint uiAtlasGrpIndex = ui->cmbAtlasGroups->currentIndex();
-	
-	ui->lblNumTextures->setText(QString::number(m_pModel->GetNumTextures(uiAtlasGrpIndex)));
-	ui->lblTexDimensions->setText("(" % QString::number(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).width()) % "x" % QString::number(m_pModel->GetAtlasDimensions(uiAtlasGrpIndex).height()) % ")");
-	ui->lblTexType->setText(HyGlobal::AtlasTextureTypeString(m_pModel->GetAtlasTextureType(uiAtlasGrpIndex)));
-	
-	ui->actionRemoveGroup->setEnabled(uiAtlasGrpIndex != 0);
 
-	// Restore expanded filters if they have been reloaded
-	QJsonArray expandedFilterArray = m_pModel->GetExpandedFiltersArray();
-	uint uiFilterIndex = 0;
-	QTreeWidgetItemIterator iter(ui->atlasList);
-	while(*iter)
-	{
-		if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-		{
-			if(expandedFilterArray.at(uiFilterIndex).toBool())
-				(*iter)->setExpanded(true);
-			else
-				(*iter)->setExpanded(false);
 
-			++uiFilterIndex;
-		}
 
-		++iter;
-	}
-}
 
-/*virtual*/ void AtlasWidget::enterEvent(QEvent *pEvent) /*override*/
-{
-	m_Draw.Show();
-	QWidget::enterEvent(pEvent);
-}
 
-/*virtual*/ void AtlasWidget::leaveEvent(QEvent *pEvent) /*override*/
-{
-	m_Draw.Hide();
-	QWidget::leaveEvent(pEvent);
-}
 
-/*virtual*/ void AtlasWidget::resizeEvent(QResizeEvent *event) /*override*/
-{
-	QWidget::resizeEvent(event);
 
-	if(ui->atlasList == nullptr)
-		return;
-
-	int iTotalWidth = ui->atlasList->size().width();
-	ui->atlasList->setColumnWidth(0, iTotalWidth - 60);
-}
-
-bool AtlasWidget::DoAtlasGroupSettingsDlg()
-{
-	bool bAccepted = false;
-	QList<AtlasFrame *> frameList = m_pModel->GetFrames(ui->cmbAtlasGroups->currentIndex());
-	
-	bool bAtlasGrpHasImages = frameList.size() > 0;
-
-	DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bAtlasGrpHasImages, m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex()));
-	if(QDialog::Accepted == pDlg->exec())
-	{
-		// Ensure that all current images in atlas group aren't larger than the new atlas itself
-		QJsonObject newPackerSettings = m_pModel->GetPackerSettings(ui->cmbAtlasGroups->currentIndex());
-		pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
-
-		bool bPackIsValid = true;
-		for(int i = 0; i < frameList.size(); ++i)
-		{
-			if(m_pModel->IsImageValid(frameList[i]->GetSize().width(), frameList[i]->GetSize().height(), newPackerSettings) == false)
-			{
-				HyGuiLog("Could not save atlas group settings because image '" % frameList[i]->GetName() % "' will no longer fit on the atlas", LOGTYPE_Warning);
-				bPackIsValid = false;
-				break;
-			}
-		}
-
-		if(bPackIsValid)
-		{
-			m_pModel->SetPackerSettings(ui->cmbAtlasGroups->currentIndex(), newPackerSettings);
-
-			if(pDlg->IsSettingsDirty() && bAtlasGrpHasImages)
-				m_pModel->RepackAll(ui->cmbAtlasGroups->currentIndex());
-			else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
-				m_pModel->WriteMetaSettings();
-
-			bAccepted = true;
-		}
-	}
-
-	delete pDlg;
-	RefreshInfo();
-
-	return bAccepted;
-}
 
 void AtlasWidget::on_actionDeleteImages_triggered()
 {
-	QList<QTreeWidgetItem *> selectedTreeItemList = ui->atlasList->selectedItems();
 
-	QList<QTreeWidgetItem *> selectedFrameList;
-	QList<QTreeWidgetItem *> selectedFilterList;
-
-	GetSelectedItemsRecursively(selectedTreeItemList, selectedFrameList, selectedFilterList);
-	
-	// First loop through and check to see if any links are present, and abort if dependecies are found
-	for(int i = 0; i < selectedFrameList.count(); ++i)
-	{
-		AtlasFrame *pFrame = selectedFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-		QSet<ProjectItemData *> sLinks = pFrame->GetLinks();
-		if(sLinks.empty() == false)
-		{
-			QString sMessage = "'" % pFrame->GetName() % "' image cannot be deleted because it is in use by the following items: \n\n";
-			for(QSet<ProjectItemData *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
-				sMessage.append(HyGlobal::ItemName((*LinksIter)->GetType(), true) % "/" % (*LinksIter)->GetName(true) % "\n");
-
-			HyGuiLog(sMessage, LOGTYPE_Warning);
-			return;
-		}
-	}
-
-	if(selectedFrameList.size() > 0)
-	{
-		if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete " % QString::number(selectedFrameList.size()) % " frames?", QMessageBox::Yes, QMessageBox::No))
-			return;
-	}
-
-	// No dependencies found, resume with deleting
-	QMap<uint, QSet<int> > affectedTextureIndexMap;
-	for(int i = 0; i < selectedFrameList.count(); ++i)
-	{
-		AtlasFrame *pFrame = selectedFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-		affectedTextureIndexMap[m_pModel->GetAtlasGrpIndexFromAtlasGrpId(pFrame->GetAtlasGrpId())].insert(pFrame->GetTextureIndex());
-
-		m_pModel->RemoveFrame(pFrame);
-		delete selectedFrameList[i];
-	}
-
-	if(affectedTextureIndexMap.empty() == false)
-	{
-		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
-			m_pModel->Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
-	}
-
-	// Delete the selected filters. When deleting a parent of another filter, it will delete its children too.
-	// Make sure to just delete children filters first or else it will crash, so process 'selectedFilterList' backwards
-	for(int i = selectedFilterList.size() - 1; i >= 0; --i)
-		delete selectedFilterList[i];
 }
 
 void AtlasWidget::on_actionReplaceImages_triggered()
 {
-	// Query all selected frames in Atlas Manager
-	QList<QTreeWidgetItem *> selectedTreeItemList = ui->atlasList->selectedItems();
-	QList<QTreeWidgetItem *> selectedTreeItemFrameList;
-	QList<QTreeWidgetItem *> selectedFilterList;
-	GetSelectedItemsRecursively(selectedTreeItemList, selectedTreeItemFrameList, selectedFilterList);
-	if(selectedFilterList.empty() == false)
-	{
-		HyGuiLog("Please unselect any atlas filters before replacing images", LOGTYPE_Warning);
-		return;
-	}
-	
-	ProjectTabBar *pTabBar = m_pModel->GetProjOwner().GetTabBar();
-	
-	// Keep track of any linked/referenced items as they will need to be re-saved after image replacement
-	QList<ProjectItemData *> affectedItemList;
-	for(int i = 0; i < selectedTreeItemFrameList.count(); ++i)
-	{
-		AtlasFrame *pFrame = selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-		
-		QSet<ProjectItemData *> sLinks = pFrame->GetLinks();
-		if(sLinks.empty() == false)
-		{
-			for(QSet<ProjectItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
-			{
-				ProjectItemData *pLinkedItem = *linksIter;
-				affectedItemList.append(pLinkedItem);
-				
-				// Abort if any of these linked items are currently opened & unsaved
-				for(int i = 0; i < pTabBar->count(); ++i)
-				{
-					QVariant v = pTabBar->tabData(i);
-					ProjectItemData *pOpenItem = v.value<ProjectItemData *>();
-					
-					if(pLinkedItem == pOpenItem && pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
-					{
-						QString sMessage = "'" % pFrame->GetName() % "' image cannot be replaced because an item that references it is currently opened and unsaved:\n" % pOpenItem->GetName(true);
-						HyGuiLog(sMessage, LOGTYPE_Warning);
-						return;
-					}
-				}
-			}
-		}
-	}
 
-	// Store a list of the frames, since 'selectedAtlasTreeItemList' will become invalid within Refresh()
-	QList<AtlasFrame *> selectedFrameList;
-	for(int i = 0; i < selectedTreeItemFrameList.count(); ++i)
-		selectedFrameList.append(selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>());
-
-	QFileDialog dlg(this);
-	dlg.setDirectory("");
-
-	if(selectedFrameList.count() == 1)
-	{
-		dlg.setFileMode(QFileDialog::ExistingFile);
-		dlg.setWindowTitle("Select an image as the replacement");
-	}
-	else
-	{
-		dlg.setFileMode(QFileDialog::ExistingFiles);
-		dlg.setWindowTitle("Select " % QString::number(selectedFrameList.count()) % " images as replacements");
-	}
-	dlg.setWindowModality(Qt::ApplicationModal);
-	dlg.setModal(true);
-	QStringList sFilterList = HYMETA_ImageFilterList;
-	dlg.setNameFilters(sFilterList);
-
-	QStringList sImportImgList;
-	do
-	{
-		if(dlg.exec() == QDialog::Rejected)
-			return;
-
-		sImportImgList = dlg.selectedFiles();
-
-		if(sImportImgList.count() != selectedFrameList.count())
-			HyGuiLog("You must select " % QString::number(selectedFrameList.count()) % " images", LOGTYPE_Warning);
-	}
-	while(sImportImgList.count() != selectedFrameList.count());
-
-	// Ensure all new replacement images will fit on the specified atlas
-	QList<QImage *> newReplacementImageList;
-	for(int i = 0; i < selectedFrameList.count(); ++i)
-	{
-		QFileInfo fileInfo(sImportImgList[i]);
-		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
-		QSize atlasDimensions = m_pModel->GetAtlasDimensions(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(selectedFrameList[i]->GetAtlasGrpId()));
-		if(m_pModel->IsImageValid(*pNewImage, selectedFrameList[i]->GetAtlasGrpId()) == false)
-		{
-			HyGuiLog("Replacement image " % fileInfo.fileName() % " will not fit in atlas group '" % QString::number(selectedFrameList[i]->GetAtlasGrpId()) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
-
-			for(int j = 0; j < newReplacementImageList.size(); ++j)
-				delete newReplacementImageList[j];
-
-			return;
-		}
-
-		newReplacementImageList.push_back(pNewImage);
-	}
-
-	QMap<uint, QSet<int> > affectedTextureIndexMap;
-	for(int i = 0; i < selectedFrameList.count(); ++i)
-	{
-		HyGuiLog("Replacing: " % selectedFrameList[i]->GetName() % " -> " % sImportImgList[i], LOGTYPE_Info);
-
-		affectedTextureIndexMap[m_pModel->GetAtlasGrpIndexFromAtlasGrpId(selectedFrameList[i]->GetAtlasGrpId())].insert(selectedFrameList[i]->GetTextureIndex());
-		
-		QFileInfo fileInfo(sImportImgList[i]);
-		m_pModel->ReplaceFrame(selectedFrameList[i], fileInfo.baseName(), *newReplacementImageList[i], false);
-	}
-
-	for(int j = 0; j < newReplacementImageList.size(); ++j)
-		delete newReplacementImageList[j];
-
-	if(affectedTextureIndexMap.empty() == false)
-	{
-		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
-			m_pModel->Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
-	}
-	
-	// Resave all affected items that had a replaced atlas frame
-	for(int i = 0; i < affectedItemList.size(); ++i)
-	{
-		if(affectedItemList[i]->Save(i == (affectedItemList.size() - 1)) == false)
-			HyGuiLog(affectedItemList[i]->GetName(true) % " failed to save its new atlas frame", LOGTYPE_Error);
-	}
 }
 
 void AtlasWidget::on_atlasList_itemSelectionChanged()
 {
-	QList<QTreeWidgetItem *> selectedItemList = ui->atlasList->selectedItems();
 
-	m_Draw.SetSelected(selectedItemList);
-
-	int iNumSelected = selectedItemList.count();
-	ui->actionRename->setEnabled(iNumSelected == 1);
-	ui->actionDeleteImages->setEnabled(iNumSelected != 0);
-	ui->actionReplaceImages->setEnabled(iNumSelected != 0);
-	
-	// Determine the best suited icon based on selection
-	HyGuiItemType eIconType = ITEM_Unknown;
-	for(int i = 0; i < selectedItemList.size(); ++i)
-	{
-		if(selectedItemList[i]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-		{
-			ui->actionReplaceImages->setEnabled(false);
-
-			if(eIconType != ITEM_AtlasImage)
-				eIconType = ITEM_Filter;
-		}
-		else
-			eIconType = ITEM_AtlasImage;
-	}
-
-	if(eIconType != ITEM_Unknown)
-		ui->actionDeleteImages->setIcon(HyGlobal::ItemIcon(eIconType, SUBICON_Delete));
-}
-
-void AtlasWidget::OnContextMenu(const QPoint &pos)
-{
-	QPoint globalPos = ui->atlasList->mapToGlobal(pos);
-	QTreeWidgetItem *pTreeNode = ui->atlasList->itemAt(pos);
-
-	QMenu contextMenu;
-	QMenu atlasGrpMenu;
-	
-	if(pTreeNode == nullptr)
-	{
-		contextMenu.addAction(ui->actionImportImages);
-		contextMenu.addAction(ui->actionImportDirectory);
-		contextMenu.addAction(ui->actionAddFilter);
-	}
-	else
-	{
-		if(m_pModel->GetNumAtlasGroups() > 1)
-		{
-			atlasGrpMenu.setIcon(QIcon(":/icons16x16/atlas-assemble.png"));
-			atlasGrpMenu.setTitle("Atlas Groups...");
-			atlasGrpMenu.setToolTip("By organizing images into groups, you can logically partition assets to avoid unnecessary loads.");
-			
-			for(int i = 0; i < m_pModel->GetNumAtlasGroups(); ++i)
-			{
-				QAction *pActionAtlasGrpMove = new QAction();
-				pActionAtlasGrpMove->setText(m_pModel->GetAtlasGroupName(i));
-				pActionAtlasGrpMove->setIcon(QIcon(":/icons16x16/atlas-assemble.png"));
-				pActionAtlasGrpMove->setData(m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(i));
-				
-				atlasGrpMenu.addAction(pActionAtlasGrpMove);
-			}
-			
-			connect(&atlasGrpMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_actionAtlasGrpTransfer_triggered(QAction*)));
-			
-			contextMenu.addMenu(&atlasGrpMenu);
-			contextMenu.addSeparator();
-		}
-		
-		contextMenu.addAction(ui->actionImportImages);
-		contextMenu.addAction(ui->actionImportDirectory);
-		contextMenu.addAction(ui->actionAddFilter);
-		contextMenu.addSeparator();
-		contextMenu.addAction(ui->actionDeleteImages);
-		contextMenu.addAction(ui->actionReplaceImages);
-		contextMenu.addAction(ui->actionRename);
-	}
-
-	contextMenu.exec(globalPos);
-	
-	QList<QAction *> actionAtlasGrpMoveList = atlasGrpMenu.actions();
-	for(int i = 0; i < actionAtlasGrpMoveList.size(); ++i)
-		delete actionAtlasGrpMoveList[i];
-}
-
-void AtlasWidget::GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef)
-{
-	for(int i = 0; i < selectedTreeItems.count(); ++i)
-	{
-		// First determine if any selected QTreeWidgetItem is a filter, and dig into its children if so
-		if(selectedTreeItems[i]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-		{
-			filterListRef.append(selectedTreeItems[i]);
-
-			QList<QTreeWidgetItem *> filterContentsList;
-			for(int j = 0; j < selectedTreeItems[i]->childCount(); ++j)
-				filterContentsList.append(selectedTreeItems[i]->child(j));
-
-			GetSelectedItemsRecursively(filterContentsList, frameListRef, filterListRef);
-		}
-		else
-			frameListRef.append(selectedTreeItems[i]);
-	}
 }
 
 void AtlasWidget::on_actionRename_triggered()
 {
-	QTreeWidgetItem *pSelectedItem = ui->atlasList->selectedItems()[0];
 
-	DlgInputName *pDlg = new DlgInputName("Rename " % pSelectedItem->text(0), pSelectedItem->text(0));
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		if(pSelectedItem->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-			pSelectedItem->setText(0, pDlg->GetName());
-		else
-		{
-			AtlasFrame *pFrame = pSelectedItem->data(0, Qt::UserRole).value<AtlasFrame *>();
-			pFrame->SetName(pDlg->GetName());
-
-			m_pModel->WriteMetaSettings();
-		}
-	}
-
-	delete pDlg;
 }
 
 void AtlasWidget::on_cmbAtlasGroups_currentIndexChanged(int index)
 {
-	RefreshInfo();
+	
 }
 
 void AtlasWidget::on_actionAddGroup_triggered()
 {
-	DlgInputName *pDlg = new DlgInputName("Creating New Atlas Group", "NewAtlasGroup");
-	
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		ui->cmbAtlasGroups->setCurrentIndex(m_pModel->CreateNewAtlasGrp(pDlg->GetName()));
-		if(DoAtlasGroupSettingsDlg() == false)
-			on_actionRemoveGroup_triggered();
-	}
-	
-	delete pDlg;
+
 }
 
 void AtlasWidget::on_actionGroupSettings_triggered()
 {
-	DoAtlasGroupSettingsDlg();
+	
 }
 
 void AtlasWidget::on_actionRemoveGroup_triggered()
 {
-	uint uiCurIndex = ui->cmbAtlasGroups->currentIndex();
-	ui->cmbAtlasGroups->setCurrentIndex(0);
-	
-	m_pModel->RemoveAtlasGrp(m_pModel->GetAtlasGrpIdFromAtlasGrpIndex(uiCurIndex));
+
 }
 
 void AtlasWidget::on_actionAtlasGrpTransfer_triggered(QAction *pAction)
 {
-	quint32 uiNewAtlasGrpId = static_cast<quint32>(pAction->data().toInt());    // Which atlas group ID we're transferring to
-	
-	QList<QTreeWidgetItem *> selectedTreeItemList = ui->atlasList->selectedItems();
-	QList<QTreeWidgetItem *> selectedTreeItemFrameList;
-	QList<QTreeWidgetItem *> selectedFilterList;
-	GetSelectedItemsRecursively(selectedTreeItemList, selectedTreeItemFrameList, selectedFilterList);
 
-	// Ensure all transferred images can fit on new atlas
-	for(int i = 0; i < selectedTreeItemFrameList.count(); ++i)
-	{
-		AtlasFrame *pFrame = selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-		if(pFrame->GetAtlasGrpId() == uiNewAtlasGrpId)
-			continue;
-
-		QSize atlasDimensions = m_pModel->GetAtlasDimensions(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(uiNewAtlasGrpId));
-		if(m_pModel->IsImageValid(pFrame->GetSize().width(), pFrame->GetSize().height(), uiNewAtlasGrpId) == false)
-		{
-			HyGuiLog("Cannot transfer image " % pFrame->GetName() % " because it will not fit in atlas group '" % QString::number(uiNewAtlasGrpId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
-			return;
-		}
-	}
-
-	QMap<uint, QSet<int> > affectedTextureIndexMap; // old
-	QSet<AtlasFrame *> framesGoingToNewAtlasGrpSet; // new
-	
-	for(int i = 0; i < selectedTreeItemFrameList.count(); ++i)
-	{
-		AtlasFrame *pFrame = selectedTreeItemFrameList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-		if(pFrame->GetAtlasGrpId() == uiNewAtlasGrpId)
-			continue;
-		
-		affectedTextureIndexMap[m_pModel->GetAtlasGrpIndexFromAtlasGrpId(pFrame->GetAtlasGrpId())].insert(pFrame->GetTextureIndex());
-		framesGoingToNewAtlasGrpSet.insert(pFrame);
-		
-		m_pModel->TransferFrame(pFrame, uiNewAtlasGrpId);
-	}
-	
-	// Repack all old affected atlas groups
-	if(affectedTextureIndexMap.empty() == false)
-	{
-		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
-			m_pModel->Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
-	}
-	
-	// Repack new affected atlas group
-	m_pModel->Repack(m_pModel->GetAtlasGrpIndexFromAtlasGrpId(uiNewAtlasGrpId), QSet<int>(), framesGoingToNewAtlasGrpSet);
 }
 
 void AtlasWidget::on_actionImportImages_triggered()

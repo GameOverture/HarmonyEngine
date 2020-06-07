@@ -53,6 +53,24 @@ bool ITreeModel::InsertTreeItem(TreeModelItemData *pNewItemData, TreeModelItem *
 	return true;
 }
 
+QList<TreeModelItemData *> ITreeModel::GetItemsRecursively(const QModelIndex &indexRef)
+{
+	QList<TreeModelItemData *> returnList;
+
+	QStack<TreeModelItem *> treeItemStack;
+	treeItemStack.push(static_cast<TreeModelItem *>(indexRef.internalPointer()));
+	while(!treeItemStack.isEmpty())
+	{
+		TreeModelItem *pItem = treeItemStack.pop();
+		returnList.push_back(pItem->data(0).value<TreeModelItemData *>());
+
+		for(int i = 0; i < pItem->GetNumChildren(); ++i)
+			treeItemStack.push(pItem->GetChild(i));
+	}
+
+	return returnList;
+}
+
 /*virtual*/ QVariant ITreeModel::headerData(int iSection, Qt::Orientation orientation, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
 	if(iRole == Qt::TextAlignmentRole)

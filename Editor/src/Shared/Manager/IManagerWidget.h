@@ -10,6 +10,8 @@
 #ifndef IMANAGERWIDGET_H
 #define IMANAGERWIDGET_H
 
+#include "AtlasDraw.h"
+
 #include <QWidget>
 #include <QMenu>
 
@@ -17,16 +19,37 @@ namespace Ui {
 class IManagerWidget;
 }
 
-class IStateData;
-class ProjectItemData;
+class IManagerModel;
+
+class ManagerProxyModel : public QSortFilterProxyModel
+{
+public:
+	ManagerProxyModel(QObject *pParent = nullptr);
+	virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+};
 
 class IManagerWidget : public QWidget
 {
 	Q_OBJECT
 
+	IManagerModel *				m_pModel;
+	AtlasDraw					m_Draw;
+
 public:
 	explicit IManagerWidget(QWidget *pParent = nullptr);
+	explicit IManagerWidget(IManagerModel *pModel, QWidget *pParent = nullptr);
 	~IManagerWidget();
+
+	IManagerModel &GetModel();
+
+	quint32 GetSelectedBankId();
+
+	void RefreshInfo();
+
+protected:
+	virtual void enterEvent(QEvent *pEvent) override;
+	virtual void leaveEvent(QEvent *pEvent) override;
+	virtual void resizeEvent(QResizeEvent *event) override;
 
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
@@ -57,6 +80,9 @@ private Q_SLOTS:
 	
 private:
 	Ui::IManagerWidget *ui;
+
+	void GetSelectedItems(QList<AssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut);
+	//void GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
 };
 
 #endif // IMANAGERWIDGET_H

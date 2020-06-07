@@ -14,20 +14,19 @@
 #include "AtlasWidget.h"
 
 AtlasFrame::AtlasFrame(IManagerModel &modelRef,
+					   HyGuiItemType eType,
 					   QUuid uuid,
 					   quint32 uiChecksum,
 					   quint32 uiBankId,
 					   QString sName,
 					   QRect rAlphaCrop,
-					   AtlasItemType eType,
 					   int iW,
 					   int iH,
 					   int iX,
 					   int iY,
 					   int iTextureIndex,
 					   uint uiErrors) :
-	AssetItemData(modelRef, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
-	m_eType(eType),
+	AssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
 	m_iWidth(iW),
 	m_iHeight(iH),
 	m_rAlphaCrop(rAlphaCrop),
@@ -88,7 +87,7 @@ QPoint AtlasFrame::GetPosition()
 
 AtlasItemType AtlasFrame::GetType()
 {
-	return m_eType;
+	return HyGlobal::GetAtlasItemFromItem(m_eTYPE);
 }
 
 int AtlasFrame::GetTextureIndex()

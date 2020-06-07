@@ -13,7 +13,6 @@
 #include "IManagerModel.h"
 
 #include "AtlasFrame.h"
-#include "_Dependencies/scriptum/imagepacker.h"
 
 class AtlasModel : public IManagerModel
 {
@@ -41,12 +40,19 @@ public:
 
 	void RepackAll(uint uiAtlasGrpIndex);
 	void Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
+	
+	virtual QString OnBankInfo(uint uiBankIndex) override;
+	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 
 protected:
 	virtual void OnCreateBank(BankData &newBankRef) override;
 	virtual void OnDeleteBank(BankData &bankToBeDeleted) override;
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 	virtual AssetItemData *OnAllocateAssetData(QString sFilePath, quint32 uiBankId, HyGuiItemType eType) override;
+
+	virtual bool OnRemoveAssets(QList<AssetItemData *> assetList) override; // Must call DeleteAsset() on each asset
+	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) override;
+	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) override; // Must call MoveAsset() on each asset
 
 	virtual QJsonObject GetSaveJson() override;
 
@@ -60,7 +66,7 @@ private Q_SLOTS:
 //	QDir										m_DataDir;
 //
 //	QJsonObject									m_PackerSettings;
-//	ImagePacker									m_Packer;
+//	
 //	QList<AtlasFrame *>							m_FrameList;
 //
 //	AtlasGrp(QString sAbsDataDirPath) : m_DataDir(sAbsDataDirPath)
@@ -76,21 +82,7 @@ private Q_SLOTS:
 //		return m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 //	}
 //
-//	void SetPackerSettings()
-//	{
-//		m_Packer.sortOrder = m_PackerSettings["cmbSortOrder"].toInt();// m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
-//		m_Packer.border.t = m_PackerSettings["sbFrameMarginTop"].toInt();// m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
-//		m_Packer.border.l = m_PackerSettings["sbFrameMarginLeft"].toInt();// m_iFrameMarginLeft;//ui->sbFrameMarginLeft->value();
-//		m_Packer.border.r = m_PackerSettings["sbFrameMarginRight"].toInt();// m_iFrameMarginRight;//ui->sbFrameMarginRight->value();
-//		m_Packer.border.b = m_PackerSettings["sbFrameMarginBottom"].toInt();// m_iFrameMarginBottom;//ui->sbFrameMarginBottom->value();
-//		m_Packer.extrude = m_PackerSettings["extrude"].toInt();// m_iExtrude;//ui->extrude->value();
-//		m_Packer.merge = m_PackerSettings["chkMerge"].toBool();// m_bMerge;//ui->chkMerge->isChecked();
-//		m_Packer.square = m_PackerSettings["chkSquare"].toBool();// m_bSquare;//ui->chkSquare->isChecked();
-//		m_Packer.autosize = m_PackerSettings["chkAutosize"].toBool();// m_bAutoSize;//ui->chkAutosize->isChecked();
-//		m_Packer.minFillRate = m_PackerSettings["minFillRate"].toInt();// m_iFillRate;//ui->minFillRate->value();
-//		m_Packer.mergeBF = false;
-//		m_Packer.rotate = ImagePacker::NEVER;
-//	}
+//	
 //};
 
 #endif // ATLASMODEL_H
