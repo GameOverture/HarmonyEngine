@@ -114,6 +114,8 @@ if(Qt5_DIR)
 		src/Shared/Item/IModel.h
 		src/Shared/Item/IWidget.h
 		src/Shared/Item/IWidget.ui
+		src/Shared/Manager/IAssetItemData.cpp
+		src/Shared/Manager/IAssetItemData.h
 		src/Shared/Manager/IManagerModel.cpp
 		src/Shared/Manager/IManagerModel.h
 		src/Shared/Manager/IManagerWidget.cpp

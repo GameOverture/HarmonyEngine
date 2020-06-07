@@ -25,28 +25,28 @@ class AtlasWidget;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class AtlasTreeWidget : public QTreeWidget
-{
-	AtlasWidget *      m_pOwner;
-
-public:
-	AtlasTreeWidget(QWidget *parent = Q_NULLPTR);
-	void SetAtlasOwner(AtlasWidget *pOwner);
-
-protected:
-	virtual void dropEvent(QDropEvent *e) override;
-};
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class AtlasTreeItem : public QTreeWidgetItem
-{
-public:
-	AtlasTreeItem(AtlasTreeWidget *pView, int type = Type) : QTreeWidgetItem(pView, type)
-	{ }
-	AtlasTreeItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
-	{ }
-
-	bool operator<(const QTreeWidgetItem& other) const;
-};
+//class AtlasTreeWidget : public QTreeWidget
+//{
+//	AtlasWidget *      m_pOwner;
+//
+//public:
+//	AtlasTreeWidget(QWidget *parent = Q_NULLPTR);
+//	void SetAtlasOwner(AtlasWidget *pOwner);
+//
+//protected:
+//	virtual void dropEvent(QDropEvent *e) override;
+//};
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//class AtlasTreeItem : public QTreeWidgetItem
+//{
+//public:
+//	AtlasTreeItem(AtlasTreeWidget *pView, int type = Type) : QTreeWidgetItem(pView, type)
+//	{ }
+//	AtlasTreeItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type)
+//	{ }
+//
+//	bool operator<(const QTreeWidgetItem& other) const;
+//};
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class AtlasWidget : public QWidget

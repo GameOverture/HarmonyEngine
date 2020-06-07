@@ -10,7 +10,7 @@
 #ifndef ATLASFRAME_H
 #define ATLASFRAME_H
 
-#include "IManagerModel.h"
+#include "IAssetItemData.h"
 #include "ProjectItemData.h"
 
 #include <QWidget>
@@ -36,7 +36,7 @@ class AtlasFrame : public AssetItemData
 	int									m_iPosY;
 
 public:
-	AtlasFrame(QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QRect rAlphaCrop, AtlasItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
+	AtlasFrame(IManagerModel &modelRef, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QRect rAlphaCrop, AtlasItemType eType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
 	~AtlasFrame();
 
 	//AtlasTreeItem *GetTreeItem();
@@ -51,11 +51,9 @@ public:
 
 	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY);
 
-	void GetJsonObj(QJsonObject &frameObj);
+	virtual void GetJsonObj(QJsonObject &frameObj) override;
 
-private:
 	//void UpdateTreeItemIconAndToolTip();
-	bool DeleteMetaImage(QDir metaDir);
 	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
 };
 //Q_DECLARE_METATYPE(AtlasFrame *)

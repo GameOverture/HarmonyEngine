@@ -96,7 +96,7 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 		return nullptr;
 	}
 
-	InsertNewItem(pNewProject, m_pRootItem);
+	InsertTreeItem(pNewProject, m_pRootItem);
 	pNewProject->LoadExplorerModel();
 
 	return pNewProject;
@@ -150,7 +150,7 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemT
 			if(bFound == false)
 			{
 				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix ExplorerItemData here and continue traversing down the tree
-				InsertNewItem(new ExplorerItemData(*pProj, ITEM_Prefix, sPathSplitList[i]), pCurTreeItem);
+				InsertTreeItem(new ExplorerItemData(*pProj, ITEM_Prefix, sPathSplitList[i]), pCurTreeItem);
 				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
 			}
 		}
@@ -160,9 +160,12 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemT
 	if(eNewItemType == ITEM_Prefix)
 		pNewItem = new ExplorerItemData(*pProj, ITEM_Prefix, sName);
 	else
+	{
 		pNewItem = new ProjectItemData(*pProj, eNewItemType, sName, initItemFileData, bIsPendingSave);
+		m_ItemUuidMap[static_cast<ProjectItemData *>(pNewItem)->GetUuid()] = static_cast<ProjectItemData *>(pNewItem);
+	}
 
-	InsertNewItem(pNewItem, pCurTreeItem);
+	InsertTreeItem(pNewItem, pCurTreeItem);
 	return pNewItem;
 }
 
@@ -215,7 +218,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 	// Import images into the selected atlas group, or default one
 	QSet<AtlasFrame *> importedImageSet;
-	quint32 uiAtlasGrpId = pDestProject->GetAtlasModel().GetAtlasGrpIdFromAtlasGrpIndex(0);
+	quint32 uiAtlasGrpId = pDestProject->GetAtlasModel().GetBankIdFromBankIndex(0);
 	if(pDestProject->GetAtlasWidget())
 		uiAtlasGrpId = pDestProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
 
@@ -302,7 +305,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		{
 			QJsonObject imageObj = imageArray[i].toObject();
 
-			if(pDestProject->GetAtlasModel().DoesImageExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
+			if(pDestProject->GetAtlasModel().DoesAssetExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
 			{
 				// Ensure filename is its metadata name so it's used when imported.
 				QFileInfo pasteImageFileInfo(imageObj["uri"].toString());
@@ -331,7 +334,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			break;
 		}
 
-		QSet<AtlasFrame *> newImportedImagesSet = pDestProject->GetAtlasModel().ImportImages(importImageList, uiAtlasGrpId, eType, correspondingParentList);
+		QSet<AtlasFrame *> newImportedImagesSet = pDestProject->GetAtlasModel().ImportAssets(importImageList, uiAtlasGrpId, eType, correspondingParentList);
 		if(newImportedImagesSet.empty())
 		{
 			HyGuiLog("Failed to paste item - its image(s) could not import.", LOGTYPE_Warning);
@@ -388,7 +391,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 	}
 
 	if(importedImageSet.empty() == false)
-		pDestProject->GetAtlasModel().Repack(pDestProject->GetAtlasModel().GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGrpId), QSet<int>(), importedImageSet);
+		pDestProject->GetAtlasModel().Repack(pDestProject->GetAtlasModel().GetBankIndexFromBankId(uiAtlasGrpId), QSet<int>(), importedImageSet);
 
 	return true;
 }
@@ -530,28 +533,6 @@ ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid)
 //	ExplorerItemData *pProject = pProjectTreeItem->data(0).value<ExplorerItemData *>();
 //	delete pProject;
 //}
-
-bool ExplorerModel::InsertNewItem(ExplorerItemData *pNewItem, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
-{
-	QModelIndex parentIndex = FindIndex<ExplorerItemData *>(pParentTreeItem->data(0).value<ExplorerItemData *>(), 0);
-	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
-
-	if(insertRow(iRow, parentIndex) == false)
-	{
-		HyGuiLog("ExplorerModel::InsertNewItem() - insertRow failed", LOGTYPE_Error);
-		return false;
-	}
-
-	QVariant v;
-	v.setValue<ExplorerItemData *>(pNewItem);
-	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
-		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
-
-	if(pNewItem->IsProjectItem())
-		m_ItemUuidMap[static_cast<ProjectItemData *>(pNewItem)->GetUuid()] = static_cast<ProjectItemData *>(pNewItem);
-
-	return true;
-}
 
 TreeModelItem *ExplorerModel::FindProjectTreeItem(Project *pProject)
 {

@@ -29,34 +29,34 @@
 const float fTRANS_DUR = 0.5f;
 const int iPADDING = 2;
 
-AtlasTreeWidget::AtlasTreeWidget(QWidget *parent /*= Q_NULLPTR*/) :
-	QTreeWidget(parent)
-{
-}
-void AtlasTreeWidget::SetAtlasOwner(AtlasWidget *pOwner)
-{
-	m_pOwner = pOwner;
-}
-/*virtual*/ void AtlasTreeWidget::dropEvent(QDropEvent *e)
-{
-	QTreeWidget::dropEvent(e);
-
-	sortItems(0, Qt::AscendingOrder);
-	m_pOwner->GetData().WriteMetaSettings();
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AtlasTreeItem::operator<(const QTreeWidgetItem &rhs) const
-{
-	bool bLeftIsFilter = this->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter;
-	bool bRightIsFilter = rhs.data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter;
-
-	if(bLeftIsFilter && bRightIsFilter == false)
-		return true;
-	if(bLeftIsFilter == false && bRightIsFilter)
-		return false;
-
-	return this->text(0) < rhs.text(0);
-}
+//AtlasTreeWidget::AtlasTreeWidget(QWidget *parent /*= Q_NULLPTR*/) :
+//	QTreeWidget(parent)
+//{
+//}
+//void AtlasTreeWidget::SetAtlasOwner(AtlasWidget *pOwner)
+//{
+//	m_pOwner = pOwner;
+//}
+///*virtual*/ void AtlasTreeWidget::dropEvent(QDropEvent *e)
+//{
+//	QTreeWidget::dropEvent(e);
+//
+//	sortItems(0, Qt::AscendingOrder);
+//	m_pOwner->GetData().WriteMetaSettings();
+//}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//bool AtlasTreeItem::operator<(const QTreeWidgetItem &rhs) const
+//{
+//	bool bLeftIsFilter = this->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter;
+//	bool bRightIsFilter = rhs.data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter;
+//
+//	if(bLeftIsFilter && bRightIsFilter == false)
+//		return true;
+//	if(bLeftIsFilter == false && bRightIsFilter)
+//		return false;
+//
+//	return this->text(0) < rhs.text(0);
+//}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 AtlasWidget::AtlasWidget(QWidget *pParent) :
@@ -325,7 +325,7 @@ void AtlasWidget::on_actionReplaceImages_triggered()
 		return;
 	}
 	
-	ProjectTabBar *pTabBar = m_pModel->GetProjOwner()->GetTabBar();
+	ProjectTabBar *pTabBar = m_pModel->GetProjOwner().GetTabBar();
 	
 	// Keep track of any linked/referenced items as they will need to be re-saved after image replacement
 	QList<ProjectItemData *> affectedItemList;

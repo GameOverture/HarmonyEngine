@@ -34,6 +34,25 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 	delete m_pRootItem;
 }
 
+bool ITreeModel::InsertTreeItem(TreeModelItemData *pNewItemData, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
+{
+	QModelIndex parentIndex = FindIndex<TreeModelItemData *>(pParentTreeItem->data(0).value<TreeModelItemData *>(), 0);
+	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
+
+	if(insertRow(iRow, parentIndex) == false)
+	{
+		HyGuiLog("ExplorerModel::InsertNewItem() - insertRow failed", LOGTYPE_Error);
+		return false;
+	}
+
+	QVariant v;
+	v.setValue<TreeModelItemData *>(pNewItemData);
+	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
+		HyGuiLog("IManagerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+
+	return true;
+}
+
 /*virtual*/ QVariant ITreeModel::headerData(int iSection, Qt::Orientation orientation, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
 	if(iRole == Qt::TextAlignmentRole)

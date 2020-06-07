@@ -13,7 +13,8 @@
 
 #include "AtlasWidget.h"
 
-AtlasFrame::AtlasFrame(QUuid uuid,
+AtlasFrame::AtlasFrame(IManagerModel &modelRef,
+					   QUuid uuid,
 					   quint32 uiChecksum,
 					   quint32 uiBankId,
 					   QString sName,
@@ -25,7 +26,7 @@ AtlasFrame::AtlasFrame(QUuid uuid,
 					   int iY,
 					   int iTextureIndex,
 					   uint uiErrors) :
-	AssetItemData(uuid, uiChecksum, uiBankId, sName, uiErrors),
+	AssetItemData(modelRef, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
 	m_eType(eType),
 	m_iWidth(iW),
 	m_iHeight(iH),
@@ -126,7 +127,7 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 	}
 }
 
-void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
+/*virtual*/ void AtlasFrame::GetJsonObj(QJsonObject &frameObj) /*override*/
 {
 	frameObj.insert("frameUUID", GetUuid().toString(QUuid::WithoutBraces));
 	frameObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(GetBankId())));
@@ -178,23 +179,16 @@ void AtlasFrame::GetJsonObj(QJsonObject &frameObj)
 //	}
 //}
 
-bool AtlasFrame::DeleteMetaImage(QDir metaDir)
-{
-	QFile imageFile(metaDir.path() % "/" % ConstructImageFileName());
-	if(imageFile.remove() == false)
-		return false;
 
-	return true;
-}
 
 void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)
 {
 	m_sName = sName;
 
-	if(m_pTreeWidgetItem)
-		m_pTreeWidgetItem->setText(0, m_sName);
+	//if(m_pTreeWidgetItem)
+	//	m_pTreeWidgetItem->setText(0, m_sName);
 
-	m_uiImageChecksum = uiChecksum;
+	m_uiChecksum = uiChecksum;
 	m_iWidth = newImage.width();
 	m_iHeight = newImage.height();
 
@@ -205,7 +199,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 
 	// DO NOT clear 'm_iTextureIndex' as it's needed in the WidgetAtlasGroup::Repack()
 
-	if(newImage.save(metaDir.path() % "/" % ConstructImageFileName()) == false)
+	if(newImage.save(metaDir.path() % "/" % ConstructMetaFileName()) == false)
 		HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
 }
 //

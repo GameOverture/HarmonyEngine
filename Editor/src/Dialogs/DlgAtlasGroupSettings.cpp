@@ -53,7 +53,9 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
 {
 	QJsonObject returnSettingsObj;
 	
+	// TODO: rename to bankId
 	returnSettingsObj.insert("atlasGrpId", 0);
+	// TODO: rename to bankName
 	returnSettingsObj.insert("txtName", "Default");
 	returnSettingsObj.insert("cmbSortOrder", 0);
 	returnSettingsObj.insert("sbFrameMarginTop", 0);

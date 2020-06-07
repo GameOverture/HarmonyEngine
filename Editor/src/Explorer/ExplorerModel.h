@@ -52,7 +52,6 @@ public:
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
 
 private:
-	bool InsertNewItem(ExplorerItemData *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
 	TreeModelItem *FindProjectTreeItem(Project *pProject);
 	TreeModelItem *FindPrefixTreeItem(const QModelIndex &indexRef) const;
 	QModelIndex FindIndexByItemPath(Project *pProject, QString sPath, HyGuiItemType eType);

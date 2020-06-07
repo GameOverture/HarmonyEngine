@@ -12,117 +12,50 @@
 
 #include "Global.h"
 #include "ITreeModel.h"
-#include "ProjectItemData.h"
-#include "TreeModelItemData.h"
+#include "IAssetItemData.h"
 
 #include <QUuid>
-
-class AssetItemData : public TreeModelItemData
-{
-	IManagerModel &						m_ModelRef;
-	const QUuid							m_UNIQUE_ID;
-	quint32								m_uiChecksum;
-	quint32								m_uiBankId;
-	QString								m_sName;
-	QString								m_sMetaFileExt; // includes period
-
-	QSet<ProjectItemData *>				m_DependencySet;
-	uint								m_uiErrors;
-
-public:
-	AssetItemData(IManagerModel &modelRef, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors) :
-		m_ModelRef(modelRef),
-		m_UNIQUE_ID(uuid),
-		m_uiChecksum(uiChecksum),
-		m_uiBankId(uiBankId),
-		m_sName(sName),
-		m_sMetaFileExt(sMetaFileExt),
-		m_uiErrors(uiErrors) // '0' when there is no error
-	{
-	}
-
-	const QUuid &GetUuid() {
-		return m_UNIQUE_ID;
-	}
-
-	quint32 GetChecksum() {
-		return m_uiChecksum;
-	}
-
-	quint32 GetBankId() {
-		return m_uiBankId;
-	}
-	void SetBankId(quint32 uiNewBankId) {
-		m_uiBankId = uiNewBankId;
-	}
-
-	QString GetFilter() const
-	{
-		return m_ModelRef.AssembleFilter(this);
-	}
-
-	QString GetName() const {
-		return m_sName;
-	}
-	void SetName(QString sNewName) {
-		m_sName = sNewName;
-	}
-
-	QSet<ProjectItemData *> GetLinks() {
-		return m_DependencySet;
-	}
-
-	QString ConstructMetaFileName()
-	{
-		QString sMetaName;
-		sMetaName = sMetaName.sprintf("%010u", m_uiChecksum);
-		sMetaName += m_sMetaFileExt;
-
-		return sMetaName;
-	}
-
-	void SetError(AtlasFrameError eError)
-	{
-		if(eError == ATLASFRAMEERROR_CannotFindMetaImg)
-			HyGuiLog(m_sName % " - GUIFRAMEERROR_CannotFindMetaImg", LOGTYPE_Error);
-
-		m_uiErrors |= (1 << eError);
-
-		//UpdateTreeItemIconAndToolTip();
-	}
-
-	void ClearError(AtlasFrameError eError)
-	{
-		m_uiErrors &= ~(1 << eError);
-
-		//UpdateTreeItemIconAndToolTip();
-	}
-
-	uint GetErrors()
-	{
-		return m_uiErrors;
-	}
-};
 
 class IManagerModel : public ITreeModel
 {
 	Q_OBJECT
 
+protected:
 	struct BankData
 	{
-		QDir								m_Dir;
-		QJsonObject							m_Settings;
-		QList<AssetItemData *>				m_AssetList;
+		QString									m_sAbsPath;
+		QJsonObject								m_Settings;
+		QList<AssetItemData *>					m_AssetList;
 
 		BankData(QString sAbsDataDirPath, QJsonObject settingsObj) :
-			m_Dir(sAbsDataDirPath),
+			m_sAbsPath(sAbsDataDirPath),
 			m_Settings(settingsObj)
 		{ }
+
+		~BankData()
+		{
+			for(int i = 0; i < m_AssetList.size(); ++i)
+				delete m_AssetList[i];
+		}
+
+		quint32 GetId() const {
+			// TODO: rename to bankId
+			if(m_Settings.contains("atlasGrpId") == false) {
+				HyGuiLog("BankData::GetId could not find 'bankId' in bank's settings", LOGTYPE_Error);
+			}
+			// TODO: rename to bankId
+			return m_Settings["atlasGrpId"].toInt();
+		}
+
+		QString GetName() const {
+			// TODO: rename to bankName
+			return m_Settings["txtName"].toString();
+		}
 	};
 	class BanksModel : public QAbstractListModel
 	{
-		IManagerModel &						m_ModelRef;
-		QList<BankData *>					m_BankList;
+		IManagerModel &							m_ModelRef;
+		QList<BankData *>						m_BankList;
 
 	public:
 		BanksModel(IManagerModel &modelRef) :
@@ -130,15 +63,38 @@ class IManagerModel : public ITreeModel
 		{
 		}
 
-		void CreateBank(QString sAbsPath, QJsonObject settingsObj)
+		virtual ~BanksModel()
 		{
-			BankData *pNewBank = new BankData(sAbsPath, settingsObj);
-			m_BankList.push_back(pNewBank);
+			for(int i = 0; i < m_BankList.size(); ++i)
+				delete m_BankList[i];
 		}
-		
+
 		BankData *GetBank(uint uiIndex)
 		{
 			return m_BankList[uiIndex];
+		}
+
+		void AppendBank(QString sAbsPath, QJsonObject settingsObj)
+		{
+			beginInsertRows(QModelIndex(), m_BankList.count(), m_BankList.count());
+			BankData *pNewBank = new BankData(sAbsPath, settingsObj);
+			m_BankList.push_back(pNewBank);
+			endInsertRows();
+
+			m_ModelRef.OnCreateBank(*pNewBank);
+		}
+		
+		void RemoveBank(uint uiIndex)
+		{
+			BankData *pBankToBeRemoved = m_BankList[uiIndex];
+			m_ModelRef.OnDeleteBank(*pBankToBeRemoved);
+			
+			beginRemoveRows(QModelIndex(), uiIndex, uiIndex);
+			m_BankList.removeAt(uiIndex);
+			endRemoveRows();
+
+			delete pBankToBeRemoved;
+			
 		}
 
 		int GetIndex(BankData *pData) const
@@ -170,6 +126,7 @@ class IManagerModel : public ITreeModel
 	BanksModel									m_BanksModel;
 
 	Project &									m_ProjectRef;
+	const HyGuiItemType							m_eITEM_TYPE;
 
 	QDir										m_MetaDir;
 	QDir										m_DataDir;
@@ -177,64 +134,8 @@ class IManagerModel : public ITreeModel
 	quint32										m_uiNextBankId;
 	QJsonArray									m_ExpandedFiltersArray;
 
-	class AssetLookup
-	{
-		QMap<QUuid, AssetItemData *>				m_AssetUuidMap;
-		QMap<quint32, QList<AssetItemData *> >		m_AssetChecksumMap;
-
-	public:
-		void AddLookup(AssetItemData *pAsset) {
-			m_AssetUuidMap[pAsset->GetUuid()] = pAsset;
-
-			uint32 uiChecksum = pAsset->GetChecksum();
-
-			if(m_AssetChecksumMap.contains(uiChecksum))
-			{
-				m_AssetChecksumMap.find(uiChecksum).value().append(pAsset);
-				HyGuiLog("'" % pAsset->GetName() % "' is a duplicate of '" % m_AssetChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_AssetChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
-			}
-			else
-			{
-				QList<AssetItemData *> newFrameList;
-				newFrameList.append(pAsset);
-				m_AssetChecksumMap[uiChecksum] = newFrameList;
-			}
-		}
-		bool RemoveLookup(AssetItemData *pAsset) {  // Returns true if no remaining duplicates exist
-			m_AssetUuidMap.remove(pAsset->GetUuid());
-
-			auto iter = m_AssetChecksumMap.find(pAsset->GetChecksum());
-			if(iter == m_AssetChecksumMap.end())
-				HyGuiLog("AtlasModel::RemoveLookup could not find frame", LOGTYPE_Error);
-
-			iter.value().removeOne(pAsset);
-			if(iter.value().size() == 0)
-			{
-				m_AssetChecksumMap.remove(pAsset->GetChecksum());
-				return true;
-			}
-
-			return false;
-		}
-		AssetItemData *FindById(QUuid uuid) {
-			auto iter = m_AssetUuidMap.find(uuid);
-			if(iter == m_AssetUuidMap.end())
-				return nullptr;
-			else
-				return iter.value();
-		}
-		QList<AssetItemData *> FindByChecksum(quint32 uiChecksum) {
-			auto iter = m_AssetChecksumMap.find(uiChecksum);
-			if(iter == m_AssetChecksumMap.end())
-				return QList<AssetItemData *>();
-			else
-				return iter.value();
-		}
-		bool DoesAssetExist(quint32 uiChecksum) {
-			return m_AssetChecksumMap.contains(uiChecksum);
-		}
-	};
-	AssetLookup									m_AssetLookup;
+	QMap<QUuid, AssetItemData *>				m_AssetUuidMap;
+	QMap<quint32, QList<AssetItemData *> >		m_AssetChecksumMap;
 
 public:
 	IManagerModel(Project &projRef, HyGuiItemType eItemType);
@@ -242,52 +143,57 @@ public:
 
 	Project &GetProjOwner();
 
+	QDir GetMetaDir();
+	QDir GetDataDir();
+
 	int GetNumBanks();
 	QString GetBankName(uint uiBankIndex);
 	QJsonObject GetBankSettings(uint uiBankIndex);
 	void SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj);
 
-	QList<AssetItemData *> GetAssets(uint uiBankIndex);
-
 	QJsonArray GetExpandedFiltersArray();
-
 	QString AssembleFilter(const AssetItemData *pAsset) const;
+
+	bool RemoveLookup(AssetItemData *pAsset); // Returns true if no remaining duplicates exist
+	AssetItemData *FindById(QUuid uuid);
+	QList<AssetItemData *> FindByChecksum(quint32 uiChecksum);
+	bool DoesAssetExist(quint32 uiChecksum);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//AssetItemData *CreateAsset(QUuid uuid, quint32 uiCRC, int32 uiBankId, QString sName);//, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
 	void RemoveAsset(AssetItemData *pAsset);
-	bool TransferAsset(AssetItemData *pAsset, uint uiBankIndex);
-	AssetItemData *GenerateAsset(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiBankIndex, HyGuiItemType eType);
-	bool ReplaceAsset(AssetItemData *pAsset, QString sName, QImage &newImage, bool bDoBankRepack);
+	bool TransferAsset(AssetItemData *pAsset, uint uiNewBankId);
 
-	QList<AssetItemData *> RequestAssets(ProjectItemData *pItem);
+	//QList<AssetItemData *> RequestAssets(ProjectItemData *pItem);
 	QList<AssetItemData *> RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList);
 	QList<AssetItemData *> RequestAssetsByUuid(ProjectItemData *pItem, QList<QUuid> requestList);
-
-	void RelinquishFrames(ProjectItemData *pItem, QList<AtlasFrame *> relinquishList);
+	void RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QSet<AssetItemData *> ImportAssets(QStringList sImportList, uint uiBankIndex, HyGuiItemType eType, QList<AssetItemData *> correspondingParentList);
-
-	AssetItemData *CreateFilter(QString sName, AssetItemData *pParent);
-
-	bool DoesAssetExist(quint32 uiChecksum);
+	QSet<AssetItemData *> ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItem *> correspondingParentList);
+	bool CreateNewFilter(QString sName, TreeModelItem *pParent);
 
 	uint CreateNewBank(QString sName);
-	void RemoveBank(uint uiBankIndex);
+	void RemoveBank(quint32 uiBankId);
 
-	uint GetBankIndexFromBankUuid(QUuid uiAtlasGrpId);
-	QUuid GetBankUuidFromBankIndex(uint uiBankIndex);
+	uint GetBankIndexFromBankId(quint32 uiBankId);
+	quint32 GetBankIdFromBankIndex(uint uiBankIndex);
 
-	void WriteMeta();
-	void WriteData();
+	void SaveMeta();
+	void SaveRuntime(); // Saves meta, outputs runtime assets, and reloads Harmony in the editor
 
 protected:
+	virtual void OnCreateBank(BankData &newBankRef) = 0;
+	virtual void OnDeleteBank(BankData &bankToBeDeleted) = 0;
+	
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
+	virtual AssetItemData *OnAllocateAssetData(QString sFilePath, quint32 uiBankId, HyGuiItemType eType) = 0;
+
+	virtual QJsonObject GetSaveJson() = 0;
 
 private:
-	TreeModelItemData *AddTreeItem(bool bIsFilter, const QString sPrefix, const QString sName, QJsonObject metaObj);
-	bool InsertTreeItem(TreeModelItemData *pNewItem, TreeModelItem *pParentTreeItem, int iRow = -1);
+	AssetItemData *CreateAssetTreeItem(const QString sPrefix, const QString sName, QJsonObject metaObj);
+	void RegisterAsset(AssetItemData *pAsset);
 };
 
 #endif // IMANAGERMODEL_H
