@@ -35,7 +35,15 @@ IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 		HyGuiLog(HyGlobal::ItemName(m_eITEM_TYPE, true) % " data directory is missing, recreating", LOGTYPE_Info);
 		m_DataDir.mkpath(m_DataDir.absolutePath());
 	}
+}
 
+/*virtual*/ IManagerModel::~IManagerModel()
+{
+	
+}
+
+void IManagerModel::Init()
+{
 	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, false) % HYGUIPATH_MetaExt));
 	if(settingsFile.exists())
 	{
@@ -61,7 +69,10 @@ IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 			// TODO: rename to bankId
 			QString sName = HyGlobal::MakeFileNameFromCounter(bankArray[i].toObject()["atlasGrpId"].toInt());
 			BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(sName), bankArray[i].toObject());
-			OnCreateBank(*pNewBank);
+
+			//OnCreateBank(*pNewBank);
+			if(m_eITEM_TYPE == ITEM_AtlasImage)
+				m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewBank->GetId()));
 		}
 
 		m_ExpandedFiltersArray = settingsObj["expanded"].toArray();
@@ -156,11 +167,6 @@ IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 		m_uiNextBankId = 0;
 		CreateNewBank("Default");
 	}
-}
-
-/*virtual*/ IManagerModel::~IManagerModel()
-{
-	
 }
 
 Project &IManagerModel::GetProjOwner()
@@ -540,7 +546,10 @@ void IManagerModel::CreateNewBank(QString sName)
 	bankObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
 
 	BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_uiNextBankId)), bankObj);
-	OnCreateBank(*pNewBank);
+	
+	//OnCreateBank(*pNewBank);
+	if(m_eITEM_TYPE == ITEM_AtlasImage)
+		m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewBank->GetId()));
 
 	m_uiNextBankId++;
 	SaveMeta();
@@ -560,7 +569,9 @@ void IManagerModel::RemoveBank(quint32 uiBankId)
 		{
 			if(m_BanksModel.GetBank(i)->m_AssetList.empty())
 			{
-				OnDeleteBank(*m_BanksModel.GetBank(i));
+				//OnDeleteBank(*m_BanksModel.GetBank(i));
+				if(m_eITEM_TYPE == ITEM_AtlasImage)
+					m_DataDir.rmdir(HyGlobal::MakeFileNameFromCounter(m_BanksModel.GetBank(i)->GetId()));
 
 				m_BanksModel.RemoveBank(i);
 				SaveMeta();
@@ -718,6 +729,9 @@ void IManagerModel::SaveRuntime()
 
 /*virtual*/ QVariant IManagerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
+	if(indexRef.isValid() == false)
+		return QVariant();
+
 	TreeModelItem *pTreeItem = GetItem(indexRef);
 	if(pTreeItem == m_pRootItem)
 		return QVariant();

@@ -83,6 +83,7 @@ private Q_SLOTS:
 private:
 	Ui::IManagerWidget *ui;
 
+public:
 	void GetSelectedItems(QList<AssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut);
 	//void GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
 };

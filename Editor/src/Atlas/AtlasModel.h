@@ -46,8 +46,8 @@ public:
 	virtual QStringList GetSupportedFileExtList() override;
 
 protected:
-	virtual void OnCreateBank(BankData &newBankRef) override;
-	virtual void OnDeleteBank(BankData &bankToBeDeleted) override;
+	//virtual void OnCreateBank(BankData &newBankRef) override;
+	//virtual void OnDeleteBank(BankData &bankToBeDeleted) override;
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 
 	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) override; // Must call RegisterAsset() on each asset

@@ -154,6 +154,17 @@ void IModel::MoveStateForward(int iStateIndex)
 //	m_ItemRef.GetProject().GetAtlasModel().RelinquishAssets(&m_ItemRef, GetAtlasAssets());
 //}
 
+QVariant IModel::AddAsset(int iStateIndex, AssetItemData *pAsset)
+{
+	return m_StateList[iStateIndex]->AddFrame(static_cast<AtlasFrame *>(pAsset));
+}
+
+void IModel::RemoveAsset(int iStateIndex, AssetItemData *pAsset)
+{
+	m_StateList[iStateIndex]->RelinquishFrame(static_cast<AtlasFrame *>(pAsset));
+}
+
+
 FileDataPair IModel::PopState(uint32 uiIndex)
 {
 	FileDataPair retObj = GetStateFileData(uiIndex);

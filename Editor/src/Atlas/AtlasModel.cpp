@@ -307,15 +307,15 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	return QStringList() << ".png";
 }
 
-/*virtual*/ void AtlasModel::OnCreateBank(BankData &newBankRef) /*override*/
-{
-	m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(newBankRef.GetId()));
-}
+///*virtual*/ void AtlasModel::OnCreateBank(BankData &newBankRef) /*override*/
+//{
+//	m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(newBankRef.GetId()));
+//}
 
-/*virtual*/ void AtlasModel::OnDeleteBank(BankData &bankToBeDeleted) /*override*/
-{
-	m_DataDir.rmdir(HyGlobal::MakeFileNameFromCounter(bankToBeDeleted.GetId()));
-}
+///*virtual*/ void AtlasModel::OnDeleteBank(BankData &bankToBeDeleted) /*override*/
+//{
+//	m_DataDir.rmdir(HyGlobal::MakeFileNameFromCounter(bankToBeDeleted.GetId()));
+//}
 
 /*virtual*/ AssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {

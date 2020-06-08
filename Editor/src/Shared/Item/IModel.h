@@ -94,6 +94,8 @@ public:
 	//QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut);
 	//void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
 	//void RelinquishAllFrames();
+	QVariant AddAsset(int m_iStateIndex, AssetItemData *pAsset);
+	void RemoveAsset(int iStateIndex, AssetItemData *pAsset);
 
 	FileDataPair PopState(uint32 uiIndex);
 	

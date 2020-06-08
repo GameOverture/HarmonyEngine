@@ -14,6 +14,7 @@
 #include "SpriteUndoCmds.h"
 #include "DlgInputName.h"
 #include "SpriteDraw.h"
+#include "IManagerWidget.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -286,7 +287,11 @@ void SpriteWidget::on_actionAlignCenterHorizontal_triggered()
 
 void SpriteWidget::on_actionImportFrames_triggered()
 {
-	QUndoCommand *pCmd = new UndoCmd_AddFrames("Add Frames", m_ItemRef, GetCurStateIndex());
+	QList<AssetItemData *> selectedAssetsList;
+	QList<TreeModelItemData *> selectedFiltersList;
+	m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedItems(selectedAssetsList, selectedFiltersList);
+
+	QUndoCommand *pCmd = new UndoCmd_AddFrames("Add Frames", m_ItemRef, GetCurStateIndex(), selectedAssetsList);
 	GetItem().GetUndoStack()->push(pCmd);
 }
 

@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "SpriteModels.h"
 #include "Project.h"
+#include "AtlasModel.h"
 
 #include <QJsonArray>
 
@@ -279,16 +280,26 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair
 		uuidRequestList.append(QUuid(metaFrameArray[i].toString()));
 
 	int iAffectedFrameIndex = 0;
-	QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesByUuid(this, uuidRequestList, iAffectedFrameIndex);
+
+	//QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesByUuid(this, uuidRequestList, iAffectedFrameIndex);
+	
+	QList<AssetItemData *> requestedAtlasFramesList = m_ModelRef.GetItem().GetProject().GetAtlasModel().RequestAssetsByUuid(&m_ModelRef.GetItem(), uuidRequestList);
+		
+
+	for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
+		AddFrame(static_cast<AtlasFrame *>(requestedAtlasFramesList[i]));
+
 		
 	if(dataFrameArray.size() != requestedAtlasFramesList.size())
 		HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
 
 	for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
 	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(requestedAtlasFramesList[i]);
+
 		QJsonObject spriteFrameObj = dataFrameArray[i].toObject();
-		QPoint vOffset(spriteFrameObj["offsetX"].toInt() - requestedAtlasFramesList[i]->GetCrop().left(),
-						spriteFrameObj["offsetY"].toInt() - ((requestedAtlasFramesList[i]->GetSize().height() - 1) - requestedAtlasFramesList[i]->GetCrop().bottom()));  // -1 on height because it's NOT zero based like everything else
+		QPoint vOffset(spriteFrameObj["offsetX"].toInt() - pFrame->GetCrop().left(),
+						spriteFrameObj["offsetY"].toInt() - ((pFrame->GetSize().height() - 1) - pFrame->GetCrop().bottom()));  // -1 on height because it's NOT zero based like everything else
 
 		m_pFramesModel->SetFrameOffset(i, vOffset);
 		m_pFramesModel->DurationFrame(i, spriteFrameObj["duration"].toDouble());

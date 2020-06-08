@@ -40,6 +40,8 @@ public:
 	IManagerModel(Project &projRef, HyGuiItemType eItemType);
 	virtual ~IManagerModel();
 
+	void Init();
+
 	Project &GetProjOwner();
 	QAbstractListModel *GetBanksModel();
 
@@ -101,8 +103,8 @@ protected:
 	void DeleteAsset(AssetItemData *pAsset);
 	void MoveAsset(AssetItemData *pAsset, quint32 uiNewBankId);
 
-	virtual void OnCreateBank(BankData &newBankRef) = 0;
-	virtual void OnDeleteBank(BankData &bankToBeDeleted) = 0;
+	//virtual void OnCreateBank(BankData &newBankRef) = 0;
+	//virtual void OnDeleteBank(BankData &bankToBeDeleted) = 0;
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
 	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) = 0; // Must call RegisterAsset() on each asset

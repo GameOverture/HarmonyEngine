@@ -54,9 +54,11 @@ TextModel::TextModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataR
 		int iAffectedFrameIndex = 0;
 		QList<QUuid> uuidRequestList;
 		uuidRequestList.append(QUuid(itemFileDataRef.m_Meta["frameUUID"].toString()));
-		QList<AtlasFrame *> pRequestedList = RequestFramesByUuid(nullptr, uuidRequestList, iAffectedFrameIndex);
+
+		//QList<AtlasFrame *> pRequestedList = RequestFramesByUuid(nullptr, uuidRequestList, iAffectedFrameIndex);
+		QList<AssetItemData *> pRequestedList = m_ItemRef.GetProject().GetAtlasModel().RequestAssetsByUuid(&m_ItemRef, uuidRequestList);
 		if(pRequestedList.size() == 1)
-			m_pAtlasFrame = pRequestedList[0];
+			m_pAtlasFrame = static_cast<AtlasFrame *>(pRequestedList[0]);
 		else
 			HyGuiLog("More than one frame returned for a font", LOGTYPE_Error);
 	}

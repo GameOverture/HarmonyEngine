@@ -15,6 +15,7 @@
 #include "Project.h"
 #include "IModel.h"
 #include "GlobalWidgetMappers.h"
+#include "AtlasModel.h"
 
 #include <QUndoCommand>
 #include <QComboBox>
@@ -426,19 +427,19 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_AddFrames : public QUndoCommand
 {
-	ProjectItemData &           m_ItemRef;
-	int                     m_iStateIndex;
+	ProjectItemData &				m_ItemRef;
+	int								m_iStateIndex;
 
-	QList<AtlasFrame *>     m_Frames;
+	QList<AssetItemData *>			m_Frames;
 	
 public:
-	UndoCmd_AddFrames(QString sText, ProjectItemData &itemRef, int iStateIndex, QUndoCommand *pParent = 0) :
+	UndoCmd_AddFrames(QString sText, ProjectItemData &itemRef, int iStateIndex, QList<AssetItemData *> framesList, QUndoCommand *pParent = 0) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
-		m_iStateIndex(iStateIndex)
+		m_iStateIndex(iStateIndex),
+		m_Frames(framesList)
 	{
 		setText(sText);
-		m_Frames.clear();
 	}
 	
 	virtual ~UndoCmd_AddFrames()
@@ -446,14 +447,32 @@ public:
 
 	void redo() override
 	{
-		int iAffectedFrameIndex = 0;
-		m_Frames = static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames, iAffectedFrameIndex);
-		m_ItemRef.FocusWidgetState(m_iStateIndex, iAffectedFrameIndex);
+		//m_Frames = static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames, iAffectedFrameIndex);
+		
+		m_Frames = m_ItemRef.GetProject().GetAtlasModel().RequestAssets(&m_ItemRef, m_Frames);
+		QVariant focusSubState;
+		if(m_iStateIndex >= 0)
+		{
+			for(int i = 0; i < m_Frames.size(); ++i)
+				focusSubState = m_ItemRef.GetModel()->AddAsset(m_iStateIndex, m_Frames[i]);// m_StateList[m_iStateIndex]->AddFrame(m_Frames[i]);
+		}
+
+
+		m_ItemRef.FocusWidgetState(m_iStateIndex, focusSubState);
 	}
 	
 	void undo() override
 	{
-		static_cast<IModel *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
+		//static_cast<IModel *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
+
+		if(m_iStateIndex >= 0)
+		{
+			for(int i = 0; i < m_Frames.size(); ++i)
+				m_ItemRef.GetModel()->RemoveAsset(m_iStateIndex, m_Frames[i]);// m_StateList[m_iStateIndex]->RelinquishFrame(m_Frames[i]);
+		}
+		m_ItemRef.GetProject().GetAtlasModel().RelinquishAssets(&m_ItemRef, m_Frames);
+
+
 		m_ItemRef.FocusWidgetState(m_iStateIndex, -1);
 	}
 };
@@ -464,10 +483,10 @@ class UndoCmd_DeleteFrame : public QUndoCommand
 	ProjectItemData &			m_ItemRef;
 	int							m_iStateIndex;
 
-	QList<AtlasFrame *>			m_Frames;
+	QList<AssetItemData *>		m_Frames;
 
 public:
-	UndoCmd_DeleteFrame(QString sText, ProjectItemData &itemRef, int iStateIndex, AtlasFrame *pFrame, QUndoCommand *pParent = 0) :
+	UndoCmd_DeleteFrame(QString sText, ProjectItemData &itemRef, int iStateIndex, AssetItemData *pFrame, QUndoCommand *pParent = 0) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
 		m_iStateIndex(iStateIndex)
@@ -481,15 +500,27 @@ public:
 
 	void redo() override
 	{
-		static_cast<IModel *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
+		if(m_iStateIndex >= 0)
+		{
+			for(int i = 0; i < m_Frames.size(); ++i)
+				m_ItemRef.GetModel()->RemoveAsset(m_iStateIndex, m_Frames[i]);// m_StateList[m_iStateIndex]->RelinquishFrame(m_Frames[i]);
+		}
+		m_ItemRef.GetProject().GetAtlasModel().RelinquishAssets(&m_ItemRef, m_Frames);
+
 		m_ItemRef.FocusWidgetState(m_iStateIndex, -3);
 	}
 	
 	void undo() override
 	{
-		int iAffectedFrameIndex = 0;
-		static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames, iAffectedFrameIndex);
-		m_ItemRef.FocusWidgetState(m_iStateIndex, iAffectedFrameIndex);
+		m_Frames = m_ItemRef.GetProject().GetAtlasModel().RequestAssets(&m_ItemRef, m_Frames);
+		QVariant focusSubState;
+		if(m_iStateIndex >= 0)
+		{
+			for(int i = 0; i < m_Frames.size(); ++i)
+				focusSubState = m_ItemRef.GetModel()->AddAsset(m_iStateIndex, m_Frames[i]);// m_StateList[m_iStateIndex]->AddFrame(m_Frames[i]);
+		}
+
+		m_ItemRef.FocusWidgetState(m_iStateIndex, focusSubState);
 	}
 };
 
