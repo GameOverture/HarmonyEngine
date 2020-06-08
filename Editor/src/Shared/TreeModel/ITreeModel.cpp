@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "ITreeModel.h"
 #include "TreeModelItem.h"
+#include "TreeModelItemData.h"
 
 ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject *pParent /*= nullptr*/) :
 	QAbstractItemModel(pParent)

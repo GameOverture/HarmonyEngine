@@ -13,6 +13,7 @@
 #include "DlgAtlasGroupSettings.h"
 #include "Harmony.h"
 #include "MainWindow.h"
+#include "ProjectItemData.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -710,6 +711,63 @@ void IManagerModel::SaveRuntime()
 	}
 
 	Harmony::Reload(&m_ProjectRef);
+}
+
+/*virtual*/ QVariant IManagerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
+		return QVariant();
+
+	if(iRole == Qt::UserRole)
+		return ITreeModel::data(indexRef, iRole);
+
+	TreeModelItemData *pItemData = pTreeItem->data(0).value<TreeModelItemData *>();
+	if(pItemData == nullptr)
+		return QVariant();
+
+	switch(iRole)
+	{
+	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
+	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
+		return QVariant(pItemData->GetText());
+
+	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
+		if(pItemData->GetType() != ITEM_Filter)
+		{
+			AssetItemData *pAsset = static_cast<AssetItemData *>(pItemData);
+			if(pAsset->GetErrors() != 0)
+				return QVariant(pItemData->GetIcon(SUBICON_Warning));
+		}
+		return QVariant(pItemData->GetIcon(SUBICON_None));
+
+	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
+		if(pItemData->GetType() != ITEM_Filter)
+		{
+			AssetItemData *pAsset = static_cast<AssetItemData *>(pItemData);
+			if(pAsset->GetErrors() != 0)
+				return QVariant(HyGlobal::GetGuiFrameErrors(pAsset->GetErrors()));
+
+			return QVariant(m_MetaDir.absoluteFilePath(pAsset->ConstructMetaFileName()));
+		}
+		return QVariant();
+
+	case Qt::StatusTipRole:		// The data displayed in the status bar. (QString)
+		return QVariant(pItemData->GetText());
+
+	default:
+		return QVariant();
+	}
+}
+
+/*virtual*/ Qt::ItemFlags IManagerModel::flags(const QModelIndex& indexRef) const /*override*/
+{
+	TreeModelItemData *pItem = GetItem(indexRef)->data(0).value<TreeModelItemData *>();
+
+	if(indexRef.isValid() == false || pItem == nullptr)
+		return QAbstractItemModel::flags(indexRef);
+
+	return QAbstractItemModel::flags(indexRef);// | Qt::ItemIsDropEnabled | (pItem->GetType() == ITEM_Project ? 0 : Qt::ItemIsDragEnabled);
 }
 
 void IManagerModel::RegisterAsset(AssetItemData *pAsset)

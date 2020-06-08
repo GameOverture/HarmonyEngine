@@ -74,7 +74,7 @@ public:
 	virtual QVariant data(const QModelIndex &indexRef, int role) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &indexRef) const override = 0;
 
-	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) = 0;
+	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) { }
 
 protected:
 	// NOTE: Public access should use data() with role = Qt::UserRole to get TreeModelItemData

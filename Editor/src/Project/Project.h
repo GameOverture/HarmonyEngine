@@ -52,7 +52,7 @@ class Project : public ExplorerItemData
 	DlgProjectSettings									m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
 	AtlasModel *										m_pAtlasModel;
-	AtlasWidget *										m_pAtlasWidget;
+	IManagerWidget *									m_pAtlasWidget;
 
 	GltfModel *											m_pGltfModel;
 	GltfWidget *										m_pGltfWidget;

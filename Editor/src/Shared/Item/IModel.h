@@ -16,6 +16,7 @@
 #include <QStringListModel>
 
 class IModel;
+class AssetItemData;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class IStateData
@@ -90,7 +91,7 @@ public:
 	void MoveStateForward(int iStateIndex);
 	
 	QList<AtlasFrame *> RequestFramesByUuid(IStateData *pState, QList<QUuid> requestList, int &iAffectedFrameIndexOut);
-	QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut);
+	QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AssetItemData *> requestList, int &iAffectedFrameIndexOut);
 	void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
 	void RelinquishAllFrames();
 

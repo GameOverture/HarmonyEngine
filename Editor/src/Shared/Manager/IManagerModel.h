@@ -100,7 +100,7 @@ protected:
 
 		int GetIndex(BankData *pData) const
 		{
-			for(uint32 i = 0; i < m_BankList.size(); ++i)
+			for(int i = 0; i < m_BankList.size(); ++i)
 			{
 				if(pData == m_BankList[i])
 					return i;
@@ -190,6 +190,9 @@ public:
 
 	void SaveMeta();
 	void SaveRuntime(); // Saves meta, outputs runtime assets, and reloads Harmony in the editor
+
+	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
+	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
 
 	virtual QString OnBankInfo(uint uiBankIndex) = 0;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;

@@ -28,6 +28,7 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QProcess>
+#include <QDragEnterEvent>
 
 ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 	m_pProjectOwner(pProjectOwner)
@@ -105,7 +106,7 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	m_pAtlasModel = new AtlasModel(this);
+	m_pAtlasModel = new AtlasModel(*this);
 	m_pGltfModel = new GltfModel(this);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -869,13 +870,13 @@ bool Project::HarmonyInitialize()
 	m_pDraw = new ProjectDraw();
 	m_pDraw->Load();
 
-	if(m_pAtlasWidget)
-		m_pAtlasWidget->StashTreeWidgets();
+	//if(m_pAtlasWidget)
+	//	m_pAtlasWidget->StashTreeWidgets();
 
 	delete m_pAtlasWidget;
 	delete m_pGltfWidget;
 	delete m_pAudioWidget;
-	m_pAtlasWidget = new AtlasWidget(m_pAtlasModel, nullptr);
+	m_pAtlasWidget = new IManagerWidget(m_pAtlasModel, nullptr);
 	m_pGltfWidget = new GltfWidget(m_pGltfModel, nullptr);
 	m_pAudioWidget = new AudioAssetsWidget(this, nullptr);
 

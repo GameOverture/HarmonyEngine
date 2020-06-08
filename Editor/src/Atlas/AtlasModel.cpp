@@ -188,7 +188,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		pFrame->DeleteMetaFile();
 
 	// Determine the new checksum into the map
-	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
+	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
 	pFrame->ReplaceImage(sName, uiChecksum, newImage, m_MetaDir);
 
 	// Re-enter the frame into the map
@@ -224,7 +224,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	for(int i = HyClamp(existingTexturesInfoList.size() - 1, 0, existingTexturesInfoList.size()); i < existingTexturesInfoList.size(); ++i)
 		repackTexIndicesSet.insert(i);
 
-	QList<int> textureIndexList = repackTexIndicesSet.toList();
+	QList<int> textureIndexList = repackTexIndicesSet.values();
 
 	// Get all the affected frames into a list
 	QList<AssetItemData *> &atlasGrpFrameListRef = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
@@ -238,7 +238,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		}
 	}
 
-	QList<AtlasFrame *>newFramesList = newFramesSet.toList();
+	QList<AtlasFrame *>newFramesList = newFramesSet.values();
 
 
 	AtlasRepackThread *pWorkerThread = new AtlasRepackThread(*m_BanksModel.GetBank(uiBankIndex), textureIndexList, newFramesList, m_MetaDir);
