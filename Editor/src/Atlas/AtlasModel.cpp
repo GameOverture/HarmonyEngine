@@ -398,6 +398,8 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
 			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
 	}
+
+	return true;
 }
 
 /*virtual*/ bool AtlasModel::OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) /*override*/
@@ -416,7 +418,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 			for(int j = 0; j < newReplacementImageList.size(); ++j)
 				delete newReplacementImageList[j];
 
-			return;
+			return false;
 		}
 
 		newReplacementImageList.push_back(pNewImage);

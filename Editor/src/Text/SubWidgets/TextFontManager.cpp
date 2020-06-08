@@ -288,10 +288,10 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 	return hNewLayer;
 }
 
-void TextFontManager::SetAtlasGroup(quint32 uiAtlasGroupId)
+void TextFontManager::SetAtlasGroup(quint32 uiBankId)
 {
 	AtlasModel &atlasModelRef = m_GlyphsModel.GetOwner().GetProject().GetAtlasModel();
-	m_GlyphsModel.SetPropertyValue("Atlas Info", TEXTPROP_AtlasGroup, atlasModelRef.GetAtlasGroupName(atlasModelRef.GetAtlasGrpIndexFromAtlasGrpId(uiAtlasGroupId)));
+	m_GlyphsModel.SetPropertyValue("Atlas Info", TEXTPROP_AtlasGroup, atlasModelRef.GetBankName(atlasModelRef.GetBankIndexFromBankId(uiBankId)));
 }
 
 void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)

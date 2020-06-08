@@ -43,9 +43,9 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 		for(int i = 0; i < atlasFrameList.size(); ++i)
 		{
 			QJsonObject atlasFrameObj;
-			atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetImageChecksum())));
+			atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetChecksum())));
 			atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
-			atlasFrameObj.insert("uri", QJsonValue(pProjectItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_AtlasImage, true) % "/" % atlasFrameList[i]->ConstructImageFileName()));
+			atlasFrameObj.insert("uri", QJsonValue(pProjectItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_AtlasImage, true) % "/" % atlasFrameList[i]->ConstructMetaFileName()));
 			imagesArray.append(atlasFrameObj);
 		}
 		clipboardObj.insert("images", imagesArray);

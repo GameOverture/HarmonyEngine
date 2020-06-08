@@ -22,7 +22,7 @@
 
 // Forward declaration
 class AtlasModel;
-class AtlasWidget;
+class IManagerWidget;
 class GltfModel;
 class GltfWidget;
 class AudioAssetsWidget;
@@ -98,7 +98,7 @@ public:
 
 	ExplorerModel &GetExplorerModel();
 	AtlasModel &GetAtlasModel();
-	AtlasWidget *GetAtlasWidget();
+	IManagerWidget *GetAtlasWidget();
 
 	GltfModel *GetGltfModel();
 	GltfWidget *GetGltfWidget();

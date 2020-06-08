@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "ProjectItemData.h"
 #include "MainWindow.h"
-#include "AtlasWidget.h"
 #include "AudioAssetsWidget.h"
 #include "AudioModel.h"
 #include "AtlasFrame.h"

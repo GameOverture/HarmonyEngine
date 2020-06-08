@@ -23,13 +23,13 @@ int SpriteFramesModel::Add(AtlasFrame *pFrame)
 	SpriteFrame *pFrameToInsert = nullptr;
 
 	// See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
-	QMap<QUuid, SpriteFrame *>::iterator iter = m_RemovedFrameIdMap.find(pFrame->GetId());
+	QMap<QUuid, SpriteFrame *>::iterator iter = m_RemovedFrameIdMap.find(pFrame->GetUuid());
 	if(iter == m_RemovedFrameIdMap.end())
 		pFrameToInsert = new SpriteFrame(pFrame, m_FramesList.count());
 	else
 	{
 		pFrameToInsert = iter.value();
-		m_RemovedFrameIdMap.remove(pFrame->GetId());
+		m_RemovedFrameIdMap.remove(pFrame->GetUuid());
 	}
 
 	beginInsertRows(QModelIndex(), pFrameToInsert->m_iRowIndex, pFrameToInsert->m_iRowIndex);
@@ -46,7 +46,7 @@ void SpriteFramesModel::Remove(AtlasFrame *pFrame)
 		// NOTE: Don't delete this frame as the remove may be 'undone'
 		if(m_FramesList[i]->m_pFrame == pFrame)
 		{
-			m_RemovedFrameIdMap[pFrame->GetId()] = m_FramesList[i];
+			m_RemovedFrameIdMap[pFrame->GetUuid()] = m_FramesList[i];
 
 			beginRemoveRows(QModelIndex(), i, i);
 			m_FramesList.removeAt(i);
@@ -135,7 +135,7 @@ QJsonArray SpriteFramesModel::GetFramesInfo(float &fTotalDurationRef)
 		QJsonObject frameObj;
 		fTotalDurationRef += m_FramesList[i]->m_fDuration;
 
-		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetImageChecksum())));
+		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetChecksum())));
 		frameObj.insert("duration", m_FramesList[i]->m_fDuration);
 		frameObj.insert("offsetX", m_FramesList[i]->m_vOffset.x() + m_FramesList[i]->m_pFrame->GetCrop().left());
 		frameObj.insert("offsetY", m_FramesList[i]->m_vOffset.y() + ((m_FramesList[i]->m_pFrame->GetSize().height() - 1) - m_FramesList[i]->m_pFrame->GetCrop().bottom())); // -1 on height because it's NOT zero based like everything else);
@@ -398,7 +398,7 @@ SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 
 	QList<AtlasFrame *> frameList = pState->GetAtlasFrames();
 	for(int i = 0; i < frameList.size(); ++i)
-		frameIdsArray.append(frameList[i]->GetId().toString(QUuid::WithoutBraces));
+		frameIdsArray.append(frameList[i]->GetUuid().toString(QUuid::WithoutBraces));
 	stateFileData.m_Meta.insert("frameIds", frameIdsArray);
 
 	stateFileData.m_Data.insert("loop", pState->GetLoopMapper()->IsChecked());

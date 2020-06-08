@@ -12,9 +12,9 @@
 #include "ExplorerItemData.h"
 #include "Project/Project.h"
 #include "Project/ProjectItemData.h"
-#include "Atlas/AtlasWidget.h"
 #include "Harmony/Harmony.h"
 #include "Project/ProjectItemMimeData.h"
+#include "AtlasModel.h"
 
 ExplorerModel::ExplorerModel() :
 	ITreeModel(1, QStringList(), nullptr)

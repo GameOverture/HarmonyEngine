@@ -18,7 +18,7 @@
 
 #define DISPLAYORDER_AtlasSelectedFrames 1000
 
-AtlasDraw::AtlasDraw(IManagerModel &atlasManagerModel) :
+AtlasDraw::AtlasDraw(IManagerModel *pAtlasManagerModel) :
 	IDraw(nullptr, FileDataPair()),
 	m_bIsMouseOver(false),
 	m_HoverBackground(this),
@@ -49,10 +49,13 @@ AtlasDraw::AtlasDraw(IManagerModel &atlasManagerModel) :
 	m_HoverStrokeOutter.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeOutter);
 	m_HoverStrokeOutter.SetVisible(false);
 	m_HoverStrokeOutter.Load();
+
+	if(pAtlasManagerModel == nullptr)
+		return;
 	
-	for(int i = 0; i < atlasManagerModel.GetNumBanks(); ++i)
+	for(int i = 0; i < pAtlasManagerModel->GetNumBanks(); ++i)
 	{
-		QList<AssetItemData *> assetList = atlasManagerModel.GetBankAssets(i);
+		QList<AssetItemData *> assetList = pAtlasManagerModel->GetBankAssets(i);
 		for(int j = 0; j < assetList.size(); ++j)
 		{
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[j]);

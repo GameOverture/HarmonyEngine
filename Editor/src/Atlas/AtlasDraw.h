@@ -35,7 +35,7 @@ class AtlasDraw : public IDraw
 	HyTexturedQuad2d *						m_pHoverTexQuad;
 
 public:
-	AtlasDraw(IManagerModel &atlasManagerModel);
+	AtlasDraw(IManagerModel *pAtlasManagerModel);
 	virtual ~AtlasDraw();
 
 	void SetHover(TreeModelItemData *pHoverItem);

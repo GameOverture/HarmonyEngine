@@ -9,13 +9,14 @@
  *************************************************************************/
 #include "Global.h"
 #include "Project.h"
-#include "AtlasWidget.h"
 #include "GltfWidget.h"
 #include "AudioAssetsWidget.h"
 #include "MainWindow.h"
 #include "ProjectItemMimeData.h"
 #include "ExplorerModel.h"
 #include "VersionPatcher.h"
+#include "IManagerWidget.h"
+#include "AtlasModel.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -317,7 +318,7 @@ QJsonObject Project::GetSettingsObj() const
 
 QString Project::GetDirPath() const
 {
-	QFileInfo file(m_sText);
+	QFileInfo file(m_sName);
 	return file.dir().absolutePath() + '/';
 }
 
@@ -328,7 +329,7 @@ QString Project::GetGameName() const
 
 QString Project::GetAbsPath() const
 {
-	return m_sText;
+	return m_sName;
 }
 
 QString Project::GetAssetsAbsPath() const
@@ -381,7 +382,7 @@ AtlasModel &Project::GetAtlasModel()
 	return *m_pAtlasModel;
 }
 
-AtlasWidget *Project::GetAtlasWidget()
+IManagerWidget *Project::GetAtlasWidget()
 {
 	return m_pAtlasWidget;
 }
@@ -526,7 +527,7 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 	{
 		if(!dataFile.open(QIODevice::ReadOnly))
 		{
-			HyGuiLog("Project::LoadExplorerModel() could not open " % m_sText % "'s " % QFileInfo(sFilePath).fileName() % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
+			HyGuiLog("Project::LoadExplorerModel() could not open " % m_sName % "'s " % QFileInfo(sFilePath).fileName() % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
 			m_bHasError = true;
 			return false; // Don't write with invalid object
 		}

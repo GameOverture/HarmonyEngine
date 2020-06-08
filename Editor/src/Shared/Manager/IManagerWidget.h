@@ -12,6 +12,7 @@
 
 #include "AtlasDraw.h"
 
+#include <QSortFilterProxyModel>
 #include <QWidget>
 #include <QMenu>
 

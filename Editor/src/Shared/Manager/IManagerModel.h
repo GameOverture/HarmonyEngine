@@ -202,7 +202,6 @@ protected:
 
 	virtual void OnCreateBank(BankData &newBankRef) = 0;
 	virtual void OnDeleteBank(BankData &bankToBeDeleted) = 0;
-	
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
 	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) = 0; // Must call RegisterAsset() on each asset

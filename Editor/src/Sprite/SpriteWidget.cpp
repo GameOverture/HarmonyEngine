@@ -13,7 +13,6 @@
 #include "GlobalUndoCmds.h"
 #include "SpriteUndoCmds.h"
 #include "DlgInputName.h"
-#include "AtlasWidget.h"
 #include "SpriteDraw.h"
 
 #include <QFile>

@@ -16,7 +16,6 @@
 #include "ProjectItemMimeData.h"
 #include "ExplorerItemData.h"
 #include "ExplorerModel.h"
-#include "AtlasWidget.h"
 #include "IModel.h"
 #include "DlgInputName.h"
 

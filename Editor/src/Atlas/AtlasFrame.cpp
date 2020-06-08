@@ -9,9 +9,8 @@
  *************************************************************************/
 #include "Global.h"
 #include "AtlasFrame.h"
+#include "IManagerModel.h"
 #include "_Dependencies/scriptum/imagepacker.h"
-
-#include "AtlasWidget.h"
 
 AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 					   HyGuiItemType eType,
@@ -143,23 +142,7 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 	frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
 	frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
 	frameObj.insert("errors", QJsonValue(static_cast<int>(GetErrors())));
-
-	QString sFilterPath = "";
-	if(m_pTreeWidgetItem)
-	{
-		QTreeWidgetItem *pTreeParent = m_pTreeWidgetItem->parent();
-		while(pTreeParent)
-		{
-			if(pTreeParent->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-				break;
-
-			pTreeParent = pTreeParent->parent();
-		}
-		if(pTreeParent)
-			sFilterPath = HyGlobal::GetTreeWidgetItemPath(pTreeParent);
-	}
-
-	frameObj.insert("filter", QJsonValue(sFilterPath));
+	frameObj.insert("filter", QJsonValue(m_ModelRef.AssembleFilter(this)));
 }
 
 

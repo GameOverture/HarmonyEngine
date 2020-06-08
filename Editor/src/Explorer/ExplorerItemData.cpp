@@ -33,7 +33,7 @@ Project &ExplorerItemData::GetProject() const
 
 /*virtual*/ QString ExplorerItemData::GetName(bool bWithPrefix) const
 {
-	return bWithPrefix ? GetPrefix() % m_sText : m_sText;
+	return bWithPrefix ? GetPrefix() % m_sName : m_sName;
 }
 
 QString ExplorerItemData::GetPrefix() const
@@ -61,9 +61,9 @@ void ExplorerItemData::Rename(QString sNewPrefix, QString sNewName)
 	QString sNewPath = sNewPrefix % sNewName;
 
 	if(m_eTYPE == ITEM_Prefix)
-		m_sText = m_pProject->RenamePrefix(sOldPath, sNewPath);
+		m_sName = m_pProject->RenamePrefix(sOldPath, sNewPath);
 	else
-		m_sText = m_pProject->RenameItem(m_eTYPE, sOldPath, sNewPath);
+		m_sName = m_pProject->RenameItem(m_eTYPE, sOldPath, sNewPath);
 }
 
 /*virtual*/ void ExplorerItemData::DeleteFromProject()

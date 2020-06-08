@@ -23,7 +23,6 @@ class AtlasRepackThread : public QThread
 	BankData &			m_BankRef;
 	ImagePacker			m_Packer;
 
-	AtlasGrp *			m_pAtlasGrp;
 	QList<int>			m_TextureIndexList;
 	QList<AtlasFrame *> m_NewFramesList;
 	QDir				m_MetaDir;

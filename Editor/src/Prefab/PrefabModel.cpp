@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "PrefabModel.h"
 #include "Project.h"
-#include "AtlasWidget.h"
 //#include "assimp/Importer.hpp"      // C++ importer interface
 //#include "assimp/Exporter.hpp"      // C++ importer interface
 //#include "assimp/scene.h"           // Output data structure

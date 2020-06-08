@@ -20,9 +20,9 @@
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
 #include "ExplorerWidget.h"
-#include "AtlasWidget.h"
 #include "GltfWidget.h"
 #include "AudioAssetsWidget.h"
+#include "IManagerWidget.h"
 
 #include <QFileDialog>
 #include <QShowEvent>
