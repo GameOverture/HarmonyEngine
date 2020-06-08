@@ -20,7 +20,6 @@
 
 IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 	ITreeModel(2, QStringList(), nullptr),
-	m_BanksModel(*this),
 	m_ProjectRef(projRef),
 	m_eITEM_TYPE(eItemType),
 	m_MetaDir(m_ProjectRef.GetMetaDataAbsPath() + HyGlobal::ItemName(eItemType, true)),
@@ -61,7 +60,8 @@ IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 		{
 			// TODO: rename to bankId
 			QString sName = HyGlobal::MakeFileNameFromCounter(bankArray[i].toObject()["atlasGrpId"].toInt());
-			m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(sName), bankArray[i].toObject());
+			BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(sName), bankArray[i].toObject());
+			OnCreateBank(*pNewBank);
 		}
 
 		m_ExpandedFiltersArray = settingsObj["expanded"].toArray();
@@ -539,7 +539,8 @@ void IManagerModel::CreateNewBank(QString sName)
 	// TODO: rename to bankId
 	bankObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
 
-	m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_uiNextBankId)), bankObj);
+	BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_uiNextBankId)), bankObj);
+	OnCreateBank(*pNewBank);
 
 	m_uiNextBankId++;
 	SaveMeta();
@@ -559,6 +560,8 @@ void IManagerModel::RemoveBank(quint32 uiBankId)
 		{
 			if(m_BanksModel.GetBank(i)->m_AssetList.empty())
 			{
+				OnDeleteBank(*m_BanksModel.GetBank(i));
+
 				m_BanksModel.RemoveBank(i);
 				SaveMeta();
 			}

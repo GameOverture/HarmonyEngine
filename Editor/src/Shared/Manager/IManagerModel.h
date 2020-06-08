@@ -13,117 +13,15 @@
 #include "Global.h"
 #include "ITreeModel.h"
 #include "IAssetItemData.h"
+#include "AssetBanksModel.h"
 
 #include <QUuid>
-
-struct BankData
-{
-	QString									m_sAbsPath;
-	QJsonObject								m_Settings;
-	QList<AssetItemData *>					m_AssetList;
-
-	BankData(QString sAbsDataDirPath, QJsonObject settingsObj) :
-		m_sAbsPath(sAbsDataDirPath),
-		m_Settings(settingsObj)
-	{ }
-
-	~BankData()
-	{
-		for(int i = 0; i < m_AssetList.size(); ++i)
-			delete m_AssetList[i];
-	}
-
-	quint32 GetId() const {
-		// TODO: rename to bankId
-		if(m_Settings.contains("atlasGrpId") == false) {
-			HyGuiLog("BankData::GetId could not find 'bankId' in bank's settings", LOGTYPE_Error);
-		}
-		// TODO: rename to bankId
-		return m_Settings["atlasGrpId"].toInt();
-	}
-
-	QString GetName() const {
-		// TODO: rename to bankName
-		return m_Settings["txtName"].toString();
-	}
-};
 
 class IManagerModel : public ITreeModel
 {
 	Q_OBJECT
 
 protected:
-	class BanksModel : public QAbstractListModel
-	{
-		IManagerModel &							m_ModelRef;
-		QList<BankData *>						m_BankList;
-
-	public:
-		BanksModel(IManagerModel &modelRef) :
-			m_ModelRef(modelRef)
-		{
-		}
-
-		virtual ~BanksModel()
-		{
-			for(int i = 0; i < m_BankList.size(); ++i)
-				delete m_BankList[i];
-		}
-
-		BankData *GetBank(uint uiIndex)
-		{
-			return m_BankList[uiIndex];
-		}
-
-		void AppendBank(QString sAbsPath, QJsonObject settingsObj)
-		{
-			beginInsertRows(QModelIndex(), m_BankList.count(), m_BankList.count());
-			BankData *pNewBank = new BankData(sAbsPath, settingsObj);
-			m_BankList.push_back(pNewBank);
-			endInsertRows();
-
-			m_ModelRef.OnCreateBank(*pNewBank);
-		}
-		
-		void RemoveBank(uint uiIndex)
-		{
-			BankData *pBankToBeRemoved = m_BankList[uiIndex];
-			m_ModelRef.OnDeleteBank(*pBankToBeRemoved);
-			
-			beginRemoveRows(QModelIndex(), uiIndex, uiIndex);
-			m_BankList.removeAt(uiIndex);
-			endRemoveRows();
-
-			delete pBankToBeRemoved;
-			
-		}
-
-		int GetIndex(BankData *pData) const
-		{
-			for(int i = 0; i < m_BankList.size(); ++i)
-			{
-				if(pData == m_BankList[i])
-					return i;
-			}
-			return -1;
-		}
-
-		virtual int rowCount(const QModelIndex &parent = QModelIndex()) const {
-			return m_BankList.size();
-		}
-		virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const {
-			if (role == Qt::TextAlignmentRole)
-				return Qt::AlignLeft;
-
-			if(role == Qt::DisplayRole || role == Qt::EditRole)
-				return "Bank: " % QString::number(GetIndex(m_BankList[index.row()])) % " - " % m_BankList[index.row()]->m_Settings["Name"].toString();
-
-			return QVariant();
-		}
-		virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const {
-			return QVariant();
-		}
-	};
 	BanksModel									m_BanksModel;
 
 	Project &									m_ProjectRef;
