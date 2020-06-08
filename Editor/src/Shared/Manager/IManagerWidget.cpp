@@ -141,6 +141,14 @@ quint32 IManagerWidget::GetSelectedBankId()
 	return m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex());
 }
 
+void IManagerWidget::DrawUpdate()
+{
+	QModelIndex index = ui->assetTree->indexAt(pos);
+
+	m_Draw.SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
+	m_Draw.DrawUpdate();
+}
+
 void IManagerWidget::RefreshInfo()
 {
 	uint uiBankIndex = ui->cmbBanks->currentIndex();

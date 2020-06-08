@@ -19,13 +19,10 @@ if(Qt5_DIR)
 		src/Atlas/AtlasFrame.cpp
 		src/Atlas/AtlasModel.cpp
 		src/Atlas/AtlasRepackThread.cpp
-		src/Atlas/AtlasWidget.cpp
 		src/Atlas/AtlasDraw.h
 		src/Atlas/AtlasFrame.h
 		src/Atlas/AtlasModel.h
 		src/Atlas/AtlasRepackThread.h
-		src/Atlas/AtlasWidget.h
-		src/Atlas/AtlasWidget.ui
 		src/Audio/AudioAssetsWidget.cpp
 		src/Audio/AudioModel.cpp
 		src/Audio/AudioWidget.cpp

@@ -11,11 +11,10 @@
 #define ATLASDRAW_H
 
 #include "IDraw.h"
-#include "AtlasModel.h"
+#include "IManagerModel.h"
 
 class AtlasDraw : public IDraw
 {
-	AtlasModel &							m_ModelRef;
 	bool									m_bIsMouseOver;
 	
 	// TODO: Test whether splitting HyTexturedQuad's into multiple maps has any lookup/insert benefit, rather than one massive QMap
@@ -36,11 +35,11 @@ class AtlasDraw : public IDraw
 	HyTexturedQuad2d *						m_pHoverTexQuad;
 
 public:
-	AtlasDraw(AtlasModel *pModelRef);
+	AtlasDraw(IManagerModel &atlasManagerModel);
 	virtual ~AtlasDraw();
 
-	void SetHover(QTreeWidgetItem *pHoverItem);
-	void SetSelected(QList<QTreeWidgetItem *> selectedList);
+	void SetHover(TreeModelItemData *pHoverItem);
+	void SetSelected(QList<AssetItemData *> selectedList);
 
 	void DrawUpdate();
 

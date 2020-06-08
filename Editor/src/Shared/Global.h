@@ -59,7 +59,7 @@ enum HyGuiItemType
 	ITEM_Sprite,
 	ITEM_Shader,
 	ITEM_Entity,
-    ITEM_Prefab,
+	ITEM_Prefab,
 	ITEM_Entity3d,
 	ITEM_BoundingVolume,
 	ITEM_Physics,

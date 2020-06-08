@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "AtlasModel.h"
 #include "Project.h"
-#include "AtlasWidget.h"
 #include "AtlasRepackThread.h"
 #include "MainWindow.h"
 #include "DlgAtlasGroupSettings.h"
@@ -122,14 +121,14 @@ HyTextureFormat AtlasModel::GetAtlasTextureType(uint uiBankIndex)
 	return static_cast<HyTextureFormat>(m_BanksModel.GetBank(uiBankIndex)->m_Settings["textureType"].toInt());
 }
 
-bool AtlasModel::IsImageValid(QImage &image, quint32 uiAtlasGrpId)
+bool AtlasModel::IsImageValid(QImage &image, quint32 uiBankId)
 {
-	return IsImageValid(image.width(), image.height(), uiAtlasGrpId);
+	return IsImageValid(image.width(), image.height(), uiBankId);
 }
 
-bool AtlasModel::IsImageValid(int iWidth, int iHeight, quint32 uiAtlasGrpId)
+bool AtlasModel::IsImageValid(int iWidth, int iHeight, quint32 uiBankId)
 {
-	uint uiBankIndex = GetBankIndexFromBankId(uiAtlasGrpId);
+	uint uiBankIndex = GetBankIndexFromBankId(uiBankId);
 	return IsImageValid(iWidth, iHeight, m_BanksModel.GetBank(uiBankIndex)->m_Settings);
 }
 
@@ -157,27 +156,27 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QIm
 	if(IsImageValid(newImage, m_BanksModel.GetBank(uiBankIndex)->GetId()) == false)
 		return nullptr;
 
-	// This will also create a meta image
-	AtlasFrame *pFrame = ImportImage(sName, newImage, m_AtlasGrpList[uiAtlasGrpIndex]->GetId(), eType, nullptr);
+	// This will also create a meta image and register asset
+	AtlasFrame *pFrame = ImportImage(sName, newImage, m_BanksModel.GetBank(uiBankIndex)->GetId(), eType);
 
 	QSet<AtlasFrame *> newFrameSet;
 	newFrameSet.insert(pFrame);
-	Repack(uiAtlasGrpIndex, QSet<int>(), newFrameSet);
+	Repack(uiBankIndex, QSet<int>(), newFrameSet);
 
 	// This retrieves the newly created AtlasFrame and links it to its ProjectItemData
 	QList<QUuid> idList;
-	idList.append(pFrame->GetId());
-	QList<AtlasFrame *> returnList = RequestFramesById(pItem, idList);
+	idList.append(pFrame->GetUuid());
+	QList<AssetItemData *> returnList = RequestAssetsByUuid(pItem, idList);
 
 	if(returnList.empty() == false)
-		return returnList[0];
+		return static_cast<AtlasFrame *>(returnList[0]);
 
 	return nullptr;
 }
 
 bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)
 {
-	if(IsImageValid(newImage, pFrame->GetAtlasGrpId()) == false)
+	if(IsImageValid(newImage, pFrame->GetBankId()) == false)
 		return false;
 
 	QSet<int> textureIndexToReplaceSet;
@@ -185,63 +184,64 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		textureIndexToReplaceSet.insert(pFrame->GetTextureIndex());
 
 	// First remove the frame from the map
-	if(m_FrameLookup.RemoveLookup(pFrame))
-		pFrame->DeleteMetaImage(m_MetaDir);
+	if(RemoveLookup(pFrame))
+		pFrame->DeleteMetaFile();
 
 	// Determine the new checksum into the map
 	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
 	pFrame->ReplaceImage(sName, uiChecksum, newImage, m_MetaDir);
 
 	// Re-enter the frame into the map
-	m_FrameLookup.RegisterAsset(pFrame);
+	RegisterAsset(pFrame);
 
 	if(bDoAtlasGroupRepack)
 	{
-		uint uiAtlasGrpIndex = GetAtlasGrpIndexFromAtlasGrpId(pFrame->GetAtlasGrpId());
-		Repack(uiAtlasGrpIndex, textureIndexToReplaceSet, QSet<AtlasFrame *>());
+		uint uiBankIndex = GetBankIndexFromBankId(pFrame->GetBankId());
+		Repack(uiBankIndex, textureIndexToReplaceSet, QSet<AtlasFrame *>());
 	}
 
 	return true;
 }
 
-void AtlasModel::RepackAll(uint uiAtlasGrpIndex)
+void AtlasModel::RepackAll(uint uiBankIndex)
 {
-	int iNumTotalTextures = m_AtlasGrpList[uiAtlasGrpIndex]->GetExistingTextureInfoList().size();
+	int iNumTotalTextures = GetNumTextures(uiBankIndex);
 	
 	QSet<int> textureIndexSet;
 	for(int i = 0; i < iNumTotalTextures; ++i)
 		textureIndexSet.insert(i);
 
 	if(textureIndexSet.empty() == false)
-		Repack(uiAtlasGrpIndex, textureIndexSet, QSet<AtlasFrame *>());
+		Repack(uiBankIndex, textureIndexSet, QSet<AtlasFrame *>());
 	else
 		SaveRuntime();
 }
 
-void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
+void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
 {
 	// Always repack the last texture to ensure it gets filled as much as it can
-	QFileInfoList existingTexturesInfoList = m_AtlasGrpList[uiAtlasGrpIndex]->GetExistingTextureInfoList();
+	QFileInfoList existingTexturesInfoList = GetExistingTextureInfoList(uiBankIndex);
 	for(int i = HyClamp(existingTexturesInfoList.size() - 1, 0, existingTexturesInfoList.size()); i < existingTexturesInfoList.size(); ++i)
 		repackTexIndicesSet.insert(i);
 
 	QList<int> textureIndexList = repackTexIndicesSet.toList();
 
 	// Get all the affected frames into a list
-	QList<AtlasFrame *> &atlasGrpFrameListRef = m_AtlasGrpList[uiAtlasGrpIndex]->m_FrameList;
+	QList<AssetItemData *> &atlasGrpFrameListRef = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
 	for(int i = 0; i < atlasGrpFrameListRef.size(); ++i)
 	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[i]);
 		for(int j = 0; j < textureIndexList.size(); ++j)
 		{
-			if(atlasGrpFrameListRef[i]->GetTextureIndex() == textureIndexList[j])
-				newFramesSet.insert(atlasGrpFrameListRef[i]);
+			if(pFrame->GetTextureIndex() == textureIndexList[j])
+				newFramesSet.insert(pFrame);
 		}
 	}
 
 	QList<AtlasFrame *>newFramesList = newFramesSet.toList();
 
 
-	AtlasRepackThread *pWorkerThread = new AtlasRepackThread(m_AtlasGrpList[uiAtlasGrpIndex], textureIndexList, newFramesList, m_MetaDir);
+	AtlasRepackThread *pWorkerThread = new AtlasRepackThread(*m_BanksModel.GetBank(uiBankIndex), textureIndexList, newFramesList, m_MetaDir);
 	connect(pWorkerThread, &AtlasRepackThread::finished, pWorkerThread, &QObject::deleteLater);
 	connect(pWorkerThread, &AtlasRepackThread::LoadUpdate, this, &AtlasModel::OnLoadUpdate);
 	connect(pWorkerThread, &AtlasRepackThread::RepackIsFinished, this, &AtlasModel::OnRepackFinished);
@@ -365,46 +365,14 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 		}
 	}
 
-
+	// Passed error check: proceed with import
 	for(int i = 0; i < sImportAssetList.size(); ++i)
-	{
-		//for(int i = 0; i < newImageList.size(); ++i)
-		//returnList.insert(ImportImage(QFileInfo(sImportImgList[i]).baseName(), *newImageList[i], uiAtlasGrpId, eType, correspondingParentList[i]));
-
-		QFileInfo fileInfo(sImportAssetList[i]);
-
-		quint32 uiChecksum = HyGlobal::CRCData(0, newImageList[i]->bits(), newImageList[i]->byteCount());
-
-		AtlasItemType eAtlasItemType = HyGlobal::GetAtlasItemFromItem(eType);
-
-		QRect rAlphaCrop(0, 0, newImageList[i]->width(), newImageList[i]->height());
-		if(eAtlasItemType == ATLASITEM_Image) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
-			rAlphaCrop = ImagePacker::crop(*newImageList[i]);
-
-		AssetItemData *pNewAsset = new AtlasFrame(*this,
-												eType,
-												QUuid::createUuid(),
-												uiChecksum,
-												uiBankId,
-												fileInfo.baseName(),
-												rAlphaCrop,
-												newImageList[i]->width(),
-												newImageList[i]->height(),
-												-1,
-												-1,
-												-1,
-												0);
-
-		newImageList[i]->save(m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName()));
-
-		RegisterAsset(pNewAsset);
-		returnList.append(pNewAsset);
-	}
+		returnList.append(ImportImage(QFileInfo(sImportAssetList[i]).baseName(), *newImageList[i], uiBankId, eType));
 
 	if(returnList.empty() == false)
 	{
 		QSet<AtlasFrame *> newSet;
-		for(auto pItem : returnList)
+		for(auto pItem : returnList.toSet())
 			newSet.insert(static_cast<AtlasFrame *>(pItem));
 		Repack(GetBankIndexFromBankId(uiBankId), QSet<int>(), newSet);
 	}
@@ -575,4 +543,36 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 /*slot*/ void AtlasModel::OnRepackFinished()
 {
 	SaveRuntime();
+}
+
+AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, HyGuiItemType eType)
+{
+	QFileInfo fileInfo(sName);
+
+	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
+
+	AtlasItemType eAtlasItemType = HyGlobal::GetAtlasItemFromItem(eType);
+
+	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
+	if(eAtlasItemType == ATLASITEM_Image) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
+		rAlphaCrop = ImagePacker::crop(newImage);
+
+	AtlasFrame *pNewAsset = new AtlasFrame(*this,
+		eType,
+		QUuid::createUuid(),
+		uiChecksum,
+		uiBankId,
+		fileInfo.baseName(),
+		rAlphaCrop,
+		newImage.width(),
+		newImage.height(),
+		-1,
+		-1,
+		-1,
+		0);
+
+	newImage.save(m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName()));
+	RegisterAsset(pNewAsset);
+	
+	return pNewAsset;
 }

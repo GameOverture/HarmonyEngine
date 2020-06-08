@@ -77,6 +77,7 @@ public:
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) = 0;
 
 protected:
+	// NOTE: Public access should use data() with role = Qt::UserRole to get TreeModelItemData
 	TreeModelItem *GetItem(const QModelIndex &indexRef) const;
 };
 

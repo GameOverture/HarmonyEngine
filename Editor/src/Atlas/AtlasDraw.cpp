@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "AtlasDraw.h"
+#include "AtlasFrame.h"
 
 #define DISPLAYORDER_AtlasHoverFrame 1004
 #define DISPLAYORDER_AtlasHoverBG 1003
@@ -17,9 +18,8 @@
 
 #define DISPLAYORDER_AtlasSelectedFrames 1000
 
-AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
+AtlasDraw::AtlasDraw(IManagerModel &atlasManagerModel) :
 	IDraw(nullptr, FileDataPair()),
-	m_ModelRef(*pModelRef),
 	m_bIsMouseOver(false),
 	m_HoverBackground(this),
 	m_HoverStrokeInner(nullptr),
@@ -50,24 +50,25 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
 	m_HoverStrokeOutter.SetVisible(false);
 	m_HoverStrokeOutter.Load();
 	
-	for(int i = 0; i < m_ModelRef.GetNumAtlasGroups(); ++i)
+	for(int i = 0; i < atlasManagerModel.GetNumBanks(); ++i)
 	{
-		QList<AtlasFrame *> frameList = m_ModelRef.GetFrames(i);
-		for(int j = 0; j < frameList.size(); ++j)
+		QList<AssetItemData *> assetList = atlasManagerModel.GetBankAssets(i);
+		for(int j = 0; j < assetList.size(); ++j)
 		{
-			if(frameList[j]->GetTextureIndex() < 0)
+			AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[j]);
+			if(pFrame->GetTextureIndex() < 0)
 				continue;
 
-			uint32 uiTextureIndex = frameList[j]->GetTextureIndex();
+			uint32 uiTextureIndex = pFrame->GetTextureIndex();
 			
 			while(m_MasterList.size() <= static_cast<int>(uiTextureIndex))
 				m_MasterList.append(new TextureEnt(this));
 			
-			HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(frameList[j]->GetAtlasGrpId(), uiTextureIndex, m_MasterList[uiTextureIndex]);
-			pNewTexQuad->SetTextureSource(frameList[j]->GetX(), frameList[j]->GetY(), frameList[j]->GetCrop().width(), frameList[j]->GetCrop().height());
+			HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(pFrame->GetBankId(), uiTextureIndex, m_MasterList[uiTextureIndex]);
+			pNewTexQuad->SetTextureSource(pFrame->GetX(), pFrame->GetY(), pFrame->GetCrop().width(), pFrame->GetCrop().height());
 			pNewTexQuad->SetDisplayOrder(DISPLAYORDER_AtlasSelectedFrames);
 			
-			m_MasterList[uiTextureIndex]->m_FrameUuidMap.insert(frameList[j]->GetId(), pNewTexQuad);
+			m_MasterList[uiTextureIndex]->m_FrameUuidMap.insert(pFrame->GetUuid(), pNewTexQuad);
 		}
 	}
 }
@@ -77,15 +78,14 @@ AtlasDraw::AtlasDraw(AtlasModel *pModelRef) :
 
 }
 
-void AtlasDraw::SetHover(QTreeWidgetItem *pHoverItem)
+void AtlasDraw::SetHover(TreeModelItemData *pHoverItem)
 {
 	HyTexturedQuad2d *pNewHoverTexQuad = nullptr;
-
-	if(pHoverItem)
+	if(pHoverItem && pHoverItem->GetType() != ITEM_Filter)
 	{
-		AtlasFrame *pFrame = pHoverItem->data(0, Qt::UserRole).value<AtlasFrame *>();
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(pHoverItem);
 		if(pFrame && pFrame->GetErrors() == 0)
-			pNewHoverTexQuad = m_MasterList[pFrame->GetTextureIndex()]->m_FrameUuidMap[pFrame->GetId()];
+			pNewHoverTexQuad = m_MasterList[pFrame->GetTextureIndex()]->m_FrameUuidMap[pFrame->GetUuid()];
 	}
 	
 	if(m_pHoverTexQuad)
@@ -94,7 +94,7 @@ void AtlasDraw::SetHover(QTreeWidgetItem *pHoverItem)
 	m_pHoverTexQuad = pNewHoverTexQuad;
 }
 
-void AtlasDraw::SetSelected(QList<QTreeWidgetItem *> selectedList)
+void AtlasDraw::SetSelected(QList<AssetItemData *> selectedList)
 {
 	for(int i = 0; i < m_SelectedTexQuadList.size(); ++i)
 		m_SelectedTexQuadList[i]->SetVisible(false);
@@ -102,9 +102,9 @@ void AtlasDraw::SetSelected(QList<QTreeWidgetItem *> selectedList)
 	m_SelectedTexQuadList.clear();
 	for(int i = 0; i < selectedList.size(); ++i)
 	{
-		AtlasFrame *pFrame = selectedList[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(selectedList[i]);
 		if(pFrame && pFrame->GetErrors() == 0)
-			m_SelectedTexQuadList.append(m_MasterList[pFrame->GetTextureIndex()]->m_FrameUuidMap[pFrame->GetId()]);
+			m_SelectedTexQuadList.append(m_MasterList[pFrame->GetTextureIndex()]->m_FrameUuidMap[pFrame->GetUuid()]);
 	}
 }
 

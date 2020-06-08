@@ -44,6 +44,7 @@ public:
 
 	quint32 GetSelectedBankId();
 
+	void DrawUpdate();
 	void RefreshInfo();
 
 protected:

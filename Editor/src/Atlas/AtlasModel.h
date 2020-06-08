@@ -31,15 +31,15 @@ public:
 	QSize GetAtlasDimensions(uint uiBankIndex);
 	HyTextureFormat GetAtlasTextureType(uint uiBankIndex);
 
-	bool IsImageValid(QImage &image, quint32 uiAtlasGrpId);
-	bool IsImageValid(int iWidth, int iHeight, quint32 uiAtlasGrpId);
+	bool IsImageValid(QImage &image, quint32 uiBankId);
+	bool IsImageValid(int iWidth, int iHeight, quint32 uiBankId);
 	bool IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings);
 
 	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType);
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
 
-	void RepackAll(uint uiAtlasGrpIndex);
-	void Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
+	void RepackAll(uint uiBankIndex);
+	void Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
@@ -60,6 +60,9 @@ protected:
 private Q_SLOTS:
 	void OnLoadUpdate(QString sMsg, int iPercComplete);
 	void OnRepackFinished();
+
+private:
+	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiBankIndex, HyGuiItemType eType);
 };
 
 //struct AtlasGrp

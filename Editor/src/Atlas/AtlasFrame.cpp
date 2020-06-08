@@ -191,7 +191,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	m_iWidth = newImage.width();
 	m_iHeight = newImage.height();
 
-	if(m_eType == ATLASITEM_Image)
+	if(m_eTYPE == ATLASITEM_Image)
 		m_rAlphaCrop = ImagePacker::crop(newImage);
 	else // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
