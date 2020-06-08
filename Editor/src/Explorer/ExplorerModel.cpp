@@ -198,12 +198,6 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 	QDir metaDir(pDestProject->GetMetaDataAbsPath());
 	QDir metaTempDir = HyGlobal::PrepTempDir(pDestProject);
 
-	// Import images into the selected atlas group, or default one
-	QSet<AtlasFrame *> importedImageSet;
-	quint32 uiAtlasGrpId = pDestProject->GetAtlasModel().GetBankIdFromBankIndex(0);
-	if(pDestProject->GetAtlasWidget())
-		uiAtlasGrpId = pDestProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
-
 	// Parse 'sSrc' for paste information
 	QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
 	QJsonArray pasteArray = pasteDoc.array();
@@ -300,7 +294,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		for(int i = 0; i < importFileInfoList.size(); ++i)
 			importImageList.append(importFileInfoList[i].absoluteFilePath());
 		// TODO: Create filters that match the source of the pasted images
-		QList<AtlasTreeItem *> correspondingParentList;
+		QList<TreeModelItemData *> correspondingParentList;
 		for(int i = 0; i < importImageList.size(); ++i)
 			correspondingParentList.push_back(nullptr);
 
@@ -316,44 +310,11 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			break;
 		}
 
-		QSet<AtlasFrame *> newImportedImagesSet = pDestProject->GetAtlasModel().ImportAssets(importImageList, uiAtlasGrpId, eType, correspondingParentList);
-		if(newImportedImagesSet.empty())
-		{
-			HyGuiLog("Failed to paste item - its image(s) could not import.", LOGTYPE_Warning);
-			return false;
-		}
-
-
-		importedImageSet += newImportedImagesSet;
-
-		//// Replace any image "id" with the newly imported frames' ids
-		//if(pasteObj["src"].isArray())
-		//{
-		//	QJsonArray srcArray = pasteObj["src"].toArray();
-		//	if(srcArray.empty() == false && srcArray[0].isObject() == false)
-		//		HyGuiLog("DataExplorerWidget::PasteItemSrc - src array isn't of QJsonObjects", LOGTYPE_Error);
-
-		//	// Copy everything into newSrcArray, while replacing "id" with proper value
-		//	QJsonArray newSrcArray;
-		//	for(int i = 0; i < srcArray.size(); ++i)
-		//	{
-		//		QJsonObject srcArrayObj = srcArray[i].toObject();
-
-		//		srcArrayObj = ReplaceIdWithProperValue(srcArrayObj, importedImageSet);
-		//		newSrcArray.append(srcArrayObj);
-		//	}
-
-		//	pasteObj["src"] = newSrcArray;
-		//}
-		//else if(pasteObj["src"].isObject())
-		//{
-		//	QJsonObject srcObj = pasteObj["src"].toObject();
-		//	srcObj = ReplaceIdWithProperValue(srcObj, importedImageSet);
-
-		//	pasteObj["src"] = srcObj;
-		//}
-		//else
-		//	HyGuiLog("DataExplorerWidget::PasteItemSrc - src isn't an object or array", LOGTYPE_Error);
+		// Import images into the selected atlas group, or default one
+		quint32 uiAtlasGrpId = pDestProject->GetAtlasModel().GetBankIdFromBankIndex(0);
+		//if(pDestProject->GetAtlasWidget())
+		//	uiAtlasGrpId = pDestProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
+		pDestProject->GetAtlasModel().ImportNewAssets(importImageList, uiAtlasGrpId, eType, correspondingParentList);
 
 		// Create a new project item representing the pasted item and save it
 		QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
@@ -371,9 +332,6 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			return false;
 #endif
 	}
-
-	if(importedImageSet.empty() == false)
-		pDestProject->GetAtlasModel().Repack(pDestProject->GetAtlasModel().GetBankIndexFromBankId(uiAtlasGrpId), QSet<int>(), importedImageSet);
 
 	return true;
 }

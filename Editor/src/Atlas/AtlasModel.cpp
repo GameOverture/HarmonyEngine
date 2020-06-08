@@ -302,6 +302,11 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 	return bAccepted;
 }
 
+/*virtual*/ QStringList AtlasModel::GetSupportedFileExtList() /*override*/
+{
+	return QStringList() << ".png";
+}
+
 /*virtual*/ void AtlasModel::OnCreateBank(BankData &newBankRef) /*override*/
 {
 	m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(newBankRef.GetId()));
@@ -336,55 +341,77 @@ void AtlasModel::Repack(uint uiAtlasGrpIndex, QSet<int> repackTexIndicesSet, QSe
 	return pNewFrame;
 }
 
-/*virtual*/ AssetItemData *AtlasModel::OnAllocateAssetData(QString sFilePath, quint32 uiBankId, HyGuiItemType eType) /*override*/
+/*virtual*/ QList<AssetItemData *> AtlasModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) /*override*/
 {
-	//QList<QImage *> newImageList;
-	//for(int i = 0; i < sImportList.size(); ++i)
-	//{
-	QFileInfo fileInfo(sFilePath);
+	QList<AssetItemData *> returnList;
 
-	QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
-	//newImageList.push_back(pNewImage);
-
-	QSize atlasDimensions = GetAtlasDimensions(GetBankIndexFromBankId(uiBankId));
-	if(IsImageValid(*pNewImage, uiBankId) == false)
+	// Error check all the imported assets before adding them, and cancel entire import if any fail
+	QList<QImage *> newImageList;
+	for(int i = 0; i < sImportAssetList.size(); ++i)
 	{
-		HyGuiLog("Importing image " % fileInfo.fileName() % " will not fit in atlas bank '" % QString::number(uiBankId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
-		delete pNewImage;
-		return nullptr;
+		QFileInfo fileInfo(sImportAssetList[i]);
+
+		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
+		newImageList.push_back(pNewImage);
+
+		QSize atlasDimensions = GetAtlasDimensions(GetBankIndexFromBankId(uiBankId));
+		if(IsImageValid(*pNewImage, uiBankId) == false)
+		{
+			HyGuiLog("Importing image " % fileInfo.fileName() % " will not fit in atlas bank '" % QString::number(uiBankId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
+			
+			for(auto image : newImageList)
+				delete image;
+			return returnList;
+		}
 	}
-	//}
 
 
-	//for(int i = 0; i < newImageList.size(); ++i)
-		//returnSet.insert(ImportImage(QFileInfo(sImportImgList[i]).baseName(), *newImageList[i], uiAtlasGrpId, eType, correspondingParentList[i]));
+	for(int i = 0; i < sImportAssetList.size(); ++i)
+	{
+		//for(int i = 0; i < newImageList.size(); ++i)
+		//returnList.insert(ImportImage(QFileInfo(sImportImgList[i]).baseName(), *newImageList[i], uiAtlasGrpId, eType, correspondingParentList[i]));
 
-	quint32 uiChecksum = HyGlobal::CRCData(0, pNewImage->bits(), pNewImage->byteCount());
+		QFileInfo fileInfo(sImportAssetList[i]);
 
-	AtlasItemType eAtlasItemType = HyGlobal::GetAtlasItemFromItem(eType);
+		quint32 uiChecksum = HyGlobal::CRCData(0, newImageList[i]->bits(), newImageList[i]->byteCount());
 
-	QRect rAlphaCrop(0, 0, pNewImage->width(), pNewImage->height());
-	if(eAtlasItemType == ATLASITEM_Image) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
-		rAlphaCrop = ImagePacker::crop(*pNewImage);
+		AtlasItemType eAtlasItemType = HyGlobal::GetAtlasItemFromItem(eType);
 
-	AtlasFrame *pNewFrame = new AtlasFrame(*this,
-										   eType,
-										   QUuid::createUuid(),
-										   uiChecksum,
-										   uiBankId,
-										   fileInfo.baseName(),
-										   rAlphaCrop,
-										   pNewImage->width(),
-										   pNewImage->height(),
-										   -1,
-										   -1,
-										   -1,
-										   0);
+		QRect rAlphaCrop(0, 0, newImageList[i]->width(), newImageList[i]->height());
+		if(eAtlasItemType == ATLASITEM_Image) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
+			rAlphaCrop = ImagePacker::crop(*newImageList[i]);
 
-	pNewImage->save(m_MetaDir.absoluteFilePath(pNewFrame->ConstructMetaFileName()));
-	delete pNewImage;
+		AssetItemData *pNewAsset = new AtlasFrame(*this,
+												eType,
+												QUuid::createUuid(),
+												uiChecksum,
+												uiBankId,
+												fileInfo.baseName(),
+												rAlphaCrop,
+												newImageList[i]->width(),
+												newImageList[i]->height(),
+												-1,
+												-1,
+												-1,
+												0);
 
-	return pNewFrame;
+		newImageList[i]->save(m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName()));
+
+		RegisterAsset(pNewAsset);
+		returnList.append(pNewAsset);
+	}
+
+	if(returnList.empty() == false)
+	{
+		QSet<AtlasFrame *> newSet;
+		for(auto pItem : returnList)
+			newSet.insert(static_cast<AtlasFrame *>(pItem));
+		Repack(GetBankIndexFromBankId(uiBankId), QSet<int>(), newSet);
+	}
+
+	for(auto image : newImageList)
+		delete image;
+	return returnList;
 }
 
 /*virtual*/ bool AtlasModel::OnRemoveAssets(QList<AssetItemData *> assetList) /*override*/

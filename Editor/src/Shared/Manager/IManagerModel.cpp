@@ -167,6 +167,11 @@ Project &IManagerModel::GetProjOwner()
 	return m_ProjectRef;
 }
 
+QAbstractListModel *IManagerModel::GetBanksModel()
+{
+	return &m_BanksModel;
+}
+
 QDir IManagerModel::GetMetaDir()
 {
 	return m_MetaDir;
@@ -200,6 +205,21 @@ void IManagerModel::SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj
 QList<AssetItemData *> IManagerModel::GetBankAssets(uint uiBankIndex)
 {
 	return m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
+}
+
+bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList)
+{
+	if(correspondingParentList.size() != sImportList.size())
+	{
+		HyGuiLog("AtlasModel::ImportImages was passed a correspondingParentList that isn't the same size as the sImportImgList", LOGTYPE_Error);
+		return false;
+	}
+
+	QList<AssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType);
+	for(int i = 0; i < returnList.size(); ++i)
+		InsertTreeItem(returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
+
+	return true;
 }
 
 void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList)
@@ -365,6 +385,24 @@ QString IManagerModel::AssembleFilter(const AssetItemData *pAsset) const
 	return sPrefix;
 }
 
+TreeModelItemData *IManagerModel::FindTreeItemFilter(TreeModelItemData *pItem) const
+{
+	if(pItem == nullptr)
+		return nullptr;
+
+	if(pItem->GetType() == ITEM_Filter)
+		return pItem;
+
+	TreeModelItem *pTreeItem = GetItem(FindIndex<const TreeModelItemData *>(pItem, 0));
+	pTreeItem = pTreeItem->GetParent();
+	TreeModelItemData *pFilter = pTreeItem->data(0).value<TreeModelItemData *>();
+
+	if(pFilter == nullptr || pFilter->GetType() != ITEM_Filter)
+		return nullptr;
+	
+	return pFilter;
+}
+
 bool IManagerModel::RemoveLookup(AssetItemData *pAsset)
 {
 	m_AssetUuidMap.remove(pAsset->GetUuid());
@@ -477,41 +515,17 @@ void IManagerModel::RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData
 		relinquishList[i]->RemoveLink(pItem);
 }
 
-QSet<AssetItemData *> IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItem *> correspondingParentList)
+TreeModelItemData *IManagerModel::CreateNewFilter(QString sName, TreeModelItemData *pParent)
 {
-	if(correspondingParentList.size() != sImportList.size())
-	{
-		HyGuiLog("AtlasModel::ImportImages was passed a correspondingParentList that isn't the same size as the sImportImgList", LOGTYPE_Error);
-		return QSet<AssetItemData *>(); // indicates error
-	}
-
-	// TODO: Error check all the imported assets before adding them, and cancel entire import if any fail (currently will import all passing assets)
-
-	QSet<AssetItemData *> returnSet;
-	for(int i = 0; i < sImportList.size(); ++i)
-	{
-		AssetItemData *pNewAsset = OnAllocateAssetData(sImportList[i], uiBankId, eType);
-		if(pNewAsset)
-		{
-			RegisterAsset(pNewAsset);
-			InsertTreeItem(pNewAsset, correspondingParentList[i]);
-
-			returnSet.insert(pNewAsset);
-		}
-	}
-
-	return returnSet;
-}
-
-bool IManagerModel::CreateNewFilter(QString sName, TreeModelItem *pParent)
-{
-	if(InsertTreeItem(new TreeModelItemData(ITEM_Filter, sName), pParent))
+	TreeModelItem *pTreeParent = pParent ? GetItem(FindIndex<TreeModelItemData *>(pParent, 0)) : nullptr;
+	TreeModelItemData *pNewFilterData = new TreeModelItemData(ITEM_Filter, sName);
+	if(InsertTreeItem(pNewFilterData, pTreeParent))
 	{
 		SaveMeta();
-		return true;
+		return pNewFilterData;
 	}
 
-	return false;
+	return nullptr;
 }
 
 void IManagerModel::CreateNewBank(QString sName)
@@ -698,6 +712,33 @@ void IManagerModel::SaveRuntime()
 	Harmony::Reload(&m_ProjectRef);
 }
 
+void IManagerModel::RegisterAsset(AssetItemData *pAsset)
+{
+	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
+	{
+		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
+		{
+			m_BanksModel.GetBank(i)->m_AssetList.append(pAsset);
+			break;
+		}
+	}
+
+	m_AssetUuidMap[pAsset->GetUuid()] = pAsset;
+
+	uint32 uiChecksum = pAsset->GetChecksum();
+	if(m_AssetChecksumMap.contains(uiChecksum))
+	{
+		m_AssetChecksumMap.find(uiChecksum).value().append(pAsset);
+		HyGuiLog("'" % pAsset->GetName() % "' is a duplicate of '" % m_AssetChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_AssetChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
+	}
+	else
+	{
+		QList<AssetItemData *> newFrameList;
+		newFrameList.append(pAsset);
+		m_AssetChecksumMap[uiChecksum] = newFrameList;
+	}
+}
+
 void IManagerModel::DeleteAsset(AssetItemData *pAsset)
 {
 	if(RemoveLookup(pAsset))
@@ -771,31 +812,4 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(const QString sPrefix, const Q
 
 	InsertTreeItem(pNewItemData, pCurTreeItem);
 	return pNewItemData;
-}
-
-void IManagerModel::RegisterAsset(AssetItemData *pAsset)
-{
-	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
-	{
-		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
-		{
-			m_BanksModel.GetBank(i)->m_AssetList.append(pAsset);
-			break;
-		}
-	}
-
-	m_AssetUuidMap[pAsset->GetUuid()] = pAsset;
-
-	uint32 uiChecksum = pAsset->GetChecksum();
-	if(m_AssetChecksumMap.contains(uiChecksum))
-	{
-		m_AssetChecksumMap.find(uiChecksum).value().append(pAsset);
-		HyGuiLog("'" % pAsset->GetName() % "' is a duplicate of '" % m_AssetChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_AssetChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
-	}
-	else
-	{
-		QList<AssetItemData *> newFrameList;
-		newFrameList.append(pAsset);
-		m_AssetChecksumMap[uiChecksum] = newFrameList;
-	}
 }

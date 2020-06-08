@@ -43,13 +43,14 @@ public:
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
+	virtual QStringList GetSupportedFileExtList() override;
 
 protected:
 	virtual void OnCreateBank(BankData &newBankRef) override;
 	virtual void OnDeleteBank(BankData &bankToBeDeleted) override;
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
-	virtual AssetItemData *OnAllocateAssetData(QString sFilePath, quint32 uiBankId, HyGuiItemType eType) override;
 
+	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) override; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QList<AssetItemData *> assetList) override; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) override;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) override; // Must call MoveAsset() on each asset

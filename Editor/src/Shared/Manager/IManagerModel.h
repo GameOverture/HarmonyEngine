@@ -143,6 +143,7 @@ public:
 	virtual ~IManagerModel();
 
 	Project &GetProjOwner();
+	QAbstractListModel *GetBanksModel();
 
 	QDir GetMetaDir();
 	QDir GetDataDir();
@@ -153,6 +154,7 @@ public:
 	void SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj);
 	QList<AssetItemData *> GetBankAssets(uint uiBankIndex);
 
+	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList);
 	void RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
 	void ReplaceAssets(QList<AssetItemData *> assetsList);
 	void Rename(TreeModelItemData *pItem, QString sNewName);
@@ -160,6 +162,7 @@ public:
 
 	QJsonArray GetExpandedFiltersArray();
 	QString AssembleFilter(const AssetItemData *pAsset) const;
+	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
 
 	bool RemoveLookup(AssetItemData *pAsset); // Returns true if no remaining duplicates exist
 	AssetItemData *FindById(QUuid uuid);
@@ -177,8 +180,7 @@ public:
 	void RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QSet<AssetItemData *> ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItem *> correspondingParentList);
-	bool CreateNewFilter(QString sName, TreeModelItem *pParent);
+	TreeModelItemData *CreateNewFilter(QString sName, TreeModelItemData *pParent);
 
 	void CreateNewBank(QString sName);
 	void RemoveBank(quint32 uiBankId);
@@ -191,8 +193,10 @@ public:
 
 	virtual QString OnBankInfo(uint uiBankIndex) = 0;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;
+	virtual QStringList GetSupportedFileExtList() = 0;
 
 protected:
+	void RegisterAsset(AssetItemData *pAsset);
 	void DeleteAsset(AssetItemData *pAsset);
 	void MoveAsset(AssetItemData *pAsset, quint32 uiNewBankId);
 
@@ -200,8 +204,8 @@ protected:
 	virtual void OnDeleteBank(BankData &bankToBeDeleted) = 0;
 	
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
-	virtual AssetItemData *OnAllocateAssetData(QString sFilePath, quint32 uiBankId, HyGuiItemType eType) = 0;
 
+	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) = 0; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QList<AssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) = 0;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) = 0; // Must call MoveAsset() on each asset
@@ -210,7 +214,7 @@ protected:
 
 private:
 	AssetItemData *CreateAssetTreeItem(const QString sPrefix, const QString sName, QJsonObject metaObj);
-	void RegisterAsset(AssetItemData *pAsset);
+	
 };
 
 #endif // IMANAGERMODEL_H

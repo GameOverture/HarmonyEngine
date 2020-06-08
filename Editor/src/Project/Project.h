@@ -29,8 +29,6 @@ class AudioAssetsWidget;
 class Harmony;
 class ExplorerModel;
 
-class AtlasTreeItem;
-
 class ProjectTabBar : public QTabBar
 {
 	Project *										m_pProjectOwner;

@@ -23,6 +23,7 @@
 
 #include <QUndoCommand>
 #include <QMessageBox>
+#include <QFileDialog>
 
 ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 	QSortFilterProxyModel(pParent)
@@ -67,6 +68,8 @@ IManagerWidget::IManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullp
 	m_pModel(pModel),
 	m_Draw(pModel)
 {
+	ui->setupUi(this);
+
 	ManagerProxyModel *pProxyModel = new ManagerProxyModel(this);
 	pProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	pProxyModel->setSourceModel(m_pModel);
@@ -77,6 +80,50 @@ IManagerWidget::IManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullp
 	pProxyModel->setFilterKeyColumn(0);
 
 	ui->assetTree->setModel(pProxyModel);
+	ui->assetTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	ui->assetTree->setDragEnabled(true);
+	ui->assetTree->setDropIndicatorShown(true);
+	ui->assetTree->setDragDropMode(QAbstractItemView::InternalMove);
+	//ui->assetTree->SetAtlasOwner(this);
+	//ui->assetTree->viewport()->setAcceptDrops(true);
+	ui->assetTree->sortByColumn(0, Qt::AscendingOrder);
+	ui->assetTree->setSortingEnabled(true);
+	ui->assetTree->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui->assetTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
+
+	ui->actionDeleteAssets->setEnabled(false);
+	ui->actionReplaceAssets->setEnabled(false);
+
+	ui->btnBankSettings->setDefaultAction(ui->actionBankSettings);
+	ui->btnImportAssets->setDefaultAction(ui->actionImportAssets);
+	ui->btnImportDir->setDefaultAction(ui->actionImportDirectory);
+
+	ui->btnDeleteAssets->setDefaultAction(ui->actionDeleteAssets);
+	ui->btnReplaceAssets->setDefaultAction(ui->actionReplaceAssets);
+	ui->btnCreateFilter->setDefaultAction(ui->actionAddFilter);
+
+	ui->btnAddBank->setDefaultAction(ui->actionAddBank);
+	ui->btnRemoveBank->setDefaultAction(ui->actionRemoveBank);
+
+	ui->cmbBanks->clear();
+	ui->cmbBanks->setModel(m_pModel->GetBanksModel());
+
+	//QList<AtlasTreeItem *> atlasTreeItemList = m_pModel->GetTopLevelTreeItemList();
+	//for(int i = 0; i < atlasTreeItemList.size(); ++i)
+	//	ui->atlasList->addTopLevelItem(atlasTreeItemList[i]);
+
+
+
+	//QJsonArray expandedArray = settingsObj["expanded"].toArray();
+	//if(expandedArray.isEmpty() == false)
+	//{
+	//	for(int i = 0; i < atlasFiltersTreeItemList.size(); ++i)
+	//		atlasFiltersTreeItemList[i]->setExpanded(expandedArray[i].toBool());
+	//}
+
+	RefreshInfo();
+
+
 }
 
 IManagerWidget::~IManagerWidget()
@@ -330,16 +377,145 @@ void IManagerWidget::on_actionBankTransfer_triggered(QAction *pAction)
 	m_pModel->TransferAssets(selectedAssetsList, uiNewBankId);
 }
 
-void IManagerWidget::on_actionImportImages_triggered()
+void IManagerWidget::on_actionImportAssets_triggered()
 {
+	QFileDialog dlg(this);
+	dlg.setFileMode(QFileDialog::ExistingFile);
+	dlg.setViewMode(QFileDialog::Detail);
+	dlg.setWindowModality(Qt::ApplicationModal);
+	dlg.setModal(true);
+
+	QStringList sFilterList;
+	for(int i = 0; i < m_pModel->GetSupportedFileExtList().size(); ++i)
+		sFilterList += "*" % m_pModel->GetSupportedFileExtList()[i];
+	sFilterList += "*.*";
+	dlg.setNameFilters(sFilterList);
+
+	if(dlg.exec() == QDialog::Rejected)
+		return;
+
+	QStringList sImportImgList = dlg.selectedFiles();
+
+	//QString sSelectedFilter(tr("PNG (*.png)"));
+	//QStringList sImportImgList = QFileDialog::getOpenFileNames(this,
+	//	"Import image(s) into atlases",
+	//	QString(),
+	//	tr("All files (*.*);;PNG (*.png)"),
+	//	&sSelectedFilter);
+
+
+	QList<AssetItemData *> selectedAssetsList;
+	QList<TreeModelItemData *> selectedFiltersList;
+	GetSelectedItems(selectedAssetsList, selectedFiltersList);
+
+	TreeModelItemData *pParent = nullptr;
+	if(selectedAssetsList.empty() == false)
+		pParent = m_pModel->FindTreeItemFilter(selectedAssetsList[0]);
+	else if(selectedFiltersList.empty() == false)
+		pParent = selectedFiltersList[0];
+
+	QList<TreeModelItemData *> correspondingParentList;
+	for(int i = 0; i < sImportImgList.size(); ++i)
+		correspondingParentList.append(pParent);
+
+	m_pModel->ImportNewAssets(sImportImgList,
+							  m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
+							  ITEM_AtlasImage,
+							  correspondingParentList);
 }
 
 void IManagerWidget::on_actionImportDirectory_triggered()
 {
+	QFileDialog dlg(this);
+	dlg.setFileMode(QFileDialog::Directory);
+	dlg.setOption(QFileDialog::ShowDirsOnly, true);
+	dlg.setViewMode(QFileDialog::Detail);
+	dlg.setWindowModality(Qt::ApplicationModal);
+	dlg.setModal(true);
+
+	if(dlg.exec() == QDialog::Rejected)
+		return;
+
+	QList<AssetItemData *> selectedAssetsList;
+	QList<TreeModelItemData *> selectedFiltersList;
+	GetSelectedItems(selectedAssetsList, selectedFiltersList);
+
+	// The 'pImportParent' will be the root point for all new AtlasTreeItem insertions (both filters and images)
+	TreeModelItemData *pImportParent = nullptr;
+	if(selectedAssetsList.empty() == false)
+		pImportParent = m_pModel->FindTreeItemFilter(selectedAssetsList[0]);
+	else if(selectedFiltersList.empty() == false)
+		pImportParent = selectedFiltersList[0];
+
+	// Store all the specified imported image paths and their corresponding parent tree items they should be inserted into
+	QStringList sImportImgList;
+	QList<TreeModelItemData *> correspondingParentList;
+
+	// Loop through all the specified import directories
+	QStringList sDirs = dlg.selectedFiles();
+	for(int iDirIndex = 0; iDirIndex < sDirs.size(); ++iDirIndex)
+	{
+		// Dig recursively through this directory and grab all the image files (while creating filters that resemble the folder structure they're stored in)
+		QDir dirEntry(sDirs[iDirIndex]);
+		TreeModelItemData *pCurFilter = m_pModel->CreateNewFilter(dirEntry.dirName(), pImportParent);
+
+		QStack<QPair<QFileInfoList, TreeModelItemData *>> dirStack;
+		dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(dirEntry.entryInfoList(), pCurFilter));
+
+		while(dirStack.isEmpty() == false)
+		{
+			QPair<QFileInfoList, TreeModelItemData *> curDir = dirStack.pop();
+			QFileInfoList list = curDir.first;
+
+			for(int i = 0; i < list.count(); i++)
+			{
+				QFileInfo info = list[i];
+				if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
+				{
+					QDir subDir(info.filePath());
+					dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(subDir.entryInfoList(), m_pModel->CreateNewFilter(subDir.dirName(), curDir.second)));
+				}
+				else if(info.suffix().toLower() == "png")
+				{
+					sImportImgList.push_back(info.filePath());
+					correspondingParentList.push_back(curDir.second);
+				}
+			}
+		}
+	}
+
+	m_pModel->ImportNewAssets(sImportImgList,
+							  m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
+							  ITEM_AtlasImage,
+							  correspondingParentList);
 }
 
 void IManagerWidget::on_actionAddFilter_triggered()
 {
+	DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter");
+	if(pDlg->exec() == QDialog::Accepted)
+	{
+		TreeModelItemData *pNewFilter = nullptr;
+
+		QList<AssetItemData *> selectedAssetsList;
+		QList<TreeModelItemData *> selectedFiltersList;
+		GetSelectedItems(selectedAssetsList, selectedFiltersList);
+
+		TreeModelItemData *pParent = nullptr;
+		if(selectedAssetsList.empty() == false)
+			pParent = m_pModel->FindTreeItemFilter(selectedAssetsList[0]);
+		else if(selectedFiltersList.empty() == false)
+			pParent = selectedFiltersList[0];
+
+		pNewFilter = m_pModel->CreateNewFilter(pDlg->GetName(), pParent);
+
+		//ui->atlasList->sortItems(0, Qt::AscendingOrder);
+		//ui->atlasList->clearSelection();
+		//ui->atlasList->expandItem(pNewFilter);
+		//pNewFilter->setSelected(true);
+	}
+
+	delete pDlg;
 }
 
 void IManagerWidget::GetSelectedItems(QList<AssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut)
