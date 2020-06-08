@@ -203,9 +203,9 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	return stateFileData;
 }
 
-/*virtual*/ QList<AtlasFrame *> TextModel::GetAtlasFrames() const /*override*/
+/*virtual*/ QList<AssetItemData *> TextModel::GetAtlasAssets() const /*override*/
 {
-	QList<AtlasFrame *> retAtlasFrameList;
+	QList<AssetItemData *> retAtlasFrameList;
 	if(m_pAtlasFrame)
 		retAtlasFrameList.push_back(m_pAtlasFrame);
 

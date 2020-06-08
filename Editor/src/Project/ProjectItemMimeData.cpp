@@ -38,7 +38,7 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 		clipboardObj.insert("dataObj", itemFileData.m_Data);
 
 		// IMAGE INFO
-		QList<AtlasFrame *> atlasFrameList = pProjectItem->GetModel()->GetAtlasFrames();
+		QList<AssetItemData *> atlasFrameList = pProjectItem->GetModel()->GetAtlasAssets();
 		QJsonArray imagesArray;
 		for(int i = 0; i < atlasFrameList.size(); ++i)
 		{

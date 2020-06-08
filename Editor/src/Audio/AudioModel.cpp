@@ -28,9 +28,9 @@ AudioModel::~AudioModel()
 	return FileDataPair();
 }
 
-/*virtual*/ QList<AtlasFrame *> AudioModel::GetAtlasFrames() const /*override*/
+/*virtual*/ QList<AssetItemData *> AudioModel::GetAtlasAssets() const /*override*/
 {
-	return QList<AtlasFrame *>();
+	return QList<AssetItemData *>();
 }
 
 /*virtual*/ QStringList AudioModel::GetFontUrls() const /*override*/

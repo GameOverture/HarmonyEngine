@@ -323,9 +323,9 @@ bool EntityModel::RemoveChild(TreeModelItemData *pItem)
 	return stateFileData;
 }
 
-/*virtual*/ QList<AtlasFrame *> EntityModel::GetAtlasFrames() const /*override*/
+/*virtual*/ QList<AssetItemData *> EntityModel::GetAtlasAssets() const /*override*/
 {
-	return QList<AtlasFrame *>();
+	return QList<AssetItemData *>();
 }
 
 /*virtual*/ QStringList EntityModel::GetFontUrls() const /*override*/

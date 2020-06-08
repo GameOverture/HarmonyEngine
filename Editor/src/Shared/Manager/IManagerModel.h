@@ -59,7 +59,7 @@ public:
 	bool TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId);
 
 	QJsonArray GetExpandedFiltersArray();
-	QString AssembleFilter(const AssetItemData *pAsset) const;
+	QString AssembleFilter(AssetItemData *pAsset) const;
 	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
 
 	bool RemoveLookup(AssetItemData *pAsset); // Returns true if no remaining duplicates exist

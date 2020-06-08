@@ -362,11 +362,11 @@ QJsonArray IManagerModel::GetExpandedFiltersArray()
 	return m_ExpandedFiltersArray;
 }
 
-QString IManagerModel::AssembleFilter(const AssetItemData *pAsset) const
+QString IManagerModel::AssembleFilter(AssetItemData *pAsset) const
 {
 	QStringList sPrefixParts;
 
-	TreeModelItem *pTreeItem = GetItem(FindIndex<const AssetItemData *>(pAsset, 0))->GetParent();
+	TreeModelItem *pTreeItem = GetItem(FindIndex<AssetItemData *>(pAsset, 0))->GetParent();
 	while(pTreeItem && pTreeItem != m_pRootItem)
 	{
 		TreeModelItemData *pItem = pTreeItem->data(0).value<TreeModelItemData *>();
@@ -394,7 +394,7 @@ TreeModelItemData *IManagerModel::FindTreeItemFilter(TreeModelItemData *pItem) c
 	if(pItem->GetType() == ITEM_Filter)
 		return pItem;
 
-	TreeModelItem *pTreeItem = GetItem(FindIndex<const TreeModelItemData *>(pItem, 0));
+	TreeModelItem *pTreeItem = GetItem(FindIndex<TreeModelItemData *>(pItem, 0));
 	pTreeItem = pTreeItem->GetParent();
 	TreeModelItemData *pFilter = pTreeItem->data(0).value<TreeModelItemData *>();
 

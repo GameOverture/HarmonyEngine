@@ -78,7 +78,7 @@ public:
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
-	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
+	virtual QList<AssetItemData *> GetAtlasAssets() const override;
 	virtual QStringList GetFontUrls() const override;
 };
 

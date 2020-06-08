@@ -10,10 +10,10 @@
 #ifndef TREEMODELITEMDATA_H
 #define TREEMODELITEMDATA_H
 
+#include "Global.h"
+
 #include <QObject>
 #include <QTreeWidget>
-
-#include "Global.h"
 
 class TreeModelItemData : public QObject
 {
@@ -37,6 +37,7 @@ public:
 	bool IsProjectItem() const;
 };
 Q_DECLARE_METATYPE(TreeModelItemData *)
+Q_DECLARE_METATYPE(const TreeModelItemData *)
 
 QDataStream &operator<<(QDataStream &out, TreeModelItemData *const &rhs);
 QDataStream &operator>>(QDataStream &in, TreeModelItemData *rhs);

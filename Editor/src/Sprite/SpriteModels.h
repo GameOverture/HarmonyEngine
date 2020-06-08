@@ -34,15 +34,15 @@ public:
 														m_fDuration(0.016f)
 	{ }
 
-	QPoint GetRenderOffset()
-	{
-		QPoint ptRenderOffset;
+	//QPoint GetRenderOffset()
+	//{
+	//	QPoint ptRenderOffset;
 
-		ptRenderOffset.setX(m_vOffset.x() + m_pFrame->GetCrop().left());
-		ptRenderOffset.setY(m_vOffset.y() + (m_pFrame->GetSize().height() - m_pFrame->GetCrop().bottom()));
+	//	ptRenderOffset.setX(m_vOffset.x() + m_pFrame->GetCrop().left());
+	//	ptRenderOffset.setY(m_vOffset.y() + (m_pFrame->GetSize().height() - m_pFrame->GetCrop().bottom()));
 
-		return ptRenderOffset;
-	}
+	//	return ptRenderOffset;
+	//}
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SpriteFramesModel : public QAbstractTableModel
@@ -106,7 +106,7 @@ public:
 
 	//void GetStateFileData(FileDataPair &stateFileDataOut);
 
-	QList<AtlasFrame *> GetAtlasFrames() const;
+	QList<AssetItemData *> GetAtlasFrames() const;
 	
 	virtual int AddFrame(AtlasFrame *pFrame) override;
 	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
@@ -123,7 +123,7 @@ public:
 	virtual bool OnPrepSave() override { return true; }
 	virtual void InsertItemSpecificData(FileDataPair &itemFileDataOut) override;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
-	virtual QList<AtlasFrame *> GetAtlasFrames() const override;
+	virtual QList<AssetItemData *> GetAtlasAssets() const override;
 	virtual QStringList GetFontUrls() const override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

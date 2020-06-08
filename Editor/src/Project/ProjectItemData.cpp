@@ -13,6 +13,7 @@
 #include "AudioAssetsWidget.h"
 #include "AudioModel.h"
 #include "AtlasFrame.h"
+#include "AtlasModel.h"
 #include "IModel.h"
 #include "SpriteWidget.h"
 #include "SpriteDraw.h"
@@ -297,7 +298,8 @@ void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)
 	m_pUndoStack->setClean();
 
 	// Unlinks all dependencies
-	m_pModel->RelinquishAllFrames();
+	//m_pModel->RelinquishAllFrames();
+	GetProject().GetAtlasModel().RelinquishAssets(this, m_pModel->GetAtlasAssets());
 
 	ExplorerItemData::DeleteFromProject();
 }

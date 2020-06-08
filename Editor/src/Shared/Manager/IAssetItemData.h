@@ -20,6 +20,8 @@ class IManagerModel;
 
 class AssetItemData : public TreeModelItemData
 {
+	Q_OBJECT
+
 protected:
 	IManagerModel &						m_ModelRef;
 	const QUuid							m_UNIQUE_ID;
@@ -38,7 +40,7 @@ public:
 	quint32 GetBankId();
 	void SetBankId(quint32 uiNewBankId);
 
-	QString GetFilter() const;
+	QString GetFilter();
 	QString GetName() const;
 	QString GetMetaFileExt() const;
 

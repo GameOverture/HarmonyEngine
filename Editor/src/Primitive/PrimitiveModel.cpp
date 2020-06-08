@@ -28,9 +28,9 @@ PrimitiveModel::~PrimitiveModel()
 	return FileDataPair();
 }
 
-/*virtual*/ QList<AtlasFrame *> PrimitiveModel::GetAtlasFrames() const /*override*/
+/*virtual*/ QList<AssetItemData *> PrimitiveModel::GetAtlasAssets() const /*override*/
 {
-	return QList<AtlasFrame *>();
+	return QList<AssetItemData *>();
 }
 
 /*virtual*/ QStringList PrimitiveModel::GetFontUrls() const /*override*/

@@ -20,6 +20,8 @@
 
 class AtlasFrame : public AssetItemData
 {
+	Q_OBJECT
+
 	int									m_iWidth;
 	int									m_iHeight;
 	QRect								m_rAlphaCrop;

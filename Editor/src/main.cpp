@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "MainWindow.h"
 #include "AtlasFrame.h"
-#include "Shared/TreeModel/TreeModelItemData.h"
+#include "TreeModelItemData.h"
 #include "DlgProjectSettings.h"
 
 #include <QApplication>

@@ -342,9 +342,9 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 	return FileDataPair();
 }
 
-/*virtual*/ QList<AtlasFrame *> PrefabModel::GetAtlasFrames() const /*override*/
+/*virtual*/ QList<AssetItemData *> PrefabModel::GetAtlasAssets() const /*override*/
 {
-	return QList<AtlasFrame *>();
+	return QList<AssetItemData *>();
 }
 
 /*virtual*/ QStringList PrefabModel::GetFontUrls() const /*override*/

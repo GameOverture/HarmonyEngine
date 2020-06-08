@@ -42,7 +42,7 @@ void AssetItemData::SetBankId(quint32 uiNewBankId)
 	m_uiBankId = uiNewBankId;
 }
 
-QString AssetItemData::GetFilter() const
+QString AssetItemData::GetFilter()
 {
 	return m_ModelRef.AssembleFilter(this);
 }

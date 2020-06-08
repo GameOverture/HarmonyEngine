@@ -43,7 +43,7 @@ void SpriteFramesModel::Remove(AtlasFrame *pFrame)
 {
 	for(int i = 0; i < m_FramesList.count(); ++i)
 	{
-		// NOTE: Don't delete this frame as the remove may be 'undone'
+		// NOTE: Don't delete this SpriteFrame as the remove may be 'undone'
 		if(m_FramesList[i]->m_pFrame == pFrame)
 		{
 			m_RemovedFrameIdMap[pFrame->GetUuid()] = m_FramesList[i];
@@ -352,9 +352,9 @@ SpriteFramesModel *SpriteStateData::GetFramesModel()
 //	stateObjOut.insert("reverse", m_pChkMapper_Reverse->IsChecked());
 //}
 
-QList<AtlasFrame *> SpriteStateData::GetAtlasFrames() const
+QList<AssetItemData *> SpriteStateData::GetAtlasFrames() const
 {
-	QList<AtlasFrame *> atlasList;
+	QList<AssetItemData *> atlasList;
 	for(int i = 0; i < m_pFramesModel->rowCount(); ++i)
 		atlasList.push_back(m_pFramesModel->GetFrameAt(i)->m_pFrame);
 
@@ -396,7 +396,7 @@ SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
 	QJsonArray frameIdsArray;
 
-	QList<AtlasFrame *> frameList = pState->GetAtlasFrames();
+	QList<AssetItemData *> frameList = pState->GetAtlasFrames();
 	for(int i = 0; i < frameList.size(); ++i)
 		frameIdsArray.append(frameList[i]->GetUuid().toString(QUuid::WithoutBraces));
 	stateFileData.m_Meta.insert("frameIds", frameIdsArray);
@@ -413,12 +413,12 @@ SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	return stateFileData;
 }
 
-/*virtual*/ QList<AtlasFrame *> SpriteModel::GetAtlasFrames() const /*override*/
+/*virtual*/ QList<AssetItemData *> SpriteModel::GetAtlasAssets() const /*override*/
 {
-	QList<AtlasFrame *> retAtlasFrameList;
+	QList<AssetItemData *> retAtlasFrameList;
 	for(int i = 0; i < m_StateList.size(); ++i)
 	{
-		QList<AtlasFrame *> atlasFrameList = static_cast<SpriteStateData *>(m_StateList[i])->GetAtlasFrames();
+		QList<AssetItemData *> atlasFrameList = static_cast<SpriteStateData *>(m_StateList[i])->GetAtlasFrames();
 		retAtlasFrameList += atlasFrameList;
 	}
 

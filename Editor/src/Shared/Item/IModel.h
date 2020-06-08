@@ -90,10 +90,10 @@ public:
 	void MoveStateBack(int iStateIndex);
 	void MoveStateForward(int iStateIndex);
 	
-	QList<AtlasFrame *> RequestFramesByUuid(IStateData *pState, QList<QUuid> requestList, int &iAffectedFrameIndexOut);
-	QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AssetItemData *> requestList, int &iAffectedFrameIndexOut);
-	void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
-	void RelinquishAllFrames();
+	//QList<AtlasFrame *> RequestFramesByUuid(IStateData *pState, QList<QUuid> requestList, int &iAffectedFrameIndexOut);
+	//QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut);
+	//void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
+	//void RelinquishAllFrames();
 
 	FileDataPair PopState(uint32 uiIndex);
 	
@@ -128,7 +128,7 @@ public:
 	virtual bool OnPrepSave() = 0;	// Prepares item for saving, and returns if valid
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const = 0;
-	virtual QList<AtlasFrame *> GetAtlasFrames() const = 0;
+	virtual QList<AssetItemData *> GetAtlasAssets() const = 0;
 	virtual QStringList GetFontUrls() const = 0;
 };
 
