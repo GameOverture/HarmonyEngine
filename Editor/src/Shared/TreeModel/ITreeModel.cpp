@@ -37,8 +37,14 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 
 bool ITreeModel::InsertTreeItem(TreeModelItemData *pNewItemData, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
 {
-	QModelIndex parentIndex = FindIndex<TreeModelItemData *>(pParentTreeItem->data(0).value<TreeModelItemData *>(), 0);
-	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
+	QModelIndex parentIndex;
+	if(pParentTreeItem)
+	{
+		parentIndex = FindIndex<TreeModelItemData *>(pParentTreeItem->data(0).value<TreeModelItemData *>(), 0);
+		iRow = (iRow < 0 ? pParentTreeItem->GetNumChildren() : iRow);
+	}
+	else
+		iRow = 0;
 
 	if(insertRow(iRow, parentIndex) == false)
 	{

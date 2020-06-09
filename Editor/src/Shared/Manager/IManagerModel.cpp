@@ -386,7 +386,9 @@ QString IManagerModel::AssembleFilter(AssetItemData *pAsset) const
 	for(int i = 0; i < sPrefixParts.size(); ++i)
 	{
 		sPrefix += sPrefixParts[i];
-		sPrefix += "/";
+
+		if(i != sPrefixParts.size() - 1)
+			sPrefix += "/";
 	}
 
 	return sPrefix;
