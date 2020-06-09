@@ -683,7 +683,7 @@ void IManagerModel::SaveMeta()
 	// TODO: rename to nextBankId
 	settingsObj.insert("startAtlasId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
 
-	QFile settingsFile(HyGlobal::ItemName(m_eITEM_TYPE, false) % HYGUIPATH_MetaExt);
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, false) % HYGUIPATH_MetaExt));
 	if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 		HyGuiLog("Couldn't open meta file for writing", LOGTYPE_Error);
