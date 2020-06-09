@@ -114,15 +114,12 @@
    </item>
    <item>
     <widget class="QTreeView" name="assetTree">
-     <property name="mouseTracking">
-      <bool>false</bool>
-     </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
+      <enum>QAbstractItemView::ExtendedSelection</enum>
      </property>
-     <attribute name="headerVisible">
-      <bool>false</bool>
-     </attribute>
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
