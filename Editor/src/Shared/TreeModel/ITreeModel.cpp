@@ -60,7 +60,7 @@ bool ITreeModel::InsertTreeItem(TreeModelItemData *pNewItemData, TreeModelItem *
 	return true;
 }
 
-QList<TreeModelItemData *> ITreeModel::GetItemsRecursively(const QModelIndex &indexRef)
+QList<TreeModelItemData *> ITreeModel::GetItemsRecursively(const QModelIndex &indexRef) const
 {
 	QList<TreeModelItemData *> returnList;
 

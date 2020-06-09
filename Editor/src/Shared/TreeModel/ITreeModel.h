@@ -52,7 +52,7 @@ public:
 	}
 
 	bool InsertTreeItem(TreeModelItemData *pNewItemData, TreeModelItem *pParentTreeItem, int iRow = -1);
-	QList<TreeModelItemData *> GetItemsRecursively(const QModelIndex &indexRef);
+	QList<TreeModelItemData *> GetItemsRecursively(const QModelIndex &indexRef) const;
 
 	virtual QVariant headerData(int iSection, Qt::Orientation orientation, int iRole = Qt::DisplayRole) const override;
 

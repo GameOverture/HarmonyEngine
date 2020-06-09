@@ -751,10 +751,31 @@ void IManagerModel::SaveRuntime()
 	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
 		if(indexRef.column() == 0)
 			return QVariant(pItemData->GetText());
-		else if(pItemData->GetType() != ITEM_Filter)
-			return QVariant("Bank: " % QString::number(GetBankIndexFromBankId(static_cast<AssetItemData *>(pItemData)->GetBankId())));
 		else
-			return QVariant();
+		{
+			if(pItemData->GetType() != ITEM_Filter)
+				return QVariant("Bank: " % QString::number(GetBankIndexFromBankId(static_cast<AssetItemData *>(pItemData)->GetBankId())));
+			else
+			{
+				QList<TreeModelItemData *> itemsInFilterList = GetItemsRecursively(indexRef);
+				quint32 uiBankId = 0;
+				bool bBankIdDetermined = false;
+				for(auto pItem : itemsInFilterList)
+				{
+					if(pItem->GetType() != ITEM_Filter)
+					{
+						if(bBankIdDetermined == false)
+						{
+							uiBankId = static_cast<AssetItemData *>(pItem)->GetBankId();
+							bBankIdDetermined = true;
+						}
+						else if(uiBankId != static_cast<AssetItemData *>(pItem)->GetBankId())
+							return QVariant("Mixed");
+					}
+				}
+				return QVariant("Bank: " % QString::number(GetBankIndexFromBankId(uiBankId)));
+			}
+		}
 
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
 		if(indexRef.column() == 0)

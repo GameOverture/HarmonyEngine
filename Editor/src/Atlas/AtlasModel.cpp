@@ -268,7 +268,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	if(QDialog::Accepted == pDlg->exec())
 	{
 		// Ensure that all current images in atlas group aren't larger than the new atlas itself
-		QJsonObject newPackerSettings;
+		QJsonObject newPackerSettings = m_BanksModel.GetBank(uiBankIndex)->m_Settings;
 		pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
 	
 		bool bPackIsValid = true;
