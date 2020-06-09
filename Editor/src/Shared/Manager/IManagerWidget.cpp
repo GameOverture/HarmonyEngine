@@ -389,7 +389,7 @@ void IManagerWidget::on_actionBankTransfer_triggered(QAction *pAction)
 void IManagerWidget::on_actionImportAssets_triggered()
 {
 	QFileDialog dlg(this);
-	dlg.setFileMode(QFileDialog::ExistingFile);
+	dlg.setFileMode(QFileDialog::ExistingFiles);
 	dlg.setViewMode(QFileDialog::Detail);
 	dlg.setWindowModality(Qt::ApplicationModal);
 	dlg.setModal(true);
@@ -527,29 +527,35 @@ void IManagerWidget::on_actionAddFilter_triggered()
 	delete pDlg;
 }
 
-void IManagerWidget::GetSelectedItems(QList<AssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut)
+void IManagerWidget::GetSelectedItems(QList<AssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut)
 {
-	selectedItemsOut.clear();
-	selectedPrefixesOut.clear();
+	selectedAssetsOut.clear();
+	selectedFiltersOut.clear();
 
 	QItemSelection selectedItems = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapSelectionToSource(ui->assetTree->selectionModel()->selection());
 	QModelIndexList selectedIndices = selectedItems.indexes();
+
+	QList<TreeModelItemData *> itemList;
 	for(int i = 0; i < selectedIndices.size(); ++i)
 	{
-		QList<TreeModelItemData *> itemsList = m_pModel->GetItemsRecursively(selectedIndices[i]);
-		for(auto item : itemsList)
-			selectedItemsOut += static_cast<AssetItemData *>(item);
+		if(selectedIndices[i].column() != 0)
+			continue;
+
+		itemList += m_pModel->GetItemsRecursively(selectedIndices[i]);;
 	}
 
-	// Poor man's unique only algorithm
-	selectedItemsOut = selectedItemsOut.toSet().toList();
-
-	for(int i = 0; i < selectedItemsOut.size();)
+	// Separate out items and filters to their own respective lists, while ignoring any duplicate items while preserving the order in 'itemList'
+	QSet<TreeModelItemData *> seenItemSet;
+	for(int i = 0; i < itemList.size(); ++i)
 	{
-		if(selectedItemsOut[i]->GetType() == ITEM_Filter)
-			selectedPrefixesOut.push_back(selectedItemsOut.takeAt(i));
+		if(seenItemSet.contains(itemList[i]))
+			continue;
+		seenItemSet.insert(itemList[i]);
+
+		if(itemList[i]->GetType() == ITEM_Filter)
+			selectedFiltersOut.append(itemList[i]);
 		else
-			++i;
+			selectedAssetsOut.append(static_cast<AssetItemData *>(itemList[i]));
 	}
 }
 

@@ -25,6 +25,11 @@ BankData *BanksModel::GetBank(uint uiIndex)
 	return m_BankList[uiIndex];
 }
 
+const BankData *BanksModel::GetBank(uint uiIndex) const
+{
+	return m_BankList[uiIndex];
+}
+
 BankData *BanksModel::AppendBank(QString sAbsPath, QJsonObject settingsObj)
 {
 	beginInsertRows(QModelIndex(), m_BankList.count(), m_BankList.count());

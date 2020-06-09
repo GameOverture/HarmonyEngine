@@ -23,7 +23,8 @@ IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 	m_ProjectRef(projRef),
 	m_eITEM_TYPE(eItemType),
 	m_MetaDir(m_ProjectRef.GetMetaDataAbsPath() + HyGlobal::ItemName(eItemType, true)),
-	m_DataDir(m_ProjectRef.GetAssetsAbsPath() + HyGlobal::ItemName(eItemType, true))
+	m_DataDir(m_ProjectRef.GetAssetsAbsPath() + HyGlobal::ItemName(eItemType, true)),
+	m_uiNextBankId(9999) // Should be properly initialized with Init()
 {
 	if(m_MetaDir.exists() == false)
 	{
@@ -39,7 +40,6 @@ IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 
 /*virtual*/ IManagerModel::~IManagerModel()
 {
-	
 }
 
 void IManagerModel::Init()
@@ -587,7 +587,7 @@ void IManagerModel::RemoveBank(quint32 uiBankId)
 	HyGuiLog("IManagerModel::RemoveBank could not find bank ID: " % QString::number(uiBankId), LOGTYPE_Error);
 }
 
-uint IManagerModel::GetBankIndexFromBankId(quint32 uiBankId)
+uint IManagerModel::GetBankIndexFromBankId(quint32 uiBankId) const
 {
 	uint uiBankIndex = 0xFFFFFFFF;
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
@@ -605,7 +605,7 @@ uint IManagerModel::GetBankIndexFromBankId(quint32 uiBankId)
 	return uiBankIndex;
 }
 
-quint32 IManagerModel::GetBankIdFromBankIndex(uint uiBankIndex)
+quint32 IManagerModel::GetBankIdFromBankIndex(uint uiBankIndex) const
 {
 	return m_BanksModel.GetBank(uiBankIndex)->GetId();
 }
@@ -747,16 +747,25 @@ void IManagerModel::SaveRuntime()
 	{
 	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
 	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
-		return QVariant(pItemData->GetText());
+		if(indexRef.column() == 0)
+			return QVariant(pItemData->GetText());
+		else if(pItemData->GetType() != ITEM_Filter)
+			return QVariant("Bank: " % QString::number(GetBankIndexFromBankId(static_cast<AssetItemData *>(pItemData)->GetBankId())));
+		else
+			return QVariant();
 
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
-		if(pItemData->GetType() != ITEM_Filter)
+		if(indexRef.column() == 0)
 		{
-			AssetItemData *pAsset = static_cast<AssetItemData *>(pItemData);
-			if(pAsset->GetErrors() != 0)
-				return QVariant(pItemData->GetIcon(SUBICON_Warning));
+			if(pItemData->GetType() != ITEM_Filter)
+			{
+				AssetItemData *pAsset = static_cast<AssetItemData *>(pItemData);
+				if(pAsset->GetErrors() != 0)
+					return QVariant(pItemData->GetIcon(SUBICON_Warning));
+			}
+			return QVariant(pItemData->GetIcon(SUBICON_None));
 		}
-		return QVariant(pItemData->GetIcon(SUBICON_None));
+		return QVariant();
 
 	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
 		if(pItemData->GetType() != ITEM_Filter)
@@ -775,6 +784,8 @@ void IManagerModel::SaveRuntime()
 	default:
 		return QVariant();
 	}
+
+	return QVariant();
 }
 
 /*virtual*/ Qt::ItemFlags IManagerModel::flags(const QModelIndex& indexRef) const /*override*/

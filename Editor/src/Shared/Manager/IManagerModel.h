@@ -85,8 +85,8 @@ public:
 	void CreateNewBank(QString sName);
 	void RemoveBank(quint32 uiBankId);
 
-	uint GetBankIndexFromBankId(quint32 uiBankId);
-	quint32 GetBankIdFromBankIndex(uint uiBankIndex);
+	uint GetBankIndexFromBankId(quint32 uiBankId) const;
+	quint32 GetBankIdFromBankIndex(uint uiBankIndex) const;
 
 	void SaveMeta();
 	void SaveRuntime(); // Saves meta, outputs runtime assets, and reloads Harmony in the editor

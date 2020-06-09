@@ -59,6 +59,7 @@ public:
 	virtual ~BanksModel();
 
 	BankData *GetBank(uint uiIndex);
+	const BankData *GetBank(uint uiIndex) const;
 
 	BankData *AppendBank(QString sAbsPath, QJsonObject settingsObj);
 	void RemoveBank(uint uiIndex);
