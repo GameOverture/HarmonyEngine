@@ -143,10 +143,10 @@ quint32 IManagerWidget::GetSelectedBankId()
 
 void IManagerWidget::DrawUpdate()
 {
-	QPoint pos(mapFromGlobal(QCursor::pos()).x(), mapFromGlobal(QCursor::pos()).y());
-	QModelIndex index = ui->assetTree->indexAt(pos);
+	//QPoint pos(mapFromGlobal(QCursor::pos()).x(), mapFromGlobal(QCursor::pos()).y());
+	//QModelIndex index = ui->assetTree->indexAt(pos);
 
-	m_Draw.SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
+	//m_Draw.SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
 	m_Draw.DrawUpdate();
 }
 

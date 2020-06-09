@@ -218,7 +218,11 @@ QList<TreeModelItemData *> ITreeModel::GetItemsRecursively(const QModelIndex &in
 		return QVariant();
 	}
 
-	return GetItem(indexRef)->data(indexRef.column());
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem)
+		return pTreeItem->data(indexRef.column());
+	
+	return QVariant();
 }
 
 TreeModelItem *ITreeModel::GetItem(const QModelIndex &indexRef) const
