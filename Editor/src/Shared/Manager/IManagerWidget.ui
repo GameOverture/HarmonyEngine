@@ -113,12 +113,12 @@
     </widget>
    </item>
    <item>
-    <widget class="AssetTreeView" name="assetTree">
+    <widget class="QTreeView" name="assetTree">
      <property name="mouseTracking">
       <bool>false</bool>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::MultiSelection</enum>
+      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
      <attribute name="headerVisible">
       <bool>false</bool>
@@ -287,13 +287,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>AssetTreeView</class>
-   <extends>QTreeView</extends>
-   <header>IManagerWidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../../../data/HyEditor.qrc"/>
  </resources>

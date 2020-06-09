@@ -50,10 +50,10 @@ ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 	return QString::localeAwareCompare(pLeftItem->GetText(), pRightItem->GetText()) < 0;
 }
 
-/*virtual*/ void AssetTreeView::currentChanged(const QModelIndex &current, const QModelIndex &previous) /*override*/
-{
-	static_cast<IManagerWidget *>(parent())->OnAssetTreeCurrentChanged(current, previous);
-}
+///*virtual*/ void AssetTreeView::currentChanged(const QModelIndex &current, const QModelIndex &previous) /*override*/
+//{
+//	static_cast<IManagerWidget *>(parent())->OnAssetTreeCurrentChanged(current, previous);
+//}
 
 IManagerWidget::IManagerWidget(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
@@ -182,37 +182,9 @@ void IManagerWidget::RefreshInfo()
 	//}
 }
 
-void IManagerWidget::OnAssetTreeCurrentChanged(const QModelIndex &current, const QModelIndex &previous)
-{
-	QList<AssetItemData *> selectedAssetsList;
-	QList<TreeModelItemData *> selectedFiltersList;
-	GetSelectedItems(selectedAssetsList, selectedFiltersList);
-
-	m_Draw.SetSelected(selectedAssetsList);
-
-	int iNumSelected = selectedAssetsList.count();
-	ui->actionRename->setEnabled(iNumSelected == 1);
-	ui->actionDeleteAssets->setEnabled(iNumSelected != 0);
-	ui->actionReplaceAssets->setEnabled(iNumSelected != 0);
-
-	// Determine the best suited icon based on selection
-	HyGuiItemType eIconType = ITEM_Unknown;
-	for(int i = 0; i < selectedAssetsList.size(); ++i)
-	{
-		if(selectedAssetsList[i]->GetType() == ITEM_Filter)
-		{
-			ui->actionReplaceAssets->setEnabled(false);
-
-			if(eIconType != ITEM_AtlasImage)
-				eIconType = ITEM_Filter;
-		}
-		else
-			eIconType = ITEM_AtlasImage;
-	}
-
-	if(eIconType != ITEM_Unknown)
-		ui->actionDeleteAssets->setIcon(HyGlobal::ItemIcon(eIconType, SUBICON_Delete));
-}
+//void IManagerWidget::OnAssetTreeCurrentChanged(const QModelIndex &current, const QModelIndex &previous)
+//{
+//}
 
 /*virtual*/ void IManagerWidget::enterEvent(QEvent *pEvent) /*override*/
 {
@@ -320,6 +292,40 @@ void IManagerWidget::on_actionReplaceAssets_triggered()
 	}
 
 	m_pModel->ReplaceAssets(selectedAssetsList);
+}
+
+void IManagerWidget::on_assetTree_clicked()
+{
+	QList<AssetItemData *> selectedAssetsList;
+	QList<TreeModelItemData *> selectedFiltersList;
+	GetSelectedItems(selectedAssetsList, selectedFiltersList);
+
+	m_Draw.SetSelected(selectedAssetsList);
+
+	int iNumSelected = selectedAssetsList.count();
+	ui->actionRename->setEnabled(iNumSelected == 1);
+	ui->actionDeleteAssets->setEnabled(iNumSelected != 0);
+	ui->actionReplaceAssets->setEnabled(iNumSelected != 0);
+
+	HyGuiLog(QString::number(iNumSelected), LOGTYPE_Normal);
+
+	// Determine the best suited icon based on selection
+	HyGuiItemType eIconType = ITEM_Unknown;
+	for(int i = 0; i < selectedAssetsList.size(); ++i)
+	{
+		if(selectedAssetsList[i]->GetType() == ITEM_Filter)
+		{
+			ui->actionReplaceAssets->setEnabled(false);
+
+			if(eIconType != ITEM_AtlasImage)
+				eIconType = ITEM_Filter;
+		}
+		else
+			eIconType = ITEM_AtlasImage;
+	}
+
+	if(eIconType != ITEM_Unknown)
+		ui->actionDeleteAssets->setIcon(HyGlobal::ItemIcon(eIconType, SUBICON_Delete));
 }
 
 void IManagerWidget::on_actionRename_triggered()

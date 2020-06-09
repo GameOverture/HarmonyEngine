@@ -29,15 +29,15 @@ public:
 	virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };
 
-class AssetTreeView : public QTreeView
-{
-public:
-	AssetTreeView(QWidget *pParent = nullptr) :
-		QTreeView(pParent)
-	{ }
-protected:
-	virtual void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
-};
+//class AssetTreeView : public QTreeView
+//{
+//public:
+//	AssetTreeView(QWidget *pParent = nullptr) :
+//		QTreeView(pParent)
+//	{ }
+//protected:
+//	virtual void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
+//};
 
 class IManagerWidget : public QWidget
 {
@@ -58,7 +58,7 @@ public:
 	void DrawUpdate();
 	void RefreshInfo();
 
-	void OnAssetTreeCurrentChanged(const QModelIndex &current, const QModelIndex &previous);
+	//void OnAssetTreeCurrentChanged(const QModelIndex &current, const QModelIndex &previous);
 
 protected:
 	virtual void enterEvent(QEvent *pEvent) override;
@@ -71,6 +71,8 @@ private Q_SLOTS:
 	void on_actionDeleteAssets_triggered();
 
 	void on_actionReplaceAssets_triggered();
+
+	void on_assetTree_clicked();
 
 	void on_actionRename_triggered();
 
