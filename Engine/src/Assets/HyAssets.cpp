@@ -83,7 +83,10 @@ HyAssets::HyAssets(HyAudioManager &audioRef, HyScene &sceneRef, std::string sDat
 	m_bInitialized(false),
 	m_pAtlases(nullptr),
 	m_uiNumAtlases(0),
-	m_pLoadedAtlasIndices(nullptr)
+	m_pLoadedAtlasIndices(nullptr),
+	m_pAudioBanks(nullptr),
+	m_uiNumAudioBanks(0),
+	m_pLoadedAudioIndices(nullptr)
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
@@ -148,7 +151,7 @@ HyAtlas *HyAssets::GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGro
 {
 	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 	{
-		if(m_pAtlases[i].GetAtlasGroupId() == uiAtlasGrpId && m_pAtlases[i].GetIndexInGroup() == uiIndexInGroup)
+		if(m_pAtlases[i].GetBankId() == uiAtlasGrpId && m_pAtlases[i].GetIndexInGroup() == uiIndexInGroup)
 			return &m_pAtlases[i];
 	}
 
@@ -417,12 +420,14 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 /*virtual*/ void HyAssets::OnThreadInit() /*override*/
 {
-	HyLog("Assets are initializing...");
+	HyLogTitle("Assets");
 
 #if defined(HY_PLATFORM_WINDOWS) && defined(HY_COMPILER_MSVC) && !defined(HY_CONFIG_SINGLETHREAD)
 	SetThreadPriority(m_Thread.native_handle(), THREAD_MODE_BACKGROUND_BEGIN);
 #endif
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ATLAS BANKS
 	std::string sAtlasInfoFilePath(m_sDATADIR + HYASSETS_AtlasDir + HYASSETS_AtlasFile);
 	std::string sAtlasInfoFileContents;
 	HyIO::ReadTextFile(sAtlasInfoFilePath.c_str(), sAtlasInfoFileContents);
@@ -434,12 +439,15 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 		// Iterate through each atlas group and determine how many textures total there are between all groups
 		m_uiNumAtlases = 0;
+		HyLog("Num Atlas Banks:  " << atlasGrpArray.size());
 		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
 		{
 			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
 			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
 			m_uiNumAtlases += static_cast<uint32>(texturesArray.size());
 		}
+		
+		HyLog("Total Num Atlases:" << m_uiNumAtlases);
 		m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNumAtlases]);
 		HyAtlas *pAtlasWriteLocation = m_pAtlases;
 
@@ -488,7 +496,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 			}
 		}
 	}
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Set HyAtlasIndices::sm_iIndexFlagsArraySize now that the total number of atlases is known
 	HyAtlasIndices::sm_iIndexFlagsArraySize = (m_uiNumAtlases / 32);
@@ -497,7 +504,24 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	m_pLoadedAtlasIndices = HY_NEW HyAtlasIndices();
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// AUDIO BANKS
+	std::string sAudioFilePath = m_sDATADIR + HYASSETS_AudioDir + HYASSETS_AudioFile;
+	if(HyIO::FileExists(sAudioFilePath))
+	{
+		// Create HyAudioBank objects to represent every sound bank file
+		std::string sAudioFileContents;
+		HyIO::ReadTextFile(sAudioFilePath.c_str(), sAudioFileContents);
+		jsonxx::Object audioObj;
+		if(audioObj.parse(sAudioFileContents))
+		{
+			for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
+				m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(sDataDir, iter->first, iter->second->get<jsonxx::Object>(), AllocateAudioBank());
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// INSTANCE ITEMS
 #ifndef HY_PLATFORM_GUI
 	std::string sGameDataFilePath(m_sDATADIR);
 	sGameDataFilePath += HYASSETS_DataFile;

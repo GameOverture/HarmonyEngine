@@ -17,6 +17,8 @@
 
 #if defined(HY_USE_SDL2)
 	#include "Audio/Harness/SDL2/HyAudio_SDL2.h"
+	#include "Audio/Harness/SDL2/HyAudioBank_SDL2.h"
+	#include "Audio/Harness/SDL2/HyAudioInst_SDL2.h"
 #elif defined(HY_PLATFORM_WINDOWS)
 	#include <Objbase.h>
 #endif
@@ -70,27 +72,17 @@ HyAudioManager::HyAudioManager(std::string sDataDir) :
 #if defined(HY_USE_SDL2)
 	// If no audio libraries were dynamically loaded, use SDL2 implementation
 	if(m_pInternal == nullptr)
+	{
 		m_pInternal = HY_NEW HyAudio_SDL2();
+		m_fpAllocateHyAudioBank = HyAudio_SDL2::AllocateBank;
+		m_fpAllocateHyAudioInst = HyAudio_SDL2::AllocateInst;
+	}
 #endif
 	
 	if(m_pInternal == nullptr)
 	{
-		HyLogInfo("No audio library detected");
+		HyLogWarning("No audio library detected");
 		m_pInternal = HY_NEW HyAudio_Null();
-	}
-
-	std::string sAudioFilePath = sDataDir + HYASSETS_AudioDir + HYASSETS_AudioFile;
-	if(HyIO::FileExists(sAudioFilePath))
-	{
-		// Create HyAudioBank objects to represent every sound bank file
-		std::string sAudioFileContents;
-		HyIO::ReadTextFile(sAudioFilePath.c_str(), sAudioFileContents);
-		jsonxx::Object audioObj;
-		if(audioObj.parse(sAudioFileContents))
-		{
-			for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
-				m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(sDataDir, iter->first, iter->second->get<jsonxx::Object>(), AllocateAudioBank());
-		}
 	}
 }
 

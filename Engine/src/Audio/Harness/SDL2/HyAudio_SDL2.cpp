@@ -9,26 +9,30 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Audio/Harness/SDL2/HyAudio_SDL2.h"
+#include "Audio/Harness/SDL2/HyAudioBank_SDL2.h"
+#include "Audio/Harness/SDL2/HyAudioInst_SDL2.h"
 #include "Diagnostics/Console/HyConsole.h"
 
 #if defined(HY_USE_SDL2)
 
 HyAudio_SDL2::HyAudio_SDL2()
 {
+	HyLogTitle("SDL2 Audio");
+
 	int32 iNumDevices = SDL_GetNumAudioDevices(0);
 	for(uint32 i = 0; i < iNumDevices; ++i)
 		m_sDeviceList.push_back(SDL_GetAudioDeviceName(i, 0));
 
-	m_Spec.freq = 48000;							// 44100 or 48000
+	m_DesiredSpec.freq = 44100;							// 44100 or 48000
 #if defined(HY_ENDIAN_LITTLE)
-	m_Spec.format = AUDIO_F32LSB;
+	m_DesiredSpec.format = AUDIO_F32LSB;
 #else
-	m_Spec.format = AUDIO_F32MSB;
+	m_DesiredSpec.format = AUDIO_F32MSB;
 #endif
-	m_Spec.channels = 2;							// 1 mono, 2 stereo, 4 quad, 6 (5.1)
-	m_Spec.samples = 4096;							// Specifies a unit of audio data to be used at a time. Must be a power of 2
-	m_Spec.callback = HyAudio_SDL2::OnCallback;
-	m_Spec.userdata = nullptr;
+	m_DesiredSpec.channels = 2;							// 1 mono, 2 stereo, 4 quad, 6 (5.1)
+	m_DesiredSpec.samples = 4096;						// Specifies a unit of audio data to be used at a time. Must be a power of 2
+	m_DesiredSpec.callback = HyAudio_SDL2::OnCallback;
+	m_DesiredSpec.userdata = this;
 
 	/*
 	* Note: If you're having issues with Emscripten / EMCC play around with these flags
@@ -39,11 +43,17 @@ HyAudio_SDL2::HyAudio_SDL2()
 	* SDL_AUDIO_ALLOW_CHANNELS_CHANGE      Allow any number of channels (e.g. AUDIO_CHANNELS being 2, allow actual 1)
 	* SDL_AUDIO_ALLOW_ANY_CHANGE           Allow all changes above
 	*/
-	m_hDevice = SDL_OpenAudioDevice(nullptr, 0, &m_Spec, nullptr, SDL_AUDIO_ALLOW_ANY_CHANGE);
+	m_hDevice = SDL_OpenAudioDevice(nullptr, 0, &m_DesiredSpec, nullptr, SDL_AUDIO_ALLOW_ANY_CHANGE);
 	if(m_hDevice == 0)
 	{
 		HyLogError("SDL_OpenAudioDevice failed: " << SDL_GetError());
+		return;
 	}
+
+	//HyLog("Default Device:   " << atlasGrpArray.size());
+	HyLog("Audio Driver:     " << SDL_GetCurrentAudioDriver());
+
+	SDL_PauseAudioDevice(m_hDevice, 0);
 }
 
 /*virtual*/ HyAudio_SDL2::~HyAudio_SDL2(void)
@@ -63,13 +73,11 @@ const char *HyAudio_SDL2::GetAudioDriver()
 
 /*static*/ void HyAudio_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)
 {
-	//Audio *audio = (Audio *)userdata;
+	//HyAudio_SDL2 *pThis = reinterpret_cast<HyAudio_SDL2 *>(pUserData);
+	//SDL_memset(pStream, 0, iLen); // If there is nothing to play, this callback should fill the buffer with silence
 	//Audio *previous = audio;
 	//int tempLength;
-	//uint8_t music = 0;
-
-	///* Silence the main buffer */
-	//SDL_memset(pStream, 0, iLen);
+	//uint8_t music = 0;	
 
 	///* First one is place holder */
 	//audio = audio->next;
@@ -120,7 +128,7 @@ const char *HyAudio_SDL2::GetAudioDriver()
 
 	//		if(audio->loop == 0)
 	//		{
-	//			gSoundCount--;
+	//			m_uiSoundCount--;
 	//		}
 
 	//		audio->next = NULL;
@@ -129,6 +137,16 @@ const char *HyAudio_SDL2::GetAudioDriver()
 	//		audio = previous->next;
 	//	}
 	//}
+}
+
+/*static*/ IHyAudioBank *HyAudio_SDL2::AllocateBank(IHyAudio *pAudio)
+{
+	return HY_NEW HyAudioBank_SDL2();
+}
+
+/*static*/ IHyAudioInst *HyAudio_SDL2::AllocateInst(IHyAudio *pAudio, const char *szPath)
+{
+	return HY_NEW HyAudioInst_SDL2();
 }
 
 #endif // defined(HY_USE_SDL2)

@@ -178,7 +178,7 @@ void HyDiagnostics::DumpAtlasUsage()
 	for(uint32 i = 0; i < m_AssetsRef.GetNumAtlases(); ++i)
 	{
 		HyAtlas *pAtlas = m_AssetsRef.GetAtlas(i);
-		uint32 uiAtlasGrpId = pAtlas->GetAtlasGroupId();
+		uint32 uiAtlasGrpId = pAtlas->GetBankId();
 
 		if(atlasGrpLoadsMap.find(uiAtlasGrpId) == atlasGrpLoadsMap.end())
 			atlasGrpLoadsMap[uiAtlasGrpId] = std::vector<bool>();

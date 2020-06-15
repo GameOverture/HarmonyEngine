@@ -42,7 +42,7 @@ class HyAudioBank;
 
 class HyAssets : public IHyThreadClass
 {
-	HyAudioManager &													m_AudioRef;
+	HyAudioManager &											m_AudioRef;
 	HyScene &													m_SceneRef;
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
@@ -50,6 +50,10 @@ class HyAssets : public IHyThreadClass
 	HyAtlas *													m_pAtlases;
 	uint32														m_uiNumAtlases;
 	HyAtlasIndices *											m_pLoadedAtlasIndices;
+
+	HyAudioBank *												m_pAudioBanks;
+	uint32														m_uiNumAudioBanks;
+	HyAtlasIndices *											m_pLoadedAudioIndices;
 
 	std::map<std::string, HyGLTF *>								m_GltfMap;
 

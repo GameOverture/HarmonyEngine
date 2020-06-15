@@ -77,7 +77,7 @@ bool HyAtlasIndices::IsEmpty() const
 
 
 HyAtlas::HyAtlas(std::string sFilePath,
-				 uint32 uiAtlasGroupId,
+				 uint32 uiBankId,
 				 uint32 uiIndexInGroup,
 				 uint32 uiMasterIndex,
 				 uint32 uiWidth,
@@ -85,11 +85,10 @@ HyAtlas::HyAtlas(std::string sFilePath,
 				 HyTextureFormat eTextureFormat,
 				 HyTextureFiltering eTextureFiltering,
 				 jsonxx::Array &srcFramesArrayRef) :
-	IHyFileData(HYFILE_Atlas),
-	m_uiATLAS_GROUP_ID(uiAtlasGroupId),
+	IHyFileData(sFilePath, HYFILE_Atlas),
+	m_uiBANK_ID(uiBankId),
 	m_uiINDEX_IN_GROUP(uiIndexInGroup),
 	m_uiMASTER_INDEX(uiMasterIndex),
-	m_sFILE_PATH(sFilePath),
 	m_uiWIDTH(uiWidth),
 	m_uiHEIGHT(uiHeight),
 	m_eTEXTURE_FORMAT(eTextureFormat),
@@ -120,9 +119,9 @@ HyAtlas::~HyAtlas()
 	DeletePixelData();
 }
 
-uint32 HyAtlas::GetAtlasGroupId() const
+uint32 HyAtlas::GetBankId() const
 {
-	return m_uiATLAS_GROUP_ID;
+	return m_uiBANK_ID;
 } 
 
 uint32 HyAtlas::GetIndexInGroup() const

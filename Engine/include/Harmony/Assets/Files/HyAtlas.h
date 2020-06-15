@@ -38,8 +38,7 @@ public:
 
 class HyAtlas : public IHyFileData
 {
-	const std::string						m_sFILE_PATH;
-	const uint32							m_uiATLAS_GROUP_ID;
+	const uint32							m_uiBANK_ID;
 	const uint32							m_uiINDEX_IN_GROUP;
 	const uint32							m_uiMASTER_INDEX;
 	const uint32							m_uiWIDTH;
@@ -70,7 +69,7 @@ class HyAtlas : public IHyFileData
 
 public:
 	HyAtlas(std::string sFilePath,
-			uint32 uiAtlasGroupId,
+			uint32 uiBankId,
 			uint32 uiIndexInGroup,
 			uint32 uiMasterIndex,
 			uint32 uiWidth,
@@ -81,7 +80,7 @@ public:
 
 	~HyAtlas();
 
-	uint32 GetAtlasGroupId() const;
+	uint32 GetBankId() const;
 	uint32 GetIndexInGroup() const;
 	uint32 GetMasterIndex() const;
 	uint32 GetWidth() const;

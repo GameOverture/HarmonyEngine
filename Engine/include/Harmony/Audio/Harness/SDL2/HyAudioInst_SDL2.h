@@ -15,18 +15,6 @@
 #if defined(HY_USE_SDL2)
 class HyAudioInst_SDL2 : public IHyAudioInst
 {
-	uint32_t length;
-	uint32_t lengthTrue;
-	uint8_t * bufferTrue;
-	uint8_t * buffer;
-	uint8_t loop;
-	uint8_t fade;
-	uint8_t free;
-	uint8_t volume;
-
-	SDL_AudioSpec audio;
-
-	HyAudioInst_SDL2 *		m_pNext;
 
 public:
 	HyAudioInst_SDL2();
