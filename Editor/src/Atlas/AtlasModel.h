@@ -78,7 +78,7 @@ private:
 //
 //	quint32 GetId()
 //	{
-//		return JSONOBJ_TOINT(m_PackerSettings, "atlasGrpId");
+//		return JSONOBJ_TOINT(m_PackerSettings, "atlasGrpId"); // TODO: rename to bankId
 //	}
 //
 //	QFileInfoList GetExistingTextureInfoList()

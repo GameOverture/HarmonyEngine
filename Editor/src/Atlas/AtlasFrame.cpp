@@ -128,6 +128,7 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 /*virtual*/ void AtlasFrame::GetJsonObj(QJsonObject &frameObj) /*override*/
 {
 	frameObj.insert("frameUUID", GetUuid().toString(QUuid::WithoutBraces));
+	// TODO: rename to bankId
 	frameObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(GetBankId())));
 	frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetChecksum())));
 	frameObj.insert("name", QJsonValue(GetName()));

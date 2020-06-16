@@ -245,10 +245,14 @@ bool HyEngine::PollPlatformApi()
 	HyAssert(pBuffer, "getcwd error");
 #endif
 
-	std::string sAbsDataDir(pBuffer);
+	std::string sAbsDataDir;
+	if(pBuffer)
+	{
+		sAbsDataDir = pBuffer;
+		sAbsDataDir += "/";
+	}
 	free(pBuffer);
 
-	sAbsDataDir += "/";
 	sAbsDataDir += HyEngine::sm_pInstance->m_Assets.GetDataDir();
 	sAbsDataDir = HyIO::CleanPath(sAbsDataDir.c_str(), "/", false);
 	

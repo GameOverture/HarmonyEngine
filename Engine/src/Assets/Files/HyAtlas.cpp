@@ -12,8 +12,9 @@
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 #include "soil2/SOIL2.h"
+#include "HyEngine.h"
 
-HyAtlas::HyAtlas(std::string sFilePath,
+HyAtlas::HyAtlas(std::string sFileName,
 				 uint32 uiBankId,
 				 uint32 uiIndexInGroup,
 				 uint32 uiMasterIndex,
@@ -22,7 +23,7 @@ HyAtlas::HyAtlas(std::string sFilePath,
 				 HyTextureFormat eTextureFormat,
 				 HyTextureFiltering eTextureFiltering,
 				 jsonxx::Array &srcFramesArrayRef) :
-	IHyFileData(sFilePath, HYFILE_Atlas),
+	IHyFileData(sFileName, HYFILE_Atlas),
 	m_uiBANK_ID(uiBankId),
 	m_uiINDEX_IN_GROUP(uiIndexInGroup),
 	m_uiMASTER_INDEX(uiMasterIndex),
@@ -128,14 +129,21 @@ void HyAtlas::OnLoadThread()
 			return;
 		}
 
-		if(m_sFILE_PATH[m_sFILE_PATH.size() - 1] == 'g')
+		char szTmpBuffer[16];
+		std::string sAtlasFilePath = Hy_DataDir() + HYASSETS_AtlasDir;
+		sprintf(szTmpBuffer, "%05d", m_uiBANK_ID);
+		sAtlasFilePath += szTmpBuffer;
+		sAtlasFilePath += "/";
+		sAtlasFilePath += m_sFILE_NAME;
+
+		if(sAtlasFilePath[sAtlasFilePath.size() - 1] == 'g')
 		{
 			int iWidth, iHeight, iNum8bitClrChannels; // out variables
-			m_pPixelData = SOIL_load_image(m_sFILE_PATH.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);
+			m_pPixelData = SOIL_load_image(sAtlasFilePath.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);
 			m_uiPixelDataSize = iWidth * iHeight * 4;
 		}
 		else
-			m_pPixelData = SOIL_load_DDS(m_sFILE_PATH.c_str(), &m_uiPixelDataSize, 0);
+			m_pPixelData = SOIL_load_DDS(sAtlasFilePath.c_str(), &m_uiPixelDataSize, 0);
 
 		// Use PBO/DMA transfer if available
 		if(m_pGfxApiPixelBuffer)

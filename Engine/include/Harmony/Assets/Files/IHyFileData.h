@@ -19,7 +19,7 @@ class IHyFileData
 	friend class HyAssets;
 
 protected:
-	const std::string				m_sFILE_PATH;
+	const std::string				m_sFILE_NAME;
 	const HyFileType				m_eLOADABLE_TYPE;
 
 	HyLoadState						m_eLoadState;
@@ -29,8 +29,8 @@ protected:
 	uint8 *							m_pGfxApiPixelBuffer;
 
 public:
-	IHyFileData(std::string sFilePath, HyFileType eType) :
-		m_sFILE_PATH(sFilePath),
+	IHyFileData(std::string sFileName, HyFileType eType) :
+		m_sFILE_NAME(sFileName),
 		m_eLOADABLE_TYPE(eType),
 		m_eLoadState(HYLOADSTATE_Inactive),
 		m_uiRefCount(0),

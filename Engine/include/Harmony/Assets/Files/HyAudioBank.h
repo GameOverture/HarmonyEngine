@@ -2,7 +2,7 @@
 *	HyAudioBank.h
 *	
 *	Harmony Engine
-*	Copyright (c) 2019 Jason Knobler
+*	Copyright (c) 2020 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -16,16 +16,11 @@
 
 class HyAudioBank : public IHyFileData
 {
-	const std::string		m_sNAME_ID;
-	const std::string		m_sPATH;
-	const bool				m_bIS_MASTER;
 	IHyAudioBank *			m_pInternal;
 
 public:
-	HyAudioBank(const std::string &sDataDir, const std::string &sNameId, const jsonxx::Object &initObj, IHyAudioBank *pInternal);
+	HyAudioBank(std::string sFilePath, IHyAudioBank *pInternal);
 	virtual ~HyAudioBank();
-
-	bool IsMaster() const;
 
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;

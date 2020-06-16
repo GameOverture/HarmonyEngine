@@ -48,7 +48,7 @@ class HyAtlas : public IHyFileData
 	std::mutex								m_Mutex_PixelData;
 
 public:
-	HyAtlas(std::string sFilePath,
+	HyAtlas(std::string sFileName,
 			uint32 uiBankId,
 			uint32 uiIndexInGroup,
 			uint32 uiMasterIndex,

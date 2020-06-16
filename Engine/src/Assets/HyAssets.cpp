@@ -80,7 +80,13 @@ HyAssets::HyAssets(HyAudioManager &audioRef, HyScene &sceneRef, std::string sDat
 	m_AudioRef(audioRef),
 	m_SceneRef(sceneRef),
 	m_sDATADIR(HyIO::CleanPath(sDataDirPath.c_str(), "/", true)),
-	m_bInitialized(false)
+	m_bInitialized(false),
+	m_pAtlases(nullptr),
+	m_uiNumAtlases(0),
+	m_pLoadedAtlasIndices(nullptr),
+	m_pAudioFiles(nullptr),
+	m_uiNumAudioFiles(0),
+	m_pLoadedAudioManifest(nullptr)
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
@@ -429,19 +435,20 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	jsonxx::Object atlasFileObj;
 	if(atlasFileObj.parse(sAtlasInfoFileContents))
 	{
+		// TODO: rename to banks
 		jsonxx::Array atlasGrpArray = atlasFileObj.get<jsonxx::Array>("atlasGroups");
 
 		// Iterate through each atlas group and determine how many textures total there are between all groups
 		m_uiNumAtlases = 0;
-		HyLog("Num Atlas Banks:  " << atlasGrpArray.size());
 		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
 		{
 			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
+
+			// TODO: rename to assets
 			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
 			m_uiNumAtlases += static_cast<uint32>(texturesArray.size());
 		}
-		
-		HyLog("Total Num Atlases:" << m_uiNumAtlases);
+
 		m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNumAtlases]);
 		HyAtlas *pAtlasWriteLocation = m_pAtlases;
 
@@ -451,21 +458,20 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
 		{
 			jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
+
+			// TODO: rename to bankId
 			uint32 uiAtlasGroupId = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("atlasGrpId"));
 
-			std::string sRootAtlasFilePath = m_sDATADIR + HYASSETS_AtlasDir;
-			sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
-			sRootAtlasFilePath += szTmpBuffer;
-			sRootAtlasFilePath += "/";
+			
 
+			// TODO: rename to assets
 			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
 			for(uint32 j = 0; j < static_cast<uint32>(texturesArray.size()); ++j)
 			{
 				HyAssert(uiMasterIndex < m_uiNumAtlases, "HyAssets::OnThreadInit instantiated too many atlases");
 
-				std::string sAtlasFilePath = sRootAtlasFilePath;
 				std::sprintf(szTmpBuffer, "%05d", j);
-				sAtlasFilePath += szTmpBuffer;
+				std::string sAtlasFilePath = szTmpBuffer;
 
 				uint32 uiTextureFormat = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureType"));
 				uint32 uiTextureFiltering = atlasGrpObj.has<jsonxx::Number>("textureFiltering") ? static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureFiltering")) : HYTEXFILTER_BILINEAR;
@@ -500,19 +506,49 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// AUDIO BANKS
-	//std::string sAudioFilePath = m_sDATADIR + HYASSETS_AudioDir + HYASSETS_AudioFile;
-	//if(HyIO::FileExists(sAudioFilePath))
-	//{
-	//	// Create HyAudioBank objects to represent every sound bank file
-	//	std::string sAudioFileContents;
-	//	HyIO::ReadTextFile(sAudioFilePath.c_str(), sAudioFileContents);
-	//	jsonxx::Object audioObj;
-	//	if(audioObj.parse(sAudioFileContents))
-	//	{
-	//		for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
-	//			m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(sDataDir, iter->first, iter->second->get<jsonxx::Object>(), AllocateAudioBank());
-	//	}
-	//}
+	//m_pAudioFiles;
+	//m_uiNumAudioFiles;
+	//m_pLoadedAudioManifest;
+
+	std::string sManifestFilePath = m_sDATADIR + HYASSETS_AudioDir + HYASSETS_AudioFile;
+	if(HyIO::FileExists(sManifestFilePath) == false)
+	{
+		HyLogWarning("Missing asset manifest file: " << sManifestFilePath);
+		//return;
+	}
+
+	std::string sManifestFileContents;
+	HyIO::ReadTextFile(sManifestFilePath.c_str(), sManifestFileContents);
+	jsonxx::Object fileObj;
+	if(fileObj.parse(sManifestFileContents) == false)
+	{
+		HyLogWarning("Failed to parse manifest: " << sManifestFileContents);
+		//return;
+	}
+
+	// TODO: rename to banks
+	jsonxx::Array banksArray = atlasFileObj.get<jsonxx::Array>("atlasGroups");
+	m_uiNumAudioFiles = static_cast<uint32>(banksArray.size());
+
+	m_pAudioFiles = reinterpret_cast<HyAudioBank *>(HY_NEW unsigned char[sizeof(HyAudioBank) * m_uiNumAudioFiles]);
+	HyAudioBank *pPlacementLocation = m_pAudioFiles;
+
+	char szTmpBuffer[16];
+	for(uint32 i = 0; i < m_uiNumAudioFiles; ++i)
+	{
+		jsonxx::Object bankObj = banksArray.get<jsonxx::Object>(i);
+
+		// TODO: rename to bankId
+		uint32 uiAtlasGroupId = static_cast<uint32>(bankObj.get<jsonxx::Number>("atlasGrpId"));
+
+		std::string sBankFilePath = m_sDATADIR + HYASSETS_AudioDir;
+		sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
+		sBankFilePath += szTmpBuffer;
+
+		new (pPlacementLocation)HyAudioBank(sBankFilePath, m_AudioRef.AllocateAudioBank());
+		++pPlacementLocation;
+	}
+	
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INSTANCE ITEMS

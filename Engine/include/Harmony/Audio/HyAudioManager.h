@@ -39,7 +39,6 @@ public:
 
 	void Update();
 
-private:
 	IHyAudioBank *AllocateAudioBank();
 };
 

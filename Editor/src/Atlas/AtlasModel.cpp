@@ -328,7 +328,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 										   HyGlobal::GetItemFromAtlasItem(static_cast<AtlasItemType>(metaObj["type"].toInt())),
 										   QUuid(metaObj["frameUUID"].toString()),
 										   JSONOBJ_TOINT(metaObj, "checksum"),
-										   JSONOBJ_TOINT(metaObj, "atlasGrpId"),
+										   JSONOBJ_TOINT(metaObj, "atlasGrpId"), // TODO: rename to bankId
 										   metaObj["name"].toString(),
 										   rAlphaCrop,
 										   metaObj["width"].toInt(),
@@ -497,6 +497,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		QJsonObject atlasGrpObj;
 		atlasGrpObj.insert("width", m_BanksModel.GetBank(i)->m_Settings["sbTextureWidth"].toInt());
 		atlasGrpObj.insert("height", m_BanksModel.GetBank(i)->m_Settings["sbTextureHeight"].toInt());
+		// TODO: rename to bankId
 		atlasGrpObj.insert("atlasGrpId", m_BanksModel.GetBank(i)->m_Settings["atlasGrpId"].toInt());
 		atlasGrpObj.insert("textureType", m_BanksModel.GetBank(i)->m_Settings["textureType"].toInt());
 
@@ -525,6 +526,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		for(int i = 0; i < frameArrayList.size(); ++i)
 			textureArray.append(frameArrayList[i]);
 
+		// TODO: rename to assets
 		atlasGrpObj.insert("textures", textureArray);
 
 		atlasGrpArray.append(atlasGrpObj);
