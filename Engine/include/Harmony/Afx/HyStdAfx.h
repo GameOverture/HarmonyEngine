@@ -96,6 +96,7 @@ enum HyFileType
 	HYFILE_Atlas = 0,
 	HYFILE_GLTF,
 	HYFILE_AudioBank,
+	HYFILE_Shader,
 
 	HYNUM_FILETYPES
 };

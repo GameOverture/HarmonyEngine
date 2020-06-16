@@ -44,8 +44,6 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 	}
 #endif
 
-	m_Renderer.UploadDefaultShaders();
-
 	sm_pInstance = this;
 }
 

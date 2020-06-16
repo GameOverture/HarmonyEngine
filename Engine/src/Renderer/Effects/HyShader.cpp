@@ -14,6 +14,7 @@
 /*static*/ HyShaderHandle HyShader::sm_hHandleCount = 0;
 
 HyShader::HyShader(HyShaderProgramDefaults eDefaultsFrom) :
+	IHyFileData("", HYFILE_Shader),
 	m_hHANDLE(++sm_hHandleCount),
 	m_eDEFAULTS_FROM(eDefaultsFrom),
 	m_bIsFinalized(false),
@@ -87,34 +88,45 @@ std::vector<HyShaderVertexAttribute> &HyShader::GetVertextAttributes()
 
 void HyShader::Finalize()
 {
+	IHyRenderer::AddShader(this);
+	m_bIsFinalized = true;
+}
+
+/*virtual*/ void HyShader::OnLoadThread() /*override*/
+{
+}
+
+/*virtual*/ void HyShader::OnRenderThread(IHyRenderer &rendererRef) /*override*/
+{
+	rendererRef.UploadShader(this);
+
 	// Calculate the stride based on the specified vertex attributes
 	m_uiStride = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(m_VertexAttributeList.size()); ++i)
 	{
 		switch(m_VertexAttributeList[i].eVarType)
 		{
-		case HyShaderVariable::boolean:	m_uiStride += sizeof(bool);			break;
+		case HyShaderVariable::boolean:		m_uiStride += sizeof(bool);			break;
 		case HyShaderVariable::int32:		m_uiStride += sizeof(int32);		break;
-		case HyShaderVariable::uint32:	m_uiStride += sizeof(uint32);		break;
-		case HyShaderVariable::float32:	m_uiStride += sizeof(float);		break;
+		case HyShaderVariable::uint32:		m_uiStride += sizeof(uint32);		break;
+		case HyShaderVariable::float32:		m_uiStride += sizeof(float);		break;
 		case HyShaderVariable::double64:	m_uiStride += sizeof(double);		break;
-		case HyShaderVariable::bvec2:	m_uiStride += sizeof(glm::bvec2);	break;
-		case HyShaderVariable::bvec3:	m_uiStride += sizeof(glm::bvec3);	break;
-		case HyShaderVariable::bvec4:	m_uiStride += sizeof(glm::bvec4);	break;
-		case HyShaderVariable::ivec2:	m_uiStride += sizeof(glm::ivec2);	break;
-		case HyShaderVariable::ivec3:	m_uiStride += sizeof(glm::ivec3);	break;
-		case HyShaderVariable::ivec4:	m_uiStride += sizeof(glm::ivec4);	break;
-		case HyShaderVariable::vec2:	m_uiStride += sizeof(glm::vec2);	break;
-		case HyShaderVariable::vec3:	m_uiStride += sizeof(glm::vec3);	break;
-		case HyShaderVariable::vec4:	m_uiStride += sizeof(glm::vec4);	break;
-		case HyShaderVariable::dvec2:	m_uiStride += sizeof(glm::dvec2);	break;
-		case HyShaderVariable::dvec3:	m_uiStride += sizeof(glm::dvec3);	break;
-		case HyShaderVariable::dvec4:	m_uiStride += sizeof(glm::dvec4);	break;
-		case HyShaderVariable::mat3:	m_uiStride += sizeof(glm::mat3);	break;
-		case HyShaderVariable::mat4:	m_uiStride += sizeof(glm::mat4);	break;
+		case HyShaderVariable::bvec2:		m_uiStride += sizeof(glm::bvec2);	break;
+		case HyShaderVariable::bvec3:		m_uiStride += sizeof(glm::bvec3);	break;
+		case HyShaderVariable::bvec4:		m_uiStride += sizeof(glm::bvec4);	break;
+		case HyShaderVariable::ivec2:		m_uiStride += sizeof(glm::ivec2);	break;
+		case HyShaderVariable::ivec3:		m_uiStride += sizeof(glm::ivec3);	break;
+		case HyShaderVariable::ivec4:		m_uiStride += sizeof(glm::ivec4);	break;
+		case HyShaderVariable::vec2:		m_uiStride += sizeof(glm::vec2);	break;
+		case HyShaderVariable::vec3:		m_uiStride += sizeof(glm::vec3);	break;
+		case HyShaderVariable::vec4:		m_uiStride += sizeof(glm::vec4);	break;
+		case HyShaderVariable::dvec2:		m_uiStride += sizeof(glm::dvec2);	break;
+		case HyShaderVariable::dvec3:		m_uiStride += sizeof(glm::dvec3);	break;
+		case HyShaderVariable::dvec4:		m_uiStride += sizeof(glm::dvec4);	break;
+		case HyShaderVariable::mat3:		m_uiStride += sizeof(glm::mat3);	break;
+		case HyShaderVariable::mat4:		m_uiStride += sizeof(glm::mat4);	break;
 		}
 	}
 
 	m_bIsFinalized = true;
-	IHyRenderer::AddShader(this);
 }

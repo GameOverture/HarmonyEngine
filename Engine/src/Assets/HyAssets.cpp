@@ -627,6 +627,10 @@ void HyAssets::DequeData(IHyFileData *pData)
 
 void HyAssets::FinalizeData(IHyFileData *pData)
 {
+	// TODO: this for now...
+	if(pData->GetLoadableType() == HYFILE_Shader)
+		return;
+
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Inactive, "HyAssets::FinalizeData was passed data that was HYLOADSTATE_Inactive");
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Loaded, "HyAssets::FinalizeData was passed data that was HYLOADSTATE_Loaded");
 

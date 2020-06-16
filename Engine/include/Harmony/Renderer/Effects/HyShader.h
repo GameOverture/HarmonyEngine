@@ -21,7 +21,7 @@ struct HyShaderVertexAttribute
 	uint32									uiInstanceDivisor;
 };
 
-class HyShader
+class HyShader : public IHyFileData
 {
 	friend class IHyRenderer;
 
@@ -55,6 +55,9 @@ public:
 	std::vector<HyShaderVertexAttribute> &GetVertextAttributes();
 
 	void Finalize();
+
+	virtual void OnLoadThread() override;
+	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 };
 
 #endif /* HyShader_h__ */
