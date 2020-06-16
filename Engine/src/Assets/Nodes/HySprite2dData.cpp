@@ -78,7 +78,7 @@ HySprite2dData::AnimState::AnimState(bool bLoop,
 									 bool bReverse,
 									 bool bBounce,
 									 float fDuration,
-									 HyAtlasIndices &requiredAtlasIndicesRef,
+									 HyFileIndices &requiredAtlasIndicesRef,
 									 jsonxx::Array &frameArray,
 									 HyAssets &assetsRef) :
 	m_bLOOP(bLoop),

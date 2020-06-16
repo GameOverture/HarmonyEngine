@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Threading/IHyThreadClass.h"
+#include "Assets/Files/HyFilesManifest.h"
 #include "Utilities/HyMath.h"
 
 #define HYASSETS_DataFile "data.json"
@@ -36,7 +37,6 @@ class HyText2dData;
 class HyTexturedQuad2dData;
 class HyPrefabData;
 class HyAtlas;
-class HyAtlasIndices;
 class HyGLTF;
 class HyAudioBank;
 
@@ -47,9 +47,10 @@ class HyAssets : public IHyThreadClass
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
 
+	
 	HyAtlas *													m_pAtlases;
 	uint32														m_uiNumAtlases;
-	HyAtlasIndices *											m_pLoadedAtlasIndices;
+	HyFileIndices *												m_pLoadedAtlasIndices;
 
 	std::map<std::string, HyGLTF *>								m_GltfMap;
 
@@ -91,7 +92,7 @@ public:
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 	HyAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
 	uint32 GetNumAtlases();
-	HyAtlasIndices *GetLoadedAtlases();
+	HyFileIndices *GetLoadedAtlases();
 
 	HyGLTF *GetGltf(const std::string &sIdentifier);
 

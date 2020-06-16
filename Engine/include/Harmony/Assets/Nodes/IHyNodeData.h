@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/HyAtlas.h"
+#include "Assets/Files/HyFilesManifest.h"
 
 class IHyRenderer;
 class HyGLTF;
@@ -22,7 +23,7 @@ class IHyNodeData
 	const std::string				m_sPATH;
 
 protected:
-	HyAtlasIndices					m_RequiredAtlasIndices;
+	HyFileIndices					m_RequiredAtlasIndices;
 	HyGLTF *						m_pGltf;
 	HyAudioBank *					m_pAudioBank;
 
@@ -31,7 +32,7 @@ public:
 	virtual ~IHyNodeData(void);
 	
 	const std::string &GetPath() const;
-	const HyAtlasIndices &GetRequiredAtlasIndices() const;
+	const HyFileIndices &GetRequiredAtlasIndices() const;
 	HyGLTF *GetGltf() const;
 	HyAudioBank *GetAudioBank() const;
 

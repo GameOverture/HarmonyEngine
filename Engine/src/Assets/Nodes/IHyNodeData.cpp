@@ -12,6 +12,7 @@
 
 IHyNodeData::IHyNodeData(const std::string &sPath) :
 	m_sPATH(sPath),
+	m_RequiredAtlasIndices(HYFILE_Atlas),
 	m_pGltf(nullptr),
 	m_pAudioBank(nullptr)
 { }
@@ -24,7 +25,7 @@ const std::string &IHyNodeData::GetPath() const
 	return m_sPATH;
 }
 
-const HyAtlasIndices &IHyNodeData::GetRequiredAtlasIndices() const
+const HyFileIndices &IHyNodeData::GetRequiredAtlasIndices() const
 {
 	return m_RequiredAtlasIndices;
 }

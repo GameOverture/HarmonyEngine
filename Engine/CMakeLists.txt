@@ -24,6 +24,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/HyAssets.cpp
 	src/Assets/Files/HyAtlas.cpp
 	src/Assets/Files/HyAudioBank.cpp
+	src/Assets/Files/HyFilesManifest.cpp
 	src/Assets/Files/HyGLTF.cpp
 	src/Assets/Nodes/HyAudioData.cpp
 	src/Assets/Nodes/HyEntityData.cpp
@@ -122,6 +123,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Assets/HyAssets.h
 	include/Harmony/Assets/Files/HyAtlas.h
 	include/Harmony/Assets/Files/HyAudioBank.h
+	include/Harmony/Assets/Files/HyFilesManifest.h
 	include/Harmony/Assets/Files/HyGLTF.h
 	include/Harmony/Assets/Files/IHyFileData.h
 	include/Harmony/Assets/Nodes/HyAudioData.h
