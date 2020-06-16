@@ -157,7 +157,7 @@ uint32 HyAssets::GetNumAtlases()
 	return m_uiNumAtlases;
 }
 
-HyFileIndices *HyAssets::GetLoadedAtlases()
+HyFilesManifest *HyAssets::GetLoadedAtlases()
 {
 	return m_pLoadedAtlasIndices;
 }
@@ -218,7 +218,7 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 	bool bFullyLoaded = true;
 	if(pLoadable->AcquireData() != nullptr)
 	{
-		const HyFileIndices &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
+		const HyFilesManifest &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
 		if(requiredAtlases.IsEmpty() == false)
 		{
 			for(uint32 i = 0; i < m_uiNumAtlases; ++i)
@@ -271,7 +271,7 @@ void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 
 	if(pLoadable->AcquireData() != nullptr)
 	{
-		const HyFileIndices &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
+		const HyFilesManifest &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
 		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 		{
 			if(requiredAtlases.IsSet(i))
@@ -309,7 +309,7 @@ bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 	if(pLoadable->AcquireData() != nullptr)
 	{
 		// Atlases check
-		const HyFileIndices &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
+		const HyFilesManifest &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
 		if(m_pLoadedAtlasIndices->IsSet(requiredAtlases) == false)
 			return false;
 
@@ -491,12 +491,12 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		}
 	}
 
-	// Set HyFileIndices::sm_iIndexFlagsArraySize now that the total number of atlases is known
-	HyFileIndices::sm_iIndexFlagsArraySize[HYFILE_Atlas] = (m_uiNumAtlases / 32);
+	// Set HyFilesManifest::sm_iIndexFlagsArraySize now that the total number of atlases is known
+	HyFilesManifest::sm_iIndexFlagsArraySize[HYFILE_Atlas] = (m_uiNumAtlases / 32);
 	if(m_uiNumAtlases % 32 != 0)
-		HyFileIndices::sm_iIndexFlagsArraySize[HYFILE_Atlas]++;
+		HyFilesManifest::sm_iIndexFlagsArraySize[HYFILE_Atlas]++;
 
-	m_pLoadedAtlasIndices = HY_NEW HyFileIndices(HYFILE_Atlas);
+	m_pLoadedAtlasIndices = HY_NEW HyFilesManifest(HYFILE_Atlas);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// AUDIO BANKS

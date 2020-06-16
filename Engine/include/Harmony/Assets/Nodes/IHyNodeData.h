@@ -23,7 +23,7 @@ class IHyNodeData
 	const std::string				m_sPATH;
 
 protected:
-	HyFileIndices					m_RequiredAtlasIndices;
+	HyFilesManifest					m_RequiredAtlasIndices;
 	HyGLTF *						m_pGltf;
 	HyAudioBank *					m_pAudioBank;
 
@@ -32,7 +32,7 @@ public:
 	virtual ~IHyNodeData(void);
 	
 	const std::string &GetPath() const;
-	const HyFileIndices &GetRequiredAtlasIndices() const;
+	const HyFilesManifest &GetRequiredAtlasIndices() const;
 	HyGLTF *GetGltf() const;
 	HyAudioBank *GetAudioBank() const;
 

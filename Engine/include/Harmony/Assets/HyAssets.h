@@ -47,10 +47,9 @@ class HyAssets : public IHyThreadClass
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
 
-	
 	HyAtlas *													m_pAtlases;
 	uint32														m_uiNumAtlases;
-	HyFileIndices *												m_pLoadedAtlasIndices;
+	HyFilesManifest *											m_pLoadedAtlasIndices;
 
 	std::map<std::string, HyGLTF *>								m_GltfMap;
 
@@ -92,7 +91,7 @@ public:
 	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 	HyAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
 	uint32 GetNumAtlases();
-	HyFileIndices *GetLoadedAtlases();
+	HyFilesManifest *GetLoadedAtlases();
 
 	HyGLTF *GetGltf(const std::string &sIdentifier);
 

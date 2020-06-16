@@ -32,7 +32,7 @@ class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
 			HyEngine(initStruct),
 			m_pProject(pProject)
 		{
-			m_pProject->HarmonyInitialize();
+			//m_pProject->HarmonyInitialize();
 		}
 
 		~GuiHyEngine() {

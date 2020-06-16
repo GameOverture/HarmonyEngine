@@ -87,8 +87,6 @@ std::vector<HyShaderVertexAttribute> &HyShader::GetVertextAttributes()
 
 void HyShader::Finalize()
 {
-	IHyRenderer::AddShader(this);
-
 	// Calculate the stride based on the specified vertex attributes
 	m_uiStride = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(m_VertexAttributeList.size()); ++i)
@@ -118,4 +116,5 @@ void HyShader::Finalize()
 	}
 
 	m_bIsFinalized = true;
+	IHyRenderer::AddShader(this);
 }

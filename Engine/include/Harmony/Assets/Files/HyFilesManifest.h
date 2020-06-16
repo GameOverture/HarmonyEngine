@@ -14,35 +14,25 @@
 #include "Assets/Files/IHyFileData.h"
 
 // NOTE: Can't use std::bitset because the number of bits needed is not known at compile time
-class HyFileIndices
+class HyFilesManifest
 {
 	friend class HyAssets;
 
-	static int32					sm_iIndexFlagsArraySize[HYNUM_FILETYPES];	// How many 'uint32' are needed to account for every texture index in 'm_pIndexFlags'
+	static int32					sm_iIndexFlagsArraySize[HYNUM_FILETYPES];	// How many 'uint32' are needed to account for every asset index in 'm_pIndexFlags'
 	
 	const HyFileType				m_eFILE_TYPE;
 	uint32 *						m_pIndexFlags;								// Each bit represents the respective texture index
 
 public:
-	HyFileIndices(HyFileType eFileType);
-	~HyFileIndices();
+	HyFilesManifest(HyFileType eFileType);
+	~HyFilesManifest();
 
 	bool IsSet(uint32 uiAtlasIndex) const;
-	bool IsSet(const HyFileIndices &otherRef) const;
+	bool IsSet(const HyFilesManifest &otherRef) const;
 	void Set(uint32 uiAtlasIndex);
 	void Clear(uint32 uiAtlasIndex);
 
 	bool IsEmpty() const;
-};
-
-class FileManifest
-{
-	IHyFileData *					m_pFiles;
-	uint32							m_uiNumFiles;
-	HyFileIndices					m_LoadedFiles;
-
-public:
-	FileManifest(HyFileType eFileType);
 };
 
 #endif /* HyFilesManifest_h__ */

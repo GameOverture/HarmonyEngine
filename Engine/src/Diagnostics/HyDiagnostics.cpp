@@ -171,7 +171,7 @@ uint32 HyDiagnostics::GetShowFlags()
 
 void HyDiagnostics::DumpAtlasUsage()
 {
-	HyFileIndices *pLoadedAtlases = m_AssetsRef.GetLoadedAtlases();
+	HyFilesManifest *pLoadedAtlases = m_AssetsRef.GetLoadedAtlases();
 	std::map<uint32, std::vector<bool>> atlasGrpLoadsMap;
 
 	uint32 uiNumUsed = 0;

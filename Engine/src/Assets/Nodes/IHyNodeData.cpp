@@ -25,7 +25,7 @@ const std::string &IHyNodeData::GetPath() const
 	return m_sPATH;
 }
 
-const HyFileIndices &IHyNodeData::GetRequiredAtlasIndices() const
+const HyFilesManifest &IHyNodeData::GetRequiredAtlasIndices() const
 {
 	return m_RequiredAtlasIndices;
 }
