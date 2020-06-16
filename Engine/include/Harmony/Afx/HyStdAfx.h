@@ -94,9 +94,10 @@ static_assert((int)HYPHYS_Static == (int)b2_staticBody && (int)HYPHYS_Kinematic 
 enum HyFileType
 {
 	HYFILE_Atlas = 0,
-	HYFILE_Shader,
 	HYFILE_GLTF,
-	HYFILE_AudioBank
+	HYFILE_AudioBank,
+
+	HYNUM_FILETYPES
 };
 
 enum HyAnimCtrl

@@ -51,10 +51,6 @@ class HyAssets : public IHyThreadClass
 	uint32														m_uiNumAtlases;
 	HyAtlasIndices *											m_pLoadedAtlasIndices;
 
-	HyAudioBank *												m_pAudioBanks;
-	uint32														m_uiNumAudioBanks;
-	HyAtlasIndices *											m_pLoadedAudioIndices;
-
 	std::map<std::string, HyGLTF *>								m_GltfMap;
 
 	template<typename tData>

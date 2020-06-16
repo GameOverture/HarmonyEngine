@@ -19,7 +19,7 @@
 extern std::string Hy_DataDir();
 
 HyGLTF::HyGLTF(const std::string &sIdentifier) :
-	IHyFileData(HYFILE_GLTF),
+	IHyFileData(sIdentifier, HYFILE_GLTF),
 	m_sIDENTIFIER(sIdentifier)
 {
 }

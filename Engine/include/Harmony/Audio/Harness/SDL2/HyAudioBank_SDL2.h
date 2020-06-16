@@ -16,7 +16,7 @@ class HyAudioBank_SDL2 : public IHyAudioBank
 {
 	unsigned char *			m_pBankData;
 
-	std::map<uint32, HyRectangle<int32> *>	m_ChecksumMap;
+	//std::map<uint32, HyRectangle<int32> *>	m_ChecksumMap;
 
 public:
 	HyAudioBank_SDL2();

@@ -14,7 +14,6 @@
 /*static*/ HyShaderHandle HyShader::sm_hHandleCount = 0;
 
 HyShader::HyShader(HyShaderProgramDefaults eDefaultsFrom) :
-	IHyFileData(HYFILE_Shader),
 	m_hHANDLE(++sm_hHandleCount),
 	m_eDEFAULTS_FROM(eDefaultsFrom),
 	m_bIsFinalized(false),
@@ -47,6 +46,11 @@ bool HyShader::IsFinalized()
 int32 HyShader::GetStride()
 {
 	return static_cast<int32>(m_uiStride);
+}
+
+HyShaderProgramDefaults HyShader::GetDefaults() const
+{
+	return m_eDEFAULTS_FROM;
 }
 
 const std::string &HyShader::GetSourceCode(HyShaderType eType)
@@ -84,16 +88,6 @@ std::vector<HyShaderVertexAttribute> &HyShader::GetVertextAttributes()
 void HyShader::Finalize()
 {
 	IHyRenderer::AddShader(this);
-	m_bIsFinalized = true;
-}
-
-/*virtual*/ void HyShader::OnLoadThread() /*override*/
-{
-}
-
-/*virtual*/ void HyShader::OnRenderThread(IHyRenderer &rendererRef) /*override*/
-{
-	rendererRef.UploadShader(m_eDEFAULTS_FROM, this);
 
 	// Calculate the stride based on the specified vertex attributes
 	m_uiStride = 0;
@@ -122,4 +116,6 @@ void HyShader::Finalize()
 		case HyShaderVariable::mat4:	m_uiStride += sizeof(glm::mat4);	break;
 		}
 	}
+
+	m_bIsFinalized = true;
 }

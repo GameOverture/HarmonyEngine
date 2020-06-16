@@ -18,13 +18,13 @@ class IHyFileData
 {
 	friend class HyAssets;
 
+protected:
 	const std::string				m_sFILE_PATH;
 	const HyFileType				m_eLOADABLE_TYPE;
 
 	HyLoadState						m_eLoadState;
 	uint32							m_uiRefCount;
 
-protected:
 	uint32							m_hGfxApiPbo;
 	uint8 *							m_pGfxApiPixelBuffer;
 

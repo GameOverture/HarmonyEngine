@@ -304,7 +304,7 @@ HyOpenGL::~HyOpenGL(void)
 #endif
 }
 
-/*virtual*/ void HyOpenGL::UploadShader(HyShaderProgramDefaults eDefaultsFrom, HyShader *pShader) /*override*/
+/*virtual*/ void HyOpenGL::UploadShader(HyShader *pShader) /*override*/
 {
 	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
 
@@ -314,7 +314,7 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		shaderVertexAttribListRef.clear();
 
-		switch(eDefaultsFrom)
+		switch(pShader->GetDefaults())
 		{
 		case HYSHADERPROG_QuadBatch:
 			pShader->SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
@@ -349,7 +349,7 @@ HyOpenGL::~HyOpenGL(void)
 	// If unassigned fragment shader, fill in defaults
 	if(pShader->GetSourceCode(HYSHADER_Fragment).empty())
 	{
-		switch(eDefaultsFrom)
+		switch(pShader->GetDefaults())
 		{
 		case HYSHADERPROG_QuadBatch:
 			pShader->SetSourceCode(szHYQUADBATCH_FRAGMENTSHADER, HYSHADER_Fragment);

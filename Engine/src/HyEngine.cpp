@@ -37,6 +37,8 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 {
 	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");
 
+	m_Renderer.UploadDefaultShaders();
+
 #ifndef HY_CONFIG_SINGLETHREAD
 	// TODO Cleanup: decide whether to block 
 	while(m_Assets.IsInitialized() == false)

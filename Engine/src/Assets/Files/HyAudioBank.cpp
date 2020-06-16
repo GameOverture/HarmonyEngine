@@ -14,7 +14,7 @@
 extern std::string Hy_DataDir();
 
 HyAudioBank::HyAudioBank(const std::string &sDataDir, const std::string &sNameId, const jsonxx::Object &initObj, IHyAudioBank *pInternal) :
-	IHyFileData(HYFILE_AudioBank),
+	IHyFileData(sDataDir, HYFILE_AudioBank),
 	m_sNAME_ID(sNameId),
 	m_sPATH(initObj.get<jsonxx::String>("filePath")),
 	m_bIS_MASTER(initObj.get<jsonxx::Boolean>("master")),

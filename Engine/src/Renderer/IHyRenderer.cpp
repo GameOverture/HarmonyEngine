@@ -31,9 +31,7 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 	HyAssert(sm_pInstance == nullptr, "IHyRenderer ctor called twice");
 	sm_pInstance = this;
 
-	// Built-in shaders
-	m_pShaderQuadBatch->Finalize();
-	m_pShaderPrimitive->Finalize();
+	
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -47,6 +45,13 @@ IHyRenderer::~IHyRenderer(void)
 	for(auto iter = m_StencilMap.begin(); iter != m_StencilMap.end(); ++iter)
 		delete iter->second;
 	m_StencilMap.clear();
+}
+
+void IHyRenderer::UploadDefaultShaders()
+{
+	// Built-in shaders
+	m_pShaderQuadBatch->Finalize();
+	m_pShaderPrimitive->Finalize();
 }
 
 void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)
@@ -273,7 +278,7 @@ void IHyRenderer::Render()
 /*static*/ void IHyRenderer::AddShader(HyShader *pShader)
 {
 	sm_pInstance->m_ShaderMap[pShader->GetHandle()] = pShader;
-	sm_pInstance->TxData(pShader);
+	sm_pInstance->UploadShader(pShader);
 }
 
 /*static*/ void IHyRenderer::RemoveShader(HyShader *pShader)

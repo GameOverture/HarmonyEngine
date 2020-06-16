@@ -80,13 +80,7 @@ HyAssets::HyAssets(HyAudioManager &audioRef, HyScene &sceneRef, std::string sDat
 	m_AudioRef(audioRef),
 	m_SceneRef(sceneRef),
 	m_sDATADIR(HyIO::CleanPath(sDataDirPath.c_str(), "/", true)),
-	m_bInitialized(false),
-	m_pAtlases(nullptr),
-	m_uiNumAtlases(0),
-	m_pLoadedAtlasIndices(nullptr),
-	m_pAudioBanks(nullptr),
-	m_uiNumAudioBanks(0),
-	m_pLoadedAudioIndices(nullptr)
+	m_bInitialized(false)
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
@@ -506,19 +500,19 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// AUDIO BANKS
-	std::string sAudioFilePath = m_sDATADIR + HYASSETS_AudioDir + HYASSETS_AudioFile;
-	if(HyIO::FileExists(sAudioFilePath))
-	{
-		// Create HyAudioBank objects to represent every sound bank file
-		std::string sAudioFileContents;
-		HyIO::ReadTextFile(sAudioFilePath.c_str(), sAudioFileContents);
-		jsonxx::Object audioObj;
-		if(audioObj.parse(sAudioFileContents))
-		{
-			for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
-				m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(sDataDir, iter->first, iter->second->get<jsonxx::Object>(), AllocateAudioBank());
-		}
-	}
+	//std::string sAudioFilePath = m_sDATADIR + HYASSETS_AudioDir + HYASSETS_AudioFile;
+	//if(HyIO::FileExists(sAudioFilePath))
+	//{
+	//	// Create HyAudioBank objects to represent every sound bank file
+	//	std::string sAudioFileContents;
+	//	HyIO::ReadTextFile(sAudioFilePath.c_str(), sAudioFileContents);
+	//	jsonxx::Object audioObj;
+	//	if(audioObj.parse(sAudioFileContents))
+	//	{
+	//		for(auto iter = audioObj.kv_map().begin(); iter != audioObj.kv_map().end(); ++iter)
+	//			m_AudioBankMap[iter->first] = HY_NEW HyAudioBank(sDataDir, iter->first, iter->second->get<jsonxx::Object>(), AllocateAudioBank());
+	//	}
+	//}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// INSTANCE ITEMS
@@ -633,10 +627,6 @@ void HyAssets::DequeData(IHyFileData *pData)
 
 void HyAssets::FinalizeData(IHyFileData *pData)
 {
-	// TODO: this for now...
-	if(pData->GetLoadableType() == HYFILE_Shader)
-		return;
-
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Inactive, "HyAssets::FinalizeData was passed data that was HYLOADSTATE_Inactive");
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Loaded, "HyAssets::FinalizeData was passed data that was HYLOADSTATE_Loaded");
 
