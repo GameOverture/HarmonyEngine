@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Audio/Harness/SDL2/HyAudioBank_SDL2.h"
 #include "Diagnostics/Console/HyConsole.h"
+#include "Utilities/HyIO.h"
 
 #if defined(HY_USE_SDL2)
 
@@ -22,32 +23,26 @@ HyAudioBank_SDL2::HyAudioBank_SDL2()
 
 /*virtual*/ bool HyAudioBank_SDL2::Load(std::string sFilePath) /*override*/
 {
-	SDL_RWops *pBankFile = SDL_RWFromFile(sFilePath.c_str(), "rb");
-	if(pBankFile == nullptr)
-		return false;
-
-	Sint64 iBankSize = SDL_RWsize(pBankFile);
-	m_pBankData = HY_NEW unsigned char[iBankSize + 1];
-
-	Sint64 iTotalReadObjs = 0, iCurReadObjs = 1;
-	unsigned char *pFilePtr = m_pBankData;
-	while(iTotalReadObjs < iBankSize && iCurReadObjs != 0)
+	std::string s = sFilePath;
+	s += "/door1.wav";
+	
+	m_SoundBuffers.emplace_back();
+	Buffer &bufferRef = m_SoundBuffers.back();
+	if(SDL_LoadWAV(HyIO::CleanPath(s.c_str(), "wav", false).c_str(), &bufferRef.m_Spec, &bufferRef.m_pBuffer, &bufferRef.m_uiBufferSize) == nullptr)
 	{
-		iCurReadObjs = SDL_RWread(pBankFile, pFilePtr, 1, (iBankSize - iTotalReadObjs));
-		iTotalReadObjs += iCurReadObjs;
-		pFilePtr += iCurReadObjs;
-	}
-	SDL_RWclose(pBankFile);
-
-	if(iTotalReadObjs != iBankSize)
-	{
-		HyLogError("Failed to read " << sFilePath);
-		delete[] m_pBankData;
+		HyLogError("HyAudioBank_SDL2::Load SDL_LoadWAV failed: " << SDL_GetError());
 		return false;
 	}
 
-	m_pBankData[iTotalReadObjs] = '\0';
 	return true;
+}
+
+/*virtual*/ void HyAudioBank_SDL2::Unload() /*override*/
+{
+	for(uint32 i = 0; i < m_SoundBuffers.size(); ++i)
+		SDL_FreeWAV(m_SoundBuffers[i].m_pBuffer);
+
+	m_SoundBuffers.clear();
 }
 
 #endif // defined(HY_USE_SDL2)

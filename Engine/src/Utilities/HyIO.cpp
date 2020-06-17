@@ -15,6 +15,33 @@
 
 /*static*/ void HyIO::ReadTextFile(const char *szFilePath, std::string &sContentsOut)
 {
+	//SDL_RWops *pBankFile = SDL_RWFromFile(sFilePath.c_str(), "rb");
+	//if(pBankFile == nullptr)
+	//	return false;
+
+	//Sint64 iBankSize = SDL_RWsize(pBankFile);
+	//m_pBankData = HY_NEW unsigned char[iBankSize + 1];
+
+	//Sint64 iTotalReadObjs = 0, iCurReadObjs = 1;
+	//unsigned char *pFilePtr = m_pBankData;
+	//while(iTotalReadObjs < iBankSize && iCurReadObjs != 0)
+	//{
+	//	iCurReadObjs = SDL_RWread(pBankFile, pFilePtr, 1, (iBankSize - iTotalReadObjs));
+	//	iTotalReadObjs += iCurReadObjs;
+	//	pFilePtr += iCurReadObjs;
+	//}
+	//SDL_RWclose(pBankFile);
+
+	//if(iTotalReadObjs != iBankSize)
+	//{
+	//	HyLogError("Failed to read " << sFilePath);
+	//	delete[] m_pBankData;
+	//	return false;
+	//}
+
+	//m_pBankData[iTotalReadObjs] = '\0';
+	//return true;
+
 	sContentsOut.clear();
 	if(szFilePath == nullptr)
 		return;

@@ -36,6 +36,8 @@ HyAudioBank::~HyAudioBank()
 			return;
 		}
 	}
+	else
+		m_pInternal->Unload();
 }
 
 /*virtual*/ void HyAudioBank::OnRenderThread(IHyRenderer &rendererRef) /*override*/
