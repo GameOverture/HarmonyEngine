@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyAudioBank.cpp
+*	HyFileAudio.cpp
 *	
 *	Harmony Engine
 *	Copyright (c) 2020 Jason Knobler
@@ -8,31 +8,31 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Files/HyAudioBank.h"
+#include "Assets/Files/HyFileAudio.h"
 #include "HyEngine.h"
 
 extern std::string Hy_DataDir();
 
-HyAudioBank::HyAudioBank(std::string sFilePath, IHyAudioBank *pInternal) :
-	IHyFileData(sFilePath, HYFILE_AudioBank),
+HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyAudioBank *pInternal) :
+	IHyFile(sFilePath, HYFILE_AudioBank, uiManifestIndex),
 	m_pInternal(pInternal)
 {
-	HyAssert(m_pInternal != nullptr, "HyAudioBank received a nullptr for its internal interface");
+	HyAssert(m_pInternal != nullptr, "HyFileAudio received a nullptr for its internal interface");
 }
 
-HyAudioBank::~HyAudioBank()
+HyFileAudio::~HyFileAudio()
 {
 	delete m_pInternal;
 }
 
-/*virtual*/ void HyAudioBank::OnLoadThread() /*override*/
+/*virtual*/ void HyFileAudio::OnLoadThread() /*override*/
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
 		std::string sFilePath = Hy_DataDir() + HYASSETS_AudioDir + m_sFILE_NAME;
 		if(m_pInternal->Load(sFilePath) == false)
 		{
-			HyLogError("HyAudioBank::OnLoadThread() failed");
+			HyLogError("HyFileAudio::OnLoadThread() failed");
 			return;
 		}
 	}
@@ -40,6 +40,6 @@ HyAudioBank::~HyAudioBank()
 		m_pInternal->Unload();
 }
 
-/*virtual*/ void HyAudioBank::OnRenderThread(IHyRenderer &rendererRef) /*override*/
+/*virtual*/ void HyFileAudio::OnRenderThread(IHyRenderer &rendererRef) /*override*/
 {
 }

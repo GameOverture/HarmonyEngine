@@ -15,12 +15,12 @@
 #include "Audio/Harness/IHyAudioBank.h"
 #include "Audio/Harness/IHyAudioInst.h"
 
-class HyAudioBank;
+class HyFileAudio;
 
 class HyAudioManager
 {
 	using fpAllocateHyAudio					= IHyAudio *(*)();
-	using fpAllocateHyAudioBank				= IHyAudioBank *(*)(IHyAudio *);
+	using fpAllocateHyAudioBank				= IHyAudioBank *(*)(IHyAudio *, const jsonxx::Object &);
 	using fpAllocateHyAudioInst				= IHyAudioInst *(*)(IHyAudio *, const char *);
 
 	fpAllocateHyAudio						m_fpAllocateHyAudio;
@@ -28,18 +28,17 @@ class HyAudioManager
 	fpAllocateHyAudioInst					m_fpAllocateHyAudioInst;
 	IHyAudio *								m_pInternal;
 
-	std::map<std::string, HyAudioBank *>	m_AudioBankMap;
+	std::map<std::string, HyFileAudio *>	m_AudioBankMap;
 
 public:
 	HyAudioManager(std::string sDataDir);
 	~HyAudioManager();
 
+	IHyAudioBank *AllocateAudioBank(const jsonxx::Object &bankObjRef);
 	IHyAudioInst *AllocateAudioInst(const char *szPath);
-	HyAudioBank *GetAudioBank(const std::string &sBankName);
+	HyFileAudio *GetAudioBank(const std::string &sBankName);
 
 	void Update();
-
-	IHyAudioBank *AllocateAudioBank();
 };
 
 #endif /* HyAudio_h__ */

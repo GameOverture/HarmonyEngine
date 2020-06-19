@@ -11,31 +11,30 @@
 #define IHyNodeData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Files/HyAtlas.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Assets/Files/HyFilesManifest.h"
 
 class IHyRenderer;
 class HyGLTF;
-class HyAudioBank;
+class HyFileAudio;
 
 class IHyNodeData
 {
 	const std::string				m_sPATH;
 
 protected:
-	HyFilesManifest					m_RequiredAtlasIndices;
+	HyFilesManifest					m_RequiredAtlases;
+	HyFilesManifest					m_RequiredAudio;
 	HyGLTF *						m_pGltf;
-	HyAudioBank *					m_pAudioBank;
 
 public:
 	IHyNodeData(const std::string &sPath);
 	virtual ~IHyNodeData(void);
 	
 	const std::string &GetPath() const;
-	const HyFilesManifest &GetRequiredAtlasIndices() const;
+	const HyFilesManifest &GetRequiredAtlases() const;
+	const HyFilesManifest &GetRequiredAudio() const;
 	HyGLTF *GetGltf() const;
-	HyAudioBank *GetAudioBank() const;
-
 };
 
 #endif /* IHyNodeData_h__ */

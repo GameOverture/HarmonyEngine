@@ -50,7 +50,7 @@ public:
 
 	virtual void OnUpdate() override;
 
-	static IHyAudioBank *AllocateBank(IHyAudio *pAudio);
+	static IHyAudioBank *AllocateBank(IHyAudio *pAudio, const jsonxx::Object &bankObjRef);
 	static IHyAudioInst *AllocateInst(IHyAudio *pAudio, const char *szPath);
 
 private:

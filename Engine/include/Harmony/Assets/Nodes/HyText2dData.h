@@ -88,7 +88,7 @@ class HyText2dData : public IHyNodeData
 {
 	typedef std::map<uint32, HyText2dGlyphInfo *> Typeface;
 
-	HyAtlas *						m_pAtlas;
+	HyFileAtlas *						m_pAtlas;
 
 	Typeface *						m_pTypefaces;
 	uint32							m_uiNumTypefaces;
@@ -128,7 +128,7 @@ public:
 	uint32 GetNumLayers(uint32 uiStateIndex) const;
 	const HyText2dGlyphInfo *GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const;
 	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const;
-	HyAtlas *GetAtlas() const;
+	HyFileAtlas *GetAtlas() const;
 	float GetLineHeight(uint32 uiStateIndex) const;
 	float GetLineAscender(uint32 uiStateIndex) const;
 	float GetLineDescender(uint32 uiStateIndex) const;

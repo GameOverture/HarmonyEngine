@@ -27,10 +27,10 @@ HyFilesManifest::~HyFilesManifest()
 	delete[] m_pIndexFlags;
 }
 
-bool HyFilesManifest::IsSet(uint32 uiAtlasIndex) const
+bool HyFilesManifest::IsSet(uint32 uiAssetIndex) const
 {
-	uint32 uiIndex = uiAtlasIndex / 32;
-	uint32 uiBitPos = uiAtlasIndex % 32;
+	uint32 uiIndex = uiAssetIndex / 32;
+	uint32 uiBitPos = uiAssetIndex % 32;
 
 	return 0 != (m_pIndexFlags[uiIndex] & (1 << uiBitPos));
 }
@@ -46,18 +46,18 @@ bool HyFilesManifest::IsSet(const HyFilesManifest &otherRef) const
 	return true;
 }
 
-void HyFilesManifest::Set(uint32 uiAtlasIndex)
+void HyFilesManifest::Set(uint32 uiAssetIndex)
 {
-	uint32 uiIndex = uiAtlasIndex / 32;
-	uint32 uiBitPos = uiAtlasIndex % 32;
+	uint32 uiIndex = uiAssetIndex / 32;
+	uint32 uiBitPos = uiAssetIndex % 32;
 
 	m_pIndexFlags[uiIndex] |= (1 << uiBitPos);
 }
 
-void HyFilesManifest::Clear(uint32 uiAtlasIndex)
+void HyFilesManifest::Clear(uint32 uiAssetIndex)
 {
-	uint32 uiIndex = uiAtlasIndex / 32;
-	uint32 uiBitPos = uiAtlasIndex % 32;
+	uint32 uiIndex = uiAssetIndex / 32;
+	uint32 uiBitPos = uiAssetIndex % 32;
 
 	m_pIndexFlags[uiIndex] &= ~(1 << uiBitPos);
 }

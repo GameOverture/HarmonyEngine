@@ -29,6 +29,11 @@ public:
 	void Start();
 	void Stop();
 
+	HyAudioCtrl GetState() const;
+
+	bool IsPaused();
+	void SetPause(bool bPause);
+
 	float GetPitch();
 	void SetPitch(float fPitch);
 

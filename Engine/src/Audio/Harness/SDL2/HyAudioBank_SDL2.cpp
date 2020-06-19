@@ -13,8 +13,13 @@
 
 #if defined(HY_USE_SDL2)
 
-HyAudioBank_SDL2::HyAudioBank_SDL2()
+HyAudioBank_SDL2::HyAudioBank_SDL2(const jsonxx::Object &bankObjRef)
 {
+	const jsonxx::Array &assetsArray = bankObjRef.get<jsonxx::Array>("assets");
+	for(uint32 i = 0; i < assetsArray.size(); ++i)
+	{
+		//m_ChecksumMap.insert(std::pair<uint32, std::string>(, ""));
+	}
 }
 
 /*virtual*/ HyAudioBank_SDL2::~HyAudioBank_SDL2()

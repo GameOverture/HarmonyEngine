@@ -495,13 +495,20 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
 	{
 		QJsonObject atlasGrpObj;
+
+		// TODO: rename [move width into object inside assets array]
 		atlasGrpObj.insert("width", m_BanksModel.GetBank(i)->m_Settings["sbTextureWidth"].toInt());
+		// TODO: rename [move height into object inside assets array]
 		atlasGrpObj.insert("height", m_BanksModel.GetBank(i)->m_Settings["sbTextureHeight"].toInt());
 		// TODO: rename to bankId
 		atlasGrpObj.insert("atlasGrpId", m_BanksModel.GetBank(i)->m_Settings["atlasGrpId"].toInt());
+
+		// TODO: rename [move textureType into object inside assets array]
 		atlasGrpObj.insert("textureType", m_BanksModel.GetBank(i)->m_Settings["textureType"].toInt());
 
 		QJsonArray textureArray;
+
+		// TODO: rename [frameArrayList should be broken into objects that take height, width, and textureType, then frames array]
 		QList<QJsonArray> frameArrayList;
 		QList<AssetItemData *> &atlasGrpFrameListRef = m_BanksModel.GetBank(i)->m_AssetList;
 		for(int i = 0; i < atlasGrpFrameListRef.size(); ++i)

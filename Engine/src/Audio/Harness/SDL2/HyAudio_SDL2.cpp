@@ -139,9 +139,9 @@ const char *HyAudio_SDL2::GetAudioDriver()
 	//}
 }
 
-/*static*/ IHyAudioBank *HyAudio_SDL2::AllocateBank(IHyAudio *pAudio)
+/*static*/ IHyAudioBank *HyAudio_SDL2::AllocateBank(IHyAudio *pAudio, const jsonxx::Object &bankObjRef)
 {
-	return HY_NEW HyAudioBank_SDL2();
+	return HY_NEW HyAudioBank_SDL2(bankObjRef);
 }
 
 /*static*/ IHyAudioInst *HyAudio_SDL2::AllocateInst(IHyAudio *pAudio, const char *szPath)

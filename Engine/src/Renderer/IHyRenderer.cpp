@@ -146,12 +146,12 @@ HyVertexBufferHandle IHyRenderer::AppendVertexData3d(const uint8 *pData, uint32 
 	return hReturnHandle;
 }
 
-void IHyRenderer::TxData(IHyFileData *pData)
+void IHyRenderer::TxData(IHyFile *pData)
 {
 	m_RxDataQueue.push(pData);
 }
 
-std::queue<IHyFileData *> &IHyRenderer::RxData()
+std::queue<IHyFile *> &IHyRenderer::RxData()
 {
 	return m_TxDataQueue;
 }
@@ -188,7 +188,7 @@ void IHyRenderer::ProcessMsgs()
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)
 	while(m_RxDataQueue.empty() == false)
 	{
-		IHyFileData *pData = m_RxDataQueue.front();
+		IHyFile *pData = m_RxDataQueue.front();
 		m_RxDataQueue.pop();
 
 		pData->OnRenderThread(*this);

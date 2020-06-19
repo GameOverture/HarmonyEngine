@@ -20,7 +20,7 @@ HyPrefabData::HyPrefabData(const std::string &sPath, const jsonxx::Object &itemD
 	{
 		m_UvRectList.emplace_back();
 		m_UvRectList[i].first = assetsRef.GetAtlas(static_cast<uint32>(prefabArray.get<jsonxx::Number>(i)), m_UvRectList[i].second);
-		m_RequiredAtlasIndices.Set(m_UvRectList[i].first->GetMasterIndex());
+		m_RequiredAtlases.Set(m_UvRectList[i].first->GetManifestIndex());
 	}
 
 	m_pGltf = assetsRef.GetGltf(sPath);

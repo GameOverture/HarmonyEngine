@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAtlas.cpp
+ *	HyFileAtlas.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -18,8 +18,8 @@
 
 extern std::string Hy_DataDir();
 
-HyGLTF::HyGLTF(const std::string &sIdentifier) :
-	IHyFileData(sIdentifier, HYFILE_GLTF),
+HyGLTF::HyGLTF(const std::string &sIdentifier, uint32 uiManifestIndex) :
+	IHyFile(sIdentifier, HYFILE_GLTF, uiManifestIndex),
 	m_sIDENTIFIER(sIdentifier)
 {
 }

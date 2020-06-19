@@ -66,7 +66,7 @@ HyText2dData::HyText2dData(const std::string &sPath, const jsonxx::Object &itemD
 	uint32 uiFullAtlasWidth, uiFullAtlasHeight;
 	if(m_pAtlas)
 	{
-		m_RequiredAtlasIndices.Set(m_pAtlas->GetMasterIndex());
+		m_RequiredAtlases.Set(m_pAtlas->GetManifestIndex());
 
 		uiFullAtlasWidth = m_pAtlas->GetWidth();
 		uiFullAtlasHeight = m_pAtlas->GetHeight();
@@ -184,7 +184,7 @@ const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLay
 		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_BOT_COLOR;
 }
 
-HyAtlas *HyText2dData::GetAtlas() const
+HyFileAtlas *HyText2dData::GetAtlas() const
 {
 	return m_pAtlas;
 }

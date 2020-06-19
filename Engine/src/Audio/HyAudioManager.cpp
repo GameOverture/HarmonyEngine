@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Audio/HyAudioManager.h"
-#include "Assets/Files/HyAudioBank.h"
+#include "Assets/Files/HyFileAudio.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/HyAssets.h"
 #include "Utilities/HyIO.h"
@@ -99,6 +99,14 @@ HyAudioManager::~HyAudioManager()
 #endif
 }
 
+IHyAudioBank *HyAudioManager::AllocateAudioBank(const jsonxx::Object &bankObjRef)
+{
+	if(m_fpAllocateHyAudioBank)
+		return m_fpAllocateHyAudioBank(m_pInternal, bankObjRef);
+
+	return HY_NEW HyAudioBank_Null();
+}
+
 IHyAudioInst *HyAudioManager::AllocateAudioInst(const char *szPath)
 {
 	if(m_fpAllocateHyAudioInst)
@@ -107,7 +115,7 @@ IHyAudioInst *HyAudioManager::AllocateAudioInst(const char *szPath)
 	return HY_NEW HyAudioInst_Null();
 }
 
-HyAudioBank *HyAudioManager::GetAudioBank(const std::string &sBankName)
+HyFileAudio *HyAudioManager::GetAudioBank(const std::string &sBankName)
 {
 	auto iter = m_AudioBankMap.find(sBankName);
 	if(iter != m_AudioBankMap.end())
@@ -119,12 +127,4 @@ HyAudioBank *HyAudioManager::GetAudioBank(const std::string &sBankName)
 void HyAudioManager::Update()
 {
 	m_pInternal->OnUpdate();
-}
-
-IHyAudioBank *HyAudioManager::AllocateAudioBank()
-{
-	if(m_fpAllocateHyAudioBank)
-		return m_fpAllocateHyAudioBank(m_pInternal);
-
-	return HY_NEW HyAudioBank_Null();
 }

@@ -19,14 +19,14 @@ HyTexturedQuad2dData::HyTexturedQuad2dData(uint32 uiAtlasGrpId, uint32 uiIndexIn
 	m_pAtlas(nullptr)
 {
 	m_pAtlas = assetsRef.GetAtlasUsingGroupId(m_uiATLAS_GROUP_ID, m_uiINDEX_IN_GROUP);
-	m_RequiredAtlasIndices.Set(m_pAtlas->GetMasterIndex());
+	m_RequiredAtlases.Set(m_pAtlas->GetManifestIndex());
 }
 
 HyTexturedQuad2dData::~HyTexturedQuad2dData()
 {
 }
 
-HyAtlas *HyTexturedQuad2dData::GetAtlas() const
+HyFileAtlas *HyTexturedQuad2dData::GetAtlas() const
 {
 	return m_pAtlas;
 }

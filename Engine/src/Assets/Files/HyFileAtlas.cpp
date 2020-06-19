@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAtlas.cpp
+ *	HyFileAtlas.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -8,25 +8,24 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Files/HyAtlas.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 #include "soil2/SOIL2.h"
 #include "HyEngine.h"
 
-HyAtlas::HyAtlas(std::string sFileName,
+HyFileAtlas::HyFileAtlas(std::string sFileName,
 				 uint32 uiBankId,
 				 uint32 uiIndexInGroup,
-				 uint32 uiMasterIndex,
+				 uint32 uiManifestIndex,
 				 uint32 uiWidth,
 				 uint32 uiHeight,
 				 HyTextureFormat eTextureFormat,
 				 HyTextureFiltering eTextureFiltering,
 				 jsonxx::Array &srcFramesArrayRef) :
-	IHyFileData(sFileName, HYFILE_Atlas),
+	IHyFile(sFileName, HYFILE_Atlas, uiManifestIndex),
 	m_uiBANK_ID(uiBankId),
 	m_uiINDEX_IN_GROUP(uiIndexInGroup),
-	m_uiMASTER_INDEX(uiMasterIndex),
 	m_uiWIDTH(uiWidth),
 	m_uiHEIGHT(uiHeight),
 	m_eTEXTURE_FORMAT(eTextureFormat),
@@ -51,43 +50,38 @@ HyAtlas::HyAtlas(std::string sFileName,
 	}
 }
 
-HyAtlas::~HyAtlas()
+HyFileAtlas::~HyFileAtlas()
 {
 	delete [] m_pFrames;
 	DeletePixelData();
 }
 
-uint32 HyAtlas::GetBankId() const
+uint32 HyFileAtlas::GetBankId() const
 {
 	return m_uiBANK_ID;
 } 
 
-uint32 HyAtlas::GetIndexInGroup() const
+uint32 HyFileAtlas::GetIndexInGroup() const
 {
 	return m_uiINDEX_IN_GROUP;
 }
 
-uint32 HyAtlas::GetMasterIndex() const
-{
-	return m_uiMASTER_INDEX;
-}
-
-uint32 HyAtlas::GetWidth() const
+uint32 HyFileAtlas::GetWidth() const
 {
 	return m_uiWIDTH;
 }
 
-uint32 HyAtlas::GetHeight() const
+uint32 HyFileAtlas::GetHeight() const
 {
 	return m_uiHEIGHT;
 }
 
-HyTextureHandle HyAtlas::GetTextureHandle() const
+HyTextureHandle HyFileAtlas::GetTextureHandle() const
 {
 	return m_hTextureHandle;
 }
 
-bool HyAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
+bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
 {
 	float fTexWidth = static_cast<float>(m_uiWIDTH);
 	float fTexHeight = static_cast<float>(m_uiHEIGHT);
@@ -110,14 +104,14 @@ bool HyAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
 	return false;
 }
 
-void HyAtlas::DeletePixelData()
+void HyFileAtlas::DeletePixelData()
 {
 	SOIL_free_image_data(m_pPixelData);// stbi_image_free(m_pPixelData);
 	m_pPixelData = nullptr;
 	m_uiPixelDataSize = 0;
 }
 
-void HyAtlas::OnLoadThread()
+void HyFileAtlas::OnLoadThread()
 {
 	m_Mutex_PixelData.lock();
 
@@ -151,13 +145,13 @@ void HyAtlas::OnLoadThread()
 			memcpy(m_pGfxApiPixelBuffer, m_pPixelData, m_uiPixelDataSize);
 		}
 
-		HyAssert(m_pPixelData != nullptr, "HyAtlas failed to load image data");
+		HyAssert(m_pPixelData != nullptr, "HyFileAtlas failed to load image data");
 	}
 
 	m_Mutex_PixelData.unlock();
 }
 
-void HyAtlas::OnRenderThread(IHyRenderer &rendererRef)
+void HyFileAtlas::OnRenderThread(IHyRenderer &rendererRef)
 {
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)

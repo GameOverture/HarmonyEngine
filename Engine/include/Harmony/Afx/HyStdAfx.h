@@ -113,6 +113,15 @@ enum HyAnimCtrl
 	HYANIMCTRL_DontBounce
 };
 
+enum HyAudioCtrl
+{
+	HYAUDIOCTRL_Playing,
+	HYAUDIOCTRL_Sustaining,
+	HYAUDIOCTRL_Stopped,
+	HYAUDIOCTRL_Starting,
+	HYAUDIOCTRL_Stopping
+};
+
 enum HyTextAlign
 {
 	HYALIGN_Left = 0,

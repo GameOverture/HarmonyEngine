@@ -27,7 +27,7 @@ class HyAudioManager;
 class HyScene;
 class IHyRenderer;
 class IHyLoadable;
-class IHyFileData;
+class IHyFile;
 class IHyNodeData;
 class HyEntityData;
 class HyAudioData;
@@ -36,9 +36,9 @@ class HySpine2dData;
 class HyText2dData;
 class HyTexturedQuad2dData;
 class HyPrefabData;
-class HyAtlas;
+class HyFileAtlas;
 class HyGLTF;
-class HyAudioBank;
+class HyFileAudio;
 
 class HyAssets : public IHyThreadClass
 {
@@ -47,11 +47,11 @@ class HyAssets : public IHyThreadClass
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
 
-	HyAtlas *													m_pAtlases;
+	HyFileAtlas *													m_pAtlases;
 	uint32														m_uiNumAtlases;
 	HyFilesManifest *											m_pLoadedAtlasIndices;
 
-	HyAudioBank *												m_pAudioFiles;
+	HyFileAudio *												m_pAudioFiles;
 	uint32														m_uiNumAudioFiles;
 	HyFilesManifest *											m_pLoadedAudioManifest;
 
@@ -75,12 +75,12 @@ class HyAssets : public IHyThreadClass
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
-	std::vector<IHyFileData *>									m_ReloadDataList;
+	std::vector<IHyFile *>									m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
-	std::queue<IHyFileData *>									m_Load_Prepare;
-	std::queue<IHyFileData *>									m_Load_Shared;
-	std::queue<IHyFileData *>									m_Load_Retrieval;
+	std::queue<IHyFile *>									m_Load_Prepare;
+	std::queue<IHyFile *>									m_Load_Shared;
+	std::queue<IHyFile *>									m_Load_Retrieval;
 
 public:
 	HyAssets(HyAudioManager &audioRef, HyScene &sceneRef, std::string sDataDirPath);
@@ -91,11 +91,13 @@ public:
 
 	HyAudioManager &GetAudioRef();
 
-	HyAtlas *GetAtlas(uint32 uiMasterIndex);
-	HyAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
-	HyAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
+	HyFileAtlas *GetAtlas(uint32 uiMasterIndex);
+	HyFileAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
+	HyFileAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
 	uint32 GetNumAtlases();
 	HyFilesManifest *GetLoadedAtlases();
+
+	HyFileAudio *GetAudioFile(uint32 uiManifestIndex);
 
 	HyGLTF *GetGltf(const std::string &sIdentifier);
 
@@ -116,9 +118,9 @@ protected:
 	virtual void OnThreadShutdown() override;
 
 private:
-	void QueueData(IHyFileData *pData);
-	void DequeData(IHyFileData *pData);
-	void FinalizeData(IHyFileData *pData);
+	void QueueData(IHyFile *pData);
+	void DequeData(IHyFile *pData);
+	void FinalizeData(IHyFile *pData);
 
 	void SetAsLoaded(IHyLoadable *pLoadable);
 	void SetAsUnloaded(IHyLoadable *pLoadable);

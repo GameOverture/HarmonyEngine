@@ -10,9 +10,9 @@
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
-#include "Assets/Files/HyAtlas.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Assets/Files/HyGLTF.h"
-#include "Assets/Files/HyAudioBank.h"
+#include "Assets/Files/HyFileAudio.h"
 #include "Assets/Nodes/HyEntityData.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Nodes/HySpine2dData.h"
@@ -100,7 +100,7 @@ HyAssets::~HyAssets()
 	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
 
 	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
-		m_pAtlases[i].~HyAtlas();
+		m_pAtlases[i].~HyFileAtlas();
 	unsigned char *pAtlases = reinterpret_cast<unsigned char *>(m_pAtlases);
 	delete[] pAtlases;
 	m_pAtlases = nullptr;
@@ -130,13 +130,13 @@ HyAudioManager &HyAssets::GetAudioRef()
 	return m_AudioRef;
 }
 
-HyAtlas *HyAssets::GetAtlas(uint32 uiMasterIndex)
+HyFileAtlas *HyAssets::GetAtlas(uint32 uiMasterIndex)
 {
 	HyAssert(uiMasterIndex < m_uiNumAtlases, "HyAssets::GetAtlas was given an invalid index: " << uiMasterIndex);
 	return &m_pAtlases[uiMasterIndex];
 }
 
-HyAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)
+HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)
 {
 	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 	{
@@ -147,7 +147,7 @@ HyAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)
 	return nullptr;
 }
 
-HyAtlas *HyAssets::GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup)
+HyFileAtlas *HyAssets::GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup)
 {
 	for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 	{
@@ -166,6 +166,12 @@ uint32 HyAssets::GetNumAtlases()
 HyFilesManifest *HyAssets::GetLoadedAtlases()
 {
 	return m_pLoadedAtlasIndices;
+}
+
+HyFileAudio *HyAssets::GetAudioFile(uint32 uiManifestIndex)
+{
+	HyAssert(uiManifestIndex < m_uiNumAudioFiles, "HyAssets::GetAudioFile was given an invalid index: " << uiManifestIndex);
+	return &m_pAudioFiles[uiManifestIndex];
 }
 
 HyGLTF *HyAssets::GetGltf(const std::string &sIdentifier)
@@ -224,14 +230,14 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 	bool bFullyLoaded = true;
 	if(pLoadable->AcquireData() != nullptr)
 	{
-		const HyFilesManifest &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
+		const HyFilesManifest &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlases();
 		if(requiredAtlases.IsEmpty() == false)
 		{
 			for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 			{
 				if(requiredAtlases.IsSet(i))
 				{
-					HyAtlas *pAtlas = GetAtlas(i);
+					HyFileAtlas *pAtlas = GetAtlas(i);
 					QueueData(pAtlas);
 
 					if(pAtlas->GetLoadableState() != HYLOADSTATE_Loaded)
@@ -249,13 +255,20 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 				bFullyLoaded = false;
 		}
 
-		HyAudioBank *pAudioBank = pLoadable->UncheckedGetData()->GetAudioBank();
-		if(pAudioBank)
+		const HyFilesManifest &requiredAudio = pLoadable->UncheckedGetData()->GetRequiredAudio();
+		if(requiredAudio.IsEmpty() == false)
 		{
-			QueueData(pAudioBank);
+			for(uint32 i = 0; i < m_uiNumAudioFiles; ++i)
+			{
+				if(requiredAudio.IsSet(i))
+				{
+					HyFileAudio *pAudio = GetAudioFile(i);
+					QueueData(pAudio);
 
-			if(pAudioBank->GetLoadableState() != HYLOADSTATE_Loaded)
-				bFullyLoaded = false;
+					if(pAudio->GetLoadableState() != HYLOADSTATE_Loaded)
+						bFullyLoaded = false;
+				}
+			}
 		}
 	}
 
@@ -277,12 +290,12 @@ void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 
 	if(pLoadable->AcquireData() != nullptr)
 	{
-		const HyFilesManifest &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
+		const HyFilesManifest &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlases();
 		for(uint32 i = 0; i < m_uiNumAtlases; ++i)
 		{
 			if(requiredAtlases.IsSet(i))
 			{
-				HyAtlas *pAtlas = GetAtlas(i);
+				HyFileAtlas *pAtlas = GetAtlas(i);
 				DequeData(pAtlas);
 			}
 		}
@@ -315,7 +328,7 @@ bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 	if(pLoadable->AcquireData() != nullptr)
 	{
 		// Atlases check
-		const HyFilesManifest &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlasIndices();
+		const HyFilesManifest &requiredAtlases = pLoadable->UncheckedGetData()->GetRequiredAtlases();
 		if(m_pLoadedAtlasIndices->IsSet(requiredAtlases) == false)
 			return false;
 
@@ -373,10 +386,10 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		{
 			while(m_Load_Prepare.empty() == false)
 			{
-				IHyFileData *pFileData = m_Load_Prepare.front();
+				IHyFile *pFileData = m_Load_Prepare.front();
 				if(pFileData->GetLoadableType() == HYFILE_Atlas)
 				{
-					HyAtlas *pAtlas = static_cast<HyAtlas *>(pFileData);
+					HyFileAtlas *pAtlas = static_cast<HyFileAtlas *>(pFileData);
 					uint32 uiBufferSize = pAtlas->GetWidth() * pAtlas->GetHeight() * 4;
 					pFileData->m_pGfxApiPixelBuffer = rendererRef.GetPixelBufferPtr(uiBufferSize, pFileData->m_hGfxApiPbo);
 				}
@@ -397,7 +410,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	{
 		while(m_Load_Retrieval.empty() == false)
 		{
-			IHyFileData *pData = m_Load_Retrieval.front();
+			IHyFile *pData = m_Load_Retrieval.front();
 			m_Load_Retrieval.pop();
 
 			rendererRef.TxData(pData);
@@ -408,10 +421,10 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Grab and process any returning data from the renderer
-	std::queue<IHyFileData *> &rxDataQueueRef = rendererRef.RxData();
+	std::queue<IHyFile *> &rxDataQueueRef = rendererRef.RxData();
 	while(rxDataQueueRef.empty() == false)
 	{
-		IHyFileData *pData = rxDataQueueRef.front();
+		IHyFile *pData = rxDataQueueRef.front();
 		rxDataQueueRef.pop();
 
 		FinalizeData(pData);
@@ -449,10 +462,10 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 			m_uiNumAtlases += static_cast<uint32>(texturesArray.size());
 		}
 
-		m_pAtlases = reinterpret_cast<HyAtlas *>(HY_NEW unsigned char[sizeof(HyAtlas) * m_uiNumAtlases]);
-		HyAtlas *pAtlasWriteLocation = m_pAtlases;
+		m_pAtlases = reinterpret_cast<HyFileAtlas *>(HY_NEW unsigned char[sizeof(HyFileAtlas) * m_uiNumAtlases]);
+		HyFileAtlas *pAtlasWriteLocation = m_pAtlases;
 
-		// Then iterate back over each atlas group and instantiate a HyAtlas for each texture
+		// Then iterate back over each atlas group and instantiate a HyFileAtlas for each texture
 		uint32 uiMasterIndex = 0;
 		char szTmpBuffer[16];
 		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
@@ -461,8 +474,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 			// TODO: rename to bankId
 			uint32 uiAtlasGroupId = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("atlasGrpId"));
-
-			
 
 			// TODO: rename to assets
 			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
@@ -481,7 +492,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 				else
 					sAtlasFilePath += ".dds";
 
-				new (pAtlasWriteLocation)HyAtlas(sAtlasFilePath,
+				new (pAtlasWriteLocation)HyFileAtlas(sAtlasFilePath,
 												 uiAtlasGroupId,
 												 j,
 												 uiMasterIndex,
@@ -527,11 +538,11 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	}
 
 	// TODO: rename to banks
-	jsonxx::Array banksArray = atlasFileObj.get<jsonxx::Array>("atlasGroups");
+	jsonxx::Array banksArray = fileObj.get<jsonxx::Array>("atlasGroups");
 	m_uiNumAudioFiles = static_cast<uint32>(banksArray.size());
 
-	m_pAudioFiles = reinterpret_cast<HyAudioBank *>(HY_NEW unsigned char[sizeof(HyAudioBank) * m_uiNumAudioFiles]);
-	HyAudioBank *pPlacementLocation = m_pAudioFiles;
+	m_pAudioFiles = reinterpret_cast<HyFileAudio *>(HY_NEW unsigned char[sizeof(HyFileAudio) * m_uiNumAudioFiles]);
+	HyFileAudio *pPlacementLocation = m_pAudioFiles;
 
 	char szTmpBuffer[16];
 	for(uint32 i = 0; i < m_uiNumAudioFiles; ++i)
@@ -545,7 +556,8 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
 		sBankFilePath += szTmpBuffer;
 
-		new (pPlacementLocation)HyAudioBank(sBankFilePath, m_AudioRef.AllocateAudioBank());
+		// TODO: get manifest index
+		new (pPlacementLocation)HyFileAudio(sBankFilePath, 0, m_AudioRef.AllocateAudioBank(bankObj));
 		++pPlacementLocation;
 	}
 	
@@ -569,7 +581,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		const jsonxx::Object &prefabObj = gameDataObj.get<jsonxx::Object>("Prefabs");
 
 		for(auto iter = prefabObj.kv_map().begin(); iter != prefabObj.kv_map().end(); ++iter)
-			m_GltfMap[iter->first] = HY_NEW HyGLTF(iter->first);
+			m_GltfMap[iter->first] = HY_NEW HyGLTF(iter->first, 0);
 
 		m_PrefabFactory.Init(prefabObj, *this);
 	}
@@ -587,7 +599,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 /*virtual*/ void HyAssets::OnThreadUpdate() /*override*/
 {
-	std::vector<IHyFileData *>	dataList;
+	std::vector<IHyFile *>	dataList;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
@@ -616,7 +628,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 {
 }
 
-void HyAssets::QueueData(IHyFileData *pData)
+void HyAssets::QueueData(IHyFile *pData)
 {
 	if(pData->m_uiRefCount == 0)
 	{
@@ -632,7 +644,7 @@ void HyAssets::QueueData(IHyFileData *pData)
 	pData->m_uiRefCount++;
 }
 
-void HyAssets::DequeData(IHyFileData *pData)
+void HyAssets::DequeData(IHyFile *pData)
 {
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Inactive, "Trying to DequeData that is HYLOADSTATE_Inactive");
 	HyAssert(pData->m_uiRefCount > 0, "Tried to decrement a '0' reference");
@@ -645,7 +657,7 @@ void HyAssets::DequeData(IHyFileData *pData)
 			pData->m_eLoadState = HYLOADSTATE_Discarded;
 
 			if(pData->GetLoadableType() == HYFILE_Atlas)
-				m_pLoadedAtlasIndices->Clear(static_cast<HyAtlas *>(pData)->GetMasterIndex());
+				m_pLoadedAtlasIndices->Clear(static_cast<HyFileAtlas *>(pData)->GetManifestIndex());
 
 			m_Load_Prepare.push(pData);
 		}
@@ -661,7 +673,7 @@ void HyAssets::DequeData(IHyFileData *pData)
 	}
 }
 
-void HyAssets::FinalizeData(IHyFileData *pData)
+void HyAssets::FinalizeData(IHyFile *pData)
 {
 	// TODO: this for now...
 	if(pData->GetLoadableType() == HYFILE_Shader)
@@ -683,8 +695,8 @@ void HyAssets::FinalizeData(IHyFileData *pData)
 
 			if(pData->GetLoadableType() == HYFILE_Atlas)
 			{
-				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] loaded");
-				m_pLoadedAtlasIndices->Set(static_cast<HyAtlas *>(pData)->GetMasterIndex());
+				HyLogInfo("Atlas [" << static_cast<HyFileAtlas *>(pData)->GetManifestIndex() << "] loaded");
+				m_pLoadedAtlasIndices->Set(static_cast<HyFileAtlas *>(pData)->GetManifestIndex());
 			}
 			else {
 				HyLogInfo("Custom Shader Loaded");
@@ -713,7 +725,7 @@ void HyAssets::FinalizeData(IHyFileData *pData)
 				pData->m_eLoadState = HYLOADSTATE_Queued;
 
 				if(pData->GetLoadableType() == HYFILE_Atlas) {
-					HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] reloading");
+					HyLogInfo("Atlas [" << static_cast<HyFileAtlas *>(pData)->GetManifestIndex() << "] reloading");
 				}
 				else {
 					HyLogInfo("Custom Shader reloading");
@@ -732,7 +744,7 @@ void HyAssets::FinalizeData(IHyFileData *pData)
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
 
 			if(pData->GetLoadableType() == HYFILE_Atlas)
-				HyLogInfo("Atlas [" << static_cast<HyAtlas *>(pData)->GetMasterIndex() << "] deleted")
+				HyLogInfo("Atlas [" << static_cast<HyFileAtlas *>(pData)->GetManifestIndex() << "] deleted")
 			else
 				HyLogInfo("Custom Shader deleted");
 		}

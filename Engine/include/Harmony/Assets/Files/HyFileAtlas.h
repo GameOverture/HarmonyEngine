@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAtlas.h
+ *	HyFileAtlas.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
@@ -7,20 +7,19 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HyAtlas_h__
-#define HyAtlas_h__
+#ifndef HyFileAtlas_h__
+#define HyFileAtlas_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Files/IHyFileData.h"
+#include "Assets/Files/IHyFile.h"
 #include "Utilities/HyMath.h"
 
 class HyAssets;
 
-class HyAtlas : public IHyFileData
+class HyFileAtlas : public IHyFile
 {
 	const uint32							m_uiBANK_ID;
 	const uint32							m_uiINDEX_IN_GROUP;
-	const uint32							m_uiMASTER_INDEX;
 	const uint32							m_uiWIDTH;
 	const uint32							m_uiHEIGHT;
 	const HyTextureFormat					m_eTEXTURE_FORMAT;
@@ -48,21 +47,21 @@ class HyAtlas : public IHyFileData
 	std::mutex								m_Mutex_PixelData;
 
 public:
-	HyAtlas(std::string sFileName,
+	HyFileAtlas(std::string sFileName,
 			uint32 uiBankId,
 			uint32 uiIndexInGroup,
-			uint32 uiMasterIndex,
+			uint32 uiManifestIndex,
 			uint32 uiWidth,
 			uint32 uiHeight,
 			HyTextureFormat eTextureFormat,
 			HyTextureFiltering eTextureFiltering,
 			jsonxx::Array &srcFramesArrayRef);
 
-	~HyAtlas();
+	~HyFileAtlas();
 
 	uint32 GetBankId() const;
 	uint32 GetIndexInGroup() const;
-	uint32 GetMasterIndex() const;
+	
 	uint32 GetWidth() const;
 	uint32 GetHeight() const;
 	HyTextureHandle GetTextureHandle() const;
@@ -74,4 +73,4 @@ public:
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 };
 
-#endif /* HyAtlas_h__ */
+#endif /* HyFileAtlas_h__ */

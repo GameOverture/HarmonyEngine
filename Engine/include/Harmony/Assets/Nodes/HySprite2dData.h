@@ -17,12 +17,12 @@
 
 struct HySprite2dFrame
 {
-	HyAtlas *					pAtlas;
+	HyFileAtlas *					pAtlas;
 	const HyRectangle<float>	rSRC_RECT;
 	const glm::ivec2			vOFFSET;
 	const float					fDURATION;
 
-	HySprite2dFrame(HyAtlas *pAtlas,
+	HySprite2dFrame(HyFileAtlas *pAtlas,
 					float fSrcLeft,
 					float fSrcTop,
 					float fSrcRight,

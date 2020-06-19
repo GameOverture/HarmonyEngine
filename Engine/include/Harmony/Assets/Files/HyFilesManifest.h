@@ -11,7 +11,7 @@
 #define HyFilesManifest_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Files/IHyFileData.h"
+#include "Assets/Files/IHyFile.h"
 
 // NOTE: Can't use std::bitset because the number of bits needed is not known at compile time
 class HyFilesManifest
@@ -27,10 +27,10 @@ public:
 	HyFilesManifest(HyFileType eFileType);
 	~HyFilesManifest();
 
-	bool IsSet(uint32 uiAtlasIndex) const;
+	bool IsSet(uint32 uiAssetIndex) const;
 	bool IsSet(const HyFilesManifest &otherRef) const;
-	void Set(uint32 uiAtlasIndex);
-	void Clear(uint32 uiAtlasIndex);
+	void Set(uint32 uiAssetIndex);
+	void Clear(uint32 uiAssetIndex);
 
 	bool IsEmpty() const;
 };

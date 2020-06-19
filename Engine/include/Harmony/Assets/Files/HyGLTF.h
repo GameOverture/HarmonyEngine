@@ -11,7 +11,7 @@
 #define HyGLTF_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Files/IHyFileData.h"
+#include "Assets/Files/IHyFile.h"
 #include "Renderer/Components/HyRenderBuffer.h"
 
 #include "rapidjson/document.h"
@@ -26,7 +26,7 @@
 #define TINYGLTF_USE_RAPIDJSON
 #include "tinygltf/tiny_gltf.h"
 
-class HyGLTF : public IHyFileData
+class HyGLTF : public IHyFile
 {
 	const std::string					m_sIDENTIFIER;
 	tinygltf::Model						m_AssetData;
@@ -44,7 +44,7 @@ class HyGLTF : public IHyFileData
 	};
 
 public:
-	HyGLTF(const std::string &sIdentifier);
+	HyGLTF(const std::string &sIdentifier, uint32 uiManifestIndex);
 	~HyGLTF();
 
 	const std::string &GetIdentifier() const;
