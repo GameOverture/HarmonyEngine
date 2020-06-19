@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/HyFilesManifest.h"
 
-int32 HyFilesManifest::sm_iIndexFlagsArraySize[HYNUM_FILETYPES] = { -1 };	// -1 indicates that this has not been initialized
+int32 HyFilesManifest::sm_iIndexFlagsArraySize[HYNUM_FILETYPES] = { -1, -1, -1, -1 };	// -1 indicates that this has not been initialized
 
 HyFilesManifest::HyFilesManifest(HyFileType eFileType) :
 	m_eFILE_TYPE(eFileType),

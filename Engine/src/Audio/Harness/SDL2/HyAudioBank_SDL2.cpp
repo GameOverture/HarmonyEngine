@@ -18,7 +18,9 @@ HyAudioBank_SDL2::HyAudioBank_SDL2(const jsonxx::Object &bankObjRef)
 	const jsonxx::Array &assetsArray = bankObjRef.get<jsonxx::Array>("assets");
 	for(uint32 i = 0; i < assetsArray.size(); ++i)
 	{
-		//m_ChecksumMap.insert(std::pair<uint32, std::string>(, ""));
+		jsonxx::Object assetObj = assetsArray.get<jsonxx::Object>(i);
+		m_SoundBuffers.emplace_back(assetObj.get<jsonxx::String>("fileName"));
+		m_ChecksumMap[static_cast<uint32>(assetObj.get<jsonxx::Number>("checksum"))] = &m_SoundBuffers.back();
 	}
 }
 
@@ -28,15 +30,20 @@ HyAudioBank_SDL2::HyAudioBank_SDL2(const jsonxx::Object &bankObjRef)
 
 /*virtual*/ bool HyAudioBank_SDL2::Load(std::string sFilePath) /*override*/
 {
-	std::string s = sFilePath;
-	s += "/door1.wav";
-	
-	m_SoundBuffers.emplace_back();
-	Buffer &bufferRef = m_SoundBuffers.back();
-	if(SDL_LoadWAV(HyIO::CleanPath(s.c_str(), "wav", false).c_str(), &bufferRef.m_Spec, &bufferRef.m_pBuffer, &bufferRef.m_uiBufferSize) == nullptr)
+	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBuffers.size()); ++i)
 	{
-		HyLogError("HyAudioBank_SDL2::Load SDL_LoadWAV failed: " << SDL_GetError());
-		return false;
+		std::string s = sFilePath;
+		s += "/";
+		s += m_SoundBuffers[i].m_sFileName;
+	
+		if(SDL_LoadWAV(HyIO::CleanPath(s.c_str(), "wav", false).c_str(),
+					   &m_SoundBuffers[i].m_Spec,
+					   &m_SoundBuffers[i].m_pBuffer,
+					   &m_SoundBuffers[i].m_uiBufferSize) == nullptr)
+		{
+			HyLogError("HyAudioBank_SDL2::Load SDL_LoadWAV failed: " << SDL_GetError());
+			return false;
+		}
 	}
 
 	return true;

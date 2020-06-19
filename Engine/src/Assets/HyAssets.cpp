@@ -466,7 +466,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		HyFileAtlas *pAtlasWriteLocation = m_pAtlases;
 
 		// Then iterate back over each atlas group and instantiate a HyFileAtlas for each texture
-		uint32 uiMasterIndex = 0;
+		uint32 uiManifestIndex = 0;
 		char szTmpBuffer[16];
 		for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
 		{
@@ -479,7 +479,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 			jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
 			for(uint32 j = 0; j < static_cast<uint32>(texturesArray.size()); ++j)
 			{
-				HyAssert(uiMasterIndex < m_uiNumAtlases, "HyAssets::OnThreadInit instantiated too many atlases");
+				HyAssert(uiManifestIndex < m_uiNumAtlases, "HyAssets::OnThreadInit instantiated too many atlases");
 
 				std::sprintf(szTmpBuffer, "%05d", j);
 				std::string sAtlasFilePath = szTmpBuffer;
@@ -495,7 +495,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 				new (pAtlasWriteLocation)HyFileAtlas(sAtlasFilePath,
 												 uiAtlasGroupId,
 												 j,
-												 uiMasterIndex,
+												 uiManifestIndex,
 												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")),
 												 static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")),
 												 static_cast<HyTextureFormat>(uiTextureFormat),
@@ -503,17 +503,10 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 												 texturesArray.get<jsonxx::Array>(j));
 
 				++pAtlasWriteLocation;
-				++uiMasterIndex;
+				++uiManifestIndex;
 			}
 		}
 	}
-
-	// Set HyFilesManifest::sm_iIndexFlagsArraySize now that the total number of atlases is known
-	HyFilesManifest::sm_iIndexFlagsArraySize[HYFILE_Atlas] = (m_uiNumAtlases / 32);
-	if(m_uiNumAtlases % 32 != 0)
-		HyFilesManifest::sm_iIndexFlagsArraySize[HYFILE_Atlas]++;
-
-	m_pLoadedAtlasIndices = HY_NEW HyFilesManifest(HYFILE_Atlas);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// AUDIO BANKS
@@ -556,10 +549,23 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
 		sBankFilePath += szTmpBuffer;
 
-		// TODO: get manifest index
-		new (pPlacementLocation)HyFileAudio(sBankFilePath, 0, m_AudioRef.AllocateAudioBank(bankObj));
+		new (pPlacementLocation)HyFileAudio(sBankFilePath, i, m_AudioRef.AllocateAudioBank(bankObj));
 		++pPlacementLocation;
 	}
+
+
+	// Set HyFilesManifest::sm_iIndexFlagsArraySize now that the total number of atlases is known
+	HyFilesManifest::sm_iIndexFlagsArraySize[HYFILE_Atlas] = (m_uiNumAtlases / 32);
+	if(m_uiNumAtlases % 32 != 0)
+		HyFilesManifest::sm_iIndexFlagsArraySize[HYFILE_Atlas]++;
+
+	m_pLoadedAtlasIndices = HY_NEW HyFilesManifest(HYFILE_Atlas);
+
+	HyFilesManifest::sm_iIndexFlagsArraySize[HYFILE_AudioBank] = (m_uiNumAudioFiles / 32);
+	if(m_uiNumAudioFiles % 32 != 0)
+		HyFilesManifest::sm_iIndexFlagsArraySize[HYFILE_AudioBank]++;
+
+	m_pLoadedAudioManifest = HY_NEW HyFilesManifest(HYFILE_AudioBank);
 	
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
