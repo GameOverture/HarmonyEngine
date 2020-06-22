@@ -177,7 +177,7 @@ void HyDiagnostics::DumpAtlasUsage()
 	uint32 uiNumUsed = 0;
 	for(uint32 i = 0; i < m_AssetsRef.GetNumAtlases(); ++i)
 	{
-		HyFileAtlas *pAtlas = m_AssetsRef.GetAtlas(i);
+		HyFileAtlas *pAtlas = static_cast<HyFileAtlas *>(m_AssetsRef.GetFile(HYFILE_Atlas, i));
 		uint32 uiAtlasGrpId = pAtlas->GetBankId();
 
 		if(atlasGrpLoadsMap.find(uiAtlasGrpId) == atlasGrpLoadsMap.end())

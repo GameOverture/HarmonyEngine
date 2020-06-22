@@ -89,7 +89,7 @@ const char *HyAudio_SDL2::GetAudioDriver()
 
 	/* Mix as much data as possible */
 	iLen = (iLen > audio_len ? audio_len : iLen);
-	SDL_MixAudioFormat(pStream, audio_pos, iLen, SDL_MIX_MAXVOLUME);
+	//SDL_MixAudioFormat(pStream, audio_pos, iLen, SDL_MIX_MAXVOLUME);
 	audio_pos += iLen;
 	audio_len -= iLen;
 

@@ -47,13 +47,12 @@ class HyAssets : public IHyThreadClass
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
 
-	HyFileAtlas *													m_pAtlases;
-	uint32														m_uiNumAtlases;
-	HyFilesManifest *											m_pLoadedAtlasIndices;
-
-	HyFileAudio *												m_pAudioFiles;
-	uint32														m_uiNumAudioFiles;
-	HyFilesManifest *											m_pLoadedAudioManifest;
+	struct FilesMap {
+		IHyFile *												m_pFiles = nullptr;
+		uint32													m_uiNumFiles = 0;
+		HyFilesManifest *										m_pLoadedManifest = nullptr;
+	};
+	FilesMap													m_FilesMap[HYNUM_FILETYPES];
 
 	std::map<std::string, HyGLTF *>								m_GltfMap;
 
@@ -91,13 +90,11 @@ public:
 
 	HyAudioManager &GetAudioRef();
 
-	HyFileAtlas *GetAtlas(uint32 uiMasterIndex);
+	IHyFile *GetFile(HyFileType eFileType, uint32 uiManifestIndex);
 	HyFileAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 	HyFileAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
 	uint32 GetNumAtlases();
 	HyFilesManifest *GetLoadedAtlases();
-
-	HyFileAudio *GetAudioFile(uint32 uiManifestIndex);
 
 	HyGLTF *GetGltf(const std::string &sIdentifier);
 
@@ -118,6 +115,8 @@ protected:
 	virtual void OnThreadShutdown() override;
 
 private:
+	bool ParseManifestFile(HyFileType eFileType);
+
 	void QueueData(IHyFile *pData);
 	void DequeData(IHyFile *pData);
 	void FinalizeData(IHyFile *pData);

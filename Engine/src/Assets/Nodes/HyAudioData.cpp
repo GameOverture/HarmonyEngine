@@ -18,12 +18,12 @@ HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Object &itemObj
 {
 	const jsonxx::Array &assetsArray = itemObjRef.get<jsonxx::Array>("assets");
 
-	for(uint32 i = 0; i < assetsArray.size(); ++i)
-	{
-		jsonxx::Object assetObj = assetsArray.get<jsonxx::Object>(i);
-		HyFileAudio *pAudio = assetsRef.GetAudioFile(static_cast<uint32>(assetObj.get<jsonxx::Number>("checksum")));
-		m_RequiredAudio.Set(pAudio->GetManifestIndex());
-	}
+	//for(uint32 i = 0; i < assetsArray.size(); ++i)
+	//{
+	//	jsonxx::Object assetObj = assetsArray.get<jsonxx::Object>(i);
+	//	HyFileAudio *pAudio = assetsRef.GetAudioFile(static_cast<uint32>(assetObj.get<jsonxx::Number>("checksum")));
+	//	m_RequiredAudio.Set(pAudio->GetManifestIndex());
+	//}
 
 	//m_pAudioBank = m_AudioRef.GetAudioBank(itemDataObjRef.get<jsonxx::String>("bank"));
 }
@@ -34,5 +34,5 @@ HyAudioData::~HyAudioData(void)
 
 IHyAudioInst *HyAudioData::AllocateNewInstance() const
 {
-	return m_AudioRef.AllocateAudioInst(GetPath().c_str(), );
+	return m_AudioRef.AllocateAudioInst(GetPath().c_str());
 }

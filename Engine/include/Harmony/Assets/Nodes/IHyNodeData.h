@@ -32,8 +32,7 @@ public:
 	virtual ~IHyNodeData(void);
 	
 	const std::string &GetPath() const;
-	const HyFilesManifest &GetRequiredAtlases() const;
-	const HyFilesManifest &GetRequiredAudio() const;
+	const HyFilesManifest *GetRequiredFiles(HyFileType eFileType) const;
 	HyGLTF *GetGltf() const;
 };
 

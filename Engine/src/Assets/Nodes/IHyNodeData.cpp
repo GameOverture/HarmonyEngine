@@ -25,14 +25,14 @@ const std::string &IHyNodeData::GetPath() const
 	return m_sPATH;
 }
 
-const HyFilesManifest &IHyNodeData::GetRequiredAtlases() const
+const HyFilesManifest *IHyNodeData::GetRequiredFiles(HyFileType eFileType) const
 {
-	return m_RequiredAtlases;
-}
+	if(eFileType == HYFILE_Atlas)
+		return &m_RequiredAtlases;
+	else if(eFileType == HYFILE_AudioBank)
+		return &m_RequiredAudio;
 
-const HyFilesManifest &IHyNodeData::GetRequiredAudio() const
-{
-	return m_RequiredAudio;
+	return nullptr;
 }
 
 HyGLTF *IHyNodeData::GetGltf() const
