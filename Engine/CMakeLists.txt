@@ -34,7 +34,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Nodes/HyText2dData.cpp
 	src/Assets/Nodes/HyTexturedQuad2dData.cpp
 	src/Assets/Nodes/IHyNodeData.cpp
-	src/Audio/HyAudioManager.cpp
+	src/Audio/HyAudioHarness.cpp
 	src/Audio/Harness/SDL2/HyAudio_SDL2.cpp
 	src/Audio/Harness/SDL2/HyAudioBank_SDL2.cpp
 	src/Audio/Harness/SDL2/HyAudioInst_SDL2.cpp
@@ -134,7 +134,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Assets/Nodes/HyText2dData.h
 	include/Harmony/Assets/Nodes/HyTexturedQuad2dData.h
 	include/Harmony/Assets/Nodes/IHyNodeData.h
-	include/Harmony/Audio/HyAudioManager.h
+	include/Harmony/Audio/HyAudioHarness.h
 	include/Harmony/Audio/Harness/IHyAudio.h
 	include/Harmony/Audio/Harness/IHyAudioBank.h
 	include/Harmony/Audio/Harness/IHyAudioInst.h

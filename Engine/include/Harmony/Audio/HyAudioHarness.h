@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyAudioManager.h
+*	HyAudioHarness.h
 *
 *	Harmony Engine
 *	Copyright (c) 2019 Jason Knobler
@@ -7,8 +7,8 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyAudioManager_h__
-#define HyAudioManager_h__
+#ifndef HyAudioHarness_h__
+#define HyAudioHarness_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Audio/Harness/IHyAudio.h"
@@ -17,11 +17,11 @@
 
 class HyFileAudio;
 
-class HyAudioManager
+class HyAudioHarness
 {
 	using fpAllocateHyAudio					= IHyAudio *(*)();
 	using fpAllocateHyAudioBank				= IHyAudioBank *(*)(IHyAudio *, const jsonxx::Object &);
-	using fpAllocateHyAudioInst				= IHyAudioInst *(*)(IHyAudio *, const char *);
+	using fpAllocateHyAudioInst				= IHyAudioInst *(*)(IHyAudio *, const jsonxx::Object &);
 
 	fpAllocateHyAudio						m_fpAllocateHyAudio;
 	fpAllocateHyAudioBank					m_fpAllocateHyAudioBank;
@@ -31,14 +31,14 @@ class HyAudioManager
 	std::map<std::string, HyFileAudio *>	m_AudioBankMap;
 
 public:
-	HyAudioManager(std::string sDataDir);
-	~HyAudioManager();
+	HyAudioHarness(std::string sDataDir);
+	~HyAudioHarness();
 
 	IHyAudioBank *AllocateAudioBank(const jsonxx::Object &bankObjRef);
-	IHyAudioInst *AllocateAudioInst(const char *szPath);
+	IHyAudioInst *AllocateAudioInst(const jsonxx::Object &instObjRef);
 	HyFileAudio *GetAudioBank(const std::string &sBankName);
 
 	void Update();
 };
 
-#endif /* HyAudio_h__ */
+#endif /* HyAudioHarness_h__ */

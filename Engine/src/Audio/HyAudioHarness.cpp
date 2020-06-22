@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyAudioManager.cpp
+*	HyAudioHarness.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2019 Jason Knobler
@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Audio/HyAudioManager.h"
+#include "Audio/HyAudioHarness.h"
 #include "Assets/Files/HyFileAudio.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/HyAssets.h"
@@ -23,7 +23,7 @@
 	#include <Objbase.h>
 #endif
 
-HyAudioManager::HyAudioManager(std::string sDataDir) :
+HyAudioHarness::HyAudioHarness(std::string sDataDir) :
 	m_fpAllocateHyAudio(nullptr),
 	m_fpAllocateHyAudioBank(nullptr),
 	m_fpAllocateHyAudioInst(nullptr),
@@ -86,7 +86,7 @@ HyAudioManager::HyAudioManager(std::string sDataDir) :
 	}
 }
 
-HyAudioManager::~HyAudioManager()
+HyAudioHarness::~HyAudioHarness()
 {
 	for(auto iter = m_AudioBankMap.begin(); iter != m_AudioBankMap.end(); ++iter)
 		delete iter->second;
@@ -99,7 +99,7 @@ HyAudioManager::~HyAudioManager()
 #endif
 }
 
-IHyAudioBank *HyAudioManager::AllocateAudioBank(const jsonxx::Object &bankObjRef)
+IHyAudioBank *HyAudioHarness::AllocateAudioBank(const jsonxx::Object &bankObjRef)
 {
 	if(m_fpAllocateHyAudioBank)
 		return m_fpAllocateHyAudioBank(m_pInternal, bankObjRef);
@@ -107,15 +107,15 @@ IHyAudioBank *HyAudioManager::AllocateAudioBank(const jsonxx::Object &bankObjRef
 	return HY_NEW HyAudioBank_Null();
 }
 
-IHyAudioInst *HyAudioManager::AllocateAudioInst(const char *szPath)
+IHyAudioInst *HyAudioHarness::AllocateAudioInst(const jsonxx::Object &instObjRef)
 {
 	if(m_fpAllocateHyAudioInst)
-		return m_fpAllocateHyAudioInst(m_pInternal, szPath);
+		return m_fpAllocateHyAudioInst(m_pInternal, instObjRef);
 
 	return HY_NEW HyAudioInst_Null();
 }
 
-HyFileAudio *HyAudioManager::GetAudioBank(const std::string &sBankName)
+HyFileAudio *HyAudioHarness::GetAudioBank(const std::string &sBankName)
 {
 	auto iter = m_AudioBankMap.find(sBankName);
 	if(iter != m_AudioBankMap.end())
@@ -124,7 +124,7 @@ HyFileAudio *HyAudioManager::GetAudioBank(const std::string &sBankName)
 	return nullptr;
 }
 
-void HyAudioManager::Update()
+void HyAudioHarness::Update()
 {
 	m_pInternal->OnUpdate();
 }

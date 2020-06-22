@@ -20,7 +20,7 @@
 #include "Assets/Nodes/HyText2dData.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 #include "Assets/Nodes/HyPrefabData.h"
-#include "Audio/HyAudioManager.h"
+#include "Audio/HyAudioHarness.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
@@ -75,7 +75,7 @@ const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyAssets::HyAssets(HyAudioManager &audioRef, HyScene &sceneRef, std::string sDataDirPath) :
+HyAssets::HyAssets(HyAudioHarness &audioRef, HyScene &sceneRef, std::string sDataDirPath) :
 	IHyThreadClass(HYTHREAD_Lowest),
 	m_AudioRef(audioRef),
 	m_SceneRef(sceneRef),
@@ -131,7 +131,7 @@ bool HyAssets::IsInitialized()
 	return m_bInitialized;
 }
 
-HyAudioManager &HyAssets::GetAudioRef()
+HyAudioHarness &HyAssets::GetAudioRef()
 {
 	return m_AudioRef;
 }
@@ -561,6 +561,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 	{
 		switch(eFileType)
 		{
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case HYFILE_Atlas: {
 			// TODO: rename to banks
 			jsonxx::Array atlasGrpArray = manifestFileObj.get<jsonxx::Array>("atlasGroups");
@@ -622,6 +623,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 			}
 			break; }
 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case HYFILE_AudioBank: {
 			// TODO: rename to banks
 			jsonxx::Array banksArray = manifestFileObj.get<jsonxx::Array>("atlasGroups");

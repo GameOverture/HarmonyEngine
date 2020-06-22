@@ -23,7 +23,7 @@
 #define HYASSETS_PrefabDir "Prefabs/"
 #define HYASSETS_AudioDir "Audio/"
 
-class HyAudioManager;
+class HyAudioHarness;
 class HyScene;
 class IHyRenderer;
 class IHyLoadable;
@@ -42,7 +42,7 @@ class HyFileAudio;
 
 class HyAssets : public IHyThreadClass
 {
-	HyAudioManager &											m_AudioRef;
+	HyAudioHarness &											m_AudioRef;
 	HyScene &													m_SceneRef;
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
@@ -82,13 +82,13 @@ class HyAssets : public IHyThreadClass
 	std::queue<IHyFile *>										m_Load_Retrieval;
 
 public:
-	HyAssets(HyAudioManager &audioRef, HyScene &sceneRef, std::string sDataDirPath);
+	HyAssets(HyAudioHarness &audioRef, HyScene &sceneRef, std::string sDataDirPath);
 	virtual ~HyAssets();
 
 	const std::string &GetDataDir();
 	bool IsInitialized();
 
-	HyAudioManager &GetAudioRef();
+	HyAudioHarness &GetAudioRef();
 
 	IHyFile *GetFile(HyFileType eFileType, uint32 uiManifestIndex);
 	HyFileAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);

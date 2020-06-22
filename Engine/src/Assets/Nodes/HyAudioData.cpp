@@ -10,22 +10,13 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Files/HyFileAudio.h"
-#include "Audio/HyAudioManager.h"
+#include "Audio/HyAudioHarness.h"
 
 HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Object &itemObjRef, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
-	m_AudioRef(assetsRef.GetAudioRef())
+	m_AudioRef(assetsRef.GetAudioRef()),
+	m_InitObj(itemObjRef)
 {
-	const jsonxx::Array &assetsArray = itemObjRef.get<jsonxx::Array>("assets");
-
-	//for(uint32 i = 0; i < assetsArray.size(); ++i)
-	//{
-	//	jsonxx::Object assetObj = assetsArray.get<jsonxx::Object>(i);
-	//	HyFileAudio *pAudio = assetsRef.GetAudioFile(static_cast<uint32>(assetObj.get<jsonxx::Number>("checksum")));
-	//	m_RequiredAudio.Set(pAudio->GetManifestIndex());
-	//}
-
-	//m_pAudioBank = m_AudioRef.GetAudioBank(itemDataObjRef.get<jsonxx::String>("bank"));
 }
 
 HyAudioData::~HyAudioData(void)
@@ -34,5 +25,5 @@ HyAudioData::~HyAudioData(void)
 
 IHyAudioInst *HyAudioData::AllocateNewInstance() const
 {
-	return m_AudioRef.AllocateAudioInst(GetPath().c_str());
+	return m_AudioRef.AllocateAudioInst(m_InitObj);
 }

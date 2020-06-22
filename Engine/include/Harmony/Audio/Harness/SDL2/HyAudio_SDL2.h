@@ -51,7 +51,7 @@ public:
 	virtual void OnUpdate() override;
 
 	static IHyAudioBank *AllocateBank(IHyAudio *pAudio, const jsonxx::Object &bankObjRef);
-	static IHyAudioInst *AllocateInst(IHyAudio *pAudio, const char *szPath);
+	static IHyAudioInst *AllocateInst(IHyAudio *pAudio, const jsonxx::Object &instObjRef);
 
 private:
 	static void OnCallback(void *pUserData, uint8_t *pStream, int32 iLen);

@@ -18,7 +18,8 @@
 
 class HyAudioData : public IHyNodeData
 {
-	HyAudioManager &		m_AudioRef;
+	HyAudioHarness &		m_AudioRef;
+	const jsonxx::Object	m_InitObj;
 
 public:
 	HyAudioData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef);

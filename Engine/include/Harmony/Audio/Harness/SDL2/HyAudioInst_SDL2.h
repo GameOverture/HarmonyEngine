@@ -15,10 +15,8 @@
 #if defined(HY_USE_SDL2)
 class HyAudioInst_SDL2 : public IHyAudioInst
 {
-
-
 public:
-	HyAudioInst_SDL2();
+	HyAudioInst_SDL2(const jsonxx::Object &instObjRef);
 	virtual ~HyAudioInst_SDL2();
 
 	virtual void OnLoaded() override;
