@@ -20,10 +20,7 @@ HyAudioInst_SDL2::HyAudioInst_SDL2()
 
 /*virtual*/ void HyAudioInst_SDL2::OnLoaded() /*override*/
 {
-}
 
-/*virtual*/ void HyAudioInst_SDL2::PlayOneShot() /*override*/
-{
 }
 
 /*virtual*/ void HyAudioInst_SDL2::Start() /*override*/

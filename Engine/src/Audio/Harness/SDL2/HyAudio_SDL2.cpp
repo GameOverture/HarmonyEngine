@@ -53,6 +53,7 @@ HyAudio_SDL2::HyAudio_SDL2()
 	//HyLog("Default Device:   " << atlasGrpArray.size());
 	HyLog("Audio Driver:     " << SDL_GetCurrentAudioDriver());
 
+	// Start audio device
 	SDL_PauseAudioDevice(m_hDevice, 0);
 }
 
@@ -69,12 +70,31 @@ const char *HyAudio_SDL2::GetAudioDriver()
 
 /*virtual*/ void HyAudio_SDL2::OnUpdate() /*override*/
 {
+	SDL_LockAudioDevice(m_hDevice);
+	SDL_UnlockAudioDevice(m_hDevice);
 }
 
 /*static*/ void HyAudio_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)
 {
-	//HyAudio_SDL2 *pThis = reinterpret_cast<HyAudio_SDL2 *>(pUserData);
-	//SDL_memset(pStream, 0, iLen); // If there is nothing to play, this callback should fill the buffer with silence
+	HyAudio_SDL2 *pThis = reinterpret_cast<HyAudio_SDL2 *>(pUserData);
+	SDL_memset(pStream, 0, iLen); // If there is nothing to play, this callback should fill the buffer with silence
+
+
+	static Uint32 audio_len;
+	static Uint8 *audio_pos;
+
+	/* Only play if we have data left */
+	if ( audio_len == 0 )
+		return;
+
+	/* Mix as much data as possible */
+	iLen = (iLen > audio_len ? audio_len : iLen);
+	SDL_MixAudioFormat(pStream, audio_pos, iLen, SDL_MIX_MAXVOLUME);
+	audio_pos += iLen;
+	audio_len -= iLen;
+
+
+	
 	//Audio *previous = audio;
 	//int tempLength;
 	//uint8_t music = 0;	

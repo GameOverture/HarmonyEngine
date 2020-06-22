@@ -16,13 +16,13 @@
 class HyAudioInst_SDL2 : public IHyAudioInst
 {
 
+
 public:
 	HyAudioInst_SDL2();
 	virtual ~HyAudioInst_SDL2();
 
 	virtual void OnLoaded() override;
 
-	virtual void PlayOneShot() override;
 	virtual void Start() override;
 	virtual void Stop(HyAudioStop eStopType = HYAUDIOSTOP_AllowFadeOut) override;
 

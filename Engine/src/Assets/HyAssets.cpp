@@ -510,10 +510,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// AUDIO BANKS
-	//m_pAudioFiles;
-	//m_uiNumAudioFiles;
-	//m_pLoadedAudioManifest;
-
 	std::string sManifestFilePath = m_sDATADIR + HYASSETS_AudioDir + HYASSETS_AudioFile;
 	if(HyIO::FileExists(sManifestFilePath) == false)
 	{
@@ -545,7 +541,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		// TODO: rename to bankId
 		uint32 uiAtlasGroupId = static_cast<uint32>(bankObj.get<jsonxx::Number>("atlasGrpId"));
 
-		std::string sBankFilePath = m_sDATADIR + HYASSETS_AudioDir;
+		std::string sBankFilePath = HYASSETS_AudioDir;
 		sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
 		sBankFilePath += szTmpBuffer;
 
@@ -553,7 +549,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		++pPlacementLocation;
 	}
 
-
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set HyFilesManifest::sm_iIndexFlagsArraySize now that the total number of atlases is known
 	HyFilesManifest::sm_iIndexFlagsArraySize[HYFILE_Atlas] = (m_uiNumAtlases / 32);
 	if(m_uiNumAtlases % 32 != 0)

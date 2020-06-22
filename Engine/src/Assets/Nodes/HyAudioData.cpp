@@ -34,5 +34,5 @@ HyAudioData::~HyAudioData(void)
 
 IHyAudioInst *HyAudioData::AllocateNewInstance() const
 {
-	return m_AudioRef.AllocateAudioInst(GetPath().c_str());
+	return m_AudioRef.AllocateAudioInst(GetPath().c_str(), );
 }

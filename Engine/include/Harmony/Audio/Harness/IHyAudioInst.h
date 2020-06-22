@@ -24,7 +24,6 @@ public:
 
 	virtual void OnLoaded() = 0;
 
-	virtual void PlayOneShot() = 0;
 	virtual void Start() = 0;
 	virtual void Stop(HyAudioStop eStopType = HYAUDIOSTOP_AllowFadeOut) = 0;
 	
@@ -55,7 +54,6 @@ public:
 
 	virtual void OnLoaded() override { }
 
-	virtual void PlayOneShot() override { }
 	virtual void Start() override { }
 	virtual void Stop(HyAudioStop eStopType = HYAUDIOSTOP_AllowFadeOut) override { }
 

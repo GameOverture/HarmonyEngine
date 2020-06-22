@@ -35,8 +35,8 @@ HyAudioBank_SDL2::HyAudioBank_SDL2(const jsonxx::Object &bankObjRef)
 		std::string s = sFilePath;
 		s += "/";
 		s += m_SoundBuffers[i].m_sFileName;
-	
-		if(SDL_LoadWAV(HyIO::CleanPath(s.c_str(), "wav", false).c_str(),
+
+		if(SDL_LoadWAV(s.c_str(),
 					   &m_SoundBuffers[i].m_Spec,
 					   &m_SoundBuffers[i].m_pBuffer,
 					   &m_SoundBuffers[i].m_uiBufferSize) == nullptr)

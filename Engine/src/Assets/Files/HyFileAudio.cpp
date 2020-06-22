@@ -29,7 +29,8 @@ HyFileAudio::~HyFileAudio()
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		std::string sFilePath = Hy_DataDir() + HYASSETS_AudioDir + m_sFILE_NAME;
+		std::string sFilePath = Hy_DataDir();
+		sFilePath += m_sFILE_NAME;
 		if(m_pInternal->Load(sFilePath) == false)
 		{
 			HyLogError("HyFileAudio::OnLoadThread() failed");

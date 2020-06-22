@@ -19,7 +19,7 @@ class HyAudioBank_SDL2 : public IHyAudioBank
 		std::string					m_sFileName;
 		uint8_t *					m_pBuffer = nullptr;
 		uint32						m_uiBufferSize = 0;
-		SDL_AudioSpec				m_Spec;
+		SDL_AudioSpec				m_Spec = {};
 
 		Buffer(std::string sFileName) :
 			m_sFileName(sFileName)

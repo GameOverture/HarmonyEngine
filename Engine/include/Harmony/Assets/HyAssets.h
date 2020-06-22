@@ -75,12 +75,12 @@ class HyAssets : public IHyThreadClass
 	std::map<std::pair<uint32, uint32>, HyTexturedQuad2dData *>	m_Quad2d;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
-	std::vector<IHyFile *>									m_ReloadDataList;
+	std::vector<IHyFile *>										m_ReloadDataList;
 
 	// Queues responsible for passing and retrieving factory data between the loading thread
-	std::queue<IHyFile *>									m_Load_Prepare;
-	std::queue<IHyFile *>									m_Load_Shared;
-	std::queue<IHyFile *>									m_Load_Retrieval;
+	std::queue<IHyFile *>										m_Load_Prepare;
+	std::queue<IHyFile *>										m_Load_Shared;
+	std::queue<IHyFile *>										m_Load_Retrieval;
 
 public:
 	HyAssets(HyAudioManager &audioRef, HyScene &sceneRef, std::string sDataDirPath);
