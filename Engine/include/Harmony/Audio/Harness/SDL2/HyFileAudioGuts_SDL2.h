@@ -12,6 +12,7 @@
 
 #include "Audio/Harness/IHyFileAudioGuts.h"
 
+#if defined(HY_USE_SDL2)
 class HyFileAudioGuts_SDL2 : public IHyFileAudioGuts
 {
 	struct Buffer
@@ -41,5 +42,6 @@ public:
 
 	bool GetBufferInfo(uint32 uiChecksum, uint8_t *&pBufferOut, uint32 &uiSizeOut, SDL_AudioSpec &audioSpecOut);
 };
+#endif // HY_USE_SDL2
 
 #endif /* HyAudioBank_SDL2_h__ */
