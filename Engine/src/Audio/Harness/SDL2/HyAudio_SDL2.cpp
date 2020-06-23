@@ -43,7 +43,7 @@ HyAudio_SDL2::HyAudio_SDL2()
 	* SDL_AUDIO_ALLOW_CHANNELS_CHANGE      Allow any number of channels (e.g. AUDIO_CHANNELS being 2, allow actual 1)
 	* SDL_AUDIO_ALLOW_ANY_CHANGE           Allow all changes above
 	*/
-	m_hDevice = SDL_OpenAudioDevice(nullptr, 0, &m_DesiredSpec, nullptr, SDL_AUDIO_ALLOW_ANY_CHANGE);
+	m_hDevice = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &m_DesiredSpec, nullptr, 0);
 	if(m_hDevice == 0)
 	{
 		HyLogError("SDL_OpenAudioDevice failed: " << SDL_GetError());
