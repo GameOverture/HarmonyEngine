@@ -17,7 +17,7 @@
 
 #if defined(HY_USE_SDL2)
 	#include "Audio/Harness/SDL2/HyAudio_SDL2.h"
-	#include "Audio/Harness/SDL2/HyAudioBank_SDL2.h"
+	#include "Audio/Harness/SDL2/HyFileAudioGuts_SDL2.h"
 	#include "Audio/Harness/SDL2/HyAudioInst_SDL2.h"
 #elif defined(HY_PLATFORM_WINDOWS)
 	#include <Objbase.h>

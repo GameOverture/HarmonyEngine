@@ -7,7 +7,7 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Audio/Harness/SDL2/HyAudioBank_SDL2.h"
+#include "Audio/Harness/SDL2/HyFileAudioGuts_SDL2.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Utilities/HyIO.h"
 
@@ -19,13 +19,24 @@ HyFileAudioGuts_SDL2::HyFileAudioGuts_SDL2(const jsonxx::Object &bankObjRef)
 	for(uint32 i = 0; i < assetsArray.size(); ++i)
 	{
 		jsonxx::Object assetObj = assetsArray.get<jsonxx::Object>(i);
-		m_SoundBuffers.emplace_back(assetObj.get<jsonxx::String>("fileName"));
-		m_ChecksumMap[static_cast<uint32>(assetObj.get<jsonxx::Number>("checksum"))] = &m_SoundBuffers.back();
+
+		Buffer *pNewBuffer = HY_NEW Buffer(assetObj.get<jsonxx::String>("fileName"));
+		m_SoundBuffers.push_back(pNewBuffer);
+		m_ChecksumMap[static_cast<uint32>(assetObj.get<jsonxx::Number>("checksum"))] = pNewBuffer;
 	}
 }
 
 /*virtual*/ HyFileAudioGuts_SDL2::~HyFileAudioGuts_SDL2()
 {
+	Unload();
+
+	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBuffers.size()); ++i)
+		delete m_SoundBuffers[i];
+}
+
+/*virtual*/ bool HyFileAudioGuts_SDL2::ContainsAsset(uint32 uiAssetChecksum) /*override*/
+{
+	return m_ChecksumMap.find(uiAssetChecksum) != m_ChecksumMap.end();
 }
 
 /*virtual*/ bool HyFileAudioGuts_SDL2::Load(std::string sFilePath) /*override*/
@@ -34,12 +45,12 @@ HyFileAudioGuts_SDL2::HyFileAudioGuts_SDL2(const jsonxx::Object &bankObjRef)
 	{
 		std::string s = sFilePath;
 		s += "/";
-		s += m_SoundBuffers[i].m_sFileName;
+		s += m_SoundBuffers[i]->m_sFileName;
 
 		if(SDL_LoadWAV(s.c_str(),
-					   &m_SoundBuffers[i].m_Spec,
-					   &m_SoundBuffers[i].m_pBuffer,
-					   &m_SoundBuffers[i].m_uiBufferSize) == nullptr)
+					   &m_SoundBuffers[i]->m_Spec,
+					   &m_SoundBuffers[i]->m_pBuffer,
+					   &m_SoundBuffers[i]->m_uiBufferSize) == nullptr)
 		{
 			HyLogError("HyFileAudioGuts_SDL2::Load SDL_LoadWAV failed: " << SDL_GetError());
 			return false;
@@ -52,7 +63,7 @@ HyFileAudioGuts_SDL2::HyFileAudioGuts_SDL2(const jsonxx::Object &bankObjRef)
 /*virtual*/ void HyFileAudioGuts_SDL2::Unload() /*override*/
 {
 	for(uint32 i = 0; i < m_SoundBuffers.size(); ++i)
-		SDL_FreeWAV(m_SoundBuffers[i].m_pBuffer);
+		SDL_FreeWAV(m_SoundBuffers[i]->m_pBuffer);
 
 	m_SoundBuffers.clear();
 }

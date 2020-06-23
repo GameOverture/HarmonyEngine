@@ -17,20 +17,24 @@ class HyFileAudioGuts_SDL2 : public IHyFileAudioGuts
 	struct Buffer
 	{
 		std::string					m_sFileName;
-		uint8_t *					m_pBuffer = nullptr;
-		uint32						m_uiBufferSize = 0;
-		SDL_AudioSpec				m_Spec = {};
+		uint8_t *					m_pBuffer;
+		uint32						m_uiBufferSize;
+		SDL_AudioSpec				m_Spec;
 
 		Buffer(std::string sFileName) :
-			m_sFileName(sFileName)
-		{ }
+			m_sFileName(sFileName),
+			m_pBuffer(nullptr),
+			m_uiBufferSize(0)
+		{ m_Spec = {}; }
 	};
-	std::vector<Buffer>				m_SoundBuffers;
+	std::vector<Buffer *>			m_SoundBuffers;
 	std::map<uint32, Buffer *>		m_ChecksumMap;
 
 public:
 	HyFileAudioGuts_SDL2(const jsonxx::Object &bankObjRef);
 	virtual ~HyFileAudioGuts_SDL2();
+
+	virtual bool ContainsAsset(uint32 uiAssetChecksum) override;
 
 	virtual bool Load(std::string sFilePath) override;
 	virtual void Unload() override;

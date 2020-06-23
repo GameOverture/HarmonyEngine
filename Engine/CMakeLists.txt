@@ -36,7 +36,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Nodes/IHyNodeData.cpp
 	src/Audio/HyAudioHarness.cpp
 	src/Audio/Harness/SDL2/HyAudio_SDL2.cpp
-	src/Audio/Harness/SDL2/HyAudioBank_SDL2.cpp
+	src/Audio/Harness/SDL2/HyFileAudioGuts_SDL2.cpp
 	src/Audio/Harness/SDL2/HyAudioInst_SDL2.cpp
 	src/Diagnostics/HyDiagnostics.cpp
 	src/Diagnostics/Console/HyConsole.cpp
@@ -139,7 +139,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Audio/Harness/IHyFileAudioGuts.h
 	include/Harmony/Audio/Harness/IHyAudioInst.h
 	include/Harmony/Audio/Harness/SDL2/HyAudio_SDL2.h
-	include/Harmony/Audio/Harness/SDL2/HyAudioBank_SDL2.h
+	include/Harmony/Audio/Harness/SDL2/HyFileAudioGuts_SDL2.h
 	include/Harmony/Audio/Harness/SDL2/HyAudioInst_SDL2.h
 	include/Harmony/Diagnostics/HyDiagnostics.h
 	include/Harmony/Diagnostics/Console/HyConsole.h

@@ -27,10 +27,10 @@ public:
 	HyFilesManifest(HyFileType eFileType);
 	~HyFilesManifest();
 
-	bool IsSet(uint32 uiAssetIndex) const;
+	bool IsSet(uint32 uiManifestIndex) const;
 	bool IsSet(const HyFilesManifest &otherRef) const;
-	void Set(uint32 uiAssetIndex);
-	void Clear(uint32 uiAssetIndex);
+	void Set(uint32 uiManifestIndex);
+	void Clear(uint32 uiManifestIndex);
 
 	bool IsEmpty() const;
 };

@@ -146,7 +146,37 @@ IHyFile *HyAssets::GetFile(HyFileType eFileType, uint32 uiManifestIndex)
 
 	case HYFILE_AudioBank:
 		return &static_cast<HyFileAudio *>(m_FilesMap[eFileType].m_pFiles)[uiManifestIndex];
+
+	default:
+		return nullptr;
 	}
+
+	return nullptr;
+}
+
+IHyFile *HyAssets::GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum)
+{
+	switch(eFileType)
+	{
+	case HYFILE_Atlas: {
+		HyRectangle<float> tmp;
+		for(uint32 i = 0; i < m_FilesMap[HYFILE_Atlas].m_uiNumFiles; ++i)
+		{
+			if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetUvRect(uiAssetChecksum, tmp))
+				return &m_FilesMap[HYFILE_Atlas].m_pFiles[i];
+		}
+		break; }
+
+	case HYFILE_AudioBank:
+		for(uint32 i = 0; i < m_FilesMap[HYFILE_AudioBank].m_uiNumFiles; ++i)
+		{
+			if(static_cast<HyFileAudio *>(m_FilesMap[HYFILE_AudioBank].m_pFiles)[i].ContainsAsset(uiAssetChecksum))
+				return &m_FilesMap[HYFILE_AudioBank].m_pFiles[i];
+		}
+		break;
+	}
+
+	return nullptr;
 }
 
 HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)

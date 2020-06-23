@@ -17,6 +17,14 @@ HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Object &itemObj
 	m_AudioRef(assetsRef.GetAudioRef()),
 	m_InitObj(itemObjRef)
 {
+	jsonxx::Object sdl2Obj = m_InitObj.get<jsonxx::Object>("SDL2");
+
+	jsonxx::Array assetsArray = sdl2Obj.get<jsonxx::Array>("assets");
+	for(uint32 i = 0; i < assetsArray.size(); ++i)
+	{
+		IHyFile *pAudioFile = assetsRef.GetFileWithAsset(HYFILE_AudioBank, static_cast<uint32>(assetsArray.get<jsonxx::Number>(i)));
+		m_RequiredAudio.Set(pAudioFile->GetManifestIndex());
+	}
 }
 
 HyAudioData::~HyAudioData(void)

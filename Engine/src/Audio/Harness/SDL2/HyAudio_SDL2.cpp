@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Audio/Harness/SDL2/HyAudio_SDL2.h"
-#include "Audio/Harness/SDL2/HyAudioBank_SDL2.h"
+#include "Audio/Harness/SDL2/HyFileAudioGuts_SDL2.h"
 #include "Audio/Harness/SDL2/HyAudioInst_SDL2.h"
 #include "Diagnostics/Console/HyConsole.h"
 
@@ -104,84 +104,24 @@ void HyAudio_SDL2::QueueInst(HyAudioInst_SDL2 *pInst, uint32 uiSoundChecksum)
 	HyAudio_SDL2 *pThis = reinterpret_cast<HyAudio_SDL2 *>(pUserData);
 	SDL_memset(pStream, 0, iLen); // If there is nothing to play, this callback should fill the buffer with silence
 
+	for(uint32 i = 0; i < static_cast<uint32>(pThis->m_PlayList.size()); ++i)
+	{
+		Play &playRef = pThis->m_PlayList[i];
 
-	static Uint32 audio_len;
-	static Uint8 *audio_pos;
+		uint32 uiLength = (static_cast<uint32_t>(iLen) > playRef.m_uiRemainingBytes) ? playRef.m_uiRemainingBytes : static_cast<uint32_t>(iLen);
+		SDL_MixAudioFormat(pStream, playRef.m_pBufferPos, playRef.m_AudioSpec.format, uiLength, SDL_MIX_MAXVOLUME);
 
-	/* Only play if we have data left */
-	if ( audio_len == 0 )
-		return;
+		playRef.m_pBufferPos += uiLength;
+		playRef.m_uiRemainingBytes -= uiLength;
+	}
 
-	/* Mix as much data as possible */
-	iLen = (iLen > audio_len ? audio_len : iLen);
-	//SDL_MixAudioFormat(pStream, audio_pos, iLen, SDL_MIX_MAXVOLUME);
-	audio_pos += iLen;
-	audio_len -= iLen;
-
-
-	
-	//Audio *previous = audio;
-	//int tempLength;
-	//uint8_t music = 0;	
-
-	///* First one is place holder */
-	//audio = audio->next;
-
-	//while(audio != NULL)
-	//{
-	//	if(audio->length > 0)
-	//	{
-	//		if(audio->fade == 1 && audio->loop == 1)
-	//		{
-	//			music = 1;
-
-	//			if(audio->volume > 0)
-	//			{
-	//				audio->volume--;
-	//			}
-	//			else
-	//			{
-	//				audio->length = 0;
-	//			}
-	//		}
-
-	//		if(music && audio->loop == 1 && audio->fade == 0)
-	//		{
-	//			tempLength = 0;
-	//		}
-	//		else
-	//		{
-	//			tempLength = ((uint32_t)iLen > audio->length) ? audio->length : (uint32_t)iLen;
-	//		}
-
-	//		SDL_MixAudioFormat(pStream, audio->buffer, AUDIO_FORMAT, tempLength, audio->volume);
-
-	//		audio->buffer += tempLength;
-	//		audio->length -= tempLength;
-
-	//		previous = audio;
-	//		audio = audio->next;
-	//	}
-	//	else if(audio->loop == 1 && audio->fade == 0)
-	//	{
-	//		audio->buffer = audio->bufferTrue;
-	//		audio->length = audio->lengthTrue;
-	//	}
-	//	else
-	//	{
-	//		previous->next = audio->next;
-
-	//		if(audio->loop == 0)
-	//		{
-	//			m_uiSoundCount--;
-	//		}
-
-	//		audio->next = NULL;
-	//		freeAudio(audio);
-
-	//		audio = previous->next;
-	//	}
-	//}
+	for(auto iter = pThis->m_PlayList.begin(); iter != pThis->m_PlayList.end();)
+	{
+		if(iter->m_uiRemainingBytes == 0)
+			iter = pThis->m_PlayList.erase(iter);
+		else
+			++iter;
+	}
 }
 
 /*static*/ IHyFileAudioGuts *HyAudio_SDL2::AllocateBank(IHyAudio *pAudio, const jsonxx::Object &bankObjRef)

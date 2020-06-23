@@ -22,6 +22,8 @@ public:
 	HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyFileAudioGuts *pInternal);
 	virtual ~HyFileAudio();
 
+	bool ContainsAsset(uint32 uiAssetChecksum);
+
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 };

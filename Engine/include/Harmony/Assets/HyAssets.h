@@ -91,6 +91,7 @@ public:
 	HyAudioHarness &GetAudioRef();
 
 	IHyFile *GetFile(HyFileType eFileType, uint32 uiManifestIndex);
+	IHyFile *GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum);
 	HyFileAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 	HyFileAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
 	uint32 GetNumAtlases();

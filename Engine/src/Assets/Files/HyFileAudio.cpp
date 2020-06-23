@@ -25,6 +25,11 @@ HyFileAudio::~HyFileAudio()
 	delete m_pInternal;
 }
 
+bool HyFileAudio::ContainsAsset(uint32 uiAssetChecksum)
+{
+	return m_pInternal->ContainsAsset(uiAssetChecksum);
+}
+
 /*virtual*/ void HyFileAudio::OnLoadThread() /*override*/
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)

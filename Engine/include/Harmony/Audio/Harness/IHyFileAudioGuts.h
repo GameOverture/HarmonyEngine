@@ -18,6 +18,8 @@ public:
 	IHyFileAudioGuts() = default;
 	virtual ~IHyFileAudioGuts(void) = default;
 
+	virtual bool ContainsAsset(uint32 uiAssetChecksum) = 0;
+
 	virtual bool Load(std::string sFilePath) = 0;
 	virtual void Unload() = 0;
 };
@@ -27,6 +29,9 @@ class HyAudioBank_Null : public IHyFileAudioGuts
 public:
 	HyAudioBank_Null() = default;
 	virtual ~HyAudioBank_Null() = default;
+
+	virtual bool ContainsAsset(uint32 uiAssetChecksum) override
+	{ return false; }
 
 	virtual bool Load(std::string sFilePath) override
 	{ return true; }
