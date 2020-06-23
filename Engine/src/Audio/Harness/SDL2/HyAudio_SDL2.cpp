@@ -23,11 +23,11 @@ HyAudio_SDL2::HyAudio_SDL2()
 	for(uint32 i = 0; i < iNumDevices; ++i)
 		m_sDeviceList.push_back(SDL_GetAudioDeviceName(i, 0));
 
-	m_DesiredSpec.freq = 44100;							// 44100 or 48000
+	m_DesiredSpec.freq = 48000;//44100;							// 44100 or 48000
 #if defined(HY_ENDIAN_LITTLE)
-	m_DesiredSpec.format = AUDIO_F32LSB;
+	m_DesiredSpec.format = AUDIO_S16LSB;//AUDIO_F32LSB;
 #else
-	m_DesiredSpec.format = AUDIO_F32MSB;
+	m_DesiredSpec.format = AUDIO_S16MSB;//AUDIO_F32MSB;
 #endif
 	m_DesiredSpec.channels = 2;							// 1 mono, 2 stereo, 4 quad, 6 (5.1)
 	m_DesiredSpec.samples = 4096;						// Specifies a unit of audio data to be used at a time. Must be a power of 2
