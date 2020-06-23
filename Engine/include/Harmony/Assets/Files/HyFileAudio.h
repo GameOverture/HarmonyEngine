@@ -12,14 +12,14 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/IHyFile.h"
-#include "Audio/Harness/IHyAudioBank.h"
+#include "Audio/Harness/IHyFileAudioGuts.h"
 
 class HyFileAudio : public IHyFile
 {
-	IHyAudioBank *					m_pInternal;
+	IHyFileAudioGuts *		m_pInternal;
 
 public:
-	HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyAudioBank *pInternal);
+	HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyFileAudioGuts *pInternal);
 	virtual ~HyFileAudio();
 
 	virtual void OnLoadThread() override;

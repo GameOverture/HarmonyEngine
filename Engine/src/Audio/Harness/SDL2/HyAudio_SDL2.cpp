@@ -74,6 +74,31 @@ const char *HyAudio_SDL2::GetAudioDriver()
 	SDL_UnlockAudioDevice(m_hDevice);
 }
 
+void HyAudio_SDL2::QueueInst(HyAudioInst_SDL2 *pInst, uint32 uiSoundChecksum)
+{
+	Play newPlay = {};
+	bool bFound = false;
+	for(auto file : m_AudioFileList)
+	{
+		if(file->GetBufferInfo(uiSoundChecksum, newPlay.m_pBufferPos, newPlay.m_uiRemainingBytes, newPlay.m_AudioSpec))
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(bFound == false)
+	{
+		HyLogWarning("Could not find audio: " << uiSoundChecksum);
+		return;
+	}
+
+	newPlay.m_pInst = pInst;
+
+	SDL_LockAudioDevice(m_hDevice);
+	m_PlayList.push_back(newPlay);
+	SDL_UnlockAudioDevice(m_hDevice);
+}
+
 /*static*/ void HyAudio_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)
 {
 	HyAudio_SDL2 *pThis = reinterpret_cast<HyAudio_SDL2 *>(pUserData);
@@ -159,14 +184,17 @@ const char *HyAudio_SDL2::GetAudioDriver()
 	//}
 }
 
-/*static*/ IHyAudioBank *HyAudio_SDL2::AllocateBank(IHyAudio *pAudio, const jsonxx::Object &bankObjRef)
+/*static*/ IHyFileAudioGuts *HyAudio_SDL2::AllocateBank(IHyAudio *pAudio, const jsonxx::Object &bankObjRef)
 {
-	return HY_NEW HyAudioBank_SDL2(bankObjRef);
+	HyFileAudioGuts_SDL2 *pNewFileGuts = HY_NEW HyFileAudioGuts_SDL2(bankObjRef);
+	static_cast<HyAudio_SDL2 *>(pAudio)->m_AudioFileList.push_back(pNewFileGuts);
+
+	return pNewFileGuts;
 }
 
 /*static*/ IHyAudioInst *HyAudio_SDL2::AllocateInst(IHyAudio *pAudio, const jsonxx::Object &instObjRef)
 {
-	return HY_NEW HyAudioInst_SDL2(instObjRef);
+	return HY_NEW HyAudioInst_SDL2(*static_cast<HyAudio_SDL2 *>(pAudio), instObjRef);
 }
 
 #endif // defined(HY_USE_SDL2)

@@ -99,7 +99,7 @@ HyAudioHarness::~HyAudioHarness()
 #endif
 }
 
-IHyAudioBank *HyAudioHarness::AllocateAudioBank(const jsonxx::Object &bankObjRef)
+IHyFileAudioGuts *HyAudioHarness::AllocateAudioBank(const jsonxx::Object &bankObjRef)
 {
 	if(m_fpAllocateHyAudioBank)
 		return m_fpAllocateHyAudioBank(m_pInternal, bankObjRef);

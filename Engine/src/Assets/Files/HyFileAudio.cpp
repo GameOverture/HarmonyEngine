@@ -13,7 +13,7 @@
 
 extern std::string Hy_DataDir();
 
-HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyAudioBank *pInternal) :
+HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyFileAudioGuts *pInternal) :
 	IHyFile(sFilePath, HYFILE_AudioBank, uiManifestIndex),
 	m_pInternal(pInternal)
 {

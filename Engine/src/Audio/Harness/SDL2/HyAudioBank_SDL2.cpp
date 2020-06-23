@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyAudioBank_SDL2.h
+*	HyFileAudioGuts_SDL2.h
 *
 *	Harmony Engine
 *	Copyright (c) 2020 Jason Knobler
@@ -13,7 +13,7 @@
 
 #if defined(HY_USE_SDL2)
 
-HyAudioBank_SDL2::HyAudioBank_SDL2(const jsonxx::Object &bankObjRef)
+HyFileAudioGuts_SDL2::HyFileAudioGuts_SDL2(const jsonxx::Object &bankObjRef)
 {
 	const jsonxx::Array &assetsArray = bankObjRef.get<jsonxx::Array>("assets");
 	for(uint32 i = 0; i < assetsArray.size(); ++i)
@@ -24,11 +24,11 @@ HyAudioBank_SDL2::HyAudioBank_SDL2(const jsonxx::Object &bankObjRef)
 	}
 }
 
-/*virtual*/ HyAudioBank_SDL2::~HyAudioBank_SDL2()
+/*virtual*/ HyFileAudioGuts_SDL2::~HyFileAudioGuts_SDL2()
 {
 }
 
-/*virtual*/ bool HyAudioBank_SDL2::Load(std::string sFilePath) /*override*/
+/*virtual*/ bool HyFileAudioGuts_SDL2::Load(std::string sFilePath) /*override*/
 {
 	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBuffers.size()); ++i)
 	{
@@ -41,7 +41,7 @@ HyAudioBank_SDL2::HyAudioBank_SDL2(const jsonxx::Object &bankObjRef)
 					   &m_SoundBuffers[i].m_pBuffer,
 					   &m_SoundBuffers[i].m_uiBufferSize) == nullptr)
 		{
-			HyLogError("HyAudioBank_SDL2::Load SDL_LoadWAV failed: " << SDL_GetError());
+			HyLogError("HyFileAudioGuts_SDL2::Load SDL_LoadWAV failed: " << SDL_GetError());
 			return false;
 		}
 	}
@@ -49,12 +49,25 @@ HyAudioBank_SDL2::HyAudioBank_SDL2(const jsonxx::Object &bankObjRef)
 	return true;
 }
 
-/*virtual*/ void HyAudioBank_SDL2::Unload() /*override*/
+/*virtual*/ void HyFileAudioGuts_SDL2::Unload() /*override*/
 {
 	for(uint32 i = 0; i < m_SoundBuffers.size(); ++i)
 		SDL_FreeWAV(m_SoundBuffers[i].m_pBuffer);
 
 	m_SoundBuffers.clear();
+}
+
+bool HyFileAudioGuts_SDL2::GetBufferInfo(uint32 uiChecksum, uint8_t *&pBufferOut, uint32 &uiSizeOut, SDL_AudioSpec &audioSpecOut)
+{
+	auto iter = m_ChecksumMap.find(uiChecksum);
+	if(iter == m_ChecksumMap.end())
+		return false;
+
+	pBufferOut = iter->second->m_pBuffer;
+	uiSizeOut = iter->second->m_uiBufferSize;
+	audioSpecOut = iter->second->m_Spec;
+
+	return true;
 }
 
 #endif // defined(HY_USE_SDL2)

@@ -56,7 +56,7 @@ public:
 class HyAudioInst_FMOD : public IHyAudioInst
 {
 	Studio::System *			m_pSystemRef;
-	const std::string			m_sPATH;
+	const std::string			m_sPATH; // TODO: Maybe have a pointer to actual HyAudio2d and get path from that
 
 	Studio::EventDescription *	m_pDesc;
 	Studio::EventInstance *		m_pInst;

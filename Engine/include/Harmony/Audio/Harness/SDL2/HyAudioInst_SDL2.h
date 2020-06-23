@@ -13,10 +13,28 @@
 #include "Audio/Harness/IHyAudioInst.h"
 
 #if defined(HY_USE_SDL2)
+class HyAudio_SDL2;
+
 class HyAudioInst_SDL2 : public IHyAudioInst
 {
+	HyAudio_SDL2 &			m_AudioRef;
+
+	std::vector<uint32>		m_SoundChecksumList;
+
+	enum CueType
+	{
+		CUETYPE_Unknown = -1,
+		CUETYPE_Single = 0
+	};
+	CueType					m_eCueType;
+
+	uint8_t					loop;
+	uint8_t					fade;
+	uint8_t					free;
+	uint8_t					volume;
+
 public:
-	HyAudioInst_SDL2(const jsonxx::Object &instObjRef);
+	HyAudioInst_SDL2(HyAudio_SDL2 &audioRef, const jsonxx::Object &instObjRef);
 	virtual ~HyAudioInst_SDL2();
 
 	virtual void OnLoaded() override;

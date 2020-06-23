@@ -42,6 +42,16 @@ public:
 protected:
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
+
+private:
+	// Hide any transform functionality inherited from IHyNode2d
+	void GetLocalTransform(glm::mat4 &outMtx) const = delete;
+	const glm::mat4 &GetWorldTransform() = delete;
+	using IHyNode2d::pos;
+	using IHyNode2d::rot;
+	using IHyNode2d::rot_pivot;
+	using IHyNode2d::scale;
+	using IHyNode2d::scale_pivot;
 };
 
 #endif /* HyAudio2d_h__ */

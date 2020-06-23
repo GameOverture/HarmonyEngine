@@ -136,7 +136,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Assets/Nodes/IHyNodeData.h
 	include/Harmony/Audio/HyAudioHarness.h
 	include/Harmony/Audio/Harness/IHyAudio.h
-	include/Harmony/Audio/Harness/IHyAudioBank.h
+	include/Harmony/Audio/Harness/IHyFileAudioGuts.h
 	include/Harmony/Audio/Harness/IHyAudioInst.h
 	include/Harmony/Audio/Harness/SDL2/HyAudio_SDL2.h
 	include/Harmony/Audio/Harness/SDL2/HyAudioBank_SDL2.h

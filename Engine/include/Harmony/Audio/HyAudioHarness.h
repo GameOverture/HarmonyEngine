@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Audio/Harness/IHyAudio.h"
-#include "Audio/Harness/IHyAudioBank.h"
+#include "Audio/Harness/IHyFileAudioGuts.h"
 #include "Audio/Harness/IHyAudioInst.h"
 
 class HyFileAudio;
@@ -20,7 +20,7 @@ class HyFileAudio;
 class HyAudioHarness
 {
 	using fpAllocateHyAudio					= IHyAudio *(*)();
-	using fpAllocateHyAudioBank				= IHyAudioBank *(*)(IHyAudio *, const jsonxx::Object &);
+	using fpAllocateHyAudioBank				= IHyFileAudioGuts *(*)(IHyAudio *, const jsonxx::Object &);
 	using fpAllocateHyAudioInst				= IHyAudioInst *(*)(IHyAudio *, const jsonxx::Object &);
 
 	fpAllocateHyAudio						m_fpAllocateHyAudio;
@@ -34,7 +34,7 @@ public:
 	HyAudioHarness(std::string sDataDir);
 	~HyAudioHarness();
 
-	IHyAudioBank *AllocateAudioBank(const jsonxx::Object &bankObjRef);
+	IHyFileAudioGuts *AllocateAudioBank(const jsonxx::Object &bankObjRef);
 	IHyAudioInst *AllocateAudioInst(const jsonxx::Object &instObjRef);
 	HyFileAudio *GetAudioBank(const std::string &sBankName);
 

@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyAudioBank.h
+*	IHyFileAudioGuts.h
 *	
 *	Harmony Engine
 *	Copyright (c) 2019 Jason Knobler
@@ -7,22 +7,22 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IHyAudioBank_h__
-#define IHyAudioBank_h__
+#ifndef IHyFileAudioGuts_h__
+#define IHyFileAudioGuts_h__
 
 #include <string>
 
-class IHyAudioBank
+class IHyFileAudioGuts
 {
 public:
-	IHyAudioBank() = default;
-	virtual ~IHyAudioBank(void) = default;
+	IHyFileAudioGuts() = default;
+	virtual ~IHyFileAudioGuts(void) = default;
 
 	virtual bool Load(std::string sFilePath) = 0;
 	virtual void Unload() = 0;
 };
 
-class HyAudioBank_Null : public IHyAudioBank
+class HyAudioBank_Null : public IHyFileAudioGuts
 {
 public:
 	HyAudioBank_Null() = default;
@@ -35,4 +35,4 @@ public:
 	{ }
 };
 
-#endif /* IHyAudioBank_h__ */
+#endif /* IHyFileAudioGuts_h__ */
