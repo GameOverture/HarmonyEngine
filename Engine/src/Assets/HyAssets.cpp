@@ -174,6 +174,9 @@ IHyFile *HyAssets::GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum
 				return &m_FilesMap[HYFILE_AudioBank].m_pFiles[i];
 		}
 		break;
+
+	default:
+		return nullptr;
 	}
 
 	return nullptr;
@@ -569,6 +572,10 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 	case HYFILE_AudioBank:
 		sManifestFilePath = m_sDATADIR + HYASSETS_AudioDir + HYASSETS_AudioFile;
 		break;
+
+	default:
+		HyLogWarning("Cannot parse unhandled file type: " << eFileType);
+		return false;
 	}
 
 	if(HyIO::FileExists(sManifestFilePath) == false)
@@ -678,6 +685,9 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 				++pPlacementLocation;
 			}
 			break; }
+
+		default:
+			break;
 		}
 	}
 	else
@@ -691,6 +701,8 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 		HyFilesManifest::sm_iIndexFlagsArraySize[eFileType]++;
 
 	m_FilesMap[eFileType].m_pLoadedManifest = HY_NEW HyFilesManifest(eFileType);
+	
+	return true;
 }
 
 void HyAssets::QueueData(IHyFile *pData)

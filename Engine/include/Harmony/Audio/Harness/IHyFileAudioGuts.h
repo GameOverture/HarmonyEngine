@@ -10,7 +10,7 @@
 #ifndef IHyFileAudioGuts_h__
 #define IHyFileAudioGuts_h__
 
-#include <string>
+#include "Afx/HyStdAfx.h"
 
 class IHyFileAudioGuts
 {

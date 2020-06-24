@@ -17,7 +17,7 @@
 
 #define HYASSETS_DataFile "data.json"
 #define HYASSETS_AtlasFile "atlas.json"
-#define HYASSETS_AudioFile "audio.json"
+#define HYASSETS_AudioFile "Audio.json"
 
 #define HYASSETS_AtlasDir "Atlases/"
 #define HYASSETS_PrefabDir "Prefabs/"

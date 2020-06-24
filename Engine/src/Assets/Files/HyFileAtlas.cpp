@@ -14,6 +14,8 @@
 #include "soil2/SOIL2.h"
 #include "HyEngine.h"
 
+extern std::string Hy_DataDir();
+
 HyFileAtlas::HyFileAtlas(std::string sFileName,
 				 uint32 uiBankId,
 				 uint32 uiIndexInGroup,

@@ -10,6 +10,7 @@
 #ifndef HyAudioInst_SDL2_h__
 #define HyAudioInst_SDL2_h__
 
+#include "Afx/HyStdAfx.h"
 #include "Audio/Harness/IHyAudioInst.h"
 
 #if defined(HY_USE_SDL2)

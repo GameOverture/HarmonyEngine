@@ -31,7 +31,7 @@ HyAudioHarness::HyAudioHarness(std::string sDataDir) :
 {
 	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "/", true);
 
-#if defined(HY_USE_SDL2)
+#if defined(HY_USE_SDL2) && !defined(HY_PLATFORM_BROWSER)
 	void *hModule = SDL_LoadObject("HyFMOD");
 #elif defined(HY_PLATFORM_WINDOWS)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);

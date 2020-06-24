@@ -7,6 +7,7 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
+#include "Afx/HyStdAfx.h"
 #include "Audio/Harness/SDL2/HyAudioInst_SDL2.h"
 #include "Audio/Harness/SDL2/HyAudio_SDL2.h"
 #include "Diagnostics/Console/HyConsole.h"
