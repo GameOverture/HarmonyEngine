@@ -12,58 +12,72 @@
 #include "Audio/HyAudioHarness.h"
 #include "Assets/Nodes/HyAudioData.h"
 
+IHyAudioCore *HyAudio2d::sm_pAudioCore = nullptr;
+
 HyAudio2d::HyAudio2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
 	IHyLoadable2d(HYTYPE_Audio, sPrefix, sName, pParent),
-	m_pInternal(nullptr)
+	m_uiCueFlags(0),
+	m_fVolume(1.0f),
+	m_fPitch(1.0f),
+	volume(m_fVolume, *this, 0),
+	pitch(m_fPitch, *this, 0)
 {
 }
 
 /*virtual*/ HyAudio2d::~HyAudio2d(void)
 {
-	delete m_pInternal;
+}
+
+void HyAudio2d::PlayOneShot(bool bUseCurrentSettings /*= true*/)
+{
+	if(bUseCurrentSettings)
+		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_PlayOneShot);
+	else
+		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_PlayOneShotDefault);
 }
 
 void HyAudio2d::Start()
 {
-	AcquireData();
-	m_pInternal->Start();
+	m_uiCueFlags &= ~(1 << IHyAudioCore::CUETYPE_Stop);
+	m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Start);
 }
 
 void HyAudio2d::Stop()
 {
-	AcquireData();
-	m_pInternal->Stop();
+	m_uiCueFlags &= ~(1 << IHyAudioCore::CUETYPE_Start);
+	m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Stop);
 }
 
-float HyAudio2d::GetPitch()
+void HyAudio2d::SetPause(bool bPause)
 {
-	AcquireData();
-	return m_pInternal->GetPitch();
-}
-
-void HyAudio2d::SetPitch(float fPitch)
-{
-	AcquireData();
-	m_pInternal->SetPitch(fPitch);
-}
-
-void HyAudio2d::SetReverb(int iIndex, float fLevel)
-{
-	AcquireData();
-	m_pInternal->SetReverb(iIndex, fLevel);
-}
-
-/*virtual*/ void HyAudio2d::OnDataAcquired() /*override*/
-{
-	if(m_pInternal == nullptr)
+	if(bPause)
 	{
-		const HyAudioData *pData = static_cast<const HyAudioData *>(UncheckedGetData());
-		m_pInternal = pData->AllocateNewInstance();
+		m_uiCueFlags &= ~(1 << IHyAudioCore::CUETYPE_Unpause);
+		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Pause);
+	}
+	else
+	{
+		m_uiCueFlags &= ~(1 << IHyAudioCore::CUETYPE_Pause);
+		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Unpause);
 	}
 }
 
-/*virtual*/ void HyAudio2d::OnLoaded() /*override*/
+/*virtual*/ void HyAudio2d::OnLoadedUpdate() /*override*/
 {
-	AcquireData();
-	m_pInternal->OnLoaded();
+	if(IsDirty(DIRTY_Audio))
+	{
+		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Attributes);
+		ClearDirty(DIRTY_Audio);
+	}
+
+	if(m_uiCueFlags)
+	{
+		for(uint32 i = 0; i < IHyAudioCore::NUM_CUETYPES; ++i)
+		{
+			if(0 != (m_uiCueFlags & (1 << i)))
+				sm_pAudioCore->AppendCue(this, static_cast<IHyAudioCore::CueType>(i));
+		}
+
+		m_uiCueFlags = 0;
+	}
 }

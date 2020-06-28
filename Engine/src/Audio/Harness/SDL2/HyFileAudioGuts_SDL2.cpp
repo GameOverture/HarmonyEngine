@@ -20,7 +20,7 @@ HyFileAudioGuts_SDL2::HyFileAudioGuts_SDL2(const jsonxx::Object &bankObjRef)
 	{
 		jsonxx::Object assetObj = assetsArray.get<jsonxx::Object>(i);
 
-		Buffer *pNewBuffer = HY_NEW Buffer(assetObj.get<jsonxx::String>("fileName"));
+		HyRawSoundBuffer *pNewBuffer = HY_NEW HyRawSoundBuffer(assetObj.get<jsonxx::String>("fileName"));
 		m_SoundBuffers.push_back(pNewBuffer);
 		m_ChecksumMap[static_cast<uint32>(assetObj.get<jsonxx::Number>("checksum"))] = pNewBuffer;
 	}
@@ -41,44 +41,29 @@ HyFileAudioGuts_SDL2::HyFileAudioGuts_SDL2(const jsonxx::Object &bankObjRef)
 
 /*virtual*/ bool HyFileAudioGuts_SDL2::Load(std::string sFilePath) /*override*/
 {
+	bool bAllLoaded = true;
 	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBuffers.size()); ++i)
 	{
-		std::string s = sFilePath;
-		s += "/";
-		s += m_SoundBuffers[i]->m_sFileName;
-
-		if(SDL_LoadWAV(s.c_str(),
-					   &m_SoundBuffers[i]->m_Spec,
-					   &m_SoundBuffers[i]->m_pBuffer,
-					   &m_SoundBuffers[i]->m_uiBufferSize) == nullptr)
-		{
-			HyLogError("HyFileAudioGuts_SDL2::Load SDL_LoadWAV failed: " << SDL_GetError());
-			return false;
-		}
+		if(m_SoundBuffers[i]->Load(sFilePath) == false)
+			bAllLoaded = false;
 	}
 
-	return true;
+	return bAllLoaded;
 }
 
 /*virtual*/ void HyFileAudioGuts_SDL2::Unload() /*override*/
 {
 	for(uint32 i = 0; i < m_SoundBuffers.size(); ++i)
-		SDL_FreeWAV(m_SoundBuffers[i]->m_pBuffer);
-
-	m_SoundBuffers.clear();
+		m_SoundBuffers[i]->Unload();
 }
 
-bool HyFileAudioGuts_SDL2::GetBufferInfo(uint32 uiChecksum, uint8_t *&pBufferOut, uint32 &uiSizeOut, SDL_AudioSpec &audioSpecOut)
+HyRawSoundBuffer *HyFileAudioGuts_SDL2::GetBufferInfo(uint32 uiChecksum)
 {
 	auto iter = m_ChecksumMap.find(uiChecksum);
 	if(iter == m_ChecksumMap.end())
-		return false;
+		return nullptr;
 
-	pBufferOut = iter->second->m_pBuffer;
-	uiSizeOut = iter->second->m_uiBufferSize;
-	audioSpecOut = iter->second->m_Spec;
-
-	return true;
+	return iter->second;
 }
 
 #endif // defined(HY_USE_SDL2)

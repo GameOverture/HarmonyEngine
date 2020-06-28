@@ -26,8 +26,7 @@
 HyAudioHarness::HyAudioHarness(std::string sDataDir) :
 	m_fpAllocateHyAudio(nullptr),
 	m_fpAllocateHyAudioBank(nullptr),
-	m_fpAllocateHyAudioInst(nullptr),
-	m_pInternal(nullptr)
+	m_pCore(nullptr)
 {
 	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "/", true);
 
@@ -44,23 +43,20 @@ HyAudioHarness::HyAudioHarness(std::string sDataDir) :
 #if defined(HY_USE_SDL2)
 		m_fpAllocateHyAudio = (fpAllocateHyAudio)SDL_LoadFunction(hModule, "AllocateHyAudio_FMOD");
 		m_fpAllocateHyAudioBank = (fpAllocateHyAudioBank)SDL_LoadFunction(hModule, "AllocateHyAudioBank_FMOD");
-		m_fpAllocateHyAudioInst = (fpAllocateHyAudioInst)SDL_LoadFunction(hModule, "AllocateHyAudioInst_FMOD");
 #elif defined(HY_PLATFORM_WINDOWS)
 		m_fpAllocateHyAudio = (fpAllocateHyAudio)::GetProcAddress(hModule, "AllocateHyAudio_FMOD");
 		m_fpAllocateHyAudioBank = (fpAllocateHyAudioBank)::GetProcAddress(hModule, "AllocateHyAudioBank_FMOD");
-		m_fpAllocateHyAudioInst = (fpAllocateHyAudioInst)::GetProcAddress(hModule, "AllocateHyAudioInst_FMOD");
 #endif
-		if(m_fpAllocateHyAudio != nullptr && m_fpAllocateHyAudioBank != nullptr && m_fpAllocateHyAudioInst != nullptr)
+		if(m_fpAllocateHyAudio != nullptr && m_fpAllocateHyAudioBank != nullptr)
 		{
 			HyLogInfo("FMOD audio library detected");
-			m_pInternal = m_fpAllocateHyAudio();
+			m_pCore = m_fpAllocateHyAudio();
 		}
 		else
 		{
 			HyLogError("A GetProcAddress() has failed in the FMOD module");
 			m_fpAllocateHyAudio = nullptr;
 			m_fpAllocateHyAudioBank = nullptr;
-			m_fpAllocateHyAudioInst = nullptr;
 #if defined(HY_USE_SDL2)
 			SDL_UnloadObject(hModule);
 #elif defined(HY_PLATFORM_WINDOWS)
@@ -71,18 +67,17 @@ HyAudioHarness::HyAudioHarness(std::string sDataDir) :
 
 #if defined(HY_USE_SDL2)
 	// If no audio libraries were dynamically loaded, use SDL2 implementation
-	if(m_pInternal == nullptr)
+	if(m_pCore == nullptr)
 	{
-		m_pInternal = HY_NEW HyAudio_SDL2();
+		m_pCore = HY_NEW HyAudio_SDL2();
 		m_fpAllocateHyAudioBank = HyAudio_SDL2::AllocateBank;
-		m_fpAllocateHyAudioInst = HyAudio_SDL2::AllocateInst;
 	}
 #endif
 	
-	if(m_pInternal == nullptr)
+	if(m_pCore == nullptr)
 	{
 		HyLogWarning("No audio library detected");
-		m_pInternal = HY_NEW HyAudio_Null();
+		m_pCore = HY_NEW HyAudioCore_Null();
 	}
 }
 
@@ -91,8 +86,8 @@ HyAudioHarness::~HyAudioHarness()
 	for(auto iter = m_AudioBankMap.begin(); iter != m_AudioBankMap.end(); ++iter)
 		delete iter->second;
 
-	delete m_pInternal;
-	m_pInternal = nullptr;
+	delete m_pCore;
+	m_pCore = nullptr;
 
 #if !defined(HY_USE_SDL2) && defined(HY_PLATFORM_WINDOWS)
 	CoUninitialize();
@@ -102,17 +97,9 @@ HyAudioHarness::~HyAudioHarness()
 IHyFileAudioGuts *HyAudioHarness::AllocateAudioBank(const jsonxx::Object &bankObjRef)
 {
 	if(m_fpAllocateHyAudioBank)
-		return m_fpAllocateHyAudioBank(m_pInternal, bankObjRef);
+		return m_fpAllocateHyAudioBank(m_pCore, bankObjRef);
 
 	return HY_NEW HyAudioBank_Null();
-}
-
-IHyAudioInst *HyAudioHarness::AllocateAudioInst(const jsonxx::Object &instObjRef)
-{
-	if(m_fpAllocateHyAudioInst)
-		return m_fpAllocateHyAudioInst(m_pInternal, instObjRef);
-
-	return HY_NEW HyAudioInst_Null();
 }
 
 HyFileAudio *HyAudioHarness::GetAudioBank(const std::string &sBankName)
@@ -126,5 +113,5 @@ HyFileAudio *HyAudioHarness::GetAudioBank(const std::string &sBankName)
 
 void HyAudioHarness::Update()
 {
-	m_pInternal->OnUpdate();
+	m_pCore->OnUpdate();
 }

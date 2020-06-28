@@ -28,6 +28,7 @@ HyAnimFloat::HyAnimFloat(float &valueReference, IHyNode &ownerRef, uint32 uiDirt
 	m_fpAnimFinishedFunc(NullFinishedCallback),
 	m_bAddedToOwnerUpdate(false)
 {
+	HyAssert(0 == (m_uiDIRTY_FLAGS & IHyNode::DIRTY_FromUpdater), "HyAnimFloat should not be passed 'DIRTY_FromUpdater'");
 }
 
 HyAnimFloat::~HyAnimFloat(void)

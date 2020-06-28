@@ -38,7 +38,7 @@ class HyScene
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;		// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
 
-	static std::vector<HyPhysicsGrid2d *>					sm_PhysicsGridList;
+	static std::vector<HyPhysicsGrid2d *>				sm_PhysicsGridList;
 
 	// List of nodes who can be drawn, and their graphics assets are fully loaded
 	std::vector<IHyInstance2d *>						m_NodeList_LoadedDrawable2d;
@@ -68,8 +68,8 @@ public:
 
 	void SetPause(bool bPause);
 
-	void UpdatePhysics();
 	void UpdateNodes();
+	void UpdatePhysics();
 	void PrepareRender(IHyRenderer &rendererRef);
 
 	bool CalculateCameraMask(/*const*/ IHyInstance2d &instanceRef, uint32 &uiCameraMaskOut) const;

@@ -238,10 +238,10 @@ void IHyDrawable2d::CalculateColor()
 	childRef._SetCoordinateSystem(parentRef.GetCoordinateSystem(), false);
 
 	if(parentRef.IsScissorSet())
-		static_cast<IHyDrawable2d &>(childRef)._SetScissor(parentRef.m_pScissor, false);
+		childRef._SetScissor(parentRef.m_pScissor, false);
 
 	if(parentRef.IsStencilSet())
-		static_cast<IHyDrawable2d &>(childRef)._SetStencil(parentRef.m_hStencil, false);
+		childRef._SetStencil(parentRef.m_hStencil, false);
 
 	parentRef.SetChildrenDisplayOrder(false);
 }

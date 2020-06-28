@@ -21,11 +21,19 @@ class HyAudioData : public IHyNodeData
 	HyAudioHarness &		m_AudioRef;
 	const jsonxx::Object	m_InitObj;
 
+	enum CueType
+	{
+		CUETYPE_Unknown = -1,
+		CUETYPE_Single = 0
+	};
+	CueType					m_eCueType;
+	std::vector<uint32>		m_SoundChecksumList;
+
 public:
 	HyAudioData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
 
-	IHyAudioInst *AllocateNewInstance() const;
+	uint32 GetSound() const;
 };
 
 #endif /* HyAudioData_h__ */

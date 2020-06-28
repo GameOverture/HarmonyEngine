@@ -158,11 +158,6 @@ const glm::mat4 &IHyNode3d::GetWorldTransform()
 	return m_mtxCached;
 }
 
-/*virtual*/ void IHyNode3d::Update() /*override*/
-{
-	IHyNode::Update();
-}
-
 /*friend*/ void _CtorSetupNewChild(HyEntity3d &parentRef, IHyNode3d &childRef)
 {
 	_CtorChildAppend(parentRef, childRef);

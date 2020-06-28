@@ -41,19 +41,20 @@ protected:
 		DIRTY_Scale					= 1 << 12,
 		DIRTY_Color					= 1 << 13,
 		DIRTY_Scissor				= 1 << 14,
+		DIRTY_Audio					= 1 << 15,
 
-		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_BoundingVolume | DIRTY_WorldAABB | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale | DIRTY_Color | DIRTY_Scissor
+		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_BoundingVolume | DIRTY_WorldAABB | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale | DIRTY_Color | DIRTY_Scissor | DIRTY_Audio
 	};
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
 	enum ExplicitFlag // NOTE: continue the bits in DirtyFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		EXPLICIT_Visible			= 1 << 15,
-		EXPLICIT_PauseUpdate		= 1 << 16,
-		EXPLICIT_Scissor			= 1 << 17,
-		EXPLICIT_Stencil			= 1 << 18,
-		EXPLICIT_DisplayOrder		= 1 << 19,
-		EXPLICIT_CoordinateSystem	= 1 << 20,
+		EXPLICIT_Visible			= 1 << 16,
+		EXPLICIT_PauseUpdate		= 1 << 17,
+		EXPLICIT_Scissor			= 1 << 18,
+		EXPLICIT_Stencil			= 1 << 19,
+		EXPLICIT_DisplayOrder		= 1 << 20,
+		EXPLICIT_CoordinateSystem	= 1 << 21,
 	};
 	// Various boolean values for node stored in these flags for smaller memory footprint
 	enum SettingFlag // NOTE: continue the bits in ExplicitFlag (stored in same 32bit member 'm_uiFlags')

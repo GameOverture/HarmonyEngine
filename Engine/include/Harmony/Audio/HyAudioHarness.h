@@ -11,7 +11,7 @@
 #define HyAudioHarness_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Audio/Harness/IHyAudio.h"
+#include "Audio/Harness/IHyAudioCore.h"
 #include "Audio/Harness/IHyFileAudioGuts.h"
 #include "Audio/Harness/IHyAudioInst.h"
 
@@ -19,14 +19,12 @@ class HyFileAudio;
 
 class HyAudioHarness
 {
-	using fpAllocateHyAudio					= IHyAudio *(*)();
-	using fpAllocateHyAudioBank				= IHyFileAudioGuts *(*)(IHyAudio *, const jsonxx::Object &);
-	using fpAllocateHyAudioInst				= IHyAudioInst *(*)(IHyAudio *, const jsonxx::Object &);
+	using fpAllocateHyAudio					= IHyAudioCore *(*)();
+	using fpAllocateHyAudioBank				= IHyFileAudioGuts *(*)(IHyAudioCore *, const jsonxx::Object &);
 
 	fpAllocateHyAudio						m_fpAllocateHyAudio;
 	fpAllocateHyAudioBank					m_fpAllocateHyAudioBank;
-	fpAllocateHyAudioInst					m_fpAllocateHyAudioInst;
-	IHyAudio *								m_pInternal;
+	IHyAudioCore *							m_pCore;
 
 	std::map<std::string, HyFileAudio *>	m_AudioBankMap;
 
@@ -35,7 +33,6 @@ public:
 	~HyAudioHarness();
 
 	IHyFileAudioGuts *AllocateAudioBank(const jsonxx::Object &bankObjRef);
-	IHyAudioInst *AllocateAudioInst(const jsonxx::Object &instObjRef);
 	HyFileAudio *GetAudioBank(const std::string &sBankName);
 
 	void Update();

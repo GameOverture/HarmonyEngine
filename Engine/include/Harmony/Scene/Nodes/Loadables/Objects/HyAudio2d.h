@@ -17,7 +17,20 @@
 
 class HyAudio2d : public IHyLoadable2d
 {
-	IHyAudioInst *		m_pInternal;
+	friend class IHyAudioCore;
+	static IHyAudioCore * 		sm_pAudioCore;
+	
+	uint32						m_uiCueFlags;
+
+	float						m_fVolume;
+	float						m_fPitch;
+
+	//uint8_t					loop;
+	//uint8_t					fade;
+
+public:
+	HyAnimFloat					volume;
+	HyAnimFloat					pitch;
 
 public:
 	HyAudio2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);
@@ -26,32 +39,29 @@ public:
 
 	// TODO: assignment operator and move operator
 
+	void PlayOneShot(bool bUseCurrentSettings = true);
 	void Start();
 	void Stop();
-
-	HyAudioCtrl GetState() const;
-
-	bool IsPaused();
 	void SetPause(bool bPause);
 
-	float GetPitch();
-	void SetPitch(float fPitch);
-
-	void SetReverb(int iIndex, float fLevel);
-
 protected:
-	virtual void OnDataAcquired() override;
-	virtual void OnLoaded() override;
+	virtual void OnLoadedUpdate() override;
 
 private:
 	// Hide any transform functionality inherited from IHyNode2d
 	void GetLocalTransform(glm::mat4 &outMtx) const = delete;
 	const glm::mat4 &GetWorldTransform() = delete;
+	using IHyNode2d::GetWorldAABB;
 	using IHyNode2d::pos;
 	using IHyNode2d::rot;
 	using IHyNode2d::rot_pivot;
 	using IHyNode2d::scale;
 	using IHyNode2d::scale_pivot;
+
+	using IHyNode::IsVisible;
+	using IHyNode::SetVisible;
+	using IHyNode::IsPauseUpdate;
+	using IHyNode::SetPauseUpdate;
 };
 
 #endif /* HyAudio2d_h__ */

@@ -48,8 +48,6 @@ public:
 	const glm::mat4 &GetWorldTransform();
 
 protected:
-	virtual void Update() override;
-
 	friend void _CtorSetupNewChild(HyEntity3d &parentRef, IHyNode3d &childRef);
 };
 

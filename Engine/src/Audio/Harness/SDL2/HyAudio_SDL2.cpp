@@ -11,7 +11,9 @@
 #include "Audio/Harness/SDL2/HyAudio_SDL2.h"
 #include "Audio/Harness/SDL2/HyFileAudioGuts_SDL2.h"
 #include "Audio/Harness/SDL2/HyAudioInst_SDL2.h"
+#include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
 #include "Diagnostics/Console/HyConsole.h"
+#include "Utilities/HyMath.h"
 
 #if defined(HY_USE_SDL2)
 
@@ -55,6 +57,8 @@ HyAudio_SDL2::HyAudio_SDL2()
 
 	// Start audio device
 	SDL_PauseAudioDevice(m_hDevice, 0);
+
+	m_PlayList.reserve(15); // TODO: Set to max sound events?
 }
 
 /*virtual*/ HyAudio_SDL2::~HyAudio_SDL2(void)
@@ -70,31 +74,61 @@ const char *HyAudio_SDL2::GetAudioDriver()
 
 /*virtual*/ void HyAudio_SDL2::OnUpdate() /*override*/
 {
-	SDL_LockAudioDevice(m_hDevice);
-	SDL_UnlockAudioDevice(m_hDevice);
-}
-
-void HyAudio_SDL2::QueueInst(HyAudioInst_SDL2 *pInst, uint32 uiSoundChecksum)
-{
-	Play newPlay = {};
-	bool bFound = false;
-	for(auto file : m_AudioFileList)
+	std::vector<Play> newPlayList;
+	for(auto cue : m_CueList)
 	{
-		if(file->GetBufferInfo(uiSoundChecksum, newPlay.m_pBufferPos, newPlay.m_uiRemainingBytes, newPlay.m_AudioSpec))
+		switch(cue.m_eCueType)
 		{
-			bFound = true;
+		case CUETYPE_PlayOneShotDefault:
+		case CUETYPE_PlayOneShot:
+		case CUETYPE_Start:
+			uint32 uiSoundChecksum = 0;
+			if(cue.m_pNode->Is2D())
+				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio2d *>(cue.m_pNode)->AcquireData())->GetSound();
+			//else
+			//	uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio3d *>(cue.m_pNode)->AcquireData())->GetSound();
+
+			Play newPlay = {};
+			bool bFound = false;
+			for(auto file : m_AudioFileList)
+			{
+				newPlay.m_pBuffer = file->GetBufferInfo(uiSoundChecksum);
+				newPlay.m_uiRemainingBytes = newPlay.m_pBuffer->GetBufferSize();
+				if(newPlay.m_pBuffer)
+				{
+					bFound = true;
+					break;
+				}
+			}
+			if(bFound == false)
+			{
+				HyLogWarning("Could not find audio: " << uiSoundChecksum);
+				return;
+			}
+
+			if(cue.m_eCueType == CUETYPE_Start)
+				newPlay.m_pNode = cue.m_pNode;
+			else
+				newPlay.m_pNode = nullptr;
+
+			newPlayList.push_back(newPlay);
+			break;
+
+		case CUETYPE_Stop:
+			Play newPlay = {};
+
+			break;
+		case CUETYPE_Pause:
+			break;
+		case CUETYPE_Attributes:
 			break;
 		}
-	}
-	if(bFound == false)
-	{
-		HyLogWarning("Could not find audio: " << uiSoundChecksum);
-		return;
-	}
 
-	newPlay.m_pInst = pInst;
+			
+	}
 
 	SDL_LockAudioDevice(m_hDevice);
+
 	m_PlayList.push_back(newPlay);
 	SDL_UnlockAudioDevice(m_hDevice);
 }
@@ -109,9 +143,12 @@ void HyAudio_SDL2::QueueInst(HyAudioInst_SDL2 *pInst, uint32 uiSoundChecksum)
 		Play &playRef = pThis->m_PlayList[i];
 
 		uint32 uiLength = (static_cast<uint32_t>(iLen) > playRef.m_uiRemainingBytes) ? playRef.m_uiRemainingBytes : static_cast<uint32_t>(iLen);
-		SDL_MixAudioFormat(pStream, playRef.m_pBufferPos, playRef.m_AudioSpec.format, uiLength, SDL_MIX_MAXVOLUME);
 
-		playRef.m_pBufferPos += uiLength;
+		int iVolume = SDL_MIX_MAXVOLUME;
+		if(playRef.m_pInst)
+			iVolume *= playRef.m_pInst->GetVolume();
+
+		SDL_MixAudioFormat(pStream, playRef.m_pBuffer->GetBuffer(playRef.m_uiRemainingBytes), playRef.m_pBuffer->GetFormat(), uiLength, HyClamp(iVolume, 0, SDL_MIX_MAXVOLUME));
 		playRef.m_uiRemainingBytes -= uiLength;
 	}
 
@@ -124,17 +161,12 @@ void HyAudio_SDL2::QueueInst(HyAudioInst_SDL2 *pInst, uint32 uiSoundChecksum)
 	}
 }
 
-/*static*/ IHyFileAudioGuts *HyAudio_SDL2::AllocateBank(IHyAudio *pAudio, const jsonxx::Object &bankObjRef)
+/*static*/ IHyFileAudioGuts *HyAudio_SDL2::AllocateBank(IHyAudioCore *pAudio, const jsonxx::Object &bankObjRef)
 {
 	HyFileAudioGuts_SDL2 *pNewFileGuts = HY_NEW HyFileAudioGuts_SDL2(bankObjRef);
 	static_cast<HyAudio_SDL2 *>(pAudio)->m_AudioFileList.push_back(pNewFileGuts);
 
 	return pNewFileGuts;
-}
-
-/*static*/ IHyAudioInst *HyAudio_SDL2::AllocateInst(IHyAudio *pAudio, const jsonxx::Object &instObjRef)
-{
-	return HY_NEW HyAudioInst_SDL2(*static_cast<HyAudio_SDL2 *>(pAudio), instObjRef);
 }
 
 #endif // defined(HY_USE_SDL2)

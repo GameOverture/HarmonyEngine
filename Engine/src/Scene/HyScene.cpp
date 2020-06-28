@@ -145,14 +145,6 @@ void HyScene::SetPause(bool bPause)
 
 //PRIVATE//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void HyScene::UpdatePhysics()
-{
-	HY_PROFILE_BEGIN(HYPROFILERSECTION_Physics)
-	for(auto physGrid : sm_PhysicsGridList)
-		physGrid->Update();
-	HY_PROFILE_END
-}
-
 void HyScene::UpdateNodes()
 {
 	HY_PROFILE_BEGIN(HYPROFILERSECTION_Nodes)
@@ -167,6 +159,14 @@ void HyScene::UpdateNodes()
 			sm_NodeList_PauseUpdate[i]->Update();
 	}
 
+	HY_PROFILE_END
+}
+
+void HyScene::UpdatePhysics()
+{
+	HY_PROFILE_BEGIN(HYPROFILERSECTION_Physics)
+		for(auto physGrid : sm_PhysicsGridList)
+			physGrid->Update();
 	HY_PROFILE_END
 }
 

@@ -18,21 +18,7 @@ class HyAudio_SDL2;
 
 class HyAudioInst_SDL2 : public IHyAudioInst
 {
-	HyAudio_SDL2 &			m_AudioRef;
-
-	std::vector<uint32>		m_SoundChecksumList;
-
-	enum CueType
-	{
-		CUETYPE_Unknown = -1,
-		CUETYPE_Single = 0
-	};
-	CueType					m_eCueType;
-
-	uint8_t					loop;
-	uint8_t					fade;
-	uint8_t					free;
-	uint8_t					volume;
+	
 
 public:
 	HyAudioInst_SDL2(HyAudio_SDL2 &audioRef, const jsonxx::Object &instObjRef);
@@ -40,6 +26,7 @@ public:
 
 	virtual void OnLoaded() override;
 
+	virtual void PlayOneShot() override;
 	virtual void Start() override;
 	virtual void Stop(HyAudioStop eStopType = HYAUDIOSTOP_AllowFadeOut) override;
 

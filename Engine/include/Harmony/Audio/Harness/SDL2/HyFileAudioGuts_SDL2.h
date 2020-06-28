@@ -10,26 +10,65 @@
 #ifndef HyAudioBank_SDL2_h__
 #define HyAudioBank_SDL2_h__
 
+#include "Afx/HyStdAfx.h"
 #include "Audio/Harness/IHyFileAudioGuts.h"
+#include "Diagnostics/Console/HyConsole.h"
 
 #if defined(HY_USE_SDL2)
+class HyRawSoundBuffer
+{
+	const std::string			m_sFILE_NAME;
+
+	uint8_t *					m_pBuffer;
+	uint32						m_uiBufferSize;
+	SDL_AudioSpec				m_Spec;
+
+public:
+	HyRawSoundBuffer(std::string sFileName) :
+		m_sFILE_NAME(sFileName),
+		m_pBuffer(nullptr),
+		m_uiBufferSize(0)
+	{
+		m_Spec = {};
+	}
+
+	const uint8_t *GetBuffer(uint32 uiRemainingBytes) const {
+		return m_pBuffer + (m_uiBufferSize - uiRemainingBytes);
+	}
+
+	uint32 GetBufferSize() const {
+		return m_uiBufferSize;
+	}
+
+	SDL_AudioFormat GetFormat() const {
+		return m_Spec.format;
+	}
+
+	bool Load(std::string sFilePath) {
+		std::string s = sFilePath;
+		s += "/";
+		s += m_sFILE_NAME;
+
+		if(SDL_LoadWAV(s.c_str(), &m_Spec, &m_pBuffer, &m_uiBufferSize) == nullptr)
+		{
+			HyLogError("HyRawSoundBuffer::Load SDL_LoadWAV failed: " << SDL_GetError());
+			return false;
+		}
+	}
+
+	void Unload() {
+		if(m_pBuffer)
+			SDL_FreeWAV(m_pBuffer);
+		m_pBuffer = nullptr;
+		m_uiBufferSize = 0;
+		m_Spec = {};
+	}
+};
+
 class HyFileAudioGuts_SDL2 : public IHyFileAudioGuts
 {
-	struct Buffer
-	{
-		std::string					m_sFileName;
-		uint8_t *					m_pBuffer;
-		uint32						m_uiBufferSize;
-		SDL_AudioSpec				m_Spec;
-
-		Buffer(std::string sFileName) :
-			m_sFileName(sFileName),
-			m_pBuffer(nullptr),
-			m_uiBufferSize(0)
-		{ m_Spec = {}; }
-	};
-	std::vector<Buffer *>			m_SoundBuffers;
-	std::map<uint32, Buffer *>		m_ChecksumMap;
+	std::vector<HyRawSoundBuffer *>			m_SoundBuffers;
+	std::map<uint32, HyRawSoundBuffer *>	m_ChecksumMap;
 
 public:
 	HyFileAudioGuts_SDL2(const jsonxx::Object &bankObjRef);
@@ -40,7 +79,7 @@ public:
 	virtual bool Load(std::string sFilePath) override;
 	virtual void Unload() override;
 
-	bool GetBufferInfo(uint32 uiChecksum, uint8_t *&pBufferOut, uint32 &uiSizeOut, SDL_AudioSpec &audioSpecOut);
+	HyRawSoundBuffer *GetBufferInfo(uint32 uiChecksum);
 };
 #endif // HY_USE_SDL2
 

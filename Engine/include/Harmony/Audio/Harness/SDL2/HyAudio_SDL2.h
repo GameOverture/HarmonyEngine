@@ -11,16 +11,16 @@
 #define HyAudio_SDL2_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Audio/Harness/IHyAudio.h"
+#include "Audio/Harness/IHyAudioCore.h"
 
+class IHyNode;
 class IHyFileAudioGuts;
-class IHyAudioInst;
 
 #if defined(HY_USE_SDL2)
-class HyAudioInst_SDL2;
+class HyRawSoundBuffer;
 class HyFileAudioGuts_SDL2;
 
-class HyAudio_SDL2 : public IHyAudio
+class HyAudio_SDL2 : public IHyAudioCore
 {
 	std::vector<std::string>			m_sDeviceList;
 
@@ -29,14 +29,18 @@ class HyAudio_SDL2 : public IHyAudio
 
 	std::vector<HyFileAudioGuts_SDL2 *>	m_AudioFileList;
 
+	// Used in callback thread ///////////////////////////////////////////////
 	struct Play
 	{
-		HyAudioInst_SDL2 *				m_pInst;
-		uint8_t *						m_pBufferPos;
+		const IHyNode *					m_pNode;
+		float							m_fVolume;
+		float							m_fPitch;
+		HyRawSoundBuffer *				m_pBuffer;
 		uint32							m_uiRemainingBytes;
-		SDL_AudioSpec					m_AudioSpec;
 	};
 	std::vector<Play>					m_PlayList;
+	std::vector<Play>					m_PauseList;
+	///////////////////////////////////////////////////////////////////////////
 
 public:
 	HyAudio_SDL2();
@@ -46,10 +50,7 @@ public:
 
 	virtual void OnUpdate() override;
 
-	void QueueInst(HyAudioInst_SDL2 *pInst, uint32 uiSoundChecksum);
-
-	static IHyFileAudioGuts *AllocateBank(IHyAudio *pAudio, const jsonxx::Object &bankObjRef);
-	static IHyAudioInst *AllocateInst(IHyAudio *pAudio, const jsonxx::Object &instObjRef);
+	static IHyFileAudioGuts *AllocateBank(IHyAudioCore *pAudio, const jsonxx::Object &bankObjRef);
 
 private:
 	static void OnCallback(void *pUserData, uint8_t *pStream, int32 iLen);

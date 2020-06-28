@@ -154,5 +154,5 @@ void IHyDrawable3d::CalculateColor()
 	childRef._SetCoordinateSystem(parentRef.GetCoordinateSystem(), false);
 
 	if(parentRef.IsScissorSet())
-		static_cast<IHyDrawable3d &>(childRef)._SetScissor(parentRef.m_pScissor, false);
+		childRef._SetScissor(parentRef.m_pScissor, false);
 }
