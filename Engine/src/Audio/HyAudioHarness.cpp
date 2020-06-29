@@ -16,8 +16,8 @@
 #include "HyEngine.h"
 
 #if defined(HY_USE_SDL2)
-	#include "Audio/Harness/SDL2/HyAudio_SDL2.h"
-	#include "Audio/Harness/SDL2/HyFileAudioGuts_SDL2.h"
+	#include "Audio/Harness/SDL2/HyAudioCore_SDL2.h"
+	#include "Audio/Harness/SDL2/HyFileAudioImpl_SDL2.h"
 #elif defined(HY_PLATFORM_WINDOWS)
 	#include <Objbase.h>
 #endif
@@ -68,8 +68,8 @@ HyAudioHarness::HyAudioHarness(std::string sDataDir) :
 	// If no audio libraries were dynamically loaded, use SDL2 implementation
 	if(m_pCore == nullptr)
 	{
-		m_pCore = HY_NEW HyAudio_SDL2();
-		m_fpAllocateHyAudioBank = HyAudio_SDL2::AllocateBank;
+		m_pCore = HY_NEW HyAudioCore_SDL2();
+		m_fpAllocateHyAudioBank = HyAudioCore_SDL2::AllocateBank;
 	}
 #endif
 	
@@ -93,7 +93,7 @@ HyAudioHarness::~HyAudioHarness()
 #endif
 }
 
-IHyFileAudioGuts *HyAudioHarness::AllocateAudioBank(const jsonxx::Object &bankObjRef)
+IHyFileAudioImpl *HyAudioHarness::AllocateAudioBank(const jsonxx::Object &bankObjRef)
 {
 	if(m_fpAllocateHyAudioBank)
 		return m_fpAllocateHyAudioBank(m_pCore, bankObjRef);

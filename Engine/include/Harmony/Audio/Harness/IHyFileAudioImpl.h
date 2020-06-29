@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyFileAudioGuts.h
+*	IHyFileAudioImpl.h
 *	
 *	Harmony Engine
 *	Copyright (c) 2019 Jason Knobler
@@ -7,16 +7,16 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IHyFileAudioGuts_h__
-#define IHyFileAudioGuts_h__
+#ifndef IHyFileAudioImpl_h__
+#define IHyFileAudioImpl_h__
 
 #include "Afx/HyStdAfx.h"
 
-class IHyFileAudioGuts
+class IHyFileAudioImpl
 {
 public:
-	IHyFileAudioGuts() = default;
-	virtual ~IHyFileAudioGuts(void) = default;
+	IHyFileAudioImpl() = default;
+	virtual ~IHyFileAudioImpl(void) = default;
 
 	virtual bool ContainsAsset(uint32 uiAssetChecksum) = 0;
 
@@ -24,7 +24,7 @@ public:
 	virtual void Unload() = 0;
 };
 
-class HyAudioBank_Null : public IHyFileAudioGuts
+class HyAudioBank_Null : public IHyFileAudioImpl
 {
 public:
 	HyAudioBank_Null() = default;
@@ -40,4 +40,4 @@ public:
 	{ }
 };
 
-#endif /* IHyFileAudioGuts_h__ */
+#endif /* IHyFileAudioImpl_h__ */

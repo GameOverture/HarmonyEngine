@@ -12,14 +12,14 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/IHyFile.h"
-#include "Audio/Harness/IHyFileAudioGuts.h"
+#include "Audio/Harness/IHyFileAudioImpl.h"
 
 class HyFileAudio : public IHyFile
 {
-	IHyFileAudioGuts *		m_pInternal;
+	IHyFileAudioImpl *		m_pInternal;
 
 public:
-	HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyFileAudioGuts *pInternal);
+	HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyFileAudioImpl *pInternal);
 	virtual ~HyFileAudio();
 
 	bool ContainsAsset(uint32 uiAssetChecksum);

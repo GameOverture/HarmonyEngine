@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyFileAudioGuts_SDL2.h
+*	HyFileAudioImpl_SDL2.h
 *	
 *	Harmony Engine
 *	Copyright (c) 2020 Jason Knobler
@@ -11,7 +11,7 @@
 #define HyAudioBank_SDL2_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Audio/Harness/IHyFileAudioGuts.h"
+#include "Audio/Harness/IHyFileAudioImpl.h"
 #include "Diagnostics/Console/HyConsole.h"
 
 #if defined(HY_USE_SDL2)
@@ -67,14 +67,14 @@ public:
 	}
 };
 
-class HyFileAudioGuts_SDL2 : public IHyFileAudioGuts
+class HyFileAudioImpl_SDL2 : public IHyFileAudioImpl
 {
 	std::vector<HyRawSoundBuffer *>			m_SoundBuffers;
 	std::map<uint32, HyRawSoundBuffer *>	m_ChecksumMap;
 
 public:
-	HyFileAudioGuts_SDL2(const jsonxx::Object &bankObjRef);
-	virtual ~HyFileAudioGuts_SDL2();
+	HyFileAudioImpl_SDL2(const jsonxx::Object &bankObjRef);
+	virtual ~HyFileAudioImpl_SDL2();
 
 	virtual bool ContainsAsset(uint32 uiAssetChecksum) override;
 

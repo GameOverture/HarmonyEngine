@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyAudio_SDL2.cpp
+ *	HyAudioCore_SDL2.cpp
  *
  *	Harmony Engine
  *	Copyright (c) 2020 Jason Knobler
@@ -8,8 +8,8 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Audio/Harness/SDL2/HyAudio_SDL2.h"
-#include "Audio/Harness/SDL2/HyFileAudioGuts_SDL2.h"
+#include "Audio/Harness/SDL2/HyAudioCore_SDL2.h"
+#include "Audio/Harness/SDL2/HyFileAudioImpl_SDL2.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio3d.h"
 #include "Diagnostics/Console/HyConsole.h"
@@ -17,7 +17,7 @@
 
 #if defined(HY_USE_SDL2)
 
-HyAudio_SDL2::HyAudio_SDL2()
+HyAudioCore_SDL2::HyAudioCore_SDL2()
 {
 	HyLogTitle("SDL2 Audio");
 
@@ -33,7 +33,7 @@ HyAudio_SDL2::HyAudio_SDL2()
 #endif
 	m_DesiredSpec.channels = 2;							// 1 mono, 2 stereo, 4 quad, 6 (5.1)
 	m_DesiredSpec.samples = 4096;						// Specifies a unit of audio data to be used at a time. Must be a power of 2
-	m_DesiredSpec.callback = HyAudio_SDL2::OnCallback;
+	m_DesiredSpec.callback = HyAudioCore_SDL2::OnCallback;
 	m_DesiredSpec.userdata = this;
 
 	/*
@@ -61,18 +61,18 @@ HyAudio_SDL2::HyAudio_SDL2()
 	m_PlayList.reserve(15); // TODO: Set to max sound events?
 }
 
-/*virtual*/ HyAudio_SDL2::~HyAudio_SDL2(void)
+/*virtual*/ HyAudioCore_SDL2::~HyAudioCore_SDL2(void)
 {
 	if(m_hDevice > 0)
 		SDL_CloseAudioDevice(m_hDevice);
 }
 
-const char *HyAudio_SDL2::GetAudioDriver()
+const char *HyAudioCore_SDL2::GetAudioDriver()
 {
 	return SDL_GetCurrentAudioDriver();
 }
 
-/*virtual*/ void HyAudio_SDL2::OnUpdate() /*override*/
+/*virtual*/ void HyAudioCore_SDL2::OnUpdate() /*override*/
 {
 	if(m_CueList.empty())
 		return;
@@ -186,25 +186,18 @@ const char *HyAudio_SDL2::GetAudioDriver()
 	m_CueList.clear();
 }
 
-/*static*/ void HyAudio_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)
+/*static*/ void HyAudioCore_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)
 {
-	HyAudio_SDL2 *pThis = reinterpret_cast<HyAudio_SDL2 *>(pUserData);
+	HyAudioCore_SDL2 *pThis = reinterpret_cast<HyAudioCore_SDL2 *>(pUserData);
 	SDL_memset(pStream, 0, iLen); // If there is nothing to play, this callback should fill the buffer with silence
-
-	for(uint32 i = 0; i < static_cast<uint32>(pThis->m_PlayList.size()); ++i)
-	{
-		Play &playRef = pThis->m_PlayList[i];
-
-		uint32 uiLength = (static_cast<uint32_t>(iLen) > playRef.m_uiRemainingBytes) ? playRef.m_uiRemainingBytes : static_cast<uint32_t>(iLen);
-
-		int iVolume = SDL_MIX_MAXVOLUME * playRef.m_fVolume;
-
-		SDL_MixAudioFormat(pStream, playRef.m_pBuffer->GetBuffer(playRef.m_uiRemainingBytes), playRef.m_pBuffer->GetFormat(), uiLength, HyClamp(iVolume, 0, SDL_MIX_MAXVOLUME));
-		playRef.m_uiRemainingBytes -= uiLength;
-	}
 
 	for(auto iter = pThis->m_PlayList.begin(); iter != pThis->m_PlayList.end();)
 	{
+		uint32 uiLength = (static_cast<uint32_t>(iLen) > iter->m_uiRemainingBytes) ? iter->m_uiRemainingBytes : static_cast<uint32_t>(iLen);
+		int iVolume = SDL_MIX_MAXVOLUME * iter->m_fVolume;
+
+		SDL_MixAudioFormat(pStream, iter->m_pBuffer->GetBuffer(iter->m_uiRemainingBytes), iter->m_pBuffer->GetFormat(), uiLength, HyClamp(iVolume, 0, SDL_MIX_MAXVOLUME));
+		iter->m_uiRemainingBytes -= uiLength;
 		if(iter->m_uiRemainingBytes == 0)
 			iter = pThis->m_PlayList.erase(iter);
 		else
@@ -212,10 +205,10 @@ const char *HyAudio_SDL2::GetAudioDriver()
 	}
 }
 
-/*static*/ IHyFileAudioGuts *HyAudio_SDL2::AllocateBank(IHyAudioCore *pAudio, const jsonxx::Object &bankObjRef)
+/*static*/ IHyFileAudioImpl *HyAudioCore_SDL2::AllocateBank(IHyAudioCore *pAudio, const jsonxx::Object &bankObjRef)
 {
-	HyFileAudioGuts_SDL2 *pNewFileGuts = HY_NEW HyFileAudioGuts_SDL2(bankObjRef);
-	static_cast<HyAudio_SDL2 *>(pAudio)->m_AudioFileList.push_back(pNewFileGuts);
+	HyFileAudioImpl_SDL2 *pNewFileGuts = HY_NEW HyFileAudioImpl_SDL2(bankObjRef);
+	static_cast<HyAudioCore_SDL2 *>(pAudio)->m_AudioFileList.push_back(pNewFileGuts);
 
 	return pNewFileGuts;
 }
