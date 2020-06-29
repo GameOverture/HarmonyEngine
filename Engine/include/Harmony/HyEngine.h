@@ -48,7 +48,7 @@ class HyEngine
 
 	HyConsoleInterop			m_Console;
 	HyWindowManager				m_WindowManager;
-	HyAudioHarness						m_Audio;
+	HyAudioHarness				m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
 	HyGuiComms					m_GuiComms;

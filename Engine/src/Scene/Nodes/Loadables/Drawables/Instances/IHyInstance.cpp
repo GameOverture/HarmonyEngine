@@ -13,8 +13,6 @@
 
 extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
 
-HyScene *IHyInstance::sm_pScene = nullptr;
-
 IHyInstance::IHyInstance() :
 	m_hShader(HY_UNUSED_HANDLE),
 	m_eRenderMode(HYRENDERMODE_Unknown),

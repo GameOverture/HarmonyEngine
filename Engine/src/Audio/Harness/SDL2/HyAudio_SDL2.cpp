@@ -10,8 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Audio/Harness/SDL2/HyAudio_SDL2.h"
 #include "Audio/Harness/SDL2/HyFileAudioGuts_SDL2.h"
-#include "Audio/Harness/SDL2/HyAudioInst_SDL2.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
+#include "Scene/Nodes/Loadables/Objects/HyAudio3d.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Utilities/HyMath.h"
 
@@ -81,14 +81,26 @@ const char *HyAudio_SDL2::GetAudioDriver()
 		{
 		case CUETYPE_PlayOneShotDefault:
 		case CUETYPE_PlayOneShot:
-		case CUETYPE_Start:
+		case CUETYPE_Start: {
 			uint32 uiSoundChecksum = 0;
+			float fVolume = 1.0f;
+			float fPitch = 1.0f;
 			if(cue.m_pNode->Is2D())
+			{
 				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio2d *>(cue.m_pNode)->AcquireData())->GetSound();
-			//else
-			//	uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio3d *>(cue.m_pNode)->AcquireData())->GetSound();
+				fVolume = static_cast<HyAudio2d *>(cue.m_pNode)->volume.Get();
+				fPitch = static_cast<HyAudio2d *>(cue.m_pNode)->pitch.Get();
+			}
+			else
+			{
+				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio3d *>(cue.m_pNode)->AcquireData())->GetSound();
+				fVolume = static_cast<HyAudio3d *>(cue.m_pNode)->volume.Get();
+				fPitch = static_cast<HyAudio3d *>(cue.m_pNode)->pitch.Get();
+			}
 
 			Play newPlay = {};
+			newPlay.m_fVolume = fVolume;
+			newPlay.m_fPitch = fPitch;
 			bool bFound = false;
 			for(auto file : m_AudioFileList)
 			{
@@ -108,28 +120,30 @@ const char *HyAudio_SDL2::GetAudioDriver()
 
 			if(cue.m_eCueType == CUETYPE_Start)
 				newPlay.m_pNode = cue.m_pNode;
-			else
+			else if(cue.m_eCueType == CUETYPE_PlayOneShotDefault)
+			{
+				newPlay.m_fVolume = 1.0f;
+				newPlay.m_fPitch = 1.0f;
+				newPlay.m_pNode = nullptr;
+			}
+			else // CUETYPE_PlayOneShot
 				newPlay.m_pNode = nullptr;
 
 			newPlayList.push_back(newPlay);
-			break;
+			break; }
 
 		case CUETYPE_Stop:
-			Play newPlay = {};
-
 			break;
 		case CUETYPE_Pause:
 			break;
 		case CUETYPE_Attributes:
 			break;
 		}
-
-			
 	}
 
 	SDL_LockAudioDevice(m_hDevice);
-
-	m_PlayList.push_back(newPlay);
+	for(uint32 i = 0; i < newPlayList.size(); ++i)
+		m_PlayList.push_back(newPlayList[i]);
 	SDL_UnlockAudioDevice(m_hDevice);
 }
 
@@ -144,9 +158,7 @@ const char *HyAudio_SDL2::GetAudioDriver()
 
 		uint32 uiLength = (static_cast<uint32_t>(iLen) > playRef.m_uiRemainingBytes) ? playRef.m_uiRemainingBytes : static_cast<uint32_t>(iLen);
 
-		int iVolume = SDL_MIX_MAXVOLUME;
-		if(playRef.m_pInst)
-			iVolume *= playRef.m_pInst->GetVolume();
+		int iVolume = SDL_MIX_MAXVOLUME * playRef.m_fVolume;
 
 		SDL_MixAudioFormat(pStream, playRef.m_pBuffer->GetBuffer(playRef.m_uiRemainingBytes), playRef.m_pBuffer->GetFormat(), uiLength, HyClamp(iVolume, 0, SDL_MIX_MAXVOLUME));
 		playRef.m_uiRemainingBytes -= uiLength;

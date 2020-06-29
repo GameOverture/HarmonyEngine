@@ -54,6 +54,8 @@ public:
 			HyLogError("HyRawSoundBuffer::Load SDL_LoadWAV failed: " << SDL_GetError());
 			return false;
 		}
+
+		return true;
 	}
 
 	void Unload() {

@@ -18,7 +18,6 @@
 #if defined(HY_USE_SDL2)
 	#include "Audio/Harness/SDL2/HyAudio_SDL2.h"
 	#include "Audio/Harness/SDL2/HyFileAudioGuts_SDL2.h"
-	#include "Audio/Harness/SDL2/HyAudioInst_SDL2.h"
 #elif defined(HY_PLATFORM_WINDOWS)
 	#include <Objbase.h>
 #endif
@@ -109,6 +108,11 @@ HyFileAudio *HyAudioHarness::GetAudioBank(const std::string &sBankName)
 		return iter->second;
 
 	return nullptr;
+}
+
+void HyAudioHarness::AppendCue(IHyNode *pNode, IHyAudioCore::CueType eCueType)
+{
+	m_pCore->AppendCue(pNode, eCueType);
 }
 
 void HyAudioHarness::Update()

@@ -21,20 +21,22 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyTexturedQuad2d.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
 
-bool HyScene::sm_bInst2dOrderingDirty = false;
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 std::vector<HyPhysicsGrid2d *> HyScene::sm_PhysicsGridList;
+bool HyScene::sm_bInst2dOrderingDirty = false;
 
-HyScene::HyScene(std::vector<HyWindow *> &WindowListRef) :
+HyScene::HyScene(HyAudioHarness &audioRef, std::vector<HyWindow *> &WindowListRef) :
+	m_AudioRef(audioRef),
 	m_WindowListRef(WindowListRef),
 	m_bPauseGame(false)
 {
-	IHyInstance::sm_pScene = this;
+	IHyNode::sm_pScene = this;
 }
 
 HyScene::~HyScene(void)
 {
+	IHyNode::sm_pScene = nullptr;
 }
 
 /*static*/ void HyScene::SetInstOrderingDirty()
@@ -136,6 +138,11 @@ void HyScene::RemoveNode_Loaded(const IHyInstance3d *pDrawable)
 void HyScene::CopyAllLoadedNodes(std::vector<IHyInstance2d *> &nodeListOut)
 {
 	nodeListOut = m_NodeList_LoadedDrawable2d;
+}
+
+void HyScene::AppendAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType)
+{
+	m_AudioRef.AppendCue(pNode, eCueType);
 }
 
 void HyScene::SetPause(bool bPause)

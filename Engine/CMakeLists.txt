@@ -82,6 +82,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.cpp
 	src/Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.cpp
 	src/Scene/Nodes/Loadables/Objects/HyAudio2d.cpp
+	src/Scene/Nodes/Loadables/Objects/HyAudio3d.cpp
 	src/Scene/Nodes/Objects/HyCamera.cpp
 	src/Scene/Physics/HyBox2dRuntime.cpp
 	src/Scene/Physics/HyPhysEntity2d.cpp
@@ -188,7 +189,9 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h
 	include/Harmony/Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h
 	include/Harmony/Scene/Nodes/Loadables/Drawables/Objects/HyEntityLeaf2d.h
+	include/Harmony/Scene/Nodes/Loadables/Objects/IHyAudio.h
 	include/Harmony/Scene/Nodes/Loadables/Objects/HyAudio2d.h
+	include/Harmony/Scene/Nodes/Loadables/Objects/HyAudio3d.h
 	include/Harmony/Scene/Nodes/Objects/HyCamera.h
 	include/Harmony/Scene/Nodes/Objects/IHyCamera.h
 	include/Harmony/Scene/Physics/HyBox2dRuntime.h

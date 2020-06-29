@@ -11,7 +11,7 @@
 #define IHyAudioCore_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
+#include "Scene/Nodes/IHyNode.h"
 
 class IHyAudioCore
 {
@@ -45,11 +45,9 @@ protected:
 public:
 	IHyAudioCore()
 	{
-		HyAudio2d::sm_pAudioCore = this;
 	}
 	virtual ~IHyAudioCore(void)
 	{
-		HyAudio2d::sm_pAudioCore = nullptr;
 	}
 
 	void AppendCue(IHyNode *pNode, CueType eCueType) {

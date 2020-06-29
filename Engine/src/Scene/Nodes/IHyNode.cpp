@@ -12,6 +12,8 @@
 #include "Scene/HyScene.h"
 #include "Scene/AnimFloats/HyAnimFloat.h"
 
+HyScene *IHyNode::sm_pScene = nullptr;
+
 IHyNode::IHyNode(HyType eNodeType) :
 	m_uiFlags(static_cast<uint32>(eNodeType) | SETTING_IsVisible)
 #ifdef HY_ENABLE_USER_TAGS

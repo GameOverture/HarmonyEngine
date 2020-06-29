@@ -22,6 +22,8 @@ class IHyNode
 	friend class IHyDrawable;
 
 protected:
+	static HyScene *				sm_pScene;
+
 	// These flags describe this Node's C++ object type and are set upon construction, and are then immutable
 	enum TypeFlag
 	{

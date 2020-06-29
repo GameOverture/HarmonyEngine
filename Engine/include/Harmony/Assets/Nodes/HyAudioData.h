@@ -11,10 +11,8 @@
 #define HyAudioData_h__
 
 #include "Afx/HyStdAfx.h"
-
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
-#include "Audio/Harness/IHyAudioInst.h"
 
 class HyAudioData : public IHyNodeData
 {

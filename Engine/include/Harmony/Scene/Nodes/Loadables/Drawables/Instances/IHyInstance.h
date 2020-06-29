@@ -23,8 +23,6 @@ class IHyInstance
 	friend class HyRenderBuffer;
 
 protected:
-	static HyScene *				sm_pScene;
-
 	HyShaderHandle					m_hShader;
 	HyRenderMode					m_eRenderMode;
 	HyTextureHandle					m_hTextureHandle;

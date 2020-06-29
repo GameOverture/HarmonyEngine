@@ -27,7 +27,7 @@ HyEngine::HyEngine(HarmonyInit &initStruct) :
 	m_Console(initStruct.bUseConsole, initStruct.consoleInfo),
 	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Audio(m_Init.sDataDir),
-	m_Scene(m_WindowManager.GetWindowList()),
+	m_Scene(m_Audio, m_WindowManager.GetWindowList()),
 	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
 	m_GuiComms(m_Init.uiDebugPort, m_Assets),
 	m_Time(m_Init.uiUpdateTickMs),

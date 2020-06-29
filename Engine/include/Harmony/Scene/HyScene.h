@@ -14,6 +14,7 @@
 #include "Scene/Physics/HyPhysicsGrid2d.h"
 #include "Scene/Physics/HyBox2dRuntime.h"
 #include "Scene/Physics/HyPhysicsDebug2d.h"
+#include "Audio/Harness/IHyAudioCore.h"
 
 // Forward declarations
 class IHyNode;
@@ -29,8 +30,7 @@ class IHyRenderer;
 //////////////////////////////////////////////////////////////////////////
 class HyScene
 {
-	static bool											sm_bInst2dOrderingDirty;
-
+	HyAudioHarness &									m_AudioRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
 	// TODO: Make tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
@@ -41,11 +41,12 @@ class HyScene
 	static std::vector<HyPhysicsGrid2d *>				sm_PhysicsGridList;
 
 	// List of nodes who can be drawn, and their graphics assets are fully loaded
+	static bool											sm_bInst2dOrderingDirty;
 	std::vector<IHyInstance2d *>						m_NodeList_LoadedDrawable2d;
 	std::vector<IHyInstance3d *>						m_NodeList_LoadedDrawable3d;
 
 public:
-	HyScene(std::vector<HyWindow *> &WindowListRef);
+	HyScene(HyAudioHarness &audioRef, std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
 	static void SetInstOrderingDirty();
@@ -63,8 +64,9 @@ public:
 	void AddNode_Loaded(IHyInstance3d *pDrawable);
 	void RemoveNode_Loaded(const IHyInstance2d *pDrawable);
 	void RemoveNode_Loaded(const IHyInstance3d *pDrawable);
-
 	void CopyAllLoadedNodes(std::vector<IHyInstance2d *> &nodeListOut);
+
+	void AppendAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType);
 
 	void SetPause(bool bPause);
 

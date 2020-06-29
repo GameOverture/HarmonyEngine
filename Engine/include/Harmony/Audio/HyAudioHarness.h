@@ -13,7 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Audio/Harness/IHyAudioCore.h"
 #include "Audio/Harness/IHyFileAudioGuts.h"
-#include "Audio/Harness/IHyAudioInst.h"
 
 class HyFileAudio;
 
@@ -34,6 +33,8 @@ public:
 
 	IHyFileAudioGuts *AllocateAudioBank(const jsonxx::Object &bankObjRef);
 	HyFileAudio *GetAudioBank(const std::string &sBankName);
+
+	void AppendCue(IHyNode *pNode, IHyAudioCore::CueType eCueType);
 
 	void Update();
 };
