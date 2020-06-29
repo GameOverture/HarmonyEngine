@@ -74,10 +74,13 @@ const char *HyAudio_SDL2::GetAudioDriver()
 
 /*virtual*/ void HyAudio_SDL2::OnUpdate() /*override*/
 {
-	std::vector<Play> newPlayList;
+	if(m_CueList.empty())
+		return;
+
+	SDL_LockAudioDevice(m_hDevice);
 	for(auto cue : m_CueList)
 	{
-		switch(cue.m_eCueType)
+		switch(cue.m_eCUE_TYPE)
 		{
 		case CUETYPE_PlayOneShotDefault:
 		case CUETYPE_PlayOneShot:
@@ -85,66 +88,102 @@ const char *HyAudio_SDL2::GetAudioDriver()
 			uint32 uiSoundChecksum = 0;
 			float fVolume = 1.0f;
 			float fPitch = 1.0f;
-			if(cue.m_pNode->Is2D())
+			if(cue.m_pNODE->Is2D())
 			{
-				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio2d *>(cue.m_pNode)->AcquireData())->GetSound();
-				fVolume = static_cast<HyAudio2d *>(cue.m_pNode)->volume.Get();
-				fPitch = static_cast<HyAudio2d *>(cue.m_pNode)->pitch.Get();
+				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio2d *>(cue.m_pNODE)->AcquireData())->GetSound();
+				if(cue.m_eCUE_TYPE != CUETYPE_PlayOneShotDefault)
+				{
+					fVolume = static_cast<HyAudio2d *>(cue.m_pNODE)->volume.Get();
+					fPitch = static_cast<HyAudio2d *>(cue.m_pNODE)->pitch.Get();
+				}
 			}
 			else
 			{
-				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio3d *>(cue.m_pNode)->AcquireData())->GetSound();
-				fVolume = static_cast<HyAudio3d *>(cue.m_pNode)->volume.Get();
-				fPitch = static_cast<HyAudio3d *>(cue.m_pNode)->pitch.Get();
-			}
-
-			Play newPlay = {};
-			newPlay.m_fVolume = fVolume;
-			newPlay.m_fPitch = fPitch;
-			bool bFound = false;
-			for(auto file : m_AudioFileList)
-			{
-				newPlay.m_pBuffer = file->GetBufferInfo(uiSoundChecksum);
-				newPlay.m_uiRemainingBytes = newPlay.m_pBuffer->GetBufferSize();
-				if(newPlay.m_pBuffer)
+				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio3d *>(cue.m_pNODE)->AcquireData())->GetSound();
+				if(cue.m_eCUE_TYPE != CUETYPE_PlayOneShotDefault)
 				{
-					bFound = true;
-					break;
+					fVolume = static_cast<HyAudio3d *>(cue.m_pNODE)->volume.Get();
+					fPitch = static_cast<HyAudio3d *>(cue.m_pNODE)->pitch.Get();
 				}
 			}
-			if(bFound == false)
+
+			HyRawSoundBuffer *pBuffer = nullptr;
+			for(auto file : m_AudioFileList)
+			{
+				pBuffer = file->GetBufferInfo(uiSoundChecksum);
+				if(pBuffer)
+					break;
+			}
+			if(pBuffer == false)
 			{
 				HyLogWarning("Could not find audio: " << uiSoundChecksum);
-				return;
+				break;
 			}
 
-			if(cue.m_eCueType == CUETYPE_Start)
-				newPlay.m_pNode = cue.m_pNode;
-			else if(cue.m_eCueType == CUETYPE_PlayOneShotDefault)
+			bool bFoundPlay = false;
+			const IHyNode *pId = nullptr;
+			if(cue.m_eCUE_TYPE == CUETYPE_Start)
 			{
-				newPlay.m_fVolume = 1.0f;
-				newPlay.m_fPitch = 1.0f;
-				newPlay.m_pNode = nullptr;
-			}
-			else // CUETYPE_PlayOneShot
-				newPlay.m_pNode = nullptr;
+				// Find any existing play with node ID of cue.m_pNODE
+				pId = cue.m_pNODE;
 
-			newPlayList.push_back(newPlay);
+				for(uint32 j = 0; j < static_cast<uint32>(m_PlayList.size()); ++j)
+				{
+					if(m_PlayList[j].m_pID == pId)
+					{
+						bFoundPlay = true;
+
+						m_PlayList[j].m_fVolume = fVolume;
+						m_PlayList[j].m_fPitch = fPitch;
+						m_PlayList[j].m_bPaused = false;
+						m_PlayList[j].m_pBuffer = pBuffer;
+						m_PlayList[j].m_uiRemainingBytes = pBuffer->GetBufferSize();
+					}
+				}
+			}
+
+			if(bFoundPlay == false)
+				m_PlayList.emplace_back(pId, fVolume, fPitch, false, pBuffer, pBuffer->GetBufferSize());
 			break; }
 
 		case CUETYPE_Stop:
-			break;
 		case CUETYPE_Pause:
-			break;
-		case CUETYPE_Attributes:
-			break;
+		case CUETYPE_Unpause:
+		case CUETYPE_Attributes: {
+			for(auto iter = m_PlayList.begin(); iter != m_PlayList.end(); ++iter)
+			{
+				if(iter->m_pID == cue.m_pNODE)
+				{
+					if(cue.m_eCUE_TYPE == CUETYPE_Stop)
+						m_PlayList.erase(iter);
+					else if(cue.m_eCUE_TYPE == CUETYPE_Pause)
+						iter->m_bPaused = true;
+					else if(cue.m_eCUE_TYPE == CUETYPE_Unpause)
+						iter->m_bPaused = false;
+					else if(cue.m_eCUE_TYPE == CUETYPE_Attributes)
+					{
+						if(cue.m_pNODE->Is2D())
+						{
+							iter->m_fVolume = static_cast<HyAudio2d *>(cue.m_pNODE)->volume.Get();
+							iter->m_fPitch = static_cast<HyAudio2d *>(cue.m_pNODE)->pitch.Get();
+						}
+						else
+						{
+							iter->m_fVolume = static_cast<HyAudio3d *>(cue.m_pNODE)->volume.Get();
+							iter->m_fPitch = static_cast<HyAudio3d *>(cue.m_pNODE)->pitch.Get();
+						}
+					}
+
+					break;
+				}
+			}
+			
+			break; }
 		}
 	}
-
-	SDL_LockAudioDevice(m_hDevice);
-	for(uint32 i = 0; i < newPlayList.size(); ++i)
-		m_PlayList.push_back(newPlayList[i]);
 	SDL_UnlockAudioDevice(m_hDevice);
+
+	m_CueList.clear();
 }
 
 /*static*/ void HyAudio_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)

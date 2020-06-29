@@ -25,30 +25,26 @@ public:
 		CUETYPE_Pause,
 		CUETYPE_Unpause,
 		CUETYPE_Attributes,
-
+		
 		NUM_CUETYPES
 	};
 
 protected:
 	struct Cue
 	{
-		IHyNode *						m_pNode;
-		CueType							m_eCueType;
+		IHyNode * const					m_pNODE;
+		const CueType					m_eCUE_TYPE;
 
 		Cue(IHyNode *pNode, CueType eCueType) :
-			m_pNode(pNode),
-			m_eCueType(eCueType)
+			m_pNODE(pNode),
+			m_eCUE_TYPE(eCueType)
 		{ }
 	};
 	std::vector<Cue>					m_CueList;
 
 public:
-	IHyAudioCore()
-	{
-	}
-	virtual ~IHyAudioCore(void)
-	{
-	}
+	IHyAudioCore() = default;
+	virtual ~IHyAudioCore(void) = default;
 
 	void AppendCue(IHyNode *pNode, CueType eCueType) {
 		m_CueList.emplace_back(pNode, eCueType);

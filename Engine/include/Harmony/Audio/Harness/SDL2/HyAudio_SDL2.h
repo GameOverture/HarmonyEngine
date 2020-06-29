@@ -32,14 +32,25 @@ class HyAudio_SDL2 : public IHyAudioCore
 	// Used in callback thread ///////////////////////////////////////////////
 	struct Play
 	{
-		const IHyNode *					m_pNode;
+		const IHyNode *					m_pID;
+
 		float							m_fVolume;
 		float							m_fPitch;
+		bool							m_bPaused;
+
 		HyRawSoundBuffer *				m_pBuffer;
 		uint32							m_uiRemainingBytes;
+
+		Play(const IHyNode *pID, float fVolume, float fPitch, bool bPaused, HyRawSoundBuffer *pBuffer, uint32 uiRemainingBytes) :
+			m_pID(pID),
+			m_fVolume(fVolume),
+			m_fPitch(fPitch),
+			m_bPaused(bPaused),
+			m_pBuffer(pBuffer),
+			m_uiRemainingBytes(uiRemainingBytes)
+		{ }
 	};
 	std::vector<Play>					m_PlayList;
-	std::vector<Play>					m_PauseList;
 	///////////////////////////////////////////////////////////////////////////
 
 public:
