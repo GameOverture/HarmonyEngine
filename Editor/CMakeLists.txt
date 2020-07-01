@@ -5,7 +5,7 @@ if(Qt5_DIR)
 	add_subdirectory(external/freetype2)
 	add_subdirectory(external/freetype-gl)
 
-	find_package(Qt5 COMPONENTS Core Gui Network Widgets REQUIRED)
+	find_package(Qt5 COMPONENTS Core Gui Network Widgets Multimedia REQUIRED)
 
 	set(HYEDITOR_SOURCE_FILES
 		src/main.cpp
@@ -23,10 +23,14 @@ if(Qt5_DIR)
 		src/Atlas/AtlasFrame.h
 		src/Atlas/AtlasModel.h
 		src/Atlas/AtlasRepackThread.h
+		src/Audio/AudioAsset.cpp
 		src/Audio/AudioAssetsWidget.cpp
+		src/Audio/AudioManagerModel.cpp
 		src/Audio/AudioModel.cpp
 		src/Audio/AudioWidget.cpp
+		src/Audio/AudioAsset.h
 		src/Audio/AudioAssetsWidget.h
+		src/Audio/AudioManagerModel.h
 		src/Audio/AudioModel.h
 		src/Audio/AudioWidget.h
 		src/Audio/AudioAssetsWidget.ui
@@ -224,7 +228,7 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include/Harmony")
 
 	target_compile_definitions(HyEditor PRIVATE HY_USE_QT)
-	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets)
+	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets Qt5::Multimedia)
 
 	set_target_properties(HyEditor PROPERTIES
 		CXX_STANDARD 11

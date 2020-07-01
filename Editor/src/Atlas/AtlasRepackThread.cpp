@@ -265,7 +265,7 @@ void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTe
 	}
 
 	QImage *pTexture = static_cast<QImage *>(p.device());
-	HyTextureFormat eTextureType = static_cast<HyTextureFormat>(m_BankRef.m_Settings["textureType"].toInt());
+	HyTextureFormat eTextureType = static_cast<HyTextureFormat>(m_BankRef.m_Settings["textureType"].toInt()); // TODO: rename to format [also convert to string representation]
 
 	QDir runtimeBankDir(m_BankRef.m_sAbsPath);
 

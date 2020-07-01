@@ -35,7 +35,6 @@ public:
 	AtlasFrame(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QRect rAlphaCrop, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
 	~AtlasFrame();
 
-	//AtlasTreeItem *GetTreeItem();
 	QSize GetSize();
 	QRect GetCrop();
 	QPoint GetPosition();
@@ -46,15 +45,9 @@ public:
 	int GetY();
 
 	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY);
-
-	virtual void GetJsonObj(QJsonObject &frameObj) override;
-
-	//void UpdateTreeItemIconAndToolTip();
 	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
+
+	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 };
-//Q_DECLARE_METATYPE(AtlasFrame *)
-//
-//QDataStream &operator<<(QDataStream &out, AtlasFrame *const &rhs);
-//QDataStream &operator>>(QDataStream &in, AtlasFrame *rhs);
 
 #endif // ATLASFRAME_H

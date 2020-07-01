@@ -118,7 +118,7 @@ QSize AtlasModel::GetAtlasDimensions(uint uiBankIndex)
 
 HyTextureFormat AtlasModel::GetAtlasTextureType(uint uiBankIndex)
 {
-	return static_cast<HyTextureFormat>(m_BanksModel.GetBank(uiBankIndex)->m_Settings["textureType"].toInt());
+	return static_cast<HyTextureFormat>(m_BanksModel.GetBank(uiBankIndex)->m_Settings["textureType"].toInt()); // TODO: rename to format [move textureType into object inside assets array; convert to string representation]
 }
 
 bool AtlasModel::IsImageValid(QImage &image, quint32 uiBankId)
@@ -325,8 +325,8 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	
 
 	AtlasFrame *pNewFrame = new AtlasFrame(*this,
-										   HyGlobal::GetItemFromAtlasItem(static_cast<AtlasItemType>(metaObj["type"].toInt())),
-										   QUuid(metaObj["frameUUID"].toString()),
+										   HyGlobal::GetItemFromAtlasItem(static_cast<AtlasItemType>(metaObj["type"].toInt())),  // TODO: rename [read string in as type]
+										   QUuid(metaObj["frameUUID"].toString()), // TODO: rename to assetUUID
 										   JSONOBJ_TOINT(metaObj, "checksum"),
 										   JSONOBJ_TOINT(metaObj, "atlasGrpId"), // TODO: rename to bankId
 										   metaObj["name"].toString(),
@@ -404,10 +404,11 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 /*virtual*/ bool AtlasModel::OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) /*override*/
 {
-	// Ensure all new replacement images will fit on the specified atlas
+	// Error check all the replacement assets before adding them, and cancel entire replace if any fail
 	QList<QImage *> newReplacementImageList;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
+		// Ensure all new replacement images will fit on the specified atlas
 		QFileInfo fileInfo(sImportAssetList[i]);
 		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
 		QSize atlasDimensions = GetAtlasDimensions(GetBankIndexFromBankId(assetList[i]->GetBankId()));
@@ -503,7 +504,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		// TODO: rename to bankId
 		atlasGrpObj.insert("atlasGrpId", m_BanksModel.GetBank(i)->m_Settings["atlasGrpId"].toInt());
 
-		// TODO: rename [move textureType into object inside assets array]
+		// TODO: rename to format [move textureType into object inside assets array; convert to string representation]
 		atlasGrpObj.insert("textureType", m_BanksModel.GetBank(i)->m_Settings["textureType"].toInt());
 
 		QJsonArray textureArray;
@@ -541,7 +542,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 	QJsonObject atlasInfoObj;
 	atlasInfoObj.insert("$fileVersion", HYGUI_FILE_VERSION);
-	atlasInfoObj.insert("atlasGroups", atlasGrpArray);
+	atlasInfoObj.insert("atlasGroups", atlasGrpArray); // TODO: rename to banks
 
 	return atlasInfoObj;
 }
@@ -560,7 +561,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 {
 	QFileInfo fileInfo(sName);
 
-	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.byteCount());
+	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
 
 	AtlasItemType eAtlasItemType = HyGlobal::GetAtlasItemFromItem(eType);
 

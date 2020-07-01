@@ -39,36 +39,6 @@ AtlasFrame::~AtlasFrame()
 {
 }
 
-//AtlasTreeItem *AtlasFrame::GetTreeItem()
-//{
-//	if(m_pTreeWidgetItem)
-//		return m_pTreeWidgetItem;
-//
-//	m_pTreeWidgetItem = new AtlasTreeItem((QTreeWidgetItem *)nullptr, QTreeWidgetItem::Type);
-//	m_pTreeWidgetItem->setText(0, GetName());
-//
-//	if(m_iTextureIndex >= 0)
-//	{
-//		m_pTreeWidgetItem->setText(1, "Id:" % QString::number(m_uiAtlasGrpId));
-//		ClearError(ATLASFRAMEERROR_CouldNotPack);
-//	}
-//	else
-//	{
-//		m_pTreeWidgetItem->setText(1, "Invalid");
-//		SetError(ATLASFRAMEERROR_CouldNotPack);
-//	}
-//
-//	UpdateTreeItemIconAndToolTip();
-//
-//	QVariant v; v.setValue(this);
-//	m_pTreeWidgetItem->setData(0, Qt::UserRole, v);
-//	m_pTreeWidgetItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-//
-//	return m_pTreeWidgetItem;
-//}
-
-
-
 QSize AtlasFrame::GetSize()
 {
 	return QSize(m_iWidth, m_iHeight);
@@ -125,45 +95,6 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 	}
 }
 
-/*virtual*/ void AtlasFrame::GetJsonObj(QJsonObject &frameObj) /*override*/
-{
-	frameObj.insert("frameUUID", GetUuid().toString(QUuid::WithoutBraces));
-	// TODO: rename to bankId
-	frameObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(GetBankId())));
-	frameObj.insert("checksum", QJsonValue(static_cast<qint64>(GetChecksum())));
-	frameObj.insert("name", QJsonValue(GetName()));
-	frameObj.insert("width", QJsonValue(GetSize().width()));
-	frameObj.insert("height", QJsonValue(GetSize().height()));
-	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
-	frameObj.insert("type", QJsonValue(GetType()));
-	frameObj.insert("x", QJsonValue(GetX()));
-	frameObj.insert("y", QJsonValue(GetY()));
-	frameObj.insert("cropLeft", QJsonValue(GetCrop().left()));
-	frameObj.insert("cropTop", QJsonValue(GetCrop().top()));
-	frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
-	frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
-	frameObj.insert("errors", QJsonValue(static_cast<int>(GetErrors())));
-	frameObj.insert("filter", QJsonValue(m_ModelRef.AssembleFilter(this)));
-}
-
-
-
-//void AtlasFrame::UpdateTreeItemIconAndToolTip()
-//{
-//	if(m_pTreeWidgetItem)
-//	{
-//		// Duplicates are not considered and error so don't mark the icon as a warning (if only error)
-//		if(m_uiErrors == 0)
-//			m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(HyGlobal::GetItemFromAtlasItem(m_eType), SUBICON_None));
-//		else
-//			m_pTreeWidgetItem->setIcon(0, HyGlobal::ItemIcon(HyGlobal::GetItemFromAtlasItem(m_eType), SUBICON_Warning));
-//		
-//		m_pTreeWidgetItem->setToolTip(0, HyGlobal::GetGuiFrameErrors(m_uiErrors));
-//	}
-//}
-
-
-
 void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)
 {
 	m_sName = sName;
@@ -180,20 +111,21 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	else // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
 
-	// DO NOT clear 'm_iTextureIndex' as it's needed in the WidgetAtlasGroup::Repack()
+	// DO NOT clear 'm_iTextureIndex' as it's needed in the Repack()
 
 	if(newImage.save(metaDir.path() % "/" % ConstructMetaFileName()) == false)
 		HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
 }
-//
-//QDataStream &operator<<(QDataStream &out, AtlasFrame *const &rhs)
-//{
-//	out.writeRawData(reinterpret_cast<const char*>(&rhs), sizeof(rhs));
-//	return out;
-//}
-//
-//QDataStream &operator>>(QDataStream &in, AtlasFrame *rhs)
-//{
-//	in.readRawData(reinterpret_cast<char *>(rhs), sizeof(rhs));
-//	return in;
-//}
+
+/*virtual*/ void AtlasFrame::InsertUniqueJson(QJsonObject &frameObj) /*override*/
+{
+	frameObj.insert("width", QJsonValue(GetSize().width()));
+	frameObj.insert("height", QJsonValue(GetSize().height()));
+	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
+	frameObj.insert("x", QJsonValue(GetX()));
+	frameObj.insert("y", QJsonValue(GetY()));
+	frameObj.insert("cropLeft", QJsonValue(GetCrop().left()));
+	frameObj.insert("cropTop", QJsonValue(GetCrop().top()));
+	frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
+	frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
+}

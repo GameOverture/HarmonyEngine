@@ -25,7 +25,7 @@ class AtlasModel;
 class IManagerWidget;
 class GltfModel;
 class GltfWidget;
-class AudioAssetsWidget;
+class AudioManagerModel;
 class Harmony;
 class ExplorerModel;
 
@@ -53,13 +53,16 @@ class Project : public ExplorerItemData
 
 	AtlasModel *										m_pAtlasModel;
 	IManagerWidget *									m_pAtlasWidget;
+	AudioManagerModel *									m_pAudioModel;
+	IManagerWidget *									m_pAudioWidget;
 
 	GltfModel *											m_pGltfModel;
 	GltfWidget *										m_pGltfWidget;
 
 	QStandardItemModel									m_FontListModel;
 
-	AudioAssetsWidget *									m_pAudioWidget;
+	// Below saved for later FMOD implementation
+	//AudioAssetsWidget *									m_pAudioWidget;
 
 	ProjectTabBar *										m_pTabBar;
 	ProjectItemData *									m_pCurOpenItem;
@@ -104,7 +107,7 @@ public:
 	GltfWidget *GetGltfWidget();
 
 	void SetAudioModel(QJsonObject audioObj);
-	AudioAssetsWidget *GetAudioWidget();
+	IManagerWidget *GetAudioWidget();
 
 	QStandardItemModel *GetFontListModel();
 	void ScanMetaFontDir();

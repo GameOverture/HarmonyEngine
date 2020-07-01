@@ -41,7 +41,7 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObjec
 	for(int i = 0; i < HYNUM_TEXTUREFORMATS; ++i)
 		ui->cmbTextureType->addItem(HyGlobal::AtlasTextureTypeString(static_cast<HyTextureFormat>(i)));
 	
-	ui->cmbTextureType->setCurrentIndex(m_InitialPackerSettingsObj["textureType"].toInt());
+	ui->cmbTextureType->setCurrentIndex(m_InitialPackerSettingsObj["textureType"].toInt()); // TODO: rename to format [convert to string representation]
 }
 
 DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
@@ -70,7 +70,7 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
 	returnSettingsObj.insert("sbTextureWidth", 2048);
 	returnSettingsObj.insert("sbTextureHeight", 2048);
 	returnSettingsObj.insert("cmbHeuristic", 1);
-	returnSettingsObj.insert("textureType", 0);
+	returnSettingsObj.insert("textureType", 0); // TODO: rename to format [convert to string representation]
 	
 	return returnSettingsObj;
 }
@@ -103,7 +103,7 @@ bool DlgAtlasGroupSettings::IsSettingsDirty()
 		return true;
 	if(ui->cmbHeuristic->currentIndex() != m_InitialPackerSettingsObj["cmbHeuristic"].toInt())
 		return true;
-	if(ui->cmbTextureType->currentIndex() != m_InitialPackerSettingsObj["textureType"].toInt())
+	if(ui->cmbTextureType->currentIndex() != m_InitialPackerSettingsObj["textureType"].toInt()) // TODO: rename to format [convert to string representation]
 		return true;
 	
 	return false;
@@ -130,7 +130,7 @@ void DlgAtlasGroupSettings::ApplyCurrentSettingsToObj(QJsonObject &settingsObjOu
 	settingsObjOut.insert("sbTextureWidth", ui->sbTextureWidth->value());
 	settingsObjOut.insert("sbTextureHeight", ui->sbTextureHeight->value());
 	settingsObjOut.insert("cmbHeuristic", ui->cmbHeuristic->currentIndex());
-	settingsObjOut.insert("textureType", ui->cmbTextureType->currentIndex());
+	settingsObjOut.insert("textureType", ui->cmbTextureType->currentIndex()); // TODO: rename to format [convert to string representation]
 }
 
 void DlgAtlasGroupSettings::on_btnTexSize128_clicked()

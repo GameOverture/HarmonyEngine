@@ -151,6 +151,15 @@ enum HyTextureFormat
 	HYNUM_TEXTUREFORMATS
 };
 
+enum HyAudioFormat
+{
+	HYAUDFORMAT_WAV = 0,
+	HYAUDFORMAT_OGG,
+	HYAUDFORMAT_ADPCM,
+
+	HYNUM_AUDIOFORMATS
+};
+
 enum HyTextureFiltering
 {
 	HYTEXFILTER_NEAREST = 0,

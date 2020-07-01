@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "Project.h"
 #include "GltfWidget.h"
-#include "AudioAssetsWidget.h"
+#include "AudioManagerModel.h"
 #include "MainWindow.h"
 #include "ProjectItemMimeData.h"
 #include "ExplorerModel.h"
@@ -108,6 +108,9 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 	m_pAtlasModel = new AtlasModel(*this);
 	m_pAtlasModel->Init();
+	m_pAudioModel = new AudioManagerModel(*this);
+	m_pAudioModel->Init();
+
 	m_pGltfModel = new GltfModel(this);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -414,7 +417,7 @@ void Project::SetAudioModel(QJsonObject audioObj)
 	WriteMetaData();
 }
 
-AudioAssetsWidget *Project::GetAudioWidget()
+IManagerWidget *Project::GetAudioWidget()
 {
 	return m_pAudioWidget;
 }
@@ -878,8 +881,8 @@ bool Project::HarmonyInitialize()
 	delete m_pGltfWidget;
 	delete m_pAudioWidget;
 	m_pAtlasWidget = new IManagerWidget(m_pAtlasModel, nullptr);
+	m_pAudioWidget = new IManagerWidget(m_pAudioModel, nullptr);
 	m_pGltfWidget = new GltfWidget(m_pGltfModel, nullptr);
-	m_pAudioWidget = new AudioAssetsWidget(this, nullptr);
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{

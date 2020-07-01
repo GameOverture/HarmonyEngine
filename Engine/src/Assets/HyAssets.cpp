@@ -636,7 +636,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 					std::sprintf(szTmpBuffer, "%05d", j);
 					std::string sAtlasFilePath = szTmpBuffer;
 
-					uint32 uiTextureFormat = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureType"));
+					uint32 uiTextureFormat = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureType")); // TODO: rename to format [move textureType into object inside assets array; convert to string representation]
 					uint32 uiTextureFiltering = atlasGrpObj.has<jsonxx::Number>("textureFiltering") ? static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureFiltering")) : HYTEXFILTER_BILINEAR;
 
 					if(uiTextureFormat == HYTEXTURE_R8G8B8A8 || uiTextureFormat == HYTEXTURE_R8G8B8)
@@ -648,8 +648,8 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 						uiAtlasGroupId,
 						j,
 						uiManifestIndex,
-						static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")),
-						static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")),
+						static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")), // TODO: rename [move width into object inside assets array]
+						static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")), // TODO: rename [move height into object inside assets array]
 						static_cast<HyTextureFormat>(uiTextureFormat),
 						static_cast<HyTextureFiltering>(uiTextureFiltering),
 						texturesArray.get<jsonxx::Array>(j));
@@ -662,8 +662,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case HYFILE_AudioBank: {
-			// TODO: rename to banks
-			jsonxx::Array banksArray = manifestFileObj.get<jsonxx::Array>("atlasGroups");
+			jsonxx::Array banksArray = manifestFileObj.get<jsonxx::Array>("banks");
 			m_FilesMap[eFileType].m_uiNumFiles = static_cast<uint32>(banksArray.size());
 
 			m_FilesMap[eFileType].m_pFiles = reinterpret_cast<HyFileAudio *>(HY_NEW unsigned char[sizeof(HyFileAudio) * m_FilesMap[eFileType].m_uiNumFiles]);

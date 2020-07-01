@@ -55,7 +55,10 @@ public:
 	void ClearError(AtlasFrameError eError);
 	uint GetErrors();
 
-	virtual void GetJsonObj(QJsonObject &frameObj) = 0;
+	void GetJsonObj(QJsonObject &assetObj);
+
+protected:
+	virtual void InsertUniqueJson(QJsonObject &assetObj) = 0;
 };
 
 #endif // IASSETITEMDATA_H
