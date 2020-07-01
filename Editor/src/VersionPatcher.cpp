@@ -336,6 +336,10 @@
 	dataAtlasDocRef.setObject(dataAtlasObj);
 }
 
+/*static*/ void VersionPatcher::Patch_2to3(QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
+{
+}
+
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)
 {
 	QFile dataFile(sFilePath);
