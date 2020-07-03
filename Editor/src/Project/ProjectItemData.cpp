@@ -178,12 +178,12 @@ bool ProjectItemData::Save(bool bWriteToDisk)
 	return true;
 }
 
-bool ProjectItemData::IsExistencePendingSave()
+bool ProjectItemData::IsExistencePendingSave() const
 {
 	return m_bExistencePendingSave;
 }
 
-bool ProjectItemData::IsSaveClean()
+bool ProjectItemData::IsSaveClean() const
 {
 	return m_pUndoStack->isClean() && m_bExistencePendingSave == false;
 }
@@ -270,6 +270,11 @@ void ProjectItemData::DrawShow()
 void ProjectItemData::DrawHide()
 {
 	m_pDraw->Hide();
+}
+
+bool ProjectItemData::HasError() const
+{
+	return m_ItemFileData.m_Data.empty() || m_ItemFileData.m_Meta.empty();
 }
 
 void ProjectItemData::BlockAllWidgetSignals(bool bBlock)

@@ -89,12 +89,17 @@
 		switch(iFileVersion)
 		{
 		case 0:
+			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 0 -> 1", LOGTYPE_Info);
 			Patch_0to1(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 1:
+			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 1 -> 2", LOGTYPE_Info);
 			Patch_1to2(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 2:
+			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 2 -> 3", LOGTYPE_Info);
+			Patch_2to3(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+		case 3:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 2, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 3, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -338,6 +343,12 @@
 
 /*static*/ void VersionPatcher::Patch_2to3(QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
 {
+	QJsonObject itemsObj = dataItemsDocRef.object();
+	
+	// Rename "atlasGroups" to "banks"
+	QJsonArray banksArray = itemsObj["atlasGroups"].toArray();
+	itemsObj.remove("atlasGroups");
+	itemsObj.insert("banks", banksArray);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

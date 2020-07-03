@@ -106,8 +106,7 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemT
 	}
 	if(HyGlobal::IsItemFileDataValid(initItemFileData) == false)
 	{
-		HyGuiLog("ExplorerModel::AddItem was passed an invalid FileDataPair", LOGTYPE_Error);
-		return nullptr;
+		HyGuiLog("ExplorerModel::AddItem was passed an invalid FileDataPair", LOGTYPE_Warning);
 	}
 
 	TreeModelItem *pCurTreeItem = FindProjectTreeItem(pProj);
@@ -373,6 +372,8 @@ ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid)
 				return QVariant(pItem->GetIcon(SUBICON_New));
 			else if(pProjItem->IsSaveClean() == false)
 				return QVariant(pItem->GetIcon(SUBICON_Dirty));
+			else if(pProjItem->HasError())
+				return QVariant(pItem->GetIcon(SUBICON_Warning));
 		}
 		return QVariant(pItem->GetIcon(SUBICON_None));
 

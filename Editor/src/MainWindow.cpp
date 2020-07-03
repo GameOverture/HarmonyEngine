@@ -722,7 +722,8 @@ void MainWindow::on_actionConnect_triggered()
 void MainWindow::on_actionAbout_triggered()
 {
 	QMessageBox::about(this, HyEditorToolName, "Harmony Engine and Editor Tool\n\nJason Knobler " % QString::number(QDate::currentDate().year()) %
-											   "\n\nFile Version: " % QString::number(HYGUI_FILE_VERSION));
+											   "\n\nFile Version: " % QString::number(HYGUI_FILE_VERSION) %
+											   "\nHarmony: " % m_sEnginePath);
 }
 
 void MainWindow::on_actionExit_triggered()

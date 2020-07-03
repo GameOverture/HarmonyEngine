@@ -43,9 +43,9 @@ AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<int> textureIndexL
 	
 	SetPackerSettings();
 
-	m_Packer.pack(m_BankRef.m_Settings["cmbHeuristic"].toInt(),
-				  m_BankRef.m_Settings["sbTextureWidth"].toInt(),
-				  m_BankRef.m_Settings["sbTextureHeight"].toInt());
+	m_Packer.pack(m_BankRef.m_MetaObj["cmbHeuristic"].toInt(),
+				  m_BankRef.m_MetaObj["sbTextureWidth"].toInt(),
+				  m_BankRef.m_MetaObj["sbTextureHeight"].toInt());
 
 	// Subtract '1' from the number of new textures because we want to ensure the last generated (and likely least filled) texture is last
 	int iNumNewTextures = m_Packer.bins.size() - 1;
@@ -151,13 +151,13 @@ AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<int> textureIndexL
 
 void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTextureIndex)
 {
-	if(m_BankRef.m_Settings["sbTextureWidth"].toInt() != m_Packer.bins[iPackerBinIndex].width() ||
-	   m_BankRef.m_Settings["sbTextureHeight"].toInt() != m_Packer.bins[iPackerBinIndex].height())
+	if(m_BankRef.m_MetaObj["sbTextureWidth"].toInt() != m_Packer.bins[iPackerBinIndex].width() ||
+	   m_BankRef.m_MetaObj["sbTextureHeight"].toInt() != m_Packer.bins[iPackerBinIndex].height())
 	{
 		HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimensions", LOGTYPE_Error);
 	}
 
-	QImage newTexture(m_BankRef.m_Settings["sbTextureWidth"].toInt(), m_BankRef.m_Settings["sbTextureHeight"].toInt(), QImage::Format_ARGB32);
+	QImage newTexture(m_BankRef.m_MetaObj["sbTextureWidth"].toInt(), m_BankRef.m_MetaObj["sbTextureHeight"].toInt(), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
 
 	QPainter p(&newTexture);
@@ -265,7 +265,7 @@ void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTe
 	}
 
 	QImage *pTexture = static_cast<QImage *>(p.device());
-	HyTextureFormat eTextureType = static_cast<HyTextureFormat>(m_BankRef.m_Settings["textureType"].toInt()); // TODO: rename to format [also convert to string representation]
+	HyTextureFormat eTextureType = static_cast<HyTextureFormat>(m_BankRef.m_MetaObj["textureType"].toInt()); // TODO: rename to format [also convert to string representation]
 
 	QDir runtimeBankDir(m_BankRef.m_sAbsPath);
 
@@ -327,16 +327,16 @@ void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTe
 
 void AtlasRepackThread::SetPackerSettings()
 {
-	m_Packer.sortOrder = m_BankRef.m_Settings["cmbSortOrder"].toInt();// m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
-	m_Packer.border.t = m_BankRef.m_Settings["sbFrameMarginTop"].toInt();// m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
-	m_Packer.border.l = m_BankRef.m_Settings["sbFrameMarginLeft"].toInt();// m_iFrameMarginLeft;//ui->sbFrameMarginLeft->value();
-	m_Packer.border.r = m_BankRef.m_Settings["sbFrameMarginRight"].toInt();// m_iFrameMarginRight;//ui->sbFrameMarginRight->value();
-	m_Packer.border.b = m_BankRef.m_Settings["sbFrameMarginBottom"].toInt();// m_iFrameMarginBottom;//ui->sbFrameMarginBottom->value();
-	m_Packer.extrude = m_BankRef.m_Settings["extrude"].toInt();// m_iExtrude;//ui->extrude->value();
-	m_Packer.merge = m_BankRef.m_Settings["chkMerge"].toBool();// m_bMerge;//ui->chkMerge->isChecked();
-	m_Packer.square = m_BankRef.m_Settings["chkSquare"].toBool();// m_bSquare;//ui->chkSquare->isChecked();
-	m_Packer.autosize = m_BankRef.m_Settings["chkAutosize"].toBool();// m_bAutoSize;//ui->chkAutosize->isChecked();
-	m_Packer.minFillRate = m_BankRef.m_Settings["minFillRate"].toInt();// m_iFillRate;//ui->minFillRate->value();
+	m_Packer.sortOrder = m_BankRef.m_MetaObj["cmbSortOrder"].toInt();// m_iSortOrderIndex;//ui->cmbSortOrder->currentIndex();
+	m_Packer.border.t = m_BankRef.m_MetaObj["sbFrameMarginTop"].toInt();// m_iFrameMarginTop;//ui->sbFrameMarginTop->value();
+	m_Packer.border.l = m_BankRef.m_MetaObj["sbFrameMarginLeft"].toInt();// m_iFrameMarginLeft;//ui->sbFrameMarginLeft->value();
+	m_Packer.border.r = m_BankRef.m_MetaObj["sbFrameMarginRight"].toInt();// m_iFrameMarginRight;//ui->sbFrameMarginRight->value();
+	m_Packer.border.b = m_BankRef.m_MetaObj["sbFrameMarginBottom"].toInt();// m_iFrameMarginBottom;//ui->sbFrameMarginBottom->value();
+	m_Packer.extrude = m_BankRef.m_MetaObj["extrude"].toInt();// m_iExtrude;//ui->extrude->value();
+	m_Packer.merge = m_BankRef.m_MetaObj["chkMerge"].toBool();// m_bMerge;//ui->chkMerge->isChecked();
+	m_Packer.square = m_BankRef.m_MetaObj["chkSquare"].toBool();// m_bSquare;//ui->chkSquare->isChecked();
+	m_Packer.autosize = m_BankRef.m_MetaObj["chkAutosize"].toBool();// m_bAutoSize;//ui->chkAutosize->isChecked();
+	m_Packer.minFillRate = m_BankRef.m_MetaObj["minFillRate"].toInt();// m_iFillRate;//ui->minFillRate->value();
 	m_Packer.mergeBF = false;
 	m_Packer.rotate = ImagePacker::NEVER;
 }

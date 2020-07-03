@@ -58,9 +58,10 @@ public:
 	void GiveMenuActions(QMenu *pMenu);
 	void GetLatestFileData(FileDataPair &itemFileDataOut) const;
 	bool Save(bool bWriteToDisk);
-	bool IsExistencePendingSave();
-	bool IsSaveClean();
+	bool IsExistencePendingSave() const;
+	bool IsSaveClean() const;
 	void DiscardChanges();
+	bool HasError() const;
 	
 	void BlockAllWidgetSignals(bool bBlock);
 

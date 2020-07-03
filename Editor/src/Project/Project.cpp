@@ -175,7 +175,7 @@ void Project::LoadExplorerModel()
 		if(m_ProjectFileData.m_Meta.contains(sItemTypeList[i]) == false ||
 		   m_ProjectFileData.m_Data.contains(sItemTypeList[i]) == false)
 		{
-			HyGuiLog("Missing " % sItemTypeList[i] % " between data and meta", LOGTYPE_Error);
+			HyGuiLog("Item category " % sItemTypeList[i] % " is missing data or metadata", LOGTYPE_Error);
 			continue;
 		}
 
@@ -208,8 +208,7 @@ void Project::LoadExplorerModel()
 			if(metaItemsOfType.contains(sItemPath) == false ||
 			   dataItemsOfType.contains(sItemPath) == false)
 			{
-				HyGuiLog("Missing " % sItemPath % " between data and meta", LOGTYPE_Error);
-				continue;
+				HyGuiLog(sItemPath % " is missing data or metadata", LOGTYPE_Warning);
 			}
 
 			FileDataPair itemFileData;

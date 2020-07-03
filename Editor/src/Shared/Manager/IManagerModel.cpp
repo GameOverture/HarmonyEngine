@@ -201,12 +201,12 @@ QString IManagerModel::GetBankName(uint uiBankIndex)
 
 QJsonObject IManagerModel::GetBankSettings(uint uiBankIndex)
 {
-	return m_BanksModel.GetBank(uiBankIndex)->m_Settings;
+	return m_BanksModel.GetBank(uiBankIndex)->m_MetaObj;
 }
 
 void IManagerModel::SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj)
 {
-	m_BanksModel.GetBank(uiBankIndex)->m_Settings = newSettingsObj;
+	m_BanksModel.GetBank(uiBankIndex)->m_MetaObj = newSettingsObj;
 }
 
 QList<AssetItemData *> IManagerModel::GetBankAssets(uint uiBankIndex)
@@ -619,7 +619,7 @@ void IManagerModel::SaveMeta()
 	QJsonArray groupsArray;
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
 	{
-		groupsArray.append(m_BanksModel.GetBank(i)->m_Settings);
+		groupsArray.append(m_BanksModel.GetBank(i)->m_MetaObj);
 
 		QList<AssetItemData *> &assetListRef = m_BanksModel.GetBank(i)->m_AssetList;
 		for(int j = 0; j < assetListRef.size(); ++j)

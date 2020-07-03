@@ -29,7 +29,6 @@ public:
 
 	int GetNumTextures(uint uiBankIndex);
 	QSize GetAtlasDimensions(uint uiBankIndex);
-	HyTextureFormat GetAtlasTextureType(uint uiBankIndex);
 
 	bool IsImageValid(QImage &image, quint32 uiBankId);
 	bool IsImageValid(int iWidth, int iHeight, quint32 uiBankId);

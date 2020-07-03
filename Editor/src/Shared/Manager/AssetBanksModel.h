@@ -19,12 +19,12 @@
 struct BankData
 {
 	QString									m_sAbsPath;
-	QJsonObject								m_Settings; // Meta settings
+	QJsonObject								m_MetaObj;
 	QList<AssetItemData *>					m_AssetList;
 
 	BankData(QString sAbsDataDirPath, QJsonObject settingsObj) :
 		m_sAbsPath(sAbsDataDirPath),
-		m_Settings(settingsObj)
+		m_MetaObj(settingsObj)
 	{ }
 
 	~BankData()
@@ -35,16 +35,16 @@ struct BankData
 
 	quint32 GetId() const {
 		// TODO: rename to bankId
-		if(m_Settings.contains("atlasGrpId") == false) {
+		if(m_MetaObj.contains("atlasGrpId") == false) {
 			HyGuiLog("BankData::GetId could not find 'bankId' in bank's settings", LOGTYPE_Error);
 		}
 		// TODO: rename to bankId
-		return m_Settings["atlasGrpId"].toInt();
+		return m_MetaObj["atlasGrpId"].toInt();
 	}
 
 	QString GetName() const {
 		// TODO: rename to bankName
-		return m_Settings["txtName"].toString();
+		return m_MetaObj["txtName"].toString();
 	}
 };
 

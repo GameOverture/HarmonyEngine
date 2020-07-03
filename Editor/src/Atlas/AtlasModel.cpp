@@ -110,15 +110,10 @@ int AtlasModel::GetNumTextures(uint uiBankIndex)
 
 QSize AtlasModel::GetAtlasDimensions(uint uiBankIndex)
 {
-	int iWidth = m_BanksModel.GetBank(uiBankIndex)->m_Settings["sbTextureWidth"].toInt();
-	int iHeight = m_BanksModel.GetBank(uiBankIndex)->m_Settings["sbTextureHeight"].toInt();
+	int iWidth = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["sbTextureWidth"].toInt();
+	int iHeight = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["sbTextureHeight"].toInt();
 	
 	return QSize(iWidth, iHeight);
-}
-
-HyTextureFormat AtlasModel::GetAtlasTextureType(uint uiBankIndex)
-{
-	return static_cast<HyTextureFormat>(m_BanksModel.GetBank(uiBankIndex)->m_Settings["textureType"].toInt()); // TODO: rename to format [move textureType into object inside assets array; convert to string representation]
 }
 
 bool AtlasModel::IsImageValid(QImage &image, quint32 uiBankId)
@@ -129,7 +124,7 @@ bool AtlasModel::IsImageValid(QImage &image, quint32 uiBankId)
 bool AtlasModel::IsImageValid(int iWidth, int iHeight, quint32 uiBankId)
 {
 	uint uiBankIndex = GetBankIndexFromBankId(uiBankId);
-	return IsImageValid(iWidth, iHeight, m_BanksModel.GetBank(uiBankIndex)->m_Settings);
+	return IsImageValid(iWidth, iHeight, m_BanksModel.GetBank(uiBankIndex)->m_MetaObj);
 }
 
 bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings)
@@ -253,8 +248,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	QString sInfo = "Num Textures: " % QString::number(GetNumTextures(uiBankIndex)) % " | " %
-		"(" % QString::number(GetAtlasDimensions(uiBankIndex).width()) % "x" % QString::number(GetAtlasDimensions(uiBankIndex).height()) % ")" % " | " %
-		HyGlobal::AtlasTextureTypeString(GetAtlasTextureType(uiBankIndex));
+		"(" % QString::number(GetAtlasDimensions(uiBankIndex).width()) % "x" % QString::number(GetAtlasDimensions(uiBankIndex).height()) % ")";
 
 	return sInfo;
 }
@@ -264,11 +258,11 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	QList<AssetItemData *> assetList = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
 	bool bBankHasAssets = assetList.size() > 0;
 	bool bAccepted = false;
-	DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bBankHasAssets, m_BanksModel.GetBank(uiBankIndex)->m_Settings);
+	DlgAtlasGroupSettings *pDlg = new DlgAtlasGroupSettings(bBankHasAssets, m_BanksModel.GetBank(uiBankIndex)->m_MetaObj);
 	if(QDialog::Accepted == pDlg->exec())
 	{
 		// Ensure that all current images in atlas group aren't larger than the new atlas itself
-		QJsonObject newPackerSettings = m_BanksModel.GetBank(uiBankIndex)->m_Settings;
+		QJsonObject newPackerSettings = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj;
 		pDlg->ApplyCurrentSettingsToObj(newPackerSettings);
 	
 		bool bPackIsValid = true;
@@ -285,7 +279,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	
 		if(bPackIsValid)
 		{
-			m_BanksModel.GetBank(uiBankIndex)->m_Settings = newPackerSettings;
+			m_BanksModel.GetBank(uiBankIndex)->m_MetaObj = newPackerSettings;
 	
 			if(pDlg->IsSettingsDirty() && bBankHasAssets)
 				RepackAll(uiBankIndex);
@@ -498,14 +492,14 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		QJsonObject atlasGrpObj;
 
 		// TODO: rename [move width into object inside assets array]
-		atlasGrpObj.insert("width", m_BanksModel.GetBank(i)->m_Settings["sbTextureWidth"].toInt());
+		atlasGrpObj.insert("width", m_BanksModel.GetBank(i)->m_MetaObj["sbTextureWidth"].toInt());
 		// TODO: rename [move height into object inside assets array]
-		atlasGrpObj.insert("height", m_BanksModel.GetBank(i)->m_Settings["sbTextureHeight"].toInt());
+		atlasGrpObj.insert("height", m_BanksModel.GetBank(i)->m_MetaObj["sbTextureHeight"].toInt());
 		// TODO: rename to bankId
-		atlasGrpObj.insert("atlasGrpId", m_BanksModel.GetBank(i)->m_Settings["atlasGrpId"].toInt());
+		atlasGrpObj.insert("atlasGrpId", m_BanksModel.GetBank(i)->m_MetaObj["atlasGrpId"].toInt());
 
 		// TODO: rename to format [move textureType into object inside assets array; convert to string representation]
-		atlasGrpObj.insert("textureType", m_BanksModel.GetBank(i)->m_Settings["textureType"].toInt());
+		atlasGrpObj.insert("textureType", m_BanksModel.GetBank(i)->m_MetaObj["textureType"].toInt());
 
 		QJsonArray textureArray;
 

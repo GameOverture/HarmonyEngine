@@ -39,7 +39,7 @@ class Project;
 #define HyEditorToolName "Harmony Editor Tool"
 #define HyGuiInternalCharIndicator '+'
 
-#define HYGUI_FILE_VERSION 2
+#define HYGUI_FILE_VERSION 3
 
 //#define HYGUI_UseBinaryMetaFiles
 
@@ -185,12 +185,17 @@ class HyGlobal
 public:
 	static void Initialize();
 
-	static HyGuiItemType GetItemFromAtlasItem(AtlasItemType eFrameType);
-	static AtlasItemType GetAtlasItemFromItem(HyGuiItemType eItem);
+	static HyGuiItemType GetItemFromAtlasItem(AtlasItemType eFrameType); // TODO patchv4: remove AtlasItemType
+	static AtlasItemType GetAtlasItemFromItem(HyGuiItemType eItem);		 // TODO patchv4: remove AtlasItemType
+
 	static QList<HyGuiItemType> GetTypeList();
 	static QStringList GetTypeNameList();
 	static HyGuiItemType GetTypeFromString(QString sType);
-	static QString AtlasTextureTypeString(HyTextureFormat eType);
+
+	static QList<HyTextureFormat> GetTextureFormatList();
+	static QStringList GetTextureFormatNameList();
+	static QString GetTextureFormatName(HyTextureFormat eType);
+	static HyTextureFormat GetTextureFormatFromString(QString sFormat);
 
 	static const QString ItemName(HyGuiItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString ItemExt(HyGuiItemType eItem);

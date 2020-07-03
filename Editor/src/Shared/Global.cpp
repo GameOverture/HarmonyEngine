@@ -206,7 +206,34 @@
 	return ITEM_Unknown;
 }
 
-/*static*/ QString HyGlobal::AtlasTextureTypeString(HyTextureFormat eType)
+/*static*/ QList<HyTextureFormat> HyGlobal::GetTextureFormatList()
+{
+	QList<HyTextureFormat> list;
+	list.append(HYTEXTURE_R8G8B8A8);
+	list.append(HYTEXTURE_R8G8B8);
+	list.append(HYTEXTURE_RGB_DTX1);
+	list.append(HYTEXTURE_RGBA_DTX1);
+	list.append(HYTEXTURE_DTX3);
+	list.append(HYTEXTURE_DTX5);
+
+	if(list.size() != HYNUM_TEXTUREFORMATS)
+		HyGuiLog("HyGlobal::GetTextureFormatList missing a format!", LOGTYPE_Error);
+
+	return list;
+}
+
+/*static*/ QStringList HyGlobal::GetTextureFormatNameList()
+{
+	QList<HyTextureFormat> formatList = GetTextureFormatList();
+
+	QStringList list;
+	for(int i = 0; i < formatList.size(); ++i)
+		list.append(GetTextureFormatName(formatList[i]));
+
+	return list;
+}
+
+/*static*/ QString HyGlobal::GetTextureFormatName(HyTextureFormat eType)
 {
 	switch(eType)
 	{
@@ -222,9 +249,24 @@
 		return "DTX3 (unsupported)";
 	case HYTEXTURE_DTX5:
 		return "DTX5";
+
+	default:
+		break;
 	}
 
 	return "Unknown";
+}
+
+/*static*/ HyTextureFormat HyGlobal::GetTextureFormatFromString(QString sFormat)
+{
+	QStringList sTypeList = GetTypeNameList();
+	for(int i = 0; i < sTypeList.size(); ++i)
+	{
+		if(sType.compare(sTypeList[i], Qt::CaseInsensitive) == 0)
+			return GetTypeList()[i];
+	}
+
+	return ITEM_Unknown;
 }
 
 /*static*/ const QString HyGlobal::ItemExt(HyGuiItemType eItem)
