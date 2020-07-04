@@ -110,8 +110,8 @@ int AtlasModel::GetNumTextures(uint uiBankIndex)
 
 QSize AtlasModel::GetAtlasDimensions(uint uiBankIndex)
 {
-	int iWidth = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["sbTextureWidth"].toInt();
-	int iHeight = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["sbTextureHeight"].toInt();
+	int iWidth = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["maxWidth"].toInt();
+	int iHeight = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["maxHeight"].toInt();
 	
 	return QSize(iWidth, iHeight);
 }
@@ -135,7 +135,7 @@ bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasS
 	iMarginHeight +=    atlasSettings["sbFrameMarginTop"].toInt();
 
 	QSize atlasMargins(iMarginWidth, iMarginHeight);
-	QSize atlasDimensions(atlasSettings["sbTextureWidth"].toInt(), atlasSettings["sbTextureHeight"].toInt());
+	QSize atlasDimensions(atlasSettings["maxWidth"].toInt(), atlasSettings["maxHeight"].toInt());
 
 	if(iWidth >= (atlasDimensions.width() - atlasMargins.width()) ||
 		iHeight >= (atlasDimensions.height() - atlasMargins.height()))
@@ -319,10 +319,10 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	
 
 	AtlasFrame *pNewFrame = new AtlasFrame(*this,
-										   HyGlobal::GetItemFromAtlasItem(static_cast<AtlasItemType>(metaObj["type"].toInt())),  // TODO: rename [read string in as type]
-										   QUuid(metaObj["frameUUID"].toString()), // TODO: rename to assetUUID
+										   HyGlobal::GetTypeFromString(metaObj["itemType"].toString()),
+										   QUuid(metaObj["assetUUID"].toString()),
 										   JSONOBJ_TOINT(metaObj, "checksum"),
-										   JSONOBJ_TOINT(metaObj, "atlasGrpId"), // TODO: rename to bankId
+										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
 										   rAlphaCrop,
 										   metaObj["width"].toInt(),
@@ -486,24 +486,13 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 /*virtual*/ QJsonObject AtlasModel::GetSaveJson() /*override*/
 {
-	QJsonArray atlasGrpArray;
+	QJsonArray banksArray;
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
 	{
-		QJsonObject atlasGrpObj;
+		QJsonObject bankObj;
 
-		// TODO: rename [move width into object inside assets array]
-		atlasGrpObj.insert("width", m_BanksModel.GetBank(i)->m_MetaObj["sbTextureWidth"].toInt());
-		// TODO: rename [move height into object inside assets array]
-		atlasGrpObj.insert("height", m_BanksModel.GetBank(i)->m_MetaObj["sbTextureHeight"].toInt());
-		// TODO: rename to bankId
-		atlasGrpObj.insert("atlasGrpId", m_BanksModel.GetBank(i)->m_MetaObj["atlasGrpId"].toInt());
-
-		// TODO: rename to format [move textureType into object inside assets array; convert to string representation]
-		atlasGrpObj.insert("textureType", m_BanksModel.GetBank(i)->m_MetaObj["textureType"].toInt());
-
-		QJsonArray textureArray;
-
-		// TODO: rename [frameArrayList should be broken into objects that take height, width, and textureType, then frames array]
+		bankObj.insert("bankId", m_BanksModel.GetBank(i)->m_MetaObj["bankId"].toInt());
+		
 		QList<QJsonArray> frameArrayList;
 		QList<AssetItemData *> &atlasGrpFrameListRef = m_BanksModel.GetBank(i)->m_AssetList;
 		for(int i = 0; i < atlasGrpFrameListRef.size(); ++i)
@@ -525,18 +514,26 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 			frameArrayList[pAtlasFrame->GetTextureIndex()].append(frameObj);
 		}
 
+		QJsonArray textureArray;
 		for(int i = 0; i < frameArrayList.size(); ++i)
-			textureArray.append(frameArrayList[i]);
+		{
+			QJsonObject textureObj;
+			textureObj.insert("width", m_BanksModel.GetBank(i)->m_MetaObj["maxWidth"].toInt());
+			textureObj.insert("height", m_BanksModel.GetBank(i)->m_MetaObj["maxHeight"].toInt());
+			textureObj.insert("format", m_BanksModel.GetBank(i)->m_MetaObj["textureFormat"].toString());
+			textureObj.insert("assets", frameArrayList[i]);
 
-		// TODO: rename to assets
-		atlasGrpObj.insert("textures", textureArray);
+			textureArray.append(textureObj);
+		}
 
-		atlasGrpArray.append(atlasGrpObj);
+		bankObj.insert("textures", textureArray);
+
+		banksArray.append(bankObj);
 	}
 
 	QJsonObject atlasInfoObj;
 	atlasInfoObj.insert("$fileVersion", HYGUI_FILE_VERSION);
-	atlasInfoObj.insert("atlasGroups", atlasGrpArray); // TODO: rename to banks
+	atlasInfoObj.insert("banks", banksArray);
 
 	return atlasInfoObj;
 }
@@ -557,10 +554,8 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 
 	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
 
-	AtlasItemType eAtlasItemType = HyGlobal::GetAtlasItemFromItem(eType);
-
 	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
-	if(eAtlasItemType == ATLASITEM_Image) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
+	if(eType == ITEM_AtlasImage) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		rAlphaCrop = ImagePacker::crop(newImage);
 
 	AtlasFrame *pNewAsset = new AtlasFrame(*this,

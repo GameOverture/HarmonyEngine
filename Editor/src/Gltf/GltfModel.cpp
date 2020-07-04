@@ -52,7 +52,7 @@ Project *GltfModel::GetProjOwner()
 		return Qt::AlignLeft;
 
 	//if(role == Qt::DisplayRole || role == Qt::EditRole)
-	//	return "Id: " % QString::number(m_AtlasGrpList[index.row()]->GetId()) % " - " % m_AtlasGrpList[index.row()]->m_PackerSettings["txtName"].toString();
+	//	return "Id: " % QString::number(m_AtlasGrpList[index.row()]->GetId()) % " - " % m_AtlasGrpList[index.row()]->m_PackerSettings["bankName"].toString();
 
 	return QVariant();
 }

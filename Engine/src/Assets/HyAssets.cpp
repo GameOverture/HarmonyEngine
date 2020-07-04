@@ -600,17 +600,14 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 		{
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case HYFILE_Atlas: {
-			// TODO: rename to banks
-			jsonxx::Array atlasGrpArray = manifestFileObj.get<jsonxx::Array>("atlasGroups");
+			jsonxx::Array banksArray = manifestFileObj.get<jsonxx::Array>("banks");
 
-			// Iterate through each atlas group and determine how many textures total there are between all groups
+			// Iterate through each bank and determine how many textures total there are between all banks
 			m_FilesMap[eFileType].m_uiNumFiles = 0;
-			for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
+			for(uint32 i = 0; i < static_cast<uint32>(banksArray.size()); ++i)
 			{
-				jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
-
-				// TODO: rename to assets
-				jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
+				jsonxx::Object bankObj = banksArray.get<jsonxx::Object>(i);
+				jsonxx::Array texturesArray = bankObj.get<jsonxx::Array>("textures");
 				m_FilesMap[eFileType].m_uiNumFiles += static_cast<uint32>(texturesArray.size());
 			}
 
@@ -620,15 +617,13 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 			// Then iterate back over each atlas group and instantiate a HyFileAtlas for each texture
 			uint32 uiManifestIndex = 0;
 			char szTmpBuffer[16];
-			for(uint32 i = 0; i < static_cast<uint32>(atlasGrpArray.size()); ++i)
+			for(uint32 i = 0; i < static_cast<uint32>(banksArray.size()); ++i)
 			{
-				jsonxx::Object atlasGrpObj = atlasGrpArray.get<jsonxx::Object>(i);
+				jsonxx::Object bankObj = banksArray.get<jsonxx::Object>(i);
 
-				// TODO: rename to bankId
-				uint32 uiAtlasGroupId = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("atlasGrpId"));
+				uint32 uiBankId = static_cast<uint32>(bankObj.get<jsonxx::Number>("bankId"));
 
-				// TODO: rename to assets
-				jsonxx::Array texturesArray = atlasGrpObj.get<jsonxx::Array>("textures");
+				jsonxx::Array texturesArray = bankObj.get<jsonxx::Array>("textures");
 				for(uint32 j = 0; j < static_cast<uint32>(texturesArray.size()); ++j)
 				{
 					HyAssert(uiManifestIndex < m_FilesMap[eFileType].m_uiNumFiles, "HyAssets::OnThreadInit instantiated too many atlases");
@@ -636,23 +631,20 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 					std::sprintf(szTmpBuffer, "%05d", j);
 					std::string sAtlasFilePath = szTmpBuffer;
 
-					uint32 uiTextureFormat = static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureType")); // TODO: rename to format [move textureType into object inside assets array; convert to string representation]
-					uint32 uiTextureFiltering = atlasGrpObj.has<jsonxx::Number>("textureFiltering") ? static_cast<uint32>(atlasGrpObj.get<jsonxx::Number>("textureFiltering")) : HYTEXFILTER_BILINEAR;
+					jsonxx::Object texObj = texturesArray.get<jsonxx::Object>(j);
+					HyTextureFormat eFormat = GetTextureFormatFromString(texObj.get<jsonxx::String>("format"));
 
-					if(uiTextureFormat == HYTEXTURE_R8G8B8A8 || uiTextureFormat == HYTEXTURE_R8G8B8)
+					if(eFormat == HYTEXTURE_R8G8B8A8 || eFormat == HYTEXTURE_R8G8B8)
 						sAtlasFilePath += ".png";
 					else
 						sAtlasFilePath += ".dds";
 
 					new (pAtlasWriteLocation)HyFileAtlas(sAtlasFilePath,
-						uiAtlasGroupId,
+						uiBankId,
 						j,
 						uiManifestIndex,
-						static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("width")), // TODO: rename [move width into object inside assets array]
-						static_cast<int32>(atlasGrpObj.get<jsonxx::Number>("height")), // TODO: rename [move height into object inside assets array]
-						static_cast<HyTextureFormat>(uiTextureFormat),
-						static_cast<HyTextureFiltering>(uiTextureFiltering),
-						texturesArray.get<jsonxx::Array>(j));
+						HYTEXFILTER_BILINEAR,
+						texObj);
 
 					++pAtlasWriteLocation;
 					++uiManifestIndex;
@@ -673,11 +665,10 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 			{
 				jsonxx::Object bankObj = banksArray.get<jsonxx::Object>(i);
 
-				// TODO: rename to bankId
-				uint32 uiAtlasGroupId = static_cast<uint32>(bankObj.get<jsonxx::Number>("atlasGrpId"));
+				uint32 uiBankId = static_cast<uint32>(bankObj.get<jsonxx::Number>("bankId"));
 
 				std::string sBankFilePath = HYASSETS_AudioDir;
-				sprintf(szTmpBuffer, "%05d", uiAtlasGroupId);
+				sprintf(szTmpBuffer, "%05d", uiBankId);
 				sBankFilePath += szTmpBuffer;
 
 				new (pPlacementLocation)HyFileAudio(sBankFilePath, i, m_AudioRef.AllocateAudioBank(bankObj));
@@ -859,3 +850,71 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 
 	SetEntityLoaded(pLoadable->_LoadableGetParentPtr());
 }
+
+/*static*/ std::vector<HyTextureFormat> HyAssets::GetTextureFormatList()
+{
+	std::vector<HyTextureFormat> list;
+	list.push_back(HYTEXTURE_R8G8B8A8);
+	list.push_back(HYTEXTURE_R8G8B8);
+	list.push_back(HYTEXTURE_RGB_DTX1);
+	list.push_back(HYTEXTURE_RGBA_DTX1);
+	list.push_back(HYTEXTURE_DTX3);
+	list.push_back(HYTEXTURE_DTX5);
+
+	HyAssert(list.size() == HYNUM_TEXTUREFORMATS, "HyGlobal::GetTextureFormatList missing a format!");
+
+	return list;
+}
+
+/*static*/ std::vector<std::string> HyAssets::GetTextureFormatNameList()
+{
+	std::vector<HyTextureFormat> formatList = GetTextureFormatList();
+
+	std::vector<std::string> list;
+	for(int i = 0; i < formatList.size(); ++i)
+		list.push_back(GetTextureFormatName(formatList[i]));
+
+	return list;
+}
+
+/*static*/ std::string HyAssets::GetTextureFormatName(HyTextureFormat eType)
+{
+	switch(eType)
+	{
+	case HYTEXTURE_R8G8B8A8:
+		return "R8G8B8A8";
+	case HYTEXTURE_R8G8B8:
+		return "R8G8B8 (unsupported)";
+	case HYTEXTURE_RGB_DTX1:
+		return "RGB_DTX1";
+	case HYTEXTURE_RGBA_DTX1:
+		return "RGBA_DTX1 (unsupported)";
+	case HYTEXTURE_DTX3:
+		return "DTX3 (unsupported)";
+	case HYTEXTURE_DTX5:
+		return "DTX5";
+
+	default:
+		break;
+	}
+
+	return "Unknown";
+}
+
+/*static*/ HyTextureFormat HyAssets::GetTextureFormatFromString(std::string sFormat)
+{
+	std::transform(sFormat.begin(), sFormat.end(), sFormat.begin(), ::tolower);
+
+	std::vector<std::string> sTextureFormatList = GetTextureFormatNameList();
+	for(int i = 0; i < sTextureFormatList.size(); ++i)
+	{
+		std::string sCurStr = sTextureFormatList[i];
+		std::transform(sCurStr.begin(), sCurStr.end(), sCurStr.begin(), ::tolower);
+		
+		if(sFormat == sCurStr)
+			return GetTextureFormatList()[i];
+	}
+
+	return HYTEXTURE_Unknown;
+}
+

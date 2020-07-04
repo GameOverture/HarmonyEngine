@@ -67,20 +67,6 @@ enum HyGuiItemType
 	NUMTYPES
 };
 
-// NOTE: Do not rearrange the order of this enum
-enum AtlasItemType
-{
-	ATLASITEM_Unknown = -1,
-
-	ATLASITEM_Filter = 0,
-	ATLASITEM_Image,
-	ATLASITEM_Font,
-	ATLASITEM_Spine,
-	ATLASITEM_Prefab,
-
-	NUMATLASITEM
-};
-
 enum AtlasFrameError
 {
 	ATLASFRAMEERROR_CannotFindMetaImg = 0,
@@ -134,10 +120,10 @@ enum Theme
 #define HYGUIPATH_EditorDataDir					"Editor/data/"
 #define HYGUIPATH_ProjGenDir					"Editor/data/_projGen/"
 
-#define HYGUIPATH_MetaExt						".hygui"
-#define HYGUIPATH_DataExt						".json"
+#define HYGUIPATH_ItemsFileName					"Items"
+#define HYGUIPATH_MetaExt						".meta"
+#define HYGUIPATH_DataExt						".data"
 
-#define HYMETA_DataFile							"data.hygui"
 #define HYMETA_FontsDir							"Fonts/"
 
 #define HYMETA_ImageFilterList					{"*.png", "*.*"}
@@ -185,17 +171,9 @@ class HyGlobal
 public:
 	static void Initialize();
 
-	static HyGuiItemType GetItemFromAtlasItem(AtlasItemType eFrameType); // TODO patchv4: remove AtlasItemType
-	static AtlasItemType GetAtlasItemFromItem(HyGuiItemType eItem);		 // TODO patchv4: remove AtlasItemType
-
 	static QList<HyGuiItemType> GetTypeList();
 	static QStringList GetTypeNameList();
 	static HyGuiItemType GetTypeFromString(QString sType);
-
-	static QList<HyTextureFormat> GetTextureFormatList();
-	static QStringList GetTextureFormatNameList();
-	static QString GetTextureFormatName(HyTextureFormat eType);
-	static HyTextureFormat GetTextureFormatFromString(QString sFormat);
 
 	static const QString ItemName(HyGuiItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString ItemExt(HyGuiItemType eItem);

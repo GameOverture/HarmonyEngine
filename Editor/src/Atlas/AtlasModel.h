@@ -64,28 +64,4 @@ private:
 	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiBankIndex, HyGuiItemType eType);
 };
 
-//struct AtlasGrp
-//{
-//	QDir										m_DataDir;
-//
-//	QJsonObject									m_PackerSettings;
-//	
-//	QList<AtlasFrame *>							m_FrameList;
-//
-//	AtlasGrp(QString sAbsDataDirPath) : m_DataDir(sAbsDataDirPath)
-//	{ }
-//
-//	quint32 GetId()
-//	{
-//		return JSONOBJ_TOINT(m_PackerSettings, "atlasGrpId"); // TODO: rename to bankId
-//	}
-//
-//	QFileInfoList GetExistingTextureInfoList()
-//	{
-//		return m_DataDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-//	}
-//
-//	
-//};
-
 #endif // ATLASMODEL_H

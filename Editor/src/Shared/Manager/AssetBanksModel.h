@@ -34,17 +34,14 @@ struct BankData
 	}
 
 	quint32 GetId() const {
-		// TODO: rename to bankId
-		if(m_MetaObj.contains("atlasGrpId") == false) {
+		if(m_MetaObj.contains("bankId") == false) {
 			HyGuiLog("BankData::GetId could not find 'bankId' in bank's settings", LOGTYPE_Error);
 		}
-		// TODO: rename to bankId
-		return m_MetaObj["atlasGrpId"].toInt();
+		return m_MetaObj["bankId"].toInt();
 	}
 
 	QString GetName() const {
-		// TODO: rename to bankName
-		return m_MetaObj["txtName"].toString();
+		return m_MetaObj["bankName"].toString();
 	}
 };
 

@@ -114,48 +114,6 @@
 	sm_ErrorStrings[ATLASFRAMEERROR_CouldNotPack] = "Could not pack this frame in atlas";
 }
 
-/*static*/ HyGuiItemType HyGlobal::GetItemFromAtlasItem(AtlasItemType eFrameType)
-{
-	switch(eFrameType)
-	{
-	case ATLASITEM_Filter:
-		return ITEM_Filter;
-	case ATLASITEM_Image:
-		return ITEM_AtlasImage;
-	case ATLASITEM_Font:
-		return ITEM_Text;
-	case ATLASITEM_Spine:
-		return ITEM_Spine;
-	case ATLASITEM_Prefab:
-		return ITEM_Prefab;
-	default:
-		HyGuiLog("HyGlobal::GetItemFromAtlasItem() could not find the proper item", LOGTYPE_Error);
-	}
-
-	return ITEM_Unknown;
-}
-
-/*static*/ AtlasItemType HyGlobal::GetAtlasItemFromItem(HyGuiItemType eItem)
-{
-	switch(eItem)
-	{
-	case ITEM_Filter:
-		return ATLASITEM_Filter;
-	case ITEM_AtlasImage:
-		return ATLASITEM_Image;
-	case ITEM_Text:
-		return ATLASITEM_Font;
-	case ITEM_Spine:
-		return ATLASITEM_Spine;
-	case ITEM_Prefab:
-		return ATLASITEM_Prefab;
-	default:
-		HyGuiLog("HyGlobal::GetAtlasItemFromItem() could not find the atlas item", LOGTYPE_Error);
-	}
-
-	return ATLASITEM_Unknown;
-}
-
 /*static*/ QList<HyGuiItemType> HyGlobal::GetTypeList()
 {
 	QList<HyGuiItemType> list;
@@ -195,69 +153,6 @@
 }
 
 /*static*/ HyGuiItemType HyGlobal::GetTypeFromString(QString sType)
-{
-	QStringList sTypeList = GetTypeNameList();
-	for(int i = 0; i < sTypeList.size(); ++i)
-	{
-		if(sType.compare(sTypeList[i], Qt::CaseInsensitive) == 0)
-			return GetTypeList()[i];
-	}
-
-	return ITEM_Unknown;
-}
-
-/*static*/ QList<HyTextureFormat> HyGlobal::GetTextureFormatList()
-{
-	QList<HyTextureFormat> list;
-	list.append(HYTEXTURE_R8G8B8A8);
-	list.append(HYTEXTURE_R8G8B8);
-	list.append(HYTEXTURE_RGB_DTX1);
-	list.append(HYTEXTURE_RGBA_DTX1);
-	list.append(HYTEXTURE_DTX3);
-	list.append(HYTEXTURE_DTX5);
-
-	if(list.size() != HYNUM_TEXTUREFORMATS)
-		HyGuiLog("HyGlobal::GetTextureFormatList missing a format!", LOGTYPE_Error);
-
-	return list;
-}
-
-/*static*/ QStringList HyGlobal::GetTextureFormatNameList()
-{
-	QList<HyTextureFormat> formatList = GetTextureFormatList();
-
-	QStringList list;
-	for(int i = 0; i < formatList.size(); ++i)
-		list.append(GetTextureFormatName(formatList[i]));
-
-	return list;
-}
-
-/*static*/ QString HyGlobal::GetTextureFormatName(HyTextureFormat eType)
-{
-	switch(eType)
-	{
-	case HYTEXTURE_R8G8B8A8:
-		return "R8G8B8A8";
-	case HYTEXTURE_R8G8B8:
-		return "R8G8B8 (unsupported)";
-	case HYTEXTURE_RGB_DTX1:
-		return "RGB_DTX1";
-	case HYTEXTURE_RGBA_DTX1:
-		return "RGBA_DTX1 (unsupported)";
-	case HYTEXTURE_DTX3:
-		return "DTX3 (unsupported)";
-	case HYTEXTURE_DTX5:
-		return "DTX5";
-
-	default:
-		break;
-	}
-
-	return "Unknown";
-}
-
-/*static*/ HyTextureFormat HyGlobal::GetTextureFormatFromString(QString sFormat)
 {
 	QStringList sTypeList = GetTypeNameList();
 	for(int i = 0; i < sTypeList.size(); ++i)

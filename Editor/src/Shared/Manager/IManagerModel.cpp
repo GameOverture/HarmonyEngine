@@ -44,11 +44,11 @@ IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 
 void IManagerModel::Init()
 {
-	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, false) % HYGUIPATH_MetaExt));
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_MetaExt));
 	if(settingsFile.exists())
 	{
 		if(!settingsFile.open(QIODevice::ReadOnly))
-			HyGuiLog(QString("IManagerModel::IManagerModel() could not open ") % HyGlobal::ItemName(m_eITEM_TYPE, false) % HYGUIPATH_MetaExt, LOGTYPE_Error);
+			HyGuiLog(QString("IManagerModel::IManagerModel() could not open ") % HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_MetaExt, LOGTYPE_Error);
 
 #ifdef HYGUI_UseBinaryMetaFiles
 		QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
@@ -58,16 +58,12 @@ void IManagerModel::Init()
 		settingsFile.close();
 
 		QJsonObject settingsObj = settingsDoc.object();
+		m_uiNextBankId = JSONOBJ_TOINT(settingsObj, "nextBankId");
 
-		// TODO: rename to nextBankId
-		m_uiNextBankId = JSONOBJ_TOINT(settingsObj, "startAtlasId");
-
-		// TODO: rename to banks
-		QJsonArray bankArray = settingsObj["groups"].toArray();
+		QJsonArray bankArray = settingsObj["banks"].toArray();
 		for(int i = 0; i < bankArray.size(); ++i)
 		{
-			// TODO: rename to bankId
-			QString sName = HyGlobal::MakeFileNameFromCounter(bankArray[i].toObject()["atlasGrpId"].toInt());
+			QString sName = HyGlobal::MakeFileNameFromCounter(bankArray[i].toObject()["bankId"].toInt());
 			BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(sName), bankArray[i].toObject());
 
 			//OnCreateBank(*pNewBank);
@@ -125,11 +121,10 @@ void IManagerModel::Init()
 		//for(int i = 0; i < atlasFiltersTreeItemList.size(); ++i)
 		//	atlasFiltersTreeItemList[i]->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
 
-		// TODO: rename to assets
-		QJsonArray frameArray = settingsObj["frames"].toArray();
-		for(int i = 0; i < frameArray.size(); ++i)
+		QJsonArray assetsArray = settingsObj["assets"].toArray();
+		for(int i = 0; i < assetsArray.size(); ++i)
 		{
-			QJsonObject assetObj = frameArray[i].toObject();
+			QJsonObject assetObj = assetsArray[i].toObject();
 			AssetItemData *pAssetData = CreateAssetTreeItem(assetObj["filter"].toString(), assetObj["name"].toString(), assetObj);
 
 
@@ -167,6 +162,12 @@ void IManagerModel::Init()
 		m_uiNextBankId = 0;
 		CreateNewBank("Default");
 	}
+
+
+	// Create data manifest file if one doesn't exist
+	QFile manifestFile(m_DataDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_DataExt));
+	if(manifestFile.exists() == false)
+		SaveRuntime();
 }
 
 Project &IManagerModel::GetProjOwner()
@@ -542,10 +543,8 @@ void IManagerModel::CreateNewBank(QString sName)
 	//AtlasGrp *pNewAtlasGrp = new AtlasGrp());
 	QJsonObject bankObj = DlgAtlasGroupSettings::GenerateDefaultSettingsObj();
 
-	// TODO: rename to bankName
-	bankObj.insert("txtName", sName);
-	// TODO: rename to bankId
-	bankObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
+	bankObj.insert("bankName", sName);
+	bankObj.insert("bankId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
 
 	BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_uiNextBankId)), bankObj);
 	
@@ -616,10 +615,10 @@ void IManagerModel::SaveMeta()
 {
 	// Assemble array with all the frames from every group
 	QJsonArray assetsArray;
-	QJsonArray groupsArray;
+	QJsonArray banksArray;
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
 	{
-		groupsArray.append(m_BanksModel.GetBank(i)->m_MetaObj);
+		banksArray.append(m_BanksModel.GetBank(i)->m_MetaObj);
 
 		QList<AssetItemData *> &assetListRef = m_BanksModel.GetBank(i)->m_AssetList;
 		for(int j = 0; j < assetListRef.size(); ++j)
@@ -678,14 +677,11 @@ void IManagerModel::SaveMeta()
 	//settingsObj.insert("expanded", m_ExpandedFiltersArray);
 	//settingsObj.insert("filters", filtersArray);
 
-	// TODO: rename to assets
-	settingsObj.insert("frames", assetsArray);
-	settingsObj.insert("groups", groupsArray);
+	settingsObj.insert("assets", assetsArray);
+	settingsObj.insert("banks", banksArray);
+	settingsObj.insert("nextBankId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
 
-	// TODO: rename to nextBankId
-	settingsObj.insert("startAtlasId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
-
-	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, false) % HYGUIPATH_MetaExt));
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_MetaExt));
 	if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 		HyGuiLog("Couldn't open meta file for writing", LOGTYPE_Error);
@@ -714,7 +710,7 @@ void IManagerModel::SaveRuntime()
 	QJsonDocument runtimeDoc;
 	runtimeDoc.setObject(GetSaveJson());
 
-	QFile runtimeFile(m_DataDir.absoluteFilePath(HYASSETS_AtlasFile));
+	QFile runtimeFile(m_DataDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_DataExt));
 	if(runtimeFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 		HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
 	else

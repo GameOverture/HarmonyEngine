@@ -157,7 +157,7 @@ void Project::LoadExplorerModel()
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Initialize 'm_ProjectFileData' from the project files on disk
-	if(LoadDataObj(GetMetaDataAbsPath() % HYMETA_DataFile, m_ProjectFileData.m_Meta))
+	if(LoadDataObj(GetMetaDataAbsPath() % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt, m_ProjectFileData.m_Meta))
 		WriteMetaData();
 
 	if(LoadDataObj(GetAssetsAbsPath() % HYASSETS_DataFile, m_ProjectFileData.m_Data))
@@ -184,9 +184,10 @@ void Project::LoadExplorerModel()
 		QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 		for(int j = 0; j < typeList.size(); ++j)
 		{
-			if(sItemTypeList[i] == HyGlobal::ItemName(typeList[j], true))
+			HyGuiItemType eTmpType = typeList[j];
+			if(sItemTypeList[i] == HyGlobal::ItemName(eTmpType, true))
 			{
-				eItemType = typeList[j];
+				eItemType = eTmpType;
 				break;
 			}
 		}
@@ -281,9 +282,9 @@ void Project::WriteGameData()
 
 void Project::WriteMetaData()
 {
-	QFile metaFile(GetMetaDataAbsPath() % HYMETA_DataFile);
+	QFile metaFile(GetMetaDataAbsPath() % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt);
 	if(metaFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-		HyGuiLog(QString("Couldn't open ") % HYMETA_DataFile % " for writing: " % metaFile.errorString(), LOGTYPE_Error);
+		HyGuiLog(QString("Couldn't open ") % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt % " for writing: " % metaFile.errorString(), LOGTYPE_Error);
 	else
 	{
 		m_ProjectFileData.m_Meta.insert("$fileVersion", HYGUI_FILE_VERSION);

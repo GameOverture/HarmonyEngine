@@ -15,9 +15,9 @@
 #include "Assets/Files/HyFilesManifest.h"
 #include "Utilities/HyMath.h"
 
-#define HYASSETS_DataFile "data.json"
-#define HYASSETS_AtlasFile "atlas.json"
-#define HYASSETS_AudioFile "Audio.json"
+#define HYASSETS_DataFile "Items.data"
+#define HYASSETS_AtlasFile "Atlases.data"
+#define HYASSETS_AudioFile "Audio.data"
 
 #define HYASSETS_AtlasDir "Atlases/"
 #define HYASSETS_PrefabDir "Prefabs/"
@@ -124,6 +124,12 @@ private:
 
 	void SetAsLoaded(IHyLoadable *pLoadable);
 	void SetAsUnloaded(IHyLoadable *pLoadable);
+
+public:
+	static std::vector<HyTextureFormat> GetTextureFormatList();
+	static std::vector<std::string> GetTextureFormatNameList();
+	static std::string GetTextureFormatName(HyTextureFormat eType);
+	static HyTextureFormat GetTextureFormatFromString(std::string sFormat);
 };
 
 #endif /* HyAssets_h__ */

@@ -115,16 +115,13 @@ uint AssetItemData::GetErrors()
 void AssetItemData::GetJsonObj(QJsonObject &assetObj)
 {
 	assetObj = QJsonObject();
-	// TODO: rename to assetUUID
-	assetObj.insert("frameUUID", GetUuid().toString(QUuid::WithoutBraces));
-	// TODO: rename to bankId
-	assetObj.insert("atlasGrpId", QJsonValue(static_cast<qint64>(GetBankId())));
+	assetObj.insert("assetUUID", GetUuid().toString(QUuid::WithoutBraces));
+	assetObj.insert("bankId", QJsonValue(static_cast<qint64>(GetBankId())));
 	assetObj.insert("checksum", QJsonValue(static_cast<qint64>(GetChecksum())));
 	assetObj.insert("name", QJsonValue(GetName()));
 	assetObj.insert("filter", QJsonValue(m_ModelRef.AssembleFilter(this)));
 	assetObj.insert("errors", QJsonValue(static_cast<int>(GetErrors())));
-	// TODO: rename [convert from atlastype to string]
-	assetObj.insert("type", QJsonValue(GetType()));
+	assetObj.insert("itemType", QJsonValue(HyGlobal::ItemName(GetType(), false)));
 
 	InsertUniqueJson(assetObj);
 }

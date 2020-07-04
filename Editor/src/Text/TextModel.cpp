@@ -49,11 +49,11 @@ TextModel::TextModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataR
 	InitStates<TextStateData>(itemFileDataRef);
 		
 	// Find existing AtlasFrame * to assign to 'm_pAtlasFrame'
-	if(itemFileDataRef.m_Meta.contains("frameUUID"))
+	if(itemFileDataRef.m_Meta.contains("assetUUID"))
 	{
 		int iAffectedFrameIndex = 0;
 		QList<QUuid> uuidRequestList;
-		uuidRequestList.append(QUuid(itemFileDataRef.m_Meta["frameUUID"].toString()));
+		uuidRequestList.append(QUuid(itemFileDataRef.m_Meta["assetUUID"].toString()));
 
 		//QList<AtlasFrame *> pRequestedList = RequestFramesByUuid(nullptr, uuidRequestList, iAffectedFrameIndex);
 		QList<AssetItemData *> pRequestedList = m_ItemRef.GetProject().GetAtlasModel().RequestAssetsByUuid(&m_ItemRef, uuidRequestList);
@@ -175,7 +175,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	itemSpecificFileDataOut.m_Meta["availableGlyphs"] = availableGlyphsObj;
 
 	itemSpecificFileDataOut.m_Data.insert("checksum", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetChecksum())));
-	itemSpecificFileDataOut.m_Meta.insert("frameUUID", m_pAtlasFrame == nullptr ? 0 : m_pAtlasFrame->GetUuid().toString());
+	itemSpecificFileDataOut.m_Meta.insert("assetUUID", m_pAtlasFrame == nullptr ? 0 : m_pAtlasFrame->GetUuid().toString());
 
 	//uint uiAtlasPixelDataSizeOut;
 	//unsigned char *pPixelData = m_FontManager.GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);

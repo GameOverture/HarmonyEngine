@@ -272,7 +272,7 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair
 	m_pChkMapper_Reverse->SetChecked(stateFileData.m_Data["reverse"].toBool(false));
 	m_pChkMapper_Bounce->SetChecked(stateFileData.m_Data["bounce"].toBool(false));
 
-	QJsonArray metaFrameArray = stateFileData.m_Meta["frameIds"].toArray();
+	QJsonArray metaFrameArray = stateFileData.m_Meta["assetUUIDs"].toArray();
 	QJsonArray dataFrameArray = stateFileData.m_Data["frames"].toArray();
 
 	QList<QUuid> uuidRequestList;
@@ -410,7 +410,7 @@ SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	QList<AssetItemData *> frameList = pState->GetAtlasFrames();
 	for(int i = 0; i < frameList.size(); ++i)
 		frameIdsArray.append(frameList[i]->GetUuid().toString(QUuid::WithoutBraces));
-	stateFileData.m_Meta.insert("frameIds", frameIdsArray);
+	stateFileData.m_Meta.insert("assetUUIDs", frameIdsArray);
 
 	stateFileData.m_Data.insert("loop", pState->GetLoopMapper()->IsChecked());
 	stateFileData.m_Data.insert("reverse", pState->GetReverseMapper()->IsChecked());

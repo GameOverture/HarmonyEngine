@@ -21,7 +21,7 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObjec
 {
 	ui->setupUi(this);
 
-	ui->txtName->setText(m_InitialPackerSettingsObj["txtName"].toString());
+	ui->txtName->setText(m_InitialPackerSettingsObj["bankName"].toString());
 
 	ui->cmbSortOrder->setCurrentIndex(m_InitialPackerSettingsObj["cmbSortOrder"].toInt());
 	ui->sbFrameMarginTop->setValue(m_InitialPackerSettingsObj["sbFrameMarginTop"].toInt());
@@ -34,14 +34,28 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObjec
 	ui->chkAutosize->setChecked(m_InitialPackerSettingsObj["chkAutosize"].toBool());
 	ui->minFillRate->setValue(m_InitialPackerSettingsObj["minFillRate"].toInt());
 
-	ui->sbTextureWidth->setValue(m_InitialPackerSettingsObj["sbTextureWidth"].toInt());
-	ui->sbTextureHeight->setValue(m_InitialPackerSettingsObj["sbTextureHeight"].toInt());
+	ui->sbTextureWidth->setValue(m_InitialPackerSettingsObj["maxWidth"].toInt());
+	ui->sbTextureHeight->setValue(m_InitialPackerSettingsObj["maxHeight"].toInt());
 	ui->cmbHeuristic->setCurrentIndex(m_InitialPackerSettingsObj["cmbHeuristic"].toInt());
 	
 	for(int i = 0; i < HYNUM_TEXTUREFORMATS; ++i)
-		ui->cmbTextureType->addItem(HyGlobal::GetTextureFormatName(static_cast<HyTextureFormat>(i)));
+		ui->cmbTextureType->addItem(QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(i)).c_str()));
 	
-	ui->cmbTextureType->setCurrentIndex(m_InitialPackerSettingsObj["textureType"].toInt()); // TODO: rename to format [convert to string representation]
+	QString sTextureFormat = m_InitialPackerSettingsObj["textureFormat"].toString();
+
+	auto stdStringList = HyAssets::GetTextureFormatNameList();
+	QStringList sTextureFormatList;
+	for(auto str : stdStringList)
+		sTextureFormat.push_back(str.c_str());
+
+	for(int i = 0; i < sTextureFormatList.size(); ++i)
+	{
+		if(sTextureFormatList[i].compare(sTextureFormat, Qt::CaseInsensitive) == 0)
+		{
+			ui->cmbTextureType->setCurrentIndex(i);
+			break;
+		}
+	}
 }
 
 DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
@@ -53,10 +67,8 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
 {
 	QJsonObject returnSettingsObj;
 	
-	// TODO: rename to bankId
-	returnSettingsObj.insert("atlasGrpId", 0);
-	// TODO: rename to bankName
-	returnSettingsObj.insert("txtName", "Default");
+	returnSettingsObj.insert("bankId", 0);
+	returnSettingsObj.insert("bankName", "Default");
 	returnSettingsObj.insert("cmbSortOrder", 0);
 	returnSettingsObj.insert("sbFrameMarginTop", 0);
 	returnSettingsObj.insert("sbFrameMarginLeft", 0);
@@ -67,10 +79,10 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
 	returnSettingsObj.insert("chkSquare", true);
 	returnSettingsObj.insert("chkAutosize", true);
 	returnSettingsObj.insert("minFillRate", 80);
-	returnSettingsObj.insert("sbTextureWidth", 2048);
-	returnSettingsObj.insert("sbTextureHeight", 2048);
+	returnSettingsObj.insert("maxWidth", 2048);
+	returnSettingsObj.insert("maxHeight", 2048);
 	returnSettingsObj.insert("cmbHeuristic", 1);
-	returnSettingsObj.insert("textureType", 0); // TODO: rename to format [convert to string representation]
+	returnSettingsObj.insert("textureFormat", QString(HyAssets::GetTextureFormatName(HYTEXTURE_R8G8B8A8).c_str()));
 	
 	return returnSettingsObj;
 }
@@ -97,13 +109,13 @@ bool DlgAtlasGroupSettings::IsSettingsDirty()
 		return true;
 	if(ui->minFillRate->value() != m_InitialPackerSettingsObj["minFillRate"].toInt())
 		return true;
-	if(ui->sbTextureWidth->value() != m_InitialPackerSettingsObj["sbTextureWidth"].toInt())
+	if(ui->sbTextureWidth->value() != m_InitialPackerSettingsObj["maxWidth"].toInt())
 		return true;
-	if(ui->sbTextureHeight->value() != m_InitialPackerSettingsObj["sbTextureHeight"].toInt())
+	if(ui->sbTextureHeight->value() != m_InitialPackerSettingsObj["maxHeight"].toInt())
 		return true;
 	if(ui->cmbHeuristic->currentIndex() != m_InitialPackerSettingsObj["cmbHeuristic"].toInt())
 		return true;
-	if(ui->cmbTextureType->currentIndex() != m_InitialPackerSettingsObj["textureType"].toInt()) // TODO: rename to format [convert to string representation]
+	if(ui->cmbTextureType->currentIndex() != static_cast<int>(HyAssets::GetTextureFormatFromString(m_InitialPackerSettingsObj["textureFormat"].toString().toStdString())))
 		return true;
 	
 	return false;
@@ -111,12 +123,12 @@ bool DlgAtlasGroupSettings::IsSettingsDirty()
 
 bool DlgAtlasGroupSettings::IsNameChanged()
 {
-	return (ui->txtName->text() != m_InitialPackerSettingsObj["txtName"].toString());
+	return (ui->txtName->text() != m_InitialPackerSettingsObj["bankName"].toString());
 }
 
 void DlgAtlasGroupSettings::ApplyCurrentSettingsToObj(QJsonObject &settingsObjOut)
 {
-	settingsObjOut.insert("txtName", ui->txtName->text());
+	settingsObjOut.insert("bankName", ui->txtName->text());
 	settingsObjOut.insert("cmbSortOrder", ui->cmbSortOrder->currentIndex());
 	settingsObjOut.insert("sbFrameMarginTop", ui->sbFrameMarginTop->value());
 	settingsObjOut.insert("sbFrameMarginLeft", ui->sbFrameMarginLeft->value());
@@ -127,10 +139,10 @@ void DlgAtlasGroupSettings::ApplyCurrentSettingsToObj(QJsonObject &settingsObjOu
 	settingsObjOut.insert("chkSquare", ui->chkSquare->isChecked());
 	settingsObjOut.insert("chkAutosize", ui->chkAutosize->isChecked());
 	settingsObjOut.insert("minFillRate", ui->minFillRate->value());
-	settingsObjOut.insert("sbTextureWidth", ui->sbTextureWidth->value());
-	settingsObjOut.insert("sbTextureHeight", ui->sbTextureHeight->value());
+	settingsObjOut.insert("maxWidth", ui->sbTextureWidth->value());
+	settingsObjOut.insert("maxHeight", ui->sbTextureHeight->value());
 	settingsObjOut.insert("cmbHeuristic", ui->cmbHeuristic->currentIndex());
-	settingsObjOut.insert("textureType", ui->cmbTextureType->currentIndex()); // TODO: rename to format [convert to string representation]
+	settingsObjOut.insert("textureFormat", QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(ui->cmbTextureType->currentIndex())).c_str()));
 }
 
 void DlgAtlasGroupSettings::on_btnTexSize128_clicked()

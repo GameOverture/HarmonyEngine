@@ -61,10 +61,10 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 /*virtual*/ AssetItemData *AudioManagerModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	AudioAsset *pNewFrame = new AudioAsset(*this,
-										   HyGlobal::GetTypeFromString(metaObj["type"].toString()), // TODO: rename [read string in as type]
-										   QUuid(metaObj["frameUUID"].toString()), // TODO: rename to assetUUID
+										   HyGlobal::GetTypeFromString(metaObj["itemType"].toString()),
+										   QUuid(metaObj["assetUUID"].toString()),
 										   JSONOBJ_TOINT(metaObj, "checksum"),
-										   JSONOBJ_TOINT(metaObj, "atlasGrpId"), // TODO: rename to bankId
+										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
 										   metaObj["format"].toString(),
 										   metaObj["errors"].toInt(0));

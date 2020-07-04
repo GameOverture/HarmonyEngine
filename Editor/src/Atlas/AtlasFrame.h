@@ -38,7 +38,6 @@ public:
 	QSize GetSize();
 	QRect GetCrop();
 	QPoint GetPosition();
-	AtlasItemType GetType();
 
 	int GetTextureIndex();
 	int GetX();

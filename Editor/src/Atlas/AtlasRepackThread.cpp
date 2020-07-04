@@ -44,8 +44,8 @@ AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<int> textureIndexL
 	SetPackerSettings();
 
 	m_Packer.pack(m_BankRef.m_MetaObj["cmbHeuristic"].toInt(),
-				  m_BankRef.m_MetaObj["sbTextureWidth"].toInt(),
-				  m_BankRef.m_MetaObj["sbTextureHeight"].toInt());
+				  m_BankRef.m_MetaObj["maxWidth"].toInt(),
+				  m_BankRef.m_MetaObj["maxHeight"].toInt());
 
 	// Subtract '1' from the number of new textures because we want to ensure the last generated (and likely least filled) texture is last
 	int iNumNewTextures = m_Packer.bins.size() - 1;
@@ -151,13 +151,13 @@ AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<int> textureIndexL
 
 void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTextureIndex)
 {
-	if(m_BankRef.m_MetaObj["sbTextureWidth"].toInt() != m_Packer.bins[iPackerBinIndex].width() ||
-	   m_BankRef.m_MetaObj["sbTextureHeight"].toInt() != m_Packer.bins[iPackerBinIndex].height())
+	if(m_BankRef.m_MetaObj["maxWidth"].toInt() != m_Packer.bins[iPackerBinIndex].width() ||
+	   m_BankRef.m_MetaObj["maxHeight"].toInt() != m_Packer.bins[iPackerBinIndex].height())
 	{
 		HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimensions", LOGTYPE_Error);
 	}
 
-	QImage newTexture(m_BankRef.m_MetaObj["sbTextureWidth"].toInt(), m_BankRef.m_MetaObj["sbTextureHeight"].toInt(), QImage::Format_ARGB32);
+	QImage newTexture(m_BankRef.m_MetaObj["maxWidth"].toInt(), m_BankRef.m_MetaObj["maxHeight"].toInt(), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
 
 	QPainter p(&newTexture);
@@ -265,7 +265,7 @@ void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTe
 	}
 
 	QImage *pTexture = static_cast<QImage *>(p.device());
-	HyTextureFormat eTextureType = static_cast<HyTextureFormat>(m_BankRef.m_MetaObj["textureType"].toInt()); // TODO: rename to format [also convert to string representation]
+	HyTextureFormat eTextureType = static_cast<HyTextureFormat>(HyAssets::GetTextureFormatFromString(m_BankRef.m_MetaObj["textureFormat"].toString().toStdString()));
 
 	QDir runtimeBankDir(m_BankRef.m_sAbsPath);
 

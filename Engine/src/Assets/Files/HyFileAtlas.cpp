@@ -20,28 +20,26 @@ HyFileAtlas::HyFileAtlas(std::string sFileName,
 				 uint32 uiBankId,
 				 uint32 uiIndexInGroup,
 				 uint32 uiManifestIndex,
-				 uint32 uiWidth,
-				 uint32 uiHeight,
-				 HyTextureFormat eTextureFormat,
 				 HyTextureFiltering eTextureFiltering,
-				 jsonxx::Array &srcFramesArrayRef) :
+				 jsonxx::Object &textureObjRef) :
 	IHyFile(sFileName, HYFILE_Atlas, uiManifestIndex),
 	m_uiBANK_ID(uiBankId),
 	m_uiINDEX_IN_GROUP(uiIndexInGroup),
-	m_uiWIDTH(uiWidth),
-	m_uiHEIGHT(uiHeight),
-	m_eTEXTURE_FORMAT(eTextureFormat),
+	m_uiWIDTH(textureObjRef.get<jsonxx::Number>("width")),
+	m_uiHEIGHT(textureObjRef.get<jsonxx::Number>("height")),
+	m_eTEXTURE_FORMAT(HyAssets::GetTextureFormatFromString(textureObjRef.get<jsonxx::String>("format"))),
 	m_eTEXTURE_FILTERING(eTextureFiltering),
 	m_hTextureHandle(0),
-	m_uiNUM_FRAMES(static_cast<uint32>(srcFramesArrayRef.size())),
+	m_uiNUM_FRAMES(static_cast<uint32>(textureObjRef.get<jsonxx::Array>("assets").size())),
 	m_pPixelData(nullptr),
 	m_uiPixelDataSize(0)
 {
 	m_pFrames = HY_NEW HyRectangle<int32>[m_uiNUM_FRAMES];
 
+	jsonxx::Array &framesArrayRef = textureObjRef.get<jsonxx::Array>("assets");
 	for(uint32 k = 0; k < m_uiNUM_FRAMES; ++k)
 	{
-		jsonxx::Object srcFrameObj = srcFramesArrayRef.get<jsonxx::Object>(k);
+		jsonxx::Object srcFrameObj = framesArrayRef.get<jsonxx::Object>(k);
 
 		m_pFrames[k].bottom = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("bottom"));
 		m_pFrames[k].right = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("right"));
