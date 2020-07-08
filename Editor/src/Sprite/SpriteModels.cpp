@@ -424,13 +424,17 @@ SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	return stateFileData;
 }
 
-/*virtual*/ QList<AssetItemData *> SpriteModel::GetAtlasAssets() const /*override*/
+/*virtual*/ QList<AssetItemData *> SpriteModel::GetAssets(HyGuiItemType eType) const /*override*/
 {
 	QList<AssetItemData *> retAtlasFrameList;
-	for(int i = 0; i < m_StateList.size(); ++i)
+
+	if(eType == ITEM_AtlasImage)
 	{
-		QList<AssetItemData *> atlasFrameList = static_cast<SpriteStateData *>(m_StateList[i])->GetAtlasFrames();
-		retAtlasFrameList += atlasFrameList;
+		for(int i = 0; i < m_StateList.size(); ++i)
+		{
+			QList<AssetItemData *> atlasFrameList = static_cast<SpriteStateData *>(m_StateList[i])->GetAtlasFrames();
+			retAtlasFrameList += atlasFrameList;
+		}
 	}
 
 	return retAtlasFrameList;

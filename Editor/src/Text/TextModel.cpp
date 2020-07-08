@@ -205,11 +205,15 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	return stateFileData;
 }
 
-/*virtual*/ QList<AssetItemData *> TextModel::GetAtlasAssets() const /*override*/
+/*virtual*/ QList<AssetItemData *> TextModel::GetAssets(HyGuiItemType eType) const /*override*/
 {
 	QList<AssetItemData *> retAtlasFrameList;
-	if(m_pAtlasFrame)
-		retAtlasFrameList.push_back(m_pAtlasFrame);
+
+	if(eType == ITEM_AtlasImage)
+	{
+		if(m_pAtlasFrame)
+			retAtlasFrameList.push_back(m_pAtlasFrame);
+	}
 
 	return retAtlasFrameList;
 }

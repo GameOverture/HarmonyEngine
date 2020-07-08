@@ -54,7 +54,7 @@ public:
 	void SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj);
 	QList<AssetItemData *> GetBankAssets(uint uiBankIndex);
 
-	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList);
+	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
 	void RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
 	void ReplaceAssets(QList<AssetItemData *> assetsList);
 	void Rename(TreeModelItemData *pItem, QString sNewName);
@@ -63,6 +63,7 @@ public:
 	QJsonArray GetExpandedFiltersArray();
 	QString AssembleFilter(AssetItemData *pAsset) const;
 	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
+	TreeModelItemData *ReturnFilter(QString sFilterPath); // Will create if doesn't exist
 
 	bool RemoveLookup(AssetItemData *pAsset); // Returns true if no remaining duplicates exist
 	AssetItemData *FindById(QUuid uuid);
@@ -107,7 +108,7 @@ protected:
 	//virtual void OnDeleteBank(BankData &bankToBeDeleted) = 0;
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
-	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) = 0; // Must call RegisterAsset() on each asset
+	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QList<AssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) = 0;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) = 0; // Must call MoveAsset() on each asset

@@ -152,7 +152,7 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QIm
 		return nullptr;
 
 	// This will also create a meta image and register asset
-	AtlasFrame *pFrame = ImportImage(sName, newImage, m_BanksModel.GetBank(uiBankIndex)->GetId(), eType);
+	AtlasFrame *pFrame = ImportImage(sName, newImage, m_BanksModel.GetBank(uiBankIndex)->GetId(), eType, QUuid::createUuid());
 
 	QSet<AtlasFrame *> newFrameSet;
 	newFrameSet.insert(pFrame);
@@ -181,6 +181,14 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	// First remove the frame from the map
 	if(RemoveLookup(pFrame))
 		pFrame->DeleteMetaFile();
+	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
+	{
+		if(pFrame->GetBankId() == m_BanksModel.GetBank(i)->GetId())
+		{
+			m_BanksModel.GetBank(i)->m_AssetList.removeOne(pFrame);
+			break;
+		}
+	}
 
 	// Determine the new checksum into the map
 	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
@@ -335,7 +343,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	return pNewFrame;
 }
 
-/*virtual*/ QList<AssetItemData *> AtlasModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) /*override*/
+/*virtual*/ QList<AssetItemData *> AtlasModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) /*override*/
 {
 	QList<AssetItemData *> returnList;
 
@@ -361,7 +369,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 	// Passed error check: proceed with import
 	for(int i = 0; i < sImportAssetList.size(); ++i)
-		returnList.append(ImportImage(QFileInfo(sImportAssetList[i]).baseName(), *newImageList[i], uiBankId, eType));
+		returnList.append(ImportImage(QFileInfo(sImportAssetList[i]).baseName(), *newImageList[i], uiBankId, eType, correspondingUuidList[i]));
 
 	if(returnList.empty() == false)
 	{
@@ -495,9 +503,9 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		
 		QList<QJsonArray> frameArrayList;
 		QList<AssetItemData *> &atlasGrpFrameListRef = m_BanksModel.GetBank(i)->m_AssetList;
-		for(int i = 0; i < atlasGrpFrameListRef.size(); ++i)
+		for(int j = 0; j < atlasGrpFrameListRef.size(); ++j)
 		{
-			AtlasFrame *pAtlasFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[i]);
+			AtlasFrame *pAtlasFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[j]);
 			if(pAtlasFrame->GetTextureIndex() < 0)
 				continue;
 
@@ -515,13 +523,13 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		}
 
 		QJsonArray textureArray;
-		for(int i = 0; i < frameArrayList.size(); ++i)
+		for(int j = 0; j < frameArrayList.size(); ++j)
 		{
 			QJsonObject textureObj;
 			textureObj.insert("width", m_BanksModel.GetBank(i)->m_MetaObj["maxWidth"].toInt());
 			textureObj.insert("height", m_BanksModel.GetBank(i)->m_MetaObj["maxHeight"].toInt());
 			textureObj.insert("format", m_BanksModel.GetBank(i)->m_MetaObj["textureFormat"].toString());
-			textureObj.insert("assets", frameArrayList[i]);
+			textureObj.insert("assets", frameArrayList[j]);
 
 			textureArray.append(textureObj);
 		}
@@ -548,7 +556,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	SaveRuntime();
 }
 
-AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, HyGuiItemType eType)
+AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, HyGuiItemType eType, QUuid uuid)
 {
 	QFileInfo fileInfo(sName);
 
@@ -560,7 +568,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 
 	AtlasFrame *pNewAsset = new AtlasFrame(*this,
 		eType,
-		QUuid::createUuid(),
+		uuid,//QUuid::createUuid(),
 		uiChecksum,
 		uiBankId,
 		fileInfo.baseName(),

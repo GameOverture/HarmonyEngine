@@ -38,17 +38,12 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 		clipboardObj.insert("dataObj", itemFileData.m_Data);
 
 		// IMAGE INFO
-		QList<AssetItemData *> atlasFrameList = pProjectItem->GetModel()->GetAtlasAssets();
-		QJsonArray imagesArray;
-		for(int i = 0; i < atlasFrameList.size(); ++i)
-		{
-			QJsonObject atlasFrameObj;
-			atlasFrameObj.insert("checksum", QJsonValue(static_cast<qint64>(atlasFrameList[i]->GetChecksum())));
-			atlasFrameObj.insert("name", QJsonValue(atlasFrameList[i]->GetName()));
-			atlasFrameObj.insert("uri", QJsonValue(pProjectItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(ITEM_AtlasImage, true) % "/" % atlasFrameList[i]->ConstructMetaFileName()));
-			imagesArray.append(atlasFrameObj);
-		}
+		QJsonArray imagesArray = GetAssetsArray(ITEM_AtlasImage, pProjectItem);
 		clipboardObj.insert("images", imagesArray);
+
+		// SOUND INFO
+		QJsonArray soundsArray = GetAssetsArray(ITEM_Audio, pProjectItem);
+		clipboardObj.insert("sounds", soundsArray);
 
 		// FONT INFO
 		QStringList fontUrlList = pProjectItem->GetModel()->GetFontUrls();
@@ -101,4 +96,22 @@ ProjectItemMimeData::ProjectItemMimeData(const QVariant &data) :
 	}
 
 	return QVariant();
+}
+
+QJsonArray ProjectItemMimeData::GetAssetsArray(HyGuiItemType eManagerType, ProjectItemData *pProjectItem)
+{
+	QList<AssetItemData *> assetList = pProjectItem->GetModel()->GetAssets(eManagerType);
+	QJsonArray assetArray;
+	for(int i = 0; i < assetList.size(); ++i)
+	{
+		QJsonObject assetObj;
+		assetObj.insert("assetUUID", assetList[i]->GetUuid().toString(QUuid::WithoutBraces));
+		assetObj.insert("checksum", QJsonValue(static_cast<qint64>(assetList[i]->GetChecksum())));
+		assetObj.insert("filter", assetList[i]->GetFilter());
+		assetObj.insert("name", QJsonValue(assetList[i]->GetName()));
+		assetObj.insert("uri", QJsonValue(pProjectItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(eManagerType, true) % "/" % assetList[i]->ConstructMetaFileName()));
+		assetArray.append(assetObj);
+	}
+
+	return assetArray;
 }

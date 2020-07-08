@@ -11,6 +11,7 @@
 #include "ProjectItemData.h"
 #include "MainWindow.h"
 #include "AudioAssetsWidget.h"
+#include "AudioManagerModel.h"
 #include "AudioModel.h"
 #include "AtlasFrame.h"
 #include "AtlasModel.h"
@@ -304,7 +305,8 @@ void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)
 
 	// Unlinks all dependencies
 	//m_pModel->RelinquishAllFrames();
-	GetProject().GetAtlasModel().RelinquishAssets(this, m_pModel->GetAtlasAssets());
+	GetProject().GetAtlasModel().RelinquishAssets(this, m_pModel->GetAssets(ITEM_AtlasImage));
+	GetProject().GetAudioModel().RelinquishAssets(this, m_pModel->GetAssets(ITEM_Audio));
 
 	ExplorerItemData::DeleteFromProject();
 }

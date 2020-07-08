@@ -130,7 +130,7 @@ public:
 	virtual bool OnPrepSave() = 0;	// Prepares item for saving, and returns if valid
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const = 0;
-	virtual QList<AssetItemData *> GetAtlasAssets() const = 0;
+	virtual QList<AssetItemData *> GetAssets(HyGuiItemType eType) const = 0;
 	virtual QStringList GetFontUrls() const = 0;
 };
 

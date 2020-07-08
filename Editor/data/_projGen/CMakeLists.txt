@@ -25,20 +25,47 @@ target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/soi
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	message(STATUS "Building for ${CMAKE_SYSTEM_NAME} target system")
-	set(EM_LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2 -s USE_SDL=2 --no-heap-copy --preload-file %HY_PROJDIR%%HY_RELDATADIR%@%HY_RELDATADIR% --preload-file %HY_PROJDIR%%HY_CLASS%.hyproj@%HY_CLASS%.hyproj")
+	
+	set(EM_LINK_FLAGS "")
+	list(APPEND EM_LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
+	list(APPEND EM_LINK_FLAGS "-s MIN_WEBGL_VERSION=2")
+	list(APPEND EM_LINK_FLAGS "-s MAX_WEBGL_VERSION=2")
+	list(APPEND EM_LINK_FLAGS "-s USE_SDL=2")
+	list(APPEND EM_LINK_FLAGS "--no-heap-copy")
+	list(APPEND EM_LINK_FLAGS "--preload-file %HY_PROJDIR%%HY_RELDATADIR%@%HY_RELDATADIR%")
+	list(APPEND EM_LINK_FLAGS "--preload-file %HY_PROJDIR%%HY_CLASS%.hyproj@%HY_CLASS%.hyproj")
+	
+	if(HYBUILD_SDL_NET)
+		list(APPEND EM_LINK_FLAGS "-s USE_SDL_NET=2")
+	endif()
+	
 	if(HYBUILD_DebugEmscripten)
 		message(STATUS "Building for DEBUG")
 		set(CMAKE_BUILD_TYPE Debug)
 		target_compile_definitions(HyEngine PRIVATE DEBUG)
 		target_compile_definitions(%HY_CLASS% PRIVATE DEBUG)
 		set_target_properties(%HY_CLASS% PROPERTIES COMPILE_FLAGS_FLAGS "-fsanitize=undefined -g")
-		set(EM_LINK_FLAGS "${EM_LINK_FLAGS} -g -s ASSERTIONS=1 -s SAFE_HEAP=1 -s STACK_OVERFLOW_CHECK=2 -s LLD_REPORT_UNDEFINED")
+		
+		list(APPEND EM_LINK_FLAGS "-g")
+		list(APPEND EM_LINK_FLAGS "-s ASSERTIONS=1")
+		list(APPEND EM_LINK_FLAGS "-s SAFE_HEAP=1")
+		list(APPEND EM_LINK_FLAGS "-s STACK_OVERFLOW_CHECK=2")
+		list(APPEND EM_LINK_FLAGS "-s LLD_REPORT_UNDEFINED")
 	endif()
+	
+	string(REPLACE ";" " " EM_LINK_FLAGS "${EM_LINK_FLAGS}")
+	message(STATUS "EM_LINK_FLAGS:" ${EM_LINK_FLAGS})
+	
 	set_target_properties(%HY_CLASS% PROPERTIES LINK_FLAGS ${EM_LINK_FLAGS})
 	set(CMAKE_EXECUTABLE_SUFFIX ".html")
 else()
 	target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/glad/include")
 	target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/glfw/include")
+	target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/SDL2_mixer")
+	if(HYBUILD_SDL_NET)
+		target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/SDL2_net")
+	endif()
+	
 	target_precompile_headers(%HY_CLASS% PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/%HY_SRCDIR%/pch.h")
 endif()
 

@@ -72,7 +72,7 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 	return pNewFrame;
 }
 
-/*virtual*/ QList<AssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) /*override*/
+/*virtual*/ QList<AssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) /*override*/
 {
 	// Error check all the imported assets before adding them, and cancel entire import if any fail
 	for(int i = 0; i < sImportAssetList.size(); ++i)
@@ -95,7 +95,7 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 	for(int i = 0; i < sImportAssetList.size(); ++i)
 	{
 		// ImportSound calls RegisterAsset() on valid imports
-		AudioAsset *pNewAsset = ImportSound(QFileInfo(sImportAssetList[i]).baseName(), uiBankId, eType);
+		AudioAsset *pNewAsset = ImportSound(QFileInfo(sImportAssetList[i]).baseName(), uiBankId, eType, correspondingUuidList[i]);
 		if(pNewAsset)
 			returnList.append(pNewAsset);
 	}
@@ -252,7 +252,7 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 	SaveRuntime();
 }
 
-AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, HyGuiItemType eType)
+AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, HyGuiItemType eType, QUuid uuid)
 {
 	QFile file(sFilePath);
 	if(!file.open(QIODevice::ReadOnly))
@@ -267,7 +267,7 @@ AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, 
 	quint32 uiChecksum = HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(pBinaryData.constData()), pBinaryData.size());
 	QFileInfo fileInfo(sFilePath);
 	
-	AudioAsset *pNewAsset = new AudioAsset(*this, eType, QUuid::createUuid(), uiChecksum, uiBankId, fileInfo.baseName(), "wav", 0);
+	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid/*QUuid::createUuid()*/, uiChecksum, uiBankId, fileInfo.baseName(), "wav", 0);
 
 	if(QFile::copy(sFilePath, m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName())) == false)
 	{

@@ -435,13 +435,18 @@ void IManagerWidget::on_actionImportAssets_triggered()
 		pParent = selectedFiltersList[0];
 
 	QList<TreeModelItemData *> correspondingParentList;
+	QList<QUuid> correspondingUuidList;
 	for(int i = 0; i < sImportImgList.size(); ++i)
+	{
 		correspondingParentList.append(pParent);
+		correspondingUuidList.append(QUuid::createUuid());
+	}
 
 	m_pModel->ImportNewAssets(sImportImgList,
 							  m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
 							  ITEM_AtlasImage,
-							  correspondingParentList);
+							  correspondingParentList,
+							  correspondingUuidList);
 }
 
 void IManagerWidget::on_actionImportDirectory_triggered()
@@ -470,6 +475,7 @@ void IManagerWidget::on_actionImportDirectory_triggered()
 	// Store all the specified imported image paths and their corresponding parent tree items they should be inserted into
 	QStringList sImportImgList;
 	QList<TreeModelItemData *> correspondingParentList;
+	QList<QUuid> correspondingUuidList;
 
 	// Loop through all the specified import directories
 	QStringList sDirs = dlg.selectedFiles();
@@ -499,6 +505,7 @@ void IManagerWidget::on_actionImportDirectory_triggered()
 				{
 					sImportImgList.push_back(info.filePath());
 					correspondingParentList.push_back(curDir.second);
+					correspondingUuidList.append(QUuid::createUuid());
 				}
 			}
 		}
@@ -507,7 +514,8 @@ void IManagerWidget::on_actionImportDirectory_triggered()
 	m_pModel->ImportNewAssets(sImportImgList,
 							  m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
 							  ITEM_AtlasImage,
-							  correspondingParentList);
+							  correspondingParentList,
+							  correspondingUuidList);
 }
 
 void IManagerWidget::on_actionAddFilter_triggered()

@@ -15,6 +15,7 @@
 #define HYGUI_MIMETYPE "application/x-harmony"
 
 class ExplorerItemData;
+class ProjectItemData;
 
 class ProjectItemMimeData : public QMimeData
 {
@@ -30,6 +31,7 @@ public:
 
 protected:
 	virtual QVariant retrieveData(const QString &mimeType, QVariant::Type type) const override;
+	QJsonArray GetAssetsArray(HyGuiItemType eManagerType, ProjectItemData *pProjectItem);
 };
 
 #endif // ProjectItemMimeData_H

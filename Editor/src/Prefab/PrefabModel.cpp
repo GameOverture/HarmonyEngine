@@ -342,7 +342,7 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 	return FileDataPair();
 }
 
-/*virtual*/ QList<AssetItemData *> PrefabModel::GetAtlasAssets() const /*override*/
+/*virtual*/ QList<AssetItemData *> PrefabModel::GetAssets(HyGuiItemType eType) const /*override*/
 {
 	return QList<AssetItemData *>();
 }

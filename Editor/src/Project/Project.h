@@ -102,12 +102,15 @@ public:
 	ExplorerModel &GetExplorerModel();
 	AtlasModel &GetAtlasModel();
 	IManagerWidget *GetAtlasWidget();
+	AudioManagerModel &GetAudioModel();
+	IManagerWidget *GetAudioWidget();
+
+	bool PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, HyGuiItemType eManagerType);
 
 	GltfModel *GetGltfModel();
 	GltfWidget *GetGltfWidget();
 
-	void SetAudioModel(QJsonObject audioObj);
-	IManagerWidget *GetAudioWidget();
+	//void SetAudioModel(QJsonObject audioObj);
 
 	QStandardItemModel *GetFontListModel();
 	void ScanMetaFontDir();

@@ -123,7 +123,7 @@ public:
 	virtual bool OnPrepSave() override { return true; }
 	virtual void InsertItemSpecificData(FileDataPair &itemFileDataOut) override;
 	virtual FileDataPair GetStateFileData(uint32 uiIndex) const override;
-	virtual QList<AssetItemData *> GetAtlasAssets() const override;
+	virtual QList<AssetItemData *> GetAssets(HyGuiItemType eType) const override;
 	virtual QStringList GetFontUrls() const override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

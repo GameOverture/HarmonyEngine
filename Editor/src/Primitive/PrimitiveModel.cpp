@@ -28,7 +28,7 @@ PrimitiveModel::~PrimitiveModel()
 	return FileDataPair();
 }
 
-/*virtual*/ QList<AssetItemData *> PrimitiveModel::GetAtlasAssets() const /*override*/
+/*virtual*/ QList<AssetItemData *> PrimitiveModel::GetAssets(HyGuiItemType eType) const /*override*/
 {
 	return QList<AssetItemData *>();
 }

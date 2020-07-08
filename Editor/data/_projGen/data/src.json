@@ -6,10 +6,14 @@
 		],
 		"images": [
 			{
+				"assetUUID": "{bfe33b30-3c6c-454b-93da-95592ae69f3c}",
 				"checksum": 3466142210,
-				"name": "+SystemText.png",
+				"filter": "",
+				"name": "+SystemText",
 				"uri": "[HyHarmonyTemplateDataDir]+SystemText.png"
 			}
+		],
+		"sounds": [
 		],
 		"itemName": "+HyInternal/+SystemText",
 		"itemType": "Text",
@@ -20,6 +24,7 @@
             ],
             "CameraZoom": 1,
             "UUID": "{69bd2664-cc15-4963-b538-4a22f1efb172}",
+			"assetUUID": "{bfe33b30-3c6c-454b-93da-95592ae69f3c}",
 			"availableGlyphs": {
                 "0-9": true,
                 "A-Z": true,
