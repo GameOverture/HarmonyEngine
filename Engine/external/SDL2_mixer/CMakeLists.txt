@@ -42,6 +42,8 @@ target_include_directories(SDL2_mixer PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/timidi
 target_include_directories(SDL2_mixer PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/native_midi")
 target_include_directories(SDL2_mixer PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/VisualC/external/include")
 
+target_link_libraries(SDL2_mixer PUBLIC SDL2)
+
 target_compile_definitions(SDL2_mixer PRIVATE MUSIC_WAV)
 target_compile_definitions(SDL2_mixer PRIVATE MUSIC_OGG)
 target_compile_definitions(SDL2_mixer PRIVATE OGG_DYNAMIC="libvorbisfile-3.dll")

@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IManagerWidget.h
+*	ManagerWidget.h
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2020 Jason Knobler
@@ -7,8 +7,8 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IMANAGERWIDGET_H
-#define IMANAGERWIDGET_H
+#ifndef ManagerWidget_H
+#define ManagerWidget_H
 
 #include "AtlasDraw.h"
 
@@ -17,7 +17,7 @@
 #include <QMenu>
 
 namespace Ui {
-class IManagerWidget;
+class ManagerWidget;
 }
 
 class IManagerModel;
@@ -39,7 +39,7 @@ public:
 //	virtual void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
 //};
 
-class IManagerWidget : public QWidget
+class ManagerWidget : public QWidget
 {
 	Q_OBJECT
 
@@ -47,9 +47,9 @@ class IManagerWidget : public QWidget
 	AtlasDraw					m_Draw;
 
 public:
-	explicit IManagerWidget(QWidget *pParent = nullptr);
-	explicit IManagerWidget(IManagerModel *pModel, QWidget *pParent = nullptr);
-	~IManagerWidget();
+	explicit ManagerWidget(QWidget *pParent = nullptr);
+	explicit ManagerWidget(IManagerModel *pModel, QWidget *pParent = nullptr);
+	~ManagerWidget();
 
 	IManagerModel &GetModel();
 
@@ -93,11 +93,11 @@ private Q_SLOTS:
 	void on_actionAddFilter_triggered();
 	
 private:
-	Ui::IManagerWidget *ui;
+	Ui::ManagerWidget *ui;
 
 public:
 	void GetSelectedItems(QList<AssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut);
 	//void GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
 };
 
-#endif // IMANAGERWIDGET_H
+#endif // ManagerWidget_H

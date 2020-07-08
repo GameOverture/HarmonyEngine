@@ -15,7 +15,7 @@
 #include "ProjectItemMimeData.h"
 #include "ExplorerModel.h"
 #include "VersionPatcher.h"
-#include "IManagerWidget.h"
+#include "ManagerWidget.h"
 #include "AtlasModel.h"
 
 #include <QFile>
@@ -387,7 +387,7 @@ AtlasModel &Project::GetAtlasModel()
 	return *m_pAtlasModel;
 }
 
-IManagerWidget *Project::GetAtlasWidget()
+ManagerWidget *Project::GetAtlasWidget()
 {
 	return m_pAtlasWidget;
 }
@@ -397,7 +397,7 @@ AudioManagerModel &Project::GetAudioModel()
 	return *m_pAudioModel;
 }
 
-IManagerWidget *Project::GetAudioWidget()
+ManagerWidget *Project::GetAudioWidget()
 {
 	return m_pAudioWidget;
 }
@@ -936,8 +936,8 @@ bool Project::HarmonyInitialize()
 	delete m_pAtlasWidget;
 	delete m_pGltfWidget;
 	delete m_pAudioWidget;
-	m_pAtlasWidget = new IManagerWidget(m_pAtlasModel, nullptr);
-	m_pAudioWidget = new IManagerWidget(m_pAudioModel, nullptr);
+	m_pAtlasWidget = new ManagerWidget(m_pAtlasModel, nullptr);
+	m_pAudioWidget = new ManagerWidget(m_pAudioModel, nullptr);
 	m_pGltfWidget = new GltfWidget(m_pGltfModel, nullptr);
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)

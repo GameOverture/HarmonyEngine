@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AssetBanksModel.cpp
+ *	BanksModel.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2020 Jason Knobler
@@ -8,7 +8,7 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "AssetBanksModel.h"
+#include "BanksModel.h"
 
 BanksModel::BanksModel()
 {

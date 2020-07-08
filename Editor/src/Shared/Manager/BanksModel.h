@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AssetBanksModel.h
+ *	BanksModel.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2020 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ASSETBANKSMODEL_H
-#define ASSETBANKSMODEL_H
+#ifndef BANKSMODEL_H
+#define BANKSMODEL_H
 
 #include "Global.h"
 #include "ITreeModel.h"
@@ -68,4 +68,4 @@ public:
 	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 };
 
-#endif // ASSETBANKSMODEL_H
+#endif // BANKSMODEL_H

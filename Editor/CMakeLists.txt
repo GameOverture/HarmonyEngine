@@ -115,15 +115,15 @@ if(Qt5_DIR)
 		src/Shared/Item/IModel.h
 		src/Shared/Item/IWidget.h
 		src/Shared/Item/IWidget.ui
-		src/Shared/Manager/AssetBanksModel.h
-		src/Shared/Manager/AssetBanksModel.cpp
+		src/Shared/Manager/BanksModel.h
+		src/Shared/Manager/BanksModel.cpp
 		src/Shared/Manager/IAssetItemData.cpp
 		src/Shared/Manager/IAssetItemData.h
 		src/Shared/Manager/IManagerModel.cpp
 		src/Shared/Manager/IManagerModel.h
-		src/Shared/Manager/IManagerWidget.cpp
-		src/Shared/Manager/IManagerWidget.h
-		src/Shared/Manager/IManagerWidget.ui
+		src/Shared/Manager/ManagerWidget.cpp
+		src/Shared/Manager/ManagerWidget.h
+		src/Shared/Manager/ManagerWidget.ui
 		src/Shared/Properties/PropertiesTreeModel.cpp
 		src/Shared/Properties/PropertiesTreeView.cpp
 		src/Shared/Properties/PropertiesUndoCmd.cpp

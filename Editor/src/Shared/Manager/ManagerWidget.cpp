@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IManagerWidget.cpp
+*	ManagerWidget.cpp
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2020 Jason Knobler
@@ -8,8 +8,8 @@
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Global.h"
-#include "IManagerWidget.h"
-#include "ui_IManagerWidget.h"
+#include "ManagerWidget.h"
+#include "ui_ManagerWidget.h"
 
 #include "ProjectItemData.h"
 #include "IManagerModel.h"
@@ -52,24 +52,24 @@ ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 
 ///*virtual*/ void AssetTreeView::currentChanged(const QModelIndex &current, const QModelIndex &previous) /*override*/
 //{
-//	static_cast<IManagerWidget *>(parent())->OnAssetTreeCurrentChanged(current, previous);
+//	static_cast<ManagerWidget *>(parent())->OnAssetTreeCurrentChanged(current, previous);
 //}
 
-IManagerWidget::IManagerWidget(QWidget *pParent /*= nullptr*/) :
+ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
-	ui(new Ui::IManagerWidget),
+	ui(new Ui::ManagerWidget),
 	m_pModel(nullptr),
 	m_Draw(nullptr)
 {
 	ui->setupUi(this);
 
 	// NOTE: THIS CONSTRUCTOR IS INVALID TO USE. IT EXISTS FOR QT TO ALLOW Q_OBJECT TO WORK
-	HyGuiLog("IManagerWidget::IManagerWidget() invalid constructor used", LOGTYPE_Error);
+	HyGuiLog("ManagerWidget::ManagerWidget() invalid constructor used", LOGTYPE_Error);
 }
 
-IManagerWidget::IManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr*/) :
+ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
-	ui(new Ui::IManagerWidget),
+	ui(new Ui::ManagerWidget),
 	m_pModel(pModel),
 	m_Draw(pModel)
 {
@@ -131,22 +131,22 @@ IManagerWidget::IManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullp
 
 }
 
-IManagerWidget::~IManagerWidget()
+ManagerWidget::~ManagerWidget()
 {
 	delete ui;
 }
 
-IManagerModel &IManagerWidget::GetModel()
+IManagerModel &ManagerWidget::GetModel()
 {
 	return *m_pModel;
 }
 
-quint32 IManagerWidget::GetSelectedBankId()
+quint32 ManagerWidget::GetSelectedBankId()
 {
 	return m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex());
 }
 
-void IManagerWidget::DrawUpdate()
+void ManagerWidget::DrawUpdate()
 {
 	//QPoint pos(mapFromGlobal(QCursor::pos()).x(), mapFromGlobal(QCursor::pos()).y());
 	//QModelIndex index = ui->assetTree->indexAt(pos);
@@ -155,7 +155,7 @@ void IManagerWidget::DrawUpdate()
 	m_Draw.DrawUpdate();
 }
 
-void IManagerWidget::RefreshInfo()
+void ManagerWidget::RefreshInfo()
 {
 	uint uiBankIndex = ui->cmbBanks->currentIndex();
 
@@ -182,23 +182,23 @@ void IManagerWidget::RefreshInfo()
 	//}
 }
 
-//void IManagerWidget::OnAssetTreeCurrentChanged(const QModelIndex &current, const QModelIndex &previous)
+//void ManagerWidget::OnAssetTreeCurrentChanged(const QModelIndex &current, const QModelIndex &previous)
 //{
 //}
 
-/*virtual*/ void IManagerWidget::enterEvent(QEvent *pEvent) /*override*/
+/*virtual*/ void ManagerWidget::enterEvent(QEvent *pEvent) /*override*/
 {
 	m_Draw.Show();
 	QWidget::enterEvent(pEvent);
 }
 
-/*virtual*/ void IManagerWidget::leaveEvent(QEvent *pEvent) /*override*/
+/*virtual*/ void ManagerWidget::leaveEvent(QEvent *pEvent) /*override*/
 {
 	m_Draw.Hide();
 	QWidget::leaveEvent(pEvent);
 }
 
-/*virtual*/ void IManagerWidget::resizeEvent(QResizeEvent *event) /*override*/
+/*virtual*/ void ManagerWidget::resizeEvent(QResizeEvent *event) /*override*/
 {
 	QWidget::resizeEvent(event);
 
@@ -209,7 +209,7 @@ void IManagerWidget::RefreshInfo()
 	ui->assetTree->setColumnWidth(0, iTotalWidth - 60);
 }
 
-void IManagerWidget::OnContextMenu(const QPoint &pos)
+void ManagerWidget::OnContextMenu(const QPoint &pos)
 {
 	QPoint globalPos = ui->assetTree->viewport()->mapToGlobal(pos);
 	QMenu contextMenu;
@@ -263,7 +263,7 @@ void IManagerWidget::OnContextMenu(const QPoint &pos)
 		delete actionAtlasGrpMoveList[i];
 }
 
-void IManagerWidget::on_actionDeleteAssets_triggered()
+void ManagerWidget::on_actionDeleteAssets_triggered()
 {
 	QList<AssetItemData *> selectedAssetsList;
 	QList<TreeModelItemData *> selectedFiltersList;
@@ -272,7 +272,7 @@ void IManagerWidget::on_actionDeleteAssets_triggered()
 	m_pModel->RemoveItems(selectedAssetsList, selectedFiltersList);
 }
 
-void IManagerWidget::on_actionReplaceAssets_triggered()
+void ManagerWidget::on_actionReplaceAssets_triggered()
 {
 	QList<AssetItemData *> selectedAssetsList;
 	QList<TreeModelItemData *> selectedFiltersList;
@@ -294,7 +294,7 @@ void IManagerWidget::on_actionReplaceAssets_triggered()
 	m_pModel->ReplaceAssets(selectedAssetsList);
 }
 
-void IManagerWidget::on_assetTree_clicked()
+void ManagerWidget::on_assetTree_clicked()
 {
 	QList<AssetItemData *> selectedAssetsList;
 	QList<TreeModelItemData *> selectedFiltersList;
@@ -328,7 +328,7 @@ void IManagerWidget::on_assetTree_clicked()
 		ui->actionDeleteAssets->setIcon(HyGlobal::ItemIcon(eIconType, SUBICON_Delete));
 }
 
-void IManagerWidget::on_actionRename_triggered()
+void ManagerWidget::on_actionRename_triggered()
 {
 	QList<AssetItemData *> selectedAssetsList;
 	QList<TreeModelItemData *> selectedFiltersList;
@@ -352,12 +352,12 @@ void IManagerWidget::on_actionRename_triggered()
 	delete pDlg;
 }
 
-void IManagerWidget::on_cmbBanks_currentIndexChanged(int index)
+void ManagerWidget::on_cmbBanks_currentIndexChanged(int index)
 {
 	RefreshInfo();
 }
 
-void IManagerWidget::on_actionAddBank_triggered()
+void ManagerWidget::on_actionAddBank_triggered()
 {
 	DlgInputName *pDlg = new DlgInputName("Creating New Bank", "NewAssetBank");
 	if(pDlg->exec() == QDialog::Accepted)
@@ -373,12 +373,12 @@ void IManagerWidget::on_actionAddBank_triggered()
 	delete pDlg;
 }
 
-void IManagerWidget::on_actionBankSettings_triggered()
+void ManagerWidget::on_actionBankSettings_triggered()
 {
 	m_pModel->OnBankSettingsDlg(ui->cmbBanks->currentIndex());
 }
 
-void IManagerWidget::on_actionRemoveBank_triggered()
+void ManagerWidget::on_actionRemoveBank_triggered()
 {
 	uint uiCurIndex = ui->cmbBanks->currentIndex();
 	ui->cmbBanks->setCurrentIndex(0);
@@ -386,7 +386,7 @@ void IManagerWidget::on_actionRemoveBank_triggered()
 	m_pModel->RemoveBank(m_pModel->GetBankIdFromBankIndex(uiCurIndex));
 }
 
-void IManagerWidget::on_actionBankTransfer_triggered(QAction *pAction)
+void ManagerWidget::on_actionBankTransfer_triggered(QAction *pAction)
 {
 	quint32 uiNewBankId = static_cast<quint32>(pAction->data().toInt());    // Which bank ID we're transferring to
 
@@ -397,7 +397,7 @@ void IManagerWidget::on_actionBankTransfer_triggered(QAction *pAction)
 	m_pModel->TransferAssets(selectedAssetsList, uiNewBankId);
 }
 
-void IManagerWidget::on_actionImportAssets_triggered()
+void ManagerWidget::on_actionImportAssets_triggered()
 {
 	QFileDialog dlg(this);
 	dlg.setFileMode(QFileDialog::ExistingFiles);
@@ -449,7 +449,7 @@ void IManagerWidget::on_actionImportAssets_triggered()
 							  correspondingUuidList);
 }
 
-void IManagerWidget::on_actionImportDirectory_triggered()
+void ManagerWidget::on_actionImportDirectory_triggered()
 {
 	QFileDialog dlg(this);
 	dlg.setFileMode(QFileDialog::Directory);
@@ -518,7 +518,7 @@ void IManagerWidget::on_actionImportDirectory_triggered()
 							  correspondingUuidList);
 }
 
-void IManagerWidget::on_actionAddFilter_triggered()
+void ManagerWidget::on_actionAddFilter_triggered()
 {
 	DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter");
 	if(pDlg->exec() == QDialog::Accepted)
@@ -546,7 +546,7 @@ void IManagerWidget::on_actionAddFilter_triggered()
 	delete pDlg;
 }
 
-void IManagerWidget::GetSelectedItems(QList<AssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut)
+void ManagerWidget::GetSelectedItems(QList<AssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut)
 {
 	selectedAssetsOut.clear();
 	selectedFiltersOut.clear();
@@ -578,7 +578,7 @@ void IManagerWidget::GetSelectedItems(QList<AssetItemData *> &selectedAssetsOut,
 	}
 }
 
-//void IManagerWidget::GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef)
+//void ManagerWidget::GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef)
 //{
 //	for(int i = 0; i < selectedTreeItems.count(); ++i)
 //	{

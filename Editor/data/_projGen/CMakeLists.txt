@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(%HY_CLASS% VERSION 1.0)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
 
 add_subdirectory("%HY_HARMONYDIR%Engine" "Engine")

@@ -13,7 +13,7 @@
 #include "Global.h"
 #include "ITreeModel.h"
 #include "IAssetItemData.h"
-#include "AssetBanksModel.h"
+#include "BanksModel.h"
 
 #include <QUuid>
 

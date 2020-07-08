@@ -247,7 +247,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	if(NOT HYBUILD_Qt)
 		# Below is typical desktop deployment
 		target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_mixer")
-		target_link_libraries(HyEngine PUBLIC SDL2-static SDL2main SDL2_mixer)
+		target_link_libraries(HyEngine PUBLIC SDL2 SDL2main SDL2_mixer)
 		
 		if(HYBUILD_SDL_NET)
 			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_net")
