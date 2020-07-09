@@ -15,7 +15,7 @@
 #include "ProjectItemMimeData.h"
 #include "ExplorerModel.h"
 #include "VersionPatcher.h"
-#include "IManagerWidget.h"
+#include "ManagerWidget.h"
 #include "AtlasModel.h"
 
 #include <QFile>
@@ -387,9 +387,70 @@ AtlasModel &Project::GetAtlasModel()
 	return *m_pAtlasModel;
 }
 
-IManagerWidget *Project::GetAtlasWidget()
+ManagerWidget *Project::GetAtlasWidget()
 {
 	return m_pAtlasWidget;
+}
+
+AudioManagerModel &Project::GetAudioModel()
+{
+	return *m_pAudioModel;
+}
+
+ManagerWidget *Project::GetAudioWidget()
+{
+	return m_pAudioWidget;
+}
+
+bool Project::PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, HyGuiItemType eManagerType)
+{
+	IManagerModel *pManager = nullptr;
+	quint32 uiBankId = 0;
+	switch(eManagerType)
+	{
+	case ITEM_AtlasImage:
+		pManager = m_pAtlasModel;
+		uiBankId = m_pAtlasWidget ? m_pAtlasWidget->GetSelectedBankId() : 0;
+		break;
+	case ITEM_Audio:
+		pManager = m_pAudioModel;
+		uiBankId = m_pAudioWidget ? m_pAudioWidget->GetSelectedBankId() : 0;
+		break;
+	default:
+		HyGuiLog("Project::PasteAssets - Unknown eManagerType: " % QString::number(eManagerType), LOGTYPE_Error);
+		break;
+	}
+	if(pManager == nullptr)
+		return false;
+
+	// Copy all valid assets to temp directory, then import them in with corresponding filter and UUID list
+	QDir metaTempDir = HyGlobal::PrepTempDir(this);
+
+	QStringList					importAssetList;
+	QList<TreeModelItemData *>	correspondingParentList;
+	QList<QUuid>				correspondingUuidList;
+
+	for(int i = 0; i < assetArrayRef.size(); ++i)
+	{
+		QJsonObject assetObj = assetArrayRef[i].toObject();
+
+		if(pManager->FindById(assetObj["assetUUID"].toString()) == nullptr)
+		{
+			QFileInfo assetFileInfo(assetObj["uri"].toString());
+
+			// Ensure sFilePath is its metadata name so it's used when imported.
+			QString sFilePath = metaTempDir.absolutePath() % "/" % assetObj["name"].toString() % "." % assetFileInfo.suffix();
+			QFile::copy(assetFileInfo.absoluteFilePath(), sFilePath);
+
+			importAssetList.push_back(sFilePath);
+			correspondingParentList.push_back(pManager->ReturnFilter(assetObj["filter"].toString()));
+			correspondingUuidList.push_back(assetObj["assetUUID"].toString());
+		}
+	}
+
+	pManager->ImportNewAssets(importAssetList, uiBankId, ePasteItemType, correspondingParentList, correspondingUuidList);
+
+	return true;
 }
 
 GltfModel *Project::GetGltfModel()
@@ -402,25 +463,20 @@ GltfWidget *Project::GetGltfWidget()
 	return m_pGltfWidget;
 }
 
-void Project::SetAudioModel(QJsonObject audioObj)
-{
-	QString sItemTypeName = HyGlobal::ItemName(ITEM_Audio, true);
-	if(m_ProjectFileData.m_Meta.contains(sItemTypeName) == false)
-	{
-		HyGuiLog("Project::SetAudioModel could not find item type: " % sItemTypeName, LOGTYPE_Error);
-		return;
-	}
-
-	m_ProjectFileData.m_Meta.remove(sItemTypeName);
-	m_ProjectFileData.m_Meta.insert(sItemTypeName, audioObj);
-
-	WriteMetaData();
-}
-
-IManagerWidget *Project::GetAudioWidget()
-{
-	return m_pAudioWidget;
-}
+//void Project::SetAudioModel(QJsonObject audioObj)
+//{
+//	QString sItemTypeName = HyGlobal::ItemName(ITEM_Audio, true);
+//	if(m_ProjectFileData.m_Meta.contains(sItemTypeName) == false)
+//	{
+//		HyGuiLog("Project::SetAudioModel could not find item type: " % sItemTypeName, LOGTYPE_Error);
+//		return;
+//	}
+//
+//	m_ProjectFileData.m_Meta.remove(sItemTypeName);
+//	m_ProjectFileData.m_Meta.insert(sItemTypeName, audioObj);
+//
+//	WriteMetaData();
+//}
 
 QStandardItemModel *Project::GetFontListModel()
 {
@@ -880,8 +936,8 @@ bool Project::HarmonyInitialize()
 	delete m_pAtlasWidget;
 	delete m_pGltfWidget;
 	delete m_pAudioWidget;
-	m_pAtlasWidget = new IManagerWidget(m_pAtlasModel, nullptr);
-	m_pAudioWidget = new IManagerWidget(m_pAudioModel, nullptr);
+	m_pAtlasWidget = new ManagerWidget(m_pAtlasModel, nullptr);
+	m_pAudioWidget = new ManagerWidget(m_pAudioModel, nullptr);
 	m_pGltfWidget = new GltfWidget(m_pGltfModel, nullptr);
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)

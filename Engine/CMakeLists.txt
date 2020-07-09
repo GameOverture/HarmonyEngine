@@ -1,11 +1,13 @@
 add_subdirectory(external/box2d)
 add_subdirectory(external/soil2)
 
+# Emscripten provides its own ports of SDL and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	add_subdirectory(external/glad)
-	#add_subdirectory(external/glfw)
 	
+	# Qt provides its own implementation of SDL facitlities
 	if(NOT HYBUILD_Qt)
+		# Below is typical desktop deployment
 		add_subdirectory(external/SDL2)
 		include_directories(external/SDL2/include)
 		set_target_properties(SDL2main PROPERTIES FOLDER "Engine Libs")
@@ -14,6 +16,14 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 		endif()
 		if(SDL_STATIC)
 			set_target_properties(SDL2-static PROPERTIES FOLDER "Engine Libs")
+		endif()
+		
+		add_subdirectory(external/SDL2_mixer)
+		
+		# Optional SDL2 extensions
+		set(HYBUILD_SDL_NET ON)
+		if(HYBUILD_SDL_NET)
+			add_subdirectory(external/SDL2_net)
 		endif()
 	endif()
 endif()
@@ -229,14 +239,23 @@ target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external
 
 target_link_libraries(HyEngine PUBLIC box2d soil2)
 
+# Emscripten provides its own ports of SDL and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include")
-	#target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include")
-	target_link_libraries(HyEngine PUBLIC glad) #glfw
+	target_link_libraries(HyEngine PUBLIC glad)
 	target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
 	
+	# Qt provides its own implementation of SDL facitlities
 	if(NOT HYBUILD_Qt)
-		target_link_libraries(HyEngine PUBLIC SDL2-static SDL2main)
+		# Below is typical desktop deployment
+		target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_mixer")
+		target_link_libraries(HyEngine PUBLIC SDL2 SDL2main SDL2_mixer)
+		
+		if(HYBUILD_SDL_NET)
+			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_net")
+			target_link_libraries(HyEngine PUBLIC SDL2_net)
+			target_compile_definitions(HyEngine PRIVATE HY_USE_SDL2_NET)
+		endif()
 	endif()
 endif()
 

@@ -13,7 +13,7 @@
 #include "ExplorerModel.h"
 #include "AtlasFrame.h"
 #include "AtlasModel.h"
-#include "IManagerWidget.h"
+#include "ManagerWidget.h"
 
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData),
@@ -205,11 +205,15 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	return stateFileData;
 }
 
-/*virtual*/ QList<AssetItemData *> TextModel::GetAtlasAssets() const /*override*/
+/*virtual*/ QList<AssetItemData *> TextModel::GetAssets(HyGuiItemType eType) const /*override*/
 {
 	QList<AssetItemData *> retAtlasFrameList;
-	if(m_pAtlasFrame)
-		retAtlasFrameList.push_back(m_pAtlasFrame);
+
+	if(eType == ITEM_AtlasImage)
+	{
+		if(m_pAtlasFrame)
+			retAtlasFrameList.push_back(m_pAtlasFrame);
+	}
 
 	return retAtlasFrameList;
 }

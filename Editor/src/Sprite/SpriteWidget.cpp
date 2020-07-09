@@ -14,7 +14,7 @@
 #include "SpriteUndoCmds.h"
 #include "DlgInputName.h"
 #include "SpriteDraw.h"
-#include "IManagerWidget.h"
+#include "ManagerWidget.h"
 
 #include <QFile>
 #include <QJsonDocument>

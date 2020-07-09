@@ -111,6 +111,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// Insert the minimum required fields for settings file. The project's DlgProjectSettings will fill in the rest of the defaults
 	QJsonObject jsonObj;
+	jsonObj.insert("$fileVersion", HYGUI_FILE_VERSION);
 	jsonObj.insert("GameName", ui->txtTitleName->text());
 	jsonObj.insert("ClassName", ui->txtClassName->text());
 	jsonObj.insert("DataPath", QString(ui->wgtDataDir->GetRelPath() + "/"));

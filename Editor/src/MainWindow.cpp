@@ -22,7 +22,7 @@
 #include "ExplorerWidget.h"
 #include "GltfWidget.h"
 #include "AudioAssetsWidget.h"
-#include "IManagerWidget.h"
+#include "ManagerWidget.h"
 
 #include <QFileDialog>
 #include <QShowEvent>

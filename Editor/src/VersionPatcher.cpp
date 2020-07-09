@@ -135,6 +135,12 @@
 		RewriteFile(sDataItemsPath, dataItemsDoc, false);
 		RewriteFile(sMetaAtlasesPath, metaAtlasDoc, true);
 		RewriteFile(sDataAtlasesPath, dataAtlasDoc, false);
+
+		// Finalize hyproj
+		QJsonObject projObj = projDoc.object();
+		projObj["$fileVersion"] = HYGUI_FILE_VERSION;
+		projDoc.setObject(projObj);
+		RewriteFile(pProj->GetAbsPath(), projDoc, false);
 	}
 }
 

@@ -33,7 +33,7 @@ protected:
 	void Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet);
 
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
-	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType) override; // Must call RegisterAsset() on each asset
+	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) override; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QList<AssetItemData *> assetList) override; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) override;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) override; // Must call MoveAsset() on each asset
@@ -44,7 +44,7 @@ private Q_SLOTS:
 	void OnRepackFinished();
 
 private:
-	AudioAsset *ImportSound(QString sFilePath, quint32 uiBankIndex, HyGuiItemType eType);
+	AudioAsset *ImportSound(QString sFilePath, quint32 uiBankIndex, HyGuiItemType eType, QUuid uuid);
 };
 
 #endif // AudioManagerModel_H

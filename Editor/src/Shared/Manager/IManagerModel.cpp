@@ -215,7 +215,7 @@ QList<AssetItemData *> IManagerModel::GetBankAssets(uint uiBankIndex)
 	return m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
 }
 
-bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList)
+bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList)
 {
 	if(correspondingParentList.size() != sImportList.size())
 	{
@@ -223,7 +223,7 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, H
 		return false;
 	}
 
-	QList<AssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType);
+	QList<AssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType, correspondingUuidList);
 	for(int i = 0; i < returnList.size(); ++i)
 		InsertTreeItem(returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
 
@@ -411,6 +411,41 @@ TreeModelItemData *IManagerModel::FindTreeItemFilter(TreeModelItemData *pItem) c
 		return nullptr;
 	
 	return pFilter;
+}
+
+TreeModelItemData *IManagerModel::ReturnFilter(QString sFilterPath)
+{
+	TreeModelItem *pCurTreeItem = m_pRootItem;
+	if(sFilterPath.isEmpty() == false)
+	{
+		QStringList sPathSplitList = sFilterPath.split(QChar('/'));
+		// Traverse down the tree and add any prefix TreeItem that doesn't exist, and finally adding this item's TreeItem
+		for(int i = 0; i < sPathSplitList.size(); ++i)
+		{
+			bool bFound = false;
+			for(int j = 0; j < pCurTreeItem->GetNumChildren(); ++j)
+			{
+				if(QString::compare(sPathSplitList[i], pCurTreeItem->GetChild(j)->data(0).value<TreeModelItemData *>()->GetText(), Qt::CaseInsensitive) == 0)
+				{
+					pCurTreeItem = pCurTreeItem->GetChild(j);
+					bFound = true;
+					break;
+				}
+			}
+
+			if(bFound == false)
+			{
+				// Still more filters to dig thru, so this means we're at a filter. Add the prefix TreeModelItemData here and continue traversing down the tree
+				InsertTreeItem(new TreeModelItemData(ITEM_Filter, sPathSplitList[i]), pCurTreeItem);
+				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
+			}
+		}
+	}
+
+	if(pCurTreeItem)
+		return pCurTreeItem->data(0).value<TreeModelItemData *>();
+
+	return nullptr;
 }
 
 bool IManagerModel::RemoveLookup(AssetItemData *pAsset)

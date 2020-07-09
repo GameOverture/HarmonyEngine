@@ -22,7 +22,7 @@
 
 // Forward declaration
 class AtlasModel;
-class IManagerWidget;
+class ManagerWidget;
 class GltfModel;
 class GltfWidget;
 class AudioManagerModel;
@@ -52,9 +52,9 @@ class Project : public ExplorerItemData
 	DlgProjectSettings									m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
 	AtlasModel *										m_pAtlasModel;
-	IManagerWidget *									m_pAtlasWidget;
+	ManagerWidget *										m_pAtlasWidget;
 	AudioManagerModel *									m_pAudioModel;
-	IManagerWidget *									m_pAudioWidget;
+	ManagerWidget *										m_pAudioWidget;
 
 	GltfModel *											m_pGltfModel;
 	GltfWidget *										m_pGltfWidget;
@@ -101,13 +101,16 @@ public:
 
 	ExplorerModel &GetExplorerModel();
 	AtlasModel &GetAtlasModel();
-	IManagerWidget *GetAtlasWidget();
+	ManagerWidget *GetAtlasWidget();
+	AudioManagerModel &GetAudioModel();
+	ManagerWidget *GetAudioWidget();
+
+	bool PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, HyGuiItemType eManagerType);
 
 	GltfModel *GetGltfModel();
 	GltfWidget *GetGltfWidget();
 
-	void SetAudioModel(QJsonObject audioObj);
-	IManagerWidget *GetAudioWidget();
+	//void SetAudioModel(QJsonObject audioObj);
 
 	QStandardItemModel *GetFontListModel();
 	void ScanMetaFontDir();

@@ -194,8 +194,6 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 	// Destination is known, get project information
 	Project *pDestProject = &pDestItem->GetProject();
-	QDir metaDir(pDestProject->GetMetaDataAbsPath());
-	QDir metaTempDir = HyGlobal::PrepTempDir(pDestProject);
 
 	// Parse 'sSrc' for paste information
 	QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
@@ -233,88 +231,47 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			continue;
 		}
 
-#if 1
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Pasted item's assets needs to be imported into this project
-
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		HyGuiItemType ePasteItemType = HyGlobal::GetTypeFromString(pasteObj["itemType"].toString());
-		//QString sItemType = pasteObj["itemType"].toString();
-		//QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
-		//for(int i = 0; i < typeList.size(); ++i)
-		//{
-		//	if(sItemType == HyGlobal::ItemName(typeList[i], false))
-		//	{
-		//		ePasteItemType = typeList[i];
-		//		break;
-		//	}
-		//}
 
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Import any missing fonts (.ttf)
-		if(ePasteItemType == ITEM_Text)
+		QDir metaDir(pDestProject->GetMetaDataAbsPath());
+		QString sFontMetaDir = metaDir.absoluteFilePath(HYMETA_FontsDir);
+		QDir fontMetaDir(sFontMetaDir);
+		fontMetaDir.mkdir(".");
+
+		QJsonArray fontArray = pasteObj["fonts"].toArray();
+		for(int i = 0; i < fontArray.size(); ++i)
 		{
-			QString sFontMetaDir = metaDir.absoluteFilePath(HYMETA_FontsDir);
-			QDir fontMetaDir(sFontMetaDir);
-			fontMetaDir.mkdir(".");
+			QFileInfo pasteFontFileInfo(fontArray[i].toString());
 
-			QJsonArray fontArray = pasteObj["fonts"].toArray();
-			for(int i = 0; i < fontArray.size(); ++i)
+			QString sAbsFilePath = pasteFontFileInfo.absoluteFilePath();
+			QString sAbsDestPath = sFontMetaDir % "/" % pasteFontFileInfo.fileName();
+			if(QFile::exists(sAbsDestPath) == false)
 			{
-				QFileInfo pasteFontFileInfo(fontArray[i].toString());
-
-				QString sAbsFilePath = pasteFontFileInfo.absoluteFilePath();
-				QString sAbsDestPath = sFontMetaDir % "/" % pasteFontFileInfo.fileName();
-				if(QFile::exists(sAbsDestPath) == false)
-				{
-					if(QFile::copy(sAbsFilePath, sAbsDestPath))
-						HyGuiLog("Paste imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
-					else
-						HyGuiLog("Paste failed to imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Error);
-				}
+				if(QFile::copy(sAbsFilePath, sAbsDestPath))
+					HyGuiLog("Paste imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+				else
+					HyGuiLog("Paste failed to imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Error);
 			}
-
+		}
+		if(fontArray.empty() == false)
 			pDestProject->ScanMetaFontDir();
-		}
-		// Copy images to meta-temp dir first
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// IManagerModels
 		QJsonArray imageArray = pasteObj["images"].toArray();
-		for(int i = 0; i < imageArray.size(); ++i)
-		{
-			QJsonObject imageObj = imageArray[i].toObject();
+		if(pDestProject->PasteAssets(ePasteItemType, imageArray, ITEM_AtlasImage) == false)
+			HyGuiLog("Paste failed to import texture assets", LOGTYPE_Error);
 
-			if(pDestProject->GetAtlasModel().DoesAssetExist(JSONOBJ_TOINT(imageObj, "checksum")) == false)
-			{
-				// Ensure filename is its metadata name so it's used when imported.
-				QFileInfo pasteImageFileInfo(imageObj["uri"].toString());
-				QFile::copy(pasteImageFileInfo.absoluteFilePath(), metaTempDir.absolutePath() % "/" % imageObj["name"].toString() % "." % pasteImageFileInfo.suffix());
-			}
-		}
-		// Get string list of the copied images paths
-		QStringList importImageList;
-		QFileInfoList importFileInfoList = metaTempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-		for(int i = 0; i < importFileInfoList.size(); ++i)
-			importImageList.append(importFileInfoList[i].absoluteFilePath());
-		// TODO: Create filters that match the source of the pasted images
-		QList<TreeModelItemData *> correspondingParentList;
-		for(int i = 0; i < importImageList.size(); ++i)
-			correspondingParentList.push_back(nullptr);
+		QJsonArray soundArray = pasteObj["sounds"].toArray();
+		if(pDestProject->PasteAssets(ePasteItemType, soundArray, ITEM_Audio) == false)
+			HyGuiLog("Paste failed to import sound assets", LOGTYPE_Error);
 
-
-		// Repack this atlas group with imported images
-		HyGuiItemType eType;
-		switch(ePasteItemType)
-		{
-		case ITEM_Prefab: eType = ITEM_Prefab; break;
-		case ITEM_Text: eType = ITEM_Text; break;
-		default:
-			eType = ITEM_AtlasImage;
-			break;
-		}
-
-		// Import images into the selected atlas group, or default one
-		quint32 uiAtlasGrpId = pDestProject->GetAtlasModel().GetBankIdFromBankIndex(0);
-		//if(pDestProject->GetAtlasWidget())
-		//	uiAtlasGrpId = pDestProject->GetAtlasWidget()->GetSelectedAtlasGrpId();
-		pDestProject->GetAtlasModel().ImportNewAssets(importImageList, uiAtlasGrpId, eType, correspondingParentList);
-
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Create a new project item representing the pasted item and save it
 		QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
 		FileDataPair initFileItemData;
@@ -329,7 +286,6 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 		
 		if(pImportedProjItem->Save(true) == false)
 			return false;
-#endif
 	}
 
 	return true;

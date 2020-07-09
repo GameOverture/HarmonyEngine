@@ -28,7 +28,7 @@ AudioModel::~AudioModel()
 	return FileDataPair();
 }
 
-/*virtual*/ QList<AssetItemData *> AudioModel::GetAtlasAssets() const /*override*/
+/*virtual*/ QList<AssetItemData *> AudioModel::GetAssets(HyGuiItemType eType) const /*override*/
 {
 	return QList<AssetItemData *>();
 }

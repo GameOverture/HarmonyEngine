@@ -217,7 +217,8 @@ void AudioAssetsWidget::SetupForFMOD()
 					break;
 				}
 
-				m_pProjOwner->SetAudioModel(audioDoc.object());
+				// TODO: Revive FMOD here?
+				//m_pProjOwner->SetAudioModel(audioDoc.object());
 
 				// Write out separate audio.json soundbank file
 				QFile soundBanksFile(dataDir.absoluteFilePath(HYASSETS_AudioFile));
