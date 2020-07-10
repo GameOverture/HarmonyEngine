@@ -12,6 +12,7 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Window/HyWindowManager.h"
+#include "Networking/HyNetworking.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Audio/HyAudioHarness.h"
@@ -48,6 +49,7 @@ class HyEngine
 
 	HyConsoleInterop			m_Console;
 	HyWindowManager				m_WindowManager;
+	HyNetworking				m_Networking;
 	HyAudioHarness				m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
