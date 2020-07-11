@@ -84,10 +84,10 @@ public:
 protected:
 	virtual void OnLoadedUpdate() override
 	{
-		if(IsDirty(DIRTY_Audio))
+		if(IHyNode::IsDirty(IHyNode::DIRTY_Audio))
 		{
 			m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Attributes);
-			ClearDirty(DIRTY_Audio);
+			IHyNode::ClearDirty(IHyNode::DIRTY_Audio);
 		}
 
 		if(m_uiCueFlags)
@@ -95,7 +95,7 @@ protected:
 			for(uint32 i = 0; i < IHyAudioCore::NUM_CUETYPES; ++i)
 			{
 				if(0 != (m_uiCueFlags & (1 << i)))
-					sm_pScene->AppendAudioCue(this, static_cast<IHyAudioCore::CueType>(i));
+					IHyNode::sm_pScene->AppendAudioCue(this, static_cast<IHyAudioCore::CueType>(i));
 			}
 
 			m_uiCueFlags = 0;

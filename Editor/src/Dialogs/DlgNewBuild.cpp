@@ -128,9 +128,15 @@ QStringList DlgNewBuild::GetProcOptions() const
 #ifdef Q_OS_WIN
 		sFormattedPath.replace("/", "\\");	// batch file requires Windows native directory separators
 #endif
+
+		QString sCMakeCmds = "";
+		if(ui->chkBrowserDebug->isChecked())
+			sCMakeCmds += "-DHYBUILD_DebugEmscripten=ON";
+
 		return QStringList()	<< sFormattedPath
 								<< QDir::cleanPath(ui->txtEmscriptenSdk->text())
-								<< buildDir.relativeFilePath(m_ProjectRef.GetDirPath());
+								<< buildDir.relativeFilePath(m_ProjectRef.GetDirPath())
+								<< sCMakeCmds;
 	}
 
 	return QStringList();

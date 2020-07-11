@@ -114,7 +114,7 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 				if(pBuffer)
 					break;
 			}
-			if(pBuffer == false)
+			if(pBuffer == nullptr)
 			{
 				HyLogWarning("Could not find audio: " << uiSoundChecksum);
 				break;
@@ -179,6 +179,10 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 			}
 			
 			break; }
+
+		default:
+			HyLogError("Unknown sound cue type");
+			break;
 		}
 	}
 	SDL_UnlockAudioDevice(m_hDevice);

@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 class HyAnimFloat;
+class HyScene;
 
 class IHyNode
 {

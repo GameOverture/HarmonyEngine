@@ -59,6 +59,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Input/HyInput.cpp
 	src/Input/HyInputMap.cpp
 	src/Networking/HyNetworking.cpp
+	src/Networking/IHyNetworkClass.cpp
 	src/Renderer/IHyRenderer.cpp
 	src/Renderer/Components/HyRenderBuffer.cpp
 	src/Renderer/Components/HyShaderUniforms.cpp
@@ -163,6 +164,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Input/HyInputKeys.h
 	include/Harmony/Input/HyInputMap.h
 	include/Harmony/Networking/HyNetworking.h
+	include/Harmony/Networking/IHyNetworkClass.h
 	include/Harmony/Renderer/IHyRenderer.h
 	include/Harmony/Renderer/Components/HyRenderBuffer.h
 	include/Harmony/Renderer/Components/HyShaderUniforms.h
