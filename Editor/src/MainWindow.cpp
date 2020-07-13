@@ -599,7 +599,10 @@ void MainWindow::on_actionNewBuild_triggered()
 		QProcess *pBuildProcess = new QProcess(this);
 		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
 		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
-		pBuildProcess->start(pDlg->GetProc(), pDlg->GetProcOptions());
+
+		QString sProc = pDlg->GetProc();
+		QStringList sArgList = pDlg->GetProcOptions();
+		pBuildProcess->start(sProc, sArgList);
 	}
 	delete pDlg;
 
