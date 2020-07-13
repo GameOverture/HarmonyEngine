@@ -69,7 +69,7 @@ else()
 		target_include_directories(%HY_CLASS% PUBLIC "%HY_HARMONYDIR%Engine/external/SDL2_net")
 	endif()
 	
-	target_precompile_headers(%HY_CLASS% PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/%HY_SRCDIR%/pch.h")
+	target_precompile_headers(%HY_CLASS% PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/%HY_SRCDIR%/pch.h")
 endif()
 
 target_link_libraries(%HY_CLASS% PUBLIC HyEngine)

@@ -245,7 +245,7 @@ target_link_libraries(HyEngine PUBLIC box2d soil2)
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include")
 	target_link_libraries(HyEngine PUBLIC glad)
-	target_precompile_headers(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
+	target_precompile_headers(HyEngine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
 	
 	# Qt provides its own implementation of SDL facitlities
 	if(NOT HYBUILD_Qt)

@@ -236,7 +236,7 @@ if(Qt5_DIR)
 		CXX_EXTENSIONS NO)
 
 	target_compile_definitions(HyEditor PRIVATE QT_USE_QSTRINGBUILDER QT_NO_KEYWORDS)
-	target_precompile_headers(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Global.h")
+	target_precompile_headers(HyEditor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Global.h")
 
 	# Setup windeployqt
 	if (WIN32)
