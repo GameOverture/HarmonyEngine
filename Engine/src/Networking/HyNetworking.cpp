@@ -14,6 +14,13 @@
 
 #ifdef HY_USE_SDL2_NET
 	#include "SDL_net.h"
+#elif defined(HY_PLATFORM_BROWSER)
+	#include <errno.h> /* EINPROGRESS, errno */
+	#include <sys/types.h> /* timeval */
+	#include <sys/socket.h>
+	#include <arpa/inet.h>
+	#include <fcntl.h>
+	#include <unistd.h>
 #endif
 
 HyNetworking::HyNetworking()
