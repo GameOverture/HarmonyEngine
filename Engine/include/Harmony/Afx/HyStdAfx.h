@@ -15,6 +15,12 @@
 #include "Platforms/HyPlatform.h"
 
 #include "Utilities/jsonxx.h"
+#include "rapidjson/document.h"
+typedef rapidjson::Document HyJsonDoc;
+typedef rapidjson::GenericArray<false, rapidjson::Value> HyJsonArray;
+typedef rapidjson::GenericArray<true, rapidjson::Value> HyJsonArrayConst;
+typedef rapidjson::GenericObject<false, rapidjson::Value> HyJsonObj;
+typedef rapidjson::GenericObject<true, rapidjson::Value> HyJsonObjConst;
 
 #include "box2d/box2d.h"
 
