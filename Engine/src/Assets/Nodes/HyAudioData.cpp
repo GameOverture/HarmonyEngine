@@ -19,17 +19,16 @@ HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj &itemObjRef, HyAsse
 	m_eCueType(CUETYPE_Unknown)
 {
 	HyJsonArray assetsArray = itemObjRef["assets"].GetArray();
-	//jsonxx::Array assetsArray = m_InitObj.get<jsonxx::Array>("assets");
 	for(uint32 i = 0; i < assetsArray.Size(); ++i)
 	{
-		uint32 uiChecksum = assetsArray[i].GetUint();// static_cast<uint32>(assetsArray.get<jsonxx::Number>(i));
+		uint32 uiChecksum = assetsArray[i].GetUint();
 		IHyFile *pAudioFile = assetsRef.GetFileWithAsset(HYFILE_AudioBank, uiChecksum);
 		
 		m_RequiredAudio.Set(pAudioFile->GetManifestIndex());
 		m_SoundChecksumList.push_back(uiChecksum);
 	}
 
-	std::string sType = itemObjRef["type"].GetString();// m_InitObj.get<jsonxx::String>("type");
+	std::string sType = itemObjRef["type"].GetString();
 	std::transform(sType.begin(), sType.end(), sType.begin(), ::tolower);
 	if(sType == "single")
 		m_eCueType = CUETYPE_Single;

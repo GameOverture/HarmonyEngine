@@ -511,26 +511,26 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		return;
 	}
 	HyAssert(itemsDoc.IsObject(), "HyAssets::OnThreadInit - Items json file wasn't an object");
-	//jsonxx::Object gameDataObj;
+	//HyJsonObj gameDataObj;
 	//bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
 	//HyAssert(bGameDataParsed, "Could not parse game data");
 
-	if(itemsDoc.HasMember("Audio"))// gameDataObj.has<jsonxx::Object>("Audio"))
-		m_AudioFactory.Init(itemsDoc["Audio"].GetObjectA() /*gameDataObj.get<jsonxx::Object>("Audio")*/, *this);
-	if(itemsDoc.HasMember("Prefabs"))// gameDataObj.has<jsonxx::Object>("Prefabs"))
+	if(itemsDoc.HasMember("Audio"))// gameDataObj.has<HyJsonObj>("Audio"))
+		m_AudioFactory.Init(itemsDoc["Audio"].GetObjectA() /*gameDataObj.get<HyJsonObj>("Audio")*/, *this);
+	if(itemsDoc.HasMember("Prefabs"))// gameDataObj.has<HyJsonObj>("Prefabs"))
 	{
 		HyJsonObj prefabObj = itemsDoc["Prefabs"].GetObjectA();
-		//const jsonxx::Object &prefabObj = gameDataObj.get<jsonxx::Object>("Prefabs");
+		//const HyJsonObj &prefabObj = gameDataObj.get<HyJsonObj>("Prefabs");
 
 		//for(auto iter = prefabObj.kv_map().begin(); iter != prefabObj.kv_map().end(); ++iter)
 		//	m_GltfMap[iter->first] = HY_NEW HyGLTF(iter->first, 0);
 
 		//m_PrefabFactory.Init(prefabObj, *this);
 	}
-	if(itemsDoc.HasMember("Texts"))// gameDataObj.has<jsonxx::Object>("Texts"))
-		m_TextFactory.Init(itemsDoc["Texts"].GetObjectA()/*gameDataObj.get<jsonxx::Object>("Texts")*/, *this);
-	if(itemsDoc.HasMember("Sprites"))// gameDataObj.has<jsonxx::Object>("Sprites"))
-		m_SpriteFactory.Init(itemsDoc["Sprites"].GetObjectA()/*gameDataObj.get<jsonxx::Object>("Sprites")*/, *this);
+	if(itemsDoc.HasMember("Texts"))// gameDataObj.has<HyJsonObj>("Texts"))
+		m_TextFactory.Init(itemsDoc["Texts"].GetObjectA()/*gameDataObj.get<HyJsonObj>("Texts")*/, *this);
+	if(itemsDoc.HasMember("Sprites"))// gameDataObj.has<HyJsonObj>("Sprites"))
+		m_SpriteFactory.Init(itemsDoc["Sprites"].GetObjectA()/*gameDataObj.get<HyJsonObj>("Sprites")*/, *this);
 #endif
 
 	// Atomic boolean indicated to main thread that we're initialized

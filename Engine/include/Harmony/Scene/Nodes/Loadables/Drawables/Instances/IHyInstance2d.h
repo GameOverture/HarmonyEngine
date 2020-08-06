@@ -50,7 +50,7 @@ protected:
 #ifdef HY_PLATFORM_GUI
 public:
 	template<typename HYDATATYPE>
-	void GuiOverrideData(const jsonxx::Object &itemDataObjRef, HyTextureHandle hTextureHandle)
+	void GuiOverrideData(const HyJsonObj &itemDataObjRef, HyTextureHandle hTextureHandle)
 	{
 		delete m_pData;
 		m_pData = HY_NEW HYDATATYPE(HY_GUI_DATAOVERRIDE, itemDataObjRef, *IHyLoadable::sm_pHyAssets);
