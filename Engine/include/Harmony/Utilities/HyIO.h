@@ -16,7 +16,7 @@
 class HyIO
 {
 public:
-	static void ReadTextFile(const char *szFilePath, std::string &sContentsOut);
+	static void ReadTextFile(const char *szFilePath, std::vector<char> &sContentsOut);
 
 	static void WriteTextFile(const char *szFilePath, const char *szContentBuffer);
 

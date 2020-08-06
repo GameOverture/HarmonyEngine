@@ -14,13 +14,10 @@
 #include "Compilers/HyCompiler.h"
 #include "Platforms/HyPlatform.h"
 
-#include "Utilities/jsonxx.h"
 #include "rapidjson/document.h"
 typedef rapidjson::Document HyJsonDoc;
 typedef rapidjson::GenericArray<false, rapidjson::Value> HyJsonArray;
-typedef rapidjson::GenericArray<true, rapidjson::Value> HyJsonArrayConst;
 typedef rapidjson::GenericObject<false, rapidjson::Value> HyJsonObj;
-typedef rapidjson::GenericObject<true, rapidjson::Value> HyJsonObjConst;
 
 #include "box2d/box2d.h"
 
@@ -32,7 +29,7 @@ typedef rapidjson::GenericObject<true, rapidjson::Value> HyJsonObjConst;
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/gtc/quaternion.hpp"
 
-// STL includes (TODO: to be replaced with EASTL)
+// STL includes (TODO: to be replaced/benchmarked with EASTL)
 #include <iostream>
 #include <string>
 #include <algorithm>

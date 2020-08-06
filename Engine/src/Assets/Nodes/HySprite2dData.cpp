@@ -24,27 +24,28 @@ bool HySprite2dFrame::IsValid() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HySprite2dData::HySprite2dData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef) :
+HySprite2dData::HySprite2dData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_pAnimStates(nullptr),
 	m_uiNumStates(0)
 {
-	jsonxx::Array spriteStateArray = itemDataObjRef.get<jsonxx::Array>("stateArray");
+	HyJsonArray spriteStateArray = itemDataObjRef["stateArray"].GetArray();
+	//jsonxx::Array spriteStateArray = itemDataObjRef.get<jsonxx::Array>("stateArray");
 
-	m_uiNumStates = static_cast<uint32>(spriteStateArray.size());
+	m_uiNumStates = spriteStateArray.Size();
 	m_pAnimStates = reinterpret_cast<AnimState *>(HY_NEW unsigned char[sizeof(AnimState) * m_uiNumStates]);
 	AnimState *pAnimStateWriteLocation = m_pAnimStates;
 
 	for(uint32 i = 0; i < m_uiNumStates; ++i, ++pAnimStateWriteLocation)
 	{
-		jsonxx::Object spriteStateObj = spriteStateArray.get<jsonxx::Object>(i);
+		HyJsonObj spriteStateObj = spriteStateArray[i].GetObjectA();
 
-		new (pAnimStateWriteLocation)AnimState(spriteStateObj.get<jsonxx::Boolean>("loop"),
-											   spriteStateObj.get<jsonxx::Boolean>("reverse"),
-											   spriteStateObj.get<jsonxx::Boolean>("bounce"),
-											   static_cast<float>(spriteStateObj.get<jsonxx::Number>("duration")),
+		new (pAnimStateWriteLocation)AnimState(spriteStateObj["loop"].GetBool(),// spriteStateObj.get<jsonxx::Boolean>("loop"),
+											   spriteStateObj["reverse"].GetBool(),// spriteStateObj.get<jsonxx::Boolean>("reverse"),
+											   spriteStateObj["bounce"].GetBool(),// spriteStateObj.get<jsonxx::Boolean>("bounce"),
+											   spriteStateObj["duration"].GetFloat(),// static_cast<float>(spriteStateObj.get<jsonxx::Number>("duration")),
 											   m_RequiredAtlases,
-											   spriteStateObj.get<jsonxx::Array>("frames"),
+											   spriteStateObj["frames"].GetArray(),// spriteStateObj.get<jsonxx::Array>("frames"),
 											   assetsRef);
 	}
 }
@@ -79,13 +80,13 @@ HySprite2dData::AnimState::AnimState(bool bLoop,
 									 bool bBounce,
 									 float fDuration,
 									 HyFilesManifest &requiredAtlasIndicesRef,
-									 jsonxx::Array &frameArray,
+									 HyJsonArray &frameArray,
 									 HyAssets &assetsRef) :
 	m_bLOOP(bLoop),
 	m_bREVERSE(bReverse),
 	m_bBOUNCE(bBounce),
 	m_fDURATION(fDuration),
-	m_uiNUMFRAMES(frameArray.empty() ? 1 : static_cast<uint32>(frameArray.size()))	// Cannot have '0' frames
+	m_uiNUMFRAMES(frameArray.Empty() ? 1 : frameArray.Size())	// Cannot have '0' frames
 {
 	m_pFrames = reinterpret_cast<HySprite2dFrame *>(HY_NEW unsigned char[sizeof(HySprite2dFrame) * m_uiNUMFRAMES]);
 	HySprite2dFrame *pFrameWriteLocation = m_pFrames;
@@ -97,15 +98,15 @@ HySprite2dData::AnimState::AnimState(bool bLoop,
 		glm::ivec2 vOffset(0);
 		float fDuration(0.0f);
 
-		if(frameArray.empty() == false)
+		if(frameArray.Empty() == false)
 		{
-			jsonxx::Object frameObj = frameArray.get<jsonxx::Object>(i);
+			HyJsonObj frameObj = frameArray[i].GetObjectA();
 
-			pAtlas = assetsRef.GetAtlas(static_cast<uint32>(frameObj.get<jsonxx::Number>("checksum")), rUVRect);
+			pAtlas = assetsRef.GetAtlas(frameObj["checksum"].GetUint(), rUVRect);
 			requiredAtlasIndicesRef.Set(pAtlas->GetManifestIndex());
 
-			HySetVec(vOffset, static_cast<int32>(frameObj.get<jsonxx::Number>("offsetX")), static_cast<int32>(frameObj.get<jsonxx::Number>("offsetY")));
-			fDuration = static_cast<float>(frameObj.get<jsonxx::Number>("duration"));
+			HySetVec(vOffset, frameObj["offsetX"].GetInt(), frameObj["offsetY"].GetInt());
+			fDuration = frameObj["duration"].GetFloat();
 		}
 
 		new (pFrameWriteLocation)HySprite2dFrame(pAtlas,

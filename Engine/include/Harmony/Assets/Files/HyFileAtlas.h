@@ -52,7 +52,7 @@ public:
 			uint32 uiIndexInGroup,
 			uint32 uiManifestIndex,
 			HyTextureFiltering eTextureFiltering,
-			jsonxx::Object &textureObjRef);
+			HyJsonObj &textureObjRef);
 
 	~HyFileAtlas();
 

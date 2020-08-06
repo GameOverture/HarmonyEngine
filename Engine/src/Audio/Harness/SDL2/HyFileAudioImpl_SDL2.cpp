@@ -13,16 +13,16 @@
 
 #if defined(HY_USE_SDL2)
 
-HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(const jsonxx::Object &bankObjRef)
+HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj &bankObjRef)
 {
-	const jsonxx::Array &assetsArray = bankObjRef.get<jsonxx::Array>("assets");
-	for(uint32 i = 0; i < assetsArray.size(); ++i)
+	HyJsonArray assetsArray = bankObjRef["assets"].GetArray();
+	for(uint32 i = 0; i < assetsArray.Size(); ++i)
 	{
-		jsonxx::Object assetObj = assetsArray.get<jsonxx::Object>(i);
+		HyJsonObj assetObj = assetsArray[i].GetObjectA();
 
-		HyRawSoundBuffer *pNewBuffer = HY_NEW HyRawSoundBuffer(assetObj.get<jsonxx::String>("fileName"));
+		HyRawSoundBuffer *pNewBuffer = HY_NEW HyRawSoundBuffer(assetObj["fileName"].GetString());
 		m_SoundBuffers.push_back(pNewBuffer);
-		m_ChecksumMap[static_cast<uint32>(assetObj.get<jsonxx::Number>("checksum"))] = pNewBuffer;
+		m_ChecksumMap[assetObj["checksum"].GetUint()] = pNewBuffer;
 	}
 }
 

@@ -13,7 +13,7 @@
 
 #include "soil2/SOIL2.h"
 
-/*static*/ void HyIO::ReadTextFile(const char *szFilePath, std::string &sContentsOut)
+/*static*/ void HyIO::ReadTextFile(const char *szFilePath, std::vector<char> &contentsOut)
 {
 	//SDL_RWops *pBankFile = SDL_RWFromFile(sFilePath.c_str(), "rb");
 	//if(pBankFile == nullptr)
@@ -42,16 +42,22 @@
 	//m_pBankData[iTotalReadObjs] = '\0';
 	//return true;
 
-	sContentsOut.clear();
 	if(szFilePath == nullptr)
 		return;
 
-	std::ifstream infile(szFilePath, std::ios::binary);
+	std::ifstream infile(szFilePath, std::ios::binary | std::ios::ate);
 	HyAssert(infile, "HyReadTextFile invalid file: " << szFilePath);
 
-	// TODO: Make this a lot more safer!
-	std::istreambuf_iterator<char> begin(infile), end;
-	sContentsOut.append(begin, end);
+	std::streamsize size = infile.tellg();
+	infile.seekg(0, std::ios::beg);
+
+	contentsOut.resize(size + 1);
+	if(infile.read(contentsOut.data(), size))
+		contentsOut[size] = '\0';
+	else {
+		HyLogError("HyIO::ReadTextFile - only " << infile.gcount() << " bytes was read");
+	}
+
 	infile.close();
 }
 

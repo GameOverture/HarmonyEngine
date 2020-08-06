@@ -22,7 +22,7 @@ HyAudioCore_SDL2::HyAudioCore_SDL2()
 	HyLogTitle("SDL2 Audio");
 
 	int32 iNumDevices = SDL_GetNumAudioDevices(0);
-	for(uint32 i = 0; i < iNumDevices; ++i)
+	for(int32 i = 0; i < iNumDevices; ++i)
 		m_sDeviceList.push_back(SDL_GetAudioDeviceName(i, 0));
 
 	m_DesiredSpec.freq = 48000;//44100;							// 44100 or 48000
@@ -198,7 +198,7 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	for(auto iter = pThis->m_PlayList.begin(); iter != pThis->m_PlayList.end();)
 	{
 		uint32 uiLength = (static_cast<uint32_t>(iLen) > iter->m_uiRemainingBytes) ? iter->m_uiRemainingBytes : static_cast<uint32_t>(iLen);
-		int iVolume = SDL_MIX_MAXVOLUME * iter->m_fVolume;
+		int iVolume = static_cast<int>(SDL_MIX_MAXVOLUME * iter->m_fVolume);
 
 		SDL_MixAudioFormat(pStream, iter->m_pBuffer->GetBuffer(iter->m_uiRemainingBytes), iter->m_pBuffer->GetFormat(), uiLength, HyClamp(iVolume, 0, SDL_MIX_MAXVOLUME));
 		iter->m_uiRemainingBytes -= uiLength;
@@ -209,7 +209,7 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	}
 }
 
-/*static*/ IHyFileAudioImpl *HyAudioCore_SDL2::AllocateBank(IHyAudioCore *pAudio, const jsonxx::Object &bankObjRef)
+/*static*/ IHyFileAudioImpl *HyAudioCore_SDL2::AllocateBank(IHyAudioCore *pAudio, HyJsonObj &bankObjRef)
 {
 	HyFileAudioImpl_SDL2 *pNewFileGuts = HY_NEW HyFileAudioImpl_SDL2(bankObjRef);
 	static_cast<HyAudioCore_SDL2 *>(pAudio)->m_AudioFileList.push_back(pNewFileGuts);

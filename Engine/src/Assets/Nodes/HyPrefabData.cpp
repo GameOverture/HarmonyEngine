@@ -10,16 +10,16 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyPrefabData.h"
 
-HyPrefabData::HyPrefabData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef) :
+HyPrefabData::HyPrefabData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef) :
 	IHyNodeData(sPath)
 {
-	const jsonxx::Array &prefabArray = itemDataObjRef.get<jsonxx::Array>("uvRects");
+	HyJsonArray prefabArray = itemDataObjRef["uvRects"].GetArray();
 
-	m_UvRectList.reserve(prefabArray.size());
-	for(uint32 i = 0; i < static_cast<uint32>(prefabArray.size()); ++i)
+	m_UvRectList.reserve(prefabArray.Size());
+	for(uint32 i = 0; i < prefabArray.Size(); ++i)
 	{
 		m_UvRectList.emplace_back();
-		m_UvRectList[i].first = assetsRef.GetAtlas(static_cast<uint32>(prefabArray.get<jsonxx::Number>(i)), m_UvRectList[i].second);
+		m_UvRectList[i].first = assetsRef.GetAtlas(prefabArray[i].GetUint(), m_UvRectList[i].second);
 		m_RequiredAtlases.Set(m_UvRectList[i].first->GetManifestIndex());
 	}
 

@@ -17,7 +17,6 @@
 class HyAudioData : public IHyNodeData
 {
 	HyAudioHarness &		m_AudioRef;
-	const jsonxx::Object	m_InitObj;
 
 	enum CueType
 	{
@@ -28,7 +27,7 @@ class HyAudioData : public IHyNodeData
 	std::vector<uint32>		m_SoundChecksumList;
 
 public:
-	HyAudioData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef);
+	HyAudioData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
 
 	uint32 GetSound() const;

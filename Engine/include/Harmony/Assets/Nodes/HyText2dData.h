@@ -114,14 +114,14 @@ class HyText2dData : public IHyNodeData
 		};
 		Layer *						pLayers;
 
-		FontState(Typeface *pTypefaces, float fLineGap, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, jsonxx::Array layersArray);
+		FontState(Typeface *pTypefaces, float fLineGap, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, HyJsonArray &layersArray);
 		~FontState();
 	};
 	FontState *						m_pFontStates;
 	uint32							m_uiNumStates;
 
 public:
-	HyText2dData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef);
+	HyText2dData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef);
 	virtual ~HyText2dData();
 
 	uint32 GetNumStates() const;

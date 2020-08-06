@@ -73,7 +73,7 @@ class HyFileAudioImpl_SDL2 : public IHyFileAudioImpl
 	std::map<uint32, HyRawSoundBuffer *>	m_ChecksumMap;
 
 public:
-	HyFileAudioImpl_SDL2(const jsonxx::Object &bankObjRef);
+	HyFileAudioImpl_SDL2(HyJsonObj &bankObjRef);
 	virtual ~HyFileAudioImpl_SDL2();
 
 	virtual bool ContainsAsset(uint32 uiAssetChecksum) override;

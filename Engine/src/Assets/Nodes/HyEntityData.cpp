@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyEntityData.h"
 
-HyEntityData::HyEntityData(const std::string &sPath, const jsonxx::Object &itemDataObjRef, HyAssets &assetsRef) :
+HyEntityData::HyEntityData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef) :
 	IHyNodeData(sPath)
 {
 }

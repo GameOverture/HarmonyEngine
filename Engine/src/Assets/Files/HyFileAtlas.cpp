@@ -21,32 +21,32 @@ HyFileAtlas::HyFileAtlas(std::string sFileName,
 				 uint32 uiIndexInGroup,
 				 uint32 uiManifestIndex,
 				 HyTextureFiltering eTextureFiltering,
-				 jsonxx::Object &textureObjRef) :
+				 HyJsonObj &textureObjRef) :
 	IHyFile(sFileName, HYFILE_Atlas, uiManifestIndex),
 	m_uiBANK_ID(uiBankId),
 	m_uiINDEX_IN_GROUP(uiIndexInGroup),
-	m_uiWIDTH(textureObjRef.get<jsonxx::Number>("width")),
-	m_uiHEIGHT(textureObjRef.get<jsonxx::Number>("height")),
-	m_eTEXTURE_FORMAT(HyAssets::GetTextureFormatFromString(textureObjRef.get<jsonxx::String>("format"))),
+	m_uiWIDTH(textureObjRef["width"].GetUint()),
+	m_uiHEIGHT(textureObjRef["height"].GetUint()),
+	m_eTEXTURE_FORMAT(HyAssets::GetTextureFormatFromString(textureObjRef["format"].GetString())),
 	m_eTEXTURE_FILTERING(eTextureFiltering),
 	m_hTextureHandle(0),
-	m_uiNUM_FRAMES(static_cast<uint32>(textureObjRef.get<jsonxx::Array>("assets").size())),
+	m_uiNUM_FRAMES(textureObjRef["assets"].GetArray().Size()),
 	m_pPixelData(nullptr),
 	m_uiPixelDataSize(0)
 {
 	m_pFrames = HY_NEW HyRectangle<int32>[m_uiNUM_FRAMES];
 
-	jsonxx::Array &framesArrayRef = textureObjRef.get<jsonxx::Array>("assets");
+	HyJsonArray framesArrayRef = textureObjRef["assets"].GetArray();
 	for(uint32 k = 0; k < m_uiNUM_FRAMES; ++k)
 	{
-		jsonxx::Object srcFrameObj = framesArrayRef.get<jsonxx::Object>(k);
+		HyJsonObj srcFrameObj = framesArrayRef[k].GetObjectA();
 
-		m_pFrames[k].bottom = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("bottom"));
-		m_pFrames[k].right = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("right"));
-		m_pFrames[k].left = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("left"));
-		m_pFrames[k].top = static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("top"));
+		m_pFrames[k].bottom = srcFrameObj["bottom"].GetUint();
+		m_pFrames[k].right = srcFrameObj["right"].GetUint();
+		m_pFrames[k].left = srcFrameObj["left"].GetUint();
+		m_pFrames[k].top = srcFrameObj["top"].GetUint();
 
-		m_ChecksumMap[static_cast<uint32>(srcFrameObj.get<jsonxx::Number>("checksum"))] = &m_pFrames[k];
+		m_ChecksumMap[srcFrameObj["checksum"].GetUint()] = &m_pFrames[k];
 	}
 }
 

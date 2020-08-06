@@ -37,17 +37,20 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Nested class Factory
 template<typename tData>
-void HyAssets::Factory<tData>::Init(const jsonxx::Object &subDirObjRef, HyAssets &assetsRef)
+void HyAssets::Factory<tData>::Init(HyJsonObj &subDirObjRef, HyAssets &assetsRef)
 {
-	m_DataList.reserve(subDirObjRef.size());
+	m_DataList.reserve(subDirObjRef.MemberCount());
 
 	uint32 i = 0;
-	for(auto iter = subDirObjRef.kv_map().begin(); iter != subDirObjRef.kv_map().end(); ++iter, ++i)
+	for(auto &v : subDirObjRef)
 	{
-		std::string sPath = HyIO::CleanPath(iter->first.c_str(), nullptr, true);
+		std::string sPath = HyIO::CleanPath(v.name.GetString(), nullptr, true);
 		m_LookupIndexMap.insert(std::make_pair(sPath, i));
 
-		m_DataList.emplace_back(iter->first, subDirObjRef.get<jsonxx::Object>(iter->first), assetsRef);
+		HyJsonObj obj = v.value.GetObjectA();
+		m_DataList.emplace_back(v.name.GetString(), obj, assetsRef);
+
+		++i;
 	}
 }
 
@@ -494,34 +497,40 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	ParseManifestFile(HYFILE_AudioBank);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// INSTANCE ITEMS
+	// ITEMS
 #ifndef HY_PLATFORM_GUI
 	std::string sGameDataFilePath(m_sDATADIR);
 	sGameDataFilePath += HYASSETS_DataFile;
-	std::string sGameDataFileContents;
+	std::vector<char> sGameDataFileContents;
 	HyIO::ReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);
 
-	jsonxx::Object gameDataObj;
-	bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
-	HyAssert(bGameDataParsed, "Could not parse game data");
-
-	if(gameDataObj.has<jsonxx::Object>("Audio"))
-		m_AudioFactory.Init(gameDataObj.get<jsonxx::Object>("Audio"), *this);
-	if(gameDataObj.has<jsonxx::Object>("Prefabs"))
+	HyJsonDoc itemsDoc;
+	if(itemsDoc.ParseInsitu(sGameDataFileContents.data()).HasParseError())
 	{
-		const jsonxx::Object &prefabObj = gameDataObj.get<jsonxx::Object>("Prefabs");
-
-		for(auto iter = prefabObj.kv_map().begin(); iter != prefabObj.kv_map().end(); ++iter)
-			m_GltfMap[iter->first] = HY_NEW HyGLTF(iter->first, 0);
-
-		m_PrefabFactory.Init(prefabObj, *this);
+		HyError("HyAssets::OnThreadInit - Items had JSON parsing error: " << rapidjson::GetParseErrorFunc(itemsDoc.GetParseError()));
+		return;
 	}
-	if(gameDataObj.has<jsonxx::Object>("Texts"))
-		m_TextFactory.Init(gameDataObj.get<jsonxx::Object>("Texts"), *this);
-	if(gameDataObj.has<jsonxx::Object>("Sprites"))
-		m_SpriteFactory.Init(gameDataObj.get<jsonxx::Object>("Sprites"), *this);
-	if(gameDataObj.has<jsonxx::Object>("Prefabs"))
-		m_PrefabFactory.Init(gameDataObj.get<jsonxx::Object>("Prefabs"), *this);
+	HyAssert(itemsDoc.IsObject(), "HyAssets::OnThreadInit - Items json file wasn't an object");
+	//jsonxx::Object gameDataObj;
+	//bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
+	//HyAssert(bGameDataParsed, "Could not parse game data");
+
+	if(itemsDoc.HasMember("Audio"))// gameDataObj.has<jsonxx::Object>("Audio"))
+		m_AudioFactory.Init(itemsDoc["Audio"].GetObjectA() /*gameDataObj.get<jsonxx::Object>("Audio")*/, *this);
+	if(itemsDoc.HasMember("Prefabs"))// gameDataObj.has<jsonxx::Object>("Prefabs"))
+	{
+		HyJsonObj prefabObj = itemsDoc["Prefabs"].GetObjectA();
+		//const jsonxx::Object &prefabObj = gameDataObj.get<jsonxx::Object>("Prefabs");
+
+		//for(auto iter = prefabObj.kv_map().begin(); iter != prefabObj.kv_map().end(); ++iter)
+		//	m_GltfMap[iter->first] = HY_NEW HyGLTF(iter->first, 0);
+
+		//m_PrefabFactory.Init(prefabObj, *this);
+	}
+	if(itemsDoc.HasMember("Texts"))// gameDataObj.has<jsonxx::Object>("Texts"))
+		m_TextFactory.Init(itemsDoc["Texts"].GetObjectA()/*gameDataObj.get<jsonxx::Object>("Texts")*/, *this);
+	if(itemsDoc.HasMember("Sprites"))// gameDataObj.has<jsonxx::Object>("Sprites"))
+		m_SpriteFactory.Init(itemsDoc["Sprites"].GetObjectA()/*gameDataObj.get<jsonxx::Object>("Sprites")*/, *this);
 #endif
 
 	// Atomic boolean indicated to main thread that we're initialized
@@ -584,107 +593,100 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 		return false;
 	}
 
-	std::string sManifestFileContents;
+	std::vector<char> sManifestFileContents;
 	HyIO::ReadTextFile(sManifestFilePath.c_str(), sManifestFileContents);
-	jsonxx::Object fileObj;
-	if(fileObj.parse(sManifestFileContents) == false)
+	HyJsonDoc fileDoc;
+	if(fileDoc.ParseInsitu(sManifestFileContents.data()).HasParseError())
 	{
-		HyLogWarning("Failed to open/read manifest file: " << sManifestFileContents);
+		HyError("HyAssets::ParseManifestFile - Manifest had JSON parsing error: " << rapidjson::GetParseErrorFunc(fileDoc.GetParseError()));
 		return false;
 	}
+	HyAssert(fileDoc.IsObject(), "HyAssets::ParseManifestFile - Manifest json file wasn't an object");
 
-	jsonxx::Object manifestFileObj;
-	if(manifestFileObj.parse(sManifestFileContents))
+	switch(eFileType)
 	{
-		switch(eFileType)
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	case HYFILE_Atlas: {
+		HyJsonArray banksArray = fileDoc["banks"].GetArray();
+
+		// Iterate through each bank and determine how many textures total there are between all banks
+		m_FilesMap[eFileType].m_uiNumFiles = 0;
+		for(uint32 i = 0; i < banksArray.Size(); ++i)
 		{
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		case HYFILE_Atlas: {
-			jsonxx::Array banksArray = manifestFileObj.get<jsonxx::Array>("banks");
-
-			// Iterate through each bank and determine how many textures total there are between all banks
-			m_FilesMap[eFileType].m_uiNumFiles = 0;
-			for(uint32 i = 0; i < static_cast<uint32>(banksArray.size()); ++i)
-			{
-				jsonxx::Object bankObj = banksArray.get<jsonxx::Object>(i);
-				jsonxx::Array texturesArray = bankObj.get<jsonxx::Array>("textures");
-				m_FilesMap[eFileType].m_uiNumFiles += static_cast<uint32>(texturesArray.size());
-			}
-
-			m_FilesMap[eFileType].m_pFiles = reinterpret_cast<HyFileAtlas *>(HY_NEW unsigned char[sizeof(HyFileAtlas) * m_FilesMap[eFileType].m_uiNumFiles]);
-			HyFileAtlas *pAtlasWriteLocation = static_cast<HyFileAtlas *>(m_FilesMap[eFileType].m_pFiles);
-
-			// Then iterate back over each atlas group and instantiate a HyFileAtlas for each texture
-			uint32 uiManifestIndex = 0;
-			char szTmpBuffer[16];
-			for(uint32 i = 0; i < static_cast<uint32>(banksArray.size()); ++i)
-			{
-				jsonxx::Object bankObj = banksArray.get<jsonxx::Object>(i);
-
-				uint32 uiBankId = static_cast<uint32>(bankObj.get<jsonxx::Number>("bankId"));
-
-				jsonxx::Array texturesArray = bankObj.get<jsonxx::Array>("textures");
-				for(uint32 j = 0; j < static_cast<uint32>(texturesArray.size()); ++j)
-				{
-					HyAssert(uiManifestIndex < m_FilesMap[eFileType].m_uiNumFiles, "HyAssets::OnThreadInit instantiated too many atlases");
-
-					std::sprintf(szTmpBuffer, "%05d", j);
-					std::string sAtlasFilePath = szTmpBuffer;
-
-					jsonxx::Object texObj = texturesArray.get<jsonxx::Object>(j);
-					HyTextureFormat eFormat = GetTextureFormatFromString(texObj.get<jsonxx::String>("format"));
-
-					if(eFormat == HYTEXTURE_R8G8B8A8 || eFormat == HYTEXTURE_R8G8B8)
-						sAtlasFilePath += ".png";
-					else
-						sAtlasFilePath += ".dds";
-
-					new (pAtlasWriteLocation)HyFileAtlas(sAtlasFilePath,
-						uiBankId,
-						j,
-						uiManifestIndex,
-						HYTEXFILTER_BILINEAR,
-						texObj);
-
-					++pAtlasWriteLocation;
-					++uiManifestIndex;
-				}
-			}
-			break; }
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		case HYFILE_AudioBank: {
-			jsonxx::Array banksArray = manifestFileObj.get<jsonxx::Array>("banks");
-			m_FilesMap[eFileType].m_uiNumFiles = static_cast<uint32>(banksArray.size());
-
-			m_FilesMap[eFileType].m_pFiles = reinterpret_cast<HyFileAudio *>(HY_NEW unsigned char[sizeof(HyFileAudio) * m_FilesMap[eFileType].m_uiNumFiles]);
-			HyFileAudio *pPlacementLocation = static_cast<HyFileAudio *>(m_FilesMap[eFileType].m_pFiles);
-
-			char szTmpBuffer[16];
-			for(uint32 i = 0; i < m_FilesMap[eFileType].m_uiNumFiles; ++i)
-			{
-				jsonxx::Object bankObj = banksArray.get<jsonxx::Object>(i);
-
-				uint32 uiBankId = static_cast<uint32>(bankObj.get<jsonxx::Number>("bankId"));
-
-				std::string sBankFilePath = HYASSETS_AudioDir;
-				sprintf(szTmpBuffer, "%05d", uiBankId);
-				sBankFilePath += szTmpBuffer;
-
-				new (pPlacementLocation)HyFileAudio(sBankFilePath, i, m_AudioRef.AllocateAudioBank(bankObj));
-				++pPlacementLocation;
-			}
-			break; }
-
-		default:
-			break;
+			HyJsonObj bankObj = banksArray[i].GetObjectA();
+			HyJsonArray texturesArray = bankObj["textures"].GetArray();
+			m_FilesMap[eFileType].m_uiNumFiles += texturesArray.Size();
 		}
+
+		m_FilesMap[eFileType].m_pFiles = reinterpret_cast<HyFileAtlas *>(HY_NEW unsigned char[sizeof(HyFileAtlas) * m_FilesMap[eFileType].m_uiNumFiles]);
+		HyFileAtlas *pAtlasWriteLocation = static_cast<HyFileAtlas *>(m_FilesMap[eFileType].m_pFiles);
+
+		// Then iterate back over each atlas group and instantiate a HyFileAtlas for each texture
+		uint32 uiManifestIndex = 0;
+		char szTmpBuffer[16];
+		for(uint32 i = 0; i < banksArray.Size(); ++i)
+		{
+			HyJsonObj bankObj = banksArray[i].GetObjectA();
+
+			uint32 uiBankId = bankObj["bankId"].GetUint();
+
+			HyJsonArray texturesArray = bankObj["textures"].GetArray();
+			for(uint32 j = 0; j < texturesArray.Size(); ++j)
+			{
+				HyAssert(uiManifestIndex < m_FilesMap[eFileType].m_uiNumFiles, "HyAssets::OnThreadInit instantiated too many atlases");
+
+				std::sprintf(szTmpBuffer, "%05d", j);
+				std::string sAtlasFilePath = szTmpBuffer;
+
+				HyJsonObj texObj = texturesArray[j].GetObjectA();
+				HyTextureFormat eFormat = GetTextureFormatFromString(texObj["format"].GetString());
+
+				if(eFormat == HYTEXTURE_R8G8B8A8 || eFormat == HYTEXTURE_R8G8B8)
+					sAtlasFilePath += ".png";
+				else
+					sAtlasFilePath += ".dds";
+
+				new (pAtlasWriteLocation)HyFileAtlas(sAtlasFilePath,
+					uiBankId,
+					j,
+					uiManifestIndex,
+					HYTEXFILTER_BILINEAR,
+					texObj);
+
+				++pAtlasWriteLocation;
+				++uiManifestIndex;
+			}
+		}
+		break; }
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	case HYFILE_AudioBank: {
+		HyJsonArray banksArray = fileDoc["banks"].GetArray();
+		m_FilesMap[eFileType].m_uiNumFiles = banksArray.Size();
+
+		m_FilesMap[eFileType].m_pFiles = reinterpret_cast<HyFileAudio *>(HY_NEW unsigned char[sizeof(HyFileAudio) * m_FilesMap[eFileType].m_uiNumFiles]);
+		HyFileAudio *pPlacementLocation = static_cast<HyFileAudio *>(m_FilesMap[eFileType].m_pFiles);
+
+		char szTmpBuffer[16];
+		for(uint32 i = 0; i < m_FilesMap[eFileType].m_uiNumFiles; ++i)
+		{
+			HyJsonObj bankObj = banksArray[i].GetObjectA();
+
+			uint32 uiBankId = bankObj["bankId"].GetUint();
+
+			std::string sBankFilePath = HYASSETS_AudioDir;
+			sprintf(szTmpBuffer, "%05d", uiBankId);
+			sBankFilePath += szTmpBuffer;
+
+			new (pPlacementLocation)HyFileAudio(sBankFilePath, i, m_AudioRef.AllocateAudioBank(bankObj));
+			++pPlacementLocation;
+		}
+		break; }
+
+	default:
+		break;
 	}
-	else
-	{
-		HyLogWarning("Failed to parse manifest file: " << sManifestFileContents);
-		return false;
-	}
+
 
 	HyFilesManifest::sm_iIndexFlagsArraySize[eFileType] = (m_FilesMap[eFileType].m_uiNumFiles / 32);
 	if(m_FilesMap[eFileType].m_uiNumFiles % 32 != 0)

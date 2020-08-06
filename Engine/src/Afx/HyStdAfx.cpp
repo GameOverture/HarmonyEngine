@@ -47,11 +47,11 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 {
 	sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj", false);
 
-	std::string sProjFileContents;
+	std::vector<char> sProjFileContents;
 	HyIO::ReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
 
 	HyJsonDoc projDoc;
-	if(projDoc.Parse(sProjFileContents.c_str()).HasParseError())
+	if(projDoc.ParseInsitu(sProjFileContents.data()).HasParseError())
 	{
 		HyError("HarmonyInit had JSON parsing error: " << rapidjson::GetParseErrorFunc(projDoc.GetParseError()));
 		return;
@@ -68,15 +68,14 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		sHyProjFileName = sProjectDir + "/" + sHyProjFileName;
 		sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj", false);
 
-		HyIO::ReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
-		if(projDoc.Parse(sProjFileContents.c_str()).HasParseError())
+		std::vector<char> trueProjFileContents;
+		HyIO::ReadTextFile(sHyProjFileName.c_str(), trueProjFileContents);
+		if(projDoc.ParseInsitu(trueProjFileContents.data()).HasParseError())
 		{
 			HyError("HarmonyInit's AdjustWorkingDirectory had JSON parsing error: " << rapidjson::GetParseErrorFunc(projDoc.GetParseError()));
 			return;
 		}
 		HyAssert(projDoc.IsObject(), "HarmonyInit's AdjustWorkingDirectory parsed a json file that wasn't an object");
-
-		//projObject.parse(sProjFileContents);
 
 		sDataDir = sProjectDir + "/";
 		sDataDir += projDoc["DataPath"].GetString();//projObject.get<jsonxx::String>("DataPath");

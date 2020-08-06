@@ -1186,11 +1186,11 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			break;
 
 		default:
-			HyError("Unsupported HyShaderVariable '" << shaderVertexAttribListRef[i].eVarType << "' for this platform");
+			HyError("Unsupported HyShaderVariable '" << static_cast<int>(shaderVertexAttribListRef[i].eVarType) << "' for this platform");
 			break;
 		}
 
-		HyErrorCheck_OpenGL("HyOpenGLShader::SetVertexAttributePtrs", "glVertexAttribPointer[" << shaderVertexAttribListRef[i].eVarType << "]");
+		HyErrorCheck_OpenGL("HyOpenGLShader::SetVertexAttributePtrs", "glVertexAttribPointer[" << static_cast<int>(shaderVertexAttribListRef[i].eVarType) << "]");
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -110,7 +110,6 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/HyInfoPanel.cpp
 	src/UI/HyMeter.cpp
 	src/UI/IHy9Slice.cpp
-	src/Utilities/jasonxx.cpp
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
 	src/Utilities/HyMath.cpp
@@ -220,7 +219,6 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/HyInfoPanel.h
 	include/Harmony/UI/HyMeter.h
 	include/Harmony/UI/IHy9Slice.h
-	include/Harmony/Utilities/jsonxx.h
 	include/Harmony/Utilities/Crc32.h
 	include/Harmony/Utilities/HyIO.h
 	include/Harmony/Utilities/HyMath.h

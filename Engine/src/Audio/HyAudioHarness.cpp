@@ -95,7 +95,7 @@ HyAudioHarness::~HyAudioHarness()
 #endif
 }
 
-IHyFileAudioImpl *HyAudioHarness::AllocateAudioBank(const jsonxx::Object &bankObjRef)
+IHyFileAudioImpl *HyAudioHarness::AllocateAudioBank(HyJsonObj &bankObjRef)
 {
 	if(m_fpAllocateHyAudioBank)
 		return m_fpAllocateHyAudioBank(m_pCore, bankObjRef);

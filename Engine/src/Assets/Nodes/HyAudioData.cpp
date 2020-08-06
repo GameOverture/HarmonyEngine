@@ -13,23 +13,23 @@
 #include "Audio/HyAudioHarness.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HyAudioData::HyAudioData(const std::string &sPath, const jsonxx::Object &itemObjRef, HyAssets &assetsRef) :
+HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj &itemObjRef, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_AudioRef(assetsRef.GetAudioRef()),
-	m_InitObj(itemObjRef),
 	m_eCueType(CUETYPE_Unknown)
 {
-	jsonxx::Array assetsArray = m_InitObj.get<jsonxx::Array>("assets");
-	for(uint32 i = 0; i < assetsArray.size(); ++i)
+	HyJsonArray assetsArray = itemObjRef["assets"].GetArray();
+	//jsonxx::Array assetsArray = m_InitObj.get<jsonxx::Array>("assets");
+	for(uint32 i = 0; i < assetsArray.Size(); ++i)
 	{
-		uint32 uiChecksum = static_cast<uint32>(assetsArray.get<jsonxx::Number>(i));
+		uint32 uiChecksum = assetsArray[i].GetUint();// static_cast<uint32>(assetsArray.get<jsonxx::Number>(i));
 		IHyFile *pAudioFile = assetsRef.GetFileWithAsset(HYFILE_AudioBank, uiChecksum);
 		
 		m_RequiredAudio.Set(pAudioFile->GetManifestIndex());
 		m_SoundChecksumList.push_back(uiChecksum);
 	}
 
-	std::string sType = m_InitObj.get<jsonxx::String>("type");
+	std::string sType = itemObjRef["type"].GetString();// m_InitObj.get<jsonxx::String>("type");
 	std::transform(sType.begin(), sType.end(), sType.begin(), ::tolower);
 	if(sType == "single")
 		m_eCueType = CUETYPE_Single;
