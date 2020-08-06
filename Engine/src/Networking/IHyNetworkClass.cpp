@@ -20,7 +20,7 @@ IHyNetworkClass::IHyNetworkClass(uint32 uiRecvBufferSize, HyThreadPriority ePrio
 	m_uiMAX_RECV_SIZE(uiRecvBufferSize),
 	m_eConnState(CONNECTION_NotConnected),
 	m_uiPort(0),
-	m_hSock(nullptr),
+	m_hSock(0),
 	m_uiAttemptCount(0),
 	m_pRecvBuff(HY_NEW uint8[m_uiMAX_RECV_SIZE])
 {
@@ -84,7 +84,7 @@ bool IHyNetworkClass::NetSend(const void *pData, uint32 uiNumBytes)
 void IHyNetworkClass::CleanupSocket()
 {
 	sm_pNetworking->CloseConnection(m_hSock);
-	m_hSock = nullptr;
+	m_hSock = 0;
 	m_uiAttemptCount = 0;
 	m_eConnState = CONNECTION_NotConnected;
 
@@ -103,8 +103,7 @@ void IHyNetworkClass::CleanupSocket()
 		break;
 		
 	case CONNECTION_NotConnected:
-		m_hSock = sm_pNetworking->CreateClient(m_sHost, m_uiPort);
-		if(m_hSock == nullptr)
+		if(sm_pNetworking->CreateClient(m_sHost, m_uiPort, m_hSock) == false)
 		{
 			m_uiAttemptCount++;
 			if(m_uiAttemptCount > 5)

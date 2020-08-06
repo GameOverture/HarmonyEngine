@@ -22,6 +22,13 @@ typedef HyOpenGL HyRendererInterop;
 	typedef void *HyWindowInteropPtr;
 #endif
 
+#ifdef HY_USE_SDL2_NET
+	struct _TCPsocket;
+	typedef struct _TCPsocket *TCPsocket;
+#else
+	typedef int TCPsocket;
+#endif
+
 #if defined(HY_PLATFORM_GUI)
 	// TODO: Ideally send Harmony log output to the editor's output window
 	#include "Diagnostics/Console/Interop/HyConsole_Std.h"

@@ -16,6 +16,8 @@
 #include "HyEngine.h"
 
 #if defined(HY_USE_SDL2)
+	#include "SDL_mixer.h"
+
 	#include "Audio/Harness/SDL2/HyAudioCore_SDL2.h"
 	#include "Audio/Harness/SDL2/HyFileAudioImpl_SDL2.h"
 #elif defined(HY_PLATFORM_WINDOWS)

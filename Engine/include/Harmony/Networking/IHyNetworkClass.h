@@ -10,13 +10,10 @@
 #ifndef IHyNetworkClass_h__
 #define IHyNetworkClass_h__
 
-#include "Afx/HyStdAfx.h"
+#include "Afx/HyInteropAfx.h"
 #include "Threading/IHyThreadClass.h"
 
 class HyNetworking;
-
-struct _TCPsocket;
-typedef struct _TCPsocket *TCPsocket;
 
 class IHyNetworkClass : public IHyThreadClass
 {

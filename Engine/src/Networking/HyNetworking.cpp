@@ -36,7 +36,6 @@ HyNetworking::HyNetworking()
 
 	const SDL_version *pLinkedVersion = SDLNet_Linked_Version();
 	HyLog("Running SDL_net version: " << pLinkedVersion->major << "." << pLinkedVersion->minor << "." << pLinkedVersion->patch);
-
 #endif
 
 	IHyNetworkClass::sm_pNetworking = this;
@@ -51,11 +50,11 @@ HyNetworking::~HyNetworking()
 	IHyNetworkClass::sm_pNetworking = nullptr;
 }
 
-TCPsocket HyNetworking::CreateClient(std::string sHost, uint16 uiPort)
+bool HyNetworking::CreateClient(std::string sHost, uint16 uiPort, TCPsocket &socketOut)
 {
-	TCPsocket sock = nullptr;
-
 #ifdef HY_USE_SDL2_NET
+	socketOut = nullptr;
+
 	// connect to localhost at port 9999 using TCP (client)
 	IPaddress ip;
 	if(SDLNet_ResolveHost(&ip, sHost.c_str(), uiPort) == -1) {
@@ -63,19 +62,91 @@ TCPsocket HyNetworking::CreateClient(std::string sHost, uint16 uiPort)
 		return false;
 	}
 
-	sock = SDLNet_TCP_Open(&ip);
-	if(!sock) {
+	socketOut = SDLNet_TCP_Open(&ip);
+	if(!socketOut)
+	{
 		HyLogError("SDLNet_TCP_Open: " << SDLNet_GetError());
+		return false;
 	}
-#endif
 
-	return sock;
+	return true;
+#elif defined(HY_PLATFORM_BROWSER)
+	socketOut = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if(socketOut == -1)
+	{
+		HyLogError("HyNetworking::CreateClient failed to create socket");
+		return false;
+	}
+	fcntl(socketOut, F_SETFL, O_NONBLOCK);
+
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(uiPort);
+	if(inet_pton(AF_INET, sHost.c_str(), &addr.sin_addr) != 1)
+	{
+		HyLogError("HyNetworking::CreateClient inet_pton failed");
+		return false;
+	}
+
+	const int res = ::connect(socketOut, (struct sockaddr *)&addr, sizeof(addr));
+	if(res == -1)
+	{
+		if(errno == EINPROGRESS)
+		{
+			HyLog("HyNetworking::CreateClient Connection in progress for fd:" << socketOut);
+
+			// Wait for connection to complete
+			fd_set sockets;
+			FD_ZERO(&sockets);
+			FD_SET(socketOut, &sockets);
+
+			// TODO: Set a timeout instead of blocking indefinately
+			while(select(socketOut + 1, nullptr, &sockets, nullptr, nullptr) <= 0) {}
+		}
+		else
+		{
+			HyLogWarning("HyNetworking::CreateClient connection failed");
+			return false;
+		}
+	}
+
+	return true;
+#else
+	return false;
+#endif
 }
 
 int32 HyNetworking::TcpRecv(TCPsocket hSocket, void *pData, int iMaxLength)
 {
 #ifdef HY_USE_SDL2_NET
 	return SDLNet_TCP_Recv(hSocket, pData, iMaxLength);
+#elif defined(HY_PLATFORM_BROWSER)
+	/* Wait timeout milliseconds to receive data */
+	fd_set sockets;
+	FD_ZERO(&sockets);
+	FD_SET(hSocket, &sockets);
+	timeval t{0, timeout*1000};
+	int ret = select(hSocket + 1, &sockets, nullptr, nullptr, (timeout == -1) ? nullptr : &t);
+	if(ret == 0)
+	{
+		/* Timeout */
+		return 0;
+	}
+	else if(ret < 0)
+	{
+		HyLogError("HyNetworking::TcpRecv select failed");
+		return 0;
+	}
+
+	ret = recv(hSocket, dest.data(), dest.size(), 0);
+	if(ret < 0)
+	{
+		HyLogError("HyNetworking::TcpRecv recv failed");
+		return 0;
+	}
+
+	return dest.prefix(ret);
 #else
 	return 0;
 #endif
@@ -85,8 +156,17 @@ int32 HyNetworking::TcpSend(TCPsocket hSocket, const void *pData, uint32 uiNumBy
 {
 #ifdef HY_USE_SDL2_NET
 	return SDLNet_TCP_Send(hSocket, pData, static_cast<int>(uiNumBytes));
+#elif defined(HY_PLATFORM_BROWSER)
+	const int ret = ::send(hSocket, pData, uiNumBytes, 0);
+	if(ret == -1)
+	{
+		HyLogError("HyNetworking::TcpSend send failed");
+		CloseConnection(hSocket);
+		return -1;
+	}
+	return ret;
 #else
-	return 0;
+	return -1;
 #endif
 }
 
@@ -94,5 +174,8 @@ void HyNetworking::CloseConnection(TCPsocket hSocket)
 {
 #ifdef HY_USE_SDL2_NET
 	SDLNet_TCP_Close(hSocket);
+#elif defined(HY_PLATFORM_BROWSER)
+	if(hSocket != -1)
+		::close(hSocket);
 #endif
 }

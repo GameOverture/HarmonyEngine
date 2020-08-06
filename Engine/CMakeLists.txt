@@ -256,9 +256,13 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 		if(HYBUILD_SDL_NET)
 			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_net")
 			target_link_libraries(HyEngine PUBLIC SDL2_net)
-			target_compile_definitions(HyEngine PRIVATE HY_USE_SDL2_NET)
 		endif()
 	endif()
+endif()
+
+if(HYBUILD_SDL_NET)
+	
+	target_compile_definitions(HyEngine PUBLIC HY_USE_SDL2_NET)
 endif()
 
 if (MSVC)
