@@ -47,7 +47,7 @@ void HyAssets::Factory<tData>::Init(HyJsonObj &subDirObjRef, HyAssets &assetsRef
 		std::string sPath = HyIO::CleanPath(v.name.GetString(), nullptr, true);
 		m_LookupIndexMap.insert(std::make_pair(sPath, i));
 
-		HyJsonObj obj = v.value.GetObjectA();
+		HyJsonObj obj = v.value.GetObject();
 		m_DataList.emplace_back(v.name.GetString(), obj, assetsRef);
 
 		++i;
@@ -511,15 +511,12 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 		return;
 	}
 	HyAssert(itemsDoc.IsObject(), "HyAssets::OnThreadInit - Items json file wasn't an object");
-	//HyJsonObj gameDataObj;
-	//bool bGameDataParsed = gameDataObj.parse(sGameDataFileContents);
-	//HyAssert(bGameDataParsed, "Could not parse game data");
 
-	if(itemsDoc.HasMember("Audio"))// gameDataObj.has<HyJsonObj>("Audio"))
-		m_AudioFactory.Init(itemsDoc["Audio"].GetObjectA() /*gameDataObj.get<HyJsonObj>("Audio")*/, *this);
-	if(itemsDoc.HasMember("Prefabs"))// gameDataObj.has<HyJsonObj>("Prefabs"))
+	if(itemsDoc.HasMember("Audio"))
+		m_AudioFactory.Init(itemsDoc["Audio"].GetObject(), *this);
+	if(itemsDoc.HasMember("Prefabs"))
 	{
-		HyJsonObj prefabObj = itemsDoc["Prefabs"].GetObjectA();
+		HyJsonObj prefabObj = itemsDoc["Prefabs"].GetObject();
 		//const HyJsonObj &prefabObj = gameDataObj.get<HyJsonObj>("Prefabs");
 
 		//for(auto iter = prefabObj.kv_map().begin(); iter != prefabObj.kv_map().end(); ++iter)
@@ -527,10 +524,10 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 		//m_PrefabFactory.Init(prefabObj, *this);
 	}
-	if(itemsDoc.HasMember("Texts"))// gameDataObj.has<HyJsonObj>("Texts"))
-		m_TextFactory.Init(itemsDoc["Texts"].GetObjectA()/*gameDataObj.get<HyJsonObj>("Texts")*/, *this);
-	if(itemsDoc.HasMember("Sprites"))// gameDataObj.has<HyJsonObj>("Sprites"))
-		m_SpriteFactory.Init(itemsDoc["Sprites"].GetObjectA()/*gameDataObj.get<HyJsonObj>("Sprites")*/, *this);
+	if(itemsDoc.HasMember("Texts"))
+		m_TextFactory.Init(itemsDoc["Texts"].GetObject(), *this);
+	if(itemsDoc.HasMember("Sprites"))
+		m_SpriteFactory.Init(itemsDoc["Sprites"].GetObject(), *this);
 #endif
 
 	// Atomic boolean indicated to main thread that we're initialized
@@ -596,6 +593,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 	std::vector<char> sManifestFileContents;
 	HyIO::ReadTextFile(sManifestFilePath.c_str(), sManifestFileContents);
 	HyJsonDoc fileDoc;
+
 	if(fileDoc.ParseInsitu(sManifestFileContents.data()).HasParseError())
 	{
 		HyError("HyAssets::ParseManifestFile - Manifest had JSON parsing error: " << rapidjson::GetParseErrorFunc(fileDoc.GetParseError()));
@@ -613,7 +611,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 		m_FilesMap[eFileType].m_uiNumFiles = 0;
 		for(uint32 i = 0; i < banksArray.Size(); ++i)
 		{
-			HyJsonObj bankObj = banksArray[i].GetObjectA();
+			HyJsonObj bankObj = banksArray[i].GetObject();
 			HyJsonArray texturesArray = bankObj["textures"].GetArray();
 			m_FilesMap[eFileType].m_uiNumFiles += texturesArray.Size();
 		}
@@ -626,7 +624,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 		char szTmpBuffer[16];
 		for(uint32 i = 0; i < banksArray.Size(); ++i)
 		{
-			HyJsonObj bankObj = banksArray[i].GetObjectA();
+			HyJsonObj bankObj = banksArray[i].GetObject();
 
 			uint32 uiBankId = bankObj["bankId"].GetUint();
 
@@ -638,7 +636,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 				std::sprintf(szTmpBuffer, "%05d", j);
 				std::string sAtlasFilePath = szTmpBuffer;
 
-				HyJsonObj texObj = texturesArray[j].GetObjectA();
+				HyJsonObj texObj = texturesArray[j].GetObject();
 				HyTextureFormat eFormat = GetTextureFormatFromString(texObj["format"].GetString());
 
 				if(eFormat == HYTEXTURE_R8G8B8A8 || eFormat == HYTEXTURE_R8G8B8)
@@ -670,7 +668,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 		char szTmpBuffer[16];
 		for(uint32 i = 0; i < m_FilesMap[eFileType].m_uiNumFiles; ++i)
 		{
-			HyJsonObj bankObj = banksArray[i].GetObjectA();
+			HyJsonObj bankObj = banksArray[i].GetObject();
 
 			uint32 uiBankId = bankObj["bankId"].GetUint();
 

@@ -37,7 +37,7 @@ HySprite2dData::HySprite2dData(const std::string &sPath, HyJsonObj &itemDataObjR
 
 	for(uint32 i = 0; i < m_uiNumStates; ++i, ++pAnimStateWriteLocation)
 	{
-		HyJsonObj spriteStateObj = spriteStateArray[i].GetObjectA();
+		HyJsonObj spriteStateObj = spriteStateArray[i].GetObject();
 
 		new (pAnimStateWriteLocation)AnimState(spriteStateObj["loop"].GetBool(),
 											   spriteStateObj["reverse"].GetBool(),
@@ -99,7 +99,7 @@ HySprite2dData::AnimState::AnimState(bool bLoop,
 
 		if(frameArray.Empty() == false)
 		{
-			HyJsonObj frameObj = frameArray[i].GetObjectA();
+			HyJsonObj frameObj = frameArray[i].GetObject();
 
 			pAtlas = assetsRef.GetAtlas(frameObj["checksum"].GetUint(), rUVRect);
 			requiredAtlasIndicesRef.Set(pAtlas->GetManifestIndex());

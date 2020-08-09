@@ -32,7 +32,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 	m_Text.TextSetState(uiStateIndex);
 }
 
-/*virtual*/ void TextDraw::OnApplyJsonData(jsonxx::Object &itemDataObjRef) /*override*/
+/*virtual*/ void TextDraw::OnApplyJsonData(HyJsonObj itemDataObj) /*override*/
 {
 	uint uiAtlasPixelDataSize = 0;
 	QSize atlasDimensions;
@@ -53,7 +53,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 																								  pAtlasPixelData,
 																								  uiAtlasPixelDataSize,
 																								  HYTEXTURE_R8G8B8A8);
-	m_Text.GuiOverrideData<HyText2dData>(itemDataObjRef, m_hTexture);
+	m_Text.GuiOverrideData<HyText2dData>(itemDataObj, m_hTexture);
 	m_Text.TextSet("The Quick Brown Fox Jumped Over The Lazy Dog!? 1234567890");
 }
 

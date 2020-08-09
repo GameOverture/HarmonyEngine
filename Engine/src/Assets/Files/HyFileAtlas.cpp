@@ -39,7 +39,7 @@ HyFileAtlas::HyFileAtlas(std::string sFileName,
 	HyJsonArray framesArrayRef = textureObjRef["assets"].GetArray();
 	for(uint32 k = 0; k < m_uiNUM_FRAMES; ++k)
 	{
-		HyJsonObj srcFrameObj = framesArrayRef[k].GetObjectA();
+		HyJsonObj srcFrameObj = framesArrayRef[k].GetObject();
 
 		m_pFrames[k].bottom = srcFrameObj["bottom"].GetUint();
 		m_pFrames[k].right = srcFrameObj["right"].GetUint();

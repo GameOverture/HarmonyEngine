@@ -25,7 +25,7 @@ public:
 	//void Sync();
 
 protected:
-	virtual void OnApplyJsonData(jsonxx::Object &itemDataObjRef) override;
+	virtual void OnApplyJsonData(HyJsonObj itemDataObj) override;
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;

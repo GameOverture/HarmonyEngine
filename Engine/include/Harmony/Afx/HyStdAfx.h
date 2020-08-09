@@ -16,6 +16,7 @@
 
 #include "rapidjson/document.h"
 typedef rapidjson::Document HyJsonDoc;
+typedef rapidjson::Value HyJsonValue;
 typedef rapidjson::GenericArray<false, rapidjson::Value> HyJsonArray;
 typedef rapidjson::GenericObject<false, rapidjson::Value> HyJsonObj;
 

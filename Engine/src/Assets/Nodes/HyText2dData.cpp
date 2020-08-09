@@ -23,7 +23,7 @@ HyText2dData::FontState::FontState(Typeface *pTypefaces, float fLineHeight, floa
 
 	for(uint32 i = 0; i < uiNUM_LAYERS; ++i, ++pLayerWriteLocation)
 	{
-		HyJsonObj layerObj = layersArray[i].GetObjectA();
+		HyJsonObj layerObj = layersArray[i].GetObject();
 		new (pLayerWriteLocation)Layer(layerObj["topR"].GetFloat(),
 									   layerObj["topG"].GetFloat(),
 									   layerObj["topB"].GetFloat(),
@@ -91,13 +91,13 @@ HyText2dData::HyText2dData(const std::string &sPath, HyJsonObj &itemDataObjRef, 
 	{
 		Typeface &curTypeface = m_pTypefaces[i];
 
-		HyJsonObj typefaceObj = fontArray[i].GetObjectA();
+		HyJsonObj typefaceObj = fontArray[i].GetObject();
 		HyJsonArray glyphsArray = typefaceObj["glyphs"].GetArray();
 		
 		uint32 uiNumGlyphs = glyphsArray.Size();
 		for (uint32 j = 0; j < uiNumGlyphs; ++j)
 		{
-			HyJsonObj glyphObj = glyphsArray[j].GetObjectA();
+			HyJsonObj glyphObj = glyphsArray[j].GetObject();
 
 			float fLeftUv = (uiFullAtlasWidth * rSubAtlasUVRect.left) + (fSubAtlasWidth * glyphObj["left"].GetFloat());
 			fLeftUv /= uiFullAtlasWidth;
@@ -129,7 +129,7 @@ HyText2dData::HyText2dData(const std::string &sPath, HyJsonObj &itemDataObjRef, 
 	FontState *pStateWriteLocation = m_pFontStates;
 	for (uint32 i = 0; i < stateArray.Size(); ++i, ++pStateWriteLocation)
 	{
-		HyJsonObj stateObj = stateArray[i].GetObjectA();
+		HyJsonObj stateObj = stateArray[i].GetObject();
 		new (pStateWriteLocation)FontState(m_pTypefaces,
 										   stateObj["lineHeight"].GetFloat(),
 										   stateObj["lineAscender"].GetFloat(),

@@ -49,6 +49,7 @@ HyCamera2d *IDraw::GetCamera()
 	return m_pCamera;
 }
 
+#undef GetObject
 void IDraw::ApplyJsonData()
 {
 	if(m_pProjItem == nullptr)
@@ -58,10 +59,11 @@ void IDraw::ApplyJsonData()
 	m_pProjItem->GetLatestFileData(itemFileData);
 	QByteArray src = JsonValueToSrc(itemFileData.m_Data);
 
-	jsonxx::Object itemDataObj;
-	itemDataObj.parse(src.toStdString());
+	HyJsonDoc itemDataDoc;
+	if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+		HyGuiLog("IDraw::ApplyJsonData failed to parse", LOGTYPE_Error);
 
-	OnApplyJsonData(itemDataObj);
+	OnApplyJsonData(itemDataDoc.GetObject());
 }
 
 void IDraw::Show()

@@ -18,7 +18,7 @@ HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj &bankObjRef)
 	HyJsonArray assetsArray = bankObjRef["assets"].GetArray();
 	for(uint32 i = 0; i < assetsArray.Size(); ++i)
 	{
-		HyJsonObj assetObj = assetsArray[i].GetObjectA();
+		HyJsonObj assetObj = assetsArray[i].GetObject();
 
 		HyRawSoundBuffer *pNewBuffer = HY_NEW HyRawSoundBuffer(assetObj["fileName"].GetString());
 		m_SoundBuffers.push_back(pNewBuffer);

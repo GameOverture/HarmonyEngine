@@ -50,10 +50,10 @@ protected:
 #ifdef HY_PLATFORM_GUI
 public:
 	template<typename HYDATATYPE>
-	void GuiOverrideData(const HyJsonObj &itemDataObjRef, HyTextureHandle hTextureHandle)
+	void GuiOverrideData(HyJsonObj itemDataObj, HyTextureHandle hTextureHandle)
 	{
 		delete m_pData;
-		m_pData = HY_NEW HYDATATYPE(HY_GUI_DATAOVERRIDE, itemDataObjRef, *IHyLoadable::sm_pHyAssets);
+		m_pData = HY_NEW HYDATATYPE(HY_GUI_DATAOVERRIDE, itemDataObj, *IHyLoadable::sm_pHyAssets);
 		OnDataAcquired();
 
 		if(m_hShader == HY_UNUSED_HANDLE)

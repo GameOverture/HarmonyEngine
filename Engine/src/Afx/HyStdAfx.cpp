@@ -97,7 +97,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		uiNumWindows = windowInfoArray.Size();
 		for(uint32 i = 0; i < uiNumWindows; ++i)
 		{
-			HyJsonObj windowInfoObj = windowInfoArray[i].GetObjectA();
+			HyJsonObj windowInfoObj = windowInfoArray[i].GetObject();
 
 			windowInfo[i].sName = windowInfoObj["Name"].GetString();
 			windowInfo[i].eType = static_cast<HyWindowType>(windowInfoObj["Type"].GetInt());
@@ -127,7 +127,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		bUseConsole = projDoc["UseConsole"].GetBool();// projObject.get<jsonxx::Boolean>("UseConsole");
 		
 		//HyJsonObj consoleInfoObj = projObject.get<HyJsonObj>("ConsoleInfo");
-		HyJsonObj consoleInfoObj = projDoc["ConsoleInfo"].GetObjectA();
+		HyJsonObj consoleInfoObj = projDoc["ConsoleInfo"].GetObject();
 		consoleInfo.sName = consoleInfoObj["Name"].GetString();// consoleInfoObj.get<jsonxx::String>("Name");
 		consoleInfo.eType = static_cast<HyWindowType>(consoleInfoObj["Type"].GetInt());// static_cast<HyWindowType>(static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("Type")));
 		consoleInfo.vSize.x = consoleInfoObj["ResolutionX"].GetInt();// static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionX"));
