@@ -76,8 +76,16 @@ HyText2dData::HyText2dData(const std::string &sPath, HyJsonObj &itemDataObjRef, 
 		rSubAtlasUVRect.left = rSubAtlasUVRect.top = 0.0f;
 		rSubAtlasUVRect.right = rSubAtlasUVRect.bottom = 1.0f;
 
-		uiFullAtlasWidth = itemDataObjRef["subAtlasWidth"].GetUint();
-		uiFullAtlasHeight = itemDataObjRef["subAtlasHeight"].GetUint();
+		if(itemDataObjRef.HasMember("subAtlasWidth") && itemDataObjRef.HasMember("subAtlasHeight"))
+		{
+			uiFullAtlasWidth = static_cast<uint32>(HyMax(0, itemDataObjRef["subAtlasWidth"].GetInt()));
+			uiFullAtlasHeight = static_cast<uint32>(HyMax(0, itemDataObjRef["subAtlasHeight"].GetInt()));
+		}
+		else
+		{
+			uiFullAtlasWidth = 0;
+			uiFullAtlasHeight = 0;
+		}
 	}
 	
 	float fSubAtlasWidth = uiFullAtlasWidth * (rSubAtlasUVRect.right - rSubAtlasUVRect.left);
