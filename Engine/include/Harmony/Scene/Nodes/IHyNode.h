@@ -62,9 +62,9 @@ protected:
 	// Various boolean values for node stored in these flags for smaller memory footprint
 	enum SettingFlag // NOTE: continue the bits in ExplicitFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		SETTING_IsRegistered		= 1 << 21,
-		SETTING_IsVisible			= 1 << 22,
-		SETTING_IsPauseUpdate		= 1 << 23,
+		SETTING_IsRegistered		= 1 << 22,
+		SETTING_IsVisible			= 1 << 23,
+		SETTING_IsPauseUpdate		= 1 << 24,
 	};
 	uint32							m_uiFlags;
 
