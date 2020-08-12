@@ -17,8 +17,6 @@
 
 class HyInfoPanel : public HyEntity2d
 {
-	friend class LgSlotGame;
-
 protected:
 	HySprite2d *			m_pPanel;
 	HyText2d *				m_pText;
