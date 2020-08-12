@@ -31,7 +31,6 @@ public:
 	static QJsonObject GenerateDefaultSettingsObj();
 	
 	bool IsSettingsDirty();
-	bool IsNameChanged();
 	
 	void ApplyCurrentSettingsToObj(QJsonObject &settingsObjOut);
 

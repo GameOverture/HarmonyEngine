@@ -642,7 +642,7 @@ offsetCalculation:
 
 	uint32 uiLastSpaceIndex = 0;
 	uint32 uiNewlineIndex = 0;
-	uint32 uiNumNewlineCharacters = 0;
+	uint32 uiNumUnprintableCharacters = 0;
 	bool bTerminatedEarly = false;
 	bool bFirstCharacterOnNewLine = true;
 	float fFirstCharacterNudgeRightAmt = 0.0f;
@@ -661,7 +661,7 @@ offsetCalculation:
 
 		if(m_Utf32CodeList[uiStrIndex] == '\n')
 		{
-			++uiNumNewlineCharacters;
+			++uiNumUnprintableCharacters;
 
 			bDoNewline = true;
 			++uiStrIndex;	// increment past the '\n' since the algorithm assumes a regular character to be the uiNewlineIndex
@@ -848,7 +848,7 @@ offsetCalculation:
 		vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));	// Push the final line (row)
 	}
 
-	m_uiNumRenderQuads = ((m_uiNumValidCharacters - uiNumNewlineCharacters) * uiNUM_LAYERS);
+	m_uiNumRenderQuads = ((m_uiNumValidCharacters - uiNumUnprintableCharacters) * uiNUM_LAYERS);
 
 	// Fix each text line to match proper alignment (by default, HYALIGN_Left is already set at this point)
 	if(m_eAlignment != HYALIGN_Left)

@@ -40,6 +40,7 @@ HyAnimFloat &HyAnimVec2::GetAnimFloat(uint32 uiIndex)
 
 const glm::vec3 HyAnimVec2::Extrapolate() const
 {
+	// TODO: extropolate value between static time updates
 	return glm::vec3(m_vValue.x, m_vValue.y, 0.0f);
 }
 

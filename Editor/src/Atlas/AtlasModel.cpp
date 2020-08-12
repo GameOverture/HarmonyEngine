@@ -291,8 +291,8 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	
 			if(pDlg->IsSettingsDirty() && bBankHasAssets)
 				RepackAll(uiBankIndex);
-			else if(pDlg->IsNameChanged() || pDlg->IsSettingsDirty())
-				SaveMeta();
+			else
+				SaveRuntime();
 	
 			bAccepted = true;
 		}
@@ -529,6 +529,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 			textureObj.insert("width", m_BanksModel.GetBank(i)->m_MetaObj["maxWidth"].toInt());
 			textureObj.insert("height", m_BanksModel.GetBank(i)->m_MetaObj["maxHeight"].toInt());
 			textureObj.insert("format", m_BanksModel.GetBank(i)->m_MetaObj["textureFormat"].toString());
+			textureObj.insert("filtering", m_BanksModel.GetBank(i)->m_MetaObj["textureFiltering"].toString());
 			textureObj.insert("assets", frameArrayList[j]);
 
 			textureArray.append(textureObj);

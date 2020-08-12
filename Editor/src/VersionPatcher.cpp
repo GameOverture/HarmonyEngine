@@ -123,8 +123,11 @@
 			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 2 -> 3", LOGTYPE_Info);
 			Patch_2to3(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 3:
+			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 3 -> 4", LOGTYPE_Info);
+			Patch_3to4(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+		case 4:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 3, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 4, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -613,6 +616,52 @@
 
 	// Finalize
 	dataAtlasObj["$fileVersion"] = 3;
+	dataAtlasDocRef.setObject(dataAtlasObj);
+}
+
+/*static*/ void VersionPatcher::Patch_3to4(QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
+{
+	// Meta Items
+	QJsonObject metaItemsObj = metaItemsDocRef.object();
+	metaItemsObj.insert("$fileVersion", 4);
+	metaItemsDocRef.setObject(metaItemsObj);
+
+	// Data Items
+	QJsonObject dataItemsObj = dataItemsDocRef.object();
+	dataItemsObj.insert("$fileVersion", 4);
+	dataItemsDocRef.setObject(dataItemsObj);
+
+	// Meta atlas
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray banksArray = metaAtlasObj["banks"].toArray();
+	for(int i = 0; i < banksArray.size(); ++i)
+	{
+		QJsonObject bankObj = banksArray.at(i).toObject();
+		bankObj.insert("textureFiltering", "Bilinear");
+		banksArray.replace(i, bankObj);
+	}
+	metaAtlasObj.insert("banks", banksArray);
+	metaAtlasObj["$fileVersion"] = 4;
+	metaAtlasDocRef.setObject(metaAtlasObj);
+
+	// Data atlas
+	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
+	banksArray = dataAtlasObj["banks"].toArray();
+	for(int i = 0; i < banksArray.size(); ++i)
+	{
+		QJsonObject bankObj = banksArray.at(i).toObject();
+		QJsonArray texturesArray = bankObj["textures"].toArray();
+		for(int j = 0; j < texturesArray.size(); ++j)
+		{
+			QJsonObject textureObj = texturesArray.at(j).toObject();
+			textureObj.insert("filtering", "Bilinear");
+			texturesArray.replace(j, textureObj);
+		}
+		bankObj["textures"] = texturesArray;
+		banksArray.replace(i, bankObj);
+	}
+	dataAtlasObj["banks"] = banksArray;
+	dataAtlasObj["$fileVersion"] = 4;
 	dataAtlasDocRef.setObject(dataAtlasObj);
 }
 

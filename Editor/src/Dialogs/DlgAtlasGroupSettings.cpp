@@ -38,21 +38,38 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObjec
 	ui->sbTextureHeight->setValue(m_InitialPackerSettingsObj["maxHeight"].toInt());
 	ui->cmbHeuristic->setCurrentIndex(m_InitialPackerSettingsObj["cmbHeuristic"].toInt());
 	
+	// Texture Type
 	for(int i = 0; i < HYNUM_TEXTUREFORMATS; ++i)
 		ui->cmbTextureType->addItem(QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(i)).c_str()));
 	
 	QString sTextureFormat = m_InitialPackerSettingsObj["textureFormat"].toString();
-
-	auto stdStringList = HyAssets::GetTextureFormatNameList();
+	std::vector<std::string> stdStringList = HyAssets::GetTextureFormatNameList();
 	QStringList sTextureFormatList;
 	for(auto str : stdStringList)
-		sTextureFormat.push_back(str.c_str());
-
+		sTextureFormatList.push_back(str.c_str());
 	for(int i = 0; i < sTextureFormatList.size(); ++i)
 	{
 		if(sTextureFormatList[i].compare(sTextureFormat, Qt::CaseInsensitive) == 0)
 		{
 			ui->cmbTextureType->setCurrentIndex(i);
+			break;
+		}
+	}
+
+	// Texture Filtering
+	for(int i = 0; i < HYNUM_TEXTUREFILTERS; ++i)
+		ui->cmbTextureFiltering->addItem(QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(i)).c_str()));
+
+	QString sTextureFiltering = m_InitialPackerSettingsObj["textureFiltering"].toString();
+	stdStringList = HyAssets::GetTextureFilteringNameList();
+	QStringList sTextureFilterList;
+	for(auto str : stdStringList)
+		sTextureFilterList.push_back(str.c_str());
+	for(int i = 0; i < sTextureFilterList.size(); ++i)
+	{
+		if(sTextureFilterList[i].compare(sTextureFiltering, Qt::CaseInsensitive) == 0)
+		{
+			ui->cmbTextureFiltering->setCurrentIndex(i);
 			break;
 		}
 	}
@@ -83,6 +100,7 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
 	returnSettingsObj.insert("maxHeight", 2048);
 	returnSettingsObj.insert("cmbHeuristic", 1);
 	returnSettingsObj.insert("textureFormat", QString(HyAssets::GetTextureFormatName(HYTEXTURE_R8G8B8A8).c_str()));
+	returnSettingsObj.insert("textureFiltering", QString(HyAssets::GetTextureFilteringName(HYTEXFILTER_BILINEAR).c_str()));
 	
 	return returnSettingsObj;
 }
@@ -117,13 +135,8 @@ bool DlgAtlasGroupSettings::IsSettingsDirty()
 		return true;
 	if(ui->cmbTextureType->currentIndex() != static_cast<int>(HyAssets::GetTextureFormatFromString(m_InitialPackerSettingsObj["textureFormat"].toString().toStdString())))
 		return true;
-	
-	return false;
-}
 
-bool DlgAtlasGroupSettings::IsNameChanged()
-{
-	return (ui->txtName->text() != m_InitialPackerSettingsObj["bankName"].toString());
+	return false;
 }
 
 void DlgAtlasGroupSettings::ApplyCurrentSettingsToObj(QJsonObject &settingsObjOut)
@@ -143,6 +156,7 @@ void DlgAtlasGroupSettings::ApplyCurrentSettingsToObj(QJsonObject &settingsObjOu
 	settingsObjOut.insert("maxHeight", ui->sbTextureHeight->value());
 	settingsObjOut.insert("cmbHeuristic", ui->cmbHeuristic->currentIndex());
 	settingsObjOut.insert("textureFormat", QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(ui->cmbTextureType->currentIndex())).c_str()));
+	settingsObjOut.insert("textureFiltering", QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(ui->cmbTextureFiltering->currentIndex())).c_str()));
 }
 
 void DlgAtlasGroupSettings::on_btnTexSize128_clicked()

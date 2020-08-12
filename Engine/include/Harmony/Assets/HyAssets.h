@@ -130,6 +130,11 @@ public:
 	static std::vector<std::string> GetTextureFormatNameList();
 	static std::string GetTextureFormatName(HyTextureFormat eType);
 	static HyTextureFormat GetTextureFormatFromString(std::string sFormat);
+
+	static std::vector<HyTextureFiltering> GetTextureFilteringList();
+	static std::vector<std::string> GetTextureFilteringNameList();
+	static std::string GetTextureFilteringName(HyTextureFiltering eType);
+	static HyTextureFiltering GetTextureFilteringFromString(std::string sFilter);
 };
 
 #endif /* HyAssets_h__ */

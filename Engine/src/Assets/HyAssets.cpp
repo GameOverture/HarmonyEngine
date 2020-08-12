@@ -648,7 +648,6 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 					uiBankId,
 					j,
 					uiManifestIndex,
-					HYTEXFILTER_BILINEAR,
 					texObj);
 
 				++pAtlasWriteLocation;
@@ -879,6 +878,7 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 
 /*static*/ std::string HyAssets::GetTextureFormatName(HyTextureFormat eType)
 {
+	// WARNING: Changing any of these strings affects data and meta files and requires a version patcher bump!
 	switch(eType)
 	{
 	case HYTEXTURE_R8G8B8A8:
@@ -894,11 +894,10 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	case HYTEXTURE_DTX5:
 		return "DTX5";
 
+	case HYTEXTURE_Unknown:
 	default:
-		break;
+		return "Unknown";
 	}
-
-	return "Unknown";
 }
 
 /*static*/ HyTextureFormat HyAssets::GetTextureFormatFromString(std::string sFormat)
@@ -918,3 +917,69 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	return HYTEXTURE_Unknown;
 }
 
+
+/*static*/ std::vector<HyTextureFiltering> HyAssets::GetTextureFilteringList()
+{
+	std::vector<HyTextureFiltering> list;
+	list.push_back(HYTEXFILTER_NEAREST);
+	list.push_back(HYTEXFILTER_NEAREST_MIPMAP);
+	list.push_back(HYTEXFILTER_LINEAR_MIPMAP);
+	list.push_back(HYTEXFILTER_BILINEAR);
+	list.push_back(HYTEXFILTER_BILINEAR_MIPMAP);
+	list.push_back(HYTEXFILTER_TRILINEAR);
+
+	HyAssert(list.size() == HYNUM_TEXTUREFILTERS, "HyGlobal::GetTextureFilteringList missing a format!");
+	return list;
+}
+
+/*static*/ std::vector<std::string> HyAssets::GetTextureFilteringNameList()
+{
+	std::vector<HyTextureFiltering> formatList = GetTextureFilteringList();
+
+	std::vector<std::string> list;
+	for(int i = 0; i < formatList.size(); ++i)
+		list.push_back(GetTextureFilteringName(formatList[i]));
+
+	return list;
+}
+
+/*static*/ std::string HyAssets::GetTextureFilteringName(HyTextureFiltering eType)
+{
+	// WARNING: Changing any of these strings affects data and meta files and requires a version patcher bump!
+	switch(eType)
+	{
+	case HYTEXFILTER_NEAREST:
+		return "Nearest";
+	case HYTEXFILTER_NEAREST_MIPMAP:
+		return "Nearest Mipmap";
+	case HYTEXFILTER_LINEAR_MIPMAP:
+		return "Linear Mipmap";
+	case HYTEXFILTER_BILINEAR:
+		return "Bilinear";
+	case HYTEXFILTER_BILINEAR_MIPMAP:
+		return "Bilinear Mipmap";
+	case HYTEXFILTER_TRILINEAR:
+		return "Trilinear";
+
+	case HYTEXFILTER_Unknown:
+	default:
+		return "Unknown Filter";
+	}
+}
+
+/*static*/ HyTextureFiltering HyAssets::GetTextureFilteringFromString(std::string sFilter)
+{
+	std::transform(sFilter.begin(), sFilter.end(), sFilter.begin(), ::tolower);
+
+	std::vector<std::string> sTextureFilteringList = GetTextureFilteringNameList();
+	for(int i = 0; i < sTextureFilteringList.size(); ++i)
+	{
+		std::string sCurStr = sTextureFilteringList[i];
+		std::transform(sCurStr.begin(), sCurStr.end(), sCurStr.begin(), ::tolower);
+		
+		if(sFilter == sCurStr)
+			return GetTextureFilteringList()[i];
+	}
+
+	return HYTEXFILTER_Unknown;
+}
