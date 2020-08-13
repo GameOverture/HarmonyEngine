@@ -429,7 +429,7 @@ void MainWindow::OnProcessStdOut()
 void MainWindow::OnProcessErrorOut()
 {
 	QProcess *p = (QProcess *)sender();
-	HyGuiLog(p->readAllStandardError(), LOGTYPE_Error);
+	HyGuiLog(p->readAllStandardError(), LOGTYPE_Info);
 }
 
 void MainWindow::on_actionNewProject_triggered()

@@ -95,10 +95,10 @@ HyAudioHarness::~HyAudioHarness()
 #endif
 }
 
-IHyFileAudioImpl *HyAudioHarness::AllocateAudioBank(HyJsonObj &bankObjRef)
+IHyFileAudioImpl *HyAudioHarness::AllocateAudioBank(HyJsonObj bankObj)
 {
 	if(m_fpAllocateHyAudioBank)
-		return m_fpAllocateHyAudioBank(m_pCore, bankObjRef);
+		return m_fpAllocateHyAudioBank(m_pCore, bankObj);
 
 	return HY_NEW HyAudioBank_Null();
 }

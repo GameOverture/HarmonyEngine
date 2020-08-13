@@ -209,9 +209,9 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	}
 }
 
-/*static*/ IHyFileAudioImpl *HyAudioCore_SDL2::AllocateBank(IHyAudioCore *pAudio, HyJsonObj &bankObjRef)
+/*static*/ IHyFileAudioImpl *HyAudioCore_SDL2::AllocateBank(IHyAudioCore *pAudio, HyJsonObj bankObj)
 {
-	HyFileAudioImpl_SDL2 *pNewFileGuts = HY_NEW HyFileAudioImpl_SDL2(bankObjRef);
+	HyFileAudioImpl_SDL2 *pNewFileGuts = HY_NEW HyFileAudioImpl_SDL2(bankObj);
 	static_cast<HyAudioCore_SDL2 *>(pAudio)->m_AudioFileList.push_back(pNewFileGuts);
 
 	return pNewFileGuts;

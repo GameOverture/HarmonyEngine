@@ -21,7 +21,7 @@ class HySpine2dData : public IHyNodeData
 	//spSkeletonData *		m_SpineSkeletonData;
 
 public:
-	HySpine2dData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef);
+	HySpine2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HySpine2dData();
 
 	//spSkeletonData *GetSkeletonData()								{ return m_SpineSkeletonData; }

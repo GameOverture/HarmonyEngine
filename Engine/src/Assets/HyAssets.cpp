@@ -37,7 +37,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Nested class Factory
 template<typename tData>
-void HyAssets::Factory<tData>::Init(HyJsonObj &subDirObjRef, HyAssets &assetsRef)
+void HyAssets::Factory<tData>::Init(HyJsonObj subDirObjRef, HyAssets &assetsRef)
 {
 	m_DataList.reserve(subDirObjRef.MemberCount());
 
@@ -517,7 +517,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	if(itemsDoc.HasMember("Prefabs"))
 	{
 		HyJsonObj prefabObj = itemsDoc["Prefabs"].GetObject();
-		//const HyJsonObj &prefabObj = gameDataObj.get<HyJsonObj>("Prefabs");
 
 		//for(auto iter = prefabObj.kv_map().begin(); iter != prefabObj.kv_map().end(); ++iter)
 		//	m_GltfMap[iter->first] = HY_NEW HyGLTF(iter->first, 0);

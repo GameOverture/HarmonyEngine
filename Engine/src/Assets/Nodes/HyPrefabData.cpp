@@ -10,10 +10,10 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyPrefabData.h"
 
-HyPrefabData::HyPrefabData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef) :
+HyPrefabData::HyPrefabData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath)
 {
-	HyJsonArray prefabArray = itemDataObjRef["uvRects"].GetArray();
+	HyJsonArray prefabArray = itemDataObj["uvRects"].GetArray();
 
 	m_UvRectList.reserve(prefabArray.Size());
 	for(uint32 i = 0; i < prefabArray.Size(); ++i)

@@ -20,22 +20,22 @@ HyFileAtlas::HyFileAtlas(std::string sFileName,
 				 uint32 uiBankId,
 				 uint32 uiIndexInGroup,
 				 uint32 uiManifestIndex,
-				 HyJsonObj &textureObjRef) :
+				 HyJsonObj textureObj) :
 	IHyFile(sFileName, HYFILE_Atlas, uiManifestIndex),
 	m_uiBANK_ID(uiBankId),
 	m_uiINDEX_IN_GROUP(uiIndexInGroup),
-	m_uiWIDTH(textureObjRef["width"].GetUint()),
-	m_uiHEIGHT(textureObjRef["height"].GetUint()),
-	m_eTEXTURE_FORMAT(HyAssets::GetTextureFormatFromString(textureObjRef["format"].GetString())),
-	m_eTEXTURE_FILTERING(HyAssets::GetTextureFilteringFromString(textureObjRef["filtering"].GetString())),
+	m_uiWIDTH(textureObj["width"].GetUint()),
+	m_uiHEIGHT(textureObj["height"].GetUint()),
+	m_eTEXTURE_FORMAT(HyAssets::GetTextureFormatFromString(textureObj["format"].GetString())),
+	m_eTEXTURE_FILTERING(HyAssets::GetTextureFilteringFromString(textureObj["filtering"].GetString())),
 	m_hTextureHandle(0),
-	m_uiNUM_FRAMES(textureObjRef["assets"].GetArray().Size()),
+	m_uiNUM_FRAMES(textureObj["assets"].GetArray().Size()),
 	m_pPixelData(nullptr),
 	m_uiPixelDataSize(0)
 {
 	m_pFrames = HY_NEW HyRectangle<int32>[m_uiNUM_FRAMES];
 
-	HyJsonArray framesArrayRef = textureObjRef["assets"].GetArray();
+	HyJsonArray framesArrayRef = textureObj["assets"].GetArray();
 	for(uint32 k = 0; k < m_uiNUM_FRAMES; ++k)
 	{
 		HyJsonObj srcFrameObj = framesArrayRef[k].GetObject();

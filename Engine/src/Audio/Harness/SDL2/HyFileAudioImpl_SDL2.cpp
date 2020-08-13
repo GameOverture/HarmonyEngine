@@ -13,9 +13,9 @@
 
 #if defined(HY_USE_SDL2)
 
-HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj &bankObjRef)
+HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj bankObj)
 {
-	HyJsonArray assetsArray = bankObjRef["assets"].GetArray();
+	HyJsonArray assetsArray = bankObj["assets"].GetArray();
 	for(uint32 i = 0; i < assetsArray.Size(); ++i)
 	{
 		HyJsonObj assetObj = assetsArray[i].GetObject();

@@ -53,7 +53,7 @@ class HyEntityData : public IHyNodeData
 	};
 
 public:
-	HyEntityData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef);
+	HyEntityData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HyEntityData();
 };
 

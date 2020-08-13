@@ -51,7 +51,7 @@ public:
 			uint32 uiBankId,
 			uint32 uiIndexInGroup,
 			uint32 uiManifestIndex,
-			HyJsonObj &textureObjRef);
+			HyJsonObj textureObj);
 
 	~HyFileAtlas();
 

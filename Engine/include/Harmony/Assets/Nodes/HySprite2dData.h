@@ -44,7 +44,7 @@ struct HySprite2dFrame
 class HySprite2dData : public IHyNodeData
 {
 public:
-	HySprite2dData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef);
+	HySprite2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HySprite2dData();
 
 	class AnimState
@@ -58,7 +58,7 @@ public:
 		HySprite2dFrame *	m_pFrames;
 		const uint32		m_uiNUMFRAMES;
 
-		AnimState(bool bLoop, bool bReverse, bool bBounce, float fDuration, HyFilesManifest &requiredAtlasIndicesRef, HyJsonArray &frameArray, HyAssets &assetsRef);
+		AnimState(bool bLoop, bool bReverse, bool bBounce, float fDuration, HyFilesManifest &requiredAtlasIndicesRef, HyJsonArray frameArray, HyAssets &assetsRef);
 		~AnimState();
 
 		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex) const;

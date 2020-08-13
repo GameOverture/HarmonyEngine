@@ -13,12 +13,12 @@
 #include "Audio/HyAudioHarness.h"
 #include "Diagnostics/Console/HyConsole.h"
 
-HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj &itemObjRef, HyAssets &assetsRef) :
+HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_AudioRef(assetsRef.GetAudioRef()),
 	m_eCueType(CUETYPE_Unknown)
 {
-	HyJsonArray assetsArray = itemObjRef["assets"].GetArray();
+	HyJsonArray assetsArray = itemObj["assets"].GetArray();
 	for(uint32 i = 0; i < assetsArray.Size(); ++i)
 	{
 		uint32 uiChecksum = assetsArray[i].GetUint();
@@ -28,7 +28,7 @@ HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj &itemObjRef, HyAsse
 		m_SoundChecksumList.push_back(uiChecksum);
 	}
 
-	std::string sType = itemObjRef["type"].GetString();
+	std::string sType = itemObj["type"].GetString();
 	std::transform(sType.begin(), sType.end(), sType.begin(), ::tolower);
 	if(sType == "single")
 		m_eCueType = CUETYPE_Single;

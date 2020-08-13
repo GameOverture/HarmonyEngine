@@ -123,30 +123,28 @@ int32 HyNetworking::TcpRecv(TCPsocket hSocket, void *pData, int iMaxLength)
 	return SDLNet_TCP_Recv(hSocket, pData, iMaxLength);
 #elif defined(HY_PLATFORM_BROWSER)
 	/* Wait timeout milliseconds to receive data */
+	int iTimeout = -1;
 	fd_set sockets;
 	FD_ZERO(&sockets);
 	FD_SET(hSocket, &sockets);
-	timeval t{0, timeout*1000};
-	int ret = select(hSocket + 1, &sockets, nullptr, nullptr, (timeout == -1) ? nullptr : &t);
+	timeval t{0, iTimeout*1000};
+	int ret = select(hSocket + 1, &sockets, nullptr, nullptr, (iTimeout == -1) ? nullptr : &t);
 	if(ret == 0)
-	{
-		/* Timeout */
-		return 0;
-	}
+		return 0; // Timeout occured
 	else if(ret < 0)
 	{
 		HyLogError("HyNetworking::TcpRecv select failed");
 		return 0;
 	}
 
-	ret = recv(hSocket, dest.data(), dest.size(), 0);
+	ret = recv(hSocket, pData, iMaxLength, 0);
 	if(ret < 0)
 	{
 		HyLogError("HyNetworking::TcpRecv recv failed");
 		return 0;
 	}
 
-	return dest.prefix(ret);
+	return ret;
 #else
 	return 0;
 #endif

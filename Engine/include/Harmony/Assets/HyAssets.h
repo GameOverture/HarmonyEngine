@@ -63,7 +63,7 @@ class HyAssets : public IHyThreadClass
 		std::vector<tData>										m_DataList;
 
 	public:
-		void Init(HyJsonObj &subDirObjRef, HyAssets &assetsRef);
+		void Init(HyJsonObj subDirObjRef, HyAssets &assetsRef);
 		const tData *GetData(const std::string &sPrefix, const std::string &sName) const;
 	};
 	Factory<HyAudioData>										m_AudioFactory;

@@ -24,12 +24,12 @@ bool HySprite2dFrame::IsValid() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HySprite2dData::HySprite2dData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef) :
+HySprite2dData::HySprite2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_pAnimStates(nullptr),
 	m_uiNumStates(0)
 {
-	HyJsonArray spriteStateArray = itemDataObjRef["stateArray"].GetArray();
+	HyJsonArray spriteStateArray = itemDataObj["stateArray"].GetArray();
 
 	m_uiNumStates = spriteStateArray.Size();
 	m_pAnimStates = reinterpret_cast<AnimState *>(HY_NEW unsigned char[sizeof(AnimState) * m_uiNumStates]);
@@ -79,7 +79,7 @@ HySprite2dData::AnimState::AnimState(bool bLoop,
 									 bool bBounce,
 									 float fDuration,
 									 HyFilesManifest &requiredAtlasIndicesRef,
-									 HyJsonArray &frameArray,
+									 HyJsonArray frameArray,
 									 HyAssets &assetsRef) :
 	m_bLOOP(bLoop),
 	m_bREVERSE(bReverse),

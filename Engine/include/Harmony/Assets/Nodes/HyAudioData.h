@@ -27,7 +27,7 @@ class HyAudioData : public IHyNodeData
 	std::vector<uint32>		m_SoundChecksumList;
 
 public:
-	HyAudioData(const std::string &sPath, HyJsonObj &itemDataObjRef, HyAssets &assetsRef);
+	HyAudioData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
 
 	uint32 GetSound() const;
