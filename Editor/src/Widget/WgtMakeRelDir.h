@@ -29,7 +29,7 @@ public:
 	explicit WgtMakeRelDir(QWidget *parent = 0);
 	~WgtMakeRelDir();
 
-	void Setup(QString sTitle, QString sDefaultName, QString sAbsProjectPath);
+	void Setup(QString sTitle, QString sDefaultName, QString sAbsProjectPath, QString sDefaultRelativePath = "");
 
 	QString GetRelPath() const;
 	QString GetAbsPath() const;

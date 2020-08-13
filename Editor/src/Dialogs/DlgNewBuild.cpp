@@ -25,8 +25,7 @@ DlgNewBuild::DlgNewBuild(Project &projectRef, QWidget *parent) :
 	ui(new Ui::DlgNewBuild)
 {
 	ui->setupUi(this);
-	ui->wgtBuildDir->Setup("Build", "build", m_ProjectRef.GetDirPath());
-
+	ui->wgtBuildDir->Setup("Build", "desktop", m_ProjectRef.GetDirPath(), "builds");
 	
 	// Acquire a list of valid CMake generators using the --help output
 	QString sCMakeApp = "cmake";
@@ -150,12 +149,14 @@ void DlgNewBuild::on_buttonBox_accepted()
 void DlgNewBuild::on_radDesktop_clicked()
 {
 	ui->stackedWidget->setCurrentIndex(PLAT_Desktop);
+	ui->wgtBuildDir->Setup("Build", "desktop", m_ProjectRef.GetDirPath(), "builds");
 	ErrorCheck();
 }
 
 void DlgNewBuild::on_radBrowser_clicked()
 {
 	ui->stackedWidget->setCurrentIndex(PLAT_Browser);
+	ui->wgtBuildDir->Setup("Build", "browser", m_ProjectRef.GetDirPath(), "builds");
 	ErrorCheck();
 }
 

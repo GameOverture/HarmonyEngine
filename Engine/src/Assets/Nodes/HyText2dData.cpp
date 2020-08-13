@@ -56,7 +56,7 @@ HyText2dData::HyText2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAs
 	if(sPath == HY_GUI_DATAOVERRIDE)
 		m_pAtlas = nullptr;
 	else
-		m_pAtlas = assetsRef.GetAtlas(itemDataObjRef["checksum"].GetUint(), rSubAtlasUVRect);
+		m_pAtlas = assetsRef.GetAtlas(itemDataObj["checksum"].GetUint(), rSubAtlasUVRect);
 #else
 	m_pAtlas = assetsRef.GetAtlas(itemDataObj["checksum"].GetUint(), rSubAtlasUVRect);
 #endif
