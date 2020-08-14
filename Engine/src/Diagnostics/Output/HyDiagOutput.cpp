@@ -121,9 +121,9 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 			HyInput &inputRef = Hy_Input();
 			glm::vec2 ptMousePos = inputRef.GetWorldMousePos();
 			if(inputRef.IsMouseBtnDown(HYMOUSE_BtnLeft))
-				m_txtMouse.TextSet("MOUSE DOWN\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
+				m_txtMouse.TextSet("MOUSE DOWN X:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
 			else
-				m_txtMouse.TextSet("MOUSE UP\nX:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
+				m_txtMouse.TextSet("MOUSE UP X:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
 
 			m_txtMouse.pos.Y(fOffsetY);
 			fOffsetY -= HY_SYSTEM_FONT_SIZE;

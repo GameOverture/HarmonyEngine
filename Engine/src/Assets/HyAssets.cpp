@@ -344,22 +344,22 @@ void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 	SetAsUnloaded(pLoadable);
 }
 
-void HyAssets::SetEntityLoaded(IHyLoadable *pLoadableEntity)
+void HyAssets::SetEntityLoaded(IHyLoadable *pEntity)
 {
-	if(pLoadableEntity == nullptr)
+	if(pEntity == nullptr)
 		return;
 
-	HyAssert(pLoadableEntity->_LoadableGetType() == HYTYPE_Entity, "HyAssets::SetEntityLoaded was passed a node that wasn't an entity");
+	HyAssert(pEntity->_LoadableGetType() == HYTYPE_Entity, "HyAssets::SetEntityLoaded was passed a node that wasn't an entity");
 
-	if(pLoadableEntity->IsLoaded())
+	if(pEntity->IsLoaded())
 	{
-		if(pLoadableEntity->IsChildrenLoaded() == false)
-			SetAsUnloaded(pLoadableEntity);
+		if(pEntity->IsChildrenLoaded() == false)
+			SetAsUnloaded(pEntity);
 	}
 	else
 	{
-		if(pLoadableEntity->IsChildrenLoaded())
-			SetAsLoaded(pLoadableEntity);
+		if(pEntity->IsChildrenLoaded())
+			SetAsLoaded(pEntity);
 	}
 }
 

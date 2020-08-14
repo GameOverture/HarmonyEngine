@@ -14,6 +14,10 @@
 #include "Assets/Nodes/HyText2dData.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
 
+#ifdef HY_DEBUG
+	#define HY_USE_TEXT_DEBUG_BOXES
+#endif
+
 class HyText2d : public IHyInstance2d
 {
 protected:
@@ -49,7 +53,7 @@ protected:
 	uint32				m_uiBoxAttributes;
 	glm::vec2			m_vBoxDimensions;
 	float				m_fScaleBoxModifier;
-#ifdef HY_DEBUG
+#ifdef HY_USE_TEXT_DEBUG_BOXES
 	HyPrimitive2d		m_DebugBox;
 #endif
 

@@ -14,7 +14,12 @@
 #include "Renderer/IHyRenderer.h"
 
 #define HY_NUM_PBO 10
-#define HyErrorCheck_OpenGL(funcLoc, funcName) { GLenum eError = glGetError(); HyAssert(eError == GL_NO_ERROR, "HyOpenGL error in " << funcLoc << " on function " << funcName << ": " << eError); }
+
+#ifndef HY_PLATFORM_BROWSER
+	#define HyErrorCheck_OpenGL(funcLoc, funcName) { GLenum eError = glGetError(); HyAssert(eError == GL_NO_ERROR, "HyOpenGL error in " << funcLoc << " on function " << funcName << ": " << eError); }
+#else
+	#define HyErrorCheck_OpenGL(funcLoc, funcName) // Avoid GPU-CPU Sync Points with Emscripten
+#endif
 
 class HyOpenGL : public IHyRenderer
 {

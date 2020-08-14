@@ -24,7 +24,7 @@ HyText2d::HyText2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyE
 	m_uiBoxAttributes(0),
 	m_vBoxDimensions(0.0f, 0.0f),
 	m_fScaleBoxModifier(1.0f),
-#ifdef HY_DEBUG
+#ifdef HY_USE_TEXT_DEBUG_BOXES
 	m_DebugBox(nullptr),
 #endif
 	m_eAlignment(HYALIGN_Left),
@@ -326,7 +326,7 @@ void HyText2d::SetAsLine()
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
-#ifdef HY_DEBUG
+#ifdef HY_USE_TEXT_DEBUG_BOXES
 	m_DebugBox.SetAsNothing();
 #endif
 
@@ -348,7 +348,7 @@ void HyText2d::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 
 	m_uiBoxAttributes = iFlags;
 
-#ifdef HY_DEBUG
+#ifdef HY_USE_TEXT_DEBUG_BOXES
 	glm::vec2 ptVerts[4] = { glm::vec2(0.0f, -100.0f), glm::vec2(0.0f, 0.0f), glm::vec2(m_vBoxDimensions.x, 0.0f), glm::vec2(m_vBoxDimensions.x, -100.0f) };
 	m_DebugBox.SetAsLineChain(ptVerts, 4);
 	m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
@@ -373,7 +373,7 @@ void HyText2d::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically
 
 	m_uiBoxAttributes = iFlags;
 
-#ifdef HY_DEBUG
+#ifdef HY_USE_TEXT_DEBUG_BOXES
 	m_DebugBox.SetAsBox(fWidth, fHeight);
 	m_DebugBox.SetWireframe(true);
 	m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
@@ -389,7 +389,7 @@ void HyText2d::SetAsVertical()
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
-#ifdef HY_DEBUG
+#ifdef HY_USE_TEXT_DEBUG_BOXES
 	m_DebugBox.SetAsNothing();
 #endif
 
@@ -465,7 +465,7 @@ void HyText2d::SetAsVertical()
 
 /*virtual*/ void HyText2d::OnLoadedUpdate() /*override*/
 {
-#ifdef HY_DEBUG
+#ifdef HY_USE_TEXT_DEBUG_BOXES
 	glm::vec3 vScale(1.0f);
 	glm::quat quatRot;
 	glm::vec3 ptTranslation;

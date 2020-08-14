@@ -31,7 +31,7 @@ class HyShaderUniforms
 		uint8 *GetData()								{ return m_pData + sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH; }
 		const uint8 *GetData() const					{ return m_pData + sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH; }
 
-		void SetVariableType(HyShaderVariable eType)	{ *reinterpret_cast<HyShaderVariable *>(m_pData) = eType; }
+		void SetVariableType(HyShaderVariable eType)	{ *reinterpret_cast<uint32 *>(m_pData) = static_cast<uint32>(eType); }
 		void SetName(const char *szName)
 		{ 
 			HyAssert(strlen(szName) < HY_SHADER_UNIFORM_NAME_LENGTH, "UniformBuffer::SetName() took a name >= to 'HY_SHADER_UNIFORM_NAME_LENGTH'");
