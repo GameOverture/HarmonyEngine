@@ -190,5 +190,6 @@
         <file>icons16x16/items/Build-Pending.png</file>
         <file>icons16x16/items/Build-Settings.png</file>
         <file>icons16x16/items/Build-Warning.png</file>
+        <file>icons16x16/Tools-ImportTileSheet.png</file>
     </qresource>
 </RCC>

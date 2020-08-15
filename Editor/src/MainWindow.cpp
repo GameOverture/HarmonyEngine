@@ -19,6 +19,7 @@
 #include "DlgNewBuild.h"
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
+#include "DlgImportTileSheet.h"
 #include "ExplorerWidget.h"
 #include "GltfWidget.h"
 #include "AudioAssetsWidget.h"
@@ -80,6 +81,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionRemove);
 	ui->explorer->addAction(ui->actionRename);
 	ui->explorer->addAction(ui->actionNewBuild);
+	ui->explorer->addAction(ui->actionImportTileSheet);
 	ui->explorer->addAction(ui->actionActivateProject);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -720,6 +722,12 @@ void MainWindow::on_actionConnect_triggered()
 //        HYLOG("TCP server initialized", LOGTYPE_Normal);
 
 	//m_pDebugConnection->Connect();
+}
+
+void MainWindow::on_actionImportTileSheet_triggered()
+{
+	DlgImportTileSheet dlgImportTileSheet(*Harmony::GetProject(), this);
+	dlgImportTileSheet.exec();
 }
 
 void MainWindow::on_actionAbout_triggered()

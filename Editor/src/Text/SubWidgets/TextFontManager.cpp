@@ -398,9 +398,12 @@ void TextFontManager::CleanupLayers(const QList<IStateData *> &statesListRef)
 void TextFontManager::GenerateOptimizedAtlas()
 {
 	// Get pristine 'm_pPreviewAtlas' and calculate approx 'm_uiPreviewAtlasDimension'
-	RegenFontArray();
-	m_uiPreviewAtlasGrowSize = 0;
-	ClearAndEmbiggenAtlas();
+	if(m_pPreviewAtlas)
+	{
+		RegenFontArray();
+		m_uiPreviewAtlasGrowSize = 0;
+		ClearAndEmbiggenAtlas();
+	}
 	InitAtlas();
 	m_uiPreviewAtlasDimension = sqrt(static_cast<double>(m_pPreviewAtlas->used));
 

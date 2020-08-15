@@ -36,28 +36,31 @@ if(Qt5_DIR)
 		src/Audio/AudioAssetsWidget.ui
 		src/Audio/AudioWidget.ui
 		src/Dialogs/DlgAtlasGroupSettings.cpp
-		src/Dialogs/DlgColorPicker.cpp
-		src/Dialogs/DlgInputName.cpp
-		src/Dialogs/DlgNewBuild.cpp
-		src/Dialogs/DlgNewItem.cpp
-		src/Dialogs/DlgNewProject.cpp
-		src/Dialogs/DlgProjectSettings.cpp
-		src/Dialogs/DlgSetEngineLocation.cpp
 		src/Dialogs/DlgAtlasGroupSettings.h
-		src/Dialogs/DlgColorPicker.h
-		src/Dialogs/DlgInputName.h
-		src/Dialogs/DlgNewBuild.h
-		src/Dialogs/DlgNewItem.h
-		src/Dialogs/DlgNewProject.h
-		src/Dialogs/DlgProjectSettings.h
-		src/Dialogs/DlgSetEngineLocation.h
 		src/Dialogs/DlgAtlasGroupSettings.ui
+		src/Dialogs/DlgColorPicker.cpp
+		src/Dialogs/DlgColorPicker.h
 		src/Dialogs/DlgColorPicker.ui
+		src/Dialogs/DlgImportTileSheet.cpp
+		src/Dialogs/DlgImportTileSheet.h
+		src/Dialogs/DlgImportTileSheet.ui
+		src/Dialogs/DlgInputName.cpp
+		src/Dialogs/DlgInputName.h
 		src/Dialogs/DlgInputName.ui
+		src/Dialogs/DlgNewBuild.cpp
+		src/Dialogs/DlgNewBuild.h
 		src/Dialogs/DlgNewBuild.ui
+		src/Dialogs/DlgNewItem.cpp
+		src/Dialogs/DlgNewItem.h
 		src/Dialogs/DlgNewItem.ui
+		src/Dialogs/DlgNewProject.cpp
+		src/Dialogs/DlgNewProject.h
 		src/Dialogs/DlgNewProject.ui
+		src/Dialogs/DlgProjectSettings.cpp
+		src/Dialogs/DlgProjectSettings.h
 		src/Dialogs/DlgProjectSettings.ui
+		src/Dialogs/DlgSetEngineLocation.cpp
+		src/Dialogs/DlgSetEngineLocation.h
 		src/Dialogs/DlgSetEngineLocation.ui
 		src/Entity/EntityDraw.cpp
 		src/Entity/EntityModel.cpp

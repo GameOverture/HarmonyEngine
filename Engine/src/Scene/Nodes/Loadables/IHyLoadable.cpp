@@ -134,6 +134,11 @@ bool IHyLoadable::IsLoaded() const
 
 /*virtual*/ void IHyLoadable::Unload()
 {
+#if defined(HY_PLATFORM_GUI) // Fix order of deletions when shutting down Editor, else keep this
+	if(sm_pHyAssets == nullptr)
+		return;
+#endif
+
 	HyAssert(sm_pHyAssets, "IHyLoadable::Unload was invoked before engine has been initialized");
 	sm_pHyAssets->RemoveNodeData(this);
 }
