@@ -126,6 +126,7 @@ public:
 	void SetColors(TextLayerHandle hLayer, const QColor &topColor, const QColor &botColor);
 
 	void RegenAtlas();
+	void CleanupLayers(const QList<IStateData *> &statesListRef);
 	void GenerateOptimizedAtlas();
 	unsigned char *GetAtlasInfo(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut);
 

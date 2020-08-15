@@ -28,6 +28,17 @@ bool TextLayersModel::IsEmpty() const
 	return m_LayerList.empty();
 }
 
+bool TextLayersModel::HasHandle(TextLayerHandle hHandle) const
+{
+	for(int i = 0; i < m_LayerList.size(); ++i)
+	{
+		if(hHandle == m_LayerList[i])
+			return true;
+	}
+
+	return false;
+}
+
 TextFontManager &TextLayersModel::GetFontManager()
 {
 	return m_FontManagerRef;
@@ -122,6 +133,8 @@ void TextLayersModel::RemoveLayer(TextLayerHandle hHandle)
 			endRemoveRows();
 		}
 	}
+
+	m_FontManagerRef.RegenAtlas();
 }
 
 void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
@@ -136,6 +149,8 @@ void TextLayersModel::ReAddLayer(TextLayerHandle hHandle)
 			endInsertRows();
 		}
 	}
+
+	m_FontManagerRef.RegenAtlas();
 }
 
 void TextLayersModel::MoveRowUp(int iIndex)

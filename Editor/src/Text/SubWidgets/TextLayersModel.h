@@ -44,6 +44,7 @@ public:
 	virtual ~TextLayersModel();
 
 	bool IsEmpty() const;
+	bool HasHandle(TextLayerHandle hHandle) const;
 
 	TextFontManager &GetFontManager();
 	const TextFontManager &GetFontManager() const;

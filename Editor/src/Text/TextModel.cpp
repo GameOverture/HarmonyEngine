@@ -91,6 +91,8 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 /*virtual*/ bool TextModel::OnPrepSave() /*override*/
 {
+	m_FontManager.CleanupLayers(m_StateList);
+
 	m_FontManager.GenerateOptimizedAtlas();
 	QSize atlasDimensionsOut; uint uiAtlasPixelDataSizeOut;
 	unsigned char *pPixelData = m_FontManager.GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);

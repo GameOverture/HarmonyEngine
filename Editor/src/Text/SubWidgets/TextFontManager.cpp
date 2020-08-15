@@ -362,6 +362,8 @@ void TextFontManager::SetColors(TextLayerHandle hLayer, const QColor &topColor, 
 
 void TextFontManager::RegenAtlas()
 {
+	RegenFontArray();
+
 	m_uiPreviewAtlasGrowSize = 0;
 	ClearAndEmbiggenAtlas();
 
@@ -371,20 +373,46 @@ void TextFontManager::RegenAtlas()
 	RegenFontArray();
 }
 
+void TextFontManager::CleanupLayers(const QList<IStateData *> &statesListRef)
+{
+	for(auto iter = m_LayerMap.begin(); iter != m_LayerMap.end();)
+	{
+		bool bFound = false;
+		for(int i = 0; i < statesListRef.size(); ++i)
+		{
+			TextLayersModel &layerModelRef = static_cast<TextStateData *>(statesListRef[i])->GetLayersModel();
+			if(layerModelRef.HasHandle(iter.value()->m_hUNIQUE_ID))
+			{
+				bFound = true;
+				break;
+			}
+		}
+
+		if(bFound == false)
+			iter = m_LayerMap.erase(iter);
+		else
+			++iter;
+	}
+}
+
 void TextFontManager::GenerateOptimizedAtlas()
 {
+	// Get pristine 'm_pPreviewAtlas' and calculate approx 'm_uiPreviewAtlasDimension'
+	RegenFontArray();
+	m_uiPreviewAtlasGrowSize = 0;
+	ClearAndEmbiggenAtlas();
 	InitAtlas();
-	{
-		m_uiPreviewAtlasGrowSize = FONTMANAGER_OptimizedGrowSize;
-		m_uiPreviewAtlasDimension = sqrt(static_cast<double>(m_pPreviewAtlas->used));
-		ClearAndEmbiggenAtlas();
-	}
+	m_uiPreviewAtlasDimension = sqrt(static_cast<double>(m_pPreviewAtlas->used));
+
+	// Now regen with approx dimensions
+	m_uiPreviewAtlasGrowSize = 0;
+	ClearAndEmbiggenAtlas();
+	m_uiPreviewAtlasGrowSize = FONTMANAGER_OptimizedGrowSize;
 	InitAtlas();
 
+	// Set control variables back to their defaults
 	m_bPreviewAtlasPixelDataInitialized = false;
 	m_uiPreviewAtlasGrowSize = FONTMANAGER_PreviewGrowSize;
-
-	RegenFontArray();
 }
 
 unsigned char *TextFontManager::GetAtlasInfo(uint &uiAtlasPixelDataSizeOut, QSize &atlasDimensionsOut)

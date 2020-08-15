@@ -279,7 +279,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
 			if(IsImageValid(pFrame->GetSize().width(), pFrame->GetSize().height(), newPackerSettings) == false)
 			{
-				HyGuiLog("Could not save atlas bank settings because image '" % assetList[i]->GetName() % "' will no longer fit on the atlas", LOGTYPE_Warning);
+				HyGuiLog("Could not save atlas bank settings because image '" % assetList[i]->GetName() % "' would no longer fit on the atlas", LOGTYPE_Warning);
 				bPackIsValid = false;
 				break;
 			}
