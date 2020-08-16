@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "AtlasModel.h"
+#include "AtlasDraw.h"
 #include "Project.h"
 #include "AtlasRepackThread.h"
 #include "MainWindow.h"
@@ -309,15 +310,10 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	return QStringList() << ".png";
 }
 
-///*virtual*/ void AtlasModel::OnCreateBank(BankData &newBankRef) /*override*/
-//{
-//	m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(newBankRef.GetId()));
-//}
-
-///*virtual*/ void AtlasModel::OnDeleteBank(BankData &bankToBeDeleted) /*override*/
-//{
-//	m_DataDir.rmdir(HyGlobal::MakeFileNameFromCounter(bankToBeDeleted.GetId()));
-//}
+/*virtual*/ void AtlasModel::OnAllocateDraw(IManagerDraw *&pDrawOut) /*override*/
+{
+	pDrawOut = new AtlasDraw(*this);
+}
 
 /*virtual*/ AssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {

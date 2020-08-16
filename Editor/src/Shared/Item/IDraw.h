@@ -19,7 +19,7 @@ class ProjectItemData;
 class IDraw : public HyEntity2d
 {
 protected:
-	ProjectItemData *		m_pProjItem;
+	ProjectItemData *	m_pProjItem;
 	HyCamera2d *		m_pCamera;
 
 	bool				m_bPanCameraKeyDown;
@@ -45,6 +45,8 @@ public:
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent);
 	virtual void OnMouseWheelEvent(QWheelEvent *pEvent);
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent);
+
+	virtual void OnDrawUpdate() { }
 
 protected:
 	virtual void OnApplyJsonData(HyJsonObj itemDataObj) { }

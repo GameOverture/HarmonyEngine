@@ -18,8 +18,7 @@
 
 #define DISPLAYORDER_AtlasSelectedFrames 1000
 
-AtlasDraw::AtlasDraw(IManagerModel *pAtlasManagerModel) :
-	IDraw(nullptr, FileDataPair()),
+AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
 	m_bIsMouseOver(false),
 	m_HoverBackground(this),
 	m_HoverStrokeInner(nullptr),
@@ -49,13 +48,10 @@ AtlasDraw::AtlasDraw(IManagerModel *pAtlasManagerModel) :
 	m_HoverStrokeOutter.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeOutter);
 	m_HoverStrokeOutter.SetVisible(false);
 	m_HoverStrokeOutter.Load();
-
-	if(pAtlasManagerModel == nullptr)
-		return;
 	
-	for(int i = 0; i < pAtlasManagerModel->GetNumBanks(); ++i)
+	for(int i = 0; i < atlasManagerModelRef.GetNumBanks(); ++i)
 	{
-		QList<AssetItemData *> assetList = pAtlasManagerModel->GetBankAssets(i);
+		QList<AssetItemData *> assetList = atlasManagerModelRef.GetBankAssets(i);
 		for(int j = 0; j < assetList.size(); ++j)
 		{
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[j]);
@@ -81,7 +77,7 @@ AtlasDraw::AtlasDraw(IManagerModel *pAtlasManagerModel) :
 
 }
 
-void AtlasDraw::SetHover(TreeModelItemData *pHoverItem)
+/*virtual*/ void AtlasDraw::SetHover(TreeModelItemData *pHoverItem) /*override*/
 {
 	HyTexturedQuad2d *pNewHoverTexQuad = nullptr;
 	if(pHoverItem && pHoverItem->GetType() != ITEM_Filter)
@@ -97,7 +93,7 @@ void AtlasDraw::SetHover(TreeModelItemData *pHoverItem)
 	m_pHoverTexQuad = pNewHoverTexQuad;
 }
 
-void AtlasDraw::SetSelected(QList<AssetItemData *> selectedList)
+/*virtual*/ void AtlasDraw::SetSelected(QList<AssetItemData *> selectedList) /*override*/
 {
 	for(int i = 0; i < m_SelectedTexQuadList.size(); ++i)
 		m_SelectedTexQuadList[i]->SetVisible(false);
@@ -111,7 +107,7 @@ void AtlasDraw::SetSelected(QList<AssetItemData *> selectedList)
 	}
 }
 
-void AtlasDraw::DrawUpdate()
+/*virtual*/ void AtlasDraw::OnDrawUpdate() /*override*/
 {
 	if(m_bIsMouseOver == false)
 		return;

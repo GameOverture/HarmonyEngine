@@ -122,6 +122,8 @@ if(Qt5_DIR)
 		src/Shared/Manager/BanksModel.cpp
 		src/Shared/Manager/IAssetItemData.cpp
 		src/Shared/Manager/IAssetItemData.h
+		src/Shared/Manager/IManagerDraw.cpp
+		src/Shared/Manager/IManagerDraw.h
 		src/Shared/Manager/IManagerModel.cpp
 		src/Shared/Manager/IManagerModel.h
 		src/Shared/Manager/ManagerWidget.cpp

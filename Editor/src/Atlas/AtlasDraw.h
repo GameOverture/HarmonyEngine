@@ -10,10 +10,10 @@
 #ifndef ATLASDRAW_H
 #define ATLASDRAW_H
 
-#include "IDraw.h"
-#include "IManagerModel.h"
+#include "IManagerDraw.h"
+#include "AtlasModel.h"
 
-class AtlasDraw : public IDraw
+class AtlasDraw : public IManagerDraw
 {
 	bool									m_bIsMouseOver;
 	
@@ -35,17 +35,17 @@ class AtlasDraw : public IDraw
 	HyTexturedQuad2d *						m_pHoverTexQuad;
 
 public:
-	AtlasDraw(IManagerModel *pAtlasManagerModel);
+	AtlasDraw(AtlasModel &atlasManagerModelRef);
 	virtual ~AtlasDraw();
 
-	void SetHover(TreeModelItemData *pHoverItem);
-	void SetSelected(QList<AssetItemData *> selectedList);
-
-	void DrawUpdate();
+	virtual void SetHover(TreeModelItemData *pHoverItem) override;
+	virtual void SetSelected(QList<AssetItemData *> selectedList) override;
 
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
+
+	virtual void OnDrawUpdate() override;
 };
 
 #endif // ATLASDRAW_H

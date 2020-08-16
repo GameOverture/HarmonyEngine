@@ -17,6 +17,8 @@
 
 #include <QUuid>
 
+class IManagerDraw;
+
 class IManagerModel : public ITreeModel
 {
 	Q_OBJECT
@@ -99,13 +101,14 @@ public:
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;
 	virtual QStringList GetSupportedFileExtList() = 0;
 
+	// Draw occur when the mouse hovers over the manager widget. ManagerWidget holds the ptr to IManagerDraw, but IManagerModel init/updates the actual concrete IDraw object
+	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) = 0;
+
 protected:
 	void RegisterAsset(AssetItemData *pAsset);
 	void DeleteAsset(AssetItemData *pAsset);
 	void MoveAsset(AssetItemData *pAsset, quint32 uiNewBankId);
 
-	//virtual void OnCreateBank(BankData &newBankRef) = 0;
-	//virtual void OnDeleteBank(BankData &bankToBeDeleted) = 0;
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
 	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset

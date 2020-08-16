@@ -53,6 +53,10 @@ AudioManagerModel::AudioManagerModel(Project &projRef) :
 	return QStringList() << ".wav";
 }
 
+/*virtual*/ void AudioManagerModel::OnAllocateDraw(IManagerDraw *&pDrawOut) /*override*/
+{
+}
+
 void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 {
 

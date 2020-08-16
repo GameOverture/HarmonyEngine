@@ -29,6 +29,8 @@ public:
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() override;
 
+	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) override;
+
 protected:
 	void Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet);
 

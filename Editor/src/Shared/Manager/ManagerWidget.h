@@ -10,7 +10,7 @@
 #ifndef ManagerWidget_H
 #define ManagerWidget_H
 
-#include "AtlasDraw.h"
+#include "IManagerDraw.h"
 
 #include <QSortFilterProxyModel>
 #include <QWidget>
@@ -21,6 +21,8 @@ class ManagerWidget;
 }
 
 class IManagerModel;
+class AssetItemData;
+class TreeModelItemData;
 
 class ManagerProxyModel : public QSortFilterProxyModel
 {
@@ -29,22 +31,12 @@ public:
 	virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };
 
-//class AssetTreeView : public QTreeView
-//{
-//public:
-//	AssetTreeView(QWidget *pParent = nullptr) :
-//		QTreeView(pParent)
-//	{ }
-//protected:
-//	virtual void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
-//};
-
 class ManagerWidget : public QWidget
 {
 	Q_OBJECT
 
 	IManagerModel *				m_pModel;
-	AtlasDraw					m_Draw;
+	IManagerDraw *				m_pDraw;
 
 public:
 	explicit ManagerWidget(QWidget *pParent = nullptr);

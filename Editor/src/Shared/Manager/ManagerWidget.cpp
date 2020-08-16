@@ -59,7 +59,7 @@ ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::ManagerWidget),
 	m_pModel(nullptr),
-	m_Draw(nullptr)
+	m_pDraw(nullptr)
 {
 	ui->setupUi(this);
 
@@ -71,9 +71,11 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	QWidget(pParent),
 	ui(new Ui::ManagerWidget),
 	m_pModel(pModel),
-	m_Draw(pModel)
+	m_pDraw(nullptr)
 {
 	ui->setupUi(this);
+
+	m_pModel->OnAllocateDraw(m_pDraw);
 
 	ManagerProxyModel *pProxyModel = new ManagerProxyModel(this);
 	pProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -151,8 +153,11 @@ void ManagerWidget::DrawUpdate()
 	//QPoint pos(mapFromGlobal(QCursor::pos()).x(), mapFromGlobal(QCursor::pos()).y());
 	//QModelIndex index = ui->assetTree->indexAt(pos);
 
-	//m_Draw.SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
-	m_Draw.DrawUpdate();
+	if(m_pDraw)
+	{
+		//m_Draw.SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
+		m_pDraw->OnDrawUpdate();
+	}
 }
 
 void ManagerWidget::RefreshInfo()
@@ -188,13 +193,15 @@ void ManagerWidget::RefreshInfo()
 
 /*virtual*/ void ManagerWidget::enterEvent(QEvent *pEvent) /*override*/
 {
-	m_Draw.Show();
+	if(m_pDraw)
+		m_pDraw->Show();
 	QWidget::enterEvent(pEvent);
 }
 
 /*virtual*/ void ManagerWidget::leaveEvent(QEvent *pEvent) /*override*/
 {
-	m_Draw.Hide();
+	if(m_pDraw)
+		m_pDraw->Hide();
 	QWidget::leaveEvent(pEvent);
 }
 
@@ -300,7 +307,8 @@ void ManagerWidget::on_assetTree_clicked()
 	QList<TreeModelItemData *> selectedFiltersList;
 	GetSelectedItems(selectedAssetsList, selectedFiltersList);
 
-	m_Draw.SetSelected(selectedAssetsList);
+	if(m_pDraw)
+		m_pDraw->SetSelected(selectedAssetsList);
 
 	int iNumSelected = selectedAssetsList.count();
 	ui->actionRename->setEnabled(iNumSelected == 1);
