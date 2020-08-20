@@ -349,7 +349,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 
 	QClipboard *pClipboard = QApplication::clipboard();
 	const QMimeData *pMimeData = pClipboard->mimeData();
-	ui->actionPasteItem->setEnabled(pMimeData && pMimeData->hasFormat(HYGUI_MIMETYPE));
+	ui->actionPasteItem->setEnabled(pMimeData && pMimeData->hasFormat(HYGUI_MIMETYPE_ITEM));
 	
 	if(Harmony::GetProject() == nullptr && bValidItem)
 		Harmony::SetProject(&pCurSelected->GetProject());
@@ -467,11 +467,11 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 	QClipboard *pClipboard = QApplication::clipboard();
 	const QMimeData *pMimeData = pClipboard->mimeData();
 
-	if(pMimeData->hasFormat(HYGUI_MIMETYPE))
+	if(pMimeData->hasFormat(HYGUI_MIMETYPE_ITEM))
 	{
 		QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
 		if(curIndex.isValid())
-			GetExplorerModel()->PasteItemSrc(pMimeData->data(HYGUI_MIMETYPE), curIndex);
+			GetExplorerModel()->PasteItemSrc(pMimeData->data(HYGUI_MIMETYPE_ITEM), curIndex);
 	}
 }
 

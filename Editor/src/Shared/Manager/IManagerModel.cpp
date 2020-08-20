@@ -849,7 +849,22 @@ void IManagerModel::SaveRuntime()
 	if(indexRef.isValid() == false || pItem == nullptr)
 		return QAbstractItemModel::flags(indexRef);
 
-	return QAbstractItemModel::flags(indexRef);// | Qt::ItemIsDropEnabled | (pItem->GetType() == ITEM_Project ? 0 : Qt::ItemIsDragEnabled);
+	return QAbstractItemModel::flags(indexRef) | Qt::ItemIsDropEnabled | Qt::ItemIsDragEnabled;
+}
+
+/*virtual*/ Qt::DropActions IManagerModel::supportedDragActions() const /*override*/
+{
+	return Qt::MoveAction | Qt::LinkAction;
+}
+
+/*virtual*/ Qt::DropActions IManagerModel::supportedDropActions() const /*override*/
+{
+	return Qt::MoveAction;
+}
+
+/*virtual*/ bool IManagerModel::dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) /*override*/
+{
+	return false;
 }
 
 void IManagerModel::RegisterAsset(AssetItemData *pAsset)

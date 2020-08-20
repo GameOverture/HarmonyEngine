@@ -57,13 +57,13 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 
 	// Serialize the item info into json source
 	m_Data = JsonValueToSrc(QJsonValue(clipboardArray));
-	setData(HYGUI_MIMETYPE, m_Data);
+	setData(HYGUI_MIMETYPE_ITEM, m_Data);
 }
 
 ProjectItemMimeData::ProjectItemMimeData(const QVariant &data) :
 	m_Data(data.value<QByteArray>())
 {
-	setData(HYGUI_MIMETYPE, m_Data);
+	setData(HYGUI_MIMETYPE_ITEM, m_Data);
 }
 
 /*virtual*/ ProjectItemMimeData::~ProjectItemMimeData()
@@ -71,7 +71,7 @@ ProjectItemMimeData::ProjectItemMimeData(const QVariant &data) :
 
 /*virtual*/ bool ProjectItemMimeData::hasFormat(const QString &sMimeType) const /*override*/
 {
-	if(HYGUI_MIMETYPE == sMimeType.toLower() || "application/json" == sMimeType.toLower())
+	if(HYGUI_MIMETYPE_ITEM == sMimeType.toLower() || "application/json" == sMimeType.toLower())
 		return true;
 
 	return false;
@@ -80,7 +80,7 @@ ProjectItemMimeData::ProjectItemMimeData(const QVariant &data) :
 /*virtual*/ QStringList ProjectItemMimeData::formats() const /*override*/
 {
 	QStringList sFormatList;
-	sFormatList << HYGUI_MIMETYPE;
+	sFormatList << HYGUI_MIMETYPE_ITEM;
 	sFormatList << "application/json";
 
 	return sFormatList;
@@ -88,7 +88,7 @@ ProjectItemMimeData::ProjectItemMimeData(const QVariant &data) :
 
 /*virtual*/ QVariant ProjectItemMimeData::retrieveData(const QString &mimeType, QVariant::Type type) const /*override*/
 {
-	if((mimeType.toLower() == HYGUI_MIMETYPE || mimeType.toLower() == "application/json") &&
+	if((mimeType.toLower() == HYGUI_MIMETYPE_ITEM || mimeType.toLower() == "application/json") &&
 		(type == QVariant::UserType || type == QVariant::ByteArray || type == QVariant::String))
 	{
 		QByteArray dataSrc = QByteArray(m_Data);

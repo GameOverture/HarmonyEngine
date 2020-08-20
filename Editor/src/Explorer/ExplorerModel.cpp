@@ -382,12 +382,12 @@ ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid)
 
 /*virtual*/ QStringList ExplorerModel::mimeTypes() const /*override*/
 {
-	return QStringList() << HYGUI_MIMETYPE;
+	return QStringList() << HYGUI_MIMETYPE_ITEM;
 }
 
 /*virtual*/ bool ExplorerModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
 {
-	if(pData->hasFormat(HYGUI_MIMETYPE) == false)
+	if(pData->hasFormat(HYGUI_MIMETYPE_ITEM) == false)
 		return false;
 
 	TreeModelItem *pParentTreeItem = FindPrefixTreeItem(parentRef);
@@ -403,7 +403,7 @@ ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid)
 		return true;
 	
 	if(eAction == Qt::MoveAction)
-		return PasteItemSrc(pData->data(HYGUI_MIMETYPE), parentRef);
+		return PasteItemSrc(pData->data(HYGUI_MIMETYPE_ITEM), parentRef);
 
 	HyGuiLog("dropMimeData isn't MOVEACTION", LOGTYPE_Normal);
 	return false;

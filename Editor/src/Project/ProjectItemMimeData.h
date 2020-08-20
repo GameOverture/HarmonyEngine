@@ -12,7 +12,7 @@
 
 #include <QMimeData>
 
-#define HYGUI_MIMETYPE "application/x-harmony"
+#define HYGUI_MIMETYPE_ITEM "application/x-harmonyitem"
 
 class ExplorerItemData;
 class ProjectItemData;

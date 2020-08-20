@@ -31,6 +31,17 @@ public:
 	virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };
 
+class ManagerTreeView : public QTreeView
+{
+	Q_OBJECT
+
+public:
+	ManagerTreeView(QWidget *pParent = nullptr);
+
+protected:
+	virtual void startDrag(Qt::DropActions supportedActions) override;
+};
+
 class ManagerWidget : public QWidget
 {
 	Q_OBJECT

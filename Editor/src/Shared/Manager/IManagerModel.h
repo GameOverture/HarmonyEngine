@@ -17,6 +17,8 @@
 
 #include <QUuid>
 
+#define HYGUI_MIMETYPE_ASSET "application/x-harmonyasset"
+
 class IManagerDraw;
 
 class IManagerModel : public ITreeModel
@@ -96,6 +98,12 @@ public:
 
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
+	virtual Qt::DropActions supportedDragActions() const override;
+	virtual Qt::DropActions supportedDropActions() const override;
+	virtual QMimeData *mimeData(const QModelIndexList &indexes) const = 0;
+	virtual QStringList mimeTypes() const = 0;
+	virtual bool canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const = 0;
+	virtual bool dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) override;
 
 	virtual QString OnBankInfo(uint uiBankIndex) = 0;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;

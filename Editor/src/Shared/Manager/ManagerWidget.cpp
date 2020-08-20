@@ -50,10 +50,16 @@ ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 	return QString::localeAwareCompare(pLeftItem->GetText(), pRightItem->GetText()) < 0;
 }
 
-///*virtual*/ void AssetTreeView::currentChanged(const QModelIndex &current, const QModelIndex &previous) /*override*/
-//{
-//	static_cast<ManagerWidget *>(parent())->OnAssetTreeCurrentChanged(current, previous);
-//}
+ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
+	QTreeView(pParent)
+{ }
+
+/*virtual*/ void ManagerTreeView::startDrag(Qt::DropActions supportedActions) /*override*/
+{
+	QModelIndexList indexes = selectedIndexes();
+	if(indexes.empty())
+		return;
+}
 
 ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
@@ -150,12 +156,12 @@ quint32 ManagerWidget::GetSelectedBankId()
 
 void ManagerWidget::DrawUpdate()
 {
-	//QPoint pos(mapFromGlobal(QCursor::pos()).x(), mapFromGlobal(QCursor::pos()).y());
-	//QModelIndex index = ui->assetTree->indexAt(pos);
-
 	if(m_pDraw)
 	{
-		//m_Draw.SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
+		QPoint pos(mapFromGlobal(QCursor::pos()).x(), mapFromGlobal(QCursor::pos()).y());
+		QModelIndex index = ui->assetTree->indexAt(pos);
+
+		m_pDraw->SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
 		m_pDraw->OnDrawUpdate();
 	}
 }

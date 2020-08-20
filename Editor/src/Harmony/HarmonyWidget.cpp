@@ -138,7 +138,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
 	ProjectItemData *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItemData *>();
 
-	if(pCurOpenTabItem && pCurOpenTabItem->GetType() == ITEM_Entity && pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE))
+	if(pCurOpenTabItem && pCurOpenTabItem->GetType() == ITEM_Entity && pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE_ITEM))
 	{
 		EntityNodeTreeModel &childTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
 
@@ -160,13 +160,13 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	ProjectItemData *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItemData *>();
 
 	if(pCurOpenTabItem &&
-	   pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE) &&
+	   pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE_ITEM) &&
 	   static_cast<ProjectItemData *>(pEvent->source()) != pCurOpenTabItem &&
 	   pCurOpenTabItem->GetType() == ITEM_Entity)
 	{
 		QList<QVariant> validItemList;
 		// Parse mime data source for project item array
-		QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HYGUI_MIMETYPE));
+		QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HYGUI_MIMETYPE_ITEM));
 		QJsonArray itemArray = doc.array();
 		for(int iIndex = 0; iIndex < itemArray.size(); ++iIndex)
 		{

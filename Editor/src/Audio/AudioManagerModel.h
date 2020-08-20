@@ -29,7 +29,12 @@ public:
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() override;
 
+	// Draw occur when the mouse hovers over the manager widget. ManagerWidget holds the ptr to IManagerDraw, but IManagerModel init/updates the actual concrete IDraw object
 	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) override;
+
+	virtual QMimeData *mimeData(const QModelIndexList &indexes) const override;
+	virtual QStringList mimeTypes() const override;
+	virtual bool canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const override;
 
 protected:
 	void Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet);
