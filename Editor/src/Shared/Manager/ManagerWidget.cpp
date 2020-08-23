@@ -24,6 +24,7 @@
 #include <QUndoCommand>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDrag>
 
 ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 	QSortFilterProxyModel(pParent)
@@ -59,6 +60,27 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 	QModelIndexList indexes = selectedIndexes();
 	if(indexes.empty())
 		return;
+
+	QMimeData *pMimeData = model()->mimeData(indexes);
+	if(pMimeData == nullptr)
+		return;
+
+	//QList<QPersistentModelIndex> persistentIndexes;
+	//for (int i = 0; i<indexes.count(); i++)
+	//	persistentIndexes.append(QPersistentModelIndex(indexes.at(i)));
+
+	QPixmap pixmap = indexes.first().data(Qt::DecorationRole).value<QPixmap>();
+	QDrag *pDrag = new QDrag(this);
+	pDrag->setPixmap(pixmap);
+	pDrag->setMimeData(pMimeData);
+	pDrag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
+
+	Qt::DropAction eDropAction = pDrag->exec(supportedActions);
+	if(eDropAction != Qt::MoveAction)
+	{
+		supportedActions &= ~Qt::MoveAction;
+		eDropAction = pDrag->exec(supportedActions);
+	}
 }
 
 ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :

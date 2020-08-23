@@ -316,40 +316,6 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	pDrawOut = new AtlasDraw(*this);
 }
 
-/*virtual*/ QMimeData *AtlasModel::mimeData(const QModelIndexList &indexes) const /*override*/
-{
-	for(auto index : indexes)
-	{
-		AssetItemData *pAssetData = data(index, Qt::UserRole).value<AssetItemData *>();
-		QJsonObject assetObj;
-		pAssetData->GetJsonObj(assetObj);
-	}
-
-	QMimeData *pNewMimeData = new QMimeData();
-	//pNewMimeData->setData();
-	return pNewMimeData;
-}
-
-/*virtual*/ QStringList AtlasModel::mimeTypes() const /*override*/
-{
-	return QStringList() << "image/png" << HYGUI_MIMETYPE_ASSET;
-}
-
-/*virtual*/ bool AtlasModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
-{
-	if(pData->formats().size() == 1 && pData->formats()[0].compare("image/png", Qt::CaseInsensitive) == 0)
-		return true;
-
-	for(auto sFormat : pData->formats())
-	{
-		if(sFormat.compare(HYGUI_MIMETYPE_ASSET, Qt::CaseInsensitive) == 0)
-		{
-			pData->data(HYGUI_MIMETYPE_ASSET);
-			return false;
-		}
-	}
-}
-
 /*virtual*/ AssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	QRect rAlphaCrop(QPoint(metaObj["cropLeft"].toInt(), metaObj["cropTop"].toInt()),

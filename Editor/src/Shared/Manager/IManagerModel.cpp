@@ -14,9 +14,11 @@
 #include "Harmony.h"
 #include "MainWindow.h"
 #include "ProjectItemData.h"
+#include "AssetMimeData.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QMimeData>
 
 IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 	ITreeModel(2, QStringList(), nullptr),
@@ -862,9 +864,118 @@ void IManagerModel::SaveRuntime()
 	return Qt::MoveAction;
 }
 
+/*virtual*/ QStringList IManagerModel::mimeTypes() const /*override*/
+{
+	QStringList sMimeTypeList;
+	sMimeTypeList << HYGUI_MIMETYPE_ASSET;
+
+	switch(m_eITEM_TYPE)
+	{
+	case ITEM_Audio:
+		sMimeTypeList << "audio/wav";
+		break;
+
+	case ITEM_AtlasImage:
+		sMimeTypeList << "image/png";
+		break;
+	}
+
+	return sMimeTypeList;
+}
+
+/*virtual*/ QMimeData *IManagerModel::mimeData(const QModelIndexList &indexes) const /*override*/
+{
+	QList<AssetItemData *> assetList;
+	for(auto index : indexes)
+	{
+		AssetItemData *pAssetData = data(index, Qt::UserRole).value<AssetItemData *>();
+		if(pAssetData)
+			assetList.push_back(pAssetData);
+	}
+
+	QMimeData *pNewMimeData = new AssetMimeData(m_ProjectRef, m_eITEM_TYPE, assetList);
+	return pNewMimeData;
+}
+
+/*virtual*/ bool IManagerModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
+{
+	if(pData->hasFormat(HYGUI_MIMETYPE_ASSET) == false)
+		return false;
+
+	TreeModelItemData *pParentTreeItem = FindTreeItemFilter(GetItem(parentRef)->data(0).value<TreeModelItemData *>());
+	if(pParentTreeItem == nullptr)
+		return false;
+
+	return true;
+}
+
 /*virtual*/ bool IManagerModel::dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) /*override*/
 {
-	return false;
+	if(eAction == Qt::IgnoreAction)
+		return true;
+	
+	if(eAction != Qt::MoveAction)
+	{
+		HyGuiLog("dropMimeData isn't MOVEACTION", LOGTYPE_Normal);
+		return false;
+	}
+
+	const QModelIndex &indexRef = parentRef;
+
+	// Error check destination index 'indexRef'
+	TreeModelItemData *pDestFilter = FindTreeItemFilter(GetItem(indexRef)->data(0).value<TreeModelItemData *>());
+	if(pDestFilter == nullptr)
+	{
+		HyGuiLog("IManagerModel::dropMimeData failed to find an appropriate location", LOGTYPE_Error);
+		return false;
+	}
+
+	// Parse 'sSrc' for paste information
+	QByteArray sSrc = pData->data(HYGUI_MIMETYPE_ASSET);
+	QJsonDocument assetDoc = QJsonDocument::fromJson(sSrc);
+	QJsonArray assetArray = assetDoc.array();
+	for(int iAssetIndex = 0; iAssetIndex < assetArray.size(); ++iAssetIndex)
+	{
+		QJsonObject assetObj = assetArray[iAssetIndex].toObject();
+
+		// If asset item is already in the destination project, just simply move it to new filter location
+		if(assetObj["project"].toString().toLower() == m_ProjectRef.GetAbsPath().toLower())
+		{
+			AssetItemData *pAssetItemData = FindById(assetObj["assetUUID"].toString());
+			if(pAssetItemData == nullptr)
+			{
+				HyGuiLog("IManagerModel::dropMimeData - could not find by UUID: " % assetObj["assetUUID"].toString(), LOGTYPE_Warning);
+				continue;
+			}
+
+			QModelIndex sourceIndex = FindIndex<AssetItemData *>(pAssetItemData, 0);
+			TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
+
+			// Move paste item to new prefix location within project
+			QModelIndex destIndex = FindIndex<TreeModelItemData *>(pDestFilter, 0);
+			if(sourceIndex.parent() != destIndex)
+			{
+				beginMoveRows(sourceIndex.parent(), pSourceTreeItem->GetIndex(), pSourceTreeItem->GetIndex(), destIndex, 0);
+
+				//pSourceItem->Rename(pDestItem->GetName(true), pSourceItem->GetName(false));
+			
+				//pSourceTreeItem->GetParent()->RemoveChildren(pSourceTreeItem->GetIndex(), 1);
+				//pDestTreeItem->InsertChildren(0, 1, pDestTreeItem->columnCount());
+			
+				//QVariant v;
+				//v.setValue<ExplorerItemData *>(pSourceItem);
+				//pDestTreeItem->GetChild(0)->SetData(0, v);
+
+				endMoveRows();
+			}
+
+			continue;
+		}
+
+		// TODO: Import new assets
+	}
+
+	SaveMeta();
 }
 
 void IManagerModel::RegisterAsset(AssetItemData *pAsset)
@@ -968,3 +1079,26 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(const QString sPrefix, const Q
 	InsertTreeItem(pNewItemData, pCurTreeItem);
 	return pNewItemData;
 }
+
+//TreeModelItem *IManagerModel::FindFilterTreeItem(const QModelIndex &indexRef) const
+//{
+//	// Error check destination index 'indexRef'
+//	TreeModelItem *pTreeItem = GetItem(indexRef);
+//	if(pTreeItem == m_pRootItem)
+//		return nullptr;
+//
+//	TreeModelItemData *pItem = pTreeItem->data(0).value<TreeModelItemData *>();
+//	if(pItem == nullptr)
+//		return nullptr;
+//
+//	// If the explorer item isn't a prefix or a project, go up one parent then and it should be.
+//	if(pItem->GetType() != ITEM_Filter && pItem->GetType() != ITEM_Project)
+//	{
+//		pTreeItem = pTreeItem->GetParent();
+//		pItem = pTreeItem->data(0).value<ExplorerItemData *>();
+//		if(pItem == nullptr || (pItem->GetType() != ITEM_Prefix && pItem->GetType() != ITEM_Project))
+//			return nullptr;
+//	}
+//
+//	return pTreeItem;
+//}

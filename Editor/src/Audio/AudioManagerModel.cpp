@@ -58,24 +58,6 @@ AudioManagerModel::AudioManagerModel(Project &projRef) :
 {
 }
 
-/*virtual*/ QMimeData *AudioManagerModel::mimeData(const QModelIndexList &indexes) const /*override*/
-{
-	QMimeData *pNewMimeData = new QMimeData();
-	//pNewMimeData->setData();
-	return pNewMimeData;
-}
-
-/*virtual*/ QStringList AudioManagerModel::mimeTypes() const /*override*/
-{
-	return QStringList() << "audio/wav" << HYGUI_MIMETYPE_ASSET;
-}
-
-/*virtual*/ bool AudioManagerModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
-{
-	return false;
-}
-
-
 void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 {
 

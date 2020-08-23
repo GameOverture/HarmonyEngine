@@ -46,10 +46,6 @@ public:
 
 	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) override;
 
-	virtual QMimeData *mimeData(const QModelIndexList &indexes) const override;
-	virtual QStringList mimeTypes() const override;
-	virtual bool canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const override;
-
 protected:
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 
