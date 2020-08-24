@@ -886,8 +886,11 @@ void IManagerModel::SaveRuntime()
 /*virtual*/ QMimeData *IManagerModel::mimeData(const QModelIndexList &indexes) const /*override*/
 {
 	QList<AssetItemData *> assetList;
-	for(auto index : indexes)
+	for(const auto &index : indexes)
 	{
+		if(index.column() != 0)
+			continue;
+
 		AssetItemData *pAssetData = data(index, Qt::UserRole).value<AssetItemData *>();
 		if(pAssetData)
 			assetList.push_back(pAssetData);
@@ -920,15 +923,16 @@ void IManagerModel::SaveRuntime()
 		return false;
 	}
 
-	const QModelIndex &indexRef = parentRef;
-
 	// Error check destination index 'indexRef'
-	TreeModelItemData *pDestFilter = FindTreeItemFilter(GetItem(indexRef)->data(0).value<TreeModelItemData *>());
+	TreeModelItem *pDropItem = GetItem(parentRef);
+	TreeModelItemData *pDestFilter = FindTreeItemFilter(pDropItem->data(0).value<TreeModelItemData *>());
 	if(pDestFilter == nullptr)
 	{
 		HyGuiLog("IManagerModel::dropMimeData failed to find an appropriate location", LOGTYPE_Error);
 		return false;
 	}
+
+	TreeModelItem *pDestFilterTreeItem = GetItem(FindIndex<TreeModelItemData *>(pDestFilter, 0));
 
 	// Parse 'sSrc' for paste information
 	QByteArray sSrc = pData->data(HYGUI_MIMETYPE_ASSET);
@@ -959,12 +963,12 @@ void IManagerModel::SaveRuntime()
 
 				//pSourceItem->Rename(pDestItem->GetName(true), pSourceItem->GetName(false));
 			
-				//pSourceTreeItem->GetParent()->RemoveChildren(pSourceTreeItem->GetIndex(), 1);
-				//pDestTreeItem->InsertChildren(0, 1, pDestTreeItem->columnCount());
+				pSourceTreeItem->GetParent()->RemoveChildren(pSourceTreeItem->GetIndex(), 1);
+				pDestFilterTreeItem->InsertChildren(0, 1, pDestFilterTreeItem->columnCount());
 			
-				//QVariant v;
-				//v.setValue<ExplorerItemData *>(pSourceItem);
-				//pDestTreeItem->GetChild(0)->SetData(0, v);
+				QVariant v;
+				v.setValue<AssetItemData *>(pAssetItemData);
+				pDestFilterTreeItem->GetChild(0)->SetData(0, v);
 
 				endMoveRows();
 			}

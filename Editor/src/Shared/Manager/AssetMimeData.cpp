@@ -17,7 +17,7 @@
 AssetMimeData::AssetMimeData(Project &projRef, HyGuiItemType eManagerType, QList<AssetItemData *> &assetListRef)
 {
 	QJsonArray clipboardArray;
-	for(int i = 0; i < clipboardArray.size(); ++i)
+	for(int i = 0; i < assetListRef.size(); ++i)
 	{
 		QJsonObject assetObj;
 		assetObj.insert("project", projRef.GetAbsPath().toLower());

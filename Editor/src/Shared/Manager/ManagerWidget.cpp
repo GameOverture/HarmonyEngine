@@ -183,7 +183,7 @@ void ManagerWidget::DrawUpdate()
 		QPoint pos(mapFromGlobal(QCursor::pos()).x(), mapFromGlobal(QCursor::pos()).y());
 		QModelIndex index = ui->assetTree->indexAt(pos);
 
-		m_pDraw->SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
+		//m_pDraw->SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
 		m_pDraw->OnDrawUpdate();
 	}
 }
