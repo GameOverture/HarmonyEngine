@@ -79,6 +79,9 @@ public:
 protected:
 	// NOTE: Public access should use data() with role = Qt::UserRole to get TreeModelItemData
 	TreeModelItem *GetItem(const QModelIndex &indexRef) const;
+
+	// Removes any item that is nested within any specified 'eFolderType' items. Also removes nested folders
+	void RemoveRedundantItems(HyGuiItemType eFolderType, QList<TreeModelItemData *> &itemListOut) const;
 };
 
 #endif // ITREEMODEL_H

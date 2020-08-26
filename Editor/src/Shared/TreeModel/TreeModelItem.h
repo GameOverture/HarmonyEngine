@@ -38,8 +38,10 @@ public:
 	bool InsertColumns(int iPosition, int iColumns);
 	
 	bool IsRemoveValid(int iPosition, int iCount);
-	bool RemoveChildren(int iPosition, int iCount);
+	bool DeleteChildren(int iPosition, int iCount);
 	bool RemoveColumns(int iPosition, int iColumns);
+
+	bool MoveChild(int iPosition, TreeModelItem *pNewParent, int iNewPostion);
 };
 
 #endif // TREEMODELITEM_H

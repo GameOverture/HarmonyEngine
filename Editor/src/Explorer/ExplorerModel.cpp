@@ -217,13 +217,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 				beginMoveRows(sourceIndex.parent(), pSourceTreeItem->GetIndex(), pSourceTreeItem->GetIndex(), destIndex, 0);
 
 				pSourceItem->Rename(pDestItem->GetName(true), pSourceItem->GetName(false));
-			
-				pSourceTreeItem->GetParent()->RemoveChildren(pSourceTreeItem->GetIndex(), 1);
-				pDestTreeItem->InsertChildren(0, 1, pDestTreeItem->columnCount());
-			
-				QVariant v;
-				v.setValue<ExplorerItemData *>(pSourceItem);
-				pDestTreeItem->GetChild(0)->SetData(0, v);
+				pSourceTreeItem->GetParent()->MoveChild(pSourceTreeItem->GetIndex(), pDestTreeItem, 0);
 
 				endMoveRows();
 			}
@@ -366,16 +360,19 @@ ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid)
 
 /*virtual*/ QMimeData *ExplorerModel::mimeData(const QModelIndexList &indexes) const /*override*/
 {
-	QList<ExplorerItemData *> itemList;
-	for(int i = 0; i < indexes.size(); ++i)
+	QList<TreeModelItemData *> itemList;
+	for(const auto &index : indexes)
 	{
-		ExplorerItemData *pItem = GetItem(indexes[i])->data(0).value<ExplorerItemData *>();
-		if(pItem)
-			itemList.push_back(pItem);
+		if(index.column() != 0)
+			continue;
+
+		itemList.push_back(data(index, Qt::UserRole).value<TreeModelItemData *>());
 	}
 
+	RemoveRedundantItems(ITEM_Prefix, itemList);
+
 	if(itemList.empty())
-		return 0;
+		return nullptr;
 
 	return new ProjectItemMimeData(itemList);
 }

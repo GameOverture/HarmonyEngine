@@ -115,7 +115,7 @@ bool TreeModelItem::IsRemoveValid(int iPosition, int iCount)
 		return false;
 	return true;
 }
-bool TreeModelItem::RemoveChildren(int iPosition, int iCount)
+bool TreeModelItem::DeleteChildren(int iPosition, int iCount)
 {
 	if(IsRemoveValid(iPosition, iCount) == false)
 		return false;
@@ -138,4 +138,14 @@ bool TreeModelItem::RemoveColumns(int iPosition, int iColumns)
 		m_ChildList[i]->RemoveColumns(iPosition, iColumns);
 
 	return true;
+}
+
+bool TreeModelItem::MoveChild(int iPosition, TreeModelItem *pNewParent, int iNewPostion)
+{
+	if(iPosition < 0 || iPosition >= m_ChildList.size() || pNewParent == nullptr)
+		return false;
+
+	TreeModelItem *pChild = m_ChildList.takeAt(iPosition);
+	pChild->m_pParentItem = pNewParent;
+	pNewParent->m_ChildList.insert(iNewPostion, pChild);
 }

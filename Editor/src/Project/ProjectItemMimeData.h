@@ -14,7 +14,7 @@
 
 #define HYGUI_MIMETYPE_ITEM "application/x-harmonyitem"
 
-class ExplorerItemData;
+class TreeModelItemData;
 class ProjectItemData;
 
 class ProjectItemMimeData : public QMimeData
@@ -22,7 +22,7 @@ class ProjectItemMimeData : public QMimeData
 	QByteArray				m_Data;
 
 public:
-	ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef);
+	ProjectItemMimeData(QList<TreeModelItemData *> &itemListRef);
 	ProjectItemMimeData(const QVariant &data);
 	virtual ~ProjectItemMimeData();
 

@@ -182,7 +182,7 @@ void ExplorerWidget::GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOu
 			selectedItemsOut += static_cast<ExplorerItemData *>(item);
 	}
 	
-	// Poor man's unique only algorithm
+	// Poverty unique only algorithm - does not persist order of items
 	selectedItemsOut = selectedItemsOut.toSet().toList();
 
 	for(int i = 0; i < selectedItemsOut.size();)
@@ -449,7 +449,10 @@ void ExplorerWidget::on_actionCopyItem_triggered()
 		return;
 	}
 
-	ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(selectedItems);
+	QList<TreeModelItemData *> treeItemList;
+	for(auto item : selectedItems)
+		treeItemList << item;
+	ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(treeItemList);
 	QClipboard *pClipboard = QApplication::clipboard();
 	pClipboard->setMimeData(pNewMimeData);
 

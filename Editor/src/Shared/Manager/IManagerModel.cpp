@@ -371,11 +371,11 @@ QJsonArray IManagerModel::GetExpandedFiltersArray()
 	return m_ExpandedFiltersArray;
 }
 
-QString IManagerModel::AssembleFilter(AssetItemData *pAsset) const
+QString IManagerModel::AssembleFilter(TreeModelItemData *pAsset) const
 {
 	QStringList sPrefixParts;
 
-	TreeModelItem *pTreeItem = GetItem(FindIndex<AssetItemData *>(pAsset, 0))->GetParent();
+	TreeModelItem *pTreeItem = GetItem(FindIndex<TreeModelItemData *>(pAsset, 0))->GetParent();
 	while(pTreeItem && pTreeItem != m_pRootItem)
 	{
 		TreeModelItemData *pItem = pTreeItem->data(0).value<TreeModelItemData *>();
@@ -415,7 +415,7 @@ TreeModelItemData *IManagerModel::FindTreeItemFilter(TreeModelItemData *pItem) c
 	return pFilter;
 }
 
-TreeModelItemData *IManagerModel::ReturnFilter(QString sFilterPath)
+TreeModelItemData *IManagerModel::ReturnFilter(QString sFilterPath, bool bCreateNonExistingFilter /*= true*/)
 {
 	TreeModelItem *pCurTreeItem = m_pRootItem;
 	if(sFilterPath.isEmpty() == false)
@@ -437,6 +437,9 @@ TreeModelItemData *IManagerModel::ReturnFilter(QString sFilterPath)
 
 			if(bFound == false)
 			{
+				if(bCreateNonExistingFilter == false)
+					return nullptr;
+
 				// Still more filters to dig thru, so this means we're at a filter. Add the prefix TreeModelItemData here and continue traversing down the tree
 				InsertTreeItem(new TreeModelItemData(ITEM_Filter, sPathSplitList[i]), pCurTreeItem);
 				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
@@ -885,18 +888,18 @@ void IManagerModel::SaveRuntime()
 
 /*virtual*/ QMimeData *IManagerModel::mimeData(const QModelIndexList &indexes) const /*override*/
 {
-	QList<AssetItemData *> assetList;
+	QList<TreeModelItemData *> itemList;
 	for(const auto &index : indexes)
 	{
 		if(index.column() != 0)
 			continue;
 
-		AssetItemData *pAssetData = data(index, Qt::UserRole).value<AssetItemData *>();
-		if(pAssetData)
-			assetList.push_back(pAssetData);
+		itemList.push_back(data(index, Qt::UserRole).value<TreeModelItemData *>());
 	}
 
-	QMimeData *pNewMimeData = new AssetMimeData(m_ProjectRef, m_eITEM_TYPE, assetList);
+	RemoveRedundantItems(ITEM_Filter, itemList);
+
+	QMimeData *pNewMimeData = new AssetMimeData(m_ProjectRef, m_eITEM_TYPE, itemList);
 	return pNewMimeData;
 }
 
@@ -945,38 +948,48 @@ void IManagerModel::SaveRuntime()
 		// If asset item is already in the destination project, just simply move it to new filter location
 		if(assetObj["project"].toString().toLower() == m_ProjectRef.GetAbsPath().toLower())
 		{
-			AssetItemData *pAssetItemData = FindById(assetObj["assetUUID"].toString());
-			if(pAssetItemData == nullptr)
+			TreeModelItemData *pItemData = nullptr;
+
+			if(assetObj["isFilter"].toBool())
 			{
-				HyGuiLog("IManagerModel::dropMimeData - could not find by UUID: " % assetObj["assetUUID"].toString(), LOGTYPE_Warning);
-				continue;
+				QString sFilterPath = assetObj["filter"].toString();
+				if(sFilterPath.isEmpty() == false)
+					sFilterPath += "/";
+				sFilterPath += assetObj["name"].toString();
+
+				pItemData = ReturnFilter(sFilterPath, false);
+				if(pItemData == nullptr)
+				{
+					HyGuiLog("IManagerModel::dropMimeData - ReturnFilter return nullptr with " % sFilterPath, LOGTYPE_Warning);
+					continue;
+				}
+			}
+			else
+			{
+				pItemData = FindById(assetObj["assetUUID"].toString());
+				if(pItemData == nullptr)
+				{
+					HyGuiLog("IManagerModel::dropMimeData - could not find by UUID: " % assetObj["assetUUID"].toString(), LOGTYPE_Warning);
+					continue;
+				}
 			}
 
-			QModelIndex sourceIndex = FindIndex<AssetItemData *>(pAssetItemData, 0);
+			QModelIndex sourceIndex = FindIndex<TreeModelItemData *>(pItemData, 0);
 			TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
 
-			// Move paste item to new prefix location within project
+			// Move asset item to new filter location within manager
 			QModelIndex destIndex = FindIndex<TreeModelItemData *>(pDestFilter, 0);
 			if(sourceIndex.parent() != destIndex)
 			{
 				beginMoveRows(sourceIndex.parent(), pSourceTreeItem->GetIndex(), pSourceTreeItem->GetIndex(), destIndex, 0);
-
-				//pSourceItem->Rename(pDestItem->GetName(true), pSourceItem->GetName(false));
-			
-				pSourceTreeItem->GetParent()->RemoveChildren(pSourceTreeItem->GetIndex(), 1);
-				pDestFilterTreeItem->InsertChildren(0, 1, pDestFilterTreeItem->columnCount());
-			
-				QVariant v;
-				v.setValue<AssetItemData *>(pAssetItemData);
-				pDestFilterTreeItem->GetChild(0)->SetData(0, v);
-
+				pSourceTreeItem->GetParent()->MoveChild(pSourceTreeItem->GetIndex(), pDestFilterTreeItem, 0);
 				endMoveRows();
 			}
 
 			continue;
 		}
 
-		// TODO: Import new assets
+		// TODO: Import new assets if not from current project
 	}
 
 	SaveMeta();
@@ -1083,26 +1096,3 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(const QString sPrefix, const Q
 	InsertTreeItem(pNewItemData, pCurTreeItem);
 	return pNewItemData;
 }
-
-//TreeModelItem *IManagerModel::FindFilterTreeItem(const QModelIndex &indexRef) const
-//{
-//	// Error check destination index 'indexRef'
-//	TreeModelItem *pTreeItem = GetItem(indexRef);
-//	if(pTreeItem == m_pRootItem)
-//		return nullptr;
-//
-//	TreeModelItemData *pItem = pTreeItem->data(0).value<TreeModelItemData *>();
-//	if(pItem == nullptr)
-//		return nullptr;
-//
-//	// If the explorer item isn't a prefix or a project, go up one parent then and it should be.
-//	if(pItem->GetType() != ITEM_Filter && pItem->GetType() != ITEM_Project)
-//	{
-//		pTreeItem = pTreeItem->GetParent();
-//		pItem = pTreeItem->data(0).value<ExplorerItemData *>();
-//		if(pItem == nullptr || (pItem->GetType() != ITEM_Prefix && pItem->GetType() != ITEM_Project))
-//			return nullptr;
-//	}
-//
-//	return pTreeItem;
-//}

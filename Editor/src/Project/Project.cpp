@@ -377,6 +377,22 @@ QString Project::GetBuildRelPath() const
 	return QDir::cleanPath(GetSettingsObj()["BuildPath"].toString()) + '/';
 }
 
+IManagerModel *Project::GetManagerModel(HyGuiItemType eManagerType)
+{
+	switch(eManagerType)
+	{
+	case ITEM_AtlasImage:
+		return m_pAtlasModel;
+
+	case ITEM_Audio:
+		return m_pAudioModel;
+
+	default:
+		HyGuiLog("Project::GetManagerModel was passed invalid eManagerType", LOGTYPE_Error);
+		return nullptr;
+	}
+}
+
 ExplorerModel &Project::GetExplorerModel()
 {
 	return m_ModelRef;
@@ -744,6 +760,8 @@ QString Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewP
 	WriteGameData();
 	WriteMetaData();
 
+	HyGuiLog(sOldPath % " is now known as: " % sUniqueNewPath, LOGTYPE_Normal);
+
 	return sUniqueNewPath.section('/', -1);
 }
 
@@ -1017,6 +1035,9 @@ void Project::RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObj
 	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
 	for(auto itemTypeIter = dataObjRef.begin(); itemTypeIter != dataObjRef.end(); ++itemTypeIter)
 	{
+		if(itemTypeIter.key().compare("$fileVersion") == 0)
+			continue;
+
 		QJsonObject itemTypeObj = itemTypeIter.value().toObject();
 		QStringList itemsTypeKeysList = itemTypeObj.keys();
 		for(int i = 0; i < itemsTypeKeysList.size(); ++i)

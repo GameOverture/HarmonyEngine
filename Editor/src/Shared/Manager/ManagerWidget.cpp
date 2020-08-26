@@ -65,10 +65,6 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 	if(pMimeData == nullptr)
 		return;
 
-	//QList<QPersistentModelIndex> persistentIndexes;
-	//for (int i = 0; i<indexes.count(); i++)
-	//	persistentIndexes.append(QPersistentModelIndex(indexes.at(i)));
-
 	QPixmap pixmap = indexes.first().data(Qt::DecorationRole).value<QPixmap>();
 	QDrag *pDrag = new QDrag(this);
 	pDrag->setPixmap(pixmap);
@@ -342,8 +338,6 @@ void ManagerWidget::on_assetTree_clicked()
 	ui->actionRename->setEnabled(iNumSelected == 1);
 	ui->actionDeleteAssets->setEnabled(iNumSelected != 0);
 	ui->actionReplaceAssets->setEnabled(iNumSelected != 0);
-
-	HyGuiLog(QString::number(iNumSelected), LOGTYPE_Normal);
 
 	// Determine the best suited icon based on selection
 	HyGuiItemType eIconType = ITEM_Unknown;

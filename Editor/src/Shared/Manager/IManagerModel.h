@@ -63,9 +63,9 @@ public:
 	bool TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId);
 
 	QJsonArray GetExpandedFiltersArray();
-	QString AssembleFilter(AssetItemData *pAsset) const;
+	QString AssembleFilter(TreeModelItemData *pAsset) const;
 	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
-	TreeModelItemData *ReturnFilter(QString sFilterPath); // Will create if doesn't exist
+	TreeModelItemData *ReturnFilter(QString sFilterPath, bool bCreateNonExistingFilter = true);
 
 	bool RemoveLookup(AssetItemData *pAsset); // Returns true if no remaining duplicates exist
 	AssetItemData *FindById(QUuid uuid);
@@ -126,7 +126,6 @@ protected:
 
 private:
 	AssetItemData *CreateAssetTreeItem(const QString sPrefix, const QString sName, QJsonObject metaObj);
-	//TreeModelItem *FindFilterTreeItem(const QModelIndex &indexRef) const;
 };
 
 #endif // IMANAGERMODEL_H

@@ -180,7 +180,7 @@ QList<TreeModelItemData *> ITreeModel::GetItemsRecursively(const QModelIndex &in
 		for(int i = 0; i < iRows; ++i)
 			OnTreeModelItemRemoved(pParentItem->GetChild(iPosition + i));
 
-		bSuccess = pParentItem->RemoveChildren(iPosition, iRows);
+		bSuccess = pParentItem->DeleteChildren(iPosition, iRows);
 	}
 
 	endRemoveRows();
@@ -241,4 +241,32 @@ TreeModelItem *ITreeModel::GetItem(const QModelIndex &indexRef) const
 	}
 
 	return m_pRootItem;
+}
+
+void ITreeModel::RemoveRedundantItems(HyGuiItemType eFolderType, QList<TreeModelItemData *> &itemListOut) const
+{
+	QList<TreeModelItemData *> folderList;
+	for(auto item : itemListOut)
+	{
+		if(item->GetType() == eFolderType && folderList.contains(item) == false)
+			folderList.append(item);
+	}
+
+	for(auto folder : folderList)
+	{
+		QList<TreeModelItemData *> nestedItemsList = GetItemsRecursively(FindIndex<TreeModelItemData *>(folder, 0));
+		for(auto nestedItem : nestedItemsList)
+		{
+			if(folder == nestedItem)
+				continue;
+
+			for(auto iter = itemListOut.begin(); iter != itemListOut.end();)
+			{
+				if(*iter == nestedItem)
+					iter = itemListOut.erase(iter);
+				else
+					++iter;
+			}
+		}
+	}
 }

@@ -13,20 +13,41 @@
 #include "Project.h"
 #include "IModel.h"
 #include "AtlasFrame.h"
+#include "IManagerModel.h"
 
-AssetMimeData::AssetMimeData(Project &projRef, HyGuiItemType eManagerType, QList<AssetItemData *> &assetListRef)
+AssetMimeData::AssetMimeData(Project &projRef, HyGuiItemType eManagerType, QList<TreeModelItemData *> &itemListRef)
 {
 	QJsonArray clipboardArray;
-	for(int i = 0; i < assetListRef.size(); ++i)
+
+	for(int i = 0; i < itemListRef.size(); ++i)
 	{
-		QJsonObject assetObj;
-		assetObj.insert("project", projRef.GetAbsPath().toLower());
-		assetObj.insert("assetUUID", assetListRef[i]->GetUuid().toString(QUuid::WithoutBraces));
-		assetObj.insert("checksum", QJsonValue(static_cast<qint64>(assetListRef[i]->GetChecksum())));
-		assetObj.insert("filter", assetListRef[i]->GetFilter());
-		assetObj.insert("name", QJsonValue(assetListRef[i]->GetName()));
-		assetObj.insert("uri", QJsonValue(projRef.GetMetaDataAbsPath() % HyGlobal::ItemName(eManagerType, true) % "/" % assetListRef[i]->ConstructMetaFileName()));
-		clipboardArray.append(assetObj);
+		QJsonObject itemObj;
+		itemObj.insert("project", projRef.GetAbsPath().toLower());
+
+		if(itemListRef[i]->GetType() == ITEM_Filter)
+		{
+			itemObj.insert("isFilter", true);
+
+			IManagerModel *pManager = projRef.GetManagerModel(eManagerType);
+			if(pManager == nullptr)
+				continue;
+
+			itemObj.insert("filter", pManager->AssembleFilter(itemListRef[i]));
+			itemObj.insert("name", QJsonValue(itemListRef[i]->GetText()));
+		}
+		else
+		{
+			itemObj.insert("isFilter", false);
+
+			AssetItemData *pAssetItem = static_cast<AssetItemData *>(itemListRef[i]);
+			itemObj.insert("assetUUID", pAssetItem->GetUuid().toString(QUuid::WithoutBraces));
+			itemObj.insert("checksum", QJsonValue(static_cast<qint64>(pAssetItem->GetChecksum())));
+			itemObj.insert("filter", pAssetItem->GetFilter());
+			itemObj.insert("name", QJsonValue(pAssetItem->GetName()));
+			itemObj.insert("uri", QJsonValue(projRef.GetMetaDataAbsPath() % HyGlobal::ItemName(eManagerType, true) % "/" % pAssetItem->ConstructMetaFileName()));
+		}
+
+		clipboardArray.append(itemObj);
 	}
 
 	// Serialize the item info into json source

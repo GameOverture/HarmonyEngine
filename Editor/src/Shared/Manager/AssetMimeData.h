@@ -16,14 +16,14 @@
 #define HYGUI_MIMETYPE_ASSET "application/x-harmonyasset"
 
 class Project;
-class AssetItemData;
+class TreeModelItemData;
 
 class AssetMimeData : public QMimeData
 {
 	QByteArray				m_Data;
 
 public:
-	AssetMimeData(Project &projRef, HyGuiItemType eManagerType, QList<AssetItemData *> &assetListRef);
+	AssetMimeData(Project &projRef, HyGuiItemType eManagerType, QList<TreeModelItemData *> &itemListRef);
 	AssetMimeData(const QVariant &data);
 	virtual ~AssetMimeData();
 

@@ -22,6 +22,7 @@
 
 // Forward declaration
 class AtlasModel;
+class IManagerModel;
 class ManagerWidget;
 class GltfModel;
 class GltfWidget;
@@ -99,6 +100,7 @@ public:
 	QString GetBuildAbsPath() const;
 	QString GetBuildRelPath() const;
 
+	IManagerModel *GetManagerModel(HyGuiItemType eManagerType);
 	ExplorerModel &GetExplorerModel();
 	AtlasModel &GetAtlasModel();
 	ManagerWidget *GetAtlasWidget();

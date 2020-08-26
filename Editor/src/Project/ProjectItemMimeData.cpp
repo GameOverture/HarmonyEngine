@@ -14,45 +14,52 @@
 #include "IModel.h"
 #include "AtlasFrame.h"
 
-ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
+ProjectItemMimeData::ProjectItemMimeData(QList<TreeModelItemData *> &itemListRef)
 {
 	QJsonArray clipboardArray;
 
 	for(int i = 0; i < itemListRef.size(); ++i)
 	{
-		if(itemListRef[i]->IsProjectItem() == false)
-			continue;
+		ExplorerItemData *pExplorerItemData = static_cast<ExplorerItemData *>(itemListRef[i]);
 
-		ProjectItemData *pProjectItem = static_cast<ProjectItemData *>(itemListRef[i]);
+		QJsonObject itemObj;
+		itemObj.insert("project", pExplorerItemData->GetProject().GetAbsPath());
+		itemObj.insert("itemName", pExplorerItemData->GetName(true));
+		itemObj.insert("itemType", HyGlobal::ItemName(pExplorerItemData->GetType(), false));
 
-		QJsonObject clipboardObj;
+		if(pExplorerItemData->IsProjectItem() == false)
+		{
+			itemObj.insert("isPrefix", true);
+		}
+		else
+		{
+			itemObj.insert("isPrefix", false);
 
-		// STANDARD INFO
-		clipboardObj.insert("project", pProjectItem->GetProject().GetAbsPath());
-		clipboardObj.insert("itemType", HyGlobal::ItemName(pProjectItem->GetType(), false));
-		clipboardObj.insert("itemName", pProjectItem->GetName(true));
+			ProjectItemData *pProjectItem = static_cast<ProjectItemData *>(itemListRef[i]);
 
-		FileDataPair itemFileData;
-		pProjectItem->GetLatestFileData(itemFileData);
-		clipboardObj.insert("metaObj", itemFileData.m_Meta);
-		clipboardObj.insert("dataObj", itemFileData.m_Data);
+			// STANDARD INFO
+			FileDataPair itemFileData;
+			pProjectItem->GetLatestFileData(itemFileData);
+			itemObj.insert("metaObj", itemFileData.m_Meta);
+			itemObj.insert("dataObj", itemFileData.m_Data);
 
-		// IMAGE INFO
-		QJsonArray imagesArray = GetAssetsArray(ITEM_AtlasImage, pProjectItem);
-		clipboardObj.insert("images", imagesArray);
+			// IMAGE INFO
+			QJsonArray imagesArray = GetAssetsArray(ITEM_AtlasImage, pProjectItem);
+			itemObj.insert("images", imagesArray);
 
-		// SOUND INFO
-		QJsonArray soundsArray = GetAssetsArray(ITEM_Audio, pProjectItem);
-		clipboardObj.insert("sounds", soundsArray);
+			// SOUND INFO
+			QJsonArray soundsArray = GetAssetsArray(ITEM_Audio, pProjectItem);
+			itemObj.insert("sounds", soundsArray);
 
-		// FONT INFO
-		QStringList fontUrlList = pProjectItem->GetModel()->GetFontUrls();
-		QJsonArray fontUrlArray;
-		for(int i = 0; i < fontUrlList.size(); ++i)
-			fontUrlArray.append(fontUrlList[i]);
-		clipboardObj.insert("fonts", fontUrlArray);
+			// FONT INFO
+			QStringList fontUrlList = pProjectItem->GetModel()->GetFontUrls();
+			QJsonArray fontUrlArray;
+			for(int i = 0; i < fontUrlList.size(); ++i)
+				fontUrlArray.append(fontUrlList[i]);
+			itemObj.insert("fonts", fontUrlArray);
+		}
 
-		clipboardArray.append(clipboardObj);
+		clipboardArray.append(itemObj);
 	}
 
 	// Serialize the item info into json source
