@@ -202,11 +202,13 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 	{
 		QJsonObject pasteObj = pasteArray[iPasteIndex].toObject();
 
+		HyGuiItemType ePasteItemType = HyGlobal::GetTypeFromString(pasteObj["itemType"].toString());
+
 		// If paste item is already in the destination project, just simply move it to new location
 		if(pasteObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
 		{
 			QString sItemPath = pasteObj["itemName"].toString();
-			QModelIndex sourceIndex = FindIndexByItemPath(pDestProject, sItemPath, HyGlobal::GetTypeFromString(pasteObj["itemType"].toString()));
+			QModelIndex sourceIndex = FindIndexByItemPath(pDestProject, sItemPath, ePasteItemType);
 			TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
 			ExplorerItemData *pSourceItem = pSourceTreeItem->data(0).value<ExplorerItemData *>();
 
@@ -225,10 +227,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			continue;
 		}
 
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Pasted item's assets needs to be imported into this project
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		HyGuiItemType ePasteItemType = HyGlobal::GetTypeFromString(pasteObj["itemType"].toString());
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Import any missing fonts (.ttf)
