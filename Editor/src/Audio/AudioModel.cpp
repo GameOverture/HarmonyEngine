@@ -19,6 +19,11 @@ AudioModel::~AudioModel()
 {
 }
 
+/*virtual*/ bool AudioModel::OnPrepSave() /*override*/
+{
+	return true;
+}
+
 /*virtual*/ void AudioModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
 }

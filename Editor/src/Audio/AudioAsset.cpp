@@ -18,9 +18,10 @@ AudioAsset::AudioAsset(IManagerModel &modelRef,
 					   quint32 uiChecksum,
 					   quint32 uiBankId,
 					   QString sName,
-					   QString sFormat,
+					   const WaveHeader &wavHeaderRef,
 					   uint uiErrors) :
-	AssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors)
+	AssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
+	m_WaveHeader(wavHeaderRef)
 {
 }
 
@@ -28,13 +29,24 @@ AudioAsset::~AudioAsset()
 {
 }
 
-void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum)
+void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader &wavHeaderRef)
 {
 	m_sName = sName;
 	m_uiChecksum = uiChecksum;
+	m_WaveHeader = wavHeaderRef;
 }
 
 /*virtual*/ void AudioAsset::InsertUniqueJson(QJsonObject &frameObj) /*override*/
 {
+	QJsonObject wavHeaderObj;
+	wavHeaderObj.insert("chunkSize", QJsonValue(static_cast<qint64>(m_WaveHeader.ChunkSize)));
+	wavHeaderObj.insert("audioFormat", m_WaveHeader.AudioFormat);
+	wavHeaderObj.insert("numChannels", m_WaveHeader.NumOfChan);
+	wavHeaderObj.insert("sampleRate", QJsonValue(static_cast<qint64>(m_WaveHeader.SamplesPerSec)));
+	wavHeaderObj.insert("byteRate", QJsonValue(static_cast<qint64>(m_WaveHeader.BytesPerSec)));
+	wavHeaderObj.insert("blockAlign", m_WaveHeader.BlockAlign);
+	wavHeaderObj.insert("bitsPerSample", m_WaveHeader.BitsPerSample);
+	wavHeaderObj.insert("dataSize", QJsonValue(static_cast<qint64>(m_WaveHeader.Subchunk2Size)));
 
+	frameObj.insert("wavHeader", wavHeaderObj);
 }

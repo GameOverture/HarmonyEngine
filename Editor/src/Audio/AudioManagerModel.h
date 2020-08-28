@@ -14,6 +14,7 @@
 #include "AudioAsset.h"
 
 #include <QAudioFormat>
+#include <QSoundEffect>
 
 class AudioManagerModel : public IManagerModel
 {
@@ -24,6 +25,8 @@ class AudioManagerModel : public IManagerModel
 public:
 	AudioManagerModel(Project &projRef);
 	virtual ~AudioManagerModel();
+
+	bool IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut);
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
@@ -47,7 +50,7 @@ private Q_SLOTS:
 	void OnRepackFinished();
 
 private:
-	AudioAsset *ImportSound(QString sFilePath, quint32 uiBankIndex, HyGuiItemType eType, QUuid uuid);
+	AudioAsset *ImportSound(QString sFilePath, quint32 uiBankIndex, HyGuiItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef);
 };
 
 #endif // AudioManagerModel_H

@@ -33,6 +33,26 @@ AudioManagerModel::AudioManagerModel(Project &projRef) :
 {
 }
 
+bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
+{
+	QFile file(sFilePath);
+	if(file.open(QIODevice::ReadOnly) == false)
+	{
+		HyGuiLog("Could not open file: " % sFilePath, LOGTYPE_Warning);
+		return false;
+	}
+
+	
+	file.read(reinterpret_cast<char *>(&wavHeaderOut), sizeof(WaveHeader));
+	file.close();
+
+	if(wavHeaderOut.AudioFormat != 1)
+	{
+		HyGuiLog("Only PCM (i.e. Linear quantization) wave files are supported", LOGTYPE_Warning);
+		return false;
+	}
+}
+
 /*virtual*/ QString AudioManagerModel::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	auto assetList = GetBankAssets(uiBankIndex);
@@ -65,13 +85,14 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 
 /*virtual*/ AssetItemData *AudioManagerModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
+	WaveHeader wavHeader(metaObj["wavHeader"].toObject());
 	AudioAsset *pNewFrame = new AudioAsset(*this,
 										   HyGlobal::GetTypeFromString(metaObj["itemType"].toString()),
 										   QUuid(metaObj["assetUUID"].toString()),
 										   JSONOBJ_TOINT(metaObj, "checksum"),
 										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
-										   metaObj["format"].toString(),
+										   wavHeader,
 										   metaObj["errors"].toInt(0));
 
 	return pNewFrame;
@@ -79,28 +100,23 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 
 /*virtual*/ QList<AssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) /*override*/
 {
+	QList<AssetItemData *> returnList;
+	QList<WaveHeader> headerList;
+
 	// Error check all the imported assets before adding them, and cancel entire import if any fail
 	for(int i = 0; i < sImportAssetList.size(); ++i)
 	{
-		QFileInfo fileInfo(sImportAssetList[i]);
-
-		// TODO: Error check wav format, or convert if possible
-
-		// TODO: Maybe support importing lossless compressed file types
-		//QStringList sCodecList = QAudioDeviceInfo::defaultOutputDevice().supportedCodecs();
-		//QAudioDecoder *decoder = new QAudioDecoder(this);
-		//decoder->setAudioFormat(m_DesiredRawFormat);
-		//decoder->setSourceFilename("level1.mp3");
-		//connect(decoder, SIGNAL(bufferReady()), this, SLOT(readBuffer()));
-		//decoder->start();
+		headerList.push_back(WaveHeader());
+		if(IsWaveValid(sImportAssetList[i], headerList.last()) == false)
+			return returnList;
 	}
 
 	// Passed error check: proceed with import
-	QList<AssetItemData *> returnList;
+	
 	for(int i = 0; i < sImportAssetList.size(); ++i)
 	{
 		// ImportSound calls RegisterAsset() on valid imports
-		AudioAsset *pNewAsset = ImportSound(QFileInfo(sImportAssetList[i]).baseName(), uiBankId, eType, correspondingUuidList[i]);
+		AudioAsset *pNewAsset = ImportSound(QFileInfo(sImportAssetList[i]).baseName(), uiBankId, eType, correspondingUuidList[i], headerList[i]);
 		if(pNewAsset)
 			returnList.append(pNewAsset);
 	}
@@ -134,20 +150,14 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 
 /*virtual*/ bool AudioManagerModel::OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) /*override*/
 {
+	QList<WaveHeader> headerList;
+
 	// Error check all the replacement assets before adding them, and cancel entire replace if any fail
 	for(int i = 0; i < assetList.count(); ++i)
 	{
-		QFileInfo fileInfo(sImportAssetList[i]);
-
-		// TODO: Error check wav format, or convert if possible
-
-		// TODO: Maybe support importing lossless compressed file types
-		//QStringList sCodecList = QAudioDeviceInfo::defaultOutputDevice().supportedCodecs();
-		//QAudioDecoder *decoder = new QAudioDecoder(this);
-		//decoder->setAudioFormat(m_DesiredRawFormat);
-		//decoder->setSourceFilename("level1.mp3");
-		//connect(decoder, SIGNAL(bufferReady()), this, SLOT(readBuffer()));
-		//decoder->start();
+		headerList.push_back(WaveHeader());
+		if(IsWaveValid(sImportAssetList[i], headerList.last()) == false)
+			return false;
 	}
 
 	QList <uint> affectedBankIndexList;
@@ -175,7 +185,7 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 		quint32 uiChecksum = HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(pBinaryData.constData()), pBinaryData.size());
 
 		QFileInfo fileInfo(sImportAssetList[i]);
-		pAudio->ReplaceAudio(fileInfo.baseName(), uiChecksum);
+		pAudio->ReplaceAudio(fileInfo.baseName(), uiChecksum, headerList[i]);
 		if(QFile::copy(fileInfo.absoluteFilePath(), m_MetaDir.absoluteFilePath(pAudio->ConstructMetaFileName())) == false)
 		{
 			HyGuiLog("AudioManagerModel::OnReplaceAssets - Could not copy file to meta " % fileInfo.absoluteFilePath(), LOGTYPE_Error);
@@ -257,7 +267,7 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 	SaveRuntime();
 }
 
-AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, HyGuiItemType eType, QUuid uuid)
+AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, HyGuiItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef)
 {
 	QFile file(sFilePath);
 	if(!file.open(QIODevice::ReadOnly))
@@ -272,7 +282,7 @@ AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, 
 	quint32 uiChecksum = HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(pBinaryData.constData()), pBinaryData.size());
 	QFileInfo fileInfo(sFilePath);
 	
-	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid/*QUuid::createUuid()*/, uiChecksum, uiBankId, fileInfo.baseName(), "wav", 0);
+	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, 0);
 
 	if(QFile::copy(sFilePath, m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName())) == false)
 	{
