@@ -76,7 +76,6 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	ExplorerItemData(*this, ITEM_Project, HyIO::CleanPath(sProjectFilePath.toStdString().c_str(), HyGlobal::ItemExt(ITEM_Project).toStdString().c_str(), false).c_str()),
 	m_pDraw(nullptr),
-	m_DlgProjectSettings(sProjectFilePath),
 	m_pAtlasModel(nullptr),
 	m_pAtlasWidget(nullptr),
 	m_pGltfModel(nullptr),
@@ -86,13 +85,17 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	m_pCurOpenItem(nullptr),
 	m_bHasError(false)
 {
-	VersionPatcher::Run(this);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Parse/Load .hyproj file
 
-	if(m_DlgProjectSettings.HasError())
-	{
-		m_bHasError = true;
-		return;
-	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	m_SettingsObj = ReadProjFile();
+	VersionPatcher::Run(this);
+	m_SettingsObj = ReadProjFile();
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	m_pTabBar = new ProjectTabBar(this);
 	m_pTabBar->setTabsClosable(true);
@@ -258,6 +261,29 @@ void Project::LoadExplorerModel()
 	}
 }
 
+QJsonObject Project::ReadProjFile()
+{
+	QFile projFile(GetAbsPath());
+	if(projFile.exists())
+	{
+		if(!projFile.open(QIODevice::ReadOnly))
+		{
+			HyGuiLog("Could not open project " % GetAbsPath() % ": " % projFile.errorString(), LOGTYPE_Error);
+			m_bHasError = true;
+		}
+	}
+	else
+	{
+		HyGuiLog("Could not find the project file: " % GetAbsPath(), LOGTYPE_Error);
+		m_bHasError = true;
+	}
+
+	QJsonDocument settingsDoc = QJsonDocument::fromJson(projFile.readAll());
+	projFile.close();
+
+	return settingsDoc.object();
+}
+
 void Project::WriteGameData()
 {
 	QFile dataFile(GetAssetsAbsPath() % HYASSETS_DataFile);
@@ -309,15 +335,34 @@ bool Project::HasError() const
 	return m_bHasError;
 }
 
-void Project::ExecProjSettingsDlg()
-{
-	if(m_DlgProjectSettings.exec() == QDialog::Accepted)
-		m_DlgProjectSettings.SaveSettings();
-}
-
 QJsonObject Project::GetSettingsObj() const
 {
-	return m_DlgProjectSettings.GetSettingsObj();
+	return m_SettingsObj;
+}
+
+void Project::SaveSettingsObj(const QJsonObject newSettingsObj)
+{
+	m_SettingsObj = newSettingsObj;
+
+	QFile settingsFile(GetAbsPath());
+	if(settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+	{
+		HyGuiLog(QString("Couldn't open ") % GetAbsPath() % " for writing: " % settingsFile.errorString(), LOGTYPE_Error);
+		m_bHasError = true;
+	}
+	else
+	{
+		QJsonDocument settingsDoc;
+		settingsDoc.setObject(m_SettingsObj);
+		qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+		if(0 == iBytesWritten || -1 == iBytesWritten)
+		{
+			HyGuiLog(QString("Could not write to ") % GetAbsPath() % " file: " % settingsFile.errorString(), LOGTYPE_Error);
+			m_bHasError = true;
+		}
+
+		settingsFile.close();
+	}
 }
 
 QString Project::GetDirPath() const

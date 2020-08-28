@@ -47,8 +47,9 @@ class Project : public ExplorerItemData
 {
 	Q_OBJECT
 
+	QJsonObject											m_SettingsObj;
+
 	ProjectDraw *										m_pDraw;
-	DlgProjectSettings									m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
 	AtlasModel *										m_pAtlasModel;
 	ManagerWidget *										m_pAtlasWidget;
@@ -79,8 +80,8 @@ public:
 
 	bool HasError() const;
 	
-	void ExecProjSettingsDlg();
 	QJsonObject GetSettingsObj() const;
+	void SaveSettingsObj(const QJsonObject newSettingsObj);
 
 	QString GetDirPath() const;
 	QString GetGameName() const;
@@ -155,6 +156,7 @@ public Q_SLOTS:
 	void OnCloseTab(int iIndex);
 
 private:
+	QJsonObject ReadProjFile();
 	void WriteGameData();
 	void WriteMetaData();
 

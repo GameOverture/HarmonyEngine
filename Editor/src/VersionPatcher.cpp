@@ -2,7 +2,7 @@
 #include "VersionPatcher.h"
 #include "Project.h"
 
-/*static*/ void VersionPatcher::Run(Project *pProj)
+/*static*/ bool VersionPatcher::Run(Project *pProj)
 {
 	// **********************************************************
 	// NOTE: 'pProj' is only partially constructed at this point
@@ -51,7 +51,7 @@
 		if(iFileVersion != GetFileVersion(metaAtlasDir.absoluteFilePath("Atlas.hygui"), tmpDoc, true))
 		{
 			HyGuiLog("Files are older than v2. Add your files' current version to .hyproj file ($fileVersion) in order to upgrade to latest.", LOGTYPE_Warning);
-			return;
+			return false;
 		}
 	}
 
@@ -89,7 +89,7 @@
 	if(uiMetaItemsVersion == -1 || uiDataItemsVersion == -1 || uiMetaAtlasVersion == -1 || uiDataAtlasVersion == -1)
 	{
 		HyGuiLog("Missing files between assets and meta. Skipping Version Patcher", LOGTYPE_Info);
-		return;
+		return false;
 	}
 
 	if(iFileVersion != uiMetaItemsVersion ||
@@ -98,13 +98,13 @@
 	   iFileVersion != uiDataAtlasVersion)
 	{
 		HyGuiLog("Mismatching versions found between files (assets and meta)", LOGTYPE_Error);
-		return;
+		return false;
 	}
 
 	if(iFileVersion > HYGUI_FILE_VERSION)
 	{
 		HyGuiLog("File versions (" % QString(iFileVersion) % ") are from a future editor and may not be compatible.\nCurrent Editor file version: " % QString::number(HYGUI_FILE_VERSION), LOGTYPE_Error);
-		return;
+		return false;
 	}
 
 	// Upgrade files if necessary
@@ -144,7 +144,11 @@
 		projObj["$fileVersion"] = HYGUI_FILE_VERSION;
 		projDoc.setObject(projObj);
 		RewriteFile(pProj->GetAbsPath(), projDoc, false);
+
+		return true;
 	}
+	else
+		return false;
 }
 
 /*static*/ int VersionPatcher::GetFileVersion(QString sFilePath, QJsonDocument &fileDocOut, bool bIsMeta)

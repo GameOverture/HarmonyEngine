@@ -754,7 +754,9 @@ void MainWindow::on_actionProjectSettings_triggered()
 	if(Harmony::GetProject() == nullptr)
 		return;
 
-	Harmony::GetProject()->ExecProjSettingsDlg();
+	DlgProjectSettings dlg(*Harmony::GetProject(), this);
+	if(dlg.exec() == QDialog::Accepted && dlg.HasSettingsChanged())
+		Harmony::GetProject()->SaveSettingsObj(dlg.GetNewSettingsObj());
 }
 
 void MainWindow::on_actionTheme_Lappy486_triggered()

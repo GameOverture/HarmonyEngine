@@ -3,7 +3,7 @@
 class VersionPatcher
 {
 public:
-	static void Run(Project *pProj);
+	static bool Run(Project *pProj);
 
 private:
 	static int GetFileVersion(QString sFilePath, QJsonDocument &fileDocOut, bool bIsMeta);
