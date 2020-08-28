@@ -12,6 +12,7 @@
 #include "SpriteWidget.h"
 #include "Project.h"
 #include "ExplorerModel.h"
+#include "MainWindow.h"
 
 #include <QFileInfo>
 #include <QJsonDocument>
@@ -38,7 +39,7 @@ Project &ExplorerItemData::GetProject() const
 
 QString ExplorerItemData::GetPrefix() const
 {
-	return m_pProject->GetExplorerModel().AssemblePrefix(const_cast<ExplorerItemData *>(this));
+	return MainWindow::GetExplorerModel().AssemblePrefix(const_cast<ExplorerItemData *>(this));
 }
 
 void ExplorerItemData::Rename(QString sNewName)

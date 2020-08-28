@@ -13,6 +13,7 @@
 #include "ProjectItemMimeData.h"
 #include "EntityModel.h"
 #include "EntityUndoCmds.h"
+#include "MainWindow.h"
 
 #include <QDragEnterEvent>
 
@@ -176,7 +177,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 			if(itemObj["project"].toString().toLower() == m_pProject->GetAbsPath().toLower())
 			{
 				QString sItemPath = itemObj["itemName"].toString();
-				ExplorerItemData *pItem = m_pProject->GetExplorerModel().FindItemByItemPath(m_pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
+				ExplorerItemData *pItem = MainWindow::GetExplorerModel().FindItemByItemPath(m_pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
 
 				EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
 				if(entityTreeModelRef.IsItemValid(pItem, true) == false)

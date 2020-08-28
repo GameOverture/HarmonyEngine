@@ -47,8 +47,6 @@ class Project : public ExplorerItemData
 {
 	Q_OBJECT
 
-	ExplorerModel &										m_ModelRef;
-
 	ProjectDraw *										m_pDraw;
 	DlgProjectSettings									m_DlgProjectSettings;   // Stores the actual settings in a QJsonObject within;
 
@@ -61,9 +59,6 @@ class Project : public ExplorerItemData
 	GltfWidget *										m_pGltfWidget;
 
 	QStandardItemModel									m_FontListModel;
-
-	// Below saved for later FMOD implementation
-	//AudioAssetsWidget *									m_pAudioWidget;
 
 	ProjectTabBar *										m_pTabBar;
 	ProjectItemData *									m_pCurOpenItem;
@@ -101,7 +96,7 @@ public:
 	QString GetBuildRelPath() const;
 
 	IManagerModel *GetManagerModel(HyGuiItemType eManagerType);
-	ExplorerModel &GetExplorerModel();
+
 	AtlasModel &GetAtlasModel();
 	ManagerWidget *GetAtlasWidget();
 	AudioManagerModel &GetAudioModel();
@@ -147,6 +142,7 @@ public:
 
 	void ApplySaveEnables();
 
+	void AddNewBuild();
 	void RunCMakeGui();
 
 	// IHyEngine

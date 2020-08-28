@@ -386,9 +386,14 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	return sm_pInstance->ui->menu_New_Item;
 }
 
-/*static*/ ExplorerWidget *MainWindow::GetExplorer()
+/*static*/ ExplorerModel &MainWindow::GetExplorerModel()
 {
-	return sm_pInstance->ui->explorer;
+	return sm_pInstance->m_ExplorerModel;
+}
+
+/*static*/ ExplorerWidget &MainWindow::GetExplorerWidget()
+{
+	return *sm_pInstance->ui->explorer;
 }
 
 /*static*/ IWidget *MainWindow::GetItemProperties()
@@ -396,7 +401,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	return static_cast<IWidget *>(sm_pInstance->ui->dockWidgetProperties->widget());
 }
 
-/*virtual*/ void MainWindow::closeEvent(QCloseEvent *pEvent) /*override*/
+/*virtual*/ void MainWindow::closeEvent(QCloseEvent *pEvent) /*override*/ 
 {
 	// This will ensure that the user has a chance to save all unsaved open documents, or cancel which will abort the close
 	if(Harmony::GetProject() && Harmony::GetProject()->CloseAllTabs() == false)
@@ -596,7 +601,7 @@ void MainWindow::on_actionNewBuild_triggered()
 	}
 
 	DlgNewBuild *pDlg = new DlgNewBuild(*Harmony::GetProject(), this);
-	if(pDlg->exec())
+	if(pDlg->exec() == QDialog::Accepted)
 	{
 		QProcess *pBuildProcess = new QProcess(this);
 		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
@@ -605,6 +610,8 @@ void MainWindow::on_actionNewBuild_triggered()
 		QString sProc = pDlg->GetProc();
 		QStringList sArgList = pDlg->GetProcOptions();
 		pBuildProcess->start(sProc, sArgList);
+
+		Harmony::GetProject()->AddNewBuild();
 	}
 	delete pDlg;
 

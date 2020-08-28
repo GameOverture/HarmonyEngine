@@ -329,8 +329,8 @@ void ProjectItemData::on_undoStack_cleanChanged(bool bClean)
 				pTabBar->setTabIcon(i, GetIcon(SUBICON_Dirty));
 			}
 
-			QModelIndex index = m_pProject->GetExplorerModel().FindIndex<ProjectItemData *>(this, 0);
-			m_pProject->GetExplorerModel().dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
+			QModelIndex index = MainWindow::GetExplorerModel().FindIndex<ProjectItemData *>(this, 0);
+			MainWindow::GetExplorerModel().dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
 
 			break;
 		}

@@ -71,7 +71,9 @@ public:
 
 	static QMenu *GetNewItemMenu();
 
-	static ExplorerWidget *GetExplorer();
+	static ExplorerModel &GetExplorerModel();
+	static ExplorerWidget &GetExplorerWidget();
+
 	static IWidget *GetItemProperties();
 
 protected:

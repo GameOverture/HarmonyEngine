@@ -75,7 +75,6 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	ExplorerItemData(*this, ITEM_Project, HyIO::CleanPath(sProjectFilePath.toStdString().c_str(), HyGlobal::ItemExt(ITEM_Project).toStdString().c_str(), false).c_str()),
-	m_ModelRef(modelRef),
 	m_pDraw(nullptr),
 	m_DlgProjectSettings(sProjectFilePath),
 	m_pAtlasModel(nullptr),
@@ -232,7 +231,7 @@ void Project::LoadExplorerModel()
 			if(sPrefix == "+HyInternal" && sName == "+SystemText")
 				bSystemFontFound = true;
 
-			m_ModelRef.AddItem(this, eItemType, sPrefix, sName, itemFileData, false);
+			MainWindow::GetExplorerModel().AddItem(this, eItemType, sPrefix, sName, itemFileData, false);
 		}
 	}
 
@@ -254,7 +253,7 @@ void Project::LoadExplorerModel()
 			QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "data/").toLocal8Bit());
 			sContents.replace(sBefore, sAfter);
 
-			m_ModelRef.PasteItemSrc(sContents, m_ModelRef.FindIndex<ExplorerItemData *>(this, 0));
+			MainWindow::GetExplorerModel().PasteItemSrc(sContents, MainWindow::GetExplorerModel().FindIndex<ExplorerItemData *>(this, 0));
 		}
 	}
 }
@@ -391,11 +390,6 @@ IManagerModel *Project::GetManagerModel(HyGuiItemType eManagerType)
 		HyGuiLog("Project::GetManagerModel was passed invalid eManagerType", LOGTYPE_Error);
 		return nullptr;
 	}
-}
-
-ExplorerModel &Project::GetExplorerModel()
-{
-	return m_ModelRef;
 }
 
 AtlasModel &Project::GetAtlasModel()
@@ -794,7 +788,7 @@ QList<ProjectItemData *> Project::RegisterItemsById(ProjectItemData *pItemOwner,
 {
 	QList<ProjectItemData *> itemList;
 	for(auto uuid : requestList)
-		itemList.append(m_ModelRef.FindByUuid(uuid));
+		itemList.append(MainWindow::GetExplorerModel().FindByUuid(uuid));
 
 	return RegisterItems(pItemOwner, itemList);
 }
@@ -927,6 +921,11 @@ void Project::ApplySaveEnables()
 	}
 
 	MainWindow::ApplySaveEnables(bCurItemDirty, bAnyItemDirty);
+}
+
+void Project::AddNewBuild()
+{
+
 }
 
 void Project::RunCMakeGui()

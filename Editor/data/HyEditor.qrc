@@ -191,5 +191,7 @@
         <file>icons16x16/items/Build-Settings.png</file>
         <file>icons16x16/items/Build-Warning.png</file>
         <file>icons16x16/Tools-ImportTileSheet.png</file>
+        <file>icons16x16/Build-Desktop.png</file>
+        <file>icons16x16/Build-Browser.png</file>
     </qresource>
 </RCC>

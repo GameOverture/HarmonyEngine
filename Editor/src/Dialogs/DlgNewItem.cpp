@@ -11,6 +11,7 @@
 #include "DlgNewItem.h"
 #include "ui_DlgNewItem.h"
 #include "ExplorerModel.h"
+#include "MainWindow.h"
 
 #include <QDirIterator>
 #include <QStringBuilder>
@@ -35,7 +36,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 	ui->txtPrefix->setValidator(HyGlobal::FilePathValidator());
 	on_chkNewPrefix_stateChanged(ui->chkNewPrefix->isChecked() ? Qt::Checked : Qt::Unchecked);
 
-	m_PrefixStringList = pItemProject->GetExplorerModel().GetPrefixList(pItemProject);
+	m_PrefixStringList = MainWindow::GetExplorerModel().GetPrefixList(pItemProject);
 
 	qSort(m_PrefixStringList.begin(), m_PrefixStringList.end());
 	m_PrefixStringList.prepend(QString("<no prefix>"));
