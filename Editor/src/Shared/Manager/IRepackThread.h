@@ -10,7 +10,7 @@
 #ifndef IREPACKTHREAD_H
 #define IREPACKTHREAD_H
 
-#include "IManagerModel.h"
+#include "BanksModel.h"
 
 #include <QThread>
 #include <QDir>

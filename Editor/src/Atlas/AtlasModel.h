@@ -57,10 +57,6 @@ protected:
 
 	virtual QJsonObject GetSaveJson() override;
 
-private Q_SLOTS:
-	void OnLoadUpdate(QString sMsg, int iPercComplete);
-	void OnRepackFinished();
-
 private:
 	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiBankIndex, HyGuiItemType eType, QUuid uuid);
 };

@@ -225,6 +225,9 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, H
 		return false;
 	}
 
+	if(eType == ITEM_Unknown)
+		eType = m_eITEM_TYPE;
+
 	QList<AssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType, correspondingUuidList);
 	for(int i = 0; i < returnList.size(); ++i)
 		InsertTreeItem(returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
@@ -1061,6 +1064,16 @@ void IManagerModel::MoveAsset(AssetItemData *pAsset, quint32 uiNewBankId)
 	}
 }
 
+void IManagerModel::StartRepackThread(QString sLoadMessage, IRepackThread *pRepackThread)
+{
+	connect(pRepackThread, &QThread::finished, pRepackThread, &QObject::deleteLater);
+	connect(pRepackThread, &IRepackThread::LoadUpdate, this, &IManagerModel::OnLoadUpdate);
+	connect(pRepackThread, &IRepackThread::RepackIsFinished, this, &IManagerModel::OnRepackFinished);
+
+	MainWindow::SetLoading(sLoadMessage, 0);
+	pRepackThread->start();
+}
+
 AssetItemData *IManagerModel::CreateAssetTreeItem(const QString sPrefix, const QString sName, QJsonObject metaObj)
 {
 	TreeModelItem *pCurTreeItem = m_pRootItem;
@@ -1095,4 +1108,14 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(const QString sPrefix, const Q
 
 	InsertTreeItem(pNewItemData, pCurTreeItem);
 	return pNewItemData;
+}
+
+/*slot*/ void IManagerModel::OnLoadUpdate(QString sMsg, int iPercComplete)
+{
+	MainWindow::SetLoading(sMsg, iPercComplete);
+}
+
+/*slot*/ void IManagerModel::OnRepackFinished()
+{
+	SaveRuntime();
 }

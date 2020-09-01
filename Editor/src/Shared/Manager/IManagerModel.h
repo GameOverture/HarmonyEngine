@@ -14,6 +14,7 @@
 #include "ITreeModel.h"
 #include "IAssetItemData.h"
 #include "BanksModel.h"
+#include "IRepackThread.h"
 
 #include <QUuid>
 
@@ -116,6 +117,8 @@ protected:
 	void DeleteAsset(AssetItemData *pAsset);
 	void MoveAsset(AssetItemData *pAsset, quint32 uiNewBankId);
 
+	void StartRepackThread(QString sLoadMessage, IRepackThread *pRepackThread);
+
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
 	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
@@ -127,6 +130,10 @@ protected:
 
 private:
 	AssetItemData *CreateAssetTreeItem(const QString sPrefix, const QString sName, QJsonObject metaObj);
+
+protected Q_SLOTS:
+	void OnLoadUpdate(QString sMsg, int iPercComplete);
+	void OnRepackFinished();
 };
 
 #endif // IMANAGERMODEL_H

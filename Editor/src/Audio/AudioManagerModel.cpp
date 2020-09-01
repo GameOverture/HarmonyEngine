@@ -11,6 +11,7 @@
 #include "AudioManagerModel.h"
 #include "Project.h"
 #include "MainWindow.h"
+#include "AudioRepackThread.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -88,7 +89,8 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 
 void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 {
-
+	AudioRepackThread *pWorkerThread = new AudioRepackThread(*m_BanksModel.GetBank(uiBankIndex), m_MetaDir);
+	StartRepackThread("Repacking Audio", pWorkerThread);
 }
 
 /*virtual*/ AssetItemData *AudioManagerModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/

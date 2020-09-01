@@ -247,12 +247,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 
 	AtlasRepackThread *pWorkerThread = new AtlasRepackThread(*m_BanksModel.GetBank(uiBankIndex), textureIndexList, newFramesList, m_MetaDir);
-	connect(pWorkerThread, &AtlasRepackThread::finished, pWorkerThread, &QObject::deleteLater);
-	connect(pWorkerThread, &AtlasRepackThread::LoadUpdate, this, &AtlasModel::OnLoadUpdate);
-	connect(pWorkerThread, &AtlasRepackThread::RepackIsFinished, this, &AtlasModel::OnRepackFinished);
-
-	MainWindow::SetLoading("Repacking Atlases", 0);
-	pWorkerThread->start();
+	StartRepackThread("Repacking Atlases", pWorkerThread);
 }
 
 /*virtual*/ void AtlasModel::OnNewBankDefaults(QJsonObject &bankObjRef) /*override*/
@@ -561,16 +556,6 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	atlasInfoObj.insert("banks", banksArray);
 
 	return atlasInfoObj;
-}
-
-/*slot*/ void AtlasModel::OnLoadUpdate(QString sMsg, int iPercComplete)
-{
-	MainWindow::SetLoading(sMsg, iPercComplete);
-}
-
-/*slot*/ void AtlasModel::OnRepackFinished()
-{
-	SaveRuntime();
 }
 
 AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, HyGuiItemType eType, QUuid uuid)
