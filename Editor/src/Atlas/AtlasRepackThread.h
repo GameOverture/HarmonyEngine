@@ -10,36 +10,27 @@
 #ifndef ATLASREPACKTHREAD_H
 #define ATLASREPACKTHREAD_H
 
-#include "AtlasModel.h"
+#include "IRepackThread.h"
+#include "AtlasFrame.h"
 #include "_Dependencies/scriptum/imagepacker.h"
 
-#include <QThread>
-#include <QDir>
-
-class AtlasRepackThread : public QThread
+class AtlasRepackThread : public IRepackThread
 {
 	Q_OBJECT
 
-	BankData &			m_BankRef;
 	ImagePacker			m_Packer;
 
 	QList<int>			m_TextureIndexList;
 	QList<AtlasFrame *> m_NewFramesList;
-	QDir				m_MetaDir;
 
 public:
 	AtlasRepackThread(BankData &bankRef, QList<int> textureIndexList, QList<AtlasFrame *>newFramesList, QDir metaDir);
 	virtual ~AtlasRepackThread();
 
-	virtual void run() override;
-
-	void ConstructAtlasTexture(int iPackerBinIndex, int iActualTextureIndex);
-
-Q_SIGNALS:
-	void LoadUpdate(QString sMsg, int iPercComplete);
-	void RepackIsFinished();
+	virtual void OnRun() override;
 
 private:
+	void ConstructAtlasTexture(int iPackerBinIndex, int iActualTextureIndex);
 	void SetPackerSettings();
 };
 

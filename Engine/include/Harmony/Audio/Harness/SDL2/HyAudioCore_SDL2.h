@@ -24,34 +24,43 @@ class HyAudioCore_SDL2 : public IHyAudioCore
 {
 	std::vector<std::string>			m_sDeviceList;
 
-	SDL_AudioDeviceID					m_hDevice;
-	SDL_AudioSpec						m_DesiredSpec;
+	int32								m_iDesiredFrequency;	// 44100 or 48000, etc.
+	SDL_AudioFormat						m_uiDesiredFormat;
+	int32								m_iDesiredNumChannels;	// 1 mono, 2 stereo, 4 quad, 6 (5.1)
+	int32								m_iDesiredSamples;		// Chunk size (4096, 2048, etc) - Specifies a unit of audio data to be used at a time. Must be a power of 2
 
 	std::vector<HyFileAudioImpl_SDL2 *>	m_AudioFileList;
 
-	// Used in callback thread ///////////////////////////////////////////////
-	struct Play
+	enum ChannelResizePolicy
 	{
-		const IHyNode *					m_pID;
-
-		float							m_fVolume;
-		float							m_fPitch;
-		bool							m_bPaused;
-
-		HyRawSoundBuffer *				m_pBuffer;
-		uint32							m_uiRemainingBytes;
-
-		Play(const IHyNode *pID, float fVolume, float fPitch, bool bPaused, HyRawSoundBuffer *pBuffer, uint32 uiRemainingBytes) :
-			m_pID(pID),
-			m_fVolume(fVolume),
-			m_fPitch(fPitch),
-			m_bPaused(bPaused),
-			m_pBuffer(pBuffer),
-			m_uiRemainingBytes(uiRemainingBytes)
-		{ }
+		CHANNEL_Locked = 0,
+		CHANNEL_Grow
 	};
-	std::vector<Play>					m_PlayList;
-	///////////////////////////////////////////////////////////////////////////
+	ChannelResizePolicy					m_eResizePolicy;
+
+	//// Used in callback thread ///////////////////////////////////////////////
+	//struct Play
+	//{
+	//	const IHyNode *					m_pID;
+
+	//	float							m_fVolume;
+	//	float							m_fPitch;
+	//	bool							m_bPaused;
+
+	//	HyRawSoundBuffer *				m_pBuffer;
+	//	uint32							m_uiRemainingBytes;
+
+	//	Play(const IHyNode *pID, float fVolume, float fPitch, bool bPaused, HyRawSoundBuffer *pBuffer, uint32 uiRemainingBytes) :
+	//		m_pID(pID),
+	//		m_fVolume(fVolume),
+	//		m_fPitch(fPitch),
+	//		m_bPaused(bPaused),
+	//		m_pBuffer(pBuffer),
+	//		m_uiRemainingBytes(uiRemainingBytes)
+	//	{ }
+	//};
+	//std::vector<Play>					m_PlayList;
+	/////////////////////////////////////////////////////////////////////////////
 
 public:
 	HyAudioCore_SDL2();
@@ -63,8 +72,8 @@ public:
 
 	static IHyFileAudioImpl *AllocateBank(IHyAudioCore *pAudio, HyJsonObj bankObj);
 
-private:
-	static void OnCallback(void *pUserData, uint8_t *pStream, int32 iLen);
+//private:
+//	static void OnCallback(void *pUserData, uint8_t *pStream, int32 iLen);
 };
 #endif // defined(HY_USE_SDL2)
 

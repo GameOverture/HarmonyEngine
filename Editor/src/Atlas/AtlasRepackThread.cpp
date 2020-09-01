@@ -16,10 +16,9 @@
 #include <QImageWriter>
 
 AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<int> textureIndexList, QList<AtlasFrame *> newFramesList, QDir metaDir) :
-	m_BankRef(bankRef),
+	IRepackThread(bankRef, metaDir),
 	m_TextureIndexList(textureIndexList),
-	m_NewFramesList(newFramesList),
-	m_MetaDir(metaDir)
+	m_NewFramesList(newFramesList)
 {
 }
 
@@ -27,7 +26,7 @@ AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<int> textureIndexL
 {
 }
 
-/*virtual*/ void AtlasRepackThread::run() /*override*/
+/*virtual*/ void AtlasRepackThread::OnRun() /*override*/
 {
 	m_Packer.clear();
 
@@ -145,8 +144,6 @@ AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<int> textureIndexL
 			pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(), pDupFrame->GetX(), pDupFrame->GetY());
 		}
 	}
-
-	Q_EMIT RepackIsFinished();
 }
 
 void AtlasRepackThread::ConstructAtlasTexture(int iPackerBinIndex, int iActualTextureIndex)

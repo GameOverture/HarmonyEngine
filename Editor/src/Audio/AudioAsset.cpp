@@ -19,14 +19,28 @@ AudioAsset::AudioAsset(IManagerModel &modelRef,
 					   quint32 uiBankId,
 					   QString sName,
 					   const WaveHeader &wavHeaderRef,
+					   bool bIsMusic,
+					   int32 iInstanceLimit,
 					   uint uiErrors) :
 	AssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
-	m_WaveHeader(wavHeaderRef)
+	m_WaveHeader(wavHeaderRef),
+	m_bIsMusic(bIsMusic),
+	m_iInstanceLimit(iInstanceLimit)
 {
 }
 
 AudioAsset::~AudioAsset()
 {
+}
+
+bool AudioAsset::IsMusic() const
+{
+	return m_bIsMusic;
+}
+
+int32 AudioAsset::GetInstanceLimit() const
+{
+	return m_iInstanceLimit;
 }
 
 void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader &wavHeaderRef)
@@ -49,4 +63,6 @@ void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader
 	wavHeaderObj.insert("dataSize", QJsonValue(static_cast<qint64>(m_WaveHeader.Subchunk2Size)));
 
 	frameObj.insert("wavHeader", wavHeaderObj);
+	frameObj.insert("isMusic", m_bIsMusic);
+	frameObj.insert("instanceLimit", m_iInstanceLimit);
 }

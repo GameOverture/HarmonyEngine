@@ -15,33 +15,30 @@
 #include "Diagnostics/Console/HyConsole.h"
 
 #if defined(HY_USE_SDL2)
+#include "SDL_mixer.h"
+
 class HyRawSoundBuffer
 {
 	const std::string			m_sFILE_NAME;
-
-	uint8_t *					m_pBuffer;
-	uint32						m_uiBufferSize;
-	SDL_AudioSpec				m_Spec;
+	const bool					m_bIS_MUSIC;
+	union BufferPtr
+	{
+		Mix_Chunk *				pSfx;
+		Mix_Music *				pMusic;
+	};
+	BufferPtr					m_Buffer;
 
 public:
-	HyRawSoundBuffer(std::string sFileName) :
+	HyRawSoundBuffer(std::string sFileName, bool bIsMusic) :
 		m_sFILE_NAME(sFileName),
-		m_pBuffer(nullptr),
-		m_uiBufferSize(0)
+		m_bIS_MUSIC(bIsMusic)
 	{
-		m_Spec = {};
+		m_Buffer.pSfx = nullptr;
 	}
 
-	const uint8_t *GetBuffer(uint32 uiRemainingBytes) const {
-		return m_pBuffer + (m_uiBufferSize - uiRemainingBytes);
-	}
-
-	uint32 GetBufferSize() const {
-		return m_uiBufferSize;
-	}
-
-	SDL_AudioFormat GetFormat() const {
-		return m_Spec.format;
+	~HyRawSoundBuffer()
+	{
+		Unload();
 	}
 
 	bool Load(std::string sFilePath) {
@@ -49,21 +46,38 @@ public:
 		s += "/";
 		s += m_sFILE_NAME;
 
-		if(SDL_LoadWAV(s.c_str(), &m_Spec, &m_pBuffer, &m_uiBufferSize) == nullptr)
+		if(m_bIS_MUSIC)
 		{
-			HyLogError("HyRawSoundBuffer::Load SDL_LoadWAV failed: " << SDL_GetError());
-			return false;
+			m_Buffer.pMusic = Mix_LoadMUS(s.c_str());
+			if(m_Buffer.pMusic == nullptr)
+			{
+				HyLogError("Load music failed on: " << s.c_str() << " Error: " << SDL_GetError());
+				return false;
+			}
+		}
+		else
+		{
+			m_Buffer.pSfx = Mix_LoadWAV(s.c_str()); // This can load more than just WAV formats.
+			if(m_Buffer.pSfx == nullptr)
+			{
+				HyLogError("Load sound failed on: " << s.c_str() << " Error: " << SDL_GetError());
+				return false;
+			}
 		}
 
 		return true;
 	}
 
 	void Unload() {
-		if(m_pBuffer)
-			SDL_FreeWAV(m_pBuffer);
-		m_pBuffer = nullptr;
-		m_uiBufferSize = 0;
-		m_Spec = {};
+		if(m_Buffer.pSfx != nullptr)
+		{
+			if(m_bIS_MUSIC)
+				Mix_FreeMusic(m_Buffer.pMusic);
+			else
+				Mix_FreeChunk(m_Buffer.pSfx);
+
+			m_Buffer.pSfx = nullptr;
+		}
 	}
 };
 

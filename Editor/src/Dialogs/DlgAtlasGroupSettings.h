@@ -28,8 +28,6 @@ public:
 	explicit DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObject packerSettingsObj, QWidget *parent = 0);
 	~DlgAtlasGroupSettings();
 	
-	static QJsonObject GenerateDefaultSettingsObj();
-	
 	bool IsSettingsDirty();
 	
 	void ApplyCurrentSettingsToObj(QJsonObject &settingsObjOut);

@@ -4,6 +4,8 @@ set(Qt5_DIR "" CACHE PATH "Specify cmake Qt5 directory. Ex. C:/Qt/5.12.0/msvc201
 if(Qt5_DIR)
 	add_subdirectory(external/freetype2)
 	add_subdirectory(external/freetype-gl)
+	add_subdirectory(external/libogg-1.3.4)
+	add_subdirectory(external/libvorbis-1.3.7)
 
 	find_package(Qt5 COMPONENTS Core Gui Network Widgets Multimedia REQUIRED)
 
@@ -16,24 +18,26 @@ if(Qt5_DIR)
 		src/MainWindow.ui
 		src/HyEditor.rc
 		src/Atlas/AtlasDraw.cpp
-		src/Atlas/AtlasFrame.cpp
-		src/Atlas/AtlasModel.cpp
-		src/Atlas/AtlasRepackThread.cpp
 		src/Atlas/AtlasDraw.h
+		src/Atlas/AtlasFrame.cpp
 		src/Atlas/AtlasFrame.h
+		src/Atlas/AtlasModel.cpp
 		src/Atlas/AtlasModel.h
+		src/Atlas/AtlasRepackThread.cpp
 		src/Atlas/AtlasRepackThread.h
 		src/Audio/AudioAsset.cpp
-		src/Audio/AudioAssetsWidget.cpp
-		src/Audio/AudioManagerModel.cpp
-		src/Audio/AudioModel.cpp
-		src/Audio/AudioWidget.cpp
 		src/Audio/AudioAsset.h
+		src/Audio/AudioAssetsWidget.cpp
 		src/Audio/AudioAssetsWidget.h
-		src/Audio/AudioManagerModel.h
-		src/Audio/AudioModel.h
-		src/Audio/AudioWidget.h
 		src/Audio/AudioAssetsWidget.ui
+		src/Audio/AudioManagerModel.cpp
+		src/Audio/AudioManagerModel.h
+		src/Audio/AudioModel.cpp
+		src/Audio/AudioModel.h
+		src/Audio/AudioRepackThread.cpp
+		src/Audio/AudioRepackThread.h
+		src/Audio/AudioWidget.cpp
+		src/Audio/AudioWidget.h
 		src/Audio/AudioWidget.ui
 		src/Dialogs/DlgAtlasGroupSettings.cpp
 		src/Dialogs/DlgAtlasGroupSettings.h
@@ -128,6 +132,8 @@ if(Qt5_DIR)
 		src/Shared/Manager/IManagerDraw.h
 		src/Shared/Manager/IManagerModel.cpp
 		src/Shared/Manager/IManagerModel.h
+		src/Shared/Manager/IRepackThread.cpp
+		src/Shared/Manager/IRepackThread.h
 		src/Shared/Manager/ManagerWidget.cpp
 		src/Shared/Manager/ManagerWidget.h
 		src/Shared/Manager/ManagerWidget.ui
@@ -235,7 +241,7 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include/Harmony")
 
 	target_compile_definitions(HyEditor PRIVATE HY_USE_QT)
-	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets Qt5::Multimedia)
+	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl ogg vorbis Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets Qt5::Multimedia)
 
 	set_target_properties(HyEditor PROPERTIES
 		CXX_STANDARD 11

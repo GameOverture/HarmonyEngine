@@ -64,10 +64,15 @@ class AudioAsset : public AssetItemData
 	Q_OBJECT
 
 	WaveHeader		m_WaveHeader;
+	bool			m_bIsMusic;
+	int32			m_iInstanceLimit;
 
 public:
-	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, uint uiErrors);
+	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, bool bIsMusic, int32 iInstanceLimit, uint uiErrors);
 	~AudioAsset();
+
+	bool IsMusic() const;
+	int32 GetInstanceLimit() const;
 
 	void ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader &wavHeaderRef);
 

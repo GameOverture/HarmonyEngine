@@ -580,16 +580,14 @@ TreeModelItemData *IManagerModel::CreateNewFilter(QString sName, TreeModelItemDa
 
 void IManagerModel::CreateNewBank(QString sName)
 {
-	//AtlasGrp *pNewAtlasGrp = new AtlasGrp());
-	QJsonObject bankObj = DlgAtlasGroupSettings::GenerateDefaultSettingsObj();
-
-	bankObj.insert("bankName", sName);
+	QJsonObject bankObj;
 	bankObj.insert("bankId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
+	bankObj.insert("bankName", sName);
+	OnNewBankDefaults(bankObj);
 
 	BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_uiNextBankId)), bankObj);
 	
-	//OnCreateBank(*pNewBank);
-	if(m_eITEM_TYPE == ITEM_AtlasImage)
+	if(m_eITEM_TYPE == ITEM_AtlasImage || m_eITEM_TYPE == ITEM_Audio)
 		m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewBank->GetId()));
 
 	m_uiNextBankId++;
@@ -993,6 +991,8 @@ void IManagerModel::SaveRuntime()
 	}
 
 	SaveMeta();
+
+	return true;
 }
 
 void IManagerModel::RegisterAsset(AssetItemData *pAsset)

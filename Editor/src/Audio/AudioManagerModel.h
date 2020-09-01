@@ -28,6 +28,7 @@ public:
 
 	bool IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut);
 	
+	virtual void OnNewBankDefaults(QJsonObject &bankObjRef) override;
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() override;
@@ -51,6 +52,8 @@ private Q_SLOTS:
 
 private:
 	AudioAsset *ImportSound(QString sFilePath, quint32 uiBankIndex, HyGuiItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef);
+	
+	bool wavToOgg(QString sWavFilePath, QString sOggFilePath, uint16 uiNumChannels, float fVbrQuality);
 };
 
 #endif // AudioManagerModel_H

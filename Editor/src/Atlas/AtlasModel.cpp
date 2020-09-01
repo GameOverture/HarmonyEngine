@@ -255,6 +255,25 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	pWorkerThread->start();
 }
 
+/*virtual*/ void AtlasModel::OnNewBankDefaults(QJsonObject &bankObjRef) /*override*/
+{
+	bankObjRef.insert("cmbSortOrder", 0);
+	bankObjRef.insert("sbFrameMarginTop", 0);
+	bankObjRef.insert("sbFrameMarginLeft", 0);
+	bankObjRef.insert("sbFrameMarginRight", 1);
+	bankObjRef.insert("sbFrameMarginBottom", 1);
+	bankObjRef.insert("extrude", 1);
+	bankObjRef.insert("chkMerge", true);
+	bankObjRef.insert("chkSquare", true);
+	bankObjRef.insert("chkAutosize", true);
+	bankObjRef.insert("minFillRate", 80);
+	bankObjRef.insert("maxWidth", 2048);
+	bankObjRef.insert("maxHeight", 2048);
+	bankObjRef.insert("cmbHeuristic", 1);
+	bankObjRef.insert("textureFormat", QString(HyAssets::GetTextureFormatName(HYTEXTURE_R8G8B8A8).c_str()));
+	bankObjRef.insert("textureFiltering", QString(HyAssets::GetTextureFilteringName(HYTEXFILTER_BILINEAR).c_str()));
+}
+
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	QString sInfo = "Num Textures: " % QString::number(GetNumTextures(uiBankIndex)) % " | " %

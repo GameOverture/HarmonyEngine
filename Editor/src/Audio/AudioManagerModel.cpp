@@ -51,6 +51,14 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 		HyGuiLog("Only PCM (i.e. Linear quantization) wave files are supported", LOGTYPE_Warning);
 		return false;
 	}
+
+	return true;
+}
+
+/*virtual*/ void AudioManagerModel::OnNewBankDefaults(QJsonObject &bankObjRef) /*override*/
+{
+	//bankObjRef.insert("bankId", 0);
+	//bankObjRef.insert("bankName", "Default");
 }
 
 /*virtual*/ QString AudioManagerModel::OnBankInfo(uint uiBankIndex) /*override*/
@@ -93,6 +101,8 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
 										   wavHeader,
+										   metaObj["isMusic"].toBool(),
+										   metaObj["instanceLimit"].toInt(),
 										   metaObj["errors"].toInt(0));
 
 	return pNewFrame;
@@ -116,7 +126,7 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 	for(int i = 0; i < sImportAssetList.size(); ++i)
 	{
 		// ImportSound calls RegisterAsset() on valid imports
-		AudioAsset *pNewAsset = ImportSound(QFileInfo(sImportAssetList[i]).baseName(), uiBankId, eType, correspondingUuidList[i], headerList[i]);
+		AudioAsset *pNewAsset = ImportSound(sImportAssetList[i], uiBankId, eType, correspondingUuidList[i], headerList[i]);
 		if(pNewAsset)
 			returnList.append(pNewAsset);
 	}
@@ -198,6 +208,8 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 
 	for(int i = 0; i < affectedBankIndexList.count(); ++i)
 		Repack(affectedBankIndexList[i], QSet<AudioAsset *>());
+
+	return true;
 }
 
 /*virtual*/ bool AudioManagerModel::OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
@@ -242,6 +254,8 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 			QJsonObject assetObj;
 			assetObj.insert("checksum", QJsonValue(static_cast<qint64>(bankAssetListRef[i]->GetChecksum())));
 			assetObj.insert("fileName", QJsonValue(bankAssetListRef[i]->ConstructMetaFileName()));
+			assetObj.insert("isMusic", static_cast<AudioAsset *>(bankAssetListRef[i])->IsMusic());
+			assetObj.insert("instanceLimit", static_cast<AudioAsset *>(bankAssetListRef[i])->GetInstanceLimit());
 
 			assetsArray.append(assetObj);
 		}
@@ -282,7 +296,7 @@ AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, 
 	quint32 uiChecksum = HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(pBinaryData.constData()), pBinaryData.size());
 	QFileInfo fileInfo(sFilePath);
 	
-	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, 0);
+	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, false, -1, 0);
 
 	if(QFile::copy(sFilePath, m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName())) == false)
 	{

@@ -20,7 +20,7 @@ HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj bankObj)
 	{
 		HyJsonObj assetObj = assetsArray[i].GetObject();
 
-		HyRawSoundBuffer *pNewBuffer = HY_NEW HyRawSoundBuffer(assetObj["fileName"].GetString());
+		HyRawSoundBuffer *pNewBuffer = HY_NEW HyRawSoundBuffer(assetObj["fileName"].GetString(), assetObj["isMusic"].GetBool());
 		m_SoundBuffers.push_back(pNewBuffer);
 		m_ChecksumMap[assetObj["checksum"].GetUint()] = pNewBuffer;
 	}

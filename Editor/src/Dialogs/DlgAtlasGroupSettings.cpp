@@ -80,31 +80,6 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
 	delete ui;
 }
 
-/*static*/ QJsonObject DlgAtlasGroupSettings::GenerateDefaultSettingsObj()
-{
-	QJsonObject returnSettingsObj;
-	
-	returnSettingsObj.insert("bankId", 0);
-	returnSettingsObj.insert("bankName", "Default");
-	returnSettingsObj.insert("cmbSortOrder", 0);
-	returnSettingsObj.insert("sbFrameMarginTop", 0);
-	returnSettingsObj.insert("sbFrameMarginLeft", 0);
-	returnSettingsObj.insert("sbFrameMarginRight", 1);
-	returnSettingsObj.insert("sbFrameMarginBottom", 1);
-	returnSettingsObj.insert("extrude", 1);
-	returnSettingsObj.insert("chkMerge", true);
-	returnSettingsObj.insert("chkSquare", true);
-	returnSettingsObj.insert("chkAutosize", true);
-	returnSettingsObj.insert("minFillRate", 80);
-	returnSettingsObj.insert("maxWidth", 2048);
-	returnSettingsObj.insert("maxHeight", 2048);
-	returnSettingsObj.insert("cmbHeuristic", 1);
-	returnSettingsObj.insert("textureFormat", QString(HyAssets::GetTextureFormatName(HYTEXTURE_R8G8B8A8).c_str()));
-	returnSettingsObj.insert("textureFiltering", QString(HyAssets::GetTextureFilteringName(HYTEXFILTER_BILINEAR).c_str()));
-	
-	return returnSettingsObj;
-}
-
 bool DlgAtlasGroupSettings::IsSettingsDirty()
 {
 	if(ui->cmbSortOrder->currentIndex() != m_InitialPackerSettingsObj["cmbSortOrder"].toInt())

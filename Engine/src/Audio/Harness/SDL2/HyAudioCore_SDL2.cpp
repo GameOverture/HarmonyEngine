@@ -17,6 +17,8 @@
 
 #if defined(HY_USE_SDL2)
 
+#include "SDL_mixer.h"
+
 HyAudioCore_SDL2::HyAudioCore_SDL2()
 {
 	HyLogTitle("SDL2 Audio");
@@ -25,16 +27,14 @@ HyAudioCore_SDL2::HyAudioCore_SDL2()
 	for(int32 i = 0; i < iNumDevices; ++i)
 		m_sDeviceList.push_back(SDL_GetAudioDeviceName(i, 0));
 
-	m_DesiredSpec.freq = 48000;//44100;							// 44100 or 48000
+	m_iDesiredFrequency = 48000;
 #if defined(HY_ENDIAN_LITTLE)
-	m_DesiredSpec.format = AUDIO_S16LSB;//AUDIO_F32LSB;
+	m_uiDesiredFormat = AUDIO_S16LSB;//AUDIO_F32LSB;
 #else
-	m_DesiredSpec.format = AUDIO_S16MSB;//AUDIO_F32MSB;
+	m_uiDesiredFormat = AUDIO_S16MSB;//AUDIO_F32MSB;
 #endif
-	m_DesiredSpec.channels = 2;							// 1 mono, 2 stereo, 4 quad, 6 (5.1)
-	m_DesiredSpec.samples = 4096;						// Specifies a unit of audio data to be used at a time. Must be a power of 2
-	m_DesiredSpec.callback = HyAudioCore_SDL2::OnCallback;
-	m_DesiredSpec.userdata = this;
+	m_iDesiredNumChannels = 2;
+	m_iDesiredSamples = 4096;
 
 	/*
 	* Note: If you're having issues with Emscripten / EMCC play around with these flags
@@ -45,26 +45,62 @@ HyAudioCore_SDL2::HyAudioCore_SDL2()
 	* SDL_AUDIO_ALLOW_CHANNELS_CHANGE      Allow any number of channels (e.g. AUDIO_CHANNELS being 2, allow actual 1)
 	* SDL_AUDIO_ALLOW_ANY_CHANGE           Allow all changes above
 	*/
-	m_hDevice = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &m_DesiredSpec, nullptr, 0);
-	if(m_hDevice == 0)
+	if(Mix_OpenAudioDevice(m_iDesiredFrequency, m_uiDesiredFormat, m_iDesiredNumChannels, m_iDesiredSamples, nullptr, 0) != 0)
 	{
-		HyLogError("SDL_OpenAudioDevice failed: " << SDL_GetError());
+		HyLogError("Mix_OpenAudioDevice failed: " << Mix_GetError());
 		return;
 	}
 
-	//HyLog("Default Device:   " << atlasGrpArray.size());
-	HyLog("Audio Driver:     " << SDL_GetCurrentAudioDriver());
+	// Preload support for OGG
+	int iFlags = MIX_INIT_OGG;
+	int iInitted = Mix_Init(iFlags);
+	if((iInitted & iFlags) != iFlags)
+	{
+		HyLogError("Mix_Init: Failed to init required ogg support!\n");
+		HyLogError("Mix_Init: " << Mix_GetError());
+	}
 
-	// Start audio device
-	SDL_PauseAudioDevice(m_hDevice, 0);
+	// Print audio information to log
+	const SDL_version *pLinkVersion = Mix_Linked_Version();
+	SDL_version compiledVersion;
+	SDL_MIXER_VERSION(&compiledVersion);
+	HyLog("Compiled SDL_mixer version: " << compiledVersion.major << "." << compiledVersion.minor << "." << compiledVersion.patch);
+	HyLog("Linked SDL_mixer version: " << pLinkVersion->major << "." << pLinkVersion->minor << "." << pLinkVersion->patch);
 
-	m_PlayList.reserve(15); // TODO: Set to max sound events?
+	int iFrequency, iChannels;
+	Uint16 uiFormat;
+	int iNumTimesOpened = Mix_QuerySpec(&iFrequency, &uiFormat, &iChannels);
+	if(!iNumTimesOpened) {
+		HyLogError("Mix_QuerySpec failed: " << Mix_GetError());
+	}
+	else
+	{
+		char *szFormat = "Unknown";
+		switch(uiFormat)
+		{
+			case AUDIO_U8:		szFormat="U8";		break;
+			case AUDIO_S8:		szFormat="S8";		break;
+			case AUDIO_U16LSB:	szFormat="U16LSB";	break;
+			case AUDIO_S16LSB:	szFormat="S16LSB";	break;
+			case AUDIO_U16MSB:	szFormat="U16MSB";	break;
+			case AUDIO_S16MSB:	szFormat="S16MSB";	break;
+			default:			szFormat="Unknown";	break;
+		}
+		HyLog("Frequency:        " << iFrequency << "Hz");
+		HyLog("Format:           " << szFormat);
+		HyLog("Channels:         " << iChannels);
+	}
+
+	HyLog("Audio Driver:     " << GetAudioDriver());
+
+	Mix_AllocateChannels(32); // TODO: Set to max sound events
+	m_eResizePolicy = CHANNEL_Grow;
 }
 
 /*virtual*/ HyAudioCore_SDL2::~HyAudioCore_SDL2(void)
 {
-	if(m_hDevice > 0)
-		SDL_CloseAudioDevice(m_hDevice);
+	Mix_CloseAudio();
+	Mix_Quit();
 }
 
 const char *HyAudioCore_SDL2::GetAudioDriver()
@@ -77,7 +113,6 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	if(m_CueList.empty())
 		return;
 
-	SDL_LockAudioDevice(m_hDevice);
 	for(auto cue : m_CueList)
 	{
 		switch(cue.m_eCUE_TYPE)
@@ -185,28 +220,8 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 			break;
 		}
 	}
-	SDL_UnlockAudioDevice(m_hDevice);
 
 	m_CueList.clear();
-}
-
-/*static*/ void HyAudioCore_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)
-{
-	HyAudioCore_SDL2 *pThis = reinterpret_cast<HyAudioCore_SDL2 *>(pUserData);
-	SDL_memset(pStream, 0, iLen); // If there is nothing to play, this callback should fill the buffer with silence
-
-	for(auto iter = pThis->m_PlayList.begin(); iter != pThis->m_PlayList.end();)
-	{
-		uint32 uiLength = (static_cast<uint32_t>(iLen) > iter->m_uiRemainingBytes) ? iter->m_uiRemainingBytes : static_cast<uint32_t>(iLen);
-		int iVolume = static_cast<int>(SDL_MIX_MAXVOLUME * iter->m_fVolume);
-
-		SDL_MixAudioFormat(pStream, iter->m_pBuffer->GetBuffer(iter->m_uiRemainingBytes), iter->m_pBuffer->GetFormat(), uiLength, HyClamp(iVolume, 0, SDL_MIX_MAXVOLUME));
-		iter->m_uiRemainingBytes -= uiLength;
-		if(iter->m_uiRemainingBytes == 0)
-			iter = pThis->m_PlayList.erase(iter);
-		else
-			++iter;
-	}
 }
 
 /*static*/ IHyFileAudioImpl *HyAudioCore_SDL2::AllocateBank(IHyAudioCore *pAudio, HyJsonObj bankObj)
@@ -216,5 +231,24 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 
 	return pNewFileGuts;
 }
+
+///*static*/ void HyAudioCore_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)
+//{
+//	HyAudioCore_SDL2 *pThis = reinterpret_cast<HyAudioCore_SDL2 *>(pUserData);
+//	SDL_memset(pStream, 0, iLen); // If there is nothing to play, this callback should fill the buffer with silence
+//
+//	for(auto iter = pThis->m_PlayList.begin(); iter != pThis->m_PlayList.end();)
+//	{
+//		uint32 uiLength = (static_cast<uint32_t>(iLen) > iter->m_uiRemainingBytes) ? iter->m_uiRemainingBytes : static_cast<uint32_t>(iLen);
+//		int iVolume = static_cast<int>(SDL_MIX_MAXVOLUME * iter->m_fVolume);
+//
+//		SDL_MixAudioFormat(pStream, iter->m_pBuffer->GetBuffer(iter->m_uiRemainingBytes), iter->m_pBuffer->GetFormat(), uiLength, HyClamp(iVolume, 0, SDL_MIX_MAXVOLUME));
+//		iter->m_uiRemainingBytes -= uiLength;
+//		if(iter->m_uiRemainingBytes == 0)
+//			iter = pThis->m_PlayList.erase(iter);
+//		else
+//			++iter;
+//	}
+//}
 
 #endif // defined(HY_USE_SDL2)
