@@ -20,12 +20,18 @@ AudioAsset::AudioAsset(IManagerModel &modelRef,
 					   QString sName,
 					   const WaveHeader &wavHeaderRef,
 					   bool bIsMusic,
-					   int32 iInstanceLimit,
+					   bool bExportMono,
+					   int32 iGlobalLimit,
+					   bool bCompressed,
+					   float fVbrQuality,
 					   uint uiErrors) :
 	AssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
 	m_WaveHeader(wavHeaderRef),
 	m_bIsMusic(bIsMusic),
-	m_iInstanceLimit(iInstanceLimit)
+	m_bExportMono(bExportMono),
+	m_iGlobalLimit(iGlobalLimit),
+	m_bCompressed(bCompressed),
+	m_fVbrQuality(fVbrQuality)
 {
 }
 
@@ -38,9 +44,40 @@ bool AudioAsset::IsMusic() const
 	return m_bIsMusic;
 }
 
-int32 AudioAsset::GetInstanceLimit() const
+bool AudioAsset::IsExportMono() const
 {
-	return m_iInstanceLimit;
+	return m_bExportMono;
+}
+
+int32 AudioAsset::GetGlobalLimit() const
+{
+	return m_iGlobalLimit;
+}
+
+bool AudioAsset::IsCompressed() const
+{
+	return m_bCompressed;
+}
+
+float AudioAsset::GetVbrQuality() const
+{
+	return m_fVbrQuality;
+}
+
+QString AudioAsset::ConstructDataFileName(bool bWithExt) const
+{
+	QString sDataName;
+	sDataName = sDataName.sprintf("%010u", m_uiChecksum);
+
+	if(bWithExt)
+	{
+		if(m_bCompressed)
+			sDataName += ".ogg";
+		else
+			sDataName += ".wav";
+	}
+
+	return sDataName;
 }
 
 void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader &wavHeaderRef)
@@ -64,5 +101,8 @@ void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader
 
 	frameObj.insert("wavHeader", wavHeaderObj);
 	frameObj.insert("isMusic", m_bIsMusic);
-	frameObj.insert("instanceLimit", m_iInstanceLimit);
+	frameObj.insert("isExportMono", m_bExportMono);
+	frameObj.insert("globalLimit", m_iGlobalLimit);
+	frameObj.insert("isCompressed", m_bCompressed);
+	frameObj.insert("vbrQuality", m_fVbrQuality);
 }

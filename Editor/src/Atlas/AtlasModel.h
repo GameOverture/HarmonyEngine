@@ -22,9 +22,6 @@ public:
 	AtlasModel(Project &projRef);
 	virtual ~AtlasModel();
 
-	//void StashTreeWidgets(QList<AtlasTreeItem *> treeItemList);
-	//QList<AtlasTreeItem *> GetTopLevelTreeItemList();
-
 	QFileInfoList GetExistingTextureInfoList(uint uiBankIndex);
 
 	int GetNumTextures(uint uiBankIndex);

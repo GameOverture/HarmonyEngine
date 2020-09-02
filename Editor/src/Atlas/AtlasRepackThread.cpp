@@ -16,7 +16,8 @@
 #include <QImageWriter>
 
 AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<int> textureIndexList, QList<AtlasFrame *> newFramesList, QDir metaDir) :
-	IRepackThread(bankRef, metaDir),
+	IRepackThread(metaDir),
+	m_BankRef(bankRef),
 	m_TextureIndexList(textureIndexList),
 	m_NewFramesList(newFramesList)
 {

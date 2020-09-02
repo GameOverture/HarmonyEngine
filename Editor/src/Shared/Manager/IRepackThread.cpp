@@ -10,8 +10,7 @@
 #include "Global.h"
 #include "IRepackThread.h"
 
-IRepackThread::IRepackThread(BankData &bankRef, QDir metaDir) :
-	m_BankRef(bankRef),
+IRepackThread::IRepackThread(QDir metaDir) :
 	m_MetaDir(metaDir)
 {
 }

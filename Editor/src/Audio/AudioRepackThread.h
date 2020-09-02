@@ -11,19 +11,23 @@
 #define AUDIOREPACKTHREAD_H
 
 #include "IRepackThread.h"
+#include "AudioAsset.h"
 
 class AudioRepackThread : public IRepackThread
 {
 	Q_OBJECT
 
+	QList<QPair<BankData *, QSet<AudioAsset *>>>		m_AffectedAssetsList;
+
 public:
-	AudioRepackThread(BankData &bankRef, QDir metaDir);
+	AudioRepackThread(QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAssetsList, QDir metaDir);
 	virtual ~AudioRepackThread();
 
 	virtual void OnRun() override;
 
 private:
-	bool PackToOgg(QString sWavFilePath, QString sOggFilePath, uint16 uiNumChannels, float fVbrQuality);
+	bool PackToWav(AudioAsset *pAudio, QDir runtimeBankDir);
+	bool PackToOgg(AudioAsset *pAudio, QDir runtimeBankDir);
 };
 
 #endif // AUDIOREPACKTHREAD_H

@@ -64,15 +64,24 @@ class AudioAsset : public AssetItemData
 	Q_OBJECT
 
 	WaveHeader		m_WaveHeader;
+
 	bool			m_bIsMusic;
-	int32			m_iInstanceLimit;
+	bool			m_bExportMono;
+	bool			m_bCompressed;
+	float			m_fVbrQuality;
+	int32			m_iGlobalLimit;
 
 public:
-	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, bool bIsMusic, int32 iInstanceLimit, uint uiErrors);
+	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, bool bIsMusic, bool bExportMono, int32 iGlobalLimit, bool bCompressed, float fVbrQuality, uint uiErrors);
 	~AudioAsset();
 
 	bool IsMusic() const;
-	int32 GetInstanceLimit() const;
+	bool IsExportMono() const;
+	int32 GetGlobalLimit() const;
+	bool IsCompressed() const;
+	float GetVbrQuality() const;
+
+	QString ConstructDataFileName(bool bWithExt) const;
 
 	void ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader &wavHeaderRef);
 

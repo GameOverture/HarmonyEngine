@@ -20,11 +20,10 @@ class IRepackThread : public QThread
 	Q_OBJECT
 
 protected:
-	BankData &			m_BankRef;
 	QDir				m_MetaDir;
 
 public:
-	IRepackThread(BankData &bankRef, QDir metaDir);
+	IRepackThread(QDir metaDir);
 	virtual ~IRepackThread();
 
 	virtual void run() override;

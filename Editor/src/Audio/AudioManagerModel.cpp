@@ -53,6 +53,12 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 		return false;
 	}
 
+	if(wavHeaderOut.NumOfChan > 2)
+	{
+		HyGuiLog("Only mono and stereo wave files are supported", LOGTYPE_Warning);
+		return false;
+	}
+
 	return true;
 }
 
@@ -87,9 +93,9 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 {
 }
 
-void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
+void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList)
 {
-	AudioRepackThread *pWorkerThread = new AudioRepackThread(*m_BanksModel.GetBank(uiBankIndex), m_MetaDir);
+	AudioRepackThread *pWorkerThread = new AudioRepackThread(affectedAudioList, m_MetaDir);
 	StartRepackThread("Repacking Audio", pWorkerThread);
 }
 
@@ -104,7 +110,10 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 										   metaObj["name"].toString(),
 										   wavHeader,
 										   metaObj["isMusic"].toBool(),
-										   metaObj["instanceLimit"].toInt(),
+										   metaObj["isExportMono"].toBool(),
+										   metaObj["globalLimit"].toInt(),
+										   metaObj["isCompressed"].toBool(),
+										   metaObj["vbrQuality"].toDouble(),
 										   metaObj["errors"].toInt(0));
 
 	return pNewFrame;
@@ -139,7 +148,12 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 		QSet<AudioAsset *> newSet;
 		for(auto pItem : returnList.toSet())
 			newSet.insert(static_cast<AudioAsset *>(pItem));
-		Repack(GetBankIndexFromBankId(uiBankId), newSet);
+
+		QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
+		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(GetBankIndexFromBankId(uiBankId)), newSet);
+		affectedAudioList.append(bankPair);
+
+		Repack(affectedAudioList);
 	}
 
 	return returnList;
@@ -147,6 +161,8 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 
 /*virtual*/ bool AudioManagerModel::OnRemoveAssets(QList<AssetItemData *> assetList) /*override*/
 {
+	// NOTE: there's no error checking on duplicates in 'assetList', will crash
+
 	QList <uint> affectedBankIndexList;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
@@ -154,8 +170,15 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 		DeleteAsset(assetList[i]);
 	}
 
+
+	QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
 	for(int i = 0; i < affectedBankIndexList.count(); ++i)
-		Repack(affectedBankIndexList[i], QSet<AudioAsset *>());
+	{
+		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(affectedBankIndexList[i]), QSet<AudioAsset *>());
+		affectedAudioList.append(bankPair);
+	}
+	
+	Repack(affectedAudioList);
 	
 	return true;
 }
@@ -172,13 +195,11 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 			return false;
 	}
 
-	QList <uint> affectedBankIndexList;
+	QMap<uint, QSet<AudioAsset *>> affectedMap;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		AudioAsset *pAudio = static_cast<AudioAsset *>(assetList[i]);
 		HyGuiLog("Replacing: " % pAudio->GetName() % " -> " % sImportAssetList[i], LOGTYPE_Info);
-
-		affectedBankIndexList.push_back(GetBankIndexFromBankId(pAudio->GetBankId()));
 
 		// Audio asset's checksum will change, so it needs to be removed and readded to the manager's registry
 		// First remove the audio from the map
@@ -206,10 +227,19 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 
 		// Re-enter the audio into the registry
 		RegisterAsset(pAudio);
+
+		QSet<AudioAsset *> &affectedSetRef = affectedMap[GetBankIndexFromBankId(pAudio->GetBankId())];
+		affectedSetRef.insert(pAudio);
 	}
 
-	for(int i = 0; i < affectedBankIndexList.count(); ++i)
-		Repack(affectedBankIndexList[i], QSet<AudioAsset *>());
+	QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
+	for(auto iter = affectedMap.begin(); iter != affectedMap.end(); ++iter)
+	{
+		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(iter.key()), iter.value());
+		affectedAudioList.append(bankPair);
+	}
+
+	Repack(affectedAudioList);
 
 	return true;
 }
@@ -230,12 +260,16 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 		MoveAsset(assetsList[i], uiNewBankId);
 	}
 
-	// Repack all old affected banks
+	QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
 	for(int i = 0; i < affectedBankIndexList.count(); ++i)
-		Repack(affectedBankIndexList[i], QSet<AudioAsset *>());
+	{
+		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(affectedBankIndexList[i]), QSet<AudioAsset *>());
+		affectedAudioList.append(bankPair);
+	}
+	QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(uiNewBankId), assetsGoingToNewBankSet);
+	affectedAudioList.append(bankPair);
 
-	// Repack new affected atlas group
-	Repack(GetBankIndexFromBankId(uiNewBankId), assetsGoingToNewBankSet);
+	Repack(affectedAudioList);
 
 	return true;
 }
@@ -255,9 +289,9 @@ void AudioManagerModel::Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet)
 		{
 			QJsonObject assetObj;
 			assetObj.insert("checksum", QJsonValue(static_cast<qint64>(bankAssetListRef[i]->GetChecksum())));
-			assetObj.insert("fileName", QJsonValue(bankAssetListRef[i]->ConstructMetaFileName()));
+			assetObj.insert("fileName", static_cast<AudioAsset *>(bankAssetListRef[i])->ConstructDataFileName(true));
 			assetObj.insert("isMusic", static_cast<AudioAsset *>(bankAssetListRef[i])->IsMusic());
-			assetObj.insert("instanceLimit", static_cast<AudioAsset *>(bankAssetListRef[i])->GetInstanceLimit());
+			assetObj.insert("globalLimit", static_cast<AudioAsset *>(bankAssetListRef[i])->GetGlobalLimit());
 
 			assetsArray.append(assetObj);
 		}
@@ -298,7 +332,7 @@ AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, 
 	quint32 uiChecksum = HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(pBinaryData.constData()), pBinaryData.size());
 	QFileInfo fileInfo(sFilePath);
 	
-	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, false, -1, 0);
+	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, false, wavHeaderRef.NumOfChan == 1, -1, false, 1.0f, 0);
 
 	if(QFile::copy(sFilePath, m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName())) == false)
 	{

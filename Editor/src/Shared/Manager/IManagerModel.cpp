@@ -458,6 +458,15 @@ TreeModelItemData *IManagerModel::ReturnFilter(QString sFilterPath, bool bCreate
 
 bool IManagerModel::RemoveLookup(AssetItemData *pAsset)
 {
+	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
+	{
+		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
+		{
+			m_BanksModel.GetBank(i)->m_AssetList.removeOne(pAsset);
+			break;
+		}
+	}
+
 	m_AssetUuidMap.remove(pAsset->GetUuid());
 
 	auto iter = m_AssetChecksumMap.find(pAsset->GetChecksum());
@@ -1029,15 +1038,6 @@ void IManagerModel::DeleteAsset(AssetItemData *pAsset)
 {
 	if(RemoveLookup(pAsset))
 		pAsset->DeleteMetaFile();
-
-	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
-	{
-		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
-		{
-			m_BanksModel.GetBank(i)->m_AssetList.removeOne(pAsset);
-			break;
-		}
-	}
 
 	delete pAsset;
 }

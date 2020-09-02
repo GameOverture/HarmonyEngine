@@ -18,6 +18,7 @@ class AtlasRepackThread : public IRepackThread
 {
 	Q_OBJECT
 
+	BankData &			m_BankRef;
 	ImagePacker			m_Packer;
 
 	QList<int>			m_TextureIndexList;

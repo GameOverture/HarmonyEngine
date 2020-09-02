@@ -20,64 +20,6 @@
 #include <QJsonArray>
 #include <QMimeData>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void AtlasModel::FrameLookup::AddLookup(AtlasFrame *pFrame)
-//{
-//	m_FrameIdMap[pFrame->GetId()] = pFrame;
-//
-//	uint32 uiChecksum = pFrame->GetImageChecksum();
-//	
-//	if(m_FrameChecksumMap.contains(uiChecksum))
-//	{
-//		m_FrameChecksumMap.find(uiChecksum).value().append(pFrame);
-//		HyGuiLog("'" % pFrame->GetName() % "' is a duplicate of '" % m_FrameChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_FrameChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
-//	}
-//	else
-//	{
-//		QList<AtlasFrame *> newFrameList;
-//		newFrameList.append(pFrame);
-//		m_FrameChecksumMap[uiChecksum] = newFrameList;
-//	}
-//}
-//bool AtlasModel::FrameLookup::RemoveLookup(AtlasFrame *pFrame)  // Returns true if no remaining duplicates exist
-//{
-//	m_FrameIdMap.remove(pFrame->GetId());
-//
-//	auto iter = m_FrameChecksumMap.find(pFrame->GetImageChecksum());
-//	if(iter == m_FrameChecksumMap.end())
-//		HyGuiLog("AtlasModel::RemoveLookup could not find frame", LOGTYPE_Error);
-//	
-//	iter.value().removeOne(pFrame);
-//	if(iter.value().size() == 0)
-//	{
-//		m_FrameChecksumMap.remove(pFrame->GetImageChecksum());
-//		return true;
-//	}
-//	
-//	return false;
-//}
-//AtlasFrame *AtlasModel::FrameLookup::FindById(QUuid uuid)
-//{
-//	auto iter = m_FrameIdMap.find(uuid);
-//	if(iter == m_FrameIdMap.end())
-//		return nullptr;
-//	else
-//		return iter.value();
-//}
-//QList<AtlasFrame *> AtlasModel::FrameLookup::FindByChecksum(quint32 uiChecksum)
-//{
-//	auto iter = m_FrameChecksumMap.find(uiChecksum);
-//	if(iter == m_FrameChecksumMap.end())
-//		return QList<AtlasFrame *>();
-//	else
-//		return iter.value();
-//}
-//bool AtlasModel::FrameLookup::DoesImageExist(quint32 uiChecksum)
-//{
-//	return m_FrameChecksumMap.contains(uiChecksum);
-//}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 AtlasModel::AtlasModel(Project &projRef) :
 	IManagerModel(projRef, ITEM_AtlasImage)
 {
@@ -88,16 +30,6 @@ AtlasModel::AtlasModel(Project &projRef) :
 {
 
 }
-
-//void AtlasModel::StashTreeWidgets(QList<AtlasTreeItem *> treeItemList)
-//{
-//	m_TopLevelTreeItemList = treeItemList;
-//}
-//
-//QList<AtlasTreeItem *> AtlasModel::GetTopLevelTreeItemList()
-//{
-//	return m_TopLevelTreeItemList;
-//}
 
 QFileInfoList AtlasModel::GetExistingTextureInfoList(uint uiBankIndex)
 {
@@ -183,14 +115,6 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	// First remove the frame from the map
 	if(RemoveLookup(pFrame))
 		pFrame->DeleteMetaFile();
-	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
-	{
-		if(pFrame->GetBankId() == m_BanksModel.GetBank(i)->GetId())
-		{
-			m_BanksModel.GetBank(i)->m_AssetList.removeOne(pFrame);
-			break;
-		}
-	}
 
 	// Determine the new checksum into the map
 	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());

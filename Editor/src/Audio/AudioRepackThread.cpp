@@ -9,12 +9,12 @@
  *************************************************************************/
 #include "Global.h"
 #include "AudioRepackThread.h"
-#include "AudioAsset.h"
 
 #include <vorbis/vorbisenc.h>
 
-AudioRepackThread::AudioRepackThread(BankData &bankRef, QDir metaDir) :
-	IRepackThread(bankRef, metaDir)
+AudioRepackThread::AudioRepackThread(QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAssetsList, QDir metaDir) :
+	IRepackThread(metaDir),
+	m_AffectedAssetsList(affectedAssetsList)
 {
 }
 
@@ -24,11 +24,61 @@ AudioRepackThread::AudioRepackThread(BankData &bankRef, QDir metaDir) :
 
 /*virtual*/ void AudioRepackThread::OnRun() /*override*/
 {
+	for(auto bankPair : m_AffectedAssetsList)
+	{
+		BankData *pBank = bankPair.first;
+		QSet<AudioAsset *> affectedSet(bankPair.second);
 
+		// First remove any stale audio files that are missing in 'pBank->m_AssetList'
+		QDir runtimeBankDir(pBank->m_sAbsPath);
+		QFileInfoList existingAudioInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+		for(auto fileInfo : existingAudioInfoList)
+		{
+			bool bFound = false;
+			for(auto audio : pBank->m_AssetList)
+			{
+				if(fileInfo.baseName().compare(static_cast<AudioAsset *>(audio)->ConstructDataFileName(false), Qt::CaseInsensitive) == 0)
+				{
+					// If this asset is in affected set, delete it as it will be repacked
+					for(auto affected : affectedSet)
+					{
+						if(audio == affected)
+						{
+							QFile::remove(fileInfo.absoluteFilePath());
+							break;
+						}
+					}
+
+					bFound = true;
+					break;
+				}
+			}
+
+			if(bFound == false)
+				QFile::remove(fileInfo.absoluteFilePath());
+		}
+
+		// Repack all audio in affectedSet
+		for(auto audio : affectedSet)
+		{
+			if(audio->IsCompressed())
+				PackToOgg(audio, runtimeBankDir);
+			else
+				PackToWav(audio, runtimeBankDir);
+		}
+	}
 }
 
-bool AudioRepackThread::PackToOgg(QString sWavFilePath, QString sOggFilePath, uint16 uiNumChannels, float fVbrQuality)
+bool AudioRepackThread::PackToWav(AudioAsset *pAudio, QDir runtimeBankDir)
 {
+	// TODO: convert wav to target format
+	return QFile::copy(m_MetaDir.absoluteFilePath(pAudio->ConstructMetaFileName()),
+					   runtimeBankDir.absoluteFilePath(pAudio->ConstructDataFileName(true)));
+}
+
+bool AudioRepackThread::PackToOgg(AudioAsset *pAudio, QDir runtimeBankDir)
+{
+	QString sWavFilePath = m_MetaDir.absoluteFilePath(pAudio->ConstructMetaFileName());
 	QFile wavFile(sWavFilePath);
 	if(!wavFile.open(QIODevice::ReadOnly))
 	{
@@ -36,8 +86,8 @@ bool AudioRepackThread::PackToOgg(QString sWavFilePath, QString sOggFilePath, ui
 		return false;
 	}
 	int dataLength = wavFile.size() - 44;
-	//FILE *inFile = _fdopen(_dup(wavFile.handle()), "rb");
-
+	
+	QString sOggFilePath = runtimeBankDir.absoluteFilePath(pAudio->ConstructDataFileName(true));
 	QFile oggFile(sOggFilePath);
 	if(!oggFile.open(QIODevice::WriteOnly))
 	{
@@ -132,7 +182,7 @@ bool AudioRepackThread::PackToOgg(QString sWavFilePath, QString sOggFilePath, ui
 	wavFile.read(reinterpret_cast<char *>(&wavHeader), sizeof(WaveHeader));
 
 	vorbis_info_init(&vi);
-	ret = vorbis_encode_init_vbr(&vi, wavHeader.NumOfChan, wavHeader.SamplesPerSec, HyClamp(fVbrQuality, 0.0f, 1.0f));
+	ret = vorbis_encode_init_vbr(&vi, wavHeader.NumOfChan, wavHeader.SamplesPerSec, HyClamp(pAudio->GetVbrQuality(), 0.0f, 1.0f));
 	if(ret)
 	{
 		// do not continue if setup failed; this can happen if we ask for a
@@ -213,7 +263,7 @@ bool AudioRepackThread::PackToOgg(QString sWavFilePath, QString sOggFilePath, ui
 			//	buffer[1][i] = ((readbuffer[i * 4 + 3] << 8) | (0x00ff & (int)readbuffer[i * 4 + 2])) / 32768.f;
 			//}
 			
-			if(wavHeader.NumOfChan == 2 && uiNumChannels == 1)
+			if(wavHeader.NumOfChan == 2 && pAudio->IsExportMono())
 			{
 				//Stereo input, mono output
 				for(i = 0; i < wavData.size() / 4; i++)
@@ -222,7 +272,7 @@ bool AudioRepackThread::PackToOgg(QString sWavFilePath, QString sOggFilePath, ui
 					buffer[0][i] = ((((wavData[i * 4 + 1] << 8) | (0x00ff & (int)wavData[i * 4])) / 32768.f) + (((wavData[i * 4 + 3] << 8) | (0x00ff & (int)wavData[i * 4 + 2])) / 32768.f)) * 0.5f;
 				}
 			}
-			else if(wavHeader.NumOfChan == 2 && uiNumChannels == 2)
+			else if(wavHeader.NumOfChan == 2 && pAudio->IsExportMono() == false)
 			{
 				//deinterleave samples
 				for(i = 0; i < wavData.size() / 4; i++)
@@ -231,7 +281,7 @@ bool AudioRepackThread::PackToOgg(QString sWavFilePath, QString sOggFilePath, ui
 					buffer[1][i] = ((wavData[i * 4 + 3] << 8) | (0x00ff & (int)wavData[i * 4 + 2])) / 32768.f;
 				}
 			}
-			else if(wavHeader.NumOfChan == 1 && uiNumChannels == 2)
+			else if(wavHeader.NumOfChan == 1 && pAudio->IsExportMono() == false)
 			{
 				//get the mono channel and add it to both left and right
 				for(i = 0; i < wavData.size() / 2; i++)
@@ -241,7 +291,7 @@ bool AudioRepackThread::PackToOgg(QString sWavFilePath, QString sOggFilePath, ui
 					buffer[1][i] = monoChl;
 				}
 			}
-			else if(wavHeader.NumOfChan == 1 && uiNumChannels == 1)
+			else if(wavHeader.NumOfChan == 1 && pAudio->IsExportMono())
 			{
 				//get the mono channel
 				for(i = 0; i < wavData.size() / 2; i++)
@@ -251,7 +301,7 @@ bool AudioRepackThread::PackToOgg(QString sWavFilePath, QString sOggFilePath, ui
 			}
 			else
 			{
-				HyGuiLog("WavToOgg: The input wav channels '" % QString::number(wavHeader.NumOfChan) % "' cannot encode to '" % QString::number(uiNumChannels) % "'", LOGTYPE_Error);
+				HyGuiLog("WavToOgg: The input wav channels '" % QString::number(wavHeader.NumOfChan) % "' cannot encode to " % (pAudio->IsExportMono() ? "mono" : "stereo") % " ogg", LOGTYPE_Error);
 				return false;
 			}
 

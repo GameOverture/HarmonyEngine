@@ -37,7 +37,7 @@ public:
 	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) override;
 
 protected:
-	void Repack(uint uiBankIndex, QSet<AudioAsset *> newAssetSet);
+	void Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList);
 
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) override; // Must call RegisterAsset() on each asset
