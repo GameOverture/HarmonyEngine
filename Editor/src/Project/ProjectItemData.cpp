@@ -25,6 +25,9 @@
 #include "EntityWidget.h"
 #include "EntityDraw.h"
 #include "PrimitiveModel.h"
+#include "AudioModel.h"
+#include "AudioWidget.h"
+#include "AudioDraw.h"
 
 #include <QMenu>
 #include <QJsonDocument>
@@ -215,6 +218,9 @@ void ProjectItemData::WidgetLoad()
 	case ITEM_Prefab:
 		m_pWidget = new PrefabWidget(*this);
 		break;
+	case ITEM_Audio:
+		m_pWidget = new AudioWidget(*this);
+		break;
 	default:
 		HyGuiLog("Unimplemented WidgetLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
@@ -246,6 +252,9 @@ void ProjectItemData::DrawLoad()
 		break;
 	case ITEM_Prefab:
 		m_pDraw = new PrefabDraw(this, m_ItemFileData);
+		break;
+	case ITEM_Audio:
+		m_pDraw = new AudioDraw(this, m_ItemFileData);
 		break;
 	default:
 		HyGuiLog("Unimplemented DrawLoad() type: " % QString::number(m_eTYPE), LOGTYPE_Error);

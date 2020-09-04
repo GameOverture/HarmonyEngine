@@ -73,6 +73,7 @@
      <addaction name="actionNewText"/>
      <addaction name="actionNewParticle"/>
      <addaction name="actionNewPrefab"/>
+     <addaction name="actionNewAudio"/>
      <addaction name="separator"/>
      <addaction name="actionNewEntity"/>
      <addaction name="actionNewEntity3d"/>

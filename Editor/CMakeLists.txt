@@ -30,6 +30,8 @@ if(Qt5_DIR)
 		src/Audio/AudioAssetsWidget.cpp
 		src/Audio/AudioAssetsWidget.h
 		src/Audio/AudioAssetsWidget.ui
+		src/Audio/AudioDraw.cpp
+		src/Audio/AudioDraw.h
 		src/Audio/AudioManagerModel.cpp
 		src/Audio/AudioManagerModel.h
 		src/Audio/AudioModel.cpp
