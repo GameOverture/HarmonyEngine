@@ -35,6 +35,12 @@ public:
 
 private:
 	Ui::AudioWidget *ui;
+	
+private Q_SLOTS:
+	void on_actionAddAudio_triggered();
+	void on_actionRemoveAudio_triggered();
+	void on_actionOrderAudioUpwards_triggered();
+	void on_actionOrderAudioDownwards_triggered();
 };
 
 #endif // AUDIOWIDGET_H

@@ -23,26 +23,110 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QTableView" name="tableView"/>
+         <widget class="QTableView" name="playListTableView"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QToolButton" name="btnAddAudio">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnRemoveAudio">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnOrderAudioUp">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnOrderAudioDown">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox">
-       <property name="title">
-        <string>Properties</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="PropertiesTreeView" name="treeView"/>
-        </item>
-       </layout>
-      </widget>
+      <widget class="PropertiesTreeView" name="statePropertiesTreeView"/>
      </item>
     </layout>
    </item>
   </layout>
+  <action name="actionAddAudio">
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Audio</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds selected audio assets to the current state's play list</string>
+   </property>
+  </action>
+  <action name="actionRemoveAudio">
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Audio</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes selected audio in Play List from the current state</string>
+   </property>
+  </action>
+  <action name="actionOrderAudioDownwards">
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Audio &amp;Downwards</string>
+   </property>
+   <property name="toolTip">
+    <string>Shift the selected audio asset to be played later in the sequence</string>
+   </property>
+  </action>
+  <action name="actionOrderAudioUpwards">
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Audio &amp;Upwards</string>
+   </property>
+   <property name="toolTip">
+    <string>Shift the selected audio to be played earlier in the sequence</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -51,6 +135,8 @@
    <header>PropertiesTreeView.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../data/HyEditor.qrc"/>
+ </resources>
  <connections/>
 </ui>

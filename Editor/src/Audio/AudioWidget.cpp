@@ -11,6 +11,11 @@
 #include "AudioWidget.h"
 #include "ui_AudioWidget.h"
 #include "GlobalUndoCmds.h"
+#include "AudioModel.h"
+#include "AudioWidget.h"
+#include "AudioPlayListModel.h"
+#include "PropertiesTreeModel.h"
+#include "ManagerWidget.h"
 
 #include <QLayout>
 #include <QFile>
@@ -29,7 +34,10 @@ AudioWidget::AudioWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	layout()->removeItem(ui->verticalLayout);
 	layout()->addItem(ui->verticalLayout);
 
-
+	ui->btnAddAudio->setDefaultAction(ui->actionAddAudio);
+	ui->btnRemoveAudio->setDefaultAction(ui->actionRemoveAudio);
+	ui->btnOrderAudioUp->setDefaultAction(ui->actionOrderAudioUpwards);
+	ui->btnOrderAudioDown->setDefaultAction(ui->actionOrderAudioDownwards);
 
 	//ui->btnAddFrames->setDefaultAction(ui->actionImportFrames);
 	//ui->btnRemoveFrame->setDefaultAction(ui->actionRemoveFrames);
@@ -55,36 +63,29 @@ AudioWidget::~AudioWidget()
 
 /*virtual*/ void AudioWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
-	//pMenu->addAction(ui->actionImportFrames);
-	//pMenu->addAction(ui->actionRemoveFrames);
-	//pMenu->addAction(ui->actionOrderFrameUpwards);
-	//pMenu->addAction(ui->actionOrderFrameDownwards);
+	pMenu->addAction(ui->actionAddAudio);
+	pMenu->addAction(ui->actionRemoveAudio);
+	pMenu->addAction(ui->actionOrderAudioUpwards);
+	pMenu->addAction(ui->actionOrderAudioDownwards);
 	//pMenu->addSeparator();
-	//pMenu->addAction(ui->actionAlignUp);
-	//pMenu->addAction(ui->actionAlignUp);
-	//pMenu->addAction(ui->actionAlignLeft);
-	//pMenu->addAction(ui->actionAlignDown);
-	//pMenu->addAction(ui->actionAlignRight);
-	//pMenu->addAction(ui->actionAlignCenterHorizontal);
-	//pMenu->addAction(ui->actionAlignCenterVertical);
-	//pMenu->addAction(ui->actionApplyToAll);
 }
 
 /*virtual*/ void AudioWidget::OnUpdateActions() /*override*/
 {
-	//int iCurNumFrames = static_cast<SpriteStateData *>(GetCurStateData())->GetFramesModel()->rowCount();
-	//bool bFrameIsSelected = iCurNumFrames > 0 && ui->framesView->currentIndex().row() >= 0;
+	int iCurNumAudio = static_cast<AudioStateData *>(GetCurStateData())->GetPlayListModel().rowCount();
+	bool bHasSelection = iCurNumAudio > 0 && ui->playListTableView->currentIndex().row() >= 0;
 
-	//ui->actionAlignCenterHorizontal->setEnabled(bFrameIsSelected);
-	//ui->actionAlignCenterVertical->setEnabled(bFrameIsSelected);
-	//ui->actionAlignUp->setEnabled(bFrameIsSelected);
-	//ui->actionAlignDown->setEnabled(bFrameIsSelected);
-	//ui->actionAlignLeft->setEnabled(bFrameIsSelected);
-	//ui->actionAlignRight->setEnabled(bFrameIsSelected);
+	ui->actionOrderAudioUpwards->setEnabled(ui->playListTableView->currentIndex().row() != 0 && iCurNumAudio > 1);
+	ui->actionOrderAudioDownwards->setEnabled(ui->playListTableView->currentIndex().row() != iCurNumAudio - 1 && iCurNumAudio > 1);
+	ui->actionRemoveAudio->setEnabled(bHasSelection);
 
-	//ui->actionOrderFrameUpwards->setEnabled(ui->framesView->currentIndex().row() != 0 && iCurNumFrames > 1);
-	//ui->actionOrderFrameDownwards->setEnabled(ui->framesView->currentIndex().row() != iCurNumFrames - 1 && iCurNumFrames > 1);
-	//ui->actionRemoveFrames->setEnabled(bFrameIsSelected);
+	//////////////////////////////////////////////////////
+	AudioPlayListModel &playListModelRef = static_cast<AudioModel *>(m_ItemRef.GetModel())->GetPlayListModel(GetCurStateIndex());
+	ui->playListTableView->setModel(&playListModelRef);
+	
+	//////////////////////////////////////////////////////
+	PropertiesTreeModel &propertiesModelRef = static_cast<AudioModel *>(m_ItemRef.GetModel())->GetPropertiesModel(GetCurStateIndex());
+	ui->statePropertiesTreeView->setModel(&propertiesModelRef);
 }
 
 /*virtual*/ void AudioWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
@@ -110,4 +111,26 @@ AudioWidget::~AudioWidget()
 	//	else
 	//		ui->framesView->selectRow(0);
 	//}
+}
+
+void AudioWidget::on_actionAddAudio_triggered()
+{
+	QList<AssetItemData *> selectedAssetsList;
+	QList<TreeModelItemData *> selectedFiltersList;
+	m_ItemRef.GetProject().GetAudioWidget()->GetSelectedItems(selectedAssetsList, selectedFiltersList);
+
+	QUndoCommand *pCmd = new UndoCmd_LinkStateAssets("Add Audio", m_ItemRef, GetCurStateIndex(), selectedAssetsList);
+	GetItem().GetUndoStack()->push(pCmd);
+}
+
+void AudioWidget::on_actionRemoveAudio_triggered()
+{
+}
+
+void AudioWidget::on_actionOrderAudioUpwards_triggered()
+{
+}
+
+void AudioWidget::on_actionOrderAudioDownwards_triggered()
+{
 }

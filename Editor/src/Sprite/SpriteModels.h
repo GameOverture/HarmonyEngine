@@ -23,15 +23,13 @@ class SpriteFrame
 {
 public:
 	AtlasFrame *			m_pFrame;
-	int						m_iRowIndex;
-
 	QPoint					m_vOffset;
 	float					m_fDuration;
 
-	SpriteFrame(AtlasFrame *pFrame, int iRowIndex) :	m_pFrame(pFrame),
-														m_iRowIndex(iRowIndex),
-														m_vOffset(0, 0),
-														m_fDuration(0.016f)
+	SpriteFrame(AtlasFrame *pFrame) :
+		m_pFrame(pFrame),
+		m_vOffset(0, 0),
+		m_fDuration(0.016f)
 	{ }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,9 +37,8 @@ class SpriteFramesModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
-	QList<SpriteFrame *>			m_FramesList;
-	QMap<QUuid, SpriteFrame *>		m_RemovedFrameIdMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
-
+	QList<SpriteFrame *>						m_FramesList;
+	QMap<QUuid, QPair<int, SpriteFrame *>>		m_RemovedFrameIdMap;  // Used to reinsert frames (via undo/redo) while keeping their attributes
 
 public:
 	enum eColumn

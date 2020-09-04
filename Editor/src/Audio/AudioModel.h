@@ -11,14 +11,20 @@
 #define AUDIOMODEL_H
 
 #include "IModel.h"
+#include "AudioPlayListModel.h"
 #include "PropertiesTreeModel.h"
 
 class AudioStateData : public IStateData
 {
-	
+	AudioPlayListModel		m_PlayListModel;
+	PropertiesTreeModel		m_PropertiesModel;
+
 public:
 	AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~AudioStateData();
+
+	AudioPlayListModel &GetPlayListModel();
+	PropertiesTreeModel &GetPropertiesModel();
 	
 	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
 	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
@@ -26,11 +32,12 @@ public:
 
 class AudioModel : public IModel
 {
-	PropertiesTreeModel		m_PropertiesModel;
-
 public:
 	AudioModel(ProjectItemData &itemRef, FileDataPair &itemFileDataRef);
 	virtual ~AudioModel();
+
+	AudioPlayListModel &GetPlayListModel(uint uiStateIndex);
+	PropertiesTreeModel &GetPropertiesModel(uint uiStateIndex);
 
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;

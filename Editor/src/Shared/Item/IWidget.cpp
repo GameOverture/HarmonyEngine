@@ -19,6 +19,7 @@
 #include "TextModel.h"
 #include "EntityModel.h"
 #include "PrefabModel.h"
+#include "AudioModel.h"
 
 #include <QUndoCommand>
 
@@ -114,6 +115,9 @@ void IWidget::OnAddStateTriggered()
 	case ITEM_Prefab:
 		pCmd = new UndoCmd_AddState<PrefabStateData>("Add Prefab State", m_ItemRef);
 		break;
+	case ITEM_Audio:
+		pCmd = new UndoCmd_AddState<AudioStateData>("Add Audio State", m_ItemRef);
+		break;
 	default:
 		HyGuiLog("Unimplemented item on_actionAddState_triggered(): " % QString::number(m_ItemRef.GetType()), LOGTYPE_Error);
 		break;
@@ -140,6 +144,9 @@ void IWidget::OnRemoveStateTriggered()
 		break;
 	case ITEM_Prefab:
 		pCmd = new UndoCmd_RemoveState<PrefabStateData>("Remove Prefab State", m_ItemRef, ui->cmbStates->currentIndex());
+		break;
+	case ITEM_Audio:
+		pCmd = new UndoCmd_RemoveState<AudioStateData>("Remove Audio State", m_ItemRef, ui->cmbStates->currentIndex());
 		break;
 	default:
 		HyGuiLog("Unimplemented item on_actionRemoveState_triggered(): " % QString::number(m_ItemRef.GetType()), LOGTYPE_Error);

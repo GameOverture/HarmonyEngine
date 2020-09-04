@@ -25,20 +25,26 @@ int SpriteFramesModel::Add(AtlasFrame *pFrame)
 	SpriteFrame *pFrameToInsert = nullptr;
 
 	// See if this frame has been recently removed, and re-add if possible. Otherwise, create a new Frame
-	QMap<QUuid, SpriteFrame *>::iterator iter = m_RemovedFrameIdMap.find(pFrame->GetUuid());
+	QMap<QUuid, QPair<int, SpriteFrame *>>::iterator iter = m_RemovedFrameIdMap.find(pFrame->GetUuid());
+	int iInsertIndex;
 	if(iter == m_RemovedFrameIdMap.end())
-		pFrameToInsert = new SpriteFrame(pFrame, m_FramesList.count());
+	{
+		iInsertIndex = m_FramesList.count();
+		pFrameToInsert = new SpriteFrame(pFrame);
+	}
 	else
 	{
-		pFrameToInsert = iter.value();
+		iInsertIndex = iter.value().first;
+		pFrameToInsert = iter.value().second;
+
 		m_RemovedFrameIdMap.remove(pFrame->GetUuid());
 	}
 
-	beginInsertRows(QModelIndex(), pFrameToInsert->m_iRowIndex, pFrameToInsert->m_iRowIndex);
-	m_FramesList.insert(pFrameToInsert->m_iRowIndex, pFrameToInsert);
+	beginInsertRows(QModelIndex(), iInsertIndex, iInsertIndex);
+	m_FramesList.insert(iInsertIndex, pFrameToInsert);
 	endInsertRows();
 
-	return pFrameToInsert->m_iRowIndex;
+	return iInsertIndex;
 }
 
 void SpriteFramesModel::Remove(AtlasFrame *pFrame)
@@ -48,7 +54,7 @@ void SpriteFramesModel::Remove(AtlasFrame *pFrame)
 		// NOTE: Don't delete this SpriteFrame as the remove may be 'undone'
 		if(m_FramesList[i]->m_pFrame == pFrame)
 		{
-			m_RemovedFrameIdMap[pFrame->GetUuid()] = m_FramesList[i];
+			m_RemovedFrameIdMap[pFrame->GetUuid()] = QPair<int, SpriteFrame *>(i, m_FramesList[i]);
 
 			beginRemoveRows(QModelIndex(), i, i);
 			m_FramesList.removeAt(i);
