@@ -35,8 +35,8 @@ public:
 	QString GetName() const;
 	void SetName(QString sNewName);
 	
-	virtual int AddFrame(AtlasFrame *pFrame) = 0;			// Returns the index the frame was inserted to
-	virtual void RelinquishFrame(AtlasFrame *pFrame) = 0;
+	virtual QVariant OnLinkAsset(AssetItemData *pAsset) = 0;
+	virtual void OnUnlinkAsset(AssetItemData *pAsset) = 0;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class IModel : public QAbstractListModel
@@ -89,11 +89,7 @@ public:
 	QString SetStateName(int iStateIndex, QString sNewName);
 	void MoveStateBack(int iStateIndex);
 	void MoveStateForward(int iStateIndex);
-	
-	//QList<AtlasFrame *> RequestFramesByUuid(IStateData *pState, QList<QUuid> requestList, int &iAffectedFrameIndexOut);
-	//QList<AtlasFrame *> RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut);
-	//void RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList);
-	//void RelinquishAllFrames();
+
 	QVariant AddAsset(int m_iStateIndex, AssetItemData *pAsset);
 	void RemoveAsset(int iStateIndex, AssetItemData *pAsset);
 

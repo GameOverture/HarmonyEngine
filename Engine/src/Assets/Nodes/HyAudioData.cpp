@@ -16,7 +16,7 @@
 HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_AudioRef(assetsRef.GetAudioRef()),
-	m_eCueType(CUETYPE_Unknown)
+	m_ePlayListMode(PLAYLIST_Unknown)
 {
 	HyJsonArray assetsArray = itemObj["assets"].GetArray();
 	for(uint32 i = 0; i < assetsArray.Size(); ++i)
@@ -28,24 +28,29 @@ HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &
 		m_SoundChecksumList.push_back(uiChecksum);
 	}
 
-	std::string sType = itemObj["type"].GetString();
+	std::string sType = itemObj["playListMode"].GetString();
 	std::transform(sType.begin(), sType.end(), sType.begin(), ::tolower);
-	if(sType == "single")
-		m_eCueType = CUETYPE_Single;
+	if(sType == "shuffle")
+		m_ePlayListMode = PLAYLIST_Shuffle;
+	else if(sType == "weighted")
+		m_ePlayListMode = PLAYLIST_Weighted;
+	else if(sType == "sequentialLocal")
+		m_ePlayListMode = PLAYLIST_SequentialLocal;
+	else if(sType == "sequentialGlobal")
+		m_ePlayListMode = PLAYLIST_SequentialGlobal;
 
-	if(m_eCueType == CUETYPE_Unknown)
-		HyLogWarning("HyAudioData has unknown cue type");
+	HyAssert(m_ePlayListMode != PLAYLIST_Unknown, "HyAudioData " << sPath << " has unknown Play List Mode");
 }
 
 HyAudioData::~HyAudioData(void)
 {
 }
 
-uint32 HyAudioData::GetSound() const
+uint32 HyAudioData::GetSound(IHyNode *pAudioNode) const
 {
-	switch(m_eCueType)
+	switch(m_ePlayListMode)
 	{
-	case CUETYPE_Single:
+	case PLAYLIST_Shuffle:
 		return m_SoundChecksumList[0];
 
 	default:

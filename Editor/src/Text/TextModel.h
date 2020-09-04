@@ -41,8 +41,8 @@ public:
 
 	TextLayersModel &GetLayersModel();
 
-	virtual int AddFrame(AtlasFrame *pFrame) override;
-	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
+	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
+	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TextModel : public IModel

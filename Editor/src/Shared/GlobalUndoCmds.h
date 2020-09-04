@@ -425,36 +425,34 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class UndoCmd_AddFrames : public QUndoCommand
+class UndoCmd_LinkStateAssets : public QUndoCommand
 {
 	ProjectItemData &				m_ItemRef;
 	int								m_iStateIndex;
 
-	QList<AssetItemData *>			m_Frames;
+	QList<AssetItemData *>			m_AssetList;
 	
 public:
-	UndoCmd_AddFrames(QString sText, ProjectItemData &itemRef, int iStateIndex, QList<AssetItemData *> framesList, QUndoCommand *pParent = 0) :
+	UndoCmd_LinkStateAssets(QString sText, ProjectItemData &itemRef, int iStateIndex, QList<AssetItemData *> assetList, QUndoCommand *pParent = 0) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
 		m_iStateIndex(iStateIndex),
-		m_Frames(framesList)
+		m_AssetList(assetList)
 	{
 		setText(sText);
 	}
 	
-	virtual ~UndoCmd_AddFrames()
+	virtual ~UndoCmd_LinkStateAssets()
 	{ }
 
 	void redo() override
 	{
-		//m_Frames = static_cast<IModel *>(m_ItemRef.GetModel())->RequestFrames(m_iStateIndex, m_Frames, iAffectedFrameIndex);
-		
-		m_Frames = m_ItemRef.GetProject().GetAtlasModel().RequestAssets(&m_ItemRef, m_Frames);
+		m_AssetList = m_ItemRef.GetProject().GetAtlasModel().RequestAssets(&m_ItemRef, m_AssetList);
 		QVariant focusSubState;
 		if(m_iStateIndex >= 0)
 		{
-			for(int i = 0; i < m_Frames.size(); ++i)
-				focusSubState = m_ItemRef.GetModel()->AddAsset(m_iStateIndex, m_Frames[i]);// m_StateList[m_iStateIndex]->AddFrame(m_Frames[i]);
+			for(int i = 0; i < m_AssetList.size(); ++i)
+				focusSubState = m_ItemRef.GetModel()->AddAsset(m_iStateIndex, m_AssetList[i]);
 		}
 
 
@@ -463,14 +461,12 @@ public:
 	
 	void undo() override
 	{
-		//static_cast<IModel *>(m_ItemRef.GetModel())->RelinquishFrames(m_iStateIndex, m_Frames);
-
 		if(m_iStateIndex >= 0)
 		{
-			for(int i = 0; i < m_Frames.size(); ++i)
-				m_ItemRef.GetModel()->RemoveAsset(m_iStateIndex, m_Frames[i]);// m_StateList[m_iStateIndex]->RelinquishFrame(m_Frames[i]);
+			for(int i = 0; i < m_AssetList.size(); ++i)
+				m_ItemRef.GetModel()->RemoveAsset(m_iStateIndex, m_AssetList[i]);
 		}
-		m_ItemRef.GetProject().GetAtlasModel().RelinquishAssets(&m_ItemRef, m_Frames);
+		m_ItemRef.GetProject().GetAtlasModel().RelinquishAssets(&m_ItemRef, m_AssetList);
 
 
 		m_ItemRef.FocusWidgetState(m_iStateIndex, -1);
@@ -478,46 +474,46 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class UndoCmd_DeleteFrame : public QUndoCommand
+class UndoCmd_UnlinkStateAssets : public QUndoCommand
 {
 	ProjectItemData &			m_ItemRef;
 	int							m_iStateIndex;
 
-	QList<AssetItemData *>		m_Frames;
+	QList<AssetItemData *>		m_AssetList;
 
 public:
-	UndoCmd_DeleteFrame(QString sText, ProjectItemData &itemRef, int iStateIndex, AssetItemData *pFrame, QUndoCommand *pParent = 0) :
+	UndoCmd_UnlinkStateAssets(QString sText, ProjectItemData &itemRef, int iStateIndex, QList<AssetItemData *> assetList, QUndoCommand *pParent = 0) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
-		m_iStateIndex(iStateIndex)
+		m_iStateIndex(iStateIndex),
+		m_AssetList(assetList)
 	{
 		setText(sText);
-		m_Frames.append(pFrame);
 	}
 	
-	virtual ~UndoCmd_DeleteFrame()
+	virtual ~UndoCmd_UnlinkStateAssets()
 	{ }
 
 	void redo() override
 	{
 		if(m_iStateIndex >= 0)
 		{
-			for(int i = 0; i < m_Frames.size(); ++i)
-				m_ItemRef.GetModel()->RemoveAsset(m_iStateIndex, m_Frames[i]);// m_StateList[m_iStateIndex]->RelinquishFrame(m_Frames[i]);
+			for(int i = 0; i < m_AssetList.size(); ++i)
+				m_ItemRef.GetModel()->RemoveAsset(m_iStateIndex, m_AssetList[i]);
 		}
-		m_ItemRef.GetProject().GetAtlasModel().RelinquishAssets(&m_ItemRef, m_Frames);
+		m_ItemRef.GetProject().GetAtlasModel().RelinquishAssets(&m_ItemRef, m_AssetList);
 
 		m_ItemRef.FocusWidgetState(m_iStateIndex, -3);
 	}
 	
 	void undo() override
 	{
-		m_Frames = m_ItemRef.GetProject().GetAtlasModel().RequestAssets(&m_ItemRef, m_Frames);
+		m_AssetList = m_ItemRef.GetProject().GetAtlasModel().RequestAssets(&m_ItemRef, m_AssetList);
 		QVariant focusSubState;
 		if(m_iStateIndex >= 0)
 		{
-			for(int i = 0; i < m_Frames.size(); ++i)
-				focusSubState = m_ItemRef.GetModel()->AddAsset(m_iStateIndex, m_Frames[i]);// m_StateList[m_iStateIndex]->AddFrame(m_Frames[i]);
+			for(int i = 0; i < m_AssetList.size(); ++i)
+				focusSubState = m_ItemRef.GetModel()->AddAsset(m_iStateIndex, m_AssetList[i]);
 		}
 
 		m_ItemRef.FocusWidgetState(m_iStateIndex, focusSubState);

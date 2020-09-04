@@ -29,6 +29,8 @@ AudioWidget::AudioWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	layout()->removeItem(ui->verticalLayout);
 	layout()->addItem(ui->verticalLayout);
 
+
+
 	//ui->btnAddFrames->setDefaultAction(ui->actionImportFrames);
 	//ui->btnRemoveFrame->setDefaultAction(ui->actionRemoveFrames);
 	//ui->btnOrderFrameUp->setDefaultAction(ui->actionOrderFrameUpwards);

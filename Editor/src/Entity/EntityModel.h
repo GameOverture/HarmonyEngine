@@ -52,8 +52,8 @@ public:
 
 	PropertiesTreeModel *GetPropertiesModel(ExplorerItemData *pItem);
 
-	virtual int AddFrame(AtlasFrame *pFrame) override;
-	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
+	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
+	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
 
 private:
 	PropertiesTreeModel *AllocNewPropertiesModel(ProjectItemData &entityItemRef, QVariant &subState, ExplorerItemData *pItemToAdd);

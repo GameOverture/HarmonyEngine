@@ -175,12 +175,12 @@ PropertiesTreeModel *EntityStateData::GetPropertiesModel(ExplorerItemData *pItem
 	return m_PropertiesMap[pItem];
 }
 
-/*virtual*/ int EntityStateData::AddFrame(AtlasFrame *pFrame) /*override*/
+/*virtual*/ QVariant EntityStateData::OnLinkAsset(AssetItemData *pAsset) /*override*/
 {
 	return 0;
 }
 
-/*virtual*/ void EntityStateData::RelinquishFrame(AtlasFrame *pFrame) /*override*/
+/*virtual*/ void EntityStateData::OnUnlinkAsset(AssetItemData *pAsset) /*override*/
 {
 }
 

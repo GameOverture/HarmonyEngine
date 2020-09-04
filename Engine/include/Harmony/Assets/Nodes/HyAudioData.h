@@ -13,24 +13,28 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
+#include "Scene/Nodes/IHyNode.h"
 
 class HyAudioData : public IHyNodeData
 {
 	HyAudioHarness &		m_AudioRef;
 
-	enum CueType
+	enum PlayListMode
 	{
-		CUETYPE_Unknown = -1,
-		CUETYPE_Single = 0
+		PLAYLIST_Unknown = -1,
+		PLAYLIST_Shuffle = 0,
+		PLAYLIST_Weighted,
+		PLAYLIST_SequentialLocal,
+		PLAYLIST_SequentialGlobal,
 	};
-	CueType					m_eCueType;
+	PlayListMode			m_ePlayListMode;
 	std::vector<uint32>		m_SoundChecksumList;
 
 public:
 	HyAudioData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
 
-	uint32 GetSound() const;
+	uint32 GetSound(IHyNode *pAudioNode) const;
 };
 
 #endif /* HyAudioData_h__ */

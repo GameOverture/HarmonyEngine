@@ -503,6 +503,10 @@ bool Project::PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRe
 		}
 	}
 
+	// TODO: Refactor this concept of assets having an HyGuiItemType
+	if(ePasteItemType == ITEM_Sprite)
+		ePasteItemType = ITEM_AtlasImage;
+
 	pManager->ImportNewAssets(importAssetList, uiBankId, ePasteItemType, correspondingParentList, correspondingUuidList);
 
 	return true;

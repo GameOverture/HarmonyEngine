@@ -19,6 +19,7 @@ SpriteFramesModel::SpriteFramesModel(QObject *parent) :
 {
 }
 
+// Returns the index the frame was inserted to
 int SpriteFramesModel::Add(AtlasFrame *pFrame)
 {
 	SpriteFrame *pFrameToInsert = nullptr;
@@ -287,7 +288,7 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair
 		
 
 	for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
-		AddFrame(static_cast<AtlasFrame *>(requestedAtlasFramesList[i]));
+		OnLinkAsset(requestedAtlasFramesList[i]);
 
 		
 	if(dataFrameArray.size() != requestedAtlasFramesList.size())
@@ -372,14 +373,21 @@ QList<AssetItemData *> SpriteStateData::GetAtlasFrames() const
 	return atlasList;
 }
 
-/*virtual*/ int SpriteStateData::AddFrame(AtlasFrame *pFrame)
+/*virtual*/ QVariant SpriteStateData::OnLinkAsset(AssetItemData *pAsset)
 {
-	return m_pFramesModel->Add(pFrame);
+	if(pAsset->GetType() != ITEM_AtlasImage)
+		HyGuiLog("SpriteStateData::OnLinkAsset linked non AtlasFrame assets", LOGTYPE_Error);
+
+	// Returns the index the frame was inserted to
+	return m_pFramesModel->Add(static_cast<AtlasFrame *>(pAsset));
 }
 
-/*virtual*/ void SpriteStateData::RelinquishFrame(AtlasFrame *pFrame) /*override*/
+/*virtual*/ void SpriteStateData::OnUnlinkAsset(AssetItemData *pAsset) /*override*/
 {
-	m_pFramesModel->Remove(pFrame);
+	if(pAsset->GetType() != ITEM_AtlasImage)
+		HyGuiLog("SpriteStateData::OnUnlinkAsset unlinked non AtlasFrame assets", LOGTYPE_Error);
+
+	m_pFramesModel->Remove(static_cast<AtlasFrame *>(pAsset));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

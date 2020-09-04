@@ -30,12 +30,12 @@ TextLayersModel &TextStateData::GetLayersModel()
 	return m_LayersModel;
 }
 
-/*virtual*/ int TextStateData::AddFrame(AtlasFrame *pFrame) /*override*/
+/*virtual*/ QVariant TextStateData::OnLinkAsset(AssetItemData *pAsset) /*override*/
 {
 	return 0;
 }
 
-/*virtual*/ void TextStateData::RelinquishFrame(AtlasFrame *pFrame) /*override*/
+/*virtual*/ void TextStateData::OnUnlinkAsset(AssetItemData *pAsset) /*override*/
 {
 }
 

@@ -112,58 +112,15 @@ void IModel::MoveStateForward(int iStateIndex)
 	dataChanged(createIndex(iStateIndex, 0), createIndex(iStateIndex, 0), roleList);
 }
 
-//QList<AtlasFrame *> IModel::RequestFramesByUuid(IStateData *pState, QList<QUuid> requestList, int &iAffectedFrameIndexOut)
-//{
-//	QList<AtlasFrame *> returnedAtlasFramesList = m_ItemRef.GetProject().GetAtlasModel().RequestAssetsByUuid(&m_ItemRef, requestList);
-//	
-//	if(pState)
-//	{
-//		for(int i = 0; i < returnedAtlasFramesList.size(); ++i)
-//			iAffectedFrameIndexOut = pState->AddFrame(returnedAtlasFramesList[i]);
-//	}
-//	
-//	return returnedAtlasFramesList;
-//}
-//
-//QList<AtlasFrame *> IModel::RequestFrames(int iStateIndex, QList<AtlasFrame *> requestList, int &iAffectedFrameIndexOut)
-//{
-//	QList<AtlasFrame *> returnedAtlasFramesList = m_ItemRef.GetProject().GetAtlasModel().RequestAssets(&m_ItemRef, requestList);
-//
-//	if(iStateIndex >= 0)
-//	{
-//		for(int i = 0; i < returnedAtlasFramesList.size(); ++i)
-//			iAffectedFrameIndexOut = m_StateList[iStateIndex]->AddFrame(returnedAtlasFramesList[i]);
-//	}
-//
-//	return returnedAtlasFramesList;
-//}
-//
-//void IModel::RelinquishFrames(int iStateIndex, QList<AtlasFrame *> relinquishList)
-//{
-//	if(iStateIndex >= 0)
-//	{
-//		for(int i = 0; i < relinquishList.size(); ++i)
-//			m_StateList[iStateIndex]->RelinquishFrame(relinquishList[i]);
-//	}
-//	
-//	m_ItemRef.GetProject().GetAtlasModel().RelinquishAssets(&m_ItemRef, relinquishList);
-//}
-//
-//void IModel::RelinquishAllFrames()
-//{
-//	m_ItemRef.GetProject().GetAtlasModel().RelinquishAssets(&m_ItemRef, GetAtlasAssets());
-//}
-
 QVariant IModel::AddAsset(int iStateIndex, AssetItemData *pAsset)
 {
-	return m_StateList[iStateIndex]->AddFrame(static_cast<AtlasFrame *>(pAsset));
+	return m_StateList[iStateIndex]->OnLinkAsset(pAsset);
 }
 
 void IModel::RemoveAsset(int iStateIndex, AssetItemData *pAsset)
 {
-	m_StateList[iStateIndex]->RelinquishFrame(static_cast<AtlasFrame *>(pAsset));
+	m_StateList[iStateIndex]->OnUnlinkAsset(pAsset);
 }
-
 
 FileDataPair IModel::PopState(uint32 uiIndex)
 {

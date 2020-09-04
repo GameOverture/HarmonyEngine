@@ -40,12 +40,12 @@ void PrefabStateData::Refresh()
 {
 }
 
-/*virtual*/ int PrefabStateData::AddFrame(AtlasFrame *pFrame) /*override*/
+/*virtual*/ QVariant PrefabStateData::OnLinkAsset(AssetItemData *pAsset) /*override*/
 {
 	return 0;
 }
 
-/*virtual*/ void PrefabStateData::RelinquishFrame(AtlasFrame *pFrame) /*override*/
+/*virtual*/ void PrefabStateData::OnUnlinkAsset(AssetItemData *pAsset) /*override*/
 {
 }
 

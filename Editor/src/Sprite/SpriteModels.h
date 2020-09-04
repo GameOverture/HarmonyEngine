@@ -33,16 +33,6 @@ public:
 														m_vOffset(0, 0),
 														m_fDuration(0.016f)
 	{ }
-
-	//QPoint GetRenderOffset()
-	//{
-	//	QPoint ptRenderOffset;
-
-	//	ptRenderOffset.setX(m_vOffset.x() + m_pFrame->GetCrop().left());
-	//	ptRenderOffset.setY(m_vOffset.y() + (m_pFrame->GetSize().height() - m_pFrame->GetCrop().bottom()));
-
-	//	return ptRenderOffset;
-	//}
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SpriteFramesModel : public QAbstractTableModel
@@ -66,13 +56,13 @@ public:
 
 	SpriteFramesModel(QObject *pParent);
 
-	int Add(AtlasFrame *pFrame);
+	int Add(AtlasFrame *pFrame);						// Returns the index the frame was inserted to
 	void Remove(AtlasFrame *pFrame);
 	void MoveRowUp(int iIndex);
 	void MoveRowDown(int iIndex);
-	void SetFrameOffset(int iIndex, QPoint vOffset);    // iIndex of -1 will apply to all
-	void AddFrameOffset(int iIndex, QPoint vOffset);    // iIndex of -1 will apply to all
-	void DurationFrame(int iIndex, float fDuration);    // iIndex of -1 will apply to all
+	void SetFrameOffset(int iIndex, QPoint vOffset);	// iIndex of -1 will apply to all
+	void AddFrameOffset(int iIndex, QPoint vOffset);	// iIndex of -1 will apply to all
+	void DurationFrame(int iIndex, float fDuration);	// iIndex of -1 will apply to all
 
 	QJsonArray GetFramesInfo(float &fTotalDurationRef);
 	SpriteFrame *GetFrameAt(int iIndex);
@@ -108,8 +98,8 @@ public:
 
 	QList<AssetItemData *> GetAtlasFrames() const;
 	
-	virtual int AddFrame(AtlasFrame *pFrame) override;
-	virtual void RelinquishFrame(AtlasFrame *pFrame) override;
+	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
+	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SpriteModel : public IModel

@@ -11,9 +11,23 @@
 #define AUDIOMODEL_H
 
 #include "IModel.h"
+#include "PropertiesTreeModel.h"
+
+class AudioStateData : public IStateData
+{
+	
+public:
+	AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
+	virtual ~AudioStateData();
+	
+	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
+	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
+};
 
 class AudioModel : public IModel
 {
+	PropertiesTreeModel		m_PropertiesModel;
+
 public:
 	AudioModel(ProjectItemData &itemRef, FileDataPair &itemFileDataRef);
 	virtual ~AudioModel();
