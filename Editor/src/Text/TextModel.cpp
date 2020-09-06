@@ -189,22 +189,17 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	itemSpecificFileDataOut.m_Data.insert("fontArray", fontArray);
 }
 
-/*virtual*/ FileDataPair TextModel::GetStateFileData(uint32 uiIndex) const /*override*/
+/*virtual*/ void TextModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
 {
-	FileDataPair stateFileData;
-	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
-
 	float fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight;
 	GetLayersModel(uiIndex)->GetMiscInfo(fLeftSideNudgeAmt, fLineAscender, fLineDescender, fLineHeight);
-	stateFileData.m_Data.insert("leftSideNudgeAmt", fLeftSideNudgeAmt);
-	stateFileData.m_Data.insert("lineAscender", fLineAscender);
-	stateFileData.m_Data.insert("lineDescender", fLineDescender);
-	stateFileData.m_Data.insert("lineHeight", fLineHeight);
+	stateFileDataOut.m_Data.insert("leftSideNudgeAmt", fLeftSideNudgeAmt);
+	stateFileDataOut.m_Data.insert("lineAscender", fLineAscender);
+	stateFileDataOut.m_Data.insert("lineDescender", fLineDescender);
+	stateFileDataOut.m_Data.insert("lineHeight", fLineHeight);
 
 	QJsonArray layersArray = static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel().GetLayersArray();
-	stateFileData.m_Data.insert("layers", layersArray);
-
-	return stateFileData;
+	stateFileDataOut.m_Data.insert("layers", layersArray);
 }
 
 /*virtual*/ QList<AssetItemData *> TextModel::GetAssets(HyGuiItemType eType) const /*override*/

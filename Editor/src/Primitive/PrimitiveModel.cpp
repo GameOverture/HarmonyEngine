@@ -23,9 +23,8 @@ PrimitiveModel::~PrimitiveModel()
 {
 }
 
-/*virtual*/ FileDataPair PrimitiveModel::GetStateFileData(uint32 uiIndex) const /*override*/
+/*virtual*/ void PrimitiveModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
 {
-	return FileDataPair();
 }
 
 /*virtual*/ QList<AssetItemData *> PrimitiveModel::GetAssets(HyGuiItemType eType) const /*override*/

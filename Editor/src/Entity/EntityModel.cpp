@@ -313,14 +313,8 @@ bool EntityModel::RemoveChild(TreeModelItemData *pItem)
 {
 }
 
-/*virtual*/ FileDataPair EntityModel::GetStateFileData(uint32 uiIndex) const /*override*/
+/*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
 {
-	FileDataPair stateFileData;
-	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
-
-	//stateFileData.m_Data.insert("something", );
-
-	return stateFileData;
 }
 
 /*virtual*/ QList<AssetItemData *> EntityModel::GetAssets(HyGuiItemType eType) const /*override*/

@@ -59,7 +59,7 @@ public:
 	void MoveRowDown(int iIndex);
 	void SetWeight(int iIndex, uint uiWeight);			// iIndex of -1 will apply to all
 
-	QJsonArray GenPlayListArray();
+	QJsonArray GenPlayListArray() const;
 	AudioPlayListItem *GetAudioAssetAt(int iIndex);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;

@@ -337,9 +337,8 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 	//return prefabArray;
 }
 
-/*virtual*/ FileDataPair PrefabModel::GetStateFileData(uint32 uiIndex) const /*override*/
+/*virtual*/ void PrefabModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
 {
-	return FileDataPair();
 }
 
 /*virtual*/ QList<AssetItemData *> PrefabModel::GetAssets(HyGuiItemType eType) const /*override*/

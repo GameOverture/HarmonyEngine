@@ -101,19 +101,19 @@ void AudioPlayListModel::SetWeight(int iIndex, uint uiWeight)
 	}
 }
 
-QJsonArray AudioPlayListModel::GenPlayListArray()
+QJsonArray AudioPlayListModel::GenPlayListArray() const
 {
-	QJsonArray framesArray;
+	QJsonArray playListArray;
 
 	for(int i = 0; i < m_PlayList.count(); ++i)
 	{
 		QJsonObject frameObj;
 		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_PlayList[i]->GetAudioAsset()->GetChecksum())));
 		frameObj.insert("weight", static_cast<int>(m_PlayList[i]->GetWeight()));
-		framesArray.append(frameObj);
+		playListArray.append(frameObj);
 	}
 
-	return framesArray;
+	return playListArray;
 }
 
 AudioPlayListItem *AudioPlayListModel::GetAudioAssetAt(int iIndex)
@@ -155,8 +155,8 @@ AudioPlayListItem *AudioPlayListModel::GetAudioAssetAt(int iIndex)
 			int dTotal = 0.0;
 			for(auto item : m_PlayList)
 				dTotal += static_cast<double>(item->GetWeight());
-
-			return QString::number(100.0 * (static_cast<double>(pPlayListItem->GetWeight()) / dTotal), 'g', 2) % "%";
+			
+			return QString::number(100.0 * (static_cast<double>(pPlayListItem->GetWeight()) / dTotal), 'g', 3) % "%";
 		}
 		}
 	}

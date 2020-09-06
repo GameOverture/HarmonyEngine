@@ -103,6 +103,28 @@ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPrope
 	}
 }
 
+bool PropertiesTreeModel::IsCategoryEnabled(QString sCategoryName)
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
+
+			if(categoryPropDefRef.eType == PROPERTIESTYPE_Category ||
+			   (categoryPropDefRef.eType == PROPERTIESTYPE_CategoryChecked && pCategoryTreeItem->data(COLUMN_Value).toInt() == Qt::Checked))
+			{
+				return true;
+			}
+			
+			return false;
+		}
+	}
+
+	return false;
+}
+
 bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
 {
 	// All category names must be unique

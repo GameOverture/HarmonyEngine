@@ -286,17 +286,10 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair
 	for(int i = 0; i < metaFrameArray.size(); ++i)
 		uuidRequestList.append(QUuid(metaFrameArray[i].toString()));
 
-	int iAffectedFrameIndex = 0;
-
-	//QList<AtlasFrame *> requestedAtlasFramesList = m_ModelRef.RequestFramesByUuid(this, uuidRequestList, iAffectedFrameIndex);
-	
 	QList<AssetItemData *> requestedAtlasFramesList = m_ModelRef.GetItem().GetProject().GetAtlasModel().RequestAssetsByUuid(&m_ModelRef.GetItem(), uuidRequestList);
-		
-
 	for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
 		OnLinkAsset(requestedAtlasFramesList[i]);
 
-		
 	if(dataFrameArray.size() != requestedAtlasFramesList.size())
 		HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
 
@@ -412,30 +405,24 @@ SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 {
 }
 
-/*virtual*/ FileDataPair SpriteModel::GetStateFileData(uint32 uiIndex) const /*override*/
+/*virtual*/ void SpriteModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
 {
-	FileDataPair stateFileData;
-
 	SpriteStateData *pState = static_cast<SpriteStateData *>(m_StateList[uiIndex]);
-
-	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
 	QJsonArray frameIdsArray;
 
 	QList<AssetItemData *> frameList = pState->GetAtlasFrames();
 	for(int i = 0; i < frameList.size(); ++i)
 		frameIdsArray.append(frameList[i]->GetUuid().toString(QUuid::WithoutBraces));
-	stateFileData.m_Meta.insert("assetUUIDs", frameIdsArray);
+	stateFileDataOut.m_Meta.insert("assetUUIDs", frameIdsArray);
 
-	stateFileData.m_Data.insert("loop", pState->GetLoopMapper()->IsChecked());
-	stateFileData.m_Data.insert("reverse", pState->GetReverseMapper()->IsChecked());
-	stateFileData.m_Data.insert("bounce", pState->GetBounceMapper()->IsChecked());
+	stateFileDataOut.m_Data.insert("loop", pState->GetLoopMapper()->IsChecked());
+	stateFileDataOut.m_Data.insert("reverse", pState->GetReverseMapper()->IsChecked());
+	stateFileDataOut.m_Data.insert("bounce", pState->GetBounceMapper()->IsChecked());
 
 	float fTotalDuration = 0.0f;
 	QJsonArray framesArray = pState->GetFramesModel()->GetFramesInfo(fTotalDuration);
-	stateFileData.m_Data.insert("frames", framesArray);
-	stateFileData.m_Data.insert("duration", fTotalDuration);
-
-	return stateFileData;
+	stateFileDataOut.m_Data.insert("frames", framesArray);
+	stateFileDataOut.m_Data.insert("duration", fTotalDuration);
 }
 
 /*virtual*/ QList<AssetItemData *> SpriteModel::GetAssets(HyGuiItemType eType) const /*override*/

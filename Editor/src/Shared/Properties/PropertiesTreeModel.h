@@ -81,7 +81,7 @@ class PropertiesTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
-	ProjectItemData &								m_OwnerRef;
+	ProjectItemData &							m_OwnerRef;
 	const int									m_iSTATE_INDEX;
 	const QVariant								m_iSUBSTATE;
 
@@ -101,10 +101,12 @@ public:
 	const QVariant &GetSubstate() const;
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
 	QString GetPropertyName(const QModelIndex &indexRef) const;
+
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
-	
 	void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
+
+	bool IsCategoryEnabled(QString sCategoryName);
 
 	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName,

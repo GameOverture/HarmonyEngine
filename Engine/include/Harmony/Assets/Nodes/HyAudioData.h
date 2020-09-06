@@ -21,6 +21,7 @@ class HyAudioData : public IHyNodeData
 
 	enum PlayListMode
 	{
+		// NOTE: Order matters, mode is saved as int
 		PLAYLIST_Unknown = -1,
 		PLAYLIST_Shuffle = 0,
 		PLAYLIST_Weighted,

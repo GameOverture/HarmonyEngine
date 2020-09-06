@@ -74,6 +74,15 @@ IStateData *IModel::GetStateData(int iStateIndex)
 	return m_StateList[iStateIndex];
 }
 
+FileDataPair IModel::GetStateFileData(uint32 uiIndex) const
+{
+	FileDataPair stateFileData;
+	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
+	InsertStateSpecificData(uiIndex, stateFileData);
+
+	return stateFileData;
+}
+
 QString IModel::SetStateName(int iStateIndex, QString sNewName)
 {
 	QString sOldName = m_StateList[iStateIndex]->GetName();
