@@ -125,6 +125,16 @@ enum HyTextAlign
 	HYALIGN_Justify
 };
 
+enum HyPlayListMode
+{
+	// NOTE: Order matters, mode is saved as int
+	HYPLAYLIST_Unknown = -1,
+	HYPLAYLIST_Shuffle = 0,
+	HYPLAYLIST_Weighted,
+	HYPLAYLIST_SequentialLocal,
+	HYPLAYLIST_SequentialGlobal
+};
+
 enum HyButtonState
 {
 	HYBUTTONSTATE_Pressable = 0,

@@ -15,13 +15,13 @@
 
 HyTimer::HyTimer(void) :
 	IHyTimeInst(),
-	m_dTotalDuration(0.0)
+	m_dDuration(0.0)
 {
 }
 
 HyTimer::HyTimer(double dDuration) :
 	IHyTimeInst(),
-	m_dTotalDuration(0.0)
+	m_dDuration(0.0)
 {
 	Init(dDuration);
 }
@@ -39,18 +39,18 @@ void HyTimer::Init(double dDuration)
 	}
 
 	m_dElapsedTime = 0.0f;
-	m_dTotalDuration = dDuration;
+	m_dDuration = dDuration;
 	m_bEnabled = false;
 }
 
 void HyTimer::Reset()
 {
-	Init(m_dTotalDuration);
+	Init(m_dDuration);
 }
 
 void HyTimer::Start()
 {
-	if(m_dTotalDuration == 0.0)
+	if(m_dDuration == 0.0)
 	{
 		HyLogWarning("HyTimer::Start() was invoked with uninitialized data. Should call Init() prior");
 		return;
@@ -66,7 +66,7 @@ void HyTimer::Pause()
 
 bool HyTimer::IsExpired() const
 {
-	return m_bEnabled && m_dElapsedTime >= m_dTotalDuration;
+	return m_bEnabled && m_dElapsedTime >= m_dDuration;
 }
 
 double HyTimer::TimeLeft() const
@@ -74,5 +74,5 @@ double HyTimer::TimeLeft() const
 	if(IsExpired())
 		return 0.0f;
 	
-	return HyMax(m_dTotalDuration - m_dElapsedTime, 0.0);
+	return HyMax(m_dDuration - m_dElapsedTime, 0.0);
 }

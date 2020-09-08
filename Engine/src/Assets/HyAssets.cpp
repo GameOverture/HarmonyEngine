@@ -268,7 +268,6 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 	HyAssert(pLoadable->_LoadableGetType() != HYTYPE_Entity, "HyAssets::LoadNodeData passed an entity");
 	if(pLoadable->m_eLoadState != HYLOADSTATE_Inactive || pLoadable->IsLoadDataValid() == false)
 		return;
-
 	
 	bool bFullyLoaded = true;
 	if(pLoadable->AcquireData() != nullptr)

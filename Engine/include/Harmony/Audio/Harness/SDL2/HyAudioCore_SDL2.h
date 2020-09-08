@@ -13,6 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Audio/Harness/IHyAudioCore.h"
 
+#include <bitset>
+
 class IHyNode;
 class IHyFileAudioImpl;
 
@@ -42,14 +44,11 @@ class HyAudioCore_SDL2 : public IHyAudioCore
 	//struct Play
 	//{
 	//	const IHyNode *					m_pID;
-
 	//	float							m_fVolume;
 	//	float							m_fPitch;
 	//	bool							m_bPaused;
-
 	//	HyRawSoundBuffer *				m_pBuffer;
 	//	uint32							m_uiRemainingBytes;
-
 	//	Play(const IHyNode *pID, float fVolume, float fPitch, bool bPaused, HyRawSoundBuffer *pBuffer, uint32 uiRemainingBytes) :
 	//		m_pID(pID),
 	//		m_fVolume(fVolume),
@@ -72,7 +71,8 @@ public:
 
 	static IHyFileAudioImpl *AllocateBank(IHyAudioCore *pAudio, HyJsonObj bankObj);
 
-//private:
+private:
+	static void OnChannelFinished(int iChannel);
 //	static void OnCallback(void *pUserData, uint8_t *pStream, int32 iLen);
 };
 #endif // defined(HY_USE_SDL2)

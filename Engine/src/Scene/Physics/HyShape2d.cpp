@@ -185,7 +185,7 @@ b2Shape *HyShape2d::ClonePpmShape(float fPpmInverse) const
 	return pCloneB2Shape;
 }
 
-bool HyShape2d::IsValid() const
+bool HyShape2d::IsValidShape() const
 {
 	return m_pShape != nullptr && m_eType != HYSHAPE_Unknown;
 }

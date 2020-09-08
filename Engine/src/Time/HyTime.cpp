@@ -77,15 +77,11 @@ void HyTime::CalcTimeDelta()
 	m_dTotalElapsedTime += m_dCurDeltaTime;
 	m_dThrottledTime += m_dCurDeltaTime;
 	 
-	// Update all timers
-	if(m_TimeInstList.empty() == false)
+	// Update all timers/stopwatches
+	for(auto timer: m_TimeInstList)
 	{
-		uint32 uiNumTimers = static_cast<uint32>(m_TimeInstList.size());
-		for(uint32 i = 0; i < uiNumTimers; i++)
-		{
-			if(m_TimeInstList[i]->IsEnabled())
-				m_TimeInstList[i]->Update(m_dCurDeltaTime);
-		}
+		if(timer->IsEnabled())
+			timer->Update(m_dCurDeltaTime);
 	}
 }
 

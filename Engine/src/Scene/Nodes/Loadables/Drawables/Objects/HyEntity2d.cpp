@@ -547,7 +547,7 @@ float HyEntity2d::PhysGetMass() const
 
 std::unique_ptr<HyPhysicsCollider> HyEntity2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
 {
-	if(m_pPhysicsBody == nullptr || shapeRef.IsValid() == false)
+	if(m_pPhysicsBody == nullptr || shapeRef.IsValidShape() == false)
 		return nullptr;
 
 	b2Shape *pPpmShape = shapeRef.ClonePpmShape(static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse());

@@ -20,12 +20,15 @@ template<typename NODETYPE, typename ENTTYPE>
 class IHyAudio : public NODETYPE
 {
 	uint32						m_uiCueFlags;
-
+	uint32						m_uiAssignedChannel;
 	float						m_fVolume;
 	float						m_fPitch;
-
-	//uint8_t					loop;
-	//uint8_t					fade;
+	
+	// Configurable
+	HyPlayListMode				m_ePlayListMode;
+	int32						m_iPriority;
+	int32						m_iLoops;
+	uint32						m_uiMaxDistance;
 
 public:
 	HyAnimFloat					volume;
@@ -37,6 +40,11 @@ public:
 		m_uiCueFlags(0),
 		m_fVolume(1.0f),
 		m_fPitch(1.0f),
+		m_ePlayListMode(HYPLAYLIST_Unknown),
+		m_iPriority(0),
+		m_iLoops(0),
+		m_uiMaxDistance(0),
+		m_uiAssignedChannel(0),
 		volume(m_fVolume, *this, 0),
 		pitch(m_fPitch, *this, 0)
 	{
@@ -82,6 +90,20 @@ public:
 	}
 
 protected:
+	virtual void OnDataAcquired() override
+	{
+		const HyAudioData *pData = static_cast<const HyAudioData *>(UncheckedGetData());
+
+		m_ePlayListMode = pData->GetPlayListMode();
+		m_iPriority = pData->GetPriority();
+		m_iLoops = pData->GetLoops();
+		m_uiMaxDistance = pData->GetMaxDistance();
+		volume = pData->GetVolume();
+		pitch = pData->GetPitch();
+		
+		//m_uiAssignedChannel
+	}
+
 	virtual void OnLoadedUpdate() override
 	{
 		if(IHyNode::IsDirty(IHyNode::DIRTY_Audio))

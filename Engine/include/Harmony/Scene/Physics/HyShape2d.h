@@ -31,7 +31,7 @@ public:
 	b2Shape *GetB2Shape();
 	b2Shape *ClonePpmShape(float fPpmInverse) const;
 
-	bool IsValid() const;
+	bool IsValidShape() const;
 
 	void SetAsNothing();
 

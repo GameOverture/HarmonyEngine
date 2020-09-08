@@ -60,7 +60,7 @@ IHyInstance2d &IHyInstance2d::operator=(IHyInstance2d &&donor)
 
 const HyShape2d &IHyInstance2d::GetLocalBoundingVolume()
 {
-	if(IsDirty(DIRTY_BoundingVolume) || m_LocalBoundingVolume.IsValid() == false)
+	if(IsDirty(DIRTY_BoundingVolume) || m_LocalBoundingVolume.IsValidShape() == false)
 	{
 		OnCalcBoundingVolume();
 		ClearDirty(DIRTY_BoundingVolume);
@@ -77,7 +77,7 @@ const HyShape2d &IHyInstance2d::GetLocalBoundingVolume()
 		float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
 
 		GetLocalBoundingVolume(); // This will update BV if it's dirty
-		if(m_LocalBoundingVolume.IsValid() && m_LocalBoundingVolume.GetB2Shape())
+		if(m_LocalBoundingVolume.IsValidShape() && m_LocalBoundingVolume.GetB2Shape())
 			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_WorldAABB, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
 		else
 		{

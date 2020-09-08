@@ -14,7 +14,7 @@
 
 class HyTimer : public IHyTimeInst
 {
-	double	m_dTotalDuration;
+	double	m_dDuration;
 
 public:
 	HyTimer(void);

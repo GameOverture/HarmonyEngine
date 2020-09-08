@@ -44,7 +44,7 @@ protected:
 	virtual void OnUnloaded() override;
 
 	// Optional user overrides below
-	virtual bool OnIsValid() { return true; }
+	virtual bool OnIsValid() { return true; }	// Is current state valid, TODO: possible redundancy with IsLoadDataValid()
 	virtual void OnCalcBoundingVolume() { }
 
 #ifdef HY_PLATFORM_GUI

@@ -36,6 +36,8 @@ if(Qt5_DIR)
 		src/Audio/AudioManagerModel.h
 		src/Audio/AudioModel.cpp
 		src/Audio/AudioModel.h
+		src/Audio/AudioPlayListModel.cpp
+		src/Audio/AudioPlayListModel.h
 		src/Audio/AudioRepackThread.cpp
 		src/Audio/AudioRepackThread.h
 		src/Audio/AudioWidget.cpp
