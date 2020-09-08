@@ -86,10 +86,10 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "", true);
 	
 	sGameName				= projDoc["GameName"].GetString();
-	uiUpdateTickMs			= projDoc["UpdateFpsCap"].GetUint();
-	bShowCursor				= projDoc["ShowCursor"].GetBool();
-	uiNumInputMappings		= projDoc["NumInputMappings"].GetUint();
-	uiDebugPort				= projDoc["DebugPort"].GetUint();
+	uiUpdateTickMs			= 0;//projDoc["UpdateFpsCap"].GetUint();
+	bShowCursor				= true;//projDoc["ShowCursor"].GetBool();
+	uiNumInputMappings		= 1;//projDoc["NumInputMappings"].GetUint();
+	uiDebugPort				= 3333;//projDoc["DebugPort"].GetUint();
 
 	if(projDoc.HasMember("WindowInfoArray"))
 	{
