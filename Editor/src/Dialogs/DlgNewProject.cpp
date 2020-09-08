@@ -118,6 +118,17 @@ void DlgNewProject::on_buttonBox_accepted()
 	jsonObj.insert("MetaDataPath", QString(ui->wgtMetaDir->GetRelPath() + "/"));
 	jsonObj.insert("SourcePath", QString(ui->wgtSrcDir->GetRelPath() + "/"));
 
+	QJsonArray windowInfoArray;
+	QJsonObject windowInfoObj;
+	windowInfoObj.insert("Name", ui->txtTitleName->text());
+	windowInfoObj.insert("Type", HYWINDOW_WindowedFixed);
+	windowInfoObj.insert("ResolutionX", 1280);
+	windowInfoObj.insert("ResolutionY", 720);
+	windowInfoObj.insert("LocationX", 100);
+	windowInfoObj.insert("LocationY", 100);
+	windowInfoArray.append(windowInfoObj);
+	jsonObj.insert("WindowInfo", windowInfoArray);
+
 	QFile newProjectFile(GetProjFilePath());
 	if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 	{

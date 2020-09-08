@@ -91,9 +91,9 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	uiNumInputMappings		= 1;//projDoc["NumInputMappings"].GetUint();
 	uiDebugPort				= 3333;//projDoc["DebugPort"].GetUint();
 
-	if(projDoc.HasMember("WindowInfoArray"))
+	if(projDoc.HasMember("WindowInfo"))
 	{
-		HyJsonArray windowInfoArray = projDoc["WindowInfoArray"].GetArray();
+		HyJsonArray windowInfoArray = projDoc["WindowInfo"].GetArray();
 		uiNumWindows = windowInfoArray.Size();
 		for(uint32 i = 0; i < uiNumWindows; ++i)
 		{
