@@ -314,7 +314,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	if(Harmony::GetProject() != &pItem->GetProject())
 	{
-		HyGuiLog("Cannot open '" % pItem->GetName(true) % "' because its current project is not activated.", LOGTYPE_Normal);
+		HyGuiLog("Cannot open " % HyGlobal::ItemName(pItem->GetType(), false) % " '" % pItem->GetName(true) % "' because its current project is not activated.", LOGTYPE_Normal);
 		return;
 	}
 

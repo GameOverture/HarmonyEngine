@@ -132,7 +132,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	QFile newProjectFile(GetProjFilePath());
 	if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 	{
-	   HyGuiLog("Couldn't open new project file for writing", LOGTYPE_Error);
+		HyGuiLog("Couldn't open new project file for writing", LOGTYPE_Error);
 	}
 	else
 	{

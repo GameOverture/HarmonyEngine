@@ -116,34 +116,34 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	if(m_CueList.empty())
 		return;
 
-	//for(auto cue : m_CueList)
-	//{
-	//	switch(cue.m_eCUE_TYPE)
-	//	{
-	//	case CUETYPE_PlayOneShotDefault:
-	//	case CUETYPE_PlayOneShot:
-	//	case CUETYPE_Start: {
-	//		uint32 uiSoundChecksum = 0;
-	//		float fVolume = 1.0f;
-	//		float fPitch = 1.0f;
-	//		if(cue.m_pNODE->Is2D())
-	//		{
-	//			uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio2d *>(cue.m_pNODE)->AcquireData())->GetSound(cue.m_pNODE);
-	//			if(cue.m_eCUE_TYPE != CUETYPE_PlayOneShotDefault)
-	//			{
-	//				fVolume = static_cast<HyAudio2d *>(cue.m_pNODE)->volume.Get();
-	//				fPitch = static_cast<HyAudio2d *>(cue.m_pNODE)->pitch.Get();
-	//			}
-	//		}
-	//		else
-	//		{
-	//			uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio3d *>(cue.m_pNODE)->AcquireData())->GetSound(cue.m_pNODE);
-	//			if(cue.m_eCUE_TYPE != CUETYPE_PlayOneShotDefault)
-	//			{
-	//				fVolume = static_cast<HyAudio3d *>(cue.m_pNODE)->volume.Get();
-	//				fPitch = static_cast<HyAudio3d *>(cue.m_pNODE)->pitch.Get();
-	//			}
-	//		}
+	for(auto cue : m_CueList)
+	{
+		switch(cue.m_eCUE_TYPE)
+		{
+		case CUETYPE_PlayOneShotDefault:
+		case CUETYPE_PlayOneShot:
+		case CUETYPE_Start: {
+			uint32 uiSoundChecksum = 0;
+			float fVolume = 1.0f;
+			float fPitch = 1.0f;
+			if(cue.m_pNODE->Is2D())
+			{
+				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio2d *>(cue.m_pNODE)->AcquireData())->GetSound(cue.m_pNODE);
+				if(cue.m_eCUE_TYPE != CUETYPE_PlayOneShotDefault)
+				{
+					fVolume = static_cast<HyAudio2d *>(cue.m_pNODE)->volume.Get();
+					fPitch = static_cast<HyAudio2d *>(cue.m_pNODE)->pitch.Get();
+				}
+			}
+			else
+			{
+				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio3d *>(cue.m_pNODE)->AcquireData())->GetSound(cue.m_pNODE);
+				if(cue.m_eCUE_TYPE != CUETYPE_PlayOneShotDefault)
+				{
+					fVolume = static_cast<HyAudio3d *>(cue.m_pNODE)->volume.Get();
+					fPitch = static_cast<HyAudio3d *>(cue.m_pNODE)->pitch.Get();
+				}
+			}
 
 	//		HyRawSoundBuffer *pBuffer = nullptr;
 	//		for(auto file : m_AudioFileList)
