@@ -64,8 +64,6 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 
 /*virtual*/ void AudioManagerModel::OnNewBankDefaults(QJsonObject &bankObjRef) /*override*/
 {
-	//bankObjRef.insert("bankId", 0);
-	//bankObjRef.insert("bankName", "Default");
 }
 
 /*virtual*/ QString AudioManagerModel::OnBankInfo(uint uiBankIndex) /*override*/
