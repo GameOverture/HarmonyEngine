@@ -111,7 +111,7 @@ bool AudioRepackThread::PackToOgg(AudioAsset *pAudio, QDir runtimeBankDir)
 	vorbis_block		vb; // local working space for packet->PCM decode
 
 	int eos = 0, ret;
-	int i, founddata;
+	//int i, founddata;
 
 	//#if defined(macintosh) && defined(__MWERKS__)
 	//    int argc = 0;

@@ -20,22 +20,22 @@
 #include <QFileDialog>
 #include <QMimeData>
 
-IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
+IManagerModel::IManagerModel(Project &projRef, AssetType eAssetType) :
 	ITreeModel(2, QStringList(), nullptr),
 	m_ProjectRef(projRef),
-	m_eITEM_TYPE(eItemType),
-	m_MetaDir(m_ProjectRef.GetMetaDataAbsPath() + HyGlobal::ItemName(eItemType, true)),
-	m_DataDir(m_ProjectRef.GetAssetsAbsPath() + HyGlobal::ItemName(eItemType, true)),
-	m_uiNextBankId(9999) // Should be properly initialized with Init()
+	m_eASSET_TYPE(eAssetType),
+	m_MetaDir(m_ProjectRef.GetMetaDataAbsPath() + HyGlobal::AssetName(eAssetType)),
+	m_DataDir(m_ProjectRef.GetAssetsAbsPath() + HyGlobal::AssetName(eAssetType)),
+	m_uiNextBankId(99999) // Should be properly initialized with Init()
 {
 	if(m_MetaDir.exists() == false)
 	{
-		HyGuiLog(HyGlobal::ItemName(m_eITEM_TYPE, true) % " meta directory is missing, recreating", LOGTYPE_Info);
+		HyGuiLog(HyGlobal::AssetName(m_eASSET_TYPE) % " meta directory is missing, recreating", LOGTYPE_Info);
 		m_MetaDir.mkpath(m_MetaDir.absolutePath());
 	}
 	if(m_DataDir.exists() == false)
 	{
-		HyGuiLog(HyGlobal::ItemName(m_eITEM_TYPE, true) % " data directory is missing, recreating", LOGTYPE_Info);
+		HyGuiLog(HyGlobal::AssetName(m_eASSET_TYPE) % " data directory is missing, recreating", LOGTYPE_Info);
 		m_DataDir.mkpath(m_DataDir.absolutePath());
 	}
 }
@@ -44,13 +44,14 @@ IManagerModel::IManagerModel(Project &projRef, HyGuiItemType eItemType) :
 {
 }
 
+// Init() exists because we need to construct using virtual functions
 void IManagerModel::Init()
 {
-	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_MetaExt));
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt));
 	if(settingsFile.exists())
 	{
 		if(!settingsFile.open(QIODevice::ReadOnly))
-			HyGuiLog(QString("IManagerModel::IManagerModel() could not open ") % HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_MetaExt, LOGTYPE_Error);
+			HyGuiLog(QString("IManagerModel::IManagerModel() could not open ") % HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt, LOGTYPE_Error);
 
 #ifdef HYGUI_UseBinaryMetaFiles
 		QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
@@ -68,60 +69,9 @@ void IManagerModel::Init()
 			QString sName = HyGlobal::MakeFileNameFromCounter(bankArray[i].toObject()["bankId"].toInt());
 			BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(sName), bankArray[i].toObject());
 
-			//OnCreateBank(*pNewBank);
-			if(m_eITEM_TYPE == ITEM_AtlasImage)
+			if(m_eASSET_TYPE == ASSET_Atlas)
 				m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewBank->GetId()));
 		}
-
-		m_ExpandedFiltersArray = settingsObj["expanded"].toArray();
-
-		//// Create all the filter items first, storing their actual path in their data (for now)
-		//QJsonArray filtersArray = settingsObj["filters"].toArray();
-		//for(int i = 0; i < filtersArray.size(); ++i)
-		//{
-		//	QDir filterPathDir(filtersArray.at(i).toString());
-
-		//	AtlasTreeItem *pNewTreeItem = new AtlasTreeItem((QTreeWidgetItem *)nullptr, QTreeWidgetItem::Type);
-
-		//	pNewTreeItem->setText(0, filterPathDir.dirName());
-		//	pNewTreeItem->setIcon(0, HyGlobal::ItemIcon(ITEM_Filter, SUBICON_None));
-
-		//	QVariant v(QString(filterPathDir.absolutePath()));
-		//	pNewTreeItem->setData(0, Qt::UserRole, v);
-
-		//	m_TopLevelTreeItemList.append(pNewTreeItem);
-		//}
-
-		//// Then place the filters correctly as a parent hierarchy using the path string stored in their data
-		//QList<AtlasTreeItem *> atlasFiltersTreeItemList(m_TopLevelTreeItemList);
-		//for(int i = 0; i < m_TopLevelTreeItemList.size(); ++i)
-		//{
-		//	AtlasTreeItem *pParentFilter = nullptr;
-
-		//	QString sFilterPath = m_TopLevelTreeItemList[i]->data(0, Qt::UserRole).toString();
-		//	sFilterPath.truncate(sFilterPath.lastIndexOf("/"));
-		//	if(sFilterPath != "")
-		//	{
-		//		for(int j = 0; j < atlasFiltersTreeItemList.size(); ++j)
-		//		{
-		//			if(atlasFiltersTreeItemList[j]->data(0, Qt::UserRole).toString() == sFilterPath)
-		//			{
-		//				pParentFilter = atlasFiltersTreeItemList[j];
-		//				break;
-		//			}
-		//		}
-		//	}
-
-		//	if(pParentFilter)
-		//	{
-		//		pParentFilter->addChild(m_TopLevelTreeItemList.takeAt(i));
-		//		i = -1;
-		//	}
-		//}
-
-		//// Finally go through all the filters and set the data string to the 'HYTREEWIDGETITEM_IsFilter' value to identify this QTreeWidgetItem as a filter
-		//for(int i = 0; i < atlasFiltersTreeItemList.size(); ++i)
-		//	atlasFiltersTreeItemList[i]->setData(0, Qt::UserRole, QVariant(QString(HYTREEWIDGETITEM_IsFilter)));
 
 		QJsonArray assetsArray = settingsObj["assets"].toArray();
 		for(int i = 0; i < assetsArray.size(); ++i)
@@ -129,34 +79,11 @@ void IManagerModel::Init()
 			QJsonObject assetObj = assetsArray[i].toObject();
 			AssetItemData *pAssetData = CreateAssetTreeItem(assetObj["filter"].toString(), assetObj["name"].toString(), assetObj);
 
-
-			//QString sFilterPath = frameObj["filter"].toString();
-			//AtlasTreeItem *pFrameParent = nullptr;
-			//if(sFilterPath != "")
-			//{
-			//	for(int j = 0; j < atlasFiltersTreeItemList.size(); ++j)
-			//	{
-			//		if(atlasFiltersTreeItemList[j]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter && HyGlobal::GetTreeWidgetItemPath(atlasFiltersTreeItemList[j]) == sFilterPath)
-			//		{
-			//			pFrameParent = atlasFiltersTreeItemList[j];
-			//			break;
-			//		}
-			//	}
-			//}
-
 			// Check to see if the actual meta asset exists on disk
 			if(QFile::exists(m_MetaDir.absoluteFilePath(pAssetData->ConstructMetaFileName())) == false)
-				pAssetData->SetError(ATLASFRAMEERROR_CannotFindMetaImg);
+				pAssetData->SetError(ASSETERROR_CannotFindMetaFile);
 			else
-				pAssetData->ClearError(ATLASFRAMEERROR_CannotFindMetaImg);
-
-			//if(pNewFrame->GetName().isEmpty() || pNewFrame->GetName()[0] != HyGuiInternalCharIndicator)
-			//{
-			//	if(pFrameParent)
-			//		pFrameParent->addChild(pNewFrame->GetTreeItem());
-			//	else
-			//		m_TopLevelTreeItemList.append(pNewFrame->GetTreeItem());
-			//}
+				pAssetData->ClearError(ASSETERROR_CannotFindMetaFile);
 		}
 	}
 	else
@@ -165,14 +92,18 @@ void IManagerModel::Init()
 		CreateNewBank("Default");
 	}
 
-
 	// Create data manifest file if one doesn't exist
-	QFile manifestFile(m_DataDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_DataExt));
+	QFile manifestFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
 	if(manifestFile.exists() == false)
 		SaveRuntime();
 }
 
-Project &IManagerModel::GetProjOwner()
+AssetType IManagerModel::GetAssetType() const
+{
+	return m_eASSET_TYPE;
+}
+
+Project &IManagerModel::GetProjOwner() const
 {
 	return m_ProjectRef;
 }
@@ -226,7 +157,13 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, H
 	}
 
 	if(eType == ITEM_Unknown)
-		eType = m_eITEM_TYPE;
+	{
+		switch(m_eASSET_TYPE)
+		{
+		case ASSET_Atlas:	eType = ITEM_AtlasImage;	break;
+		case ASSET_Audio:	eType = ITEM_Audio;			break;
+		}
+	}
 
 	QList<AssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType, correspondingUuidList);
 	for(int i = 0; i < returnList.size(); ++i)
@@ -369,11 +306,6 @@ bool IManagerModel::TransferAssets(QList<AssetItemData *> assetsList, uint uiNew
 	return OnMoveAssets(assetsList, uiNewBankId);
 }
 
-QJsonArray IManagerModel::GetExpandedFiltersArray()
-{
-	return m_ExpandedFiltersArray;
-}
-
 QString IManagerModel::AssembleFilter(TreeModelItemData *pAsset) const
 {
 	QStringList sPrefixParts;
@@ -506,33 +438,6 @@ bool IManagerModel::DoesAssetExist(quint32 uiChecksum)
 	return m_AssetChecksumMap.contains(uiChecksum);
 }
 
-//QList<AssetItemData *> IManagerModel::RequestAssets(ProjectItemData *pItem)
-//{
-//	QList<QTreeWidgetItem *> selectedItems;
-//	if(m_pProjOwner->GetAtlasWidget())
-//	{
-//		selectedItems = m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->selectedItems();
-//		qSort(selectedItems.begin(), selectedItems.end(), SortTreeWidgetsPredicate());
-//
-//		m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget()->clearSelection();
-//	}
-//
-//	QList<AtlasFrame *> frameRequestList;
-//	for(int i = 0; i < selectedItems.size(); ++i)
-//	{
-//		AtlasFrame *pFrame = selectedItems[i]->data(0, Qt::UserRole).value<AtlasFrame *>();
-//		if(pFrame == nullptr)
-//			continue;
-//
-//		frameRequestList.append(pFrame);
-//	}
-//
-//	if(frameRequestList.empty())
-//		return QList<AtlasFrame *>();
-//
-//	return RequestAssets(pItem, frameRequestList);
-//}
-
 QList<AssetItemData *> IManagerModel::RequestAssetsByUuid(ProjectItemData *pItem, QList<QUuid> requestList)
 {
 	if(requestList.empty())
@@ -559,7 +464,7 @@ QList<AssetItemData *> IManagerModel::RequestAssetsByUuid(ProjectItemData *pItem
 QList<AssetItemData *> IManagerModel::RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList)
 {
 	if(requestList.empty())
-		return requestList;//RequestAssets(pItem);
+		return requestList;
 
 	QList<AssetItemData *> returnList;
 	for(int i = 0; i < requestList.size(); ++i)
@@ -599,7 +504,7 @@ void IManagerModel::CreateNewBank(QString sName)
 
 	BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_uiNextBankId)), bankObj);
 	
-	if(m_eITEM_TYPE == ITEM_AtlasImage || m_eITEM_TYPE == ITEM_Audio)
+	if(m_eASSET_TYPE == ASSET_Atlas || m_eASSET_TYPE == ASSET_Audio)
 		m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewBank->GetId()));
 
 	m_uiNextBankId++;
@@ -621,7 +526,7 @@ void IManagerModel::RemoveBank(quint32 uiBankId)
 			if(m_BanksModel.GetBank(i)->m_AssetList.empty())
 			{
 				//OnDeleteBank(*m_BanksModel.GetBank(i));
-				if(m_eITEM_TYPE == ITEM_AtlasImage)
+				if(m_eASSET_TYPE == ASSET_Atlas)
 					m_DataDir.rmdir(HyGlobal::MakeFileNameFromCounter(m_BanksModel.GetBank(i)->GetId()));
 
 				m_BanksModel.RemoveBank(i);
@@ -663,7 +568,6 @@ quint32 IManagerModel::GetBankIdFromBankIndex(uint uiBankIndex) const
 
 void IManagerModel::SaveMeta()
 {
-	// Assemble array with all the frames from every group
 	QJsonArray assetsArray;
 	QJsonArray banksArray;
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
@@ -679,59 +583,14 @@ void IManagerModel::SaveMeta()
 		}
 	}
 
-//	QJsonArray filtersArray;
-//	m_ExpandedFiltersArray = QJsonArray();
-//	if(m_pProjOwner->GetAtlasWidget())
-//	{
-//		QTreeWidgetItemIterator iter(m_pProjOwner->GetAtlasWidget()->GetFramesTreeWidget());
-//		while(*iter)
-//		{
-//			if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-//			{
-//				QTreeWidgetItem *pTreeWidgetItem = *iter;
-//				QString sFilterName = pTreeWidgetItem->text(0);
-//				bool bExpanded = pTreeWidgetItem->isExpanded();
-//
-//				QString sFilterPath = HyGlobal::GetTreeWidgetItemPath(*iter);
-//				filtersArray.append(QJsonValue(sFilterPath));
-//				m_ExpandedFiltersArray.append(bExpanded);
-//			}
-//
-//			++iter;
-//		}
-//	}
-//	else
-//	{
-//		QFile settingsFile(m_MetaDir.absoluteFilePath(HYMETA_AtlasFile));
-//		if(settingsFile.exists())
-//		{
-//			if(!settingsFile.open(QIODevice::ReadOnly))
-//				HyGuiLog(QString("WidgetAtlasGroup::WidgetAtlasGroup() could not open ") % HYMETA_AtlasFile, LOGTYPE_Error);
-//
-//#ifdef HYGUI_UseBinaryMetaFiles
-//			QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
-//#else
-//			QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
-//#endif
-//			settingsFile.close();
-//
-//			QJsonObject settingsObj = settingsDoc.object();
-//			filtersArray = settingsObj["filters"].toArray();
-//			m_ExpandedFiltersArray = settingsObj["expanded"].toArray();
-//		}
-//	}
-
-	// Assemble the official QJsonObject for the write
+	// Assemble the root QJsonObject for the write
 	QJsonObject settingsObj;
 	settingsObj.insert("$fileVersion", HYGUI_FILE_VERSION);
-	//settingsObj.insert("expanded", m_ExpandedFiltersArray);
-	//settingsObj.insert("filters", filtersArray);
-
 	settingsObj.insert("assets", assetsArray);
 	settingsObj.insert("banks", banksArray);
 	settingsObj.insert("nextBankId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
 
-	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_MetaExt));
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt));
 	if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 		HyGuiLog("Couldn't open meta file for writing", LOGTYPE_Error);
@@ -760,7 +619,7 @@ void IManagerModel::SaveRuntime()
 	QJsonDocument runtimeDoc;
 	runtimeDoc.setObject(GetSaveJson());
 
-	QFile runtimeFile(m_DataDir.absoluteFilePath(HyGlobal::ItemName(m_eITEM_TYPE, true) % HYGUIPATH_DataExt));
+	QFile runtimeFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
 	if(runtimeFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 		HyGuiLog("Couldn't open atlas data info file for writing", LOGTYPE_Error);
 	else
@@ -882,14 +741,13 @@ void IManagerModel::SaveRuntime()
 	QStringList sMimeTypeList;
 	sMimeTypeList << HYGUI_MIMETYPE_ASSET;
 
-	switch(m_eITEM_TYPE)
+	switch(m_eASSET_TYPE)
 	{
-	case ITEM_Audio:
-		sMimeTypeList << "audio/wav";
-		break;
-
-	case ITEM_AtlasImage:
+	case ASSET_Atlas:
 		sMimeTypeList << "image/png";
+		break;
+	case ASSET_Audio:
+		sMimeTypeList << "audio/wav";
 		break;
 	}
 
@@ -909,7 +767,7 @@ void IManagerModel::SaveRuntime()
 
 	RemoveRedundantItems(ITEM_Filter, itemList);
 
-	QMimeData *pNewMimeData = new AssetMimeData(m_ProjectRef, m_eITEM_TYPE, itemList);
+	QMimeData *pNewMimeData = new AssetMimeData(m_ProjectRef, m_eASSET_TYPE, itemList);
 	return pNewMimeData;
 }
 

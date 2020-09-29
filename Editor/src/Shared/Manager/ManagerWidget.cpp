@@ -20,6 +20,7 @@
 #include "EntityModel.h"
 #include "PrefabModel.h"
 #include "MainWindow.h"
+#include "DlgAssetProperties.h"
 
 #include <QUndoCommand>
 #include <QMessageBox>
@@ -246,8 +247,12 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	QMenu contextMenu;
 	QMenu bankMenu;
 
+	QList<AssetItemData *> selectedAssetsList;
+	QList<TreeModelItemData *> selectedFiltersList;
+	GetSelectedItems(selectedAssetsList, selectedFiltersList);
+
 	QModelIndex index = ui->assetTree->indexAt(pos);
-	if(index.isValid() == false)
+	if(index.isValid() == false || selectedAssetsList.empty())
 	{
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
@@ -255,6 +260,8 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else
 	{
+		contextMenu.addAction(ui->actionAssetSettings);
+
 		if(m_pModel->GetNumBanks() > 1)
 		{
 			bankMenu.setIcon(QIcon(":/icons16x16/atlas-assemble.png"));
@@ -275,9 +282,9 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 			connect(&bankMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_actionBankTransfer_triggered(QAction*)));
 
 			contextMenu.addMenu(&bankMenu);
-			contextMenu.addSeparator();
 		}
 
+		contextMenu.addSeparator();
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
 		contextMenu.addAction(ui->actionAddFilter);
@@ -292,6 +299,21 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	QList<QAction *> actionAtlasGrpMoveList = bankMenu.actions();
 	for(int i = 0; i < actionAtlasGrpMoveList.size(); ++i)
 		delete actionAtlasGrpMoveList[i];
+}
+
+void ManagerWidget::on_actionAssetSettings_triggered()
+{
+	QList<AssetItemData *> selectedAssetsList;
+	QList<TreeModelItemData *> selectedFiltersList;
+	GetSelectedItems(selectedAssetsList, selectedFiltersList);
+
+	if(selectedAssetsList.empty())
+		return;
+
+	DlgAssetProperties dlg(m_pModel->GetAssetType(), selectedAssetsList);
+	if(dlg.exec() == QDialog::Accepted)
+	{
+	}
 }
 
 void ManagerWidget::on_actionDeleteAssets_triggered()
@@ -607,23 +629,3 @@ void ManagerWidget::GetSelectedItems(QList<AssetItemData *> &selectedAssetsOut, 
 			selectedAssetsOut.append(static_cast<AssetItemData *>(itemList[i]));
 	}
 }
-
-//void ManagerWidget::GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef)
-//{
-//	for(int i = 0; i < selectedTreeItems.count(); ++i)
-//	{
-//		// First determine if any selected QTreeWidgetItem is a filter, and dig into its children if so
-//		if(selectedTreeItems[i]->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-//		{
-//			filterListRef.append(selectedTreeItems[i]);
-//
-//			QList<QTreeWidgetItem *> filterContentsList;
-//			for(int j = 0; j < selectedTreeItems[i]->childCount(); ++j)
-//				filterContentsList.append(selectedTreeItems[i]->child(j));
-//
-//			GetSelectedItemsRecursively(filterContentsList, frameListRef, filterListRef);
-//		}
-//		else
-//			frameListRef.append(selectedTreeItems[i]);
-//	}
-//}

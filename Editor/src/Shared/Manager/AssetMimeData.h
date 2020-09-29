@@ -23,7 +23,7 @@ class AssetMimeData : public QMimeData
 	QByteArray				m_Data;
 
 public:
-	AssetMimeData(Project &projRef, HyGuiItemType eManagerType, QList<TreeModelItemData *> &itemListRef);
+	AssetMimeData(Project &projRef, AssetType eManagerType, QList<TreeModelItemData *> &itemListRef);
 	AssetMimeData(const QVariant &data);
 	virtual ~AssetMimeData();
 

@@ -19,6 +19,8 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 					   quint32 uiBankId,
 					   QString sName,
 					   QRect rAlphaCrop,
+					   HyTextureFormat eFormat,
+					   HyTextureFiltering eFiltering,
 					   int iW,
 					   int iH,
 					   int iX,
@@ -29,6 +31,8 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 	m_iWidth(iW),
 	m_iHeight(iH),
 	m_rAlphaCrop(rAlphaCrop),
+	m_eFormat(eFormat),
+	m_eFiltering(eFiltering),
 	m_iPosX(iX),
 	m_iPosY(iY),
 	m_iTextureIndex(iTextureIndex)
@@ -39,32 +43,42 @@ AtlasFrame::~AtlasFrame()
 {
 }
 
-QSize AtlasFrame::GetSize()
+QSize AtlasFrame::GetSize() const
 {
 	return QSize(m_iWidth, m_iHeight);
 }
 
-QRect AtlasFrame::GetCrop()
+QRect AtlasFrame::GetCrop() const
 {
 	return m_rAlphaCrop;
 }
 
-QPoint AtlasFrame::GetPosition()
+HyTextureFormat AtlasFrame::GetFormat() const
+{
+	return m_eFormat;
+}
+
+HyTextureFiltering AtlasFrame::GetFiltering() const
+{
+	return m_eFiltering;
+}
+
+QPoint AtlasFrame::GetPosition() const
 {
 	return QPoint(m_iPosX, m_iPosY);
 }
 
-int AtlasFrame::GetTextureIndex()
+int AtlasFrame::GetTextureIndex() const
 {
 	return m_iTextureIndex;
 }
 
-int AtlasFrame::GetX()
+int AtlasFrame::GetX() const
 {
 	return m_iPosX;
 }
 
-int AtlasFrame::GetY()
+int AtlasFrame::GetY() const
 {
 	return m_iPosY;
 }
@@ -76,26 +90,14 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 	m_iPosY = iY;
 
 	if(m_iTextureIndex != -1)
-	{
-		ClearError(ATLASFRAMEERROR_CouldNotPack);
-
-		//if(m_pTreeWidgetItem)
-		//	m_pTreeWidgetItem->setText(1, "Id:" % QString::number(m_uiAtlasGrpId));
-	}
+		ClearError(ASSETERROR_CouldNotPack);
 	else
-	{
-		SetError(ATLASFRAMEERROR_CouldNotPack);
-		//if(m_pTreeWidgetItem)
-		//	m_pTreeWidgetItem->setText(1, "Invalid");
-	}
+		SetError(ASSETERROR_CouldNotPack);
 }
 
 void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)
 {
 	m_sName = sName;
-
-	//if(m_pTreeWidgetItem)
-	//	m_pTreeWidgetItem->setText(0, m_sName);
 
 	m_uiChecksum = uiChecksum;
 	m_iWidth = newImage.width();
@@ -123,4 +125,6 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	frameObj.insert("cropTop", QJsonValue(GetCrop().top()));
 	frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
 	frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
+	frameObj.insert("textureFormat", HyAssets::GetTextureFormatName(m_eFormat).c_str());
+	frameObj.insert("textureFiltering", HyAssets::GetTextureFilteringName(m_eFiltering).c_str());
 }

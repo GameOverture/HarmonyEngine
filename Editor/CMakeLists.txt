@@ -43,6 +43,9 @@ if(Qt5_DIR)
 		src/Audio/AudioWidget.cpp
 		src/Audio/AudioWidget.h
 		src/Audio/AudioWidget.ui
+		src/Dialogs/DlgAssetProperties.cpp
+		src/Dialogs/DlgAssetProperties.h
+		src/Dialogs/DlgAssetProperties.ui
 		src/Dialogs/DlgAtlasGroupSettings.cpp
 		src/Dialogs/DlgAtlasGroupSettings.h
 		src/Dialogs/DlgAtlasGroupSettings.ui
@@ -269,6 +272,10 @@ if(Qt5_DIR)
 				\"$<TARGET_FILE:HyEditor>\"
 		COMMENT "Deploying Qt on Windows...")
 	endif ()
+	
+	if (MSVC)
+		target_compile_definitions(HyEditor PUBLIC _CRT_SECURE_NO_WARNINGS)
+	endif()
 
 	# Sets up filters for VS
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${HYEDITOR_SOURCE_FILES})

@@ -38,7 +38,7 @@ DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefa
 
 	m_PrefixStringList = MainWindow::GetExplorerModel().GetPrefixList(pItemProject);
 
-	qSort(m_PrefixStringList.begin(), m_PrefixStringList.end());
+	std::sort(m_PrefixStringList.begin(), m_PrefixStringList.end());
 	m_PrefixStringList.prepend(QString("<no prefix>"));
 
 	ui->cmbPrefixList->clear();

@@ -100,7 +100,7 @@ void IModel::MoveStateBack(int iStateIndex)
 	if(beginMoveRows(QModelIndex(), iStateIndex, iStateIndex, QModelIndex(), iStateIndex - 1) == false)
 		return;
 
-	m_StateList.swap(iStateIndex, iStateIndex - 1);
+	m_StateList.swapItemsAt(iStateIndex, iStateIndex - 1);
 	endMoveRows();
 
 	QVector<int> roleList;
@@ -113,7 +113,7 @@ void IModel::MoveStateForward(int iStateIndex)
 	if(beginMoveRows(QModelIndex(), iStateIndex, iStateIndex, QModelIndex(), iStateIndex + 2) == false)    // + 2 is here because Qt is retarded
 		return;
 
-	m_StateList.swap(iStateIndex, iStateIndex + 1);
+	m_StateList.swapItemsAt(iStateIndex, iStateIndex + 1);
 	endMoveRows();
 
 	QVector<int> roleList;

@@ -28,24 +28,24 @@ protected:
 	BanksModel									m_BanksModel;
 
 	Project &									m_ProjectRef;
-	const HyGuiItemType							m_eITEM_TYPE;
+	const AssetType								m_eASSET_TYPE;
 
 	QDir										m_MetaDir;
 	QDir										m_DataDir;
 
 	quint32										m_uiNextBankId;
-	QJsonArray									m_ExpandedFiltersArray;
 
 	QMap<QUuid, AssetItemData *>				m_AssetUuidMap;
 	QMap<quint32, QList<AssetItemData *> >		m_AssetChecksumMap;
 
 public:
-	IManagerModel(Project &projRef, HyGuiItemType eItemType);
+	IManagerModel(Project &projRef, AssetType eAssetType);
 	virtual ~IManagerModel();
 
-	void Init();
+	void Init();	// Init() exists because we need to construct using virtual functions
 
-	Project &GetProjOwner();
+	AssetType GetAssetType() const;
+	Project &GetProjOwner() const;
 	QAbstractListModel *GetBanksModel();
 
 	QDir GetMetaDir();
@@ -63,7 +63,6 @@ public:
 	void Rename(TreeModelItemData *pItem, QString sNewName);
 	bool TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId);
 
-	QJsonArray GetExpandedFiltersArray();
 	QString AssembleFilter(TreeModelItemData *pAsset) const;
 	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
 	TreeModelItemData *ReturnFilter(QString sFilterPath, bool bCreateNonExistingFilter = true);
@@ -74,13 +73,9 @@ public:
 	bool DoesAssetExist(quint32 uiChecksum);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//AssetItemData *CreateAsset(QUuid uuid, quint32 uiCRC, int32 uiBankId, QString sName);//, QRect rAlphaCrop, AtlasItemType eFrameType, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
-	
-	
-
-	//QList<AssetItemData *> RequestAssets(ProjectItemData *pItem);
-	QList<AssetItemData *> RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList);
+	// [ASSET-ITEM] DEPENDENCIES LINK FUNCTIONS
 	QList<AssetItemData *> RequestAssetsByUuid(ProjectItemData *pItem, QList<QUuid> requestList);
+	QList<AssetItemData *> RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList);
 	void RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -109,7 +104,7 @@ public:
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;
 	virtual QStringList GetSupportedFileExtList() = 0;
 
-	// Draw occur when the mouse hovers over the manager widget. ManagerWidget holds the ptr to IManagerDraw, but IManagerModel init/updates the actual concrete IDraw object
+	// Draw occurs when the mouse hovers over the manager widget. ManagerWidget holds the ptr to IManagerDraw, but IManagerModel init/updates the actual concrete IDraw object
 	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) = 0;
 
 protected:

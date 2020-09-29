@@ -421,14 +421,14 @@ QString Project::GetBuildRelPath() const
 	return QDir::cleanPath(GetSettingsObj()["BuildPath"].toString()) + '/';
 }
 
-IManagerModel *Project::GetManagerModel(HyGuiItemType eManagerType)
+IManagerModel *Project::GetManagerModel(AssetType eManagerType)
 {
 	switch(eManagerType)
 	{
-	case ITEM_AtlasImage:
+	case ASSET_Atlas:
 		return m_pAtlasModel;
 
-	case ITEM_Audio:
+	case ASSET_Audio:
 		return m_pAudioModel;
 
 	default:
@@ -871,7 +871,7 @@ QList<ProjectItemData *> Project::GetItemOwners(ProjectItemData *pItem)
 	if(m_ItemOwnerMap.contains(pItem) == false)
 		return QList<ProjectItemData *>();
 
-	return m_ItemOwnerMap[pItem].toList();
+	return m_ItemOwnerMap[pItem].values();
 }
 
 void Project::OpenTab(ProjectItemData *pItem)

@@ -75,7 +75,7 @@ void AssetItemData::RemoveLink(ProjectItemData *pProjItem)
 QString AssetItemData::ConstructMetaFileName()
 {
 	QString sMetaName;
-	sMetaName = sMetaName.sprintf("%010u", m_uiChecksum);
+	sMetaName = sMetaName.asprintf("%010u", m_uiChecksum);
 	sMetaName += m_sMetaFileExt;
 
 	return sMetaName;
@@ -90,9 +90,9 @@ bool AssetItemData::DeleteMetaFile()
 	return true;
 }
 
-void AssetItemData::SetError(AtlasFrameError eError)
+void AssetItemData::SetError(AssetErrorType eError)
 {
-	if(eError == ATLASFRAMEERROR_CannotFindMetaImg)
+	if(eError == ASSETERROR_CannotFindMetaFile)
 		HyGuiLog(m_sName % " - GUIFRAMEERROR_CannotFindMetaImg", LOGTYPE_Error);
 
 	m_uiErrors |= (1 << eError);
@@ -100,7 +100,7 @@ void AssetItemData::SetError(AtlasFrameError eError)
 	//UpdateTreeItemIconAndToolTip();
 }
 
-void AssetItemData::ClearError(AtlasFrameError eError)
+void AssetItemData::ClearError(AssetErrorType eError)
 {
 	m_uiErrors &= ~(1 << eError);
 

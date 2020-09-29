@@ -264,7 +264,7 @@ if(HYBUILD_SDL_NET)
 endif()
 
 if (MSVC)
-	target_compile_definitions(HyEngine PRIVATE _CRT_SECURE_NO_WARNINGS)
+	target_compile_definitions(HyEngine PUBLIC _CRT_SECURE_NO_WARNINGS)
 endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${HYENGINE_SOURCE_FILES})

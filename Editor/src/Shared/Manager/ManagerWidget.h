@@ -71,6 +71,8 @@ protected:
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
 
+	void on_actionAssetSettings_triggered();
+
 	void on_actionDeleteAssets_triggered();
 
 	void on_actionReplaceAssets_triggered();
@@ -100,7 +102,6 @@ private:
 
 public:
 	void GetSelectedItems(QList<AssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut);
-	//void GetSelectedItemsRecursively(QList<QTreeWidgetItem *> selectedTreeItems, QList<QTreeWidgetItem *> &frameListRef, QList<QTreeWidgetItem *> &filterListRef);
 };
 
 #endif // ManagerWidget_H

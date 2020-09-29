@@ -114,7 +114,7 @@ QStringList DlgNewBuild::GetProcOptions() const
 	{
 		return QStringList()	<< "-G"
 								<< ui->cmbCMake->currentText()
-								<< ui->txtCMakeOptions->text().split(' ', QString::SkipEmptyParts)
+								<< ui->txtCMakeOptions->text().split(' ', Qt::SkipEmptyParts)
 								<< "-S"
 								<< m_ProjectRef.GetDirPath()
 								<< "-B"

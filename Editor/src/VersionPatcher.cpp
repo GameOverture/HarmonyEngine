@@ -126,8 +126,11 @@
 			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 3 -> 4", LOGTYPE_Info);
 			Patch_3to4(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 4:
+			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 4 -> 5", LOGTYPE_Info);
+			Patch_4to5(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+		case 5:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 4, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 5, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -533,32 +536,6 @@
 		bankObj.remove("sbTextureHeight");
 		bankObj.insert("maxHeight", iHeight);
 
-		// Determine how many textures there are by using 'dataAtlasDocRef'
-		int iNumTextures = 0;
-		QJsonObject tmpDataAtlasObj = dataAtlasDocRef.object();
-		QJsonArray tmpBanksArray = tmpDataAtlasObj["atlasGroups"].toArray();
-
-		// Move [width, height, textureType->format, and create assets array] into "textures" array of objects
-		for(int i = 0; i < tmpBanksArray.size(); ++i)
-		{
-			QJsonObject tmpBankObj = tmpBanksArray[i].toObject();
-
-			QJsonArray tmpTexturesArray = tmpBankObj["textures"].toArray();
-			iNumTextures = tmpTexturesArray.size();
-		}
-
-		QJsonArray textureArray;
-		for(int iTex = 0; iTex < iNumTextures; ++iTex)
-		{
-			QJsonObject textureObj;
-			textureObj.insert("width", iWidth);
-			textureObj.insert("height", iHeight);
-			textureObj.insert("textureFormat", QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(iTextureFormat)).c_str()));
-			
-			textureArray.append(textureObj);
-		}
-		bankObj.insert("textures", textureArray);
-
 		metaBanksArray.replace(i, bankObj);
 	}
 
@@ -667,6 +644,88 @@
 	dataAtlasObj["banks"] = banksArray;
 	dataAtlasObj["$fileVersion"] = 4;
 	dataAtlasDocRef.setObject(dataAtlasObj);
+}
+
+/*static*/ void VersionPatcher::Patch_4to5(QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
+{
+	// Meta Items
+	QJsonObject metaItemsObj = metaItemsDocRef.object();
+	metaItemsObj.insert("$fileVersion", 5);
+	metaItemsDocRef.setObject(metaItemsObj);
+
+	// Data Items
+	QJsonObject dataItemsObj = dataItemsDocRef.object();
+	dataItemsObj.insert("$fileVersion", 5);
+	dataItemsDocRef.setObject(dataItemsObj);
+
+	// Data atlas
+	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
+	dataAtlasObj["$fileVersion"] = 5;
+	dataAtlasDocRef.setObject(dataAtlasObj);
+
+	// Meta atlas
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray assetsArray = metaAtlasObj["assets"].toArray();
+	QJsonArray banksArray = metaAtlasObj["banks"].toArray();
+	for(int i = 0; i < assetsArray.size(); ++i)
+	{
+		QJsonObject assetObj = assetsArray.at(i).toObject();
+
+		// Get texture format and filter from its bank
+		int iBankId = assetObj["bankId"].toInt();
+		bool bFound = false;
+		for(int j = 0; j < banksArray.size(); ++j)
+		{
+			QJsonObject bankObj = banksArray.at(j).toObject();
+			if(bankObj["bankId"].toInt() == iBankId)
+			{
+				assetObj.insert("textureFormat", bankObj["textureFormat"].toString());
+				assetObj.insert("textureFiltering", bankObj["textureFiltering"].toString());
+				bFound = true;
+				break;
+			}
+		}
+		if(bFound == false)
+		{
+			assetObj.insert("textureFormat", "R8G8B8A8");
+			assetObj.insert("textureFiltering", "Bilinear");
+		}
+
+		assetsArray.replace(i, assetObj);
+	}
+	metaAtlasObj.insert("assets", assetsArray);
+
+	for(int i = 0; i < banksArray.size(); ++i)
+	{
+		QJsonObject bankObj = banksArray.at(i).toObject();
+		bankObj.remove("textureFormat");
+		bankObj.remove("textureFiltering");
+		bankObj.remove("textureType");
+
+		// Insert new "unfilledIndices" array into meta object
+		QJsonArray unfilledIndicesArray;
+		QJsonArray dataAtlasBankArray = dataAtlasObj["banks"].toArray();
+		for(auto dataBank : dataAtlasBankArray)
+		{
+			QJsonObject dataBankObj = dataBank.toObject();
+			if(dataBankObj["bankId"].toInt() == bankObj["bankId"].toInt())
+			{
+				// Take the last texture index in bank, since it's guarenteed that on this version all textures in bank have same format/filtering
+				QJsonArray dataBankTexturesArray = dataBankObj["textures"].toArray();
+				if(dataBankTexturesArray.empty())
+					unfilledIndicesArray.append(0);
+				else
+					unfilledIndicesArray.append(dataBankTexturesArray.size() - 1);
+			}
+		}
+		bankObj.insert("unfilledIndices", unfilledIndicesArray);
+
+		banksArray.replace(i, bankObj);
+	}
+	metaAtlasObj.insert("banks", banksArray);
+	
+	metaAtlasObj["$fileVersion"] = 5;
+	metaAtlasDocRef.setObject(metaAtlasObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)
