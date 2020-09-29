@@ -145,84 +145,84 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 				}
 			}
 
-	//		HyRawSoundBuffer *pBuffer = nullptr;
-	//		for(auto file : m_AudioFileList)
-	//		{
-	//			pBuffer = file->GetBufferInfo(uiSoundChecksum);
-	//			if(pBuffer)
-	//				break;
-	//		}
-	//		if(pBuffer == nullptr)
-	//		{
-	//			HyLogWarning("Could not find audio: " << uiSoundChecksum);
-	//			break;
-	//		}
+			HyRawSoundBuffer *pBuffer = nullptr;
+			for(auto file : m_AudioFileList)
+			{
+				pBuffer = file->GetBufferInfo(uiSoundChecksum);
+				if(pBuffer)
+					break;
+			}
+			if(pBuffer == nullptr)
+			{
+				HyLogWarning("Could not find audio: " << uiSoundChecksum);
+				break;
+			}
 
-	//		bool bFoundPlay = false;
-	//		const IHyNode *pId = nullptr;
-	//		if(cue.m_eCUE_TYPE == CUETYPE_Start)
-	//		{
-	//			// Find any existing play with node ID of cue.m_pNODE
-	//			pId = cue.m_pNODE;
+			//bool bFoundPlay = false;
+			//const IHyNode *pId = nullptr;
+			//if(cue.m_eCUE_TYPE == CUETYPE_Start)
+			//{
+			//	// Find any existing play with node ID of cue.m_pNODE
+			//	pId = cue.m_pNODE;
 
-	//			for(uint32 j = 0; j < static_cast<uint32>(m_PlayList.size()); ++j)
-	//			{
-	//				if(m_PlayList[j].m_pID == pId)
-	//				{
-	//					bFoundPlay = true;
+			//	for(uint32 j = 0; j < static_cast<uint32>(m_PlayList.size()); ++j)
+			//	{
+			//		if(m_PlayList[j].m_pID == pId)
+			//		{
+			//			bFoundPlay = true;
 
-	//					m_PlayList[j].m_fVolume = fVolume;
-	//					m_PlayList[j].m_fPitch = fPitch;
-	//					m_PlayList[j].m_bPaused = false;
-	//					m_PlayList[j].m_pBuffer = pBuffer;
-	//					m_PlayList[j].m_uiRemainingBytes = pBuffer->GetBufferSize();
-	//				}
-	//			}
-	//		}
+			//			m_PlayList[j].m_fVolume = fVolume;
+			//			m_PlayList[j].m_fPitch = fPitch;
+			//			m_PlayList[j].m_bPaused = false;
+			//			m_PlayList[j].m_pBuffer = pBuffer;
+			//			m_PlayList[j].m_uiRemainingBytes = pBuffer->GetBufferSize();
+			//		}
+			//	}
+			//}
 
-	//		if(bFoundPlay == false)
-	//			m_PlayList.emplace_back(pId, fVolume, fPitch, false, pBuffer, pBuffer->GetBufferSize());
-	//		break; }
+			//if(bFoundPlay == false)
+			//	m_PlayList.emplace_back(pId, fVolume, fPitch, false, pBuffer, pBuffer->GetBufferSize());
+			break; }
 
-	//	case CUETYPE_Stop:
-	//	case CUETYPE_Pause:
-	//	case CUETYPE_Unpause:
-	//	case CUETYPE_Attributes: {
-	//		for(auto iter = m_PlayList.begin(); iter != m_PlayList.end(); ++iter)
-	//		{
-	//			if(iter->m_pID == cue.m_pNODE)
-	//			{
-	//				if(cue.m_eCUE_TYPE == CUETYPE_Stop)
-	//					m_PlayList.erase(iter);
-	//				else if(cue.m_eCUE_TYPE == CUETYPE_Pause)
-	//					iter->m_bPaused = true;
-	//				else if(cue.m_eCUE_TYPE == CUETYPE_Unpause)
-	//					iter->m_bPaused = false;
-	//				else if(cue.m_eCUE_TYPE == CUETYPE_Attributes)
-	//				{
-	//					if(cue.m_pNODE->Is2D())
-	//					{
-	//						iter->m_fVolume = static_cast<HyAudio2d *>(cue.m_pNODE)->volume.Get();
-	//						iter->m_fPitch = static_cast<HyAudio2d *>(cue.m_pNODE)->pitch.Get();
-	//					}
-	//					else
-	//					{
-	//						iter->m_fVolume = static_cast<HyAudio3d *>(cue.m_pNODE)->volume.Get();
-	//						iter->m_fPitch = static_cast<HyAudio3d *>(cue.m_pNODE)->pitch.Get();
-	//					}
-	//				}
+		case CUETYPE_Stop:
+		case CUETYPE_Pause:
+		case CUETYPE_Unpause:
+		case CUETYPE_Attributes: {
+			//for(auto iter = m_PlayList.begin(); iter != m_PlayList.end(); ++iter)
+			//{
+			//	if(iter->m_pID == cue.m_pNODE)
+			//	{
+			//		if(cue.m_eCUE_TYPE == CUETYPE_Stop)
+			//			m_PlayList.erase(iter);
+			//		else if(cue.m_eCUE_TYPE == CUETYPE_Pause)
+			//			iter->m_bPaused = true;
+			//		else if(cue.m_eCUE_TYPE == CUETYPE_Unpause)
+			//			iter->m_bPaused = false;
+			//		else if(cue.m_eCUE_TYPE == CUETYPE_Attributes)
+			//		{
+			//			if(cue.m_pNODE->Is2D())
+			//			{
+			//				iter->m_fVolume = static_cast<HyAudio2d *>(cue.m_pNODE)->volume.Get();
+			//				iter->m_fPitch = static_cast<HyAudio2d *>(cue.m_pNODE)->pitch.Get();
+			//			}
+			//			else
+			//			{
+			//				iter->m_fVolume = static_cast<HyAudio3d *>(cue.m_pNODE)->volume.Get();
+			//				iter->m_fPitch = static_cast<HyAudio3d *>(cue.m_pNODE)->pitch.Get();
+			//			}
+			//		}
 
-	//				break;
-	//			}
-	//		}
-	//		
-	//		break; }
+			//		break;
+			//	}
+			//}
+			
+			break; }
 
-	//	default:
-	//		HyLogError("Unknown sound cue type");
-	//		break;
-	//	}
-	//}
+		default:
+			HyLogError("Unknown sound cue type");
+			break;
+		}
+	}
 
 	m_CueList.clear();
 }
