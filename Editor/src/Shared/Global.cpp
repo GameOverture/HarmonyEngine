@@ -12,6 +12,7 @@
 
 /*static*/ QString HyGlobal::sm_sItemNames[NUMTYPES];
 /*static*/ QString HyGlobal::sm_sItemNamesPlural[NUMTYPES];
+/*static*/ QString HyGlobal::sm_AssetNames[NUMASSETTYPES];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
@@ -26,7 +27,7 @@
 /*static*/ QRegExpValidator *HyGlobal::sm_pNumbersValidator  = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pVector2dValidator = nullptr;
 
-/*static*/ QString HyGlobal::sm_ErrorStrings[NUMATLASFRAMEERROR];
+/*static*/ QString HyGlobal::sm_ErrorStrings[NUM_ASSETERRORS];
 
 /*static*/ void HyGlobal::Initialize()
 {
@@ -63,6 +64,9 @@
 	sm_sItemNamesPlural[ITEM_Entity3d] = "Entities3d";
 	sm_sItemNamesPlural[ITEM_BoundingVolume] = "BoundingVolumes";
 	sm_sItemNamesPlural[ITEM_Physics] = "Physics";
+
+	sm_AssetNames[ASSET_Atlas] = "Atlases";
+	sm_AssetNames[ASSET_Audio] = "Audio";
 
 	sm_sSubIconNames[SUBICON_None] = "";
 	sm_sSubIconNames[SUBICON_New] = "-New";
@@ -110,8 +114,8 @@
 	sm_pNumbersValidator  = new QRegExpValidator(QRegExp("[0-9]*"));
 	sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));
 
-	sm_ErrorStrings[ATLASFRAMEERROR_CannotFindMetaImg] = "Cannot find source meta-image";
-	sm_ErrorStrings[ATLASFRAMEERROR_CouldNotPack] = "Could not pack this frame in atlas";
+	sm_ErrorStrings[ASSETERROR_CannotFindMetaFile] = "Cannot find source meta-image";
+	sm_ErrorStrings[ASSETERROR_CouldNotPack] = "Could not pack this frame in atlas";
 }
 
 /*static*/ QList<HyGuiItemType> HyGlobal::GetTypeList()
@@ -180,7 +184,7 @@
 	QString sErrorString;
 	sErrorString.clear();
 
-	for(int i = 0; i < NUMATLASFRAMEERROR; ++i)
+	for(int i = 0; i < NUM_ASSETERRORS; ++i)
 	{
 		if((uiErrorFlags & (1 << i)) != 0)
 		{
@@ -254,7 +258,7 @@
 /*static*/ QString HyGlobal::MakeFileNameFromCounter(int iCount)
 {
 	QString sNewString;
-	sNewString.sprintf("%05d", iCount);
+	sNewString.asprintf("%05d", iCount);
 
 	return sNewString;
 }

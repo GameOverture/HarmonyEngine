@@ -51,8 +51,8 @@ public:
 	QString ConstructMetaFileName();
 	bool DeleteMetaFile();
 
-	void SetError(AtlasFrameError eError);
-	void ClearError(AtlasFrameError eError);
+	void SetError(AssetErrorType eError);
+	void ClearError(AssetErrorType eError);
 	uint GetErrors();
 
 	void GetJsonObj(QJsonObject &assetObj);

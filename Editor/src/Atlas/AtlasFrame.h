@@ -26,22 +26,38 @@ class AtlasFrame : public AssetItemData
 	int									m_iHeight;
 	QRect								m_rAlphaCrop;
 
+	HyTextureFormat						m_eFormat;
+	HyTextureFiltering					m_eFiltering;
+
 	int									m_iTextureIndex;
 
 	int									m_iPosX;
 	int									m_iPosY;
 
 public:
-	AtlasFrame(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QRect rAlphaCrop, int iW, int iH, int iX, int iY, int iTextureIndex, uint uiErrors);
+	AtlasFrame(IManagerModel &modelRef,
+			   HyGuiItemType eType,
+			   QUuid uuid,
+			   quint32 uiChecksum,
+			   quint32 uiBankId,
+			   QString sName,
+			   QRect rAlphaCrop,
+			   HyTextureFormat eFormat,
+			   HyTextureFiltering eFiltering,
+			   int iW, int iH, int iX, int iY,
+			   int iTextureIndex,
+			   uint uiErrors);
 	~AtlasFrame();
 
-	QSize GetSize();
-	QRect GetCrop();
-	QPoint GetPosition();
+	QSize GetSize() const;
+	QRect GetCrop() const;
+	HyTextureFormat GetFormat() const;
+	HyTextureFiltering GetFiltering() const;
+	QPoint GetPosition() const;
 
-	int GetTextureIndex();
-	int GetX();
-	int GetY();
+	int GetTextureIndex() const;
+	int GetX() const;
+	int GetY() const;
 
 	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY);
 	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);

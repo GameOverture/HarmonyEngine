@@ -15,7 +15,7 @@
 #include "AtlasFrame.h"
 #include "IManagerModel.h"
 
-AssetMimeData::AssetMimeData(Project &projRef, HyGuiItemType eManagerType, QList<TreeModelItemData *> &itemListRef)
+AssetMimeData::AssetMimeData(Project &projRef, AssetType eManagerType, QList<TreeModelItemData *> &itemListRef)
 {
 	QJsonArray clipboardArray;
 
@@ -44,7 +44,7 @@ AssetMimeData::AssetMimeData(Project &projRef, HyGuiItemType eManagerType, QList
 			itemObj.insert("checksum", QJsonValue(static_cast<qint64>(pAssetItem->GetChecksum())));
 			itemObj.insert("filter", pAssetItem->GetFilter());
 			itemObj.insert("name", QJsonValue(pAssetItem->GetName()));
-			itemObj.insert("uri", QJsonValue(projRef.GetMetaDataAbsPath() % HyGlobal::ItemName(eManagerType, true) % "/" % pAssetItem->ConstructMetaFileName()));
+			itemObj.insert("uri", QJsonValue(projRef.GetMetaDataAbsPath() % HyGlobal::AssetName(eManagerType) % "/" % pAssetItem->ConstructMetaFileName()));
 		}
 
 		clipboardArray.append(itemObj);

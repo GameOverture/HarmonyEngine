@@ -158,7 +158,7 @@ void TextLayersModel::MoveRowUp(int iIndex)
 	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
 		return;
 
-	m_LayerList.swap(iIndex, iIndex - 1);
+	m_LayerList.swapItemsAt(iIndex, iIndex - 1);
 	endMoveRows();
 }
 
@@ -167,7 +167,7 @@ void TextLayersModel::MoveRowDown(int iIndex)
 	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)
 		return;
 
-	m_LayerList.swap(iIndex, iIndex + 1);
+	m_LayerList.swapItemsAt(iIndex, iIndex + 1);
 	endMoveRows();
 }
 

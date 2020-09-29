@@ -21,7 +21,7 @@
 #include <QMimeData>
 
 AudioManagerModel::AudioManagerModel(Project &projRef) :
-	IManagerModel(projRef, ITEM_Audio)
+	IManagerModel(projRef, ASSET_Audio)
 {
 	m_DesiredRawFormat.setChannelCount(2);
 	m_DesiredRawFormat.setCodec("audio/wav"); // also consider "audio/x-raw" or "audio/pcm"
@@ -143,8 +143,9 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 	// Repack asset bank with newly imported audio
 	if(returnList.empty() == false)
 	{
+		QSet<AssetItemData *> returnListAsSet(returnList.begin(), returnList.end());
 		QSet<AudioAsset *> newSet;
-		for(auto pItem : returnList.toSet())
+		for(auto pItem : returnListAsSet)
 			newSet.insert(static_cast<AudioAsset *>(pItem));
 
 		QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;

@@ -289,6 +289,18 @@
     <string>Change asset bank options and for the currently selected bank</string>
    </property>
   </action>
+  <action name="actionAssetSettings">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Atlas-Settings.png</normaloff>:/icons16x16/items/Atlas-Settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Asset Properties</string>
+   </property>
+   <property name="toolTip">
+    <string>Configure all selected assets' properties</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

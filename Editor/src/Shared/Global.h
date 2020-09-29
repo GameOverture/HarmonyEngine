@@ -38,7 +38,7 @@ class Project;
 #define HyEditorToolName "Harmony Editor Tool"
 #define HyGuiInternalCharIndicator '+'
 
-#define HYGUI_FILE_VERSION 4
+#define HYGUI_FILE_VERSION 5
 
 //#define HYGUI_UseBinaryMetaFiles
 
@@ -66,12 +66,22 @@ enum HyGuiItemType
 	NUMTYPES
 };
 
-enum AtlasFrameError
+enum AssetType
 {
-	ATLASFRAMEERROR_CannotFindMetaImg = 0,
-	ATLASFRAMEERROR_CouldNotPack,
+	ASSET_Unknown = -1,
 
-	NUMATLASFRAMEERROR
+	ASSET_Atlas = 0,
+	ASSET_Audio,
+
+	NUMASSETTYPES
+};
+
+enum AssetErrorType
+{
+	ASSETERROR_CannotFindMetaFile = 0,
+	ASSETERROR_CouldNotPack,
+
+	NUM_ASSETERRORS
 };
 
 enum MdiArea
@@ -151,6 +161,7 @@ class HyGlobal
 {
 	static QString														sm_sItemNames[NUMTYPES];
 	static QString														sm_sItemNamesPlural[NUMTYPES];
+	static QString														sm_AssetNames[NUMASSETTYPES];
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
 
 	static QIcon														sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
@@ -165,7 +176,7 @@ class HyGlobal
 	static QRegExpValidator *											sm_pNumbersValidator;
 	static QRegExpValidator *											sm_pVector2dValidator;
 
-	static QString														sm_ErrorStrings[NUMATLASFRAMEERROR];
+	static QString														sm_ErrorStrings[NUM_ASSETERRORS];
 
 public:
 	static void Initialize();
@@ -175,6 +186,7 @@ public:
 	static HyGuiItemType GetTypeFromString(QString sType);
 
 	static const QString ItemName(HyGuiItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
+	static const QString AssetName(AssetType eAsset)					{ return sm_AssetNames[eAsset]; }
 	static const QString ItemExt(HyGuiItemType eItem);
 	static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)	{ return sm_ItemIcons[eItm][eSubIcon]; }
 	static const QColor ItemColor(HyGuiItemType eItem)					{ return sm_ItemColors[eItem]; }

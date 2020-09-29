@@ -71,7 +71,7 @@ void AudioPlayListModel::MoveRowUp(int iIndex)
 	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
 		return;
 
-	m_PlayList.swap(iIndex, iIndex - 1);
+	m_PlayList.swapItemsAt(iIndex, iIndex - 1);
 	endMoveRows();
 }
 
@@ -80,7 +80,7 @@ void AudioPlayListModel::MoveRowDown(int iIndex)
 	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
 		return;
 
-	m_PlayList.swap(iIndex, iIndex + 1);
+	m_PlayList.swapItemsAt(iIndex, iIndex + 1);
 	endMoveRows();
 }
 

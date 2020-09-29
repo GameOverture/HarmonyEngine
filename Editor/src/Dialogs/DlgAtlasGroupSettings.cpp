@@ -28,51 +28,10 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObjec
 	ui->sbFrameMarginLeft->setValue(m_InitialPackerSettingsObj["sbFrameMarginLeft"].toInt());
 	ui->sbFrameMarginRight->setValue(m_InitialPackerSettingsObj["sbFrameMarginRight"].toInt());
 	ui->sbFrameMarginBottom->setValue(m_InitialPackerSettingsObj["sbFrameMarginBottom"].toInt());
-	ui->extrude->setValue(m_InitialPackerSettingsObj["extrude"].toInt());
-	ui->chkMerge->setChecked(m_InitialPackerSettingsObj["chkMerge"].toBool());
-	ui->chkSquare->setChecked(m_InitialPackerSettingsObj["chkSquare"].toBool());
-	ui->chkAutosize->setChecked(m_InitialPackerSettingsObj["chkAutosize"].toBool());
-	ui->minFillRate->setValue(m_InitialPackerSettingsObj["minFillRate"].toInt());
 
 	ui->sbTextureWidth->setValue(m_InitialPackerSettingsObj["maxWidth"].toInt());
 	ui->sbTextureHeight->setValue(m_InitialPackerSettingsObj["maxHeight"].toInt());
 	ui->cmbHeuristic->setCurrentIndex(m_InitialPackerSettingsObj["cmbHeuristic"].toInt());
-	
-	// Texture Type
-	for(int i = 0; i < HYNUM_TEXTUREFORMATS; ++i)
-		ui->cmbTextureType->addItem(QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(i)).c_str()));
-	
-	QString sTextureFormat = m_InitialPackerSettingsObj["textureFormat"].toString();
-	std::vector<std::string> stdStringList = HyAssets::GetTextureFormatNameList();
-	QStringList sTextureFormatList;
-	for(auto str : stdStringList)
-		sTextureFormatList.push_back(str.c_str());
-	for(int i = 0; i < sTextureFormatList.size(); ++i)
-	{
-		if(sTextureFormatList[i].compare(sTextureFormat, Qt::CaseInsensitive) == 0)
-		{
-			ui->cmbTextureType->setCurrentIndex(i);
-			break;
-		}
-	}
-
-	// Texture Filtering
-	for(int i = 0; i < HYNUM_TEXTUREFILTERS; ++i)
-		ui->cmbTextureFiltering->addItem(QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(i)).c_str()));
-
-	QString sTextureFiltering = m_InitialPackerSettingsObj["textureFiltering"].toString();
-	stdStringList = HyAssets::GetTextureFilteringNameList();
-	QStringList sTextureFilterList;
-	for(auto str : stdStringList)
-		sTextureFilterList.push_back(str.c_str());
-	for(int i = 0; i < sTextureFilterList.size(); ++i)
-	{
-		if(sTextureFilterList[i].compare(sTextureFiltering, Qt::CaseInsensitive) == 0)
-		{
-			ui->cmbTextureFiltering->setCurrentIndex(i);
-			break;
-		}
-	}
 }
 
 DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
@@ -92,23 +51,11 @@ bool DlgAtlasGroupSettings::IsSettingsDirty()
 		return true;
 	if(ui->sbFrameMarginBottom->value() != m_InitialPackerSettingsObj["sbFrameMarginBottom"].toInt())
 		return true;
-	if(ui->extrude->value() != m_InitialPackerSettingsObj["extrude"].toInt())
-		return true;
-	if(ui->chkMerge->isChecked() != m_InitialPackerSettingsObj["chkMerge"].toBool())
-		return true;
-	if(ui->chkSquare->isChecked() != m_InitialPackerSettingsObj["chkSquare"].toBool())
-		return true;
-	if(ui->chkAutosize->isChecked() != m_InitialPackerSettingsObj["chkAutosize"].toBool())
-		return true;
-	if(ui->minFillRate->value() != m_InitialPackerSettingsObj["minFillRate"].toInt())
-		return true;
 	if(ui->sbTextureWidth->value() != m_InitialPackerSettingsObj["maxWidth"].toInt())
 		return true;
 	if(ui->sbTextureHeight->value() != m_InitialPackerSettingsObj["maxHeight"].toInt())
 		return true;
 	if(ui->cmbHeuristic->currentIndex() != m_InitialPackerSettingsObj["cmbHeuristic"].toInt())
-		return true;
-	if(ui->cmbTextureType->currentIndex() != static_cast<int>(HyAssets::GetTextureFormatFromString(m_InitialPackerSettingsObj["textureFormat"].toString().toStdString())))
 		return true;
 
 	return false;
@@ -122,16 +69,9 @@ void DlgAtlasGroupSettings::ApplyCurrentSettingsToObj(QJsonObject &settingsObjOu
 	settingsObjOut.insert("sbFrameMarginLeft", ui->sbFrameMarginLeft->value());
 	settingsObjOut.insert("sbFrameMarginRight", ui->sbFrameMarginRight->value());
 	settingsObjOut.insert("sbFrameMarginBottom", ui->sbFrameMarginBottom->value());
-	settingsObjOut.insert("extrude", ui->extrude->value());
-	settingsObjOut.insert("chkMerge", ui->chkMerge->isChecked());
-	settingsObjOut.insert("chkSquare", ui->chkSquare->isChecked());
-	settingsObjOut.insert("chkAutosize", ui->chkAutosize->isChecked());
-	settingsObjOut.insert("minFillRate", ui->minFillRate->value());
 	settingsObjOut.insert("maxWidth", ui->sbTextureWidth->value());
 	settingsObjOut.insert("maxHeight", ui->sbTextureHeight->value());
 	settingsObjOut.insert("cmbHeuristic", ui->cmbHeuristic->currentIndex());
-	settingsObjOut.insert("textureFormat", QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(ui->cmbTextureType->currentIndex())).c_str()));
-	settingsObjOut.insert("textureFiltering", QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(ui->cmbTextureFiltering->currentIndex())).c_str()));
 }
 
 void DlgAtlasGroupSettings::on_btnTexSize128_clicked()

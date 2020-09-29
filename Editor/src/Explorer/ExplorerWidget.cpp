@@ -183,7 +183,7 @@ void ExplorerWidget::GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOu
 	}
 	
 	// Poverty unique only algorithm - does not persist order of items
-	selectedItemsOut = selectedItemsOut.toSet().toList();
+	selectedItemsOut = selectedItemsOut.toSet().values();
 
 	for(int i = 0; i < selectedItemsOut.size();)
 	{

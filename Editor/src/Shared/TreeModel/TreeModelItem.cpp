@@ -148,4 +148,6 @@ bool TreeModelItem::MoveChild(int iPosition, TreeModelItem *pNewParent, int iNew
 	TreeModelItem *pChild = m_ChildList.takeAt(iPosition);
 	pChild->m_pParentItem = pNewParent;
 	pNewParent->m_ChildList.insert(iNewPostion, pChild);
+
+	return true;
 }

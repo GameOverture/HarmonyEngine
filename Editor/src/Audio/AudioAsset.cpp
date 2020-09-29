@@ -67,7 +67,7 @@ float AudioAsset::GetVbrQuality() const
 QString AudioAsset::ConstructDataFileName(bool bWithExt) const
 {
 	QString sDataName;
-	sDataName = sDataName.sprintf("%010u", m_uiChecksum);
+	sDataName = sDataName.asprintf("%010u", m_uiChecksum);
 
 	if(bWithExt)
 	{

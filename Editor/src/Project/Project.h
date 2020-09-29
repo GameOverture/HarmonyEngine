@@ -96,7 +96,7 @@ public:
 	QString GetBuildAbsPath() const;
 	QString GetBuildRelPath() const;
 
-	IManagerModel *GetManagerModel(HyGuiItemType eManagerType);
+	IManagerModel *GetManagerModel(AssetType eManagerType);
 
 	AtlasModel &GetAtlasModel();
 	ManagerWidget *GetAtlasWidget();

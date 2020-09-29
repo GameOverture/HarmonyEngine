@@ -21,7 +21,7 @@
 #include <QMimeData>
 
 AtlasModel::AtlasModel(Project &projRef) :
-	IManagerModel(projRef, ITEM_AtlasImage)
+	IManagerModel(projRef, ASSET_Atlas)
 {
 
 }
@@ -148,29 +148,30 @@ void AtlasModel::RepackAll(uint uiBankIndex)
 
 void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
 {
-	// Always repack the last texture to ensure it gets filled as much as it can
-	QFileInfoList existingTexturesInfoList = GetExistingTextureInfoList(uiBankIndex);
-	for(int i = HyClamp(existingTexturesInfoList.size() - 1, 0, existingTexturesInfoList.size()); i < existingTexturesInfoList.size(); ++i)
-		repackTexIndicesSet.insert(i);
+	// Always repack the unfilled textures to ensure it gets filled as much as it can
+	QJsonArray unfilledTextureIndicesArray = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["unfilledIndices"].toArray();
+	for(auto unfilledTextureIndex : unfilledTextureIndicesArray)
+		repackTexIndicesSet.insert(unfilledTextureIndex.toInt());
 
 	QList<int> textureIndexList = repackTexIndicesSet.values();
 
 	// Get all the affected frames into a list
-	QList<AssetItemData *> &atlasGrpFrameListRef = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
-	for(int i = 0; i < atlasGrpFrameListRef.size(); ++i)
+	QList<AssetItemData *> entireAssetList = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
+	for(int i = 0; i < entireAssetList.size(); ++i)
 	{
-		AtlasFrame *pFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[i]);
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(entireAssetList[i]);
 		for(int j = 0; j < textureIndexList.size(); ++j)
 		{
 			if(pFrame->GetTextureIndex() == textureIndexList[j])
+			{
 				newFramesSet.insert(pFrame);
+				break;
+			}
 		}
 	}
 
-	QList<AtlasFrame *>newFramesList = newFramesSet.values();
-
-
-	AtlasRepackThread *pWorkerThread = new AtlasRepackThread(*m_BanksModel.GetBank(uiBankIndex), textureIndexList, newFramesList, m_MetaDir);
+	QList<AtlasFrame *> affectedFramesList = newFramesSet.values();
+	AtlasRepackThread *pWorkerThread = new AtlasRepackThread(*m_BanksModel.GetBank(uiBankIndex), affectedFramesList, m_MetaDir);
 	StartRepackThread("Repacking Atlases", pWorkerThread);
 }
 
@@ -181,16 +182,9 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	bankObjRef.insert("sbFrameMarginLeft", 0);
 	bankObjRef.insert("sbFrameMarginRight", 1);
 	bankObjRef.insert("sbFrameMarginBottom", 1);
-	bankObjRef.insert("extrude", 1);
-	bankObjRef.insert("chkMerge", true);
-	bankObjRef.insert("chkSquare", true);
-	bankObjRef.insert("chkAutosize", true);
-	bankObjRef.insert("minFillRate", 80);
 	bankObjRef.insert("maxWidth", 2048);
 	bankObjRef.insert("maxHeight", 2048);
 	bankObjRef.insert("cmbHeuristic", 1);
-	bankObjRef.insert("textureFormat", QString(HyAssets::GetTextureFormatName(HYTEXTURE_R8G8B8A8).c_str()));
-	bankObjRef.insert("textureFiltering", QString(HyAssets::GetTextureFilteringName(HYTEXFILTER_BILINEAR).c_str()));
 }
 
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
@@ -268,6 +262,8 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
 										   rAlphaCrop,
+										   HyAssets::GetTextureFormatFromString(metaObj["textureFormat"].toString().toStdString()),
+										   HyAssets::GetTextureFilteringFromString(metaObj["textureFiltering"].toString().toStdString()),
 										   metaObj["width"].toInt(),
 										   metaObj["height"].toInt(),
 										   metaObj["x"].toInt(),
@@ -308,8 +304,9 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 	if(returnList.empty() == false)
 	{
+		QSet<AssetItemData *> returnListAsSet(returnList.begin(), returnList.end());
 		QSet<AtlasFrame *> newSet;
-		for(auto pItem : returnList.toSet())
+		for(auto pItem : returnListAsSet)
 			newSet.insert(static_cast<AtlasFrame *>(pItem));
 		Repack(GetBankIndexFromBankId(uiBankId), QSet<int>(), newSet);
 	}
@@ -382,6 +379,8 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
 			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
 	}
+
+	return true;
 }
 
 /*virtual*/ bool AtlasModel::OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
@@ -425,6 +424,8 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 	// Repack new affected atlas group
 	Repack(GetBankIndexFromBankId(uiNewBankId), QSet<int>(), framesGoingToNewAtlasGrpSet);
+
+	return true;
 }
 
 /*virtual*/ QJsonObject AtlasModel::GetSaveJson() /*override*/
@@ -436,16 +437,24 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 		bankObj.insert("bankId", m_BanksModel.GetBank(i)->m_MetaObj["bankId"].toInt());
 		
-		QList<QJsonArray> frameArrayList;
-		QList<AssetItemData *> &atlasGrpFrameListRef = m_BanksModel.GetBank(i)->m_AssetList;
-		for(int j = 0; j < atlasGrpFrameListRef.size(); ++j)
+		// These List indices correspond to each other
+		QList<QJsonArray> assetArrayList;
+		QList<HyTextureFormat> formatList;
+		QList<HyTextureFiltering> filteringList;
+
+		QList<AssetItemData *> &entireBankAssetsListRef = m_BanksModel.GetBank(i)->m_AssetList;
+		for(int j = 0; j < entireBankAssetsListRef.size(); ++j)
 		{
-			AtlasFrame *pAtlasFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[j]);
+			AtlasFrame *pAtlasFrame = static_cast<AtlasFrame *>(entireBankAssetsListRef[j]);
 			if(pAtlasFrame->GetTextureIndex() < 0)
 				continue;
 
-			while(frameArrayList.empty() || frameArrayList.size() <= pAtlasFrame->GetTextureIndex())
-				frameArrayList.append(QJsonArray());
+			while(assetArrayList.empty() || assetArrayList.size() <= pAtlasFrame->GetTextureIndex())
+			{
+				assetArrayList.append(QJsonArray());
+				formatList.append(HYTEXTURE_R8G8B8A8);
+				filteringList.append(HYTEXFILTER_BILINEAR);
+			}
 
 			QJsonObject frameObj;
 			frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pAtlasFrame->GetChecksum())));
@@ -454,18 +463,20 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 			frameObj.insert("right", QJsonValue(pAtlasFrame->GetX() + pAtlasFrame->GetCrop().width()));
 			frameObj.insert("bottom", QJsonValue(pAtlasFrame->GetY() + pAtlasFrame->GetCrop().height()));
 
-			frameArrayList[pAtlasFrame->GetTextureIndex()].append(frameObj);
+			assetArrayList[pAtlasFrame->GetTextureIndex()].append(frameObj);
+			formatList[pAtlasFrame->GetTextureIndex()] = pAtlasFrame->GetFormat();
+			filteringList[pAtlasFrame->GetTextureIndex()] = pAtlasFrame->GetFiltering();
 		}
 
 		QJsonArray textureArray;
-		for(int j = 0; j < frameArrayList.size(); ++j)
+		for(int j = 0; j < assetArrayList.size(); ++j)
 		{
 			QJsonObject textureObj;
 			textureObj.insert("width", m_BanksModel.GetBank(i)->m_MetaObj["maxWidth"].toInt());
 			textureObj.insert("height", m_BanksModel.GetBank(i)->m_MetaObj["maxHeight"].toInt());
-			textureObj.insert("format", m_BanksModel.GetBank(i)->m_MetaObj["textureFormat"].toString());
-			textureObj.insert("filtering", m_BanksModel.GetBank(i)->m_MetaObj["textureFiltering"].toString());
-			textureObj.insert("assets", frameArrayList[j]);
+			textureObj.insert("format", HyAssets::GetTextureFormatName(formatList[j]).c_str());
+			textureObj.insert("filtering", HyAssets::GetTextureFilteringName(filteringList[j]).c_str());
+			textureObj.insert("assets", assetArrayList[j]);
 
 			textureArray.append(textureObj);
 		}
@@ -494,11 +505,13 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 
 	AtlasFrame *pNewAsset = new AtlasFrame(*this,
 		eType,
-		uuid,//QUuid::createUuid(),
+		uuid,
 		uiChecksum,
 		uiBankId,
 		fileInfo.baseName(),
 		rAlphaCrop,
+		HYTEXTURE_R8G8B8A8,
+		HYTEXFILTER_BILINEAR,
 		newImage.width(),
 		newImage.height(),
 		-1,
