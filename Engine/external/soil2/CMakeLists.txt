@@ -1,3 +1,5 @@
+project(soil2)
+
 set(SOIL2_SOURCE_FILES
 	src/etc1_utils.c
 	src/image_DXT.c
@@ -23,13 +25,17 @@ set(SOIL2_HEADER_FILES
 	include/soil2/stb_image.h
 	include/soil2/stb_image_write.h)
 
-add_library(soil2 STATIC ${SOIL2_SOURCE_FILES} ${SOIL2_HEADER_FILES})
-target_include_directories(soil2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_include_directories(soil2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/soil2")
-target_include_directories(soil2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../glad/include")
-set_target_properties(soil2 PROPERTIES
+add_library(${PROJECT_NAME} STATIC ${SOIL2_SOURCE_FILES} ${SOIL2_HEADER_FILES})
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/soil2")
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../glad/include")
+set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 14
 	CXX_STANDARD_REQUIRED YES
 	CXX_EXTENSIONS NO)
 
-set_target_properties(soil2 PROPERTIES FOLDER "Engine Libs")
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "Engine Libs")
+
+if (MSVC)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
+endif()
