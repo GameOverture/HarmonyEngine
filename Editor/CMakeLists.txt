@@ -224,7 +224,7 @@ if(Qt5_DIR)
 	include_directories(${Qt5Widgets_INCLUDES})
 	add_definitions(${Qt5Widgets_DEFINITIONS})
 
-	add_executable(HyEditor ${HYEDITOR_SOURCE_FILES} data/HyEditor.qrc)
+	add_executable(HyEditor WIN32 ${HYEDITOR_SOURCE_FILES} data/HyEditor.qrc)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Atlas")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Audio")

@@ -144,7 +144,6 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 					fPitch = static_cast<HyAudio3d *>(cue.m_pNODE)->pitch.Get();
 				}
 			}
-		}
 
 			HyRawSoundBuffer *pBuffer = nullptr;
 			for(auto file : m_AudioFileList)

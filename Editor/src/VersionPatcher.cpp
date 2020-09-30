@@ -679,17 +679,13 @@
 			QJsonObject bankObj = banksArray.at(j).toObject();
 			if(bankObj["bankId"].toInt() == iBankId)
 			{
-				assetObj.insert("textureFormat", bankObj["textureFormat"].toString());
 				assetObj.insert("textureFiltering", bankObj["textureFiltering"].toString());
 				bFound = true;
 				break;
 			}
 		}
 		if(bFound == false)
-		{
-			assetObj.insert("textureFormat", "R8G8B8A8");
 			assetObj.insert("textureFiltering", "Bilinear");
-		}
 
 		assetsArray.replace(i, assetObj);
 	}
