@@ -220,8 +220,8 @@ void DlgNewProject::on_buttonBox_accepted()
 		sContents.replace("%HY_TITLE%", ui->txtTitleName->text());
 		sContents.replace("%HY_CLASS%", ui->txtClassName->text());
 		sContents.replace("%HY_PROJDIR%", GetProjDirPath());
-		sContents.replace("%HY_SRCDIR%", QDir(GetProjDirPath()).relativeFilePath(srcDir.absolutePath()));
-		sContents.replace("%HY_HARMONYDIR%", MainWindow::EngineSrcLocation());
+		sContents.replace("%HY_RELSRCDIR%", QDir(GetProjDirPath()).relativeFilePath(srcDir.absolutePath()));
+		sContents.replace("%HY_RELHARMONYDIR%", QDir(GetProjDirPath()).relativeFilePath(MainWindow::EngineSrcLocation()));
 		sContents.replace("%HY_RELDATADIR%", ui->wgtDataDir->GetRelPath());
 		sContents.replace("%HY_DEPENDENCIES_ADD%", GetDependAdd());
 		sContents.replace("%HY_DEPENDENCIES_LINK%", GetDependLink());

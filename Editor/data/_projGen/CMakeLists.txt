@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(%HY_CLASS%)
 
-set(REL_SRC_DIR "%HY_SRCDIR%")
+set(REL_SRC_DIR "%HY_RELSRCDIR%")
 set(REL_DATA_DIR "%HY_RELDATADIR%")
-set(ABS_HARMONY_DIR "%HY_HARMONYDIR%")
+set(REL_HARMONY_DIR "%HY_RELHARMONYDIR%")
 
 set(GAME_SRCFILES
 	"${REL_SRC_DIR}/pch.h"
@@ -27,7 +27,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
 option(HYBUILD_SDL_NET "Use SDL2_NET" ON)
 
-add_subdirectory("${ABS_HARMONY_DIR}/Engine" "HyEngine")
+add_subdirectory("${REL_HARMONY_DIR}/Engine" "HyEngine")
 %HY_DEPENDENCIES_ADD%
 add_executable(${PROJECT_NAME} WIN32 ${GAME_SRCFILES} "${PROJECT_NAME}.hyproj")
 set_target_properties(${PROJECT_NAME} PROPERTIES
