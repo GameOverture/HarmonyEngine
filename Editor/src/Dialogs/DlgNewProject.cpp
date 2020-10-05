@@ -47,6 +47,7 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 	ui->txtGameLocation->blockSignals(false);
 	
 	UpdateProjectDir();
+	UpdateSrcDependencies();
 
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
 	connect(ui->wgtDataDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
@@ -57,7 +58,32 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 
 DlgNewProject::~DlgNewProject()
 {
+	for(int i = 0; i < m_SrcDependencyList.count(); ++i)
+		delete m_SrcDependencyList[i];
+
 	delete ui;
+}
+
+void DlgNewProject::AddSrcDep()
+{
+	m_SrcDependencyList.append(new WgtSrcDependency(this, GetProjDirPath(), ui->grpAdvanced));
+	ui->grpAdvanced->layout()->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
+	connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &DlgNewProject::ErrorCheck);
+
+	UpdateSrcDependencies();
+}
+
+void DlgNewProject::RemoveSrcDep(WgtSrcDependency *pRemoved)
+{
+	for(int i = 0; i < m_SrcDependencyList.count(); ++i)
+	{
+		if(m_SrcDependencyList[i] == pRemoved)
+		{
+			delete m_SrcDependencyList.takeAt(i);
+			break;
+		}
+	}
+	UpdateSrcDependencies();
 }
 
 QString DlgNewProject::GetProjFilePath()
@@ -106,6 +132,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	buildDir.setPath(GetProjDirPath());
 	buildDir.mkdir(ui->wgtSrcDir->GetRelPath());
 	buildDir.cd(ui->wgtSrcDir->GetRelPath());
+	buildDir.mkdir("Game");
 	QDir srcDir(buildDir);
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,13 +196,14 @@ void DlgNewProject::on_buttonBox_accepted()
 		{
 			QFile file(fileInfoList[i].absoluteFilePath());
 			QString sNewFileName = fileInfoList[i].fileName().replace("%HY_CLASS%", ui->txtClassName->text());
-			file.rename(fileInfoList[i].absoluteDir().absolutePath() % "/" % sNewFileName);
+			file.rename(fileInfoList[i].absoluteDir().absolutePath() % "/Game/" % sNewFileName);
 			file.close();
 		}
 	}
 	// Then replace the variable contents of the copied source files
 	fileInfoList = QDir(GetProjDirPath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
 	fileInfoList += srcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+	fileInfoList += QDir(srcDir.absoluteFilePath("Game")).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
 	QTextCodec *pCodec = QTextCodec::codecForLocale();
 	for(int i = 0; i < fileInfoList.size(); ++i)
 	{
@@ -195,6 +223,8 @@ void DlgNewProject::on_buttonBox_accepted()
 		sContents.replace("%HY_SRCDIR%", QDir(GetProjDirPath()).relativeFilePath(srcDir.absolutePath()));
 		sContents.replace("%HY_HARMONYDIR%", MainWindow::EngineSrcLocation());
 		sContents.replace("%HY_RELDATADIR%", ui->wgtDataDir->GetRelPath());
+		sContents.replace("%HY_DEPENDENCIES_ADD%", GetDependAdd());
+		sContents.replace("%HY_DEPENDENCIES_LINK%", GetDependLink());
 
 		if(!file.open(QFile::WriteOnly))
 		{
@@ -251,8 +281,76 @@ void DlgNewProject::on_chkCreateGameDir_clicked()
 void DlgNewProject::UpdateProjectDir()
 {
 	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath());
-	ui->wgtMetaDir->Setup("Meta-Data", "_metaData", GetProjDirPath());
+	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath());
 	ui->wgtSrcDir->Setup("Source", "src", GetProjDirPath());
+
+	for(auto srcDep : m_SrcDependencyList)
+		srcDep->ResetProjDir(GetProjDirPath());
+}
+
+void DlgNewProject::UpdateSrcDependencies()
+{
+	if(m_SrcDependencyList.empty())
+	{
+		m_SrcDependencyList.append(new WgtSrcDependency(this, GetProjDirPath(), ui->grpAdvanced));
+		ui->grpAdvanced->layout()->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
+		connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &DlgNewProject::ErrorCheck);
+		return;
+	}
+
+	if(ui->lytSrcDependencies->count() != m_SrcDependencyList.count())
+	{
+		if(ui->lytSrcDependencies->count() < m_SrcDependencyList.count())
+		{
+			for(int i = ui->lytSrcDependencies->count(); i < m_SrcDependencyList.count(); ++i)
+				ui->lytSrcDependencies->addWidget(m_SrcDependencyList[i]);
+		}
+		else
+		{
+			for(int i = m_SrcDependencyList.count(); i < ui->lytSrcDependencies->count() - 1; ++i) // Keep at least '1'
+				delete ui->lytSrcDependencies->takeAt(i);
+		}
+
+		// Remove and re-add the layout that holds SrcDependency widgets. Otherwise it jumbles them together.
+		//ui->grpAdvanced->layout()->removeItem(ui->lytSrcDependencies);
+		//ui->grpAdvanced->layout()->addItem(ui->lytSrcDependencies);
+	}
+
+	ErrorCheck();
+}
+
+QString DlgNewProject::GetDependAdd()
+{
+	QString sReturn = "";
+	for(auto srcDep : m_SrcDependencyList)
+	{
+		if(srcDep->IsActivated() == false)
+			continue;
+
+		sReturn += "add_subdirectory(\"";
+		sReturn += srcDep->GetRelPath();
+		sReturn += "\" \"";
+		sReturn += srcDep->GetProjectName();
+		sReturn += "\")\n";
+	}
+
+	return sReturn;
+}
+
+QString DlgNewProject::GetDependLink()
+{
+	QString sReturn = "";
+	for(auto srcDep : m_SrcDependencyList)
+	{
+		if(srcDep->IsActivated() == false)
+			continue;
+
+		sReturn += "\"";
+		sReturn += srcDep->GetProjectName();
+		sReturn += "\" ";
+	}
+
+	return sReturn;
 }
 
 void DlgNewProject::ErrorCheck()
@@ -308,6 +406,21 @@ void DlgNewProject::ErrorCheck()
 			bIsError = true;
 			break;
 		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		for(auto srcDep : m_SrcDependencyList)
+		{
+			sError = srcDep->GetError();
+			if(sError.isEmpty() == false)
+			{
+				ui->lblError->setText(sError);
+				bIsError = true;
+				break;
+			}
+		}
+		if(sError.isEmpty() == false)
+			break;
+
 	}while(false);
 
 	ui->lblError->setVisible(bIsError);

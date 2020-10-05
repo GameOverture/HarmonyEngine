@@ -25,7 +25,7 @@ WgtMakeRelDir::~WgtMakeRelDir()
 	delete ui;
 }
 
-void WgtMakeRelDir::Setup(QString sTitle, QString sDefaultName, QString sAbsProjectPath, QString sDefaultRelativePath)
+void WgtMakeRelDir::Setup(QString sTitle, QString sDefaultName, QString sAbsProjectPath, QString sDefaultRelativePath /*= ""*/, QString sDirNameLabel /*= ""*/)
 {
 	m_sTitle = sTitle;
 
@@ -37,13 +37,19 @@ void WgtMakeRelDir::Setup(QString sTitle, QString sDefaultName, QString sAbsProj
 	ui->txtDirName->blockSignals(false);
 
 	m_sAbsProjPath = sAbsProjectPath;
-	if(sDefaultRelativePath.isEmpty())
+
+	// Don't overwrite any already set 'm_sAbsParentDirPath' unless 'sDefaultRelativePath' is specified
+	if(sDefaultRelativePath.isEmpty() && m_sAbsParentDirPath.isEmpty())
 		m_sAbsParentDirPath = m_sAbsProjPath;
 	else
 		m_sAbsParentDirPath = m_sAbsProjPath % sDefaultRelativePath;
 
-	ui->lblRelative->setText(sTitle % " relative location:");
-	ui->lblDirName->setText(sTitle % " dir name:");
+	ui->lblRelative->setText(m_sTitle % " relative location:");
+
+	if(sDirNameLabel.isEmpty())
+		ui->lblDirName->setText(m_sTitle % " dir name:");
+	else
+		ui->lblDirName->setText(sDirNameLabel);
 
 	Refresh();
 }

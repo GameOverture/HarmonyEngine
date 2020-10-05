@@ -185,6 +185,9 @@ if(Qt5_DIR)
 		src/Widget/WgtMakeRelDir.cpp
 		src/Widget/WgtMakeRelDir.h
 		src/Widget/WgtMakeRelDir.ui
+		src/Widget/WgtSrcDependency.cpp
+		src/Widget/WgtSrcDependency.h
+		src/Widget/WgtSrcDependency.ui
 		src/Widget/WidgetColor.cpp
 		src/Widget/WidgetGradientEditor.cpp
 		src/Widget/WidgetLiveVariable.cpp

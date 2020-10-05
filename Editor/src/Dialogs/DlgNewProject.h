@@ -10,6 +10,8 @@
 #ifndef DLGNEWPROJECT_H
 #define DLGNEWPROJECT_H
 
+#include "WgtSrcDependency.h"
+
 #include <QDialog>
 
 namespace Ui {
@@ -19,10 +21,15 @@ class DlgNewProject;
 class DlgNewProject : public QDialog
 {
 	Q_OBJECT
+
+		QList<WgtSrcDependency *>	m_SrcDependencyList;
 	
 public:
 	explicit DlgNewProject(QString &sDefaultLocation, QWidget *parent = 0);
 	~DlgNewProject();
+
+	void AddSrcDep();
+	void RemoveSrcDep(WgtSrcDependency *pRemoved);
 
 	QString GetProjFilePath();
 	QString GetProjFileName();
@@ -46,6 +53,11 @@ private:
 	Ui::DlgNewProject *ui;
 
 	void UpdateProjectDir();
+	void UpdateSrcDependencies();
+
+	QString GetDependAdd();
+	QString GetDependLink();
+
 	void ErrorCheck();
 };
 
