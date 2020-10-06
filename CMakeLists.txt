@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(Harmony VERSION 1.0)
+project(Harmony)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(HYBUILD_Qt ON)

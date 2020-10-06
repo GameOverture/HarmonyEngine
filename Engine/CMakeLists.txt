@@ -267,5 +267,5 @@ if (MSVC)
 	target_compile_definitions(HyEngine PUBLIC _CRT_SECURE_NO_WARNINGS)
 endif()
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${HYENGINE_SOURCE_FILES})
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/" FILES ${HYENGINE_HEADER_FILES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES ${HYENGINE_SOURCE_FILES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/" PREFIX "Source Files" FILES ${HYENGINE_HEADER_FILES})

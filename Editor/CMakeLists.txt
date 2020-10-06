@@ -280,8 +280,7 @@ if(Qt5_DIR)
 		target_compile_definitions(HyEditor PUBLIC _CRT_SECURE_NO_WARNINGS)
 	endif()
 
-	# Sets up filters for VS
-	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${HYEDITOR_SOURCE_FILES})
+	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES ${HYEDITOR_SOURCE_FILES})
 else()
 	message(WARNING "Required variable Qt5_DIR. Specify cmake Qt5 directory -Example- C:/Qt/5.12.0/msvc2017_64/lib/cmake/Qt5")
 endif()
