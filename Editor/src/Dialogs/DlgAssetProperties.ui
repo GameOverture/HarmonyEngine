@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>270</width>
-    <height>251</height>
+    <height>185</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,29 +37,101 @@
    </item>
    <item>
     <widget class="QStackedWidget" name="stackedAssetType">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
      <widget class="QWidget" name="atlasPage">
-      <widget class="QComboBox" name="cmbTextureType">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>60</y>
-         <width>69</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="cmbTextureFiltering">
-       <property name="geometry">
-        <rect>
-         <x>150</x>
-         <y>60</y>
-         <width>69</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="1" column="1">
+        <widget class="QComboBox" name="cmbTextureFiltering"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Filtering:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="cmbTextureType"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Type:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
-     <widget class="QWidget" name="audioPage"/>
+     <widget class="QWidget" name="audioPage">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="chkIsMusic">
+         <property name="text">
+          <string>Is Music</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="chkExportAsMono">
+         <property name="text">
+          <string>Export As Mono</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="chkIsCompressed">
+         <property name="text">
+          <string>Is Compressed:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QDoubleSpinBox" name="sbVbrQuality">
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblVbrQuality">
+           <property name="text">
+            <string>VBR Quality</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="chkUseGlobalLimit">
+         <property name="text">
+          <string>Use Global Limit:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QSpinBox" name="sbGlobalLimit">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblInstances">
+           <property name="text">
+            <string>Instances</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>

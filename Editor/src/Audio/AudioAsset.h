@@ -69,7 +69,7 @@ class AudioAsset : public AssetItemData
 	bool			m_bExportMono;
 	bool			m_bCompressed;
 	float			m_fVbrQuality;
-	int32			m_iGlobalLimit;
+	int32			m_iGlobalLimit;	// -1 indicates no global limit
 
 public:
 	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, bool bIsMusic, bool bExportMono, int32 iGlobalLimit, bool bCompressed, float fVbrQuality, uint uiErrors);

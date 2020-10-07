@@ -52,8 +52,6 @@ private Q_SLOTS:
 
 private:
 	AudioAsset *ImportSound(QString sFilePath, quint32 uiBankIndex, HyGuiItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef);
-	
-	bool wavToOgg(QString sWavFilePath, QString sOggFilePath, uint16 uiNumChannels, float fVbrQuality);
 };
 
 #endif // AudioManagerModel_H

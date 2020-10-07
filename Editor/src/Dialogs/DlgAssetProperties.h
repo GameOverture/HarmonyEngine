@@ -29,11 +29,17 @@ public:
 	explicit DlgAssetProperties(AssetType eManagerType, QList<AssetItemData *> assetList, QWidget *parent = 0);
 	~DlgAssetProperties();
 
-//private Q_SLOTS:
-//	virtual void done(int r);
+private Q_SLOTS:
+	void on_chkIsCompressed_clicked();
+	void on_chkUseGlobalLimit_clicked();
+
+	virtual void done(int r);
 
 private:
 	Ui::DlgAssetProperties *ui;
+
+	void Refresh();
+	bool IsSettingsDirty();
 };
 
 #endif // DLGASSETPROPERTIES_H

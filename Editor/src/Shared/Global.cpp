@@ -257,8 +257,7 @@
 
 /*static*/ QString HyGlobal::MakeFileNameFromCounter(int iCount)
 {
-	QString sNewString;
-	sNewString.asprintf("%05d", iCount);
+	QString sNewString = QString("%1").arg(iCount, 5, 10, QChar('0'));
 
 	return sNewString;
 }
