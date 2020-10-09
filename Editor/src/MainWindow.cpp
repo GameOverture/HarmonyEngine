@@ -234,8 +234,13 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	if(pProject == nullptr)
 	{
 		ui->tabWidgetAssetManager->clear();
+		ui->actionCloseProject->setEnabled(false);
+		ui->actionProjectSettings->setEnabled(false);
 		return;
 	}
+
+	ui->actionCloseProject->setEnabled(true);
+	ui->actionProjectSettings->setEnabled(true);
 
 	// Insert the project's TabBar
 	bool bTabsFound = false;
@@ -475,12 +480,36 @@ void MainWindow::on_actionOpenProject_triggered()
 
 void MainWindow::on_actionCloseProject_triggered()
 {
-	Project *pProj = &ui->explorer->GetFirstSelectedItem()->GetProject();
+	Project *pProj = nullptr;
+	if(ui->explorer->GetFirstSelectedItem() == nullptr)
+		pProj = Harmony::GetProject();
+	else
+		pProj = &ui->explorer->GetFirstSelectedItem()->GetProject();
+
+	if(pProj == nullptr)
+		return;
+
 	bool bClearCurrentProject = Harmony::GetProject() == pProj;
 	m_ExplorerModel.RemoveItem(pProj);
 
 	if(bClearCurrentProject)
 		Harmony::SetProject(nullptr);
+}
+
+void MainWindow::on_actionProjectSettings_triggered()
+{
+	Project *pProj = nullptr;
+	if(ui->explorer->GetFirstSelectedItem() == nullptr)
+		pProj = Harmony::GetProject();
+	else
+		pProj = &ui->explorer->GetFirstSelectedItem()->GetProject();
+
+	if(pProj == nullptr)
+		return;
+
+	DlgProjectSettings dlg(*pProj, this);
+	if(dlg.exec() == QDialog::Accepted && dlg.HasSettingsChanged())
+		pProj->SaveSettingsObj(dlg.GetNewSettingsObj());
 }
 
 void MainWindow::on_actionNewPrefix_triggered()
@@ -747,16 +776,6 @@ void MainWindow::on_actionAbout_triggered()
 void MainWindow::on_actionExit_triggered()
 {
 	close();
-}
-
-void MainWindow::on_actionProjectSettings_triggered()
-{
-	if(Harmony::GetProject() == nullptr)
-		return;
-
-	DlgProjectSettings dlg(*Harmony::GetProject(), this);
-	if(dlg.exec() == QDialog::Accepted && dlg.HasSettingsChanged())
-		Harmony::GetProject()->SaveSettingsObj(dlg.GetNewSettingsObj());
 }
 
 void MainWindow::on_actionTheme_Lappy486_triggered()

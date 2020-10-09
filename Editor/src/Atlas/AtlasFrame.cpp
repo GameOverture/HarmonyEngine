@@ -58,9 +58,19 @@ HyTextureFormat AtlasFrame::GetFormat() const
 	return m_eFormat;
 }
 
+void AtlasFrame::SetFormat(HyTextureFormat eFormat)
+{
+	m_eFormat = eFormat;
+}
+
 HyTextureFiltering AtlasFrame::GetFiltering() const
 {
 	return m_eFiltering;
+}
+
+void AtlasFrame::SetFiltering(HyTextureFiltering eFiltering)
+{
+	m_eFiltering = eFiltering;
 }
 
 QPoint AtlasFrame::GetPosition() const

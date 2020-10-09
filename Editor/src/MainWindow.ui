@@ -350,9 +350,6 @@
    </property>
   </action>
   <action name="actionCloseProject">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="icon">
     <iconset resource="../data/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Project-Close.png</normaloff>:/icons16x16/items/Project-Close.png</iconset>
@@ -518,9 +515,6 @@
    </property>
   </action>
   <action name="actionProjectSettings">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="icon">
     <iconset resource="../data/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Project-Settings.png</normaloff>:/icons16x16/items/Project-Settings.png</iconset>

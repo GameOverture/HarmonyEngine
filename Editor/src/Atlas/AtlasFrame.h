@@ -51,8 +51,12 @@ public:
 
 	QSize GetSize() const;
 	QRect GetCrop() const;
+	
 	HyTextureFormat GetFormat() const;
+	void SetFormat(HyTextureFormat eFormat);
 	HyTextureFiltering GetFiltering() const;
+	void SetFiltering(HyTextureFiltering eFiltering);
+
 	QPoint GetPosition() const;
 
 	int GetTextureIndex() const;

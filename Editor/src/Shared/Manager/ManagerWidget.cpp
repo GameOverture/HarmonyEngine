@@ -312,8 +312,7 @@ void ManagerWidget::on_actionAssetSettings_triggered()
 
 	DlgAssetProperties dlg(m_pModel->GetAssetType(), selectedAssetsList);
 	if(dlg.exec() == QDialog::Accepted)
-	{
-	}
+		m_pModel->ReplaceAssets(dlg.GetChangedAssets(), false);
 }
 
 void ManagerWidget::on_actionDeleteAssets_triggered()
@@ -337,14 +336,7 @@ void ManagerWidget::on_actionReplaceAssets_triggered()
 		return;
 	}
 
-	// TODO: also check if all of selectedAssetsList belong to the same filter, since only replacing in this matter makes sense
-	if(false)
-	{
-		HyGuiLog("Only select assets from under the same filter (or root).", LOGTYPE_Warning);
-		return;
-	}
-
-	m_pModel->ReplaceAssets(selectedAssetsList);
+	m_pModel->ReplaceAssets(selectedAssetsList, true);
 }
 
 void ManagerWidget::on_assetTree_clicked()

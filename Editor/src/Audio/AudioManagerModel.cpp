@@ -243,6 +243,29 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 	return true;
 }
 
+/*virtual*/ bool AudioManagerModel::OnUpdateAssets(QList<AssetItemData *> assetList) /*override*/
+{
+	QMap<uint, QSet<AudioAsset *>> affectedMap;
+	for(int i = 0; i < assetList.count(); ++i)
+	{
+		AudioAsset *pAudio = static_cast<AudioAsset *>(assetList[i]);
+
+		QSet<AudioAsset *> &affectedSetRef = affectedMap[GetBankIndexFromBankId(pAudio->GetBankId())];
+		affectedSetRef.insert(pAudio);
+	}
+
+	QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
+	for(auto iter = affectedMap.begin(); iter != affectedMap.end(); ++iter)
+	{
+		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(iter.key()), iter.value());
+		affectedAudioList.append(bankPair);
+	}
+
+	Repack(affectedAudioList);
+
+	return true;
+}
+
 /*virtual*/ bool AudioManagerModel::OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
 {
 	QList<uint> affectedBankIndexList;			// old

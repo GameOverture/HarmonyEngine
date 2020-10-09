@@ -313,8 +313,6 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 {
 	ExplorerItemData *pCurSelected = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItemData *>();
 	bool bValidItem = (pCurSelected != nullptr);
-	FINDACTION("actionProjectSettings")->setEnabled(bValidItem);
-	FINDACTION("actionCloseProject")->setEnabled(bValidItem);
 	FINDACTION("actionNewPrefix")->setEnabled(bValidItem);
 	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);

@@ -42,19 +42,20 @@ AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<AtlasFrame *> affe
 {
 	QDir runtimeBankDir(m_BankRef.m_sAbsPath);
 
-	QList<int> unfilledTextureIndexList;
-	
+	// Delete the old obsolete textures. The assets on them will be regenerated
 	for(auto iter = m_BucketMap.begin(); iter != m_BucketMap.end(); ++iter)
 	{
-		// Delete the old obsolete textures. The assets on them will be regenerated
 		QList<int> textureIndexList = iter.value()->m_TextureIndexSet.values();
 		for(int i = 0; i < textureIndexList.size(); ++i)
 		{
 			QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
 			QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".dds"));
 		}
+	}
 
-
+	QList<int> unfilledTextureIndexList;
+	for(auto iter = m_BucketMap.begin(); iter != m_BucketMap.end(); ++iter)
+	{
 		iter.value()->m_Packer.clear();
 
 		// Repack the affected frames and determine how many textures this repack took

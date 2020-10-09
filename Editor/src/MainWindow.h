@@ -87,6 +87,7 @@ private Q_SLOTS:
 	void on_actionNewProject_triggered();
 	void on_actionOpenProject_triggered();
 	void on_actionCloseProject_triggered();
+	void on_actionProjectSettings_triggered();
 
 	void on_actionNewPrefix_triggered();
 	void on_actionNewAudio_triggered();
@@ -110,8 +111,6 @@ private Q_SLOTS:
 	void on_actionAbout_triggered();
 	
 	void on_actionExit_triggered();
-
-	void on_actionProjectSettings_triggered();
 
 	void on_actionTheme_Lappy486_triggered();
 

@@ -23,7 +23,7 @@ AudioAsset::AudioAsset(IManagerModel &modelRef,
 					   bool bExportMono,
 					   int32 iGlobalLimit,
 					   bool bCompressed,
-					   float fVbrQuality,
+					   double dVbrQuality,
 					   uint uiErrors) :
 	AssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
 	m_WaveHeader(wavHeaderRef),
@@ -31,7 +31,7 @@ AudioAsset::AudioAsset(IManagerModel &modelRef,
 	m_bExportMono(bExportMono),
 	m_iGlobalLimit(iGlobalLimit),
 	m_bCompressed(bCompressed),
-	m_fVbrQuality(fVbrQuality)
+	m_dVbrQuality(dVbrQuality)
 {
 }
 
@@ -59,9 +59,34 @@ bool AudioAsset::IsCompressed() const
 	return m_bCompressed;
 }
 
-float AudioAsset::GetVbrQuality() const
+double AudioAsset::GetVbrQuality() const
 {
-	return m_fVbrQuality;
+	return m_dVbrQuality;
+}
+
+void AudioAsset::SetIsMusic(bool bIsMusic)
+{
+	m_bIsMusic = bIsMusic;
+}
+
+void AudioAsset::SetIsExportMono(bool bIsExportMono)
+{
+	m_bExportMono = bIsExportMono;
+}
+
+void AudioAsset::SetGlobalLimit(int32 iGlobalLimit)
+{
+	m_iGlobalLimit = iGlobalLimit;
+}
+
+void AudioAsset::SetIsCompressed(bool bIsCompressed)
+{
+	m_bCompressed = bIsCompressed;
+}
+
+void AudioAsset::SetVbrQuality(double dVbrQuality)
+{
+	m_dVbrQuality = dVbrQuality;
 }
 
 QString AudioAsset::ConstructDataFileName(bool bWithExt) const
@@ -104,5 +129,5 @@ void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader
 	frameObj.insert("isExportMono", m_bExportMono);
 	frameObj.insert("globalLimit", m_iGlobalLimit);
 	frameObj.insert("isCompressed", m_bCompressed);
-	frameObj.insert("vbrQuality", m_fVbrQuality);
+	frameObj.insert("vbrQuality", m_dVbrQuality);
 }

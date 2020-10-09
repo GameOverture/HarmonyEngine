@@ -212,7 +212,7 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 	OnRemoveAssets(assetsList);
 }
 
-void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList)
+void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets)
 {
 	ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
 
@@ -245,44 +245,47 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList)
 		}
 	}
 
-	QFileDialog dlg(MainWindow::GetInstance());
-	dlg.setDirectory("");
-
-	if(assetsList.count() == 1)
+	if(bWithNewAssets)
 	{
-		dlg.setFileMode(QFileDialog::ExistingFile);
-		dlg.setWindowTitle("Select an asset as the replacement");
+		// Initialize file dialog to choose new assets as replacement(s)
+		QFileDialog dlg(MainWindow::GetInstance());
+		dlg.setDirectory("");
+		if(assetsList.count() == 1)
+		{
+			dlg.setFileMode(QFileDialog::ExistingFile);
+			dlg.setWindowTitle("Select an asset as the replacement");
+		}
+		else
+		{
+			dlg.setFileMode(QFileDialog::ExistingFiles);
+			dlg.setWindowTitle("Select " % QString::number(assetsList.count()) % " assets as replacements");
+		}
+		dlg.setWindowModality(Qt::ApplicationModal);
+		dlg.setModal(true);
+		QStringList sFilterList = { "*" % assetsList[0]->GetMetaFileExt(), "*.*" };
+		dlg.setNameFilters(sFilterList);
+		QStringList sImportAssetList;
+		do
+		{
+			if(dlg.exec() == QDialog::Rejected)
+				return;
+
+			sImportAssetList = dlg.selectedFiles();
+
+			if(sImportAssetList.count() != assetsList.count())
+				HyGuiLog("You must select " % QString::number(assetsList.count()) % " assets", LOGTYPE_Warning);
+		} while(sImportAssetList.count() != assetsList.count());
+
+		OnReplaceAssets(sImportAssetList, assetsList);
 	}
 	else
-	{
-		dlg.setFileMode(QFileDialog::ExistingFiles);
-		dlg.setWindowTitle("Select " % QString::number(assetsList.count()) % " assets as replacements");
-	}
-	dlg.setWindowModality(Qt::ApplicationModal);
-	dlg.setModal(true);
-	QStringList sFilterList = { "*" % assetsList[0]->GetMetaFileExt(), "*.*"};
-	dlg.setNameFilters(sFilterList);
+		OnUpdateAssets(assetsList);
 
-	QStringList sImportAssetList;
-	do
-	{
-		if(dlg.exec() == QDialog::Rejected)
-			return;
-
-		sImportAssetList = dlg.selectedFiles();
-
-		if(sImportAssetList.count() != assetsList.count())
-			HyGuiLog("You must select " % QString::number(assetsList.count()) % " assets", LOGTYPE_Warning);
-	}
-	while(sImportAssetList.count() != assetsList.count());
-
-	OnReplaceAssets(sImportAssetList, assetsList);
-
-	// Resave all affected items that had a replaced atlas frame
+	// Resave all affected items that had a replaced asset
 	for(int i = 0; i < affectedItemList.size(); ++i)
 	{
 		if(affectedItemList[i]->Save(i == (affectedItemList.size() - 1)) == false)
-			HyGuiLog(affectedItemList[i]->GetName(true) % " failed to save its new atlas frame", LOGTYPE_Error);
+			HyGuiLog(affectedItemList[i]->GetName(true) % " failed to save after replacing assets", LOGTYPE_Error);
 	}
 }
 

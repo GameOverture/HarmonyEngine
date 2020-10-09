@@ -59,7 +59,7 @@ public:
 
 	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
 	void RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
-	void ReplaceAssets(QList<AssetItemData *> assetsList);
+	void ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets);
 	void Rename(TreeModelItemData *pItem, QString sNewName);
 	bool TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId);
 
@@ -119,6 +119,7 @@ protected:
 	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QList<AssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) = 0;
+	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) = 0;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) = 0; // Must call MoveAsset() on each asset
 
 	virtual QJsonObject GetSaveJson() = 0;

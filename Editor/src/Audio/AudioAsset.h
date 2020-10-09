@@ -68,18 +68,23 @@ class AudioAsset : public AssetItemData
 	bool			m_bIsMusic;
 	bool			m_bExportMono;
 	bool			m_bCompressed;
-	float			m_fVbrQuality;
+	double			m_dVbrQuality;
 	int32			m_iGlobalLimit;	// -1 indicates no global limit
 
 public:
-	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, bool bIsMusic, bool bExportMono, int32 iGlobalLimit, bool bCompressed, float fVbrQuality, uint uiErrors);
+	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, bool bIsMusic, bool bExportMono, int32 iGlobalLimit, bool bCompressed, double dVbrQuality, uint uiErrors);
 	~AudioAsset();
 
 	bool IsMusic() const;
 	bool IsExportMono() const;
 	int32 GetGlobalLimit() const;
 	bool IsCompressed() const;
-	float GetVbrQuality() const;
+	double GetVbrQuality() const;
+	void SetIsMusic(bool bIsMusic);
+	void SetIsExportMono(bool bIsExportMono);
+	void SetGlobalLimit(int32 iGlobalLimit);
+	void SetIsCompressed(bool bIsCompressed);
+	void SetVbrQuality(double dVbrQuality);
 
 	QString ConstructDataFileName(bool bWithExt) const;
 

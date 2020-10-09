@@ -10,7 +10,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "Harmony/Afx/HyStdAfx.h"
+#include "Harmony/HyEngine.h"
 #ifdef HY_COMPILER_MSVC
 	#pragma warning ( push )
 	#pragma warning( disable: 4100 )
@@ -30,7 +30,7 @@
 #include <QJsonArray>
 
 #include "WidgetOutputLog.h"
-#include "Harmony/HyEngine.h"
+
 
 class Project;
 

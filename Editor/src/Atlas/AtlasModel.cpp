@@ -383,6 +383,24 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	return true;
 }
 
+/*virtual*/ bool AtlasModel::OnUpdateAssets(QList<AssetItemData *> assetList) /*override*/
+{
+	QMap<uint, QSet<int> > affectedTextureIndexMap;
+	for(int i = 0; i < assetList.count(); ++i)
+	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
+		affectedTextureIndexMap[GetBankIndexFromBankId(pFrame->GetBankId())].insert(pFrame->GetTextureIndex());
+	}
+
+	if(affectedTextureIndexMap.empty() == false)
+	{
+		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
+			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
+	}
+
+	return true;
+}
+
 /*virtual*/ bool AtlasModel::OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
 {
 	// Ensure all transferred assets (images) can fit on new atlas

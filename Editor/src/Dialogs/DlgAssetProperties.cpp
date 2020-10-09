@@ -24,7 +24,24 @@ DlgAssetProperties::DlgAssetProperties(AssetType eManagerType, QList<AssetItemDa
 	ui->stackedAssetType->setCurrentIndex(eManagerType);
 
 	if(m_SelectedAssets.count() > 1)
+	{
+		QString	sGroupName = m_SelectedAssets[0]->GetName();
+		int iDiffIndex = sGroupName.length();
+		for(auto pAsset : m_SelectedAssets)
+		{
+			for(int i = 0; i < pAsset->GetName().length() && i < iDiffIndex; ++i)
+			{
+				if(sGroupName[i] != pAsset->GetName()[i])
+				{
+					iDiffIndex = i;
+					break;
+				}
+			}
+		}
+		sGroupName = sGroupName.left(iDiffIndex);
+		ui->txtName->setText(sGroupName);
 		ui->lblNumSelected->setText(QString::number(m_SelectedAssets.count()) % " assets selected");
+	}
 	else
 	{
 		ui->txtName->setText(m_SelectedAssets[0]->GetName());
@@ -35,18 +52,41 @@ DlgAssetProperties::DlgAssetProperties(AssetType eManagerType, QList<AssetItemDa
 
 	switch(eManagerType)
 	{
-	case ASSET_Atlas:
-		// Texture Type
+	case ASSET_Atlas: {
+		// Texture Type ///////////////////////////////////////////////////////////////////////////////////////////
+		HyTextureFormat eFormat = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetFormat();
+		for(auto pAsset : m_SelectedAssets)
+		{
+			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+			if(pFrame->GetFormat() != eFormat)
+			{
+				ui->cmbTextureType->addItem("<different options>");
+				eFormat = HYTEXTURE_Unknown;
+				break;
+			}
+		}
 		for(int i = 0; i < HYNUM_TEXTUREFORMATS; ++i)
 			ui->cmbTextureType->addItem(QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(i)).c_str()));
 
-		// Texture Filtering
+		ui->cmbTextureType->setCurrentIndex(eFormat == HYTEXTURE_Unknown ? 0 : eFormat);
+
+		// Texture Filtering ///////////////////////////////////////////////////////////////////////////////////////////
+		HyTextureFiltering eFiltering = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetFiltering();
+		for(auto pAsset : m_SelectedAssets)
+		{
+			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+			if(pFrame->GetFiltering() != eFiltering)
+			{
+				ui->cmbTextureFiltering->addItem("<different options>");
+				eFiltering = HYTEXFILTER_Unknown;
+				break;
+			}
+		}
 		for(int i = 0; i < HYNUM_TEXTUREFILTERS; ++i)
 			ui->cmbTextureFiltering->addItem(QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(i)).c_str()));
 
-		ui->cmbTextureType->setCurrentIndex(static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetFormat());
-		ui->cmbTextureFiltering->setCurrentIndex(static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetFiltering());
-		break;
+		ui->cmbTextureFiltering->setCurrentIndex(eFiltering == HYTEXFILTER_Unknown ? 0 : eFiltering);
+		break; }
 
 	case ASSET_Audio:
 		// Is Music ///////////////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +140,6 @@ DlgAssetProperties::DlgAssetProperties(AssetType eManagerType, QList<AssetItemDa
 			}
 		}
 		ui->chkUseGlobalLimit->setCheckState(eCheckState);
-		
 		break;
 	} // switch(eManagerType)
 
@@ -112,8 +151,19 @@ DlgAssetProperties::~DlgAssetProperties()
 	delete ui;
 }
 
+QList<AssetItemData *> DlgAssetProperties::GetChangedAssets()
+{
+	return m_ChangedAssets;
+}
+
 void DlgAssetProperties::on_chkIsCompressed_clicked()
 {
+	Refresh();
+}
+
+void DlgAssetProperties::on_sbVbrQuality_valueChanged(double dArg)
+{
+	ui->chkIsCompressed->setChecked(true);
 	Refresh();
 }
 
@@ -122,12 +172,23 @@ void DlgAssetProperties::on_chkUseGlobalLimit_clicked()
 	Refresh();
 }
 
+void DlgAssetProperties::on_sbGlobalLimit_valueChanged(int iArg)
+{
+	ui->chkUseGlobalLimit->setChecked(true);
+	Refresh();
+}
+
 /*virtual*/ void DlgAssetProperties::done(int r)
 {
+	bool bAssetsChanged = DetermineChangedAssets();
+
 	if(r == QDialog::Accepted)
 	{
-		if(QMessageBox::Ok == QMessageBox::warning(nullptr, QString("Save asset properties?"), QString("Save asset properties? Changed assets will need to be repacked."), QMessageBox::Ok, QMessageBox::Cancel))
+		if(bAssetsChanged && QMessageBox::Ok == QMessageBox::warning(nullptr, QString("Save asset properties?"), QString("Save asset properties? Changed assets will need to be repacked."), QMessageBox::Ok, QMessageBox::Cancel))
+		{
+			ApplyChanges();
 			QDialog::done(r);
+		}
 		else
 			QDialog::done(QDialog::Rejected);
 	}
@@ -152,31 +213,140 @@ void DlgAssetProperties::Refresh()
 	}
 }
 
-//bool DlgAssetProperties::IsSettingsDirty()
-//{
-//	switch(ui->stackedAssetType->currentIndex())
-//	{
-//	case ASSET_Atlas:
-//		break;
-//
-//	case ASSET_Audio:
-//		if(ui->chkIsMusic->checkState() != Qt::PartiallyChecked)
-//		{
-//			if(ui->chkIsMusic->checkState() == Qt::Checked)
-//			{
-//				for(auto asset : m_SelectedAssets)
-//				{
-//					if(static_cast<AudioAsset *>(asset)->IsMusic() == false)
-//						return true;
-//				}
-//			}
-//		}
-//
-//		ui->sbVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
-//		ui->lblVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
-//
-//		ui->sbGlobalLimit->setDisabled(ui->chkUseGlobalLimit->checkState() == Qt::Unchecked);
-//		ui->lblInstances->setDisabled(ui->chkUseGlobalLimit->checkState() == Qt::Unchecked);
-//		break;
-//	}
-//}
+bool DlgAssetProperties::DetermineChangedAssets()
+{
+	m_ChangedAssets.clear();
+
+	switch(ui->stackedAssetType->currentIndex())
+	{
+	case ASSET_Atlas: {
+		bool bHasDiffOptions = ui->cmbTextureType->count() == (HYNUM_TEXTUREFORMATS + 1);
+		bool bIsDiffOptions = bHasDiffOptions && ui->cmbTextureType->currentIndex() == 0;
+		if(bIsDiffOptions == false)
+		{
+			for(auto pAsset : m_SelectedAssets)
+			{
+				AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+				if(pFrame->GetFormat() != static_cast<HyTextureFormat>(ui->cmbTextureType->currentIndex() - (bHasDiffOptions ? 1 : 0)))
+				{
+					m_ChangedAssets.append(pAsset);
+					continue;
+				}
+			}
+		}
+
+		bHasDiffOptions = ui->cmbTextureFiltering->count() == (HYNUM_TEXTUREFILTERS + 1);
+		bIsDiffOptions = bHasDiffOptions && ui->cmbTextureFiltering->currentIndex() == 0;
+		if(bIsDiffOptions == false)
+		{
+			for(auto pAsset : m_SelectedAssets)
+			{
+				AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+				if(pFrame->GetFiltering() != static_cast<HyTextureFiltering>(ui->cmbTextureFiltering->currentIndex() - (bHasDiffOptions ? 1 : 0)))
+				{
+					m_ChangedAssets.append(pAsset);
+					continue;
+				}
+			}
+		}
+		break; }
+
+	case ASSET_Audio:
+		for(auto pAsset : m_SelectedAssets)
+		{
+			AudioAsset *pAudio = static_cast<AudioAsset *>(pAsset);
+			if((pAudio->IsMusic() && ui->chkIsMusic->checkState() == Qt::Unchecked) ||
+			   (pAudio->IsMusic() == false && ui->chkIsMusic->checkState() == Qt::Checked))
+			{
+				m_ChangedAssets.append(pAsset);
+				continue;
+			}
+
+			if((pAudio->IsExportMono() && ui->chkExportAsMono->checkState() == Qt::Unchecked) ||
+			   (pAudio->IsExportMono() == false && ui->chkExportAsMono->checkState() == Qt::Checked))
+			{
+				m_ChangedAssets.append(pAsset);
+				continue;
+			}
+
+			if((pAudio->IsCompressed() && ui->chkIsCompressed->checkState() == Qt::Unchecked) ||
+			   (pAudio->IsCompressed() == false && ui->chkIsCompressed->checkState() == Qt::Checked) ||
+			   (pAudio->IsCompressed() && pAudio->GetVbrQuality() != ui->sbVbrQuality->value()))
+			{
+				m_ChangedAssets.append(pAsset);
+				continue;
+			}
+
+			if((pAudio->GetGlobalLimit() > 0 && ui->chkUseGlobalLimit->checkState() == Qt::Unchecked) ||
+			   (pAudio->GetGlobalLimit() > 0 == false && ui->chkUseGlobalLimit->checkState() == Qt::Checked) ||
+			   (pAudio->GetGlobalLimit() > 0 && pAudio->GetGlobalLimit() != ui->sbGlobalLimit->value()))
+			{
+				m_ChangedAssets.append(pAsset);
+				continue;
+			}
+		}
+		break;
+	}
+
+	return m_ChangedAssets.empty() == false;
+}
+
+void DlgAssetProperties::ApplyChanges()
+{
+	switch(ui->stackedAssetType->currentIndex())
+	{
+	case ASSET_Atlas: {
+		bool bHasDiffOptions = ui->cmbTextureType->count() == (HYNUM_TEXTUREFORMATS + 1);
+		bool bIsDiffOptions = bHasDiffOptions && ui->cmbTextureType->currentIndex() == 0;
+		if(bIsDiffOptions == false)
+		{
+			HyTextureFormat eNewFormat = static_cast<HyTextureFormat>(ui->cmbTextureType->currentIndex() - (bHasDiffOptions ? 1 : 0));
+			for(auto pAsset : m_ChangedAssets)
+			{
+				AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+				pFrame->SetFormat(eNewFormat);
+			}
+		}
+
+		bHasDiffOptions = ui->cmbTextureFiltering->count() == (HYNUM_TEXTUREFILTERS + 1);
+		bIsDiffOptions = bHasDiffOptions && ui->cmbTextureFiltering->currentIndex() == 0;
+		if(bIsDiffOptions == false)
+		{
+			HyTextureFiltering eNewFiltering = static_cast<HyTextureFiltering>(ui->cmbTextureFiltering->currentIndex() - (bHasDiffOptions ? 1 : 0));
+			for(auto pAsset : m_ChangedAssets)
+			{
+				AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+				pFrame->SetFiltering(eNewFiltering);
+			}
+		}
+		break; }
+
+	case ASSET_Audio:
+		for(auto pAsset : m_ChangedAssets)
+		{
+			AudioAsset *pAudio = static_cast<AudioAsset *>(pAsset);
+			if(ui->chkIsMusic->checkState() != Qt::PartiallyChecked)
+				pAudio->SetIsMusic(ui->chkIsMusic->checkState() == Qt::Checked);
+
+			if(ui->chkExportAsMono->checkState() != Qt::PartiallyChecked)
+				pAudio->SetIsExportMono(ui->chkExportAsMono->checkState() == Qt::Checked);
+				
+
+			if(ui->chkIsCompressed->checkState() != Qt::PartiallyChecked)
+			{
+				pAudio->SetIsCompressed(ui->chkIsCompressed->checkState() == Qt::Checked);
+				if(ui->chkIsCompressed->checkState() == Qt::Checked)
+					pAudio->SetVbrQuality(ui->sbVbrQuality->value());
+			}
+
+			if(ui->chkUseGlobalLimit->checkState() != Qt::PartiallyChecked)
+			{
+				if(ui->chkUseGlobalLimit->checkState() == Qt::Checked)
+					pAudio->SetGlobalLimit(ui->sbGlobalLimit->value());
+				else
+					pAudio->SetGlobalLimit(-1);
+			}
+		}
+		break;
+	}
+}
