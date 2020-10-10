@@ -237,8 +237,10 @@ void ManagerWidget::RefreshInfo()
 	if(ui->assetTree == nullptr)
 		return;
 
+	const int iInfoColumnWidth = 130;
+
 	int iTotalWidth = ui->assetTree->size().width();
-	ui->assetTree->setColumnWidth(0, iTotalWidth - 60);
+	ui->assetTree->setColumnWidth(0, iTotalWidth - iInfoColumnWidth);
 }
 
 void ManagerWidget::OnContextMenu(const QPoint &pos)

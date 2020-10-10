@@ -66,6 +66,7 @@ public:
 	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY);
 	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
 
+	virtual QString GetPropertyInfo() override;
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 };
 

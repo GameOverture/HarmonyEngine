@@ -662,7 +662,7 @@ void IManagerModel::SaveRuntime()
 		else
 		{
 			if(pItemData->GetType() != ITEM_Filter)
-				return QVariant("Bank: " % QString::number(GetBankIndexFromBankId(static_cast<AssetItemData *>(pItemData)->GetBankId())));
+				return QVariant(static_cast<AssetItemData *>(pItemData)->GetPropertyInfo());// "Bank: " % QString::number(GetBankIndexFromBankId(static_cast<AssetItemData *>(pItemData)->GetBankId())));
 			else
 			{
 				QList<TreeModelItemData *> itemsInFilterList = GetItemsRecursively(indexRef);

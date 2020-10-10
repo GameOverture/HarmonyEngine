@@ -90,6 +90,7 @@ public:
 
 	void ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader &wavHeaderRef);
 
+	virtual QString GetPropertyInfo() override;
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 };
 

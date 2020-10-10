@@ -51,6 +51,8 @@ public:
 	QString ConstructMetaFileName();
 	bool DeleteMetaFile();
 
+	virtual QString GetPropertyInfo() = 0;
+
 	void SetError(AssetErrorType eError);
 	void ClearError(AssetErrorType eError);
 	uint GetErrors();

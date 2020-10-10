@@ -112,6 +112,36 @@ void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader
 	m_WaveHeader = wavHeaderRef;
 }
 
+/*virtual*/ QString AudioAsset::GetPropertyInfo() /*override*/
+{
+	QString sInfo;
+
+	if(m_bIsMusic)
+		sInfo = "Music";
+	else
+		sInfo = "SFX";
+	if(m_bExportMono)
+	{
+		if(sInfo.isEmpty() == false)
+			sInfo +=  " | ";
+		sInfo += "Mono";
+	}
+	if(m_bCompressed)
+	{
+		if(sInfo.isEmpty() == false)
+			sInfo +=  " | ";
+		sInfo += "Compressed";
+	}
+	if(m_iGlobalLimit > 0)
+	{
+		if(sInfo.isEmpty() == false)
+			sInfo +=  " | ";
+		sInfo += "Limit:" % QString::number(m_iGlobalLimit);
+	}
+
+	return sInfo;
+}
+
 /*virtual*/ void AudioAsset::InsertUniqueJson(QJsonObject &frameObj) /*override*/
 {
 	QJsonObject wavHeaderObj;

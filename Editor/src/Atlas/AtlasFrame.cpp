@@ -124,6 +124,11 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 		HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
 }
 
+/*virtual*/ QString AtlasFrame::GetPropertyInfo() /*override*/
+{
+	return QString(HyAssets::GetTextureFormatName(m_eFormat).c_str()) % " | " % QString(HyAssets::GetTextureFilteringName(m_eFiltering).c_str());
+}
+
 /*virtual*/ void AtlasFrame::InsertUniqueJson(QJsonObject &frameObj) /*override*/
 {
 	frameObj.insert("width", QJsonValue(GetSize().width()));
