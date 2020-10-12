@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Audio/Harness/IHyAudioCore.h"
 
-#include <bitset>
+#include <unordered_map>
 
 class IHyNode;
 class IHyFileAudioImpl;
@@ -22,8 +22,12 @@ class IHyFileAudioImpl;
 class HyRawSoundBuffer;
 class HyFileAudioImpl_SDL2;
 
+#define HYMAX_AUDIOCHANNELS 32
+
 class HyAudioCore_SDL2 : public IHyAudioCore
 {
+	static HyAudioCore_SDL2 *			sm_pInstance;
+
 	std::vector<std::string>			m_sDeviceList;
 
 	int32								m_iDesiredFrequency;	// 44100 or 48000, etc.
@@ -33,33 +37,9 @@ class HyAudioCore_SDL2 : public IHyAudioCore
 
 	std::vector<HyFileAudioImpl_SDL2 *>	m_AudioFileList;
 
-	enum ChannelResizePolicy
-	{
-		CHANNEL_Locked = 0,
-		CHANNEL_Grow
-	};
-	ChannelResizePolicy					m_eResizePolicy;
-
-	//// Used in callback thread ///////////////////////////////////////////////
-	//struct Play
-	//{
-	//	const IHyNode *					m_pID;
-	//	float							m_fVolume;
-	//	float							m_fPitch;
-	//	bool							m_bPaused;
-	//	HyRawSoundBuffer *				m_pBuffer;
-	//	uint32							m_uiRemainingBytes;
-	//	Play(const IHyNode *pID, float fVolume, float fPitch, bool bPaused, HyRawSoundBuffer *pBuffer, uint32 uiRemainingBytes) :
-	//		m_pID(pID),
-	//		m_fVolume(fVolume),
-	//		m_fPitch(fPitch),
-	//		m_bPaused(bPaused),
-	//		m_pBuffer(pBuffer),
-	//		m_uiRemainingBytes(uiRemainingBytes)
-	//	{ }
-	//};
-	//std::vector<Play>					m_PlayList;
-	/////////////////////////////////////////////////////////////////////////////
+	// These are kept in sync
+	std::unordered_map<IHyNode *, int32>	m_NodeMap;
+	std::unordered_map<int32, IHyNode *>	m_ChannelMap;
 
 public:
 	HyAudioCore_SDL2();
@@ -72,8 +52,10 @@ public:
 	static IHyFileAudioImpl *AllocateBank(IHyAudioCore *pAudio, HyJsonObj bankObj);
 
 private:
-	static void OnChannelFinished(int iChannel);
-//	static void OnCallback(void *pUserData, uint8_t *pStream, int32 iLen);
+	template<typename NODETYPE>
+	void Play(CueType ePlayType, NODETYPE *pAudioNode);
+
+	static void OnChannelFinished(int32 iChannel);
 };
 #endif // defined(HY_USE_SDL2)
 

@@ -112,13 +112,12 @@ bool HyEngine::Update()
 	{
 		m_Scene.UpdateNodes();
 		m_Scene.UpdatePhysics();
-
+		m_Audio.Update();
+		
 		HY_PROFILE_BEGIN(HYPROFILERSECTION_Update)
 		if(PollPlatformApi() == false || OnUpdate() == false)
 			return false;
 		HY_PROFILE_END
-
-		m_Audio.Update();
 
 		m_Assets.Update(m_Renderer);
 		m_Renderer.ProcessMsgs();

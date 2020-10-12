@@ -20,7 +20,6 @@ template<typename NODETYPE, typename ENTTYPE>
 class IHyAudio : public NODETYPE
 {
 	uint32						m_uiCueFlags;
-	uint32						m_uiAssignedChannel;
 	float						m_fVolume;
 	float						m_fPitch;
 	
@@ -44,16 +43,25 @@ public:
 		m_iPriority(0),
 		m_iLoops(0),
 		m_uiMaxDistance(0),
-		m_uiAssignedChannel(0),
 		volume(m_fVolume, *this, 0),
 		pitch(m_fPitch, *this, 0)
 	{
 	}
 
 	// TODO: copy ctor and move ctor
-	virtual ~IHyAudio(void) = default;
-
+	virtual ~IHyAudio(void)
+	{
+	}
 	// TODO: assignment operator and move operator
+
+	int32 GetLoops() const
+	{
+		return m_iLoops;
+	}
+	void SetLoops(int32 iLoops)
+	{
+		m_iLoops = iLoops;
+	}
 
 	void PlayOneShot(bool bUseCurrentSettings /*= true*/)
 	{
@@ -100,8 +108,6 @@ protected:
 		m_uiMaxDistance = pData->GetMaxDistance();
 		volume = pData->GetVolume();
 		pitch = pData->GetPitch();
-		
-		//m_uiAssignedChannel
 	}
 
 	virtual void OnLoadedUpdate() override
@@ -125,4 +131,4 @@ protected:
 	}
 };
 
-#endif /* HyAudio2d_h__ */
+#endif /* IHyAudio_h__ */

@@ -85,6 +85,8 @@ float HyAudioData::GetPitch() const
 
 uint32 HyAudioData::GetSound(IHyNode *pAudioNode) const
 {
+	// TODO: Implement this!
+
 	switch(m_ePlayListMode)
 	{
 	case HYPLAYLIST_Shuffle:

@@ -19,6 +19,8 @@
 
 #include "SDL_mixer.h"
 
+HyAudioCore_SDL2 *HyAudioCore_SDL2::sm_pInstance = nullptr;
+
 HyAudioCore_SDL2::HyAudioCore_SDL2()
 {
 	HyLogTitle("SDL2 Audio");
@@ -93,17 +95,22 @@ HyAudioCore_SDL2::HyAudioCore_SDL2()
 
 	HyLog("Audio Driver:     " << GetAudioDriver());
 
-	Mix_AllocateChannels(32); // TODO: Set to max sound events and figure out what channel selection/priority algorithm is worth implementing
-	m_eResizePolicy = CHANNEL_Grow;
-
 	// Set API callbacks
 	Mix_ChannelFinished(HyAudioCore_SDL2::OnChannelFinished);
+
+	Mix_AllocateChannels(HYMAX_AUDIOCHANNELS);
+	m_NodeMap.reserve(HYMAX_AUDIOCHANNELS);
+	m_ChannelMap.reserve(HYMAX_AUDIOCHANNELS);
+
+	sm_pInstance = this;
 }
 
 /*virtual*/ HyAudioCore_SDL2::~HyAudioCore_SDL2(void)
 {
 	Mix_CloseAudio();
 	Mix_Quit();
+
+	sm_pInstance = nullptr;
 }
 
 const char *HyAudioCore_SDL2::GetAudioDriver()
@@ -122,67 +129,12 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 		{
 		case CUETYPE_PlayOneShotDefault:
 		case CUETYPE_PlayOneShot:
-		case CUETYPE_Start: {
-			uint32 uiSoundChecksum = 0;
-			float fVolume = 1.0f;
-			float fPitch = 1.0f;
-			if (cue.m_pNODE->Is2D())
-			{
-				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio2d *>(cue.m_pNODE)->AcquireData())->GetSound(cue.m_pNODE);
-				if (cue.m_eCUE_TYPE != CUETYPE_PlayOneShotDefault)
-				{
-					fVolume = static_cast<HyAudio2d *>(cue.m_pNODE)->volume.Get();
-					fPitch = static_cast<HyAudio2d *>(cue.m_pNODE)->pitch.Get();
-				}
-			}
+		case CUETYPE_Start:
+			if(cue.m_pNODE->Is2D())
+				Play<HyAudio2d>(cue.m_eCUE_TYPE, static_cast<HyAudio2d *>(cue.m_pNODE));
 			else
-			{
-				uiSoundChecksum = static_cast<const HyAudioData *>(static_cast<HyAudio3d *>(cue.m_pNODE)->AcquireData())->GetSound(cue.m_pNODE);
-				if (cue.m_eCUE_TYPE != CUETYPE_PlayOneShotDefault)
-				{
-					fVolume = static_cast<HyAudio3d *>(cue.m_pNODE)->volume.Get();
-					fPitch = static_cast<HyAudio3d *>(cue.m_pNODE)->pitch.Get();
-				}
-			}
-
-			HyRawSoundBuffer *pBuffer = nullptr;
-			for(auto file : m_AudioFileList)
-			{
-				pBuffer = file->GetBufferInfo(uiSoundChecksum);
-				if(pBuffer)
-					break;
-			}
-			if(pBuffer == nullptr)
-			{
-				HyLogWarning("Could not find audio: " << uiSoundChecksum);
-				break;
-			}
-
-			//bool bFoundPlay = false;
-			//const IHyNode *pId = nullptr;
-			//if(cue.m_eCUE_TYPE == CUETYPE_Start)
-			//{
-			//	// Find any existing play with node ID of cue.m_pNODE
-			//	pId = cue.m_pNODE;
-
-			//	for(uint32 j = 0; j < static_cast<uint32>(m_PlayList.size()); ++j)
-			//	{
-			//		if(m_PlayList[j].m_pID == pId)
-			//		{
-			//			bFoundPlay = true;
-
-			//			m_PlayList[j].m_fVolume = fVolume;
-			//			m_PlayList[j].m_fPitch = fPitch;
-			//			m_PlayList[j].m_bPaused = false;
-			//			m_PlayList[j].m_pBuffer = pBuffer;
-			//			m_PlayList[j].m_uiRemainingBytes = pBuffer->GetBufferSize();
-			//		}
-			//	}
-			//}
-
-			//if(bFoundPlay == false)
-			//	m_PlayList.emplace_back(pId, fVolume, fPitch, false, pBuffer, pBuffer->GetBufferSize());
-			break; }
+				Play<HyAudio3d>(cue.m_eCUE_TYPE, static_cast<HyAudio3d *>(cue.m_pNODE));
+			break;
 
 		case CUETYPE_Stop:
 		case CUETYPE_Pause:
@@ -235,28 +187,64 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	return pNewFileGuts;
 }
 
-/*static*/ void HyAudioCore_SDL2::OnChannelFinished(int iChannel)
+template<typename NODETYPE>
+void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 {
+	// Determine buffer
+	HyRawSoundBuffer *pBuffer = nullptr;
+	uint32 uiSoundChecksum = static_cast<const HyAudioData *>(pAudioNode->AcquireData())->GetSound(pAudioNode);
+	for(auto file : m_AudioFileList)
+	{
+		pBuffer = file->GetBufferInfo(uiSoundChecksum);
+		if(pBuffer)
+			break;
+	}
+	if(pBuffer == nullptr)
+	{
+		HyLogWarning("Could not find audio: " << uiSoundChecksum);
+		return;
+	}
 
+	// Determine attributes
+	float fVolume = 1.0f;
+	float fPitch = 1.0f;
+	if(ePlayType != CUETYPE_PlayOneShotDefault)
+	{
+		fVolume = pAudioNode->volume.Get();
+		fPitch = pAudioNode->pitch.Get();
+	}
+
+	// Play in Mixer
+	if(pBuffer->IsMusic())
+	{
+	}
+	else
+	{
+		int32 iAssignedChannel = -1;
+		if(ePlayType == CUETYPE_Start && m_NodeMap.count(pAudioNode) != 0)
+			iAssignedChannel = m_NodeMap[pAudioNode];
+
+		iAssignedChannel = Mix_PlayChannel(iAssignedChannel, pBuffer->GetSfxPtr(), pAudioNode->GetLoops());
+		if(iAssignedChannel == -1)
+			return;
+
+		Mix_Volume(iAssignedChannel, MIX_MAX_VOLUME * fVolume);
+
+		if(ePlayType == CUETYPE_Start)
+		{
+			m_NodeMap[pAudioNode] = iAssignedChannel;
+			m_ChannelMap[iAssignedChannel] = pAudioNode;
+		}
+	}
 }
 
-///*static*/ void HyAudioCore_SDL2::OnCallback(void *pUserData, uint8_t *pStream, int32 iLen)
-//{
-//	HyAudioCore_SDL2 *pThis = reinterpret_cast<HyAudioCore_SDL2 *>(pUserData);
-//	SDL_memset(pStream, 0, iLen); // If there is nothing to play, this callback should fill the buffer with silence
-//
-//	for(auto iter = pThis->m_PlayList.begin(); iter != pThis->m_PlayList.end();)
-//	{
-//		uint32 uiLength = (static_cast<uint32_t>(iLen) > iter->m_uiRemainingBytes) ? iter->m_uiRemainingBytes : static_cast<uint32_t>(iLen);
-//		int iVolume = static_cast<int>(SDL_MIX_MAXVOLUME * iter->m_fVolume);
-//
-//		SDL_MixAudioFormat(pStream, iter->m_pBuffer->GetBuffer(iter->m_uiRemainingBytes), iter->m_pBuffer->GetFormat(), uiLength, HyClamp(iVolume, 0, SDL_MIX_MAXVOLUME));
-//		iter->m_uiRemainingBytes -= uiLength;
-//		if(iter->m_uiRemainingBytes == 0)
-//			iter = pThis->m_PlayList.erase(iter);
-//		else
-//			++iter;
-//	}
-//}
+/*static*/ void HyAudioCore_SDL2::OnChannelFinished(int32 iChannel)
+{
+	if(sm_pInstance->m_ChannelMap.count(iChannel) == 0)
+		return;
+
+	sm_pInstance->m_NodeMap.erase(sm_pInstance->m_ChannelMap[iChannel]);
+	sm_pInstance->m_ChannelMap.erase(iChannel);
+}
 
 #endif // defined(HY_USE_SDL2)

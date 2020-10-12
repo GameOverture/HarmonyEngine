@@ -41,6 +41,16 @@ public:
 		Unload();
 	}
 
+	bool IsMusic() const {
+		return m_bIS_MUSIC;
+	}
+	Mix_Chunk *GetSfxPtr() {
+		return m_Buffer.pSfx;
+	}
+	Mix_Music *GetMusicPtr() {
+		return m_Buffer.pMusic;
+	}
+
 	bool Load(std::string sFilePath) {
 		std::string s = sFilePath;
 		s += "/";
