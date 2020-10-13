@@ -71,7 +71,7 @@ public:
 			m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_PlayOneShotDefault);
 	}
 
-	void Start()
+	void Play()
 	{
 		m_uiCueFlags &= ~(1 << IHyAudioCore::CUETYPE_Stop);
 		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Start);
