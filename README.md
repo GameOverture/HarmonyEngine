@@ -23,6 +23,6 @@ Or by using any combination of above, create complex animation hierarchies and a
 
 Quickly setup new projects. The Editor creates and populates a new workspace containing all initially necessary assets and code projects.
 
-**Requires at least Qt Version 5.11.0 to compile the editor** 
+**Requires at least Qt Version 5.13.0 to compile the editor** 
 
 TBD
