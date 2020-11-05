@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>583</width>
-    <height>286</height>
+    <height>302</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -113,6 +113,9 @@
       </item>
       <item>
        <widget class="WgtMakeRelDir" name="wgtSrcDir" native="true"/>
+      </item>
+      <item>
+       <widget class="WgtMakeRelDir" name="wgtBuildDir" native="true"/>
       </item>
       <item>
        <widget class="Line" name="line">

@@ -17,6 +17,7 @@
 #include "DlgNewProject.h"
 #include "DlgNewItem.h"
 #include "DlgNewBuild.h"
+#include "DlgNewPackage.h"
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
 #include "DlgImportTileSheet.h"
@@ -632,6 +633,21 @@ void MainWindow::on_actionNewBuild_triggered()
 	DlgNewBuild *pDlg = new DlgNewBuild(*Harmony::GetProject(), this);
 	if(pDlg->exec() == QDialog::Accepted)
 	{
+		// TODO: FILE IO FAILS TO DELETE AND IMMEDIATELY CREATE!
+		//QDir buildDir(Harmony::GetProject()->GetBuildAbsPath());
+		//if(buildDir.exists())
+		//{
+		//	QFileInfoList tempFileInfoList = buildDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
+		//	if(tempFileInfoList.isEmpty() == false &&
+		//	   QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Clean existing build", "Do you want to generate a new IDE and override existing build?", QMessageBox::Yes, QMessageBox::No))
+		//	{
+		//		buildDir.removeRecursively();
+		//	}
+		//}
+		//if(false == buildDir.mkpath("."))
+		//	HyGuiLog("Could not create build directory", LOGTYPE_Error);
+
+
 		QProcess *pBuildProcess = new QProcess(this);
 		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
 		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
@@ -662,89 +678,29 @@ void MainWindow::on_actionNewBuild_triggered()
 //		return;
 //	}
 //
-//#if defined(Q_OS_WIN)
-//	bool bUseVs2017 = false;
-//	bool bUseVs2015 = false;
-//	bool bUseVs2013 = false;
-//
-//	QSettings windowsRegEntryVS2017("HKEY_CLASSES_ROOT\\VisualStudio.DTE.15.0", QSettings::NativeFormat);
-//	if(windowsRegEntryVS2017.childKeys().empty() == false)
-//		bUseVs2017 = true;
-//
-//	QSettings windowsRegEntryVS2015("HKEY_CLASSES_ROOT\\VisualStudio.DTE.14.0", QSettings::NativeFormat);
-//	if(windowsRegEntryVS2015.childKeys().empty() == false)
-//		bUseVs2015 = true;
-//
-//	QSettings windowsRegEntryVS2013("HKEY_CLASSES_ROOT\\VisualStudio.DTE.12.0", QSettings::NativeFormat);
-//	if(windowsRegEntryVS2013.childKeys().empty() == false)
-//		bUseVs2013 = true;
-//
-//	// Use the newest version
-//	if(bUseVs2017)
-//		bUseVs2013 = bUseVs2015 = false;
-//	else if(bUseVs2015)
-//		bUseVs2013 = false;
-//	else if(bUseVs2013 == false) {
-//		HyGuiLog("No appropriate IDE was detected on this machine.", LOGTYPE_Error);
-//	}
-//
-//	for(int i = 0; i < ideFileInfoList.size(); ++i)
-//	{
-//		QFile file(ideFileInfoList[i].absoluteFilePath());
-//		if(file.open(QFile::ReadOnly))
-//		{
-//			QTextStream in(&file);
-//			QString line;
-//			do
-//			{
-//				line = in.readLine();
-//
-//				if(line.contains("# Visual Studio 15", Qt::CaseSensitive))
-//				{
-//					if(bUseVs2017)
-//					{
-//						file.close();
-//						if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
-//							HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
-//						return;
-//					}
-//					else
-//						break;
-//				}
-//
-//				if(line.contains("# Visual Studio 14", Qt::CaseSensitive))
-//				{
-//					if(bUseVs2015)
-//					{
-//						file.close();
-//						if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
-//							HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
-//						return;
-//					}
-//					else
-//						break;
-//				}
-//
-//				if(line.contains("# Visual Studio 2013", Qt::CaseSensitive))
-//				{
-//					if(bUseVs2013)
-//					{
-//						file.close();
-//						if(false == QDesktopServices::openUrl(QUrl(ideFileInfoList[i].absoluteFilePath())))
-//							HyGuiLog("Could not open IDE at:\n" % ideFileInfoList[i].absoluteFilePath(), LOGTYPE_Error);
-//						return;
-//					}
-//					else
-//						break;
-//				}
-//			} while (!line.isNull());
-//
-//			file.close();
-//		}
-//	}
-//#endif
-//
 //	QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
+}
+
+void MainWindow::on_actionNewPackage_triggered()
+{
+	if(Harmony::GetProject() == nullptr)
+	{
+		HyGuiLog("on_actionNewPackage_triggered invoked with no loaded project", LOGTYPE_Error);
+		return;
+	}
+
+	DlgNewPackage *pDlg = new DlgNewPackage(*Harmony::GetProject(), this);
+	if(pDlg->exec() == QDialog::Accepted)
+	{
+		QProcess *pBuildProcess = new QProcess(this);
+		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
+		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
+
+		QString sProc = pDlg->GetProc();
+		QStringList sArgList = pDlg->GetProcOptions();
+		pBuildProcess->start(sProc, sArgList);
+	}
+	delete pDlg;
 }
 
 void MainWindow::on_actionConnect_triggered()

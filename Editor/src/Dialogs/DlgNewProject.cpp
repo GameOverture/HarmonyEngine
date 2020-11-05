@@ -53,6 +53,7 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 	connect(ui->wgtDataDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	connect(ui->wgtMetaDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	connect(ui->wgtSrcDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
+	connect(ui->wgtBuildDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	ErrorCheck();
 }
 
@@ -128,6 +129,10 @@ void DlgNewProject::on_buttonBox_accepted()
 	buildDir.cd(ui->wgtMetaDir->GetRelPath());
 	buildDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
 
+	// BUILD
+	buildDir.setPath(GetProjDirPath());
+	buildDir.mkdir(ui->wgtBuildDir->GetRelPath());
+
 	// SOURCE
 	buildDir.setPath(GetProjDirPath());
 	buildDir.mkdir(ui->wgtSrcDir->GetRelPath());
@@ -144,6 +149,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	jsonObj.insert("DataPath", QString(ui->wgtDataDir->GetRelPath() + "/"));
 	jsonObj.insert("MetaDataPath", QString(ui->wgtMetaDir->GetRelPath() + "/"));
 	jsonObj.insert("SourcePath", QString(ui->wgtSrcDir->GetRelPath() + "/"));
+	jsonObj.insert("BuildPath", QString(ui->wgtBuildDir->GetRelPath() + "/"));
 
 	QJsonArray windowInfoArray;
 	QJsonObject windowInfoObj;

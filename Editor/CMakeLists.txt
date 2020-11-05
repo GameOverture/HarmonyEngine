@@ -64,6 +64,9 @@ if(Qt5_DIR)
 		src/Dialogs/DlgNewItem.cpp
 		src/Dialogs/DlgNewItem.h
 		src/Dialogs/DlgNewItem.ui
+		src/Dialogs/DlgNewPackage.cpp
+		src/Dialogs/DlgNewPackage.h
+		src/Dialogs/DlgNewPackage.ui
 		src/Dialogs/DlgNewProject.cpp
 		src/Dialogs/DlgNewProject.h
 		src/Dialogs/DlgNewProject.ui

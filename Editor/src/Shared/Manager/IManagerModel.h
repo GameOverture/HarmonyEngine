@@ -99,7 +99,6 @@ public:
 	virtual bool canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const override;
 	virtual bool dropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) override;
 
-	virtual void OnNewBankDefaults(QJsonObject &bankObjRef) = 0;
 	virtual QString OnBankInfo(uint uiBankIndex) = 0;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;
 	virtual QStringList GetSupportedFileExtList() = 0;

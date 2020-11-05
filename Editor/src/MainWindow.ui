@@ -121,6 +121,7 @@
     </property>
     <addaction name="actionNewBuild"/>
     <addaction name="separator"/>
+    <addaction name="actionNewPackage"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -648,6 +649,21 @@
    </property>
    <property name="toolTip">
     <string>Automatically slice an assembled grid of sprites from a single image</string>
+   </property>
+  </action>
+  <action name="actionNewPackage">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/package-x-generic.png</normaloff>:/icons16x16/package-x-generic.png</iconset>
+   </property>
+   <property name="text">
+    <string>Package Project</string>
+   </property>
+   <property name="toolTip">
+    <string>Package the currently active project into a runnable executable</string>
    </property>
   </action>
  </widget>

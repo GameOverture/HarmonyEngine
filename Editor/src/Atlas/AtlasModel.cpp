@@ -175,18 +175,6 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	StartRepackThread("Repacking Atlases", pWorkerThread);
 }
 
-/*virtual*/ void AtlasModel::OnNewBankDefaults(QJsonObject &bankObjRef) /*override*/
-{
-	bankObjRef.insert("cmbSortOrder", 0);
-	bankObjRef.insert("sbFrameMarginTop", 0);
-	bankObjRef.insert("sbFrameMarginLeft", 0);
-	bankObjRef.insert("sbFrameMarginRight", 1);
-	bankObjRef.insert("sbFrameMarginBottom", 1);
-	bankObjRef.insert("maxWidth", 2048);
-	bankObjRef.insert("maxHeight", 2048);
-	bankObjRef.insert("cmbHeuristic", 1);
-}
-
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	QString sInfo = "Num Textures: " % QString::number(GetNumTextures(uiBankIndex)) % " | " %

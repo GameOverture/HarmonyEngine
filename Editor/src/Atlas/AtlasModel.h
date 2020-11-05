@@ -37,7 +37,6 @@ public:
 	void RepackAll(uint uiBankIndex);
 	void Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
 	
-	virtual void OnNewBankDefaults(QJsonObject &bankObjRef) override;
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() override;

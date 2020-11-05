@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(%HY_CLASS%)
 
+set(CODE_NAME "%HY_CLASS%")
 set(REL_SRC_DIR "%HY_RELSRCDIR%")
 set(REL_DATA_DIR "%HY_RELDATADIR%")
 set(REL_HARMONY_DIR "%HY_RELHARMONYDIR%")
@@ -29,7 +30,7 @@ option(HYBUILD_SDL_NET "Use SDL2_NET" ON)
 
 add_subdirectory("${REL_HARMONY_DIR}/Engine" "HyEngine")
 %HY_DEPENDENCIES_ADD%
-add_executable(${PROJECT_NAME} WIN32 ${GAME_SRCFILES} "${PROJECT_NAME}.hyproj")
+add_executable(${PROJECT_NAME} WIN32 ${GAME_SRCFILES} "${CODE_NAME}.hyproj")
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 14
 	CXX_STANDARD_REQUIRED YES
@@ -54,7 +55,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	
 	list(APPEND EM_LINK_FLAGS "--no-heap-copy")
 	list(APPEND EM_LINK_FLAGS "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/${REL_DATA_DIR}@./data")
-	list(APPEND EM_LINK_FLAGS "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.hyproj@${PROJECT_NAME}.hyproj")
+	list(APPEND EM_LINK_FLAGS "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/${CODE_NAME}.hyproj@${CODE_NAME}.hyproj")
 	
 	if(HYBUILD_DebugEmscripten)
 		message(STATUS "Building for DEBUG")

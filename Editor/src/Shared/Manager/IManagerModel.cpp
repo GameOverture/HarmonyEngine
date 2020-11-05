@@ -503,7 +503,18 @@ void IManagerModel::CreateNewBank(QString sName)
 	QJsonObject bankObj;
 	bankObj.insert("bankId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
 	bankObj.insert("bankName", sName);
-	OnNewBankDefaults(bankObj);
+
+	if(m_eASSET_TYPE == ASSET_Atlas)
+	{
+		bankObj.insert("cmbSortOrder", 0);
+		bankObj.insert("sbFrameMarginTop", 0);
+		bankObj.insert("sbFrameMarginLeft", 0);
+		bankObj.insert("sbFrameMarginRight", 1);
+		bankObj.insert("sbFrameMarginBottom", 1);
+		bankObj.insert("maxWidth", 2048);
+		bankObj.insert("maxHeight", 2048);
+		bankObj.insert("cmbHeuristic", 1);
+	}
 
 	BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_uiNextBankId)), bankObj);
 	

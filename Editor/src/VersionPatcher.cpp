@@ -10,13 +10,14 @@
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup each file's directory
+
+	// ITEMS
 	QDir metaDir(pProj->GetMetaDataAbsPath());
 	if(metaDir.exists() == false)
 	{
 		HyGuiLog("Meta directory is missing, recreating", LOGTYPE_Info);
 		metaDir.mkpath(metaDir.absolutePath());
 	}
-	
 	QDir dataDir(pProj->GetAssetsAbsPath());
 	if(dataDir.exists() == false)
 	{
@@ -24,18 +25,32 @@
 		dataDir.mkpath(dataDir.absolutePath());
 	}
 	
-	QDir metaAtlasDir(pProj->GetMetaDataAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true));
+	// ATLAS
+	QDir metaAtlasDir(pProj->GetMetaDataAbsPath() + HyGlobal::AssetName(ASSET_Atlas));
 	if(metaAtlasDir.exists() == false)
 	{
 		HyGuiLog("Meta atlas directory is missing, recreating", LOGTYPE_Info);
 		metaAtlasDir.mkpath(metaAtlasDir.absolutePath());
 	}
-	
-	QDir dataAtlasDir(pProj->GetAssetsAbsPath() + HyGlobal::ItemName(ITEM_AtlasImage, true));
+	QDir dataAtlasDir(pProj->GetAssetsAbsPath() + HyGlobal::AssetName(ASSET_Atlas));
 	if(dataAtlasDir.exists() == false)
 	{
 		HyGuiLog("Data atlas directory is missing, recreating", LOGTYPE_Info);
 		dataAtlasDir.mkpath(dataAtlasDir.absolutePath());
+	}
+
+	// AUDIO
+	QDir metaAudioDir(pProj->GetMetaDataAbsPath() + HyGlobal::AssetName(ASSET_Audio));
+	if(metaAudioDir.exists() == false)
+	{
+		HyGuiLog("Meta audio directory is missing, recreating", LOGTYPE_Info);
+		metaAudioDir.mkpath(metaAudioDir.absolutePath());
+	}
+	QDir dataAudioDir(pProj->GetAssetsAbsPath() + HyGlobal::AssetName(ASSET_Audio));
+	if(dataAudioDir.exists() == false)
+	{
+		HyGuiLog("Data audio directory is missing, recreating", LOGTYPE_Info);
+		dataAudioDir.mkpath(dataAudioDir.absolutePath());
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,18 +73,24 @@
 	// Assemble file names
 	QString sMetaItemsPath = metaDir.absoluteFilePath(QString(HYGUIPATH_ItemsFileName) % HYGUIPATH_MetaExt);
 	QString sDataItemsPath = dataDir.absoluteFilePath(QString(HYGUIPATH_ItemsFileName) % HYGUIPATH_DataExt);
-	QString sMetaAtlasesPath = metaAtlasDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasImage, true) % HYGUIPATH_MetaExt);
-	QString sDataAtlasesPath = dataAtlasDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasImage, true) % HYGUIPATH_DataExt);
+	QString sMetaAtlasesPath = metaAtlasDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Atlas) % HYGUIPATH_MetaExt);
+	QString sDataAtlasesPath = dataAtlasDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Atlas) % HYGUIPATH_DataExt);
+	QString sMetaAudioPath = metaAudioDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Audio) % HYGUIPATH_MetaExt);
+	QString sDataAudioPath = dataAudioDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Audio) % HYGUIPATH_DataExt);
 
 	// Get files' versions and acquire each QJsonDocument to be sent into the patching functions
-	int uiMetaItemsVersion = -1;
-	int uiDataItemsVersion = -1;
-	int uiMetaAtlasVersion = -1;
-	int uiDataAtlasVersion = -1;
 	QJsonDocument metaItemsDoc;
 	QJsonDocument dataItemsDoc;
 	QJsonDocument metaAtlasDoc;
 	QJsonDocument dataAtlasDoc;
+	QJsonDocument metaAudioDoc;
+	QJsonDocument dataAudioDoc;
+	int uiMetaItemsVersion = -1;
+	int uiDataItemsVersion = -1;
+	int uiMetaAtlasVersion = -1;
+	int uiDataAtlasVersion = -1;
+	int uiMetaAudioVersion = GetFileVersion(sMetaAudioPath, metaAudioDoc, true);
+	int uiDataAudioVersion = GetFileVersion(sDataAudioPath, dataAudioDoc, false);
 	if(iFileVersion <= 2) // Versions <= 2 used old filenames
 	{
 		uiMetaItemsVersion = GetFileVersion(metaDir.absoluteFilePath("data.hygui"), metaItemsDoc, true);
@@ -86,21 +107,16 @@
 	}
 	
 	// -1 means file is missing (or didn't open)
-	if(uiMetaItemsVersion == -1 || uiDataItemsVersion == -1 || uiMetaAtlasVersion == -1 || uiDataAtlasVersion == -1)
-	{
-		HyGuiLog("Missing files between assets and meta. Skipping Version Patcher", LOGTYPE_Info);
-		return false;
-	}
-
-	if(iFileVersion != uiMetaItemsVersion ||
-	   iFileVersion != uiDataItemsVersion ||
-	   iFileVersion != uiMetaAtlasVersion ||
-	   iFileVersion != uiDataAtlasVersion)
+	if((iFileVersion != uiMetaItemsVersion && uiMetaItemsVersion != -1) ||
+	   (iFileVersion != uiDataItemsVersion && uiDataItemsVersion != -1) ||
+	   (iFileVersion != uiMetaAtlasVersion && uiMetaAtlasVersion != -1) ||
+	   (iFileVersion != uiDataAtlasVersion && uiDataAtlasVersion != -1) ||
+	   (iFileVersion != uiMetaAudioVersion && uiMetaAudioVersion != -1) ||
+	   (iFileVersion != uiDataAudioVersion && uiDataAudioVersion != -1))
 	{
 		HyGuiLog("Mismatching versions found between files (assets and meta)", LOGTYPE_Error);
 		return false;
 	}
-
 	if(iFileVersion > HYGUI_FILE_VERSION)
 	{
 		HyGuiLog("File versions (" % QString(iFileVersion) % ") are from a future editor and may not be compatible.\nCurrent Editor file version: " % QString::number(HYGUI_FILE_VERSION), LOGTYPE_Error);
@@ -129,8 +145,11 @@
 			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 4 -> 5", LOGTYPE_Info);
 			Patch_4to5(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 5:
+			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 5 -> 6", LOGTYPE_Info);
+			Patch_5to6(projDoc);
+		case 6:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 5, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 6, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -141,11 +160,10 @@
 		RewriteFile(sDataItemsPath, dataItemsDoc, false);
 		RewriteFile(sMetaAtlasesPath, metaAtlasDoc, true);
 		RewriteFile(sDataAtlasesPath, dataAtlasDoc, false);
+		RewriteFile(sMetaAudioPath, metaAudioDoc, true);
+		RewriteFile(sDataAudioPath, dataAudioDoc, false);
 
 		// Finalize hyproj
-		QJsonObject projObj = projDoc.object();
-		projObj["$fileVersion"] = HYGUI_FILE_VERSION;
-		projDoc.setObject(projObj);
 		RewriteFile(pProj->GetAbsPath(), projDoc, false);
 
 		return true;
@@ -724,8 +742,19 @@
 	metaAtlasDocRef.setObject(metaAtlasObj);
 }
 
+/*static*/ void VersionPatcher::Patch_5to6(QJsonDocument &projDocRef)
+{
+	QJsonObject projObj = projDocRef.object();
+	projObj.insert("BuildPath", "build/");
+	projDocRef.setObject(projObj);
+}
+
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)
 {
+	QJsonObject obj = fileDocRef.object();
+	obj.insert("$fileVersion", HYGUI_FILE_VERSION);
+	fileDocRef.setObject(obj);
+
 	QFile dataFile(sFilePath);
 	if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 		HyGuiLog(QString("Couldn't open ") % HYASSETS_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);

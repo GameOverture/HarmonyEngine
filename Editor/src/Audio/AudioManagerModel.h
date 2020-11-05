@@ -28,7 +28,6 @@ public:
 
 	bool IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut);
 	
-	virtual void OnNewBankDefaults(QJsonObject &bankObjRef) override;
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() override;
