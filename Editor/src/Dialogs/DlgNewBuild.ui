@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>453</width>
-    <height>274</height>
+    <height>258</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,9 +65,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="WgtMakeRelDir" name="wgtBuildDir" native="true"/>
    </item>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
@@ -224,14 +221,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>WgtMakeRelDir</class>
-   <extends>QWidget</extends>
-   <header>WgtMakeRelDir.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../../data/HyEditor.qrc"/>
  </resources>

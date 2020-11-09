@@ -39,6 +39,8 @@ public:
 
 private Q_SLOTS:
 
+	void on_txtBuildName_textChanged(const QString &arg1);
+
 	void on_buttonBox_accepted();
 
 	void on_radDesktop_clicked();
@@ -56,6 +58,8 @@ private Q_SLOTS:
 
 private:
 	Ui::DlgNewBuild *ui;
+
+	QString GetAbsBuildDir() const;
 
 	void ErrorCheck();
 };

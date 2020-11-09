@@ -100,7 +100,7 @@ public:
 protected:
 	virtual void OnDataAcquired() override
 	{
-		const HyAudioData *pData = static_cast<const HyAudioData *>(UncheckedGetData());
+		const HyAudioData *pData = static_cast<const HyAudioData *>(this->UncheckedGetData());
 
 		m_ePlayListMode = pData->GetPlayListMode();
 		m_iPriority = pData->GetPriority();

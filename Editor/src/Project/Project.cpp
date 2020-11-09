@@ -972,11 +972,6 @@ void Project::ApplySaveEnables()
 	MainWindow::ApplySaveEnables(bCurItemDirty, bAnyItemDirty);
 }
 
-void Project::AddNewBuild()
-{
-
-}
-
 void Project::RunCMakeGui()
 {
 #if defined(Q_OS_WIN)

@@ -25,7 +25,8 @@ DlgNewBuild::DlgNewBuild(Project &projectRef, QWidget *parent) :
 	ui(new Ui::DlgNewBuild)
 {
 	ui->setupUi(this);
-	ui->wgtBuildDir->Setup("Build", "desktop", m_ProjectRef.GetDirPath(), "builds");
+
+	ui->txtBuildName->setValidator(HyGlobal::CodeNameValidator());
 	
 	// Acquire a list of valid CMake generators using the --help output
 	QString sCMakeApp = "cmake";
@@ -80,8 +81,6 @@ DlgNewBuild::DlgNewBuild(Project &projectRef, QWidget *parent) :
 	}
 
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
-	connect(ui->wgtBuildDir, &WgtMakeRelDir::OnDirty, this, &DlgNewBuild::ErrorCheck);
-
 	ui->stackedWidget->setCurrentIndex(PLAT_Desktop);
 
 	ErrorCheck();
@@ -118,11 +117,11 @@ QStringList DlgNewBuild::GetProcOptions() const
 								<< "-S"
 								<< m_ProjectRef.GetDirPath()
 								<< "-B"
-								<< ui->wgtBuildDir->GetAbsPath();
+								<< GetAbsBuildDir();
 	}
 	else if(ui->radBrowser->isChecked())
 	{
-		QDir buildDir(ui->wgtBuildDir->GetAbsPath());
+		QDir buildDir(GetAbsBuildDir());
 		QString sFormattedPath = buildDir.absolutePath();
 #ifdef Q_OS_WIN
 		sFormattedPath.replace("/", "\\");	// batch file requires Windows native directory separators
@@ -141,6 +140,11 @@ QStringList DlgNewBuild::GetProcOptions() const
 	return QStringList();
 }
 
+void DlgNewBuild::on_txtBuildName_textChanged(const QString &arg1)
+{
+	ErrorCheck();
+}
+
 void DlgNewBuild::on_buttonBox_accepted()
 {
 	
@@ -149,14 +153,14 @@ void DlgNewBuild::on_buttonBox_accepted()
 void DlgNewBuild::on_radDesktop_clicked()
 {
 	ui->stackedWidget->setCurrentIndex(PLAT_Desktop);
-	ui->wgtBuildDir->Setup("Build", "desktop", m_ProjectRef.GetDirPath(), "builds");
+	ui->txtBuildName->setText("Desktop");
 	ErrorCheck();
 }
 
 void DlgNewBuild::on_radBrowser_clicked()
 {
 	ui->stackedWidget->setCurrentIndex(PLAT_Browser);
-	ui->wgtBuildDir->Setup("Build", "browser", m_ProjectRef.GetDirPath(), "builds");
+	ui->txtBuildName->setText("Browser");
 	ErrorCheck();
 }
 
@@ -216,6 +220,11 @@ void DlgNewBuild::on_btnEmscriptenSdkBrowse_clicked()
 	ErrorCheck();
 }
 
+QString DlgNewBuild::GetAbsBuildDir() const
+{
+	return m_ProjectRef.GetBuildAbsPath() % ui->txtBuildName->text();
+}
+
 void DlgNewBuild::ErrorCheck()
 {
 	bool bIsError = false;
@@ -228,10 +237,10 @@ void DlgNewBuild::ErrorCheck()
 			break;
 		}
 
-		QString sError = ui->wgtBuildDir->GetError();
-		if(sError.isEmpty() == false)
+		QDir buildDir(GetAbsBuildDir());
+		if(buildDir.exists())
 		{
-			ui->lblError->setText(sError);
+			ui->lblError->setText("Build directory already exists");
 			bIsError = true;
 			break;
 		}

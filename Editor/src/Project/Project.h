@@ -143,7 +143,6 @@ public:
 
 	void ApplySaveEnables();
 
-	void AddNewBuild();
 	void RunCMakeGui();
 
 	// IHyEngine

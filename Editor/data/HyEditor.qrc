@@ -194,5 +194,6 @@
         <file>icons16x16/Build-Desktop.png</file>
         <file>icons16x16/Build-Browser.png</file>
         <file>icons16x16/package-x-generic.png</file>
+        <file>icons16x16/items/Build-Open.png</file>
     </qresource>
 </RCC>

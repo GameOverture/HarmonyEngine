@@ -104,6 +104,7 @@ private Q_SLOTS:
 	void on_menu_View_aboutToShow();
 	
 	void on_actionNewBuild_triggered();
+	void on_actionOpenIde_triggered(QAction *pAction);
 	void on_actionNewPackage_triggered();
 
 	void on_actionConnect_triggered();
@@ -125,7 +126,7 @@ private:
 	Ui::MainWindow *ui;
 
 	void NewItem(HyGuiItemType eItem);
-
+	void RefreshBuildMenu();
 	void SaveSettings();
 	void SelectTheme(Theme eTheme);
 };

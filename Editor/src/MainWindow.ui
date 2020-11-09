@@ -666,6 +666,18 @@
     <string>Package the currently active project into a runnable executable</string>
    </property>
   </action>
+  <action name="actionOpenIde">
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/code.png</normaloff>:/icons16x16/code.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open IDE</string>
+   </property>
+   <property name="toolTip">
+    <string>Open code integrated development environment generated from build</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

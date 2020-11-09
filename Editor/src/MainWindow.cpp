@@ -265,6 +265,8 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	ui->tabWidgetAssetManager->addTab(pProject->GetAtlasWidget(), HyGlobal::ItemIcon(ITEM_AtlasImage, SUBICON_None), "Atlases");
 	ui->tabWidgetAssetManager->addTab(pProject->GetGltfWidget(), HyGlobal::ItemIcon(ITEM_Prefab, SUBICON_None), "Models");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAudioWidget(), HyGlobal::ItemIcon(ITEM_Audio, SUBICON_None), "Audio");
+
+	RefreshBuildMenu();
 }
 
 /*static*/ void MainWindow::SetLoading(QString sMsg, int iPercentComplete)
@@ -656,7 +658,7 @@ void MainWindow::on_actionNewBuild_triggered()
 		QStringList sArgList = pDlg->GetProcOptions();
 		pBuildProcess->start(sProc, sArgList);
 
-		Harmony::GetProject()->AddNewBuild();
+		RefreshBuildMenu();
 	}
 	delete pDlg;
 
@@ -679,6 +681,12 @@ void MainWindow::on_actionNewBuild_triggered()
 //	}
 //
 //	QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
+}
+
+void MainWindow::on_actionOpenIde_triggered(QAction *pAction)
+{
+	QString sIdeFilePath = pAction->data().toString();
+	QDesktopServices::openUrl(QUrl(sIdeFilePath));
 }
 
 void MainWindow::on_actionNewPackage_triggered()
@@ -797,6 +805,49 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 	}
 
 	delete pDlg;
+}
+
+void MainWindow::RefreshBuildMenu()
+{
+	// Clean out existing actionOpenIde's
+	ui->menu_Build->clear();
+	ui->menu_Build->addAction(ui->actionNewBuild);
+
+	if(Harmony::GetProject() == nullptr)
+		return;
+
+	QMenu *pBuildsMenu = nullptr;
+	Project *pProject = Harmony::GetProject();
+	QString sAbsBuildDir = pProject->GetBuildAbsPath();
+	QDir buildDir(sAbsBuildDir);
+	QStringList buildDirList = buildDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+	for(auto sDirName : buildDirList)
+	{
+		QDir dir(buildDir.absolutePath() % "/" % sDirName);
+		QFileInfoList buildFileInfoList = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+		
+		for(auto fileInfo : buildFileInfoList)
+		{
+			// Look for .sln (Visual Studio)
+			if(fileInfo.completeSuffix().compare("sln", Qt::CaseInsensitive) == 0)
+			{
+				if(pBuildsMenu == nullptr)
+					pBuildsMenu = ui->menu_Build->addMenu(QIcon(":/icons16x16/items/Build-Open.png"), "Builds");
+
+				QAction *pActionOpenIde = new QAction(pBuildsMenu);
+				pActionOpenIde->setText(sDirName);
+				pActionOpenIde->setIcon(QIcon(":/icons16x16/code.png"));
+				pActionOpenIde->setData(fileInfo.absoluteFilePath());
+
+				connect(pBuildsMenu, SIGNAL(triggered(QAction *)), this, SLOT(MainWindow::on_actionOpenIde_triggered(QAction)));
+				pBuildsMenu->addAction(pActionOpenIde);
+			}
+			// TODO: scan for other popular IDE's
+		}
+	}
+
+	ui->menu_Build->addSeparator();
+	ui->menu_Build->addAction(ui->actionNewPackage);
 }
 
 void MainWindow::SaveSettings()

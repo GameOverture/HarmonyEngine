@@ -1,6 +1,8 @@
 add_subdirectory(external/box2d)
 add_subdirectory(external/soil2)
 
+set(HYBUILD_SDL_NET OFF)
+
 # Emscripten provides its own ports of SDL and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	add_subdirectory(external/glad)
@@ -8,6 +10,10 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	# Qt provides its own implementation of SDL facitlities
 	if(NOT HYBUILD_Qt)
 		# Below is typical desktop deployment
+
+		# TODO: have 'HYBUILD_SDL_NET' be configurable for desktop builds
+		set(HYBUILD_SDL_NET ON)
+
 		add_subdirectory(external/SDL2)
 		include_directories(external/SDL2/include)
 		set_target_properties(SDL2main PROPERTIES FOLDER "Engine Libs")
@@ -19,9 +25,8 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 		endif()
 		
 		add_subdirectory(external/SDL2_mixer)
-		
+
 		# Optional SDL2 extensions
-		set(HYBUILD_SDL_NET ON)
 		if(HYBUILD_SDL_NET)
 			add_subdirectory(external/SDL2_net)
 		endif()
@@ -255,6 +260,12 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_net")
 			target_link_libraries(HyEngine PUBLIC SDL2_net)
 		endif()
+	endif()
+else() # Emscripten
+	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_mixer")
+	
+	if(HYBUILD_SDL_NET)
+		target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_net")
 	endif()
 endif()
 
