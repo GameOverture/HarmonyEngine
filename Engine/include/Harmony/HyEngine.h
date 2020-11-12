@@ -64,7 +64,7 @@ class HyEngine
 #endif
 
 public:
-	HyEngine(HarmonyInit &initStruct);
+	HyEngine(const HarmonyInit &initStruct);
 	~HyEngine();
 
 	HyRendererInterop &GetRenderer();

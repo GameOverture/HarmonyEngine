@@ -22,9 +22,9 @@ extern HyWindow &Hy_Window(uint32 uiWindowIndex);
 
 HyEngine *HyEngine::sm_pInstance = nullptr;
 
-HyEngine::HyEngine(HarmonyInit &initStruct) :
+HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	m_Init(initStruct),
-	m_Console(initStruct.bUseConsole, initStruct.consoleInfo),
+	m_Console(m_Init.bUseConsole, m_Init.consoleInfo),
 	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Audio(m_Init.sDataDir),
 	m_Scene(m_Audio, m_WindowManager.GetWindowList()),

@@ -17,7 +17,7 @@
 #include <iostream>
 #include <fstream>
 
-HyConsole_Win::HyConsole_Win(bool bCreateConsole, HyWindowInfo &consoleInfo)
+HyConsole_Win::HyConsole_Win(bool bCreateConsole, const HyWindowInfo &consoleInfo)
 {
 	if(bCreateConsole == false)
 		return;
