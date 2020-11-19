@@ -50,9 +50,9 @@ public:
 	void CleanupSocket();
 
 protected:
-	virtual void OnThreadInit() override;
-	virtual void OnThreadUpdate() override;
-	virtual void OnThreadShutdown() override;
+	virtual void OnThreadInit() override final;
+	virtual void OnThreadUpdate() override final;
+	virtual void OnThreadShutdown() override final;
 
 	virtual void OnNetConnect() = 0;
 	virtual void OnNetUpdate() = 0;

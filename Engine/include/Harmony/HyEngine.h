@@ -11,14 +11,14 @@
 #define HyEngine_h__
 
 #include "Afx/HyInteropAfx.h"
-#include "Window/HyWindowManager.h"
-#include "Networking/HyNetworking.h"
+#include "Assets/HyAssets.h"
+#include "Audio/HyAudioHarness.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
-#include "Audio/HyAudioHarness.h"
 #include "Input/HyInput.h"
-#include "Time/HyTime.h"
 #include "Renderer/Effects/HyStencil.h"
+#include "Networking/HyNetworking.h"
+#include "Networking/IHyNetworkClass.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HySprite2d.h"
@@ -29,8 +29,9 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntityLeaf2d.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
-#include "Assets/HyAssets.h"
 #include "Threading/IHyThreadClass.h"
+#include "Threading/IHyThreadClass.h"
+#include "Time/HyTime.h"
 #include "UI/IHy9Slice.h"
 #include "UI/HyInfoPanel.h"
 #include "UI/HyButton.h"
@@ -39,6 +40,7 @@
 #include "Utilities/HyImage.h"
 #include "Utilities/HyIO.h"
 #include "Utilities/HyRand.h"
+#include "Window/HyWindowManager.h"
 
 class HyEngine
 {
