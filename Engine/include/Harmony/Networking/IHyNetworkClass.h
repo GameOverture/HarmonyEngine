@@ -32,7 +32,7 @@ class IHyNetworkClass : public IHyThreadClass
 
 	std::string					m_sHost;
 	uint16						m_uiPort;
-	TCPsocket					m_hSock;
+	HyTcpSocket					m_hSock;
 	uint32						m_uiAttemptCount;
 
 	uint8 *						m_pRecvBuff;

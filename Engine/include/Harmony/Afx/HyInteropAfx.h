@@ -24,9 +24,9 @@ typedef HyOpenGL HyRendererInterop;
 
 #ifdef HY_USE_SDL2_NET
 	struct _TCPsocket;
-	typedef struct _TCPsocket *TCPsocket;
+	typedef struct _TCPsocket *HyTcpSocket;
 #else
-	typedef int TCPsocket;
+	typedef int HyTcpSocket;
 #endif
 
 #if defined(HY_PLATFORM_GUI)

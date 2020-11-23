@@ -50,12 +50,12 @@ HyNetworking::~HyNetworking()
 	IHyNetworkClass::sm_pNetworking = nullptr;
 }
 
-bool HyNetworking::CreateClient(std::string sHost, uint16 uiPort, TCPsocket &socketOut)
+bool HyNetworking::CreateClient(std::string sHost, uint16 uiPort, HyTcpSocket &socketOut)
 {
 #ifdef HY_USE_SDL2_NET
 	socketOut = nullptr;
 
-	// connect to localhost at port 9999 using TCP (client)
+	// connect using TCP (client)
 	IPaddress ip;
 	if(SDLNet_ResolveHost(&ip, sHost.c_str(), uiPort) == -1) {
 		HyLogError("SDLNet_ResolveHost: " << SDLNet_GetError());
@@ -117,7 +117,7 @@ bool HyNetworking::CreateClient(std::string sHost, uint16 uiPort, TCPsocket &soc
 #endif
 }
 
-int32 HyNetworking::TcpRecv(TCPsocket hSocket, void *pData, int iMaxLength)
+int32 HyNetworking::TcpRecv(HyTcpSocket hSocket, void *pData, int iMaxLength)
 {
 #ifdef HY_USE_SDL2_NET
 	return SDLNet_TCP_Recv(hSocket, pData, iMaxLength);
@@ -150,7 +150,7 @@ int32 HyNetworking::TcpRecv(TCPsocket hSocket, void *pData, int iMaxLength)
 #endif
 }
 
-int32 HyNetworking::TcpSend(TCPsocket hSocket, const void *pData, uint32 uiNumBytes)
+int32 HyNetworking::TcpSend(HyTcpSocket hSocket, const void *pData, uint32 uiNumBytes)
 {
 #ifdef HY_USE_SDL2_NET
 	return SDLNet_TCP_Send(hSocket, pData, static_cast<int>(uiNumBytes));
@@ -168,7 +168,7 @@ int32 HyNetworking::TcpSend(TCPsocket hSocket, const void *pData, uint32 uiNumBy
 #endif
 }
 
-void HyNetworking::CloseConnection(TCPsocket hSocket)
+void HyNetworking::CloseConnection(HyTcpSocket hSocket)
 {
 #ifdef HY_USE_SDL2_NET
 	SDLNet_TCP_Close(hSocket);

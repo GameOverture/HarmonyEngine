@@ -18,13 +18,13 @@ public:
 	HyNetworking();
 	~HyNetworking();
 
-	bool CreateClient(std::string sHost, uint16 uiPort, TCPsocket &socketOut);
+	bool CreateClient(std::string sHost, uint16 uiPort, HyTcpSocket &socketOut);
 
 	// Returns the number of bytes received. If the number returned is less than or equal to zero, then an error occured, or the remote host has closed the connection.
-	int32 TcpRecv(TCPsocket hSocket, void *pData, int iMaxLength);
-	int32 TcpSend(TCPsocket hSocket, const void *pData, uint32 uiNumBytes);
+	int32 TcpRecv(HyTcpSocket hSocket, void *pData, int iMaxLength);
+	int32 TcpSend(HyTcpSocket hSocket, const void *pData, uint32 uiNumBytes);
 
-	void CloseConnection(TCPsocket hSocket);
+	void CloseConnection(HyTcpSocket hSocket);
 };
 
 #endif /* HyNetworking_h__ */
