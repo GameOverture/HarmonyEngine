@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Diagnostics/Console/Interop/HyConsole_Std.h"
 
-HyConsole_Std::HyConsole_Std(bool bCreateConsole, HyWindowInfo &consoleInfo)
+HyConsole_Std::HyConsole_Std(bool bCreateConsole, const HyWindowInfo &consoleInfo)
 {
 }
 

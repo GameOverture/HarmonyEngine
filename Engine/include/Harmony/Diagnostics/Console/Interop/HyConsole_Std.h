@@ -15,7 +15,7 @@
 class HyConsole_Std : public HyConsole
 {
 public:
-	HyConsole_Std(bool bCreateConsole, HyWindowInfo &consoleInfo);
+	HyConsole_Std(bool bCreateConsole, const HyWindowInfo &consoleInfo);
 	virtual ~HyConsole_Std();
 
 	virtual void Log(std::ostream &os, const char *szMsg, LogType eType);
