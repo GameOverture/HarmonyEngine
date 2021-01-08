@@ -745,17 +745,20 @@
 /*static*/ void VersionPatcher::Patch_5to6(QJsonDocument &projDocRef)
 {
 	QJsonObject projObj = projDocRef.object();
-	projObj.insert("BuildPath", "build/");
+	projObj.insert("BuildPath", "./build/");
 	projDocRef.setObject(projObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)
 {
+	QFile dataFile(sFilePath);
+	if(dataFile.exists() == false) // Don't create files that don't exist. That is handled by the the respective asset/manager/etc class
+		return;
+
 	QJsonObject obj = fileDocRef.object();
 	obj.insert("$fileVersion", HYGUI_FILE_VERSION);
 	fileDocRef.setObject(obj);
 
-	QFile dataFile(sFilePath);
 	if(dataFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 		HyGuiLog(QString("Couldn't open ") % HYASSETS_DataFile % " for writing: " % dataFile.errorString(), LOGTYPE_Error);
 	else
