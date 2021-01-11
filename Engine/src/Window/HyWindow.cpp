@@ -366,11 +366,11 @@ void HyWindow::DoEvent(const SDL_Event &eventRef, HyInput &inputRef)
 		HyLog("Window " << m_uiId << " restored");
 		break;
 	case SDL_WINDOWEVENT_ENTER:
-		HyLog("Mouse entered window " << m_uiId);
+		//HyLog("Mouse entered window " << m_uiId);
 		inputRef.SetMouseWindow(this);
 		break;
 	case SDL_WINDOWEVENT_LEAVE:
-		HyLog("Mouse left window " << m_uiId);
+		//HyLog("Mouse left window " << m_uiId);
 		break;
 	case SDL_WINDOWEVENT_FOCUS_GAINED:
 		HyLog("Window " << m_uiId << " gained keyboard focus");
