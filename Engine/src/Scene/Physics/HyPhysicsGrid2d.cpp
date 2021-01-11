@@ -30,6 +30,13 @@ HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*
 
 HyPhysicsGrid2d::~HyPhysicsGrid2d()
 {
+	const b2Body *pIter = GetBodyList();
+	while(pIter)
+	{
+		reinterpret_cast<HyEntity2d *>(pIter->GetUserData())->PhysRelease();
+		pIter = GetBodyList();
+	}
+
 	HyScene::RemovePhysicsGrid(this);
 }
 

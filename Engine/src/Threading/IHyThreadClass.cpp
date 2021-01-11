@@ -123,6 +123,7 @@ bool IHyThreadClass::IsThreadFinished()
 void IHyThreadClass::ThreadJoin()
 {
 #ifndef HY_CONFIG_SINGLETHREAD
+	ThreadStop();
 	if(m_Thread.joinable())
 		m_Thread.join();
 #endif

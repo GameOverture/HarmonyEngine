@@ -30,6 +30,7 @@ IHyNetworkClass::IHyNetworkClass(uint32 uiRecvBufferSize, HyThreadPriority ePrio
 /*virtual*/ IHyNetworkClass::~IHyNetworkClass()
 {
 	CleanupSocket();
+	delete[] m_pRecvBuff;
 }
 
 bool IHyNetworkClass::StartClient(const char *szHost, uint16 uiPort)
