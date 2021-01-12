@@ -287,9 +287,8 @@ void SpriteWidget::on_actionAlignCenterHorizontal_triggered()
 
 void SpriteWidget::on_actionImportFrames_triggered()
 {
-	QList<AssetItemData *> selectedAssetsList;
-	QList<TreeModelItemData *> selectedFiltersList;
-	m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedItems(selectedAssetsList, selectedFiltersList);
+	QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
+	m_ItemRef.GetProject().GetAtlasWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
 
 	QUndoCommand *pCmd = new UndoCmd_LinkStateAssets("Add Frames", m_ItemRef, GetCurStateIndex(), selectedAssetsList);
 	GetItem().GetUndoStack()->push(pCmd);

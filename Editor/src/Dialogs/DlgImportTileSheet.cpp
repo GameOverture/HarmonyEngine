@@ -70,14 +70,11 @@ void DlgImportTileSheet::on_buttonBox_accepted()
 
 	QList<AssetItemData *> selectedAssetsList;
 	QList<TreeModelItemData *> selectedFiltersList;
+	TreeModelItemData *pFirstSelected = nullptr;
 	if(m_ProjectRef.GetAtlasWidget())
-		m_ProjectRef.GetAtlasWidget()->GetSelectedItems(selectedAssetsList, selectedFiltersList);
+		pFirstSelected = m_ProjectRef.GetAtlasWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
 
-	TreeModelItemData *pParent = nullptr;
-	if(selectedAssetsList.empty() == false)
-		pParent = m_ProjectRef.GetAtlasModel().FindTreeItemFilter(selectedAssetsList[0]);
-	else if(selectedFiltersList.empty() == false)
-		pParent = selectedFiltersList[0];
+	TreeModelItemData *pParent = m_ProjectRef.GetAtlasModel().FindTreeItemFilter(pFirstSelected);
 
 	QList<TreeModelItemData *> correspondingParentList;
 	QList<QUuid> correspondingUuidList;

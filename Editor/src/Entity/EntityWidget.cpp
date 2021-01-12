@@ -61,8 +61,8 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
 {
-	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
-	MainWindow::GetExplorerWidget().GetSelectedItems(selectedItems, selectedPrefixes);
+	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
+	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);
 	bool bEnableAddNodeBtn = false;
 	EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
 	for(auto pItem : selectedItems)
@@ -124,8 +124,8 @@ ExplorerItemData *EntityWidget::GetSelectedNode()
 
 void EntityWidget::on_actionAddSelectedChild_triggered()
 {
-	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
-	MainWindow::GetExplorerWidget().GetSelectedItems(selectedItems, selectedPrefixes);
+	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
+	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);
 	if(selectedItems.empty())
 	{
 		HyGuiLog("Currently selected item(s) in Explorer is/are not a ProjectItemData. Cannot add node(s) to entity.", LOGTYPE_Error);

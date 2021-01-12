@@ -29,6 +29,7 @@ class ExplorerWidget;
 class ExplorerModel;
 class Project;
 class ExplorerItemData;
+class ProjectItemData;
 
 class ExplorerProxyModel : public QSortFilterProxyModel
 {
@@ -59,8 +60,9 @@ public:
 	void SetModel(ExplorerModel &modelRef);
 	ExplorerModel *GetExplorerModel();
 
-	ExplorerItemData *GetFirstSelectedItem();
-	void GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut);
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// NOTE: ManagerWidget::GetSelected is a synonymous function - all fixes/enhancements should be copied over until refactored into a base class
+	ExplorerItemData *GetSelected(QList<ProjectItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut);
 
 private:
 	Ui::ExplorerWidget *ui;

@@ -484,10 +484,12 @@ void MainWindow::on_actionOpenProject_triggered()
 void MainWindow::on_actionCloseProject_triggered()
 {
 	Project *pProj = nullptr;
-	if(ui->explorer->GetFirstSelectedItem() == nullptr)
+	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+	if(pFirstSelected == nullptr)
 		pProj = Harmony::GetProject();
 	else
-		pProj = &ui->explorer->GetFirstSelectedItem()->GetProject();
+		pProj = &pFirstSelected->GetProject();
 
 	if(pProj == nullptr)
 		return;
@@ -502,10 +504,12 @@ void MainWindow::on_actionCloseProject_triggered()
 void MainWindow::on_actionProjectSettings_triggered()
 {
 	Project *pProj = nullptr;
-	if(ui->explorer->GetFirstSelectedItem() == nullptr)
+	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+	if(pFirstSelected == nullptr)
 		pProj = Harmony::GetProject();
 	else
-		pProj = &ui->explorer->GetFirstSelectedItem()->GetProject();
+		pProj = &pFirstSelected->GetProject();
 
 	if(pProj == nullptr)
 		return;
@@ -754,16 +758,17 @@ void MainWindow::on_actionTheme_Compe_triggered()
 
 void MainWindow::on_actionActivateProject_triggered()
 {
-	ExplorerItemData *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
+	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
 	
-	bool bNewProject = Harmony::GetProject() != &pCurSelectedItem->GetProject();
+	bool bNewProject = Harmony::GetProject() != &pFirstSelected->GetProject();
 	if(bNewProject)
 	{
 		sm_pInstance->ui->dockWidgetProperties->setWindowTitle("Item Properties");
 		sm_pInstance->ui->dockWidgetProperties->setWidget(nullptr);
 	}
 
-	m_Harmony.SetProject(&pCurSelectedItem->GetProject());
+	m_Harmony.SetProject(&pFirstSelected->GetProject());
 
 	if(Harmony::GetProject() && bNewProject && Harmony::GetProject()->GetCurrentOpenItem())
 		OpenItem(Harmony::GetProject()->GetCurrentOpenItem());
@@ -771,16 +776,23 @@ void MainWindow::on_actionActivateProject_triggered()
 
 void MainWindow::NewItem(HyGuiItemType eItem)
 {
-	ExplorerItemData *pCurSelectedItem = ui->explorer->GetFirstSelectedItem();
+	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+	if(pFirstSelected == nullptr)
+	{
+		HyGuiLog("Nothing selected (no project) to add item to.", LOGTYPE_Error);
+		return;
+	}
+
 	Project *pProj = Harmony::GetProject();
 
-	if(pProj != &pCurSelectedItem->GetProject())
+	if(pProj != &pFirstSelected->GetProject())
 	{
 		HyGuiLog("Current project does not equal the selected item's project", LOGTYPE_Error);
 		return;
 	}
 
-	QString sDefaultPrefix = pCurSelectedItem->GetType() == ITEM_Prefix ? pCurSelectedItem->GetName(true) : pCurSelectedItem->GetPrefix();
+	QString sDefaultPrefix = pFirstSelected->GetType() == ITEM_Prefix ? pFirstSelected->GetName(true) : pFirstSelected->GetPrefix();
 	if(sDefaultPrefix.isEmpty() == false && sDefaultPrefix[sDefaultPrefix.size() - 1] == '/')
 		sDefaultPrefix = sDefaultPrefix.left(sDefaultPrefix.size() - 1);
 

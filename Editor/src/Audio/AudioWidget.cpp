@@ -117,7 +117,7 @@ void AudioWidget::on_actionAddAudio_triggered()
 {
 	QList<AssetItemData *> selectedAssetsList;
 	QList<TreeModelItemData *> selectedFiltersList;
-	m_ItemRef.GetProject().GetAudioWidget()->GetSelectedItems(selectedAssetsList, selectedFiltersList);
+	m_ItemRef.GetProject().GetAudioWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
 
 	QUndoCommand *pCmd = new UndoCmd_LinkStateAssets("Add Audio", m_ItemRef, GetCurStateIndex(), selectedAssetsList);
 	GetItem().GetUndoStack()->push(pCmd);

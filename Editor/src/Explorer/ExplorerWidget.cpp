@@ -159,45 +159,77 @@ ExplorerModel *ExplorerWidget::GetExplorerModel()
 	return static_cast<ExplorerModel *>(static_cast<ExplorerProxyModel *>(ui->treeView->model())->sourceModel());
 }
 
-ExplorerItemData *ExplorerWidget::GetFirstSelectedItem()
+//ExplorerItemData *ExplorerWidget::GetFirstSelectedItem()
+//{
+//	QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
+//	if(curIndex.isValid() == false)
+//		return nullptr;
+//
+//	return GetExplorerModel()->data(curIndex, Qt::UserRole).value<ExplorerItemData *>();
+//}
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// NOTE: ManagerWidget::GetSelected is a synonymous function - all fixes/enhancements should be copied over until refactored into a base class
+ExplorerItemData *ExplorerWidget::GetSelected(QList<ProjectItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut)
 {
+	ExplorerItemData *pFirstItemSelected = nullptr;
 	QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
-	if(curIndex.isValid() == false)
-		return nullptr;
+	if(curIndex.isValid())
+		pFirstItemSelected = GetExplorerModel()->data(curIndex, Qt::UserRole).value<ExplorerItemData *>();
 
-	return GetExplorerModel()->data(curIndex, Qt::UserRole).value<ExplorerItemData *>();
-}
-
-void ExplorerWidget::GetSelectedItems(QList<ExplorerItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut)
-{
 	selectedItemsOut.clear();
 	selectedPrefixesOut.clear();
-
 	QItemSelection selectedItems = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapSelectionToSource(ui->treeView->selectionModel()->selection());
 	QModelIndexList selectedIndices = selectedItems.indexes();
+
+	QList<TreeModelItemData *> itemList;
 	for(int i = 0; i < selectedIndices.size(); ++i)
 	{
-		QList<TreeModelItemData *> itemsList = GetExplorerModel()->GetItemsRecursively(selectedIndices[i]);
-		for(auto item : itemsList)
-			selectedItemsOut += static_cast<ExplorerItemData *>(item);
-	}
-	
-	// Poverty unique only algorithm - does not persist order of items
-	selectedItemsOut = selectedItemsOut.toSet().values();
+		if(selectedIndices[i].column() != 0)
+			continue;
 
-	for(int i = 0; i < selectedItemsOut.size();)
-	{
-		if(selectedItemsOut[i]->GetType() == ITEM_Prefix)
-			selectedPrefixesOut.push_back(selectedItemsOut.takeAt(i));
-		else
-			++i;
+		itemList += GetExplorerModel()->GetItemsRecursively(selectedIndices[i]);
 	}
+
+	// Separate out items and prefixes to their own respective lists, while ignoring any duplicate items while preserving the order in 'itemList'
+	QSet<TreeModelItemData *> seenItemSet;
+	for(int i = 0; i < itemList.size(); ++i)
+	{
+		if(seenItemSet.contains(itemList[i]))
+			continue;
+		seenItemSet.insert(itemList[i]);
+
+		if(itemList[i]->GetType() == ITEM_Prefix)
+			selectedPrefixesOut.append(static_cast<ExplorerItemData *>(itemList[i]));
+		else
+			selectedItemsOut.append(static_cast<ProjectItemData *>(itemList[i]));
+	}
+
+	//for(int i = 0; i < selectedIndices.size(); ++i)
+	//{
+	//	QList<TreeModelItemData *> itemsList = GetExplorerModel()->GetItemsRecursively(selectedIndices[i]);
+	//	for(auto item : itemsList)
+	//		selectedPrefixesOut += static_cast<ExplorerItemData *>(item);
+	//}
+	//
+	//// Poverty unique only algorithm - does not persist order of items
+	//selectedItemsOut = selectedItemsOut.toSet().values();
+
+	//for(int i = 0; i < selectedItemsOut.size();)
+	//{
+	//	if(selectedItemsOut[i]->GetType() == ITEM_Prefix)
+	//		selectedPrefixesOut.push_back(selectedItemsOut.takeAt(i));
+	//	else
+	//		++i;
+	//}
+
+	return pFirstItemSelected;
 }
 
 void ExplorerWidget::OnContextMenu(const QPoint &pos)
 {
-	ExplorerItemData *pContextExplorerItem = GetFirstSelectedItem();//ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItemData *>();
-	//QModelIndex index = ui->treeView->indexAt(pos);
+	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
+	ExplorerItemData *pContextExplorerItem = GetSelected(selectedItems, selectedPrefixes);
 	
 	QMenu contextMenu;
 	if(pContextExplorerItem == nullptr)
@@ -207,9 +239,6 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else
 	{
-		QList<ExplorerItemData *> selectedItems, selectedPrefixes;
-		GetSelectedItems(selectedItems, selectedPrefixes);
-
 		switch(pContextExplorerItem->GetType())
 		{
 		case ITEM_Project:
@@ -359,24 +388,25 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 
 void ExplorerWidget::on_actionRename_triggered()
 {
-	ExplorerItemData *pItem = GetFirstSelectedItem();
-	if(pItem == nullptr)
+	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
+	ExplorerItemData *pFirstSelected = GetSelected(selectedItems, selectedPrefixes);
+	if(pFirstSelected == nullptr)
 	{
 		HyGuiLog("on_actionRename_triggered() was invoked on a nullptr ExplorerItemData *", LOGTYPE_Error);
 		return;
 	}
 	
-	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pItem->GetType(), false), pItem->GetName(false));
+	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pFirstSelected->GetType(), false), pFirstSelected->GetName(false));
 	if(pDlg->exec() == QDialog::Accepted)
-		pItem->Rename(pDlg->GetName());
+		pFirstSelected->Rename(pDlg->GetName());
 
 	delete pDlg;
 }
 
 void ExplorerWidget::on_actionDeleteItem_triggered()
 {
-	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
-	GetSelectedItems(selectedItems, selectedPrefixes);
+	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
+	GetSelected(selectedItems, selectedPrefixes);
 	if(selectedItems.size() + selectedPrefixes.size() == 0)
 	{
 		HyGuiLog("on_actionDeleteItem_triggered() was invoked on nothing selected", LOGTYPE_Error);
@@ -438,8 +468,8 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 
 void ExplorerWidget::on_actionCopyItem_triggered()
 {
-	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
-	GetSelectedItems(selectedItems, selectedPrefixes);
+	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
+	GetSelected(selectedItems, selectedPrefixes);
 
 	if(selectedItems.empty())
 	{
@@ -478,8 +508,8 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 
 void ExplorerWidget::on_actionOpen_triggered()
 {
-	QList<ExplorerItemData *> selectedItems, selectedPrefixes;
-	GetSelectedItems(selectedItems, selectedPrefixes);
+	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
+	GetSelected(selectedItems, selectedPrefixes);
 	if(selectedItems.size() == 0)
 	{
 		HyGuiLog("on_actionOpen_triggered() was invoked on no item selected", LOGTYPE_Error);

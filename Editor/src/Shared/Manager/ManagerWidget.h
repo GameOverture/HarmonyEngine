@@ -55,13 +55,14 @@ public:
 	~ManagerWidget();
 
 	IManagerModel &GetModel();
-
 	quint32 GetSelectedBankId();
 
 	void DrawUpdate();
 	void RefreshInfo();
 
-	//void OnAssetTreeCurrentChanged(const QModelIndex &current, const QModelIndex &previous);
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// NOTE: ExplorerWidget::GetSelected is a synonymous function - all fixes/enhancements should be copied over until refactored into a base class
+	TreeModelItemData *GetSelected(QList<AssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut);
 
 protected:
 	virtual void enterEvent(QEvent *pEvent) override;
@@ -99,9 +100,6 @@ private Q_SLOTS:
 	
 private:
 	Ui::ManagerWidget *ui;
-
-public:
-	void GetSelectedItems(QList<AssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut);
 };
 
 #endif // ManagerWidget_H
