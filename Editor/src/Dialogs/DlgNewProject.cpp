@@ -289,6 +289,7 @@ void DlgNewProject::UpdateProjectDir()
 	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath());
 	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath());
 	ui->wgtSrcDir->Setup("Source", "src", GetProjDirPath());
+	ui->wgtBuildDir->Setup("Build", "build", GetProjDirPath());
 
 	for(auto srcDep : m_SrcDependencyList)
 		srcDep->ResetProjDir(GetProjDirPath());
