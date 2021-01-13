@@ -57,9 +57,9 @@ IHyInstance3d &IHyInstance3d::operator=(IHyInstance3d &&donor)
 	IHyDrawable3d::Update();
 }
 
-/*virtual*/ bool IHyInstance3d::IsValid() /*override final*/
+/*virtual*/ bool IHyInstance3d::IsValidToRender() /*override final*/
 {
-	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) && OnIsValid();
+	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) && OnIsValidToRender();
 }
 
 /*virtual*/ void IHyInstance3d::OnLoaded() /*override*/

@@ -353,11 +353,11 @@ glm::ivec2 HySprite2d::AnimGetCurFrameOffset()
 
 /*virtual*/ bool HySprite2d::IsLoadDataValid() /*override*/
 {
-	AcquireData();
-	return m_pData != nullptr;
+	const HySprite2dData *pData = static_cast<const HySprite2dData *>(AcquireData());
+	return pData && pData->GetNumStates() != 0;
 }
 
-/*virtual*/ bool HySprite2d::OnIsValid() /*override*/
+/*virtual*/ bool HySprite2d::OnIsValidToRender() /*override*/
 {
 	return ((m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Invalid) == 0);
 }

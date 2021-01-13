@@ -196,7 +196,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	uint32 uiTotalNumInsts = static_cast<uint32>(m_NodeList_LoadedDrawable3d.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_LoadedDrawable3d[i]->IsValid() == false)
+		if(m_NodeList_LoadedDrawable3d[i]->IsValidToRender() == false)
 			continue;
 
 		rendererRef.AppendDrawable3d(i, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CAMERA_MASK);
@@ -217,7 +217,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	uiTotalNumInsts = static_cast<uint32>(m_NodeList_LoadedDrawable2d.size());
 	for(uint32 i = 0; i < uiTotalNumInsts; ++i)
 	{
-		if(m_NodeList_LoadedDrawable2d[i]->IsValid() == false || CalculateCameraMask(*m_NodeList_LoadedDrawable2d[i], uiCameraMask) == false)
+		if(m_NodeList_LoadedDrawable2d[i]->IsValidToRender() == false || CalculateCameraMask(*m_NodeList_LoadedDrawable2d[i], uiCameraMask) == false)
 			continue;
 
 		rendererRef.AppendDrawable2d(i, *m_NodeList_LoadedDrawable2d[i], uiCameraMask);

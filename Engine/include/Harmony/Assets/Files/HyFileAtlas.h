@@ -48,10 +48,10 @@ class HyFileAtlas : public IHyFile
 
 public:
 	HyFileAtlas(std::string sFileName,
-			uint32 uiBankId,
-			uint32 uiIndexInGroup,
-			uint32 uiManifestIndex,
-			HyJsonObj textureObj);
+		uint32 uiBankId,
+		uint32 uiIndexInGroup,
+		uint32 uiManifestIndex,
+		HyJsonObj textureObj);
 
 	~HyFileAtlas();
 

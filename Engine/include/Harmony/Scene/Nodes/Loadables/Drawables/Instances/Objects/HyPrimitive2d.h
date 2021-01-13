@@ -82,7 +82,7 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 protected:
-	virtual bool OnIsValid() override;
+	virtual bool OnIsValidToRender() override;
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 

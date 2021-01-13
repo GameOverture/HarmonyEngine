@@ -169,10 +169,10 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 
 /*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
 {
-	return (m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValidShape());
+	return m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValidShape();
 }
 
-/*virtual*/ bool HyPrimitive2d::OnIsValid() /*override*/
+/*virtual*/ bool HyPrimitive2d::OnIsValidToRender() /*override*/
 {
 	return m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValidShape();
 }

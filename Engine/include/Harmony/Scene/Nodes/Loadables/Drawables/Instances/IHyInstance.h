@@ -46,7 +46,7 @@ public:
 	const HyShaderUniforms &GetShaderUniforms() const;
 
 protected:
-	virtual bool IsValid() = 0;
+	virtual bool IsValidToRender() = 0;
 	virtual void OnUpdateUniforms() { }			// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) { }
 

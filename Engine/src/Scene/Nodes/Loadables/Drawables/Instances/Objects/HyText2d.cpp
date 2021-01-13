@@ -402,7 +402,7 @@ void HyText2d::SetAsVertical()
 	return pData && pData->GetNumStates() != 0;
 }
 
-/*virtual*/ bool HyText2d::OnIsValid() /*override*/
+/*virtual*/ bool HyText2d::OnIsValidToRender() /*override*/
 {
 	return m_uiNumValidCharacters > 0;
 }

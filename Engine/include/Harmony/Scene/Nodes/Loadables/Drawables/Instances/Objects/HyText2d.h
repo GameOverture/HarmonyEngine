@@ -132,7 +132,7 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 protected:
-	virtual bool OnIsValid() override;
+	virtual bool OnIsValidToRender() override;
 	virtual void OnCalcBoundingVolume() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;

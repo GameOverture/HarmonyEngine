@@ -38,13 +38,13 @@ public:
 
 protected:
 	virtual void Update() override final;
-	virtual bool IsValid() override final;
+	virtual bool IsValidToRender() override final;
 
 	virtual void OnLoaded() override;
 	virtual void OnUnloaded() override;
 
 	// Optional user overrides below
-	virtual bool OnIsValid() { return true; }	// Is current state valid, TODO: possible redundancy with IsLoadDataValid()
+	virtual bool OnIsValidToRender() { return true; }
 	virtual void OnCalcBoundingVolume() { }
 
 #ifdef HY_PLATFORM_GUI

@@ -31,13 +31,13 @@ public:
 
 protected:
 	virtual void Update() override final;
-	virtual bool IsValid() override final;
+	virtual bool IsValidToRender() override final;
 
 	virtual void OnLoaded() override;									// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnUnloaded() override;									// HyAssets invokes this instance's data has been erased
 
 	// Optional user overrides below
-	virtual bool OnIsValid() { return true; }
+	virtual bool OnIsValidToRender() { return true; }
 
 #ifdef HY_PLATFORM_GUI
 public:
