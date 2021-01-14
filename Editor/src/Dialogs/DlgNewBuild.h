@@ -34,6 +34,8 @@ public:
 	explicit DlgNewBuild(Project &projectRef, QWidget *parent = 0);
 	~DlgNewBuild();
 
+	QString GetAbsBuildDir() const;
+
 	QString GetProc() const;
 	QStringList GetProcOptions() const;
 
@@ -58,8 +60,6 @@ private Q_SLOTS:
 
 private:
 	Ui::DlgNewBuild *ui;
-
-	QString GetAbsBuildDir() const;
 
 	void ErrorCheck();
 };

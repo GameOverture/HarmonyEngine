@@ -91,6 +91,11 @@ DlgNewBuild::~DlgNewBuild()
 	delete ui;
 }
 
+QString DlgNewBuild::GetAbsBuildDir() const
+{
+	return m_ProjectRef.GetBuildAbsPath() % ui->txtBuildName->text();
+}
+
 QString DlgNewBuild::GetProc() const
 {
 	if(ui->radDesktop->isChecked())
@@ -218,11 +223,6 @@ void DlgNewBuild::on_btnEmscriptenSdkBrowse_clicked()
 	}
 
 	ErrorCheck();
-}
-
-QString DlgNewBuild::GetAbsBuildDir() const
-{
-	return m_ProjectRef.GetBuildAbsPath() % ui->txtBuildName->text();
 }
 
 void DlgNewBuild::ErrorCheck()

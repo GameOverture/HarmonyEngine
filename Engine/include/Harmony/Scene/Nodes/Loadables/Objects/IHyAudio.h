@@ -97,17 +97,23 @@ public:
 		}
 	}
 
+	virtual bool IsLoadDataValid() override
+	{
+		const HyAudioData *pData = static_cast<const HyAudioData *>(this->AcquireData());
+		return pData && pData->GetNumStates() != 0;
+	}
+
 protected:
 	virtual void OnDataAcquired() override
 	{
 		const HyAudioData *pData = static_cast<const HyAudioData *>(this->UncheckedGetData());
 
-		m_ePlayListMode = pData->GetPlayListMode();
-		m_iPriority = pData->GetPriority();
-		m_iLoops = pData->GetLoops();
-		m_uiMaxDistance = pData->GetMaxDistance();
-		volume = pData->GetVolume();
-		pitch = pData->GetPitch();
+		m_ePlayListMode = pData->GetPlayListMode(0);
+		m_iPriority = pData->GetPriority(0);
+		m_iLoops = pData->GetLoops(0);
+		m_uiMaxDistance = pData->GetMaxDistance(0);
+		volume = pData->GetVolume(0);
+		pitch = pData->GetPitch(0);
 	}
 
 	virtual void OnLoadedUpdate() override

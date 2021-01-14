@@ -57,7 +57,7 @@ protected:
 	HyPrimitive2d		m_DebugBox;
 #endif
 
-	HyTextAlign				m_eAlignment;
+	HyTextAlign			m_eAlignment;
 	bool				m_bMonospacedDigits;
 
 	struct GlyphInfo

@@ -641,18 +641,22 @@ void MainWindow::on_actionNewBuild_triggered()
 	{
 		// TODO: FILE IO FAILS TO DELETE AND IMMEDIATELY CREATE!
 		QString sBuildPath = Harmony::GetProject()->GetBuildAbsPath();
-		QDir buildDir(sBuildPath);
-		if(buildDir.exists())
+		QDir rootBuildDir(sBuildPath);
+		if(rootBuildDir.exists())
 		{
-			QFileInfoList tempFileInfoList = buildDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
-			if(tempFileInfoList.isEmpty() == false &&
-			   QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Clean existing build", "Do you want to generate a new IDE and override existing build?", QMessageBox::Yes, QMessageBox::No))
+			QDir buildDir(pDlg->GetAbsBuildDir());
+			if(buildDir.exists())
 			{
-				buildDir.removeRecursively();
-				QThread::sleep(2);
+				QFileInfoList tempFileInfoList = buildDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
+				if(tempFileInfoList.isEmpty() == false &&
+					QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Clean existing build", "Do you want to generate a new IDE and override existing build?", QMessageBox::Yes, QMessageBox::No))
+				{
+					buildDir.removeRecursively();
+					QThread::sleep(2);
+				}
 			}
 		}
-		if(false == buildDir.mkpath("."))
+		else if(false == rootBuildDir.mkpath("."))
 		{
 			HyGuiLog("Could not create root build directory", LOGTYPE_Error);
 			return;

@@ -18,25 +18,34 @@
 class HyAudioData : public IHyNodeData
 {
 	HyAudioHarness &		m_AudioRef;
-	std::vector<uint32>		m_PlayList;	// Stores checksums
-	
-	HyPlayListMode			m_ePlayListMode;
-	float					m_fVolume;
-	float					m_fPitch;
-	int32					m_iPriority;
-	int32					m_iLoops;
-	uint32					m_uiMaxDistance;
+
+	class AudioState
+	{
+	public:
+		std::vector<uint32>		m_PlayList;	// Stores checksums
+
+		HyPlayListMode			m_ePlayListMode;
+		float					m_fVolume;
+		float					m_fPitch;
+		int32					m_iPriority;
+		int32					m_iLoops;
+		uint32					m_uiMaxDistance;
+	};
+	AudioState *			m_pAudioStates;
+	uint32					m_uiNumStates;
 
 public:
 	HyAudioData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
 
-	HyPlayListMode GetPlayListMode() const;
-	int32 GetPriority() const;
-	int32 GetLoops() const;
-	uint32 GetMaxDistance() const;
-	float GetVolume() const;
-	float GetPitch() const;
+	uint32 GetNumStates() const;
+
+	HyPlayListMode GetPlayListMode(uint32 uiStateIndex) const;
+	int32 GetPriority(uint32 uiStateIndex) const;
+	int32 GetLoops(uint32 uiStateIndex) const;
+	uint32 GetMaxDistance(uint32 uiStateIndex) const;
+	float GetVolume(uint32 uiStateIndex) const;
+	float GetPitch(uint32 uiStateIndex) const;
 
 	uint32 GetSound(IHyNode *pAudioNode) const;
 };

@@ -100,6 +100,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Objects/HyAudio2d.cpp
 	src/Scene/Nodes/Loadables/Objects/HyAudio3d.cpp
 	src/Scene/Nodes/Objects/HyCamera.cpp
+	src/Scene/Nodes/Objects/IHyCamera.cpp
 	src/Scene/Physics/HyBox2dRuntime.cpp
 	src/Scene/Physics/HyPhysEntity2d.cpp
 	src/Scene/Physics/HyPhysicsCollider.cpp

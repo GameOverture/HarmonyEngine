@@ -160,10 +160,16 @@ glm::vec2 HyText2d::TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
 	CalculateGlyphInfos();
 
-	if(m_pGlyphInfos == nullptr)
-		return glm::vec2(0);
+	if(AcquireData() == nullptr || m_pGlyphInfos == nullptr)
+	{
+		if(UncheckedGetData() == nullptr) {
+			HyLogWarning("HyText2d::TextGetGlyphOffset invoked on null data");
+		}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
+		return glm::vec2(0);
+	}
+
+	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
@@ -174,7 +180,11 @@ glm::vec2 HyText2d::TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
 	CalculateGlyphInfos();
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
+	if(AcquireData() == nullptr) {
+		HyLogWarning("HyText2d::TextGetGlyphSize invoked on null data");
+	}
+
+	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 	const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
 	if(pGlyphRef == nullptr)
 		return glm::vec2(0.0f);
@@ -186,10 +196,16 @@ glm::vec2 HyText2d::TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
 
 float HyText2d::TextGetGlyphAlpha(uint32 uiCharIndex)
 {
-	if(m_pGlyphInfos == nullptr)
-		return 1.0f;
+	if(AcquireData() == nullptr || m_pGlyphInfos == nullptr)
+	{
+		if(UncheckedGetData() == nullptr) {
+			HyLogWarning("HyText2d::TextGetGlyphAlpha invoked on null data");
+		}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
+		return 1.0f;
+	}
+
+	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
@@ -200,10 +216,16 @@ void HyText2d::TextSetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 {
 	CalculateGlyphInfos();
 
-	if(m_pGlyphInfos == nullptr)
-		return;
+	if(AcquireData() == nullptr || m_pGlyphInfos == nullptr)
+	{
+		if(UncheckedGetData() == nullptr) {
+			HyLogWarning("HyText2d::TextSetGlyphAlpha invoked on null data");
+		}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
+		return;
+	}
+
+	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
 
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
@@ -220,9 +242,15 @@ uint32 HyText2d::TextGetState()
 
 void HyText2d::TextSetState(uint32 uiStateIndex)
 {
-	if(uiStateIndex >= static_cast<const HyText2dData *>(AcquireData())->GetNumStates())
+	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HyText2dData *>(UncheckedGetData())->GetNumStates())
 	{
-		HyLogWarning(m_sPrefix << "/" << m_sName << " (HyText2d) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HyText2dData *>(AcquireData())->GetNumStates() << "'");
+		if(UncheckedGetData() == nullptr) {
+			HyLogWarning("HyText2d::TextSetGlyphAlpha invoked on null data");
+		}
+		else if(uiStateIndex >= static_cast<const HyText2dData *>(UncheckedGetData())->GetNumStates()) {
+			HyLogWarning(m_sPrefix << "/" << m_sName << " (HyText2d) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HyText2dData *>(AcquireData())->GetNumStates() << "'");
+		}
+
 		return;
 	}
 
@@ -235,12 +263,22 @@ void HyText2d::TextSetState(uint32 uiStateIndex)
 
 uint32 HyText2d::TextGetNumLayers()
 {
-	return static_cast<const HyText2dData *>(AcquireData())->GetNumLayers(m_uiCurFontState);
+	if(AcquireData() == nullptr) {
+		HyLogWarning("HyText2d::TextGetNumLayers invoked on null data");
+		return 0;
+	}
+
+	return static_cast<const HyText2dData *>(UncheckedGetData())->GetNumLayers(m_uiCurFontState);
 }
 
 uint32 HyText2d::TextGetNumLayers(uint32 uiStateIndex)
 {
-	return static_cast<const HyText2dData *>(AcquireData())->GetNumLayers(uiStateIndex);
+	if(AcquireData() == nullptr) {
+		HyLogWarning("HyText2d::TextGetNumLayers invoked on null data");
+		return 0;
+	}
+
+	return static_cast<const HyText2dData *>(UncheckedGetData())->GetNumLayers(uiStateIndex);
 }
 
 std::pair<HyAnimVec3 &, HyAnimVec3 &> HyText2d::TextGetLayerColor(uint32 uiLayerIndex)
@@ -255,35 +293,54 @@ std::pair<HyAnimVec3 &, HyAnimVec3 &> HyText2d::TextGetLayerColor(uint32 uiLayer
 
 void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
 {
-	AcquireData();
+	if(AcquireData() == nullptr) {
+		HyLogWarning("HyText2d::TextSetLayerColor invoked on null data");
+		return;
+	}
+
 	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
 	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
 }
 
 void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB)
 {
-	AcquireData();
+	if(AcquireData() == nullptr) {
+		HyLogWarning("HyText2d::TextSetLayerColor invoked on null data");
+		return;
+	}
+
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
 }
 
 void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
-	AcquireData();
+	if(AcquireData() == nullptr) {
+		HyLogWarning("HyText2d::TextSetLayerColor invoked on null data");
+		return;
+	}
+
 	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
 	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
 }
 
 void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
-	AcquireData();
+	if(AcquireData() == nullptr) {
+		HyLogWarning("HyText2d::TextSetLayerColor invoked on null data");
+		return;
+	}
+
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
 }
 
 void HyText2d::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex)
 {
-	AcquireData();
+	if(AcquireData() == nullptr) {
+		HyLogWarning("HyText2d::TextSetLayerColor invoked on null data");
+		return;
+	}
 
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor.Set(((uiRgbHex >> 16) & 0xFF) / 255.0f, ((uiRgbHex >> 8) & 0xFF) / 255.0f, (uiRgbHex & 0xFF) / 255.0f);
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor.Set(((uiRgbHex >> 16) & 0xFF) / 255.0f, ((uiRgbHex >> 8) & 0xFF) / 255.0f, (uiRgbHex & 0xFF) / 255.0f);
@@ -553,10 +610,10 @@ void HyText2d::MarkAsDirty()
 
 void HyText2d::CalculateGlyphInfos()
 {
-	if(m_bIsDirty == false)
+	if(m_bIsDirty == false || AcquireData() == nullptr)
 		return;
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 
 	m_uiNumValidCharacters = 0;
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);

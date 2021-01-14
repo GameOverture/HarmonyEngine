@@ -77,7 +77,7 @@ HyAudioCore_SDL2::HyAudioCore_SDL2()
 	}
 	else
 	{
-		char *szFormat = "Unknown";
+		const char *szFormat = "Unknown";
 		switch(uiFormat)
 		{
 			case AUDIO_U8:		szFormat="U8";		break;

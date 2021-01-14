@@ -16,10 +16,14 @@
 HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_AudioRef(assetsRef.GetAudioRef()),
-	m_ePlayListMode(HYPLAYLIST_Unknown)
+	m_pAudioStates(nullptr),
+	m_uiNumStates(0)
 {
 	HyJsonArray audioStateArray = itemObj["stateArray"].GetArray();
-	for(uint32 i = 0; i < audioStateArray.Size(); ++i)
+
+	m_uiNumStates = audioStateArray.Size();
+	m_pAudioStates = HY_NEW AudioState[m_uiNumStates];
+	for(uint32 i = 0; i < m_uiNumStates; ++i)
 	{
 		HyJsonObj stateObj = audioStateArray[i].GetObject();
 
@@ -31,66 +35,68 @@ HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &
 			IHyFile *pAudioFile = assetsRef.GetFileWithAsset(HYFILE_AudioBank, uiChecksum);
 		
 			m_RequiredAudio.Set(pAudioFile->GetManifestIndex());
-			m_PlayList.push_back(uiChecksum);
+			m_pAudioStates[i].m_PlayList.push_back(uiChecksum);
 		}
 
-		// Init first state
-		if(i == 0)
-		{
-			m_ePlayListMode = static_cast<HyPlayListMode>(stateObj["playListMode"].GetInt());
-			HyAssert(m_ePlayListMode != HYPLAYLIST_Unknown, "HyAudioData " << sPath << " has unknown Play List Mode");
+		m_pAudioStates[i].m_ePlayListMode = static_cast<HyPlayListMode>(stateObj["playListMode"].GetInt());
+		HyAssert(m_pAudioStates[i].m_ePlayListMode != HYPLAYLIST_Unknown, "HyAudioData " << sPath << " has unknown Play List Mode");
 
-			m_fVolume = static_cast<float>(stateObj["volume"].GetDouble());
-			m_fPitch = static_cast<float>(stateObj["pitch"].GetDouble());
-			m_iPriority = stateObj["priority"].GetInt();
-			m_iLoops = stateObj["loops"].GetInt();
-			m_uiMaxDistance = stateObj["maxDist"].GetInt();
-		}
+		m_pAudioStates[i].m_fVolume = static_cast<float>(stateObj["volume"].GetDouble());
+		m_pAudioStates[i].m_fPitch = static_cast<float>(stateObj["pitch"].GetDouble());
+		m_pAudioStates[i].m_iPriority = stateObj["priority"].GetInt();
+		m_pAudioStates[i].m_iLoops = stateObj["loops"].GetInt();
+		m_pAudioStates[i].m_uiMaxDistance = stateObj["maxDist"].GetInt();
 	}
 }
 
 HyAudioData::~HyAudioData(void)
 {
+	delete[] m_pAudioStates;
 }
 
-HyPlayListMode HyAudioData::GetPlayListMode() const
+uint32 HyAudioData::GetNumStates() const
 {
-	return m_ePlayListMode;
+	return m_uiNumStates;
 }
 
-int32 HyAudioData::GetPriority() const
+HyPlayListMode HyAudioData::GetPlayListMode(uint32 uiStateIndex) const
 {
-	return m_iPriority;
+	return m_pAudioStates[uiStateIndex].m_ePlayListMode;
 }
 
-int32 HyAudioData::GetLoops() const
+int32 HyAudioData::GetPriority(uint32 uiStateIndex) const
 {
-	return m_iLoops;
+	return m_pAudioStates[uiStateIndex].m_iPriority;
 }
 
-uint32 HyAudioData::GetMaxDistance() const
+int32 HyAudioData::GetLoops(uint32 uiStateIndex) const
 {
-	return m_uiMaxDistance;
+	return m_pAudioStates[uiStateIndex].m_iLoops;
 }
 
-float HyAudioData::GetVolume() const
+uint32 HyAudioData::GetMaxDistance(uint32 uiStateIndex) const
 {
-	return m_fVolume;
+	return m_pAudioStates[uiStateIndex].m_uiMaxDistance;
 }
 
-float HyAudioData::GetPitch() const
+float HyAudioData::GetVolume(uint32 uiStateIndex) const
 {
-	return m_fPitch;
+	return m_pAudioStates[uiStateIndex].m_fVolume;
+}
+
+float HyAudioData::GetPitch(uint32 uiStateIndex) const
+{
+	return m_pAudioStates[uiStateIndex].m_fPitch;
 }
 
 uint32 HyAudioData::GetSound(IHyNode *pAudioNode) const
 {
 	// TODO: Implement this!
 
-	switch(m_ePlayListMode)
+	switch(m_pAudioStates[0/*pAudioNode->GetState()*/].m_ePlayListMode)
 	{
 	case HYPLAYLIST_Shuffle:
-		return m_PlayList[0];
+		return m_pAudioStates[0/*pAudioNode->GetState()*/].m_PlayList[0];
 
 	default:
 		HyError("HyAudioData::GetSound - Unhandled cue type");
