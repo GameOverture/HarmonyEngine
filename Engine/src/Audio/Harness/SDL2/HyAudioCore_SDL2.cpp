@@ -8,6 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
+#include "Assets/Nodes/HyAudioData.h"
 #include "Audio/Harness/SDL2/HyAudioCore_SDL2.h"
 #include "Audio/Harness/SDL2/HyFileAudioImpl_SDL2.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"

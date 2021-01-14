@@ -10,6 +10,8 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Scene/Nodes/Loadables/Objects/IHyAudio.h"
+#include "Scene/Nodes/Loadables/IHyLoadable2d.h"
+#include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Audio/HyAudioHarness.h"
 #include "Assets/Nodes/HyAudioData.h"
@@ -127,3 +129,6 @@ template<typename NODETYPE, typename ENTTYPE>
 		m_uiCueFlags = 0;
 	}
 }
+
+template class IHyAudio<IHyLoadable2d, HyEntity2d>;
+template class IHyAudio<IHyLoadable3d, HyEntity3d>;
