@@ -333,6 +333,14 @@ void HyEntity2d::ForEachChild(std::function<void(IHyNode2d *)> func)
 	}
 }
 
+std::vector<IHyNode2d *> HyEntity2d::FindChildren(std::function<bool(IHyNode2d *)> func)
+{
+	std::vector<IHyNode2d *> foundList;
+	std::copy_if(m_ChildList.begin(), m_ChildList.end(), std::back_inserter(foundList), func);
+
+	return foundList;
+}
+
 void HyEntity2d::EnableMouseInput()
 {
 	m_uiAttributes |= ATTRIBFLAG_MouseInput;

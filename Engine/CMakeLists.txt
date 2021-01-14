@@ -99,6 +99,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.cpp
 	src/Scene/Nodes/Loadables/Objects/HyAudio2d.cpp
 	src/Scene/Nodes/Loadables/Objects/HyAudio3d.cpp
+	src/Scene/Nodes/Loadables/Objects/IHyAudio.cpp
 	src/Scene/Nodes/Objects/HyCamera.cpp
 	src/Scene/Nodes/Objects/IHyCamera.cpp
 	src/Scene/Physics/HyBox2dRuntime.cpp

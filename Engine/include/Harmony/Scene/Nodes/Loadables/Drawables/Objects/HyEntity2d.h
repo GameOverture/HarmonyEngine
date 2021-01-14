@@ -90,6 +90,7 @@ public:
 	virtual uint32 ChildCount();
 	virtual IHyNode2d *ChildGet(uint32 uiIndex);
 	void ForEachChild(std::function<void(IHyNode2d *)> func);
+	std::vector<IHyNode2d *> FindChildren(std::function<bool(IHyNode2d *)> func);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// MOUSE BUTTON INPUT
