@@ -9,7 +9,6 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HySprite2d.h"
-#include "HyEngine.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Assets/Nodes/HySprite2dData.h"

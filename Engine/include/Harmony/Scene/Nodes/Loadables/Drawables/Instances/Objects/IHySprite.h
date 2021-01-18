@@ -11,7 +11,6 @@
 #define IHySprite_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Utilities/HyMath.h"
 
 class IHyNode;
 class HyVertexBuffer;
