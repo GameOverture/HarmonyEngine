@@ -14,8 +14,7 @@
 #include "Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance.h"
 #include "Scene/Physics/HyShape2d.h"
-#include "Renderer/Effects/HyShader.h"
-#include "Renderer/Components/HyShaderUniforms.h"
+#include "Assets/Nodes/HySprite2dData.h"
 
 class IHyInstance2d : public IHyDrawable2d, public IHyInstance
 {

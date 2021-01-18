@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/HyInfoPanel.h"
+#include "Assets/Nodes/HySprite2dData.h"
 
 HyInfoPanel::HyInfoPanel(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),

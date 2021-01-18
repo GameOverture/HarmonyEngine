@@ -14,11 +14,10 @@
 #include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Audio/HyAudioHarness.h"
-#include "Assets/Nodes/HyAudioData.h"
 #include "Scene/HyScene.h"
 
 template<typename NODETYPE, typename ENTTYPE>
-IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix = "", std::string sName = "", ENTTYPE *pParent = nullptr) :
+IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, ENTTYPE *pParent /*= nullptr*/) :
 	NODETYPE(HYTYPE_Audio, sPrefix, sName, pParent),
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),

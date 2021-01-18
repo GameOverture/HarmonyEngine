@@ -80,7 +80,8 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 		} break;
 
 	default:
-		HyLogError("HyShape2d::operator=() - Unknown shape type: " << rhs.GetType());
+		// Unknown shape type (unitialized IHyNode objects)
+		break;
 	}
 
 	return *this;

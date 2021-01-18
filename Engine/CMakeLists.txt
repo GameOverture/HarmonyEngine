@@ -95,6 +95,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/HySprite2d.cpp
 	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.cpp
 	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyTexturedQuad2d.cpp
+	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/IHySprite.cpp
 	src/Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.cpp
 	src/Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.cpp
 	src/Scene/Nodes/Loadables/Objects/HyAudio2d.cpp
@@ -203,6 +204,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/HySprite2d.h
 	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.h
 	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyTexturedQuad2d.h
+	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/IHySprite.h
 	include/Harmony/Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h
 	include/Harmony/Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h
 	include/Harmony/Scene/Nodes/Loadables/Drawables/Objects/HyEntityLeaf2d.h
