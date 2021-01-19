@@ -47,25 +47,25 @@ SpriteDraw::SpriteDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 void SpriteDraw::PlayAnim(quint32 uiFrameIndex)
 {
-	if(m_Sprite.AnimIsReverse())
-		m_Sprite.AnimCtrl(HYANIMCTRL_Reverse);
+	if(m_Sprite.IsAnimReverse())
+		m_Sprite.SetAnimCtrl(HYANIMCTRL_Reverse);
 	else
-		m_Sprite.AnimCtrl(HYANIMCTRL_DontReverse);
+		m_Sprite.SetAnimCtrl(HYANIMCTRL_DontReverse);
 
-	m_Sprite.AnimCtrl(HYANIMCTRL_Reset);
-	m_Sprite.AnimCtrl(HYANIMCTRL_Play);
-	m_Sprite.AnimSetFrame(uiFrameIndex);
+	m_Sprite.SetAnimCtrl(HYANIMCTRL_Reset);
+	m_Sprite.SetAnimCtrl(HYANIMCTRL_Play);
+	m_Sprite.SetFrame(uiFrameIndex);
 }
 
 void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 {
-	m_Sprite.AnimSetState(uiStateIndex);
-	m_Sprite.AnimSetFrame(uiFrameIndex);
+	m_Sprite.SetState(uiStateIndex);
+	m_Sprite.SetFrame(uiFrameIndex);
 }
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
-	if(m_Sprite.AnimIsPaused())
+	if(m_Sprite.IsAnimPaused())
 	{
 		if(pEvent->key() == Qt::Key_Left)
 			m_vTranslateAmt.setX(m_vTranslateAmt.x() - 1);
@@ -131,19 +131,19 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	if(m_Sprite.AcquireData() != nullptr)
 	{
 		// Clear whatever anim ctrl was set since it will only set the proper attributes from GuiOverrideData, leaving stale flags behind
-		for(uint32 i = 0; i < m_Sprite.AnimGetNumStates(); ++i)
+		for(uint32 i = 0; i < m_Sprite.GetNumStates(); ++i)
 		{
-			m_Sprite.AnimCtrl(HYANIMCTRL_DontLoop, i);
-			m_Sprite.AnimCtrl(HYANIMCTRL_DontBounce, i);
-			m_Sprite.AnimCtrl(HYANIMCTRL_Play, i);
+			m_Sprite.SetAnimCtrl(HYANIMCTRL_DontLoop, i);
+			m_Sprite.SetAnimCtrl(HYANIMCTRL_DontBounce, i);
+			m_Sprite.SetAnimCtrl(HYANIMCTRL_Play, i);
 		}
 	}
 
 	m_Sprite.GuiOverrideData<HySprite2dData>(itemDataObj, HY_UNUSED_HANDLE);
-	m_Sprite.AnimCtrl(HYANIMCTRL_Reset);
+	m_Sprite.SetAnimCtrl(HYANIMCTRL_Reset);
 	
 	SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
-	m_Sprite.AnimSetPause(pWidget->IsPlayingAnim() == false);
+	m_Sprite.SetAnimPause(pWidget->IsPlayingAnim() == false);
 
 	m_Sprite.Load();
 }
@@ -172,7 +172,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	if(pWidget == nullptr)
 		return;
 	
-	m_Sprite.AnimSetPause(pWidget->IsPlayingAnim() == false);
+	m_Sprite.SetAnimPause(pWidget->IsPlayingAnim() == false);
 
 	m_Sprite.pos.Set(m_vTranslateAmt.x(), m_vTranslateAmt.y());
 
@@ -180,7 +180,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	if(m_Sprite.AcquireData() == nullptr)
 		return;
 	
-	if(m_Sprite.AnimIsPaused())
+	if(m_Sprite.IsAnimPaused())
 	{
 		int iStateIndex, iFrameIndex;
 		pWidget->GetSpriteInfo(iStateIndex, iFrameIndex);
@@ -191,14 +191,14 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		if(iFrameIndex < 0)
 			iFrameIndex = 0;
 
-		m_Sprite.AnimSetState(static_cast<uint32>(iStateIndex));
-		m_Sprite.AnimSetFrame(static_cast<uint32>(iFrameIndex));
+		m_Sprite.SetState(static_cast<uint32>(iStateIndex));
+		m_Sprite.SetFrame(static_cast<uint32>(iFrameIndex));
 	}
 	else
 	{
-		pWidget->SetSelectedFrame(m_Sprite.AnimGetFrame());
+		pWidget->SetSelectedFrame(m_Sprite.GetFrame());
 
-		if(m_Sprite.AnimIsFinished())
+		if(m_Sprite.IsAnimFinished())
 			pWidget->StopPlayingAnim();
 	}
 }
