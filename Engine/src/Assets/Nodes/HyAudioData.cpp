@@ -16,8 +16,7 @@
 HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_AudioRef(assetsRef.GetAudioRef()),
-	m_pAudioStates(nullptr),
-	m_uiNumStates(0)
+	m_pAudioStates(nullptr)
 {
 	HyJsonArray audioStateArray = itemObj["stateArray"].GetArray();
 
@@ -52,11 +51,6 @@ HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &
 HyAudioData::~HyAudioData(void)
 {
 	delete[] m_pAudioStates;
-}
-
-uint32 HyAudioData::GetNumStates() const
-{
-	return m_uiNumStates;
 }
 
 HyPlayListMode HyAudioData::GetPlayListMode(uint32 uiStateIndex) const

@@ -56,7 +56,7 @@ HyButton::HyButton(const char *szPanelPrefix, const char *szPanelName, const cha
 	HyInfoPanel::Init(szPanelPrefix, szPanelName, szTextPrefix, szTextName, iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY, pParent);
 
 	HyAssert(m_pPanel, "HyButton was constructed with a null m_pPanel");
-	HyAssert(m_pPanel->AnimGetNumStates() >= 2, "HyButton was constructed with a panel with not enough anim states");
+	HyAssert(m_pPanel->GetNumStates() >= 2, "HyButton was constructed with a panel with not enough anim states");
 
 	EnableMouseInput();
 }
@@ -66,12 +66,12 @@ void HyButton::SetAsSelected(bool bInvokeButtonClicked)
 	if(bInvokeButtonClicked)
 		OnMouseClicked();
 	else
-		m_pPanel->AnimSetState(HYBUTTONSTATE_Selected);
+		m_pPanel->SetState(HYBUTTONSTATE_Selected);
 }
 
 void HyButton::SetAsDisabled()
 {
-	m_pPanel->AnimSetState(HYBUTTONSTATE_Disabled);
+	m_pPanel->SetState(HYBUTTONSTATE_Disabled);
 }
 
 void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack)
@@ -81,20 +81,20 @@ void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack)
 
 /*virtual*/ void HyButton::OnMouseDown() /*override final*/
 {
-	if(m_pPanel->AnimGetState() != HYBUTTONSTATE_Selected && m_pPanel->AnimGetState() != HYBUTTONSTATE_Disabled)
-		m_pPanel->AnimSetState(HYBUTTONSTATE_Down);
+	if(m_pPanel->GetState() != HYBUTTONSTATE_Selected && m_pPanel->GetState() != HYBUTTONSTATE_Disabled)
+		m_pPanel->SetState(HYBUTTONSTATE_Down);
 }
 
 /*virtual*/ void HyButton::OnMouseUp() /*override final*/
 {
-	if(m_pPanel->AnimGetState() != HYBUTTONSTATE_Selected && m_pPanel->AnimGetState() != HYBUTTONSTATE_Disabled)
-		m_pPanel->AnimSetState(HYBUTTONSTATE_Pressable);
+	if(m_pPanel->GetState() != HYBUTTONSTATE_Selected && m_pPanel->GetState() != HYBUTTONSTATE_Disabled)
+		m_pPanel->SetState(HYBUTTONSTATE_Pressable);
 }
 
 /*virtual*/ void HyButton::OnMouseLeave() /*override final*/
 {
-	if(m_pPanel->AnimGetState() != HYBUTTONSTATE_Selected && m_pPanel->AnimGetState() != HYBUTTONSTATE_Disabled)
-		m_pPanel->AnimSetState(HYBUTTONSTATE_Pressable);
+	if(m_pPanel->GetState() != HYBUTTONSTATE_Selected && m_pPanel->GetState() != HYBUTTONSTATE_Disabled)
+		m_pPanel->SetState(HYBUTTONSTATE_Pressable);
 }
 
 /*virtual*/ void HyButton::OnMouseClicked() /*override final*/

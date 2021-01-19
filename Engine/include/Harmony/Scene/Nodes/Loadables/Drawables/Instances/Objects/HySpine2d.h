@@ -90,7 +90,7 @@ class HySpine2d : public IHyInstance2d
 //	// Note: The play rate value is preserved when using this function. Its +/- sign may be
 //	//       switched however if told to reverse from playing forward and vice versa.	
 //	//--------------------------------------------------------------------------------------
-//	//void AnimCtrl(eAnimControl eAnimCtrl);
+//	//void SetAnimCtrl(eAnimControl eAnimCtrl);
 //
 //	//--------------------------------------------------------------------------------------
 //	// Modifies how fast the Spine2d's animation will play. Supplying a negative number 

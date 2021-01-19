@@ -81,8 +81,8 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 	if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
 	{
-		ptCenter.x = TextGetBox().x * 0.5f;
-		ptCenter.y = TextGetBox().y * 0.5f;
+		ptCenter.x = GetTextBox().x * 0.5f;
+		ptCenter.y = GetTextBox().y * 0.5f;
 	}
 
 	m_LocalBoundingVolume.SetAsBox(m_fUsedPixelWidth * 0.5f, m_fUsedPixelHeight * 0.5f, ptCenter, rot.Get());
@@ -95,7 +95,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 
-	const uint32 uiNUMLAYERS = pData->GetNumLayers(m_uiCurFontState);
+	const uint32 uiNUMLAYERS = pData->GetNumLayers(m_uiState);
 	const glm::mat4 &mtxTransformRef = GetWorldTransform();
 
 	uint32 iOffsetIndex = 0;
@@ -108,7 +108,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 			if(m_Utf32CodeList[j] == '\n')
 				continue;
 
-			const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiCurFontState, i, m_Utf32CodeList[j]);
+			const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiState, i, m_Utf32CodeList[j]);
 			if(pGlyphRef == nullptr)
 				continue;
 
@@ -118,12 +118,12 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 			vertexBufferRef.AppendData2d(&m_pGlyphInfos[uiGlyphOffsetIndex].vOffset, sizeof(glm::vec2));
 
-			vertexBufferRef.AppendData2d(&m_StateColors[m_uiCurFontState]->m_LayerColors[i]->topColor.Get(), sizeof(glm::vec3));
+			vertexBufferRef.AppendData2d(&m_StateColors[m_uiState]->m_LayerColors[i]->topColor.Get(), sizeof(glm::vec3));
 
 			float fAlpha = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
 			vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 
-			vertexBufferRef.AppendData2d(&m_StateColors[m_uiCurFontState]->m_LayerColors[i]->botColor.Get(), sizeof(glm::vec3));
+			vertexBufferRef.AppendData2d(&m_StateColors[m_uiState]->m_LayerColors[i]->botColor.Get(), sizeof(glm::vec3));
 
 			vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 

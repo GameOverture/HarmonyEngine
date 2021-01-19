@@ -12,6 +12,7 @@
 
 IHyNodeData::IHyNodeData(const std::string &sPath) :
 	m_sPATH(sPath),
+	m_uiNumStates(0),
 	m_RequiredAtlases(HYFILE_Atlas),
 	m_RequiredAudio(HYFILE_AudioBank),
 	m_pGltf(nullptr)
@@ -19,6 +20,11 @@ IHyNodeData::IHyNodeData(const std::string &sPath) :
 
 /*virtual*/ IHyNodeData::~IHyNodeData(void)
 { }
+
+uint32 IHyNodeData::GetNumStates() const
+{
+	return m_uiNumStates;
+}
 
 const std::string &IHyNodeData::GetPath() const
 { 

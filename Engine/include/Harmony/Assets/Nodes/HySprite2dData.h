@@ -64,9 +64,7 @@ public:
 		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex) const;
 	};
 	AnimState *			m_pAnimStates;
-	uint32				m_uiNumStates;
 
-	uint32 GetNumStates() const;
 	const AnimState &GetState(uint32 uiAnimStateIndex) const;
 	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
 };

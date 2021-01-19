@@ -63,7 +63,7 @@ HyMeter::HyMeter(const char *szPanelPrefix, const char *szPanelName, const char 
 
 	if(m_pText)
 	{
-		m_pText->TextSetMonospacedDigits(true);
+		m_pText->SetMonospacedDigits(true);
 		SetTextLocation(iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY);
 
 		FormatDigits();
@@ -93,12 +93,12 @@ void HyMeter::SetValue(int32 iPennies, float fRackDuration)
 		m_fThresholdDist = 0.0f;
 
 		m_SpinText.m_pSpinText_Shown->pos.Y(0.0f);
-		m_SpinText.m_pSpinText_Padded->pos.Y(-m_pText->TextGetBox().y);
+		m_SpinText.m_pSpinText_Padded->pos.Y(-m_pText->GetTextBox().y);
 	}
 	else
 	{
 		m_iPrevValue = m_iCurValue;
-		m_dTotalDistance = abs(m_iTargetValue - m_iCurValue) * static_cast<double>(m_pText->TextGetBox().y);
+		m_dTotalDistance = abs(m_iTargetValue - m_iCurValue) * static_cast<double>(m_pText->GetTextBox().y);
 		m_dTotalDistance -= m_fThresholdDist;
 	}
 
@@ -153,14 +153,14 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 	FormatDigits();
 }
 
-void HyMeter::TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
+void HyMeter::SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
 {
 	if(m_pText == nullptr)
 		return;
 
-	m_pText->TextSetLayerColor(uiLayerIndex, fR, fG, fB);
-	m_SpinText.m_pSpinText_Shown->TextSetLayerColor(uiLayerIndex, fR, fG, fB);
-	m_SpinText.m_pSpinText_Padded->TextSetLayerColor(uiLayerIndex, fR, fG, fB);
+	m_pText->SetLayerColor(uiLayerIndex, fR, fG, fB);
+	m_SpinText.m_pSpinText_Shown->SetLayerColor(uiLayerIndex, fR, fG, fB);
+	m_SpinText.m_pSpinText_Padded->SetLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
 void HyMeter::TextSetState(uint32 uiAnimState)
@@ -168,9 +168,9 @@ void HyMeter::TextSetState(uint32 uiAnimState)
 	if(m_pText == nullptr)
 		return;
 
-	m_pText->TextSetState(uiAnimState);
-	m_SpinText.m_pSpinText_Shown->TextSetState(uiAnimState);
-	m_SpinText.m_pSpinText_Padded->TextSetState(uiAnimState);
+	m_pText->SetState(uiAnimState);
+	m_SpinText.m_pSpinText_Shown->SetState(uiAnimState);
+	m_SpinText.m_pSpinText_Padded->SetState(uiAnimState);
 }
 
 
@@ -192,8 +192,8 @@ void HyMeter::TextSetState(uint32 uiAnimState)
 	HyInfoPanel::SetTextLocation(iOffsetX, iOffsetY, iWidth, iHeight);
 
 	m_SpinText.pos.Set(m_pText->pos.X(), m_pText->pos.Y());
-	m_SpinText.m_pSpinText_Shown->SetAsScaleBox(m_pText->TextGetBox().x, m_pText->TextGetBox().y);
-	m_SpinText.m_pSpinText_Padded->SetAsScaleBox(m_pText->TextGetBox().x, m_pText->TextGetBox().y);
+	m_SpinText.m_pSpinText_Shown->SetAsScaleBox(m_pText->GetTextBox().x, m_pText->GetTextBox().y);
+	m_SpinText.m_pSpinText_Padded->SetAsScaleBox(m_pText->GetTextBox().x, m_pText->GetTextBox().y);
 
 	FormatDigits();
 }
@@ -205,8 +205,8 @@ void HyMeter::TextSetState(uint32 uiAnimState)
 
 	HyMeter::SetTextAlignment(eAlignment);
 
-	m_SpinText.m_pSpinText_Shown->TextSetAlignment(eAlignment);
-	m_SpinText.m_pSpinText_Padded->TextSetAlignment(eAlignment);
+	m_SpinText.m_pSpinText_Shown->SetTextAlignment(eAlignment);
+	m_SpinText.m_pSpinText_Padded->SetTextAlignment(eAlignment);
 
 	FormatDigits();
 }
@@ -262,21 +262,21 @@ void HyMeter::FormatDigits()
 	if(m_pText == nullptr)
 		return;
 
-	float fThreshold = m_pText->TextGetBox().y;
+	float fThreshold = m_pText->GetTextBox().y;
 
-	m_pText->TextSet(FormatString(m_iCurValue));
+	m_pText->SetText(FormatString(m_iCurValue));
 
 	if(m_bSpinDigits)
 	{
-		std::string sShownString = m_pText->TextGet();
-		m_SpinText.m_pSpinText_Shown->TextSet(sShownString);
+		std::string sShownString = m_pText->GetText();
+		m_SpinText.m_pSpinText_Shown->SetText(sShownString);
 
 		HyAssert(sShownString.empty() == false, "FormatString() returned an empty string");
 		uint32 uiCharIndexForScissor = static_cast<uint32>(sShownString.size()) - 1;
 
 		if(m_iCurValue <= m_iTargetValue)
 		{
-			m_SpinText.m_pSpinText_Padded->TextSet(FormatString(m_iCurValue + 1));
+			m_SpinText.m_pSpinText_Padded->SetText(FormatString(m_iCurValue + 1));
 			m_SpinText.m_pSpinText_Padded->pos.Y(m_SpinText.m_pSpinText_Shown->pos.Y() - fThreshold);
 
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)
@@ -291,7 +291,7 @@ void HyMeter::FormatDigits()
 		}
 		else
 		{
-			m_SpinText.m_pSpinText_Padded->TextSet(FormatString(m_iCurValue - 1));
+			m_SpinText.m_pSpinText_Padded->SetText(FormatString(m_iCurValue - 1));
 			m_SpinText.m_pSpinText_Padded->pos.Y(m_SpinText.m_pSpinText_Shown->pos.Y() + fThreshold);
 
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)
@@ -312,34 +312,34 @@ void HyMeter::FormatDigits()
 			{
 				if(i < uiCharIndexForScissor)
 				{
-					m_pText->TextSetGlyphAlpha(i, 1.0f);
-					m_SpinText.m_pSpinText_Shown->TextSetGlyphAlpha(i, 0.0f);
-					m_SpinText.m_pSpinText_Padded->TextSetGlyphAlpha(i, 0.0f);
+					m_pText->SetGlyphAlpha(i, 1.0f);
+					m_SpinText.m_pSpinText_Shown->SetGlyphAlpha(i, 0.0f);
+					m_SpinText.m_pSpinText_Padded->SetGlyphAlpha(i, 0.0f);
 				}
 				else
 				{
-					m_pText->TextSetGlyphAlpha(i, 0.0f);
-					m_SpinText.m_pSpinText_Shown->TextSetGlyphAlpha(i, 1.0f);
-					m_SpinText.m_pSpinText_Padded->TextSetGlyphAlpha(i, 1.0f);
+					m_pText->SetGlyphAlpha(i, 0.0f);
+					m_SpinText.m_pSpinText_Shown->SetGlyphAlpha(i, 1.0f);
+					m_SpinText.m_pSpinText_Padded->SetGlyphAlpha(i, 1.0f);
 				}
 			}
 			else
 			{
-				m_pText->TextSetGlyphAlpha(i, 1.0f);
-				m_SpinText.m_pSpinText_Shown->TextSetGlyphAlpha(i, 0.0f);
-				m_SpinText.m_pSpinText_Padded->TextSetGlyphAlpha(i, 0.0f);
+				m_pText->SetGlyphAlpha(i, 1.0f);
+				m_SpinText.m_pSpinText_Shown->SetGlyphAlpha(i, 0.0f);
+				m_SpinText.m_pSpinText_Padded->SetGlyphAlpha(i, 0.0f);
 			}
 		}
 
 		m_SpinText.SetScissor(0,
 			0,
-			static_cast<uint32>(m_pText->TextGetBox().x),
+			static_cast<uint32>(m_pText->GetTextBox().x),
 			static_cast<uint32>(fThreshold));
 	}
 	else
 	{
-		for(uint32 i = 0; i < m_pText->TextGet().size(); ++i)
-			m_pText->TextSetGlyphAlpha(i, 1.0f);
+		for(uint32 i = 0; i < m_pText->GetText().size(); ++i)
+			m_pText->SetGlyphAlpha(i, 1.0f);
 	}
 
 
@@ -371,7 +371,7 @@ void HyMeter::FormatDigits()
 	}
 	else	// Spinning (analog) digits
 	{
-		float fThreshold = m_pText->TextGetBox().y;
+		float fThreshold = m_pText->GetTextBox().y;
 
 		double dTravelDist = m_dTotalDistance * (m_fElapsedTimeRack / m_fRackingDuration);
 		m_fThresholdDist += static_cast<float>(dTravelDist - m_dPrevDistance);

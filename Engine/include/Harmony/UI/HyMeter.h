@@ -59,12 +59,12 @@ class HyMeter : public HyInfoPanel
 			delete m_pSpinText_Padded;
 
 			m_pSpinText_Shown = HY_NEW HyText2d(szTextPrefix, szTextName, this);
-			m_pSpinText_Shown->TextSetAlignment(HYALIGN_Center);
-			m_pSpinText_Shown->TextSetMonospacedDigits(true);
+			m_pSpinText_Shown->SetTextAlignment(HYALIGN_Center);
+			m_pSpinText_Shown->SetMonospacedDigits(true);
 
 			m_pSpinText_Padded = HY_NEW HyText2d(szTextPrefix, szTextName, this);
-			m_pSpinText_Padded->TextSetAlignment(HYALIGN_Center);
-			m_pSpinText_Padded->TextSetMonospacedDigits(true);
+			m_pSpinText_Padded->SetTextAlignment(HYALIGN_Center);
+			m_pSpinText_Padded->SetMonospacedDigits(true);
 		}
 	};
 	SpinText 				m_SpinText;
@@ -96,7 +96,7 @@ public:
 	bool IsUsingCommas();
 	void SetAsUsingCommas(bool bSet);
 
-	void TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
+	void SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 
 	void TextSetState(uint32 uiAnimState);
 

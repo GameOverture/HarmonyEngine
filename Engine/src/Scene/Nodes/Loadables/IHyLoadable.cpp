@@ -18,7 +18,8 @@ IHyLoadable::IHyLoadable(std::string sPrefix, std::string sName) :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(nullptr),
 	m_sName(sName),
-	m_sPrefix(sPrefix)
+	m_sPrefix(sPrefix),
+	m_uiState(0)
 {
 }
 
@@ -26,7 +27,8 @@ IHyLoadable::IHyLoadable(const IHyLoadable &copyRef) :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(copyRef.m_pData),
 	m_sName(copyRef.m_sName),
-	m_sPrefix(copyRef.m_sPrefix)
+	m_sPrefix(copyRef.m_sPrefix),
+	m_uiState(copyRef.m_uiState)
 {
 }
 
@@ -34,7 +36,8 @@ IHyLoadable::IHyLoadable(IHyLoadable &&donor) :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(std::move(donor.m_pData)),
 	m_sName(std::move(donor.m_sName)),
-	m_sPrefix(std::move(donor.m_sPrefix))
+	m_sPrefix(std::move(donor.m_sPrefix)),
+	m_uiState(std::move(donor.m_uiState))
 {
 }
 
@@ -105,6 +108,26 @@ void IHyLoadable::_Reinitialize(std::string sPrefix, std::string sName)
 
 	if(bWasLoaded)
 		Load();
+}
+
+uint32 IHyLoadable::GetState() const
+{
+	return m_uiState;
+}
+
+/*virtual*/ void IHyLoadable::SetState(uint32 uiStateIndex)
+{
+	m_uiState = uiStateIndex;
+}
+
+uint32 IHyLoadable::GetNumStates()
+{
+	if(AcquireData() == nullptr) {
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimGetNumStates invoked on null data");
+		return 0;
+	}
+	
+	return UncheckedGetData()->GetNumStates();
 }
 
 const IHyNodeData *IHyLoadable::AcquireData()

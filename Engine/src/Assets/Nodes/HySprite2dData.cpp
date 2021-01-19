@@ -26,8 +26,7 @@ bool HySprite2dFrame::IsValid() const
 
 HySprite2dData::HySprite2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
-	m_pAnimStates(nullptr),
-	m_uiNumStates(0)
+	m_pAnimStates(nullptr)
 {
 	HyJsonArray spriteStateArray = itemDataObj["stateArray"].GetArray();
 
@@ -57,11 +56,6 @@ HySprite2dData::HySprite2dData(const std::string &sPath, HyJsonObj itemDataObj, 
 	unsigned char *pAnimStatesBuffer = reinterpret_cast<unsigned char *>(m_pAnimStates);
 	delete[] pAnimStatesBuffer;
 	pAnimStatesBuffer = nullptr;
-}
-
-uint32 HySprite2dData::GetNumStates() const
-{
-	return m_uiNumStates;
 }
 
 const HySprite2dData::AnimState &HySprite2dData::GetState(uint32 uiAnimStateIndex) const

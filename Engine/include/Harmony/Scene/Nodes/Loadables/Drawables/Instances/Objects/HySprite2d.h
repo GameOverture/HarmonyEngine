@@ -35,7 +35,7 @@ public:
 	//
 	// Leaving default arguments will clear any currently assigned call back.
 	//--------------------------------------------------------------------------------------
-	void AnimSetCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack = HySprite2d::NullAnimCallback, void *pParam = nullptr);
+	void SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack = HySprite2d::NullAnimCallback, void *pParam = nullptr);
 
 protected:
 	virtual void OnInvokeCallback(uint32 uiStateIndex) override;

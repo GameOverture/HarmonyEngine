@@ -27,8 +27,6 @@ protected:
 	std::string						m_sRawString;
 	std::vector<uint32>				m_Utf32CodeList;
 
-	uint32							m_uiCurFontState;
-
 	struct StateColors
 	{
 		struct LayerColor
@@ -85,49 +83,47 @@ public:
 	const IHyText &operator=(const IHyText &rhs);
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
-	void TextSet(const std::string sText);
-	const std::string &TextGet() const;
+	void SetText(const std::string sText);
+	const std::string &GetText() const;
 
-	float TextGetPixelWidth(bool bIncludeScaling = true);
-	float TextGetPixelHeight(bool bIncludeScaling = true);
+	float GetTextWidth(bool bIncludeScaling = true);
+	float GetTextHeight(bool bIncludeScaling = true);
 
-	uint32 TextGetNumCharacters() const;
-	uint32 TextGetNumShownCharacters() const;
+	uint32 GetNumGlyphs() const;
+	uint32 GetNumShownGlyphs() const;
 	uint32 GetNumRenderQuads();
-	float TextGetScaleBoxModifer();
+	//float TextGetScaleBoxModifer();
 
-	glm::vec2 TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
-	glm::vec2 TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
-	float TextGetGlyphAlpha(uint32 uiCharIndex);
-	void TextSetGlyphAlpha(uint32 uiCharIndex, float fAlpha);
+	glm::vec2 GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
+	glm::vec2 GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
+	float GetGlyphAlpha(uint32 uiCharIndex);
+	void SetGlyphAlpha(uint32 uiCharIndex, float fAlpha);
 
-	uint32 TextGetState();
-	void TextSetState(uint32 uiStateIndex);
+	uint32 GetNumLayers();
+	uint32 GetNumLayers(uint32 uiStateIndex);
 
-	uint32 TextGetNumLayers();
-	uint32 TextGetNumLayers(uint32 uiStateIndex);
+	std::pair<HyAnimVec3 &, HyAnimVec3 &> GetLayerColor(uint32 uiLayerIndex);
+	std::pair<HyAnimVec3 &, HyAnimVec3 &> GetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex);
+	void SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
+	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB);
+	void SetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
+	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
+	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex);
 
-	std::pair<HyAnimVec3 &, HyAnimVec3 &> TextGetLayerColor(uint32 uiLayerIndex);
-	std::pair<HyAnimVec3 &, HyAnimVec3 &> TextGetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex);
-	void TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
-	void TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB);
-	void TextSetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
-	void TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
-	void TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex);
+	HyTextAlign GetTextAlignment();
+	void SetTextAlignment(HyTextAlign eAlignment);
 
-	HyTextAlign TextGetAlignment();
-	void TextSetAlignment(HyTextAlign eAlignment);
+	bool IsMonospacedDigits();
+	void SetMonospacedDigits(bool bSet);
 
-	bool TextIsMonospacedDigits();
-	void TextSetMonospacedDigits(bool bSet);
-
-	const glm::vec2 &TextGetBox();
+	const glm::vec2 &GetTextBox();
 
 	void SetAsLine();
 	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 	void SetAsVertical();
 
+	virtual void SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
 
 protected:

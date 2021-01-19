@@ -19,7 +19,6 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(std::string sPrefix /*= ""*/, std::string sN
 	NODETYPE(HYTYPE_Text, sPrefix, sName, pParent),
 	m_bIsDirty(false),
 	m_sRawString(""),
-	m_uiCurFontState(0),
 	m_uiBoxAttributes(0),
 	m_vBoxDimensions(0.0f, 0.0f),
 	m_fScaleBoxModifier(1.0f),
@@ -40,7 +39,6 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(const IHyText &copyRef) :
 	m_bIsDirty(true),
 	m_sRawString(copyRef.m_sRawString),
 	m_Utf32CodeList(copyRef.m_Utf32CodeList),
-	m_uiCurFontState(copyRef.m_uiCurFontState),
 	m_uiBoxAttributes(copyRef.m_uiBoxAttributes),
 	m_vBoxDimensions(copyRef.m_vBoxDimensions),
 	m_fScaleBoxModifier(copyRef.m_fScaleBoxModifier),
@@ -78,7 +76,7 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 	m_bIsDirty = true;
 	m_sRawString = rhs.m_sRawString;
 	m_Utf32CodeList = rhs.m_Utf32CodeList;
-	m_uiCurFontState = rhs.m_uiCurFontState;
+	m_uiState = rhs.m_uiState;
 	m_uiBoxAttributes = rhs.m_uiBoxAttributes;
 	m_vBoxDimensions = rhs.m_vBoxDimensions;
 	m_fScaleBoxModifier = rhs.m_fScaleBoxModifier;
@@ -96,7 +94,7 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSet(const std::string sText)
+void IHyText<NODETYPE, ENTTYPE>::SetText(const std::string sText)
 {
 	if(sText == m_sRawString)
 		return;
@@ -118,33 +116,33 @@ void IHyText<NODETYPE, ENTTYPE>::TextSet(const std::string sText)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-const std::string &IHyText<NODETYPE, ENTTYPE>::TextGet() const
+const std::string &IHyText<NODETYPE, ENTTYPE>::GetText() const
 {
 	return m_sRawString;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHyText<NODETYPE, ENTTYPE>::TextGetPixelWidth(bool bIncludeScaling /*= true*/)
+float IHyText<NODETYPE, ENTTYPE>::GetTextWidth(bool bIncludeScaling /*= true*/)
 {
 	CalculateGlyphInfos();
 	return m_fUsedPixelWidth * (bIncludeScaling ? scale.X() : 1.0f);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHyText<NODETYPE, ENTTYPE>::TextGetPixelHeight(bool bIncludeScaling /*= true*/)
+float IHyText<NODETYPE, ENTTYPE>::GetTextHeight(bool bIncludeScaling /*= true*/)
 {
 	CalculateGlyphInfos();
 	return m_fUsedPixelHeight * (bIncludeScaling ? scale.Y() : 1.0f);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::TextGetNumCharacters() const
+uint32 IHyText<NODETYPE, ENTTYPE>::GetNumGlyphs() const
 {
 	return static_cast<uint32>(m_Utf32CodeList.size());
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::TextGetNumShownCharacters() const
+uint32 IHyText<NODETYPE, ENTTYPE>::GetNumShownGlyphs() const
 {
 	return m_uiNumValidCharacters;
 }
@@ -156,15 +154,15 @@ uint32 IHyText<NODETYPE, ENTTYPE>::GetNumRenderQuads()
 	return m_uiNumRenderQuads;
 }
 
-template<typename NODETYPE, typename ENTTYPE>
-float IHyText<NODETYPE, ENTTYPE>::TextGetScaleBoxModifer()
-{
-	CalculateGlyphInfos();
-	return m_fScaleBoxModifier;
-}
+//template<typename NODETYPE, typename ENTTYPE>
+//float IHyText<NODETYPE, ENTTYPE>::TextGetScaleBoxModifer()
+//{
+//	CalculateGlyphInfos();
+//	return m_fScaleBoxModifier;
+//}
 
 template<typename NODETYPE, typename ENTTYPE>
-glm::vec2 IHyText<NODETYPE, ENTTYPE>::TextGetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
+glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
 	CalculateGlyphInfos();
 
@@ -178,14 +176,14 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::TextGetGlyphOffset(uint32 uiCharIndex, uin
 	}
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
-	uint32 uiNumLayers = pData->GetNumLayers(m_uiCurFontState);
+	uint32 uiNumLayers = pData->GetNumLayers(m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
 	return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-glm::vec2 IHyText<NODETYPE, ENTTYPE>::TextGetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
+glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
 	CalculateGlyphInfos();
 
@@ -194,7 +192,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::TextGetGlyphSize(uint32 uiCharIndex, uint3
 	}
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
-	const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
+	const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
 	if(pGlyphRef == nullptr)
 		return glm::vec2(0.0f);
 
@@ -204,7 +202,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::TextGetGlyphSize(uint32 uiCharIndex, uint3
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHyText<NODETYPE, ENTTYPE>::TextGetGlyphAlpha(uint32 uiCharIndex)
+float IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha(uint32 uiCharIndex)
 {
 	if(AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
@@ -216,14 +214,14 @@ float IHyText<NODETYPE, ENTTYPE>::TextGetGlyphAlpha(uint32 uiCharIndex)
 	}
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
-	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
 	return m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
+void IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 {
 	CalculateGlyphInfos();
 
@@ -237,7 +235,7 @@ void IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha(uint32 uiCharIndex, float fAl
 	}
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
-	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiState);
 
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 	{
@@ -247,46 +245,18 @@ void IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha(uint32 uiCharIndex, float fAl
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::TextGetState()
-{
-	return m_uiCurFontState;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSetState(uint32 uiStateIndex)
-{
-	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HyText2dData *>(UncheckedGetData())->GetNumStates())
-	{
-		if(UncheckedGetData() == nullptr) {
-			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
-		}
-		else if(uiStateIndex >= static_cast<const HyText2dData *>(UncheckedGetData())->GetNumStates()) {
-			HyLogWarning(m_sPrefix << "/" << m_sName << " (HyText2d) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HyText2dData *>(AcquireData())->GetNumStates() << "'");
-		}
-
-		return;
-	}
-
-	if(m_uiCurFontState == uiStateIndex)
-		return;
-
-	m_uiCurFontState = uiStateIndex;
-	MarkAsDirty();
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers()
+uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers()
 {
 	if(AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
 		return 0;
 	}
 
-	return static_cast<const HyText2dData *>(UncheckedGetData())->GetNumLayers(m_uiCurFontState);
+	return static_cast<const HyText2dData *>(UncheckedGetData())->GetNumLayers(m_uiState);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers(uint32 uiStateIndex)
+uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers(uint32 uiStateIndex)
 {
 	if(AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
@@ -297,31 +267,31 @@ uint32 IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers(uint32 uiStateIndex)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-std::pair<HyAnimVec3 &, HyAnimVec3 &> IHyText<NODETYPE, ENTTYPE>::TextGetLayerColor(uint32 uiLayerIndex)
+std::pair<HyAnimVec3 &, HyAnimVec3 &> IHyText<NODETYPE, ENTTYPE>::GetLayerColor(uint32 uiLayerIndex)
 {
-	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->topColor, m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->botColor);
+	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->topColor, m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->botColor);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-std::pair<HyAnimVec3 &, HyAnimVec3 &> IHyText<NODETYPE, ENTTYPE>::TextGetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex)
+std::pair<HyAnimVec3 &, HyAnimVec3 &> IHyText<NODETYPE, ENTTYPE>::GetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex)
 {
 	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor, m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
+void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
 {
 	if(AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
-	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
-	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
+	m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
+	m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB)
+void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB)
 {
 	if(AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
@@ -333,19 +303,19 @@ void IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor(uint32 uiLayerIndex, uint32 u
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
+void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
 	if(AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
-	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
-	m_StateColors[m_uiCurFontState]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
+	m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
+	m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
+void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
 	if(AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
@@ -357,7 +327,7 @@ void IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor(uint32 uiLayerIndex, uint32 u
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex)
+void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex)
 {
 	if(AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
@@ -369,13 +339,13 @@ void IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor(uint32 uiLayerIndex, uint32 u
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-HyTextAlign IHyText<NODETYPE, ENTTYPE>::TextGetAlignment()
+HyTextAlign IHyText<NODETYPE, ENTTYPE>::GetTextAlignment()
 {
 	return m_eAlignment;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSetAlignment(HyTextAlign eAlignment)
+void IHyText<NODETYPE, ENTTYPE>::SetTextAlignment(HyTextAlign eAlignment)
 {
 	if(m_eAlignment != eAlignment)
 		MarkAsDirty();
@@ -384,13 +354,13 @@ void IHyText<NODETYPE, ENTTYPE>::TextSetAlignment(HyTextAlign eAlignment)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-bool IHyText<NODETYPE, ENTTYPE>::TextIsMonospacedDigits()
+bool IHyText<NODETYPE, ENTTYPE>::IsMonospacedDigits()
 {
 	return m_bMonospacedDigits;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::TextSetMonospacedDigits(bool bSet)
+void IHyText<NODETYPE, ENTTYPE>::SetMonospacedDigits(bool bSet)
 {
 	if(m_bMonospacedDigits != bSet)
 		MarkAsDirty();
@@ -399,7 +369,7 @@ void IHyText<NODETYPE, ENTTYPE>::TextSetMonospacedDigits(bool bSet)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::TextGetBox()
+const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBox()
 {
 	return m_vBoxDimensions;
 }
@@ -479,6 +449,29 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+/*virtual*/ void IHyText<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
+{
+	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HyText2dData *>(UncheckedGetData())->GetNumStates())
+	{
+		if(UncheckedGetData() == nullptr) {
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
+		}
+		else if(uiStateIndex >= static_cast<const HyText2dData *>(UncheckedGetData())->GetNumStates()) {
+			HyLogWarning(m_sPrefix << "/" << m_sName << " (HyText2d) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HyText2dData *>(AcquireData())->GetNumStates() << "'");
+		}
+
+		return;
+	}
+
+	if(m_uiState == uiStateIndex)
+		return;
+
+	IHyLoadable::SetState(uiStateIndex);
+	
+	MarkAsDirty();
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHyText<NODETYPE, ENTTYPE>::IsLoadDataValid() /*override*/
 {
 	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
@@ -545,7 +538,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 
 	m_uiNumValidCharacters = 0;
-	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiCurFontState);
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiState);
 	const uint32 uiSTR_SIZE = static_cast<uint32>(m_Utf32CodeList.size());
 
 	if(m_pGlyphInfos == nullptr || m_uiNumReservedGlyphs < uiSTR_SIZE * uiNUM_LAYERS)
@@ -584,7 +577,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 			// UTF-32 value of '48' == zero (...and '57' == nine)
 			for(uint32 iDigit = 48; iDigit < 58; ++iDigit)
 			{
-				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, iDigit);
+				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiState, uiLayerIndex, iDigit);
 				if(pGlyphRef)
 				{
 					if(pMonospaceWidths[uiLayerIndex] < pGlyphRef->fADVANCE_X)
@@ -662,7 +655,7 @@ offsetCalculation:
 			{
 				uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
 
-				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiCurFontState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
+				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
 				if(pGlyphRef == nullptr)
 					break;
 
@@ -680,7 +673,7 @@ offsetCalculation:
 
 				float fAdvanceAmtX = pGlyphRef->fADVANCE_X;
 				float fAscender = static_cast<float>(pGlyphRef->iOFFSET_Y);
-				float fDecender = HyClamp(static_cast<float>(pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(m_uiCurFontState));
+				float fDecender = HyClamp(static_cast<float>(pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(m_uiState));
 				float fOffsetX = static_cast<float>(pGlyphRef->iOFFSET_X);
 
 				if(m_bMonospacedDigits && m_Utf32CodeList[uiStrIndex] >= 48 && m_Utf32CodeList[uiStrIndex] <= 57)
@@ -779,7 +772,7 @@ offsetCalculation:
 
 		if(bDoNewline)
 		{
-			float fNewLineOffset = (pData->GetLineHeight(m_uiCurFontState) * m_fScaleBoxModifier);
+			float fNewLineOffset = (pData->GetLineHeight(m_uiState) * m_fScaleBoxModifier);
 
 			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
 				fNewLineOffset = fCurLineHeight;
@@ -841,7 +834,7 @@ offsetCalculation:
 	{
 		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
 		{
-			float fNudgeAmt = (m_vBoxDimensions.x - vNewlineInfo[i].fUSED_WIDTH);// - (pData->GetLeftSideNudgeAmt(m_uiCurFontState) * m_fScaleBoxModifier);
+			float fNudgeAmt = (m_vBoxDimensions.x - vNewlineInfo[i].fUSED_WIDTH);// - (pData->GetLeftSideNudgeAmt(m_uiState) * m_fScaleBoxModifier);
 			fNudgeAmt *= (m_eAlignment == HYALIGN_Center) ? 0.5f : 1.0f;
 
 			uint32 uiStrIndex = vNewlineInfo[i].uiSTART_CHARACTER_INDEX;

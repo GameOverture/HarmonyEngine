@@ -23,7 +23,6 @@ IHySprite<NODETYPE, ENTTYPE>::IHySprite(std::string sPrefix /*= ""*/, std::strin
 	m_bIsAnimPaused(false),
 	m_fAnimPlayRate(1.0f),
 	m_fElapsedFrameTime(0.0f),
-	m_uiCurAnimState(0),
 	m_uiCurFrame(0),
 	m_vCustomOffset(0, 0)
 {
@@ -36,7 +35,6 @@ IHySprite<NODETYPE, ENTTYPE>::IHySprite(const IHySprite &copyRef) :
 	m_bIsAnimPaused(copyRef.m_bIsAnimPaused),
 	m_fAnimPlayRate(copyRef.m_fAnimPlayRate),
 	m_fElapsedFrameTime(copyRef.m_fElapsedFrameTime),
-	m_uiCurAnimState(copyRef.m_uiCurAnimState),
 	m_uiCurFrame(copyRef.m_uiCurFrame)
 {
 	for(uint32 i = 0; i < static_cast<uint32>(copyRef.m_AnimCtrlAttribList.size()); ++i)
@@ -56,7 +54,6 @@ const IHySprite<NODETYPE, ENTTYPE> &IHySprite<NODETYPE, ENTTYPE>::operator=(cons
 	m_bIsAnimPaused = rhs.m_bIsAnimPaused;
 	m_fAnimPlayRate = rhs.m_fAnimPlayRate;
 	m_fElapsedFrameTime = rhs.m_fElapsedFrameTime;
-	m_uiCurAnimState = rhs.m_uiCurAnimState;
 	m_uiCurFrame = rhs.m_uiCurFrame;
 
 	m_AnimCtrlAttribList.clear();
@@ -67,115 +64,98 @@ const IHySprite<NODETYPE, ENTTYPE> &IHySprite<NODETYPE, ENTTYPE>::operator=(cons
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHySprite<NODETYPE, ENTTYPE>::AnimCtrl(HyAnimCtrl eAnimCtrl)
+void IHySprite<NODETYPE, ENTTYPE>::SetAnimCtrl(HyAnimCtrl eAnimCtrl)
 {
-	AnimCtrl(eAnimCtrl, m_uiCurAnimState);
+	SetAnimCtrl(eAnimCtrl, m_uiState);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHySprite<NODETYPE, ENTTYPE>::AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState)
+void IHySprite<NODETYPE, ENTTYPE>::SetAnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiStateIndex)
 {
-	while(uiAnimState >= m_AnimCtrlAttribList.size())
+	while(uiStateIndex >= m_AnimCtrlAttribList.size())
 		m_AnimCtrlAttribList.push_back(0);
 
 	switch(eAnimCtrl)
 	{
 	case HYANIMCTRL_Play:
 		m_bIsAnimPaused = false;
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Finished;
+		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Finished;
 		break;
 	case HYANIMCTRL_Reset:
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_IsBouncing;
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Finished;
-		if(m_AnimCtrlAttribList[uiAnimState] & ANIMCTRLATTRIB_Reverse && static_cast<const HySprite2dData *>(AcquireData())->GetState(uiAnimState).m_uiNUMFRAMES > 0)
-			AnimSetFrame(static_cast<const HySprite2dData *>(AcquireData())->GetState(uiAnimState).m_uiNUMFRAMES - 1);
+		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_IsBouncing;
+		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Finished;
+		if(m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Reverse && static_cast<const HySprite2dData *>(AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES > 0)
+			SetFrame(static_cast<const HySprite2dData *>(AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES - 1);
 		else
-			AnimSetFrame(0);
+			SetFrame(0);
 		break;
 
 	case HYANIMCTRL_Reverse:
-		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Reverse;
+		m_AnimCtrlAttribList[uiStateIndex] |= ANIMCTRLATTRIB_Reverse;
 		break;
 	case HYANIMCTRL_DontReverse:
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Reverse;
+		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Reverse;
 		break;
 	case HYANIMCTRL_Loop:
-		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Loop;
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Finished;
+		m_AnimCtrlAttribList[uiStateIndex] |= ANIMCTRLATTRIB_Loop;
+		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Finished;
 		break;
 	case HYANIMCTRL_DontLoop:
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Loop;
+		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Loop;
 		break;
 	case HYANIMCTRL_Bounce:
-		m_AnimCtrlAttribList[uiAnimState] |= ANIMCTRLATTRIB_Bounce;
+		m_AnimCtrlAttribList[uiStateIndex] |= ANIMCTRLATTRIB_Bounce;
 		break;
 	case HYANIMCTRL_DontBounce:
-		m_AnimCtrlAttribList[uiAnimState] &= ~ANIMCTRLATTRIB_Bounce;
+		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Bounce;
 		break;
 	}
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-bool IHySprite<NODETYPE, ENTTYPE>::AnimIsReverse()
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimReverse()
 {
-	return AnimIsReverse(m_uiCurAnimState);
+	return IsAnimReverse(m_uiState);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-bool IHySprite<NODETYPE, ENTTYPE>::AnimIsReverse(uint32 uiAnimState)
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimReverse(uint32 uiStateIndex)
 {
 	if(AcquireData() == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimIsReverse invoked on null data");
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::IsAnimReverse invoked on null data");
 		return false;
 	}
 
-	return (m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Reverse) != 0;
+	return (m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Reverse) != 0;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHySprite<NODETYPE, ENTTYPE>::AnimGetNumStates()
+uint32 IHySprite<NODETYPE, ENTTYPE>::GetNumFrames()
 {
 	if(AcquireData() == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimGetNumStates invoked on null data");
-		return 0;
-	}
-	
-	return static_cast<const HySprite2dData *>(UncheckedGetData())->GetNumStates();
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-uint32 IHySprite<NODETYPE, ENTTYPE>::AnimGetState() const
-{
-	return m_uiCurAnimState;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-uint32 IHySprite<NODETYPE, ENTTYPE>::AnimGetNumFrames()
-{
-	if(AcquireData() == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimGetNumFrames invoked on null data");
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::GetNumFrames invoked on null data");
 		return 0;
 	}
 
-	return static_cast<const HySprite2dData *>(UncheckedGetData())->GetState(m_uiCurAnimState).m_uiNUMFRAMES;
+	return static_cast<const HySprite2dData *>(UncheckedGetData())->GetState(m_uiState).m_uiNUMFRAMES;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHySprite<NODETYPE, ENTTYPE>::AnimGetFrame() const
+uint32 IHySprite<NODETYPE, ENTTYPE>::GetFrame() const
 {
 	return m_uiCurFrame;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHySprite<NODETYPE, ENTTYPE>::AnimSetFrame(uint32 uiFrameIndex)
+void IHySprite<NODETYPE, ENTTYPE>::SetFrame(uint32 uiFrameIndex)
 {
-	if(AcquireData() == nullptr || uiFrameIndex >= static_cast<const HySprite2dData *>(UncheckedGetData())->GetState(m_uiCurAnimState).m_uiNUMFRAMES)
+	if(AcquireData() == nullptr || uiFrameIndex >= static_cast<const HySprite2dData *>(UncheckedGetData())->GetState(m_uiState).m_uiNUMFRAMES)
 	{
 		if(UncheckedGetData() == nullptr) {
 			HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimSetFrame invoked on null data");
 		}
 		else {
-			HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimSetFrame wants to set frame index of '" << uiFrameIndex << "' when total number of frames is '" << static_cast<const HySprite2dData *>(AcquireData())->GetState(m_uiCurAnimState).m_uiNUMFRAMES << "'");
+			HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimSetFrame wants to set frame index of '" << uiFrameIndex << "' when total number of frames is '" << static_cast<const HySprite2dData *>(AcquireData())->GetState(m_uiState).m_uiNUMFRAMES << "'");
 		}
 
 		return;
@@ -186,20 +166,20 @@ void IHySprite<NODETYPE, ENTTYPE>::AnimSetFrame(uint32 uiFrameIndex)
 
 	m_uiCurFrame = uiFrameIndex;
 
-	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 	m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
 	
 	SetDirty(DIRTY_BoundingVolume);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::AnimGetPlayRate() const
+float IHySprite<NODETYPE, ENTTYPE>::GetAnimRate() const
 {
 	return m_fAnimPlayRate;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHySprite<NODETYPE, ENTTYPE>::AnimSetPlayRate(float fPlayRate)
+void IHySprite<NODETYPE, ENTTYPE>::SetAnimRate(float fPlayRate)
 {
 	if(fPlayRate < 0.0f)
 		fPlayRate = 0.0f;
@@ -208,61 +188,27 @@ void IHySprite<NODETYPE, ENTTYPE>::AnimSetPlayRate(float fPlayRate)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHySprite<NODETYPE, ENTTYPE>::AnimSetState(uint32 uiStateIndex)
-{
-	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySprite2dData *>(UncheckedGetData())->GetNumStates())
-	{
-		if(UncheckedGetData() == nullptr) {
-			HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimSetState invoked on null data");
-		}
-		else if(uiStateIndex >= static_cast<const HySprite2dData *>(UncheckedGetData())->GetNumStates()) {
-			HyLogWarning(m_sPrefix << "/" << m_sName << " (HySprite) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySprite2dData *>(AcquireData())->GetNumStates() << "'");
-		}
-		
-		return;
-	}
-
-	if(m_uiCurAnimState == uiStateIndex)
-		return;
-
-	m_uiCurAnimState = uiStateIndex;
-
-	while(m_uiCurAnimState >= m_AnimCtrlAttribList.size())
-		m_AnimCtrlAttribList.push_back(0);
-
-	if(0 == (m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Reverse) || AnimGetNumFrames() == 0)
-		m_uiCurFrame = 0;
-	else
-		m_uiCurFrame = AnimGetNumFrames() - 1;
-
-	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-	m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
-
-	SetDirty(DIRTY_BoundingVolume);
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-bool IHySprite<NODETYPE, ENTTYPE>::AnimIsFinished()
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimFinished()
 {
 	if(AcquireData() == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimIsFinished invoked on null data");
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::IsAnimFinished invoked on null data");
 		return false;
 	}
 
-	return (m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Finished) != 0;
+	return (m_AnimCtrlAttribList[m_uiState] & ANIMCTRLATTRIB_Finished) != 0;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-bool IHySprite<NODETYPE, ENTTYPE>::AnimIsPaused()
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimPaused()
 {
 	return m_bIsAnimPaused;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHySprite<NODETYPE, ENTTYPE>::AnimSetPause(bool bPause)
+void IHySprite<NODETYPE, ENTTYPE>::SetAnimPause(bool bPause)
 {
 	if(AcquireData() == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimSetPause invoked on null data");
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::SetAnimPause invoked on null data");
 		return;
 	}
 
@@ -273,29 +219,29 @@ void IHySprite<NODETYPE, ENTTYPE>::AnimSetPause(bool bPause)
 	m_fElapsedFrameTime = 0.0f;
 
 	if(m_bIsAnimPaused == false)
-		m_AnimCtrlAttribList[m_uiCurAnimState] &= ~ANIMCTRLATTRIB_Finished;
+		m_AnimCtrlAttribList[m_uiState] &= ~ANIMCTRLATTRIB_Finished;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::AnimGetDuration()
+float IHySprite<NODETYPE, ENTTYPE>::GetAnimDuration()
 {
 	if(AcquireData() == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimGetDuration invoked on null data");
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::GetAnimDuration invoked on null data");
 		return 0.0f;
 	}
 
-	return static_cast<const HySprite2dData *>(UncheckedGetData())->GetState(m_uiCurAnimState).m_fDURATION;
+	return static_cast<const HySprite2dData *>(UncheckedGetData())->GetState(m_uiState).m_fDURATION;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::AnimGetCurFrameWidth(bool bIncludeScaling /*= true*/)
+float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameWidth(bool bIncludeScaling /*= true*/)
 {
 	if(AcquireData() == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimGetCurFrameWidth invoked on null data");
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameWidth invoked on null data");
 		return 0.0f;
 	}
 
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
@@ -313,14 +259,14 @@ float IHySprite<NODETYPE, ENTTYPE>::AnimGetCurFrameWidth(bool bIncludeScaling /*
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::AnimGetCurFrameHeight(bool bIncludeScaling /*= true*/)
+float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameHeight(bool bIncludeScaling /*= true*/)
 {
 	if(AcquireData() == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimGetCurFrameHeight invoked on null data");
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameHeight invoked on null data");
 		return 0.0f;
 	}
 
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
@@ -338,11 +284,11 @@ float IHySprite<NODETYPE, ENTTYPE>::AnimGetCurFrameHeight(bool bIncludeScaling /
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::AnimGetMaxWidth(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
+float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
 {
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(AcquireData());
 	if(pData == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimGetMaxWidth invoked on null data");
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth invoked on null data");
 		return 0.0f;
 	}
 
@@ -369,11 +315,11 @@ float IHySprite<NODETYPE, ENTTYPE>::AnimGetMaxWidth(uint32 uiStateIndex, bool bI
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::AnimGetMaxHeight(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
+float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
 {
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(AcquireData());
 	if(pData == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimGetMaxHeight invoked on null data");
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight invoked on null data");
 		return 0.0f;
 	}
 
@@ -407,10 +353,44 @@ void IHySprite<NODETYPE, ENTTYPE>::SetUserOffset(int32 iOffsetX, int32 iOffsetY)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::AnimGetCurFrameOffset()
+glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 {
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiState, m_uiCurFrame);
 	return frameRef.vOFFSET + m_vCustomOffset;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+/*virtual*/ void IHySprite<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
+{
+	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySprite2dData *>(UncheckedGetData())->GetNumStates())
+	{
+		if(UncheckedGetData() == nullptr) {
+			HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimSetState invoked on null data");
+		}
+		else if(uiStateIndex >= static_cast<const HySprite2dData *>(UncheckedGetData())->GetNumStates()) {
+			HyLogWarning(m_sPrefix << "/" << m_sName << " (HySprite) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySprite2dData *>(AcquireData())->GetNumStates() << "'");
+		}
+		
+		return;
+	}
+
+	if(m_uiState == uiStateIndex)
+		return;
+
+	IHyLoadable::SetState(uiStateIndex);
+
+	while(m_uiState >= m_AnimCtrlAttribList.size())
+		m_AnimCtrlAttribList.push_back(0);
+
+	if(0 == (m_AnimCtrlAttribList[m_uiState] & ANIMCTRLATTRIB_Reverse) || GetNumFrames() == 0)
+		m_uiCurFrame = 0;
+	else
+		m_uiCurFrame = GetNumFrames() - 1;
+
+	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
+	m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
+
+	SetDirty(DIRTY_BoundingVolume);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -423,7 +403,7 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHySprite<NODETYPE, ENTTYPE>::OnIsValidToRender() /*override*/
 {
-	return ((m_AnimCtrlAttribList[m_uiCurAnimState] & ANIMCTRLATTRIB_Invalid) == 0);
+	return ((m_AnimCtrlAttribList[m_uiState] & ANIMCTRLATTRIB_Invalid) == 0);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -462,11 +442,11 @@ template<typename NODETYPE, typename ENTTYPE>
 	if(m_bIsAnimPaused == false)
 		m_fElapsedFrameTime += Hy_UpdateStep() * m_fAnimPlayRate;
 
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
-	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiCurAnimState];
+	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
+	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[m_uiState];
 	while(m_fElapsedFrameTime >= frameRef.fDURATION && frameRef.fDURATION > 0.0f)
 	{
-		int32 iNumFrames = AnimGetNumFrames();
+		int32 iNumFrames = GetNumFrames();
 		int32 iNextFrameIndex = static_cast<int32>(m_uiCurFrame);
 		bool bInvokeCallback = false;
 
@@ -567,10 +547,10 @@ template<typename NODETYPE, typename ENTTYPE>
 		m_fElapsedFrameTime -= frameRef.fDURATION;
 
 		if(bInvokeCallback)
-			OnInvokeCallback(m_uiCurAnimState);
+			OnInvokeCallback(m_uiState);
 	}
 
-	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 	m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
 }
 

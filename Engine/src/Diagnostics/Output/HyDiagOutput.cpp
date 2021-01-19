@@ -67,7 +67,7 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 		if((m_uiShowFlags & HYDIAG_LastFrameTime) != 0)
 		{
 			ss << "Cur : " << dTimeDelta << "ms";
-			m_txtLastFrameTime.TextSet(ss.str());
+			m_txtLastFrameTime.SetText(ss.str());
 
 			m_txtLastFrameTime.pos.Y(fOffsetY);
 			fOffsetY -= HY_SYSTEM_FONT_SIZE;
@@ -80,21 +80,21 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 				ss.str("");
 				ss.clear();
 				ss << "Avg : " << static_cast<double>(m_dFrameTime_Cumulative / m_uiFrameCount) * 1000.0 << "ms";
-				m_txtAvgFrame.TextSet(ss.str());
+				m_txtAvgFrame.SetText(ss.str());
 				m_txtAvgFrame.pos.Y(fOffsetY);
 				fOffsetY -= HY_SYSTEM_FONT_SIZE;
 
 				ss.str("");
 				ss.clear();
 				ss << "Low : " << m_dFrameTime_Low << "ms";
-				m_txtAvgFrameLow.TextSet(ss.str());
+				m_txtAvgFrameLow.SetText(ss.str());
 				m_txtAvgFrameLow.pos.Y(fOffsetY);
 				fOffsetY -= HY_SYSTEM_FONT_SIZE;
 
 				ss.str("");
 				ss.clear();
 				ss << "High: " << m_dFrameTime_High << "ms";
-				m_txtAvgFrameHigh.TextSet(ss.str());
+				m_txtAvgFrameHigh.SetText(ss.str());
 				m_txtAvgFrameHigh.pos.Y(fOffsetY);
 				fOffsetY -= HY_SYSTEM_FONT_SIZE;
 			}
@@ -104,7 +104,7 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 				ss.str("");
 				ss.clear();
 				ss << "FPS : " << m_uiFrameCount;
-				m_txtFps.TextSet(ss.str());
+				m_txtFps.SetText(ss.str());
 				m_txtFps.pos.Y(fOffsetY);
 				fOffsetY -= HY_SYSTEM_FONT_SIZE;
 			}
@@ -121,9 +121,9 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 			HyInput &inputRef = Hy_Input();
 			glm::vec2 ptMousePos = inputRef.GetWorldMousePos();
 			if(inputRef.IsMouseBtnDown(HYMOUSE_BtnLeft))
-				m_txtMouse.TextSet("MOUSE DOWN X:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
+				m_txtMouse.SetText("MOUSE DOWN X:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
 			else
-				m_txtMouse.TextSet("MOUSE UP X:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
+				m_txtMouse.SetText("MOUSE UP X:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
 
 			m_txtMouse.pos.Y(fOffsetY);
 			fOffsetY -= HY_SYSTEM_FONT_SIZE;

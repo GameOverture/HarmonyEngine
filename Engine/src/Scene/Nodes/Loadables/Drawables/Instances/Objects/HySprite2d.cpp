@@ -42,7 +42,7 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 	return *this;
 }
 
-void HySprite2d::AnimSetCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/, void *pParam /*= nullptr*/)
+void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/, void *pParam /*= nullptr*/)
 {
 	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySprite2dData *>(UncheckedGetData())->GetNumStates())
 	{
@@ -67,11 +67,11 @@ void HySprite2d::AnimSetCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 
 /*virtual*/ void HySprite2d::OnCalcBoundingVolume() /*override*/
 {
-	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiCurAnimState, m_uiCurFrame).vOFFSET + m_vCustomOffset;
+	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET + m_vCustomOffset;
 	vFrameOffset *= scale.Get();
 
-	float fHalfWidth = AnimGetCurFrameWidth(true) * 0.5f;
-	float fHalfHeight = AnimGetCurFrameHeight(true) * 0.5f;
+	float fHalfWidth = GetCurFrameWidth(true) * 0.5f;
+	float fHalfHeight = GetCurFrameHeight(true) * 0.5f;
 
 	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), rot.Get());
 }
@@ -89,7 +89,7 @@ void HySprite2d::AnimSetCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 
 /*virtual*/ void HySprite2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
 {
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiCurAnimState, m_uiCurFrame);
+	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 
 	glm::vec2 vSize(frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth(), frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight());
 	vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));

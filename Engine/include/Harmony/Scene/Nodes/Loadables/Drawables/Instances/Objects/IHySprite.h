@@ -37,7 +37,6 @@ protected:
 	float					m_fAnimPlayRate;
 	float					m_fElapsedFrameTime;
 
-	uint32					m_uiCurAnimState;
 	uint32					m_uiCurFrame;
 
 	glm::ivec2				m_vCustomOffset;					// If set, every frame offsets by this amount (plus any offset it is created with in the Editor)
@@ -52,23 +51,21 @@ public:
 	//--------------------------------------------------------------------------------------
 	// Set how to playback the animation on the current (or specified) state/animation.
 	//--------------------------------------------------------------------------------------
-	void AnimCtrl(HyAnimCtrl eAnimCtrl);
-	void AnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiAnimState);
+	void SetAnimCtrl(HyAnimCtrl eAnimCtrl);
+	void SetAnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiStateIndex);
 
-	bool AnimIsReverse();
-	bool AnimIsReverse(uint32 uiAnimState);
+	bool IsAnimReverse();
+	bool IsAnimReverse(uint32 uiStateIndex);
 	
-	uint32 AnimGetNumStates();
-	uint32 AnimGetState() const;
-	uint32 AnimGetNumFrames();
-	uint32 AnimGetFrame() const;
-	void AnimSetFrame(uint32 uiFrameIndex);
+	uint32 GetNumFrames();
+	uint32 GetFrame() const;
+	void SetFrame(uint32 uiFrameIndex);
 
 	//--------------------------------------------------------------------------------------
 	// Returns the time modifier (defaulted to 1.0f) that's applied the animation frame duration 
 	// set by the Editor Tool.
 	//--------------------------------------------------------------------------------------
-	float AnimGetPlayRate() const;
+	float GetAnimRate() const;
 
 	//--------------------------------------------------------------------------------------
 	// Modifies the time modifier that's applied the animation frame duration 
@@ -77,7 +74,7 @@ public:
 	// Note: This method will not unpause an sprite. It will just set its play rate for
 	//       when it is told to resume.
 	//--------------------------------------------------------------------------------------
-	void AnimSetPlayRate(float fPlayRate);
+	void SetAnimRate(float fPlayRate);
 
 	//--------------------------------------------------------------------------------------
 	// Change the animation state of the sprite. The new state sets the current frame index
@@ -87,29 +84,29 @@ public:
 	//       to pause prior to AnimSetState(), it will switch to inital frame and continue 
 	//       to pause.
 	//--------------------------------------------------------------------------------------
-	void AnimSetState(uint32 uiStateIndex);
 
 	//--------------------------------------------------------------------------------------
 	// Returns a boolean value that represents whether this animation has finished playing.
 	// A looping animation never will return true.
 	//--------------------------------------------------------------------------------------
-	bool AnimIsFinished();
+	bool IsAnimFinished();
 
-	bool AnimIsPaused();
+	bool IsAnimPaused();
 
-	void AnimSetPause(bool bPause);
+	void SetAnimPause(bool bPause);
 
-	float AnimGetDuration();
+	float GetAnimDuration();
 
-	float AnimGetCurFrameWidth(bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED width of the current frame
-	float AnimGetCurFrameHeight(bool bIncludScaling = true);	// Returns the ALPHA-CROPPED height of the current frame
+	float GetCurFrameWidth(bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED width of the current frame
+	float GetCurFrameHeight(bool bIncludScaling = true);	// Returns the ALPHA-CROPPED height of the current frame
 
-	float AnimGetMaxWidth(uint32 uiStateIndex, bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED width of the widest frame in this animation state
-	float AnimGetMaxHeight(uint32 uiStateIndex, bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED height of the tallest frame in this animation state
+	float GetStateMaxWidth(uint32 uiStateIndex, bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED width of the widest frame in this animation state
+	float GetStateMaxHeight(uint32 uiStateIndex, bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED height of the tallest frame in this animation state
 
 	void SetUserOffset(int32 iOffsetX, int32 iOffsetY);
-	glm::ivec2 AnimGetCurFrameOffset();
+	glm::ivec2 GetCurFrameOffset();
 
+	virtual void SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
 
 protected:

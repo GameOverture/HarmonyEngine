@@ -17,7 +17,7 @@
 
 class HyAudioData : public IHyNodeData
 {
-	HyAudioHarness &		m_AudioRef;
+	HyAudioHarness &			m_AudioRef;
 
 	class AudioState
 	{
@@ -31,14 +31,11 @@ class HyAudioData : public IHyNodeData
 		int32					m_iLoops;
 		uint32					m_uiMaxDistance;
 	};
-	AudioState *			m_pAudioStates;
-	uint32					m_uiNumStates;
+	AudioState *				m_pAudioStates;
 
 public:
 	HyAudioData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
-
-	uint32 GetNumStates() const;
 
 	HyPlayListMode GetPlayListMode(uint32 uiStateIndex) const;
 	int32 GetPriority(uint32 uiStateIndex) const;

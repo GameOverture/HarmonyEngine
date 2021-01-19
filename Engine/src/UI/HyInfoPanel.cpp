@@ -68,7 +68,7 @@ HyInfoPanel::~HyInfoPanel()
 
 	if(m_pText)
 	{
-		m_pText->TextSetAlignment(HYALIGN_Center);
+		m_pText->SetTextAlignment(HYALIGN_Center);
 		SetTextLocation(iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY);
 	}
 
@@ -89,20 +89,20 @@ HyText2d *HyInfoPanel::GetTextPtr()
 {
 	if(m_pPanel)
 	{
-		m_pPanel->AnimSetState(uiAnimIndex);
+		m_pPanel->SetState(uiAnimIndex);
 
 		if(bResetAnim)
-			m_pPanel->AnimSetFrame(0);
+			m_pPanel->SetFrame(0);
 
 		if(m_pText)
-			SetTextLocation(m_vTextOffset.x, m_vTextOffset.y, static_cast<int32>(m_pText->TextGetBox().x), static_cast<int32>(m_pText->TextGetBox().y));
+			SetTextLocation(m_vTextOffset.x, m_vTextOffset.y, static_cast<int32>(m_pText->GetTextBox().x), static_cast<int32>(m_pText->GetTextBox().y));
 	}
 }
 
 float HyInfoPanel::GetPanelWidth()
 {
 	if(m_pPanel)
-		return m_pPanel->AnimGetCurFrameWidth(true);
+		return m_pPanel->GetCurFrameWidth(true);
 	
 	return 0.0f;
 }
@@ -110,7 +110,7 @@ float HyInfoPanel::GetPanelWidth()
 float HyInfoPanel::GetPanelHeight()
 {
 	if(m_pPanel)
-		return m_pPanel->AnimGetCurFrameHeight(true);
+		return m_pPanel->GetCurFrameHeight(true);
 
 	return 0.0f;
 }
@@ -118,7 +118,7 @@ float HyInfoPanel::GetPanelHeight()
 /*virtual*/ std::string HyInfoPanel::GetStr()
 {
 	if(m_pText)
-		return m_pText->TextGet();
+		return m_pText->GetText();
 
 	return std::string();
 }
@@ -126,7 +126,7 @@ float HyInfoPanel::GetPanelHeight()
 /*virtual*/ void HyInfoPanel::SetStr(std::string sText)
 {
 	if(m_pText)
-		m_pText->TextSet(sText);
+		m_pText->SetText(sText);
 }
 
 /*virtual*/ void HyInfoPanel::SetTextLocation(int32 iOffsetX, int32 iOffsetY, int32 iWidth, int32 iHeight)
@@ -142,7 +142,7 @@ float HyInfoPanel::GetPanelHeight()
 	{
 		const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_pPanel->AcquireData());
 		HyAssert(pPanelData, "HyInfoPanel could not acquire data for its panel");
-		const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_pPanel->AnimGetState(), m_pPanel->AnimGetFrame());
+		const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_pPanel->GetState(), m_pPanel->GetFrame());
 		vPanelOffset = frameRef.vOFFSET;
 	}
 	
@@ -153,13 +153,13 @@ float HyInfoPanel::GetPanelHeight()
 /*virtual*/ void HyInfoPanel::SetTextAlignment(HyTextAlign eAlignment)
 {
 	if(m_pText)
-		m_pText->TextSetAlignment(eAlignment);
+		m_pText->SetTextAlignment(eAlignment);
 }
 
 /*virtual*/ glm::vec2 HyInfoPanel::GetTextScaleBox()
 {
 	if(m_pText)
-		return m_pText->TextGetBox();
+		return m_pText->GetTextBox();
 
 	return glm::vec2(0.0f);
 }

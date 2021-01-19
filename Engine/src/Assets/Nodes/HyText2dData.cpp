@@ -47,8 +47,7 @@ HyText2dData::HyText2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAs
 	IHyNodeData(sPath),
 	m_pTypefaces(nullptr),
 	m_uiNumTypefaces(0),
-	m_pFontStates(nullptr),
-	m_uiNumStates(0)
+	m_pFontStates(nullptr)
 {
 	HyRectangle<float> rSubAtlasUVRect;
 
@@ -160,11 +159,6 @@ HyText2dData::~HyText2dData(void)
 			delete iter->second;
 	}
 	delete[] m_pTypefaces;
-}
-
-uint32 HyText2dData::GetNumStates() const
-{
-	return m_uiNumStates;
 }
 
 uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex) const

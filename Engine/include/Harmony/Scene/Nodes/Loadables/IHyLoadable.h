@@ -29,6 +29,8 @@ protected:
 	std::string						m_sName;
 	std::string						m_sPrefix;
 
+	uint32							m_uiState;
+
 public:
 	IHyLoadable(std::string sPrefix, std::string sName);
 	IHyLoadable(const IHyLoadable &copyRef);
@@ -40,6 +42,10 @@ public:
 
 	const std::string &GetName() const;
 	const std::string &GetPrefix() const;
+
+	uint32 GetState() const;
+	virtual void SetState(uint32 uiStateIndex);
+	uint32 GetNumStates();
 
 	const IHyNodeData *AcquireData();
 

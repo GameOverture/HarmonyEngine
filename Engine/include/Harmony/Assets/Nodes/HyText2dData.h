@@ -118,13 +118,11 @@ class HyText2dData : public IHyNodeData
 		~FontState();
 	};
 	FontState *						m_pFontStates;
-	uint32							m_uiNumStates;
 
 public:
 	HyText2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HyText2dData();
 
-	uint32 GetNumStates() const;
 	uint32 GetNumLayers(uint32 uiStateIndex) const;
 	const HyText2dGlyphInfo *GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const;
 	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const;

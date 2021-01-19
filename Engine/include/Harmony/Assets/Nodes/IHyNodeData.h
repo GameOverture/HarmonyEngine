@@ -23,6 +23,7 @@ class IHyNodeData
 	const std::string				m_sPATH;
 
 protected:
+	uint32							m_uiNumStates;
 	HyFilesManifest					m_RequiredAtlases;
 	HyFilesManifest					m_RequiredAudio;
 	HyGLTF *						m_pGltf;
@@ -30,6 +31,8 @@ protected:
 public:
 	IHyNodeData(const std::string &sPath);
 	virtual ~IHyNodeData(void);
+
+	uint32 GetNumStates() const;
 	
 	const std::string &GetPath() const;
 	const HyFilesManifest *GetRequiredFiles(HyFileType eFileType) const;
