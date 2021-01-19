@@ -84,10 +84,10 @@
 //// goes to frame [0] or frame [last] if playing in reverse.
 ////
 //// Note: This does not automatically begin playing the animation. If spine2d was instructed
-////       to pause prior to AnimSetState(), it will switch to inital frame and continue 
+////       to pause prior to SetState(), it will switch to inital frame and continue 
 ////       to pause.
 ////--------------------------------------------------------------------------------------
-//void HySpine2d::AnimSetState(uint32 uiAnimId, bool bLoop, uint32 uiStateId /*= 0*/)
+//void HySpine2d::SetState(uint32 uiAnimId, bool bLoop, uint32 uiStateId /*= 0*/)
 //{
 //	if(m_uiCurAnimState == uiAnimId)
 //		return;
@@ -100,7 +100,7 @@
 //	//pTrkEntry->listener = OnAnimationStateListen;
 //}
 //
-//void HySpine2d::AnimSetState(const char *szAnimName, bool bLoop, uint32 uiIndex /*= 0*/)
+//void HySpine2d::SetState(const char *szAnimName, bool bLoop, uint32 uiIndex /*= 0*/)
 //{
 //	spTrackEntry *pTrkEntry = spAnimationState_setAnimationByName(m_ppAnimStates[uiIndex], 0, szAnimName, bLoop);
 //	m_pIsAnimStateEnabled[uiIndex] = true;
@@ -171,7 +171,7 @@
 //		m_RenderState.AppendInstances(1);
 //	}
 //
-//	//AnimSetState(m_uiNumAnims, m_bLooping);
+//	//SetState(m_uiNumAnims, m_bLooping);
 //}
 
 ///*virtual*/ void HySpine2d::OnLoadedUpdate() /*override*/

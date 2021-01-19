@@ -30,7 +30,7 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(std::string sPrefix /*= ""*/, std::string sN
 	m_fUsedPixelWidth(0.0f),
 	m_fUsedPixelHeight(0.0f)
 {
-	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+	this->m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -76,7 +76,6 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 	m_bIsDirty = true;
 	m_sRawString = rhs.m_sRawString;
 	m_Utf32CodeList = rhs.m_Utf32CodeList;
-	m_uiState = rhs.m_uiState;
 	m_uiBoxAttributes = rhs.m_uiBoxAttributes;
 	m_vBoxDimensions = rhs.m_vBoxDimensions;
 	m_fScaleBoxModifier = rhs.m_fScaleBoxModifier;
@@ -125,14 +124,14 @@ template<typename NODETYPE, typename ENTTYPE>
 float IHyText<NODETYPE, ENTTYPE>::GetTextWidth(bool bIncludeScaling /*= true*/)
 {
 	CalculateGlyphInfos();
-	return m_fUsedPixelWidth * (bIncludeScaling ? scale.X() : 1.0f);
+	return m_fUsedPixelWidth * (bIncludeScaling ? this->scale.X() : 1.0f);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 float IHyText<NODETYPE, ENTTYPE>::GetTextHeight(bool bIncludeScaling /*= true*/)
 {
 	CalculateGlyphInfos();
-	return m_fUsedPixelHeight * (bIncludeScaling ? scale.Y() : 1.0f);
+	return m_fUsedPixelHeight * (bIncludeScaling ? this->scale.Y() : 1.0f);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -166,17 +165,17 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 
 {
 	CalculateGlyphInfos();
 
-	if(AcquireData() == nullptr || m_pGlyphInfos == nullptr)
+	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
-		if(UncheckedGetData() == nullptr) {
+		if(this->UncheckedGetData() == nullptr) {
 			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphOffset invoked on null data");
 		}
 
 		return glm::vec2(0);
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
-	uint32 uiNumLayers = pData->GetNumLayers(m_uiState);
+	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	uint32 uiNumLayers = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
 	return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
@@ -187,12 +186,12 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 {
 	CalculateGlyphInfos();
 
-	if(AcquireData() == nullptr) {
+	if(this->AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphSize invoked on null data");
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
-	const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
+	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
 	if(pGlyphRef == nullptr)
 		return glm::vec2(0.0f);
 
@@ -204,17 +203,17 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 template<typename NODETYPE, typename ENTTYPE>
 float IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha(uint32 uiCharIndex)
 {
-	if(AcquireData() == nullptr || m_pGlyphInfos == nullptr)
+	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
-		if(UncheckedGetData() == nullptr) {
+		if(this->UncheckedGetData() == nullptr) {
 			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphAlpha invoked on null data");
 		}
 
 		return 1.0f;
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
-	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiState);
+	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
 	return m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
@@ -225,17 +224,17 @@ void IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 {
 	CalculateGlyphInfos();
 
-	if(AcquireData() == nullptr || m_pGlyphInfos == nullptr)
+	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
-		if(UncheckedGetData() == nullptr) {
+		if(this->UncheckedGetData() == nullptr) {
 			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
 		}
 
 		return;
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
-	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiState);
+	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 	{
@@ -247,29 +246,29 @@ void IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 template<typename NODETYPE, typename ENTTYPE>
 uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers()
 {
-	if(AcquireData() == nullptr) {
+	if(this->AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
 		return 0;
 	}
 
-	return static_cast<const HyText2dData *>(UncheckedGetData())->GetNumLayers(m_uiState);
+	return static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumLayers(this->m_uiState);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers(uint32 uiStateIndex)
 {
-	if(AcquireData() == nullptr) {
+	if(this->AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
 		return 0;
 	}
 
-	return static_cast<const HyText2dData *>(UncheckedGetData())->GetNumLayers(uiStateIndex);
+	return static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumLayers(uiStateIndex);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 std::pair<HyAnimVec3 &, HyAnimVec3 &> IHyText<NODETYPE, ENTTYPE>::GetLayerColor(uint32 uiLayerIndex)
 {
-	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->topColor, m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->botColor);
+	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->topColor, m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->botColor);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -281,19 +280,19 @@ std::pair<HyAnimVec3 &, HyAnimVec3 &> IHyText<NODETYPE, ENTTYPE>::GetLayerColor(
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
 {
-	if(AcquireData() == nullptr) {
+	if(this->AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
-	m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
-	m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
+	m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
+	m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB)
 {
-	if(AcquireData() == nullptr) {
+	if(this->AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
@@ -305,19 +304,19 @@ void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiSta
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
-	if(AcquireData() == nullptr) {
+	if(this->AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
-	m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
-	m_StateColors[m_uiState]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
+	m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
+	m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
-	if(AcquireData() == nullptr) {
+	if(this->AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
@@ -329,7 +328,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiSta
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex)
 {
-	if(AcquireData() == nullptr) {
+	if(this->AcquireData() == nullptr) {
 		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
@@ -451,19 +450,19 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHyText<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
 {
-	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HyText2dData *>(UncheckedGetData())->GetNumStates())
+	if(this->AcquireData() == nullptr || uiStateIndex >= static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumStates())
 	{
-		if(UncheckedGetData() == nullptr) {
+		if(this->UncheckedGetData() == nullptr) {
 			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
 		}
-		else if(uiStateIndex >= static_cast<const HyText2dData *>(UncheckedGetData())->GetNumStates()) {
-			HyLogWarning(m_sPrefix << "/" << m_sName << " (HyText2d) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HyText2dData *>(AcquireData())->GetNumStates() << "'");
+		else if(uiStateIndex >= static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumStates()) {
+			HyLogWarning(this->m_sPrefix << "/" << this->m_sName << " (HyText2d) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HyText2dData *>(this->AcquireData())->GetNumStates() << "'");
 		}
 
 		return;
 	}
 
-	if(m_uiState == uiStateIndex)
+	if(this->m_uiState == uiStateIndex)
 		return;
 
 	IHyLoadable::SetState(uiStateIndex);
@@ -474,7 +473,7 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHyText<NODETYPE, ENTTYPE>::IsLoadDataValid() /*override*/
 {
-	const HyText2dData *pData = static_cast<const HyText2dData *>(AcquireData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(this->AcquireData());
 	return pData && pData->GetNumStates() != 0;
 }
 
@@ -487,7 +486,7 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHyText<NODETYPE, ENTTYPE>::OnDataAcquired() /*override*/
 {
-	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
+	const HyText2dData *pTextData = static_cast<const HyText2dData *>(this->UncheckedGetData());
 
 	for(uint32 i = 0; i < m_StateColors.size(); ++i)
 	{
@@ -504,7 +503,7 @@ template<typename NODETYPE, typename ENTTYPE>
 
 		for(uint32 j = 0; j < pTextData->GetNumLayers(i); ++j)
 		{
-			m_StateColors[i]->m_LayerColors.push_back(HY_NEW StateColors::LayerColor(*this));
+			m_StateColors[i]->m_LayerColors.push_back(HY_NEW typename StateColors::LayerColor(*this));
 
 			m_StateColors[i]->m_LayerColors[j]->topColor.Set(pTextData->GetDefaultColor(i, j, true));
 			m_StateColors[i]->m_LayerColors[j]->botColor.Set(pTextData->GetDefaultColor(i, j, false));
@@ -519,12 +518,12 @@ template<typename NODETYPE, typename ENTTYPE>
 {
 	NODETYPE::OnLoaded();
 
-	const HyText2dData *pTextData = static_cast<const HyText2dData *>(UncheckedGetData());
+	const HyText2dData *pTextData = static_cast<const HyText2dData *>(this->UncheckedGetData());
 	if(pTextData == nullptr)
 		return;
 
 	if(pTextData->GetAtlas())
-		m_hTextureHandle = pTextData->GetAtlas()->GetTextureHandle();
+		this->m_hTextureHandle = pTextData->GetAtlas()->GetTextureHandle();
 
 	MarkAsDirty();
 }
@@ -532,13 +531,13 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 {
-	if(m_bIsDirty == false || AcquireData() == nullptr)
+	if(m_bIsDirty == false || this->AcquireData() == nullptr)
 		return;
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
 
 	m_uiNumValidCharacters = 0;
-	const uint32 uiNUM_LAYERS = pData->GetNumLayers(m_uiState);
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 	const uint32 uiSTR_SIZE = static_cast<uint32>(m_Utf32CodeList.size());
 
 	if(m_pGlyphInfos == nullptr || m_uiNumReservedGlyphs < uiSTR_SIZE * uiNUM_LAYERS)
@@ -577,7 +576,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 			// UTF-32 value of '48' == zero (...and '57' == nine)
 			for(uint32 iDigit = 48; iDigit < 58; ++iDigit)
 			{
-				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiState, uiLayerIndex, iDigit);
+				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, iDigit);
 				if(pGlyphRef)
 				{
 					if(pMonospaceWidths[uiLayerIndex] < pGlyphRef->fADVANCE_X)
@@ -655,7 +654,7 @@ offsetCalculation:
 			{
 				uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
 
-				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
+				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
 				if(pGlyphRef == nullptr)
 					break;
 
@@ -673,7 +672,7 @@ offsetCalculation:
 
 				float fAdvanceAmtX = pGlyphRef->fADVANCE_X;
 				float fAscender = static_cast<float>(pGlyphRef->iOFFSET_Y);
-				float fDecender = HyClamp(static_cast<float>(pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(m_uiState));
+				float fDecender = HyClamp(static_cast<float>(pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(this->m_uiState));
 				float fOffsetX = static_cast<float>(pGlyphRef->iOFFSET_X);
 
 				if(m_bMonospacedDigits && m_Utf32CodeList[uiStrIndex] >= 48 && m_Utf32CodeList[uiStrIndex] <= 57)
@@ -772,7 +771,7 @@ offsetCalculation:
 
 		if(bDoNewline)
 		{
-			float fNewLineOffset = (pData->GetLineHeight(m_uiState) * m_fScaleBoxModifier);
+			float fNewLineOffset = (pData->GetLineHeight(this->m_uiState) * m_fScaleBoxModifier);
 
 			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
 				fNewLineOffset = fCurLineHeight;
@@ -834,7 +833,7 @@ offsetCalculation:
 	{
 		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
 		{
-			float fNudgeAmt = (m_vBoxDimensions.x - vNewlineInfo[i].fUSED_WIDTH);// - (pData->GetLeftSideNudgeAmt(m_uiState) * m_fScaleBoxModifier);
+			float fNudgeAmt = (m_vBoxDimensions.x - vNewlineInfo[i].fUSED_WIDTH);// - (pData->GetLeftSideNudgeAmt(this->m_uiState) * m_fScaleBoxModifier);
 			fNudgeAmt *= (m_eAlignment == HYALIGN_Center) ? 0.5f : 1.0f;
 
 			uint32 uiStrIndex = vNewlineInfo[i].uiSTART_CHARACTER_INDEX;
@@ -940,7 +939,7 @@ offsetCalculation:
 	delete[] pMonospaceAscender;
 	delete[] pMonospaceDecender;
 
-	SetDirty(DIRTY_BoundingVolume);
+	this->SetDirty(this->DIRTY_BoundingVolume);
 	m_bIsDirty = false;
 }
 

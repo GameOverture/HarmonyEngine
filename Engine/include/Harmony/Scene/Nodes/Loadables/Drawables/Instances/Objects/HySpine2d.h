@@ -60,8 +60,8 @@ class HySpine2d : public IHyInstance2d
 //	//inline bool AnimGetIsReverse() { return ; }
 //	//inline float AnimGetPlayRate() { return m_fPlayRate; }
 //
-//	void AnimSetState(uint32 uiAnimId, bool bLoop, uint32 uiIndex = 0);
-//	void AnimSetState(const char *szAnimName, bool bLoop, uint32 uiIndex = 0);
+//	void SetState(uint32 uiAnimId, bool bLoop, uint32 uiIndex = 0);
+//	void SetState(const char *szAnimName, bool bLoop, uint32 uiIndex = 0);
 //	void AnimChainState(uint32 uiAnimId, bool bLoop, float fDelay, uint32 uiIndex = 0);
 //
 //	void AnimSetStateEnabled(bool bEnable, uint32 uiIndex);

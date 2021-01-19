@@ -133,7 +133,7 @@ protected:
 	virtual bool OnIsValidToRender() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
-	virtual void OnLoadedUpdate() = 0;
+	virtual void OnLoadedUpdate() override = 0;
 
 	void CalculateGlyphInfos();
 

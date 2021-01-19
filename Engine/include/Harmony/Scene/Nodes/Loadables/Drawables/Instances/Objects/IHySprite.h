@@ -81,7 +81,7 @@ public:
 	// to frame [0] or frame [last] if the animation ctrls specify to play in reverse.
 	//
 	// Note: This does not automatically begin playing the animation. If entity was instructed
-	//       to pause prior to AnimSetState(), it will switch to inital frame and continue 
+	//       to pause prior to SetState(), it will switch to inital frame and continue 
 	//       to pause.
 	//--------------------------------------------------------------------------------------
 
