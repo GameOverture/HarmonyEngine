@@ -88,7 +88,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 #endif
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		HyLog("clearing to Harmony grey");
+		HyLog("Clearing to Harmony grey");
 	}
 
 	if(m_WindowListRef.empty() == false)
