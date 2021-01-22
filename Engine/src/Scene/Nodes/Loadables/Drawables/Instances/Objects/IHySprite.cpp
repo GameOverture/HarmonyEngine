@@ -355,7 +355,12 @@ void IHySprite<NODETYPE, ENTTYPE>::SetUserOffset(int32 iOffsetX, int32 iOffsetY)
 template<typename NODETYPE, typename ENTTYPE>
 glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 {
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(this->AcquireData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	if(this->AcquireData() == nullptr) {
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset invoked on null data");
+		return glm::ivec2(0.0f);
+	}
+
+	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	return frameRef.vOFFSET + m_vCustomOffset;
 }
 

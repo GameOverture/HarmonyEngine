@@ -36,7 +36,8 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	m_sShader("Unknown"),
 	m_iMaxTextureSize(0),
 	m_sCompressedTextures("Unknown"),
-	m_bInitialMemCheckpointSet(false)
+	m_bInitialMemCheckpointSet(false),
+	m_pDiagOutput(nullptr)
 {
 #if defined(HY_COMPILER_MSVC)
 	m_sCompiler = "MSVC";
@@ -101,6 +102,7 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 
 HyDiagnostics::~HyDiagnostics()
 {
+	delete m_pDiagOutput;
 }
 
 void HyDiagnostics::BootMessage()
@@ -113,7 +115,7 @@ void HyDiagnostics::BootMessage()
 #endif
 
 	HyLog("");
-	HyLogTitle(sGameTitle << "\n\t" << Hy_DateTime());
+	HyLogTitle(sGameTitle << "\n\t" << m_TimeRef.GetDateTime());
 	HyLog("Compiler:         " << m_sCompiler);
 	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
 	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMappings);
@@ -156,17 +158,23 @@ void HyDiagnostics::BootMessage()
 
 void HyDiagnostics::Show(uint32 uiDiagFlags)
 {
-	if(uiDiagFlags != 0 && m_DiagOutput.IsLoaded() == false)
-		m_DiagOutput.Load();
+	if(m_pDiagOutput == nullptr)
+		m_pDiagOutput = HY_NEW HyDiagOutput();
 
-	m_DiagOutput.SetShowFlags(uiDiagFlags);
-	m_DiagOutput.pos.Set(5, Hy_Window().GetHeight() - 5);
-	m_DiagOutput.UseWindowCoordinates(0);
+	if(uiDiagFlags != 0 && m_pDiagOutput->IsLoaded() == false)
+		m_pDiagOutput->Load();
+
+	m_pDiagOutput->SetShowFlags(uiDiagFlags);
+	m_pDiagOutput->pos.Set(5, Hy_Window().GetHeight() - 5);
+	m_pDiagOutput->UseWindowCoordinates(0);
 }
 
 uint32 HyDiagnostics::GetShowFlags()
 {
-	return m_DiagOutput.GetShowFlags();
+	if(m_pDiagOutput)
+		return m_pDiagOutput->GetShowFlags();
+
+	return 0;
 }
 
 void HyDiagnostics::DumpAtlasUsage()
@@ -330,7 +338,8 @@ void HyDiagnostics::ProfileEnd()
 
 void HyDiagnostics::ApplyTimeDelta()
 {
-	m_DiagOutput.ApplyTimeDelta(m_TimeRef.GetUpdateStepSecondsDbl());
+	if(m_pDiagOutput)
+		m_pDiagOutput->ApplyTimeDelta(m_TimeRef.GetUpdateStepSecondsDbl());
 }
 
 void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)

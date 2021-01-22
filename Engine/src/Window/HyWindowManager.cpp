@@ -21,6 +21,7 @@ HyWindowManager::HyWindowManager(uint32 uiNumWindows, bool bShowCursor, const Hy
 #endif
 
 	HyAssert(uiNumWindows >= 1, "HyWindowManager was constructed with 0 windows");
+	HyLog("HyWindowManager creating '" << uiNumWindows << "' window(s)");
 	for(uint32 i = 0; i < uiNumWindows; ++i)
 		m_WindowList.push_back(HY_NEW HyWindow(i, windowInfos[i]));
 }

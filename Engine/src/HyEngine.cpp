@@ -76,7 +76,7 @@ HyRendererInterop &HyEngine::GetRenderer()
 }
 
 #ifdef HY_PLATFORM_BROWSER
-	void HyInternal_BrowserFrameIter__(void *pUserData)
+	void HyEngine_BrowserUpdate(void *pUserData)
 	{
 		reinterpret_cast<HyEngine *>(pUserData)->Update();
 	}
@@ -92,8 +92,8 @@ int32 HyEngine::RunGame()
 	while(Update())
 	{ }
 #else
-	HyLogTitle("Starting emscripten_set_main_loop_arg");
-	emscripten_set_main_loop_arg(HyInternal_BrowserFrameIter__, this, 0, true);
+	HyLogTitle("Setting Emscripten Loop");
+	emscripten_set_main_loop_arg(HyEngine_BrowserUpdate, this, 0, true);
 #endif
 
 	return 0;

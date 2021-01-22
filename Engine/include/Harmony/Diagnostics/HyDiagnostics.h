@@ -23,7 +23,7 @@ class HyScene;
 	#define HYSETTING_ProfilerEnabled
 #endif
 
-#ifdef HY_PLATFORM_GUI
+#if defined(HY_PLATFORM_GUI) || defined(HY_PLATFORM_BROWSER)
 	#undef HYSETTING_ProfilerEnabled
 #endif
 #ifdef HYSETTING_ProfilerEnabled
@@ -66,7 +66,7 @@ class HyDiagnostics
 #endif
 
 	HyProfiler					m_Profiler;
-	HyDiagOutput				m_DiagOutput;
+	HyDiagOutput *				m_pDiagOutput;
 
 public:
 	HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef);

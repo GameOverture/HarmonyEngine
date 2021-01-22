@@ -11,9 +11,6 @@
 #define HyProfiler_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
-
 #include <stack>
 
 enum HyProfilerSection
@@ -31,12 +28,12 @@ enum HyProfilerSection
 	HYNUM_PROFILERSECTION
 };
 
-class HyProfiler : public HyEntity2d
+class HyProfiler
 {
 	uint64_t							m_uiSectionTicks[HYNUM_PROFILERSECTION];
-	HyProfilerSection				m_eCurrentSection;
+	HyProfilerSection					m_eCurrentSection;
 
-	std::stack<HyProfilerSection>	m_SectionStack;
+	std::stack<HyProfilerSection>		m_SectionStack;
 	uint64_t							m_uiTotalTicks;
 
 public:
