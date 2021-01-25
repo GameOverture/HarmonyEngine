@@ -16,23 +16,15 @@
 
 extern HyInput &Hy_Input();
 
-HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Entity, "", "", pParent),
+HyEntity2d::HyEntity2d() :
+	IHyDrawable2d(HYTYPE_Entity),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
 	m_pPhysicsBody(nullptr)
 {
 }
 
-HyEntity2d::HyEntity2d(std::string sPrefix, std::string sName, HyEntity2d *pParent) :
-	IHyDrawable2d(HYTYPE_Entity, sPrefix, sName, pParent),
-	m_uiAttributes(0),
-	m_eMouseInputState(MOUSEINPUT_None),
-	m_pPhysicsBody(nullptr)
-{
-}
-
-HyEntity2d::HyEntity2d(HyEntity2d &&donor) :
+HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 	IHyDrawable2d(std::move(donor)),
 	m_ChildList(std::move(donor.m_ChildList)),
 	m_uiAttributes(std::move(donor.m_uiAttributes)),
@@ -49,7 +41,7 @@ HyEntity2d::~HyEntity2d(void)
 	PhysRelease();
 }
 
-HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor)
+HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor) noexcept
 {
 	IHyDrawable2d::operator=(std::move(donor));
 
@@ -800,7 +792,17 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsDrawable)
-		_CtorSetupNewChild(*this, static_cast<IHyDrawable2d &>(childRef));
+	{
+		static_cast<IHyDrawable2d &>(childRef)._SetCoordinateSystem(GetCoordinateSystem(), false);
+
+		if(IsScissorSet())
+			static_cast<IHyDrawable2d &>(childRef)._SetScissor(m_pScissor, false);
+
+		if(IsStencilSet())
+			static_cast<IHyDrawable2d &>(childRef)._SetStencil(m_hStencil, false);
+
+		SetChildrenDisplayOrder(false);
+	}
 
 	if(sm_pHyAssets)
 		sm_pHyAssets->SetEntityLoaded(this);
@@ -901,10 +903,4 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 		iOrderValue = SetChildrenDisplayOrder(bIsOverriding);
 
 	return iOrderValue;
-}
-
-/*friend*/ void _CtorChildAppend(HyEntity2d &entityRef, IHyNode2d &childRef)
-{
-	entityRef.m_ChildList.push_back(&childRef);
-	entityRef.SetDirty(HyEntity2d::DIRTY_ALL);
 }

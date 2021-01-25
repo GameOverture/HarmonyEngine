@@ -40,11 +40,11 @@ IHyNode::IHyNode(const IHyNode &copyRef) :
 	// MOVE TODO: Account for m_ActiveAnimFloatsList
 }
 
-IHyNode::IHyNode(IHyNode &&donor) :
+IHyNode::IHyNode(IHyNode &&donor) noexcept :
 	m_uiFlags(0),
 	m_ActiveAnimFloatsList(std::move(donor.m_ActiveAnimFloatsList))
 #ifdef HY_ENABLE_USER_TAGS
-	, m_iTag(donor.m_iTag)
+	, m_iTag(std::move(donor.m_iTag))
 #endif
 {
 	if(donor.IsRegistered())

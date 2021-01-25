@@ -13,8 +13,8 @@
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
-HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyInstance2d(HYTYPE_Primitive, "", "", pParent)
+HyPrimitive2d::HyPrimitive2d() :
+	IHyInstance2d(HYTYPE_Primitive)
 {
 	ClearData();
 }

@@ -11,8 +11,7 @@
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.h"
 #include "Assets/Nodes/HyText2dData.h"
 
-HyText2d::HyText2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
-	IHyText<IHyInstance2d, HyEntity2d>(sPrefix, sName, pParent)
+HyText2d::HyText2d()
 {
 }
 

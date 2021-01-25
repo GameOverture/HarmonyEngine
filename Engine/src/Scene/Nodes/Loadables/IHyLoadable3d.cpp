@@ -11,9 +11,9 @@
 #include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-IHyLoadable3d::IHyLoadable3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
-	IHyNode3d(eNodeType, pParent),
-	IHyLoadable(sPrefix, sName)
+IHyLoadable3d::IHyLoadable3d(HyType eNodeType) :
+	IHyNode3d(eNodeType),
+	IHyLoadable()
 {
 	m_uiFlags |= NODETYPE_IsLoadable;
 }
@@ -24,7 +24,7 @@ IHyLoadable3d::IHyLoadable3d(const IHyLoadable3d &copyRef) :
 {
 }
 
-IHyLoadable3d::IHyLoadable3d(IHyLoadable3d &&donor) :
+IHyLoadable3d::IHyLoadable3d(IHyLoadable3d &&donor) noexcept :
 	IHyNode3d(std::move(donor)),
 	IHyLoadable(std::move(donor))
 {
@@ -50,12 +50,7 @@ IHyLoadable3d &IHyLoadable3d::operator=(IHyLoadable3d &&donor)
 	return *this;
 }
 
-void IHyLoadable3d::Reinitialize(std::string sPrefix, std::string sName)
-{
-	IHyLoadable::_Reinitialize(sPrefix, sName);
-}
-
-void IHyLoadable3d::Reinitialize(std::string sPrefix, std::string sName, HyEntity3d *pParent)
+void IHyLoadable3d::Init(std::string sPrefix, std::string sName, HyEntity3d *pParent)
 {
 	IHyLoadable::_Reinitialize(sPrefix, sName);
 

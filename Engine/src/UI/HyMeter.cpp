@@ -13,61 +13,51 @@
 
 extern float Hy_UpdateStep();
 
-HyMeter::HyMeter(HyEntity2d *pParent /*= nullptr*/) :
-	HyInfoPanel(pParent),
-	m_SpinText(this)
+HyMeter::HyMeter()
 {
+	ChildAppend(m_SpinText);
 }
 
-HyMeter::HyMeter(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent) :
-	HyInfoPanel(nullptr),
-	m_SpinText(this)
+HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
 {
-	Init(szPanelPrefix, szPanelName, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName);
 }
 
-HyMeter::HyMeter(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) :
-	HyInfoPanel(nullptr),
-	m_SpinText(this)
+HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY)
 {
-	Init(szTextPrefix, szTextName, iTextDimensionsX, iTextDimensionsY, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY);
 }
 
-HyMeter::HyMeter(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) :
-	HyInfoPanel(nullptr),
-	m_SpinText(this)
+HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
 {
-	Init(szPanelPrefix, szPanelName, szTextPrefix, szTextName, iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
 /*virtual*/ HyMeter::~HyMeter()
 {
 }
 
-/*virtual*/ void HyMeter::Init(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent) /*override*/
+/*virtual*/ void HyMeter::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName) /*override*/
 {
-	Init(szPanelPrefix, szPanelName, nullptr, nullptr, 0, 0, 0, 0, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
-/*virtual*/ void HyMeter::Init(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) /*override*/
+/*virtual*/ void HyMeter::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY) /*override*/
 {
-	Init(nullptr, nullptr, szTextPrefix, szTextName, 0, 0, iTextDimensionsX, iTextDimensionsY, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, 0, 0);
 }
 
-/*virtual*/ void HyMeter::Init(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) /*override*/
+/*virtual*/ void HyMeter::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) /*override*/
 {
-	m_SpinText.Init(szTextPrefix, szTextName);
+	HyInfoPanel::Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 
-	HyInfoPanel::Init(szPanelPrefix, szPanelName, szTextPrefix, szTextName, iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY, pParent);
-	HyAssert(m_pText, "HyMeter was constructed with a null m_pText");
+	m_Text.SetMonospacedDigits(true);
+	SetTextLocation(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 
-	if(m_pText)
-	{
-		m_pText->SetMonospacedDigits(true);
-		SetTextLocation(iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY);
+	FormatDigits();
 
-		FormatDigits();
-	}
+	m_SpinText.Setup(sTextPrefix, sTextName);
+	ChildAppend(m_SpinText);
 }
 
 int32 HyMeter::GetValue()
@@ -77,9 +67,6 @@ int32 HyMeter::GetValue()
 
 void HyMeter::SetValue(int32 iPennies, float fRackDuration)
 {
-	if(m_pText == nullptr)
-		return;
-
 	m_iTargetValue = iPennies;
 
 	m_fRackingDuration = fRackDuration;
@@ -92,13 +79,13 @@ void HyMeter::SetValue(int32 iPennies, float fRackDuration)
 		m_dTotalDistance = 0.0;
 		m_fThresholdDist = 0.0f;
 
-		m_SpinText.m_pSpinText_Shown->pos.Y(0.0f);
-		m_SpinText.m_pSpinText_Padded->pos.Y(-m_pText->GetTextBox().y);
+		m_SpinText.m_SpinText_Shown.pos.Y(0.0f);
+		m_SpinText.m_SpinText_Padded.pos.Y(-m_Text.GetTextBox().y);
 	}
 	else
 	{
 		m_iPrevValue = m_iCurValue;
-		m_dTotalDistance = abs(m_iTargetValue - m_iCurValue) * static_cast<double>(m_pText->GetTextBox().y);
+		m_dTotalDistance = abs(m_iTargetValue - m_iCurValue) * static_cast<double>(m_Text.GetTextBox().y);
 		m_dTotalDistance -= m_fThresholdDist;
 	}
 
@@ -108,6 +95,11 @@ void HyMeter::SetValue(int32 iPennies, float fRackDuration)
 void HyMeter::OffsetValue(int32 iPenniesOffsetAmt, float fRackDuration)
 {
 	SetValue(m_iTargetValue + iPenniesOffsetAmt, fRackDuration);
+}
+
+void HyMeter::SetDenomination(int32 iDenom)
+{
+	m_iDenomination = iDenom;
 }
 
 void HyMeter::Slam()
@@ -155,24 +147,17 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 
 void HyMeter::SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
 {
-	if(m_pText == nullptr)
-		return;
-
-	m_pText->SetLayerColor(uiLayerIndex, fR, fG, fB);
-	m_SpinText.m_pSpinText_Shown->SetLayerColor(uiLayerIndex, fR, fG, fB);
-	m_SpinText.m_pSpinText_Padded->SetLayerColor(uiLayerIndex, fR, fG, fB);
+	m_Text.SetLayerColor(uiLayerIndex, fR, fG, fB);
+	m_SpinText.m_SpinText_Shown.SetLayerColor(uiLayerIndex, fR, fG, fB);
+	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
 void HyMeter::TextSetState(uint32 uiAnimState)
 {
-	if(m_pText == nullptr)
-		return;
-
-	m_pText->SetState(uiAnimState);
-	m_SpinText.m_pSpinText_Shown->SetState(uiAnimState);
-	m_SpinText.m_pSpinText_Padded->SetState(uiAnimState);
+	m_Text.SetState(uiAnimState);
+	m_SpinText.m_SpinText_Shown.SetState(uiAnimState);
+	m_SpinText.m_SpinText_Padded.SetState(uiAnimState);
 }
-
 
 /*virtual*/ std::string HyMeter::GetStr() /*override*/
 {
@@ -184,29 +169,23 @@ void HyMeter::TextSetState(uint32 uiAnimState)
 	HyError("HyMeter::SetStr is not implemented");
 }
 
-/*virtual*/ void HyMeter::SetTextLocation(int32 iOffsetX, int32 iOffsetY, int32 iWidth, int32 iHeight) /*override*/
+/*virtual*/ void HyMeter::SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY) /*override*/
 {
-	if(m_pText == nullptr)
-		return;
+	HyInfoPanel::SetTextLocation(iWidth, iHeight, iOffsetX, iOffsetY);
 
-	HyInfoPanel::SetTextLocation(iOffsetX, iOffsetY, iWidth, iHeight);
-
-	m_SpinText.pos.Set(m_pText->pos.X(), m_pText->pos.Y());
-	m_SpinText.m_pSpinText_Shown->SetAsScaleBox(m_pText->GetTextBox().x, m_pText->GetTextBox().y);
-	m_SpinText.m_pSpinText_Padded->SetAsScaleBox(m_pText->GetTextBox().x, m_pText->GetTextBox().y);
+	m_SpinText.pos.Set(m_Text.pos.X(), m_Text.pos.Y());
+	m_SpinText.m_SpinText_Shown.SetAsScaleBox(m_Text.GetTextBox().x, m_Text.GetTextBox().y);
+	m_SpinText.m_SpinText_Padded.SetAsScaleBox(m_Text.GetTextBox().x, m_Text.GetTextBox().y);
 
 	FormatDigits();
 }
 
 /*virtual*/ void HyMeter::SetTextAlignment(HyTextAlign eAlignment) /*override*/
 {
-	if(m_pText == nullptr)
-		return;
+	HyInfoPanel::SetTextAlignment(eAlignment);
 
-	HyMeter::SetTextAlignment(eAlignment);
-
-	m_SpinText.m_pSpinText_Shown->SetTextAlignment(eAlignment);
-	m_SpinText.m_pSpinText_Padded->SetTextAlignment(eAlignment);
+	m_SpinText.m_SpinText_Shown.SetTextAlignment(eAlignment);
+	m_SpinText.m_SpinText_Padded.SetTextAlignment(eAlignment);
 
 	FormatDigits();
 }
@@ -249,9 +228,9 @@ std::string HyMeter::FormatString(int32 iValue)
 	else
 	{
 		if(m_bUseCommas)
-			returnStr = ToStringWithCommas(iValue);
+			returnStr = ToStringWithCommas(iValue / m_iDenomination);
 		else
-			returnStr = std::to_string(iValue);
+			returnStr = std::to_string(iValue / m_iDenomination);
 	}
 
 	return returnStr;
@@ -259,25 +238,22 @@ std::string HyMeter::FormatString(int32 iValue)
 
 void HyMeter::FormatDigits()
 {
-	if(m_pText == nullptr)
-		return;
+	float fThreshold = m_Text.GetTextBox().y;
 
-	float fThreshold = m_pText->GetTextBox().y;
-
-	m_pText->SetText(FormatString(m_iCurValue));
+	m_Text.SetText(FormatString(m_iCurValue));
 
 	if(m_bSpinDigits)
 	{
-		std::string sShownString = m_pText->GetText();
-		m_SpinText.m_pSpinText_Shown->SetText(sShownString);
+		std::string sShownString = m_Text.GetText();
+		m_SpinText.m_SpinText_Shown.SetText(sShownString);
 
 		HyAssert(sShownString.empty() == false, "FormatString() returned an empty string");
 		uint32 uiCharIndexForScissor = static_cast<uint32>(sShownString.size()) - 1;
 
 		if(m_iCurValue <= m_iTargetValue)
 		{
-			m_SpinText.m_pSpinText_Padded->SetText(FormatString(m_iCurValue + 1));
-			m_SpinText.m_pSpinText_Padded->pos.Y(m_SpinText.m_pSpinText_Shown->pos.Y() - fThreshold);
+			m_SpinText.m_SpinText_Padded.SetText(FormatString(m_iCurValue + 1));
+			m_SpinText.m_SpinText_Padded.pos.Y(m_SpinText.m_SpinText_Shown.pos.Y() - fThreshold);
 
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)
 			{
@@ -291,8 +267,8 @@ void HyMeter::FormatDigits()
 		}
 		else
 		{
-			m_SpinText.m_pSpinText_Padded->SetText(FormatString(m_iCurValue - 1));
-			m_SpinText.m_pSpinText_Padded->pos.Y(m_SpinText.m_pSpinText_Shown->pos.Y() + fThreshold);
+			m_SpinText.m_SpinText_Padded.SetText(FormatString(m_iCurValue - 1));
+			m_SpinText.m_SpinText_Padded.pos.Y(m_SpinText.m_SpinText_Shown.pos.Y() + fThreshold);
 
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)
 			{
@@ -312,43 +288,43 @@ void HyMeter::FormatDigits()
 			{
 				if(i < uiCharIndexForScissor)
 				{
-					m_pText->SetGlyphAlpha(i, 1.0f);
-					m_SpinText.m_pSpinText_Shown->SetGlyphAlpha(i, 0.0f);
-					m_SpinText.m_pSpinText_Padded->SetGlyphAlpha(i, 0.0f);
+					m_Text.SetGlyphAlpha(i, 1.0f);
+					m_SpinText.m_SpinText_Shown.SetGlyphAlpha(i, 0.0f);
+					m_SpinText.m_SpinText_Padded.SetGlyphAlpha(i, 0.0f);
 				}
 				else
 				{
-					m_pText->SetGlyphAlpha(i, 0.0f);
-					m_SpinText.m_pSpinText_Shown->SetGlyphAlpha(i, 1.0f);
-					m_SpinText.m_pSpinText_Padded->SetGlyphAlpha(i, 1.0f);
+					m_Text.SetGlyphAlpha(i, 0.0f);
+					m_SpinText.m_SpinText_Shown.SetGlyphAlpha(i, 1.0f);
+					m_SpinText.m_SpinText_Padded.SetGlyphAlpha(i, 1.0f);
 				}
 			}
 			else
 			{
-				m_pText->SetGlyphAlpha(i, 1.0f);
-				m_SpinText.m_pSpinText_Shown->SetGlyphAlpha(i, 0.0f);
-				m_SpinText.m_pSpinText_Padded->SetGlyphAlpha(i, 0.0f);
+				m_Text.SetGlyphAlpha(i, 1.0f);
+				m_SpinText.m_SpinText_Shown.SetGlyphAlpha(i, 0.0f);
+				m_SpinText.m_SpinText_Padded.SetGlyphAlpha(i, 0.0f);
 			}
 		}
 
 		m_SpinText.SetScissor(0,
 			0,
-			static_cast<uint32>(m_pText->GetTextBox().x),
+			static_cast<uint32>(m_Text.GetTextBox().x),
 			static_cast<uint32>(fThreshold));
 	}
 	else
 	{
-		for(uint32 i = 0; i < m_pText->GetText().size(); ++i)
-			m_pText->SetGlyphAlpha(i, 1.0f);
+		for(uint32 i = 0; i < m_Text.GetText().size(); ++i)
+			m_Text.SetGlyphAlpha(i, 1.0f);
 	}
 
 
-	m_SpinText.SetVisible(m_pText->IsVisible() && m_bSpinDigits);
+	m_SpinText.SetVisible(m_Text.IsVisible() && m_bSpinDigits);
 }
 
 /*virtual*/ void HyMeter::OnUpdate() /*override*/
 {
-	if(m_iCurValue == m_iTargetValue || m_pText == nullptr)
+	if(m_iCurValue == m_iTargetValue)
 		return;
 
 	m_fElapsedTimeRack = HyClamp(m_fElapsedTimeRack + Hy_UpdateStep(), 0.0f, m_fRackingDuration);
@@ -371,7 +347,7 @@ void HyMeter::FormatDigits()
 	}
 	else	// Spinning (analog) digits
 	{
-		float fThreshold = m_pText->GetTextBox().y;
+		float fThreshold = m_Text.GetTextBox().y;
 
 		double dTravelDist = m_dTotalDistance * (m_fElapsedTimeRack / m_fRackingDuration);
 		m_fThresholdDist += static_cast<float>(dTravelDist - m_dPrevDistance);
@@ -382,19 +358,19 @@ void HyMeter::FormatDigits()
 
 		if(m_iTargetValue >= m_iCurValue)
 		{
-			m_SpinText.m_pSpinText_Shown->pos.Y(m_fThresholdDist);
-			m_SpinText.m_pSpinText_Padded->pos.Y(m_fThresholdDist);
+			m_SpinText.m_SpinText_Shown.pos.Y(m_fThresholdDist);
+			m_SpinText.m_SpinText_Padded.pos.Y(m_fThresholdDist);
 
 			m_iCurValue += iTimesPastThreshold;
-			m_SpinText.m_pSpinText_Padded->pos.Offset(0.0f, -fThreshold);
+			m_SpinText.m_SpinText_Padded.pos.Offset(0.0f, -fThreshold);
 		}
 		else
 		{
-			m_SpinText.m_pSpinText_Shown->pos.Y(-m_fThresholdDist);
-			m_SpinText.m_pSpinText_Padded->pos.Y(-m_fThresholdDist);
+			m_SpinText.m_SpinText_Shown.pos.Y(-m_fThresholdDist);
+			m_SpinText.m_SpinText_Padded.pos.Y(-m_fThresholdDist);
 
 			m_iCurValue -= iTimesPastThreshold;
-			m_SpinText.m_pSpinText_Padded->pos.Offset(0.0f, fThreshold);
+			m_SpinText.m_SpinText_Padded.pos.Offset(0.0f, fThreshold);
 		}
 
 		if(iTimesPastThreshold > 0)

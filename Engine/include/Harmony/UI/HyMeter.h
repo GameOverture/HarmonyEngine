@@ -18,6 +18,7 @@ class HyMeter : public HyInfoPanel
 	int32					m_iCurValue = 0;
 	int32					m_iPrevValue = 0;
 	int32					m_iTargetValue = 0;
+	int32					m_iDenomination = 1; // Used when not displaying as cash
 
 	float					m_fRackingDuration = 1.0f;
 	float					m_fElapsedTimeRack = 0.0f;
@@ -35,54 +36,41 @@ class HyMeter : public HyInfoPanel
 	class SpinText : public HyEntity2d
 	{
 	public:
-		HyText2d *				m_pSpinText_Shown;
-		HyText2d *				m_pSpinText_Padded;
+		HyText2d			m_SpinText_Shown;
+		HyText2d			m_SpinText_Padded;
 
-		SpinText(HyEntity2d *pParent) :	HyEntity2d(pParent),
-			m_pSpinText_Shown(nullptr),
-			m_pSpinText_Padded(nullptr)
+		SpinText() = default;
+		virtual ~SpinText() = default;
+
+		void Setup(std::string sTextPrefix, std::string sTextName)
 		{
-		}
+			m_SpinText_Shown.Init(sTextPrefix, sTextName, this);
+			m_SpinText_Shown.SetTextAlignment(HYALIGN_Center);
+			m_SpinText_Shown.SetMonospacedDigits(true);
 
-		virtual ~SpinText()
-		{
-			delete m_pSpinText_Shown;
-			delete m_pSpinText_Padded;
-		}
-
-		void Init(const char *szTextPrefix, const char *szTextName)
-		{
-			if(szTextName == nullptr)
-				return;
-
-			delete m_pSpinText_Shown;
-			delete m_pSpinText_Padded;
-
-			m_pSpinText_Shown = HY_NEW HyText2d(szTextPrefix, szTextName, this);
-			m_pSpinText_Shown->SetTextAlignment(HYALIGN_Center);
-			m_pSpinText_Shown->SetMonospacedDigits(true);
-
-			m_pSpinText_Padded = HY_NEW HyText2d(szTextPrefix, szTextName, this);
-			m_pSpinText_Padded->SetTextAlignment(HYALIGN_Center);
-			m_pSpinText_Padded->SetMonospacedDigits(true);
+			m_SpinText_Padded.Init(sTextPrefix, sTextName, this);
+			m_SpinText_Padded.SetTextAlignment(HYALIGN_Center);
+			m_SpinText_Padded.SetMonospacedDigits(true);
 		}
 	};
 	SpinText 				m_SpinText;
 
 public:
-	HyMeter(HyEntity2d *pParent = nullptr);
-	HyMeter(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent);
-	HyMeter(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent);
-	HyMeter(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent);
+	HyMeter();
+	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName);
+	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY);
+	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
 	virtual ~HyMeter();
 
-	virtual void Init(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent) override;
-	virtual void Init(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) override;
-	virtual void Init(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) override;
+	virtual void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName) override;
+	virtual void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY) override;
+	virtual void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) override;
 
 	int32 GetValue();
 	void SetValue(int32 iPennies, float fRackDuration);
 	void OffsetValue(int32 iPenniesOffsetAmt, float fRackDuration);
+
+	void SetDenomination(int32 iDenom);
 
 	void Slam();
 	bool IsRacking();
@@ -102,7 +90,7 @@ public:
 
 	virtual std::string GetStr() override;
 	virtual void SetStr(std::string sText) override;
-	virtual void SetTextLocation(int32 iOffsetX, int32 iOffsetY, int32 iWidth, int32 iHeight) override;
+	virtual void SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY) override;
 	virtual void SetTextAlignment(HyTextAlign eAlignment) override;
 
 private:

@@ -76,7 +76,7 @@ protected:
 	float				m_fUsedPixelHeight;
 
 public:
-	IHyText(std::string sPrefix = "", std::string sName = "", ENTTYPE *pParent = nullptr);
+	IHyText();
 	IHyText(const IHyText &copyRef);
 	virtual ~IHyText(void);
 

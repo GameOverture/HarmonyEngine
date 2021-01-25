@@ -20,14 +20,15 @@ HyDiagOutput::HyDiagOutput() :
 	m_dFrameTime_High(0.0),
 	m_dFrameTime_Cumulative(0.0),
 	m_uiFrameCount(0),
-	m_txtLastFrameTime(HY_SYSTEM_FONT, this),
-	m_txtAvgFrame(HY_SYSTEM_FONT, this),
-	m_txtAvgFrameLow(HY_SYSTEM_FONT, this),
-	m_txtAvgFrameHigh(HY_SYSTEM_FONT, this),
-	m_txtFps(HY_SYSTEM_FONT, this),
-	m_txtMouse(HY_SYSTEM_FONT, this),
 	m_uiShowFlags(HYDIAG_NONE)
 {
+	m_txtLastFrameTime.Init(HY_SYSTEM_FONT, this);
+	m_txtAvgFrame.Init(HY_SYSTEM_FONT, this);
+	m_txtAvgFrameLow.Init(HY_SYSTEM_FONT, this);
+	m_txtAvgFrameHigh.Init(HY_SYSTEM_FONT, this);
+	m_txtFps.Init(HY_SYSTEM_FONT, this);
+	m_txtMouse.Init(HY_SYSTEM_FONT, this);
+
 	SetDisplayOrder(HY_SYSTEM_FONT_DISPLAYORDER);
 	SetShowFlags(HYDIAG_NONE);
 }

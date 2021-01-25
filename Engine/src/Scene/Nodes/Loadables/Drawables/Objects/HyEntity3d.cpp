@@ -10,8 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-HyEntity3d::HyEntity3d(std::string sPrefix, std::string sName, HyEntity3d *pParent) :
-	IHyDrawable3d(HYTYPE_Entity, sPrefix, sName, pParent)
+HyEntity3d::HyEntity3d() :
+	IHyDrawable3d(HYTYPE_Entity)
 {
 }
 
@@ -137,7 +137,12 @@ void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsDrawable)
-		_CtorSetupNewChild(*this, static_cast<IHyDrawable3d &>(childRef));
+	{
+		static_cast<IHyDrawable3d &>(childRef)._SetCoordinateSystem(GetCoordinateSystem(), false);
+
+		if(IsScissorSet())
+			static_cast<IHyDrawable3d &>(childRef)._SetScissor(m_pScissor, false);
+	}
 }
 
 /*virtual*/ void HyEntity3d::SetDirty(uint32 uiDirtyFlags)
@@ -146,10 +151,4 @@ void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->SetDirty(uiDirtyFlags);
-}
-
-/*friend*/ void _CtorChildAppend(HyEntity3d &entityRef, IHyNode3d &childRef)
-{
-	entityRef.m_ChildList.push_back(&childRef);
-	entityRef.SetDirty(HyEntity3d::DIRTY_ALL);
 }

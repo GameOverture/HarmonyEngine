@@ -11,155 +11,111 @@
 #include "UI/HyInfoPanel.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
-HyInfoPanel::HyInfoPanel(HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent),
-	m_pPanel(nullptr),
-	m_pText(nullptr)
+HyInfoPanel::HyInfoPanel()
 {
 }
 
-HyInfoPanel::HyInfoPanel(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent) :
-	HyEntity2d(nullptr),
-	m_pPanel(nullptr),
-	m_pText(nullptr)
+HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
 {
-	Init(szPanelPrefix, szPanelName, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName);
 }
 
-HyInfoPanel::HyInfoPanel(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) :
-	HyEntity2d(nullptr),
-	m_pPanel(nullptr),
-	m_pText(nullptr)
+HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY)
 {
-	Init(szTextPrefix, szTextName, iTextDimensionsX, iTextDimensionsY, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY);
 }
 
-HyInfoPanel::HyInfoPanel(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent) :
-	HyEntity2d(nullptr),
-	m_pPanel(nullptr),
-	m_pText(nullptr)
+HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
 {
-	Init(szPanelPrefix, szPanelName, szTextPrefix, szTextName, iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
-HyInfoPanel::~HyInfoPanel()
+/*virtual*/ HyInfoPanel::~HyInfoPanel()
 {
-	delete m_pPanel;
-	delete m_pText;
 }
 
-/*virtual*/ void HyInfoPanel::Init(const char *szPanelPrefix, const char *szPanelName, HyEntity2d *pParent)
+/*virtual*/ void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
 {
-	Init(szPanelPrefix, szPanelName, nullptr, nullptr, 0, 0, 0, 0, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
-/*virtual*/ void HyInfoPanel::Init(const char *szTextPrefix, const char *szTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent)
+/*virtual*/ void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY)
 {
-	Init(nullptr, nullptr, szTextPrefix, szTextName, 0, 0, iTextDimensionsX, iTextDimensionsY, pParent);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, 0, 0);
 }
 
-/*virtual*/ void HyInfoPanel::Init(const char *szPanelPrefix, const char *szPanelName, const char *szTextPrefix, const char *szTextName, int32 iTextOffsetX, int32 iTextOffsetY, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent)
+/*virtual*/ void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
 {
-	delete m_pPanel;
-	delete m_pText;
-
-	m_pPanel = szPanelName != nullptr ? HY_NEW HySprite2d(szPanelPrefix, szPanelName, this) : nullptr;
-	m_pText = szTextName != nullptr ? HY_NEW HyText2d(szTextPrefix, szTextName, this) : nullptr;
-
-	if(m_pText)
-	{
-		m_pText->SetTextAlignment(HYALIGN_Center);
-		SetTextLocation(iTextOffsetX, iTextOffsetY, iTextDimensionsX, iTextDimensionsY);
-	}
-
-	Reinitialize("", "", pParent);
+	m_Panel.Init(sPanelPrefix, sPanelName, this);
+	m_Text.Init(sTextPrefix, sTextName, this);
+	
+	m_Text.SetTextAlignment(HYALIGN_Center);
+	SetTextLocation(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
-HySprite2d *HyInfoPanel::GetPanelPtr()
+HySprite2d &HyInfoPanel::GetPanel()
 {
-	return m_pPanel;
+	return m_Panel;
 }
 
-HyText2d *HyInfoPanel::GetTextPtr()
+HyText2d &HyInfoPanel::GetText()
 {
-	return m_pText;
+	return m_Text;
 }
 
 /*virtual*/ void HyInfoPanel::SetPanelState(uint32 uiAnimIndex, bool bResetAnim)
 {
-	if(m_pPanel)
-	{
-		m_pPanel->SetState(uiAnimIndex);
+	m_Panel.SetState(uiAnimIndex);
 
-		if(bResetAnim)
-			m_pPanel->SetFrame(0);
+	if(bResetAnim)
+		m_Panel.SetFrame(0);
 
-		if(m_pText)
-			SetTextLocation(m_vTextOffset.x, m_vTextOffset.y, static_cast<int32>(m_pText->GetTextBox().x), static_cast<int32>(m_pText->GetTextBox().y));
-	}
+	SetTextLocation(static_cast<int32>(m_Text.GetTextBox().x), static_cast<int32>(m_Text.GetTextBox().y), m_vTextOffset.x, m_vTextOffset.y);
 }
 
 float HyInfoPanel::GetPanelWidth()
 {
-	if(m_pPanel)
-		return m_pPanel->GetCurFrameWidth(true);
-	
-	return 0.0f;
+	return m_Panel.GetCurFrameWidth(true);
 }
 
 float HyInfoPanel::GetPanelHeight()
 {
-	if(m_pPanel)
-		return m_pPanel->GetCurFrameHeight(true);
-
-	return 0.0f;
+	return m_Panel.GetCurFrameHeight(true);
 }
 
 /*virtual*/ std::string HyInfoPanel::GetStr()
 {
-	if(m_pText)
-		return m_pText->GetText();
-
-	return std::string();
+	return m_Text.GetText();
 }
 
 /*virtual*/ void HyInfoPanel::SetStr(std::string sText)
 {
-	if(m_pText)
-		m_pText->SetText(sText);
+	m_Text.SetText(sText);
 }
 
-/*virtual*/ void HyInfoPanel::SetTextLocation(int32 iOffsetX, int32 iOffsetY, int32 iWidth, int32 iHeight)
+/*virtual*/ void HyInfoPanel::SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY)
 {
-	if(m_pText == nullptr)
-		return;
-
 	m_vTextOffset.x = iOffsetX;
 	m_vTextOffset.y = iOffsetY;
 
 	glm::ivec2 vPanelOffset(0);
-	if(m_pPanel)
+	const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_Panel.AcquireData());
+	if(pPanelData)
 	{
-		const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_pPanel->AcquireData());
-		HyAssert(pPanelData, "HyInfoPanel could not acquire data for its panel");
-		const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_pPanel->GetState(), m_pPanel->GetFrame());
+		const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_Panel.GetState(), m_Panel.GetFrame());
 		vPanelOffset = frameRef.vOFFSET;
 	}
 	
-	m_pText->pos.Set(m_vTextOffset.x + vPanelOffset.x, m_vTextOffset.y + vPanelOffset.y);
-	m_pText->SetAsScaleBox(static_cast<float>(iWidth), static_cast<float>(iHeight), true);
+	m_Text.pos.Set(m_vTextOffset.x + vPanelOffset.x, m_vTextOffset.y + vPanelOffset.y);
+	m_Text.SetAsScaleBox(static_cast<float>(iWidth), static_cast<float>(iHeight), true);
 }
 
 /*virtual*/ void HyInfoPanel::SetTextAlignment(HyTextAlign eAlignment)
 {
-	if(m_pText)
-		m_pText->SetTextAlignment(eAlignment);
+	m_Text.SetTextAlignment(eAlignment);
 }
 
 /*virtual*/ glm::vec2 HyInfoPanel::GetTextScaleBox()
 {
-	if(m_pText)
-		return m_pText->GetTextBox();
-
-	return glm::vec2(0.0f);
+	return m_Text.GetTextBox();
 }

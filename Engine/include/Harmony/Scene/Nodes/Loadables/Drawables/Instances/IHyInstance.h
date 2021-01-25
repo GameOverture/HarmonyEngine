@@ -31,11 +31,11 @@ protected:
 public:
 	IHyInstance();
 	IHyInstance(const IHyInstance &copyRef);
-	IHyInstance(IHyInstance &&donor);
+	IHyInstance(IHyInstance &&donor) noexcept;
 	virtual ~IHyInstance();
 
 	IHyInstance &operator=(const IHyInstance &rhs);
-	IHyInstance &operator=(IHyInstance &&donor);
+	IHyInstance &operator=(IHyInstance &&donor) noexcept;
 
 	HyRenderMode GetRenderMode() const;
 	HyTextureHandle GetTextureHandle() const;

@@ -13,8 +13,8 @@
 
 extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
 
-IHyInstance2d::IHyInstance2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
-	IHyDrawable2d(eNodeType, sPrefix, sName, pParent)
+IHyInstance2d::IHyInstance2d(HyType eNodeType) :
+	IHyDrawable2d(eNodeType)
 {
 }
 
@@ -25,7 +25,7 @@ IHyInstance2d::IHyInstance2d(const IHyInstance2d &copyRef) :
 {
 }
 
-IHyInstance2d::IHyInstance2d(IHyInstance2d &&donor) :
+IHyInstance2d::IHyInstance2d(IHyInstance2d &&donor) noexcept :
 	IHyDrawable2d(std::move(donor)),
 	IHyInstance(std::move(donor)),
 	m_LocalBoundingVolume(std::move(donor.m_LocalBoundingVolume))
@@ -48,7 +48,7 @@ IHyInstance2d &IHyInstance2d::operator=(const IHyInstance2d &rhs)
 	return *this;
 }
 
-IHyInstance2d &IHyInstance2d::operator=(IHyInstance2d &&donor)
+IHyInstance2d &IHyInstance2d::operator=(IHyInstance2d &&donor) noexcept
 {
 	IHyDrawable2d::operator=(std::move(donor));
 	IHyInstance::operator=(std::move(donor));

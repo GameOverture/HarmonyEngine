@@ -63,13 +63,13 @@ protected:
 		HyStencil				m_StencilForEdges;
 
 	public:
-		Border(glm::vec2 vFillDimensions, float fBorderThickness, HyPrimitive2d &fillRef, HyEntity2d *pParent);
+		Border(glm::vec2 vFillDimensions, float fBorderThickness, HyPrimitive2d &fillRef);
 	};
 	HyPrimitive2d			m_Fill;
 	Border					m_Border;
 
 public:
-	IHy9Slice(glm::vec2 vFillDimensions, float fBorderThickness, HyEntity2d *pParent);
+	IHy9Slice(glm::vec2 vFillDimensions, float fBorderThickness);
 	virtual ~IHy9Slice();
 
 	float GetWidth(bool bIncludeBorders);

@@ -31,7 +31,7 @@ public:
 	HyAnimFloat					pitch;
 
 public:
-	IHyAudio(std::string sPrefix = "", std::string sName = "", ENTTYPE *pParent = nullptr);
+	IHyAudio();
 
 	// TODO: copy ctor and move ctor
 	virtual ~IHyAudio(void);

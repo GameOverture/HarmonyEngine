@@ -40,13 +40,12 @@ protected:
 	b2Body *								m_pPhysicsBody;
 
 public:
-	HyEntity2d(HyEntity2d *pParent = nullptr);
-	HyEntity2d(std::string sPrefix, std::string sName, HyEntity2d *pParent);
+	HyEntity2d();
 	HyEntity2d(const HyEntity2d &) = delete;
-	HyEntity2d(HyEntity2d &&donor);
+	HyEntity2d(HyEntity2d &&donor) noexcept;
 	virtual ~HyEntity2d(void);
 
-	HyEntity2d &operator=(HyEntity2d &&donor);
+	HyEntity2d &operator=(HyEntity2d &&donor) noexcept;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OVERRIDES + OVERLOADS
@@ -182,8 +181,6 @@ protected:
 	virtual void OnMouseDown() { }
 	virtual void OnMouseUp() { }
 	virtual void OnMouseClicked() { }
-
-	friend void _CtorChildAppend(HyEntity2d &entityRef, IHyNode2d &childRef);
 };
 
 #endif /* HyEntity2d_h__ */

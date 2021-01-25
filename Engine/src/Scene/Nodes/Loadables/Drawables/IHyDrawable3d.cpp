@@ -14,8 +14,8 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyDrawable3d::IHyDrawable3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
-	IHyLoadable3d(eNodeType, sPrefix, sName, pParent),
+IHyDrawable3d::IHyDrawable3d(HyType eNodeType) :
+	IHyLoadable3d(eNodeType),
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	tint(*this, DIRTY_Color),
@@ -24,9 +24,6 @@ IHyDrawable3d::IHyDrawable3d(HyType eNodeType, std::string sPrefix, std::string 
 	m_uiFlags |= NODETYPE_IsDrawable;
 
 	tint.Set(1.0f);
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyDrawable3d::IHyDrawable3d(const IHyDrawable3d &copyRef) :
@@ -39,12 +36,9 @@ IHyDrawable3d::IHyDrawable3d(const IHyDrawable3d &copyRef) :
 
 	tint = copyRef.tint;
 	alpha = copyRef.alpha;
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
-IHyDrawable3d::IHyDrawable3d(IHyDrawable3d &&donor) :
+IHyDrawable3d::IHyDrawable3d(IHyDrawable3d &&donor) noexcept :
 	IHyLoadable3d(std::move(donor)),
 	IHyDrawable(std::move(donor)),
 	tint(*this, DIRTY_Color),
@@ -147,12 +141,4 @@ void IHyDrawable3d::CalculateColor()
 /*virtual*/ HyEntity3d *IHyDrawable3d::_VisableGetParent3dPtr() /*override final*/
 {
 	return m_pParent;
-}
-
-/*friend*/ void _CtorSetupNewChild(HyEntity3d &parentRef, IHyDrawable3d &childRef)
-{
-	childRef._SetCoordinateSystem(parentRef.GetCoordinateSystem(), false);
-
-	if(parentRef.IsScissorSet())
-		childRef._SetScissor(parentRef.m_pScissor, false);
 }

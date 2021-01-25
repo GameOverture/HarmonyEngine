@@ -28,7 +28,7 @@ IHyInstance::IHyInstance(const IHyInstance &copyRef) :
 {
 }
 
-IHyInstance::IHyInstance(IHyInstance &&donor) :
+IHyInstance::IHyInstance(IHyInstance &&donor) noexcept :
 	m_hShader(std::move(donor.m_hShader)),
 	m_eRenderMode(std::move(donor.m_eRenderMode)),
 	m_hTextureHandle(std::move(donor.m_hTextureHandle)),
@@ -50,7 +50,7 @@ IHyInstance &IHyInstance::operator=(const IHyInstance &rhs)
 	return *this;
 }
 
-IHyInstance &IHyInstance::operator=(IHyInstance &&donor)
+IHyInstance &IHyInstance::operator=(IHyInstance &&donor) noexcept
 {
 	m_hShader = std::move(donor.m_hShader);
 	m_eRenderMode = std::move(donor.m_eRenderMode);

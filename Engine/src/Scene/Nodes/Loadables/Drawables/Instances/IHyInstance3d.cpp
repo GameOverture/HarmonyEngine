@@ -13,8 +13,8 @@
 
 extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
 
-IHyInstance3d::IHyInstance3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
-	IHyDrawable3d(eNodeType, sPrefix, sName, pParent)
+IHyInstance3d::IHyInstance3d(HyType eNodeType) :
+	IHyDrawable3d(eNodeType)
 {
 }
 
@@ -24,7 +24,7 @@ IHyInstance3d::IHyInstance3d(const IHyInstance3d &copyRef) :
 {
 }
 
-IHyInstance3d::IHyInstance3d(IHyInstance3d &&donor) :
+IHyInstance3d::IHyInstance3d(IHyInstance3d &&donor) noexcept :
 	IHyDrawable3d(std::move(donor)),
 	IHyInstance(std::move(donor))
 {
@@ -44,7 +44,7 @@ IHyInstance3d &IHyInstance3d::operator=(const IHyInstance3d &rhs)
 	return *this;
 }
 
-IHyInstance3d &IHyInstance3d::operator=(IHyInstance3d &&donor)
+IHyInstance3d &IHyInstance3d::operator=(IHyInstance3d &&donor) noexcept
 {
 	IHyLoadable3d::operator=(std::move(donor));
 	IHyInstance::operator=(std::move(donor));

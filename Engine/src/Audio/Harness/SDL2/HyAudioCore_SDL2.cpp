@@ -229,7 +229,7 @@ void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 		if(iAssignedChannel == -1)
 			return;
 
-		Mix_Volume(iAssignedChannel, MIX_MAX_VOLUME * fVolume);
+		Mix_Volume(iAssignedChannel, static_cast<int>(MIX_MAX_VOLUME * fVolume));
 
 		if(ePlayType == CUETYPE_Start)
 		{

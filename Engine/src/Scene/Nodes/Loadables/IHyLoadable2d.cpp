@@ -12,9 +12,9 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-IHyLoadable2d::IHyLoadable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
-	IHyNode2d(eNodeType, pParent),
-	IHyLoadable(sPrefix, sName)
+IHyLoadable2d::IHyLoadable2d(HyType eNodeType) :
+	IHyNode2d(eNodeType),
+	IHyLoadable()
 {
 	m_uiFlags |= NODETYPE_IsLoadable;
 }
@@ -25,7 +25,7 @@ IHyLoadable2d::IHyLoadable2d(const IHyLoadable2d &copyRef) :
 {
 }
 
-IHyLoadable2d::IHyLoadable2d(IHyLoadable2d &&donor) :
+IHyLoadable2d::IHyLoadable2d(IHyLoadable2d &&donor) noexcept :
 	IHyNode2d(std::move(donor)),
 	IHyLoadable(std::move(donor))
 {
@@ -51,12 +51,7 @@ IHyLoadable2d &IHyLoadable2d::operator=(IHyLoadable2d &&donor)
 	return *this;
 }
 
-void IHyLoadable2d::Reinitialize(std::string sPrefix, std::string sName)
-{
-	IHyLoadable::_Reinitialize(sPrefix, sName);
-}
-
-void IHyLoadable2d::Reinitialize(std::string sPrefix, std::string sName, HyEntity2d *pParent)
+void IHyLoadable2d::Init(std::string sPrefix, std::string sName, HyEntity2d *pParent)
 {
 	IHyLoadable::_Reinitialize(sPrefix, sName);
 

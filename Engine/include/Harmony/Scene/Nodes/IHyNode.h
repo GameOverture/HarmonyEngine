@@ -77,7 +77,7 @@ protected:
 public:
 	IHyNode(HyType eNodeType);
 	IHyNode(const IHyNode &copyRef);
-	IHyNode(IHyNode &&donor);
+	IHyNode(IHyNode &&donor) noexcept;
 	virtual ~IHyNode();
 
 	IHyNode &operator=(const IHyNode &rhs);

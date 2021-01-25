@@ -12,9 +12,9 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
 #include "HyEngine.h"
 
-IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
+IHyNode2d::IHyNode2d(HyType eNodeType) :
 	IHyNode(eNodeType),
-	m_pParent(pParent),
+	m_pParent(nullptr),
 	m_fRotation(0.0f),
 	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
@@ -24,9 +24,6 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 {
 	m_uiFlags |= NODETYPE_Is2d;
 	scale.Set(1.0f);
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
@@ -48,12 +45,9 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	rot_pivot = copyRef.rot_pivot;
 	scale = copyRef.scale;
 	scale_pivot = copyRef.scale_pivot;
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
-IHyNode2d::IHyNode2d(IHyNode2d &&donor) :
+IHyNode2d::IHyNode2d(IHyNode2d &&donor) noexcept :
 	IHyNode(std::move(donor)),
 	m_pParent(donor.ParentGet()),
 	m_mtxCached(std::move(donor.m_mtxCached)),
@@ -74,9 +68,6 @@ IHyNode2d::IHyNode2d(IHyNode2d &&donor) :
 	scale_pivot = std::move(donor.scale_pivot);
 
 	donor.ParentDetach();
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 /*virtual*/ IHyNode2d::~IHyNode2d()
@@ -177,12 +168,4 @@ const glm::mat4 &IHyNode2d::GetWorldTransform()
 /*virtual*/ const b2AABB &IHyNode2d::GetWorldAABB()
 {
 	return m_WorldAABB;
-}
-
-/*friend*/ void _CtorSetupNewChild(HyEntity2d &parentRef, IHyNode2d &childRef)
-{
-	_CtorChildAppend(parentRef, childRef);
-
-	childRef._SetVisible(parentRef.IsVisible(), false);
-	childRef._SetPauseUpdate(parentRef.IsPauseUpdate(), false);
 }

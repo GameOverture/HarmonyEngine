@@ -13,7 +13,7 @@
 
 extern float Hy_UpdateStep();
 
-IHy9Slice::Border::Border(glm::vec2 vFillDimensions, float fBorderThickness, HyPrimitive2d &fillRef, HyEntity2d *pParent)
+IHy9Slice::Border::Border(glm::vec2 vFillDimensions, float fBorderThickness, HyPrimitive2d &fillRef)
 {
 	m_Corners[LowerLeft].SetAsCircle(fBorderThickness);
 	m_Corners[LowerLeft].pos.Set(0.0f, 0.0f);
@@ -64,13 +64,12 @@ IHy9Slice::Border::Border(glm::vec2 vFillDimensions, float fBorderThickness, HyP
 		m_Vert[i].SetStencil(&m_StencilForEdges);
 }
 
-IHy9Slice::IHy9Slice(glm::vec2 vFillDimensions, float fBorderThickness, HyEntity2d *pParent) :
-	HyEntity2d(pParent),
+IHy9Slice::IHy9Slice(glm::vec2 vFillDimensions, float fBorderThickness) :
 	m_vFillDimensions(vFillDimensions),
 	m_fBorderThickness(fBorderThickness),
 	m_fElapsedTime(0.0f),
 	m_ePanelState(PANELSTATE_Hidden),
-	m_Border(vFillDimensions, fBorderThickness, m_Fill, this)
+	m_Border(vFillDimensions, fBorderThickness, m_Fill)
 {
 	ChildAppend(m_Border);
 

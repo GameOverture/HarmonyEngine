@@ -15,8 +15,8 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyDrawable2d::IHyDrawable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
-	IHyLoadable2d(eNodeType, sPrefix, sName, pParent),
+IHyDrawable2d::IHyDrawable2d(HyType eNodeType) :
+	IHyLoadable2d(eNodeType),
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	m_iDisplayOrder(0),
@@ -31,9 +31,6 @@ IHyDrawable2d::IHyDrawable2d(HyType eNodeType, std::string sPrefix, std::string 
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :
@@ -52,12 +49,9 @@ IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
-IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) :
+IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) noexcept :
 	IHyLoadable2d(std::move(donor)),
 	IHyDrawable(std::move(donor)),
 	m_iDisplayOrder(std::move(donor.m_iDisplayOrder)),
@@ -73,9 +67,6 @@ IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyDrawable2d::~IHyDrawable2d()
@@ -98,7 +89,7 @@ IHyDrawable2d &IHyDrawable2d::operator=(const IHyDrawable2d &rhs)
 	return *this;
 }
 
-IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor)
+IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor) noexcept
 {
 	IHyLoadable2d::operator=(std::move(donor));
 	IHyDrawable::operator=(std::move(donor));
@@ -231,17 +222,4 @@ void IHyDrawable2d::CalculateColor()
 /*virtual*/ HyEntity3d *IHyDrawable2d::_VisableGetParent3dPtr() /*override final*/
 {
 	return nullptr;
-}
-
-/*friend*/ void _CtorSetupNewChild(HyEntity2d &parentRef, IHyDrawable2d &childRef)
-{
-	childRef._SetCoordinateSystem(parentRef.GetCoordinateSystem(), false);
-
-	if(parentRef.IsScissorSet())
-		childRef._SetScissor(parentRef.m_pScissor, false);
-
-	if(parentRef.IsStencilSet())
-		childRef._SetStencil(parentRef.m_hStencil, false);
-
-	parentRef.SetChildrenDisplayOrder(false);
 }

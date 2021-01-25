@@ -33,9 +33,9 @@ public:
 	HyAnimVec3					scale_pivot;
 
 public:
-	IHyNode3d(HyType eNodeType, HyEntity3d *pParent);
+	IHyNode3d(HyType eNodeType);
 	IHyNode3d(const IHyNode3d &copyRef);
-	IHyNode3d(IHyNode3d &&donor);
+	IHyNode3d(IHyNode3d &&donor) noexcept;
 	virtual ~IHyNode3d();
 
 	IHyNode3d &operator=(const IHyNode3d &rhs);
@@ -46,9 +46,6 @@ public:
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
 	const glm::mat4 &GetWorldTransform();
-
-protected:
-	friend void _CtorSetupNewChild(HyEntity3d &parentRef, IHyNode3d &childRef);
 };
 
 #endif /* IHyNode3d_h__ */

@@ -12,9 +12,9 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 #include "Scene/HyScene.h"
 
-IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :
+IHyNode3d::IHyNode3d(HyType eNodeType) :
 	IHyNode(eNodeType),
-	m_pParent(pParent),
+	m_pParent(nullptr),
 	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
@@ -22,9 +22,6 @@ IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :
 	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	scale.Set(1.0f);
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :
@@ -42,7 +39,7 @@ IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :
 	scale_pivot.Set(copyRef.scale_pivot.Get());
 }
 
-IHyNode3d::IHyNode3d(IHyNode3d &&donor) :
+IHyNode3d::IHyNode3d(IHyNode3d &&donor) noexcept :
 	IHyNode(std::move(donor)),
 	m_pParent(donor.ParentGet()),
 	m_mtxCached(std::move(donor.m_mtxCached)),
@@ -61,9 +58,6 @@ IHyNode3d::IHyNode3d(IHyNode3d &&donor) :
 	scale_pivot = std::move(donor.scale_pivot);
 
 	donor.ParentDetach();
-
-	if(m_pParent)
-		_CtorSetupNewChild(*m_pParent, *this);
 }
 
 IHyNode3d::~IHyNode3d()
@@ -156,12 +150,4 @@ const glm::mat4 &IHyNode3d::GetWorldTransform()
 	}
 
 	return m_mtxCached;
-}
-
-/*friend*/ void _CtorSetupNewChild(HyEntity3d &parentRef, IHyNode3d &childRef)
-{
-	_CtorChildAppend(parentRef, childRef);
-
-	childRef._SetVisible(parentRef.IsVisible(), false);
-	childRef._SetPauseUpdate(parentRef.IsPauseUpdate(), false);
 }

@@ -32,9 +32,9 @@ protected:
 	uint32							m_uiState;
 
 public:
-	IHyLoadable(std::string sPrefix, std::string sName);
+	IHyLoadable();
 	IHyLoadable(const IHyLoadable &copyRef);
-	IHyLoadable(IHyLoadable &&donor);
+	IHyLoadable(IHyLoadable &&donor) noexcept;
 	virtual ~IHyLoadable();
 
 	IHyLoadable &operator=(const IHyLoadable &rhs);

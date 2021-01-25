@@ -42,7 +42,7 @@ protected:
 	glm::ivec2				m_vCustomOffset;					// If set, every frame offsets by this amount (plus any offset it is created with in the Editor)
 
 public:
-	IHySprite(std::string sPrefix = "", std::string sName = "", ENTTYPE *pParent = nullptr);
+	IHySprite();
 	IHySprite(const IHySprite &copyRef);
 	virtual ~IHySprite(void);
 

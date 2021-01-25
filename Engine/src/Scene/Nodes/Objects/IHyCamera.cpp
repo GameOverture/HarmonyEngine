@@ -20,7 +20,7 @@ class IHyRenderer;
 
 template<typename NODETYPE>
 IHyCamera<NODETYPE>::IHyCamera(HyWindow *pWindow) :
-	NODETYPE(HYTYPE_Camera, nullptr),
+	NODETYPE(HYTYPE_Camera),
 	m_pWindowPtr(pWindow),
 	m_uiCullMaskBit(0),
 	m_fCameraShakeRadius(0.0f),

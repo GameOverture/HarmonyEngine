@@ -21,7 +21,7 @@ protected:
 	std::vector<IHyNode3d *>		m_ChildList;
 
 public:
-	HyEntity3d(std::string sPrefix, std::string sName, HyEntity3d *pParent);
+	HyEntity3d();
 	virtual ~HyEntity3d(void);
 
 	void ChildAppend(IHyNode3d &childRef);
@@ -43,8 +43,6 @@ protected:
 
 	// Optional user overrides below
 	virtual void OnUpdate() { }
-
-	friend void _CtorChildAppend(HyEntity3d &entityRef, IHyNode3d &childRef);
 };
 
 #endif /* HyEntity3d_h__ */

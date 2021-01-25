@@ -16,7 +16,7 @@
 class HyPrefab3d : public IHyInstance3d
 {
 public:
-	HyPrefab3d(std::string sPrefix = "", std::string sName = "", HyEntity3d *pParent = nullptr);
+	HyPrefab3d();
 	HyPrefab3d(const HyPrefab3d &copyRef);
 	virtual ~HyPrefab3d();
 };

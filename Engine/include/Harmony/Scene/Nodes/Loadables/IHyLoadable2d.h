@@ -18,16 +18,15 @@
 class IHyLoadable2d : public IHyNode2d, public IHyLoadable
 {
 public:
-	IHyLoadable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
+	IHyLoadable2d(HyType eNodeType);
 	IHyLoadable2d(const IHyLoadable2d &copyRef);
-	IHyLoadable2d(IHyLoadable2d &&donor);
+	IHyLoadable2d(IHyLoadable2d &&donor) noexcept;
 	virtual ~IHyLoadable2d();
 
 	IHyLoadable2d &operator=(const IHyLoadable2d &rhs);
 	IHyLoadable2d &operator=(IHyLoadable2d &&donor);
 
-	void Reinitialize(std::string sPrefix, std::string sName);
-	void Reinitialize(std::string sPrefix, std::string sName, HyEntity2d *pParent);
+	void Init(std::string sPrefix, std::string sName, HyEntity2d *pParent);
 
 protected:
 	virtual void Update() override;

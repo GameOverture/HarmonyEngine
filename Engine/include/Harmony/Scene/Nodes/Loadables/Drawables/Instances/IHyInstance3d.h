@@ -22,13 +22,13 @@ class IHyInstance3d : public IHyDrawable3d, public IHyInstance
 	friend class HyScene;
 
 public:
-	IHyInstance3d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity3d *pParent);
+	IHyInstance3d(HyType eInstType);
 	IHyInstance3d(const IHyInstance3d &copyRef);
-	IHyInstance3d(IHyInstance3d &&donor);
+	IHyInstance3d(IHyInstance3d &&donor) noexcept;
 	virtual ~IHyInstance3d();
 
 	IHyInstance3d &operator=(const IHyInstance3d &rhs);
-	IHyInstance3d &operator=(IHyInstance3d &&donor);
+	IHyInstance3d &operator=(IHyInstance3d &&donor) noexcept;
 
 protected:
 	virtual void Update() override final;
