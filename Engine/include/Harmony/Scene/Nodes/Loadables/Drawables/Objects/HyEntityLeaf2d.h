@@ -22,10 +22,9 @@ protected:
 	LEAF			m_Leaf;
 
 public:
-	HyEntityLeaf2d(std::string sPrefix, std::string sName, HyEntity2d *pParent) :
-		HyEntity2d(pParent),
-		m_Leaf(sPrefix, sName, this)
+	HyEntityLeaf2d(std::string sLeafPrefix, std::string sLeafName)
 	{
+		m_Leaf.Init(sLeafPrefix, sLeafName, this);
 	}
 
 	virtual ~HyEntityLeaf2d()
