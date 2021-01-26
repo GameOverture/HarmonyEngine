@@ -93,7 +93,7 @@ int32 HyEngine::RunGame()
 	{ }
 #else
 	HyLogTitle("Setting Emscripten Loop");
-	emscripten_set_main_loop_arg(HyEngine_BrowserUpdate, this, 0, true);
+	emscripten_set_main_loop_arg(HyEngine_BrowserUpdate, this, 0, false);
 #endif
 
 	return 0;
