@@ -16,9 +16,9 @@
 
 TextDraw::TextDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
-	m_Text("", "+GuiPreview", this),
 	m_hTexture(HY_UNUSED_HANDLE)
 {
+	m_Text.Init("", "+GuiPreview", this);
 	m_Text.SetText("The Quick Brown Fox Jumped Over The Lazy Dog!? 1234567890");
 	m_Text.SetTextAlignment(HYALIGN_Center);
 }

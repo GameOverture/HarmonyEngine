@@ -11,10 +11,11 @@
 #include "EntityDraw.h"
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
-	IDraw(pProjItem, initFileDataRef),
-	m_primOriginHorz(this),
-	m_primOriginVert(this)
+	IDraw(pProjItem, initFileDataRef)
 {
+	ChildAppend(m_primOriginHorz);
+	ChildAppend(m_primOriginVert);
+
 	std::vector<glm::vec2> lineList(2, glm::vec2());
 
 	lineList[0].x = -5000.0f;

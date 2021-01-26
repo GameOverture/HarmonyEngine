@@ -12,32 +12,36 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(/*uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent*/) :
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup) :
 	IHyInstance2d(HYTYPE_TexturedQuad),
 	m_bIsRaw(false),
-	m_uiAtlasGroupId(0),//uiAtlasGrpId),
-	m_uiAtlasIndexInGroup(0),//uiIndexInGroup),
+	m_uiAtlasGroupId(uiAtlasGrpId),
+	m_uiAtlasIndexInGroup(uiIndexInGroup),
 	m_uiRawTextureWidth(0),
 	m_uiRawTextureHeight(0),
 	m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
 {
+	m_sPrefix = std::to_string(uiAtlasGrpId);
+	m_sName = std::to_string(uiIndexInGroup);
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
-//HyTexturedQuad2d::HyTexturedQuad2d(/*HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent*/) :
-//	IHyInstance2d(HYTYPE_TexturedQuad),//, nullptr, "raw", pParent),
-//	m_bIsRaw(true),
-//	m_uiAtlasGroupId(0),
-//	m_uiAtlasIndexInGroup(0),
-//	m_uiRawTextureWidth(uiTextureWidth),
-//	m_uiRawTextureHeight(uiTextureHeight),
-//	m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
-//{
-//	m_eRenderMode = HYRENDERMODE_TriangleStrip;
-//	m_hTextureHandle = hTextureHandle;
-//
-//	m_LocalBoundingVolume.SetAsBox(static_cast<float>(m_uiRawTextureWidth), static_cast<float>(m_uiRawTextureHeight));
-//}
+HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight) :
+	IHyInstance2d(HYTYPE_TexturedQuad),//, nullptr, "raw", pParent),
+	m_bIsRaw(true),
+	m_uiAtlasGroupId(0),
+	m_uiAtlasIndexInGroup(0),
+	m_uiRawTextureWidth(uiTextureWidth),
+	m_uiRawTextureHeight(uiTextureHeight),
+	m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
+{
+	m_sName = "raw";
+
+	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+	m_hTextureHandle = hTextureHandle;
+
+	m_LocalBoundingVolume.SetAsBox(static_cast<float>(m_uiRawTextureWidth), static_cast<float>(m_uiRawTextureHeight));
+}
 
 HyTexturedQuad2d::HyTexturedQuad2d(const HyTexturedQuad2d &copyRef) :
 	IHyInstance2d(copyRef),

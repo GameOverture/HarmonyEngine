@@ -66,7 +66,13 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 
 /*virtual*/ void HySprite2d::OnCalcBoundingVolume() /*override*/
 {
-	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(AcquireData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET + m_vCustomOffset;
+	if(AcquireData() == nullptr)
+	{
+		HyLogWarning("HySprite2d::OnCalcBoundingVolume invoked on null data");
+		return;
+	}
+
+	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET + m_vCustomOffset;
 	vFrameOffset *= scale.Get();
 
 	float fHalfWidth = GetCurFrameWidth(true) * 0.5f;

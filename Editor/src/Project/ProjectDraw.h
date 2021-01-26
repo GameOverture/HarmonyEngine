@@ -18,7 +18,7 @@ class CheckerGrid : public HyPrimitive2d
 	float               m_fGridSize;
 
 public:
-	CheckerGrid(float fWidth, float fHeight, float fGridSize, HyEntity2d *pParent);
+	CheckerGrid(float fWidth, float fHeight, float fGridSize);
 	virtual ~CheckerGrid();
 
 	virtual void OnUpdateUniforms() override;

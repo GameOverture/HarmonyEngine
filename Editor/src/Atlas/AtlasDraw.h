@@ -22,7 +22,7 @@ class AtlasDraw : public IManagerDraw
 	{
 		QMap<QUuid, HyTexturedQuad2d *>		m_FrameUuidMap;
 		
-		TextureEnt(HyEntity2d *pParent) : HyEntity2d(pParent)
+		TextureEnt()
 		{ }
 	};
 	QList<TextureEnt *>						m_MasterList;

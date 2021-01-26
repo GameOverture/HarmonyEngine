@@ -20,11 +20,12 @@
 
 AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
 	m_bIsMouseOver(false),
-	m_HoverBackground(this),
-	m_HoverStrokeInner(nullptr),
-	m_HoverStrokeOutter(nullptr),
 	m_pHoverTexQuad(nullptr)
 {
+	ChildAppend(m_HoverBackground);
+	ChildAppend(m_HoverStrokeInner);
+	ChildAppend(m_HoverStrokeOutter);
+
 	m_HoverBackground.SetWireframe(false);
 	m_HoverBackground.SetAsBox(100.0f, 100.0f);
 	m_HoverBackground.SetTint(0.0f, 0.0f, 0.0f);
@@ -61,9 +62,14 @@ AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
 			uint32 uiTextureIndex = pFrame->GetTextureIndex();
 			
 			while(m_MasterList.size() <= static_cast<int>(uiTextureIndex))
-				m_MasterList.append(new TextureEnt(this));
+			{
+				TextureEnt *pNewTexEnt = new TextureEnt();
+				ChildAppend(*pNewTexEnt);
+				m_MasterList.append(pNewTexEnt);
+			}
 			
-			HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(pFrame->GetBankId(), uiTextureIndex, m_MasterList[uiTextureIndex]);
+			HyTexturedQuad2d *pNewTexQuad = new HyTexturedQuad2d(pFrame->GetBankId(), uiTextureIndex);
+			m_MasterList[uiTextureIndex]->ChildAppend(*pNewTexQuad);
 			pNewTexQuad->SetTextureSource(pFrame->GetX(), pFrame->GetY(), pFrame->GetCrop().width(), pFrame->GetCrop().height());
 			pNewTexQuad->SetDisplayOrder(DISPLAYORDER_AtlasSelectedFrames);
 			

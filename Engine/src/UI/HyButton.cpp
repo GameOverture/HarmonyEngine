@@ -51,7 +51,7 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 {
 	HyInfoPanel::Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 
-	HyAssert(m_Panel.GetNumStates() >= 4, "HyButton was constructed with a panel with not enough anim states");
+	HyAssert(m_Panel.GetNumStates() >= 3, "HyButton was constructed with a panel with not enough anim states");
 
 	EnableMouseInput();
 }

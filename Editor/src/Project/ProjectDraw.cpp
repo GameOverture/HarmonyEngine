@@ -54,8 +54,7 @@ void main()
 )src";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize, HyEntity2d *pParent) :
-	HyPrimitive2d(pParent),
+CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 	m_vDIMENSIONS(fWidth, fHeight),
 	m_fGridSize(fGridSize)
 {
@@ -63,7 +62,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize, HyEntity2
 	pos.Set(m_vDIMENSIONS.x * -0.5f, m_vDIMENSIONS.y * -0.5f);
 }
 
-CheckerGrid::~CheckerGrid()
+/*virtual*/ CheckerGrid::~CheckerGrid()
 {
 }
 
@@ -125,8 +124,10 @@ CheckerGrid::~CheckerGrid()
 
 ProjectDraw::ProjectDraw() :
 	IDraw(nullptr, FileDataPair()),
-	m_CheckerGrid(20000.0f, 20000.0f, 25.0f, this)
+	m_CheckerGrid(20000.0f, 20000.0f, 25.0f)
 {
+	ChildAppend(m_CheckerGrid);
+
 	m_pCheckerGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
 	m_pCheckerGridShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
