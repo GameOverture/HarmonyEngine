@@ -371,7 +371,7 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Error check attribute list
 #ifdef HY_DEBUG
-	HyLog("DEBUG: Compiling shader: " << pShader->GetHandle());
+	HyLog("DEBUG: Compiling shader: " << static_cast<int>(pShader->GetHandle()));
 
 	GLint iMaxVertexAttribs;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &iMaxVertexAttribs);
@@ -436,7 +436,7 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGLShader::Link", "glLinkProgram");
 
 #ifdef HY_DEBUG
-	HyLog("DEBUG: Linking shader: " << pShader->GetHandle());
+	HyLog("DEBUG: Linking shader: " << static_cast<int>(pShader->GetHandle()));
 
 	GLint status = 0;
 	glGetProgramiv(hGLShaderProg, GL_LINK_STATUS, &status);

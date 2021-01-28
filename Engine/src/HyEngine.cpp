@@ -134,29 +134,30 @@ bool HyEngine::Update()
 bool HyEngine::PollPlatformApi()
 {
 #ifdef HY_USE_SDL2
-	while(SDL_PollEvent(&m_SdlEvent))
+	SDL_Event sdlEvent;
+	while(SDL_PollEvent(&sdlEvent))
 	{
-		switch(m_SdlEvent.type)
+		switch(sdlEvent.type)
 		{
 		case SDL_QUIT:
 			return false;
 		case SDL_WINDOWEVENT:
-			m_WindowManager.DoEvent(m_SdlEvent, m_Input);
+			m_WindowManager.DoEvent(sdlEvent, m_Input);
 			break;
 		case SDL_KEYDOWN:
-			m_Input.DoKeyDownEvent(m_SdlEvent);
+			m_Input.DoKeyDownEvent(sdlEvent);
 			break;
 		case SDL_KEYUP:
-			m_Input.DoKeyUpEvent(m_SdlEvent);
+			m_Input.DoKeyUpEvent(sdlEvent);
 			break;
 		case SDL_MOUSEMOTION:
-			m_Input.DoMouseMoveEvent(m_SdlEvent);
+			m_Input.DoMouseMoveEvent(sdlEvent);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			m_Input.DoMouseDownEvent(m_SdlEvent);
+			m_Input.DoMouseDownEvent(sdlEvent);
 			break;
 		case SDL_MOUSEBUTTONUP:
-			m_Input.DoMouseUpEvent(m_SdlEvent);
+			m_Input.DoMouseUpEvent(sdlEvent);
 			break;
 		}
 	}

@@ -134,7 +134,7 @@ QStringList DlgNewBuild::GetProcOptions() const
 
 		QString sCMakeCmds = "";
 		if(ui->chkBrowserDebug->isChecked())
-			sCMakeCmds += "\"-DHYBUILD_DebugEmscripten=ON\""; // Batch files replace '=' with space if you don't use quotes
+			sCMakeCmds += "-DHYBUILD_DebugEmscripten"; // Batch files replace '=' with space if you don't use quotes
 
 		return QStringList()	<< sFormattedPath
 								<< QDir::cleanPath(ui->txtEmscriptenSdk->text())

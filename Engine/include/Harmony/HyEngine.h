@@ -61,10 +61,6 @@ class HyEngine
 	HyInput						m_Input;
 	HyRendererInterop			m_Renderer;
 
-#ifdef HY_USE_SDL2
-	SDL_Event					m_SdlEvent;
-#endif
-
 public:
 	HyEngine(const HarmonyInit &initStruct);
 	~HyEngine();
