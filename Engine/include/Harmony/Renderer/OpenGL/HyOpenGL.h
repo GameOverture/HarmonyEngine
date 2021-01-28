@@ -23,7 +23,6 @@
 
 class HyOpenGL : public IHyRenderer
 {
-protected:
 #if defined(HY_USE_SDL2)
 	SDL_GLContext									m_Context;
 #endif
