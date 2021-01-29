@@ -12,7 +12,7 @@
 
 #include <GL/glew.h>
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #define HY_USE_SDL2
 
 #include <emscripten.h>

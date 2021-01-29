@@ -15,7 +15,12 @@
 #include "Diagnostics/Console/HyConsole.h"
 
 #if defined(HY_USE_SDL2)
-#include "SDL_mixer.h"
+
+#ifdef HY_PLATFORM_BROWSER
+	#include <SDL2/SDL_mixer.h>
+#else
+	#include "SDL_mixer.h"
+#endif
 
 class HyRawSoundBuffer
 {

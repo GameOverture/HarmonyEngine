@@ -18,7 +18,11 @@
 
 #if defined(HY_USE_SDL2)
 
-#include "SDL_mixer.h"
+#ifdef HY_PLATFORM_BROWSER
+	#include <SDL2/SDL_mixer.h>
+#else
+	#include "SDL_mixer.h"
+#endif
 
 HyAudioCore_SDL2 *HyAudioCore_SDL2::sm_pInstance = nullptr;
 

@@ -16,7 +16,11 @@
 #include "HyEngine.h"
 
 #if defined(HY_USE_SDL2)
-	#include "SDL_mixer.h"
+	#ifdef HY_PLATFORM_BROWSER
+		#include <SDL2/SDL_mixer.h>
+	#else
+		#include "SDL_mixer.h"
+	#endif
 
 	#include "Audio/Harness/SDL2/HyAudioCore_SDL2.h"
 	#include "Audio/Harness/SDL2/HyFileAudioImpl_SDL2.h"

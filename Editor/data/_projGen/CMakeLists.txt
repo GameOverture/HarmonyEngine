@@ -64,7 +64,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 		set(CMAKE_BUILD_TYPE Debug)
 		target_compile_definitions(HyEngine PRIVATE DEBUG)
 		target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG)
-		set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS_FLAGS "-fsanitize=undefined -fsanitize=address -g4")
+		set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-s USE_SDL=2 -fsanitize=undefined -fsanitize=address -g4")
 		
 		list(APPEND EM_LINK_FLAGS "-g4")
 		list(APPEND EM_LINK_FLAGS "-s ASSERTIONS=1")
