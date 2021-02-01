@@ -36,7 +36,7 @@ public:
 	HyAnimVec2						scale_pivot;
 
 public:
-	IHyNode2d(HyType eNodeType);
+	IHyNode2d(HyType eNodeType, HyEntity2d *pParent);
 	IHyNode2d(const IHyNode2d &copyRef);
 	IHyNode2d(IHyNode2d &&donor) noexcept;
 	virtual ~IHyNode2d();

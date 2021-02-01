@@ -26,7 +26,7 @@ protected:
 	uint32			m_uiNumSegments = 16;
 
 public:
-	HyPrimitive2d();
+	HyPrimitive2d(HyEntity2d *pParent = nullptr);
 	HyPrimitive2d(const HyPrimitive2d &copyRef);
 	virtual ~HyPrimitive2d(void);
 

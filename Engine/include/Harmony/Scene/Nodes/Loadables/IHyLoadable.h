@@ -26,13 +26,13 @@ protected:
 	
 	HyLoadState						m_eLoadState;
 	const IHyNodeData *				m_pData;
-	std::string						m_sName;
 	std::string						m_sPrefix;
+	std::string						m_sName;
 
 	uint32							m_uiState;
 
 public:
-	IHyLoadable();
+	IHyLoadable(std::string sPrefix, std::string sName);
 	IHyLoadable(const IHyLoadable &copyRef);
 	IHyLoadable(IHyLoadable &&donor) noexcept;
 	virtual ~IHyLoadable();

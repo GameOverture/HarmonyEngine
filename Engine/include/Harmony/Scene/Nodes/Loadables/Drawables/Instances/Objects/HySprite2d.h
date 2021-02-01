@@ -23,7 +23,7 @@ class HySprite2d : public IHySprite<IHyInstance2d, HyEntity2d>
 	std::vector<std::pair<HySprite2dAnimFinishedCallback, void *> >	m_AnimCallbackList;
 
 public:
-	HySprite2d();
+	HySprite2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);
 	HySprite2d(const HySprite2d &copyRef);
 	virtual ~HySprite2d(void);
 

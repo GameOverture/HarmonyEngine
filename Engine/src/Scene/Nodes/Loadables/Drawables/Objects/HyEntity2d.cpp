@@ -16,8 +16,8 @@
 
 extern HyInput &Hy_Input();
 
-HyEntity2d::HyEntity2d() :
-	IHyDrawable2d(HYTYPE_Entity),
+HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_Entity, "", "", pParent),
 	m_uiAttributes(0),
 	m_eMouseInputState(MOUSEINPUT_None),
 	m_pPhysicsBody(nullptr)
@@ -242,19 +242,17 @@ void HyEntity2d::ChildAppend(IHyNode2d &childRef)
 	childRef.m_pParent = this;
 
 	m_ChildList.push_back(&childRef);
-
 	SetNewChildAttributes(childRef);
 }
 
 /*virtual*/ bool HyEntity2d::ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef)
 {
-	childRef.ParentDetach();
-
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
 		if((*iter) == &insertBefore || 
 		   ((*iter)->GetType() == HYTYPE_Entity && static_cast<HyEntity2d *>(*iter)->ChildExists(insertBefore)))
 		{
+			childRef.ParentDetach();
 			childRef.m_pParent = this;
 
 			m_ChildList.insert(iter, &childRef);
@@ -903,4 +901,9 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 		iOrderValue = SetChildrenDisplayOrder(bIsOverriding);
 
 	return iOrderValue;
+}
+
+/*friend*/ void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode)
+{
+	pEntity->m_ChildList.push_back(pChildNode);
 }

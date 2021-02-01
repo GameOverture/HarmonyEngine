@@ -40,7 +40,7 @@ protected:
 	b2Body *								m_pPhysicsBody;
 
 public:
-	HyEntity2d();
+	HyEntity2d(HyEntity2d *pParent = nullptr);
 	HyEntity2d(const HyEntity2d &) = delete;
 	HyEntity2d(HyEntity2d &&donor) noexcept;
 	virtual ~HyEntity2d(void);
@@ -181,6 +181,8 @@ protected:
 	virtual void OnMouseDown() { }
 	virtual void OnMouseUp() { }
 	virtual void OnMouseClicked() { }
+
+	friend void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode);
 };
 
 #endif /* HyEntity2d_h__ */

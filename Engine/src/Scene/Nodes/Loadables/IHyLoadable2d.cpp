@@ -12,11 +12,14 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-IHyLoadable2d::IHyLoadable2d(HyType eNodeType) :
-	IHyNode2d(eNodeType),
-	IHyLoadable()
+IHyLoadable2d::IHyLoadable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+	IHyNode2d(eNodeType, pParent),
+	IHyLoadable(sPrefix, sName)
 {
 	m_uiFlags |= NODETYPE_IsLoadable;
+
+	if(m_pParent)
+		m_pParent->m_eLoadState = HYLOADSTATE_Inactive;
 }
 
 IHyLoadable2d::IHyLoadable2d(const IHyLoadable2d &copyRef) :

@@ -10,8 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-HyEntity3d::HyEntity3d() :
-	IHyDrawable3d(HYTYPE_Entity)
+HyEntity3d::HyEntity3d(HyEntity3d *pParent /*= nullptr*/) :
+	IHyDrawable3d(HYTYPE_Entity, "", "", pParent)
 {
 }
 
@@ -34,13 +34,12 @@ void HyEntity3d::ChildAppend(IHyNode3d &childRef)
 
 /*virtual*/ bool HyEntity3d::ChildInsert(IHyNode3d &insertBefore, IHyNode3d &childRef)
 {
-	childRef.ParentDetach();
-
 	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
 	{
 		if((*iter) == &insertBefore || 
 		   ((*iter)->GetType() == HYTYPE_Entity && static_cast<HyEntity3d *>(*iter)->ChildExists(insertBefore)))
 		{
+			childRef.ParentDetach();
 			childRef.m_pParent = this;
 
 			m_ChildList.insert(iter, &childRef);
@@ -151,4 +150,9 @@ void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->SetDirty(uiDirtyFlags);
+}
+
+/*friend*/ void HyNodeCtorAppend(HyEntity3d *pEntity, IHyNode3d *pChildNode)
+{
+	pEntity->m_ChildList.push_back(pChildNode);
 }

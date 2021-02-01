@@ -13,8 +13,8 @@
 
 extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
 
-IHyInstance3d::IHyInstance3d(HyType eNodeType) :
-	IHyDrawable3d(eNodeType)
+IHyInstance3d::IHyInstance3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
+	IHyDrawable3d(eNodeType, sPrefix, sName, pParent)
 {
 }
 

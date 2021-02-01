@@ -15,7 +15,8 @@
 
 extern float Hy_UpdateStep();
 
-HySprite2d::HySprite2d()
+HySprite2d::HySprite2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
+	IHySprite<IHyInstance2d, HyEntity2d>(sPrefix, sName, pParent)
 {
 }
 

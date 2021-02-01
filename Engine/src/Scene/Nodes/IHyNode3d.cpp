@@ -12,9 +12,11 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 #include "Scene/HyScene.h"
 
-IHyNode3d::IHyNode3d(HyType eNodeType) :
+extern void HyNodeCtorAppend(HyEntity3d *pEntity, IHyNode3d *pChildNode);
+
+IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :
 	IHyNode(eNodeType),
-	m_pParent(nullptr),
+	m_pParent(pParent),
 	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
@@ -22,6 +24,20 @@ IHyNode3d::IHyNode3d(HyType eNodeType) :
 	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	scale.Set(1.0f);
+
+	if(m_pParent)
+	{
+		HyNodeCtorAppend(m_pParent, this);
+		if(m_pParent->IsVisible() == false)
+		{
+			m_uiFlags &= ~SETTING_IsVisible;
+		}
+		if(m_pParent->IsPauseUpdate())
+		{
+			m_uiFlags |= SETTING_IsPauseUpdate;
+			HyScene::AddNode_PauseUpdate(this);
+		}
+	}
 }
 
 IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :

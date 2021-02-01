@@ -15,8 +15,8 @@
 #include "Diagnostics/Console/HyConsole.h"
 
 template<typename NODETYPE, typename ENTTYPE>
-IHyText<NODETYPE, ENTTYPE>::IHyText() :
-	NODETYPE(HYTYPE_Text),
+IHyText<NODETYPE, ENTTYPE>::IHyText(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
+	NODETYPE(HYTYPE_Text, sPrefix, sName, pParent),
 	m_bIsDirty(false),
 	m_sRawString(""),
 	m_uiBoxAttributes(0),

@@ -12,9 +12,11 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
 #include "HyEngine.h"
 
-IHyNode2d::IHyNode2d(HyType eNodeType) :
+extern void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode);
+
+IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 	IHyNode(eNodeType),
-	m_pParent(nullptr),
+	m_pParent(pParent),
 	m_fRotation(0.0f),
 	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
@@ -24,6 +26,20 @@ IHyNode2d::IHyNode2d(HyType eNodeType) :
 {
 	m_uiFlags |= NODETYPE_Is2d;
 	scale.Set(1.0f);
+
+	if(m_pParent)
+	{
+		HyNodeCtorAppend(m_pParent, this);
+		if(m_pParent->IsVisible() == false)
+		{
+			m_uiFlags &= ~SETTING_IsVisible;
+		}
+		if(m_pParent->IsPauseUpdate())
+		{
+			m_uiFlags |= SETTING_IsPauseUpdate;
+			HyScene::AddNode_PauseUpdate(this);
+		}
+	}
 }
 
 IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :

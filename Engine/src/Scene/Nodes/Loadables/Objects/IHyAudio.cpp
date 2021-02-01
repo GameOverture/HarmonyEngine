@@ -17,8 +17,8 @@
 #include "Scene/HyScene.h"
 
 template<typename NODETYPE, typename ENTTYPE>
-IHyAudio<NODETYPE, ENTTYPE>::IHyAudio() :
-	NODETYPE(HYTYPE_Audio),
+IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
+	NODETYPE(HYTYPE_Audio, sPrefix, sName, pParent),
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),
 	m_fPitch(1.0f),

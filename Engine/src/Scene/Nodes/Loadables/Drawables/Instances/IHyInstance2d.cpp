@@ -13,8 +13,8 @@
 
 extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
 
-IHyInstance2d::IHyInstance2d(HyType eNodeType) :
-	IHyDrawable2d(eNodeType)
+IHyInstance2d::IHyInstance2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+	IHyDrawable2d(eNodeType, sPrefix, sName, pParent)
 {
 }
 

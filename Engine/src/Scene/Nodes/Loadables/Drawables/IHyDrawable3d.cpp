@@ -14,8 +14,8 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyDrawable3d::IHyDrawable3d(HyType eNodeType) :
-	IHyLoadable3d(eNodeType),
+IHyDrawable3d::IHyDrawable3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
+	IHyLoadable3d(eNodeType, sPrefix, sName, pParent),
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	tint(*this, DIRTY_Color),
@@ -24,6 +24,22 @@ IHyDrawable3d::IHyDrawable3d(HyType eNodeType) :
 	m_uiFlags |= NODETYPE_IsDrawable;
 
 	tint.Set(1.0f);
+
+	if(m_pParent)
+	{
+		m_iCoordinateSystem = m_pParent->GetCoordinateSystem();
+
+		if(m_pParent->IsScissorSet())
+		{
+			if(m_pScissor == nullptr)
+				m_pScissor = HY_NEW ScissorRect();
+
+			m_pScissor->m_WorldScissorRect = m_pParent->m_pScissor->m_WorldScissorRect;
+		}
+
+		if(m_pParent->IsStencilSet())
+			m_hStencil = m_pParent->m_hStencil;
+	}
 }
 
 IHyDrawable3d::IHyDrawable3d(const IHyDrawable3d &copyRef) :

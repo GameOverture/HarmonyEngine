@@ -15,8 +15,9 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyDrawable2d::IHyDrawable2d(HyType eNodeType) :
-	IHyLoadable2d(eNodeType),
+IHyDrawable2d::IHyDrawable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+	IHyLoadable2d(eNodeType, sPrefix, sName, pParent),
+	IHyDrawable(),
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	m_iDisplayOrder(0),
@@ -31,6 +32,44 @@ IHyDrawable2d::IHyDrawable2d(HyType eNodeType) :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
+
+	if(m_pParent)
+	{
+		m_iCoordinateSystem = m_pParent->GetCoordinateSystem();
+
+		if(m_pParent->IsScissorSet())
+		{
+			if(m_pScissor == nullptr)
+				m_pScissor = HY_NEW ScissorRect();
+
+			m_pScissor->m_WorldScissorRect = m_pParent->m_pScissor->m_WorldScissorRect;
+		}
+
+		if(m_pParent->IsStencilSet())
+			m_hStencil = m_pParent->m_hStencil;
+
+		//int32 iOrderValue = m_pParent->GetDisplayOrder() + 1;
+
+		//if(m_pParent->IsReverseDisplayOrder() == false)
+		//{
+		//	for(uint32 i = 0; i < m_pParent->ChildCount(); ++i)
+		//	{
+		//		if(0 != (m_pParent->ChildGet(i)->m_uiFlags & NODETYPE_IsDrawable))
+		//			iOrderValue = static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+		//	}
+		//}
+		//else
+		//{
+		//	for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
+		//	{
+		//		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+		//			iOrderValue = static_cast<IHyDrawable2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+		//	}
+		//}
+
+		//m_iDisplayOrder = iOrderValue;
+		m_pParent->SetChildrenDisplayOrder(false);
+	}
 }
 
 IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :

@@ -22,7 +22,7 @@ class HyText2d : public IHyText<IHyInstance2d, HyEntity2d>
 #endif
 
 public:
-	HyText2d();
+	HyText2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);
 	HyText2d(const HyText2d &copyRef);
 	virtual ~HyText2d(void);
 

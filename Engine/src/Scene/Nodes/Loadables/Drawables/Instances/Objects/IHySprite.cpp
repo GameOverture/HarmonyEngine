@@ -18,8 +18,8 @@
 extern float Hy_UpdateStep();
 
 template<typename NODETYPE, typename ENTTYPE>
-IHySprite<NODETYPE, ENTTYPE>::IHySprite() :
-	NODETYPE(HYTYPE_Sprite),
+IHySprite<NODETYPE, ENTTYPE>::IHySprite(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
+	NODETYPE(HYTYPE_Sprite, sPrefix, sName, pParent),
 	m_bIsAnimPaused(false),
 	m_fAnimPlayRate(1.0f),
 	m_fElapsedFrameTime(0.0f),

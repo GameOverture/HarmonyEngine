@@ -12,8 +12,8 @@
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup) :
-	IHyInstance2d(HYTYPE_TexturedQuad),
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent /*= nullptr*/) :
+	IHyInstance2d(HYTYPE_TexturedQuad, "", "", pParent),
 	m_bIsRaw(false),
 	m_uiAtlasGroupId(uiAtlasGrpId),
 	m_uiAtlasIndexInGroup(uiIndexInGroup),
@@ -26,8 +26,8 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup) :
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight) :
-	IHyInstance2d(HYTYPE_TexturedQuad),//, nullptr, "raw", pParent),
+HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent /*= nullptr*/) :
+	IHyInstance2d(HYTYPE_TexturedQuad, "", "raw", pParent),
 	m_bIsRaw(true),
 	m_uiAtlasGroupId(0),
 	m_uiAtlasIndexInGroup(0),

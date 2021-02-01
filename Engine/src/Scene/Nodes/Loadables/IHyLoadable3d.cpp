@@ -11,11 +11,14 @@
 #include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 #include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
 
-IHyLoadable3d::IHyLoadable3d(HyType eNodeType) :
-	IHyNode3d(eNodeType),
-	IHyLoadable()
+IHyLoadable3d::IHyLoadable3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
+	IHyNode3d(eNodeType, pParent),
+	IHyLoadable(sPrefix, sName)
 {
 	m_uiFlags |= NODETYPE_IsLoadable;
+
+	if(m_pParent)
+		m_pParent->m_eLoadState = HYLOADSTATE_Inactive;
 }
 
 IHyLoadable3d::IHyLoadable3d(const IHyLoadable3d &copyRef) :

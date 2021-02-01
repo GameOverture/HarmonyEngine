@@ -10,8 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrefab3d.h"
 
-HyPrefab3d::HyPrefab3d() :
-	IHyInstance3d(HYTYPE_Prefab)
+HyPrefab3d::HyPrefab3d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity3d *pParent /*= nullptr*/) :
+	IHyInstance3d(HYTYPE_Prefab, sPrefix, sName, pParent)
 {
 }
 

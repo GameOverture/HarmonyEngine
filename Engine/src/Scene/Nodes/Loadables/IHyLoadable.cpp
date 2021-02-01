@@ -14,11 +14,11 @@
 
 /*static*/ HyAssets *IHyLoadable::sm_pHyAssets = nullptr;
 
-IHyLoadable::IHyLoadable() :
+IHyLoadable::IHyLoadable(std::string sPrefix, std::string sName) :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(nullptr),
-	m_sName(""),
-	m_sPrefix(""),
+	m_sPrefix(sPrefix),
+	m_sName(sName),
 	m_uiState(0)
 {
 }
@@ -26,8 +26,8 @@ IHyLoadable::IHyLoadable() :
 IHyLoadable::IHyLoadable(const IHyLoadable &copyRef) :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(copyRef.m_pData),
-	m_sName(copyRef.m_sName),
 	m_sPrefix(copyRef.m_sPrefix),
+	m_sName(copyRef.m_sName),
 	m_uiState(copyRef.m_uiState)
 {
 }
@@ -35,8 +35,8 @@ IHyLoadable::IHyLoadable(const IHyLoadable &copyRef) :
 IHyLoadable::IHyLoadable(IHyLoadable &&donor) noexcept :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(std::move(donor.m_pData)),
-	m_sName(std::move(donor.m_sName)),
 	m_sPrefix(std::move(donor.m_sPrefix)),
+	m_sName(std::move(donor.m_sName)),
 	m_uiState(std::move(donor.m_uiState))
 {
 }

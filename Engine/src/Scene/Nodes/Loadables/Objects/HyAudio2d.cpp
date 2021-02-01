@@ -12,7 +12,8 @@
 #include "Audio/HyAudioHarness.h"
 #include "Assets/Nodes/HyAudioData.h"
 
-HyAudio2d::HyAudio2d()
+HyAudio2d::HyAudio2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
+	IHyAudio<IHyLoadable2d, HyEntity2d>(sPrefix, sName, pParent)
 {
 }
 
