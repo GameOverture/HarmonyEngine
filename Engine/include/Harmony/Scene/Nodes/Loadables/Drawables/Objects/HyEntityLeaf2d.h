@@ -22,7 +22,8 @@ protected:
 	LEAF			m_Leaf;
 
 public:
-	HyEntityLeaf2d(std::string sLeafPrefix, std::string sLeafName)
+	HyEntityLeaf2d(std::string sLeafPrefix, std::string sLeafName, HyEntity2d *pParent = nullptr) :
+		HyEntity2d(pParent)
 	{
 		m_Leaf.Init(sLeafPrefix, sLeafName, this);
 	}
