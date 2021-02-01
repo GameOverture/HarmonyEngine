@@ -73,7 +73,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 			HyError("glad failed to initalize");
 		}
 		HyLog("glad initalized");
-#else
+#elif defined(HY_USE_GLEW)
 		GLenum err = glewInit();
 
 		if(err != GLEW_OK) {
@@ -133,6 +133,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 			//case GL_COMPRESSED_SIGNED_R11_EAC:					sCompressedTextureFormats += "";	break;
 			//case GL_COMPRESSED_RG11_EAC:						sCompressedTextureFormats += "";	break;
 			//case GL_COMPRESSED_SIGNED_RG11_EAC:					sCompressedTextureFormats += "";	break;
+#ifndef HY_PLATFORM_BROWSER // emscripten compiled these before when I used glew.h
 		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
 			sCompressedTextureFormats += "RGB_DXT1 ";
 			m_uiSupportedTextureFormats |= HYTEXTURE_RGB_DTX1;
@@ -149,9 +150,14 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 			sCompressedTextureFormats += "DXT5 ";
 			m_uiSupportedTextureFormats |= HYTEXTURE_DTX5;
 			break;
+#endif
 		}
 	}
 	delete[] pFormatArray;
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);		// 4-byte pixel alignment
+
+	m_VertexBuffer.Initialize2d();				// vertex buffer for 2D scene nodes
 
 	SetRendererInfo("OpenGL",
 					reinterpret_cast<const char *>(glGetString(GL_VERSION)),
@@ -160,11 +166,6 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 					reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)),
 					iMaxTextureSize,
 					sCompressedTextureFormats);
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);		// 4-byte pixel alignment
-
-	// 2D vertex buffer setup
-	m_VertexBuffer.Initialize2d();
 }
 
 HyOpenGL::~HyOpenGL(void)
@@ -470,6 +471,12 @@ HyOpenGL::~HyOpenGL(void)
 		glBindVertexArray(uiVao);
 		HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
 
+#ifndef HY_PLATFORM_BROWSER // emscripten also compiled with ARB when I used glew.h
+		#define hyVertexAttribDivisor glVertexAttribDivisorARB
+#else
+		#define hyVertexAttribDivisor glVertexAttribDivisor
+#endif
+
 		for(uint32 i = 0; i < shaderVertexAttribListRef.size(); ++i)
 		{
 			GLuint uiLocation = glGetAttribLocation(hGLShaderProg, shaderVertexAttribListRef[i].sName.c_str());
@@ -483,8 +490,8 @@ HyOpenGL::~HyOpenGL(void)
 				glEnableVertexAttribArray(uiLocation + 0);
 				glEnableVertexAttribArray(uiLocation + 1);
 
-				glVertexAttribDivisorARB(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisorARB(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 			else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::mat3)
 			{
@@ -492,9 +499,9 @@ HyOpenGL::~HyOpenGL(void)
 				glEnableVertexAttribArray(uiLocation + 1);
 				glEnableVertexAttribArray(uiLocation + 2);
 
-				glVertexAttribDivisorARB(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisorARB(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisorARB(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 			else if(shaderVertexAttribListRef[i].eVarType == HyShaderVariable::mat4)
 			{
@@ -503,15 +510,15 @@ HyOpenGL::~HyOpenGL(void)
 				glEnableVertexAttribArray(uiLocation + 2);
 				glEnableVertexAttribArray(uiLocation + 3);
 
-				glVertexAttribDivisorARB(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisorARB(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisorARB(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
-				glVertexAttribDivisorARB(uiLocation + 3, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation + 0, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation + 1, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation + 2, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation + 3, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 			else
 			{
 				glEnableVertexAttribArray(uiLocation);
-				glVertexAttribDivisorARB(uiLocation, shaderVertexAttribListRef[i].uiInstanceDivisor);
+				hyVertexAttribDivisor(uiLocation, shaderVertexAttribListRef[i].uiInstanceDivisor);
 			}
 
 			HyErrorCheck_OpenGL("HyOpenGLShader::OnUpload", "glEnableVertexAttribArray or glVertexAttribDivisorARB");
@@ -560,6 +567,7 @@ HyOpenGL::~HyOpenGL(void)
 	case HYTEXTURE_R8G8B8: {
 		eInternalFormat = GL_RGB;
 		break; }
+#ifndef HY_PLATFORM_BROWSER // emscripten compiled these before when I used glew.h
 	case HYTEXTURE_RGB_DTX1: {
 		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_RGB_DTX1)) ? GL_COMPRESSED_RGB_S3TC_DXT1_EXT : GL_COMPRESSED_RGB;
 		break; }
@@ -572,6 +580,7 @@ HyOpenGL::~HyOpenGL(void)
 	case HYTEXTURE_DTX5: {
 		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_DTX5)) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGBA;
 		break; }
+#endif
 	default: {
 		HyLogError("Unknown TextureFormat used for 'eDesiredFormat'");
 		break; }
@@ -804,9 +813,11 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 	{
 	case HYSHADER_Vertex:			iShaderHandle = glCreateShader(GL_VERTEX_SHADER);				break;
 	case HYSHADER_Fragment:			iShaderHandle = glCreateShader(GL_FRAGMENT_SHADER);				break;
-	//case HYSHADER_Geometry:			iShaderHandle = glCreateShader(GL_GEOMETRY_SHADER);				break;
+#ifndef HY_PLATFORM_BROWSER // emscripten compiled these before when I used glew.h
+	case HYSHADER_Geometry:			iShaderHandle = glCreateShader(GL_GEOMETRY_SHADER);				break;
 	case HYSHADER_TessControl:		iShaderHandle = glCreateShader(GL_TESS_CONTROL_SHADER);			break;
 	case HYSHADER_TessEvaluation:	iShaderHandle = glCreateShader(GL_TESS_EVALUATION_SHADER);		break;
+#endif
 	default:
 		HyError("Unknown shader type");
 	}

@@ -10,13 +10,15 @@
 #ifndef HyPlatform_Browser_h__
 #define HyPlatform_Browser_h__
 
-#include <GL/glew.h>
-
-#include <SDL2/SDL.h>
-#define HY_USE_SDL2
-
 #include <emscripten.h>
 #include <emscripten/html5.h>
+
+#define HY_USE_SDL2
+#include <SDL2/SDL.h>
+
+#include <GLES3/gl3.h>
+
+//#define HY_USE_GLEW
 
 #define HY_MAXWINDOWS 1
 #define HY_ENDIAN_LITTLE

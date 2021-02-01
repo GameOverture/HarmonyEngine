@@ -40,8 +40,8 @@ protected:
 	HyWindow *										m_pCurWindow;
 	
 	// Message queues (transfer and receive)
-	std::queue<IHyFile *>						m_TxDataQueue;
-	std::queue<IHyFile *>						m_RxDataQueue;
+	std::queue<IHyFile *>							m_TxDataQueue;
+	std::queue<IHyFile *>							m_RxDataQueue;
 	
 	// Effects containers
 	std::map<HyShaderHandle, HyShader *>			m_ShaderMap;
