@@ -275,7 +275,6 @@ else() # Emscripten
 endif()
 
 if(HYBUILD_SDL_NET)
-	
 	target_compile_definitions(HyEngine PUBLIC HY_USE_SDL2_NET)
 endif()
 

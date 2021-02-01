@@ -15,6 +15,7 @@ int main(int argc, char **argv)
 {
 	HarmonyInit initStruct("%HY_CLASS%.hyproj");
 
-	%HY_CLASS% game(initStruct);
-	return game.RunGame();
+	// Emscripten's update loop requires all memory to be on the heap (above 'initStruct' is copied internally)
+	%HY_CLASS% *pGame = HY_NEW %HY_CLASS%(initStruct);
+	return pGame->RunGame();
 }
