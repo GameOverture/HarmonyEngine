@@ -155,4 +155,5 @@ void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 /*friend*/ void HyNodeCtorAppend(HyEntity3d *pEntity, IHyNode3d *pChildNode)
 {
 	pEntity->m_ChildList.push_back(pChildNode);
+	pEntity->SetDirty(HyEntity3d::DIRTY_ALL);
 }

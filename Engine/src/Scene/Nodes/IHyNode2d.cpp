@@ -25,6 +25,11 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
+
+	// Initialize as 'invalid'
+	m_WorldAABB.lowerBound.Set(1.0f, 1.0f);
+	m_WorldAABB.upperBound.Set(-1.0f, -1.0f);
+
 	scale.Set(1.0f);
 
 	if(m_pParent)

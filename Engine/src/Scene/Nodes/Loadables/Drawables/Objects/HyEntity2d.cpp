@@ -906,4 +906,5 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 /*friend*/ void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode)
 {
 	pEntity->m_ChildList.push_back(pChildNode);
+	pEntity->SetDirty(HyEntity2d::DIRTY_ALL);
 }
