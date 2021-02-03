@@ -11,8 +11,8 @@
 #define IHy9Slice_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
 class IHy9Slice : public HyEntity2d
 {

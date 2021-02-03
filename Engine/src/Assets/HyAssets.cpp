@@ -23,9 +23,9 @@
 #include "Audio/HyAudioHarness.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
-#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Renderer/IHyRenderer.h"
 #include "Utilities/HyIO.h"
 #include "Utilities/HyMath.h"
@@ -388,13 +388,13 @@ bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 // Unload everything
 void HyAssets::Shutdown()
 {
-	std::vector<IHyInstance2d *> vReloadInsts;
+	std::vector<IHyDrawable2d *> vReloadInsts;
 	m_SceneRef.CopyAllLoadedNodes(vReloadInsts);
 
 	//m_QueuedEntityList.clear();
 
 	for(uint32 i = 0; i < m_QueuedInstList.size(); ++i)
-		vReloadInsts.push_back(static_cast<IHyInstance2d *>(m_QueuedInstList[i]));
+		vReloadInsts.push_back(static_cast<IHyDrawable2d *>(m_QueuedInstList[i]));
 
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();

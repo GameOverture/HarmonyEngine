@@ -20,7 +20,7 @@ class IHyNode
 	friend class HyScene;
 	friend class HyEntity2d;
 	friend class HyAnimFloat;
-	friend class IHyDrawable;
+	friend class IHyBody;
 
 protected:
 	static HyScene *				sm_pScene;

@@ -11,8 +11,8 @@
 #include "Renderer/Components/HyRenderBuffer.h"
 #include "Renderer/Components/HyShaderUniforms.h"
 #include "Renderer/IHyRenderer.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance3d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Diagnostics/Console/HyConsole.h"
 
 HyRenderBuffer::HyRenderBuffer() :
@@ -46,7 +46,7 @@ void HyRenderBuffer::Reset()
 	m_pRenderStatesUserStartPos = nullptr;
 }
 
-void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyInstance &instanceRef, HyCameraMask uiCameraMask, HyScreenRect<int32> &scissorRectRef, HyStencilHandle hStencil, int32 iCoordinateSystem, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance)
+void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, HyCameraMask uiCameraMask, HyScreenRect<int32> &scissorRectRef, HyStencilHandle hStencil, int32 iCoordinateSystem, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance)
 {
 	State *pRenderState = new (m_pCurWritePosition)State(uiId,
 														 uiCameraMask,

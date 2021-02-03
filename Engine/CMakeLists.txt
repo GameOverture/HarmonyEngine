@@ -82,22 +82,22 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/IHyLoadable.cpp
 	src/Scene/Nodes/Loadables/IHyLoadable2d.cpp
 	src/Scene/Nodes/Loadables/IHyLoadable3d.cpp
-	src/Scene/Nodes/Loadables/Drawables/IHyDrawable.cpp
-	src/Scene/Nodes/Loadables/Drawables/IHyDrawable2d.cpp
-	src/Scene/Nodes/Loadables/Drawables/IHyDrawable3d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/IHyInstance.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/IHyInstance3d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrefab3d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/HySpine2d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/HySprite2d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyTexturedQuad2d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/IHySprite.cpp
-	src/Scene/Nodes/Loadables/Drawables/Instances/Objects/IHyText.cpp
-	src/Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.cpp
-	src/Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.cpp
+	src/Scene/Nodes/Loadables/Bodies/IHyBody.cpp
+	src/Scene/Nodes/Loadables/Bodies/IHyBody2d.cpp
+	src/Scene/Nodes/Loadables/Bodies/IHyBody3d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrefab3d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySpine2d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.cpp
+	src/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.cpp
 	src/Scene/Nodes/Loadables/Objects/HyAudio2d.cpp
 	src/Scene/Nodes/Loadables/Objects/HyAudio3d.cpp
 	src/Scene/Nodes/Loadables/Objects/IHyAudio.cpp
@@ -192,23 +192,23 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Scene/Nodes/Loadables/IHyLoadable.h
 	include/Harmony/Scene/Nodes/Loadables/IHyLoadable2d.h
 	include/Harmony/Scene/Nodes/Loadables/IHyLoadable3d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/IHyDrawable.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/IHyDrawable2d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/IHyDrawable3d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/IHyInstance.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/IHyInstance3d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrefab3d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/HySpine2d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/HySprite2d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/HyTexturedQuad2d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/IHySprite.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Instances/Objects/IHyText.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Objects/HyEntity3d.h
-	include/Harmony/Scene/Nodes/Loadables/Drawables/Objects/HyEntityLeaf2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/IHyBody.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/IHyBody2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/IHyBody3d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrefab3d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySpine2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntityLeaf2d.h
 	include/Harmony/Scene/Nodes/Loadables/Objects/IHyAudio.h
 	include/Harmony/Scene/Nodes/Loadables/Objects/HyAudio2d.h
 	include/Harmony/Scene/Nodes/Loadables/Objects/HyAudio3d.h

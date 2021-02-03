@@ -12,13 +12,13 @@
 #include "HyEngine.h"
 #include "Renderer/IHyRenderer.h"
 #include "Window/HyWindow.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance3d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HySprite2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HySpine2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyTexturedQuad2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySpine2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h"
 #include "Scene/Physics/HyPhysEntity2d.h"
 
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
@@ -98,18 +98,18 @@ HyScene::~HyScene(void)
 	}
 }
 
-void HyScene::AddNode_Loaded(IHyInstance2d *pDrawable)
+void HyScene::AddNode_Loaded(IHyDrawable2d *pDrawable)
 {
 	m_NodeList_LoadedDrawable2d.push_back(pDrawable);
 	sm_bInst2dOrderingDirty = true;
 }
 
-void HyScene::AddNode_Loaded(IHyInstance3d *pDrawable)
+void HyScene::AddNode_Loaded(IHyDrawable3d *pDrawable)
 {
 	m_NodeList_LoadedDrawable3d.push_back(pDrawable);
 }
 
-void HyScene::RemoveNode_Loaded(const IHyInstance2d *pDrawable)
+void HyScene::RemoveNode_Loaded(const IHyDrawable2d *pDrawable)
 {
 	for(auto it = m_NodeList_LoadedDrawable2d.begin(); it != m_NodeList_LoadedDrawable2d.end(); ++it)
 	{
@@ -122,7 +122,7 @@ void HyScene::RemoveNode_Loaded(const IHyInstance2d *pDrawable)
 	}
 }
 
-void HyScene::RemoveNode_Loaded(const IHyInstance3d *pDrawable)
+void HyScene::RemoveNode_Loaded(const IHyDrawable3d *pDrawable)
 {
 	for(auto it = m_NodeList_LoadedDrawable3d.begin(); it != m_NodeList_LoadedDrawable3d.end(); ++it)
 	{
@@ -135,7 +135,7 @@ void HyScene::RemoveNode_Loaded(const IHyInstance3d *pDrawable)
 	}
 }
 
-void HyScene::CopyAllLoadedNodes(std::vector<IHyInstance2d *> &nodeListOut)
+void HyScene::CopyAllLoadedNodes(std::vector<IHyDrawable2d *> &nodeListOut)
 {
 	nodeListOut = m_NodeList_LoadedDrawable2d;
 }
@@ -188,7 +188,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	HY_PROFILE_BEGIN(HYPROFILERSECTION_PrepRender)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Initialize the buffer - PrepareBuffers may manipulate current IHyDrawInsts or insert new IHyDrawInsts while it updates all the effects
+	// Initialize the buffer - PrepareBuffers may manipulate current IHyDrawable or insert new IHyDrawable while it updates all the effects
 	rendererRef.PrepareBuffers();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -254,7 +254,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 	HY_PROFILE_END
 }
 
-bool HyScene::CalculateCameraMask(/*const*/ IHyInstance2d &instanceRef, uint32 &uiCameraMaskOut) const
+bool HyScene::CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut) const
 {
 	uiCameraMaskOut = 0;
 	if(instanceRef.GetCoordinateSystem() >= 0)
@@ -279,7 +279,7 @@ bool HyScene::CalculateCameraMask(/*const*/ IHyInstance2d &instanceRef, uint32 &
 	return uiCameraMaskOut != 0;
 }
 
-/*static*/ bool HyScene::Node2dSortPredicate(const IHyInstance2d *pInst1, const IHyInstance2d *pInst2)
+/*static*/ bool HyScene::Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2)
 {
 	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
 	{

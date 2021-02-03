@@ -18,7 +18,7 @@
 #include "Renderer/Effects/HyStencil.h"
 #include "Diagnostics/Console/HyConsole.h"
 #include "Scene/Nodes/Objects/HyCamera.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 
 HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :
 	IHyRenderer(diagnosticsRef, windowListRef),
@@ -917,7 +917,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if(pRenderState->SCISSOR_RECT.iTag != IHyDrawable::SCISSORTAG_Disabled)
+	if(pRenderState->SCISSOR_RECT.iTag != IHyBody::SCISSORTAG_Disabled)
 	{
 		const HyScreenRect<int32> &scissorRectRef = pRenderState->SCISSOR_RECT;
 

@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyPhysicsDebug2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
 HyPhysicsDebug2d::HyPhysicsDebug2d(float fPixelsPerMeter) :
 	m_fPIXELS_PER_METER(fPixelsPerMeter)

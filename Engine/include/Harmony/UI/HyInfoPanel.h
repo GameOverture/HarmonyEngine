@@ -11,9 +11,9 @@
 #define HyInfoPanel_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HySprite2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 
 class HyInfoPanel : public HyEntity2d
 {

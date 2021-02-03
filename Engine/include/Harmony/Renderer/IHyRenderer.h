@@ -18,8 +18,8 @@
 
 class HyStencil;
 class HyPortal2d;
-class IHyInstance3d;
-class IHyInstance2d;
+class IHyDrawable3d;
+class IHyDrawable2d;
 class HyWindow;
 class HyGfxComms;
 class HyDiagnostics;
@@ -61,8 +61,8 @@ public:
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
 
 	void PrepareBuffers();
-	void AppendDrawable3d(uint32 uiId, IHyInstance3d &instanceRef, HyCameraMask uiCameraMask);
-	void AppendDrawable2d(uint32 uiId, IHyInstance2d &instanceRef, HyCameraMask uiCameraMask);
+	void AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask);
+	void AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask);
 
 	HyVertexBufferHandle AppendVertexData3d(const uint8 *pData, uint32 uiSize);
 

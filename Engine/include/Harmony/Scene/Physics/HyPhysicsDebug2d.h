@@ -11,7 +11,7 @@
 #define HyDrawPhys2d_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyPrimitive2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
 class HyPhysicsDebug2d : public b2Draw
 {

@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Objects/HyEntity2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "HyEngine.h"
 
 extern void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode);

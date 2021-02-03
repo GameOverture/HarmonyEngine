@@ -11,8 +11,8 @@
 #include "Diagnostics/HyDiagnostics.h"
 #include "Time/HyTime.h"
 #include "Assets/HyAssets.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/IHyInstance2d.h"
-#include "Scene/Nodes/Loadables/Drawables/Instances/Objects/HyText2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 #include "HyEngine.h"
 
 extern std::string Hy_DateTime();
@@ -228,7 +228,7 @@ void HyDiagnostics::DumpAtlasUsage()
 
 void HyDiagnostics::DumpNodeUsage()
 {
-	std::vector<IHyInstance2d *> loadedNodesList;
+	std::vector<IHyDrawable2d *> loadedNodesList;
 	m_SceneRef.CopyAllLoadedNodes(loadedNodesList);
 
 	uint32 uiNumAudio = 0;
