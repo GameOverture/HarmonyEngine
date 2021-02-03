@@ -162,6 +162,16 @@ void DlgNewProject::on_buttonBox_accepted()
 	windowInfoArray.append(windowInfoObj);
 	jsonObj.insert("WindowInfo", windowInfoArray);
 
+	jsonObj.insert("UseConsole", true);
+	QJsonObject consoleInfoObj;
+	consoleInfoObj.insert("LocationX", 0);
+	consoleInfoObj.insert("LocationY", 0);
+	consoleInfoObj.insert("Name", "Harmony Log Console");
+	consoleInfoObj.insert("ResolutionX", 0);
+	consoleInfoObj.insert("ResolutionY", 0);
+	consoleInfoObj.insert("Type", 3);
+	jsonObj.insert("ConsoleInfo", consoleInfoObj);
+
 	QFile newProjectFile(GetProjFilePath());
 	if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 	{
