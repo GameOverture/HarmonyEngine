@@ -24,9 +24,19 @@ IManagerModel::IManagerModel(Project &projRef, AssetType eAssetType) :
 	ITreeModel(2, QStringList(), nullptr),
 	m_ProjectRef(projRef),
 	m_eASSET_TYPE(eAssetType),
+	m_bIsSingleBank(false),
 	m_MetaDir(m_ProjectRef.GetMetaDataAbsPath() + HyGlobal::AssetName(eAssetType)),
 	m_DataDir(m_ProjectRef.GetAssetsAbsPath() + HyGlobal::AssetName(eAssetType)),
 	m_uiNextBankId(99999) // Should be properly initialized with Init()
+{
+}
+
+/*virtual*/ IManagerModel::~IManagerModel()
+{
+}
+
+// Init() exists because we need to construct using virtual functions
+void IManagerModel::Init()
 {
 	if(m_MetaDir.exists() == false)
 	{
@@ -38,15 +48,7 @@ IManagerModel::IManagerModel(Project &projRef, AssetType eAssetType) :
 		HyGuiLog(HyGlobal::AssetName(m_eASSET_TYPE) % " data directory is missing, recreating", LOGTYPE_Info);
 		m_DataDir.mkpath(m_DataDir.absolutePath());
 	}
-}
 
-/*virtual*/ IManagerModel::~IManagerModel()
-{
-}
-
-// Init() exists because we need to construct using virtual functions
-void IManagerModel::Init()
-{
 	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt));
 	if(settingsFile.exists())
 	{
@@ -69,7 +71,7 @@ void IManagerModel::Init()
 			QString sName = HyGlobal::MakeFileNameFromCounter(bankArray[i].toObject()["bankId"].toInt());
 			BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(sName), bankArray[i].toObject());
 
-			if(m_eASSET_TYPE == ASSET_Atlas)
+			if(m_eASSET_TYPE == ASSET_Atlas || m_eASSET_TYPE == ASSET_Audio)
 				m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewBank->GetId()));
 		}
 
@@ -92,10 +94,7 @@ void IManagerModel::Init()
 		CreateNewBank("Default");
 	}
 
-	// Create data manifest file if one doesn't exist
-	QFile manifestFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
-	if(manifestFile.exists() == false)
-		SaveRuntime();
+	OnInit();
 }
 
 AssetType IManagerModel::GetAssetType() const
@@ -111,6 +110,11 @@ Project &IManagerModel::GetProjOwner() const
 QAbstractListModel *IManagerModel::GetBanksModel()
 {
 	return &m_BanksModel;
+}
+
+bool IManagerModel::IsSingleBank() const
+{
+	return m_bIsSingleBank;
 }
 
 QDir IManagerModel::GetMetaDir()
@@ -160,12 +164,13 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, H
 	{
 		switch(m_eASSET_TYPE)
 		{
+		case ASSET_Source:	eType = ITEM_Source;		break;
 		case ASSET_Atlas:	eType = ITEM_AtlasImage;	break;
 		case ASSET_Audio:	eType = ITEM_Audio;			break;
 		}
 	}
 
-	QList<AssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType, correspondingUuidList);
+	QList<AssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType, correspondingParentList, correspondingUuidList);
 	for(int i = 0; i < returnList.size(); ++i)
 		InsertTreeItem(returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
 
@@ -309,9 +314,15 @@ bool IManagerModel::TransferAssets(QList<AssetItemData *> assetsList, uint uiNew
 	return OnMoveAssets(assetsList, uiNewBankId);
 }
 
-QString IManagerModel::AssembleFilter(TreeModelItemData *pAsset) const
+QString IManagerModel::AssembleFilter(TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const
 {
+	if(pAsset == nullptr)
+		return QString();
+
 	QStringList sPrefixParts;
+
+	if(bIncludeSelfIfFilter && pAsset->GetType() == ITEM_Filter)
+		sPrefixParts.append(pAsset->GetText());
 
 	TreeModelItem *pTreeItem = GetItem(FindIndex<TreeModelItemData *>(pAsset, 0))->GetParent();
 	while(pTreeItem && pTreeItem != m_pRootItem)
@@ -692,7 +703,11 @@ void IManagerModel::SaveRuntime()
 							return QVariant("Mixed");
 					}
 				}
-				return QVariant("Bank: " % QString::number(GetBankIndexFromBankId(uiBankId)));
+
+				if(m_bIsSingleBank == false)
+					return QVariant("Bank: " % QString::number(GetBankIndexFromBankId(uiBankId)));
+
+				return QVariant();
 			}
 		}
 
@@ -946,7 +961,7 @@ void IManagerModel::StartRepackThread(QString sLoadMessage, IRepackThread *pRepa
 	pRepackThread->start();
 }
 
-AssetItemData *IManagerModel::CreateAssetTreeItem(const QString sPrefix, const QString sName, QJsonObject metaObj)
+AssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sName, QJsonObject metaObj)
 {
 	TreeModelItem *pCurTreeItem = m_pRootItem;
 	if(sPrefix.isEmpty() == false)

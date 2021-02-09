@@ -44,7 +44,7 @@ void AssetItemData::SetBankId(quint32 uiNewBankId)
 
 QString AssetItemData::GetFilter()
 {
-	return m_ModelRef.AssembleFilter(this);
+	return m_ModelRef.AssembleFilter(this, false);
 }
 
 QString AssetItemData::GetName() const
@@ -72,7 +72,7 @@ void AssetItemData::RemoveLink(ProjectItemData *pProjItem)
 	m_DependencySet.remove(pProjItem);
 }
 
-QString AssetItemData::ConstructMetaFileName()
+/*virtual*/ QString AssetItemData::ConstructMetaFileName()
 {
 	QString sMetaName;
 	sMetaName = sMetaName.asprintf("%010u", m_uiChecksum);
@@ -93,7 +93,7 @@ bool AssetItemData::DeleteMetaFile()
 void AssetItemData::SetError(AssetErrorType eError)
 {
 	if(eError == ASSETERROR_CannotFindMetaFile)
-		HyGuiLog(m_sName % " - GUIFRAMEERROR_CannotFindMetaImg", LOGTYPE_Error);
+		HyGuiLog(m_sName % " - Cannot find meta file", LOGTYPE_Error);
 
 	m_uiErrors |= (1 << eError);
 
@@ -119,7 +119,7 @@ void AssetItemData::GetJsonObj(QJsonObject &assetObj)
 	assetObj.insert("bankId", QJsonValue(static_cast<qint64>(GetBankId())));
 	assetObj.insert("checksum", QJsonValue(static_cast<qint64>(GetChecksum())));
 	assetObj.insert("name", QJsonValue(GetName()));
-	assetObj.insert("filter", QJsonValue(m_ModelRef.AssembleFilter(this)));
+	assetObj.insert("filter", QJsonValue(m_ModelRef.AssembleFilter(this, false)));
 	assetObj.insert("errors", QJsonValue(static_cast<int>(GetErrors())));
 	assetObj.insert("itemType", QJsonValue(HyGlobal::ItemName(GetType(), false)));
 

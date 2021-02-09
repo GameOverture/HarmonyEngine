@@ -56,7 +56,8 @@ enum HyGuiItemType
 	ITEM_Text,
 	ITEM_Spine,
 	ITEM_Sprite,
-	ITEM_Shader,
+	ITEM_Source,
+	ITEM_Header,
 	ITEM_Entity,
 	ITEM_Prefab,
 	ITEM_Entity3d,
@@ -70,7 +71,8 @@ enum AssetType
 {
 	ASSET_Unknown = -1,
 
-	ASSET_Atlas = 0,
+	ASSET_Source = 0,
+	ASSET_Atlas,
 	ASSET_Audio,
 
 	NUMASSETTYPES

@@ -13,6 +13,8 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
+#include <emscripten/fetch.h>
+
 #define HY_USE_SDL2
 #include <SDL2/SDL.h>
 

@@ -77,7 +77,7 @@ QString DlgNewItem::GetName()
 QString DlgNewItem::GetPrefix()
 {
 	if(ui->chkNewPrefix->isChecked())
-        return QString(HyIO::CleanPath(ui->txtPrefix->text().toStdString().c_str(), nullptr, false).c_str());
+		return QString(HyIO::CleanPath(ui->txtPrefix->text().toStdString().c_str(), nullptr, false).c_str());
 	else
 		return ui->cmbPrefixList->currentIndex() == 0 ? QString() : ui->cmbPrefixList->currentText();
 }

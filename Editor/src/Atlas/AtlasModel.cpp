@@ -236,6 +236,14 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	pDrawOut = new AtlasDraw(*this);
 }
 
+/*virtual*/ void AtlasModel::OnInit() /*override*/
+{
+	// Create data manifest file if one doesn't exist
+	QFile manifestFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
+	if(manifestFile.exists() == false)
+		SaveRuntime();
+}
+
 /*virtual*/ AssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	QRect rAlphaCrop(QPoint(metaObj["cropLeft"].toInt(), metaObj["cropTop"].toInt()),
@@ -262,7 +270,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	return pNewFrame;
 }
 
-/*virtual*/ QList<AssetItemData *> AtlasModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) /*override*/
+/*virtual*/ QList<AssetItemData *> AtlasModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
 	QList<AssetItemData *> returnList;
 

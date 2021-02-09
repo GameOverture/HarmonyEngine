@@ -48,7 +48,7 @@ public:
 	void InsertLink(ProjectItemData *pProjItem);
 	void RemoveLink(ProjectItemData *pProjItem);
 
-	QString ConstructMetaFileName();
+	virtual QString ConstructMetaFileName();
 	bool DeleteMetaFile();
 
 	virtual QString GetPropertyInfo() = 0;

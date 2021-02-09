@@ -21,6 +21,7 @@
 #include <QStandardItemModel>
 
 // Forward declaration
+class SourceModel;
 class AtlasModel;
 class IManagerModel;
 class ManagerWidget;
@@ -51,6 +52,8 @@ class Project : public ExplorerItemData
 
 	ProjectDraw *										m_pDraw;
 
+	SourceModel *										m_pSourceModel;
+	ManagerWidget *										m_pSourceWidget;
 	AtlasModel *										m_pAtlasModel;
 	ManagerWidget *										m_pAtlasWidget;
 	AudioManagerModel *									m_pAudioModel;
@@ -98,6 +101,8 @@ public:
 
 	IManagerModel *GetManagerModel(AssetType eManagerType);
 
+	SourceModel &GetSourceModel();
+	ManagerWidget *GetSourceWidget();
 	AtlasModel &GetAtlasModel();
 	ManagerWidget *GetAtlasWidget();
 	AudioManagerModel &GetAudioModel();

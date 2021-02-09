@@ -93,6 +93,14 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 	StartRepackThread("Repacking Audio", pWorkerThread);
 }
 
+/*virtual*/ void AudioManagerModel::OnInit() /*override*/
+{
+	// Create data manifest file if one doesn't exist
+	QFile manifestFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
+	if(manifestFile.exists() == false)
+		SaveRuntime();
+}
+
 /*virtual*/ AssetItemData *AudioManagerModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	WaveHeader wavHeader(metaObj["wavHeader"].toObject());
@@ -113,7 +121,7 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 	return pNewFrame;
 }
 
-/*virtual*/ QList<AssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) /*override*/
+/*virtual*/ QList<AssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
 	QList<AssetItemData *> returnList;
 	QList<WaveHeader> headerList;

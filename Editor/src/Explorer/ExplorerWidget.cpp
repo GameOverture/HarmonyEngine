@@ -255,7 +255,8 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Text:
 		case ITEM_Spine:
 		case ITEM_Sprite:
-		case ITEM_Shader:
+		case ITEM_Source:
+		case ITEM_Header:
 		case ITEM_Entity:
 		case ITEM_Prefab:
 		case ITEM_Prefix:
@@ -327,7 +328,8 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 	case ITEM_Text:
 	case ITEM_Spine:
 	case ITEM_Sprite:
-	case ITEM_Shader:
+	case ITEM_Source:
+	case ITEM_Header:
 	case ITEM_Entity:
 	case ITEM_Prefab:
 		MainWindow::OpenItem(static_cast<ProjectItemData *>(pItem));
@@ -364,7 +366,8 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 		case ITEM_Text:
 		case ITEM_Spine:
 		case ITEM_Sprite:
-		case ITEM_Shader:
+		case ITEM_Source:
+		case ITEM_Header:
 		case ITEM_Entity:
 			ui->actionCopyItem->setEnabled(true);
 			break;

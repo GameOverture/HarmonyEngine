@@ -17,6 +17,10 @@ if(Qt5_DIR)
 		src/VersionPatcher.h
 		src/MainWindow.ui
 		src/HyEditor.rc
+		src/Assets/Source/SourceFile.cpp
+		src/Assets/Source/SourceFile.h
+		src/Assets/Source/SourceModel.cpp
+		src/Assets/Source/SourceModel.h
 		src/Atlas/AtlasDraw.cpp
 		src/Atlas/AtlasDraw.h
 		src/Atlas/AtlasFrame.cpp
@@ -232,6 +236,8 @@ if(Qt5_DIR)
 
 	add_executable(HyEditor WIN32 ${HYEDITOR_SOURCE_FILES} data/HyEditor.qrc)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Source")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Atlas")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Audio")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Dialogs")

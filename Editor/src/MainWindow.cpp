@@ -262,6 +262,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	// Project manager widgets
 	ui->tabWidgetAssetManager->clear();
+	ui->tabWidgetAssetManager->addTab(pProject->GetSourceWidget(), QIcon(":/icons16x16/code.png"), "Source");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAtlasWidget(), HyGlobal::ItemIcon(ITEM_AtlasImage, SUBICON_None), "Atlases");
 	ui->tabWidgetAssetManager->addTab(pProject->GetGltfWidget(), HyGlobal::ItemIcon(ITEM_Prefab, SUBICON_None), "Models");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAudioWidget(), HyGlobal::ItemIcon(ITEM_Audio, SUBICON_None), "Audio");

@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "Project.h"
+#include "SourceModel.h"
 #include "GltfWidget.h"
 #include "AudioManagerModel.h"
 #include "MainWindow.h"
@@ -76,6 +77,8 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	ExplorerItemData(*this, ITEM_Project, HyIO::CleanPath(sProjectFilePath.toStdString().c_str(), HyGlobal::ItemExt(ITEM_Project).toStdString().c_str(), false).c_str()),
 	m_pDraw(nullptr),
+	m_pSourceModel(nullptr),
+	m_pSourceWidget(nullptr),
 	m_pAtlasModel(nullptr),
 	m_pAtlasWidget(nullptr),
 	m_pGltfModel(nullptr),
@@ -87,10 +90,6 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Parse/Load .hyproj file
-
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
 	m_SettingsObj = ReadProjFile();
 	VersionPatcher::Run(this);
 	m_SettingsObj = ReadProjFile();
@@ -108,12 +107,16 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	m_pSourceModel = new SourceModel(*this);
+	m_pSourceModel->Init();
+
 	m_pAtlasModel = new AtlasModel(*this);
 	m_pAtlasModel->Init();
-	m_pAudioModel = new AudioManagerModel(*this);
-	m_pAudioModel->Init();
 
 	m_pGltfModel = new GltfModel(this);
+
+	m_pAudioModel = new AudioManagerModel(*this);
+	m_pAudioModel->Init();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -143,11 +146,17 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 /*virtual*/ Project::~Project()
 {
+	delete m_pSourceWidget;
 	delete m_pAtlasWidget;
 	delete m_pGltfWidget;
 
 	Harmony::OnProjectDestructor(this); // Order matters because this calls Project::HarmonyShutdown()
 	delete m_pDraw;
+	
+	delete m_pSourceModel;
+	delete m_pAtlasModel;
+	delete m_pGltfModel;
+	delete m_pAudioModel;
 }
 
 /*virtual*/ QString Project::GetName(bool bWithPrefix) const /*override*/
@@ -195,7 +204,7 @@ void Project::LoadExplorerModel()
 		}
 		if(eItemType == ITEM_Unknown)
 		{
-			HyGuiLog("Project ctor eType == TYPE_Unknown", LOGTYPE_Error);
+			//HyGuiLog("Project ctor eType == TYPE_Unknown", LOGTYPE_Error);
 			continue;
 		}
 
@@ -425,6 +434,9 @@ IManagerModel *Project::GetManagerModel(AssetType eManagerType)
 {
 	switch(eManagerType)
 	{
+	case ASSET_Source:
+		return m_pSourceModel;
+
 	case ASSET_Atlas:
 		return m_pAtlasModel;
 
@@ -435,6 +447,16 @@ IManagerModel *Project::GetManagerModel(AssetType eManagerType)
 		HyGuiLog("Project::GetManagerModel was passed invalid eManagerType", LOGTYPE_Error);
 		return nullptr;
 	}
+}
+
+SourceModel &Project::GetSourceModel()
+{
+	return *m_pSourceModel;
+}
+
+ManagerWidget *Project::GetSourceWidget()
+{
+	return m_pSourceWidget;
 }
 
 AtlasModel &Project::GetAtlasModel()
@@ -994,9 +1016,11 @@ bool Project::HarmonyInitialize()
 	//if(m_pAtlasWidget)
 	//	m_pAtlasWidget->StashTreeWidgets();
 
+	delete m_pSourceWidget;
 	delete m_pAtlasWidget;
 	delete m_pGltfWidget;
 	delete m_pAudioWidget;
+	m_pSourceWidget = new ManagerWidget(m_pSourceModel, nullptr);
 	m_pAtlasWidget = new ManagerWidget(m_pAtlasModel, nullptr);
 	m_pAudioWidget = new ManagerWidget(m_pAudioModel, nullptr);
 	m_pGltfWidget = new GltfWidget(m_pGltfModel, nullptr);

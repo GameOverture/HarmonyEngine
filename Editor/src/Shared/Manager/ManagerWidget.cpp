@@ -100,6 +100,9 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 {
 	ui->setupUi(this);
 
+	if(m_pModel->IsSingleBank())
+		ui->grpBank->hide();
+
 	m_pModel->OnAllocateDraw(m_pDraw);
 
 	ManagerProxyModel *pProxyModel = new ManagerProxyModel(this);
@@ -483,15 +486,7 @@ void ManagerWidget::on_actionImportAssets_triggered()
 	if(dlg.exec() == QDialog::Rejected)
 		return;
 
-	QStringList sImportImgList = dlg.selectedFiles();
-
-	//QString sSelectedFilter(tr("PNG (*.png)"));
-	//QStringList sImportImgList = QFileDialog::getOpenFileNames(this,
-	//	"Import image(s) into atlases",
-	//	QString(),
-	//	tr("All files (*.*);;PNG (*.png)"),
-	//	&sSelectedFilter);
-
+	QStringList sImportList = dlg.selectedFiles();
 
 	QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
 	TreeModelItemData *pFirstSelected = GetSelected(selectedAssetsList, selectedFiltersList);
@@ -500,13 +495,13 @@ void ManagerWidget::on_actionImportAssets_triggered()
 
 	QList<TreeModelItemData *> correspondingParentList;
 	QList<QUuid> correspondingUuidList;
-	for(int i = 0; i < sImportImgList.size(); ++i)
+	for(int i = 0; i < sImportList.size(); ++i)
 	{
 		correspondingParentList.append(pParent);
 		correspondingUuidList.append(QUuid::createUuid());
 	}
 
-	m_pModel->ImportNewAssets(sImportImgList,
+	m_pModel->ImportNewAssets(sImportList,
 							  m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
 							  ITEM_Unknown, // Uses default item type of manager
 							  correspondingParentList,
@@ -532,7 +527,7 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 	TreeModelItemData *pImportParent = m_pModel->FindTreeItemFilter(pFirstSelected);
 
 	// Store all the specified imported image paths and their corresponding parent tree items they should be inserted into
-	QStringList sImportImgList;
+	QStringList sImportList;
 	QList<TreeModelItemData *> correspondingParentList;
 	QList<QUuid> correspondingUuidList;
 
@@ -560,17 +555,24 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 					QDir subDir(info.filePath());
 					dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(subDir.entryInfoList(), m_pModel->CreateNewFilter(subDir.dirName(), curDir.second)));
 				}
-				else if(info.suffix().toLower() == "png")
+				else
 				{
-					sImportImgList.push_back(info.filePath());
-					correspondingParentList.push_back(curDir.second);
-					correspondingUuidList.append(QUuid::createUuid());
+					for(auto sExt : m_pModel->GetSupportedFileExtList())
+					{
+						if(QString('.' % info.suffix()).compare(sExt, Qt::CaseInsensitive) == 0)
+						{
+							sImportList.push_back(info.filePath());
+							correspondingParentList.push_back(curDir.second);
+							correspondingUuidList.append(QUuid::createUuid());
+							break;
+						}
+					}
 				}
 			}
 		}
 	}
 
-	m_pModel->ImportNewAssets(sImportImgList,
+	m_pModel->ImportNewAssets(sImportList,
 							  m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
 							  ITEM_Unknown, // Uses default item type of manager
 							  correspondingParentList,

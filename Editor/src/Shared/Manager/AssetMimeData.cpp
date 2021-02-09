@@ -32,7 +32,7 @@ AssetMimeData::AssetMimeData(Project &projRef, AssetType eManagerType, QList<Tre
 			if(pManager == nullptr)
 				continue;
 
-			itemObj.insert("filter", pManager->AssembleFilter(itemListRef[i]));
+			itemObj.insert("filter", pManager->AssembleFilter(itemListRef[i], false));
 			itemObj.insert("name", QJsonValue(itemListRef[i]->GetText()));
 		}
 		else

@@ -30,6 +30,8 @@ protected:
 	Project &									m_ProjectRef;
 	const AssetType								m_eASSET_TYPE;
 
+	bool										m_bIsSingleBank;
+
 	QDir										m_MetaDir;
 	QDir										m_DataDir;
 
@@ -47,6 +49,7 @@ public:
 	AssetType GetAssetType() const;
 	Project &GetProjOwner() const;
 	QAbstractListModel *GetBanksModel();
+	bool IsSingleBank() const;
 
 	QDir GetMetaDir();
 	QDir GetDataDir();
@@ -63,7 +66,7 @@ public:
 	void Rename(TreeModelItemData *pItem, QString sNewName);
 	bool TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId);
 
-	QString AssembleFilter(TreeModelItemData *pAsset) const;
+	QString AssembleFilter(TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const;
 	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
 	TreeModelItemData *ReturnFilter(QString sFilterPath, bool bCreateNonExistingFilter = true);
 
@@ -113,9 +116,11 @@ protected:
 
 	void StartRepackThread(QString sLoadMessage, IRepackThread *pRepackThread);
 
+	virtual void OnInit() = 0;
+
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
-	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
+	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QList<AssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) = 0;
 	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) = 0;
@@ -124,7 +129,7 @@ protected:
 	virtual QJsonObject GetSaveJson() = 0;
 
 private:
-	AssetItemData *CreateAssetTreeItem(const QString sPrefix, const QString sName, QJsonObject metaObj);
+	AssetItemData *CreateAssetTreeItem(QString sPrefix, QString sName, QJsonObject metaObj);
 
 protected Q_SLOTS:
 	void OnLoadUpdate(QString sMsg, int iPercComplete);
