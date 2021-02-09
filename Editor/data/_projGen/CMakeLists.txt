@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(%HY_CLASS%)
 
-set(CODE_NAME "%HY_CLASS%")
 set(REL_SRC_DIR "%HY_RELSRCDIR%")
 set(REL_DATA_DIR "%HY_RELDATADIR%")
 set(REL_HARMONY_DIR "%HY_RELHARMONYDIR%")
@@ -27,7 +26,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
-option(HYBUILD_SDL_NET "Use SDL2_NET" ON)
+option(HYBUILD_SDL_NET "Use SDL2_NET" OFF)
 
 message(STATUS "Harmony building for target: ${CMAKE_SYSTEM_NAME}")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
@@ -60,7 +59,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	
 	list(APPEND HYEM_LINK_FLAGS "--no-heap-copy")
 	list(APPEND HYEM_LINK_FLAGS "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/${REL_DATA_DIR}@./data")
-	list(APPEND HYEM_LINK_FLAGS "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/${CODE_NAME}.hyproj@${CODE_NAME}.hyproj")
+	list(APPEND HYEM_LINK_FLAGS "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.hyproj@${PROJECT_NAME}.hyproj")
 	
 	if(HYBUILD_DebugEmscripten)
 		message(STATUS "!!! EMSCRIPTEN DEBUG FLAGS ENABLED !!!")
@@ -101,7 +100,7 @@ endif()
 
 add_subdirectory("${REL_HARMONY_DIR}/Engine" "HyEngine")
 %HY_DEPENDENCIES_ADD%
-add_executable(${PROJECT_NAME} WIN32 ${GAME_SRCFILES} "${CODE_NAME}.hyproj")
+add_executable(${PROJECT_NAME} WIN32 ${GAME_SRCFILES} "${PROJECT_NAME}.hyproj")
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 14
 	CXX_STANDARD_REQUIRED YES

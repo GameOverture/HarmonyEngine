@@ -102,7 +102,7 @@ void SourceModel::WriteCMakeLists()
 				}
 				else
 				{
-					for(auto sExt : GetSupportedFileExtList())
+					for(const auto &sExt : GetSupportedFileExtList())
 					{
 						if(QString('.' % info.suffix()).compare(sExt, Qt::CaseInsensitive) == 0)
 						{
