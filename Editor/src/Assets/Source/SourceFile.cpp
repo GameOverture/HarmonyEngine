@@ -29,7 +29,14 @@ SourceFile::~SourceFile()
 
 /*virtual*/ QString SourceFile::ConstructMetaFileName() /*override*/
 {
-	return QString(m_ModelRef.AssembleFilter(this, false) % GetName());
+	QString sCombinedPath;
+	QString sFilterPath = GetFilter();
+	if(sFilterPath.isEmpty())
+		sCombinedPath = GetName();
+	else
+		sCombinedPath = sFilterPath + "/" + GetName();
+
+	return sCombinedPath;
 }
 
 /*virtual*/ QString SourceFile::GetPropertyInfo() /*override*/
