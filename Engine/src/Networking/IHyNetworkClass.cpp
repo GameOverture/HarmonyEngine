@@ -92,11 +92,11 @@ void IHyNetworkClass::CleanupSocket()
 	OnNetShutdown();
 }
 
-/*virtual*/ void IHyNetworkClass::OnThreadInit() /*override*/
+/*virtual*/ void IHyNetworkClass::OnThreadInit() /*override final*/
 {
 }
 
-/*virtual*/ void IHyNetworkClass::OnThreadUpdate() /*override*/
+/*virtual*/ void IHyNetworkClass::OnThreadUpdate() /*override final*/
 {
 	switch(m_eConnState)
 	{
@@ -127,7 +127,7 @@ void IHyNetworkClass::CleanupSocket()
 	}
 }
 
-/*virtual*/ void IHyNetworkClass::OnThreadShutdown() /*override*/
+/*virtual*/ void IHyNetworkClass::OnThreadShutdown() /*override final*/
 {
 	CleanupSocket();
 }

@@ -18,14 +18,13 @@
 	#else
 		#include "SDL_net.h"
 	#endif
-
-//#elif defined(HY_PLATFORM_BROWSER)
-//	#include <errno.h> /* EINPROGRESS, errno */
-//	#include <sys/types.h> /* timeval */
-//	#include <sys/socket.h>
-//	#include <arpa/inet.h>
-//	#include <fcntl.h>
-//	#include <unistd.h>
+#elif defined(HY_USE_POSIX)
+	#include <errno.h> /* EINPROGRESS, errno */
+	#include <sys/types.h> /* timeval */
+	#include <sys/socket.h>
+	#include <arpa/inet.h>
+	#include <fcntl.h>
+	#include <unistd.h>
 #endif
 
 HyNetworking::HyNetworking()
@@ -75,7 +74,7 @@ bool HyNetworking::CreateClient(std::string sHost, uint16 uiPort, HyTcpSocket &s
 	}
 
 	return true;
-#elif defined(HY_PLATFORM_BROWSER)
+#elif defined(HY_USE_POSIX)
 	socketOut = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(socketOut == -1)
 	{
@@ -126,7 +125,7 @@ int32 HyNetworking::TcpRecv(HyTcpSocket hSocket, void *pData, int iMaxLength)
 {
 #ifdef HY_USE_SDL2_NET
 	return SDLNet_TCP_Recv(hSocket, pData, iMaxLength);
-#elif defined(HY_PLATFORM_BROWSER)
+#elif defined(HY_USE_POSIX)
 	/* Wait timeout milliseconds to receive data */
 	int iTimeout = -1;
 	fd_set sockets;
@@ -159,7 +158,7 @@ int32 HyNetworking::TcpSend(HyTcpSocket hSocket, const void *pData, uint32 uiNum
 {
 #ifdef HY_USE_SDL2_NET
 	return SDLNet_TCP_Send(hSocket, pData, static_cast<int>(uiNumBytes));
-#elif defined(HY_PLATFORM_BROWSER)
+#elif defined(HY_USE_POSIX)
 	const int ret = ::send(hSocket, pData, uiNumBytes, 0);
 	if(ret == -1)
 	{
@@ -177,7 +176,7 @@ void HyNetworking::CloseConnection(HyTcpSocket hSocket)
 {
 #ifdef HY_USE_SDL2_NET
 	SDLNet_TCP_Close(hSocket);
-#elif defined(HY_PLATFORM_BROWSER)
+#elif defined(HY_USE_POSIX)
 	if(hSocket != -1)
 		::close(hSocket);
 #endif
