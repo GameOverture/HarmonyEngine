@@ -195,5 +195,23 @@
         <file>icons16x16/Build-Browser.png</file>
         <file>icons16x16/package-x-generic.png</file>
         <file>icons16x16/items/Build-Open.png</file>
+        <file>icons16x16/items/Header.png</file>
+        <file>icons16x16/items/Header-Close.png</file>
+        <file>icons16x16/items/Header-Delete.png</file>
+        <file>icons16x16/items/Header-Dirty.png</file>
+        <file>icons16x16/items/Header-New.png</file>
+        <file>icons16x16/items/Header-Open.png</file>
+        <file>icons16x16/items/Header-Pending.png</file>
+        <file>icons16x16/items/Header-Settings.png</file>
+        <file>icons16x16/items/Header-Warning.png</file>
+        <file>icons16x16/items/Source.png</file>
+        <file>icons16x16/items/Source-Close.png</file>
+        <file>icons16x16/items/Source-Delete.png</file>
+        <file>icons16x16/items/Source-Dirty.png</file>
+        <file>icons16x16/items/Source-New.png</file>
+        <file>icons16x16/items/Source-Open.png</file>
+        <file>icons16x16/items/Source-Pending.png</file>
+        <file>icons16x16/items/Source-Settings.png</file>
+        <file>icons16x16/items/Source-Warning.png</file>
     </qresource>
 </RCC>
