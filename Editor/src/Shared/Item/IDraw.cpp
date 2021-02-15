@@ -28,7 +28,7 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_bPanCameraKeyDown(false),
 	m_bIsCameraPanning(false)
 {
-	m_pCamera = Hy_Window().CreateCamera2d();
+	m_pCamera = HyEngine::Window().CreateCamera2d();
 	if(HyGlobal::IsItemFileDataValid(initFileDataRef))
 	{
 		m_pCamera->pos.Set(initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[0].toDouble()) : 0.0f,
@@ -40,8 +40,8 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 
 /*virtual*/ IDraw::~IDraw()
 {
-	if(Hy_IsInitialized())
-		Hy_Window().RemoveCamera(m_pCamera);
+	if(HyEngine::IsInitialized())
+		HyEngine::Window().RemoveCamera(m_pCamera);
 }
 
 HyCamera2d *IDraw::GetCamera()
