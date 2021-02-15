@@ -26,8 +26,8 @@ std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 std::vector<HyPhysicsGrid2d *> HyScene::sm_PhysicsGridList;
 bool HyScene::sm_bInst2dOrderingDirty = false;
 
-HyScene::HyScene(HyAudioHarness &audioRef, std::vector<HyWindow *> &WindowListRef) :
-	m_AudioRef(audioRef),
+HyScene::HyScene(IHyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef) :
+	m_AudioCoreRef(audioCoreRef),
 	m_WindowListRef(WindowListRef),
 	m_bPauseGame(false)
 {
@@ -142,7 +142,7 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyDrawable2d *> &nodeListOut)
 
 void HyScene::AppendAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType)
 {
-	m_AudioRef.AppendCue(pNode, eCueType);
+	m_AudioCoreRef.AppendCue(pNode, eCueType);
 }
 
 void HyScene::SetPause(bool bPause)

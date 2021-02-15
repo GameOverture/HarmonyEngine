@@ -26,7 +26,9 @@
 
 HyAudioCore_SDL2 *HyAudioCore_SDL2::sm_pInstance = nullptr;
 
-HyAudioCore_SDL2::HyAudioCore_SDL2()
+HyAudioCore_SDL2::HyAudioCore_SDL2() :
+	m_fGlobalSfxVolume(1.0f),
+	m_fGlobalMusicVolume(1.0f)
 {
 	HyLogTitle("SDL2 Audio");
 
@@ -103,9 +105,9 @@ HyAudioCore_SDL2::HyAudioCore_SDL2()
 	// Set API callbacks
 	Mix_ChannelFinished(HyAudioCore_SDL2::OnChannelFinished);
 
-	Mix_AllocateChannels(HYMAX_AUDIOCHANNELS);
-	m_NodeMap.reserve(HYMAX_AUDIOCHANNELS);
-	m_ChannelMap.reserve(HYMAX_AUDIOCHANNELS);
+	int32 iNumChannels = Mix_AllocateChannels(HYMAX_AUDIOCHANNELS);
+	m_NodeMap.reserve(iNumChannels);
+	m_ChannelMap.reserve(iNumChannels);
 
 	sm_pInstance = this;
 }
@@ -121,6 +123,32 @@ HyAudioCore_SDL2::HyAudioCore_SDL2()
 const char *HyAudioCore_SDL2::GetAudioDriver()
 {
 	return SDL_GetCurrentAudioDriver();
+}
+
+/*virtual*/ void HyAudioCore_SDL2::SetSfxVolume(float fGlobalSfxVolume) /*override*/
+{
+	m_fGlobalSfxVolume = HyClamp(fGlobalSfxVolume, 0.0f, 1.0f);
+	
+	for(const auto &iter : m_ChannelMap)
+	{
+		if(iter.second->Is2D())
+			Mix_Volume(iter.first, static_cast<int>(MIX_MAX_VOLUME * (static_cast<HyAudio2d *>(iter.second)->volume.Get() * m_fGlobalSfxVolume)));
+		else
+			Mix_Volume(iter.first, static_cast<int>(MIX_MAX_VOLUME * (static_cast<HyAudio3d *>(iter.second)->volume.Get() * m_fGlobalSfxVolume)));
+	}
+}
+
+/*virtual*/ void HyAudioCore_SDL2::SetMusicVolume(float fGlobalMusicVolume) /*override*/
+{
+	//Mix_VolumeMusic(static_cast<int>(MIX_MAX_VOLUME * fGlobalMusicVolume));
+}
+
+/*virtual*/ IHyFileAudioImpl *HyAudioCore_SDL2::AllocateAudioBank(HyJsonObj bankObj) /*override*/
+{
+	HyFileAudioImpl_SDL2 *pNewFileGuts = HY_NEW HyFileAudioImpl_SDL2(bankObj);
+	m_AudioFileList.push_back(pNewFileGuts);
+
+	return pNewFileGuts;
 }
 
 /*virtual*/ void HyAudioCore_SDL2::OnUpdate() /*override*/
@@ -205,14 +233,6 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	m_CueList.clear();
 }
 
-/*static*/ IHyFileAudioImpl *HyAudioCore_SDL2::AllocateBank(IHyAudioCore *pAudio, HyJsonObj bankObj)
-{
-	HyFileAudioImpl_SDL2 *pNewFileGuts = HY_NEW HyFileAudioImpl_SDL2(bankObj);
-	static_cast<HyAudioCore_SDL2 *>(pAudio)->m_AudioFileList.push_back(pNewFileGuts);
-
-	return pNewFileGuts;
-}
-
 template<typename NODETYPE>
 void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 {
@@ -254,7 +274,7 @@ void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 		if(iAssignedChannel == -1)
 			return;
 
-		Mix_Volume(iAssignedChannel, static_cast<int>(MIX_MAX_VOLUME * fVolume));
+		Mix_Volume(iAssignedChannel, static_cast<int>(MIX_MAX_VOLUME * (fVolume * m_fGlobalSfxVolume)));
 
 		if(ePlayType == CUETYPE_Start)
 		{
@@ -274,7 +294,7 @@ void HyAudioCore_SDL2::Modify(NODETYPE *pAudioNode)
 		return;
 	}
 
-	Mix_Volume(nodeIter->second, static_cast<int>(MIX_MAX_VOLUME * pAudioNode->volume.Get()));
+	Mix_Volume(nodeIter->second, static_cast<int>(MIX_MAX_VOLUME * (pAudioNode->volume.Get() * m_fGlobalSfxVolume)));
 }
 
 /*static*/ void HyAudioCore_SDL2::OnChannelFinished(int32 iChannel)

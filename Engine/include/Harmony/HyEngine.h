@@ -93,6 +93,9 @@ private:
 	friend HyShaderHandle		Hy_DefaultShaderHandle(HyType eType);
 	friend std::string			Hy_DateTime();
 	friend std::string			Hy_DataDir();
+
+public:
+	static HyAudioHarness &Audio();
 };
 
 #endif /* HyEngine_h__ */

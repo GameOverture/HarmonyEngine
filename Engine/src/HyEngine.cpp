@@ -26,9 +26,9 @@ HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	m_Init(initStruct),
 	m_Console(m_Init.bUseConsole, m_Init.consoleInfo),
 	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
-	m_Audio(m_Init.sDataDir),
-	m_Scene(m_Audio, m_WindowManager.GetWindowList()),
-	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
+	m_Audio(),
+	m_Scene(m_Audio.GetCore(), m_WindowManager.GetWindowList()),
+	m_Assets(m_Audio.GetCore(), m_Scene, m_Init.sDataDir),
 	m_GuiComms(m_Init.uiDebugPort, m_Assets),
 	m_Time(m_Init.uiUpdateTickMs),
 	m_Diagnostics(m_Init, m_Time, m_Assets, m_Scene),
@@ -112,7 +112,7 @@ bool HyEngine::Update()
 	{
 		m_Scene.UpdateNodes();
 		m_Scene.UpdatePhysics();
-		m_Audio.Update();
+		m_Audio.GetCore().OnUpdate();
 		
 		HY_PROFILE_BEGIN(HYPROFILERSECTION_Update)
 		if(PollPlatformApi() == false || OnUpdate() == false)
@@ -257,4 +257,10 @@ bool HyEngine::PollPlatformApi()
 	sAbsDataDir = HyIO::CleanPath(sAbsDataDir.c_str(), "/", false);
 	
 	return sAbsDataDir;
+}
+
+/*static*/ HyAudioHarness &HyEngine::Audio()
+{
+	HyAssert(HyEngine::sm_pInstance != nullptr, "HyEngine::Audio() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Audio;
 }

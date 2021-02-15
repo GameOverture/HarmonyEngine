@@ -27,9 +27,9 @@ void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern "C"
 {
-	__declspec (dllexport) IHyAudio *AllocateHyAudio_FMOD()
+	__declspec (dllexport) IHyAudioCore *AllocateHyAudio_FMOD()
 	{
-		IHyAudio *pNewAudio = new HyAudio_FMOD();
+		IHyAudioCore *pNewAudio = new HyAudio_FMOD();
 		return pNewAudio;
 	}
 }
@@ -61,6 +61,12 @@ Studio::System *HyAudio_FMOD::GetSystem() const
 	return m_pSystem;
 }
 
+/*virtual*/ IHyFileAudioImpl *HyAudio_FMOD::AllocateAudioBank(HyJsonObj bankObj) /*override*/
+{
+	IHyFileAudioImpl *pNewAudio = new HyAudioBank_FMOD(GetSystem());
+	return pNewAudio;
+}
+
 /*virtual*/ void HyAudio_FMOD::OnUpdate() /*override*/
 {
 	ERRCHECK(m_pSystem->update());
@@ -68,14 +74,6 @@ Studio::System *HyAudio_FMOD::GetSystem() const
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-extern "C"
-{
-	__declspec (dllexport) IHyAudioBank *AllocateHyAudioBank_FMOD(IHyAudio *pAudio)
-	{
-		IHyAudioBank *pNewAudio = new HyAudioBank_FMOD(static_cast<HyAudio_FMOD *>(pAudio)->GetSystem());
-		return pNewAudio;
-	}
-}
 
 HyAudioBank_FMOD::HyAudioBank_FMOD(Studio::System *pSystemRef) :
 	m_pSystemRef(pSystemRef),

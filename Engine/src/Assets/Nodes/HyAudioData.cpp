@@ -15,7 +15,6 @@
 
 HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
-	m_AudioRef(assetsRef.GetAudioRef()),
 	m_pAudioStates(nullptr)
 {
 	HyJsonArray audioStateArray = itemObj["stateArray"].GetArray();

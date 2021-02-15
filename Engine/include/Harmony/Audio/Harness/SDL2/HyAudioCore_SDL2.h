@@ -26,16 +26,19 @@ class HyFileAudioImpl_SDL2;
 
 class HyAudioCore_SDL2 : public IHyAudioCore
 {
-	static HyAudioCore_SDL2 *			sm_pInstance;
+	static HyAudioCore_SDL2 *				sm_pInstance;
 
-	std::vector<std::string>			m_sDeviceList;
+	std::vector<std::string>				m_sDeviceList;
 
-	int32								m_iDesiredFrequency;	// 44100 or 48000, etc.
-	SDL_AudioFormat						m_uiDesiredFormat;
-	int32								m_iDesiredNumChannels;	// 1 mono, 2 stereo, 4 quad, 6 (5.1)
-	int32								m_iDesiredSamples;		// Chunk size (4096, 2048, etc) - Specifies a unit of audio data to be used at a time. Must be a power of 2
+	int32									m_iDesiredFrequency;	// 44100 or 48000, etc.
+	SDL_AudioFormat							m_uiDesiredFormat;
+	int32									m_iDesiredNumChannels;	// 1 mono, 2 stereo, 4 quad, 6 (5.1)
+	int32									m_iDesiredSamples;		// Chunk size (4096, 2048, etc) - Specifies a unit of audio data to be used at a time. Must be a power of 2
 
-	std::vector<HyFileAudioImpl_SDL2 *>	m_AudioFileList;
+	std::vector<HyFileAudioImpl_SDL2 *>		m_AudioFileList;
+
+	float									m_fGlobalSfxVolume;
+	float									m_fGlobalMusicVolume;
 
 	// These are kept in sync
 	std::unordered_map<IHyNode *, int32>	m_NodeMap;
@@ -47,9 +50,11 @@ public:
 
 	const char *GetAudioDriver();
 
-	virtual void OnUpdate() override;
+	virtual void SetSfxVolume(float fGlobalSfxVolume) override;
+	virtual void SetMusicVolume(float fGlobalMusicVolume) override;
+	virtual IHyFileAudioImpl *AllocateAudioBank(HyJsonObj bankObj) override;
 
-	static IHyFileAudioImpl *AllocateBank(IHyAudioCore *pAudio, HyJsonObj bankObj);
+	virtual void OnUpdate() override;
 
 private:
 	template<typename NODETYPE>

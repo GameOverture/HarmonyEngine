@@ -17,8 +17,6 @@
 
 class HyAudioData : public IHyNodeData
 {
-	HyAudioHarness &			m_AudioRef;
-
 	class AudioState
 	{
 	public:

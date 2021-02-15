@@ -18,25 +18,18 @@ class HyFileAudio;
 
 class HyAudioHarness
 {
-	using fpAllocateHyAudio					= IHyAudioCore *(*)();
-	using fpAllocateHyAudioBank				= IHyFileAudioImpl *(*)(IHyAudioCore *, HyJsonObj);
+	friend class HyEngine;
 
-	fpAllocateHyAudio						m_fpAllocateHyAudio;
-	fpAllocateHyAudioBank					m_fpAllocateHyAudioBank;
 	IHyAudioCore *							m_pCore;
 
-	std::map<std::string, HyFileAudio *>	m_AudioBankMap;
-
 public:
-	HyAudioHarness(std::string sDataDir);
+	HyAudioHarness();
 	~HyAudioHarness();
 
-	IHyFileAudioImpl *AllocateAudioBank(HyJsonObj bankObj);
-	HyFileAudio *GetAudioBank(const std::string &sBankName);
+	void SetSfxVolume(float fGlobalSfxVolume);
 
-	void AppendCue(IHyNode *pNode, IHyAudioCore::CueType eCueType);
-
-	void Update();
+private:
+	IHyAudioCore &GetCore() const;
 };
 
 #endif /* HyAudioHarness_h__ */

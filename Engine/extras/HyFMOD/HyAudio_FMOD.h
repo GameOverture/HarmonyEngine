@@ -24,7 +24,7 @@ void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class HyAudio_FMOD : public IHyAudio
+class HyAudio_FMOD : public IHyAudioCore
 {
 	Studio::System *			m_pSystem;
 
@@ -34,6 +34,7 @@ public:
 
 	Studio::System *GetSystem() const;
 
+	virtual IHyFileAudioImpl *AllocateAudioBank(HyJsonObj bankObj) override;
 	virtual void OnUpdate() override;
 };
 

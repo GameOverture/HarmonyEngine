@@ -30,7 +30,7 @@ class IHyRenderer;
 //////////////////////////////////////////////////////////////////////////
 class HyScene
 {
-	HyAudioHarness &									m_AudioRef;
+	IHyAudioCore &										m_AudioCoreRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
 	// TODO: Make tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
@@ -46,7 +46,7 @@ class HyScene
 	std::vector<IHyDrawable3d *>						m_NodeList_LoadedDrawable3d;
 
 public:
-	HyScene(HyAudioHarness &audioRef, std::vector<HyWindow *> &WindowListRef);
+	HyScene(IHyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
 	static void SetInstOrderingDirty();
