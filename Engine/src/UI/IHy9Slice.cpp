@@ -11,8 +11,6 @@
 #include "UI/IHy9Slice.h"
 #include "HyEngine.h"
 
-extern float Hy_UpdateStep();
-
 IHy9Slice::Border::Border(glm::vec2 vFillDimensions, float fBorderThickness, HyPrimitive2d &fillRef)
 {
 	m_Corners[LowerLeft].SetAsCircle(fBorderThickness);
@@ -154,7 +152,7 @@ bool IHy9Slice::IsShown()
 {
 	if(m_fElapsedTime > 0.0f)
 	{
-		m_fElapsedTime -= Hy_UpdateStep();
+		m_fElapsedTime -= HyEngine::DeltaTime();
 		return;
 	}
 

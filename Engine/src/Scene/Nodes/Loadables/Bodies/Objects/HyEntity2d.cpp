@@ -14,8 +14,6 @@
 #include "Assets/Nodes/HyEntityData.h"
 #include "HyEngine.h"
 
-extern HyInput &Hy_Input();
-
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyBody2d(HYTYPE_Entity, "", "", pParent),
 	m_uiAttributes(0),
@@ -688,16 +686,16 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		bool bMouseInBounds;
 		if(GetCoordinateSystem() >= 0)
 		{
-			ptMousePt = Hy_Input().GetMousePos();
-			bMouseInBounds = Hy_Input().GetMouseWindowIndex() == GetCoordinateSystem() && HyTestPointAABB(GetWorldAABB(), ptMousePt);
+			ptMousePt = HyEngine::Input().GetMousePos();
+			bMouseInBounds = HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem() && HyTestPointAABB(GetWorldAABB(), ptMousePt);
 		}
 		else
 		{
-			ptMousePt = Hy_Input().GetWorldMousePos();
+			ptMousePt = HyEngine::Input().GetWorldMousePos();
 			bMouseInBounds = HyTestPointAABB(GetWorldAABB(), ptMousePt);
 		}
 
-		bool bLeftClickDown = Hy_Input().IsMouseBtnDown(HYMOUSE_BtnLeft);
+		bool bLeftClickDown = HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft);
 
 		switch(m_eMouseInputState)
 		{

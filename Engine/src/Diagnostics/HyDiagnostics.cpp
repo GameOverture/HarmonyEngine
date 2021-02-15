@@ -15,9 +15,6 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 #include "HyEngine.h"
 
-extern std::string Hy_DateTime();
-extern HyWindow &Hy_Window();
-
 HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :
 	m_InitStructRef(initStruct),
 	m_TimeRef(timeRef),
@@ -165,7 +162,7 @@ void HyDiagnostics::Show(uint32 uiDiagFlags)
 		m_pDiagOutput->Load();
 
 	m_pDiagOutput->SetShowFlags(uiDiagFlags);
-	m_pDiagOutput->pos.Set(5, Hy_Window().GetHeight() - 5);
+	m_pDiagOutput->pos.Set(5, HyEngine::Window().GetHeight() - 5);
 	m_pDiagOutput->UseWindowCoordinates(0);
 }
 

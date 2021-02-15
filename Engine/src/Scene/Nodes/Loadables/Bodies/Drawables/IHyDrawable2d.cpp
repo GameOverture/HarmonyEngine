@@ -11,8 +11,6 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "HyEngine.h"
 
-extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
-
 IHyDrawable2d::IHyDrawable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
 	IHyBody2d(eNodeType, sPrefix, sName, pParent)
 {
@@ -104,7 +102,7 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 /*virtual*/ void IHyDrawable2d::OnLoaded() /*override*/
 {
 	if(m_hShader == HY_UNUSED_HANDLE)
-		m_hShader = Hy_DefaultShaderHandle(GetType());
+		m_hShader = HyEngine::DefaultShaderHandle(GetType());
 
 	sm_pScene->AddNode_Loaded(this);
 }

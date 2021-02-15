@@ -11,8 +11,6 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable.h"
 #include "HyEngine.h"
 
-extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
-
 IHyDrawable::IHyDrawable() :
 	m_hShader(HY_UNUSED_HANDLE),
 	m_eRenderMode(HYRENDERMODE_Unknown),
@@ -78,7 +76,7 @@ void IHyDrawable::SetShader(HyShader *pShader)
 		m_hShader = pShader->GetHandle();
 	}
 	else
-		m_hShader = Hy_DefaultShaderHandle(_DrawableGetNodeRef().GetType());
+		m_hShader = HyEngine::DefaultShaderHandle(_DrawableGetNodeRef().GetType());
 }
 
 HyShaderHandle IHyDrawable::GetShaderHandle()

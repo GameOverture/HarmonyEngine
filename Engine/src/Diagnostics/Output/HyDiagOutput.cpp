@@ -11,8 +11,6 @@
 #include "Diagnostics/Output/HyDiagOutput.h"
 #include "HyEngine.h"
 
-extern HyInput &Hy_Input();
-
 #define HYDIAG_WIDTH 600.0f
 
 HyDiagOutput::HyDiagOutput() :
@@ -119,7 +117,7 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 
 		if((m_uiShowFlags & HYDIAG_Mouse) != 0)
 		{
-			HyInput &inputRef = Hy_Input();
+			HyInput &inputRef = HyEngine::Input();
 			glm::vec2 ptMousePos = inputRef.GetWorldMousePos();
 			if(inputRef.IsMouseBtnDown(HYMOUSE_BtnLeft))
 				m_txtMouse.SetText("MOUSE DOWN X:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));

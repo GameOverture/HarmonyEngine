@@ -11,8 +11,6 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
 #include "HyEngine.h"
 
-extern HyShaderHandle Hy_DefaultShaderHandle(HyType eType);
-
 IHyDrawable3d::IHyDrawable3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
 	IHyBody3d(eNodeType, sPrefix, sName, pParent)
 {
@@ -65,7 +63,7 @@ IHyDrawable3d &IHyDrawable3d::operator=(IHyDrawable3d &&donor) noexcept
 /*virtual*/ void IHyDrawable3d::OnLoaded() /*override*/
 {
 	if(m_hShader == HY_UNUSED_HANDLE)
-		m_hShader = Hy_DefaultShaderHandle(GetType());
+		m_hShader = HyEngine::DefaultShaderHandle(GetType());
 
 	sm_pScene->AddNode_Loaded(this);
 }

@@ -11,8 +11,6 @@
 #include "Assets/Files/HyFileAudio.h"
 #include "HyEngine.h"
 
-extern std::string Hy_DataDir();
-
 HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyFileAudioImpl *pInternal) :
 	IHyFile(sFilePath, HYFILE_AudioBank, uiManifestIndex),
 	m_pInternal(pInternal)
@@ -34,7 +32,7 @@ bool HyFileAudio::ContainsAsset(uint32 uiAssetChecksum)
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		std::string sFilePath = Hy_DataDir();
+		std::string sFilePath = HyEngine::DataDir();
 		sFilePath += m_sFILE_NAME;
 		if(m_pInternal->Load(sFilePath) == false)
 		{

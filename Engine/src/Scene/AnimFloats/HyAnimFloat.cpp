@@ -13,8 +13,6 @@
 #include "HyEngine.h"
 #include "Utilities/HyMath.h"
 
-extern float Hy_UpdateStep();
-
 HyAnimFloat::HyAnimFloat(float &valueReference, IHyNode &ownerRef, uint32 uiDirtyFlags) :
 	m_fValueRef(valueReference),
 	m_OwnerRef(ownerRef),
@@ -289,7 +287,7 @@ bool HyAnimFloat::UpdateFloat()
 //////////////////////////////////////////////////////////////////////////
 bool HyAnimFloat::_Tween()
 {
-	m_fElapsedTime = HyClamp(m_fElapsedTime + Hy_UpdateStep(), 0.0f, m_fDuration);
+	m_fElapsedTime = HyClamp(m_fElapsedTime + HyEngine::DeltaTime(), 0.0f, m_fDuration);
 	
 	m_fValueRef = m_fStart + (m_fTarget - m_fStart) * m_fpAnimFunc(m_fElapsedTime / m_fDuration);
 	m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
@@ -299,7 +297,7 @@ bool HyAnimFloat::_Tween()
 
 bool HyAnimFloat::_Proc()
 {
-	m_fElapsedTime = HyClamp(m_fElapsedTime + Hy_UpdateStep(), 0.0f, m_fDuration);
+	m_fElapsedTime = HyClamp(m_fElapsedTime + HyEngine::DeltaTime(), 0.0f, m_fDuration);
 
 	m_fValueRef = m_fpAnimFunc(m_fElapsedTime / m_fDuration);
 	m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
@@ -309,7 +307,7 @@ bool HyAnimFloat::_Proc()
 
 bool HyAnimFloat::_Updater()
 {
-	m_fElapsedTime += Hy_UpdateStep();
+	m_fElapsedTime += HyEngine::DeltaTime();
 
 	m_fValueRef = m_fpAnimFunc(m_fElapsedTime);
 	m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS | IHyNode::DIRTY_FromUpdater);

@@ -11,8 +11,6 @@
 #include "Scene/Physics/HyPhysicsGrid2d.h"
 #include "HyEngine.h"
 
-extern float Hy_UpdateStep();
-
 HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*/, float fPixelsPerMeter /*= 80.0f*/, int32 iVelocityIterations /*= 8*/, int32 iPositionIterations /*= 3*/) :
 	b2World(b2Vec2(vGravity.x, vGravity.y)),
 	m_fPixelsPerMeter(fPixelsPerMeter),
@@ -48,7 +46,7 @@ void HyPhysicsGrid2d::Update()
 		//DrawDebugData();
 	}
 
-	Step(Hy_UpdateStep(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	Step(HyEngine::DeltaTime(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 }
 
 std::vector<HyPrimitive2d> &HyPhysicsGrid2d::GetDebugDrawList()

@@ -8,14 +8,13 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
+#include "HyEngine.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Renderer/Components/HyVertexBuffer.h"
 #include "Diagnostics/Console/HyConsole.h"
-
-extern float Hy_UpdateStep();
 
 template<typename NODETYPE, typename ENTTYPE>
 IHySprite<NODETYPE, ENTTYPE>::IHySprite(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
@@ -445,7 +444,7 @@ template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHySprite<NODETYPE, ENTTYPE>::OnLoadedUpdate() /*override*/
 {
 	if(m_bIsAnimPaused == false)
-		m_fElapsedFrameTime += Hy_UpdateStep() * m_fAnimPlayRate;
+		m_fElapsedFrameTime += HyEngine::DeltaTime() * m_fAnimPlayRate;
 
 	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[this->m_uiState];

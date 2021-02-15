@@ -11,8 +11,6 @@
 #include "UI/HyMeter.h"
 #include "HyEngine.h"
 
-extern float Hy_UpdateStep();
-
 HyMeter::HyMeter()
 {
 	ChildAppend(m_SpinText);
@@ -327,7 +325,7 @@ void HyMeter::FormatDigits()
 	if(m_iCurValue == m_iTargetValue)
 		return;
 
-	m_fElapsedTimeRack = HyClamp(m_fElapsedTimeRack + Hy_UpdateStep(), 0.0f, m_fRackingDuration);
+	m_fElapsedTimeRack = HyClamp(m_fElapsedTimeRack + HyEngine::DeltaTime(), 0.0f, m_fRackingDuration);
 
 	if(m_fElapsedTimeRack == m_fRackingDuration)
 	{

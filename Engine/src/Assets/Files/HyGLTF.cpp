@@ -16,8 +16,6 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/quaternion.hpp"
 
-extern std::string Hy_DataDir();
-
 HyGLTF::HyGLTF(const std::string &sIdentifier, uint32 uiManifestIndex) :
 	IHyFile(sIdentifier, HYFILE_GLTF, uiManifestIndex),
 	m_sIDENTIFIER(sIdentifier)
@@ -40,7 +38,7 @@ void HyGLTF::OnLoadThread()
 		//tinygltf::TinyGLTF loader;
 		//std::string sError;
 		//std::string sWarning;
-		//std::string sFilePath = Hy_DataDir() + HYASSETS_PrefabDir + m_sIDENTIFIER + ".gltf";
+		//std::string sFilePath = HyEngine::DataDir() + HYASSETS_PrefabDir + m_sIDENTIFIER + ".gltf";
 		//bool bLoadSuccess = loader.LoadASCIIFromFile(&m_AssetData, &sError, &sWarning, sFilePath);
 		//if(bLoadSuccess == false)
 		//{

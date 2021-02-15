@@ -14,8 +14,6 @@
 #include "Input/HyInputMap.h"
 #include "Window/HyWindow.h"
 
-extern HyInput &Hy_Input();
-
 HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :
 	m_uiNUM_INPUT_MAPS(uiNumInputMappings),
 	m_WindowListRef(windowListRef),

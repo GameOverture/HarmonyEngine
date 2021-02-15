@@ -81,21 +81,19 @@ private:
 	bool Update();
 	bool PollPlatformApi();
 
-	friend bool					Hy_IsInitialized();
-	friend const HarmonyInit &	Hy_InitValues();
-	friend float				Hy_UpdateStep();
-	friend double				Hy_UpdateStepDbl();
-	friend void					Hy_PauseGame(bool bPause);
-	friend HyWindow &			Hy_Window();
-	friend HyWindow &			Hy_Window(uint32 uiWindowIndex);
-	friend HyInput &			Hy_Input();
-	friend HyDiagnostics &		Hy_Diagnostics();
-	friend HyShaderHandle		Hy_DefaultShaderHandle(HyType eType);
-	friend std::string			Hy_DateTime();
-	friend std::string			Hy_DataDir();
-
 public:
+	static bool IsInitialized();
+	static const HarmonyInit &InitValues();
+	static float DeltaTime();
+	static double DeltaTimeD();
+	static void PauseGame(bool bPause);
+	static HyWindow &Window(uint32 uiWindowIndex = 0);
+	static HyInput &Input();
 	static HyAudioHarness &Audio();
+	static HyDiagnostics &Diagnostics();
+	static HyShaderHandle DefaultShaderHandle(HyType eType);
+	static std::string DateTime();
+	static std::string DataDir();
 };
 
 #endif /* HyEngine_h__ */

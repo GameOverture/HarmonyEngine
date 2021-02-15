@@ -177,14 +177,14 @@
 ///*virtual*/ void HySpine2d::OnLoadedUpdate() /*override*/
 //{
 //	// Update the time field used for attachments and such
-//	spSkeleton_update(m_pSpineSkeleton, Hy_UpdateStep());
+//	spSkeleton_update(m_pSpineSkeleton, HyEngine::DeltaTime());
 //
 //	// Calculate the animation state
 //	for(uint32 i = 0; i < m_uiNumAnimStates; ++i)
 //	{
 //		if(m_pIsAnimStateEnabled[i])
 //		{
-//			spAnimationState_update(m_ppAnimStates[i], Hy_UpdateStep() * m_fAnimPlayRate);
+//			spAnimationState_update(m_ppAnimStates[i], HyEngine::DeltaTime() * m_fAnimPlayRate);
 //			spAnimationState_apply(m_ppAnimStates[i], m_pSpineSkeleton);
 //		}
 //	}

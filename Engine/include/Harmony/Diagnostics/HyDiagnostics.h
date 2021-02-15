@@ -27,8 +27,8 @@ class HyScene;
 	#undef HYSETTING_ProfilerEnabled
 #endif
 #ifdef HYSETTING_ProfilerEnabled
-	#define HY_PROFILE_BEGIN(name) Hy_Diagnostics().ProfileBegin(name);
-	#define HY_PROFILE_END Hy_Diagnostics().ProfileEnd();
+	#define HY_PROFILE_BEGIN(name) HyEngine::Diagnostics().ProfileBegin(name);
+	#define HY_PROFILE_END HyEngine::Diagnostics().ProfileEnd();
 #else
 	#define HY_PROFILE_BEGIN(name) 
 	#define HY_PROFILE_END 

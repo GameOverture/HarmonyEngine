@@ -14,8 +14,6 @@
 #include "soil2/SOIL2.h"
 #include "HyEngine.h"
 
-extern std::string Hy_DataDir();
-
 HyFileAtlas::HyFileAtlas(std::string sFileName,
 				 uint32 uiBankId,
 				 uint32 uiIndexInGroup,
@@ -123,7 +121,7 @@ void HyFileAtlas::OnLoadThread()
 		}
 
 		char szTmpBuffer[16];
-		std::string sAtlasFilePath = Hy_DataDir() + HYASSETS_AtlasDir;
+		std::string sAtlasFilePath = HyEngine::DataDir() + HYASSETS_AtlasDir;
 		sprintf(szTmpBuffer, "%05d", m_uiBANK_ID);
 		sAtlasFilePath += szTmpBuffer;
 		sAtlasFilePath += "/";
