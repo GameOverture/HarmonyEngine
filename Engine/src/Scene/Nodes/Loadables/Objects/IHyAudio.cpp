@@ -26,8 +26,8 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, EN
 	m_iPriority(0),
 	m_iLoops(0),
 	m_uiMaxDistance(0),
-	volume(m_fVolume, *this, 0),
-	pitch(m_fPitch, *this, 0)
+	volume(m_fVolume, *this, DIRTY_Audio),
+	pitch(m_fPitch, *this, DIRTY_Audio)
 {
 }
 

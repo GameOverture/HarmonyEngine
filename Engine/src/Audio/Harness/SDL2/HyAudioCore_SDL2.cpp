@@ -143,8 +143,29 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 
 		case CUETYPE_Stop:
 		case CUETYPE_Pause:
-		case CUETYPE_Unpause:
-		case CUETYPE_Attributes: {
+		case CUETYPE_Unpause: {
+			auto nodeIter = m_NodeMap.find(cue.m_pNODE);
+			if(nodeIter == m_NodeMap.end())
+			{
+				HyLogWarning("HyAudioCore_SDL2 could not find audio node to stop/(un)pause");
+				break;
+			}
+			if(cue.m_eCUE_TYPE == CUETYPE_Stop)
+				Mix_HaltChannel(nodeIter->second);
+			else if(cue.m_eCUE_TYPE == CUETYPE_Pause)
+				Mix_Pause(nodeIter->second);
+			else if(cue.m_eCUE_TYPE == CUETYPE_Unpause)
+				Mix_Resume(nodeIter->second);
+			break; }
+		
+		case CUETYPE_Attributes:
+			if(cue.m_pNODE->Is2D())
+				Modify<HyAudio2d>(static_cast<HyAudio2d *>(cue.m_pNODE));
+			else
+				Modify<HyAudio3d>(static_cast<HyAudio3d *>(cue.m_pNODE));
+			break;
+
+
 			//for(auto iter = m_PlayList.begin(); iter != m_PlayList.end(); ++iter)
 			//{
 			//	if(iter->m_pID == cue.m_pNODE)
@@ -173,7 +194,7 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 			//	}
 			//}
 			
-			break; }
+			break;
 
 		default:
 			HyLogError("Unknown sound cue type");
@@ -241,6 +262,19 @@ void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 			m_ChannelMap[iAssignedChannel] = pAudioNode;
 		}
 	}
+}
+
+template<typename NODETYPE>
+void HyAudioCore_SDL2::Modify(NODETYPE *pAudioNode)
+{
+	auto nodeIter = m_NodeMap.find(pAudioNode);
+	if(nodeIter == m_NodeMap.end())
+	{
+		HyLogWarning("HyAudioCore_SDL2 could not find audio node to modify");
+		return;
+	}
+
+	Mix_Volume(nodeIter->second, static_cast<int>(MIX_MAX_VOLUME * pAudioNode->volume.Get()));
 }
 
 /*static*/ void HyAudioCore_SDL2::OnChannelFinished(int32 iChannel)

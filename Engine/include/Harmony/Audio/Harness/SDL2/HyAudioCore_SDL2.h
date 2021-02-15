@@ -55,6 +55,9 @@ private:
 	template<typename NODETYPE>
 	void Play(CueType ePlayType, NODETYPE *pAudioNode);
 
+	template<typename NODETYPE>
+	void Modify(NODETYPE *pAudioNode);
+
 	static void OnChannelFinished(int32 iChannel);
 };
 #endif // defined(HY_USE_SDL2)
