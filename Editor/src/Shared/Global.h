@@ -183,6 +183,7 @@ class HyGlobal
 public:
 	static void Initialize();
 
+	static QList<HyGuiItemType> GetProjItemTypeList();
 	static QList<HyGuiItemType> GetTypeList();
 	static QStringList GetTypeNameList();
 	static HyGuiItemType GetTypeFromString(QString sType);

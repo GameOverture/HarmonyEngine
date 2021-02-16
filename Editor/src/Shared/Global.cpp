@@ -122,6 +122,21 @@
 	sm_ErrorStrings[ASSETERROR_CouldNotPack] = "Could not pack this frame in atlas";
 }
 
+/*static*/ QList<HyGuiItemType> HyGlobal::GetProjItemTypeList()
+{
+	QList<HyGuiItemType> list;
+	list.append(ITEM_Audio);
+	list.append(ITEM_Particles);
+	list.append(ITEM_Text);
+	list.append(ITEM_Spine);
+	list.append(ITEM_Sprite);
+	list.append(ITEM_Prefab);
+	list.append(ITEM_Entity);
+	list.append(ITEM_Entity3d);
+
+	return list;
+}
+
 /*static*/ QList<HyGuiItemType> HyGlobal::GetTypeList()
 {
 	QList<HyGuiItemType> list;

@@ -190,9 +190,9 @@ void Project::LoadExplorerModel()
 			continue;
 		}
 
-		// Determine which enum type of 'HyGuiItemType'
+		// Determine which enum type of 'HyGuiItemType' - if not found in HyGlobal::GetProjItemTypeList skip it
 		HyGuiItemType eItemType = ITEM_Unknown;
-		QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+		QList<HyGuiItemType> typeList = HyGlobal::GetProjItemTypeList();
 		for(int j = 0; j < typeList.size(); ++j)
 		{
 			HyGuiItemType eTmpType = typeList[j];
@@ -202,11 +202,10 @@ void Project::LoadExplorerModel()
 				break;
 			}
 		}
+
+		// Skip any items not found in HyGlobal::GetProjItemTypeList()
 		if(eItemType == ITEM_Unknown)
-		{
-			//HyGuiLog("Project ctor eType == TYPE_Unknown", LOGTYPE_Error);
 			continue;
-		}
 
 		QJsonObject metaItemsOfType = m_ProjectFileData.m_Meta[sItemTypeList[i]].toObject();
 		QJsonObject dataItemsOfType = m_ProjectFileData.m_Data[sItemTypeList[i]].toObject();
@@ -682,12 +681,9 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 
 	// Ensure save object has all the valid types in map
 	bool bTypeNotFound = false;
-	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+	QList<HyGuiItemType> typeList = HyGlobal::GetProjItemTypeList();
 	for(int i = 0; i < typeList.size(); ++i)
 	{
-		if(typeList[i] == ITEM_Project || typeList[i] == ITEM_Filter || typeList[i] == ITEM_AtlasImage)
-			continue;
-
 		QString sTypeName = HyGlobal::ItemName(typeList[i], true);
 		if(dataObjRef.contains(sTypeName) == false)
 		{
@@ -717,7 +713,7 @@ void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
 {
 	bool bItemsDeleted = false;
 
-	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+	QList<HyGuiItemType> typeList = HyGlobal::GetProjItemTypeList();
 	for(auto itemTypeIter = m_ProjectFileData.m_Data.begin(); itemTypeIter != m_ProjectFileData.m_Data.end(); ++itemTypeIter)
 	{
 		HyGuiItemType eType = ITEM_Unknown;
@@ -730,7 +726,7 @@ void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
 			}
 		}
 		if(eType == ITEM_Unknown)
-			HyGuiLog("DeletePrefixAndContents bad", LOGTYPE_Error);
+			HyGuiLog("Project::DeletePrefixAndContents - Item type is unknown", LOGTYPE_Error);
 
 		QJsonObject itemObj = itemTypeIter.value().toObject();
 		for(auto iter = itemObj.begin(); iter != itemObj.end(); ++iter)
@@ -1099,7 +1095,7 @@ void Project::RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObj
 	if(sNewPath.endsWith('/', Qt::CaseInsensitive) == false)
 		sNewPath += '/';
 
-	QList<HyGuiItemType> typeList = HyGlobal::GetTypeList();
+	QList<HyGuiItemType> typeList = HyGlobal::GetProjItemTypeList();
 	for(auto itemTypeIter = dataObjRef.begin(); itemTypeIter != dataObjRef.end(); ++itemTypeIter)
 	{
 		if(itemTypeIter.key().compare("$fileVersion") == 0)
@@ -1130,7 +1126,7 @@ void Project::RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObj
 			}
 		}
 		if(eType == ITEM_Unknown)
-			HyGuiLog("RenamePrefix bad", LOGTYPE_Error);
+			HyGuiLog("Project::RenamePrefixInDataObj could not find item type", LOGTYPE_Error);
 
 		QString sItemTypeName = HyGlobal::ItemName(eType, true);
 		if(dataObjRef.contains(sItemTypeName) == false) {

@@ -4,9 +4,9 @@
 
 /*static*/ bool VersionPatcher::Run(Project *pProj)
 {
-	// **********************************************************
-	// NOTE: 'pProj' is only partially constructed at this point
-	// **********************************************************
+	// ************************************************************
+	// WARNING: 'pProj' is only partially constructed at this point
+	// ************************************************************
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup each file's directory
@@ -70,7 +70,7 @@
 		}
 	}
 
-	// Assemble file names
+	// Assemble correct/proper file names
 	QString sMetaItemsPath = metaDir.absoluteFilePath(QString(HYGUIPATH_ItemsFileName) % HYGUIPATH_MetaExt);
 	QString sDataItemsPath = dataDir.absoluteFilePath(QString(HYGUIPATH_ItemsFileName) % HYGUIPATH_DataExt);
 	QString sMetaAtlasesPath = metaAtlasDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Atlas) % HYGUIPATH_MetaExt);
