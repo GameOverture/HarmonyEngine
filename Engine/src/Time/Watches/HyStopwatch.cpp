@@ -19,11 +19,6 @@ HyStopwatch::~HyStopwatch(void)
 {
 }
 
-double HyStopwatch::TimeElapsed() const
-{
-	return m_dElapsedTime;
-}
-
 void HyStopwatch::Start()
 {
 	m_bIsRunning = true;

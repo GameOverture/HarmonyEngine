@@ -21,6 +21,8 @@ public:
 	HyTimer(double dDuration);
 	virtual ~HyTimer(void);
 
+	double GetDuration() const;
+
 	void Init(double dDuration);
 	void Reset();
 

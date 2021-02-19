@@ -27,6 +27,7 @@ public:
 	virtual ~IHyTimeInst(void);
 
 	bool IsRunning() const;
+	double TimeElapsed() const;
 
 private:
 	void Update(double dDelta);

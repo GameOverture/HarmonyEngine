@@ -30,6 +30,11 @@ HyTimer::~HyTimer(void)
 {
 }
 
+double HyTimer::GetDuration() const
+{
+	return m_dDuration;
+}
+
 void HyTimer::Init(double dDuration)
 {
 	if(dDuration <= 0.0)

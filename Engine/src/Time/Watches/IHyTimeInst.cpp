@@ -33,6 +33,11 @@ bool IHyTimeInst::IsRunning() const
 	return m_bIsRunning;
 }
 
+double IHyTimeInst::TimeElapsed() const
+{
+	return m_dElapsedTime;
+}
+
 void IHyTimeInst::Update(double dDelta)
 {
 	m_dElapsedTime += dDelta;

@@ -18,8 +18,6 @@ public:
 	HyStopwatch(void);
 	virtual ~HyStopwatch(void);
 
-	double TimeElapsed() const;
-
 	void Start();
 	void Pause();
 
