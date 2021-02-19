@@ -40,7 +40,7 @@ void HyTimer::Init(double dDuration)
 
 	m_dElapsedTime = 0.0f;
 	m_dDuration = dDuration;
-	m_bEnabled = false;
+	m_bIsRunning = false;
 }
 
 void HyTimer::Reset()
@@ -56,17 +56,17 @@ void HyTimer::Start()
 		return;
 	}
 	
-	m_bEnabled = true;
+	m_bIsRunning = true;
 }
 
 void HyTimer::Pause()
 {
-	m_bEnabled = false;
+	m_bIsRunning = false;
 }
 
 bool HyTimer::IsExpired() const
 {
-	return m_bEnabled && m_dElapsedTime >= m_dDuration;
+	return m_dElapsedTime >= m_dDuration;
 }
 
 double HyTimer::TimeLeft() const

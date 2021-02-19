@@ -80,7 +80,7 @@ void HyTime::CalcTimeDelta()
 	// Update all timers/stopwatches
 	for(auto timer: m_TimeInstList)
 	{
-		if(timer->IsEnabled())
+		if(timer->IsRunning())
 			timer->Update(m_dCurDeltaTime);
 	}
 }

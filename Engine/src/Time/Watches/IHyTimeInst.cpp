@@ -15,7 +15,7 @@
 HyTime *IHyTimeInst::sm_pTime = nullptr;
 
 IHyTimeInst::IHyTimeInst(void) :
-	m_bEnabled(false),
+	m_bIsRunning(false),
 	m_dElapsedTime(0.0)
 {
 	HyAssert(sm_pTime, "IHyTimeInst was invoked before Engine was initialized (sm_pTime == nullptr)");
@@ -28,9 +28,9 @@ IHyTimeInst::~IHyTimeInst(void)
 		HyRemoveTimeInst(*sm_pTime, this);
 }
 
-bool IHyTimeInst::IsEnabled() const
+bool IHyTimeInst::IsRunning() const
 {
-	return m_bEnabled;
+	return m_bIsRunning;
 }
 
 void IHyTimeInst::Update(double dDelta)

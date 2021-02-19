@@ -26,16 +26,16 @@ double HyStopwatch::TimeElapsed() const
 
 void HyStopwatch::Start()
 {
-	m_bEnabled = true;
+	m_bIsRunning = true;
 }
 
 void HyStopwatch::Pause()
 {
-	m_bEnabled = false;
+	m_bIsRunning = false;
 }
 
 void HyStopwatch::Reset()
 {
-	m_bEnabled = false;
+	m_bIsRunning = false;
 	m_dElapsedTime = 0.0;
 }

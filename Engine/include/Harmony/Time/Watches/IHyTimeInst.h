@@ -19,14 +19,14 @@ class IHyTimeInst
 	static HyTime *	sm_pTime;
 
 protected:
-	bool			m_bEnabled;
+	bool			m_bIsRunning;
 	double			m_dElapsedTime;
 
 public:
 	IHyTimeInst(void);
 	virtual ~IHyTimeInst(void);
 
-	bool IsEnabled() const;
+	bool IsRunning() const;
 
 private:
 	void Update(double dDelta);
