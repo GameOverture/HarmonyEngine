@@ -21,19 +21,19 @@ class HyDiagnostics;
 
 class HyTime
 {
-	double						m_dUpdateTick_Seconds;		// Non-zero value when a 'ThrottledUpdate' is desired
+	double								m_dUpdateTick_Seconds;		// Non-zero value when a 'ThrottledUpdate' is desired
 
-	std::vector<IHyTimeInst *>	m_TimeInstList;
+	static std::vector<IHyTimeInst *>	sm_TimeInstList;
 
-	double						m_dTotalElapsedTime;
-	double						m_dThrottledTime;
+	double								m_dTotalElapsedTime;
+	double								m_dThrottledTime;
 
-	double						m_dSpiralOfDeathCounter;	// In 'ThrottledUpdate' environments a potential to have updates take longer than the alloted time step will cause an infinite loop
-															// This counter keeps track of these scenarios
-	double						m_dCurDeltaTime;
+	double								m_dSpiralOfDeathCounter;	// In 'ThrottledUpdate' environments a potential to have updates take longer than the alloted time step will cause an infinite loop
+																	// This counter keeps track of these scenarios
+	double								m_dCurDeltaTime;
 
-	uint64_t					m_uiPrev;
-	uint64_t					m_uiCur;
+	uint64_t							m_uiPrev;
+	uint64_t							m_uiCur;
 
 public:
 	HyTime(uint32 uiUpdateTickMs);
@@ -60,8 +60,8 @@ public:
 
 	std::string GetDateTime();
 
-	friend void HyAddTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst);
-	friend void HyRemoveTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst);
+	static void AddTimeInst(IHyTimeInst *pTimeInst);
+	static void RemoveTimeInst(IHyTimeInst *pTimeInst);
 };
 
 #endif /* HyTime_h__ */

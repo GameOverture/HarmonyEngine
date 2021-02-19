@@ -12,20 +12,16 @@
 #include "Time/HyTime.h"
 #include "HyEngine.h"
 
-HyTime *IHyTimeInst::sm_pTime = nullptr;
-
 IHyTimeInst::IHyTimeInst(void) :
 	m_bIsRunning(false),
 	m_dElapsedTime(0.0)
 {
-	HyAssert(sm_pTime, "IHyTimeInst was invoked before Engine was initialized (sm_pTime == nullptr)");
-	HyAddTimeInst(*sm_pTime, this);
+	HyTime::AddTimeInst(this);
 }
 
 IHyTimeInst::~IHyTimeInst(void)
 {
-	if(HyEngine::IsInitialized())
-		HyRemoveTimeInst(*sm_pTime, this);
+	HyTime::RemoveTimeInst(this);
 }
 
 bool IHyTimeInst::IsRunning() const

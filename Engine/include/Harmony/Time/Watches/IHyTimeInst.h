@@ -10,13 +10,9 @@
 #ifndef IHyTimeInst_h__
 #define IHyTimeInst_h__
 
-class HyTime;
-
 class IHyTimeInst
 {
 	friend class HyTime;
-
-	static HyTime *	sm_pTime;
 
 protected:
 	bool			m_bIsRunning;

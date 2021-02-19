@@ -16,19 +16,19 @@
 #define HYTIME_ThresholdWarningsEvery 25.0	// How often to print a warning
 #define HYTIME_ThresholdMaxReset 100.0		// Maximum threshold until we hard reset
 
+std::vector<IHyTimeInst *>	HyTime::sm_TimeInstList;
+
 HyTime::HyTime(uint32 uiUpdateTickMs) :
 	m_dTotalElapsedTime(0.0),
 	m_dThrottledTime(0.0),
 	m_dSpiralOfDeathCounter(HYTIME_ThresholdWarningsEvery),
 	m_dCurDeltaTime(0.0)
 {
-	IHyTimeInst::sm_pTime = this;
 	SetUpdateTickMs(uiUpdateTickMs);
 }
 
 HyTime::~HyTime(void)
 {
-	IHyTimeInst::sm_pTime = nullptr;
 }
 
 void HyTime::SetUpdateTickMs(uint32 uiUpdateTickMs)
@@ -78,7 +78,7 @@ void HyTime::CalcTimeDelta()
 	m_dThrottledTime += m_dCurDeltaTime;
 	 
 	// Update all timers/stopwatches
-	for(auto timer: m_TimeInstList)
+	for(auto timer: sm_TimeInstList)
 	{
 		if(timer->IsRunning())
 			timer->Update(m_dCurDeltaTime);
@@ -156,24 +156,24 @@ std::string HyTime::GetDateTime()
 #endif
 }
 
-/*friend*/ void HyAddTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst)
+/*static*/ void HyTime::AddTimeInst(IHyTimeInst *pTimeInst)
 {
 	if(pTimeInst == nullptr)
 		return;
 
-	timeRef.m_TimeInstList.push_back(pTimeInst);
+	sm_TimeInstList.push_back(pTimeInst);
 }
 
-/*friend*/ void HyRemoveTimeInst(HyTime &timeRef, IHyTimeInst *pTimeInst)
+/*static*/ void HyTime::RemoveTimeInst(IHyTimeInst *pTimeInst)
 {
 	if(pTimeInst == nullptr)
 		return;
 
-	for(std::vector<IHyTimeInst*>::iterator it = timeRef.m_TimeInstList.begin(); it != timeRef.m_TimeInstList.end(); ++it)
+	for(std::vector<IHyTimeInst*>::iterator it = sm_TimeInstList.begin(); it != sm_TimeInstList.end(); ++it)
 	{
 		if((*it) == pTimeInst)
 		{
-			it = timeRef.m_TimeInstList.erase(it);
+			it = sm_TimeInstList.erase(it);
 			break;
 		}
 	}
