@@ -123,6 +123,12 @@ void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec
 	SetData();
 }
 
+void HyPrimitive2d::SetAsShape(const HyShape2d &shapeRef)
+{
+	m_LocalBoundingVolume = shapeRef;
+	SetData();
+}
+
 uint32 HyPrimitive2d::GetNumVerts() const
 {
 	return m_uiNumVerts;

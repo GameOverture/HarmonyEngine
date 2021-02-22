@@ -68,6 +68,8 @@ public:
 	// fRot the rotation of the box in local coordinates.
 	void SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
+	void SetAsShape(const HyShape2d &shapeRef);
+
 	uint32 GetNumVerts() const;
 
 	bool IsWireframe();
