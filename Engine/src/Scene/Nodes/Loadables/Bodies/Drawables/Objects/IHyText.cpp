@@ -93,6 +93,13 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
 template<typename NODETYPE, typename ENTTYPE>
+void IHyText<NODETYPE, ENTTYPE>::SetText(const std::stringstream sText)
+{
+	SetText(sText.str());
+}
+
+// Assumes UTF-8 encoding. Accepts newline characters '\n'
+template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetText(const std::string sText)
 {
 	if(sText == m_sRawString)

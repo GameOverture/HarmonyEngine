@@ -136,21 +136,21 @@ void DlgNewItem::ErrorCheck()
 	bool bIsError = false;
 	do
 	{
-		QStringList sSplitPrefixList = sPrefix.split('/');
-		for(int i = 0; i < sSplitPrefixList.size() && bIsError == false; ++i)
-		{
-			QStringList sTypeNameList = HyGlobal::GetTypeNameList();
-			for(int j = 0; j < sTypeNameList.size() && bIsError == false; ++j)
-			{
-				if(sSplitPrefixList[i].compare(sTypeNameList[j], Qt::CaseInsensitive) == 0 ||
-				   ui->txtName->text().compare(sTypeNameList[j], Qt::CaseInsensitive) == 0)
-				{
-					ui->lblError->setText("Error: The prefix and/or name is using a reserved name.");
-					bIsError = true;
-					break;
-				}
-			}
-		}
+		//QStringList sSplitPrefixList = sPrefix.split('/');
+		//for(int i = 0; i < sSplitPrefixList.size() && bIsError == false; ++i)
+		//{
+		//	QStringList sTypeNameList = HyGlobal::GetTypeNameList();
+		//	for(int j = 0; j < sTypeNameList.size() && bIsError == false; ++j)
+		//	{
+		//		if(sSplitPrefixList[i].compare(sTypeNameList[j], Qt::CaseInsensitive) == 0 ||
+		//		   ui->txtName->text().compare(sTypeNameList[j], Qt::CaseInsensitive) == 0)
+		//		{
+		//			ui->lblError->setText("Error: The prefix and/or name is using a reserved name.");
+		//			bIsError = true;
+		//			break;
+		//		}
+		//	}
+		//}
 		
 		if(ui->txtName->text().isEmpty())
 		{

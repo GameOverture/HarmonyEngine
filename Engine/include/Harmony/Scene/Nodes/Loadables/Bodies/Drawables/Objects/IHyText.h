@@ -83,6 +83,7 @@ public:
 	const IHyText &operator=(const IHyText &rhs);
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
+	void SetText(const std::stringstream sText);
 	void SetText(const std::string sText);
 	const std::string &GetText() const;
 
