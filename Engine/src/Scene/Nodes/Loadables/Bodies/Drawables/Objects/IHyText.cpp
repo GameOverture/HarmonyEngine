@@ -131,14 +131,14 @@ template<typename NODETYPE, typename ENTTYPE>
 float IHyText<NODETYPE, ENTTYPE>::GetTextWidth(bool bIncludeScaling /*= true*/)
 {
 	CalculateGlyphInfos();
-	return m_fUsedPixelWidth * (bIncludeScaling ? this->scale.X() : 1.0f);
+	return m_fUsedPixelWidth * (bIncludeScaling ? std::fabs(this->scale.X()) : 1.0f);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 float IHyText<NODETYPE, ENTTYPE>::GetTextHeight(bool bIncludeScaling /*= true*/)
 {
 	CalculateGlyphInfos();
-	return m_fUsedPixelHeight * (bIncludeScaling ? this->scale.Y() : 1.0f);
+	return m_fUsedPixelHeight * (bIncludeScaling ? std::fabs(this->scale.Y()) : 1.0f);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -813,7 +813,7 @@ offsetCalculation:
 			}
 
 			// Push back this line of text's info, and initialize for the next
-			vNewlineInfo.push_back(LineInfo(fCurLineWidth, fCurLineHeight, uiNewlineIndex));
+			vNewlineInfo.push_back(LineInfo(fCurLineWidth, fNewLineOffset, uiNewlineIndex));
 			fLastSpacePosX = 0.0f;
 			fLastCharWidth = 0.0f;
 			fCurLineWidth = 0.0f;

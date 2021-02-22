@@ -77,15 +77,25 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 /*virtual*/ void HyText2d::OnCalcBoundingVolume() /*override*/
 {
-	glm::vec2 ptCenter(0.0f, 0.0f);
+	if(m_uiNumReservedGlyphs == 0)
+		return;
 
-	if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
+	glm::vec2 ptBotLeft(m_pGlyphInfos[0].vOffset.x, m_pGlyphInfos[0].vOffset.y);
+	for(int i = 0; i < m_uiNumReservedGlyphs; ++i)
 	{
-		ptCenter.x = GetTextBox().x * 0.5f;
-		ptCenter.y = GetTextBox().y * 0.5f;
+		if(m_pGlyphInfos[i].vOffset.x < ptBotLeft.x)
+			ptBotLeft.x = m_pGlyphInfos[i].vOffset.x;
+		if(m_pGlyphInfos[i].vOffset.y < ptBotLeft.y)
+			ptBotLeft.y = m_pGlyphInfos[i].vOffset.y;
 	}
+	ptBotLeft.x *= std::fabs(scale.X());
+	ptBotLeft.y *= std::fabs(scale.Y());
 
-	m_LocalBoundingVolume.SetAsBox(m_fUsedPixelWidth * 0.5f, m_fUsedPixelHeight * 0.5f, ptCenter, rot.Get());
+	float fHalfWidth = GetTextWidth(true) * 0.5f;
+	float fHalfHeight = GetTextHeight(true) * 0.5f;
+
+	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
+	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
 }
 
 /*virtual*/ void HyText2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
