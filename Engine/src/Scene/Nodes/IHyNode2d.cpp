@@ -21,8 +21,8 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
+	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_WorldAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -56,8 +56,8 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
+	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_WorldAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -77,8 +77,8 @@ IHyNode2d::IHyNode2d(IHyNode2d &&donor) noexcept :
 	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
 	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
+	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_WorldAABB),
+	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_WorldAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 

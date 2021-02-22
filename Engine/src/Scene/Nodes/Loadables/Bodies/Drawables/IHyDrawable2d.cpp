@@ -79,8 +79,9 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_WorldAABB, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
 		else
 		{
-			m_WorldAABB.lowerBound.SetZero();
-			m_WorldAABB.upperBound.SetZero();
+			// Set to invalid AABB
+			m_WorldAABB.lowerBound.Set(1.0f, 1.0f);
+			m_WorldAABB.upperBound.Set(-1.0f, -1.0f);
 		}
 
 		ClearDirty(DIRTY_WorldAABB);

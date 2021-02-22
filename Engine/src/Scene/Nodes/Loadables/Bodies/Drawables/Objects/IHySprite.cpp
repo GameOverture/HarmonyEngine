@@ -279,7 +279,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameHeight(bool bIncludeScaling /*= t
 		glm::decompose(this->GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
 	}
 
-	return ((frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight()) /*+ frameRef.vOFFSET.x*/) * vScale.y;
+	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
