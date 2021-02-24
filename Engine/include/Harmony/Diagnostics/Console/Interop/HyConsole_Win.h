@@ -10,15 +10,15 @@
 #ifndef HyConsole_Win_h__
 #define HyConsole_Win_h__
 
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
-class HyConsole_Win : public HyConsole
+class HyConsole_Win : public IHyConsole
 {
 public:
 	HyConsole_Win(bool bCreateConsole, const HyWindowInfo &consoleInfo);
 	virtual ~HyConsole_Win();
 
-	virtual void Log(std::ostream &os, const char *szMsg, LogType eType);
+	virtual void OnLog(std::ostream &os, const char *szMsg, LogType eType) override;
 };
 
 #endif /* HyConsole_Win_h__ */

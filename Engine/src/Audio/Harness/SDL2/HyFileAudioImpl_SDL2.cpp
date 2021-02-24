@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Audio/Harness/SDL2/HyFileAudioImpl_SDL2.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 #include "Utilities/HyIO.h"
 
 #if defined(HY_USE_SDL2)

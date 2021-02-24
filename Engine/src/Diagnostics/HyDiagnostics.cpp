@@ -120,18 +120,17 @@ void HyDiagnostics::BootMessage()
 	HyLogSection("Platform");
 
 	HyLog(m_sPlatform);
-	if(m_uiNumCpuCores != 0) {
+
+	if(m_uiNumCpuCores != 0)
 		HyLog("Num CPU Cores:    " << m_uiNumCpuCores);
-	}
-	else {
+	else
 		HyLog("Num CPU Cores:    unknown");
-	}
-	if(m_uiL1CacheSizeBytes != 0) {
-		HyLog("CPU L1 Cache:     " << m_uiL1CacheSizeBytes << " bytes")
-	}
-	else {
+
+	if(m_uiL1CacheSizeBytes != 0)
+		HyLog("CPU L1 Cache:     " << m_uiL1CacheSizeBytes << " bytes");
+	else
 		HyLog("CPU L1 Cache:     unknown");
-	}
+
 	HyLog("System Memory:    " << (m_uiTotalMemBytes / 1024 / 1024) << " MB");
 	if(m_uiVirtualMemBytes != 0) {
 		HyLog("Available Memory: " << (m_uiVirtualMemBytes / 1024 / 1024) << " MB");

@@ -52,7 +52,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Audio/Harness/SDL2/HyAudioCore_SDL2.cpp
 	src/Audio/Harness/SDL2/HyFileAudioImpl_SDL2.cpp
 	src/Diagnostics/HyDiagnostics.cpp
-	src/Diagnostics/Console/HyConsole.cpp
+	src/Diagnostics/Console/IHyConsole.cpp
 	src/Diagnostics/Console/Interop/HyConsole_Std.cpp
 	src/Diagnostics/Console/Interop/HyConsole_Win.cpp
 	src/Diagnostics/GuiComms/HyGuiComms.cpp
@@ -159,7 +159,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Audio/Harness/SDL2/HyAudioCore_SDL2.h
 	include/Harmony/Audio/Harness/SDL2/HyFileAudioImpl_SDL2.h
 	include/Harmony/Diagnostics/HyDiagnostics.h
-	include/Harmony/Diagnostics/Console/HyConsole.h
+	include/Harmony/Diagnostics/Console/IHyConsole.h
 	include/Harmony/Diagnostics/Console/Interop/HyConsole_Std.h
 	include/Harmony/Diagnostics/Console/Interop/HyConsole_Win.h
 	include/Harmony/Diagnostics/GuiComms/HyGuiComms.h

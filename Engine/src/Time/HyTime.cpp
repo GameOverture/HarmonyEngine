@@ -11,7 +11,7 @@
 #include "Time/HyTime.h"
 #include "Scene/HyScene.h"
 #include "Diagnostics/HyDiagnostics.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 #define HYTIME_ThresholdWarningsEvery 25.0	// How often to print a warning
 #define HYTIME_ThresholdMaxReset 100.0		// Maximum threshold until we hard reset

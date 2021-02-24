@@ -13,7 +13,7 @@
 #include "Audio/Harness/SDL2/HyFileAudioImpl_SDL2.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio3d.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 #include "Utilities/HyMath.h"
 
 #if defined(HY_USE_SDL2)
@@ -79,9 +79,8 @@ HyAudioCore_SDL2::HyAudioCore_SDL2() :
 	int iFrequency, iChannels;
 	Uint16 uiFormat;
 	int iNumTimesOpened = Mix_QuerySpec(&iFrequency, &uiFormat, &iChannels);
-	if(!iNumTimesOpened) {
+	if(!iNumTimesOpened)
 		HyLogError("Mix_QuerySpec failed: " << Mix_GetError());
-	}
 	else
 	{
 		const char *szFormat = "Unknown";

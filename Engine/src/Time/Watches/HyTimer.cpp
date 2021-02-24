@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Time/Watches/HyTimer.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 #include "Time/HyTime.h"
 #include "Utilities/HyMath.h"
 

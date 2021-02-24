@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Networking/HyNetworking.h"
 #include "Networking/IHyNetworkClass.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 #ifdef HY_USE_SDL2_NET
 	#ifdef HY_PLATFORM_BROWSER
@@ -61,7 +61,8 @@ bool HyNetworking::CreateClient(std::string sHost, uint16 uiPort, HyTcpSocket &s
 
 	// connect using TCP (client)
 	IPaddress ip;
-	if(SDLNet_ResolveHost(&ip, sHost.c_str(), uiPort) == -1) {
+	if(SDLNet_ResolveHost(&ip, sHost.c_str(), uiPort) == -1)
+	{
 		HyLogError("SDLNet_ResolveHost: " << SDLNet_GetError());
 		return false;
 	}

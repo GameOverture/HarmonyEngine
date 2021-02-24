@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 #include "Assets/HyAssets.h"
 
 /*static*/ HyAssets *IHyLoadable::sm_pHyAssets = nullptr;

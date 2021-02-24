@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyShape2d.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 HyShape2d::HyShape2d() :
 	m_eType(HYSHAPE_Unknown),

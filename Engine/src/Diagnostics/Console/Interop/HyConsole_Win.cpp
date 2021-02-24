@@ -122,11 +122,11 @@ HyConsole_Win::HyConsole_Win(bool bCreateConsole, const HyWindowInfo &consoleInf
 	DeleteMenu(hm, SC_CLOSE, MF_BYCOMMAND);
 }
 
-HyConsole_Win::~HyConsole_Win()
+/*virtual*/ HyConsole_Win::~HyConsole_Win()
 {
 }
 
-/*virtual*/ void HyConsole_Win::Log(std::ostream &os, const char *szMsg, LogType eType)
+/*virtual*/ void HyConsole_Win::OnLog(std::ostream &os, const char *szMsg, LogType eType) /*override*/
 {
 	switch(eType)
 	{

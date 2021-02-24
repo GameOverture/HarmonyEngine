@@ -14,7 +14,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Renderer/Components/HyVertexBuffer.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 template<typename NODETYPE, typename ENTTYPE>
 IHySprite<NODETYPE, ENTTYPE>::IHySprite(std::string sPrefix, std::string sName, ENTTYPE *pParent) :

@@ -14,11 +14,11 @@ HyConsole_Std::HyConsole_Std(bool bCreateConsole, const HyWindowInfo &consoleInf
 {
 }
 
-HyConsole_Std::~HyConsole_Std()
+/*virtual*/ HyConsole_Std::~HyConsole_Std()
 {
 }
 
-/*virtual*/ void HyConsole_Std::Log(std::ostream &os, const char *szMsg, LogType eType)
+/*virtual*/ void HyConsole_Std::OnLog(std::ostream &os, const char *szMsg, LogType eType) /*override*/
 {
 	switch(eType)
 	{

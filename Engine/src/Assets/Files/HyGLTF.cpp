@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/HyGLTF.h"
 #include "Renderer/IHyRenderer.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 #include "HyEngine.h"
 
 #include "glm/gtc/type_ptr.hpp"

@@ -29,7 +29,7 @@
 #include "Renderer/IHyRenderer.h"
 #include "Utilities/HyIO.h"
 #include "Utilities/HyMath.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 #include <fstream>
 #include <iostream>
@@ -807,7 +807,7 @@ void HyAssets::FinalizeData(IHyFile *pData)
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
 
 			if(pData->GetLoadableType() == HYFILE_Atlas)
-				HyLogInfo("Atlas [" << static_cast<HyFileAtlas *>(pData)->GetManifestIndex() << "] deleted")
+				HyLogInfo("Atlas [" << static_cast<HyFileAtlas *>(pData)->GetManifestIndex() << "] deleted");
 			else
 				HyLogInfo("Custom Shader deleted");
 		}

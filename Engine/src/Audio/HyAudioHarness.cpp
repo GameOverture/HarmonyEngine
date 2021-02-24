@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Audio/HyAudioHarness.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 #include "Assets/HyAssets.h"
 #include "Utilities/HyIO.h"
 #include "HyEngine.h"

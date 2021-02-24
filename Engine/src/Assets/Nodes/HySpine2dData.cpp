@@ -11,7 +11,7 @@
 #include "Assets/Nodes/HySpine2dData.h"
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 HySpine2dData::HySpine2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath)

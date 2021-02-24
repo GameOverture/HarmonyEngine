@@ -16,7 +16,7 @@
 #endif
 #include "Window/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 #include "Scene/Nodes/Objects/HyCamera.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 
@@ -36,12 +36,10 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	if(m_WindowListRef.empty() == false)
 	{
 		m_Context = SDL_GL_CreateContext(m_WindowListRef[0]->GetInterop());
-		if(m_Context) {
+		if(m_Context)
 			HyLog("SDL_GL_CreateContext passed");
-		}
-		else {
+		else
 			HyLog("SDL_GL_CreateContext failed");
-		}
 	}
 #endif
 

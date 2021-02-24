@@ -11,7 +11,7 @@
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Files/HyFileAudio.h"
 #include "Audio/HyAudioHarness.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),

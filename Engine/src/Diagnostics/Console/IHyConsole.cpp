@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyConsole.h
+ *	IHyConsole.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2017 Jason Knobler
@@ -8,25 +8,30 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
-HyConsole *HyConsole::sm_pInstance = nullptr;
-std::stringstream HyConsole::sm_ss;
-std::mutex HyConsole::sm_csLog;
+IHyConsole *IHyConsole::sm_pInstance = nullptr;
 
-HyConsole::HyConsole() 
+IHyConsole::IHyConsole() 
 {
-	HyAssert(sm_pInstance == nullptr, "An instance of HyConsole already exists");
+	HyAssert(sm_pInstance == nullptr, "An instance of IHyConsole already exists");
 	sm_pInstance = this;
 }
 
-HyConsole::~HyConsole()
+IHyConsole::~IHyConsole()
 {
 	sm_pInstance = nullptr;
 }
 
-/*static*/ HyConsole *HyConsole::Get()
+/*static*/ IHyConsole *IHyConsole::Get()
 {
 	HyAssert(sm_pInstance, "HyConsole::Get() was invoked before IHyApplication was initialized");
 	return sm_pInstance;
+}
+
+void IHyConsole::Log(std::ostream &os, const char *szMsg, LogType eType)
+{
+	m_csLog.lock();
+	OnLog(os, szMsg, eType);
+	m_csLog.unlock();
 }

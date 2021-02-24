@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Networking/IHyNetworkClass.h"
 #include "Networking/HyNetworking.h"
-#include "Diagnostics/Console/HyConsole.h"
+#include "Diagnostics/Console/IHyConsole.h"
 #include "Utilities/HyMath.h"
 
 /*static*/ HyNetworking *IHyNetworkClass::sm_pNetworking = nullptr;
