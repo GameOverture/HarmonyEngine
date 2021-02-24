@@ -11,21 +11,25 @@
 #include "UI/HyInfoPanel.h"
 #include "Assets/Nodes/HySprite2dData.h"
 
-HyInfoPanel::HyInfoPanel()
+HyInfoPanel::HyInfoPanel(HyEntity2d *pParent /*= nullptr*/) :
+	HyEntity2d(pParent)
 {
 }
 
-HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
+HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+	HyEntity2d(pParent)
 {
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName);
 }
 
-HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY)
+HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent /*= nullptr*/) :
+	HyEntity2d(pParent)
 {
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY);
 }
 
-HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
+HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
+	HyEntity2d(pParent)
 {
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }

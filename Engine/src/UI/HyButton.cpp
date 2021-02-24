@@ -10,24 +10,28 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/HyButton.h"
 
-HyButton::HyButton() :
+HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
+	HyInfoPanel(pParent),
 	m_fpButtonClickedCallback(nullptr)
 {
 }
 
-HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName) :
+HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+	HyInfoPanel(pParent),
 	m_fpButtonClickedCallback(nullptr)
 {
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName);
 }
 
-HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY) :
+HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent /*= nullptr*/) :
+	HyInfoPanel(pParent),
 	m_fpButtonClickedCallback(nullptr)
 {
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY);
 }
 
-HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) :
+HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
+	HyInfoPanel(pParent),
 	m_fpButtonClickedCallback(nullptr)
 {
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
