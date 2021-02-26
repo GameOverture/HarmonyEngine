@@ -89,7 +89,7 @@ void HyInfoPanel::Setup(float fWidth, float fHeight, float fStroke, std::string 
 	m_pProcPanel = HY_NEW ProcPanel(fWidth, fHeight, fStroke, this);
 	m_Text.Init(sTextPrefix, sTextName, this);
 
-	DoSetup(0, 0, 0, 0);
+	DoSetup("", "", sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 void HyInfoPanel::Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
@@ -99,7 +99,7 @@ void HyInfoPanel::Setup(float fWidth, float fHeight, float fStroke, std::string 
 	m_pProcPanel = HY_NEW ProcPanel(fWidth, fHeight, fStroke, this);
 	m_Text.Init(sTextPrefix, sTextName, this);
 
-	DoSetup(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	DoSetup("", "", sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
 void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
@@ -109,7 +109,7 @@ void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::s
 	m_Panel.Init(sPanelPrefix, sPanelName, this);
 	m_Text.Init(sTextPrefix, sTextName, this);
 
-	DoSetup(0, 0, 0, 0);
+	DoSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
@@ -119,7 +119,7 @@ void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::s
 	m_Panel.Init(sPanelPrefix, sPanelName, this);
 	m_Text.Init(sTextPrefix, sTextName, this);
 
-	DoSetup(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	DoSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
 float HyInfoPanel::GetPanelWidth()
@@ -247,7 +247,7 @@ HyText2d &HyInfoPanel::GetTextNode()
 	return m_Text;
 }
 
-/*virtual*/ void HyInfoPanel::DoSetup(int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
+/*virtual*/ void HyInfoPanel::DoSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
 {
 	m_Text.SetTextAlignment(HYALIGN_Center);
 	SetTextLocation(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);

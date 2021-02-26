@@ -65,7 +65,7 @@ public:
 	HyText2d &GetTextNode();
 
 protected:
-	virtual void DoSetup(int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
+	virtual void DoSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
 };
 
 #endif /* HyInfoPanel_h__ */

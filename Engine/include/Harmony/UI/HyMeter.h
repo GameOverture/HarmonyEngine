@@ -97,7 +97,7 @@ protected:
 
 	virtual void OnUpdate() override;
 
-	virtual void DoSetup(int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) override;
+	virtual void DoSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) override;
 };
 
 #endif /* HyMeter_h__ */
