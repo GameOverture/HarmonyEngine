@@ -39,8 +39,11 @@ class HyMeter : public HyInfoPanel
 		HyText2d			m_SpinText_Shown;
 		HyText2d			m_SpinText_Padded;
 
-		SpinText() = default;
-		virtual ~SpinText() = default;
+		SpinText(HyEntity2d *pParent) :
+			HyEntity2d(pParent)
+		{ }
+		virtual ~SpinText()
+		{ }
 
 		void Setup(std::string sTextPrefix, std::string sTextName)
 		{
@@ -56,15 +59,12 @@ class HyMeter : public HyInfoPanel
 	SpinText 				m_SpinText;
 
 public:
-	HyMeter();
-	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName);
-	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY);
-	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
+	HyMeter(HyEntity2d *pParent = nullptr);
+	HyMeter(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
+	HyMeter(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
+	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
+	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
 	virtual ~HyMeter();
-
-	virtual void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName) override;
-	virtual void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY) override;
-	virtual void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) override;
 
 	int32 GetValue();
 	void SetValue(int32 iPennies, float fRackDuration);
@@ -84,21 +84,20 @@ public:
 	bool IsUsingCommas();
 	void SetAsUsingCommas(bool bSet);
 
-	void SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
-
-	void TextSetState(uint32 uiAnimState);
-
-	virtual std::string GetStr() override;
-	virtual void SetStr(std::string sText) override;
+	void SetText(std::string sText) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
+	virtual void SetTextState(uint32 uiStateIndex);
 	virtual void SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY) override;
 	virtual void SetTextAlignment(HyTextAlign eAlignment) override;
+	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 
-private:
+protected:
 	std::string ToStringWithCommas(int32 iValue);
 	std::string FormatString(int32 iValue);
 	void FormatDigits();
 
 	virtual void OnUpdate() override;
+
+	virtual void DoSetup(int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) override;
 };
 
 #endif /* HyMeter_h__ */

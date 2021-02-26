@@ -11,51 +11,46 @@
 #include "UI/HyMeter.h"
 #include "HyEngine.h"
 
-HyMeter::HyMeter()
+HyMeter::HyMeter(HyEntity2d *pParent /*= nullptr*/) :
+	HyInfoPanel(pParent),
+	m_SpinText(this)
 {
-	ChildAppend(m_SpinText);
 }
 
-HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
+HyMeter::HyMeter(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+	HyInfoPanel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, pParent),
+	m_SpinText(this)
 {
-	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName);
+	m_SpinText.Setup(sTextPrefix, sTextName);
+	DoSetup(0, 0, 0, 0);
 }
 
-HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY)
+HyMeter::HyMeter(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
+	HyInfoPanel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
+	m_SpinText(this)
 {
-	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY);
+	m_SpinText.Setup(sTextPrefix, sTextName);
+	DoSetup(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
-HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
+HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+	HyInfoPanel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, pParent),
+	m_SpinText(this)
 {
-	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	m_SpinText.Setup(sTextPrefix, sTextName);
+	DoSetup(0, 0, 0, 0);
+}
+
+HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
+	HyInfoPanel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
+	m_SpinText(this)
+{
+	m_SpinText.Setup(sTextPrefix, sTextName);
+	DoSetup(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
 /*virtual*/ HyMeter::~HyMeter()
 {
-}
-
-/*virtual*/ void HyMeter::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName) /*override*/
-{
-	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
-}
-
-/*virtual*/ void HyMeter::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY) /*override*/
-{
-	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, 0, 0);
-}
-
-/*virtual*/ void HyMeter::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) /*override*/
-{
-	HyInfoPanel::Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
-
-	m_Text.SetMonospacedDigits(true);
-	SetTextLocation(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
-
-	FormatDigits();
-
-	m_SpinText.Setup(sTextPrefix, sTextName);
-	ChildAppend(m_SpinText);
 }
 
 int32 HyMeter::GetValue()
@@ -143,28 +138,12 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 	FormatDigits();
 }
 
-void HyMeter::SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
+/*virtual*/ void HyMeter::SetTextState(uint32 uiStateIndex)
 {
-	m_Text.SetLayerColor(uiLayerIndex, fR, fG, fB);
-	m_SpinText.m_SpinText_Shown.SetLayerColor(uiLayerIndex, fR, fG, fB);
-	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fR, fG, fB);
-}
-
-void HyMeter::TextSetState(uint32 uiAnimState)
-{
-	m_Text.SetState(uiAnimState);
-	m_SpinText.m_SpinText_Shown.SetState(uiAnimState);
-	m_SpinText.m_SpinText_Padded.SetState(uiAnimState);
-}
-
-/*virtual*/ std::string HyMeter::GetStr() /*override*/
-{
-	return FormatString(m_iCurValue);
-}
-
-/*virtual*/ void HyMeter::SetStr(std::string sText) /*override*/
-{
-	HyError("HyMeter::SetStr is not implemented");
+	HyInfoPanel::SetTextState(uiStateIndex);
+	
+	m_SpinText.m_SpinText_Shown.SetState(uiStateIndex);
+	m_SpinText.m_SpinText_Padded.SetState(uiStateIndex);
 }
 
 /*virtual*/ void HyMeter::SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY) /*override*/
@@ -186,6 +165,14 @@ void HyMeter::TextSetState(uint32 uiAnimState)
 	m_SpinText.m_SpinText_Padded.SetTextAlignment(eAlignment);
 
 	FormatDigits();
+}
+
+/*virtual*/ void HyMeter::SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
+{
+	HyInfoPanel::SetTextLayerColor(uiLayerIndex, fR, fG, fB);
+
+	m_SpinText.m_SpinText_Shown.SetLayerColor(uiLayerIndex, fR, fG, fB);
+	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
 std::string HyMeter::ToStringWithCommas(int32 iValue)
@@ -376,3 +363,12 @@ void HyMeter::FormatDigits()
 	}
 }
 
+/*virtual*/ void HyMeter::DoSetup(int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) /*override*/
+{
+	HyInfoPanel::DoSetup(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+
+	m_Text.SetMonospacedDigits(true);
+	SetTextLocation(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+
+	FormatDigits();
+}

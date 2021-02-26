@@ -356,7 +356,7 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 {
 	if(this->AcquireData() == nullptr) {
 		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset invoked on null data");
-		return glm::ivec2(0.0f);
+		return glm::ivec2(0);
 	}
 
 	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);

@@ -115,6 +115,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Time/Watches/HyTimer.cpp
 	src/Time/Watches/IHyTimeInst.cpp
 	src/UI/HyButton.cpp
+	src/UI/HyCheckBox.cpp
 	src/UI/HyInfoPanel.cpp
 	src/UI/HyMeter.cpp
 	src/UI/IHy9Slice.cpp
@@ -226,6 +227,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Time/Watches/HyTimer.h
 	include/Harmony/Time/Watches/IHyTimeInst.h
 	include/Harmony/UI/HyButton.h
+	include/Harmony/UI/HyCheckBox.h
 	include/Harmony/UI/HyInfoPanel.h
 	include/Harmony/UI/HyMeter.h
 	include/Harmony/UI/IHy9Slice.h

@@ -67,7 +67,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 {
 	if(AcquireData() == nullptr)
 	{
-		HyLogWarning("HySprite2d::OnCalcBoundingVolume invoked on null data");
+		//HyLogWarning("HySprite2d::OnCalcBoundingVolume invoked on null data");
 		return;
 	}
 

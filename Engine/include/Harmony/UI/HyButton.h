@@ -14,33 +14,51 @@
 #include "UI/HyInfoPanel.h"
 
 class HyButton;
-typedef std::function<void(HyButton *pSelf)> HyButtonClickedCallback;
+typedef std::function<void(HyButton *, void *)> HyButtonClickedCallback;
+
+enum HyButtonState
+{
+	HYBUTTONSTATE_Idle = 0,
+	HYBUTTONSTATE_Down,
+	HYBUTTONSTATE_Highlighted,
+	HYBUTTONSTATE_HighlightedDown,
+	HYBUTTONSTATE_Hover,
+	HYBUTTONSTATE_HighlightedHover
+};
 
 class HyButton : public HyInfoPanel
 {
-	HyButtonClickedCallback		m_fpButtonClickedCallback = nullptr;
+protected:
+	HyButtonClickedCallback		m_fpButtonClickedCallback;
+	void *						m_pParam;
+
+	bool						m_bAllowDownState;
+	bool						m_bAllowHoverState;
+	
+	bool						m_bIsHighlighted;
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
+	HyButton(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
+	HyButton(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
 	HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
-	HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, HyEntity2d *pParent = nullptr);
 	HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
 	virtual ~HyButton();
 
-	virtual void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName) override;
-	virtual void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY) override;
-	virtual void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) override;
+	virtual void SetAsDisabled(bool bIsDisabled);
 
-	void SetAsSelected(bool bInvokeButtonClicked);
-	void SetAsDisabled();
+	bool IsHighlighted() const;
+	void SetAsHighlighted(bool bIsHighlighted);
 
-	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack);
+	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr);
+	void InvokeButtonClicked();
 
-private:
-	virtual void OnMouseDown() override final;
-	virtual void OnMouseUp() override final;
-	virtual void OnMouseLeave() override final;
-	virtual void OnMouseClicked() override final;
+protected:
+	virtual void OnMouseEnter() override;
+	virtual void OnMouseLeave() override;
+	virtual void OnMouseDown() override;
+	virtual void OnMouseUp() override;
+	virtual void OnMouseClicked() override;
 };
 
 #endif /* HyButton_h__ */

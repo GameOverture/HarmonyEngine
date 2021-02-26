@@ -67,6 +67,12 @@ void IHyLoadable2d::Init(std::string sPrefix, std::string sName, HyEntity2d *pPa
 	}
 }
 
+void IHyLoadable2d::Uninit()
+{
+	Unload();
+	Init("", "", m_pParent);
+}
+
 /*virtual*/ void IHyLoadable2d::Update() /*override*/
 {
 	IHyNode2d::Update();

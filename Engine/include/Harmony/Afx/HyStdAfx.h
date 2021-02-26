@@ -135,16 +135,6 @@ enum HyPlayListMode
 	HYPLAYLIST_SequentialGlobal
 };
 
-enum HyButtonState
-{
-	HYBUTTONSTATE_Pressable = 0,
-	HYBUTTONSTATE_Down,
-	HYBUTTONSTATE_Disabled,
-	HYBUTTONSTATE_Selected,
-	HYBUTTONSTATE_DisabledSelected,
-	HYBUTTONSTATE_Hover
-};
-
 enum HyLoadState
 {
 	HYLOADSTATE_Inactive = 0,

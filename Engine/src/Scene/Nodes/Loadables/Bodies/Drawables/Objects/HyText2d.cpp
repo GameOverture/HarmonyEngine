@@ -81,7 +81,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		return;
 
 	glm::vec2 ptBotLeft(m_pGlyphInfos[0].vOffset.x, m_pGlyphInfos[0].vOffset.y);
-	for(int i = 0; i < m_uiNumReservedGlyphs; ++i)
+	for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
 	{
 		if(m_pGlyphInfos[i].vOffset.x < ptBotLeft.x)
 			ptBotLeft.x = m_pGlyphInfos[i].vOffset.x;

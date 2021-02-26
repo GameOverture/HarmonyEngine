@@ -863,7 +863,7 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	std::vector<HyTextureFormat> formatList = GetTextureFormatList();
 
 	std::vector<std::string> list;
-	for(int i = 0; i < formatList.size(); ++i)
+	for(int32 i = 0; i < static_cast<int32>(formatList.size()); ++i)
 		list.push_back(GetTextureFormatName(formatList[i]));
 
 	return list;
@@ -898,7 +898,7 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	std::transform(sFormat.begin(), sFormat.end(), sFormat.begin(), ::tolower);
 
 	std::vector<std::string> sTextureFormatList = GetTextureFormatNameList();
-	for(int i = 0; i < sTextureFormatList.size(); ++i)
+	for(int32 i = 0; i < static_cast<int32>(sTextureFormatList.size()); ++i)
 	{
 		std::string sCurStr = sTextureFormatList[i];
 		std::transform(sCurStr.begin(), sCurStr.end(), sCurStr.begin(), ::tolower);
@@ -930,7 +930,7 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	std::vector<HyTextureFiltering> formatList = GetTextureFilteringList();
 
 	std::vector<std::string> list;
-	for(int i = 0; i < formatList.size(); ++i)
+	for(int32 i = 0; i < static_cast<int32>(formatList.size()); ++i)
 		list.push_back(GetTextureFilteringName(formatList[i]));
 
 	return list;
@@ -965,7 +965,7 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	std::transform(sFilter.begin(), sFilter.end(), sFilter.begin(), ::tolower);
 
 	std::vector<std::string> sTextureFilteringList = GetTextureFilteringNameList();
-	for(int i = 0; i < sTextureFilteringList.size(); ++i)
+	for(int32 i = 0; i < static_cast<int32>(sTextureFilteringList.size()); ++i)
 	{
 		std::string sCurStr = sTextureFilteringList[i];
 		std::transform(sCurStr.begin(), sCurStr.end(), sCurStr.begin(), ::tolower);

@@ -35,6 +35,7 @@
 #include "UI/IHy9Slice.h"
 #include "UI/HyInfoPanel.h"
 #include "UI/HyButton.h"
+#include "UI/HyCheckBox.h"
 #include "UI/HyMeter.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyImage.h"

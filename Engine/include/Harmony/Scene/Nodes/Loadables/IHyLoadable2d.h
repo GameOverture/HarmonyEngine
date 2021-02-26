@@ -27,6 +27,7 @@ public:
 	IHyLoadable2d &operator=(IHyLoadable2d &&donor);
 
 	void Init(std::string sPrefix, std::string sName, HyEntity2d *pParent);
+	void Uninit();
 
 protected:
 	virtual void Update() override;
