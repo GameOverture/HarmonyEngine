@@ -41,12 +41,12 @@ public:
 
 #ifdef HY_PLATFORM_GUI
 	// TODO: Pipe messages to the Editor Tool
-	#define HyLog(msg) { }
-	#define HyLogWarning(msg) { }
-	#define HyLogError(msg) { }
-	#define HyLogInfo(msg) { }
-	#define HyLogTitle(msg) { }
-	#define HyLogSection(msg) { }
+	#define HyLog(msg) do { } while (false)
+	#define HyLogWarning(msg) do { } while (false)
+	#define HyLogError(msg) do { } while (false)
+	#define HyLogInfo(msg) do { } while (false)
+	#define HyLogTitle(msg) do { } while (false)
+	#define HyLogSection(msg) do { } while (false)
 #else
 	#define HyLog(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Regular)
 	#define HyLogWarning(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Warning)
