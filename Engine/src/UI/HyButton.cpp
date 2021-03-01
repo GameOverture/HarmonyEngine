@@ -185,12 +185,12 @@ void HyButton::InvokeButtonClicked()
 
 	if(IsHighlighted() == false)
 	{
-		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
+		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down || m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
 			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
 	}
 	else
 	{
-		if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
+		if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedDown || m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
 			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
 	}
 }
