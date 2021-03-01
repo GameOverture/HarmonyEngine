@@ -45,7 +45,7 @@ public:
 	HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
 	virtual ~HyButton();
 
-	virtual void SetAsDisabled(bool bIsDisabled);
+	virtual void SetAsDisabled(bool bIsDisabled) override;
 
 	bool IsHighlighted() const;
 	void SetAsHighlighted(bool bIsHighlighted);

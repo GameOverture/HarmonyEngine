@@ -49,6 +49,7 @@ public:
 	float GetPanelWidth();
 	float GetPanelHeight();
 
+	uint32 GetSpriteState() const;
 	virtual void SetSpriteState(uint32 uiStateIndex);
 
 	std::string GetText() const;

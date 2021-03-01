@@ -69,7 +69,7 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 {
 }
 
-/*virtual*/ void HyButton::SetAsDisabled(bool bIsDisabled)
+/*virtual*/ void HyButton::SetAsDisabled(bool bIsDisabled) /*override*/
 {
 	HyInfoPanel::SetAsDisabled(bIsDisabled);
 	m_bIsDisabled ? DisableMouseInput() : EnableMouseInput();

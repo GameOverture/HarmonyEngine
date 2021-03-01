@@ -135,7 +135,7 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 	FormatDigits();
 }
 
-/*virtual*/ void HyMeter::SetTextState(uint32 uiStateIndex)
+/*virtual*/ void HyMeter::SetTextState(uint32 uiStateIndex) /*override*/
 {
 	HyInfoPanel::SetTextState(uiStateIndex);
 	
@@ -164,7 +164,7 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 	FormatDigits();
 }
 
-/*virtual*/ void HyMeter::SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
+/*virtual*/ void HyMeter::SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) /*override*/
 {
 	HyInfoPanel::SetTextLayerColor(uiLayerIndex, fR, fG, fB);
 

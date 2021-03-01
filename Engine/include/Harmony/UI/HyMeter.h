@@ -85,10 +85,10 @@ public:
 	void SetAsUsingCommas(bool bSet);
 
 	void SetText(std::string sText) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
-	virtual void SetTextState(uint32 uiStateIndex);
+	virtual void SetTextState(uint32 uiStateIndex) override;
 	virtual void SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY) override;
 	virtual void SetTextAlignment(HyTextAlign eAlignment) override;
-	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
+	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
 
 protected:
 	std::string ToStringWithCommas(int32 iValue);

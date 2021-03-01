@@ -150,6 +150,11 @@ float HyInfoPanel::GetPanelHeight()
 		return m_Panel.GetCurFrameHeight(true);
 }
 
+uint32 HyInfoPanel::GetSpriteState() const
+{
+	return m_Panel.GetState();
+}
+
 /*virtual*/ void HyInfoPanel::SetSpriteState(uint32 uiStateIndex)
 {
 	if(m_Panel.IsLoadDataValid() == false)
