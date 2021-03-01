@@ -112,7 +112,7 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 
 bool HyButton::IsHideDownState() const
 {
-	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideDownState) == 0;
+	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideDownState) != 0;
 }
 
 void HyButton::SetHideDownState(bool bIsHideDownState)
@@ -132,7 +132,7 @@ void HyButton::SetHideDownState(bool bIsHideDownState)
 
 bool HyButton::IsHideHoverState() const
 {
-	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideHoverState) == 0;
+	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideHoverState) != 0;
 }
 
 void HyButton::SetHideHoverState(bool bIsHideHoverState)
