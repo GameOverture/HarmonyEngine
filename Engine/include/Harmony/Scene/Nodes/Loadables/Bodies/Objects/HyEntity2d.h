@@ -22,12 +22,12 @@ class HyEntity2d : public IHyBody2d
 protected:
 	std::vector<IHyNode2d *>				m_ChildList;
 
-	enum Attributes
+	enum Entity2dAttributes
 	{
-		ATTRIBFLAG_MouseInput				= 1 << 1,
-		ATTRIBFLAG_ReverseDisplayOrder		= 1 << 2,
+		ENT2DATTRIB_MouseInput				= 1 << 1,
+		ENT2DATTRIB_ReverseDisplayOrder		= 1 << 2,
 	};
-	uint32									m_uiAttributes;
+	uint32									m_uiEntAttribs;
 
 	enum MouseInputState
 	{

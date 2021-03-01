@@ -29,13 +29,8 @@ enum HyButtonState
 class HyButton : public HyInfoPanel
 {
 protected:
-	HyButtonClickedCallback		m_fpButtonClickedCallback;
-	void *						m_pParam;
-
-	bool						m_bAllowDownState;
-	bool						m_bAllowHoverState;
-	
-	bool						m_bIsHighlighted;
+	HyButtonClickedCallback		m_fpBtnClickedCallback;
+	void *						m_pBtnClickedParam;
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
@@ -46,9 +41,13 @@ public:
 	virtual ~HyButton();
 
 	virtual void SetAsDisabled(bool bIsDisabled) override;
+	virtual void SetAsHighlighted(bool bIsHighlighted) override;
 
-	bool IsHighlighted() const;
-	void SetAsHighlighted(bool bIsHighlighted);
+	bool IsHideDownState() const;
+	void SetHideDownState(bool bIsHideDownState);
+
+	bool IsHideHoverState() const;
+	void SetHideHoverState(bool bIsHideHoverState);
 
 	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr);
 	void InvokeButtonClicked();

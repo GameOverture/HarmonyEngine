@@ -13,56 +13,41 @@
 
 HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 	HyInfoPanel(pParent),
-	m_fpButtonClickedCallback(nullptr),
-	m_pParam(nullptr),
-	m_bAllowDownState(true),
-	m_bAllowHoverState(true),
-	m_bIsHighlighted(false)
+	m_fpBtnClickedCallback(nullptr),
+	m_pBtnClickedParam(nullptr)
 {
 }
 
 HyButton::HyButton(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyInfoPanel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, pParent),
-	m_fpButtonClickedCallback(nullptr),
-	m_pParam(nullptr),
-	m_bAllowDownState(true),
-	m_bAllowHoverState(true),
-	m_bIsHighlighted(false)
+	m_fpBtnClickedCallback(nullptr),
+	m_pBtnClickedParam(nullptr)
 {
-	SetAsDisabled(m_bIsDisabled);
+	OnSetup("", "", sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 HyButton::HyButton(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
 	HyInfoPanel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
-	m_fpButtonClickedCallback(nullptr),
-	m_pParam(nullptr),
-	m_bAllowDownState(true),
-	m_bAllowHoverState(true),
-	m_bIsHighlighted(false)
+	m_fpBtnClickedCallback(nullptr),
+	m_pBtnClickedParam(nullptr)
 {
-	SetAsDisabled(m_bIsDisabled);
+	OnSetup("", "", sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
 HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyInfoPanel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, pParent),
-	m_fpButtonClickedCallback(nullptr),
-	m_pParam(nullptr),
-	m_bAllowDownState(true),
-	m_bAllowHoverState(true),
-	m_bIsHighlighted(false)
+	m_fpBtnClickedCallback(nullptr),
+	m_pBtnClickedParam(nullptr)
 {
-	SetAsDisabled(m_bIsDisabled);
+	OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
 	HyInfoPanel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
-	m_fpButtonClickedCallback(nullptr),
-	m_pParam(nullptr),
-	m_bAllowDownState(true),
-	m_bAllowHoverState(true),
-	m_bIsHighlighted(false)
+	m_fpBtnClickedCallback(nullptr),
+	m_pBtnClickedParam(nullptr)
 {
-	SetAsDisabled(m_bIsDisabled);
+	OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
 /*virtual*/ HyButton::~HyButton()
@@ -72,82 +57,103 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 /*virtual*/ void HyButton::SetAsDisabled(bool bIsDisabled) /*override*/
 {
 	HyInfoPanel::SetAsDisabled(bIsDisabled);
-	m_bIsDisabled ? DisableMouseInput() : EnableMouseInput();
+	IsDisabled() ? DisableMouseInput() : EnableMouseInput();
 
-	if(m_Panel.IsLoadDataValid() == false)
+	if(m_SpritePanel.IsLoadDataValid() == false)
 		return;
 	
-	if(m_bIsDisabled)
+	if(IsDisabled())
 	{
-		if(m_Panel.GetState() == HYBUTTONSTATE_Down || m_Panel.GetState() == HYBUTTONSTATE_Hover)
-			m_Panel.SetState(HYBUTTONSTATE_Idle);
-		else if(m_Panel.GetState() == HYBUTTONSTATE_HighlightedDown || m_Panel.GetState() == HYBUTTONSTATE_HighlightedHover)
-			m_Panel.SetState(HYBUTTONSTATE_Highlighted);
+		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down || m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
+		else if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedDown || m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
 	}
 }
 
-bool HyButton::IsHighlighted() const
+/*virtual*/ void HyButton::SetAsHighlighted(bool bIsHighlighted) /*override*/
 {
-	return m_bIsHighlighted;
-}
-
-void HyButton::SetAsHighlighted(bool bIsHighlighted)
-{
-	if(m_bIsHighlighted == bIsHighlighted)
+	if(bIsHighlighted == IsHighlighted())
 		return;
 
-	m_bIsHighlighted = bIsHighlighted;
+	HyInfoPanel::SetAsHighlighted(bIsHighlighted);
 
-	if(m_pProcPanel)
-	{
-		if(m_bIsHighlighted)
-		{
-			m_pProcPanel->m_Stroke.SetTint(0.0f, 0.0f, 1.0f);
-			m_pProcPanel->m_Stroke.SetLineThickness(m_pProcPanel->m_Stroke.GetLineThickness() * 2.0f);
-		}
-		else
-		{
-			m_pProcPanel->m_Stroke.SetTint(0.3f, 0.3f, 0.3f);
-			m_pProcPanel->m_Stroke.SetLineThickness(m_pProcPanel->m_Stroke.GetLineThickness() / 2.0f);
-		}
-	}
-
-	if(m_Panel.IsLoadDataValid() == false)
+	if(m_SpritePanel.IsLoadDataValid() == false)
 		return;
 
-	switch(m_Panel.GetState())
+	switch(m_SpritePanel.GetState())
 	{
 	case HYBUTTONSTATE_Idle:
-		if(m_bIsHighlighted)
-			m_Panel.SetState(HYBUTTONSTATE_Highlighted);
+		if(IsHighlighted())
+			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
 		break;
 	case HYBUTTONSTATE_Down:
-		if(m_bIsHighlighted)
-			m_Panel.SetState(HYBUTTONSTATE_HighlightedDown);
+		if(IsHighlighted())
+			m_SpritePanel.SetState(HYBUTTONSTATE_HighlightedDown);
 		break;
 	case HYBUTTONSTATE_Highlighted:
-		if(m_bIsHighlighted == false)
-			m_Panel.SetState(HYBUTTONSTATE_Idle);
+		if(IsHighlighted() == false)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
 		break;
 	case HYBUTTONSTATE_HighlightedDown:
-		if(m_bIsHighlighted == false)
-			m_Panel.SetState(HYBUTTONSTATE_Down);
+		if(IsHighlighted() == false)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Down);
 		break;
 	case HYBUTTONSTATE_Hover:
-		if(m_bIsHighlighted)
-			m_Panel.SetState(HYBUTTONSTATE_HighlightedHover);
+		if(IsHighlighted())
+			m_SpritePanel.SetState(HYBUTTONSTATE_HighlightedHover);
 		break;
 	case HYBUTTONSTATE_HighlightedHover:
-		if(m_bIsHighlighted == false)
-			m_Panel.SetState(HYBUTTONSTATE_Hover);
+		if(IsHighlighted() == false)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Hover);
 		break;
 	}
+}
+
+bool HyButton::IsHideDownState() const
+{
+	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideDownState) == 0;
+}
+
+void HyButton::SetHideDownState(bool bIsHideDownState)
+{
+	if(bIsHideDownState)
+	{
+		m_uiInfoPanelAttribs |= INFOPANELATTRIB_HideDownState;
+
+		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
+		else if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedDown)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
+	}
+	else
+		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_HideDownState;
+}
+
+bool HyButton::IsHideHoverState() const
+{
+	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideHoverState) == 0;
+}
+
+void HyButton::SetHideHoverState(bool bIsHideHoverState)
+{
+	if(bIsHideHoverState)
+	{
+		m_uiInfoPanelAttribs |= INFOPANELATTRIB_HideHoverState;
+
+		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
+		else if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
+	}
+	else
+		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_HideHoverState;
 }
 
 void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/)
 {
-	m_fpButtonClickedCallback = fpCallBack;
-	m_pParam = pParam;
+	m_fpBtnClickedCallback = fpCallBack;
+	m_pBtnClickedParam = pParam;
 }
 
 void HyButton::InvokeButtonClicked()
@@ -157,62 +163,62 @@ void HyButton::InvokeButtonClicked()
 
 /*virtual*/ void HyButton::OnMouseEnter() /*override*/
 {
-	if(m_bAllowHoverState == false || m_Panel.IsLoadDataValid() == false)
+	if(IsHideHoverState() || m_SpritePanel.IsLoadDataValid() == false)
 		return;
 	
-	if(m_bIsHighlighted == false)
+	if(IsHighlighted() == false)
 	{
-		if(m_Panel.GetState() == HYBUTTONSTATE_Idle && m_Panel.GetNumStates() > HYBUTTONSTATE_Hover)
-			m_Panel.SetState(HYBUTTONSTATE_Hover);
+		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Idle && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Hover)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Hover);
 	}
 	else
 	{
-		if(m_Panel.GetState() == HYBUTTONSTATE_Highlighted && m_Panel.GetNumStates() > HYBUTTONSTATE_HighlightedHover)
-			m_Panel.SetState(HYBUTTONSTATE_HighlightedHover);
+		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Highlighted && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedHover)
+			m_SpritePanel.SetState(HYBUTTONSTATE_HighlightedHover);
 	}
 }
 
 /*virtual*/ void HyButton::OnMouseLeave() /*override*/
 {
-	if(m_Panel.IsLoadDataValid() == false)
+	if(m_SpritePanel.IsLoadDataValid() == false)
 		return;
 
-	if(m_bIsHighlighted == false)
+	if(IsHighlighted() == false)
 	{
-		if(m_Panel.GetState() == HYBUTTONSTATE_Hover)
-			m_Panel.SetState(HYBUTTONSTATE_Idle);
+		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
 	}
 	else
 	{
-		if(m_Panel.GetState() == HYBUTTONSTATE_HighlightedHover)
-			m_Panel.SetState(HYBUTTONSTATE_Highlighted);
+		if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
 	}
 }
 
 /*virtual*/ void HyButton::OnMouseDown() /*override*/
 {
-	if(m_bAllowDownState == false || m_Panel.IsLoadDataValid() == false)
+	if(IsHideDownState() || m_SpritePanel.IsLoadDataValid() == false)
 		return;
 
-	if(m_bIsHighlighted == false)
+	if(IsHighlighted() == false)
 	{
-		if(m_Panel.GetNumStates() > HYBUTTONSTATE_Down)
-			m_Panel.SetState(HYBUTTONSTATE_Down);
+		if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Down)
+			m_SpritePanel.SetState(HYBUTTONSTATE_Down);
 	}
 	else
 	{
-		if(m_Panel.GetNumStates() > HYBUTTONSTATE_HighlightedDown)
-			m_Panel.SetState(HYBUTTONSTATE_HighlightedDown);
+		if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedDown)
+			m_SpritePanel.SetState(HYBUTTONSTATE_HighlightedDown);
 	}
 }
 
 /*virtual*/ void HyButton::OnMouseUp() /*override*/
 {
-	m_Panel.SetState(m_bIsHighlighted ? HYBUTTONSTATE_Highlighted : HYBUTTONSTATE_Idle);
+	m_SpritePanel.SetState(IsHighlighted() ? HYBUTTONSTATE_Highlighted : HYBUTTONSTATE_Idle);
 }
 
 /*virtual*/ void HyButton::OnMouseClicked() /*override*/
 {
-	if(m_fpButtonClickedCallback)
-		m_fpButtonClickedCallback(this, m_pParam);
+	if(m_fpBtnClickedCallback)
+		m_fpBtnClickedCallback(this, m_pBtnClickedParam);
 }

@@ -16,7 +16,7 @@
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyBody2d(HYTYPE_Entity, "", "", pParent),
-	m_uiAttributes(0),
+	m_uiEntAttribs(0),
 	m_eMouseInputState(MOUSEINPUT_None),
 	m_pPhysicsBody(nullptr)
 {
@@ -25,7 +25,7 @@ HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 	IHyBody2d(std::move(donor)),
 	m_ChildList(std::move(donor.m_ChildList)),
-	m_uiAttributes(std::move(donor.m_uiAttributes)),
+	m_uiEntAttribs(std::move(donor.m_uiEntAttribs)),
 	m_eMouseInputState(std::move(donor.m_eMouseInputState)),
 	m_pPhysicsBody(std::move(donor.m_pPhysicsBody))
 {
@@ -44,7 +44,7 @@ HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor) noexcept
 	IHyBody2d::operator=(std::move(donor));
 
 	m_ChildList = std::move(donor.m_ChildList);
-	m_uiAttributes = std::move(donor.m_uiAttributes);
+	m_uiEntAttribs = std::move(donor.m_uiEntAttribs);
 	m_eMouseInputState = std::move(donor.m_eMouseInputState);
 	m_pPhysicsBody = std::move(m_pPhysicsBody);
 
@@ -331,12 +331,12 @@ std::vector<IHyNode2d *> HyEntity2d::FindChildren(std::function<bool(IHyNode2d *
 
 void HyEntity2d::EnableMouseInput()
 {
-	m_uiAttributes |= ATTRIBFLAG_MouseInput;
+	m_uiEntAttribs |= ENT2DATTRIB_MouseInput;
 }
 
 void HyEntity2d::DisableMouseInput()
 {
-	m_uiAttributes &= ~ATTRIBFLAG_MouseInput;
+	m_uiEntAttribs &= ~ENT2DATTRIB_MouseInput;
 }
 
 void HyEntity2d::PhysInit(HyPhysicsGrid2d &physGridRef,
@@ -613,15 +613,15 @@ void HyEntity2d::PhysRelease()
 
 bool HyEntity2d::IsReverseDisplayOrder() const
 {
-	return (m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder);
+	return (m_uiEntAttribs & ENT2DATTRIB_ReverseDisplayOrder);
 }
 
 void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 {
 	if(bReverse)
-		m_uiAttributes |= ATTRIBFLAG_ReverseDisplayOrder;
+		m_uiEntAttribs |= ENT2DATTRIB_ReverseDisplayOrder;
 	else
-		m_uiAttributes &= ~ATTRIBFLAG_ReverseDisplayOrder;
+		m_uiEntAttribs &= ~ENT2DATTRIB_ReverseDisplayOrder;
 
 	SetDisplayOrder(m_iDisplayOrder, false);
 }
@@ -630,7 +630,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 {
 	int32 iOrderValue = m_iDisplayOrder + 1;
 
-	if((m_uiAttributes & ATTRIBFLAG_ReverseDisplayOrder) == 0)
+	if((m_uiEntAttribs & ENT2DATTRIB_ReverseDisplayOrder) == 0)
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
@@ -680,7 +680,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 {
 	IHyBody2d::Update();
 
-	if((m_uiAttributes & ATTRIBFLAG_MouseInput) != 0)
+	if((m_uiEntAttribs & ENT2DATTRIB_MouseInput) != 0)
 	{
 		glm::vec2 ptMousePt;
 		bool bMouseInBounds;

@@ -18,20 +18,28 @@
 class HyInfoPanel : public HyEntity2d
 {
 protected:
-	class ProcPanel : public HyEntity2d
+	class PrimPanel : public HyEntity2d
 	{
 	public:
 		HyPrimitive2d		m_Fill;
 		HyPrimitive2d		m_Stroke;
 
-		ProcPanel(float fWidth, float fHeight, float fStroke, HyEntity2d *pParent);
+		PrimPanel(float fWidth, float fHeight, float fStroke, HyEntity2d *pParent);
 	};
-	ProcPanel *				m_pProcPanel;	// Used when sprite is not specified
-
-	HySprite2d				m_Panel;
+	PrimPanel *				m_pPrimPanel;			// Optionally construct a primitive panel instead of using HySprite2d
+	HySprite2d				m_SpritePanel;
 	HyText2d				m_Text;
 
-	bool					m_bIsDisabled;
+	enum InfoPanelAttributes
+	{
+		INFOPANELATTRIB_IsPrimitive = 1 << 0,		// Whether the panel is constructed via HyPrimitive2d's instead of a HySprite2d
+		INFOPANELATTRIB_HideDownState = 1 << 1,		// Don't visually indicate down state (if available)
+		INFOPANELATTRIB_HideHoverState = 1 << 2,	// Don't visually indicate hover state (if available)
+		INFOPANELATTRIB_HideDisabledState = 1 << 3,	// Don't visually indicate if disabled
+		INFOPANELATTRIB_IsDisabled = 1 << 4,
+		INFOPANELATTRIB_IsHighlighted = 1 << 5,
+	};
+	uint32					m_uiInfoPanelAttribs;
 
 public:
 	HyInfoPanel(HyEntity2d *pParent = nullptr);
@@ -59,14 +67,22 @@ public:
 	virtual void SetTextAlignment(HyTextAlign eAlignment);
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 
+	bool IsPrimitivePanel() const;
+
 	bool IsDisabled() const;
 	virtual void SetAsDisabled(bool bIsDisabled);
 
+	bool IsHighlighted() const;
+	virtual void SetAsHighlighted(bool bIsHighlighted);
+
+	HyEntity2d *GetPrimitiveNode();
 	HySprite2d &GetSpriteNode();
 	HyText2d &GetTextNode();
 
 protected:
-	virtual void DoSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
+	virtual void OnSetup(std::string sPanelPrefix, std::string sPanelName,
+						 std::string sTextPrefix, std::string sTextName,
+						 int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
 };
 
 #endif /* HyInfoPanel_h__ */
