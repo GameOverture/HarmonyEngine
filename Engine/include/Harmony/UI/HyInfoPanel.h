@@ -35,7 +35,7 @@ protected:
 		INFOPANELATTRIB_IsPrimitive = 1 << 0,		// Whether the panel is constructed via HyPrimitive2d's instead of a HySprite2d
 		INFOPANELATTRIB_HideDownState = 1 << 1,		// Don't visually indicate down state (if available)
 		INFOPANELATTRIB_HideHoverState = 1 << 2,	// Don't visually indicate hover state (if available)
-		INFOPANELATTRIB_HideDisabledState = 1 << 3,	// Don't visually indicate if disabled
+		INFOPANELATTRIB_HideDisabled = 1 << 3,		// Don't visually indicate if disabled
 		INFOPANELATTRIB_IsDisabled = 1 << 4,
 		INFOPANELATTRIB_IsHighlighted = 1 << 5,
 	};
@@ -74,6 +74,9 @@ public:
 
 	bool IsHighlighted() const;
 	virtual void SetAsHighlighted(bool bIsHighlighted);
+
+	bool IsHideDisabled() const;				// Whether to not visually indicate if disabled
+	void SetHideDisabled(bool bIsHideDisabled);	// Whether to not visually indicate if disabled
 
 	HyEntity2d *GetPrimitiveNode();
 	HySprite2d &GetSpriteNode();

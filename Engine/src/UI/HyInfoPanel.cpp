@@ -239,7 +239,9 @@ bool HyInfoPanel::IsDisabled() const
 	if(bIsDisabled)
 	{
 		m_uiInfoPanelAttribs |= INFOPANELATTRIB_IsDisabled;
-		SetTint(0.3f, 0.3f, 0.3f);
+
+		if(IsHideDisabled() == false)
+			SetTint(0.3f, 0.3f, 0.3f);
 	}
 	else
 	{
@@ -275,6 +277,25 @@ bool HyInfoPanel::IsHighlighted() const
 			m_pPrimPanel->m_Stroke.SetTint(0.3f, 0.3f, 0.3f);
 			m_pPrimPanel->m_Stroke.SetLineThickness(m_pPrimPanel->m_Stroke.GetLineThickness() / 2.0f);
 		}
+	}
+}
+
+bool HyInfoPanel::IsHideDisabled() const
+{
+	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideDisabled) != 0;
+}
+
+void HyInfoPanel::SetHideDisabled(bool bIsHideDisabled)
+{
+	if(bIsHideDisabled)
+	{
+		m_uiInfoPanelAttribs |= INFOPANELATTRIB_HideDisabled;
+		SetTint(1.0f, 1.0f, 1.0f);
+	}
+	else
+	{
+		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_HideDisabled;
+		SetAsDisabled(IsDisabled());
 	}
 }
 
