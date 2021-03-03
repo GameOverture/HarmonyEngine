@@ -123,7 +123,7 @@ uint32 IHyLoadable::GetState() const
 uint32 IHyLoadable::GetNumStates()
 {
 	if(AcquireData() == nullptr) {
-		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimGetNumStates invoked on null data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::AnimGetNumStates invoked on null data");
 		return 0;
 	}
 	

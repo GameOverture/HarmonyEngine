@@ -31,7 +31,8 @@ public:
 		LOG_Error,
 		LOG_Info,
 		LOG_Title,
-		LOG_Section
+		LOG_Section,
+		LOG_Debug
 	};
 	static IHyConsole *Get();
 
@@ -47,6 +48,7 @@ public:
 	#define HyLogInfo(msg) do { } while (false)
 	#define HyLogTitle(msg) do { } while (false)
 	#define HyLogSection(msg) do { } while (false)
+	#define HyLogDebug(msg) do { } while (false)
 #else
 	#define HyLog(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Regular)
 	#define HyLogWarning(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Warning)
@@ -54,6 +56,12 @@ public:
 	#define HyLogInfo(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Info)
 	#define HyLogTitle(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Title)
 	#define HyLogSection(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Section)
+
+	#ifdef HY_DEBUG_LOGS
+		#define HyLogDebug(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Debug)
+	#else
+		#define HyLogDebug(msg) do { } while (false)
+	#endif
 #endif
 
 #endif /* IHyConsole_h__*/

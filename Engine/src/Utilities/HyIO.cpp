@@ -124,9 +124,9 @@
 	std::streamsize size = infile.tellg();
 	infile.seekg(0, std::ios::beg);
 
-	contentsOut.resize(size + 1);
+	contentsOut.resize(static_cast<uint32>(size) + 1);
 	if(infile.read(contentsOut.data(), size))
-		contentsOut[size] = '\0';
+		contentsOut[static_cast<uint32>(size)] = '\0';
 	else {
 		HyLogError("HyIO::ReadTextFile - only " << infile.gcount() << " bytes was read");
 	}

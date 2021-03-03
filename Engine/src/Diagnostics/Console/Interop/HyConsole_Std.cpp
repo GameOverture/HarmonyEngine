@@ -60,6 +60,11 @@ HyConsole_Std::HyConsole_Std(bool bCreateConsole, const HyWindowInfo &consoleInf
 		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		os << "-==== " << szMsg << " ====-";
 		break; }
+
+	case LOG_Debug:
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_GREEN);
+		os << "[D]: " << szMsg;
+		break;
 	}
 
 	// Reset console color and start a newline for next Write()

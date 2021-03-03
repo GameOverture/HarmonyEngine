@@ -44,12 +44,10 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 {
 	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySprite2dData *>(UncheckedGetData())->GetNumStates())
 	{
-		if(UncheckedGetData() == nullptr) {
-			HyLogWarning("HySprite2d::AnimSetCallback invoked on null data");
-		}
-		else {
-			HyLogWarning("HySprite2d::AnimSetCallback wants to set anim callback on index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySprite2dData *>(AcquireData())->GetNumStates() << "'");
-		}
+		if(UncheckedGetData() == nullptr)
+			HyLogDebug("HySprite2d::AnimSetCallback invoked on null data");
+		else
+			HyLogWarning(this->m_sPrefix << "/" << this->m_sName << " (HySprite) wants to set anim callback on index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySprite2dData *>(AcquireData())->GetNumStates() << "'");
 
 		return;
 	}
@@ -67,7 +65,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 {
 	if(AcquireData() == nullptr)
 	{
-		//HyLogWarning("HySprite2d::OnCalcBoundingVolume invoked on null data");
+		HyLogDebug("HySprite2d::OnCalcBoundingVolume invoked on null data");
 		return;
 	}
 

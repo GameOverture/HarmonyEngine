@@ -175,7 +175,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 
 	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
 		if(this->UncheckedGetData() == nullptr) {
-			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphOffset invoked on null data");
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphOffset invoked on null data");
 		}
 
 		return glm::vec2(0);
@@ -194,7 +194,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 	CalculateGlyphInfos();
 
 	if(this->AcquireData() == nullptr) {
-		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphSize invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphSize invoked on null data");
 	}
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
@@ -213,7 +213,7 @@ float IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha(uint32 uiCharIndex)
 	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
 		if(this->UncheckedGetData() == nullptr) {
-			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphAlpha invoked on null data");
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphAlpha invoked on null data");
 		}
 
 		return 1.0f;
@@ -234,7 +234,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
 		if(this->UncheckedGetData() == nullptr) {
-			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
 		}
 
 		return;
@@ -254,7 +254,7 @@ template<typename NODETYPE, typename ENTTYPE>
 uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers()
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
 		return 0;
 	}
 
@@ -265,7 +265,7 @@ template<typename NODETYPE, typename ENTTYPE>
 uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers(uint32 uiStateIndex)
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
 		return 0;
 	}
 
@@ -288,7 +288,7 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
@@ -300,7 +300,7 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB)
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
@@ -312,7 +312,7 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
@@ -324,7 +324,7 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
@@ -336,7 +336,7 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex)
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
@@ -460,7 +460,7 @@ template<typename NODETYPE, typename ENTTYPE>
 	if(this->AcquireData() == nullptr || uiStateIndex >= static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumStates())
 	{
 		if(this->UncheckedGetData() == nullptr) {
-			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
 		}
 		else if(uiStateIndex >= static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumStates()) {
 			HyLogWarning(this->m_sPrefix << "/" << this->m_sName << " (HyText2d) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HyText2dData *>(this->AcquireData())->GetNumStates() << "'");
