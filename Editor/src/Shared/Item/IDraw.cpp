@@ -49,7 +49,6 @@ HyCamera2d *IDraw::GetCamera()
 	return m_pCamera;
 }
 
-#undef GetObject
 void IDraw::ApplyJsonData()
 {
 	if(m_pProjItem == nullptr)
@@ -63,6 +62,7 @@ void IDraw::ApplyJsonData()
 	if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
 		HyGuiLog("IDraw::ApplyJsonData failed to parse", LOGTYPE_Error);
 
+	#undef GetObject
 	OnApplyJsonData(itemDataDoc.GetObject());
 }
 

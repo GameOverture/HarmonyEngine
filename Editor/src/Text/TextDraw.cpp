@@ -55,7 +55,18 @@ void TextDraw::SetTextState(uint uiStateIndex)
 																								  pAtlasPixelData,
 																								  uiAtlasPixelDataSize,
 																								  HYTEXTURE_R8G8B8A8);
-	m_Text.GuiOverrideData<HyText2dData>(itemDataObj, m_hTexture);
+
+	// Re-acquire latest FileDataPair because a newly generated preview texture may have been created above via GetAtlasInfo()
+	FileDataPair itemFileData;
+	m_pProjItem->GetLatestFileData(itemFileData);
+	QByteArray src = JsonValueToSrc(itemFileData.m_Data);
+
+	HyJsonDoc itemDataDoc;
+	if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+		HyGuiLog("TextDraw::OnApplyJsonData failed to parse", LOGTYPE_Error);
+
+	#undef GetObject
+	m_Text.GuiOverrideData<HyText2dData>(itemDataDoc.GetObject(), m_hTexture);
 	m_Text.SetText("The Quick Brown Fox Jumped Over The Lazy Dog!? 1234567890");
 }
 
