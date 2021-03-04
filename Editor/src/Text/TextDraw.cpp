@@ -25,6 +25,8 @@ TextDraw::TextDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataR
 
 TextDraw::~TextDraw()
 {
+	if(m_hTexture != HY_UNUSED_HANDLE)
+		Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(m_hTexture);
 }
 
 void TextDraw::SetTextState(uint uiStateIndex)

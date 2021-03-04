@@ -17,7 +17,7 @@
 
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData),
-	m_LayersModel(static_cast<TextModel &>(modelRef).GetFontManager(), static_cast<TextModel &>(modelRef).GetFontManager().RegisterLayers(stateFileData.m_Data), &modelRef)
+	m_LayersModel(static_cast<TextModel &>(modelRef).GetFontManager(), static_cast<TextModel &>(modelRef).GetFontManager().RegisterLayers(stateFileData.m_Data))
 {
 }
 
@@ -99,23 +99,23 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 	QImage fontAtlasImage(pPixelData, atlasDimensionsOut.width(), atlasDimensionsOut.height(), QImage::Format_RGBA8888);
 
-	// If an atlas group has not been established (first time saving) then choose whichever 
+	// Best determine atlas bank to save generated texture in
 	m_FontManager.GetGlyphsModel()->FindPropertyValue("Atlas Info", TEXTPROP_AtlasGroup);
-	quint32 uiAtlasGrpIndex = 0;
+	quint32 uiAtlasBankIndex = 0;
 	if(m_pAtlasFrame == nullptr)
 	{
 		if(m_ItemRef.GetProject().GetAtlasWidget())
-			uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetBankIndexFromBankId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedBankId());
+			uiAtlasBankIndex = m_ItemRef.GetProject().GetAtlasModel().GetBankIndexFromBankId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedBankId());
 	}
 	else
-		uiAtlasGrpIndex = m_ItemRef.GetProject().GetAtlasModel().GetBankIndexFromBankId(m_pAtlasFrame->GetBankId());
+		uiAtlasBankIndex = m_ItemRef.GetProject().GetAtlasModel().GetBankIndexFromBankId(m_pAtlasFrame->GetBankId());
 
-	// Ensure newly generated font sub-atlas will fit in atlas group dimensions
-	QSize atlasDimensions = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasGrpIndex);
-	quint32 uiNewAtlasGrpId = m_ItemRef.GetProject().GetAtlasModel().GetBankIdFromBankIndex(uiAtlasGrpIndex);
-	if(m_ItemRef.GetProject().GetAtlasModel().IsImageValid(fontAtlasImage, uiNewAtlasGrpId) == false)
+	// Ensure newly generated font sub-atlas will fit in atlas bank dimensions
+	QSize atlasDimensions = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasBankIndex);
+	quint32 uiNewAtlasBankId = m_ItemRef.GetProject().GetAtlasModel().GetBankIdFromBankIndex(uiAtlasBankIndex);
+	if(m_ItemRef.GetProject().GetAtlasModel().IsImageValid(fontAtlasImage, uiNewAtlasBankId) == false)
 	{
-		HyGuiLog("Cannot generate text sub-atlas for " % m_ItemRef.GetName(true) % " because it will not fit in atlas group '" % QString::number(uiNewAtlasGrpId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
+		HyGuiLog("Cannot generate text sub-atlas for " % m_ItemRef.GetName(true) % " because it will not fit in atlas group '" % QString::number(uiNewAtlasBankId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
 		return false;
 	}
 
@@ -123,10 +123,13 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	if(m_pAtlasFrame)
 	{
 		if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true) == false)
+		{
+			HyGuiLog("Cannot ReplaceFrame text sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
 			return false;
+		}
 	}
 	else
-		m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasGrpIndex, ITEM_Text);
+		m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasBankIndex, ITEM_Text);
 
 	if(m_pAtlasFrame)
 		m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetBankId());

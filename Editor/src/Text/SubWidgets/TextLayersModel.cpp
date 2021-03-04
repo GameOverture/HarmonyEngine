@@ -12,8 +12,8 @@
 #include "Project.h"
 #include "ExplorerModel.h"
 
-TextLayersModel::TextLayersModel(TextFontManager &fontManagerRef, const QList<TextLayerHandle> &layerList, QObject *pParent) :
-	QAbstractTableModel(pParent),
+TextLayersModel::TextLayersModel(TextFontManager &fontManagerRef, const QList<TextLayerHandle> &layerList) :
+	QAbstractTableModel(nullptr),
 	m_FontManagerRef(fontManagerRef),
 	m_LayerList(layerList)
 {

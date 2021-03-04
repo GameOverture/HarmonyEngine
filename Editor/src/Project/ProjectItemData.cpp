@@ -196,6 +196,9 @@ void ProjectItemData::DiscardChanges()
 {
 	m_pUndoStack->clear();
 
+	DrawUnload();
+	WidgetUnload();
+
 	delete m_pModel;
 	LoadModel();
 }

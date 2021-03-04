@@ -40,7 +40,7 @@ private:
 	QList<QPair<int, TextLayerHandle> >	m_RemovedLayerList;
 
 public:
-	TextLayersModel(TextFontManager &fontManagerRef, const QList<TextLayerHandle> &layerList, QObject *pParent);
+	TextLayersModel(TextFontManager &fontManagerRef, const QList<TextLayerHandle> &layerList);
 	virtual ~TextLayersModel();
 
 	bool IsEmpty() const;
