@@ -98,6 +98,7 @@ public:
 	QString GetSourceRelPath() const;
 	QString GetBuildAbsPath() const;
 	QString GetBuildRelPath() const;
+	QString GetUserAbsPath() const;
 
 	IManagerModel *GetManagerModel(AssetType eManagerType);
 

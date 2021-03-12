@@ -267,6 +267,27 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	ui->tabWidgetAssetManager->addTab(pProject->GetGltfWidget(), HyGlobal::ItemIcon(ITEM_Prefab, SUBICON_None), "Models");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAudioWidget(), HyGlobal::ItemIcon(ITEM_Audio, SUBICON_None), "Audio");
 
+	// Restore asset manager widgets to their previous state
+	QSettings settings(pProject->GetUserAbsPath(), QSettings::IniFormat);
+	settings.beginGroup("AssetManagers");
+	{
+		int iAssetManagerTabIndex = settings.value("TabIndex").toInt();
+		ui->tabWidgetAssetManager->setCurrentIndex(iAssetManagerTabIndex);
+
+		QStringList expandedSourceList = settings.value(HyGlobal::AssetName(ASSET_Source)).toStringList();
+		pProject->GetSourceWidget()->RestoreExpandedState(expandedSourceList);
+
+		QStringList expandedAtlasList = settings.value(HyGlobal::AssetName(ASSET_Atlas)).toStringList();
+		pProject->GetAtlasWidget()->RestoreExpandedState(expandedAtlasList);
+
+		//QStringList expandedPrefabList = settings.value(HyGlobal::AssetName(ASSET_Prefabs)).toStringList();
+		//pProject->GetGltfWidget()->RestoreExpandedState(expandedPrefabList);
+
+		QStringList expandedAudioList = settings.value(HyGlobal::AssetName(ASSET_Audio)).toStringList();
+		pProject->GetAudioWidget()->RestoreExpandedState(expandedAudioList);
+	}
+	settings.endGroup();
+
 	RefreshBuildMenu();
 }
 
@@ -403,6 +424,11 @@ void MainWindow::SetCurrentProject(Project *pProject)
 /*static*/ ExplorerWidget &MainWindow::GetExplorerWidget()
 {
 	return *sm_pInstance->ui->explorer;
+}
+
+/*static*/ int MainWindow::GetAssetManagerTabIndex()
+{
+	return sm_pInstance->ui->tabWidgetAssetManager->currentIndex();
 }
 
 /*static*/ IWidget *MainWindow::GetItemProperties()

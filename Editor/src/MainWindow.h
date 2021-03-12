@@ -74,6 +74,8 @@ public:
 	static ExplorerModel &GetExplorerModel();
 	static ExplorerWidget &GetExplorerWidget();
 
+	static int GetAssetManagerTabIndex();
+
 	static IWidget *GetItemProperties();
 
 protected:

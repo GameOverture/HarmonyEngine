@@ -78,6 +78,27 @@ QList<TreeModelItemData *> ITreeModel::GetItemsRecursively(const QModelIndex &in
 	return returnList;
 }
 
+QModelIndexList ITreeModel::GetAllIndices() const
+{
+	QModelIndexList returnList;
+	QStack<QModelIndex> indexStack;
+
+	// Top level indices
+	for(int i = 0; i < rowCount(); ++i)
+		indexStack.push(index(i, 0));
+
+	while(!indexStack.isEmpty())
+	{
+		QModelIndex curIndex = indexStack.pop();
+		returnList.push_back(curIndex);
+
+		for(int i = 0; i < rowCount(curIndex); ++i)
+			indexStack.push(index(i, 0, curIndex));
+	}
+
+	return returnList;
+}
+
 /*virtual*/ QVariant ITreeModel::headerData(int iSection, Qt::Orientation orientation, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
 	if(iRole == Qt::TextAlignmentRole)

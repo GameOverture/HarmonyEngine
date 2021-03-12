@@ -215,6 +215,50 @@ void ManagerWidget::RefreshInfo()
 	//}
 }
 
+QStringList ManagerWidget::GetExpandedFilters()
+{
+	QStringList expandedList;
+
+	QModelIndexList indexList = GetModel().GetAllIndices();
+	for(QModelIndex srcIndex : indexList)
+	{
+		QModelIndex proxyIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapFromSource(srcIndex);
+		if(ui->assetTree->isExpanded(proxyIndex))
+		{
+			TreeModelItemData *pItemData = GetModel().data(srcIndex, Qt::UserRole).value<TreeModelItemData *>();
+			if(pItemData->GetType() == ITEM_Filter)
+				expandedList << GetModel().AssembleFilter(pItemData, true);
+		}
+	}
+
+	return expandedList;
+}
+
+void ManagerWidget::RestoreExpandedState(QStringList expandedFilterList)
+{
+	QModelIndexList indexList = GetModel().GetAllIndices();
+	for(QModelIndex srcIndex : indexList)
+	{
+		TreeModelItemData *pItemData = GetModel().data(srcIndex, Qt::UserRole).value<TreeModelItemData *>();
+		if(pItemData->GetType() != ITEM_Filter)
+			continue;
+
+		bool bIsExpanded = false;
+		QString sItemDataFilter = GetModel().AssembleFilter(pItemData, true);
+		for(auto sFilter : expandedFilterList)
+		{
+			if(sItemDataFilter.compare(sFilter, Qt::CaseInsensitive) == 0)
+			{
+				bIsExpanded = true;
+				break;
+			}
+		}
+
+		QModelIndex proxyIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapFromSource(srcIndex);
+		ui->assetTree->setExpanded(proxyIndex, bIsExpanded);
+	}
+}
+
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // NOTE: ExplorerWidget::GetSelected is a synonymous function - all fixes/enhancements should be copied over until refactored into a base class
 TreeModelItemData *ManagerWidget::GetSelected(QList<AssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut)

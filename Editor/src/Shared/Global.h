@@ -73,6 +73,7 @@ enum AssetType
 
 	ASSET_Source = 0,
 	ASSET_Atlas,
+	ASSET_Prefabs,
 	ASSET_Audio,
 
 	NUMASSETTYPES
@@ -134,6 +135,7 @@ enum Theme
 #define HYGUIPATH_ItemsFileName					"Items"
 #define HYGUIPATH_MetaExt						".meta"
 #define HYGUIPATH_DataExt						".data"
+#define HYGUIPATH_UserExt						".user"
 
 #define HYMETA_FontsDir							"Fonts/"
 

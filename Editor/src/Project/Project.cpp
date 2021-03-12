@@ -30,6 +30,7 @@
 #include <QStandardPaths>
 #include <QProcess>
 #include <QDragEnterEvent>
+#include <QSettings>
 
 ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 	m_pProjectOwner(pProjectOwner)
@@ -146,11 +147,12 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 /*virtual*/ Project::~Project()
 {
+	Harmony::OnProjectDestructor(this); // Order matters because this calls Project::HarmonyShutdown()
 	delete m_pSourceWidget;
 	delete m_pAtlasWidget;
 	delete m_pGltfWidget;
+	delete m_pAudioWidget;
 
-	Harmony::OnProjectDestructor(this); // Order matters because this calls Project::HarmonyShutdown()
 	delete m_pDraw;
 	
 	delete m_pSourceModel;
@@ -427,6 +429,14 @@ QString Project::GetBuildAbsPath() const
 QString Project::GetBuildRelPath() const
 {
 	return QDir::cleanPath(GetSettingsObj()["BuildPath"].toString()) + '/';
+}
+
+QString Project::GetUserAbsPath() const
+{
+	QDir settingsDir(GetDirPath());
+	QFileInfo projFileInfo(GetAbsPath());
+	
+	return settingsDir.absoluteFilePath(projFileInfo.baseName() % HYGUIPATH_UserExt);
 }
 
 IManagerModel *Project::GetManagerModel(AssetType eManagerType)
@@ -1009,17 +1019,14 @@ bool Project::HarmonyInitialize()
 	m_pDraw = new ProjectDraw();
 	m_pDraw->Load();
 
-	//if(m_pAtlasWidget)
-	//	m_pAtlasWidget->StashTreeWidgets();
-
 	delete m_pSourceWidget;
 	delete m_pAtlasWidget;
 	delete m_pGltfWidget;
 	delete m_pAudioWidget;
 	m_pSourceWidget = new ManagerWidget(m_pSourceModel, nullptr);
 	m_pAtlasWidget = new ManagerWidget(m_pAtlasModel, nullptr);
-	m_pAudioWidget = new ManagerWidget(m_pAudioModel, nullptr);
 	m_pGltfWidget = new GltfWidget(m_pGltfModel, nullptr);
+	m_pAudioWidget = new ManagerWidget(m_pAudioModel, nullptr);
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{
@@ -1055,6 +1062,19 @@ void Project::HarmonyShutdown()
 {
 	delete m_pDraw;
 	m_pDraw = nullptr;
+
+	// Save asset manager widgets expanded/selected state
+	QSettings settings(GetUserAbsPath(), QSettings::IniFormat);
+	settings.beginGroup("AssetManagers");
+	{
+		settings.setValue("TabIndex", MainWindow::GetAssetManagerTabIndex());
+
+		settings.setValue(HyGlobal::AssetName(ASSET_Source), m_pSourceWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSET_Atlas), m_pAtlasWidget->GetExpandedFilters());
+		//settings.setValue(HyGlobal::AssetName(ASSET_Prefabs), m_pGltfWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSET_Audio), m_pAudioWidget->GetExpandedFilters());
+	}
+	settings.endGroup();
 }
 
 void Project::OnTabBarCurrentChanged(int iIndex)

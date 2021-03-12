@@ -69,6 +69,7 @@
 
 	sm_AssetNames[ASSET_Source] = "Source";
 	sm_AssetNames[ASSET_Atlas] = "Atlases";
+	sm_AssetNames[ASSET_Prefabs] = "Prefabs";
 	sm_AssetNames[ASSET_Audio] = "Audio";
 
 	sm_sSubIconNames[SUBICON_None] = "";
