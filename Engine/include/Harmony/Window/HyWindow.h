@@ -62,16 +62,6 @@ public:
 			return *this;
 		}
 
-		//CameraIterator2d operator++(int)	// Postfix increment operator
-		//{
-		//	do 
-		//	{
-		//		++m_iter;
-		//	} while(m_iter != m_CamsListRef.end() && (*m_iter)->IsVisible() == false);
-
-		//	return *this;
-		//}
-
 		bool IsEnd()		{ return m_iter == m_CamsListRef.end(); }
 		HyCamera2d *Get()	{ return *m_iter; }
 		void Reset()
@@ -119,7 +109,7 @@ public:
 
 	glm::vec2							ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
 
-	HyWindowInteropPtr						GetInterop();
+	HyWindowInteropPtr					GetInterop();
 
 	bool								IsFullScreen();
 	void								SetFullScreen(bool bFullScreen);

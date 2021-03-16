@@ -18,6 +18,8 @@ typedef HyOpenGL HyRendererInterop;
 
 #if defined(HY_USE_SDL2)
 	typedef SDL_Window *HyWindowInteropPtr;
+#elif defined(HY_USE_GLFW)
+	typedef GLFWwindow *HyWindowInteropPtr;
 #else
 	typedef void *HyWindowInteropPtr;
 #endif

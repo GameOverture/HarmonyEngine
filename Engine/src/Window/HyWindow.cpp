@@ -35,16 +35,17 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef) :
 
 #ifdef HY_USE_SDL2
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-#ifndef HY_PLATFORM_BROWSER
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-#else // Browsers set version for OpenGL ES 3.0 (ES is implicit with Emscripten? SDL_GL_CONTEXT_PROFILE_MASK not available in Emscripten's SDL2)
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#endif
+	#ifndef HY_PLATFORM_BROWSER
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	#else // Browsers set version for OpenGL ES 3.0 (ES is implicit with Emscripten? SDL_GL_CONTEXT_PROFILE_MASK not available in Emscripten's SDL2)
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	#endif
 
 	uint32 uiWindowFlags = SDL_WINDOW_OPENGL;
 	switch(m_Info.eType)
@@ -95,9 +96,9 @@ HyWindow::~HyWindow(void)
 	while(m_Cams3dList.empty() == false)
 		RemoveCamera(m_Cams3dList.back());
 
-//#ifdef HY_USE_GLFW
-//	glfwDestroyWindow(m_hData);
-//#endif
+#ifdef HY_USE_GLFW
+	glfwDestroyWindow(m_hData);
+#endif
 }
 
 uint32 HyWindow::GetIndex() const
@@ -154,8 +155,8 @@ void HyWindow::SetWindowSize(glm::ivec2 vResolutionHint)
 	m_Info.vSize = vResolutionHint;
 	
 #ifdef HY_USE_GLFW
-	glfwSetWindowSize(m_hData, m_Info.vSize.x, m_Info.vSize.y);
-#elif defined(HY_PLATFORM_GUI)
+	glfwSetWindowSize(m_hData, m_Info.vSize.x, m_Info.vSize.y); // m_vFramebufferSize is set in callback
+#else
 	m_vFramebufferSize = m_Info.vSize;
 #endif
 }
@@ -350,11 +351,10 @@ void HyWindow::DoEvent(const SDL_Event &eventRef, HyInput &inputRef)
 		m_Info.ptLocation.y = eventRef.window.data2;
 		break;
 	case SDL_WINDOWEVENT_RESIZED:
-		// External event, i.e. the user or the window manager
+		// Indicating an external event, i.e. the user or the window manager
 		break;
 	case SDL_WINDOWEVENT_SIZE_CHANGED:
-		m_Info.vSize.x = eventRef.window.data1;
-		m_Info.vSize.y = eventRef.window.data2;
+		SetWindowSize(glm::ivec2(eventRef.window.data1, eventRef.window.data2));
 		break;
 	case SDL_WINDOWEVENT_MINIMIZED:
 		HyLog("Window " << m_uiId << " minimized");
