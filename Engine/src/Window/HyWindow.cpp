@@ -150,12 +150,18 @@ glm::ivec2 HyWindow::GetWindowSize()
 	return m_Info.vSize;
 }
 
-void HyWindow::SetWindowSize(glm::ivec2 vResolutionHint)
+void HyWindow::SetWindowSize(glm::ivec2 vSize)
 {
-	m_Info.vSize = vResolutionHint;
-	
-#ifdef HY_USE_GLFW
+	if(GetWidth() == vSize.x && GetHeight() == vSize.y)
+		return;
+
+#ifdef HY_USE_SDL2
+	SDL_SetWindowSize(m_pData, vSize.x, vSize.y);
+#elif defined(HY_USE_GLFW)
 	glfwSetWindowSize(m_hData, m_Info.vSize.x, m_Info.vSize.y); // m_vFramebufferSize is set in callback
+#else
+	HyLog("Window " << m_uiINDEX << " Resized: " << vSize.x << ", " << vSize.y);
+	m_Info.vSize = vSize;
 #endif
 }
 
@@ -357,7 +363,8 @@ void HyWindow::DoEvent(const SDL_Event &eventRef, HyInput &inputRef)
 		// Indicating an external event, i.e. the user or the window manager
 		break;
 	case SDL_WINDOWEVENT_SIZE_CHANGED:
-		SetWindowSize(glm::ivec2(eventRef.window.data1, eventRef.window.data2));
+		HyLog("Window " << m_uiINDEX << " Resized: " << eventRef.window.data1 << ", " << eventRef.window.data2);
+		HySetVec(m_Info.vSize, eventRef.window.data1, eventRef.window.data2);
 		break;
 	case SDL_WINDOWEVENT_MINIMIZED:
 		HyLog("Window " << m_uiId << " minimized");

@@ -18,6 +18,16 @@
 	#define HyThrottleUpdate while(m_Time.ThrottleUpdate())
 #endif
 
+#ifdef HY_PLATFORM_BROWSER
+	EM_BOOL EmscriptenResizeCallback(int eventType, const EmscriptenUiEvent *e, void *userData)
+	{
+		glm::ivec2 vCanvas(e->windowInnerWidth, e->windowInnerHeight);
+		HyEngine::Window().SetWindowSize(vCanvas);
+
+		return 0;
+	}
+#endif
+
 HyEngine *HyEngine::sm_pInstance = nullptr;
 
 HyEngine::HyEngine(const HarmonyInit &initStruct) :
@@ -40,6 +50,10 @@ HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	while(m_Assets.IsInitialized() == false)
 	{
 	}
+#endif
+
+#ifdef HY_PLATFORM_BROWSER
+	emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, EmscriptenResizeCallback);
 #endif
 
 	sm_pInstance = this;
