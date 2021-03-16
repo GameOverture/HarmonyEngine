@@ -89,7 +89,8 @@ public:
 	glm::ivec2							GetWindowSize();
 	void								SetWindowSize(glm::ivec2 vResolutionHint);
 
-	glm::ivec2							GetFramebufferSize();
+	glm::ivec2							GetFramebufferSize() const;
+	void								SetFramebufferSize(glm::ivec2 vBufferSize);
 
 	glm::ivec2							GetLocation();
 	void								SetLocation(glm::ivec2 ptLocation);

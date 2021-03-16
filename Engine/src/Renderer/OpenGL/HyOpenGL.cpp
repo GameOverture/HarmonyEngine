@@ -885,15 +885,17 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 		m_mtxView = glm::translate(m_mtxView, glm::vec3(vFramebufferSize.x * -0.5f, vFramebufferSize.y * -0.5f, 0.0f));
 	}
 
-	float fWidth = (viewportRect.Width() * vFramebufferSize.x);
-	float fHeight = (viewportRect.Height() * vFramebufferSize.y);
+	float fFbWidth = (viewportRect.Width() * vFramebufferSize.x);
+	float fFbHeight = (viewportRect.Height() * vFramebufferSize.y);
+	float fWinWidth = pCamera->GetWindow().GetWidthF();
+	float fWinHeight = pCamera->GetWindow().GetHeightF();
 
-	m_mtxProj = glm::ortho(fWidth * -0.5f, fWidth * 0.5f, fHeight * -0.5f, fHeight * 0.5f, 0.0f, 1.0f);
+	m_mtxProj = glm::ortho(fFbWidth * -0.5f, fFbWidth * 0.5f, fFbHeight * -0.5f, fFbHeight * 0.5f, 0.0f, 1.0f);
 
 	glViewport(static_cast<GLint>(viewportRect.left * vFramebufferSize.x),
 			   static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
-			   static_cast<GLsizei>(fWidth),
-			   static_cast<GLsizei>(fHeight));
+			   static_cast<GLsizei>(fWinWidth),
+			   static_cast<GLsizei>(fWinHeight));
 	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glViewport");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

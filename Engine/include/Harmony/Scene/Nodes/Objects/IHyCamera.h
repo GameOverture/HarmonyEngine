@@ -45,7 +45,7 @@ public:
 	const HyRectangle<float> &GetViewport();
 
 	// All values are [0.0 - 1.0] representing percentages of the entire game window
-	void SetViewport(float fPosX, float fPosY, float fWidth, float fHeight);
+	void SetViewport(float fNormalizedPosX, float fNormalizedPosY, float fNormalizedWidth, float fNormalizedHeight);
 
 	bool IsCameraShake();
 	void CameraShake(float fRadius);

@@ -156,14 +156,17 @@ void HyWindow::SetWindowSize(glm::ivec2 vResolutionHint)
 	
 #ifdef HY_USE_GLFW
 	glfwSetWindowSize(m_hData, m_Info.vSize.x, m_Info.vSize.y); // m_vFramebufferSize is set in callback
-#else
-	m_vFramebufferSize = m_Info.vSize;
 #endif
 }
 
-glm::ivec2 HyWindow::GetFramebufferSize()
+glm::ivec2 HyWindow::GetFramebufferSize() const
 {
 	return m_vFramebufferSize;
+}
+
+void HyWindow::SetFramebufferSize(glm::ivec2 vBufferSize)
+{
+	m_vFramebufferSize = vBufferSize;
 }
 
 glm::ivec2 HyWindow::GetLocation()

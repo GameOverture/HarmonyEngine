@@ -50,12 +50,12 @@ const HyRectangle<float> &IHyCamera<NODETYPE>::GetViewport()
 
 // All values are [0.0 - 1.0] representing percentages of the entire game window
 template<typename NODETYPE>
-void IHyCamera<NODETYPE>::SetViewport(float fPosX, float fPosY, float fWidth, float fHeight)
+void IHyCamera<NODETYPE>::SetViewport(float fNormalizedPosX, float fNormalizedPosY, float fNormalizedWidth, float fNormalizedHeight)
 {
-	m_ViewportRect.left = fPosX;
-	m_ViewportRect.bottom = fPosY;
-	m_ViewportRect.right = m_ViewportRect.left + fWidth;
-	m_ViewportRect.top = m_ViewportRect.bottom + fHeight;
+	m_ViewportRect.left = fNormalizedPosX;
+	m_ViewportRect.bottom = fNormalizedPosY;
+	m_ViewportRect.right = m_ViewportRect.left + fNormalizedWidth;
+	m_ViewportRect.top = m_ViewportRect.bottom + fNormalizedHeight;
 }
 
 template<typename NODETYPE>
