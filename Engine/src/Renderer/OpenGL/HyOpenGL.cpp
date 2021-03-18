@@ -887,8 +887,8 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 
 	float fFbWidth = (viewportRect.Width() * vFramebufferSize.x);
 	float fFbHeight = (viewportRect.Height() * vFramebufferSize.y);
-	float fWinWidth = pCamera->GetWindow().GetWidthF();
-	float fWinHeight = pCamera->GetWindow().GetHeightF();
+	float fWinWidth = m_pCurWindow->GetWidthF();
+	float fWinHeight = m_pCurWindow->GetHeightF();
 
 	m_mtxProj = glm::ortho(fFbWidth * -0.5f, fFbWidth * 0.5f, fFbHeight * -0.5f, fFbHeight * 0.5f, 0.0f, 1.0f);
 
