@@ -21,27 +21,9 @@
 #ifdef HY_PLATFORM_BROWSER
 	EM_BOOL EmscriptenResizeCallback(int eventType, const EmscriptenUiEvent *e, void *userData)
 	{
-		HyLog("Em Resize Callback: " << e->windowInnerWidth << ", " << e->windowInnerHeight);
-
-		// Preserve aspect ratio
-		glm::ivec2 vCurWindowSize = HyEngine::Window().GetWindowSize();
-		float fAspectRatio = static_cast<float>(vCurWindowSize.x) / static_cast<float>(vCurWindowSize.y);
-
-		// Determine whether width or height is our constraint
-		float fCanvasAspectRatio = e->windowInnerWidth / e->windowInnerHeight;
-
 		glm::ivec2 vNewWindowSize(e->windowInnerWidth, e->windowInnerHeight);
-		if(fCanvasAspectRatio < fAspectRatio) // Width constraint (calculate height, based on provided width)
-		{
-			vNewWindowSize.y = (e->windowInnerWidth * vCurWindowSize.y) / vCurWindowSize.x;
-			vNewWindowSize.x = e->windowInnerWidth;
-		}
-		else if(fCanvasAspectRatio > fAspectRatio) // Height constraint (calculate width, based on provided height)
-		{
-			vNewWindowSize.x = e->windowInnerHeight * vCurWindowSize.x / vCurWindowSize.y;
-			vNewWindowSize.y = e->windowInnerHeight;
-		}
 
+		HyLog("Em Resize Callback: " << vNewWindowSize.x << ", " << vNewWindowSize.y);
 		HyEngine::Window().SetWindowSize(vNewWindowSize);
 
 		return 0;
@@ -173,9 +155,13 @@ bool HyEngine::PollPlatformApi()
 		{
 		case SDL_QUIT:
 			return false;
-		case SDL_WINDOWEVENT:
-			m_WindowManager.DoEvent(sdlEvent, m_Input);
-			break;
+		case SDL_WINDOWEVENT: {
+			HyWindow *pWindow = m_WindowManager.DoEvent(sdlEvent, m_Input);
+			if(pWindow && sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+				OnWindowResized(*pWindow);
+			else if(pWindow && sdlEvent.window.event == SDL_WINDOWEVENT_MOVED)
+				OnWindowMoved(*pWindow);
+			break; }
 		case SDL_KEYDOWN:
 			m_Input.DoKeyDownEvent(sdlEvent);
 			break;

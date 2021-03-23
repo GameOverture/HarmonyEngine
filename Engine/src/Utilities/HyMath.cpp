@@ -131,3 +131,25 @@ float HyEase_AngleLinear(float angleA, float angleB, int32 spin, float t)
 	return HyEase_Linear(angleA,angleB,t);
 }
 
+
+glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight)
+{
+	// Preserve old aspect ratio
+	float fLockedAspectRatio = static_cast<float>(iOldWidth) / static_cast<float>(iOldHeight);
+	float fScaledAspectRatio = static_cast<float>(iNewWidth) / static_cast<float>(iNewHeight);
+
+	// Determine whether width or height is our constraint, then calculate the return size
+	glm::ivec2 vReturnSize(iNewWidth, iNewHeight);
+	if(fScaledAspectRatio < fLockedAspectRatio) // Width constraint (calculate height, based on provided width)
+	{
+		vReturnSize.y = (iNewWidth * iOldHeight) / iOldWidth;
+		vReturnSize.x = iNewWidth;
+	}
+	else if(fScaledAspectRatio > fLockedAspectRatio) // Height constraint (calculate width, based on provided height)
+	{
+		vReturnSize.x = iNewHeight * iOldWidth / iOldHeight;
+		vReturnSize.y = iNewHeight;
+	}
+
+	return vReturnSize;
+}

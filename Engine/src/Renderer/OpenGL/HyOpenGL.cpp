@@ -460,7 +460,7 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// For each context/window, setup the vertex attributes per VAO
-	for(uint32 i = 0; i < GetNumWindows(); ++i)
+	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		SetCurrentWindow(i);
 
@@ -887,34 +887,33 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 
 	float fFbWidth = (viewportRect.Width() * vFramebufferSize.x);
 	float fFbHeight = (viewportRect.Height() * vFramebufferSize.y);
-	float fWinWidth = m_pCurWindow->GetWidthF();
-	float fWinHeight = m_pCurWindow->GetHeightF();
 
 	m_mtxProj = glm::ortho(fFbWidth * -0.5f, fFbWidth * 0.5f, fFbHeight * -0.5f, fFbHeight * 0.5f, 0.0f, 1.0f);
 
 	glViewport(static_cast<GLint>(viewportRect.left * vFramebufferSize.x),
-			   static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
-			   static_cast<GLsizei>(fWinWidth),
-			   static_cast<GLsizei>(fWinHeight));
-	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glViewport");
+		static_cast<GLint>(viewportRect.bottom * vFramebufferSize.y),
+		m_pCurWindow->GetWidth(),
+		m_pCurWindow->GetHeight());
+	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glViewport");
+	// TODO: glViewport width and height are silently clamped to a range that depends on the implementation. To query this range, call glGet with argument GL_MAX_VIEWPORT_DIMS
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set the proper shader program
 	GLuint uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][pRenderState->hSHADER];
 	glBindVertexArray(uiVao);
-	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
+	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glBindVertexArray");
 
 	GLuint hGlHandle = m_GLShaderMap[pRenderState->hSHADER];
 	glUseProgram(hGlHandle);
-	HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glUseProgram");
+	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUseProgram");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Bind texture(s)
 	glActiveTexture(GL_TEXTURE0);
-	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glActiveTexture");
+	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glActiveTexture");
 
 	glBindTexture(GL_TEXTURE_2D, pRenderState->hTEXTURE_0);
-	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glBindTexture");
+	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glBindTexture");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if(pRenderState->SCISSOR_RECT.iTag != IHyBody::SCISSORTAG_Disabled)
@@ -926,33 +925,33 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
 				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
 
-		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glScissor");
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glScissor");
 
 		glEnable(GL_SCISSOR_TEST);
-		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glEnable");
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glEnable");
 	}
 	else
 	{
 		glDisable(GL_SCISSOR_TEST);
-		HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDisable");
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDisable");
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Always attempt to assign these uniforms if the shader chooses to use them
 	GLint iUniLocation = glGetUniformLocation(hGlHandle, "u_mtxWorldToCamera");
-	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
+	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glGetUniformLocation");
 	if(iUniLocation >= 0)
 	{
 		glUniformMatrix4fv(iUniLocation, 1, GL_FALSE, &m_mtxView[0][0]);
-		HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix4fv");
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniformMatrix4fv");
 	}
 
 	iUniLocation = glGetUniformLocation(hGlHandle, "u_mtxCameraToClip");
-	HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
+	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glGetUniformLocation");
 	if(iUniLocation >= 0)
 	{
 		glUniformMatrix4fv(iUniLocation, 1, GL_FALSE, &m_mtxProj[0][0]);
-		HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix4fv");
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniformMatrix4fv");
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -967,7 +966,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 		pExBuffer += HY_SHADER_UNIFORM_NAME_LENGTH;
 
 		iUniLocation = glGetUniformLocation(hGlHandle, szUniformName);
-		HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glGetUniformLocation");
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glGetUniformLocation");
 		HyAssert(iUniLocation >= 0, "HyOpenGLShader::SetUniformGLSL - Uniform location returned '-1' for \"" << szUniformName << "\"");
 
 		HyShaderVariable eVarType = static_cast<HyShaderVariable>(*reinterpret_cast<uint32 *>(pExBuffer));
@@ -976,25 +975,25 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 		{
 		case HyShaderVariable::boolean:
 			glUniform1i(iUniLocation, *reinterpret_cast<bool *>(pExBuffer));
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1i");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform1i");
 			pExBuffer += sizeof(bool);
 			break;
 
 		case HyShaderVariable::int32:
 			glUniform1i(iUniLocation, *reinterpret_cast<int32 *>(pExBuffer));
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1i");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform1i");
 			pExBuffer += sizeof(int32);
 			break;
 
 		case HyShaderVariable::uint32:
 			glUniform1ui(iUniLocation, *reinterpret_cast<uint32 *>(pExBuffer));
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1ui");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform1ui");
 			pExBuffer += sizeof(uint32);
 			break;
 
 		case HyShaderVariable::float32:
 			glUniform1f(iUniLocation, *reinterpret_cast<float *>(pExBuffer));
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform1f");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform1f");
 			pExBuffer += sizeof(float);
 			break;
 
@@ -1004,7 +1003,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 
 		case HyShaderVariable::bvec2:
 			glUniform2i(iUniLocation, reinterpret_cast<glm::bvec2 *>(pExBuffer)->x, reinterpret_cast<glm::bvec2 *>(pExBuffer)->y);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2i");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform2i");
 			pExBuffer += sizeof(glm::bvec2);
 			break;
 
@@ -1012,7 +1011,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			glUniform3i(iUniLocation, reinterpret_cast<glm::bvec3 *>(pExBuffer)->x,
 									  reinterpret_cast<glm::bvec3 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::bvec3 *>(pExBuffer)->z);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform3i");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform3i");
 			pExBuffer += sizeof(glm::bvec3);
 			break;
 
@@ -1021,13 +1020,13 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 									  reinterpret_cast<glm::bvec4 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::bvec4 *>(pExBuffer)->z,
 									  reinterpret_cast<glm::bvec4 *>(pExBuffer)->w);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform4i");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform4i");
 			pExBuffer += sizeof(glm::bvec4);
 			break;
 
 		case HyShaderVariable::ivec2:
 			glUniform2i(iUniLocation, reinterpret_cast<glm::ivec2 *>(pExBuffer)->x, reinterpret_cast<glm::ivec2 *>(pExBuffer)->y);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2i");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform2i");
 			pExBuffer += sizeof(glm::ivec2);
 			break;
 
@@ -1035,7 +1034,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			glUniform3i(iUniLocation, reinterpret_cast<glm::ivec3 *>(pExBuffer)->x,
 									  reinterpret_cast<glm::ivec3 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::ivec3 *>(pExBuffer)->z);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform3i");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform3i");
 			pExBuffer += sizeof(glm::ivec3);
 			break;
 
@@ -1044,13 +1043,13 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 									  reinterpret_cast<glm::ivec4 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::ivec4 *>(pExBuffer)->z,
 									  reinterpret_cast<glm::ivec4 *>(pExBuffer)->w);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform4i");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform4i");
 			pExBuffer += sizeof(glm::ivec4);
 			break;
 
 		case HyShaderVariable::vec2:
 			glUniform2f(iUniLocation, reinterpret_cast<glm::vec2 *>(pExBuffer)->x, reinterpret_cast<glm::vec2 *>(pExBuffer)->y);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform2f");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform2f");
 			pExBuffer += sizeof(glm::vec2);
 			break;
 
@@ -1058,7 +1057,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			glUniform3f(iUniLocation, reinterpret_cast<glm::vec3 *>(pExBuffer)->x,
 									  reinterpret_cast<glm::vec3 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::vec3 *>(pExBuffer)->z);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform3f");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform3f");
 			pExBuffer += sizeof(glm::vec3);
 			break;
 
@@ -1067,7 +1066,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 									  reinterpret_cast<glm::vec4 *>(pExBuffer)->y,
 									  reinterpret_cast<glm::vec4 *>(pExBuffer)->z,
 									  reinterpret_cast<glm::vec4 *>(pExBuffer)->w);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniform4f");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform4f");
 			pExBuffer += sizeof(glm::vec4);
 			break;
 
@@ -1079,13 +1078,13 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 
 		case HyShaderVariable::mat3:
 			glUniformMatrix3fv(iUniLocation, 1, GL_FALSE, &(*reinterpret_cast<glm::mat3 *>(pExBuffer))[0][0]);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix3fv");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniformMatrix3fv");
 			pExBuffer += sizeof(glm::mat3);
 			break;
 
 		case HyShaderVariable::mat4:
 			glUniformMatrix4fv(iUniLocation, 1, GL_FALSE, &(*reinterpret_cast<glm::mat4 *>(pExBuffer))[0][0]);
-			HyErrorCheck_OpenGL("HyOpenGLShader::SetUniformGLSL", "glUniformMatrix4fv");
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniformMatrix4fv");
 			pExBuffer += sizeof(glm::mat4);
 			break;
 		}

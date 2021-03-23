@@ -240,7 +240,6 @@ enum HyWindowType
 	HYWINDOW_BorderlessWindow
 };
 
-
 enum HyThreadPriority
 {
 	HYTHREAD_Lowest = -2,

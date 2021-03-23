@@ -71,7 +71,6 @@ public:
 
 	HyShaderHandle GetDefaultShaderHandle(HyType eType);
 	
-	uint32 GetNumWindows();
 	virtual void SetCurrentWindow(uint32 uiIndex);
 	
 	void ProcessMsgs();

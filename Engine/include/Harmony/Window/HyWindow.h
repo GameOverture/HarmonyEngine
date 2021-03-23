@@ -29,7 +29,7 @@ class HyWindow
 	std::vector<HyCamera2d *>				m_Cams2dList;
 	std::vector<HyCamera3d *>				m_Cams3dList;
 
-	HyWindowInteropPtr						m_pData;
+	HyWindowInteropPtr						m_pInterop;
 
 public:
 	class CameraIterator2d
@@ -87,10 +87,10 @@ public:
 	float								GetWidthF(float fPercent = 1.0f);
 	float								GetHeightF(float fPercent = 1.0f);
 	glm::ivec2							GetWindowSize();
-	void								SetWindowSize(glm::ivec2 vResolutionHint);
+	void								SetWindowSize(glm::ivec2 vSizeHint);
 
 	glm::ivec2							GetFramebufferSize() const;
-	void								SetFramebufferSize(glm::ivec2 vBufferSize);
+	void								SetFramebufferSize(glm::ivec2 vDrawableSize);
 
 	glm::ivec2							GetLocation();
 	void								SetLocation(glm::ivec2 ptLocation);

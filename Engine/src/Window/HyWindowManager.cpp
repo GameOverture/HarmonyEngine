@@ -44,15 +44,17 @@ HyWindow& HyWindowManager::GetWindow(uint32 uiWindowIndex)
 }
 
 #ifdef HY_USE_SDL2
-void HyWindowManager::DoEvent(const SDL_Event& eventRef, HyInput &inputRef)
+HyWindow *HyWindowManager::DoEvent(const SDL_Event& eventRef, HyInput &inputRef)
 {
-	for(auto window : m_WindowList)
+	for(auto pWindow : m_WindowList)
 	{
-		if(eventRef.window.windowID == window->GetId())
+		if(eventRef.window.windowID == pWindow->GetId())
 		{
-			window->DoEvent(eventRef, inputRef);
-			break;
+			pWindow->DoEvent(eventRef, inputRef);
+			return pWindow;
 		}
 	}
+
+	return nullptr;
 }
 #endif

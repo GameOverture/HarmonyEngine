@@ -178,11 +178,6 @@ HyShaderHandle IHyRenderer::GetDefaultShaderHandle(HyType eType)
 	return HYTYPE_Unknown;
 }
 
-uint32 IHyRenderer::GetNumWindows()
-{
-	return static_cast<uint32>(m_WindowListRef.size());
-}
-
 void IHyRenderer::ProcessMsgs()
 {
 	// HANDLE DATA MESSAGES (Which loads/unloads texture resources)

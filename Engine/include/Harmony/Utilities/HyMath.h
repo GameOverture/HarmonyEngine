@@ -185,4 +185,10 @@ struct HyScreenRect
 	}
 };
 
+class HyMath
+{
+public:
+	static glm::ivec2 LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight);
+};
+
 #endif /* HyMath_h__ */
