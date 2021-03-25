@@ -868,11 +868,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	if(pCamera)
 	{
 		viewportRect = pCamera->GetViewport();
-		m_mtxView = pCamera->GetSceneTransform();
-
-		// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly somewhere here or in the shader)
-		m_mtxView[3].x *= -1;
-		m_mtxView[3].y *= -1;
+		m_mtxView = glm::inverse(pCamera->GetSceneTransform()); // View Matrix is calculated by taking the inverse of the camera transform
 	}
 	else // Using window coordinates (origin is bottom left corner)
 	{
