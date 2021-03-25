@@ -68,7 +68,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 
 /*virtual*/ void CheckerGrid::OnUpdateUniforms() /*override*/
 {
-	glm::mat4 mtx = HyPrimitive2d::GetWorldTransform();
+	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform();
 
 	m_ShaderUniforms.Set("u_mtxTransform", mtx);
 	m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);
