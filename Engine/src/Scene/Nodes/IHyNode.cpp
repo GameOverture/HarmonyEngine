@@ -243,7 +243,7 @@ bool IHyNode::IsRegistered() const
 
 	// Special cases
 	if((uiDirtyFlags & (DIRTY_BoundingVolume | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale)) != 0)
-		uiDirtyFlags |= DIRTY_WorldAABB;
+		uiDirtyFlags |= DIRTY_SceneAABB;
 
 	m_uiFlags |= uiDirtyFlags;
 }

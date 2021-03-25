@@ -77,7 +77,7 @@ public:
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 	virtual void ResetDisplayOrder() override;
 
-	virtual const b2AABB &GetWorldAABB() override;
+	virtual const b2AABB &GetSceneAABB() override;
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// CHILDREN NODES

@@ -25,8 +25,8 @@ public:
 private:
 	// Hide any transform functionality inherited from IHyNode2d
 	using IHyNode2d::GetLocalTransform;
-	using IHyNode2d::GetWorldTransform;
-	using IHyNode2d::GetWorldAABB;
+	using IHyNode2d::GetSceneTransform;
+	using IHyNode2d::GetSceneAABB;
 	using IHyNode2d::pos;
 	using IHyNode2d::rot;
 	using IHyNode2d::rot_pivot;

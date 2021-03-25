@@ -153,3 +153,9 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 
 	return vReturnSize;
 }
+
+/*static*/ void HyMath::InvalidateAABB(b2AABB &aabbOut)
+{
+	aabbOut.lowerBound.Set(1.0f, 1.0f);
+	aabbOut.upperBound.Set(-1.0f, -1.0f);
+}

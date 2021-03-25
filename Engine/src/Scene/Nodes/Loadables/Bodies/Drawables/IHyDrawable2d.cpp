@@ -67,27 +67,26 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 	return m_LocalBoundingVolume;
 }
 
-/*virtual*/ const b2AABB &IHyDrawable2d::GetWorldAABB() /*override*/
+/*virtual*/ const b2AABB &IHyDrawable2d::GetSceneAABB() /*override*/
 {
-	if(IsDirty(DIRTY_WorldAABB))
+	if(IsDirty(DIRTY_SceneAABB))
 	{
-		glm::mat4 mtxWorld = GetWorldTransform();
-		float fWorldRotationRadians = glm::atan(mtxWorld[0][1], mtxWorld[0][0]);
+		glm::mat4 mtxScene = GetSceneTransform();
+		float fSceneRotationRadians = glm::atan(mtxScene[0][1], mtxScene[0][0]);
 
 		GetLocalBoundingVolume(); // This will update BV if it's dirty
 		if(m_LocalBoundingVolume.IsValidShape() && m_LocalBoundingVolume.GetB2Shape())
-			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_WorldAABB, b2Transform(b2Vec2(mtxWorld[3].x, mtxWorld[3].y), b2Rot(fWorldRotationRadians)), 0);
+			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_SceneAABB, b2Transform(b2Vec2(mtxScene[3].x, mtxScene[3].y), b2Rot(fSceneRotationRadians)), 0);
 		else
 		{
 			// Set to invalid AABB
-			m_WorldAABB.lowerBound.Set(1.0f, 1.0f);
-			m_WorldAABB.upperBound.Set(-1.0f, -1.0f);
+			HyMath::InvalidateAABB(m_SceneAABB);
 		}
 
-		ClearDirty(DIRTY_WorldAABB);
+		ClearDirty(DIRTY_SceneAABB);
 	}
 
-	return m_WorldAABB;
+	return m_SceneAABB;
 }
 
 /*virtual*/ void IHyDrawable2d::Update() /*override final*/

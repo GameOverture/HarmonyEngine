@@ -185,7 +185,7 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms()
 {
-	glm::mat4 mtx = GetWorldTransform();
+	glm::mat4 mtx = GetSceneTransform();
 
 	// TODO: Get rid of top/bot color
 	glm::vec3 tint = CalculateTopTint();

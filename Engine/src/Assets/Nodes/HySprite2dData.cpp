@@ -16,7 +16,7 @@ HyTextureHandle HySprite2dFrame::GetGfxApiHandle() const
 	return pAtlas ? pAtlas->GetTextureHandle() : HY_UNUSED_HANDLE;
 }
 
-bool HySprite2dFrame::IsValid() const
+bool HySprite2dFrame::IsAtlasValid() const
 {
 	return pAtlas != nullptr;
 }

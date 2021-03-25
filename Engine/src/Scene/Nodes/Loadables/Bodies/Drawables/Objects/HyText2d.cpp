@@ -62,7 +62,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	glm::vec3 ptTranslation;
 	glm::vec3 vSkew;
 	glm::vec4 vPerspective;
-	glm::decompose(GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	glm::decompose(GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
 
 	m_DebugBox.pos.Set(ptTranslation);
 	m_DebugBox.rot.Set(rot.Get()); // TODO: This is wrong! Needs World transform's amount of rotation
@@ -106,7 +106,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 
 	const uint32 uiNUMLAYERS = pData->GetNumLayers(m_uiState);
-	const glm::mat4 &mtxTransformRef = GetWorldTransform();
+	const glm::mat4 &mtxTransformRef = GetSceneTransform();
 
 	uint32 iOffsetIndex = 0;
 	for(int32 i = uiNUMLAYERS - 1; i >= 0; --i)

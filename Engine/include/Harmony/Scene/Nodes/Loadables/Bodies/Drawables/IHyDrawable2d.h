@@ -34,7 +34,7 @@ public:
 	IHyDrawable2d &operator=(IHyDrawable2d &&donor) noexcept;
 
 	const HyShape2d &GetLocalBoundingVolume();
-	virtual const b2AABB &GetWorldAABB() override;
+	virtual const b2AABB &GetSceneAABB() override;
 
 protected:
 	virtual void Update() override final;

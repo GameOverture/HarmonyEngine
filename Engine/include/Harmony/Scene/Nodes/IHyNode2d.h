@@ -26,7 +26,7 @@ protected:
 	glm::mat4						m_mtxCached;
 	float							m_fRotation;		// Reference value used in 'rot' HyAnimFloat
 
-	b2AABB							m_WorldAABB;
+	b2AABB							m_SceneAABB;
 
 public:
 	HyAnimVec2						pos;
@@ -48,9 +48,9 @@ public:
 	HyEntity2d *ParentGet() const;
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
-	const glm::mat4 &GetWorldTransform();
+	const glm::mat4 &GetSceneTransform();
 
-	virtual const b2AABB &GetWorldAABB();
+	virtual const b2AABB &GetSceneAABB();
 };
 
 #endif /* IHyNode2d_h__ */

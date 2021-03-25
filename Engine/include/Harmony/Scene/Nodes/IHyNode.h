@@ -38,7 +38,7 @@ protected:
 	{
 		DIRTY_FromUpdater			= 1 << 7,
 		DIRTY_BoundingVolume		= 1 << 8,
-		DIRTY_WorldAABB				= 1 << 9,
+		DIRTY_SceneAABB				= 1 << 9,
 		DIRTY_Position				= 1 << 10,
 		DIRTY_Rotation				= 1 << 11,
 		DIRTY_Scale					= 1 << 12,
@@ -46,7 +46,7 @@ protected:
 		DIRTY_Scissor				= 1 << 14,
 		DIRTY_Audio					= 1 << 15,
 
-		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_BoundingVolume | DIRTY_WorldAABB | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale | DIRTY_Color | DIRTY_Scissor | DIRTY_Audio
+		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_BoundingVolume | DIRTY_SceneAABB | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale | DIRTY_Color | DIRTY_Scissor | DIRTY_Audio
 	};
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.

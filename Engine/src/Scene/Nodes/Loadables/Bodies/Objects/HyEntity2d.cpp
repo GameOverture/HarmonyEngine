@@ -215,21 +215,21 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	}
 }
 
-/*virtual*/ const b2AABB &HyEntity2d::GetWorldAABB() /*override*/
+/*virtual*/ const b2AABB &HyEntity2d::GetSceneAABB() /*override*/
 {
-	m_WorldAABB.lowerBound = m_WorldAABB.upperBound = b2Vec2(0.0f, 0.0f);
+	HyMath::InvalidateAABB(m_SceneAABB);
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(m_ChildList[i]->GetWorldAABB().IsValid() == false)
+		if(m_ChildList[i]->GetSceneAABB().IsValid() == false)
 			continue;
 
-		if(i == 0)
-			m_WorldAABB = m_ChildList[i]->GetWorldAABB();
+		if(m_SceneAABB.IsValid() == false)
+			m_SceneAABB = m_ChildList[i]->GetSceneAABB();
 		else
-			m_WorldAABB.Combine(m_ChildList[i]->GetWorldAABB());
+			m_SceneAABB.Combine(m_ChildList[i]->GetSceneAABB());
 	}
 
-	return m_WorldAABB;
+	return m_SceneAABB;
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childRef)
@@ -682,17 +682,17 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 	if((m_uiEntAttribs & ENT2DATTRIB_MouseInput) != 0)
 	{
-		glm::vec2 ptMousePt;
+		glm::vec2 ptMousePos;
 		bool bMouseInBounds;
 		if(GetCoordinateSystem() >= 0)
 		{
-			ptMousePt = HyEngine::Input().GetMousePos();
-			bMouseInBounds = HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem() && HyTestPointAABB(GetWorldAABB(), ptMousePt);
+			ptMousePos = HyEngine::Input().GetMousePos();
+			bMouseInBounds = HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem() && HyTestPointAABB(GetSceneAABB(), ptMousePos);
 		}
 		else
 		{
-			ptMousePt = HyEngine::Input().GetWorldMousePos();
-			bMouseInBounds = HyTestPointAABB(GetWorldAABB(), ptMousePt);
+			ptMousePos = HyEngine::Input().GetWorldMousePos();
+			bMouseInBounds = HyTestPointAABB(GetSceneAABB(), ptMousePos);
 		}
 
 		bool bLeftClickDown = HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft);

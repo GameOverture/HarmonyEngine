@@ -127,5 +127,5 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
-	vertexBufferRef.AppendData2d(&GetWorldTransform(), sizeof(glm::mat4));
+	vertexBufferRef.AppendData2d(&GetSceneTransform(), sizeof(glm::mat4));
 }

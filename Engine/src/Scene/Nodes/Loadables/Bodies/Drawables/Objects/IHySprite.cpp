@@ -251,7 +251,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameWidth(bool bIncludeScaling /*= tr
 		glm::vec3 ptTranslation;
 		glm::vec3 vSkew;
 		glm::vec4 vPerspective;
-		glm::decompose(this->GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
 	}
 
 	return frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * vScale.x;
@@ -276,7 +276,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameHeight(bool bIncludeScaling /*= t
 		glm::vec3 ptTranslation;
 		glm::vec3 vSkew;
 		glm::vec4 vPerspective;
-		glm::decompose(this->GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
 	}
 
 	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
@@ -298,7 +298,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth(uint32 uiStateIndex, bool b
 		glm::vec3 ptTranslation;
 		glm::vec3 vSkew;
 		glm::vec4 vPerspective;
-		glm::decompose(this->GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
 	}
 	
 	float fMaxWidth = 0.0f;
@@ -329,7 +329,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight(uint32 uiStateIndex, bool 
 		glm::vec3 ptTranslation;
 		glm::vec3 vSkew;
 		glm::vec4 vPerspective;
-		glm::decompose(this->GetWorldTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
 	}
 
 	float fMaxHeight = 0.0f;
@@ -433,7 +433,7 @@ template<typename NODETYPE, typename ENTTYPE>
 		if(stateRef.m_bREVERSE)
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Reverse;
 
-		if(stateRef.m_uiNUMFRAMES == 0 || stateRef.GetFrame(0).IsValid() == false)
+		if(stateRef.m_uiNUMFRAMES == 0 || stateRef.GetFrame(0).IsAtlasValid() == false)
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Invalid;
 		else
 			m_AnimCtrlAttribList[i] &= ~ANIMCTRLATTRIB_Invalid;

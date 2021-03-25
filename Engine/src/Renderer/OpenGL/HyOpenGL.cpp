@@ -868,7 +868,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	if(pCamera)
 	{
 		viewportRect = pCamera->GetViewport();
-		m_mtxView = pCamera->GetWorldTransform();
+		m_mtxView = pCamera->GetSceneTransform();
 
 		// Reversing X and Y because it's more intuitive (or I'm not multiplying the matrices correctly somewhere here or in the shader)
 		m_mtxView[3].x *= -1;

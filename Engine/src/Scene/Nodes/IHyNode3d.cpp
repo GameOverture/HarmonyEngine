@@ -17,11 +17,11 @@ extern void HyNodeCtorAppend(HyEntity3d *pEntity, IHyNode3d *pChildNode);
 IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :
 	IHyNode(eNodeType),
 	m_pParent(pParent),
-	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
+	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_SceneAABB)
 {
 	scale.Set(1.0f);
 
@@ -42,11 +42,11 @@ IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :
 
 IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :
 	IHyNode(copyRef),
-	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
+	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_SceneAABB)
 {
 	pos.Set(copyRef.pos.Get());
 	rot.Set(copyRef.rot.Get());
@@ -59,11 +59,11 @@ IHyNode3d::IHyNode3d(IHyNode3d &&donor) noexcept :
 	IHyNode(std::move(donor)),
 	m_pParent(donor.ParentGet()),
 	m_mtxCached(std::move(donor.m_mtxCached)),
-	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
-	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB),
-	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_WorldAABB)
+	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_SceneAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -146,13 +146,13 @@ void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const
 	outMtx = glm::translate(outMtx, scale_pivot.Get() * -1.0f);
 }
 
-const glm::mat4 &IHyNode3d::GetWorldTransform()
+const glm::mat4 &IHyNode3d::GetSceneTransform()
 {
 	if(IsDirty(DIRTY_Position | DIRTY_Rotation | DIRTY_Scale))
 	{
 		if(m_pParent)
 		{
-			m_mtxCached = m_pParent->GetWorldTransform();
+			m_mtxCached = m_pParent->GetSceneTransform();
 			
 			glm::mat4 mtxLocal;
 			GetLocalTransform(mtxLocal);

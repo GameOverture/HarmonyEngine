@@ -45,7 +45,7 @@ public:
 	HyEntity3d *ParentGet() const;
 
 	void GetLocalTransform(glm::mat4 &outMtx) const;
-	const glm::mat4 &GetWorldTransform();
+	const glm::mat4 &GetSceneTransform();
 };
 
 #endif /* IHyNode3d_h__ */

@@ -114,9 +114,9 @@ void IHyBody::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 				glm::mat4 mtx;
 
 				if((_VisableGetNodeRef().m_uiFlags & IHyNode::NODETYPE_Is2d) != 0)
-					mtx = static_cast<IHyNode2d &>(_VisableGetNodeRef()).GetWorldTransform();
+					mtx = static_cast<IHyNode2d &>(_VisableGetNodeRef()).GetSceneTransform();
 				else
-					mtx = static_cast<IHyNode3d &>(_VisableGetNodeRef()).GetWorldTransform();
+					mtx = static_cast<IHyNode3d &>(_VisableGetNodeRef()).GetSceneTransform();
 
 				m_pScissor->m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_pScissor->m_LocalScissorRect.x);
 				m_pScissor->m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_pScissor->m_LocalScissorRect.y);
