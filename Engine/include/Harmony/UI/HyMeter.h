@@ -11,9 +11,9 @@
 #define HyMeter_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyInfoPanel.h"
+#include "UI/HyWidget.h"
 
-class HyMeter : public HyInfoPanel
+class HyMeter : public HyWidget
 {
 	int32					m_iCurValue = 0;
 	int32					m_iPrevValue = 0;

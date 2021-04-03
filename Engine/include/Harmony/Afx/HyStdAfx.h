@@ -253,7 +253,7 @@ enum HyDiagFlag
 {
 	HYDIAG_NONE				= 0,
 
-	HYDIAG_LastFrameTime		= 1 << 0,
+	HYDIAG_LastFrameTime	= 1 << 0,
 	HYDIAG_AvgFrameTimes	= 1 << 1,
 	HYDIAG_Fps				= 1 << 2,
 	HYDIAG_FRAMETIMES		= (HYDIAG_LastFrameTime | HYDIAG_AvgFrameTimes | HYDIAG_Fps),

@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyInfoPanel.cpp
+*	HyWidget.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2018 Jason Knobler
@@ -8,11 +8,11 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/HyInfoPanel.h"
+#include "UI/HyWidget.h"
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyInfoPanel::PrimPanel::PrimPanel(float fWidth, float fHeight, float fStroke, HyEntity2d *pParent) :
+HyWidget::PrimPanel::PrimPanel(float fWidth, float fHeight, float fStroke, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_Fill(this),
 	m_Stroke(this)
@@ -28,8 +28,8 @@ HyInfoPanel::PrimPanel::PrimPanel(float fWidth, float fHeight, float fStroke, Hy
 	Load();
 }
 
-HyInfoPanel::HyInfoPanel(HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent),
+HyWidget::HyWidget(HyEntity2d *pParent /*= nullptr*/) :
+	IHyLayoutItem(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -37,8 +37,8 @@ HyInfoPanel::HyInfoPanel(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyInfoPanel::HyInfoPanel(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent),
+HyWidget::HyWidget(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+	IHyLayoutItem(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -47,8 +47,8 @@ HyInfoPanel::HyInfoPanel(float fWidth, float fHeight, float fStroke, std::string
 	Setup(fWidth, fHeight, fStroke, sTextPrefix, sTextName);
 }
 
-HyInfoPanel::HyInfoPanel(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent),
+HyWidget::HyWidget(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
+	IHyLayoutItem(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -57,8 +57,8 @@ HyInfoPanel::HyInfoPanel(float fWidth, float fHeight, float fStroke, std::string
 	Setup(fWidth, fHeight, fStroke, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
-HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent),
+HyWidget::HyWidget(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+	IHyLayoutItem(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -67,8 +67,8 @@ HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName);
 }
 
-HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent),
+HyWidget::HyWidget(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
+	IHyLayoutItem(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -77,17 +77,17 @@ HyInfoPanel::HyInfoPanel(std::string sPanelPrefix, std::string sPanelName, std::
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
-/*virtual*/ HyInfoPanel::~HyInfoPanel()
+/*virtual*/ HyWidget::~HyWidget()
 {
 	delete m_pPrimPanel;
 }
 
-void HyInfoPanel::Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName)
+void HyWidget::Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName)
 {
 	Setup(fWidth, fHeight, fStroke, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
-void HyInfoPanel::Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
+void HyWidget::Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
 {
 	m_uiInfoPanelAttribs |= INFOPANELATTRIB_IsPrimitive;
 
@@ -99,12 +99,12 @@ void HyInfoPanel::Setup(float fWidth, float fHeight, float fStroke, std::string 
 	OnSetup("", "", sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
-void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
+void HyWidget::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
 {
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
-void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
+void HyWidget::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
 {
 	m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_IsPrimitive;
 
@@ -114,9 +114,13 @@ void HyInfoPanel::Setup(std::string sPanelPrefix, std::string sPanelName, std::s
 	m_Text.Init(sTextPrefix, sTextName, this);
 
 	OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+
+	auto aabb = GetSceneAABB();
+	if(aabb.IsValid())
+		HySetVec(m_vSizeHint, aabb.GetExtents().x * 2.0f, aabb.GetExtents().y * 2.0f);
 }
 
-float HyInfoPanel::GetPanelWidth()
+float HyWidget::GetPanelWidth()
 {
 	if(m_pPrimPanel)
 	{
@@ -130,7 +134,7 @@ float HyInfoPanel::GetPanelWidth()
 		return m_SpritePanel.GetCurFrameWidth(true);
 }
 
-float HyInfoPanel::GetPanelHeight()
+float HyWidget::GetPanelHeight()
 {
 	if(m_pPrimPanel)
 	{
@@ -144,16 +148,16 @@ float HyInfoPanel::GetPanelHeight()
 		return m_SpritePanel.GetCurFrameHeight(true);
 }
 
-uint32 HyInfoPanel::GetSpriteState() const
+uint32 HyWidget::GetSpriteState() const
 {
 	return m_SpritePanel.GetState();
 }
 
-/*virtual*/ void HyInfoPanel::SetSpriteState(uint32 uiStateIndex)
+/*virtual*/ void HyWidget::SetSpriteState(uint32 uiStateIndex)
 {
 	if(m_SpritePanel.IsLoadDataValid() == false)
 	{
-		HyLogWarning("HyInfoPanel::SetSpriteState was invoked with an invalid panel sprite");
+		HyLogWarning("HyWidget::SetSpriteState was invoked with an invalid panel sprite");
 		return;
 	}
 
@@ -176,22 +180,22 @@ uint32 HyInfoPanel::GetSpriteState() const
 	SetTextLocation(static_cast<int32>(m_Text.GetTextBox().x), static_cast<int32>(m_Text.GetTextBox().y), vOrigTextOffset.x, vOrigTextOffset.y);
 }
 
-/*virtual*/ std::string HyInfoPanel::GetText() const
+/*virtual*/ std::string HyWidget::GetText() const
 {
 	return m_Text.GetText();
 }
 
-/*virtual*/ void HyInfoPanel::SetText(std::string sText)
+/*virtual*/ void HyWidget::SetText(std::string sText)
 {
 	m_Text.SetText(sText);
 }
 
-/*virtual*/ void HyInfoPanel::SetTextState(uint32 uiStateIndex)
+/*virtual*/ void HyWidget::SetTextState(uint32 uiStateIndex)
 {
 	m_Text.SetState(uiStateIndex);
 }
 
-/*virtual*/ void HyInfoPanel::SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY)
+/*virtual*/ void HyWidget::SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY)
 {
 	m_Text.SetTextAlignment(HYALIGN_Center);
 
@@ -214,27 +218,27 @@ uint32 HyInfoPanel::GetSpriteState() const
 		m_Text.SetAsScaleBox(GetPanelWidth(), GetPanelHeight(), true);
 }
 
-/*virtual*/ void HyInfoPanel::SetTextAlignment(HyTextAlign eAlignment)
+/*virtual*/ void HyWidget::SetTextAlignment(HyTextAlign eAlignment)
 {
 	m_Text.SetTextAlignment(eAlignment);
 }
 
-/*virtual*/ void HyInfoPanel::SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
+/*virtual*/ void HyWidget::SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
 {
 	m_Text.SetLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
-bool HyInfoPanel::IsPrimitivePanel() const
+bool HyWidget::IsPrimitivePanel() const
 {
 	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_IsPrimitive) != 0;
 }
 
-bool HyInfoPanel::IsDisabled() const
+bool HyWidget::IsDisabled() const
 {
 	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_IsDisabled) != 0;
 }
 
-/*virtual*/ void HyInfoPanel::SetAsDisabled(bool bIsDisabled)
+/*virtual*/ void HyWidget::SetAsDisabled(bool bIsDisabled)
 {
 	if(bIsDisabled)
 	{
@@ -250,12 +254,12 @@ bool HyInfoPanel::IsDisabled() const
 	}
 }
 
-bool HyInfoPanel::IsHighlighted() const
+bool HyWidget::IsHighlighted() const
 {
 	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_IsHighlighted) != 0;
 }
 
-/*virtual*/ void HyInfoPanel::SetAsHighlighted(bool bIsHighlighted)
+/*virtual*/ void HyWidget::SetAsHighlighted(bool bIsHighlighted)
 {
 	if(bIsHighlighted == IsHighlighted())
 		return;
@@ -280,12 +284,12 @@ bool HyInfoPanel::IsHighlighted() const
 	}
 }
 
-bool HyInfoPanel::IsHideDisabled() const
+bool HyWidget::IsHideDisabled() const
 {
 	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideDisabled) != 0;
 }
 
-void HyInfoPanel::SetHideDisabled(bool bIsHideDisabled)
+void HyWidget::SetHideDisabled(bool bIsHideDisabled)
 {
 	if(bIsHideDisabled)
 	{
@@ -299,24 +303,33 @@ void HyInfoPanel::SetHideDisabled(bool bIsHideDisabled)
 	}
 }
 
-HyEntity2d *HyInfoPanel::GetPrimitiveNode()
+HyEntity2d *HyWidget::GetPrimitiveNode()
 {
 	return	m_pPrimPanel;
 }
 
-HySprite2d &HyInfoPanel::GetSpriteNode()
+HySprite2d &HyWidget::GetSpriteNode()
 {
 	return m_SpritePanel;
 }
 
-HyText2d &HyInfoPanel::GetTextNode()
+HyText2d &HyWidget::GetTextNode()
 {
 	return m_Text;
 }
 
-/*virtual*/ void HyInfoPanel::OnSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
+/*virtual*/ void HyWidget::OnSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
 {
 	SetTextLocation(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 	SetAsDisabled(IsDisabled());
 	SetAsHighlighted(IsHighlighted());
+}
+
+/*virtual*/ void HyWidget::OnResize(int32 iNewWidth, int32 iNewHeight)
+{
+	auto aabb = GetSceneAABB();
+	float fCurWidth = aabb.GetExtents().x * 2.0f;
+	float fCurHeight = aabb.GetExtents().y * 2.0f;
+
+	scale.Set((scale.X() * iNewWidth) / fCurWidth, (scale.Y() * iNewHeight) / fCurHeight);
 }

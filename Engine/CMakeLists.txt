@@ -116,9 +116,12 @@ set(HYENGINE_SOURCE_FILES
 	src/Time/Watches/IHyTimeInst.cpp
 	src/UI/HyButton.cpp
 	src/UI/HyCheckBox.cpp
-	src/UI/HyInfoPanel.cpp
+	src/UI/HyWidget.cpp
 	src/UI/HyMeter.cpp
 	src/UI/IHy9Slice.cpp
+	src/UI/Layouts/IHyLayout.cpp
+	src/UI/Layouts/IHyLayoutItem.cpp
+	src/UI/Layouts/HyBoxLayout.cpp
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
 	src/Utilities/HyMath.cpp
@@ -228,9 +231,12 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Time/Watches/IHyTimeInst.h
 	include/Harmony/UI/HyButton.h
 	include/Harmony/UI/HyCheckBox.h
-	include/Harmony/UI/HyInfoPanel.h
+	include/Harmony/UI/HyWidget.h
 	include/Harmony/UI/HyMeter.h
 	include/Harmony/UI/IHy9Slice.h
+	include/Harmony/UI/Layouts/IHyLayout.h
+	include/Harmony/UI/Layouts/IHyLayoutItem.h
+	include/Harmony/UI/Layouts/HyBoxLayout.h
 	include/Harmony/Utilities/Crc32.h
 	include/Harmony/Utilities/HyIO.h
 	include/Harmony/Utilities/HyMath.h

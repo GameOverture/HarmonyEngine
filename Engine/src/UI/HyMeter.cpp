@@ -12,27 +12,27 @@
 #include "HyEngine.h"
 
 HyMeter::HyMeter(HyEntity2d *pParent /*= nullptr*/) :
-	HyInfoPanel(pParent),
+	HyWidget(pParent),
 	m_SpinText(this)
 {
 }
 
 HyMeter::HyMeter(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyInfoPanel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, pParent),
+	HyWidget(fWidth, fHeight, fStroke, sTextPrefix, sTextName, pParent),
 	m_SpinText(this)
 {
 	OnSetup("", "", sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 HyMeter::HyMeter(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
-	HyInfoPanel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
+	HyWidget(fWidth, fHeight, fStroke, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
 	m_SpinText(this)
 {
 	OnSetup("", "", sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
 HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyInfoPanel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, pParent),
+	HyWidget(sPanelPrefix, sPanelName, sTextPrefix, sTextName, pParent),
 	m_SpinText(this)
 {
 	
@@ -40,7 +40,7 @@ HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string s
 }
 
 HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
-	HyInfoPanel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
+	HyWidget(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
 	m_SpinText(this)
 {
 	OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
@@ -137,7 +137,7 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 
 /*virtual*/ void HyMeter::SetTextState(uint32 uiStateIndex) /*override*/
 {
-	HyInfoPanel::SetTextState(uiStateIndex);
+	HyWidget::SetTextState(uiStateIndex);
 	
 	m_SpinText.m_SpinText_Shown.SetState(uiStateIndex);
 	m_SpinText.m_SpinText_Padded.SetState(uiStateIndex);
@@ -145,7 +145,7 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 
 /*virtual*/ void HyMeter::SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY) /*override*/
 {
-	HyInfoPanel::SetTextLocation(iWidth, iHeight, iOffsetX, iOffsetY);
+	HyWidget::SetTextLocation(iWidth, iHeight, iOffsetX, iOffsetY);
 
 	m_Text.SetMonospacedDigits(true);
 
@@ -158,7 +158,7 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 
 /*virtual*/ void HyMeter::SetTextAlignment(HyTextAlign eAlignment) /*override*/
 {
-	HyInfoPanel::SetTextAlignment(eAlignment);
+	HyWidget::SetTextAlignment(eAlignment);
 
 	m_SpinText.m_SpinText_Shown.SetTextAlignment(eAlignment);
 	m_SpinText.m_SpinText_Padded.SetTextAlignment(eAlignment);
@@ -168,7 +168,7 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 
 /*virtual*/ void HyMeter::SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) /*override*/
 {
-	HyInfoPanel::SetTextLayerColor(uiLayerIndex, fR, fG, fB);
+	HyWidget::SetTextLayerColor(uiLayerIndex, fR, fG, fB);
 
 	m_SpinText.m_SpinText_Shown.SetLayerColor(uiLayerIndex, fR, fG, fB);
 	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fR, fG, fB);
@@ -364,7 +364,7 @@ void HyMeter::FormatDigits()
 
 /*virtual*/ void HyMeter::OnSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) /*override*/
 {
-	HyInfoPanel::OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	HyWidget::OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 	
 	m_SpinText.Setup(sTextPrefix, sTextName);
 	FormatDigits();

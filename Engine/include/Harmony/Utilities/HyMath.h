@@ -148,6 +148,14 @@ struct HyRectangle
 		return abs(bottom - top);
 	}
 
+	void Set(T tLeft, T tTop, T tRight, T tBottom)
+	{
+		left = tLeft;
+		top = tTop;
+		right = tRight;
+		bottom = tBottom;
+	}
+
 	// Does not compare tags
 	bool operator==(const HyRectangle<T> &rhs) const
 	{
