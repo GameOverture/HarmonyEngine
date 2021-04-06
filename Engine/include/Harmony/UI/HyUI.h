@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyLayoutItem.h
+*	HyUI.h
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -7,18 +7,20 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IHyLayoutItem_h__
-#define IHyLayoutItem_h__
+#ifndef HyUI_h__
+#define HyUI_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 
-class IHyLayoutItem : protected HyEntity2d
+class HyUI : public HyEntity2d
 {
+	friend class IHyLayout;
+
 protected:
 	enum SizePolicyFlag
 	{
-		// WARNING: THIS ENUM ORDER MATTERS
+		// WARNING: THIS ENUM ORDER MATTERS (BIT SHIFTS ASSUME THESE VALUES)
 		Grow	= 1 << 0,
 		Expand	= 1 << 1,
 		Shrink	= 1 << 2,
@@ -26,6 +28,15 @@ protected:
 	};
 
 public:
+	enum Orientation
+	{
+		// WARNING: THIS ENUM ORDER MATTERS (glm::ivec2 [] dimension values)
+		Horizontal = 0,
+		Vertical,
+
+		NumOrientations
+	};
+
 	enum SizePolicy
 	{
 		Fixed = 0,							// GetSizeHint() is the only acceptable alternative, so the widget can never grow or shrink (e.g. the vertical direction of a push button).
@@ -34,18 +45,18 @@ public:
 		Preferred = Grow | Shrink,			// GetSizeHint() is best, but the widget can be shrunk and still be useful. The widget can be expanded, but there is no advantage to it being larger than SizeHint() (the default HyWidget policy).
 		MinimumExpanding = Grow | Expand,	// GetSizeHint() is the minimum size. The widget can make use of extra space, so it should get as much space as possible (e.g. the horizontal direction of a horizontal slider).
 		Expanding = Grow | Shrink | Expand,	// GetSizeHint() is a sensible size, but the widget can be shrunk and still be useful. The widget can make use of extra space, so it should get as much space as possible (e.g. the horizontal direction of a horizontal slider).
-		Fill = Grow | Shrink | Ignore		// GetSizeHint() is ignored. The widget will use as little or as much space as possible.
+		None = Grow | Shrink | Ignore		// GetSizeHint() is ignored. The widget will use as little or as much space as possible.
 	};
 
 protected:
-	SizePolicy				m_HorzPolicy;
-	SizePolicy				m_VertPolicy;
+	SizePolicy				m_SizePolicies[NumOrientations];
 	glm::ivec2				m_vSizeHint;
 
 public:
-	IHyLayoutItem(HyEntity2d *pParent = nullptr);
-	virtual ~IHyLayoutItem();
+	HyUI(HyEntity2d *pParent = nullptr);
+	virtual ~HyUI();
 
+	SizePolicy GetSizePolicy(Orientation eOrientation) const;
 	SizePolicy GetHorizontalPolicy() const;
 	SizePolicy GetVerticalPolicy() const;
 
@@ -54,10 +65,9 @@ public:
 	void SetVerticalPolicy(SizePolicy ePolicy);
 
 	glm::ivec2 GetSizeHint() const;
-	void SetSizeHint(int32 iWidth, int32 iHeight);
 
 protected:
-	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) = 0;
+	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) { }
 };
 
-#endif /* IHyLayoutItem_h__ */
+#endif /* HyUI_h__ */

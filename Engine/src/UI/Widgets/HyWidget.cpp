@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/HyWidget.h"
+#include "UI/Widgets/HyWidget.h"
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
@@ -29,7 +29,7 @@ HyWidget::PrimPanel::PrimPanel(float fWidth, float fHeight, float fStroke, HyEnt
 }
 
 HyWidget::HyWidget(HyEntity2d *pParent /*= nullptr*/) :
-	IHyLayoutItem(pParent),
+	HyUI(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -38,7 +38,7 @@ HyWidget::HyWidget(HyEntity2d *pParent /*= nullptr*/) :
 }
 
 HyWidget::HyWidget(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	IHyLayoutItem(pParent),
+	HyUI(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -48,7 +48,7 @@ HyWidget::HyWidget(float fWidth, float fHeight, float fStroke, std::string sText
 }
 
 HyWidget::HyWidget(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
-	IHyLayoutItem(pParent),
+	HyUI(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -58,7 +58,7 @@ HyWidget::HyWidget(float fWidth, float fHeight, float fStroke, std::string sText
 }
 
 HyWidget::HyWidget(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	IHyLayoutItem(pParent),
+	HyUI(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -68,7 +68,7 @@ HyWidget::HyWidget(std::string sPanelPrefix, std::string sPanelName, std::string
 }
 
 HyWidget::HyWidget(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
-	IHyLayoutItem(pParent),
+	HyUI(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
@@ -327,6 +327,8 @@ HyText2d &HyWidget::GetTextNode()
 
 /*virtual*/ void HyWidget::OnResize(int32 iNewWidth, int32 iNewHeight)
 {
+	scale.Set(1.0f, 1.0f);
+
 	auto aabb = GetSceneAABB();
 	float fCurWidth = aabb.GetExtents().x * 2.0f;
 	float fCurHeight = aabb.GetExtents().y * 2.0f;

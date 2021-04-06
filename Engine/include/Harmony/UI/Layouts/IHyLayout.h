@@ -11,19 +11,18 @@
 #define IHyLayout_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyWidget.h"
+#include "UI/HyUI.h"
 
-class IHyLayout : protected IHyLayoutItem
+class IHyLayout : public HyUI
 {
 protected:
-	glm::ivec2			m_vSize;
-	HyRectangle<int32>	m_Margins;		// Tag = Spacing between widgets inside the layout
+	glm::ivec2							m_vSize;
+	HyRectangle<int32>					m_Margins;		// Tag = Spacing between widgets inside the layout
 
 public:
 	IHyLayout(HyEntity2d *pParent = nullptr);
 	virtual ~IHyLayout();
 
-	void AddItem(IHyLayoutItem *pItem);
 	void SetSize(int32 iWidth, int32 iHeight);
 	void SetMargins(int32 iLeft, int32 iTop, int32 iRight, int32 iBottom, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY);
 
@@ -31,7 +30,10 @@ public:
 	uint16 GetVerticalSpacing();
 
 protected:
-	virtual void OnDoLayout() = 0;
+	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
+
+	virtual void OnSetLayoutItems() = 0;
+	void SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols);
 };
 
 #endif /* IHyLayout_h__ */

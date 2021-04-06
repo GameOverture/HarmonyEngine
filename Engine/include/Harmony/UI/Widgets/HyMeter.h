@@ -11,7 +11,7 @@
 #define HyMeter_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyWidget.h"
+#include "UI/Widgets/HyWidget.h"
 
 class HyMeter : public HyWidget
 {

@@ -11,7 +11,7 @@
 #define HyCheckBox_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyButton.h"
+#include "UI/Widgets/HyButton.h"
 
 class HyCheckBox : public HyButton
 {

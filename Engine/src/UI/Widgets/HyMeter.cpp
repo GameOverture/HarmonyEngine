@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/HyMeter.h"
+#include "UI/Widgets/HyMeter.h"
 #include "HyEngine.h"
 
 HyMeter::HyMeter(HyEntity2d *pParent /*= nullptr*/) :

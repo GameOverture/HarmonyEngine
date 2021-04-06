@@ -13,15 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Layouts/IHyLayout.h"
 
-class HyBoxLayout : protected IHyLayout
+class HyBoxLayout : public IHyLayout
 {
-public:
-	enum Orientation
-	{
-		Horizontal = 0,
-		Vertical
-	};
-
 protected:
 	Orientation		m_eOrientation;
 
@@ -29,8 +22,41 @@ public:
 	HyBoxLayout(Orientation eOrientation, HyEntity2d *pParent = nullptr);
 	virtual ~HyBoxLayout();
 
+	void AppendItem(HyUI &itemRef);
+	void Clear();
+
 protected:
-	virtual void OnDoLayout() override;
+	virtual void OnSetLayoutItems() override;
+
+private:
+	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
+	using HyEntity2d::ChildAppend;
+	using HyEntity2d::ChildInsert;
+};
+
+class HyHBoxLayout : public HyBoxLayout
+{
+public:
+	HyHBoxLayout(HyEntity2d *pParent = nullptr) :
+		HyBoxLayout(Horizontal, pParent)
+	{ }
+
+private:
+	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
+	using HyEntity2d::ChildAppend;
+	using HyEntity2d::ChildInsert;
+};
+class HyVBoxLayout : public HyBoxLayout
+{
+public:
+	HyVBoxLayout(HyEntity2d *pParent = nullptr) :
+		HyBoxLayout(Vertical, pParent)
+	{ }
+
+private:
+	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
+	using HyEntity2d::ChildAppend;
+	using HyEntity2d::ChildInsert;
 };
 
 #endif /* HyBoxLayout_h__ */

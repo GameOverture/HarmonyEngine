@@ -11,7 +11,7 @@
 #define HyButton_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyWidget.h"
+#include "UI/Widgets/HyWidget.h"
 
 class HyButton;
 typedef std::function<void(HyButton *, void *)> HyButtonClickedCallback;

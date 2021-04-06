@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/HyButton.h"
+#include "UI/Widgets/HyButton.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :

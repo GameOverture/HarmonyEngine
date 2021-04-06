@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/HyCheckBox.h"
+#include "UI/Widgets/HyCheckBox.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 HyCheckBox::HyCheckBox(HyEntity2d *pParent /*= nullptr*/) :

@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/IHy9Slice.h"
+#include "UI/Containers/IHy9Slice.h"
 #include "HyEngine.h"
 
 IHy9Slice::Border::Border(glm::vec2 vFillDimensions, float fBorderThickness, HyPrimitive2d &fillRef)
