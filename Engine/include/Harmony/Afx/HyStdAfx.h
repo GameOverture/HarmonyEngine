@@ -56,6 +56,11 @@ typedef uint32 HyVertexBufferHandle;
 // They increase the memory footprint of every node/instance by 8 bytes
 #define HY_ENABLE_USER_TAGS
 
+#define HY_SIZEFLAG_GROW (1 << 0)
+#define HY_SIZEFLAG_EXPAND (1 << 1)
+#define HY_SIZEFLAG_SHRINK (1 << 2)
+#define HY_SIZEFLAG_IGNORE (1 << 3)
+
 enum HyType
 {
 	HYTYPE_Unknown = 0,
@@ -69,9 +74,11 @@ enum HyType
 	HYTYPE_Text,
 	HYTYPE_Prefab,
 	HYTYPE_Entity,
-	HYTYPE_Camera
-	// NOTE: Cannot exceed 15 types due to IHyNode only reserving 4 bits to store this value
+	HYTYPE_Camera,
+
+	HYNUM_TYPES
 };
+static_assert((int)HYNUM_TYPES < 16, "HyType cannot exceed 15 items due to IHyNode only reserving 4 bits to store this value");
 
 enum HyShapeType
 {
@@ -89,6 +96,7 @@ enum HyShapeType
 enum HyPhysicsType
 {
 	HYPHYS_Unknown = -1,
+
 	HYPHYS_Static = 0,
 	HYPHYS_Kinematic,
 	HYPHYS_Dynamic
@@ -117,10 +125,10 @@ enum HyAnimCtrl
 	HYANIMCTRL_DontBounce
 };
 
-enum HyTextAlign
+enum HyAlignment
 {
 	HYALIGN_Left = 0,
-	HYALIGN_Center,
+	HYALIGN_HCenter,
 	HYALIGN_Right,
 	HYALIGN_Justify
 };
@@ -238,6 +246,33 @@ enum HyWindowType
 	HYWINDOW_WindowedSizeable,
 	HYWINDOW_FullScreen,
 	HYWINDOW_BorderlessWindow
+};
+
+enum HyLayoutType
+{
+	HYLAYOUT_Horizontal = 0,
+	HYLAYOUT_Vertical,
+	HYLAYOUT_Grid
+};
+
+enum HySizePolicy
+{
+	HYSIZEPOLICY_Fixed = 0,																	// GetSizeHint() is the only acceptable alternative, so the widget can never grow or shrink (e.g. the vertical direction of a push button).
+	HYSIZEPOLICY_Minimum = HY_SIZEFLAG_GROW,												// GetSizeHint() is the minimum size. The widget can be expanded, but there is no advantage to it being larger (e.g. the horizontal direction of a push button).
+	HYSIZEPOLICY_Maximum = HY_SIZEFLAG_SHRINK,												// GetSizeHint() is the maximum size. The widget can be shrunk any amount without detriment if other widgets need the space (e.g. a separator line). It cannot be larger than the size provided by SizeHint().
+	HYSIZEPOLICY_Preferred = HY_SIZEFLAG_GROW | HY_SIZEFLAG_SHRINK,							// GetSizeHint() is best, but the widget can be shrunk and still be useful. The widget can be expanded, but there is no advantage to it being larger than SizeHint() (the default HyWidget policy).
+	HYSIZEPOLICY_MinimumExpanding = HY_SIZEFLAG_GROW | HY_SIZEFLAG_EXPAND,					// GetSizeHint() is the minimum size. The widget can make use of extra space, so it should get as much space as possible (e.g. the horizontal direction of a horizontal slider).
+	HYSIZEPOLICY_Expanding = HY_SIZEFLAG_GROW | HY_SIZEFLAG_SHRINK | HY_SIZEFLAG_EXPAND,	// GetSizeHint() is a sensible size, but the widget can be shrunk and still be useful. The widget can make use of extra space, so it should get as much space as possible (e.g. the horizontal direction of a horizontal slider).
+	HYSIZEPOLICY_None = HY_SIZEFLAG_GROW | HY_SIZEFLAG_SHRINK | HY_SIZEFLAG_IGNORE			// GetSizeHint() is ignored. The widget will use as little or as much space as possible.
+};
+
+enum HyOrientation
+{
+	// WARNING: THIS ENUM ORDER MATTERS (glm::ivec2 [] dimension values)
+	HYORIEN_Horizontal = 0,
+	HYORIEN_Vertical,
+
+	HYNUM_ORIENTATIONS
 };
 
 enum HyThreadPriority

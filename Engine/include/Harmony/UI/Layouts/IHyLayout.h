@@ -11,29 +11,36 @@
 #define IHyLayout_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyUI.h"
+#include "UI/HyEntityUi.h"
 
-class IHyLayout : public HyUI
+class IHyLayout : public HyEntityUi
 {
 protected:
+	const HyLayoutType					m_eLAYOUT_TYPE;
+
 	glm::ivec2							m_vSize;
 	HyRectangle<int32>					m_Margins;		// Tag = Spacing between widgets inside the layout
 
 public:
-	IHyLayout(HyEntity2d *pParent = nullptr);
+	IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent = nullptr);
 	virtual ~IHyLayout();
 
-	void SetSize(int32 iWidth, int32 iHeight);
+	glm::ivec2 GetSize() const;
+	void SetSize(int32 iNewWidth, int32 iNewHeight);
+
 	void SetMargins(int32 iLeft, int32 iTop, int32 iRight, int32 iBottom, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY);
 
 	uint16 GetHorizontalSpacing();
 	uint16 GetVerticalSpacing();
 
 protected:
-	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
-
 	virtual void OnSetLayoutItems() = 0;
 	void SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols);
+
+private:
+	// Prevent adding any child that isn't of IHyLayoutItem type
+	using HyEntity2d::ChildAppend;
+	using HyEntity2d::ChildInsert;
 };
 
 #endif /* IHyLayout_h__ */

@@ -54,7 +54,7 @@ protected:
 	glm::vec2			m_vBoxDimensions;
 	float				m_fScaleBoxModifier;
 
-	HyTextAlign			m_eAlignment;
+	HyAlignment			m_eAlignment;
 	bool				m_bMonospacedDigits;
 
 	struct GlyphInfo
@@ -111,8 +111,8 @@ public:
 	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
 	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex);
 
-	HyTextAlign GetTextAlignment();
-	void SetTextAlignment(HyTextAlign eAlignment);
+	HyAlignment GetTextAlignment();
+	void SetTextAlignment(HyAlignment eAlignment);
 
 	bool IsMonospacedDigits();
 	void SetMonospacedDigits(bool bSet);

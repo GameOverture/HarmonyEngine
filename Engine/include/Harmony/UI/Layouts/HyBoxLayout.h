@@ -13,16 +13,18 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Layouts/IHyLayout.h"
 
+class IHyWidget;
+
 class HyBoxLayout : public IHyLayout
 {
 protected:
-	Orientation		m_eOrientation;
+	HyOrientation		m_eOrientation;
 
 public:
-	HyBoxLayout(Orientation eOrientation, HyEntity2d *pParent = nullptr);
+	HyBoxLayout(HyOrientation eOrientation, HyEntity2d *pParent = nullptr);
 	virtual ~HyBoxLayout();
 
-	void AppendItem(HyUI &itemRef);
+	void AppendItem(HyEntityUi &itemRef);
 	void Clear();
 
 protected:
@@ -38,7 +40,7 @@ class HyHBoxLayout : public HyBoxLayout
 {
 public:
 	HyHBoxLayout(HyEntity2d *pParent = nullptr) :
-		HyBoxLayout(Horizontal, pParent)
+		HyBoxLayout(HYORIEN_Horizontal, pParent)
 	{ }
 
 private:
@@ -50,7 +52,7 @@ class HyVBoxLayout : public HyBoxLayout
 {
 public:
 	HyVBoxLayout(HyEntity2d *pParent = nullptr) :
-		HyBoxLayout(Vertical, pParent)
+		HyBoxLayout(HYORIEN_Vertical, pParent)
 	{ }
 
 private:

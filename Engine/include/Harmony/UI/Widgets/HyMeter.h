@@ -11,9 +11,9 @@
 #define HyMeter_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/Widgets/HyWidget.h"
+#include "UI/Widgets/HyLabel.h"
 
-class HyMeter : public HyWidget
+class HyMeter : public HyLabel
 {
 	int32					m_iCurValue = 0;
 	int32					m_iPrevValue = 0;
@@ -48,11 +48,11 @@ class HyMeter : public HyWidget
 		void Setup(std::string sTextPrefix, std::string sTextName)
 		{
 			m_SpinText_Shown.Init(sTextPrefix, sTextName, this);
-			m_SpinText_Shown.SetTextAlignment(HYALIGN_Center);
+			m_SpinText_Shown.SetTextAlignment(HYALIGN_HCenter);
 			m_SpinText_Shown.SetMonospacedDigits(true);
 
 			m_SpinText_Padded.Init(sTextPrefix, sTextName, this);
-			m_SpinText_Padded.SetTextAlignment(HYALIGN_Center);
+			m_SpinText_Padded.SetTextAlignment(HYALIGN_HCenter);
 			m_SpinText_Padded.SetMonospacedDigits(true);
 		}
 	};
@@ -87,7 +87,7 @@ public:
 	void SetText(std::string sText) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
 	virtual void SetTextState(uint32 uiStateIndex) override;
 	virtual void SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY) override;
-	virtual void SetTextAlignment(HyTextAlign eAlignment) override;
+	virtual void SetTextAlignment(HyAlignment eAlignment) override;
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
 
 protected:

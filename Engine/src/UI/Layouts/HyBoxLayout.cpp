@@ -9,9 +9,10 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Layouts/HyBoxLayout.h"
+#include "UI/Widgets/IHyWidget.h"
 
-HyBoxLayout::HyBoxLayout(Orientation eOrientation, HyEntity2d *pParent /*= nullptr*/) :
-	IHyLayout(pParent),
+HyBoxLayout::HyBoxLayout(HyOrientation eOrientation, HyEntity2d *pParent /*= nullptr*/) :
+	IHyLayout(eOrientation == HYORIEN_Horizontal ? HYLAYOUT_Horizontal : HYLAYOUT_Vertical, pParent),
 	m_eOrientation(eOrientation)
 {
 }
@@ -20,7 +21,7 @@ HyBoxLayout::HyBoxLayout(Orientation eOrientation, HyEntity2d *pParent /*= nullp
 {
 }
 
-void HyBoxLayout::AppendItem(HyUI &itemRef)
+void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 {
 	ChildAppend(itemRef);
 	OnSetLayoutItems();
@@ -40,7 +41,7 @@ void HyBoxLayout::Clear()
 
 	uint32 uiNumCols = 0;
 	uint32 uiNumRows = 0;
-	if(m_eOrientation == Horizontal)
+	if(m_eOrientation == HYORIEN_Horizontal)
 	{
 		uiNumCols = uiNumChildren;
 		uiNumRows = 1;

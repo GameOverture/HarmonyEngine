@@ -11,7 +11,7 @@
 #define HyButton_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/Widgets/HyWidget.h"
+#include "UI/Widgets/HyLabel.h"
 
 class HyButton;
 typedef std::function<void(HyButton *, void *)> HyButtonClickedCallback;
@@ -26,7 +26,7 @@ enum HyButtonState
 	HYBUTTONSTATE_HighlightedHover
 };
 
-class HyButton : public HyWidget
+class HyButton : public HyLabel
 {
 protected:
 	HyButtonClickedCallback		m_fpBtnClickedCallback;

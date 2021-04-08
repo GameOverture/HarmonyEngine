@@ -13,16 +13,18 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Layouts/IHyLayout.h"
 
+class HySpacer;
+
 class HyGridLayout : public IHyLayout
 {
 	glm::ivec2					m_GridSize;
-	std::vector<HyUI *>			m_NullItemList;
+	std::vector<HySpacer *>		m_SpacerList;
 
 public:
 	HyGridLayout(HyEntity2d *pParent = nullptr);
 	virtual ~HyGridLayout();
 
-	void InsertLayoutItem(int32 iX, int32 iY, HyUI *pItem);
+	void InsertItem(int32 iX, int32 iY, HyEntityUi *pItem);
 	void Clear();
 
 protected:

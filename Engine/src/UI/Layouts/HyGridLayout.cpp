@@ -9,27 +9,28 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Layouts/HyGridLayout.h"
+#include "UI/Widgets/HySpacer.h"
 
 HyGridLayout::HyGridLayout(HyEntity2d *pParent /*= nullptr*/) :
-	IHyLayout(pParent)
+	IHyLayout(HYLAYOUT_Grid, pParent)
 {
 }
 
 /*virtual*/ HyGridLayout::~HyGridLayout()
 {
-	for(uint32 i = 0; i < m_NullItemList.size(); ++i)
-		delete m_NullItemList[i];
+	for(uint32 i = 0; i < m_SpacerList.size(); ++i)
+		delete m_SpacerList[i];
 }
 
-void HyGridLayout::InsertLayoutItem(int32 iX, int32 iY, HyUI *pItem)
+void HyGridLayout::InsertItem(int32 iX, int32 iY, HyEntityUi *pItem)
 {
 	if(pItem)
 		ChildAppend(*pItem);
 	else
 	{
 		// Create "null" layout item to fill index location (utilized by grid layouts)
-		HyUI *pNullItem = HY_NEW HyUI;
-		m_NullItemList.push_back(pNullItem);
+		HySpacer *pNullItem = HY_NEW HySpacer;
+		m_SpacerList.push_back(pNullItem);
 		ChildAppend(*pNullItem);
 	}
 	OnSetLayoutItems();
@@ -38,10 +39,12 @@ void HyGridLayout::InsertLayoutItem(int32 iX, int32 iY, HyUI *pItem)
 void HyGridLayout::Clear()
 {
 	while(m_ChildList.empty() == false)
-		delete m_ChildList[m_ChildList.size() - 1];
+		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
-	for(uint32 i = 0; i < m_NullItemList.size(); ++i)
-		delete m_NullItemList[i];
+	for(uint32 i = 0; i < m_SpacerList.size(); ++i)
+		delete m_SpacerList[i];
+
+	m_GridSize.x = m_GridSize.y = 0;
 }
 
 /*virtual*/ void HyGridLayout::OnSetLayoutItems() /*override*/

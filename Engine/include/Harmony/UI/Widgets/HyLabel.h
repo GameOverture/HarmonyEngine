@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyWidget.h
+*	HyLabel.h
 *
 *	Harmony Engine
 *	Copyright (c) 2018 Jason Knobler
@@ -7,15 +7,15 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyWidget_h__
-#define HyWidget_h__
+#ifndef HyLabel_h__
+#define HyLabel_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyUI.h"
+#include "UI/Widgets/IHyWidget.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 
-class HyWidget : public HyUI
+class HyLabel : public IHyWidget
 {
 protected:
 	class PrimPanel : public HyEntity2d
@@ -42,12 +42,12 @@ protected:
 	uint32					m_uiInfoPanelAttribs;
 
 public:
-	HyWidget(HyEntity2d *pParent = nullptr);
-	HyWidget(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
-	HyWidget(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
-	HyWidget(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
-	HyWidget(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
-	virtual ~HyWidget();
+	HyLabel(HyEntity2d *pParent = nullptr);
+	HyLabel(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
+	HyLabel(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
+	HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
+	HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
+	virtual ~HyLabel();
 
 	void Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName);
 	void Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
@@ -64,7 +64,7 @@ public:
 	void SetText(std::string sText);
 	virtual void SetTextState(uint32 uiStateIndex);
 	virtual void SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY);
-	virtual void SetTextAlignment(HyTextAlign eAlignment);
+	virtual void SetTextAlignment(HyAlignment eAlignment);
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 
 	bool IsPrimitivePanel() const;
@@ -90,4 +90,4 @@ protected:
 	virtual void OnResize(int32 iNewWidth, int32 iNewHeight);
 };
 
-#endif /* HyWidget_h__ */
+#endif /* HyLabel_h__ */

@@ -12,14 +12,14 @@
 #include "Diagnostics/Console/IHyConsole.h"
 
 HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
-	HyWidget(pParent),
+	HyLabel(pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
 }
 
 HyButton::HyButton(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyWidget(fWidth, fHeight, fStroke, sTextPrefix, sTextName, pParent),
+	HyLabel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
@@ -27,7 +27,7 @@ HyButton::HyButton(float fWidth, float fHeight, float fStroke, std::string sText
 }
 
 HyButton::HyButton(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
-	HyWidget(fWidth, fHeight, fStroke, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
+	HyLabel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
@@ -35,7 +35,7 @@ HyButton::HyButton(float fWidth, float fHeight, float fStroke, std::string sText
 }
 
 HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyWidget(sPanelPrefix, sPanelName, sTextPrefix, sTextName, pParent),
+	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
@@ -43,7 +43,7 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 }
 
 HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
-	HyWidget(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
+	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
@@ -56,7 +56,7 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 
 /*virtual*/ void HyButton::SetAsDisabled(bool bIsDisabled) /*override*/
 {
-	HyWidget::SetAsDisabled(bIsDisabled);
+	HyLabel::SetAsDisabled(bIsDisabled);
 	IsDisabled() ? DisableMouseInput() : EnableMouseInput();
 
 	if(m_SpritePanel.IsLoadDataValid() == false)
@@ -76,7 +76,7 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 	if(bIsHighlighted == IsHighlighted())
 		return;
 
-	HyWidget::SetAsHighlighted(bIsHighlighted);
+	HyLabel::SetAsHighlighted(bIsHighlighted);
 
 	if(m_SpritePanel.IsLoadDataValid() == false)
 		return;

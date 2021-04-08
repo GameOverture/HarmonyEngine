@@ -114,12 +114,15 @@ set(HYENGINE_SOURCE_FILES
 	src/Time/Watches/HyStopwatch.cpp
 	src/Time/Watches/HyTimer.cpp
 	src/Time/Watches/IHyTimeInst.cpp
-	src/UI/HyUI.cpp
+	src/UI/HyEntityUi.cpp
 	src/UI/Widgets/HyButton.cpp
 	src/UI/Widgets/HyCheckBox.cpp
-	src/UI/Widgets/HyWidget.cpp
+	src/UI/Widgets/HyLabel.cpp
 	src/UI/Widgets/HyMeter.cpp
+	src/UI/Widgets/HySpacer.cpp
+	src/UI/Widgets/IHyWidget.cpp
 	src/UI/Containers/IHy9Slice.cpp
+	src/UI/Containers/HyContainer.cpp
 	src/UI/Layouts/IHyLayout.cpp
 	src/UI/Layouts/HyBoxLayout.cpp
 	src/UI/Layouts/HyGridLayout.cpp
@@ -230,12 +233,15 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Time/Watches/HyStopwatch.h
 	include/Harmony/Time/Watches/HyTimer.h
 	include/Harmony/Time/Watches/IHyTimeInst.h
-	include/Harmony/UI/HyUI.h
+	include/Harmony/UI/HyEntityUi.h
 	include/Harmony/UI/Widgets/HyButton.h
 	include/Harmony/UI/Widgets/HyCheckBox.h
-	include/Harmony/UI/Widgets/HyWidget.h
+	include/Harmony/UI/Widgets/HyLabel.h
 	include/Harmony/UI/Widgets/HyMeter.h
+	include/Harmony/UI/Widgets/HySpacer.h
+	include/Harmony/UI/Widgets/IHyWidget.h
 	include/Harmony/UI/Containers/IHy9Slice.h
+	include/Harmony/UI/Containers/HyContainer.h
 	include/Harmony/UI/Layouts/IHyLayout.h
 	include/Harmony/UI/Layouts/HyBoxLayout.h
 	include/Harmony/UI/Layouts/HyGridLayout.h
