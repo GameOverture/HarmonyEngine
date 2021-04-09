@@ -21,7 +21,7 @@ IHyBody3d::IHyBody3d(HyType eNodeType, std::string sPrefix, std::string sName, H
 	tint(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiFlags |= NODETYPE_IsDrawable;
+	m_uiFlags |= NODETYPE_IsBody;
 
 	tint.Set(1.0f);
 
@@ -48,7 +48,7 @@ IHyBody3d::IHyBody3d(const IHyBody3d &copyRef) :
 	tint(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiFlags |= NODETYPE_IsDrawable;
+	m_uiFlags |= NODETYPE_IsBody;
 
 	tint = copyRef.tint;
 	alpha = copyRef.alpha;
@@ -60,7 +60,7 @@ IHyBody3d::IHyBody3d(IHyBody3d &&donor) noexcept :
 	tint(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiFlags |= NODETYPE_IsDrawable;
+	m_uiFlags |= NODETYPE_IsBody;
 
 	tint = std::move(donor.tint);
 	alpha = std::move(donor.alpha);

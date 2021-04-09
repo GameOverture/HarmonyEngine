@@ -34,6 +34,7 @@ public:
 	uint16 GetVerticalSpacing();
 
 protected:
+	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetLayoutItems() = 0;
 	void SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols);
 

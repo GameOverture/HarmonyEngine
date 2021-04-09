@@ -30,9 +30,10 @@ public:
 	IHyDrawable3d &operator=(const IHyDrawable3d &rhs);
 	IHyDrawable3d &operator=(IHyDrawable3d &&donor) noexcept;
 
+	virtual bool IsValidToRender() override final;
+
 protected:
 	virtual void Update() override final;
-	virtual bool IsValidToRender() override final;
 
 	virtual void OnLoaded() override;									// HyAssets invokes this once all required IHyLoadables are fully loaded for this node
 	virtual void OnUnloaded() override;									// HyAssets invokes this instance's data has been erased

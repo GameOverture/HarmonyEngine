@@ -46,3 +46,4 @@ void IHyWidget::SetVerticalPolicy(HySizePolicy ePolicy)
 {
 	m_SizePolicies[HYORIEN_Vertical] = ePolicy;
 }
+

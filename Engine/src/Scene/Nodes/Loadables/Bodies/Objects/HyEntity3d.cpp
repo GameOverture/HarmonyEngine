@@ -135,7 +135,7 @@ void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 	childRef._SetVisible(IsVisible(), false);
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
-	if(childRef.GetInternalFlags() & NODETYPE_IsDrawable)
+	if(childRef.GetInternalFlags() & NODETYPE_IsBody)
 	{
 		static_cast<IHyBody3d &>(childRef)._SetCoordinateSystem(GetCoordinateSystem(), false);
 

@@ -25,7 +25,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiFlags |= NODETYPE_IsDrawable;
+	m_uiFlags |= NODETYPE_IsBody;
 
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
@@ -54,7 +54,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 		//{
 		//	for(uint32 i = 0; i < m_pParent->ChildCount(); ++i)
 		//	{
-		//		if(0 != (m_pParent->ChildGet(i)->m_uiFlags & NODETYPE_IsDrawable))
+		//		if(0 != (m_pParent->ChildGet(i)->m_uiFlags & NODETYPE_IsBody))
 		//			iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 		//	}
 		//}
@@ -62,7 +62,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 		//{
 		//	for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
 		//	{
-		//		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+		//		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 		//			iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 		//	}
 		//}
@@ -80,7 +80,7 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiFlags |= NODETYPE_IsDrawable;
+	m_uiFlags |= NODETYPE_IsBody;
 
 	topColor = copyRef.topColor;
 	botColor = copyRef.botColor;
@@ -98,7 +98,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
 {
-	m_uiFlags |= NODETYPE_IsDrawable;
+	m_uiFlags |= NODETYPE_IsBody;
 
 	topColor = std::move(donor.topColor);
 	botColor = std::move(donor.botColor);

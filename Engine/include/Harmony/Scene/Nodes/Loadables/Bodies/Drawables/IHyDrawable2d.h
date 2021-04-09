@@ -36,9 +36,10 @@ public:
 	const HyShape2d &GetLocalBoundingVolume();
 	virtual const b2AABB &GetSceneAABB() override;
 
+	virtual bool IsValidToRender() override final;
+
 protected:
 	virtual void Update() override final;
-	virtual bool IsValidToRender() override final;
 
 	virtual void OnLoaded() override;
 	virtual void OnUnloaded() override;

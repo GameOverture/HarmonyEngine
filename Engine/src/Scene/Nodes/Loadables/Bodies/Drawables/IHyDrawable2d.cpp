@@ -14,6 +14,7 @@
 IHyDrawable2d::IHyDrawable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
 	IHyBody2d(eNodeType, sPrefix, sName, pParent)
 {
+	m_uiFlags |= NODETYPE_IsDrawable;
 }
 
 IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :
@@ -21,6 +22,7 @@ IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :
 	IHyDrawable(copyRef),
 	m_LocalBoundingVolume(copyRef.m_LocalBoundingVolume)
 {
+	m_uiFlags |= NODETYPE_IsDrawable;
 }
 
 IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) noexcept :
@@ -28,6 +30,7 @@ IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) noexcept :
 	IHyDrawable(std::move(donor)),
 	m_LocalBoundingVolume(std::move(donor.m_LocalBoundingVolume))
 {
+	m_uiFlags |= NODETYPE_IsDrawable;
 }
 
 IHyDrawable2d::~IHyDrawable2d()

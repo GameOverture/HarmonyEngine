@@ -13,10 +13,16 @@
 HySpacer::HySpacer(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent)
 {
+	m_SizePolicies[HYORIEN_Horizontal] = m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Expanding;
 }
 
 /*virtual*/ HySpacer::~HySpacer()
 {
+}
+
+/*virtual*/ glm::vec2 HySpacer::GetPosOffset() /*override*/
+{
+	return glm::vec2(0.0f, 0.0f);
 }
 
 /*virtual*/ void HySpacer::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/

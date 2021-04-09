@@ -109,7 +109,7 @@ void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 			static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bOverrideExplicitChildren);
 	}
 }
@@ -125,7 +125,7 @@ void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChil
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 			static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bOverrideExplicitChildren);
 	}
 }
@@ -141,7 +141,7 @@ void HyEntity2d::SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 			static_cast<IHyBody2d *>(m_ChildList[i])->_SetStencil(m_hStencil, bOverrideExplicitChildren);
 	}
 }
@@ -157,7 +157,7 @@ void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChil
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 			static_cast<IHyBody2d *>(m_ChildList[i])->_SetStencil(m_hStencil, bOverrideExplicitChildren);
 	}
 }
@@ -173,7 +173,7 @@ void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 			static_cast<IHyBody2d *>(m_ChildList[i])->_SetCoordinateSystem(m_iCoordinateSystem, bOverrideExplicitChildren);
 	}
 }
@@ -189,7 +189,7 @@ void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex, bool bOverrideExplicit
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 			static_cast<IHyBody2d *>(m_ChildList[i])->_SetCoordinateSystem(iWindowIndex, bOverrideExplicitChildren);
 	}
 }
@@ -210,7 +210,7 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	IHyBody2d::ResetDisplayOrder();
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 			static_cast<IHyBody2d *>(m_ChildList[i])->ResetDisplayOrder();
 	}
 }
@@ -220,8 +220,12 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	HyMath::InvalidateAABB(m_SceneAABB);
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(m_ChildList[i]->GetSceneAABB().IsValid() == false)
+		if((0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable) &&
+			static_cast<IHyDrawable2d *>(m_ChildList[i])->IsValidToRender() == false) ||
+			m_ChildList[i]->GetSceneAABB().IsValid() == false)
+		{
 			continue;
+		}
 
 		if(m_SceneAABB.IsValid() == false)
 			m_SceneAABB = m_ChildList[i]->GetSceneAABB();
@@ -634,7 +638,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 				iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 		}
 	}
@@ -642,7 +646,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	{
 		for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
 		{
-			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 				iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 		}
 	}
@@ -787,7 +791,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	childRef._SetVisible(IsVisible(), false);
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
-	if(childRef.GetInternalFlags() & NODETYPE_IsDrawable)
+	if(childRef.GetInternalFlags() & NODETYPE_IsBody)
 	{
 		static_cast<IHyBody2d &>(childRef)._SetCoordinateSystem(GetCoordinateSystem(), false);
 
@@ -857,7 +861,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 				static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bIsOverriding);
 		}
 	}
@@ -871,7 +875,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 				static_cast<IHyBody2d *>(m_ChildList[i])->_SetStencil(m_hStencil, bIsOverriding);
 		}
 	}
@@ -885,7 +889,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
-			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable))
+			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 				static_cast<IHyBody2d *>(m_ChildList[i])->_SetCoordinateSystem(iWindowIndex, bIsOverriding);
 		}
 	}

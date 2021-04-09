@@ -49,6 +49,11 @@ void IHyLayout::SetSize(int32 iNewWidth, int32 iNewHeight)
 	OnSetLayoutItems();
 }
 
+/*virtual*/ glm::vec2 IHyLayout::GetPosOffset() /*override*/
+{
+	return glm::vec2(0.0f, 0.0f);
+}
+
 void IHyLayout::SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols)
 {
 	// First determine the preferred length of all the layout children together, and tally their size policies
@@ -102,16 +107,16 @@ void IHyLayout::SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols)
 		iPrefColSize = HyMax(iPrefColSize, pCurColSizes[i]);
 	delete[] pCurColSizes;
 
-	// m_vSizeHint represents the preferred size a layout would ideally be
-	m_vSizeHint.x = m_Margins.left + m_Margins.right + ((uiNumCols - 1) * GetHorizontalSpacing());
-	m_vSizeHint.x += iPrefRowSize;
-	m_vSizeHint.y = m_Margins.top + m_Margins.bottom + ((uiNumRows - 1) * GetVerticalSpacing());
-	m_vSizeHint.y += iPrefColSize;
+	// m_vUiSizeHint represents the preferred size a layout would ideally be
+	m_vUiSizeHint.x = m_Margins.left + m_Margins.right + ((uiNumCols - 1) * GetHorizontalSpacing());
+	m_vUiSizeHint.x += iPrefRowSize;
+	m_vUiSizeHint.y = m_Margins.top + m_Margins.bottom + ((uiNumRows - 1) * GetVerticalSpacing());
+	m_vUiSizeHint.y += iPrefColSize;
 
-	// Determine if preferred size (m_vSizeHint) fits within m_vSize
+	// Determine if preferred size (m_vUiSizeHint) fits within m_vSize
 	//	- Distrubute positive difference to all 'expanding' then 'grow' size policies
 	//	- Distrubute negative difference to all 'fill' then 'shrink' size policies
-	glm::vec2 vDifference = m_vSize - m_vSizeHint;
+	glm::vec2 vDifference = m_vSize - m_vUiSizeHint;
 
 	glm::vec2 vGrowAmt(0.0f, 0.0f);
 	glm::vec2 vExpandAmt(0.0f, 0.0f);
@@ -169,12 +174,10 @@ void IHyLayout::SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols)
 				pLayout->SetSize(vItemSize.x, vItemSize.y);
 			}
 
-			// Determine the position offset from the newly calculated SceneAABB's bottom
-			auto ptLowerBound = pItem->GetSceneAABB().lowerBound;
-			glm::vec2 vOffset = glm::vec2(ptLowerBound.x, ptLowerBound.y) - pItem->pos.Get();
+			
 
 			// Set item to the ptCurPos + its local offset, then update ptCurPos for the next item
-			pItem->pos.Set(ptCurPos - vOffset);
+			pItem->pos.Set(ptCurPos + pItem->GetPosOffset());
 
 			ptCurPos.x += vItemSize.x + GetHorizontalSpacing();
 			fRowHeight = HyMax(fRowHeight, static_cast<float>(vItemSize.y));

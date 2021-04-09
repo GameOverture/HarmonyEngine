@@ -50,8 +50,8 @@ public:
 	virtual ~HyLabel();
 
 	void Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName);
-	void Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
 	void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName);
+	void Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
 	void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
 
 	float GetPanelWidth();
@@ -87,7 +87,8 @@ protected:
 						 std::string sTextPrefix, std::string sTextName,
 						 int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
 
-	virtual void OnResize(int32 iNewWidth, int32 iNewHeight);
+	virtual glm::vec2 GetPosOffset() override;
+	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
 };
 
 #endif /* HyLabel_h__ */
