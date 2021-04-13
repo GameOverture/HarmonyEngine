@@ -87,10 +87,10 @@ protected:
 	void CommonSetup();
 	virtual void OnSetup() { }					// Optional override for derived classes
 
-	virtual void ResetTextOnPanel();
-
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
+
+	virtual void ResetTextOnPanel();
 };
 
 #endif /* HyLabel_h__ */
