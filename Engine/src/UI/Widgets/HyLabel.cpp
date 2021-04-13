@@ -303,11 +303,15 @@ void HyLabel::CommonSetup()
 		auto &aabb = m_pPrimPanel->GetSceneAABB();
 		if(aabb.IsValid())
 			HySetVec(m_vUiSizeHint, aabb.GetExtents().x * 2.0f, aabb.GetExtents().y * 2.0f);
+		
+		m_pPrimPanel->scale = vCachedScale;
 	}
 	else if(m_SpritePanel.IsLoadDataValid())
 		HySetVec(m_vUiSizeHint, m_SpritePanel.GetCurFrameWidth(false), m_SpritePanel.GetCurFrameHeight(false));
-	else if(m_Text.IsLoadDataValid())
-		HySetVec(m_vUiSizeHint, m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
+	
+	// m_vUiSizeHint must be established
+	if(m_vUiSizeHint.x == 0 || m_vUiSizeHint.y == 0)
+		HySetVec(m_vUiSizeHint, 300, 75);
 }
 
 /*virtual*/ glm::vec2 HyLabel::GetPosOffset() /*override*/
@@ -317,7 +321,7 @@ void HyLabel::CommonSetup()
 		ptLowerBound = m_pPrimPanel->GetSceneAABB().lowerBound;
 	else if(m_SpritePanel.IsLoadDataValid())
 		ptLowerBound = m_SpritePanel.GetSceneAABB().lowerBound;
-	else if(m_Text.IsLoadDataValid())
+	else
 	{
 		// Have a zero vector be returned
 		ptLowerBound.x = pos.Get().x;
@@ -331,23 +335,15 @@ void HyLabel::CommonSetup()
 {
 	if(m_pPrimPanel)
 	{
-		m_pPrimPanel->scale.Set(1.0f, 1.0f);
-
-		if(m_vUiSizeHint.x != 0.0f)
-			m_pPrimPanel->scale.X((m_pPrimPanel->scale.X() * iNewWidth) / m_vUiSizeHint.x);
-		if(m_vUiSizeHint.y != 0.0f)
-			m_pPrimPanel->scale.Y((m_pPrimPanel->scale.Y() * iNewHeight) / m_vUiSizeHint.y);
+		m_pPrimPanel->scale.X(static_cast<float>(iNewWidth) / m_vUiSizeHint.x);
+		m_pPrimPanel->scale.Y(static_cast<float>(iNewHeight) / m_vUiSizeHint.y);
 	}
 	else if(m_SpritePanel.IsLoadDataValid())
 	{
-		m_SpritePanel.scale.Set(1.0f, 1.0f);
-
-		if(m_vUiSizeHint.x != 0.0f)
-			m_SpritePanel.scale.X((m_SpritePanel.scale.X() * iNewWidth) / m_vUiSizeHint.x);
-		if(m_vUiSizeHint.y != 0.0f)
-			m_SpritePanel.scale.Y((m_SpritePanel.scale.Y() * iNewHeight) / m_vUiSizeHint.y);
+		m_SpritePanel.scale.X(static_cast<float>(iNewWidth) / m_vUiSizeHint.x);
+		m_SpritePanel.scale.Y(static_cast<float>(iNewHeight) / m_vUiSizeHint.y);
 	}
-	else if(m_Text.IsLoadDataValid())
+	else
 		m_Text.SetAsScaleBox(iNewWidth - m_TextMargins.left - m_TextMargins.right, iNewHeight - m_TextMargins.bottom - m_TextMargins.top);
 
 	ResetTextOnPanel();
@@ -355,12 +351,15 @@ void HyLabel::CommonSetup()
 
 /*virtual*/ void HyLabel::ResetTextOnPanel()
 {
-	// Position text
+	glm::vec2 vPanelDimensions = GetPanelDimensions();
 	glm::ivec2 vPanelOffset = GetPosOffset();
-	m_Text.pos.Set(m_TextMargins.left - vPanelOffset.x, m_TextMargins.bottom - vPanelOffset.y);
+
+	// Position text
+	m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / m_vUiSizeHint.x)) - vPanelOffset.x,
+				   (m_TextMargins.bottom * (vPanelDimensions.y / m_vUiSizeHint.y)) - vPanelOffset.y);
 
 	// Size text
-	glm::vec2 vPanelDimensions = GetPanelDimensions();
 	if(vPanelDimensions.x != 0.0f && vPanelDimensions.y != 0.0f)
-		m_Text.SetAsScaleBox(vPanelDimensions.x - m_TextMargins.left - m_TextMargins.right, vPanelDimensions.y - m_TextMargins.bottom - m_TextMargins.top, true);
+		m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / m_vUiSizeHint.x)),
+							 vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / m_vUiSizeHint.y)), true);
 }
