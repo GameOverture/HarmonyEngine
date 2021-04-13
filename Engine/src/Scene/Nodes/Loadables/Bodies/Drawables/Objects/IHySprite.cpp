@@ -407,7 +407,7 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHySprite<NODETYPE, ENTTYPE>::OnIsValidToRender() /*override*/
 {
-	return IsLoaded() && ((m_AnimCtrlAttribList[this->m_uiState] & ANIMCTRLATTRIB_Invalid) == 0);
+	return (m_AnimCtrlAttribList[this->m_uiState] & ANIMCTRLATTRIB_Invalid) == 0;
 }
 
 template<typename NODETYPE, typename ENTTYPE>

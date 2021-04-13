@@ -55,7 +55,9 @@ IHyDrawable3d &IHyDrawable3d::operator=(IHyDrawable3d &&donor) noexcept
 
 /*virtual*/ bool IHyDrawable3d::IsValidToRender() /*override final*/
 {
-	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) && OnIsValidToRender();
+	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) &&
+			IsLoaded() &&
+			OnIsValidToRender();
 }
 
 /*virtual*/ void IHyDrawable3d::Update() /*override final*/

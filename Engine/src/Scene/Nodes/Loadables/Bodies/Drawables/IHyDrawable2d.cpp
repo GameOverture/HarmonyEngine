@@ -99,7 +99,9 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 
 /*virtual*/ bool IHyDrawable2d::IsValidToRender() /*override final*/
 {
-	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) && OnIsValidToRender();
+	return (m_uiFlags & (SETTING_IsVisible | SETTING_IsRegistered)) == (SETTING_IsVisible | SETTING_IsRegistered) &&
+			IsLoaded() &&
+			OnIsValidToRender();
 }
 
 /*virtual*/ void IHyDrawable2d::OnLoaded() /*override*/
