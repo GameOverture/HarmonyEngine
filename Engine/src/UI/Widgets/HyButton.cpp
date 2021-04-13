@@ -23,7 +23,6 @@ HyButton::HyButton(float fWidth, float fHeight, float fStroke, std::string sText
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
-	OnSetup("", "", sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 HyButton::HyButton(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
@@ -31,7 +30,6 @@ HyButton::HyButton(float fWidth, float fHeight, float fStroke, std::string sText
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
-	OnSetup("", "", sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
 HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
@@ -39,7 +37,6 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
-	OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
@@ -47,7 +44,6 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
-	OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
 }
 
 /*virtual*/ HyButton::~HyButton()

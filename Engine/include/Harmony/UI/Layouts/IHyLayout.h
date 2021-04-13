@@ -28,7 +28,7 @@ public:
 	glm::ivec2 GetSize() const;
 	void SetSize(int32 iNewWidth, int32 iNewHeight);
 
-	void SetMargins(int32 iLeft, int32 iTop, int32 iRight, int32 iBottom, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY);
+	void SetMargins(int32 iLeft, int32 iBottom, int32 iRight, int32 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY);
 
 	uint16 GetHorizontalSpacing();
 	uint16 GetVerticalSpacing();

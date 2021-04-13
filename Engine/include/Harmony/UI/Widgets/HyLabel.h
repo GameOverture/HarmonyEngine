@@ -24,11 +24,12 @@ protected:
 		HyPrimitive2d		m_Fill;
 		HyPrimitive2d		m_Stroke;
 
-		PrimPanel(float fWidth, float fHeight, float fStroke, HyEntity2d *pParent);
+		PrimPanel(int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent);
 	};
 	PrimPanel *				m_pPrimPanel;			// Optionally construct a primitive panel instead of using HySprite2d
 	HySprite2d				m_SpritePanel;
 	HyText2d				m_Text;
+	HyRectangle<float>		m_TextMargins;
 
 	enum InfoPanelAttributes
 	{
@@ -43,19 +44,20 @@ protected:
 
 public:
 	HyLabel(HyEntity2d *pParent = nullptr);
-	HyLabel(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
-	HyLabel(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
+	HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
+	HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
-	HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
+	HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyLabel();
 
-	void Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName);
+	void Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName);
 	void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName);
-	void Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
-	void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
+	void Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
+	void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
 
 	float GetPanelWidth();
 	float GetPanelHeight();
+	glm::vec2 GetPanelDimensions();
 
 	uint32 GetSpriteState() const;
 	virtual void SetSpriteState(uint32 uiStateIndex);
@@ -63,7 +65,6 @@ public:
 	std::string GetText() const;
 	void SetText(std::string sText);
 	virtual void SetTextState(uint32 uiStateIndex);
-	virtual void SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY);
 	virtual void SetTextAlignment(HyAlignment eAlignment);
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 
@@ -83,9 +84,10 @@ public:
 	HyText2d &GetTextNode();
 
 protected:
-	virtual void OnSetup(std::string sPanelPrefix, std::string sPanelName,
-						 std::string sTextPrefix, std::string sTextName,
-						 int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY);
+	void CommonSetup();
+	virtual void OnSetup() { }					// Optional override for derived classes
+
+	virtual void ResetTextOnPanel();
 
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;

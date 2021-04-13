@@ -20,7 +20,7 @@ TextDraw::TextDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataR
 {
 	m_Text.Init("", "+GuiPreview", this);
 	m_Text.SetText("The Quick Brown Fox Jumped Over The Lazy Dog!? 1234567890");
-	m_Text.SetTextAlignment(HYALIGN_Center);
+	m_Text.SetTextAlignment(HYALIGN_HCenter);
 }
 
 TextDraw::~TextDraw()

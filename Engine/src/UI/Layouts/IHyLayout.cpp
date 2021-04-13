@@ -26,9 +26,9 @@ glm::ivec2 IHyLayout::GetSize() const
 	return m_vSize;
 }
 
-void IHyLayout::SetMargins(int32 iLeft, int32 iTop, int32 iRight, int32 iBottom, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY)
+void IHyLayout::SetMargins(int32 iLeft, int32 iBottom, int32 iRight, int32 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY)
 {
-	m_Margins.Set(iLeft, iTop, iRight, iBottom);
+	m_Margins.Set(iLeft, iBottom, iRight, iTop);
 	m_Margins.iTag = uiWidgetSpacingX | (uiWidgetSpacingY << 16);
 	OnSetLayoutItems();
 }

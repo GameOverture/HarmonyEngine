@@ -43,6 +43,7 @@ void HyGridLayout::Clear()
 
 	for(uint32 i = 0; i < m_SpacerList.size(); ++i)
 		delete m_SpacerList[i];
+	m_SpacerList.clear();
 
 	m_GridSize.x = m_GridSize.y = 0;
 }

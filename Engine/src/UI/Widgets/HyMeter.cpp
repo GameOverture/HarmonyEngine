@@ -21,29 +21,28 @@ HyMeter::HyMeter(float fWidth, float fHeight, float fStroke, std::string sTextPr
 	HyLabel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, pParent),
 	m_SpinText(this)
 {
-	OnSetup("", "", sTextPrefix, sTextName, 0, 0, 0, 0);
+	OnSetup();
 }
 
 HyMeter::HyMeter(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(fWidth, fHeight, fStroke, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
 	m_SpinText(this)
 {
-	OnSetup("", "", sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	OnSetup();
 }
 
 HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, pParent),
 	m_SpinText(this)
 {
-	
-	OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
+	OnSetup();
 }
 
 HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
 	m_SpinText(this)
 {
-	OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	OnSetup();
 }
 
 /*virtual*/ HyMeter::~HyMeter()
@@ -143,9 +142,9 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 	m_SpinText.m_SpinText_Padded.SetState(uiStateIndex);
 }
 
-/*virtual*/ void HyMeter::SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY) /*override*/
+/*virtual*/ void HyMeter::ResetTextOnPanel() /*override*/
 {
-	HyLabel::SetTextLocation(iWidth, iHeight, iOffsetX, iOffsetY);
+	HyLabel::ResetTextOnPanel();
 
 	m_Text.SetMonospacedDigits(true);
 
@@ -362,10 +361,8 @@ void HyMeter::FormatDigits()
 	}
 }
 
-/*virtual*/ void HyMeter::OnSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) /*override*/
+/*virtual*/ void HyMeter::OnSetup() /*override*/
 {
-	HyLabel::OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
-	
-	m_SpinText.Setup(sTextPrefix, sTextName);
+	m_SpinText.Setup(m_Text.GetPrefix(), m_Text.GetName());
 	FormatDigits();
 }

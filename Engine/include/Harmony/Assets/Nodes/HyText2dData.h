@@ -76,7 +76,7 @@ struct HyText2dGlyphInfo
 		iOFFSET_Y(iOffsetY),
 		fADVANCE_X(fAdvanceX),
 		fADVANCE_Y(fAdvanceY),
-		rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot)
+		rSRC_RECT(fSrcLeft, fSrcBot, fSrcRight, fSrcTop)
 	{
 	}
 };

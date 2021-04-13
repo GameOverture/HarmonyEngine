@@ -119,16 +119,16 @@ template<typename T>
 struct HyRectangle
 {
 	T left;
-	T top;
-	T right;
 	T bottom;
+	T right;
+	T top;
 
 	int32 iTag;
 
-	HyRectangle() : left(0), top(0), right(0), bottom(0), iTag(0)
+	HyRectangle() : left(0), bottom(0), right(0), top(0), iTag(0)
 	{ }
 
-	HyRectangle(T tLeft, T tTop, T tRight, T tBottom) : left(tLeft), top(tTop), right(tRight), bottom(tBottom), iTag(0)
+	HyRectangle(T tLeft, T tBottom, T tRight, T tTop) : left(tLeft), bottom(tBottom), right(tRight), top(tTop), iTag(0)
 	{ }
 
 	std::string ToString() const
@@ -148,7 +148,7 @@ struct HyRectangle
 		return abs(bottom - top);
 	}
 
-	void Set(T tLeft, T tTop, T tRight, T tBottom)
+	void Set(T tLeft, T tBottom, T tRight, T tTop)
 	{
 		left = tLeft;
 		top = tTop;

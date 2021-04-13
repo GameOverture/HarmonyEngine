@@ -29,7 +29,7 @@ struct HySprite2dFrame
 					float fSrcBot,
 					glm::ivec2 vOffset,
 					float fDuration) :	pAtlas(pAtlas),
-										rSRC_RECT(fSrcLeft, fSrcTop, fSrcRight, fSrcBot),
+										rSRC_RECT(fSrcLeft, fSrcBot, fSrcRight, fSrcTop),
 										vOFFSET(vOffset),
 										fDURATION(fDuration)
 	{ }

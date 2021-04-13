@@ -86,7 +86,7 @@ public:
 
 	void SetText(std::string sText) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
 	virtual void SetTextState(uint32 uiStateIndex) override;
-	virtual void SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY) override;
+	virtual void ResetTextOnPanel() override;
 	virtual void SetTextAlignment(HyAlignment eAlignment) override;
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
 
@@ -96,8 +96,7 @@ protected:
 	void FormatDigits();
 
 	virtual void OnUpdate() override;
-
-	virtual void OnSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY) override;
+	virtual void OnSetup() override;
 };
 
 #endif /* HyMeter_h__ */

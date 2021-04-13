@@ -12,18 +12,18 @@
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyLabel::PrimPanel::PrimPanel(float fWidth, float fHeight, float fStroke, HyEntity2d *pParent) :
+HyLabel::PrimPanel::PrimPanel(int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_Fill(this),
 	m_Stroke(this)
 {
-	m_Fill.SetAsBox(fWidth, fHeight);
+	m_Fill.SetAsBox(iWidth, iHeight);
 	m_Fill.SetTint(0.5f, 0.5f, 0.5f);
 	
-	m_Stroke.SetAsBox(fWidth, fHeight);
+	m_Stroke.SetAsBox(iWidth, iHeight);
 	m_Stroke.SetTint(0.3f, 0.3f, 0.3f);
 	m_Stroke.SetWireframe(true);
-	m_Stroke.SetLineThickness(fStroke);
+	m_Stroke.SetLineThickness(iStroke);
 
 	Load();
 }
@@ -37,24 +37,24 @@ HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyLabel::HyLabel(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "", this)
 {
-	Setup(fWidth, fHeight, fStroke, sTextPrefix, sTextName);
+	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName);
 }
 
-HyLabel::HyLabel(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "", this)
 {
-	Setup(fWidth, fHeight, fStroke, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
 
 HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
@@ -67,14 +67,14 @@ HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string s
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName);
 }
 
-HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiInfoPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "", this)
 {
-	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
 
 /*virtual*/ HyLabel::~HyLabel()
@@ -82,9 +82,9 @@ HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string s
 	delete m_pPrimPanel;
 }
 
-void HyLabel::Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName)
+void HyLabel::Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName)
 {
-	Setup(fWidth, fHeight, fStroke, sTextPrefix, sTextName, 0, 0, 0, 0);
+	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
@@ -92,18 +92,22 @@ void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::strin
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
-void HyLabel::Setup(float fWidth, float fHeight, float fStroke, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
+void HyLabel::Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
 {
 	m_uiInfoPanelAttribs |= INFOPANELATTRIB_IsPrimitive;
 
 	m_SpritePanel.Uninit();
 	delete m_pPrimPanel;
-	m_pPrimPanel = HY_NEW PrimPanel(fWidth, fHeight, fStroke, this);
+	m_pPrimPanel = HY_NEW PrimPanel(iWidth, iHeight, iStroke, this);
 
-	OnSetup("", "", sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	m_Text.Init(sTextPrefix, sTextName, this);
+	m_TextMargins.Set(iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
+
+	CommonSetup();
+	OnSetup();
 }
 
-void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
+void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
 {
 	m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_IsPrimitive;
 
@@ -111,35 +115,41 @@ void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::strin
 	m_pPrimPanel = nullptr;
 	m_SpritePanel.Init(sPanelPrefix, sPanelName, this);
 
-	OnSetup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	m_Text.Init(sTextPrefix, sTextName, this);
+	m_TextMargins.Set(iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
+
+	CommonSetup();
+	OnSetup();
 }
 
 float HyLabel::GetPanelWidth()
 {
 	if(m_pPrimPanel)
-	{
-		b2AABB tmpAABB;
-		b2Transform tmpTransform;
-		tmpTransform.SetIdentity();
-		m_pPrimPanel->m_Fill.GetLocalBoundingVolume().GetB2Shape()->ComputeAABB(&tmpAABB, tmpTransform, 0);
-		return tmpAABB.upperBound.x - tmpAABB.lowerBound.x;
-	}
-	else
+		return m_pPrimPanel->GetSceneAABB().GetExtents().x * 2.0f;
+	else if(m_SpritePanel.IsLoadDataValid())
 		return m_SpritePanel.GetCurFrameWidth(true);
+
+	return 0.0f;
 }
 
 float HyLabel::GetPanelHeight()
 {
 	if(m_pPrimPanel)
-	{
-		b2AABB tmpAABB;
-		b2Transform tmpTransform;
-		tmpTransform.SetIdentity();
-		m_pPrimPanel->m_Fill.GetLocalBoundingVolume().GetB2Shape()->ComputeAABB(&tmpAABB, tmpTransform, 0);
-		return tmpAABB.upperBound.y - tmpAABB.lowerBound.y;
-	}
-	else
+		return m_pPrimPanel->GetSceneAABB().GetExtents().y * 2.0f;
+	else if(m_SpritePanel.IsLoadDataValid())
 		return m_SpritePanel.GetCurFrameHeight(true);
+
+	return 0.0f;
+}
+
+glm::vec2 HyLabel::GetPanelDimensions()
+{
+	if(m_pPrimPanel)
+		return glm::vec2(m_pPrimPanel->GetSceneAABB().GetExtents().x * 2.0f, m_pPrimPanel->GetSceneAABB().GetExtents().y * 2.0f);
+	else if(m_SpritePanel.IsLoadDataValid())
+		return glm::vec2(m_SpritePanel.GetCurFrameWidth(true), m_SpritePanel.GetCurFrameHeight(true));
+
+	return glm::vec2(0.0f, 0.0f);
 }
 
 uint32 HyLabel::GetSpriteState() const
@@ -155,23 +165,9 @@ uint32 HyLabel::GetSpriteState() const
 		return;
 	}
 
-	// Calculate the original text offset specified from an earlier call to Setup()
-	glm::ivec2 vOrigTextOffset = m_Text.pos.Get();
-	glm::ivec2 vPanelOffset(0);
-	const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_SpritePanel.AcquireData());
-	if(pPanelData)
-	{
-		const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_SpritePanel.GetState(), m_SpritePanel.GetFrame());
-		vPanelOffset = frameRef.vOFFSET;
-	}
-	vOrigTextOffset.x -= vPanelOffset.x;
-	vOrigTextOffset.y -= vPanelOffset.y;
-
-	// Now set new sprite state, so below SetTextLocation() can offset properly onto it
+	// Now set new sprite state, so below ResetTextOnPanel() can offset properly onto it
 	m_SpritePanel.SetState(uiStateIndex);
-
-	// Realign text on new panel sprite state
-	SetTextLocation(static_cast<int32>(m_Text.GetTextBox().x), static_cast<int32>(m_Text.GetTextBox().y), vOrigTextOffset.x, vOrigTextOffset.y);
+	ResetTextOnPanel();
 }
 
 /*virtual*/ std::string HyLabel::GetText() const
@@ -187,29 +183,6 @@ uint32 HyLabel::GetSpriteState() const
 /*virtual*/ void HyLabel::SetTextState(uint32 uiStateIndex)
 {
 	m_Text.SetState(uiStateIndex);
-}
-
-/*virtual*/ void HyLabel::SetTextLocation(int32 iWidth, int32 iHeight, int32 iOffsetX, int32 iOffsetY)
-{
-	m_Text.SetTextAlignment(HYALIGN_HCenter);
-
-	glm::ivec2 vPanelOffset(0);
-	if(m_pPrimPanel == nullptr)
-	{
-		const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_SpritePanel.AcquireData());
-		if(pPanelData)
-		{
-			const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_SpritePanel.GetState(), m_SpritePanel.GetFrame());
-			vPanelOffset = frameRef.vOFFSET;
-		}
-	}
-	
-	m_Text.pos.Set(iOffsetX + vPanelOffset.x, iOffsetY + vPanelOffset.y);
-
-	if(iWidth > 0 && iHeight > 0)
-		m_Text.SetAsScaleBox(static_cast<float>(iWidth), static_cast<float>(iHeight), true);
-	else
-		m_Text.SetAsScaleBox(GetPanelWidth(), GetPanelHeight(), true);
 }
 
 /*virtual*/ void HyLabel::SetTextAlignment(HyAlignment eAlignment)
@@ -312,11 +285,12 @@ HyText2d &HyLabel::GetTextNode()
 	return m_Text;
 }
 
-/*virtual*/ void HyLabel::OnSetup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY)
+void HyLabel::CommonSetup()
 {
-	m_Text.Init(sTextPrefix, sTextName, this);
+	m_Text.SetTextAlignment(HYALIGN_HCenter);
 
-	SetTextLocation(iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY);
+	ResetTextOnPanel();
+
 	SetAsDisabled(IsDisabled());
 	SetAsHighlighted(IsHighlighted());
 
@@ -334,6 +308,27 @@ HyText2d &HyLabel::GetTextNode()
 		HySetVec(m_vUiSizeHint, m_SpritePanel.GetCurFrameWidth(false), m_SpritePanel.GetCurFrameHeight(false));
 	else if(m_Text.IsLoadDataValid())
 		HySetVec(m_vUiSizeHint, m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
+}
+
+/*virtual*/ void HyLabel::ResetTextOnPanel()
+{
+	// Position text
+	glm::ivec2 vPanelOffset(0, 0);
+	if(m_SpritePanel.IsLoadDataValid())
+	{
+		const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_SpritePanel.AcquireData());
+		const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_SpritePanel.GetState(), m_SpritePanel.GetFrame());
+		vPanelOffset = frameRef.vOFFSET;
+		vPanelOffset *= m_SpritePanel.scale.Get();
+	}
+	m_Text.pos.Set(m_TextMargins.left + vPanelOffset.x, m_TextMargins.bottom + vPanelOffset.y);
+
+	// Size text
+	glm::vec2 vPanelDimensions = GetPanelDimensions();
+	if(m_TextMargins.right > 0 && m_TextMargins.top > 0)
+		m_Text.SetAsScaleBox(vPanelDimensions.x - m_TextMargins.left - m_TextMargins.right, vPanelDimensions.y - m_TextMargins.bottom - m_TextMargins.top, true);
+	else
+		m_Text.SetAsScaleBox(GetPanelWidth(), GetPanelHeight(), true);
 }
 
 /*virtual*/ glm::vec2 HyLabel::GetPosOffset() /*override*/

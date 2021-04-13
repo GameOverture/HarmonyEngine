@@ -19,7 +19,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, H
 	m_uiAtlasIndexInGroup(uiIndexInGroup),
 	m_uiRawTextureWidth(0),
 	m_uiRawTextureHeight(0),
-	m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
+	m_SrcRect(0.0f, 1.0f, 1.0f, 0.0f)
 {
 	m_sPrefix = std::to_string(uiAtlasGrpId);
 	m_sName = std::to_string(uiIndexInGroup);
@@ -33,7 +33,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiText
 	m_uiAtlasIndexInGroup(0),
 	m_uiRawTextureWidth(uiTextureWidth),
 	m_uiRawTextureHeight(uiTextureHeight),
-	m_SrcRect(0.0f, 0.0f, 1.0f, 1.0f)
+	m_SrcRect(0.0f, 1.0f, 1.0f, 0.0f)
 {
 	m_sName = "raw";
 
