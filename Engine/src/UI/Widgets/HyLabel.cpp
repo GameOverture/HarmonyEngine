@@ -289,8 +289,6 @@ void HyLabel::CommonSetup()
 {
 	m_Text.SetTextAlignment(HYALIGN_HCenter);
 
-	ResetTextOnPanel();
-
 	SetAsDisabled(IsDisabled());
 	SetAsHighlighted(IsHighlighted());
 
@@ -312,6 +310,8 @@ void HyLabel::CommonSetup()
 	// m_vUiSizeHint must be established
 	if(m_vUiSizeHint.x == 0 || m_vUiSizeHint.y == 0)
 		HySetVec(m_vUiSizeHint, 300, 75);
+
+	ResetTextOnPanel();
 }
 
 /*virtual*/ glm::vec2 HyLabel::GetPosOffset() /*override*/
