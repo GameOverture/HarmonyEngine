@@ -33,8 +33,6 @@ IHyDrawable3d::IHyDrawable3d(IHyDrawable3d &&donor) noexcept :
 
 IHyDrawable3d::~IHyDrawable3d()
 {
-	if(m_eLoadState != HYLOADSTATE_Inactive)
-		Unload();
 }
 
 IHyDrawable3d &IHyDrawable3d::operator=(const IHyDrawable3d &rhs)

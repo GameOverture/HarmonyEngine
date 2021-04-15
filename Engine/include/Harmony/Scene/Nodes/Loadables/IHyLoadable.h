@@ -20,6 +20,7 @@ class HyAssets;
 class IHyLoadable
 {
 	friend class HyAssets;
+	friend class HyDiagnostics;
 
 protected:
 	static HyAssets *				sm_pHyAssets;

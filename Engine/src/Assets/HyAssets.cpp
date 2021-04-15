@@ -383,13 +383,13 @@ bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 // Unload everything
 void HyAssets::Shutdown()
 {
-	std::vector<IHyDrawable2d *> vReloadInsts;
+	std::vector<IHyLoadable *> vReloadInsts;
 	m_SceneRef.CopyAllLoadedNodes(vReloadInsts);
 
 	//m_QueuedEntityList.clear();
 
 	for(uint32 i = 0; i < m_QueuedInstList.size(); ++i)
-		vReloadInsts.push_back(static_cast<IHyDrawable2d *>(m_QueuedInstList[i]));
+		vReloadInsts.push_back(static_cast<IHyLoadable *>(m_QueuedInstList[i]));
 
 	for(uint32 i = 0; i < vReloadInsts.size(); ++i)
 		vReloadInsts[i]->Unload();

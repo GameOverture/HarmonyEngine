@@ -224,7 +224,7 @@ void HyDiagnostics::DumpAtlasUsage()
 
 void HyDiagnostics::DumpNodeUsage()
 {
-	std::vector<IHyDrawable2d *> loadedNodesList;
+	std::vector<IHyLoadable *> loadedNodesList;
 	m_SceneRef.CopyAllLoadedNodes(loadedNodesList);
 
 	uint32 uiNumAudio = 0;
@@ -237,7 +237,7 @@ void HyDiagnostics::DumpNodeUsage()
 	uint32 uiNumPrefab3d = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(loadedNodesList.size()); ++i)
 	{
-		switch(loadedNodesList[i]->GetType())
+		switch(loadedNodesList[i]->_LoadableGetType())
 		{
 		case HYTYPE_Audio:			uiNumAudio++;			break;
 		case HYTYPE_Particles:		uiNumParticles2d++;		break;

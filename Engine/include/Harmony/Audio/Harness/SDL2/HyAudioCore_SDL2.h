@@ -64,6 +64,9 @@ private:
 	void Modify(NODETYPE *pAudioNode);
 
 	static void OnChannelFinished(int32 iChannel);
+
+	static int computeChunkLengthMillisec(int chunkSize);
+	static void OnPitchModifer(int iChannel, void *pStream, int iLength, void *pData);
 };
 #endif // defined(HY_USE_SDL2)
 

@@ -64,7 +64,7 @@ public:
 	void AddNode_Loaded(IHyDrawable3d *pDrawable);
 	void RemoveNode_Loaded(const IHyDrawable2d *pDrawable);
 	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
-	void CopyAllLoadedNodes(std::vector<IHyDrawable2d *> &nodeListOut);
+	void CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut);
 
 	void AppendAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType);
 

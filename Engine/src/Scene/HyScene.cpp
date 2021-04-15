@@ -135,9 +135,18 @@ void HyScene::RemoveNode_Loaded(const IHyDrawable3d *pDrawable)
 	}
 }
 
-void HyScene::CopyAllLoadedNodes(std::vector<IHyDrawable2d *> &nodeListOut)
+void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 {
-	nodeListOut = m_NodeList_LoadedDrawable2d;
+	nodeListOut.clear();
+
+	for(auto it = sm_NodeList_All.begin(); it != sm_NodeList_All.end(); ++it)
+	{
+		if(((*it)->GetInternalFlags() & IHyNode::NODETYPE_IsLoadable) != 0 &&
+			reinterpret_cast<IHyLoadable *>(*it)->IsLoaded())
+		{
+			nodeListOut.push_back(reinterpret_cast<IHyLoadable *>(*it));
+		}
+	}
 }
 
 void HyScene::AppendAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType)

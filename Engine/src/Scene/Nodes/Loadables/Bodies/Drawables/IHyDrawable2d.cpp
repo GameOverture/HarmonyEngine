@@ -35,8 +35,6 @@ IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) noexcept :
 
 IHyDrawable2d::~IHyDrawable2d()
 {
-	ParentDetach();
-	Unload();
 }
 
 IHyDrawable2d &IHyDrawable2d::operator=(const IHyDrawable2d &rhs)
