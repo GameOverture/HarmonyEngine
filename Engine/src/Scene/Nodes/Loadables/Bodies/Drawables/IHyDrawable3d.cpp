@@ -33,6 +33,8 @@ IHyDrawable3d::IHyDrawable3d(IHyDrawable3d &&donor) noexcept :
 
 IHyDrawable3d::~IHyDrawable3d()
 {
+	ParentDetach();
+	Unload();
 }
 
 IHyDrawable3d &IHyDrawable3d::operator=(const IHyDrawable3d &rhs)

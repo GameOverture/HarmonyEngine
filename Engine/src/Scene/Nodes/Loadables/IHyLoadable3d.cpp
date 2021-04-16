@@ -35,8 +35,6 @@ IHyLoadable3d::IHyLoadable3d(IHyLoadable3d &&donor) noexcept :
 
 IHyLoadable3d::~IHyLoadable3d()
 {
-	ParentDetach();
-	Unload();
 }
 
 IHyLoadable3d &IHyLoadable3d::operator=(const IHyLoadable3d &rhs)
