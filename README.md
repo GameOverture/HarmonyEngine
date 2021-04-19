@@ -12,7 +12,6 @@ Getting Started:
 
 Harmony Library
 ---------------
-Self-contained, zero dependency static library.
 
 TBD
 
