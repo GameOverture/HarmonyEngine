@@ -36,6 +36,7 @@ IHyLoadable2d::IHyLoadable2d(IHyLoadable2d &&donor) noexcept :
 
 IHyLoadable2d::~IHyLoadable2d()
 {
+	Unload();
 }
 
 IHyLoadable2d &IHyLoadable2d::operator=(const IHyLoadable2d &rhs)

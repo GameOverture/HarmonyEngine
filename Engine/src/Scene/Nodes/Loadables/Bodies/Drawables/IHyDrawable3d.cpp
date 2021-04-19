@@ -33,7 +33,7 @@ IHyDrawable3d::IHyDrawable3d(IHyDrawable3d &&donor) noexcept :
 
 IHyDrawable3d::~IHyDrawable3d()
 {
-	ParentDetach();
+	// Required Unload() here because we want to invoke this class's virtual IHyDrawable3d::OnUnloaded
 	Unload();
 }
 

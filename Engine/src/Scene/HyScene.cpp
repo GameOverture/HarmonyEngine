@@ -141,10 +141,15 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 
 	for(auto it = sm_NodeList_All.begin(); it != sm_NodeList_All.end(); ++it)
 	{
-		if(((*it)->GetInternalFlags() & IHyNode::NODETYPE_IsLoadable) != 0 &&
-			reinterpret_cast<IHyLoadable *>(*it)->IsLoaded())
+		if(((*it)->GetInternalFlags() & IHyNode::NODETYPE_IsLoadable) != 0)
 		{
-			nodeListOut.push_back(reinterpret_cast<IHyLoadable *>(*it));
+			if((*it)->Is2D())
+			{
+				if(static_cast<IHyLoadable2d *>(*it)->IsLoaded())
+					nodeListOut.push_back(static_cast<IHyLoadable2d *>(*it));
+			}
+			else if(static_cast<IHyLoadable3d *>(*it)->IsLoaded())
+				nodeListOut.push_back(static_cast<IHyLoadable3d *>(*it));
 		}
 	}
 }

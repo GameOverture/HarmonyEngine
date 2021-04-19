@@ -32,6 +32,7 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, EN
 }
 
 // TODO: copy ctor and move ctor
+
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ IHyAudio<NODETYPE, ENTTYPE>::~IHyAudio(void)
 {

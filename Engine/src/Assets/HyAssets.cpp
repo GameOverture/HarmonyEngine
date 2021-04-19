@@ -25,7 +25,6 @@
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h"
-#include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Renderer/IHyRenderer.h"
 #include "Utilities/HyIO.h"
 #include "Utilities/HyMath.h"
@@ -94,8 +93,7 @@ HyAssets::~HyAssets()
 {
 	IHyLoadable::sm_pHyAssets = nullptr;
 
-	HyAssert(IsShutdown(), "Tried to destruct the HyAssets while data still exists");
-
+	HyAssert(IsShutdown(), "Tried to destruct the manifests while data still exists");
 	for(uint32 i = 0; i < HYNUM_FILETYPES; ++i)
 	{
 		switch(i)
@@ -312,8 +310,8 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 
 void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 {
-	HyAssert(pLoadable->_LoadableGetType() != HYTYPE_Entity, "HyAssets::RemoveNodeData passed an entity");
-	if(pLoadable->m_eLoadState == HYLOADSTATE_Inactive)
+	//HyAssert(pLoadable->_LoadableGetType() != HYTYPE_Entity, "HyAssets::RemoveNodeData passed an entity");
+	if(pLoadable->m_eLoadState == HYLOADSTATE_Inactive || pLoadable->_LoadableGetType() == HYTYPE_Entity)
 		return;
 
 	if(pLoadable->AcquireData() != nullptr)

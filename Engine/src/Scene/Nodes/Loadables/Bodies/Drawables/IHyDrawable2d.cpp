@@ -35,7 +35,7 @@ IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) noexcept :
 
 IHyDrawable2d::~IHyDrawable2d()
 {
-	ParentDetach();
+	// Required Unload() here because we want to invoke this class's virtual IHyDrawable2d::OnUnloaded
 	Unload();
 }
 

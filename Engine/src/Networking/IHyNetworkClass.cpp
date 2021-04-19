@@ -29,7 +29,6 @@ IHyNetworkClass::IHyNetworkClass(uint32 uiRecvBufferSize, HyThreadPriority ePrio
 
 /*virtual*/ IHyNetworkClass::~IHyNetworkClass()
 {
-	CleanupSocket();
 	delete[] m_pRecvBuff;
 }
 
