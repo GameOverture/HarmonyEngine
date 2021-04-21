@@ -27,6 +27,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
 option(HYBUILD_SDL_NET "Use SDL2_NET" OFF)
+option(HYBUILD_GLFW "Use GLFW for windowing, glcontext, input, and time instead of SDL2" OFF)
+option(HYBUILD_STATIC "Statically link all dependencies into the executable" OFF)
 
 message(STATUS "Harmony building for target: ${CMAKE_SYSTEM_NAME}")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
