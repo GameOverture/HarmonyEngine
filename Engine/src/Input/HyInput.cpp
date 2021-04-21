@@ -14,6 +14,83 @@
 #include "Input/HyInputMap.h"
 #include "Window/HyWindow.h"
 
+
+#ifdef HY_USE_GLFW
+	void HyGlfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods)
+	{
+		HyInput &inputRef = HyEngine::Input();
+		
+		inputRef.m_pMouseWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
+
+		if(iAction == GLFW_PRESS)
+		{
+			inputRef.m_uiMouseBtnFlags |= (1 << iButton);
+			inputRef.m_uiMouseBtnFlags_NewlyPressed |= (1 << iButton);
+		}
+		else // GLFW_RELEASE
+			inputRef.m_uiMouseBtnFlags &= ~(1 << iButton);
+	}
+
+	void HyGlfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY)
+	{
+		HyInput &inputRef = HyEngine::Input();
+
+		inputRef.m_pMouseWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
+		inputRef.m_ptMousePos.x = static_cast<float>(dX);
+		inputRef.m_ptMousePos.y = static_cast<float>(dY);
+
+		if(inputRef.m_bTouchScreenHack)
+			HyGlfw_MouseButtonCallback(pWindow, HYMOUSE_BtnLeft, GLFW_PRESS, 0);
+	}
+
+	void HyGlfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY)
+	{
+	}
+
+	void HyGlfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods)
+	{
+		HyEngine::Input().OnGlfwKey(iKey, iAction);
+	}
+
+	void HyGlfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint)
+	{
+	}
+
+	void HyGlfw_CharModsCallback(GLFWwindow *pWindow, uint32 uiCodepoint, int32 iMods)
+	{
+	}
+
+	void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent)
+	{
+		HyInput &inputRef = HyEngine::Input();
+
+		if(iEvent == GLFW_CONNECTED)
+		{
+			int32 iAxisCount, iButtonCount;
+			glfwGetJoystickAxes(iJoyId, &iAxisCount);
+			glfwGetJoystickButtons(iJoyId, &iButtonCount);
+
+			HyLog("Found joystick " << iJoyId + 1 << " named \"" << glfwGetJoystickName(iJoyId) << "\" with " << iAxisCount << " axes, " << iButtonCount <<" buttons");
+			inputRef.m_JoystickList[inputRef.m_uiJoystickCount++] = iJoyId;
+		}
+		else // GLFW_DISCONNECTED
+		{
+			uint32 i = 0;
+			for(; i < inputRef.m_uiJoystickCount; ++i)
+			{
+				if(inputRef.m_JoystickList[i] == iJoyId)
+					break;
+			}
+
+			for (i = i + 1; i < inputRef.m_uiJoystickCount; ++i)
+				inputRef.m_JoystickList[i - 1] = inputRef.m_JoystickList[i];
+
+			HyLog("Lost joystick " << iJoyId + 1);
+			inputRef.m_uiJoystickCount--;
+		}
+	}
+#endif
+
 HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :
 	m_uiNUM_INPUT_MAPS(uiNumInputMappings),
 	m_WindowListRef(windowListRef),
@@ -37,23 +114,16 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 #ifdef HY_USE_GLFW
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
-		glfwSetMouseButtonCallback(m_WindowListRef[i]->GetHandle(), glfw_MouseButtonCallback);
-		glfwSetCursorPosCallback(m_WindowListRef[i]->GetHandle(), glfw_CursorPosCallback);
-		glfwSetScrollCallback(m_WindowListRef[i]->GetHandle(), glfw_ScrollCallback);
-		glfwSetKeyCallback(m_WindowListRef[i]->GetHandle(), glfw_KeyCallback);
-		glfwSetCharCallback(m_WindowListRef[i]->GetHandle(), glfw_CharCallback);
-
+		glfwSetMouseButtonCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_MouseButtonCallback);
+		glfwSetCursorPosCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_CursorPosCallback);
+		glfwSetScrollCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_ScrollCallback);
+		glfwSetKeyCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_KeyCallback);
+		glfwSetCharCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_CharCallback);
 #ifndef HY_PLATFORM_BROWSER
-		glfwSetCharModsCallback(m_WindowListRef[i]->GetHandle(), glfw_CharModsCallback);
+		glfwSetCharModsCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_CharModsCallback);
 #endif
 	}
-
-	//for(int32 i = HYJOYSTICK_0; i < HYNUM_JOYSTICK; ++i)
-	//{
-	//	if(glfwJoystickPresent(i))
-	//		glfw_JoystickCallback(i, GLFW_CONNECTED);
-	//}
-	glfwSetJoystickCallback(glfw_JoystickCallback);
+	glfwSetJoystickCallback(HyGlfw_JoystickCallback);
 #endif
 }
 
@@ -185,7 +255,13 @@ void HyInput::EnableTouchScreenHack(bool bEnable)
 	m_bTouchScreenHack = bEnable;
 }
 
-#ifdef HY_USE_SDL2
+#ifdef HY_USE_GLFW
+void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
+{
+	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+		m_pInputMaps[i].ApplyInput(iKey, static_cast<HyBtnPressState>(iAction));
+}
+#elif defined(HY_USE_SDL2)
 void HyInput::DoKeyDownEvent(const SDL_Event &eventRef)
 {
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)

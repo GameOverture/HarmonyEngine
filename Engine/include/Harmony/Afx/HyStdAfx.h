@@ -30,6 +30,10 @@ typedef rapidjson::GenericObject<false, rapidjson::Value> HyJsonObj;
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/gtc/quaternion.hpp"
 
+#ifdef HY_USE_GLFW
+	#include <GLFW/glfw3.h>
+#endif
+
 // STL includes (TODO: to be replaced/benchmarked with EASTL)
 #include <iostream>
 #include <string>

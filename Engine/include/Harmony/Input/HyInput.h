@@ -92,7 +92,17 @@ public:
 	void EnableTouchScreenHack(bool bEnable);
 
 private:
-#ifdef HY_USE_SDL2
+#ifdef HY_USE_GLFW
+	friend void HyGlfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);
+	friend void HyGlfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY);
+	friend void HyGlfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY);
+	friend void HyGlfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods);
+	friend void HyGlfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint);
+	friend void HyGlfw_CharModsCallback(GLFWwindow *pWindow, uint32 uiCodepoint, int32 iMods);
+	friend void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent);
+
+	void OnGlfwKey(int32 iKey, int32 iAction);
+#elif defined(HY_USE_SDL2)
 	void DoKeyDownEvent(const SDL_Event &eventRef);
 	void DoKeyUpEvent(const SDL_Event &eventRef);
 	void DoMouseDownEvent(const SDL_Event &eventRef);
@@ -100,6 +110,7 @@ private:
 	void DoMouseMoveEvent(const SDL_Event &eventRef);
 	void SetMouseWindow(HyWindow *pWindow);
 #endif
+
 	void Update();
 };
 

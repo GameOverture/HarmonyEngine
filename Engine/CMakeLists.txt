@@ -1,33 +1,45 @@
 add_subdirectory(external/box2d)
 add_subdirectory(external/soil2)
 
-# Emscripten provides its own ports of SDL and GLEW
+# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_STATIC
+
+# Emscripten provides its own ports of SDL, GLFW, and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	add_subdirectory(external/glad)
-	
-	# TODO: have 'HYBUILD_SDL_NET' be configurable for desktop builds
-	set(HYBUILD_SDL_NET ON)
 	
 	# Qt provides its own implementation of SDL facitlities
 	if(HYBUILD_Qt)
 		set(HYBUILD_SDL_NET OFF)
+		set(HYBUILD_GLFW OFF)
 	else()
 		# Below is typical desktop deployment
+		if(HYBUILD_STATIC)
+			set(SDL_STATIC ON)
+			set(SDL_SHARED OFF)
+		else()
+			set(SDL_SHARED ON)
+		endif()
+		
 		add_subdirectory(external/SDL2)
 		include_directories(external/SDL2/include)
 		set_target_properties(SDL2main PROPERTIES FOLDER "Engine Libs")
-		if(SDL_SHARED)
-			set_target_properties(SDL2 PROPERTIES FOLDER "Engine Libs")
-		endif()
-		if(SDL_STATIC)
-			set_target_properties(SDL2-static PROPERTIES FOLDER "Engine Libs")
-		endif()
+		set_target_properties(SDL2-static PROPERTIES FOLDER "Engine Libs")
+		set_target_properties(SDL2 PROPERTIES FOLDER "Engine Libs")
 		
 		add_subdirectory(external/SDL2_mixer)
 
 		# Optional SDL2 extensions
 		if(HYBUILD_SDL_NET)
 			add_subdirectory(external/SDL2_net)
+		endif()
+		
+		if(HYBUILD_GLFW)
+			add_compile_definitions(HY_USE_GLFW)
+			set(GLFW_BUILD_EXAMPLES, OFF)
+			set(GLFW_BUILD_TESTS, OFF)
+			set(GLFW_BUILD_DOCS, OFF)
+			set(GLFW_INSTALL, OFF)
+			add_subdirectory(external/glfw)
 		endif()
 	endif()
 endif()
@@ -280,6 +292,11 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 		if(HYBUILD_SDL_NET)
 			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_net")
 			target_link_libraries(HyEngine PUBLIC SDL2_net)
+		endif()
+		
+		if(HYBUILD_GLFW)
+			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw")
+			target_link_libraries(HyEngine PUBLIC glfw)
 		endif()
 	endif()
 endif()

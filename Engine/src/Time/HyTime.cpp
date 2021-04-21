@@ -23,6 +23,12 @@ HyTime::HyTime(uint32 uiUpdateTickMs) :
 	m_dThrottledTime(0.0),
 	m_dSpiralOfDeathCounter(HYTIME_ThresholdWarningsEvery),
 	m_dCurDeltaTime(0.0)
+#ifdef HY_USE_GLFW
+	, m_dPrevTime(0.0f)
+#elif defined(HY_USE_SDL2)
+	, m_uiPrev(0),
+	m_uiCur(0)
+#endif
 {
 	SetUpdateTickMs(uiUpdateTickMs);
 }
@@ -60,7 +66,12 @@ double HyTime::GetTotalElapsedTime() const
 
 void HyTime::SetCurDeltaTime()
 {
-#ifdef HY_USE_SDL2
+#ifdef HY_USE_GLFW
+	double dCurTime = glfwGetTime();
+
+	m_dCurDeltaTime = dCurTime - m_dPrevTime;
+	m_dPrevTime = dCurTime;
+#elif defined(HY_USE_SDL2)
 	m_uiPrev = m_uiCur;
 	m_uiCur = SDL_GetPerformanceCounter();
 

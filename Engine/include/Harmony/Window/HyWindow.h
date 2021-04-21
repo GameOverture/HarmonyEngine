@@ -73,7 +73,7 @@ public:
 	};
 
 public:
-	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef);
+	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowInteropPtr hSharedContext);
 	~HyWindow(void);
 
 	uint32								GetIndex() const;
@@ -115,7 +115,15 @@ public:
 	bool								IsFullScreen();
 	void								SetFullScreen(bool bFullScreen);
 
-#ifdef HY_USE_SDL2
+#ifdef HY_USE_GLFW
+	// Returns the monitor this window is currently associated with.
+	// (Determined by the monitor closest to window's center)
+	GLFWmonitor *						GetGlfwMonitor();
+
+	friend void HyGlfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
+	friend void HyGlfw_FramebufferSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
+	friend void HyGlfw_WindowPosCallback(GLFWwindow *pWindow, int32 iX, int32 iY);
+#elif defined(HY_USE_SDL2)
 	void DoEvent(const SDL_Event &eventRef, HyInput &inputRef);
 #endif
 };

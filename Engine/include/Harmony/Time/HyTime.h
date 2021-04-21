@@ -32,8 +32,12 @@ class HyTime
 																	// This counter keeps track of these scenarios
 	double								m_dCurDeltaTime;
 
+#ifdef HY_USE_GLFW
+	double								m_dPrevTime;
+#elif defined(HY_USE_SDL2)
 	uint64_t							m_uiPrev;
 	uint64_t							m_uiCur;
+#endif
 
 public:
 	HyTime(uint32 uiUpdateTickMs);

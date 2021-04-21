@@ -29,8 +29,10 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 {
 	HyLog("OpenGL is initializing...");
 
-#if defined(HY_USE_SDL2)
+#if defined(HY_USE_SDL2) && !defined(HY_USE_GLFW)
 	m_Context = nullptr;
+
+	// TODO: CHECK TO SEE IF THIS IS THE REASON MULTIPLE WINDOWS LEAK WITH SDL2 ON WINDOWS 7
 
 	// Create the context with the first window, and share it between any other windows
 	if(m_WindowListRef.empty() == false)
@@ -50,7 +52,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	{
 		SetCurrentWindow(i);
 
-#if defined(HY_USE_SDL2)
+#if defined(HY_USE_SDL2) && !defined(HY_USE_GLFW)
 		// Prep GL extensions with GLAD+SDL2
 		#if defined(HY_USE_GLAD)
 			#if defined(HY_PLATFORM_BROWSER)
@@ -174,7 +176,7 @@ HyOpenGL::~HyOpenGL(void)
 	delete [] m_pPboHandles;
 	delete [] m_pPboStates;
 
-#if defined(HY_USE_SDL2)
+#if defined(HY_USE_SDL2) && !defined(HY_USE_GLFW)
 	SDL_GL_DeleteContext(m_Context);
 #endif
 }
@@ -183,7 +185,9 @@ HyOpenGL::~HyOpenGL(void)
 {
 	IHyRenderer::SetCurrentWindow(uiIndex);
 
-#if defined(HY_USE_SDL2)
+#ifdef HY_USE_GLFW
+	glfwMakeContextCurrent(m_pCurWindow->GetInterop());
+#elif defined(HY_USE_SDL2)
 	SDL_GL_MakeCurrent(m_pCurWindow->GetInterop(), m_Context);
 #endif
 }
@@ -298,7 +302,11 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::FinishRender()
 {
-#ifdef HY_USE_SDL2
+#ifdef HY_USE_GLFW
+	//glfwSwapInterval(0);
+	// This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
+	glfwSwapBuffers(m_pCurWindow->GetInterop());
+#elif defined(HY_USE_SDL2)
 	SDL_GL_SwapWindow(m_pCurWindow->GetInterop());
 #endif
 }

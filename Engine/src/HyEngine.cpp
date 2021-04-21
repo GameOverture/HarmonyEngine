@@ -71,6 +71,10 @@ HyEngine::~HyEngine()
 		m_Renderer.ProcessMsgs();
 	}
 
+#ifdef HY_USE_GLFW
+	glfwTerminate(); // TODO: this is leaking 304 bytes of memory on my machine
+#endif
+
 #ifdef HY_USE_SDL2
 	SDL_Quit();
 #endif
@@ -147,7 +151,17 @@ bool HyEngine::Update()
 
 bool HyEngine::PollPlatformApi()
 {
-#ifdef HY_USE_SDL2
+#ifdef HY_USE_GLFW
+	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
+	{
+		if(glfwWindowShouldClose(HyEngine::Window(i).GetInterop()))
+			return false;
+	}
+
+	// TODO: invoke OnWindowResized() and OnWindowMoved() where appropriate
+
+	glfwPollEvents();
+#elif defined(HY_USE_SDL2)
 	SDL_Event sdlEvent;
 	while(SDL_PollEvent(&sdlEvent))
 	{
