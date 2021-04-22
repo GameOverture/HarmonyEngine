@@ -35,6 +35,9 @@ IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) noexcept :
 
 IHyDrawable2d::~IHyDrawable2d()
 {
+	// Detach from parent here, so parent entity isn't considered unloaded because of this node
+	ParentDetach();
+
 	// Required Unload() here because we want to invoke this class's virtual IHyDrawable2d::OnUnloaded
 	Unload();
 }

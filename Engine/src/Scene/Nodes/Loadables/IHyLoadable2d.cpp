@@ -36,6 +36,7 @@ IHyLoadable2d::IHyLoadable2d(IHyLoadable2d &&donor) noexcept :
 
 IHyLoadable2d::~IHyLoadable2d()
 {
+	ParentDetach();	// Detach from parent here, so parent entity isn't considered unloaded because of this node
 	Unload();
 }
 
