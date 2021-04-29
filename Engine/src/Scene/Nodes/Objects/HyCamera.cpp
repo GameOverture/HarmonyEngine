@@ -33,8 +33,8 @@ const b2AABB &HyCamera2d::GetWorldViewBounds()
 	float fHalfWidth = ((m_pWindowPtr->GetFramebufferSize().x * m_ViewportRect.Width()) * 0.5f) * scale.X();
 	float fHalfHeight = ((m_pWindowPtr->GetFramebufferSize().y * m_ViewportRect.Height()) * 0.5f) * scale.Y();
 
-	m_aabbViewBounds.lowerBound.Set((pos.X() * scale.X()) - fHalfWidth, (pos.Y() * scale.Y()) - fHalfHeight);
-	m_aabbViewBounds.upperBound.Set((pos.X() * scale.X()) + fHalfWidth, (pos.Y() * scale.Y()) + fHalfHeight);
+	m_aabbViewBounds.lowerBound.Set(pos.X() - (fHalfWidth * scale.X()), pos.Y() - (fHalfHeight * scale.Y()));
+	m_aabbViewBounds.upperBound.Set(pos.X() + (fHalfWidth * scale.X()), pos.Y() + (fHalfHeight * scale.Y()));
 
 	return m_aabbViewBounds;
 }
