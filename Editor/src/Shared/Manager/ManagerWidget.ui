@@ -50,17 +50,20 @@
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QToolButton" name="btnAddBank">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QComboBox" name="cmbBanks"/>
         </item>
-       </layout>
-      </item>
-      <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QToolButton" name="btnAddBank">
+         <widget class="QToolButton" name="btnBankSettings">
           <property name="text">
            <string>...</string>
           </property>
@@ -75,7 +78,7 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <property name="spacing">
          <number>2</number>
@@ -102,15 +105,54 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="1">
-       <widget class="QToolButton" name="btnBankSettings">
-        <property name="text">
-         <string>...</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="lblSearchIcon">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/search.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblSearchText">
+       <property name="text">
+        <string>Search</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txtSearch"/>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkShowAllBanks">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Show All Banks</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="ManagerTreeView" name="assetTree">

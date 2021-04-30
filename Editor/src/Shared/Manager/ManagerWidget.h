@@ -26,9 +26,16 @@ class TreeModelItemData;
 
 class ManagerProxyModel : public QSortFilterProxyModel
 {
+	int32			m_iFilterBankIndex;
+
 public:
 	ManagerProxyModel(QObject *pParent = nullptr);
+
+	void FilterByBankIndex(int iBankIndex);
+
+protected:
 	virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+	virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };
 
 class ManagerTreeView : public QTreeView
@@ -100,6 +107,10 @@ private Q_SLOTS:
 	void on_actionImportDirectory_triggered();
 
 	void on_actionAddFilter_triggered();
+
+	void on_chkShowAllBanks_clicked();
+
+	void on_txtSearch_textChanged(const QString &text);
 	
 private:
 	Ui::ManagerWidget *ui;

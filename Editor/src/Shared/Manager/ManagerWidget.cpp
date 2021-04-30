@@ -28,8 +28,17 @@
 #include <QDrag>
 
 ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
-	QSortFilterProxyModel(pParent)
-{ }
+	QSortFilterProxyModel(pParent),
+	m_iFilterBankIndex(-1)
+{
+	setFilterCaseSensitivity(Qt::CaseInsensitive);
+}
+
+void ManagerProxyModel::FilterByBankIndex(int iBankIndex)
+{
+	m_iFilterBankIndex = iBankIndex;
+	invalidateFilter();
+}
 
 /*virtual*/ bool ManagerProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const /*override*/
 {
@@ -50,6 +59,47 @@ ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 		return pLeftItem->GetType() < pRightItem->GetType();
 
 	return QString::localeAwareCompare(pLeftItem->GetText(), pRightItem->GetText()) < 0;
+}
+
+/*virtual*/ bool ManagerProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const /*override*/
+{
+	QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
+	TreeModelItemData *pItemData = sourceModel()->data(index, Qt::UserRole).value<TreeModelItemData *>();
+	
+	if(pItemData)
+	{
+		QRegExp searchFilter = filterRegExp();
+
+		if(pItemData->GetType() == ITEM_Filter)
+		{
+			QList<TreeModelItemData *> itemsInFilterList = static_cast<IManagerModel *>(sourceModel())->GetItemsRecursively(index);
+			if(itemsInFilterList.size() == 1)
+				return true; // Always show empty filters
+
+			for(auto pItem : itemsInFilterList)
+			{
+				if(pItem->GetType() != ITEM_Filter)
+				{
+					if(m_iFilterBankIndex < 0 || m_iFilterBankIndex == static_cast<IManagerModel *>(sourceModel())->GetBankIndexFromBankId(static_cast<AssetItemData *>(pItem)->GetBankId()))
+					{
+						if(searchFilter.isValid() == false || pItem->GetText().contains(searchFilter))
+							return true;
+					}
+				}
+			}
+			return false;
+		}
+		else if(searchFilter.isValid() && pItemData->GetText().contains(searchFilter) == false)
+			return false;
+		else
+		{
+			AssetItemData *pAssetItemData = static_cast<AssetItemData *>(pItemData);
+			if(m_iFilterBankIndex < 0 || m_iFilterBankIndex == static_cast<IManagerModel *>(sourceModel())->GetBankIndexFromBankId(pAssetItemData->GetBankId()))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
@@ -190,29 +240,27 @@ void ManagerWidget::DrawUpdate()
 
 void ManagerWidget::RefreshInfo()
 {
-	uint uiBankIndex = ui->cmbBanks->currentIndex();
+	bool bShowAllBanks = ui->chkShowAllBanks->isChecked();
+	if(bShowAllBanks)
+	{
+		ui->cmbBanks->setEnabled(false);
+		ui->lblBankInfo->setText("Showing all banks");
+		ui->actionRemoveBank->setEnabled(false);
+		ui->actionBankSettings->setEnabled(false);
 
-	ui->lblBankInfo->setText(m_pModel->OnBankInfo(uiBankIndex));
-	ui->actionRemoveBank->setEnabled(uiBankIndex != 0);
+		static_cast<ManagerProxyModel *>(ui->assetTree->model())->FilterByBankIndex(-1);
+	}
+	else
+	{
+		ui->cmbBanks->setEnabled(true);
+		uint uiBankIndex = ui->cmbBanks->currentIndex();
 
-	// Restore expanded filters if they have been reloaded
-	//QJsonArray expandedFilterArray = m_pModel->GetExpandedFiltersArray();
-	//uint uiFilterIndex = 0;
-	//QTreeWidgetItemIterator iter(ui->atlasList);
-	//while(*iter)
-	//{
-	//	if((*iter)->data(0, Qt::UserRole).toString() == HYTREEWIDGETITEM_IsFilter)
-	//	{
-	//		if(expandedFilterArray.at(uiFilterIndex).toBool())
-	//			(*iter)->setExpanded(true);
-	//		else
-	//			(*iter)->setExpanded(false);
+		ui->lblBankInfo->setText(m_pModel->OnBankInfo(uiBankIndex));
+		ui->actionRemoveBank->setEnabled(uiBankIndex != 0);
+		ui->actionBankSettings->setEnabled(true);
 
-	//		++uiFilterIndex;
-	//	}
-
-	//	++iter;
-	//}
+		static_cast<ManagerProxyModel *>(ui->assetTree->model())->FilterByBankIndex(uiBankIndex);
+	}
 }
 
 QStringList ManagerWidget::GetExpandedFilters()
@@ -638,4 +686,14 @@ void ManagerWidget::on_actionAddFilter_triggered()
 	}
 
 	delete pDlg;
+}
+
+void ManagerWidget::on_chkShowAllBanks_clicked()
+{
+	RefreshInfo();
+}
+
+void ManagerWidget::on_txtSearch_textChanged(const QString &text)
+{
+	static_cast<ManagerProxyModel *>(ui->assetTree->model())->setFilterWildcard(text);
 }
