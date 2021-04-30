@@ -17,8 +17,10 @@ class HySpacer;
 
 class HyGridLayout : public IHyLayout
 {
-	glm::ivec2					m_GridSize;
-	std::vector<HySpacer *>		m_SpacerList;
+	glm::ivec2							m_GridSize;
+	std::map<glm::ivec2, HyEntityUi *>	m_IndexMap;
+
+	std::vector<HySpacer *>				m_SpacerList;
 
 public:
 	HyGridLayout(HyEntity2d *pParent = nullptr);
