@@ -27,16 +27,16 @@ void HyGridLayout::InsertItem(int32 iX, int32 iY, HyEntityUi *pItem)
 	m_GridSize.x = HyMax(iX + 1, m_GridSize.x);
 	m_GridSize.y = HyMax(iY + 1, m_GridSize.y);
 
-	auto key = glm::ivec2(iX, iY);
-	auto iter = m_IndexMap.find(key);
-	if(iter == m_IndexMap.end() || iter->second == nullptr)
-		m_IndexMap[key] = pItem;
-	else
-	{
-		// TODO: insert item properly by moving existing item around
-		iter->second->ParentDetach();
-		m_IndexMap[key] = pItem;
-	}
+	//auto key = glm::ivec2(iX, iY);
+	//auto iter = m_IndexMap.find(key);
+	//if(iter == m_IndexMap.end() || iter->second == nullptr)
+	//	m_IndexMap[key] = pItem;
+	//else
+	//{
+	//	// TODO: insert item properly by moving existing item around
+	//	iter->second->ParentDetach();
+	//	m_IndexMap[key] = pItem;
+	//}
 
 	if(pItem)
 		ChildAppend(*pItem);
