@@ -68,6 +68,10 @@ void ManagerProxyModel::FilterByBankIndex(int iBankIndex)
 	
 	if(pItemData)
 	{
+		// Don't display anything that starts with HyGuiInternalCharIndicator
+		if(pItemData->GetText().isEmpty() == false && pItemData->GetText()[0] == HyGuiInternalCharIndicator)
+			return false;
+
 		QRegExp searchFilter = filterRegExp();
 
 		if(pItemData->GetType() == ITEM_Filter)
@@ -158,11 +162,6 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ManagerProxyModel *pProxyModel = new ManagerProxyModel(this);
 	pProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 	pProxyModel->setSourceModel(m_pModel);
-
-	// Don't display anything that starts with HyGuiInternalCharIndicator
-	// TODO: replace regexp using HyGuiInternalCharIndicator
-	pProxyModel->setFilterRegExp(QRegExp("^[^+]*$", Qt::CaseInsensitive));
-	pProxyModel->setFilterKeyColumn(0);
 
 	ui->assetTree->setModel(pProxyModel);
 	ui->assetTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
