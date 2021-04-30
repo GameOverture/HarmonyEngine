@@ -38,8 +38,9 @@
    <item>
     <widget class="QStackedWidget" name="stackedAssetType">
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
+     <widget class="QWidget" name="page"/>
      <widget class="QWidget" name="atlasPage">
       <layout class="QFormLayout" name="formLayout">
        <item row="1" column="1">
@@ -64,6 +65,7 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_2"/>
      <widget class="QWidget" name="audioPage">
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
