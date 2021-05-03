@@ -275,10 +275,10 @@ HyEntity2d *HyLabel::GetPrimitiveNode()
 	return	m_pPrimPanel;
 }
 
-//HySprite2d &HyLabel::GetSpriteNode()
-//{
-//	return m_SpritePanel;
-//}
+HySprite2d &HyLabel::GetSpriteNode()
+{
+	return m_SpritePanel;
+}
 
 HyText2d &HyLabel::GetTextNode()
 {

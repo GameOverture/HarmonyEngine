@@ -80,7 +80,7 @@ public:
 	void SetHideDisabled(bool bIsHideDisabled);	// Whether to not visually indicate if disabled
 
 	HyEntity2d *GetPrimitiveNode();
-	//HySprite2d &GetSpriteNode();
+	HySprite2d &GetSpriteNode();
 	HyText2d &GetTextNode();
 
 protected:
