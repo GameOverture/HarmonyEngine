@@ -15,9 +15,13 @@
 
 class HySpacer : public IHyWidget
 {
+	glm::ivec2			m_vMinSize;
+
 public:
 	HySpacer(HyEntity2d *pParent = nullptr);
 	virtual ~HySpacer();
+
+	void SetMinSize(int32 iWidth, int32 iHeight);
 
 protected:
 	virtual glm::ivec2 GetSizeHint() override;

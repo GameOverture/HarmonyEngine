@@ -11,7 +11,8 @@
 #include "UI/Widgets/HySpacer.h"
 
 HySpacer::HySpacer(HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent)
+	IHyWidget(pParent),
+	m_vMinSize(0, 0)
 {
 	m_SizePolicies[HYORIEN_Horizontal] = m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Expanding;
 }
@@ -20,9 +21,16 @@ HySpacer::HySpacer(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+void HySpacer::SetMinSize(int32 iWidth, int32 iHeight)
+{
+	m_vMinSize.x = iWidth;
+	m_vMinSize.y = iHeight;
+	m_SizePolicies[HYORIEN_Horizontal] = m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Minimum;
+}
+
 /*virtual*/ glm::ivec2 HySpacer::GetSizeHint() /*override*/
 {
-	return glm::ivec2(0.0f, 0.0f);
+	return m_vMinSize;
 }
 
 /*virtual*/ glm::vec2 HySpacer::GetPosOffset() /*override*/
