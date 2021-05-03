@@ -23,15 +23,11 @@ protected:
 	};
 	const UiType			m_eUI_TYPE;
 
-	glm::ivec2				m_vUiSizeHint;
-
 public:
 	HyEntityUi(UiType eType, HyEntity2d *pParent = nullptr);
 	virtual ~HyEntityUi();
 
 	UiType GetUiType() const;
-	glm::ivec2 GetSizeHint() const;
-	virtual glm::vec2 GetPosOffset() = 0;
 };
 
 #endif /* HyEntityUi_h__ */

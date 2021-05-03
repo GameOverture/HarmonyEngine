@@ -12,8 +12,7 @@
 
 HyEntityUi::HyEntityUi(UiType eType, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
-	m_eUI_TYPE(eType),
-	m_vUiSizeHint(0, 0)
+	m_eUI_TYPE(eType)
 {
 }
 
@@ -24,9 +23,4 @@ HyEntityUi::HyEntityUi(UiType eType, HyEntity2d *pParent /*= nullptr*/) :
 HyEntityUi::UiType HyEntityUi::GetUiType() const
 {
 	return m_eUI_TYPE;
-}
-
-glm::ivec2 HyEntityUi::GetSizeHint() const
-{
-	return m_vUiSizeHint;
 }

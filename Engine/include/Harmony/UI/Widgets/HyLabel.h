@@ -80,13 +80,14 @@ public:
 	void SetHideDisabled(bool bIsHideDisabled);	// Whether to not visually indicate if disabled
 
 	HyEntity2d *GetPrimitiveNode();
-	HySprite2d &GetSpriteNode();
+	//HySprite2d &GetSpriteNode();
 	HyText2d &GetTextNode();
 
 protected:
 	void CommonSetup();
 	virtual void OnSetup() { }					// Optional override for derived classes
 
+	virtual glm::ivec2 GetSizeHint() override;
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
 

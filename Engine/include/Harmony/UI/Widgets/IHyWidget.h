@@ -32,6 +32,8 @@ public:
 	void SetVerticalPolicy(HySizePolicy ePolicy);
 
 protected:
+	virtual glm::ivec2 GetSizeHint() = 0;
+	virtual glm::vec2 GetPosOffset() = 0;
 	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) = 0;
 };
 

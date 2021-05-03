@@ -19,7 +19,9 @@ protected:
 	const HyLayoutType					m_eLAYOUT_TYPE;
 
 	glm::ivec2							m_vSize;
+	glm::ivec2							m_vPreferredSize;
 	HyRectangle<int32>					m_Margins;		// Tag = Spacing between widgets inside the layout
+
 
 public:
 	IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent = nullptr);
@@ -28,14 +30,19 @@ public:
 	glm::ivec2 GetSize() const;
 	void SetSize(int32 iNewWidth, int32 iNewHeight);
 
+	glm::ivec2 GetPreferredSize() const;
+
 	void SetMargins(int32 iLeft, int32 iBottom, int32 iRight, int32 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY);
 
 	uint16 GetHorizontalSpacing();
 	uint16 GetVerticalSpacing();
 
 protected:
-	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetLayoutItems() = 0;
+
+	// Children indices are laid out using row-major
+	// [0] [1] [2]
+	// [3] [4] [5]
 	void SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols);
 
 private:

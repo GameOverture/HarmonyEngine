@@ -275,10 +275,10 @@ HyEntity2d *HyLabel::GetPrimitiveNode()
 	return	m_pPrimPanel;
 }
 
-HySprite2d &HyLabel::GetSpriteNode()
-{
-	return m_SpritePanel;
-}
+//HySprite2d &HyLabel::GetSpriteNode()
+//{
+//	return m_SpritePanel;
+//}
 
 HyText2d &HyLabel::GetTextNode()
 {
@@ -292,7 +292,12 @@ void HyLabel::CommonSetup()
 	SetAsDisabled(IsDisabled());
 	SetAsHighlighted(IsHighlighted());
 
-	// Determine the m_vUiSizeHint
+	ResetTextOnPanel();
+}
+
+/*virtual*/ glm::ivec2 HyLabel::GetSizeHint() /*override*/
+{
+	glm::ivec2 vUiSizeHint;
 	if(m_pPrimPanel)
 	{
 		glm::vec2 vCachedScale = m_pPrimPanel->scale.Get();
@@ -300,48 +305,48 @@ void HyLabel::CommonSetup()
 
 		auto &aabb = m_pPrimPanel->GetSceneAABB();
 		if(aabb.IsValid())
-			HySetVec(m_vUiSizeHint, aabb.GetExtents().x * 2.0f, aabb.GetExtents().y * 2.0f);
+			HySetVec(vUiSizeHint, aabb.GetExtents().x * 2.0f, aabb.GetExtents().y * 2.0f);
 		
 		m_pPrimPanel->scale = vCachedScale;
 	}
 	else if(m_SpritePanel.IsLoadDataValid())
-		HySetVec(m_vUiSizeHint, m_SpritePanel.GetCurFrameWidth(false), m_SpritePanel.GetCurFrameHeight(false));
+		HySetVec(vUiSizeHint, m_SpritePanel.GetCurFrameWidth(false), m_SpritePanel.GetCurFrameHeight(false));
 	
-	// m_vUiSizeHint must be established
-	if(m_vUiSizeHint.x == 0 || m_vUiSizeHint.y == 0)
-		HySetVec(m_vUiSizeHint, 300, 75);
+	// vUiSizeHint must be established
+	if(vUiSizeHint.x == 0 || vUiSizeHint.y == 0)
+		HySetVec(vUiSizeHint, 300, 75);
 
-	ResetTextOnPanel();
+	return vUiSizeHint;
 }
 
 /*virtual*/ glm::vec2 HyLabel::GetPosOffset() /*override*/
 {
-	b2Vec2 ptLowerBound(0.0f, 0.0f);
-	if(m_pPrimPanel)
-		ptLowerBound = m_pPrimPanel->GetSceneAABB().lowerBound;
-	else if(m_SpritePanel.IsLoadDataValid())
-		ptLowerBound = m_SpritePanel.GetSceneAABB().lowerBound;
-	else
+	if(m_SpritePanel.IsLoadDataValid())
 	{
-		// Have a zero vector be returned
-		ptLowerBound.x = pos.Get().x;
-		ptLowerBound.y = pos.Get().y;
+		glm::vec2 vPanelDimensions = GetPanelDimensions();
+
+		const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_SpritePanel.AcquireData());
+		const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_SpritePanel.GetState(), m_SpritePanel.GetFrame());
+
+		auto vUiSizeHint = GetSizeHint();
+		return -glm::vec2(frameRef.vOFFSET.x * (vPanelDimensions.x / vUiSizeHint.x), frameRef.vOFFSET.y * (vPanelDimensions.y / vUiSizeHint.y));
 	}
 
-	return glm::vec2(pos.Get() - glm::vec2(ptLowerBound.x, ptLowerBound.y));
+	return glm::vec2(0.0f, 0.0f);
 }
 
 /*virtual*/ void HyLabel::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
+	auto vUiSizeHint = GetSizeHint();
 	if(m_pPrimPanel)
 	{
-		m_pPrimPanel->scale.X(static_cast<float>(iNewWidth) / m_vUiSizeHint.x);
-		m_pPrimPanel->scale.Y(static_cast<float>(iNewHeight) / m_vUiSizeHint.y);
+		m_pPrimPanel->scale.X(static_cast<float>(iNewWidth) / vUiSizeHint.x);
+		m_pPrimPanel->scale.Y(static_cast<float>(iNewHeight) / vUiSizeHint.y);
 	}
 	else if(m_SpritePanel.IsLoadDataValid())
 	{
-		m_SpritePanel.scale.X(static_cast<float>(iNewWidth) / m_vUiSizeHint.x);
-		m_SpritePanel.scale.Y(static_cast<float>(iNewHeight) / m_vUiSizeHint.y);
+		m_SpritePanel.scale.X(static_cast<float>(iNewWidth) / vUiSizeHint.x);
+		m_SpritePanel.scale.Y(static_cast<float>(iNewHeight) / vUiSizeHint.y);
 	}
 	else
 		m_Text.SetAsScaleBox(iNewWidth - m_TextMargins.left - m_TextMargins.right, iNewHeight - m_TextMargins.bottom - m_TextMargins.top);
@@ -355,11 +360,12 @@ void HyLabel::CommonSetup()
 	glm::ivec2 vPanelOffset = GetPosOffset();
 
 	// Position text
-	m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / m_vUiSizeHint.x)) - vPanelOffset.x,
-				   (m_TextMargins.bottom * (vPanelDimensions.y / m_vUiSizeHint.y)) - vPanelOffset.y);
+	auto vUiSizeHint = GetSizeHint();
+	m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x,
+				   (m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y);
 
 	// Size text
 	if(vPanelDimensions.x != 0.0f && vPanelDimensions.y != 0.0f)
-		m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / m_vUiSizeHint.x)),
-							 vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / m_vUiSizeHint.y)), true);
+		m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)),
+							 vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / vUiSizeHint.y)), true);
 }

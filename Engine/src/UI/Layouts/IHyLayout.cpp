@@ -13,7 +13,9 @@
 
 IHyLayout::IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntityUi(Ui_Layout, pParent),
-	m_eLAYOUT_TYPE(eLayoutType)
+	m_eLAYOUT_TYPE(eLayoutType),
+	m_vSize(0, 0),
+	m_vPreferredSize(0, 0)
 {
 }
 
@@ -49,9 +51,9 @@ void IHyLayout::SetSize(int32 iNewWidth, int32 iNewHeight)
 	OnSetLayoutItems();
 }
 
-/*virtual*/ glm::vec2 IHyLayout::GetPosOffset() /*override*/
+glm::ivec2 IHyLayout::GetPreferredSize() const
 {
-	return glm::vec2(0.0f, 0.0f);
+	return m_vPreferredSize;
 }
 
 void IHyLayout::SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols)
@@ -73,12 +75,13 @@ void IHyLayout::SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols)
 		{
 			// Children are guaranteed to be HyEntityUi
 			HyEntityUi *pItem = static_cast<HyEntityUi *>(m_ChildList[iRow + (iCol * uiNumRows)]);
-			glm::ivec2 vItemSizeHint = pItem->GetSizeHint();
+			glm::ivec2 vItemSizeHint;
 			
 			if(pItem->GetUiType() == Ui_Widget)
 			{
 				IHyWidget *pWidget = static_cast<IHyWidget *>(pItem);
-				
+				vItemSizeHint = pWidget->GetSizeHint();
+
 				vNumGrowItems.x += (pWidget->GetHorizontalPolicy() & HY_SIZEFLAG_GROW);				// Adds 1 or 0
 				vNumGrowItems.y += (pWidget->GetVerticalPolicy() & HY_SIZEFLAG_GROW);				// Adds 1 or 0
 
@@ -95,6 +98,8 @@ void IHyLayout::SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols)
 				vItemSizeHint.x *= (((pWidget->GetHorizontalPolicy() & HY_SIZEFLAG_IGNORE) >> 3) ^ 1);	// Multiply by 1 or 0
 				vItemSizeHint.y *= (((pWidget->GetVerticalPolicy() & HY_SIZEFLAG_IGNORE) >> 3) ^ 1);	// Multiply by 1 or 0
 			}
+			else // Ui_Layout
+				vItemSizeHint = static_cast<IHyLayout *>(pItem)->GetPreferredSize();
 
 			iCurRowSize += vItemSizeHint.x;
 			pCurColSizes[iCol] += vItemSizeHint.y;
@@ -107,16 +112,16 @@ void IHyLayout::SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols)
 		iPrefColSize = HyMax(iPrefColSize, pCurColSizes[i]);
 	delete[] pCurColSizes;
 
-	// m_vUiSizeHint represents the preferred size a layout would ideally be
-	m_vUiSizeHint.x = m_Margins.left + m_Margins.right + ((uiNumCols - 1) * GetHorizontalSpacing());
-	m_vUiSizeHint.x += iPrefRowSize;
-	m_vUiSizeHint.y = m_Margins.top + m_Margins.bottom + ((uiNumRows - 1) * GetVerticalSpacing());
-	m_vUiSizeHint.y += iPrefColSize;
+	// m_vPreferredSize represents the preferred size a layout would ideally be
+	m_vPreferredSize.x = m_Margins.left + m_Margins.right + ((uiNumCols - 1) * GetHorizontalSpacing());
+	m_vPreferredSize.x += iPrefRowSize;
+	m_vPreferredSize.y = m_Margins.top + m_Margins.bottom + ((uiNumRows - 1) * GetVerticalSpacing());
+	m_vPreferredSize.y += iPrefColSize;
 
-	// Determine if preferred size (m_vUiSizeHint) fits within m_vSize
+	// Determine if preferred size (m_vPreferredSize) fits within m_vSize
 	//	- Distrubute positive difference to all 'expanding' then 'grow' size policies
 	//	- Distrubute negative difference to all 'fill' then 'shrink' size policies
-	glm::vec2 vDifference = m_vSize - m_vUiSizeHint;
+	glm::vec2 vDifference = m_vSize - m_vPreferredSize;
 
 	glm::vec2 vGrowAmt(0.0f, 0.0f);
 	glm::vec2 vExpandAmt(0.0f, 0.0f);
@@ -146,11 +151,15 @@ void IHyLayout::SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols)
 		{
 			// Children are guaranteed to be HyEntityUi
 			HyEntityUi *pItem = static_cast<HyEntityUi *>(m_ChildList[iRow + (iCol * uiNumRows)]);
-			glm::ivec2 vItemSize = pItem->GetSizeHint();
 
+			// Set item to the ptCurPos
+			pItem->pos.Set(ptCurPos);
+
+			glm::ivec2 vItemSize;
 			if(pItem->GetUiType() == Ui_Widget)
 			{
 				IHyWidget *pWidget = static_cast<IHyWidget *>(pItem);
+				vItemSize = pWidget->GetSizeHint();
 
 				// Resize this item based on all the final calculations of size policies and size constraints
 				vItemSize.x += vGrowAmt.x * static_cast<float>(pWidget->GetHorizontalPolicy() & HY_SIZEFLAG_GROW);
@@ -161,23 +170,23 @@ void IHyLayout::SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols)
 				vItemSize.y += vShrinkAmt.y * static_cast<float>((pWidget->GetVerticalPolicy() & HY_SIZEFLAG_SHRINK) >> 2);
 
 				pWidget->OnResize(vItemSize.x, vItemSize.y);
+
+				// Apply its local offset
+				pItem->pos.Offset(pWidget->GetPosOffset());
 			}
 			else // Ui_Layout
 			{
+				IHyLayout *pLayout = static_cast<IHyLayout *>(pItem);
+				vItemSize = pLayout->GetPreferredSize();
+
 				vItemSize.x += vGrowAmt.x;
 				vItemSize.y += vGrowAmt.y;
 				vItemSize.x += vExpandAmt.x;
 				vItemSize.y += vExpandAmt.y;
 				vItemSize.x += vShrinkAmt.x;
 				vItemSize.y += vShrinkAmt.y;
-				IHyLayout *pLayout = static_cast<IHyLayout *>(pItem);
 				pLayout->SetSize(vItemSize.x, vItemSize.y);
 			}
-
-			
-
-			// Set item to the ptCurPos + its local offset, then update ptCurPos for the next item
-			pItem->pos.Set(ptCurPos + pItem->GetPosOffset());
 
 			ptCurPos.x += vItemSize.x + GetHorizontalSpacing();
 			fRowHeight = HyMax(fRowHeight, static_cast<float>(vItemSize.y));

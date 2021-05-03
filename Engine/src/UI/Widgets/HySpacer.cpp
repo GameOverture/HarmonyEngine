@@ -20,6 +20,11 @@ HySpacer::HySpacer(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+/*virtual*/ glm::ivec2 HySpacer::GetSizeHint() /*override*/
+{
+	return glm::ivec2(0.0f, 0.0f);
+}
+
 /*virtual*/ glm::vec2 HySpacer::GetPosOffset() /*override*/
 {
 	return glm::vec2(0.0f, 0.0f);
