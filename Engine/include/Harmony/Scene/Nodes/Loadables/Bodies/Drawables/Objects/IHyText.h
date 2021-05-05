@@ -19,6 +19,9 @@
 
 #define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
+// Convienence function macro
+#define HySetText(textNode, msg) textNode.SetText((std::stringstream() << msg).str())
+
 template<typename NODETYPE, typename ENTTYPE>
 class IHyText : public NODETYPE
 {
