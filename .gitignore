@@ -9,7 +9,8 @@ build/
 build-HyEditor-*/
 .vs/
 GeneratedFiles/
-3rdParty/
+
+spine-cpp/
 
 *.exe
 *.ilk

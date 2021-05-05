@@ -25,13 +25,19 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
+# Build Options
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
 option(HYBUILD_SDL_NET "Use SDL2_NET" OFF)
 option(HYBUILD_GLFW "Use GLFW for windowing, glcontext, input, and time instead of SDL2" OFF)
 option(HYBUILD_STATIC "Statically link all dependencies into the executable" OFF)
+# Build Extras
+option(HYBUILD_SPINE "Runtime support for Spine 2d animation - requires Spine License" OFF)
 
 if(HYBUILD_GLFW)
 	add_compile_definitions(HY_USE_GLFW)
+endif()
+if(HYBUILD_SPINE)
+	add_compile_definitions(HY_USE_SPINE)
 endif()
 
 message(STATUS "Harmony building for target: ${CMAKE_SYSTEM_NAME}")
@@ -46,6 +52,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	list(APPEND HYEM_COMPILE_FLAGS "-s USE_OGG=1")
 	list(APPEND HYEM_COMPILE_FLAGS "-s USE_VORBIS=1")
 	list(APPEND HYEM_COMPILE_FLAGS "-s USE_SDL_MIXER=2")
+	list(APPEND HYEM_COMPILE_FLAGS "-s FETCH=1")
 	
 	set(HYEM_LINK_FLAGS "")
 	list(APPEND HYEM_LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
@@ -57,6 +64,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	list(APPEND HYEM_LINK_FLAGS "-s USE_OGG=1")
 	list(APPEND HYEM_LINK_FLAGS "-s USE_VORBIS=1")
 	list(APPEND HYEM_LINK_FLAGS "-s USE_SDL_MIXER=2")
+	list(APPEND HYEM_LINK_FLAGS "-s FETCH=1")
 	
 	if(HYBUILD_SDL_NET)
 		list(APPEND HYEM_COMPILE_FLAGS "-s USE_SDL_NET=2")

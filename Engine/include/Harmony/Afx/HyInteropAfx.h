@@ -11,11 +11,12 @@
 #define HyInteropAfx_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Afx/Platforms/HyPlatAfx.h"
 
+// RENDERING ///////////////////////////////////////////////////////////////
 #include "Renderer/OpenGL/HyOpenGL.h"
 typedef HyOpenGL HyRendererInterop;
 
+// WINDOWING ///////////////////////////////////////////////////////////////
 #if defined(HY_USE_GLFW)
 	typedef GLFWwindow *HyWindowInteropPtr;
 #elif defined(HY_USE_SDL2)
@@ -24,6 +25,7 @@ typedef HyOpenGL HyRendererInterop;
 	typedef void *HyWindowInteropPtr;
 #endif
 
+// NETWORKING //////////////////////////////////////////////////////////////
 #ifdef HY_USE_SDL2_NET
 	struct _TCPsocket;
 	typedef struct _TCPsocket *HyTcpSocket;
@@ -31,6 +33,7 @@ typedef HyOpenGL HyRendererInterop;
 	typedef int HyTcpSocket;
 #endif
 
+// DEBUG CONSOLE ///////////////////////////////////////////////////////////
 #if defined(HY_PLATFORM_GUI)
 	// TODO: Ideally send Harmony log output to the editor's output window
 	#include "Diagnostics/Console/Interop/HyConsole_Std.h"
@@ -41,6 +44,13 @@ typedef HyOpenGL HyRendererInterop;
 #else
 	#include "Diagnostics/Console/Interop/HyConsole_Std.h"
 	typedef HyConsole_Std HyConsoleInterop;
+#endif
+
+// SPINE RUNTIME ////////////////////////////////////////////////////////////
+#ifdef HY_USE_SPINE
+	
+#else
+	
 #endif
 
 #endif /* HyInteropAfx_h__ */

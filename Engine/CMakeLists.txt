@@ -1,8 +1,17 @@
+# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_STATIC
+# BUILD EXTRAS:  HYBUILD_SPINE
+
 add_subdirectory(external/box2d)
 add_subdirectory(external/soil2)
 
-# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_STATIC
-# BUILD EXTRAS:  HYBUILD_SPINE
+if(HYBUILD_SPINE)
+	add_subdirectory(extra/spine-cpp)
+	set_target_properties(spine-cpp PROPERTIES
+	CXX_STANDARD 14
+	CXX_STANDARD_REQUIRED YES
+	CXX_EXTENSIONS NO
+	FOLDER "Engine Libs")
+endif()
 
 # Emscripten provides its own ports of SDL, GLFW, and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
@@ -279,6 +288,10 @@ target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/soil2/include")
 
 target_link_libraries(HyEngine PUBLIC box2d soil2)
+
+if(HYBUILD_SPINE)
+	target_link_libraries(HyEngine PUBLIC spine-cpp)
+endif()
 
 # Emscripten provides its own ports of SDL and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
