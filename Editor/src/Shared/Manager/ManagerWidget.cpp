@@ -40,6 +40,11 @@ void ManagerProxyModel::FilterByBankIndex(int iBankIndex)
 	invalidateFilter();
 }
 
+bool ManagerProxyModel::IsPassFilter(QModelIndex index)
+{
+	return filterAcceptsRow(index.row(), index.parent());
+}
+
 /*virtual*/ bool ManagerProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const /*override*/
 {
 	TreeModelItemData *pLeftItem = sourceModel()->data(left, Qt::UserRole).value<TreeModelItemData *>();
@@ -695,4 +700,15 @@ void ManagerWidget::on_chkShowAllBanks_clicked()
 void ManagerWidget::on_txtSearch_textChanged(const QString &text)
 {
 	static_cast<ManagerProxyModel *>(ui->assetTree->model())->setFilterWildcard(text);
+
+	//// This expands all items that are found in text search filter, but is too slow and also doesn't collapse afterwards
+	//if(text.isEmpty() == false)
+	//{
+	//	QModelIndexList indexList = GetModel().GetAllIndices();
+	//	for(QModelIndex srcIndex : indexList)
+	//	{
+	//		if(srcIndex.isValid() && static_cast<ManagerProxyModel *>(ui->assetTree->model())->IsPassFilter(srcIndex))
+	//			ui->assetTree->expand(srcIndex);
+	//	}
+	//}
 }

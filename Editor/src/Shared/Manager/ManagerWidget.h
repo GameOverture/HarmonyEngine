@@ -26,12 +26,13 @@ class TreeModelItemData;
 
 class ManagerProxyModel : public QSortFilterProxyModel
 {
-	int32			m_iFilterBankIndex;
+	int32						m_iFilterBankIndex;
 
 public:
 	ManagerProxyModel(QObject *pParent = nullptr);
 
 	void FilterByBankIndex(int iBankIndex);
+	bool IsPassFilter(QModelIndex index);
 
 protected:
 	virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
