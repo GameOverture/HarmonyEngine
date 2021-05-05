@@ -30,6 +30,10 @@ option(HYBUILD_SDL_NET "Use SDL2_NET" OFF)
 option(HYBUILD_GLFW "Use GLFW for windowing, glcontext, input, and time instead of SDL2" OFF)
 option(HYBUILD_STATIC "Statically link all dependencies into the executable" OFF)
 
+if(HYBUILD_GLFW)
+	add_compile_definitions(HY_USE_GLFW)
+endif()
+
 message(STATUS "Harmony building for target: ${CMAKE_SYSTEM_NAME}")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	set(HYEM_COMPILE_FLAGS "")

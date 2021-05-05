@@ -2,6 +2,7 @@ add_subdirectory(external/box2d)
 add_subdirectory(external/soil2)
 
 # BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_STATIC
+# BUILD EXTRAS:  HYBUILD_SPINE
 
 # Emscripten provides its own ports of SDL, GLFW, and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
@@ -42,6 +43,8 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			add_subdirectory(external/glfw)
 		endif()
 	endif()
+else()
+	set(HYBUILD_STATIC ON)
 endif()
 
 set(HYENGINE_SOURCE_FILES
