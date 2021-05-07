@@ -13,9 +13,9 @@
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Scene/HyScene.h"
 
-//HySpine2d::HySpine2d(std::string sPrefix, std::string sName, HyEntity2d *pParent) :
-//	IHyBody2d(HYTYPE_Spine, sPrefix, sName, pParent),
-//	m_pSpineSkeleton(NULL),
+HySpine2d::HySpine2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_Spine, sPrefix, sName, pParent)
+//	m_pSpineSkeleton(nullptr),
 //	m_ppSpineAnims(NULL),
 //	m_ppAnimStates(NULL),
 //	m_fAnimPlayRate(1.0f),
@@ -23,39 +23,30 @@
 //	m_uiNumAnimStates(0),
 //	m_uiCurAnimState(0),
 //	m_spSkeletonBounds(NULL)
-//{
-//	m_eRenderMode = HYRENDERMODE_TriangleStrip;
-//}
-//
-//HySpine2d::HySpine2d(const HySpine2d &copyRef) :
-//	IHyBody2d(copyRef)
-//{
-//	HyError("HySpine2d::copy ctor implement me!");
-//}
-//
-//HySpine2d::~HySpine2d(void)
-//{
-//	if(m_pSpineSkeleton)
-//		spSkeleton_dispose(m_pSpineSkeleton);
-//
-//	if(m_ppAnimStates)
-//	{
-//		for(uint32 i = 0; i < m_uiNumAnimStates; ++i)
-//			spAnimationState_dispose(m_ppAnimStates[i]);
-//
-//		delete [] m_ppAnimStates;
-//	}
-//}
-//
-//const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
-//{
-//	IHyBody2d::operator=(rhs);
-//
-//	HyError("HySpine2d::operator= implement me!");
-//
-//	return *this;
-//}
-//
+{
+	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+}
+
+HySpine2d::HySpine2d(const HySpine2d &copyRef) :
+	IHyDrawable2d(copyRef)
+{
+}
+
+HySpine2d::~HySpine2d(void)
+{
+}
+
+const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
+{
+	IHyDrawable2d::operator=(rhs);
+	return *this;
+}
+
+uint32 HySpine2d::GetNumSlots() const
+{
+	return 0;
+}
+
 ////uint32 HySpine2d::GetTextureId()
 ////{
 ////	if(m_uiTextureid == 0)

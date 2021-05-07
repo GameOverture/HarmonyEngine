@@ -17,36 +17,112 @@ if(Qt5_DIR)
 		src/VersionPatcher.h
 		src/MainWindow.ui
 		src/HyEditor.rc
+		src/Assets/AssetMimeData.cpp
+		src/Assets/AssetMimeData.h
+		src/Assets/BanksModel.h
+		src/Assets/BanksModel.cpp
+		src/Assets/IAssetItemData.cpp
+		src/Assets/IAssetItemData.h
+		src/Assets/IManagerDraw.cpp
+		src/Assets/IManagerDraw.h
+		src/Assets/IManagerModel.cpp
+		src/Assets/IManagerModel.h
+		src/Assets/IRepackThread.cpp
+		src/Assets/IRepackThread.h
+		src/Assets/ManagerWidget.cpp
+		src/Assets/ManagerWidget.h
+		src/Assets/ManagerWidget.ui
 		src/Assets/Source/SourceFile.cpp
 		src/Assets/Source/SourceFile.h
 		src/Assets/Source/SourceModel.cpp
 		src/Assets/Source/SourceModel.h
-		src/Atlas/AtlasDraw.cpp
-		src/Atlas/AtlasDraw.h
-		src/Atlas/AtlasFrame.cpp
-		src/Atlas/AtlasFrame.h
-		src/Atlas/AtlasModel.cpp
-		src/Atlas/AtlasModel.h
-		src/Atlas/AtlasRepackThread.cpp
-		src/Atlas/AtlasRepackThread.h
-		src/Audio/AudioAsset.cpp
-		src/Audio/AudioAsset.h
-		src/Audio/AudioAssetsWidget.cpp
-		src/Audio/AudioAssetsWidget.h
-		src/Audio/AudioAssetsWidget.ui
-		src/Audio/AudioDraw.cpp
-		src/Audio/AudioDraw.h
-		src/Audio/AudioManagerModel.cpp
-		src/Audio/AudioManagerModel.h
-		src/Audio/AudioModel.cpp
-		src/Audio/AudioModel.h
-		src/Audio/AudioPlayListModel.cpp
-		src/Audio/AudioPlayListModel.h
-		src/Audio/AudioRepackThread.cpp
-		src/Audio/AudioRepackThread.h
-		src/Audio/AudioWidget.cpp
-		src/Audio/AudioWidget.h
-		src/Audio/AudioWidget.ui
+		src/Assets/Atlas/AtlasDraw.cpp
+		src/Assets/Atlas/AtlasDraw.h
+		src/Assets/Atlas/AtlasFrame.cpp
+		src/Assets/Atlas/AtlasFrame.h
+		src/Assets/Atlas/AtlasModel.cpp
+		src/Assets/Atlas/AtlasModel.h
+		src/Assets/Atlas/AtlasRepackThread.cpp
+		src/Assets/Atlas/AtlasRepackThread.h
+		src/Assets/Audio/AudioAsset.cpp
+		src/Assets/Audio/AudioAsset.h
+		src/Assets/Audio/AudioAssetsWidget.cpp
+		src/Assets/Audio/AudioAssetsWidget.h
+		src/Assets/Audio/AudioAssetsWidget.ui
+		src/Assets/Audio/AudioManagerModel.cpp
+		src/Assets/Audio/AudioManagerModel.h
+		src/Assets/Audio/AudioRepackThread.cpp
+		src/Assets/Audio/AudioRepackThread.h
+		src/Items/IDraw.cpp
+		src/Items/IModel.cpp
+		src/Items/IWidget.cpp
+		src/Items/IDraw.h
+		src/Items/IModel.h
+		src/Items/IWidget.h
+		src/Items/IWidget.ui
+		src/Items/Spine/SpineDraw.cpp
+		src/Items/Spine/SpineDraw.h
+		src/Items/Spine/SpineModel.cpp
+		src/Items/Spine/SpineModel.h
+		src/Items/Spine/SpineUndoCmds.cpp
+		src/Items/Spine/SpineUndoCmds.h
+		src/Items/Spine/SpineWidget.cpp
+		src/Items/Spine/SpineWidget.h
+		src/Items/Spine/SpineWidget.ui
+		src/Items/Sprite/SpriteDraw.cpp
+		src/Items/Sprite/SpriteModels.cpp
+		src/Items/Sprite/SpriteTableView.cpp
+		src/Items/Sprite/SpriteUndoCmds.cpp
+		src/Items/Sprite/SpriteWidget.cpp
+		src/Items/Sprite/SpriteDraw.h
+		src/Items/Sprite/SpriteModels.h
+		src/Items/Sprite/SpriteTableView.h
+		src/Items/Sprite/SpriteUndoCmds.h
+		src/Items/Sprite/SpriteWidget.h
+		src/Items/Sprite/SpriteWidget.ui
+		src/Items/Text/TextDraw.cpp
+		src/Items/Text/TextModel.cpp
+		src/Items/Text/TextUndoCmds.cpp
+		src/Items/Text/TextWidget.cpp
+		src/Items/Text/TextDraw.h
+		src/Items/Text/TextModel.h
+		src/Items/Text/TextUndoCmds.h
+		src/Items/Text/TextWidget.h
+		src/Items/Text/TextWidget.ui
+		src/Items/Text/SubWidgets/TextFontManager.cpp
+		src/Items/Text/SubWidgets/TextLayersModel.cpp
+		src/Items/Text/SubWidgets/TextLayersWidget.cpp
+		src/Items/Text/SubWidgets/TextFontManager.h
+		src/Items/Text/SubWidgets/TextLayersModel.h
+		src/Items/Text/SubWidgets/TextLayersWidget.h
+		src/Items/Entity/EntityDraw.cpp
+		src/Items/Entity/EntityModel.cpp
+		src/Items/Entity/EntityUndoCmds.cpp
+		src/Items/Entity/EntityWidget.cpp
+		src/Items/Entity/EntityDraw.h
+		src/Items/Entity/EntityModel.h
+		src/Items/Entity/EntityUndoCmds.h
+		src/Items/Entity/EntityWidget.h
+		src/Items/Entity/EntityToolbox.ui
+		src/Items/Entity/EntityWidget.ui
+		src/Items/Prefab/PrefabDraw.cpp
+		src/Items/Prefab/PrefabModel.cpp
+		src/Items/Prefab/PrefabWidget.cpp
+		src/Items/Prefab/PrefabDraw.h
+		src/Items/Prefab/PrefabModel.h
+		src/Items/Prefab/PrefabWidget.h
+		src/Items/Prefab/PrefabWidget.ui
+		src/Items/Primitive/PrimitiveModel.cpp
+		src/Items/Primitive/PrimitiveModel.h
+		src/Items/Audio/AudioDraw.cpp
+		src/Items/Audio/AudioDraw.h
+		src/Items/Audio/AudioModel.cpp
+		src/Items/Audio/AudioModel.h
+		src/Items/Audio/AudioPlayListModel.cpp
+		src/Items/Audio/AudioPlayListModel.h
+		src/Items/Audio/AudioWidget.cpp
+		src/Items/Audio/AudioWidget.h
+		src/Items/Audio/AudioWidget.ui
 		src/Dialogs/DlgAssetProperties.cpp
 		src/Dialogs/DlgAssetProperties.h
 		src/Dialogs/DlgAssetProperties.ui
@@ -80,16 +156,6 @@ if(Qt5_DIR)
 		src/Dialogs/DlgSetEngineLocation.cpp
 		src/Dialogs/DlgSetEngineLocation.h
 		src/Dialogs/DlgSetEngineLocation.ui
-		src/Entity/EntityDraw.cpp
-		src/Entity/EntityModel.cpp
-		src/Entity/EntityUndoCmds.cpp
-		src/Entity/EntityWidget.cpp
-		src/Entity/EntityDraw.h
-		src/Entity/EntityModel.h
-		src/Entity/EntityUndoCmds.h
-		src/Entity/EntityWidget.h
-		src/Entity/EntityToolbox.ui
-		src/Entity/EntityWidget.ui
 		src/Explorer/ExplorerItemData.cpp
 		src/Explorer/ExplorerModel.cpp
 		src/Explorer/ExplorerWidget.cpp
@@ -97,26 +163,12 @@ if(Qt5_DIR)
 		src/Explorer/ExplorerModel.h
 		src/Explorer/ExplorerWidget.h
 		src/Explorer/ExplorerWidget.ui
-		src/Gltf/GltfModel.cpp
-		src/Gltf/GltfWidget.cpp
-		src/Gltf/GltfModel.h
-		src/Gltf/GltfWidget.h
-		src/Gltf/GltfWidget.ui
 		src/Harmony/Harmony.cpp
 		src/Harmony/HarmonyConnection.cpp
 		src/Harmony/HarmonyWidget.cpp
 		src/Harmony/Harmony.h
 		src/Harmony/HarmonyConnection.h
 		src/Harmony/HarmonyWidget.h
-		src/Prefab/PrefabDraw.cpp
-		src/Prefab/PrefabModel.cpp
-		src/Prefab/PrefabWidget.cpp
-		src/Prefab/PrefabDraw.h
-		src/Prefab/PrefabModel.h
-		src/Prefab/PrefabWidget.h
-		src/Prefab/PrefabWidget.ui
-		src/Primitive/PrimitiveModel.cpp
-		src/Primitive/PrimitiveModel.h
 		src/Project/Project.cpp
 		src/Project/ProjectDraw.cpp
 		src/Project/ProjectItemData.cpp
@@ -129,28 +181,6 @@ if(Qt5_DIR)
 		src/Shared/Global.h
 		src/Shared/GlobalUndoCmds.h
 		src/Shared/GlobalWidgetMappers.h
-		src/Shared/Item/IDraw.cpp
-		src/Shared/Item/IModel.cpp
-		src/Shared/Item/IWidget.cpp
-		src/Shared/Item/IDraw.h
-		src/Shared/Item/IModel.h
-		src/Shared/Item/IWidget.h
-		src/Shared/Item/IWidget.ui
-		src/Shared/Manager/AssetMimeData.cpp
-		src/Shared/Manager/AssetMimeData.h
-		src/Shared/Manager/BanksModel.h
-		src/Shared/Manager/BanksModel.cpp
-		src/Shared/Manager/IAssetItemData.cpp
-		src/Shared/Manager/IAssetItemData.h
-		src/Shared/Manager/IManagerDraw.cpp
-		src/Shared/Manager/IManagerDraw.h
-		src/Shared/Manager/IManagerModel.cpp
-		src/Shared/Manager/IManagerModel.h
-		src/Shared/Manager/IRepackThread.cpp
-		src/Shared/Manager/IRepackThread.h
-		src/Shared/Manager/ManagerWidget.cpp
-		src/Shared/Manager/ManagerWidget.h
-		src/Shared/Manager/ManagerWidget.ui
 		src/Shared/Properties/PropertiesTreeModel.cpp
 		src/Shared/Properties/PropertiesTreeView.cpp
 		src/Shared/Properties/PropertiesUndoCmd.cpp
@@ -163,32 +193,6 @@ if(Qt5_DIR)
 		src/Shared/TreeModel/ITreeModel.h
 		src/Shared/TreeModel/TreeModelItem.h
 		src/Shared/TreeModel/TreeModelItemData.h
-		src/Sprite/SpriteDraw.cpp
-		src/Sprite/SpriteModels.cpp
-		src/Sprite/SpriteTableView.cpp
-		src/Sprite/SpriteUndoCmds.cpp
-		src/Sprite/SpriteWidget.cpp
-		src/Sprite/SpriteDraw.h
-		src/Sprite/SpriteModels.h
-		src/Sprite/SpriteTableView.h
-		src/Sprite/SpriteUndoCmds.h
-		src/Sprite/SpriteWidget.h
-		src/Sprite/SpriteWidget.ui
-		src/Text/TextDraw.cpp
-		src/Text/TextModel.cpp
-		src/Text/TextUndoCmds.cpp
-		src/Text/TextWidget.cpp
-		src/Text/TextDraw.h
-		src/Text/TextModel.h
-		src/Text/TextUndoCmds.h
-		src/Text/TextWidget.h
-		src/Text/TextWidget.ui
-		src/Text/SubWidgets/TextFontManager.cpp
-		src/Text/SubWidgets/TextLayersModel.cpp
-		src/Text/SubWidgets/TextLayersWidget.cpp
-		src/Text/SubWidgets/TextFontManager.h
-		src/Text/SubWidgets/TextLayersModel.h
-		src/Text/SubWidgets/TextLayersWidget.h
 		src/Widget/WgtMakeRelDir.cpp
 		src/Widget/WgtMakeRelDir.h
 		src/Widget/WgtMakeRelDir.ui
@@ -238,24 +242,26 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Source")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Atlas")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Audio")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Atlas")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Audio")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Sprite")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Text")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Spine")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Prefab")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Primitive")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Entity")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Audio")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Dialogs")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Entity")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Text")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Harmony")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Project")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Sprite")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Prefab")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Primitive")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Widget")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gltf")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Item")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Manager")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Properties")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/TreeModel")
+
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include/Harmony")
 

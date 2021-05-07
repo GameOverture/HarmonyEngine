@@ -81,7 +81,7 @@ HyEngine::~HyEngine()
 
 	// Below prints all the memory leaks to stdout once the program exits (if in debug and MSVC compiler on Windows)
 	// _CrtSetBreakAlloc(18); // set memory-allocation breakpoints in code
-#if defined(HY_DEBUG) && defined(_MSC_VER) && defined(HY_PLATFORM_WINDOWS)
+#if defined(HY_DEBUG) && defined(HY_COMPILER_MSVC) && defined(HY_PLATFORM_WINDOWS) && !defined(HY_USE_SPINE)
 	HY_SET_CRT_DEBUG_FIELD(_CRTDBG_LEAK_CHECK_DF);
 #endif
 

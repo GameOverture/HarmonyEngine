@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SpineWidget</class>
+ <widget class="QWidget" name="SpineWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>246</width>
+    <height>490</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SpineWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2"/>
+   </item>
+  </layout>
+  <action name="actionAddFill">
+   <property name="text">
+    <string>Add Fill</string>
+   </property>
+   <property name="toolTip">
+    <string>Append a fill layer</string>
+   </property>
+  </action>
+  <action name="actionAddSDF">
+   <property name="text">
+    <string>Add SDF</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a signed distance field layer</string>
+   </property>
+  </action>
+  <action name="actionAddEdge">
+   <property name="text">
+    <string>Add Outline</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a standard outline</string>
+   </property>
+  </action>
+  <action name="actionAddEdgeFill">
+   <property name="text">
+    <string>Add Fill+Outline</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a standard outline that is filled in</string>
+   </property>
+  </action>
+  <action name="actionAddInner">
+   <property name="text">
+    <string>Add Inner</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds an inner outline</string>
+   </property>
+  </action>
+  <action name="actionRemoveLayer">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected text layer</string>
+   </property>
+  </action>
+  <action name="actionOrderLayerUp">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Layer Up</string>
+   </property>
+   <property name="toolTip">
+    <string>Shifts the currently selected text layer upwards (earlier in render)</string>
+   </property>
+  </action>
+  <action name="actionOrderLayerDown">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Layer Down</string>
+   </property>
+   <property name="toolTip">
+    <string>Shifts the currently selected text layer downwards (later in render)</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../../../data/HyEditor.qrc"/>
+ </resources>
+ <connections/>
+</ui>

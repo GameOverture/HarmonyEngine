@@ -5,7 +5,7 @@ add_subdirectory(external/box2d)
 add_subdirectory(external/soil2)
 
 if(HYBUILD_SPINE)
-	add_subdirectory(extra/spine-cpp)
+	add_subdirectory(extras/SpineRuntime/spine-cpp)
 	set_target_properties(spine-cpp PROPERTIES
 	CXX_STANDARD 14
 	CXX_STANDARD_REQUIRED YES

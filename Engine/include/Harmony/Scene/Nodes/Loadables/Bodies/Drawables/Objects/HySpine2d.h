@@ -10,15 +10,14 @@
 #ifndef HySpine2d_h__
 #define HySpine2d_h__
 
-#include "Afx/HyStdAfx.h"
+#include "Afx/HyInteropAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Assets/Nodes/HySpine2dData.h"
 
 class HySpine2d : public IHyDrawable2d
 {
-//protected:
-//	spSkeleton*				m_pSpineSkeleton;
-//	spAnimation **			m_ppSpineAnims;
+//	spine::Skeleton *		m_pSpineSkeleton;
+//	spine::Animation **		m_ppSpineAnims;
 //	uint32					m_uiNumAnims;
 //
 //	spAnimationStateData *	m_pAnimStateData;
@@ -31,14 +30,15 @@ class HySpine2d : public IHyDrawable2d
 //	uint32					m_uiCurAnimState;
 //	bool					m_bLooping;
 //
-//public:
-//	HySpine2d(std::string sPrefix, std::string sName, HyEntity2d *pParent);
-//	HySpine2d(const HySpine2d &copyRef);
-//	virtual ~HySpine2d(void);
-//
-//	const HySpine2d &operator=(const HySpine2d &rhs);
-//
-//	spSkeleton *GetSkeleton()		{ return m_pSpineSkeleton; }
+public:
+	HySpine2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);
+	HySpine2d(const HySpine2d &copyRef);
+	virtual ~HySpine2d(void);
+
+	const HySpine2d &operator=(const HySpine2d &rhs);
+
+	uint32 GetNumSlots() const;
+
 //
 //	/************************************************************************************************
 //											ANIMATION CALLS

@@ -26,7 +26,7 @@
 #define HY_MAXWINDOWS 6
 #define HY_ENDIAN_LITTLE	// All x86 and x86-64 machines are little-endian.
 
-#if defined(HY_DEBUG) && defined(HY_COMPILER_MSVC)
+#if defined(HY_DEBUG) && defined(HY_COMPILER_MSVC) && !defined(HY_USE_SPINE)
 	#define _CRTDBG_MAP_ALLOC
 	#include <stdlib.h>
 	#include <crtdbg.h>

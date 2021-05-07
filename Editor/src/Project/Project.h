@@ -25,8 +25,6 @@ class SourceModel;
 class AtlasModel;
 class IManagerModel;
 class ManagerWidget;
-class GltfModel;
-class GltfWidget;
 class AudioManagerModel;
 class Harmony;
 class ExplorerModel;
@@ -58,9 +56,6 @@ class Project : public ExplorerItemData
 	ManagerWidget *										m_pAtlasWidget;
 	AudioManagerModel *									m_pAudioModel;
 	ManagerWidget *										m_pAudioWidget;
-
-	GltfModel *											m_pGltfModel;
-	GltfWidget *										m_pGltfWidget;
 
 	QStandardItemModel									m_FontListModel;
 
@@ -110,9 +105,6 @@ public:
 	ManagerWidget *GetAudioWidget();
 
 	bool PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, HyGuiItemType eManagerType);
-
-	GltfModel *GetGltfModel();
-	GltfWidget *GetGltfWidget();
 
 	//void SetAudioModel(QJsonObject audioObj);
 

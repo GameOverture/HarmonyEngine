@@ -349,6 +349,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
 	FINDACTION("actionNewText")->setEnabled(bValidItem);
 	FINDACTION("actionNewSprite")->setEnabled(bValidItem);
+	FINDACTION("actionNewSpine")->setEnabled(bValidItem);
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
 	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
 	FINDACTION("actionNewEntity")->setEnabled(bValidItem);

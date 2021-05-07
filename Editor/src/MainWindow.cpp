@@ -22,7 +22,6 @@
 #include "DlgProjectSettings.h"
 #include "DlgImportTileSheet.h"
 #include "ExplorerWidget.h"
-#include "GltfWidget.h"
 #include "AudioAssetsWidget.h"
 #include "ManagerWidget.h"
 
@@ -74,6 +73,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionNewParticle);
 	ui->explorer->addAction(ui->actionNewText);
 	ui->explorer->addAction(ui->actionNewSprite);
+	ui->explorer->addAction(ui->actionNewSpine);
 	ui->explorer->addAction(ui->actionNewEntity);
 	ui->explorer->addAction(ui->actionNewPrefab);
 	ui->explorer->addAction(ui->actionNewEntity3d);
@@ -264,7 +264,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	ui->tabWidgetAssetManager->clear();
 	ui->tabWidgetAssetManager->addTab(pProject->GetSourceWidget(), QIcon(":/icons16x16/code.png"), "Source");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAtlasWidget(), HyGlobal::ItemIcon(ITEM_AtlasImage, SUBICON_None), "Atlases");
-	ui->tabWidgetAssetManager->addTab(pProject->GetGltfWidget(), HyGlobal::ItemIcon(ITEM_Prefab, SUBICON_None), "Models");
+	//ui->tabWidgetAssetManager->addTab(pProject->GetGltfWidget(), HyGlobal::ItemIcon(ITEM_Prefab, SUBICON_None), "Models");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAudioWidget(), HyGlobal::ItemIcon(ITEM_Audio, SUBICON_None), "Audio");
 
 	// Restore asset manager widgets to their previous state
@@ -569,6 +569,11 @@ void MainWindow::on_actionNewParticle_triggered()
 void MainWindow::on_actionNewSprite_triggered()
 {
 	NewItem(ITEM_Sprite);
+}
+
+void MainWindow::on_actionNewSpine_triggered()
+{
+	NewItem(ITEM_Spine);
 }
 
 void MainWindow::on_actionNewText_triggered()

@@ -72,6 +72,7 @@
      <addaction name="actionNewSprite"/>
      <addaction name="actionNewText"/>
      <addaction name="actionNewParticle"/>
+     <addaction name="actionNewSpine"/>
      <addaction name="actionNewPrefab"/>
      <addaction name="actionNewAudio"/>
      <addaction name="separator"/>
@@ -676,6 +677,24 @@
    </property>
    <property name="toolTip">
     <string>Open code integrated development environment generated from build</string>
+   </property>
+  </action>
+  <action name="actionNewSpine">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Spine-New.png</normaloff>:/icons16x16/items/Spine-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Spine</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new Spine item to the currently loaded project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+I</string>
    </property>
   </action>
  </widget>

@@ -14,8 +14,13 @@
 #include "Diagnostics/Console/IHyConsole.h"
 
 HySpine2dData::HySpine2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
-	IHyNodeData(sPath)
+	IHyNodeData(sPath),
+	m_pAtlasData(nullptr),
+	m_pSkeletonData(nullptr),
+	m_pAnimStateData(nullptr)
 {
+	//m_pAtlasData = new spine::Atlas("", );
+
 	//std::string sAtlasPath(GetPath());
 	//sAtlasPath += ".atlas";
 

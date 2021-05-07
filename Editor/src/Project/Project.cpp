@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "Project.h"
 #include "SourceModel.h"
-#include "GltfWidget.h"
 #include "AudioManagerModel.h"
 #include "MainWindow.h"
 #include "ProjectItemMimeData.h"
@@ -82,8 +81,7 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	m_pSourceWidget(nullptr),
 	m_pAtlasModel(nullptr),
 	m_pAtlasWidget(nullptr),
-	m_pGltfModel(nullptr),
-	m_pGltfWidget(nullptr),
+	m_pAudioModel(nullptr),
 	m_pAudioWidget(nullptr),
 	m_pTabBar(nullptr),
 	m_pCurOpenItem(nullptr),
@@ -113,8 +111,6 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 	m_pAtlasModel = new AtlasModel(*this);
 	m_pAtlasModel->Init();
-
-	m_pGltfModel = new GltfModel(this);
 
 	m_pAudioModel = new AudioManagerModel(*this);
 	m_pAudioModel->Init();
@@ -150,14 +146,12 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	Harmony::OnProjectDestructor(this); // Order matters because this calls Project::HarmonyShutdown()
 	delete m_pSourceWidget;
 	delete m_pAtlasWidget;
-	delete m_pGltfWidget;
 	delete m_pAudioWidget;
 
 	delete m_pDraw;
 	
 	delete m_pSourceModel;
 	delete m_pAtlasModel;
-	delete m_pGltfModel;
 	delete m_pAudioModel;
 }
 
@@ -541,16 +535,6 @@ bool Project::PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRe
 	pManager->ImportNewAssets(importAssetList, uiBankId, ePasteItemType, correspondingParentList, correspondingUuidList);
 
 	return true;
-}
-
-GltfModel *Project::GetGltfModel()
-{
-	return m_pGltfModel;
-}
-
-GltfWidget *Project::GetGltfWidget()
-{
-	return m_pGltfWidget;
 }
 
 //void Project::SetAudioModel(QJsonObject audioObj)
@@ -1022,11 +1006,9 @@ bool Project::HarmonyInitialize()
 
 	delete m_pSourceWidget;
 	delete m_pAtlasWidget;
-	delete m_pGltfWidget;
 	delete m_pAudioWidget;
 	m_pSourceWidget = new ManagerWidget(m_pSourceModel, nullptr);
 	m_pAtlasWidget = new ManagerWidget(m_pAtlasModel, nullptr);
-	m_pGltfWidget = new GltfWidget(m_pGltfModel, nullptr);
 	m_pAudioWidget = new ManagerWidget(m_pAudioModel, nullptr);
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)

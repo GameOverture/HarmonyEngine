@@ -4,6 +4,13 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(HYBUILD_Qt ON)
 
+# Build Extras
+option(HYBUILD_SPINE "Runtime support for Spine 2d animation - requires Spine License" OFF)
+
+if(HYBUILD_SPINE)
+	add_compile_definitions(HY_USE_SPINE)
+endif()
+
 add_subdirectory(Engine)
 add_subdirectory(Editor)
 

@@ -20,6 +20,8 @@
 #include "SpriteDraw.h"
 #include "TextWidget.h"
 #include "TextDraw.h"
+#include "SpineWidget.h"
+#include "SpineDraw.h"
 #include "PrefabWidget.h"
 #include "PrefabDraw.h"
 #include "EntityWidget.h"
@@ -83,6 +85,9 @@ void ProjectItemData::LoadModel()
 		break;
 	case ITEM_Text:
 		m_pModel = new TextModel(*this, m_ItemFileData);
+		break;
+	case ITEM_Spine:
+		m_pModel = new SpineModel(*this, m_ItemFileData);
 		break;
 	case ITEM_Entity:
 		m_pModel = new EntityModel(*this, m_ItemFileData);
@@ -215,6 +220,9 @@ void ProjectItemData::WidgetLoad()
 	case ITEM_Text:
 		m_pWidget = new TextWidget(*this);
 		break;
+	case ITEM_Spine:
+		m_pWidget = new SpineWidget(*this);
+		break;
 	case ITEM_Entity:
 		m_pWidget = new EntityWidget(*this);
 		break;
@@ -249,6 +257,9 @@ void ProjectItemData::DrawLoad()
 		break;
 	case ITEM_Text:
 		m_pDraw = new TextDraw(this, m_ItemFileData);
+		break;
+	case ITEM_Spine:
+		m_pDraw = new SpineDraw(this, m_ItemFileData);
 		break;
 	case ITEM_Entity:
 		m_pDraw = new EntityDraw(this, m_ItemFileData);

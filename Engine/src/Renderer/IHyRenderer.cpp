@@ -118,6 +118,11 @@ void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCa
 		uiNumVerticesPerInstance = 4;
 		break;
 
+	case HYTYPE_Spine:
+		uiNumInstances = static_cast<HySpine2d &>(instanceRef).GetNumSlots();
+		uiNumVerticesPerInstance = 4;
+		break;
+
 	default:
 		HyError("IHyRenderer::AppendDrawable2d - Unknown instance type");
 	}
@@ -163,6 +168,7 @@ HyShaderHandle IHyRenderer::GetDefaultShaderHandle(HyType eType)
 	case HYTYPE_Sprite:
 	case HYTYPE_TexturedQuad:
 	case HYTYPE_Text:
+	case HYTYPE_Spine:
 		return m_pShaderQuadBatch->GetHandle();
 
 	case HYTYPE_Primitive:
