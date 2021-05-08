@@ -840,11 +840,11 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 	if(pDlg->exec())
 	{
 		ExplorerItemData *pNewItem = m_ExplorerModel.AddItem(pProj,
-														 eItem,
-														 pDlg->GetPrefix(),
-														 pDlg->GetName(),
-														 HyGlobal::GenerateNewItemFileData(pDlg->GetImportFile()),
-														 pDlg->GetImportFile().isEmpty()); // Blank items are pending save
+															 eItem,
+															 pDlg->GetPrefix(),
+															 pDlg->GetName(),
+															 HyGlobal::GenerateNewItemFileData(pDlg->GetImportFile()),
+															 pDlg->GetImportFile().isEmpty()); // Blank items are pending save
 
 		if(pNewItem->IsProjectItem())
 		{

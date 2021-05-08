@@ -10,6 +10,8 @@
 #include "Global.h"
 #include "Project.h"
 
+#include "SpineModel.h"
+
 /*static*/ QString HyGlobal::sm_sItemNames[NUMTYPES];
 /*static*/ QString HyGlobal::sm_sItemNamesPlural[NUMTYPES];
 /*static*/ QString HyGlobal::sm_AssetNames[NUMASSETTYPES];
@@ -399,6 +401,7 @@ bool HyGlobal::IsItemFileDataValid(const FileDataPair &itemfileDataRef)
 FileDataPair HyGlobal::GenerateNewItemFileData(QString sImportPath /*= ""*/)
 {
 	FileDataPair newItemFileData;
+
 	newItemFileData.m_Meta["stateArray"] = QJsonArray();
 	newItemFileData.m_Data["stateArray"] = QJsonArray();
 
@@ -409,6 +412,9 @@ FileDataPair HyGlobal::GenerateNewItemFileData(QString sImportPath /*= ""*/)
 	newItemFileData.m_Meta["CameraZoom"] = 1;
 
 	newItemFileData.m_Meta["UUID"] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+	if(sImportPath.isEmpty() == false)
+		newItemFileData.m_Meta["newImport"] = sImportPath;
 
 	if(IsItemFileDataValid(newItemFileData) == false)
 		HyGuiLog("ExplorerModel::GenerateNewItemFileData - IsItemFileDataValid return false", LOGTYPE_Error);

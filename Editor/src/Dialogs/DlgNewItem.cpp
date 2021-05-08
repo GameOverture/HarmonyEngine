@@ -235,8 +235,8 @@ void DlgNewItem::on_btnImportBrowse_clicked()
 	else if(m_eItemType == ITEM_Spine)
 	{
 		sCaption = "Import new spine file";
-		sFilters = tr("All files (*.*);;Spine (*.json)");
-		sSelectedFilter = tr("Spine (*.json)");
+		sFilters = tr("Spine Files (*.skel *.json)");
+		sSelectedFilter = tr("Spine Files (*.skel *.json)");
 	}
 	else
 	{

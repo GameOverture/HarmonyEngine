@@ -64,6 +64,11 @@ ProjectItemData::ProjectItemData(Project &projRef,
 
 	LoadModel();
 
+	// "newImport" indicates to LoadModel() that this item is brand new and should setup its meta/data accordingly
+	// It should now be removed so reloading this item doesn't try to reimport itself
+	if(m_ItemFileData.m_Meta.contains("newImport"))
+		m_ItemFileData.m_Meta.remove("newImport");
+
 	connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
 	connect(m_pUndoStack, SIGNAL(indexChanged(int)), this, SLOT(on_undoStack_indexChanged(int)));
 }
