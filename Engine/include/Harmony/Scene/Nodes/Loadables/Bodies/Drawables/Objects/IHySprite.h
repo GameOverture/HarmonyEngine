@@ -39,8 +39,6 @@ protected:
 
 	uint32					m_uiCurFrame;
 
-	glm::ivec2				m_vCustomOffset;					// If set, every frame offsets by this amount (plus any offset it is created with in the Editor)
-
 public:
 	IHySprite(std::string sPrefix, std::string sName, ENTTYPE *pParent);
 	IHySprite(const IHySprite &copyRef);
@@ -103,7 +101,6 @@ public:
 	float GetStateMaxWidth(uint32 uiStateIndex, bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED width of the widest frame in this animation state
 	float GetStateMaxHeight(uint32 uiStateIndex, bool bIncludeScaling = true);	// Returns the ALPHA-CROPPED height of the tallest frame in this animation state
 
-	void SetUserOffset(int32 iOffsetX, int32 iOffsetY);
 	glm::ivec2 GetCurFrameOffset();
 
 	virtual void SetState(uint32 uiStateIndex) override;

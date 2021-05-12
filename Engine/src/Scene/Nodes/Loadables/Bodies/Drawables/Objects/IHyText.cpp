@@ -953,8 +953,7 @@ offsetCalculation:
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::MarkAsDirty()
 {
-	//if(IsLoaded())
-		m_bIsDirty = true;
+	m_bIsDirty = true;
 }
 
 // Converts a given UTF-8 encoded character (array) to its UTF-32 LE equivalent

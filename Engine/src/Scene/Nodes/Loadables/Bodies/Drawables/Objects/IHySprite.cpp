@@ -22,8 +22,7 @@ IHySprite<NODETYPE, ENTTYPE>::IHySprite(std::string sPrefix, std::string sName, 
 	m_bIsAnimPaused(false),
 	m_fAnimPlayRate(1.0f),
 	m_fElapsedFrameTime(0.0f),
-	m_uiCurFrame(0),
-	m_vCustomOffset(0, 0)
+	m_uiCurFrame(0)
 {
 	this->m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
@@ -345,13 +344,6 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight(uint32 uiStateIndex, bool 
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHySprite<NODETYPE, ENTTYPE>::SetUserOffset(int32 iOffsetX, int32 iOffsetY)
-{
-	m_vCustomOffset.x = iOffsetX;
-	m_vCustomOffset.y = iOffsetY;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
 glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 {
 	if(this->AcquireData() == nullptr) {
@@ -360,7 +352,7 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 	}
 
 	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	return frameRef.vOFFSET + m_vCustomOffset;
+	return frameRef.vOFFSET;
 }
 
 template<typename NODETYPE, typename ENTTYPE>

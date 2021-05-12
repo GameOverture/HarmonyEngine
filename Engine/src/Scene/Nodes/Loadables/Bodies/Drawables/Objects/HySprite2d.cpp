@@ -69,7 +69,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 		return;
 	}
 
-	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET + m_vCustomOffset;
+	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET;
 	vFrameOffset.x *= std::fabs(scale.Get().x);
 	vFrameOffset.y *= std::fabs(scale.Get().y);
 
@@ -97,7 +97,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	glm::vec2 vSize(frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth(), frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight());
 	vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
 
-	glm::vec2 vOffset(frameRef.vOFFSET.x + m_vCustomOffset.x, frameRef.vOFFSET.y + m_vCustomOffset.y);
+	glm::vec2 vOffset(frameRef.vOFFSET.x, frameRef.vOFFSET.y);
 	vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
 
 	vertexBufferRef.AppendData2d(&CalculateTopTint(), sizeof(glm::vec3));
