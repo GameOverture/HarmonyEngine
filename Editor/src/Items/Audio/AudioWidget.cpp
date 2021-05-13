@@ -11,6 +11,7 @@
 #include "AudioWidget.h"
 #include "ui_AudioWidget.h"
 #include "GlobalUndoCmds.h"
+#include "AudioUndoCmd.h"
 #include "AudioModel.h"
 #include "AudioWidget.h"
 #include "AudioPlayListModel.h"
@@ -48,10 +49,7 @@ AudioWidget::AudioWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	//ui->btnLastFrame->setDefaultAction(ui->actionLastFrame);
 
 	////ui->framesView->setModel(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(0)->pFramesModel);
-	//ui->framesView->setItemDelegate(new WidgetSpriteDelegate(&m_ItemRef, ui->framesView, this));
-	//QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
-	//connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-	//	this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
+	//ui->playListTableView->setItemDelegate(new WidgetSpriteDelegate(&m_ItemRef, ui->framesView, this));
 
 	//FocusState(0, -1);
 }
@@ -72,6 +70,15 @@ AudioWidget::~AudioWidget()
 
 /*virtual*/ void AudioWidget::OnUpdateActions() /*override*/
 {
+	AudioPlayListModel &playListModelRef = static_cast<AudioModel *>(m_ItemRef.GetModel())->GetPlayListModel(GetCurStateIndex());
+	ui->playListTableView->setModel(&playListModelRef);
+
+	QItemSelectionModel *pSelModel = ui->playListTableView->selectionModel();
+	connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+			this, SLOT(on_playListTableView_selectionChanged(const QItemSelection &, const QItemSelection &)));
+	
+	//////////////////////////////////////////////////////
+
 	int iCurNumAudio = static_cast<AudioStateData *>(GetCurStateData())->GetPlayListModel().rowCount();
 	bool bHasSelection = iCurNumAudio > 0 && ui->playListTableView->currentIndex().row() >= 0;
 
@@ -79,10 +86,6 @@ AudioWidget::~AudioWidget()
 	ui->actionOrderAudioDownwards->setEnabled(ui->playListTableView->currentIndex().row() != iCurNumAudio - 1 && iCurNumAudio > 1);
 	ui->actionRemoveAudio->setEnabled(bHasSelection);
 
-	//////////////////////////////////////////////////////
-	AudioPlayListModel &playListModelRef = static_cast<AudioModel *>(m_ItemRef.GetModel())->GetPlayListModel(GetCurStateIndex());
-	ui->playListTableView->setModel(&playListModelRef);
-	
 	//////////////////////////////////////////////////////
 	PropertiesTreeModel &propertiesModelRef = static_cast<AudioModel *>(m_ItemRef.GetModel())->GetPropertiesModel(GetCurStateIndex());
 	ui->statePropertiesTreeView->setModel(&propertiesModelRef);
@@ -102,15 +105,25 @@ AudioWidget::~AudioWidget()
 	//pCurStateData->GetReverseMapper()->AddCheckBoxMapping(ui->chkReverse);
 	//pCurStateData->GetBounceMapper()->AddCheckBoxMapping(ui->chkBounce);
 
-	//// iSubStateIndex represents which row to select
-	//if(subState.toInt() >= 0 && ui->framesView->model()->rowCount() > 0)
-	//{
-	//	int iRowToSelect = subState.toInt();
-	//	if(iRowToSelect < ui->framesView->model()->rowCount())
-	//		ui->framesView->selectRow(iRowToSelect);
-	//	else
-	//		ui->framesView->selectRow(0);
-	//}
+	// iSubStateIndex represents which row to select
+	if(subState.toInt() >= 0 && ui->playListTableView->model()->rowCount() > 0)
+	{
+		int iRowToSelect = subState.toInt();
+		if(iRowToSelect < ui->playListTableView->model()->rowCount())
+			ui->playListTableView->selectRow(iRowToSelect);
+		else
+			ui->playListTableView->selectRow(0);
+	}
+}
+
+QTableView *AudioWidget::GetPlayListTableView()
+{
+	return ui->playListTableView;
+}
+
+void AudioWidget::on_playListTableView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
+{
+	UpdateActions();
 }
 
 void AudioWidget::on_actionAddAudio_triggered()
@@ -125,12 +138,27 @@ void AudioWidget::on_actionAddAudio_triggered()
 
 void AudioWidget::on_actionRemoveAudio_triggered()
 {
+	QList<AssetItemData *> removeList;
+	removeList.append(static_cast<AudioPlayListModel *>(ui->playListTableView->model())->GetAudioAssetAt(ui->playListTableView->currentIndex().row())->GetAudioAsset());
+
+	QUndoCommand *pCmd = new UndoCmd_UnlinkStateAssets("Remove Frame", m_ItemRef, GetCurStateIndex(), removeList);
+	GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidget::on_actionOrderAudioUpwards_triggered()
 {
+	QVariantList paramList;
+	paramList.append(ui->playListTableView->currentIndex().row());
+	paramList.append(ui->playListTableView->currentIndex().row() - 1);
+	QUndoCommand *pCmd = new AudioUndoCmd(AUDIOCMD_OrderAudio, m_ItemRef, paramList);
+	GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidget::on_actionOrderAudioDownwards_triggered()
 {
+	QVariantList paramList;
+	paramList.append(ui->playListTableView->currentIndex().row());
+	paramList.append(ui->playListTableView->currentIndex().row() + 1);
+	QUndoCommand *pCmd = new AudioUndoCmd(AUDIOCMD_OrderAudio, m_ItemRef, paramList);
+	GetItem().GetUndoStack()->push(pCmd);
 }

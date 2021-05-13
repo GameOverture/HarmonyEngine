@@ -46,6 +46,7 @@ void SpriteUndoCmd_OrderFrame::redo()
 		iOffset++;
 	}
 	
+	// TODO: replace this with ProjectItem::FocusWidgetState
 	m_pSpriteTableView->selectRow(m_iFrameIndexDest);
 }
 
@@ -66,6 +67,7 @@ void SpriteUndoCmd_OrderFrame::undo()
 		iOffset++;
 	}
 	
+	// TODO: replace this with ProjectItem::FocusWidgetState
 	m_pSpriteTableView->selectRow(m_iFrameIndex);
 }
 
@@ -115,6 +117,8 @@ void SpriteUndoCmd_OffsetFrame::redo()
 		pSpriteFramesModel->SetFrameOffset(m_iFrameIndex, m_vNewOffsetList[0]);
 		m_pSpriteTableView->selectRow(m_iFrameIndex);
 	}
+
+	// TODO: replace this with ProjectItem::FocusWidgetState
 }
 
 void SpriteUndoCmd_OffsetFrame::undo()
@@ -131,6 +135,8 @@ void SpriteUndoCmd_OffsetFrame::undo()
 		pSpriteFramesModel->SetFrameOffset(m_iFrameIndex, m_OriginalOffsetList[0]);
 		m_pSpriteTableView->selectRow(m_iFrameIndex);
 	}
+
+	// TODO: replace this with ProjectItem::FocusWidgetState
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

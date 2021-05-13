@@ -22,33 +22,61 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, EN
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),
 	m_fPitch(1.0f),
-	m_ePlayListMode(HYPLAYLIST_Unknown),
-	m_iPriority(0),
-	m_iLoops(0),
-	m_uiMaxDistance(0),
 	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
 	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
 {
 }
 
-// TODO: copy ctor and move ctor
+template<typename NODETYPE, typename ENTTYPE>
+IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(const IHyAudio &copyRef) :
+	NODETYPE(copyRef),
+	m_uiCueFlags(copyRef.m_uiCueFlags),
+	m_fVolume(copyRef.m_fVolume),
+	m_fPitch(copyRef.m_fPitch),
+	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
+	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
+{
+	for(uint32 i = 0; i < static_cast<uint32>(copyRef.m_AudioStateAttribList.size()); ++i)
+		m_AudioStateAttribList.push_back(copyRef.m_AudioStateAttribList[i]);
+
+	volume = copyRef.volume;
+	pitch = copyRef.pitch;
+}
 
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ IHyAudio<NODETYPE, ENTTYPE>::~IHyAudio(void)
 {
 }
 
-// TODO: assignment operator and move operator
+template<typename NODETYPE, typename ENTTYPE>
+const IHyAudio<NODETYPE, ENTTYPE> &IHyAudio<NODETYPE, ENTTYPE>::operator=(const IHyAudio<NODETYPE, ENTTYPE> &rhs)
+{
+	NODETYPE::operator=(rhs);
+
+	m_uiCueFlags = rhs.m_uiCueFlags;
+	m_fVolume = rhs.m_fVolume;
+	m_fPitch = rhs.m_fPitch;
+	
+	m_AudioStateAttribList.clear();
+	for(uint32 i = 0; i < static_cast<uint32>(rhs.m_AudioStateAttribList.size()); ++i)
+		m_AudioStateAttribList.push_back(rhs.m_AudioStateAttribList[i]);
+
+	volume = rhs.volume;
+	pitch = rhs.pitch;
+
+	return *this;
+}
+
 template<typename NODETYPE, typename ENTTYPE>
 int32 IHyAudio<NODETYPE, ENTTYPE>::GetLoops() const
 {
-	return m_iLoops;
+	return m_AudioStateAttribList[this->m_uiState].m_uiLoops;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyAudio<NODETYPE, ENTTYPE>::SetLoops(int32 iLoops)
 {
-	m_iLoops = iLoops;
+	m_AudioStateAttribList[this->m_uiState].m_uiLoops = iLoops;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -90,6 +118,16 @@ void IHyAudio<NODETYPE, ENTTYPE>::SetPause(bool bPause)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+/*virtual*/ void IHyAudio<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
+{
+	if(this->m_uiState == uiStateIndex)
+		return;
+
+	IHyLoadable::SetState(uiStateIndex);
+	m_CurPlayList.clear();
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHyAudio<NODETYPE, ENTTYPE>::IsLoadDataValid() /*override*/
 {
 	const HyAudioData *pData = static_cast<const HyAudioData *>(this->AcquireData());
@@ -97,16 +135,61 @@ template<typename NODETYPE, typename ENTTYPE>
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+uint32 IHyAudio<NODETYPE, ENTTYPE>::GetNextSound()
+{
+	const HyAudioData *pData = static_cast<const HyAudioData *>(this->UncheckedGetData());
+	switch(m_AudioStateAttribList[this->m_uiState].m_ePlayListMode)
+	{
+	case HYPLAYLIST_Shuffle: {
+		if(m_CurPlayList.empty())
+			Shuffle();
+		uint32 uiSound = m_CurPlayList.back();
+		m_CurPlayList.pop_back();
+		return uiSound;
+	}
+
+	case HYPLAYLIST_Weighted: {
+		const HyAudioPlayList &playListRef = pData->GetPlayList(this->m_uiState);
+		return playListRef[PullEntryIndex(playListRef)].first;
+	}
+
+	case HYPLAYLIST_SequentialLocal: {
+		if(m_CurPlayList.empty())
+		{
+			const HyAudioPlayList &playListRef = pData->GetPlayList(this->m_uiState);
+			for(int i = 0; i < playListRef.size(); ++i)
+				m_CurPlayList.push_back(playListRef[i].first);
+		}
+		uint32 uiSound = m_CurPlayList.back();
+		m_CurPlayList.pop_back();
+		return uiSound;
+	}
+
+	case HYPLAYLIST_SequentialGlobal:
+		return pData->GetNextSequential(this->m_uiState);
+
+	default:
+		HyError("HyAudioData::GetSound - Unhandled cue type");
+		return 0;
+	}
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHyAudio<NODETYPE, ENTTYPE>::OnDataAcquired() /*override*/
 {
 	const HyAudioData *pData = static_cast<const HyAudioData *>(this->UncheckedGetData());
 
-	m_ePlayListMode = pData->GetPlayListMode(0);
-	m_iPriority = pData->GetPriority(0);
-	m_iLoops = pData->GetLoops(0);
-	m_uiMaxDistance = pData->GetMaxDistance(0);
-	volume = pData->GetVolume(0);
-	pitch = pData->GetPitch(0);
+	m_AudioStateAttribList.clear();
+	for(uint32 i = 0; i < pData->GetNumStates(); ++i)
+	{
+		AudioStateAttribs stateAttrib(pData->GetPlayListMode(i),
+									  true, // TODO: Not implemented yet
+									  pData->GetPriority(i),
+									  pData->GetLoops(i),
+									  pData->GetMaxDistance(i));
+
+		m_AudioStateAttribList.push_back(stateAttrib);
+	}
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -128,6 +211,55 @@ template<typename NODETYPE, typename ENTTYPE>
 
 		m_uiCueFlags = 0;
 	}
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHyAudio<NODETYPE, ENTTYPE>::Shuffle()
+{
+	const HyAudioData *pData = static_cast<const HyAudioData *>(this->AcquireData());
+	const HyAudioPlayList &playListRef = pData->GetPlayList(this->m_uiState);
+	HyAudioPlayList tmpPlayList(playListRef);
+
+	m_CurPlayList.clear();
+	m_CurPlayList.reserve(playListRef.size());
+
+	for(int i = 0; i < playListRef.size(); ++i)
+	{
+		uint32 uiIndex = PullEntryIndex(tmpPlayList);
+
+		m_CurPlayList.push_back(tmpPlayList[uiIndex].first);
+		tmpPlayList.erase(tmpPlayList.begin() + uiIndex);
+	}
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+uint32 IHyAudio<NODETYPE, ENTTYPE>::PullEntryIndex(const HyAudioPlayList &entriesList)
+{
+	uint32 uiTotalWeight = 0;
+	for(int j = 0; j < entriesList.size(); ++j)
+		uiTotalWeight += entriesList[j].second;
+
+	uint32 uiWeight = HyRand::Range(0u, uiTotalWeight);
+
+	// If this rng exceeds the weight table max return the last valid entry
+	uint32 uiIndex = 0;
+	if(uiWeight >= uiTotalWeight)
+	{
+		uiIndex = entriesList.size() - 1;
+		while(entriesList[uiIndex].second == 0 && uiIndex > 0)
+			uiIndex--;
+	}
+	else // Normal lookup
+	{
+		uint32 tmpCount = entriesList[uiIndex].second;
+		while(tmpCount <= uiWeight && uiIndex < entriesList.size())
+		{
+			uiIndex++;
+			tmpCount += entriesList[uiIndex].second;
+		}
+	}
+
+	return uiIndex;
 }
 
 template class IHyAudio<IHyLoadable2d, HyEntity2d>;

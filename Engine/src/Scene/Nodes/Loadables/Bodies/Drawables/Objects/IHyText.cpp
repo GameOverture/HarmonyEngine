@@ -457,23 +457,10 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHyText<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
 {
-	if(this->AcquireData() == nullptr || uiStateIndex >= static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumStates())
-	{
-		if(this->UncheckedGetData() == nullptr) {
-			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
-		}
-		else if(uiStateIndex >= static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumStates()) {
-			HyLogWarning(this->m_sPrefix << "/" << this->m_sName << " (HyText2d) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HyText2dData *>(this->AcquireData())->GetNumStates() << "'");
-		}
-
-		return;
-	}
-
-	if(this->m_uiState == uiStateIndex)
+	if(m_uiState == uiStateIndex)
 		return;
 
 	IHyLoadable::SetState(uiStateIndex);
-	
 	MarkAsDirty();
 }
 

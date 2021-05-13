@@ -13,6 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/AnimFloats/HyAnimFloat.h"
 
+typedef std::vector<std::pair<uint32, uint32>> HyAudioPlayList;	// <checksum, weight>
+
 template<typename NODETYPE, typename ENTTYPE>
 class IHyAudio : public NODETYPE
 {
@@ -21,10 +23,25 @@ class IHyAudio : public NODETYPE
 	float						m_fPitch;
 	
 	// Configurable
-	HyPlayListMode				m_ePlayListMode;
-	int32						m_iPriority;
-	int32						m_iLoops;
-	uint32						m_uiMaxDistance;
+	struct AudioStateAttribs
+	{
+		uint32					m_ePlayListMode : 3;
+		uint32					m_bAllowRepeats : 1;
+		uint32					m_uiPriority : 4;
+		uint32					m_uiLoops : 8;			// 255 = loop forever
+		uint32					m_uiMaxDistance : 16;
+
+		AudioStateAttribs(HyPlayListMode ePlayList, bool bAllowRepeats, uint8 uiPriority, uint8 uiLoops, uint16 uiMaxDist)
+		{
+			m_ePlayListMode = ePlayList;
+			m_bAllowRepeats = bAllowRepeats;
+			m_uiPriority = uiPriority;
+			m_uiLoops = uiLoops;
+			m_uiMaxDistance = uiMaxDist;
+		}
+	};
+	std::vector<AudioStateAttribs>	m_AudioStateAttribList;
+	std::vector<uint32>				m_CurPlayList;		// Holds Checksums
 
 public:
 	HyAnimFloat					volume;
@@ -32,10 +49,10 @@ public:
 
 public:
 	IHyAudio(std::string sPrefix, std::string sName, ENTTYPE *pParent);
-
-	// TODO: copy ctor and move ctor
+	IHyAudio(const IHyAudio &copyRef);
 	virtual ~IHyAudio(void);
-	// TODO: assignment operator and move operator
+	
+	const IHyAudio &operator=(const IHyAudio &rhs);
 
 	int32 GetLoops() const;
 	void SetLoops(int32 iLoops);
@@ -44,11 +61,20 @@ public:
 	void Stop();
 	void SetPause(bool bPause);
 
+	virtual void SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
+
+	uint32 GetNextSound();	// Returns the next sound checksum to be played
 
 protected:
 	virtual void OnDataAcquired() override;
 	virtual void OnLoadedUpdate() override;
+
+	void Shuffle();
+
+	uint32 PullEntryIndex(const HyAudioPlayList &entriesList);
 };
+
+
 
 #endif /* IHyAudio_h__ */

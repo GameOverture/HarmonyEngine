@@ -358,18 +358,6 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHySprite<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
 {
-	if(this->AcquireData() == nullptr || uiStateIndex >= static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetNumStates())
-	{
-		if(this->UncheckedGetData() == nullptr) {
-			HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::AnimSetState invoked on null data");
-		}
-		else if(uiStateIndex >= static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetNumStates()) {
-			HyLogWarning(this->m_sPrefix << "/" << this->m_sName << " (HySprite) wants to set state index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySprite2dData *>(this->AcquireData())->GetNumStates() << "'");
-		}
-		
-		return;
-	}
-
 	if(this->m_uiState == uiStateIndex)
 		return;
 

@@ -13,14 +13,15 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
-#include "Scene/Nodes/IHyNode.h"
+#include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
+#include "Scene/Nodes/Loadables/Objects/HyAudio3d.h"
 
 class HyAudioData : public IHyNodeData
 {
 	class AudioState
 	{
 	public:
-		std::vector<uint32>		m_PlayList;	// Stores checksums
+		HyAudioPlayList			m_PlayList;
 
 		HyPlayListMode			m_ePlayListMode;
 		float					m_fVolume;
@@ -31,9 +32,13 @@ class HyAudioData : public IHyNodeData
 	};
 	AudioState *				m_pAudioStates;
 
+	std::vector<uint32> *		m_pSequentialCountList; // Needs to be dynamically allocated so we can update the vector within a const function
+
 public:
 	HyAudioData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
+
+	const HyAudioPlayList &GetPlayList(uint32 uiStateIndex) const;
 
 	HyPlayListMode GetPlayListMode(uint32 uiStateIndex) const;
 	int32 GetPriority(uint32 uiStateIndex) const;
@@ -42,7 +47,7 @@ public:
 	float GetVolume(uint32 uiStateIndex) const;
 	float GetPitch(uint32 uiStateIndex) const;
 
-	uint32 GetSound(IHyNode *pAudioNode) const;
+	uint32 GetNextSequential(uint32 uiStateIndex) const;
 };
 
 #endif /* HyAudioData_h__ */

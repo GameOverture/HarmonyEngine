@@ -189,8 +189,6 @@ AudioPlayListItem *AudioPlayListModel::GetAudioAssetAt(int iIndex)
 
 /*virtual*/ bool AudioPlayListModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
 {
-	HyGuiLog("AudioPlayListModel::setData was invoked", LOGTYPE_Error);
-
 	AudioPlayListItem *pPlayListItem = m_PlayList[index.row()];
 
 	if(role == Qt::EditRole)

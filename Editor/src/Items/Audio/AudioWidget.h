@@ -16,6 +16,7 @@
 #include <QWidget>
 #include <QMenu>
 #include <QComboBox>
+#include <QTableView>
 
 namespace Ui {
 	class AudioWidget;
@@ -33,10 +34,13 @@ public:
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
+	QTableView *GetPlayListTableView();
+
 private:
 	Ui::AudioWidget *ui;
 	
 private Q_SLOTS:
+	void on_playListTableView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);
 	void on_actionAddAudio_triggered();
 	void on_actionRemoveAudio_triggered();
 	void on_actionOrderAudioUpwards_triggered();

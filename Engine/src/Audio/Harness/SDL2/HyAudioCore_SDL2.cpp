@@ -238,7 +238,7 @@ void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 {
 	// Determine buffer
 	HyRawSoundBuffer *pBuffer = nullptr;
-	uint32 uiSoundChecksum = static_cast<const HyAudioData *>(pAudioNode->AcquireData())->GetSound(pAudioNode);
+	uint32 uiSoundChecksum = pAudioNode->GetNextSound();
 	for(auto file : m_AudioFileList)
 	{
 		pBuffer = file->GetBufferInfo(uiSoundChecksum);

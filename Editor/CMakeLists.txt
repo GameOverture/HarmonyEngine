@@ -96,12 +96,12 @@ if(Qt5_DIR)
 		src/Items/Text/SubWidgets/TextLayersModel.h
 		src/Items/Text/SubWidgets/TextLayersWidget.h
 		src/Items/Entity/EntityDraw.cpp
-		src/Items/Entity/EntityModel.cpp
-		src/Items/Entity/EntityUndoCmds.cpp
-		src/Items/Entity/EntityWidget.cpp
 		src/Items/Entity/EntityDraw.h
+		src/Items/Entity/EntityModel.cpp
 		src/Items/Entity/EntityModel.h
+		src/Items/Entity/EntityUndoCmds.cpp
 		src/Items/Entity/EntityUndoCmds.h
+		src/Items/Entity/EntityWidget.cpp
 		src/Items/Entity/EntityWidget.h
 		src/Items/Entity/EntityToolbox.ui
 		src/Items/Entity/EntityWidget.ui
@@ -118,6 +118,8 @@ if(Qt5_DIR)
 		src/Items/Audio/AudioDraw.h
 		src/Items/Audio/AudioModel.cpp
 		src/Items/Audio/AudioModel.h
+		src/Items/Audio/AudioUndoCmd.h
+		src/Items/Audio/AudioUndoCmd.cpp
 		src/Items/Audio/AudioPlayListModel.cpp
 		src/Items/Audio/AudioPlayListModel.h
 		src/Items/Audio/AudioWidget.cpp
