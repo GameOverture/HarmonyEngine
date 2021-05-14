@@ -267,6 +267,10 @@ void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 	// Play in Mixer
 	if(pBuffer->IsMusic())
 	{
+		Mix_PlayMusic(pBuffer->GetMusicPtr(), pAudioNode->GetLoops());
+		
+		int32 iVolume = static_cast<int>(MIX_MAX_VOLUME * (fVolume * m_fGlobalSfxVolume));
+		Mix_VolumeMusic(iVolume);
 	}
 	else
 	{
