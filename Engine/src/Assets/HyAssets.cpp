@@ -86,7 +86,7 @@ HyAssets::HyAssets(IHyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sD
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
-	ThreadWait();
+	//ThreadWait();
 }
 
 HyAssets::~HyAssets()
@@ -532,10 +532,12 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
 	m_Mutex.lock();
-	while(m_Load_Shared.empty() == false)
+	int32 iMaxLoadPerUpdate = 5;
+	while(m_Load_Shared.empty() == false && iMaxLoadPerUpdate > 0)
 	{
 		dataList.push_back(m_Load_Shared.front());
 		m_Load_Shared.pop();
+		iMaxLoadPerUpdate--;
 	}
 	m_Mutex.unlock();
 

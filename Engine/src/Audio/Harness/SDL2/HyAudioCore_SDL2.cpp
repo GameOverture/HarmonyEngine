@@ -144,7 +144,8 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 
 /*virtual*/ void HyAudioCore_SDL2::SetMusicVolume(float fGlobalMusicVolume) /*override*/
 {
-	//Mix_VolumeMusic(static_cast<int>(MIX_MAX_VOLUME * fGlobalMusicVolume));
+	m_fGlobalMusicVolume = HyClamp(fGlobalMusicVolume, 0.0f, 1.0f) * HYAUDIO_SDL_VOLUME_DAMPENING;
+	Mix_VolumeMusic(static_cast<int>(MIX_MAX_VOLUME * m_fGlobalMusicVolume));
 }
 
 /*virtual*/ IHyFileAudioImpl *HyAudioCore_SDL2::AllocateAudioBank(HyJsonObj bankObj) /*override*/
@@ -269,7 +270,7 @@ void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 	{
 		Mix_PlayMusic(pBuffer->GetMusicPtr(), pAudioNode->GetLoops());
 		
-		int32 iVolume = static_cast<int>(MIX_MAX_VOLUME * (fVolume * m_fGlobalSfxVolume));
+		int32 iVolume = static_cast<int>(MIX_MAX_VOLUME * (fVolume * m_fGlobalMusicVolume));
 		Mix_VolumeMusic(iVolume);
 	}
 	else
