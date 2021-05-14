@@ -135,7 +135,7 @@ template<typename NODETYPE, typename ENTTYPE>
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyAudio<NODETYPE, ENTTYPE>::GetNextSound()
+uint32 IHyAudio<NODETYPE, ENTTYPE>::PullNextSound()
 {
 	const HyAudioData *pData = static_cast<const HyAudioData *>(this->UncheckedGetData());
 	switch(m_AudioStateAttribList[this->m_uiState].m_ePlayListMode)
@@ -143,14 +143,15 @@ uint32 IHyAudio<NODETYPE, ENTTYPE>::GetNextSound()
 	case HYPLAYLIST_Shuffle: {
 		if(m_CurPlayList.empty())
 			Shuffle();
-		uint32 uiSound = m_CurPlayList.back();
+		m_uiLastPlayed = m_CurPlayList.back();
 		m_CurPlayList.pop_back();
-		return uiSound;
+		return m_uiLastPlayed;
 	}
 
 	case HYPLAYLIST_Weighted: {
 		const HyAudioPlayList &playListRef = pData->GetPlayList(this->m_uiState);
-		return playListRef[PullEntryIndex(playListRef)].first;
+		m_uiLastPlayed = playListRef[PullEntryIndex(playListRef)].first;
+		return m_uiLastPlayed;
 	}
 
 	case HYPLAYLIST_SequentialLocal: {
@@ -160,18 +161,25 @@ uint32 IHyAudio<NODETYPE, ENTTYPE>::GetNextSound()
 			for(int i = 0; i < playListRef.size(); ++i)
 				m_CurPlayList.push_back(playListRef[i].first);
 		}
-		uint32 uiSound = m_CurPlayList.back();
+		m_uiLastPlayed = m_CurPlayList.back();
 		m_CurPlayList.pop_back();
-		return uiSound;
+		return m_uiLastPlayed;
 	}
 
 	case HYPLAYLIST_SequentialGlobal:
-		return pData->GetNextSequential(this->m_uiState);
+		m_uiLastPlayed = pData->GetNextSequential(this->m_uiState);
+		return m_uiLastPlayed;
 
 	default:
 		HyError("HyAudioData::GetSound - Unhandled cue type");
 		return 0;
 	}
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+uint32 IHyAudio<NODETYPE, ENTTYPE>::GetLastPlayed()
+{
+	return m_uiLastPlayed;
 }
 
 template<typename NODETYPE, typename ENTTYPE>

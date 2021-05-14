@@ -73,6 +73,7 @@ AudioWidget::~AudioWidget()
 	AudioPlayListModel &playListModelRef = static_cast<AudioModel *>(m_ItemRef.GetModel())->GetPlayListModel(GetCurStateIndex());
 	ui->playListTableView->setModel(&playListModelRef);
 
+	// TODO: Determine if connect() leaks if I keep assigning a new sender
 	QItemSelectionModel *pSelModel = ui->playListTableView->selectionModel();
 	connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
 			this, SLOT(on_playListTableView_selectionChanged(const QItemSelection &, const QItemSelection &)));

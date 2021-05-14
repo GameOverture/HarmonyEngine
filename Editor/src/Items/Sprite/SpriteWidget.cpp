@@ -95,7 +95,7 @@ SpriteWidget::~SpriteWidget()
 	SpriteStateData *pCurStateData = static_cast<SpriteStateData *>(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
 	ui->framesView->setModel(pCurStateData->GetFramesModel());
 
-	// TODO: Why is this done here again from ctor?
+	// TODO: Determine if connect() leaks if I keep assigning a new asender
 	QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
 	connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
 		this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));

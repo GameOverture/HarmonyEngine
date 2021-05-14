@@ -42,6 +42,7 @@ class IHyAudio : public NODETYPE
 	};
 	std::vector<AudioStateAttribs>	m_AudioStateAttribList;
 	std::vector<uint32>				m_CurPlayList;		// Holds Checksums
+	uint32							m_uiLastPlayed;		// Checksum of last played audio
 
 public:
 	HyAnimFloat					volume;
@@ -64,7 +65,8 @@ public:
 	virtual void SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
 
-	uint32 GetNextSound();	// Returns the next sound checksum to be played
+	uint32 PullNextSound();	// Returns the next sound checksum to be played
+	uint32 GetLastPlayed();
 
 protected:
 	virtual void OnDataAcquired() override;

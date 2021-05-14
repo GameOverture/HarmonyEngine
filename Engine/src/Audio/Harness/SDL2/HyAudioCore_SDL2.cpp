@@ -24,11 +24,15 @@
 	#include "SDL_mixer.h"
 #endif
 
+// SDL maps exactly the % of the volume meter in Window's Volume Mixer. But most other programs never approach 
+// this maximum, even when you max out their volume dial. Provide the maximum volume allowed in 'HYAUDIO_SDL_VOLUME_DAMPENING'
+#define HYAUDIO_SDL_VOLUME_DAMPENING 0.75f
+
 HyAudioCore_SDL2 *HyAudioCore_SDL2::sm_pInstance = nullptr;
 
 HyAudioCore_SDL2::HyAudioCore_SDL2() :
-	m_fGlobalSfxVolume(1.0f),
-	m_fGlobalMusicVolume(1.0f)
+	m_fGlobalSfxVolume(HYAUDIO_SDL_VOLUME_DAMPENING),
+	m_fGlobalMusicVolume(HYAUDIO_SDL_VOLUME_DAMPENING)
 {
 	HyLogTitle("SDL2 Audio");
 
@@ -127,7 +131,7 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 
 /*virtual*/ void HyAudioCore_SDL2::SetSfxVolume(float fGlobalSfxVolume) /*override*/
 {
-	m_fGlobalSfxVolume = HyClamp(fGlobalSfxVolume, 0.0f, 1.0f);
+	m_fGlobalSfxVolume = HyClamp(fGlobalSfxVolume, 0.0f, 1.0f) * HYAUDIO_SDL_VOLUME_DAMPENING;
 	
 	for(const auto &iter : m_ChannelMap)
 	{
@@ -238,7 +242,7 @@ void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 {
 	// Determine buffer
 	HyRawSoundBuffer *pBuffer = nullptr;
-	uint32 uiSoundChecksum = pAudioNode->GetNextSound();
+	uint32 uiSoundChecksum = pAudioNode->PullNextSound();
 	for(auto file : m_AudioFileList)
 	{
 		pBuffer = file->GetBufferInfo(uiSoundChecksum);
@@ -274,7 +278,8 @@ void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 		if(iAssignedChannel == -1)
 			return;
 
-		Mix_Volume(iAssignedChannel, static_cast<int>(MIX_MAX_VOLUME * (fVolume * m_fGlobalSfxVolume)));
+		int32 iVolume = static_cast<int>(MIX_MAX_VOLUME * (fVolume * m_fGlobalSfxVolume));
+		Mix_Volume(iAssignedChannel, iVolume);
 
 		if(ePlayType == CUETYPE_Start)
 		{
@@ -289,12 +294,10 @@ void HyAudioCore_SDL2::Modify(NODETYPE *pAudioNode)
 {
 	auto nodeIter = m_NodeMap.find(pAudioNode);
 	if(nodeIter == m_NodeMap.end())
-	{
-		HyLogWarning("HyAudioCore_SDL2 could not find audio node to modify");
 		return;
-	}
 
-	Mix_Volume(nodeIter->second, static_cast<int>(MIX_MAX_VOLUME * (pAudioNode->volume.Get() * m_fGlobalSfxVolume)));
+	int32 iVolume = static_cast<int>(MIX_MAX_VOLUME * (pAudioNode->volume.Get() * m_fGlobalSfxVolume));
+	Mix_Volume(nodeIter->second, iVolume);
 
 	if(pAudioNode->pitch.Get() != 1.0f)
 	{
@@ -319,7 +322,7 @@ Uint16 formatSampleSize(Uint16 format)
 /*static*/ int HyAudioCore_SDL2::computeChunkLengthMillisec(int chunkSize)
 {
 	/* bytes / samplesize == sample points */
-	const Uint32 points = chunkSize / formatSampleSize(sm_pInstance->m_uiDesiredFormat);
+	const Uint32 points = chunkSize / sizeof(int16);//formatSampleSize(sm_pInstance->m_uiDesiredFormat);
 
 	/* sample points / channels == sample frames */
 	const Uint32 frames = (points / sm_pInstance->m_iDesiredNumChannels);
@@ -330,28 +333,31 @@ Uint16 formatSampleSize(Uint16 format)
 
 /*static*/ void HyAudioCore_SDL2::OnPitchModifer(int iChannel, void *pStream, int iLength, void *pData)
 {
-	//// TODO: Check for 3D node
-	//HyAudio2d *pNode = reinterpret_cast<HyAudio2d *>(pData);
+	// TODO: Check for 3D node
+	HyAudio2d *pNode = reinterpret_cast<HyAudio2d *>(pData);
+	
+	HyRawSoundBuffer *pBuffer = nullptr;
+	uint32 uiSoundChecksum = pNode->GetLastPlayed();
+	for(auto file : sm_pInstance->m_AudioFileList)
+	{
+		pBuffer = file->GetBufferInfo(uiSoundChecksum);
+		if(pBuffer)
+			break;
+	}
 
-	//HyRawSoundBuffer *pBuffer = nullptr;
-	//uint32 uiSoundChecksum = static_cast<const HyAudioData *>(pNode->AcquireData())->GetSound(pNode);
-	//for(auto file : sm_pInstance->m_AudioFileList)
-	//{
-	//	pBuffer = file->GetBufferInfo(uiSoundChecksum);
-	//	if(pBuffer)
-	//		break;
-	//}
+	if(pBuffer == nullptr)
+		return;
 
 
-	//const float speedFactor = pNode->pitch.Get(); // speed
-	//const int channelCount = sm_pInstance->m_iDesiredNumChannels;
-	//const int frequency = sm_pInstance->m_iDesiredFrequency;
+	const float speedFactor = pNode->pitch.Get(); // speed
+	const int channelCount = sm_pInstance->m_iDesiredNumChannels;
+	const int frequency = sm_pInstance->m_iDesiredFrequency;
 
-	//const Sint16* chunkData = reinterpret_cast<Sint16*>(pBuffer->GetSfxPtr()->abuf);
+	const Sint16* chunkData = reinterpret_cast<Sint16*>(pBuffer->GetSfxPtr()->abuf);
 
-	//Sint16* buffer = static_cast<Sint16*>(pStream);
-	//const int bufferSize = iLength / sizeof(m_uiDesiredFormat);  // buffer size (as array)
-	//const int bufferDuration = computeChunkLengthMillisec(iLength);  // buffer time duration
+	Sint16* buffer = static_cast<Sint16*>(pStream);
+	const int bufferSize = iLength / sizeof(int16);  // buffer size (as array)
+	const int bufferDuration = computeChunkLengthMillisec(iLength);  // buffer time duration
 
 	//if(not touched)  // if playback is still untouched
 	//{
@@ -387,34 +393,34 @@ Uint16 formatSampleSize(Uint16 format)
 	//// if there is still sound to be played
 	//if(position < duration or loop)
 	//{
-	//	const float delta = 1000.0/frequency,   // normal duration of each sample
-	//				delta2 = delta*speedFactor; // virtual stretched duration, scaled by 'speedFactor'
+		//const float delta = 1000.0/frequency,   // normal duration of each sample
+		//			delta2 = delta*speedFactor; // virtual stretched duration, scaled by 'speedFactor'
 
-	//	for(int i = 0; i < bufferSize; i += channelCount)
-	//	{
-	//		const int j = i/channelCount; // j goes from 0 to size/channelCount, incremented 1 by 1
-	//		const float x = position + j*delta2;  // get "virtual" index. its corresponding value will be interpolated.
-	//		const int k = floor(x / delta);  // get left index to interpolate from original chunk data (right index will be this plus 1)
-	//		const float proportion = (x / delta) - k;  // get the proportion of the right value (left will be 1.0 minus this)
+		//for(int i = 0; i < bufferSize; i += channelCount)
+		//{
+		//	const int j = i/channelCount; // j goes from 0 to size/channelCount, incremented 1 by 1
+		//	const float x = position + j*delta2;  // get "virtual" index. its corresponding value will be interpolated.
+		//	const int k = floor(x / delta);  // get left index to interpolate from original chunk data (right index will be this plus 1)
+		//	const float proportion = (x / delta) - k;  // get the proportion of the right value (left will be 1.0 minus this)
 
-	//		// usually just 2 channels: 0 (left) and 1 (right), but who knows...
-	//		for(int c = 0; c < channelCount; c++)
-	//		{
-	//			// check if k will be within bounds
-	//			if(k*channelCount + channelCount - 1 < chunkSize or loop)
-	//			{
-	//				Sint16  leftValue =  chunkData[(  k   * channelCount + c) % chunkSize],
-	//									rightValue = chunkData[((k+1) * channelCount + c) % chunkSize];
+		//	// usually just 2 channels: 0 (left) and 1 (right), but who knows...
+		//	for(int c = 0; c < channelCount; c++)
+		//	{
+		//		// check if k will be within bounds
+		//		if(k*channelCount + channelCount - 1 < iLength/* or loop*/)
+		//		{
+		//			Sint16  leftValue =  chunkData[(  k   * channelCount + c) % iLength],
+		//								rightValue = chunkData[((k+1) * channelCount + c) % iLength];
 
-	//				// put interpolated value on 'data' (linear interpolation)
-	//				buffer[i + c] = (1-proportion)*leftValue + proportion*rightValue;
-	//			}
-	//			else  // if k will be out of bounds (chunk bounds), it means we already finished; thus, we'll pass silence
-	//			{
-	//				buffer[i + c] = 0;
-	//			}
-	//		}
-	//	}
+		//			// put interpolated value on 'data' (linear interpolation)
+		//			buffer[i + c] = (1-proportion)*leftValue + proportion*rightValue;
+		//		}
+		//		else  // if k will be out of bounds (chunk bounds), it means we already finished; thus, we'll pass silence
+		//		{
+		//			buffer[i + c] = 0;
+		//		}
+		//	}
+		//}
 
 	//	// update position
 	//	position += bufferDuration * speedFactor; // this is not exact since a frame may play less than its duration when finished playing, but its simpler
