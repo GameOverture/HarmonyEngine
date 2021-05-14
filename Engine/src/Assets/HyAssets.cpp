@@ -86,7 +86,7 @@ HyAssets::HyAssets(IHyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sD
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
-	//ThreadWait();
+	ThreadWait();
 }
 
 HyAssets::~HyAssets()
@@ -527,31 +527,38 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 /*virtual*/ void HyAssets::OnThreadUpdate() /*override*/
 {
-	std::vector<IHyFile *>	dataList;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
-	m_Mutex.lock();
-	int32 iMaxLoadPerUpdate = 5;
-	while(m_Load_Shared.empty() == false && iMaxLoadPerUpdate > 0)
+	bool bAllFinished = false;
+	while(bAllFinished == false)
 	{
-		dataList.push_back(m_Load_Shared.front());
-		m_Load_Shared.pop();
-		iMaxLoadPerUpdate--;
+		std::vector<IHyFile *>	dataList;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Copy all the ptrs into their vectors to be processed, while emptying the shared queue
+		m_Mutex.lock();
+		int32 iMaxLoadPerUpdate = 5;
+		while(m_Load_Shared.empty() == false && iMaxLoadPerUpdate > 0)
+		{
+			dataList.push_back(m_Load_Shared.front());
+			m_Load_Shared.pop();
+			iMaxLoadPerUpdate--;
+
+			if(m_Load_Shared.empty())
+				bAllFinished = true;
+		}
+		m_Mutex.unlock();
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Load everything that is enqueued (outside of any critical section)
+		for(uint32 i = 0; i < dataList.size(); ++i)
+			dataList[i]->OnLoadThread();
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Copy all the (loaded) IData ptrs to the retrieval vector
+		m_Mutex.lock();
+		for(uint32 i = 0; i < dataList.size(); ++i)
+			m_Load_Retrieval.push(dataList[i]);
+		m_Mutex.unlock();
 	}
-	m_Mutex.unlock();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Load everything that is enqueued (outside of any critical section)
-	for(uint32 i = 0; i < dataList.size(); ++i)
-		dataList[i]->OnLoadThread();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Copy all the (loaded) IData ptrs to the retrieval vector
-	m_Mutex.lock();
-	for(uint32 i = 0; i < dataList.size(); ++i)
-		m_Load_Retrieval.push(dataList[i]);
-	m_Mutex.unlock();
 }
 
 /*virtual*/ void HyAssets::OnThreadShutdown() /*override*/
