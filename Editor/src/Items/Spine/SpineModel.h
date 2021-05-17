@@ -26,6 +26,8 @@ class SpineModel : public IModel
 {
 	Q_OBJECT
 
+	QList<AtlasFrame *>		m_AtlasFrameList;
+
 public:
 	SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~SpineModel();
