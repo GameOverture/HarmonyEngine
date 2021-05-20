@@ -11,17 +11,27 @@
 #define HyContainer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
+#include "UI/HyEntityUi.h"
 #include "UI/Layouts/IHyLayout.h"
 
-class HyContainer : public HyEntity2d
+class HyContainer : public HyEntityUi
 {
 	glm::vec2				m_vSize;
 	IHyLayout *				m_pRootLayout;
 
 public:
-	HyContainer();
+	HyContainer(HyLayoutType eRootLayout, HyEntity2d *pParent = nullptr);
 	virtual ~HyContainer();
+
+	glm::ivec2 GetSize() const;
+	void SetSize(int32 iNewWidth, int32 iNewHeight);
+
+	IHyLayout *GetRootLayout();
+
+	template<typename LAYOUT>
+	LAYOUT *GetRootLayout() {
+		return static_cast<LAYOUT *>(m_pRootLayout);
+	}
 };
 
 #endif /* HyContainer_h__ */

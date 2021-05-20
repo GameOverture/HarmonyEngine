@@ -457,7 +457,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHyText<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
 {
-	if(m_uiState == uiStateIndex)
+	if(this->m_uiState == uiStateIndex)
 		return;
 
 	IHyLoadable::SetState(uiStateIndex);

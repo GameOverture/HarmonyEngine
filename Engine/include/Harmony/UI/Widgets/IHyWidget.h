@@ -15,7 +15,7 @@
 
 class IHyWidget : public HyEntityUi
 {
-	friend class IHyLayout;
+	friend class HyBoxLayout;
 
 protected:
 	HySizePolicy			m_SizePolicies[HYNUM_ORIENTATIONS];
@@ -24,6 +24,7 @@ public:
 	IHyWidget(HyEntity2d *pParent = nullptr);
 	virtual ~IHyWidget();
 
+	HySizePolicy GetSizePolicy(HyOrientation eOrien) const;
 	HySizePolicy GetHorizontalPolicy() const;
 	HySizePolicy GetVerticalPolicy() const;
 
@@ -31,9 +32,10 @@ public:
 	void SetHorizontalPolicy(HySizePolicy ePolicy);
 	void SetVerticalPolicy(HySizePolicy ePolicy);
 
-protected:
 	virtual glm::ivec2 GetSizeHint() = 0;
 	virtual glm::vec2 GetPosOffset() = 0;
+
+protected:
 	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) = 0;
 };
 

@@ -30,6 +30,10 @@ public:
 	void Clear();
 
 protected:
+
+	// Children indices are laid out using row-major
+	// [0] [1] [2]
+	// [3] [4] [5]
 	virtual void OnSetLayoutItems() override;
 
 private:

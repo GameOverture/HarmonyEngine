@@ -36,29 +36,29 @@ private:
 	using HyEntity2d::ChildInsert;
 };
 
-class HyHBoxLayout : public HyBoxLayout
-{
-public:
-	HyHBoxLayout(HyEntity2d *pParent = nullptr) :
-		HyBoxLayout(HYORIEN_Horizontal, pParent)
-	{ }
-
-private:
-	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
-	using HyEntity2d::ChildAppend;
-	using HyEntity2d::ChildInsert;
-};
-class HyVBoxLayout : public HyBoxLayout
-{
-public:
-	HyVBoxLayout(HyEntity2d *pParent = nullptr) :
-		HyBoxLayout(HYORIEN_Vertical, pParent)
-	{ }
-
-private:
-	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
-	using HyEntity2d::ChildAppend;
-	using HyEntity2d::ChildInsert;
-};
+//class HyHBoxLayout : public HyBoxLayout
+//{
+//public:
+//	HyHBoxLayout(HyEntity2d *pParent = nullptr) :
+//		HyBoxLayout(HYORIEN_Horizontal, pParent)
+//	{ }
+//
+//private:
+//	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
+//	using HyEntity2d::ChildAppend;
+//	using HyEntity2d::ChildInsert;
+//};
+//class HyVBoxLayout : public HyBoxLayout
+//{
+//public:
+//	HyVBoxLayout(HyEntity2d *pParent = nullptr) :
+//		HyBoxLayout(HYORIEN_Vertical, pParent)
+//	{ }
+//
+//private:
+//	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
+//	using HyEntity2d::ChildAppend;
+//	using HyEntity2d::ChildInsert;
+//};
 
 #endif /* HyBoxLayout_h__ */

@@ -15,6 +15,9 @@
 
 class IHyLayout : public HyEntityUi
 {
+	friend class HyContainer;
+	friend class HyBoxLayout;
+
 protected:
 	const HyLayoutType					m_eLAYOUT_TYPE;
 
@@ -28,22 +31,17 @@ public:
 	virtual ~IHyLayout();
 
 	glm::ivec2 GetSize() const;
-	void SetSize(int32 iNewWidth, int32 iNewHeight);
-
 	glm::ivec2 GetPreferredSize() const;
 
 	void SetMargins(int32 iLeft, int32 iBottom, int32 iRight, int32 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY);
 
 	uint16 GetHorizontalSpacing();
 	uint16 GetVerticalSpacing();
+	glm::ivec2 GetSpacing();
 
 protected:
 	virtual void OnSetLayoutItems() = 0;
-
-	// Children indices are laid out using row-major
-	// [0] [1] [2]
-	// [3] [4] [5]
-	void SetLayoutItems(uint32 uiNumRows, uint32 uiNumCols);
+	void SetSize(int32 iNewWidth, int32 iNewHeight);
 
 private:
 	// Prevent adding any child that isn't of IHyLayoutItem type

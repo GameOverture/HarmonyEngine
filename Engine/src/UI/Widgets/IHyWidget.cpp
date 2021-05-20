@@ -21,6 +21,11 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+HySizePolicy IHyWidget::GetSizePolicy(HyOrientation eOrien) const
+{
+	return m_SizePolicies[eOrien];
+}
+
 HySizePolicy IHyWidget::GetHorizontalPolicy() const
 {
 	return m_SizePolicies[HYORIEN_Horizontal];

@@ -62,6 +62,9 @@ void HyGridLayout::Clear()
 	m_GridSize.x = m_GridSize.y = 0;
 }
 
+// Children indices are laid out using row-major
+// [0] [1] [2]
+// [3] [4] [5]
 /*virtual*/ void HyGridLayout::OnSetLayoutItems() /*override*/
 {
 	uint32 uiNumChildren = ChildCount();
@@ -69,6 +72,4 @@ void HyGridLayout::Clear()
 		return;
 
 	//for();
-
-	SetLayoutItems(m_GridSize.x, m_GridSize.y);
 }

@@ -19,7 +19,8 @@ protected:
 	enum UiType
 	{
 		Ui_Widget = 0,
-		Ui_Layout
+		Ui_Layout,
+		Ui_Container
 	};
 	const UiType			m_eUI_TYPE;
 
