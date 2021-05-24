@@ -23,6 +23,12 @@ IHyLayout::IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/
 {
 }
 
+void IHyLayout::ClearWidgets()
+{
+	while(m_ChildList.empty() == false)
+		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
+}
+
 glm::ivec2 IHyLayout::GetSize() const
 {
 	return m_vSize;

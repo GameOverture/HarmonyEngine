@@ -156,7 +156,7 @@
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Data Explorer</string>
+    <string>Project Explorer</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>

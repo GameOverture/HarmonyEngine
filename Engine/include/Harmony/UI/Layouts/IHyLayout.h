@@ -30,6 +30,8 @@ public:
 	IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent = nullptr);
 	virtual ~IHyLayout();
 
+	void ClearWidgets();
+
 	glm::ivec2 GetSize() const;
 	glm::ivec2 GetPreferredSize() const;
 

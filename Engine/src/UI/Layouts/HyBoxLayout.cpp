@@ -27,12 +27,6 @@ void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 	OnSetLayoutItems();
 }
 
-void HyBoxLayout::Clear()
-{
-	while(m_ChildList.empty() == false)
-		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
-}
-
 /*virtual*/ void HyBoxLayout::OnSetLayoutItems() /*override*/
 {
 	uint32 uiNumChildren = ChildCount();

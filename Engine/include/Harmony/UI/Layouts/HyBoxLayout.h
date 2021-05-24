@@ -25,7 +25,6 @@ public:
 	virtual ~HyBoxLayout();
 
 	void AppendItem(HyEntityUi &itemRef);
-	void Clear();
 
 protected:
 	virtual void OnSetLayoutItems() override;
