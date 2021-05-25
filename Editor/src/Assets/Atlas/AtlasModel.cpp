@@ -155,7 +155,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 	QList<int> textureIndexList = repackTexIndicesSet.values();
 
-	// Get all the affected frames into a list
+	// Get all the remaining/affected frames into a list
 	QList<AssetItemData *> entireAssetList = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
 	for(int i = 0; i < entireAssetList.size(); ++i)
 	{
@@ -168,6 +168,14 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 				break;
 			}
 		}
+	}
+
+	// Delete all affected textures. The following AtlasRepackThread will regenerate all the remaining/modified assets
+	QDir runtimeBankDir(m_BanksModel.GetBank(uiBankIndex)->m_sAbsPath);
+	for(int i = 0; i < textureIndexList.size(); ++i)
+	{
+		QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
+		QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".dds"));
 	}
 
 	QList<AtlasFrame *> affectedFramesList = newFramesSet.values();

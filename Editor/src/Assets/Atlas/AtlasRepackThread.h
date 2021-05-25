@@ -30,7 +30,7 @@ class AtlasRepackThread : public IRepackThread
 	QMap<QPair<HyTextureFormat, HyTextureFiltering>, PackerBucket *> m_BucketMap;
 
 public:
-	AtlasRepackThread(BankData &bankRef, QList<AtlasFrame *>newFramesList, QDir metaDir);
+	AtlasRepackThread(BankData &bankRef, QList<AtlasFrame *> affectedFramesList, QDir metaDir);
 	virtual ~AtlasRepackThread();
 
 	virtual void OnRun() override;
