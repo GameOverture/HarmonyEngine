@@ -290,6 +290,9 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 			(*iter)->m_pParent = nullptr;
 			m_ChildList.erase(iter);
 
+			if(sm_pHyAssets)
+				sm_pHyAssets->SetEntityLoaded(this);
+
 			return true;
 		}
 	}
@@ -301,6 +304,9 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 {
 	while(m_ChildList.empty() == false)
 		newParent.ChildAppend(*m_ChildList[0]);
+
+	if(sm_pHyAssets)
+		sm_pHyAssets->SetEntityLoaded(this);
 }
 
 /*virtual*/ uint32 HyEntity2d::ChildCount()
