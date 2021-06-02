@@ -103,7 +103,7 @@ public:
 
 	glm::ivec2 GetCurFrameOffset();
 
-	virtual void SetState(uint32 uiStateIndex) override;
+	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
 
 protected:

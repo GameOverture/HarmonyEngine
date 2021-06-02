@@ -115,7 +115,7 @@ uint32 IHyLoadable::GetState() const
 	return m_uiState;
 }
 
-/*virtual*/ void IHyLoadable::SetState(uint32 uiStateIndex)
+/*virtual*/ bool IHyLoadable::SetState(uint32 uiStateIndex)
 {
 	if(AcquireData() == nullptr || uiStateIndex >= UncheckedGetData()->GetNumStates())
 	{
@@ -124,10 +124,11 @@ uint32 IHyLoadable::GetState() const
 		else if(uiStateIndex >= UncheckedGetData()->GetNumStates())
 			HyLogWarning(m_sPrefix << "/" << m_sName << " wants to set state index of '" << uiStateIndex << "' when total number of states is '" << UncheckedGetData()->GetNumStates() << "'");
 
-		return;
+		return false;
 	}
 
 	m_uiState = uiStateIndex;
+	return true;
 }
 
 uint32 IHyLoadable::GetNumStates()

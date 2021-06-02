@@ -127,7 +127,7 @@ public:
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 	void SetAsVertical();
 
-	virtual void SetState(uint32 uiStateIndex) override;
+	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
 
 protected:

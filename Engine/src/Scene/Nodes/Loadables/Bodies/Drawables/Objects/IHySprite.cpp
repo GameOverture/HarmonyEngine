@@ -356,12 +356,10 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-/*virtual*/ void IHySprite<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
+/*virtual*/ bool IHySprite<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
 {
-	if(this->m_uiState == uiStateIndex)
-		return;
-
-	IHyLoadable::SetState(uiStateIndex);
+	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)
+		return false;
 
 	while(this->m_uiState >= m_AnimCtrlAttribList.size())
 		m_AnimCtrlAttribList.push_back(0);
@@ -375,6 +373,7 @@ template<typename NODETYPE, typename ENTTYPE>
 	this->m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
 
 	this->SetDirty(this->DIRTY_BoundingVolume);
+	return true;
 }
 
 template<typename NODETYPE, typename ENTTYPE>

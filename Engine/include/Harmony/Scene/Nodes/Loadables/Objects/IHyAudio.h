@@ -62,7 +62,7 @@ public:
 	void Stop();
 	void SetPause(bool bPause);
 
-	virtual void SetState(uint32 uiStateIndex) override;
+	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
 
 	uint32 PullNextSound();	// Returns the next sound checksum to be played

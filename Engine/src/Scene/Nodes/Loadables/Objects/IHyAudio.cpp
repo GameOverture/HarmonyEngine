@@ -118,13 +118,13 @@ void IHyAudio<NODETYPE, ENTTYPE>::SetPause(bool bPause)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-/*virtual*/ void IHyAudio<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
+/*virtual*/ bool IHyAudio<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
 {
-	if(this->m_uiState == uiStateIndex)
-		return;
+	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)
+		return false;
 
-	IHyLoadable::SetState(uiStateIndex);
 	m_CurPlayList.clear();
+	return true;
 }
 
 template<typename NODETYPE, typename ENTTYPE>

@@ -45,7 +45,7 @@ public:
 	const std::string &GetPrefix() const;
 
 	uint32 GetState() const;
-	virtual void SetState(uint32 uiStateIndex);
+	virtual bool SetState(uint32 uiStateIndex);
 	uint32 GetNumStates();
 
 	const IHyNodeData *AcquireData();
