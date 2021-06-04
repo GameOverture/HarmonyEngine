@@ -157,7 +157,7 @@ public:
 
 	virtual void Load() override;
 	virtual void Unload() override;
-	virtual bool IsLoadDataValid() override;
+	//virtual bool IsLoadDataValid() override;
 	
 protected:
 	virtual void Update() override final;
