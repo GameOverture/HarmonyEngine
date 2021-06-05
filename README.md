@@ -51,7 +51,7 @@ Press "Configure" button and confirm creating the build directory
 In the next dialog, choose which IDE to generate in first combo box
 
 Fill in the value for variable Qt5_DIR. Specify cmake Qt5 directory:
--Example-  C:/Qt/5.12.0/msvc2017_64/lib/cmake/Qt5
+-Example-  C:/Qt/5.13.0/msvc2017_64/lib/cmake/Qt5
   
 Press "Configure" again until all red options disappear
 Press "Generate" once
@@ -62,7 +62,7 @@ Press "Open Project" to open the generated solution (.sln) or navigate to the sp
 cmake -S "<path to repo>" -B "<path to repo>\build" -DQt5_DIR=<path cmake Qt5> -G "Visual Studio 16 2019"
 
 Fill in the value for variable Qt5_DIR. Specify cmake Qt5 directory:
--Example-  C:/Qt/5.12.0/msvc2017_64/lib/cmake/Qt5
+-Example-  C:/Qt/5.13.0/msvc2017_64/lib/cmake/Qt5
 
 This will use default settings to generate a build. If on Windows, CMake will detect which version of 
 Visual Studio you have installed to generate if you omit the -G argument. If Visual Studio 2019 is chosen 
