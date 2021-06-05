@@ -5,7 +5,7 @@ Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 
 **Disclaimer:** This is a very much work in progress and not ready for public consumption.
 
-## Tech Stack
+## Technologies Utilized
 
 **Engine:** OpenGL, SDL2 (or GLFW), Box2d, glad, glm, stb, soil2, rapidjson
 
@@ -19,10 +19,10 @@ Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 - Compile and run the same game code in Windows, Mac, Linux environments. As well as target web and mobile environments by transpiling to wasm via Emscripten.
 - Robust and simple programming API, learn once, apply to every type of game object
 - First-class support for Spine Animation
+- TBD
   
 ## Editor Features
-Setup and design sprite animations, fonts, sound cues, *particles, shaders, and more*.
-Or by using any combination of above, create complex entity hierarchies and apply physics.
+Setup and design sprite animations, fonts, sound cues, particles, and more. Or by using any combination of them, create complex entity hierarchies, apply physics, and setup bounding volumes
 
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 - Quickly generate and setup new code projects and builds with all dependencies taken care of
@@ -30,6 +30,7 @@ Or by using any combination of above, create complex entity hierarchies and appl
 - Efficient texture atlas management, packing, and compression
 - Stylized bitmap font creation
 - Audio designer
+- TBD
 
 ## Installation 
 
