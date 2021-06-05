@@ -1,27 +1,97 @@
-HarmonyEngine
-=============
+    
+# Harmony Engine
 
-Cross-platform multi-threaded engine that combines the best open-source libraries available under one unified work flow. 
+Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 
 **Disclaimer:** This is a very much work in progress and not ready for public consumption.
 
-Getting Started:
-----------------
+## Tech Stack
+
+**Engine:** SDL2 (or GLFW), Box2d, glad, glm, soil2, stb, rapidjson
+
+**Editor:** Qt, freetype2, freetype-gl, libogg/vorbis, QtWaitingSpinner
+
+**Build:** CMake, Emscripten
+
+  
+## Engine Features
+
+- Compile and run the same game code in Windows, Mac, Linux environments. As well as target web and mobile environments by transpiling to wasm via Emscripten.
+- Robust and simple programming API, learn once, apply to every type of game object
+- First-class support for Spine Animation
+  
+## Editor Features
+Setup and design sprite animations, fonts, sound cues, *particles, shaders, and more*.
+Or by using any combination of above, create complex entity hierarchies and apply physics.
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+- Quickly generate and setup new code projects and builds with all dependencies taken care of
+- Handle the entire asset pipeline from importing, previewing, and replacing assets
+- Efficient texture atlas management, packing, and compression
+- Stylized bitmap font creation
+- Audio designer
+
+## Installation 
+
 1. Clone this repository
-2. Download and execute the CMake Installer. Make sure to set the PATH variable during installation
+2. Download and execute the [CMake Installer](https://cmake.org/download/). Make sure to set the PATH variable during installation
+3. Run a pre-built Harmony Editor or compile it from source
 
-Harmony Library
----------------
+### Compiling the Editor
+Compiling the editor **requires at least Qt Version 5.13.0**, open-source version
 
-TBD
+Using CMake, choose one of the two methods below:
+```
+-- GUI TOOL ---------------------------------------------------------------------------------------------
+Open CMake-gui tool
 
-Editor Tool
--------------
-A WYSIWYG GUI application that allows you to visually design sprite animations, fonts, particles, shaders, and more.
-Or by using any combination of above, create complex animation hierarchies and apply physics.
+"Where is the source code:" should be:    <path to repo>
+"Where to build the binaries:" should be: <path to repo>\build
 
-Quickly setup new projects. The Editor creates and populates a new workspace containing all initially necessary assets and code projects.
+Press "Configure" button and confirm creating the build directory
+In the next dialog, choose which IDE to generate in first combo box
+(will default to your installed version of Visual Studio)
+  - The rest can be left as default
+Press "Configure" again until all red options disappear
+Press "Generate" once
+Press "Open Project" to open the generated solution (.sln) or navigate to the specified build directory
 
-**Requires at least Qt Version 5.13.0 to compile the editor** 
+-- COMMAND LINE ----------------------------------------------------------------------------------------
+cmake -S "<path to repo>" -B "<path to repo>\build" -G "Visual Studio 16 2019"
 
-TBD
+This will use default settings to generate a build. If on Windows, CMake will detect which version of 
+Visual Studio you have installed to generate if you omit the -G argument. If Visual Studio 2019 is chosen 
+it will default to generating 64bit, while older versions of Visual Studio will generate 32bit. You can
+explicitly set the archetecture yourself by including the -G and -A arguments. Examples below:
+... -G "Visual Studio 16 2019" -A Win32
+... -G "Visual Studio 15 2017" -A x64
+... -G "Visual Studio 14 2015" -A x64
+
+The solution (.sln) will be placed in the build directory (-B argument above)
+
+----------------------------------------------------------------------------------------------------------
+If you want to run the CMake command consecutive times on the same build (for example an error occured) you should first delete the previously generated "build" and "bin" folders.
+  ```
+  
+## Usage/Examples
+
+```C++
+HySprite2d hero("Level1", "Hero");
+hero.pos.Set(0.0f, 0.0f);
+
+// Move left and grow larger
+hero.pos.Tween(100.0f, 0.0f, 2.5f);
+hero.scale.Tween(1.5f, 1.5f, 2.5f);
+
+// TODO: actual useful examples
+```
+  
+## Documentation
+
+lol
+
+  
+## License
+
+**Engine:** [Modified zlib](https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE/)
+
+**Editor:** [GPL/LGPL](https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE/)
