@@ -38,9 +38,8 @@ Or by using any combination of above, create complex entity hierarchies and appl
 3. Run a pre-built Harmony Editor or compile it from source
 
 ### Compiling the Editor
-Compiling the editor **requires at least Qt Version 5.13.0**, open-source version
-
-Using CMake, choose one of the two methods below:
+- Compiling the editor **requires at least Qt Version 5.13.0**, open-source version
+- Using CMake, choose one of the two methods below:
 ```
 -- GUI TOOL ---------------------------------------------------------------------------------------------
 Open CMake-gui tool
@@ -60,7 +59,7 @@ Press "Open Project" to open the generated solution (.sln) or navigate to the sp
 
 -- COMMAND LINE ----------------------------------------------------------------------------------------
   
-cmake -S "<path to repo>" -B "<path to repo>\build" -DQt5_DIR=<path to cmake Qt5> -G "Visual Studio 16 2019"
+cmake -S "<path to repo>" -B "<path to repo>\build" -DQt5_DIR=<path cmake Qt5> -G "Visual Studio 16 2019"
 
 Fill in the value for variable Qt5_DIR. Specify cmake Qt5 directory:
 -Example-  C:/Qt/5.12.0/msvc2017_64/lib/cmake/Qt5
