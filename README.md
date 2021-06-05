@@ -7,7 +7,7 @@ Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 
 ## Tech Stack
 
-**Engine:** SDL2 (or GLFW), Box2d, glad, glm, soil2, stb, rapidjson
+**Engine:** OpenGL, SDL2 (or GLFW), Box2d, glad, glm, stb, soil2, rapidjson
 
 **Editor:** Qt, freetype2, freetype-gl, libogg/vorbis, QtWaitingSpinner
 
@@ -23,6 +23,7 @@ Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 ## Editor Features
 Setup and design sprite animations, fonts, sound cues, *particles, shaders, and more*.
 Or by using any combination of above, create complex entity hierarchies and apply physics.
+
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 - Quickly generate and setup new code projects and builds with all dependencies taken care of
 - Handle the entire asset pipeline from importing, previewing, and replacing assets
@@ -49,14 +50,20 @@ Open CMake-gui tool
 
 Press "Configure" button and confirm creating the build directory
 In the next dialog, choose which IDE to generate in first combo box
-(will default to your installed version of Visual Studio)
-  - The rest can be left as default
+
+Fill in the value for variable Qt5_DIR. Specify cmake Qt5 directory:
+-Example-  C:/Qt/5.12.0/msvc2017_64/lib/cmake/Qt5
+  
 Press "Configure" again until all red options disappear
 Press "Generate" once
 Press "Open Project" to open the generated solution (.sln) or navigate to the specified build directory
 
 -- COMMAND LINE ----------------------------------------------------------------------------------------
-cmake -S "<path to repo>" -B "<path to repo>\build" -G "Visual Studio 16 2019"
+  
+cmake -S "<path to repo>" -B "<path to repo>\build" -DQt5_DIR=<path to cmake Qt5> -G "Visual Studio 16 2019"
+
+Fill in the value for variable Qt5_DIR. Specify cmake Qt5 directory:
+-Example-  C:/Qt/5.12.0/msvc2017_64/lib/cmake/Qt5
 
 This will use default settings to generate a build. If on Windows, CMake will detect which version of 
 Visual Studio you have installed to generate if you omit the -G argument. If Visual Studio 2019 is chosen 
@@ -67,18 +74,16 @@ explicitly set the archetecture yourself by including the -G and -A arguments. E
 ... -G "Visual Studio 14 2015" -A x64
 
 The solution (.sln) will be placed in the build directory (-B argument above)
-
-----------------------------------------------------------------------------------------------------------
-If you want to run the CMake command consecutive times on the same build (for example an error occured) you should first delete the previously generated "build" and "bin" folders.
-  ```
+```
   
 ## Usage/Examples
 
 ```C++
 HySprite2d hero("Level1", "Hero");
+hero.Load();
 hero.pos.Set(0.0f, 0.0f);
 
-// Move left and grow larger
+// Move right and grow larger
 hero.pos.Tween(100.0f, 0.0f, 2.5f);
 hero.scale.Tween(1.5f, 1.5f, 2.5f);
 
