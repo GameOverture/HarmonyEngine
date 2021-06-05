@@ -146,10 +146,11 @@ void HyButton::SetHideHoverState(bool bIsHideHoverState)
 		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_HideHoverState;
 }
 
-void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/)
+void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
 {
 	m_fpBtnClickedCallback = fpCallBack;
 	m_pBtnClickedParam = pParam;
+	m_ClickedSound.Init(sAudioPrefix, sAudioName, this);
 }
 
 void HyButton::InvokeButtonClicked()
@@ -217,4 +218,6 @@ void HyButton::InvokeButtonClicked()
 {
 	if(m_fpBtnClickedCallback)
 		m_fpBtnClickedCallback(this, m_pBtnClickedParam);
+
+	m_ClickedSound.PlayOneShot(true);
 }

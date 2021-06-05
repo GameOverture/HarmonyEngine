@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyLabel.h"
+#include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
 
 class HyButton;
 typedef std::function<void(HyButton *, void *)> HyButtonClickedCallback;
@@ -31,6 +32,7 @@ class HyButton : public HyLabel
 protected:
 	HyButtonClickedCallback		m_fpBtnClickedCallback;
 	void *						m_pBtnClickedParam;
+	HyAudio2d					m_ClickedSound;
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
@@ -49,7 +51,7 @@ public:
 	bool IsHideHoverState() const;
 	void SetHideHoverState(bool bIsHideHoverState);
 
-	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr);
+	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
 	void InvokeButtonClicked();
 
 protected:

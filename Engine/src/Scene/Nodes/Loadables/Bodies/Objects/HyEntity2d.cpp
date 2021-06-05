@@ -686,17 +686,6 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		sm_pHyAssets->SetEntityLoaded(this);
 }
 
-///*virtual*/ bool HyEntity2d::IsLoadDataValid() /*override*/
-//{
-//	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-//	{
-//		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsLoadable) && static_cast<IHyLoadable2d *>(m_ChildList[i])->IsLoadDataValid())
-//			return false;
-//	}
-//
-//	return true;
-//}
-
 /*virtual*/ void HyEntity2d::Update() /*override final*/
 {
 	IHyBody2d::Update();
