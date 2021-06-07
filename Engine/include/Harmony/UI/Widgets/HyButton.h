@@ -58,7 +58,6 @@ protected:
 	virtual void OnMouseEnter() override;
 	virtual void OnMouseLeave() override;
 	virtual void OnMouseDown() override;
-	virtual void OnMouseUp() override;
 	virtual void OnMouseClicked() override;
 };
 

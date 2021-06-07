@@ -179,7 +179,6 @@ protected:
 	virtual void OnMouseEnter() { }
 	virtual void OnMouseLeave() { }
 	virtual void OnMouseDown() { }
-	virtual void OnMouseUp() { }
 	virtual void OnMouseClicked() { }
 
 	friend void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode);

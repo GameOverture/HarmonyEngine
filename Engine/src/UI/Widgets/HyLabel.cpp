@@ -212,12 +212,16 @@ bool HyLabel::IsDisabled() const
 		m_uiInfoPanelAttribs |= INFOPANELATTRIB_IsDisabled;
 
 		if(IsHideDisabled() == false)
-			SetTint(0.3f, 0.3f, 0.3f);
+		{
+			topColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
+			botColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
+		}
 	}
 	else
 	{
 		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_IsDisabled;
-		SetTint(1.0f, 1.0f, 1.0f);
+		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
+		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 	}
 }
 

@@ -692,18 +692,14 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 	if((m_uiEntAttribs & ENT2DATTRIB_MouseInput) != 0)
 	{
-		glm::vec2 ptMousePos;
 		bool bMouseInBounds;
 		if(GetCoordinateSystem() >= 0)
 		{
-			ptMousePos = HyEngine::Input().GetMousePos();
-			bMouseInBounds = HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem() && HyTestPointAABB(GetSceneAABB(), ptMousePos);
+			bMouseInBounds = HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem() &&
+							 HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
 		}
 		else
-		{
-			ptMousePos = HyEngine::Input().GetWorldMousePos();
-			bMouseInBounds = HyTestPointAABB(GetSceneAABB(), ptMousePos);
-		}
+			bMouseInBounds = HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetWorldMousePos());
 
 		bool bLeftClickDown = HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft);
 
@@ -745,7 +741,6 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 			else if(bLeftClickDown == false)
 			{
 				m_eMouseInputState = MOUSEINPUT_Hover;
-				OnMouseUp();
 				OnMouseClicked();
 			}
 			break;

@@ -209,13 +209,10 @@ void HyButton::InvokeButtonClicked()
 	}
 }
 
-/*virtual*/ void HyButton::OnMouseUp() /*override*/
-{
-	m_SpritePanel.SetState(IsHighlighted() ? HYBUTTONSTATE_Highlighted : HYBUTTONSTATE_Idle);
-}
-
 /*virtual*/ void HyButton::OnMouseClicked() /*override*/
 {
+	m_SpritePanel.SetState(IsHighlighted() ? HYBUTTONSTATE_HighlightedHover : HYBUTTONSTATE_Hover);
+
 	if(m_fpBtnClickedCallback)
 		m_fpBtnClickedCallback(this, m_pBtnClickedParam);
 
