@@ -253,12 +253,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 template<typename NODETYPE, typename ENTTYPE>
 uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers()
 {
-	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
-		return 0;
-	}
-
-	return static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumLayers(this->m_uiState);
+	return this->GetNumLayers(this->m_uiState);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
