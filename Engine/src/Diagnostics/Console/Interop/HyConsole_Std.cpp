@@ -71,3 +71,8 @@ HyConsole_Std::HyConsole_Std(bool bCreateConsole, const HyWindowInfo &consoleInf
 	//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE);
 	os << std::endl;
 }
+
+/*virtual*/ void HyConsole_Std::Clear() /*override*/
+{
+
+}

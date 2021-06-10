@@ -19,6 +19,7 @@ public:
 	virtual ~HyConsole_Std();
 
 	virtual void OnLog(std::ostream &os, const char *szMsg, LogType eType) override;
+	virtual void Clear() override;
 };
 
 #endif /* HyConsole_Gui_h__ */

@@ -179,4 +179,41 @@ HyConsole_Win::HyConsole_Win(bool bCreateConsole, const HyWindowInfo &consoleInf
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE);
 	os << std::endl;
 }
+
+/*virtual*/ void HyConsole_Win::Clear() /*override*/
+{
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	// Get the number of character cells in the current buffer.
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	if(!GetConsoleScreenBufferInfo(hConsole, &csbi))
+		return;
+
+	// Scroll the rectangle of the entire buffer.
+	SMALL_RECT scrollRect;
+	scrollRect.Left = 0;
+	scrollRect.Top = 0;
+	scrollRect.Right = csbi.dwSize.X;
+	scrollRect.Bottom = csbi.dwSize.Y;
+
+	// Scroll it upwards off the top of the buffer with a magnitude of the entire height.
+	COORD scrollTarget;
+	scrollTarget.X = 0;
+	scrollTarget.Y = (SHORT)(0 - csbi.dwSize.Y);
+
+	// Fill with empty spaces with the buffer's default text attribute.
+	CHAR_INFO fill;
+	fill.Char.UnicodeChar = TEXT(' ');
+	fill.Attributes = csbi.wAttributes;
+
+	// Do the scroll
+	ScrollConsoleScreenBuffer(hConsole, &scrollRect, NULL, scrollTarget, &fill);
+
+	// Move the cursor to the top left corner too.
+	csbi.dwCursorPosition.X = 0;
+	csbi.dwCursorPosition.Y = 0;
+
+	SetConsoleCursorPosition(hConsole, csbi.dwCursorPosition);
+}
+
 #endif /*HY_PLATFORM_WINDOWS*/

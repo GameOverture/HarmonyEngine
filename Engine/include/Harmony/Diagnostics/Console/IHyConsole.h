@@ -38,6 +38,7 @@ public:
 
 	void Log(std::ostream &os, const char *szMsg, LogType eType);
 	virtual void OnLog(std::ostream &os, const char *szMsg, LogType eType) = 0;
+	virtual void Clear() = 0;
 };
 
 #ifdef HY_PLATFORM_GUI
@@ -49,6 +50,7 @@ public:
 	#define HyLogTitle(msg) do { } while (false)
 	#define HyLogSection(msg) do { } while (false)
 	#define HyLogDebug(msg) do { } while (false)
+	#define HyLogClear() do { } while (false)
 #else
 	#define HyLog(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Regular)
 	#define HyLogWarning(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Warning)
@@ -56,6 +58,7 @@ public:
 	#define HyLogInfo(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Info)
 	#define HyLogTitle(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Title)
 	#define HyLogSection(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Section)
+	#define HyLogClear() IHyConsole::Get()->Clear()
 
 	#ifdef HY_DEBUG_LOGS
 		#define HyLogDebug(msg) IHyConsole::Get()->Log(std::cout, (std::stringstream() << msg).str().c_str(), IHyConsole::LOG_Debug)
