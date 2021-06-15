@@ -108,14 +108,14 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 
 bool HyButton::IsHideDownState() const
 {
-	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideDownState) != 0;
+	return (m_uiPanelAttribs & PANELATTRIB_HideDownState) != 0;
 }
 
 void HyButton::SetHideDownState(bool bIsHideDownState)
 {
 	if(bIsHideDownState)
 	{
-		m_uiInfoPanelAttribs |= INFOPANELATTRIB_HideDownState;
+		m_uiPanelAttribs |= PANELATTRIB_HideDownState;
 
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down)
 			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
@@ -123,19 +123,19 @@ void HyButton::SetHideDownState(bool bIsHideDownState)
 			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
 	}
 	else
-		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_HideDownState;
+		m_uiPanelAttribs &= ~PANELATTRIB_HideDownState;
 }
 
 bool HyButton::IsHideHoverState() const
 {
-	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideHoverState) != 0;
+	return (m_uiPanelAttribs & PANELATTRIB_HideHoverState) != 0;
 }
 
 void HyButton::SetHideHoverState(bool bIsHideHoverState)
 {
 	if(bIsHideHoverState)
 	{
-		m_uiInfoPanelAttribs |= INFOPANELATTRIB_HideHoverState;
+		m_uiPanelAttribs |= PANELATTRIB_HideHoverState;
 
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
 			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
@@ -143,7 +143,7 @@ void HyButton::SetHideHoverState(bool bIsHideHoverState)
 			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
 	}
 	else
-		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_HideHoverState;
+		m_uiPanelAttribs &= ~PANELATTRIB_HideHoverState;
 }
 
 void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)

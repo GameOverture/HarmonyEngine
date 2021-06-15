@@ -26,21 +26,23 @@ protected:
 
 		PrimPanel(int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent);
 	};
-	PrimPanel *				m_pPrimPanel;			// Optionally construct a primitive panel instead of using HySprite2d
+
+	enum PanelAttributes
+	{
+		PANELATTRIB_IsPrimitive		= 1 << 0,	// Whether the panel is constructed via HyLabel::PrimPanel instead of a HySprite2d
+		PANELATTRIB_HideDownState	= 1 << 1,	// Don't visually indicate down state (if available)
+		PANELATTRIB_HideHoverState	= 1 << 2,	// Don't visually indicate hover state (if available)
+		PANELATTRIB_HideDisabled	= 1 << 3,	// Don't visually indicate if disabled
+		PANELATTRIB_IsDisabled		= 1 << 4,
+		PANELATTRIB_IsHighlighted	= 1 << 5,
+	};
+	uint32					m_uiPanelAttribs;
+
+	PrimPanel *				m_pPrimPanel;		// Optionally construct a primitive panel instead of using HySprite2d
 	HySprite2d				m_SpritePanel;
+
 	HyText2d				m_Text;
 	HyRectangle<float>		m_TextMargins;
-
-	enum InfoPanelAttributes
-	{
-		INFOPANELATTRIB_IsPrimitive = 1 << 0,		// Whether the panel is constructed via HyPrimitive2d's instead of a HySprite2d
-		INFOPANELATTRIB_HideDownState = 1 << 1,		// Don't visually indicate down state (if available)
-		INFOPANELATTRIB_HideHoverState = 1 << 2,	// Don't visually indicate hover state (if available)
-		INFOPANELATTRIB_HideDisabled = 1 << 3,		// Don't visually indicate if disabled
-		INFOPANELATTRIB_IsDisabled = 1 << 4,
-		INFOPANELATTRIB_IsHighlighted = 1 << 5,
-	};
-	uint32					m_uiInfoPanelAttribs;
 
 public:
 	HyLabel(HyEntity2d *pParent = nullptr);

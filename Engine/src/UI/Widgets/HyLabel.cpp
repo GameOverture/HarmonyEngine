@@ -30,7 +30,7 @@ HyLabel::PrimPanel::PrimPanel(int32 iWidth, int32 iHeight, int32 iStroke, HyEnti
 
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
-	m_uiInfoPanelAttribs(0),
+	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "", this)
@@ -39,7 +39,7 @@ HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 
 HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
-	m_uiInfoPanelAttribs(0),
+	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "", this)
@@ -49,7 +49,7 @@ HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPr
 
 HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
-	m_uiInfoPanelAttribs(0),
+	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "", this)
@@ -59,7 +59,7 @@ HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPr
 
 HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
-	m_uiInfoPanelAttribs(0),
+	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "", this)
@@ -69,7 +69,7 @@ HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string s
 
 HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
-	m_uiInfoPanelAttribs(0),
+	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "", this)
@@ -94,7 +94,7 @@ void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::strin
 
 void HyLabel::Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
 {
-	m_uiInfoPanelAttribs |= INFOPANELATTRIB_IsPrimitive;
+	m_uiPanelAttribs |= PANELATTRIB_IsPrimitive;
 
 	m_SpritePanel.Uninit();
 	delete m_pPrimPanel;
@@ -109,7 +109,7 @@ void HyLabel::Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTex
 
 void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
 {
-	m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_IsPrimitive;
+	m_uiPanelAttribs &= ~PANELATTRIB_IsPrimitive;
 
 	delete m_pPrimPanel;
 	m_pPrimPanel = nullptr;
@@ -197,19 +197,19 @@ uint32 HyLabel::GetSpriteState() const
 
 bool HyLabel::IsPrimitivePanel() const
 {
-	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_IsPrimitive) != 0;
+	return (m_uiPanelAttribs & PANELATTRIB_IsPrimitive) != 0;
 }
 
 bool HyLabel::IsDisabled() const
 {
-	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_IsDisabled) != 0;
+	return (m_uiPanelAttribs & PANELATTRIB_IsDisabled) != 0;
 }
 
 /*virtual*/ void HyLabel::SetAsDisabled(bool bIsDisabled)
 {
 	if(bIsDisabled)
 	{
-		m_uiInfoPanelAttribs |= INFOPANELATTRIB_IsDisabled;
+		m_uiPanelAttribs |= PANELATTRIB_IsDisabled;
 
 		if(IsHideDisabled() == false)
 		{
@@ -219,7 +219,7 @@ bool HyLabel::IsDisabled() const
 	}
 	else
 	{
-		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_IsDisabled;
+		m_uiPanelAttribs &= ~PANELATTRIB_IsDisabled;
 		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 	}
@@ -227,7 +227,7 @@ bool HyLabel::IsDisabled() const
 
 bool HyLabel::IsHighlighted() const
 {
-	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_IsHighlighted) != 0;
+	return (m_uiPanelAttribs & PANELATTRIB_IsHighlighted) != 0;
 }
 
 /*virtual*/ void HyLabel::SetAsHighlighted(bool bIsHighlighted)
@@ -237,7 +237,7 @@ bool HyLabel::IsHighlighted() const
 
 	if(bIsHighlighted)
 	{
-		m_uiInfoPanelAttribs |= INFOPANELATTRIB_IsHighlighted;
+		m_uiPanelAttribs |= PANELATTRIB_IsHighlighted;
 		if(m_pPrimPanel)
 		{
 			m_pPrimPanel->m_Stroke.SetTint(0.0f, 0.0f, 1.0f);
@@ -246,7 +246,7 @@ bool HyLabel::IsHighlighted() const
 	}
 	else
 	{
-		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_IsHighlighted;
+		m_uiPanelAttribs &= ~PANELATTRIB_IsHighlighted;
 		if(m_pPrimPanel)
 		{
 			m_pPrimPanel->m_Stroke.SetTint(0.3f, 0.3f, 0.3f);
@@ -257,19 +257,19 @@ bool HyLabel::IsHighlighted() const
 
 bool HyLabel::IsHideDisabled() const
 {
-	return (m_uiInfoPanelAttribs & INFOPANELATTRIB_HideDisabled) != 0;
+	return (m_uiPanelAttribs & PANELATTRIB_HideDisabled) != 0;
 }
 
 void HyLabel::SetHideDisabled(bool bIsHideDisabled)
 {
 	if(bIsHideDisabled)
 	{
-		m_uiInfoPanelAttribs |= INFOPANELATTRIB_HideDisabled;
+		m_uiPanelAttribs |= PANELATTRIB_HideDisabled;
 		SetTint(1.0f, 1.0f, 1.0f);
 	}
 	else
 	{
-		m_uiInfoPanelAttribs &= ~INFOPANELATTRIB_HideDisabled;
+		m_uiPanelAttribs &= ~PANELATTRIB_HideDisabled;
 		SetAsDisabled(IsDisabled());
 	}
 }
