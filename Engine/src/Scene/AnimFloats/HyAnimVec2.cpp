@@ -49,15 +49,29 @@ float HyAnimVec2::X() const
 	return m_AnimFloatList[0].Get();
 }
 
-void HyAnimVec2::X(float fValue)
+float HyAnimVec2::X(float fNewValue)
 {
-	m_AnimFloatList[0] = fValue;
+	m_AnimFloatList[0] = fNewValue;
+	m_AnimFloatList[1].StopAnim();
+	return m_AnimFloatList[0].Get();
+}
+
+float HyAnimVec2::X(int32 iNewValue)
+{
+	m_AnimFloatList[0] = static_cast<float>(iNewValue);
+	m_AnimFloatList[1].StopAnim();
+	return m_AnimFloatList[0].Get();
+}
+
+void HyAnimVec2::SetX(float fNewValue)
+{
+	m_AnimFloatList[0] = fNewValue;
 	m_AnimFloatList[1].StopAnim();
 }
 
-void HyAnimVec2::X(int32 iValue)
+void HyAnimVec2::SetX(int32 iNewValue)
 {
-	m_AnimFloatList[0] = static_cast<float>(iValue);
+	m_AnimFloatList[0] = static_cast<float>(iNewValue);
 	m_AnimFloatList[1].StopAnim();
 }
 
@@ -66,16 +80,30 @@ float HyAnimVec2::Y() const
 	return m_AnimFloatList[1].Get();
 }
 
-void HyAnimVec2::Y(float fValue)
+float HyAnimVec2::Y(float fNewValue)
 {
 	m_AnimFloatList[0].StopAnim();
-	m_AnimFloatList[1] = fValue;
+	m_AnimFloatList[1] = fNewValue;
+	return m_AnimFloatList[1].Get();
 }
 
-void HyAnimVec2::Y(int32 iValue)
+float HyAnimVec2::Y(int32 iNewValue)
 {
 	m_AnimFloatList[0].StopAnim();
-	m_AnimFloatList[1] = static_cast<float>(iValue);
+	m_AnimFloatList[1] = static_cast<float>(iNewValue);
+	return m_AnimFloatList[1].Get();
+}
+
+void HyAnimVec2::SetY(float fNewValue)
+{
+	m_AnimFloatList[0].StopAnim();
+	m_AnimFloatList[1] = fNewValue;
+}
+
+void HyAnimVec2::SetY(int32 iNewValue)
+{
+	m_AnimFloatList[0].StopAnim();
+	m_AnimFloatList[1] = static_cast<float>(iNewValue);
 }
 
 void HyAnimVec2::Set(float fAll)

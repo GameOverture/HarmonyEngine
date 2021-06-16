@@ -29,12 +29,16 @@ public:
 	const glm::vec3 Extrapolate() const;
 
 	float X() const;
-	void X(float fValue);
-	void X(int32 iValue);
+	float X(float fNewValue);
+	float X(int32 iNewValue);
+	void SetX(float fNewValue);
+	void SetX(int32 iNewValue);
 
 	float Y() const;
-	void Y(float fValue);
-	void Y(int32 iValue);
+	float Y(float fNewValue);
+	float Y(int32 iNewValue);
+	void SetY(float fNewValue);
+	void SetY(int32 iNewValue);
 
 	void Set(float fAll);
 	void Set(int32 iX, int32 iY);

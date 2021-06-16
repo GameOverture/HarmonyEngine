@@ -27,13 +27,22 @@ public:
 	const glm::vec3 &Get() const;
 
 	float X() const;
-	void X(float fValue);
+	float X(float fNewValue);
+	float X(int32 iNewValue);
+	void SetX(float fNewValue);
+	void SetX(int32 iNewValue);
 
 	float Y() const;
-	void Y(float fValue);
+	float Y(float fNewValue);
+	float Y(int32 iNewValue);
+	void SetY(float fNewValue);
+	void SetY(int32 iNewValue);
 
 	float Z() const;
-	void Z(float fValue);
+	float Z(float fNewValue);
+	float Z(int32 iNewValue);
+	void SetZ(float fNewValue);
+	void SetZ(int32 iNewValue);
 
 	void Set(float fAll);
 	void Set(float fX, float fY, float fZ);

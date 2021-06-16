@@ -38,9 +38,32 @@ float HyAnimVec3::X() const
 	return m_AnimFloatList[0].Get();
 }
 
-void HyAnimVec3::X(float fValue)
+float HyAnimVec3::X(float fNewValue)
 {
-	m_AnimFloatList[0] = fValue;
+	m_AnimFloatList[0] = fNewValue;
+	m_AnimFloatList[1].StopAnim();
+	m_AnimFloatList[2].StopAnim();
+	return m_AnimFloatList[0].Get();
+}
+
+float HyAnimVec3::X(int32 iNewValue)
+{
+	m_AnimFloatList[0] = static_cast<float>(iNewValue);
+	m_AnimFloatList[1].StopAnim();
+	m_AnimFloatList[2].StopAnim();
+	return m_AnimFloatList[0].Get();
+}
+
+void HyAnimVec3::SetX(float fNewValue)
+{
+	m_AnimFloatList[0] = fNewValue;
+	m_AnimFloatList[1].StopAnim();
+	m_AnimFloatList[2].StopAnim();
+}
+
+void HyAnimVec3::SetX(int32 iNewValue)
+{
+	m_AnimFloatList[0] = static_cast<float>(iNewValue);
 	m_AnimFloatList[1].StopAnim();
 	m_AnimFloatList[2].StopAnim();
 }
@@ -50,10 +73,33 @@ float HyAnimVec3::Y() const
 	return m_AnimFloatList[1].Get();
 }
 
-void HyAnimVec3::Y(float fValue)
+float HyAnimVec3::Y(float fNewValue)
 {
 	m_AnimFloatList[0].StopAnim();
-	m_AnimFloatList[1] = fValue;
+	m_AnimFloatList[1] = fNewValue;
+	m_AnimFloatList[2].StopAnim();
+	return m_AnimFloatList[1].Get();
+}
+
+float HyAnimVec3::Y(int32 iNewValue)
+{
+	m_AnimFloatList[0].StopAnim();
+	m_AnimFloatList[1] = static_cast<float>(iNewValue);
+	m_AnimFloatList[2].StopAnim();
+	return m_AnimFloatList[1].Get();
+}
+
+void HyAnimVec3::SetY(float fNewValue)
+{
+	m_AnimFloatList[0].StopAnim();
+	m_AnimFloatList[1] = fNewValue;
+	m_AnimFloatList[2].StopAnim();
+}
+
+void HyAnimVec3::SetY(int32 iNewValue)
+{
+	m_AnimFloatList[0].StopAnim();
+	m_AnimFloatList[1] = static_cast<float>(iNewValue);
 	m_AnimFloatList[2].StopAnim();
 }
 
@@ -62,11 +108,34 @@ float HyAnimVec3::Z() const
 	return m_AnimFloatList[2].Get();
 }
 
-void HyAnimVec3::Z(float fValue)
+float HyAnimVec3::Z(float fNewValue)
 {
 	m_AnimFloatList[0].StopAnim();
 	m_AnimFloatList[1].StopAnim();
-	m_AnimFloatList[2] = fValue;
+	m_AnimFloatList[2] = fNewValue;
+	return m_AnimFloatList[2].Get();
+}
+
+float HyAnimVec3::Z(int32 iNewValue)
+{
+	m_AnimFloatList[0].StopAnim();
+	m_AnimFloatList[1].StopAnim();
+	m_AnimFloatList[2] = static_cast<float>(iNewValue);
+	return m_AnimFloatList[2].Get();
+}
+
+void HyAnimVec3::SetZ(float fNewValue)
+{
+	m_AnimFloatList[0].StopAnim();
+	m_AnimFloatList[1].StopAnim();
+	m_AnimFloatList[2] = fNewValue;
+}
+
+void HyAnimVec3::SetZ(int32 iNewValue)
+{
+	m_AnimFloatList[0].StopAnim();
+	m_AnimFloatList[1].StopAnim();
+	m_AnimFloatList[2] = static_cast<float>(iNewValue);
 }
 
 void HyAnimVec3::Set(float fAll)
