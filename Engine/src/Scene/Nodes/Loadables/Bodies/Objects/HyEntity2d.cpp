@@ -264,6 +264,7 @@ void HyEntity2d::ChildAppend(IHyNode2d &childRef)
 		}
 	}
 
+	HyLogWarning("HyEntity2d::ChildInsert failed - could not find 'insertBefore' node");
 	return false;
 }
 
