@@ -49,12 +49,12 @@ HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string s
 {
 }
 
-int32 HyMeter::GetValue()
+int64 HyMeter::GetValue()
 {
 	return m_iTargetValue;
 }
 
-void HyMeter::SetValue(int32 iPennies, float fRackDuration)
+void HyMeter::SetValue(int64 iPennies, float fRackDuration)
 {
 	m_iTargetValue = iPennies;
 
@@ -81,7 +81,7 @@ void HyMeter::SetValue(int32 iPennies, float fRackDuration)
 	FormatDigits();
 }
 
-void HyMeter::OffsetValue(int32 iPenniesOffsetAmt, float fRackDuration)
+void HyMeter::OffsetValue(int64 iPenniesOffsetAmt, float fRackDuration)
 {
 	SetValue(m_iTargetValue + iPenniesOffsetAmt, fRackDuration);
 }
@@ -173,7 +173,7 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
-std::string HyMeter::ToStringWithCommas(int32 iValue)
+std::string HyMeter::ToStringWithCommas(int64 iValue)
 {
 	std::string sStr = std::to_string(iValue);
 
@@ -186,7 +186,7 @@ std::string HyMeter::ToStringWithCommas(int32 iValue)
 	}
 }
 
-std::string HyMeter::FormatString(int32 iValue)
+std::string HyMeter::FormatString(int64 iValue)
 {
 	std::string returnStr;
 
@@ -194,8 +194,8 @@ std::string HyMeter::FormatString(int32 iValue)
 	{
 		returnStr = (iValue < 0) ? "-$" : "$";
 
-		int iNumCents = (abs(iValue) % 100);
-		int iNumDollars = (abs(iValue) / 100);
+		int64 iNumCents = (abs(iValue) % 100);
+		int64 iNumDollars = (abs(iValue) / 100);
 
 		if(m_bUseCommas)
 			returnStr += ToStringWithCommas(iNumDollars);
@@ -321,7 +321,7 @@ void HyMeter::FormatDigits()
 	if(m_bSpinDigits == false)
 	{
 		// Standard non-spinning rack
-		int32 iCurPennies = static_cast<uint32>((m_iTargetValue - m_iPrevValue) * (m_fElapsedTimeRack / m_fRackingDuration)) + m_iPrevValue;
+		int64 iCurPennies = static_cast<int64>(static_cast<double>(m_iTargetValue - m_iPrevValue) * (m_fElapsedTimeRack / m_fRackingDuration) + m_iPrevValue);
 		if(iCurPennies != m_iCurValue)
 		{
 			m_iCurValue = iCurPennies;
@@ -336,7 +336,7 @@ void HyMeter::FormatDigits()
 		m_fThresholdDist += static_cast<float>(dTravelDist - m_dPrevDistance);
 		m_dPrevDistance = dTravelDist;
 
-		int iTimesPastThreshold = static_cast<int>(m_fThresholdDist / fThreshold);
+		int32 iTimesPastThreshold = static_cast<int32>(m_fThresholdDist / fThreshold);
 		m_fThresholdDist -= (iTimesPastThreshold * fThreshold);
 
 		if(m_iTargetValue >= m_iCurValue)

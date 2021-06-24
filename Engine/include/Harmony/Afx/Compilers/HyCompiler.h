@@ -15,8 +15,10 @@ typedef signed char			int8;
 typedef unsigned char		uint8;
 typedef signed short		int16;
 typedef unsigned short		uint16;
-typedef signed int			int32;
-typedef unsigned int		uint32;
+typedef signed int			int32;		// TODO: Make this 'signed long' - Box2d already declares a typedef int32 (incorrectly?) as signed int
+typedef unsigned int		uint32;		// TODO: Make this 'unsigned long' - Box2d already declares a typedef int32 (incorrectly?) as unsigned int
+typedef long long			int64;
+typedef unsigned long long	uint64;
 
 // These macros use the (compiler-specific) project settings
 // to create independent versions for the game.

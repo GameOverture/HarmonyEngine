@@ -15,9 +15,9 @@
 
 class HyMeter : public HyLabel
 {
-	int32					m_iCurValue = 0;
-	int32					m_iPrevValue = 0;
-	int32					m_iTargetValue = 0;
+	int64					m_iCurValue = 0;
+	int64					m_iPrevValue = 0;
+	int64					m_iTargetValue = 0;
 	int32					m_iDenomination = 1; // Used when not displaying as cash
 
 	float					m_fRackingDuration = 1.0f;
@@ -66,9 +66,9 @@ public:
 	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyMeter();
 
-	int32 GetValue();
-	void SetValue(int32 iPennies, float fRackDuration);
-	void OffsetValue(int32 iPenniesOffsetAmt, float fRackDuration);
+	int64 GetValue();
+	void SetValue(int64 iPennies, float fRackDuration);
+	void OffsetValue(int64 iPenniesOffsetAmt, float fRackDuration);
 
 	void SetDenomination(int32 iDenom);
 
@@ -91,8 +91,8 @@ public:
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
 
 protected:
-	std::string ToStringWithCommas(int32 iValue);
-	std::string FormatString(int32 iValue);
+	std::string ToStringWithCommas(int64 iValue);
+	std::string FormatString(int64 iValue);
 	void FormatDigits();
 
 	virtual void OnUpdate() override;
