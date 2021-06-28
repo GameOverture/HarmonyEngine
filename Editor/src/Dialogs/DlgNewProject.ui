@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>583</width>
-    <height>302</height>
+    <width>590</width>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,12 +32,12 @@
      <item row="1" column="1">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>C++ Class Name:</string>
+        <string>Code Name:</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="txtClassName"/>
+      <widget class="QLineEdit" name="txtCodeName"/>
      </item>
      <item row="2" column="0">
       <widget class="QLineEdit" name="txtTitleName"/>
@@ -100,9 +100,25 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="chkUseGit">
+     <property name="text">
+      <string>Generate git files</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="grpAdvanced">
      <property name="title">
       <string>Advanced</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -112,20 +128,7 @@
        <widget class="WgtMakeRelDir" name="wgtMetaDir" native="true"/>
       </item>
       <item>
-       <widget class="WgtMakeRelDir" name="wgtSrcDir" native="true"/>
-      </item>
-      <item>
        <widget class="WgtMakeRelDir" name="wgtBuildDir" native="true"/>
-      </item>
-      <item>
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="lytSrcDependencies"/>
       </item>
      </layout>
     </widget>
@@ -178,7 +181,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>txtTitleName</tabstop>
-  <tabstop>txtClassName</tabstop>
+  <tabstop>txtCodeName</tabstop>
   <tabstop>txtGameLocation</tabstop>
   <tabstop>btnBrowse</tabstop>
   <tabstop>chkCreateGameDir</tabstop>

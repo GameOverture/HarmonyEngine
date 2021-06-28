@@ -36,6 +36,9 @@ if(Qt5_DIR)
 		src/Assets/Source/SourceFile.h
 		src/Assets/Source/SourceModel.cpp
 		src/Assets/Source/SourceModel.h
+		src/Assets/Source/SourceSettingsDlg.cpp
+		src/Assets/Source/SourceSettingsDlg.h
+		src/Assets/Source/SourceSettingsDlg.ui
 		src/Assets/Atlas/AtlasDraw.cpp
 		src/Assets/Atlas/AtlasDraw.h
 		src/Assets/Atlas/AtlasFrame.cpp
@@ -201,6 +204,9 @@ if(Qt5_DIR)
 		src/Widget/WgtSrcDependency.cpp
 		src/Widget/WgtSrcDependency.h
 		src/Widget/WgtSrcDependency.ui
+		src/Widget/WgtSrcDepGrp.cpp
+		src/Widget/WgtSrcDepGrp.h
+		src/Widget/WgtSrcDepGrp.ui
 		src/Widget/WidgetColor.cpp
 		src/Widget/WidgetGradientEditor.cpp
 		src/Widget/WidgetLiveVariable.cpp

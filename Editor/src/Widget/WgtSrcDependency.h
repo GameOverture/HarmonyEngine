@@ -16,28 +16,27 @@ namespace Ui {
 class WgtSrcDependency;
 }
 
-class DlgNewProject;
+class SourceSettingsDlg;
 
 class WgtSrcDependency : public QWidget
 {
 	Q_OBJECT
 
-	DlgNewProject *			m_pParentDlg;
-
-	QString					m_sAbsProjPath;
+	SourceSettingsDlg *		m_pParentDlg;
 	QString					m_sAbsSrcDepPath;
 	
 public:
-	explicit WgtSrcDependency(DlgNewProject *pParentDlg, QString sAbsProjectPath, QWidget *parent = 0);
-	~WgtSrcDependency();
+	explicit WgtSrcDependency(SourceSettingsDlg *pParentDlg, QWidget *pParent = nullptr);
+	virtual ~WgtSrcDependency();
 
 	bool IsActivated() const;
 
 	QString GetProjectName() const;
-	QString GetRelPath() const;
+	//QString GetRelPath() const;
 	QString GetAbsPath() const;
 
-	void ResetProjDir(QString sNewProjDirPath);
+	void Set(QString sProjectName, QString sDependAbsPath);
+	//void ResetProjDir(QString sNewProjDirPath);
 
 	void Refresh();
 	QString GetError();

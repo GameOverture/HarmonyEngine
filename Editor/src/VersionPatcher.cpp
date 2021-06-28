@@ -130,26 +130,29 @@
 		switch(iFileVersion)
 		{
 		case 0:
-			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 0 -> 1", LOGTYPE_Info);
+			HyGuiLog("Patching project files: version 0 -> 1", LOGTYPE_Info);
 			Patch_0to1(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 1:
-			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 1 -> 2", LOGTYPE_Info);
+			HyGuiLog("Patching project files: version 1 -> 2", LOGTYPE_Info);
 			Patch_1to2(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 2:
-			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 2 -> 3", LOGTYPE_Info);
+			HyGuiLog("Patching project files: version 2 -> 3", LOGTYPE_Info);
 			Patch_2to3(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 3:
-			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 3 -> 4", LOGTYPE_Info);
+			HyGuiLog("Patching project files: version 3 -> 4", LOGTYPE_Info);
 			Patch_3to4(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 4:
-			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 4 -> 5", LOGTYPE_Info);
+			HyGuiLog("Patching project files: version 4 -> 5", LOGTYPE_Info);
 			Patch_4to5(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 		case 5:
-			HyGuiLog("Patching project " % pProj->GetGameName() % " files: version 5 -> 6", LOGTYPE_Info);
+			HyGuiLog("Patching project files: version 5 -> 6", LOGTYPE_Info);
 			Patch_5to6(projDoc);
 		case 6:
+			HyGuiLog("Patching project files: version 6 -> 7", LOGTYPE_Info);
+			Patch_6to7(projDoc);
+		case 7:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 6, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 7, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -746,6 +749,15 @@
 {
 	QJsonObject projObj = projDocRef.object();
 	projObj.insert("BuildPath", "./build/");
+	projDocRef.setObject(projObj);
+}
+
+/*static*/ void VersionPatcher::Patch_6to7(QJsonDocument &projDocRef)
+{
+	QJsonObject projObj = projDocRef.object();
+	QString sTitle = projObj["GameName"].toString();
+	projObj.remove("GameName");
+	projObj.insert("Title", sTitle);
 	projDocRef.setObject(projObj);
 }
 

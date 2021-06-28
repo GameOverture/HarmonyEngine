@@ -85,7 +85,7 @@
   </layout>
   <action name="actionAddCategory">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -97,7 +97,7 @@
   </action>
   <action name="actionRenameCategory">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
    </property>
    <property name="text">
@@ -109,7 +109,7 @@
   </action>
   <action name="actionRemoveCategory">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -121,7 +121,7 @@
   </action>
   <action name="actionAddAudioBank">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -133,7 +133,7 @@
   </action>
   <action name="actionDeleteAudioBank">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
@@ -145,7 +145,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../../data/HyEditor.qrc"/>
+  <include location="../../../data/HyEditor.qrc"/>
  </resources>
  <connections/>
 </ui>

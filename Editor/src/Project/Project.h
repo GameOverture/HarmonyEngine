@@ -72,6 +72,7 @@ public:
 	Project(const QString sProjectFilePath, ExplorerModel &modelRef);
 	virtual ~Project();
 
+	QString GetName() const;
 	virtual QString GetName(bool bWithPrefix) const override;
 	
 	void LoadExplorerModel();
@@ -82,15 +83,13 @@ public:
 	void SaveSettingsObj(const QJsonObject newSettingsObj);
 
 	QString GetDirPath() const;
-	QString GetGameName() const;
+	QString GetTitle() const;
 
 	QString GetAbsPath() const;
 	QString GetAssetsAbsPath() const;
 	QString GetAssetsRelPath() const;
 	QString GetMetaDataAbsPath() const;
 	QString GetMetaDataRelPath() const;
-	QString GetSourceAbsPath() const;
-	QString GetSourceRelPath() const;
 	QString GetBuildAbsPath() const;
 	QString GetBuildRelPath() const;
 	QString GetUserAbsPath() const;

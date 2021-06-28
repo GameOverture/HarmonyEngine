@@ -25,19 +25,18 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 
 	QJsonObject projSettingsObj = m_ProjectRef.GetSettingsObj();
 
-	ui->txtTitleName->setText(projSettingsObj["GameName"].toString());
-	ui->txtClassName->setText(projSettingsObj["ClassName"].toString());
+	ui->txtTitleName->setText(projSettingsObj["Title"].toString());
+	ui->txtCodeName->setText(projSettingsObj["CodeName"].toString());
 
 	ui->txtAssetsLocation->setText(projSettingsObj["DataPath"].toString());
 	ui->txtMetaDataLocation->setText(projSettingsObj["MetaDataPath"].toString());
-	ui->txtSourceLocation->setText(projSettingsObj["SourcePath"].toString());
 
 	ui->sbInputMaps->setValue(projSettingsObj["NumInputMappings"].toInt());
 	ui->sbUpdateFpsCap->setValue(projSettingsObj["UpdateFpsCap"].toInt());
 	ui->sbPixelsPerMeter->setValue(projSettingsObj["PixelsPerMeter"].toInt());
 	ui->chkShowCursor->setChecked(projSettingsObj["ShowCursor"].toBool());
 
-	setWindowTitle(m_ProjectRef.GetGameName() % " Game Settings");
+	setWindowTitle(m_ProjectRef.GetTitle() % " Settings");
 	setWindowIcon(HyGlobal::ItemIcon(ITEM_Project, SUBICON_Settings));
 }
 

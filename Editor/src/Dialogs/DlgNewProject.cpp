@@ -17,7 +17,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QTextCodec>
+
 #include <QUuid>
 
 DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
@@ -27,7 +27,7 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 	ui->setupUi(this);
 
 	ui->txtTitleName->blockSignals(true);
-	ui->txtClassName->blockSignals(true);
+	ui->txtCodeName->blockSignals(true);
 	ui->txtGameLocation->blockSignals(true);
 	{
 		ui->txtTitleName->setText("New Game");
@@ -35,56 +35,29 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 		ui->txtTitleName->selectAll();
 		ui->txtTitleName->setValidator(HyGlobal::FreeFormValidator());
 
-		ui->txtClassName->setText("NewGame");
-		ui->txtClassName->setValidator(HyGlobal::CodeNameValidator());
+		ui->txtCodeName->setText("NewGame");
+		ui->txtCodeName->setValidator(HyGlobal::CodeNameValidator());
 
 		ui->txtGameLocation->setText(sDefaultLocation);
 
 		on_txtTitleName_textChanged("New Game");
 	}
 	ui->txtTitleName->blockSignals(false);
-	ui->txtClassName->blockSignals(false);
+	ui->txtCodeName->blockSignals(false);
 	ui->txtGameLocation->blockSignals(false);
 	
 	UpdateProjectDir();
-	UpdateSrcDependencies();
 
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
 	connect(ui->wgtDataDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	connect(ui->wgtMetaDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
-	connect(ui->wgtSrcDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	connect(ui->wgtBuildDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	ErrorCheck();
 }
 
 DlgNewProject::~DlgNewProject()
 {
-	for(int i = 0; i < m_SrcDependencyList.count(); ++i)
-		delete m_SrcDependencyList[i];
-
 	delete ui;
-}
-
-void DlgNewProject::AddSrcDep()
-{
-	m_SrcDependencyList.append(new WgtSrcDependency(this, GetProjDirPath(), ui->grpAdvanced));
-	ui->grpAdvanced->layout()->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
-	connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &DlgNewProject::ErrorCheck);
-
-	UpdateSrcDependencies();
-}
-
-void DlgNewProject::RemoveSrcDep(WgtSrcDependency *pRemoved)
-{
-	for(int i = 0; i < m_SrcDependencyList.count(); ++i)
-	{
-		if(m_SrcDependencyList[i] == pRemoved)
-		{
-			delete m_SrcDependencyList.takeAt(i);
-			break;
-		}
-	}
-	UpdateSrcDependencies();
 }
 
 QString DlgNewProject::GetProjFilePath()
@@ -94,13 +67,13 @@ QString DlgNewProject::GetProjFilePath()
 
 QString DlgNewProject::GetProjFileName()
 {
-	return ui->txtClassName->text() % HyGlobal::ItemExt(ITEM_Project);
+	return ui->txtCodeName->text() % HyGlobal::ItemExt(ITEM_Project);
 }
 
 QString DlgNewProject::GetProjDirPath()
 {
 	if(ui->chkCreateGameDir->isChecked())
-		return ui->txtGameLocation->text() + '/' + ui->txtClassName->text() + '/';
+		return ui->txtGameLocation->text() + '/' + ui->txtCodeName->text() + '/';
 	else
 		return ui->txtGameLocation->text() + '/';
 }
@@ -112,11 +85,11 @@ bool DlgNewProject::IsCreatingGameDir()
 
 void DlgNewProject::on_buttonBox_accepted()
 {
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Create workspace file tree
 	QDir buildDir(GetProjDirPath());
 	buildDir.mkpath(".");
 
-	// Create workspace file tree
-	//
 	// DATA
 	buildDir.mkdir(ui->wgtDataDir->GetRelPath());
 	buildDir.cd(ui->wgtDataDir->GetRelPath());
@@ -127,28 +100,23 @@ void DlgNewProject::on_buttonBox_accepted()
 	buildDir.setPath(GetProjDirPath());
 	buildDir.mkdir(ui->wgtMetaDir->GetRelPath());
 	buildDir.cd(ui->wgtMetaDir->GetRelPath());
+	buildDir.mkdir(HyGlobal::ItemName(ITEM_Source, true));
 	buildDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
+	buildDir.mkdir(HyGlobal::ItemName(ITEM_Audio, true));
 
-	// BUILD
-	buildDir.setPath(GetProjDirPath());
-	buildDir.mkdir(ui->wgtBuildDir->GetRelPath());
-
-	// SOURCE
-	buildDir.setPath(GetProjDirPath());
-	buildDir.mkdir(ui->wgtSrcDir->GetRelPath());
-	buildDir.cd(ui->wgtSrcDir->GetRelPath());
-	buildDir.mkdir("Game");
-	QDir srcDir(buildDir);
+	//// BUILD
+	//buildDir.setPath(GetProjDirPath());
+	//buildDir.mkdir(ui->wgtBuildDir->GetRelPath());
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
-	// Insert the minimum required fields for settings file. The project's DlgProjectSettings will fill in the rest of the defaults
+	// Generate HyProj file. Insert the minimum required fields for it. 
+	// The project's DlgProjectSettings will fill in the rest of the defaults
 	QJsonObject jsonObj;
 	jsonObj.insert("$fileVersion", HYGUI_FILE_VERSION);
-	jsonObj.insert("GameName", ui->txtTitleName->text());
-	jsonObj.insert("ClassName", ui->txtClassName->text());
+	jsonObj.insert("Title", ui->txtTitleName->text());
+	jsonObj.insert("CodeName", ui->txtCodeName->text());
 	jsonObj.insert("DataPath", QString(ui->wgtDataDir->GetRelPath() + "/"));
 	jsonObj.insert("MetaDataPath", QString(ui->wgtMetaDir->GetRelPath() + "/"));
-	jsonObj.insert("SourcePath", QString(ui->wgtSrcDir->GetRelPath() + "/"));
 	jsonObj.insert("BuildPath", QString(ui->wgtBuildDir->GetRelPath() + "/"));
 
 	QJsonArray windowInfoArray;
@@ -190,66 +158,69 @@ void DlgNewProject::on_buttonBox_accepted()
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	// Copy files to new project location
-	// root files
-	QDir projGenDir(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir);
-	QFileInfoList fileInfoList = projGenDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	for(int i = 0; i < fileInfoList.size(); ++i)
-		QFile::copy(fileInfoList[i].absoluteFilePath(), QDir(GetProjDirPath()).absoluteFilePath(fileInfoList[i].fileName()));
-	// src files
-	QDir projGenSrcDir(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "src");
-	fileInfoList = projGenSrcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	for(int i = 0; i < fileInfoList.size(); ++i)
-		QFile::copy(fileInfoList[i].absoluteFilePath(), srcDir.absoluteFilePath(fileInfoList[i].fileName()));
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////
-	// Rename the copied source files if needed
-	fileInfoList = QDir(GetProjDirPath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	fileInfoList += srcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	for(int i = 0; i < fileInfoList.size(); ++i)
+	// Copy standard git files to new project location
+	if(ui->chkUseGit->isChecked())
 	{
-		if(fileInfoList[i].fileName().contains("%HY_CLASS%"))
-		{
-			QFile file(fileInfoList[i].absoluteFilePath());
-			QString sNewFileName = fileInfoList[i].fileName().replace("%HY_CLASS%", ui->txtClassName->text());
-			file.rename(fileInfoList[i].absoluteDir().absolutePath() % "/Game/" % sNewFileName);
-			file.close();
-		}
+		QDir projGenDir(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir);
+		QFileInfoList fileInfoList = projGenDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+		for(int i = 0; i < fileInfoList.size(); ++i)
+			QFile::copy(fileInfoList[i].absoluteFilePath(), QDir(GetProjDirPath()).absoluteFilePath(fileInfoList[i].fileName()));
 	}
-	// Then replace the variable contents of the copied source files
-	fileInfoList = QDir(GetProjDirPath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	fileInfoList += srcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	fileInfoList += QDir(srcDir.absoluteFilePath("Game")).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	QTextCodec *pCodec = QTextCodec::codecForLocale();
-	for(int i = 0; i < fileInfoList.size(); ++i)
-	{
-		QFile file(fileInfoList[i].absoluteFilePath());
-		if(!file.open(QFile::ReadOnly))
-		{
-			HyGuiLog("Error reading " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
-			return;
-		}
 
-		QString sContents = pCodec->toUnicode(file.readAll());
-		file.close();
+	//// src files
+	//QDir projGenSrcDir(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "src");
+	//fileInfoList = projGenSrcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+	//for(int i = 0; i < fileInfoList.size(); ++i)
+	//	QFile::copy(fileInfoList[i].absoluteFilePath(), srcDir.absoluteFilePath(fileInfoList[i].fileName()));
 
-		sContents.replace("%HY_TITLE%", ui->txtTitleName->text());
-		sContents.replace("%HY_CLASS%", ui->txtClassName->text());
-		sContents.replace("%HY_PROJDIR%", GetProjDirPath());
-		sContents.replace("%HY_RELSRCDIR%", QDir(GetProjDirPath()).relativeFilePath(srcDir.absolutePath()));
-		sContents.replace("%HY_RELHARMONYDIR%", QDir(GetProjDirPath()).relativeFilePath(MainWindow::EngineSrcLocation()));
-		sContents.replace("%HY_RELDATADIR%", ui->wgtDataDir->GetRelPath());
-		sContents.replace("%HY_DEPENDENCIES_ADD%", GetDependAdd());
-		sContents.replace("%HY_DEPENDENCIES_LINK%", GetDependLink());
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//// Rename the copied source files if needed
+	//fileInfoList = QDir(GetProjDirPath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+	//fileInfoList += srcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+	//for(int i = 0; i < fileInfoList.size(); ++i)
+	//{
+	//	if(fileInfoList[i].fileName().contains("%HY_CLASS%"))
+	//	{
+	//		QFile file(fileInfoList[i].absoluteFilePath());
+	//		QString sNewFileName = fileInfoList[i].fileName().replace("%HY_CLASS%", ui->txtCodeName->text());
+	//		file.rename(fileInfoList[i].absoluteDir().absolutePath() % "/Game/" % sNewFileName);
+	//		file.close();
+	//	}
+	//}
+	//// Then replace the variable contents of the copied source files
+	//fileInfoList = QDir(GetProjDirPath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+	//fileInfoList += srcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+	//fileInfoList += QDir(srcDir.absoluteFilePath("Game")).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+	//QTextCodec *pCodec = QTextCodec::codecForLocale();
+	//for(int i = 0; i < fileInfoList.size(); ++i)
+	//{
+	//	QFile file(fileInfoList[i].absoluteFilePath());
+	//	if(!file.open(QFile::ReadOnly))
+	//	{
+	//		HyGuiLog("Error reading " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
+	//		return;
+	//	}
 
-		if(!file.open(QFile::WriteOnly))
-		{
-			HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
-			return;
-		}
-		file.write(pCodec->fromUnicode(sContents));
-		file.close();
-	}
+	//	QString sContents = pCodec->toUnicode(file.readAll());
+	//	file.close();
+
+	//	sContents.replace("%HY_TITLE%", ui->txtTitleName->text());
+	//	sContents.replace("%HY_CLASS%", ui->txtCodeName->text());
+	//	sContents.replace("%HY_PROJDIR%", GetProjDirPath());
+	//	sContents.replace("%HY_RELSRCDIR%", QDir(GetProjDirPath()).relativeFilePath(srcDir.absolutePath()));
+	//	sContents.replace("%HY_RELHARMONYDIR%", QDir(GetProjDirPath()).relativeFilePath(MainWindow::EngineSrcLocation()));
+	//	sContents.replace("%HY_RELDATADIR%", ui->wgtDataDir->GetRelPath());
+	//	sContents.replace("%HY_DEPENDENCIES_ADD%", GetDependAdd());
+	//	sContents.replace("%HY_DEPENDENCIES_LINK%", GetDependLink());
+
+	//	if(!file.open(QFile::WriteOnly))
+	//	{
+	//		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
+	//		return;
+	//	}
+	//	file.write(pCodec->fromUnicode(sContents));
+	//	file.close();
+	//}
 }
 
 void DlgNewProject::on_btnBrowse_clicked()
@@ -283,9 +254,9 @@ void DlgNewProject::on_txtTitleName_textChanged(const QString &arg1)
 
 	int iPos;
 	if(QValidator::Invalid != HyGlobal::CodeNameValidator()->validate(sFixedForClass, iPos))
-		ui->txtClassName->setText(sFixedForClass);
+		ui->txtCodeName->setText(sFixedForClass);
 
-	ui->lblAppendHint->setText("Appends \"/" % ui->txtClassName->text() % "/\" to above");
+	ui->lblAppendHint->setText("Appends \"/" % ui->txtCodeName->text() % "/\" to above");
 	UpdateProjectDir();
 }
 
@@ -298,76 +269,7 @@ void DlgNewProject::UpdateProjectDir()
 {
 	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath());
 	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath());
-	ui->wgtSrcDir->Setup("Source", "src", GetProjDirPath());
 	ui->wgtBuildDir->Setup("Build", "build", GetProjDirPath());
-
-	for(auto srcDep : m_SrcDependencyList)
-		srcDep->ResetProjDir(GetProjDirPath());
-}
-
-void DlgNewProject::UpdateSrcDependencies()
-{
-	if(m_SrcDependencyList.empty())
-	{
-		m_SrcDependencyList.append(new WgtSrcDependency(this, GetProjDirPath(), ui->grpAdvanced));
-		ui->grpAdvanced->layout()->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
-		connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &DlgNewProject::ErrorCheck);
-		return;
-	}
-
-	if(ui->lytSrcDependencies->count() != m_SrcDependencyList.count())
-	{
-		if(ui->lytSrcDependencies->count() < m_SrcDependencyList.count())
-		{
-			for(int i = ui->lytSrcDependencies->count(); i < m_SrcDependencyList.count(); ++i)
-				ui->lytSrcDependencies->addWidget(m_SrcDependencyList[i]);
-		}
-		else
-		{
-			for(int i = m_SrcDependencyList.count(); i < ui->lytSrcDependencies->count() - 1; ++i) // Keep at least '1'
-				delete ui->lytSrcDependencies->takeAt(i);
-		}
-
-		// Remove and re-add the layout that holds SrcDependency widgets. Otherwise it jumbles them together.
-		//ui->grpAdvanced->layout()->removeItem(ui->lytSrcDependencies);
-		//ui->grpAdvanced->layout()->addItem(ui->lytSrcDependencies);
-	}
-
-	ErrorCheck();
-}
-
-QString DlgNewProject::GetDependAdd()
-{
-	QString sReturn = "";
-	for(auto srcDep : m_SrcDependencyList)
-	{
-		if(srcDep->IsActivated() == false)
-			continue;
-
-		sReturn += "add_subdirectory(\"";
-		sReturn += srcDep->GetRelPath();
-		sReturn += "\" \"";
-		sReturn += srcDep->GetProjectName();
-		sReturn += "\")\n";
-	}
-
-	return sReturn;
-}
-
-QString DlgNewProject::GetDependLink()
-{
-	QString sReturn = "";
-	for(auto srcDep : m_SrcDependencyList)
-	{
-		if(srcDep->IsActivated() == false)
-			continue;
-
-		sReturn += "\"";
-		sReturn += srcDep->GetProjectName();
-		sReturn += "\" ";
-	}
-
-	return sReturn;
 }
 
 void DlgNewProject::ErrorCheck()
@@ -381,7 +283,7 @@ void DlgNewProject::ErrorCheck()
 			bIsError = true;
 			break;
 		}
-		if(ui->txtClassName->text().isEmpty())
+		if(ui->txtCodeName->text().isEmpty())
 		{
 			ui->lblError->setText("Error: Class name cannot be blank.");
 			bIsError = true;
@@ -415,29 +317,6 @@ void DlgNewProject::ErrorCheck()
 			bIsError = true;
 			break;
 		}
-
-		sError = ui->wgtSrcDir->GetError();
-		if(sError.isEmpty() == false)
-		{
-			ui->lblError->setText(sError);
-			bIsError = true;
-			break;
-		}
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		for(auto srcDep : m_SrcDependencyList)
-		{
-			sError = srcDep->GetError();
-			if(sError.isEmpty() == false)
-			{
-				ui->lblError->setText(sError);
-				bIsError = true;
-				break;
-			}
-		}
-		if(sError.isEmpty() == false)
-			break;
-
 	}while(false);
 
 	ui->lblError->setVisible(bIsError);

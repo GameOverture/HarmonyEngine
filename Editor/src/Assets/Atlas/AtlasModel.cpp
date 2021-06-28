@@ -252,6 +252,18 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		SaveRuntime();
 }
 
+/*virtual*/ void AtlasModel::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
+{
+	newMetaBankObjRef.insert("cmbSortOrder", 0);
+	newMetaBankObjRef.insert("sbFrameMarginTop", 0);
+	newMetaBankObjRef.insert("sbFrameMarginLeft", 0);
+	newMetaBankObjRef.insert("sbFrameMarginRight", 1);
+	newMetaBankObjRef.insert("sbFrameMarginBottom", 1);
+	newMetaBankObjRef.insert("maxWidth", 2048);
+	newMetaBankObjRef.insert("maxHeight", 2048);
+	newMetaBankObjRef.insert("cmbHeuristic", 1);
+}
+
 /*virtual*/ AssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	QRect rAlphaCrop(QPoint(metaObj["cropLeft"].toInt(), metaObj["cropTop"].toInt()),

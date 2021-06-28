@@ -102,7 +102,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	//HyGuiLog("GLSL: " % QString(reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION))), LOGTYPE_Normal);
 
 	HarmonyInit initStruct;
-	initStruct.sGameName = m_pProject->GetGameName().toStdString();
+	initStruct.sGameName = m_pProject->GetTitle().toStdString();
 	initStruct.sDataDir = m_pProject->GetAssetsAbsPath().toStdString();
 	m_pHyEngine = new GuiHyEngine(initStruct, m_pProject);
 }

@@ -85,7 +85,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	sProjectDir = HyIO::CleanPath(sProjectDir.c_str(), "", true);
 	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "", true);
 	
-	sGameName				= projDoc["GameName"].GetString();
+	sGameName				= projDoc["Title"].GetString();
 	uiUpdateTickMs			= 0;//projDoc["UpdateFpsCap"].GetUint();
 	bShowCursor				= true;//projDoc["ShowCursor"].GetBool();
 	uiNumInputMappings		= 1;//projDoc["NumInputMappings"].GetUint();

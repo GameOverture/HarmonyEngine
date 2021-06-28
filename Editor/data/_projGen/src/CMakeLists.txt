@@ -1,20 +1,17 @@
 cmake_minimum_required(VERSION 3.10)
-project(%HY_CLASS%)
+project(%HY_PROJECTNAME%)
 
-set(REL_SRC_DIR "%HY_RELSRCDIR%")
+set(REL_PROJ_PATH "%HY_RELPROJPATH%")
 set(REL_DATA_DIR "%HY_RELDATADIR%")
 set(REL_HARMONY_DIR "%HY_RELHARMONYDIR%")
-set(EXE_OUTPUT_NAME ${PROJECT_NAME})
+set(EXE_OUTPUT_NAME "%HY_OUTPUTNAME%")
 
 set(GAME_SRCFILES
-	"${REL_SRC_DIR}/pch.h"
-	"${REL_SRC_DIR}/main.cpp"
-	"${REL_SRC_DIR}/Game/${PROJECT_NAME}.cpp"
-	"${REL_SRC_DIR}/Game/${PROJECT_NAME}.h")
-	
+%HY_SRCFILES%)
+
 set(GAME_INCLUDE_DIRS "")
-list(APPEND GAME_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src")
-list(APPEND GAME_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src/Game")
+list(APPEND GAME_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
+%HY_INCLUDEDIRS%
 
 #################################################################################################
 # ^ ^ ^ USER CONFIG ABOVE ^ ^ ^
@@ -39,9 +36,9 @@ if(HYBUILD_SPINE)
 	add_compile_definitions(HY_USE_SPINE)
 endif()
 
-message(STATUS "Harmony building for target: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "%HY_TITLE% building for target: ${CMAKE_SYSTEM_NAME}")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/web")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${REL_PROJ_PATH}/bin/web")
 	set(HYEM_COMPILE_FLAGS "")
 	list(APPEND HYEM_COMPILE_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
 	list(APPEND HYEM_COMPILE_FLAGS "-s MIN_WEBGL_VERSION=2")
@@ -73,10 +70,10 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	
 	list(APPEND HYEM_LINK_FLAGS "--no-heap-copy")
 	list(APPEND HYEM_LINK_FLAGS "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/${REL_DATA_DIR}@./data")
-	list(APPEND HYEM_LINK_FLAGS "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.hyproj@${PROJECT_NAME}.hyproj")
+	list(APPEND HYEM_LINK_FLAGS "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/${REL_PROJ_PATH}/${PROJECT_NAME}.hyproj@${PROJECT_NAME}.hyproj")
 	
 	if(HYBUILD_DebugEmscripten)
-		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/web/debug")
+		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${REL_PROJ_PATH}/bin/web/debug")
 		message(STATUS "!!! EMSCRIPTEN DEBUG FLAGS ENABLED !!!")
 		add_compile_definitions(DEBUG)
 		
@@ -114,12 +111,12 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 else()
 	if(MSVC)
 		if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Win32")
-			set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/Win32")
+			set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${REL_PROJ_PATH}/bin/Win32")
 		else()
-			set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/x64")
+			set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${REL_PROJ_PATH}/bin/x64")
 		endif()
 	else()
-		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/")
+		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${REL_PROJ_PATH}/bin/")
 	endif()
 endif()
 
@@ -134,7 +131,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 target_include_directories(${PROJECT_NAME} PRIVATE "$<BUILD_INTERFACE:${GAME_INCLUDE_DIRS}>")
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
-	target_precompile_headers(${PROJECT_NAME} PRIVATE "${REL_SRC_DIR}/pch.h")
+	target_precompile_headers(${PROJECT_NAME} PRIVATE "pch.h")
 endif()
 target_link_libraries(${PROJECT_NAME} PUBLIC HyEngine %HY_DEPENDENCIES_LINK%)
 
@@ -144,7 +141,7 @@ if(TARGET uninstall)
 endif()
 
 if (MSVC)
-	set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+	set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/${REL_PROJ_PATH}")
 	set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 	
 	# Copy OGG/VORBIS DLL's to output directory
@@ -165,4 +162,4 @@ if (MSVC)
 	endforeach()
 endif()
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/${REL_SRC_DIR}" PREFIX "Source Files" FILES ${GAME_SRCFILES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" PREFIX "Source Files" FILES ${GAME_SRCFILES})

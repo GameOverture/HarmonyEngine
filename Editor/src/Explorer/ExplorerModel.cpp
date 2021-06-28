@@ -307,7 +307,7 @@ ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid)
 	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
 	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
 		if(pItem->GetType() == ITEM_Project)
-			return QVariant(static_cast<Project *>(pItem)->GetGameName());
+			return QVariant(static_cast<Project *>(pItem)->GetTitle());
 		else
 			return QVariant(pItem->GetName(false));
 

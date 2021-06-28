@@ -117,6 +117,7 @@ protected:
 	void StartRepackThread(QString sLoadMessage, IRepackThread *pRepackThread);
 
 	virtual void OnInit() = 0;
+	virtual void OnCreateNewBank(QJsonObject &newBankMetaBankRef) = 0;
 
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 

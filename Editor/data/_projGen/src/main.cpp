@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "%HY_CLASS%.h"
+#include "%HY_CODENAME%.h"
 
 //--------------------------------------------------------------------------------------
 // Entry point to %HY_TITLE%
@@ -13,11 +13,11 @@
 //--------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
-	HarmonyInit initStruct("%HY_CLASS%.hyproj");
+	HarmonyInit initStruct("%HY_CODENAME%.hyproj");
 
 	// Emscripten requires all initial memory to be on the heap (above 'initStruct' is copied internally)
 	// and the main() function to exit in order for its artificial 'update loop' to work correctly in the browser
-	%HY_CLASS% *pGame = HY_NEW %HY_CLASS%(initStruct);
+	%HY_CODENAME% *pGame = HY_NEW %HY_CODENAME%(initStruct);
 	int32 iReturnCode = pGame->RunGame();
 #ifndef HY_PLATFORM_BROWSER
 	delete pGame;

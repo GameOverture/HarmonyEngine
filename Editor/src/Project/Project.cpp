@@ -155,9 +155,15 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	delete m_pAudioModel;
 }
 
+QString Project::GetName() const
+{
+	QFileInfo fileInfo(m_sName);
+	return fileInfo.baseName();
+}
+
 /*virtual*/ QString Project::GetName(bool bWithPrefix) const /*override*/
 {
-	return "";
+	return GetName();
 }
 
 void Project::LoadExplorerModel()
@@ -375,9 +381,9 @@ QString Project::GetDirPath() const
 	return file.dir().absolutePath() + '/';
 }
 
-QString Project::GetGameName() const
+QString Project::GetTitle() const
 {
-	return GetSettingsObj()["GameName"].toString();
+	return GetSettingsObj()["Title"].toString();
 }
 
 QString Project::GetAbsPath() const
@@ -405,16 +411,6 @@ QString Project::GetMetaDataRelPath() const
 	return QDir::cleanPath(GetSettingsObj()["MetaDataPath"].toString()) + '/';
 }
 
-QString Project::GetSourceAbsPath() const
-{
-	return QDir::cleanPath(GetDirPath() + '/' + GetSettingsObj()["SourcePath"].toString()) + '/';
-}
-
-QString Project::GetSourceRelPath() const
-{
-	return QDir::cleanPath(GetSettingsObj()["SourcePath"].toString()) + '/';
-}
-
 QString Project::GetBuildAbsPath() const
 {
 	return QDir::cleanPath(GetDirPath() + '/' + GetSettingsObj()["BuildPath"].toString()) + '/';
@@ -430,7 +426,7 @@ QString Project::GetUserAbsPath() const
 	QDir settingsDir(GetDirPath());
 	QFileInfo projFileInfo(GetAbsPath());
 	
-	return settingsDir.absoluteFilePath(projFileInfo.baseName() % HYGUIPATH_UserExt);
+	return settingsDir.absoluteFilePath(GetName(false) % HYGUIPATH_UserExt);
 }
 
 IManagerModel *Project::GetManagerModel(AssetType eManagerType)

@@ -9,17 +9,16 @@
  *************************************************************************/
 #include "Global.h"
 #include "WgtSrcDependency.h"
+#include "SourceSettingsDlg.h"
 #include "ui_WgtSrcDependency.h"
 #include "DlgNewProject.h"
 
 #include <QFileDialog>
 
-WgtSrcDependency::WgtSrcDependency(DlgNewProject *pParentDlg, QString sAbsProjectPath, QWidget *parent) :
-	QWidget(parent),
+WgtSrcDependency::WgtSrcDependency(SourceSettingsDlg *pParentDlg, QWidget *pParent /*= nullptr*/) :
+	QWidget(pParent),
 	ui(new Ui::WgtSrcDependency),
-	m_pParentDlg(pParentDlg),
-	m_sAbsProjPath(sAbsProjectPath),
-	m_sAbsSrcDepPath(sAbsProjectPath)
+	m_pParentDlg(pParentDlg)
 {
 	ui->setupUi(this);
 	ui->stackedWidget->setCurrentIndex(0);
@@ -27,7 +26,7 @@ WgtSrcDependency::WgtSrcDependency(DlgNewProject *pParentDlg, QString sAbsProjec
 	ui->txtProjectName->setValidator(HyGlobal::FileNameValidator());
 }
 
-WgtSrcDependency::~WgtSrcDependency()
+/*virtual*/ WgtSrcDependency::~WgtSrcDependency()
 {
 	delete ui;
 }
@@ -42,31 +41,41 @@ QString WgtSrcDependency::GetProjectName() const
 	return ui->txtProjectName->text();
 }
 
-QString WgtSrcDependency::GetRelPath() const
-{
-	return ui->txtRelativePath->text();
-}
+//QString WgtSrcDependency::GetRelPath() const
+//{
+//	return ui->txtRelativePath->text();
+//}
 
 QString WgtSrcDependency::GetAbsPath() const
 {
 	return m_sAbsSrcDepPath;
 }
 
-void WgtSrcDependency::ResetProjDir(QString sNewProjDirPath)
+void WgtSrcDependency::Set(QString sProjectName, QString sDependAbsPath)
 {
-	if(m_sAbsSrcDepPath == m_sAbsProjPath)
-		m_sAbsSrcDepPath = sNewProjDirPath;
-
-	m_sAbsProjPath = sNewProjDirPath;
+	ui->txtProjectName->setText(sProjectName);
+	m_sAbsSrcDepPath = sDependAbsPath;
 
 	Refresh();
 }
 
+//void WgtSrcDependency::ResetProjDir(QString sNewProjDirPath)
+//{
+//	if(m_sAbsSrcDepPath == m_sAbsProjPath)
+//		m_sAbsSrcDepPath = sNewProjDirPath;
+//
+//	m_sAbsProjPath = sNewProjDirPath;
+//
+//	Refresh();
+//}
+
 void WgtSrcDependency::Refresh()
 {
-	QDir projDir(m_sAbsProjPath);
+	QDir projDir(m_pParentDlg->GetProjectDir());
 
-	// Update ui->txtRelativePath using 'm_sAbsSrcDepPath'
+	// Update ui->txtRelativePath to be the relative path from the HyProj location
+	// NOTE: this relative location isn't useful in code because the CMakeLists.txt works from the meta/Source directory
+	//       it is just here for the user's of the editor's sake
 	ui->txtRelativePath->setText(projDir.relativeFilePath(m_sAbsSrcDepPath));
 	if(ui->txtRelativePath->text().isEmpty())
 		ui->txtRelativePath->setText(".");

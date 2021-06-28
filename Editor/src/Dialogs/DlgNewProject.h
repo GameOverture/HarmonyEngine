@@ -21,15 +21,10 @@ class DlgNewProject;
 class DlgNewProject : public QDialog
 {
 	Q_OBJECT
-
-		QList<WgtSrcDependency *>	m_SrcDependencyList;
 	
 public:
-	explicit DlgNewProject(QString &sDefaultLocation, QWidget *parent = 0);
-	~DlgNewProject();
-
-	void AddSrcDep();
-	void RemoveSrcDep(WgtSrcDependency *pRemoved);
+	explicit DlgNewProject(QString &sDefaultLocation, QWidget *pParent = nullptr);
+	virtual ~DlgNewProject();
 
 	QString GetProjFilePath();
 	QString GetProjFileName();
@@ -53,10 +48,6 @@ private:
 	Ui::DlgNewProject *ui;
 
 	void UpdateProjectDir();
-	void UpdateSrcDependencies();
-
-	QString GetDependAdd();
-	QString GetDependLink();
 
 	void ErrorCheck();
 };

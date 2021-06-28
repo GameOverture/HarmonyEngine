@@ -101,6 +101,10 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 		SaveRuntime();
 }
 
+/*virtual*/ void AudioManagerModel::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
+{
+}
+
 /*virtual*/ AssetItemData *AudioManagerModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	WaveHeader wavHeader(metaObj["wavHeader"].toObject());
