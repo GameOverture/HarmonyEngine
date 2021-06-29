@@ -58,3 +58,8 @@ SourceFile::~SourceFile()
 	//frameObj.insert("textureFormat", HyAssets::GetTextureFormatName(m_eFormat).c_str());
 	//frameObj.insert("textureFiltering", HyAssets::GetTextureFilteringName(m_eFiltering).c_str());
 }
+
+void SourceFile::UpdateChecksum(quint32 uiChecksum)
+{
+	m_uiChecksum = uiChecksum;
+}

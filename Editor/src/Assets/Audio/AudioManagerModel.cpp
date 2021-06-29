@@ -78,7 +78,7 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 	return bAccepted;
 }
 
-/*virtual*/ QStringList AudioManagerModel::GetSupportedFileExtList() /*override*/
+/*virtual*/ QStringList AudioManagerModel::GetSupportedFileExtList() const /*override*/
 {
 	return QStringList() << ".wav";
 }
@@ -302,6 +302,10 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 	Repack(affectedAudioList);
 
 	return true;
+}
+
+/*virtual*/ void AudioManagerModel::OnSaveMeta() /*override*/
+{
 }
 
 /*virtual*/ QJsonObject AudioManagerModel::GetSaveJson() /*override*/

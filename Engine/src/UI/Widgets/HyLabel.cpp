@@ -23,7 +23,7 @@ HyLabel::PrimPanel::PrimPanel(int32 iWidth, int32 iHeight, int32 iStroke, HyEnti
 	m_Stroke.SetAsBox(iWidth, iHeight);
 	m_Stroke.SetTint(0.3f, 0.3f, 0.3f);
 	m_Stroke.SetWireframe(true);
-	m_Stroke.SetLineThickness(iStroke);
+	m_Stroke.SetLineThickness(static_cast<float>(iStroke));
 
 	Load();
 }
@@ -101,7 +101,10 @@ void HyLabel::Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTex
 	m_pPrimPanel = HY_NEW PrimPanel(iWidth, iHeight, iStroke, this);
 
 	m_Text.Init(sTextPrefix, sTextName, this);
-	m_TextMargins.Set(iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
+	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
+					  static_cast<float>(iTextMarginBottom),
+					  static_cast<float>(iTextMarginRight),
+					  static_cast<float>(iTextMarginTop));
 
 	CommonSetup();
 	OnSetup();
@@ -116,7 +119,10 @@ void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::strin
 	m_SpritePanel.Init(sPanelPrefix, sPanelName, this);
 
 	m_Text.Init(sTextPrefix, sTextName, this);
-	m_TextMargins.Set(iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
+	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
+					  static_cast<float>(iTextMarginBottom),
+					  static_cast<float>(iTextMarginRight),
+					  static_cast<float>(iTextMarginTop));
 
 	CommonSetup();
 	OnSetup();
@@ -309,12 +315,12 @@ void HyLabel::CommonSetup()
 
 		auto &aabb = m_pPrimPanel->GetSceneAABB();
 		if(aabb.IsValid())
-			HySetVec(vUiSizeHint, aabb.GetExtents().x * 2.0f, aabb.GetExtents().y * 2.0f);
+			HySetVec(vUiSizeHint, static_cast<int32>(aabb.GetExtents().x * 2.0f), static_cast<int32>(aabb.GetExtents().y * 2.0f));
 		
 		m_pPrimPanel->scale = vCachedScale;
 	}
 	else if(m_SpritePanel.IsLoadDataValid())
-		HySetVec(vUiSizeHint, m_SpritePanel.GetCurFrameWidth(false), m_SpritePanel.GetCurFrameHeight(false));
+		HySetVec(vUiSizeHint, static_cast<int32>(m_SpritePanel.GetCurFrameWidth(false)), static_cast<int32>(m_SpritePanel.GetCurFrameHeight(false)));
 	
 	// vUiSizeHint must be established
 	if(vUiSizeHint.x == 0 || vUiSizeHint.y == 0)

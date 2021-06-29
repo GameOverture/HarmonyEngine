@@ -234,7 +234,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	return bAccepted;
 }
 
-/*virtual*/ QStringList AtlasModel::GetSupportedFileExtList() /*override*/
+/*virtual*/ QStringList AtlasModel::GetSupportedFileExtList() const /*override*/
 {
 	return QStringList() << ".png";
 }
@@ -460,6 +460,10 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	Repack(GetBankIndexFromBankId(uiNewBankId), QSet<int>(), framesGoingToNewAtlasGrpSet);
 
 	return true;
+}
+
+/*virtual*/ void AtlasModel::OnSaveMeta() /*override*/
+{
 }
 
 /*virtual*/ QJsonObject AtlasModel::GetSaveJson() /*override*/

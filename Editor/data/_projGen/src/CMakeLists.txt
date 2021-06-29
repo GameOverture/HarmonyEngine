@@ -12,7 +12,6 @@ set(GAME_SRCFILES
 set(GAME_INCLUDE_DIRS "")
 list(APPEND GAME_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
 %HY_INCLUDEDIRS%
-
 #################################################################################################
 # ^ ^ ^ USER CONFIG ABOVE ^ ^ ^
 
@@ -122,7 +121,7 @@ endif()
 
 add_subdirectory("${REL_HARMONY_DIR}/Engine" "HyEngine")
 %HY_DEPENDENCIES_ADD%
-add_executable(${PROJECT_NAME} WIN32 ${GAME_SRCFILES} "${PROJECT_NAME}.hyproj")
+add_executable(${PROJECT_NAME} WIN32 ${GAME_SRCFILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 14
 	CXX_STANDARD_REQUIRED YES

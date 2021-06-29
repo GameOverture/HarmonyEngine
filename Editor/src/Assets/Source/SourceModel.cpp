@@ -51,7 +51,7 @@ SourceModel::SourceModel(Project &projRef) :
 	{
 		m_BanksModel.GetBank(uiBankIndex)->m_MetaObj = pDlg->GetMetaObj();
 
-		WriteCMakeLists();
+		SaveMeta();
 		bAccepted = true;
 	}
 	delete pDlg;
@@ -59,7 +59,7 @@ SourceModel::SourceModel(Project &projRef) :
 	return bAccepted;
 }
 
-/*virtual*/ QStringList SourceModel::GetSupportedFileExtList() /*override*/
+/*virtual*/ QStringList SourceModel::GetSupportedFileExtList() const /*override*/
 {
 	return QStringList() << ".cpp" << ".h"; // TODO: Add shader file types eventually
 }
@@ -71,7 +71,7 @@ SourceModel::SourceModel(Project &projRef) :
 quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName) const
 {
 	QString sCombinedPath;
-	if(sFilterPath.isEmpty())
+	if(sFilterPath.isEmpty() || sFilterPath == ".")
 		sCombinedPath = sFileName;
 	else
 		sCombinedPath = sFilterPath + "/" + sFileName;
@@ -80,116 +80,88 @@ quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName)
 	return HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(sCleanPath.data()), sCleanPath.size());
 }
 
-void SourceModel::WriteCMakeLists()
+QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName)
 {
-	SaveMeta();
+	QString sTemplateFilePath = MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "src/";
+	switch(eTemplate)
+	{
+	case TEMPLATE_Main:			sTemplateFilePath += "main.cpp";		break;
+	case TEMPLATE_Pch:			sTemplateFilePath += "pch.h";			break;
+	case TEMPLATE_MainClassCpp:	sTemplateFilePath += "MainClass.cpp";	break;
+	case TEMPLATE_MainClassH:	sTemplateFilePath += "MainClass.h";		break;
+	case TEMPLATE_ClassCpp:		sTemplateFilePath += "Class.cpp";		break;
+	case TEMPLATE_ClassH:		sTemplateFilePath += "Class.h";			break;
+	}
 
-	QFile file(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "src/CMakeLists.txt");
+	QFile file(sTemplateFilePath);
 	if(!file.open(QFile::ReadOnly))
 	{
 		HyGuiLog("Error reading " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
-		return;
+		return QString();
 	}
 	QTextCodec *pCodec = QTextCodec::codecForLocale();
 	QString sContents = pCodec->toUnicode(file.readAll());
 	file.close();
 
-	// Replace the template CMakeLists %HY_% variables
-	const BankData *pSourceBank = m_BanksModel.GetBank(0);
-
-	sContents.replace("%HY_PROJECTNAME%", m_ProjectRef.GetName());
-	sContents.replace("%HY_RELPROJPATH%", m_MetaDir.relativeFilePath(m_ProjectRef.GetDirPath()));
-	sContents.replace("%HY_RELDATADIR%", m_MetaDir.relativeFilePath(m_ProjectRef.GetAssetsAbsPath()));
-	sContents.replace("%HY_RELHARMONYDIR%", m_MetaDir.relativeFilePath(MainWindow::EngineSrcLocation()));
-
-	sContents.replace("%HY_OUTPUTNAME%", pSourceBank->m_MetaObj["OutputName"].toString());
-
-	
-	QString sSrcFiles;
-	for(int32 i = 0; i < pSourceBank->m_AssetList.size(); ++i)
-	{
-		sSrcFiles += "\t\"" + static_cast<SourceFile *>(pSourceBank->m_AssetList[i])->ConstructMetaFileName();
-		if(i == pSourceBank->m_AssetList.size() - 1)
-			sSrcFiles += "\"";
-		else
-			sSrcFiles += "\"\n";
-	}
-	sContents.replace("%HY_SRCFILES%", sSrcFiles);
-
-	QStringList srcFolderList;
-	for(int32 i = 0; i < pSourceBank->m_AssetList.size(); ++i)
-		srcFolderList.push_back(pSourceBank->m_AssetList[i]->GetFilter());
-	srcFolderList = srcFolderList.toSet().toList(); // Remove duplicates
-	QString sIncludeDirs;
-	for(auto sFolder : srcFolderList)
-		sIncludeDirs += "list(APPEND GAME_INCLUDE_DIRS \"${CMAKE_CURRENT_SOURCE_DIR}/" + sFolder + ")\n";
-	sContents.replace("%HY_INCLUDEDIRS%", sIncludeDirs);
-
+	// Replace template variables
+	sContents.replace("%HY_CLASS%", sClassName);
 	sContents.replace("%HY_TITLE%", m_ProjectRef.GetTitle());
+	sContents.replace("%HY_PROJECTNAME%", m_ProjectRef.GetName());
 
-	QString sDependAdd;
-	QJsonArray srcDependsArray = pSourceBank->m_MetaObj["SrcDepends"].toArray();
-	for(auto srcDep : srcDependsArray)
-	{
-		QJsonObject srcDepObj = srcDep.toObject();
-
-		sDependAdd += "add_subdirectory(\"";
-		sDependAdd += srcDepObj["RelPath"].toString();// srcDep->GetRelPath();
-		sDependAdd += "\" \"";
-		sDependAdd += srcDepObj["ProjectName"].toString();// srcDep->GetProjectName();
-		sDependAdd += "\")\n";
-	}
-	sContents.replace("%HY_DEPENDENCIES_ADD%", sDependAdd);
-
-	QString sDependLink;
-	for(auto srcDep : srcDependsArray)
-	{
-		QJsonObject srcDepObj = srcDep.toObject();
-
-		sDependLink += "\"";
-		sDependLink += srcDepObj["ProjectName"].toString();//srcDep->GetProjectName();
-		sDependLink += "\" ";
-	}
-	sContents.replace("%HY_DEPENDENCIES_LINK%", sDependLink);
-
-	// Save generated CMakeLists file to destination
-	file.setFileName(m_MetaDir.absoluteFilePath("CMakeLists.txt"));
+	// Save generated source file to destination
+	QString sDestinationPath = m_MetaDir.absoluteFilePath(AssembleFilter(data(destIndex, Qt::UserRole).value<TreeModelItemData *>(), true));
+	sDestinationPath += "/" + sFileName + "." + QFileInfo(sTemplateFilePath).suffix();
+	file.setFileName(sDestinationPath);
 	if(!file.open(QFile::WriteOnly))
 	{
 		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
-		return;
+		return QString();
 	}
 	file.write(pCodec->fromUnicode(sContents));
 	file.close();
 
-	//QDir projGenSrcDir();
-	//fileInfoList = projGenSrcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//for(int i = 0; i < fileInfoList.size(); ++i)
-	//	QFile::copy(fileInfoList[i].absoluteFilePath(), srcDir.absoluteFilePath(fileInfoList[i].fileName()));
+	return sDestinationPath;
+}
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	//// Rename the copied source files if needed
-	//fileInfoList = QDir(GetProjDirPath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//fileInfoList += srcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//for(int i = 0; i < fileInfoList.size(); ++i)
-	//{
-	//	if(fileInfoList[i].fileName().contains("%HY_CLASS%"))
-	//	{
-	//		QFile file(fileInfoList[i].absoluteFilePath());
-	//		QString sNewFileName = fileInfoList[i].fileName().replace("%HY_CLASS%", ui->txtClassName->text());
-	//		file.rename(fileInfoList[i].absoluteDir().absolutePath() % "/Game/" % sNewFileName);
-	//		file.close();
-	//	}
-	//}
-	//// Then replace the variable contents of the copied source files
-	//fileInfoList = QDir(GetProjDirPath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//fileInfoList += srcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//fileInfoList += QDir(srcDir.absoluteFilePath("Game")).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//QTextCodec *pCodec = QTextCodec::codecForLocale();
-	//for(int i = 0; i < fileInfoList.size(); ++i)
-	//{
-	//	
-	//}
+void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint32> &checksumListOut) const
+{
+	srcFilePathListOut.clear();
+	checksumListOut.clear();
+
+	QStack<QFileInfoList> dirStack;
+	QFileInfoList metaInfoList = m_MetaDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
+	dirStack.push(metaInfoList);
+
+	while(dirStack.isEmpty() == false)
+	{
+		QFileInfoList fileInfoList = dirStack.pop();
+
+		for(int i = 0; i < fileInfoList.count(); i++)
+		{
+			QFileInfo info = fileInfoList[i];
+			QString sTest = info.absoluteFilePath();
+			if(info.isDir())
+			{
+				QDir subDir(info.filePath());
+				dirStack.push(subDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot));
+			}
+			else
+			{
+				for(const auto &sExt : GetSupportedFileExtList())
+				{
+					if(QString('.' % info.suffix()).compare(sExt, Qt::CaseInsensitive) == 0)
+					{
+						srcFilePathListOut.push_back(info.filePath());
+						
+						QString sFilterPath = m_MetaDir.relativeFilePath(info.absoluteDir().absolutePath());
+						QString sFileName = info.fileName();
+						checksumListOut.push_back(ComputeFileChecksum(sFilterPath, sFileName));
+						break;
+					}
+				}
+			}
+		}
+	}
 }
 
 /*virtual*/ void SourceModel::OnInit() /*override*/
@@ -197,17 +169,17 @@ void SourceModel::WriteCMakeLists()
 	if(m_BanksModel.GetBank(0)->m_AssetList.empty())
 	{
 		// If asset list is empty try importing (refreshing) everything in m_MetaDir (source) directory.
-		// If that is also empty, then generate a brand new project
+		// If this is also empty, then generate a brand new project
 		QStringList sImportList;
 		QList<TreeModelItemData *> correspondingParentList;
 		QList<QUuid> correspondingUuidList;
 
-		// Dig recursively through this directory and grab all the source files (while creating filters that resemble the folder structure they're stored in)
+		// Dig recursively through m_MetaDir and grab all the source files (while creating filters that resemble the folder structure they're stored in)
 		QDir dirEntry(m_MetaDir);
 		TreeModelItemData *pCurFilter = nullptr;
 
 		QStack<QPair<QFileInfoList, TreeModelItemData *>> dirStack;
-		dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(dirEntry.entryInfoList(QDir::NoDotAndDotDot), pCurFilter));
+		dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(dirEntry.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot), pCurFilter));
 
 		while(dirStack.isEmpty() == false)
 		{
@@ -217,7 +189,7 @@ void SourceModel::WriteCMakeLists()
 			for(int i = 0; i < list.count(); i++)
 			{
 				QFileInfo info = list[i];
-				if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
+				if(info.isDir())// && info.fileName() != ".." && info.fileName() != ".")
 				{
 					QDir subDir(info.filePath());
 					dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(subDir.entryInfoList(), CreateNewFilter(subDir.dirName(), curDir.second)));
@@ -237,6 +209,26 @@ void SourceModel::WriteCMakeLists()
 				}
 			}
 		}
+
+		// If nothing exists, generate a brand new project
+		if(sImportList.empty())
+		{
+			sImportList << GenerateSrcFile(TEMPLATE_Main, QModelIndex(), m_ProjectRef.GetName(), "main");
+			correspondingParentList << nullptr;
+			correspondingUuidList << QUuid::createUuid();
+
+			sImportList << GenerateSrcFile(TEMPLATE_Pch, QModelIndex(), m_ProjectRef.GetName(), "pch");
+			correspondingParentList << nullptr;
+			correspondingUuidList << QUuid::createUuid();
+
+			sImportList << GenerateSrcFile(TEMPLATE_MainClassCpp, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName());
+			correspondingParentList << nullptr;
+			correspondingUuidList << QUuid::createUuid();
+
+			sImportList << GenerateSrcFile(TEMPLATE_MainClassH, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName());
+			correspondingParentList << nullptr;
+			correspondingUuidList << QUuid::createUuid();
+		}
 		
 		ImportNewAssets(sImportList,
 						0,
@@ -244,7 +236,7 @@ void SourceModel::WriteCMakeLists()
 						correspondingParentList,
 						correspondingUuidList);
 
-		WriteCMakeLists();
+		SaveMeta();
 	}
 }
 
@@ -348,14 +340,132 @@ void SourceModel::WriteCMakeLists()
 
 /*virtual*/ bool SourceModel::OnUpdateAssets(QList<AssetItemData *> assetList) /*override*/
 {
-	// This function doesn't make sense with how source files are kept
+	// This function doesn't make sense with how source files are kept (they're updated via some IDE)
 	return false;
 }
 
 /*virtual*/ bool SourceModel::OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
 {
-	// This function doesn't make sense with how source files are kept
+	// This function doesn't make sense with how source files are kept (single bank)
 	return false;
+}
+
+/*virtual*/ void SourceModel::OnSaveMeta() /*override*/
+{
+	const BankData *pSourceBank = m_BanksModel.GetBank(0);
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// First ensure all source files are residing in their proper folder on disk (represented here with filters)
+	QStringList srcFilePathList;
+	QList<quint32> currentChecksumList;
+	GatherSourceFiles(srcFilePathList, currentChecksumList);
+
+	for(int32 i = 0; i < pSourceBank->m_AssetList.size(); ++i)
+	{
+		if(pSourceBank->m_AssetList[i]->GetFilter().isEmpty() == false)
+		{
+			if(m_MetaDir.mkpath(pSourceBank->m_AssetList[i]->GetFilter()) == false)
+				HyGuiLog("SourceModel::OnSaveMeta mkpath() failed", LOGTYPE_Error);
+		}
+
+		for(int32 iSrcFileIndex = 0; iSrcFileIndex < currentChecksumList.size(); ++iSrcFileIndex)
+		{
+			if(pSourceBank->m_AssetList[i]->GetChecksum() == currentChecksumList[iSrcFileIndex])
+			{
+				QFileInfo oldFileInfo(srcFilePathList[iSrcFileIndex]);
+				QFileInfo newFileInfo(m_MetaDir.absoluteFilePath(pSourceBank->m_AssetList[i]->ConstructMetaFileName()));
+				if(oldFileInfo != newFileInfo)
+				{
+					QString sOldFilePath = oldFileInfo.absoluteFilePath();
+					QString sNewFilePath = newFileInfo.absoluteFilePath();
+					QFile::rename(sOldFilePath, sNewFilePath);
+					static_cast<SourceFile *>(pSourceBank->m_AssetList[i])->UpdateChecksum(ComputeFileChecksum(pSourceBank->m_AssetList[i]->GetFilter(), pSourceBank->m_AssetList[i]->GetName()));
+				}
+				
+				break;
+			}
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Now re-generate the CMakeLists.txt
+	QFile file(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "src/CMakeLists.txt");
+	if(!file.open(QFile::ReadOnly))
+	{
+		HyGuiLog("Error reading " % file.fileName() % " when generating CMakeLists.txt: " % file.errorString(), LOGTYPE_Error);
+		return;
+	}
+	QTextCodec *pCodec = QTextCodec::codecForLocale();
+	QString sContents = pCodec->toUnicode(file.readAll());
+	file.close();
+
+	// Replace the template CMakeLists %HY_% variables
+	sContents.replace("%HY_PROJECTNAME%", m_ProjectRef.GetName());
+	sContents.replace("%HY_RELPROJPATH%", m_MetaDir.relativeFilePath(m_ProjectRef.GetDirPath()));
+	sContents.replace("%HY_RELDATADIR%", m_MetaDir.relativeFilePath(m_ProjectRef.GetAssetsAbsPath()));
+	sContents.replace("%HY_RELHARMONYDIR%", m_MetaDir.relativeFilePath(MainWindow::EngineSrcLocation()));
+	sContents.replace("%HY_OUTPUTNAME%", pSourceBank->m_MetaObj["OutputName"].toString());
+
+	QString sSrcFiles;
+	for(int32 i = 0; i < pSourceBank->m_AssetList.size(); ++i)
+	{
+		sSrcFiles += "\t\"" + static_cast<SourceFile *>(pSourceBank->m_AssetList[i])->ConstructMetaFileName();
+		if(i == pSourceBank->m_AssetList.size() - 1)
+			sSrcFiles += "\"";
+		else
+			sSrcFiles += "\"\n";
+	}
+	sContents.replace("%HY_SRCFILES%", sSrcFiles);
+
+	QStringList srcFolderList;
+	for(int32 i = 0; i < pSourceBank->m_AssetList.size(); ++i)
+	{
+		QString sFilter = pSourceBank->m_AssetList[i]->GetFilter();
+		if(sFilter.isEmpty() == false)
+			srcFolderList.push_back(sFilter);
+	}
+	srcFolderList = srcFolderList.toSet().toList(); // Remove duplicates
+	QString sIncludeDirs;
+	for(auto sFolder : srcFolderList)
+		sIncludeDirs += "list(APPEND GAME_INCLUDE_DIRS \"${CMAKE_CURRENT_SOURCE_DIR}/" + sFolder + "\")\n";
+	sContents.replace("%HY_INCLUDEDIRS%", sIncludeDirs);
+
+	sContents.replace("%HY_TITLE%", m_ProjectRef.GetTitle());
+
+	QString sDependAdd;
+	QJsonArray srcDependsArray = pSourceBank->m_MetaObj["SrcDepends"].toArray();
+	for(auto srcDep : srcDependsArray)
+	{
+		QJsonObject srcDepObj = srcDep.toObject();
+
+		sDependAdd += "add_subdirectory(\"";
+		sDependAdd += srcDepObj["RelPath"].toString();
+		sDependAdd += "\" \"";
+		sDependAdd += srcDepObj["ProjectName"].toString();
+		sDependAdd += "\")\n";
+	}
+	sContents.replace("%HY_DEPENDENCIES_ADD%", sDependAdd);
+
+	QString sDependLink;
+	for(auto srcDep : srcDependsArray)
+	{
+		QJsonObject srcDepObj = srcDep.toObject();
+
+		sDependLink += "\"";
+		sDependLink += srcDepObj["ProjectName"].toString();
+		sDependLink += "\" ";
+	}
+	sContents.replace("%HY_DEPENDENCIES_LINK%", sDependLink);
+
+	// Save generated CMakeLists file to destination
+	file.setFileName(m_MetaDir.absoluteFilePath("CMakeLists.txt"));
+	if(!file.open(QFile::WriteOnly))
+	{
+		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
+		return;
+	}
+	file.write(pCodec->fromUnicode(sContents));
+	file.close();
 }
 
 /*virtual*/ QJsonObject SourceModel::GetSaveJson() /*override*/

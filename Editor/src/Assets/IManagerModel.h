@@ -104,7 +104,7 @@ public:
 
 	virtual QString OnBankInfo(uint uiBankIndex) = 0;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;
-	virtual QStringList GetSupportedFileExtList() = 0;
+	virtual QStringList GetSupportedFileExtList() const = 0;
 
 	// Draw occurs when the mouse hovers over the manager widget. ManagerWidget holds the ptr to IManagerDraw, but IManagerModel init/updates the actual concrete IDraw object
 	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) = 0;
@@ -127,6 +127,7 @@ protected:
 	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) = 0;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) = 0; // Must call MoveAsset() on each asset
 
+	virtual void OnSaveMeta() = 0;
 	virtual QJsonObject GetSaveJson() = 0;
 
 private:

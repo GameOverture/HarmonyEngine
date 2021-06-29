@@ -34,6 +34,7 @@ public:
 	virtual QString GetPropertyInfo() override;
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 
+	void UpdateChecksum(quint32 uiChecksum);
 };
 
 #endif // SourceFile_H

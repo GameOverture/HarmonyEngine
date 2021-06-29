@@ -241,7 +241,7 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 
 					if(pLinkedItem == pOpenItem && pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
 					{
-						QString sMessage = "'" % assetsList[i]->GetName() % "' image cannot be replaced because an item that references it is currently opened and unsaved:\n" % pOpenItem->GetName(true);
+						QString sMessage = "'" % assetsList[i]->GetName() % "' asset cannot be replaced because an item that references it is currently opened and unsaved:\n" % pOpenItem->GetName(true);
 						HyGuiLog(sMessage, LOGTYPE_Warning);
 						return;
 					}
@@ -625,6 +625,8 @@ void IManagerModel::SaveMeta()
 
 		settingsFile.close();
 	}
+
+	OnSaveMeta();
 }
 
 void IManagerModel::SaveRuntime()

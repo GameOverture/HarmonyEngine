@@ -120,7 +120,7 @@ QStringList DlgNewBuild::GetProcOptions() const
 								<< ui->cmbCMake->currentText()
 								<< ui->txtCMakeOptions->text().split(' ', Qt::SkipEmptyParts)
 								<< "-S"
-								<< m_ProjectRef.GetDirPath()
+								<< m_ProjectRef.GetMetaDataAbsPath() + HyGlobal::AssetName(ASSET_Source)
 								<< "-B"
 								<< GetAbsBuildDir();
 	}

@@ -39,7 +39,7 @@ public:
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
-	virtual QStringList GetSupportedFileExtList() override;
+	virtual QStringList GetSupportedFileExtList() const override;
 
 	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) override;
 
@@ -54,6 +54,7 @@ protected:
 	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) override;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) override; // Must call MoveAsset() on each asset
 
+	virtual void OnSaveMeta() override;
 	virtual QJsonObject GetSaveJson() override;
 
 private:

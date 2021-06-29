@@ -1,15 +1,15 @@
 #include "pch.h"
-#include "%HY_CODENAME%.h"
+#include "%HY_CLASS%.h"
 
-%HY_CODENAME%::%HY_CODENAME%(HyEntity2d *pParent) :
+%HY_CLASS%::%HY_CLASS%(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 {
 }
 
-/*virtual*/ %HY_CODENAME%::~%HY_CODENAME%()
+/*virtual*/ %HY_CLASS%::~%HY_CLASS%()
 {
 }
 
-/*virtual*/ void %HY_CODENAME%::OnUpdate() /*override*/
+/*virtual*/ void %HY_CLASS%::OnUpdate() /*override*/
 {
 }

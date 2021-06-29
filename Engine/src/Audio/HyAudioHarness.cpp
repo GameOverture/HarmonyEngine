@@ -32,7 +32,7 @@ HyAudioHarness::HyAudioHarness() :
 {
 	using fpAllocateHyAudio					= IHyAudioCore *(*)();
 
-	fpAllocateHyAudio fpAllocateHyAudioCore;
+	fpAllocateHyAudio fpAllocateHyAudioCore = nullptr;
 
 #if defined(HY_USE_SDL2) && !defined(HY_PLATFORM_BROWSER)
 	void *hModule = SDL_LoadObject("HyFMOD");
