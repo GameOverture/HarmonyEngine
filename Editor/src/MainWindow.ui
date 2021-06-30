@@ -697,6 +697,15 @@
     <string>Ctrl+N, Ctrl+I</string>
    </property>
   </action>
+  <action name="actionOpenFolderExplorer">
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Prefix.png</normaloff>:/icons16x16/items/Prefix.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Containing Folder In Explorer</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

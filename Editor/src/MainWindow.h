@@ -90,6 +90,7 @@ private Q_SLOTS:
 	void on_actionOpenProject_triggered();
 	void on_actionCloseProject_triggered();
 	void on_actionProjectSettings_triggered();
+	void on_actionOpenFolderExplorer_triggered();
 
 	void on_actionNewPrefix_triggered();
 	void on_actionNewAudio_triggered();

@@ -25,7 +25,7 @@ class SourceFile : public AssetItemData
 public:
 	SourceFile(IManagerModel &modelRef,
 			   QUuid uuid,
-			   quint32 uiChecksum,			// Checksum is the (filter path + filename) string all lowercase (with forward slashes / )
+			   quint32 uiChecksum,			// Checksum is the (filter path + filename) string all lowercase with forward slashes ('/'). No filter will not have any forward slashes.
 			   QString fileName,			// Includes file extension
 			   uint uiErrors);
 	~SourceFile();

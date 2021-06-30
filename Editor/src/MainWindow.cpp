@@ -84,6 +84,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionNewBuild);
 	ui->explorer->addAction(ui->actionImportTileSheet);
 	ui->explorer->addAction(ui->actionActivateProject);
+	ui->explorer->addAction(ui->actionOpenFolderExplorer);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// FIRST RUN CHECK - Ensure Harmony Engine project location has been specified
@@ -544,6 +545,35 @@ void MainWindow::on_actionProjectSettings_triggered()
 	DlgProjectSettings dlg(*pProj, this);
 	if(dlg.exec() == QDialog::Accepted && dlg.HasSettingsChanged())
 		pProj->SaveSettingsObj(dlg.GetNewSettingsObj());
+}
+
+void MainWindow::on_actionOpenFolderExplorer_triggered()
+{
+	Project *pProj = nullptr;
+	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+	if(pFirstSelected != nullptr)
+		pProj = &pFirstSelected->GetProject();
+
+	if(pProj == nullptr)
+		return;
+
+#if defined(Q_OS_MACOS)
+	QStringList args;
+	args << "-e";
+	args << "tell application \"Finder\"";
+	args << "-e";
+	args << "activate";
+	args << "-e";
+	args << "select POSIX file \"" + pProj->GetAbsPath() + "\"";
+	args << "-e";
+	args << "end tell";
+	QProcess::startDetached("osascript", args);
+#elif defined(Q_OS_WIN)
+	QStringList args;
+	args << "/select," << QDir::toNativeSeparators(pProj->GetAbsPath());
+	QProcess::startDetached("explorer", args);
+#endif
 }
 
 void MainWindow::on_actionNewPrefix_triggered()

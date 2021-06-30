@@ -249,6 +249,8 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			contextMenu.addSeparator();
 			contextMenu.addAction(FINDACTION("actionCloseProject"));
 			contextMenu.addAction(FINDACTION("actionProjectSettings"));
+			contextMenu.addSeparator();
+			contextMenu.addAction(FINDACTION("actionOpenFolderExplorer"));
 			break;
 		case ITEM_Audio:
 		case ITEM_Particles:
