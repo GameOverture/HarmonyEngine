@@ -49,7 +49,7 @@ SourceModel::SourceModel(Project &projRef) :
 	SourceSettingsDlg *pDlg = new SourceSettingsDlg(m_ProjectRef, m_BanksModel.GetBank(uiBankIndex)->m_MetaObj);
 	if(QDialog::Accepted == pDlg->exec())
 	{
-		m_BanksModel.GetBank(uiBankIndex)->m_MetaObj = pDlg->GetMetaObj();
+		pDlg->UpdateMetaObj(m_BanksModel.GetBank(uiBankIndex)->m_MetaObj);
 
 		SaveMeta();
 		bAccepted = true;

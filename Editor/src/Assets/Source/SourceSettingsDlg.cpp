@@ -34,7 +34,6 @@ SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject sett
 
 		m_SrcDependencyList.append(new WgtSrcDependency(this));
 		m_SrcDependencyList[m_SrcDependencyList.count() - 1]->Set(depObj["ProjectName"].toString(), metaDir.absolutePath());
-
 		ui->lytDependencies->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
 		connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &SourceSettingsDlg::ErrorCheck);
 	}
@@ -83,6 +82,7 @@ void SourceSettingsDlg::Refresh()
 	if(m_SrcDependencyList.empty())
 	{
 		m_SrcDependencyList.append(new WgtSrcDependency(this));
+		ui->lytDependencies->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
 		connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &SourceSettingsDlg::ErrorCheck);
 		return;
 	}
@@ -108,10 +108,9 @@ void SourceSettingsDlg::Refresh()
 	ErrorCheck();
 }
 
-QJsonObject SourceSettingsDlg::GetMetaObj() const
+void SourceSettingsDlg::UpdateMetaObj(QJsonObject &metaObjRef) const
 {
-	QJsonObject metaObj;
-	metaObj.insert("OutputName", ui->txtOutputName->text());
+	metaObjRef.insert("OutputName", ui->txtOutputName->text());
 
 	QDir metaDir(m_ProjectRef.GetMetaDataAbsPath() % HyGlobal::AssetName(ASSET_Source));
 	QJsonArray srcDependsArray;
@@ -123,9 +122,7 @@ QJsonObject SourceSettingsDlg::GetMetaObj() const
 
 		srcDependsArray.append(srcDepObj);
 	}
-	metaObj.insert("SrcDepends", srcDependsArray);
-
-	return metaObj;
+	metaObjRef.insert("SrcDepends", srcDependsArray);
 }
 
 void SourceSettingsDlg::on_txtOutputName_textChanged(const QString &arg1)

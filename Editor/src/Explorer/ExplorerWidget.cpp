@@ -357,6 +357,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	FINDACTION("actionNewEntity")->setEnabled(bValidItem);
 	FINDACTION("actionNewPrefab")->setEnabled(bValidItem);
 	FINDACTION("actionNewEntity3d")->setEnabled(bValidItem);
+	FINDACTION("actionBuildSettings")->setEnabled(bValidItem);
 	FINDACTION("actionNewBuild")->setEnabled(bValidItem);
 	FINDACTION("actionImportTileSheet")->setEnabled(bValidItem);
 

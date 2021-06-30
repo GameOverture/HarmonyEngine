@@ -107,6 +107,7 @@ private Q_SLOTS:
 
 	void on_menu_View_aboutToShow();
 	
+	void on_actionBuildSettings_triggered();
 	void on_actionNewBuild_triggered();
 	void on_actionOpenIde_triggered(QAction *pAction);
 	void on_actionNewPackage_triggered();

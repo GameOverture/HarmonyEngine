@@ -56,6 +56,8 @@ void WgtSrcDependency::Set(QString sProjectName, QString sDependAbsPath)
 	ui->txtProjectName->setText(sProjectName);
 	m_sAbsSrcDepPath = sDependAbsPath;
 
+	ui->stackedWidget->setCurrentIndex(1);
+
 	Refresh();
 }
 

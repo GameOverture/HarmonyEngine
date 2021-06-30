@@ -24,6 +24,7 @@
 #include "ExplorerWidget.h"
 #include "AudioAssetsWidget.h"
 #include "ManagerWidget.h"
+#include "SourceModel.h"
 
 #include <QFileDialog>
 #include <QShowEvent>
@@ -81,6 +82,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionPaste);
 	ui->explorer->addAction(ui->actionRemove);
 	ui->explorer->addAction(ui->actionRename);
+	ui->explorer->addAction(ui->actionBuildSettings);
 	ui->explorer->addAction(ui->actionNewBuild);
 	ui->explorer->addAction(ui->actionImportTileSheet);
 	ui->explorer->addAction(ui->actionActivateProject);
@@ -690,6 +692,17 @@ void MainWindow::on_menu_View_aboutToShow()
 	ui->menu_View->addActions(pPopupMenu->actions());
 }
 
+void MainWindow::on_actionBuildSettings_triggered()
+{
+	if(Harmony::GetProject() == nullptr)
+	{
+		HyGuiLog("on_actionBuildSettings_triggered invoked with no loaded project", LOGTYPE_Error);
+		return;
+	}
+
+	Harmony::GetProject()->GetSourceModel().OnBankSettingsDlg(0);
+}
+
 void MainWindow::on_actionNewBuild_triggered()
 {
 	if(Harmony::GetProject() == nullptr)
@@ -893,6 +906,7 @@ void MainWindow::RefreshBuildMenu()
 {
 	// Clean out existing actionOpenIde's
 	ui->menu_Build->clear();
+	ui->menu_Build->addAction(ui->actionBuildSettings);
 	ui->menu_Build->addAction(ui->actionNewBuild);
 
 	if(Harmony::GetProject() == nullptr)

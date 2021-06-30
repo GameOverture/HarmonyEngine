@@ -41,7 +41,7 @@ public:
 
 	void Refresh();
 
-	QJsonObject GetMetaObj() const;
+	void UpdateMetaObj(QJsonObject &metaObjRef) const;
 
 private Q_SLOTS:
 	void on_txtOutputName_textChanged(const QString &arg1);

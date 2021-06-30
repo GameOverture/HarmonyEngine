@@ -120,6 +120,7 @@
     <property name="title">
      <string>&amp;Build</string>
     </property>
+    <addaction name="actionBuildSettings"/>
     <addaction name="actionNewBuild"/>
     <addaction name="separator"/>
     <addaction name="actionNewPackage"/>
@@ -704,6 +705,21 @@
    </property>
    <property name="text">
     <string>Open Containing Folder In Explorer</string>
+   </property>
+  </action>
+  <action name="actionBuildSettings">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Build-Settings.png</normaloff>:/icons16x16/items/Build-Settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Build Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Change build settings for currently active project</string>
    </property>
   </action>
  </widget>
