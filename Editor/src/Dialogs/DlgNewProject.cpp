@@ -114,7 +114,6 @@ void DlgNewProject::on_buttonBox_accepted()
 	QJsonObject jsonObj;
 	jsonObj.insert("$fileVersion", HYGUI_FILE_VERSION);
 	jsonObj.insert("Title", ui->txtTitleName->text());
-	jsonObj.insert("CodeName", ui->txtCodeName->text());
 	jsonObj.insert("DataPath", QString(ui->wgtDataDir->GetRelPath() + "/"));
 	jsonObj.insert("MetaDataPath", QString(ui->wgtMetaDir->GetRelPath() + "/"));
 	jsonObj.insert("BuildPath", QString(ui->wgtBuildDir->GetRelPath() + "/"));

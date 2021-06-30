@@ -26,14 +26,13 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 	QJsonObject projSettingsObj = m_ProjectRef.GetSettingsObj();
 
 	ui->txtTitleName->setText(projSettingsObj["Title"].toString());
-	ui->txtCodeName->setText(projSettingsObj["CodeName"].toString());
+	ui->txtCodeName->setText(projectRef.GetName());
 
 	ui->txtAssetsLocation->setText(projSettingsObj["DataPath"].toString());
 	ui->txtMetaDataLocation->setText(projSettingsObj["MetaDataPath"].toString());
 
 	ui->sbInputMaps->setValue(projSettingsObj["NumInputMappings"].toInt());
 	ui->sbUpdateFpsCap->setValue(projSettingsObj["UpdateFpsCap"].toInt());
-	ui->sbPixelsPerMeter->setValue(projSettingsObj["PixelsPerMeter"].toInt());
 	ui->chkShowCursor->setChecked(projSettingsObj["ShowCursor"].toBool());
 
 	setWindowTitle(m_ProjectRef.GetTitle() % " Settings");

@@ -149,7 +149,7 @@
 			Patch_5to6(projDoc);
 		case 6:
 			HyGuiLog("Patching project files: version 6 -> 7", LOGTYPE_Info);
-			Patch_6to7(projDoc);
+			Patch_6to7(pProj, projDoc);
 		case 7:
 			// current version
 			static_assert(HYGUI_FILE_VERSION == 7, "Improper file version set in VersionPatcher");
@@ -752,12 +752,33 @@
 	projDocRef.setObject(projObj);
 }
 
-/*static*/ void VersionPatcher::Patch_6to7(QJsonDocument &projDocRef)
+/*static*/ void VersionPatcher::Patch_6to7(Project *pProj, QJsonDocument &projDocRef)
 {
 	QJsonObject projObj = projDocRef.object();
+
+	// Copy source code into new <meta>/Source location
+	QDir oldSrcDir(pProj->GetDirPath() + projObj["SourcePath"].toString());
+	QDir newSrcDir(pProj->GetDirPath() + projObj["MetaDataPath"].toString() + HyGlobal::AssetName(ASSET_Source));
+	newSrcDir.mkpath(".");
+
+	QStringList sFoundSourceFileAppendList;
+	HyGlobal::RecursiveFindFileOfExt("cpp", sFoundSourceFileAppendList, oldSrcDir);
+	HyGlobal::RecursiveFindFileOfExt("h", sFoundSourceFileAppendList, oldSrcDir);
+	for(auto sSrcFile : sFoundSourceFileAppendList)
+	{
+		QFileInfo srcFileInfo(sSrcFile);
+		QFile::copy(srcFileInfo.absoluteFilePath(), newSrcDir.absoluteFilePath(srcFileInfo.fileName()));
+	}
+
+	// Rename GameName -> Title
 	QString sTitle = projObj["GameName"].toString();
 	projObj.remove("GameName");
 	projObj.insert("Title", sTitle);
+
+	// No longer used
+	projObj.remove("CodeName");
+	projObj.remove("PixelsPerMeter");
+
 	projDocRef.setObject(projObj);
 }
 
