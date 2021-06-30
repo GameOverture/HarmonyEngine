@@ -327,7 +327,7 @@
 			if(info.isDir())// && info.fileName() != ".." && info.fileName() != ".")
 			{
 				QDir subDir(info.filePath());
-				QFileInfoList subList = subDir.entryInfoList();
+				QFileInfoList subList = subDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
 
 				dirStack.push(subList);
 			}

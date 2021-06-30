@@ -2,6 +2,8 @@
 #include "VersionPatcher.h"
 #include "Project.h"
 
+#include <QMessageBox>
+
 /*static*/ bool VersionPatcher::Run(Project *pProj)
 {
 	// ************************************************************
@@ -780,6 +782,8 @@
 	projObj.remove("PixelsPerMeter");
 
 	projDocRef.setObject(projObj);
+
+	QMessageBox::information(nullptr, "Version Patcher 6->7", "You will need to delete and regenerate any builds for project '" % sTitle % "'");
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)
