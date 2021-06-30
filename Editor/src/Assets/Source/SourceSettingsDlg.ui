@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>619</width>
-    <height>144</height>
+    <height>179</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -43,6 +43,20 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chkUseGlfw">
+     <property name="text">
+      <string>Use GLFW for windowing, glcontext, input, and time instead of SDL2</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chkUseSdlNet">
+     <property name="text">
+      <string>Use SDL_NET for networking sockets</string>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QVBoxLayout" name="lytDependencies"/>

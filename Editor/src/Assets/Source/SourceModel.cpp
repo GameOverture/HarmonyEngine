@@ -243,6 +243,8 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 {
 	newMetaBankObjRef["OutputName"] = m_ProjectRef.GetName();
 	newMetaBankObjRef["SrcDepends"] = QJsonArray();
+	newMetaBankObjRef["UseGlfw"] = false;
+	newMetaBankObjRef["UseSdlNet"] = false;
 }
 
 /*virtual*/ AssetItemData *SourceModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
@@ -433,6 +435,16 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	sContents.replace("%HY_RELDATADIR%", m_MetaDir.relativeFilePath(m_ProjectRef.GetAssetsAbsPath()));
 	sContents.replace("%HY_RELHARMONYDIR%", m_MetaDir.relativeFilePath(MainWindow::EngineSrcLocation()));
 	sContents.replace("%HY_OUTPUTNAME%", pSourceBank->m_MetaObj["OutputName"].toString());
+
+	if(pSourceBank->m_MetaObj["UseGlfw"].toBool())
+		sContents.replace("%HY_USEGLFW%", "set(HYBUILD_GLFW ON)");
+	else
+		sContents.replace("%HY_USEGLFW%", "set(HYBUILD_GLFW OFF)");
+
+	if(pSourceBank->m_MetaObj["UseSdlNet"].toBool())
+		sContents.replace("%HY_USESDLNET%", "set(HYBUILD_SDL_NET ON)");
+	else
+		sContents.replace("%HY_USESDLNET%", "set(HYBUILD_SDL_NET OFF)");
 
 	QString sSrcFiles;
 	for(int32 i = 0; i < pSourceBank->m_AssetList.size(); ++i)
