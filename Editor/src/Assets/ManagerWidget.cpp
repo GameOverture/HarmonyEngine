@@ -160,7 +160,10 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->setupUi(this);
 
 	if(m_pModel->IsSingleBank())
+	{
 		ui->grpBank->hide();
+		ui->chkShowAllBanks->hide();
+	}
 
 	m_pModel->OnAllocateDraw(m_pDraw);
 
@@ -179,6 +182,12 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->assetTree->setSortingEnabled(true);
 	ui->assetTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->assetTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
+
+	// Setup Actions
+	ui->actionImportAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_None));
+	ui->actionImportDirectory->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Open));
+	ui->actionDeleteAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Delete));
+	ui->actionAssetSettings->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Settings));
 
 	ui->actionDeleteAssets->setEnabled(false);
 	ui->actionReplaceAssets->setEnabled(false);
@@ -489,24 +498,6 @@ void ManagerWidget::on_assetTree_clicked()
 	ui->actionRename->setEnabled(iNumSelected == 1 || selectedFiltersList.empty() == false);
 	ui->actionDeleteAssets->setEnabled(iNumSelected != 0);
 	ui->actionReplaceAssets->setEnabled(iNumSelected != 0);
-
-	// Determine the best suited icon based on selection
-	HyGuiItemType eIconType = ITEM_Unknown;
-	for(int i = 0; i < selectedAssetsList.size(); ++i)
-	{
-		if(selectedAssetsList[i]->GetType() == ITEM_Filter)
-		{
-			ui->actionReplaceAssets->setEnabled(false);
-
-			if(eIconType != ITEM_AtlasImage)
-				eIconType = ITEM_Filter;
-		}
-		else
-			eIconType = ITEM_AtlasImage;
-	}
-
-	if(eIconType != ITEM_Unknown)
-		ui->actionDeleteAssets->setIcon(HyGlobal::ItemIcon(eIconType, SUBICON_Delete));
 }
 
 void ManagerWidget::on_actionRename_triggered()

@@ -202,6 +202,25 @@
 	return "";
 }
 
+/*static*/ const QIcon HyGlobal::AssetIcon(AssetType eAsset, SubIcon eSubIcon)
+{
+	switch(eAsset)
+	{
+	case ASSET_Source:
+		return sm_ItemIcons[ITEM_Source][eSubIcon];
+	case ASSET_Atlas:
+		return sm_ItemIcons[ITEM_AtlasImage][eSubIcon];
+	case ASSET_Prefabs:
+		return sm_ItemIcons[ITEM_Prefab][eSubIcon];
+	case ASSET_Audio:
+		return sm_ItemIcons[ITEM_Audio][eSubIcon];
+
+	case ASSET_Unknown:
+	default:
+		return QIcon();
+	}
+}
+
 /*static*/ const QString HyGlobal::GetGuiFrameErrors(uint uiErrorFlags)
 {
 	QString sErrorString;
@@ -291,7 +310,7 @@
 		sExt.remove(0, 1);
 	sExt = sExt.toLower();
 
-	QFileInfoList list = dirEntry.entryInfoList();
+	QFileInfoList list = dirEntry.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
 	QStack<QFileInfoList> dirStack;
 	dirStack.push(list);
 
@@ -305,7 +324,7 @@
 			QString sFilePath = info.filePath();
 			QString sSuffix = info.suffix().toLower();
 
-			if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
+			if(info.isDir())// && info.fileName() != ".." && info.fileName() != ".")
 			{
 				QDir subDir(info.filePath());
 				QFileInfoList subList = subDir.entryInfoList();

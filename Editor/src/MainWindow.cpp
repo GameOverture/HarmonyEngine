@@ -202,14 +202,14 @@ MainWindow::MainWindow(QWidget *pParent) :
 	statusBar()->addWidget(&m_LoadingMsg);
 	statusBar()->addWidget(&m_LoadingBar);
 
-	QPixmap *pPixmap = new QPixmap(":/icons16x16/smiley-sad.gif");
-	QLabel *pSvnStatusIcon = new QLabel;
-	pSvnStatusIcon->setPixmap(*pPixmap);
-	statusBar()->addPermanentWidget(pSvnStatusIcon);
+	//QPixmap *pPixmap = new QPixmap(":/icons16x16/smiley-sad.gif");
+	//QLabel *pSvnStatusIcon = new QLabel;
+	//pSvnStatusIcon->setPixmap(*pPixmap);
+	//statusBar()->addPermanentWidget(pSvnStatusIcon);
 
-	QLabel *pSvnLoginLabel = new QLabel;
-	pSvnLoginLabel->setText("SVN Not Detected");
-	statusBar()->addPermanentWidget(pSvnLoginLabel);
+	//QLabel *pSvnLoginLabel = new QLabel;
+	//pSvnLoginLabel->setText("SVN Not Detected");
+	//statusBar()->addPermanentWidget(pSvnLoginLabel);
 
 	HyGuiLog("Ready to go!", LOGTYPE_Normal);
 }

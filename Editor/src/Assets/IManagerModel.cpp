@@ -174,6 +174,7 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, H
 	for(int i = 0; i < returnList.size(); ++i)
 		InsertTreeItem(returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
 
+	SaveMeta();
 	return true;
 }
 
@@ -215,6 +216,7 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 	}
 
 	OnRemoveAssets(assetsList);
+	SaveMeta();
 }
 
 void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets)
@@ -292,6 +294,8 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 		if(affectedItemList[i]->Save(i == (affectedItemList.size() - 1)) == false)
 			HyGuiLog(affectedItemList[i]->GetName(true) % " failed to save after replacing assets", LOGTYPE_Error);
 	}
+
+	SaveMeta();
 }
 
 void IManagerModel::Rename(TreeModelItemData *pItem, QString sNewName)

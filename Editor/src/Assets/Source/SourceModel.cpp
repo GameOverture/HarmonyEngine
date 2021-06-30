@@ -139,7 +139,6 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 		for(int i = 0; i < fileInfoList.count(); i++)
 		{
 			QFileInfo info = fileInfoList[i];
-			QString sTest = info.absoluteFilePath();
 			if(info.isDir())
 			{
 				QDir subDir(info.filePath());
@@ -356,6 +355,8 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// First ensure all source files are residing in their proper folder on disk (represented here with filters)
+	// If any changes need to be made, the file's checksum will also be updated and the .meta file will need to be resaved
+	bool bResaveMeta = false;
 	QStringList srcFilePathList;
 	QList<quint32> currentChecksumList;
 	GatherSourceFiles(srcFilePathList, currentChecksumList);
@@ -380,11 +381,38 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 					QString sNewFilePath = newFileInfo.absoluteFilePath();
 					QFile::rename(sOldFilePath, sNewFilePath);
 					static_cast<SourceFile *>(pSourceBank->m_AssetList[i])->UpdateChecksum(ComputeFileChecksum(pSourceBank->m_AssetList[i]->GetFilter(), pSourceBank->m_AssetList[i]->GetName()));
+
+					bResaveMeta = true;
 				}
 				
 				break;
 			}
 		}
+	}
+
+	// Clear out any empty directories that are no longer used
+	QFileInfoList metaInfoList = m_MetaDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+	for(int i = 0; i < metaInfoList.count(); i++)
+	{
+		QFileInfo info = metaInfoList[i];
+		if(info.isDir())
+		{
+			QDir subDir(info.filePath());
+			QStringList sFoundFilesAppendList;
+
+			QStringList sExtList = GetSupportedFileExtList();
+			for(auto sExt : sExtList)
+				HyGlobal::RecursiveFindFileOfExt(sExt, sFoundFilesAppendList, subDir);
+
+			if(sFoundFilesAppendList.empty())
+				subDir.removeRecursively();
+		}
+	}
+
+	if(bResaveMeta)
+	{
+		SaveMeta(); // Recursive call here, that shouldn't ever occur twice in a row
+		return;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

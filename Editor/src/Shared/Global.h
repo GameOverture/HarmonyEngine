@@ -194,6 +194,7 @@ public:
 	static const QString AssetName(AssetType eAsset)					{ return sm_AssetNames[eAsset]; }
 	static const QString ItemExt(HyGuiItemType eItem);
 	static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)	{ return sm_ItemIcons[eItm][eSubIcon]; }
+	static const QIcon AssetIcon(AssetType eAsset, SubIcon eSubIcon);
 	static const QColor ItemColor(HyGuiItemType eItem)					{ return sm_ItemColors[eItem]; }
 	static const QString ThemeString(Theme eTheme)						{ return sm_Themes[eTheme]; }
 
