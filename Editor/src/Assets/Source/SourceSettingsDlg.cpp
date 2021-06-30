@@ -32,10 +32,12 @@ SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject sett
 		if(metaDir.cd(depObj["RelPath"].toString()) == false)
 			HyGuiLog("SourceSettingsDlg could not derive absolute dependency path", LOGTYPE_Error);
 
-		m_SrcDependencyList.append(new WgtSrcDependency(this));
-		m_SrcDependencyList[m_SrcDependencyList.count() - 1]->Set(depObj["ProjectName"].toString(), metaDir.absolutePath());
-		ui->lytDependencies->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
-		connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &SourceSettingsDlg::ErrorCheck);
+		WgtSrcDependency *pNewWgtSrcDep = new WgtSrcDependency(this);
+		pNewWgtSrcDep->Set(depObj["ProjectName"].toString(), metaDir.absolutePath());
+
+		m_SrcDependencyList.append(pNewWgtSrcDep);
+		ui->lytDependencies->addWidget(pNewWgtSrcDep);
+		connect(pNewWgtSrcDep, &WgtSrcDependency::OnDirty, this, &SourceSettingsDlg::ErrorCheck);
 	}
 
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
@@ -55,15 +57,6 @@ QString SourceSettingsDlg::GetProjectDir() const
 	return m_ProjectRef.GetDirPath();
 }
 
-void SourceSettingsDlg::AddSrcDep()
-{
-	m_SrcDependencyList.append(new WgtSrcDependency(this));
-	ui->lytDependencies->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
-	connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &SourceSettingsDlg::ErrorCheck);
-
-	Refresh();
-}
-
 void SourceSettingsDlg::RemoveSrcDep(WgtSrcDependency *pRemoved)
 {
 	for(int i = 0; i < m_SrcDependencyList.count(); ++i)
@@ -79,14 +72,6 @@ void SourceSettingsDlg::RemoveSrcDep(WgtSrcDependency *pRemoved)
 
 void SourceSettingsDlg::Refresh()
 {
-	if(m_SrcDependencyList.empty())
-	{
-		m_SrcDependencyList.append(new WgtSrcDependency(this));
-		ui->lytDependencies->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
-		connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &SourceSettingsDlg::ErrorCheck);
-		return;
-	}
-
 	if(ui->lytDependencies->count() != m_SrcDependencyList.count())
 	{
 		if(ui->lytDependencies->count() < m_SrcDependencyList.count())
@@ -99,10 +84,6 @@ void SourceSettingsDlg::Refresh()
 			for(int i = m_SrcDependencyList.count(); i < ui->lytDependencies->count() - 1; ++i) // Keep at least '1'
 				delete ui->lytDependencies->takeAt(i);
 		}
-
-		// Remove and re-add the layout that holds SrcDependency widgets. Otherwise it jumbles them together.
-		//ui->grpAdvanced->layout()->removeItem(ui->lytDependencies);
-		//ui->grpAdvanced->layout()->addItem(ui->lytDependencies);
 	}
 
 	ErrorCheck();
@@ -135,18 +116,36 @@ void SourceSettingsDlg::ErrorCheck()
 	bool bIsError = false;
 	do
 	{
-		QString sError;
+		if(ui->txtOutputName->text().isEmpty())
+		{
+			ui->lblError->setText("'Output Name' cannot be blank");
+			bIsError = true;
+			break;
+		}
+
 		for(auto srcDep : m_SrcDependencyList)
 		{
-			sError = srcDep->GetError();
+			QString sError = srcDep->GetError();
 			if(sError.isEmpty() == false)
 			{
+				ui->lblError->setText(sError);
 				bIsError = true;
 				break;
 			}
 		}
+		if(bIsError)
+			break;
 	}while(false);
 
 	ui->lblError->setVisible(bIsError);
 	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
+}
+
+void SourceSettingsDlg::on_btnAddDependency_clicked()
+{
+	m_SrcDependencyList.append(new WgtSrcDependency(this));
+	ui->lytDependencies->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
+	connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &SourceSettingsDlg::ErrorCheck);
+
+	Refresh();
 }

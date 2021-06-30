@@ -21,8 +21,6 @@ WgtSrcDependency::WgtSrcDependency(SourceSettingsDlg *pParentDlg, QWidget *pPare
 	m_pParentDlg(pParentDlg)
 {
 	ui->setupUi(this);
-	ui->stackedWidget->setCurrentIndex(0);
-
 	ui->txtProjectName->setValidator(HyGlobal::FileNameValidator());
 }
 
@@ -31,20 +29,10 @@ WgtSrcDependency::WgtSrcDependency(SourceSettingsDlg *pParentDlg, QWidget *pPare
 	delete ui;
 }
 
-bool WgtSrcDependency::IsActivated() const
-{
-	return ui->stackedWidget->currentIndex() != 0;
-}
-
 QString WgtSrcDependency::GetProjectName() const
 {
 	return ui->txtProjectName->text();
 }
-
-//QString WgtSrcDependency::GetRelPath() const
-//{
-//	return ui->txtRelativePath->text();
-//}
 
 QString WgtSrcDependency::GetAbsPath() const
 {
@@ -56,20 +44,8 @@ void WgtSrcDependency::Set(QString sProjectName, QString sDependAbsPath)
 	ui->txtProjectName->setText(sProjectName);
 	m_sAbsSrcDepPath = sDependAbsPath;
 
-	ui->stackedWidget->setCurrentIndex(1);
-
 	Refresh();
 }
-
-//void WgtSrcDependency::ResetProjDir(QString sNewProjDirPath)
-//{
-//	if(m_sAbsSrcDepPath == m_sAbsProjPath)
-//		m_sAbsSrcDepPath = sNewProjDirPath;
-//
-//	m_sAbsProjPath = sNewProjDirPath;
-//
-//	Refresh();
-//}
 
 void WgtSrcDependency::Refresh()
 {
@@ -88,9 +64,6 @@ void WgtSrcDependency::Refresh()
 QString WgtSrcDependency::GetError()
 {
 	QString sError; // Empty string indicates no error
-
-	if(ui->stackedWidget->currentIndex() == 0)
-		return sError;
 
 	do
 	{
@@ -128,15 +101,8 @@ QString WgtSrcDependency::GetError()
 	return sError;
 }
 
-void WgtSrcDependency::on_btnAddDependency_clicked()
-{
-	ui->stackedWidget->setCurrentIndex(1);
-	m_pParentDlg->AddSrcDep();
-}
-
 void WgtSrcDependency::on_btnRemoveDependency_clicked()
 {
-	ui->stackedWidget->setCurrentIndex(0);
 	m_pParentDlg->RemoveSrcDep(this);
 }
 

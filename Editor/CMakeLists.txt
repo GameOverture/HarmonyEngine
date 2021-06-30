@@ -204,9 +204,6 @@ if(Qt5_DIR)
 		src/Widget/WgtSrcDependency.cpp
 		src/Widget/WgtSrcDependency.h
 		src/Widget/WgtSrcDependency.ui
-		src/Widget/WgtSrcDepGrp.cpp
-		src/Widget/WgtSrcDepGrp.h
-		src/Widget/WgtSrcDepGrp.ui
 		src/Widget/WidgetColor.cpp
 		src/Widget/WidgetGradientEditor.cpp
 		src/Widget/WidgetLiveVariable.cpp

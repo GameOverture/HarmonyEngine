@@ -36,7 +36,6 @@ public:
 
 	QString GetProjectDir() const;
 	
-	void AddSrcDep();
 	void RemoveSrcDep(WgtSrcDependency *pRemoved);
 
 	void Refresh();
@@ -45,6 +44,8 @@ public:
 
 private Q_SLOTS:
 	void on_txtOutputName_textChanged(const QString &arg1);
+
+	void on_btnAddDependency_clicked();
 
 private:
 	void ErrorCheck();

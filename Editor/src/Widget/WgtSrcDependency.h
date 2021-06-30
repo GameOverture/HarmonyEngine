@@ -29,20 +29,16 @@ public:
 	explicit WgtSrcDependency(SourceSettingsDlg *pParentDlg, QWidget *pParent = nullptr);
 	virtual ~WgtSrcDependency();
 
-	bool IsActivated() const;
-
 	QString GetProjectName() const;
-	//QString GetRelPath() const;
 	QString GetAbsPath() const;
 
 	void Set(QString sProjectName, QString sDependAbsPath);
-	//void ResetProjDir(QString sNewProjDirPath);
 
 	void Refresh();
+
 	QString GetError();
 	
 private Q_SLOTS:
-	void on_btnAddDependency_clicked();
 	void on_btnRemoveDependency_clicked();
 	void on_btnBrowseDir_clicked();
 	void on_txtProjectName_textChanged(const QString &arg1);
