@@ -109,7 +109,6 @@ private Q_SLOTS:
 	
 	void on_actionBuildSettings_triggered();
 	void on_actionNewBuild_triggered();
-	void on_actionOpenIde_triggered(QAction *pAction);
 	void on_actionNewPackage_triggered();
 
 	void on_actionConnect_triggered();

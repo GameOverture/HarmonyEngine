@@ -36,6 +36,9 @@ if(Qt5_DIR)
 		src/Assets/Source/SourceFile.h
 		src/Assets/Source/SourceModel.cpp
 		src/Assets/Source/SourceModel.h
+		src/Assets/Source/SourceGenFileDlg.cpp
+		src/Assets/Source/SourceGenFileDlg.h
+		src/Assets/Source/SourceGenFileDlg.ui
 		src/Assets/Source/SourceSettingsDlg.cpp
 		src/Assets/Source/SourceSettingsDlg.h
 		src/Assets/Source/SourceSettingsDlg.ui

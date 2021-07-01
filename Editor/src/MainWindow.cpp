@@ -560,22 +560,7 @@ void MainWindow::on_actionOpenFolderExplorer_triggered()
 	if(pProj == nullptr)
 		return;
 
-#if defined(Q_OS_MACOS)
-	QStringList args;
-	args << "-e";
-	args << "tell application \"Finder\"";
-	args << "-e";
-	args << "activate";
-	args << "-e";
-	args << "select POSIX file \"" + pProj->GetAbsPath() + "\"";
-	args << "-e";
-	args << "end tell";
-	QProcess::startDetached("osascript", args);
-#elif defined(Q_OS_WIN)
-	QStringList args;
-	args << "/select," << QDir::toNativeSeparators(pProj->GetAbsPath());
-	QProcess::startDetached("explorer", args);
-#endif
+	HyGlobal::OpenFileInExplorer(pProj->GetAbsPath());
 }
 
 void MainWindow::on_actionNewPrefix_triggered()
@@ -770,12 +755,6 @@ void MainWindow::on_actionNewBuild_triggered()
 //	QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
 }
 
-void MainWindow::on_actionOpenIde_triggered(QAction *pAction)
-{
-	QString sIdeFilePath = pAction->data().toString();
-	QDesktopServices::openUrl(QUrl(sIdeFilePath));
-}
-
 void MainWindow::on_actionNewPackage_triggered()
 {
 	if(Harmony::GetProject() == nullptr)
@@ -819,7 +798,7 @@ void MainWindow::on_actionImportTileSheet_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-	QMessageBox::about(this, HyEditorToolName, "Harmony Engine and Editor Tool\n\nJason Knobler " % QString::number(QDate::currentDate().year()) %
+	QMessageBox::about(this, HyEditorToolName, "Harmony Engine and Editor Tool\n\nJason Knobler 2012-" % QString::number(QDate::currentDate().year()) %
 											   "\n\nFile Version: " % QString::number(HYGUI_FILE_VERSION) %
 											   "\nHarmony: " % m_sEnginePath);
 }
@@ -922,24 +901,33 @@ void MainWindow::RefreshBuildMenu()
 		QDir dir(buildDir.absolutePath() % "/" % sDirName);
 		QFileInfoList buildFileInfoList = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 		
+		QString sBestAbsFilePath = dir.absolutePath();
+		bool bIdeFileFound = false;
 		for(auto fileInfo : buildFileInfoList)
 		{
 			// Look for .sln (Visual Studio)
-			if(fileInfo.completeSuffix().compare("sln", Qt::CaseInsensitive) == 0)
+			if(fileInfo.suffix().compare("sln", Qt::CaseInsensitive) == 0)
 			{
-				if(pBuildsMenu == nullptr)
-					pBuildsMenu = ui->menu_Build->addMenu(QIcon(":/icons16x16/items/Build-Open.png"), "Builds");
-
-				QAction *pActionOpenIde = new QAction(pBuildsMenu);
-				pActionOpenIde->setText(sDirName);
-				pActionOpenIde->setIcon(QIcon(":/icons16x16/code.png"));
-				pActionOpenIde->setData(fileInfo.absoluteFilePath());
-
-				connect(pBuildsMenu, SIGNAL(triggered(QAction *)), this, SLOT(MainWindow::on_actionOpenIde_triggered(QAction)));
-				pBuildsMenu->addAction(pActionOpenIde);
+				sBestAbsFilePath = fileInfo.absoluteFilePath();
+				bIdeFileFound = true;
+				break;
 			}
 			// TODO: scan for other popular IDE's
 		}
+
+		// Setup the action and its trigger
+		if(pBuildsMenu == nullptr)
+			pBuildsMenu = ui->menu_Build->addMenu(QIcon(":/icons16x16/items/Build-Open.png"), "Builds");
+
+		QAction *pActionOpenIde = new QAction(pBuildsMenu);
+		pActionOpenIde->setText(sDirName);
+		pActionOpenIde->setIcon(QIcon(":/icons16x16/code.png"));
+		if(bIdeFileFound)
+			connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { QDesktopServices::openUrl(QUrl(sBestAbsFilePath)); });
+		else // Couldn't determine the exact IDE file, so just open the build directory in explorer
+			connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { HyGlobal::OpenFileInExplorer(sBestAbsFilePath); });
+
+		pBuildsMenu->addAction(pActionOpenIde);
 	}
 
 	ui->menu_Build->addSeparator();

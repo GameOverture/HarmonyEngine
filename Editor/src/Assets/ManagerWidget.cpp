@@ -184,6 +184,7 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	connect(ui->assetTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 
 	// Setup Actions
+	ui->actionGenerateAsset->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_New));
 	ui->actionImportAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_None));
 	ui->actionImportDirectory->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Open));
 	ui->actionDeleteAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Delete));
@@ -192,16 +193,21 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->actionDeleteAssets->setEnabled(false);
 	ui->actionReplaceAssets->setEnabled(false);
 
+	ui->btnAddBank->setDefaultAction(ui->actionAddBank);
+	ui->btnRemoveBank->setDefaultAction(ui->actionRemoveBank);
 	ui->btnBankSettings->setDefaultAction(ui->actionBankSettings);
+
+	ui->btnGenerateAsset->setDefaultAction(ui->actionGenerateAsset);
+	ui->btnCreateFilter->setDefaultAction(ui->actionAddFilter);
 	ui->btnImportAssets->setDefaultAction(ui->actionImportAssets);
 	ui->btnImportDir->setDefaultAction(ui->actionImportDirectory);
 
 	ui->btnDeleteAssets->setDefaultAction(ui->actionDeleteAssets);
 	ui->btnReplaceAssets->setDefaultAction(ui->actionReplaceAssets);
-	ui->btnCreateFilter->setDefaultAction(ui->actionAddFilter);
 
-	ui->btnAddBank->setDefaultAction(ui->actionAddBank);
-	ui->btnRemoveBank->setDefaultAction(ui->actionRemoveBank);
+	// Only Source Asset Manager is capable of generating new assets
+	if(m_pModel->GetAssetType() != ASSET_Source)
+		ui->btnGenerateAsset->hide();
 
 	ui->cmbBanks->clear();
 	ui->cmbBanks->setModel(m_pModel->GetBanksModel());
@@ -554,6 +560,12 @@ void ManagerWidget::on_actionBankTransfer_triggered(QAction *pAction)
 	GetSelected(selectedAssetsList, selectedFiltersList);
 
 	m_pModel->TransferAssets(selectedAssetsList, uiNewBankId);
+}
+
+void ManagerWidget::on_actionGenerateAsset_triggered()
+{
+	QModelIndex curIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapToSource(ui->assetTree->selectionModel()->currentIndex());
+	m_pModel->GenerateAssetsDlg(curIndex);
 }
 
 void ManagerWidget::on_actionImportAssets_triggered()

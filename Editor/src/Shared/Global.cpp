@@ -12,6 +12,8 @@
 
 #include "SpineModel.h"
 
+#include <QProcess>
+
 /*static*/ QString HyGlobal::sm_sItemNames[NUMTYPES];
 /*static*/ QString HyGlobal::sm_sItemNamesPlural[NUMTYPES];
 /*static*/ QString HyGlobal::sm_AssetNames[NUMASSETTYPES];
@@ -391,7 +393,7 @@
 	return metaTempDir;
 }
 
-bool HyGlobal::IsItemFileDataValid(const FileDataPair &itemfileDataRef)
+/*static*/ bool HyGlobal::IsItemFileDataValid(const FileDataPair &itemfileDataRef)
 {
 	std::function<bool(const QJsonArray &)> fpMetaStateArrayCheck = [](const QJsonArray &metaStateArrayRef)->bool
 	{
@@ -417,7 +419,7 @@ bool HyGlobal::IsItemFileDataValid(const FileDataPair &itemfileDataRef)
 		itemfileDataRef.m_Meta.contains("UUID") && itemfileDataRef.m_Meta["UUID"].isString());
 }
 
-FileDataPair HyGlobal::GenerateNewItemFileData(QString sImportPath /*= ""*/)
+/*static*/ FileDataPair HyGlobal::GenerateNewItemFileData(QString sImportPath /*= ""*/)
 {
 	FileDataPair newItemFileData;
 
@@ -441,7 +443,7 @@ FileDataPair HyGlobal::GenerateNewItemFileData(QString sImportPath /*= ""*/)
 	return newItemFileData;
 }
 
-void HyGlobal::ModifyJsonObject(QJsonObject &objRef, const QString &path, const QJsonValue &newValue)
+/*static*/ void HyGlobal::ModifyJsonObject(QJsonObject &objRef, const QString &path, const QJsonValue &newValue)
 {
 	const int indexOfDot = path.indexOf('.');
 	const QString propertyName = path.left(indexOfDot);
@@ -461,12 +463,32 @@ void HyGlobal::ModifyJsonObject(QJsonObject &objRef, const QString &path, const 
 	objRef[propertyName] = subValue;
 }
 
-void HyGlobal::ModifyJsonObject(QJsonDocument &docRef, const QString &sPath, const QJsonValue &newValue)
+/*static*/ void HyGlobal::ModifyJsonObject(QJsonDocument &docRef, const QString &sPath, const QJsonValue &newValue)
 {
 	QJsonObject obj = docRef.object();
 	ModifyJsonObject(obj, sPath, newValue);
 
 	docRef = QJsonDocument(obj);
+}
+
+/*static*/ void HyGlobal::OpenFileInExplorer(QString sAbsFilePath)
+{
+	#if defined(Q_OS_MACOS)
+	QStringList args;
+	args << "-e";
+	args << "tell application \"Finder\"";
+	args << "-e";
+	args << "activate";
+	args << "-e";
+	args << "select POSIX file \"" + sAbsFilePath + "\"";
+	args << "-e";
+	args << "end tell";
+	QProcess::startDetached("osascript", args);
+#elif defined(Q_OS_WIN)
+	QStringList args;
+	args << "/select," << QDir::toNativeSeparators(sAbsFilePath);
+	QProcess::startDetached("explorer", args);
+#endif
 }
 
 

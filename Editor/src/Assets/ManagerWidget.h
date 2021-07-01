@@ -103,6 +103,8 @@ private Q_SLOTS:
 
 	void on_actionBankTransfer_triggered(QAction *pAction);
 
+	void on_actionGenerateAsset_triggered();
+
 	void on_actionImportAssets_triggered();
 
 	void on_actionImportDirectory_triggered();

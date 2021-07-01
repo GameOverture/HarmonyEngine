@@ -2,7 +2,7 @@
 #include "%HY_CLASS%.h"
 
 %HY_CLASS%::%HY_CLASS%(HyEntity2d *pParent) :
-	HyEntity2d(pParent),
+	HyEntity2d(pParent)
 {
 }
 

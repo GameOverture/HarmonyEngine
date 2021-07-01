@@ -125,6 +125,10 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 	return pNewFrame;
 }
 
+/*virtual*/ void AudioManagerModel::OnGenerateAssetsDlg(const QModelIndex &indexDestination) /*override*/
+{
+}
+
 /*virtual*/ QList<AssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
 	QList<AssetItemData *> returnList;

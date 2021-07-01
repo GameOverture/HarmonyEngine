@@ -173,6 +173,27 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
+      <widget class="QToolButton" name="btnGenerateAsset">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnCreateFilter">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="btnImportAssets">
        <property name="text">
         <string>...</string>
@@ -181,13 +202,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnImportDir">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnCreateFilter">
        <property name="text">
         <string>...</string>
        </property>
@@ -343,6 +357,18 @@
     <string>Configure all selected assets' properties</string>
    </property>
   </action>
+  <action name="actionGenerateAsset">
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Atlas-New.png</normaloff>:/icons16x16/items/Atlas-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>Generate Asset</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new file to project</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -353,7 +379,7 @@
  </customwidgets>
  <resources>
   <include location="../../data/HyEditor.qrc"/>
-  <include location="../../../data/HyEditor.qrc"/>
+  <include location="../../data/HyEditor.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -778,7 +778,7 @@
 	projObj.insert("Title", sTitle);
 
 	// No longer used
-	projObj.remove("CodeName");
+	projObj.remove("ClassName");
 	projObj.remove("PixelsPerMeter");
 
 	projDocRef.setObject(projObj);

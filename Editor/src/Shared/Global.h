@@ -227,6 +227,8 @@ public:
 
 	static void ModifyJsonObject(QJsonObject &objRef, const QString &path, const QJsonValue &newValue);
 	static void ModifyJsonObject(QJsonDocument &docRef, const QString &sPath, const QJsonValue &newValue);
+
+	static void OpenFileInExplorer(QString sFilePath);
 };
 
 struct SortTreeWidgetsPredicate

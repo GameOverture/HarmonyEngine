@@ -11,6 +11,7 @@
 #include "SourceModel.h"
 #include "SourceFile.h"
 #include "SourceSettingsDlg.h"
+#include "SourceGenFileDlg.h"
 #include "Project.h"
 #include "MainWindow.h"
 
@@ -256,6 +257,36 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 										  metaObj["errors"].toInt(0));
 
 	return pNewFile;
+}
+
+/*virtual*/ void SourceModel::OnGenerateAssetsDlg(const QModelIndex &indexDestination) /*override*/
+{
+	SourceGenFileDlg *pDlg = new SourceGenFileDlg();
+	if(QDialog::Accepted == pDlg->exec())
+	{
+		QStringList sImportList;
+		QList<TreeModelItemData *> correspondingParentList;
+		QList<QUuid> correspondingUuidList;
+
+		TreeModelItemData *pParentLocation = data(indexDestination, Qt::UserRole).value<TreeModelItemData *>();
+
+		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName());
+		correspondingParentList << pParentLocation;
+		correspondingUuidList << QUuid::createUuid();
+
+		sImportList << GenerateSrcFile(TEMPLATE_ClassH, indexDestination, pDlg->GetCodeClassName(), pDlg->GetHeaderFileName());
+		correspondingParentList << pParentLocation;
+		correspondingUuidList << QUuid::createUuid();
+		
+		ImportNewAssets(sImportList,
+						0,
+						ITEM_Source,
+						correspondingParentList,
+						correspondingUuidList);
+
+		SaveMeta();
+	}
+	delete pDlg;
 }
 
 /*virtual*/ QList<AssetItemData *> SourceModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
