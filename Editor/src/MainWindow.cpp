@@ -702,9 +702,9 @@ void MainWindow::on_actionNewBuild_triggered()
 		// TODO: FILE IO FAILS TO DELETE AND IMMEDIATELY CREATE!
 		QString sBuildPath = Harmony::GetProject()->GetBuildAbsPath();
 		QDir rootBuildDir(sBuildPath);
+		QDir buildDir(pDlg->GetAbsBuildDir());
 		if(rootBuildDir.exists())
 		{
-			QDir buildDir(pDlg->GetAbsBuildDir());
 			if(buildDir.exists())
 			{
 				QFileInfoList tempFileInfoList = buildDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
@@ -726,11 +726,12 @@ void MainWindow::on_actionNewBuild_triggered()
 		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
 		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
 
+		connect(pBuildProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+			[=](int exitCode, QProcess::ExitStatus exitStatus) { RefreshBuildMenu(); QMessageBox::information(nullptr, "Build Complete", "Build '" % buildDir.dirName() % "' has completed."); });
+
 		QString sProc = pDlg->GetProc();
 		QStringList sArgList = pDlg->GetProcOptions();
 		pBuildProcess->start(sProc, sArgList);
-
-		RefreshBuildMenu();
 	}
 	delete pDlg;
 
@@ -896,42 +897,47 @@ void MainWindow::RefreshBuildMenu()
 	QString sAbsBuildDir = pProject->GetBuildAbsPath();
 	QDir buildDir(sAbsBuildDir);
 	QStringList buildDirList = buildDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-	for(auto sDirName : buildDirList)
+	if(buildDirList.empty() == false)
 	{
-		QDir dir(buildDir.absolutePath() % "/" % sDirName);
-		QFileInfoList buildFileInfoList = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-		
-		QString sBestAbsFilePath = dir.absolutePath();
-		bool bIdeFileFound = false;
-		for(auto fileInfo : buildFileInfoList)
+		ui->menu_Build->addSeparator();
+
+		for(auto sDirName : buildDirList)
 		{
-			// Look for .sln (Visual Studio)
-			if(fileInfo.suffix().compare("sln", Qt::CaseInsensitive) == 0)
+			QDir dir(buildDir.absolutePath() % "/" % sDirName);
+			QFileInfoList buildFileInfoList = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+
+			QString sBestAbsFilePath = dir.absolutePath();
+			bool bIdeFileFound = false;
+			for(auto fileInfo : buildFileInfoList)
 			{
-				sBestAbsFilePath = fileInfo.absoluteFilePath();
-				bIdeFileFound = true;
-				break;
+				// Look for .sln (Visual Studio)
+				if(fileInfo.suffix().compare("sln", Qt::CaseInsensitive) == 0)
+				{
+					sBestAbsFilePath = fileInfo.absoluteFilePath();
+					bIdeFileFound = true;
+					break;
+				}
+				// TODO: scan for other popular IDE's
 			}
-			// TODO: scan for other popular IDE's
+
+			// Setup the action and its trigger
+			if(pBuildsMenu == nullptr)
+				pBuildsMenu = ui->menu_Build->addMenu(QIcon(":/icons16x16/items/Build-Open.png"), "Builds");
+
+			QAction *pActionOpenIde = new QAction(pBuildsMenu);
+			pActionOpenIde->setText(sDirName);
+			pActionOpenIde->setIcon(QIcon(":/icons16x16/code.png"));
+			if(bIdeFileFound)
+				connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { QDesktopServices::openUrl(QUrl(sBestAbsFilePath)); });
+			else // Couldn't determine the exact IDE file, so just open the build directory in explorer
+				connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { HyGlobal::OpenFileInExplorer(sBestAbsFilePath); });
+
+			pBuildsMenu->addAction(pActionOpenIde);
 		}
-
-		// Setup the action and its trigger
-		if(pBuildsMenu == nullptr)
-			pBuildsMenu = ui->menu_Build->addMenu(QIcon(":/icons16x16/items/Build-Open.png"), "Builds");
-
-		QAction *pActionOpenIde = new QAction(pBuildsMenu);
-		pActionOpenIde->setText(sDirName);
-		pActionOpenIde->setIcon(QIcon(":/icons16x16/code.png"));
-		if(bIdeFileFound)
-			connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { QDesktopServices::openUrl(QUrl(sBestAbsFilePath)); });
-		else // Couldn't determine the exact IDE file, so just open the build directory in explorer
-			connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { HyGlobal::OpenFileInExplorer(sBestAbsFilePath); });
-
-		pBuildsMenu->addAction(pActionOpenIde);
 	}
 
-	ui->menu_Build->addSeparator();
-	ui->menu_Build->addAction(ui->actionNewPackage);
+	//ui->menu_Build->addSeparator();
+	//ui->menu_Build->addAction(ui->actionNewPackage);
 }
 
 void MainWindow::SaveSettings()
