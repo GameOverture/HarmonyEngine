@@ -717,7 +717,7 @@ void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
 			}
 		}
 		if(eType == ITEM_Unknown)
-			HyGuiLog("Project::DeletePrefixAndContents - Item type is unknown", LOGTYPE_Error);
+			continue;
 
 		QJsonObject itemObj = itemTypeIter.value().toObject();
 		for(auto iter = itemObj.begin(); iter != itemObj.end(); ++iter)
@@ -1100,6 +1100,18 @@ void Project::RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObj
 		if(itemTypeIter.key().compare("$fileVersion") == 0)
 			continue;
 
+		HyGuiItemType eType = ITEM_Unknown;
+		for(int i = 0; i < typeList.size(); ++i)
+		{
+			if(itemTypeIter.key() == HyGlobal::ItemName(typeList[i], true))
+			{
+				eType = typeList[i];
+				break;
+			}
+		}
+		if(eType == ITEM_Unknown)
+			continue;
+
 		QJsonObject itemTypeObj = itemTypeIter.value().toObject();
 		QStringList itemsTypeKeysList = itemTypeObj.keys();
 		for(int i = 0; i < itemsTypeKeysList.size(); ++i)
@@ -1114,18 +1126,6 @@ void Project::RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObj
 				itemTypeObj.insert(sNewKey, data);
 			}
 		}
-
-		HyGuiItemType eType = ITEM_Unknown;
-		for(int i = 0; i < typeList.size(); ++i)
-		{
-			if(itemTypeIter.key() == HyGlobal::ItemName(typeList[i], true))
-			{
-				eType = typeList[i];
-				break;
-			}
-		}
-		if(eType == ITEM_Unknown)
-			HyGuiLog("Project::RenamePrefixInDataObj could not find item type", LOGTYPE_Error);
 
 		QString sItemTypeName = HyGlobal::ItemName(eType, true);
 		if(dataObjRef.contains(sItemTypeName) == false) {
