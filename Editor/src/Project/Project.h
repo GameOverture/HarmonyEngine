@@ -124,6 +124,8 @@ public:
 
 	bool DoesItemExist(HyGuiItemType eType, QString sPath) const;
 
+	void SaveUserData() const;
+
 	// Dependency links between items
 	QList<ProjectItemData *> RegisterItemsById(ProjectItemData *pItemOwner, QList<QUuid> requestList);
 	QList<ProjectItemData *> RegisterItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList);

@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "IManagerModel.h"
 #include "Project.h"
-#include "DlgAtlasGroupSettings.h"
 #include "Harmony.h"
 #include "MainWindow.h"
 #include "ProjectItemData.h"

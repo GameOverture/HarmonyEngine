@@ -842,6 +842,22 @@ bool Project::DoesItemExist(HyGuiItemType eType, QString sPath) const
 	return false;
 }
 
+void Project::SaveUserData() const
+{
+	// Save asset manager widgets expanded/selected state
+	QSettings settings(GetUserAbsPath(), QSettings::IniFormat);
+	settings.beginGroup("AssetManagers");
+	{
+		settings.setValue("TabIndex", MainWindow::GetAssetManagerTabIndex());
+
+		settings.setValue(HyGlobal::AssetName(ASSET_Source), m_pSourceWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSET_Atlas), m_pAtlasWidget->GetExpandedFilters());
+		//settings.setValue(HyGlobal::AssetName(ASSET_Prefabs), m_pGltfWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSET_Audio), m_pAudioWidget->GetExpandedFilters());
+	}
+	settings.endGroup();
+}
+
 QList<ProjectItemData *> Project::RegisterItemsById(ProjectItemData *pItemOwner, QList<QUuid> requestList)
 {
 	QList<ProjectItemData *> itemList;
@@ -1042,18 +1058,7 @@ void Project::HarmonyShutdown()
 	delete m_pDraw;
 	m_pDraw = nullptr;
 
-	// Save asset manager widgets expanded/selected state
-	QSettings settings(GetUserAbsPath(), QSettings::IniFormat);
-	settings.beginGroup("AssetManagers");
-	{
-		settings.setValue("TabIndex", MainWindow::GetAssetManagerTabIndex());
-
-		settings.setValue(HyGlobal::AssetName(ASSET_Source), m_pSourceWidget->GetExpandedFilters());
-		settings.setValue(HyGlobal::AssetName(ASSET_Atlas), m_pAtlasWidget->GetExpandedFilters());
-		//settings.setValue(HyGlobal::AssetName(ASSET_Prefabs), m_pGltfWidget->GetExpandedFilters());
-		settings.setValue(HyGlobal::AssetName(ASSET_Audio), m_pAudioWidget->GetExpandedFilters());
-	}
-	settings.endGroup();
+	SaveUserData();
 }
 
 void Project::OnTabBarCurrentChanged(int iIndex)

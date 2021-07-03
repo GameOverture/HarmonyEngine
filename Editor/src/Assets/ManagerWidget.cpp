@@ -40,11 +40,6 @@ void ManagerProxyModel::FilterByBankIndex(int iBankIndex)
 	invalidateFilter();
 }
 
-bool ManagerProxyModel::IsPassFilter(QModelIndex index)
-{
-	return filterAcceptsRow(index.row(), index.parent());
-}
-
 /*virtual*/ bool ManagerProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const /*override*/
 {
 	TreeModelItemData *pLeftItem = sourceModel()->data(left, Qt::UserRole).value<TreeModelItemData *>();
@@ -60,8 +55,11 @@ bool ManagerProxyModel::IsPassFilter(QModelIndex index)
 	if(pLeftItem->GetType() != ITEM_Filter && pRightItem->GetType() == ITEM_Filter)
 		return false;
 
-	if(pLeftItem->GetType() != pRightItem->GetType())
-		return pLeftItem->GetType() < pRightItem->GetType();
+	if(static_cast<IManagerModel *>(sourceModel())->GetAssetType() != ASSET_Source)
+	{
+		if(pLeftItem->GetType() != pRightItem->GetType())
+			return pLeftItem->GetType() < pRightItem->GetType();
+	}
 
 	return QString::localeAwareCompare(pLeftItem->GetText(), pRightItem->GetText()) < 0;
 }
@@ -513,7 +511,14 @@ void ManagerWidget::on_actionRename_triggered()
 
 	DlgInputName *pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText());
 	if(pDlg->exec() == QDialog::Accepted)
+	{
 		m_pModel->Rename(pItemToBeRenamed, pDlg->GetName());
+
+		// HACK: I can't seem to make this ProxyModel resort/refresh other than by calling this?
+		m_pModel->GetProjOwner().SaveUserData(); // Save expanded state so below hack works nicer
+		static_cast<ManagerProxyModel *>(ui->assetTree->model())->setFilterWildcard("x");
+		static_cast<ManagerProxyModel *>(ui->assetTree->model())->setFilterWildcard(ui->txtSearch->text());
+	}
 
 	delete pDlg;
 }
