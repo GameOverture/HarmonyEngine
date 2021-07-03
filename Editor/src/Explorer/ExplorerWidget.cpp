@@ -403,7 +403,7 @@ void ExplorerWidget::on_actionRename_triggered()
 		return;
 	}
 	
-	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pFirstSelected->GetType(), false), pFirstSelected->GetName(false));
+	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pFirstSelected->GetType(), false), pFirstSelected->GetName(false), HyGlobal::FileNameValidator());
 	if(pDlg->exec() == QDialog::Accepted)
 		pFirstSelected->Rename(pDlg->GetName());
 

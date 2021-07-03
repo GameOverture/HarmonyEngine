@@ -21,11 +21,11 @@ class DlgInputName : public QDialog
 {
 	Q_OBJECT
 	
-	void CtorInit(QString sDlgTitle, QString sCurName);
+	void CtorInit(QString sDlgTitle, QString sCurName, const QValidator *pValidator);
 
 public:
-	explicit DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent = 0);
-	explicit DlgInputName(const QString sDlgTitle, ExplorerItemData *pItem, QWidget *parent = 0);
+	explicit DlgInputName(const QString sDlgTitle, QString sCurName, const QValidator *pValidator, QWidget *pParent = 0);
+	explicit DlgInputName(const QString sDlgTitle, ExplorerItemData *pItem, const QValidator *pValidator, QWidget *parent = 0);
 	~DlgInputName();
 	
 	QString GetName();

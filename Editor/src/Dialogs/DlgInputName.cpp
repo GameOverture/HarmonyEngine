@@ -14,32 +14,32 @@
 #include <QPushButton>
 #include <QStringBuilder>
 
-void DlgInputName::CtorInit(QString sDlgTitle, QString sCurName)
+void DlgInputName::CtorInit(QString sDlgTitle, QString sCurName, const QValidator *pValidator)
 {
 	ui->setupUi(this);
 
 	setWindowTitle(sDlgTitle);
 	setWindowIcon(QIcon(":/icons16x16/generic-rename.png"));
 
-	ui->txtName->setValidator(HyGlobal::FileNameValidator());
+	ui->txtName->setValidator(pValidator);
 	ui->txtName->setText(sCurName);
 	ui->txtName->selectAll();
 
 	ui->lblName->setText("Name:");
 }
 
-DlgInputName::DlgInputName(const QString sDlgTitle, QString sCurName, QWidget *pParent /*= 0*/) :
+DlgInputName::DlgInputName(const QString sDlgTitle, QString sCurName, const QValidator *pValidator, QWidget *pParent /*= 0*/) :
 	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
 	ui(new Ui::DlgInputName)
 {
-	CtorInit(sDlgTitle, sCurName);
+	CtorInit(sDlgTitle, sCurName, pValidator);
 }
 
-DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerItemData *pItem, QWidget *parent /*= 0*/) :
+DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerItemData *pItem, const QValidator *pValidator, QWidget *parent /*= 0*/) :
 	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
 	ui(new Ui::DlgInputName)
 {
-	CtorInit(sDlgTitle, pItem->GetName(false));
+	CtorInit(sDlgTitle, pItem->GetName(false), pValidator);
 
 	if(pItem == nullptr)
 	{
