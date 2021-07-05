@@ -1129,6 +1129,8 @@ void Project::RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObj
 				QJsonValue data = itemTypeObj[itemsTypeKeysList[i]];
 				itemTypeObj.remove(itemsTypeKeysList[i]);
 				itemTypeObj.insert(sNewKey, data);
+
+				HyGuiLog(itemsTypeKeysList[i] % " is now known as: " % sNewKey, LOGTYPE_Normal);
 			}
 		}
 

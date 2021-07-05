@@ -218,7 +218,11 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			{
 				beginMoveRows(sourceIndex.parent(), pSourceTreeItem->GetIndex(), pSourceTreeItem->GetIndex(), destIndex, 0);
 
-				pSourceItem->Rename(pDestItem->GetName(true), pSourceItem->GetName(false));
+				QString sNewPrefix;
+				if(pDestItem->GetType() != ITEM_Project)
+					sNewPrefix = pDestItem->GetName(true);
+
+				pSourceItem->Rename(sNewPrefix, pSourceItem->GetName(false));
 				pSourceTreeItem->GetParent()->MoveChild(pSourceTreeItem->GetIndex(), pDestTreeItem, 0);
 
 				endMoveRows();
