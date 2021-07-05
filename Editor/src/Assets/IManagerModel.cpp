@@ -805,10 +805,6 @@ void IManagerModel::SaveRuntime()
 	if(pData->hasFormat(HYGUI_MIMETYPE_ASSET) == false)
 		return false;
 
-	TreeModelItemData *pParentTreeItem = FindTreeItemFilter(GetItem(parentRef)->data(0).value<TreeModelItemData *>());
-	if(pParentTreeItem == nullptr)
-		return false;
-
 	return true;
 }
 
@@ -826,12 +822,6 @@ void IManagerModel::SaveRuntime()
 	// Error check destination index 'indexRef'
 	TreeModelItem *pDropItem = GetItem(parentRef);
 	TreeModelItemData *pDestFilter = FindTreeItemFilter(pDropItem->data(0).value<TreeModelItemData *>());
-	if(pDestFilter == nullptr)
-	{
-		HyGuiLog("IManagerModel::dropMimeData failed to find an appropriate location", LOGTYPE_Error);
-		return false;
-	}
-
 	TreeModelItem *pDestFilterTreeItem = GetItem(FindIndex<TreeModelItemData *>(pDestFilter, 0));
 
 	// Parse 'sSrc' for paste information
