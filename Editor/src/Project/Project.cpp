@@ -170,7 +170,7 @@ void Project::LoadExplorerModel()
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Initialize 'm_ProjectFileData' from the project files on disk
-	if(LoadDataObj(GetMetaDataAbsPath() % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt, m_ProjectFileData.m_Meta))
+	if(LoadDataObj(GetMetaAbsPath() % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt, m_ProjectFileData.m_Meta))
 		WriteMetaData();
 
 	if(LoadDataObj(GetAssetsAbsPath() % HYASSETS_DataFile, m_ProjectFileData.m_Data))
@@ -317,7 +317,7 @@ void Project::WriteGameData()
 
 void Project::WriteMetaData()
 {
-	QFile metaFile(GetMetaDataAbsPath() % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt);
+	QFile metaFile(GetMetaAbsPath() % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt);
 	if(metaFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
 		HyGuiLog(QString("Couldn't open ") % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt % " for writing: " % metaFile.errorString(), LOGTYPE_Error);
 	else
@@ -401,14 +401,24 @@ QString Project::GetAssetsRelPath() const
 	return QDir::cleanPath(GetSettingsObj()["DataPath"].toString()) + '/';
 }
 
-QString Project::GetMetaDataAbsPath() const
+QString Project::GetMetaAbsPath() const
 {
-	return QDir::cleanPath(GetDirPath() + '/' + GetSettingsObj()["MetaDataPath"].toString()) + '/';
+	return QDir::cleanPath(GetDirPath() + '/' + GetSettingsObj()["MetaPath"].toString()) + '/';
 }
 
-QString Project::GetMetaDataRelPath() const
+QString Project::GetMetaRelPath() const
 {
-	return QDir::cleanPath(GetSettingsObj()["MetaDataPath"].toString()) + '/';
+	return QDir::cleanPath(GetSettingsObj()["MetaPath"].toString()) + '/';
+}
+
+QString Project::GetSourceAbsPath() const
+{
+	return QDir::cleanPath(GetDirPath() + '/' + GetSettingsObj()["SourcePath"].toString()) + '/';
+}
+
+QString Project::GetSourceRelPath() const
+{
+	return QDir::cleanPath(GetSettingsObj()["SourcePath"].toString()) + '/';
 }
 
 QString Project::GetBuildAbsPath() const
@@ -556,7 +566,7 @@ QStandardItemModel *Project::GetFontListModel()
 void Project::ScanMetaFontDir()
 {
 	QStringList sFilterList(HYMETA_FontFilterList);
-	QDir metaDir(GetMetaDataAbsPath() % HYMETA_FontsDir);
+	QDir metaDir(GetMetaAbsPath() % HYMETA_FontsDir);
 	QFileInfoList metaFontFileInfoList = metaDir.entryInfoList(sFilterList);
 
 	QMap<QString,QString> metaFontsMap;

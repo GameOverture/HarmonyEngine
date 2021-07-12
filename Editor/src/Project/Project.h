@@ -88,8 +88,10 @@ public:
 	QString GetAbsPath() const;
 	QString GetAssetsAbsPath() const;
 	QString GetAssetsRelPath() const;
-	QString GetMetaDataAbsPath() const;
-	QString GetMetaDataRelPath() const;
+	QString GetMetaAbsPath() const;
+	QString GetMetaRelPath() const;
+	QString GetSourceAbsPath() const;
+	QString GetSourceRelPath() const;
 	QString GetBuildAbsPath() const;
 	QString GetBuildRelPath() const;
 	QString GetUserAbsPath() const;

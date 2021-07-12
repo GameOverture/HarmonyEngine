@@ -235,7 +235,7 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Import any missing fonts (.ttf)
-		QDir metaDir(pDestProject->GetMetaDataAbsPath());
+		QDir metaDir(pDestProject->GetMetaAbsPath());
 		QString sFontMetaDir = metaDir.absoluteFilePath(HYMETA_FontsDir);
 		QDir fontMetaDir(sFontMetaDir);
 		fontMetaDir.mkdir(".");

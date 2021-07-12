@@ -376,7 +376,7 @@
 
 /*static*/ QDir HyGlobal::PrepTempDir(Project *pProject)
 {
-	QDir metaDir(pProject->GetMetaDataAbsPath());
+	QDir metaDir(pProject->GetMetaAbsPath());
 	QDir metaTempDir(metaDir.absoluteFilePath(HYGUIPATH_TempDir));
 	if(metaTempDir.exists())
 	{

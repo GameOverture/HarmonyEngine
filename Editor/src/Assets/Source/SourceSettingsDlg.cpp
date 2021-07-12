@@ -31,7 +31,7 @@ SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject sett
 	{
 		QJsonObject depObj = dependsArray[i].toObject();
 
-		QDir metaDir(m_ProjectRef.GetMetaDataAbsPath() % HyGlobal::AssetName(ASSET_Source));
+		QDir metaDir(m_ProjectRef.GetSourceAbsPath());
 		if(metaDir.cd(depObj["RelPath"].toString()) == false)
 			HyGuiLog("SourceSettingsDlg could not derive absolute dependency path", LOGTYPE_Error);
 
@@ -99,7 +99,7 @@ void SourceSettingsDlg::UpdateMetaObj(QJsonObject &metaObjRef) const
 	metaObjRef.insert("UseGlfw", ui->chkUseGlfw->isChecked());
 	metaObjRef.insert("UseSdlNet", ui->chkUseSdlNet->isChecked());
 
-	QDir metaDir(m_ProjectRef.GetMetaDataAbsPath() % HyGlobal::AssetName(ASSET_Source));
+	QDir metaDir(m_ProjectRef.GetSourceAbsPath());
 	QJsonArray srcDependsArray;
 	for(auto srcDep : m_SrcDependencyList)
 	{

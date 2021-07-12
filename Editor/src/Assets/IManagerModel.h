@@ -44,7 +44,7 @@ public:
 	IManagerModel(Project &projRef, AssetType eAssetType);
 	virtual ~IManagerModel();
 
-	void Init();	// Init() exists because we need to construct using virtual functions
+	void Init();	// Init() exists because we need to construct using virtual functions (or after derived ctor initialization)
 
 	AssetType GetAssetType() const;
 	Project &GetProjOwner() const;

@@ -43,7 +43,7 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	if(itemFileDataRef.m_Meta.contains("newImport"))
 	{
 		// Initialize Spine directories
-		QDir metaDir(itemRef.GetProject().GetMetaDataAbsPath());
+		QDir metaDir(itemRef.GetProject().GetMetaAbsPath());
 		metaDir.mkdir("Spine");
 		if(metaDir.cd("Spine") == false)
 			HyGuiLog("SpineModel could not navigate to Spine meta directory", LOGTYPE_Error);

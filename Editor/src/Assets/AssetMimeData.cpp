@@ -44,7 +44,9 @@ AssetMimeData::AssetMimeData(Project &projRef, AssetType eManagerType, QList<Tre
 			itemObj.insert("checksum", QJsonValue(static_cast<qint64>(pAssetItem->GetChecksum())));
 			itemObj.insert("filter", pAssetItem->GetFilter());
 			itemObj.insert("name", QJsonValue(pAssetItem->GetName()));
-			itemObj.insert("uri", QJsonValue(projRef.GetMetaDataAbsPath() % HyGlobal::AssetName(eManagerType) % "/" % pAssetItem->ConstructMetaFileName()));
+
+			// TODO: Make this work with source code assets
+			itemObj.insert("uri", QJsonValue(projRef.GetMetaAbsPath() % HyGlobal::AssetName(eManagerType) % "/" % pAssetItem->ConstructMetaFileName()));
 		}
 
 		clipboardArray.append(itemObj);

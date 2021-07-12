@@ -51,6 +51,7 @@ DlgNewProject::DlgNewProject(QString &sDefaultLocation, QWidget *parent) :
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
 	connect(ui->wgtDataDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	connect(ui->wgtMetaDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
+	connect(ui->wgtSourceDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	connect(ui->wgtBuildDir, &WgtMakeRelDir::OnDirty, this, &DlgNewProject::ErrorCheck);
 	ErrorCheck();
 }
@@ -104,6 +105,10 @@ void DlgNewProject::on_buttonBox_accepted()
 	buildDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
 	buildDir.mkdir(HyGlobal::ItemName(ITEM_Audio, true));
 
+	// SOURCE
+	buildDir.setPath(GetProjDirPath());
+	buildDir.mkdir(ui->wgtSourceDir->GetRelPath());
+
 	//// BUILD
 	//buildDir.setPath(GetProjDirPath());
 	//buildDir.mkdir(ui->wgtBuildDir->GetRelPath());
@@ -115,7 +120,8 @@ void DlgNewProject::on_buttonBox_accepted()
 	jsonObj.insert("$fileVersion", HYGUI_FILE_VERSION);
 	jsonObj.insert("Title", ui->txtTitleName->text());
 	jsonObj.insert("DataPath", QString(ui->wgtDataDir->GetRelPath() + "/"));
-	jsonObj.insert("MetaDataPath", QString(ui->wgtMetaDir->GetRelPath() + "/"));
+	jsonObj.insert("MetaPath", QString(ui->wgtMetaDir->GetRelPath() + "/"));
+	jsonObj.insert("SourcePath", QString(ui->wgtSourceDir->GetRelPath() + "/"));
 	jsonObj.insert("BuildPath", QString(ui->wgtBuildDir->GetRelPath() + "/"));
 
 	QJsonArray windowInfoArray;
@@ -268,6 +274,7 @@ void DlgNewProject::UpdateProjectDir()
 {
 	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath());
 	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath());
+	ui->wgtSourceDir->Setup("Source Code", "src", GetProjDirPath(), "meta");
 	ui->wgtBuildDir->Setup("Build", "build", GetProjDirPath());
 }
 

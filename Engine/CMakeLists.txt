@@ -151,6 +151,8 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Layouts/IHyLayout.cpp
 	src/UI/Layouts/HyBoxLayout.cpp
 	src/UI/Layouts/HyGridLayout.cpp
+	src/UI/Localization/HyCurrency.cpp
+	src/UI/Localization/HyTextUi.cpp
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
 	src/Utilities/HyMath.cpp
@@ -270,6 +272,8 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Layouts/IHyLayout.h
 	include/Harmony/UI/Layouts/HyBoxLayout.h
 	include/Harmony/UI/Layouts/HyGridLayout.h
+	include/Harmony/UI/Localization/HyCurrency.h
+	include/Harmony/UI/Localization/HyTextUi.h
 	include/Harmony/Utilities/Crc32.h
 	include/Harmony/Utilities/HyIO.h
 	include/Harmony/Utilities/HyMath.h

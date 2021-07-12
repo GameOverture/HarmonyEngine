@@ -116,7 +116,9 @@ QJsonArray ProjectItemMimeData::GetAssetsArray(HyGuiItemType eManagerType, Proje
 		assetObj.insert("checksum", QJsonValue(static_cast<qint64>(assetList[i]->GetChecksum())));
 		assetObj.insert("filter", assetList[i]->GetFilter());
 		assetObj.insert("name", QJsonValue(assetList[i]->GetName()));
-		assetObj.insert("uri", QJsonValue(pProjectItem->GetProject().GetMetaDataAbsPath() % HyGlobal::ItemName(eManagerType, true) % "/" % assetList[i]->ConstructMetaFileName()));
+
+		// TODO: Make source code assets work with this
+		assetObj.insert("uri", QJsonValue(pProjectItem->GetProject().GetMetaAbsPath() % HyGlobal::ItemName(eManagerType, true) % "/" % assetList[i]->ConstructMetaFileName()));
 		assetArray.append(assetObj);
 	}
 

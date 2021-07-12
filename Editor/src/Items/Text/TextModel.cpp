@@ -137,7 +137,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 		return false;
 
 	// Copy font files into the font meta directory
-	QDir metaDir(m_ItemRef.GetProject().GetMetaDataAbsPath() % HYMETA_FontsDir);
+	QDir metaDir(m_ItemRef.GetProject().GetMetaAbsPath() % HYMETA_FontsDir);
 	if(metaDir.mkpath("."))
 	{
 		for(int i = 0; i < m_StateList.size(); ++i)

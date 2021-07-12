@@ -120,7 +120,7 @@ QStringList DlgNewBuild::GetProcOptions() const
 								<< ui->cmbCMake->currentText()
 								<< ui->txtCMakeOptions->text().split(' ', Qt::SkipEmptyParts)
 								<< "-S"
-								<< m_ProjectRef.GetMetaDataAbsPath() + HyGlobal::AssetName(ASSET_Source)
+								<< m_ProjectRef.GetSourceAbsPath()
 								<< "-B"
 								<< GetAbsBuildDir();
 	}
@@ -138,7 +138,7 @@ QStringList DlgNewBuild::GetProcOptions() const
 
 		return QStringList()	<< sFormattedPath
 								<< QDir::cleanPath(ui->txtEmscriptenSdk->text())
-								<< QDir::cleanPath(buildDir.relativeFilePath(m_ProjectRef.GetDirPath()))
+								<< QDir::cleanPath(buildDir.relativeFilePath(m_ProjectRef.GetSourceAbsPath()))
 								<< sCMakeCmds;
 	}
 

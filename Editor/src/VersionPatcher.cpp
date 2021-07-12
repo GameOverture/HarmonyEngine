@@ -6,21 +6,48 @@
 
 /*static*/ bool VersionPatcher::Run(Project *pProj)
 {
-	// ************************************************************
+	// ********************************************************************************************
 	// WARNING: 'pProj' is only partially constructed at this point
-	// ************************************************************
+	//          Should only rely on pProj->GetAbsPath() and pProj->GetDirPath() on being accurate
+	//          pProj->GetSettingsObj() will return a JSON object that may be from an older file version
+	// ********************************************************************************************
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Determine the file version
+	QJsonDocument projDoc;
+	int iFileVersion = GetFileVersion(pProj->GetAbsPath(), projDoc, false);
+	if(iFileVersion == -1)
+	{
+		HyGuiLog("VersionPatcher - HyProj file cannot be found.", LOGTYPE_Error);
+		return false;
+	}
+	if(iFileVersion == 0)
+	{
+		iFileVersion = 2; // version 2 is the first version that specifies file version on .hyproj file
+		HyGuiLog("File version is older than v2. Attempting recover as v2", LOGTYPE_Warning);
+	}
+
+	// Meta path key has changed from versions so do not rely on GetMetaAbsPath()
+	QString sMetaAbsPath;
+	if(iFileVersion <= 7)
+		sMetaAbsPath = QDir::cleanPath(pProj->GetDirPath() + '/' + pProj->GetSettingsObj()["MetaDataPath"].toString()) + '/';
+	else
+		sMetaAbsPath = QDir::cleanPath(pProj->GetDirPath() + '/' + pProj->GetSettingsObj()["MetaPath"].toString()) + '/';
+
+	// Data path key hasn't changed, but grabbing it manually here instead of using pProj->GetAssetsAbsPath() for posterity's sake
+	QString sDataAbsPath = QDir::cleanPath(pProj->GetDirPath() + '/' + pProj->GetSettingsObj()["DataPath"].toString()) + '/';
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup each file's directory
 
 	// ITEMS
-	QDir metaDir(pProj->GetMetaDataAbsPath());
+	QDir metaDir(sMetaAbsPath);
 	if(metaDir.exists() == false)
 	{
 		HyGuiLog("Meta directory is missing, recreating", LOGTYPE_Info);
 		metaDir.mkpath(metaDir.absolutePath());
 	}
-	QDir dataDir(pProj->GetAssetsAbsPath());
+	QDir dataDir(sDataAbsPath);
 	if(dataDir.exists() == false)
 	{
 		HyGuiLog("Data directory is missing, recreating", LOGTYPE_Info);
@@ -28,13 +55,13 @@
 	}
 	
 	// ATLAS
-	QDir metaAtlasDir(pProj->GetMetaDataAbsPath() + HyGlobal::AssetName(ASSET_Atlas));
+	QDir metaAtlasDir(sMetaAbsPath + HyGlobal::AssetName(ASSET_Atlas));
 	if(metaAtlasDir.exists() == false)
 	{
 		HyGuiLog("Meta atlas directory is missing, recreating", LOGTYPE_Info);
 		metaAtlasDir.mkpath(metaAtlasDir.absolutePath());
 	}
-	QDir dataAtlasDir(pProj->GetAssetsAbsPath() + HyGlobal::AssetName(ASSET_Atlas));
+	QDir dataAtlasDir(sDataAbsPath + HyGlobal::AssetName(ASSET_Atlas));
 	if(dataAtlasDir.exists() == false)
 	{
 		HyGuiLog("Data atlas directory is missing, recreating", LOGTYPE_Info);
@@ -42,34 +69,17 @@
 	}
 
 	// AUDIO
-	QDir metaAudioDir(pProj->GetMetaDataAbsPath() + HyGlobal::AssetName(ASSET_Audio));
+	QDir metaAudioDir(sMetaAbsPath + HyGlobal::AssetName(ASSET_Audio));
 	if(metaAudioDir.exists() == false)
 	{
 		HyGuiLog("Meta audio directory is missing, recreating", LOGTYPE_Info);
 		metaAudioDir.mkpath(metaAudioDir.absolutePath());
 	}
-	QDir dataAudioDir(pProj->GetAssetsAbsPath() + HyGlobal::AssetName(ASSET_Audio));
+	QDir dataAudioDir(sDataAbsPath + HyGlobal::AssetName(ASSET_Audio));
 	if(dataAudioDir.exists() == false)
 	{
 		HyGuiLog("Data audio directory is missing, recreating", LOGTYPE_Info);
 		dataAudioDir.mkpath(dataAudioDir.absolutePath());
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Reach each file for its file version
-	QJsonDocument projDoc;
-	int iFileVersion = GetFileVersion(pProj->GetAbsPath(), projDoc, false);
-	if(iFileVersion == 0)
-	{
-		iFileVersion = 2; // version 2 is the first version that specifies file version on .hyproj file
-
-		// Version 2 uses outdated "Atlas.hygui", so we check a file to ensure they're at least v2
-		QJsonDocument tmpDoc;
-		if(iFileVersion != GetFileVersion(metaAtlasDir.absoluteFilePath("Atlas.hygui"), tmpDoc, true))
-		{
-			HyGuiLog("Files are older than v2. Add your files' current version to .hyproj file ($fileVersion) in order to upgrade to latest.", LOGTYPE_Warning);
-			return false;
-		}
 	}
 
 	// Assemble correct/proper file names
@@ -153,8 +163,11 @@
 			HyGuiLog("Patching project files: version 6 -> 7", LOGTYPE_Info);
 			Patch_6to7(pProj, projDoc);
 		case 7:
+			HyGuiLog("Patching project files: version 7 -> 8", LOGTYPE_Info);
+			Patch_7to8(projDoc);
+		case 8:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 7, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 8, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -784,6 +797,21 @@
 	projDocRef.setObject(projObj);
 
 	QMessageBox::information(nullptr, "Version Patcher 6->7", "You will need to delete and regenerate any builds for project '" % sTitle % "'");
+}
+
+/*static*/ void VersionPatcher::Patch_7to8(QJsonDocument &projDocRef)
+{
+	QJsonObject projObj = projDocRef.object();
+
+	// Rename MetaDataPath -> MetaPath
+	QString sMetaPath = projObj["MetaDataPath"].toString();
+	projObj.remove("MetaDataPath");
+	projObj.insert("MetaPath", sMetaPath);
+
+	QString sSourcePath = sMetaPath + HyGlobal::AssetName(ASSET_Source) + "/";
+	projObj.insert("SourcePath", sSourcePath); // Re-add back 'SourcePath' from version 6 since that is needed to be separated from meta (to make clones/skins etc easier)
+
+	projDocRef.setObject(projObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

@@ -24,7 +24,7 @@ IManagerModel::IManagerModel(Project &projRef, AssetType eAssetType) :
 	m_ProjectRef(projRef),
 	m_eASSET_TYPE(eAssetType),
 	m_bIsSingleBank(false),
-	m_MetaDir(m_ProjectRef.GetMetaDataAbsPath() + HyGlobal::AssetName(eAssetType)),
+	m_MetaDir(m_ProjectRef.GetMetaAbsPath() + HyGlobal::AssetName(eAssetType)),
 	m_DataDir(m_ProjectRef.GetAssetsAbsPath() + HyGlobal::AssetName(eAssetType)),
 	m_uiNextBankId(99999) // Should be properly initialized with Init()
 {
@@ -34,7 +34,7 @@ IManagerModel::IManagerModel(Project &projRef, AssetType eAssetType) :
 {
 }
 
-// Init() exists because we need to construct using virtual functions
+// Init() exists because we need to construct using virtual functions (or after derived ctor initialization)
 void IManagerModel::Init()
 {
 	if(m_MetaDir.exists() == false)

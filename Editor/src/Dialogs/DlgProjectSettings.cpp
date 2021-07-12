@@ -29,7 +29,7 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 	ui->txtCodeName->setText(projectRef.GetName());
 
 	ui->txtAssetsLocation->setText(projSettingsObj["DataPath"].toString());
-	ui->txtMetaDataLocation->setText(projSettingsObj["MetaDataPath"].toString());
+	ui->txtMetaDataLocation->setText(projSettingsObj["MetaPath"].toString());
 
 	ui->sbInputMaps->setValue(projSettingsObj["NumInputMappings"].toInt());
 	ui->sbUpdateFpsCap->setValue(projSettingsObj["UpdateFpsCap"].toInt());

@@ -25,7 +25,8 @@ SourceModel::SourceModel(Project &projRef) :
 	IManagerModel(projRef, ASSET_Source)
 {
 	m_bIsSingleBank = true;
-	m_DataDir.setPath(m_MetaDir.absolutePath()); // SourceModel doesn't use a DataDir
+	m_MetaDir.setPath(m_ProjectRef.GetSourceAbsPath());
+	m_DataDir.setPath(m_ProjectRef.GetSourceAbsPath()); // SourceModel doesn't use a DataDir
 }
 
 /*virtual*/ SourceModel::~SourceModel()
