@@ -37,6 +37,7 @@
 #include "UI/Widgets/HyButton.h"
 #include "UI/Widgets/HyCheckBox.h"
 #include "UI/Widgets/HyMeter.h"
+#include "UI/Widgets/HyProgressBar.h"
 #include "UI/Widgets/HySpacer.h"
 #include "UI/Layouts/HyBoxLayout.h"
 #include "UI/Layouts/HyGridLayout.h"
@@ -101,6 +102,7 @@ public:
 	static HyWindow &Window(uint32 uiWindowIndex = 0);
 	static HyInput &Input();
 	static HyAudioHarness &Audio();
+	static void LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut);
 	static HyDiagnostics &Diagnostics();
 	static HyShaderHandle DefaultShaderHandle(HyType eType);
 	static std::string DateTime();

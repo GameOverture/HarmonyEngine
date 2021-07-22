@@ -253,7 +253,7 @@ uint32 IHyAudio<NODETYPE, ENTTYPE>::PullEntryIndex(const HyAudioPlayList &entrie
 	uint32 uiIndex = 0;
 	if(uiWeight >= uiTotalWeight)
 	{
-		uiIndex = entriesList.size() - 1;
+		uiIndex = static_cast<uint32>(entriesList.size()) - 1;
 		while(entriesList[uiIndex].second == 0 && uiIndex > 0)
 			uiIndex--;
 	}

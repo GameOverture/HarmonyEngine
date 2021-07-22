@@ -21,8 +21,10 @@ protected:
 	class PrimPanel : public HyEntity2d
 	{
 	public:
+		HyPrimitive2d		m_BG;				// Acts as thin stroke outline (the stroke's stroke) and a background color that isn't covered by m_Fill
 		HyPrimitive2d		m_Fill;
 		HyPrimitive2d		m_Stroke;
+		HyPrimitive2d		m_Border;
 
 		PrimPanel(int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent);
 	};

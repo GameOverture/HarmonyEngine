@@ -46,22 +46,21 @@ public:
 
 	static void Imbue(std::string sIso639Code, std::string sIso4217Code);
 
-	static std::string Number_Format(int64 iValue, HyNumberFormat format);
-	static std::string Number_Format(double dValue, HyNumberFormat format);
+	static std::string Number_Format(int64 iValue, HyNumberFormat format = HyNumberFormat());
+	static std::string Number_Format(double dValue, HyNumberFormat format = HyNumberFormat());
 
 	// 'iValue' is the total number of all fractional units (pennies/pence/etc) in the total value (eg. 150 = $1.50)
-	static std::string Money_Format(int64 iValue, HyNumberFormat format);
-	static std::string Money_Format(double dValue, HyNumberFormat format);
+	static std::string Money_Format(int64 iValue, HyNumberFormat format = HyNumberFormat());
+	static std::string Money_Format(double dValue, HyNumberFormat format = HyNumberFormat());
 	static int32 Money_GetNumFractionalDigits();
 
-	
-	//static double ConvertCentsToDbl(int64 iTotalFractionUnits);
+	static std::string Percent_Format(double dValue, HyNumberFormat format = HyNumberFormat());
 
 private:
 #ifdef HY_USE_ICU
 	static icu::number::LocalizedNumberFormatter AssembleFormatter(HyNumberFormat format);
 #else
-	static std::stringstream *AllocateFormatter(HyNumberFormat format);
+	static void AssembleFormatter(std::stringstream &ssRef, HyNumberFormat format);
 #endif
 };
 

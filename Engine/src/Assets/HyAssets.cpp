@@ -83,7 +83,7 @@ HyAssets::HyAssets(IHyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sD
 	m_SceneRef(sceneRef),
 	m_sDATADIR(HyIO::CleanPath(sDataDirPath.c_str(), "/", true)),
 	m_bInitialized(false),
-	m_fLoadingPercent(1.0f)
+	m_uiLoadingCountTotal(0)
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
@@ -304,8 +304,12 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 		SetAsLoaded(pLoadable);
 	else
 	{
+		if(m_QueuedInstList.size() == 0)
+			m_uiLoadingCountTotal = 0; // Restart the % loaded
+
 		pLoadable->m_eLoadState = HYLOADSTATE_Queued;
 		m_QueuedInstList.push_back(pLoadable);
+		m_uiLoadingCountTotal++;
 	}
 }
 
@@ -377,6 +381,12 @@ bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 		return false;
 
 	return true;
+}
+
+void HyAssets::GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) const
+{
+	uiNumQueuedOut = static_cast<uint32>(m_QueuedInstList.size());
+	uiTotalOut = m_uiLoadingCountTotal;
 }
 
 // Unload everything
@@ -823,7 +833,9 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 		{
 			if((*it) == pLoadable)
 			{
+				// Canceling the loading
 				m_QueuedInstList.erase(it);
+				m_uiLoadingCountTotal--;
 				break;
 			}
 		}

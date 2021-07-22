@@ -44,11 +44,13 @@ enum HyNumFmtGrouping // Use separators to break up larger integer values (aka t
 enum HyNumFmtRounding // Whether to round any fractional values to a whole integer
 {
 	HYFMTROUNDING_None = 0,							// Default. Shows fractional values using the precision specified by HyNumberFormat::SetFractionPrecision() padding values
-	HYFMTROUNDING_NoneUnlimited,						// Show all fractional digits to the fullest precision
 	HYFMTROUNDING_Ceiling,
 	HYFMTROUNDING_Floor,
 	HYFMTROUNDING_HalfFloor,
 	HYFMTROUNDING_HalfCeiling,
+#ifdef HY_USE_ICU
+	HYFMTROUNDING_NoneUnlimited,					// Show all fractional digits to the fullest precision
+#endif
 };
 
 class HyNumberFormat
@@ -61,8 +63,8 @@ class HyNumberFormat
 	uint32	m_uiGrouping : 3;
 	uint32	m_uiRounding : 3;
 
-	uint32	m_uiTruncateIntegerAt : 7;
-	uint32	m_uiPaddingIntegerAt : 7;
+	uint32	m_uiTruncateIntegerAt : 7; // Not used
+	uint32	m_uiFillIntegerZeros : 7;
 
 	uint32	m_uiMinFraction : 4;
 	uint32	m_uiMaxFraction : 4;
@@ -90,7 +92,7 @@ public:
 	void SetFractionPrecision(int32 iMinFractionPlaces = 0, int32 iMaxFractionPlaces = 6);
 
 	// Values will clamp to [0-127]
-	void SetIntegerWidth(int32 iTruncateAtPlaces = 0, int32 iZeroPaddingPlaces = 0);
+	void SetIntegerPaddingWidth(int32 iZeroPaddingPlaces = 1);
 };
 
 #endif /* HyNumberFormat_h__ */

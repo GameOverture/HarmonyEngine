@@ -245,6 +245,12 @@ bool HyEngine::PollPlatformApi()
 	return sm_pInstance->m_Audio;
 }
 
+/*static*/ void HyEngine::LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut)
+{
+	HyAssert(sm_pInstance != nullptr, "HyEngine::LoadingStatus() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Assets.GetNodeLoadingStatus(uiNumQueuedOut, uiTotalOut);
+}
+
 /*static*/ HyDiagnostics &HyEngine::Diagnostics()
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::Diagnostics() was invoked before engine has been initialized.");

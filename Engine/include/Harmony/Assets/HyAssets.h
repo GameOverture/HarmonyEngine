@@ -80,8 +80,7 @@ class HyAssets : public IHyThreadClass
 	std::queue<IHyFile *>										m_Load_Prepare;
 	std::queue<IHyFile *>										m_Load_Shared;
 	std::queue<IHyFile *>										m_Load_Retrieval;
-
-	float														m_fLoadingPercent; // Best guess at % loaded of all queued assets [0.0 - 1.0]
+	uint32														m_uiLoadingCountTotal;	// Used to determine best guess at % loaded of all queued assets [0.0 - 1.0]
 
 public:
 	HyAssets(IHyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath);
@@ -92,6 +91,7 @@ public:
 
 	IHyFile *GetFile(HyFileType eFileType, uint32 uiManifestIndex);
 	IHyFile *GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum);
+
 	HyFileAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
 	HyFileAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
 	uint32 GetNumAtlases();
@@ -104,6 +104,8 @@ public:
 	void RemoveNodeData(IHyLoadable *pLoadable);
 	void SetEntityLoaded(IHyLoadable *pEntity);
 	bool IsInstLoaded(IHyLoadable *pLoadable);
+
+	void GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) const;
 
 	void Shutdown();
 	bool IsShutdown();

@@ -19,7 +19,7 @@ HyNumberFormat::HyNumberFormat()
 	m_uiRounding = HYFMTROUNDING_None;
 
 	m_uiTruncateIntegerAt = 0;
-	m_uiPaddingIntegerAt = 0;
+	m_uiFillIntegerZeros = 1;
 
 	m_uiMinFraction = 0;
 	m_uiMaxFraction = 6;
@@ -33,7 +33,7 @@ HyNumberFormat::HyNumberFormat(const HyNumberFormat &copyRef)
 	m_uiRounding = copyRef.m_uiRounding;
 
 	m_uiTruncateIntegerAt = copyRef.m_uiTruncateIntegerAt;
-	m_uiPaddingIntegerAt = copyRef.m_uiPaddingIntegerAt;
+	m_uiFillIntegerZeros = copyRef.m_uiFillIntegerZeros;
 
 	m_uiMinFraction = copyRef.m_uiMinFraction;
 	m_uiMaxFraction = copyRef.m_uiMaxFraction;
@@ -47,7 +47,7 @@ HyNumberFormat &HyNumberFormat::operator=(const HyNumberFormat &rhs)
 	m_uiRounding = rhs.m_uiRounding;
 
 	m_uiTruncateIntegerAt = rhs.m_uiTruncateIntegerAt;
-	m_uiPaddingIntegerAt = rhs.m_uiPaddingIntegerAt;
+	m_uiFillIntegerZeros = rhs.m_uiFillIntegerZeros;
 
 	m_uiMinFraction = rhs.m_uiMinFraction;
 	m_uiMaxFraction = rhs.m_uiMaxFraction;
@@ -87,8 +87,7 @@ void HyNumberFormat::SetFractionPrecision(int32 iMinFractionPlaces /*= 0*/, int3
 }
 
 // Values will clamp to [0-127]
-void HyNumberFormat::SetIntegerWidth(int32 iTruncateAtPlaces /*= 0*/, int32 iZeroPaddingPlaces /*= 0*/)
+void HyNumberFormat::SetIntegerPaddingWidth(int32 iZeroPaddingPlaces /*= 1*/)
 {
-	m_uiTruncateIntegerAt = HyClamp(iTruncateAtPlaces, 0, 127);
-	m_uiPaddingIntegerAt = HyClamp(iZeroPaddingPlaces, 0, 127);
+	m_uiFillIntegerZeros = HyClamp(iZeroPaddingPlaces, 0, 127);
 }

@@ -143,6 +143,7 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Widgets/HyButton.cpp
 	src/UI/Widgets/HyCheckBox.cpp
 	src/UI/Widgets/HyLabel.cpp
+	src/UI/Widgets/HyProgressBar.cpp
 	src/UI/Widgets/HyMeter.cpp
 	src/UI/Widgets/HySpacer.cpp
 	src/UI/Widgets/IHyWidget.cpp
@@ -265,6 +266,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Widgets/HyButton.h
 	include/Harmony/UI/Widgets/HyCheckBox.h
 	include/Harmony/UI/Widgets/HyLabel.h
+	include/Harmony/UI/Widgets/HyProgressBar.h
 	include/Harmony/UI/Widgets/HyMeter.h
 	include/Harmony/UI/Widgets/HySpacer.h
 	include/Harmony/UI/Widgets/IHyWidget.h

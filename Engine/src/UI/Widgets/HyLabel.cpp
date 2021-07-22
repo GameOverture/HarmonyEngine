@@ -12,18 +12,28 @@
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyLabel::PrimPanel::PrimPanel(int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent) :
+HyLabel::PrimPanel::PrimPanel(int32 iWidth, int32 iHeight, int32 iBorder, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
+	m_BG(this),
 	m_Fill(this),
-	m_Stroke(this)
+	m_Stroke(this),
+	m_Border(this)
 {
+	m_BG.SetAsBox(iWidth, iHeight);
+	m_BG.SetTint(0.0f, 0.0f, 0.0f);
+
 	m_Fill.SetAsBox(iWidth, iHeight);
 	m_Fill.SetTint(0.5f, 0.5f, 0.5f);
 	
+	m_Border.SetAsBox(iWidth, iHeight);
+	m_Border.SetTint(0.3f, 0.3f, 0.3f);
+	m_Border.SetWireframe(true);
+	m_Border.SetLineThickness(static_cast<float>(iBorder));
+
 	m_Stroke.SetAsBox(iWidth, iHeight);
-	m_Stroke.SetTint(0.3f, 0.3f, 0.3f);
+	m_Stroke.SetTint(0.15f, 0.15f, 0.15f);
 	m_Stroke.SetWireframe(true);
-	m_Stroke.SetLineThickness(static_cast<float>(iStroke));
+	m_Stroke.SetLineThickness(static_cast<float>(iBorder+2));
 
 	Load();
 }
@@ -33,7 +43,7 @@ HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
-	m_Text("", "", this)
+	m_Text("", "")
 {
 }
 
@@ -42,7 +52,7 @@ HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPr
 	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
-	m_Text("", "", this)
+	m_Text("", "")
 {
 	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName);
 }
@@ -52,7 +62,7 @@ HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPr
 	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
-	m_Text("", "", this)
+	m_Text("", "")
 {
 	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
@@ -62,7 +72,7 @@ HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string s
 	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
-	m_Text("", "", this)
+	m_Text("", "")
 {
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName);
 }
@@ -72,7 +82,7 @@ HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string s
 	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
-	m_Text("", "", this)
+	m_Text("", "")
 {
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
