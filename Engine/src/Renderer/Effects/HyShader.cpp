@@ -92,6 +92,11 @@ void HyShader::Finalize()
 	m_bIsFinalized = true;
 }
 
+/*virtual*/ std::string HyShader::AssetTypeName() /*override*/
+{
+	return "Shader";
+}
+
 /*virtual*/ void HyShader::OnLoadThread() /*override*/
 {
 }

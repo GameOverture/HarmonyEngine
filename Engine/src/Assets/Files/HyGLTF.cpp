@@ -31,7 +31,12 @@ const std::string &HyGLTF::GetIdentifier() const
 	return m_sIDENTIFIER;
 }
 
-void HyGLTF::OnLoadThread()
+/*virtual*/ std::string HyGLTF::AssetTypeName() /*override*/
+{
+	return "GLTF";
+}
+
+/*virtual*/ void HyGLTF::OnLoadThread() /*override*/
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
@@ -48,7 +53,7 @@ void HyGLTF::OnLoadThread()
 	}
 }
 
-void HyGLTF::OnRenderThread(IHyRenderer &rendererRef)
+/*virtual*/ void HyGLTF::OnRenderThread(IHyRenderer &rendererRef) /*override*/
 {
 	//if(GetLoadableState() == HYLOADSTATE_Queued)
 	//{

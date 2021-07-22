@@ -65,6 +65,7 @@ public:
 
 	void DeletePixelData();
 
+	virtual std::string AssetTypeName() override;
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 };

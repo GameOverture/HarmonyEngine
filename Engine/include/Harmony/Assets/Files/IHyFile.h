@@ -45,6 +45,7 @@ public:
 
 	uint32 GetManifestIndex() const { return m_uiMANIFEST_INDEX; }
 
+	virtual std::string AssetTypeName() = 0;
 	virtual void OnLoadThread() = 0;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;
 };

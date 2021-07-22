@@ -17,7 +17,7 @@ endif()
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	add_subdirectory(external/glad)
 	
-	# Qt provides its own implementation of SDL facitlities
+	# Qt provides its own implementation of SDL/GLFW facilities
 	if(HYBUILD_Qt)
 		set(HYBUILD_SDL_NET OFF)
 		set(HYBUILD_GLFW OFF)
@@ -151,7 +151,8 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Layouts/IHyLayout.cpp
 	src/UI/Layouts/HyBoxLayout.cpp
 	src/UI/Layouts/HyGridLayout.cpp
-	src/UI/Localization/HyCurrency.cpp
+	src/UI/Localization/HyLocale.cpp
+	src/UI/Localization/HyNumberFormat.cpp
 	src/UI/Localization/HyTextUi.cpp
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
@@ -272,7 +273,8 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Layouts/IHyLayout.h
 	include/Harmony/UI/Layouts/HyBoxLayout.h
 	include/Harmony/UI/Layouts/HyGridLayout.h
-	include/Harmony/UI/Localization/HyCurrency.h
+	include/Harmony/UI/Localization/HyLocale.h
+	include/Harmony/UI/Localization/HyNumberFormat.h
 	include/Harmony/UI/Localization/HyTextUi.h
 	include/Harmony/Utilities/Crc32.h
 	include/Harmony/Utilities/HyIO.h
@@ -318,6 +320,24 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 		if(HYBUILD_GLFW)
 			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw")
 			target_link_libraries(HyEngine PUBLIC glfw)
+		endif()
+		
+		if(HYBUILD_ICU)
+			# ICU - International Components for Unicode (aka Insane Clown Union)
+			# ICU Components Reference: https://cmake.org/cmake/help/latest/module/FindICU.html
+			
+			add_compile_definitions(HY_USE_ICU)
+			
+			cmake_policy(SET CMP0074 NEW) # find_package() command now searches prefixes specified by <PackageName>_ROOT
+			set(ICU_DEBUG ON)
+			set(ICU_ROOT "C:/Soft/test/icu4c-69_1-Win64-MSVC2019")
+			if(WIN32)
+				find_package(ICU 69.0 COMPONENTS uc in REQUIRED)
+				target_link_libraries(HyEngine PUBLIC ICU::uc ICU::in)
+			else()
+				find_package(ICU 69.0 COMPONENTS uc i18n REQUIRED)
+				target_link_libraries(HyEngine PUBLIC ICU::uc ICU::i18n)
+			endif()
 		endif()
 	endif()
 endif()

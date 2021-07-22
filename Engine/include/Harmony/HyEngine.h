@@ -40,7 +40,7 @@
 #include "UI/Widgets/HySpacer.h"
 #include "UI/Layouts/HyBoxLayout.h"
 #include "UI/Layouts/HyGridLayout.h"
-#include "UI/Localization/HyCurrency.h"
+#include "UI/Localization/HyLocale.h"
 #include "UI/Localization/HyTextUi.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyImage.h"

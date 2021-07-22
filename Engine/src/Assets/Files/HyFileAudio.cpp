@@ -28,6 +28,11 @@ bool HyFileAudio::ContainsAsset(uint32 uiAssetChecksum)
 	return m_pInternal->ContainsAsset(uiAssetChecksum);
 }
 
+/*virtual*/ std::string HyFileAudio::AssetTypeName() /*override*/
+{
+	return "Audio";
+}
+
 /*virtual*/ void HyFileAudio::OnLoadThread() /*override*/
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)

@@ -81,6 +81,8 @@ class HyAssets : public IHyThreadClass
 	std::queue<IHyFile *>										m_Load_Shared;
 	std::queue<IHyFile *>										m_Load_Retrieval;
 
+	float														m_fLoadingPercent; // Best guess at % loaded of all queued assets [0.0 - 1.0]
+
 public:
 	HyAssets(IHyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath);
 	virtual ~HyAssets();

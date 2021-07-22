@@ -82,7 +82,8 @@ HyAssets::HyAssets(IHyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sD
 	m_AudioCoreRef(audioCoreRef),
 	m_SceneRef(sceneRef),
 	m_sDATADIR(HyIO::CleanPath(sDataDirPath.c_str(), "/", true)),
-	m_bInitialized(false)
+	m_bInitialized(false),
+	m_fLoadingPercent(1.0f)
 {
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
@@ -763,14 +764,7 @@ void HyAssets::FinalizeData(IHyFile *pData)
 			if(m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest)
 			{
 				m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest->Set(static_cast<HyFileAtlas *>(pData)->GetManifestIndex());
-
-				std::string sAssetType;
-				if(pData->GetLoadableType() == HYFILE_Atlas)
-					sAssetType = "Atlas";
-				else if(pData->GetLoadableType() == HYFILE_AudioBank)
-					sAssetType = "Audio";
-
-				HyLogInfo(sAssetType << " [" << pData->GetManifestIndex() << "] loaded");
+				HyLogInfo(pData->AssetTypeName() << " [" << pData->GetManifestIndex() << "] loaded");
 			}
 
 			// Check queued list upon every loaded piece of data that comes through
@@ -794,13 +788,7 @@ void HyAssets::FinalizeData(IHyFile *pData)
 			if((*iter) == pData)
 			{
 				pData->m_eLoadState = HYLOADSTATE_Queued;
-
-				if(pData->GetLoadableType() == HYFILE_Atlas) {
-					HyLogInfo("Atlas [" << static_cast<HyFileAtlas *>(pData)->GetManifestIndex() << "] reloading");
-				}
-				else {
-					HyLogInfo("Custom Shader reloading");
-				}
+				HyLogInfo(pData->AssetTypeName() << " [" << pData->GetManifestIndex() << "] reloading");
 
 				m_Load_Prepare.push(pData);
 
@@ -813,11 +801,7 @@ void HyAssets::FinalizeData(IHyFile *pData)
 		if(bFoundInReloadList == false)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
-
-			if(pData->GetLoadableType() == HYFILE_Atlas)
-				HyLogInfo("Atlas [" << static_cast<HyFileAtlas *>(pData)->GetManifestIndex() << "] deleted");
-			else
-				HyLogInfo("Custom Shader deleted");
+			HyLogInfo(pData->AssetTypeName() << " [" << pData->GetManifestIndex() << "] deleted");
 		}
 	}
 }

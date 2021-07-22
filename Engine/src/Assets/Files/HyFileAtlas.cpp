@@ -108,7 +108,12 @@ void HyFileAtlas::DeletePixelData()
 	m_uiPixelDataSize = 0;
 }
 
-void HyFileAtlas::OnLoadThread()
+/*virtual*/ std::string HyFileAtlas::AssetTypeName() /*override*/
+{
+	return "Atlas";
+}
+
+/*virtual*/ void HyFileAtlas::OnLoadThread() /*override*/
 {
 	m_Mutex_PixelData.lock();
 
@@ -148,7 +153,7 @@ void HyFileAtlas::OnLoadThread()
 	m_Mutex_PixelData.unlock();
 }
 
-void HyFileAtlas::OnRenderThread(IHyRenderer &rendererRef)
+/*virtual*/ void HyFileAtlas::OnRenderThread(IHyRenderer &rendererRef) /*override*/
 {
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
