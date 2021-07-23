@@ -25,6 +25,7 @@ SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject sett
 
 	ui->chkUseGlfw->setChecked(settingsObj["UseGlfw"].toBool());
 	ui->chkUseSdlNet->setChecked(settingsObj["UseSdlNet"].toBool());
+	ui->chkUseIcu->setChecked(settingsObj["UseIcu"].toBool());
 	
 	QJsonArray dependsArray = settingsObj["SrcDepends"].toArray();
 	for(int32 i = 0; i < dependsArray.size(); ++i)
@@ -98,6 +99,7 @@ void SourceSettingsDlg::UpdateMetaObj(QJsonObject &metaObjRef) const
 
 	metaObjRef.insert("UseGlfw", ui->chkUseGlfw->isChecked());
 	metaObjRef.insert("UseSdlNet", ui->chkUseSdlNet->isChecked());
+	metaObjRef.insert("UseIcu", ui->chkUseIcu->isChecked());
 
 	QDir metaDir(m_ProjectRef.GetSourceAbsPath());
 	QJsonArray srcDependsArray;

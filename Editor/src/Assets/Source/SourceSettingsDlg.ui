@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>619</width>
-    <height>179</height>
+    <width>625</width>
+    <height>195</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -55,6 +55,13 @@
     <widget class="QCheckBox" name="chkUseSdlNet">
      <property name="text">
       <string>Use SDL_NET for networking sockets</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chkUseIcu">
+     <property name="text">
+      <string>Use ICU (international components unicode) for localization formatting - Desktop builds require ICU libaries</string>
      </property>
     </widget>
    </item>

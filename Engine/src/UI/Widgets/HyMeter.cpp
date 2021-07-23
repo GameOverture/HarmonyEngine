@@ -123,14 +123,14 @@ void HyMeter::SetAsSpinningMeter(bool bSet)
 	FormatDigits();
 }
 
-bool HyMeter::IsUsingCommas()
+HyNumberFormat HyMeter::GetNumFormat() const
 {
-	return m_bUseCommas;
+	return m_NumberFormat;
 }
 
-void HyMeter::SetAsUsingCommas(bool bSet)
+void HyMeter::SetNumFormat(HyNumberFormat format)
 {
-	m_bUseCommas = bSet;
+	m_NumberFormat = format;
 	FormatDigits();
 }
 
@@ -173,57 +173,14 @@ void HyMeter::SetAsUsingCommas(bool bSet)
 	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
-std::string HyMeter::ToStringWithCommas(int64 iValue)
-{
-	std::string sStr = std::to_string(iValue);
-
-	if(sStr.size() < 4)
-		return sStr;
-	else
-	{
-		std::string sAppend = "," + sStr.substr(sStr.size() - 3, sStr.size());
-		return ToStringWithCommas(iValue / 1000) + sAppend;
-	}
-}
-
-std::string HyMeter::FormatString(int64 iValue)
-{
-	std::string returnStr;
-
-	if(m_bShowAsCash)
-	{
-		returnStr = (iValue < 0) ? "-$" : "$";
-
-		int64 iNumCents = (abs(iValue) % 100);
-		int64 iNumDollars = (abs(iValue) / 100);
-
-		if(m_bUseCommas)
-			returnStr += ToStringWithCommas(iNumDollars);
-		else
-			returnStr += std::to_string(iNumDollars);
-
-		if(iNumCents >= 10)
-			returnStr += ".";
-		else
-			returnStr += ".0";
-		returnStr += std::to_string(iNumCents);
-	}
-	else
-	{
-		if(m_bUseCommas)
-			returnStr = ToStringWithCommas(iValue / m_iDenomination);
-		else
-			returnStr = std::to_string(iValue / m_iDenomination);
-	}
-
-	return returnStr;
-}
-
 void HyMeter::FormatDigits()
 {
 	float fThreshold = m_Text.GetTextBox().y;
 
-	m_Text.SetText(FormatString(m_iCurValue));
+	if(m_bShowAsCash)
+		m_Text.SetText(HyLocale::Money_Format(m_iCurValue, m_NumberFormat));
+	else
+		m_Text.SetText(HyLocale::Number_Format(m_iCurValue, m_NumberFormat));
 
 	if(m_bSpinDigits)
 	{
@@ -235,7 +192,11 @@ void HyMeter::FormatDigits()
 
 		if(m_iCurValue <= m_iTargetValue)
 		{
-			m_SpinText.m_SpinText_Padded.SetText(FormatString(m_iCurValue + 1));
+			if(m_bShowAsCash)
+				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Money_Format(m_iCurValue + 1, m_NumberFormat));
+			else
+				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Number_Format(m_iCurValue + 1, m_NumberFormat));
+
 			m_SpinText.m_SpinText_Padded.pos.Y(m_SpinText.m_SpinText_Shown.pos.Y() - fThreshold);
 
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)
@@ -250,7 +211,11 @@ void HyMeter::FormatDigits()
 		}
 		else
 		{
-			m_SpinText.m_SpinText_Padded.SetText(FormatString(m_iCurValue - 1));
+			if(m_bShowAsCash)
+				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Money_Format(m_iCurValue - 1, m_NumberFormat));
+			else
+				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Number_Format(m_iCurValue - 1, m_NumberFormat));
+
 			m_SpinText.m_SpinText_Padded.pos.Y(m_SpinText.m_SpinText_Shown.pos.Y() + fThreshold);
 
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)

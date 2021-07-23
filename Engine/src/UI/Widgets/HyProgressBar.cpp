@@ -16,7 +16,7 @@ HyProgressBar::HyProgressBar(HyEntity2d *pParent /*= nullptr*/) :
 	m_iMaximum(0),
 	m_iValue(0)
 {
-	m_NumFormat.SetFractionPrecision(0, 1);
+	m_NumberFormat.SetFractionPrecision(0, 1);
 }
 
 HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent /*= nullptr*/) :
@@ -25,7 +25,7 @@ HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, HyEntit
 	m_iMaximum(0),
 	m_iValue(0)
 {
-	m_NumFormat.SetFractionPrecision(0, 1);
+	m_NumberFormat.SetFractionPrecision(0, 1);
 }
 
 HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
@@ -34,7 +34,7 @@ HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, std::st
 	m_iMaximum(0),
 	m_iValue(0)
 {
-	m_NumFormat.SetFractionPrecision(0, 1);
+	m_NumberFormat.SetFractionPrecision(0, 1);
 }
 
 /*virtual*/ HyProgressBar::~HyProgressBar()
@@ -76,9 +76,15 @@ void HyProgressBar::SetValue(int32 iValue)
 	AdjustProgress();
 }
 
-HyNumberFormat &HyProgressBar::SetPercentFormat()
+HyNumberFormat HyProgressBar::GetNumFormat() const
 {
-	return m_NumFormat;
+	return m_NumberFormat;
+}
+
+void HyProgressBar::SetNumFormat(HyNumberFormat format)
+{
+	m_NumberFormat = format;
+	AdjustProgress();
 }
 
 void HyProgressBar::AdjustProgress()
@@ -91,6 +97,6 @@ void HyProgressBar::AdjustProgress()
 
 		m_pPrimPanel->m_Fill.scale.SetX(fProgress);
 
-		SetText(HyLocale::Percent_Format(fProgress * 100.0, m_NumFormat));
+		SetText(HyLocale::Percent_Format(fProgress * 100.0, m_NumberFormat));
 	}
 }

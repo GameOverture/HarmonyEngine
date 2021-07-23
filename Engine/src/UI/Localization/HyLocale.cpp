@@ -78,7 +78,7 @@ HyLocale::HyLocale()
 		dDenominator *= 10.0;
 
 	auto localizedNumFormatter = AssembleFormatter(format);
-	auto sUnicodeStr = localizedNumFormatter.unit(icu::CurrencyUnit(sm_sIso4217Code.c_str(), eStatus)).formatDouble(static_cast<double>(iValue) / dDenominator, eStatus).toString(eStatus);
+	auto sUnicodeStr = localizedNumFormatter.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus)).formatDouble(static_cast<double>(iValue) / dDenominator, eStatus).toString(eStatus);
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
@@ -97,7 +97,7 @@ HyLocale::HyLocale()
 #if HY_USE_ICU
 	UErrorCode eStatus;
 	auto localizedNumFormatter = AssembleFormatter(format);
-	auto sUnicodeStr = localizedNumFormatter.unit(icu::CurrencyUnit(sm_sIso4217Code.c_str(), eStatus)).formatDouble(dValue, eStatus).toString(eStatus);
+	auto sUnicodeStr = localizedNumFormatter.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus)).formatDouble(dValue, eStatus).toString(eStatus);
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
@@ -136,7 +136,7 @@ HyLocale::HyLocale()
 {
 #if HY_USE_ICU
 	UErrorCode eStatus;
-	icu::UnicodeString uc;
+	UnicodeString uc;
 	uc.fromUTF8(sm_sIso4217Code);
 	
 	return ucurr_getDefaultFractionDigits(uc.getBuffer(), &eStatus);
@@ -152,7 +152,7 @@ HyLocale::HyLocale()
 #if HY_USE_ICU
 	UErrorCode eStatus;
 	auto localizedNumFormatter = AssembleFormatter(format);
-	auto sUnicodeStr = localizedNumFormatter.unit(icu::NoUnit::percent()).formatDouble(dValue, eStatus).toString(eStatus);
+	auto sUnicodeStr = localizedNumFormatter.unit(NoUnit::percent()).formatDouble(dValue, eStatus).toString(eStatus);
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
@@ -165,9 +165,9 @@ HyLocale::HyLocale()
 }
 
 #ifdef HY_USE_ICU
-/*static*/ icu::number::LocalizedNumberFormatter HyLocale::AssembleFormatter(HyNumberFormat format)
+/*static*/ number::LocalizedNumberFormatter HyLocale::AssembleFormatter(HyNumberFormat format)
 {
-	auto localizedNumFormatter = icu::number::NumberFormatter::withLocale(icu::Locale(sm_sIso639Code.c_str()));
+	auto localizedNumFormatter = number::NumberFormatter::withLocale(Locale(sm_sIso639Code.c_str()));
 
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		localizedNumFormatter = localizedNumFormatter.decimal(UNumberDecimalSeparatorDisplay::UNUM_DECIMAL_SEPARATOR_ALWAYS);
@@ -207,7 +207,7 @@ HyLocale::HyLocale()
 	case HYFMTGROUPING_Min2:
 		localizedNumFormatter = localizedNumFormatter.grouping(UNumberGroupingStrategy::UNUM_GROUPING_MIN2);
 		break;
-	case HYFMTGROUPING_OnAligned:
+	case HYFMTGROUPING_Always:
 		localizedNumFormatter = localizedNumFormatter.grouping(UNumberGroupingStrategy::UNUM_GROUPING_ON_ALIGNED);
 		break;
 	case HYFMTGROUPING_Thousands:
@@ -215,12 +215,12 @@ HyLocale::HyLocale()
 		break;
 	}
 
-	localizedNumFormatter = localizedNumFormatter.integerWidth(icu::number::IntegerWidth::zeroFillTo(format.m_uiFillIntegerZeros));
+	localizedNumFormatter = localizedNumFormatter.integerWidth(number::IntegerWidth::zeroFillTo(format.m_uiFillIntegerZeros));
 
 	switch(format.m_uiRounding)
 	{
 	case HYFMTROUNDING_None:
-		localizedNumFormatter = localizedNumFormatter.precision(icu::number::Precision::minMaxFraction(format.m_uiMinFraction, format.m_uiMaxFraction));
+		//localizedNumFormatter = localizedNumFormatter.precision(number::Precision::minMaxFraction(format.m_uiMinFraction, format.m_uiMaxFraction));
 	default:
 		break;
 	case HYFMTROUNDING_Ceiling:
@@ -236,7 +236,7 @@ HyLocale::HyLocale()
 		localizedNumFormatter = localizedNumFormatter.roundingMode(UNumberFormatRoundingMode::UNUM_ROUND_HALF_CEILING);
 		break;
 	case HYFMTROUNDING_NoneUnlimited:
-		localizedNumFormatter = localizedNumFormatter.precision(icu::number::Precision::unlimited());
+		localizedNumFormatter = localizedNumFormatter.precision(number::Precision::unlimited());
 		break;
 	}
 
@@ -263,13 +263,13 @@ HyLocale::HyLocale()
 //	UErrorCode eStatus = U_ZERO_ERROR;
 //
 //	// Ensure that the decimal separatator is '.' for standard parsing with 'std::stod()' below
-//	icu::DecimalFormatSymbols decimalFormatSyms(icu::Locale(sm_sIso639Code.c_str()), eStatus);
-//	decimalFormatSyms.setSymbol(icu::DecimalFormatSymbols::kDecimalSeparatorSymbol, '.');
+//	DecimalFormatSymbols decimalFormatSyms(Locale(sm_sIso639Code.c_str()), eStatus);
+//	decimalFormatSyms.setSymbol(DecimalFormatSymbols::kDecimalSeparatorSymbol, '.');
 //	
 //	auto localizedNumFormatter = AssembleFormatter(HyNumberFormat())
 //		.symbols(decimalFormatSyms)
-//		.unit(icu::CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
-//	auto formattedNum = localizedNumFormatter.formatDecimal(icu::StringPiece(sValue.c_str()), eStatus);
+//		.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
+//	auto formattedNum = localizedNumFormatter.formatDecimal(StringPiece(sValue.c_str()), eStatus);
 //	auto sUnicodeStr = formattedNum.toString(eStatus);
 //
 //	sValue.clear();
@@ -291,4 +291,52 @@ HyLocale::HyLocale()
 //
 //
 //	return dReturnValue;
+//}
+
+
+
+//std::string HyMeter::FormatString(int64 iValue)
+//{
+//	std::string returnStr;
+//
+//	if(m_bShowAsCash)
+//	{
+//		returnStr = (iValue < 0) ? "-$" : "$";
+//
+//		int64 iNumCents = (abs(iValue) % 100);
+//		int64 iNumDollars = (abs(iValue) / 100);
+//
+//		if(m_bUseCommas)
+//			returnStr += ToStringWithCommas(iNumDollars);
+//		else
+//			returnStr += std::to_string(iNumDollars);
+//
+//		if(iNumCents >= 10)
+//			returnStr += ".";
+//		else
+//			returnStr += ".0";
+//		returnStr += std::to_string(iNumCents);
+//	}
+//	else
+//	{
+//		if(m_bUseCommas)
+//			returnStr = ToStringWithCommas(iValue / m_iDenomination);
+//		else
+//			returnStr = std::to_string(iValue / m_iDenomination);
+//	}
+//
+//	return returnStr;
+//}
+
+//std::string HyMeter::ToStringWithCommas(int64 iValue)
+//{
+//	std::string sStr = std::to_string(iValue);
+//
+//	if(sStr.size() < 4)
+//		return sStr;
+//	else
+//	{
+//		std::string sAppend = "," + sStr.substr(sStr.size() - 3, sStr.size());
+//		return ToStringWithCommas(iValue / 1000) + sAppend;
+//	}
 //}

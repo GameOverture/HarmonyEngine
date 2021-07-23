@@ -10,6 +10,7 @@
 #ifndef HyPlatform_Gui_h__
 #define HyPlatform_Gui_h__
 
+#undef APIENTRY
 #include <glad/glad.h>
 #define HY_USE_GLAD
 

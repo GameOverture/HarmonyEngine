@@ -247,6 +247,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	newMetaBankObjRef["SrcDepends"] = QJsonArray();
 	newMetaBankObjRef["UseGlfw"] = false;
 	newMetaBankObjRef["UseSdlNet"] = false;
+	newMetaBankObjRef["UseIcu"] = false;
 }
 
 /*virtual*/ AssetItemData *SourceModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
@@ -477,6 +478,11 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 		sContents.replace("%HY_USESDLNET%", "set(HYBUILD_SDL_NET ON)");
 	else
 		sContents.replace("%HY_USESDLNET%", "set(HYBUILD_SDL_NET OFF)");
+
+	if(pSourceBank->m_MetaObj["UseIcu"].toBool())
+		sContents.replace("%HY_USEICU%", "set(HYBUILD_ICU ON)");
+	else
+		sContents.replace("%HY_USEICU%", "set(HYBUILD_ICU OFF)");
 
 	QString sSrcFiles;
 	for(int32 i = 0; i < pSourceBank->m_AssetList.size(); ++i)

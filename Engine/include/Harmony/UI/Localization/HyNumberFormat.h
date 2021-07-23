@@ -38,7 +38,7 @@ enum HyNumFmtGrouping // Use separators to break up larger integer values (aka t
 	HYFMTGROUPING_Default = 0,						// Display grouping using the default strategy for all locales.
 	HYFMTGROUPING_Off,								// Do not display grouping separators in any locale.
 	HYFMTGROUPING_Min2,								// Display grouping using locale defaults, except do not show grouping on values smaller than 10000 (such that there is a minimum of two digits before the first separator)
-	HYFMTGROUPING_OnAligned,							// Always display the grouping separator on values of at least 1000.
+	HYFMTGROUPING_Always,							// Always display the grouping separator on values of at least 1000.
 	HYFMTGROUPING_Thousands							// Use the Western defaults: groups of 3 and enabled for all numbers 1000 or greater. Do not use locale data for determining the grouping strategy.
 };
 enum HyNumFmtRounding // Whether to round any fractional values to a whole integer
@@ -77,22 +77,31 @@ public:
 	HyNumberFormat &operator=(const HyNumberFormat &rhs);
 
 	// Whether to show the decimal separator after integers when there are one or more digits to display
-	void SetDecimalSeparator(HyNumDecimalSeparator eDecimalSeparator);
+	HyNumDecimalSeparator GetDecimalSeparator() const;
+	// Whether to show the decimal separator after integers when there are one or more digits to display
+	HyNumberFormat SetDecimalSeparator(HyNumDecimalSeparator eDecimalSeparator);
 
 	// How to denote positive and negative numbers.
-	void SetSign(HyNumFmtSign eSign);
+	HyNumFmtSign GetSign() const;
+	// How to denote positive and negative numbers.
+	HyNumberFormat SetSign(HyNumFmtSign eSign);
 
 	// Use separators to break up larger integer values (aka the comma in $12,345.00)
-	void SetGrouping(HyNumFmtGrouping eGrouping);
+	HyNumFmtGrouping GetGrouping() const;
+	// Use separators to break up larger integer values (aka the comma in $12,345.00)
+	HyNumberFormat SetGrouping(HyNumFmtGrouping eGrouping);
 
 	// Whether to round any fractional values to a whole integer
-	void SetRounding(HyNumFmtRounding eRounding);
+	HyNumFmtRounding GetRounding() const;
+	// Whether to round any fractional values to a whole integer
+	HyNumberFormat SetRounding(HyNumFmtRounding eRounding);
 
 	// Values will clamp to [0-15]
-	void SetFractionPrecision(int32 iMinFractionPlaces = 0, int32 iMaxFractionPlaces = 6);
+	HyNumberFormat SetFractionPrecision(int32 iMinFractionPlaces = 0, int32 iMaxFractionPlaces = 6);
 
-	// Values will clamp to [0-127]
-	void SetIntegerPaddingWidth(int32 iZeroPaddingPlaces = 1);
+	// Minimum number of integer digits to display. Will pad with zeros.
+	// Valid values for 'iZeroPaddingPlaces' [0-127]
+	HyNumberFormat SetIntegerPaddingWidth(int32 iZeroPaddingPlaces = 1);
 };
 
 #endif /* HyNumberFormat_h__ */

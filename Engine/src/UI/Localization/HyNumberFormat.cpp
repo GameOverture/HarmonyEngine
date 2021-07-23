@@ -55,39 +55,61 @@ HyNumberFormat &HyNumberFormat::operator=(const HyNumberFormat &rhs)
 	return *this;
 }
 
-// Whether to show the decimal separator after integers when there are one or more digits to display
-void HyNumberFormat::SetDecimalSeparator(HyNumDecimalSeparator eDecimalSeparator)
+HyNumDecimalSeparator HyNumberFormat::GetDecimalSeparator() const
+{
+	return static_cast<HyNumDecimalSeparator>(m_uiDecimalSeparator);
+}
+
+HyNumberFormat HyNumberFormat::SetDecimalSeparator(HyNumDecimalSeparator eDecimalSeparator)
 {
 	m_uiDecimalSeparator = eDecimalSeparator;
+	return *this;
 }
 
-// How to denote positive and negative numbers.
-void HyNumberFormat::SetSign(HyNumFmtSign eSign)
+HyNumFmtSign HyNumberFormat::GetSign() const
+{
+	return static_cast<HyNumFmtSign>(m_uiSign);
+}
+
+HyNumberFormat HyNumberFormat::SetSign(HyNumFmtSign eSign)
 {
 	m_uiSign = eSign;
+	return *this;
 }
 
-// Use separators to break up larger integer values (aka the comma in $12,345.00)
-void HyNumberFormat::SetGrouping(HyNumFmtGrouping eGrouping)
+HyNumFmtGrouping HyNumberFormat::GetGrouping() const
+{
+	return static_cast<HyNumFmtGrouping>(m_uiGrouping);
+}
+
+HyNumberFormat HyNumberFormat::SetGrouping(HyNumFmtGrouping eGrouping)
 {
 	m_uiGrouping = eGrouping;
+	return *this;
 }
 
-// Whether to round any fractional values to a whole integer
-void HyNumberFormat::SetRounding(HyNumFmtRounding eRounding)
+HyNumFmtRounding HyNumberFormat::GetRounding() const
+{
+	return static_cast<HyNumFmtRounding>(m_uiRounding);
+}
+
+HyNumberFormat HyNumberFormat::SetRounding(HyNumFmtRounding eRounding)
 {
 	m_uiRounding = eRounding;
+	return *this;
 }
 
 // Values will clamp to [0-15]
-void HyNumberFormat::SetFractionPrecision(int32 iMinFractionPlaces /*= 0*/, int32 iMaxFractionPlaces /*= 6*/)
+HyNumberFormat HyNumberFormat::SetFractionPrecision(int32 iMinFractionPlaces /*= 0*/, int32 iMaxFractionPlaces /*= 6*/)
 {
 	m_uiMinFraction = HyClamp(iMinFractionPlaces, 0, 15);
 	m_uiMaxFraction = HyClamp(iMaxFractionPlaces, 0, 15);
+	return *this;
 }
 
 // Values will clamp to [0-127]
-void HyNumberFormat::SetIntegerPaddingWidth(int32 iZeroPaddingPlaces /*= 1*/)
+HyNumberFormat HyNumberFormat::SetIntegerPaddingWidth(int32 iZeroPaddingPlaces /*= 1*/)
 {
 	m_uiFillIntegerZeros = HyClamp(iZeroPaddingPlaces, 0, 127);
+	return *this;
 }

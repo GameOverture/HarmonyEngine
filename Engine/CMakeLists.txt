@@ -1,4 +1,4 @@
-# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_STATIC
+# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_ICU, HYBUILD_STATIC
 # BUILD EXTRAS:  HYBUILD_SPINE
 
 add_subdirectory(external/box2d)
@@ -332,7 +332,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			
 			cmake_policy(SET CMP0074 NEW) # find_package() command now searches prefixes specified by <PackageName>_ROOT
 			set(ICU_DEBUG ON)
-			set(ICU_ROOT "C:/Soft/test/icu4c-69_1-Win64-MSVC2019")
+			set(ICU_ROOT "C:/Soft/test/icu4c-69_1-Win64-MSVC2019") # TODO: Fix this!
 			if(WIN32)
 				find_package(ICU 69.0 COMPONENTS uc in REQUIRED)
 				target_link_libraries(HyEngine PUBLIC ICU::uc ICU::in)

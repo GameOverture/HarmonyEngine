@@ -22,6 +22,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 %HY_USEGLFW%
 %HY_USESDLNET%
+%HY_USEICU%
 
 # Build Options
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
@@ -62,6 +63,11 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	list(APPEND HYEM_LINK_FLAGS "-s USE_VORBIS=1")
 	list(APPEND HYEM_LINK_FLAGS "-s USE_SDL_MIXER=2")
 	list(APPEND HYEM_LINK_FLAGS "-s FETCH=1")
+	
+	if(HYBUILD_ICU)
+		list(APPEND HYEM_COMPILE_FLAGS "-s USE_ICU=1")
+		list(APPEND HYEM_LINK_FLAGS "-s USE_ICU=1")
+	endif()
 	
 	if(HYBUILD_SDL_NET)
 		list(APPEND HYEM_COMPILE_FLAGS "-s USE_SDL_NET=2")

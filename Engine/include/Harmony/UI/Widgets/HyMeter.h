@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyLabel.h"
+#include "UI/Localization/HyLocale.h"
 
 class HyMeter : public HyLabel
 {
@@ -25,7 +26,7 @@ class HyMeter : public HyLabel
 
 	bool					m_bShowAsCash = false;
 	bool					m_bSpinDigits = false;
-	bool					m_bUseCommas = false;
+	HyNumberFormat			m_NumberFormat;
 
 	double					m_dTotalDistance = 0.0f;
 	double					m_dPrevDistance = 0.0;
@@ -81,8 +82,8 @@ public:
 	bool IsSpinningMeter();
 	void SetAsSpinningMeter(bool bSet);
 
-	bool IsUsingCommas();
-	void SetAsUsingCommas(bool bSet);
+	HyNumberFormat GetNumFormat() const;
+	void SetNumFormat(HyNumberFormat format);
 
 	void SetText(std::string sText) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
 	virtual void SetTextState(uint32 uiStateIndex) override;
@@ -91,8 +92,6 @@ public:
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
 
 protected:
-	std::string ToStringWithCommas(int64 iValue);
-	std::string FormatString(int64 iValue);
 	void FormatDigits();
 
 	virtual void OnUpdate() override;

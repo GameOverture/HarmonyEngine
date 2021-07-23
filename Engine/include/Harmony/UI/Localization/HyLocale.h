@@ -16,6 +16,12 @@
 #if HY_USE_ICU
 	#define U_CHARSET_IS_UTF8 1
 	#include <unicode/numberformatter.h>
+	
+	#ifdef HY_PLATFORM_BROWSER
+		using namespace icu_62;
+	#else
+		using namespace icu;
+	#endif
 #else
 	#include <locale>
 	#include <iomanip>

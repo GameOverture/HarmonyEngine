@@ -20,7 +20,7 @@ class HyProgressBar : public HyLabel
 	int32			m_iMaximum;
 	int32			m_iValue;
 
-	HyNumberFormat	m_NumFormat;
+	HyNumberFormat	m_NumberFormat;
 
 public:
 	HyProgressBar(HyEntity2d *pParent = nullptr);
@@ -34,7 +34,8 @@ public:
 	void SetRange(int32 iMinimum, int32 iMaximum);
 	void SetValue(int32 iValue);
 
-	HyNumberFormat &SetPercentFormat();
+	HyNumberFormat GetNumFormat() const;
+	void SetNumFormat(HyNumberFormat format);
 
 protected:
 	void AdjustProgress();
