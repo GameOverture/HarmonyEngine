@@ -33,6 +33,7 @@ TextFontManager::TextFontManager(ProjectItemData &itemRef, QJsonObject availGlyp
 	m_uiPreviewAtlasDimension(m_uiPreviewAtlasGrowSize),
 	m_bPreviewAtlasPixelDataInitialized(false)
 {
+	// Default empty font settings
 	bool b09 = true;
 	bool bAZ = true;
 	bool baz = true;
@@ -704,8 +705,17 @@ QString TextFontManager::GetAvailableTypefaceGlyphs() const
 	if(propValue.toInt() == Qt::Checked)
 		sAvailableTypefaceGlyphs += TEXTPROP_Symbols;
 
+	// Always append Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) to be used for invalid glyphs
+	sAvailableTypefaceGlyphs.append(QChar(65533));
+
+	// Finally append the "Additional glyphs" specified, discarding any duplicates
 	propValue = m_GlyphsModel.FindPropertyValue("Uses Glyphs", TEXTPROP_AdditionalSyms);
-	sAvailableTypefaceGlyphs += propValue.toString(); // May contain duplicates as stated in freetype-gl documentation
+	QString sAdditionalGlyphs = propValue.toString();
+	for(int i = 0; i < sAdditionalGlyphs.size(); ++i)
+	{
+		if(sAvailableTypefaceGlyphs.contains(sAdditionalGlyphs[i]) == false)
+			sAvailableTypefaceGlyphs += sAdditionalGlyphs[i];
+	}
 
 	return sAvailableTypefaceGlyphs;
 }

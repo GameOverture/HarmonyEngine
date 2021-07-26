@@ -86,18 +86,18 @@ public:
 	const IHyText &operator=(const IHyText &rhs);
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
-	void SetText(const std::stringstream sText);
-	void SetText(const std::string sText);
-	const std::string &GetText() const;
+	void SetText(const std::stringstream ssUtf8Text);
+	void SetText(const std::string sUtf8Text);
+	const std::string &GetUtf8String() const;
 
 	float GetTextWidth(bool bIncludeScaling = true);
 	float GetTextHeight(bool bIncludeScaling = true);
 
-	uint32 GetNumGlyphs() const;
-	uint32 GetNumShownGlyphs() const;
+	uint32 GetNumCharacters() const;
+	uint32 GetNumShownCharacters() const;
 	uint32 GetNumRenderQuads();
-	//float TextGetScaleBoxModifer();
 
+	uint32 GetCharacterCode(uint32 uiCharIndex) const;
 	glm::vec2 GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
 	glm::vec2 GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
 	float GetGlyphAlpha(uint32 uiCharIndex);

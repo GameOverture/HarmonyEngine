@@ -11,8 +11,9 @@
 #include "UI/Localization/HyLocale.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-/*static*/ std::string HyLocale::sm_sIso639Code("en");
-/*static*/ std::string HyLocale::sm_sIso4217Code("usd");
+/*static*/ std::string HyLocale::sm_sIso639Code("de");
+/*static*/ std::string HyLocale::sm_sIso3166Code("DE");
+/*static*/ std::string HyLocale::sm_sIso4217Code("EUR");
 
 HyLocale::HyLocale()
 {
@@ -22,10 +23,19 @@ HyLocale::HyLocale()
 {
 }
 
-/*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso4217Code)
+/*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code)
 {
+	HyAssert(sIso639Code.size() == 2, "ISO 639 code must be '2' characters");
+	HyAssert(sIso3166Code.size() == 2, "ISO 3166 code must be '2' characters");
+	HyAssert(sIso4217Code.size() == 3, "ISO 4217 code must be '3' characters");
+
 	sm_sIso639Code = sIso639Code;
+	sm_sIso3166Code = sIso3166Code;
 	sm_sIso4217Code = sIso4217Code;
+
+	std::transform(sm_sIso639Code.begin(), sm_sIso639Code.end(), sm_sIso639Code.begin(), ::tolower);
+	std::transform(sm_sIso3166Code.begin(), sm_sIso3166Code.end(), sm_sIso3166Code.begin(), ::toupper);
+	std::transform(sm_sIso4217Code.begin(), sm_sIso4217Code.end(), sm_sIso4217Code.begin(), ::toupper);
 }
 
 /*static*/ std::string HyLocale::Number_Format(int64 iValue, HyNumberFormat format /*= HyNumberFormat()*/)
@@ -33,8 +43,11 @@ HyLocale::HyLocale()
 	std::string sText;
 
 #if HY_USE_ICU
-	UErrorCode eStatus;
-	auto sUnicodeStr = AssembleFormatter(format).formatInt(iValue, eStatus).toString(eStatus);
+	auto localizedNumFormatter = AssembleFormatter(format);
+
+	UErrorCode eStatus = U_ZERO_ERROR;
+	auto formattedNum = localizedNumFormatter.formatInt(iValue, eStatus);
+	auto sUnicodeStr = formattedNum.toString(eStatus);
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
@@ -167,7 +180,7 @@ HyLocale::HyLocale()
 #ifdef HY_USE_ICU
 /*static*/ number::LocalizedNumberFormatter HyLocale::AssembleFormatter(HyNumberFormat format)
 {
-	auto localizedNumFormatter = number::NumberFormatter::withLocale(Locale(sm_sIso639Code.c_str()));
+	auto localizedNumFormatter = number::NumberFormatter::withLocale(Locale(sm_sIso639Code.c_str(), sm_sIso3166Code.c_str()));
 
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		localizedNumFormatter = localizedNumFormatter.decimal(UNumberDecimalSeparatorDisplay::UNUM_DECIMAL_SEPARATOR_ALWAYS);

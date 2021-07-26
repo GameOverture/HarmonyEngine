@@ -93,19 +93,19 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetText(const std::stringstream sText)
+void IHyText<NODETYPE, ENTTYPE>::SetText(const std::stringstream ssUtf8Text)
 {
-	SetText(sText.str());
+	SetText(ssUtf8Text.str());
 }
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetText(const std::string sText)
+void IHyText<NODETYPE, ENTTYPE>::SetText(const std::string sUtf8Text)
 {
-	if(sText == m_sRawString)
+	if(sUtf8Text == m_sRawString)
 		return;
 
-	m_sRawString = sText;
+	m_sRawString = sUtf8Text;
 
 	// Convert 'm_sRawString' from UTF - 8 to UTF - 32LE
 	m_Utf32CodeList.clear();
@@ -122,7 +122,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetText(const std::string sText)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-const std::string &IHyText<NODETYPE, ENTTYPE>::GetText() const
+const std::string &IHyText<NODETYPE, ENTTYPE>::GetUtf8String() const
 {
 	return m_sRawString;
 }
@@ -142,13 +142,13 @@ float IHyText<NODETYPE, ENTTYPE>::GetTextHeight(bool bIncludeScaling /*= true*/)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::GetNumGlyphs() const
+uint32 IHyText<NODETYPE, ENTTYPE>::GetNumCharacters() const
 {
 	return static_cast<uint32>(m_Utf32CodeList.size());
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::GetNumShownGlyphs() const
+uint32 IHyText<NODETYPE, ENTTYPE>::GetNumShownCharacters() const
 {
 	return m_uiNumValidCharacters;
 }
@@ -160,12 +160,12 @@ uint32 IHyText<NODETYPE, ENTTYPE>::GetNumRenderQuads()
 	return m_uiNumRenderQuads;
 }
 
-//template<typename NODETYPE, typename ENTTYPE>
-//float IHyText<NODETYPE, ENTTYPE>::TextGetScaleBoxModifer()
-//{
-//	CalculateGlyphInfos();
-//	return m_fScaleBoxModifier;
-//}
+template<typename NODETYPE, typename ENTTYPE>
+uint32 IHyText<NODETYPE, ENTTYPE>::GetCharacterCode(uint32 uiCharIndex) const
+{
+	HyAssert(uiCharIndex < m_Utf32CodeList.size(), "IHyText<NODETYPE, ENTTYPE>::GetCharacterCode() was passed invalid 'uiCharIndex'");
+	return m_Utf32CodeList[uiCharIndex];
+}
 
 template<typename NODETYPE, typename ENTTYPE>
 glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
@@ -185,6 +185,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 
 	uint32 uiNumLayers = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
+	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset() was passed invalid 'uiCharIndex'");
 	return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
 }
 
@@ -198,6 +199,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 	}
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	HyAssert(uiCharIndex < m_Utf32CodeList.size(), "IHyText<NODETYPE, ENTTYPE>::GetGlyphSize() was passed invalid 'uiCharIndex'");
 	const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
 	if(pGlyphRef == nullptr)
 		return glm::vec2(0.0f);
@@ -223,6 +225,7 @@ float IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha(uint32 uiCharIndex)
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
+	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha() was passed invalid 'uiCharIndex'");
 	return m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
 }
 
@@ -246,6 +249,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 	{
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, uiLayerIndex);
+		HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha() was passed invalid 'uiCharIndex'");
 		m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha = fAlpha;
 	}
 }
@@ -525,7 +529,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
 
-	m_uiNumValidCharacters = 0;
+	m_uiNumValidCharacters = m_uiNumRenderQuads = 0;
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 	const uint32 uiSTR_SIZE = static_cast<uint32>(m_Utf32CodeList.size());
 
@@ -631,7 +635,7 @@ offsetCalculation:
 			++uiNumUnprintableCharacters;
 
 			bDoNewline = true;
-			++uiStrIndex;	// increment past the '\n' since the algorithm assumes a regular character to be the uiNewlineIndex
+			++uiStrIndex;	// increment past the '\n' since the algorithm below assumes a regular character to be the uiNewlineIndex
 
 			uiLastSpaceIndex = uiNewlineIndex;	// Assigning uiLastSpaceIndex to be equal to uiNewlineIndex will "trick" the algorithm below to NOT split the line at the last ' ' character
 			fLastCharWidth = fCurLineWidth;	// Since we aren't technically splitting to the previous character, this will assign the proper line width to vNewlineInfo

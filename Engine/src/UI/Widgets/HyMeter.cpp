@@ -184,11 +184,10 @@ void HyMeter::FormatDigits()
 
 	if(m_bSpinDigits)
 	{
-		std::string sShownString = m_Text.GetText();
-		m_SpinText.m_SpinText_Shown.SetText(sShownString);
+		m_SpinText.m_SpinText_Shown.SetText(m_Text.GetUtf8String());
 
-		HyAssert(sShownString.empty() == false, "FormatString() returned an empty string");
-		uint32 uiCharIndexForScissor = static_cast<uint32>(sShownString.size()) - 1;
+		HyAssert(m_Text.GetNumCharacters() != 0, "HyLocale number formatting returned an empty string");
+		uint32 uiCharIndexForScissor = m_Text.GetNumCharacters() - 1;
 
 		if(m_iCurValue <= m_iTargetValue)
 		{
@@ -201,10 +200,10 @@ void HyMeter::FormatDigits()
 
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)
 			{
-				char cChar = sShownString[uiCharIndexForScissor];
-				if(cChar >= 48 && cChar <= 57)
+				uint32 uiCharCode = m_Text.GetCharacterCode(uiCharIndexForScissor);
+				if(uiCharCode >= 48 && uiCharCode <= 57)
 				{
-					if(cChar != '9')
+					if(uiCharCode != '9')
 						break;
 				}
 			}
@@ -220,19 +219,19 @@ void HyMeter::FormatDigits()
 
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)
 			{
-				char cChar = sShownString[uiCharIndexForScissor];
-				if(cChar >= 48 && cChar <= 57)
+				uint32 uiCharCode = m_Text.GetCharacterCode(uiCharIndexForScissor);
+				if(uiCharCode >= 48 && uiCharCode <= 57)
 				{
-					if(cChar != '0')
+					if(uiCharCode != '0')
 						break;
 				}
 			}
 		}
 
-		for(uint32 i = 0; i < sShownString.size(); ++i)
+		for(uint32 i = 0; i < m_Text.GetNumCharacters(); ++i)
 		{
-			char cChar = sShownString[i];
-			if(cChar >= 48 && cChar <= 57)
+			uint32 uiCharCode = m_Text.GetCharacterCode(i);
+			if(uiCharCode >= 48 && uiCharCode <= 57)
 			{
 				if(i < uiCharIndexForScissor)
 				{
@@ -262,7 +261,7 @@ void HyMeter::FormatDigits()
 	}
 	else
 	{
-		for(uint32 i = 0; i < m_Text.GetText().size(); ++i)
+		for(uint32 i = 0; i < m_Text.GetNumCharacters(); ++i)
 			m_Text.SetGlyphAlpha(i, 1.0f);
 	}
 

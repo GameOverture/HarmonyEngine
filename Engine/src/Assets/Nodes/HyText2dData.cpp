@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyText2dData.h"
 #include "Renderer/IHyRenderer.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 HyText2dData::FontState::FontState(Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, HyJsonArray layersArray) :
 	fLINE_HEIGHT(fLineHeight),
@@ -116,16 +117,18 @@ HyText2dData::HyText2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAs
 			fBottomUv /= uiFullAtlasHeight;
 
 			uint32 uiCode = glyphObj["code"].GetUint();
-			curTypeface[uiCode] = HY_NEW HyText2dGlyphInfo(glyphObj["width"].GetUint(),
-														   glyphObj["height"].GetUint(),
-														   glyphObj["offset_x"].GetInt(),
-														   glyphObj["offset_y"].GetInt(),
-														   glyphObj["advance_x"].GetFloat(),
-														   glyphObj["advance_y"].GetFloat(),
-														   fLeftUv,
-														   fTopUv,
-														   fRightUv,
-														   fBottomUv);
+			HyAssert(curTypeface.find(uiCode) == curTypeface.end(), "Duplicate glyph codes found - fix in HyEditor");
+			curTypeface[uiCode] = HY_NEW HyText2dGlyphInfo(
+				glyphObj["width"].GetUint(),
+				glyphObj["height"].GetUint(),
+				glyphObj["offset_x"].GetInt(),
+				glyphObj["offset_y"].GetInt(),
+				glyphObj["advance_x"].GetFloat(),
+				glyphObj["advance_y"].GetFloat(),
+				fLeftUv,
+				fTopUv,
+				fRightUv,
+				fBottomUv);
 		}
 	}
 
@@ -168,12 +171,22 @@ uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex) const
 
 const HyText2dGlyphInfo *HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const
 {
+	// Special case: No-Break Space CodePoint: 160
+	if(uiUtf32Code == 160)
+		uiUtf32Code = 32; // Use standard space (no breaks should occur because it should act as a regular character from this point)
+
 	auto iter = m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiUtf32Code);
 	if(iter == m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end())
 	{
-		// Returning nullptr here causes glitched out sprites and other corruption. Fatal error.
-		HyError("Missing glyph " << uiUtf32Code << " ('" << static_cast<char>(uiUtf32Code) << "') in Text instance: " << GetPath());
-		return nullptr;
+		HyLogDebug("Missing glyph code " << uiUtf32Code << " in Text instance: " << GetPath());
+
+		// Instead return Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) which should always be available
+		iter = m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(65533);
+		if(iter == m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end())
+		{
+			HyError("Could not retrive Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) which should always be available");
+			return nullptr; // Returning nullptr here causes glitched out sprites and other corruption. Fatal error.
+		}
 	}
 
 	return iter->second;

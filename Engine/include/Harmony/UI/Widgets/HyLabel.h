@@ -66,7 +66,7 @@ public:
 	uint32 GetSpriteState() const;
 	virtual void SetSpriteState(uint32 uiStateIndex);
 
-	std::string GetText() const;
+	std::string GetUtf8String() const;
 	void SetText(std::string sText);
 	virtual void SetTextState(uint32 uiStateIndex);
 	virtual void SetTextAlignment(HyAlignment eAlignment);

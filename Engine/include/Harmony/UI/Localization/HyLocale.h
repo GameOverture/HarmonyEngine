@@ -29,8 +29,9 @@
 
 class HyLocale
 {
-	static std::string		sm_sIso639Code;
-	static std::string		sm_sIso4217Code;
+	static std::string		sm_sIso639Code;			// Language Code
+	static std::string		sm_sIso3166Code;		// Country Code
+	static std::string		sm_sIso4217Code;		// Currency Code
 	
 	bool					m_bUseDecimalSymbol = true;		// Use the fractional symbol if the value is less than 1 integer unit (aka 50¢)
 
@@ -50,7 +51,10 @@ public:
 	HyLocale();
 	virtual ~HyLocale();
 
-	static void Imbue(std::string sIso639Code, std::string sIso4217Code);
+	// sIso639Code: 2 letter lowercase Language Code (example: en)
+	// sIso3166Code: 2 letter uppercase Country Code (example: US)
+	// sIso4217Code: 3 letter uppercase Currency Code (example: USD)
+	static void Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code);
 
 	static std::string Number_Format(int64 iValue, HyNumberFormat format = HyNumberFormat());
 	static std::string Number_Format(double dValue, HyNumberFormat format = HyNumberFormat());

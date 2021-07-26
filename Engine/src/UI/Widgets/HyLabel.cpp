@@ -186,9 +186,9 @@ uint32 HyLabel::GetSpriteState() const
 	ResetTextOnPanel();
 }
 
-/*virtual*/ std::string HyLabel::GetText() const
+/*virtual*/ std::string HyLabel::GetUtf8String() const
 {
-	return m_Text.GetText();
+	return m_Text.GetUtf8String();
 }
 
 /*virtual*/ void HyLabel::SetText(std::string sText)
