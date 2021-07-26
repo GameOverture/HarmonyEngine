@@ -11,9 +11,9 @@
 #include "UI/Localization/HyLocale.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-/*static*/ std::string HyLocale::sm_sIso639Code("de");
-/*static*/ std::string HyLocale::sm_sIso3166Code("DE");
-/*static*/ std::string HyLocale::sm_sIso4217Code("EUR");
+/*static*/ std::string HyLocale::sm_sIso639Code("en");
+/*static*/ std::string HyLocale::sm_sIso3166Code("US");
+/*static*/ std::string HyLocale::sm_sIso4217Code("USD");
 
 HyLocale::HyLocale()
 {
@@ -83,20 +83,20 @@ HyLocale::HyLocale()
 	std::string sText;
 
 #if HY_USE_ICU
-	UErrorCode eStatus;
-
 	int32 iNumFractionDigits = Money_GetNumFractionalDigits();
 	double dDenominator = 1.0;
 	for(int32 i = 0; i < iNumFractionDigits; ++i)
 		dDenominator *= 10.0;
 
+	UErrorCode eStatus;
 	auto localizedNumFormatter = AssembleFormatter(format);
 	auto sUnicodeStr = localizedNumFormatter.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus)).formatDouble(static_cast<double>(iValue) / dDenominator, eStatus).toString(eStatus);
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
 	AssembleFormatter(str, format);
-	str << std::put_money(iValue);
+	str.imbue(std::locale("en_US.UTF-8"));
+	str << std::showbase << std::put_money(iValue);
 	sText = str.str();
 #endif
 
@@ -115,7 +115,8 @@ HyLocale::HyLocale()
 #else
 	std::stringstream str;
 	AssembleFormatter(str, format);
-	str << /*std::showbase << */std::put_money(dValue);
+	str.imbue(std::locale("en_US.UTF-8"));
+	str << std::showbase << std::put_money(dValue);
 	sText = str.str();
 
 	//if(iValue < 100 && m_bUseDecimalSymbol)
@@ -258,13 +259,14 @@ HyLocale::HyLocale()
 #else
 /*static*/ void HyLocale::AssembleFormatter(std::stringstream &ssRef, HyNumberFormat format)
 {
+	ssRef.imbue(std::locale());
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		ssRef.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always)
 		ssRef.setf(std::ios_base::showpos);
 
-	ssRef << std::fixed;
-	ssRef.precision(format.m_uiMaxFraction);
+	//ssRef << std::fixed;
+	//ssRef.precision(format.m_uiMaxFraction);
 }
 #endif
 
