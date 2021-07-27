@@ -15,19 +15,11 @@
 /*static*/ std::string HyLocale::sm_sIso3166Code("US");
 /*static*/ std::string HyLocale::sm_sIso4217Code("USD");
 
-HyLocale::HyLocale()
-{
-}
-
-/*virtual*/ HyLocale::~HyLocale()
-{
-}
-
 /*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code)
 {
-	HyAssert(sIso639Code.size() == 2, "ISO 639 code must be '2' characters");
-	HyAssert(sIso3166Code.size() == 2, "ISO 3166 code must be '2' characters");
-	HyAssert(sIso4217Code.size() == 3, "ISO 4217 code must be '3' characters");
+	HyAssert(sIso639Code.empty() || sIso639Code.size() == 2, "ISO 639 code must be empty string or '2' characters");
+	HyAssert(sIso3166Code.empty() || sIso3166Code.size() == 2, "ISO 3166 code must be empty string or '2' characters");
+	HyAssert(sIso4217Code.empty() || sIso4217Code.size() == 3, "ISO 4217 code must be empty string or '3' characters");
 
 	sm_sIso639Code = sIso639Code;
 	sm_sIso3166Code = sIso3166Code;
@@ -43,15 +35,25 @@ HyLocale::HyLocale()
 	std::string sText;
 
 #if HY_USE_ICU
-	auto localizedNumFormatter = AssembleFormatter(format);
-
 	UErrorCode eStatus = U_ZERO_ERROR;
+	auto localizedNumFormatter = AssembleFormatter(format);
 	auto formattedNum = localizedNumFormatter.formatInt(iValue, eStatus);
+
 	auto sUnicodeStr = formattedNum.toString(eStatus);
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
-	AssembleFormatter(str, format);
+	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, int64>(format, iValue, AssembleLocaleString())));
+	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
+		str.setf(std::ios_base::showpoint);
+	if(format.m_uiSign == HYFMTSIGN_Always ||
+		(format.m_uiSign == HYFMTSIGN_AlwaysExceptZero && iValue != 0) ||
+		format.m_uiSign == HYFMTSIGN_AccountingAlways ||
+		(format.m_uiSign == HYFMTSIGN_AccountingExceptZero && iValue != 0))
+	{
+		str.setf(std::ios_base::showpos);
+	}
+
 	str << iValue;
 	sText = str.str();
 #endif
@@ -64,12 +66,27 @@ HyLocale::HyLocale()
 	std::string sText;
 
 #if HY_USE_ICU
-	UErrorCode eStatus;
-	auto sUnicodeStr = AssembleFormatter(format).formatDouble(dValue, eStatus).toString(eStatus);
+	UErrorCode eStatus = U_ZERO_ERROR;
+	auto localizedNumFormatter = AssembleFormatter(format);
+	auto formattedNum = localizedNumFormatter.formatDouble(dValue, eStatus);
+
+	auto sUnicodeStr = formattedNum.toString(eStatus);
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
-	AssembleFormatter(str, format);
+	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, double>(format, dValue, AssembleLocaleString())));
+	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
+		str.setf(std::ios_base::showpoint);
+	if(format.m_uiSign == HYFMTSIGN_Always ||
+		(format.m_uiSign == HYFMTSIGN_AlwaysExceptZero && dValue != 0) ||
+		format.m_uiSign == HYFMTSIGN_AccountingAlways ||
+		(format.m_uiSign == HYFMTSIGN_AccountingExceptZero && dValue != 0))
+	{
+		str.setf(std::ios_base::showpos);
+	}
+	str << std::fixed;
+	str.precision(format.m_uiMaxFraction);
+
 	str << dValue;
 	sText = str.str();
 #endif
@@ -90,12 +107,25 @@ HyLocale::HyLocale()
 
 	UErrorCode eStatus;
 	auto localizedNumFormatter = AssembleFormatter(format);
-	auto sUnicodeStr = localizedNumFormatter.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus)).formatDouble(static_cast<double>(iValue) / dDenominator, eStatus).toString(eStatus);
+	auto formattedNum = localizedNumFormatter
+		.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus))
+		.formatDouble(static_cast<double>(iValue) / dDenominator, eStatus);
+	
+	auto sUnicodeStr = formattedNum.toString(eStatus);
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
-	AssembleFormatter(str, format);
-	str.imbue(std::locale("en_US.UTF-8"));
+	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, int64>(format, iValue, AssembleLocaleString())));
+	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
+		str.setf(std::ios_base::showpoint);
+	if(format.m_uiSign == HYFMTSIGN_Always ||
+		(format.m_uiSign == HYFMTSIGN_AlwaysExceptZero && iValue != 0) ||
+		format.m_uiSign == HYFMTSIGN_AccountingAlways ||
+		(format.m_uiSign == HYFMTSIGN_AccountingExceptZero && iValue != 0))
+	{
+		str.setf(std::ios_base::showpos);
+	}
+
 	str << std::showbase << std::put_money(iValue);
 	sText = str.str();
 #endif
@@ -114,33 +144,24 @@ HyLocale::HyLocale()
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
-	AssembleFormatter(str, format);
-	str.imbue(std::locale("en_US.UTF-8"));
-	str << std::showbase << std::put_money(dValue);
+	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, double>(format, dValue, AssembleLocaleString())));
+	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
+		str.setf(std::ios_base::showpoint);
+	if(format.m_uiSign == HYFMTSIGN_Always ||
+		(format.m_uiSign == HYFMTSIGN_AlwaysExceptZero && dValue != 0.0) ||
+		format.m_uiSign == HYFMTSIGN_AccountingAlways ||
+		(format.m_uiSign == HYFMTSIGN_AccountingExceptZero && dValue != 0.0))
+	{
+		str.setf(std::ios_base::showpos);
+	}
+
+	int32 iNumFractionDigits = Money_GetNumFractionalDigits();
+	double dDenominator = 1.0;
+	for(int32 i = 0; i < iNumFractionDigits; ++i)
+		dDenominator *= 10.0;
+
+	str << std::showbase << std::put_money(dValue * dDenominator);
 	sText = str.str();
-
-	//if(iValue < 100 && m_bUseDecimalSymbol)
-	//{
-	//	sText = std::to_string(iValue);
-	//	sText += "\xC2\xA2";	// This is the cent symbol in UTF8
-	//}
-	//else
-	//{
-	//	int64 iValue = static_cast<int64>(dValue * 100.0);
-	//	sText = "$";
-	//	int64 iNumDollars = (abs(iValue) / 100);
-	//	sText += std::to_string(iNumDollars);
-
-	//	int64 iNumCents = (abs(iValue) % 100);
-	//	if(/*m_bAlwaysShowDecimal ||*/ iNumCents != 0)
-	//	{
-	//		if(iNumCents >= 10)
-	//			sText += ".";
-	//		else
-	//			sText += ".0";
-	//		sText += std::to_string(iNumCents);
-	//	}
-	//}
 #endif
 
 	return sText;
@@ -155,7 +176,7 @@ HyLocale::HyLocale()
 	
 	return ucurr_getDefaultFractionDigits(uc.getBuffer(), &eStatus);
 #else
-	return 2;
+	return std::use_facet<std::moneypunct<char>>(std::locale(AssembleLocaleString())).frac_digits();
 #endif
 }
 
@@ -169,9 +190,9 @@ HyLocale::HyLocale()
 	auto sUnicodeStr = localizedNumFormatter.unit(NoUnit::percent()).formatDouble(dValue, eStatus).toString(eStatus);
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
+	// Use best guess for formatting
 	std::stringstream str;
-	AssembleFormatter(str, format);
-	str << dValue << "%";
+	str << Number_Format(dValue, format) << "%";
 	sText = str.str();
 #endif
 
@@ -221,9 +242,6 @@ HyLocale::HyLocale()
 	case HYFMTGROUPING_Min2:
 		localizedNumFormatter = localizedNumFormatter.grouping(UNumberGroupingStrategy::UNUM_GROUPING_MIN2);
 		break;
-	case HYFMTGROUPING_Always:
-		localizedNumFormatter = localizedNumFormatter.grouping(UNumberGroupingStrategy::UNUM_GROUPING_ON_ALIGNED);
-		break;
 	case HYFMTGROUPING_Thousands:
 		localizedNumFormatter = localizedNumFormatter.grouping(UNumberGroupingStrategy::UNUM_GROUPING_THOUSANDS);
 		break;
@@ -257,18 +275,42 @@ HyLocale::HyLocale()
 	return localizedNumFormatter;
 }
 #else
-/*static*/ void HyLocale::AssembleFormatter(std::stringstream &ssRef, HyNumberFormat format)
+/*static*/ std::string HyLocale::AssembleLocaleString()
 {
-	ssRef.imbue(std::locale());
-	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
-		ssRef.setf(std::ios_base::showpoint);
-	if(format.m_uiSign == HYFMTSIGN_Always)
-		ssRef.setf(std::ios_base::showpos);
-
-	//ssRef << std::fixed;
-	//ssRef.precision(format.m_uiMaxFraction);
+	std::string sStdName;
+	if(sm_sIso639Code.empty() == false)
+	{
+		sStdName = sm_sIso639Code;
+		if(sm_sIso3166Code.empty() == false)
+			sStdName += "_" + sm_sIso3166Code;
+	}
+	sStdName += ".UTF-8";
+	return sStdName;
 }
 #endif
+
+//if(iValue < 100 && m_bUseDecimalSymbol)
+//{
+//	sText = std::to_string(iValue);
+//	sText += "\xC2\xA2";	// This is the cent symbol in UTF8
+//}
+//else
+//{
+//	int64 iValue = static_cast<int64>(dValue * 100.0);
+//	sText = "$";
+//	int64 iNumDollars = (abs(iValue) / 100);
+//	sText += std::to_string(iNumDollars);
+
+//	int64 iNumCents = (abs(iValue) % 100);
+//	if(/*m_bAlwaysShowDecimal ||*/ iNumCents != 0)
+//	{
+//		if(iNumCents >= 10)
+//			sText += ".";
+//		else
+//			sText += ".0";
+//		sText += std::to_string(iNumCents);
+//	}
+//}
 
 ///*static*/ double HyLocale::Number_Parse(std::string sValue)
 //{
