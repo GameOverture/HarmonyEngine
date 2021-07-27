@@ -108,6 +108,8 @@ void IHyNetworkClass::CleanupSocket()
 	case CONNECTION_NotConnected:
 		if(sm_pNetworking->CreateClient(m_sHost, m_uiPort, m_hSock) == false)
 		{
+			OnNetShutdown();
+
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			m_uiAttemptCount++;
 			if(m_uiAttemptCount > 5)
