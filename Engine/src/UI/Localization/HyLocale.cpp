@@ -37,6 +37,11 @@
 	std::transform(sm_sIso4217Code.begin(), sm_sIso4217Code.end(), sm_sIso4217Code.begin(), ::toupper);
 }
 
+/*static*/ void HyLocale::SetMinorCurrencySymbol(std::string sMinorCurrencySymbolUtf8)
+{
+	sm_sMinorCurrencyUnit = sMinorCurrencySymbolUtf8;
+}
+
 /*static*/ std::string HyLocale::Number_Format(int64 iValue, HyNumberFormat format /*= HyNumberFormat()*/)
 {
 	std::string sText;

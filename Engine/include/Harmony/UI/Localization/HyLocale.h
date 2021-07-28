@@ -46,7 +46,7 @@ public:
 	// Once specified, HyNumberFormat's used in Money_Format() can optionally use the minor
 	// fractional symbol if the value is less than 1 integer unit (aka 50¢)
 	// sMinorCurrencyUnitUtf8: UTF-8 string representing the minor currency symbol to use
-	static void SetMinorCurrencyUnit(std::string sMinorCurrencyUnitUtf8);
+	static void SetMinorCurrencySymbol(std::string sMinorCurrencySymbolUtf8);
 
 	static std::string Number_Format(int64 iValue, HyNumberFormat format = HyNumberFormat());
 	static std::string Number_Format(double dValue, HyNumberFormat format = HyNumberFormat());
