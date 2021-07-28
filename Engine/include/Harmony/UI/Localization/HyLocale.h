@@ -33,7 +33,7 @@ class HyLocale
 	static std::string		sm_sIso3166Code;		// Country Code
 	static std::string		sm_sIso4217Code;		// Currency Code
 
-	static std::string		sm_sMinorCurrencyUnit;	// Currency "cent" symbol
+	static std::string		sm_sMinorCurrencySymbol;// Currency "cent" symbol
 
 public:
 	// Globally sets all HyLocale formatting

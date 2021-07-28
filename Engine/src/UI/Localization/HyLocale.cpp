@@ -14,7 +14,7 @@
 /*static*/ std::string HyLocale::sm_sIso639Code("en");
 /*static*/ std::string HyLocale::sm_sIso3166Code("US");
 /*static*/ std::string HyLocale::sm_sIso4217Code("USD");
-/*static*/ std::string HyLocale::sm_sMinorCurrencyUnit("");
+/*static*/ std::string HyLocale::sm_sMinorCurrencySymbol("");
 
 /*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code /*= ""*/)
 {
@@ -39,7 +39,7 @@
 
 /*static*/ void HyLocale::SetMinorCurrencySymbol(std::string sMinorCurrencySymbolUtf8)
 {
-	sm_sMinorCurrencyUnit = sMinorCurrencySymbolUtf8;
+	sm_sMinorCurrencySymbol = sMinorCurrencySymbolUtf8;
 }
 
 /*static*/ std::string HyLocale::Number_Format(int64 iValue, HyNumberFormat format /*= HyNumberFormat()*/)
@@ -115,11 +115,11 @@
 	std::string sText;
 
 	if(format.IsUsingMinorCurrencySymbol() &&
-	   sm_sMinorCurrencyUnit.empty() == false &&
+	   sm_sMinorCurrencySymbol.empty() == false &&
 	   iValue < 100)
 	{
 		sText = std::to_string(iValue);
-		sText += sm_sMinorCurrencyUnit;
+		sText += sm_sMinorCurrencySymbol;
 		return sText;
 	}
 
@@ -165,12 +165,12 @@
 	std::string sText;
 
 	if(format.IsUsingMinorCurrencySymbol() &&
-	   sm_sMinorCurrencyUnit.empty() == false &&
+	   sm_sMinorCurrencySymbol.empty() == false &&
 	   dValue < 1.0)
 	{
 		int32 iCents = dValue * 100.0;
 		sText = std::to_string(iCents);
-		sText += sm_sMinorCurrencyUnit;
+		sText += sm_sMinorCurrencySymbol;
 		return sText;
 	}
 
