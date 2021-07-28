@@ -55,7 +55,7 @@
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
-	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, int64>(format, iValue, AssembleLocaleString())));
+	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, int64>(format, iValue, AssembleStdLocaleString())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -86,7 +86,7 @@
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
-	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, double>(format, dValue, AssembleLocaleString())));
+	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, double>(format, dValue, AssembleStdLocaleString())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -139,7 +139,7 @@
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
-	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, int64>(format, iValue, AssembleLocaleString())));
+	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, int64>(format, iValue, AssembleStdLocaleString())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -181,7 +181,7 @@
 	sUnicodeStr.toUTF8String<std::string>(sText);
 #else
 	std::stringstream str;
-	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, double>(format, dValue, AssembleLocaleString())));
+	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, double>(format, dValue, AssembleStdLocaleString())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -217,7 +217,7 @@
 	
 	return ucurr_getDefaultFractionDigits(uc.getBuffer(), &eStatus);
 #else
-	return std::use_facet<std::moneypunct<char>>(std::locale(AssembleLocaleString())).frac_digits();
+	return std::use_facet<std::moneypunct<char>>(std::locale(AssembleStdLocaleString())).frac_digits();
 #endif
 }
 
