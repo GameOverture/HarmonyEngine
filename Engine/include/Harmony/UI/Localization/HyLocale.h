@@ -13,6 +13,9 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Localization/HyNumberFormat.h"
 
+#include <locale>
+#include <iomanip>
+
 #if HY_USE_ICU
 	#define U_CHARSET_IS_UTF8 1
 	#include <unicode/numberformatter.h>
@@ -22,9 +25,6 @@
 	#else
 		using namespace icu;
 	#endif
-#else
-	#include <locale>
-	#include <iomanip>
 #endif
 
 class HyLocale
@@ -32,8 +32,8 @@ class HyLocale
 	static std::string		sm_sIso639Code;			// Language Code
 	static std::string		sm_sIso3166Code;		// Country Code
 	static std::string		sm_sIso4217Code;		// Currency Code
-	
-	bool					m_bUseDecimalSymbol = true;		// Use the fractional symbol if the value is less than 1 integer unit (aka 50¢)
+
+	static std::string		sm_sMinorCurrencyUnit;	// Currency "cent" symbol
 
 public:
 	// Globally sets all HyLocale formatting
@@ -41,7 +41,12 @@ public:
 	// sIso639Code: 2 letter lowercase Language Code (example: en)
 	// sIso3166Code: 2 letter uppercase Country Code (example: US)
 	// sIso4217Code: ***ONLY USED WITH ICU LIBRARY*** 3 letter uppercase Currency Code (example: USD)
-	static void Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code);
+	static void Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code = "");
+
+	// Once specified, HyNumberFormat's used in Money_Format() can optionally use the minor
+	// fractional symbol if the value is less than 1 integer unit (aka 50¢)
+	// sMinorCurrencyUnitUtf8: UTF-8 string representing the minor currency symbol to use
+	static void SetMinorCurrencyUnit(std::string sMinorCurrencyUnitUtf8);
 
 	static std::string Number_Format(int64 iValue, HyNumberFormat format = HyNumberFormat());
 	static std::string Number_Format(double dValue, HyNumberFormat format = HyNumberFormat());
@@ -54,11 +59,11 @@ public:
 	static std::string Percent_Format(double dValue, HyNumberFormat format = HyNumberFormat());
 
 private:
+	static std::string AssembleStdLocaleString();
+
 #ifdef HY_USE_ICU
 	static icu::number::LocalizedNumberFormatter AssembleFormatter(HyNumberFormat format);
 #else
-	static std::string AssembleLocaleString();
-
 	template <typename CharT, typename ValueT>
 	class HyLocale_numberpunct : public std::numpunct_byname<CharT>
 	{

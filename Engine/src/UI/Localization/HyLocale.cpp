@@ -14,8 +14,9 @@
 /*static*/ std::string HyLocale::sm_sIso639Code("en");
 /*static*/ std::string HyLocale::sm_sIso3166Code("US");
 /*static*/ std::string HyLocale::sm_sIso4217Code("USD");
+/*static*/ std::string HyLocale::sm_sMinorCurrencyUnit("");
 
-/*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code)
+/*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code /*= ""*/)
 {
 	HyAssert(sIso639Code.empty() || sIso639Code.size() == 2, "ISO 639 code must be empty string or '2' characters");
 	HyAssert(sIso3166Code.empty() || sIso3166Code.size() == 2, "ISO 3166 code must be empty string or '2' characters");
@@ -24,6 +25,12 @@
 	sm_sIso639Code = sIso639Code;
 	sm_sIso3166Code = sIso3166Code;
 	sm_sIso4217Code = sIso4217Code;
+
+	if(sm_sIso4217Code.empty())
+	{
+		sm_sIso4217Code = std::use_facet<std::moneypunct<char, true>>(std::locale(AssembleStdLocaleString())).curr_symbol();
+		sm_sIso4217Code = sm_sIso4217Code.substr(0, 3);
+	}
 
 	std::transform(sm_sIso639Code.begin(), sm_sIso639Code.end(), sm_sIso639Code.begin(), ::tolower);
 	std::transform(sm_sIso3166Code.begin(), sm_sIso3166Code.end(), sm_sIso3166Code.begin(), ::toupper);
@@ -84,10 +91,13 @@
 	{
 		str.setf(std::ios_base::showpos);
 	}
-	str << std::fixed;
 	str.precision(format.m_uiMaxFraction);
 
-	str << dValue;
+	if(format.IsUsingScientificNotation())
+		str << std::scientific << std::fixed << dValue;
+	else
+		str << std::fixed << dValue;
+	
 	sText = str.str();
 #endif
 
@@ -98,6 +108,15 @@
 /*static*/ std::string HyLocale::Money_Format(int64 iValue, HyNumberFormat format /*= HyNumberFormat()*/)
 {
 	std::string sText;
+
+	if(format.IsUsingMinorCurrencySymbol() &&
+	   sm_sMinorCurrencyUnit.empty() == false &&
+	   iValue < 100)
+	{
+		sText = std::to_string(iValue);
+		sText += sm_sMinorCurrencyUnit;
+		return sText;
+	}
 
 #if HY_USE_ICU
 	int32 iNumFractionDigits = Money_GetNumFractionalDigits();
@@ -126,7 +145,10 @@
 		str.setf(std::ios_base::showpos);
 	}
 
-	str << std::showbase << std::put_money(iValue);
+	if(format.IsUsingScientificNotation())
+		str << std::scientific << std::showbase << std::put_money(iValue);
+	else
+		str << std::showbase << std::put_money(iValue);
 	sText = str.str();
 #endif
 
@@ -136,6 +158,16 @@
 /*static*/ std::string HyLocale::Money_Format(double dValue, HyNumberFormat format /*= HyNumberFormat()*/)
 {
 	std::string sText;
+
+	if(format.IsUsingMinorCurrencySymbol() &&
+	   sm_sMinorCurrencyUnit.empty() == false &&
+	   dValue < 1.0)
+	{
+		int32 iCents = dValue * 100.0;
+		sText = std::to_string(iCents);
+		sText += sm_sMinorCurrencyUnit;
+		return sText;
+	}
 
 #if HY_USE_ICU
 	UErrorCode eStatus;
@@ -160,7 +192,11 @@
 	for(int32 i = 0; i < iNumFractionDigits; ++i)
 		dDenominator *= 10.0;
 
-	str << std::showbase << std::put_money(dValue * dDenominator);
+	if(format.IsUsingScientificNotation())
+		str << std::scientific << std::showbase << std::put_money(dValue * dDenominator);
+	else
+		str << std::showbase << std::put_money(dValue * dDenominator);
+
 	sText = str.str();
 #endif
 
@@ -214,6 +250,9 @@
 	case HYFMTSIGN_Always:
 		localizedNumFormatter = localizedNumFormatter.sign(UNumberSignDisplay::UNUM_SIGN_ALWAYS);
 		break;
+	case HYFMTSIGN_AlwaysExceptZero:
+		localizedNumFormatter = localizedNumFormatter.sign(UNumberSignDisplay::UNUM_SIGN_EXCEPT_ZERO);
+		break;
 	case HYFMTSIGN_Never:
 		localizedNumFormatter = localizedNumFormatter.sign(UNumberSignDisplay::UNUM_SIGN_NEVER);
 		break;
@@ -222,9 +261,6 @@
 		break;
 	case HYFMTSIGN_AccountingAlways:
 		localizedNumFormatter = localizedNumFormatter.sign(UNumberSignDisplay::UNUM_SIGN_ACCOUNTING_ALWAYS);
-		break;
-	case HYFMTSIGN_ExceptZero:
-		localizedNumFormatter = localizedNumFormatter.sign(UNumberSignDisplay::UNUM_SIGN_EXCEPT_ZERO);
 		break;
 	case HYFMTSIGN_AccountingExceptZero:
 		localizedNumFormatter = localizedNumFormatter.sign(UNumberSignDisplay::UNUM_SIGN_ACCOUNTING_EXCEPT_ZERO);
@@ -272,10 +308,14 @@
 		break;
 	}
 
+	if(format.IsUsingScientificNotation())
+		localizedNumFormatter = localizedNumFormatter.notation(number::Notation::scientific());
+
 	return localizedNumFormatter;
 }
-#else
-/*static*/ std::string HyLocale::AssembleLocaleString()
+#endif
+
+/*static*/ std::string HyLocale::AssembleStdLocaleString()
 {
 	std::string sStdName;
 	if(sm_sIso639Code.empty() == false)
@@ -287,7 +327,6 @@
 	sStdName += ".UTF-8";
 	return sStdName;
 }
-#endif
 
 //if(iValue < 100 && m_bUseDecimalSymbol)
 //{

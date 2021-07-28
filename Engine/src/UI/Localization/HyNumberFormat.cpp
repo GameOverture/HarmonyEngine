@@ -18,7 +18,9 @@ HyNumberFormat::HyNumberFormat()
 	m_uiGrouping = HYFMTGROUPING_Default;
 	m_uiRounding = HYFMTROUNDING_None;
 
-	m_uiTruncateIntegerAt = 0;
+	m_uiUseMinorCurrencySymbol = 0;
+	m_uiUseScientificNotation = 0;
+	
 	m_uiFillIntegerZeros = 1;
 
 	m_uiMinFraction = 0;
@@ -32,7 +34,9 @@ HyNumberFormat::HyNumberFormat(const HyNumberFormat &copyRef)
 	m_uiGrouping = copyRef.m_uiGrouping;
 	m_uiRounding = copyRef.m_uiRounding;
 
-	m_uiTruncateIntegerAt = copyRef.m_uiTruncateIntegerAt;
+	m_uiUseMinorCurrencySymbol = copyRef.m_uiUseMinorCurrencySymbol;
+	m_uiUseScientificNotation = copyRef.m_uiUseScientificNotation;
+
 	m_uiFillIntegerZeros = copyRef.m_uiFillIntegerZeros;
 
 	m_uiMinFraction = copyRef.m_uiMinFraction;
@@ -46,7 +50,9 @@ HyNumberFormat &HyNumberFormat::operator=(const HyNumberFormat &rhs)
 	m_uiGrouping = rhs.m_uiGrouping;
 	m_uiRounding = rhs.m_uiRounding;
 
-	m_uiTruncateIntegerAt = rhs.m_uiTruncateIntegerAt;
+	m_uiUseMinorCurrencySymbol = rhs.m_uiUseMinorCurrencySymbol;
+	m_uiUseScientificNotation = rhs.m_uiUseScientificNotation;
+
 	m_uiFillIntegerZeros = rhs.m_uiFillIntegerZeros;
 
 	m_uiMinFraction = rhs.m_uiMinFraction;
@@ -96,6 +102,28 @@ HyNumFmtRounding HyNumberFormat::GetRounding() const
 HyNumberFormat HyNumberFormat::SetRounding(HyNumFmtRounding eRounding)
 {
 	m_uiRounding = eRounding;
+	return *this;
+}
+
+bool HyNumberFormat::IsUsingMinorCurrencySymbol() const
+{
+	return (m_uiUseMinorCurrencySymbol == 1);
+}
+
+HyNumberFormat HyNumberFormat::SetUsingMinorCurrencySymbol(bool bUseMinorCurrencySymbol)
+{
+	m_uiUseMinorCurrencySymbol = bUseMinorCurrencySymbol ? 1 : 0;
+	return *this;
+}
+
+bool HyNumberFormat::IsUsingScientificNotation() const
+{
+	return (m_uiUseScientificNotation == 1);
+}
+
+HyNumberFormat HyNumberFormat::SetUsingScientificNotation(bool bUseScientificNotation)
+{
+	m_uiUseScientificNotation = bUseScientificNotation ? 1 : 0;
 	return *this;
 }
 

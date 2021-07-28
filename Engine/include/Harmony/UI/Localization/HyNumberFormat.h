@@ -60,12 +60,14 @@ class HyNumberFormat
 	uint32	m_uiGrouping : 3;
 	uint32	m_uiRounding : 3;
 
-	uint32	m_uiTruncateIntegerAt : 7; // Not used
+	uint32	m_uiUseMinorCurrencySymbol : 1;
+	uint32	m_uiUseScientificNotation : 1;
+
 	uint32	m_uiFillIntegerZeros : 7;
 
 	uint32	m_uiMinFraction : 4;
 	uint32	m_uiMaxFraction : 4;
-	// Total bits used: 32
+	// Total bits used: 27
 
 public:
 	HyNumberFormat();
@@ -92,6 +94,16 @@ public:
 	HyNumFmtRounding GetRounding() const;
 	// Whether to round any fractional values to a whole integer
 	HyNumberFormat SetRounding(HyNumFmtRounding eRounding);
+
+	// Whether to optionally use the minor fractional symbol when formatting currencies if the value is less than 1 integer unit (aka 50¢)
+	bool IsUsingMinorCurrencySymbol() const;
+	// Whether to optionally use the minor fractional symbol when formatting currencies if the value is less than 1 integer unit (aka 50¢)
+	HyNumberFormat SetUsingMinorCurrencySymbol(bool bUseMinorCurrencySymbol);
+
+	// Whether to optionally format floating-point values using scientific notation
+	bool IsUsingScientificNotation() const;
+	// Whether to optionally format floating-point values using scientific notation
+	HyNumberFormat SetUsingScientificNotation(bool bUseScientificNotation);
 
 	// Values will clamp to [0-15]
 	HyNumberFormat SetFractionPrecision(int32 iMinFractionPlaces = 0, int32 iMaxFractionPlaces = 6);
