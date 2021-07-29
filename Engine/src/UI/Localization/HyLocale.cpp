@@ -168,7 +168,7 @@
 	   sm_sMinorCurrencySymbol.empty() == false &&
 	   dValue < 1.0)
 	{
-		int32 iCents = dValue * 100.0;
+		int32 iCents = static_cast<int32>(dValue * 100.0); // Truncate any fractional values
 		sText = std::to_string(iCents);
 		sText += sm_sMinorCurrencySymbol;
 		return sText;

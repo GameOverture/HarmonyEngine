@@ -75,6 +75,7 @@ void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc /*= H
 	if(fSeconds <= 0.0f)
 	{
 		Set(fTo);
+		fpFinishedCallback(&m_OwnerRef);
 		return;
 	}
 
@@ -94,6 +95,7 @@ void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTw
 	if(fSeconds <= 0.0f)
 	{
 		Set(m_fValueRef + fOffsetAmt);
+		fpFinishedCallback(&m_OwnerRef);
 		return;
 	}
 
@@ -110,9 +112,20 @@ void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTw
 
 void HyAnimFloat::Proc(float fSeconds, std::function<float(float)> fpProcFunc, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
 {
-	m_fDuration = fSeconds;
+	// Even if duration is instant, we still need to invoke the proc func once. Do so safely by ensuring m_fDuration isn't 0.0
+	if(fSeconds <= 0.0f)
+	{
+		// This will simulate the final update of the proc func
+		m_fDuration = 1.0f;
+		m_fElapsedTime = 1.0f;
+	}
+	else
+	{
+		// Standard initialization
+		m_fDuration = fSeconds;
+		m_fElapsedTime = 0.0f;
+	}
 	m_fpAnimFunc = fpProcFunc;
-	m_fElapsedTime = 0.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::_Proc;
 	m_fpAnimFinishedFunc = fpFinishedCallback;
 

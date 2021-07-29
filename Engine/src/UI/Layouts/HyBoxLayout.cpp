@@ -122,9 +122,9 @@ void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 
 			// Resize this item based on all the final calculations of size policies and size constraints
 			HySizePolicy eSizePolicy = pWidget->GetSizePolicy(static_cast<HyOrientation>(m_eOrientation));
-			vItemSize[m_eOrientation] += vGrowAmt * (eSizePolicy & HY_SIZEFLAG_GROW);
-			vItemSize[m_eOrientation] += vExpandAmt * ((eSizePolicy & HY_SIZEFLAG_EXPAND) >> 1);
-			vItemSize[m_eOrientation] += vShrinkAmt * ((eSizePolicy & HY_SIZEFLAG_SHRINK) >> 2);
+			vItemSize[m_eOrientation] += static_cast<int32>(vGrowAmt * (eSizePolicy & HY_SIZEFLAG_GROW));
+			vItemSize[m_eOrientation] += static_cast<int32>(vExpandAmt * ((eSizePolicy & HY_SIZEFLAG_EXPAND) >> 1));
+			vItemSize[m_eOrientation] += static_cast<int32>(vShrinkAmt * ((eSizePolicy & HY_SIZEFLAG_SHRINK) >> 2));
 
 			HySizePolicy eInverseSizePolicy = pWidget->GetSizePolicy(static_cast<HyOrientation>(iInverseOrien));
 			if(vDifference[iInverseOrien] >= 0)
@@ -150,9 +150,9 @@ void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 			IHyLayout *pLayout = static_cast<IHyLayout *>(pItem);
 			vItemSize = pLayout->GetPreferredSize();
 
-			vItemSize[m_eOrientation] += vGrowAmt;
-			vItemSize[m_eOrientation] += vExpandAmt;
-			vItemSize[m_eOrientation] += vShrinkAmt;
+			vItemSize[m_eOrientation] += static_cast<int32>(vGrowAmt);
+			vItemSize[m_eOrientation] += static_cast<int32>(vExpandAmt);
+			vItemSize[m_eOrientation] += static_cast<int32>(vShrinkAmt);
 
 			vItemSize[iInverseOrien] += m_vSize[iInverseOrien] - vItemSize[iInverseOrien];
 
