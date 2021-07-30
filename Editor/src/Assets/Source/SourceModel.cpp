@@ -114,7 +114,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	QString sDestinationPath = m_MetaDir.absoluteFilePath(AssembleFilter(data(destIndex, Qt::UserRole).value<TreeModelItemData *>(), true));
 	sDestinationPath += "/" + sFileName + "." + QFileInfo(sTemplateFilePath).suffix();
 	file.setFileName(sDestinationPath);
-	if(!file.open(QFile::WriteOnly))
+	if(!file.open(QFile::WriteOnly | QFile::Text))
 	{
 		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
 		return QString();
@@ -537,7 +537,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 
 	// Save generated CMakeLists file to destination
 	file.setFileName(m_MetaDir.absoluteFilePath("CMakeLists.txt"));
-	if(!file.open(QFile::WriteOnly))
+	if(!file.open(QFile::WriteOnly | QFile::Text))
 	{
 		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
 		return;

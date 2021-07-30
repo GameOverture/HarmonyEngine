@@ -22,6 +22,11 @@ protected:
 	LEAF			m_Leaf;
 
 public:
+	HyEntityLeaf2d(HyEntity2d *pParent = nullptr) :
+		HyEntity2d(pParent)
+	{
+	}
+
 	HyEntityLeaf2d(std::string sLeafPrefix, std::string sLeafName, HyEntity2d *pParent = nullptr) :
 		HyEntity2d(pParent)
 	{
@@ -32,6 +37,16 @@ public:
 	{
 		// Manually remove the defining leaf here so it doesn't assert when 'm_Leaf' destructs and removes itself from this class
 		HyEntity2d::ChildRemove(&m_Leaf);
+	}
+
+	bool IsLeafValid() const
+	{
+		return m_Leaf.IsDataValid();
+	}
+
+	void InitLeaf(std::string sLeafPrefix, std::string sLeafName)
+	{
+		m_Leaf.Init(sLeafPrefix, sLeafName, this);
 	}
 
 	LEAF &GetLeaf()
