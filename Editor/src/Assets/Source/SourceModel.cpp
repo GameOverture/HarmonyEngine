@@ -101,9 +101,12 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 		HyGuiLog("Error reading " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
 		return QString();
 	}
-	QTextCodec *pCodec = QTextCodec::codecForLocale();
-	QString sContents = pCodec->toUnicode(file.readAll());
+	
+	QString sContents = file.readAll();
 	file.close();
+
+	// Strip return characters because they are causing problems
+	sContents.remove('\r');
 
 	// Replace template variables
 	sContents.replace("%HY_CLASS%", sClassName);
@@ -119,7 +122,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
 		return QString();
 	}
-	file.write(pCodec->fromUnicode(sContents));
+	file.write(sContents.toUtf8());
 	file.close();
 
 	return sDestinationPath;
@@ -458,9 +461,11 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 		HyGuiLog("Error reading " % file.fileName() % " when generating CMakeLists.txt: " % file.errorString(), LOGTYPE_Error);
 		return;
 	}
-	QTextCodec *pCodec = QTextCodec::codecForLocale();
-	QString sContents = pCodec->toUnicode(file.readAll());
+	QString sContents = file.readAll();
 	file.close();
+
+	// Strip return characters because they are causing problems
+	sContents.remove('\r');
 
 	// Replace the template CMakeLists %HY_% variables
 	sContents.replace("%HY_PROJECTNAME%", m_ProjectRef.GetName());
@@ -542,7 +547,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
 		return;
 	}
-	file.write(pCodec->fromUnicode(sContents));
+	file.write(sContents.toUtf8());
 	file.close();
 }
 
