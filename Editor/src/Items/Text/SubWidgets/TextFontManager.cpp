@@ -275,7 +275,15 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 
 	int iFontIndex = DoesFontExist(sFontName, eRenderMode, fOutlineThickness, fSize);
 	if(iFontIndex < 0)
+	{
 		iFontIndex = CreatePreviewFont(sFontName, eRenderMode, fOutlineThickness, fSize);
+		while(iFontIndex == TEXTFONTERROR_AtlasFull)
+		{
+			ClearAndEmbiggenAtlas();
+			InitAtlas();
+			iFontIndex = CreatePreviewFont(sFontName, eRenderMode, fOutlineThickness, fSize);
+		}
+	}
 	if(iFontIndex < 0)
 	{
 		HyGuiLog("TextFontManager::AddNewLayer failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
@@ -299,7 +307,15 @@ void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)
 {
 	int iFontIndex = DoesFontExist(sFontName, GetRenderMode(hLayer), GetOutlineThickness(hLayer), GetSize(hLayer));
 	if(iFontIndex < 0)
+	{
 		iFontIndex = CreatePreviewFont(sFontName, GetRenderMode(hLayer), GetOutlineThickness(hLayer), GetSize(hLayer));
+		while(iFontIndex == TEXTFONTERROR_AtlasFull)
+		{
+			ClearAndEmbiggenAtlas();
+			InitAtlas();
+			iFontIndex = CreatePreviewFont(sFontName, GetRenderMode(hLayer), GetOutlineThickness(hLayer), GetSize(hLayer));
+		}
+	}
 	if(iFontIndex < 0)
 	{
 		HyGuiLog("TextFontManager::SetFont failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
@@ -314,7 +330,15 @@ void TextFontManager::SetFontSize(TextLayerHandle hLayer, float fSize)
 {
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), GetRenderMode(hLayer), GetOutlineThickness(hLayer), fSize);
 	if(iFontIndex < 0)
+	{
 		iFontIndex = CreatePreviewFont(GetFontName(hLayer), GetRenderMode(hLayer), GetOutlineThickness(hLayer), fSize);
+		while(iFontIndex == TEXTFONTERROR_AtlasFull)
+		{
+			ClearAndEmbiggenAtlas();
+			InitAtlas();
+			iFontIndex = CreatePreviewFont(GetFontName(hLayer), GetRenderMode(hLayer), GetOutlineThickness(hLayer), fSize);
+		}
+	}
 	if(iFontIndex < 0)
 	{
 		HyGuiLog("TextFontManager::SetFontSize failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
@@ -329,7 +353,15 @@ void TextFontManager::SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode)
 {
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
 	if(iFontIndex < 0)
+	{
 		iFontIndex = CreatePreviewFont(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
+		while(iFontIndex == TEXTFONTERROR_AtlasFull)
+		{
+			ClearAndEmbiggenAtlas();
+			InitAtlas();
+			iFontIndex = CreatePreviewFont(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
+		}
+	}
 	if(iFontIndex < 0)
 	{
 		HyGuiLog("TextFontManager::SetRenderMode failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
@@ -344,7 +376,15 @@ void TextFontManager::SetOutlineThickness(TextLayerHandle hLayer, float fThickne
 {
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
 	if(iFontIndex < 0)
+	{
 		iFontIndex = CreatePreviewFont(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
+		while(iFontIndex == TEXTFONTERROR_AtlasFull)
+		{
+			ClearAndEmbiggenAtlas();
+			InitAtlas();
+			iFontIndex = CreatePreviewFont(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
+		}
+	}
 	if(iFontIndex < 0)
 	{
 		HyGuiLog("TextFontManager::SetOutlineThickness failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
@@ -465,7 +505,6 @@ int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, 
 
 int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
-	InitAtlas();
 	m_bPreviewAtlasPixelDataInitialized = false;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -485,23 +524,23 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 		return TEXTFONTERROR_FontNotFound;
 	}
 
+	QString sGlyphList = GetAvailableTypefaceGlyphs();
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Allocate new font onto atlas
-	QString sAvailableTypefaceGlyphs = GetAvailableTypefaceGlyphs();
 	PreviewFont *pNewPreviewFont = new PreviewFont(m_pPreviewAtlas,
-												   sAvailableTypefaceGlyphs,
-												   sFontPath,
-												   fSize,
-												   fOutlineThickness,
-												   eRenderMode);
+		sGlyphList,
+		sFontPath,
+		fSize,
+		fOutlineThickness,
+		eRenderMode);
+
 	if(pNewPreviewFont->GetMissedGlyphs() > 0)
 	{
 		HyGuiLog("Font preview could not fit '" % QString::number(pNewPreviewFont->GetMissedGlyphs()) % "' glyphs on atlas.", LOGTYPE_Info);
 		delete pNewPreviewFont;
-		ClearAndEmbiggenAtlas();
 
-		// Try it all again
-		return CreatePreviewFont(sFontName, eRenderMode, fOutlineThickness, fSize);
+		return TEXTFONTERROR_AtlasFull;
 	}
 
 	m_PreviewFontList.append(pNewPreviewFont);
@@ -515,10 +554,10 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 			iter.value()->m_fLineAscender = pNewPreviewFont->GetTextureFont()->ascender;
 			iter.value()->m_fLineDescender = pNewPreviewFont->GetTextureFont()->descender;
 
-			for(int j = 0; j < sAvailableTypefaceGlyphs.count(); ++j)
+			for(int j = 0; j < sGlyphList.count(); ++j)
 			{
 				// NOTE: Assumes LITTLE ENDIAN
-				QString sSingleChar = sAvailableTypefaceGlyphs[j];
+				QString sSingleChar = sGlyphList[j];
 				texture_glyph_t *pGlyph = texture_font_get_glyph(pNewPreviewFont->GetTextureFont(), sSingleChar.toUtf8().data());
 
 				// Only keep track of negative offset_x's
@@ -537,20 +576,27 @@ int TextFontManager::InitAtlas()
 	if(m_pPreviewAtlasPixelData != nullptr)
 		return TEXTFONTERROR_Success;
 
-	if(m_pPreviewAtlas == nullptr)
-		m_pPreviewAtlas = texture_atlas_new(m_uiPreviewAtlasDimension, m_uiPreviewAtlasDimension, 1);
-
+	if(m_pPreviewAtlas) // This shouldn't happen
+		delete m_pPreviewAtlas;
+	
+	m_pPreviewAtlas = texture_atlas_new(m_uiPreviewAtlasDimension, m_uiPreviewAtlasDimension, 1);
 	m_uiPreviewAtlasBufferSize = static_cast<uint>(m_uiPreviewAtlasDimension * m_uiPreviewAtlasDimension * 4);
 	m_pPreviewAtlasPixelData = new unsigned char[m_uiPreviewAtlasBufferSize];
 
 	// This creates the preview fonts of the already existing fonts in 'm_FontArray'
-	for(int i = 0; i < m_FontArray.size(); ++i)
+	int iNumFonts = m_FontArray.size();
+	for(int i = 0; i < iNumFonts; ++i)
 	{
 		QJsonObject fontObj = m_FontArray[i].toObject();
 		switch(CreatePreviewFont(fontObj["font"].toString(), static_cast<rendermode_t>(fontObj["mode"].toInt()), fontObj["outlineThickness"].toDouble(), fontObj["size"].toDouble()))
 		{
 		case TEXTFONTERROR_AtlasFull:
 			ClearAndEmbiggenAtlas();
+			
+			m_pPreviewAtlas = texture_atlas_new(m_uiPreviewAtlasDimension, m_uiPreviewAtlasDimension, 1);
+			m_uiPreviewAtlasBufferSize = static_cast<uint>(m_uiPreviewAtlasDimension * m_uiPreviewAtlasDimension * 4);
+			m_pPreviewAtlasPixelData = new unsigned char[m_uiPreviewAtlasBufferSize];
+
 			i = -1; // Atlas has been enlarged, start loop over at '0', which will also recreate the atlas
 			break;
 
