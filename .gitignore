@@ -10,9 +10,6 @@ build-HyEditor-*/
 .vs/
 GeneratedFiles/
 
-!Engine/extras/ICU/README.txt
-Engine/extras/ICU/
-
 spine-cpp/
 
 *.exe
@@ -27,3 +24,6 @@ spine-cpp/
 *.opendb
 *.stash
 *.aps
+
+Engine/extras/ICU/*
+!Engine/extras/ICU/README.txt
