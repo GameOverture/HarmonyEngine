@@ -484,6 +484,11 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	else
 		sContents.replace("%HY_USESDLNET%", "set(HYBUILD_SDL_NET OFF)");
 
+	if(pSourceBank->m_MetaObj["UseSpine"].toBool())
+		sContents.replace("%HY_USESPINE%", "set(HYBUILD_SPINE ON)");
+	else
+		sContents.replace("%HY_USESPINE%", "set(HYBUILD_SPINE OFF)");
+
 	if(pSourceBank->m_MetaObj["UseIcu"].toBool())
 		sContents.replace("%HY_USEICU%", "set(HYBUILD_ICU ON)");
 	else

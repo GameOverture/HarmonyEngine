@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>625</width>
-    <height>195</height>
+    <height>275</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -59,10 +59,26 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="chkUseIcu">
-     <property name="text">
-      <string>Use ICU (international components unicode) for localization formatting - Desktop builds require ICU libaries</string>
+    <widget class="QGroupBox" name="grpExtras">
+     <property name="title">
+      <string>Extras - Requires libraries to be installed</string>
      </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="chkUseSpine">
+        <property name="text">
+         <string>Spine (2D animation for games)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkUseIcu">
+        <property name="text">
+         <string>Use ICU (international components unicode) for localization formatting</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

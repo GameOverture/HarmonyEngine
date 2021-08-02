@@ -20,15 +20,15 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
+# Build Options
 %HY_USEGLFW%
 %HY_USESDLNET%
-%HY_USEICU%
-
-# Build Options
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
 option(HYBUILD_STATIC "Statically link all dependencies into the executable" OFF)
-# Build Extras
-option(HYBUILD_SPINE "Runtime support for Spine 2d animation - requires Spine License" OFF)
+
+# Built Extras - Requires installed libraries
+%HY_USESPINE%
+%HY_USEICU%
 
 if(HYBUILD_GLFW)
 	add_compile_definitions(HY_USE_GLFW)

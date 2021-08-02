@@ -10,6 +10,9 @@ build-HyEditor-*/
 .vs/
 GeneratedFiles/
 
+!Engine/extras/ICU/README.txt
+Engine/extras/ICU/
+
 spine-cpp/
 
 *.exe

@@ -5,7 +5,6 @@ http://en.esotericsoftware.com/spine-runtimes-license
    https://github.com/esotericsoftware/spine-runtimes - Repo
    http://esotericsoftware.com/git/spine-runtimes/archive - ZIP
    
-2. Copy the folder 'spine-runtimes/spine-cpp' to 'HarmonyEngine/Engine/extras/SpineRuntime' aka this README.txt location
+2. Copy JUST the folder 'spine-cpp' (located within the spine-runtimes folder) to 'HarmonyEngine/Engine/extras/Spine' aka this README.txt location
 
-3. Create new builds that enable the Spine Runtime
-   CMake option: -DHYBUILD_SPINE=ON
+3. Create new builds that enable Spine by choosing the option in the build settings dialog within the Harmony Editor

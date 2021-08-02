@@ -1,11 +1,11 @@
-# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_ICU, HYBUILD_STATIC
-# BUILD EXTRAS:  HYBUILD_SPINE
+# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_STATIC
+# BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_ICU
 
 add_subdirectory(external/box2d)
 add_subdirectory(external/soil2)
 
 if(HYBUILD_SPINE)
-	add_subdirectory(extras/SpineRuntime/spine-cpp)
+	add_subdirectory(extras/Spine/spine-cpp)
 	set_target_properties(spine-cpp PROPERTIES
 	CXX_STANDARD 14
 	CXX_STANDARD_REQUIRED YES
@@ -331,8 +331,8 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			add_compile_definitions(HY_USE_ICU)
 			
 			cmake_policy(SET CMP0074 NEW) # find_package() command now searches prefixes specified by <PackageName>_ROOT
-			set(ICU_DEBUG ON)
-			set(ICU_ROOT "C:/Soft/test/icu4c-69_1-Win64-MSVC2019") # TODO: Fix this!
+			#set(ICU_DEBUG ON)
+			set(ICU_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/extras/ICU")
 			if(WIN32)
 				find_package(ICU 69.0 COMPONENTS uc in REQUIRED)
 				target_link_libraries(HyEngine PUBLIC ICU::uc ICU::in)
