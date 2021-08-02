@@ -11,6 +11,12 @@
 #include "UI/Localization/HyLocale.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
+#ifdef HY_DEBUG
+	#define CHECK_ICU_STATUS(status) if(status > 0) HyLogError("ICU Status Error: " << status)
+#else
+	#define CHECK_ICU_STATUS(status)
+#endif
+
 /*static*/ std::string HyLocale::sm_sIso639Code("en");
 /*static*/ std::string HyLocale::sm_sIso3166Code("US");
 /*static*/ std::string HyLocale::sm_sIso4217Code("USD");
@@ -50,9 +56,14 @@
 	UErrorCode eStatus = U_ZERO_ERROR;
 	auto localizedNumFormatter = AssembleFormatter(format);
 	auto formattedNum = localizedNumFormatter.formatInt(iValue, eStatus);
+	CHECK_ICU_STATUS(eStatus);
 
 	auto sUnicodeStr = formattedNum.toString(eStatus);
+	CHECK_ICU_STATUS(eStatus);
+
 	sUnicodeStr.toUTF8String<std::string>(sText);
+	if(sText.empty())
+		HyLogError("HyLocale::Number_Format(int64) returned empty string! - " << "Value: " << iValue << ", Status: " << eStatus);
 #else
 	std::stringstream str;
 	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, int64>(format, iValue, AssembleStdLocaleString())));
@@ -81,9 +92,14 @@
 	UErrorCode eStatus = U_ZERO_ERROR;
 	auto localizedNumFormatter = AssembleFormatter(format);
 	auto formattedNum = localizedNumFormatter.formatDouble(dValue, eStatus);
+	CHECK_ICU_STATUS(eStatus);
 
 	auto sUnicodeStr = formattedNum.toString(eStatus);
+	CHECK_ICU_STATUS(eStatus);
+
 	sUnicodeStr.toUTF8String<std::string>(sText);
+	if(sText.empty())
+		HyLogError("HyLocale::Number_Format(double) returned empty string! - " << "Value: " << dValue << ", Status: " << eStatus);
 #else
 	std::stringstream str;
 	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, double>(format, dValue, AssembleStdLocaleString())));
@@ -129,14 +145,20 @@
 	for(int32 i = 0; i < iNumFractionDigits; ++i)
 		dDenominator *= 10.0;
 
-	UErrorCode eStatus;
+	UErrorCode eStatus = U_ZERO_ERROR;
 	auto localizedNumFormatter = AssembleFormatter(format);
-	auto formattedNum = localizedNumFormatter
-		.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus))
-		.formatDouble(static_cast<double>(iValue) / dDenominator, eStatus);
+	localizedNumFormatter = localizedNumFormatter.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
+	CHECK_ICU_STATUS(eStatus);
+
+	auto formattedNum = localizedNumFormatter.formatDouble(static_cast<double>(iValue) / dDenominator, eStatus);
+	CHECK_ICU_STATUS(eStatus);
 	
 	auto sUnicodeStr = formattedNum.toString(eStatus);
+	CHECK_ICU_STATUS(eStatus);
+
 	sUnicodeStr.toUTF8String<std::string>(sText);
+	if(sText.empty())
+		HyLogError("HyLocale::Money_Format(int64) returned empty string! - " << "Value: " << iValue << ", Status: " << eStatus);
 #else
 	std::stringstream str;
 	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, int64>(format, iValue, AssembleStdLocaleString())));
@@ -175,10 +197,20 @@
 	}
 
 #if HY_USE_ICU
-	UErrorCode eStatus;
+	UErrorCode eStatus = U_ZERO_ERROR;
 	auto localizedNumFormatter = AssembleFormatter(format);
-	auto sUnicodeStr = localizedNumFormatter.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus)).formatDouble(dValue, eStatus).toString(eStatus);
+	localizedNumFormatter = localizedNumFormatter.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
+	CHECK_ICU_STATUS(eStatus);
+
+	auto formattedNum = localizedNumFormatter.formatDouble(dValue, eStatus);
+	CHECK_ICU_STATUS(eStatus);
+
+	auto sUnicodeStr = formattedNum.toString(eStatus);
+	CHECK_ICU_STATUS(eStatus);
+
 	sUnicodeStr.toUTF8String<std::string>(sText);
+	if(sText.empty())
+		HyLogError("HyLocale::Money_Format(double) returned empty string! - " << "Value: " << dValue << ", Status: " << eStatus);
 #else
 	std::stringstream str;
 	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, double>(format, dValue, AssembleStdLocaleString())));
@@ -211,11 +243,17 @@
 /*static*/ int32 HyLocale::Money_GetNumFractionalDigits()
 {
 #if HY_USE_ICU
-	UErrorCode eStatus;
-	UnicodeString uc;
-	uc.fromUTF8(sm_sIso4217Code);
+	UChar szCurrency[4];
+	szCurrency[0] = sm_sIso4217Code[0];
+	szCurrency[1] = sm_sIso4217Code[1];
+	szCurrency[2] = sm_sIso4217Code[2];
+	szCurrency[3] = '\0';
 	
-	return ucurr_getDefaultFractionDigits(uc.getBuffer(), &eStatus);
+	UErrorCode eStatus = U_ZERO_ERROR;
+	int32 iNumFracDigits = ucurr_getDefaultFractionDigits(szCurrency, &eStatus);
+	CHECK_ICU_STATUS(eStatus);
+
+	return iNumFracDigits;
 #else
 	return std::use_facet<std::moneypunct<char>>(std::locale(AssembleStdLocaleString())).frac_digits();
 #endif
@@ -226,10 +264,19 @@
 	std::string sText;
 
 #if HY_USE_ICU
-	UErrorCode eStatus;
+	UErrorCode eStatus = U_ZERO_ERROR;
 	auto localizedNumFormatter = AssembleFormatter(format);
-	auto sUnicodeStr = localizedNumFormatter.unit(NoUnit::percent()).formatDouble(dValue, eStatus).toString(eStatus);
+	localizedNumFormatter = localizedNumFormatter.unit(NoUnit::percent());
+
+	auto formattedNum = localizedNumFormatter.formatDouble(dValue, eStatus);
+	CHECK_ICU_STATUS(eStatus);
+
+	auto sUnicodeStr = formattedNum.toString(eStatus);
+	CHECK_ICU_STATUS(eStatus);
+
 	sUnicodeStr.toUTF8String<std::string>(sText);
+	if(sText.empty())
+		HyLogError("HyLocale::Percent_Format(double) returned empty string! - " << "Value: " << dValue << ", Status: " << eStatus);
 #else
 	// Use best guess for formatting
 	std::stringstream str;
