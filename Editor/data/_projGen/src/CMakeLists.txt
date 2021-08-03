@@ -164,8 +164,18 @@ if (MSVC)
 	foreach(CUR_RUNTIME_FILE IN LISTS HY_AUDIO_RUNTIME_LIBS)
 		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CUR_RUNTIME_FILE} $(OutDir)
-			COMMENT "Copying audio runtime file: ${CUR_RUNTIME_FILE}\n")
+			COMMENT "Copying audio runtime lib: ${CUR_RUNTIME_FILE}\n")
 	endforeach()
+	
+	if(HYBUILD_ICU)
+		set(ICU_RUNTIME_LIBS "")
+		file(GLOB_RECURSE ICU_RUNTIME_LIBS "${REL_HARMONY_DIR}/Engine/extras/ICU/*.dll")
+		foreach(CUR_RUNTIME_FILE IN LISTS ICU_RUNTIME_LIBS)
+			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CUR_RUNTIME_FILE} $(OutDir)
+				COMMENT "Copying ICU runtime lib: ${CUR_RUNTIME_FILE}\n")
+		endforeach()
+	endif()
 endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" PREFIX "Source Files" FILES ${GAME_SRCFILES})
