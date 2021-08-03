@@ -184,9 +184,9 @@ void HyMeter::FormatDigits()
 
 	if(m_bSpinDigits)
 	{
-		m_SpinText.m_SpinText_Shown.SetText(m_Text.GetUtf8String());
+		HyAssert(m_Text.GetNumCharacters() != 0, "HyMeter - EMPTY STRING! " << "IsCash: " << (m_bShowAsCash ? "true" : "false") << ", Value: " << m_iCurValue);
 
-		HyAssert(m_Text.GetNumCharacters() != 0, "HyLocale number formatting returned an empty string");
+		m_SpinText.m_SpinText_Shown.SetText(m_Text.GetUtf8String());
 		uint32 uiCharIndexForScissor = m_Text.GetNumCharacters() - 1;
 
 		if(m_iCurValue <= m_iTargetValue)

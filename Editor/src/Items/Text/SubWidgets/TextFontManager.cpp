@@ -271,6 +271,7 @@ float TextFontManager::GetLeftSideNudgeAmt(TextLayerHandle hLayer) const
 
 TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
 {
+	InitAtlas();
 	TextLayerHandle hNewLayer = HY_UNUSED_HANDLE;
 
 	int iFontIndex = DoesFontExist(sFontName, eRenderMode, fOutlineThickness, fSize);
@@ -305,6 +306,7 @@ void TextFontManager::SetAtlasGroup(quint32 uiBankId)
 
 void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)
 {
+	InitAtlas();
 	int iFontIndex = DoesFontExist(sFontName, GetRenderMode(hLayer), GetOutlineThickness(hLayer), GetSize(hLayer));
 	if(iFontIndex < 0)
 	{
@@ -328,6 +330,7 @@ void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)
 
 void TextFontManager::SetFontSize(TextLayerHandle hLayer, float fSize)
 {
+	InitAtlas();
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), GetRenderMode(hLayer), GetOutlineThickness(hLayer), fSize);
 	if(iFontIndex < 0)
 	{
@@ -351,6 +354,7 @@ void TextFontManager::SetFontSize(TextLayerHandle hLayer, float fSize)
 
 void TextFontManager::SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode)
 {
+	InitAtlas();
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), eMode, GetOutlineThickness(hLayer), GetSize(hLayer));
 	if(iFontIndex < 0)
 	{
@@ -374,6 +378,7 @@ void TextFontManager::SetRenderMode(TextLayerHandle hLayer, rendermode_t eMode)
 
 void TextFontManager::SetOutlineThickness(TextLayerHandle hLayer, float fThickness)
 {
+	InitAtlas();
 	int iFontIndex = DoesFontExist(GetFontName(hLayer), GetRenderMode(hLayer), fThickness, GetSize(hLayer));
 	if(iFontIndex < 0)
 	{
