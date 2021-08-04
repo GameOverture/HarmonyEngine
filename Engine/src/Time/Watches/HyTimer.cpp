@@ -15,13 +15,17 @@
 
 HyTimer::HyTimer(void) :
 	IHyTimeInst(),
-	m_dDuration(0.0)
+	m_dDuration(0.0),
+	m_fpCallbackFunc(nullptr),
+	m_pCallbackData(nullptr)
 {
 }
 
 HyTimer::HyTimer(double dDuration) :
 	IHyTimeInst(),
-	m_dDuration(0.0)
+	m_dDuration(0.0),
+	m_fpCallbackFunc(nullptr),
+	m_pCallbackData(nullptr)
 {
 	Init(dDuration);
 }
@@ -80,4 +84,20 @@ double HyTimer::TimeLeft() const
 		return 0.0f;
 	
 	return HyMax(m_dDuration - m_dElapsedTime, 0.0);
+}
+
+void HyTimer::SetExpiredCallback(std::function<void(void *)> fpFunc, void *pData)
+{
+	m_fpCallbackFunc = fpFunc;
+	m_pCallbackData = pData;
+}
+
+/*virtual*/ void HyTimer::OnUpdate() /*override*/
+{
+	if(IsExpired() && m_fpCallbackFunc)
+	{
+		m_fpCallbackFunc(m_pCallbackData);
+		m_fpCallbackFunc = nullptr;
+		m_pCallbackData = nullptr;
+	}
 }

@@ -37,4 +37,5 @@ double IHyTimeInst::TimeElapsed() const
 void IHyTimeInst::Update(double dDelta)
 {
 	m_dElapsedTime += dDelta;
+	OnUpdate();
 }

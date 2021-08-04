@@ -27,6 +27,7 @@ public:
 
 private:
 	void Update(double dDelta);
+	virtual void OnUpdate() { };
 };
 
 #endif /* IHyTimeInst_h__ */

@@ -14,7 +14,10 @@
 
 class HyTimer : public IHyTimeInst
 {
-	double	m_dDuration;
+	double							m_dDuration;
+
+	std::function<void(void *)>		m_fpCallbackFunc;
+	void *							m_pCallbackData;
 
 public:
 	HyTimer(void);
@@ -31,6 +34,11 @@ public:
 
 	bool IsExpired() const;
 	double TimeLeft() const;
+
+	void SetExpiredCallback(std::function<void(void *)> fpFunc, void *pData);
+
+private:
+	virtual void OnUpdate() override;
 };
 
 #endif /* HyTimer_h__ */
