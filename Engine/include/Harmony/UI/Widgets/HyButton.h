@@ -59,6 +59,11 @@ protected:
 	virtual void OnMouseLeave() override;
 	virtual void OnMouseDown() override;
 	virtual void OnMouseClicked() override;
+
+	virtual void OnBtnStateChange(HyButtonState eNewState) { }
+
+private:
+	void SetBtnState(HyButtonState eState);
 };
 
 #endif /* HyButton_h__ */

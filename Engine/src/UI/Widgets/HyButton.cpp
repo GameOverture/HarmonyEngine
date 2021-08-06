@@ -61,9 +61,9 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 	if(IsDisabled())
 	{
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down || m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
+			SetBtnState(HYBUTTONSTATE_Idle);
 		else if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedDown || m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
+			SetBtnState(HYBUTTONSTATE_Highlighted);
 	}
 }
 
@@ -80,28 +80,28 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 	switch(m_SpritePanel.GetState())
 	{
 	case HYBUTTONSTATE_Idle:
-		if(IsHighlighted())
-			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
+		if(IsHighlighted() && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Highlighted)
+			SetBtnState(HYBUTTONSTATE_Highlighted);
 		break;
 	case HYBUTTONSTATE_Down:
-		if(IsHighlighted())
-			m_SpritePanel.SetState(HYBUTTONSTATE_HighlightedDown);
+		if(IsHighlighted() && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedDown)
+			SetBtnState(HYBUTTONSTATE_HighlightedDown);
 		break;
 	case HYBUTTONSTATE_Highlighted:
 		if(IsHighlighted() == false)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
+			SetBtnState(HYBUTTONSTATE_Idle);
 		break;
 	case HYBUTTONSTATE_HighlightedDown:
 		if(IsHighlighted() == false)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Down);
+			SetBtnState(HYBUTTONSTATE_Down);
 		break;
 	case HYBUTTONSTATE_Hover:
-		if(IsHighlighted())
-			m_SpritePanel.SetState(HYBUTTONSTATE_HighlightedHover);
+		if(IsHighlighted() && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedHover)
+			SetBtnState(HYBUTTONSTATE_HighlightedHover);
 		break;
 	case HYBUTTONSTATE_HighlightedHover:
 		if(IsHighlighted() == false)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Hover);
+			SetBtnState(HYBUTTONSTATE_Hover);
 		break;
 	}
 }
@@ -118,9 +118,9 @@ void HyButton::SetHideDownState(bool bIsHideDownState)
 		m_uiPanelAttribs |= PANELATTRIB_HideDownState;
 
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
+			SetBtnState(HYBUTTONSTATE_Idle);
 		else if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedDown)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
+			SetBtnState(HYBUTTONSTATE_Highlighted);
 	}
 	else
 		m_uiPanelAttribs &= ~PANELATTRIB_HideDownState;
@@ -138,9 +138,9 @@ void HyButton::SetHideHoverState(bool bIsHideHoverState)
 		m_uiPanelAttribs |= PANELATTRIB_HideHoverState;
 
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
+			SetBtnState(HYBUTTONSTATE_Idle);
 		else if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
+			SetBtnState(HYBUTTONSTATE_Highlighted);
 	}
 	else
 		m_uiPanelAttribs &= ~PANELATTRIB_HideHoverState;
@@ -166,12 +166,12 @@ void HyButton::InvokeButtonClicked()
 	if(IsHighlighted() == false)
 	{
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Idle && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Hover)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Hover);
+			SetBtnState(HYBUTTONSTATE_Hover);
 	}
 	else
 	{
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Highlighted && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedHover)
-			m_SpritePanel.SetState(HYBUTTONSTATE_HighlightedHover);
+			SetBtnState(HYBUTTONSTATE_HighlightedHover);
 	}
 }
 
@@ -183,12 +183,12 @@ void HyButton::InvokeButtonClicked()
 	if(IsHighlighted() == false)
 	{
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down || m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Idle);
+			SetBtnState(HYBUTTONSTATE_Idle);
 	}
 	else
 	{
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedDown || m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Highlighted);
+			SetBtnState(HYBUTTONSTATE_Highlighted);
 	}
 }
 
@@ -200,21 +200,39 @@ void HyButton::InvokeButtonClicked()
 	if(IsHighlighted() == false)
 	{
 		if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Down)
-			m_SpritePanel.SetState(HYBUTTONSTATE_Down);
+			SetBtnState(HYBUTTONSTATE_Down);
 	}
 	else
 	{
 		if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedDown)
-			m_SpritePanel.SetState(HYBUTTONSTATE_HighlightedDown);
+			SetBtnState(HYBUTTONSTATE_HighlightedDown);
 	}
 }
 
 /*virtual*/ void HyButton::OnMouseClicked() /*override*/
 {
-	m_SpritePanel.SetState(IsHighlighted() ? HYBUTTONSTATE_HighlightedHover : HYBUTTONSTATE_Hover);
+	if(IsHighlighted())
+	{
+		if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedHover)
+			SetBtnState(HYBUTTONSTATE_HighlightedHover);
+		else if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Highlighted)
+			SetBtnState(HYBUTTONSTATE_Highlighted);
+		else
+			SetBtnState(HYBUTTONSTATE_Idle);
+	}
+	else if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Hover)
+		SetBtnState(HYBUTTONSTATE_Hover);
+	else
+		SetBtnState(HYBUTTONSTATE_Idle);
 
 	if(m_fpBtnClickedCallback)
 		m_fpBtnClickedCallback(this, m_pBtnClickedParam);
 
 	m_ClickedSound.PlayOneShot(true);
+}
+
+void HyButton::SetBtnState(HyButtonState eState)
+{
+	m_SpritePanel.SetState(eState);
+	OnBtnStateChange(eState);
 }
