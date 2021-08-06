@@ -146,7 +146,7 @@ void IDraw::ResizeRenderer()
 	else */if(!numDegrees.isNull())
 	{
 		QPoint numSteps = numDegrees / 15;
-		m_pCamera->scale.TweenOffset(numSteps.y() * 0.2f, numSteps.y() * 0.2f, 0.5f, HyTween::QuadInOut);
+		m_pCamera->scale.TweenOffset(numSteps.y() * -0.2f, numSteps.y() * -0.2f, 0.5f, HyTween::QuadInOut);
 		//scrollWithDegrees(numSteps);
 	}
 
