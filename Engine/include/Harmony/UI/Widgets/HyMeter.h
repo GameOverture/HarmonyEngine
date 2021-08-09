@@ -59,6 +59,12 @@ class HyMeter : public HyLabel
 	};
 	SpinText 				m_SpinText;
 
+protected:
+
+	// For now as a test, I'm only using these for the credit and win meter but leaving the functionality here since every meter should have the ability to have a built in effect
+	HySprite2d				m_InnerEffect;	
+	HySprite2d				m_OuterEffect;
+
 public:
 	HyMeter(HyEntity2d *pParent = nullptr);
 	HyMeter(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
@@ -85,6 +91,8 @@ public:
 	HyNumberFormat GetNumFormat() const;
 	void SetNumFormat(HyNumberFormat format);
 
+	void	PlayEffects(bool bInnerOn, bool bOuterOn);
+
 	void SetText(std::string sText) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
 	virtual void SetTextState(uint32 uiStateIndex) override;
 	virtual void ResetTextOnPanel() override;
@@ -93,6 +101,8 @@ public:
 
 protected:
 	void FormatDigits();
+
+	
 
 	virtual void OnUpdate() override;
 	virtual void OnSetup() override;

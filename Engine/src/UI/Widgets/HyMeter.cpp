@@ -271,8 +271,11 @@ void HyMeter::FormatDigits()
 
 /*virtual*/ void HyMeter::OnUpdate() /*override*/
 {
-	if(m_iCurValue == m_iTargetValue)
+	if (m_iCurValue == m_iTargetValue)
+	{
+		PlayEffects(false, false);
 		return;
+	}
 
 	m_fElapsedTimeRack = HyClamp(m_fElapsedTimeRack + HyEngine::DeltaTime(), 0.0f, m_fRackingDuration);
 
@@ -329,4 +332,63 @@ void HyMeter::FormatDigits()
 {
 	m_SpinText.Setup(m_Text.GetPrefix(), m_Text.GetName());
 	FormatDigits();
+}
+
+void HyMeter::PlayEffects(bool bInnerOn, bool bOuterOn)
+{
+	if (m_InnerEffect.IsLoadDataValid() == true)
+	{
+	//	if (m_InnerEffect.IsVisible() == true && m_InnerEffect.alpha.IsAnimating() == true && bInnerOn == false)
+	//		m_InnerEffect.alpha.StopAnim();
+
+		if (((bInnerOn == false && m_InnerEffect.IsVisible() != false) || (bInnerOn == true && m_InnerEffect.IsVisible() != true)) &&
+			m_InnerEffect.alpha.IsAnimating() == false)
+		{
+			if (bInnerOn == true)
+			{
+				m_InnerEffect.alpha.Set(0.0f);
+				m_InnerEffect.SetVisible(true);
+			}
+
+			m_InnerEffect.SetTag(bInnerOn);
+			m_InnerEffect.alpha.Tween(((bInnerOn == true) ? 1.0f : 0.0f), 1.0f, HyTween::Linear, [](IHyNode* pSelf)
+				{
+					HySprite2d* pEffect = reinterpret_cast<HySprite2d*>(pSelf);
+
+					if (pSelf->GetTag() == 0)
+						pSelf->SetVisible(false);
+
+					pSelf->SetTag(0);
+				});
+		}
+	}
+
+	if (m_OuterEffect.IsLoadDataValid() == true)
+	{
+		
+
+	//	if (m_OuterEffect.IsVisible() == true && m_OuterEffect.alpha.IsAnimating() == true && bInnerOn == false)
+	//		m_OuterEffect.alpha.StopAnim();
+
+		if (((bInnerOn == false && m_OuterEffect.IsVisible() != false) || (bInnerOn == true && m_OuterEffect.IsVisible() != true)) &&
+			m_OuterEffect.alpha.IsAnimating() == false)
+		{
+			if (bOuterOn == true)
+			{
+				m_OuterEffect.SetVisible(true);
+				m_OuterEffect.alpha.Set(0.0f);
+			}
+
+			m_OuterEffect.SetTag(bOuterOn);
+			m_OuterEffect.alpha.Tween(((bOuterOn == true) ? 1.0f : 0.0f), 1.0f, HyTween::Linear, [](IHyNode* pSelf)
+				{
+					HySprite2d* pEffect = reinterpret_cast<HySprite2d*>(pSelf);
+
+					if (pSelf->GetTag() == 0)
+						pSelf->SetVisible(false);
+
+					pSelf->SetTag(0);
+				});
+		}
+	}
 }
