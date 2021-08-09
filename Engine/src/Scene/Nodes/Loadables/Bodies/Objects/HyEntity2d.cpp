@@ -221,7 +221,7 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if((0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable) &&
-			static_cast<IHyDrawable2d *>(m_ChildList[i])->IsValidToRender() == false) ||
+			static_cast<IHyDrawable2d *>(m_ChildList[i])->IsLoadDataValid() == false) ||
 			m_ChildList[i]->GetSceneAABB().IsValid() == false)
 		{
 			continue;
