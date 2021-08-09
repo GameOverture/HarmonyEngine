@@ -220,8 +220,12 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	HyMath::InvalidateAABB(m_SceneAABB);
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
-		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable) && m_ChildList[i]->GetSceneAABB().IsValid() == false)
+		if((0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsDrawable) &&
+			static_cast<IHyDrawable2d *>(m_ChildList[i])->IsValidToRender() == false) ||
+			m_ChildList[i]->GetSceneAABB().IsValid() == false)
+		{
 			continue;
+		}
 
 		if(m_SceneAABB.IsValid() == false)
 			m_SceneAABB = m_ChildList[i]->GetSceneAABB();
