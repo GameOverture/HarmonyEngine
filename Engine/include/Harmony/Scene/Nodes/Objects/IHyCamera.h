@@ -42,9 +42,9 @@ protected:
 
 public:
 	HyWindow &GetWindow();
-	const HyRectangle<float> &GetViewport();
+	const HyRectangle<float> &GetViewport() const;
 
-	// All values are [0.0 - 1.0] representing percentages of the entire game window
+	// All values are [0.0 - 1.0] representing percentages of the entire window this camera belongs to
 	void SetViewport(float fNormalizedPosX, float fNormalizedPosY, float fNormalizedWidth, float fNormalizedHeight);
 
 	bool IsCameraShake();

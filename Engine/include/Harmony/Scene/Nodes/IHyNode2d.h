@@ -47,7 +47,7 @@ public:
 	void ParentDetach();
 	HyEntity2d *ParentGet() const;
 
-	void GetLocalTransform(glm::mat4 &outMtx) const;
+	void GetLocalTransform(glm::mat4 &mtxOut) const;
 	const glm::mat4 &GetSceneTransform();
 
 	virtual const b2AABB &GetSceneAABB();

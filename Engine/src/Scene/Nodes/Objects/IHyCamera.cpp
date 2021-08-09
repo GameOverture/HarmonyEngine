@@ -43,12 +43,12 @@ HyWindow &IHyCamera<NODETYPE>::GetWindow()
 }
 
 template<typename NODETYPE>
-const HyRectangle<float> &IHyCamera<NODETYPE>::GetViewport()
+const HyRectangle<float> &IHyCamera<NODETYPE>::GetViewport() const
 {
 	return m_ViewportRect;
 }
 
-// All values are [0.0 - 1.0] representing percentages of the entire game window
+// All values are [0.0 - 1.0] representing percentages of the entire window this camera belongs to
 template<typename NODETYPE>
 void IHyCamera<NODETYPE>::SetViewport(float fNormalizedPosX, float fNormalizedPosY, float fNormalizedWidth, float fNormalizedHeight)
 {

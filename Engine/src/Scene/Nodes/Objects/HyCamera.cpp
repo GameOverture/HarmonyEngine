@@ -30,6 +30,8 @@ HyCamera2d::~HyCamera2d()
 
 const b2AABB &HyCamera2d::GetWorldViewBounds()
 {
+	// TODO: Account for camera rotation!
+
 	float fHalfWidth = ((m_pWindowPtr->GetFramebufferSize().x * m_ViewportRect.Width()) * 0.5f) * scale.X();
 	float fHalfHeight = ((m_pWindowPtr->GetFramebufferSize().y * m_ViewportRect.Height()) * 0.5f) * scale.Y();
 

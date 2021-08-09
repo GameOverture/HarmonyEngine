@@ -209,7 +209,7 @@ float HyWindow::GetHeightF(float fPercent /*= 1.0f*/)
 	return static_cast<float>(m_Info.vSize.y) * fPercent;
 }
 
-glm::ivec2 HyWindow::GetWindowSize()
+glm::ivec2 HyWindow::GetWindowSize() const
 {
 	return m_Info.vSize;
 }
@@ -229,17 +229,6 @@ void HyWindow::SetWindowSize(glm::ivec2 vSizeHint)
 #endif
 }
 
-glm::ivec2 HyWindow::GetFramebufferSize() const
-{
-	return m_vFramebufferSize;
-}
-
-void HyWindow::SetFramebufferSize(glm::ivec2 vBufferSize)
-{
-	m_vFramebufferSize = vBufferSize;
-	HyLog("Window " << m_uiINDEX << " Framebuffer: " << m_vFramebufferSize.x << ", " << m_vFramebufferSize.y);
-}
-
 glm::ivec2 HyWindow::GetLocation()
 {
 	return m_Info.ptLocation;
@@ -254,6 +243,17 @@ void HyWindow::SetLocation(glm::ivec2 ptLocation)
 #else
 	m_Info.ptLocation = ptLocation;
 #endif
+}
+
+glm::ivec2 HyWindow::GetFramebufferSize() const
+{
+	return m_vFramebufferSize;
+}
+
+void HyWindow::SetFramebufferSize(glm::ivec2 vBufferSize)
+{
+	m_vFramebufferSize = vBufferSize;
+	HyLog("Window " << m_uiINDEX << " Framebuffer: " << m_vFramebufferSize.x << ", " << m_vFramebufferSize.y);
 }
 
 HyCamera2d *HyWindow::CreateCamera2d()
@@ -327,28 +327,25 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 	}
 }
 
-glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate)
+glm::vec2 HyWindow::ProjectCoordinateToWorldPos2d(glm::vec2 ptWindowCoordinate) const
 {
-	// Y-axis goes up when working with world coordinates
-	ptViewportCoordinate.y = GetWindowSize().y - ptViewportCoordinate.y;
-
 	// Convert to normalized [0.0 - 1.0]
-	ptViewportCoordinate /= GetWindowSize();
+	ptWindowCoordinate /= GetWindowSize();
 
 	glm::vec2 ptWorldPos(0.0f);
 
-	// Find the first camera that encompasses this normalized point in the viewport
+	// Find the first camera that encompasses this window coordinate in its viewport
 	for(uint32 i = 0; i < m_Cams2dList.size(); ++i)
 	{
 		const HyRectangle<float> &viewportRect = m_Cams2dList[i]->GetViewport();
 
-		if(ptViewportCoordinate.x >= viewportRect.left   && ptViewportCoordinate.x <= viewportRect.right &&
-		   ptViewportCoordinate.y >= viewportRect.bottom && ptViewportCoordinate.y <= viewportRect.top)
+		if(ptWindowCoordinate.x >= viewportRect.left   && ptWindowCoordinate.x <= viewportRect.right &&
+		   ptWindowCoordinate.y >= viewportRect.bottom && ptWindowCoordinate.y <= viewportRect.top)
 		{
 			// Find local coordinate in found camera's viewport
 			glm::vec2 vOffsetInViewport;
-			vOffsetInViewport.x = (ptViewportCoordinate.x - viewportRect.left) / (viewportRect.right - viewportRect.left);
-			vOffsetInViewport.y = (ptViewportCoordinate.y - viewportRect.bottom) / (viewportRect.top - viewportRect.bottom);
+			vOffsetInViewport.x = (ptWindowCoordinate.x - viewportRect.left) / (viewportRect.right - viewportRect.left);
+			vOffsetInViewport.y = (ptWindowCoordinate.y - viewportRect.bottom) / (viewportRect.top - viewportRect.bottom);
 
 			// Now using the found camera's transformation convert to the world position
 			const b2AABB &aabbWorldRef = m_Cams2dList[i]->GetWorldViewBounds();
@@ -378,6 +375,31 @@ glm::vec2 HyWindow::ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoor
 	}
 
 	return ptWorldPos;
+}
+
+bool HyWindow::ProjectWorldPosToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const
+{
+	// Find the first camera that contains this ptWorldPos
+	for(uint32 i = 0; i < m_Cams2dList.size(); ++i)
+	{
+		const b2AABB &aabbWorldRef = m_Cams2dList[i]->GetWorldViewBounds();
+		if(HyTestPointAABB(aabbWorldRef, ptWorldPos))
+		{
+			const HyRectangle<float> &viewportRect = m_Cams2dList[i]->GetViewport();
+			float fFbWidth = (viewportRect.Width() * GetFramebufferSize().x);
+			float fFbHeight = (viewportRect.Height() * GetFramebufferSize().y);
+
+			glm::vec2 ptNormalized;
+			ptNormalized.x = (ptWorldPos.x - aabbWorldRef.lowerBound.x) / (aabbWorldRef.GetExtents().x * 2.0f);
+			ptNormalized.y = (ptWorldPos.y - aabbWorldRef.lowerBound.y) / (aabbWorldRef.GetExtents().y * 2.0f);
+
+			ptWindowCoordinateOut.x = (viewportRect.left * GetFramebufferSize().x) + (ptNormalized.x * fFbWidth);
+			ptWindowCoordinateOut.y = (viewportRect.bottom * GetFramebufferSize().y) + (ptNormalized.y * fFbHeight);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 HyWindowInteropPtr HyWindow::GetInterop()

@@ -37,6 +37,8 @@ class HyCamera3d final : public IHyCamera<IHyNode3d>
 {
 	friend class HyWindow;
 
+	// TODO: Add near and far plane
+
 protected:
 	HyCamera3d(HyWindow *pWindow);
 	virtual ~HyCamera3d();

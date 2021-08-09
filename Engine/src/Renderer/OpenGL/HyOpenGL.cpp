@@ -1204,7 +1204,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			break;
 		}
 
-		HyErrorCheck_OpenGL("HyOpenGLShader::SetVertexAttributePtrs", "glVertexAttribPointer[" << static_cast<int>(shaderVertexAttribListRef[i].eVarType) << "]");
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glVertexAttribPointer[" << static_cast<int>(shaderVertexAttribListRef[i].eVarType) << "]");
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1225,7 +1225,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Everything is prepared, do the drawing
 	glDrawArraysInstanced(eDrawMode, 0, pRenderState->uiNUM_VERTS_PER_INSTANCE, pRenderState->uiNUM_INSTANCES);
-	HyErrorCheck_OpenGL("HyOpenGLShader::DrawRenderState_2d", "glDrawArraysInstanced");
+	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDrawArraysInstanced");
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Reset OpenGL states

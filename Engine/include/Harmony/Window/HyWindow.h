@@ -86,14 +86,13 @@ public:
 	int32								GetHeight();
 	float								GetWidthF(float fPercent = 1.0f);
 	float								GetHeightF(float fPercent = 1.0f);
-	glm::ivec2							GetWindowSize();
+	glm::ivec2							GetWindowSize() const;
 	void								SetWindowSize(glm::ivec2 vSizeHint);
+	glm::ivec2							GetLocation();
+	void								SetLocation(glm::ivec2 ptLocation);
 
 	glm::ivec2							GetFramebufferSize() const;
 	void								SetFramebufferSize(glm::ivec2 vDrawableSize);
-
-	glm::ivec2							GetLocation();
-	void								SetLocation(glm::ivec2 ptLocation);
 
 	HyCamera2d *						CreateCamera2d();
 	HyCamera3d *						CreateCamera3d();
@@ -108,7 +107,8 @@ public:
 	void								RemoveCamera(HyCamera2d *&pCam);
 	void								RemoveCamera(HyCamera3d *&pCam);
 
-	glm::vec2							ConvertViewportCoordinateToWorldPos(glm::vec2 ptViewportCoordinate);
+	glm::vec2							ProjectCoordinateToWorldPos2d(glm::vec2 ptWindowCoordinate) const;
+	bool								ProjectWorldPosToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const;
 
 	HyWindowInteropPtr					GetInterop();
 

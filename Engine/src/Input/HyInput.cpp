@@ -148,12 +148,12 @@ uint32 HyInput::GetMouseWindowIndex() const
 
 glm::vec2 HyInput::GetMousePos() const
 {
-	return glm::vec2(m_ptMousePos.x, m_pMouseWindow->GetWindowSize().y - m_ptMousePos.y); // Y-axis goes up in harmony, so flip it
+	return glm::vec2(m_ptMousePos.x, m_pMouseWindow->GetWindowSize().y - m_ptMousePos.y); // Y-axis goes up in Harmony, so inverse it
 }
 
 glm::vec2 HyInput::GetWorldMousePos() const
 {
-	return m_pMouseWindow->ConvertViewportCoordinateToWorldPos(m_ptMousePos);
+	return m_pMouseWindow->ProjectCoordinateToWorldPos2d(GetMousePos());
 }
 
 void HyInput::SetActionCategory(int32 iActionId, uint8 uiCategory, uint32 uiMappingIndex /*= 0*/)
