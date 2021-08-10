@@ -118,7 +118,9 @@ void HyDiagOutput::ApplyTimeDelta(double dTimeDelta)
 		if((m_uiShowFlags & HYDIAG_Mouse) != 0)
 		{
 			HyInput &inputRef = HyEngine::Input();
-			glm::vec2 ptMousePos = inputRef.GetWorldMousePos();
+			glm::vec2 ptMousePos = inputRef.GetMousePos();
+			//glm::vec2 ptWorldMousePos;
+			//inputRef.GetWorldMousePos();
 			if(inputRef.IsMouseBtnDown(HYMOUSE_BtnLeft))
 				m_txtMouse.SetText("MOUSE DOWN X:" + std::to_string(ptMousePos.x) + " Y:" + std::to_string(ptMousePos.y));
 			else

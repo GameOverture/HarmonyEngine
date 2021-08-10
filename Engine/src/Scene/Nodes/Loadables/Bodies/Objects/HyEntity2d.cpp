@@ -700,7 +700,13 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 							 HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
 		}
 		else
-			bMouseInBounds = HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetWorldMousePos());
+		{
+			glm::vec2 ptWorldMousePos;
+			if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
+				bMouseInBounds = HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
+			else
+				bMouseInBounds = false;
+		}
 
 		bool bLeftClickDown = HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft);
 
@@ -748,20 +754,16 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		}
 	}
 
-	// TODO: Fix this
-	if(m_pPhysicsBody != nullptr)
+	if(m_pPhysicsBody && m_pPhysicsBody->IsEnabled())
 	{
-		if(m_pPhysicsBody->IsEnabled())
+		if(pos.IsAnimating() == false)
 		{
-			if(pos.IsAnimating() == false)
-			{
-				pos.GetAnimFloat(0).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().x * static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
-				pos.GetAnimFloat(1).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().y * static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
-			}
-
-			if(rot.IsAnimating() == false)
-				rot.Updater([&](float fUnused) { return glm::degrees(m_pPhysicsBody->GetAngle()); });
+			pos.GetAnimFloat(0).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().x * static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
+			pos.GetAnimFloat(1).Updater([&](float fUnused) { return (m_pPhysicsBody->GetPosition().y * static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPixelsPerMeter()); });
 		}
+
+		if(rot.IsAnimating() == false)
+			rot.Updater([&](float fUnused) { return glm::degrees(m_pPhysicsBody->GetAngle()); });
 	}
 
 	OnUpdate();

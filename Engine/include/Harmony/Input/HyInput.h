@@ -47,7 +47,7 @@ public:
 	bool IsMouseBtnDown(HyMouseBtn eBtn) const;
 	uint32 GetMouseWindowIndex() const;
 	glm::vec2 GetMousePos() const;
-	glm::vec2 GetWorldMousePos() const;
+	bool GetWorldMousePos(glm::vec2 &ptWorldPosOut) const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup Button/Axis Mapping

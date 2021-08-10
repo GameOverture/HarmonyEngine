@@ -107,8 +107,8 @@ public:
 	void								RemoveCamera(HyCamera2d *&pCam);
 	void								RemoveCamera(HyCamera3d *&pCam);
 
-	glm::vec2							ProjectCoordinateToWorldPos2d(glm::vec2 ptWindowCoordinate) const;
-	bool								ProjectWorldPosToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const;
+	bool								ProjectToWorldPos2d(const glm::vec2 &ptWindowCoordinate, glm::vec2 &ptWorldPosOut) const;
+	bool								ProjectToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const;
 
 	HyWindowInteropPtr					GetInterop();
 

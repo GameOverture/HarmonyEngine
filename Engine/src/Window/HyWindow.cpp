@@ -327,25 +327,24 @@ void HyWindow::RemoveCamera(HyCamera3d *&pCam)
 	}
 }
 
-glm::vec2 HyWindow::ProjectCoordinateToWorldPos2d(glm::vec2 ptWindowCoordinate) const
+bool HyWindow::ProjectToWorldPos2d(const glm::vec2 &ptWindowCoordinate, glm::vec2 &ptWorldPosOut) const
 {
-	// Convert to normalized [0.0 - 1.0]
-	ptWindowCoordinate /= GetWindowSize();
-
-	glm::vec2 ptWorldPos(0.0f);
+	// Convert 'ptWindowCoordinate' to normalized coordinates [0.0 - 1.0]
+	glm::vec2 ptNormalizedCoord(ptWindowCoordinate);
+	ptNormalizedCoord /= GetWindowSize();
 
 	// Find the first camera that encompasses this window coordinate in its viewport
 	for(uint32 i = 0; i < m_Cams2dList.size(); ++i)
 	{
 		const HyRectangle<float> &viewportRect = m_Cams2dList[i]->GetViewport();
 
-		if(ptWindowCoordinate.x >= viewportRect.left   && ptWindowCoordinate.x <= viewportRect.right &&
-		   ptWindowCoordinate.y >= viewportRect.bottom && ptWindowCoordinate.y <= viewportRect.top)
+		if(ptNormalizedCoord.x >= viewportRect.left   && ptNormalizedCoord.x <= viewportRect.right &&
+		   ptNormalizedCoord.y >= viewportRect.bottom && ptNormalizedCoord.y <= viewportRect.top)
 		{
 			// Find local coordinate in found camera's viewport
 			glm::vec2 vOffsetInViewport;
-			vOffsetInViewport.x = (ptWindowCoordinate.x - viewportRect.left) / (viewportRect.right - viewportRect.left);
-			vOffsetInViewport.y = (ptWindowCoordinate.y - viewportRect.bottom) / (viewportRect.top - viewportRect.bottom);
+			vOffsetInViewport.x = (ptNormalizedCoord.x - viewportRect.left) / (viewportRect.right - viewportRect.left);
+			vOffsetInViewport.y = (ptNormalizedCoord.y - viewportRect.bottom) / (viewportRect.top - viewportRect.bottom);
 
 			// Now using the found camera's transformation convert to the world position
 			const b2AABB &aabbWorldRef = m_Cams2dList[i]->GetWorldViewBounds();
@@ -356,28 +355,27 @@ glm::vec2 HyWindow::ProjectCoordinateToWorldPos2d(glm::vec2 ptWindowCoordinate) 
 			{
 				// TODO: Calculate world vector orientation
 				HyError("ConvertViewportCoordinateToWorldPos() TODO: Calculate world vector orientation for camera");
-
 				glm::vec2 vOrientation(cos(glm::radians(fDeg)), sin(glm::radians(fDeg)));
 			}
 			else
 			{
-				//const b2AABB &aabbWorldRef = m_Cams2dList[i]->GetWorldAABB();
+				ptWorldPosOut.x = (aabbWorldRef.upperBound.x - aabbWorldRef.lowerBound.x) * vOffsetInViewport.x;
+				ptWorldPosOut.x += aabbWorldRef.lowerBound.x;
 
-				ptWorldPos.x = (aabbWorldRef.upperBound.x - aabbWorldRef.lowerBound.x) * vOffsetInViewport.x;
-				ptWorldPos.x += aabbWorldRef.lowerBound.x;
+				ptWorldPosOut.y = (aabbWorldRef.upperBound.y - aabbWorldRef.lowerBound.y) * vOffsetInViewport.y;
+				ptWorldPosOut.y += aabbWorldRef.lowerBound.y;
 
-				ptWorldPos.y = (aabbWorldRef.upperBound.y - aabbWorldRef.lowerBound.y) * vOffsetInViewport.y;
-				ptWorldPos.y += aabbWorldRef.lowerBound.y;
+				return true;
 			}
 
 			break;
 		}
 	}
 
-	return ptWorldPos;
+	return false;
 }
 
-bool HyWindow::ProjectWorldPosToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const
+bool HyWindow::ProjectToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const
 {
 	// Find the first camera that contains this ptWorldPos
 	for(uint32 i = 0; i < m_Cams2dList.size(); ++i)

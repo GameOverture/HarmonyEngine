@@ -151,9 +151,9 @@ glm::vec2 HyInput::GetMousePos() const
 	return glm::vec2(m_ptMousePos.x, m_pMouseWindow->GetWindowSize().y - m_ptMousePos.y); // Y-axis goes up in Harmony, so inverse it
 }
 
-glm::vec2 HyInput::GetWorldMousePos() const
+bool HyInput::GetWorldMousePos(glm::vec2 &ptWorldPosOut) const
 {
-	return m_pMouseWindow->ProjectCoordinateToWorldPos2d(GetMousePos());
+	return m_pMouseWindow->ProjectToWorldPos2d(GetMousePos(), ptWorldPosOut);
 }
 
 void HyInput::SetActionCategory(int32 iActionId, uint8 uiCategory, uint32 uiMappingIndex /*= 0*/)
