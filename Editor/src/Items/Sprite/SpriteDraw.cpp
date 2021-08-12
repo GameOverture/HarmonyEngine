@@ -136,6 +136,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		{
 			m_Sprite.SetAnimCtrl(HYANIMCTRL_DontLoop, i);
 			m_Sprite.SetAnimCtrl(HYANIMCTRL_DontBounce, i);
+			m_Sprite.SetAnimCtrl(HYANIMCTRL_DontReverse, i);
 			m_Sprite.SetAnimCtrl(HYANIMCTRL_Play, i);
 		}
 	}
