@@ -69,12 +69,12 @@ void HyMeter::SetValue(int64 iPennies, float fRackDuration)
 		m_fThresholdDist = 0.0f;
 
 		m_SpinText.m_SpinText_Shown.pos.Y(0.0f);
-		m_SpinText.m_SpinText_Padded.pos.Y(-m_Text.GetTextBox().y);
+		m_SpinText.m_SpinText_Padded.pos.Y(-m_Text.GetTextBoxDimensions().y);
 	}
 	else
 	{
 		m_iPrevValue = m_iCurValue;
-		m_dTotalDistance = abs(m_iTargetValue - m_iCurValue) * static_cast<double>(m_Text.GetTextBox().y);
+		m_dTotalDistance = abs(m_iTargetValue - m_iCurValue) * static_cast<double>(m_Text.GetTextBoxDimensions().y);
 		m_dTotalDistance -= m_fThresholdDist;
 	}
 
@@ -149,8 +149,8 @@ void HyMeter::SetNumFormat(HyNumberFormat format)
 	m_Text.SetMonospacedDigits(true);
 
 	m_SpinText.pos.Set(m_Text.pos.X(), m_Text.pos.Y());
-	m_SpinText.m_SpinText_Shown.SetAsScaleBox(m_Text.GetTextBox().x, m_Text.GetTextBox().y);
-	m_SpinText.m_SpinText_Padded.SetAsScaleBox(m_Text.GetTextBox().x, m_Text.GetTextBox().y);
+	m_SpinText.m_SpinText_Shown.SetAsScaleBox(m_Text.GetTextBoxDimensions().x, m_Text.GetTextBoxDimensions().y);
+	m_SpinText.m_SpinText_Padded.SetAsScaleBox(m_Text.GetTextBoxDimensions().x, m_Text.GetTextBoxDimensions().y);
 
 	FormatDigits();
 }
@@ -175,7 +175,7 @@ void HyMeter::SetNumFormat(HyNumberFormat format)
 
 void HyMeter::FormatDigits()
 {
-	float fThreshold = m_Text.GetTextBox().y;
+	float fThreshold = m_Text.GetTextBoxDimensions().y;
 
 	if(m_bShowAsCash)
 		m_Text.SetText(HyLocale::Money_Format(m_iCurValue, m_NumberFormat));
@@ -256,7 +256,7 @@ void HyMeter::FormatDigits()
 
 		m_SpinText.SetScissor(0,
 			0,
-			static_cast<uint32>(m_Text.GetTextBox().x),
+			static_cast<uint32>(m_Text.GetTextBoxDimensions().x),
 			static_cast<uint32>(fThreshold));
 	}
 	else
@@ -297,7 +297,7 @@ void HyMeter::FormatDigits()
 	}
 	else	// Spinning (analog) digits
 	{
-		float fThreshold = m_Text.GetTextBox().y;
+		float fThreshold = m_Text.GetTextBoxDimensions().y;
 
 		double dTravelDist = m_dTotalDistance * (m_fElapsedTimeRack / m_fRackingDuration);
 		m_fThresholdDist += static_cast<float>(dTravelDist - m_dPrevDistance);

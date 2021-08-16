@@ -52,6 +52,12 @@ void HyTimer::Init(double dDuration)
 	m_bIsRunning = false;
 }
 
+void HyTimer::InitStart(double dDuration)
+{
+	Init(dDuration);
+	Start();
+}
+
 void HyTimer::Reset()
 {
 	Init(m_dDuration);

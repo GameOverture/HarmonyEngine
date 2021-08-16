@@ -374,7 +374,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetMonospacedDigits(bool bSet)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBox()
+const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions()
 {
 	return m_vBoxDimensions;
 }

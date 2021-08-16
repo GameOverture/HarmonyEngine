@@ -159,3 +159,29 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	aabbOut.lowerBound.Set(1.0f, 1.0f);
 	aabbOut.upperBound.Set(-1.0f, -1.0f);
 }
+
+/*static*/ glm::vec2 HyMath::PerpendicularClockwise(const glm::vec2 &vDirVector)
+{
+	return glm::vec2(vDirVector.y, -vDirVector.x);
+}
+
+/*static*/ glm::ivec2 HyMath::PerpendicularClockwise(const glm::ivec2 &vDirVector)
+{
+	return glm::ivec2(vDirVector.y, -vDirVector.x);
+}
+
+/*static*/ glm::vec2 HyMath::PerpendicularCounterClockwise(const glm::vec2 &vDirVector)
+{
+	return glm::vec2(-vDirVector.y, vDirVector.x);
+}
+
+/*static*/ glm::ivec2 HyMath::PerpendicularCounterClockwise(const glm::ivec2 &vDirVector)
+{
+	return glm::ivec2(-vDirVector.y, vDirVector.x);
+}
+
+/*static*/ float HyMath::AngleFromVector(const glm::vec2 &vDirVector)
+{
+	glm::vec2 vNormalizedDirVector = glm::normalize(vDirVector);
+	return glm::degrees(atan2(vNormalizedDirVector.y, vNormalizedDirVector.x));
+}

@@ -14,8 +14,8 @@
 
 #define HY_PI 3.141592f
 
-//#define HyRadToDeg(radian) ((radian) * (180.0f / HY_PI))
-//#define HyDegToRad(degree) ((degree) * (HY_PI / 180.0f))
+//#define HyRadToDeg(radian) ((radian) * (180.0f / HY_PI)) // Use glm::degrees() instead
+//#define HyDegToRad(degree) ((degree) * (HY_PI / 180.0f)) // Use glm::radians() instead
 
 // maps unsigned 8 bits/channel to HYCOLOR
 #define HYCOLOR_ARGB(a,r,g,b) \
@@ -38,30 +38,6 @@ void HyCopyVec(glm::vec3 &destRef, const glm::vec3 &srcRef);
 void HyCopyVec(glm::vec2 &destRef, const glm::vec3 &srcRef);
 void HyCopyVec(glm::vec3 &destRef, const glm::vec2 &srcRef);
 
-template <typename VEC>
-int32 HyHalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptPointOnPlane)
-{
-	// Calculate a vector from the point on the plane to our test point
-	VEC vTemp(ptTestPoint - ptPointOnPlane);
-
-	// Calculate the distance: dot product of the new vector with the plane's normal
-	float fDist = glm::dot(vTemp, vNormal);
-
-	float fEpsilon = std::numeric_limits<float>::epsilon();
-	if(fDist > fEpsilon)
-	{
-		// ptTestPoint is in front of the plane
-		return 1;
-	}
-	else if(fDist < -fEpsilon)
-	{
-		// ptTestPoint is behind the plane
-		return -1;
-	}
-
-	// If neither of these were true, then ptTestPoint is on the plane
-	return 0;
-}
 
 bool HyTestPointAABB(const b2AABB &aabb, const glm::vec2 &pt);
 
@@ -198,6 +174,38 @@ class HyMath
 public:
 	static glm::ivec2 LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight);
 	static void InvalidateAABB(b2AABB &aabbOut);
+
+	static glm::vec2 PerpendicularClockwise(const glm::vec2 &vDirVector);
+	static glm::ivec2 PerpendicularClockwise(const glm::ivec2 &vDirVector);
+	static glm::vec2 PerpendicularCounterClockwise(const glm::vec2 &vDirVector);
+	static glm::ivec2 PerpendicularCounterClockwise(const glm::ivec2 &vDirVector);
+
+	static float AngleFromVector(const glm::vec2 &vDirVector);
+
+	template <typename VEC>
+	int32 HalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptPointOnPlane)
+	{
+		// Calculate a vector from the point on the plane to our test point
+		VEC vTemp(ptTestPoint - ptPointOnPlane);
+
+		// Calculate the distance: dot product of the new vector with the plane's normal
+		float fDist = glm::dot(vTemp, vNormal);
+
+		float fEpsilon = std::numeric_limits<float>::epsilon();
+		if(fDist > fEpsilon)
+		{
+			// ptTestPoint is in front of the plane
+			return 1;
+		}
+		else if(fDist < -fEpsilon)
+		{
+			// ptTestPoint is behind the plane
+			return -1;
+		}
+
+		// If neither of these were true, then ptTestPoint is on the plane
+		return 0;
+	}
 };
 
 #endif /* HyMath_h__ */

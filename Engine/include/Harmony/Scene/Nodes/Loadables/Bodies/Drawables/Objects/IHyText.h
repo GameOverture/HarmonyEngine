@@ -120,7 +120,7 @@ public:
 	bool IsMonospacedDigits();
 	void SetMonospacedDigits(bool bSet);
 
-	const glm::vec2 &GetTextBox();
+	const glm::vec2 &GetTextBoxDimensions();
 
 	void SetAsLine();
 	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);

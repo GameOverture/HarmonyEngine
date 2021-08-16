@@ -27,6 +27,7 @@ public:
 	double GetDuration() const;
 
 	void Init(double dDuration);
+	void InitStart(double dDuration);
 	void Reset();
 
 	void Start();
