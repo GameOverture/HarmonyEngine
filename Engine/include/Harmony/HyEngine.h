@@ -99,6 +99,7 @@ public:
 	static float DeltaTime();
 	static double DeltaTimeD();
 	static void PauseGame(bool bPause);
+	static uint32 NumWindows();
 	static HyWindow &Window(uint32 uiWindowIndex = 0);
 	static HyInput &Input();
 	static HyAudioHarness &Audio();
