@@ -50,6 +50,12 @@ bool EntityNodeTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialog
 			HyGuiLog("Entity cannot add itself as a child", LOGTYPE_Error);
 		return false;
 	}
+	if(HyGlobal::GetProjItemTypeList().contains(pItem->GetType()) == false)
+	{
+		if(bShowDialogsOnFail)
+			HyGuiLog(pItem->GetText() % " is not a valid child type: " % QString::number(pItem->GetType()), LOGTYPE_Error);
+		return false;
+	}
 	if(pItem->GetType() == ITEM_Entity)
 	{
 		// TODO: Ensure that this child entity doesn't contain this as child

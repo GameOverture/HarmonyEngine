@@ -136,7 +136,7 @@ void EntityWidget::on_actionAddSelectedChild_triggered()
 	for(auto pItem : selectedItems)
 	{
 		EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
-		if(pTreeModel->IsItemValid(pItem, true) == false)
+		if(pTreeModel->IsItemValid(pItem, false) == false)
 			continue;
 	
 		QVariant v;
