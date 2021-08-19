@@ -42,7 +42,7 @@ public:
 	HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyButton();
 
-	virtual void SetAsDisabled(bool bIsDisabled) override;
+	virtual void SetAsEnabled(bool bEnabled) override;
 	virtual void SetAsHighlighted(bool bIsHighlighted) override;
 
 	bool IsHideDownState() const;

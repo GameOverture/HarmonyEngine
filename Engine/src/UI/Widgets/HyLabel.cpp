@@ -216,14 +216,20 @@ bool HyLabel::IsPrimitivePanel() const
 	return (m_uiPanelAttribs & PANELATTRIB_IsPrimitive) != 0;
 }
 
-bool HyLabel::IsDisabled() const
+bool HyLabel::IsEnabled() const
 {
-	return (m_uiPanelAttribs & PANELATTRIB_IsDisabled) != 0;
+	return (m_uiPanelAttribs & PANELATTRIB_IsDisabled) == 0;
 }
 
-/*virtual*/ void HyLabel::SetAsDisabled(bool bIsDisabled)
+/*virtual*/ void HyLabel::SetAsEnabled(bool bEnabled)
 {
-	if(bIsDisabled)
+	if(bEnabled)
+	{
+		m_uiPanelAttribs &= ~PANELATTRIB_IsDisabled;
+		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
+		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
+	}
+	else
 	{
 		m_uiPanelAttribs |= PANELATTRIB_IsDisabled;
 
@@ -232,12 +238,6 @@ bool HyLabel::IsDisabled() const
 			topColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
 			botColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
 		}
-	}
-	else
-	{
-		m_uiPanelAttribs &= ~PANELATTRIB_IsDisabled;
-		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
-		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 	}
 }
 
@@ -286,7 +286,7 @@ void HyLabel::SetHideDisabled(bool bIsHideDisabled)
 	else
 	{
 		m_uiPanelAttribs &= ~PANELATTRIB_HideDisabled;
-		SetAsDisabled(IsDisabled());
+		SetAsEnabled(IsEnabled());
 	}
 }
 
@@ -309,7 +309,7 @@ void HyLabel::CommonSetup()
 {
 	m_Text.SetTextAlignment(HYALIGN_HCenter);
 
-	SetAsDisabled(IsDisabled());
+	SetAsEnabled(IsEnabled());
 	SetAsHighlighted(IsHighlighted());
 
 	ResetTextOnPanel();

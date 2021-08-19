@@ -50,15 +50,15 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 {
 }
 
-/*virtual*/ void HyButton::SetAsDisabled(bool bIsDisabled) /*override*/
+/*virtual*/ void HyButton::SetAsEnabled(bool bEnabled) /*override*/
 {
-	HyLabel::SetAsDisabled(bIsDisabled);
-	IsDisabled() ? DisableMouseInput() : EnableMouseInput();
+	HyLabel::SetAsEnabled(bEnabled);
+	IsEnabled() ? EnableMouseInput() : DisableMouseInput();
 
 	if(m_SpritePanel.IsLoadDataValid() == false)
 		return;
 	
-	if(IsDisabled())
+	if(IsEnabled() == false)
 	{
 		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down || m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
 			SetBtnState(HYBUTTONSTATE_Idle);

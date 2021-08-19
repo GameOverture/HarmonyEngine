@@ -74,8 +74,8 @@ public:
 
 	bool IsPrimitivePanel() const;
 
-	bool IsDisabled() const;
-	virtual void SetAsDisabled(bool bIsDisabled);
+	bool IsEnabled() const;
+	virtual void SetAsEnabled(bool bEnabled);
 
 	bool IsHighlighted() const;
 	virtual void SetAsHighlighted(bool bIsHighlighted);
