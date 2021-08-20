@@ -120,7 +120,10 @@ uint32 IHyLoadable::GetState() const
 	if(AcquireData() == nullptr || uiStateIndex >= UncheckedGetData()->GetNumStates())
 	{
 		if(UncheckedGetData() == nullptr)
+		{
 			HyLogDebug("SetState() invoked on null data");
+			m_uiState = uiStateIndex;
+		}
 		else if(uiStateIndex >= UncheckedGetData()->GetNumStates())
 			HyLogWarning(m_sPrefix << "/" << m_sName << " wants to set state index of '" << uiStateIndex << "' when total number of states is '" << UncheckedGetData()->GetNumStates() << "'");
 
