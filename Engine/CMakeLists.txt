@@ -328,8 +328,6 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			# ICU - International Components for Unicode (aka Insane Clown Union)
 			# ICU Components Reference: https://cmake.org/cmake/help/latest/module/FindICU.html
 			
-			add_compile_definitions(HY_USE_ICU)
-			
 			cmake_policy(SET CMP0074 NEW) # find_package() command now searches prefixes specified by <PackageName>_ROOT
 			#set(ICU_DEBUG ON)
 			set(ICU_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/extras/ICU")

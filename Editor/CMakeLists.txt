@@ -171,20 +171,20 @@ if(Qt5_DIR)
 		src/Explorer/ExplorerModel.h
 		src/Explorer/ExplorerWidget.h
 		src/Explorer/ExplorerWidget.ui
+		src/Explorer/Project/Project.cpp
+		src/Explorer/Project/ProjectDraw.cpp
+		src/Explorer/Project/ProjectItemData.cpp
+		src/Explorer/Project/ProjectItemMimeData.cpp
+		src/Explorer/Project/Project.h
+		src/Explorer/Project/ProjectDraw.h
+		src/Explorer/Project/ProjectItemData.h
+		src/Explorer/Project/ProjectItemMimeData.h
 		src/Harmony/Harmony.cpp
 		src/Harmony/HarmonyConnection.cpp
 		src/Harmony/HarmonyWidget.cpp
 		src/Harmony/Harmony.h
 		src/Harmony/HarmonyConnection.h
 		src/Harmony/HarmonyWidget.h
-		src/Project/Project.cpp
-		src/Project/ProjectDraw.cpp
-		src/Project/ProjectItemData.cpp
-		src/Project/ProjectItemMimeData.cpp
-		src/Project/Project.h
-		src/Project/ProjectDraw.h
-		src/Project/ProjectItemData.h
-		src/Project/ProjectItemMimeData.h
 		src/Shared/Global.cpp
 		src/Shared/Global.h
 		src/Shared/GlobalUndoCmds.h
@@ -262,9 +262,9 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Audio")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Dialogs")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Harmony")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Project")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Widget")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer/Project")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Manager")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Properties")

@@ -147,7 +147,7 @@
 
 	UErrorCode eStatus = U_ZERO_ERROR;
 	auto localizedNumFormatter = AssembleFormatter(format);
-	localizedNumFormatter = localizedNumFormatter.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
+	localizedNumFormatter = localizedNumFormatter.unit(icu::CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
 	CHECK_ICU_STATUS(eStatus);
 
 	auto formattedNum = localizedNumFormatter.formatDouble(static_cast<double>(iValue) / dDenominator, eStatus);
@@ -199,7 +199,7 @@
 #if HY_USE_ICU
 	UErrorCode eStatus = U_ZERO_ERROR;
 	auto localizedNumFormatter = AssembleFormatter(format);
-	localizedNumFormatter = localizedNumFormatter.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
+	localizedNumFormatter = localizedNumFormatter.unit(icu::CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
 	CHECK_ICU_STATUS(eStatus);
 
 	auto formattedNum = localizedNumFormatter.formatDouble(dValue, eStatus);
@@ -266,7 +266,7 @@
 #if HY_USE_ICU
 	UErrorCode eStatus = U_ZERO_ERROR;
 	auto localizedNumFormatter = AssembleFormatter(format);
-	localizedNumFormatter = localizedNumFormatter.unit(NoUnit::percent());
+	localizedNumFormatter = localizedNumFormatter.unit(icu::NoUnit::percent());
 
 	auto formattedNum = localizedNumFormatter.formatDouble(dValue, eStatus);
 	CHECK_ICU_STATUS(eStatus);
@@ -288,9 +288,9 @@
 }
 
 #ifdef HY_USE_ICU
-/*static*/ number::LocalizedNumberFormatter HyLocale::AssembleFormatter(HyNumberFormat format)
+/*static*/ icu::number::LocalizedNumberFormatter HyLocale::AssembleFormatter(HyNumberFormat format)
 {
-	auto localizedNumFormatter = number::NumberFormatter::withLocale(Locale(sm_sIso639Code.c_str(), sm_sIso3166Code.c_str()));
+	auto localizedNumFormatter = icu::number::NumberFormatter::withLocale(icu::Locale(sm_sIso639Code.c_str(), sm_sIso3166Code.c_str()));
 
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		localizedNumFormatter = localizedNumFormatter.decimal(UNumberDecimalSeparatorDisplay::UNUM_DECIMAL_SEPARATOR_ALWAYS);
@@ -335,7 +335,7 @@
 		break;
 	}
 
-	localizedNumFormatter = localizedNumFormatter.integerWidth(number::IntegerWidth::zeroFillTo(format.m_uiFillIntegerZeros));
+	localizedNumFormatter = localizedNumFormatter.integerWidth(icu::number::IntegerWidth::zeroFillTo(format.m_uiFillIntegerZeros));
 
 	switch(format.m_uiRounding)
 	{
@@ -349,19 +349,13 @@
 	case HYFMTROUNDING_Floor:
 		localizedNumFormatter = localizedNumFormatter.roundingMode(UNumberFormatRoundingMode::UNUM_ROUND_FLOOR);
 		break;
-	case HYFMTROUNDING_HalfFloor:
-		localizedNumFormatter = localizedNumFormatter.roundingMode(UNumberFormatRoundingMode::UNUM_ROUND_HALF_FLOOR);
-		break;
-	case HYFMTROUNDING_HalfCeiling:
-		localizedNumFormatter = localizedNumFormatter.roundingMode(UNumberFormatRoundingMode::UNUM_ROUND_HALF_CEILING);
-		break;
 	case HYFMTROUNDING_NoneUnlimited:
-		localizedNumFormatter = localizedNumFormatter.precision(number::Precision::unlimited());
+		localizedNumFormatter = localizedNumFormatter.precision(icu::number::Precision::unlimited());
 		break;
 	}
 
 	if(format.IsUsingScientificNotation())
-		localizedNumFormatter = localizedNumFormatter.notation(number::Notation::scientific());
+		localizedNumFormatter = localizedNumFormatter.notation(icu::number::Notation::scientific());
 
 	return localizedNumFormatter;
 }
@@ -375,8 +369,10 @@
 		sStdName = sm_sIso639Code;
 		if(sm_sIso3166Code.empty() == false)
 			sStdName += "_" + sm_sIso3166Code;
+
+		sStdName += ".UTF-8";
 	}
-	sStdName += ".UTF-8";
+	
 	return sStdName;
 }
 

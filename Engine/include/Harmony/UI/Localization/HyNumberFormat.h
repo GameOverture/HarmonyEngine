@@ -43,8 +43,6 @@ enum HyNumFmtRounding // Whether to round any fractional values to a whole integ
 	HYFMTROUNDING_None = 0,					// Default. Shows fractional values using the precision specified by HyNumberFormat::SetFractionPrecision() padding values
 	HYFMTROUNDING_Ceiling,
 	HYFMTROUNDING_Floor,
-	HYFMTROUNDING_HalfFloor,
-	HYFMTROUNDING_HalfCeiling,
 #ifdef HY_USE_ICU
 	HYFMTROUNDING_NoneUnlimited,			// Show all fractional digits to the fullest precision
 #endif
