@@ -26,7 +26,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	layout()->removeItem(ui->verticalLayout);
 	layout()->addItem(ui->verticalLayout);
 
-	ui->btnAddChild->setDefaultAction(ui->actionAddSelectedChild);
+	ui->btnAddChild->setDefaultAction(ui->actionAppendChildren);
 	ui->btnAddChildPrimitive->setDefaultAction(ui->actionAddPrimitive);
 	ui->btnInsertBoundingVolume->setDefaultAction(ui->actionInsertBoundingVolume);
 	ui->btnInsertPhysics->setDefaultAction(ui->actionInsertPhysicsBody);
@@ -73,7 +73,7 @@ EntityWidget::~EntityWidget()
 			break;
 		}
 	}
-	ui->actionAddSelectedChild->setEnabled(bEnableAddNodeBtn);
+	ui->actionAppendChildren->setEnabled(bEnableAddNodeBtn);
 
 	bool bFrameIsSelected = true;
 	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
@@ -122,7 +122,7 @@ ExplorerItemData *EntityWidget::GetSelectedNode()
 	return ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItemData *>();
 }
 
-void EntityWidget::on_actionAddSelectedChild_triggered()
+void EntityWidget::on_actionAppendChildren_triggered()
 {
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
 	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>280</width>
+    <width>274</width>
     <height>823</height>
    </rect>
   </property>
@@ -149,7 +149,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="../../data/HyEditor.qrc">:/icons16x16/Harmony.png</pixmap>
+              <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/Harmony.png</pixmap>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -200,7 +200,7 @@
   </layout>
   <action name="actionAddPrimitive">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Primitive-New.png</normaloff>:/icons16x16/items/Primitive-New.png</iconset>
    </property>
    <property name="text">
@@ -212,7 +212,7 @@
   </action>
   <action name="actionInsertBoundingVolume">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/items/BoundingVolume-New.png</normaloff>:/icons16x16/items/BoundingVolume-New.png</iconset>
    </property>
    <property name="text">
@@ -224,7 +224,7 @@
   </action>
   <action name="actionInsertPhysicsBody">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Physics-New.png</normaloff>:/icons16x16/items/Physics-New.png</iconset>
    </property>
    <property name="text">
@@ -242,9 +242,9 @@
     <string>Inserts a scissor box which culls away a portion of the visual</string>
    </property>
   </action>
-  <action name="actionAddSelectedChild">
+  <action name="actionAppendChildren">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
@@ -256,8 +256,9 @@
   </action>
  </widget>
  <resources>
+  <include location="../../../data/HyEditor.qrc"/>
+  <include location="../../../data/HyEditor.qrc"/>
   <include location="../../data/HyEditor.qrc"/>
-  <include location="../res/HyEditor.qrc"/>
  </resources>
  <connections/>
 </ui>

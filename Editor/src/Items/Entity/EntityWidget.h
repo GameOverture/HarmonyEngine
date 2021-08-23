@@ -49,7 +49,7 @@ public:
 
 private Q_SLOTS:
 	void on_nodeTree_clicked(QModelIndex);
-	void on_actionAddSelectedChild_triggered();
+	void on_actionAppendChildren_triggered();
 	void on_actionAddPrimitive_triggered();
 	void on_actionInsertBoundingVolume_triggered();
 	void on_actionInsertPhysicsBody_triggered();
