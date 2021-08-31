@@ -178,7 +178,7 @@ const HyText2dGlyphInfo *HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLa
 	auto iter = m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiUtf32Code);
 	if(iter == m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end())
 	{
-		HyLogDebug("Missing glyph code " << uiUtf32Code << " in Text instance: " << GetPath());
+		HyLogWarning("Missing glyph code " << uiUtf32Code << " in Text instance: " << GetPath());
 
 		// Instead return Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) which should always be available
 		iter = m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(65533);

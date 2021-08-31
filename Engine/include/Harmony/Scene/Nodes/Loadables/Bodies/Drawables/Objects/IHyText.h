@@ -20,7 +20,7 @@
 #define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
 // Convienence function macro
-#define HySetText(textNode, msg) textNode.SetText((std::stringstream() << msg).str())
+#define HySetText(textNode, msg) textNode.SetText((std::stringstream() << msg))
 
 template<typename NODETYPE, typename ENTTYPE>
 class IHyText : public NODETYPE
@@ -85,10 +85,11 @@ public:
 
 	const IHyText &operator=(const IHyText &rhs);
 
-	// Assumes UTF-8 encoding. Accepts newline characters '\n'
-	void SetText(const std::stringstream ssUtf8Text);
-	void SetText(const std::string sUtf8Text);
 	const std::string &GetUtf8String() const;
+
+	// Assumes UTF-8 encoding. Accepts newline characters '\n'
+	void SetText(const std::string &sUtf8Text);
+	void SetText(const std::stringstream &ssUtf8Text);
 
 	float GetTextWidth(bool bIncludeScaling = true);
 	float GetTextHeight(bool bIncludeScaling = true);

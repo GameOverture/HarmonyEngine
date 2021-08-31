@@ -13,9 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Localization/HyNumberFormat.h"
 
-#include <locale>
-#include <iomanip>
-
 #if HY_USE_ICU
 	#define U_CHARSET_IS_UTF8 1
 	#include <unicode/numberformatter.h>
@@ -23,11 +20,47 @@
 
 class HyLocale
 {
-	static std::string		sm_sIso639Code;			// Language Code
-	static std::string		sm_sIso3166Code;		// Country Code
-	static std::string		sm_sIso4217Code;		// Currency Code
+	template <typename CharT, typename ValueT>
+	friend class HyNumpunct;
 
-	static std::string		sm_sMinorCurrencySymbol;// Currency "cent" symbol
+	template <typename CharT, bool bIntSyms, typename ValueT>
+	friend class HyMoneypunct;
+
+	static std::string					sm_sIso639Code;			// Language Code
+	static std::string					sm_sIso3166Code;		// Country Code
+	static std::string					sm_sIso4217Code;		// Currency Code
+
+	static std::string					sm_sMinorCurrencySymbol;// Currency "cent" symbol
+
+	template<typename CharT>
+	struct FallbackNumpunctData
+	{
+		CharT							m_cDecimalPoint;
+		CharT							m_cThousandsSep;
+		std::string						m_sGrouping;			// The groups are stored as binary values: three-digit group is '\3', and 51-digit group is '3'
+		std::basic_string<CharT>		m_sCurrSymbol;			// The object of type string_type holding the currency symbol.
+		std::basic_string<CharT>		m_sPositiveSign;		// Only the first character of the string returned is the character that appears in the pos_format() position indicated by the value sign. The rest of the characters appear after the rest of the monetary string.
+		std::basic_string<CharT>		m_sNegativeSign;		// Only the first character of the string returned is the character that appears in the neg_format() position indicated by the value sign. The rest of the characters appear after the rest of the monetary string.
+		int32							m_iFracDigits;			// The number of digits to be displayed after the decimal point (when writing money). In common U.S. locales, this is the value 2
+
+		FallbackNumpunctData(CharT cDecimalPoint, CharT cThousandsSep, std::string sGrouping, std::basic_string<CharT> sCurrSymbol, std::basic_string<CharT> sPositiveSign, std::basic_string<CharT> sNegativeSign, int32 iFracDigits)
+		{
+			Set(cDecimalPoint, cThousandsSep, sGrouping, sCurrSymbol, sPositiveSign, sNegativeSign, iFracDigits);
+		}
+		void Set(CharT cDecimalPoint, CharT cThousandsSep, std::string sGrouping, std::basic_string<CharT> sCurrSymbol, std::basic_string<CharT> sPositiveSign, std::basic_string<CharT> sNegativeSign, int32 iFracDigits)
+		{
+			m_cDecimalPoint = cDecimalPoint;
+			m_cThousandsSep = cThousandsSep;
+			m_sGrouping = sGrouping;
+			m_sCurrSymbol = sCurrSymbol;
+			m_sPositiveSign = sPositiveSign;
+			m_sNegativeSign = sNegativeSign;
+			m_iFracDigits = iFracDigits;
+		}
+	};
+	static FallbackNumpunctData<char>	sm_FallbackNumpunctData;
+	static FallbackNumpunctData<wchar_t>sm_FallbackNumpunctWideData;
+	static std::map<std::string, int32>	sm_Iso4217Map;
 
 public:
 	// Globally sets all HyLocale formatting
@@ -53,179 +86,15 @@ public:
 	static std::string Percent_Format(double dValue, HyNumberFormat format = HyNumberFormat());
 
 private:
-	static std::string AssembleStdLocaleString();
-
 #ifdef HY_USE_ICU
 	static icu::number::LocalizedNumberFormatter AssembleFormatter(HyNumberFormat format);
-#else
-
-	// Emscripten shits the bed with any std::locale object so avoid them like this
-	#ifndef HY_PLATFORM_BROWSER
-		//template <typename CharT, typename ValueT>
-		//using HyNumpunct = std::numpunct_byname<CharT>;
-		#define HyNumpunct std::numpunct_byname<CharT>
-
-		//template <typename CharT, bool bIntSyms, typename ValueT>
-		//using HyMoneypunct = std::moneypunct_byname<CharT, bIntSyms>;
-		#define HyMoneypunct std::moneypunct_byname<CharT, bIntSyms>
-	#else
-		//template <typename CharT, typename ValueT>
-		//using HyNumpunct = std::numpunct<CharT>;
-		#define HyNumpunct std::numpunct<CharT>
-
-		//template <typename CharT, bool bIntSyms, typename ValueT>
-		//using HyMoneypunct = std::moneypunct<CharT, bIntSyms>;
-		#define HyMoneypunct std::moneypunct<CharT, bIntSyms>
-	#endif
-
-	template <typename CharT, typename ValueT>
-	class HyLocale_numberpunct : public HyNumpunct
-	{
-		HyNumberFormat				m_NumberFormat;
-		ValueT						m_Value;
-
-	public:
-		explicit HyLocale_numberpunct(HyNumberFormat format, ValueT value, std::string sLocaleName, std::size_t refs = 0) :
-#ifndef HY_PLATFORM_BROWSER
-			HyNumpunct(sLocaleName, refs),
-#else
-			HyNumpunct(refs),
 #endif
-			m_NumberFormat(format),
-			m_Value(value)
-		{ }
 
-		virtual ~HyLocale_numberpunct() = default;
+	static std::locale AssembleStdLocale();
+	static void AssembleFallbackNumpunct();
 
-	protected:
-		// Provides the numbers of digits between each pair of thousands separators
-		virtual std::string do_grouping() const override
-		{
-			switch(m_NumberFormat.GetGrouping())
-			{
-			default:
-			case HYFMTGROUPING_Default:
-				return HyNumpunct::do_grouping();
-
-			case HYFMTGROUPING_Off:
-				return "";
-
-			case HYFMTGROUPING_Min2:
-				if(m_Value >= 10000)
-					return HyNumpunct::do_grouping();
-				else
-					return "";
-
-			case HYFMTGROUPING_Thousands:
-				return "\003";
-			}
-		}
-	};
-
-	template <typename CharT, bool bIntSyms, typename ValueT>
-	class HyLocale_moneypunct : public HyMoneypunct
-	{
-		HyNumberFormat				m_NumberFormat;
-		ValueT						m_Value;
-
-	public:
-		explicit HyLocale_moneypunct(HyNumberFormat format, ValueT value, std::string sLocaleName, std::size_t refs = 0) :
-#ifndef HY_PLATFORM_BROWSER
-			HyMoneypunct(sLocaleName, refs),
-#else
-			HyMoneypunct(refs),
-#endif
-			m_NumberFormat(format),
-			m_Value(value)
-		{ }
-
-		virtual ~HyLocale_moneypunct() = default;
-
-	protected:
-		// Provides the numbers of digits between each pair of thousands separators
-		virtual std::string do_grouping() const override
-		{
-			switch(m_NumberFormat.GetGrouping())
-			{
-			default:
-			case HYFMTGROUPING_Default:
-				return HyMoneypunct::do_grouping();
-
-			case HYFMTGROUPING_Off:
-				return "";
-
-			case HYFMTGROUPING_Min2: {
-				int32 iNumFractionDigits = this->frac_digits();
-				double dDenominator = 1.0;
-				for(int32 i = 0; i < iNumFractionDigits; ++i)
-					dDenominator *= 10.0;
-				if((m_Value / dDenominator) >= 10000)
-					return HyMoneypunct::do_grouping();
-				else
-					return "";
-			}
-
-			case HYFMTGROUPING_Thousands:
-				return "\003";
-			}
-		}
-
-		// Provides the string to indicate a positive value
-		virtual std::string do_positive_sign() const override
-		{
-			switch(m_NumberFormat.GetSign())
-			{
-			default:
-			case HYFMTSIGN_Default:
-			case HYFMTSIGN_Always:
-			case HYFMTSIGN_Accounting:
-			case HYFMTSIGN_AccountingAlways:
-				return HyMoneypunct::do_positive_sign();
-
-			case HYFMTSIGN_AlwaysExceptZero:
-			case HYFMTSIGN_AccountingExceptZero:
-				if(m_Value != 0)
-					return HyMoneypunct::do_positive_sign();
-				else
-					return "";
-
-			case HYFMTSIGN_Never:
-				return "";
-			}
-		}
-
-		// Provides the string to indicate a negative value
-		virtual std::string do_negative_sign() const override
-		{
-			switch(m_NumberFormat.GetSign())
-			{
-			default:
-			case HYFMTSIGN_Default:
-			case HYFMTSIGN_Always:
-				return HyMoneypunct::do_negative_sign();
-
-			case HYFMTSIGN_AlwaysExceptZero:
-				if(m_Value != 0)
-					return HyMoneypunct::do_negative_sign();
-				else
-					return "";
-
-			case HYFMTSIGN_Never:
-				return "";
-
-			case HYFMTSIGN_Accounting:
-			case HYFMTSIGN_AccountingAlways:
-				return "()";
-
-			case HYFMTSIGN_AccountingExceptZero:
-				if(m_Value != 0)
-					return "()";
-				else
-					return "";
-			}
-		}
-	};
-#endif
+	template<typename CharT>
+	static FallbackNumpunctData<CharT> GetFallbackNumpunctData();
 };
 
 #endif /* HyLocale_h__ */

@@ -145,6 +145,7 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Widgets/HyLabel.cpp
 	src/UI/Widgets/HyProgressBar.cpp
 	src/UI/Widgets/HyMeter.cpp
+	src/UI/Widgets/HyRichText.cpp
 	src/UI/Widgets/HySpacer.cpp
 	src/UI/Widgets/IHyWidget.cpp
 	src/UI/Containers/IHy9Slice.cpp
@@ -268,6 +269,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Widgets/HyLabel.h
 	include/Harmony/UI/Widgets/HyProgressBar.h
 	include/Harmony/UI/Widgets/HyMeter.h
+	include/Harmony/UI/Widgets/HyRichText.h
 	include/Harmony/UI/Widgets/HySpacer.h
 	include/Harmony/UI/Widgets/IHyWidget.h
 	include/Harmony/UI/Containers/IHy9Slice.h
@@ -276,6 +278,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Layouts/HyBoxLayout.h
 	include/Harmony/UI/Layouts/HyGridLayout.h
 	include/Harmony/UI/Localization/HyLocale.h
+	include/Harmony/UI/Localization/HyNumpunct.h
 	include/Harmony/UI/Localization/HyNumberFormat.h
 	include/Harmony/UI/Localization/HyTextUi.h
 	include/Harmony/Utilities/Crc32.h

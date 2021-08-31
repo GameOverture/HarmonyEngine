@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Localization/HyLocale.h"
-#include "Diagnostics/Console/IHyConsole.h"
+#include "UI/Localization/HyNumpunct.h"
 
 #ifdef HY_DEBUG
 	#define CHECK_ICU_STATUS(status) if(status > 0) HyLogError("ICU Status Error: " << status)
@@ -20,7 +20,10 @@
 /*static*/ std::string HyLocale::sm_sIso639Code("en");
 /*static*/ std::string HyLocale::sm_sIso3166Code("US");
 /*static*/ std::string HyLocale::sm_sIso4217Code("USD");
-/*static*/ std::string HyLocale::sm_sMinorCurrencySymbol("");
+/*static*/ std::string HyLocale::sm_sMinorCurrencySymbol("\xC2\xA2");
+/*static*/ HyLocale::FallbackNumpunctData<char> HyLocale::sm_FallbackNumpunctData('.', ',', "\003", "$", "+", "-", 2);
+/*static*/ HyLocale::FallbackNumpunctData<wchar_t> HyLocale::sm_FallbackNumpunctWideData(L'.', L',', "\003", L"$", L"+", L"-", 2);
+/*static*/ std::map<std::string, int32>	HyLocale::sm_Iso4217Map;
 
 /*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code /*= ""*/)
 {
@@ -34,13 +37,16 @@
 
 	if(sm_sIso4217Code.empty())
 	{
-		sm_sIso4217Code = std::use_facet<std::moneypunct<char, true>>(std::locale(AssembleStdLocaleString())).curr_symbol();
+		std::locale loc(AssembleStdLocale(), new HyMoneypunct<char, true, int64>(HyNumberFormat(), 0, ""));
+		sm_sIso4217Code = std::use_facet<HyMoneypunct<char, true, int64>>(loc).curr_symbol();
 		sm_sIso4217Code = sm_sIso4217Code.substr(0, 3);
 	}
 
 	std::transform(sm_sIso639Code.begin(), sm_sIso639Code.end(), sm_sIso639Code.begin(), ::tolower);
 	std::transform(sm_sIso3166Code.begin(), sm_sIso3166Code.end(), sm_sIso3166Code.begin(), ::toupper);
 	std::transform(sm_sIso4217Code.begin(), sm_sIso4217Code.end(), sm_sIso4217Code.begin(), ::toupper);
+
+	AssembleFallbackNumpunct();
 }
 
 /*static*/ void HyLocale::SetMinorCurrencySymbol(std::string sMinorCurrencySymbolUtf8)
@@ -65,8 +71,9 @@
 	if(sText.empty())
 		HyLogError("HyLocale::Number_Format(int64) returned empty string! - " << "Value: " << iValue << ", Status: " << eStatus);
 #else
+	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, int64>(format, iValue, AssembleStdLocaleString())));
+	str.imbue(std::locale(loc, new HyNumpunct<char, int64>(format, iValue, loc.name())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -101,8 +108,9 @@
 	if(sText.empty())
 		HyLogError("HyLocale::Number_Format(double) returned empty string! - " << "Value: " << dValue << ", Status: " << eStatus);
 #else
+	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	str.imbue(std::locale(str.getloc(), new HyLocale_numberpunct<char, double>(format, dValue, AssembleStdLocaleString())));
+	str.imbue(std::locale(loc, new HyNumpunct<char, double>(format, dValue, loc.name())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -160,8 +168,9 @@
 	if(sText.empty())
 		HyLogError("HyLocale::Money_Format(int64) returned empty string! - " << "Value: " << iValue << ", Status: " << eStatus);
 #else
+	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, int64>(format, iValue, AssembleStdLocaleString())));
+	str.imbue(std::locale(loc, new HyMoneypunct<char, false, int64>(format, iValue, loc.name())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -212,8 +221,11 @@
 	if(sText.empty())
 		HyLogError("HyLocale::Money_Format(double) returned empty string! - " << "Value: " << dValue << ", Status: " << eStatus);
 #else
+
+	std::locale loc = AssembleStdLocale();
+
 	std::stringstream str;
-	str.imbue(std::locale(str.getloc(), new HyLocale_moneypunct<char, false, double>(format, dValue, AssembleStdLocaleString())));
+	str.imbue(std::locale(loc, new HyMoneypunct<char, false, double>(format, dValue, loc.name())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -255,7 +267,7 @@
 
 	return iNumFracDigits;
 #else
-	return std::use_facet<std::moneypunct<char>>(std::locale(AssembleStdLocaleString())).frac_digits();
+	return std::use_facet<std::moneypunct<char>>(AssembleStdLocale()).frac_digits();
 #endif
 }
 
@@ -361,7 +373,7 @@
 }
 #endif
 
-/*static*/ std::string HyLocale::AssembleStdLocaleString()
+/*static*/ std::locale HyLocale::AssembleStdLocale()
 {
 	std::string sStdName;
 	if(sm_sIso639Code.empty() == false)
@@ -372,115 +384,49 @@
 
 		sStdName += ".UTF-8";
 	}
+
+	std::locale assembledLocale;
+	try
+	{
+		assembledLocale = std::locale(sStdName);
+	}
+	catch(const std::exception &)
+	{
+		//HyLogWarning("HyLocale::AssembleStdLocale() failed with \"" << sStdName << "\". Using fallback locale.");
+		assembledLocale = std::locale();
+	}
 	
-	return sStdName;
+	return assembledLocale;
 }
 
-//if(iValue < 100 && m_bUseDecimalSymbol)
-//{
-//	sText = std::to_string(iValue);
-//	sText += "\xC2\xA2";	// This is the cent symbol in UTF8
-//}
-//else
-//{
-//	int64 iValue = static_cast<int64>(dValue * 100.0);
-//	sText = "$";
-//	int64 iNumDollars = (abs(iValue) / 100);
-//	sText += std::to_string(iNumDollars);
+/*static*/ void HyLocale::AssembleFallbackNumpunct()
+{
+	if(sm_Iso4217Map.empty())
+	{
+		sm_Iso4217Map["AED"] = 784;
+	}
 
-//	int64 iNumCents = (abs(iValue) % 100);
-//	if(/*m_bAlwaysShowDecimal ||*/ iNumCents != 0)
-//	{
-//		if(iNumCents >= 10)
-//			sText += ".";
-//		else
-//			sText += ".0";
-//		sText += std::to_string(iNumCents);
-//	}
-//}
+	if(sm_Iso4217Map.find(sm_sIso639Code) == sm_Iso4217Map.end())
+	{
+		sm_FallbackNumpunctData.Set('.', ',', "\003", "$", "+", "-", 2);
+		sm_FallbackNumpunctWideData.Set(L'.', L',', "\003", L"$", L"+", L"-", 2);
+		return;
+	}
 
-///*static*/ double HyLocale::Number_Parse(std::string sValue)
-//{
-//	double dReturnValue = 0.0;
-//
-//#if HY_USE_ICU
-//	UErrorCode eStatus = U_ZERO_ERROR;
-//
-//	// Ensure that the decimal separatator is '.' for standard parsing with 'std::stod()' below
-//	DecimalFormatSymbols decimalFormatSyms(Locale(sm_sIso639Code.c_str()), eStatus);
-//	decimalFormatSyms.setSymbol(DecimalFormatSymbols::kDecimalSeparatorSymbol, '.');
-//	
-//	auto localizedNumFormatter = AssembleFormatter(HyNumberFormat())
-//		.symbols(decimalFormatSyms)
-//		.unit(CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
-//	auto formattedNum = localizedNumFormatter.formatDecimal(StringPiece(sValue.c_str()), eStatus);
-//	auto sUnicodeStr = formattedNum.toString(eStatus);
-//
-//	sValue.clear();
-//	sUnicodeStr.toUTF8String<std::string>(sValue);
-//#endif
-//
-//	// Strip any formatting the string may have
-//	sValue.erase(std::remove_if(sValue.begin(), sValue.end(), [](char c)->bool { return !std::isdigit(c) && c != '.'; }), sValue.end());
-//
-//	try {
-//		dReturnValue = std::stod(sValue);
-//	}
-//	catch(const std::invalid_argument &) {
-//		HyLogError("HyLocale::Money_Parse - std::stod() Argument is invalid");
-//	}
-//	catch(const std::out_of_range &) {
-//		HyLogError("HyLocale::Money_Parse - std::stod() Argument is out of range for a double");
-//	}
-//
-//
-//	return dReturnValue;
-//}
+	switch(sm_Iso4217Map[sm_sIso639Code])
+	{
+	case 784: // AED - United Arab Emirates dirham
+		sm_FallbackNumpunctData.Set('.', ',', "\003", "$", "+", "-", 2);
+		break;
+	}
+}
 
+template<typename CharT>
+/*static*/ HyLocale::FallbackNumpunctData<CharT> HyLocale::GetFallbackNumpunctData()
+{
+	if constexpr(std::is_same<CharT, char>::value)
+		return sm_FallbackNumpunctData;
+	else
+		return sm_FallbackNumpunctWideData;
+}
 
-
-//std::string HyMeter::FormatString(int64 iValue)
-//{
-//	std::string returnStr;
-//
-//	if(m_bShowAsCash)
-//	{
-//		returnStr = (iValue < 0) ? "-$" : "$";
-//
-//		int64 iNumCents = (abs(iValue) % 100);
-//		int64 iNumDollars = (abs(iValue) / 100);
-//
-//		if(m_bUseCommas)
-//			returnStr += ToStringWithCommas(iNumDollars);
-//		else
-//			returnStr += std::to_string(iNumDollars);
-//
-//		if(iNumCents >= 10)
-//			returnStr += ".";
-//		else
-//			returnStr += ".0";
-//		returnStr += std::to_string(iNumCents);
-//	}
-//	else
-//	{
-//		if(m_bUseCommas)
-//			returnStr = ToStringWithCommas(iValue / m_iDenomination);
-//		else
-//			returnStr = std::to_string(iValue / m_iDenomination);
-//	}
-//
-//	return returnStr;
-//}
-
-//std::string HyMeter::ToStringWithCommas(int64 iValue)
-//{
-//	std::string sStr = std::to_string(iValue);
-//
-//	if(sStr.size() < 4)
-//		return sStr;
-//	else
-//	{
-//		std::string sAppend = "," + sStr.substr(sStr.size() - 3, sStr.size());
-//		return ToStringWithCommas(iValue / 1000) + sAppend;
-//	}
-//}

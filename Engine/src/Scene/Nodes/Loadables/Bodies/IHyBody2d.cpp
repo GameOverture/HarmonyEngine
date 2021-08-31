@@ -182,10 +182,13 @@ int32 IHyBody2d::GetDisplayOrder() const
 
 /*virtual*/ void IHyBody2d::SetDisplayOrder(int32 iOrderValue)
 {
-	m_iDisplayOrder = iOrderValue;
 	m_uiFlags |= EXPLICIT_DisplayOrder;
 
-	HyScene::SetInstOrderingDirty();
+	if(m_iDisplayOrder != iOrderValue)
+	{
+		m_iDisplayOrder = iOrderValue;
+		HyScene::SetInstOrderingDirty();
+	}
 }
 
 /*virtual*/ void IHyBody2d::ResetDisplayOrder()

@@ -91,16 +91,15 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 	return *this;
 }
 
-// Assumes UTF-8 encoding. Accepts newline characters '\n'
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetText(const std::stringstream ssUtf8Text)
+const std::string &IHyText<NODETYPE, ENTTYPE>::GetUtf8String() const
 {
-	SetText(ssUtf8Text.str());
+	return m_sRawString;
 }
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetText(const std::string sUtf8Text)
+void IHyText<NODETYPE, ENTTYPE>::SetText(const std::string &sUtf8Text)
 {
 	if(sUtf8Text == m_sRawString)
 		return;
@@ -121,10 +120,11 @@ void IHyText<NODETYPE, ENTTYPE>::SetText(const std::string sUtf8Text)
 	MarkAsDirty();
 }
 
+// Assumes UTF-8 encoding. Accepts newline characters '\n'
 template<typename NODETYPE, typename ENTTYPE>
-const std::string &IHyText<NODETYPE, ENTTYPE>::GetUtf8String() const
+void IHyText<NODETYPE, ENTTYPE>::SetText(const std::stringstream &ssUtf8Text)
 {
-	return m_sRawString;
+	SetText(ssUtf8Text.str());
 }
 
 template<typename NODETYPE, typename ENTTYPE>
