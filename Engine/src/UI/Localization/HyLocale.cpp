@@ -20,7 +20,7 @@
 /*static*/ std::string HyLocale::sm_sIso639Code("en");
 /*static*/ std::string HyLocale::sm_sIso3166Code("US");
 /*static*/ std::string HyLocale::sm_sIso4217Code("USD");
-/*static*/ std::string HyLocale::sm_sMinorCurrencySymbol("\xC2\xA2");
+/*static*/ std::string HyLocale::sm_sMinorCurrencySymbol("\xC2\xA2"); // Cent symbol in UTF8
 /*static*/ HyLocale::FallbackNumpunctData<char> HyLocale::sm_FallbackNumpunctData('.', ',', "\003", "$", "+", "-", 2);
 /*static*/ HyLocale::FallbackNumpunctData<wchar_t> HyLocale::sm_FallbackNumpunctWideData(L'.', L',', "\003", L"$", L"+", L"-", 2);
 /*static*/ std::map<std::string, int32>	HyLocale::sm_Iso4217Map;

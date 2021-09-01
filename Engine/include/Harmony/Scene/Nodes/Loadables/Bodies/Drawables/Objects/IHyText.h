@@ -26,7 +26,18 @@ template<typename NODETYPE, typename ENTTYPE>
 class IHyText : public NODETYPE
 {
 protected:
-	bool							m_bIsDirty;
+	enum TextAttributes
+	{
+		TEXTATTRIB_IsDirty					= 1 << 0,
+		TEXTATTRIB_IsColumn					= 1 << 1,
+		TEXTATTRIB_IsVertical				= 1 << 2,
+		TEXTATTRIB_ColumnSplitWordsToFit	= 1 << 3,
+		TEXTATTRIB_IsScaleBox				= 1 << 4,
+		TEXTATTRIB_ScaleBoxCenterVertically	= 1 << 5,
+		TEXTATTRIB_UseMonospacedDigits		= 1 << 6
+	};
+	uint32							m_uiTextAttributes;
+
 	std::string						m_sRawString;
 	std::vector<uint32>				m_Utf32CodeList;
 
@@ -34,49 +45,42 @@ protected:
 	{
 		struct LayerColor
 		{
-			HyAnimVec3 		topColor;
-			HyAnimVec3 		botColor;
+			HyAnimVec3 				topColor;
+			HyAnimVec3 				botColor;
 
-			LayerColor(NODETYPE &colorOwner) :	topColor(colorOwner, 0),
-												botColor(colorOwner, 0)
+			LayerColor(NODETYPE &colorOwner) :
+				topColor(colorOwner, 0),
+				botColor(colorOwner, 0)
 			{ }
 		};
 		std::vector<LayerColor *>	m_LayerColors;
 	};
 	std::vector<StateColors *>		m_StateColors;
 
-	enum BoxAttributes
-	{
-		BOXATTRIB_IsColumn					= 1 << 0,
-		BOXATTRIB_IsVertical				= 1 << 1,
-		BOXATTRIB_ColumnSplitWordsToFit		= 1 << 2,
-		BOXATTRIB_IsScaleBox				= 1 << 3,
-		BOXATTRIB_ScaleBoxCenterVertically	= 1 << 4,
-	};
-	uint32				m_uiBoxAttributes;
-	glm::vec2			m_vBoxDimensions;
-	float				m_fScaleBoxModifier;
+	glm::vec2						m_vBoxDimensions;
+	float							m_fScaleBoxModifier;
 
-	HyAlignment			m_eAlignment;
-	bool				m_bMonospacedDigits;
+	HyAlignment						m_eAlignment;
+	uint32							m_uiIndent;
 
 	struct GlyphInfo
 	{
-		glm::vec2			vOffset;
-		float				fAlpha;
+		glm::vec2					vOffset;
+		float						fAlpha;
 
-		GlyphInfo() :	vOffset(0.0f),
-						fAlpha(1.0f)
+		GlyphInfo() :
+			vOffset(0.0f),
+			fAlpha(1.0f)
 		{ }
 	};
-	GlyphInfo *			m_pGlyphInfos;
-	uint32				m_uiNumReservedGlyphs;		// Essentially NUM_LAYERS * NUM_UTF32_CHARACTERS
+	GlyphInfo *						m_pGlyphInfos;
+	uint32							m_uiNumReservedGlyphs;		// Essentially NUM_LAYERS * NUM_UTF32_CHARACTERS
 
-	uint32				m_uiNumValidCharacters;		// How many characters (with their effects) were rendered
-	uint32				m_uiNumRenderQuads;
+	uint32							m_uiNumValidCharacters;		// How many characters (with their effects) were rendered
+	uint32							m_uiNumRenderQuads;
 
-	float				m_fUsedPixelWidth;
-	float				m_fUsedPixelHeight;
+	float							m_fUsedPixelWidth;
+	float							m_fUsedPixelHeight;
 
 public:
 	IHyText(std::string sPrefix, std::string sName, ENTTYPE *pParent);
@@ -115,13 +119,19 @@ public:
 	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
 	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex);
 
-	HyAlignment GetTextAlignment();
+	HyAlignment GetTextAlignment() const;
 	void SetTextAlignment(HyAlignment eAlignment);
 
-	bool IsMonospacedDigits();
+	uint32 GetTextIndent() const;
+	void SetTextIndent(uint32 uiIndentPixels);
+
+	// The offset location past the last glyph. Essentially where the user input cursor in a command window would be
+	glm::vec2 GetTextCursorPos();
+
+	bool IsMonospacedDigits() const;
 	void SetMonospacedDigits(bool bSet);
 
-	const glm::vec2 &GetTextBoxDimensions();
+	const glm::vec2 &GetTextBoxDimensions() const;
 
 	void SetAsLine();
 	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);

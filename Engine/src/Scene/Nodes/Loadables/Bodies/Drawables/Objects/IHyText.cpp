@@ -17,13 +17,12 @@
 template<typename NODETYPE, typename ENTTYPE>
 IHyText<NODETYPE, ENTTYPE>::IHyText(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
 	NODETYPE(HYTYPE_Text, sPrefix, sName, pParent),
-	m_bIsDirty(false),
+	m_uiTextAttributes(0),
 	m_sRawString(""),
-	m_uiBoxAttributes(0),
 	m_vBoxDimensions(0.0f, 0.0f),
 	m_fScaleBoxModifier(1.0f),
 	m_eAlignment(HYALIGN_Left),
-	m_bMonospacedDigits(false),
+	m_uiIndent(0),
 	m_pGlyphInfos(nullptr),
 	m_uiNumReservedGlyphs(0),
 	m_uiNumValidCharacters(0),
@@ -36,14 +35,13 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(std::string sPrefix, std::string sName, ENTT
 template<typename NODETYPE, typename ENTTYPE>
 IHyText<NODETYPE, ENTTYPE>::IHyText(const IHyText &copyRef) :
 	NODETYPE(copyRef),
-	m_bIsDirty(true),
+	m_uiTextAttributes(copyRef.m_uiTextAttributes),
 	m_sRawString(copyRef.m_sRawString),
 	m_Utf32CodeList(copyRef.m_Utf32CodeList),
-	m_uiBoxAttributes(copyRef.m_uiBoxAttributes),
 	m_vBoxDimensions(copyRef.m_vBoxDimensions),
 	m_fScaleBoxModifier(copyRef.m_fScaleBoxModifier),
 	m_eAlignment(copyRef.m_eAlignment),
-	m_bMonospacedDigits(copyRef.m_bMonospacedDigits),
+	m_uiIndent(copyRef.m_uiIndent),
 	m_pGlyphInfos(nullptr),
 	m_uiNumReservedGlyphs(copyRef.m_uiNumReservedGlyphs),
 	m_uiNumValidCharacters(copyRef.m_uiNumValidCharacters),
@@ -51,6 +49,7 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(const IHyText &copyRef) :
 	m_fUsedPixelWidth(copyRef.m_fUsedPixelWidth),
 	m_fUsedPixelHeight(copyRef.m_fUsedPixelHeight)
 {
+	MarkAsDirty();
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -73,20 +72,20 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 {
 	NODETYPE::operator=(rhs);
 
-	m_bIsDirty = true;
+	m_uiTextAttributes = rhs.m_uiTextAttributes;
 	m_sRawString = rhs.m_sRawString;
 	m_Utf32CodeList = rhs.m_Utf32CodeList;
-	m_uiBoxAttributes = rhs.m_uiBoxAttributes;
 	m_vBoxDimensions = rhs.m_vBoxDimensions;
 	m_fScaleBoxModifier = rhs.m_fScaleBoxModifier;
 	m_eAlignment = rhs.m_eAlignment;
-	m_bMonospacedDigits = rhs.m_bMonospacedDigits;
+	m_uiIndent = rhs.m_uiIndent;
 	m_pGlyphInfos = nullptr;
 	m_uiNumReservedGlyphs = rhs.m_uiNumReservedGlyphs;
 	m_uiNumValidCharacters = rhs.m_uiNumValidCharacters;
 	m_uiNumRenderQuads = rhs.m_uiNumRenderQuads;
 	m_fUsedPixelWidth = rhs.m_fUsedPixelWidth;
 	m_fUsedPixelHeight = rhs.m_fUsedPixelHeight;
+	MarkAsDirty();
 
 	return *this;
 }
@@ -344,7 +343,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiSta
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-HyAlignment IHyText<NODETYPE, ENTTYPE>::GetTextAlignment()
+HyAlignment IHyText<NODETYPE, ENTTYPE>::GetTextAlignment() const
 {
 	return m_eAlignment;
 }
@@ -353,28 +352,69 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetTextAlignment(HyAlignment eAlignment)
 {
 	if(m_eAlignment != eAlignment)
+	{
 		MarkAsDirty();
-	
-	m_eAlignment = eAlignment;
+		m_eAlignment = eAlignment;
+	}
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-bool IHyText<NODETYPE, ENTTYPE>::IsMonospacedDigits()
+uint32 IHyText<NODETYPE, ENTTYPE>::GetTextIndent() const
 {
-	return m_bMonospacedDigits;
+	return m_uiIndent;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHyText<NODETYPE, ENTTYPE>::SetTextIndent(uint32 uiIndentPixels)
+{
+	if(m_uiIndent != uiIndentPixels)
+	{
+		MarkAsDirty();
+		m_uiIndent = uiIndentPixels;
+	}
+}
+
+// The offset location past the last glyph. Essentially where the user input cursor in a command window would be
+template<typename NODETYPE, typename ENTTYPE>
+glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
+{
+	CalculateGlyphInfos();
+
+	if(this->AcquireData() == nullptr) {
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos invoked on null data");
+		return glm::vec2();
+	}
+
+	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
+	if(m_uiNumValidCharacters > 0)
+	{
+		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - 1, pData->GetNumLayers(m_uiState), 0);
+		return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[m_uiNumValidCharacters - 1])->uiWIDTH, 0.0f);
+	}
+
+	return glm::vec2();
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsMonospacedDigits() const
+{
+	return (m_uiTextAttributes & TEXTATTRIB_UseMonospacedDigits) != 0;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetMonospacedDigits(bool bSet)
 {
-	if(m_bMonospacedDigits != bSet)
+	if(IsMonospacedDigits() != bSet)
 		MarkAsDirty();
 	
-	m_bMonospacedDigits = bSet;
+	if(bSet)
+		m_uiTextAttributes |= TEXTATTRIB_UseMonospacedDigits;
+	else
+		m_uiTextAttributes &= ~TEXTATTRIB_UseMonospacedDigits;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions()
+const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions() const
 {
 	return m_vBoxDimensions;
 }
@@ -382,7 +422,7 @@ const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions()
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 {
-	m_uiBoxAttributes = 0;
+	m_uiTextAttributes = 0;
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
@@ -396,18 +436,18 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 {
-	int32 iFlags = BOXATTRIB_IsColumn;
+	int32 iFlags = TEXTATTRIB_IsColumn;
 
 	if(bSplitWordsToFit)
-		iFlags |= BOXATTRIB_ColumnSplitWordsToFit;
+		iFlags |= TEXTATTRIB_ColumnSplitWordsToFit;
 	
-	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth)
+	if(m_uiTextAttributes == iFlags && m_vBoxDimensions.x == fWidth)
 		return;
 
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = 0.0f;
 
-	m_uiBoxAttributes = iFlags;
+	m_uiTextAttributes = iFlags;
 
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 	OnSetDebugBox();
@@ -419,18 +459,18 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
-	int32 iFlags = BOXATTRIB_IsScaleBox;
+	int32 iFlags = TEXTATTRIB_IsScaleBox;
 
 	if(bCenterVertically)
-		iFlags |= BOXATTRIB_ScaleBoxCenterVertically;
+		iFlags |= TEXTATTRIB_ScaleBoxCenterVertically;
 
-	if(m_uiBoxAttributes == iFlags && m_vBoxDimensions.x == fWidth && m_vBoxDimensions.y == fHeight)
+	if(m_uiTextAttributes == iFlags && m_vBoxDimensions.x == fWidth && m_vBoxDimensions.y == fHeight)
 		return;
 
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = fHeight;
 
-	m_uiBoxAttributes = iFlags;
+	m_uiTextAttributes = iFlags;
 
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 	OnSetDebugBox();
@@ -442,7 +482,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 {
-	m_uiBoxAttributes = BOXATTRIB_IsVertical;
+	m_uiTextAttributes = TEXTATTRIB_IsVertical;
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
@@ -524,7 +564,7 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 {
-	if(m_bIsDirty == false || this->AcquireData() == nullptr)
+	if((m_uiTextAttributes & TEXTATTRIB_IsDirty) == 0 || this->AcquireData() == nullptr)
 		return;
 
 	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
@@ -553,7 +593,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 	float *pMonospaceWidths = nullptr;
 	float *pMonospaceAscender = nullptr;
 	float *pMonospaceDecender = nullptr;
-	if(m_bMonospacedDigits)
+	if(IsMonospacedDigits())
 	{
 		pMonospaceWidths = HY_NEW float[uiNUM_LAYERS];
 		pMonospaceAscender = HY_NEW float[uiNUM_LAYERS];
@@ -591,6 +631,13 @@ offsetCalculation:
 		m_pGlyphInfos[i].vOffset.x = m_pGlyphInfos[i].vOffset.y = 0.0f;
 
 	memset(pWritePos, 0, sizeof(glm::vec2) * uiNUM_LAYERS);
+
+	// Apply indent to each write position layer
+	if(m_uiIndent != 0)
+	{
+		for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
+			pWritePos[uiLayerIndex].x += m_uiIndent * m_fScaleBoxModifier;
+	}
 
 	// vNewlineInfo is used to set text alignment of center, right, or justified. (left alignment is already accomplished by default)
 	//				It can also be used to calculate the total used space
@@ -668,7 +715,7 @@ offsetCalculation:
 				float fDecender = HyClamp(static_cast<float>(pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(this->m_uiState));
 				float fOffsetX = static_cast<float>(pGlyphRef->iOFFSET_X);
 
-				if(m_bMonospacedDigits && m_Utf32CodeList[uiStrIndex] >= 48 && m_Utf32CodeList[uiStrIndex] <= 57)
+				if(IsMonospacedDigits() && m_Utf32CodeList[uiStrIndex] >= 48 && m_Utf32CodeList[uiStrIndex] <= 57)
 				{
 					fAdvanceAmtX = pMonospaceWidths[uiLayerIndex];
 					fAscender = pMonospaceAscender[uiLayerIndex];
@@ -698,13 +745,13 @@ offsetCalculation:
 					fCurLineDecender = (fDecender * m_fScaleBoxModifier);
 
 				// If drawing text within a box, and we advance past our width, determine if we should newline
-				if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) == 0 &&
-					(m_uiBoxAttributes & BOXATTRIB_IsColumn) != 0 &&
+				if((m_uiTextAttributes & TEXTATTRIB_IsScaleBox) == 0 &&
+					(m_uiTextAttributes & TEXTATTRIB_IsColumn) != 0 &&
 					fCurLineWidth > m_vBoxDimensions.x)
 				{
 					// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
-					if((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) != 0 ||
-						((m_uiBoxAttributes & BOXATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
+					if((m_uiTextAttributes & TEXTATTRIB_ColumnSplitWordsToFit) != 0 ||
+						((m_uiTextAttributes & TEXTATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
 					{
 						// Don't newline on ' ' characters
 						if(uiStrIndex != uiLastSpaceIndex)
@@ -716,7 +763,7 @@ offsetCalculation:
 				}
 			}
 
-			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
+			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) != 0)
 			{
 				bDoNewline = true;
 			}
@@ -738,10 +785,10 @@ offsetCalculation:
 			}
 		}
 
-		// If this is the first line, and we're a BOXATTRIB_ScaleBox, then place text snug against the top of the bounds box
+		// If this is the first line, and we're a TEXTATTRIB_ScaleBox, then place text snug against the top of the bounds box
 		if(bFirstLine && (bDoNewline || uiStrIndex == (uiSTR_SIZE - 1)))
 		{
-			if((m_uiBoxAttributes & BOXATTRIB_IsScaleBox) != 0)
+			if((m_uiTextAttributes & TEXTATTRIB_IsScaleBox) != 0)
 			{
 				for(int32 iFirstLineStrIndex = static_cast<int32>(uiStrIndex); iFirstLineStrIndex >= 0; --iFirstLineStrIndex)
 				{
@@ -766,7 +813,7 @@ offsetCalculation:
 		{
 			float fNewLineOffset = (pData->GetLineHeight(this->m_uiState) * m_fScaleBoxModifier);
 
-			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) != 0)
+			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) != 0)
 				fNewLineOffset = fCurLineHeight;
 			else if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
 			{
@@ -783,7 +830,7 @@ offsetCalculation:
 				pWritePos[i].y -= fNewLineOffset;
 			}
 
-			if((m_uiBoxAttributes & BOXATTRIB_IsVertical) == 0)
+			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) == 0)
 			{
 				// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
 				if(uiNewlineIndex != uiLastSpaceIndex)
@@ -901,7 +948,7 @@ offsetCalculation:
 	for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
 		m_fUsedPixelHeight += vNewlineInfo[i].fUSED_HEIGHT;
 
-	if(0 != (m_uiBoxAttributes & BOXATTRIB_IsScaleBox))
+	if(0 != (m_uiTextAttributes & TEXTATTRIB_IsScaleBox))
 	{
 		if(bScaleBoxModiferIsSet == false)
 		{
@@ -913,14 +960,14 @@ offsetCalculation:
 			bScaleBoxModiferIsSet = true;
 			goto offsetCalculation;
 		}
-		else if(0 != (m_uiBoxAttributes & BOXATTRIB_ScaleBoxCenterVertically))
+		else if(0 != (m_uiTextAttributes & TEXTATTRIB_ScaleBoxCenterVertically))
 		{
 			float fCenterNudgeAmt = (m_vBoxDimensions.y - m_fUsedPixelHeight) * 0.5f;
 			for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
 				m_pGlyphInfos[i].vOffset.y -= fCenterNudgeAmt;
 		}
 	}
-	else if(0 != (m_uiBoxAttributes & BOXATTRIB_IsColumn))	// Move column text to fit below its node position, which will extend downward from
+	else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsColumn))	// Move column text to fit below its node position, which will extend downward from
 	{
 		float fTopLineNudgeAmt = vNewlineInfo[0].fUSED_HEIGHT;
 		for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
@@ -933,13 +980,13 @@ offsetCalculation:
 	delete[] pMonospaceDecender;
 
 	this->SetDirty(this->DIRTY_BoundingVolume);
-	m_bIsDirty = false;
+	m_uiTextAttributes &= ~TEXTATTRIB_IsDirty;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::MarkAsDirty()
 {
-	m_bIsDirty = true;
+	m_uiTextAttributes |= TEXTATTRIB_IsDirty;
 }
 
 // Converts a given UTF-8 encoded character (array) to its UTF-32 LE equivalent

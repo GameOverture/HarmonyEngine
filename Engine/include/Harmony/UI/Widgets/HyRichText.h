@@ -15,20 +15,32 @@
 
 class HyRichText : public IHyWidget
 {
+protected:
+	std::string						m_sTextPrefix;
+	std::string						m_sTextName;
+	uint32							m_uiColumnWidth;
+
+	std::string						m_sRichText;
+	std::vector<IHyDrawable2d *>	m_DrawableList;
+
 public:
 	HyRichText(HyEntity2d *pParent = nullptr);
+	HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyEntity2d *pParent = nullptr);
 	virtual ~HyRichText();
 
 	virtual glm::ivec2 GetSizeHint() override;
 	virtual glm::vec2 GetPosOffset() override;
 
-	//void SetFormat(uint32 uiTextSize, uint32 uiLineSize, uint32 uiSpriteMaxHeight
+	void Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth);
 
-	void InsertText(std::string sPrefix, std::string sName, std::string sText, uint32 uiState);
-	void InsertSprite(std::string sPrefix, std::string sName, uint32 uiState);
+	// {1} = Any text inserted after this uses state '1'
+	// {spritePrefix/spriteName,3} = Insert a sprite ('spritePrefix/spriteName') with state '3', scaled to fit within text line
+	void SetRichText(const std::string &sRichTextFormat);
 
 protected:
 	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
+
+	void AssembleDrawables();
 };
 
 #endif /* HyRichText_h__ */
