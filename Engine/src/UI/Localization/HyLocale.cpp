@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Localization/HyLocale.h"
 #include "UI/Localization/HyNumpunct.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 #ifdef HY_DEBUG
 	#define CHECK_ICU_STATUS(status) if(status > 0) HyLogError("ICU Status Error: " << status)
