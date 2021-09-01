@@ -95,7 +95,7 @@ void HyProgressBar::AdjustProgress()
 		if((m_iMaximum - m_iMinimum) != 0)
 			fProgress = 1.0f - static_cast<float>(m_iValue - m_iMinimum) / static_cast<float>(m_iMaximum - m_iMinimum);
 
-		m_pPrimPanel->m_Fill.scale.SetX(fProgress);
+		m_pPrimPanel->m_Fill.scale.Tween(fProgress, 1.0f, 0.25f, HyTween::QuadInOut);
 
 		SetText(HyLocale::Percent_Format(fProgress * 100.0, m_NumberFormat));
 	}
