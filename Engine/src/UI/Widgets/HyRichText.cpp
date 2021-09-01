@@ -11,6 +11,7 @@
 #include "UI/Widgets/HyRichText.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 #include <regex>
 
@@ -31,7 +32,8 @@ HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ glm::ivec2 HyRichText::GetSizeHint() /*override*/
 {
-	return glm::ivec2(0.0f, 0.0f);
+	auto vExtents = GetSceneAABB().GetExtents();
+	return glm::ivec2(vExtents.x * 2, vExtents.y * 2);
 }
 
 /*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
@@ -103,7 +105,7 @@ void HyRichText::AssembleDrawables()
 
 	// Reassemble the drawable list
 	std::string sCurText;
-	uint32 uiCurState = 0;
+	uint32 uiCurTextState = 0;
 	glm::vec2 ptCurPos(0.0f, 0.0f);
 	uint32 uiCurFmtIndex = 0;
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
@@ -112,7 +114,7 @@ void HyRichText::AssembleDrawables()
 		m_DrawableList.push_back(pNewText);
 		pNewText->pos.Set(0.0f, ptCurPos.y);
 		pNewText->SetAsColumn(m_uiColumnWidth);
-		pNewText->SetState(uiCurState);
+		pNewText->SetState(uiCurTextState);
 		pNewText->SetTextIndent(ptCurPos.x);
 		pNewText->SetText(sCurText);
 
@@ -124,9 +126,18 @@ void HyRichText::AssembleDrawables()
 		{
 			// If .first is empty string then just change text state
 			if(formatChangeList[uiCurFmtIndex].first.empty())
-				uiCurState = formatChangeList[uiCurFmtIndex].second;
+				uiCurTextState = formatChangeList[uiCurFmtIndex].second;
 			else // Otherwise insert sprite
 			{
+				// Using the text's data, determine how the line height used to scale the inserted sprite
+				float fLineHeight = 32.0f; // Some default value to fallback to
+				const HyText2dData *pTextData = static_cast<const HyText2dData *>(pNewText->AcquireData());
+				if(pTextData)
+					fLineHeight = pTextData->GetLineHeight(uiCurTextState);
+				else
+					HyLogWarning("HyRichText could not acquire data for text: " << pNewText->GetPrefix() << "/" << pNewText->GetName());
+
+				// Assemble the prefix and name for this sprite
 				std::string sName = formatChangeList[uiCurFmtIndex].first;
 				std::string sPrefix;
 				if(sName.find_last_of('/') != std::string::npos)
@@ -135,14 +146,27 @@ void HyRichText::AssembleDrawables()
 					sName = sName.substr(sName.find_last_of('/') + 1);
 				}
 
+				// Allocate sprite and initialize
 				HySprite2d *pNewSprite = HY_NEW HySprite2d(sPrefix, sName, this);
 				m_DrawableList.push_back(pNewSprite);
 				pNewSprite->pos.Set(ptCurPos);
 				pNewSprite->SetState(formatChangeList[uiCurFmtIndex].second);
 
-				// TODO: Scale sprite to fit within
-				// TODO: update 'uiCurPos
+				float fScaleX = (m_uiColumnWidth - ptCurPos.x) / pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), false);
+				float fScaleY = fLineHeight / pNewSprite->GetStateMaxHeight(pNewSprite->GetState(), false);
+				pNewSprite->scale.Set(HyMin(fScaleX, fScaleY));
+
+				// Find next drawable location and position 'ptCurPos' to it
+				ptCurPos.x += pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), true);
+
+				if(ptCurPos.x >= m_uiColumnWidth)
+				{
+					ptCurPos.x = 0.0f;
+					ptCurPos.y -= fLineHeight;
+				}
 			}
+
+			uiCurFmtIndex++;
 		}
 	}
 }

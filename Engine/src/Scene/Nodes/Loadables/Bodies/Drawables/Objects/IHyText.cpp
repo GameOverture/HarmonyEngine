@@ -818,9 +818,12 @@ offsetCalculation:
 			else if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
 			{
 				// Text box is too small to fit a single character
-				m_uiNumValidCharacters = 0;
-				bTerminatedEarly = true;
-				break;
+				HyLogWarning("Text box is too small to fit a single character");
+
+				// NOTE: Commenting this out until I see if indents cause any issues
+				//m_uiNumValidCharacters = 0;
+				//bTerminatedEarly = true;
+				//break;
 			}
 
 			// Reset the write position onto a newline
