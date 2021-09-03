@@ -69,6 +69,8 @@ public:
 	HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyMeter();
 
+	virtual void SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/);
+
 	int64 GetValue();
 	void SetValue(int64 iPennies, float fRackDuration);
 	void OffsetValue(int64 iPenniesOffsetAmt, float fRackDuration);
@@ -89,8 +91,7 @@ public:
 
 	void SetText(std::string sText) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
 	virtual void SetTextState(uint32 uiStateIndex) override;
-	virtual void ResetTextOnPanel() override;
-	virtual void SetTextAlignment(HyAlignment eAlignment) override;
+	virtual void ResetTextAndPanel() override;
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
 
 protected:

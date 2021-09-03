@@ -49,6 +49,16 @@ HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string s
 {
 }
 
+/*virtual*/ void HyMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/)
+{
+	HyLabel::SetAsStacked(eTextAlignment);
+
+	m_SpinText.m_SpinText_Shown.SetTextAlignment(eTextAlignment);
+	m_SpinText.m_SpinText_Padded.SetTextAlignment(eTextAlignment);
+
+	FormatDigits();
+}
+
 int64 HyMeter::GetValue()
 {
 	return m_iTargetValue;
@@ -142,25 +152,15 @@ void HyMeter::SetNumFormat(HyNumberFormat format)
 	m_SpinText.m_SpinText_Padded.SetState(uiStateIndex);
 }
 
-/*virtual*/ void HyMeter::ResetTextOnPanel() /*override*/
+/*virtual*/ void HyMeter::ResetTextAndPanel() /*override*/
 {
-	HyLabel::ResetTextOnPanel();
+	HyLabel::ResetTextAndPanel();
 
 	m_Text.SetMonospacedDigits(true);
 
 	m_SpinText.pos.Set(m_Text.pos.X(), m_Text.pos.Y());
 	m_SpinText.m_SpinText_Shown.SetAsScaleBox(m_Text.GetTextBoxDimensions().x, m_Text.GetTextBoxDimensions().y);
 	m_SpinText.m_SpinText_Padded.SetAsScaleBox(m_Text.GetTextBoxDimensions().x, m_Text.GetTextBoxDimensions().y);
-
-	FormatDigits();
-}
-
-/*virtual*/ void HyMeter::SetTextAlignment(HyAlignment eAlignment) /*override*/
-{
-	HyLabel::SetTextAlignment(eAlignment);
-
-	m_SpinText.m_SpinText_Shown.SetTextAlignment(eAlignment);
-	m_SpinText.m_SpinText_Padded.SetTextAlignment(eAlignment);
 
 	FormatDigits();
 }

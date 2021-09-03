@@ -21,7 +21,7 @@ protected:
 	class PrimPanel : public HyEntity2d
 	{
 	public:
-		HyPrimitive2d		m_BG;				// Acts as thin stroke outline (the stroke's stroke) and a background color that isn't covered by m_Fill
+		HyPrimitive2d		m_BG;					// Acts as thin stroke outline (the stroke's stroke) and a background color that isn't covered by m_Fill
 		HyPrimitive2d		m_Fill;
 		HyPrimitive2d		m_Stroke;
 		HyPrimitive2d		m_Border;
@@ -31,20 +31,28 @@ protected:
 
 	enum PanelAttributes
 	{
-		PANELATTRIB_IsPrimitive		= 1 << 0,	// Whether the panel is constructed via HyLabel::PrimPanel instead of a HySprite2d
-		PANELATTRIB_HideDownState	= 1 << 1,	// Don't visually indicate down state (if available)
-		PANELATTRIB_HideHoverState	= 1 << 2,	// Don't visually indicate hover state (if available)
-		PANELATTRIB_HideDisabled	= 1 << 3,	// Don't visually indicate if disabled
-		PANELATTRIB_IsDisabled		= 1 << 4,
-		PANELATTRIB_IsHighlighted	= 1 << 5,
+		PANELATTRIB_IsPrimitive				= 1 << 0,		// Whether the panel is constructed via HyLabel::PrimPanel instead of a HySprite2d
+		PANELATTRIB_HideDownState			= 1 << 1,		// Don't visually indicate down state (when available)
+		PANELATTRIB_HideHoverState			= 1 << 2,		// Don't visually indicate hover state (when available)
+		PANELATTRIB_HideDisabled			= 1 << 3,		// Don't visually indicate if disabled
+		PANELATTRIB_IsDisabled				= 1 << 4,
+		PANELATTRIB_IsHighlighted			= 1 << 5,
+
+		PANELATTRIB_IsSideBySide			= 1 << 6,
+		PANELATTRIB_SideBySideTextFirst		= 1 << 7,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
+		PANELATTRIB_SideBySideVertical		= 1 << 8,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
+
+		PANELATTRIB_StackedTextLeftAlign	= 1 << 9,		// When panel is stacked, use left alignment (when neither left, right, or justify, it will center)
+		PANELATTRIB_StackedTextRightAlign	= 1 << 10,		// When panel is stacked, use right alignment (when neither right, left, or justify, it will center)
+		PANELATTRIB_StackedTextJustifyAlign	= 1 << 11,		// When panel is stacked, use justify alignment (when neither justify, left, or right, it will center)
 	};
 	uint32					m_uiPanelAttribs;
 
-	PrimPanel *				m_pPrimPanel;		// Optionally construct a primitive panel instead of using HySprite2d
+	PrimPanel *				m_pPrimPanel;					// Optionally construct a primitive panel instead of using HySprite2d
 	HySprite2d				m_SpritePanel;
 
 	HyText2d				m_Text;
-	HyRectangle<float>		m_TextMargins;
+	HyRectangle<float>		m_TextMargins;					// Margins used for Stacked text scale box; The 'iTag' is used for Side-by-side padding between text/panel
 
 public:
 	HyLabel(HyEntity2d *pParent = nullptr);
@@ -59,6 +67,9 @@ public:
 	void Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
 	void Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
 
+	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_HCenter);		// Default setup. Shows text positioned on top and inside the panel based on 'eTextAlignment'
+	void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIEN_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
+
 	float GetPanelWidth();
 	float GetPanelHeight();
 	glm::vec2 GetPanelDimensions();
@@ -69,7 +80,6 @@ public:
 	std::string GetUtf8String() const;
 	void SetText(std::string sText);
 	virtual void SetTextState(uint32 uiStateIndex);
-	virtual void SetTextAlignment(HyAlignment eAlignment);
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 
 	bool IsPrimitivePanel() const;
@@ -95,7 +105,7 @@ protected:
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
 
-	virtual void ResetTextOnPanel();
+	virtual void ResetTextAndPanel();
 };
 
 #endif /* HyLabel_h__ */

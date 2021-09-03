@@ -422,7 +422,7 @@ const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions() const
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 {
-	m_uiTextAttributes = 0;
+	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_IsScaleBox | TEXTATTRIB_IsVertical);
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
@@ -436,18 +436,16 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 {
-	int32 iFlags = TEXTATTRIB_IsColumn;
+	m_uiTextAttributes &= ~(TEXTATTRIB_IsScaleBox | TEXTATTRIB_IsVertical);
+	m_uiTextAttributes |= TEXTATTRIB_IsColumn;
 
 	if(bSplitWordsToFit)
-		iFlags |= TEXTATTRIB_ColumnSplitWordsToFit;
-	
-	if(m_uiTextAttributes == iFlags && m_vBoxDimensions.x == fWidth)
-		return;
+		m_uiTextAttributes |= TEXTATTRIB_ColumnSplitWordsToFit;
+	else
+		m_uiTextAttributes &= ~TEXTATTRIB_ColumnSplitWordsToFit;
 
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = 0.0f;
-
-	m_uiTextAttributes = iFlags;
 
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 	OnSetDebugBox();
@@ -459,18 +457,16 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
-	int32 iFlags = TEXTATTRIB_IsScaleBox;
+	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_IsVertical);
+	m_uiTextAttributes |= TEXTATTRIB_IsScaleBox;
 
 	if(bCenterVertically)
-		iFlags |= TEXTATTRIB_ScaleBoxCenterVertically;
-
-	if(m_uiTextAttributes == iFlags && m_vBoxDimensions.x == fWidth && m_vBoxDimensions.y == fHeight)
-		return;
+		m_uiTextAttributes |= TEXTATTRIB_ScaleBoxCenterVertically;
+	else
+		m_uiTextAttributes &= ~TEXTATTRIB_ScaleBoxCenterVertically;
 
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = fHeight;
-
-	m_uiTextAttributes = iFlags;
 
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 	OnSetDebugBox();
@@ -482,7 +478,8 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 {
-	m_uiTextAttributes = TEXTATTRIB_IsVertical;
+	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_IsScaleBox);
+	m_uiTextAttributes |= TEXTATTRIB_IsVertical;
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 

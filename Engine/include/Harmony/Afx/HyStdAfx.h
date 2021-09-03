@@ -271,12 +271,12 @@ enum HySizePolicy
 
 enum HyOrientation
 {
-	// WARNING: THIS ENUM ORDER MATTERS (glm::ivec2 [] dimension values)
 	HYORIEN_Horizontal = 0,
 	HYORIEN_Vertical,
 
 	HYNUM_ORIENTATIONS
 };
+static_assert(HYORIEN_Horizontal == 0 && HYORIEN_Vertical == 1, "HyOrientation enum order matters (glm::ivec2 [] dimension values) ");
 
 enum HyThreadPriority
 {

@@ -32,8 +32,7 @@ HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ glm::ivec2 HyRichText::GetSizeHint() /*override*/
 {
-	auto vExtents = GetSceneAABB().GetExtents();
-	return glm::ivec2(vExtents.x * 2, vExtents.y * 2);
+	return glm::ivec2(GetSceneWidth(), GetSceneHeight());
 }
 
 /*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/

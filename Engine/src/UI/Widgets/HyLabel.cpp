@@ -138,10 +138,53 @@ void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::strin
 	OnSetup();
 }
 
+/*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/)
+{
+	m_uiPanelAttribs &= ~PANELATTRIB_IsSideBySide;
+	switch(eTextAlignment)
+	{
+	case HYALIGN_Left:
+		m_uiPanelAttribs &= ~(PANELATTRIB_StackedTextRightAlign | PANELATTRIB_StackedTextJustifyAlign);
+		m_uiPanelAttribs |= PANELATTRIB_StackedTextLeftAlign;
+		break;
+	case HYALIGN_HCenter:
+		m_uiPanelAttribs &= ~(PANELATTRIB_StackedTextLeftAlign | PANELATTRIB_StackedTextRightAlign | PANELATTRIB_StackedTextJustifyAlign);
+		break;
+	case HYALIGN_Right:
+		m_uiPanelAttribs &= ~(PANELATTRIB_StackedTextLeftAlign | PANELATTRIB_StackedTextJustifyAlign);
+		m_uiPanelAttribs |= PANELATTRIB_StackedTextRightAlign;
+		break;
+	case HYALIGN_Justify:
+		m_uiPanelAttribs &= ~(PANELATTRIB_StackedTextLeftAlign | PANELATTRIB_StackedTextRightAlign);
+		m_uiPanelAttribs |= PANELATTRIB_StackedTextJustifyAlign;
+		break;
+	}
+	
+	ResetTextAndPanel();
+}
+
+void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /*= 5*/, HyOrientation eOrientation /*= HYORIEN_Horizontal*/)
+{
+	m_uiPanelAttribs |= PANELATTRIB_IsSideBySide;
+	if(bPanelBeforeText)
+		m_uiPanelAttribs &= ~PANELATTRIB_SideBySideTextFirst;
+	else
+		m_uiPanelAttribs |= PANELATTRIB_SideBySideTextFirst;
+
+	m_TextMargins.iTag = iPadding;
+
+	if(eOrientation == HYORIEN_Horizontal)
+		m_uiPanelAttribs &= ~PANELATTRIB_SideBySideVertical;
+	else
+		m_uiPanelAttribs |= PANELATTRIB_SideBySideVertical;
+
+	ResetTextAndPanel();
+}
+
 float HyLabel::GetPanelWidth()
 {
 	if(m_pPrimPanel)
-		return m_pPrimPanel->GetSceneAABB().GetExtents().x * 2.0f;
+		return m_pPrimPanel->GetSceneWidth();
 	else if(m_SpritePanel.IsLoadDataValid())
 		return m_SpritePanel.GetCurFrameWidth(true);
 
@@ -151,7 +194,7 @@ float HyLabel::GetPanelWidth()
 float HyLabel::GetPanelHeight()
 {
 	if(m_pPrimPanel)
-		return m_pPrimPanel->GetSceneAABB().GetExtents().y * 2.0f;
+		return m_pPrimPanel->GetSceneHeight();
 	else if(m_SpritePanel.IsLoadDataValid())
 		return m_SpritePanel.GetCurFrameHeight(true);
 
@@ -161,7 +204,7 @@ float HyLabel::GetPanelHeight()
 glm::vec2 HyLabel::GetPanelDimensions()
 {
 	if(m_pPrimPanel)
-		return glm::vec2(m_pPrimPanel->GetSceneAABB().GetExtents().x * 2.0f, m_pPrimPanel->GetSceneAABB().GetExtents().y * 2.0f);
+		return glm::vec2(m_pPrimPanel->GetSceneWidth(), m_pPrimPanel->GetSceneHeight());
 	else if(m_SpritePanel.IsLoadDataValid())
 		return glm::vec2(m_SpritePanel.GetCurFrameWidth(true), m_SpritePanel.GetCurFrameHeight(true));
 
@@ -181,9 +224,9 @@ uint32 HyLabel::GetSpriteState() const
 		return;
 	}
 
-	// Now set new sprite state, so below ResetTextOnPanel() can offset properly onto it
+	// Now set new sprite state, so below ResetTextAndPanel() can offset properly onto it
 	m_SpritePanel.SetState(uiStateIndex);
-	ResetTextOnPanel();
+	ResetTextAndPanel();
 }
 
 /*virtual*/ std::string HyLabel::GetUtf8String() const
@@ -194,16 +237,13 @@ uint32 HyLabel::GetSpriteState() const
 /*virtual*/ void HyLabel::SetText(std::string sText)
 {
 	m_Text.SetText(sText);
+	ResetTextAndPanel();
 }
 
 /*virtual*/ void HyLabel::SetTextState(uint32 uiStateIndex)
 {
 	m_Text.SetState(uiStateIndex);
-}
-
-/*virtual*/ void HyLabel::SetTextAlignment(HyAlignment eAlignment)
-{
-	m_Text.SetTextAlignment(eAlignment);
+	ResetTextAndPanel();
 }
 
 /*virtual*/ void HyLabel::SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
@@ -307,12 +347,10 @@ HyText2d &HyLabel::GetTextNode()
 
 void HyLabel::CommonSetup()
 {
-	m_Text.SetTextAlignment(HYALIGN_HCenter);
-
 	SetAsEnabled(IsEnabled());
 	SetAsHighlighted(IsHighlighted());
 
-	ResetTextOnPanel();
+	ResetTextAndPanel();
 }
 
 /*virtual*/ glm::ivec2 HyLabel::GetSizeHint() /*override*/
@@ -320,17 +358,21 @@ void HyLabel::CommonSetup()
 	glm::ivec2 vUiSizeHint;
 	if(m_pPrimPanel)
 	{
-		glm::vec2 vCachedScale = m_pPrimPanel->scale.Get();
+		glm::vec2 vPreserveScale = m_pPrimPanel->scale.Get();
 		m_pPrimPanel->scale.Set(1.0f, 1.0f);
 
 		auto &aabb = m_pPrimPanel->GetSceneAABB();
 		if(aabb.IsValid())
 			HySetVec(vUiSizeHint, static_cast<int32>(aabb.GetExtents().x * 2.0f), static_cast<int32>(aabb.GetExtents().y * 2.0f));
 		
-		m_pPrimPanel->scale = vCachedScale;
+		m_pPrimPanel->scale = vPreserveScale;
 	}
 	else if(m_SpritePanel.IsLoadDataValid())
-		HySetVec(vUiSizeHint, static_cast<int32>(m_SpritePanel.GetCurFrameWidth(false)), static_cast<int32>(m_SpritePanel.GetCurFrameHeight(false)));
+	{
+		HySetVec(vUiSizeHint,
+			static_cast<int32>(m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false)),
+			static_cast<int32>(m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false)));
+	}
 	
 	// vUiSizeHint must be established
 	if(vUiSizeHint.x == 0 || vUiSizeHint.y == 0)
@@ -371,21 +413,92 @@ void HyLabel::CommonSetup()
 	else
 		m_Text.SetAsScaleBox(iNewWidth - m_TextMargins.left - m_TextMargins.right, iNewHeight - m_TextMargins.bottom - m_TextMargins.top);
 
-	ResetTextOnPanel();
+	ResetTextAndPanel();
 }
 
-/*virtual*/ void HyLabel::ResetTextOnPanel()
+/*virtual*/ void HyLabel::ResetTextAndPanel()
 {
-	glm::vec2 vPanelDimensions = GetPanelDimensions();
-	glm::ivec2 vPanelOffset = GetPosOffset();
+	if(m_uiPanelAttribs & PANELATTRIB_IsSideBySide)
+	{
+		IHyBody2d *pFirst = nullptr;
+		glm::vec2 vFirstSize;
 
-	// Position text
-	auto vUiSizeHint = GetSizeHint();
-	m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x,
-				   (m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y);
+		IHyBody2d *pSecond = nullptr;
+		glm::vec2 vSecondSize;
 
-	// Size text
-	if(vPanelDimensions.x != 0.0f && vPanelDimensions.y != 0.0f)
-		m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)),
-							 vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / vUiSizeHint.y)), true);
+		if(m_uiPanelAttribs & PANELATTRIB_SideBySideTextFirst)
+		{
+			pFirst = &m_Text;
+			HySetVec(vFirstSize, m_Text.GetTextWidth(true), m_Text.GetTextHeight(true));
+
+			pSecond = m_pPrimPanel ? static_cast<IHyBody2d *>(m_pPrimPanel) : &m_SpritePanel;
+			HySetVec(vSecondSize, GetPanelWidth(), GetPanelHeight());
+		}
+		else
+		{
+			pFirst = m_pPrimPanel ? static_cast<IHyBody2d *>(m_pPrimPanel) : &m_SpritePanel;
+			HySetVec(vFirstSize, GetPanelWidth(), GetPanelHeight());
+
+			pSecond = &m_Text;
+			HySetVec(vSecondSize, m_Text.GetTextWidth(true), m_Text.GetTextHeight(true));
+		}
+
+		// NOTE: 'm_TextMargins.iTag' is the padding between the panel/text (when set as side-by-side)
+		if(m_uiPanelAttribs & PANELATTRIB_SideBySideVertical)
+		{
+			m_Text.SetTextAlignment(HYALIGN_HCenter);
+
+			if(vFirstSize.x >= vSecondSize.x)
+			{
+				pFirst->pos.Set(0.0f, vSecondSize.y + m_TextMargins.iTag);
+				pSecond->pos.Set((vFirstSize.x - vSecondSize.x) * 0.5f, 0.0f);
+			}
+			else
+			{
+				pFirst->pos.Set((vFirstSize.x - vSecondSize.x) * 0.5f, vSecondSize.y + m_TextMargins.iTag);
+				pSecond->pos.Set(0.0f, 0.0f);
+			}
+		}
+		else // Horizontal side-by-side
+		{
+			m_Text.SetTextAlignment(HYALIGN_Left);
+
+			if(vFirstSize.y >= vSecondSize.y)
+			{
+				pFirst->pos.Set(0.0f, 0.0f);
+				pSecond->pos.Set(vFirstSize.x + m_TextMargins.iTag, (vFirstSize.y - vSecondSize.y) * 0.5f);
+			}
+			else
+			{
+				pFirst->pos.Set(0.0f, (vSecondSize.y - vFirstSize.y) * 0.5f);
+				pSecond->pos.Set(vFirstSize.x + m_TextMargins.iTag, 0.0f);
+			}
+		}
+	}
+	else // Stacked Panel/Text
+	{
+		HyAlignment eAlignment;
+		if(0 == (m_uiPanelAttribs & (PANELATTRIB_StackedTextLeftAlign | PANELATTRIB_StackedTextRightAlign | PANELATTRIB_StackedTextJustifyAlign)))
+			eAlignment = HYALIGN_HCenter;
+		else if(m_uiPanelAttribs & PANELATTRIB_StackedTextLeftAlign)
+			eAlignment = HYALIGN_Left;
+		else if(m_uiPanelAttribs & PANELATTRIB_StackedTextRightAlign)
+			eAlignment = HYALIGN_Right;
+		else
+			eAlignment = HYALIGN_Justify;
+		m_Text.SetTextAlignment(eAlignment);
+
+		glm::vec2 vPanelDimensions = GetPanelDimensions();
+		glm::ivec2 vPanelOffset = GetPosOffset();
+
+		// Position text
+		auto vUiSizeHint = GetSizeHint();
+		m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x,
+			(m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y);
+
+		// Size text
+		if(vPanelDimensions.x != 0.0f && vPanelDimensions.y != 0.0f)
+			m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)),
+				vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / vUiSizeHint.y)), true);
+	}
 }

@@ -187,5 +187,24 @@ const glm::mat4 &IHyNode2d::GetSceneTransform()
 
 /*virtual*/ const b2AABB &IHyNode2d::GetSceneAABB()
 {
+	// Derived versions of this function will properly update 'm_SceneAABB' before returning
 	return m_SceneAABB;
+}
+
+float IHyNode2d::GetSceneHeight()
+{
+	const b2AABB &aabbRef = GetSceneAABB();
+	if(aabbRef.IsValid())
+		return aabbRef.GetExtents().x * 2.0f;
+
+	return 0.0f;
+}
+
+float IHyNode2d::GetSceneWidth()
+{
+	const b2AABB &aabbRef = GetSceneAABB();
+	if(aabbRef.IsValid())
+		return aabbRef.GetExtents().y * 2.0f;
+
+	return 0.0f;
 }
