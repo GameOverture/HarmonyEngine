@@ -195,7 +195,7 @@ float IHyNode2d::GetSceneHeight()
 {
 	const b2AABB &aabbRef = GetSceneAABB();
 	if(aabbRef.IsValid())
-		return aabbRef.GetExtents().x * 2.0f;
+		return aabbRef.GetExtents().y * 2.0f;
 
 	return 0.0f;
 }
@@ -204,7 +204,7 @@ float IHyNode2d::GetSceneWidth()
 {
 	const b2AABB &aabbRef = GetSceneAABB();
 	if(aabbRef.IsValid())
-		return aabbRef.GetExtents().y * 2.0f;
+		return aabbRef.GetExtents().x * 2.0f;
 
 	return 0.0f;
 }

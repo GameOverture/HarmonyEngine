@@ -21,11 +21,13 @@ class HyProgressBar : public HyLabel
 	int32			m_iValue;
 
 	HyNumberFormat	m_NumberFormat;
+	HySprite2d		m_sprFill;
 
 public:
 	HyProgressBar(HyEntity2d *pParent = nullptr);
 	HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent = nullptr);
 	HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
+	HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sPanelFillPrefix, std::string sPanelFillName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d* pParent = nullptr);
 	virtual ~HyProgressBar();
 
 	void Reset();
@@ -33,6 +35,8 @@ public:
 	void SetMaximum(int32 iMaximum);
 	void SetRange(int32 iMinimum, int32 iMaximum);
 	void SetValue(int32 iValue);
+
+	HySprite2d& GetFill();
 
 	HyNumberFormat GetNumFormat() const;
 	void SetNumFormat(HyNumberFormat format);
