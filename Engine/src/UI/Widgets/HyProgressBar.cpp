@@ -26,6 +26,7 @@ HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, std::st
 	m_iValue(0),
 	m_pFill(nullptr)
 {
+	OnSetup();
 }
 
 HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
@@ -35,6 +36,7 @@ HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, std::st
 	m_iValue(0),
 	m_pFill(nullptr)
 {
+	OnSetup();
 }
 
 HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
@@ -44,6 +46,7 @@ HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, s
 	m_iValue(0),
 	m_pFill(nullptr)
 {
+	OnSetup();
 }
 
 HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
@@ -53,6 +56,7 @@ HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, s
 	m_iValue(0),
 	m_pFill(nullptr)
 {
+	OnSetup();
 }
 
 /*virtual*/ HyProgressBar::~HyProgressBar()
@@ -81,11 +85,16 @@ void HyProgressBar::SetFillMargins(int32 iFillMarginLeft, int32 iFillMarginBotto
 void HyProgressBar::Reset()
 {
 	m_iMinimum = m_iMaximum = m_iValue = 0;
+	m_pFill->scale.SetX(0.0f);
+
 	AdjustProgress();
 }
 
 void HyProgressBar::SetMinimum(int32 iMinimum)
 {
+	if(m_iMinimum == iMinimum)
+		return;
+
 	m_iMinimum = iMinimum;
 	m_iMaximum = HyMax(m_iMaximum, m_iMinimum);
 	m_iValue = HyClamp(m_iValue, m_iMinimum, m_iMaximum);
@@ -94,6 +103,9 @@ void HyProgressBar::SetMinimum(int32 iMinimum)
 
 void HyProgressBar::SetMaximum(int32 iMaximum)
 {
+	if(m_iMaximum == iMaximum)
+		return;
+
 	m_iMaximum = iMaximum;
 	m_iMinimum = HyMin(m_iMinimum, m_iMaximum);
 	m_iValue = HyClamp(m_iValue, m_iMinimum, m_iMaximum);
@@ -102,6 +114,9 @@ void HyProgressBar::SetMaximum(int32 iMaximum)
 
 void HyProgressBar::SetRange(int32 iMinimum, int32 iMaximum)
 {
+	if(m_iMinimum == iMinimum && m_iMaximum == iMaximum)
+		return;
+
 	SetMinimum(iMinimum);
 	SetMaximum(iMaximum);
 	AdjustProgress();
@@ -109,6 +124,9 @@ void HyProgressBar::SetRange(int32 iMinimum, int32 iMaximum)
 
 void HyProgressBar::SetValue(int32 iValue)
 {
+	if(m_iValue == iValue)
+		return;
+
 	m_iValue = HyClamp(iValue, m_iMinimum, m_iMaximum);
 	AdjustProgress();
 }
