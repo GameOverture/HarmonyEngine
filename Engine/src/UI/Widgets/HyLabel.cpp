@@ -15,25 +15,21 @@
 HyLabel::PrimPanel::PrimPanel(int32 iWidth, int32 iHeight, int32 iBorder, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_BG(this),
-	m_Fill(this),
 	m_Stroke(this),
 	m_Border(this)
 {
 	m_BG.SetAsBox(iWidth, iHeight);
 	m_BG.SetTint(0.0f, 0.0f, 0.0f);
 
-	m_Fill.SetAsBox(iWidth, iHeight);
-	m_Fill.SetTint(0.5f, 0.5f, 0.5f);
+	m_Stroke.SetAsBox(iWidth, iHeight);
+	m_Stroke.SetTint(0.15f, 0.15f, 0.15f);
+	m_Stroke.SetWireframe(true);
+	m_Stroke.SetLineThickness(static_cast<float>(iBorder+2));
 	
 	m_Border.SetAsBox(iWidth, iHeight);
 	m_Border.SetTint(0.3f, 0.3f, 0.3f);
 	m_Border.SetWireframe(true);
 	m_Border.SetLineThickness(static_cast<float>(iBorder));
-
-	m_Stroke.SetAsBox(iWidth, iHeight);
-	m_Stroke.SetTint(0.15f, 0.15f, 0.15f);
-	m_Stroke.SetWireframe(true);
-	m_Stroke.SetLineThickness(static_cast<float>(iBorder+2));
 
 	Load();
 }
@@ -54,7 +50,7 @@ HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPr
 	m_SpritePanel("", "", this),
 	m_Text("", "")
 {
-	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName);
+	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName, iStroke, iStroke, iStroke, iStroke);
 }
 
 HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
@@ -186,7 +182,7 @@ float HyLabel::GetPanelWidth()
 	if(m_pPrimPanel)
 		return m_pPrimPanel->GetSceneWidth();
 	else if(m_SpritePanel.IsLoadDataValid())
-		return m_SpritePanel.GetCurFrameWidth(true);
+		return m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), true);
 
 	return 0.0f;
 }
@@ -196,19 +192,14 @@ float HyLabel::GetPanelHeight()
 	if(m_pPrimPanel)
 		return m_pPrimPanel->GetSceneHeight();
 	else if(m_SpritePanel.IsLoadDataValid())
-		return m_SpritePanel.GetCurFrameHeight(true);
+		return m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), true);
 
 	return 0.0f;
 }
 
 glm::vec2 HyLabel::GetPanelDimensions()
 {
-	if(m_pPrimPanel)
-		return glm::vec2(m_pPrimPanel->GetSceneWidth(), m_pPrimPanel->GetSceneHeight());
-	else if(m_SpritePanel.IsLoadDataValid())
-		return glm::vec2(m_SpritePanel.GetCurFrameWidth(true), m_SpritePanel.GetCurFrameHeight(true));
-
-	return glm::vec2(0.0f, 0.0f);
+	return glm::vec2(GetPanelWidth(), GetPanelHeight());
 }
 
 uint32 HyLabel::GetSpriteState() const

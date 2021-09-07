@@ -100,6 +100,7 @@ void HyRichText::AssembleDrawables()
 	}
 
 	// Remove all formatting syntax from 'm_sRichText' and insert a delimiter in each place
+	// Store results in a string stream 'ssCleanText' to process each delimited string
 	std::istringstream ssCleanText(std::regex_replace(m_sRichText, rgx, "\x7F")); // "\x7F" is delete character (127) to be used as a dilimiter to split each drawable
 
 	// Reassemble the drawable list

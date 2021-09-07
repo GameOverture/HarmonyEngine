@@ -14,52 +14,68 @@ HyProgressBar::HyProgressBar(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
-	m_iValue(0)
+	m_iValue(0),
+	m_pFill(nullptr)
 {
-	m_NumberFormat.SetFractionPrecision(0, 1);
-}
-
-HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(iWidth, iHeight, iStroke, "", "", 0, iStroke+1, 0, iStroke+1, pParent),
-	m_iMinimum(0),
-	m_iMaximum(0),
-	m_iValue(0)
-{
-	m_NumberFormat.SetFractionPrecision(0, 1);
 }
 
 HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(iWidth, iHeight, iStroke, sTextPrefix, sTextName, 0, iStroke+1, 0, iStroke+1, pParent),
+	HyLabel(iWidth, iHeight, iStroke, sTextPrefix, sTextName, iStroke+1, iStroke+1, iStroke+1, iStroke+1, pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
-	m_iValue(0)
+	m_iValue(0),
+	m_pFill(nullptr)
 {
-	m_NumberFormat.SetFractionPrecision(0, 1);
 }
 
-HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sPanelFillPrefix, std::string sPanelFillName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d* pParent /*= nullptr*/) :
-	m_sprFill(sPanelFillPrefix, sPanelFillName, this),
+HyProgressBar::HyProgressBar(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(iWidth, iHeight, iStroke, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+	m_iMinimum(0),
+	m_iMaximum(0),
+	m_iValue(0),
+	m_pFill(nullptr)
+{
+}
+
+HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0, pParent),
+	m_iMinimum(0),
+	m_iMaximum(0),
+	m_iValue(0),
+	m_pFill(nullptr)
+{
+}
+
+HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
-	m_iValue(0)
+	m_iValue(0),
+	m_pFill(nullptr)
 {
-	m_sprFill.UseWindowCoordinates(0);
-	m_sprFill.scale.Set(0.0f, 1.0f);
-	ChildInsert(this->GetSpriteNode(), m_sprFill);
-	m_NumberFormat.SetFractionPrecision(0, 1);
-
-	if (m_pPrimPanel)
-		m_pPrimPanel->m_Fill.scale.SetX(0.0f);
 }
 
 /*virtual*/ HyProgressBar::~HyProgressBar()
 {
+	delete m_pFill;
 }
 
-HySprite2d& HyProgressBar::GetFill()
+void HyProgressBar::SetFillMargins(const HyRectangle<float> &fillMarginsRef)
 {
-	return m_sprFill;
+	SetFillMargins(fillMarginsRef.left, fillMarginsRef.bottom, fillMarginsRef.right, fillMarginsRef.top);
+}
+
+void HyProgressBar::SetFillMargins(int32 iFillMarginLeft, int32 iFillMarginBottom, int32 iFillMarginRight, int32 iFillMarginTop)
+{
+	m_FillMargins.Set(iFillMarginLeft, iFillMarginBottom, iFillMarginRight, iFillMarginTop);
+
+	if(m_pFill->GetType() == HYTYPE_Primitive)
+	{
+		glm::vec2 vTotalFillArea(GetPanelWidth() - (m_FillMargins.left + m_FillMargins.right), GetPanelHeight() - (m_FillMargins.top + m_FillMargins.bottom));
+		static_cast<HyPrimitive2d *>(m_pFill)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
+	}
+
+	AdjustProgress();
 }
 
 void HyProgressBar::Reset()
@@ -108,29 +124,42 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 	AdjustProgress();
 }
 
-void HyProgressBar::AdjustProgress()
+/*virtual*/ void HyProgressBar::OnSetup() /*override*/
 {
-	if (IsLoaded() == false)
-		return;
+	m_FillMargins = m_TextMargins;
 
-	if (m_iValue > 0)
+	delete m_pFill;
+	if(m_SpritePanel.IsLoadDataValid() && m_SpritePanel.GetNumStates() > 1)
 	{
-		float fProgress = 0.0f;
-		if ((m_iMaximum - m_iMinimum) != 0)
-			fProgress = 1.0f - static_cast<float>(m_iValue - m_iMinimum) / static_cast<float>(m_iMaximum - m_iMinimum);
-
-		if (m_sprFill.IsLoadDataValid() == true)
-			m_sprFill.scale.Tween(fProgress, 1.0f, 0.2f, HyTween::QuadInOut);
-		else if (m_pPrimPanel)
-			m_pPrimPanel->m_Fill.scale.Tween(fProgress, 1.0f, 0.2f, HyTween::QuadInOut);
-
-	//	SetText(HyLocale::Percent_Format(fProgress * 100.0, m_NumberFormat));
+		m_pFill = HY_NEW HySprite2d(m_SpritePanel.GetPrefix(), m_SpritePanel.GetName(), this);
+		m_pFill->SetState(1);
 	}
 	else
 	{
-		if (m_sprFill.IsLoadDataValid() == true)
-			m_sprFill.scale.SetX(0.0f);
-		else if (m_pPrimPanel)
-			m_pPrimPanel->m_Fill.scale.SetX(0.0f);
+		m_pFill = HY_NEW HyPrimitive2d(this);
+
+		glm::vec2 vTotalFillArea(GetPanelWidth() - (m_FillMargins.left + m_FillMargins.right), GetPanelHeight() - (m_FillMargins.top + m_FillMargins.bottom));
+		static_cast<HyPrimitive2d *>(m_pFill)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
 	}
+
+	m_NumberFormat.SetFractionPrecision(0, 1);
+	
+	AdjustProgress();
+}
+
+void HyProgressBar::AdjustProgress()
+{
+	if(IsLoaded() == false || m_pFill == nullptr)
+		return;
+
+	// Position fill
+	m_pFill->pos.Set(m_FillMargins.left, m_FillMargins.bottom);
+
+	// Scale fill
+	float fProgress = 0.0f;
+	if((m_iMaximum - m_iMinimum) != 0)
+		fProgress = 1.0f - static_cast<float>(m_iValue - m_iMinimum) / static_cast<float>(m_iMaximum - m_iMinimum);
+	m_pFill->scale.Tween(fProgress, 1.0f, 0.2f, HyTween::QuadInOut);
+
+	SetText(HyLocale::Percent_Format(fProgress * 100.0, m_NumberFormat));
 }
