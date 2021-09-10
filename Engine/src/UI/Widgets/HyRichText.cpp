@@ -41,12 +41,12 @@ HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextN
 
 /*virtual*/ glm::ivec2 HyRichText::GetSizeHint() /*override*/
 {
-	return glm::ivec2(m_uiColumnWidth, GetSceneHeight() + m_fColumnLineHeightOffset);
+	return glm::ivec2(m_uiColumnWidth, GetSceneHeight());
 }
 
 /*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
 {
-	return glm::vec2(0.0f, GetSceneHeight() + m_fColumnLineHeightOffset);
+	return glm::vec2(0.0f, GetSceneHeight() - m_fColumnLineHeightOffset);
 }
 
 void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth)
@@ -140,10 +140,7 @@ void HyRichText::AssembleDrawables()
 
 		const HyText2dData *pTextData = static_cast<const HyText2dData *>(pNewText->AcquireData());
 		if(sCurText.empty() == false && pTextData)
-		{
-			m_fColumnLineHeightOffset = 0.0f;// HyMax(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
-			ptCurPos.y += m_fColumnLineHeightOffset;
-		}
+			m_fColumnLineHeightOffset = HyMax(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
 
 		// Handle next format change
 		if(uiCurFmtIndex < formatChangeList.size())
@@ -180,6 +177,9 @@ void HyRichText::AssembleDrawables()
 				float fScaleX = (m_uiColumnWidth - ptCurPos.x) / pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), false);
 				float fScaleY = fLineHeight / pNewSprite->GetStateMaxHeight(pNewSprite->GetState(), false);
 				pNewSprite->scale.Set(HyMin(fScaleX, fScaleY));
+				glm::vec2 vOffset = pNewSprite->GetCurFrameOffset();
+				vOffset *= pNewSprite->scale.Get();
+				pNewSprite->pos.Offset(-vOffset);	// NOTE: Only offsetting based on frame '0' - which will only work *most* of the time
 
 				// Find next drawable location and position 'ptCurPos' to it
 				ptCurPos.x += pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), true);
