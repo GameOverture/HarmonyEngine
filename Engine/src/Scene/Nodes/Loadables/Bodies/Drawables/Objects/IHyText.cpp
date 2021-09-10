@@ -389,7 +389,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 	if(m_uiNumValidCharacters > 0)
 	{
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - 1, pData->GetNumLayers(m_uiState), 0);
-		return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[m_uiNumValidCharacters - 1])->uiWIDTH, 0.0f);
+		return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[m_uiNumValidCharacters - 1])->fADVANCE_X, 0.0f);
 	}
 
 	return glm::vec2();
@@ -858,7 +858,7 @@ offsetCalculation:
 
 			bFirstCharacterOnNewLine = true;
 		}
-	}
+	} // for(uiStrIndex < uiSTR_SIZE)
 
 	if(bTerminatedEarly == false)
 	{
