@@ -967,12 +967,12 @@ offsetCalculation:
 				m_pGlyphInfos[i].vOffset.y -= fCenterNudgeAmt;
 		}
 	}
-	else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsColumn))	// Move column text to fit below its node position, which will extend downward from
-	{
-		float fTopLineNudgeAmt = vNewlineInfo[0].fUSED_HEIGHT;
-		for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
-			m_pGlyphInfos[i].vOffset.y -= fTopLineNudgeAmt;
-	}
+	//else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsColumn))	// Move column text to fit below its node position, which will extend downward from
+	//{
+	//	float fTopLineNudgeAmt = vNewlineInfo[0].fUSED_HEIGHT;
+	//	for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
+	//		m_pGlyphInfos[i].vOffset.y -= fTopLineNudgeAmt;
+	//}
 
 	delete[] pWritePos;
 	delete[] pMonospaceWidths;

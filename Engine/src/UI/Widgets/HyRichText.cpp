@@ -85,31 +85,33 @@ void HyRichText::AssembleDrawables()
 	m_fColumnLineHeightOffset = 0.0f;
 
 	// Capture each formatting change within 'm_sRichText'
-	std::regex rgx(".*\\{(.*)\\}");
+	std::regex rgx("\\{(.+?)\\}");
 	std::smatch match;
 	std::vector<std::pair<std::string, uint32>> formatChangeList;
-	if(std::regex_search(m_sRichText, match, rgx))
-	{
-		for(uint32 i = 1; i < static_cast<uint32>(match.size()); ++i)
-		{
-			std::smatch m;
-			std::string sMatch = match[i].str();
-			if(std::regex_search(sMatch, m, std::regex("([A-Za-z_]+[A-Za-z0-9_/]*,\\d+)"))) // Doesn't start with number and has ',' number param (sprite with state)
-			{
-				std::string sPath = m[1].str().substr(0, sPath.find(','));
-				uint32 uiState = std::stoi(m[1].str().substr(sPath.find(',') + 1));
 
-				formatChangeList.push_back(std::pair<std::string, uint32>(sPath, uiState));
-			}
-			else if(std::regex_search(sMatch, m, std::regex("([A-Za-z_]+[A-Za-z0-9_/]*)"))) // Doesn't start with number (sprite)
-			{
-				std::string sPath = m[1].str();
-				formatChangeList.push_back(std::pair<std::string, uint32>(sPath, 0));
-			}
-			else if(std::regex_search(sMatch, m, std::regex("(\\d+)"))) // Is only number (change text state)
-			{
-				formatChangeList.push_back(std::pair<std::string, uint32>("", std::stoi(m[1].str())));
-			}
+	auto iterBegin = std::sregex_iterator(m_sRichText.begin(), m_sRichText.end(), rgx);
+	auto iterEnd = std::sregex_iterator();
+	for(std::sregex_iterator iter = iterBegin; iter != iterEnd; ++iter)
+	{
+		std::smatch match = *iter;
+		std::string sMatch = match[1].str();
+
+		std::smatch m;
+		if(std::regex_search(sMatch, m, std::regex("([A-Za-z_]+[A-Za-z0-9_/]*,\\d+)"))) // Doesn't start with number and has ',' number param (sprite with state)
+		{
+			std::string sPath = m[1].str().substr(0, sPath.find(','));
+			uint32 uiState = std::stoi(m[1].str().substr(sPath.find(',') + 1));
+
+			formatChangeList.push_back(std::pair<std::string, uint32>(sPath, uiState));
+		}
+		else if(std::regex_search(sMatch, m, std::regex("([A-Za-z_]+[A-Za-z0-9_/]*)"))) // Doesn't start with number (sprite)
+		{
+			std::string sPath = m[1].str();
+			formatChangeList.push_back(std::pair<std::string, uint32>(sPath, 0));
+		}
+		else if(std::regex_search(sMatch, m, std::regex("(\\d+)"))) // Is only number (change text state)
+		{
+			formatChangeList.push_back(std::pair<std::string, uint32>("", std::stoi(m[1].str())));
 		}
 	}
 
@@ -138,7 +140,10 @@ void HyRichText::AssembleDrawables()
 
 		const HyText2dData *pTextData = static_cast<const HyText2dData *>(pNewText->AcquireData());
 		if(sCurText.empty() == false && pTextData)
-			m_fColumnLineHeightOffset = HyMax(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
+		{
+			m_fColumnLineHeightOffset = 0.0f;// HyMax(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
+			ptCurPos.y += m_fColumnLineHeightOffset;
+		}
 
 		// Handle next format change
 		if(uiCurFmtIndex < formatChangeList.size())
