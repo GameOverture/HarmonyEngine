@@ -13,7 +13,8 @@
 
 HyBoxLayout::HyBoxLayout(HyOrientation eOrientation, HyEntity2d *pParent /*= nullptr*/) :
 	IHyLayout(eOrientation == HYORIEN_Horizontal ? HYLAYOUT_Horizontal : HYLAYOUT_Vertical, pParent),
-	m_eOrientation(eOrientation)
+	m_eOrientation(eOrientation),
+	m_bReverse(eOrientation == HYORIEN_Horizontal ? false : true) // 'm_bReverse' is defaulted ON when 'm_eOrientation' is HYORIEN_Vertical to achieve top->bottom as default
 {
 }
 
@@ -24,6 +25,16 @@ HyBoxLayout::HyBoxLayout(HyOrientation eOrientation, HyEntity2d *pParent /*= nul
 void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 {
 	ChildAppend(itemRef);
+	OnSetLayoutItems();
+}
+
+void HyBoxLayout::ReverseOrder(bool bReverse)
+{
+	if(m_eOrientation == HYORIEN_Horizontal)
+		m_bReverse = bReverse;
+	else
+		m_bReverse = !bReverse; // HYORIEN_Vertical needs this flipped to achieve top->bottom default
+
 	OnSetLayoutItems();
 }
 
@@ -43,11 +54,11 @@ void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 	glm::ivec2 vNumExpandItems;
 	glm::ivec2 vNumShrinkItems;
 	glm::ivec2 vNumNoneItems;
-	
-	for(uint32 i = 0; i < uiNumChildren; ++i)
+
+	auto fpPreferredSize = [&](IHyNode2d *&pChildItem) // Lambda func used to iterate over 'm_ChildList'
 	{
 		// Children are guaranteed to be HyEntityUi
-		HyEntityUi *pItem = static_cast<HyEntityUi *>(m_ChildList[i]);
+		HyEntityUi *pItem = static_cast<HyEntityUi *>(pChildItem);
 		glm::ivec2 vItemSizeHint;
 			
 		if(pItem->GetUiType() == Ui_Widget)
@@ -81,7 +92,12 @@ void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 
 		m_vPreferredSize[m_eOrientation] += vItemSizeHint[m_eOrientation];
 		m_vPreferredSize[iInverseOrien] = HyMax(m_vPreferredSize[iInverseOrien], vItemSizeHint[iInverseOrien]);
-	}
+	};
+	if(m_bReverse)
+		std::for_each(m_ChildList.rbegin(), m_ChildList.rend(), fpPreferredSize);
+	else
+		std::for_each(m_ChildList.begin(), m_ChildList.end(), fpPreferredSize);
+
 
 	// Determine if preferred size (m_vPreferredSize) fits within m_vSize
 	//	- Distrubute positive difference to all 'expanding' then 'grow' size policies
@@ -106,10 +122,11 @@ void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 
 	// Finally go through each child and set its position and OnResize()
 	glm::vec2 ptCurPos(m_Margins.left, m_Margins.bottom);
-	for(uint32 i = 0; i < uiNumChildren; ++i)
+
+	auto fpPositionAndResize = [&](IHyNode2d *&pChildItem) // Lambda func used to iterate over 'm_ChildList'
 	{
 		// Children are guaranteed to be HyEntityUi
-		HyEntityUi *pItem = static_cast<HyEntityUi *>(m_ChildList[i]);
+		HyEntityUi *pItem = static_cast<HyEntityUi *>(pChildItem);
 
 		// Set item to the ptCurPos
 		pItem->pos.Set(ptCurPos);
@@ -160,5 +177,9 @@ void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 		}
 
 		ptCurPos[m_eOrientation] += vItemSize[m_eOrientation] + GetSpacing()[m_eOrientation];
-	}
+	};
+	if(m_bReverse)
+		std::for_each(m_ChildList.rbegin(), m_ChildList.rend(), fpPositionAndResize);
+	else
+		std::for_each(m_ChildList.begin(), m_ChildList.end(), fpPositionAndResize);
 }

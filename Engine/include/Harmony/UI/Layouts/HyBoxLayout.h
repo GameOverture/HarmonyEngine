@@ -21,13 +21,14 @@ class HyBoxLayout : public IHyLayout
 
 protected:
 	HyOrientation		m_eOrientation;
+	bool				m_bReverse;			// By default items are appended left->right, or top->bottom (NOTE: 'm_bReverse' is defaulted ON when 'm_eOrientation' is HYORIEN_Vertical to achieve top->bottom as default)
 
 public:
 	HyBoxLayout(HyOrientation eOrientation, HyEntity2d *pParent = nullptr);
 	virtual ~HyBoxLayout();
 
-
 	void AppendItem(HyEntityUi &itemRef);
+	void ReverseOrder(bool bReverse);
 
 protected:
 	virtual void OnSetLayoutItems() override;
