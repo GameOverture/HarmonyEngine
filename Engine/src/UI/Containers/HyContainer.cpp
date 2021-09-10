@@ -15,27 +15,27 @@
 HyContainer::HyContainer(HyLayoutType eRootLayout, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntityUi(Ui_Container, pParent),
 	m_pRootLayout(nullptr),
+	m_pPrimPanel(nullptr),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f)
 {
-	switch(eRootLayout)
-	{
-	case HYLAYOUT_Horizontal:
-		m_pRootLayout = HY_NEW HyBoxLayout(HYORIEN_Horizontal, this);
-		break;
-	case HYLAYOUT_Vertical:
-		m_pRootLayout = HY_NEW HyBoxLayout(HYORIEN_Vertical, this);
-		break;
+	AllocRootLayout(eRootLayout);
+}
 
-	default:
-		HyError("HyContainer::HyContainer layout type not supported");
-		break;
-	}
+HyContainer::HyContainer(HyLayoutType eRootLayout, int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent /*= nullptr*/) :
+	HyEntityUi(Ui_Container, pParent),
+	m_pRootLayout(nullptr),
+	m_pPrimPanel(HY_NEW HyPrimitivePanel(iWidth, iHeight, iStroke, this)),
+	m_eContainerState(CONTAINERSTATE_Shown),
+	m_fElapsedTime(0.0f)
+{
+	AllocRootLayout(eRootLayout);
 }
 
 /*virtual*/ HyContainer::~HyContainer()
 {
 	delete m_pRootLayout;
+	delete m_pPrimPanel;
 }
 
 glm::ivec2 HyContainer::GetSize() const
@@ -45,7 +45,10 @@ glm::ivec2 HyContainer::GetSize() const
 
 void HyContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
-	m_pRootLayout->SetSize(iNewWidth, iNewHeight);
+	HyInternal_LayoutSetSize(*m_pRootLayout, iNewWidth, iNewHeight);
+
+	if(m_pPrimPanel)
+		m_pPrimPanel->SetSize(iNewWidth, iNewHeight);
 }
 
 bool HyContainer::Show(bool bInstant /*= false*/)
@@ -56,8 +59,9 @@ bool HyContainer::Show(bool bInstant /*= false*/)
 	if(bInstant)
 	{
 		m_eContainerState = CONTAINERSTATE_Shown;
-		OnShown();
 		m_fElapsedTime = 0.0f;
+
+		OnShown();
 	}
 	else
 	{
@@ -76,8 +80,9 @@ bool HyContainer::Hide(bool bInstant /*= false*/)
 	if(bInstant)
 	{
 		m_eContainerState = CONTAINERSTATE_Hidden;
-		OnHidden();
 		m_fElapsedTime = 0.0f;
+
+		OnHidden();
 	}
 	else
 	{
@@ -103,7 +108,7 @@ IHyLayout *HyContainer::GetRootLayout()
 	return m_pRootLayout;
 }
 
-/*virtual*/ void HyContainer::OnUpdate() /*override*/
+/*virtual*/ void HyContainer::OnUpdate() /*override final*/
 {
 	if(m_fElapsedTime > 0.0f)
 	{
@@ -128,4 +133,26 @@ IHyLayout *HyContainer::GetRootLayout()
 	}
 
 	m_fElapsedTime = 0.0f;
+	OnContainerUpdate();
+}
+
+void HyContainer::AllocRootLayout(HyLayoutType eRootLayout)
+{
+	switch(eRootLayout)
+	{
+	case HYLAYOUT_Horizontal:
+		m_pRootLayout = HY_NEW HyBoxLayout(HYORIEN_Horizontal, this);
+		break;
+	case HYLAYOUT_Vertical:
+		m_pRootLayout = HY_NEW HyBoxLayout(HYORIEN_Vertical, this);
+		break;
+
+	default:
+		HyError("HyContainer::HyContainer layout type not supported");
+		break;
+	}
+
+	if(m_pPrimPanel)
+		HyInternal_LayoutSetSize(*m_pRootLayout, m_pPrimPanel->GetSize().x, m_pPrimPanel->GetSize().y);
+	//m_pRootLayout-
 }

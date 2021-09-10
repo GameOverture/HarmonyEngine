@@ -12,13 +12,14 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/HyEntityUi.h"
+#include "UI/HyPrimitivePanel.h"
 #include "UI/Layouts/IHyLayout.h"
 
 class HyContainer : public HyEntityUi
 {
 protected:
-	glm::vec2				m_vSize;
 	IHyLayout *				m_pRootLayout;
+	HyPrimitivePanel *		m_pPrimPanel;
 
 	enum ContainerState
 	{
@@ -32,6 +33,7 @@ protected:
 
 public:
 	HyContainer(HyLayoutType eRootLayout, HyEntity2d *pParent = nullptr);
+	HyContainer(HyLayoutType eRootLayout, int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent = nullptr);
 	virtual ~HyContainer();
 
 	glm::ivec2 GetSize() const;
@@ -50,13 +52,16 @@ public:
 	}
 
 protected:
-	virtual void OnUpdate() override;
+	virtual void OnUpdate() override final;
+	virtual void OnContainerUpdate() { }
 
 	// Optional overrides to control show and hide animations/functionality
 	virtual float OnBeginShow() { return 0.0f; }	// Returns the duration (in seconds) of the show transition
 	virtual void OnShown()		{ SetVisible(true); }
 	virtual float OnBeginHide() { return 0.0f; }	// Returns the duration (in seconds) of the hide transition
 	virtual void OnHidden()		{ SetVisible(false); }
+
+	void AllocRootLayout(HyLayoutType eRootLayout);
 };
 
 #endif /* HyContainer_h__ */

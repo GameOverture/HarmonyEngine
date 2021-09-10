@@ -11,6 +11,7 @@
 #define HyLabel_h__
 
 #include "Afx/HyStdAfx.h"
+#include "UI/HyPrimitivePanel.h"
 #include "UI/Widgets/IHyWidget.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
@@ -18,19 +19,9 @@
 class HyLabel : public IHyWidget
 {
 protected:
-	class PrimPanel : public HyEntity2d
-	{
-	public:
-		HyPrimitive2d		m_BG;					// Acts as thin stroke outline (the stroke's stroke) and a background color that isn't covered by m_Fill
-		HyPrimitive2d		m_Stroke;
-		HyPrimitive2d		m_Border;
-
-		PrimPanel(int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent);
-	};
-
 	enum PanelAttributes
 	{
-		PANELATTRIB_IsPrimitive				= 1 << 0,		// Whether the panel is constructed via HyLabel::PrimPanel instead of a HySprite2d
+		PANELATTRIB_IsPrimitive				= 1 << 0,		// Whether the panel is constructed via HyPrimitivePanel instead of a HySprite2d
 		PANELATTRIB_HideDownState			= 1 << 1,		// Don't visually indicate down state (when available)
 		PANELATTRIB_HideHoverState			= 1 << 2,		// Don't visually indicate hover state (when available)
 		PANELATTRIB_HideDisabled			= 1 << 3,		// Don't visually indicate if disabled
@@ -47,7 +38,7 @@ protected:
 	};
 	uint32					m_uiPanelAttribs;
 
-	PrimPanel *				m_pPrimPanel;					// Optionally construct a primitive panel instead of using HySprite2d
+	HyPrimitivePanel *		m_pPrimPanel;					// Optionally construct a primitive panel instead of using HySprite2d
 	HySprite2d				m_SpritePanel;
 
 	HyText2d				m_Text;

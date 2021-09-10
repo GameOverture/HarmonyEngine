@@ -156,7 +156,7 @@ void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 
 			vItemSize[iInverseOrien] += m_vSize[iInverseOrien] - vItemSize[iInverseOrien];
 
-			pLayout->SetSize(vItemSize.x, vItemSize.y);
+			HyInternal_LayoutSetSize(*pLayout, vItemSize.x, vItemSize.y);
 		}
 
 		ptCurPos[m_eOrientation] += vItemSize[m_eOrientation] + GetSpacing()[m_eOrientation];

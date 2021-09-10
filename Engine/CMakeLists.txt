@@ -140,6 +140,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Time/Watches/HyTimer.cpp
 	src/Time/Watches/IHyTimeInst.cpp
 	src/UI/HyEntityUi.cpp
+	src/UI/HyPrimitivePanel.cpp
 	src/UI/Widgets/HyButton.cpp
 	src/UI/Widgets/HyCheckBox.cpp
 	src/UI/Widgets/HyLabel.cpp
@@ -264,6 +265,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Time/Watches/HyTimer.h
 	include/Harmony/Time/Watches/IHyTimeInst.h
 	include/Harmony/UI/HyEntityUi.h
+	include/Harmony/UI/HyPrimitivePanel.h
 	include/Harmony/UI/Widgets/HyButton.h
 	include/Harmony/UI/Widgets/HyCheckBox.h
 	include/Harmony/UI/Widgets/HyLabel.h

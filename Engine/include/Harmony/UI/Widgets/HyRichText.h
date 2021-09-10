@@ -19,6 +19,7 @@ protected:
 	std::string						m_sTextPrefix;
 	std::string						m_sTextName;
 	uint32							m_uiColumnWidth;
+	float							m_fColumnLineHeightOffset;
 
 	std::string						m_sRichText;
 	std::vector<IHyDrawable2d *>	m_DrawableList;

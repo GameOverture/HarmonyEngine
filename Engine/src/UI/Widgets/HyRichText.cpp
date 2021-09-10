@@ -17,8 +17,17 @@
 
 HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
-	m_uiColumnWidth(0)
+	m_uiColumnWidth(0),
+	m_fColumnLineHeightOffset(0.0f)
 {
+}
+
+HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyEntity2d *pParent /*= nullptr*/) :
+	IHyWidget(pParent),
+	m_uiColumnWidth(0),
+	m_fColumnLineHeightOffset(0.0f)
+{
+	Setup(sTextPrefix, sTextName, uiColumnWidth);
 }
 
 /*virtual*/ HyRichText::~HyRichText()
@@ -32,16 +41,18 @@ HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ glm::ivec2 HyRichText::GetSizeHint() /*override*/
 {
-	return glm::ivec2(GetSceneWidth(), GetSceneHeight());
+	return glm::ivec2(m_uiColumnWidth, GetSceneHeight() + m_fColumnLineHeightOffset);
 }
 
 /*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
 {
-	return glm::vec2(0.0f, 0.0f);
+	return glm::vec2(0.0f, GetSceneHeight() + m_fColumnLineHeightOffset);
 }
 
 void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth)
 {
+	m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Fixed;
+
 	m_sTextPrefix = sTextPrefix;
 	m_sTextName = sTextName;
 	m_uiColumnWidth = uiColumnWidth;
@@ -59,6 +70,8 @@ void HyRichText::SetRichText(const std::string &sRichTextFormat)
 
 /*virtual*/ void HyRichText::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
+	m_uiColumnWidth = iNewWidth;
+	AssembleDrawables();
 }
 
 void HyRichText::AssembleDrawables()
@@ -69,9 +82,10 @@ void HyRichText::AssembleDrawables()
 		delete m_DrawableList.back();
 		m_DrawableList.pop_back();
 	}
+	m_fColumnLineHeightOffset = 0.0f;
 
 	// Capture each formatting change within 'm_sRichText'
-	std::regex rgx(".*[^\\\\]{(.*)}");
+	std::regex rgx(".*\\{(.*)\\}");
 	std::smatch match;
 	std::vector<std::pair<std::string, uint32>> formatChangeList;
 	if(std::regex_search(m_sRichText, match, rgx))
@@ -111,6 +125,7 @@ void HyRichText::AssembleDrawables()
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
 	{
 		HyText2d *pNewText = HY_NEW HyText2d(m_sTextPrefix, m_sTextName, this);
+		pNewText->Load();
 		m_DrawableList.push_back(pNewText);
 		pNewText->pos.Set(0.0f, ptCurPos.y);
 		pNewText->SetAsColumn(m_uiColumnWidth);
@@ -121,8 +136,12 @@ void HyRichText::AssembleDrawables()
 		// Update 'uiCurPos' to the location past the last glyph
 		ptCurPos = pNewText->GetTextCursorPos();
 
+		const HyText2dData *pTextData = static_cast<const HyText2dData *>(pNewText->AcquireData());
+		if(sCurText.empty() == false && pTextData)
+			m_fColumnLineHeightOffset = HyMax(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
+
 		// Handle next format change
-		if(formatChangeList.empty() == false)
+		if(uiCurFmtIndex < formatChangeList.size())
 		{
 			// If .first is empty string then just change text state
 			if(formatChangeList[uiCurFmtIndex].first.empty())
@@ -148,6 +167,7 @@ void HyRichText::AssembleDrawables()
 
 				// Allocate sprite and initialize
 				HySprite2d *pNewSprite = HY_NEW HySprite2d(sPrefix, sName, this);
+				pNewSprite->Load();
 				m_DrawableList.push_back(pNewSprite);
 				pNewSprite->pos.Set(ptCurPos);
 				pNewSprite->SetState(formatChangeList[uiCurFmtIndex].second);

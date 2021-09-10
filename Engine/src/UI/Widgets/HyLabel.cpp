@@ -12,28 +12,6 @@
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyLabel::PrimPanel::PrimPanel(int32 iWidth, int32 iHeight, int32 iBorder, HyEntity2d *pParent) :
-	HyEntity2d(pParent),
-	m_BG(this),
-	m_Stroke(this),
-	m_Border(this)
-{
-	m_BG.SetAsBox(iWidth, iHeight);
-	m_BG.SetTint(0.0f, 0.0f, 0.0f);
-
-	m_Stroke.SetAsBox(iWidth, iHeight);
-	m_Stroke.SetTint(0.15f, 0.15f, 0.15f);
-	m_Stroke.SetWireframe(true);
-	m_Stroke.SetLineThickness(static_cast<float>(iBorder+2));
-	
-	m_Border.SetAsBox(iWidth, iHeight);
-	m_Border.SetTint(0.3f, 0.3f, 0.3f);
-	m_Border.SetWireframe(true);
-	m_Border.SetLineThickness(static_cast<float>(iBorder));
-
-	Load();
-}
-
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiPanelAttribs(0),
@@ -104,7 +82,7 @@ void HyLabel::Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTex
 
 	m_SpritePanel.Uninit();
 	delete m_pPrimPanel;
-	m_pPrimPanel = HY_NEW PrimPanel(iWidth, iHeight, iStroke, this);
+	m_pPrimPanel = HY_NEW HyPrimitivePanel(iWidth, iHeight, iStroke, this);
 
 	m_Text.Init(sTextPrefix, sTextName, this);
 	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
@@ -211,7 +189,7 @@ uint32 HyLabel::GetSpriteState() const
 {
 	if(m_SpritePanel.IsLoadDataValid() == false)
 	{
-		HyLogWarning("HyLabel::SetSpriteState was invoked with an invalid panel sprite");
+		HyLogDebug("HyLabel::SetSpriteState was invoked with an invalid panel sprite");
 		return;
 	}
 
@@ -287,8 +265,8 @@ bool HyLabel::IsHighlighted() const
 		m_uiPanelAttribs |= PANELATTRIB_IsHighlighted;
 		if(m_pPrimPanel)
 		{
-			m_pPrimPanel->m_Stroke.SetTint(0.0f, 0.0f, 1.0f);
-			m_pPrimPanel->m_Stroke.SetLineThickness(m_pPrimPanel->m_Stroke.GetLineThickness() * 2.0f);
+			m_pPrimPanel->SetBorderColor(0x0000FF);
+			//m_pPrimPanel->m_Stroke.SetLineThickness(m_pPrimPanel->m_Stroke.GetLineThickness() * 2.0f);
 		}
 	}
 	else
@@ -296,8 +274,8 @@ bool HyLabel::IsHighlighted() const
 		m_uiPanelAttribs &= ~PANELATTRIB_IsHighlighted;
 		if(m_pPrimPanel)
 		{
-			m_pPrimPanel->m_Stroke.SetTint(0.3f, 0.3f, 0.3f);
-			m_pPrimPanel->m_Stroke.SetLineThickness(m_pPrimPanel->m_Stroke.GetLineThickness() / 2.0f);
+			m_pPrimPanel->SetBorderColor(0x3F3F41);
+			//m_pPrimPanel->m_Stroke.SetLineThickness(m_pPrimPanel->m_Stroke.GetLineThickness() / 2.0f);
 		}
 	}
 }
@@ -364,10 +342,12 @@ void HyLabel::CommonSetup()
 			static_cast<int32>(m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false)),
 			static_cast<int32>(m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false)));
 	}
-	
-	// vUiSizeHint must be established
+	else if(m_Text.IsLoadDataValid())
+		HySetVec(vUiSizeHint, m_Text.GetTextWidth(true), m_Text.GetTextHeight(true));
+
+	// vUiSizeHint must be established - TODO: Is this still true?
 	if(vUiSizeHint.x == 0 || vUiSizeHint.y == 0)
-		HySetVec(vUiSizeHint, 300, 75);
+		HySetVec(vUiSizeHint, 1, 1);
 
 	return vUiSizeHint;
 }

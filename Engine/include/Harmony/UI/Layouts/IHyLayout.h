@@ -13,10 +13,14 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/HyEntityUi.h"
 
+#define HY_UILAYOUT \
+	private:\
+		using HyEntity2d::ChildAppend; \
+		using HyEntity2d::ChildInsert;
+
 class IHyLayout : public HyEntityUi
 {
-	friend class HyContainer;
-	friend class HyBoxLayout;
+	HY_UILAYOUT
 
 protected:
 	const HyLayoutType					m_eLAYOUT_TYPE;
@@ -24,7 +28,6 @@ protected:
 	glm::ivec2							m_vSize;
 	glm::ivec2							m_vPreferredSize;
 	HyRectangle<int32>					m_Margins;		// Tag = Spacing between widgets inside the layout
-
 
 public:
 	IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent = nullptr);
@@ -45,10 +48,7 @@ protected:
 	virtual void OnSetLayoutItems() = 0;
 	void SetSize(int32 iNewWidth, int32 iNewHeight);
 
-private:
-	// Prevent adding any child that isn't of IHyLayoutItem type
-	using HyEntity2d::ChildAppend;
-	using HyEntity2d::ChildInsert;
+	friend void HyInternal_LayoutSetSize(IHyLayout &layoutRef, int32 iNewWidth, int32 iNewHeight);
 };
 
 #endif /* IHyLayout_h__ */

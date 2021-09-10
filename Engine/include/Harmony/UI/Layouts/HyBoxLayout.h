@@ -17,6 +17,8 @@ class IHyWidget;
 
 class HyBoxLayout : public IHyLayout
 {
+	HY_UILAYOUT
+
 protected:
 	HyOrientation		m_eOrientation;
 
@@ -24,40 +26,30 @@ public:
 	HyBoxLayout(HyOrientation eOrientation, HyEntity2d *pParent = nullptr);
 	virtual ~HyBoxLayout();
 
+
 	void AppendItem(HyEntityUi &itemRef);
 
 protected:
 	virtual void OnSetLayoutItems() override;
-
-private:
-	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
-	using HyEntity2d::ChildAppend;
-	using HyEntity2d::ChildInsert;
 };
 
-//class HyHBoxLayout : public HyBoxLayout
-//{
-//public:
-//	HyHBoxLayout(HyEntity2d *pParent = nullptr) :
-//		HyBoxLayout(HYORIEN_Horizontal, pParent)
-//	{ }
-//
-//private:
-//	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
-//	using HyEntity2d::ChildAppend;
-//	using HyEntity2d::ChildInsert;
-//};
-//class HyVBoxLayout : public HyBoxLayout
-//{
-//public:
-//	HyVBoxLayout(HyEntity2d *pParent = nullptr) :
-//		HyBoxLayout(HYORIEN_Vertical, pParent)
-//	{ }
-//
-//private:
-//	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
-//	using HyEntity2d::ChildAppend;
-//	using HyEntity2d::ChildInsert;
-//};
+class HyHBoxLayout : public HyBoxLayout
+{
+	HY_UILAYOUT
+
+public:
+	HyHBoxLayout(HyEntity2d *pParent = nullptr) :
+		HyBoxLayout(HYORIEN_Horizontal, pParent)
+	{ }
+};
+class HyVBoxLayout : public HyBoxLayout
+{
+	HY_UILAYOUT
+
+public:
+	HyVBoxLayout(HyEntity2d *pParent = nullptr) :
+		HyBoxLayout(HYORIEN_Vertical, pParent)
+	{ }
+};
 
 #endif /* HyBoxLayout_h__ */

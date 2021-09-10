@@ -111,6 +111,12 @@ void HyPrimitive2d::SetAsBox(int32 iWidth, int32 iHeight)
 	SetData();
 }
 
+void HyPrimitive2d::SetAsBox(uint32 uiWidth, uint32 uiHeight)
+{
+	m_LocalBoundingVolume.SetAsBox(static_cast<int32>(uiWidth), static_cast<int32>(uiHeight));
+	SetData();
+}
+
 void HyPrimitive2d::SetAsBox(float fWidth, float fHeight)
 {
 	m_LocalBoundingVolume.SetAsBox(fWidth, fHeight);

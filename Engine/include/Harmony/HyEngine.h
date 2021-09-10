@@ -38,6 +38,7 @@
 #include "UI/Widgets/HyCheckBox.h"
 #include "UI/Widgets/HyMeter.h"
 #include "UI/Widgets/HyProgressBar.h"
+#include "UI/Widgets/HyRichText.h"
 #include "UI/Widgets/HySpacer.h"
 #include "UI/Layouts/HyBoxLayout.h"
 #include "UI/Layouts/HyGridLayout.h"

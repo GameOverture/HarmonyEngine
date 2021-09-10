@@ -66,3 +66,8 @@ void IHyLayout::SetSize(int32 iNewWidth, int32 iNewHeight)
 	HySetVec(m_vSize, iNewWidth, iNewHeight);
 	OnSetLayoutItems();
 }
+
+/*friend*/ void HyInternal_LayoutSetSize(IHyLayout &layoutRef, int32 iNewWidth, int32 iNewHeight)
+{
+	layoutRef.SetSize(iNewWidth, iNewHeight);
+}

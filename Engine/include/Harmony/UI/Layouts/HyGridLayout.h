@@ -17,6 +17,8 @@ class HySpacer;
 
 class HyGridLayout : public IHyLayout
 {
+	HY_UILAYOUT
+
 	glm::ivec2							m_GridSize;
 	std::map<glm::ivec2, HyEntityUi *>	m_IndexMap;
 
@@ -35,11 +37,6 @@ protected:
 	// [0] [1] [2]
 	// [3] [4] [5]
 	virtual void OnSetLayoutItems() override;
-
-private:
-	// Hide any children functionality inherited from HyEntity2d because derived layouts can only have 'HyUI' as children
-	using HyEntity2d::ChildAppend;
-	using HyEntity2d::ChildInsert;
 };
 
 #endif /* HyGridLayout_h__ */
