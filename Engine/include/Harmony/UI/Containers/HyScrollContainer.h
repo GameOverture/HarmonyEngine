@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyContainer.h
+*	HyScrollContainer.h
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -7,64 +7,21 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyContainer_h__
-#define HyContainer_h__
+#ifndef HyScrollContainer_h__
+#define HyScrollContainer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyEntityUi.h"
-#include "UI/HyPrimitivePanel.h"
-#include "UI/Layouts/IHyLayout.h"
+#include "UI/Containers/HyContainer.h"
 
-class HyContainer : public HyEntityUi
+class HyScrollContainer : public HyContainer
 {
-protected:
-	IHyLayout *				m_pRootLayout;
-	HyPrimitivePanel *		m_pPrimPanel;
-
-	enum ContainerState
-	{
-		CONTAINERSTATE_Hidden = 0,
-		CONTAINERSTATE_Showing,
-		CONTAINERSTATE_Shown,
-		CONTAINERSTATE_Hiding
-	};
-	ContainerState			m_eContainerState;
-	float					m_fElapsedTime;
-
 public:
-	HyContainer(HyLayoutType eRootLayout, HyEntity2d *pParent = nullptr);
-	HyContainer(HyLayoutType eRootLayout, int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent = nullptr);
-	virtual ~HyContainer();
-
-	glm::ivec2 GetSize() const;
-	void SetSize(int32 iNewWidth, int32 iNewHeight);
-
-	bool Show(bool bInstant = false);
-	bool Hide(bool bInstant = false);
-
-	bool IsTransition();
-	bool IsShown();
-
-	IHyLayout *GetRootLayout();
-	template<typename LAYOUT>
-	LAYOUT *GetRootLayout() {
-		return static_cast<LAYOUT *>(m_pRootLayout);
-	}
+	HyScrollContainer(HyLayoutType eRootLayout, HyEntity2d *pParent = nullptr);
+	HyScrollContainer(HyLayoutType eRootLayout, int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent = nullptr);
+	virtual ~HyScrollContainer();
 
 protected:
-	virtual void OnUpdate() override final;
 	virtual void OnContainerUpdate() { }
-
-	// Optional overrides to control show and hide animations/functionality
-	virtual float OnBeginShow() { return 0.0f; }	// Returns the duration (in seconds) of the show transition
-	virtual void OnShown()		{ SetVisible(true); }
-	virtual float OnBeginHide() { return 0.0f; }	// Returns the duration (in seconds) of the hide transition
-	virtual void OnHidden()		{ SetVisible(false); }
-
-	void AllocRootLayout(HyLayoutType eRootLayout);
-
-private:
-	virtual glm::ivec2 GetSizeHint() override;
 };
 
-#endif /* HyContainer_h__ */
+#endif /* HyScrollContainer_h__ */

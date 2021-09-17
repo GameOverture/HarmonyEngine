@@ -33,6 +33,7 @@
 #include "Threading/IHyThreadClass.h"
 #include "Time/HyTime.h"
 #include "UI/Containers/HyContainer.h"
+#include "UI/Containers/HyScrollContainer.h"
 #include "UI/Containers/IHy9Slice.h"
 #include "UI/Widgets/HyButton.h"
 #include "UI/Widgets/HyCheckBox.h"
