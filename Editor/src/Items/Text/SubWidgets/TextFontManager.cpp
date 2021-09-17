@@ -569,7 +569,6 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 				if(pGlyph->offset_x < 0 && iter.value()->m_fLeftSideNudgeAmt < abs(pGlyph->offset_x))
 					iter.value()->m_fLeftSideNudgeAmt = abs(pGlyph->offset_x);
 			}
-			break;
 		}
 	}
 
