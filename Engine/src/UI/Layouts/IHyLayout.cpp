@@ -14,8 +14,7 @@
 IHyLayout::IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntityUi(Ui_Layout, pParent),
 	m_eLAYOUT_TYPE(eLayoutType),
-	m_vSize(0, 0),
-	m_vPreferredSize(0, 0)
+	m_vSize(0, 0)
 {
 }
 
@@ -23,10 +22,13 @@ IHyLayout::IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/
 {
 }
 
-void IHyLayout::ClearWidgets()
+/*virtual*/ void IHyLayout::Clear() /*override*/
 {
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
+
+	OnClear();
+	OnSetLayoutItems();
 }
 
 glm::ivec2 IHyLayout::GetSize() const
@@ -54,11 +56,6 @@ uint16 IHyLayout::GetVerticalSpacing()
 glm::ivec2 IHyLayout::GetSpacing()
 {
 	return glm::ivec2(GetHorizontalSpacing(), GetVerticalSpacing());
-}
-
-glm::ivec2 IHyLayout::GetPreferredSize() const
-{
-	return m_vPreferredSize;
 }
 
 void IHyLayout::SetSize(int32 iNewWidth, int32 iNewHeight)

@@ -104,7 +104,7 @@ void HyRichText::AssembleDrawables()
 
 			formatChangeList.push_back(std::pair<std::string, uint32>(sPath, uiState));
 		}
-		else if(std::regex_search(sMatch, m, std::regex("([A-Za-z_]+[A-Za-z0-9_/]*)"))) // Doesn't start with number (sprite)
+		else if(std::regex_search(sMatch, m, std::regex("([A-Za-z_]+[A-Za-z0-9_/]*)"))) // Doesn't start with number (either sprite or alignment)
 		{
 			std::string sPath = m[1].str();
 			formatChangeList.push_back(std::pair<std::string, uint32>(sPath, 0));
@@ -122,7 +122,9 @@ void HyRichText::AssembleDrawables()
 	// Reassemble the drawable list
 	std::string sCurText;
 	uint32 uiCurTextState = 0;
+	HyAlignment eAlignment = HYALIGN_Left;
 	glm::vec2 ptCurPos(0.0f, 0.0f);
+	float fHorizontalCenterAccum = 0.0f;
 	uint32 uiCurFmtIndex = 0;
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
 	{
@@ -131,12 +133,14 @@ void HyRichText::AssembleDrawables()
 		m_DrawableList.push_back(pNewText);
 		pNewText->pos.Set(0.0f, ptCurPos.y);
 		pNewText->SetAsColumn(m_uiColumnWidth);
+		//pNewText->SetTextAlignment(eAlignment);
 		pNewText->SetState(uiCurTextState);
 		pNewText->SetTextIndent(ptCurPos.x);
 		pNewText->SetText(sCurText);
 
 		// Update 'uiCurPos' to the location past the last glyph
-		ptCurPos = pNewText->GetTextCursorPos();
+		ptCurPos.x = pNewText->GetTextCursorPos().x;
+		ptCurPos.y += pNewText->GetTextCursorPos().y;
 
 		const HyText2dData *pTextData = static_cast<const HyText2dData *>(pNewText->AcquireData());
 		if(sCurText.empty() == false && pTextData)

@@ -13,6 +13,7 @@
 // Order of these #includes matter!
 #include "Compilers/HyCompiler.h"
 #include "Platforms/HyPlatform.h"
+#include "HyFlags.h"
 
 #include "rapidjson/document.h"
 typedef rapidjson::Document HyJsonDoc;
@@ -262,10 +263,10 @@ enum HySizePolicy
 {
 	HYSIZEPOLICY_Fixed = 0,																	// GetSizeHint() is the only acceptable alternative, so the widget can never grow or shrink (e.g. the vertical direction of a push button).
 	HYSIZEPOLICY_Minimum = HY_SIZEFLAG_GROW,												// GetSizeHint() is the minimum size. The widget can be expanded, but there is no advantage to it being larger (e.g. the horizontal direction of a push button).
+	HYSIZEPOLICY_MinimumExpanding = HY_SIZEFLAG_EXPAND,										// GetSizeHint() is the minimum size. The widget can make use of extra space, so it should get as much space as possible (e.g. the horizontal direction of a horizontal slider).
+	HYSIZEPOLICY_Expanding = HY_SIZEFLAG_GROW | HY_SIZEFLAG_SHRINK | HY_SIZEFLAG_EXPAND,	// GetSizeHint() is a sensible size, but the widget can be shrunk and still be useful. The widget can make use of extra space, so it should get as much space as possible (e.g. the horizontal direction of a horizontal slider).
 	HYSIZEPOLICY_Maximum = HY_SIZEFLAG_SHRINK,												// GetSizeHint() is the maximum size. The widget can be shrunk any amount without detriment if other widgets need the space (e.g. a separator line). It cannot be larger than the size provided by SizeHint().
 	HYSIZEPOLICY_Preferred = HY_SIZEFLAG_GROW | HY_SIZEFLAG_SHRINK,							// GetSizeHint() is best, but the widget can be shrunk and still be useful. The widget can be expanded, but there is no advantage to it being larger than SizeHint() (the default HyWidget policy).
-	HYSIZEPOLICY_MinimumExpanding = HY_SIZEFLAG_GROW | HY_SIZEFLAG_EXPAND,					// GetSizeHint() is the minimum size. The widget can make use of extra space, so it should get as much space as possible (e.g. the horizontal direction of a horizontal slider).
-	HYSIZEPOLICY_Expanding = HY_SIZEFLAG_GROW | HY_SIZEFLAG_SHRINK | HY_SIZEFLAG_EXPAND,	// GetSizeHint() is a sensible size, but the widget can be shrunk and still be useful. The widget can make use of extra space, so it should get as much space as possible (e.g. the horizontal direction of a horizontal slider).
 	HYSIZEPOLICY_None = HY_SIZEFLAG_GROW | HY_SIZEFLAG_SHRINK | HY_SIZEFLAG_IGNORE			// GetSizeHint() is ignored. The widget will use as little or as much space as possible.
 };
 
@@ -276,7 +277,7 @@ enum HyOrientation
 
 	HYNUM_ORIENTATIONS
 };
-static_assert(HYORIEN_Horizontal == 0 && HYORIEN_Vertical == 1, "HyOrientation enum order matters (glm::ivec2 [] dimension values) ");
+static_assert(HYORIEN_Horizontal == 0 && HYORIEN_Vertical == 1 && HYNUM_ORIENTATIONS == 2, "HyOrientation enum order matters (glm::ivec2 [] dimension values) ");
 
 enum HyThreadPriority
 {

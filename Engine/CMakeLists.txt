@@ -151,6 +151,7 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Widgets/IHyWidget.cpp
 	src/UI/Containers/IHy9Slice.cpp
 	src/UI/Containers/HyContainer.cpp
+	src/UI/Containers/HyScrollContainer.cpp
 	src/UI/Layouts/IHyLayout.cpp
 	src/UI/Layouts/HyBoxLayout.cpp
 	src/UI/Layouts/HyGridLayout.cpp
@@ -165,6 +166,7 @@ set(HYENGINE_SOURCE_FILES
 
 set(HYENGINE_HEADER_FILES
 	include/Harmony/HyEngine.h
+	include/Harmony/Afx/HyFlags.h
 	include/Harmony/Afx/HyInteropAfx.h
 	include/Harmony/Afx/HyStdAfx.h
 	include/Harmony/Afx/Compilers/HyCompiler.h
@@ -276,6 +278,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Widgets/IHyWidget.h
 	include/Harmony/UI/Containers/IHy9Slice.h
 	include/Harmony/UI/Containers/HyContainer.h
+	include/Harmony/UI/Containers/HyScrollContainer.h
 	include/Harmony/UI/Layouts/IHyLayout.h
 	include/Harmony/UI/Layouts/HyBoxLayout.h
 	include/Harmony/UI/Layouts/HyGridLayout.h

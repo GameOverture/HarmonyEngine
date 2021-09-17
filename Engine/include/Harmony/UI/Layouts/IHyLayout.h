@@ -24,19 +24,17 @@ class IHyLayout : public HyEntityUi
 
 protected:
 	const HyLayoutType					m_eLAYOUT_TYPE;
-
 	glm::ivec2							m_vSize;
-	glm::ivec2							m_vPreferredSize;
 	HyRectangle<int32>					m_Margins;		// Tag = Spacing between widgets inside the layout
 
 public:
 	IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent = nullptr);
 	virtual ~IHyLayout();
 
-	void ClearWidgets();
+	void Clear();
 
 	glm::ivec2 GetSize() const;
-	glm::ivec2 GetPreferredSize() const;
+	virtual glm::ivec2 GetSizeHint() = 0;	// The preferred size of *this
 
 	void SetMargins(int32 iLeft, int32 iBottom, int32 iRight, int32 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY);
 
@@ -45,6 +43,7 @@ public:
 	glm::ivec2 GetSpacing();
 
 protected:
+	virtual void OnClear() { }
 	virtual void OnSetLayoutItems() = 0;
 	void SetSize(int32 iNewWidth, int32 iNewHeight);
 

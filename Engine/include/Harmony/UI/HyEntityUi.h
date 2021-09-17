@@ -29,6 +29,7 @@ public:
 	virtual ~HyEntityUi();
 
 	UiType GetUiType() const;
+	virtual glm::ivec2 GetSizeHint() = 0;	// The preferred size of *this
 };
 
 #endif /* HyEntityUi_h__ */

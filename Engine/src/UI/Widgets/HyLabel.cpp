@@ -343,7 +343,7 @@ void HyLabel::CommonSetup()
 			static_cast<int32>(m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false)));
 	}
 	else if(m_Text.IsLoadDataValid())
-		HySetVec(vUiSizeHint, m_Text.GetTextWidth(true), m_Text.GetTextHeight(true));
+		HySetVec(vUiSizeHint, m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
 
 	// vUiSizeHint must be established - TODO: Is this still true?
 	if(vUiSizeHint.x == 0 || vUiSizeHint.y == 0)
@@ -465,11 +465,13 @@ void HyLabel::CommonSetup()
 		// Position text
 		auto vUiSizeHint = GetSizeHint();
 		m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x,
-			(m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y);
+					   (m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y);
 
 		// Size text
 		if(vPanelDimensions.x != 0.0f && vPanelDimensions.y != 0.0f)
+		{
 			m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)),
-				vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / vUiSizeHint.y)), true);
+								 vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / vUiSizeHint.y)), true);
+		}
 	}
 }

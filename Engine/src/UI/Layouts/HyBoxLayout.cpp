@@ -22,6 +22,11 @@ HyBoxLayout::HyBoxLayout(HyOrientation eOrientation, HyEntity2d *pParent /*= nul
 {
 }
 
+/*virtual*/ glm::ivec2 HyBoxLayout::GetSizeHint() /*override*/
+{
+	return m_vSizeHint;
+}
+
 void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
 {
 	ChildAppend(itemRef);
@@ -46,10 +51,10 @@ void HyBoxLayout::ReverseOrder(bool bReverse)
 
 	int32 iInverseOrien = m_eOrientation ? 0 : 1;
 
-	// Figure out m_vPreferredSize while counting size policies
-	m_vPreferredSize.x = m_Margins.left + m_Margins.right;
-	m_vPreferredSize.y = m_Margins.top + m_Margins.bottom;
-	m_vPreferredSize[m_eOrientation] += (GetSpacing()[m_eOrientation] * (uiNumChildren - 1));
+	// Figure out m_vSizeHint while counting size policies
+	m_vSizeHint.x = m_Margins.left + m_Margins.right;
+	m_vSizeHint.y = m_Margins.top + m_Margins.bottom;
+	m_vSizeHint[m_eOrientation] += (GetSpacing()[m_eOrientation] * (uiNumChildren - 1));
 	glm::ivec2 vNumGrowItems;
 	glm::ivec2 vNumExpandItems;
 	glm::ivec2 vNumShrinkItems;
@@ -59,12 +64,11 @@ void HyBoxLayout::ReverseOrder(bool bReverse)
 	{
 		// Children are guaranteed to be HyEntityUi
 		HyEntityUi *pItem = static_cast<HyEntityUi *>(pChildItem);
-		glm::ivec2 vItemSizeHint;
+		glm::ivec2 vItemSizeHint = pItem->GetSizeHint();
 			
 		if(pItem->GetUiType() == Ui_Widget)
 		{
 			IHyWidget *pWidget = static_cast<IHyWidget *>(pItem);
-			vItemSizeHint = pWidget->GetSizeHint();
 
 			vNumGrowItems.x += (pWidget->GetHorizontalPolicy() & HY_SIZEFLAG_GROW);				// Adds 1 or 0
 			vNumGrowItems.y += (pWidget->GetVerticalPolicy() & HY_SIZEFLAG_GROW);				// Adds 1 or 0
@@ -84,14 +88,13 @@ void HyBoxLayout::ReverseOrder(bool bReverse)
 		}
 		else // Ui_Layout
 		{
-			vItemSizeHint = static_cast<IHyLayout *>(pItem)->GetPreferredSize();
 			vNumGrowItems.x++; vNumGrowItems.y++;
 			vNumExpandItems.x++; vNumExpandItems.y++;
 			vNumShrinkItems.x++; vNumShrinkItems.y++;
 		}
 
-		m_vPreferredSize[m_eOrientation] += vItemSizeHint[m_eOrientation];
-		m_vPreferredSize[iInverseOrien] = HyMax(m_vPreferredSize[iInverseOrien], vItemSizeHint[iInverseOrien]);
+		m_vSizeHint[m_eOrientation] += vItemSizeHint[m_eOrientation];
+		m_vSizeHint[iInverseOrien] = HyMax(m_vSizeHint[iInverseOrien], vItemSizeHint[iInverseOrien]);
 	};
 	if(m_bReverse)
 		std::for_each(m_ChildList.rbegin(), m_ChildList.rend(), fpPreferredSize);
@@ -99,25 +102,25 @@ void HyBoxLayout::ReverseOrder(bool bReverse)
 		std::for_each(m_ChildList.begin(), m_ChildList.end(), fpPreferredSize);
 
 
-	// Determine if preferred size (m_vPreferredSize) fits within m_vSize
+	// Determine if preferred size (m_vSizeHint) fits within m_vSize
 	//	- Distrubute positive difference to all 'expanding' then 'grow' size policies
 	//	- Distrubute negative difference to all 'fill' then 'shrink' size policies
-	glm::vec2 vDifference = m_vSize - m_vPreferredSize;
+	glm::vec2 vDifference = m_vSize - m_vSizeHint;
 
-	float vGrowAmt = 0.0f;
-	float vExpandAmt = 0.0f;
-	float vShrinkAmt = 0.0f;
+	float fGrowAmt = 0.0f;
+	float fExpandAmt = 0.0f;
+	float fShrinkAmt = 0.0f;
 	if(vDifference[m_eOrientation] >= 0)
 	{
 		if(vNumExpandItems[m_eOrientation] > 0)
-			vExpandAmt = vDifference[m_eOrientation] / vNumExpandItems[m_eOrientation];
+			fExpandAmt = vDifference[m_eOrientation] / vNumExpandItems[m_eOrientation];
 		else if(vNumGrowItems[m_eOrientation] > 0)
-			vGrowAmt = vDifference[m_eOrientation] / vNumGrowItems[m_eOrientation];
+			fGrowAmt = vDifference[m_eOrientation] / vNumGrowItems[m_eOrientation];
 	}
 	else
 	{
 		if(vNumShrinkItems[m_eOrientation] > 0)
-			vShrinkAmt = vDifference[m_eOrientation] / vNumShrinkItems[m_eOrientation];
+			fShrinkAmt = vDifference[m_eOrientation] / vNumShrinkItems[m_eOrientation];
 	}
 
 	// Finally go through each child and set its position and OnResize()
@@ -139,9 +142,9 @@ void HyBoxLayout::ReverseOrder(bool bReverse)
 
 			// Resize this item based on all the final calculations of size policies and size constraints
 			HySizePolicy eSizePolicy = pWidget->GetSizePolicy(static_cast<HyOrientation>(m_eOrientation));
-			vItemSize[m_eOrientation] += static_cast<int32>(vGrowAmt * (eSizePolicy & HY_SIZEFLAG_GROW));
-			vItemSize[m_eOrientation] += static_cast<int32>(vExpandAmt * ((eSizePolicy & HY_SIZEFLAG_EXPAND) >> 1));
-			vItemSize[m_eOrientation] += static_cast<int32>(vShrinkAmt * ((eSizePolicy & HY_SIZEFLAG_SHRINK) >> 2));
+			vItemSize[m_eOrientation] += static_cast<int32>(fGrowAmt * (eSizePolicy & HY_SIZEFLAG_GROW));
+			vItemSize[m_eOrientation] += static_cast<int32>(fExpandAmt * ((eSizePolicy & HY_SIZEFLAG_EXPAND) >> 1));
+			vItemSize[m_eOrientation] += static_cast<int32>(fShrinkAmt * ((eSizePolicy & HY_SIZEFLAG_SHRINK) >> 2));
 
 			HySizePolicy eInverseSizePolicy = pWidget->GetSizePolicy(static_cast<HyOrientation>(iInverseOrien));
 			if(vDifference[iInverseOrien] >= 0)
@@ -165,11 +168,11 @@ void HyBoxLayout::ReverseOrder(bool bReverse)
 		else // Ui_Layout
 		{
 			IHyLayout *pLayout = static_cast<IHyLayout *>(pItem);
-			vItemSize = pLayout->GetPreferredSize();
+			vItemSize = pLayout->GetSizeHint();
 
-			vItemSize[m_eOrientation] += static_cast<int32>(vGrowAmt);
-			vItemSize[m_eOrientation] += static_cast<int32>(vExpandAmt);
-			vItemSize[m_eOrientation] += static_cast<int32>(vShrinkAmt);
+			vItemSize[m_eOrientation] += static_cast<int32>(fGrowAmt);
+			vItemSize[m_eOrientation] += static_cast<int32>(fExpandAmt);
+			vItemSize[m_eOrientation] += static_cast<int32>(fShrinkAmt);
 
 			vItemSize[iInverseOrien] += m_vSize[iInverseOrien] - vItemSize[iInverseOrien];
 
