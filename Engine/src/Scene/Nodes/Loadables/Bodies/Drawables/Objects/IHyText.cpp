@@ -12,6 +12,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
 #include "Assets/Nodes/HyText2dData.h"
+#include "Utilities/HyMath.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -444,7 +445,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit
 	else
 		m_uiTextAttributes &= ~TEXTATTRIB_ColumnSplitWordsToFit;
 
-	m_vBoxDimensions.x = fWidth;
+	m_vBoxDimensions.x = HyMax(1.0f, fWidth);
 	m_vBoxDimensions.y = 0.0f;
 
 #ifdef HY_USE_TEXT_DEBUG_BOXES

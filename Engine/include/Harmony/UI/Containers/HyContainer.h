@@ -17,6 +17,8 @@
 
 class HyContainer : public HyEntityUi
 {
+	friend class IHyLayout;
+
 protected:
 	IHyLayout *				m_pRootLayout;
 	HyPrimitivePanel *		m_pPrimPanel;
@@ -45,15 +47,19 @@ public:
 	bool IsTransition();
 	bool IsShown();
 
-	IHyLayout *GetRootLayout();
-	template<typename LAYOUT>
-	LAYOUT *GetRootLayout() {
-		return static_cast<LAYOUT *>(m_pRootLayout);
-	}
+	void AppendItem(HyEntityUi &itemRef);
+	void ClearItems();
+
+	//IHyLayout *GetRootLayout();
+	//template<typename LAYOUT>
+	//LAYOUT *GetRootLayout() {
+	//	return static_cast<LAYOUT *>(m_pRootLayout);
+	//}
 
 protected:
 	virtual void OnUpdate() override final;
 	virtual void OnContainerUpdate() { }
+	virtual void OnSetLayoutItems() { }
 
 	// Optional overrides to control show and hide animations/functionality
 	virtual float OnBeginShow() { return 0.0f; }	// Returns the duration (in seconds) of the show transition

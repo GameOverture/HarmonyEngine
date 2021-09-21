@@ -70,7 +70,7 @@ public:
 	void InsertItem(HyEntityUi *pItem, uint32 uiX, uint32 uiY, uint32 uiColumnSpan = 0, uint32 uiRowSpan = 0);
 
 protected:
-	virtual void OnClear() override;
+	virtual void OnClearItems() override;
 	virtual void OnSetLayoutItems() override;
 
 	void EmbiggenGrid(uint32 uiNumColumns, uint32 uiNumRows);

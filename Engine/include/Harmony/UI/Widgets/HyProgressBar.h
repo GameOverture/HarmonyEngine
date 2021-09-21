@@ -33,7 +33,7 @@ public:
 	HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyProgressBar();
 
-	void SetFillMargins(const HyRectangle<float> &fillMarginsRef);
+	void SetFillMargins(const HyRectangle<int32> &fillMarginsRef);
 	void SetFillMargins(int32 iFillMarginLeft, int32 iFillMarginBottom, int32 iFillMarginRight, int32 iFillMarginTop);
 
 	void Reset();

@@ -30,7 +30,6 @@ public:
 
 	virtual glm::ivec2 GetSizeHint() override;	// The preferred size of *this
 
-	void AppendItem(HyEntityUi &itemRef);
 	void ReverseOrder(bool bReverse);
 
 protected:

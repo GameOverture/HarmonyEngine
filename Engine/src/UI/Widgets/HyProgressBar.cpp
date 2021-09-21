@@ -64,14 +64,14 @@ HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, s
 	delete m_pFill;
 }
 
-void HyProgressBar::SetFillMargins(const HyRectangle<float> &fillMarginsRef)
+void HyProgressBar::SetFillMargins(const HyRectangle<int32> &fillMarginsRef)
 {
 	SetFillMargins(fillMarginsRef.left, fillMarginsRef.bottom, fillMarginsRef.right, fillMarginsRef.top);
 }
 
 void HyProgressBar::SetFillMargins(int32 iFillMarginLeft, int32 iFillMarginBottom, int32 iFillMarginRight, int32 iFillMarginTop)
 {
-	m_FillMargins.Set(iFillMarginLeft, iFillMarginBottom, iFillMarginRight, iFillMarginTop);
+	m_FillMargins.Set(static_cast<float>(iFillMarginLeft), static_cast<float>(iFillMarginBottom), static_cast<float>(iFillMarginRight), static_cast<float>(iFillMarginTop));
 
 	if(m_pFill->GetType() == HYTYPE_Primitive)
 	{

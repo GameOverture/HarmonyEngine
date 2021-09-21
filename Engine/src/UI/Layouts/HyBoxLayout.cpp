@@ -27,12 +27,6 @@ HyBoxLayout::HyBoxLayout(HyOrientation eOrientation, HyEntity2d *pParent /*= nul
 	return m_vSizeHint;
 }
 
-void HyBoxLayout::AppendItem(HyEntityUi &itemRef)
-{
-	ChildAppend(itemRef);
-	OnSetLayoutItems();
-}
-
 void HyBoxLayout::ReverseOrder(bool bReverse)
 {
 	if(m_eOrientation == HYORIEN_Horizontal)
@@ -40,7 +34,7 @@ void HyBoxLayout::ReverseOrder(bool bReverse)
 	else
 		m_bReverse = !bReverse; // HYORIEN_Vertical needs this flipped to achieve top->bottom default
 
-	OnSetLayoutItems();
+	SetLayoutItems();
 }
 
 /*virtual*/ void HyBoxLayout::OnSetLayoutItems() /*override*/

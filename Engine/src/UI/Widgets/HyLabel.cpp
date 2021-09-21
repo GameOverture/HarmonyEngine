@@ -19,6 +19,7 @@ HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	m_SpritePanel("", "", this),
 	m_Text("", "")
 {
+	Setup("", "", "", "");
 }
 
 HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
@@ -343,7 +344,7 @@ void HyLabel::CommonSetup()
 			static_cast<int32>(m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false)));
 	}
 	else if(m_Text.IsLoadDataValid())
-		HySetVec(vUiSizeHint, m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
+		HySetVec(vUiSizeHint, static_cast<int32>(m_Text.GetTextWidth(false)), static_cast<int32>(m_Text.GetTextHeight(false)));
 
 	// vUiSizeHint must be established - TODO: Is this still true?
 	if(vUiSizeHint.x == 0 || vUiSizeHint.y == 0)

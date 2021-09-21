@@ -10,11 +10,13 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Layouts/IHyLayout.h"
 #include "UI/Widgets/IHyWidget.h"
+#include "UI/Containers/HyContainer.h"
 
 IHyLayout::IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntityUi(Ui_Layout, pParent),
+	m_pContainerParent(nullptr),
 	m_eLAYOUT_TYPE(eLayoutType),
-	m_vSize(0, 0)
+	m_vSize(1, 1)
 {
 }
 
@@ -22,13 +24,19 @@ IHyLayout::IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/
 {
 }
 
-/*virtual*/ void IHyLayout::Clear() /*override*/
+void IHyLayout::AppendItem(HyEntityUi &itemRef)
+{
+	ChildAppend(itemRef);
+	SetLayoutItems();
+}
+
+/*virtual*/ void IHyLayout::ClearItems() /*override*/
 {
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
-	OnClear();
-	OnSetLayoutItems();
+	OnClearItems();
+	SetLayoutItems();
 }
 
 glm::ivec2 IHyLayout::GetSize() const
@@ -40,7 +48,7 @@ void IHyLayout::SetMargins(int32 iLeft, int32 iBottom, int32 iRight, int32 iTop,
 {
 	m_Margins.Set(iLeft, iBottom, iRight, iTop);
 	m_Margins.iTag = uiWidgetSpacingX | (uiWidgetSpacingY << 16);
-	OnSetLayoutItems();
+	SetLayoutItems();
 }
 
 uint16 IHyLayout::GetHorizontalSpacing()
@@ -58,10 +66,22 @@ glm::ivec2 IHyLayout::GetSpacing()
 	return glm::ivec2(GetHorizontalSpacing(), GetVerticalSpacing());
 }
 
+void IHyLayout::SetLayoutItems()
+{
+	OnSetLayoutItems();
+	if(m_pContainerParent)
+		m_pContainerParent->OnSetLayoutItems();
+}
+
 void IHyLayout::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
 	HySetVec(m_vSize, iNewWidth, iNewHeight);
-	OnSetLayoutItems();
+	SetLayoutItems();
+}
+
+void IHyLayout::SetContainerParent(HyContainer *pContainerParent)
+{
+	m_pContainerParent = pContainerParent;
 }
 
 /*friend*/ void HyInternal_LayoutSetSize(IHyLayout &layoutRef, int32 iNewWidth, int32 iNewHeight)

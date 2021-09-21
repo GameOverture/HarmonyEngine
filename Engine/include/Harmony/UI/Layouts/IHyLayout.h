@@ -13,6 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/HyEntityUi.h"
 
+class HyContainer;
+
 #define HY_UILAYOUT \
 	private:\
 		using HyEntity2d::ChildAppend; \
@@ -21,8 +23,10 @@
 class IHyLayout : public HyEntityUi
 {
 	HY_UILAYOUT
+	friend class HyContainer;
 
 protected:
+	HyContainer *						m_pContainerParent;
 	const HyLayoutType					m_eLAYOUT_TYPE;
 	glm::ivec2							m_vSize;
 	HyRectangle<int32>					m_Margins;		// Tag = Spacing between widgets inside the layout
@@ -31,7 +35,8 @@ public:
 	IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent = nullptr);
 	virtual ~IHyLayout();
 
-	void Clear();
+	void AppendItem(HyEntityUi &itemRef);
+	void ClearItems();
 
 	glm::ivec2 GetSize() const;
 	virtual glm::ivec2 GetSizeHint() = 0;	// The preferred size of *this
@@ -43,9 +48,14 @@ public:
 	glm::ivec2 GetSpacing();
 
 protected:
-	virtual void OnClear() { }
+	void SetLayoutItems();
+
+	virtual void OnClearItems() { }
 	virtual void OnSetLayoutItems() = 0;
 	void SetSize(int32 iNewWidth, int32 iNewHeight);
+
+private:
+	void SetContainerParent(HyContainer *pContainerParent);
 
 	friend void HyInternal_LayoutSetSize(IHyLayout &layoutRef, int32 iNewWidth, int32 iNewHeight);
 };

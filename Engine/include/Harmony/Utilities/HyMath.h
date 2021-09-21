@@ -169,6 +169,58 @@ struct HyScreenRect
 	}
 };
 
+class HyColor
+{
+public:
+	uint8		alpha;
+	uint8		red;
+	uint8		green;
+	uint8		blue;
+
+	HyColor() :
+		alpha(0xFF),
+		red(0x00),
+		green(0x00),
+		blue(0x00)
+	{ }
+	HyColor(uint8 uiRed, uint8 uiGreen, uint8 uiBlue, uint8 uiAlpha = 0xFF) :
+		alpha(uiAlpha),
+		red(uiRed),
+		green(uiGreen),
+		blue(uiBlue)
+	{ }
+	HyColor(uint32 uiColor) :
+		alpha((uiColor >> 24) & 0xFF),
+		red((uiColor >> 16) & 0xFF),
+		green((uiColor >> 8) & 0xFF),
+		blue(uiColor & 0xFF)
+	{ }
+	HyColor(float fRed, float fGreen, float fBlue, float fAlpha = 1.0f) :
+		alpha(static_cast<uint8>(255.0f * HyClamp(fAlpha, 0.0f, 1.0f))),
+		red(static_cast<uint8>(255.0f * HyClamp(fRed, 0.0f, 1.0f))),
+		green(static_cast<uint8>(255.0f * HyClamp(fGreen, 0.0f, 1.0f))),
+		blue(static_cast<uint8>(255.0f * HyClamp(fBlue, 0.0f, 1.0f)))
+	{ }
+
+	// Returned as uint32 mask: ARGB
+	uint32 GetColor32() {
+		return (alpha << 24) | (red << 16) | (green << 8) | blue;
+	}
+
+	float GetRedF() const {
+		return red / 255.0f;
+	}
+	float GetGreenF() const {
+		return green / 255.0f;
+	}
+	float GetBlueF() const {
+		return blue / 255.0f;
+	}
+	float GetAlphaF() const {
+		return alpha / 255.0f;
+	}
+};
+
 class HyMath
 {
 public:

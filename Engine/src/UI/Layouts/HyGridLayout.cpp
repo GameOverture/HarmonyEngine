@@ -51,7 +51,7 @@ void HyGridLayout::SetColumnMinimumWidth(uint32 uiColumnIndex, uint32 uiMinWidth
 		EmbiggenGrid(uiColumnIndex + 1, GetNumRows());
 
 	m_ColMinWidthList[uiColumnIndex] = uiMinWidth;
-	OnSetLayoutItems();
+	SetLayoutItems();
 }
 
 uint32 HyGridLayout::GetRowMinimumHeight(uint32 uiRowIndex)
@@ -68,7 +68,7 @@ void HyGridLayout::SetRowMinimumHeight(uint32 uiRowIndex, uint32 uiMinHeight)
 		EmbiggenGrid(GetNumColumns(), uiRowIndex + 1);
 
 	m_RowMinHeightList[uiRowIndex] = uiMinHeight;
-	OnSetLayoutItems();
+	SetLayoutItems();
 }
 
 
@@ -86,7 +86,7 @@ void HyGridLayout::SetColumnStretchPriority(uint32 uiColumnIndex, uint32 uiColum
 		EmbiggenGrid(uiColumnIndex + 1, GetNumRows());
 
 	m_ColumnStretchPriorityList[uiColumnIndex] = uiColumnStretchPriority;
-	OnSetLayoutItems();
+	SetLayoutItems();
 }
 
 uint32 HyGridLayout::GetRowStretchPriority(uint32 uiRowIndex)
@@ -103,7 +103,7 @@ void HyGridLayout::SetRowStretchPriority(uint32 uiRowIndex, uint32 uiRowStretchP
 		EmbiggenGrid(GetNumColumns(), uiRowIndex + 1);
 
 	m_RowStretchPriorityList[uiRowIndex] = uiRowStretchPriority;
-	OnSetLayoutItems();
+	SetLayoutItems();
 }
 
 // Item indices are laid out using row-major
@@ -152,10 +152,10 @@ void HyGridLayout::InsertItem(HyEntityUi *pItem, uint32 uiX, uint32 uiY, uint32 
 		}
 	}
 
-	OnSetLayoutItems();
+	SetLayoutItems();
 }
 
-/*virtual*/ void HyGridLayout::OnClear() /*override*/
+/*virtual*/ void HyGridLayout::OnClearItems() /*override*/
 {
 	HySetVec(m_vGridSize, 0, 0);
 	m_ColMinWidthList.clear();

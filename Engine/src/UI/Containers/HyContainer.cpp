@@ -45,10 +45,10 @@ glm::ivec2 HyContainer::GetSize() const
 
 void HyContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
-	HyInternal_LayoutSetSize(*m_pRootLayout, iNewWidth, iNewHeight);
-
 	if(m_pPrimPanel)
 		m_pPrimPanel->SetSize(iNewWidth, iNewHeight);
+
+	HyInternal_LayoutSetSize(*m_pRootLayout, iNewWidth, iNewHeight);
 }
 
 bool HyContainer::Show(bool bInstant /*= false*/)
@@ -103,9 +103,14 @@ bool HyContainer::IsShown()
 	return m_eContainerState == CONTAINERSTATE_Shown || m_eContainerState == CONTAINERSTATE_Showing;
 }
 
-IHyLayout *HyContainer::GetRootLayout()
+void HyContainer::AppendItem(HyEntityUi &itemRef)
 {
-	return m_pRootLayout;
+	m_pRootLayout->AppendItem(itemRef);
+}
+
+void HyContainer::ClearItems()
+{
+	m_pRootLayout->ClearItems();
 }
 
 /*virtual*/ void HyContainer::OnUpdate() /*override final*/
@@ -148,13 +153,17 @@ void HyContainer::AllocRootLayout(HyLayoutType eRootLayout)
 		break;
 
 	default:
-		HyError("HyContainer::HyContainer layout type not supported");
-		break;
+		HyError("HyContainer::HyContainer layout type not implemented");
+		return;
 	}
+	m_pRootLayout->SetContainerParent(this);
 
 	if(m_pPrimPanel)
 		HyInternal_LayoutSetSize(*m_pRootLayout, m_pPrimPanel->GetSize().x, m_pPrimPanel->GetSize().y);
-	//m_pRootLayout-
+}
+
+void OnSetLayoutItems()
+{
 }
 
 /*virtual*/ glm::ivec2 HyContainer::GetSizeHint() /*override*/
