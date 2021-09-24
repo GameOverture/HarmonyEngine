@@ -30,10 +30,16 @@ class HyScrollContainer : public HyContainer
 
 public:
 	HyScrollContainer(HyLayoutType eRootLayout, HyEntity2d *pParent = nullptr);
-	HyScrollContainer(HyLayoutType eRootLayout, int32 iWidth, int32 iHeight, int32 iStroke, uint32 uiScrollBarDiameter, HyEntity2d *pParent = nullptr);
+	HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, uint32 uiScrollBarDiameter, HyEntity2d *pParent = nullptr);
 	virtual ~HyScrollContainer();
 
-	virtual void OnSetLayoutItems();
+	void SetScrollBarColor(HyColor color);
+
+protected:
+	virtual void OnContainerUpdate() override;
+	virtual void OnSetLayoutItems() override;
+
+	static void OnScroll(HyScrollBar *pSelf, uint32 uiNewPosition, void *pData);
 };
 
 #endif /* HyScrollContainer_h__ */

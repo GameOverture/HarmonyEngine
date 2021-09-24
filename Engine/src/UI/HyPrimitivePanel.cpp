@@ -10,21 +10,28 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/HyPrimitivePanel.h"
 
-HyPrimitivePanel::HyPrimitivePanel(uint32 uiWidth, uint32 uiHeight, uint32 uiBorderSize, HyEntity2d *pParent) :
+HyPrimitivePanelInit::HyPrimitivePanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiBorderSize /*= 4*/, HyColor backgroundColor /*= HyColor(0x252526)*/, HyColor borderColor /*= HyColor(0x3F3F41)*/) :
+	m_uiWidth(uiWidth),
+	m_uiHeight(uiHeight),
+	m_uiBorderSize(uiBorderSize),
+	m_BgColor(backgroundColor),
+	m_BorderColor(borderColor)
+{ }
+
+HyPrimitivePanel::HyPrimitivePanel(const HyPrimitivePanelInit &initRef, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_Stroke(this),
 	m_Border(this),
 	m_BG(this),
-	m_vSize(uiWidth, uiHeight),
-	m_uiBorderSize(uiBorderSize)
+	m_Data(initRef)
 {
 	m_Stroke.SetWireframe(true);
 
-	SetSize(m_vSize.x, m_vSize.y);
+	SetSize(m_Data.m_uiWidth, m_Data.m_uiHeight);
+	SetBgColor(m_Data.m_BgColor);
+	SetBorderColor(m_Data.m_BorderColor);
 
-	SetBgColor(0x252526);
-	SetBorderColor(0x3F3F41);
-
+	// TODO: Refactor so Primitives should not require Load()
 	Load();
 }
 
@@ -32,67 +39,47 @@ HyPrimitivePanel::HyPrimitivePanel(uint32 uiWidth, uint32 uiHeight, uint32 uiBor
 {
 }
 
-HyAnimVec3 &HyPrimitivePanel::BgColorTop()
+HyColor HyPrimitivePanel::GetBgColor() const
 {
-	return m_BG.topColor;
+	return HyColor(m_BG.topColor.X(), m_BG.topColor.Y(), m_BG.topColor.Z());
 }
 
-HyAnimVec3 &HyPrimitivePanel::BgColorBot()
+void HyPrimitivePanel::SetBgColor(HyColor color)
 {
-	return m_BG.botColor;
+	m_BG.SetTint(color);
 }
 
-void HyPrimitivePanel::SetBgColor(float fR, float fG, float fB)
+HyColor HyPrimitivePanel::GetBorderColor() const
 {
-	m_BG.SetTint(fR, fG, fB);
+	return HyColor(m_Border.topColor.X(), m_Border.topColor.Y(), m_Border.topColor.Z());
 }
 
-void HyPrimitivePanel::SetBgColor(uint32 uiColor)
+void HyPrimitivePanel::SetBorderColor(HyColor color)
 {
-	m_BG.SetTint(uiColor);
-}
-
-HyAnimVec3 &HyPrimitivePanel::BorderColorTop()
-{
-	return m_Border.topColor;
-}
-
-HyAnimVec3 &HyPrimitivePanel::BorderColorBot()
-{
-	return m_Border.botColor;
-}
-
-// TODO: Stroke color
-//void HyPrimitivePanel::SetBorderColor(float fR, float fG, float fB)
-//{
-//	m_Border.SetTint(fR, fG, fB);
-//	//uint32 uiColorStroke = (uiColorFill & 0xfefefe) >> 1;
-//}
-
-void HyPrimitivePanel::SetBorderColor(uint32 uiColor)
-{
-	m_Border.SetTint(uiColor);
-	m_Stroke.SetTint((uiColor & 0xfefefe) << 1);
+	m_Border.SetTint(color);
+	m_Stroke.SetTint(color.Lighten());
 }
 
 glm::ivec2 HyPrimitivePanel::GetSize() const
 {
-	return m_vSize;
+	return glm::ivec2(m_Data.m_uiWidth, m_Data.m_uiHeight);
 }
 
 void HyPrimitivePanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 {
-	HySetVec(m_vSize, uiWidth, uiHeight);
-	m_BG.SetAsBox(m_vSize.x, m_vSize.y);
-	m_Stroke.SetAsBox(m_vSize.x, m_vSize.y);
+	m_Data.m_uiWidth = uiWidth;
+	m_Data.m_uiHeight = uiHeight;
 
-	m_Border.SetAsBox(m_vSize.x + (m_uiBorderSize * 2), m_vSize.y + (m_uiBorderSize * 2));
-	m_Border.pos.Set(-static_cast<int32>(m_uiBorderSize), -static_cast<int32>(m_uiBorderSize));
+	m_BG.SetAsBox(m_Data.m_uiWidth, m_Data.m_uiHeight);
+	m_Stroke.SetAsBox(m_Data.m_uiWidth, m_Data.m_uiHeight);
+
+	m_Border.SetAsBox(m_Data.m_uiWidth + (m_Data.m_uiBorderSize * 2), m_Data.m_uiHeight + (m_Data.m_uiBorderSize * 2));
+	m_Border.pos.Set(-static_cast<int32>(m_Data.m_uiBorderSize), -static_cast<int32>(m_Data.m_uiBorderSize));
 }
 
 uint32 HyPrimitivePanel::GetBorderSize() const
 {
-	return m_uiBorderSize;
+	return m_Data.m_uiBorderSize;
 }
 
 void HyPrimitivePanel::SetBorderSize(uint32 uiBorderSize)
@@ -101,8 +88,8 @@ void HyPrimitivePanel::SetBorderSize(uint32 uiBorderSize)
 	if(uiBorderSize & 1)
 		uiBorderSize++;
 
-	m_uiBorderSize = uiBorderSize;
+	m_Data.m_uiBorderSize = uiBorderSize;
 
-	m_Border.SetAsBox(m_vSize.x + (m_uiBorderSize * 2), m_vSize.y + (m_uiBorderSize * 2));
-	m_Border.pos.Set(m_uiBorderSize * -0.5f, m_uiBorderSize * -0.5f);
+	m_Border.SetAsBox(m_Data.m_uiWidth + (m_Data.m_uiBorderSize * 2), m_Data.m_uiHeight + (m_Data.m_uiBorderSize * 2));
+	m_Border.pos.Set(m_Data.m_uiBorderSize * -0.5f, m_Data.m_uiBorderSize * -0.5f);
 }

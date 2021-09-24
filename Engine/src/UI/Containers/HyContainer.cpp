@@ -22,10 +22,10 @@ HyContainer::HyContainer(HyLayoutType eRootLayout, HyEntity2d *pParent /*= nullp
 	AllocRootLayout(eRootLayout);
 }
 
-HyContainer::HyContainer(HyLayoutType eRootLayout, int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent /*= nullptr*/) :
+HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntityUi(Ui_Container, pParent),
 	m_pRootLayout(nullptr),
-	m_pPrimPanel(HY_NEW HyPrimitivePanel(iWidth, iHeight, iStroke, this)),
+	m_pPrimPanel(HY_NEW HyPrimitivePanel(initRef, this)),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f)
 {
@@ -118,6 +118,7 @@ void HyContainer::ClearItems()
 	if(m_fElapsedTime > 0.0f)
 	{
 		m_fElapsedTime -= HyEngine::DeltaTime();
+		OnContainerUpdate();
 		return;
 	}
 

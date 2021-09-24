@@ -191,6 +191,9 @@ bool HyEngine::PollPlatformApi()
 		case SDL_MOUSEBUTTONUP:
 			m_Input.DoMouseUpEvent(sdlEvent);
 			break;
+		case SDL_MOUSEWHEEL:
+			m_Input.DoMouseWheelEvent(sdlEvent);
+			break;
 		}
 	}
 #endif

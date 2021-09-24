@@ -22,24 +22,24 @@ HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	Setup("", "", "", "");
 }
 
-HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "")
 {
-	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName, iStroke, iStroke, iStroke, iStroke);
+	Setup(initRef, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
-HyLabel::HyLabel(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiPanelAttribs(0),
 	m_pPrimPanel(nullptr),
 	m_SpritePanel("", "", this),
 	m_Text("", "")
 {
-	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
+	Setup(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
 
 HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
@@ -67,9 +67,9 @@ HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string s
 	delete m_pPrimPanel;
 }
 
-void HyLabel::Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName)
+void HyLabel::Setup(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName)
 {
-	Setup(iWidth, iHeight, iStroke, sTextPrefix, sTextName, 0, 0, 0, 0);
+	Setup(initRef, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
@@ -77,13 +77,13 @@ void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::strin
 	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
-void HyLabel::Setup(int32 iWidth, int32 iHeight, int32 iStroke, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
+void HyLabel::Setup(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
 {
 	m_uiPanelAttribs |= PANELATTRIB_IsPrimitive;
 
 	m_SpritePanel.Uninit();
 	delete m_pPrimPanel;
-	m_pPrimPanel = HY_NEW HyPrimitivePanel(iWidth, iHeight, iStroke, this);
+	m_pPrimPanel = HY_NEW HyPrimitivePanel(initRef, this);
 
 	m_Text.Init(sTextPrefix, sTextName, this);
 	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
@@ -300,9 +300,9 @@ void HyLabel::SetHideDisabled(bool bIsHideDisabled)
 	}
 }
 
-HyEntity2d *HyLabel::GetPrimitiveNode()
+HyPrimitivePanel *HyLabel::GetPrimitivePanel()
 {
-	return	m_pPrimPanel;
+	return m_pPrimPanel;
 }
 
 HySprite2d &HyLabel::GetSpriteNode()

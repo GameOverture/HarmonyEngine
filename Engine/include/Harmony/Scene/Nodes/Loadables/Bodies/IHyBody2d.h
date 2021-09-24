@@ -43,6 +43,7 @@ public:
 	IHyBody2d &operator=(IHyBody2d &&donor) noexcept;
 
 	void SetTint(float fR, float fG, float fB);
+	void SetTint(HyColor color);
 	void SetTint(uint32 uiColor);
 
 	float CalculateAlpha();

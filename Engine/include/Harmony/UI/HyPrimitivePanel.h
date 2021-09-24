@@ -13,28 +13,35 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 
+struct HyPrimitivePanelInit
+{
+	uint32					m_uiWidth;
+	uint32					m_uiHeight;
+	uint32					m_uiBorderSize;
+
+	HyColor					m_BgColor;
+	HyColor					m_BorderColor;
+
+	HyPrimitivePanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiBorderSize = 4, HyColor backgroundColor = HyColor(0x252526), HyColor borderColor = HyColor(0x3F3F41));
+};
+
 class HyPrimitivePanel : public HyEntity2d
 {
-	HyPrimitive2d		m_Border;
-	HyPrimitive2d		m_BG;
-	HyPrimitive2d		m_Stroke;	// Acts as thin stroke around the BG always 1px in size
+	HyPrimitive2d			m_Border;
+	HyPrimitive2d			m_BG;
+	HyPrimitive2d			m_Stroke;	// Acts as thin stroke around the BG always 1px in size
 	
-	glm::ivec2			m_vSize;
-	uint32				m_uiBorderSize;
+	HyPrimitivePanelInit	m_Data;		// This structure is always kept up to date with current settings
 
 public:
-	HyPrimitivePanel(uint32 uiWidth, uint32 uiHeight, uint32 uiBorderSize, HyEntity2d *pParent);
+	HyPrimitivePanel(const HyPrimitivePanelInit &initRef, HyEntity2d *pParent);
 	virtual ~HyPrimitivePanel();
 
-	HyAnimVec3 &BgColorTop();
-	HyAnimVec3 &BgColorBot();
-	void SetBgColor(float fR, float fG, float fB);
-	void SetBgColor(uint32 uiColor);
+	HyColor GetBgColor() const;
+	void SetBgColor(HyColor color);
 
-	HyAnimVec3 &BorderColorTop();
-	HyAnimVec3 &BorderColorBot();
-	void SetBorderColor(float fR, float fG, float fB);
-	void SetBorderColor(uint32 uiColor);
+	HyColor GetBorderColor() const;
+	void SetBorderColor(HyColor color);
 
 	glm::ivec2 GetSize() const;
 	void SetSize(uint32 uiWidth, uint32 uiHeight);

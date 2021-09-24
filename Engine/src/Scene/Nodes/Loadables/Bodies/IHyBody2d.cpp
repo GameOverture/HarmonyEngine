@@ -150,6 +150,11 @@ void IHyBody2d::SetTint(float fR, float fG, float fB)
 	botColor.Set(fR, fG, fB);
 }
 
+void IHyBody2d::SetTint(HyColor color)
+{
+	SetTint(color.GetRedF(), color.GetGreenF(), color.GetBlueF());
+}
+
 void IHyBody2d::SetTint(uint32 uiColor)
 {
 	SetTint(((uiColor >> 16) & 0xFF) / 255.0f,

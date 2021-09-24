@@ -35,7 +35,7 @@ protected:
 
 public:
 	HyContainer(HyLayoutType eRootLayout, HyEntity2d *pParent = nullptr);
-	HyContainer(HyLayoutType eRootLayout, int32 iWidth, int32 iHeight, int32 iStroke, HyEntity2d *pParent = nullptr);
+	HyContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyContainer();
 
 	glm::ivec2 GetSize() const;
