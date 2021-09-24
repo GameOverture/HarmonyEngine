@@ -29,6 +29,8 @@ class HyInput
 	uint32						m_uiMouseBtnFlags;
 	uint32						m_uiMouseBtnFlags_NewlyPressed;
 	uint32						m_uiMouseBtnFlags_Buffered;
+	glm::ivec2					m_vMouseScroll_LiveCount;
+	glm::ivec2					m_vMouseScroll_ThisFrame;
 
 	bool						m_bTouchScreenHack;	// Some touch screens do not send a 'MOUSE DOWN' message on initial touch, until you "drag" the cursor at least 1px or release the touch
 
@@ -48,6 +50,7 @@ public:
 	uint32 GetMouseWindowIndex() const;
 	glm::vec2 GetMousePos() const;
 	bool GetWorldMousePos(glm::vec2 &ptWorldPosOut) const;
+	glm::ivec2 GetMouseScroll() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup Button/Axis Mapping
@@ -105,9 +108,10 @@ private:
 #elif defined(HY_USE_SDL2)
 	void DoKeyDownEvent(const SDL_Event &eventRef);
 	void DoKeyUpEvent(const SDL_Event &eventRef);
+	void DoMouseMoveEvent(const SDL_Event &eventRef);
 	void DoMouseDownEvent(const SDL_Event &eventRef);
 	void DoMouseUpEvent(const SDL_Event &eventRef);
-	void DoMouseMoveEvent(const SDL_Event &eventRef);
+	void DoMouseWheelEvent(const SDL_Event &eventRef);
 	void SetMouseWindow(HyWindow *pWindow);
 #endif
 

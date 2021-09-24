@@ -45,6 +45,10 @@
 
 	void HyGlfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY)
 	{
+		HyInput &inputRef = HyEngine::Input();
+
+		inputRef.m_vMouseScroll_LiveCount.x += static_cast<int32>(dX);
+		inputRef.m_vMouseScroll_LiveCount.y += static_cast<int32>(dY);
 	}
 
 	void HyGlfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods)
@@ -154,6 +158,11 @@ glm::vec2 HyInput::GetMousePos() const
 bool HyInput::GetWorldMousePos(glm::vec2 &ptWorldPosOut) const
 {
 	return m_pMouseWindow->ProjectToWorldPos2d(GetMousePos(), ptWorldPosOut);
+}
+
+glm::ivec2 HyInput::GetMouseScroll() const
+{
+	return m_vMouseScroll_ThisFrame;
 }
 
 void HyInput::SetActionCategory(int32 iActionId, uint8 uiCategory, uint32 uiMappingIndex /*= 0*/)
@@ -274,6 +283,16 @@ void HyInput::DoKeyUpEvent(const SDL_Event &eventRef)
 		m_pInputMaps[i].ApplyInput(eventRef.key.keysym.sym, HYBTN_Release);
 }
 
+void HyInput::DoMouseMoveEvent(const SDL_Event &eventRef)
+{
+	m_ptMousePos.x = static_cast<float>(eventRef.motion.x);
+	m_ptMousePos.y = static_cast<float>(eventRef.motion.y);
+
+	//if(m_bTouchScreenHack)
+	//	DoMouseBtnEvent(
+	//	glfw_MouseButtonCallback(pWindow, HYMOUSE_BtnLeft, GLFW_PRESS, 0);
+}
+
 void HyInput::DoMouseDownEvent(const SDL_Event &eventRef)
 {
 	m_uiMouseBtnFlags |= (1 << eventRef.button.button);
@@ -285,14 +304,10 @@ void HyInput::DoMouseUpEvent(const SDL_Event &eventRef)
 	m_uiMouseBtnFlags &= ~(1 << eventRef.button.button);
 }
 
-void HyInput::DoMouseMoveEvent(const SDL_Event &eventRef)
+void HyInput::DoMouseWheelEvent(const SDL_Event &eventRef)
 {
-	m_ptMousePos.x = static_cast<float>(eventRef.motion.x);
-	m_ptMousePos.y = static_cast<float>(eventRef.motion.y);
-
-	//if(m_bTouchScreenHack)
-	//	DoMouseBtnEvent(
-	//	glfw_MouseButtonCallback(pWindow, HYMOUSE_BtnLeft, GLFW_PRESS, 0);
+	m_vMouseScroll_LiveCount.x += eventRef.wheel.x;
+	m_vMouseScroll_LiveCount.y += eventRef.wheel.y;
 }
 
 void HyInput::SetMouseWindow(HyWindow *pWindow)
@@ -308,4 +323,7 @@ void HyInput::Update()
 	
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 		m_pInputMaps[i].Update();
+
+	m_vMouseScroll_ThisFrame = m_vMouseScroll_LiveCount;
+	m_vMouseScroll_LiveCount.x = m_vMouseScroll_LiveCount.y = 0;
 }
