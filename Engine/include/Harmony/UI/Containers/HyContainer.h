@@ -39,7 +39,7 @@ public:
 	virtual ~HyContainer();
 
 	glm::ivec2 GetSize() const;
-	void SetSize(int32 iNewWidth, int32 iNewHeight);
+	virtual void SetSize(int32 iNewWidth, int32 iNewHeight);
 
 	bool Show(bool bInstant = false);
 	bool Hide(bool bInstant = false);

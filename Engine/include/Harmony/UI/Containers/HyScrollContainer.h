@@ -16,6 +16,7 @@
 
 class HyScrollContainer : public HyContainer
 {
+protected:
 	enum
 	{
 		USE_VERT = 1 << 0,
@@ -32,6 +33,8 @@ public:
 	HyScrollContainer(HyLayoutType eRootLayout, HyEntity2d *pParent = nullptr);
 	HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, uint32 uiScrollBarDiameter, HyEntity2d *pParent = nullptr);
 	virtual ~HyScrollContainer();
+
+	virtual void SetSize(int32 iNewWidth, int32 iNewHeight) override;
 
 	void SetScrollBarColor(HyColor color);
 

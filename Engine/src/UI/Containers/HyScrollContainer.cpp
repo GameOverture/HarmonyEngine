@@ -47,6 +47,21 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitive
 {
 }
 
+/*virtual*/ void HyScrollContainer::SetSize(int32 iNewWidth, int32 iNewHeight) /*override*/
+{
+	if(m_pPrimPanel)
+		m_pPrimPanel->SetSize(iNewWidth, iNewHeight);
+
+	SetScissor(0, 0, iNewWidth, iNewHeight);
+	m_pPrimPanel->ClearScissor(false);
+
+	if(m_uiScrollFlags & USE_VERT)
+		iNewHeight = m_pRootLayout->GetSizeHint().y != 0 ? m_pRootLayout->GetSizeHint().y : iNewHeight;
+	if(m_uiScrollFlags & USE_HORZ)
+		iNewWidth = m_pRootLayout->GetSizeHint().x != 0 ? m_pRootLayout->GetSizeHint().x : iNewWidth;
+	HyInternal_LayoutSetSize(*m_pRootLayout, iNewWidth, iNewHeight);
+}
+
 void HyScrollContainer::SetScrollBarColor(HyColor color)
 {
 	m_VertBar.SetColor(color);
