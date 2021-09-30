@@ -397,6 +397,41 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
+{
+	if(m_uiTextAttributes & TEXTATTRIB_IsScaleBox)
+		return glm::vec2(0.0f, 0.0f);
+
+	if(this->AcquireData() == nullptr) {
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft invoked on null data");
+		return glm::vec2(0.0f, 0.0f);
+	}
+
+	CalculateGlyphInfos();
+	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
+
+	float fX = 0.0f;
+	if((m_uiTextAttributes & TEXTATTRIB_IsColumn) == 0)
+	{
+		switch(m_eAlignment)
+		{
+		case HYALIGN_HCenter:
+			fX = GetTextWidth() * -0.5f;
+			break;
+
+		case HYALIGN_Right:
+			fX = -GetTextWidth();
+			break;
+
+		default:
+			break;
+		}
+	}
+		
+	return glm::vec2(fX, GetTextCursorPos().y - abs(pData->GetLineDescender(m_uiState)));
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 bool IHyText<NODETYPE, ENTTYPE>::IsMonospacedDigits() const
 {
 	return (m_uiTextAttributes & TEXTATTRIB_UseMonospacedDigits) != 0;

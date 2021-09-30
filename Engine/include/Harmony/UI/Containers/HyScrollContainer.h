@@ -17,6 +17,8 @@
 class HyScrollContainer : public HyContainer
 {
 protected:
+	glm::ivec2				m_vShownSize;	// This will match the container's panel's size. The inherited 'm_pRootLayout' may have a different (usually larger) size
+
 	enum
 	{
 		USE_VERT = 1 << 0,
@@ -34,6 +36,7 @@ public:
 	HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, uint32 uiScrollBarDiameter, HyEntity2d *pParent = nullptr);
 	virtual ~HyScrollContainer();
 
+	virtual glm::ivec2 GetSize() override;
 	virtual void SetSize(int32 iNewWidth, int32 iNewHeight) override;
 
 	void SetScrollBarColor(HyColor color);

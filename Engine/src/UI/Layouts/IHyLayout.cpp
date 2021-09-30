@@ -16,7 +16,7 @@ IHyLayout::IHyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/
 	HyEntityUi(Ui_Layout, pParent),
 	m_pContainerParent(nullptr),
 	m_eLAYOUT_TYPE(eLayoutType),
-	m_vSize(1, 1)
+	m_vSize(0, 0)
 {
 }
 
@@ -39,9 +39,15 @@ void IHyLayout::AppendItem(HyEntityUi &itemRef)
 	SetLayoutItems();
 }
 
-glm::ivec2 IHyLayout::GetSize() const
+glm::ivec2 IHyLayout::GetSize()
 {
-	return m_vSize;
+	glm::ivec2 vCurSize = m_vSize;
+	if(vCurSize.x == 0)
+		vCurSize.x = GetSizeHint().x;
+	if(vCurSize.y == 0)
+		vCurSize.y = GetSizeHint().y;
+	
+	return vCurSize;
 }
 
 void IHyLayout::SetMargins(int32 iLeft, int32 iBottom, int32 iRight, int32 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY)
@@ -75,6 +81,9 @@ void IHyLayout::SetLayoutItems()
 
 void IHyLayout::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
+	if(m_vSize.x == iNewWidth && m_vSize.y == iNewHeight)
+		return;
+
 	HySetVec(m_vSize, iNewWidth, iNewHeight);
 	SetLayoutItems();
 }

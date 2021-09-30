@@ -128,6 +128,9 @@ public:
 	// The offset location past the last glyph. Essentially where the user input cursor in a command window would be
 	glm::vec2 GetTextCursorPos();
 
+	// The offset location from 'pos' to the bottom left of all the written glyphs. Affected by things like alignment and SetAs.
+	glm::vec2 GetTextBottomLeft();
+
 	bool IsMonospacedDigits() const;
 	void SetMonospacedDigits(bool bSet);
 

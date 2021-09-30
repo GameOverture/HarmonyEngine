@@ -222,17 +222,17 @@ void HyScrollBar::SetColor(HyColor color)
 	m_NegBtn.SetColor(color);
 }
 
-void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiDiameter, float fClientTotalSize, float fClientShownSize)
+void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiDiameter, uint32 uiClientTotalSize, uint32 uiClientShownSize)
 {
-	if(fClientTotalSize <= 0.0f || fClientTotalSize <= fClientShownSize)
+	if(uiClientTotalSize <= 0 || uiClientTotalSize <= uiClientShownSize)
 	{
 		m_bIsValidMetrics = false;
 		return;
 	}
 	m_bIsValidMetrics = true;
 
-	m_fClientTotalSize = fClientTotalSize;
-	m_fClientShownSize = fClientShownSize;
+	m_fClientTotalSize = static_cast<float>(uiClientTotalSize);
+	m_fClientShownSize = static_cast<float>(uiClientShownSize);
 	float fPercent = m_fClientShownSize / m_fClientTotalSize;
 
 	m_PageControl.SetMetrics(m_eORIENTATION, uiLength - (uiDiameter * 2), uiDiameter, fPercent);
@@ -244,15 +244,18 @@ void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiDiameter, float fClientTo
 		m_PageControl.pos.Set(0, uiDiameter);
 		m_PosBtn.pos.Set(0, uiLength - uiDiameter);
 		m_NegBtn.pos.Set(0, 0);
+
+		m_AnimScrollPos.Set(m_fClientTotalSize - m_fClientShownSize);
 	}
 	else // HYORIEN_Horizontal
 	{
 		m_PageControl.pos.Set(uiDiameter, 0);
 		m_PosBtn.pos.Set(uiLength - uiDiameter, 0);
 		m_NegBtn.pos.Set(0, 0);
+
+		m_AnimScrollPos.Set(0.0f);
 	}
 
-	m_AnimScrollPos.Set(0.0f);
 	InvokeOnScrollCallback();
 }
 
@@ -285,8 +288,14 @@ void HyScrollBar::DoPageScroll(int32 iPagesOffset)
 
 void HyScrollBar::OffsetSlider(float fPixels)
 {
-	// TODO: Convert fPixels to client sizing
-	m_AnimScrollPos.Offset(fPixels);
+	// Convert fPixels to client sizing
+	float fScrollBarLength = 0.0f;
+	if(m_eORIENTATION == HYORIEN_Vertical)
+		fScrollBarLength = m_PageControl.GetSceneHeight();
+	else
+		fScrollBarLength = m_PageControl.GetSceneWidth();
+
+	m_AnimScrollPos.Offset((fPixels * m_fClientTotalSize) / fScrollBarLength);
 	InvokeOnScrollCallback();
 }
 

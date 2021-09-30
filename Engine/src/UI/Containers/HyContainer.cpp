@@ -38,12 +38,12 @@ HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &i
 	delete m_pPrimPanel;
 }
 
-glm::ivec2 HyContainer::GetSize() const
+/*virtual*/ glm::ivec2 HyContainer::GetSize()
 {
 	return m_pRootLayout->GetSize();
 }
 
-void HyContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
+/*virtual*/ void HyContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
 	if(m_pPrimPanel)
 		m_pPrimPanel->SetSize(iNewWidth, iNewHeight);

@@ -185,6 +185,9 @@ void HyRichText::AssembleDrawables()
 				vOffset *= pNewSprite->scale.Get();
 				pNewSprite->pos.Offset(-vOffset);	// NOTE: Only offsetting based on frame '0' - which will only work *most* of the time
 
+				// Also offset the sprite down by the decender amount, because at the moment they're sitting on the 'baseline'
+				pNewSprite->pos.Offset(0.0f, -abs(pTextData->GetLineDescender(uiCurTextState)));
+
 				// Find next drawable location and position 'ptCurPos' to it
 				ptCurPos.x += pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), true);
 

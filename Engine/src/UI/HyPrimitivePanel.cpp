@@ -39,6 +39,16 @@ HyPrimitivePanel::HyPrimitivePanel(const HyPrimitivePanelInit &initRef, HyEntity
 {
 }
 
+uint32 HyPrimitivePanel::GetWidth() const
+{
+	return m_Data.m_uiWidth;
+}
+
+uint32 HyPrimitivePanel::GetHeight() const
+{
+	return m_Data.m_uiHeight;
+}
+
 HyColor HyPrimitivePanel::GetBgColor() const
 {
 	return HyColor(m_BG.topColor.X(), m_BG.topColor.Y(), m_BG.topColor.Z());

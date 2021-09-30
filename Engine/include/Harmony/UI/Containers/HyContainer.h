@@ -38,7 +38,7 @@ public:
 	HyContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyContainer();
 
-	glm::ivec2 GetSize() const;
+	virtual glm::ivec2 GetSize();
 	virtual void SetSize(int32 iNewWidth, int32 iNewHeight);
 
 	bool Show(bool bInstant = false);

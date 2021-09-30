@@ -37,6 +37,9 @@ public:
 	HyPrimitivePanel(const HyPrimitivePanelInit &initRef, HyEntity2d *pParent);
 	virtual ~HyPrimitivePanel();
 
+	uint32 GetWidth() const;
+	uint32 GetHeight() const;
+
 	HyColor GetBgColor() const;
 	void SetBgColor(HyColor color);
 

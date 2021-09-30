@@ -89,7 +89,8 @@ public:
 	HyNumberFormat GetNumFormat() const;
 	void SetNumFormat(HyNumberFormat format);
 
-	void SetText(std::string sText) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
+	void SetText(const std::stringstream &ssUtf8Text) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
+	void SetText(const std::string &sUtf8Text) = delete;		// Hiding SetText() since it doesn't make sense to use with HyMeters
 	virtual void SetTextState(uint32 uiStateIndex) override;
 	virtual void ResetTextAndPanel() override;
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;

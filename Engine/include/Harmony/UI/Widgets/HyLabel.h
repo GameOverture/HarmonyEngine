@@ -68,7 +68,8 @@ public:
 	virtual void SetSpriteState(uint32 uiStateIndex);
 
 	std::string GetUtf8String() const;
-	void SetText(std::string sText);
+	void SetText(const std::stringstream &ssUtf8Text);
+	void SetText(const std::string &sUtf8Text);
 	virtual void SetTextState(uint32 uiStateIndex);
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 
@@ -96,6 +97,9 @@ protected:
 	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
 
 	virtual void ResetTextAndPanel();
+
+private:
+	glm::vec2 GetPanelOffset();
 };
 
 #endif /* HyLabel_h__ */

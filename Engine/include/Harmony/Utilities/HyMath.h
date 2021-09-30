@@ -236,6 +236,10 @@ public:
 	{
 		return Brightness() > 127.5f;
 	}
+	bool IsDark() const
+	{
+		return Brightness() <= 127.5f;
+	}
 };
 
 class HyMath
