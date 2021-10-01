@@ -15,6 +15,7 @@
 // PageControl class
 HyScrollBar::PageControl::PageControl(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
+	m_uiDiameter(uiDiameter),
 	m_Panel(this),
 	m_Slider(this),
 	m_eDragState(DRAG_None)
@@ -23,17 +24,24 @@ HyScrollBar::PageControl::PageControl(HyOrientation eOrientation, uint32 uiLengt
 	SetMetrics(eOrientation, uiLength, uiDiameter, 1.0f);
 }
 
+uint32 HyScrollBar::PageControl::GetDiameter() const
+{
+	return m_uiDiameter;
+}
+
 void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, float fSliderPercent)
 {
+	m_uiDiameter = uiDiameter;
+
 	if(eOrientation == HYORIEN_Vertical)
 	{
-		m_Panel.SetAsBox(uiDiameter, uiLength);
-		m_Slider.SetAsBox(static_cast<float>(uiDiameter), (uiLength - (uiDiameter * 2)) * fSliderPercent);
+		m_Panel.SetAsBox(m_uiDiameter, uiLength);
+		m_Slider.SetAsBox(static_cast<float>(m_uiDiameter), (uiLength - (m_uiDiameter * 2)) * fSliderPercent);
 	}
 	else
 	{
-		m_Panel.SetAsBox(uiLength, uiDiameter);
-		m_Slider.SetAsBox((uiLength - (uiDiameter * 2)) * fSliderPercent, static_cast<float>(uiDiameter));
+		m_Panel.SetAsBox(uiLength, m_uiDiameter);
+		m_Slider.SetAsBox((uiLength - (m_uiDiameter * 2)) * fSliderPercent, static_cast<float>(m_uiDiameter));
 	}
 }
 
@@ -213,6 +221,21 @@ HyScrollBar::HyScrollBar(HyOrientation eOrientation, uint32 uiDiameter, HyEntity
 HyOrientation HyScrollBar::GetOrientation() const
 {
 	return m_eORIENTATION;
+}
+
+uint32 HyScrollBar::GetDiameter() const
+{
+	return m_PageControl.GetDiameter();
+}
+
+float HyScrollBar::GetLineScrollAmt() const
+{
+	return m_fLineScrollAmt;
+}
+
+void HyScrollBar::SetLineScrollAmt(float fLineScrollAmt)
+{
+	m_fLineScrollAmt = fLineScrollAmt;
 }
 
 void HyScrollBar::SetColor(HyColor color)

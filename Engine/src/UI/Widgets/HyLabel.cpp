@@ -382,7 +382,7 @@ void HyLabel::CommonSetup()
 		if(m_pPrimPanel || m_SpritePanel.IsLoadDataValid())
 			return GetPanelOffset();
 		else if(m_Text.IsLoadDataValid())
-			return m_Text.GetTextBottomLeft();
+			return -m_Text.GetTextBottomLeft();
 	}
 
 	return glm::vec2(0.0f, 0.0f);
@@ -401,8 +401,16 @@ void HyLabel::CommonSetup()
 		m_SpritePanel.scale.X(static_cast<float>(iNewWidth) / vUiSizeHint.x);
 		m_SpritePanel.scale.Y(static_cast<float>(iNewHeight) / vUiSizeHint.y);
 	}
-	else
-		m_Text.SetAsScaleBox(iNewWidth - m_TextMargins.left - m_TextMargins.right, iNewHeight - m_TextMargins.bottom - m_TextMargins.top);
+	else if(m_Text.IsLoadDataValid())
+	{
+		glm::vec2 vTextSize(m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
+
+		float fScaleX = iNewWidth / vTextSize.x;
+		float fScaleY = iNewHeight / vTextSize.y;
+		scale.Set(HyMin(fScaleX, fScaleY));
+
+		//m_Text.SetAsScaleBox(iNewWidth - m_TextMargins.left - m_TextMargins.right, iNewHeight - m_TextMargins.bottom - m_TextMargins.top);
+	}
 
 	ResetTextAndPanel();
 }

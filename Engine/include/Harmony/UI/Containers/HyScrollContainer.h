@@ -40,6 +40,7 @@ public:
 	virtual void SetSize(int32 iNewWidth, int32 iNewHeight) override;
 
 	void SetScrollBarColor(HyColor color);
+	void SetLineScrollAmt(float fLineScrollAmt);
 
 protected:
 	virtual void OnContainerUpdate() override;

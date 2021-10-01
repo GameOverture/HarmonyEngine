@@ -66,6 +66,12 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitive
 		iNewHeight = 0;
 	if(m_uiScrollFlags & USE_HORZ)
 		iNewWidth = 0;
+
+	if(iNewWidth != 0 && (m_uiScrollFlags & USE_VERT) != 0)
+		iNewWidth -= m_VertBar.GetDiameter();
+	if(iNewHeight != 0 && (m_uiScrollFlags & USE_HORZ) != 0)
+		iNewHeight -= m_HorzBar.GetDiameter();
+
 	HyInternal_LayoutSetSize(*m_pRootLayout, iNewWidth, iNewHeight);
 }
 
@@ -73,6 +79,12 @@ void HyScrollContainer::SetScrollBarColor(HyColor color)
 {
 	m_VertBar.SetColor(color);
 	m_HorzBar.SetColor(color);
+}
+
+void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
+{
+	m_VertBar.SetLineScrollAmt(fLineScrollAmt);
+	m_HorzBar.SetLineScrollAmt(fLineScrollAmt);
 }
 
 /*virtual*/ void HyScrollContainer::OnContainerUpdate() /*override*/
