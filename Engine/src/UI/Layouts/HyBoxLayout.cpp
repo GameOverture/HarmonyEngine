@@ -150,7 +150,7 @@ void HyBoxLayout::ReverseOrder(bool bReverse)
 			vItemSize[m_eOrientation] += static_cast<int32>(fShrinkAmt * ((eSizePolicy & HY_SIZEFLAG_SHRINK) >> 2));
 
 			HySizePolicy eInverseSizePolicy = pWidget->GetSizePolicy(static_cast<HyOrientation>(iInverseOrien));
-			if(vDifference[iInverseOrien] >= 0)
+			if(vItemSize[iInverseOrien] <= vActualSize[iInverseOrien])
 			{
 				if((eInverseSizePolicy & HY_SIZEFLAG_EXPAND) != 0)
 					vItemSize[iInverseOrien] += vActualSize[iInverseOrien] - vItemSize[iInverseOrien];

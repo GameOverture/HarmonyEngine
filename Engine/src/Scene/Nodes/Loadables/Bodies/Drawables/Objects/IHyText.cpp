@@ -389,8 +389,13 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
 	if(m_uiNumValidCharacters > 0)
 	{
+		const HyText2dGlyphInfo *pGlyph = pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[m_uiNumValidCharacters - 1]);
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - 1, pData->GetNumLayers(m_uiState), 0);
-		return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[m_uiNumValidCharacters - 1])->fADVANCE_X, 0.0f);
+
+		glm::vec2 ptCursorPos = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pGlyph->fADVANCE_X, 0.0f);
+		ptCursorPos.y += (pGlyph->uiHEIGHT - pGlyph->iOFFSET_Y) * m_fScaleBoxModifier; // Find the baseline of this last glyph
+		
+		return ptCursorPos;
 	}
 
 	return glm::vec2();

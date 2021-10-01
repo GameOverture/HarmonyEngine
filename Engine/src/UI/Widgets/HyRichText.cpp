@@ -99,8 +99,8 @@ void HyRichText::AssembleDrawables()
 		std::smatch m;
 		if(std::regex_search(sMatch, m, std::regex("([A-Za-z_]+[A-Za-z0-9_/]*,\\d+)"))) // Doesn't start with number and has ',' number param (sprite with state)
 		{
-			std::string sPath = m[1].str().substr(0, sPath.find(','));
-			uint32 uiState = std::stoi(m[1].str().substr(sPath.find(',') + 1));
+			std::string sPath = m[1].str().substr(0, m[1].str().find(','));
+			uint32 uiState = std::stoi(m[1].str().substr(m[1].str().find(',') + 1));
 
 			formatChangeList.push_back(std::pair<std::string, uint32>(sPath, uiState));
 		}
@@ -175,27 +175,36 @@ void HyRichText::AssembleDrawables()
 				HySprite2d *pNewSprite = HY_NEW HySprite2d(sPrefix, sName, this);
 				pNewSprite->Load();
 				m_DrawableList.push_back(pNewSprite);
-				pNewSprite->pos.Set(ptCurPos);
+
 				pNewSprite->SetState(formatChangeList[uiCurFmtIndex].second);
 
+				// Determine sprite scale with remaining room left on line
 				float fScaleX = (m_uiColumnWidth - ptCurPos.x) / pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), false);
 				float fScaleY = fLineHeight / pNewSprite->GetStateMaxHeight(pNewSprite->GetState(), false);
 				pNewSprite->scale.Set(HyMin(fScaleX, fScaleY));
+
+				// Determine if this sprite will not fit in the remaining space on this text line
+				if((ptCurPos.x + pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), true)) >= (m_uiColumnWidth-1)) // the -1 should help with scale floating point above
+				{
+					ptCurPos.x = 0.0f;
+					ptCurPos.y -= fLineHeight;
+
+					// Recalculate sprite scale with modified ptCurPos
+					float fScaleX = (m_uiColumnWidth - ptCurPos.x) / pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), false);
+					float fScaleY = fLineHeight / pNewSprite->GetStateMaxHeight(pNewSprite->GetState(), false);
+					pNewSprite->scale.Set(HyMin(fScaleX, fScaleY));
+				}
+				pNewSprite->pos.Set(ptCurPos);
+
+				// Find next drawable location and position 'ptCurPos' to it
+				ptCurPos.x += pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), true);
+
 				glm::vec2 vOffset = pNewSprite->GetCurFrameOffset();
 				vOffset *= pNewSprite->scale.Get();
 				pNewSprite->pos.Offset(-vOffset);	// NOTE: Only offsetting based on frame '0' - which will only work *most* of the time
 
 				// Also offset the sprite down by the decender amount, because at the moment they're sitting on the 'baseline'
 				pNewSprite->pos.Offset(0.0f, -abs(pTextData->GetLineDescender(uiCurTextState)));
-
-				// Find next drawable location and position 'ptCurPos' to it
-				ptCurPos.x += pNewSprite->GetStateMaxWidth(pNewSprite->GetState(), true);
-
-				if(ptCurPos.x >= m_uiColumnWidth)
-				{
-					ptCurPos.x = 0.0f;
-					ptCurPos.y -= fLineHeight;
-				}
 			}
 
 			uiCurFmtIndex++;
