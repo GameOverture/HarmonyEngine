@@ -27,6 +27,9 @@ public:
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
+
+private:
+	void SetPreviewText();
 };
 
 #endif // TEXTDRAW_H

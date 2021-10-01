@@ -19,8 +19,7 @@ TextDraw::TextDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataR
 	m_hTexture(HY_UNUSED_HANDLE)
 {
 	m_Text.Init("", "+GuiPreview", this);
-	m_Text.SetText("The Quick Brown Fox Jumped Over The Lazy Dog!? 1234567890");
-	m_Text.SetTextAlignment(HYALIGN_HCenter);
+	SetPreviewText();
 }
 
 TextDraw::~TextDraw()
@@ -67,7 +66,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 
 	#undef GetObject
 	m_Text.GuiOverrideData<HyText2dData>(itemDataDoc.GetObject(), m_hTexture);
-	m_Text.SetText("The Quick Brown Fox Jumped Over The Lazy Dog!? 1234567890");
+	SetPreviewText();
 }
 
 /*virtual*/ void TextDraw::OnShow() /*override*/
@@ -82,4 +81,18 @@ void TextDraw::SetTextState(uint uiStateIndex)
 
 /*virtual*/ void TextDraw::OnResizeRenderer() /*override*/
 {
+}
+
+void TextDraw::SetPreviewText()
+{
+	m_Text.SetText(std::stringstream() <<
+		"The Quick Brown Fox Jumped Over The Lazy Dog!?\n" <<
+		"abcdefghijklmnopqrstuvwxyz\n" <<
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ\n" <<
+		"1234567890 !$#%&()+,.");// /\\[]_{}|:;<>?@");
+
+	// "ALL" SYMBOLS: ! \" # $ % & ' ( ) * + , - . / \\ [ ] ^ _ ` { | } ~ : ; < = > ? @
+	// BAD SYMBOLS: ' * - " ^ ` ~ =
+	
+	m_Text.SetTextAlignment(HYALIGN_HCenter);
 }
