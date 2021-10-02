@@ -89,7 +89,6 @@ public:
 	HyText2d &GetTextNode();
 
 protected:
-	void CommonSetup();
 	virtual void OnSetup() { }					// Optional override for derived classes
 
 	virtual glm::ivec2 GetSizeHint() override;

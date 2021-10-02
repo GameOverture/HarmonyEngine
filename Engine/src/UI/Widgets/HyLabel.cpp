@@ -91,7 +91,10 @@ void HyLabel::Setup(const HyPrimitivePanelInit &initRef, std::string sTextPrefix
 					  static_cast<float>(iTextMarginRight),
 					  static_cast<float>(iTextMarginTop));
 
-	CommonSetup();
+	SetAsEnabled(IsEnabled());
+	SetAsHighlighted(IsHighlighted());
+
+	ResetTextAndPanel();
 	OnSetup();
 }
 
@@ -109,7 +112,10 @@ void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::strin
 					  static_cast<float>(iTextMarginRight),
 					  static_cast<float>(iTextMarginTop));
 
-	CommonSetup();
+	SetAsEnabled(IsEnabled());
+	SetAsHighlighted(IsHighlighted());
+
+	ResetTextAndPanel();
 	OnSetup();
 }
 
@@ -320,14 +326,6 @@ HyText2d &HyLabel::GetTextNode()
 	return m_Text;
 }
 
-void HyLabel::CommonSetup()
-{
-	SetAsEnabled(IsEnabled());
-	SetAsHighlighted(IsHighlighted());
-
-	ResetTextAndPanel();
-}
-
 /*virtual*/ glm::ivec2 HyLabel::GetSizeHint() /*override*/
 {
 	glm::ivec2 vUiSizeHint;
@@ -523,20 +521,6 @@ glm::vec2 HyLabel::GetPanelOffset()
 		return glm::vec2(0.0f, 0.0f);
 	else if(m_SpritePanel.IsLoadDataValid())
 	{
-#if 1 // I think this is the more proper way but I'm a fucking idiot so who knows
-		glm::vec3 vScale(1.0f);
-		glm::quat quatRot;
-		glm::vec3 ptTranslation;
-		glm::vec3 vSkew;
-		glm::vec4 vPerspective;
-		glm::decompose(GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-
-		auto sceneAABB = m_SpritePanel.GetSceneAABB();
-		glm::vec2 ptBotLeft(sceneAABB.lowerBound.x, sceneAABB.lowerBound.y);
-		glm::vec2 ptPos(ptTranslation.x, ptTranslation.y);
-
-		return -(ptBotLeft - ptPos);
-#else
 		glm::vec2 vPanelDimensions = GetPanelDimensions();
 
 		const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_SpritePanel.AcquireData());
@@ -544,7 +528,6 @@ glm::vec2 HyLabel::GetPanelOffset()
 
 		auto vUiSizeHint = GetSizeHint();
 		return -glm::vec2(frameRef.vOFFSET.x * (vPanelDimensions.x / vUiSizeHint.x), frameRef.vOFFSET.y * (vPanelDimensions.y / vUiSizeHint.y));
-#endif
 	}
 
 	return glm::vec2(0.0f, 0.0f);
