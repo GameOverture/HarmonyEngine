@@ -237,7 +237,7 @@ void HyGridLayout::InsertItem(HyEntityUi *pItem, uint32 uiX, uint32 uiY, uint32 
 				if(m_GridCells[i][j].m_pItem != nullptr && m_GridCells[i][j].m_pItem->GetUiType() == Ui_Widget)
 				{
 					IHyWidget *pWidget = static_cast<IHyWidget *>(m_GridCells[i][j].m_pItem);
-					if(pWidget->GetHorizontalPolicy() & (HY_SIZEFLAG_GROW | HY_SIZEFLAG_EXPAND) == 0)
+					if((pWidget->GetHorizontalPolicy() & (HY_SIZEFLAG_GROW | HY_SIZEFLAG_EXPAND)) == 0)
 						bExpand = false;
 
 					// TODO: figure out newly scaled width and heights of column/rows

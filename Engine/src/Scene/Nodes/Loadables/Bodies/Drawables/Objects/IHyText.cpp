@@ -386,11 +386,11 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 		return glm::vec2();
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
 	if(m_uiNumValidCharacters > 0)
 	{
-		const HyText2dGlyphInfo *pGlyph = pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[m_uiNumValidCharacters - 1]);
-		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - 1, pData->GetNumLayers(m_uiState), 0);
+		const HyText2dGlyphInfo *pGlyph = pData->GetGlyph(this->m_uiState, 0, m_Utf32CodeList[m_uiNumValidCharacters - 1]);
+		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - 1, pData->GetNumLayers(this->m_uiState), 0);
 
 		glm::vec2 ptCursorPos = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pGlyph->fADVANCE_X, 0.0f);
 		ptCursorPos.y += (pGlyph->uiHEIGHT - pGlyph->iOFFSET_Y) * m_fScaleBoxModifier; // Find the baseline of this last glyph
@@ -413,7 +413,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 	}
 
 	CalculateGlyphInfos();
-	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
+	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
 
 	float fX = 0.0f;
 	if((m_uiTextAttributes & TEXTATTRIB_IsColumn) == 0)
@@ -433,7 +433,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 		}
 	}
 		
-	return glm::vec2(fX, GetTextCursorPos().y - abs(pData->GetLineDescender(m_uiState)));
+	return glm::vec2(fX, GetTextCursorPos().y - abs(pData->GetLineDescender(this->m_uiState)));
 }
 
 template<typename NODETYPE, typename ENTTYPE>

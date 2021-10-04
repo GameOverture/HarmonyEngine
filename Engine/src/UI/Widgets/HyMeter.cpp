@@ -49,7 +49,7 @@ HyMeter::HyMeter(std::string sPanelPrefix, std::string sPanelName, std::string s
 {
 }
 
-/*virtual*/ void HyMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/)
+/*virtual*/ void HyMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/) /*override*/
 {
 	HyLabel::SetAsStacked(eTextAlignment);
 
