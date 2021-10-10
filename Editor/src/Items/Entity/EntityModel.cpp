@@ -317,6 +317,10 @@ bool EntityModel::RemoveChild(TreeModelItemData *pItem)
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
+	QJsonArray childrenNodesArray;
+
+
+	itemSpecificFileDataOut.m_Meta.insert("childrenNodes", childrenNodesArray);
 }
 
 /*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/

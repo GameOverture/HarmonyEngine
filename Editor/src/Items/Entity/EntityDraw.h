@@ -15,10 +15,10 @@
 
 class EntityDraw : public IDraw
 {
-	HyPrimitive2d			m_primOriginHorz;
-	HyPrimitive2d			m_primOriginVert;
+	HyPrimitive2d					m_primOriginHorz;
+	HyPrimitive2d					m_primOriginVert;
 
-
+	std::vector<IHyLoadable2d *>	m_ChildNodesList;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);

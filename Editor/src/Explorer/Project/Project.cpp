@@ -703,8 +703,10 @@ void Project::DeleteItemInDataObj(HyGuiItemType eType, QString sPath, QJsonObjec
 		HyGuiLog("Project::DeleteItemInDataObj could not find item type: " % sItemTypeName, LOGTYPE_Error);
 
 	QJsonObject itemTypeObject = dataObjRef[sItemTypeName].toObject();
-	if(itemTypeObject.contains(sPath) == false)
-		HyGuiLog("Project::DeleteItemInDataObj could not find item: " % sPath, LOGTYPE_Error);
+
+	// If this item is "existence pending" it won't be found in commented code below
+	//if(itemTypeObject.contains(sPath) == false)
+	//	HyGuiLog("Project::DeleteItemInDataObj could not find item: " % sPath, LOGTYPE_Error);
 
 	itemTypeObject.remove(sPath);
 	dataObjRef[sItemTypeName] = itemTypeObject;

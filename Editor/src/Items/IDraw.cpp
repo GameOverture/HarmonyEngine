@@ -56,7 +56,8 @@ void IDraw::ApplyJsonData()
 
 	FileDataPair itemFileData;
 	m_pProjItem->GetLatestFileData(itemFileData);
-	QByteArray src = JsonValueToSrc(itemFileData.m_Data);
+
+	QByteArray src = JsonValueToSrc(m_pProjItem->GetType() == ITEM_Entity ? itemFileData.m_Meta : itemFileData.m_Data);
 
 	HyJsonDoc itemDataDoc;
 	if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
