@@ -36,7 +36,7 @@ public:
 	float GetPpmInverse();
 
 	bool IsDebugDraw();
-	void DebugDraw(bool bEnableDebugDraw);
+	void EnableDebugDraw(bool bEnableDebugDraw);
 };
 
 #endif /* HyPhysicsGrid_h__ */
