@@ -42,6 +42,8 @@ class ProjectItemData : public ExplorerItemData
 	// Loaded when item is opened
 	IWidget *				m_pWidget;
 	IDraw *					m_pDraw;
+
+	QSet<ProjectItemData *>	m_DependencySet;
 	
 	ProjectItemData(Project &projRef, HyGuiItemType eType, const QString sName, const FileDataPair &initItemFileDataRef, bool bIsPendingSave);
 public:
@@ -54,6 +56,10 @@ public:
 	IWidget *GetWidget();
 	IDraw *GetDraw();
 	QUndoStack *GetUndoStack();
+
+	QSet<ProjectItemData *> GetDependencies();
+	void InsertDependency(ProjectItemData *pProjItem);
+	void RemoveDependency(ProjectItemData *pProjItem);
 	
 	void GiveMenuActions(QMenu *pMenu);
 	void GetLatestFileData(FileDataPair &itemFileDataOut) const;

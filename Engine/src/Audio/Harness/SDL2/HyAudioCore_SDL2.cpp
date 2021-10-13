@@ -290,6 +290,8 @@ void HyAudioCore_SDL2::Play(CueType ePlayType, NODETYPE *pAudioNode)
 		{
 			m_NodeMap[pAudioNode] = iAssignedChannel;
 			m_ChannelMap[iAssignedChannel] = pAudioNode;
+
+			HyLogWarning("m_ChannelMap CUE - " << iAssignedChannel);
 		}
 	}
 }
@@ -313,7 +315,12 @@ void HyAudioCore_SDL2::Modify(NODETYPE *pAudioNode)
 /*static*/ void HyAudioCore_SDL2::OnChannelFinished(int32 iChannel)
 {
 	if(sm_pInstance->m_ChannelMap.count(iChannel) == 0)
+	{
+		HyLogWarning("HyAudioCore_SDL2::OnChannelFinished() - m_ChannelMap[" << iChannel << "] had zero entires");
 		return;
+	}
+
+	HyLogWarning("m_ChannelMap ERASE - " << iChannel);
 
 	sm_pInstance->m_NodeMap.erase(sm_pInstance->m_ChannelMap[iChannel]);
 	sm_pInstance->m_ChannelMap.erase(iChannel);

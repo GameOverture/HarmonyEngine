@@ -173,6 +173,8 @@ bool HyEngine::PollPlatformApi()
 			HyWindow *pWindow = m_WindowManager.DoEvent(sdlEvent, m_Input);
 			if(pWindow && sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 				OnWindowResized(*pWindow);
+			else if(pWindow && sdlEvent.window.event == SDL_WINDOWEVENT_SHOWN)
+				OnWindowResized(*pWindow);
 			else if(pWindow && sdlEvent.window.event == SDL_WINDOWEVENT_MOVED)
 				OnWindowMoved(*pWindow);
 			break; }

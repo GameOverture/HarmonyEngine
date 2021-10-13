@@ -57,17 +57,17 @@ QString AssetItemData::GetMetaFileExt() const
 	return m_sMetaFileExt;
 }
 
-QSet<ProjectItemData *> AssetItemData::GetLinks()
+QSet<ProjectItemData *> AssetItemData::GetDependencies()
 {
 	return m_DependencySet;
 }
 
-void AssetItemData::InsertLink(ProjectItemData *pProjItem)
+void AssetItemData::InsertDependency(ProjectItemData *pProjItem)
 {
 	m_DependencySet.insert(pProjItem);
 }
 
-void AssetItemData::RemoveLink(ProjectItemData *pProjItem)
+void AssetItemData::RemoveDependency(ProjectItemData *pProjItem)
 {
 	m_DependencySet.remove(pProjItem);
 }

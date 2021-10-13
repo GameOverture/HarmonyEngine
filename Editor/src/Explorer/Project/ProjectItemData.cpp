@@ -137,6 +137,21 @@ QUndoStack *ProjectItemData::GetUndoStack()
 	return m_pUndoStack;
 }
 
+QSet<ProjectItemData *> ProjectItemData::GetDependencies()
+{
+	return m_DependencySet;
+}
+
+void ProjectItemData::InsertDependency(ProjectItemData *pProjItem)
+{
+	m_DependencySet.insert(pProjItem);
+}
+
+void ProjectItemData::RemoveDependency(ProjectItemData *pProjItem)
+{
+	m_DependencySet.remove(pProjItem);
+}
+
 void ProjectItemData::GiveMenuActions(QMenu *pMenu)
 {
 	pMenu->addAction(m_pActionUndo);

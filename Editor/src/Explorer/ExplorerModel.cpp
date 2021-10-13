@@ -293,6 +293,45 @@ ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid)
 	return m_ItemUuidMap[uuid];
 }
 
+QList<ProjectItemData *> ExplorerModel::RequestItemsByUuid(ProjectItemData *pItemOwner, QList<QUuid> requestList)
+{
+	QList<ProjectItemData *> itemRequestList;
+	for(auto uuid : requestList)
+	{
+		ProjectItemData *pFoundItem = FindByUuid(uuid);
+		if(pFoundItem == nullptr || &pFoundItem->GetProject() != &pItemOwner->GetProject())
+			continue;
+
+		itemRequestList.push_back(pFoundItem);
+	}
+
+	return RequestItems(pItemOwner, itemRequestList);
+}
+
+QList<ProjectItemData *> ExplorerModel::RequestItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList)
+{
+	if(requestList.empty())
+		return requestList;
+
+	QList<ProjectItemData *> returnList;
+	for(int i = 0; i < requestList.size(); ++i)
+	{
+		if(requestList[i] == nullptr || &requestList[i]->GetProject() != &pItemOwner->GetProject())
+			continue;
+
+		requestList[i]->InsertDependency(pItemOwner);
+		returnList.append(requestList[i]);
+	}
+
+	return returnList;
+}
+
+void ExplorerModel::RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> relinquishList)
+{
+	for(int i = 0; i < relinquishList.size(); ++i)
+		relinquishList[i]->RemoveDependency(pItemOwner);
+}
+
 /*virtual*/ QVariant ExplorerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);

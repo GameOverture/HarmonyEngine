@@ -39,6 +39,13 @@ public:
 
 	ProjectItemData *FindByUuid(QUuid uuid);
 
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// [ITEM-ITEM] DEPENDENCIES LINK FUNCTIONS
+	QList<ProjectItemData *> RequestItemsByUuid(ProjectItemData *pItemOwner, QList<QUuid> requestList);
+	QList<ProjectItemData *> RequestItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList);
+	void RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> relinquishList);
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
 	virtual Qt::DropActions supportedDragActions() const override;

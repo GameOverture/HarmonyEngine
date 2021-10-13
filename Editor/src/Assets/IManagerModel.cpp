@@ -187,7 +187,7 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 	// First loop through and check to see if any links are present, and abort if dependecies are found
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
-		QSet<ProjectItemData *> sLinks = assetsList[i]->GetLinks();
+		QSet<ProjectItemData *> sLinks = assetsList[i]->GetDependencies();
 		if(sLinks.empty() == false)
 		{
 			QString sMessage = "'" % assetsList[i]->GetName() % "' asset cannot be deleted because it is in use by the following items: \n\n";
@@ -231,7 +231,7 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 	QList<ProjectItemData *> affectedItemList;
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
-		QSet<ProjectItemData *> sLinks = assetsList[i]->GetLinks();
+		QSet<ProjectItemData *> sLinks = assetsList[i]->GetDependencies();
 		if(sLinks.empty() == false)
 		{
 			for(QSet<ProjectItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
@@ -465,22 +465,22 @@ QList<AssetItemData *> IManagerModel::RequestAssetsByUuid(ProjectItemData *pItem
 	if(requestList.empty())
 		return QList<AssetItemData *>();
 
-	QList<AssetItemData *> frameRequestList;
+	QList<AssetItemData *> assetsRequestList;
 	for(int i = 0; i < requestList.size(); ++i)
 	{
-		AssetItemData *pFoundFrame = FindById(requestList[i]);
-		if(pFoundFrame == nullptr)
+		AssetItemData *pFoundAsset = FindById(requestList[i]);
+		if(pFoundAsset == nullptr)
 		{
 			// TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
-			HyGuiLog("Cannot find image with UUID: " % requestList[i].toString() % "\nIt may have been removed, or is invalid in the Atlas Manager.", LOGTYPE_Warning);
+			HyGuiLog("Cannot find asset with UUID: " % requestList[i].toString() % "\nIt may have been removed, or is invalid in its asset manager.", LOGTYPE_Warning);
 		}
 		else
 		{
-			frameRequestList.append(pFoundFrame);
+			assetsRequestList.append(pFoundAsset);
 		}
 	}
 
-	return RequestAssets(pItem, frameRequestList);
+	return RequestAssets(pItem, assetsRequestList);
 }
 
 QList<AssetItemData *> IManagerModel::RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList)
@@ -491,7 +491,7 @@ QList<AssetItemData *> IManagerModel::RequestAssets(ProjectItemData *pItem, QLis
 	QList<AssetItemData *> returnList;
 	for(int i = 0; i < requestList.size(); ++i)
 	{
-		requestList[i]->InsertLink(pItem);
+		requestList[i]->InsertDependency(pItem);
 		returnList.append(requestList[i]);
 	}
 
@@ -501,7 +501,7 @@ QList<AssetItemData *> IManagerModel::RequestAssets(ProjectItemData *pItem, QLis
 void IManagerModel::RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList)
 {
 	for(int i = 0; i < relinquishList.size(); ++i)
-		relinquishList[i]->RemoveLink(pItem);
+		relinquishList[i]->RemoveDependency(pItem);
 }
 
 TreeModelItemData *IManagerModel::CreateNewFilter(QString sName, TreeModelItemData *pParent)

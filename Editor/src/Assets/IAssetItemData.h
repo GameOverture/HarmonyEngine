@@ -44,9 +44,9 @@ public:
 	QString GetName() const;
 	QString GetMetaFileExt() const;
 
-	QSet<ProjectItemData *> GetLinks();
-	void InsertLink(ProjectItemData *pProjItem);
-	void RemoveLink(ProjectItemData *pProjItem);
+	QSet<ProjectItemData *> GetDependencies();
+	void InsertDependency(ProjectItemData *pProjItem);
+	void RemoveDependency(ProjectItemData *pProjItem);
 
 	virtual QString ConstructMetaFileName();
 	bool DeleteMetaFile();
