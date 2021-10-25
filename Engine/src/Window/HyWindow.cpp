@@ -427,8 +427,28 @@ void HyWindow::SetFullScreen(bool bFullScreen)
 	glfwSetWindowMonitor(m_pInterop, bFullScreen ? GetGlfwMonitor() : nullptr, m_Info.ptLocation.x, m_Info.ptLocation.y, m_Info.vSize.x, m_Info.vSize.y, GLFW_DONT_CARE);
 #elif defined(HY_USE_SDL2) && !defined(HY_PLATFORM_BROWSER) // SDL_SetWindowFullscreen not supported with Emscripten's SDL2
 	SDL_SetWindowFullscreen(m_pInterop, bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
-#else
-	HyLogWarning("HyWindow::SetFullScreen is not implemented for this build configuration");
+#elif defined(HY_PLATFORM_BROWSER)
+
+	int scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_DEFAULT;// EMSCRIPTEN_FULLSCREEN_SCALE_STRETCH; EMSCRIPTEN_FULLSCREEN_SCALE_ASPECT; EMSCRIPTEN_FULLSCREEN_SCALE_CENTER
+	int canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_NONE;
+	int filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT; // EMSCRIPTEN_FULLSCREEN_FILTERING_NEAREST
+
+	EmscriptenFullscreenStrategy s;
+	memset(&s, 0, sizeof(s));
+	s.scaleMode = scaleMode;
+	s.canvasResolutionScaleMode = canvasResolutionScaleMode;
+	s.filteringMode = filteringMode;
+	s.canvasResizedCallback = on_canvassize_changed;
+	
+	bool bUseSoftFullScreen = false;
+
+	EMSCRIPTEN_RESULT ret;
+	if(bUseSoftFullScreen)
+		ret = emscripten_enter_soft_fullscreen(0, &s);
+	else
+		ret = emscripten_request_fullscreen_strategy(0, 1, &s);
+
+
 #endif
 }
 
