@@ -68,6 +68,7 @@ public:
 	void SetDensity(int32 iFixtureIndex, float fDensityAmt)			{ m_Fixtures[iFixtureIndex].pFixture->SetDensity(fDensityAmt); m_b2Body->ResetMassData(); }
 	void SetDensity(float fDensityAmt)								{ for(uint32 i = 0; i < m_Fixtures.size(); ++i) m_Fixtures[i].pFixture->SetDensity(fDensityAmt); m_b2Body->ResetMassData(); }
 	
+	void SetFilter(int32 iFixtureIndex, b2Filter& filter)			{ m_Fixtures[iFixtureIndex].pFixture->SetFilterData(filter); }
 	void SetFilter(b2Filter & filter)								{ for(uint32 i = 0; i < m_Fixtures.size(); ++i) m_Fixtures[i].pFixture->SetFilterData(filter); }
 
 	int32 AddBoxFixture(float fHalfWidth, float fHalfHeight, float fDensity, glm::vec2 vOffset = glm::vec2(0.0f), float fAngleOffset = 0.0f);
