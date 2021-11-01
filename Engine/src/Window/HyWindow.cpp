@@ -438,7 +438,7 @@ void HyWindow::SetFullScreen(bool bFullScreen)
 	s.scaleMode = scaleMode;
 	s.canvasResolutionScaleMode = canvasResolutionScaleMode;
 	s.filteringMode = filteringMode;
-	s.canvasResizedCallback = on_canvassize_changed;
+	//s.canvasResizedCallback = on_canvassize_changed;
 	
 	bool bUseSoftFullScreen = false;
 
@@ -447,7 +447,6 @@ void HyWindow::SetFullScreen(bool bFullScreen)
 		ret = emscripten_enter_soft_fullscreen(0, &s);
 	else
 		ret = emscripten_request_fullscreen_strategy(0, 1, &s);
-
 
 #endif
 }
