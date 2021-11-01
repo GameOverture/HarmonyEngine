@@ -100,6 +100,16 @@ public:
 	// PHYSICS
 	void PhysInit(HyPhysicsGrid2d &physGridRef,
 				  HyPhysicsType eType,
+				  b2Vec2 pos,
+				  bool bIsEnabled = true,
+				  bool bIsFixedRotation = false,
+				  bool bIsCcd = false,
+				  bool bIsAwake = true,
+				  bool bAllowSleep = true,
+				  float fGravityScale = 1.0f);
+
+	void PhysInit(HyPhysicsGrid2d& physGridRef,
+				  HyPhysicsType eType,
 				  bool bIsEnabled = true,
 				  bool bIsFixedRotation = false,
 				  bool bIsCcd = false,

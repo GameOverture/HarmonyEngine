@@ -350,7 +350,7 @@ void HyEntity2d::DisableMouseInput()
 	m_uiEntAttribs &= ~ENT2DATTRIB_MouseInput;
 }
 
-void HyEntity2d::PhysInit(HyPhysicsGrid2d &physGridRef,
+void HyEntity2d::PhysInit(HyPhysicsGrid2d& physGridRef,
 						  HyPhysicsType eType,
 						  bool bIsEnabled /*= true*/,
 						  bool bIsFixedRotation /*= false*/,
@@ -364,6 +364,34 @@ void HyEntity2d::PhysInit(HyPhysicsGrid2d &physGridRef,
 	b2BodyDef bodyDef;
 	bodyDef.userData = this;
 	bodyDef.position.Set(pos.X() * physGridRef.GetPpmInverse(), pos.Y() * physGridRef.GetPpmInverse());
+	bodyDef.angle = rot.Get();
+
+	bodyDef.type = static_cast<b2BodyType>(eType); // static_assert guarantees this to match
+	bodyDef.enabled = bIsEnabled;
+	bodyDef.fixedRotation = bIsFixedRotation;
+	bodyDef.bullet = bIsCcd;
+	bodyDef.awake = bIsAwake;
+	bodyDef.allowSleep = bAllowSleep;
+	bodyDef.gravityScale = fGravityScale;
+
+	m_pPhysicsBody = physGridRef.CreateBody(&bodyDef);
+}
+
+void HyEntity2d::PhysInit(HyPhysicsGrid2d& physGridRef,
+						  HyPhysicsType eType,
+						  b2Vec2 vPos,
+						  bool bIsEnabled /*= true*/,
+						  bool bIsFixedRotation /*= false*/,
+						  bool bIsCcd /*= false*/,
+						  bool bIsAwake /*= true*/,
+						  bool bAllowSleep /*= true*/,
+						  float fGravityScale /*= 1.0f*/)
+{
+	PhysRelease();
+
+	b2BodyDef bodyDef;
+	bodyDef.userData = this;
+	bodyDef.position.Set(vPos.x * physGridRef.GetPpmInverse(), vPos.y * physGridRef.GetPpmInverse());
 	bodyDef.angle = rot.Get();
 
 	bodyDef.type = static_cast<b2BodyType>(eType); // static_assert guarantees this to match
