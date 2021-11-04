@@ -501,6 +501,9 @@ HyText2d &HyLabel::GetTextNode()
 		glm::vec2 vPanelDimensions = GetPanelDimensions();
 		glm::ivec2 vPanelOffset = GetPanelOffset();
 
+		if(m_pPrimPanel)
+			HySetVec(vPanelOffset, m_pPrimPanel->GetBorderSize(), m_pPrimPanel->GetBorderSize());
+
 		// Position text
 		auto vUiSizeHint = GetSizeHint();
 		m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x,
