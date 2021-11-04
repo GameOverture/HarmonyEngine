@@ -160,6 +160,8 @@ void HyButton::InvokeButtonClicked()
 
 /*virtual*/ void HyButton::OnMouseEnter() /*override*/
 {
+
+
 	if(IsHideHoverState() || m_SpritePanel.IsLoadDataValid() == false)
 		return;
 	
