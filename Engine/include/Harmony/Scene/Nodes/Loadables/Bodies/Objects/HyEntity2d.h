@@ -135,6 +135,10 @@ public:
 	glm::vec2 PhysWorldCenterMass() const;
 	glm::vec2 PhysLocalCenterMass() const;
 	glm::vec2 PhysGetLinearVelocity() const;
+	
+	void PhysSetFilterData(b2Filter& Filter);
+	const b2Filter & PhysGetFilterData(int iIndex);
+	
 	void PhysSetLinearVelocity(glm::vec2 vVelocity);
 	float PhysGetAngularVelocity() const;
 	void PhysSetAngularVelocity(float fOmega);
