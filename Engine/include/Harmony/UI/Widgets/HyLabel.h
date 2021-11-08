@@ -27,14 +27,15 @@ protected:
 		PANELATTRIB_HideDisabled			= 1 << 3,		// Don't visually indicate if disabled
 		PANELATTRIB_IsDisabled				= 1 << 4,
 		PANELATTRIB_IsHighlighted			= 1 << 5,
+		PANELATTRIB_ShowHandCursor			= 1 << 6,		// When mouse cursor hovers over label, change to a hand icon
 
-		PANELATTRIB_IsSideBySide			= 1 << 6,
-		PANELATTRIB_SideBySideTextFirst		= 1 << 7,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
-		PANELATTRIB_SideBySideVertical		= 1 << 8,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
+		PANELATTRIB_IsSideBySide			= 1 << 7,
+		PANELATTRIB_SideBySideTextFirst		= 1 << 8,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
+		PANELATTRIB_SideBySideVertical		= 1 << 9,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
 
-		PANELATTRIB_StackedTextLeftAlign	= 1 << 9,		// When panel is stacked, use left alignment (when neither left, right, or justify, it will center)
-		PANELATTRIB_StackedTextRightAlign	= 1 << 10,		// When panel is stacked, use right alignment (when neither right, left, or justify, it will center)
-		PANELATTRIB_StackedTextJustifyAlign	= 1 << 11,		// When panel is stacked, use justify alignment (when neither justify, left, or right, it will center)
+		PANELATTRIB_StackedTextLeftAlign	= 1 << 10,		// When panel is stacked, use left alignment (when neither left, right, or justify, it will center)
+		PANELATTRIB_StackedTextRightAlign	= 1 << 11,		// When panel is stacked, use right alignment (when neither right, left, or justify, it will center)
+		PANELATTRIB_StackedTextJustifyAlign	= 1 << 12,		// When panel is stacked, use justify alignment (when neither justify, left, or right, it will center)
 	};
 	uint32					m_uiPanelAttribs;
 
@@ -81,6 +82,9 @@ public:
 	bool IsHighlighted() const;
 	virtual void SetAsHighlighted(bool bIsHighlighted);
 
+	bool IsShowHandCursor() const;
+	void SetShowHandCursor(bool bShowHandCursor);
+
 	bool IsHideDisabled() const;				// Whether to not visually indicate if disabled
 	void SetHideDisabled(bool bIsHideDisabled);	// Whether to not visually indicate if disabled
 
@@ -90,6 +94,9 @@ public:
 
 protected:
 	virtual void OnSetup() { }					// Optional override for derived classes
+
+	virtual void OnMouseEnter() override;
+	virtual void OnMouseLeave() override;
 
 	virtual glm::ivec2 GetSizeHint() override;
 	virtual glm::vec2 GetPosOffset() override;

@@ -55,6 +55,8 @@ public:
 	void InvokeButtonClicked();
 
 protected:
+	virtual void OnSetup() override;
+
 	virtual void OnMouseEnter() override;
 	virtual void OnMouseLeave() override;
 	virtual void OnMouseDown() override;

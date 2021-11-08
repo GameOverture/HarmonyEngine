@@ -23,6 +23,7 @@ HyButton::HyButton(const HyPrimitivePanelInit &initRef, std::string sTextPrefix,
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
+	OnSetup();
 }
 
 HyButton::HyButton(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
@@ -30,6 +31,7 @@ HyButton::HyButton(const HyPrimitivePanelInit &initRef, std::string sTextPrefix,
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
+	OnSetup();
 }
 
 HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
@@ -37,6 +39,7 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
+	OnSetup();
 }
 
 HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
@@ -44,6 +47,7 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
+	OnSetup();
 }
 
 /*virtual*/ HyButton::~HyButton()
@@ -158,9 +162,14 @@ void HyButton::InvokeButtonClicked()
 	OnMouseClicked();
 }
 
+/*virtual*/ void HyButton::OnSetup() /*override*/
+{
+	SetShowHandCursor(true);
+}
+
 /*virtual*/ void HyButton::OnMouseEnter() /*override*/
 {
-
+	HyLabel::OnMouseEnter();
 
 	if(IsHideHoverState() || m_SpritePanel.IsLoadDataValid() == false)
 		return;
@@ -179,6 +188,8 @@ void HyButton::InvokeButtonClicked()
 
 /*virtual*/ void HyButton::OnMouseLeave() /*override*/
 {
+	HyLabel::OnMouseLeave();
+
 	if(m_SpritePanel.IsLoadDataValid() == false)
 		return;
 

@@ -19,10 +19,13 @@ typedef HyOpenGL HyRendererInterop;
 // WINDOWING ///////////////////////////////////////////////////////////////
 #if defined(HY_USE_GLFW)
 	typedef GLFWwindow *HyWindowInteropPtr;
+	typedef GLFWcursor *HyMouseCursorPtr;
 #elif defined(HY_USE_SDL2)
 	typedef SDL_Window *HyWindowInteropPtr;
+	typedef SDL_Cursor *HyMouseCursorPtr;
 #else
 	typedef void *HyWindowInteropPtr;
+	typedef void *HyMouseCursorPtr;
 #endif
 
 // NETWORKING //////////////////////////////////////////////////////////////

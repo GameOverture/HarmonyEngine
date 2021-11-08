@@ -10,7 +10,7 @@
 #ifndef HyInput_h__
 #define HyInput_h__
 
-#include "Afx/HyStdAfx.h"
+#include "Afx/HyInteropAfx.h"
 #include "Input/HyInputMap.h"
 
 class HyWindow;
@@ -20,22 +20,24 @@ class HyInput
 	friend class HyEngine;
 	friend class HyWindow;
 
-	const uint32				m_uiNUM_INPUT_MAPS;
-	HyInputMap *				m_pInputMaps;
+	const uint32					m_uiNUM_INPUT_MAPS;
+	HyInputMap *					m_pInputMaps;
 
-	std::vector<HyWindow *> &	m_WindowListRef;
-	HyWindow *					m_pMouseWindow;
-	glm::vec2					m_ptMousePos;
-	uint32						m_uiMouseBtnFlags;
-	uint32						m_uiMouseBtnFlags_NewlyPressed;
-	uint32						m_uiMouseBtnFlags_Buffered;
-	glm::ivec2					m_vMouseScroll_LiveCount;
-	glm::ivec2					m_vMouseScroll_ThisFrame;
+	std::vector<HyWindow *> &		m_WindowListRef;
+	HyWindow *						m_pMouseWindow;
+	glm::vec2						m_ptMousePos;
+	uint32							m_uiMouseBtnFlags;
+	uint32							m_uiMouseBtnFlags_NewlyPressed;
+	uint32							m_uiMouseBtnFlags_Buffered;
+	glm::ivec2						m_vMouseScroll_LiveCount;
+	glm::ivec2						m_vMouseScroll_ThisFrame;
 
-	bool						m_bTouchScreenHack;	// Some touch screens do not send a 'MOUSE DOWN' message on initial touch, until you "drag" the cursor at least 1px or release the touch
+	bool							m_bTouchScreenHack;	// Some touch screens do not send a 'MOUSE DOWN' message on initial touch, until you "drag" the cursor at least 1px or release the touch
 
-	int32						m_JoystickList[HYNUM_JOYSTICK];
-	uint32						m_uiJoystickCount;
+	int32							m_JoystickList[HYNUM_JOYSTICK];
+	uint32							m_uiJoystickCount;
+
+	std::map<int, HyMouseCursorPtr>	m_LoadedCursorsMap;
 
 public:
 	HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
@@ -51,6 +53,10 @@ public:
 	glm::vec2 GetMousePos() const;
 	bool GetWorldMousePos(glm::vec2 &ptWorldPosOut) const;
 	glm::ivec2 GetMouseScroll() const;
+
+	// Change the mouse cursor icon
+	void SetMouseCursor(HyMouseCursor eCursor);
+	void ResetMouseCursor();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup Button/Axis Mapping

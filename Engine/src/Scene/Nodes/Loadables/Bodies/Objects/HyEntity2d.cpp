@@ -350,6 +350,22 @@ void HyEntity2d::DisableMouseInput()
 	m_uiEntAttribs &= ~ENT2DATTRIB_MouseInput;
 }
 
+bool HyEntity2d::IsMouseInBounds()
+{
+	if(GetCoordinateSystem() >= 0)
+	{
+		return HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem() && HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
+	}
+	else
+	{
+		glm::vec2 ptWorldMousePos;
+		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
+			return HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
+	}
+
+	return false;
+}
+
 void HyEntity2d::PhysInit(HyPhysicsGrid2d& physGridRef,
 						  HyPhysicsType eType,
 						  bool bIsEnabled /*= true*/,
@@ -721,21 +737,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 	if((m_uiEntAttribs & ENT2DATTRIB_MouseInput) != 0)
 	{
-		bool bMouseInBounds;
-		if(GetCoordinateSystem() >= 0)
-		{
-			bMouseInBounds = HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem() &&
-							 HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
-		}
-		else
-		{
-			glm::vec2 ptWorldMousePos;
-			if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
-				bMouseInBounds = HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
-			else
-				bMouseInBounds = false;
-		}
-
+		bool bMouseInBounds = IsMouseInBounds();
 		bool bLeftClickDown = HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft);
 
 		switch(m_eMouseInputState)

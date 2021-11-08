@@ -133,6 +133,15 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 
 /*virtual*/ HyInput::~HyInput()
 {
+	for(auto iter = m_LoadedCursorsMap.begin(); iter != m_LoadedCursorsMap.end(); ++iter)
+	{
+#if defined(HY_USE_GLFW)
+		glfwDestroyCursor(iter->second);
+#elif defined(HY_USE_SDL2)
+		SDL_FreeCursor(iter->second);
+#endif
+	}
+
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 		static_cast<HyInputMap *>(m_pInputMaps)[i].~HyInputMap();
 
@@ -163,6 +172,33 @@ bool HyInput::GetWorldMousePos(glm::vec2 &ptWorldPosOut) const
 glm::ivec2 HyInput::GetMouseScroll() const
 {
 	return m_vMouseScroll_ThisFrame;
+}
+
+void HyInput::SetMouseCursor(HyMouseCursor eCursor)
+{
+	if(m_LoadedCursorsMap.find(eCursor) == m_LoadedCursorsMap.end())
+	{
+#if defined(HY_USE_GLFW)
+		m_LoadedCursorsMap[eCursor] = glfwCreateStandardCursor(static_cast<int>(eCursor));
+#elif defined(HY_USE_SDL2)
+		m_LoadedCursorsMap[eCursor] = SDL_CreateSystemCursor(static_cast<SDL_SystemCursor>(eCursor));
+#endif
+	}
+
+#if defined(HY_USE_GLFW)
+	glfwSetCursor(m_WindowListRef[0]->GetInterop(), m_LoadedCursorsMap[eCursor]);
+#elif defined(HY_USE_SDL2)
+	SDL_SetCursor(m_LoadedCursorsMap[eCursor]);
+#endif
+}
+
+void HyInput::ResetMouseCursor()
+{
+#if defined(HY_USE_GLFW)
+	glfwSetCursor(m_WindowListRef[0]->GetInterop(), nullptr);
+#elif defined(HY_USE_SDL2)
+	SetMouseCursor(HYMOUSECURSOR_Arrow);
+#endif
 }
 
 void HyInput::SetActionCategory(int32 iActionId, uint8 uiCategory, uint32 uiMappingIndex /*= 0*/)

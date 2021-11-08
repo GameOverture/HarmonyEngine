@@ -11,6 +11,7 @@
 #include "UI/Widgets/HyLabel.h"
 #include "Assets/Nodes/HySprite2dData.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "HyEngine.h"
 
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
@@ -249,6 +250,9 @@ bool HyLabel::IsEnabled() const
 		m_uiPanelAttribs &= ~PANELATTRIB_IsDisabled;
 		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
+
+		if(IsMouseInBounds())
+			OnMouseEnter();
 	}
 	else
 	{
@@ -259,6 +263,8 @@ bool HyLabel::IsEnabled() const
 			topColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
 			botColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
 		}
+
+		OnMouseLeave();
 	}
 }
 
@@ -290,6 +296,19 @@ bool HyLabel::IsHighlighted() const
 			//m_pPrimPanel->m_Stroke.SetLineThickness(m_pPrimPanel->m_Stroke.GetLineThickness() / 2.0f);
 		}
 	}
+}
+
+bool HyLabel::IsShowHandCursor() const
+{
+	return (m_uiPanelAttribs & PANELATTRIB_ShowHandCursor) != 0;
+}
+
+void HyLabel::SetShowHandCursor(bool bShowHandCursor)
+{
+	if(bShowHandCursor)
+		m_uiPanelAttribs |= PANELATTRIB_ShowHandCursor;
+	else
+		m_uiPanelAttribs &= ~PANELATTRIB_ShowHandCursor;
 }
 
 bool HyLabel::IsHideDisabled() const
@@ -324,6 +343,18 @@ HySprite2d &HyLabel::GetSpriteNode()
 HyText2d &HyLabel::GetTextNode()
 {
 	return m_Text;
+}
+
+/*virtual*/ void HyLabel::OnMouseEnter() /*override*/
+{
+	if(IsShowHandCursor() && IsEnabled())
+		HyEngine::Input().SetMouseCursor(HYMOUSECURSOR_Hand);
+}
+
+/*virtual*/ void HyLabel::OnMouseLeave() /*override*/
+{
+	if(IsShowHandCursor())
+		HyEngine::Input().ResetMouseCursor();
 }
 
 /*virtual*/ glm::ivec2 HyLabel::GetSizeHint() /*override*/
