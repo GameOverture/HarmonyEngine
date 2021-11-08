@@ -588,6 +588,21 @@ void HyEntity2d::PhysApplyAngularImpulse(float fImpulse, bool bWake)
 		m_pPhysicsBody->ApplyAngularImpulse(fImpulse, bWake);
 }
 
+void HyEntity2d::PhysSetFilterData(b2Filter& Filter)
+{
+	for (b2Fixture* f = m_pPhysicsBody->GetFixtureList(); f; f = f->GetNext())
+	{
+		f->SetFilterData(Filter);
+	}
+}
+
+const b2Filter & HyEntity2d::PhysGetFilterData(int iIndex) 
+{
+	return m_pPhysicsBody->GetFixtureList()[iIndex].GetFilterData();
+}
+
+
+
 float HyEntity2d::PhysGetMass() const
 {
 	if(m_pPhysicsBody)
