@@ -165,6 +165,7 @@ void HyButton::InvokeButtonClicked()
 /*virtual*/ void HyButton::OnSetup() /*override*/
 {
 	SetShowHandCursor(true);
+	SetAsEnabled(IsEnabled());
 }
 
 /*virtual*/ void HyButton::OnMouseEnter() /*override*/

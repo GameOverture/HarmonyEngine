@@ -108,6 +108,8 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 		#list(APPEND HYEM_LINK_FLAGS "-fsanitize=address")
 		#list(APPEND HYEM_LINK_FLAGS "-s TOTAL_MEMORY=2147418112")
 		#list(APPEND HYEM_LINK_FLAGS "-gsource-map http://localhost:8000/")
+	else()
+		list(APPEND HYEM_COMPILE_FLAGS "-O2")
 	endif()
 	
 	string(REPLACE ";" " " HYEM_COMPILE_FLAGS "${HYEM_COMPILE_FLAGS}")

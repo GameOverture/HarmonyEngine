@@ -64,6 +64,11 @@ HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, s
 	delete m_pFill;
 }
 
+const HyRectangle<float> &HyProgressBar::GetFillMargins() const
+{
+	return m_FillMargins;
+}
+
 void HyProgressBar::SetFillMargins(const HyRectangle<int32> &fillMarginsRef)
 {
 	SetFillMargins(fillMarginsRef.left, fillMarginsRef.bottom, fillMarginsRef.right, fillMarginsRef.top);
@@ -149,16 +154,17 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 	delete m_pFill;
 	if(m_SpritePanel.IsLoadDataValid() && m_SpritePanel.GetNumStates() > 1)
 	{
-		m_pFill = HY_NEW HySprite2d(m_SpritePanel.GetPrefix(), m_SpritePanel.GetName(), this);
+		m_pFill = HY_NEW HySprite2d(m_SpritePanel.GetPrefix(), m_SpritePanel.GetName());
 		m_pFill->SetState(1);
 	}
 	else
 	{
-		m_pFill = HY_NEW HyPrimitive2d(this);
+		m_pFill = HY_NEW HyPrimitive2d();
 
 		glm::vec2 vTotalFillArea(GetPanelWidth() - (m_FillMargins.left + m_FillMargins.right), GetPanelHeight() - (m_FillMargins.top + m_FillMargins.bottom));
 		static_cast<HyPrimitive2d *>(m_pFill)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
 	}
+	ChildInsert(m_Text, *m_pFill);
 
 	m_NumberFormat.SetFractionPrecision(0, 1);
 	

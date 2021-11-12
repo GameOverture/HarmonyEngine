@@ -41,12 +41,6 @@ double HyTimer::GetDuration() const
 
 void HyTimer::Init(double dDuration)
 {
-	if(dDuration <= 0.0)
-	{
-		HyLogWarning("HyTimer::Init() was passed a value that was <= 0.0. Ignoring call");
-		return;
-	}
-
 	m_dElapsedTime = 0.0f;
 	m_dDuration = dDuration;
 	m_bIsRunning = false;
@@ -65,12 +59,6 @@ void HyTimer::Reset()
 
 void HyTimer::Start()
 {
-	if(m_dDuration == 0.0)
-	{
-		HyLogWarning("HyTimer::Start() was invoked with uninitialized data. Should call Init() prior");
-		return;
-	}
-	
 	m_bIsRunning = true;
 }
 
