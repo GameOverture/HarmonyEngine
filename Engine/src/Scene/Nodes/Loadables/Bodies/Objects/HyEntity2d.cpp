@@ -17,7 +17,6 @@
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyBody2d(HYTYPE_Entity, "", "", pParent),
 	m_uiEntAttribs(0),
-	m_eMouseInputState(MOUSEINPUT_None),
 	m_pPhysicsBody(nullptr)
 {
 }
@@ -26,7 +25,6 @@ HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 	IHyBody2d(std::move(donor)),
 	m_ChildList(std::move(donor.m_ChildList)),
 	m_uiEntAttribs(std::move(donor.m_uiEntAttribs)),
-	m_eMouseInputState(std::move(donor.m_eMouseInputState)),
 	m_pPhysicsBody(std::move(donor.m_pPhysicsBody))
 {
 }
@@ -45,7 +43,6 @@ HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor) noexcept
 
 	m_ChildList = std::move(donor.m_ChildList);
 	m_uiEntAttribs = std::move(donor.m_uiEntAttribs);
-	m_eMouseInputState = std::move(donor.m_eMouseInputState);
 	m_pPhysicsBody = std::move(m_pPhysicsBody);
 
 	return *this;
@@ -342,12 +339,12 @@ std::vector<IHyNode2d *> HyEntity2d::FindChildren(std::function<bool(IHyNode2d *
 
 void HyEntity2d::EnableMouseInput()
 {
-	m_uiEntAttribs |= ENT2DATTRIB_MouseInput;
+	m_uiEntAttribs |= ENT2DATTRIB_MouseInputEnabled;
 }
 
 void HyEntity2d::DisableMouseInput()
 {
-	m_uiEntAttribs &= ~ENT2DATTRIB_MouseInput;
+	m_uiEntAttribs &= ~ENT2DATTRIB_MouseInputEnabled;
 }
 
 bool HyEntity2d::IsMouseInBounds()
@@ -750,53 +747,69 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 {
 	IHyBody2d::Update();
 
-	if((m_uiEntAttribs & ENT2DATTRIB_MouseInput) != 0)
+	if((m_uiEntAttribs & ENT2DATTRIB_MouseInputEnabled) != 0)
 	{
 		bool bMouseInBounds = IsMouseInBounds();
 		bool bLeftClickDown = HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft);
 
-		switch(m_eMouseInputState)
+		if((m_uiEntAttribs & ENT2DATTRIB_MouseInputHover) == 0) // Not currently hovering
 		{
-		case MOUSEINPUT_None:
 			if(bMouseInBounds)
 			{
-				m_eMouseInputState = MOUSEINPUT_Hover;
+				m_uiEntAttribs |= ENT2DATTRIB_MouseInputHover;
 				OnMouseEnter();
-
+	
 				if(bLeftClickDown)
 				{
-					m_eMouseInputState = MOUSEINPUT_Down;
-					OnMouseDown();
+					if((m_uiEntAttribs & (ENT2DATTRIB_MouseInputInvalid | ENT2DATTRIB_MouseInputDown)) == 0)
+					{
+						m_uiEntAttribs |= ENT2DATTRIB_MouseInputDown;
+						OnMouseDown();
+					}
+				}
+				else
+				{
+					m_uiEntAttribs &= ~(ENT2DATTRIB_MouseInputDown | ENT2DATTRIB_MouseInputInvalid);
 				}
 			}
-			break;
-
-		case MOUSEINPUT_Hover:
-			if(bMouseInBounds == false)
+			else
 			{
-				m_eMouseInputState = MOUSEINPUT_None;
-				OnMouseLeave();
+				if(bLeftClickDown && (m_uiEntAttribs & ENT2DATTRIB_MouseInputDown) == 0)
+					m_uiEntAttribs |= ENT2DATTRIB_MouseInputInvalid;
 			}
-			else if(bLeftClickDown)
-			{
-				m_eMouseInputState = MOUSEINPUT_Down;
-				OnMouseDown();
-			}
-			break;
-
-		case MOUSEINPUT_Down:
-			if(bMouseInBounds == false)
-			{
-				m_eMouseInputState = MOUSEINPUT_None;
-				OnMouseLeave();
-			}
-			else if(bLeftClickDown == false)
-			{
-				m_eMouseInputState = MOUSEINPUT_Hover;
-				OnMouseClicked();
-			}
-			break;
 		}
+		else // Is currently hovering
+		{
+			if(bMouseInBounds) // Still in bounds
+			{
+				if(bLeftClickDown)
+				{
+					if((m_uiEntAttribs & (ENT2DATTRIB_MouseInputInvalid | ENT2DATTRIB_MouseInputDown)) == 0)
+					{
+						m_uiEntAttribs |= ENT2DATTRIB_MouseInputDown;
+						OnMouseDown();
+					}
+				}
+				else
+				{
+					if((m_uiEntAttribs & ENT2DATTRIB_MouseInputDown) != 0)
+					{
+						m_uiEntAttribs &= ~ENT2DATTRIB_MouseInputDown;
+						OnMouseClicked();
+					}
+
+					m_uiEntAttribs &= ~ENT2DATTRIB_MouseInputInvalid;
+				}
+			}
+			else // Left bounds
+			{
+				m_uiEntAttribs &= ~ENT2DATTRIB_MouseInputHover;
+				OnMouseLeave();
+			}
+		}
+
+		if(bLeftClickDown == false)
+			m_uiEntAttribs &= ~(ENT2DATTRIB_MouseInputDown | ENT2DATTRIB_MouseInputInvalid);
 	}
 
 	if(m_pPhysicsBody && m_pPhysicsBody->IsEnabled())

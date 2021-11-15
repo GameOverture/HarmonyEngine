@@ -24,18 +24,14 @@ protected:
 
 	enum Entity2dAttributes
 	{
-		ENT2DATTRIB_MouseInput				= 1 << 1,
-		ENT2DATTRIB_ReverseDisplayOrder		= 1 << 2,
+		ENT2DATTRIB_MouseInputEnabled		= 1 << 1,
+		ENT2DATTRIB_MouseInputHover			= 1 << 2,
+		ENT2DATTRIB_MouseInputDown			= 1 << 3,
+		ENT2DATTRIB_MouseInputInvalid		= 1 << 4,	// When mouse input was initially pressed outside of bounds
+
+		ENT2DATTRIB_ReverseDisplayOrder		= 1 << 5,
 	};
 	uint32									m_uiEntAttribs;
-
-	enum MouseInputState
-	{
-		MOUSEINPUT_None = 0,
-		MOUSEINPUT_Hover,
-		MOUSEINPUT_Down
-	};
-	MouseInputState							m_eMouseInputState;
 
 	b2Body *								m_pPhysicsBody;
 
