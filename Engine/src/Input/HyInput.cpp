@@ -190,10 +190,15 @@ void HyInput::SetMouseCursor(HyMouseCursor eCursor)
 #elif defined(HY_USE_SDL2)
 	SDL_SetCursor(m_LoadedCursorsMap[eCursor]);
 #endif
+
+	m_bCursorWasSet = true;
 }
 
 void HyInput::ResetMouseCursor()
 {
+	if(m_bCursorWasSet)
+		return;
+
 #if defined(HY_USE_GLFW)
 	glfwSetCursor(m_WindowListRef[0]->GetInterop(), nullptr);
 #elif defined(HY_USE_SDL2)
@@ -354,6 +359,8 @@ void HyInput::SetMouseWindow(HyWindow *pWindow)
 
 void HyInput::Update()
 {
+	m_bCursorWasSet = false;
+
 	m_uiMouseBtnFlags_Buffered = (m_uiMouseBtnFlags ^ m_uiMouseBtnFlags_NewlyPressed);
 	m_uiMouseBtnFlags_NewlyPressed = 0;
 	

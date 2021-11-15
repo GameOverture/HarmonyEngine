@@ -38,6 +38,7 @@ class HyInput
 	uint32							m_uiJoystickCount;
 
 	std::map<int, HyMouseCursorPtr>	m_LoadedCursorsMap;
+	bool							m_bCursorWasSet;
 
 public:
 	HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
