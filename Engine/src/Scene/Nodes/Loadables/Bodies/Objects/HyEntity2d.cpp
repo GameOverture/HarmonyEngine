@@ -807,9 +807,6 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 				OnMouseLeave();
 			}
 		}
-
-		if(bLeftClickDown == false)
-			m_uiEntAttribs &= ~(ENT2DATTRIB_MouseInputDown | ENT2DATTRIB_MouseInputInvalid);
 	}
 
 	if(m_pPhysicsBody && m_pPhysicsBody->IsEnabled())
