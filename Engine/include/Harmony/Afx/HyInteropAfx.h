@@ -39,6 +39,7 @@ typedef HyOpenGL HyRendererInterop;
 	#include "Audio/SDL2/HyFileAudioImpl_SDL2.h"
 	typedef HyAudioCore_SDL2 HyAudioInterop;
 #else
+	#include  "Audio/IHyAudioCore.h"
 	typedef HyAudioCore_Null HyAudioInterop;
 #endif
 

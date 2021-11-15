@@ -86,11 +86,19 @@ public:
 	{
 		return HY_NEW HyAudioBank_Null();
 	}
-
 	virtual void OnSetSfxVolume(float fGlobalSfxVolume) override
 	{ }
-
 	virtual void OnSetMusicVolume(float fGlobalMusicVolume) override
+	{ }
+	virtual void OnCue_Play(HyAudioHandle hHandle, PlayInfo &playInfoRef) override
+	{ }
+	virtual void OnCue_Stop(HyAudioHandle hHandle) override
+	{ }
+	virtual void OnCue_Pause(HyAudioHandle hHandle) override
+	{ }
+	virtual void OnCue_Unpause(HyAudioHandle hHandle) override
+	{ }
+	virtual void OnCue_Volume(HyAudioHandle hHandle) override
 	{ }
 };
 
