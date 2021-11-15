@@ -22,15 +22,14 @@ Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 - TBD
   
 ## Editor Features
-Setup and design sprite animations, fonts, sound cues, particles, and more. Or by using any combination of them, create complex entity hierarchies, apply physics, and setup bounding volumes
+Setup and design sprite animations, fonts, sound cues, particles, and more. Or by using any combination of them, create complex entity hierarchies, apply physics or colliders, and setup bounding volumes
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![Harmony Editor Screenshot](https://user-images.githubusercontent.com/344924/140581279-a3899c64-ea8b-4c9a-b869-b11d07444db2.png)
 - Quickly generate and setup new code projects and builds with all dependencies taken care of
 - Handle the entire asset pipeline from importing, previewing, and replacing assets
 - Efficient texture atlas management, packing, and compression
 - Stylized bitmap font creation
 - Audio designer
-- TBD
 
 ## Installation 
 
