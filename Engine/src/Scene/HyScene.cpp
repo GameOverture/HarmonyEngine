@@ -154,9 +154,9 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
-void HyScene::AppendAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType)
+void HyScene::ProcessAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType)
 {
-	m_AudioCoreRef.AppendCue(pNode, eCueType);
+	m_AudioCoreRef.ProcessCue(pNode, eCueType);
 }
 
 void HyScene::SetPause(bool bPause)
@@ -179,15 +179,14 @@ void HyScene::UpdateNodes()
 		for(uint32 i = 0; i < sm_NodeList_PauseUpdate.size(); ++i)
 			sm_NodeList_PauseUpdate[i]->Update();
 	}
-
 	HY_PROFILE_END
 }
 
 void HyScene::UpdatePhysics()
 {
 	HY_PROFILE_BEGIN(HYPROFILERSECTION_Physics)
-		for(auto physGrid : sm_PhysicsGridList)
-			physGrid->Update();
+	for(auto physGrid : sm_PhysicsGridList)
+		physGrid->Update();
 	HY_PROFILE_END
 }
 

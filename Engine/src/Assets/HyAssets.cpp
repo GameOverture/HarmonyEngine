@@ -20,7 +20,6 @@
 #include "Assets/Nodes/HyText2dData.h"
 #include "Assets/Nodes/HyTexturedQuad2dData.h"
 #include "Assets/Nodes/HyPrefabData.h"
-#include "Audio/HyAudioHarness.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"

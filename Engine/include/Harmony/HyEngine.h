@@ -12,7 +12,6 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
-#include "Audio/HyAudioHarness.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Input/HyInput.h"
@@ -61,7 +60,7 @@ class HyEngine
 	HyConsoleInterop			m_Console;
 	HyWindowManager				m_WindowManager;
 	HyNetworking				m_Networking;
-	HyAudioHarness				m_Audio;
+	HyAudioInterop 				m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
 	HyGuiComms					m_GuiComms;
@@ -104,7 +103,7 @@ public:
 	static uint32 NumWindows();
 	static HyWindow &Window(uint32 uiWindowIndex = 0);
 	static HyInput &Input();
-	static HyAudioHarness &Audio();
+	static void SetVolume(float fGlobalSfxVolume, float fGlobalMusicVolume);
 	static void LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut);
 	static HyDiagnostics &Diagnostics();
 	static HyShaderHandle DefaultShaderHandle(HyType eType);

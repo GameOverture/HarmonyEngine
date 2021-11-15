@@ -10,7 +10,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Assets/Files/HyFileAudio.h"
-#include "Audio/HyAudioHarness.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &assetsRef) :

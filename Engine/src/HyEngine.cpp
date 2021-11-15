@@ -37,8 +37,8 @@ HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	m_Console(m_Init.bUseConsole, m_Init.consoleInfo),
 	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Audio(),
-	m_Scene(m_Audio.GetCore(), m_WindowManager.GetWindowList()),
-	m_Assets(m_Audio.GetCore(), m_Scene, m_Init.sDataDir),
+	m_Scene(m_Audio, m_WindowManager.GetWindowList()),
+	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
 	m_GuiComms(m_Init.uiDebugPort, m_Assets),
 	m_Time(m_Init.uiUpdateTickMs),
 	m_Diagnostics(m_Init, m_Time, m_Assets, m_Scene),
@@ -130,7 +130,6 @@ bool HyEngine::Update()
 	{
 		m_Scene.UpdateNodes();
 		m_Scene.UpdatePhysics();
-		m_Audio.GetCore().OnUpdate();
 		
 		HY_PROFILE_BEGIN(HYPROFILERSECTION_Update)
 		if(PollPlatformApi() == false || OnUpdate() == false)
@@ -250,10 +249,11 @@ bool HyEngine::PollPlatformApi()
 	return sm_pInstance->m_Input;
 }
 
-/*static*/ HyAudioHarness &HyEngine::Audio()
+/*static*/ void HyEngine::SetVolume(float fGlobalSfxVolume, float fGlobalMusicVolume)
 {
-	HyAssert(sm_pInstance != nullptr, "HyEngine::Audio() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Audio;
+	HyAssert(sm_pInstance != nullptr, "HyEngine::SetVolume() was invoked before engine has been initialized.");
+	sm_pInstance->m_Audio.SetSfxVolume(fGlobalSfxVolume);
+	sm_pInstance->m_Audio.SetMusicVolume(fGlobalMusicVolume);
 }
 
 /*static*/ void HyEngine::LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut)

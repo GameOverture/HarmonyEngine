@@ -13,12 +13,15 @@
 #include "Scene/Nodes/Loadables/IHyLoadable2d.h"
 #include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 #include "Assets/Nodes/HyAudioData.h"
-#include "Audio/HyAudioHarness.h"
 #include "Scene/HyScene.h"
+
+template<typename NODETYPE, typename ENTTYPE>
+HyAudioHandle IHyAudio<NODETYPE, ENTTYPE>::sm_hUniqueIdCounter = 1;
 
 template<typename NODETYPE, typename ENTTYPE>
 IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
 	NODETYPE(HYTYPE_Audio, sPrefix, sName, pParent),
+	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),
 	m_fPitch(1.0f),
@@ -30,6 +33,7 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, EN
 template<typename NODETYPE, typename ENTTYPE>
 IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(const IHyAudio &copyRef) :
 	NODETYPE(copyRef),
+	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(copyRef.m_uiCueFlags),
 	m_fVolume(copyRef.m_fVolume),
 	m_fPitch(copyRef.m_fPitch),
@@ -65,6 +69,12 @@ const IHyAudio<NODETYPE, ENTTYPE> &IHyAudio<NODETYPE, ENTTYPE>::operator=(const 
 	pitch = rhs.pitch;
 
 	return *this;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+HyAudioHandle IHyAudio<NODETYPE, ENTTYPE>::GetHandle() const
+{
+	return m_hUNIQUE_ID;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -214,7 +224,7 @@ template<typename NODETYPE, typename ENTTYPE>
 		for(uint32 i = 0; i < IHyAudioCore::NUM_CUETYPES; ++i)
 		{
 			if(0 != (m_uiCueFlags & (1 << i)))
-				IHyNode::sm_pScene->AppendAudioCue(this, static_cast<IHyAudioCore::CueType>(i));
+				IHyNode::sm_pScene->ProcessAudioCue(this, static_cast<IHyAudioCore::CueType>(i));
 		}
 
 		m_uiCueFlags = 0;

@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/IHyFile.h"
-#include "Audio/Harness/IHyFileAudioImpl.h"
+#include "Audio/IHyFileAudioImpl.h"
 
 class HyFileAudio : public IHyFile
 {

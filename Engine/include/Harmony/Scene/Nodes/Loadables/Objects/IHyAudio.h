@@ -18,6 +18,9 @@ typedef std::vector<std::pair<uint32, uint32>> HyAudioPlayList;	// <checksum, we
 template<typename NODETYPE, typename ENTTYPE>
 class IHyAudio : public NODETYPE
 {
+	static HyAudioHandle		sm_hUniqueIdCounter;
+	const HyAudioHandle			m_hUNIQUE_ID;
+
 	uint32						m_uiCueFlags;
 	float						m_fVolume;
 	float						m_fPitch;
@@ -54,6 +57,8 @@ public:
 	virtual ~IHyAudio(void);
 	
 	const IHyAudio &operator=(const IHyAudio &rhs);
+
+	HyAudioHandle GetHandle() const;
 
 	int32 GetLoops() const;
 	void SetLoops(int32 iLoops);

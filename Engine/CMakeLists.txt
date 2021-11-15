@@ -73,9 +73,9 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Nodes/HyText2dData.cpp
 	src/Assets/Nodes/HyTexturedQuad2dData.cpp
 	src/Assets/Nodes/IHyNodeData.cpp
-	src/Audio/HyAudioHarness.cpp
-	src/Audio/Harness/SDL2/HyAudioCore_SDL2.cpp
-	src/Audio/Harness/SDL2/HyFileAudioImpl_SDL2.cpp
+	src/Audio/IHyAudioCore.cpp
+	src/Audio/SDL2/HyAudioCore_SDL2.cpp
+	src/Audio/SDL2/HyFileAudioImpl_SDL2.cpp
 	src/Diagnostics/HyDiagnostics.cpp
 	src/Diagnostics/Console/IHyConsole.cpp
 	src/Diagnostics/Console/Interop/HyConsole_Std.cpp
@@ -195,11 +195,10 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Assets/Nodes/HyText2dData.h
 	include/Harmony/Assets/Nodes/HyTexturedQuad2dData.h
 	include/Harmony/Assets/Nodes/IHyNodeData.h
-	include/Harmony/Audio/HyAudioHarness.h
-	include/Harmony/Audio/Harness/IHyAudioCore.h
-	include/Harmony/Audio/Harness/IHyFileAudioImpl.h
-	include/Harmony/Audio/Harness/SDL2/HyAudioCore_SDL2.h
-	include/Harmony/Audio/Harness/SDL2/HyFileAudioImpl_SDL2.h
+	include/Harmony/Audio/IHyAudioCore.h
+	include/Harmony/Audio/IHyFileAudioImpl.h
+	include/Harmony/Audio/SDL2/HyAudioCore_SDL2.h
+	include/Harmony/Audio/SDL2/HyFileAudioImpl_SDL2.h
 	include/Harmony/Diagnostics/HyDiagnostics.h
 	include/Harmony/Diagnostics/Console/IHyConsole.h
 	include/Harmony/Diagnostics/Console/Interop/HyConsole_Std.h

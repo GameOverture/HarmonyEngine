@@ -11,7 +11,7 @@
 #define HyAudioBank_SDL2_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Audio/Harness/IHyFileAudioImpl.h"
+#include "Audio/IHyFileAudioImpl.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 #if defined(HY_USE_SDL2)

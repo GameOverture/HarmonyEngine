@@ -14,7 +14,7 @@
 #include "Scene/Physics/HyPhysicsGrid2d.h"
 #include "Scene/Physics/HyBox2dRuntime.h"
 #include "Scene/Physics/HyPhysicsDebug2d.h"
-#include "Audio/Harness/IHyAudioCore.h"
+#include "Audio/IHyAudioCore.h"
 
 // Forward declarations
 class IHyNode;
@@ -66,7 +66,7 @@ public:
 	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
 	void CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut);
 
-	void AppendAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType);
+	void ProcessAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType);
 
 	void SetPause(bool bPause);
 

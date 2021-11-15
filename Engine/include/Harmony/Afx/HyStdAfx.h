@@ -43,6 +43,7 @@ typedef rapidjson::GenericObject<false, rapidjson::Value> HyJsonObj;
 #include <queue>
 #include <set>
 #include <map>
+#include <unordered_map>
 #include <cctype>
 #include <sstream>
 #include <thread>
@@ -56,6 +57,7 @@ typedef uint32 HyTextureHandle;
 typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
 typedef uint32 HyVertexBufferHandle;
+typedef uint32 HyAudioHandle;
 
 // Tags aren't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 // They increase the memory footprint of every node/instance by 8 bytes
