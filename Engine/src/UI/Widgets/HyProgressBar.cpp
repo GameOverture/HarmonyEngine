@@ -9,13 +9,16 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyProgressBar.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 HyProgressBar::HyProgressBar(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
-	m_pFill(nullptr)
+	m_pBar(nullptr),
+	m_fBarScissorAmt(0.0f),
+	m_BarScissorAmt(m_fBarScissorAmt, *this, 0)
 {
 }
 
@@ -24,7 +27,9 @@ HyProgressBar::HyProgressBar(const HyPrimitivePanelInit &initRef, std::string sT
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
-	m_pFill(nullptr)
+	m_pBar(nullptr),
+	m_fBarScissorAmt(0.0f),
+	m_BarScissorAmt(m_fBarScissorAmt, *this, 0)
 {
 	OnSetup();
 }
@@ -34,7 +39,9 @@ HyProgressBar::HyProgressBar(const HyPrimitivePanelInit &initRef, std::string sT
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
-	m_pFill(nullptr)
+	m_pBar(nullptr),
+	m_fBarScissorAmt(0.0f),
+	m_BarScissorAmt(m_fBarScissorAmt, *this, 0)
 {
 	OnSetup();
 }
@@ -44,7 +51,9 @@ HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, s
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
-	m_pFill(nullptr)
+	m_pBar(nullptr),
+	m_fBarScissorAmt(0.0f),
+	m_BarScissorAmt(m_fBarScissorAmt, *this, 0)
 {
 	OnSetup();
 }
@@ -54,34 +63,36 @@ HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, s
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
-	m_pFill(nullptr)
+	m_pBar(nullptr),
+	m_fBarScissorAmt(0.0f),
+	m_BarScissorAmt(m_fBarScissorAmt, *this, 0)
 {
 	OnSetup();
 }
 
 /*virtual*/ HyProgressBar::~HyProgressBar()
 {
-	delete m_pFill;
+	delete m_pBar;
 }
 
-const HyRectangle<float> &HyProgressBar::GetFillMargins() const
+const glm::ivec2 &HyProgressBar::GetBarOffset() const
 {
-	return m_FillMargins;
+	return m_vBarOffset;
 }
 
-void HyProgressBar::SetFillMargins(const HyRectangle<int32> &fillMarginsRef)
+void HyProgressBar::SetBarOffset(const glm::ivec2 &barOffset)
 {
-	SetFillMargins(fillMarginsRef.left, fillMarginsRef.bottom, fillMarginsRef.right, fillMarginsRef.top);
+	SetBarOffset(barOffset.x, barOffset.y);
 }
 
-void HyProgressBar::SetFillMargins(int32 iFillMarginLeft, int32 iFillMarginBottom, int32 iFillMarginRight, int32 iFillMarginTop)
+void HyProgressBar::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 {
-	m_FillMargins.Set(static_cast<float>(iFillMarginLeft), static_cast<float>(iFillMarginBottom), static_cast<float>(iFillMarginRight), static_cast<float>(iFillMarginTop));
+	HySetVec(m_vBarOffset, iBarOffsetX, iBarOffsetY);
 
-	if(m_pFill->GetType() == HYTYPE_Primitive)
+	if(m_pBar && m_pBar->GetType() == HYTYPE_Primitive)
 	{
-		glm::vec2 vTotalFillArea(GetPanelWidth() - (m_FillMargins.left + m_FillMargins.right), GetPanelHeight() - (m_FillMargins.top + m_FillMargins.bottom));
-		static_cast<HyPrimitive2d *>(m_pFill)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
+		glm::vec2 vTotalFillArea(GetPanelWidth() - (m_vBarOffset.x * 2.0f), GetPanelHeight() - (m_vBarOffset.y * 2.0f));
+		static_cast<HyPrimitive2d *>(m_pBar)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
 	}
 
 	AdjustProgress();
@@ -90,7 +101,7 @@ void HyProgressBar::SetFillMargins(int32 iFillMarginLeft, int32 iFillMarginBotto
 void HyProgressBar::Reset()
 {
 	m_iMinimum = m_iMaximum = m_iValue = 0;
-	m_pFill->scale.SetX(0.0f);
+	//m_pBar->scale.SetX(0.0f);
 
 	AdjustProgress();
 }
@@ -147,24 +158,29 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 	AdjustProgress();
 }
 
+/*virtual*/ void HyProgressBar::OnUpdate() /*override*/
+{
+	if(m_pBar)
+		m_pBar->SetScissor(0, 0, m_BarScissorAmt.Get(), m_pBar->GetSceneHeight());
+}
+
 /*virtual*/ void HyProgressBar::OnSetup() /*override*/
 {
-	m_FillMargins = m_TextMargins;
-
-	delete m_pFill;
+	delete m_pBar;
 	if(m_SpritePanel.IsLoadDataValid() && m_SpritePanel.GetNumStates() > 1)
 	{
-		m_pFill = HY_NEW HySprite2d(m_SpritePanel.GetPrefix(), m_SpritePanel.GetName());
-		m_pFill->SetState(1);
+		m_pBar = HY_NEW HySprite2d(m_SpritePanel.GetPrefix(), m_SpritePanel.GetName());
+		m_pBar->SetState(1);
 	}
 	else
 	{
-		m_pFill = HY_NEW HyPrimitive2d();
+		m_pBar = HY_NEW HyPrimitive2d();
 
-		glm::vec2 vTotalFillArea(GetPanelWidth() - (m_FillMargins.left + m_FillMargins.right), GetPanelHeight() - (m_FillMargins.top + m_FillMargins.bottom));
-		static_cast<HyPrimitive2d *>(m_pFill)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
+		glm::vec2 vTotalFillArea(GetPanelWidth() - (m_vBarOffset.x * 2.0f), GetPanelHeight() - (m_vBarOffset.y * 2.0f));
+		static_cast<HyPrimitive2d *>(m_pBar)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
 	}
-	ChildInsert(m_Text, *m_pFill);
+	m_pBar->Load();
+	ChildInsert(m_Text, *m_pBar);
 
 	m_NumberFormat.SetFractionPrecision(0, 1);
 	
@@ -173,17 +189,16 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 
 void HyProgressBar::AdjustProgress()
 {
-	if(IsLoaded() == false || m_pFill == nullptr)
+	if(IsLoaded() == false || m_pBar == nullptr)
 		return;
 
-	// Position fill
-	m_pFill->pos.Set(m_FillMargins.left, m_FillMargins.bottom);
+	m_pBar->pos.Set(m_vBarOffset);
 
-	// Scale fill
 	float fProgress = 0.0f;
 	if((m_iMaximum - m_iMinimum) != 0)
 		fProgress = 1.0f - static_cast<float>(m_iValue - m_iMinimum) / static_cast<float>(m_iMaximum - m_iMinimum);
-	m_pFill->scale.Tween(fProgress, 1.0f, 0.2f, HyTween::QuadInOut);
+	
+	m_BarScissorAmt.Tween(m_pBar->GetSceneWidth() * fProgress, 0.2f, HyTween::QuadInOut);
 
 	SetText(HyLocale::Percent_Format(fProgress * 100.0, m_NumberFormat));
 }

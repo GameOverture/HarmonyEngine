@@ -20,8 +20,10 @@ class HyProgressBar : public HyLabel
 	int32				m_iMaximum;
 	int32				m_iValue;
 
-	IHyDrawable2d *		m_pFill;
-	HyRectangle<float>	m_FillMargins;
+	IHyDrawable2d *		m_pBar;
+	glm::ivec2			m_vBarOffset;
+	float				m_fBarScissorAmt;
+	HyAnimFloat			m_BarScissorAmt;
 	
 	HyNumberFormat		m_NumberFormat;
 
@@ -33,9 +35,9 @@ public:
 	HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyProgressBar();
 
-	const HyRectangle<float> &GetFillMargins() const;
-	void SetFillMargins(const HyRectangle<int32> &fillMarginsRef);
-	void SetFillMargins(int32 iFillMarginLeft, int32 iFillMarginBottom, int32 iFillMarginRight, int32 iFillMarginTop);
+	const glm::ivec2 &GetBarOffset() const;
+	void SetBarOffset(const glm::ivec2 &barOffset);
+	void SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY);
 
 	void Reset();
 	void SetMinimum(int32 iMinimum);
@@ -47,6 +49,7 @@ public:
 	void SetNumFormat(HyNumberFormat format);
 
 protected:
+	virtual void OnUpdate() override;
 	virtual void OnSetup() override;
 	void AdjustProgress();
 };
