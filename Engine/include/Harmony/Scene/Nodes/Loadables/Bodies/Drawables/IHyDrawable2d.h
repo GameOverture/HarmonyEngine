@@ -44,9 +44,8 @@ protected:
 	virtual void OnLoaded() override;
 	virtual void OnUnloaded() override;
 
-	// Optional user overrides below
-	virtual bool OnIsValidToRender() { return true; }
-	virtual void OnCalcBoundingVolume() { }
+	virtual bool OnIsValidToRender() = 0;
+	virtual void OnCalcBoundingVolume() = 0;
 
 #ifdef HY_PLATFORM_GUI
 public:

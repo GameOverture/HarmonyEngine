@@ -86,6 +86,8 @@ public:
 
 protected:
 	virtual bool OnIsValidToRender() override;
+	virtual void OnCalcBoundingVolume() override;
+
 	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 

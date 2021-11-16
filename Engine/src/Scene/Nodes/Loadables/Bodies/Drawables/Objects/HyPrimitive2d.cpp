@@ -189,6 +189,11 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	return m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValidShape();
 }
 
+/*virtual*/ void HyPrimitive2d::OnCalcBoundingVolume() /*override*/
+{
+	// m_LocalBoundingVolume should already be set
+}
+
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms()
 {
 	glm::mat4 mtx = GetSceneTransform();
