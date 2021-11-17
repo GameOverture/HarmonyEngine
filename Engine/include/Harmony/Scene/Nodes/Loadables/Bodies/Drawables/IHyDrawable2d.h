@@ -22,7 +22,7 @@ class IHyDrawable2d : public IHyBody2d, public IHyDrawable
 	friend class HyScene;
 
 protected:
-	HyShape2d						m_LocalBoundingVolume;
+	HyShape2d						m_LocalBoundingVolume; // Used to assemble scene AABB, for view frustrum culling
 
 public:
 	IHyDrawable2d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity2d *pParent);

@@ -166,7 +166,9 @@ public:
 	bool IsReverseDisplayOrder() const;
 	void ReverseDisplayOrder(bool bReverse);
 	int32 SetChildrenDisplayOrder(bool bOverrideExplicitChildren);
-
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// CHILDREN LOAD/UNLOAD
 	virtual void Load() override;
 	virtual void Unload() override;
 	
