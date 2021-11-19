@@ -39,17 +39,16 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		m_DebugBox.SetAsNothing();
 	else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsColumn)) // SetAsColumn
 	{
-		glm::vec2 ptVerts[4] = { glm::vec2(0.0f, -100.0f), glm::vec2(0.0f, 0.0f), glm::vec2(m_vBoxDimensions.x, 0.0f), glm::vec2(m_vBoxDimensions.x, -100.0f) };
-		m_DebugBox.SetAsLineChain(ptVerts, 4);
+		m_DebugBox.SetAsShape(GetLocalBoundingVolume());
+		//glm::vec2 ptVerts[4] = { glm::vec2(0.0f, -100.0f), glm::vec2(0.0f, 0.0f), glm::vec2(m_vBoxDimensions.x, 0.0f), glm::vec2(m_vBoxDimensions.x, -100.0f) };
+		//m_DebugBox.SetAsLineChain(ptVerts, 4);
 		m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
-		m_DebugBox.Load();
 	}
 	else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsScaleBox)) // SetAsScaleBox
 	{
 		m_DebugBox.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
 		m_DebugBox.SetWireframe(true);
 		m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
-		m_DebugBox.Load();
 	}
 }
 #endif
@@ -77,6 +76,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 /*virtual*/ void HyText2d::OnCalcBoundingVolume() /*override*/
 {
+	CalculateGlyphInfos();
 	if(m_uiNumReservedGlyphs == 0)
 		return;
 
