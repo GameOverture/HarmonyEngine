@@ -467,10 +467,6 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
-#ifdef HY_USE_TEXT_DEBUG_BOXES
-	OnSetDebugBox();
-#endif
-
 	MarkAsDirty();
 }
 
@@ -487,10 +483,6 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit
 
 	m_vBoxDimensions.x = HyMax(1.0f, fWidth);
 	m_vBoxDimensions.y = 0.0f;
-
-#ifdef HY_USE_TEXT_DEBUG_BOXES
-	OnSetDebugBox();
-#endif
 
 	MarkAsDirty();
 }
@@ -509,10 +501,6 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = fHeight;
 
-#ifdef HY_USE_TEXT_DEBUG_BOXES
-	OnSetDebugBox();
-#endif
-
 	MarkAsDirty();
 }
 
@@ -523,10 +511,6 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 	m_uiTextAttributes |= TEXTATTRIB_IsVertical;
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
-
-#ifdef HY_USE_TEXT_DEBUG_BOXES
-	OnSetDebugBox();
-#endif
 
 	MarkAsDirty();
 }
@@ -1022,6 +1006,10 @@ offsetCalculation:
 
 	this->SetDirty(this->DIRTY_BoundingVolume);
 	m_uiTextAttributes &= ~TEXTATTRIB_IsDirty;
+
+#ifdef HY_USE_TEXT_DEBUG_BOXES
+	OnSetDebugBox();
+#endif
 }
 
 template<typename NODETYPE, typename ENTTYPE>

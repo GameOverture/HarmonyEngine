@@ -42,6 +42,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		m_DebugBox.SetAsShape(GetLocalBoundingVolume());
 		//glm::vec2 ptVerts[4] = { glm::vec2(0.0f, -100.0f), glm::vec2(0.0f, 0.0f), glm::vec2(m_vBoxDimensions.x, 0.0f), glm::vec2(m_vBoxDimensions.x, -100.0f) };
 		//m_DebugBox.SetAsLineChain(ptVerts, 4);
+		m_DebugBox.SetWireframe(true);
 		m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
 	}
 	else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsScaleBox)) // SetAsScaleBox
@@ -80,7 +81,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	if(m_uiNumReservedGlyphs == 0)
 		return;
 
-	glm::vec2 ptBotLeft(m_pGlyphInfos[0].vOffset.x, m_pGlyphInfos[0].vOffset.y);
+	glm::vec2 ptBotLeft(m_pGlyphInfos[0].vOffset.x - m_uiIndent, m_pGlyphInfos[0].vOffset.y);
 	for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
 	{
 		if(m_pGlyphInfos[i].vOffset.x < ptBotLeft.x)
