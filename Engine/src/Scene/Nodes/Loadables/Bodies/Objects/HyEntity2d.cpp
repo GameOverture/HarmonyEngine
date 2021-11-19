@@ -349,17 +349,25 @@ void HyEntity2d::DisableMouseInput()
 
 bool HyEntity2d::IsMouseInBounds()
 {
-	if(GetCoordinateSystem() >= 0)
+	if(GetCoordinateSystem() >= 0 && HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem())
 	{
-		return HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem() && HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
+		if(bv.IsValidShape())
+			return bv.TestPoint(GetSceneTransform(), HyEngine::Input().GetMousePos());
+		else
+			return HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
 	}
-	else
+	else if(GetCoordinateSystem() < 0)
 	{
 		glm::vec2 ptWorldMousePos;
 		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
-			return HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
+		{
+			if(bv.IsValidShape())
+				bv.TestPoint(GetSceneTransform(), ptWorldMousePos);
+			else
+				return HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
+		}
 	}
-
+	
 	return false;
 }
 

@@ -17,13 +17,13 @@ HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
 	m_iPhysVelocityIterations(iVelocityIterations),
 	m_iPhysPositionIterations(iPositionIterations),
-	m_DrawPhys2d(fPixelsPerMeter)
+	m_DebugDraw(*this)
 {
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
-	SetContactListener(&m_Phys2dContactListener);
+	SetContactListener(&m_ContactListener);
 
-	m_DrawPhys2d.SetFlags(0xff);
-	SetDebugDraw(&m_DrawPhys2d);
+	m_DebugDraw.SetFlags(0xff);
+	SetDebugDraw(&m_DebugDraw);
 
 	HyScene::AddPhysicsGrid(this);
 }
@@ -42,9 +42,9 @@ HyPhysicsGrid2d::~HyPhysicsGrid2d()
 
 void HyPhysicsGrid2d::Update()
 {
-	if(m_DrawPhys2d.GetFlags() != 0)
+	if(m_DebugDraw.GetFlags() != 0)
 	{
-		m_DrawPhys2d.GetDrawList().clear();
+		m_DebugDraw.GetDrawList().clear();
 		DebugDraw();
 	}
 
@@ -53,7 +53,7 @@ void HyPhysicsGrid2d::Update()
 
 std::vector<HyPrimitive2d> &HyPhysicsGrid2d::GetDebugDrawList()
 {
-	return m_DrawPhys2d.GetDrawList();
+	return m_DebugDraw.GetDrawList();
 }
 
 float HyPhysicsGrid2d::GetPixelsPerMeter()
@@ -68,13 +68,13 @@ float HyPhysicsGrid2d::GetPpmInverse()
 
 bool HyPhysicsGrid2d::IsDebugDraw()
 {
-	return m_DrawPhys2d.GetFlags() != 0;
+	return m_DebugDraw.GetFlags() != 0;
 }
 
 void HyPhysicsGrid2d::EnableDebugDraw(bool bEnableDebugDraw)
 {
 	if(bEnableDebugDraw)
-		m_DrawPhys2d.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+		m_DebugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
 	else
-		m_DrawPhys2d.ClearFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+		m_DebugDraw.ClearFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
 }

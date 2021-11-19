@@ -27,13 +27,16 @@ protected:
 		ENT2DATTRIB_MouseInputEnabled		= 1 << 1,
 		ENT2DATTRIB_MouseInputHover			= 1 << 2,
 		ENT2DATTRIB_MouseInputDown			= 1 << 3,
-		ENT2DATTRIB_MouseInputInvalid		= 1 << 4,	// When mouse input was initially pressed outside of bounds
+		ENT2DATTRIB_MouseInputInvalid		= 1 << 4,				// When mouse input was initially pressed outside of bounds
 
 		ENT2DATTRIB_ReverseDisplayOrder		= 1 << 5,
 	};
 	uint32									m_uiEntAttribs;
 
 	b2Body *								m_pPhysicsBody;
+
+public:
+	HyShape2d								bv;						// A shape representing this entity for collision and physics
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);

@@ -11,8 +11,8 @@
 #define HyPhysicsGrid_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Physics/HyPhysicsDebug2d.h"
 #include "Scene/Physics/HyBox2dRuntime.h"
+#include "Scene/Physics/HyPhysicsDebug2d.h"
 
 class HyPhysicsGrid2d : public b2World
 {
@@ -22,8 +22,8 @@ class HyPhysicsGrid2d : public b2World
 	int32				m_iPhysVelocityIterations;
 	int32				m_iPhysPositionIterations;
 
-	HyPhysicsDebug2d	m_DrawPhys2d;
-	HyBox2dRuntime		m_Phys2dContactListener;
+	HyBox2dRuntime		m_ContactListener;
+	HyPhysicsDebug2d	m_DebugDraw;
 
 public:
 	HyPhysicsGrid2d(glm::vec2 vGravity = glm::vec2(0.0f, -10.0f), float fPixelsPerMeter = 80.0f, int32 iVelocityIterations = 8, int32 iPositionIterations = 3);

@@ -13,13 +13,15 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
+class HyPhysicsGrid2d;
+
 class HyPhysicsDebug2d : public b2Draw
 {
-	const float					m_fPIXELS_PER_METER;
+	HyPhysicsGrid2d &			m_GridRef;
 	std::vector<HyPrimitive2d>	m_DrawList;
 
 public:
-	HyPhysicsDebug2d(float fPixelsPerMeter);
+	HyPhysicsDebug2d(HyPhysicsGrid2d &gridRef);
 	virtual ~HyPhysicsDebug2d(void);
 
 	std::vector<HyPrimitive2d> &GetDrawList();
