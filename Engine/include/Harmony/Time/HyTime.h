@@ -19,25 +19,30 @@ class IHyTimeInst;
 class HyStopwatch;
 class HyDiagnostics;
 
+typedef std::chrono::high_resolution_clock				StdPerfClock;
+typedef std::chrono::duration<double, std::ratio<1> >	StdSecondDur;
+
 class HyTime
 {
-	double								m_dUpdateTick_Seconds;		// Non-zero value when a 'ThrottledUpdate' is desired
+	double													m_dUpdateTick_Seconds;		// Non-zero value when a 'ThrottledUpdate' is desired
 
-	static std::vector<IHyTimeInst *>	sm_TimeInstList;
+	static std::vector<IHyTimeInst *>						sm_TimeInstList;
 
-	double								m_dTotalElapsedTime;
-	double								m_dThrottledTime;
+	double													m_dTotalElapsedTime;
+	double													m_dThrottledTime;
 
-	double								m_dSpiralOfDeathCounter;	// In 'ThrottledUpdate' environments a potential to have updates take longer than the alloted time step will cause an infinite loop
-																	// This counter keeps track of these scenarios
-	double								m_dCurDeltaTime;
+	double													m_dSpiralOfDeathCounter;	// In 'ThrottledUpdate' environments a potential to have updates take longer than the alloted time step will cause an infinite loop
+																						// This counter keeps track of these scenarios
+	double													m_dCurDeltaTime;
 
 #ifdef HY_USE_GLFW
-	double								m_dPrevTime;
+	double													m_dPrevTime;
 #elif defined(HY_USE_SDL2)
-	uint64_t							m_uiPrev;
-	uint64_t							m_uiCur;
+	uint64_t												m_uiPrev;
+	uint64_t												m_uiCur;
 #endif
+
+	static std::chrono::time_point<StdPerfClock>			sm_TimeStamp;
 
 public:
 	HyTime(uint32 uiUpdateTickMs);
@@ -66,6 +71,9 @@ public:
 
 	static void AddTimeInst(IHyTimeInst *pTimeInst);
 	static void RemoveTimeInst(IHyTimeInst *pTimeInst);
+
+	static void StartTimeStamp();
+	static double EndTimeStamp();
 };
 
 #endif /* HyTime_h__ */

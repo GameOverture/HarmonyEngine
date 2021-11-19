@@ -17,6 +17,7 @@
 #define HYTIME_ThresholdMaxReset 100.0		// Maximum threshold until we hard reset
 
 std::vector<IHyTimeInst *>	HyTime::sm_TimeInstList;
+std::chrono::time_point<StdPerfClock>	HyTime::sm_TimeStamp;
 
 HyTime::HyTime(uint32 uiUpdateTickMs) :
 	m_dTotalElapsedTime(0.0),
@@ -188,4 +189,14 @@ std::string HyTime::GetDateTime()
 			break;
 		}
 	}
+}
+
+/*static*/ void HyTime::StartTimeStamp()
+{
+	sm_TimeStamp = StdPerfClock::now();
+}
+
+/*static*/ double HyTime::EndTimeStamp()
+{
+	return std::chrono::duration_cast<StdSecondDur>(StdPerfClock::now() - sm_TimeStamp).count();
 }
