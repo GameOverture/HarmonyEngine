@@ -47,6 +47,15 @@ uint32 HySpine2d::GetNumSlots() const
 	return 0;
 }
 
+/*virtual*/ bool HySpine2d::OnIsValidToRender() /*override*/
+{
+	return true;
+}
+
+/*virtual*/ void HySpine2d::OnCalcBoundingVolume() /*override*/
+{
+}
+
 ////uint32 HySpine2d::GetTextureId()
 ////{
 ////	if(m_uiTextureid == 0)

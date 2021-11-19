@@ -32,7 +32,7 @@ SpineDraw::~SpineDraw()
 {
 	SetVisible(true);
 }
-
+ 
 /*virtual*/ void SpineDraw::OnHide() /*override*/
 {
 	SetVisible(false, true);

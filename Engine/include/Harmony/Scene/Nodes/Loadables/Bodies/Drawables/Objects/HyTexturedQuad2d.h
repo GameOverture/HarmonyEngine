@@ -44,6 +44,10 @@ public:
 
 protected:
 	virtual void OnLoaded() override;
+
+	virtual bool OnIsValidToRender() override;
+	virtual void OnCalcBoundingVolume() override;
+
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 };
 

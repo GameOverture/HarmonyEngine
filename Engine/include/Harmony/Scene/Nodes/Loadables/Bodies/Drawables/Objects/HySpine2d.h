@@ -39,6 +39,10 @@ public:
 
 	uint32 GetNumSlots() const;
 
+protected:
+	virtual bool OnIsValidToRender() override;
+	virtual void OnCalcBoundingVolume() override;
+
 //
 //	/************************************************************************************************
 //											ANIMATION CALLS

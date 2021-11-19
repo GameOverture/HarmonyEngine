@@ -128,6 +128,16 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 		m_hTextureHandle = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
 }
 
+/*virtual*/ bool HyTexturedQuad2d::OnIsValidToRender() /*override*/
+{
+	return true;
+}
+
+/*virtual*/ void HyTexturedQuad2d::OnCalcBoundingVolume() /*override*/
+{
+
+}
+
 /*virtual*/ void HyTexturedQuad2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
 {
 	const HyTexturedQuad2dData *pData = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData());

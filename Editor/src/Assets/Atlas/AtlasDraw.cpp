@@ -32,7 +32,6 @@ AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
 	m_HoverBackground.SetDisplayOrder(DISPLAYORDER_AtlasHoverBG);
 	m_HoverBackground.SetVisible(false);
 	m_HoverBackground.alpha.Set(0.65f);
-	m_HoverBackground.Load();
 	
 	m_HoverStrokeInner.SetWireframe(true);
 	m_HoverStrokeInner.SetAsBox(100.0f, 100.0f);
@@ -40,7 +39,6 @@ AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
 	m_HoverStrokeInner.SetTint(1.0f, 0.0f, 0.0f);
 	m_HoverStrokeInner.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeInner);
 	m_HoverStrokeInner.SetVisible(false);
-	m_HoverStrokeInner.Load();
 	
 	m_HoverStrokeOutter.SetWireframe(true);
 	m_HoverStrokeOutter.SetAsBox(100.0f, 100.0f);
@@ -48,7 +46,6 @@ AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
 	m_HoverStrokeOutter.SetTint(0.0f, 0.0f, 0.0f);
 	m_HoverStrokeOutter.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeOutter);
 	m_HoverStrokeOutter.SetVisible(false);
-	m_HoverStrokeOutter.Load();
 	
 	for(int i = 0; i < atlasManagerModelRef.GetNumBanks(); ++i)
 	{
