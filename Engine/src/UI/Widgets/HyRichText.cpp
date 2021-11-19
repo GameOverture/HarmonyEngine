@@ -210,4 +210,6 @@ void HyRichText::AssembleDrawables()
 			uiCurFmtIndex++;
 		}
 	}
+
+	SetDirty(IHyNode::DIRTY_BoundingVolume);
 }
