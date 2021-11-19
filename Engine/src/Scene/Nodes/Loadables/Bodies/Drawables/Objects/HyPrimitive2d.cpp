@@ -221,6 +221,11 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	vertexBufferRef.AppendData2d(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
 }
 
+/*virtual*/ void HyPrimitive2d::Load() /*override*/
+{
+	IHyLoadable::Load();
+}
+
 void HyPrimitive2d::ClearData()
 {
 	delete [] m_pVertBuffer;
@@ -279,6 +284,8 @@ void HyPrimitive2d::SetData()
 	default:
 		HyLogError("HyPrimitive2d::SetData() - Unknown shape type: " << m_LocalBoundingVolume.GetType());
 	}
+
+	Load();
 }
 
 void HyPrimitive2d::_SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)

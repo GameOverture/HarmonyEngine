@@ -245,7 +245,6 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 			if(CalculateCameraMask(physDrawListRef[i], uiCameraMask) == false)
 				continue;
 
-			physDrawListRef[i].Load();
 			rendererRef.AppendDrawable2d(i, physDrawListRef[i], uiCameraMask);
 		}
 	}

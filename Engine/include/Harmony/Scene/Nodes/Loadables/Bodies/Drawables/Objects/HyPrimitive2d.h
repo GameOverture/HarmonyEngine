@@ -92,6 +92,8 @@ protected:
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 
 private:
+	virtual void Load() override;
+
 	void ClearData();
 	void SetData();
 

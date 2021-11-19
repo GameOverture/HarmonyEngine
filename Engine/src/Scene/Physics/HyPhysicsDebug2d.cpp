@@ -37,7 +37,6 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 	m_DrawList.back().SetAsPolygon(convertedVertList.data(), vertexCount);
 	m_DrawList.back().SetWireframe(true);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
-	m_DrawList.back().Load();
 }
 
 // Draw a solid closed polygon provided in CCW order.
@@ -52,7 +51,6 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 	m_DrawList.back().SetAsPolygon(convertedVertList.data(), vertexCount);
 	m_DrawList.back().SetWireframe(false);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
-	m_DrawList.back().Load();
 }
 
 // Draw a circle.
@@ -65,7 +63,6 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 	m_DrawList.back().SetAsCircle(ptConvertedCenter, radius * m_GridRef.GetPixelsPerMeter());
 	m_DrawList.back().SetWireframe(true);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
-	m_DrawList.back().Load();
 }
 
 // Draw a solid circle.
@@ -78,7 +75,6 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 	m_DrawList.back().SetAsCircle(ptConvertedCenter, radius * m_GridRef.GetPixelsPerMeter());
 	m_DrawList.back().SetWireframe(false);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
-	m_DrawList.back().Load();
 }
 
 // Draw a line segment.
@@ -91,7 +87,6 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 
 	m_DrawList.back().SetAsLineSegment(ptConvertedP1, ptConvertedP2);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
-	m_DrawList.back().Load();
 }
 
 // Draw a transform. Choose your own length scale.
@@ -106,5 +101,4 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 	m_DrawList.back().SetAsBox(size * 0.5f, size * 0.5f, glm::vec2(p.x * m_GridRef.GetPixelsPerMeter(), p.y * m_GridRef.GetPixelsPerMeter()), 0.0f);
 	m_DrawList.back().SetWireframe(false);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
-	m_DrawList.back().Load();
 }
