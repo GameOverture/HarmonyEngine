@@ -14,7 +14,7 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntityUi(Ui_Widget, pParent)
 {
 	for(int32 i = 0; i < HYNUM_ORIENTATIONS; ++i)
-		m_SizePolicies[i] = HYSIZEPOLICY_Preferred;
+		m_SizePolicies[i] = HYSIZEPOLICY_Fixed;
 }
 
 /*virtual*/ IHyWidget::~IHyWidget()

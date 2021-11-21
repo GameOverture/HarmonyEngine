@@ -25,7 +25,6 @@ void HySpacer::SetMinSize(int32 iWidth, int32 iHeight)
 {
 	m_vMinSize.x = iWidth;
 	m_vMinSize.y = iHeight;
-	m_SizePolicies[HYORIEN_Horizontal] = m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Minimum;
 }
 
 /*virtual*/ glm::ivec2 HySpacer::GetSizeHint() /*override*/
@@ -38,6 +37,7 @@ void HySpacer::SetMinSize(int32 iWidth, int32 iHeight)
 	return glm::vec2(0.0f, 0.0f);
 }
 
-/*virtual*/ void HySpacer::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
+/*virtual*/ glm::vec2 HySpacer::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
+	return glm::vec2(iNewWidth, iNewHeight);
 }

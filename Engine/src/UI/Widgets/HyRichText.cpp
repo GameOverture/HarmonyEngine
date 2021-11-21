@@ -51,6 +51,7 @@ HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextN
 
 void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth)
 {
+	m_SizePolicies[HYORIEN_Horizontal] = HYSIZEPOLICY_Flexible;
 	m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Fixed;
 
 	m_sTextPrefix = sTextPrefix;
@@ -68,10 +69,12 @@ void HyRichText::SetRichText(const std::string &sRichTextFormat)
 	AssembleDrawables();
 }
 
-/*virtual*/ void HyRichText::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
+/*virtual*/ glm::vec2 HyRichText::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
 	m_uiColumnWidth = iNewWidth;
 	AssembleDrawables();
+
+	return glm::vec2(m_uiColumnWidth, GetSceneHeight());
 }
 
 void HyRichText::AssembleDrawables()

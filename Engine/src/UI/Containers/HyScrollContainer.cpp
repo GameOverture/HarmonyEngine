@@ -55,22 +55,32 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitive
 /*virtual*/ void HyScrollContainer::SetSize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
 	HySetVec(m_vShownSize, iNewWidth, iNewHeight);
-
 	if(m_pPrimPanel)
 		m_pPrimPanel->SetSize(m_vShownSize.x, m_vShownSize.y);
 
-	SetScissor(0, 0, m_vShownSize.x, m_vShownSize.y);
+	SetScissor(0, 0, m_vShownSize.x - ((m_uiScrollFlags & USE_VERT) * m_VertBar.GetDiameter()), m_vShownSize.y - (((m_uiScrollFlags & USE_HORZ) >> 1) * m_HorzBar.GetDiameter()));
 	m_pPrimPanel->ClearScissor(false);
+	m_VertBar.ClearScissor(false);
+	m_HorzBar.ClearScissor(false);
 
+	// '0' indicates to the layout that it should use its sizehint for that dimension
 	if(m_uiScrollFlags & USE_VERT)
 		iNewHeight = 0;
 	if(m_uiScrollFlags & USE_HORZ)
 		iNewWidth = 0;
 
-	if(iNewWidth != 0 && (m_uiScrollFlags & USE_VERT) != 0)
-		iNewWidth -= m_VertBar.GetDiameter();
-	if(iNewHeight != 0 && (m_uiScrollFlags & USE_HORZ) != 0)
-		iNewHeight -= m_HorzBar.GetDiameter();
+	if(iNewWidth != 0)
+	{
+		iNewWidth -= (m_pRootLayout->GetMargins().left + m_pRootLayout->GetMargins().right);
+		if((m_uiScrollFlags & USE_VERT) != 0)
+			iNewWidth -= m_VertBar.GetDiameter();
+	}
+	if(iNewHeight != 0)
+	{
+		iNewHeight -= (m_pRootLayout->GetMargins().top + m_pRootLayout->GetMargins().bottom);
+		if((m_uiScrollFlags & USE_HORZ) != 0)
+			iNewHeight -= m_HorzBar.GetDiameter();
+	}
 
 	HyInternal_LayoutSetSize(*m_pRootLayout, iNewWidth, iNewHeight);
 }

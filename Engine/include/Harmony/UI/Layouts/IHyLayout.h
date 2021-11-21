@@ -41,6 +41,7 @@ public:
 	glm::ivec2 GetSize();
 	virtual glm::ivec2 GetSizeHint() = 0;	// The preferred size of *this
 
+	const HyRectangle<int32> &GetMargins() const;
 	void SetMargins(int32 iLeft, int32 iBottom, int32 iRight, int32 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY);
 
 	uint16 GetHorizontalSpacing();

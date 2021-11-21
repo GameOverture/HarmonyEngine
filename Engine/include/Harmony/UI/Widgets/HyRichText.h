@@ -39,7 +39,7 @@ public:
 	void SetRichText(const std::string &sRichTextFormat);
 
 protected:
-	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
+	virtual glm::vec2 OnResize(int32 iNewWidth, int32 iNewHeight) override;
 
 	void AssembleDrawables();
 };

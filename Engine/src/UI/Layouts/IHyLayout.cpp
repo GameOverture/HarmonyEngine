@@ -50,6 +50,11 @@ glm::ivec2 IHyLayout::GetSize()
 	return vCurSize;
 }
 
+const HyRectangle<int32> &IHyLayout::GetMargins() const
+{
+	return m_Margins;
+}
+
 void IHyLayout::SetMargins(int32 iLeft, int32 iBottom, int32 iRight, int32 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY)
 {
 	m_Margins.Set(iLeft, iBottom, iRight, iTop);

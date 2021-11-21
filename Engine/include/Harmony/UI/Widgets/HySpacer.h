@@ -26,7 +26,7 @@ public:
 protected:
 	virtual glm::ivec2 GetSizeHint() override;
 	virtual glm::vec2 GetPosOffset() override;
-	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) override;
+	virtual glm::vec2 OnResize(int32 iNewWidth, int32 iNewHeight) override;
 };
 
 #endif /* HySpacer_h__ */

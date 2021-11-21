@@ -417,7 +417,7 @@ HyText2d &HyLabel::GetTextNode()
 	return glm::vec2(0.0f, 0.0f);
 }
 
-/*virtual*/ void HyLabel::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
+/*virtual*/ glm::vec2 HyLabel::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
 	auto vUiSizeHint = GetSizeHint();
 	if(m_pPrimPanel)
@@ -442,6 +442,8 @@ HyText2d &HyLabel::GetTextNode()
 	}
 
 	ResetTextAndPanel();
+	
+	return glm::vec2(iNewWidth, iNewHeight);
 }
 
 /*virtual*/ void HyLabel::ResetTextAndPanel()

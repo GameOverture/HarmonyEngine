@@ -36,7 +36,7 @@ public:
 	virtual glm::vec2 GetPosOffset() = 0;
 
 protected:
-	virtual void OnResize(int32 iNewWidth, int32 iNewHeight) = 0;
+	virtual glm::vec2 OnResize(int32 iNewWidth, int32 iNewHeight) = 0;
 };
 
 #endif /* IHyWidget_h__ */
