@@ -33,19 +33,20 @@ protected:
 		NODETYPE_IsLoadable			= 1 << 5,
 		NODETYPE_IsBody				= 1 << 6,
 		NODETYPE_IsDrawable			= 1 << 7,
+		NODETYPE_IsLayout			= 1 << 8,
 	};
 	// These flags get set by HyAnimFloat's when their corresponding respective values are manipulated
 	enum DirtyFlag // NOTE: continue the bits in TypeFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		DIRTY_FromUpdater			= 1 << 8,
-		DIRTY_BoundingVolume		= 1 << 9,
-		DIRTY_SceneAABB				= 1 << 10,
-		DIRTY_Position				= 1 << 11,
-		DIRTY_Rotation				= 1 << 12,
-		DIRTY_Scale					= 1 << 13,
-		DIRTY_Color					= 1 << 14,
-		DIRTY_Scissor				= 1 << 15,
-		DIRTY_Audio					= 1 << 16,
+		DIRTY_FromUpdater			= 1 << 9,
+		DIRTY_BoundingVolume		= 1 << 10,
+		DIRTY_SceneAABB				= 1 << 11,
+		DIRTY_Position				= 1 << 12,
+		DIRTY_Rotation				= 1 << 13,
+		DIRTY_Scale					= 1 << 14,
+		DIRTY_Color					= 1 << 15,
+		DIRTY_Scissor				= 1 << 16,
+		DIRTY_Audio					= 1 << 17,
 
 		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_BoundingVolume | DIRTY_SceneAABB | DIRTY_Position | DIRTY_Rotation | DIRTY_Scale | DIRTY_Color | DIRTY_Scissor | DIRTY_Audio
 	};
@@ -53,19 +54,19 @@ protected:
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
 	enum ExplicitFlag // NOTE: continue the bits in DirtyFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		EXPLICIT_Visible			= 1 << 17,
-		EXPLICIT_PauseUpdate		= 1 << 18,
-		EXPLICIT_Scissor			= 1 << 19,
-		EXPLICIT_Stencil			= 1 << 20,
-		EXPLICIT_DisplayOrder		= 1 << 21,
-		EXPLICIT_CoordinateSystem	= 1 << 22,
+		EXPLICIT_Visible			= 1 << 18,
+		EXPLICIT_PauseUpdate		= 1 << 19,
+		EXPLICIT_Scissor			= 1 << 20,
+		EXPLICIT_Stencil			= 1 << 21,
+		EXPLICIT_DisplayOrder		= 1 << 22,
+		EXPLICIT_CoordinateSystem	= 1 << 23,
 	};
 	// Various boolean values for node stored in these flags for smaller memory footprint
 	enum SettingFlag // NOTE: continue the bits in ExplicitFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		SETTING_IsRegistered		= 1 << 23,
-		SETTING_IsVisible			= 1 << 24,
-		SETTING_IsPauseUpdate		= 1 << 25,
+		SETTING_IsRegistered		= 1 << 24,
+		SETTING_IsVisible			= 1 << 25,
+		SETTING_IsPauseUpdate		= 1 << 26,
 	};
 	uint32							m_uiFlags;
 
@@ -93,14 +94,14 @@ public:
 	bool IsPauseUpdate() const;
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused);
 
+	uint32 GetInternalFlags() const;
+
 #ifdef HY_ENABLE_USER_TAGS
 	int64_t GetTag() const;
 	void SetTag(int64_t iTag);
 #endif
 
 protected:
-	uint32 GetInternalFlags() const;
-
 	bool IsRegistered() const;
 
 	virtual void Update();																// Only Scene will invoke this

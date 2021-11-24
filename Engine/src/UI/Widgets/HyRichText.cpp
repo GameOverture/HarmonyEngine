@@ -16,14 +16,14 @@
 #include <regex>
 
 HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
+	IHyEntityUi(pParent),
 	m_uiColumnWidth(0),
 	m_fColumnLineHeightOffset(0.0f)
 {
 }
 
 HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
+	IHyEntityUi(pParent),
 	m_uiColumnWidth(0),
 	m_fColumnLineHeightOffset(0.0f)
 {
@@ -39,20 +39,9 @@ HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextN
 	}
 }
 
-/*virtual*/ glm::ivec2 HyRichText::GetSizeHint() /*override*/
-{
-	return glm::ivec2(m_uiColumnWidth, GetSceneHeight());
-}
-
-/*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
-{
-	return glm::vec2(0.0f, GetSceneHeight() - m_fColumnLineHeightOffset);
-}
-
 void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth)
 {
-	m_SizePolicies[HYORIEN_Horizontal] = HYSIZEPOLICY_Flexible;
-	m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Fixed;
+	SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Fixed);
 
 	m_sTextPrefix = sTextPrefix;
 	m_sTextName = sTextName;
@@ -69,12 +58,22 @@ void HyRichText::SetRichText(const std::string &sRichTextFormat)
 	AssembleDrawables();
 }
 
-/*virtual*/ glm::vec2 HyRichText::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
+/*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
 {
-	m_uiColumnWidth = iNewWidth;
+	return glm::vec2(0.0f, GetSceneHeight() - m_fColumnLineHeightOffset);
+}
+
+/*virtual*/ void HyRichText::OnSetSizeHint() /*override*/
+{
+	HySetVec(m_vSizeHint, m_uiColumnWidth, GetSceneHeight());
+}
+
+/*virtual*/ glm::ivec2 HyRichText::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
+{
+	m_uiColumnWidth = uiNewWidth;
 	AssembleDrawables();
 
-	return glm::vec2(m_uiColumnWidth, GetSceneHeight());
+	return glm::ivec2(m_uiColumnWidth, GetSceneHeight());
 }
 
 void HyRichText::AssembleDrawables()
@@ -215,4 +214,5 @@ void HyRichText::AssembleDrawables()
 	}
 
 	SetDirty(IHyNode::DIRTY_BoundingVolume);
+	m_bSizeHintDirty = true;
 }

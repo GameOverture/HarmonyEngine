@@ -161,6 +161,11 @@ bool IHyNode::IsPauseUpdate() const
 	m_uiFlags |= EXPLICIT_PauseUpdate;
 }
 
+uint32 IHyNode::GetInternalFlags() const
+{
+	return m_uiFlags;
+}
+
 #ifdef HY_ENABLE_USER_TAGS
 int64_t IHyNode::GetTag() const
 {
@@ -172,11 +177,6 @@ void IHyNode::SetTag(int64_t iTag)
 	m_iTag = iTag;
 }
 #endif
-
-uint32 IHyNode::GetInternalFlags() const
-{
-	return m_uiFlags;
-}
 
 bool IHyNode::IsRegistered() const
 {

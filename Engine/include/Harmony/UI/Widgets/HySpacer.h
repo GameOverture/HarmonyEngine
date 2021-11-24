@@ -11,12 +11,10 @@
 #define HySpacer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/Widgets/IHyWidget.h"
+#include "UI/IHyEntityUi.h"
 
-class HySpacer : public IHyWidget
+class HySpacer : public IHyEntityUi
 {
-	glm::ivec2			m_vMinSize;
-
 public:
 	HySpacer(HyEntity2d *pParent = nullptr);
 	virtual ~HySpacer();
@@ -24,9 +22,9 @@ public:
 	void SetMinSize(int32 iWidth, int32 iHeight);
 
 protected:
-	virtual glm::ivec2 GetSizeHint() override;
 	virtual glm::vec2 GetPosOffset() override;
-	virtual glm::vec2 OnResize(int32 iNewWidth, int32 iNewHeight) override;
+	virtual void OnSetSizeHint() override;
+	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 };
 
 #endif /* HySpacer_h__ */

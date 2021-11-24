@@ -12,11 +12,11 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/HyPrimitivePanel.h"
-#include "UI/Widgets/IHyWidget.h"
+#include "UI/IHyEntityUi.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 
-class HyLabel : public IHyWidget
+class HyLabel : public IHyEntityUi
 {
 protected:
 	enum PanelAttributes
@@ -93,14 +93,14 @@ public:
 	HyText2d &GetTextNode();
 
 protected:
-	virtual void OnSetup() { }					// Optional override for derived classes
-
 	virtual void OnMouseEnter() override;
 	virtual void OnMouseLeave() override;
 
-	virtual glm::ivec2 GetSizeHint() override;
 	virtual glm::vec2 GetPosOffset() override;
-	virtual glm::vec2 OnResize(int32 iNewWidth, int32 iNewHeight) override;
+	virtual void OnSetSizeHint() override;
+	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
+
+	virtual void OnSetup() { }					// Optional override for derived classes
 
 	virtual void ResetTextAndPanel();
 

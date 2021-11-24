@@ -11,25 +11,13 @@
 #include "UI/Widgets/HySpacer.h"
 
 HySpacer::HySpacer(HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
-	m_vMinSize(0, 0)
+	IHyEntityUi(pParent)
 {
-	m_SizePolicies[HYORIEN_Horizontal] = m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Expanding;
+	SetSizePolicy(HYSIZEPOLICY_Expanding, HYSIZEPOLICY_Expanding);
 }
 
 /*virtual*/ HySpacer::~HySpacer()
 {
-}
-
-void HySpacer::SetMinSize(int32 iWidth, int32 iHeight)
-{
-	m_vMinSize.x = iWidth;
-	m_vMinSize.y = iHeight;
-}
-
-/*virtual*/ glm::ivec2 HySpacer::GetSizeHint() /*override*/
-{
-	return m_vMinSize;
 }
 
 /*virtual*/ glm::vec2 HySpacer::GetPosOffset() /*override*/
@@ -37,7 +25,12 @@ void HySpacer::SetMinSize(int32 iWidth, int32 iHeight)
 	return glm::vec2(0.0f, 0.0f);
 }
 
-/*virtual*/ glm::vec2 HySpacer::OnResize(int32 iNewWidth, int32 iNewHeight) /*override*/
+/*virtual*/ void HySpacer::OnSetSizeHint() /*override*/
 {
-	return glm::vec2(iNewWidth, iNewHeight);
+	HySetVec(m_vSizeHint, 0, 0);
+}
+
+/*virtual*/ glm::ivec2 HySpacer::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
+{
+	return glm::ivec2(uiNewWidth, uiNewHeight);
 }

@@ -11,9 +11,9 @@
 #define HyRichText_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/Widgets/IHyWidget.h"
+#include "UI/IHyEntityUi.h"
 
-class HyRichText : public IHyWidget
+class HyRichText : public IHyEntityUi
 {
 protected:
 	std::string						m_sTextPrefix;
@@ -29,9 +29,6 @@ public:
 	HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyEntity2d *pParent = nullptr);
 	virtual ~HyRichText();
 
-	virtual glm::ivec2 GetSizeHint() override;
-	virtual glm::vec2 GetPosOffset() override;
-
 	void Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth);
 
 	// {1} = Any text inserted after this uses state '1'
@@ -39,7 +36,9 @@ public:
 	void SetRichText(const std::string &sRichTextFormat);
 
 protected:
-	virtual glm::vec2 OnResize(int32 iNewWidth, int32 iNewHeight) override;
+	virtual glm::vec2 GetPosOffset() override;
+	virtual void OnSetSizeHint() override;
+	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 
 	void AssembleDrawables();
 };

@@ -58,6 +58,7 @@ typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
 typedef uint32 HyVertexBufferHandle;
 typedef uint32 HyAudioHandle;
+typedef uint32 HyLayoutHandle;
 
 // Tags aren't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 // They increase the memory footprint of every node/instance by 8 bytes
@@ -256,7 +257,7 @@ enum HyLayoutType
 {
 	HYLAYOUT_Horizontal = 0,
 	HYLAYOUT_Vertical,
-	HYLAYOUT_Grid
+	//HYLAYOUT_Grid
 };
 
 enum HySizePolicy

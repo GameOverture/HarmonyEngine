@@ -139,7 +139,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Time/Watches/HyStopwatch.cpp
 	src/Time/Watches/HyTimer.cpp
 	src/Time/Watches/IHyTimeInst.cpp
-	src/UI/HyEntityUi.cpp
+	src/UI/IHyEntityUi.cpp
 	src/UI/HyPrimitivePanel.cpp
 	src/UI/Widgets/HyButton.cpp
 	src/UI/Widgets/HyCheckBox.cpp
@@ -148,17 +148,13 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Widgets/HyMeter.cpp
 	src/UI/Widgets/HyRichText.cpp
 	src/UI/Widgets/HySpacer.cpp
-	src/UI/Widgets/IHyWidget.cpp
 	src/UI/Containers/IHy9Slice.cpp
 	src/UI/Containers/HyContainer.cpp
-	src/UI/Containers/HyScrollBar.cpp
 	src/UI/Containers/HyScrollContainer.cpp
-	src/UI/Layouts/IHyLayout.cpp
-	src/UI/Layouts/HyBoxLayout.cpp
-	src/UI/Layouts/HyGridLayout.cpp
+	src/UI/Containers/Components/HyLayout.cpp
+	src/UI/Containers/Components/HyScrollBar.cpp
 	src/UI/Localization/HyLocale.cpp
 	src/UI/Localization/HyNumberFormat.cpp
-	src/UI/Localization/HyTextUi.cpp
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
 	src/Utilities/HyMath.cpp
@@ -266,7 +262,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Time/Watches/HyStopwatch.h
 	include/Harmony/Time/Watches/HyTimer.h
 	include/Harmony/Time/Watches/IHyTimeInst.h
-	include/Harmony/UI/HyEntityUi.h
+	include/Harmony/UI/IHyEntityUi.h
 	include/Harmony/UI/HyPrimitivePanel.h
 	include/Harmony/UI/Widgets/HyButton.h
 	include/Harmony/UI/Widgets/HyCheckBox.h
@@ -275,18 +271,14 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Widgets/HyMeter.h
 	include/Harmony/UI/Widgets/HyRichText.h
 	include/Harmony/UI/Widgets/HySpacer.h
-	include/Harmony/UI/Widgets/IHyWidget.h
 	include/Harmony/UI/Containers/IHy9Slice.h
 	include/Harmony/UI/Containers/HyContainer.h
-	include/Harmony/UI/Containers/HyScrollBar.h
 	include/Harmony/UI/Containers/HyScrollContainer.h
-	include/Harmony/UI/Layouts/IHyLayout.h
-	include/Harmony/UI/Layouts/HyBoxLayout.h
-	include/Harmony/UI/Layouts/HyGridLayout.h
+	include/Harmony/UI/Containers/Components/HyLayout.h
+	include/Harmony/UI/Containers/Components/HyScrollBar.h
 	include/Harmony/UI/Localization/HyLocale.h
 	include/Harmony/UI/Localization/HyNumpunct.h
 	include/Harmony/UI/Localization/HyNumberFormat.h
-	include/Harmony/UI/Localization/HyTextUi.h
 	include/Harmony/Utilities/Crc32.h
 	include/Harmony/Utilities/HyIO.h
 	include/Harmony/Utilities/HyMath.h

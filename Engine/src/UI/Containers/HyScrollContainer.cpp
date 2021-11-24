@@ -11,20 +11,6 @@
 #include "UI/Containers/HyScrollContainer.h"
 #include "HyEngine.h"
 
-HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, HyEntity2d *pParent /*= nullptr*/) :
-	HyContainer(eRootLayout, pParent),
-	m_uiScrollFlags(USE_VERT),
-	m_VertBar(HYORIEN_Vertical, 20, this),
-	m_HorzBar(HYORIEN_Horizontal, 20, this)
-{
-	if((m_uiScrollFlags & USE_VERT) == 0)
-		m_VertBar.alpha.Set(0.0f);
-	if((m_uiScrollFlags & USE_HORZ) == 0)
-		m_HorzBar.alpha.Set(0.0f);
-	m_VertBar.SetOnScrollCallback(OnScroll, this);
-	m_HorzBar.SetOnScrollCallback(OnScroll, this);
-}
-
 HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, uint32 uiScrollBarDiameter, HyEntity2d *pParent /*= nullptr*/) :
 	HyContainer(eRootLayout, initRef, pParent),
 	m_uiScrollFlags(USE_VERT),
@@ -40,26 +26,19 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitive
 	m_HorzBar.SetOnScrollCallback(OnScroll, this);
 
 	SetSize(initRef.m_uiWidth, initRef.m_uiHeight);
-	SetScrollBarColor(m_pPrimPanel->GetBgColor());
+	SetScrollBarColor(m_Panel.GetBgColor());
 }
 
 /*virtual*/ HyScrollContainer::~HyScrollContainer()
 {
 }
 
-/*virtual*/ glm::ivec2 HyScrollContainer::GetSize() /*override*/
-{
-	return m_vShownSize;
-}
-
 /*virtual*/ void HyScrollContainer::SetSize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
-	HySetVec(m_vShownSize, iNewWidth, iNewHeight);
-	if(m_pPrimPanel)
-		m_pPrimPanel->SetSize(m_vShownSize.x, m_vShownSize.y);
+	m_Panel.SetSize(iNewWidth, iNewHeight);
 
-	SetScissor(0, 0, m_vShownSize.x - ((m_uiScrollFlags & USE_VERT) * m_VertBar.GetDiameter()), m_vShownSize.y - (((m_uiScrollFlags & USE_HORZ) >> 1) * m_HorzBar.GetDiameter()));
-	m_pPrimPanel->ClearScissor(false);
+	SetScissor(0, 0, iNewWidth - ((m_uiScrollFlags & USE_VERT) * m_VertBar.GetDiameter()), iNewHeight - (((m_uiScrollFlags & USE_HORZ) >> 1) * m_HorzBar.GetDiameter()));
+	m_Panel.ClearScissor(false);
 	m_VertBar.ClearScissor(false);
 	m_HorzBar.ClearScissor(false);
 
@@ -71,18 +50,18 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitive
 
 	if(iNewWidth != 0)
 	{
-		iNewWidth -= (m_pRootLayout->GetMargins().left + m_pRootLayout->GetMargins().right);
+		iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
 		if((m_uiScrollFlags & USE_VERT) != 0)
 			iNewWidth -= m_VertBar.GetDiameter();
 	}
 	if(iNewHeight != 0)
 	{
-		iNewHeight -= (m_pRootLayout->GetMargins().top + m_pRootLayout->GetMargins().bottom);
+		iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
 		if((m_uiScrollFlags & USE_HORZ) != 0)
 			iNewHeight -= m_HorzBar.GetDiameter();
 	}
 
-	HyInternal_LayoutSetSize(*m_pRootLayout, iNewWidth, iNewHeight);
+	m_RootLayout.SetSize(iNewWidth, iNewHeight);
 }
 
 void HyScrollContainer::SetScrollBarColor(HyColor color)
@@ -104,11 +83,9 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 	m_HorzBar.DoLineScroll(vScroll.x);
 }
 
-/*virtual*/ void HyScrollContainer::OnSetLayoutItems() /*override*/
+/*virtual*/ void HyScrollContainer::OnRootLayoutUpdate() /*override*/
 {
-	HyContainer::OnSetLayoutItems();
-
-	glm::ivec2 vSizeHint = m_pRootLayout->GetSizeHint();
+	glm::ivec2 vSizeHint = m_RootLayout.GetSizeHint();
 
 	switch(m_uiScrollFlags)
 	{
@@ -143,7 +120,7 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 	HyScrollContainer *pThis = static_cast<HyScrollContainer *>(pData);
 
 	if(pSelf->GetOrientation() == HYORIEN_Vertical)
-		pThis->m_pRootLayout->pos.SetY(-static_cast<float>(uiNewPosition));
+		pThis->m_RootLayout.pos.SetY(-static_cast<float>(uiNewPosition));
 	else
-		pThis->m_pRootLayout->pos.SetX(static_cast<float>(uiNewPosition));
+		pThis->m_RootLayout.pos.SetX(static_cast<float>(uiNewPosition));
 }

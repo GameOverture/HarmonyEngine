@@ -11,17 +11,18 @@
 #define HyContainer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyEntityUi.h"
+#include "UI/IHyEntityUi.h"
 #include "UI/HyPrimitivePanel.h"
-#include "UI/Layouts/IHyLayout.h"
+#include "UI/Containers/Components/HyLayout.h"
 
-class HyContainer : public HyEntityUi
+class HyContainer : public HyEntity2d
 {
-	friend class IHyLayout;
-
 protected:
-	IHyLayout *				m_pRootLayout;
-	HyPrimitivePanel *		m_pPrimPanel;
+	HyLayout								m_RootLayout;
+	std::map<HyLayoutHandle, HyLayout *>	m_SubLayoutMap;
+	static HyLayoutHandle					sm_hHandleCounter;
+	
+	HyPrimitivePanel						m_Panel;
 
 	enum ContainerState
 	{
@@ -30,15 +31,14 @@ protected:
 		CONTAINERSTATE_Shown,
 		CONTAINERSTATE_Hiding
 	};
-	ContainerState			m_eContainerState;
-	float					m_fElapsedTime;
+	ContainerState							m_eContainerState;
+	float									m_fElapsedTime;
 
 public:
-	HyContainer(HyLayoutType eRootLayout, HyEntity2d *pParent = nullptr);
 	HyContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyContainer();
 
-	virtual glm::ivec2 GetSize();
+	glm::ivec2 GetSize();
 	virtual void SetSize(int32 iNewWidth, int32 iNewHeight);
 
 	bool Show(bool bInstant = false);
@@ -47,30 +47,22 @@ public:
 	bool IsTransition();
 	bool IsShown();
 
-	void AppendItem(HyEntityUi &itemRef);
+	bool AppendItem(IHyEntityUi &itemRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
+	HyLayoutHandle InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	void ClearItems();
 
-	//IHyLayout *GetRootLayout();
-	//template<typename LAYOUT>
-	//LAYOUT *GetRootLayout() {
-	//	return static_cast<LAYOUT *>(m_pRootLayout);
-	//}
+	bool SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 
 protected:
 	virtual void OnUpdate() override final;
 	virtual void OnContainerUpdate() { }
-	virtual void OnSetLayoutItems() { }
+	virtual void OnRootLayoutUpdate() { }
 
 	// Optional overrides to control show and hide animations/functionality
 	virtual float OnBeginShow() { return 0.0f; }	// Returns the duration (in seconds) of the show transition
 	virtual void OnShown()		{ SetVisible(true); }
 	virtual float OnBeginHide() { return 0.0f; }	// Returns the duration (in seconds) of the hide transition
 	virtual void OnHidden()		{ SetVisible(false); }
-
-	void AllocRootLayout(HyLayoutType eRootLayout);
-
-private:
-	virtual glm::ivec2 GetSizeHint() override;
 };
 
 #endif /* HyContainer_h__ */

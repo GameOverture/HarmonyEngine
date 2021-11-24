@@ -9,46 +9,35 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Containers/HyContainer.h"
-#include "UI/Layouts/HyBoxLayout.h"
 #include "HyEngine.h"
 
-HyContainer::HyContainer(HyLayoutType eRootLayout, HyEntity2d *pParent /*= nullptr*/) :
-	HyEntityUi(Ui_Container, pParent),
-	m_pRootLayout(nullptr),
-	m_pPrimPanel(nullptr),
-	m_eContainerState(CONTAINERSTATE_Shown),
-	m_fElapsedTime(0.0f)
-{
-	AllocRootLayout(eRootLayout);
-}
+HyLayoutHandle HyContainer::sm_hHandleCounter = 1;
 
 HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
-	HyEntityUi(Ui_Container, pParent),
-	m_pRootLayout(nullptr),
-	m_pPrimPanel(HY_NEW HyPrimitivePanel(initRef, this)),
+	HyEntity2d(pParent),
+	m_RootLayout(eRootLayout, this),
+	m_Panel(initRef, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f)
 {
-	AllocRootLayout(eRootLayout);
+	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Fixed, HYSIZEPOLICY_Fixed);
+	m_RootLayout.Resize(m_Panel.GetSize().x, m_Panel.GetSize().y);
 }
 
 /*virtual*/ HyContainer::~HyContainer()
 {
-	delete m_pRootLayout;
-	delete m_pPrimPanel;
+	ClearItems();
 }
 
-/*virtual*/ glm::ivec2 HyContainer::GetSize()
+glm::ivec2 HyContainer::GetSize()
 {
-	return m_pRootLayout->GetSize();
+	return m_Panel.GetSize();
 }
 
 /*virtual*/ void HyContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
-	if(m_pPrimPanel)
-		m_pPrimPanel->SetSize(iNewWidth, iNewHeight);
-
-	HyInternal_LayoutSetSize(*m_pRootLayout, iNewWidth, iNewHeight);
+	m_Panel.SetSize(iNewWidth, iNewHeight);
+	m_RootLayout.Resize(iNewWidth, iNewHeight);
 }
 
 bool HyContainer::Show(bool bInstant /*= false*/)
@@ -103,18 +92,69 @@ bool HyContainer::IsShown()
 	return m_eContainerState == CONTAINERSTATE_Shown || m_eContainerState == CONTAINERSTATE_Showing;
 }
 
-void HyContainer::AppendItem(HyEntityUi &itemRef)
+bool HyContainer::AppendItem(IHyEntityUi &itemRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
-	m_pRootLayout->AppendItem(itemRef);
+	if(hInsertInto == HY_UNUSED_HANDLE)
+		m_RootLayout.AppendItem(itemRef);
+	else if(m_SubLayoutMap.find(hInsertInto) != m_SubLayoutMap.end())
+		m_SubLayoutMap[hInsertInto]->AppendItem(itemRef);
+}
+
+HyLayoutHandle HyContainer::InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
+{
+	HyLayoutHandle hNewLayoutHandle = HY_UNUSED_HANDLE;
+
+	if(hInsertInto == HY_UNUSED_HANDLE)
+	{
+		hNewLayoutHandle = sm_hHandleCounter++;
+		m_SubLayoutMap.insert(std::pair<HyLayoutHandle, HyLayout *>(hNewLayoutHandle, HY_NEW HyLayout(eNewLayoutType)));
+
+		m_RootLayout.AppendItem(*m_SubLayoutMap[hNewLayoutHandle]);
+	}
+	else if(m_SubLayoutMap.find(hInsertInto) != m_SubLayoutMap.end())
+	{
+		hNewLayoutHandle = sm_hHandleCounter++;
+		m_SubLayoutMap.insert(std::pair<HyLayoutHandle, HyLayout *>(hNewLayoutHandle, HY_NEW HyLayout(eNewLayoutType)));
+
+		m_SubLayoutMap[hInsertInto]->AppendItem(*m_SubLayoutMap[hNewLayoutHandle]);
+	}
+
+	return hNewLayoutHandle;
 }
 
 void HyContainer::ClearItems()
 {
-	m_pRootLayout->ClearItems();
+	m_RootLayout.ClearItems();
+
+	for(auto pSubLayout : m_SubLayoutMap)
+		delete pSubLayout.second;
+	m_SubLayoutMap.clear();
+}
+
+bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+{
+	if(hAffectedLayout == HY_UNUSED_HANDLE)
+	{
+		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, uiWidgetSpacingX, uiWidgetSpacingY);
+		return true;
+	}
+	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
+	{
+		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, uiWidgetSpacingX, uiWidgetSpacingY);
+		return true;
+	}
+
+	return false;
 }
 
 /*virtual*/ void HyContainer::OnUpdate() /*override final*/
 {
+	if(m_RootLayout.IsLayoutDirty())
+	{
+		m_RootLayout.SetLayoutItems();
+		OnRootLayoutUpdate();
+	}
+
 	if(m_fElapsedTime > 0.0f)
 	{
 		m_fElapsedTime -= HyEngine::DeltaTime();
@@ -140,34 +180,4 @@ void HyContainer::ClearItems()
 
 	m_fElapsedTime = 0.0f;
 	OnContainerUpdate();
-}
-
-void HyContainer::AllocRootLayout(HyLayoutType eRootLayout)
-{
-	switch(eRootLayout)
-	{
-	case HYLAYOUT_Horizontal:
-		m_pRootLayout = HY_NEW HyBoxLayout(HYORIEN_Horizontal, this);
-		break;
-	case HYLAYOUT_Vertical:
-		m_pRootLayout = HY_NEW HyBoxLayout(HYORIEN_Vertical, this);
-		break;
-
-	default:
-		HyError("HyContainer::HyContainer layout type not implemented");
-		return;
-	}
-	m_pRootLayout->SetContainerParent(this);
-
-	if(m_pPrimPanel)
-		HyInternal_LayoutSetSize(*m_pRootLayout, m_pPrimPanel->GetSize().x, m_pPrimPanel->GetSize().y);
-}
-
-void OnSetLayoutItems()
-{
-}
-
-/*virtual*/ glm::ivec2 HyContainer::GetSizeHint() /*override*/
-{
-	return GetSize();
 }
