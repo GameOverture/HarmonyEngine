@@ -95,9 +95,17 @@ bool HyContainer::IsShown()
 bool HyContainer::AppendItem(IHyEntityUi &itemRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	if(hInsertInto == HY_UNUSED_HANDLE)
+	{
 		m_RootLayout.AppendItem(itemRef);
+		return true;
+	}
 	else if(m_SubLayoutMap.find(hInsertInto) != m_SubLayoutMap.end())
+	{
 		m_SubLayoutMap[hInsertInto]->AppendItem(itemRef);
+		return true;
+	}
+
+	return false;
 }
 
 HyLayoutHandle HyContainer::InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)

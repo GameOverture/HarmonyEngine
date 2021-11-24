@@ -30,8 +30,7 @@ protected:
 	HyScrollBar				m_HorzBar;
 
 public:
-	HyScrollContainer(HyLayoutType eRootLayout, HyEntity2d *pParent = nullptr);
-	HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, uint32 uiScrollBarDiameter, HyEntity2d *pParent = nullptr);
+	HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, uint32 uiScrollBarDiameter, bool bUseVert, bool bUseHorz, HyEntity2d *pParent = nullptr);
 	virtual ~HyScrollContainer();
 
 	virtual void SetSize(int32 iNewWidth, int32 iNewHeight) override;

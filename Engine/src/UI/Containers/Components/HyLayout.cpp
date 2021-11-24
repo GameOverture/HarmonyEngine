@@ -248,7 +248,7 @@ void HyLayout::SetLayoutItems()
 /*virtual*/ glm::ivec2 HyLayout::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
 	if(m_vActualSize.x == uiNewWidth && m_vActualSize.y == uiNewHeight)
-		return;
+		return m_vActualSize;
 
 	HySetVec(m_vActualSize, static_cast<int32>(uiNewWidth), static_cast<int32>(uiNewHeight));
 	SetLayoutItems();

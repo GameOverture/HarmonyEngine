@@ -11,17 +11,22 @@
 #include "UI/Containers/HyScrollContainer.h"
 #include "HyEngine.h"
 
-HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, uint32 uiScrollBarDiameter, HyEntity2d *pParent /*= nullptr*/) :
+HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, uint32 uiScrollBarDiameter, bool bUseVert, bool bUseHorz, HyEntity2d *pParent /*= nullptr*/) :
 	HyContainer(eRootLayout, initRef, pParent),
-	m_uiScrollFlags(USE_VERT),
+	m_uiScrollFlags(0),
 	m_uiScrollBarDiameter(uiScrollBarDiameter),
 	m_VertBar(HYORIEN_Vertical, m_uiScrollBarDiameter, this),
 	m_HorzBar(HYORIEN_Horizontal, m_uiScrollBarDiameter, this)
 {
-	if((m_uiScrollFlags & USE_VERT) == 0)
+	if(bUseVert)
+		m_uiScrollFlags |= USE_VERT;
+	else
 		m_VertBar.alpha.Set(0.0f);
-	if((m_uiScrollFlags & USE_HORZ) == 0)
+	if(bUseHorz)
+		m_uiScrollFlags |= USE_HORZ;
+	else
 		m_HorzBar.alpha.Set(0.0f);
+		
 	m_VertBar.SetOnScrollCallback(OnScroll, this);
 	m_HorzBar.SetOnScrollCallback(OnScroll, this);
 
@@ -61,7 +66,7 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitive
 			iNewHeight -= m_HorzBar.GetDiameter();
 	}
 
-	m_RootLayout.SetSize(iNewWidth, iNewHeight);
+	m_RootLayout.Resize(iNewWidth, iNewHeight);
 }
 
 void HyScrollContainer::SetScrollBarColor(HyColor color)

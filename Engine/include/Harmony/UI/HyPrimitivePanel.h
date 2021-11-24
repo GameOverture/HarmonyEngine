@@ -22,6 +22,7 @@ struct HyPrimitivePanelInit
 	HyColor					m_BgColor;
 	HyColor					m_BorderColor;
 
+	HyPrimitivePanelInit();
 	HyPrimitivePanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiBorderSize = 4, HyColor backgroundColor = HyColor(0x252526), HyColor borderColor = HyColor(0x3F3F41));
 };
 

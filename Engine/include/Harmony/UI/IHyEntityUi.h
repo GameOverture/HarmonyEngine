@@ -18,6 +18,7 @@ class HyLayout;
 class IHyEntityUi : public HyEntity2d
 {
 	friend class HyContainer;
+	friend class HyScrollContainer;
 	friend class HyLayout;
 
 	HySizePolicy			m_SizePolicies[HYNUM_ORIENTATIONS];
