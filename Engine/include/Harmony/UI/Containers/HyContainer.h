@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/IHyEntityUi.h"
-#include "UI/HyPrimitivePanel.h"
+#include "UI/HyPanel.h"
 #include "UI/Containers/Components/HyLayout.h"
 
 class HyContainer : public HyEntity2d
@@ -22,7 +22,7 @@ protected:
 	std::map<HyLayoutHandle, HyLayout *>	m_SubLayoutMap;
 	static HyLayoutHandle					sm_hHandleCounter;
 	
-	HyPrimitivePanel						m_Panel;
+	HyPanel									m_Panel;
 
 	enum ContainerState
 	{
@@ -35,7 +35,7 @@ protected:
 	float									m_fElapsedTime;
 
 public:
-	HyContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, HyEntity2d *pParent = nullptr);
+	HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyContainer();
 
 	glm::ivec2 GetSize();

@@ -285,7 +285,7 @@ template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
 {
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
-	if(pData == nullptr) {
+	if(pData == nullptr || pData->GetNumStates() == 0) {
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth invoked on null data");
 		return 0.0f;
 	}

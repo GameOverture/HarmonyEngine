@@ -11,7 +11,7 @@
 #include "UI/Containers/HyScrollContainer.h"
 #include "HyEngine.h"
 
-HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, uint32 uiScrollBarDiameter, bool bUseVert, bool bUseHorz, HyEntity2d *pParent /*= nullptr*/) :
+HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, uint32 uiScrollBarDiameter, bool bUseVert, bool bUseHorz, HyEntity2d *pParent /*= nullptr*/) :
 	HyContainer(eRootLayout, initRef, pParent),
 	m_uiScrollFlags(0),
 	m_uiScrollBarDiameter(uiScrollBarDiameter),

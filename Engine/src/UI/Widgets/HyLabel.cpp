@@ -15,97 +15,40 @@
 
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
-	m_uiPanelAttribs(0),
-	m_pPrimPanel(nullptr),
-	m_SpritePanel("", "", this),
-	m_Text("", "")
+	m_uiLabelAttribs(0),
+	m_Panel(this)
 {
-	Setup("", "", "", "");
+	Setup(HyPanelInit(), "", "");
 }
 
-HyLabel::HyLabel(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
-	m_uiPanelAttribs(0),
-	m_pPrimPanel(nullptr),
-	m_SpritePanel("", "", this),
-	m_Text("", "")
+	m_uiLabelAttribs(0),
+	m_Panel(this)
 {
 	Setup(initRef, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
-HyLabel::HyLabel(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
-	m_uiPanelAttribs(0),
-	m_pPrimPanel(nullptr),
-	m_SpritePanel("", "", this),
-	m_Text("", "")
+	m_uiLabelAttribs(0),
+	m_Panel(this)
 {
 	Setup(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
 
-HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	IHyEntityUi(pParent),
-	m_uiPanelAttribs(0),
-	m_pPrimPanel(nullptr),
-	m_SpritePanel("", "", this),
-	m_Text("", "")
-{
-	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName);
-}
-
-HyLabel::HyLabel(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	IHyEntityUi(pParent),
-	m_uiPanelAttribs(0),
-	m_pPrimPanel(nullptr),
-	m_SpritePanel("", "", this),
-	m_Text("", "")
-{
-	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
-}
-
 /*virtual*/ HyLabel::~HyLabel()
 {
-	delete m_pPrimPanel;
 }
 
-void HyLabel::Setup(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName)
+void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName)
 {
 	Setup(initRef, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
-void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName)
+void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
 {
-	Setup(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0);
-}
-
-void HyLabel::Setup(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
-{
-	m_uiPanelAttribs |= PANELATTRIB_IsPrimitive;
-
-	m_SpritePanel.Uninit();
-	delete m_pPrimPanel;
-	m_pPrimPanel = HY_NEW HyPrimitivePanel(initRef, this);
-
-	m_Text.Init(sTextPrefix, sTextName, this);
-	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
-					  static_cast<float>(iTextMarginBottom),
-					  static_cast<float>(iTextMarginRight),
-					  static_cast<float>(iTextMarginTop));
-
-	SetAsEnabled(IsEnabled());
-	SetAsHighlighted(IsHighlighted());
-
-	ResetTextAndPanel();
-	OnSetup();
-}
-
-void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
-{
-	m_uiPanelAttribs &= ~PANELATTRIB_IsPrimitive;
-
-	delete m_pPrimPanel;
-	m_pPrimPanel = nullptr;
-	m_SpritePanel.Init(sPanelPrefix, sPanelName, this);
+	m_Panel.Setup(initRef);
 
 	m_Text.Init(sTextPrefix, sTextName, this);
 	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
@@ -122,23 +65,23 @@ void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::strin
 
 /*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/)
 {
-	m_uiPanelAttribs &= ~PANELATTRIB_IsSideBySide;
+	m_uiLabelAttribs &= ~LABELATTRIB_IsSideBySide;
 	switch(eTextAlignment)
 	{
 	case HYALIGN_Left:
-		m_uiPanelAttribs &= ~(PANELATTRIB_StackedTextRightAlign | PANELATTRIB_StackedTextJustifyAlign);
-		m_uiPanelAttribs |= PANELATTRIB_StackedTextLeftAlign;
+		m_uiLabelAttribs &= ~(LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign);
+		m_uiLabelAttribs |= LABELATTRIB_StackedTextLeftAlign;
 		break;
 	case HYALIGN_HCenter:
-		m_uiPanelAttribs &= ~(PANELATTRIB_StackedTextLeftAlign | PANELATTRIB_StackedTextRightAlign | PANELATTRIB_StackedTextJustifyAlign);
+		m_uiLabelAttribs &= ~(LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign);
 		break;
 	case HYALIGN_Right:
-		m_uiPanelAttribs &= ~(PANELATTRIB_StackedTextLeftAlign | PANELATTRIB_StackedTextJustifyAlign);
-		m_uiPanelAttribs |= PANELATTRIB_StackedTextRightAlign;
+		m_uiLabelAttribs &= ~(LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextJustifyAlign);
+		m_uiLabelAttribs |= LABELATTRIB_StackedTextRightAlign;
 		break;
 	case HYALIGN_Justify:
-		m_uiPanelAttribs &= ~(PANELATTRIB_StackedTextLeftAlign | PANELATTRIB_StackedTextRightAlign);
-		m_uiPanelAttribs |= PANELATTRIB_StackedTextJustifyAlign;
+		m_uiLabelAttribs &= ~(LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextRightAlign);
+		m_uiLabelAttribs |= LABELATTRIB_StackedTextJustifyAlign;
 		break;
 	}
 	
@@ -147,62 +90,45 @@ void HyLabel::Setup(std::string sPanelPrefix, std::string sPanelName, std::strin
 
 void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /*= 5*/, HyOrientation eOrientation /*= HYORIEN_Horizontal*/)
 {
-	m_uiPanelAttribs |= PANELATTRIB_IsSideBySide;
+	m_uiLabelAttribs |= LABELATTRIB_IsSideBySide;
 	if(bPanelBeforeText)
-		m_uiPanelAttribs &= ~PANELATTRIB_SideBySideTextFirst;
+		m_uiLabelAttribs &= ~LABELATTRIB_SideBySideTextFirst;
 	else
-		m_uiPanelAttribs |= PANELATTRIB_SideBySideTextFirst;
+		m_uiLabelAttribs |= LABELATTRIB_SideBySideTextFirst;
 
 	m_TextMargins.iTag = iPadding;
 
 	if(eOrientation == HYORIEN_Horizontal)
-		m_uiPanelAttribs &= ~PANELATTRIB_SideBySideVertical;
+		m_uiLabelAttribs &= ~LABELATTRIB_SideBySideVertical;
 	else
-		m_uiPanelAttribs |= PANELATTRIB_SideBySideVertical;
+		m_uiLabelAttribs |= LABELATTRIB_SideBySideVertical;
 
 	ResetTextAndPanel();
 }
 
 float HyLabel::GetPanelWidth()
 {
-	if(m_pPrimPanel)
-		return m_pPrimPanel->GetSceneWidth();
-	else if(m_SpritePanel.IsLoadDataValid())
-		return m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), true);
-
-	return 0.0f;
+	return m_Panel.GetWidth();
 }
 
 float HyLabel::GetPanelHeight()
 {
-	if(m_pPrimPanel)
-		return m_pPrimPanel->GetSceneHeight();
-	else if(m_SpritePanel.IsLoadDataValid())
-		return m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), true);
-
-	return 0.0f;
+	return m_Panel.GetHeight();
 }
 
-glm::vec2 HyLabel::GetPanelDimensions()
+glm::vec2 HyLabel::GetPanelSize()
 {
 	return glm::vec2(GetPanelWidth(), GetPanelHeight());
 }
 
 uint32 HyLabel::GetSpriteState() const
 {
-	return m_SpritePanel.GetState();
+	return m_Panel.GetSpriteState();
 }
 
 /*virtual*/ void HyLabel::SetSpriteState(uint32 uiStateIndex)
 {
-	if(m_SpritePanel.IsLoadDataValid() == false)
-	{
-		HyLogDebug("HyLabel::SetSpriteState was invoked with an invalid panel sprite");
-		return;
-	}
-
-	// Now set new sprite state, so below ResetTextAndPanel() can offset properly onto it
-	m_SpritePanel.SetState(uiStateIndex);
+	m_Panel.SetSpriteState(uiStateIndex);
 	ResetTextAndPanel();
 }
 
@@ -235,19 +161,19 @@ void HyLabel::SetText(const std::string &sUtf8Text)
 
 bool HyLabel::IsPrimitivePanel() const
 {
-	return (m_uiPanelAttribs & PANELATTRIB_IsPrimitive) != 0;
+	return m_Panel.IsPrimitive();
 }
 
 bool HyLabel::IsEnabled() const
 {
-	return (m_uiPanelAttribs & PANELATTRIB_IsDisabled) == 0;
+	return (m_uiLabelAttribs & LABELATTRIB_IsDisabled) == 0;
 }
 
 /*virtual*/ void HyLabel::SetAsEnabled(bool bEnabled)
 {
 	if(bEnabled)
 	{
-		m_uiPanelAttribs &= ~PANELATTRIB_IsDisabled;
+		m_uiLabelAttribs &= ~LABELATTRIB_IsDisabled;
 		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 
@@ -256,7 +182,7 @@ bool HyLabel::IsEnabled() const
 	}
 	else
 	{
-		m_uiPanelAttribs |= PANELATTRIB_IsDisabled;
+		m_uiLabelAttribs |= LABELATTRIB_IsDisabled;
 
 		if(IsHideDisabled() == false)
 		{
@@ -270,7 +196,7 @@ bool HyLabel::IsEnabled() const
 
 bool HyLabel::IsHighlighted() const
 {
-	return (m_uiPanelAttribs & PANELATTRIB_IsHighlighted) != 0;
+	return (m_uiLabelAttribs & LABELATTRIB_IsHighlighted) != 0;
 }
 
 /*virtual*/ void HyLabel::SetAsHighlighted(bool bIsHighlighted)
@@ -280,64 +206,51 @@ bool HyLabel::IsHighlighted() const
 
 	if(bIsHighlighted)
 	{
-		m_uiPanelAttribs |= PANELATTRIB_IsHighlighted;
-		if(m_pPrimPanel)
-		{
-			m_pPrimPanel->SetBorderColor(0x0000FF);
-			//m_pPrimPanel->m_Stroke.SetLineThickness(m_pPrimPanel->m_Stroke.GetLineThickness() * 2.0f);
-		}
+		m_uiLabelAttribs |= LABELATTRIB_IsHighlighted;
+		m_Panel.SetBorderColor(0x0000FF);
 	}
 	else
 	{
-		m_uiPanelAttribs &= ~PANELATTRIB_IsHighlighted;
-		if(m_pPrimPanel)
-		{
-			m_pPrimPanel->SetBorderColor(0x3F3F41);
-			//m_pPrimPanel->m_Stroke.SetLineThickness(m_pPrimPanel->m_Stroke.GetLineThickness() / 2.0f);
-		}
+		m_uiLabelAttribs &= ~LABELATTRIB_IsHighlighted;
+		m_Panel.SetBorderColor(0x3F3F41);
 	}
 }
 
 bool HyLabel::IsShowHandCursor() const
 {
-	return (m_uiPanelAttribs & PANELATTRIB_ShowHandCursor) != 0;
+	return (m_uiLabelAttribs & LABELATTRIB_ShowHandCursor) != 0;
 }
 
 void HyLabel::SetShowHandCursor(bool bShowHandCursor)
 {
 	if(bShowHandCursor)
-		m_uiPanelAttribs |= PANELATTRIB_ShowHandCursor;
+		m_uiLabelAttribs |= LABELATTRIB_ShowHandCursor;
 	else
-		m_uiPanelAttribs &= ~PANELATTRIB_ShowHandCursor;
+		m_uiLabelAttribs &= ~LABELATTRIB_ShowHandCursor;
 }
 
 bool HyLabel::IsHideDisabled() const
 {
-	return (m_uiPanelAttribs & PANELATTRIB_HideDisabled) != 0;
+	return (m_uiLabelAttribs & LABELATTRIB_HideDisabled) != 0;
 }
 
 void HyLabel::SetHideDisabled(bool bIsHideDisabled)
 {
 	if(bIsHideDisabled)
 	{
-		m_uiPanelAttribs |= PANELATTRIB_HideDisabled;
+		m_uiLabelAttribs |= LABELATTRIB_HideDisabled;
 		SetTint(1.0f, 1.0f, 1.0f);
 	}
 	else
 	{
-		m_uiPanelAttribs &= ~PANELATTRIB_HideDisabled;
+		m_uiLabelAttribs &= ~LABELATTRIB_HideDisabled;
 		SetAsEnabled(IsEnabled());
 	}
 }
 
-HyPrimitivePanel *HyLabel::GetPrimitivePanel()
-{
-	return m_pPrimPanel;
-}
-
 HySprite2d &HyLabel::GetSpriteNode()
 {
-	return m_SpritePanel;
+	return m_Panel.GetSprite();
 }
 
 HyText2d &HyLabel::GetTextNode()
@@ -359,10 +272,10 @@ HyText2d &HyLabel::GetTextNode()
 
 /*virtual*/ glm::vec2 HyLabel::GetPosOffset() /*override*/
 {
-	if((m_uiPanelAttribs & PANELATTRIB_IsSideBySide) == 0) // Is Stacked
+	if((m_uiLabelAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
-		if(m_pPrimPanel || m_SpritePanel.IsLoadDataValid())
-			return GetPanelOffset();
+		if(m_Panel.IsValid())
+			return m_Panel.GetBotLeftOffset();
 		else if(m_Text.IsLoadDataValid())
 			return -m_Text.GetTextBottomLeft();
 	}
@@ -374,31 +287,16 @@ HyText2d &HyLabel::GetTextNode()
 {
 	HySetVec(m_vSizeHint, 0, 0);
 
-	if((m_uiPanelAttribs & PANELATTRIB_IsSideBySide) == 0) // Is Stacked
+	if((m_uiLabelAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
-		if(m_pPrimPanel)
-		{
-			glm::vec2 vPreserveScale = m_pPrimPanel->scale.Get();
-			m_pPrimPanel->scale.Set(1.0f, 1.0f);
-
-			auto &aabb = m_pPrimPanel->GetSceneAABB();
-			if(aabb.IsValid())
-				HySetVec(m_vSizeHint, static_cast<int32>(aabb.GetExtents().x * 2.0f), static_cast<int32>(aabb.GetExtents().y * 2.0f));
-
-			m_pPrimPanel->scale = vPreserveScale;
-		}
-		else if(m_SpritePanel.IsLoadDataValid())
-		{
-			HySetVec(m_vSizeHint,
-				static_cast<int32>(m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false)),
-				static_cast<int32>(m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false)));
-		}
+		if(m_Panel.IsValid())
+			m_vSizeHint = m_Panel.GetSizeHint();
 		else if(m_Text.IsLoadDataValid())
 			HySetVec(m_vSizeHint, static_cast<int32>(m_Text.GetTextWidth(false)), static_cast<int32>(m_Text.GetTextHeight(false)));
 	}
 	else // Side-by-side
 	{
-		if(m_uiPanelAttribs & PANELATTRIB_SideBySideVertical)
+		if(m_uiLabelAttribs & LABELATTRIB_SideBySideVertical)
 		{
 			m_vSizeHint.x = HyMax(GetPanelWidth(), m_Text.GetTextWidth(true));
 			m_vSizeHint.y = GetPanelHeight() + m_TextMargins.iTag + m_Text.GetTextHeight(true);
@@ -413,16 +311,10 @@ HyText2d &HyLabel::GetTextNode()
 
 /*virtual*/ glm::ivec2 HyLabel::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
-	auto vUiSizeHint = GetSizeHint();
-	if(m_pPrimPanel)
+	//if((m_uiLabelAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
+	if(m_Panel.IsValid())
 	{
-		m_pPrimPanel->scale.X(static_cast<float>(uiNewWidth) / vUiSizeHint.x);
-		m_pPrimPanel->scale.Y(static_cast<float>(uiNewHeight) / vUiSizeHint.y);
-	}
-	else if(m_SpritePanel.IsLoadDataValid())
-	{
-		m_SpritePanel.scale.X(static_cast<float>(uiNewWidth) / vUiSizeHint.x);
-		m_SpritePanel.scale.Y(static_cast<float>(uiNewHeight) / vUiSizeHint.y);
+		m_Panel.SetSize(uiNewWidth, uiNewHeight);
 	}
 	else if(m_Text.IsLoadDataValid())
 	{
@@ -431,8 +323,6 @@ HyText2d &HyLabel::GetTextNode()
 		float fScaleX = uiNewWidth / vTextSize.x;
 		float fScaleY = uiNewHeight / vTextSize.y;
 		scale.Set(HyMin(fScaleX, fScaleY));
-
-		//m_Text.SetAsScaleBox(iNewWidth - m_TextMargins.left - m_TextMargins.right, iNewHeight - m_TextMargins.bottom - m_TextMargins.top);
 	}
 
 	ResetTextAndPanel();
@@ -442,7 +332,7 @@ HyText2d &HyLabel::GetTextNode()
 
 /*virtual*/ void HyLabel::ResetTextAndPanel()
 {
-	if(m_uiPanelAttribs & PANELATTRIB_IsSideBySide)
+	if(m_uiLabelAttribs & LABELATTRIB_IsSideBySide)
 	{
 		m_Text.SetAsLine();
 
@@ -455,9 +345,9 @@ HyText2d &HyLabel::GetTextNode()
 		glm::vec2 vSecondSize;
 		glm::vec2 vSecondOffset;
 
-		if(m_uiPanelAttribs & PANELATTRIB_SideBySideTextFirst)
+		if(m_uiLabelAttribs & LABELATTRIB_SideBySideTextFirst)
 		{
-			if(m_uiPanelAttribs & PANELATTRIB_SideBySideVertical)
+			if(m_uiLabelAttribs & LABELATTRIB_SideBySideVertical)
 				m_Text.SetTextAlignment(HYALIGN_HCenter);
 			else
 				m_Text.SetTextAlignment(HYALIGN_Right);
@@ -466,20 +356,20 @@ HyText2d &HyLabel::GetTextNode()
 			HySetVec(vFirstSize, m_Text.GetTextWidth(true), m_Text.GetTextHeight(true));
 			vFirstOffset = m_Text.GetTextBottomLeft();
 
-			pSecond = m_pPrimPanel ? static_cast<IHyBody2d *>(m_pPrimPanel) : &m_SpritePanel;
+			pSecond = &m_Panel;
 			HySetVec(vSecondSize, GetPanelWidth(), GetPanelHeight());
-			vSecondOffset = -GetPanelOffset();
+			vSecondOffset = -m_Panel.GetBotLeftOffset();
 		}
 		else
 		{
-			if(m_uiPanelAttribs & PANELATTRIB_SideBySideVertical)
+			if(m_uiLabelAttribs & LABELATTRIB_SideBySideVertical)
 				m_Text.SetTextAlignment(HYALIGN_HCenter);
 			else
 				m_Text.SetTextAlignment(HYALIGN_Left);
 
-			pFirst = m_pPrimPanel ? static_cast<IHyBody2d *>(m_pPrimPanel) : &m_SpritePanel;
+			pFirst = &m_Panel;
 			HySetVec(vFirstSize, GetPanelWidth(), GetPanelHeight());
-			vFirstOffset = -GetPanelOffset();
+			vFirstOffset = -m_Panel.GetBotLeftOffset();
 
 			pSecond = &m_Text;
 			HySetVec(vSecondSize, m_Text.GetTextWidth(true), m_Text.GetTextHeight(true));
@@ -491,7 +381,7 @@ HyText2d &HyLabel::GetTextNode()
 		pSecond->pos.Set(-vSecondOffset);
 
 		// NOTE: 'm_TextMargins.iTag' is the padding between the panel/text (when set as side-by-side)
-		if(m_uiPanelAttribs & PANELATTRIB_SideBySideVertical)
+		if(m_uiLabelAttribs & LABELATTRIB_SideBySideVertical)
 		{
 			if(vFirstSize.x >= vSecondSize.x)
 			{
@@ -515,21 +405,18 @@ HyText2d &HyLabel::GetTextNode()
 	else // Stacked Panel/Text
 	{
 		HyAlignment eAlignment;
-		if(0 == (m_uiPanelAttribs & (PANELATTRIB_StackedTextLeftAlign | PANELATTRIB_StackedTextRightAlign | PANELATTRIB_StackedTextJustifyAlign)))
+		if(0 == (m_uiLabelAttribs & (LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign)))
 			eAlignment = HYALIGN_HCenter;
-		else if(m_uiPanelAttribs & PANELATTRIB_StackedTextLeftAlign)
+		else if(m_uiLabelAttribs & LABELATTRIB_StackedTextLeftAlign)
 			eAlignment = HYALIGN_Left;
-		else if(m_uiPanelAttribs & PANELATTRIB_StackedTextRightAlign)
+		else if(m_uiLabelAttribs & LABELATTRIB_StackedTextRightAlign)
 			eAlignment = HYALIGN_Right;
 		else
 			eAlignment = HYALIGN_Justify;
 		m_Text.SetTextAlignment(eAlignment);
 
-		glm::vec2 vPanelDimensions = GetPanelDimensions();
-		glm::ivec2 vPanelOffset = GetPanelOffset();
-
-		if(m_pPrimPanel)
-			HySetVec(vPanelOffset, m_pPrimPanel->GetBorderSize(), m_pPrimPanel->GetBorderSize());
+		glm::vec2 vPanelDimensions = m_Panel.GetSize();
+		glm::ivec2 vPanelOffset = m_Panel.GetBotLeftOffset();
 
 		// Position text
 		auto vUiSizeHint = GetSizeHint();
@@ -545,22 +432,4 @@ HyText2d &HyLabel::GetTextNode()
 	}
 
 	m_bSizeHintDirty = true;
-}
-
-glm::vec2 HyLabel::GetPanelOffset()
-{
-	if(m_pPrimPanel)
-		return glm::vec2(0.0f, 0.0f);
-	else if(m_SpritePanel.IsLoadDataValid())
-	{
-		glm::vec2 vPanelDimensions = GetPanelDimensions();
-
-		const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_SpritePanel.AcquireData());
-		const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_SpritePanel.GetState(), m_SpritePanel.GetFrame());
-
-		auto vUiSizeHint = GetSizeHint();
-		return -glm::vec2(frameRef.vOFFSET.x * (vPanelDimensions.x / vUiSizeHint.x), frameRef.vOFFSET.y * (vPanelDimensions.y / vUiSizeHint.y));
-	}
-
-	return glm::vec2(0.0f, 0.0f);
 }

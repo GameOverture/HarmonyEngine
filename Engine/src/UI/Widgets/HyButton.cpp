@@ -18,7 +18,7 @@ HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyButton::HyButton(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+HyButton::HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, sTextPrefix, sTextName, pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
@@ -26,24 +26,8 @@ HyButton::HyButton(const HyPrimitivePanelInit &initRef, std::string sTextPrefix,
 	OnSetup();
 }
 
-HyButton::HyButton(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+HyButton::HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
-	m_fpBtnClickedCallback(nullptr),
-	m_pBtnClickedParam(nullptr)
-{
-	OnSetup();
-}
-
-HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, pParent),
-	m_fpBtnClickedCallback(nullptr),
-	m_pBtnClickedParam(nullptr)
-{
-	OnSetup();
-}
-
-HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
@@ -59,14 +43,14 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 	HyLabel::SetAsEnabled(bEnabled);
 	IsEnabled() ? EnableMouseInput() : DisableMouseInput();
 
-	if(m_SpritePanel.IsLoadDataValid() == false)
+	if(m_Panel.IsSprite() == false)
 		return;
 	
 	if(IsEnabled() == false)
 	{
-		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down || m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
+		if(m_Panel.GetSpriteState() == HYBUTTONSTATE_Down || m_Panel.GetSpriteState() == HYBUTTONSTATE_Hover)
 			SetBtnState(HYBUTTONSTATE_Idle);
-		else if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedDown || m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
+		else if(m_Panel.GetSpriteState() == HYBUTTONSTATE_HighlightedDown || m_Panel.GetSpriteState() == HYBUTTONSTATE_HighlightedHover)
 			SetBtnState(HYBUTTONSTATE_Highlighted);
 	}
 }
@@ -78,17 +62,17 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 
 	HyLabel::SetAsHighlighted(bIsHighlighted);
 
-	if(m_SpritePanel.IsLoadDataValid() == false)
+	if(m_Panel.IsSprite() == false)
 		return;
 
-	switch(m_SpritePanel.GetState())
+	switch(m_Panel.GetSpriteState())
 	{
 	case HYBUTTONSTATE_Idle:
-		if(IsHighlighted() && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Highlighted)
+		if(IsHighlighted() && m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_Highlighted)
 			SetBtnState(HYBUTTONSTATE_Highlighted);
 		break;
 	case HYBUTTONSTATE_Down:
-		if(IsHighlighted() && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedDown)
+		if(IsHighlighted() && m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_HighlightedDown)
 			SetBtnState(HYBUTTONSTATE_HighlightedDown);
 		break;
 	case HYBUTTONSTATE_Highlighted:
@@ -100,7 +84,7 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 			SetBtnState(HYBUTTONSTATE_Down);
 		break;
 	case HYBUTTONSTATE_Hover:
-		if(IsHighlighted() && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedHover)
+		if(IsHighlighted() && m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_HighlightedHover)
 			SetBtnState(HYBUTTONSTATE_HighlightedHover);
 		break;
 	case HYBUTTONSTATE_HighlightedHover:
@@ -112,42 +96,42 @@ HyButton::HyButton(std::string sPanelPrefix, std::string sPanelName, std::string
 
 bool HyButton::IsHideDownState() const
 {
-	return (m_uiPanelAttribs & PANELATTRIB_HideDownState) != 0;
+	return (m_uiLabelAttribs & LABELATTRIB_HideDownState) != 0;
 }
 
 void HyButton::SetHideDownState(bool bIsHideDownState)
 {
 	if(bIsHideDownState)
 	{
-		m_uiPanelAttribs |= PANELATTRIB_HideDownState;
+		m_uiLabelAttribs |= LABELATTRIB_HideDownState;
 
-		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down)
+		if(m_Panel.GetSpriteState() == HYBUTTONSTATE_Down)
 			SetBtnState(HYBUTTONSTATE_Idle);
-		else if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedDown)
+		else if(m_Panel.GetSpriteState() == HYBUTTONSTATE_HighlightedDown)
 			SetBtnState(HYBUTTONSTATE_Highlighted);
 	}
 	else
-		m_uiPanelAttribs &= ~PANELATTRIB_HideDownState;
+		m_uiLabelAttribs &= ~LABELATTRIB_HideDownState;
 }
 
 bool HyButton::IsHideHoverState() const
 {
-	return (m_uiPanelAttribs & PANELATTRIB_HideHoverState) != 0;
+	return (m_uiLabelAttribs & LABELATTRIB_HideHoverState) != 0;
 }
 
 void HyButton::SetHideHoverState(bool bIsHideHoverState)
 {
 	if(bIsHideHoverState)
 	{
-		m_uiPanelAttribs |= PANELATTRIB_HideHoverState;
+		m_uiLabelAttribs |= LABELATTRIB_HideHoverState;
 
-		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
+		if(m_Panel.GetSpriteState() == HYBUTTONSTATE_Hover)
 			SetBtnState(HYBUTTONSTATE_Idle);
-		else if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
+		else if(m_Panel.GetSpriteState() == HYBUTTONSTATE_HighlightedHover)
 			SetBtnState(HYBUTTONSTATE_Highlighted);
 	}
 	else
-		m_uiPanelAttribs &= ~PANELATTRIB_HideHoverState;
+		m_uiLabelAttribs &= ~LABELATTRIB_HideHoverState;
 }
 
 void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
@@ -172,17 +156,17 @@ void HyButton::InvokeButtonClicked()
 {
 	HyLabel::OnMouseEnter();
 
-	if(IsHideHoverState() || m_SpritePanel.IsLoadDataValid() == false)
+	if(IsHideHoverState() || m_Panel.IsSprite() == false)
 		return;
 	
 	if(IsHighlighted() == false)
 	{
-		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Idle && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Hover)
+		if(m_Panel.GetSpriteState() == HYBUTTONSTATE_Idle && m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_Hover)
 			SetBtnState(HYBUTTONSTATE_Hover);
 	}
 	else
 	{
-		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Highlighted && m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedHover)
+		if(m_Panel.GetSpriteState() == HYBUTTONSTATE_Highlighted && m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_HighlightedHover)
 			SetBtnState(HYBUTTONSTATE_HighlightedHover);
 	}
 }
@@ -191,34 +175,34 @@ void HyButton::InvokeButtonClicked()
 {
 	HyLabel::OnMouseLeave();
 
-	if(m_SpritePanel.IsLoadDataValid() == false)
+	if(m_Panel.IsSprite() == false)
 		return;
 
 	if(IsHighlighted() == false)
 	{
-		if(m_SpritePanel.GetState() == HYBUTTONSTATE_Down || m_SpritePanel.GetState() == HYBUTTONSTATE_Hover)
+		if(m_Panel.GetSpriteState() == HYBUTTONSTATE_Down || m_Panel.GetSpriteState() == HYBUTTONSTATE_Hover)
 			SetBtnState(HYBUTTONSTATE_Idle);
 	}
 	else
 	{
-		if(m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedDown || m_SpritePanel.GetState() == HYBUTTONSTATE_HighlightedHover)
+		if(m_Panel.GetSpriteState() == HYBUTTONSTATE_HighlightedDown || m_Panel.GetSpriteState() == HYBUTTONSTATE_HighlightedHover)
 			SetBtnState(HYBUTTONSTATE_Highlighted);
 	}
 }
 
 /*virtual*/ void HyButton::OnMouseDown() /*override*/
 {
-	if(IsHideDownState() || m_SpritePanel.IsLoadDataValid() == false)
+	if(IsHideDownState() || m_Panel.IsSprite() == false)
 		return;
 
 	if(IsHighlighted() == false)
 	{
-		if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Down)
+		if(m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_Down)
 			SetBtnState(HYBUTTONSTATE_Down);
 	}
 	else
 	{
-		if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedDown)
+		if(m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_HighlightedDown)
 			SetBtnState(HYBUTTONSTATE_HighlightedDown);
 	}
 }
@@ -227,14 +211,14 @@ void HyButton::InvokeButtonClicked()
 {
 	if(IsHighlighted())
 	{
-		if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_HighlightedHover)
+		if(m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_HighlightedHover)
 			SetBtnState(HYBUTTONSTATE_HighlightedHover);
-		else if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Highlighted)
+		else if(m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_Highlighted)
 			SetBtnState(HYBUTTONSTATE_Highlighted);
 		else
 			SetBtnState(HYBUTTONSTATE_Idle);
 	}
-	else if(m_SpritePanel.GetNumStates() > HYBUTTONSTATE_Hover)
+	else if(m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_Hover)
 		SetBtnState(HYBUTTONSTATE_Hover);
 	else
 		SetBtnState(HYBUTTONSTATE_Idle);
@@ -247,6 +231,6 @@ void HyButton::InvokeButtonClicked()
 
 void HyButton::SetBtnState(HyButtonState eState)
 {
-	m_SpritePanel.SetState(eState);
+	m_Panel.SetSpriteState(eState);
 	OnBtnStateChange(eState);
 }

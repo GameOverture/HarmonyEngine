@@ -22,7 +22,7 @@ HyProgressBar::HyProgressBar(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyProgressBar::HyProgressBar(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+HyProgressBar::HyProgressBar(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, sTextPrefix, sTextName, 0, 0, 0, 0, pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
@@ -34,32 +34,8 @@ HyProgressBar::HyProgressBar(const HyPrimitivePanelInit &initRef, std::string sT
 	OnSetup();
 }
 
-HyProgressBar::HyProgressBar(const HyPrimitivePanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+HyProgressBar::HyProgressBar(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
-	m_iMinimum(0),
-	m_iMaximum(0),
-	m_iValue(0),
-	m_pBar(nullptr),
-	m_fBarScissorAmt(0.0f),
-	m_BarScissorAmt(m_fBarScissorAmt, *this, 0)
-{
-	OnSetup();
-}
-
-HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, 0, 0, 0, 0, pParent),
-	m_iMinimum(0),
-	m_iMaximum(0),
-	m_iValue(0),
-	m_pBar(nullptr),
-	m_fBarScissorAmt(0.0f),
-	m_BarScissorAmt(m_fBarScissorAmt, *this, 0)
-{
-	OnSetup();
-}
-
-HyProgressBar::HyProgressBar(std::string sPanelPrefix, std::string sPanelName, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(sPanelPrefix, sPanelName, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
@@ -167,9 +143,9 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 /*virtual*/ void HyProgressBar::OnSetup() /*override*/
 {
 	delete m_pBar;
-	if(m_SpritePanel.IsLoadDataValid() && m_SpritePanel.GetNumStates() > 1)
+	if(m_Panel.IsSprite() && m_Panel.GetSprite().GetNumStates() > 1)
 	{
-		m_pBar = HY_NEW HySprite2d(m_SpritePanel.GetPrefix(), m_SpritePanel.GetName());
+		m_pBar = HY_NEW HySprite2d(m_Panel.GetSprite().GetPrefix(), m_Panel.GetSprite().GetName());
 		m_pBar->SetState(1);
 	}
 	else

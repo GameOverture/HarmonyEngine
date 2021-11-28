@@ -13,7 +13,7 @@
 
 HyLayoutHandle HyContainer::sm_hHandleCounter = 1;
 
-HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPrimitivePanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
 	m_RootLayout(eRootLayout, this),
 	m_Panel(initRef, this),
