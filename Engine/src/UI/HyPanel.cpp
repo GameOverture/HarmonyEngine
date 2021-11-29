@@ -15,7 +15,8 @@ HyPanelInit::HyPanelInit() :
 	m_uiHeight(0),
 	m_uiBorderSize(0),
 	m_BgColor(HyColor(0x252526)),
-	m_BorderColor(HyColor(0x3F3F41))
+	m_BorderColor(HyColor(0x3F3F41)),
+	m_ePanelType(PANELTYPE_Null)
 {
 }
 
@@ -26,7 +27,8 @@ HyPanelInit::HyPanelInit(std::string sSpritePrefix, std::string sSpriteName) :
 	m_uiHeight(0),
 	m_uiBorderSize(0),
 	m_BgColor(HyColor(0x252526)),
-	m_BorderColor(HyColor(0x3F3F41))
+	m_BorderColor(HyColor(0x3F3F41)),
+	m_ePanelType(PANELTYPE_Sprite)
 {
 }
 
@@ -35,7 +37,8 @@ HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiBorderSize /*
 	m_uiHeight(uiHeight),
 	m_uiBorderSize(uiBorderSize),
 	m_BgColor(backgroundColor),
-	m_BorderColor(borderColor)
+	m_BorderColor(borderColor),
+	m_ePanelType(PANELTYPE_Primitive)
 { }
 
 HyPanel::HyPanel(HyEntity2d *pParent /*= nullptr*/) :
@@ -62,57 +65,56 @@ HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
 
 void HyPanel::Setup(const HyPanelInit &initRef)
 {
-	m_uiWidth = initRef.m_uiWidth;
-	m_uiHeight = initRef.m_uiHeight;
-	m_uiBorderSize = initRef.m_uiBorderSize;
+	m_ePanelType = initRef.m_ePanelType;
 
-	if(initRef.m_sSpriteName.empty() && m_uiWidth != 0 && m_uiHeight != 0)
+	switch(m_ePanelType)
 	{
+	case HyPanelInit::PANELTYPE_Null:
+		SetAsNull();
+		break;
+
+	case HyPanelInit::PANELTYPE_Sprite:
+		m_SpritePanel.Init(initRef.m_sSpritePrefix, initRef.m_sSpriteName, this);
+		if(m_SpritePanel.IsLoadDataValid() == false)
+			SetAsNull();
+		break;
+
+	case HyPanelInit::PANELTYPE_Primitive:
 		m_SpritePanel.Uninit();
-
-		m_BG.SetAsBox(m_uiWidth, m_uiHeight);
-
-		m_Stroke.SetWireframe(true);
-		m_Stroke.SetAsBox(m_uiWidth, m_uiHeight);
-
-		m_Border.SetAsBox(m_uiWidth + (m_uiBorderSize * 2), m_uiHeight + (m_uiBorderSize * 2));
-		m_Border.pos.Set(-static_cast<int32>(m_uiBorderSize), -static_cast<int32>(m_uiBorderSize));
-
+		
+		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
+		m_uiBorderSize = initRef.m_uiBorderSize;
+		ConstructPrimitives();
 		SetBgColor(initRef.m_BgColor);
 		SetBorderColor(initRef.m_BorderColor);
+		break;
 	}
-	else if(initRef.m_sSpriteName.empty() == false)
-	{
-		m_uiWidth = m_uiHeight = 0; // Indicates using sprite for panel
-		m_SpritePanel.Init(initRef.m_sSpritePrefix, initRef.m_sSpriteName, this);
-	}
-	else
-		SetAsNull();
 }
 
 void HyPanel::SetAsNull()
 {
 	m_SpritePanel.Uninit();
 
-	m_uiWidth = m_uiHeight = m_uiBorderSize = 0;
 	m_Border.SetAsNothing();
 	m_BG.SetAsNothing();
 	m_Stroke.SetAsNothing();
+
+	m_ePanelType = HyPanelInit::PANELTYPE_Null;
 }
 
 bool HyPanel::IsValid()
 {
-	return IsPrimitive() || m_SpritePanel.IsLoadDataValid();
+	return m_ePanelType != HyPanelInit::PANELTYPE_Null;
 }
 
 bool HyPanel::IsPrimitive() const
 {
-	return m_uiWidth != 0 && m_uiHeight != 0;
+	return m_ePanelType == HyPanelInit::PANELTYPE_Primitive;
 }
 
 bool HyPanel::IsSprite()
 {
-	return m_SpritePanel.IsLoadDataValid();
+	return m_ePanelType == HyPanelInit::PANELTYPE_Sprite;
 }
 
 HySprite2d &HyPanel::GetSprite()
@@ -133,26 +135,34 @@ void HyPanel::SetSpriteState(uint32 uiStateIndex)
 glm::ivec2 HyPanel::GetSizeHint()
 {
 	if(IsPrimitive())
-		return glm::ivec2(m_uiWidth, m_uiHeight);
-	else
+		return GetSize();
+	else if(IsSprite())
+	{
 		return glm::ivec2(m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false),
 						  m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false));
+	}
+	
+	return m_vSize;
 }
 
 uint32 HyPanel::GetWidth()
 {
 	if(IsPrimitive())
-		return GetSceneWidth();
-	else
+		return m_BG.GetSceneWidth();
+	else if(IsSprite())
 		return m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), true);
+	else
+		return m_vSize.x;
 }
 
 uint32 HyPanel::GetHeight()
 {
 	if(IsPrimitive())
-		return GetSceneHeight();
-	else
+		return m_BG.GetSceneHeight();
+	else if(IsSprite())
 		return m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), true);
+	else
+		return m_vSize.y;
 }
 
 glm::ivec2 HyPanel::GetSize()
@@ -162,9 +172,16 @@ glm::ivec2 HyPanel::GetSize()
 
 void HyPanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 {
-	auto vUiSizeHint = GetSizeHint();
-	scale.X(static_cast<float>(uiWidth) / vUiSizeHint.x);
-	scale.Y(static_cast<float>(uiHeight) / vUiSizeHint.y);
+	HySetVec(m_vSize, uiWidth, uiHeight);
+
+	if(IsPrimitive())
+		ConstructPrimitives();
+	else if(IsSprite())
+	{
+		auto vUiSizeHint = GetSizeHint();
+		scale.X(static_cast<float>(uiWidth) / vUiSizeHint.x);
+		scale.Y(static_cast<float>(uiHeight) / vUiSizeHint.y);
+	}
 }
 
 glm::vec2 HyPanel::GetBotLeftOffset()
@@ -212,4 +229,15 @@ void HyPanel::SetBorderColor(HyColor color)
 uint32 HyPanel::GetBorderSize() const
 {
 	return m_uiBorderSize;
+}
+
+void HyPanel::ConstructPrimitives()
+{
+	m_BG.SetAsBox(m_vSize.x, m_vSize.y);
+
+	m_Stroke.SetWireframe(true);
+	m_Stroke.SetAsBox(m_vSize.x, m_vSize.y);
+
+	m_Border.SetAsBox(m_vSize.x + (m_uiBorderSize * 2), m_vSize.y + (m_uiBorderSize * 2));
+	m_Border.pos.Set(-static_cast<int32>(m_uiBorderSize), -static_cast<int32>(m_uiBorderSize));
 }

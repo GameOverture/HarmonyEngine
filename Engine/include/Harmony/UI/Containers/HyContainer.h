@@ -47,7 +47,7 @@ public:
 	bool IsTransition();
 	bool IsShown();
 
-	bool AppendItem(IHyEntityUi &itemRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
+	bool AppendWidget(IHyEntityUi &itemRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	HyLayoutHandle InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	void ClearItems();
 
@@ -56,7 +56,7 @@ public:
 protected:
 	virtual void OnUpdate() override final;
 	virtual void OnContainerUpdate() { }
-	virtual void OnRootLayoutUpdate() { }
+	virtual void OnRootLayoutUpdate() { m_RootLayout.Resize(m_Panel.GetWidth(), m_Panel.GetHeight()); }
 
 	// Optional overrides to control show and hide animations/functionality
 	virtual float OnBeginShow() { return 0.0f; }	// Returns the duration (in seconds) of the show transition

@@ -14,6 +14,7 @@
 IHyEntityUi::IHyEntityUi(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
 	m_vMinSize(0, 0),
+	m_bLockProportions(false),
 	m_bSizeHintDirty(true),
 	m_vSizeHint(0, 0)
 {
@@ -62,6 +63,19 @@ void IHyEntityUi::SetHorizontalPolicy(HySizePolicy ePolicy)
 void IHyEntityUi::SetVerticalPolicy(HySizePolicy ePolicy)
 {
 	m_SizePolicies[HYORIEN_Vertical] = ePolicy;
+
+	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
+}
+
+bool IHyEntityUi::IsLockedProportions() const
+{
+	return m_bLockProportions;
+}
+
+void IHyEntityUi::SetLockedProportions(bool bLockProportions)
+{
+	m_bLockProportions = bLockProportions;
 
 	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
 		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
@@ -117,6 +131,13 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 	else
 		uiNewHeight = vSizeHint.y + (((m_SizePolicies[1] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[1]);
 	uiNewHeight = HyMax(uiNewHeight, static_cast<uint32>(m_vMinSize.y));
+
+	if(m_bLockProportions)
+	{
+		glm::ivec2 vProportionalSize = HyMath::LockAspectRatio(vSizeHint.x, vSizeHint.y, uiNewWidth, uiNewHeight);
+		uiNewWidth = vProportionalSize.x;
+		uiNewHeight = vProportionalSize.y;
+	}
 
 	return OnResize(uiNewWidth, uiNewHeight);
 }

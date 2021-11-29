@@ -36,12 +36,12 @@ void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiL
 	if(eOrientation == HYORIEN_Vertical)
 	{
 		m_Panel.SetAsBox(m_uiDiameter, uiLength);
-		m_Slider.SetAsBox(static_cast<float>(m_uiDiameter) * 0.5f, (uiLength - (m_uiDiameter * 2)) * fSliderPercent);
+		m_Slider.SetAsBox(static_cast<float>(m_uiDiameter) /** 0.5f*/, (uiLength - (m_uiDiameter * 2)) * fSliderPercent);
 	}
 	else
 	{
 		m_Panel.SetAsBox(uiLength, m_uiDiameter);
-		m_Slider.SetAsBox((uiLength - (m_uiDiameter * 2)) * fSliderPercent, static_cast<float>(m_uiDiameter) * 0.5f);
+		m_Slider.SetAsBox((uiLength - (m_uiDiameter * 2)) * fSliderPercent, static_cast<float>(m_uiDiameter) /** 0.5f*/);
 	}
 }
 

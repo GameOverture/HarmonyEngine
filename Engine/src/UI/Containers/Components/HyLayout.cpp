@@ -38,7 +38,7 @@ void HyLayout::AppendItem(IHyEntityUi &itemRef)
 	SetLayoutDirty();
 }
 
-/*virtual*/ void HyLayout::ClearItems() /*override*/
+void HyLayout::DetachAllItems()
 {
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
@@ -107,8 +107,68 @@ void HyLayout::SetLayoutDirty()
 		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
 }
 
-void HyLayout::SetLayoutItems()
+/*virtual*/ void HyLayout::OnSetSizeHint() /*override*/
 {
+	HySetVec(m_vMinSize, m_Margins.left + m_Margins.right, m_Margins.top + m_Margins.bottom);
+
+	m_vSizeHint = m_vMinSize;
+
+	uint32 uiNumChildren = ChildCount();
+	if(uiNumChildren == 0)
+	{
+		m_SizePolicies[HYORIEN_Horizontal] = HYSIZEPOLICY_Flexible;
+		m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Flexible;
+		return;
+	}
+
+	HyOrientation eOrientation, eInverseOrien;
+	if(m_eLayoutType == HYLAYOUT_Horizontal)
+	{
+		eOrientation = HYORIEN_Horizontal;
+		eInverseOrien = HYORIEN_Vertical;
+	}
+	else
+	{
+		eOrientation = HYORIEN_Vertical;
+		eInverseOrien = HYORIEN_Horizontal;
+	}
+
+	// Figure out m_vSizeHint while counting size policies
+	m_vSizeHint[eOrientation] += (GetSpacing()[eOrientation] * (uiNumChildren - 1));
+	HySetVec(m_vNumExpandItems, 0, 0);
+	HySetVec(m_vNumShrinkItems, 0, 0);
+
+	auto fpPreferredSize = [&](IHyNode2d *&pChildItem) // Lambda func used to iterate over 'm_ChildList'
+	{
+		// Children are guaranteed to be IHyEntityUi
+		IHyEntityUi *pItem = static_cast<IHyEntityUi *>(pChildItem);
+
+		glm::ivec2 vItemMinSize = pItem->GetMinSize();
+		m_vMinSize[eOrientation] += vItemMinSize[eOrientation];
+		m_vMinSize[eInverseOrien] = HyMax(m_vMinSize[eInverseOrien], vItemMinSize[eInverseOrien]);
+
+		m_vNumExpandItems.x += (pItem->GetHorizontalPolicy() & HY_SIZEFLAG_EXPAND);			// Adds 1 or 0
+		m_vNumExpandItems.y += (pItem->GetVerticalPolicy() & HY_SIZEFLAG_EXPAND);			// Adds 1 or 0
+
+		m_vNumShrinkItems.x += ((pItem->GetHorizontalPolicy() & HY_SIZEFLAG_SHRINK) >> 1);	// Adds 1 or 0
+		m_vNumShrinkItems.y += ((pItem->GetVerticalPolicy() & HY_SIZEFLAG_SHRINK) >> 1);	// Adds 1 or 0
+
+		glm::ivec2 vItemSizeHint = pItem->GetSizeHint();
+		m_vSizeHint[eOrientation] += vItemSizeHint[eOrientation];
+		m_vSizeHint[eInverseOrien] = HyMax(m_vSizeHint[eInverseOrien], vItemSizeHint[eInverseOrien]);
+	};
+	std::for_each(m_ChildList.begin(), m_ChildList.end(), fpPreferredSize);
+
+	m_SizePolicies[eOrientation] = m_vNumShrinkItems[eOrientation] == 0 ? HYSIZEPOLICY_Expanding : HYSIZEPOLICY_Flexible;
+	m_SizePolicies[eInverseOrien] = m_vNumShrinkItems[eInverseOrien] == 0 ? HYSIZEPOLICY_Expanding : HYSIZEPOLICY_Flexible;
+}
+
+/*virtual*/ glm::ivec2 HyLayout::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
+{
+	//if(m_vActualSize.x == uiNewWidth && m_vActualSize.y == uiNewHeight)
+	//	return m_vActualSize;
+
+	HySetVec(m_vActualSize, static_cast<int32>(uiNewWidth), static_cast<int32>(uiNewHeight));
 	GetSizeHint(); // Updates m_vSizeHint (should already be updated at this point)
 
 	HyOrientation eOrientation, eInverseOrien;
@@ -187,71 +247,6 @@ void HyLayout::SetLayoutItems()
 		std::for_each(m_ChildList.begin(), m_ChildList.end(), fpPositionAndResize);
 
 	m_bLayoutDirty = false;
-}
-
-/*virtual*/ void HyLayout::OnSetSizeHint() /*override*/
-{
-	HySetVec(m_vMinSize, m_Margins.left + m_Margins.right, m_Margins.top + m_Margins.bottom);
-
-	m_vSizeHint = m_vMinSize;
-
-	uint32 uiNumChildren = ChildCount();
-	if(uiNumChildren == 0)
-	{
-		m_SizePolicies[HYORIEN_Horizontal] = HYSIZEPOLICY_Flexible;
-		m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Flexible;
-		return;
-	}
-
-	HyOrientation eOrientation, eInverseOrien;
-	if(m_eLayoutType == HYLAYOUT_Horizontal)
-	{
-		eOrientation = HYORIEN_Horizontal;
-		eInverseOrien = HYORIEN_Vertical;
-	}
-	else
-	{
-		eOrientation = HYORIEN_Vertical;
-		eInverseOrien = HYORIEN_Horizontal;
-	}
-
-	// Figure out m_vSizeHint while counting size policies
-	m_vSizeHint[eOrientation] += (GetSpacing()[eOrientation] * (uiNumChildren - 1));
-	HySetVec(m_vNumExpandItems, 0, 0);
-	HySetVec(m_vNumShrinkItems, 0, 0);
-
-	auto fpPreferredSize = [&](IHyNode2d *&pChildItem) // Lambda func used to iterate over 'm_ChildList'
-	{
-		// Children are guaranteed to be IHyEntityUi
-		IHyEntityUi *pItem = static_cast<IHyEntityUi *>(pChildItem);
-
-		glm::ivec2 vItemMinSize = pItem->GetMinSize();
-		m_vMinSize[eOrientation] += vItemMinSize[eOrientation];
-		m_vMinSize[eInverseOrien] = HyMax(m_vMinSize[eInverseOrien], vItemMinSize[eInverseOrien]);
-
-		m_vNumExpandItems.x += (pItem->GetHorizontalPolicy() & HY_SIZEFLAG_EXPAND);			// Adds 1 or 0
-		m_vNumExpandItems.y += (pItem->GetVerticalPolicy() & HY_SIZEFLAG_EXPAND);			// Adds 1 or 0
-
-		m_vNumShrinkItems.x += ((pItem->GetHorizontalPolicy() & HY_SIZEFLAG_SHRINK) >> 1);	// Adds 1 or 0
-		m_vNumShrinkItems.y += ((pItem->GetVerticalPolicy() & HY_SIZEFLAG_SHRINK) >> 1);	// Adds 1 or 0
-
-		glm::ivec2 vItemSizeHint = pItem->GetSizeHint();
-		m_vSizeHint[eOrientation] += vItemSizeHint[eOrientation];
-		m_vSizeHint[eInverseOrien] = HyMax(m_vSizeHint[eInverseOrien], vItemSizeHint[eInverseOrien]);
-	};
-	std::for_each(m_ChildList.begin(), m_ChildList.end(), fpPreferredSize);
-
-	m_SizePolicies[eOrientation] = m_vNumShrinkItems[eOrientation] == 0 ? HYSIZEPOLICY_Expanding : HYSIZEPOLICY_Flexible;
-	m_SizePolicies[eInverseOrien] = m_vNumShrinkItems[eInverseOrien] == 0 ? HYSIZEPOLICY_Expanding : HYSIZEPOLICY_Flexible;
-}
-
-/*virtual*/ glm::ivec2 HyLayout::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
-{
-	if(m_vActualSize.x == uiNewWidth && m_vActualSize.y == uiNewHeight)
-		return m_vActualSize;
-
-	HySetVec(m_vActualSize, static_cast<int32>(uiNewWidth), static_cast<int32>(uiNewHeight));
-	SetLayoutItems();
 
 	return m_vActualSize;
 }

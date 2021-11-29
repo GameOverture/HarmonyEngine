@@ -32,6 +32,8 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPanelInit
 
 	SetSize(initRef.m_uiWidth, initRef.m_uiHeight);
 	SetScrollBarColor(m_Panel.GetBgColor());
+
+	m_RootLayout.SetSizePolicy(bUseHorz ? HYSIZEPOLICY_Expanding : HYSIZEPOLICY_Fixed, bUseVert ? HYSIZEPOLICY_Expanding : HYSIZEPOLICY_Fixed);
 }
 
 /*virtual*/ HyScrollContainer::~HyScrollContainer()
@@ -40,33 +42,7 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPanelInit
 
 /*virtual*/ void HyScrollContainer::SetSize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
-	m_Panel.SetSize(iNewWidth, iNewHeight);
-
-	SetScissor(0, 0, iNewWidth - ((m_uiScrollFlags & USE_VERT) * m_VertBar.GetDiameter()), iNewHeight - (((m_uiScrollFlags & USE_HORZ) >> 1) * m_HorzBar.GetDiameter()));
-	m_Panel.ClearScissor(false);
-	m_VertBar.ClearScissor(false);
-	m_HorzBar.ClearScissor(false);
-
-	// '0' indicates to the layout that it should use its sizehint for that dimension
-	if(m_uiScrollFlags & USE_VERT)
-		iNewHeight = 0;
-	if(m_uiScrollFlags & USE_HORZ)
-		iNewWidth = 0;
-
-	if(iNewWidth != 0)
-	{
-		iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
-		if((m_uiScrollFlags & USE_VERT) != 0)
-			iNewWidth -= m_VertBar.GetDiameter();
-	}
-	if(iNewHeight != 0)
-	{
-		iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
-		if((m_uiScrollFlags & USE_HORZ) != 0)
-			iNewHeight -= m_HorzBar.GetDiameter();
-	}
-
-	m_RootLayout.Resize(iNewWidth, iNewHeight);
+	HyContainer::SetSize(iNewWidth, iNewHeight);
 }
 
 void HyScrollContainer::SetScrollBarColor(HyColor color)
@@ -90,7 +66,43 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 
 /*virtual*/ void HyScrollContainer::OnRootLayoutUpdate() /*override*/
 {
+	int32 iNewWidth = m_Panel.GetWidth();
+	int32 iNewHeight = m_Panel.GetHeight();
+
+	SetScissor(0, 0, iNewWidth - ((m_uiScrollFlags & USE_VERT) * m_VertBar.GetDiameter()), iNewHeight - (((m_uiScrollFlags & USE_HORZ) >> 1) * m_HorzBar.GetDiameter()));
+	m_Panel.ClearScissor(false);
+	m_VertBar.ClearScissor(false);
+	m_HorzBar.ClearScissor(false);
+
+	// If scrolling, then use its sizehint for that dimension
 	glm::ivec2 vSizeHint = m_RootLayout.GetSizeHint();
+	if(m_uiScrollFlags & USE_VERT)
+		iNewHeight = 0;
+	if(m_uiScrollFlags & USE_HORZ)
+		iNewWidth = 0;
+
+	if(iNewWidth != 0)
+	{
+		iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
+		if((m_uiScrollFlags & USE_VERT) != 0)
+			iNewWidth -= m_VertBar.GetDiameter();
+	}
+	else
+		iNewWidth = vSizeHint.x;
+
+	if(iNewHeight != 0)
+	{
+		iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
+		if((m_uiScrollFlags & USE_HORZ) != 0)
+			iNewHeight -= m_HorzBar.GetDiameter();
+	}
+	else
+		iNewHeight = vSizeHint.y;
+
+	m_RootLayout.Resize(iNewWidth, iNewHeight);
+
+
+	
 
 	switch(m_uiScrollFlags)
 	{

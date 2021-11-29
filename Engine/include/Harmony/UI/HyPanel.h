@@ -26,6 +26,14 @@ struct HyPanelInit
 	HyColor					m_BgColor;
 	HyColor					m_BorderColor;
 
+	enum PanelType
+	{
+		PANELTYPE_Null = 0,
+		PANELTYPE_Sprite,
+		PANELTYPE_Primitive
+	};
+	PanelType				m_ePanelType;
+
 	HyPanelInit();
 	HyPanelInit(std::string sSpritePrefix, std::string sSpriteName);
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiBorderSize = 4, HyColor backgroundColor = HyColor(0x252526), HyColor borderColor = HyColor(0x3F3F41));
@@ -33,12 +41,12 @@ struct HyPanelInit
 
 class HyPanel : public HyEntity2d
 {
+	glm::ivec2				m_vSize;
+	uint32					m_uiBorderSize;
+	HyPanelInit::PanelType	m_ePanelType;
+
 	HySprite2d				m_SpritePanel;
 
-	// Primitive Panel
-	uint32					m_uiWidth;
-	uint32					m_uiHeight;
-	uint32					m_uiBorderSize;
 	HyPrimitive2d			m_Border;
 	HyPrimitive2d			m_BG;
 	HyPrimitive2d			m_Stroke;	// Acts as thin stroke around the BG always 1px in size
@@ -72,6 +80,9 @@ public:
 	HyColor GetBorderColor() const;
 	void SetBorderColor(HyColor color);
 	uint32 GetBorderSize() const;
+
+protected:
+	void ConstructPrimitives();
 };
 
 #endif /* HyPanel_h__ */

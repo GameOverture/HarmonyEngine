@@ -322,7 +322,10 @@ HyText2d &HyLabel::GetTextNode()
 
 		float fScaleX = uiNewWidth / vTextSize.x;
 		float fScaleY = uiNewHeight / vTextSize.y;
-		scale.Set(HyMin(fScaleX, fScaleY));
+		m_Text.scale.Set(HyMin(fScaleX, fScaleY));
+
+		uiNewWidth = m_Text.GetTextWidth(true);
+		uiNewHeight = m_Text.GetTextHeight(true);
 	}
 
 	ResetTextAndPanel();

@@ -21,7 +21,7 @@ HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, H
 	m_fElapsedTime(0.0f)
 {
 	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Fixed, HYSIZEPOLICY_Fixed);
-	m_RootLayout.Resize(m_Panel.GetSize().x, m_Panel.GetSize().y);
+	m_RootLayout.SetLayoutDirty();
 }
 
 /*virtual*/ HyContainer::~HyContainer()
@@ -37,7 +37,7 @@ glm::ivec2 HyContainer::GetSize()
 /*virtual*/ void HyContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
 	m_Panel.SetSize(iNewWidth, iNewHeight);
-	m_RootLayout.Resize(iNewWidth, iNewHeight);
+	m_RootLayout.SetLayoutDirty();
 }
 
 bool HyContainer::Show(bool bInstant /*= false*/)
@@ -92,7 +92,7 @@ bool HyContainer::IsShown()
 	return m_eContainerState == CONTAINERSTATE_Shown || m_eContainerState == CONTAINERSTATE_Showing;
 }
 
-bool HyContainer::AppendItem(IHyEntityUi &itemRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
+bool HyContainer::AppendWidget(IHyEntityUi &itemRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	if(hInsertInto == HY_UNUSED_HANDLE)
 	{
@@ -132,7 +132,7 @@ HyLayoutHandle HyContainer::InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHa
 
 void HyContainer::ClearItems()
 {
-	m_RootLayout.ClearItems();
+	m_RootLayout.DetachAllItems();
 
 	for(auto pSubLayout : m_SubLayoutMap)
 		delete pSubLayout.second;
@@ -159,7 +159,7 @@ bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTo
 {
 	if(m_RootLayout.IsLayoutDirty())
 	{
-		m_RootLayout.SetLayoutItems();
+		
 		OnRootLayoutUpdate();
 	}
 
