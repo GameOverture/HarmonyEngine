@@ -136,7 +136,7 @@ glm::ivec2 HyPanel::GetSizeHint()
 		return glm::ivec2(m_uiWidth, m_uiHeight);
 	else
 		return glm::ivec2(m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false),
-						  m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false));
+						  m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false));
 }
 
 uint32 HyPanel::GetWidth()
