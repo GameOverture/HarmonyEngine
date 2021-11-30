@@ -395,6 +395,8 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 		glm::vec2 ptCursorPos = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pGlyph->fADVANCE_X, 0.0f);
 		ptCursorPos.y += (pGlyph->uiHEIGHT - pGlyph->iOFFSET_Y) * m_fScaleBoxModifier; // Find the baseline of this last glyph
 		
+		ptCursorPos.x *= this->scale.X();
+		ptCursorPos.y *= this->scale.Y();
 		return ptCursorPos;
 	}
 
@@ -433,7 +435,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 		}
 	}
 		
-	return glm::vec2(fX, GetTextCursorPos().y - abs(pData->GetLineDescender(this->m_uiState)));
+	return glm::vec2(fX, GetTextCursorPos().y);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
