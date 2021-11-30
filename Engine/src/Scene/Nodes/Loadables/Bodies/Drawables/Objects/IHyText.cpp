@@ -772,8 +772,8 @@ offsetCalculation:
 					fCurLineWidth > m_vBoxDimensions.x)
 				{
 					// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
-					if((m_uiTextAttributes & TEXTATTRIB_ColumnSplitWordsToFit) != 0 ||
-						((m_uiTextAttributes & TEXTATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
+					//if((m_uiTextAttributes & TEXTATTRIB_ColumnSplitWordsToFit) != 0 ||
+					//	((m_uiTextAttributes & TEXTATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
 					{
 						// Don't newline on ' ' characters
 						if(uiStrIndex != uiLastSpaceIndex)
