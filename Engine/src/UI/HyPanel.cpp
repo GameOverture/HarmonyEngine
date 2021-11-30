@@ -236,7 +236,7 @@ void HyPanel::ConstructPrimitives()
 	m_BG.SetAsBox(m_vSize.x, m_vSize.y);
 
 	m_Stroke.SetWireframe(true);
-	m_Stroke.SetAsBox(m_vSize.x, m_vSize.y);
+	m_Stroke.SetAsBox(m_vSize.x + 1, m_vSize.y + 1);
 
 	m_Border.SetAsBox(m_vSize.x + (m_uiBorderSize * 2), m_vSize.y + (m_uiBorderSize * 2));
 	m_Border.pos.Set(-static_cast<int32>(m_uiBorderSize), -static_cast<int32>(m_uiBorderSize));

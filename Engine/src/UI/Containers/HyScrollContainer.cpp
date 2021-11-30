@@ -69,7 +69,9 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 	int32 iNewWidth = m_Panel.GetWidth();
 	int32 iNewHeight = m_Panel.GetHeight();
 
-	SetScissor(0, 0, iNewWidth - ((m_uiScrollFlags & USE_VERT) * m_VertBar.GetDiameter()), iNewHeight - (((m_uiScrollFlags & USE_HORZ) >> 1) * m_HorzBar.GetDiameter()));
+	SetScissor(0, 0,
+		iNewWidth - ((m_uiScrollFlags & USE_VERT) * m_VertBar.GetDiameter()),
+		iNewHeight - (((m_uiScrollFlags & USE_HORZ) >> 1) * m_HorzBar.GetDiameter()));
 	m_Panel.ClearScissor(false);
 	m_VertBar.ClearScissor(false);
 	m_HorzBar.ClearScissor(false);

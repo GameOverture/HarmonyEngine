@@ -21,11 +21,11 @@ class IHyEntityUi : public HyEntity2d
 	friend class HyScrollContainer;
 	friend class HyLayout;
 
+protected:
 	HySizePolicy			m_SizePolicies[HYNUM_ORIENTATIONS];
 	glm::ivec2				m_vMinSize;
 	bool					m_bLockProportions;
 
-protected:
 	bool					m_bSizeHintDirty;
 	glm::ivec2				m_vSizeHint;
 
@@ -45,7 +45,7 @@ public:
 	void SetLockedProportions(bool bLockProportions);
 
 	glm::ivec2 GetMinSize();
-	void SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY);
+	virtual void SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY);
 
 	glm::ivec2 GetSizeHint();
 

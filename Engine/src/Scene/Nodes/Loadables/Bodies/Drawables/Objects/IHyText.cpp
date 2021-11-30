@@ -435,7 +435,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 		}
 	}
 		
-	return glm::vec2(fX, GetTextCursorPos().y);
+	return glm::vec2(fX, GetTextCursorPos().y);// -(abs(pData->GetLineDescender(this->m_uiState) * this->scale.Y())));
 }
 
 template<typename NODETYPE, typename ENTTYPE>

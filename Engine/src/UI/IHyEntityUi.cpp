@@ -94,7 +94,7 @@ glm::ivec2 IHyEntityUi::GetMinSize()
 	return vMinSize;
 }
 
-void IHyEntityUi::SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY)
+/*virtual*/ void IHyEntityUi::SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY)
 {
 	glm::ivec2 vSizeHint = GetSizeHint();
 	HySetVec(m_vMinSize, HyMin(uiMinSizeX, static_cast<uint32>(vSizeHint.x)), HyMin(uiMinSizeY, static_cast<uint32>(vSizeHint.y)));

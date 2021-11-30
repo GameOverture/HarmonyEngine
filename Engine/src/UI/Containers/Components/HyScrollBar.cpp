@@ -36,7 +36,7 @@ void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiL
 	if(eOrientation == HYORIEN_Vertical)
 	{
 		m_Panel.SetAsBox(m_uiDiameter, uiLength);
-		m_Slider.SetAsBox(static_cast<float>(m_uiDiameter) /** 0.5f*/, (uiLength - (m_uiDiameter * 2)) * fSliderPercent);
+		m_Slider.SetAsBox(static_cast<float>(m_uiDiameter) * 0.5f, (uiLength - (m_uiDiameter * 2)) * fSliderPercent);
 	}
 	else
 	{
@@ -48,9 +48,9 @@ void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiL
 void HyScrollBar::PageControl::SetSliderPos(HyOrientation eOrientation, float fAnimScrollPos, float fClientTotalSize, float fClientShownSize)
 {
 	if(eOrientation == HYORIEN_Vertical)
-		m_Slider.pos.Set(0.0f, (fAnimScrollPos * (m_Panel.GetSceneHeight() - m_Slider.GetSceneHeight())) / static_cast<float>(fClientTotalSize - fClientShownSize));
+		m_Slider.pos.Set(static_cast<float>(m_uiDiameter) * 0.25f, (fAnimScrollPos * (m_Panel.GetSceneHeight() - m_Slider.GetSceneHeight())) / static_cast<float>(fClientTotalSize - fClientShownSize));
 	else
-		m_Slider.pos.Set((fAnimScrollPos * (m_Panel.GetSceneWidth() - m_Slider.GetSceneWidth())) / static_cast<float>(fClientTotalSize - fClientShownSize), 0.0f);
+		m_Slider.pos.Set((fAnimScrollPos * (m_Panel.GetSceneWidth() - m_Slider.GetSceneWidth())) / static_cast<float>(fClientTotalSize - fClientShownSize), static_cast<float>(m_uiDiameter) * 0.25f);
 }
 
 void HyScrollBar::PageControl::SetColor(HyColor color)
@@ -97,13 +97,26 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 
 /*virtual*/ void HyScrollBar::PageControl::OnMouseDown() /*override*/
 {
+	HyScrollBar *pScrollBar = static_cast<HyScrollBar *>(m_pParent);
+
 	glm::vec2 ptMousePos;
 	if(GetCoordinateSystem() >= 0)
 		ptMousePos = HyEngine::Input().GetMousePos();
 	else
 		HyEngine::Input().GetWorldMousePos(ptMousePos);
 
-	const b2AABB &sliderAABB = m_Slider.GetSceneAABB();
+	b2AABB sliderAABB = m_Slider.GetSceneAABB();
+	if(pScrollBar->GetOrientation() == HYORIEN_Vertical)
+	{
+		sliderAABB.lowerBound.x -= static_cast<float>(m_uiDiameter) * 0.5f;
+		sliderAABB.upperBound.x += static_cast<float>(m_uiDiameter) * 0.5f;
+	}
+	else
+	{
+		sliderAABB.lowerBound.y -= static_cast<float>(m_uiDiameter) * 0.5f;
+		sliderAABB.upperBound.y += static_cast<float>(m_uiDiameter) * 0.5f;
+	}
+	
 	if(HyTestPointAABB(sliderAABB, ptMousePos))
 	{
 		m_eDragState = DRAG_MouseHeld;
@@ -111,7 +124,7 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 	}
 	else
 	{
-		HyScrollBar *pScrollBar = static_cast<HyScrollBar *>(m_pParent);
+		
 		if(pScrollBar->GetOrientation() == HYORIEN_Vertical)
 		{
 			if(ptMousePos.y >= sliderAABB.GetCenter().y)

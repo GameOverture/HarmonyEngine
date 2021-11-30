@@ -19,6 +19,8 @@ public:
 	HySpacer(HyEntity2d *pParent = nullptr);
 	virtual ~HySpacer();
 
+	virtual void SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY) override;
+
 protected:
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;
