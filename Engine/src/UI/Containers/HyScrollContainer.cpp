@@ -62,7 +62,7 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 /*virtual*/ void HyScrollContainer::OnContainerUpdate() /*override*/
 {
 	glm::ivec2 vScroll = HyEngine::Input().GetMouseScroll();
-	m_VertBar.DoLineScroll(vScroll.y);
+	m_VertBar.DoLineScroll(-vScroll.y);
 	m_HorzBar.DoLineScroll(vScroll.x);
 }
 
@@ -84,18 +84,16 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 		iNewWidth = 0;
 	else if(m_bUseVertBar)
 	{
-		//iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
-		//if((m_uiScrollFlags & USE_VERT) != 0)
-			iNewWidth -= m_VertBar.GetDiameter();
+		iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
+		iNewWidth -= m_VertBar.GetDiameter();
 	}
 
 	if(m_bUseVertBar)
 		iNewHeight = 0;
 	else if(m_bUseHorzBar)
 	{
-		//iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
-		//if((m_uiScrollFlags & USE_HORZ) != 0)
-			iNewHeight -= m_HorzBar.GetDiameter();
+		iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
+		iNewHeight -= m_HorzBar.GetDiameter();
 	}
 
 	glm::ivec2 vActualSize = m_RootLayout.Resize(iNewWidth, iNewHeight);
@@ -126,12 +124,12 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 	}
 }
 
-/*static*/ void HyScrollContainer::OnScroll(HyScrollBar *pSelf, uint32 uiNewPosition, void *pData)
+/*static*/ void HyScrollContainer::OnScroll(HyScrollBar *pSelf, float fNewPosition, float fTotalRange, void *pData)
 {
 	HyScrollContainer *pThis = static_cast<HyScrollContainer *>(pData);
 
 	if(pSelf->GetOrientation() == HYORIEN_Vertical)
-		pThis->m_RootLayout.pos.SetY(-static_cast<float>(uiNewPosition));
+		pThis->m_RootLayout.pos.SetY(fNewPosition - fTotalRange);
 	else
-		pThis->m_RootLayout.pos.SetX(static_cast<float>(uiNewPosition));
+		pThis->m_RootLayout.pos.SetX(fNewPosition);
 }

@@ -220,8 +220,9 @@ void HyLayout::SetLayoutDirty()
 		else
 			iMaxInverse = HyMax(iMaxInverse, vItemSize[eInverseOrien]);
 
+		// TODO: If 'pItem' is a nested layout, it should pass '0' to Resize where appropriate
 		glm::ivec2 vActualItemSize = pItem->Resize(vItemSize.x, vItemSize.y);
-		if(vTargetSize[eOrientation] != 0 && vActualItemSize[eOrientation] != vItemSize[eOrientation])
+		if(vTargetSize[eOrientation] != 0 && vActualItemSize != vItemSize)
 			bNeedsResize = true;
 
 		// After resizing, apply offset to get 'pItem' oriented to its bottom left

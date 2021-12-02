@@ -14,7 +14,7 @@
 #include "UI/Widgets/HyButton.h"
 
 class HyScrollBar;
-typedef std::function<void(HyScrollBar *pSelf, uint32 uiNewPosition, void *pData)> HyScrollBarCallback;
+typedef std::function<void(HyScrollBar *pSelf, float fNewPosition, float fTotalRange, void *pData)> HyScrollBarCallback;
 
 class HyScrollBar : public HyEntity2d
 {

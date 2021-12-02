@@ -48,7 +48,7 @@ void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiL
 void HyScrollBar::PageControl::SetSliderPos(HyOrientation eOrientation, float fAnimScrollPos, float fClientTotalSize, float fClientShownSize)
 {
 	if(eOrientation == HYORIEN_Vertical)
-		m_Slider.pos.Set(static_cast<float>(m_uiDiameter) * 0.25f, (fAnimScrollPos * (m_Panel.GetSceneHeight() - m_Slider.GetSceneHeight())) / static_cast<float>(fClientTotalSize - fClientShownSize));
+		m_Slider.pos.Set(static_cast<float>(m_uiDiameter) * 0.25f, ((static_cast<float>(fClientTotalSize - fClientShownSize) - fAnimScrollPos) * (m_Panel.GetSceneHeight() - m_Slider.GetSceneHeight())) / static_cast<float>(fClientTotalSize - fClientShownSize));
 	else
 		m_Slider.pos.Set((fAnimScrollPos * (m_Panel.GetSceneWidth() - m_Slider.GetSceneWidth())) / static_cast<float>(fClientTotalSize - fClientShownSize), static_cast<float>(m_uiDiameter) * 0.25f);
 }
@@ -128,9 +128,9 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 		if(pScrollBar->GetOrientation() == HYORIEN_Vertical)
 		{
 			if(ptMousePos.y >= sliderAABB.GetCenter().y)
-				pScrollBar->DoPageScroll(1);
-			else
 				pScrollBar->DoPageScroll(-1);
+			else
+				pScrollBar->DoPageScroll(1);
 		}
 		else // HYORIEN_Horizontal
 		{
@@ -174,19 +174,19 @@ void HyScrollBar::Button::SetMetrics(HyOrientation eOrientation, bool bPositive,
 	{
 		if(bPositive)
 		{
-			glm::vec2 ptUpArrow[3];
-			HySetVec(ptUpArrow[0], uiDiameter * 0.2f, uiDiameter * 0.2f);
-			HySetVec(ptUpArrow[1], uiDiameter * 0.5f, uiDiameter * 0.8f);
-			HySetVec(ptUpArrow[2], uiDiameter * 0.8f, uiDiameter * 0.2f);
-			m_Decal.SetAsPolygon(ptUpArrow, 3);
-		}
-		else // negative
-		{
 			glm::vec2 ptDownArrow[3];
 			HySetVec(ptDownArrow[0], uiDiameter * 0.2f, uiDiameter * 0.8f);
 			HySetVec(ptDownArrow[1], uiDiameter * 0.5f, uiDiameter * 0.2f);
 			HySetVec(ptDownArrow[2], uiDiameter * 0.8f, uiDiameter * 0.8f);
 			m_Decal.SetAsPolygon(ptDownArrow, 3);
+		}
+		else // negative
+		{
+			glm::vec2 ptUpArrow[3];
+			HySetVec(ptUpArrow[0], uiDiameter * 0.2f, uiDiameter * 0.2f);
+			HySetVec(ptUpArrow[1], uiDiameter * 0.5f, uiDiameter * 0.8f);
+			HySetVec(ptUpArrow[2], uiDiameter * 0.8f, uiDiameter * 0.2f);
+			m_Decal.SetAsPolygon(ptUpArrow, 3);
 		}
 	}
 	else // HYORIEN_Horizontal
@@ -280,18 +280,14 @@ void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiClientTotalSize, uint32 u
 	if(m_eORIENTATION == HYORIEN_Vertical)
 	{
 		m_PageControl.pos.Set(0, uiDiameter);
-		m_PosBtn.pos.Set(0, uiLength - uiDiameter);
-		m_NegBtn.pos.Set(0, 0);
-
-		m_AnimScrollPos.Set(m_fClientTotalSize - m_fClientShownSize);
+		m_PosBtn.pos.Set(0, 0);
+		m_NegBtn.pos.Set(0, uiLength - uiDiameter);
 	}
 	else // HYORIEN_Horizontal
 	{
 		m_PageControl.pos.Set(uiDiameter, 0);
 		m_PosBtn.pos.Set(uiLength - uiDiameter, 0);
 		m_NegBtn.pos.Set(0, 0);
-
-		m_AnimScrollPos.Set(0.0f);
 	}
 
 	InvokeOnScrollCallback();
@@ -329,7 +325,10 @@ void HyScrollBar::OffsetSlider(float fPixels)
 	// Convert fPixels to client sizing
 	float fScrollBarLength = 0.0f;
 	if(m_eORIENTATION == HYORIEN_Vertical)
+	{
+		fPixels *= -1.0f;
 		fScrollBarLength = m_PageControl.GetSceneHeight();
+	}
 	else
 		fScrollBarLength = m_PageControl.GetSceneWidth();
 
@@ -366,5 +365,5 @@ void HyScrollBar::InvokeOnScrollCallback()
 	m_PageControl.SetSliderPos(m_eORIENTATION, m_AnimScrollPos.Get(), m_fClientTotalSize, m_fClientShownSize);
 
 	if(m_fpCallback)
-		m_fpCallback(this, static_cast<uint32>(m_AnimScrollPos.Get()), m_pCallbackData);
+		m_fpCallback(this, static_cast<uint32>(m_AnimScrollPos.Get()), static_cast<float>(m_fClientTotalSize - m_fClientShownSize), m_pCallbackData);
 }

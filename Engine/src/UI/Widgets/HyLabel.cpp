@@ -301,36 +301,71 @@ HyText2d &HyLabel::GetTextNode()
 	}
 	else // Side-by-side
 	{
+		glm::vec2 vPanelSizeHint = m_Panel.GetSizeHint();
 		if(m_uiLabelAttribs & LABELATTRIB_SideBySideVertical)
 		{
-			m_vSizeHint.x = HyMax(GetPanelWidth(), m_Text.GetTextWidth(true));
-			m_vSizeHint.y = GetPanelHeight() + m_TextMargins.iTag + m_Text.GetTextHeight(true);
+			m_vSizeHint.x = HyMax(vPanelSizeHint.x, m_Text.GetTextWidth(false));
+			m_vSizeHint.y = vPanelSizeHint.y + m_TextMargins.iTag + m_Text.GetTextHeight(false);
 		}
-		else
+		else // Horizontal
 		{
-			m_vSizeHint.x = GetPanelWidth() + m_TextMargins.iTag + m_Text.GetTextWidth(true);
-			m_vSizeHint.y = HyMax(GetPanelHeight(), m_Text.GetTextHeight(true));
+			m_vSizeHint.x = vPanelSizeHint.x + m_TextMargins.iTag + m_Text.GetTextWidth(false);
+			m_vSizeHint.y = HyMax(vPanelSizeHint.y, m_Text.GetTextHeight(false));
 		}
 	}
 }
 
 /*virtual*/ glm::ivec2 HyLabel::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
-	//if((m_uiLabelAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
-	if(m_Panel.IsValid())
+	if((m_uiLabelAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
-		m_Panel.SetSize(uiNewWidth, uiNewHeight);
+		if(m_Panel.IsValid())
+		{
+			m_Panel.SetSize(uiNewWidth, uiNewHeight);
+		}
+		else if(m_Text.IsLoadDataValid())
+		{
+			glm::vec2 vTextSize(m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
+
+			float fScaleX = uiNewWidth / vTextSize.x;
+			float fScaleY = uiNewHeight / vTextSize.y;
+			m_Text.scale.Set(HyMin(fScaleX, fScaleY));
+
+			uiNewWidth = m_Text.GetTextWidth(true);
+			uiNewHeight = m_Text.GetTextHeight(true);
+		}
 	}
-	else if(m_Text.IsLoadDataValid())
+	else // Side-by-side
 	{
-		glm::vec2 vTextSize(m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
+		glm::ivec2 vSizeHint = GetSizeHint();
+		glm::ivec2 vPanelSizeHint = m_Panel.GetSizeHint();
+		glm::ivec2 vTextSizeHint(m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
 
-		float fScaleX = uiNewWidth / vTextSize.x;
-		float fScaleY = uiNewHeight / vTextSize.y;
+		glm::ivec2 vNewPanelSize, vNewTextSize;
+		if(m_uiLabelAttribs & LABELATTRIB_SideBySideVertical)
+		{
+			vSizeHint.y -= m_TextMargins.iTag;
+
+		}
+		else // Horizontal
+		{
+			vSizeHint.x -= m_TextMargins.iTag;
+
+			// Determine what % of size goes to panel/text
+			float fPanelPerc = static_cast<float>(vPanelSizeHint.x) / static_cast<float>(vSizeHint.x);
+			float fTextPerc = static_cast<float>(vTextSizeHint.x) / static_cast<float>(vSizeHint.x);
+
+			vNewPanelSize = HyMath::LockAspectRatio(vPanelSizeHint.x, vPanelSizeHint.y, uiNewWidth * fPanelPerc, uiNewHeight);
+			vNewTextSize = HyMath::LockAspectRatio(vTextSizeHint.x, vTextSizeHint.y, uiNewWidth * fTextPerc, uiNewHeight);
+			//HySetVec(vNewTextSize, uiNewWidth * fTextPerc, vTextSizeHint.y);
+		}
+
+		if(m_Panel.IsValid())
+			m_Panel.SetSize(vNewPanelSize.x, vNewPanelSize.y);
+
+		float fScaleX = static_cast<float>(vNewTextSize.x) / static_cast<float>(vTextSizeHint.x);
+		float fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);
 		m_Text.scale.Set(HyMin(fScaleX, fScaleY));
-
-		uiNewWidth = m_Text.GetTextWidth(true);
-		uiNewHeight = m_Text.GetTextHeight(true);
 	}
 
 	ResetTextAndPanel();

@@ -36,7 +36,7 @@ protected:
 	virtual void OnContainerUpdate() override;
 	virtual void OnRootLayoutUpdate() override;
 
-	static void OnScroll(HyScrollBar *pSelf, uint32 uiNewPosition, void *pData);
+	static void OnScroll(HyScrollBar *pSelf, float fNewPosition, float fTotalRange, void *pData);
 };
 
 #endif /* HyScrollContainer_h__ */
