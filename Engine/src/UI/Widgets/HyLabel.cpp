@@ -126,6 +126,11 @@ uint32 HyLabel::GetSpriteState() const
 	return m_Panel.GetSpriteState();
 }
 
+void HyLabel::SetPanelVisible(bool bVisible)
+{
+	m_Panel.SetVisible(bVisible);
+}
+
 /*virtual*/ void HyLabel::SetSpriteState(uint32 uiStateIndex)
 {
 	m_Panel.SetSpriteState(uiStateIndex);
