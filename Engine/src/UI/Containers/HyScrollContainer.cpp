@@ -13,27 +13,17 @@
 
 HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, uint32 uiScrollBarDiameter, bool bUseVert, bool bUseHorz, HyEntity2d *pParent /*= nullptr*/) :
 	HyContainer(eRootLayout, initRef, pParent),
-	m_uiScrollFlags(0),
-	m_uiScrollBarDiameter(uiScrollBarDiameter),
-	m_VertBar(HYORIEN_Vertical, m_uiScrollBarDiameter, this),
-	m_HorzBar(HYORIEN_Horizontal, m_uiScrollBarDiameter, this)
+	m_bUseVertBar(bUseVert),
+	m_bUseHorzBar(bUseHorz),
+	m_VertBar(HYORIEN_Vertical, uiScrollBarDiameter, this),
+	m_HorzBar(HYORIEN_Horizontal, uiScrollBarDiameter, this)
 {
-	if(bUseVert)
-		m_uiScrollFlags |= USE_VERT;
-	else
-		m_VertBar.alpha.Set(0.0f);
-	if(bUseHorz)
-		m_uiScrollFlags |= USE_HORZ;
-	else
-		m_HorzBar.alpha.Set(0.0f);
-		
 	m_VertBar.SetOnScrollCallback(OnScroll, this);
 	m_HorzBar.SetOnScrollCallback(OnScroll, this);
-
-	SetSize(initRef.m_uiWidth, initRef.m_uiHeight);
 	SetScrollBarColor(m_Panel.GetBgColor());
-
-	m_RootLayout.SetSizePolicy(bUseHorz ? HYSIZEPOLICY_Expanding : HYSIZEPOLICY_Fixed, bUseVert ? HYSIZEPOLICY_Expanding : HYSIZEPOLICY_Fixed);
+	EnableScrollBars(m_bUseVertBar, m_bUseHorzBar);
+	
+	SetSize(initRef.m_uiWidth, initRef.m_uiHeight);
 }
 
 /*virtual*/ HyScrollContainer::~HyScrollContainer()
@@ -43,6 +33,18 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPanelInit
 /*virtual*/ void HyScrollContainer::SetSize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
 	HyContainer::SetSize(iNewWidth, iNewHeight);
+}
+
+void HyScrollContainer::EnableScrollBars(bool bUseVert, bool bUseHorz)
+{
+	m_bUseVertBar = bUseVert;
+	m_bUseHorzBar = bUseHorz;
+
+	// Use alpha because *this container may want to SetVisible() and it should then propagate to the scroll bars
+	m_VertBar.alpha.Set(static_cast<int32>(m_bUseVertBar) * 1.0f);
+	m_HorzBar.alpha.Set(static_cast<int32>(m_bUseHorzBar) * 1.0f);
+
+	m_RootLayout.SetLayoutDirty();
 }
 
 void HyScrollContainer::SetScrollBarColor(HyColor color)
@@ -70,67 +72,57 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 	int32 iNewHeight = m_Panel.GetHeight();
 
 	SetScissor(0, 0,
-		iNewWidth - ((m_uiScrollFlags & USE_VERT) * m_VertBar.GetDiameter()),
-		iNewHeight - (((m_uiScrollFlags & USE_HORZ) >> 1) * m_HorzBar.GetDiameter()));
+		iNewWidth - (static_cast<int32>(m_bUseVertBar) * m_VertBar.GetDiameter()),
+		iNewHeight - (static_cast<int32>(m_bUseHorzBar) * m_HorzBar.GetDiameter()));
 	m_Panel.ClearScissor(false);
 	m_VertBar.ClearScissor(false);
 	m_HorzBar.ClearScissor(false);
 
-	// If scrolling, then use its sizehint for that dimension
-	glm::ivec2 vSizeHint = m_RootLayout.GetSizeHint();
-	if(m_uiScrollFlags & USE_VERT)
-		iNewHeight = 0;
-	if(m_uiScrollFlags & USE_HORZ)
+	// If scrolling, then use '0' for that dimension, to indicate to the layout use the exact amount it needs.
+	// NOTE: Using the layout's size hint (instead of '0') may be inaccurate if other dimension is being resized
+	if(m_bUseHorzBar)
 		iNewWidth = 0;
-
-	if(iNewWidth != 0)
+	else if(m_bUseVertBar)
 	{
-		iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
-		if((m_uiScrollFlags & USE_VERT) != 0)
+		//iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
+		//if((m_uiScrollFlags & USE_VERT) != 0)
 			iNewWidth -= m_VertBar.GetDiameter();
 	}
-	else
-		iNewWidth = vSizeHint.x;
 
-	if(iNewHeight != 0)
+	if(m_bUseVertBar)
+		iNewHeight = 0;
+	else if(m_bUseHorzBar)
 	{
-		iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
-		if((m_uiScrollFlags & USE_HORZ) != 0)
+		//iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
+		//if((m_uiScrollFlags & USE_HORZ) != 0)
 			iNewHeight -= m_HorzBar.GetDiameter();
 	}
-	else
-		iNewHeight = vSizeHint.y;
 
-	m_RootLayout.Resize(iNewWidth, iNewHeight);
+	glm::ivec2 vActualSize = m_RootLayout.Resize(iNewWidth, iNewHeight);
 
-
-	
-
-	switch(m_uiScrollFlags)
+	if(m_bUseVertBar && m_bUseHorzBar == false)
 	{
-	case USE_VERT:
-		m_VertBar.SetMetrics(GetSize().y, m_uiScrollBarDiameter, vSizeHint.y, GetSize().y);
-		m_VertBar.pos.Set(GetSize().x - m_uiScrollBarDiameter, 0);
+		m_VertBar.SetMetrics(GetSize().y, vActualSize.y, GetSize().y);
+		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter(), 0);
 		m_VertBar.alpha.Set(1.0f);
 		m_HorzBar.alpha.Set(0.0f);
-		break;
-
-	case USE_HORZ:
-		m_HorzBar.SetMetrics(GetSize().x, m_uiScrollBarDiameter, vSizeHint.x, GetSize().x);
+	}
+	else if(m_bUseVertBar == false && m_bUseHorzBar)
+	{
+		m_HorzBar.SetMetrics(GetSize().x, vActualSize.x, GetSize().x);
 		m_HorzBar.pos.Set(0, 0);
 		m_HorzBar.alpha.Set(1.0f);
 		m_VertBar.alpha.Set(0.0f);
-		break;
-
-	case USE_BOTH:
-		m_VertBar.SetMetrics(GetSize().y - m_uiScrollBarDiameter, m_uiScrollBarDiameter, vSizeHint.y, GetSize().y);
-		m_VertBar.pos.Set(GetSize().x - m_uiScrollBarDiameter, static_cast<int32>(m_uiScrollBarDiameter));
+	}
+	else if(m_bUseVertBar && m_bUseHorzBar)
+	{
+		m_VertBar.SetMetrics(GetSize().y - m_HorzBar.GetDiameter(), vActualSize.y, GetSize().y);
+		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter(), static_cast<int32>(m_HorzBar.GetDiameter()));
 		m_VertBar.alpha.Set(1.0f);
 
-		m_HorzBar.SetMetrics(GetSize().x - m_uiScrollBarDiameter, m_uiScrollBarDiameter, vSizeHint.x, GetSize().x);
+		m_HorzBar.SetMetrics(GetSize().x - m_VertBar.GetDiameter(), vActualSize.x, GetSize().x);
 		m_HorzBar.pos.Set(0, 0);
 		m_HorzBar.alpha.Set(1.0f);
-		break;
 	}
 }
 

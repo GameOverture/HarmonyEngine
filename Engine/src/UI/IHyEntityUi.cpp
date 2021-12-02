@@ -109,6 +109,10 @@ glm::ivec2 IHyEntityUi::GetSizeHint()
 	{
 		OnSetSizeHint();
 		m_bSizeHintDirty = false;
+
+		// Ensure MinSize still works with the new size hint
+		// NOTE: 'm_bSizeHintDirty' needs to be set false or else infinite loop
+		SetMinSize(m_vMinSize.x, m_vMinSize.y);
 	}
 	return m_vSizeHint;
 }
@@ -119,20 +123,26 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 	glm::ivec2 vDiff = glm::ivec2(uiNewWidth, uiNewHeight) - vSizeHint;
 
 	// X-Axis
-	if(vDiff[0] >= 0)
-		uiNewWidth = vSizeHint.x + ((m_SizePolicies[0] & HY_SIZEFLAG_EXPAND) * vDiff[0]);
-	else
-		uiNewWidth = vSizeHint.x + (((m_SizePolicies[0] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[0]);
-	uiNewWidth = HyMax(uiNewWidth, static_cast<uint32>(m_vMinSize.x));
+	if(uiNewWidth != 0)
+	{
+		if(vDiff[0] >= 0)
+			uiNewWidth = vSizeHint.x + ((m_SizePolicies[0] & HY_SIZEFLAG_EXPAND) * vDiff[0]);
+		else
+			uiNewWidth = vSizeHint.x + (((m_SizePolicies[0] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[0]);
+		uiNewWidth = HyMax(uiNewWidth, static_cast<uint32>(m_vMinSize.x));
+	}
 
 	// Y-Axis
-	if(vDiff[1] >= 0)
-		uiNewHeight = vSizeHint.y + ((m_SizePolicies[1] & HY_SIZEFLAG_EXPAND) * vDiff[1]);
-	else
-		uiNewHeight = vSizeHint.y + (((m_SizePolicies[1] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[1]);
-	uiNewHeight = HyMax(uiNewHeight, static_cast<uint32>(m_vMinSize.y));
+	if(uiNewHeight != 0)
+	{
+		if(vDiff[1] >= 0)
+			uiNewHeight = vSizeHint.y + ((m_SizePolicies[1] & HY_SIZEFLAG_EXPAND) * vDiff[1]);
+		else
+			uiNewHeight = vSizeHint.y + (((m_SizePolicies[1] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[1]);
+		uiNewHeight = HyMax(uiNewHeight, static_cast<uint32>(m_vMinSize.y));
+	}
 
-	if(m_bLockProportions)
+	if(m_bLockProportions && uiNewWidth != 0 && uiNewHeight != 0)
 	{
 		glm::ivec2 vProportionalSize = HyMath::LockAspectRatio(vSizeHint.x, vSizeHint.y, uiNewWidth, uiNewHeight);
 		uiNewWidth = vProportionalSize.x;

@@ -20,7 +20,7 @@ HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, H
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f)
 {
-	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Fixed, HYSIZEPOLICY_Fixed);
+	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
 	m_RootLayout.SetLayoutDirty();
 }
 
@@ -158,10 +158,7 @@ bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTo
 /*virtual*/ void HyContainer::OnUpdate() /*override final*/
 {
 	if(m_RootLayout.IsLayoutDirty())
-	{
-		
 		OnRootLayoutUpdate();
-	}
 
 	if(m_fElapsedTime > 0.0f)
 	{

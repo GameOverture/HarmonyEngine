@@ -18,8 +18,8 @@ class HyLayout : public IHyEntityUi
 	HyLayoutType						m_eLayoutType;
 	glm::ivec2							m_vActualSize;
 
-	glm::ivec2							m_vNumExpandItems;
-	glm::ivec2							m_vNumShrinkItems;
+	uint32								m_uiNumExpandItems;	// How many child items have a size policy of EXPAND
+	uint32								m_uiNumShrinkItems;	// How many child items have a size policy of SHRINK
 	
 	bool								m_bReverse;			// By default items are appended left->right, or top->bottom (NOTE: 'm_bReverse' is defaulted ON when 'm_eOrientation' is HYORIEN_Vertical to achieve top->bottom as default)
 
@@ -52,6 +52,8 @@ public:
 protected:
 	virtual void OnSetSizeHint() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
+
+	void GetDistributedScalingAmts(int32 iTargetLength, int32 iCurrLength, float &fExpandAmtOut, float &fShrinkAmtOut);
 
 private:
 	using HyEntity2d::ChildAppend;

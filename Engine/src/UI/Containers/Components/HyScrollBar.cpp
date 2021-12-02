@@ -258,8 +258,10 @@ void HyScrollBar::SetColor(HyColor color)
 	m_NegBtn.SetColor(color);
 }
 
-void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiDiameter, uint32 uiClientTotalSize, uint32 uiClientShownSize)
+void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiClientTotalSize, uint32 uiClientShownSize)
 {
+	uint32 uiDiameter = GetDiameter();
+
 	if(uiClientTotalSize <= 0 || uiClientTotalSize <= uiClientShownSize)
 	{
 		m_bIsValidMetrics = false;

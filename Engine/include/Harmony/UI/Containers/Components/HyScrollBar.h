@@ -90,7 +90,7 @@ public:
 	void SetLineScrollAmt(float fLineScrollAmt);
 
 	void SetColor(HyColor color);
-	void SetMetrics(uint32 uiLength, uint32 uiDiameter, uint32 uiClientTotalSize, uint32 uiClientShownSize);
+	void SetMetrics(uint32 uiLength, uint32 uiClientTotalSize, uint32 uiClientShownSize);
 	bool IsValidMetrics() const;
 
 	void SetOnScrollCallback(HyScrollBarCallback fpCallback, void *pData);

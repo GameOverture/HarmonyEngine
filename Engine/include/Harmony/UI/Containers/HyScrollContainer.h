@@ -17,15 +17,8 @@
 class HyScrollContainer : public HyContainer
 {
 protected:
-	enum
-	{
-		USE_VERT = 1 << 0,
-		USE_HORZ = 1 << 1,
-		USE_BOTH = USE_VERT | USE_HORZ
-	};
-	uint32					m_uiScrollFlags;
-	uint32					m_uiScrollBarDiameter;
-
+	bool					m_bUseVertBar;
+	bool					m_bUseHorzBar;
 	HyScrollBar				m_VertBar;
 	HyScrollBar				m_HorzBar;
 
@@ -35,6 +28,7 @@ public:
 
 	virtual void SetSize(int32 iNewWidth, int32 iNewHeight) override;
 
+	void EnableScrollBars(bool bUseVert, bool bUseHorz);
 	void SetScrollBarColor(HyColor color);
 	void SetLineScrollAmt(float fLineScrollAmt);
 
