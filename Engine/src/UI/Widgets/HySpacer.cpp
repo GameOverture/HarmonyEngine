@@ -9,7 +9,6 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HySpacer.h"
-#include "UI/Containers/Components/HyLayout.h"
 
 HySpacer::HySpacer(HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent)
@@ -19,15 +18,6 @@ HySpacer::HySpacer(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ HySpacer::~HySpacer()
 {
-}
-
-/*virtual*/ void HySpacer::SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY) /*override*/
-{
-	HySetVec(m_vMinSize, uiMinSizeX, uiMinSizeY);
-
-	m_bSizeHintDirty = true;
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
 }
 
 /*virtual*/ glm::vec2 HySpacer::GetPosOffset() /*override*/

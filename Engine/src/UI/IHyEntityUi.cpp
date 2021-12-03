@@ -14,6 +14,7 @@
 IHyEntityUi::IHyEntityUi(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
 	m_vMinSize(0, 0),
+	m_vMaxSize(std::numeric_limits<int32>().max(), std::numeric_limits<int32>().max()),
 	m_bLockProportions(false),
 	m_bSizeHintDirty(true),
 	m_vSizeHint(0, 0)
@@ -45,27 +46,19 @@ void IHyEntityUi::SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPol
 {
 	m_SizePolicies[HYORIEN_Horizontal] = eHorizPolicy;
 	m_SizePolicies[HYORIEN_Vertical] = eVertPolicy;
-
-	SetMinSize(m_vMinSize.x, m_vMinSize.y); // This will 'fix' min size if policy conflicts with it
-
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
+	SetSizeAndLayoutDirty();
 }
 
 void IHyEntityUi::SetHorizontalPolicy(HySizePolicy ePolicy)
 {
 	m_SizePolicies[HYORIEN_Horizontal] = ePolicy;
-
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
+	SetSizeAndLayoutDirty();
 }
 
 void IHyEntityUi::SetVerticalPolicy(HySizePolicy ePolicy)
 {
 	m_SizePolicies[HYORIEN_Vertical] = ePolicy;
-
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
+	SetSizeAndLayoutDirty();
 }
 
 bool IHyEntityUi::IsLockedProportions() const
@@ -76,9 +69,7 @@ bool IHyEntityUi::IsLockedProportions() const
 void IHyEntityUi::SetLockedProportions(bool bLockProportions)
 {
 	m_bLockProportions = bLockProportions;
-
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
+	SetSizeAndLayoutDirty();
 }
 
 glm::ivec2 IHyEntityUi::GetMinSize()
@@ -88,19 +79,45 @@ glm::ivec2 IHyEntityUi::GetMinSize()
 	glm::ivec2 vMinSize = m_vMinSize;
 	if((m_SizePolicies[HYORIEN_Horizontal] & HY_SIZEFLAG_SHRINK) == 0)
 		vMinSize.x = vSizeHint.x;
+	else
+		vMinSize.x = HyMin(vMinSize.x, vSizeHint.x);
+
 	if((m_SizePolicies[HYORIEN_Vertical] & HY_SIZEFLAG_SHRINK) == 0)
 		vMinSize.y = vSizeHint.y;
+	else
+		vMinSize.y = HyMin(vMinSize.y, vSizeHint.y);
 
 	return vMinSize;
 }
 
-/*virtual*/ void IHyEntityUi::SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY)
+void IHyEntityUi::SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY)
+{
+	HySetVec(m_vMinSize, uiMinSizeX, uiMinSizeY);
+	SetSizeAndLayoutDirty();
+}
+
+glm::ivec2 IHyEntityUi::GetMaxSize()
 {
 	glm::ivec2 vSizeHint = GetSizeHint();
-	HySetVec(m_vMinSize, HyMin(uiMinSizeX, static_cast<uint32>(vSizeHint.x)), HyMin(uiMinSizeY, static_cast<uint32>(vSizeHint.y)));
 
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
+	glm::ivec2 vMaxSize = m_vMaxSize;
+	if((m_SizePolicies[HYORIEN_Horizontal] & HY_SIZEFLAG_EXPAND) == 0)
+		vMaxSize.x = vSizeHint.x;
+	else
+		vMaxSize.x = HyMax(vMaxSize.x, vSizeHint.x);
+
+	if((m_SizePolicies[HYORIEN_Vertical] & HY_SIZEFLAG_EXPAND) == 0)
+		vMaxSize.y = vSizeHint.y;
+	else
+		vMaxSize.y = HyMax(vMaxSize.y, vSizeHint.y);
+
+	return vMaxSize;
+}
+
+void IHyEntityUi::SetMaxSize(uint32 uiMaxSizeX, uint32 uiMaxSizeY)
+{
+	HySetVec(m_vMaxSize, uiMaxSizeX, uiMaxSizeY);
+	SetSizeAndLayoutDirty();
 }
 
 glm::ivec2 IHyEntityUi::GetSizeHint()
@@ -109,10 +126,6 @@ glm::ivec2 IHyEntityUi::GetSizeHint()
 	{
 		OnSetSizeHint();
 		m_bSizeHintDirty = false;
-
-		// Ensure MinSize still works with the new size hint
-		// NOTE: 'm_bSizeHintDirty' needs to be set false or else infinite loop
-		SetMinSize(m_vMinSize.x, m_vMinSize.y);
 	}
 	return m_vSizeHint;
 }
@@ -130,6 +143,7 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 		else
 			uiNewWidth = vSizeHint.x + (((m_SizePolicies[0] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[0]);
 		uiNewWidth = HyMax(uiNewWidth, static_cast<uint32>(m_vMinSize.x));
+		uiNewWidth = HyMin(uiNewWidth, static_cast<uint32>(m_vMaxSize.x));
 	}
 
 	// Y-Axis
@@ -140,6 +154,7 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 		else
 			uiNewHeight = vSizeHint.y + (((m_SizePolicies[1] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[1]);
 		uiNewHeight = HyMax(uiNewHeight, static_cast<uint32>(m_vMinSize.y));
+		uiNewHeight = HyMin(uiNewHeight, static_cast<uint32>(m_vMaxSize.y));
 	}
 
 	if(m_bLockProportions && uiNewWidth != 0 && uiNewHeight != 0)
@@ -150,4 +165,11 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 	}
 
 	return OnResize(uiNewWidth, uiNewHeight);
+}
+
+void IHyEntityUi::SetSizeAndLayoutDirty()
+{
+	m_bSizeHintDirty = true;
+	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
 }

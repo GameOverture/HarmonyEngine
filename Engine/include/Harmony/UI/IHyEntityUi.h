@@ -24,6 +24,7 @@ class IHyEntityUi : public HyEntity2d
 protected:
 	HySizePolicy			m_SizePolicies[HYNUM_ORIENTATIONS];
 	glm::ivec2				m_vMinSize;
+	glm::ivec2				m_vMaxSize;
 	bool					m_bLockProportions;
 
 	bool					m_bSizeHintDirty;
@@ -45,7 +46,9 @@ public:
 	void SetLockedProportions(bool bLockProportions);
 
 	glm::ivec2 GetMinSize();
-	virtual void SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY);
+	void SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY);
+	glm::ivec2 GetMaxSize();
+	void SetMaxSize(uint32 uiMaxSizeX, uint32 uiMaxSizeY);
 
 	glm::ivec2 GetSizeHint();
 
@@ -55,6 +58,8 @@ protected:
 	virtual glm::vec2 GetPosOffset() = 0;									// What offset is needed to get *this oriented to its bottom left
 	virtual void OnSetSizeHint() = 0;										// Sets the preferred size of *this into 'm_vSizeHint'
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) = 0;	// Returns the size *this was actually set to (which may be different than what's passed in due to constraints)
+
+	void SetSizeAndLayoutDirty();
 };
 
 #endif /* IHyEntityUi_h__ */
