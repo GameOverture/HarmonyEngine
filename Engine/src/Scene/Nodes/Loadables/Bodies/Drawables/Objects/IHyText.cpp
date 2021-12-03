@@ -694,6 +694,7 @@ offsetCalculation:
 	for(uint32 uiStrIndex = 0; uiStrIndex < uiSTR_SIZE; ++uiStrIndex)
 	{
 		bool bDoNewline = false;
+		bool bHandleNewlineCharacter = false;
 
 		if(m_Utf32CodeList[uiStrIndex] == 32)	// 32 = ' ' character
 		{
@@ -708,7 +709,9 @@ offsetCalculation:
 			bDoNewline = true;
 			++uiStrIndex;	// increment past the '\n' since the algorithm below assumes a regular character to be the uiNewlineIndex
 
-			uiLastSpaceIndex = uiNewlineIndex;	// Assigning uiLastSpaceIndex to be equal to uiNewlineIndex will "trick" the algorithm below to NOT split the line at the last ' ' character
+			//uiLastSpaceIndex = uiNewlineIndex;	// Assigning uiLastSpaceIndex to be equal to uiNewlineIndex will "trick" the algorithm below to NOT split the line at the last ' ' character
+			bHandleNewlineCharacter = true;
+
 			fLastCharWidth = fCurLineWidth;	// Since we aren't technically splitting to the previous character, this will assign the proper line width to vNewlineInfo
 		}
 		else
@@ -860,12 +863,12 @@ offsetCalculation:
 			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) == 0)
 			{
 				// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
-				if(uiNewlineIndex != uiLastSpaceIndex)
+				if(bHandleNewlineCharacter == false && (uiNewlineIndex != uiLastSpaceIndex || uiLastSpaceIndex == 0))
 				{
 					uiStrIndex = uiLastSpaceIndex;
 					fCurLineWidth = fLastSpacePosX;
 				}
-				else // Splitting mid-word, go back one character to place on newline
+				else // Handling '\n' or we're splitting mid-word, go back one character to place on newline
 				{
 					--uiStrIndex;
 					fCurLineWidth = fLastCharWidth;
