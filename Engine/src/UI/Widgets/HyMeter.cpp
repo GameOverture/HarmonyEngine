@@ -35,7 +35,7 @@ HyMeter::HyMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 {
 }
 
-/*virtual*/ void HyMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/) /*override*/
+/*virtual*/ void HyMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/, bool bUseScaleBox /*= true*/) /*override*/
 {
 	HyLabel::SetAsStacked(eTextAlignment);
 

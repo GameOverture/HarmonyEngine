@@ -124,7 +124,6 @@ void HyRichText::AssembleDrawables()
 	// Reassemble the drawable list
 	std::string sCurText;
 	uint32 uiCurTextState = 0;
-	HyAlignment eAlignment = HYALIGN_Left;
 	glm::vec2 ptCurPos(0.0f, 0.0f);
 	float fHorizontalCenterAccum = 0.0f;
 	uint32 uiCurFmtIndex = 0;

@@ -63,7 +63,7 @@ void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::st
 	OnSetup();
 }
 
-/*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/)
+/*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/, bool bUseScaleBox /*= true*/)
 {
 	m_uiLabelAttribs &= ~LABELATTRIB_IsSideBySide;
 	switch(eTextAlignment)
@@ -84,6 +84,11 @@ void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::st
 		m_uiLabelAttribs |= LABELATTRIB_StackedTextJustifyAlign;
 		break;
 	}
+
+	if(bUseScaleBox)
+		m_uiLabelAttribs &= ~LABELATTRIB_StackedTextUseLine;
+	else
+		m_uiLabelAttribs |= LABELATTRIB_StackedTextUseLine;
 	
 	ResetTextAndPanel();
 }
@@ -447,31 +452,52 @@ HyText2d &HyLabel::GetTextNode()
 	}
 	else // Stacked Panel/Text
 	{
+		glm::ivec2 vUiSizeHint = GetSizeHint();
+		glm::vec2 vPanelDimensions = m_Panel.GetSize();
+		glm::ivec2 vPanelOffset = m_Panel.GetBotLeftOffset();
+
+		// Position text to bottom left of 'm_TextMargins'
+		m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x,
+					   (m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y);
+
 		HyAlignment eAlignment;
+		float fLineOffsetX = 0.0f;	// If *this is 'LABELATTRIB_StackedTextUseLine' determine how much to offset m_Text's position (not needed for scale boxes)
 		if(0 == (m_uiLabelAttribs & (LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign)))
+		{
 			eAlignment = HYALIGN_HCenter;
+			fLineOffsetX = (vPanelDimensions.x * 0.5f) - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x));
+		}
 		else if(m_uiLabelAttribs & LABELATTRIB_StackedTextLeftAlign)
 			eAlignment = HYALIGN_Left;
 		else if(m_uiLabelAttribs & LABELATTRIB_StackedTextRightAlign)
+		{
 			eAlignment = HYALIGN_Right;
+			fLineOffsetX = vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x));
+		}
 		else
 			eAlignment = HYALIGN_Justify;
 		m_Text.SetTextAlignment(eAlignment);
 
-		glm::vec2 vPanelDimensions = m_Panel.GetSize();
-		glm::ivec2 vPanelOffset = m_Panel.GetBotLeftOffset();
-
-		// Position text
-		auto vUiSizeHint = GetSizeHint();
-		m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x,
-					   (m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y);
-
 		// Size text
 		if(vPanelDimensions.x != 0.0f && vPanelDimensions.y != 0.0f)
 		{
-			m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)),
-								 vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / vUiSizeHint.y)), true);
+			if(m_uiLabelAttribs & LABELATTRIB_StackedTextUseLine)
+			{
+				m_Text.SetAsLine();
+
+				float fLineOffsetY = 0.0f;
+				float fVerticalSpace = vPanelDimensions.y - ((m_TextMargins.top + m_TextMargins.bottom) * (vPanelDimensions.y / vUiSizeHint.y));
+				float fTextHeight = m_Text.GetTextHeight(true);
+				if(fVerticalSpace > fTextHeight)
+					fLineOffsetY = (fVerticalSpace - fTextHeight) * 0.5f;
+				m_Text.pos.Offset(fLineOffsetX, fLineOffsetY);
+			}
+			else
+				m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)),
+									 vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / vUiSizeHint.y)), true);
 		}
+		else
+			m_Text.SetAsLine();
 	}
 
 	m_bSizeHintDirty = true;

@@ -67,7 +67,7 @@ public:
 	HyMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyMeter();
 
-	virtual void SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/) override;
+	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_HCenter, bool bUseScaleBox = true) override;
 
 	int64 GetValue();
 	void SetValue(int64 iPennies, float fRackDuration);
@@ -95,8 +95,6 @@ public:
 
 protected:
 	void FormatDigits();
-
-	
 
 	virtual void OnUpdate() override;
 	virtual void OnSetup() override;
