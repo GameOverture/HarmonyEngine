@@ -18,11 +18,10 @@
 class HyContainer : public HyEntity2d
 {
 protected:
+	HyPanel									m_Panel;
 	HyLayout								m_RootLayout;
 	std::map<HyLayoutHandle, HyLayout *>	m_SubLayoutMap;
 	static HyLayoutHandle					sm_hHandleCounter;
-	
-	HyPanel									m_Panel;
 
 	enum ContainerState
 	{

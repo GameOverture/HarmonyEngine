@@ -15,8 +15,8 @@ HyLayoutHandle HyContainer::sm_hHandleCounter = 1;
 
 HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
-	m_RootLayout(eRootLayout, this),
 	m_Panel(initRef, this),
+	m_RootLayout(eRootLayout, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f)
 {
