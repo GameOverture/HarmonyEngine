@@ -14,6 +14,7 @@ HySpacer::HySpacer(HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent)
 {
 	SetSizePolicy(HYSIZEPOLICY_Expanding, HYSIZEPOLICY_Expanding);
+	m_eLoadState = HYLOADSTATE_Loaded;
 }
 
 /*virtual*/ HySpacer::~HySpacer()

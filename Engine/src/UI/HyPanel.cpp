@@ -13,9 +13,9 @@
 HyPanelInit::HyPanelInit() :
 	m_uiWidth(0),
 	m_uiHeight(0),
-	m_uiBorderSize(0),
-	m_BgColor(HyColor(0x252526)),
-	m_BorderColor(HyColor(0x3F3F41)),
+	m_uiFrameSize(0),
+	m_PanelColor(HyColor(0x252526)),
+	m_FrameColor(HyColor(0x3F3F41)),
 	m_ePanelType(PANELTYPE_Null)
 {
 }
@@ -25,36 +25,36 @@ HyPanelInit::HyPanelInit(std::string sSpritePrefix, std::string sSpriteName) :
 	m_sSpriteName(sSpriteName),
 	m_uiWidth(0),
 	m_uiHeight(0),
-	m_uiBorderSize(0),
-	m_BgColor(HyColor(0x252526)),
-	m_BorderColor(HyColor(0x3F3F41)),
+	m_uiFrameSize(0),
+	m_PanelColor(HyColor(0x252526)),
+	m_FrameColor(HyColor(0x3F3F41)),
 	m_ePanelType(PANELTYPE_Sprite)
 {
 }
 
-HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiBorderSize /*= 4*/, HyColor backgroundColor /*= HyColor(0x252526)*/, HyColor borderColor /*= HyColor(0x3F3F41)*/) :
+HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize /*= 4*/, HyColor panelColor /*= HyColor(0x252526)*/, HyColor frameColor /*= HyColor(0x3F3F41)*/) :
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
-	m_uiBorderSize(uiBorderSize),
-	m_BgColor(backgroundColor),
-	m_BorderColor(borderColor),
+	m_uiFrameSize(uiFrameSize),
+	m_PanelColor(panelColor),
+	m_FrameColor(frameColor),
 	m_ePanelType(PANELTYPE_Primitive)
 { }
 
 HyPanel::HyPanel(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
-	m_Stroke(this),
-	m_Border(this),
-	m_BG(this)
+	m_Panel(this),
+	m_Frame1(this),
+	m_Frame2(this)
 {
 	Setup(HyPanelInit());
 }
 
 HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
-	m_Stroke(this),
-	m_Border(this),
-	m_BG(this)
+	m_Panel(this),
+	m_Frame1(this),
+	m_Frame2(this)
 {
 	Setup(initRef);
 }
@@ -83,10 +83,10 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 		m_SpritePanel.Uninit();
 		
 		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
-		m_uiBorderSize = initRef.m_uiBorderSize;
+		m_uiFrameSize = initRef.m_uiFrameSize;
 		ConstructPrimitives();
-		SetBgColor(initRef.m_BgColor);
-		SetBorderColor(initRef.m_BorderColor);
+		SetPanelColor(initRef.m_PanelColor);
+		SetFrameColor(initRef.m_FrameColor);
 		break;
 	}
 }
@@ -95,9 +95,9 @@ void HyPanel::SetAsNull()
 {
 	m_SpritePanel.Uninit();
 
-	m_Border.SetAsNothing();
-	m_BG.SetAsNothing();
-	m_Stroke.SetAsNothing();
+	m_Panel.SetAsNothing();
+	m_Frame1.SetAsNothing();
+	m_Frame2.SetAsNothing();
 
 	m_ePanelType = HyPanelInit::PANELTYPE_Null;
 }
@@ -147,22 +147,36 @@ glm::ivec2 HyPanel::GetSizeHint()
 
 uint32 HyPanel::GetWidth()
 {
-	if(IsPrimitive())
-		return m_BG.GetSceneWidth();
-	else if(IsSprite())
+	if(IsSprite())
 		return m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), true);
 	else
-		return m_vSize.x;
+	{
+		glm::vec3 vScale;
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+
+		return m_vSize.x * vScale.x;
+	}
 }
 
 uint32 HyPanel::GetHeight()
 {
-	if(IsPrimitive())
-		return m_BG.GetSceneHeight();
-	else if(IsSprite())
+	if(IsSprite())
 		return m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), true);
 	else
-		return m_vSize.y;
+	{
+		glm::vec3 vScale;
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+
+		return m_vSize.y * vScale.y;
+	}
 }
 
 glm::ivec2 HyPanel::GetSize()
@@ -184,13 +198,15 @@ void HyPanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 	}
 }
 
+uint32 HyPanel::GetFrameSize() const
+{
+	return m_uiFrameSize;
+}
+
 glm::vec2 HyPanel::GetBotLeftOffset()
 {
 	if(IsPrimitive())
-	{
-		//HySetVec(vPanelOffset, m_pPrimPanel->GetBorderSize(), m_pPrimPanel->GetBorderSize());
-		return glm::vec2(0.0f, 0.0f);
-	}
+		return glm::vec2(GetFrameSize(), GetFrameSize());
 	else if(m_SpritePanel.IsLoadDataValid())
 	{
 		glm::vec2 vPanelDimensions = GetSize();
@@ -205,39 +221,51 @@ glm::vec2 HyPanel::GetBotLeftOffset()
 	return glm::vec2(0.0f, 0.0f);
 }
 
-HyColor HyPanel::GetBgColor() const
+HyColor HyPanel::GetPanelColor() const
 {
-	return HyColor(m_BG.topColor.X(), m_BG.topColor.Y(), m_BG.topColor.Z());
+	return HyColor(m_Panel.topColor.X(), m_Panel.topColor.Y(), m_Panel.topColor.Z());
 }
 
-void HyPanel::SetBgColor(HyColor color)
+void HyPanel::SetPanelColor(HyColor color)
 {
-	m_BG.SetTint(color);
+	m_Panel.SetTint(color);
 }
 
-HyColor HyPanel::GetBorderColor() const
+HyColor HyPanel::GetFrameColor() const
 {
-	return HyColor(m_Border.topColor.X(), m_Border.topColor.Y(), m_Border.topColor.Z());
+	return HyColor(m_Frame1.topColor.X(), m_Frame1.topColor.Y(), m_Frame1.topColor.Z());
 }
 
-void HyPanel::SetBorderColor(HyColor color)
+void HyPanel::SetFrameColor(HyColor color)
 {
-	m_Border.SetTint(color);
-	m_Stroke.SetTint(color.Lighten());
-}
-
-uint32 HyPanel::GetBorderSize() const
-{
-	return m_uiBorderSize;
+	m_Frame1.SetTint(color);
+	if(color.IsDark())
+		m_Frame2.SetTint(color.Lighten());
+	else
+		m_Frame2.SetTint(color.Darken());
 }
 
 void HyPanel::ConstructPrimitives()
 {
-	m_BG.SetAsBox(m_vSize.x, m_vSize.y);
+	m_Panel.SetAsBox(m_vSize.x - (m_uiFrameSize * 2), m_vSize.y - (m_uiFrameSize * 2));
+	m_Panel.pos.Set(static_cast<int32>(m_uiFrameSize), static_cast<int32>(m_uiFrameSize));
 
-	m_Stroke.SetWireframe(true);
-	m_Stroke.SetAsBox(m_vSize.x + 1, m_vSize.y + 1);
+	if(m_uiFrameSize > 0)
+	{
+		m_Frame1.SetAsBox(m_vSize.x, m_vSize.y);
 
-	m_Border.SetAsBox(m_vSize.x + (m_uiBorderSize * 2), m_vSize.y + (m_uiBorderSize * 2));
-	m_Border.pos.Set(-static_cast<int32>(m_uiBorderSize), -static_cast<int32>(m_uiBorderSize));
+		uint32 uiHalfFrameSize = m_uiFrameSize / 3;
+		if(uiHalfFrameSize > 0)
+		{
+			m_Frame2.SetAsBox(m_vSize.x - (m_uiFrameSize * 2) + (uiHalfFrameSize * 2), m_vSize.y - (m_uiFrameSize * 2) + (uiHalfFrameSize * 2));
+			m_Frame2.pos.Set(static_cast<int32>(m_uiFrameSize - uiHalfFrameSize), static_cast<int32>(m_uiFrameSize - uiHalfFrameSize));
+		}
+		else
+			m_Frame2.SetAsNothing();
+	}
+	else
+	{
+		m_Frame1.SetAsNothing();
+		m_Frame2.SetAsNothing();
+	}
 }

@@ -217,12 +217,12 @@ bool HyLabel::IsHighlighted() const
 	if(bIsHighlighted)
 	{
 		m_uiLabelAttribs |= LABELATTRIB_IsHighlighted;
-		m_Panel.SetBorderColor(0x0000FF);
+		m_Panel.SetFrameColor(0x0000FF);
 	}
 	else
 	{
 		m_uiLabelAttribs &= ~LABELATTRIB_IsHighlighted;
-		m_Panel.SetBorderColor(0x3F3F41);
+		m_Panel.SetFrameColor(0x3F3F41);
 	}
 }
 

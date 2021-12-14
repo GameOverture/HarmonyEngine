@@ -20,7 +20,7 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPanelInit
 {
 	m_VertBar.SetOnScrollCallback(OnScroll, this);
 	m_HorzBar.SetOnScrollCallback(OnScroll, this);
-	SetScrollBarColor(m_Panel.GetBgColor());
+	SetScrollBarColor(m_Panel.GetPanelColor());
 	EnableScrollBars(m_bUseVertBar, m_bUseHorzBar);
 	
 	SetSize(initRef.m_uiWidth, initRef.m_uiHeight);
@@ -71,9 +71,13 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 	int32 iNewWidth = m_Panel.GetWidth();
 	int32 iNewHeight = m_Panel.GetHeight();
 
-	SetScissor(0, 0,
-		iNewWidth - (static_cast<int32>(m_bUseVertBar) * m_VertBar.GetDiameter()),
-		iNewHeight - (static_cast<int32>(m_bUseHorzBar) * m_HorzBar.GetDiameter()));
+	int32 iScissorMargin = 0;
+	if(m_Panel.IsPrimitive())
+		iScissorMargin = m_Panel.GetFrameSize();
+
+	SetScissor(iScissorMargin, iScissorMargin,
+		iNewWidth - (iScissorMargin * 2) - (static_cast<int32>(m_bUseVertBar) * m_VertBar.GetDiameter()),
+		iNewHeight - (iScissorMargin * 2) - (static_cast<int32>(m_bUseHorzBar) * m_HorzBar.GetDiameter()));
 	m_Panel.ClearScissor(false);
 	m_VertBar.ClearScissor(false);
 	m_HorzBar.ClearScissor(false);
@@ -100,26 +104,26 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 
 	if(m_bUseVertBar && m_bUseHorzBar == false)
 	{
-		m_VertBar.SetMetrics(GetSize().y, vActualSize.y, GetSize().y);
-		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter(), 0);
+		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2), vActualSize.y, GetSize().y);
+		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter() - iScissorMargin, iScissorMargin);
 		m_VertBar.alpha.Set(1.0f);
 		m_HorzBar.alpha.Set(0.0f);
 	}
 	else if(m_bUseVertBar == false && m_bUseHorzBar)
 	{
-		m_HorzBar.SetMetrics(GetSize().x, vActualSize.x, GetSize().x);
-		m_HorzBar.pos.Set(0, 0);
+		m_HorzBar.SetMetrics(GetSize().x - (iScissorMargin * 2), vActualSize.x, GetSize().x);
+		m_HorzBar.pos.Set(iScissorMargin, iScissorMargin);
 		m_HorzBar.alpha.Set(1.0f);
 		m_VertBar.alpha.Set(0.0f);
 	}
 	else if(m_bUseVertBar && m_bUseHorzBar)
 	{
-		m_VertBar.SetMetrics(GetSize().y - m_HorzBar.GetDiameter(), vActualSize.y, GetSize().y);
-		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter(), static_cast<int32>(m_HorzBar.GetDiameter()));
+		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2) - m_HorzBar.GetDiameter(), vActualSize.y, GetSize().y);
+		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter() - iScissorMargin, iScissorMargin + static_cast<int32>(m_HorzBar.GetDiameter()));
 		m_VertBar.alpha.Set(1.0f);
 
-		m_HorzBar.SetMetrics(GetSize().x - m_VertBar.GetDiameter(), vActualSize.x, GetSize().x);
-		m_HorzBar.pos.Set(0, 0);
+		m_HorzBar.SetMetrics(GetSize().x - (iScissorMargin * 2) - m_VertBar.GetDiameter(), vActualSize.x, GetSize().x);
+		m_HorzBar.pos.Set(iScissorMargin, iScissorMargin);
 		m_HorzBar.alpha.Set(1.0f);
 	}
 }
