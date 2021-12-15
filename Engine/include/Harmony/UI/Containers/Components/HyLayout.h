@@ -31,6 +31,7 @@ public:
 	HyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent = nullptr);
 	virtual ~HyLayout();
 
+	virtual HySizePolicy GetSizePolicy(HyOrientation eOrien) override;
 	virtual glm::vec2 GetPosOffset() override;	// What offset is needed to get *this oriented to its bottom left
 
 	void AppendItem(IHyEntityUi &itemRef);

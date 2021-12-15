@@ -34,9 +34,9 @@ public:
 	IHyEntityUi(HyEntity2d *pParent = nullptr);
 	virtual ~IHyEntityUi();
 
-	HySizePolicy GetSizePolicy(HyOrientation eOrien) const;
-	HySizePolicy GetHorizontalPolicy() const;
-	HySizePolicy GetVerticalPolicy() const;
+	virtual HySizePolicy GetSizePolicy(HyOrientation eOrien);
+	//HySizePolicy GetHorizontalPolicy() const;
+	//HySizePolicy GetVerticalPolicy() const;
 
 	void SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPolicy);
 	void SetHorizontalPolicy(HySizePolicy ePolicy);

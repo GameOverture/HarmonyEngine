@@ -27,6 +27,26 @@ HyLayout::HyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) 
 {
 }
 
+/*virtual*/ HySizePolicy HyLayout::GetSizePolicy(HyOrientation eOrien) /*override*/
+{
+	uint32 uiSizePolicy = 0;// HYSIZEPOLICY_Fixed;
+	bool bShrinkValid = true;
+	for(int32 i = 0; i < static_cast<int32>(m_ChildList.size()); ++i)
+	{
+		// Children are guaranteed to be IHyEntityUi
+		IHyEntityUi *pItem = static_cast<IHyEntityUi *>(m_ChildList[i]);
+
+		if(pItem->GetSizePolicy(eOrien) & HY_SIZEFLAG_EXPAND)
+			uiSizePolicy |= HY_SIZEFLAG_EXPAND;
+		if(((pItem->GetSizePolicy(eOrien) & HY_SIZEFLAG_SHRINK) >> 1) == 0)
+			bShrinkValid = false;
+	}
+	if(bShrinkValid)
+		uiSizePolicy |= HY_SIZEFLAG_SHRINK;
+
+	return static_cast<HySizePolicy>(uiSizePolicy);
+}
+
 /*virtual*/ glm::vec2 HyLayout::GetPosOffset() /*override*/
 {
 	return glm::vec2(0, 0);
@@ -161,15 +181,22 @@ void HyLayout::SetLayoutDirty()
 	}
 
 	HyOrientation eOrientation, eInverseOrien;
+	int32 iOrienMargin, iInverseOrienMargin;
 	if(m_eLayoutType == HYLAYOUT_Horizontal)
 	{
 		eOrientation = HYORIEN_Horizontal;
 		eInverseOrien = HYORIEN_Vertical;
+		
+		iOrienMargin = m_Margins.left + m_Margins.right;
+		iInverseOrienMargin = m_Margins.top + m_Margins.bottom;
 	}
 	else
 	{
 		eOrientation = HYORIEN_Vertical;
 		eInverseOrien = HYORIEN_Horizontal;
+		
+		iOrienMargin = m_Margins.top + m_Margins.bottom;
+		iInverseOrienMargin = m_Margins.left + m_Margins.right;
 	}
 
 
@@ -207,14 +234,14 @@ void HyLayout::SetLayoutDirty()
 			if(vItemSize[eInverseOrien] <= vTargetSize[eInverseOrien])
 			{
 				if((eSizePolicy & HY_SIZEFLAG_EXPAND) != 0)
-					vItemSize[eInverseOrien] += vTargetSize[eInverseOrien] - vItemSize[eInverseOrien];
+					vItemSize[eInverseOrien] += (vTargetSize[eInverseOrien] - iInverseOrienMargin) - vItemSize[eInverseOrien];
 				else
-					pItem->pos.GetAnimFloat(eInverseOrien).Offset(0.5f * (vTargetSize[eInverseOrien] - vItemSize[eInverseOrien]));
+					pItem->pos.GetAnimFloat(eInverseOrien).Offset(0.5f * ((vTargetSize[eInverseOrien] - iInverseOrienMargin) - vItemSize[eInverseOrien]));
 			}
 			else
 			{
 				if((eSizePolicy & HY_SIZEFLAG_SHRINK) != 0)
-					vItemSize[eInverseOrien] += vTargetSize[eInverseOrien] - vItemSize[eInverseOrien];
+					vItemSize[eInverseOrien] += (vTargetSize[eInverseOrien] - iInverseOrienMargin) - vItemSize[eInverseOrien];
 			}
 		}
 		else

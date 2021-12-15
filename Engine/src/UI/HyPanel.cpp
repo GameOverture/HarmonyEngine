@@ -206,7 +206,7 @@ uint32 HyPanel::GetFrameSize() const
 glm::vec2 HyPanel::GetBotLeftOffset()
 {
 	if(IsPrimitive())
-		return glm::vec2(GetFrameSize(), GetFrameSize());
+		return glm::vec2(0, 0);
 	else if(m_SpritePanel.IsLoadDataValid())
 	{
 		glm::vec2 vPanelDimensions = GetSize();
