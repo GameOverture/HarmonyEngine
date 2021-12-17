@@ -12,32 +12,27 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/HyPanel.h"
-#include "UI/IHyEntityUi.h"
+#include "UI/Widgets/IHyWidget.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 
-class HyLabel : public IHyEntityUi
+class HyLabel : public IHyWidget
 {
 protected:
 	enum LabelAttributes
 	{
-		LABELATTRIB_HideDownState			= 1 << 0,		// Don't visually indicate down state (when available)
-		LABELATTRIB_HideHoverState			= 1 << 1,		// Don't visually indicate hover state (when available)
-		LABELATTRIB_HideDisabled			= 1 << 2,		// Don't visually indicate if disabled
-		LABELATTRIB_IsDisabled				= 1 << 3,
-		LABELATTRIB_IsHighlighted			= 1 << 4,
-		LABELATTRIB_ShowHandCursor			= 1 << 5,		// When mouse cursor hovers over panel, change to a hand icon
-
-		LABELATTRIB_IsSideBySide			= 1 << 6,
-		LABELATTRIB_SideBySideTextFirst		= 1 << 7,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
-		LABELATTRIB_SideBySideVertical		= 1 << 8,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
+		LABELATTRIB_IsSideBySide			= 1 << 3,
+		LABELATTRIB_SideBySideTextFirst		= 1 << 4,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
+		LABELATTRIB_SideBySideVertical		= 1 << 5,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
 		
-		LABELATTRIB_StackedTextLeftAlign	= 1 << 9,		// When panel is stacked, use left alignment (when neither left, right, or justify, it will center)
-		LABELATTRIB_StackedTextRightAlign	= 1 << 10,		// When panel is stacked, use right alignment (when neither right, left, or justify, it will center)
-		LABELATTRIB_StackedTextJustifyAlign	= 1 << 11,		// When panel is stacked, use justify alignment (when neither justify, left, or right, it will center)
-		LABELATTRIB_StackedTextUseLine		= 1 << 12,		// When panel is stacked, use standard text line located at bot left margin, instead of scale box
+		LABELATTRIB_StackedTextLeftAlign	= 1 << 6,		// When panel is stacked, use left alignment (when neither left, right, or justify, it will center)
+		LABELATTRIB_StackedTextRightAlign	= 1 << 7,		// When panel is stacked, use right alignment (when neither right, left, or justify, it will center)
+		LABELATTRIB_StackedTextJustifyAlign	= 1 << 8,		// When panel is stacked, use justify alignment (when neither justify, left, or right, it will center)
+		LABELATTRIB_StackedTextUseLine		= 1 << 9,		// When panel is stacked, use standard text line located at bot left margin, instead of scale box
+		
+		LABELATTRIB_FLAG_NEXT				= 1 << 10
 	};
-	uint32					m_uiLabelAttribs;
+	static_assert(LABELATTRIB_IsSideBySide == UIATTRIB_FLAG_NEXT, "HyLabel is not matching with base classes attrib flags");
 
 	HyPanel					m_Panel;
 
@@ -73,25 +68,10 @@ public:
 
 	bool IsPrimitivePanel() const;
 
-	bool IsEnabled() const;
-	virtual void SetAsEnabled(bool bEnabled);
-
-	bool IsHighlighted() const;
-	virtual void SetAsHighlighted(bool bIsHighlighted);
-
-	bool IsShowHandCursor() const;
-	void SetShowHandCursor(bool bShowHandCursor);
-
-	bool IsHideDisabled() const;				// Whether to not visually indicate if disabled
-	void SetHideDisabled(bool bIsHideDisabled);	// Whether to not visually indicate if disabled
-
 	HySprite2d &GetSpriteNode();
 	HyText2d &GetTextNode();
 
 protected:
-	virtual void OnMouseEnter() override;
-	virtual void OnMouseLeave() override;
-
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;

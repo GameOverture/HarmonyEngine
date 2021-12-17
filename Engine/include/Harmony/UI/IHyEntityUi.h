@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
+#include "Input/HyInputKeys.h"
 
 class HyLayout;
 
@@ -22,21 +23,21 @@ class IHyEntityUi : public HyEntity2d
 	friend class HyLayout;
 
 protected:
-	HySizePolicy			m_SizePolicies[HYNUM_ORIENTATIONS];
-	glm::ivec2				m_vMinSize;
-	glm::ivec2				m_vMaxSize;
-	bool					m_bLockProportions;
+	HySizePolicy						m_SizePolicies[HYNUM_ORIENTATIONS];
+	glm::ivec2							m_vMinSize;
+	glm::ivec2							m_vMaxSize;
+	bool								m_bLockProportions;
 
-	bool					m_bSizeHintDirty;
-	glm::ivec2				m_vSizeHint;
+	bool								m_bSizeHintDirty;
+	glm::ivec2							m_vSizeHint;
 
 public:
 	IHyEntityUi(HyEntity2d *pParent = nullptr);
 	virtual ~IHyEntityUi();
 
+	HySizePolicy GetHorizontalPolicy();
+	HySizePolicy GetVerticalPolicy();
 	virtual HySizePolicy GetSizePolicy(HyOrientation eOrien);
-	//HySizePolicy GetHorizontalPolicy() const;
-	//HySizePolicy GetVerticalPolicy() const;
 
 	void SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPolicy);
 	void SetHorizontalPolicy(HySizePolicy ePolicy);

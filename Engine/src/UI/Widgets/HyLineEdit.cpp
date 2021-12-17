@@ -38,7 +38,7 @@ void HyLineEdit::SetCursorChar(std::string sUtf8Char)
 
 /*virtual*/ void HyLineEdit::OnSetup() /*override*/
 {
-	m_uiLabelAttribs |= LABELATTRIB_StackedTextUseLine | LABELATTRIB_StackedTextLeftAlign;
+	m_uiAttribs |= LABELATTRIB_StackedTextUseLine | LABELATTRIB_StackedTextLeftAlign;
 	m_TextCursorBlinkTimer.SetExpiredCallback(OnCursorTimer, this);
 }
 

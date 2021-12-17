@@ -177,6 +177,18 @@ bool HyEngine::PollPlatformApi()
 			else if(pWindow && sdlEvent.window.event == SDL_WINDOWEVENT_MOVED)
 				OnWindowMoved(*pWindow);
 			break; }
+		case SDL_TEXTINPUT:
+			/* Add new text onto the end of our text */
+			m_Input.DoTextInputEvent(sdlEvent);
+			break;
+		case SDL_TEXTEDITING:
+			/*
+			Update the composition text.
+			Update the cursor position.
+			Update the selection length (if any).
+			*/
+			m_Input.DoTextEditEvent(sdlEvent);
+			break;
 		case SDL_KEYDOWN:
 			m_Input.DoKeyDownEvent(sdlEvent);
 			break;

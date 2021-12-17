@@ -11,6 +11,7 @@
 #include "UI/Containers/HyContainer.h"
 #include "HyEngine.h"
 
+HyContainer *HyContainer::sm_pFocusedContainer = nullptr;
 HyLayoutHandle HyContainer::sm_hHandleCounter = 1;
 
 HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
@@ -18,7 +19,8 @@ HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, H
 	m_Panel(initRef, this),
 	m_RootLayout(eRootLayout, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
-	m_fElapsedTime(0.0f)
+	m_fElapsedTime(0.0f),
+	m_pFocusedWidget(nullptr)
 {
 	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
 	m_RootLayout.SetLayoutDirty();
@@ -80,6 +82,30 @@ bool HyContainer::Hide(bool bInstant /*= false*/)
 	}
 
 	return true;
+}
+
+void HyContainer::TakeFocus()
+{
+	if(sm_pFocusedContainer == this)
+		return;
+
+	if(sm_pFocusedContainer && sm_pFocusedContainer->m_pFocusedWidget)
+		sm_pFocusedContainer->m_pFocusedWidget->OnRelinquishFocus();
+
+	sm_pFocusedContainer = this;
+	if(sm_pFocusedContainer->m_pFocusedWidget)
+		sm_pFocusedContainer->m_pFocusedWidget->OnTakeFocus();
+	else
+		sm_pFocusedContainer->FocusNextItem();
+}
+
+void HyContainer::RelinquishFocus()
+{
+	if(sm_pFocusedContainer == this)
+	{
+		sm_pFocusedContainer->m_pFocusedWidget->OnRelinquishFocus();
+		sm_pFocusedContainer = nullptr;
+	}
 }
 
 bool HyContainer::IsTransition()
@@ -155,6 +181,20 @@ bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTo
 	return false;
 }
 
+IHyEntityUi *HyContainer::FocusNextItem()
+{
+	return nullptr;
+	//if(m_pFocusedItem == nullptr)
+	//{
+	//	m_RootLayout.ForEachChild([&](IHyNode2d *pChild)
+	//		{
+	//			IHyEntityUi *pItem = static_cast<IHyEntityUi *>(pChild);
+	//			if(pItem->IsKeyboardFocusAllowed())
+	//				m_pFocusedItem = pItem;
+	//		});
+	//}
+}
+
 /*virtual*/ void HyContainer::OnUpdate() /*override final*/
 {
 	if(m_RootLayout.IsLayoutDirty())
@@ -183,6 +223,17 @@ bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTo
 		break;
 	}
 
+	// TODO: if(this == sm_pFocusedContainer) check for 'TAB' and 'SHIFT+TAB' to cycle keyboard focus to valid widgets
+
 	m_fElapsedTime = 0.0f;
 	OnContainerUpdate();
+}
+
+bool HyContainer::RequestWidgetFocus(IHyWidget *pWidget)
+{
+	if(pWidget != nullptr && sm_pFocusedContainer != this && m_pFocusedWidget != pWidget)
+		return false;
+
+	m_pFocusedWidget = pWidget;
+	m_pFocusedWidget->OnTakeFocus();
 }

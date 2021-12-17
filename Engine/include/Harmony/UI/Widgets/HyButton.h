@@ -30,6 +30,16 @@ enum HyButtonState
 class HyButton : public HyLabel
 {
 protected:
+	enum ButtonAttributes
+	{
+		BTNATTRIB_HideDownState		= 1 << 10,		// Don't visually indicate down state (when available)
+		BTNATTRIB_HideHoverState	= 1 << 11,		// Don't visually indicate hover state (when available)
+		BTNATTRIB_IsHighlighted		= 1 << 12,
+
+		BTNATTRIB_FLAG_NEXT			= 1 << 13
+	};
+	static_assert(BTNATTRIB_HideDownState == LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
+
 	HyButtonClickedCallback		m_fpBtnClickedCallback;
 	void *						m_pBtnClickedParam;
 	HyAudio2d					m_ClickedSound;
@@ -41,13 +51,15 @@ public:
 	virtual ~HyButton();
 
 	virtual void SetAsEnabled(bool bEnabled) override;
-	virtual void SetAsHighlighted(bool bIsHighlighted) override;
 
 	bool IsHideDownState() const;
 	void SetHideDownState(bool bIsHideDownState);
 
 	bool IsHideHoverState() const;
 	void SetHideHoverState(bool bIsHideHoverState);
+
+	bool IsHighlighted() const;
+	void SetAsHighlighted(bool bIsHighlighted);
 
 	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
 	void InvokeButtonClicked();

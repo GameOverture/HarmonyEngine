@@ -32,6 +32,14 @@ class HyInput
 	glm::ivec2						m_vMouseScroll_LiveCount;
 	glm::ivec2						m_vMouseScroll_ThisFrame;
 
+#ifdef HY_USE_GLFW
+	bool							m_bTextInputActive;
+#endif
+	std::string						m_sTextInput;
+	std::string						m_sTextComposition;
+	int32							m_iTextCursorIndex;
+	int32							m_iTextSelectLength;
+
 	bool							m_bTouchScreenHack;	// Some touch screens do not send a 'MOUSE DOWN' message on initial touch, until you "drag" the cursor at least 1px or release the touch
 
 	int32							m_JoystickList[HYNUM_JOYSTICK];
@@ -85,6 +93,11 @@ public:
 	float GetAxis(int32 iUserId, uint32 uiMappingIndex = 0) const;
 	float GetAxisDelta(int32 iUserId, uint32 uiMappingIndex = 0) const;
 
+	bool IsTextInputActive();
+	void StartTextInput();
+	std::string GetTextInput(int32 &iCursorIndexOut, int32 &iSelectionLengthOut); // Returns UTF-8 string that has been constructed by user since StartTextInput() was called
+	void StopTextInput();
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Replay API
 
@@ -102,17 +115,20 @@ public:
 	void EnableTouchScreenHack(bool bEnable);
 
 private:
+	void SetTextInput(std::string sText, std::string sCompText, int32 iCursorIndex, int32 iSelectionLength);
+
 #ifdef HY_USE_GLFW
 	friend void HyGlfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);
 	friend void HyGlfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY);
 	friend void HyGlfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY);
 	friend void HyGlfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods);
 	friend void HyGlfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint);
-	friend void HyGlfw_CharModsCallback(GLFWwindow *pWindow, uint32 uiCodepoint, int32 iMods);
 	friend void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent);
 
 	void OnGlfwKey(int32 iKey, int32 iAction);
 #elif defined(HY_USE_SDL2)
+	void DoTextInputEvent(const SDL_Event &eventRef);		// Add new text onto the end of our text
+	void DoTextEditEvent(const SDL_Event &eventRef);		// Update the composition text; Update the cursor position; Update the selection length
 	void DoKeyDownEvent(const SDL_Event &eventRef);
 	void DoKeyUpEvent(const SDL_Event &eventRef);
 	void DoMouseMoveEvent(const SDL_Event &eventRef);

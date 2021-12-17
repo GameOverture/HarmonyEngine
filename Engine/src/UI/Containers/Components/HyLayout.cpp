@@ -9,6 +9,8 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Containers/Components/HyLayout.h"
+#include "UI/Containers/HyContainer.h"
+#include "UI/Widgets/IHyWidget.h"
 
 HyLayout::HyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
@@ -125,6 +127,18 @@ void HyLayout::SetLayoutDirty()
 	// Propagate upward if this is nested in another layout
 	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
 		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
+}
+
+bool HyLayout::RequestWidgetFocus(IHyWidget *pWidget)
+{
+	// Propagate upward if this is nested in another layout
+	if(m_pParent)
+	{
+		if((m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+			return static_cast<HyLayout *>(m_pParent)->RequestWidgetFocus(pWidget);
+		else // m_pParent must be the container (and *this is the root layout)
+			return static_cast<HyContainer *>(m_pParent)->RequestWidgetFocus(pWidget);
+	}
 }
 
 /*virtual*/ void HyLayout::OnSetSizeHint() /*override*/

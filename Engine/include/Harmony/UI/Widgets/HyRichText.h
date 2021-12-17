@@ -11,9 +11,9 @@
 #define HyRichText_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/IHyEntityUi.h"
+#include "UI/Widgets/IHyWidget.h"
 
-class HyRichText : public IHyEntityUi
+class HyRichText : public IHyWidget
 {
 protected:
 	std::string						m_sTextPrefix;

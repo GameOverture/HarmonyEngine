@@ -13,6 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/IHyEntityUi.h"
 
+class IHyWidget;
+
 class HyLayout : public IHyEntityUi
 {
 	HyLayoutType						m_eLayoutType;
@@ -49,6 +51,8 @@ public:
 
 	bool IsLayoutDirty() const;
 	void SetLayoutDirty();
+
+	bool RequestWidgetFocus(IHyWidget *pWidget);
 
 protected:
 	virtual void OnSetSizeHint() override;

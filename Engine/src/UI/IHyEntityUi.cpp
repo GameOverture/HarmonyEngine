@@ -27,20 +27,20 @@ IHyEntityUi::IHyEntityUi(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+HySizePolicy IHyEntityUi::GetHorizontalPolicy()
+{
+	return GetSizePolicy(HYORIEN_Horizontal);
+}
+
+HySizePolicy IHyEntityUi::GetVerticalPolicy()
+{
+	return GetSizePolicy(HYORIEN_Vertical);
+}
+
 /*virtual*/ HySizePolicy IHyEntityUi::GetSizePolicy(HyOrientation eOrien)
 {
 	return m_SizePolicies[eOrien];
 }
-
-//HySizePolicy IHyEntityUi::GetHorizontalPolicy() const
-//{
-//	return m_SizePolicies[HYORIEN_Horizontal];
-//}
-//
-//HySizePolicy IHyEntityUi::GetVerticalPolicy() const
-//{
-//	return m_SizePolicies[HYORIEN_Vertical];
-//}
 
 void IHyEntityUi::SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPolicy)
 {

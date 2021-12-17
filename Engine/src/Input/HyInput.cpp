@@ -14,9 +14,10 @@
 #include "Input/HyInputMap.h"
 #include "Window/HyWindow.h"
 
+#include <codecvt>
 
 #ifdef HY_USE_GLFW
-	void HyGlfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods)
+/*friend*/ void HyGlfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods)
 	{
 		HyInput &inputRef = HyEngine::Input();
 		
@@ -31,7 +32,7 @@
 			inputRef.m_uiMouseBtnFlags &= ~(1 << iButton);
 	}
 
-	void HyGlfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY)
+	/*friend*/ void HyGlfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY)
 	{
 		HyInput &inputRef = HyEngine::Input();
 
@@ -43,7 +44,7 @@
 			HyGlfw_MouseButtonCallback(pWindow, HYMOUSE_BtnLeft, GLFW_PRESS, 0);
 	}
 
-	void HyGlfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY)
+	/*friend*/ void HyGlfw_ScrollCallback(GLFWwindow *pWindow, double dX, double dY)
 	{
 		HyInput &inputRef = HyEngine::Input();
 
@@ -51,20 +52,28 @@
 		inputRef.m_vMouseScroll_LiveCount.y += static_cast<int32>(dY);
 	}
 
-	void HyGlfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods)
+	/*friend*/ void HyGlfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods)
 	{
 		HyEngine::Input().OnGlfwKey(iKey, iAction);
 	}
 
-	void HyGlfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint)
+	/*friend*/ void HyGlfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint)
 	{
+		// the UTF-8 - UTF-32 standard conversion facet
+		std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cvt;
+
+		// UTF-32 to UTF-8
+		std::u32string sUtf32(uiCodepoint);
+		std::string sUtf8 = cvt.to_bytes(sUtf32);
+
+		int32 iCursorIndex, iSelLen;
+		std::string sCurString = HyEngine::Input().GetTextInput(iCursorIndex, iSelLen);
+		sCurString += sUtf8;
+
+		HyEngine::Input().SetTextInput(sCurString, "", iCursorIndex, iSelLen);
 	}
 
-	void HyGlfw_CharModsCallback(GLFWwindow *pWindow, uint32 uiCodepoint, int32 iMods)
-	{
-	}
-
-	void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent)
+	/*friend*/ void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent)
 	{
 		HyInput &inputRef = HyEngine::Input();
 
@@ -101,6 +110,8 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	m_uiMouseBtnFlags(0),
 	m_uiMouseBtnFlags_NewlyPressed(0),
 	m_uiMouseBtnFlags_Buffered(0),
+	m_iTextCursorIndex(0),
+	m_iTextSelectLength(0),
 	m_bTouchScreenHack(false),
 	m_uiJoystickCount(0)
 {
@@ -116,6 +127,8 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	m_pMouseWindow = m_WindowListRef[0];
 
 #ifdef HY_USE_GLFW
+	m_bTextInputActive = false;
+
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		glfwSetMouseButtonCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_MouseButtonCallback);
@@ -123,9 +136,6 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 		glfwSetScrollCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_ScrollCallback);
 		glfwSetKeyCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_KeyCallback);
 		glfwSetCharCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_CharCallback);
-#ifndef HY_PLATFORM_BROWSER
-		glfwSetCharModsCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_CharModsCallback);
-#endif
 	}
 	glfwSetJoystickCallback(HyGlfw_JoystickCallback);
 #endif
@@ -284,6 +294,45 @@ float HyInput::GetAxisDelta(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
 	return m_pInputMaps[uiMappingIndex].GetAxisDelta(iUserId);
 }
 
+bool HyInput::IsTextInputActive()
+{
+#ifdef HY_USE_GLFW
+	return m_bTextInputActive;
+#elif defined(HY_USE_SDL2)
+	return SDL_IsTextInputActive();
+#endif
+}
+
+void HyInput::StartTextInput()
+{
+	m_sTextInput.clear();
+	m_sTextComposition.clear();
+	m_iTextCursorIndex = m_iTextSelectLength = 0;
+
+#ifdef HY_USE_GLFW
+	m_bTextInputActive = true;
+#elif defined(HY_USE_SDL2)
+	SDL_StartTextInput();
+#endif
+}
+
+std::string HyInput::GetTextInput(int32 &iCursorIndexOut, int32 &iSelectionLengthOut)
+{
+	iCursorIndexOut = m_iTextCursorIndex;
+	iSelectionLengthOut = m_iTextSelectLength;
+	m_sTextComposition;
+	return m_sTextInput;
+}
+
+void HyInput::StopTextInput()
+{
+#ifdef HY_USE_GLFW
+	m_bTextInputActive = false;
+#elif defined(HY_USE_SDL2)
+	SDL_StopTextInput();
+#endif
+}
+
 void HyInput::RecordingStart()
 {
 }
@@ -305,6 +354,14 @@ void HyInput::EnableTouchScreenHack(bool bEnable)
 	m_bTouchScreenHack = bEnable;
 }
 
+void HyInput::SetTextInput(std::string sText, std::string sCompText, int32 iCursorIndex, int32 iSelectionLength)
+{
+	m_sTextInput = sText;
+	m_sTextComposition = sCompText;
+	m_iTextCursorIndex = iCursorIndex;
+	m_iTextSelectLength = iSelectionLength;
+}
+
 #ifdef HY_USE_GLFW
 void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
 {
@@ -312,6 +369,17 @@ void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
 		m_pInputMaps[i].ApplyInput(iKey, static_cast<HyBtnPressState>(iAction));
 }
 #elif defined(HY_USE_SDL2)
+void HyInput::DoTextInputEvent(const SDL_Event &eventRef)
+{
+	m_sTextInput += eventRef.text.text;
+	SetTextInput(m_sTextInput, m_sTextComposition, m_iTextCursorIndex, m_iTextSelectLength);
+}
+
+void HyInput::DoTextEditEvent(const SDL_Event &eventRef)
+{
+	SetTextInput(m_sTextInput, eventRef.edit.text, eventRef.edit.start, eventRef.edit.length);
+}
+
 void HyInput::DoKeyDownEvent(const SDL_Event &eventRef)
 {
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)

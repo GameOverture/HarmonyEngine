@@ -14,9 +14,14 @@
 #include "UI/IHyEntityUi.h"
 #include "UI/HyPanel.h"
 #include "UI/Containers/Components/HyLayout.h"
+#include "UI/Widgets/IHyWidget.h"
 
 class HyContainer : public HyEntity2d
 {
+	friend class HyLayout;
+
+	static HyContainer *					sm_pFocusedContainer;
+
 protected:
 	HyPanel									m_Panel;
 	HyLayout								m_RootLayout;
@@ -33,6 +38,8 @@ protected:
 	ContainerState							m_eContainerState;
 	float									m_fElapsedTime;
 
+	IHyWidget *								m_pFocusedWidget;		// Which widget currently has keyboard input focus. NOTE: widget will only take input if *this container is 'sm_pFocusedContainer'
+
 public:
 	HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyContainer();
@@ -43,6 +50,9 @@ public:
 	bool Show(bool bInstant = false);
 	bool Hide(bool bInstant = false);
 
+	void TakeFocus();
+	void RelinquishFocus();
+
 	bool IsTransition();
 	bool IsShown();
 
@@ -51,6 +61,8 @@ public:
 	void ClearItems();
 
 	bool SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+
+	IHyEntityUi *FocusNextItem();
 
 protected:
 	virtual void OnUpdate() override final;
@@ -62,6 +74,9 @@ protected:
 	virtual void OnShown()		{ SetVisible(true); }
 	virtual float OnBeginHide() { return 0.0f; }	// Returns the duration (in seconds) of the hide transition
 	virtual void OnHidden()		{ SetVisible(false); }
+
+private:
+	bool RequestWidgetFocus(IHyWidget *pWidget);
 };
 
 #endif /* HyContainer_h__ */

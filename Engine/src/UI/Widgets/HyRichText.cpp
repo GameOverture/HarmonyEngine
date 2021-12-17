@@ -16,14 +16,14 @@
 #include <regex>
 
 HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
-	IHyEntityUi(pParent),
+	IHyWidget(pParent),
 	m_uiColumnWidth(0),
 	m_fColumnLineHeightOffset(0.0f)
 {
 }
 
 HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyEntity2d *pParent /*= nullptr*/) :
-	IHyEntityUi(pParent),
+	IHyWidget(pParent),
 	m_uiColumnWidth(0),
 	m_fColumnLineHeightOffset(0.0f)
 {

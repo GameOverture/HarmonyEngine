@@ -149,6 +149,7 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Widgets/HyMeter.cpp
 	src/UI/Widgets/HyRichText.cpp
 	src/UI/Widgets/HySpacer.cpp
+	src/UI/Widgets/IHyWidget.cpp
 	src/UI/Containers/IHy9Slice.cpp
 	src/UI/Containers/HyContainer.cpp
 	src/UI/Containers/HyScrollContainer.cpp
@@ -273,6 +274,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Widgets/HyMeter.h
 	include/Harmony/UI/Widgets/HyRichText.h
 	include/Harmony/UI/Widgets/HySpacer.h
+	include/Harmony/UI/Widgets/IHyWidget.h
 	include/Harmony/UI/Containers/IHy9Slice.h
 	include/Harmony/UI/Containers/HyContainer.h
 	include/Harmony/UI/Containers/HyScrollContainer.h
