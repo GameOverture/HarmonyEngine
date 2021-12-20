@@ -34,7 +34,7 @@ public:
 
 protected:
 	virtual void OnUpdate() override;
-	virtual void OnMouseClicked() override;
+	virtual void OnUiMouseClicked() override;
 
 	virtual void OnTakeKeyboardFocus() override;
 	virtual void OnRelinquishKeyboardFocus() override;

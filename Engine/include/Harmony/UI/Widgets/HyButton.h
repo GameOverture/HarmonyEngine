@@ -67,10 +67,10 @@ public:
 protected:
 	virtual void OnSetup() override;
 
-	virtual void OnMouseEnter() override;
-	virtual void OnMouseLeave() override;
-	virtual void OnMouseDown() override;
-	virtual void OnMouseClicked() override;
+	virtual void OnUiMouseEnter() override;
+	virtual void OnUiMouseLeave() override;
+	virtual void OnUiMouseDown() override;
+	virtual void OnUiMouseClicked() override;
 
 	virtual void OnBtnStateChange(HyButtonState eNewState) { }
 

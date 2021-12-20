@@ -119,16 +119,38 @@ void IHyWidget::SetHoverCursor(HyMouseCursor eMouseCursor)
 	m_eHoverCursor = eMouseCursor;
 }
 
-/*virtual*/ void IHyWidget::OnMouseEnter() /*override*/
+/*virtual*/ void IHyWidget::OnMouseEnter() /*override final*/
 {
-	if(IsInputAllowed() && IsHoverCursor())
-		HyEngine::Input().SetMouseCursor(m_eHoverCursor);
+	if(IsInputAllowed())
+	{
+		if(IsHoverCursor())
+			HyEngine::Input().SetMouseCursor(m_eHoverCursor);
+
+		OnUiMouseEnter();
+	}
 }
 
-/*virtual*/ void IHyWidget::OnMouseLeave() /*override*/
+/*virtual*/ void IHyWidget::OnMouseLeave() /*override final*/
 {
-	if(IsInputAllowed() && IsHoverCursor())
-		HyEngine::Input().ResetMouseCursor();
+	if(IsInputAllowed())
+	{
+		if(IsHoverCursor())
+			HyEngine::Input().ResetMouseCursor();
+
+		OnUiMouseLeave();
+	}
+}
+
+/*virtual*/ void IHyWidget::OnMouseDown() /*override final*/
+{
+	if(IsInputAllowed())
+		OnUiMouseDown();
+}
+
+/*virtual*/ void IHyWidget::OnMouseClicked() /*override final*/
+{
+	if(IsInputAllowed())
+		OnUiMouseClicked();
 }
 
 void IHyWidget::TakeKeyboardFocus()

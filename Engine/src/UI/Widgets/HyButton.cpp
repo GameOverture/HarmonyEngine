@@ -166,10 +166,8 @@ void HyButton::InvokeButtonClicked()
 	SetAsEnabled(IsEnabled());
 }
 
-/*virtual*/ void HyButton::OnMouseEnter() /*override*/
+/*virtual*/ void HyButton::OnUiMouseEnter() /*override*/
 {
-	IHyWidget::OnMouseEnter();
-
 	if(IsHideHoverState() || m_Panel.IsSprite() == false)
 		return;
 	
@@ -185,10 +183,8 @@ void HyButton::InvokeButtonClicked()
 	}
 }
 
-/*virtual*/ void HyButton::OnMouseLeave() /*override*/
+/*virtual*/ void HyButton::OnUiMouseLeave() /*override*/
 {
-	IHyWidget::OnMouseLeave();
-
 	if(m_Panel.IsSprite() == false)
 		return;
 
@@ -204,7 +200,7 @@ void HyButton::InvokeButtonClicked()
 	}
 }
 
-/*virtual*/ void HyButton::OnMouseDown() /*override*/
+/*virtual*/ void HyButton::OnUiMouseDown() /*override*/
 {
 	if(IsHideDownState() || m_Panel.IsSprite() == false)
 		return;
@@ -221,7 +217,7 @@ void HyButton::InvokeButtonClicked()
 	}
 }
 
-/*virtual*/ void HyButton::OnMouseClicked() /*override*/
+/*virtual*/ void HyButton::OnUiMouseClicked() /*override*/
 {
 	if(IsHighlighted())
 	{

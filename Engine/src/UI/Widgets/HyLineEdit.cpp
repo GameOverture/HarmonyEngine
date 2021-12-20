@@ -39,9 +39,18 @@ void HyLineEdit::SetCursorChar(std::string sUtf8Char)
 
 /*virtual*/ void HyLineEdit::OnUpdate() /*override*/
 {
+	if(IsKeyboardFocus())
+	{
+		m_TextCursor.pos.Set(m_Text.pos);
+		m_TextCursor.pos.Offset(m_Text.GetTextCursorPos());
+		m_TextCursor.SetState(m_Text.GetState());
+
+		int32 iCursorIndexOut, iSelectionLengthOut;
+		SetText(HyEngine::Input().GetTextInput(iCursorIndexOut, iSelectionLengthOut));
+	}
 }
 
-/*virtual*/ void HyLineEdit::OnMouseClicked() /*override*/
+/*virtual*/ void HyLineEdit::OnUiMouseClicked() /*override*/
 {
 	RequestKeyboardFocus();
 }
@@ -77,17 +86,10 @@ void HyLineEdit::SetCursorChar(std::string sUtf8Char)
 
 	if(pThis->IsKeyboardFocus())
 	{
-		pThis->m_TextCursor.pos.Set(pThis->m_Text.pos);
-		pThis->m_TextCursor.pos.Offset(pThis->m_Text.GetTextCursorPos());
-		pThis->m_TextCursor.SetState(pThis->m_Text.GetState());
-
 		if(pThis->m_TextCursor.alpha.Get() == 0.0f)
 			pThis->m_TextCursor.alpha.Set(1.0f);
 		else
 			pThis->m_TextCursor.alpha.Set(0.0f);
-
-		int32 iCursorIndexOut, iSelectionLengthOut;
-		pThis->SetText(HyEngine::Input().GetTextInput(iCursorIndexOut, iSelectionLengthOut));
 	}
 	
 	pThis->m_TextCursorBlinkTimer.InitStart(0.5f);

@@ -51,8 +51,15 @@ public:
 	void SetHoverCursor(HyMouseCursor eMouseCursor);
 
 protected:
-	virtual void OnMouseEnter() override;
-	virtual void OnMouseLeave() override;
+	virtual void OnMouseEnter() override final;
+	virtual void OnMouseLeave() override final;
+	virtual void OnMouseDown() override final;
+	virtual void OnMouseClicked() override final;
+
+	virtual void OnUiMouseEnter() { }
+	virtual void OnUiMouseLeave() { }
+	virtual void OnUiMouseDown() { }
+	virtual void OnUiMouseClicked() { }
 
 	void TakeKeyboardFocus();
 	void RelinquishKeyboardFocus();

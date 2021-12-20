@@ -113,8 +113,6 @@ public:
 	void EnableTouchScreenHack(bool bEnable);
 
 private:
-	void SetTextInput(std::string sText, std::string sCompText, int32 iCursorIndex, int32 iSelectionLength);
-
 #ifdef HY_USE_GLFW
 	friend void HyGlfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);
 	friend void HyGlfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY);
@@ -125,16 +123,18 @@ private:
 
 	void OnGlfwKey(int32 iKey, int32 iAction);
 #elif defined(HY_USE_SDL2)
-	void DoTextInputEvent(const SDL_Event &eventRef);		// Add new text onto the end of our text
-	void DoTextEditEvent(const SDL_Event &eventRef);		// Update the composition text; Update the cursor position; Update the selection length
 	void DoKeyDownEvent(const SDL_Event &eventRef);
 	void DoKeyUpEvent(const SDL_Event &eventRef);
+	void DoTextInputEvent(const SDL_Event &eventRef);		// Add new text onto the end of our text
+	void DoTextEditEvent(const SDL_Event &eventRef);		// Update the composition text; Update the cursor position; Update the selection length
 	void DoMouseMoveEvent(const SDL_Event &eventRef);
 	void DoMouseDownEvent(const SDL_Event &eventRef);
 	void DoMouseUpEvent(const SDL_Event &eventRef);
 	void DoMouseWheelEvent(const SDL_Event &eventRef);
 	void SetMouseWindow(HyWindow *pWindow);
 #endif
+
+	void UpdateTextInput(HyKeyboardBtn eBtn);
 
 	void Update();
 };
