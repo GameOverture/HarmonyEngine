@@ -141,6 +141,21 @@ bool HyLayout::RequestWidgetFocus(IHyWidget *pWidget)
 	}
 }
 
+bool HyLayout::IsWidgetInputAllowed()
+{
+	// Propagate upward if this is nested in another layout
+	if(m_pParent)
+	{
+		if((m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+			return static_cast<HyLayout *>(m_pParent)->IsWidgetInputAllowed();
+		else // m_pParent must be the container (and *this is the root layout)
+			return static_cast<HyContainer *>(m_pParent)->IsInputAllowed();
+	}
+
+	// This shouldn't happen
+	return false;
+}
+
 /*virtual*/ void HyLayout::OnSetSizeHint() /*override*/
 {
 	HySetVec(m_vMinSize, m_Margins.left + m_Margins.right, m_Margins.top + m_Margins.bottom);

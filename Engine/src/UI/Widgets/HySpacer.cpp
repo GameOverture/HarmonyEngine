@@ -11,7 +11,7 @@
 #include "UI/Widgets/HySpacer.h"
 
 HySpacer::HySpacer(HyEntity2d *pParent /*= nullptr*/) :
-	IHyEntityUi(pParent)
+	IHyWidget(pParent)
 {
 	SetSizePolicy(HYSIZEPOLICY_Expanding, HYSIZEPOLICY_Expanding);
 	m_eLoadState = HYLOADSTATE_Loaded;

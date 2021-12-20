@@ -20,7 +20,7 @@ protected:
 	HyText2d			m_TextCursor;	// Stores and shows the cursor character in UTF-8
 	HyTimer				m_TextCursorBlinkTimer;
 
-	// Text selction highlight
+	// Text selection highlight
 	HyPrimitive2d		m_Selection;
 	int32				m_iSelectionStartIndex;
 
@@ -33,6 +33,12 @@ public:
 	void SetCursorChar(std::string sUtf8Char);
 
 protected:
+	virtual void OnUpdate() override;
+	virtual void OnMouseClicked() override;
+
+	virtual void OnTakeKeyboardFocus() override;
+	virtual void OnRelinquishKeyboardFocus() override;
+
 	virtual void OnSetup() override;
 
 	static void OnCursorTimer(void *pThisData);

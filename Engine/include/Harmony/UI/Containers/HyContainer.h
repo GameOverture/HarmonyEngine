@@ -20,7 +20,10 @@ class HyContainer : public HyEntity2d
 {
 	friend class HyLayout;
 
-	static HyContainer *					sm_pFocusedContainer;
+	static HyContainer *					sm_pCurModalContainer;	// If any container is considered 'modal' then only that container may accept input
+	static std::vector<HyContainer *>		sm_pContainerList;
+
+	bool									m_bInputAllowed;
 
 protected:
 	HyPanel									m_Panel;
@@ -38,8 +41,6 @@ protected:
 	ContainerState							m_eContainerState;
 	float									m_fElapsedTime;
 
-	IHyWidget *								m_pFocusedWidget;		// Which widget currently has keyboard input focus. NOTE: widget will only take input if *this container is 'sm_pFocusedContainer'
-
 public:
 	HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyContainer();
@@ -49,31 +50,35 @@ public:
 
 	bool Show(bool bInstant = false);
 	bool Hide(bool bInstant = false);
-
-	void TakeFocus();
-	void RelinquishFocus();
-
 	bool IsTransition();
 	bool IsShown();
 
-	bool AppendWidget(IHyEntityUi &itemRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
+	void SetAsModal();
+	static void RelinquishModal();
+
+	bool IsInputAllowed() const;
+	void SetInputAllowed(bool bEnable);
+	IHyWidget *GetFocusedWidget();
+	IHyWidget *FocusNextWidget();
+
+	bool AppendWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	HyLayoutHandle InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	void ClearItems();
 
 	bool SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 
-	IHyEntityUi *FocusNextItem();
-
 protected:
 	virtual void OnUpdate() override final;
+	std::vector<IHyWidget *> AssembleWidgetList();
+
 	virtual void OnContainerUpdate() { }
 	virtual void OnRootLayoutUpdate() { m_RootLayout.Resize(m_Panel.GetWidth(), m_Panel.GetHeight()); }
 
 	// Optional overrides to control show and hide animations/functionality
 	virtual float OnBeginShow() { return 0.0f; }	// Returns the duration (in seconds) of the show transition
-	virtual void OnShown()		{ SetVisible(true); }
+	virtual void OnShown()		{ SetVisible(true); SetInputAllowed(true); }
 	virtual float OnBeginHide() { return 0.0f; }	// Returns the duration (in seconds) of the hide transition
-	virtual void OnHidden()		{ SetVisible(false); }
+	virtual void OnHidden()		{ SetVisible(false); SetInputAllowed(false);}
 
 private:
 	bool RequestWidgetFocus(IHyWidget *pWidget);

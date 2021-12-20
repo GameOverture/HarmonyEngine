@@ -89,9 +89,5 @@ void HyTimer::SetExpiredCallback(std::function<void(void *)> fpFunc, void *pData
 /*virtual*/ void HyTimer::OnUpdate() /*override*/
 {
 	if(IsExpired() && m_fpCallbackFunc)
-	{
 		m_fpCallbackFunc(m_pCallbackData);
-		m_fpCallbackFunc = nullptr;
-		m_pCallbackData = nullptr;
-	}
 }

@@ -22,9 +22,10 @@ protected:
 	{
 		UIATTRIB_HideDisabled = 1 << 0,		// Don't visually indicate if disabled
 		UIATTRIB_IsDisabled = 1 << 1,
-		UIATTRIB_CanKeyboardFocus = 1 << 2,
+		UIATTRIB_KeyboardFocusAllowed = 1 << 2,
+		UIATTRIB_IsKeyboardFocus = 1 << 3,
 
-		UIATTRIB_FLAG_NEXT = 1 << 3,
+		UIATTRIB_FLAG_NEXT = 1 << 4,
 	};
 	uint32								m_uiAttribs;
 	HyMouseCursor						m_eHoverCursor;					// When mouse hovers over *this, change to a specified cursor
@@ -33,14 +34,17 @@ public:
 	IHyWidget(HyEntity2d *pParent = nullptr);
 	virtual ~IHyWidget();
 
+	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed
+
 	bool IsEnabled() const;
 	virtual void SetAsEnabled(bool bEnabled);
 
-	bool IsHideDisabled() const;				// Whether to not visually indicate if disabled
-	void SetHideDisabled(bool bIsHideDisabled);	// Whether to not visually indicate if disabled
+	bool IsHideDisabled() const;					// Whether to not visually indicate if disabled
+	void SetHideDisabled(bool bIsHideDisabled);		// Whether to not visually indicate if disabled
 
 	bool IsKeyboardFocusAllowed() const;
 	void SetKeyboardFocusAllowed(bool bEnabled);
+	bool IsKeyboardFocus() const;
 	bool RequestKeyboardFocus();
 
 	bool IsHoverCursor() const;
@@ -49,10 +53,11 @@ public:
 protected:
 	virtual void OnMouseEnter() override;
 	virtual void OnMouseLeave() override;
-	virtual void OnMouseClicked() override;
 
-	virtual void OnTakeFocus() { }
-	virtual void OnRelinquishFocus() { }
+	void TakeKeyboardFocus();
+	void RelinquishKeyboardFocus();
+	virtual void OnTakeKeyboardFocus() { }			// Widgets that are 'IsKeyboardFocusAllowed' should override this
+	virtual void OnRelinquishKeyboardFocus() { }	// Widgets that are 'IsKeyboardFocusAllowed' should override this
 };
 
 #endif /* IHyWidget_h__ */

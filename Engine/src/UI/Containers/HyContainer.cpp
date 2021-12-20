@@ -11,24 +11,36 @@
 #include "UI/Containers/HyContainer.h"
 #include "HyEngine.h"
 
-HyContainer *HyContainer::sm_pFocusedContainer = nullptr;
+HyContainer *HyContainer::sm_pCurModalContainer = nullptr;
+std::vector<HyContainer *> HyContainer::sm_pContainerList;
 HyLayoutHandle HyContainer::sm_hHandleCounter = 1;
 
 HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
+	m_bInputAllowed(true),
 	m_Panel(initRef, this),
 	m_RootLayout(eRootLayout, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
-	m_fElapsedTime(0.0f),
-	m_pFocusedWidget(nullptr)
+	m_fElapsedTime(0.0f)
 {
 	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
 	m_RootLayout.SetLayoutDirty();
+
+	sm_pContainerList.push_back(this);
 }
 
 /*virtual*/ HyContainer::~HyContainer()
 {
 	ClearItems();
+
+	for(auto it = sm_pContainerList.begin(); it != sm_pContainerList.end(); ++it)
+	{
+		if((*it) == this)
+		{
+			sm_pContainerList.erase(it);
+			break;
+		}
+	}
 }
 
 glm::ivec2 HyContainer::GetSize()
@@ -84,30 +96,6 @@ bool HyContainer::Hide(bool bInstant /*= false*/)
 	return true;
 }
 
-void HyContainer::TakeFocus()
-{
-	if(sm_pFocusedContainer == this)
-		return;
-
-	if(sm_pFocusedContainer && sm_pFocusedContainer->m_pFocusedWidget)
-		sm_pFocusedContainer->m_pFocusedWidget->OnRelinquishFocus();
-
-	sm_pFocusedContainer = this;
-	if(sm_pFocusedContainer->m_pFocusedWidget)
-		sm_pFocusedContainer->m_pFocusedWidget->OnTakeFocus();
-	else
-		sm_pFocusedContainer->FocusNextItem();
-}
-
-void HyContainer::RelinquishFocus()
-{
-	if(sm_pFocusedContainer == this)
-	{
-		sm_pFocusedContainer->m_pFocusedWidget->OnRelinquishFocus();
-		sm_pFocusedContainer = nullptr;
-	}
-}
-
 bool HyContainer::IsTransition()
 {
 	return m_eContainerState == CONTAINERSTATE_Showing || m_eContainerState == CONTAINERSTATE_Hiding;
@@ -118,16 +106,122 @@ bool HyContainer::IsShown()
 	return m_eContainerState == CONTAINERSTATE_Shown || m_eContainerState == CONTAINERSTATE_Showing;
 }
 
-bool HyContainer::AppendWidget(IHyEntityUi &itemRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
+void HyContainer::SetAsModal()
+{
+	if(sm_pCurModalContainer == this)
+		return;
+
+	for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
+	{
+		IHyWidget *pFocusedWidget = sm_pContainerList[i]->GetFocusedWidget();
+		if(sm_pContainerList[i] == this || sm_pContainerList[i]->m_bInputAllowed == false || pFocusedWidget == nullptr)
+			continue;
+		else
+			pFocusedWidget->RelinquishKeyboardFocus();
+	}
+
+	sm_pCurModalContainer = this;
+}
+
+/*static*/ void HyContainer::RelinquishModal()
+{
+	for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
+	{
+		IHyWidget *pFocusedWidget = sm_pContainerList[i]->GetFocusedWidget();
+		if(sm_pContainerList[i] == sm_pCurModalContainer || sm_pContainerList[i]->m_bInputAllowed == false || pFocusedWidget == nullptr)
+			continue;
+		else
+			pFocusedWidget->TakeKeyboardFocus();
+	}
+
+	sm_pCurModalContainer = nullptr;
+}
+
+bool HyContainer::IsInputAllowed() const
+{
+	return m_bInputAllowed && (sm_pCurModalContainer == nullptr || sm_pCurModalContainer == this);
+}
+
+void HyContainer::SetInputAllowed(bool bEnable)
+{
+	if(m_bInputAllowed == bEnable)
+		return;
+
+	m_bInputAllowed = bEnable;
+	IHyWidget *pFocusedWidget = GetFocusedWidget();
+	if(pFocusedWidget && (sm_pCurModalContainer == nullptr || sm_pCurModalContainer == this))
+	{
+		if(m_bInputAllowed)
+			pFocusedWidget->TakeKeyboardFocus();
+		else
+			pFocusedWidget->RelinquishKeyboardFocus();
+	}
+}
+
+IHyWidget *HyContainer::GetFocusedWidget()
+{
+	auto widgetList = AssembleWidgetList();
+	for(uint32 i = 0; i < static_cast<uint32>(widgetList.size()); ++i)
+	{
+		if(widgetList[i]->IsKeyboardFocus())
+			return widgetList[i];
+	}
+
+	return nullptr;
+}
+
+IHyWidget *HyContainer::FocusNextWidget()
+{
+	auto widgetList = AssembleWidgetList();
+	IHyWidget *pOldFocusedWidget = nullptr;
+	IHyWidget *pNewFocusedWidget = nullptr;
+	for(uint32 i = 0; i < static_cast<uint32>(widgetList.size()); ++i)
+	{
+		if(pOldFocusedWidget == nullptr)
+		{
+			if(widgetList[i]->IsKeyboardFocus())
+				pOldFocusedWidget = widgetList[i];
+		}
+		else
+		{
+			if(widgetList[i]->IsKeyboardFocusAllowed())
+			{
+				pNewFocusedWidget = widgetList[i];
+				break;
+			}
+		}
+	}
+
+	if(pNewFocusedWidget == nullptr)
+	{
+		for(uint32 i = 0; i < static_cast<uint32>(widgetList.size()); ++i)
+		{
+			if(widgetList[i]->IsKeyboardFocusAllowed())
+			{
+				pNewFocusedWidget = widgetList[i];
+				break;
+			}
+		}
+	}
+
+	if(pOldFocusedWidget)
+		pOldFocusedWidget->RelinquishKeyboardFocus();
+	if(pNewFocusedWidget)
+		pNewFocusedWidget->TakeKeyboardFocus();
+
+	return pNewFocusedWidget;
+}
+
+bool HyContainer::AppendWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	if(hInsertInto == HY_UNUSED_HANDLE)
 	{
-		m_RootLayout.AppendItem(itemRef);
+		m_RootLayout.AppendItem(widgetRef);
 		return true;
 	}
 	else if(m_SubLayoutMap.find(hInsertInto) != m_SubLayoutMap.end())
 	{
-		m_SubLayoutMap[hInsertInto]->AppendItem(itemRef);
+		m_SubLayoutMap[hInsertInto]->AppendItem(widgetRef);
 		return true;
 	}
 
@@ -158,6 +252,10 @@ HyLayoutHandle HyContainer::InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHa
 
 void HyContainer::ClearItems()
 {
+	IHyWidget *pFocusedWidget = GetFocusedWidget();
+	if(pFocusedWidget)
+		pFocusedWidget->RelinquishKeyboardFocus();
+
 	m_RootLayout.DetachAllItems();
 
 	for(auto pSubLayout : m_SubLayoutMap)
@@ -179,20 +277,6 @@ bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTo
 	}
 
 	return false;
-}
-
-IHyEntityUi *HyContainer::FocusNextItem()
-{
-	return nullptr;
-	//if(m_pFocusedItem == nullptr)
-	//{
-	//	m_RootLayout.ForEachChild([&](IHyNode2d *pChild)
-	//		{
-	//			IHyEntityUi *pItem = static_cast<IHyEntityUi *>(pChild);
-	//			if(pItem->IsKeyboardFocusAllowed())
-	//				m_pFocusedItem = pItem;
-	//		});
-	//}
 }
 
 /*virtual*/ void HyContainer::OnUpdate() /*override final*/
@@ -229,11 +313,34 @@ IHyEntityUi *HyContainer::FocusNextItem()
 	OnContainerUpdate();
 }
 
+std::vector<IHyWidget *> HyContainer::AssembleWidgetList()
+{
+	std::vector<IHyWidget *> widgetList;
+
+	std::function<void(HyLayout *)> fpRecursive = [&](HyLayout *pLayout) {
+		for(uint32 i = 0; i < pLayout->ChildCount(); ++i)
+		{
+			IHyEntityUi *pItem = static_cast<IHyEntityUi *>(pLayout->ChildGet(i));
+			if((pItem->GetInternalFlags() & NODETYPE_IsLayout) == 0)
+				widgetList.push_back(static_cast<IHyWidget *>(pItem));
+			else
+				fpRecursive(static_cast<HyLayout *>(pItem));
+		}
+	};
+	fpRecursive(&m_RootLayout);
+
+	return widgetList;
+}
+
 bool HyContainer::RequestWidgetFocus(IHyWidget *pWidget)
 {
-	if(pWidget != nullptr && sm_pFocusedContainer != this && m_pFocusedWidget != pWidget)
+	IHyWidget *pFocusedWidget = GetFocusedWidget();
+	if(pWidget == nullptr || IsInputAllowed() == false || pFocusedWidget == pWidget)
 		return false;
 
-	m_pFocusedWidget = pWidget;
-	m_pFocusedWidget->OnTakeFocus();
+	if(pFocusedWidget)
+		pFocusedWidget->RelinquishKeyboardFocus();
+
+	pWidget->TakeKeyboardFocus();
+	return true;
 }

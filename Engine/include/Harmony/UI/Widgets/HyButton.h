@@ -32,11 +32,11 @@ class HyButton : public HyLabel
 protected:
 	enum ButtonAttributes
 	{
-		BTNATTRIB_HideDownState		= 1 << 10,		// Don't visually indicate down state (when available)
-		BTNATTRIB_HideHoverState	= 1 << 11,		// Don't visually indicate hover state (when available)
-		BTNATTRIB_IsHighlighted		= 1 << 12,
+		BTNATTRIB_HideDownState		= 1 << 11,		// Don't visually indicate down state (when available)
+		BTNATTRIB_HideHoverState	= 1 << 12,		// Don't visually indicate hover state (when available)
+		BTNATTRIB_IsHighlighted		= 1 << 13,
 
-		BTNATTRIB_FLAG_NEXT			= 1 << 13
+		BTNATTRIB_FLAG_NEXT			= 1 << 14
 	};
 	static_assert(BTNATTRIB_HideDownState == LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
 

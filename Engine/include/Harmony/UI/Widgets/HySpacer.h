@@ -11,9 +11,9 @@
 #define HySpacer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/IHyEntityUi.h"
+#include "UI/Widgets/IHyWidget.h"
 
-class HySpacer : public IHyEntityUi
+class HySpacer : public IHyWidget
 {
 public:
 	HySpacer(HyEntity2d *pParent = nullptr);

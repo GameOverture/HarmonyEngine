@@ -23,6 +23,14 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+bool IHyWidget::IsInputAllowed() const
+{
+	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		return IsEnabled() && static_cast<HyLayout *>(m_pParent)->IsWidgetInputAllowed();
+
+	return IsEnabled();
+}
+
 bool IHyWidget::IsEnabled() const
 {
 	return (m_uiAttribs & UIATTRIB_IsDisabled) == 0;
@@ -36,6 +44,7 @@ bool IHyWidget::IsEnabled() const
 		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 
+		EnableMouseInput();
 		if(IsMouseInBounds())
 			OnMouseEnter();
 	}
@@ -49,7 +58,9 @@ bool IHyWidget::IsEnabled() const
 			botColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
 		}
 
-		OnMouseLeave();
+		DisableMouseInput();
+		if(IsMouseInBounds())
+			OnMouseLeave();
 	}
 }
 
@@ -74,15 +85,20 @@ void IHyWidget::SetHideDisabled(bool bIsHideDisabled)
 
 bool IHyWidget::IsKeyboardFocusAllowed() const
 {
-	return (m_uiAttribs & UIATTRIB_CanKeyboardFocus);
+	return (m_uiAttribs & UIATTRIB_KeyboardFocusAllowed);
 }
 
 void IHyWidget::SetKeyboardFocusAllowed(bool bEnabled)
 {
 	if(bEnabled)
-		m_uiAttribs |= UIATTRIB_CanKeyboardFocus;
+		m_uiAttribs |= UIATTRIB_KeyboardFocusAllowed;
 	else
-		m_uiAttribs &= ~UIATTRIB_CanKeyboardFocus;
+		m_uiAttribs &= ~UIATTRIB_KeyboardFocusAllowed;
+}
+
+bool IHyWidget::IsKeyboardFocus() const
+{
+	return (m_uiAttribs & UIATTRIB_IsKeyboardFocus);
 }
 
 bool IHyWidget::RequestKeyboardFocus()
@@ -105,17 +121,26 @@ void IHyWidget::SetHoverCursor(HyMouseCursor eMouseCursor)
 
 /*virtual*/ void IHyWidget::OnMouseEnter() /*override*/
 {
-	if(IsHoverCursor() && IsEnabled())
+	if(IsInputAllowed() && IsHoverCursor())
 		HyEngine::Input().SetMouseCursor(m_eHoverCursor);
 }
 
 /*virtual*/ void IHyWidget::OnMouseLeave() /*override*/
 {
-	if(IsHoverCursor())
+	if(IsInputAllowed() && IsHoverCursor())
 		HyEngine::Input().ResetMouseCursor();
 }
 
-/*virtual*/ void IHyWidget::OnMouseClicked() /*override*/
+void IHyWidget::TakeKeyboardFocus()
 {
+	HyAssert(IsKeyboardFocusAllowed(), "IHyWidget::TakeKeyboardFocus was invoked when keyboard focus is NOT allowed");
+	
+	m_uiAttribs |= UIATTRIB_IsKeyboardFocus;
+	OnTakeKeyboardFocus();
+}
 
+void IHyWidget::RelinquishKeyboardFocus()
+{
+	m_uiAttribs &= ~UIATTRIB_IsKeyboardFocus;
+	OnRelinquishKeyboardFocus();
 }

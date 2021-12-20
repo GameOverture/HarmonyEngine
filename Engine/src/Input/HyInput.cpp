@@ -296,10 +296,10 @@ float HyInput::GetAxisDelta(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
 
 bool HyInput::IsTextInputActive()
 {
-#ifdef HY_USE_GLFW
-	return m_bTextInputActive;
-#elif defined(HY_USE_SDL2)
+#if defined(HY_USE_SDL2)
 	return SDL_IsTextInputActive();
+#else
+	return m_bTextInputActive;
 #endif
 }
 
@@ -377,7 +377,7 @@ void HyInput::DoTextInputEvent(const SDL_Event &eventRef)
 
 void HyInput::DoTextEditEvent(const SDL_Event &eventRef)
 {
-	SetTextInput(m_sTextInput, eventRef.edit.text, eventRef.edit.start, eventRef.edit.length);
+	//SetTextInput(m_sTextInput, eventRef.edit.text, eventRef.edit.start, eventRef.edit.length);
 }
 
 void HyInput::DoKeyDownEvent(const SDL_Event &eventRef)

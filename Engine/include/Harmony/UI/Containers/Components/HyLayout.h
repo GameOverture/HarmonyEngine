@@ -53,6 +53,7 @@ public:
 	void SetLayoutDirty();
 
 	bool RequestWidgetFocus(IHyWidget *pWidget);
+	bool IsWidgetInputAllowed();
 
 protected:
 	virtual void OnSetSizeHint() override;

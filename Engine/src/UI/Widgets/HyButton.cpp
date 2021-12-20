@@ -41,7 +41,6 @@ HyButton::HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::str
 /*virtual*/ void HyButton::SetAsEnabled(bool bEnabled) /*override*/
 {
 	HyLabel::SetAsEnabled(bEnabled);
-	IsEnabled() ? EnableMouseInput() : DisableMouseInput();
 
 	if(m_Panel.IsSprite() == false)
 		return;
@@ -224,8 +223,6 @@ void HyButton::InvokeButtonClicked()
 
 /*virtual*/ void HyButton::OnMouseClicked() /*override*/
 {
-	IHyWidget::OnMouseClicked();
-
 	if(IsHighlighted())
 	{
 		if(m_Panel.GetSprite().GetNumStates() > HYBUTTONSTATE_HighlightedHover)
