@@ -32,9 +32,7 @@ class HyInput
 	glm::ivec2						m_vMouseScroll_LiveCount;
 	glm::ivec2						m_vMouseScroll_ThisFrame;
 
-#ifndef HY_USE_SDL2
 	bool							m_bTextInputActive;
-#endif
 	std::string						m_sTextInput;
 	std::string						m_sTextComposition;
 	int32							m_iTextCursorIndex;

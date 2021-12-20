@@ -63,7 +63,7 @@
 		std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cvt;
 
 		// UTF-32 to UTF-8
-		std::u32string sUtf32(uiCodepoint);
+		std::u32string sUtf32;// (uiCodepoint); // TODO: fix this
 		std::string sUtf8 = cvt.to_bytes(sUtf32);
 
 		int32 iCursorIndex, iSelLen;
@@ -110,6 +110,7 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	m_uiMouseBtnFlags(0),
 	m_uiMouseBtnFlags_NewlyPressed(0),
 	m_uiMouseBtnFlags_Buffered(0),
+	m_bTextInputActive(false),
 	m_iTextCursorIndex(0),
 	m_iTextSelectLength(0),
 	m_bTouchScreenHack(false),
@@ -127,8 +128,6 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	m_pMouseWindow = m_WindowListRef[0];
 
 #ifdef HY_USE_GLFW
-	m_bTextInputActive = false;
-
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		glfwSetMouseButtonCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_MouseButtonCallback);
