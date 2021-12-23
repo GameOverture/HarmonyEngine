@@ -2,7 +2,7 @@
 *	HyMeter.h
 *
 *	Harmony Engine
-*	Copyright (c) 2018 Jason Knobler
+*	Copyright (c) 2021 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -87,13 +87,15 @@ public:
 	HyNumberFormat GetNumFormat() const;
 	void SetNumFormat(HyNumberFormat format);
 
-	void SetText(const std::stringstream &ssUtf8Text) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
-	void SetText(const std::string &sUtf8Text) = delete;		// Hiding SetText() since it doesn't make sense to use with HyMeters
+	//void SetText(const std::stringstream &ssUtf8Text) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
+	//void SetText(const std::string &sUtf8Text) = delete;		// Hiding SetText() since it doesn't make sense to use with HyMeters
 	virtual void SetTextState(uint32 uiStateIndex) override;
 	virtual void ResetTextAndPanel() override;
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
 
 protected:
+	using HyLabel::SetText;
+
 	void FormatDigits();
 
 	virtual void OnUpdate() override;

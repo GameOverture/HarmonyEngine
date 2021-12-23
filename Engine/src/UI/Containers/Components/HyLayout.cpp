@@ -11,6 +11,7 @@
 #include "UI/Containers/Components/HyLayout.h"
 #include "UI/Containers/HyContainer.h"
 #include "UI/Widgets/IHyWidget.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 HyLayout::HyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
@@ -29,6 +30,11 @@ HyLayout::HyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) 
 {
 }
 
+HyLayoutType HyLayout::GetLayoutType() const
+{
+	return m_eLayoutType;
+}
+
 /*virtual*/ HySizePolicy HyLayout::GetSizePolicy(HyOrientation eOrien) /*override*/
 {
 	uint32 uiSizePolicy = 0;// HYSIZEPOLICY_Fixed;
@@ -40,11 +46,9 @@ HyLayout::HyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) 
 
 		if(pItem->GetSizePolicy(eOrien) & HY_SIZEFLAG_EXPAND)
 			uiSizePolicy |= HY_SIZEFLAG_EXPAND;
-		if(((pItem->GetSizePolicy(eOrien) & HY_SIZEFLAG_SHRINK) >> 1) == 0)
-			bShrinkValid = false;
+		if((pItem->GetSizePolicy(eOrien) & HY_SIZEFLAG_SHRINK) >> 1)
+			uiSizePolicy |= HY_SIZEFLAG_SHRINK;
 	}
-	if(bShrinkValid)
-		uiSizePolicy |= HY_SIZEFLAG_SHRINK;
 
 	return static_cast<HySizePolicy>(uiSizePolicy);
 }
@@ -276,8 +280,30 @@ bool HyLayout::IsWidgetInputAllowed()
 		else
 			iMaxInverse = HyMax(iMaxInverse, vItemSize[eInverseOrien]);
 
-		// TODO: If 'pItem' is a nested layout, it should pass '0' to Resize where appropriate
-		glm::ivec2 vActualItemSize = pItem->Resize(vItemSize.x, vItemSize.y);
+		// If 'pItem' is a nested layout, it should pass '0' to Resize where appropriate
+		glm::ivec2 vResize = vItemSize;
+		if((pItem->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		{
+			if(vTargetSize.x == 0)
+				vResize.x = 0;
+			if(vTargetSize.y == 0)
+				vResize.y = 0;
+			//switch(static_cast<HyLayout *>(pItem)->GetLayoutType())
+			//{
+			//case HYLAYOUT_Horizontal:
+			//	
+			//	break;
+			//	
+			//case HYLAYOUT_Vertical:
+			//	vResize.y = 0;
+			//	break;
+
+			//default:
+			//	HyLogWarning("Layout type not handled");
+			//	break;
+			//}
+		}
+		glm::ivec2 vActualItemSize = pItem->Resize(vResize.x, vResize.y);
 		if(vTargetSize[eOrientation] != 0 && vActualItemSize != vItemSize)
 			bNeedsResize = true;
 

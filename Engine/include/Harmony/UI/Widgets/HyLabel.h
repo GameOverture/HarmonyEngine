@@ -2,7 +2,7 @@
 *	HyLabel.h
 *
 *	Harmony Engine
-*	Copyright (c) 2018 Jason Knobler
+*	Copyright (c) 2021 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -62,7 +62,7 @@ public:
 
 	std::string GetUtf8String() const;
 	void SetText(const std::stringstream &ssUtf8Text);
-	void SetText(const std::string &sUtf8Text);
+	virtual void SetText(const std::string &sUtf8Text);
 	virtual void SetTextState(uint32 uiStateIndex);
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
 

@@ -19,6 +19,7 @@
 class HyContainer : public HyEntity2d
 {
 	friend class HyLayout;
+	friend class HyInput;
 
 	static HyContainer *					sm_pCurModalContainer;	// If any container is considered 'modal' then only that container may accept input
 	static std::vector<HyContainer *>		sm_pContainerList;
@@ -44,6 +45,8 @@ protected:
 public:
 	HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyContainer();
+
+	static bool IsModalActive();
 
 	glm::ivec2 GetSize();
 	virtual void SetSize(int32 iNewWidth, int32 iNewHeight);
@@ -82,6 +85,9 @@ protected:
 
 private:
 	bool RequestWidgetFocus(IHyWidget *pWidget);
+
+	static void DistrubuteTextInput(std::string sText);
+	static void DistrubuteKeyboardInput(HyKeyboardBtn eBtn);
 };
 
 #endif /* HyContainer_h__ */

@@ -1,8 +1,8 @@
 /**************************************************************************
-*	HyLabel.cpp
+*	HyLineEdit.cpp
 *
 *	Harmony Engine
-*	Copyright (c) 2018 Jason Knobler
+*	Copyright (c) 2021 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -12,18 +12,21 @@
 #include "HyEngine.h"
 
 HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(pParent)
+	HyLabel(pParent),
+	m_TextInput(m_Text, this)
 {
 }
 
 HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, sTextPrefix, sTextName, pParent)
+	HyLabel(initRef, sTextPrefix, sTextName, pParent),
+	m_TextInput(m_Text, this)
 {
 	OnSetup();
 }
 
 HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent)
+	HyLabel(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+	m_TextInput(m_Text, this)
 {
 	OnSetup();
 }
@@ -32,22 +35,22 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std:
 {
 }
 
-void HyLineEdit::SetCursorChar(std::string sUtf8Char)
+/*virtual*/ void HyLineEdit::SetText(const std::string &sUtf8Text) /*override*/
 {
-	m_TextCursor.SetText(sUtf8Char);
+	HyLabel::SetText(sUtf8Text);
+	m_TextInput.SetCursor(sUtf8Text.length(), 0);
 }
 
-/*virtual*/ void HyLineEdit::OnUpdate() /*override*/
+/*virtual*/ void HyLineEdit::OnUiTextInput(std::string sNewText) /*override*/
 {
-	if(IsKeyboardFocus())
-	{
-		m_TextCursor.pos.Set(m_Text.pos);
-		m_TextCursor.pos.Offset(m_Text.GetTextCursorPos());
-		m_TextCursor.SetState(m_Text.GetState());
+	m_TextInput.OnUiTextInput(sNewText);
+	SetText(m_Text.GetUtf8String()); // Ensure HyLabel is informed of m_Text changing
+}
 
-		int32 iCursorIndexOut, iSelectionLengthOut;
-		SetText(HyEngine::Input().GetTextInput(iCursorIndexOut, iSelectionLengthOut));
-	}
+/*virtual*/ void HyLineEdit::OnUiKeyboardInput(HyKeyboardBtn eBtn) /*override*/
+{
+	m_TextInput.OnUiKeyboardInput(eBtn);
+	SetText(m_Text.GetUtf8String()); // Ensure HyLabel is informed of m_Text changing
 }
 
 /*virtual*/ void HyLineEdit::OnUiMouseClicked() /*override*/
@@ -57,40 +60,19 @@ void HyLineEdit::SetCursorChar(std::string sUtf8Char)
 
 /*virtual*/ void HyLineEdit::OnTakeKeyboardFocus() /*override*/
 {
-	HyEngine::Input().StartTextInput();
+	m_TextInput.OnTakeKeyboardFocus();
 }
 
 /*virtual*/ void HyLineEdit::OnRelinquishKeyboardFocus() /*override*/
 {
-	int32 iCursorIndexOut, iSelectionLengthOut;
-	SetText(HyEngine::Input().GetTextInput(iCursorIndexOut, iSelectionLengthOut));
-
-	HyEngine::Input().StopTextInput();
+	m_TextInput.OnRelinquishKeyboardFocus();
 }
 
 /*virtual*/ void HyLineEdit::OnSetup() /*override*/
 {
-	m_TextCursor.Init(m_Text.GetPrefix(), m_Text.GetName(), this);
-	m_TextCursor.alpha.Set(0.0f);
-	m_TextCursor.SetText("|");
+	m_TextInput.Load();
+
 	SetKeyboardFocusAllowed(true);
 	SetHoverCursor(HYMOUSECURSOR_IBeam);
 	m_uiAttribs |= LABELATTRIB_StackedTextUseLine | LABELATTRIB_StackedTextLeftAlign;
-	m_TextCursorBlinkTimer.SetExpiredCallback(OnCursorTimer, this);
-	m_TextCursorBlinkTimer.InitStart(0.5f);
-}
-
-/*static*/ void HyLineEdit::OnCursorTimer(void *pThisData)
-{
-	HyLineEdit *pThis = static_cast<HyLineEdit *>(pThisData);
-
-	if(pThis->IsKeyboardFocus())
-	{
-		if(pThis->m_TextCursor.alpha.Get() == 0.0f)
-			pThis->m_TextCursor.alpha.Set(1.0f);
-		else
-			pThis->m_TextCursor.alpha.Set(0.0f);
-	}
-	
-	pThis->m_TextCursorBlinkTimer.InitStart(0.5f);
 }

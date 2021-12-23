@@ -206,6 +206,7 @@ bool HyEngine::PollPlatformApi()
 		}
 	}
 #endif
+
 	m_Input.Update();
 	return true;
 }

@@ -43,6 +43,11 @@ HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, H
 	}
 }
 
+/*static*/ bool HyContainer::IsModalActive()
+{
+	return sm_pCurModalContainer != nullptr;
+}
+
 glm::ivec2 HyContainer::GetSize()
 {
 	return m_Panel.GetSize();
@@ -307,8 +312,6 @@ bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTo
 		break;
 	}
 
-	// TODO: if(this == sm_pFocusedContainer) check for 'TAB' and 'SHIFT+TAB' to cycle keyboard focus to valid widgets
-
 	m_fElapsedTime = 0.0f;
 	OnContainerUpdate();
 }
@@ -343,4 +346,39 @@ bool HyContainer::RequestWidgetFocus(IHyWidget *pWidget)
 
 	pWidget->TakeKeyboardFocus();
 	return true;
+}
+
+/*static*/ void HyContainer::DistrubuteTextInput(std::string sText)
+{
+	for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
+	{
+		IHyWidget *pFocusedWidget = sm_pContainerList[i]->GetFocusedWidget();
+		if(pFocusedWidget && sm_pContainerList[i]->IsInputAllowed())
+			pFocusedWidget->OnUiTextInput(sText);
+	}
+}
+
+/*static*/ void HyContainer::DistrubuteKeyboardInput(HyKeyboardBtn eBtn)
+{
+	// Check for 'TAB' and 'SHIFT+TAB' to cycle keyboard focus to valid widgets
+	switch(eBtn)
+	{
+	case HYKEY_Tab:
+		for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
+		{
+			if(sm_pContainerList[i]->IsInputAllowed())
+				sm_pContainerList[i]->FocusNextWidget();
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
+	{
+		IHyWidget *pFocusedWidget = sm_pContainerList[i]->GetFocusedWidget();
+		if(pFocusedWidget && sm_pContainerList[i]->IsInputAllowed())
+			pFocusedWidget->OnUiKeyboardInput(eBtn);
+	}
 }

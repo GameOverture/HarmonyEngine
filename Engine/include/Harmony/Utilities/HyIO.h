@@ -15,6 +15,14 @@
 class HyIO
 {
 public:
+	// Return the number of UTF-8 characters from a well formed UTF-8 string sequence
+	static size_t Utf8Length(const std::string &sStrRef);
+
+	// Erase the number of UTF-8 characters 'uiCount' starting from UTF-8 character 'uiOffset'
+	static void Utf8Erase(std::string &sStrRef, size_t uiOffset, size_t uiCount);
+
+	static void Utf8Insert(std::string &sStrRef, size_t uiOffset, const std::string &sUtf8Str);
+
 	static std::string CleanPath(const char *szPath, const char *szExtension, bool bMakeLowercase);
 	static bool FileExists(const std::string &sFilePath);
 

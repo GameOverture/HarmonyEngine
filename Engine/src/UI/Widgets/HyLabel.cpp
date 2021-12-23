@@ -2,7 +2,7 @@
 *	HyLabel.cpp
 *
 *	Harmony Engine
-*	Copyright (c) 2018 Jason Knobler
+*	Copyright (c) 2021 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -80,7 +80,7 @@ void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::st
 		break;
 	}
 
-	if(bUseScaleBox)
+	if(bUseScaleBox && m_Panel.IsValid())
 		m_uiAttribs &= ~LABELATTRIB_StackedTextUseLine;
 	else
 		m_uiAttribs |= LABELATTRIB_StackedTextUseLine;
@@ -147,7 +147,7 @@ void HyLabel::SetText(const std::stringstream &ssUtf8Text)
 	SetText(ssUtf8Text.str());
 }
 
-void HyLabel::SetText(const std::string &sUtf8Text)
+/*virtual*/ void HyLabel::SetText(const std::string &sUtf8Text)
 {
 	m_Text.SetText(sUtf8Text);
 	ResetTextAndPanel();
@@ -399,5 +399,5 @@ HyText2d &HyLabel::GetTextNode()
 			m_Text.SetAsLine();
 	}
 
-	m_bSizeHintDirty = true;
+	SetSizeAndLayoutDirty();
 }

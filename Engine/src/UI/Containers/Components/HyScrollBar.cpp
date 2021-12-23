@@ -365,5 +365,5 @@ void HyScrollBar::InvokeOnScrollCallback()
 	m_PageControl.SetSliderPos(m_eORIENTATION, m_AnimScrollPos.Get(), m_fClientTotalSize, m_fClientShownSize);
 
 	if(m_fpCallback)
-		m_fpCallback(this, static_cast<uint32>(m_AnimScrollPos.Get()), static_cast<float>(m_fClientTotalSize - m_fClientShownSize), m_pCallbackData);
+		m_fpCallback(this, m_AnimScrollPos.Get(), m_fClientTotalSize - m_fClientShownSize, m_pCallbackData);
 }

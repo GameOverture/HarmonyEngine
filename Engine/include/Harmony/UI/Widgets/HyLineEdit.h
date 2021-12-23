@@ -12,17 +12,12 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyLabel.h"
-#include "Time/Watches/HyTimer.h"
+#include "UI/Widgets/Components/HyTextInput.h"
 
 class HyLineEdit : public HyLabel
 {
 protected:
-	HyText2d			m_TextCursor;	// Stores and shows the cursor character in UTF-8
-	HyTimer				m_TextCursorBlinkTimer;
-
-	// Text selection highlight
-	HyPrimitive2d		m_Selection;
-	int32				m_iSelectionStartIndex;
+	HyTextInput			m_TextInput;
 
 public:
 	HyLineEdit(HyEntity2d *pParent = nullptr);
@@ -30,18 +25,17 @@ public:
 	HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyLineEdit();
 
-	void SetCursorChar(std::string sUtf8Char);
+	virtual void SetText(const std::string &sUtf8Text) override;
 
 protected:
-	virtual void OnUpdate() override;
+	virtual void OnUiTextInput(std::string sNewText) override;
+	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn) override;
 	virtual void OnUiMouseClicked() override;
 
 	virtual void OnTakeKeyboardFocus() override;
 	virtual void OnRelinquishKeyboardFocus() override;
 
 	virtual void OnSetup() override;
-
-	static void OnCursorTimer(void *pThisData);
 };
 
 #endif /* HyLineEdit_h__ */

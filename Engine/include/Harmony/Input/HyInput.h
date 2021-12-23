@@ -33,7 +33,6 @@ class HyInput
 	glm::ivec2						m_vMouseScroll_ThisFrame;
 
 	bool							m_bTextInputActive;
-	std::string						m_sTextInput;
 	std::string						m_sTextComposition;
 	int32							m_iTextCursorIndex;
 	int32							m_iTextSelectLength;
@@ -85,7 +84,6 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check for Input
-
 	bool IsActionDown(int32 iUserId, uint32 uiMappingIndex = 0) const;
 	bool IsActionReleased(int32 iUserId, uint32 uiMappingIndex = 0) const;	// Only true for a single frame upon button release
 	float GetAxis(int32 iUserId, uint32 uiMappingIndex = 0) const;
@@ -93,7 +91,6 @@ public:
 
 	bool IsTextInputActive();
 	void StartTextInput();
-	std::string GetTextInput(int32 &iCursorIndexOut, int32 &iSelectionLengthOut); // Returns UTF-8 string that has been constructed by user since StartTextInput() was called
 	void StopTextInput();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,9 +131,10 @@ private:
 	void SetMouseWindow(HyWindow *pWindow);
 #endif
 
-	void UpdateTextInput(HyKeyboardBtn eBtn);
+	void DistrubuteTextInput(std::string sNewText);
+	void DistrubuteKeyboardInput(HyKeyboardBtn eBtn);
 
-	void Update();
+	void Update();		// This update occurs AFTER event polls are processed
 };
 
 #endif /* HyInput_h__ */

@@ -2,7 +2,7 @@
 *	HyButton.h
 *
 *	Harmony Engine
-*	Copyright (c) 2018 Jason Knobler
+*	Copyright (c) 2021 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE

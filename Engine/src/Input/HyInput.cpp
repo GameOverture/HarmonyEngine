@@ -13,6 +13,7 @@
 #include "Input/HyInput.h"
 #include "Input/HyInputMap.h"
 #include "Window/HyWindow.h"
+#include "UI/Containers/HyContainer.h"
 
 #include <codecvt>
 
@@ -63,14 +64,10 @@
 		std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cvt;
 
 		// UTF-32 to UTF-8
-		std::u32string sUtf32;// (uiCodepoint); // TODO: fix this
+		std::u32string sUtf32;//(uiCodepoint); // TODO: fix this
 		std::string sUtf8 = cvt.to_bytes(sUtf32);
-
-		int32 iCursorIndex, iSelLen;
-		std::string sCurString = HyEngine::Input().GetTextInput(iCursorIndex, iSelLen);
-		sCurString += sUtf8;
-
-		HyEngine::Input().SetTextInput(sCurString, "", iCursorIndex, iSelLen);
+		
+		HyEngine::Input().DistrubuteTextInput(sUtf8);
 	}
 
 	/*friend*/ void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent)
@@ -111,8 +108,6 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	m_uiMouseBtnFlags_NewlyPressed(0),
 	m_uiMouseBtnFlags_Buffered(0),
 	m_bTextInputActive(false),
-	m_iTextCursorIndex(0),
-	m_iTextSelectLength(0),
 	m_bTouchScreenHack(false),
 	m_uiJoystickCount(0)
 {
@@ -304,30 +299,16 @@ bool HyInput::IsTextInputActive()
 
 void HyInput::StartTextInput()
 {
-	m_sTextInput.clear();
-	m_sTextComposition.clear();
-	m_iTextCursorIndex = m_iTextSelectLength = 0;
-
-#ifdef HY_USE_GLFW
 	m_bTextInputActive = true;
-#elif defined(HY_USE_SDL2)
+#if defined(HY_USE_SDL2)
 	SDL_StartTextInput();
 #endif
 }
 
-std::string HyInput::GetTextInput(int32 &iCursorIndexOut, int32 &iSelectionLengthOut)
-{
-	iCursorIndexOut = m_iTextCursorIndex;
-	iSelectionLengthOut = m_iTextSelectLength;
-	m_sTextComposition;
-	return m_sTextInput;
-}
-
 void HyInput::StopTextInput()
 {
-#ifdef HY_USE_GLFW
 	m_bTextInputActive = false;
-#elif defined(HY_USE_SDL2)
+#if defined(HY_USE_SDL2)
 	SDL_StopTextInput();
 #endif
 }
@@ -354,112 +335,91 @@ void HyInput::EnableTouchScreenHack(bool bEnable)
 }
 
 #ifdef HY_USE_GLFW
-void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
-{
-	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
-		m_pInputMaps[i].ApplyInput(iKey, static_cast<HyBtnPressState>(iAction));
-}
+	void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
+	{
+		DistrubuteKeyboardInput(static_cast<HyKeyboardBtn>(iKey));
 
+		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+			m_pInputMaps[i].ApplyInput(iKey, static_cast<HyBtnPressState>(iAction));
+	}
 #elif defined(HY_USE_SDL2)
+	void HyInput::DoKeyDownEvent(const SDL_Event &eventRef)
+	{
+		DistrubuteKeyboardInput(static_cast<HyKeyboardBtn>(eventRef.key.keysym.sym));
 
-void HyInput::DoKeyDownEvent(const SDL_Event &eventRef)
-{
-	if(IsTextInputActive())
-		UpdateTextInput(static_cast<HyKeyboardBtn>(eventRef.key.keysym.sym));
+		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+			m_pInputMaps[i].ApplyInput(eventRef.key.keysym.sym, HYBTN_Press);
+	}
 
-	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
-		m_pInputMaps[i].ApplyInput(eventRef.key.keysym.sym, HYBTN_Press);
-}
+	void HyInput::DoKeyUpEvent(const SDL_Event &eventRef)
+	{
+		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+			m_pInputMaps[i].ApplyInput(eventRef.key.keysym.sym, HYBTN_Release);
+	}
 
-void HyInput::DoKeyUpEvent(const SDL_Event &eventRef)
-{
-	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
-		m_pInputMaps[i].ApplyInput(eventRef.key.keysym.sym, HYBTN_Release);
-}
+	void HyInput::DoTextInputEvent(const SDL_Event &eventRef)
+	{
+		size_t uiTextLen = SDL_strlen(eventRef.text.text);
+		if(uiTextLen == 0)// || eventRef.text.text[0] == '\n')// || markedRect.w < 0)
+			return;
 
-void HyInput::DoTextInputEvent(const SDL_Event &eventRef)
-{
-	size_t uiTextLen = SDL_strlen(eventRef.text.text);
-	if(uiTextLen == 0 || eventRef.text.text[0] == '\n')// || markedRect.w < 0)
-		return;
+		DistrubuteTextInput(std::string(eventRef.text.text, uiTextLen));
 
-	m_sTextInput.append(eventRef.text.text, uiTextLen);
+		// After text inputed, we can clear up markedText because it is committed
+		m_sTextComposition.clear();
+	}
 
-	// After text inputed, we can clear up markedText because it is committed
-	m_sTextComposition.clear();
-}
+	void HyInput::DoTextEditEvent(const SDL_Event &eventRef)
+	{
+		m_sTextComposition = eventRef.edit.text;
+		m_iTextCursorIndex = eventRef.edit.start;
+		m_iTextSelectLength = eventRef.edit.length;
 
-void HyInput::DoTextEditEvent(const SDL_Event &eventRef)
-{
-	m_sTextComposition = eventRef.edit.text;
-	m_iTextCursorIndex = eventRef.edit.start;
+		// When does this return something interesting?
+		HyLog("HyInput::DoTextEditEvent:" << m_sTextComposition << "[" << m_iTextCursorIndex << ", " << m_iTextSelectLength << "]");
+	}
 
-	HyLog("HyInput::DoTextEditEvent: " << m_sTextComposition << " [" << m_iTextCursorIndex << "]");
-}
+	void HyInput::DoMouseMoveEvent(const SDL_Event &eventRef)
+	{
+		m_ptMousePos.x = static_cast<float>(eventRef.motion.x);
+		m_ptMousePos.y = static_cast<float>(eventRef.motion.y);
 
-void HyInput::DoMouseMoveEvent(const SDL_Event &eventRef)
-{
-	m_ptMousePos.x = static_cast<float>(eventRef.motion.x);
-	m_ptMousePos.y = static_cast<float>(eventRef.motion.y);
+		//if(m_bTouchScreenHack)
+		//	DoMouseBtnEvent(
+		//	glfw_MouseButtonCallback(pWindow, HYMOUSE_BtnLeft, GLFW_PRESS, 0);
+	}
 
-	//if(m_bTouchScreenHack)
-	//	DoMouseBtnEvent(
-	//	glfw_MouseButtonCallback(pWindow, HYMOUSE_BtnLeft, GLFW_PRESS, 0);
-}
+	void HyInput::DoMouseDownEvent(const SDL_Event &eventRef)
+	{
+		m_uiMouseBtnFlags |= (1 << eventRef.button.button);
+		m_uiMouseBtnFlags_NewlyPressed |= (1 << eventRef.button.button);
+	}
 
-void HyInput::DoMouseDownEvent(const SDL_Event &eventRef)
-{
-	m_uiMouseBtnFlags |= (1 << eventRef.button.button);
-	m_uiMouseBtnFlags_NewlyPressed |= (1 << eventRef.button.button);
-}
+	void HyInput::DoMouseUpEvent(const SDL_Event &eventRef)
+	{
+		m_uiMouseBtnFlags &= ~(1 << eventRef.button.button);
+	}
 
-void HyInput::DoMouseUpEvent(const SDL_Event &eventRef)
-{
-	m_uiMouseBtnFlags &= ~(1 << eventRef.button.button);
-}
+	void HyInput::DoMouseWheelEvent(const SDL_Event &eventRef)
+	{
+		m_vMouseScroll_LiveCount.x += eventRef.wheel.x;
+		m_vMouseScroll_LiveCount.y += eventRef.wheel.y;
+	}
 
-void HyInput::DoMouseWheelEvent(const SDL_Event &eventRef)
-{
-	m_vMouseScroll_LiveCount.x += eventRef.wheel.x;
-	m_vMouseScroll_LiveCount.y += eventRef.wheel.y;
-}
-
-void HyInput::SetMouseWindow(HyWindow *pWindow)
-{
-	m_pMouseWindow = pWindow;
-}
+	void HyInput::SetMouseWindow(HyWindow *pWindow)
+	{
+		m_pMouseWindow = pWindow;
+	}
 #endif
 
-void HyInput::UpdateTextInput(HyKeyboardBtn eBtn)
+void HyInput::DistrubuteTextInput(std::string sNewText)
 {
-	switch(eBtn)
-	{
-	case HYKEY_Enter:
-		break;
+	HyContainer::DistrubuteTextInput(sNewText);
+}
 
-	case HYKEY_BackSpace:
-		do
-		{
-			if(m_sTextInput.empty())
-				break;
-
-			if((m_sTextInput.back() & 0x80) == 0x00) // One byte
-			{
-				m_sTextInput.pop_back();
-				break;
-			}
-
-			if((m_sTextInput.back() & 0xC0) == 0x80) // Byte from the multi-byte sequence
-				m_sTextInput.pop_back();
-			if((m_sTextInput.back() & 0xC0) == 0xC0) // First byte of multi-byte sequence (now UTF-8 character fully deleted)
-			{
-				m_sTextInput.pop_back();
-				break;
-			}
-
-		} while(true);
-		break;
-	}
+void HyInput::DistrubuteKeyboardInput(HyKeyboardBtn eBtn)
+{
+	HyContainer::DistrubuteKeyboardInput(eBtn);
 }
 
 void HyInput::Update()

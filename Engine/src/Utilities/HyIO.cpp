@@ -16,6 +16,79 @@
 #include <fstream>
 #include <iomanip>
 
+/*static*/ size_t HyIO::Utf8Length(const std::string &sStrRef)
+{
+	const char *szStr = sStrRef.c_str();
+	size_t uiCount = 0;
+	while(*szStr != '\0')
+	{
+		if((*szStr & 0xC0) != 0x80)
+			++uiCount;
+		++szStr;
+	}
+
+	return uiCount;
+}
+
+/*static*/ void HyIO::Utf8Erase(std::string &sStrRef, size_t uiOffset, size_t uiCount)
+{
+	const char *szStr = sStrRef.c_str();
+	size_t uiUtf8Count = 0;
+	size_t uiNumByteOffset = 0;
+	while(*szStr != '\0')
+	{
+		if((*szStr & 0xC0) != 0x80)
+		{
+			if(uiUtf8Count == uiOffset)
+				break;
+		
+			++uiUtf8Count;
+		}
+		++uiNumByteOffset;
+		++szStr;
+	}
+
+	szStr = &sStrRef.at(uiNumByteOffset);
+	uiUtf8Count = 0;
+	size_t uiNumByteCount = 0;
+	while(*szStr != '\0')
+	{
+		if((*szStr & 0xC0) != 0x80)
+		{
+			if(uiUtf8Count == uiOffset)
+				break;
+
+			++uiUtf8Count;
+		}
+		++uiNumByteCount;
+		++szStr;
+	}
+
+	sStrRef = sStrRef.erase(uiNumByteOffset, uiNumByteCount);
+}
+
+/*static*/ void HyIO::Utf8Insert(std::string &sStrRef, size_t uiOffset, const std::string &sUtf8Str)
+{
+	const char *szStr = sStrRef.c_str();
+	size_t uiUtf8Count = 0;
+	size_t uiNumByteOffset = 0;
+	while(*szStr != '\0')
+	{
+		if((*szStr & 0xC0) != 0x80)
+		{
+			if(uiUtf8Count == uiOffset)
+				break;
+
+			++uiUtf8Count;
+		}
+		++uiNumByteOffset;
+		++szStr;
+	}
+
+	// TODO: Fix
+	sStrRef = sStrRef.insert(uiOffset, sUtf8Str);
+}
+
 /*static*/ std::string HyIO::CleanPath(const char *szPath, const char *szExtension, bool bMakeLowercase)
 {
 	std::string sPath(szPath ? szPath : "");

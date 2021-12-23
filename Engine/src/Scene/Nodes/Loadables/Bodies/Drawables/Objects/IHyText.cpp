@@ -185,7 +185,9 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 
 	uint32 uiNumLayers = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
-	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset() was passed invalid 'uiCharIndex'");
+	if(uiGlyphOffsetIndex < m_uiNumReservedGlyphs) // "IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset() was passed invalid 'uiCharIndex'");
+		return glm::vec2(0);
+
 	return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
 }
 
