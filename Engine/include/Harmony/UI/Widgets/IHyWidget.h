@@ -15,7 +15,7 @@
 
 class IHyWidget : public IHyEntityUi
 {
-	friend class HyContainer;
+	friend class HyUiContainer;
 
 protected:
 	enum WidgetAttributes

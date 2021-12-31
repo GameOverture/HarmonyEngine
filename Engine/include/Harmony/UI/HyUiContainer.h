@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyContainer.h
+*	HyUiContainer.h
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -7,22 +7,22 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyContainer_h__
-#define HyContainer_h__
+#ifndef HyUiContainer_h__
+#define HyUiContainer_h__
 
 #include "Afx/HyStdAfx.h"
 #include "UI/IHyEntityUi.h"
-#include "UI/HyPanel.h"
-#include "UI/Containers/Components/HyLayout.h"
+#include "UI/Components/HyPanel.h"
+#include "UI/Components/HyLayout.h"
 #include "UI/Widgets/IHyWidget.h"
 
-class HyContainer : public HyEntity2d
+class HyUiContainer : public HyEntity2d
 {
 	friend class HyLayout;
 	friend class HyInput;
 
-	static HyContainer *					sm_pCurModalContainer;	// If any container is considered 'modal' then only that container may accept input
-	static std::vector<HyContainer *>		sm_pContainerList;
+	static HyUiContainer *					sm_pCurModalContainer;	// If any container is considered 'modal' then only that container may accept input
+	static std::vector<HyUiContainer *>		sm_pContainerList;
 
 	bool									m_bInputAllowed;
 
@@ -43,8 +43,8 @@ protected:
 	float									m_fElapsedTime;
 
 public:
-	HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
-	virtual ~HyContainer();
+	HyUiContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
+	virtual ~HyUiContainer();
 
 	static bool IsModalActive();
 
@@ -90,4 +90,4 @@ private:
 	static void DistrubuteKeyboardInput(HyKeyboardBtn eBtn);
 };
 
-#endif /* HyContainer_h__ */
+#endif /* HyUiContainer_h__ */

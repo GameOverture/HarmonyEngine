@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/IHyWidget.h"
-#include "UI/Containers/Components/HyLayout.h"
+#include "UI/Components/HyLayout.h"
 #include "HyEngine.h"
 
 IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :

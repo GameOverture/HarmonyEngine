@@ -8,8 +8,8 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/Containers/Components/HyLayout.h"
-#include "UI/Containers/HyContainer.h"
+#include "UI/Components/HyLayout.h"
+#include "UI/HyUiContainer.h"
 #include "UI/Widgets/IHyWidget.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
@@ -141,7 +141,7 @@ bool HyLayout::RequestWidgetFocus(IHyWidget *pWidget)
 		if((m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
 			return static_cast<HyLayout *>(m_pParent)->RequestWidgetFocus(pWidget);
 		else // m_pParent must be the container (and *this is the root layout)
-			return static_cast<HyContainer *>(m_pParent)->RequestWidgetFocus(pWidget);
+			return static_cast<HyUiContainer *>(m_pParent)->RequestWidgetFocus(pWidget);
 	}
 }
 
@@ -153,7 +153,7 @@ bool HyLayout::IsWidgetInputAllowed()
 		if((m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
 			return static_cast<HyLayout *>(m_pParent)->IsWidgetInputAllowed();
 		else // m_pParent must be the container (and *this is the root layout)
-			return static_cast<HyContainer *>(m_pParent)->IsInputAllowed();
+			return static_cast<HyUiContainer *>(m_pParent)->IsInputAllowed();
 	}
 
 	// This shouldn't happen

@@ -8,11 +8,11 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/Containers/HyScrollContainer.h"
+#include "UI/HyScrollContainer.h"
 #include "HyEngine.h"
 
 HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, uint32 uiScrollBarDiameter, bool bUseVert, bool bUseHorz, HyEntity2d *pParent /*= nullptr*/) :
-	HyContainer(eRootLayout, initRef, pParent),
+	HyUiContainer(eRootLayout, initRef, pParent),
 	m_bUseVertBar(bUseVert),
 	m_bUseHorzBar(bUseHorz),
 	m_VertBar(HYORIEN_Vertical, uiScrollBarDiameter, this),
@@ -32,7 +32,7 @@ HyScrollContainer::HyScrollContainer(HyLayoutType eRootLayout, const HyPanelInit
 
 /*virtual*/ void HyScrollContainer::SetSize(int32 iNewWidth, int32 iNewHeight) /*override*/
 {
-	HyContainer::SetSize(iNewWidth, iNewHeight);
+	HyUiContainer::SetSize(iNewWidth, iNewHeight);
 }
 
 void HyScrollContainer::EnableScrollBars(bool bUseVert, bool bUseHorz)

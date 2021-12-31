@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/Containers/Components/HyScrollBar.h"
+#include "UI/Components/HyScrollBar.h"
 #include "HyEngine.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

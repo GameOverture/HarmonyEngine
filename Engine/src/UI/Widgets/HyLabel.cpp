@@ -14,21 +14,24 @@
 
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
-	m_Panel(this)
+	m_Panel(this),
+	m_Text(this)
 {
 	Setup(HyPanelInit(), "", "");
 }
 
 HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
-	m_Panel(this)
+	m_Panel(this),
+	m_Text(sTextPrefix, sTextName, this)
 {
 	Setup(initRef, sTextPrefix, sTextName, 0, 0, 0, 0);
 }
 
 HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
-	m_Panel(this)
+	m_Panel(this),
+	m_Text(sTextPrefix, sTextName, this)
 {
 	Setup(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
@@ -46,7 +49,7 @@ void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::st
 {
 	m_Panel.Setup(initRef);
 
-	m_Text.Init(sTextPrefix, sTextName, this);
+	m_Text.InitLeaf(sTextPrefix, sTextName);
 	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
 					  static_cast<float>(iTextMarginBottom),
 					  static_cast<float>(iTextMarginRight),
@@ -155,13 +158,13 @@ void HyLabel::SetText(const std::stringstream &ssUtf8Text)
 
 /*virtual*/ void HyLabel::SetTextState(uint32 uiStateIndex)
 {
-	m_Text.SetState(uiStateIndex);
+	m_Text.GetLeaf().SetState(uiStateIndex);
 	ResetTextAndPanel();
 }
 
 /*virtual*/ void HyLabel::SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
 {
-	m_Text.SetLayerColor(uiLayerIndex, fR, fG, fB);
+	m_Text.SetTextLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
 bool HyLabel::IsPrimitivePanel() const
@@ -176,7 +179,7 @@ HySprite2d &HyLabel::GetSpriteNode()
 
 HyText2d &HyLabel::GetTextNode()
 {
-	return m_Text;
+	return m_Text.GetLeaf();
 }
 
 /*virtual*/ glm::vec2 HyLabel::GetPosOffset() /*override*/
@@ -233,7 +236,7 @@ HyText2d &HyLabel::GetTextNode()
 
 			float fScaleX = uiNewWidth / vTextSize.x;
 			float fScaleY = uiNewHeight / vTextSize.y;
-			m_Text.scale.Set(HyMin(fScaleX, fScaleY));
+			m_Text.GetLeaf().scale.Set(HyMin(fScaleX, fScaleY));
 
 			uiNewWidth = m_Text.GetTextWidth(true);
 			uiNewHeight = m_Text.GetTextHeight(true);
@@ -269,7 +272,7 @@ HyText2d &HyLabel::GetTextNode()
 
 		float fScaleX = static_cast<float>(vNewTextSize.x) / static_cast<float>(vTextSizeHint.x);
 		float fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);
-		m_Text.scale.Set(HyMin(fScaleX, fScaleY));
+		m_Text.GetLeaf().scale.Set(HyMin(fScaleX, fScaleY));
 	}
 
 	ResetTextAndPanel();

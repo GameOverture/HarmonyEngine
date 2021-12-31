@@ -11,10 +11,10 @@
 #define HyScrollContainer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/Containers/HyContainer.h"
-#include "UI/Containers/Components/HyScrollBar.h"
+#include "UI/HyUiContainer.h"
+#include "UI/Components/HyScrollBar.h"
 
-class HyScrollContainer : public HyContainer
+class HyScrollContainer : public HyUiContainer
 {
 protected:
 	bool					m_bUseVertBar;

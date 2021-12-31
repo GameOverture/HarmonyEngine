@@ -13,7 +13,7 @@
 #include "Input/HyInput.h"
 #include "Input/HyInputMap.h"
 #include "Window/HyWindow.h"
-#include "UI/Containers/HyContainer.h"
+#include "UI/HyUiContainer.h"
 
 #include <codecvt>
 
@@ -414,12 +414,12 @@ void HyInput::EnableTouchScreenHack(bool bEnable)
 
 void HyInput::DistrubuteTextInput(std::string sNewText)
 {
-	HyContainer::DistrubuteTextInput(sNewText);
+	HyUiContainer::DistrubuteTextInput(sNewText);
 }
 
 void HyInput::DistrubuteKeyboardInput(HyKeyboardBtn eBtn)
 {
-	HyContainer::DistrubuteKeyboardInput(eBtn);
+	HyUiContainer::DistrubuteKeyboardInput(eBtn);
 }
 
 void HyInput::Update()

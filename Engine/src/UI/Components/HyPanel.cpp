@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/HyPanel.h"
+#include "UI/Components/HyPanel.h"
 
 HyPanelInit::HyPanelInit() :
 	m_uiWidth(0),

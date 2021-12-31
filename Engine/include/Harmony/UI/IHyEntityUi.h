@@ -18,7 +18,7 @@ class HyLayout;
 
 class IHyEntityUi : public HyEntity2d
 {
-	friend class HyContainer;
+	friend class HyUiContainer;
 	friend class HyScrollContainer;
 	friend class HyLayout;
 

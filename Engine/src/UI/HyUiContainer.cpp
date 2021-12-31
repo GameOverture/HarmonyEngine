@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyContainer.cpp
+*	HyUiContainer.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -8,14 +8,14 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/Containers/HyContainer.h"
+#include "UI/HyUiContainer.h"
 #include "HyEngine.h"
 
-HyContainer *HyContainer::sm_pCurModalContainer = nullptr;
-std::vector<HyContainer *> HyContainer::sm_pContainerList;
-HyLayoutHandle HyContainer::sm_hHandleCounter = 1;
+HyUiContainer *HyUiContainer::sm_pCurModalContainer = nullptr;
+std::vector<HyUiContainer *> HyUiContainer::sm_pContainerList;
+HyLayoutHandle HyUiContainer::sm_hHandleCounter = 1;
 
-HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+HyUiContainer::HyUiContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
 	m_bInputAllowed(true),
 	m_Panel(initRef, this),
@@ -29,7 +29,7 @@ HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, H
 	sm_pContainerList.push_back(this);
 }
 
-/*virtual*/ HyContainer::~HyContainer()
+/*virtual*/ HyUiContainer::~HyUiContainer()
 {
 	ClearItems();
 
@@ -43,23 +43,23 @@ HyContainer::HyContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, H
 	}
 }
 
-/*static*/ bool HyContainer::IsModalActive()
+/*static*/ bool HyUiContainer::IsModalActive()
 {
 	return sm_pCurModalContainer != nullptr;
 }
 
-glm::ivec2 HyContainer::GetSize()
+glm::ivec2 HyUiContainer::GetSize()
 {
 	return m_Panel.GetSize();
 }
 
-/*virtual*/ void HyContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
+/*virtual*/ void HyUiContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
 	m_Panel.SetSize(iNewWidth, iNewHeight);
 	m_RootLayout.SetLayoutDirty();
 }
 
-bool HyContainer::Show(bool bInstant /*= false*/)
+bool HyUiContainer::Show(bool bInstant /*= false*/)
 {
 	if(IsShown() || IsTransition())
 		return false;
@@ -80,7 +80,7 @@ bool HyContainer::Show(bool bInstant /*= false*/)
 	return true;
 }
 
-bool HyContainer::Hide(bool bInstant /*= false*/)
+bool HyUiContainer::Hide(bool bInstant /*= false*/)
 {
 	if(IsShown() == false || IsTransition())
 		return false;
@@ -101,17 +101,17 @@ bool HyContainer::Hide(bool bInstant /*= false*/)
 	return true;
 }
 
-bool HyContainer::IsTransition()
+bool HyUiContainer::IsTransition()
 {
 	return m_eContainerState == CONTAINERSTATE_Showing || m_eContainerState == CONTAINERSTATE_Hiding;
 }
 
-bool HyContainer::IsShown()
+bool HyUiContainer::IsShown()
 {
 	return m_eContainerState == CONTAINERSTATE_Shown || m_eContainerState == CONTAINERSTATE_Showing;
 }
 
-void HyContainer::SetAsModal()
+void HyUiContainer::SetAsModal()
 {
 	if(sm_pCurModalContainer == this)
 		return;
@@ -128,7 +128,7 @@ void HyContainer::SetAsModal()
 	sm_pCurModalContainer = this;
 }
 
-/*static*/ void HyContainer::RelinquishModal()
+/*static*/ void HyUiContainer::RelinquishModal()
 {
 	for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
 	{
@@ -142,12 +142,12 @@ void HyContainer::SetAsModal()
 	sm_pCurModalContainer = nullptr;
 }
 
-bool HyContainer::IsInputAllowed() const
+bool HyUiContainer::IsInputAllowed() const
 {
 	return m_bInputAllowed && (sm_pCurModalContainer == nullptr || sm_pCurModalContainer == this);
 }
 
-void HyContainer::SetInputAllowed(bool bEnable)
+void HyUiContainer::SetInputAllowed(bool bEnable)
 {
 	if(m_bInputAllowed == bEnable)
 		return;
@@ -163,7 +163,7 @@ void HyContainer::SetInputAllowed(bool bEnable)
 	}
 }
 
-IHyWidget *HyContainer::GetFocusedWidget()
+IHyWidget *HyUiContainer::GetFocusedWidget()
 {
 	auto widgetList = AssembleWidgetList();
 	for(uint32 i = 0; i < static_cast<uint32>(widgetList.size()); ++i)
@@ -175,7 +175,7 @@ IHyWidget *HyContainer::GetFocusedWidget()
 	return nullptr;
 }
 
-IHyWidget *HyContainer::FocusNextWidget()
+IHyWidget *HyUiContainer::FocusNextWidget()
 {
 	auto widgetList = AssembleWidgetList();
 	IHyWidget *pOldFocusedWidget = nullptr;
@@ -217,7 +217,7 @@ IHyWidget *HyContainer::FocusNextWidget()
 	return pNewFocusedWidget;
 }
 
-bool HyContainer::AppendWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
+bool HyUiContainer::AppendWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	if(hInsertInto == HY_UNUSED_HANDLE)
 	{
@@ -233,7 +233,7 @@ bool HyContainer::AppendWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto 
 	return false;
 }
 
-HyLayoutHandle HyContainer::InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
+HyLayoutHandle HyUiContainer::InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	HyLayoutHandle hNewLayoutHandle = HY_UNUSED_HANDLE;
 
@@ -255,7 +255,7 @@ HyLayoutHandle HyContainer::InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHa
 	return hNewLayoutHandle;
 }
 
-void HyContainer::ClearItems()
+void HyUiContainer::ClearItems()
 {
 	IHyWidget *pFocusedWidget = GetFocusedWidget();
 	if(pFocusedWidget)
@@ -268,7 +268,7 @@ void HyContainer::ClearItems()
 	m_SubLayoutMap.clear();
 }
 
-bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+bool HyUiContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{
@@ -284,7 +284,7 @@ bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTo
 	return false;
 }
 
-/*virtual*/ void HyContainer::OnUpdate() /*override final*/
+/*virtual*/ void HyUiContainer::OnUpdate() /*override final*/
 {
 	if(m_RootLayout.IsLayoutDirty())
 		OnRootLayoutUpdate();
@@ -316,7 +316,7 @@ bool HyContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTo
 	OnContainerUpdate();
 }
 
-std::vector<IHyWidget *> HyContainer::AssembleWidgetList()
+std::vector<IHyWidget *> HyUiContainer::AssembleWidgetList()
 {
 	std::vector<IHyWidget *> widgetList;
 
@@ -335,7 +335,7 @@ std::vector<IHyWidget *> HyContainer::AssembleWidgetList()
 	return widgetList;
 }
 
-bool HyContainer::RequestWidgetFocus(IHyWidget *pWidget)
+bool HyUiContainer::RequestWidgetFocus(IHyWidget *pWidget)
 {
 	IHyWidget *pFocusedWidget = GetFocusedWidget();
 	if(pWidget == nullptr || IsInputAllowed() == false || pFocusedWidget == pWidget)
@@ -348,7 +348,7 @@ bool HyContainer::RequestWidgetFocus(IHyWidget *pWidget)
 	return true;
 }
 
-/*static*/ void HyContainer::DistrubuteTextInput(std::string sText)
+/*static*/ void HyUiContainer::DistrubuteTextInput(std::string sText)
 {
 	for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
 	{
@@ -358,7 +358,7 @@ bool HyContainer::RequestWidgetFocus(IHyWidget *pWidget)
 	}
 }
 
-/*static*/ void HyContainer::DistrubuteKeyboardInput(HyKeyboardBtn eBtn)
+/*static*/ void HyUiContainer::DistrubuteKeyboardInput(HyKeyboardBtn eBtn)
 {
 	// Check for 'TAB' and 'SHIFT+TAB' to cycle keyboard focus to valid widgets
 	switch(eBtn)

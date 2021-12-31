@@ -23,7 +23,8 @@ protected:
 
 public:
 	HyEntityLeaf2d(HyEntity2d *pParent = nullptr) :
-		HyEntity2d(pParent)
+		HyEntity2d(pParent),
+		m_Leaf("", "", this)
 	{
 	}
 
@@ -52,6 +53,16 @@ public:
 	LEAF &GetLeaf()
 	{
 		return m_Leaf;
+	}
+
+	const LEAF &GetLeaf() const
+	{
+		return m_Leaf;
+	}
+
+	virtual bool IsLoadDataValid()
+	{
+		return m_Leaf.IsLoadDataValid();
 	}
 
 	virtual bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childInst) override
@@ -88,6 +99,11 @@ public:
 	{
 		HyAssert(uiIndex < static_cast<uint32>(m_ChildList.size() - 1), "HyEntityLeaf2d::ChildGet passed an invalid index");
 		return m_ChildList[uiIndex + 1];
+	}
+
+	LEAF &operator->()
+	{
+		return m_Leaf;
 	}
 };
 

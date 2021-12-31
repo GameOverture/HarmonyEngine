@@ -16,7 +16,7 @@
 HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_Primitive, "", "", pParent)
 {
-	ClearData();
+	SetAsNothing();
 }
 
 HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
@@ -25,22 +25,22 @@ HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
 	m_fLineThickness(copyRef.m_fLineThickness)
 {
 	// TODO: Check to see if this works
-	SetData();
+	AssembleData();
 }
 
 HyPrimitive2d::~HyPrimitive2d(void)
 {
-	ClearData();
+	ClearVertexData();
 }
 
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 {
-	ClearData();
+	ClearVertexData();
 	IHyDrawable2d::operator=(rhs);
 
 	m_bWireframe = rhs.m_bWireframe;
 	m_fLineThickness = rhs.m_fLineThickness;
-	SetData();
+	AssembleData();
 
 	return *this;
 }
@@ -48,91 +48,91 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 void HyPrimitive2d::SetAsNothing()
 {
 	m_LocalBoundingVolume.SetAsNothing();
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
 {
 	m_LocalBoundingVolume.SetAsLineSegment(pt1, pt2);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
 {
 	m_LocalBoundingVolume.SetAsLineSegment(pt1, pt2);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 {
 	m_LocalBoundingVolume.SetAsLineLoop(pVertices, uiNumVerts);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 {
 	m_LocalBoundingVolume.SetAsLineChain(pVertices, uiNumVerts);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsCircle(float fRadius)
 {
 	m_LocalBoundingVolume.SetAsCircle(fRadius);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
 {
 	m_LocalBoundingVolume.SetAsCircle(ptCenter, fRadius);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsCircle(const b2Vec2 &ptCenter, float fRadius)
 {
 	m_LocalBoundingVolume.SetAsCircle(ptCenter, fRadius);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsPolygon(const glm::vec2 *pVertices, uint32 uiNumVerts)
 {
 	m_LocalBoundingVolume.SetAsPolygon(pVertices, uiNumVerts);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsPolygon(const b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
 	m_LocalBoundingVolume.SetAsPolygon(pVertexList, uiNumVertices);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsBox(int32 iWidth, int32 iHeight)
 {
 	m_LocalBoundingVolume.SetAsBox(iWidth, iHeight);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsBox(uint32 uiWidth, uint32 uiHeight)
 {
 	m_LocalBoundingVolume.SetAsBox(static_cast<int32>(uiWidth), static_cast<int32>(uiHeight));
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsBox(float fWidth, float fHeight)
 {
 	m_LocalBoundingVolume.SetAsBox(fWidth, fHeight);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
 {
 	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, ptBoxCenter, fRotDeg);
-	SetData();
+	AssembleData();
 }
 
 void HyPrimitive2d::SetAsShape(const HyShape2d &shapeRef)
 {
 	m_LocalBoundingVolume = shapeRef;
-	SetData();
+	AssembleData();
 }
 
 uint32 HyPrimitive2d::GetNumVerts() const
@@ -151,7 +151,7 @@ void HyPrimitive2d::SetWireframe(bool bIsWireframe)
 		return;
 
 	m_bWireframe = bIsWireframe;
-	SetData();
+	AssembleData();
 }
 
 float HyPrimitive2d::GetLineThickness()
@@ -165,7 +165,7 @@ void HyPrimitive2d::SetLineThickness(float fThickness)
 		return;
 
 	m_fLineThickness = fThickness;
-	SetData();
+	AssembleData();
 }
 
 uint32 HyPrimitive2d::GetNumCircleSegments()
@@ -176,7 +176,7 @@ uint32 HyPrimitive2d::GetNumCircleSegments()
 void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 {
 	m_uiNumSegments = uiNumSegments;
-	SetData();
+	AssembleData();
 }
 
 /*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
@@ -226,18 +226,17 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	IHyLoadable::Load();
 }
 
-void HyPrimitive2d::ClearData()
+void HyPrimitive2d::ClearVertexData()
 {
 	delete [] m_pVertBuffer;
 	m_pVertBuffer = nullptr;
 	m_uiNumVerts = 0;
 
 	m_eRenderMode = HYRENDERMODE_Unknown;
-//	m_LocalBoundingVolume.SetAsNothing();	
 	m_ShaderUniforms.Clear();
 }
 
-void HyPrimitive2d::SetData()
+void HyPrimitive2d::AssembleData()
 {
 	b2Shape *pb2Shape = m_LocalBoundingVolume.GetB2Shape();
 
@@ -282,16 +281,17 @@ void HyPrimitive2d::SetData()
 		break; }
 
 	default:
-		HyLogError("HyPrimitive2d::SetData() - Unknown shape type: " << m_LocalBoundingVolume.GetType());
+		HyLogError("HyPrimitive2d::AssembleData() - Unknown shape type: " << m_LocalBoundingVolume.GetType());
 	}
 
+	SetDirty(DIRTY_BoundingVolume);
 	Load();
 }
 
 void HyPrimitive2d::_SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
 	HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
-	ClearData();
+	ClearVertexData();
 
 	m_eRenderMode = HYRENDERMODE_Triangles;
 
@@ -342,7 +342,7 @@ void HyPrimitive2d::_SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 
 	return;
 
-	//ClearData();
+	//ClearVertexData();
 
 	//HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
 
@@ -393,7 +393,7 @@ void HyPrimitive2d::_SetAsCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSeg
 
 	if(m_bWireframe == false)
 	{
-		ClearData();
+		ClearVertexData();
 
 		m_eRenderMode = HYRENDERMODE_Triangles;
 		m_uiNumVerts = static_cast<uint32>(k_segments) * 3;
@@ -449,7 +449,7 @@ void HyPrimitive2d::_SetAsCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSeg
 
 void HyPrimitive2d::_SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
-	ClearData();
+	ClearVertexData();
 
 	m_eRenderMode = HYRENDERMODE_Triangles;
 	m_uiNumVerts = (uiNumVertices - 2) * 3;

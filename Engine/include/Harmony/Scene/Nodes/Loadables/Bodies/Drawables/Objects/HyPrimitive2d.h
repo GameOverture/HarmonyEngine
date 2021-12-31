@@ -94,8 +94,8 @@ protected:
 private:
 	virtual void Load() override;
 
-	void ClearData();
-	void SetData();
+	void ClearVertexData();
+	void AssembleData();
 
 	void _SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices);
 	void _SetAsCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSegments);

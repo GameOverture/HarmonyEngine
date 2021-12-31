@@ -144,7 +144,7 @@ void HyMeter::SetNumFormat(HyNumberFormat format)
 
 	m_Text.SetMonospacedDigits(true);
 
-	m_SpinText.pos.Set(m_Text.pos.X(), m_Text.pos.Y());
+	m_SpinText.pos.Set(m_Text.pos);
 	m_SpinText.m_SpinText_Shown.SetAsScaleBox(m_Text.GetTextBoxDimensions().x, m_Text.GetTextBoxDimensions().y);
 	m_SpinText.m_SpinText_Padded.SetAsScaleBox(m_Text.GetTextBoxDimensions().x, m_Text.GetTextBoxDimensions().y);
 
@@ -252,7 +252,7 @@ void HyMeter::FormatDigits()
 	}
 
 
-	m_SpinText.SetVisible(m_Text.IsVisible() && m_bSpinDigits);
+	m_SpinText.SetVisible(m_Text.GetLeaf().IsVisible() && m_bSpinDigits);
 }
 
 /*virtual*/ void HyMeter::OnUpdate() /*override*/
@@ -313,7 +313,7 @@ void HyMeter::FormatDigits()
 
 /*virtual*/ void HyMeter::OnSetup() /*override*/
 {
-	m_SpinText.Setup(m_Text.GetPrefix(), m_Text.GetName());
+	m_SpinText.Setup(m_Text.GetLeaf().GetPrefix(), m_Text.GetLeaf().GetName());
 	FormatDigits();
 }
 
