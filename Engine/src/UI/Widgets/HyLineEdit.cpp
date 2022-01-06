@@ -152,6 +152,9 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 		} while(true);
 		m_Text.SetText(sText);
 		break; }
+
+	default:
+		break;
 	}
 
 	m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);

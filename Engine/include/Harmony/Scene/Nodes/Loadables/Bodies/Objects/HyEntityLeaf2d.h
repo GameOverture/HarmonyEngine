@@ -60,7 +60,7 @@ public:
 		return m_Leaf;
 	}
 
-	virtual bool IsLoadDataValid()
+	virtual bool IsLoadDataValid() override
 	{
 		return m_Leaf.IsLoadDataValid();
 	}
