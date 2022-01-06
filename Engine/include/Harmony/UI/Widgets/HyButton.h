@@ -38,7 +38,7 @@ protected:
 
 		BTNATTRIB_FLAG_NEXT			= 1 << 14
 	};
-	static_assert(BTNATTRIB_HideDownState == LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
+	static_assert((int)BTNATTRIB_HideDownState == (int)LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
 
 	HyButtonClickedCallback		m_fpBtnClickedCallback;
 	void *						m_pBtnClickedParam;

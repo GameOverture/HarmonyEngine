@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/IHyWidget.h"
 #include "UI/Components/HyPanel.h"
-#include "UI/Components/HyTextUi.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 
 class HyLabel : public IHyWidget
 {
@@ -31,10 +31,10 @@ protected:
 		
 		LABELATTRIB_FLAG_NEXT				= 1 << 11
 	};
-	static_assert(LABELATTRIB_IsSideBySide == UIATTRIB_FLAG_NEXT, "HyLabel is not matching with base classes attrib flags");
+	static_assert((int)LABELATTRIB_IsSideBySide == (int)UIATTRIB_FLAG_NEXT, "HyLabel is not matching with base classes attrib flags");
 
 	HyPanel					m_Panel;
-	HyTextUi				m_Text;
+	HyText2d				m_Text;
 
 	HyRectangle<float>		m_TextMargins;					// Margins used for Stacked text scale box; The 'iTag' is used for Side-by-side padding between text/panel
 
