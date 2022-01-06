@@ -15,29 +15,32 @@
 
 HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
+	m_bUseValidator(false),
 	m_iCursorIndex(0),
 	m_iSelectionLength(0),
 	m_Selection(this),
-	m_PrimCursor(this)
+	m_Cursor(this)
 {
 }
 
 HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, sTextPrefix, sTextName, pParent),
+	m_bUseValidator(false),
 	m_iCursorIndex(0),
 	m_iSelectionLength(0),
 	m_Selection(this),
-	m_PrimCursor(this)
+	m_Cursor(this)
 {
 	OnSetup();
 }
 
 HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+	m_bUseValidator(false),
 	m_iCursorIndex(0),
 	m_iSelectionLength(0),
 	m_Selection(this),
-	m_PrimCursor(this)
+	m_Cursor(this)
 {
 	OnSetup();
 }
@@ -50,6 +53,17 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std:
 {
 	HyLabel::SetText(sUtf8Text);
 	SetCursor(sUtf8Text.length(), 0);
+}
+
+void HyLineEdit::SetInputValidator(const std::regex &regEx)
+{
+	m_bUseValidator = true;
+	m_InputValidator = regEx;
+}
+
+void HyLineEdit::ClearInputValidator()
+{
+	m_bUseValidator = false;
 }
 
 bool HyLineEdit::IsCursorShown() const
@@ -65,7 +79,7 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	if(m_Text.IsLoadDataValid() == false || IsCursorShown() == false)
 	{
 		m_Selection.SetAsNothing();
-		m_PrimCursor.SetAsNothing();
+		m_Cursor.SetAsNothing();
 		return;
 	}
 
@@ -79,23 +93,37 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	}
 	else
 		m_Selection.SetAsNothing();
-	m_PrimCursor.SetAsBox(2.0f, fCursorHeight);
+	m_Cursor.SetAsBox(2.0f, fCursorHeight);
 
 	m_Selection.SetDisplayOrder(m_Text.GetDisplayOrder() - 1);
-	m_PrimCursor.SetDisplayOrder(m_Text.GetDisplayOrder() + 1);
+	m_Cursor.SetDisplayOrder(m_Text.GetDisplayOrder() + 1);
 
-	//if(m_iCursorIndex == m_Text.GetNumShownCharacters())
-	//	m_PrimCursor.pos.Set(m_Text.GetTextCursorPos());
-	//else
-	//	m_PrimCursor.pos.Set(m_Text.GetGlyphOffset(m_iCursorIndex, 0));
-
-	// 
+	m_Cursor.pos.Set(m_Text.pos);
+	m_Cursor.pos.Offset(m_Text.GetTextCursorPos().x, 0.0f);
+	
 	m_Selection.alpha.Set(m_BlinkTimer.IsRunning() * 1.0f);
-	m_PrimCursor.alpha.Set(m_BlinkTimer.IsRunning() * 1.0f);
+	m_Cursor.alpha.Set(m_BlinkTimer.IsRunning() * 1.0f);
 }
 
 /*virtual*/ void HyLineEdit::OnUiTextInput(std::string sNewUtf8Text) /*override*/
 {
+	if(m_bUseValidator)
+	{
+		std::smatch base_match;
+		if(std::regex_match(sNewUtf8Text, base_match, m_InputValidator))
+		{
+			// The first sub_match is the whole string; the next
+			// sub_match is the first parenthesized expression.
+			if(base_match.size() == 2)
+			{
+				std::ssub_match base_sub_match = base_match[1];
+				sNewUtf8Text = base_sub_match.str();
+			}
+		}
+		else
+			return;
+	}
+
 	std::string sText = m_Text.GetUtf8String();
 
 	if(m_iCursorIndex == HyIO::Utf8Length(sText))
@@ -115,9 +143,6 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	m_Text.SetText(sText);
 
 	m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
-	//alpha.Set(1.0f);
-
-
 	SetText(m_Text.GetUtf8String()); // Ensure HyLabel is informed of m_Text changing
 }
 
@@ -158,8 +183,6 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	}
 
 	m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
-	//alpha.Set(1.0f);
-
 	SetText(m_Text.GetUtf8String()); // Ensure HyLabel is informed of m_Text changing
 }
 
@@ -171,15 +194,16 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 /*virtual*/ void HyLineEdit::OnTakeKeyboardFocus() /*override*/
 {
 	HyEngine::Input().StartTextInput();
+
 	m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
-	//alpha.Set(1.0f);
+	SetCursor(m_Text.GetUtf8String().length(), 0);
 }
 
 /*virtual*/ void HyLineEdit::OnRelinquishKeyboardFocus() /*override*/
 {
 	HyEngine::Input().StopTextInput();
 	m_BlinkTimer.Reset();
-	//alpha.Set(0.0f);
+	m_Cursor.alpha.Set(0.0f);
 }
 
 /*virtual*/ void HyLineEdit::OnSetup() /*override*/
@@ -194,14 +218,19 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	m_uiAttribs |= LABELATTRIB_StackedTextUseLine | LABELATTRIB_StackedTextLeftAlign;
 }
 
+void HyLineEdit::ToggleCursorVisible(bool bForceShown)
+{
+	if(bForceShown || m_Cursor.alpha.Get() == 0.0f)
+		m_Cursor.alpha.Set(1.0f);
+	else
+		m_Cursor.alpha.Set(0.0f);
+}
+
 /*static*/ void HyLineEdit::OnCursorTimer(void *pThisData)
 {
 	HyLineEdit *pThis = static_cast<HyLineEdit *>(pThisData);
 
-	//if(pThis->alpha.Get() == 0.0f)
-	//	pThis->alpha.Set(1.0f);
-	//else
-	//	pThis->alpha.Set(0.0f);
+	pThis->ToggleCursorVisible(false);
 
 	pThis->m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
 }

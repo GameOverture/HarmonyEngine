@@ -185,7 +185,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 
 	uint32 uiNumLayers = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
-	if(uiGlyphOffsetIndex < m_uiNumReservedGlyphs) // "IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset() was passed invalid 'uiCharIndex'");
+	if(uiGlyphOffsetIndex >= m_uiNumReservedGlyphs) // "IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset() was passed invalid 'uiCharIndex'");
 		return glm::vec2(0);
 
 	return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
@@ -394,7 +394,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 		const HyText2dGlyphInfo *pGlyph = pData->GetGlyph(this->m_uiState, 0, m_Utf32CodeList[m_uiNumValidCharacters - 1]);
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - 1, pData->GetNumLayers(this->m_uiState), 0);
 
-		glm::vec2 ptCursorPos = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pGlyph->fADVANCE_X, 0.0f);
+		glm::vec2 ptCursorPos = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pGlyph->fADVANCE_X * m_fScaleBoxModifier, 0.0f);
 		ptCursorPos.y += (pGlyph->uiHEIGHT - pGlyph->iOFFSET_Y) * m_fScaleBoxModifier; // Find the baseline of this last glyph
 		
 		ptCursorPos.x *= this->scale.X();

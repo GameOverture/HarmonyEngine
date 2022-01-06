@@ -14,13 +14,18 @@
 #include "UI/Widgets/HyLabel.h"
 #include "Time/Watches/HyTimer.h"
 
+#include <regex>
+
 class HyLineEdit : public HyLabel
 {
 protected:
+	bool								m_bUseValidator;
+	std::regex							m_InputValidator;
+
 	int32								m_iCursorIndex;			// Cursor index in full UTF-8 characters
 	int32								m_iSelectionLength;		// Selection length in full UTF-8 characters
 	HyPrimitive2d						m_Selection;			// Actual text selection highlight visual
-	HyPrimitive2d						m_PrimCursor;			// Shows a standard vertical line draw with a primitive
+	HyPrimitive2d						m_Cursor;				// Shows a standard vertical line draw with a primitive
 
 	HyTimer								m_BlinkTimer;
 
@@ -31,6 +36,9 @@ public:
 	virtual ~HyLineEdit();
 
 	virtual void SetText(const std::string &sUtf8Text) override;
+
+	void SetInputValidator(const std::regex &regEx);
+	void ClearInputValidator();
 
 	bool IsCursorShown() const;
 	void SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen);
@@ -45,6 +53,7 @@ protected:
 
 	virtual void OnSetup() override;
 
+	void ToggleCursorVisible(bool bForceShown);
 	static void OnCursorTimer(void *pThisData);
 };
 
