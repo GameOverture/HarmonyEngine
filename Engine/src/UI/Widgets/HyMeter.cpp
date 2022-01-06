@@ -159,6 +159,14 @@ void HyMeter::SetNumFormat(HyNumberFormat format)
 	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
+/*virtual*/ void HyMeter::SetTextLayerColor(uint32 uiLayerIndex, float fUpperR, float fUpperG, float fUpperB, float fLowerR, float fLowerG, float fLowerB) /*override*/
+{
+	HyLabel::SetTextLayerColor(uiLayerIndex, fUpperR, fUpperG, fUpperB, fLowerR, fLowerG, fLowerB);
+
+	m_SpinText.m_SpinText_Shown.SetLayerColor(uiLayerIndex, fUpperR, fUpperG, fUpperB, fLowerR, fLowerG, fLowerB);
+	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fUpperR, fUpperG, fUpperB, fLowerR, fLowerG, fLowerB);
+}
+
 void HyMeter::FormatDigits()
 {
 	float fThreshold = m_Text.GetTextBoxDimensions().y;

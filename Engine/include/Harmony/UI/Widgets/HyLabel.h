@@ -64,6 +64,7 @@ public:
 	virtual void SetText(const std::string &sUtf8Text);
 	virtual void SetTextState(uint32 uiStateIndex);
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
+	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fUpperR, float fUpperG, float fUpperB, float fLowerR, float fLowerG, float fLowerB);
 
 	bool IsPrimitivePanel() const;
 

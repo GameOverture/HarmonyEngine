@@ -92,6 +92,7 @@ public:
 	virtual void SetTextState(uint32 uiStateIndex) override;
 	virtual void ResetTextAndPanel() override;
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
+	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fUpperR, float fUpperG, float fUpperB, float fLowerR, float fLowerG, float fLowerB) override;
 
 protected:
 	using HyLabel::SetText;

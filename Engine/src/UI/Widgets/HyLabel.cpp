@@ -164,6 +164,11 @@ void HyLabel::SetText(const std::stringstream &ssUtf8Text)
 	m_Text.SetLayerColor(uiLayerIndex, fR, fG, fB);
 }
 
+/*virtual*/ void HyLabel::SetTextLayerColor(uint32 uiLayerIndex, float fUpperR, float fUpperG, float fUpperB, float fLowerR, float fLowerG, float fLowerB)
+{
+	m_Text.SetLayerColor(uiLayerIndex, fUpperR, fUpperG, fUpperB, fLowerR, fLowerG, fLowerB);
+}
+
 bool HyLabel::IsPrimitivePanel() const
 {
 	return m_Panel.IsPrimitive();
