@@ -134,9 +134,7 @@ void HyPanel::SetSpriteState(uint32 uiStateIndex)
 
 glm::ivec2 HyPanel::GetSizeHint()
 {
-	if(IsPrimitive())
-		return GetSize();
-	else if(IsSprite())
+	if(IsSprite())
 	{
 		return glm::ivec2(m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false),
 						  m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false));
@@ -148,35 +146,17 @@ glm::ivec2 HyPanel::GetSizeHint()
 uint32 HyPanel::GetWidth()
 {
 	if(IsSprite())
-		return m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), true);
+		return m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false) * scale.X();
 	else
-	{
-		glm::vec3 vScale;
-		glm::quat quatRot;
-		glm::vec3 ptTranslation;
-		glm::vec3 vSkew;
-		glm::vec4 vPerspective;
-		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-
-		return m_vSize.x * vScale.x;
-	}
+		return m_vSize.x * scale.X();
 }
 
 uint32 HyPanel::GetHeight()
 {
 	if(IsSprite())
-		return m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), true);
+		return m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false) * scale.Y();
 	else
-	{
-		glm::vec3 vScale;
-		glm::quat quatRot;
-		glm::vec3 ptTranslation;
-		glm::vec3 vSkew;
-		glm::vec4 vPerspective;
-		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-
-		return m_vSize.y * vScale.y;
-	}
+		return m_vSize.y * scale.Y();
 }
 
 glm::ivec2 HyPanel::GetSize()
