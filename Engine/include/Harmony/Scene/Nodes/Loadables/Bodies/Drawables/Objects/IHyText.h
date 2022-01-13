@@ -19,7 +19,7 @@
 
 #define HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex) static_cast<uint32>(uiCharIndex + (m_Utf32CodeList.size() * ((uiNumLayers - 1) - uiLayerIndex)))
 
-// Convienence function macro
+// Convenience function macro
 #define HySetText(textNode, msg) textNode.SetText((std::stringstream() << msg))
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -97,6 +97,8 @@ public:
 
 	float GetTextWidth(bool bIncludeScaling = true);
 	float GetTextHeight(bool bIncludeScaling = true);
+	
+	float GetLineHeight(bool bIncludeScaling = true);
 
 	uint32 GetNumCharacters() const;
 	uint32 GetNumShownCharacters() const;
@@ -125,7 +127,7 @@ public:
 	uint32 GetTextIndent() const;
 	void SetTextIndent(uint32 uiIndentPixels);
 
-	// The offset location past the last glyph. Essentially where the user input cursor in a command window would be
+	// The offset location past the last glyph. Essentially where the user input cursor in a command window would be, on the baseline
 	glm::vec2 GetTextCursorPos();
 
 	// The offset location from 'pos' to the bottom left of all the written glyphs. Affected by things like alignment and SetAs.
@@ -135,6 +137,8 @@ public:
 	void SetMonospacedDigits(bool bSet);
 
 	const glm::vec2 &GetTextBoxDimensions() const;
+
+	bool IsScaleBox() const;
 
 	void SetAsLine();
 	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);

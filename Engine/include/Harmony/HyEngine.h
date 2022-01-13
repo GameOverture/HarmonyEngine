@@ -36,7 +36,7 @@
 #include "UI/Widgets/HyButton.h"
 #include "UI/Widgets/HyCheckBox.h"
 #include "UI/Widgets/HyLineEdit.h"
-#include "UI/Widgets/HyMeter.h"
+#include "UI/Widgets/HyRackMeter.h"
 #include "UI/Widgets/HyProgressBar.h"
 #include "UI/Widgets/HyRichText.h"
 #include "UI/Widgets/HySpacer.h"

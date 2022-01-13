@@ -391,7 +391,7 @@ HyText2d &HyLabel::GetTextNode()
 
 				float fLineOffsetY = 0.0f;
 				float fVerticalSpace = vPanelDimensions.y - ((m_TextMargins.top + m_TextMargins.bottom) * (vPanelDimensions.y / vUiSizeHint.y));
-				float fTextHeight = m_Text.GetTextHeight(true);
+				float fTextHeight = m_Text.GetLineHeight(true);
 				if(fVerticalSpace > fTextHeight)
 					fLineOffsetY = (fVerticalSpace - fTextHeight) * 0.5f;
 				m_Text.pos.Offset(fLineOffsetX, fLineOffsetY);

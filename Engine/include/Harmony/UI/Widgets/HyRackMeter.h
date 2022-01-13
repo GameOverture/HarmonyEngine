@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyMeter.h
+*	HyRackMeter.h
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -7,34 +7,39 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyMeter_h__
-#define HyMeter_h__
+#ifndef HyRackMeter_h__
+#define HyRackMeter_h__
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyLabel.h"
 #include "UI/Localization/HyLocale.h"
 
-class HyMeter : public HyLabel
+class HyRackMeter : public HyLabel
 {
 protected:
+	enum RackMeterAttributes
+	{
+		RACKMETERATTRIB_IsSpinDigits = 1 << 11,
+		RACKMETERATTRIB_IsMoney = 1 << 12,
+
+		RACKMETERATTRIB_FLAG_NEXT = 1 << 13
+	};
+	static_assert((int)RACKMETERATTRIB_IsSpinDigits == (int)LABELATTRIB_FLAG_NEXT, "HyRackMeter is not matching with base classes attrib flags");
+
 
 	int64					m_iCurValue = 0;
 	int64					m_iPrevValue = 0;
 	int64					m_iTargetValue = 0;
-	int32					m_iDenomination = 1; // Used when not displaying as cash
 
 	float					m_fRackingDuration = 1.0f;
 	float					m_fElapsedTimeRack = 0.0f;
 
-	bool					m_bShowAsCash = false;
-	bool					m_bSpinDigits = false;
 	HyNumberFormat			m_NumberFormat;
 
+	// Spin digits member variables
 	double					m_dTotalDistance = 0.0f;
 	double					m_dPrevDistance = 0.0;
 	float					m_fThresholdDist = 0.0f;
-
-	uint32					m_uiScissorLayerIndex = 0;
 
 	class SpinText : public HyEntity2d
 	{
@@ -62,18 +67,16 @@ protected:
 	SpinText 				m_SpinText;
 
 public:
-	HyMeter(HyEntity2d *pParent = nullptr);
-	HyMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
-	HyMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
-	virtual ~HyMeter();
+	HyRackMeter(HyEntity2d *pParent = nullptr);
+	HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
+	HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
+	virtual ~HyRackMeter();
 
 	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_HCenter, bool bUseScaleBox = true) override;
 
 	int64 GetValue();
 	void SetValue(int64 iPennies, float fRackDuration);
 	void OffsetValue(int64 iPenniesOffsetAmt, float fRackDuration);
-
-	void SetDenomination(int32 iDenom);
 
 	void Slam();
 	bool IsRacking();
@@ -87,20 +90,19 @@ public:
 	HyNumberFormat GetNumFormat() const;
 	void SetNumFormat(HyNumberFormat format);
 
-	//void SetText(const std::stringstream &ssUtf8Text) = delete;	// Hiding SetText() since it doesn't make sense to use with HyMeters
-	//void SetText(const std::string &sUtf8Text) = delete;		// Hiding SetText() since it doesn't make sense to use with HyMeters
-	virtual void SetTextState(uint32 uiStateIndex) override;
-	virtual void ResetTextAndPanel() override;
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
 	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fUpperR, float fUpperG, float fUpperB, float fLowerR, float fLowerG, float fLowerB) override;
 
 protected:
-	using HyLabel::SetText;
-
-	void FormatDigits();
-
 	virtual void OnUpdate() override;
+
+	using HyLabel::SetText; // Hiding SetText() since it doesn't make sense to use with HyRackMeters
+
 	virtual void OnSetup() override;
+	virtual void ResetTextAndPanel() override;
+
+	float GetSpinHeightThreshold();
+	void FormatDigits();
 };
 
-#endif /* HyMeter_h__ */
+#endif /* HyRackMeter_h__ */

@@ -54,7 +54,7 @@ public:
 	float GetPanelHeight();
 	glm::vec2 GetPanelSize();
 
-	void  SetPanelVisible(bool bVisible);
+	void SetPanelVisible(bool bVisible);
 
 	uint32 GetSpriteState() const;
 	virtual void SetSpriteState(uint32 uiStateIndex);

@@ -142,6 +142,21 @@ float IHyText<NODETYPE, ENTTYPE>::GetTextHeight(bool bIncludeScaling /*= true*/)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+float IHyText<NODETYPE, ENTTYPE>::GetLineHeight(bool bIncludeScaling /*= true*/)
+{
+	if(this->AcquireData() == nullptr)
+	{
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetLineHeight invoked on null data");
+		return 0.0f;
+	}
+
+	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	float fLineHeight = pData->GetLineHeight(this->m_uiState);
+
+	return fLineHeight * (bIncludeScaling ? std::fabs(this->scale.Y()) : 1.0f);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 uint32 IHyText<NODETYPE, ENTTYPE>::GetNumCharacters() const
 {
 	return static_cast<uint32>(m_Utf32CodeList.size());
@@ -377,7 +392,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetTextIndent(uint32 uiIndentPixels)
 	}
 }
 
-// The offset location past the last glyph. Essentially where the user input cursor in a command window would be
+// The offset location past the last glyph. Essentially where the user input cursor in a command window would be, on the baseline
 template<typename NODETYPE, typename ENTTYPE>
 glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 {
@@ -462,6 +477,12 @@ template<typename NODETYPE, typename ENTTYPE>
 const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions() const
 {
 	return m_vBoxDimensions;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsScaleBox() const
+{
+	return m_uiTextAttributes & TEXTATTRIB_IsScaleBox;
 }
 
 template<typename NODETYPE, typename ENTTYPE>

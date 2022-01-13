@@ -88,7 +88,7 @@ class HyText2dData : public IHyNodeData
 {
 	typedef std::map<uint32, HyText2dGlyphInfo *> Typeface;
 
-	HyFileAtlas *						m_pAtlas;
+	HyFileAtlas *					m_pAtlas;
 
 	Typeface *						m_pTypefaces;
 	uint32							m_uiNumTypefaces;
@@ -107,9 +107,10 @@ class HyText2dData : public IHyNodeData
 			const glm::vec3			vDEFAULT_BOT_COLOR;
 			const Typeface &		TYPEFACE_REF;
 
-			Layer(float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB, Typeface &typefaceRef) :	vDEFAULT_TOP_COLOR(fTopR, fTopG, fTopB),
-																															vDEFAULT_BOT_COLOR(fBotR, fBotG, fBotB),
-																															TYPEFACE_REF(typefaceRef)
+			Layer(float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB, Typeface &typefaceRef) :
+				vDEFAULT_TOP_COLOR(fTopR, fTopG, fTopB),
+				vDEFAULT_BOT_COLOR(fBotR, fBotG, fBotB),
+				TYPEFACE_REF(typefaceRef)
 			{ }
 		};
 		Layer *						pLayers;
