@@ -103,13 +103,13 @@ class HyText2dData : public IHyNodeData
 
 		struct Layer
 		{
-			const glm::vec3			vDEFAULT_TOP_COLOR;
-			const glm::vec3			vDEFAULT_BOT_COLOR;
+			const HyColor			DEFAULT_TOP_COLOR;
+			const HyColor			DEFAULT_BOT_COLOR;
 			const Typeface &		TYPEFACE_REF;
 
 			Layer(float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB, Typeface &typefaceRef) :
-				vDEFAULT_TOP_COLOR(fTopR, fTopG, fTopB),
-				vDEFAULT_BOT_COLOR(fBotR, fBotG, fBotB),
+				DEFAULT_TOP_COLOR(fTopR, fTopG, fTopB),
+				DEFAULT_BOT_COLOR(fBotR, fBotG, fBotB),
 				TYPEFACE_REF(typefaceRef)
 			{ }
 		};
@@ -126,7 +126,7 @@ public:
 
 	uint32 GetNumLayers(uint32 uiStateIndex) const;
 	const HyText2dGlyphInfo *GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const;
-	const glm::vec3 &GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const;
+	HyColor GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const;
 	HyFileAtlas *GetAtlas() const;
 	float GetLineHeight(uint32 uiStateIndex) const;
 	float GetLineAscender(uint32 uiStateIndex) const;

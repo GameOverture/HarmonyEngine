@@ -90,8 +90,7 @@ public:
 	HyNumberFormat GetNumFormat() const;
 	void SetNumFormat(HyNumberFormat format);
 
-	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) override;
-	virtual void SetTextLayerColor(uint32 uiLayerIndex, float fUpperR, float fUpperG, float fUpperB, float fLowerR, float fLowerG, float fLowerB) override;
+	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor) override;
 
 protected:
 	virtual void OnUpdate() override;

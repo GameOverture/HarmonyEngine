@@ -129,14 +129,14 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 			vertexBufferRef.AppendData2d(&m_pGlyphInfos[uiGlyphOffsetIndex].vOffset, sizeof(glm::vec2));
 
-			glm::vec3 vTopColor = m_StateColors[m_uiState]->m_LayerColors[i]->topColor.Get();
+			glm::vec3 vTopColor = m_StateColors[m_uiState]->m_LayerColors[i]->topClr.GetAsVec3();
 			vTopColor *= CalculateTopTint();
 			vertexBufferRef.AppendData2d(&vTopColor, sizeof(glm::vec3));
 
 			float fAlpha = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
 			vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 
-			glm::vec3 vBotColor = m_StateColors[m_uiState]->m_LayerColors[i]->botColor.Get();
+			glm::vec3 vBotColor = m_StateColors[m_uiState]->m_LayerColors[i]->botClr.GetAsVec3();
 			vBotColor *= CalculateBotTint();
 			vertexBufferRef.AppendData2d(&vBotColor, sizeof(glm::vec3));
 

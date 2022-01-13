@@ -133,20 +133,12 @@ void HyRackMeter::SetNumFormat(HyNumberFormat format)
 	FormatDigits();
 }
 
-/*virtual*/ void HyRackMeter::SetTextLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB) /*override*/
+/*virtual*/ void HyRackMeter::SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor) /*override*/
 {
-	HyLabel::SetTextLayerColor(uiLayerIndex, fR, fG, fB);
+	HyLabel::SetTextLayerColor(uiStateIndex, uiLayerIndex, topColor, botColor);
 
-	m_SpinText.m_SpinText_Shown.SetLayerColor(uiLayerIndex, fR, fG, fB);
-	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fR, fG, fB);
-}
-
-/*virtual*/ void HyRackMeter::SetTextLayerColor(uint32 uiLayerIndex, float fUpperR, float fUpperG, float fUpperB, float fLowerR, float fLowerG, float fLowerB) /*override*/
-{
-	HyLabel::SetTextLayerColor(uiLayerIndex, fUpperR, fUpperG, fUpperB, fLowerR, fLowerG, fLowerB);
-
-	m_SpinText.m_SpinText_Shown.SetLayerColor(uiLayerIndex, fUpperR, fUpperG, fUpperB, fLowerR, fLowerG, fLowerB);
-	m_SpinText.m_SpinText_Padded.SetLayerColor(uiLayerIndex, fUpperR, fUpperG, fUpperB, fLowerR, fLowerG, fLowerB);
+	m_SpinText.m_SpinText_Shown.SetLayerColor(uiStateIndex, uiLayerIndex, topColor, botColor);
+	m_SpinText.m_SpinText_Padded.SetLayerColor(uiStateIndex, uiLayerIndex, topColor, botColor);
 }
 
 /*virtual*/ void HyRackMeter::OnUpdate() /*override*/

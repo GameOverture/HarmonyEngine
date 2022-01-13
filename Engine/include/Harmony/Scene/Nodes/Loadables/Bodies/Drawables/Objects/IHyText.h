@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/AnimFloats/HyAnimVec3.h"
+#include "Utilities/HyMath.h"
 
 #ifdef HY_DEBUG
 	#define HY_USE_TEXT_DEBUG_BOXES
@@ -45,13 +46,8 @@ protected:
 	{
 		struct LayerColor
 		{
-			HyAnimVec3 				topColor;
-			HyAnimVec3 				botColor;
-
-			LayerColor(NODETYPE &colorOwner) :
-				topColor(colorOwner, 0),
-				botColor(colorOwner, 0)
-			{ }
+			HyColor 				topClr;
+			HyColor 				botClr;
 		};
 		std::vector<LayerColor *>	m_LayerColors;
 	};
@@ -113,13 +109,8 @@ public:
 	uint32 GetNumLayers();
 	uint32 GetNumLayers(uint32 uiStateIndex);
 
-	std::pair<HyAnimVec3 &, HyAnimVec3 &> GetLayerColor(uint32 uiLayerIndex);
-	std::pair<HyAnimVec3 &, HyAnimVec3 &> GetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex);
-	void SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB);
-	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB);
-	void SetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
-	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB);
-	void SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex);
+	std::pair<HyColor, HyColor> GetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex);
+	void SetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
 
 	HyAlignment GetTextAlignment() const;
 	void SetTextAlignment(HyAlignment eAlignment);

@@ -192,12 +192,12 @@ const HyText2dGlyphInfo *HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLa
 	return iter->second;
 }
 
-const glm::vec3 &HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const
+HyColor HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const
 {
 	if(bTop)
-		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_TOP_COLOR;
+		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].DEFAULT_TOP_COLOR;
 	else
-		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].vDEFAULT_BOT_COLOR;
+		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].DEFAULT_BOT_COLOR;
 }
 
 HyFileAtlas *HyText2dData::GetAtlas() const

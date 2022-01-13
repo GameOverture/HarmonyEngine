@@ -203,7 +203,7 @@ public:
 	{ }
 
 	// Returned as uint32 mask: ARGB
-	uint32 GetColor32() const {
+	uint32 GetAsUint32() const {
 		return (m_uiA << 24) | (m_uiR << 16) | (m_uiG << 8) | m_uiB;
 	}
 
@@ -220,13 +220,21 @@ public:
 		return m_uiA / 255.0f;
 	}
 
+	glm::vec4 GetAsVec4() const {
+		return glm::vec4(GetRedF(), GetGreenF(), GetBlueF(), GetAlphaF());
+	}
+
+	glm::vec3 GetAsVec3() const {
+		return glm::vec3(GetRedF(), GetGreenF(), GetBlueF());
+	}
+
 	HyColor Lighten() const
 	{
-		return HyColor((GetColor32() & 0xfefefe) << 1);
+		return HyColor((GetAsUint32() & 0xfefefe) << 1);
 	}
 	HyColor Darken() const
 	{
-		return HyColor((GetColor32() & 0xfefefe) >> 1);
+		return HyColor((GetAsUint32() & 0xfefefe) >> 1);
 	}
 	float Brightness() const
 	{

@@ -289,75 +289,21 @@ uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers(uint32 uiStateIndex)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-std::pair<HyAnimVec3 &, HyAnimVec3 &> IHyText<NODETYPE, ENTTYPE>::GetLayerColor(uint32 uiLayerIndex)
+std::pair<HyColor, HyColor> IHyText<NODETYPE, ENTTYPE>::GetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex)
 {
-	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->topColor, m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->botColor);
+	return std::pair<HyColor, HyColor>(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topClr, m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botClr);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-std::pair<HyAnimVec3 &, HyAnimVec3 &> IHyText<NODETYPE, ENTTYPE>::GetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex)
-{
-	return std::pair<HyAnimVec3 &, HyAnimVec3 &>(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor, m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor);
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, float fR, float fG, float fB)
+void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor)
 {
 	if(this->AcquireData() == nullptr) {
 		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
 		return;
 	}
 
-	m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
-	m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fR, float fG, float fB)
-{
-	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
-		return;
-	}
-
-	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor.Set(fR, fG, fB);
-	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor.Set(fR, fG, fB);
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
-{
-	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
-		return;
-	}
-
-	m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
-	m_StateColors[this->m_uiState]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB)
-{
-	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
-		return;
-	}
-
-	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor.Set(fTopR, fTopG, fTopB);
-	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor.Set(fBotR, fBotG, fBotB);
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiLayerIndex, uint32 uiStateIndex, uint32 uiRgbHex)
-{
-	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
-		return;
-	}
-
-	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topColor.Set(((uiRgbHex >> 16) & 0xFF) / 255.0f, ((uiRgbHex >> 8) & 0xFF) / 255.0f, (uiRgbHex & 0xFF) / 255.0f);
-	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botColor.Set(((uiRgbHex >> 16) & 0xFF) / 255.0f, ((uiRgbHex >> 8) & 0xFF) / 255.0f, (uiRgbHex & 0xFF) / 255.0f);
+	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topClr = topColor;
+	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botClr = botColor;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -583,10 +529,10 @@ template<typename NODETYPE, typename ENTTYPE>
 
 		for(uint32 j = 0; j < pTextData->GetNumLayers(i); ++j)
 		{
-			m_StateColors[i]->m_LayerColors.push_back(HY_NEW typename StateColors::LayerColor(*this));
+			m_StateColors[i]->m_LayerColors.push_back(HY_NEW typename StateColors::LayerColor());
 
-			m_StateColors[i]->m_LayerColors[j]->topColor.Set(pTextData->GetDefaultColor(i, j, true));
-			m_StateColors[i]->m_LayerColors[j]->botColor.Set(pTextData->GetDefaultColor(i, j, false));
+			m_StateColors[i]->m_LayerColors[j]->topClr = pTextData->GetDefaultColor(i, j, true);
+			m_StateColors[i]->m_LayerColors[j]->botClr = pTextData->GetDefaultColor(i, j, false);
 		}
 	}
 
