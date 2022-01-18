@@ -95,27 +95,17 @@ const HyRectangle<int16> &HyLayout::GetMargins() const
 	return m_Margins;
 }
 
-void HyLayout::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY)
+void HyLayout::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing)
 {
 	m_Margins.Set(iLeft, iBottom, iRight, iTop);
-	m_Margins.iTag = uiWidgetSpacingX | (uiWidgetSpacingY << 16);
+	m_Margins.iTag = iWidgetSpacing;
 	
 	SetLayoutDirty();
 }
 
-uint16 HyLayout::GetHorizontalSpacing()
+int32 HyLayout::GetWidgetSpacing()
 {
-	return m_Margins.iTag & 0x0000FFFF;
-}
-
-uint16 HyLayout::GetVerticalSpacing()
-{
-	return (m_Margins.iTag & 0xFFFF0000) >> 16;
-}
-
-glm::ivec2 HyLayout::GetSpacing()
-{
-	return glm::ivec2(GetHorizontalSpacing(), GetVerticalSpacing());
+	return m_Margins.iTag;
 }
 
 bool HyLayout::IsLayoutDirty() const
@@ -162,7 +152,7 @@ bool HyLayout::IsWidgetInputAllowed()
 
 /*virtual*/ void HyLayout::OnSetSizeHint() /*override*/
 {
-	HySetVec(m_vMinSize, m_Margins.left + m_Margins.right, m_Margins.top + m_Margins.bottom);
+	HySetVec(m_vMinSize, m_Margins.left, m_Margins.bottom);
 	m_vSizeHint = m_vMinSize;
 
 	uint32 uiNumChildren = ChildCount();
@@ -174,19 +164,34 @@ bool HyLayout::IsWidgetInputAllowed()
 	{
 		eOrientation = HYORIEN_Horizontal;
 		eInverseOrien = HYORIEN_Vertical;
+
+		// NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
+		m_vSizeHint.x += (m_Margins.right * 0.5f);
+		m_vMinSize.x += (m_Margins.right * 0.5f);
+		m_vSizeHint.y += m_Margins.top;
+		m_vMinSize.y += m_Margins.top;
 	}
 	else
 	{
 		eOrientation = HYORIEN_Vertical;
 		eInverseOrien = HYORIEN_Horizontal;
+
+		// NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
+		m_vSizeHint.x += m_Margins.right;
+		m_vMinSize.x += m_Margins.right;
+		m_vSizeHint.y += (m_Margins.top * 0.5f);
+		m_vMinSize.y += (m_Margins.top * 0.5f);
 	}
 
 	// Figure out m_vSizeHint while counting size policies
-	m_vSizeHint[eOrientation] += (GetSpacing()[eOrientation] * (uiNumChildren - 1));
+	m_vSizeHint[eOrientation] += (GetWidgetSpacing() * (uiNumChildren - 1));
+	m_vMinSize[eOrientation] += (GetWidgetSpacing() * (uiNumChildren - 1));
 	m_uiNumExpandItems = m_uiNumShrinkItems = 0;
 
-	auto fpPreferredSize = [&](IHyNode2d *&pChildItem) // Lambda func used to iterate over 'm_ChildList'
+	for(uint32 i = 0; i < static_cast<uint32>(m_ChildList.size()); ++i)
 	{
+		IHyNode2d *pChildItem = m_ChildList[i];
+
 		// Children are guaranteed to be IHyEntityUi
 		IHyEntityUi *pItem = static_cast<IHyEntityUi *>(pChildItem);
 
@@ -200,8 +205,7 @@ bool HyLayout::IsWidgetInputAllowed()
 		glm::ivec2 vItemSizeHint = pItem->GetSizeHint();
 		m_vSizeHint[eOrientation] += vItemSizeHint[eOrientation];
 		m_vSizeHint[eInverseOrien] = HyMax(m_vSizeHint[eInverseOrien], vItemSizeHint[eInverseOrien]);
-	};
-	std::for_each(m_ChildList.begin(), m_ChildList.end(), fpPreferredSize);
+	}
 }
 
 /*virtual*/ glm::ivec2 HyLayout::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
@@ -214,21 +218,17 @@ bool HyLayout::IsWidgetInputAllowed()
 	}
 
 	HyOrientation eOrientation, eInverseOrien;
-	int32 iOrienMargin, iInverseOrienMargin;
+	int32 iInverseOrienMargin;
 	if(m_eLayoutType == HYLAYOUT_Horizontal)
 	{
 		eOrientation = HYORIEN_Horizontal;
 		eInverseOrien = HYORIEN_Vertical;
-		
-		iOrienMargin = m_Margins.left + m_Margins.right;
 		iInverseOrienMargin = m_Margins.top + m_Margins.bottom;
 	}
 	else
 	{
 		eOrientation = HYORIEN_Vertical;
 		eInverseOrien = HYORIEN_Horizontal;
-		
-		iOrienMargin = m_Margins.top + m_Margins.bottom;
 		iInverseOrienMargin = m_Margins.left + m_Margins.right;
 	}
 
@@ -239,7 +239,7 @@ bool HyLayout::IsWidgetInputAllowed()
 
 	// Go through each child and set its position and OnResize()
 	glm::vec2 ptCurPos(m_Margins.left, m_Margins.bottom);
-	int32 iMaxInverse = 0; // Used to determine the m_vActualSize when the inverse demension was specified as '0'
+	int32 iMaxInverse = 0; // Used to determine the m_vActualSize when the inverse dimension was specified as '0'
 	bool bNeedsResize = false;
 
 	auto fpPositionAndResize = [&](IHyNode2d *&pChildItem) // Lambda func used to iterate over 'm_ChildList'
@@ -255,7 +255,7 @@ bool HyLayout::IsWidgetInputAllowed()
 		if(vTargetSize[eOrientation] != 0)
 		{
 			HySizePolicy eSizePolicy = pItem->GetSizePolicy(eOrientation);
-			// Along 'eOrientation', distrubute either 'fExpandAmt' or 'fShrinkAmt' among those with those size policies
+			// Along 'eOrientation', distribute either 'fExpandAmt' or 'fShrinkAmt' among those with those size policies
 			vItemSize[eOrientation] += static_cast<int32>(fExpandAmt * (eSizePolicy & HY_SIZEFLAG_EXPAND));
 			vItemSize[eOrientation] += static_cast<int32>(fShrinkAmt * ((eSizePolicy & HY_SIZEFLAG_SHRINK) >> 1));
 		}
@@ -310,7 +310,7 @@ bool HyLayout::IsWidgetInputAllowed()
 		// After resizing, apply offset to get 'pItem' oriented to its bottom left
 		pItem->pos.Offset(pItem->GetPosOffset());
 
-		ptCurPos[eOrientation] += vActualItemSize[eOrientation] + GetSpacing()[eOrientation];
+		ptCurPos[eOrientation] += vActualItemSize[eOrientation] + GetWidgetSpacing();
 	};
 	if(m_bReverse)
 		std::for_each(m_ChildList.rbegin(), m_ChildList.rend(), fpPositionAndResize);
@@ -325,7 +325,7 @@ bool HyLayout::IsWidgetInputAllowed()
 
 	if(bNeedsResize)
 	{
-		vTargetSize[eOrientation] = ptCurPos[eOrientation] - GetSpacing()[eOrientation];
+		vTargetSize[eOrientation] = ptCurPos[eOrientation] - GetWidgetSpacing();
 		HySetVec(ptCurPos, m_Margins.left, m_Margins.bottom);
 
 		GetDistributedScalingAmts(vTargetSize[eOrientation], GetSizeHint()[eOrientation], fExpandAmt, fShrinkAmt);
@@ -338,7 +338,7 @@ bool HyLayout::IsWidgetInputAllowed()
 
 	m_bLayoutDirty = false;
 
-	m_vActualSize[eOrientation] = ptCurPos[eOrientation] - GetSpacing()[eOrientation];
+	m_vActualSize[eOrientation] = ptCurPos[eOrientation] - GetWidgetSpacing();
 	m_vActualSize[eInverseOrien] = vTargetSize[eInverseOrien];
 	return m_vActualSize;
 }
@@ -351,13 +351,13 @@ void HyLayout::GetDistributedScalingAmts(int32 iTargetLength, int32 iCurrLength,
 	fExpandAmtOut = 0.0f;
 	fShrinkAmtOut = 0.0f;
 
-	// Distrubute positive difference to all 'expanding' size policies
+	// Distribute positive difference to all 'expanding' size policies
 	if(fDifference >= 0)
 	{
 		if(m_uiNumExpandItems > 0)
 			fExpandAmtOut = fDifference / m_uiNumExpandItems;
 	}
-	else // Distrubute negative difference to all 'shrink' size policies
+	else // Distribute negative difference to all 'shrink' size policies
 	{
 		if(m_uiNumShrinkItems > 0)
 			fShrinkAmtOut = fDifference / m_uiNumShrinkItems;

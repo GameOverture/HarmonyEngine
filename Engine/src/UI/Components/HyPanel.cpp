@@ -10,28 +10,42 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Components/HyPanel.h"
 
+// Constructs a 'BoundingVolume' panel with 0 width/height
 HyPanelInit::HyPanelInit() :
 	m_uiWidth(0),
 	m_uiHeight(0),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor(0x252526)),
-	m_FrameColor(HyColor(0x3F3F41)),
-	m_ePanelType(PANELTYPE_Null)
+	m_PanelColor(HyColor()),
+	m_FrameColor(HyColor()),
+	m_ePanelType(PANELTYPE_BoundingVolume)
 {
 }
 
+// Constructs a 'BoundingVolume' panel
+HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight) :
+	m_uiWidth(uiWidth),
+	m_uiHeight(uiHeight),
+	m_uiFrameSize(0),
+	m_PanelColor(HyColor()),
+	m_FrameColor(HyColor()),
+	m_ePanelType(PANELTYPE_BoundingVolume)
+{
+}
+
+// Constructs a 'Sprite' panel
 HyPanelInit::HyPanelInit(std::string sSpritePrefix, std::string sSpriteName) :
 	m_sSpritePrefix(sSpritePrefix),
 	m_sSpriteName(sSpriteName),
 	m_uiWidth(0),
 	m_uiHeight(0),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor(0x252526)),
-	m_FrameColor(HyColor(0x3F3F41)),
+	m_PanelColor(HyColor()),
+	m_FrameColor(HyColor()),
 	m_ePanelType(PANELTYPE_Sprite)
 {
 }
 
+// Constructs a 'Primitive' panel
 HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize /*= 4*/, HyColor panelColor /*= HyColor(0x252526)*/, HyColor frameColor /*= HyColor(0x3F3F41)*/) :
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
@@ -65,23 +79,23 @@ HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
 
 void HyPanel::Setup(const HyPanelInit &initRef)
 {
+	m_SpritePanel.Uninit();
+	m_Frame1.SetAsNothing();
+	m_Frame2.SetAsNothing();
+	m_Panel.SetAsNothing();
+	
 	m_ePanelType = initRef.m_ePanelType;
-
 	switch(m_ePanelType)
 	{
-	case HyPanelInit::PANELTYPE_Null:
-		SetAsNull();
+	case HyPanelInit::PANELTYPE_BoundingVolume:
+		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
 		break;
 
 	case HyPanelInit::PANELTYPE_Sprite:
 		m_SpritePanel.Init(initRef.m_sSpritePrefix, initRef.m_sSpriteName, this);
-		if(m_SpritePanel.IsLoadDataValid() == false)
-			SetAsNull();
 		break;
 
 	case HyPanelInit::PANELTYPE_Primitive:
-		m_SpritePanel.Uninit();
-		
 		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
 		m_uiFrameSize = initRef.m_uiFrameSize;
 		ConstructPrimitives();
@@ -91,20 +105,17 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 	}
 }
 
-void HyPanel::SetAsNull()
-{
-	m_SpritePanel.Uninit();
-
-	m_Panel.SetAsNothing();
-	m_Frame1.SetAsNothing();
-	m_Frame2.SetAsNothing();
-
-	m_ePanelType = HyPanelInit::PANELTYPE_Null;
-}
-
 bool HyPanel::IsValid()
 {
-	return m_ePanelType != HyPanelInit::PANELTYPE_Null;
+	if(m_ePanelType == HyPanelInit::PANELTYPE_Sprite)
+		return m_SpritePanel.IsLoadDataValid();
+	else
+		return m_vSize.x > 0.0f && m_vSize.y > 0.0f;
+}
+
+bool HyPanel::IsBoundingVolume() const
+{
+	return m_ePanelType == HyPanelInit::PANELTYPE_BoundingVolume;
 }
 
 bool HyPanel::IsPrimitive() const
@@ -112,7 +123,7 @@ bool HyPanel::IsPrimitive() const
 	return m_ePanelType == HyPanelInit::PANELTYPE_Primitive;
 }
 
-bool HyPanel::IsSprite()
+bool HyPanel::IsSprite() const
 {
 	return m_ePanelType == HyPanelInit::PANELTYPE_Sprite;
 }
@@ -166,6 +177,9 @@ glm::ivec2 HyPanel::GetSize()
 
 void HyPanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 {
+	//if(IsNull() || uiWidth == 0 || uiHeight == 0)
+	//	return;
+
 	HySetVec(m_vSize, uiWidth, uiHeight);
 
 	if(IsPrimitive())
@@ -185,9 +199,7 @@ uint32 HyPanel::GetFrameSize() const
 
 glm::vec2 HyPanel::GetBotLeftOffset()
 {
-	if(IsPrimitive())
-		return glm::vec2(0, 0);
-	else if(m_SpritePanel.IsLoadDataValid())
+	if(m_SpritePanel.IsLoadDataValid())
 	{
 		glm::vec2 vPanelDimensions = GetSize();
 

@@ -45,11 +45,8 @@ public:
 	void ReverseOrder(bool bReverse);
 
 	const HyRectangle<int16> &GetMargins() const;
-	void SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY);
-
-	uint16 GetHorizontalSpacing();
-	uint16 GetVerticalSpacing();
-	glm::ivec2 GetSpacing();
+	void SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing);
+	int32 GetWidgetSpacing();
 
 	bool IsLayoutDirty() const;
 	void SetLayoutDirty();

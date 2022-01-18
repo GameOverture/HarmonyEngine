@@ -68,7 +68,7 @@ public:
 	HyLayoutHandle InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	void ClearItems();
 
-	bool SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	bool SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 
 protected:
 	virtual void OnUpdate() override final;

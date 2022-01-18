@@ -80,7 +80,7 @@ void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::st
 		break;
 	}
 
-	if(bUseScaleBox && m_Panel.IsValid())
+	if(bUseScaleBox)
 		m_uiAttribs &= ~LABELATTRIB_StackedTextUseLine;
 	else
 		m_uiAttribs |= LABELATTRIB_StackedTextUseLine;
@@ -118,7 +118,7 @@ float HyLabel::GetPanelHeight()
 
 glm::vec2 HyLabel::GetPanelSize()
 {
-	return glm::vec2(GetPanelWidth(), GetPanelHeight());
+	return m_Panel.GetSize();
 }
 
 uint32 HyLabel::GetSpriteState() const
@@ -183,10 +183,10 @@ HyText2d &HyLabel::GetTextNode()
 {
 	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
-		if(m_Panel.IsValid())
-			return m_Panel.GetBotLeftOffset();
-		else if(m_Text.IsLoadDataValid())
+		if(m_Panel.IsValid() == false)
 			return -m_Text.GetTextBottomLeft();
+		else
+			return m_Panel.GetBotLeftOffset();
 	}
 
 	return glm::vec2(0.0f, 0.0f);
@@ -198,10 +198,10 @@ HyText2d &HyLabel::GetTextNode()
 
 	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
-		if(m_Panel.IsValid())
-			m_vSizeHint = m_Panel.GetSizeHint();
-		else if(m_Text.IsLoadDataValid())
+		if(m_Panel.IsValid() == false)
 			HySetVec(m_vSizeHint, static_cast<int32>(m_Text.GetTextWidth(false)), static_cast<int32>(m_Text.GetTextHeight(false)));
+		else
+			m_vSizeHint = m_Panel.GetSizeHint();
 	}
 	else // Side-by-side
 	{
@@ -223,11 +223,7 @@ HyText2d &HyLabel::GetTextNode()
 {
 	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
-		if(m_Panel.IsValid())
-		{
-			m_Panel.SetSize(uiNewWidth, uiNewHeight);
-		}
-		else if(m_Text.IsLoadDataValid())
+		if(m_Panel.IsValid() == false)
 		{
 			glm::vec2 vTextSize(m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
 
@@ -238,6 +234,8 @@ HyText2d &HyLabel::GetTextNode()
 			uiNewWidth = m_Text.GetTextWidth(true);
 			uiNewHeight = m_Text.GetTextHeight(true);
 		}
+		else
+			m_Panel.SetSize(uiNewWidth, uiNewHeight);
 	}
 	else // Side-by-side
 	{
@@ -264,8 +262,7 @@ HyText2d &HyLabel::GetTextNode()
 			//HySetVec(vNewTextSize, uiNewWidth * fTextPerc, vTextSizeHint.y);
 		}
 
-		if(m_Panel.IsValid())
-			m_Panel.SetSize(vNewPanelSize.x, vNewPanelSize.y);
+		m_Panel.SetSize(vNewPanelSize.x, vNewPanelSize.y);
 
 		float fScaleX = static_cast<float>(vNewTextSize.x) / static_cast<float>(vTextSizeHint.x);
 		float fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);

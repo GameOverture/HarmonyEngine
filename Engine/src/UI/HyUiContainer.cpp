@@ -268,16 +268,16 @@ void HyUiContainer::ClearItems()
 	m_SubLayoutMap.clear();
 }
 
-bool HyUiContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, uint16 uiWidgetSpacingX, uint16 uiWidgetSpacingY, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+bool HyUiContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{
-		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, uiWidgetSpacingX, uiWidgetSpacingY);
+		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, iWidgetSpacing);
 		return true;
 	}
 	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
 	{
-		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, uiWidgetSpacingX, uiWidgetSpacingY);
+		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, iWidgetSpacing);
 		return true;
 	}
 

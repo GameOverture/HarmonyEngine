@@ -18,6 +18,7 @@
 HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiColumnWidth(0),
+	m_fTotalHeight(0.0f),
 	m_fColumnLineHeightOffset(0.0f)
 {
 }
@@ -25,6 +26,7 @@ HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiColumnWidth(0),
+	m_fTotalHeight(0.0f),
 	m_fColumnLineHeightOffset(0.0f)
 {
 	Setup(sTextPrefix, sTextName, uiColumnWidth);
@@ -60,12 +62,12 @@ void HyRichText::SetRichText(const std::string &sRichTextFormat)
 
 /*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
 {
-	return glm::vec2(0.0f, GetSceneHeight() - m_fColumnLineHeightOffset);
+	return glm::vec2(0.0f, m_fTotalHeight - m_fColumnLineHeightOffset);
 }
 
 /*virtual*/ void HyRichText::OnSetSizeHint() /*override*/
 {
-	HySetVec(m_vSizeHint, m_uiColumnWidth, GetSceneHeight());
+	HySetVec(m_vSizeHint, m_uiColumnWidth, m_fTotalHeight);
 }
 
 /*virtual*/ glm::ivec2 HyRichText::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
@@ -73,7 +75,7 @@ void HyRichText::SetRichText(const std::string &sRichTextFormat)
 	m_uiColumnWidth = uiNewWidth;
 	AssembleDrawables();
 
-	return glm::ivec2(m_uiColumnWidth, GetSceneHeight());
+	return glm::ivec2(m_uiColumnWidth, m_fTotalHeight);
 }
 
 void HyRichText::AssembleDrawables()
@@ -84,6 +86,7 @@ void HyRichText::AssembleDrawables()
 		delete m_DrawableList.back();
 		m_DrawableList.pop_back();
 	}
+	m_fTotalHeight = 0.0f;
 	m_fColumnLineHeightOffset = 0.0f;
 
 	// Capture each formatting change within 'm_sRichText'
@@ -143,6 +146,7 @@ void HyRichText::AssembleDrawables()
 		ptCurPos.x = pNewText->GetTextCursorPos().x;
 		ptCurPos.y += pNewText->GetTextCursorPos().y;
 
+		// TODO: 'm_fColumnLineHeightOffset' should actually be (I think) the max of first line's height, not the max line height overall
 		const HyText2dData *pTextData = static_cast<const HyText2dData *>(pNewText->AcquireData());
 		if(sCurText.empty() == false && pTextData)
 			m_fColumnLineHeightOffset = HyMax(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
@@ -211,6 +215,9 @@ void HyRichText::AssembleDrawables()
 			uiCurFmtIndex++;
 		}
 	}
+
+	m_fTotalHeight = std::fabs(ptCurPos.y);
+	m_fTotalHeight += m_fColumnLineHeightOffset;// std::fabs(pTextData->GetLineDescender(uiCurTextState)
 
 	SetDirty(IHyNode::DIRTY_BoundingVolume);
 	m_bSizeHintDirty = true;
