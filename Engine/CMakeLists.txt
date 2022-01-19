@@ -149,11 +149,11 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Widgets/HyProgressBar.cpp
 	src/UI/Widgets/HyRackMeter.cpp
 	src/UI/Widgets/HyRichText.cpp
-	src/UI/Widgets/HySpacer.cpp
 	src/UI/Widgets/IHyWidget.cpp
 	src/UI/Components/HyLayout.cpp
 	src/UI/Components/HyPanel.cpp
 	src/UI/Components/HyScrollBar.cpp
+	src/UI/Components/HySpacer.cpp
 	src/UI/Localization/HyLocale.cpp
 	src/UI/Localization/HyNumberFormat.cpp
 	src/Utilities/Crc32.cpp
@@ -273,11 +273,11 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Widgets/HyProgressBar.h
 	include/Harmony/UI/Widgets/HyRackMeter.h
 	include/Harmony/UI/Widgets/HyRichText.h
-	include/Harmony/UI/Widgets/HySpacer.h
 	include/Harmony/UI/Widgets/IHyWidget.h
 	include/Harmony/UI/Components/HyLayout.h
 	include/Harmony/UI/Components/HyPanel.h
 	include/Harmony/UI/Components/HyScrollBar.h
+	include/Harmony/UI/Components/HySpacer.h
 	include/Harmony/UI/Localization/HyLocale.h
 	include/Harmony/UI/Localization/HyNumpunct.h
 	include/Harmony/UI/Localization/HyNumberFormat.h

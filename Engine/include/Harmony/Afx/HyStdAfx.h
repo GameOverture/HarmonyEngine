@@ -58,6 +58,7 @@ typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
 typedef uint32 HyVertexBufferHandle;
 typedef uint32 HyAudioHandle;
+typedef uint32 HySpacerHandle;
 typedef uint32 HyLayoutHandle;
 
 // Tags aren't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
@@ -251,13 +252,6 @@ enum HyWindowType
 	HYWINDOW_WindowedSizeable,
 	HYWINDOW_FullScreen,
 	HYWINDOW_BorderlessWindow
-};
-
-enum HyLayoutType
-{
-	HYLAYOUT_Horizontal = 0,
-	HYLAYOUT_Vertical,
-	//HYLAYOUT_Grid
 };
 
 enum HySizePolicy

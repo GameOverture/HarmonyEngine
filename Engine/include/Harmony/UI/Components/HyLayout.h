@@ -17,7 +17,7 @@ class IHyWidget;
 
 class HyLayout : public IHyEntityUi
 {
-	HyLayoutType						m_eLayoutType;
+	HyOrientation						m_eLayoutType;
 	glm::ivec2							m_vActualSize;
 
 	uint32								m_uiNumExpandItems;	// How many child items have a size policy of EXPAND
@@ -30,10 +30,10 @@ class HyLayout : public IHyEntityUi
 	bool								m_bLayoutDirty;
 
 public:
-	HyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent = nullptr);
+	HyLayout(HyOrientation eLayoutType, HyEntity2d *pParent = nullptr);
 	virtual ~HyLayout();
 
-	HyLayoutType GetLayoutType() const;
+	HyOrientation GetLayoutType() const;
 
 	virtual HySizePolicy GetSizePolicy(HyOrientation eOrien) override;
 	virtual glm::vec2 GetPosOffset() override;	// What offset is needed to get *this oriented to its bottom left

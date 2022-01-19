@@ -39,7 +39,6 @@
 #include "UI/Widgets/HyRackMeter.h"
 #include "UI/Widgets/HyProgressBar.h"
 #include "UI/Widgets/HyRichText.h"
-#include "UI/Widgets/HySpacer.h"
 #include "UI/Localization/HyLocale.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyImage.h"

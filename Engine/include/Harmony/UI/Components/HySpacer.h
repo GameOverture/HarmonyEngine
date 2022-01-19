@@ -13,11 +13,19 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/IHyWidget.h"
 
+// This class is used internally in HyUiContainer (via ::InsertSpacer()) and are managed indirectly with HySpacerHandle's (via ::SetSpacer())
+class HyUiContainer;
+
 class HySpacer : public IHyWidget
 {
+	friend class HyUiContainer;
+	const HyOrientation	m_eORIEN_TYPE;
+
+	HySpacer(HyOrientation eOrienType);
 public:
-	HySpacer(HyEntity2d *pParent = nullptr);
 	virtual ~HySpacer();
+
+	void Setup(HySizePolicy eSizePolicy, uint32 uiSize);
 
 protected:
 	virtual glm::vec2 GetPosOffset() override;

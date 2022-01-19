@@ -13,11 +13,11 @@
 #include "UI/Widgets/IHyWidget.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyLayout::HyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) :
+HyLayout::HyLayout(HyOrientation eLayoutType, HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
 	m_eLayoutType(eLayoutType),
 	m_vActualSize(0, 0),
-	m_bReverse(m_eLayoutType == HYLAYOUT_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYLAYOUT_Vertical to achieve top->bottom as default
+	m_bReverse(m_eLayoutType == HYORIEN_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIEN_Vertical to achieve top->bottom as default
 	m_bLayoutDirty(false)
 {
 	m_uiFlags |= NODETYPE_IsLayout;
@@ -30,7 +30,7 @@ HyLayout::HyLayout(HyLayoutType eLayoutType, HyEntity2d *pParent /*= nullptr*/) 
 {
 }
 
-HyLayoutType HyLayout::GetLayoutType() const
+HyOrientation HyLayout::GetLayoutType() const
 {
 	return m_eLayoutType;
 }
@@ -74,16 +74,16 @@ void HyLayout::DetachAllItems()
 
 bool HyLayout::IsReverseOrder()
 {
-	if(m_eLayoutType == HYLAYOUT_Vertical)
-		return !m_bReverse; // HYLAYOUT_Vertical needs this flipped to achieve top->bottom default
+	if(m_eLayoutType == HYORIEN_Vertical)
+		return !m_bReverse; // HYORIEN_Vertical needs this flipped to achieve top->bottom default
 	else
 		return m_bReverse;
 }
 
 void HyLayout::ReverseOrder(bool bReverse)
 {
-	if(m_eLayoutType == HYLAYOUT_Vertical)
-		m_bReverse = !bReverse; // HYLAYOUT_Vertical needs this flipped to achieve top->bottom default
+	if(m_eLayoutType == HYORIEN_Vertical)
+		m_bReverse = !bReverse; // HYORIEN_Vertical needs this flipped to achieve top->bottom default
 	else
 		m_bReverse = bReverse;
 
@@ -160,7 +160,7 @@ bool HyLayout::IsWidgetInputAllowed()
 		return;
 
 	HyOrientation eOrientation, eInverseOrien;
-	if(m_eLayoutType == HYLAYOUT_Horizontal)
+	if(m_eLayoutType == HYORIEN_Horizontal)
 	{
 		eOrientation = HYORIEN_Horizontal;
 		eInverseOrien = HYORIEN_Vertical;
@@ -219,7 +219,7 @@ bool HyLayout::IsWidgetInputAllowed()
 
 	HyOrientation eOrientation, eInverseOrien;
 	int32 iInverseOrienMargin;
-	if(m_eLayoutType == HYLAYOUT_Horizontal)
+	if(m_eLayoutType == HYORIEN_Horizontal)
 	{
 		eOrientation = HYORIEN_Horizontal;
 		eInverseOrien = HYORIEN_Vertical;

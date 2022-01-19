@@ -13,13 +13,14 @@
 
 HyUiContainer *HyUiContainer::sm_pCurModalContainer = nullptr;
 std::vector<HyUiContainer *> HyUiContainer::sm_pContainerList;
-HyLayoutHandle HyUiContainer::sm_hHandleCounter = 1;
+HySpacerHandle HyUiContainer::sm_hSpacerHandleCounter = 1;
+HyLayoutHandle HyUiContainer::sm_hLayoutHandleCounter = 1;
 
-HyUiContainer::HyUiContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
 	m_bInputAllowed(true),
 	m_Panel(initRef, this),
-	m_RootLayout(eRootLayout, this),
+	m_RootLayout(eRootLayoutDirection, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f)
 {
@@ -217,7 +218,7 @@ IHyWidget *HyUiContainer::FocusNextWidget()
 	return pNewFocusedWidget;
 }
 
-bool HyUiContainer::AppendWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
+bool HyUiContainer::InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	if(hInsertInto == HY_UNUSED_HANDLE)
 	{
@@ -233,20 +234,44 @@ bool HyUiContainer::AppendWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInt
 	return false;
 }
 
-HyLayoutHandle HyUiContainer::InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
+HySpacerHandle HyUiContainer::InsertSpacer(HySizePolicy eSizePolicy /*= HYSIZEPOLICY_Expanding*/, uint32 uiSize /*= 0*/, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
+{
+	HySpacerHandle hNewSpacerHandle = HY_UNUSED_HANDLE;
+
+	if(hInsertInto == HY_UNUSED_HANDLE)
+	{
+		hNewSpacerHandle = sm_hSpacerHandleCounter++;
+		m_SubSpacerMap.insert(std::pair<HySpacerHandle, HySpacer *>(hNewSpacerHandle, HY_NEW HySpacer(m_RootLayout.GetLayoutType())));
+
+		m_RootLayout.AppendItem(*m_SubSpacerMap[hNewSpacerHandle]);
+		m_SubSpacerMap[hNewSpacerHandle]->Setup(eSizePolicy, uiSize);
+	}
+	else if(m_SubLayoutMap.find(hInsertInto) != m_SubLayoutMap.end())
+	{
+		hNewSpacerHandle = sm_hSpacerHandleCounter++;
+		m_SubSpacerMap.insert(std::pair<HySpacerHandle, HySpacer *>(hNewSpacerHandle, HY_NEW HySpacer(m_SubLayoutMap[hInsertInto]->GetLayoutType())));
+
+		m_SubLayoutMap[hInsertInto]->AppendItem(*m_SubSpacerMap[hNewSpacerHandle]);
+		m_SubSpacerMap[hNewSpacerHandle]->Setup(eSizePolicy, uiSize);
+	}
+
+	return hNewSpacerHandle;
+}
+
+HyLayoutHandle HyUiContainer::InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	HyLayoutHandle hNewLayoutHandle = HY_UNUSED_HANDLE;
 
 	if(hInsertInto == HY_UNUSED_HANDLE)
 	{
-		hNewLayoutHandle = sm_hHandleCounter++;
+		hNewLayoutHandle = sm_hLayoutHandleCounter++;
 		m_SubLayoutMap.insert(std::pair<HyLayoutHandle, HyLayout *>(hNewLayoutHandle, HY_NEW HyLayout(eNewLayoutType)));
 
 		m_RootLayout.AppendItem(*m_SubLayoutMap[hNewLayoutHandle]);
 	}
 	else if(m_SubLayoutMap.find(hInsertInto) != m_SubLayoutMap.end())
 	{
-		hNewLayoutHandle = sm_hHandleCounter++;
+		hNewLayoutHandle = sm_hLayoutHandleCounter++;
 		m_SubLayoutMap.insert(std::pair<HyLayoutHandle, HyLayout *>(hNewLayoutHandle, HY_NEW HyLayout(eNewLayoutType)));
 
 		m_SubLayoutMap[hInsertInto]->AppendItem(*m_SubLayoutMap[hNewLayoutHandle]);
@@ -263,9 +288,23 @@ void HyUiContainer::ClearItems()
 
 	m_RootLayout.DetachAllItems();
 
+	for(auto pSubSpacer : m_SubSpacerMap)
+		delete pSubSpacer.second;
+	m_SubSpacerMap.clear();
+
 	for(auto pSubLayout : m_SubLayoutMap)
 		delete pSubLayout.second;
 	m_SubLayoutMap.clear();
+}
+
+bool HyUiContainer::SetSpacer(HySizePolicy eSizePolicy, uint32 uiSize, HySpacerHandle hSpacer)
+{
+	if(m_SubSpacerMap.find(hSpacer) != m_SubSpacerMap.end())
+	{
+		m_SubSpacerMap[hSpacer]->Setup(eSizePolicy, uiSize);
+		return true;
+	}
+	return false;
 }
 
 bool HyUiContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)

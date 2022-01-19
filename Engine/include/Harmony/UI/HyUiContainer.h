@@ -14,23 +14,28 @@
 #include "UI/IHyEntityUi.h"
 #include "UI/Components/HyPanel.h"
 #include "UI/Components/HyLayout.h"
-#include "UI/Widgets/IHyWidget.h"
+#include "UI/Components/HySpacer.h"
 
 class HyUiContainer : public HyEntity2d
 {
 	friend class HyLayout;
 	friend class HyInput;
 
+	// Global UI Container members
 	static HyUiContainer *					sm_pCurModalContainer;	// If any container is considered 'modal' then only that container may accept input
 	static std::vector<HyUiContainer *>		sm_pContainerList;
 
+protected:
 	bool									m_bInputAllowed;
 
-protected:
 	HyPanel									m_Panel;
 	HyLayout								m_RootLayout;
+
+	std::map<HySpacerHandle, HySpacer *>	m_SubSpacerMap;
+	static HySpacerHandle					sm_hSpacerHandleCounter;
+
 	std::map<HyLayoutHandle, HyLayout *>	m_SubLayoutMap;
-	static HyLayoutHandle					sm_hHandleCounter;
+	static HyLayoutHandle					sm_hLayoutHandleCounter;
 
 	enum ContainerState
 	{
@@ -43,7 +48,7 @@ protected:
 	float									m_fElapsedTime;
 
 public:
-	HyUiContainer(HyLayoutType eRootLayout, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
+	HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyUiContainer();
 
 	static bool IsModalActive();
@@ -64,10 +69,12 @@ public:
 	IHyWidget *GetFocusedWidget();
 	IHyWidget *FocusNextWidget();
 
-	bool AppendWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
-	HyLayoutHandle InsertLayout(HyLayoutType eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
+	bool InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
+	HySpacerHandle InsertSpacer(HySizePolicy eSizePolicy = HYSIZEPOLICY_Expanding, uint32 uiSize = 0, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
+	HyLayoutHandle InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	void ClearItems();
 
+	bool SetSpacer(HySizePolicy eSizePolicy, uint32 uiSize, HySpacerHandle hSpacer);
 	bool SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 
 protected:
