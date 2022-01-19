@@ -165,7 +165,7 @@ bool HyLayout::IsWidgetInputAllowed()
 		eOrientation = HYORIEN_Horizontal;
 		eInverseOrien = HYORIEN_Vertical;
 
-		// NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
+		// HACK NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
 		m_vSizeHint.x += (m_Margins.right * 0.5f);
 		m_vMinSize.x += (m_Margins.right * 0.5f);
 		m_vSizeHint.y += m_Margins.top;
@@ -176,7 +176,7 @@ bool HyLayout::IsWidgetInputAllowed()
 		eOrientation = HYORIEN_Vertical;
 		eInverseOrien = HYORIEN_Horizontal;
 
-		// NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
+		// HACK NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
 		m_vSizeHint.x += m_Margins.right;
 		m_vMinSize.x += m_Margins.right;
 		m_vSizeHint.y += (m_Margins.top * 0.5f);
@@ -231,7 +231,6 @@ bool HyLayout::IsWidgetInputAllowed()
 		eInverseOrien = HYORIEN_Horizontal;
 		iInverseOrienMargin = m_Margins.left + m_Margins.right;
 	}
-
 
 	float fExpandAmt = 0.0f, fShrinkAmt = 0.0f;
 	if(vTargetSize[eOrientation] != 0)
@@ -288,20 +287,6 @@ bool HyLayout::IsWidgetInputAllowed()
 				vResize.x = 0;
 			if(vTargetSize.y == 0)
 				vResize.y = 0;
-			//switch(static_cast<HyLayout *>(pItem)->GetLayoutType())
-			//{
-			//case HYLAYOUT_Horizontal:
-			//	
-			//	break;
-			//	
-			//case HYLAYOUT_Vertical:
-			//	vResize.y = 0;
-			//	break;
-
-			//default:
-			//	HyLogWarning("Layout type not handled");
-			//	break;
-			//}
 		}
 		glm::ivec2 vActualItemSize = pItem->Resize(vResize.x, vResize.y);
 		if(vTargetSize[eOrientation] != 0 && vActualItemSize != vItemSize)
