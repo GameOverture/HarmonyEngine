@@ -44,6 +44,8 @@ public:
 	HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyLabel();
 
+	virtual bool IsLoadDataValid() override;
+
 	void Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName);
 	void Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
 

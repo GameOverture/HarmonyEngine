@@ -234,7 +234,7 @@ bool HyUiContainer::InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInt
 	return false;
 }
 
-HySpacerHandle HyUiContainer::InsertSpacer(HySizePolicy eSizePolicy /*= HYSIZEPOLICY_Expanding*/, uint32 uiSize /*= 0*/, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
+HySpacerHandle HyUiContainer::InsertSpacer(HySizePolicy eSizePolicy /*= HYSIZEPOLICY_Expanding*/, uint32 uiSizeHint /*= 0*/, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	HySpacerHandle hNewSpacerHandle = HY_UNUSED_HANDLE;
 
@@ -244,7 +244,7 @@ HySpacerHandle HyUiContainer::InsertSpacer(HySizePolicy eSizePolicy /*= HYSIZEPO
 		m_SubSpacerMap.insert(std::pair<HySpacerHandle, HySpacer *>(hNewSpacerHandle, HY_NEW HySpacer(m_RootLayout.GetLayoutType())));
 
 		m_RootLayout.AppendItem(*m_SubSpacerMap[hNewSpacerHandle]);
-		m_SubSpacerMap[hNewSpacerHandle]->Setup(eSizePolicy, uiSize);
+		m_SubSpacerMap[hNewSpacerHandle]->Setup(eSizePolicy, uiSizeHint);
 	}
 	else if(m_SubLayoutMap.find(hInsertInto) != m_SubLayoutMap.end())
 	{
@@ -252,10 +252,31 @@ HySpacerHandle HyUiContainer::InsertSpacer(HySizePolicy eSizePolicy /*= HYSIZEPO
 		m_SubSpacerMap.insert(std::pair<HySpacerHandle, HySpacer *>(hNewSpacerHandle, HY_NEW HySpacer(m_SubLayoutMap[hInsertInto]->GetLayoutType())));
 
 		m_SubLayoutMap[hInsertInto]->AppendItem(*m_SubSpacerMap[hNewSpacerHandle]);
-		m_SubSpacerMap[hNewSpacerHandle]->Setup(eSizePolicy, uiSize);
+		m_SubSpacerMap[hNewSpacerHandle]->Setup(eSizePolicy, uiSizeHint);
 	}
 
 	return hNewSpacerHandle;
+}
+
+uint32 HyUiContainer::GetSpacerSize(HySpacerHandle hSpacer)
+{
+	if(m_RootLayout.IsLayoutDirty())
+		OnRootLayoutUpdate();
+
+	if(m_SubSpacerMap.find(hSpacer) != m_SubSpacerMap.end())
+		return static_cast<uint32>(m_SubSpacerMap.at(hSpacer)->GetActualSize());
+
+	return 0;
+}
+
+bool HyUiContainer::SetSpacerSize(HySpacerHandle hSpacer, HySizePolicy eSizePolicy, uint32 uiSizeHint)
+{
+	if(m_SubSpacerMap.find(hSpacer) != m_SubSpacerMap.end())
+	{
+		m_SubSpacerMap[hSpacer]->Setup(eSizePolicy, uiSizeHint);
+		return true;
+	}
+	return false;
 }
 
 HyLayoutHandle HyUiContainer::InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
@@ -280,6 +301,33 @@ HyLayoutHandle HyUiContainer::InsertLayout(HyOrientation eNewLayoutType, HyLayou
 	return hNewLayoutHandle;
 }
 
+glm::ivec2 HyUiContainer::GetLayoutSize(HyLayoutHandle hLayout)
+{
+	if(m_RootLayout.IsLayoutDirty())
+		OnRootLayoutUpdate();
+
+	if(m_SubLayoutMap.find(hLayout) != m_SubLayoutMap.end())
+		return m_SubLayoutMap.at(hLayout)->GetActualSize();
+
+	return glm::ivec2(0.0f);
+}
+
+bool HyUiContainer::SetLayoutMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+{
+	if(hAffectedLayout == HY_UNUSED_HANDLE)
+	{
+		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, iWidgetSpacing);
+		return true;
+	}
+	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
+	{
+		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, iWidgetSpacing);
+		return true;
+	}
+
+	return false;
+}
+
 void HyUiContainer::ClearItems()
 {
 	IHyWidget *pFocusedWidget = GetFocusedWidget();
@@ -295,32 +343,6 @@ void HyUiContainer::ClearItems()
 	for(auto pSubLayout : m_SubLayoutMap)
 		delete pSubLayout.second;
 	m_SubLayoutMap.clear();
-}
-
-bool HyUiContainer::SetSpacer(HySizePolicy eSizePolicy, uint32 uiSize, HySpacerHandle hSpacer)
-{
-	if(m_SubSpacerMap.find(hSpacer) != m_SubSpacerMap.end())
-	{
-		m_SubSpacerMap[hSpacer]->Setup(eSizePolicy, uiSize);
-		return true;
-	}
-	return false;
-}
-
-bool HyUiContainer::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
-{
-	if(hAffectedLayout == HY_UNUSED_HANDLE)
-	{
-		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, iWidgetSpacing);
-		return true;
-	}
-	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
-	{
-		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, iWidgetSpacing);
-		return true;
-	}
-
-	return false;
 }
 
 /*virtual*/ void HyUiContainer::OnUpdate() /*override final*/

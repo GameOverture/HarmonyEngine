@@ -253,7 +253,7 @@ glm::ivec2 HyWindow::GetFramebufferSize() const
 void HyWindow::SetFramebufferSize(glm::ivec2 vBufferSize)
 {
 	m_vFramebufferSize = vBufferSize;
-	HyLog("Window " << m_uiINDEX << " Framebuffer: " << m_vFramebufferSize.x << ", " << m_vFramebufferSize.y);
+	HyLogDebug("Window " << m_uiINDEX << " Framebuffer: " << m_vFramebufferSize.x << ", " << m_vFramebufferSize.y);
 }
 
 HyCamera2d *HyWindow::CreateCamera2d()

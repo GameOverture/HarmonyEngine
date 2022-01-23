@@ -37,6 +37,11 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 {
 }
 
+/*virtual*/ bool HyLabel::IsLoadDataValid() /*override*/
+{
+	return m_Panel.IsValid() || m_Text.IsLoadDataValid();
+}
+
 void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName)
 {
 	Setup(initRef, sTextPrefix, sTextName, 0, 0, 0, 0);

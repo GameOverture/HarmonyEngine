@@ -19,13 +19,17 @@ class HyUiContainer;
 class HySpacer : public IHyWidget
 {
 	friend class HyUiContainer;
-	const HyOrientation	m_eORIEN_TYPE;
+
+	const HyOrientation		m_eORIEN_TYPE;
+	int32					m_iSizeHint;
+	int32					m_iActualSize;
 
 	HySpacer(HyOrientation eOrienType);
 public:
 	virtual ~HySpacer();
 
-	void Setup(HySizePolicy eSizePolicy, uint32 uiSize);
+	int32 GetActualSize() const;
+	void Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint);
 
 protected:
 	virtual glm::vec2 GetPosOffset() override;

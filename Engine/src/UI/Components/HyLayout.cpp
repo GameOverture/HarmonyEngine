@@ -35,6 +35,21 @@ HyOrientation HyLayout::GetLayoutType() const
 	return m_eLayoutType;
 }
 
+void HyLayout::SetLayoutType(HyOrientation eLayoutType)
+{
+	if(m_eLayoutType == eLayoutType)
+		return;
+
+	m_eLayoutType = eLayoutType;
+	m_bReverse = (m_eLayoutType == HYORIEN_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIEN_Vertical to achieve top->bottom as default
+	SetLayoutDirty();
+}
+
+glm::ivec2 HyLayout::GetActualSize() const
+{
+	return m_vActualSize;
+}
+
 /*virtual*/ HySizePolicy HyLayout::GetSizePolicy(HyOrientation eOrien) /*override*/
 {
 	uint32 uiSizePolicy = 0;// HYSIZEPOLICY_Fixed;
@@ -166,8 +181,8 @@ bool HyLayout::IsWidgetInputAllowed()
 		eInverseOrien = HYORIEN_Vertical;
 
 		// HACK NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
-		m_vSizeHint.x += (m_Margins.right * 0.5f);
-		m_vMinSize.x += (m_Margins.right * 0.5f);
+		m_vSizeHint.x += (m_Margins.right /** 0.5f*/);
+		m_vMinSize.x += (m_Margins.right /** 0.5f*/);
 		m_vSizeHint.y += m_Margins.top;
 		m_vMinSize.y += m_Margins.top;
 	}
@@ -179,8 +194,8 @@ bool HyLayout::IsWidgetInputAllowed()
 		// HACK NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
 		m_vSizeHint.x += m_Margins.right;
 		m_vMinSize.x += m_Margins.right;
-		m_vSizeHint.y += (m_Margins.top * 0.5f);
-		m_vMinSize.y += (m_Margins.top * 0.5f);
+		m_vSizeHint.y += (m_Margins.top /** 0.5f*/);
+		m_vMinSize.y += (m_Margins.top /** 0.5f*/);
 	}
 
 	// Figure out m_vSizeHint while counting size policies

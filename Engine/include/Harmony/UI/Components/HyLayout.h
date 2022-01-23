@@ -34,6 +34,9 @@ public:
 	virtual ~HyLayout();
 
 	HyOrientation GetLayoutType() const;
+	void SetLayoutType(HyOrientation eLayoutType);
+
+	glm::ivec2 GetActualSize() const;
 
 	virtual HySizePolicy GetSizePolicy(HyOrientation eOrien) override;
 	virtual glm::vec2 GetPosOffset() override;	// What offset is needed to get *this oriented to its bottom left

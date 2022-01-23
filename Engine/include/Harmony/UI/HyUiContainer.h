@@ -70,12 +70,16 @@ public:
 	IHyWidget *FocusNextWidget();
 
 	bool InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
-	HySpacerHandle InsertSpacer(HySizePolicy eSizePolicy = HYSIZEPOLICY_Expanding, uint32 uiSize = 0, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
-	HyLayoutHandle InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
-	void ClearItems();
 
-	bool SetSpacer(HySizePolicy eSizePolicy, uint32 uiSize, HySpacerHandle hSpacer);
-	bool SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	HySpacerHandle InsertSpacer(HySizePolicy eSizePolicy = HYSIZEPOLICY_Expanding, uint32 uiSizeHint = 0, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
+	uint32 GetSpacerSize(HySpacerHandle hSpacer);
+	bool SetSpacerSize(HySpacerHandle hSpacer, HySizePolicy eSizePolicy, uint32 uiSizeHint);
+
+	HyLayoutHandle InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
+	glm::ivec2 GetLayoutSize(HyLayoutHandle hLayout);
+	bool SetLayoutMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	
+	void ClearItems();
 
 protected:
 	virtual void OnUpdate() override final;
