@@ -148,6 +148,7 @@ bool HyLayout::RequestWidgetFocus(IHyWidget *pWidget)
 		else // m_pParent must be the container (and *this is the root layout)
 			return static_cast<HyUiContainer *>(m_pParent)->RequestWidgetFocus(pWidget);
 	}
+	return false;
 }
 
 bool HyLayout::IsWidgetInputAllowed()

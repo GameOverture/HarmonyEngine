@@ -245,13 +245,14 @@ float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameWidth(bool bIncludeScaling /*= tr
 
 	glm::vec3 vScale(1.0f);
 	if(bIncludeScaling)
-	{
-		glm::quat quatRot;
-		glm::vec3 ptTranslation;
-		glm::vec3 vSkew;
-		glm::vec4 vPerspective;
-		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-	}
+		HyCopyVec(vScale, scale.Get());
+	//{
+	//	glm::quat quatRot;
+	//	glm::vec3 ptTranslation;
+	//	glm::vec3 vSkew;
+	//	glm::vec4 vPerspective;
+	//	glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	//}
 
 	return frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * vScale.x;
 }
@@ -270,13 +271,14 @@ float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameHeight(bool bIncludeScaling /*= t
 
 	glm::vec3 vScale(1.0f);
 	if(bIncludeScaling)
-	{
-		glm::quat quatRot;
-		glm::vec3 ptTranslation;
-		glm::vec3 vSkew;
-		glm::vec4 vPerspective;
-		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-	}
+		HyCopyVec(vScale, scale.Get());
+	//{
+	//	glm::quat quatRot;
+	//	glm::vec3 ptTranslation;
+	//	glm::vec3 vSkew;
+	//	glm::vec4 vPerspective;
+	//	glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	//}
 
 	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
 }
@@ -292,13 +294,14 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth(uint32 uiStateIndex, bool b
 
 	glm::vec3 vScale(1.0f);
 	if(bIncludeScaling)
-	{
-		glm::quat quatRot;
-		glm::vec3 ptTranslation;
-		glm::vec3 vSkew;
-		glm::vec4 vPerspective;
-		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-	}
+		HyCopyVec(vScale, scale.Get());
+	//{
+	//	glm::quat quatRot;
+	//	glm::vec3 ptTranslation;
+	//	glm::vec3 vSkew;
+	//	glm::vec4 vPerspective;
+	//	glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	//}
 	
 	float fMaxWidth = 0.0f;
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
@@ -323,13 +326,14 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight(uint32 uiStateIndex, bool 
 
 	glm::vec3 vScale(1.0f);
 	if(bIncludeScaling)
-	{
-		glm::quat quatRot;
-		glm::vec3 ptTranslation;
-		glm::vec3 vSkew;
-		glm::vec4 vPerspective;
-		glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-	}
+		HyCopyVec(vScale, scale.Get());
+	//{
+	//	glm::quat quatRot;
+	//	glm::vec3 ptTranslation;
+	//	glm::vec3 vSkew;
+	//	glm::vec4 vPerspective;
+	//	glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	//}
 
 	float fMaxHeight = 0.0f;
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)

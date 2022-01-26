@@ -34,23 +34,36 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 /*virtual*/ void HyText2d::OnSetDebugBox() /*override*/
 {
-	// SetAsLine or SetAsVertical
-	if(m_uiTextAttributes == 0 || 0 != (m_uiTextAttributes & TEXTATTRIB_IsVertical))
-		m_DebugBox.SetAsNothing();
-	else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsColumn)) // SetAsColumn
+	m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
+	m_DebugBox.SetWireframe(true);
+
+	// SetAsLine
+	if((m_uiTextAttributes & (TEXTATTRIB_IsColumn | TEXTATTRIB_IsScaleBox | TEXTATTRIB_IsVertical)) == 0)
 	{
-		m_DebugBox.SetAsShape(GetLocalBoundingVolume());
-		//glm::vec2 ptVerts[4] = { glm::vec2(0.0f, -100.0f), glm::vec2(0.0f, 0.0f), glm::vec2(m_vBoxDimensions.x, 0.0f), glm::vec2(m_vBoxDimensions.x, -100.0f) };
-		//m_DebugBox.SetAsLineChain(ptVerts, 4);
-		m_DebugBox.SetWireframe(true);
-		m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
+		switch(m_eAlignment)
+		{
+		case HYALIGN_Left:
+		case HYALIGN_Justify:
+			m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(GetTextWidth(false), 0.0f));
+			break;
+		
+		case HYALIGN_HCenter:
+			m_DebugBox.SetAsLineSegment(glm::vec2(GetTextWidth(false) * -0.5f, 0.0f), glm::vec2(GetTextWidth(false) * 0.5f, 0.0f));
+			break;
+
+		case HYALIGN_Right:
+			m_DebugBox.SetAsLineSegment(glm::vec2(-GetTextWidth(false), 0.0f), glm::vec2(0.0f, 0.0f));
+			break;
+		}
 	}
-	else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsScaleBox)) // SetAsScaleBox
-	{
+	else if(m_uiTextAttributes & TEXTATTRIB_IsScaleBox)
 		m_DebugBox.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
-		m_DebugBox.SetWireframe(true);
-		m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
-	}
+	else if(m_uiTextAttributes & TEXTATTRIB_IsColumn)
+		m_DebugBox.SetAsShape(GetLocalBoundingVolume());
+	else if(m_uiTextAttributes & TEXTATTRIB_IsVertical)
+		m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetTextHeight(false)));
+	else
+		HyError("HyText2d::OnSetDebugBox - Unknown HyText2d text attributes");
 }
 #endif
 
@@ -65,10 +78,10 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	glm::decompose(GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
 
 	m_DebugBox.pos.Set(ptTranslation);
-	m_DebugBox.rot.Set(rot.Get()); // TODO: This is wrong! Needs World transform's amount of rotation
+	m_DebugBox.rot.Set(rot.Get()); // TODO: This is wrong! Needs scene transform's amount of rotation
 	m_DebugBox.scale.Set(vScale);
 	m_DebugBox.UseWindowCoordinates(GetCoordinateSystem());
-	m_DebugBox.SetDisplayOrder(GetDisplayOrder());
+	m_DebugBox.SetDisplayOrder(GetDisplayOrder()+1);
 	m_DebugBox.SetVisible(IsVisible());
 #endif
 
