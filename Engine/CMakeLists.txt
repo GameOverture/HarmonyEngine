@@ -144,6 +144,7 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/HyScrollContainer.cpp
 	src/UI/Widgets/HyButton.cpp
 	src/UI/Widgets/HyCheckBox.cpp
+	src/UI/Widgets/HyComboBox.cpp
 	src/UI/Widgets/HyLabel.cpp
 	src/UI/Widgets/HyLineEdit.cpp
 	src/UI/Widgets/HyProgressBar.cpp
@@ -268,6 +269,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/HyScrollContainer.h
 	include/Harmony/UI/Widgets/HyButton.h
 	include/Harmony/UI/Widgets/HyCheckBox.h
+	include/Harmony/UI/Widgets/HyComboBox.h
 	include/Harmony/UI/Widgets/HyLabel.h
 	include/Harmony/UI/Widgets/HyLineEdit.h
 	include/Harmony/UI/Widgets/HyProgressBar.h
