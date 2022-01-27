@@ -41,9 +41,15 @@ HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std:
 
 uint32 HyComboBox::InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
 {
-	HyButton *pNewBtn = HY_NEW HyButton(initRef, sTextPrefix, sTextName, this);
+	return InsertSubButton(initRef, sTextPrefix, sTextName, 0, 0, 0, 0, fpCallBack, pParam, sAudioPrefix, sAudioName);
+}
+
+uint32 HyComboBox::InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
+{
+	HyButton *pNewBtn = HY_NEW HyButton(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, this);
 	pNewBtn->SetButtonClickedCallback(fpCallBack, pParam, sAudioPrefix, sAudioName);
 	pNewBtn->alpha.Set(0.0f);
+	pNewBtn->Load();
 
 	m_SubBtnList.push_back(pNewBtn);
 	return static_cast<uint32>(m_SubBtnList.size()) - 1;
@@ -172,5 +178,5 @@ HyButton *HyComboBox::GetSubBtn(uint32 uiIndex)
 /*virtual*/ void HyComboBox::OnSetup() /*override*/
 {
 	HyButton::OnSetup();
-	//SetButtonClickedCallback(
+	SetButtonClickedCallback([](HyButton *pBtn, void *pData) { static_cast<HyComboBox *>(pData)->ToggleExpanded(); }, this);
 }
