@@ -232,7 +232,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetAnimDuration()
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameWidth(bool bIncludeScaling /*= true*/)
+float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(float fPercent /*= 1.0f*/)
 {
 	if(this->AcquireData() == nullptr) {
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameWidth invoked on null data");
@@ -243,22 +243,11 @@ float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameWidth(bool bIncludeScaling /*= tr
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
-	glm::vec3 vScale(1.0f);
-	if(bIncludeScaling)
-		HyCopyVec(vScale, scale.Get());
-	//{
-	//	glm::quat quatRot;
-	//	glm::vec3 ptTranslation;
-	//	glm::vec3 vSkew;
-	//	glm::vec4 vPerspective;
-	//	glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-	//}
-
-	return frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * vScale.x;
+	return (frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth()) * fPercent;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameHeight(bool bIncludeScaling /*= true*/)
+float IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight(float fPercent /*= 1.0f*/)
 {
 	if(this->AcquireData() == nullptr) {
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameHeight invoked on null data");
@@ -269,45 +258,23 @@ float IHySprite<NODETYPE, ENTTYPE>::GetCurFrameHeight(bool bIncludeScaling /*= t
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
-	glm::vec3 vScale(1.0f);
-	if(bIncludeScaling)
-		HyCopyVec(vScale, scale.Get());
-	//{
-	//	glm::quat quatRot;
-	//	glm::vec3 ptTranslation;
-	//	glm::vec3 vSkew;
-	//	glm::vec4 vPerspective;
-	//	glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-	//}
-
-	return frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
+	return (frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight()) * fPercent;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
+float IHySprite<NODETYPE, ENTTYPE>::GetStateWidth(uint32 uiStateIndex, float fPercent /*= 1.0f*/)
 {
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
 	if(pData == nullptr || pData->GetNumStates() == 0) {
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth invoked on null data");
 		return 0.0f;
 	}
-
-	glm::vec3 vScale(1.0f);
-	if(bIncludeScaling)
-		HyCopyVec(vScale, scale.Get());
-	//{
-	//	glm::quat quatRot;
-	//	glm::vec3 ptTranslation;
-	//	glm::vec3 vSkew;
-	//	glm::vec4 vPerspective;
-	//	glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-	//}
 	
 	float fMaxWidth = 0.0f;
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
 		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
-		float fFrameWidth = frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth() * vScale.x;
+		float fFrameWidth = (frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth()) * fPercent;
 		if(fMaxWidth < fFrameWidth)
 			fMaxWidth = fFrameWidth;
 	}
@@ -316,7 +283,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth(uint32 uiStateIndex, bool b
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight(uint32 uiStateIndex, bool bIncludeScaling /*= true*/)
+float IHySprite<NODETYPE, ENTTYPE>::GetStateHeight(uint32 uiStateIndex, float fPercent /*= 1.0f*/)
 {
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
 	if(pData == nullptr) {
@@ -324,22 +291,11 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight(uint32 uiStateIndex, bool 
 		return 0.0f;
 	}
 
-	glm::vec3 vScale(1.0f);
-	if(bIncludeScaling)
-		HyCopyVec(vScale, scale.Get());
-	//{
-	//	glm::quat quatRot;
-	//	glm::vec3 ptTranslation;
-	//	glm::vec3 vSkew;
-	//	glm::vec4 vPerspective;
-	//	glm::decompose(this->GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
-	//}
-
 	float fMaxHeight = 0.0f;
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
 		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
-		float fFrameHeight = frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight() * vScale.y;
+		float fFrameHeight = (frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight()) * fPercent;
 		if(fMaxHeight < fFrameHeight)
 			fMaxHeight = fFrameHeight;
 	}

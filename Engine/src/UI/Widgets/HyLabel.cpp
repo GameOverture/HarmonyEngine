@@ -121,11 +121,6 @@ float HyLabel::GetPanelHeight()
 	return m_Panel.GetHeight();
 }
 
-glm::vec2 HyLabel::GetPanelSize()
-{
-	return m_Panel.GetSize();
-}
-
 uint32 HyLabel::GetSpriteState() const
 {
 	return m_Panel.GetSpriteState();
@@ -204,7 +199,7 @@ HyText2d &HyLabel::GetTextNode()
 	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
 		if(m_Panel.IsValid() == false)
-			HySetVec(m_vSizeHint, static_cast<int32>(m_Text.GetTextWidth(false)), static_cast<int32>(m_Text.GetTextHeight(false)));
+			HySetVec(m_vSizeHint, static_cast<int32>(m_Text.GetWidth()), static_cast<int32>(m_Text.GetHeight()));
 		else
 			m_vSizeHint = m_Panel.GetSizeHint();
 	}
@@ -213,13 +208,13 @@ HyText2d &HyLabel::GetTextNode()
 		glm::vec2 vPanelSizeHint = m_Panel.GetSizeHint();
 		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
 		{
-			m_vSizeHint.x = HyMax(vPanelSizeHint.x, m_Text.GetTextWidth(false));
-			m_vSizeHint.y = vPanelSizeHint.y + m_TextMargins.iTag + m_Text.GetTextHeight(false);
+			m_vSizeHint.x = HyMax(vPanelSizeHint.x, m_Text.GetWidth());
+			m_vSizeHint.y = vPanelSizeHint.y + m_TextMargins.iTag + m_Text.GetHeight();
 		}
 		else // Horizontal
 		{
-			m_vSizeHint.x = vPanelSizeHint.x + m_TextMargins.iTag + m_Text.GetTextWidth(false);
-			m_vSizeHint.y = HyMax(vPanelSizeHint.y, m_Text.GetTextHeight(false));
+			m_vSizeHint.x = vPanelSizeHint.x + m_TextMargins.iTag + m_Text.GetWidth();
+			m_vSizeHint.y = HyMax(vPanelSizeHint.y, m_Text.GetHeight());
 		}
 	}
 }
@@ -230,14 +225,14 @@ HyText2d &HyLabel::GetTextNode()
 	{
 		if(m_Panel.IsValid() == false)
 		{
-			glm::vec2 vTextSize(m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
+			glm::vec2 vTextSize(m_Text.GetWidth(), m_Text.GetHeight());
 
 			float fScaleX = uiNewWidth / vTextSize.x;
 			float fScaleY = uiNewHeight / vTextSize.y;
 			m_Text.scale.Set(HyMin(fScaleX, fScaleY));
 
-			uiNewWidth = m_Text.GetTextWidth(true);
-			uiNewHeight = m_Text.GetTextHeight(true);
+			//uiNewWidth = m_Text.GetTextWidth(true);
+			//uiNewHeight = m_Text.GetTextHeight(true);
 		}
 		else
 			m_Panel.SetSize(uiNewWidth, uiNewHeight);
@@ -246,7 +241,7 @@ HyText2d &HyLabel::GetTextNode()
 	{
 		glm::ivec2 vSizeHint = GetSizeHint();
 		glm::ivec2 vPanelSizeHint = m_Panel.GetSizeHint();
-		glm::ivec2 vTextSizeHint(m_Text.GetTextWidth(false), m_Text.GetTextHeight(false));
+		glm::ivec2 vTextSizeHint(m_Text.GetWidth(), m_Text.GetHeight());
 
 		glm::ivec2 vNewPanelSize, vNewTextSize;
 		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
@@ -302,7 +297,7 @@ HyText2d &HyLabel::GetTextNode()
 				m_Text.SetTextAlignment(HYALIGN_Right);
 
 			pFirst = &m_Text;
-			HySetVec(vFirstSize, m_Text.GetTextWidth(true), m_Text.GetTextHeight(true));
+			HySetVec(vFirstSize, m_Text.GetWidth() * m_Text.scale.X(), m_Text.GetHeight() * m_Text.scale.Y());
 			vFirstOffset = m_Text.GetTextBottomLeft();
 
 			pSecond = &m_Panel;
@@ -321,7 +316,7 @@ HyText2d &HyLabel::GetTextNode()
 			vFirstOffset = -m_Panel.GetBotLeftOffset();
 
 			pSecond = &m_Text;
-			HySetVec(vSecondSize, m_Text.GetTextWidth(true), m_Text.GetTextHeight(true));
+			HySetVec(vSecondSize, m_Text.GetWidth() * m_Text.scale.X(), m_Text.GetHeight() * m_Text.scale.Y());
 			vSecondOffset = m_Text.GetTextBottomLeft();
 		}
 
@@ -388,7 +383,7 @@ HyText2d &HyLabel::GetTextNode()
 
 				float fLineOffsetY = 0.0f;
 				float fVerticalSpace = vPanelDimensions.y - ((m_TextMargins.top + m_TextMargins.bottom) * (vPanelDimensions.y / vUiSizeHint.y));
-				float fTextHeight = m_Text.GetLineHeight(true);
+				float fTextHeight = m_Text.GetLineBreakHeight() * m_Text.scale.Y();
 				if(fVerticalSpace > fTextHeight)
 					fLineOffsetY = (fVerticalSpace - fTextHeight) * 0.5f;
 				m_Text.pos.Offset(fLineOffsetX, fLineOffsetY);

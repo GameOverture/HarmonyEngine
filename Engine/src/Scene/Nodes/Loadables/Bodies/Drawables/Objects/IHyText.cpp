@@ -128,21 +128,21 @@ void IHyText<NODETYPE, ENTTYPE>::SetText(const std::stringstream &ssUtf8Text)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHyText<NODETYPE, ENTTYPE>::GetTextWidth(bool bIncludeScaling /*= true*/)
+float IHyText<NODETYPE, ENTTYPE>::GetWidth(float fPercent /*= 1.0f*/)
 {
 	CalculateGlyphInfos();
-	return m_fUsedPixelWidth * (bIncludeScaling ? std::fabs(this->scale.X()) : 1.0f);
+	return m_fUsedPixelWidth * fPercent;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHyText<NODETYPE, ENTTYPE>::GetTextHeight(bool bIncludeScaling /*= true*/)
+float IHyText<NODETYPE, ENTTYPE>::GetHeight(float fPercent /*= 1.0f*/)
 {
 	CalculateGlyphInfos();
-	return m_fUsedPixelHeight * (bIncludeScaling ? std::fabs(this->scale.Y()) : 1.0f);
+	return m_fUsedPixelHeight * fPercent;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHyText<NODETYPE, ENTTYPE>::GetLineHeight(bool bIncludeScaling /*= true*/)
+float IHyText<NODETYPE, ENTTYPE>::GetLineBreakHeight(float fPercent /*= 1.0f*/)
 {
 	if(this->AcquireData() == nullptr)
 	{
@@ -153,7 +153,7 @@ float IHyText<NODETYPE, ENTTYPE>::GetLineHeight(bool bIncludeScaling /*= true*/)
 	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
 	float fLineHeight = pData->GetLineHeight(this->m_uiState);
 
-	return fLineHeight * (bIncludeScaling ? std::fabs(this->scale.Y()) : 1.0f);
+	return fLineHeight * fPercent;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -386,11 +386,11 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 		switch(m_eAlignment)
 		{
 		case HYALIGN_HCenter:
-			fX = GetTextWidth() * -0.5f;
+			fX = GetWidth(-0.5f);
 			break;
 
 		case HYALIGN_Right:
-			fX = -GetTextWidth();
+			fX = GetWidth(-1.0f);
 			break;
 
 		default:

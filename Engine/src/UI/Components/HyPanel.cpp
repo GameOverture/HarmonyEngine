@@ -79,6 +79,7 @@ HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
 
 void HyPanel::Setup(const HyPanelInit &initRef)
 {
+	scale.Set(1.0f, 1.0f);
 	m_SpritePanel.Uninit();
 	m_Frame1.SetAsNothing();
 	m_Frame2.SetAsNothing();
@@ -147,8 +148,8 @@ glm::ivec2 HyPanel::GetSizeHint()
 {
 	if(IsSprite())
 	{
-		return glm::ivec2(m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false),
-						  m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false));
+		return glm::ivec2(m_SpritePanel.GetStateWidth(m_SpritePanel.GetState()),
+						  m_SpritePanel.GetStateHeight(m_SpritePanel.GetState()));
 	}
 	
 	return m_vSize;
@@ -157,7 +158,7 @@ glm::ivec2 HyPanel::GetSizeHint()
 uint32 HyPanel::GetWidth()
 {
 	if(IsSprite())
-		return m_SpritePanel.GetStateMaxWidth(m_SpritePanel.GetState(), false) * scale.X();
+		return m_SpritePanel.GetStateWidth(m_SpritePanel.GetState()) * scale.X();
 	else
 		return m_vSize.x * scale.X();
 }
@@ -165,7 +166,7 @@ uint32 HyPanel::GetWidth()
 uint32 HyPanel::GetHeight()
 {
 	if(IsSprite())
-		return m_SpritePanel.GetStateMaxHeight(m_SpritePanel.GetState(), false) * scale.Y();
+		return m_SpritePanel.GetStateHeight(m_SpritePanel.GetState()) * scale.Y();
 	else
 		return m_vSize.y * scale.Y();
 }
@@ -177,9 +178,6 @@ glm::ivec2 HyPanel::GetSize()
 
 void HyPanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 {
-	//if(IsNull() || uiWidth == 0 || uiHeight == 0)
-	//	return;
-
 	HySetVec(m_vSize, uiWidth, uiHeight);
 
 	if(IsPrimitive())

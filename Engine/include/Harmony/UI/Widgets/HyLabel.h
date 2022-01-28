@@ -54,7 +54,6 @@ public:
 
 	float GetPanelWidth();
 	float GetPanelHeight();
-	glm::vec2 GetPanelSize();
 
 	void SetPanelVisible(bool bVisible);
 

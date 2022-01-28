@@ -232,7 +232,7 @@ float HyRackMeter::GetSpinHeightThreshold()
 	if(m_Text.IsScaleBox())
 		return m_Text.GetTextBoxDimensions().y;
 
-	return m_Text.GetLineHeight();
+	return m_Text.GetLineBreakHeight();
 }
 
 void HyRackMeter::FormatDigits()
@@ -321,7 +321,7 @@ void HyRackMeter::FormatDigits()
 		if(m_Text.IsScaleBox())
 			uiWidth = m_Text.GetTextBoxDimensions().x;
 		else
-			uiWidth = m_Text.GetTextWidth(true);
+			uiWidth = m_Text.GetWidth();
 
 		m_SpinText.SetScissor(0, 0, uiWidth, static_cast<uint32>(fThreshold));
 	}

@@ -70,11 +70,11 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	}
 
 	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET;
-	vFrameOffset.x *= std::fabs(scale.Get().x);
-	vFrameOffset.y *= std::fabs(scale.Get().y);
+	//vFrameOffset.x *= std::fabs(scale.Get().x);
+	//vFrameOffset.y *= std::fabs(scale.Get().y);
 
-	float fHalfWidth = GetCurFrameWidth(true) * 0.5f;
-	float fHalfHeight = GetCurFrameHeight(true) * 0.5f;
+	float fHalfWidth = GetFrameWidth(0.5f);
+	float fHalfHeight = GetFrameHeight(0.5f);
 
 	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
 }

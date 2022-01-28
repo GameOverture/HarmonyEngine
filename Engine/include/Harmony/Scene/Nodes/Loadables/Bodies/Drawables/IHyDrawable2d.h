@@ -22,7 +22,7 @@ class IHyDrawable2d : public IHyBody2d, public IHyDrawable
 	friend class HyScene;
 
 protected:
-	HyShape2d						m_LocalBoundingVolume; // Used to assemble scene AABB, for view frustrum culling
+	HyShape2d				m_LocalBoundingVolume; // A conforming shape around *this that assumes an identity matrix for its transform.
 
 public:
 	IHyDrawable2d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
@@ -45,7 +45,7 @@ protected:
 	virtual void OnUnloaded() override;
 
 	virtual bool OnIsValidToRender() = 0;
-	virtual void OnCalcBoundingVolume() = 0;
+	virtual void OnCalcBoundingVolume() = 0; // Set 'm_LocalBoundingVolume' to a conforming shape around *this that assumes an identity matrix for its transform.
 
 #ifdef HY_PLATFORM_GUI
 public:

@@ -91,10 +91,10 @@ public:
 	void SetText(const std::string &sUtf8Text);
 	void SetText(const std::stringstream &ssUtf8Text);
 
-	float GetTextWidth(bool bIncludeScaling = true);
-	float GetTextHeight(bool bIncludeScaling = true);
+	float GetWidth(float fPercent = 1.0f);		// Returns the maximum pixel width of all lines of text (ignores any scaling)
+	float GetHeight(float fPercent = 1.0f);		// Returns the maximum pixel height of all lines of text (ignores any scaling)
 	
-	float GetLineHeight(bool bIncludeScaling = true);
+	float GetLineBreakHeight(float fPercent = 1.0f);
 
 	uint32 GetNumCharacters() const;
 	uint32 GetNumShownCharacters() const;

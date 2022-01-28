@@ -44,15 +44,15 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		{
 		case HYALIGN_Left:
 		case HYALIGN_Justify:
-			m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(GetTextWidth(false), 0.0f));
+			m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(GetWidth(), 0.0f));
 			break;
 		
 		case HYALIGN_HCenter:
-			m_DebugBox.SetAsLineSegment(glm::vec2(GetTextWidth(false) * -0.5f, 0.0f), glm::vec2(GetTextWidth(false) * 0.5f, 0.0f));
+			m_DebugBox.SetAsLineSegment(glm::vec2(GetWidth(-0.5f), 0.0f), glm::vec2(GetWidth(0.5f), 0.0f));
 			break;
 
 		case HYALIGN_Right:
-			m_DebugBox.SetAsLineSegment(glm::vec2(-GetTextWidth(false), 0.0f), glm::vec2(0.0f, 0.0f));
+			m_DebugBox.SetAsLineSegment(glm::vec2(-GetWidth(), 0.0f), glm::vec2(0.0f, 0.0f));
 			break;
 		}
 	}
@@ -61,7 +61,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	else if(m_uiTextAttributes & TEXTATTRIB_IsColumn)
 		m_DebugBox.SetAsShape(GetLocalBoundingVolume());
 	else if(m_uiTextAttributes & TEXTATTRIB_IsVertical)
-		m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetTextHeight(false)));
+		m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetHeight()));
 	else
 		HyError("HyText2d::OnSetDebugBox - Unknown HyText2d text attributes");
 }
@@ -106,8 +106,8 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	ptBotLeft.x *= std::fabs(scale.X());
 	ptBotLeft.y *= std::fabs(scale.Y());
 
-	float fHalfWidth = GetTextWidth(true) * 0.5f;
-	float fHalfHeight = GetTextHeight(true) * 0.5f;
+	float fHalfWidth = GetWidth(0.5f);
+	float fHalfHeight = GetHeight(0.5f);
 
 	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
 	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
