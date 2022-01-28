@@ -70,15 +70,16 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 /*virtual*/ void HyText2d::OnLoadedUpdate() /*override*/
 {
 #ifdef HY_USE_TEXT_DEBUG_BOXES
+	const glm::mat4 &mtxSceneRef = GetSceneTransform();
 	glm::vec3 vScale(1.0f);
 	glm::quat quatRot;
 	glm::vec3 ptTranslation;
 	glm::vec3 vSkew;
 	glm::vec4 vPerspective;
-	glm::decompose(GetSceneTransform(), vScale, quatRot, ptTranslation, vSkew, vPerspective);
+	glm::decompose(mtxSceneRef, vScale, quatRot, ptTranslation, vSkew, vPerspective);
 
 	m_DebugBox.pos.Set(ptTranslation);
-	m_DebugBox.rot.Set(rot.Get()); // TODO: This is wrong! Needs scene transform's amount of rotation
+	m_DebugBox.rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
 	m_DebugBox.scale.Set(vScale);
 	m_DebugBox.UseWindowCoordinates(GetCoordinateSystem());
 	m_DebugBox.SetDisplayOrder(GetDisplayOrder()+1);

@@ -80,7 +80,7 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 		glm::mat4 mtxScene = GetSceneTransform();
 		float fSceneRotationRadians = glm::atan(mtxScene[0][1], mtxScene[0][0]);
 
-		GetLocalBoundingVolume(); // This will update BV if it's dirty
+		GetLocalBoundingVolume(); // This will update 'm_LocalBoundingVolume' if it's dirty
 		if(m_LocalBoundingVolume.IsValidShape() && m_LocalBoundingVolume.GetB2Shape())
 			m_LocalBoundingVolume.GetB2Shape()->ComputeAABB(&m_SceneAABB, b2Transform(b2Vec2(mtxScene[3].x, mtxScene[3].y), b2Rot(fSceneRotationRadians)), 0);
 		else

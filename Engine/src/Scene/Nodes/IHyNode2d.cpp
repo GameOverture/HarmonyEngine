@@ -185,12 +185,6 @@ const glm::mat4 &IHyNode2d::GetSceneTransform()
 	return m_mtxCached;
 }
 
-/*virtual*/ const b2AABB &IHyNode2d::GetSceneAABB()
-{
-	// Derived versions of this function will properly update 'm_SceneAABB' before returning
-	return m_SceneAABB;
-}
-
 float IHyNode2d::GetSceneHeight()
 {
 	const b2AABB &aabbRef = GetSceneAABB();

@@ -24,12 +24,16 @@ protected:
 
 		COMBOBOXATTRIB_IsHorzExpand		= 1 << 16,
 		COMBOBOXATTRIB_IsPositiveExpand = 1 << 17,
+		COMBOBOXATTRIB_IsInstantExpand	= 1 << 18,
 
-		COMBOBOXATTRIB_FLAG_NEXT		= 1 << 18
+		COMBOBOXATTRIB_FLAG_NEXT		= 1 << 19
 	};
 	static_assert((int)COMBOBOXATTRIB_IsExpanded == (int)BTNATTRIB_FLAG_NEXT, "HyComboBox is not matching with base classes attrib flags");
 
+	HyPanel						m_SubBtnPanel;
 	std::vector<HyButton *>		m_SubBtnList;
+	float						m_fSubBtnSpacing;
+
 	float						m_fElapsedExpandedTime;
 	float						m_fExpandedTimeout;
 
@@ -42,6 +46,8 @@ public:
 	uint32 InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
 	uint32 InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
 	void ClearSubButtons();
+
+	void SetExpandType(HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate);
 
 	bool IsExpanded() const;
 	bool IsTransition() const;

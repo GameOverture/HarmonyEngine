@@ -18,3 +18,8 @@ HyAudio2d::HyAudio2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, H
 /*virtual*/ HyAudio2d::~HyAudio2d(void)
 {
 }
+
+/*virtual*/ const b2AABB &HyAudio2d::GetSceneAABB() /*override*/
+{
+	return m_SceneAABB;
+}

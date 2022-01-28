@@ -27,6 +27,7 @@ protected:
 	float							m_fRotation;		// Reference value used in 'rot' HyAnimFloat
 
 	b2AABB							m_SceneAABB;		// Don't directly use, acquiring using GetSceneAABB()
+														// Derived versions of this function will properly update 'm_SceneAABB' before returning
 
 public:
 	HyAnimVec2						pos;
@@ -50,7 +51,7 @@ public:
 	void GetLocalTransform(glm::mat4 &mtxOut) const;
 	const glm::mat4 &GetSceneTransform();
 
-	virtual const b2AABB &GetSceneAABB();
+	virtual const b2AABB &GetSceneAABB() = 0;
 	float GetSceneHeight();
 	float GetSceneWidth();
 };

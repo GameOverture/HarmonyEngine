@@ -18,6 +18,11 @@ HyCamera2d::HyCamera2d(HyWindow *pWindow) :
 HyCamera2d::~HyCamera2d()
 { }
 
+/*virtual*/ const b2AABB &HyCamera2d::GetSceneAABB() /*override*/
+{
+	return m_SceneAABB;
+}
+
 /*virtual*/ void HyCamera2d::SetZoom(const float fZoom)
 {
 	scale.Set(fZoom, fZoom);

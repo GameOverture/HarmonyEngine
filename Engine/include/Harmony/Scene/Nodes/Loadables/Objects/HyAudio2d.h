@@ -22,6 +22,8 @@ public:
 	virtual ~HyAudio2d(void);
 	// TODO: assignment operator and move operator
 
+	virtual const b2AABB &IHyNode2d::GetSceneAABB() override;
+
 private:
 	// Hide any transform functionality inherited from IHyNode2d
 	using IHyNode2d::GetLocalTransform;
