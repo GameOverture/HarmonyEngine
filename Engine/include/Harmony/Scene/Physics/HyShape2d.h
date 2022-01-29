@@ -70,7 +70,12 @@ public:
 	void SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
 	bool TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const;
-	bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;
+	//bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;
+
+	bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform);
+
+protected:
+	b2Shape *CloneTransform(const glm::mat4 &mtxTransform) const;
 };
 
 #endif /* HyShape2d_h__ */

@@ -48,7 +48,7 @@ public:
 protected:
 	virtual bool IsValidToRender() = 0;
 	virtual void OnUpdateUniforms() { }			// Upon updating, this function will set the shaders' uniforms when using the default shader
-	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) { }
+	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) = 0;
 
 private:
 	virtual IHyNode &_DrawableGetNodeRef() = 0;

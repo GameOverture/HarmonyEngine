@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyShape2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "Utilities/HyMath.h"
 
 HyShape2d::HyShape2d() :
 	m_eType(HYSHAPE_Unknown),
@@ -80,7 +81,7 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 		} break;
 
 	default:
-		// Unknown shape type (unitialized IHyNode objects)
+		// Unknown shape type (uninitialized IHyNode objects)
 		break;
 	}
 
@@ -306,88 +307,202 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 
 bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const
 {
-	return m_pShape && m_pShape->TestPoint(b2Transform(b2Vec2(mtxSelfTransform[3].x, mtxSelfTransform[3].y), b2Rot(glm::atan(mtxSelfTransform[0][1], mtxSelfTransform[0][0]))), b2Vec2(ptTestPoint.x, ptTestPoint.y));
+	bool bIsCollide = false;
+	
+	b2Shape *pTransformedSelf = CloneTransform(mtxSelfTransform);
+	if(pTransformedSelf)
+	{
+		bIsCollide = pTransformedSelf->TestPoint(b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), b2Vec2(ptTestPoint.x, ptTestPoint.y));
+		delete pTransformedSelf;
+	}
+
+	return bIsCollide;
 }
 
-bool HyShape2d::IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const
-{
-	b2Transform selfTransform(b2Vec2(mtxSelfTransform[3].x, mtxSelfTransform[3].y), b2Rot(glm::atan(mtxSelfTransform[0][1], mtxSelfTransform[0][0])));
-	b2Transform testTransform(b2Vec2(mtxTestTransform[3].x, mtxTestTransform[3].y), b2Rot(glm::atan(mtxTestTransform[0][1], mtxTestTransform[0][0])));
+//bool HyShape2d::IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const
+//{
+//	// TODO: Account for any scaling within 'mtxSelfTransform' and 'mtxTestTransform'
+//	b2Transform selfTransform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f));
+//	b2Transform testTransform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f));
+//	//b2Transform selfTransform(b2Vec2(mtxSelfTransform[3].x, mtxSelfTransform[3].y), b2Rot(glm::atan(mtxSelfTransform[0][1], mtxSelfTransform[0][0])));
+//	//b2Transform testTransform(b2Vec2(mtxTestTransform[3].x, mtxTestTransform[3].y), b2Rot(glm::atan(mtxTestTransform[0][1], mtxTestTransform[0][0])));
+//
+//	b2Manifold localManifold;
+//
+//	switch(m_eType)
+//	{
+//	case HYSHAPE_LineSegment:
+//	case HYSHAPE_LineChain:
+//	case HYSHAPE_LineLoop:
+//		switch(testShape.GetType())
+//		{
+//		case HYSHAPE_LineSegment:
+//		case HYSHAPE_LineChain:
+//		case HYSHAPE_LineLoop:
+//			HyError("HyShape2d::IsColliding - Line to Line collision is not supported");
+//			return false;
+//		case HYSHAPE_Circle:
+//			b2CollideEdgeAndCircle(&localManifold, static_cast<const b2EdgeShape *>(m_pShape), selfTransform, static_cast<const b2CircleShape *>(testShape.GetB2Shape()), testTransform);
+//			break;
+//		case HYSHAPE_Polygon:
+//			b2CollideEdgeAndPolygon(&localManifold, static_cast<const b2EdgeShape *>(m_pShape), selfTransform, static_cast<const b2PolygonShape *>(testShape.GetB2Shape()), testTransform);
+//			break;
+//
+//		default:
+//			HyError("Unhandled shape type of test shape in HyShape2d::IsColliding");
+//			break;
+//		}
+//		break;
+//
+//	case HYSHAPE_Circle:
+//		switch(testShape.GetType())
+//		{
+//		case HYSHAPE_LineSegment:
+//		case HYSHAPE_LineChain:
+//		case HYSHAPE_LineLoop:
+//			b2CollideEdgeAndCircle(&localManifold, static_cast<const b2EdgeShape *>(testShape.GetB2Shape()), testTransform, static_cast<const b2CircleShape *>(m_pShape), selfTransform);
+//			return false;
+//		case HYSHAPE_Circle:
+//			b2CollideCircles(&localManifold, static_cast<const b2CircleShape *>(m_pShape), selfTransform, static_cast<const b2CircleShape *>(testShape.GetB2Shape()), testTransform);
+//			break;
+//		case HYSHAPE_Polygon:
+//			b2CollidePolygonAndCircle(&localManifold, static_cast<const b2PolygonShape *>(testShape.GetB2Shape()), testTransform, static_cast<const b2CircleShape *>(m_pShape), selfTransform);
+//			break;
+//
+//		default:
+//			HyError("Unhandled shape type of test shape in HyShape2d::IsColliding");
+//			break;
+//		}
+//		break;
+//
+//	case HYSHAPE_Polygon:
+//		switch(testShape.GetType())
+//		{
+//		case HYSHAPE_LineSegment:
+//		case HYSHAPE_LineChain:
+//		case HYSHAPE_LineLoop:
+//			b2CollideEdgeAndPolygon(&localManifold, static_cast<const b2EdgeShape *>(testShape.GetB2Shape()), testTransform, static_cast<const b2PolygonShape *>(m_pShape), selfTransform);
+//			break;
+//		case HYSHAPE_Circle:
+//			b2CollidePolygonAndCircle(&localManifold, static_cast<const b2PolygonShape *>(m_pShape), selfTransform, static_cast<const b2CircleShape *>(testShape.GetB2Shape()), testTransform);
+//			break;
+//		case HYSHAPE_Polygon:
+//			b2CollidePolygons(&localManifold, static_cast<const b2PolygonShape *>(m_pShape), selfTransform, static_cast<const b2PolygonShape *>(testShape.GetB2Shape()), testTransform);
+//			break;
+//
+//		default:
+//			HyError("Unhandled shape type of test shape in HyShape2d::IsColliding");
+//			break;
+//		}
+//		break;
+//
+//	default:
+//		HyError("Unhandled shape type of self in HyShape2d::IsColliding");
+//		break;
+//	}
+//
+//	worldManifoldOut.Initialize(&localManifold, selfTransform, m_pShape->m_radius, testTransform, testShape.GetB2Shape()->m_radius);
+//	return localManifold.pointCount != 0;
+//}
 
-	b2Manifold localManifold;
+bool HyShape2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform)
+{
+	b2Shape *pTransformedSelf = CloneTransform(mtxTransform);
+	if(pTransformedSelf)
+	{
+		pTransformedSelf->ComputeAABB(&aabbOut, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), 0);
+		delete pTransformedSelf;
+
+		return true;
+	}
+
+	return false;
+}
+
+b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
+{
+	b2Shape *pCloneB2Shape = nullptr;
+	std::vector<glm::vec4> vertList;
+	std::vector<b2Vec2> b2VertList;
 
 	switch(m_eType)
 	{
 	case HYSHAPE_LineSegment:
+		pCloneB2Shape = HY_NEW b2EdgeShape();
+
+		vertList.emplace_back(static_cast<b2EdgeShape *>(m_pShape)->m_vertex1.x, static_cast<b2EdgeShape *>(m_pShape)->m_vertex1.y, 0.0f, 1.0f);
+		vertList.emplace_back(static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.x, static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.y, 0.0f, 1.0f);
+
+		vertList[0] = mtxTransform * vertList[0];
+		vertList[1] = mtxTransform * vertList[1];
+
+		static_cast<b2EdgeShape *>(pCloneB2Shape)->Set(b2Vec2(vertList[0].x, vertList[0].y), b2Vec2(vertList[1].x, vertList[1].y));
+		break;
+
 	case HYSHAPE_LineChain:
+		pCloneB2Shape = HY_NEW b2ChainShape();
+		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count; ++i)
+		{
+			vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x,
+								  static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y, 0.0f, 1.0f);
+			vertList[i] = mtxTransform * vertList[i];
+			b2VertList.emplace_back(vertList[i].x, vertList[i].y);
+		}
+
+		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(b2VertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count);
+		break;
+
 	case HYSHAPE_LineLoop:
-		switch(testShape.GetType())
+		pCloneB2Shape = HY_NEW b2ChainShape();
+		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count; ++i)
 		{
-		case HYSHAPE_LineSegment:
-		case HYSHAPE_LineChain:
-		case HYSHAPE_LineLoop:
-			HyError("HyShape2d::IsColliding - Line to Line collision is not supported");
-			return false;
-		case HYSHAPE_Circle:
-			b2CollideEdgeAndCircle(&localManifold, static_cast<const b2EdgeShape *>(m_pShape), selfTransform, static_cast<const b2CircleShape *>(testShape.GetB2Shape()), testTransform);
-			break;
-		case HYSHAPE_Polygon:
-			b2CollideEdgeAndPolygon(&localManifold, static_cast<const b2EdgeShape *>(m_pShape), selfTransform, static_cast<const b2PolygonShape *>(testShape.GetB2Shape()), testTransform);
-			break;
-
-		default:
-			HyError("Unhandled shape type of test shape in HyShape2d::IsColliding");
-			break;
+			vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x,
+								  static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y, 0.0f, 1.0f);
+			vertList[i] = mtxTransform * vertList[i];
+			b2VertList.emplace_back(vertList[i].x, vertList[i].y);
 		}
+
+		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateLoop(b2VertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count);
 		break;
 
-	case HYSHAPE_Circle:
-		switch(testShape.GetType())
-		{
-		case HYSHAPE_LineSegment:
-		case HYSHAPE_LineChain:
-		case HYSHAPE_LineLoop:
-			b2CollideEdgeAndCircle(&localManifold, static_cast<const b2EdgeShape *>(testShape.GetB2Shape()), testTransform, static_cast<const b2CircleShape *>(m_pShape), selfTransform);
-			return false;
-		case HYSHAPE_Circle:
-			b2CollideCircles(&localManifold, static_cast<const b2CircleShape *>(m_pShape), selfTransform, static_cast<const b2CircleShape *>(testShape.GetB2Shape()), testTransform);
-			break;
-		case HYSHAPE_Polygon:
-			b2CollidePolygonAndCircle(&localManifold, static_cast<const b2PolygonShape *>(testShape.GetB2Shape()), testTransform, static_cast<const b2CircleShape *>(m_pShape), selfTransform);
-			break;
+	case HYSHAPE_Circle: {
+		pCloneB2Shape = HY_NEW b2CircleShape();
 
-		default:
-			HyError("Unhandled shape type of test shape in HyShape2d::IsColliding");
-			break;
-		}
-		break;
+		vertList.emplace_back(static_cast<b2CircleShape *>(m_pShape)->m_p.x, static_cast<b2CircleShape *>(m_pShape)->m_p.y, 0.0f, 1.0f);
+
+		// TODO OPTIMIZE: I only need the scaling vec from the 'mtxTransform'
+		glm::vec3 vScale(1.0f);
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(mtxTransform, vScale, quatRot, ptTranslation, vSkew, vPerspective);
+
+		vertList[0] = mtxTransform * vertList[0];
+		static_cast<b2CircleShape *>(pCloneB2Shape)->m_p.Set(vertList[0].x, vertList[0].y);
+		static_cast<b2CircleShape *>(pCloneB2Shape)->m_radius = static_cast<b2CircleShape *>(m_pShape)->m_radius * HyMax(vScale.x, vScale.y);
+		break; }
 
 	case HYSHAPE_Polygon:
-		switch(testShape.GetType())
-		{
-		case HYSHAPE_LineSegment:
-		case HYSHAPE_LineChain:
-		case HYSHAPE_LineLoop:
-			b2CollideEdgeAndPolygon(&localManifold, static_cast<const b2EdgeShape *>(testShape.GetB2Shape()), testTransform, static_cast<const b2PolygonShape *>(m_pShape), selfTransform);
-			break;
-		case HYSHAPE_Circle:
-			b2CollidePolygonAndCircle(&localManifold, static_cast<const b2PolygonShape *>(m_pShape), selfTransform, static_cast<const b2CircleShape *>(testShape.GetB2Shape()), testTransform);
-			break;
-		case HYSHAPE_Polygon:
-			b2CollidePolygons(&localManifold, static_cast<const b2PolygonShape *>(m_pShape), selfTransform, static_cast<const b2PolygonShape *>(testShape.GetB2Shape()), testTransform);
+		// TODO: Trace down why sometimes the position vector of the transform is nan. This causes an assert() in b2PolygonShape::Set()
+		if(std::isnan(mtxTransform[3].x) || std::isnan(mtxTransform[3].y))
 			break;
 
-		default:
-			HyError("Unhandled shape type of test shape in HyShape2d::IsColliding");
-			break;
+		pCloneB2Shape = HY_NEW b2PolygonShape();
+		for(int32 i = 0; i < static_cast<b2PolygonShape *>(m_pShape)->m_count; ++i)
+		{
+			vertList.emplace_back(static_cast<b2PolygonShape *>(m_pShape)->m_vertices[i].x,
+								  static_cast<b2PolygonShape *>(m_pShape)->m_vertices[i].y, 0.0f, 1.0f);
+			vertList[i] = mtxTransform * vertList[i];
+			b2VertList.emplace_back(vertList[i].x, vertList[i].y);
 		}
+
+		static_cast<b2PolygonShape *>(pCloneB2Shape)->Set(b2VertList.data(), static_cast<b2PolygonShape *>(m_pShape)->m_count);
 		break;
 
 	default:
-		HyError("Unhandled shape type of self in HyShape2d::IsColliding");
 		break;
 	}
 
-	worldManifoldOut.Initialize(&localManifold, selfTransform, m_pShape->m_radius, testTransform, testShape.GetB2Shape()->m_radius);
-	return localManifold.pointCount != 0;
+	return pCloneB2Shape;
 }

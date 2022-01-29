@@ -70,8 +70,6 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	}
 
 	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET;
-	//vFrameOffset.x *= std::fabs(scale.Get().x);
-	//vFrameOffset.y *= std::fabs(scale.Get().y);
 
 	float fHalfWidth = GetFrameWidth(0.5f);
 	float fHalfHeight = GetFrameHeight(0.5f);

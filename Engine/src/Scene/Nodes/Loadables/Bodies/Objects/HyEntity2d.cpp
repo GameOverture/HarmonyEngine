@@ -362,7 +362,7 @@ bool HyEntity2d::IsMouseInBounds()
 		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
 		{
 			if(bv.IsValidShape())
-				bv.TestPoint(GetSceneTransform(), ptWorldMousePos);
+				return bv.TestPoint(GetSceneTransform(), ptWorldMousePos);
 			else
 				return HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
 		}
