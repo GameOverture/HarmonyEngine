@@ -385,7 +385,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 	{
 		switch(m_eAlignment)
 		{
-		case HYALIGN_HCenter:
+		case HYALIGN_Center:
 			fX = GetWidth(-0.5f);
 			break;
 
@@ -873,7 +873,7 @@ offsetCalculation:
 		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
 		{
 			float fNudgeAmt = (m_vBoxDimensions.x - vNewlineInfo[i].fUSED_WIDTH);
-			fNudgeAmt *= (m_eAlignment == HYALIGN_HCenter) ? 0.5f : 1.0f; // HYALIGN_Right == (fNudgeAmt *= 1.0f)
+			fNudgeAmt *= (m_eAlignment == HYALIGN_Center) ? 0.5f : 1.0f; // HYALIGN_Right == (fNudgeAmt *= 1.0f)
 
 			uint32 uiStrIndex = vNewlineInfo[i].uiSTART_CHARACTER_INDEX;
 			uint32 uiEndIndex = (i + 1) < vNewlineInfo.size() ? vNewlineInfo[i + 1].uiSTART_CHARACTER_INDEX : m_uiNumValidCharacters;

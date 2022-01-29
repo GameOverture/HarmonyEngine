@@ -135,7 +135,7 @@ enum HyAnimCtrl
 enum HyAlignment
 {
 	HYALIGN_Left = 0,
-	HYALIGN_HCenter,
+	HYALIGN_Center,
 	HYALIGN_Right,
 	HYALIGN_Justify
 };

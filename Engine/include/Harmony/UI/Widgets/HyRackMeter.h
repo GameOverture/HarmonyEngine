@@ -56,11 +56,11 @@ protected:
 		void Setup(std::string sTextPrefix, std::string sTextName)
 		{
 			m_SpinText_Shown.Init(sTextPrefix, sTextName, this);
-			m_SpinText_Shown.SetTextAlignment(HYALIGN_HCenter);
+			m_SpinText_Shown.SetTextAlignment(HYALIGN_Center);
 			m_SpinText_Shown.SetMonospacedDigits(true);
 
 			m_SpinText_Padded.Init(sTextPrefix, sTextName, this);
-			m_SpinText_Padded.SetTextAlignment(HYALIGN_HCenter);
+			m_SpinText_Padded.SetTextAlignment(HYALIGN_Center);
 			m_SpinText_Padded.SetMonospacedDigits(true);
 		}
 	};
@@ -72,7 +72,7 @@ public:
 	HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyRackMeter();
 
-	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_HCenter, bool bUseScaleBox = true) override;
+	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, bool bUseScaleBox = true) override;
 
 	int64 GetValue();
 	void SetValue(int64 iPennies, float fRackDuration);

@@ -47,7 +47,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 			m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(GetWidth(), 0.0f));
 			break;
 		
-		case HYALIGN_HCenter:
+		case HYALIGN_Center:
 			m_DebugBox.SetAsLineSegment(glm::vec2(GetWidth(-0.5f), 0.0f), glm::vec2(GetWidth(0.5f), 0.0f));
 			break;
 

@@ -63,7 +63,7 @@ void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::st
 	OnSetup();
 }
 
-/*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/, bool bUseScaleBox /*= true*/)
+/*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_Center*/, bool bUseScaleBox /*= true*/)
 {
 	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
 	switch(eTextAlignment)
@@ -72,7 +72,7 @@ void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::st
 		m_uiAttribs &= ~(LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign);
 		m_uiAttribs |= LABELATTRIB_StackedTextLeftAlign;
 		break;
-	case HYALIGN_HCenter:
+	case HYALIGN_Center:
 		m_uiAttribs &= ~(LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign);
 		break;
 	case HYALIGN_Right:
@@ -292,7 +292,7 @@ HyText2d &HyLabel::GetTextNode()
 		if(m_uiAttribs & LABELATTRIB_SideBySideTextFirst)
 		{
 			if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
-				m_Text.SetTextAlignment(HYALIGN_HCenter);
+				m_Text.SetTextAlignment(HYALIGN_Center);
 			else
 				m_Text.SetTextAlignment(HYALIGN_Right);
 
@@ -307,7 +307,7 @@ HyText2d &HyLabel::GetTextNode()
 		else
 		{
 			if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
-				m_Text.SetTextAlignment(HYALIGN_HCenter);
+				m_Text.SetTextAlignment(HYALIGN_Center);
 			else
 				m_Text.SetTextAlignment(HYALIGN_Left);
 
@@ -360,7 +360,7 @@ HyText2d &HyLabel::GetTextNode()
 		float fLineOffsetX = 0.0f;	// If *this is 'LABELATTRIB_StackedTextUseLine' determine how much to offset m_Text's position (not needed for scale boxes)
 		if(0 == (m_uiAttribs & (LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign)))
 		{
-			eAlignment = HYALIGN_HCenter;
+			eAlignment = HYALIGN_Center;
 			fLineOffsetX = (vPanelDimensions.x * 0.5f) - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x));
 		}
 		else if(m_uiAttribs & LABELATTRIB_StackedTextLeftAlign)
