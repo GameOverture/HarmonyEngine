@@ -18,6 +18,8 @@ class HyShape2d
 	b2Shape *						m_pShape;
 
 public:
+	static const float				FloatSlop;
+
 	HyShape2d();
 	HyShape2d(const HyShape2d &copyRef);
 	virtual ~HyShape2d();

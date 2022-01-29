@@ -109,8 +109,13 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	float fHalfWidth = GetWidth(0.5f);
 	float fHalfHeight = GetHeight(0.5f);
 
-	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
-	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
+	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
+		m_LocalBoundingVolume.SetAsNothing();
+	else
+	{
+		glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
+		m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
+	}
 }
 
 /*virtual*/ void HyText2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/

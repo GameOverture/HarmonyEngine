@@ -12,6 +12,8 @@
 #include "Diagnostics/Console/IHyConsole.h"
 #include "Utilities/HyMath.h"
 
+const float HyShape2d::FloatSlop = b2_linearSlop;
+
 HyShape2d::HyShape2d() :
 	m_eType(HYSHAPE_Unknown),
 	m_pShape(nullptr)
@@ -484,7 +486,8 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 		break; }
 
 	case HYSHAPE_Polygon:
-		// TODO: Trace down why sometimes the position vector of the transform is nan. This causes an assert() in b2PolygonShape::Set()
+		// TODO: Trace down why sometimes the position vector of the transform is NaN. This causes a mostly harmless assert() in b2PolygonShape::Set()
+		//       Doing below check in GetLocalTransform() will breakpoint
 		if(std::isnan(mtxTransform[3].x) || std::isnan(mtxTransform[3].y))
 			break;
 

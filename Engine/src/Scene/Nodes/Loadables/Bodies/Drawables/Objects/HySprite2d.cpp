@@ -74,7 +74,10 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	float fHalfWidth = GetFrameWidth(0.5f);
 	float fHalfHeight = GetFrameHeight(0.5f);
 
-	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
+	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
+		m_LocalBoundingVolume.SetAsNothing();
+	else
+		m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
 }
 
 /*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
