@@ -41,27 +41,33 @@ float HyAnimFloat::Get() const
 void HyAnimFloat::Set(float fValue)
 {
 	if(m_fValueRef != fValue)
+	{
+		m_fValueRef = fValue;
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef = fValue;
 	StopAnim();
 }
 
 void HyAnimFloat::Set(const HyAnimFloat &valueRef)
 {
 	if(m_fValueRef != valueRef.Get())
+	{
+		m_fValueRef = valueRef.Get();
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef = valueRef.Get();
 	StopAnim();
 }
 
 void HyAnimFloat::Offset(float fValue)
 {
 	if(fValue != 0.0f)
+	{
+		m_fValueRef += fValue;
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef += fValue;
 	StopAnim();
 }
 
@@ -162,9 +168,11 @@ float HyAnimFloat::GetAnimRemainingDuration() const
 HyAnimFloat &HyAnimFloat::operator=(const float &rhs)
 {
 	if(m_fValueRef != rhs)
+	{
+		m_fValueRef = rhs;
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef = rhs;
 	StopAnim();
 
 	return *this;
@@ -173,9 +181,11 @@ HyAnimFloat &HyAnimFloat::operator=(const float &rhs)
 HyAnimFloat &HyAnimFloat::operator+=(const float &rhs)
 {
 	if(rhs != 0.0f)
+	{
+		m_fValueRef += rhs;
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef += rhs;
 	StopAnim();
 
 	return *this;
@@ -184,9 +194,11 @@ HyAnimFloat &HyAnimFloat::operator+=(const float &rhs)
 HyAnimFloat &HyAnimFloat::operator-=(const float &rhs)
 {
 	if(rhs != 0.0f)
+	{
+		m_fValueRef -= rhs;
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef -= rhs;
 	StopAnim();
 
 	return *this;
@@ -194,11 +206,12 @@ HyAnimFloat &HyAnimFloat::operator-=(const float &rhs)
 
 HyAnimFloat &HyAnimFloat::operator*=(const float &rhs)
 {
-	float fProduct = m_fValueRef * rhs;
-	if(fProduct != m_fValueRef)
+	if(rhs != 1.0f)
+	{
+		m_fValueRef *= rhs;
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
-
-	m_fValueRef = fProduct;
+	}
+	
 	StopAnim();
 
 	return *this;
@@ -208,9 +221,11 @@ HyAnimFloat &HyAnimFloat::operator/=(const float &rhs)
 {
 	HyAssert(rhs != 0.0f, "HyAnimFloat::operator/= was passed a float that == 0.0f");
 	if(rhs != 1.0f)
+	{
+		m_fValueRef /= rhs;
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef /= rhs;
 	StopAnim();
 
 	return *this;
@@ -219,9 +234,11 @@ HyAnimFloat &HyAnimFloat::operator/=(const float &rhs)
 HyAnimFloat &HyAnimFloat::operator=(const HyAnimFloat &rhs)
 {
 	if(m_fValueRef != rhs.Get())
+	{
+		m_fValueRef = rhs.Get();
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef = rhs.Get();
 	StopAnim();
 
 	return *this;
@@ -230,9 +247,11 @@ HyAnimFloat &HyAnimFloat::operator=(const HyAnimFloat &rhs)
 HyAnimFloat &HyAnimFloat::operator+=(const HyAnimFloat &rhs)
 {
 	if(rhs.Get() != 0.0f)
+	{
+		m_fValueRef += rhs.Get();
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef += rhs.Get();
 	StopAnim();
 
 	return *this;
@@ -241,9 +260,11 @@ HyAnimFloat &HyAnimFloat::operator+=(const HyAnimFloat &rhs)
 HyAnimFloat &HyAnimFloat::operator-=(const HyAnimFloat &rhs)
 {
 	if(rhs.Get() != 0.0f)
+	{
+		m_fValueRef -= rhs.Get();
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef -= rhs.Get();
 	StopAnim();
 
 	return *this;
@@ -251,11 +272,12 @@ HyAnimFloat &HyAnimFloat::operator-=(const HyAnimFloat &rhs)
 
 HyAnimFloat &HyAnimFloat::operator*=(const HyAnimFloat &rhs)
 {
-	float fProduct = m_fValueRef * rhs.Get();
-	if(m_fValueRef != fProduct)
+	if(rhs.Get() != 1.0f)
+	{
+		m_fValueRef *= rhs.Get();
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef = fProduct;
 	StopAnim();
 
 	return *this;
@@ -265,9 +287,11 @@ HyAnimFloat &HyAnimFloat::operator/=(const HyAnimFloat &rhs)
 {
 	HyAssert(rhs.Get() != 0.0f, "HyAnimFloat::operator/= was passed a HyAnimFloat that == 0.0f");
 	if(rhs.Get() != 1.0f)
+	{
+		m_fValueRef /= rhs.Get();
 		m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	}
 
-	m_fValueRef /= rhs.Get();
 	StopAnim();
 
 	return *this;

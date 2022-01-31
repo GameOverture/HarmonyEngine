@@ -51,7 +51,6 @@ struct HyPanelInit
 class HyPanel : public HyEntity2d
 {
 	HyPanelInit::PanelType	m_ePanelType;
-	glm::ivec2				m_vSize;
 
 	HySprite2d				m_SpritePanel;
 
@@ -59,6 +58,9 @@ class HyPanel : public HyEntity2d
 	HyPrimitive2d			m_Frame1;
 	HyPrimitive2d			m_Frame2;	// When thicc enough, a frame can have two tones to it
 	HyPrimitive2d			m_Panel;
+
+public:
+	HyAnimVec2				size;
 
 public:
 	HyPanel(HyEntity2d *pParent = nullptr);
@@ -77,12 +79,7 @@ public:
 	void SetSpriteState(uint32 uiStateIndex);
 
 	glm::ivec2 GetSizeHint();
-	uint32 GetWidth();
-	uint32 GetHeight();
-	glm::ivec2 GetSize();
-	void SetSize(uint32 uiWidth, uint32 uiHeight);
 	uint32 GetFrameSize() const;
-
 	glm::vec2 GetBotLeftOffset();
 
 	HyColor GetPanelColor() const;
@@ -91,6 +88,7 @@ public:
 	void SetFrameColor(HyColor color);
 
 protected:
+	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	void ConstructPrimitives();
 };
 

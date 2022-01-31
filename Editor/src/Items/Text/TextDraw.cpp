@@ -94,5 +94,5 @@ void TextDraw::SetPreviewText()
 	// "ALL" SYMBOLS: ! \" # $ % & ' ( ) * + , - . / \\ [ ] ^ _ ` { | } ~ : ; < = > ? @
 	// BAD SYMBOLS: ' * - " ^ ` ~ =
 	
-	m_Text.SetTextAlignment(HYALIGN_HCenter);
+	m_Text.SetTextAlignment(HYALIGN_Center);
 }

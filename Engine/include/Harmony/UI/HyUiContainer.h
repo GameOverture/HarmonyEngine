@@ -86,7 +86,7 @@ protected:
 	std::vector<IHyWidget *> AssembleWidgetList();
 
 	virtual void OnContainerUpdate() { }
-	virtual void OnRootLayoutUpdate() { m_RootLayout.Resize(m_Panel.GetWidth(), m_Panel.GetHeight()); }
+	virtual void OnRootLayoutUpdate() { m_RootLayout.Resize(static_cast<uint32>(m_Panel.size.X()), static_cast<uint32>(m_Panel.size.Y())); }
 
 	// Optional overrides to control show and hide animations/functionality
 	virtual float OnBeginShow() { return 0.0f; }	// Returns the duration (in seconds) of the show transition

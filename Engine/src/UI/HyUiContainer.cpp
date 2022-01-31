@@ -51,12 +51,12 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 
 glm::ivec2 HyUiContainer::GetSize()
 {
-	return m_Panel.GetSize();
+	return m_Panel.size.Get();
 }
 
 /*virtual*/ void HyUiContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
-	m_Panel.SetSize(iNewWidth, iNewHeight);
+	m_Panel.size.Set(iNewWidth, iNewHeight);
 	m_RootLayout.SetLayoutDirty();
 }
 

@@ -881,16 +881,12 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 
 	if(m_pPhysicsBody && (uiDirtyFlags & IHyNode::DIRTY_FromUpdater) == 0)
 	{
-		float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
-
-		uint32 uiTransformFlags = (uiDirtyFlags & (DIRTY_Position | DIRTY_Rotation));
-		if((DIRTY_Position | DIRTY_Rotation) == uiTransformFlags)
+		if(uiDirtyFlags & DIRTY_Transform)
+		{
+			float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
 			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * fPpmInverse, pos.Y() * fPpmInverse), glm::radians(rot.Get()));
-		else if(DIRTY_Position == uiTransformFlags)
-			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * fPpmInverse, pos.Y() * fPpmInverse), m_pPhysicsBody->GetAngle());
-		else if(DIRTY_Rotation == uiTransformFlags)
-			m_pPhysicsBody->SetTransform(m_pPhysicsBody->GetPosition(), glm::radians(rot.Get()));
-
+		}
+		
 		ClearDirty(IHyNode::DIRTY_FromUpdater);
 	}
 

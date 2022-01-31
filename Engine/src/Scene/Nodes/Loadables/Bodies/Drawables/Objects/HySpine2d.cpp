@@ -47,6 +47,10 @@ uint32 HySpine2d::GetNumSlots() const
 	return 0;
 }
 
+/*virtual*/ void HySpine2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+{
+}
+
 /*virtual*/ bool HySpine2d::OnIsValidToRender() /*override*/
 {
 	return true;

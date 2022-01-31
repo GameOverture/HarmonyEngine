@@ -113,12 +113,12 @@ void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /
 
 float HyLabel::GetPanelWidth()
 {
-	return m_Panel.GetWidth();
+	return m_Panel.size.X();
 }
 
 float HyLabel::GetPanelHeight()
 {
-	return m_Panel.GetHeight();
+	return m_Panel.size.Y();
 }
 
 uint32 HyLabel::GetSpriteState() const
@@ -235,7 +235,7 @@ HyText2d &HyLabel::GetTextNode()
 			//uiNewHeight = m_Text.GetTextHeight(true);
 		}
 		else
-			m_Panel.SetSize(uiNewWidth, uiNewHeight);
+			m_Panel.size.Set(static_cast<int32>(uiNewWidth), static_cast<int32>(uiNewHeight));
 	}
 	else // Side-by-side
 	{
@@ -262,7 +262,7 @@ HyText2d &HyLabel::GetTextNode()
 			//HySetVec(vNewTextSize, uiNewWidth * fTextPerc, vTextSizeHint.y);
 		}
 
-		m_Panel.SetSize(vNewPanelSize.x, vNewPanelSize.y);
+		m_Panel.size.Set(vNewPanelSize.x, vNewPanelSize.y);
 
 		float fScaleX = static_cast<float>(vNewTextSize.x) / static_cast<float>(vTextSizeHint.x);
 		float fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);
@@ -276,6 +276,8 @@ HyText2d &HyLabel::GetTextNode()
 
 /*virtual*/ void HyLabel::ResetTextAndPanel()
 {
+	SetSizeAndLayoutDirty();
+
 	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
 	{
 		m_Text.SetAsLine();
@@ -349,7 +351,7 @@ HyText2d &HyLabel::GetTextNode()
 	else // Stacked Panel/Text
 	{
 		glm::ivec2 vUiSizeHint = GetSizeHint();
-		glm::vec2 vPanelDimensions = m_Panel.GetSize();
+		glm::vec2 vPanelDimensions = m_Panel.size.Get();
 		glm::ivec2 vPanelOffset = m_Panel.GetBotLeftOffset();
 
 		// Position text to bottom left of 'm_TextMargins'

@@ -40,6 +40,7 @@ public:
 	uint32 GetNumSlots() const;
 
 protected:
+	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 	virtual bool OnIsValidToRender() override;
 	virtual void OnCalcBoundingVolume() override;
 

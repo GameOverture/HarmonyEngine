@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyComboBox.h
+*	HyComboBox.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2022 Jason Knobler
@@ -85,6 +85,11 @@ void HyComboBox::SetExpandType(HyOrientation eOrientation, bool bPositiveDirecti
 		m_uiAttribs |= COMBOBOXATTRIB_IsInstantExpand;
 }
 
+void HyComboBox::SetExpandPanel(const HyPanelInit &panelInit)
+{
+	m_SubBtnPanel.Setup(panelInit);
+}
+
 bool HyComboBox::IsExpanded() const
 {
 	return m_uiAttribs & COMBOBOXATTRIB_IsExpanded;
@@ -111,8 +116,18 @@ void HyComboBox::ToggleExpanded()
 		ptTweenDest[iExpandIndex] += (GetSizeHint()[iExpandIndex] + m_fSubBtnSpacing) * iExpandDir;
 		for(uint32 i = 0; i < m_SubBtnList.size(); ++i)
 		{
-			m_SubBtnList[i]->pos.Tween(ptTweenDest[0], ptTweenDest[1], 0.5f, HyTween::QuadOut);
-			m_SubBtnList[i]->alpha.Tween(1.0f, fTweenExpandDur * 0.5f);
+			if(m_uiAttribs & COMBOBOXATTRIB_IsInstantExpand)
+			{
+				m_SubBtnList[i]->pos.Set(ptTweenDest[0], ptTweenDest[1]);
+				m_SubBtnList[i]->alpha.Set(1.0f);
+				
+			}
+			else
+			{
+				m_SubBtnList[i]->pos.Tween(ptTweenDest[0], ptTweenDest[1], 0.5f, HyTween::QuadOut);
+				m_SubBtnList[i]->alpha.Tween(1.0f, fTweenExpandDur * 0.5f);
+			}
+
 			ptTweenDest[iExpandIndex] += (m_SubBtnList[i]->GetSizeHint()[iExpandIndex] + m_fSubBtnSpacing) * iExpandDir;
 		}
 	}

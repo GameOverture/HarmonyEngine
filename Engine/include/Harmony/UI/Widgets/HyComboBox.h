@@ -48,6 +48,7 @@ public:
 	void ClearSubButtons();
 
 	void SetExpandType(HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate);
+	void SetExpandPanel(const HyPanelInit &panelInit);
 
 	bool IsExpanded() const;
 	bool IsTransition() const;

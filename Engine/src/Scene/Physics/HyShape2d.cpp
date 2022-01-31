@@ -423,6 +423,11 @@ bool HyShape2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform)
 
 b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 {
+	float fScaleX = glm::length(glm::vec3(mtxTransform[0][0], mtxTransform[0][1], mtxTransform[0][2]));
+	float fScaleY = glm::length(glm::vec3(mtxTransform[1][0], mtxTransform[1][1], mtxTransform[1][2]));
+	if(fScaleX < FloatSlop || fScaleY < FloatSlop)
+		return nullptr;
+
 	b2Shape *pCloneB2Shape = nullptr;
 	std::vector<glm::vec4> vertList;
 	std::vector<b2Vec2> b2VertList;
@@ -472,17 +477,9 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 
 		vertList.emplace_back(static_cast<b2CircleShape *>(m_pShape)->m_p.x, static_cast<b2CircleShape *>(m_pShape)->m_p.y, 0.0f, 1.0f);
 
-		// TODO OPTIMIZE: I only need the scaling vec from the 'mtxTransform'
-		glm::vec3 vScale(1.0f);
-		glm::quat quatRot;
-		glm::vec3 ptTranslation;
-		glm::vec3 vSkew;
-		glm::vec4 vPerspective;
-		glm::decompose(mtxTransform, vScale, quatRot, ptTranslation, vSkew, vPerspective);
-
 		vertList[0] = mtxTransform * vertList[0];
 		static_cast<b2CircleShape *>(pCloneB2Shape)->m_p.Set(vertList[0].x, vertList[0].y);
-		static_cast<b2CircleShape *>(pCloneB2Shape)->m_radius = static_cast<b2CircleShape *>(m_pShape)->m_radius * HyMax(vScale.x, vScale.y);
+		static_cast<b2CircleShape *>(pCloneB2Shape)->m_radius = static_cast<b2CircleShape *>(m_pShape)->m_radius * HyMax(fScaleX, fScaleY);
 		break; }
 
 	case HYSHAPE_Polygon:

@@ -18,11 +18,11 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 	IHyNode(eNodeType),
 	m_pParent(pParent),
 	m_fRotation(0.0f),
-	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB)
+	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -52,11 +52,11 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	m_mtxCached(copyRef.m_mtxCached),
 	m_fRotation(copyRef.m_fRotation),
 	m_SceneAABB(copyRef.m_SceneAABB),
-	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB)
+	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -73,11 +73,11 @@ IHyNode2d::IHyNode2d(IHyNode2d &&donor) noexcept :
 	m_mtxCached(std::move(donor.m_mtxCached)),
 	m_fRotation(donor.m_fRotation),
 	m_SceneAABB(std::move(donor.m_SceneAABB)),
-	pos(*this, DIRTY_Position | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot(m_fRotation, *this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot_pivot(*this, DIRTY_Rotation | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Scale | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB)
+	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -165,7 +165,7 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &mtxOut) const
 
 const glm::mat4 &IHyNode2d::GetSceneTransform()
 {
-	if(IsDirty(DIRTY_Position | DIRTY_Rotation | DIRTY_Scale))
+	if(IsDirty(DIRTY_Transform))
 	{
 		if(m_pParent)
 		{
@@ -179,7 +179,7 @@ const glm::mat4 &IHyNode2d::GetSceneTransform()
 		else
 			GetLocalTransform(m_mtxCached);
 
-		ClearDirty(DIRTY_Position | DIRTY_Rotation | DIRTY_Scale);
+		ClearDirty(DIRTY_Transform);
 	}
 
 	return m_mtxCached;

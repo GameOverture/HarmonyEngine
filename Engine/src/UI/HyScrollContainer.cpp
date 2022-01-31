@@ -68,8 +68,8 @@ void HyScrollContainer::SetLineScrollAmt(float fLineScrollAmt)
 
 /*virtual*/ void HyScrollContainer::OnRootLayoutUpdate() /*override*/
 {
-	int32 iNewWidth = m_Panel.GetWidth();
-	int32 iNewHeight = m_Panel.GetHeight();
+	int32 iNewWidth = m_Panel.size.X();
+	int32 iNewHeight = m_Panel.size.Y();
 
 	int32 iScissorMargin = 0;
 	if(m_Panel.IsPrimitive())
