@@ -256,6 +256,12 @@ void HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
 
 void HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
 {
+	if(fRadius < FloatSlop)
+	{
+		SetAsNothing();
+		return;
+	}
+
 	m_eType = HYSHAPE_Circle;
 
 	delete m_pShape;
@@ -291,6 +297,12 @@ void HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)
 
 void HyShape2d::SetAsBox(float fWidth, float fHeight)
 {
+	if(fWidth < FloatSlop || fHeight < FloatSlop)
+	{
+		SetAsNothing();
+		return;
+	}
+
 	m_eType = HYSHAPE_Polygon;
 
 	delete m_pShape;
@@ -300,6 +312,12 @@ void HyShape2d::SetAsBox(float fWidth, float fHeight)
 
 void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
 {
+	if(fHalfWidth * 2 < FloatSlop || fHalfHeight * 2 < FloatSlop)
+	{
+		SetAsNothing();
+		return;
+	}
+
 	m_eType = HYSHAPE_Polygon;
 
 	delete m_pShape;
