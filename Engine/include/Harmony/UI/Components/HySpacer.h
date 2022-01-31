@@ -28,6 +28,9 @@ class HySpacer : public IHyWidget
 public:
 	virtual ~HySpacer();
 
+	virtual float GetWidth(float fPercent = 1.0f) override;
+	virtual float GetHeight(float fPercent = 1.0f) override;
+
 	int32 GetActualSize() const;
 	void Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint);
 

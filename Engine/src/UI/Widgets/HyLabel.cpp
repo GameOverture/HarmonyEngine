@@ -37,6 +37,32 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 {
 }
 
+/*virtual*/ float HyLabel::GetWidth(float fPercent /*= 1.0f*/) /*override*/
+{
+	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
+	{
+		if((m_uiAttribs & LABELATTRIB_SideBySideVertical) == 0)
+			return (m_Panel.size.X() + (m_Text.GetWidth() * m_Text.scale.X()) + m_TextMargins.iTag) * fPercent;
+		else
+			return HyMax(m_Panel.size.X(), m_Text.GetWidth() * m_Text.scale.X()) * fPercent;
+	}
+	else // Is stacked
+		return m_Panel.size.X() * fPercent;
+}
+
+/*virtual*/ float HyLabel::GetHeight(float fPercent /*= 1.0f*/) /*override*/
+{
+	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
+	{
+		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
+			return (m_Panel.size.Y() + (m_Text.GetHeight() * m_Text.scale.Y()) + m_TextMargins.iTag) * fPercent;
+		else
+			return HyMax(m_Panel.size.Y(), m_Text.GetHeight() * m_Text.scale.Y()) * fPercent;
+	}
+	else // Is stacked
+		return m_Panel.size.Y() * fPercent;
+}
+
 /*virtual*/ bool HyLabel::IsLoadDataValid() /*override*/
 {
 	return m_Panel.IsValid() || m_Text.IsLoadDataValid();
@@ -111,16 +137,6 @@ void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /
 	ResetTextAndPanel();
 }
 
-float HyLabel::GetPanelWidth()
-{
-	return m_Panel.size.X();
-}
-
-float HyLabel::GetPanelHeight()
-{
-	return m_Panel.size.Y();
-}
-
 uint32 HyLabel::GetSpriteState() const
 {
 	return m_Panel.GetSpriteState();
@@ -164,19 +180,15 @@ void HyLabel::SetText(const std::stringstream &ssUtf8Text)
 	m_Text.SetLayerColor(uiStateIndex, uiLayerIndex, topColor, botColor);
 }
 
-bool HyLabel::IsPrimitivePanel() const
+bool HyLabel::IsTextMonospacedDigits() const
 {
-	return m_Panel.IsPrimitive();
+	return m_Text.IsMonospacedDigits();
 }
 
-HySprite2d &HyLabel::GetSpriteNode()
+/*virtual*/ void HyLabel::SetTextMonospacedDigits(bool bSet)
 {
-	return m_Panel.GetSprite();
-}
-
-HyText2d &HyLabel::GetTextNode()
-{
-	return m_Text;
+	m_Text.SetMonospacedDigits(bSet);
+	ResetTextAndPanel();
 }
 
 /*virtual*/ glm::vec2 HyLabel::GetPosOffset() /*override*/
@@ -303,7 +315,7 @@ HyText2d &HyLabel::GetTextNode()
 			vFirstOffset = m_Text.GetTextBottomLeft();
 
 			pSecond = &m_Panel;
-			HySetVec(vSecondSize, GetPanelWidth(), GetPanelHeight());
+			vSecondSize = m_Panel.size.Get();
 			vSecondOffset = -m_Panel.GetBotLeftOffset();
 		}
 		else
@@ -314,7 +326,7 @@ HyText2d &HyLabel::GetTextNode()
 				m_Text.SetTextAlignment(HYALIGN_Left);
 
 			pFirst = &m_Panel;
-			HySetVec(vFirstSize, GetPanelWidth(), GetPanelHeight());
+			vFirstSize = m_Panel.size.Get();
 			vFirstOffset = -m_Panel.GetBotLeftOffset();
 
 			pSecond = &m_Text;

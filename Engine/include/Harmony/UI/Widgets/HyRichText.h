@@ -30,6 +30,9 @@ public:
 	HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyEntity2d *pParent = nullptr);
 	virtual ~HyRichText();
 
+	virtual float GetWidth(float fPercent = 1.0f) override;
+	virtual float GetHeight(float fPercent = 1.0f) override;
+
 	void Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth);
 
 	// {1} = Any text inserted after this uses state '1'

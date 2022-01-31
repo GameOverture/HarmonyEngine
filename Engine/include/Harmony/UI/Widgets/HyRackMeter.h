@@ -57,11 +57,9 @@ protected:
 		{
 			m_SpinText_Shown.Init(sTextPrefix, sTextName, this);
 			m_SpinText_Shown.SetTextAlignment(HYALIGN_Center);
-			m_SpinText_Shown.SetMonospacedDigits(true);
 
 			m_SpinText_Padded.Init(sTextPrefix, sTextName, this);
 			m_SpinText_Padded.SetTextAlignment(HYALIGN_Center);
-			m_SpinText_Padded.SetMonospacedDigits(true);
 		}
 	};
 	SpinText 				m_SpinText;
@@ -91,6 +89,7 @@ public:
 	void SetNumFormat(HyNumberFormat format);
 
 	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor) override;
+	virtual void SetTextMonospacedDigits(bool bSet) override;
 
 protected:
 	virtual void OnUpdate() override;

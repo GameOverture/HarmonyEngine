@@ -141,6 +141,14 @@ void HyRackMeter::SetNumFormat(HyNumberFormat format)
 	m_SpinText.m_SpinText_Padded.SetLayerColor(uiStateIndex, uiLayerIndex, topColor, botColor);
 }
 
+/*virtual*/ void HyRackMeter::SetTextMonospacedDigits(bool bSet)
+{
+	m_SpinText.m_SpinText_Shown.SetMonospacedDigits(bSet);
+	m_SpinText.m_SpinText_Padded.SetMonospacedDigits(bSet);
+
+	HyLabel::SetTextMonospacedDigits(bSet);
+}
+
 /*virtual*/ void HyRackMeter::OnUpdate() /*override*/
 {
 	if(m_iCurValue == m_iTargetValue)
@@ -199,6 +207,7 @@ void HyRackMeter::SetNumFormat(HyNumberFormat format)
 
 /*virtual*/ void HyRackMeter::OnSetup() /*override*/
 {
+	SetTextMonospacedDigits(true);
 	m_SpinText.Setup(m_Text.GetPrefix(), m_Text.GetName());
 	FormatDigits();
 }
@@ -209,8 +218,6 @@ void HyRackMeter::SetNumFormat(HyNumberFormat format)
 
 	m_SpinText.m_SpinText_Shown.SetState(m_Text.GetState());
 	m_SpinText.m_SpinText_Padded.SetState(m_Text.GetState());
-
-	m_Text.SetMonospacedDigits(true);
 
 	m_SpinText.pos.Set(m_Text.pos);
 	if(m_Text.IsScaleBox())

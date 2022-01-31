@@ -30,6 +30,16 @@ HyLayout::HyLayout(HyOrientation eLayoutType, HyEntity2d *pParent /*= nullptr*/)
 {
 }
 
+/*virtual*/ float HyLayout::GetWidth(float fPercent /*= 1.0f*/) /*override*/
+{
+	return m_vActualSize.x * fPercent;
+}
+
+/*virtual*/ float HyLayout::GetHeight(float fPercent /*= 1.0f*/) /*override*/
+{
+	return m_vActualSize.y * fPercent;
+}
+
 HyOrientation HyLayout::GetLayoutType() const
 {
 	return m_eLayoutType;

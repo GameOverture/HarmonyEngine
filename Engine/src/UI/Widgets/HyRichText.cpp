@@ -41,6 +41,16 @@ HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextN
 	}
 }
 
+/*virtual*/ float HyRichText::GetWidth(float fPercent /*= 1.0f*/) /*override*/
+{
+	return m_uiColumnWidth * fPercent;
+}
+
+/*virtual*/ float HyRichText::GetHeight(float fPercent /*= 1.0f*/) /*override*/
+{
+	return m_fTotalHeight * fPercent;
+}
+
 void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth)
 {
 	SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Fixed);

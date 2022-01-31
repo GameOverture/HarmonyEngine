@@ -33,6 +33,9 @@ public:
 	HyLayout(HyOrientation eLayoutType, HyEntity2d *pParent = nullptr);
 	virtual ~HyLayout();
 
+	virtual float GetWidth(float fPercent = 1.0f) override;
+	virtual float GetHeight(float fPercent = 1.0f) override;
+
 	HyOrientation GetLayoutType() const;
 	void SetLayoutType(HyOrientation eLayoutType);
 

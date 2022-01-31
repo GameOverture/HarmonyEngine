@@ -23,6 +23,16 @@ HySpacer::HySpacer(HyOrientation eOrienType) :
 {
 }
 
+/*virtual*/ float HySpacer::GetWidth(float fPercent /*= 1.0f*/) /*override*/
+{
+	return (m_eORIEN_TYPE == HYORIEN_Horizontal) ? m_iActualSize * fPercent : 0;
+}
+
+/*virtual*/ float HySpacer::GetHeight(float fPercent /*= 1.0f*/) /*override*/
+{
+	return (m_eORIEN_TYPE == HYORIEN_Vertical) ? m_iActualSize * fPercent : 0;
+}
+
 int32 HySpacer::GetActualSize() const
 {
 	return m_iActualSize;
