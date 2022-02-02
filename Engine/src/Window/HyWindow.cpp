@@ -110,8 +110,9 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShow
 	#endif
 
 	uint32 uiWindowFlags = SDL_WINDOW_OPENGL;
-	switch(m_Info.eType)
+	switch(m_Info.eMode)
 	{
+	case HYWINDOW_Unknown:
 	case HYWINDOW_WindowedSizeable:
 		uiWindowFlags |= SDL_WINDOW_RESIZABLE;
 		break;
@@ -405,48 +406,106 @@ HyWindowInteropPtr HyWindow::GetInterop()
 	return m_pInterop;
 }
 
-bool HyWindow::IsFullScreen()
+HyWindowMode HyWindow::GetMode()
 {
 #ifdef HY_USE_GLFW
 	return glfwGetWindowMonitor(m_pInterop) != nullptr;
 #elif defined(HY_USE_SDL2)
-	SDL_DisplayMode windowMode, desktopMode;
-	SDL_GetWindowDisplayMode(m_pInterop, &windowMode);
-	SDL_GetDesktopDisplayMode(0, &desktopMode);
+	uint32 uiFlags = SDL_GetWindowFlags(m_pInterop);
+	if(uiFlags & SDL_WINDOW_RESIZABLE)
+		return HYWINDOW_WindowedSizeable;
+	if(uiFlags & SDL_WINDOW_FULLSCREEN_DESKTOP)
+		return HYWINDOW_BorderlessWindow;
+	if(uiFlags & SDL_WINDOW_FULLSCREEN)
+		return HYWINDOW_FullScreen;
 
-	return (windowMode.h == desktopMode.h && windowMode.w == desktopMode.w);
+	return HYWINDOW_WindowedFixed;
+#elif defined(HY_PLATFORM_BROWSER)
+	EmscriptenFullscreenChangeEvent fsce;
+	EMSCRIPTEN_RESULT ret = emscripten_get_fullscreen_status(&fsce);
+	if(ret != EMSCRIPTEN_RESULT_SUCCESS)
+	{
+		HyLogError("emscripten_get_fullscreen_status failed: " << ret);
+		return HYWINDOW_Unknown;
+	}
+
+	if(fsce.isFullscreen)
+		return HYWINDOW_BorderlessWindow;
+	else
+		return HYWINDOW_WindowedSizeable;
 #else
 	HyLogWarning("HyWindow::IsFullScreen is not implemented for this build configuration");
-	return false;
+	return HYWINDOW_Unknown;
 #endif
 }
 
-void HyWindow::SetFullScreen(bool bFullScreen)
+void HyWindow::SetMode(HyWindowMode eMode)
 {
 #ifdef HY_USE_GLFW
 	glfwSetWindowMonitor(m_pInterop, bFullScreen ? GetGlfwMonitor() : nullptr, m_Info.ptLocation.x, m_Info.ptLocation.y, m_Info.vSize.x, m_Info.vSize.y, GLFW_DONT_CARE);
 #elif defined(HY_USE_SDL2) && !defined(HY_PLATFORM_BROWSER) // SDL_SetWindowFullscreen not supported with Emscripten's SDL2
-	SDL_SetWindowFullscreen(m_pInterop, bFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+	uint32 uiFlags = 0;
+	switch(eMode)
+	{
+	case HYWINDOW_WindowedSizeable:
+	case HYWINDOW_WindowedFixed:
+		break;
+	case HYWINDOW_FullScreen:
+		uiFlags = SDL_WINDOW_FULLSCREEN;
+		break;
+	case HYWINDOW_BorderlessWindow:
+		uiFlags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+		break;
+
+	case HYWINDOW_Unknown:
+		return;
+	}
+	if(SDL_SetWindowFullscreen(m_pInterop, uiFlags) < 0)
+		HyLogError("HyWindow::SetFullScreen() - " << SDL_GetError());
+
+	SDL_SetWindowResizable(m_pInterop, eMode == HYWINDOW_WindowedSizeable ? SDL_TRUE : SDL_FALSE);
 #elif defined(HY_PLATFORM_BROWSER)
 
-	int scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_DEFAULT;// EMSCRIPTEN_FULLSCREEN_SCALE_STRETCH; EMSCRIPTEN_FULLSCREEN_SCALE_ASPECT; EMSCRIPTEN_FULLSCREEN_SCALE_CENTER
-	int canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_NONE;
-	int filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT; // EMSCRIPTEN_FULLSCREEN_FILTERING_NEAREST
-
-	EmscriptenFullscreenStrategy s;
-	memset(&s, 0, sizeof(s));
-	s.scaleMode = scaleMode;
-	s.canvasResolutionScaleMode = canvasResolutionScaleMode;
-	s.filteringMode = filteringMode;
-	//s.canvasResizedCallback = on_canvassize_changed;
-	
-	bool bUseSoftFullScreen = false;
-
-	EMSCRIPTEN_RESULT ret;
-	if(bUseSoftFullScreen)
-		ret = emscripten_enter_soft_fullscreen(0, &s);
+	if(eMode == HYWINDOW_BorderlessWindow || eMode == HYWINDOW_FullScreen)
+	{
+		EMSCRIPTEN_RESULT ret = emscripten_request_fullscreen("#canvas", 1);
+		if(ret != EMSCRIPTEN_RESULT_SUCCESS)
+			HyLogError("emscripten_request_fullscreen failed: " << ret);
+	}
 	else
-		ret = emscripten_request_fullscreen_strategy(0, 1, &s);
+	{
+		EMSCRIPTEN_RESULT ret = emscripten_exit_fullscreen();
+		if(ret != EMSCRIPTEN_RESULT_SUCCESS)
+			HyLogError("emscripten_exit_fullscreen failed: " << ret);
+
+		EmscriptenFullscreenChangeEvent fsce;
+		ret = emscripten_get_fullscreen_status(&fsce);
+		if(ret != EMSCRIPTEN_RESULT_SUCCESS)
+			HyLogError("emscripten_get_fullscreen_status failed: " << ret);
+
+		if(fsce.isFullscreen) {
+			HyLogError("Emscripten fullscreen exit did not work!\n");
+		}
+	}
+
+	//int scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_DEFAULT;// EMSCRIPTEN_FULLSCREEN_SCALE_STRETCH; EMSCRIPTEN_FULLSCREEN_SCALE_ASPECT; EMSCRIPTEN_FULLSCREEN_SCALE_CENTER
+	//int canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_NONE;
+	//int filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT; // EMSCRIPTEN_FULLSCREEN_FILTERING_NEAREST
+
+	//EmscriptenFullscreenStrategy s;
+	//memset(&s, 0, sizeof(s));
+	//s.scaleMode = scaleMode;
+	//s.canvasResolutionScaleMode = canvasResolutionScaleMode;
+	//s.filteringMode = filteringMode;
+	////s.canvasResizedCallback = on_canvassize_changed;
+	//
+	//bool bUseSoftFullScreen = false;
+
+	//EMSCRIPTEN_RESULT ret;
+	//if(bUseSoftFullScreen)
+	//	ret = emscripten_enter_soft_fullscreen(0, &s);
+	//else
+	//	ret = emscripten_request_fullscreen_strategy(0, 1, &s);
 
 #endif
 }

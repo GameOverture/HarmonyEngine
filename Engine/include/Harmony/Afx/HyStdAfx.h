@@ -110,16 +110,6 @@ enum HyPhysicsType
 };
 static_assert((int)HYPHYS_Static == (int)b2_staticBody && (int)HYPHYS_Kinematic == (int)b2_kinematicBody && (int)HYPHYS_Dynamic == (int)b2_dynamicBody, "Harmony and Box2d types don't match!");
 
-enum HyFileType
-{
-	HYFILE_Atlas = 0,
-	HYFILE_GLTF,
-	HYFILE_AudioBank,
-	HYFILE_Shader,
-
-	HYNUM_FILETYPES
-};
-
 enum HyAnimCtrl
 {
 	HYANIMCTRL_Play = 0,
@@ -155,6 +145,16 @@ enum HyLoadState
 	HYLOADSTATE_Queued,
 	HYLOADSTATE_Discarded,
 	HYLOADSTATE_Loaded
+};
+
+enum HyFileType
+{
+	HYFILE_Atlas = 0,
+	HYFILE_GLTF,
+	HYFILE_AudioBank,
+	HYFILE_Shader,
+
+	HYNUM_FILETYPES
 };
 
 enum HyTextureFormat
@@ -246,9 +246,11 @@ enum class HyShaderVariable : uint32
 	mat4
 };
 
-enum HyWindowType
+enum HyWindowMode
 {
-	HYWINDOW_WindowedFixed,
+	HYWINDOW_Unknown = -1,
+
+	HYWINDOW_WindowedFixed = 0,
 	HYWINDOW_WindowedSizeable,
 	HYWINDOW_FullScreen,
 	HYWINDOW_BorderlessWindow
@@ -303,14 +305,14 @@ struct HyWindowInfo
 	std::string		sName;
 	glm::ivec2		vSize;
 	glm::ivec2		ptLocation;
-	HyWindowType	eType;
+	HyWindowMode	eMode;
 
 	HyWindowInfo &operator =(const HyWindowInfo &rhs)
 	{
 		sName = rhs.sName;
 		vSize = rhs.vSize;
 		ptLocation = rhs.ptLocation;
-		eType = rhs.eType;
+		eMode = rhs.eMode;
 
 		return *this;
 	}

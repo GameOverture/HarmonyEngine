@@ -26,16 +26,19 @@ protected:
 		COMBOBOXATTRIB_IsPositiveExpand = 1 << 17,
 		COMBOBOXATTRIB_IsInstantExpand	= 1 << 18,
 
-		COMBOBOXATTRIB_FLAG_NEXT		= 1 << 19
+		COMBOBOXATTRIB_IsExpandMouseDwn = 1 << 19,		// While expanded, keeps track of a left mouse click (anywhere) to retract the combo box upon release
+		COMBOBOXATTRIB_NeedsRetracting	= 1 << 20,		// While expanded, this flag indicates that this combo box should retract on the next update. (This allows sub btn callbacks to occur before getting disabled on the retract)
+
+		COMBOBOXATTRIB_FLAG_NEXT		= 1 << 21
 	};
 	static_assert((int)COMBOBOXATTRIB_IsExpanded == (int)BTNATTRIB_FLAG_NEXT, "HyComboBox is not matching with base classes attrib flags");
 
-	HyPanel						m_SubBtnPanel;
-	std::vector<HyButton *>		m_SubBtnList;
-	float						m_fSubBtnSpacing;
+	HyPanel								m_SubBtnPanel;
+	std::vector<HyButton *>				m_SubBtnList;
+	float								m_fSubBtnSpacing;
 
-	float						m_fElapsedExpandedTime;
-	float						m_fExpandedTimeout;
+	float								m_fElapsedExpandedTime;
+	float								m_fExpandedTimeout;
 
 public:
 	HyComboBox(HyEntity2d *pParent = nullptr);
@@ -48,7 +51,8 @@ public:
 	void ClearSubButtons();
 
 	void SetExpandType(HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate);
-	void SetExpandPanel(const HyPanelInit &panelInit);
+	void SetExpandPanel(std::string sSpritePrefix, std::string sSpriteName);
+	void SetExpandPanel(uint32 uiFrameSize, HyColor panelColor = HyColor(0x252526), HyColor frameColor = HyColor(0x3F3F41));
 
 	bool IsExpanded() const;
 	bool IsTransition() const;
@@ -57,11 +61,11 @@ public:
 	void SetExpandedTimeout(float fTimeoutDuration);
 	void ResetExpandedTimeout();
 
-	HyButton *GetSubBtn(uint32 uiIndex);
-
 protected:
 	virtual void OnUpdate() override;
 	virtual void OnSetup() override;
+
+	static void OnComboBoxClickedCallback(HyButton *pBtn, void *pData);
 };
 
 #endif /* HyComboBox_h__ */

@@ -27,7 +27,7 @@ private:
 	virtual ~HyCamera2d();
 	
 public:
-	virtual const b2AABB &IHyNode2d::GetSceneAABB() override;
+	virtual const b2AABB &GetSceneAABB() override;
 
 	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;

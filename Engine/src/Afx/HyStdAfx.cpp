@@ -27,7 +27,7 @@ HarmonyInit::HarmonyInit()
 	for(uint32 i = 0; i < HY_MAXWINDOWS; ++i)
 	{
 		windowInfo[i].sName = "Window: " + std::to_string(i);
-		windowInfo[i].eType = HYWINDOW_WindowedFixed;
+		windowInfo[i].eMode = HYWINDOW_WindowedFixed;
 		windowInfo[i].vSize.x = 1280;
 		windowInfo[i].vSize.y = 756;
 		windowInfo[i].ptLocation.x = i * windowInfo[i].vSize.x;
@@ -36,7 +36,7 @@ HarmonyInit::HarmonyInit()
 
 	bUseConsole = false;
 	consoleInfo.sName = "Harmony Log Console";
-	consoleInfo.eType = HYWINDOW_WindowedSizeable;
+	consoleInfo.eMode = HYWINDOW_WindowedSizeable;
 	consoleInfo.vSize.x = 64;
 	consoleInfo.vSize.y = 80;
 	consoleInfo.ptLocation.x = 512;
@@ -100,7 +100,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 			HyJsonObj windowInfoObj = windowInfoArray[i].GetObject();
 
 			windowInfo[i].sName = windowInfoObj["Name"].GetString();
-			windowInfo[i].eType = static_cast<HyWindowType>(windowInfoObj["Type"].GetInt());
+			windowInfo[i].eMode = static_cast<HyWindowMode>(windowInfoObj["Type"].GetInt());
 			windowInfo[i].vSize.x = windowInfoObj["ResolutionX"].GetInt();
 			windowInfo[i].vSize.y = windowInfoObj["ResolutionY"].GetInt();
 			windowInfo[i].ptLocation.x = windowInfoObj["LocationX"].GetInt();
@@ -113,7 +113,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		for(uint32 i = 0; i < HY_MAXWINDOWS; ++i)
 		{
 			windowInfo[i].sName = "Window: " + std::to_string(i);
-			windowInfo[i].eType = HYWINDOW_WindowedFixed;
+			windowInfo[i].eMode = HYWINDOW_WindowedFixed;
 			windowInfo[i].vSize.x = 512;
 			windowInfo[i].vSize.y = 256;
 			windowInfo[i].ptLocation.x = i * windowInfo[i].vSize.x;
@@ -129,7 +129,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		//HyJsonObj consoleInfoObj = projObject.get<HyJsonObj>("ConsoleInfo");
 		HyJsonObj consoleInfoObj = projDoc["ConsoleInfo"].GetObject();
 		consoleInfo.sName = consoleInfoObj["Name"].GetString();// consoleInfoObj.get<jsonxx::String>("Name");
-		consoleInfo.eType = static_cast<HyWindowType>(consoleInfoObj["Type"].GetInt());// static_cast<HyWindowType>(static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("Type")));
+		consoleInfo.eMode = static_cast<HyWindowMode>(consoleInfoObj["Type"].GetInt());// static_cast<HyWindowType>(static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("Type")));
 		consoleInfo.vSize.x = consoleInfoObj["ResolutionX"].GetInt();// static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionX"));
 		consoleInfo.vSize.y = consoleInfoObj["ResolutionY"].GetInt();//static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionY"));
 		consoleInfo.ptLocation.x = consoleInfoObj["LocationX"].GetInt();//static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("LocationX"));
@@ -139,7 +139,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	{
 		bUseConsole = false;
 		consoleInfo.sName = "Harmony Log Console";
-		consoleInfo.eType = HYWINDOW_WindowedSizeable;
+		consoleInfo.eMode = HYWINDOW_WindowedSizeable;
 		consoleInfo.vSize.x = 64;
 		consoleInfo.vSize.y = 80;
 		consoleInfo.ptLocation.x = 512;

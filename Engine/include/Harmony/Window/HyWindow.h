@@ -112,8 +112,8 @@ public:
 
 	HyWindowInteropPtr					GetInterop();
 
-	bool								IsFullScreen();
-	void								SetFullScreen(bool bFullScreen);
+	HyWindowMode						GetMode();
+	void								SetMode(HyWindowMode eMode);
 
 #ifdef HY_USE_GLFW
 	// Returns the monitor this window is currently associated with.
