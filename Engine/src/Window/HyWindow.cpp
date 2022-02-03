@@ -47,7 +47,7 @@ HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShow
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
 	GLFWmonitor *pMonitorOwner = nullptr;
-	switch(m_Info.eType)
+	switch(m_Info.eMode)
 	{
 	case HYWINDOW_WindowedSizeable:
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -409,7 +409,7 @@ HyWindowInteropPtr HyWindow::GetInterop()
 HyWindowMode HyWindow::GetMode()
 {
 #ifdef HY_USE_GLFW
-	return glfwGetWindowMonitor(m_pInterop) != nullptr;
+	return m_Info.eMode;// glfwGetWindowMonitor(m_pInterop) != nullptr;
 #elif defined(HY_USE_SDL2)
 	uint32 uiFlags = SDL_GetWindowFlags(m_pInterop);
 	if(uiFlags & SDL_WINDOW_RESIZABLE)
@@ -442,7 +442,7 @@ HyWindowMode HyWindow::GetMode()
 void HyWindow::SetMode(HyWindowMode eMode)
 {
 #ifdef HY_USE_GLFW
-	glfwSetWindowMonitor(m_pInterop, bFullScreen ? GetGlfwMonitor() : nullptr, m_Info.ptLocation.x, m_Info.ptLocation.y, m_Info.vSize.x, m_Info.vSize.y, GLFW_DONT_CARE);
+	glfwSetWindowMonitor(m_pInterop, (eMode == HYWINDOW_FullScreen) ? GetGlfwMonitor() : nullptr, m_Info.ptLocation.x, m_Info.ptLocation.y, m_Info.vSize.x, m_Info.vSize.y, GLFW_DONT_CARE);
 #elif defined(HY_USE_SDL2) && !defined(HY_PLATFORM_BROWSER) // SDL_SetWindowFullscreen not supported with Emscripten's SDL2
 	uint32 uiFlags = 0;
 	switch(eMode)
