@@ -196,7 +196,11 @@ bool HyLabel::IsTextMonospacedDigits() const
 	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
 		if(m_Panel.IsValid() == false)
-			return -m_Text.GetTextBottomLeft();
+		{
+			glm::vec2 vOffset = m_Text.GetTextBottomLeft();
+			vOffset *= m_Text.scale.Get();
+			return -vOffset;
+		}
 		else
 			return m_Panel.GetBotLeftOffset();
 	}
