@@ -2,7 +2,7 @@
 *	HyPhysicsGrid.h
 *	
 *	Harmony Engine
-*	Copyright (c) 2020 Jason Knobler
+*	Copyright (c) 2022 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -14,8 +14,10 @@
 #include "Scene/Physics/HyBox2dRuntime.h"
 #include "Scene/Physics/HyPhysicsDebug2d.h"
 
-class HyPhysicsGrid2d : public b2World
+class HyPhysicsGrid2d : public HyEntity2d
 {
+	b2World				m_b2World;
+
 	float				m_fPixelsPerMeter;
 	float				m_fPpmInverse;
 
@@ -26,7 +28,7 @@ class HyPhysicsGrid2d : public b2World
 	HyPhysicsDebug2d	m_DebugDraw;
 
 public:
-	HyPhysicsGrid2d(glm::vec2 vGravity = glm::vec2(0.0f, -10.0f), float fPixelsPerMeter = 80.0f, int32 iVelocityIterations = 8, int32 iPositionIterations = 3);
+	HyPhysicsGrid2d(glm::vec2 vGravity = glm::vec2(0.0f, -10.0f), float fPixelsPerMeter = 80.0f, int32 iVelocityIterations = 8, int32 iPositionIterations = 3, HyEntity2d *pParent = nullptr);
 	virtual ~HyPhysicsGrid2d();
 
 	void Update();

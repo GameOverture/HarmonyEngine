@@ -238,7 +238,7 @@ void HyComboBox::ResetExpandedTimeout()
 	HyButton::OnSetup();
 	SetButtonClickedCallback(OnComboBoxClickedCallback, this);
 
-	bv.SetAsBox(GetWidth(), GetHeight());
+	shape.SetAsBox(GetWidth(), GetHeight());
 }
 
 /*static*/ void HyComboBox::OnComboBoxClickedCallback(HyButton *pBtn, void *pData)

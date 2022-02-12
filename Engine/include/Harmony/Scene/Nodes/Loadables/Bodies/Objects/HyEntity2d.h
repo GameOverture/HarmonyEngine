@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Scene/Physics/HyPhysicsGrid2d.h"
-#include "Scene/Physics/HyPhysicsCollider.h"
+#include "Scene/Physics/HyPhysics2d.h"
 
 class HyEntity2d : public IHyBody2d
 {
@@ -33,10 +33,9 @@ protected:
 	};
 	uint32									m_uiEntAttribs;
 
-	b2Body *								m_pPhysicsBody;
-
 public:
-	HyShape2d								bv;						// A shape representing this entity for collision and physics
+	HyShape2d								shape;					// A shape representing this entity for collision and physics
+	HyPhysics2d								physics;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -96,73 +95,6 @@ public:
 	void DisableMouseInput();
 
 	bool IsMouseInBounds();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PHYSICS
-	void PhysInit(HyPhysicsGrid2d &physGridRef,
-				  HyPhysicsType eType,
-				  b2Vec2 pos,
-				  bool bIsEnabled = true,
-				  bool bIsFixedRotation = false,
-				  bool bIsCcd = false,
-				  bool bIsAwake = true,
-				  bool bAllowSleep = true,
-				  float fGravityScale = 1.0f);
-
-	void PhysInit(HyPhysicsGrid2d& physGridRef,
-				  HyPhysicsType eType,
-				  bool bIsEnabled = true,
-				  bool bIsFixedRotation = false,
-				  bool bIsCcd = false,
-				  bool bIsAwake = true,
-				  bool bAllowSleep = true,
-				  float fGravityScale = 1.0f);
-
-	HyPhysicsType PhysGetType() const;
-	void PhysSetType(HyPhysicsType eType);
-	bool PhysIsEnabled() const;
-	void PhysSetEnabled(bool bEnable);
-	bool PhysIsFixedRotation() const;
-	void PhysSetFixedRotation(bool bFixedRot);
-	bool PhysIsCcd() const;
-	void PhysSetCcd(bool bContinuousCollisionDetection);
-	bool PhysIsAwake() const;
-	void PhysSetAwake(bool bAwake);
-	bool PhysIsSleepingAllowed() const;
-	void PhysSetSleepingAllowed(bool bAllowSleep);
-	float PhysGetGravityScale() const;
-	void PhysSetGravityScale(float fGravityScale);
-
-	glm::vec2 PhysWorldCenterMass() const;
-	glm::vec2 PhysLocalCenterMass() const;
-	glm::vec2 PhysGetLinearVelocity() const;
-	
-	void PhysSetFilterData(b2Filter& Filter);
-	const b2Filter & PhysGetFilterData(int iIndex);
-	
-	void PhysSetLinearVelocity(glm::vec2 vVelocity);
-	float PhysGetAngularVelocity() const;
-	void PhysSetAngularVelocity(float fOmega);
-	void PhysApplyForce(const glm::vec2 &vForce, const glm::vec2 &ptPoint, bool bWake);
-	void PhysApplyForceToCenter(const glm::vec2 &vForce, bool bWake);
-	void PhysApplyTorque(float fTorque, bool bWake);
-	void PhysApplyLinearImpulse(const glm::vec2 &vImpulse, const glm::vec2 &ptPoint, bool bWake);
-	void PhysApplyLinearImpulseToCenter(const glm::vec2 &vImpulse, bool bWake);
-	void PhysApplyAngularImpulse(float fImpulse, bool bWake);
-	float PhysGetMass() const;
-	float PhysGetInertia() const;
-
-	// fFriction : The friction coefficient, usually in the range [0,1].
-	// fRestitution : (elasticity) usually in the range [0,1].
-	// fDensity : usually in kg/m^2.
-	// bIsSensor : Is a sensor shape collects contact information but never generates a collision response.
-	std::unique_ptr<HyPhysicsCollider> PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
-	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
-	std::unique_ptr<HyPhysicsCollider> PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
-	std::unique_ptr<HyPhysicsCollider> PhysAddLineChainCollider(const glm::vec2 *pVerts, uint32 uiNumVerts, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
-	void PhysDestroyCollider(std::unique_ptr<HyPhysicsCollider> pCollider);
-
-	void PhysRelease();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DISPLAY ORDER

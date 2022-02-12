@@ -120,8 +120,8 @@ void b2Contact::Destroy(b2Contact* contact, b2BlockAllocator* allocator)
 	b2Shape::Type typeA = fixtureA->GetType();
 	b2Shape::Type typeB = fixtureB->GetType();
 
-	b2Assert(0 <= typeA && typeB < b2Shape::e_typeCount);
-	b2Assert(0 <= typeA && typeB < b2Shape::e_typeCount);
+	b2Assert(0 <= typeA && typeA < b2Shape::e_typeCount);
+	b2Assert(0 <= typeB && typeB < b2Shape::e_typeCount);
 
 	b2ContactDestroyFcn* destroyFcn = s_registers[typeA][typeB].destroyFcn;
 	destroyFcn(contact, allocator);
@@ -156,6 +156,7 @@ b2Contact::b2Contact(b2Fixture* fA, int32 indexA, b2Fixture* fB, int32 indexB)
 
 	m_friction = b2MixFriction(m_fixtureA->m_friction, m_fixtureB->m_friction);
 	m_restitution = b2MixRestitution(m_fixtureA->m_restitution, m_fixtureB->m_restitution);
+	m_restitutionThreshold = b2MixRestitutionThreshold(m_fixtureA->m_restitutionThreshold, m_fixtureB->m_restitutionThreshold);
 
 	m_tangentSpeed = 0.0f;
 }

@@ -54,6 +54,19 @@ Please do not submit pull requests with new features or core library changes. In
 - Results are in the build sub-folder
 - On Windows you can open box2d.sln
 
+## Building Box2D - Using vcpkg
+You can download and install Box2D using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+
+- git clone https://github.com/Microsoft/vcpkg.git
+- cd vcpkg
+- ./bootstrap-vcpkg.sh
+- ./vcpkg integrate install
+- ./vcpkg install box2d
+
+The Box2D port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
+
+Note: vcpkg support is not provided by the Box2D project
+
 ## Building for Xcode
 - Install [CMake](https://cmake.org)
 - Add Cmake to the path in .zprofile (the default Terminal shell is zsh)
@@ -65,6 +78,30 @@ Please do not submit pull requests with new features or core library changes. In
 - Select the testbed scheme
 - Edit the scheme to set a custom working directory, make this be in box2d/testbed
 - You can now build and run the testbed
+
+## Installing using CMake
+You can use the CMake install feature to deploy the library to a central location that can
+be accessed using:
+```
+find_package(box2d REQUIRED)
+target_link_libraries(mytarget PRIVATE box2d)
+```
+You can build and install the library and docs using this command sequence (requires Doxygen):
+```
+mkdir build
+cd build
+cmake -DBOX2D_BUILD_DOCS=ON ..
+cmake --build .
+cmake --build . --target INSTALL
+```
+On Windows this tries to install in `Program Files` and thus requires admin privileges. Alternatively you can target another directory using something like this:
+```
+mkdir build
+cd build
+cmake -DBOX2D_BUILD_DOCS=ON -DCMAKE_INSTALL_PREFIX="C:/packages" ..
+cmake --build .
+cmake --build . --target INSTALL
+```
 
 ## Documentation
 - [Manual](https://box2d.org/documentation/)

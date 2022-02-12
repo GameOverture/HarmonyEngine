@@ -14,8 +14,11 @@
 
 class HyShape2d
 {
-	HyShapeType						m_eType;
-	b2Shape *						m_pShape;
+	HyShapeType									m_eType;
+	b2Shape *									m_pShape;
+
+	std::function<void(HyShape2d *, void *)>	m_fpModifiedCallback;
+	void *										m_pModifiedCallbackParam;
 
 public:
 	static const float				FloatSlop;
@@ -50,9 +53,9 @@ public:
 	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts);
 
 	// Set as a circle with the specified center and radius
-	void SetAsCircle(float fRadius);
-	void SetAsCircle(const glm::vec2 &ptCenter, float fRadius);
-	void SetAsCircle(const b2Vec2& center, float fRadius);
+	bool SetAsCircle(float fRadius);
+	bool SetAsCircle(const glm::vec2 &ptCenter, float fRadius);
+	bool SetAsCircle(const b2Vec2& center, float fRadius);
 
 	// Set as a convex hull from the given array of local points.
 	// uiCount must be in the range [3, b2_maxPolygonVertices].
@@ -63,13 +66,13 @@ public:
 	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
 
 	// Build vertices to represent an axis-aligned box
-	void SetAsBox(int32 iWidth, int32 iHeight);
-	void SetAsBox(float fWidth, float fHeight);
+	bool SetAsBox(int32 iWidth, int32 iHeight);
+	bool SetAsBox(float fWidth, float fHeight);
 
 	// Build vertices to represent an oriented box.
 	// ptBoxCenter is the center of the box in local coordinates.
 	// fRot the rotation of the box in local coordinates.
-	void SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
+	bool SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
 	bool TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const;
 	//bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;

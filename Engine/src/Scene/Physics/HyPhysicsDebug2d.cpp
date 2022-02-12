@@ -96,9 +96,9 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 
 /*virtual*/ void HyPhysicsDebug2d::DrawPoint(const b2Vec2& p, float size, const b2Color& color) /*override*/
 {
-	m_DrawList.emplace_back();
+	//m_DrawList.emplace_back();
 
-	m_DrawList.back().SetAsBox(size * 0.5f, size * 0.5f, glm::vec2(p.x * m_GridRef.GetPixelsPerMeter(), p.y * m_GridRef.GetPixelsPerMeter()), 0.0f);
-	m_DrawList.back().SetWireframe(false);
-	m_DrawList.back().SetTint(color.r, color.g, color.b);
+	//m_DrawList.back().SetAsBox(size * 0.5f, size * 0.5f, glm::vec2(p.x * m_GridRef.GetPixelsPerMeter(), p.y * m_GridRef.GetPixelsPerMeter()), 0.0f);
+	//m_DrawList.back().SetWireframe(false);
+	//m_DrawList.back().SetTint(color.r, color.g, color.b);
 }

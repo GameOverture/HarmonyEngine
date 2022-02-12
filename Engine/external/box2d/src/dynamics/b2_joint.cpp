@@ -31,12 +31,61 @@
 #include "box2d/b2_prismatic_joint.h"
 #include "box2d/b2_pulley_joint.h"
 #include "box2d/b2_revolute_joint.h"
-#include "box2d/b2_rope_joint.h"
 #include "box2d/b2_weld_joint.h"
 #include "box2d/b2_wheel_joint.h"
 #include "box2d/b2_world.h"
 
 #include <new>
+
+void b2LinearStiffness(float& stiffness, float& damping,
+	float frequencyHertz, float dampingRatio,
+	const b2Body* bodyA, const b2Body* bodyB)
+{
+	float massA = bodyA->GetMass();
+	float massB = bodyB->GetMass();
+	float mass;
+	if (massA > 0.0f && massB > 0.0f)
+	{
+		mass = massA * massB / (massA + massB);
+	}
+	else if (massA > 0.0f)
+	{
+		mass = massA;
+	}
+	else
+	{
+		mass = massB;
+	}
+
+	float omega = 2.0f * b2_pi * frequencyHertz;
+	stiffness = mass * omega * omega;
+	damping = 2.0f * mass * dampingRatio * omega;
+}
+
+void b2AngularStiffness(float& stiffness, float& damping,
+	float frequencyHertz, float dampingRatio,
+	const b2Body* bodyA, const b2Body* bodyB)
+{
+	float IA = bodyA->GetInertia();
+	float IB = bodyB->GetInertia();
+	float I;
+	if (IA > 0.0f && IB > 0.0f)
+	{
+		I = IA * IB / (IA + IB);
+	}
+	else if (IA > 0.0f)
+	{
+		I = IA;
+	}
+	else
+	{
+		I = IB;
+	}
+
+	float omega = 2.0f * b2_pi * frequencyHertz;
+	stiffness = I * omega * omega;
+	damping = 2.0f * I * dampingRatio * omega;
+}
 
 b2Joint* b2Joint::Create(const b2JointDef* def, b2BlockAllocator* allocator)
 {
@@ -107,13 +156,6 @@ b2Joint* b2Joint::Create(const b2JointDef* def, b2BlockAllocator* allocator)
 		}
 		break;
 
-	case e_ropeJoint:
-		{
-			void* mem = allocator->Allocate(sizeof(b2RopeJoint));
-			joint = new (mem) b2RopeJoint(static_cast<const b2RopeJointDef*>(def));
-		}
-		break;
-
 	case e_motorJoint:
 		{
 			void* mem = allocator->Allocate(sizeof(b2MotorJoint));
@@ -168,10 +210,6 @@ void b2Joint::Destroy(b2Joint* joint, b2BlockAllocator* allocator)
 
 	case e_frictionJoint:
 		allocator->Free(joint, sizeof(b2FrictionJoint));
-		break;
-
-	case e_ropeJoint:
-		allocator->Free(joint, sizeof(b2RopeJoint));
 		break;
 
 	case e_motorJoint:

@@ -453,15 +453,15 @@ void b2World::Solve(const b2TimeStep& step)
 			b2Assert(b->IsEnabled() == true);
 			island.Add(b);
 
-			// Make sure the body is awake (without resetting sleep timer).
-			b->m_flags |= b2Body::e_awakeFlag;
-
 			// To keep islands as small as possible, we don't
 			// propagate islands across static bodies.
 			if (b->GetType() == b2_staticBody)
 			{
 				continue;
 			}
+
+			// Make sure the body is awake (without resetting sleep timer).
+			b->m_flags |= b2Body::e_awakeFlag;
 
 			// Search all contacts connected to this body.
 			for (b2ContactEdge* ce = b->m_contactList; ce; ce = ce->next)
@@ -1058,6 +1058,12 @@ void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color
 			b2Vec2 v1 = b2Mul(xf, edge->m_vertex1);
 			b2Vec2 v2 = b2Mul(xf, edge->m_vertex2);
 			m_debugDraw->DrawSegment(v1, v2, color);
+
+			if (edge->m_oneSided == false)
+			{
+				m_debugDraw->DrawPoint(v1, 4.0f, color);
+				m_debugDraw->DrawPoint(v2, 4.0f, color);
+			}
 		}
 		break;
 
@@ -1067,31 +1073,12 @@ void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color
 			int32 count = chain->m_count;
 			const b2Vec2* vertices = chain->m_vertices;
 
-			b2Color ghostColor(0.75f * color.r, 0.75f * color.g, 0.75f * color.b, color.a);
-
 			b2Vec2 v1 = b2Mul(xf, vertices[0]);
-			m_debugDraw->DrawPoint(v1, 4.0f, color);
-
-			if (chain->m_hasPrevVertex)
-			{
-				b2Vec2 vp = b2Mul(xf, chain->m_prevVertex);
-				m_debugDraw->DrawSegment(vp, v1, ghostColor);
-				m_debugDraw->DrawCircle(vp, 0.1f, ghostColor);
-			}
-
 			for (int32 i = 1; i < count; ++i)
 			{
 				b2Vec2 v2 = b2Mul(xf, vertices[i]);
 				m_debugDraw->DrawSegment(v1, v2, color);
-				m_debugDraw->DrawPoint(v2, 4.0f, color);
 				v1 = v2;
-			}
-
-			if (chain->m_hasNextVertex)
-			{
-				b2Vec2 vn = b2Mul(xf, chain->m_nextVertex);
-				m_debugDraw->DrawSegment(v1, vn, ghostColor);
-				m_debugDraw->DrawCircle(vn, 0.1f, ghostColor);
 			}
 		}
 		break;
@@ -1111,9 +1098,9 @@ void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color
 			m_debugDraw->DrawSolidPolygon(vertices, vertexCount, color);
 		}
 		break;
-            
-    default:
-        break;
+
+	default:
+	break;
 	}
 }
 
@@ -1279,7 +1266,7 @@ void b2World::Dump()
 
 	b2OpenDump("box2d_dump.inl");
 
-	b2Dump("b2Vec2 g(%.15lef, %.15lef);\n", m_gravity.x, m_gravity.y);
+	b2Dump("b2Vec2 g(%.9g, %.9g);\n", m_gravity.x, m_gravity.y);
 	b2Dump("m_world->SetGravity(g);\n");
 
 	b2Dump("b2Body** bodies = (b2Body**)b2Alloc(%d * sizeof(b2Body*));\n", m_bodyCount);

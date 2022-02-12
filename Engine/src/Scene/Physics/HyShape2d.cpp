@@ -16,13 +16,17 @@ const float HyShape2d::FloatSlop = b2_linearSlop;
 
 HyShape2d::HyShape2d() :
 	m_eType(HYSHAPE_Unknown),
-	m_pShape(nullptr)
+	m_pShape(nullptr),
+	m_fpModifiedCallback(nullptr),
+	m_pModifiedCallbackParam(nullptr)
 {
 }
 
 HyShape2d::HyShape2d(const HyShape2d &copyRef) :
 	m_eType(HYSHAPE_Unknown),
-	m_pShape(nullptr)
+	m_pShape(nullptr),
+	m_fpModifiedCallback(nullptr),
+	m_pModifiedCallbackParam(nullptr)
 {
 	operator=(copyRef);
 }
@@ -138,7 +142,7 @@ b2Shape *HyShape2d::ClonePpmShape(float fPpmInverse) const
 		vertList.emplace_back(static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.x * fPpmInverse,
 							  static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.y * fPpmInverse);
 
-		static_cast<b2EdgeShape *>(pCloneB2Shape)->Set(vertList[0], vertList[1]);
+		static_cast<b2EdgeShape *>(pCloneB2Shape)->SetTwoSided(vertList[0], vertList[1]);
 		break;
 
 	case HYSHAPE_LineChain:
@@ -149,7 +153,7 @@ b2Shape *HyShape2d::ClonePpmShape(float fPpmInverse) const
 				static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y * fPpmInverse);
 		}
 
-		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(&vertList[0], static_cast<b2ChainShape *>(m_pShape)->m_count);
+		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(&vertList[0], static_cast<b2ChainShape *>(m_pShape)->m_count, b2Vec2(0, 0), b2Vec2(0, 0));
 		break;
 
 	case HYSHAPE_LineLoop:
@@ -213,7 +217,7 @@ void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
 
 	delete m_pShape;
 	m_pShape = HY_NEW b2EdgeShape();
-	static_cast<b2EdgeShape *>(m_pShape)->Set(pt1, pt2);
+	static_cast<b2EdgeShape *>(m_pShape)->SetTwoSided(pt1, pt2);
 }
 
 void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -244,22 +248,22 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts);
 }
 
-void HyShape2d::SetAsCircle(float fRadius)
+bool HyShape2d::SetAsCircle(float fRadius)
 {
-	SetAsCircle(glm::vec2(0.0f, 0.0f), fRadius);
+	return SetAsCircle(glm::vec2(0.0f, 0.0f), fRadius);
 }
 
-void HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
+bool HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
 {
-	SetAsCircle(b2Vec2(ptCenter.x, ptCenter.y), fRadius);
+	return SetAsCircle(b2Vec2(ptCenter.x, ptCenter.y), fRadius);
 }
 
-void HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
+bool HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
 {
 	if(fRadius < FloatSlop)
 	{
 		SetAsNothing();
-		return;
+		return false;
 	}
 
 	m_eType = HYSHAPE_Circle;
@@ -268,6 +272,8 @@ void HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
 	m_pShape = HY_NEW b2CircleShape();
 	static_cast<b2CircleShape *>(m_pShape)->m_p = center;
 	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
+
+	return true;
 }
 
 void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
@@ -290,32 +296,36 @@ void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
 	static_cast<b2PolygonShape *>(m_pShape)->Set(pPointArray, uiCount);
 }
 
-void HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)
+bool HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)
 {
-	SetAsBox(static_cast<float>(iWidth), static_cast<float>(iHeight));
+	return SetAsBox(static_cast<float>(iWidth), static_cast<float>(iHeight));
 }
 
-void HyShape2d::SetAsBox(float fWidth, float fHeight)
+bool HyShape2d::SetAsBox(float fWidth, float fHeight)
 {
 	if(fWidth < FloatSlop || fHeight < FloatSlop)
 	{
 		SetAsNothing();
-		return;
+		return false;
 	}
 
 	m_eType = HYSHAPE_Polygon;
 
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
-	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fWidth * 0.5f, fHeight * 0.5f, b2Vec2(fWidth * 0.5f, fHeight * 0.5f), 0.0f);	// Offsets Box2d's center to bottom left
+	
+	// Offsets Box2d's center to Harmony's default bottom left
+	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fWidth * 0.5f, fHeight * 0.5f, b2Vec2(fWidth * 0.5f, fHeight * 0.5f), 0.0f);
+
+	return true;
 }
 
-void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
+bool HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
 {
 	if(fHalfWidth * 2 < FloatSlop || fHalfHeight * 2 < FloatSlop)
 	{
 		SetAsNothing();
-		return;
+		return false;
 	}
 
 	m_eType = HYSHAPE_Polygon;
@@ -323,6 +333,8 @@ void HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(ptBoxCenter.x, ptBoxCenter.y), glm::radians(fRotDeg));
+
+	return true;
 }
 
 bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const
@@ -443,7 +455,7 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 {
 	float fScaleX = glm::length(glm::vec3(mtxTransform[0][0], mtxTransform[0][1], mtxTransform[0][2]));
 	float fScaleY = glm::length(glm::vec3(mtxTransform[1][0], mtxTransform[1][1], mtxTransform[1][2]));
-	if(fScaleX < FloatSlop || fScaleY < FloatSlop)
+	if(fScaleX < FloatSlop || fScaleY < FloatSlop || std::isnan(mtxTransform[3].x) || std::isnan(mtxTransform[3].y)) // TODO: Trace down why sometimes the position vector of the transform is NaN. This causes a mostly harmless assert() in b2PolygonShape::Set() (Doing isNan check in GetLocalTransform() will breakpoint)
 		return nullptr;
 
 	b2Shape *pCloneB2Shape = nullptr;
@@ -461,7 +473,7 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 		vertList[0] = mtxTransform * vertList[0];
 		vertList[1] = mtxTransform * vertList[1];
 
-		static_cast<b2EdgeShape *>(pCloneB2Shape)->Set(b2Vec2(vertList[0].x, vertList[0].y), b2Vec2(vertList[1].x, vertList[1].y));
+		static_cast<b2EdgeShape *>(pCloneB2Shape)->SetTwoSided(b2Vec2(vertList[0].x, vertList[0].y), b2Vec2(vertList[1].x, vertList[1].y));
 		break;
 
 	case HYSHAPE_LineChain:
@@ -501,11 +513,6 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 		break; }
 
 	case HYSHAPE_Polygon:
-		// TODO: Trace down why sometimes the position vector of the transform is NaN. This causes a mostly harmless assert() in b2PolygonShape::Set()
-		//       Doing below check in GetLocalTransform() will breakpoint
-		if(std::isnan(mtxTransform[3].x) || std::isnan(mtxTransform[3].y))
-			break;
-
 		pCloneB2Shape = HY_NEW b2PolygonShape();
 		for(int32 i = 0; i < static_cast<b2PolygonShape *>(m_pShape)->m_count; ++i)
 		{

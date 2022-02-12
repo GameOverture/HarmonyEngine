@@ -106,6 +106,7 @@ b2PrismaticJoint::b2PrismaticJoint(const b2PrismaticJointDef* def)
 	m_enableLimit = def->enableLimit;
 	m_enableMotor = def->enableMotor;
 
+	m_translation = 0.0f;
 	m_axis.SetZero();
 	m_perp.SetZero();
 }
@@ -461,7 +462,7 @@ b2Vec2 b2PrismaticJoint::GetAnchorB() const
 
 b2Vec2 b2PrismaticJoint::GetReactionForce(float inv_dt) const
 {
-	return inv_dt * (m_impulse.x * m_perp + (m_motorImpulse + m_lowerImpulse + m_upperImpulse) * m_axis);
+	return inv_dt * (m_impulse.x * m_perp + (m_motorImpulse + m_lowerImpulse - m_upperImpulse) * m_axis);
 }
 
 float b2PrismaticJoint::GetReactionTorque(float inv_dt) const
@@ -606,7 +607,6 @@ void b2PrismaticJoint::Dump()
 	b2Dump("  joints[%d] = m_world->CreateJoint(&jd);\n", m_index);
 }
 
-///
 void b2PrismaticJoint::Draw(b2Draw* draw) const
 {
 	const b2Transform& xfA = m_bodyA->GetTransform();

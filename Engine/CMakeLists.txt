@@ -129,8 +129,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Objects/HyCamera.cpp
 	src/Scene/Nodes/Objects/IHyCamera.cpp
 	src/Scene/Physics/HyBox2dRuntime.cpp
-	src/Scene/Physics/HyPhysEntity2d.cpp
-	src/Scene/Physics/HyPhysicsCollider.cpp
+	src/Scene/Physics/HyPhysics2d.cpp
 	src/Scene/Physics/HyPhysicsDebug2d.cpp
 	src/Scene/Physics/HyPhysicsGrid2d.cpp
 	src/Scene/Physics/HyShape2d.cpp
@@ -254,8 +253,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Scene/Nodes/Objects/HyCamera.h
 	include/Harmony/Scene/Nodes/Objects/IHyCamera.h
 	include/Harmony/Scene/Physics/HyBox2dRuntime.h
-	include/Harmony/Scene/Physics/HyPhysEntity2d.h
-	include/Harmony/Scene/Physics/HyPhysicsCollider.h
+	include/Harmony/Scene/Physics/HyPhysics2d.h
 	include/Harmony/Scene/Physics/HyPhysicsDebug2d.h
 	include/Harmony/Scene/Physics/HyPhysicsGrid2d.h
 	include/Harmony/Scene/Physics/HyShape2d.h

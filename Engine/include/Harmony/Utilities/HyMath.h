@@ -249,6 +249,7 @@ public:
 		return Brightness() <= 127.5f;
 	}
 };
+typedef HyColor HyColour;
 
 class HyMath
 {
