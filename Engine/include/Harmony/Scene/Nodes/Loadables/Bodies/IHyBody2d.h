@@ -29,6 +29,9 @@ protected:
 
 	int32							m_iDisplayOrder;		// Higher values are displayed front-most
 
+	b2AABB							m_SceneAABB;			// Don't directly use, acquiring using GetSceneAABB()
+															// Derived versions of this function will properly update 'm_SceneAABB' before returning
+
 public:
 	HyAnimVec3						topColor;
 	HyAnimVec3						botColor;
@@ -59,6 +62,10 @@ public:
 	virtual void ResetDisplayOrder();
 
 	bool IsMouseInBounds();
+
+	virtual const b2AABB &GetSceneAABB() = 0;
+	float GetSceneHeight();
+	float GetSceneWidth();
 
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;

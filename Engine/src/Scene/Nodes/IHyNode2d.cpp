@@ -26,9 +26,6 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
-	// Initialize as 'invalid'
-	HyMath::InvalidateAABB(m_SceneAABB);
-
 	scale.Set(1.0f);
 
 	if(m_pParent)
@@ -51,7 +48,6 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	m_pParent(copyRef.m_pParent),
 	m_mtxCached(copyRef.m_mtxCached),
 	m_fRotation(copyRef.m_fRotation),
-	m_SceneAABB(copyRef.m_SceneAABB),
 	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
@@ -72,7 +68,6 @@ IHyNode2d::IHyNode2d(IHyNode2d &&donor) noexcept :
 	m_pParent(donor.ParentGet()),
 	m_mtxCached(std::move(donor.m_mtxCached)),
 	m_fRotation(donor.m_fRotation),
-	m_SceneAABB(std::move(donor.m_SceneAABB)),
 	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
@@ -183,22 +178,4 @@ const glm::mat4 &IHyNode2d::GetSceneTransform()
 	}
 
 	return m_mtxCached;
-}
-
-float IHyNode2d::GetSceneHeight()
-{
-	const b2AABB &aabbRef = GetSceneAABB();
-	if(aabbRef.IsValid())
-		return aabbRef.GetExtents().y * 2.0f;
-
-	return 0.0f;
-}
-
-float IHyNode2d::GetSceneWidth()
-{
-	const b2AABB &aabbRef = GetSceneAABB();
-	if(aabbRef.IsValid())
-		return aabbRef.GetExtents().x * 2.0f;
-
-	return 0.0f;
 }

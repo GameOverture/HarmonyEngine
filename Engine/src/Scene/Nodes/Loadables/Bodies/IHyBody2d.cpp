@@ -28,6 +28,9 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
+	// Initialize as 'invalid'
+	HyMath::InvalidateAABB(m_SceneAABB);
+
 	topColor.Set(1.0f);
 	botColor.Set(1.0f);
 
@@ -57,6 +60,7 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	IHyLoadable2d(copyRef),
 	IHyBody(copyRef),
 	m_iDisplayOrder(copyRef.m_iDisplayOrder),
+	m_SceneAABB(copyRef.m_SceneAABB),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color)
@@ -78,6 +82,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	IHyLoadable2d(std::move(donor)),
 	IHyBody(std::move(donor)),
 	m_iDisplayOrder(std::move(donor.m_iDisplayOrder)),
+	m_SceneAABB(std::move(donor.m_SceneAABB)),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
@@ -232,6 +237,24 @@ bool IHyBody2d::IsMouseInBounds()
 	}
 
 	return false;
+}
+
+float IHyBody2d::GetSceneHeight()
+{
+	const b2AABB &aabbRef = GetSceneAABB();
+	if(aabbRef.IsValid())
+		return aabbRef.GetExtents().y * 2.0f;
+
+	return 0.0f;
+}
+
+float IHyBody2d::GetSceneWidth()
+{
+	const b2AABB &aabbRef = GetSceneAABB();
+	if(aabbRef.IsValid())
+		return aabbRef.GetExtents().x * 2.0f;
+
+	return 0.0f;
 }
 
 /*virtual*/ void IHyBody2d::SetDirty(uint32 uiDirtyFlags) /*override*/
