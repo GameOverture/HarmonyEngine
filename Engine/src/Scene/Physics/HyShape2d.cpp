@@ -16,17 +16,17 @@ const float HyShape2d::FloatSlop = b2_linearSlop;
 
 HyShape2d::HyShape2d() :
 	m_eType(HYSHAPE_Unknown),
-	m_pShape(nullptr),
-	m_fpModifiedCallback(nullptr),
-	m_pModifiedCallbackParam(nullptr)
+	m_pShape(nullptr)//,
+	//m_fpModifiedCallback(nullptr),
+	//m_pModifiedCallbackParam(nullptr)
 {
 }
 
 HyShape2d::HyShape2d(const HyShape2d &copyRef) :
 	m_eType(HYSHAPE_Unknown),
-	m_pShape(nullptr),
-	m_fpModifiedCallback(nullptr),
-	m_pModifiedCallbackParam(nullptr)
+	m_pShape(nullptr)//,
+	//m_fpModifiedCallback(nullptr),
+	//m_pModifiedCallbackParam(nullptr)
 {
 	operator=(copyRef);
 }
@@ -69,7 +69,7 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 
 		// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
 		static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
-		static_cast<b2ChainShape *>(m_pShape)->CreateChain(pRhsChainShape->m_vertices, pRhsChainShape->m_count);
+		static_cast<b2ChainShape *>(m_pShape)->CreateChain(pRhsChainShape->m_vertices, pRhsChainShape->m_count, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
 		} break;
 
 	case HYSHAPE_Circle: {
@@ -245,7 +245,7 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 
 	delete m_pShape;
 	m_pShape = HY_NEW b2ChainShape();
-	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts);
+	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
 }
 
 bool HyShape2d::SetAsCircle(float fRadius)
@@ -486,7 +486,7 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 			b2VertList.emplace_back(vertList[i].x, vertList[i].y);
 		}
 
-		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(b2VertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count);
+		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(b2VertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
 		break;
 
 	case HYSHAPE_LineLoop:

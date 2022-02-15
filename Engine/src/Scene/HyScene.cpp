@@ -12,6 +12,7 @@
 #include "HyEngine.h"
 #include "Renderer/IHyRenderer.h"
 #include "Window/HyWindow.h"
+#include "Scene/Nodes/Loadables/IHyLoadable.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
@@ -22,7 +23,6 @@
 
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
-std::vector<HyPhysicsGrid2d *> HyScene::sm_PhysicsGridList;
 bool HyScene::sm_bInst2dOrderingDirty = false;
 
 HyScene::HyScene(IHyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef) :
@@ -74,24 +74,6 @@ HyScene::~HyScene(void)
 		{
 			// TODO: Log about erasing Node
 			sm_NodeList_PauseUpdate.erase(it);
-			break;
-		}
-	}
-}
-
-/*static*/ void HyScene::AddPhysicsGrid(HyPhysicsGrid2d *pPhysGrid)
-{
-	sm_PhysicsGridList.push_back(pPhysGrid);
-}
-
-/*static*/ void HyScene::RemovePhysicsGrid(HyPhysicsGrid2d *pPhysGrid)
-{
-	for(auto it = sm_PhysicsGridList.begin(); it != sm_PhysicsGridList.end(); ++it)
-	{
-		if((*it) == pPhysGrid)
-		{
-			//HyLog("Remove Physics Grid: " << pNode->GetType());
-			sm_PhysicsGridList.erase(it);
 			break;
 		}
 	}
@@ -181,14 +163,6 @@ void HyScene::UpdateNodes()
 	HY_PROFILE_END
 }
 
-void HyScene::UpdatePhysics()
-{
-	HY_PROFILE_BEGIN(HYPROFILERSECTION_Physics)
-	for(auto physGrid : sm_PhysicsGridList)
-		physGrid->Update();
-	HY_PROFILE_END
-}
-
 // RENDER STATE BUFFER
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Buffer Header (contains uiNum3dRenderStates; uiNum2dRenderStates) || RenderState3D/UniformData-|-RenderState2D/UniformData-|
@@ -235,18 +209,18 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		rendererRef.AppendDrawable2d(i, *m_NodeList_LoadedDrawable2d[i], uiCameraMask);
 	}
 	
-	// Debug physics draws
-	for(auto physGrid : sm_PhysicsGridList)
-	{
-		std::vector<HyPrimitive2d> &physDrawListRef = physGrid->GetDebugDrawList();
-		for(uint32 i = 0; i < static_cast<uint32>(physDrawListRef.size()); ++i)
-		{
-			if(CalculateCameraMask(physDrawListRef[i], uiCameraMask) == false)
-				continue;
+	//// Debug physics draws
+	//for(auto physGrid : sm_PhysicsGridList)
+	//{
+	//	std::vector<HyPrimitive2d> &physDrawListRef = physGrid->GetDebugDrawList();
+	//	for(uint32 i = 0; i < static_cast<uint32>(physDrawListRef.size()); ++i)
+	//	{
+	//		if(CalculateCameraMask(physDrawListRef[i], uiCameraMask) == false)
+	//			continue;
 
-			rendererRef.AppendDrawable2d(i, physDrawListRef[i], uiCameraMask);
-		}
-	}
+	//		rendererRef.AppendDrawable2d(i, physDrawListRef[i], uiCameraMask);
+	//	}
+	//}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// SetCullMaskBit for each enabled camera

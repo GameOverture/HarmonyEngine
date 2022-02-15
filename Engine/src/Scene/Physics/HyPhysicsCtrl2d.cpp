@@ -1,0 +1,535 @@
+/**************************************************************************
+*	HyPhysicsCtrl2d.cpp
+*	
+*	Harmony Engine
+*	Copyright (c) 2022 Jason Knobler
+*
+*	Harmony License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
+#include "Afx/HyStdAfx.h"
+#include "Scene/Physics/HyPhysicsCtrl2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h"
+#include "Diagnostics/Console/IHyConsole.h"
+
+HyPhysicsCtrl2d::HyPhysicsCtrl2d() :
+	m_pInit(nullptr),
+	m_pData(nullptr)
+{
+}
+
+HyPhysicsCtrl2d::~HyPhysicsCtrl2d()
+{
+	delete m_pInit;
+}
+
+void HyPhysicsCtrl2d::Init(const b2BodyDef &bodyDef)
+{
+	Init(static_cast<HyPhysicsType>(bodyDef.type),
+		bodyDef.enabled,
+		bodyDef.fixedRotation,
+		bodyDef.awake,
+		glm::vec2(bodyDef.linearVelocity.x, bodyDef.linearVelocity.y),
+		bodyDef.angularVelocity,
+		bodyDef.linearDamping,
+		bodyDef.angularDamping,
+		bodyDef.allowSleep,
+		bodyDef.gravityScale,
+		bodyDef.bullet);
+}
+
+void HyPhysicsCtrl2d::Init(
+	HyPhysicsType eType,
+	bool bIsEnabled /*= true*/,
+	bool bIsFixedRotation /*= false*/,
+	bool bIsAwake /*= true*/,
+	glm::vec2 vLinearVelocity /*= glm::vec2(0.0f, 0.0f)*/,
+	float fAngularVelocity /*= 0.0f*/,
+	float fLinearDamping /*= 0.0f*/,
+	float fAngularDamping /*= 0.0f*/,
+	bool bAllowSleep /*= true*/,
+	float fGravityScale /*= 1.0f*/,
+	bool bIsCcd /*= false*/)
+{
+	HyAssert(eType == HYPHYS_Unknown, "HyPhysicsCtrl2d::Init was passed 'HYPHYS_Unknown'");
+
+	// If 'm_pData' exists, then this node is already apart of an active simulation. Simply update the m_pData->m_pBody with all the incoming parameters
+	if(m_pData)
+	{
+		// Box2d already checks for a redundant values getting set, and avoids most computation
+		m_pData->m_pBody->SetType(static_cast<b2BodyType>(eType));
+		m_pData->m_pBody->SetEnabled(bIsEnabled);
+		m_pData->m_pBody->SetFixedRotation(bIsFixedRotation);
+		m_pData->m_pBody->SetAwake(bIsAwake);
+		m_pData->m_pBody->SetLinearVelocity(b2Vec2(vLinearVelocity.x, vLinearVelocity.y));
+		m_pData->m_pBody->SetAngularVelocity(fAngularVelocity);
+		m_pData->m_pBody->SetLinearDamping(fLinearDamping);
+		m_pData->m_pBody->SetAngularDamping(fAngularDamping);
+		m_pData->m_pBody->SetSleepingAllowed(bAllowSleep);
+		m_pData->m_pBody->SetGravityScale(fGravityScale);
+		m_pData->m_pBody->SetBullet(bIsCcd);
+
+		return;
+	}
+
+	delete m_pInit;
+	m_pInit = HY_NEW b2BodyDef();
+	//m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(this);
+	m_pInit->type = static_cast<b2BodyType>(eType); // static_assert at HyPhysicsType's declaration guarantees this to match
+	m_pInit->enabled = bIsEnabled;
+	m_pInit->fixedRotation = bIsFixedRotation;
+	m_pInit->awake = bIsAwake;
+	m_pInit->linearVelocity = b2Vec2(vLinearVelocity.x, vLinearVelocity.y);
+	m_pInit->angularVelocity = fAngularVelocity;
+	m_pInit->linearDamping = fLinearDamping;
+	m_pInit->angularDamping = fAngularDamping;
+	m_pInit->allowSleep = bAllowSleep;
+	m_pInit->gravityScale = fGravityScale;
+	m_pInit->bullet = bIsCcd;
+
+	// TODO: If attached to physics grid, call InitChildPhysics
+}
+
+void HyPhysicsCtrl2d::Uninit()
+{
+
+}
+
+bool HyPhysicsCtrl2d::IsSimulating() const
+{
+	return m_pData != nullptr;
+}
+
+HyPhysicsType HyPhysicsCtrl2d::GetType() const
+{
+	// static_assert at HyPhysicsType's declaration guarantees enums to match
+	if(m_pData)
+		return static_cast<HyPhysicsType>(m_pData->m_pBody->GetType());
+	else if(m_pInit)
+		return static_cast<HyPhysicsType>(m_pInit->type);
+	else
+		return HYPHYS_Unknown;
+}
+
+void HyPhysicsCtrl2d::SetType(HyPhysicsType eType)
+{
+	// static_assert at HyPhysicsType's declaration guarantees enums to match
+	if(m_pData)
+		m_pData->m_pBody->SetType(static_cast<b2BodyType>(eType));
+	else if(m_pInit)
+		m_pInit->type = static_cast<b2BodyType>(eType);
+	else
+	{
+		b2BodyDef def;
+		def.type = static_cast<b2BodyType>(eType);
+		Init(def);
+	}
+}
+
+bool HyPhysicsCtrl2d::IsEnabled() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->IsEnabled();
+	else if(m_pInit)
+		return m_pInit->enabled;
+	else
+		return b2BodyDef().enabled;
+}
+
+void HyPhysicsCtrl2d::SetEnabled(bool bEnable)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetEnabled(bEnable);
+	else if(m_pInit)
+		m_pInit->enabled = bEnable;
+	else
+	{
+		b2BodyDef def;
+		def.enabled = bEnable;
+		Init(def);
+	}
+}
+
+bool HyPhysicsCtrl2d::IsFixedRotation() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->IsFixedRotation();
+	else if(m_pInit)
+		return m_pInit->fixedRotation;
+	else
+		return b2BodyDef().fixedRotation;
+}
+
+void HyPhysicsCtrl2d::SetFixedRotation(bool bFixedRot)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetFixedRotation(bFixedRot);
+	else if(m_pInit)
+		m_pInit->fixedRotation = bFixedRot;
+	else
+	{
+		b2BodyDef def;
+		def.fixedRotation = bFixedRot;
+		Init(def);
+	}
+}
+
+bool HyPhysicsCtrl2d::IsAwake() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->IsAwake();
+	else if(m_pInit)
+		return m_pInit->awake;
+	else
+		return b2BodyDef().awake;
+}
+
+void HyPhysicsCtrl2d::SetAwake(bool bAwake)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetAwake(bAwake);
+	else if(m_pInit)
+		m_pInit->awake = bAwake;
+	else
+	{
+		b2BodyDef def;
+		def.awake = bAwake;
+		Init(def);
+	}
+}
+
+glm::vec2 HyPhysicsCtrl2d::GetLinearVelocity() const
+{
+	if(m_pData)
+		return glm::vec2(m_pData->m_pBody->GetLinearVelocity().x, m_pData->m_pBody->GetLinearVelocity().y);
+	else if(m_pInit)
+		return glm::vec2(m_pInit->linearVelocity.x, m_pInit->linearVelocity.y);
+	else
+		return glm::vec2(b2BodyDef().linearVelocity.x, b2BodyDef().linearVelocity.y);
+}
+
+void HyPhysicsCtrl2d::SetLinearVelocity(glm::vec2 vVelocity)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetLinearVelocity(b2Vec2(vVelocity.x, vVelocity.y));
+	else if(m_pInit)
+		m_pInit->linearVelocity = b2Vec2(vVelocity.x, vVelocity.y);
+	else
+	{
+		b2BodyDef def;
+		def.linearVelocity = b2Vec2(vVelocity.x, vVelocity.y);
+		Init(def);
+	}
+}
+
+float HyPhysicsCtrl2d::GetAngularVelocity() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->GetAngularVelocity();
+	else if(m_pInit)
+		return m_pInit->angularVelocity;
+	else
+		return b2BodyDef().angularVelocity;
+}
+
+void HyPhysicsCtrl2d::SetAngularVelocity(float fOmega)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetAngularVelocity(fOmega);
+	else if(m_pInit)
+		m_pInit->angularVelocity = fOmega;
+	else
+	{
+		b2BodyDef def;
+		def.angularVelocity = fOmega;
+		Init(def);
+	}
+}
+
+float HyPhysicsCtrl2d::GetLinearDamping() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->GetLinearDamping();
+	else if(m_pInit)
+		return m_pInit->linearDamping;
+	else
+		return b2BodyDef().linearDamping;
+}
+
+void HyPhysicsCtrl2d::SetLinearDamping(float fLinearDamping)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetLinearDamping(fLinearDamping);
+	else if(m_pInit)
+		m_pInit->linearDamping = fLinearDamping;
+	else
+	{
+		b2BodyDef def;
+		def.linearDamping = fLinearDamping;
+		Init(def);
+	}
+}
+
+float HyPhysicsCtrl2d::GetAngularDamping() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->GetAngularDamping();
+	else if(m_pInit)
+		return m_pInit->angularDamping;
+	else
+		return b2BodyDef().angularDamping;
+}
+
+void HyPhysicsCtrl2d::SetAngularDamping(float fAngularDamping)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetAngularDamping(fAngularDamping);
+	else if(m_pInit)
+		m_pInit->angularDamping = fAngularDamping;
+	else
+	{
+		b2BodyDef def;
+		def.angularDamping = fAngularDamping;
+		Init(def);
+	}
+}
+
+bool HyPhysicsCtrl2d::IsSleepingAllowed() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->IsSleepingAllowed();
+	else if(m_pInit)
+		return m_pInit->allowSleep;
+	else
+		return b2BodyDef().allowSleep;
+}
+
+void HyPhysicsCtrl2d::SetSleepingAllowed(bool bAllowSleep)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetSleepingAllowed(bAllowSleep);
+	else if(m_pInit)
+		m_pInit->allowSleep = bAllowSleep;
+	else
+	{
+		b2BodyDef def;
+		def.allowSleep = bAllowSleep;
+		Init(def);
+	}
+}
+
+float HyPhysicsCtrl2d::GetGravityScale() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->GetGravityScale();
+	else if(m_pInit)
+		return m_pInit->gravityScale;
+	else
+		return b2BodyDef().gravityScale;
+}
+
+void HyPhysicsCtrl2d::SetGravityScale(float fGravityScale)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetGravityScale(fGravityScale);
+	else if(m_pInit)
+		m_pInit->gravityScale = fGravityScale;
+	else
+	{
+		b2BodyDef def;
+		def.gravityScale = fGravityScale;
+		Init(def);
+	}
+}
+
+bool HyPhysicsCtrl2d::IsCcd() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->IsBullet();
+	else if(m_pInit)
+		return m_pInit->bullet;
+	else
+		return b2BodyDef().bullet;
+}
+
+void HyPhysicsCtrl2d::SetCcd(bool bContinuousCollisionDetection)
+{
+	if(m_pData)
+		m_pData->m_pBody->SetBullet(bContinuousCollisionDetection);
+	else if(m_pInit)
+		m_pInit->bullet = bContinuousCollisionDetection;
+	else
+	{
+		b2BodyDef def;
+		def.bullet = bContinuousCollisionDetection;
+		Init(def);
+	}
+}
+
+glm::vec2 HyPhysicsCtrl2d::GridCenterMass() const
+{
+	if(m_pData)
+		return glm::vec2(m_pData->m_pBody->GetWorldCenter().x, m_pData->m_pBody->GetWorldCenter().y);
+
+	//HyLogWarning("HyPhysicsCtrl2d::GridCenterMass invoked before physics component is set");
+	return glm::vec2(0.0f, 0.0f);
+}
+
+glm::vec2 HyPhysicsCtrl2d::LocalCenterMass() const
+{
+	if(m_pData)
+		return glm::vec2(m_pData->m_pBody->GetLocalCenter().x, m_pData->m_pBody->GetLocalCenter().y);
+
+	//HyLogWarning("HyPhysicsCtrl2d::LocalCenterMass invoked before physics component is set");
+	return glm::vec2(0.0f, 0.0f);
+}
+
+void HyPhysicsCtrl2d::ApplyForce(const glm::vec2 &vForce, const glm::vec2 &ptPoint, bool bWake)
+{
+	if(m_pData)
+		m_pData->m_pBody->ApplyForce(b2Vec2(vForce.x, vForce.y), b2Vec2(ptPoint.x, ptPoint.y), bWake);
+}
+
+void HyPhysicsCtrl2d::ApplyForceToCenter(const glm::vec2 &vForce, bool bWake)
+{
+	if(m_pData)
+		m_pData->m_pBody->ApplyForceToCenter(b2Vec2(vForce.x, vForce.y), bWake);
+}
+
+void HyPhysicsCtrl2d::ApplyTorque(float fTorque, bool bWake)
+{
+	if(m_pData)
+		m_pData->m_pBody->ApplyTorque(fTorque, bWake);
+}
+
+void HyPhysicsCtrl2d::ApplyLinearImpulse(const glm::vec2 &vImpulse, const glm::vec2 &ptPoint, bool bWake)
+{
+	if(m_pData)
+		m_pData->m_pBody->ApplyLinearImpulse(b2Vec2(vImpulse.x, vImpulse.y), b2Vec2(ptPoint.x, ptPoint.y), bWake);
+}
+
+void HyPhysicsCtrl2d::ApplyLinearImpulseToCenter(const glm::vec2 &vImpulse, bool bWake)
+{
+	if(m_pData)
+		m_pData->m_pBody->ApplyLinearImpulseToCenter(b2Vec2(vImpulse.x, vImpulse.y), bWake);
+}
+
+void HyPhysicsCtrl2d::ApplyAngularImpulse(float fImpulse, bool bWake)
+{
+	if(m_pData)
+		m_pData->m_pBody->ApplyAngularImpulse(fImpulse, bWake);
+}
+
+float HyPhysicsCtrl2d::GetMass() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->GetMass();
+
+	return 0.0f;
+}
+
+float HyPhysicsCtrl2d::GetInertia() const
+{
+	if(m_pData)
+		return m_pData->m_pBody->GetInertia();
+
+	return 0.0f;
+}
+
+void HyPhysicsCtrl2d::SetFilterData(b2Filter &Filter)
+{
+	if(m_pData)
+	{
+		for(b2Fixture *f = m_pData->m_pBody->GetFixtureList(); f; f = f->GetNext())
+			f->SetFilterData(Filter);
+	}
+}
+
+const b2Filter &HyPhysicsCtrl2d::GetFilterData(int iIndex)
+{
+	if(m_pData)
+		return m_pData->m_pBody->GetFixtureList()[iIndex].GetFilterData();
+	
+	return b2Filter();
+}
+
+// Should only be invoked by the parent HyPhysicsGrid2d
+void HyPhysicsCtrl2d::Update()
+{
+	if(m_pData == nullptr)
+		return;
+
+	HyAssert(m_pData, "HyPhysicsCtrl2d::Update() - m_pData was null");
+	HyAssert(m_pData->m_pNode->ParentGet(), "HyPhysicsCtrl2d::Update() - Node's parent is null"); // Node's parent must exist, and also be the HyPhysicsGrid2d that invoked this... which I can't check for
+
+	// If any HyAnimFloat controlling the position or rotation are not animating, reset the below lambda that will have the b2Body set them respectively
+	if(m_pData->m_pNode->pos.IsAnimating() == false)
+	{
+		m_pData->m_pNode->pos.GetAnimFloat(0).Updater([&](float fElapsedTime) { return (m_pData->m_pBody->GetPosition().x * static_cast<HyPhysicsGrid2d *>(m_pData->m_pNode->ParentGet())->GetPixelsPerMeter()); });
+		m_pData->m_pNode->pos.GetAnimFloat(1).Updater([&](float fElapsedTime) { return (m_pData->m_pBody->GetPosition().y * static_cast<HyPhysicsGrid2d *>(m_pData->m_pNode->ParentGet())->GetPixelsPerMeter()); });
+	}
+	if(m_pData->m_pNode->rot.IsAnimating() == false)
+		m_pData->m_pNode->rot.Updater([&](float fElapsedTime) { return glm::degrees(m_pData->m_pBody->GetAngle()); });
+}
+
+void HyPhysicsCtrl2d::FlushTransform()
+{
+	// 'm_pData' is guarenteed to be valid if FlushTransform() is invoked (via HyPhysicsGrid2d)
+
+	// TODO: If scale is different, modify all shapes in fixtures (cannot change num of vertices in shape says Box2d)
+	float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pData->m_pNode->ParentGet())->GetPpmInverse();
+	m_pData->m_pBody->SetTransform(b2Vec2(m_pData->m_pNode->pos.X() * fPpmInverse, m_pData->m_pNode->pos.Y() * fPpmInverse), glm::radians(m_pData->m_pNode->rot.Get()));
+}
+//
+//std::unique_ptr<HyPhysicsCtrl2d> HyPhysicsCtrl2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
+//{
+//	if(m_pPhysicsBody == nullptr || shapeRef.IsValidShape() == false)
+//		return nullptr;
+//
+//	b2Shape *pPpmShape = shapeRef.ClonePpmShape(static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse());
+//	std::unique_ptr<HyPhysicsCtrl2d> pCollider = std::make_unique<HyPhysicsCtrl2d>(m_pPhysicsBody, pPpmShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
+//	delete pPpmShape;
+//
+//	return pCollider;
+//}
+//
+//std::unique_ptr<HyPhysicsCtrl2d> HyPhysicsCtrl2d::PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
+//{
+//	return PhysAddCircleCollider(glm::vec2(0.0f, 0.0), fRadius, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
+//}
+//
+//std::unique_ptr<HyPhysicsCtrl2d> HyPhysicsCtrl2d::PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
+//{
+//	if(m_pPhysicsBody == nullptr || fRadius <= 0.0f)
+//		return nullptr;
+//
+//	float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+//	b2CircleShape circleShape;
+//	circleShape.m_p.x = ptCenter.x * fPpmInverse;
+//	circleShape.m_p.y = ptCenter.y * fPpmInverse;
+//	circleShape.m_radius = fRadius * fPpmInverse;
+//	return std::make_unique<HyPhysicsCtrl2d>(m_pPhysicsBody, &circleShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
+//}
+//
+//std::unique_ptr<HyPhysicsCtrl2d> HyPhysicsCtrl2d::PhysAddLineChainCollider(const glm::vec2 *pVerts, uint32 uiNumVerts, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
+//{
+//	if(m_pPhysicsBody == nullptr || pVerts == nullptr || uiNumVerts == 0)
+//		return nullptr;
+//
+//	float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
+//	std::vector<b2Vec2> vertList;
+//	for(uint32 i = 0; i < uiNumVerts; ++i)
+//		vertList.emplace_back(pVerts[i].x * fPpmInverse, pVerts[i].y * fPpmInverse);
+//
+//	b2ChainShape chainShape;
+//	chainShape.CreateChain(vertList.data(), uiNumVerts);
+//	return std::make_unique<HyPhysicsCtrl2d>(m_pPhysicsBody, &chainShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
+//}
+//
+//void HyPhysicsCtrl2d::PhysDestroyCollider(std::unique_ptr<HyPhysicsCtrl2d> pCollider)
+//{
+//	if(m_pPhysicsBody)
+//		m_pPhysicsBody->DestroyFixture(pCollider->GetFixture());
+//
+//	pCollider.release();
+//}

@@ -123,15 +123,15 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.cpp
 	src/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.cpp
+	src/Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.cpp
 	src/Scene/Nodes/Loadables/Objects/HyAudio2d.cpp
 	src/Scene/Nodes/Loadables/Objects/HyAudio3d.cpp
 	src/Scene/Nodes/Loadables/Objects/IHyAudio.cpp
 	src/Scene/Nodes/Objects/HyCamera.cpp
 	src/Scene/Nodes/Objects/IHyCamera.cpp
 	src/Scene/Physics/HyBox2dRuntime.cpp
-	src/Scene/Physics/HyPhysics2d.cpp
+	src/Scene/Physics/HyPhysicsCtrl2d.cpp
 	src/Scene/Physics/HyPhysicsDebug2d.cpp
-	src/Scene/Physics/HyPhysicsGrid2d.cpp
 	src/Scene/Physics/HyShape2d.cpp
 	src/Threading/IHyThreadClass.cpp
 	src/Time/HyTime.cpp
@@ -247,15 +247,15 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h
 	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h
 	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntityLeaf2d.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h
 	include/Harmony/Scene/Nodes/Loadables/Objects/IHyAudio.h
 	include/Harmony/Scene/Nodes/Loadables/Objects/HyAudio2d.h
 	include/Harmony/Scene/Nodes/Loadables/Objects/HyAudio3d.h
 	include/Harmony/Scene/Nodes/Objects/HyCamera.h
 	include/Harmony/Scene/Nodes/Objects/IHyCamera.h
 	include/Harmony/Scene/Physics/HyBox2dRuntime.h
-	include/Harmony/Scene/Physics/HyPhysics2d.h
+	include/Harmony/Scene/Physics/HyPhysicsCtrl2d.h
 	include/Harmony/Scene/Physics/HyPhysicsDebug2d.h
-	include/Harmony/Scene/Physics/HyPhysicsGrid2d.h
 	include/Harmony/Scene/Physics/HyShape2d.h
 	include/Harmony/Threading/IHyThreadClass.h
 	include/Harmony/Time/HyTime.h

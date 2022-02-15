@@ -18,9 +18,9 @@ class HyScene;
 class IHyNode
 {
 	friend class HyScene;
-	friend class HyEntity2d;
 	friend class HyAnimFloat;
 	friend class IHyBody;
+	friend class HyEntity2d;
 
 protected:
 	static HyScene *				sm_pScene;

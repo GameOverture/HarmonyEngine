@@ -14,6 +14,7 @@
 #include "Scene/HyScene.h"
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
+#include "HyEngine.h"
 
 IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
 	IHyLoadable2d(eNodeType, sPrefix, sName, pParent),
@@ -48,26 +49,6 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 		if(m_pParent->IsStencilSet())
 			m_hStencil = m_pParent->m_hStencil;
 
-		//int32 iOrderValue = m_pParent->GetDisplayOrder() + 1;
-
-		//if(m_pParent->IsReverseDisplayOrder() == false)
-		//{
-		//	for(uint32 i = 0; i < m_pParent->ChildCount(); ++i)
-		//	{
-		//		if(0 != (m_pParent->ChildGet(i)->m_uiFlags & NODETYPE_IsBody))
-		//			iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
-		//	}
-		//}
-		//else
-		//{
-		//	for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
-		//	{
-		//		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-		//			iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
-		//	}
-		//}
-
-		//m_iDisplayOrder = iOrderValue;
 		m_pParent->SetChildrenDisplayOrder(false);
 	}
 }
@@ -88,6 +69,9 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
+
+	shape = copyRef.shape;
+	physics = copyRef.physics;
 }
 
 IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
@@ -96,7 +80,8 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	m_iDisplayOrder(std::move(donor.m_iDisplayOrder)),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color)
+	alpha(m_fAlpha, *this, DIRTY_Color),
+	shape(std::move(donor.shape))
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -106,10 +91,13 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
+
+	physics = donor.physics;
 }
 
 IHyBody2d::~IHyBody2d()
 {
+	physics.Uninit();
 }
 
 IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
@@ -124,6 +112,9 @@ IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
 	alpha = rhs.alpha;
 
 	CalculateColor();
+
+	shape = rhs.shape;
+	physics = rhs.physics;
 
 	return *this;
 }
@@ -140,6 +131,9 @@ IHyBody2d &IHyBody2d::operator=(IHyBody2d &&donor) noexcept
 	alpha = std::move(donor.alpha);
 
 	CalculateColor();
+
+	shape = std::move(donor.shape);
+	physics = donor.physics;
 
 	return *this;
 }
@@ -213,6 +207,43 @@ int32 IHyBody2d::GetDisplayOrder() const
 	{
 		pRootParent->SetChildrenDisplayOrder(false);
 		HyScene::SetInstOrderingDirty();
+	}
+}
+
+bool IHyBody2d::IsMouseInBounds()
+{
+	if(GetCoordinateSystem() >= 0 && HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem())
+	{
+		if(shape.IsValidShape())
+			return shape.TestPoint(GetSceneTransform(), HyEngine::Input().GetMousePos());
+		else
+			return HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
+	}
+	else if(GetCoordinateSystem() < 0)
+	{
+		glm::vec2 ptWorldMousePos;
+		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
+		{
+			if(shape.IsValidShape())
+				return shape.TestPoint(GetSceneTransform(), ptWorldMousePos);
+			else
+				return HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
+		}
+	}
+
+	return false;
+}
+
+/*virtual*/ void IHyBody2d::SetDirty(uint32 uiDirtyFlags) /*override*/
+{
+	IHyNode2d::SetDirty(uiDirtyFlags);
+
+	// If this body is actively being simulated by a HyPhysicsGrid2d, and has a dirty transform NOT from the updater
+	if(physics.IsSimulating() &&
+		(uiDirtyFlags & IHyNode::DIRTY_FromUpdater) == 0 &&
+		(uiDirtyFlags & DIRTY_Transform))
+	{
+		physics.FlushTransform();
 	}
 }
 

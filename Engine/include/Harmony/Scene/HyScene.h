@@ -11,9 +11,6 @@
 #define HyScene_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Physics/HyPhysicsGrid2d.h"
-#include "Scene/Physics/HyBox2dRuntime.h"
-#include "Scene/Physics/HyPhysicsDebug2d.h"
 #include "Audio/IHyAudioCore.h"
 
 // Forward declarations
@@ -22,6 +19,7 @@ class IHyNode2d;
 class IHyNode3d;
 class HyEntity2d;
 class HyEntity3d;
+class IHyLoadable;
 class IHyDrawable2d;
 class IHyDrawable3d;
 class HyWindow;
@@ -37,8 +35,6 @@ class HyScene
 	static std::vector<IHyNode *>						sm_NodeList_All;
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;		// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
-
-	static std::vector<HyPhysicsGrid2d *>				sm_PhysicsGridList;
 
 	// List of nodes who can be drawn, and their graphics assets are fully loaded
 	static bool											sm_bInst2dOrderingDirty;
@@ -57,9 +53,6 @@ public:
 	static void AddNode_PauseUpdate(IHyNode *pNode);
 	static void RemoveNode_PauseUpdate(IHyNode *pNode);
 
-	static void AddPhysicsGrid(HyPhysicsGrid2d *pPhysGrid);
-	static void RemovePhysicsGrid(HyPhysicsGrid2d *pPhysGrid);
-
 	void AddNode_Loaded(IHyDrawable2d *pDrawable);
 	void AddNode_Loaded(IHyDrawable3d *pDrawable);
 	void RemoveNode_Loaded(const IHyDrawable2d *pDrawable);
@@ -71,7 +64,6 @@ public:
 	void SetPause(bool bPause);
 
 	void UpdateNodes();
-	void UpdatePhysics();
 	void PrepareRender(IHyRenderer &rendererRef);
 
 	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut) const;

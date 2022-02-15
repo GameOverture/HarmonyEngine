@@ -12,8 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
-#include "Scene/Physics/HyPhysicsGrid2d.h"
-#include "Scene/Physics/HyPhysics2d.h"
 
 class HyEntity2d : public IHyBody2d
 {
@@ -32,10 +30,6 @@ protected:
 		ENT2DATTRIB_ReverseDisplayOrder		= 1 << 5,
 	};
 	uint32									m_uiEntAttribs;
-
-public:
-	HyShape2d								shape;					// A shape representing this entity for collision and physics
-	HyPhysics2d								physics;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -94,8 +88,6 @@ public:
 	void EnableMouseInput();
 	void DisableMouseInput();
 
-	bool IsMouseInBounds();
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DISPLAY ORDER
 	bool IsReverseDisplayOrder() const;
@@ -108,13 +100,13 @@ public:
 	virtual void Unload() override;
 	
 protected:
+	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void Update() override final;
 	virtual bool IsChildrenLoaded() const override final;
 	virtual void OnDataAcquired() override;
 
-	void SetNewChildAttributes(IHyNode2d &childRef);
+	virtual void SetNewChildAttributes(IHyNode2d &childRef);
 
-	virtual void SetDirty(uint32 uiDirtyFlags) override;
 
 	virtual void _SetVisible(bool bEnabled, bool bIsOverriding) override final;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;

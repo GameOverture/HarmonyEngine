@@ -16,17 +16,14 @@
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyBody2d(HYTYPE_Entity, "", "", pParent),
-	m_uiEntAttribs(0),
-	physics(*this)
+	m_uiEntAttribs(0)
 {
 }
 
 HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 	IHyBody2d(std::move(donor)),
 	m_ChildList(std::move(donor.m_ChildList)),
-	m_uiEntAttribs(std::move(donor.m_uiEntAttribs)),
-	shape(std::move(donor.shape)),
-	physics(*this)
+	m_uiEntAttribs(std::move(donor.m_uiEntAttribs))
 {
 }
 
@@ -34,8 +31,6 @@ HyEntity2d::~HyEntity2d(void)
 {
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
-
-	physics.PhysRelease();
 }
 
 HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor) noexcept
@@ -44,8 +39,6 @@ HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor) noexcept
 
 	m_ChildList = std::move(donor.m_ChildList);
 	m_uiEntAttribs = std::move(donor.m_uiEntAttribs);
-	shape = std::move(donor.shape);
-	//physics = std::move(donor.physics);
 
 	return *this;
 }
@@ -349,30 +342,6 @@ void HyEntity2d::DisableMouseInput()
 	m_uiEntAttribs &= ~ENT2DATTRIB_MouseInputEnabled;
 }
 
-bool HyEntity2d::IsMouseInBounds()
-{
-	if(GetCoordinateSystem() >= 0 && HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem())
-	{
-		if(shape.IsValidShape())
-			return shape.TestPoint(GetSceneTransform(), HyEngine::Input().GetMousePos());
-		else
-			return HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
-	}
-	else if(GetCoordinateSystem() < 0)
-	{
-		glm::vec2 ptWorldMousePos;
-		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
-		{
-			if(shape.IsValidShape())
-				return shape.TestPoint(GetSceneTransform(), ptWorldMousePos);
-			else
-				return HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
-		}
-	}
-	
-	return false;
-}
-
 bool HyEntity2d::IsReverseDisplayOrder() const
 {
 	return (m_uiEntAttribs & ENT2DATTRIB_ReverseDisplayOrder);
@@ -436,6 +405,14 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 	if(sm_pHyAssets)
 		sm_pHyAssets->SetEntityLoaded(this);
+}
+
+/*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
+{
+	IHyBody2d::SetDirty(uiDirtyFlags);
+
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->SetDirty(uiDirtyFlags);
 }
 
 /*virtual*/ void HyEntity2d::Update() /*override final*/
@@ -504,8 +481,6 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		}
 	}
 
-	physics.Update();
-
 	OnUpdate();
 }
 
@@ -550,25 +525,6 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 
 	if(sm_pHyAssets)
 		sm_pHyAssets->SetEntityLoaded(this);
-}
-
-/*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
-{
-	IHyNode2d::SetDirty(uiDirtyFlags);
-
-	if(m_pPhysicsBody && (uiDirtyFlags & IHyNode::DIRTY_FromUpdater) == 0)
-	{
-		if(uiDirtyFlags & DIRTY_Transform)
-		{
-			float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
-			m_pPhysicsBody->SetTransform(b2Vec2(pos.X() * fPpmInverse, pos.Y() * fPpmInverse), glm::radians(rot.Get()));
-		}
-		
-		ClearDirty(IHyNode::DIRTY_FromUpdater);
-	}
-
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->SetDirty(uiDirtyFlags);
 }
 
 /*virtual*/ void HyEntity2d::_SetVisible(bool bEnabled, bool bIsOverriding) /*override final*/

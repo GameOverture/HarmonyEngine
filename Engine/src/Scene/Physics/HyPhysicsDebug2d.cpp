@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyPhysicsDebug2d.h"
-#include "Scene/Physics/HyPhysicsGrid2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
 HyPhysicsDebug2d::HyPhysicsDebug2d(HyPhysicsGrid2d &gridRef) :

@@ -15,6 +15,7 @@
 #include "Scene/Nodes/Loadables/IHyLoadable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/IHyBody.h"
 #include "Scene/AnimFloats/HyAnimVec3.h"
+#include "Scene/Physics/HyPhysicsCtrl2d.h"
 
 class IHyBody2d : public IHyLoadable2d, public IHyBody
 {
@@ -32,6 +33,9 @@ public:
 	HyAnimVec3						topColor;
 	HyAnimVec3						botColor;
 	HyAnimFloat						alpha;
+
+	HyShape2d						shape;					// A shape representing *this for collision and physics
+	HyPhysicsCtrl2d					physics;
 
 public:
 	IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
@@ -54,7 +58,10 @@ public:
 	virtual void SetDisplayOrder(int32 iOrderValue);
 	virtual void ResetDisplayOrder();
 
+	bool IsMouseInBounds();
+
 protected:
+	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void Update() override;
 
 	// Internal Entity propagation function overrides

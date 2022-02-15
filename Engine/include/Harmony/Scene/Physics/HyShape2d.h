@@ -17,8 +17,8 @@ class HyShape2d
 	HyShapeType									m_eType;
 	b2Shape *									m_pShape;
 
-	std::function<void(HyShape2d *, void *)>	m_fpModifiedCallback;
-	void *										m_pModifiedCallbackParam;
+	//std::function<void(HyShape2d *, void *)>	m_fpModifiedCallback;
+	//void *										m_pModifiedCallbackParam;
 
 public:
 	static const float				FloatSlop;
