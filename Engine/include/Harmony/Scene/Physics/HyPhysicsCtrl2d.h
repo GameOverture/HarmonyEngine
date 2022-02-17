@@ -15,28 +15,41 @@
 
 struct HyPhysicsComponent2d;
 
+struct HyPhysicsInit2d
+{
+	b2BodyDef				m_BodyDef;
+	b2FixtureDef			m_FixtureDef;
+};
+
 class HyPhysicsCtrl2d
 {
 	friend class HyPhysicsGrid2d;			// To invoke Update
 	friend class IHyBody2d;					// To invoke FlushTransform
 
-	b2BodyDef *				m_pInit;		// Dynamically allocated when physics simulation is desired. Simulation will then start if/once owner of *this is a child of a HyPhysicsGrid2d.
+	IHyBody2d &				m_NodeRef;
+	HyPhysicsInit2d *		m_pInit;		// Dynamically allocated when physics simulation is desired. Simulation will then start if/once owner of *this is a child of a HyPhysicsGrid2d.
 	HyPhysicsComponent2d *	m_pData;		// A pointer to the parent's concrete value in HyPhysicsGrid2d::m_PhysChildMap. Null if owner of *this is not yet a child of a HyPhysicsGrid2d
 
 public:
-	HyPhysicsCtrl2d();
+	HyPhysicsCtrl2d(IHyBody2d &nodeRef);
 	~HyPhysicsCtrl2d();
 
-	void Init(const b2BodyDef &bodyDef);
+	void Init(const b2BodyDef &bodyDef, const b2FixtureDef &fixtureDef);
 	void Init(HyPhysicsType eType,
 		bool bIsEnabled = true,
 		bool bIsFixedRotation = false,
+		float fDensity = 1.0f,
+		float fFriction = 0.2f,
 		bool bIsAwake = true,
 		glm::vec2 vLinearVelocity = glm::vec2(0.0f, 0.0f),
 		float fAngularVelocity = 0.0f,
 		float fLinearDamping = 0.0f,
 		float fAngularDamping = 0.0f,
+		float fRestitution = 0.0f,
+		float fRestitutionThreshold = 1.0f,
+		b2Filter filter = b2Filter(),
 		bool bAllowSleep = true,
+		bool bIsSensor = false,
 		float fGravityScale = 1.0f,
 		bool bIsCcd = false);
 
@@ -66,6 +79,20 @@ public:
 	bool IsCcd() const;
 	void SetCcd(bool bContinuousCollisionDetection);
 
+	// Applies to the fixture/shape
+	float GetDensity() const;
+	void SetDensity(float fDensity);
+	float GetFriction() const;
+	void SetFriction(float fFriction);
+	float GetRestitution() const;
+	void SetRestitution(float fRestitution);
+	float GetRestitutionThreshold() const;
+	void SetRestitutionThreshold(float fRestitutionThreshold);
+	const b2Filter &GetFilter() const;
+	void SetFilter(const b2Filter &filter);
+	bool IsSensor() const;
+	void SetSensor(bool bIsSensor);
+
 	glm::vec2 GridCenterMass() const;
 	glm::vec2 LocalCenterMass() const;
 	void ApplyForce(const glm::vec2 &vForce, const glm::vec2 &ptPoint, bool bWake);
@@ -77,22 +104,9 @@ public:
 	float GetMass() const;
 	float GetInertia() const;
 
-	void SetFilterData(b2Filter &Filter);
-	const b2Filter &GetFilterData(int iIndex);
-
 private:
 	void Update();			// Should only be invoked by the parent HyPhysicsGrid2d
 	void FlushTransform();	// Should only be invoked by the node IHyBody2d
-
-	// fFriction : The friction coefficient, usually in the range [0,1].
-	// fRestitution : (elasticity) usually in the range [0,1].
-	// fDensity : usually in kg/m^2.
-	// bIsSensor : Is a sensor shape collects contact information but never generates a collision response.
-	std::unique_ptr<HyPhysicsCtrl2d> PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
-	std::unique_ptr<HyPhysicsCtrl2d> PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
-	std::unique_ptr<HyPhysicsCtrl2d> PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
-	std::unique_ptr<HyPhysicsCtrl2d> PhysAddLineChainCollider(const glm::vec2 *pVerts, uint32 uiNumVerts, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter);
-	void PhysDestroyCollider(std::unique_ptr<HyPhysicsCtrl2d> pCollider);
 };
 
 #endif /* HyPhysicsCtrl2d_h__ */

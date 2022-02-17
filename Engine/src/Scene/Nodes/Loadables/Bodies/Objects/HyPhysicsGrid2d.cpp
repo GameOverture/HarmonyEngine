@@ -20,6 +20,8 @@ HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*
 	m_iPhysPositionIterations(iPositionIterations),
 	m_DebugDraw(*this)
 {
+	m_uiFlags |= NODETYPE_IsPhysicsGrid;
+
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	m_b2World.SetContactListener(&m_ContactListener);
 
@@ -38,7 +40,7 @@ HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*
 	if(0 != (childRef.GetInternalFlags() & NODETYPE_IsBody))
 	{
 		IHyBody2d &bodyRef = static_cast<IHyBody2d &>(childRef);
-		InitChildPhysics(bodyRef); // Does nothing if 'bodyRef.physics.m_pInit' is null
+		TryInitChildPhysics(bodyRef);
 	}
 }
 
@@ -64,37 +66,35 @@ HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*
 	return bValidRemoval;
 }
 
-void HyPhysicsGrid2d::InitChildPhysics(IHyBody2d &bodyRef)
+void HyPhysicsGrid2d::TryInitChildPhysics(IHyBody2d &bodyRef)
 {
-	if(bodyRef.physics.m_pInit == nullptr)
+	if(bodyRef.physics.m_pInit == nullptr || bodyRef.shape.IsValidShape() == false)
 		return;
 
+	auto resultPair = m_PhysChildMap.emplace(std::pair<IHyBody2d *, HyPhysicsComponent2d>(&bodyRef, HyPhysicsComponent2d()));
+	HyPhysicsComponent2d &compRef = resultPair.first->second;
+	HyAssert(resultPair.second, "HyPhysicsGrid2d::TryInitChildPhysics() was invoked with a IHyBody2d that was already simulating");
+	if(resultPair.second) // New insert occurred
+	{
+		compRef.m_pBody = m_b2World.CreateBody(&bodyRef.physics.m_pInit->m_BodyDef);
 
+		bodyRef.physics.m_pInit->m_FixtureDef.shape = bodyRef.shape.ClonePpmShape(GetPpmInverse());
+		compRef.m_pFixture = compRef.m_pBody->CreateFixture(&bodyRef.physics.m_pInit->m_FixtureDef);
+		delete bodyRef.physics.m_pInit->m_FixtureDef.shape;
+		bodyRef.physics.m_pInit->m_FixtureDef.shape = nullptr;
+	}
+}
+
+void HyPhysicsGrid2d::UninitChildPhysics(IHyBody2d &bodyRef)
+{
+	auto iter = m_PhysChildMap.find(&bodyRef);
+	if(iter == m_PhysChildMap.end())
+		return;
+
+	m_b2World.DestroyBody(iter->second.m_pBody);
+	iter->first->physics.m_pData = nullptr;
 	
-	HyPhysicsComponent2d &physicsCompRef = m_PhysChildMap.emplace(std::pair<IHyBody2d *, HyPhysicsComponent2d>(&bodyRef, HyPhysicsComponent2d())).first->second;
-	physicsCompRef.m_pNode = &bodyRef;
-
-	//bodyRef.physics.m_pData = ;
-
-
-
-	//PhysRelease();
-
-	//b2Body *pBody, const b2Shape *pb2PpmShape, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter
-	//	b2FixtureDef def;
-	//def.shape = pb2PpmShape;
-	////def.userData = this;
-	//def.friction = 0.2f;		// The friction coefficient, usually in the range [0,1].
-	//def.restitution = 0.0f;		// The restitution (elasticity) usually in the range [0,1].
-	//def.density = fDensity;		// The density, usually in kg/m^2.
-	//def.isSensor = bIsSensor;
-	//def.filter = collideFilter;
-
-	//m_pFixture = pBody->CreateFixture(&def);
-
-	//b2Body *pPhysicsBody = m_b2World.CreateBody(&bodyDef);
-
-	//bodyRef.physics.m_pData->m_pBody
+	m_PhysChildMap.erase(&bodyRef);
 }
 
 float HyPhysicsGrid2d::GetPixelsPerMeter()
@@ -128,7 +128,7 @@ std::vector<HyPrimitive2d> &HyPhysicsGrid2d::GetDebugDrawList()
 /*virtual*/ void HyPhysicsGrid2d::OnUpdate() /*override*/
 {
 	for(auto iter = m_PhysChildMap.begin(); iter != m_PhysChildMap.end(); ++iter)
-		iter->second.m_pNode->physics.Update();
+		iter->first->physics.Update();
 
 	if(m_DebugDraw.GetFlags() != 0)
 	{

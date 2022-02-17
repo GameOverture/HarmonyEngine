@@ -16,17 +16,17 @@ const float HyShape2d::FloatSlop = b2_linearSlop;
 
 HyShape2d::HyShape2d() :
 	m_eType(HYSHAPE_Unknown),
-	m_pShape(nullptr)//,
-	//m_fpModifiedCallback(nullptr),
-	//m_pModifiedCallbackParam(nullptr)
+	m_pShape(nullptr),
+	m_fpModifiedCallback(nullptr),
+	m_pModifiedCallbackParam(nullptr)
 {
 }
 
 HyShape2d::HyShape2d(const HyShape2d &copyRef) :
 	m_eType(HYSHAPE_Unknown),
-	m_pShape(nullptr)//,
-	//m_fpModifiedCallback(nullptr),
-	//m_pModifiedCallbackParam(nullptr)
+	m_pShape(nullptr),
+	m_fpModifiedCallback(nullptr),
+	m_pModifiedCallbackParam(nullptr)
 {
 	operator=(copyRef);
 }
@@ -91,12 +91,21 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 		break;
 	}
 
+	if(m_fpModifiedCallback)
+		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+
 	return *this;
 }
 
 HyShapeType HyShape2d::GetType() const
 {
 	return m_eType;
+}
+
+void HyShape2d::SetModifiedCallback(std::function<void(HyShape2d *, void *)> fpModifiedCallback, void *pParam)
+{
+	m_fpModifiedCallback = fpModifiedCallback;
+	m_pModifiedCallbackParam = pParam;
 }
 
 void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
@@ -119,11 +128,6 @@ void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
 }
 
 const b2Shape *HyShape2d::GetB2Shape() const
-{
-	return m_pShape;
-}
-
-b2Shape *HyShape2d::GetB2Shape()
 {
 	return m_pShape;
 }
@@ -204,6 +208,9 @@ void HyShape2d::SetAsNothing()
 
 	delete m_pShape;
 	m_pShape = nullptr;
+
+	if(m_fpModifiedCallback)
+		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
 }
 
 void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
@@ -218,6 +225,9 @@ void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
 	delete m_pShape;
 	m_pShape = HY_NEW b2EdgeShape();
 	static_cast<b2EdgeShape *>(m_pShape)->SetTwoSided(pt1, pt2);
+
+	if(m_fpModifiedCallback)
+		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
 }
 
 void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -232,6 +242,9 @@ void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	delete m_pShape;
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(&vertList[0], uiNumVerts);
+
+	if(m_fpModifiedCallback)
+		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
 }
 
 void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -246,6 +259,9 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	delete m_pShape;
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
+
+	if(m_fpModifiedCallback)
+		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
 }
 
 bool HyShape2d::SetAsCircle(float fRadius)
@@ -273,6 +289,9 @@ bool HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
 	static_cast<b2CircleShape *>(m_pShape)->m_p = center;
 	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
 
+	if(m_fpModifiedCallback)
+		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+
 	return true;
 }
 
@@ -294,6 +313,9 @@ void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->Set(pPointArray, uiCount);
+
+	if(m_fpModifiedCallback)
+		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
 }
 
 bool HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)
@@ -317,6 +339,9 @@ bool HyShape2d::SetAsBox(float fWidth, float fHeight)
 	// Offsets Box2d's center to Harmony's default bottom left
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fWidth * 0.5f, fHeight * 0.5f, b2Vec2(fWidth * 0.5f, fHeight * 0.5f), 0.0f);
 
+	if(m_fpModifiedCallback)
+		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+
 	return true;
 }
 
@@ -333,6 +358,9 @@ bool HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(ptBoxCenter.x, ptBoxCenter.y), glm::radians(fRotDeg));
+
+	if(m_fpModifiedCallback)
+		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
 
 	return true;
 }
@@ -437,7 +465,7 @@ bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &pt
 //	return localManifold.pointCount != 0;
 //}
 
-bool HyShape2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform)
+bool HyShape2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const
 {
 	b2Shape *pTransformedSelf = CloneTransform(mtxTransform);
 	if(pTransformedSelf)

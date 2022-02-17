@@ -17,11 +17,11 @@ class HyShape2d
 	HyShapeType									m_eType;
 	b2Shape *									m_pShape;
 
-	//std::function<void(HyShape2d *, void *)>	m_fpModifiedCallback;
-	//void *										m_pModifiedCallbackParam;
+	std::function<void(HyShape2d *, void *)>	m_fpModifiedCallback;
+	void *										m_pModifiedCallbackParam;
 
 public:
-	static const float				FloatSlop;
+	static const float							FloatSlop;
 
 	HyShape2d();
 	HyShape2d(const HyShape2d &copyRef);
@@ -30,10 +30,11 @@ public:
 	const HyShape2d &operator=(const HyShape2d &rhs);
 
 	HyShapeType GetType() const;
+	void SetModifiedCallback(std::function<void(HyShape2d *, void *)> fpModifiedCallback, void *pParam);
+
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
 	
 	const b2Shape *GetB2Shape() const;
-	b2Shape *GetB2Shape();
 	b2Shape *ClonePpmShape(float fPpmInverse) const;
 
 	bool IsValidShape() const;
@@ -77,7 +78,7 @@ public:
 	bool TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const;
 	//bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;
 
-	bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform);
+	bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const;
 
 protected:
 	b2Shape *CloneTransform(const glm::mat4 &mtxTransform) const;

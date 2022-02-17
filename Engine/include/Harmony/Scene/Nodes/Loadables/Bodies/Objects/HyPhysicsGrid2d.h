@@ -17,12 +17,10 @@
 
 struct HyPhysicsComponent2d
 {
-	IHyBody2d *									m_pNode;
 	b2Body *									m_pBody;
 	b2Fixture *									m_pFixture;
 
 	HyPhysicsComponent2d() :
-		m_pNode(nullptr),
 		m_pBody(nullptr),
 		m_pFixture(nullptr)
 	{ }
@@ -30,6 +28,8 @@ struct HyPhysicsComponent2d
 
 class HyPhysicsGrid2d : public HyEntity2d
 {
+	friend class HyPhysicsCtrl2d;
+
 protected:
 	b2World										m_b2World;
 
@@ -62,7 +62,8 @@ public:
 protected:
 	virtual void OnUpdate() override;
 	
-	void InitChildPhysics(IHyBody2d &bodyRef); // Does nothing if 'bodyRef.physics.m_pInit' is null
+	void TryInitChildPhysics(IHyBody2d &bodyRef); // Does nothing if 'bodyRef.physics.m_pInit' is null or shape not valid
+	void UninitChildPhysics(IHyBody2d &bodyRef);
 };
 
 #endif /* HyPhysicsGrid_h__ */

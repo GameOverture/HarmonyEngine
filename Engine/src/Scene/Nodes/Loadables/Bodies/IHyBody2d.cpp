@@ -24,7 +24,8 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 	m_iDisplayOrder(0),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color)
+	alpha(m_fAlpha, *this, DIRTY_Color),
+	physics(*this)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -63,7 +64,8 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	m_SceneAABB(copyRef.m_SceneAABB),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color)
+	alpha(m_fAlpha, *this, DIRTY_Color),
+	physics(*this)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -75,7 +77,6 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	m_CachedBotColor = botColor.Get();
 
 	shape = copyRef.shape;
-	physics = copyRef.physics;
 }
 
 IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
@@ -86,7 +87,8 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
-	shape(std::move(donor.shape))
+	shape(std::move(donor.shape)),
+	physics(*this)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -96,8 +98,6 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
-
-	physics = donor.physics;
 }
 
 IHyBody2d::~IHyBody2d()
@@ -119,7 +119,6 @@ IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
 	CalculateColor();
 
 	shape = rhs.shape;
-	physics = rhs.physics;
 
 	return *this;
 }
@@ -138,7 +137,6 @@ IHyBody2d &IHyBody2d::operator=(IHyBody2d &&donor) noexcept
 	CalculateColor();
 
 	shape = std::move(donor.shape);
-	physics = donor.physics;
 
 	return *this;
 }

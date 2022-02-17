@@ -238,7 +238,7 @@ void HyPrimitive2d::ClearVertexData()
 
 void HyPrimitive2d::AssembleData()
 {
-	b2Shape *pb2Shape = m_LocalBoundingVolume.GetB2Shape();
+	const b2Shape *pb2Shape = m_LocalBoundingVolume.GetB2Shape();
 
 	switch(m_LocalBoundingVolume.GetType())
 	{
@@ -247,37 +247,37 @@ void HyPrimitive2d::AssembleData()
 
 	case HYSHAPE_LineSegment: {
 		std::vector<b2Vec2> pointList;
-		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex1);
-		pointList.push_back(static_cast<b2EdgeShape *>(pb2Shape)->m_vertex2);
+		pointList.push_back(static_cast<const b2EdgeShape *>(pb2Shape)->m_vertex1);
+		pointList.push_back(static_cast<const b2EdgeShape *>(pb2Shape)->m_vertex2);
 		_SetAsLineChain(pointList.data(), 2);
 		break; }
 
 	case HYSHAPE_LineLoop:
 	case HYSHAPE_LineChain: {
-		_SetAsLineChain(static_cast<b2ChainShape *>(pb2Shape)->m_vertices, static_cast<b2ChainShape *>(pb2Shape)->m_count);
+		_SetAsLineChain(static_cast<const b2ChainShape *>(pb2Shape)->m_vertices, static_cast<const b2ChainShape *>(pb2Shape)->m_count);
 		break; }
 
 	case HYSHAPE_Circle:
-		_SetAsCircle(glm::vec2(static_cast<b2CircleShape *>(pb2Shape)->m_p.x, static_cast<b2CircleShape *>(pb2Shape)->m_p.y), pb2Shape->m_radius, m_uiNumSegments);
+		_SetAsCircle(glm::vec2(static_cast<const b2CircleShape *>(pb2Shape)->m_p.x, static_cast<const b2CircleShape *>(pb2Shape)->m_p.y), pb2Shape->m_radius, m_uiNumSegments);
 		break;
 
 	case HYSHAPE_Polygon: {
 		if(m_bWireframe)
 		{
-			int32 iNumVerts = static_cast<b2PolygonShape *>(pb2Shape)->m_count;
+			int32 iNumVerts = static_cast<const b2PolygonShape *>(pb2Shape)->m_count;
 			HyAssert(iNumVerts >= 3, "HyPrimitive error, not enough verts for HYSHAPE_Polygon");
 
 			std::vector<b2Vec2> vertList;
 			for(int32 i = 0; i < iNumVerts; ++i)
-				vertList.push_back(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices[i]);
+				vertList.push_back(static_cast<const b2PolygonShape *>(pb2Shape)->m_vertices[i]);
 
 			// Make it loop
-			vertList.push_back(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices[0]);
+			vertList.push_back(static_cast<const b2PolygonShape *>(pb2Shape)->m_vertices[0]);
 
 			_SetAsLineChain(vertList.data(), iNumVerts + 1);
 		}
 		else
-			_SetAsPolygon(static_cast<b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<b2PolygonShape *>(pb2Shape)->m_count);
+			_SetAsPolygon(static_cast<const b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<const b2PolygonShape *>(pb2Shape)->m_count);
 		break; }
 
 	default:
@@ -447,7 +447,7 @@ void HyPrimitive2d::_SetAsCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSeg
 	}
 }
 
-void HyPrimitive2d::_SetAsPolygon(b2Vec2 *pVertexList, uint32 uiNumVertices)
+void HyPrimitive2d::_SetAsPolygon(const b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
 	ClearVertexData();
 
