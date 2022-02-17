@@ -35,13 +35,13 @@ void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiL
 
 	if(eOrientation == HYORIEN_Vertical)
 	{
-		m_Panel.SetAsBox(m_uiDiameter, uiLength);
-		m_Slider.SetAsBox(static_cast<float>(m_uiDiameter) * 0.5f, (uiLength - (m_uiDiameter * 2)) * fSliderPercent);
+		m_Panel.shape.SetAsBox(static_cast<int32>(m_uiDiameter), static_cast<int32>(uiLength));
+		m_Slider.shape.SetAsBox(static_cast<float>(m_uiDiameter) * 0.5f, (uiLength - (m_uiDiameter * 2)) * fSliderPercent);
 	}
 	else
 	{
-		m_Panel.SetAsBox(uiLength, m_uiDiameter);
-		m_Slider.SetAsBox((uiLength - (m_uiDiameter * 2)) * fSliderPercent, static_cast<float>(m_uiDiameter) /** 0.5f*/);
+		m_Panel.shape.SetAsBox(static_cast<int32>(uiLength), static_cast<int32>(m_uiDiameter));
+		m_Slider.shape.SetAsBox((uiLength - (m_uiDiameter * 2)) * fSliderPercent, static_cast<float>(m_uiDiameter) /** 0.5f*/);
 	}
 }
 
@@ -168,7 +168,7 @@ void HyScrollBar::Button::SetColor(HyColor color)
 
 void HyScrollBar::Button::SetMetrics(HyOrientation eOrientation, bool bPositive, uint32 uiDiameter)
 {
-	m_Panel.SetAsBox(uiDiameter, uiDiameter);
+	m_Panel.shape.SetAsBox(static_cast<int32>(uiDiameter), static_cast<int32>(uiDiameter));
 
 	if(eOrientation == HYORIEN_Vertical)
 	{
@@ -178,7 +178,7 @@ void HyScrollBar::Button::SetMetrics(HyOrientation eOrientation, bool bPositive,
 			HySetVec(ptDownArrow[0], uiDiameter * 0.2f, uiDiameter * 0.8f);
 			HySetVec(ptDownArrow[1], uiDiameter * 0.5f, uiDiameter * 0.2f);
 			HySetVec(ptDownArrow[2], uiDiameter * 0.8f, uiDiameter * 0.8f);
-			m_Decal.SetAsPolygon(ptDownArrow, 3);
+			m_Decal.shape.SetAsPolygon(ptDownArrow, 3);
 		}
 		else // negative
 		{
@@ -186,7 +186,7 @@ void HyScrollBar::Button::SetMetrics(HyOrientation eOrientation, bool bPositive,
 			HySetVec(ptUpArrow[0], uiDiameter * 0.2f, uiDiameter * 0.2f);
 			HySetVec(ptUpArrow[1], uiDiameter * 0.5f, uiDiameter * 0.8f);
 			HySetVec(ptUpArrow[2], uiDiameter * 0.8f, uiDiameter * 0.2f);
-			m_Decal.SetAsPolygon(ptUpArrow, 3);
+			m_Decal.shape.SetAsPolygon(ptUpArrow, 3);
 		}
 	}
 	else // HYORIEN_Horizontal
@@ -197,7 +197,7 @@ void HyScrollBar::Button::SetMetrics(HyOrientation eOrientation, bool bPositive,
 			HySetVec(ptRightArrow[0], uiDiameter * 0.2f, uiDiameter * 0.8f);
 			HySetVec(ptRightArrow[1], uiDiameter * 0.8f, uiDiameter * 0.5f);
 			HySetVec(ptRightArrow[2], uiDiameter * 0.2f, uiDiameter * 0.2f);
-			m_Decal.SetAsPolygon(ptRightArrow, 3);
+			m_Decal.shape.SetAsPolygon(ptRightArrow, 3);
 		}
 		else // negative
 		{
@@ -205,7 +205,7 @@ void HyScrollBar::Button::SetMetrics(HyOrientation eOrientation, bool bPositive,
 			HySetVec(ptLeftArrow[0], uiDiameter * 0.2f, uiDiameter * 0.5f);
 			HySetVec(ptLeftArrow[1], uiDiameter * 0.8f, uiDiameter * 0.8f);
 			HySetVec(ptLeftArrow[2], uiDiameter * 0.8f, uiDiameter * 0.2f);
-			m_Decal.SetAsPolygon(ptLeftArrow, 3);
+			m_Decal.shape.SetAsPolygon(ptLeftArrow, 3);
 		}
 	}
 }

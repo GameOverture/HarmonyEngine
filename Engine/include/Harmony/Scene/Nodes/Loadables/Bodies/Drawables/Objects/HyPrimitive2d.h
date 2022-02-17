@@ -32,45 +32,6 @@ public:
 
 	const HyPrimitive2d &operator=(const HyPrimitive2d &rhs);
 
-	void SetAsNothing();
-
-	// Set as an isolated edge.
-	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);
-	void SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2);
-
-	// Set as a line loop. This automatically connects last vertex to the first.
-	// Passed in parameters are copied, and understood to be local coordinates
-	void SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts);
-
-	// Set as a line chain with isolated end vertices. Passed in parameters are 
-	// copied, and understood to be local coordinates
-	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts);
-
-	// Set as a circle with the specified center and radius
-	void SetAsCircle(float fRadius);
-	void SetAsCircle(const glm::vec2 &ptCenter, float fRadius);
-	void SetAsCircle(const b2Vec2 &ptCenter, float fRadius);
-
-	// Set as a convex hull from the given array of local points.
-	// uiNumVerts must be in the range [3, b2_maxPolygonVertices].
-	// The points may be re-ordered, even if they form a convex polygon
-	// Collinear points are handled but not removed. Collinear points
-	// may lead to poor stacking behavior in physics simulation.
-	void SetAsPolygon(const glm::vec2 *pVertices, uint32 uiNumVerts);
-	void SetAsPolygon(const b2Vec2 *pVertexList, uint32 uiNumVertices);
-
-	// Build vertices to represent an axis-aligned box
-	void SetAsBox(int32 iWidth, int32 iHeight);
-	void SetAsBox(uint32 uiWidth, uint32 uiHeight);
-	void SetAsBox(float fWidth, float fHeight);
-
-	// Build vertices to represent an oriented box.
-	// ptBoxCenter is the center of the box in local coordinates.
-	// fRot the rotation of the box in local coordinates.
-	void SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
-
-	void SetAsShape(const HyShape2d &shapeRef);
-
 	uint32 GetNumVerts() const;
 
 	bool IsWireframe();
@@ -85,6 +46,7 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 protected:
+	virtual void OnShapeChanged() override;
 	virtual bool OnIsValidToRender() override;
 	virtual void OnCalcBoundingVolume() override;
 

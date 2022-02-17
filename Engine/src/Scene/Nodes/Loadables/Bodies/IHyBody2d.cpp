@@ -55,6 +55,8 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 
 		m_pParent->SetChildrenDisplayOrder(false);
 	}
+
+	shape.RegisterBody(this);
 }
 
 IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
@@ -77,6 +79,7 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	m_CachedBotColor = botColor.Get();
 
 	shape = copyRef.shape;
+	shape.RegisterBody(this);
 }
 
 IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
@@ -98,6 +101,8 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
+
+	shape.RegisterBody(this);
 }
 
 IHyBody2d::~IHyBody2d()
@@ -271,6 +276,12 @@ float IHyBody2d::GetSceneWidth()
 /*virtual*/ void IHyBody2d::Update() /*override*/
 {
 	IHyLoadable2d::Update();
+}
+
+void IHyBody2d::ShapeChanged()
+{
+
+	OnShapeChanged();
 }
 
 /*virtual*/ int32 IHyBody2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)

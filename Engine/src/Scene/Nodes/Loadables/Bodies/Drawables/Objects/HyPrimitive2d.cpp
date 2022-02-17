@@ -16,7 +16,6 @@
 HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_Primitive, "", "", pParent)
 {
-	SetAsNothing();
 }
 
 HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
@@ -24,7 +23,6 @@ HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
 	m_bWireframe(copyRef.m_bWireframe),
 	m_fLineThickness(copyRef.m_fLineThickness)
 {
-	// TODO: Check to see if this works
 	AssembleData();
 }
 
@@ -43,96 +41,6 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	AssembleData();
 
 	return *this;
-}
-
-void HyPrimitive2d::SetAsNothing()
-{
-	m_LocalBoundingVolume.SetAsNothing();
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
-{
-	m_LocalBoundingVolume.SetAsLineSegment(pt1, pt2);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
-{
-	m_LocalBoundingVolume.SetAsLineSegment(pt1, pt2);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
-{
-	m_LocalBoundingVolume.SetAsLineLoop(pVertices, uiNumVerts);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
-{
-	m_LocalBoundingVolume.SetAsLineChain(pVertices, uiNumVerts);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsCircle(float fRadius)
-{
-	m_LocalBoundingVolume.SetAsCircle(fRadius);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
-{
-	m_LocalBoundingVolume.SetAsCircle(ptCenter, fRadius);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsCircle(const b2Vec2 &ptCenter, float fRadius)
-{
-	m_LocalBoundingVolume.SetAsCircle(ptCenter, fRadius);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsPolygon(const glm::vec2 *pVertices, uint32 uiNumVerts)
-{
-	m_LocalBoundingVolume.SetAsPolygon(pVertices, uiNumVerts);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsPolygon(const b2Vec2 *pVertexList, uint32 uiNumVertices)
-{
-	m_LocalBoundingVolume.SetAsPolygon(pVertexList, uiNumVertices);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsBox(int32 iWidth, int32 iHeight)
-{
-	m_LocalBoundingVolume.SetAsBox(iWidth, iHeight);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsBox(uint32 uiWidth, uint32 uiHeight)
-{
-	m_LocalBoundingVolume.SetAsBox(static_cast<int32>(uiWidth), static_cast<int32>(uiHeight));
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsBox(float fWidth, float fHeight)
-{
-	m_LocalBoundingVolume.SetAsBox(fWidth, fHeight);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
-{
-	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, ptBoxCenter, fRotDeg);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsShape(const HyShape2d &shapeRef)
-{
-	m_LocalBoundingVolume = shapeRef;
-	AssembleData();
 }
 
 uint32 HyPrimitive2d::GetNumVerts() const
@@ -181,17 +89,22 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 
 /*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
 {
-	return m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValidShape();
+	return m_pVertBuffer != nullptr && shape.IsValidShape();
+}
+
+/*virtual*/ void HyPrimitive2d::OnShapeChanged() /*override*/
+{
+	AssembleData();
 }
 
 /*virtual*/ bool HyPrimitive2d::OnIsValidToRender() /*override*/
 {
-	return m_pVertBuffer != nullptr && m_LocalBoundingVolume.IsValidShape();
+	return m_pVertBuffer != nullptr && shape.IsValidShape();
 }
 
 /*virtual*/ void HyPrimitive2d::OnCalcBoundingVolume() /*override*/
 {
-	// m_LocalBoundingVolume should already be set
+	m_LocalBoundingVolume = shape;
 }
 
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms()
@@ -238,9 +151,9 @@ void HyPrimitive2d::ClearVertexData()
 
 void HyPrimitive2d::AssembleData()
 {
-	const b2Shape *pb2Shape = m_LocalBoundingVolume.GetB2Shape();
+	const b2Shape *pb2Shape = shape.GetB2Shape();
 
-	switch(m_LocalBoundingVolume.GetType())
+	switch(shape.GetType())
 	{
 	case HYSHAPE_Unknown:	// Shape hasn't been set yet by user
 		break;
@@ -281,7 +194,7 @@ void HyPrimitive2d::AssembleData()
 		break; }
 
 	default:
-		HyLogError("HyPrimitive2d::AssembleData() - Unknown shape type: " << m_LocalBoundingVolume.GetType());
+		HyLogError("HyPrimitive2d::AssembleData() - Unknown shape type: " << shape.GetType());
 	}
 
 	SetDirty(DIRTY_BoundingVolume);
@@ -341,45 +254,6 @@ void HyPrimitive2d::_SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	}
 
 	return;
-
-	//ClearVertexData();
-
-	//HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
-
-	//m_RenderState.SetRenderMode(HYRENDERMODE_TriangleStrip);
-	//m_RenderState.SetShaderId(HYSHADERPROG_Lines2d);
-	//m_RenderState.SetNumInstances(uiNumVertices - 1);
-	//m_RenderState.SetNumVerticesPerInstance(4);				// 8 vertices per instance because of '2' duplicate vertex positions and normals on each end of line segment
-
-	//m_pVertBuffer = HY_NEW glm::vec2[m_RenderState.GetNumInstances() * 8];	// size*4 = Each vertex of segment has '2' duplicate vertex positions that are offset by '2' corresponding normals within vertex shader 
-	//m_uiBufferSize = (m_RenderState.GetNumInstances() * 8) * sizeof(glm::vec2);
-
-	//if(m_eCoordUnit == HYCOORDUNIT_Default)
-	//	m_eCoordUnit = HyDefaultCoordinateUnit();
-	//float fCoordMod = (m_eCoordUnit == HYCOORDUNIT_Meters) ? HyPixelsPerMeter() : 1.0f;
-
-	//uint32 i, j;
-	//for(i = j = 0; i < m_RenderState.GetNumInstances(); ++i, j += 8)
-	//{
-	//	b2Vec2 vVecDirection = pVertexList[i + 1] - pVertexList[i + 0];
-
-	//	glm::vec2 ptVertScaled(pVertexList[i + 0].x, pVertexList[i + 0].y);
-	//	ptVertScaled *= fCoordMod;
-
-	//	/*postion 1    */ m_pVertBuffer[j + 0] = ptVertScaled;
-	//	/*Normal  1    */ m_pVertBuffer[j + 1] = glm::normalize(glm::vec2(-vVecDirection.y, vVecDirection.x));
-	//	/*postion 1 dup*/ m_pVertBuffer[j + 2] = m_pVertBuffer[j + 0];
-	//	/*Normal  1 inv*/ m_pVertBuffer[j + 3] = m_pVertBuffer[j + 1] * -1.0f;
-
-	//	ptVertScaled.x = pVertexList[i + 1].x;
-	//	ptVertScaled.y = pVertexList[i + 1].y;
-	//	ptVertScaled *= fCoordMod;
-
-	//	/*postion 2    */ m_pVertBuffer[j + 4] = ptVertScaled;
-	//	/*Normal  2    */ m_pVertBuffer[j + 5] = glm::normalize(glm::vec2(vVecDirection.y, -vVecDirection.x)) * -1.0f;
-	//	/*postion 2 dup*/ m_pVertBuffer[j + 6] = m_pVertBuffer[j + 4];
-	//	/*Normal  2 inv*/ m_pVertBuffer[j + 7] = m_pVertBuffer[j + 5] * -1.0f;
-	//}
 }
 
 void HyPrimitive2d::_SetAsCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSegments)

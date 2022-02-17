@@ -20,6 +20,7 @@
 class IHyBody2d : public IHyLoadable2d, public IHyBody
 {
 	friend class HyEntity2d;
+	friend class HyShape2d;
 
 protected:
 	float							m_fAlpha;
@@ -70,6 +71,9 @@ public:
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void Update() override;
+
+	void ShapeChanged();
+	virtual void OnShapeChanged() { }; // Optional override to indicate whenever IHyBody2d::shape gets modified
 
 	// Internal Entity propagation function overrides
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding);

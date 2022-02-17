@@ -34,7 +34,7 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 		convertedVertList.emplace_back(vertices[i].x * m_GridRef.GetPixelsPerMeter(), vertices[i].y * m_GridRef.GetPixelsPerMeter());
 
 	m_DrawList.emplace_back();
-	m_DrawList.back().SetAsPolygon(convertedVertList.data(), vertexCount);
+	m_DrawList.back().shape.SetAsPolygon(convertedVertList.data(), vertexCount);
 	m_DrawList.back().SetWireframe(true);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
 }
@@ -48,7 +48,7 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 
 	m_DrawList.emplace_back();
 
-	m_DrawList.back().SetAsPolygon(convertedVertList.data(), vertexCount);
+	m_DrawList.back().shape.SetAsPolygon(convertedVertList.data(), vertexCount);
 	m_DrawList.back().SetWireframe(false);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
 }
@@ -60,7 +60,7 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 
 	m_DrawList.emplace_back();
 
-	m_DrawList.back().SetAsCircle(ptConvertedCenter, radius * m_GridRef.GetPixelsPerMeter());
+	m_DrawList.back().shape.SetAsCircle(ptConvertedCenter, radius * m_GridRef.GetPixelsPerMeter());
 	m_DrawList.back().SetWireframe(true);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
 }
@@ -72,7 +72,7 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 
 	m_DrawList.emplace_back();
 
-	m_DrawList.back().SetAsCircle(ptConvertedCenter, radius * m_GridRef.GetPixelsPerMeter());
+	m_DrawList.back().shape.SetAsCircle(ptConvertedCenter, radius * m_GridRef.GetPixelsPerMeter());
 	m_DrawList.back().SetWireframe(false);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
 }
@@ -85,7 +85,7 @@ std::vector<HyPrimitive2d> &HyPhysicsDebug2d::GetDrawList()
 
 	m_DrawList.emplace_back();
 
-	m_DrawList.back().SetAsLineSegment(ptConvertedP1, ptConvertedP2);
+	m_DrawList.back().shape.SetAsLineSegment(ptConvertedP1, ptConvertedP2);
 	m_DrawList.back().SetTint(color.r, color.g, color.b);
 }
 

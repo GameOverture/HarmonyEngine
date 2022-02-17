@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyShape2d.h"
+#include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
 #include "Utilities/HyMath.h"
 
@@ -17,16 +18,14 @@ const float HyShape2d::FloatSlop = b2_linearSlop;
 HyShape2d::HyShape2d() :
 	m_eType(HYSHAPE_Unknown),
 	m_pShape(nullptr),
-	m_fpModifiedCallback(nullptr),
-	m_pModifiedCallbackParam(nullptr)
+	m_pRegisteredBodyShape(nullptr)
 {
 }
 
 HyShape2d::HyShape2d(const HyShape2d &copyRef) :
 	m_eType(HYSHAPE_Unknown),
 	m_pShape(nullptr),
-	m_fpModifiedCallback(nullptr),
-	m_pModifiedCallbackParam(nullptr)
+	m_pRegisteredBodyShape(nullptr)
 {
 	operator=(copyRef);
 }
@@ -54,9 +53,8 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 		m_eType = HYSHAPE_LineLoop;
 			
 		b2ChainShape *pRhsChainShape = static_cast<b2ChainShape *>(rhs.m_pShape);
-		m_pShape = HY_NEW b2ChainShape(*pRhsChainShape);
+		m_pShape = HY_NEW b2ChainShape(); // NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
 
-		// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
 		static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
 		static_cast<b2ChainShape *>(m_pShape)->CreateLoop(pRhsChainShape->m_vertices, pRhsChainShape->m_count);
 		} break;
@@ -65,9 +63,8 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 		m_eType = HYSHAPE_LineChain;
 			
 		b2ChainShape *pRhsChainShape = static_cast<b2ChainShape *>(rhs.m_pShape);
-		m_pShape = HY_NEW b2ChainShape(*pRhsChainShape);
+		m_pShape = HY_NEW b2ChainShape(); // NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
 
-		// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
 		static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
 		static_cast<b2ChainShape *>(m_pShape)->CreateChain(pRhsChainShape->m_vertices, pRhsChainShape->m_count, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
 		} break;
@@ -91,8 +88,8 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 		break;
 	}
 
-	if(m_fpModifiedCallback)
-		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+	if(m_pRegisteredBodyShape)
+		m_pRegisteredBodyShape->ShapeChanged();
 
 	return *this;
 }
@@ -100,12 +97,6 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 HyShapeType HyShape2d::GetType() const
 {
 	return m_eType;
-}
-
-void HyShape2d::SetModifiedCallback(std::function<void(HyShape2d *, void *)> fpModifiedCallback, void *pParam)
-{
-	m_fpModifiedCallback = fpModifiedCallback;
-	m_pModifiedCallbackParam = pParam;
 }
 
 void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
@@ -209,8 +200,8 @@ void HyShape2d::SetAsNothing()
 	delete m_pShape;
 	m_pShape = nullptr;
 
-	if(m_fpModifiedCallback)
-		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+	if(m_pRegisteredBodyShape)
+		m_pRegisteredBodyShape->ShapeChanged();
 }
 
 void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
@@ -226,8 +217,8 @@ void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
 	m_pShape = HY_NEW b2EdgeShape();
 	static_cast<b2EdgeShape *>(m_pShape)->SetTwoSided(pt1, pt2);
 
-	if(m_fpModifiedCallback)
-		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+	if(m_pRegisteredBodyShape)
+		m_pRegisteredBodyShape->ShapeChanged();
 }
 
 void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -243,8 +234,8 @@ void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(&vertList[0], uiNumVerts);
 
-	if(m_fpModifiedCallback)
-		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+	if(m_pRegisteredBodyShape)
+		m_pRegisteredBodyShape->ShapeChanged();
 }
 
 void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -260,8 +251,8 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
 
-	if(m_fpModifiedCallback)
-		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+	if(m_pRegisteredBodyShape)
+		m_pRegisteredBodyShape->ShapeChanged();
 }
 
 bool HyShape2d::SetAsCircle(float fRadius)
@@ -289,8 +280,8 @@ bool HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
 	static_cast<b2CircleShape *>(m_pShape)->m_p = center;
 	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
 
-	if(m_fpModifiedCallback)
-		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+	if(m_pRegisteredBodyShape)
+		m_pRegisteredBodyShape->ShapeChanged();
 
 	return true;
 }
@@ -314,8 +305,8 @@ void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->Set(pPointArray, uiCount);
 
-	if(m_fpModifiedCallback)
-		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+	if(m_pRegisteredBodyShape)
+		m_pRegisteredBodyShape->ShapeChanged();
 }
 
 bool HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)
@@ -339,8 +330,8 @@ bool HyShape2d::SetAsBox(float fWidth, float fHeight)
 	// Offsets Box2d's center to Harmony's default bottom left
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fWidth * 0.5f, fHeight * 0.5f, b2Vec2(fWidth * 0.5f, fHeight * 0.5f), 0.0f);
 
-	if(m_fpModifiedCallback)
-		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+	if(m_pRegisteredBodyShape)
+		m_pRegisteredBodyShape->ShapeChanged();
 
 	return true;
 }
@@ -359,8 +350,8 @@ bool HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(ptBoxCenter.x, ptBoxCenter.y), glm::radians(fRotDeg));
 
-	if(m_fpModifiedCallback)
-		m_fpModifiedCallback(this, m_pModifiedCallbackParam);
+	if(m_pRegisteredBodyShape)
+		m_pRegisteredBodyShape->ShapeChanged();
 
 	return true;
 }
@@ -558,4 +549,9 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 	}
 
 	return pCloneB2Shape;
+}
+
+void HyShape2d::RegisterBody(IHyBody2d *pBody)
+{
+	m_pRegisteredBodyShape = pBody;
 }

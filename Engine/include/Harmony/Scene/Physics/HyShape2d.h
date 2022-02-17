@@ -12,13 +12,16 @@
 
 #include "Afx/HyStdAfx.h"
 
+class IHyBody2d;
+
 class HyShape2d
 {
+	friend class IHyBody2d; // In order to invoke IHyBody2d::ShapeChanged()
+
 	HyShapeType									m_eType;
 	b2Shape *									m_pShape;
 
-	std::function<void(HyShape2d *, void *)>	m_fpModifiedCallback;
-	void *										m_pModifiedCallbackParam;
+	IHyBody2d *									m_pRegisteredBodyShape;	// This only gets set by the shape owned by IHyBody2d in order to properly call IHyBody2d::ShapeChanged()
 
 public:
 	static const float							FloatSlop;
@@ -30,8 +33,6 @@ public:
 	const HyShape2d &operator=(const HyShape2d &rhs);
 
 	HyShapeType GetType() const;
-	void SetModifiedCallback(std::function<void(HyShape2d *, void *)> fpModifiedCallback, void *pParam);
-
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
 	
 	const b2Shape *GetB2Shape() const;
@@ -82,6 +83,8 @@ public:
 
 protected:
 	b2Shape *CloneTransform(const glm::mat4 &mtxTransform) const;
+
+	void RegisterBody(IHyBody2d *pBody);
 };
 
 #endif /* HyShape2d_h__ */

@@ -19,6 +19,7 @@ class IHyNode
 {
 	friend class HyScene;
 	friend class HyAnimFloat;
+	friend class HyShape2d;
 	friend class IHyBody;
 	friend class HyEntity2d;
 

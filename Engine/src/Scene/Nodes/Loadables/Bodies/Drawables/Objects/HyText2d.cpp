@@ -44,24 +44,24 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		{
 		case HYALIGN_Left:
 		case HYALIGN_Justify:
-			m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(GetWidth(), 0.0f));
+			m_DebugBox.shape.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(GetWidth(), 0.0f));
 			break;
-		
+
 		case HYALIGN_Center:
-			m_DebugBox.SetAsLineSegment(glm::vec2(GetWidth(-0.5f), 0.0f), glm::vec2(GetWidth(0.5f), 0.0f));
+			m_DebugBox.shape.SetAsLineSegment(glm::vec2(GetWidth(-0.5f), 0.0f), glm::vec2(GetWidth(0.5f), 0.0f));
 			break;
 
 		case HYALIGN_Right:
-			m_DebugBox.SetAsLineSegment(glm::vec2(-GetWidth(), 0.0f), glm::vec2(0.0f, 0.0f));
+			m_DebugBox.shape.SetAsLineSegment(glm::vec2(-GetWidth(), 0.0f), glm::vec2(0.0f, 0.0f));
 			break;
 		}
 	}
 	else if(m_uiTextAttributes & TEXTATTRIB_IsScaleBox)
-		m_DebugBox.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
+		m_DebugBox.shape.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
 	else if(m_uiTextAttributes & TEXTATTRIB_IsColumn)
-		m_DebugBox.SetAsShape(GetLocalBoundingVolume());
+		m_DebugBox.shape = GetLocalBoundingVolume();
 	else if(m_uiTextAttributes & TEXTATTRIB_IsVertical)
-		m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetHeight()));
+		m_DebugBox.shape.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetHeight()));
 	else
 		HyError("HyText2d::OnSetDebugBox - Unknown HyText2d text attributes");
 }
