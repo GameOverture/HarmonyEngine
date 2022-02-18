@@ -18,12 +18,12 @@ class HyAtlasGroupData;
 class HyPrimitive2d : public IHyDrawable2d
 {
 protected:
-	glm::vec2 *		m_pVertBuffer = nullptr;
-	uint32			m_uiNumVerts = 0;
+	glm::vec2 *		m_pVertBuffer;
+	uint32			m_uiNumVerts;
 
-	bool			m_bWireframe = false;
-	float			m_fLineThickness = 1.0f;
-	uint32			m_uiNumSegments = 16;
+	bool			m_bWireframe;
+	float			m_fLineThickness;
+	uint32			m_uiNumSegments;
 
 public:
 	HyPrimitive2d(HyEntity2d *pParent = nullptr);

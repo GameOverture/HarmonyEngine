@@ -28,7 +28,7 @@ class HyPhysicsCtrl2d
 
 	IHyBody2d &				m_NodeRef;
 	HyPhysicsInit2d *		m_pInit;		// Dynamically allocated when physics simulation is desired. Simulation will then start if/once owner of *this is a child of a HyPhysicsGrid2d.
-	HyPhysicsComponent2d *	m_pData;		// A pointer to the parent's concrete value in HyPhysicsGrid2d::m_PhysChildMap. Null if owner of *this is not yet a child of a HyPhysicsGrid2d
+	HyPhysicsComponent2d *	m_pSimData;		// A pointer to the parent's concrete value in HyPhysicsGrid2d::m_PhysChildMap. Null if owner of *this is not yet a child of a HyPhysicsGrid2d
 
 public:
 	HyPhysicsCtrl2d(IHyBody2d &nodeRef);
@@ -45,7 +45,7 @@ public:
 		float fAngularVelocity = 0.0f,
 		float fLinearDamping = 0.0f,
 		float fAngularDamping = 0.0f,
-		float fRestitution = 0.0f,
+		float fRestitution = 0.4f,
 		float fRestitutionThreshold = 1.0f,
 		b2Filter filter = b2Filter(),
 		bool bAllowSleep = true,

@@ -28,6 +28,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntityLeaf2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h"
 #include "Threading/IHyThreadClass.h"
 #include "Threading/IHyThreadClass.h"
 #include "Time/HyTime.h"

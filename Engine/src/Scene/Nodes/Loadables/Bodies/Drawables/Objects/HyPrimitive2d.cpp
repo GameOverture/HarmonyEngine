@@ -14,14 +14,22 @@
 #include "Utilities/HyMath.h"
 
 HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Primitive, "", "", pParent)
+	IHyDrawable2d(HYTYPE_Primitive, "", "", pParent),
+	m_pVertBuffer(nullptr),
+	m_uiNumVerts(0),
+	m_bWireframe(false),
+	m_fLineThickness(1.0f),
+	m_uiNumSegments(16)
 {
 }
 
 HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
 	IHyDrawable2d(copyRef),
+	m_pVertBuffer(nullptr),
+	m_uiNumVerts(0),
 	m_bWireframe(copyRef.m_bWireframe),
-	m_fLineThickness(copyRef.m_fLineThickness)
+	m_fLineThickness(copyRef.m_fLineThickness),
+	m_uiNumSegments(copyRef.m_uiNumSegments)
 {
 	AssembleData();
 }
@@ -38,6 +46,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 
 	m_bWireframe = rhs.m_bWireframe;
 	m_fLineThickness = rhs.m_fLineThickness;
+	m_uiNumSegments = rhs.m_uiNumSegments;
 	AssembleData();
 
 	return *this;

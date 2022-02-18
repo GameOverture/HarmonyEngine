@@ -56,7 +56,7 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 		m_pShape = HY_NEW b2ChainShape(); // NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
 
 		static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
-		static_cast<b2ChainShape *>(m_pShape)->CreateLoop(pRhsChainShape->m_vertices, pRhsChainShape->m_count);
+		static_cast<b2ChainShape *>(m_pShape)->CreateLoop(pRhsChainShape->m_vertices, pRhsChainShape->m_count - 1); // minus 1 to account for the CreateLoop auto connecting
 		} break;
 
 	case HYSHAPE_LineChain: {
@@ -148,18 +148,18 @@ b2Shape *HyShape2d::ClonePpmShape(float fPpmInverse) const
 				static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y * fPpmInverse);
 		}
 
-		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(&vertList[0], static_cast<b2ChainShape *>(m_pShape)->m_count, b2Vec2(0, 0), b2Vec2(0, 0));
+		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(vertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count, b2Vec2(0, 0), b2Vec2(0, 0));
 		break;
 
 	case HYSHAPE_LineLoop:
 		pCloneB2Shape = HY_NEW b2ChainShape();
-		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count; ++i)
+		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count - 1; ++i) // minus 1 to account for the CreateLoop auto connecting
 		{
 			vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x * fPpmInverse,
 								  static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y * fPpmInverse);
 		}
 
-		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateLoop(&vertList[0], static_cast<b2ChainShape *>(m_pShape)->m_count);
+		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateLoop(vertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count - 1);
 		break;
 
 	case HYSHAPE_Circle:
@@ -510,7 +510,7 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 
 	case HYSHAPE_LineLoop:
 		pCloneB2Shape = HY_NEW b2ChainShape();
-		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count; ++i)
+		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count - 1; ++i)  // minus 1 to account for the CreateLoop auto connecting
 		{
 			vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x,
 								  static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y, 0.0f, 1.0f);
@@ -518,7 +518,7 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 			b2VertList.emplace_back(vertList[i].x, vertList[i].y);
 		}
 
-		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateLoop(b2VertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count);
+		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateLoop(b2VertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count - 1);
 		break;
 
 	case HYSHAPE_Circle: {
