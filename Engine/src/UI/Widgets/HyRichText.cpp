@@ -62,6 +62,11 @@ void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextN
 	AssembleDrawables();
 }
 
+void HyRichText::SetColumnWidth(uint32 uiColumnWidth)
+{
+	Setup(m_sTextPrefix, m_sTextName, uiColumnWidth);
+}
+
 // {1} = Any text inserted after this uses state '1'
 // {spritePrefix/spriteName,3} = Insert a sprite ('spritePrefix/spriteName') with state '3', scaled to fit within text line
 void HyRichText::SetRichText(const std::string &sRichTextFormat)
@@ -132,7 +137,7 @@ void HyRichText::AssembleDrawables()
 
 	// Remove all formatting syntax from 'm_sRichText' and insert a delimiter in each place
 	// Store results in a string stream 'ssCleanText' to process each delimited string
-	std::istringstream ssCleanText(std::regex_replace(m_sRichText, rgx, "\x7F")); // "\x7F" is delete character (127) to be used as a dilimiter to split each drawable
+	std::istringstream ssCleanText(std::regex_replace(m_sRichText, rgx, "\x7F")); // "\x7F" is delete character (127) to be used as a delimiter to split each drawable
 
 	// Reassemble the drawable list
 	std::string sCurText;
@@ -214,9 +219,9 @@ void HyRichText::AssembleDrawables()
 				// Find next drawable location and position 'ptCurPos' to it
 				ptCurPos.x += pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X());
 
-				glm::vec2 vOffset = pNewSprite->GetCurFrameOffset();
+				glm::vec2 vOffset = pNewSprite->GetStateOffset(pNewSprite->GetState());
 				vOffset *= pNewSprite->scale.Get();
-				pNewSprite->pos.Offset(-vOffset);	// NOTE: Only offsetting based on frame '0' - which will only work *most* of the time
+				pNewSprite->pos.Offset(-vOffset);
 
 				// Also offset the sprite down by the descender amount, because at the moment they're sitting on the 'baseline'
 				pNewSprite->pos.Offset(0.0f, -abs(pTextData->GetLineDescender(uiCurTextState)));

@@ -102,6 +102,7 @@ public:
 	float GetStateHeight(uint32 uiStateIndex, float fPercent = 1.0f);	// Returns the ALPHA-CROPPED height of the tallest frame in this animation state (ignores any scaling)
 
 	glm::ivec2 GetCurFrameOffset();
+	glm::ivec2 GetStateOffset(uint32 uiStateIndex);
 
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;

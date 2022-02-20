@@ -34,6 +34,7 @@ public:
 	virtual float GetHeight(float fPercent = 1.0f) override;
 
 	void Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth);
+	void SetColumnWidth(uint32 uiColumnWidth);
 
 	// {1} = Any text inserted after this uses state '1'
 	// {spritePrefix/spriteName,3} = Insert a sprite ('spritePrefix/spriteName') with state '3', scaled to fit within text line

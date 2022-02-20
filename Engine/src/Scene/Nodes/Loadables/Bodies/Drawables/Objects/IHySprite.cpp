@@ -316,6 +316,26 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetStateOffset(uint32 uiStateIndex)
+{
+	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
+	if(pData == nullptr) {
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset invoked on null data");
+		return glm::vec2(0);
+	}
+
+	glm::ivec2 vMaxOffset(0, 0);
+	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
+	{
+		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
+		vMaxOffset.x = HyMax(vMaxOffset.x, frameRef.vOFFSET.x);
+		vMaxOffset.y = HyMax(vMaxOffset.y, frameRef.vOFFSET.y);
+	}
+	
+	return vMaxOffset;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHySprite<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
 {
 	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)
