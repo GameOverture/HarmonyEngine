@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Localization/HyNumberFormat.h"
+#include "UI/Localization/HyTranslateTable.h"
 
 #if HY_USE_ICU
 	#define U_CHARSET_IS_UTF8 1
