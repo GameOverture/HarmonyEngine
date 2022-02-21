@@ -156,6 +156,7 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Components/HySpacer.cpp
 	src/UI/Localization/HyLocale.cpp
 	src/UI/Localization/HyNumberFormat.cpp
+	src/UI/Localization/HyTr.cpp
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
 	src/Utilities/HyMath.cpp
@@ -281,6 +282,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Localization/HyLocale.h
 	include/Harmony/UI/Localization/HyNumpunct.h
 	include/Harmony/UI/Localization/HyNumberFormat.h
+	include/Harmony/UI/Localization/HyTr.h
 	include/Harmony/Utilities/Crc32.h
 	include/Harmony/Utilities/HyIO.h
 	include/Harmony/Utilities/HyMath.h
