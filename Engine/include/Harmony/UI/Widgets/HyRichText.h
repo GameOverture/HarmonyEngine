@@ -19,7 +19,10 @@ protected:
 	std::string						m_sTextPrefix;
 	std::string						m_sTextName;
 	uint32							m_uiColumnWidth;
+	HyAlignment						m_eAlignment;
+
 	float							m_fTotalHeight;
+	float							m_fUsedWidth;
 	float							m_fColumnLineHeightOffset;
 
 	std::string						m_sRichText;
@@ -27,13 +30,14 @@ protected:
 
 public:
 	HyRichText(HyEntity2d *pParent = nullptr);
-	HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyEntity2d *pParent = nullptr);
+	HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent = nullptr);
 	virtual ~HyRichText();
 
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
 
-	void Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth);
+	void Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment);
+	uint32 GetColumnWidth() const;
 	void SetColumnWidth(uint32 uiColumnWidth);
 
 	// {1} = Any text inserted after this uses state '1'

@@ -18,18 +18,22 @@
 HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiColumnWidth(0),
+	m_eAlignment(HYALIGN_Left),
 	m_fTotalHeight(0.0f),
+	m_fUsedWidth(0.0f),
 	m_fColumnLineHeightOffset(0.0f)
 {
 }
 
-HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyEntity2d *pParent /*= nullptr*/) :
+HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_uiColumnWidth(0),
+	m_eAlignment(eAlignment),
 	m_fTotalHeight(0.0f),
+	m_fUsedWidth(0.0f),
 	m_fColumnLineHeightOffset(0.0f)
 {
-	Setup(sTextPrefix, sTextName, uiColumnWidth);
+	Setup(sTextPrefix, sTextName, uiColumnWidth, m_eAlignment);
 }
 
 /*virtual*/ HyRichText::~HyRichText()
@@ -43,7 +47,7 @@ HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextN
 
 /*virtual*/ float HyRichText::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
-	return m_uiColumnWidth * fPercent;
+	return /*m_fUsedWidth*/m_uiColumnWidth * fPercent;
 }
 
 /*virtual*/ float HyRichText::GetHeight(float fPercent /*= 1.0f*/) /*override*/
@@ -51,20 +55,26 @@ HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextN
 	return m_fTotalHeight * fPercent;
 }
 
-void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth)
+void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment)
 {
 	SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Fixed);
 
 	m_sTextPrefix = sTextPrefix;
 	m_sTextName = sTextName;
 	m_uiColumnWidth = uiColumnWidth;
+	m_eAlignment = eAlignment;
 
 	AssembleDrawables();
 }
 
+uint32 HyRichText::GetColumnWidth() const
+{
+	return m_uiColumnWidth;
+}
+
 void HyRichText::SetColumnWidth(uint32 uiColumnWidth)
 {
-	Setup(m_sTextPrefix, m_sTextName, uiColumnWidth);
+	Setup(m_sTextPrefix, m_sTextName, uiColumnWidth, m_eAlignment);
 }
 
 // {1} = Any text inserted after this uses state '1'
@@ -102,6 +112,7 @@ void HyRichText::AssembleDrawables()
 		m_DrawableList.pop_back();
 	}
 	m_fTotalHeight = 0.0f;
+	m_fUsedWidth = 0.0f;
 	m_fColumnLineHeightOffset = 0.0f;
 
 	// Capture each formatting change within 'm_sRichText'
@@ -152,7 +163,7 @@ void HyRichText::AssembleDrawables()
 		m_DrawableList.push_back(pNewText);
 		pNewText->pos.Set(0.0f, ptCurPos.y);
 		pNewText->SetAsColumn(static_cast<float>(m_uiColumnWidth));
-		//pNewText->SetTextAlignment(eAlignment);
+		pNewText->SetTextAlignment(m_eAlignment);
 		pNewText->SetState(uiCurTextState);
 		pNewText->SetTextIndent(static_cast<uint32>(ptCurPos.x));
 		pNewText->SetText(sCurText);

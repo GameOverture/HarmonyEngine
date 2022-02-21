@@ -872,6 +872,10 @@ offsetCalculation:
 	{
 		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
 		{
+			// Don't bother with alignment on first line if there's an indent (use HYALIGN_Left instead)
+			if(i == 0 && m_uiIndent != 0)
+				continue;
+
 			float fNudgeAmt = (m_vBoxDimensions.x - vNewlineInfo[i].fUSED_WIDTH);
 			fNudgeAmt *= (m_eAlignment == HYALIGN_Center) ? 0.5f : 1.0f; // HYALIGN_Right == (fNudgeAmt *= 1.0f)
 
