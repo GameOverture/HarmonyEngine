@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyTr.h
+*	HyTranslateTable.h
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -7,28 +7,25 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyTr_h__
-#define HyTr_h__
+#ifndef HyTranslateTable_h__
+#define HyTranslateTable_h__
 
 #include "Afx/HyStdAfx.h"
+#include <unordered_map>
 
-class HyTr
+#define HyTr(x) HyTranslateTable::Get(x)
+
+class HyTranslateTable
 {
-	enum TrState
-	{
-		TR_English = 0,
-		TR_EnglishBritish,
-		TR_Spanish,
-	};
-
-	static TrState sm_code;
+	static std::unordered_map <std::string, std::string>table;
 
 public:
-	static const std::string Get(const std::string id);
 
-	static void SetCode(TrState code);
+	static void Load();
+
+	static const std::string Get(const std::string id);
 
 private:
 };
 
-#endif /* HyTr_h__ */
+#endif /* HyTranslateTable_h__ */

@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyTr.cpp
+*	HyTranslateTable.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -8,16 +8,14 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/Localization/HyTr.h"
+#include "UI/Localization/HyTranslateTable.h"
 
-/*static*/ HyTr::TrState HyTr::sm_code(HyTr::TR_English);
-
-/*static*/ const std::string HyTr::Get(const std::string id)
+/*static*/ void HyTranslateTable::Load()
 {
-	return id;
+	// load data to table from json using settings HyLocale Language Code and Country Code
 }
 
-/*static*/ void HyTr::SetCode(TrState code)
+/*static*/ const std::string HyTranslateTable::Get(const std::string id)
 {
-	HyTr::sm_code = code;
+	return id;
 }
