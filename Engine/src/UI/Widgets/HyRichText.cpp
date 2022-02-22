@@ -47,12 +47,17 @@ HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextN
 
 /*virtual*/ float HyRichText::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
-	return /*m_fUsedWidth*/m_uiColumnWidth * fPercent;
+	return m_uiColumnWidth * fPercent;
 }
 
 /*virtual*/ float HyRichText::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
 	return m_fTotalHeight * fPercent;
+}
+
+float HyRichText::GetTextWidth(float fPercent /*= 1.0f*/)
+{
+	return m_fUsedWidth * fPercent;
 }
 
 void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment)
@@ -172,6 +177,9 @@ void HyRichText::AssembleDrawables()
 		ptCurPos.x = pNewText->GetTextCursorPos().x;
 		ptCurPos.y += pNewText->GetTextCursorPos().y;
 
+		if(m_fUsedWidth < ptCurPos.x)
+			m_fUsedWidth = ptCurPos.x;
+
 		// TODO: 'm_fColumnLineHeightOffset' should actually be (I think) the max of first line's height, not the max line height overall
 		const HyText2dData *pTextData = static_cast<const HyText2dData *>(pNewText->AcquireData());
 		if(sCurText.empty() == false && pTextData)
@@ -217,6 +225,8 @@ void HyRichText::AssembleDrawables()
 				// Determine if this sprite will not fit in the remaining space on this text line
 				if((ptCurPos.x + pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X())) >= (m_uiColumnWidth-1)) // the -1 should help with scale floating point above
 				{
+					m_fUsedWidth = m_uiColumnWidth;
+
 					ptCurPos.x = 0.0f;
 					ptCurPos.y -= fLineHeight;
 
@@ -229,6 +239,9 @@ void HyRichText::AssembleDrawables()
 
 				// Find next drawable location and position 'ptCurPos' to it
 				ptCurPos.x += pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X());
+
+				if(m_fUsedWidth < ptCurPos.x)
+					m_fUsedWidth = ptCurPos.x;
 
 				glm::vec2 vOffset = pNewSprite->GetStateOffset(pNewSprite->GetState());
 				vOffset *= pNewSprite->scale.Get();

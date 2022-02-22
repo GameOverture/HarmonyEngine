@@ -36,6 +36,8 @@ public:
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
 
+	float GetTextWidth(float fPercent = 1.0f);
+
 	void Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment);
 	uint32 GetColumnWidth() const;
 	void SetColumnWidth(uint32 uiColumnWidth);
