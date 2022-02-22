@@ -107,7 +107,6 @@ protected:
 
 	virtual void SetNewChildAttributes(IHyNode2d &childRef);
 
-
 	virtual void _SetVisible(bool bEnabled, bool bIsOverriding) override final;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
 	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding) override final;
@@ -123,6 +122,10 @@ protected:
 	virtual void OnMouseClicked() { }
 
 	friend void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode);
+
+private: // Hide inherited functionality that doesn't exist for entities
+	using IHyLoadable::GetName;
+	using IHyLoadable::GetPrefix;
 };
 
 #endif /* HyEntity2d_h__ */

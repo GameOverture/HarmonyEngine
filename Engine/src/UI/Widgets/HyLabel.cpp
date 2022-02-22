@@ -68,9 +68,19 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 	return m_Panel.IsValid() || m_Text.IsLoadDataValid();
 }
 
+void HyLabel::Setup(const HyPanelInit &initRef)
+{
+	Setup(initRef, m_Text.GetPrefix(), m_Text.GetName(), 0, 0, 0, 0);
+}
+
 void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName)
 {
 	Setup(initRef, sTextPrefix, sTextName, 0, 0, 0, 0);
+}
+
+void HyLabel::Setup(const HyPanelInit &initRef, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
+{
+	Setup(initRef, m_Text.GetPrefix(), m_Text.GetName(), iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
 
 void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
@@ -189,6 +199,16 @@ bool HyLabel::IsTextMonospacedDigits() const
 {
 	m_Text.SetMonospacedDigits(bSet);
 	ResetTextAndPanel();
+}
+
+float HyLabel::GetTextWidth(float fPercent /*= 1.0f*/)
+{
+	return m_Text.GetWidth(fPercent);
+}
+
+float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
+{
+	return m_Text.GetHeight(fPercent);
 }
 
 /*virtual*/ glm::vec2 HyLabel::GetPosOffset() /*override*/

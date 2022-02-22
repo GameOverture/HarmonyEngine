@@ -49,7 +49,9 @@ public:
 
 	virtual bool IsLoadDataValid() override;
 
+	void Setup(const HyPanelInit &initRef);
 	void Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName);
+	void Setup(const HyPanelInit &initRef, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
 	void Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
 
 	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, bool bUseScaleBox = true);							// Default setup. Shows text positioned on top and inside the panel based on 'eTextAlignment' and 'bUseScaleBox'
@@ -66,6 +68,8 @@ public:
 	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
 	bool IsTextMonospacedDigits() const;
 	virtual void SetTextMonospacedDigits(bool bSet);
+	float GetTextWidth(float fPercent = 1.0f);
+	float GetTextHeight(float fPercent = 1.0f);
 
 protected:
 	virtual glm::vec2 GetPosOffset() override;
