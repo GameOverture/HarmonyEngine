@@ -325,6 +325,7 @@ bool HyUiContainer::SetLayoutMargins(int16 iLeft, int16 iBottom, int16 iRight, i
 		return true;
 	}
 
+	HyLogWarning("HyUiContainer::SetLayoutMargins could not find specified layout: " << hAffectedLayout);
 	return false;
 }
 

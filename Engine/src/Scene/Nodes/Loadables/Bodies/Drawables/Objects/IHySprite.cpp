@@ -328,8 +328,10 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetStateOffset(uint32 uiStateIndex)
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
 		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
-		vMaxOffset.x = HyMax(vMaxOffset.x, frameRef.vOFFSET.x);
-		vMaxOffset.y = HyMax(vMaxOffset.y, frameRef.vOFFSET.y);
+		if(abs(vMaxOffset.x) < abs(frameRef.vOFFSET.x))
+			vMaxOffset.x = frameRef.vOFFSET.x;
+		if(abs(vMaxOffset.y) < abs(frameRef.vOFFSET.y))
+			vMaxOffset.y = frameRef.vOFFSET.y;
 	}
 	
 	return vMaxOffset;

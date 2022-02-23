@@ -239,7 +239,6 @@ void HyRichText::AssembleDrawables()
 
 				// Find next drawable location and position 'ptCurPos' to it
 				ptCurPos.x += pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X());
-
 				if(m_fUsedWidth < ptCurPos.x)
 					m_fUsedWidth = ptCurPos.x;
 
@@ -259,5 +258,5 @@ void HyRichText::AssembleDrawables()
 	m_fTotalHeight += m_fColumnLineHeightOffset;// std::fabs(pTextData->GetLineDescender(uiCurTextState)
 
 	SetDirty(IHyNode::DIRTY_BoundingVolume);
-	m_bSizeHintDirty = true;
+	SetSizeAndLayoutDirty();
 }

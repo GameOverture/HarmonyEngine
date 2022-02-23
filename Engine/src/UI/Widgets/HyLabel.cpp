@@ -179,6 +179,11 @@ void HyLabel::SetText(const std::stringstream &ssUtf8Text)
 	ResetTextAndPanel();
 }
 
+uint32 HyLabel::GetTextState() const
+{
+	return m_Text.GetState();
+}
+
 /*virtual*/ void HyLabel::SetTextState(uint32 uiStateIndex)
 {
 	m_Text.SetState(uiStateIndex);
@@ -421,7 +426,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 
 				float fLineOffsetY = 0.0f;
 				float fVerticalSpace = vPanelDimensions.y - ((m_TextMargins.top + m_TextMargins.bottom) * (vPanelDimensions.y / vUiSizeHint.y));
-				float fTextHeight = m_Text.GetLineBreakHeight() * m_Text.scale.Y();
+				float fTextHeight = m_Text.GetHeight() * m_Text.scale.Y();
 				if(fVerticalSpace > fTextHeight)
 					fLineOffsetY = (fVerticalSpace - fTextHeight) * 0.5f;
 				m_Text.pos.Offset(fLineOffsetX, fLineOffsetY);
