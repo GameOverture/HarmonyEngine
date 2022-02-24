@@ -12,7 +12,7 @@
 #include "HyEngine.h"
 
 /*static*/ std::unordered_map<std::string, std::string> HyTranslateTable::sm_table;
-/*static*/ std::string HyTranslateTable::sm_language("english");
+/*static*/ std::string HyTranslateTable::sm_language("default");
 /*static*/ bool HyTranslateTable::sm_testMode(false);
 
 /*static*/ void HyTranslateTable::Load(std::string sIso639Code, std::string sIso3166Code)
@@ -24,7 +24,7 @@
 	}
 
 	std::string sFilePath = HyEngine::DataDir();
-	sFilePath += HYTRANSLATETABLE_DataFile;
+	sFilePath += HYASSETS_TranslationsFile;
 
 	std::vector<char> sFileContents;
 	HyIO::ReadTextFile(sFilePath.c_str(), sFileContents);

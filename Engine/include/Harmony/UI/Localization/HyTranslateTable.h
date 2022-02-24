@@ -13,8 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include <unordered_map>
 
-#define HYTRANSLATETABLE_DataFile "Translations.data"
-
 #define HyTr(x) HyTranslateTable::Get(x)
 
 class HyTranslateTable

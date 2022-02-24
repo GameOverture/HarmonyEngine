@@ -18,6 +18,7 @@
 #define HYASSETS_DataFile "Items.data"
 #define HYASSETS_AtlasFile "Atlases.data"
 #define HYASSETS_AudioFile "Audio.data"
+#define HYASSETS_TranslationsFile "Translations.data"
 
 #define HYASSETS_AtlasDir "Atlases/"
 #define HYASSETS_PrefabDir "Prefabs/"
