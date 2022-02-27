@@ -126,6 +126,8 @@ protected:
 private: // Hide inherited functionality that doesn't exist for entities
 	using IHyLoadable::GetName;
 	using IHyLoadable::GetPrefix;
+	using IHyLoadable2d::Init;
+	using IHyLoadable2d::Uninit;
 };
 
 #endif /* HyEntity2d_h__ */
