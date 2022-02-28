@@ -133,6 +133,8 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	}
 	glfwSetJoystickCallback(HyGlfw_JoystickCallback);
 #endif
+
+	StopTextInput();
 }
 
 /*virtual*/ HyInput::~HyInput()
