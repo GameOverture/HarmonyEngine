@@ -49,8 +49,8 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItemData &entityItemRef, QLi
 		QList<TreeModelItemData *> itemList;
 		for(auto param : m_ParameterList)
 		{
-			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<TreeModelItemData *>(), true))
-				itemList.push_back(param.value<TreeModelItemData *>());
+			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<ProjectItemData *>(), true))
+				itemList.push_back(param.value<ProjectItemData *>());
 		}
 
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChildren(itemList);
@@ -70,8 +70,8 @@ EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItemData &entityItemRef, QLi
 	case ENTITYCMD_AddNewChildren: {
 		for(auto param : m_ParameterList)
 		{
-			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<TreeModelItemData *>(), true))
-				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(param.value<TreeModelItemData *>());
+			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<ProjectItemData *>(), true))
+				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(param.value<ProjectItemData *>());
 		}
 		break; }
 

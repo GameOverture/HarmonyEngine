@@ -22,19 +22,35 @@
 
 class EntityModel;
 
+class EntityNodeItemData : public TreeModelItemData
+{
+	Q_OBJECT
+
+	ProjectItemData *	m_pProjItem;
+	
+public:
+	EntityNodeItemData(ProjectItemData *pProjItem);
+	virtual ~EntityNodeItemData();
+
+	ProjectItemData *GetProjItem();
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityNodeTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
 	EntityModel *										m_pEntityModel;
+	QList<EntityNodeItemData *>							m_NodeList;
 
 public:
 	explicit EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
 	virtual ~EntityNodeTreeModel();
+	
+	EntityNodeItemData *FindEntityNodeItem(ProjectItemData *pItem);
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
-	bool InsertNewChild(TreeModelItemData *pNewItem, TreeModelItem *pParentTreeItem = nullptr, int iRow = -1);
-	bool RemoveChild(TreeModelItemData *pItem);
+	bool InsertNewChild(ProjectItemData *pProjItem, TreeModelItem *pParentTreeItem = nullptr, int iRow = -1);
+	bool RemoveChild(EntityNodeItemData *pItem);
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -73,7 +89,7 @@ public:
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItemData *pItem);
 
 	void AddNewChildren(QList<TreeModelItemData *> itemList);
-	bool RemoveChild(TreeModelItemData *pItem);
+	bool RemoveChild(ProjectItemData *pItem);
 
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;

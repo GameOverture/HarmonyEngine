@@ -12,10 +12,10 @@ if(Qt5_DIR)
 	set(HYEDITOR_SOURCE_FILES
 		src/main.cpp
 		src/MainWindow.cpp
-		src/VersionPatcher.cpp
 		src/MainWindow.h
-		src/VersionPatcher.h
 		src/MainWindow.ui
+		src/VersionPatcher.cpp
+		src/VersionPatcher.h
 		src/HyEditor.rc
 		src/Assets/AssetMimeData.cpp
 		src/Assets/AssetMimeData.h

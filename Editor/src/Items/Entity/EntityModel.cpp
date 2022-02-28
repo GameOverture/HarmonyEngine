@@ -14,26 +14,53 @@
 
 #include <QVariant>
 
+EntityNodeItemData::EntityNodeItemData(ProjectItemData *pProjItem) :
+	TreeModelItemData(pProjItem->GetType(), pProjItem->GetName(true)),
+	m_pProjItem(pProjItem)
+{
+}
+
+/*virtual*/ EntityNodeItemData::~EntityNodeItemData()
+{
+}
+
+ProjectItemData *EntityNodeItemData::GetProjItem()
+{
+	return m_pProjItem;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 EntityNodeTreeModel::EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent) :
-	ITreeModel(1, QStringList(), parent),
+	ITreeModel(3, QStringList(), parent),
 	m_pEntityModel(pEntityModel)
 {
 	// Insert self as root node
-	QModelIndex parentIndex = FindIndex<ExplorerItemData *>(m_pRootItem->data(0).value<ExplorerItemData *>(), 0);
-	int iRow = m_pRootItem->GetNumChildren();
-	if(insertRow(iRow, parentIndex) == false)
+	if(insertRow(0, QModelIndex()) == false)
 	{
 		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
+
+	EntityNodeItemData *pNewItem = new EntityNodeItemData(&pEntityModel->GetItem());
+	m_NodeList.push_back(pNewItem); // Now always [0] in m_NodeList
+
 	QVariant v;
-	v.setValue<TreeModelItemData *>(&pEntityModel->GetItem());
-	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
+	v.setValue<EntityNodeItemData *>(pNewItem);
+	if(setData(index(0, 0, QModelIndex()), v, Qt::UserRole) == false)
 		HyGuiLog("EntityNodeTreeModel::EntityNodeTreeModel() - setData failed", LOGTYPE_Error);
 }
 
 /*virtual*/ EntityNodeTreeModel::~EntityNodeTreeModel()
 {
+}
+
+EntityNodeItemData *EntityNodeTreeModel::FindEntityNodeItem(ProjectItemData *pItem)
+{
+	for(int32 i = 0; i < m_NodeList.size(); ++i)
+	{
+		if(m_NodeList[i]->GetProjItem() == pItem)
+			return m_NodeList[i];
+	}
+	return nullptr;
 }
 
 bool EntityNodeTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const
@@ -68,12 +95,12 @@ bool EntityNodeTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialog
 	return true;
 }
 
-bool EntityNodeTreeModel::InsertNewChild(TreeModelItemData *pNewItem, TreeModelItem *pParentTreeItem /*= nullptr*/, int iRow /*= -1*/)
+bool EntityNodeTreeModel::InsertNewChild(ProjectItemData *pProjItem, TreeModelItem *pParentTreeItem /*= nullptr*/, int iRow /*= -1*/)
 {
 	if(pParentTreeItem == nullptr)
-		pParentTreeItem = GetItem(FindIndex<TreeModelItemData *>(&m_pEntityModel->GetItem(), 0));
+		pParentTreeItem = GetItem(index(0, 0, QModelIndex()));// FindIndex<EntityNodeItemData *>(&m_pEntityModel->GetItem(), 0));
 
-	QModelIndex parentIndex = FindIndex<TreeModelItemData *>(pParentTreeItem->data(0).value<TreeModelItemData *>(), 0);
+	QModelIndex parentIndex = FindIndex<EntityNodeItemData *>(pParentTreeItem->data(0).value<EntityNodeItemData *>(), 0);
 	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 
 	if(insertRow(iRow, parentIndex) == false)
@@ -82,27 +109,39 @@ bool EntityNodeTreeModel::InsertNewChild(TreeModelItemData *pNewItem, TreeModelI
 		return false;
 	}
 
+	EntityNodeItemData *pNewItem = new EntityNodeItemData(pProjItem);
+	m_NodeList.push_back(pNewItem);
+
 	QVariant v;
-	v.setValue<TreeModelItemData *>(pNewItem);
+	v.setValue<EntityNodeItemData *>(pNewItem);
 	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
 		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 
 	return true;
 }
 
-bool EntityNodeTreeModel::RemoveChild(TreeModelItemData *pItem)
+bool EntityNodeTreeModel::RemoveChild(EntityNodeItemData *pItem)
 {
-	TreeModelItem *pTreeItem = GetItem(FindIndex<TreeModelItemData *>(pItem, 0));
+	TreeModelItem *pTreeItem = GetItem(FindIndex<EntityNodeItemData *>(pItem, 0));
 	TreeModelItem *pParentTreeItem = pTreeItem->GetParent();
-	return removeRow(pTreeItem->GetIndex(), createIndex(pParentTreeItem->GetIndex(), 0, pParentTreeItem));
+	if(m_NodeList.removeOne(pItem) == false)
+	{
+		HyGuiLog("ExplorerModel::RemoveChild() - m_NodeList.removeOne() failed", LOGTYPE_Error);
+		return false;
+	}
+
+	if(removeRow(pTreeItem->GetIndex(), createIndex(pParentTreeItem->GetIndex(), 0, pParentTreeItem)) == false)
+	{
+		HyGuiLog("ExplorerModel::RemoveChild() - removeRow failed", LOGTYPE_Error);
+		return false;
+	}
+
+	delete pItem;
+	return true;
 }
 
 QVariant EntityNodeTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const
 {
-	if(indexRef.row() == 0 && indexRef.parent().isValid() == false)
-	{
-	}
-
 	TreeModelItem *pTreeItem = GetItem(indexRef);
 	if(pTreeItem == m_pRootItem)
 		return QVariant();
@@ -110,29 +149,28 @@ QVariant EntityNodeTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt
 	if(iRole == Qt::UserRole)
 		return ITreeModel::data(indexRef, iRole);
 
-	ExplorerItemData *pItem = pTreeItem->data(0).value<ExplorerItemData *>();
+	EntityNodeItemData *pItem = pTreeItem->data(0).value<EntityNodeItemData *>();
 	switch(iRole)
 	{
 	case Qt::DisplayRole:		// The key data to be rendered in the form of text. (QString)
 	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
-		return QVariant(pItem->GetName(false));
+		return QVariant(pItem->GetProjItem()->GetName(false));
 
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
 		if(pItem->IsProjectItem())
 		{
-			ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pItem);
-			if(pProjItem->IsExistencePendingSave())
+			if(pItem->GetProjItem()->IsExistencePendingSave())
 				return QVariant(pItem->GetIcon(SUBICON_New));
-			else if(pProjItem->IsSaveClean() == false)
+			else if(pItem->GetProjItem()->IsSaveClean() == false)
 				return QVariant(pItem->GetIcon(SUBICON_Dirty));
 		}
 		return QVariant(pItem->GetIcon(SUBICON_None));
 
 	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
-		return QVariant(pItem->GetName(true));
+		return QVariant(pItem->GetProjItem()->GetName(true));
 
 	case Qt::StatusTipRole:		// The data displayed in the status bar. (QString)
-		return QVariant(pItem->GetName(true));
+		return QVariant(pItem->GetProjItem()->GetName(true));
 
 	default:
 		return QVariant();
@@ -292,22 +330,28 @@ void EntityModel::AddNewChildren(QList<TreeModelItemData *> itemList)
 			QList<ProjectItemData *> list;
 			list << static_cast<ProjectItemData *>(item);
 			m_ItemRef.GetProject().RegisterItems(&m_ItemRef, list);
-		}
 
-		m_TreeModel.InsertNewChild(item);
+			m_TreeModel.InsertNewChild(static_cast<ProjectItemData *>(item));
+		}
 	}
 }
 
-bool EntityModel::RemoveChild(TreeModelItemData *pItem)
+bool EntityModel::RemoveChild(ProjectItemData *pItem)
 {
-	if(pItem->IsProjectItem())
+	EntityNodeItemData *pChildNode = m_TreeModel.FindEntityNodeItem(pItem);
+	if(pChildNode == nullptr)
+		return false;
+
+	if(m_TreeModel.RemoveChild(pChildNode))
 	{
 		QList<ProjectItemData *> list;
 		list << static_cast<ProjectItemData *>(pItem);
 		m_ItemRef.GetProject().RelinquishItems(&m_ItemRef, list);
+
+		return true;
 	}
 
-	return m_TreeModel.RemoveChild(pItem);
+	return false;
 }
 
 /*virtual*/ bool EntityModel::OnPrepSave() /*override*/

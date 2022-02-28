@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>274</width>
-    <height>823</height>
+    <width>272</width>
+    <height>565</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -189,7 +189,11 @@
           </layout>
          </item>
          <item>
-          <widget class="QTreeView" name="propertyTree"/>
+          <widget class="QTreeView" name="propertyTree">
+           <attribute name="headerVisible">
+            <bool>false</bool>
+           </attribute>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -258,7 +262,7 @@
  <resources>
   <include location="../../../data/HyEditor.qrc"/>
   <include location="../../../data/HyEditor.qrc"/>
-  <include location="../../data/HyEditor.qrc"/>
+  <include location="../../../data/HyEditor.qrc"/>
  </resources>
  <connections/>
 </ui>
