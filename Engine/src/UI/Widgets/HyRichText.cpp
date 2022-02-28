@@ -225,7 +225,7 @@ void HyRichText::AssembleDrawables()
 				// Determine if this sprite will not fit in the remaining space on this text line
 				if((ptCurPos.x + pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X())) >= (m_uiColumnWidth-1)) // the -1 should help with scale floating point above
 				{
-					m_fUsedWidth = m_uiColumnWidth;
+					m_fUsedWidth = static_cast<float>(m_uiColumnWidth);
 
 					ptCurPos.x = 0.0f;
 					ptCurPos.y -= fLineHeight;

@@ -52,7 +52,7 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std:
 /*virtual*/ void HyLineEdit::SetText(const std::string &sUtf8Text) /*override*/
 {
 	HyLabel::SetText(sUtf8Text);
-	SetCursor(sUtf8Text.length(), 0);
+	SetCursor(static_cast<int32>(sUtf8Text.length()), 0);
 }
 
 void HyLineEdit::SetInputValidator(const std::regex &regEx)
@@ -138,7 +138,7 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 
 		HyIO::Utf8Insert(sText, m_iCursorIndex, sNewUtf8Text);
 	}
-	m_iCursorIndex += HyIO::Utf8Length(sNewUtf8Text);
+	m_iCursorIndex += static_cast<int32>(HyIO::Utf8Length(sNewUtf8Text));
 
 	m_Text.SetText(sText);
 
@@ -196,7 +196,7 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	HyEngine::Input().StartTextInput();
 
 	m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
-	SetCursor(m_Text.GetUtf8String().length(), 0);
+	SetCursor(static_cast<int32>(m_Text.GetUtf8String().length()), 0);
 }
 
 /*virtual*/ void HyLineEdit::OnRelinquishKeyboardFocus() /*override*/

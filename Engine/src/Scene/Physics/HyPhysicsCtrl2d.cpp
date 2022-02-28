@@ -497,14 +497,14 @@ void HyPhysicsCtrl2d::SetRestitutionThreshold(float fRestitutionThreshold)
 	}
 }
 
-const b2Filter &HyPhysicsCtrl2d::GetFilter() const
+b2Filter HyPhysicsCtrl2d::GetFilter() const
 {
 	if(m_pSimData)
 		return m_pSimData->m_pFixture->GetFilterData();
 	else if(m_pInit)
 		return m_pInit->m_FixtureDef.filter;
 	else
-		return b2FixtureDef().filter;
+		return b2Filter();
 }
 
 void HyPhysicsCtrl2d::SetFilter(const b2Filter &filter)

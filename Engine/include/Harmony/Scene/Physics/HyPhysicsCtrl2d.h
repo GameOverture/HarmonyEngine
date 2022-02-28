@@ -88,7 +88,7 @@ public:
 	void SetRestitution(float fRestitution);
 	float GetRestitutionThreshold() const;
 	void SetRestitutionThreshold(float fRestitutionThreshold);
-	const b2Filter &GetFilter() const;
+	b2Filter GetFilter() const;
 	void SetFilter(const b2Filter &filter);
 	bool IsSensor() const;
 	void SetSensor(bool bIsSensor);

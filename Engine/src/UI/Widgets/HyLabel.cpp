@@ -249,13 +249,13 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 		glm::vec2 vPanelSizeHint = m_Panel.GetSizeHint();
 		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
 		{
-			m_vSizeHint.x = HyMax(vPanelSizeHint.x, m_Text.GetWidth());
-			m_vSizeHint.y = vPanelSizeHint.y + m_TextMargins.iTag + m_Text.GetHeight();
+			m_vSizeHint.x = static_cast<int32>(HyMax(vPanelSizeHint.x, m_Text.GetWidth()));
+			m_vSizeHint.y = static_cast<int32>(vPanelSizeHint.y + m_TextMargins.iTag + m_Text.GetHeight());
 		}
 		else // Horizontal
 		{
-			m_vSizeHint.x = vPanelSizeHint.x + m_TextMargins.iTag + m_Text.GetWidth();
-			m_vSizeHint.y = HyMax(vPanelSizeHint.y, m_Text.GetHeight());
+			m_vSizeHint.x = static_cast<int32>(vPanelSizeHint.x + m_TextMargins.iTag + m_Text.GetWidth());
+			m_vSizeHint.y = static_cast<int32>(HyMax(vPanelSizeHint.y, m_Text.GetHeight()));
 		}
 	}
 }
@@ -298,8 +298,8 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 			float fPanelPerc = static_cast<float>(vPanelSizeHint.x) / static_cast<float>(vSizeHint.x);
 			float fTextPerc = static_cast<float>(vTextSizeHint.x) / static_cast<float>(vSizeHint.x);
 
-			vNewPanelSize = HyMath::LockAspectRatio(vPanelSizeHint.x, vPanelSizeHint.y, uiNewWidth * fPanelPerc, uiNewHeight);
-			vNewTextSize = HyMath::LockAspectRatio(vTextSizeHint.x, vTextSizeHint.y, uiNewWidth * fTextPerc, uiNewHeight);
+			vNewPanelSize = HyMath::LockAspectRatio(vPanelSizeHint.x, vPanelSizeHint.y, static_cast<int32>(uiNewWidth * fPanelPerc), uiNewHeight);
+			vNewTextSize = HyMath::LockAspectRatio(vTextSizeHint.x, vTextSizeHint.y, static_cast<int32>(uiNewWidth * fTextPerc), uiNewHeight);
 			//HySetVec(vNewTextSize, uiNewWidth * fTextPerc, vTextSizeHint.y);
 		}
 

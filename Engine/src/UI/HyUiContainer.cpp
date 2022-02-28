@@ -309,7 +309,7 @@ glm::ivec2 HyUiContainer::GetLayoutSize(HyLayoutHandle hLayout)
 	if(m_SubLayoutMap.find(hLayout) != m_SubLayoutMap.end())
 		return m_SubLayoutMap.at(hLayout)->GetActualSize();
 
-	return glm::ivec2(0.0f);
+	return glm::ivec2(0, 0);
 }
 
 bool HyUiContainer::SetLayoutMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)

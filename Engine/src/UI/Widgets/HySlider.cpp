@@ -85,14 +85,14 @@ void HySlider::Setup(const HyPanelInit &sliderInitRef)
 	float fRadius = GetBarRadius();
 
 	if(m_eOrientation == HYORIEN_Horizontal)
-		HySetVec(m_vSizeHint, m_fLength + (fRadius * 2), m_Slider.size.GetAnimFloat(HYORIEN_Vertical).Get());
+		HySetVec(m_vSizeHint, static_cast<int32>(m_fLength + (fRadius * 2)), static_cast<int32>(m_Slider.size.GetAnimFloat(HYORIEN_Vertical).Get()));
 	else
-		HySetVec(m_vSizeHint, m_Slider.size.GetAnimFloat(HYORIEN_Horizontal).Get(), m_fLength + (fRadius * 2));
+		HySetVec(m_vSizeHint, static_cast<int32>(m_Slider.size.GetAnimFloat(HYORIEN_Horizontal).Get()), static_cast<int32>(m_fLength + (fRadius * 2)));
 }
 
 /*virtual*/ glm::ivec2 HySlider::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
-	m_Slider.size.GetAnimFloat(m_eOrientation ^ 1) = uiNewHeight;
+	m_Slider.size.GetAnimFloat(m_eOrientation ^ 1) = static_cast<float>(uiNewHeight);
 	m_fLength = uiNewWidth - (GetBarRadius() * 2);
 	OnSetSizeHint();
 
@@ -153,7 +153,7 @@ void HySlider::Assemble()
 	m_BarFill.Assemble(m_eOrientation, fBarThickness, m_fLength, m_fStrokeAmt);
 
 	// Now position the slider on the bar at the proper location based on current values
-	uint32 uiNumSteps = m_StepList.size();
+	uint32 uiNumSteps = static_cast<uint32>(m_StepList.size());
 	if(uiNumSteps == 0)
 		uiNumSteps = abs(m_iMax - m_iMin) / m_uiStep;
 	if(uiNumSteps == 0)

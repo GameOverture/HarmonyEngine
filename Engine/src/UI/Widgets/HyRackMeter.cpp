@@ -326,9 +326,9 @@ void HyRackMeter::FormatDigits()
 
 		uint32 uiWidth;
 		if(m_Text.IsScaleBox())
-			uiWidth = m_Text.GetTextBoxDimensions().x;
+			uiWidth = static_cast<uint32>(m_Text.GetTextBoxDimensions().x);
 		else
-			uiWidth = m_Text.GetWidth();
+			uiWidth = static_cast<uint32>(m_Text.GetWidth());
 
 		m_SpinText.SetScissor(0, 0, uiWidth, static_cast<uint32>(fThreshold));
 	}

@@ -336,7 +336,7 @@ bool HyLayout::IsWidgetInputAllowed()
 
 	if(bNeedsResize)
 	{
-		vTargetSize[eOrientation] = ptCurPos[eOrientation] - GetWidgetSpacing();
+		vTargetSize[eOrientation] = static_cast<int32>(ptCurPos[eOrientation] - GetWidgetSpacing());
 		HySetVec(ptCurPos, m_Margins.left, m_Margins.bottom);
 
 		GetDistributedScalingAmts(vTargetSize[eOrientation], GetSizeHint()[eOrientation], fExpandAmt, fShrinkAmt);
@@ -349,7 +349,7 @@ bool HyLayout::IsWidgetInputAllowed()
 
 	m_bLayoutDirty = false;
 
-	m_vActualSize[eOrientation] = ptCurPos[eOrientation] - GetWidgetSpacing();
+	m_vActualSize[eOrientation] = static_cast<int32>(ptCurPos[eOrientation] - GetWidgetSpacing());
 	m_vActualSize[eInverseOrien] = vTargetSize[eInverseOrien];
 	return m_vActualSize;
 }
