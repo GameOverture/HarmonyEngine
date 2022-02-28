@@ -24,6 +24,7 @@ SpriteTableView::SpriteTableView(QWidget *pParent /*= 0*/) :
 
 /*virtual*/ void SpriteTableView::resizeEvent(QResizeEvent *pResizeEvent)
 {
+	// TODO: Use formula to account for device pixels and scaling using QWindow::devicePixelRatio()
 	int iWidth = pResizeEvent->size().width();
 
 	iWidth -= 64 + 64 + 64;

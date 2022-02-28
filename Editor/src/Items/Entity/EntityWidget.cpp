@@ -81,8 +81,7 @@ EntityWidget::~EntityWidget()
 	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
 	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
 
-
-	ExplorerItemData *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<ExplorerItemData *>();
+	EntityNodeItemData *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<EntityNodeItemData *>();
 	if(pSubStateItem == nullptr)
 	{
 		ui->lblSelectedItemIcon->setVisible(false);
@@ -95,9 +94,9 @@ EntityWidget::~EntityWidget()
 		ui->lblSelectedItemIcon->setVisible(true);
 		ui->lblSelectedItemIcon->setPixmap(pSubStateItem->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
 		ui->lblSelectedItemText->setVisible(true);
-		ui->lblSelectedItemText->setText(pSubStateItem->GetName(false) % " Properties");
+		ui->lblSelectedItemText->setText(pSubStateItem->GetProjItem()->GetName(false) % " Properties");
 
-		PropertiesTreeModel *pPropertiesModel = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetPropertiesModel(GetCurStateIndex(), pSubStateItem);
+		PropertiesTreeModel *pPropertiesModel = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetPropertiesModel(GetCurStateIndex(), pSubStateItem->GetProjItem());
 		ui->propertyTree->setModel(pPropertiesModel);
 
 		// Expand the top level nodes (the properties' categories)

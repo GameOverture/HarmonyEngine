@@ -22,6 +22,7 @@ TextLayersWidget::TextLayersWidget(QWidget *pParent /*= nullptr*/) :
 
 /*virtual*/ void TextLayersWidget::resizeEvent(QResizeEvent *pResizeEvent)
 {
+	// TODO: Use formula to account for device pixels and scaling using QWindow::devicePixelRatio()
 	int iWidth = pResizeEvent->size().width();
 
 	iWidth -= 144;

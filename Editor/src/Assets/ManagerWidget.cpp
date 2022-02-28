@@ -385,6 +385,7 @@ TreeModelItemData *ManagerWidget::GetSelected(QList<AssetItemData *> &selectedAs
 	if(ui->assetTree == nullptr)
 		return;
 
+	// TODO: Use formula to account for device pixels and scaling using QWindow::devicePixelRatio()
 	const int iInfoColumnWidth = 130;
 
 	int iTotalWidth = ui->assetTree->size().width();

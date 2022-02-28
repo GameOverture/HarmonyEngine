@@ -28,7 +28,7 @@ PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) :
 {
 	setIndentation(0);
 	setAnimated(true);
-	setColumnWidth(0, 200);
+	//setColumnWidth(0, 200);
 }
 
 PropertiesTreeView::~PropertiesTreeView()
