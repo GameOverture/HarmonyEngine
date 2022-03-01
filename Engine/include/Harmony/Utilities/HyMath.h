@@ -248,6 +248,30 @@ public:
 	{
 		return Brightness() <= 127.5f;
 	}
+
+	static const HyColor White;
+	static const HyColor Black;
+	static const HyColor Red;
+	static const HyColor DarkRed;
+	static const HyColor Green;
+	static const HyColor DarkGreen;
+	static const HyColor Blue;
+	static const HyColor DarkBlue;
+	static const HyColor Cyan;
+	static const HyColor DarkCyan;
+	static const HyColor Magenta;
+	static const HyColor DarkMagenta;
+	static const HyColor Yellow;
+	static const HyColor DarkYellow;
+	static const HyColor Gray;
+	static const HyColor DarkGray;
+	static const HyColor LightGray;
+	static const HyColor Orange;
+	static const HyColor Transparent;
+	static const HyColor ContainerPanel;
+	static const HyColor ContainerFrame;
+	static const HyColor WidgetPanel;
+	static const HyColor WidgetFrame;
 };
 typedef HyColor HyColour;
 

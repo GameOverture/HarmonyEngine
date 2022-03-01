@@ -50,9 +50,8 @@ public:
 	IHyBody2d &operator=(const IHyBody2d &rhs);
 	IHyBody2d &operator=(IHyBody2d &&donor) noexcept;
 
-	void SetTint(float fR, float fG, float fB);
 	void SetTint(HyColor color);
-	void SetTint(uint32 uiColor);
+	void SetTint(HyColor topColor, HyColor botColor);
 
 	float CalculateAlpha();
 	const glm::vec3 &CalculateTopTint();

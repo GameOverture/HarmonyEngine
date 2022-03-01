@@ -34,7 +34,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 /*virtual*/ void HyText2d::OnSetDebugBox() /*override*/
 {
-	m_DebugBox.SetTint(1.0f, 0.0f, 0.0f);
+	m_DebugBox.SetTint(HyColor::Red);
 	m_DebugBox.SetWireframe(true);
 
 	// SetAsLine

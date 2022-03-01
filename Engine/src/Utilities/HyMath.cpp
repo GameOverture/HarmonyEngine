@@ -10,6 +10,30 @@
 #include "Afx/HyStdAfx.h"
 #include "Utilities/HyMath.h"
 
+const HyColor HyColor::White(0xffffff);
+const HyColor HyColor::Black(0x000000);
+const HyColor HyColor::Red(0xff0000);
+const HyColor HyColor::DarkRed(0x800000);
+const HyColor HyColor::Green(0xff00);
+const HyColor HyColor::DarkGreen(0x008000);
+const HyColor HyColor::Blue(0xff);
+const HyColor HyColor::DarkBlue(0x000080);
+const HyColor HyColor::Cyan(0xffff);
+const HyColor HyColor::DarkCyan(0x008080);
+const HyColor HyColor::Magenta(0xff00ff);
+const HyColor HyColor::DarkMagenta(0x800080);
+const HyColor HyColor::Yellow(0xffff00);
+const HyColor HyColor::DarkYellow(0x808000);
+const HyColor HyColor::Gray(0xa0a0a4);
+const HyColor HyColor::DarkGray(0x808080);
+const HyColor HyColor::LightGray(0xc0c0c0);
+const HyColor HyColor::Orange(0xFFA500);
+const HyColor HyColor::Transparent(0.0f, 0.0f, 0.0f, 0.0f);
+const HyColor HyColor::ContainerPanel(0x252526);
+const HyColor HyColor::ContainerFrame(0x3F3F46);
+const HyColor HyColor::WidgetPanel(0x3F3F46);
+const HyColor HyColor::WidgetFrame(0x555555);
+
 void HySetVec(glm::vec2 &vecOut, float fX, float fY)
 {
 	vecOut.x = fX; vecOut.y = fY;

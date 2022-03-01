@@ -48,6 +48,11 @@ class HySlider : public IHyWidget
 	BarPrimitives		m_BarFill;
 
 	HyPanel				m_Slider;
+	bool				m_bIsDragging;
+	glm::vec2			m_ptSliderCenter;
+
+	std::function<void(HySlider *, void *)>		m_fpOnValueChanged;
+	void *										m_pValueChangedParam;
 
 public:
 	HySlider(HyEntity2d *pParent = nullptr);
@@ -59,14 +64,28 @@ public:
 
 	void Setup(const HyPanelInit &sliderInitRef);
 
+	uint32 GetNumTicks() const;
+	int32 GetValue() const;
+	void SetValue(int32 iValue);
+
+	void SetSliderColors(HyColor panelColor = HyColor::WidgetPanel, HyColor frameColor = HyColor::WidgetFrame);
+	void SetBarColors(HyColor posColor = HyColor::Blue, HyColor negColor = HyColor::Gray, HyColor strokeColor = HyColor::Black);
+
+
+
 protected:
+	virtual void OnUpdate() override;
+
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 
+	virtual void OnUiMouseDown() override;
+
 	float GetBarThickness();
 	float GetBarRadius();
 	void Assemble();
+	void PositionSlider();
 };
 
 #endif /* HySlider_h__ */

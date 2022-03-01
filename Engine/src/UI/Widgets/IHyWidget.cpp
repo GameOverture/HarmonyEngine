@@ -74,7 +74,7 @@ void IHyWidget::SetHideDisabled(bool bIsHideDisabled)
 	if(bIsHideDisabled)
 	{
 		m_uiAttribs |= UIATTRIB_HideDisabled;
-		SetTint(1.0f, 1.0f, 1.0f);
+		SetTint(HyColor::White);
 	}
 	else
 	{

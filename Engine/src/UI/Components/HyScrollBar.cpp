@@ -18,7 +18,7 @@ HyScrollBar::PageControl::PageControl(HyOrientation eOrientation, uint32 uiLengt
 	m_uiDiameter(uiDiameter),
 	m_Panel(this),
 	m_Slider(this),
-	m_eDragState(DRAG_None)
+	m_bIsDragging(false)
 {
 	EnableMouseInput();
 	SetMetrics(eOrientation, uiLength, uiDiameter, 1.0f);
@@ -64,11 +64,11 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 
 /*virtual*/ void HyScrollBar::PageControl::OnUpdate() /*override*/
 {
-	if(m_eDragState == DRAG_MouseHeld)
+	if(m_bIsDragging)
 	{
 		if(HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft) == false)
 		{
-			m_eDragState = DRAG_None;
+			m_bIsDragging = false;
 			return;
 		}
 
@@ -119,7 +119,7 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 	
 	if(HyTestPointAABB(sliderAABB, ptMousePos))
 	{
-		m_eDragState = DRAG_MouseHeld;
+		m_bIsDragging = true;
 		m_ptDragPos = ptMousePos;
 	}
 	else

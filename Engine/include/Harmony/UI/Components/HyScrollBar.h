@@ -25,14 +25,7 @@ class HyScrollBar : public HyEntity2d
 		HyPrimitive2d			m_Panel;
 		HyPrimitive2d			m_Slider;
 
-		enum DragState
-		{
-			DRAG_None = 0,
-			DRAG_MouseHeld,
-			DRAG_MouseDragCheck,
-			DRAG_IsDragging
-		};
-		DragState				m_eDragState;
+		bool					m_bIsDragging;
 		glm::vec2				m_ptDragPos;
 
 	public:

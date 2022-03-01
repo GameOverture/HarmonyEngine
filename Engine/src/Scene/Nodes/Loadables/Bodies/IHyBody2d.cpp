@@ -146,22 +146,16 @@ IHyBody2d &IHyBody2d::operator=(IHyBody2d &&donor) noexcept
 	return *this;
 }
 
-void IHyBody2d::SetTint(float fR, float fG, float fB)
-{
-	topColor.Set(fR, fG, fB);
-	botColor.Set(fR, fG, fB);
-}
-
 void IHyBody2d::SetTint(HyColor color)
 {
-	SetTint(color.GetRedF(), color.GetGreenF(), color.GetBlueF());
+	topColor.Set(color.GetRedF(), color.GetGreenF(), color.GetBlueF());
+	botColor = topColor;
 }
 
-void IHyBody2d::SetTint(uint32 uiColor)
+void IHyBody2d::SetTint(HyColor topClr, HyColor botClr)
 {
-	SetTint(((uiColor >> 16) & 0xFF) / 255.0f,
-			((uiColor >> 8) & 0xFF) / 255.0f,
-			(uiColor & 0xFF) / 255.0f);
+	topColor.Set(topClr.GetRedF(), topClr.GetGreenF(), topClr.GetBlueF());
+	botColor.Set(botClr.GetRedF(), botClr.GetGreenF(), botClr.GetBlueF());
 }
 
 float IHyBody2d::CalculateAlpha()
