@@ -23,7 +23,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	lineList[1].x = 5000.0f;
 	lineList[1].y = 0.0f;
 	m_primOriginHorz.SetLineThickness(2.0f);
-	m_primOriginHorz.SetTint(1.0f, 1.0f, 1.0f);
+	m_primOriginHorz.SetTint(HyColor::White);
 	m_primOriginHorz.SetVisible(false);
 	m_primOriginHorz.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 
@@ -32,7 +32,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	lineList[1].x = 0.0f;
 	lineList[1].y = 5000.0f;
 	m_primOriginVert.SetLineThickness(2.0f);
-	m_primOriginVert.SetTint(1.0f, 1.0f, 1.0f);
+	m_primOriginVert.SetTint(HyColor::White);
 	m_primOriginVert.SetVisible(false);
 	m_primOriginVert.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 }

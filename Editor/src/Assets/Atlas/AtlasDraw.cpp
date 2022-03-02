@@ -28,7 +28,7 @@ AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
 
 	m_HoverBackground.SetWireframe(false);
 	m_HoverBackground.shape.SetAsBox(100.0f, 100.0f);
-	m_HoverBackground.SetTint(0.0f, 0.0f, 0.0f);
+	m_HoverBackground.SetTint(HyColor::Black);
 	m_HoverBackground.SetDisplayOrder(DISPLAYORDER_AtlasHoverBG);
 	m_HoverBackground.SetVisible(false);
 	m_HoverBackground.alpha.Set(0.65f);
@@ -36,14 +36,14 @@ AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
 	m_HoverStrokeInner.SetWireframe(true);
 	m_HoverStrokeInner.shape.SetAsBox(100.0f, 100.0f);
 	m_HoverStrokeInner.SetLineThickness(2.0f);
-	m_HoverStrokeInner.SetTint(1.0f, 0.0f, 0.0f);
+	m_HoverStrokeInner.SetTint(HyColor::Red);
 	m_HoverStrokeInner.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeInner);
 	m_HoverStrokeInner.SetVisible(false);
 	
 	m_HoverStrokeOutter.SetWireframe(true);
 	m_HoverStrokeOutter.shape.SetAsBox(100.0f, 100.0f);
 	m_HoverStrokeOutter.SetLineThickness(4.0f);
-	m_HoverStrokeOutter.SetTint(0.0f, 0.0f, 0.0f);
+	m_HoverStrokeOutter.SetTint(HyColor::Black);
 	m_HoverStrokeOutter.SetDisplayOrder(DISPLAYORDER_AtlasHoverStrokeOutter);
 	m_HoverStrokeOutter.SetVisible(false);
 	
