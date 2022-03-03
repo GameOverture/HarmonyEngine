@@ -13,7 +13,7 @@
 #include "UI/Widgets/IHyWidget.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyLayout::HyLayout(HyOrientation eLayoutType, HyEntity2d *pParent /*= nullptr*/) :
+HyLayout::HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
 	m_eLayoutType(eLayoutType),
 	m_vActualSize(0, 0),
@@ -24,6 +24,8 @@ HyLayout::HyLayout(HyOrientation eLayoutType, HyEntity2d *pParent /*= nullptr*/)
 
 	m_SizePolicies[HYORIEN_Horizontal] = HYSIZEPOLICY_Flexible;
 	m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Flexible;
+
+	m_Margins.iTag = iWidgetSpacing;
 }
 
 /*virtual*/ HyLayout::~HyLayout()
@@ -178,7 +180,7 @@ bool HyLayout::IsWidgetInputAllowed()
 
 /*virtual*/ void HyLayout::OnSetSizeHint() /*override*/
 {
-	HySetVec(m_vMinSize, m_Margins.left, m_Margins.bottom);
+	HySetVec(m_vMinSize, m_Margins.left + m_Margins.right, m_Margins.bottom + m_Margins.top);
 	m_vSizeHint = m_vMinSize;
 
 	uint32 uiNumChildren = ChildCount();
@@ -190,23 +192,11 @@ bool HyLayout::IsWidgetInputAllowed()
 	{
 		eOrientation = HYORIEN_Horizontal;
 		eInverseOrien = HYORIEN_Vertical;
-
-		// HACK NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
-		m_vSizeHint.x += (m_Margins.right /** 0.5f*/);
-		m_vMinSize.x += (m_Margins.right /** 0.5f*/);
-		m_vSizeHint.y += m_Margins.top;
-		m_vMinSize.y += m_Margins.top;
 	}
 	else
 	{
 		eOrientation = HYORIEN_Vertical;
 		eInverseOrien = HYORIEN_Horizontal;
-
-		// HACK NOTE: I have no idea why I need to half these margin values in the 'orientation' dimension, otherwise they come out double
-		m_vSizeHint.x += m_Margins.right;
-		m_vMinSize.x += m_Margins.right;
-		m_vSizeHint.y += (m_Margins.top /** 0.5f*/);
-		m_vMinSize.y += (m_Margins.top /** 0.5f*/);
 	}
 
 	// Figure out m_vSizeHint while counting size policies
@@ -307,7 +297,7 @@ bool HyLayout::IsWidgetInputAllowed()
 
 		// If 'pItem' is a nested layout, it should pass '0' to Resize where appropriate
 		glm::ivec2 vResize = vItemSize;
-		if((pItem->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		if(pItem->GetInternalFlags() & NODETYPE_IsLayout)
 		{
 			if(vTargetSize.x == 0)
 				vResize.x = 0;
@@ -336,6 +326,8 @@ bool HyLayout::IsWidgetInputAllowed()
 
 	if(bNeedsResize)
 	{
+		SetSizeAndLayoutDirty();
+
 		vTargetSize[eOrientation] = static_cast<int32>(ptCurPos[eOrientation] - GetWidgetSpacing());
 		HySetVec(ptCurPos, m_Margins.left, m_Margins.bottom);
 

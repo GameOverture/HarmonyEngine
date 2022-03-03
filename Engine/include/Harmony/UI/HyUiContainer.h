@@ -27,6 +27,7 @@ class HyUiContainer : public HyEntity2d
 
 protected:
 	bool									m_bInputAllowed;
+	int32									m_iDefaultWidgetSpacing;
 
 	HyPanel									m_Panel;
 	HyLayout								m_RootLayout;
@@ -77,7 +78,8 @@ public:
 
 	HyLayoutHandle InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	glm::ivec2 GetLayoutSize(HyLayoutHandle hLayout);
-	bool SetLayoutMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	bool SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	bool SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	
 	void ClearItems();
 

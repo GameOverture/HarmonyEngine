@@ -30,7 +30,7 @@ class HyLayout : public IHyEntityUi
 	bool								m_bLayoutDirty;
 
 public:
-	HyLayout(HyOrientation eLayoutType, HyEntity2d *pParent = nullptr);
+	HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *pParent = nullptr);
 	virtual ~HyLayout();
 
 	virtual float GetWidth(float fPercent = 1.0f) override;

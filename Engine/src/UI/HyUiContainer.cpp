@@ -11,6 +11,8 @@
 #include "UI/HyUiContainer.h"
 #include "HyEngine.h"
 
+#define HYUICONTAINER_DefaultWidgetSpacing 8
+
 HyUiContainer *HyUiContainer::sm_pCurModalContainer = nullptr;
 std::vector<HyUiContainer *> HyUiContainer::sm_pContainerList;
 HySpacerHandle HyUiContainer::sm_hSpacerHandleCounter = 1;
@@ -19,8 +21,9 @@ HyLayoutHandle HyUiContainer::sm_hLayoutHandleCounter = 1;
 HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
 	m_bInputAllowed(true),
+	m_iDefaultWidgetSpacing(HYUICONTAINER_DefaultWidgetSpacing),
 	m_Panel(initRef, this),
-	m_RootLayout(eRootLayoutDirection, this),
+	m_RootLayout(eRootLayoutDirection, HYUICONTAINER_DefaultWidgetSpacing, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f)
 {
@@ -286,14 +289,14 @@ HyLayoutHandle HyUiContainer::InsertLayout(HyOrientation eNewLayoutType, HyLayou
 	if(hInsertInto == HY_UNUSED_HANDLE)
 	{
 		hNewLayoutHandle = sm_hLayoutHandleCounter++;
-		m_SubLayoutMap.insert(std::pair<HyLayoutHandle, HyLayout *>(hNewLayoutHandle, HY_NEW HyLayout(eNewLayoutType)));
+		m_SubLayoutMap.insert(std::pair<HyLayoutHandle, HyLayout *>(hNewLayoutHandle, HY_NEW HyLayout(eNewLayoutType, m_iDefaultWidgetSpacing)));
 
 		m_RootLayout.AppendItem(*m_SubLayoutMap[hNewLayoutHandle]);
 	}
 	else if(m_SubLayoutMap.find(hInsertInto) != m_SubLayoutMap.end())
 	{
 		hNewLayoutHandle = sm_hLayoutHandleCounter++;
-		m_SubLayoutMap.insert(std::pair<HyLayoutHandle, HyLayout *>(hNewLayoutHandle, HY_NEW HyLayout(eNewLayoutType)));
+		m_SubLayoutMap.insert(std::pair<HyLayoutHandle, HyLayout *>(hNewLayoutHandle, HY_NEW HyLayout(eNewLayoutType, m_iDefaultWidgetSpacing)));
 
 		m_SubLayoutMap[hInsertInto]->AppendItem(*m_SubLayoutMap[hNewLayoutHandle]);
 	}
@@ -312,20 +315,45 @@ glm::ivec2 HyUiContainer::GetLayoutSize(HyLayoutHandle hLayout)
 	return glm::ivec2(0, 0);
 }
 
-bool HyUiContainer::SetLayoutMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+bool HyUiContainer::SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{
-		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, iWidgetSpacing);
+		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, m_RootLayout.GetMargins().iTag);
 		return true;
 	}
 	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
 	{
-		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, iWidgetSpacing);
+		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, m_SubLayoutMap[hAffectedLayout]->GetMargins().iTag);
 		return true;
 	}
 
 	HyLogWarning("HyUiContainer::SetLayoutMargins could not find specified layout: " << hAffectedLayout);
+	return false;
+}
+
+bool HyUiContainer::SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+{
+	if(hAffectedLayout == HY_UNUSED_HANDLE)
+	{
+		m_RootLayout.SetMargins(m_RootLayout.GetMargins().left,
+								m_RootLayout.GetMargins().bottom,
+								m_RootLayout.GetMargins().right,
+								m_RootLayout.GetMargins().top,
+								iWidgetSpacing);
+		return true;
+	}
+	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
+	{
+		m_SubLayoutMap[hAffectedLayout]->SetMargins(m_SubLayoutMap[hAffectedLayout]->GetMargins().left,
+													m_SubLayoutMap[hAffectedLayout]->GetMargins().bottom,
+													m_SubLayoutMap[hAffectedLayout]->GetMargins().right,
+													m_SubLayoutMap[hAffectedLayout]->GetMargins().top,
+													iWidgetSpacing);
+		return true;
+	}
+
+	HyLogWarning("HyUiContainer::SetLayoutWidgetSpacing could not find specified layout: " << hAffectedLayout);
 	return false;
 }
 
