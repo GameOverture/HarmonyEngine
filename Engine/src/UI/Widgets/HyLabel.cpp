@@ -47,7 +47,12 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 			return HyMax(m_Panel.size.X(), m_Text.GetWidth() * m_Text.scale.X()) * fPercent;
 	}
 	else // Is stacked
-		return m_Panel.size.X() * fPercent;
+	{
+		if(m_Panel.IsValid())
+			return m_Panel.size.X() * fPercent;
+		else
+			return m_Text.GetWidth(fPercent);
+	}
 }
 
 /*virtual*/ float HyLabel::GetHeight(float fPercent /*= 1.0f*/) /*override*/
@@ -60,7 +65,12 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 			return HyMax(m_Panel.size.Y(), m_Text.GetHeight() * m_Text.scale.Y()) * fPercent;
 	}
 	else // Is stacked
-		return m_Panel.size.Y() * fPercent;
+	{
+		if(m_Panel.IsValid())
+			return m_Panel.size.Y() * fPercent;
+		else
+			return m_Text.GetHeight(fPercent);
+	}
 }
 
 /*virtual*/ bool HyLabel::IsLoadDataValid() /*override*/
