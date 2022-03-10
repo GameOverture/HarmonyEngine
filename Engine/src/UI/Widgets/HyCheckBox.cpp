@@ -33,6 +33,7 @@ HyCheckBox::HyCheckBox(const HyPanelInit &initRef, std::string sTextPrefix, std:
 bool HyCheckBox::IsChecked() const
 {
 	IsHighlighted();
+	return false;
 }
 
 void HyCheckBox::SetChecked(bool bChecked)
