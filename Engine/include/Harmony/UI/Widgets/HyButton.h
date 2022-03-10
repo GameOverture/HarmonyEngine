@@ -72,7 +72,7 @@ protected:
 	virtual void OnUiMouseDown() override;
 	virtual void OnUiMouseClicked() override;
 
-	virtual void OnBtnStateChange(HyButtonState eNewState) { }
+	virtual void OnBtnStateChange(HyButtonState eNewState) { }	// Derived classes optional override
 
 private:
 	void SetBtnState(HyButtonState eState);

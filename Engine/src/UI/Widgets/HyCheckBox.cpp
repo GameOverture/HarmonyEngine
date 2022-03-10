@@ -29,3 +29,18 @@ HyCheckBox::HyCheckBox(const HyPanelInit &initRef, std::string sTextPrefix, std:
 /*virtual*/ HyCheckBox::~HyCheckBox()
 {
 }
+
+bool HyCheckBox::IsChecked() const
+{
+	IsHighlighted();
+}
+
+void HyCheckBox::SetChecked(bool bChecked)
+{
+
+}
+
+/*virtual*/ void HyCheckBox::OnUiMouseClicked() /*override*/
+{
+
+}
