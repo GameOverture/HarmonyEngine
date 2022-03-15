@@ -33,20 +33,20 @@ HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight) :
 }
 
 // Constructs a 'Sprite' panel
-HyPanelInit::HyPanelInit(std::string sSpritePrefix, std::string sSpriteName) :
+HyPanelInit::HyPanelInit(std::string sSpritePrefix, std::string sSpriteName, uint32 uiFrameSize /*= 0*/) :
 	m_sSpritePrefix(sSpritePrefix),
 	m_sSpriteName(sSpriteName),
-	m_uiWidth(0),
-	m_uiHeight(0),
-	m_uiFrameSize(0),
+	m_uiWidth(0), // TBD by loading the sprite
+	m_uiHeight(0),// TBD by loading the sprite
+	m_uiFrameSize(uiFrameSize),
 	m_PanelColor(HyColor()),
 	m_FrameColor(HyColor()),
 	m_ePanelType(PANELTYPE_Sprite)
 {
 }
 
-// Constructs a 'Primitive' panel
-HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize /*= 4*/, HyColor panelColor /*= HyColor(0x252526)*/, HyColor frameColor /*= HyColor(0x3F3F41)*/) :
+// Constructs a 'Primitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
+HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor /*= HyColor(0,0,0,0)*/, HyColor frameColor /*= HyColor(0,0,0,0)*/) :
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
 	m_uiFrameSize(uiFrameSize),
@@ -55,37 +55,44 @@ HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize /*=
 	m_ePanelType(PANELTYPE_Primitive)
 { }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 HyPanel::HyPanel(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
 	m_Panel(this),
+	m_uiFrameSize(0),
 	m_Frame1(this),
 	m_Frame2(this),
 	size(*this, DIRTY_Size | DIRTY_BoundingVolume | DIRTY_SceneAABB)
 {
-	Setup(HyPanelInit());
+	Setup(HyPanelInit(), false);
 }
 
-HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
+HyPanel::HyPanel(const HyPanelInit &initRef, bool bIsContainer, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
+	m_bIsContainer(bIsContainer),
 	m_Panel(this),
+	m_uiFrameSize(0),
 	m_Frame1(this),
 	m_Frame2(this),
 	size(*this, DIRTY_Size | DIRTY_BoundingVolume | DIRTY_SceneAABB)
 {
-	Setup(initRef);
+	Setup(initRef, m_bIsContainer);
 }
 
 /*virtual*/ HyPanel::~HyPanel()
 {
 }
 
-void HyPanel::Setup(const HyPanelInit &initRef)
+void HyPanel::Setup(const HyPanelInit &initRef, bool bIsContainer)
 {
+	m_bIsContainer = bIsContainer;
+
 	m_SpritePanel.Uninit();
 	m_Frame1.shape.SetAsNothing();
 	m_Frame2.shape.SetAsNothing();
 	m_Panel.shape.SetAsNothing();
 	
+	m_uiFrameSize = initRef.m_uiFrameSize;
 	m_ePanelType = initRef.m_ePanelType;
 	switch(m_ePanelType)
 	{
@@ -100,10 +107,17 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 
 	case HyPanelInit::PANELTYPE_Primitive:
 		size.Set(static_cast<int32>(initRef.m_uiWidth), static_cast<int32>(initRef.m_uiHeight));
-		m_uiFrameSize = initRef.m_uiFrameSize;
 		ConstructPrimitives();
-		SetPanelColor(initRef.m_PanelColor);
-		SetFrameColor(initRef.m_FrameColor);
+
+		if(initRef.m_PanelColor.GetAlpha() == 0)
+			SetPanelColor(m_bIsContainer ? HyColor::ContainerPanel : HyColor::WidgetPanel);
+		else
+			SetPanelColor(initRef.m_PanelColor);
+
+		if(initRef.m_FrameColor.GetAlpha() == 0)
+			SetFrameColor(m_bIsContainer ? HyColor::ContainerFrame : HyColor::WidgetFrame);
+		else
+			SetFrameColor(initRef.m_FrameColor);
 		break;
 	}
 }

@@ -163,7 +163,6 @@ void HyButton::InvokeButtonClicked()
 {
 	SetAsHighlighted(IsHighlighted());
 	SetHoverCursor(HYMOUSECURSOR_Hand);
-	SetAsEnabled(IsEnabled());
 }
 
 /*virtual*/ void HyButton::OnUiMouseEnter() /*override*/

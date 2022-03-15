@@ -42,16 +42,17 @@ struct HyPanelInit
 	// Constructs a 'BoundingVolume' panel
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight);
 
-	// Constructs a 'Sprite' panel
-	HyPanelInit(std::string sSpritePrefix, std::string sSpriteName);
+	// Constructs a 'Sprite' panel. uiFrameSize can be specified if the art of the sprite has a framesize to be considered when various widgets are assembled
+	HyPanelInit(std::string sSpritePrefix, std::string sSpriteName, uint32 uiFrameSize = 0);
 
-	// Constructs a 'Primitive' panel
-	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0x252526), HyColor frameColor = HyColor(0x3F3F41));
+	// Constructs a 'Primitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
+	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0,0,0,0), HyColor frameColor = HyColor(0,0,0,0));
 };
 
 class HyPanel : public HyEntity2d
 {
 	HyPanelInit::PanelType	m_ePanelType;
+	bool					m_bIsContainer;	// Either is a container, otherwise is considered a widget (used for default colors)
 
 	HySprite2d				m_SpritePanel;
 
@@ -65,10 +66,10 @@ public:
 
 public:
 	HyPanel(HyEntity2d *pParent = nullptr);
-	HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent);
+	HyPanel(const HyPanelInit &initRef, bool bIsContainer, HyEntity2d *pParent);
 	virtual ~HyPanel();
 
-	void Setup(const HyPanelInit &initRef);
+	void Setup(const HyPanelInit &initRef, bool bIsContainer);
 	bool IsValid();
 
 	bool IsBoundingVolume() const;

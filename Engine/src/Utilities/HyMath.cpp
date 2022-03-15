@@ -30,7 +30,7 @@ const HyColor HyColor::LightGray(0xc0c0c0);
 const HyColor HyColor::Orange(0xFFA500);
 const HyColor HyColor::Transparent(0.0f, 0.0f, 0.0f, 0.0f);
 const HyColor HyColor::ContainerPanel(0x252526);
-const HyColor HyColor::ContainerFrame(0x3F3F46);
+const HyColor HyColor::ContainerFrame(0x000000);// 0x3F3F46);
 const HyColor HyColor::WidgetPanel(0x3F3F46);
 const HyColor HyColor::WidgetFrame(0x555555);
 

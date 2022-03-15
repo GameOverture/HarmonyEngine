@@ -15,6 +15,7 @@
 #include "UI/Components/HyPanel.h"
 #include "UI/Components/HyLayout.h"
 #include "UI/Components/HySpacer.h"
+#include "UI/Components/HyCloseButton.h"
 
 class HyUiContainer : public HyEntity2d
 {

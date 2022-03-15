@@ -103,7 +103,7 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 void HySlider::Setup(const HyPanelInit &sliderInitRef)
 {
 	//if(sliderInitRef.m_PanelColor.
-	m_Slider.Setup(sliderInitRef);
+	m_Slider.Setup(sliderInitRef, false);
 	SetBarColors();
 
 	SetAsEnabled(IsEnabled());
@@ -143,6 +143,42 @@ void HySlider::SetValue(int32 iValue)
 
 	if(m_fpOnValueChanged)
 		m_fpOnValueChanged(this, m_pValueChangedParam);
+}
+
+int32 HySlider::GetMin() const
+{
+	return m_iMin;
+}
+
+int32 HySlider::GetMax() const
+{
+	return m_iMax;
+}
+
+// If max is smaller than min, min becomes the only legal value.
+void HySlider::SetRange(int32 iMin, int32 iMax)
+{
+	if(iMax < iMin)
+		m_iMin = m_iMax = iMin;
+	else
+	{
+		m_iMin = iMin;
+		m_iMax = iMax;
+	}
+
+	m_iValue = HyClamp(m_iValue, m_iMin, m_iMax);
+	PositionSlider();
+}
+
+uint32 HySlider::GetStep() const
+{
+	return m_uiStep;
+}
+
+void HySlider::SetStep(uint32 uiStepAmt)
+{
+	m_uiStep = uiStepAmt;
+	PositionSlider();
 }
 
 void HySlider::SetSliderColors(HyColor panelColor /*= HyColor::WidgetPanel*/, HyColor frameColor /*= HyColor::WidgetFrame*/)

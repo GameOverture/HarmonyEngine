@@ -91,12 +91,12 @@ void HyComboBox::SetExpandType(HyOrientation eOrientation, bool bPositiveDirecti
 
 void HyComboBox::SetExpandPanel(std::string sSpritePrefix, std::string sSpriteName)
 {
-	m_SubBtnPanel.Setup(HyPanelInit(sSpritePrefix, sSpriteName));
+	m_SubBtnPanel.Setup(HyPanelInit(sSpritePrefix, sSpriteName), false);
 }
 
 void HyComboBox::SetExpandPanel(uint32 uiFrameSize, HyColor panelColor /*= HyColor(0x252526)*/, HyColor frameColor /*= HyColor(0x3F3F41)*/)
 {
-	m_SubBtnPanel.Setup(HyPanelInit(0, 0, uiFrameSize, panelColor, frameColor));
+	m_SubBtnPanel.Setup(HyPanelInit(0, 0, uiFrameSize, panelColor, frameColor), false);
 }
 
 bool HyComboBox::IsExpanded() const

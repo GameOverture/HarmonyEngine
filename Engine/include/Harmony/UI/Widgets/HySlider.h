@@ -68,6 +68,13 @@ public:
 	int32 GetValue() const;
 	void SetValue(int32 iValue);
 
+	int32 GetMin() const;
+	int32 GetMax() const;
+	void SetRange(int32 iMin, int32 iMax); // If iMax < iMin, iMin becomes the only legal value.
+
+	uint32 GetStep() const;
+	void SetStep(uint32 uiStepAmt);
+
 	void SetSliderColors(HyColor panelColor = HyColor::WidgetPanel, HyColor frameColor = HyColor::WidgetFrame);
 	void SetBarColors(HyColor posColor = HyColor::Blue, HyColor negColor = HyColor::Gray, HyColor strokeColor = HyColor::Black);
 

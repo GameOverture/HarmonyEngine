@@ -22,7 +22,7 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	HyEntity2d(pParent),
 	m_bInputAllowed(true),
 	m_iDefaultWidgetSpacing(HYUICONTAINER_DefaultWidgetSpacing),
-	m_Panel(initRef, this),
+	m_Panel(initRef, true, this),
 	m_RootLayout(eRootLayoutDirection, HYUICONTAINER_DefaultWidgetSpacing, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f)

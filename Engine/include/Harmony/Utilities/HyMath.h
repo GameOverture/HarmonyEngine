@@ -183,14 +183,20 @@ public:
 		m_uiG(0x00),
 		m_uiB(0x00)
 	{ }
-	HyColor(uint8 uiRed, uint8 uiGreen, uint8 uiBlue, uint8 uiAlpha = 0xFF) :
-		m_uiA(uiAlpha),
-		m_uiR(uiRed),
-		m_uiG(uiGreen),
-		m_uiB(uiBlue)
+	//HyColor(uint8 uiRed, uint8 uiGreen, uint8 uiBlue, uint8 uiAlpha = 0xFF) :
+	//	m_uiA(uiAlpha),
+	//	m_uiR(uiRed),
+	//	m_uiG(uiGreen),
+	//	m_uiB(uiBlue)
+	//{ }
+	HyColor(int32 iRed, int32 iGreen, int32 iBlue, int32 iAlpha = 0xFF) :
+		m_uiA(iAlpha & 0xFF),
+		m_uiR(iRed & 0xFF),
+		m_uiG(iGreen & 0xFF),
+		m_uiB(iBlue & 0xFF)
 	{ }
 	HyColor(uint32 uiColor) :
-		m_uiA((uiColor >> 24) & 0xFF),
+		m_uiA(0xFF),//(uiColor >> 24) & 0xFF), // Safety measure to not accidentally consider 0x0 as opaque black
 		m_uiR((uiColor >> 16) & 0xFF),
 		m_uiG((uiColor >> 8) & 0xFF),
 		m_uiB(uiColor & 0xFF)
@@ -207,14 +213,29 @@ public:
 		return (m_uiA << 24) | (m_uiR << 16) | (m_uiG << 8) | m_uiB;
 	}
 
+	uint8 GetRed() const {
+		return m_uiR;
+	}
 	float GetRedF() const {
 		return m_uiR / 255.0f;
+	}
+
+	uint8 GetGreen() const {
+		return m_uiG;
 	}
 	float GetGreenF() const {
 		return m_uiG / 255.0f;
 	}
+
+	uint8 GetBlue() const {
+		return m_uiB;
+	}
 	float GetBlueF() const {
 		return m_uiB / 255.0f;
+	}
+
+	uint8 GetAlpha() const {
+		return m_uiA;
 	}
 	float GetAlphaF() const {
 		return m_uiA / 255.0f;

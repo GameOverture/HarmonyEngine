@@ -15,6 +15,22 @@
 
 class HyCheckBox : public HyButton
 {
+protected:
+	enum CheckBoxAttributes
+	{
+		CHECKBOXATTRIB_IsChecked = 1 << 14,
+
+		CHECKBOXATTRIB_FLAG_NEXT = 1 << 15
+	};
+	static_assert((int)CHECKBOXATTRIB_IsChecked == (int)BTNATTRIB_FLAG_NEXT, "HyCheckBox is not matching with base classes attrib flags");
+
+	// To be drawn on panel when IsChecked
+	HyPrimitive2d								m_CheckMarkStroke;
+	HyPrimitive2d								m_CheckMarkFill;
+
+	std::function<void(HyCheckBox *, void *)>	m_fpOnCheckedChanged;
+	void *										m_pCheckedChangedParam;
+
 public:
 	HyCheckBox(HyEntity2d *pParent = nullptr);
 	HyCheckBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
@@ -24,8 +40,14 @@ public:
 	bool IsChecked() const;
 	void SetChecked(bool bChecked);
 
+	void SetCheckedChangedCallback(std::function<void(HyCheckBox *, void *)> fpCallback, void *pParam = nullptr);
+
 protected:
+	virtual void OnSetup() override;
+	virtual void ResetTextAndPanel() override;
 	virtual void OnUiMouseClicked() override;
+
+	void AssembleCheckmark();
 };
 
 #endif /* HyCheckBox_h__ */

@@ -151,6 +151,7 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Widgets/HyRichText.cpp
 	src/UI/Widgets/HySlider.cpp
 	src/UI/Widgets/IHyWidget.cpp
+	src/UI/Components/HyCloseButton.cpp
 	src/UI/Components/HyLayout.cpp
 	src/UI/Components/HyPanel.cpp
 	src/UI/Components/HyScrollBar.cpp
@@ -277,6 +278,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/UI/Widgets/HyRichText.h
 	include/Harmony/UI/Widgets/HySlider.h
 	include/Harmony/UI/Widgets/IHyWidget.h
+	include/Harmony/UI/Components/HyCloseButton.h
 	include/Harmony/UI/Components/HyLayout.h
 	include/Harmony/UI/Components/HyPanel.h
 	include/Harmony/UI/Components/HyScrollBar.h

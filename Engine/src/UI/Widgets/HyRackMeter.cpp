@@ -50,9 +50,9 @@ int64 HyRackMeter::GetValue()
 	return m_iTargetValue;
 }
 
-void HyRackMeter::SetValue(int64 iPennies, float fRackDuration)
+void HyRackMeter::SetValue(int64 iValue, float fRackDuration)
 {
-	m_iTargetValue = iPennies;
+	m_iTargetValue = iValue;
 
 	m_fRackingDuration = fRackDuration;
 	m_fElapsedTimeRack = 0.0f;
@@ -77,9 +77,9 @@ void HyRackMeter::SetValue(int64 iPennies, float fRackDuration)
 	FormatDigits();
 }
 
-void HyRackMeter::OffsetValue(int64 iPenniesOffsetAmt, float fRackDuration)
+void HyRackMeter::OffsetValue(int64 iOffsetAmt, float fRackDuration)
 {
-	SetValue(m_iTargetValue + iPenniesOffsetAmt, fRackDuration);
+	SetValue(m_iTargetValue + iOffsetAmt, fRackDuration);
 }
 
 void HyRackMeter::Slam()

@@ -73,8 +73,8 @@ public:
 	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, bool bUseScaleBox = true) override;
 
 	int64 GetValue();
-	void SetValue(int64 iPennies, float fRackDuration);
-	void OffsetValue(int64 iPenniesOffsetAmt, float fRackDuration);
+	void SetValue(int64 iValue, float fRackDuration);
+	void OffsetValue(int64 iOffsetAmt, float fRackDuration);
 
 	void Slam();
 	bool IsRacking();
