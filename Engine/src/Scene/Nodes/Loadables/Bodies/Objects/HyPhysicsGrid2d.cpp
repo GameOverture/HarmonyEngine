@@ -31,6 +31,8 @@ HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*
 
 /*virtual*/ HyPhysicsGrid2d::~HyPhysicsGrid2d()
 {
+	while(m_ChildList.empty() == false)
+		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 }
 
 /*virtual*/ void HyPhysicsGrid2d::SetNewChildAttributes(IHyNode2d &childRef) /*override*/
