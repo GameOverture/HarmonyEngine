@@ -41,16 +41,16 @@ HyButton::HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::str
 /*virtual*/ void HyButton::SetAsEnabled(bool bEnabled) /*override*/
 {
 	HyLabel::SetAsEnabled(bEnabled);
-
-	if(m_Panel.IsSprite() == false)
-		return;
 	
 	if(IsEnabled() == false)
 	{
-		if(m_Panel.GetSpriteState() == HYBUTTONSTATE_Down || m_Panel.GetSpriteState() == HYBUTTONSTATE_Hover)
-			SetBtnState(HYBUTTONSTATE_Idle);
-		else if(m_Panel.GetSpriteState() == HYBUTTONSTATE_HighlightedDown || m_Panel.GetSpriteState() == HYBUTTONSTATE_HighlightedHover)
-			SetBtnState(HYBUTTONSTATE_Highlighted);
+		if(m_uiAttribs & (BTNATTRIB_IsDownState | BTNATTRIB_IsHoverState))
+		{
+			if(m_uiAttribs & BTNATTRIB_IsHighlighted)
+				SetBtnState(HYBUTTONSTATE_Highlighted);
+			else
+				SetBtnState(HYBUTTONSTATE_Idle);
+		}
 	}
 }
 

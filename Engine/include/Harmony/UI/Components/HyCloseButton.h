@@ -19,6 +19,7 @@ class HyCloseButton : public HyButton
 
 	HyColor					m_PanelColor;
 	HyColor					m_FrameColor;
+	HyColor					m_XColor;
 
 	HyPrimitive2d			m_CircleStroke;
 	HyPrimitive2d			m_Circle;
@@ -28,11 +29,10 @@ class HyCloseButton : public HyButton
 public:
 	HyCloseButton(uint32 uiDiameter, HyColor panelColor, HyColor frameColor, HyEntity2d *pParent);
 
-	void SetColor(HyColor panelColor, HyColor frameColor);
+	void SetColor(HyColor panelColor, HyColor frameColor, HyColor XColor);
 
 protected:
-	virtual void OnUpdate() override;
-	virtual void OnUiMouseDown() override;
+	virtual void OnBtnStateChange(HyButtonState eNewState) override;
 
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;

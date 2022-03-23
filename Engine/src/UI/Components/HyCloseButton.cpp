@@ -30,38 +30,43 @@ HyCloseButton::HyCloseButton(uint32 uiDiameter, HyColor panelColor, HyColor fram
 
 	int32 iXDiameter = static_cast<int32>(m_uiDiameter / 4);
 	m_X1.shape.SetAsLineSegment(glm::vec2(-iXDiameter, -iXDiameter), glm::vec2(iXDiameter, iXDiameter));
+	m_X1.SetLineThickness(3);
+	
 	m_X2.shape.SetAsLineSegment(glm::vec2(-iXDiameter, iXDiameter), glm::vec2(iXDiameter, -iXDiameter));
+	m_X2.SetLineThickness(3);
 
-	SetColor(m_PanelColor, m_FrameColor);
+	m_XColor = HyColor::Black;
+	SetColor(m_PanelColor, m_FrameColor, m_XColor);
 }
 
-void HyCloseButton::SetColor(HyColor panelColor, HyColor frameColor)
+void HyCloseButton::SetColor(HyColor panelColor, HyColor frameColor, HyColor XColor)
 {
 	m_CircleStroke.SetTint(frameColor);
 	m_Circle.SetTint(panelColor);
 
-	if(panelColor.IsLight())
-	{
-		m_X1.SetTint(panelColor.Darken());
-		m_X2.SetTint(panelColor.Darken());
-	}
-	else
-	{
-		m_X1.SetTint(panelColor.Lighten());
-		m_X2.SetTint(panelColor.Lighten());
-	}
+	m_X1.SetTint(XColor);
+	m_X2.SetTint(XColor);
 }
 
-/*virtual*/ void HyCloseButton::OnUpdate() /*override*/
+/*virtual*/ void HyCloseButton::OnBtnStateChange(HyButtonState eNewState) /*override*/
 {
-	if(HyEngine::Input().IsMouseBtnDown(HYMOUSE_Btn1) == false)
-		SetColor(m_PanelColor, m_FrameColor);
-}
+	switch(eNewState)
+	{
+	case HYBUTTONSTATE_Idle:
+	case HYBUTTONSTATE_Highlighted:
+		SetColor(m_PanelColor, m_FrameColor, m_XColor);
+		break;
 
-/*virtual*/ void HyCloseButton::OnUiMouseDown() /*override*/
-{
-	HyButton::OnUiMouseDown();
-	SetColor(m_PanelColor.Darken(), m_FrameColor.Darken());
+	case HYBUTTONSTATE_Down:
+	case HYBUTTONSTATE_HighlightedDown:
+		SetColor(m_PanelColor.Darken(), m_FrameColor.Darken(), m_XColor);
+		break;
+
+	case HYBUTTONSTATE_Hover:
+	case HYBUTTONSTATE_HighlightedHover:
+		SetColor(m_PanelColor.Lighten(), m_FrameColor.Lighten(), m_XColor);
+		break;
+	}
 }
 
 /*virtual*/ glm::vec2 HyCloseButton::GetPosOffset() /*override*/
