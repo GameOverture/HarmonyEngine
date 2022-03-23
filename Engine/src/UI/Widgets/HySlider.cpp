@@ -165,7 +165,7 @@ void HySlider::SetRange(int32 iMin, int32 iMax, uint32 uiStepAmt)
 	}
 
 	m_uiAttribs &= ~SLIDERATTRIB_UseStepList;
-	m_uiStep = (uiStepAmt == 0 || uiStepAmt > (m_iMax - m_iMin)) ? 1u : uiStepAmt;
+	m_uiStep = (uiStepAmt == 0 || uiStepAmt > static_cast<uint32>(m_iMax - m_iMin)) ? 1u : uiStepAmt;
 	
 	FixValues();
 }
@@ -349,7 +349,7 @@ void HySlider::FixValues()
 			uint32 uiDiff = std::numeric_limits<uint32>::max();
 			for(uint32 i = 0; i < m_StepList.size(); ++i)
 			{
-				if(uiDiff > abs(m_iValue - m_StepList[i]))
+				if(uiDiff > static_cast<uint32>(abs(m_iValue - m_StepList[i])))
 				{
 					m_iValue = m_StepList[i];
 					uiDiff = abs(m_iValue - m_StepList[i]);
