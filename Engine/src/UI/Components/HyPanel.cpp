@@ -157,7 +157,8 @@ uint32 HyPanel::GetSpriteState() const
 
 void HyPanel::SetSpriteState(uint32 uiStateIndex)
 {
-	m_SpritePanel.SetState(uiStateIndex);
+	if(uiStateIndex < m_SpritePanel.GetNumStates())
+		m_SpritePanel.SetState(uiStateIndex);
 	
 	if(IsSprite())
 		size.Set(m_SpritePanel.GetStateWidth(m_SpritePanel.GetState()), m_SpritePanel.GetStateHeight(m_SpritePanel.GetState()));

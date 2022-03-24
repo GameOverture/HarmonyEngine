@@ -67,6 +67,8 @@ public:
 	void InvokeButtonClicked();
 
 protected:
+	virtual void OnUpdate() override;
+
 	virtual void OnSetup() override;
 
 	virtual void OnUiMouseEnter() override;
@@ -77,7 +79,8 @@ protected:
 	virtual void OnBtnStateChange(HyButtonState eNewState) { }	// Derived classes optional override
 
 private:
-	void SetBtnState(HyButtonState eState);
+	HyButtonState GetBtnState();
+	void SetBtnState(HyButtonState eOldState);
 };
 
 #endif /* HyButton_h__ */
