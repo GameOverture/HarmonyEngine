@@ -21,9 +21,9 @@ enum HyButtonState
 {
 	HYBUTTONSTATE_Idle = 0,
 	HYBUTTONSTATE_Down,
+	HYBUTTONSTATE_Hover,
 	HYBUTTONSTATE_Highlighted,
 	HYBUTTONSTATE_HighlightedDown,
-	HYBUTTONSTATE_Hover,
 	HYBUTTONSTATE_HighlightedHover
 };
 
@@ -34,9 +34,11 @@ protected:
 	{
 		BTNATTRIB_HideDownState		= 1 << 11,		// Don't visually indicate down state (when available)
 		BTNATTRIB_HideHoverState	= 1 << 12,		// Don't visually indicate hover state (when available)
-		BTNATTRIB_IsHighlighted		= 1 << 13,
+		BTNATTRIB_IsHoverState		= 1 << 13,		// When cursor is overtop button
+		BTNATTRIB_IsDownState		= 1 << 14,		// When button is pressed
+		BTNATTRIB_IsHighlighted		= 1 << 15,		// An optional cosmetic state
 
-		BTNATTRIB_FLAG_NEXT			= 1 << 14
+		BTNATTRIB_FLAG_NEXT			= 1 << 16
 	};
 	static_assert((int)BTNATTRIB_HideDownState == (int)LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
 
@@ -65,6 +67,8 @@ public:
 	void InvokeButtonClicked();
 
 protected:
+	virtual void OnUpdate() override;
+
 	virtual void OnSetup() override;
 
 	virtual void OnUiMouseEnter() override;
@@ -75,7 +79,8 @@ protected:
 	virtual void OnBtnStateChange(HyButtonState eNewState) { }	// Derived classes optional override
 
 private:
-	void SetBtnState(HyButtonState eState);
+	HyButtonState GetBtnState();
+	void SetBtnState(HyButtonState eOldState);
 };
 
 #endif /* HyButton_h__ */
