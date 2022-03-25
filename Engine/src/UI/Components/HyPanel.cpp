@@ -81,6 +81,7 @@ HyPanel::HyPanel(const HyPanelInit &initRef, bool bIsContainer, HyEntity2d *pPar
 
 /*virtual*/ HyPanel::~HyPanel()
 {
+	ParentDetach(); // This avoids a crash when SetEntityLoaded() propagates to parents and invokes this->IsValid() after being deleted
 }
 
 void HyPanel::Setup(const HyPanelInit &initRef, bool bIsContainer)
