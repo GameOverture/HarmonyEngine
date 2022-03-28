@@ -42,9 +42,9 @@ protected:
 	};
 	static_assert((int)BTNATTRIB_HideDownState == (int)LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
 
-	HyButtonClickedCallback		m_fpBtnClickedCallback;
-	void *						m_pBtnClickedParam;
-	HyAudio2d					m_ClickedSound;
+	HyButtonClickedCallback			m_fpBtnClickedCallback;
+	void *							m_pBtnClickedParam;
+	HyAudio2d						m_ClickedSound;
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
