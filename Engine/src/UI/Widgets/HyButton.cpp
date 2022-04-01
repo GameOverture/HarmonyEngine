@@ -118,6 +118,8 @@ void HyButton::InvokeButtonClicked()
 
 /*virtual*/ void HyButton::OnUpdate() /*override*/
 {
+	HyLabel::OnUpdate();
+
 	if(m_uiAttribs & BTNATTRIB_IsDownState && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft))
 		m_uiAttribs &= ~BTNATTRIB_IsDownState;
 }

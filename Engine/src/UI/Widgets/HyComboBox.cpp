@@ -171,6 +171,8 @@ void HyComboBox::ResetExpandedTimeout()
 
 /*virtual*/ void HyComboBox::OnUpdate() /*override*/
 {
+	HyButton::OnUpdate();
+
 	switch(m_uiAttribs & COMBOBOXATTRIB_STATEMASK)
 	{
 	case 0:
