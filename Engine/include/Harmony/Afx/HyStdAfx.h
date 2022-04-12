@@ -136,8 +136,11 @@ enum HyPlayListMode
 	HYPLAYLIST_Shuffle = 0,
 	HYPLAYLIST_Weighted,
 	HYPLAYLIST_SequentialLocal,
-	HYPLAYLIST_SequentialGlobal
+	HYPLAYLIST_SequentialGlobal,
+
+	HYNUM_PLAYLISTS
 };
+static_assert(HYNUM_PLAYLISTS < 7, "HyPlayListMode enum cannot exceed '7' entries because it's stored using '3' bits in struct AudioStateAttribs");
 
 enum HyLoadState
 {
