@@ -22,7 +22,7 @@
 	#include "SDL_mixer.h"
 #endif
 
-class HyRawSoundBuffer
+class HySdlRawSoundBuffer
 {
 	const std::string			m_sFILE_NAME;
 	const bool					m_bIS_MUSIC;
@@ -34,14 +34,14 @@ class HyRawSoundBuffer
 	BufferPtr					m_Buffer;
 
 public:
-	HyRawSoundBuffer(std::string sFileName, bool bIsMusic) :
+	HySdlRawSoundBuffer(std::string sFileName, bool bIsMusic) :
 		m_sFILE_NAME(sFileName),
 		m_bIS_MUSIC(bIsMusic)
 	{
 		m_Buffer.pSfx = nullptr;
 	}
 
-	~HyRawSoundBuffer()
+	~HySdlRawSoundBuffer()
 	{
 		Unload();
 	}
@@ -98,8 +98,8 @@ public:
 
 class HyFileAudioImpl_SDL2 : public IHyFileAudioImpl
 {
-	std::vector<HyRawSoundBuffer *>			m_SoundBuffers;
-	std::map<uint32, HyRawSoundBuffer *>	m_ChecksumMap;
+	std::vector<HySdlRawSoundBuffer *>			m_SoundBuffers;
+	std::map<uint32, HySdlRawSoundBuffer *>	m_ChecksumMap;
 
 public:
 	HyFileAudioImpl_SDL2(HyJsonObj bankObj);
@@ -110,7 +110,7 @@ public:
 	virtual bool Load(std::string sFilePath) override;
 	virtual void Unload() override;
 
-	HyRawSoundBuffer *GetBufferInfo(uint32 uiChecksum);
+	HySdlRawSoundBuffer *GetBufferInfo(uint32 uiChecksum);
 };
 #endif // HY_USE_SDL2
 

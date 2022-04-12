@@ -20,7 +20,7 @@ HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj bankObj)
 	{
 		HyJsonObj assetObj = assetsArray[i].GetObject();
 
-		HyRawSoundBuffer *pNewBuffer = HY_NEW HyRawSoundBuffer(assetObj["fileName"].GetString(), assetObj["isMusic"].GetBool());
+		HySdlRawSoundBuffer *pNewBuffer = HY_NEW HySdlRawSoundBuffer(assetObj["fileName"].GetString(), assetObj["isMusic"].GetBool());
 		m_SoundBuffers.push_back(pNewBuffer);
 		m_ChecksumMap[assetObj["checksum"].GetUint()] = pNewBuffer;
 	}
@@ -57,7 +57,7 @@ HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj bankObj)
 		m_SoundBuffers[i]->Unload();
 }
 
-HyRawSoundBuffer *HyFileAudioImpl_SDL2::GetBufferInfo(uint32 uiChecksum)
+HySdlRawSoundBuffer *HyFileAudioImpl_SDL2::GetBufferInfo(uint32 uiChecksum)
 {
 	auto iter = m_ChecksumMap.find(uiChecksum);
 	if(iter == m_ChecksumMap.end())

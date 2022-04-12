@@ -13,14 +13,18 @@
 #include "Scene/Nodes/Loadables/Objects/HyAudio3d.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
+IHyAudioCore *IHyAudioCore::sm_pInstance = nullptr;
+
 IHyAudioCore::IHyAudioCore() :
 	m_fGlobalSfxVolume(1.0f),
 	m_fGlobalMusicVolume(1.0f)
 {
+	sm_pInstance = this;
 }
 
 /*virtual*/ IHyAudioCore::~IHyAudioCore(void)
 {
+	sm_pInstance = nullptr;
 }
 
 void IHyAudioCore::SetSfxVolume(float fGlobalSfxVolume)
@@ -48,15 +52,11 @@ void IHyAudioCore::ProcessCue(IHyNode *pNode, CueType eCueType)
 	switch(eCueType)
 	{
 	case CUETYPE_PlayOneShotDefault:
-	case CUETYPE_PlayOneShot:
-	case CUETYPE_Start: {
-		HyAudioHandle hHandle = HY_UNUSED_HANDLE;
+	case CUETYPE_PlayOneShot: {
 		PlayInfo newPlayInfo;
 		if(pNode->Is2D())
 		{
-			if(eCueType == CUETYPE_Start)
-				hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
-			if(eCueType != CUETYPE_PlayOneShotDefault)
+			if(eCueType == CUETYPE_PlayOneShot)
 			{
 				newPlayInfo.m_fVolume = static_cast<HyAudio2d *>(pNode)->volume.Get();
 				newPlayInfo.m_fPitch = static_cast<HyAudio2d *>(pNode)->pitch.Get();
@@ -66,9 +66,7 @@ void IHyAudioCore::ProcessCue(IHyNode *pNode, CueType eCueType)
 		}
 		else
 		{
-			if(eCueType == CUETYPE_Start)
-				hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
-			if(eCueType != CUETYPE_PlayOneShotDefault)
+			if(eCueType == CUETYPE_PlayOneShot)
 			{
 				newPlayInfo.m_fVolume = static_cast<HyAudio3d *>(pNode)->volume.Get();
 				newPlayInfo.m_fPitch = static_cast<HyAudio3d *>(pNode)->pitch.Get();
@@ -77,10 +75,38 @@ void IHyAudioCore::ProcessCue(IHyNode *pNode, CueType eCueType)
 			newPlayInfo.m_uiLoops = static_cast<HyAudio3d *>(pNode)->GetLoops();
 		}
 
-		if(hHandle != HY_UNUSED_HANDLE)
-			m_PlayMap.emplace(hHandle, newPlayInfo);
+		m_OneShotList.push_back(newPlayInfo);
+		OnCue_Play(newPlayInfo);
+		break; }
 
-		OnCue_Play(hHandle, newPlayInfo);
+	case CUETYPE_Start: {
+		PlayInfo *pPlayInfo = nullptr;
+		if(pNode->Is2D())
+		{
+			HyAudioHandle hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
+			if(m_PlayMap.count(hHandle) == 0)
+				m_PlayMap[hHandle] = PlayInfo();
+			pPlayInfo = &m_PlayMap[hHandle];
+
+			pPlayInfo->m_fVolume = static_cast<HyAudio2d *>(pNode)->volume.Get();
+			pPlayInfo->m_fPitch = static_cast<HyAudio2d *>(pNode)->pitch.Get();
+			pPlayInfo->m_uiSoundChecksum = static_cast<HyAudio2d *>(pNode)->PullNextSound();
+			pPlayInfo->m_uiLoops = static_cast<HyAudio2d *>(pNode)->GetLoops();
+		}
+		else
+		{
+			HyAudioHandle hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
+			if(m_PlayMap.count(hHandle) == 0)
+				m_PlayMap[hHandle] = PlayInfo();
+			pPlayInfo = &m_PlayMap[hHandle];
+
+			pPlayInfo->m_fVolume = static_cast<HyAudio3d *>(pNode)->volume.Get();
+			pPlayInfo->m_fPitch = static_cast<HyAudio3d *>(pNode)->pitch.Get();
+			pPlayInfo->m_uiSoundChecksum = static_cast<HyAudio3d *>(pNode)->PullNextSound();
+			pPlayInfo->m_uiLoops = static_cast<HyAudio3d *>(pNode)->GetLoops();
+		}
+
+		OnCue_Play(*pPlayInfo);
 		break; }
 
 	case CUETYPE_Stop:
@@ -91,15 +117,16 @@ void IHyAudioCore::ProcessCue(IHyNode *pNode, CueType eCueType)
 			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
 		else
 			hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
-		if(m_PlayMap.find(hHandle) == m_PlayMap.end())
+		
+		if(m_PlayMap.count(hHandle) == 0)
 			break;
 		
 		if(eCueType == CUETYPE_Stop)
-			OnCue_Stop(hHandle);
+			OnCue_Stop(m_PlayMap[hHandle]);
 		else if(eCueType == CUETYPE_Pause)
-			OnCue_Pause(hHandle);
+			OnCue_Pause(m_PlayMap[hHandle]);
 		else if(eCueType == CUETYPE_Unpause)
-			OnCue_Unpause(hHandle);
+			OnCue_Unpause(m_PlayMap[hHandle]);
 		break; }
 
 	case CUETYPE_Attributes: {
@@ -115,11 +142,12 @@ void IHyAudioCore::ProcessCue(IHyNode *pNode, CueType eCueType)
 			hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
 			fVolume = static_cast<HyAudio3d *>(pNode)->volume.Get();
 		}
-		if(m_PlayMap.find(hHandle) == m_PlayMap.end())
+
+		if(m_PlayMap.count(hHandle) == 0)
 			break;
 
 		m_PlayMap[hHandle].m_fVolume = fVolume;
-		OnCue_Volume(hHandle);
+		OnCue_Volume(m_PlayMap[hHandle]);
 		break; }
 
 	default:
@@ -128,7 +156,25 @@ void IHyAudioCore::ProcessCue(IHyNode *pNode, CueType eCueType)
 	}
 }
 
-void IHyAudioCore::ReportFinished(HyAudioHandle hHandle)
+/*static*/ void IHyAudioCore::OnReportFinished(int32 iApiData)
 {
-	m_PlayMap.erase(hHandle);
+	for(auto iter = sm_pInstance->m_PlayMap.begin(); iter != sm_pInstance->m_PlayMap.end(); ++iter)
+	{
+		if(iter->second.m_iApiData == iApiData)
+		{
+			sm_pInstance->m_PlayMap.erase(iter);
+			return;
+		}
+	}
+
+	for(auto iter = sm_pInstance->m_OneShotList.begin(); iter != sm_pInstance->m_OneShotList.end(); ++iter)
+	{
+		if(iter->m_iApiData == iApiData)
+		{
+			sm_pInstance->m_OneShotList.erase(iter);
+			return;
+		}
+	}
+
+	HyLogError("IHyAudioCore::OnReportFinished did not find: " << iApiData);
 }

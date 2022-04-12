@@ -25,8 +25,6 @@
 // this maximum (it's loud as hell), even when you max out their volume dial. Provide the maximum volume allowed in 'HYAUDIO_SDL_VOLUME_DAMPENING'
 #define HYAUDIO_SDL_VOLUME_DAMPENING 0.75f
 
-HyAudioCore_SDL2 *HyAudioCore_SDL2::sm_pInstance = nullptr;
-
 HyAudioCore_SDL2::HyAudioCore_SDL2()
 {
 	m_fGlobalSfxVolume = HYAUDIO_SDL_VOLUME_DAMPENING;
@@ -102,20 +100,15 @@ HyAudioCore_SDL2::HyAudioCore_SDL2()
 	HyLog("Audio Driver:     " << GetAudioDriver());
 
 	// Set API callbacks
-	Mix_ChannelFinished(HyAudioCore_SDL2::OnChannelFinished);
+	Mix_ChannelFinished(IHyAudioCore::OnReportFinished);
 
 	int32 iNumChannels = Mix_AllocateChannels(HYMAX_AUDIOCHANNELS);
-	m_ChannelMap.reserve(iNumChannels);
-
-	sm_pInstance = this;
 }
 
 /*virtual*/ HyAudioCore_SDL2::~HyAudioCore_SDL2(void)
 {
 	Mix_CloseAudio();
 	Mix_Quit();
-
-	sm_pInstance = nullptr;
 }
 
 const char *HyAudioCore_SDL2::GetAudioDriver()
@@ -132,14 +125,11 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 {
 	m_fGlobalSfxVolume = HyClamp(fGlobalSfxVolume, 0.0f, 1.0f) * HYAUDIO_SDL_VOLUME_DAMPENING;
 	
-	for(const auto &iter : m_ChannelMap)
-	{
-		float fVolume = 1.0f;
-		if(iter.second != HY_UNUSED_HANDLE)
-			fVolume = m_PlayMap[iter.second].m_fVolume;
-
-		Mix_Volume(iter.first, static_cast<int>(MIX_MAX_VOLUME * fVolume * m_fGlobalSfxVolume));
-	}
+	for(const auto &iter : m_PlayMap)
+		Mix_Volume(iter.second.m_iApiData, static_cast<int>(MIX_MAX_VOLUME * iter.second.m_fVolume * m_fGlobalSfxVolume));
+	
+	for(const auto &iter : m_OneShotList)
+		Mix_Volume(iter.m_iApiData, static_cast<int>(MIX_MAX_VOLUME * iter.m_fVolume * m_fGlobalSfxVolume));
 }
 
 /*virtual*/ void HyAudioCore_SDL2::OnSetMusicVolume(float fGlobalMusicVolume) /*override*/
@@ -148,10 +138,10 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	Mix_VolumeMusic(static_cast<int>(MIX_MAX_VOLUME * m_fGlobalMusicVolume));
 }
 
-/*virtual*/ void HyAudioCore_SDL2::OnCue_Play(HyAudioHandle hHandle, PlayInfo &playInfoRef) /*override*/
+/*virtual*/ void HyAudioCore_SDL2::OnCue_Play(PlayInfo &playInfoRef) /*override*/
 {
-	// Determine 'HyRawSoundBuffer'
-	HyRawSoundBuffer *pBuffer = nullptr;
+	// Determine 'HySdlRawSoundBuffer'
+	HySdlRawSoundBuffer *pBuffer = nullptr;
 	for(auto file : m_AudioFileList)
 	{
 		pBuffer = static_cast<HyFileAudioImpl_SDL2 *>(file)->GetBufferInfo(playInfoRef.m_uiSoundChecksum);
@@ -160,198 +150,55 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	}
 	if(pBuffer == nullptr)
 	{
-		HyLogWarning("Could not find audio: " << playInfoRef.m_uiSoundChecksum);
+		HyLogWarning("HyAudioCore_SDL2::OnCue_Play() Could not find audio: " << playInfoRef.m_uiSoundChecksum);
 		return;
 	}
 
 	// Play in Mixer
 	if(pBuffer->IsMusic())
 	{
-		Mix_PlayMusic(pBuffer->GetMusicPtr(), playInfoRef.m_uiLoops);
+		if(Mix_PlayMusic(pBuffer->GetMusicPtr(), playInfoRef.m_uiLoops) == -1)
+		{
+			HyLogWarning("HyAudioCore_SDL2::OnCue_Play() Mix_PlayMusic failed on: " << playInfoRef.m_uiSoundChecksum);
+			return;
+		}
 
 		int32 iVolume = static_cast<int>(MIX_MAX_VOLUME * (playInfoRef.m_fVolume * m_fGlobalMusicVolume));
 		Mix_VolumeMusic(iVolume);
 	}
 	else
 	{
-		int32 iAssignedChannel = -1;
-		if(hHandle != HY_UNUSED_HANDLE && playInfoRef.m_iApiData != 0)
-			iAssignedChannel = playInfoRef.m_iApiData;
-
-		iAssignedChannel = Mix_PlayChannel(iAssignedChannel, pBuffer->GetSfxPtr(), playInfoRef.m_uiLoops);
-		if(iAssignedChannel == -1)
+		playInfoRef.m_iApiData = Mix_PlayChannelTimed(playInfoRef.m_iApiData, pBuffer->GetSfxPtr(), playInfoRef.m_uiLoops, -1);
+		if(playInfoRef.m_iApiData == -1)
+		{
+			HyLogWarning("HyAudioCore_SDL2::OnCue_Play() Mix_PlayChannelTimed failed on: " << playInfoRef.m_uiSoundChecksum);
 			return;
+		}
 
 		int32 iVolume = static_cast<int>(MIX_MAX_VOLUME * (playInfoRef.m_fVolume * m_fGlobalSfxVolume));
-		Mix_Volume(iAssignedChannel, iVolume);
-
-		if(hHandle != HY_UNUSED_HANDLE)
-			playInfoRef.m_iApiData = iAssignedChannel;
-		
-		m_ChannelMap.emplace(iAssignedChannel, hHandle);
+		Mix_Volume(playInfoRef.m_iApiData, iVolume);
 	}
 }
 
-/*virtual*/ void HyAudioCore_SDL2::OnCue_Stop(HyAudioHandle hHandle) /*override*/
+/*virtual*/ void HyAudioCore_SDL2::OnCue_Stop(PlayInfo &playInfoRef) /*override*/
 {
-	Mix_HaltChannel(m_PlayMap[hHandle].m_iApiData);
+	Mix_HaltChannel(playInfoRef.m_iApiData);
 }
 
-/*virtual*/ void HyAudioCore_SDL2::OnCue_Pause(HyAudioHandle hHandle) /*override*/
+/*virtual*/ void HyAudioCore_SDL2::OnCue_Pause(PlayInfo &playInfoRef) /*override*/
 {
-	Mix_Pause(m_PlayMap[hHandle].m_iApiData);
+	Mix_Pause(playInfoRef.m_iApiData);
 }
 
-/*virtual*/ void HyAudioCore_SDL2::OnCue_Unpause(HyAudioHandle hHandle) /*override*/
+/*virtual*/ void HyAudioCore_SDL2::OnCue_Unpause(PlayInfo &playInfoRef) /*override*/
 {
-	Mix_Resume(m_PlayMap[hHandle].m_iApiData);
+	Mix_Resume(playInfoRef.m_iApiData);
 }
 
-/*virtual*/ void HyAudioCore_SDL2::OnCue_Volume(HyAudioHandle hHandle) /*override*/
+/*virtual*/ void HyAudioCore_SDL2::OnCue_Volume(PlayInfo &playInfoRef) /*override*/
 {
-	int32 iVolume = static_cast<int>(MIX_MAX_VOLUME * (m_PlayMap[hHandle].m_fVolume * m_fGlobalSfxVolume));
-	Mix_Volume(m_PlayMap[hHandle].m_iApiData, iVolume);
+	int32 iVolume = static_cast<int>(MIX_MAX_VOLUME * (playInfoRef.m_fVolume * m_fGlobalSfxVolume));
+	Mix_Volume(playInfoRef.m_iApiData, iVolume);
 }
-
-/*static*/ void HyAudioCore_SDL2::OnChannelFinished(int32 iChannel)
-{
-	if(sm_pInstance->m_ChannelMap.count(iChannel) == 0)
-	{
-		HyLogWarning("HyAudioCore_SDL2::OnChannelFinished() - m_ChannelMap[" << iChannel << "] had zero entires");
-		return;
-	}
-
-	sm_pInstance->ReportFinished(sm_pInstance->m_ChannelMap[iChannel]);
-	sm_pInstance->m_ChannelMap.erase(iChannel);
-}
-
-//if(pAudioNode->pitch.Get() != 1.0f)
-//{
-//	Mix_RegisterEffect(nodeIter->second, OnPitchModifer, nullptr, nodeIter->first);
-//}
-//Uint16 formatSampleSize(Uint16 format)
-//{
-//	return (format & 0xFF) / 8;
-//}
-//
-///*static*/ int HyAudioCore_SDL2::computeChunkLengthMillisec(int chunkSize)
-//{
-//	/* bytes / samplesize == sample points */
-//	const Uint32 points = chunkSize / sizeof(int16);//formatSampleSize(sm_pInstance->m_uiDesiredFormat);
-//
-//	/* sample points / channels == sample frames */
-//	const Uint32 frames = (points / sm_pInstance->m_iDesiredNumChannels);
-//
-//	/* (sample frames * 1000) / frequency == play length, in ms */
-//	return ((frames * 1000) / sm_pInstance->m_iDesiredFrequency);
-//}
-//
-///*static*/ void HyAudioCore_SDL2::OnPitchModifer(int iChannel, void *pStream, int iLength, void *pData)
-//{
-//	// TODO: Check for 3D node
-//	HyAudio2d *pNode = reinterpret_cast<HyAudio2d *>(pData);
-//	
-//	HyRawSoundBuffer *pBuffer = nullptr;
-//	uint32 uiSoundChecksum = pNode->GetLastPlayed();
-//	for(auto file : sm_pInstance->m_AudioFileList)
-//	{
-//		pBuffer = file->GetBufferInfo(uiSoundChecksum);
-//		if(pBuffer)
-//			break;
-//	}
-//
-//	if(pBuffer == nullptr)
-//		return;
-//
-//
-//	const float speedFactor = pNode->pitch.Get(); // speed
-//	const int channelCount = sm_pInstance->m_iDesiredNumChannels;
-//	const int frequency = sm_pInstance->m_iDesiredFrequency;
-//
-//	const Sint16* chunkData = reinterpret_cast<Sint16*>(pBuffer->GetSfxPtr()->abuf);
-//
-//	Sint16* buffer = static_cast<Sint16*>(pStream);
-//	const int bufferSize = iLength / sizeof(int16);  // buffer size (as array)
-//	const int bufferDuration = computeChunkLengthMillisec(iLength);  // buffer time duration
-//
-//	//if(not touched)  // if playback is still untouched
-//	//{
-//	//	// if playback is still untouched and no pitch is requested this time, skip pitch routine and leave stream untouched.
-//	//	if(speedFactor == 1.0f)
-//	//	{
-//	//		// if there is still sound to be played
-//	//		if(position < duration or loop)
-//	//		{
-//	//			// just update position
-//	//			position += bufferDuration;
-//
-//	//			// reset position if looping
-//	//			if(loop) while(position > duration)
-//	//				position -= duration;
-//	//		}
-//	//		else  // if we already played the whole sound, halt channel
-//	//		{
-//	//			// set silence on the buffer since Mix_HaltChannel() poops out some of it for a few ms.
-//	//			for(int i = 0; i < bufferSize; i++)
-//	//				buffer[i] = 0;
-//
-//	//			Mix_HaltChannel(mixChannel);
-//	//		}
-//
-//	//		return;  // skipping pitch routine
-//	//	}
-//	//	// if pitch is required for the first time
-//	//	else
-//	//		touched = true;  // mark as touched and proceed to the pitch routine.
-//	//}
-//
-//	//// if there is still sound to be played
-//	//if(position < duration or loop)
-//	//{
-//		//const float delta = 1000.0/frequency,   // normal duration of each sample
-//		//			delta2 = delta*speedFactor; // virtual stretched duration, scaled by 'speedFactor'
-//
-//		//for(int i = 0; i < bufferSize; i += channelCount)
-//		//{
-//		//	const int j = i/channelCount; // j goes from 0 to size/channelCount, incremented 1 by 1
-//		//	const float x = position + j*delta2;  // get "virtual" index. its corresponding value will be interpolated.
-//		//	const int k = floor(x / delta);  // get left index to interpolate from original chunk data (right index will be this plus 1)
-//		//	const float proportion = (x / delta) - k;  // get the proportion of the right value (left will be 1.0 minus this)
-//
-//		//	// usually just 2 channels: 0 (left) and 1 (right), but who knows...
-//		//	for(int c = 0; c < channelCount; c++)
-//		//	{
-//		//		// check if k will be within bounds
-//		//		if(k*channelCount + channelCount - 1 < iLength/* or loop*/)
-//		//		{
-//		//			Sint16  leftValue =  chunkData[(  k   * channelCount + c) % iLength],
-//		//								rightValue = chunkData[((k+1) * channelCount + c) % iLength];
-//
-//		//			// put interpolated value on 'data' (linear interpolation)
-//		//			buffer[i + c] = (1-proportion)*leftValue + proportion*rightValue;
-//		//		}
-//		//		else  // if k will be out of bounds (chunk bounds), it means we already finished; thus, we'll pass silence
-//		//		{
-//		//			buffer[i + c] = 0;
-//		//		}
-//		//	}
-//		//}
-//
-//	//	// update position
-//	//	position += bufferDuration * speedFactor; // this is not exact since a frame may play less than its duration when finished playing, but its simpler
-//
-//	//	// reset position if looping
-//	//	if(loop) while(position > duration)
-//	//		position -= duration;
-//	//}
-//	//else  // if we already played the whole sound but finished earlier than expected by SDL_mixer (due to faster playback speed)
-//	//{
-//	//	// set silence on the buffer since Mix_HaltChannel() poops out some of it for a few ms.
-//	//	for(int i = 0; i < bufferSize; i++)
-//	//		buffer[i] = 0;
-//
-//	//	Mix_HaltChannel(mixChannel);
-//	//}
-//}
 
 #endif // defined(HY_USE_SDL2)

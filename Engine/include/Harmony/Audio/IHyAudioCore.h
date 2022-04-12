@@ -34,12 +34,14 @@ public:
 	};
 
 protected:
+	static IHyAudioCore *							sm_pInstance;	// Only used in ReportFinished() callback
+
 	float											m_fGlobalSfxVolume;
 	float											m_fGlobalMusicVolume;
 
 	std::vector<IHyFileAudioImpl *>					m_AudioFileList;
 
-	// Keep track of non-oneshot active sfx
+	// Keep track of active SFX's
 	struct PlayInfo
 	{
 		float				m_fVolume = 1.0f;
@@ -47,9 +49,11 @@ protected:
 		uint32				m_uiSoundChecksum = 0;
 		uint8				m_uiLoops = 0;
 
-		int32				m_iApiData = 0;
+		int32				m_iApiData = -1;
 	};
+
 	std::unordered_map<HyAudioHandle, PlayInfo>		m_PlayMap;
+	std::vector<PlayInfo>							m_OneShotList;
 
 public:
 	IHyAudioCore();
@@ -62,18 +66,18 @@ protected:
 	IHyFileAudioImpl *AllocateAudioBank(HyJsonObj bankObj);
 	void ProcessCue(IHyNode *pNode, CueType eCueType);
 
-	// Derived classes must invoke this when 'hHandle' audio is finished playing
-	void ReportFinished(HyAudioHandle hHandle);
-
 	virtual IHyFileAudioImpl *OnAllocateAudioBank(HyJsonObj bankObj) = 0;
 	virtual void OnSetSfxVolume(float fGlobalSfxVolume) = 0;
 	virtual void OnSetMusicVolume(float fGlobalMusicVolume) = 0;
 
-	virtual void OnCue_Play(HyAudioHandle hHandle, PlayInfo &playInfoRef) = 0;
-	virtual void OnCue_Stop(HyAudioHandle hHandle) = 0;
-	virtual void OnCue_Pause(HyAudioHandle hHandle) = 0;
-	virtual void OnCue_Unpause(HyAudioHandle hHandle) = 0;
-	virtual void OnCue_Volume(HyAudioHandle hHandle) = 0;
+	virtual void OnCue_Play(PlayInfo &playInfoRef) = 0;
+	virtual void OnCue_Stop(PlayInfo &playInfoRef) = 0;
+	virtual void OnCue_Pause(PlayInfo &playInfoRef) = 0;
+	virtual void OnCue_Unpause(PlayInfo &playInfoRef) = 0;
+	virtual void OnCue_Volume(PlayInfo &playInfoRef) = 0;
+	
+	// Derived classes must invoke this whenever audio SFX's are finished playing
+	static void OnReportFinished(int32 iApiData);
 };
 
 class HyAudioCore_Null : public IHyAudioCore
@@ -90,15 +94,15 @@ public:
 	{ }
 	virtual void OnSetMusicVolume(float fGlobalMusicVolume) override
 	{ }
-	virtual void OnCue_Play(HyAudioHandle hHandle, PlayInfo &playInfoRef) override
+	virtual void OnCue_Play(PlayInfo &playInfoRef) override
 	{ }
-	virtual void OnCue_Stop(HyAudioHandle hHandle) override
+	virtual void OnCue_Stop(PlayInfo &playInfoRef) override
 	{ }
-	virtual void OnCue_Pause(HyAudioHandle hHandle) override
+	virtual void OnCue_Pause(PlayInfo &playInfoRef) override
 	{ }
-	virtual void OnCue_Unpause(HyAudioHandle hHandle) override
+	virtual void OnCue_Unpause(PlayInfo &playInfoRef) override
 	{ }
-	virtual void OnCue_Volume(HyAudioHandle hHandle) override
+	virtual void OnCue_Volume(PlayInfo &playInfoRef) override
 	{ }
 };
 
