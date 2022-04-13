@@ -76,7 +76,7 @@ void IHyAudioCore::ProcessCue(IHyNode *pNode, CueType eCueType)
 		}
 
 		m_OneShotList.push_back(newPlayInfo);
-		OnCue_Play(newPlayInfo);
+		OnCue_Play(m_OneShotList.back());
 		break; }
 
 	case CUETYPE_Start: {
