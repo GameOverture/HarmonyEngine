@@ -251,9 +251,9 @@ void HyPanel::SetFrameColor(HyColor color)
 		m_Frame2.SetTint(color.Darken());
 }
 
-/*virtual*/ void HyPanel::SetDirty(uint32 uiDirtyFlags) /*override*/
+/*virtual*/ void HyPanel::OnUpdate() /*override*/
 {
-	if(uiDirtyFlags & IHyNode::DIRTY_Size)
+	if(IsDirty(IHyNode::DIRTY_Size))
 	{
 		if(IsPrimitive())
 			ConstructPrimitives();
@@ -263,10 +263,9 @@ void HyPanel::SetFrameColor(HyColor color)
 			scale.X(size.X() / vUiSizeHint.x);
 			scale.Y(size.Y() / vUiSizeHint.y);
 		}
-		uiDirtyFlags &= ~IHyNode::DIRTY_Size;
-	}
 
-	HyEntity2d::SetDirty(uiDirtyFlags);
+		ClearDirty(IHyNode::DIRTY_Size);
+	}
 }
 
 void HyPanel::ConstructPrimitives()

@@ -90,7 +90,7 @@ public:
 	void SetFrameColor(HyColor color);
 
 protected:
-	virtual void SetDirty(uint32 uiDirtyFlags) override;
+	virtual void OnUpdate() override;
 	void ConstructPrimitives();
 };
 
