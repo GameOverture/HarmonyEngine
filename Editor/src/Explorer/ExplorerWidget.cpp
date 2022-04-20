@@ -205,23 +205,13 @@ ExplorerItemData *ExplorerWidget::GetSelected(QList<ProjectItemData *> &selected
 			selectedItemsOut.append(static_cast<ProjectItemData *>(itemList[i]));
 	}
 
-	//for(int i = 0; i < selectedIndices.size(); ++i)
-	//{
-	//	QList<TreeModelItemData *> itemsList = GetExplorerModel()->GetItemsRecursively(selectedIndices[i]);
-	//	for(auto item : itemsList)
-	//		selectedPrefixesOut += static_cast<ExplorerItemData *>(item);
-	//}
-	//
-	//// Poverty unique only algorithm - does not persist order of items
-	//selectedItemsOut = selectedItemsOut.toSet().values();
-
-	//for(int i = 0; i < selectedItemsOut.size();)
-	//{
-	//	if(selectedItemsOut[i]->GetType() == ITEM_Prefix)
-	//		selectedPrefixesOut.push_back(selectedItemsOut.takeAt(i));
-	//	else
-	//		++i;
-	//}
+	// The items within 'selectedItemsOut' and 'selectedPrefixesOut' are not sorted. Sort them alphabetically by name here
+	std::sort(selectedItemsOut.begin(), selectedItemsOut.end(), [](ProjectItemData *pA, ProjectItemData *pB) {
+		return QString::localeAwareCompare(pA->GetName(true), pB->GetName(true)) < 0;
+		});
+	std::sort(selectedPrefixesOut.begin(), selectedPrefixesOut.end(), [](ExplorerItemData *pA, ExplorerItemData *pB) {
+		return QString::localeAwareCompare(pA->GetName(true), pB->GetName(true)) < 0;
+		});
 
 	return pFirstItemSelected;
 }

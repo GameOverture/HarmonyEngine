@@ -361,6 +361,14 @@ TreeModelItemData *ManagerWidget::GetSelected(QList<AssetItemData *> &selectedAs
 			selectedAssetsOut.append(static_cast<AssetItemData *>(itemList[i]));
 	}
 
+	// The items within 'selectedAssetsOut' and 'selectedFiltersOut' are not sorted. Sort them alphabetically by name here
+	std::sort(selectedAssetsOut.begin(), selectedAssetsOut.end(), [](AssetItemData *pA, AssetItemData *pB) {
+		return QString::localeAwareCompare(pA->GetName(), pB->GetName()) < 0;
+		});
+	std::sort(selectedFiltersOut.begin(), selectedFiltersOut.end(), [](TreeModelItemData *pA, TreeModelItemData *pB) {
+		return QString::localeAwareCompare(pA->GetText(), pB->GetText()) < 0;
+		});
+
 	return pFirstItemSelected;
 }
 
