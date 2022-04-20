@@ -100,7 +100,7 @@ void IHyNetworkClass::CleanupSocket()
 	switch(m_eConnState)
 	{
 	case CONNECTION_TimeOut:
-		HyLog("Attmempting to reconnect in 5 seconds...");
+		HyLog("Attempting to reconnect in 5 seconds...");
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		m_eConnState = CONNECTION_NotConnected;
 		break;
