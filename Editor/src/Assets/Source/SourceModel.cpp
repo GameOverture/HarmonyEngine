@@ -82,7 +82,7 @@ quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName)
 	return HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(sCleanPath.data()), sCleanPath.size());
 }
 
-QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName)
+QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName, QString sBaseClass, bool bEntityBaseClass)
 {
 	QString sTemplateFilePath = MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "src/";
 	switch(eTemplate)
@@ -98,7 +98,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	QFile file(sTemplateFilePath);
 	if(!file.open(QFile::ReadOnly))
 	{
-		HyGuiLog("Error reading " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
+		HyGuiLog("Error reading template file " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
 		return QString();
 	}
 	
@@ -113,10 +113,43 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	sContents.replace("%HY_TITLE%", m_ProjectRef.GetTitle());
 	sContents.replace("%HY_PROJECTNAME%", m_ProjectRef.GetName());
 
+	QString sBaseClassDecl;
+	QString sClassCtorSignature;
+	QString sMemberInitializerList;
+	QString sClassFuncs;
+	if(sBaseClass.isEmpty() == false)
+	{
+		sBaseClassDecl = " : public " + sBaseClass;
+		if(bEntityBaseClass)
+		{
+			if(eTemplate == TEMPLATE_ClassH)
+			{
+				sClassCtorSignature = "HyEntity2d *pParent = nullptr";
+				sClassFuncs = "virtual void OnUpdate() override;";
+			}
+			else if(eTemplate == TEMPLATE_ClassCpp)
+			{
+				sClassCtorSignature = "HyEntity2d *pParent /*= nullptr*/";
+				sMemberInitializerList = " :\n\tHyEntity2d(pParent)";
+				sClassFuncs = "/*virtual*/ void " + sClassName + "::OnUpdate() /*override*/\n{\n}";
+			}
+		}
+	}
+	sContents.replace("%HY_BASECLASSDECL%", sBaseClassDecl);
+	sContents.replace("%HY_CLASSCTORSIG%", sClassCtorSignature);
+	sContents.replace("%HY_CLASSMEMBERINITIALIZERLIST%", sMemberInitializerList);
+	sContents.replace("%HY_CLASSFUNCS%", sClassFuncs);
+
 	// Save generated source file to destination
 	QString sDestinationPath = m_MetaDir.absoluteFilePath(AssembleFilter(data(destIndex, Qt::UserRole).value<TreeModelItemData *>(), true));
 	sDestinationPath += "/" + sFileName + "." + QFileInfo(sTemplateFilePath).suffix();
 	file.setFileName(sDestinationPath);
+
+	// Make sure destination directory exists
+	QDir dir;
+	if(dir.mkpath(QFileInfo(file).absolutePath()) == false)
+		HyGuiLog("SourceModel::GenerateSrcFile - QDir::mkpath failed", LOGTYPE_Error);
+
 	if(!file.open(QFile::WriteOnly | QFile::Text))
 	{
 		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
@@ -217,19 +250,19 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 		// If nothing exists, generate a brand new project
 		if(sImportList.empty())
 		{
-			sImportList << GenerateSrcFile(TEMPLATE_Main, QModelIndex(), m_ProjectRef.GetName(), "main");
+			sImportList << GenerateSrcFile(TEMPLATE_Main, QModelIndex(), m_ProjectRef.GetName(), "main", QString(), false);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
 
-			sImportList << GenerateSrcFile(TEMPLATE_Pch, QModelIndex(), m_ProjectRef.GetName(), "pch");
+			sImportList << GenerateSrcFile(TEMPLATE_Pch, QModelIndex(), m_ProjectRef.GetName(), "pch", QString(), false);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
 
-			sImportList << GenerateSrcFile(TEMPLATE_MainClassCpp, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName());
+			sImportList << GenerateSrcFile(TEMPLATE_MainClassCpp, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName(), QString(), false);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
 
-			sImportList << GenerateSrcFile(TEMPLATE_MainClassH, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName());
+			sImportList << GenerateSrcFile(TEMPLATE_MainClassH, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName(), QString(), false);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
 		}
@@ -273,13 +306,13 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 		QList<TreeModelItemData *> correspondingParentList;
 		QList<QUuid> correspondingUuidList;
 
-		TreeModelItemData *pParentLocation = data(indexDestination, Qt::UserRole).value<TreeModelItemData *>();
+		TreeModelItemData *pParentLocation = FindTreeItemFilter(data(indexDestination, Qt::UserRole).value<TreeModelItemData *>());
 
-		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName());
+		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass());
 		correspondingParentList << pParentLocation;
 		correspondingUuidList << QUuid::createUuid();
 
-		sImportList << GenerateSrcFile(TEMPLATE_ClassH, indexDestination, pDlg->GetCodeClassName(), pDlg->GetHeaderFileName());
+		sImportList << GenerateSrcFile(TEMPLATE_ClassH, indexDestination, pDlg->GetCodeClassName(), pDlg->GetHeaderFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass());
 		correspondingParentList << pParentLocation;
 		correspondingUuidList << QUuid::createUuid();
 		
@@ -355,7 +388,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		SourceFile *pFile = static_cast<SourceFile *>(assetList[i]);
-		QString sFileToDelete = m_MetaDir.filePath(pFile->GetFilter() % pFile->GetName());
+		QString sFileToDelete = m_MetaDir.filePath(pFile->GetFilter() % "/" % pFile->GetName());
 		
 		if(QFile::remove(sFileToDelete) == false)
 		{
@@ -363,7 +396,8 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 			continue;
 		}
 
-		DeleteAsset(pFile);
+		//DeleteAsset(pFile);
+		//delete pFile;
 	}
 
 	return true;
@@ -549,7 +583,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	file.setFileName(m_MetaDir.absoluteFilePath("CMakeLists.txt"));
 	if(!file.open(QFile::WriteOnly | QFile::Text))
 	{
-		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
+		HyGuiLog("OnSaveMeta Error writing to " % file.fileName() % " when generating CMakeLists.txt: " % file.errorString(), LOGTYPE_Error);
 		return;
 	}
 	file.write(sContents.toUtf8());

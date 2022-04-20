@@ -114,8 +114,9 @@ void DlgNewProject::on_buttonBox_accepted()
 	//buildDir.mkdir(ui->wgtBuildDir->GetRelPath());
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
-	// Generate HyProj file. Insert the minimum required fields for it. 
+	// Generate HyProj file. Insert the minimum required fields for it.
 	// The project's DlgProjectSettings will fill in the rest of the defaults
+	HarmonyInit hyInit; // Use default values of struct;
 	QJsonObject jsonObj;
 	jsonObj.insert("$fileVersion", HYGUI_FILE_VERSION);
 	jsonObj.insert("Title", ui->txtTitleName->text());
@@ -127,22 +128,22 @@ void DlgNewProject::on_buttonBox_accepted()
 	QJsonArray windowInfoArray;
 	QJsonObject windowInfoObj;
 	windowInfoObj.insert("Name", ui->txtTitleName->text());
-	windowInfoObj.insert("Type", HYWINDOW_WindowedFixed);
-	windowInfoObj.insert("ResolutionX", 1280);
-	windowInfoObj.insert("ResolutionY", 720);
-	windowInfoObj.insert("LocationX", 100);
-	windowInfoObj.insert("LocationY", 100);
+	windowInfoObj.insert("Type", hyInit.windowInfo[0].eMode);
+	windowInfoObj.insert("ResolutionX", hyInit.windowInfo[0].vSize.x);
+	windowInfoObj.insert("ResolutionY", hyInit.windowInfo[0].vSize.y);
+	windowInfoObj.insert("LocationX", hyInit.windowInfo[0].ptLocation.x);
+	windowInfoObj.insert("LocationY", hyInit.windowInfo[0].ptLocation.y);
 	windowInfoArray.append(windowInfoObj);
 	jsonObj.insert("WindowInfo", windowInfoArray);
 
 	jsonObj.insert("UseConsole", true);
 	QJsonObject consoleInfoObj;
-	consoleInfoObj.insert("LocationX", 0);
-	consoleInfoObj.insert("LocationY", 0);
+	consoleInfoObj.insert("LocationX", hyInit.consoleInfo.ptLocation.x);
+	consoleInfoObj.insert("LocationY", hyInit.consoleInfo.ptLocation.y);
 	consoleInfoObj.insert("Name", "Harmony Log Console");
-	consoleInfoObj.insert("ResolutionX", 0);
-	consoleInfoObj.insert("ResolutionY", 0);
-	consoleInfoObj.insert("Type", 3);
+	consoleInfoObj.insert("ResolutionX", hyInit.consoleInfo.vSize.x);
+	consoleInfoObj.insert("ResolutionY", hyInit.consoleInfo.vSize.y);
+	consoleInfoObj.insert("Type", hyInit.consoleInfo.eMode);
 	jsonObj.insert("ConsoleInfo", consoleInfoObj);
 
 	QFile newProjectFile(GetProjFilePath());
@@ -171,61 +172,6 @@ void DlgNewProject::on_buttonBox_accepted()
 		for(int i = 0; i < fileInfoList.size(); ++i)
 			QFile::copy(fileInfoList[i].absoluteFilePath(), QDir(GetProjDirPath()).absoluteFilePath(fileInfoList[i].fileName()));
 	}
-
-	//// src files
-	//QDir projGenSrcDir(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "src");
-	//fileInfoList = projGenSrcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//for(int i = 0; i < fileInfoList.size(); ++i)
-	//	QFile::copy(fileInfoList[i].absoluteFilePath(), srcDir.absoluteFilePath(fileInfoList[i].fileName()));
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	//// Rename the copied source files if needed
-	//fileInfoList = QDir(GetProjDirPath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//fileInfoList += srcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//for(int i = 0; i < fileInfoList.size(); ++i)
-	//{
-	//	if(fileInfoList[i].fileName().contains("%HY_CLASS%"))
-	//	{
-	//		QFile file(fileInfoList[i].absoluteFilePath());
-	//		QString sNewFileName = fileInfoList[i].fileName().replace("%HY_CLASS%", ui->txtCodeName->text());
-	//		file.rename(fileInfoList[i].absoluteDir().absolutePath() % "/Game/" % sNewFileName);
-	//		file.close();
-	//	}
-	//}
-	//// Then replace the variable contents of the copied source files
-	//fileInfoList = QDir(GetProjDirPath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//fileInfoList += srcDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//fileInfoList += QDir(srcDir.absoluteFilePath("Game")).entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-	//QTextCodec *pCodec = QTextCodec::codecForLocale();
-	//for(int i = 0; i < fileInfoList.size(); ++i)
-	//{
-	//	QFile file(fileInfoList[i].absoluteFilePath());
-	//	if(!file.open(QFile::ReadOnly))
-	//	{
-	//		HyGuiLog("Error reading " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
-	//		return;
-	//	}
-
-	//	QString sContents = pCodec->toUnicode(file.readAll());
-	//	file.close();
-
-	//	sContents.replace("%HY_TITLE%", ui->txtTitleName->text());
-	//	sContents.replace("%HY_CLASS%", ui->txtCodeName->text());
-	//	sContents.replace("%HY_PROJDIR%", GetProjDirPath());
-	//	sContents.replace("%HY_RELSRCDIR%", QDir(GetProjDirPath()).relativeFilePath(srcDir.absolutePath()));
-	//	sContents.replace("%HY_RELHARMONYDIR%", QDir(GetProjDirPath()).relativeFilePath(MainWindow::EngineSrcLocation()));
-	//	sContents.replace("%HY_RELDATADIR%", ui->wgtDataDir->GetRelPath());
-	//	sContents.replace("%HY_DEPENDENCIES_ADD%", GetDependAdd());
-	//	sContents.replace("%HY_DEPENDENCIES_LINK%", GetDependLink());
-
-	//	if(!file.open(QFile::WriteOnly))
-	//	{
-	//		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
-	//		return;
-	//	}
-	//	file.write(pCodec->fromUnicode(sContents));
-	//	file.close();
-	//}
 }
 
 void DlgNewProject::on_btnBrowse_clicked()
@@ -274,7 +220,7 @@ void DlgNewProject::UpdateProjectDir()
 {
 	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath());
 	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath());
-	ui->wgtSourceDir->Setup("Source Code", "src", GetProjDirPath(), "meta");
+	ui->wgtSourceDir->Setup("Source Code", "Source", GetProjDirPath(), "meta");
 	ui->wgtBuildDir->Setup("Build", "build", GetProjDirPath());
 }
 

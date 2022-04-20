@@ -277,7 +277,7 @@ if(Qt5_DIR)
 	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl ogg vorbis Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets Qt5::Multimedia)
 
 	set_target_properties(HyEditor PROPERTIES
-		CXX_STANDARD 11
+		CXX_STANDARD 17
 		CXX_STANDARD_REQUIRED YES
 		CXX_EXTENSIONS NO)
 

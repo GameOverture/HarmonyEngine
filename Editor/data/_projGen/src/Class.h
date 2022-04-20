@@ -3,13 +3,13 @@
 
 #include "pch.h"
 
-class %HY_CLASS% : public HyEntity2d
+class %HY_CLASS%%HY_BASECLASSDECL%
 {
 public:
-	%HY_CLASS%(HyEntity2d *pParent);
+	%HY_CLASS%(%HY_CLASSCTORSIG%);
 	virtual ~%HY_CLASS%();
 
-	virtual void OnUpdate() override;
+	%HY_CLASSFUNCS%
 };
 
 #endif // %HY_CLASS%_h__

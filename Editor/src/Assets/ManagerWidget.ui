@@ -270,7 +270,7 @@
     <string>Add Filter</string>
    </property>
    <property name="toolTip">
-    <string>Insert a new filter to organize imported assets</string>
+    <string>Insert a new filter to organize assets</string>
    </property>
   </action>
   <action name="actionRename">

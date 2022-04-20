@@ -53,6 +53,11 @@ QString SourceGenFileDlg::GetBaseClassName() const
 	return ui->txtBaseClass->text();
 }
 
+bool SourceGenFileDlg::IsEntityBaseClass() const
+{
+	return ui->chkHyEntityBaseClass->isChecked();
+}
+
 void SourceGenFileDlg::on_txtClassName_textChanged(const QString &arg1)
 {
 	QString sFixedForClass = arg1;
@@ -80,6 +85,11 @@ void SourceGenFileDlg::on_txtCppFile_textChanged(const QString &arg1)
 
 void SourceGenFileDlg::on_txtBaseClass_textChanged(const QString &arg1)
 {
+	if(ui->txtBaseClass->text().isEmpty())
+		ui->chkHyEntityBaseClass->setEnabled(false);
+	else
+		ui->chkHyEntityBaseClass->setEnabled(true);
+
 	ErrorCheck();
 }
 

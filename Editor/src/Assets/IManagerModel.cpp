@@ -202,9 +202,23 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 	// No dependencies found, resume with deleting
 	if(assetsList.size() > 0)
 	{
-		if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete " % QString::number(assetsList.size()) % " asset(s)?", QMessageBox::Yes, QMessageBox::No))
+		QString sItemDesc;
+		if(assetsList.size() > 1)
+		{
+			if(m_eASSET_TYPE == ASSET_Source)
+				sItemDesc = QString::number(assetsList.size()) % " files";
+			else
+				sItemDesc = QString::number(assetsList.size()) % " assets";
+		}
+		else
+			sItemDesc = assetsList[0]->GetName();
+
+		if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", "Do you want to delete " % sItemDesc % "?", QMessageBox::Yes, QMessageBox::No))
 			return;
 	}
+
+	// This is above the actual removal of the TreeModelItems so assets can still determine their filter path upon deletion
+	OnRemoveAssets(assetsList);
 
 	for(int i = 0; i < assetsList.size(); ++i)
 	{
@@ -219,7 +233,6 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 			HyGuiLog("IManagerModel::removeRow returned false on: " % filtersList[i]->GetText(), LOGTYPE_Error);
 	}
 
-	OnRemoveAssets(assetsList);
 	SaveMeta();
 }
 

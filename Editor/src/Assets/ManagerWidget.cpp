@@ -206,6 +206,17 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	// Only Source Asset Manager is capable of generating new assets
 	if(m_pModel->GetAssetType() != ASSET_Source)
 		ui->btnGenerateAsset->hide();
+	else
+	{
+		// Change text and tool tips of Source Manager to make more sense
+		ui->actionGenerateAsset->setText("Add New File(s)");
+		ui->actionGenerateAsset->setToolTip("Add new files to this project. Such as a class, header, or source");
+		ui->actionImportAssets->setText("Add Existing File(s)");
+		ui->actionImportAssets->setToolTip("Add existing file(s) to this project");
+		ui->actionImportDirectory->setText("Add Existing Directory");
+		ui->actionImportDirectory->setToolTip("Add existing directory of source and header files to this project");
+		ui->actionAddFilter->setToolTip("Insert a new filter to organize files");
+	}
 
 	ui->cmbBanks->clear();
 	ui->cmbBanks->setModel(m_pModel->GetBanksModel());
@@ -412,6 +423,11 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	QModelIndex index = ui->assetTree->indexAt(pos);
 	if(index.isValid() == false || selectedAssetsList.empty())
 	{
+		if(m_pModel->GetAssetType() == ASSET_Source)
+		{
+			contextMenu.addAction(ui->actionGenerateAsset);
+			contextMenu.addSeparator();
+		}
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
 		contextMenu.addAction(ui->actionAddFilter);
@@ -420,6 +436,17 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 			contextMenu.addSeparator();
 			contextMenu.addAction(ui->actionRename);
 		}
+	}
+	else if(m_pModel->GetAssetType() == ASSET_Source)
+	{
+		contextMenu.addAction(ui->actionGenerateAsset);
+		contextMenu.addSeparator();
+		contextMenu.addAction(ui->actionImportAssets);
+		contextMenu.addAction(ui->actionImportDirectory);
+		contextMenu.addAction(ui->actionAddFilter);
+		contextMenu.addSeparator();
+		contextMenu.addAction(ui->actionDeleteAssets);
+		contextMenu.addAction(ui->actionRename);
 	}
 	else
 	{

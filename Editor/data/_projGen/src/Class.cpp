@@ -1,8 +1,7 @@
 #include "pch.h"
 #include "%HY_CLASS%.h"
 
-%HY_CLASS%::%HY_CLASS%(HyEntity2d *pParent) :
-	HyEntity2d(pParent)
+%HY_CLASS%::%HY_CLASS%(%HY_CLASSCTORSIG%)%HY_CLASSMEMBERINITIALIZERLIST%
 {
 }
 
@@ -10,6 +9,4 @@
 {
 }
 
-/*virtual*/ void %HY_CLASS%::OnUpdate() /*override*/
-{
-}
+%HY_CLASSFUNCS%

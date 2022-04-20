@@ -33,6 +33,7 @@ public:
 	QString GetHeaderFileName() const;
 	QString GetCppFileName() const;
 	QString GetBaseClassName() const;
+	bool IsEntityBaseClass() const;
 
 private Q_SLOTS:
 	void on_txtClassName_textChanged(const QString &arg1);

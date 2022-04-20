@@ -31,7 +31,7 @@ HarmonyInit::HarmonyInit()
 		windowInfo[i].vSize.x = 1280;
 		windowInfo[i].vSize.y = 756;
 		windowInfo[i].ptLocation.x = i * windowInfo[i].vSize.x;
-		windowInfo[i].ptLocation.y = 0;
+		windowInfo[i].ptLocation.y = 80;
 	}
 
 	bUseConsole = false;

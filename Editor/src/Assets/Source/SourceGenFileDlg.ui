@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>431</width>
+    <width>546</width>
     <height>198</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Add New Class</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -28,31 +28,10 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="4">
-      <widget class="QLabel" name="lblCppFile">
+     <item row="3" column="0">
+      <widget class="QLineEdit" name="txtBaseClass">
        <property name="text">
-        <string>.cpp File:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="lblHFile">
-       <property name="text">
-        <string>.h File:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="lblClassName">
-       <property name="text">
-        <string>Class Name:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLineEdit" name="txtClassName">
-       <property name="text">
-        <string/>
+        <string>HyEntity2d</string>
        </property>
       </widget>
      </item>
@@ -63,10 +42,17 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="4">
-      <widget class="QLineEdit" name="txtCppFile">
+     <item row="1" column="0">
+      <widget class="QLineEdit" name="txtClassName">
        <property name="text">
         <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="lblCppFile">
+       <property name="text">
+        <string>.cpp File:</string>
        </property>
       </widget>
      </item>
@@ -77,10 +63,34 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLineEdit" name="txtBaseClass">
+     <item row="1" column="4">
+      <widget class="QLineEdit" name="txtCppFile">
        <property name="text">
-        <string>HyEntity2d</string>
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="lblClassName">
+       <property name="text">
+        <string>Class Name:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="lblHFile">
+       <property name="text">
+        <string>.h File:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QCheckBox" name="chkHyEntityBaseClass">
+       <property name="text">
+        <string>Is apart of HyEntity Hierarchy</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -118,6 +128,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txtClassName</tabstop>
+  <tabstop>txtHFile</tabstop>
+  <tabstop>txtCppFile</tabstop>
+  <tabstop>txtBaseClass</tabstop>
+  <tabstop>chkHyEntityBaseClass</tabstop>
+ </tabstops>
  <resources>
   <include location="../../../data/HyEditor.qrc"/>
  </resources>
