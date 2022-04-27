@@ -19,6 +19,13 @@ HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	Setup(HyPanelInit(), "", "");
 }
 
+HyLabel::HyLabel(const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+	IHyWidget(pParent),
+	m_Panel(this)
+{
+	Setup(initRef, "", "", 0, 0, 0, 0);
+}
+
 HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_Panel(this)

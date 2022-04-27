@@ -17,6 +17,13 @@ HyRackMeter::HyRackMeter(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+HyRackMeter::HyRackMeter(const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(initRef, pParent),
+	m_SpinText(this)
+{
+	OnSetup();
+}
+
 HyRackMeter::HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, sTextPrefix, sTextName, pParent),
 	m_SpinText(this)

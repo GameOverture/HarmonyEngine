@@ -18,6 +18,14 @@ HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+HyButton::HyButton(const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(initRef, pParent),
+	m_fpBtnClickedCallback(nullptr),
+	m_pBtnClickedParam(nullptr)
+{
+	OnSetup();
+}
+
 HyButton::HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, sTextPrefix, sTextName, pParent),
 	m_fpBtnClickedCallback(nullptr),

@@ -33,6 +33,7 @@ protected:
 
 public:
 	HyCheckBox(HyEntity2d *pParent = nullptr);
+	HyCheckBox(const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	HyCheckBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
 	HyCheckBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
 	virtual ~HyCheckBox();

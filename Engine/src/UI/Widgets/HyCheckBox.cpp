@@ -18,6 +18,14 @@ HyCheckBox::HyCheckBox(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+HyCheckBox::HyCheckBox(const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+	HyButton(initRef, pParent),
+	m_CheckMarkStroke(this),
+	m_CheckMarkFill(this)
+{
+	OnSetup();
+}
+
 HyCheckBox::HyCheckBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(initRef, sTextPrefix, sTextName, pParent),
 	m_CheckMarkStroke(this),

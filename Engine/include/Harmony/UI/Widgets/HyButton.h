@@ -48,6 +48,7 @@ protected:
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
+	HyButton(const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
 	HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyButton();
