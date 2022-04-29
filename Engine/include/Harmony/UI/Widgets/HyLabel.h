@@ -73,8 +73,9 @@ public:
 	float GetTextWidth(float fPercent = 1.0f);
 	float GetTextHeight(float fPercent = 1.0f);
 
-protected:
 	virtual glm::vec2 GetPosOffset() override;
+
+protected:
 	virtual void OnSetSizeHint() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 

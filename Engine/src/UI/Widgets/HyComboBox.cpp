@@ -55,6 +55,7 @@ uint32 HyComboBox::InsertSubButton(const HyPanelInit &initRef, std::string sText
 	HyButton *pNewBtn = HY_NEW HyButton(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, this);
 	pNewBtn->SetButtonClickedCallback(fpCallBack, pParam, sAudioPrefix, sAudioName);
 	pNewBtn->SetAsEnabled(false);
+	pNewBtn->pos.Set(pNewBtn->GetPosOffset());
 	pNewBtn->alpha.Set(0.0f);
 	pNewBtn->Load();
 
@@ -126,14 +127,15 @@ void HyComboBox::ToggleExpanded()
 		for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
 		{
 			HyButton *pSubBtn = m_SubBtnList[i];
+			glm::vec2 vOffset = pSubBtn->GetPosOffset();
 			if(m_uiAttribs & COMBOBOXATTRIB_IsInstantExpand)
 			{
-				pSubBtn->pos.Set(ptTweenDest[0], ptTweenDest[1]);
+				pSubBtn->pos.Set(ptTweenDest[0] + vOffset.x, ptTweenDest[1] + vOffset.y);
 				pSubBtn->alpha.Set(1.0f);
 			}
 			else
 			{
-				pSubBtn->pos.Tween(ptTweenDest[0], ptTweenDest[1], 0.5f, HyTween::QuadOut);
+				pSubBtn->pos.Tween(ptTweenDest[0] + vOffset.x, ptTweenDest[1] + vOffset.y, 0.5f, HyTween::QuadOut);
 				pSubBtn->alpha.Tween(1.0f, fTweenExpandDur * 0.5f);
 			}
 
@@ -149,8 +151,9 @@ void HyComboBox::ToggleExpanded()
 		for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
 		{
 			HyButton *pSubBtn = m_SubBtnList[i];
-			
-			pSubBtn->pos.Tween(0.0f, 0.0f, fTweenExpandDur * 0.5f, HyTween::Linear);
+
+			glm::vec2 vOffset = pSubBtn->GetPosOffset();
+			pSubBtn->pos.Tween(vOffset.x, vOffset.y, fTweenExpandDur * 0.5f, HyTween::Linear);
 			pSubBtn->alpha.Tween(0.0f, fTweenExpandDur * 0.5f);
 			pSubBtn->SetAsEnabled(false);
 		}
