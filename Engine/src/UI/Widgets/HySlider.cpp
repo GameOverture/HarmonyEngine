@@ -176,8 +176,17 @@ void HySlider::SetRange(const std::vector<int32> &stepList)
 	if(stepList.empty())
 		return;
 
-	m_StepList = stepList;
 	m_uiAttribs |= SLIDERATTRIB_UseStepList;
+	m_StepList = stepList;
+	std::sort(m_StepList.begin(), m_StepList.end());
+
+	// Set m_iMin and m_iMax to values found in m_StepList
+	m_iMin = m_iMax = m_StepList[0];
+	for(uint32 i = 1; i < static_cast<uint32>(m_StepList.size()); ++i)
+	{
+		m_iMin = HyMin(m_iMin, m_StepList[i]);
+		m_iMax = HyMax(m_iMax, m_StepList[i]);
+	}
 	
 	FixValues();
 }
@@ -340,11 +349,17 @@ void HySlider::Assemble()
 
 void HySlider::FixValues()
 {
+	HyOrientation eOrientation = GetOrientation();
+
 	if(m_uiAttribs & SLIDERATTRIB_UseStepList)
 	{
 		auto iter = std::find(m_StepList.begin(), m_StepList.end(), m_iValue);
 		if(iter == m_StepList.end())
 		{
+			// TODO: Instead of testing against 'm_iValue', use the extrapolated value determined where the
+			//       user is clicking on the slider bar. This fixes the value jumping back/forth when
+			//       dragging the slider
+
 			// Find closest value within m_StepList
 			uint32 uiDiff = std::numeric_limits<uint32>::max();
 			for(uint32 i = 0; i < m_StepList.size(); ++i)
@@ -360,22 +375,19 @@ void HySlider::FixValues()
 	else
 		m_iValue = HyClamp(m_iValue, m_iMin, m_iMax);
 
-	uint32 uiNumTicks = GetNumTicks();
-	HyOrientation eOrientation = GetOrientation();
-
-	float fPos = (m_fLength / uiNumTicks) * ((m_iValue - m_iMin) / m_uiStep);
-	m_Slider.pos.GetAnimFloat(eOrientation) = fPos - (m_Slider.size.GetAnimFloat(eOrientation).Get() * 0.5f);
+	float fLocalSliderPos = m_fLength * (static_cast<float>(m_iValue - m_iMin) / static_cast<float>(m_iMax - m_iMin));
+	m_Slider.pos.GetAnimFloat(eOrientation) = fLocalSliderPos - (m_Slider.size.GetAnimFloat(eOrientation).Get() * 0.5f);
 
 	auto ptCenter = m_Slider.GetSceneAABB().GetCenter();
 	HySetVec(m_ptSliderCenter, ptCenter.x, ptCenter.y);
 
-	m_BarStroke.m_BarPos.scale.GetAnimFloat(eOrientation) = fPos;
-	m_BarStroke.m_BarNeg.pos.GetAnimFloat(eOrientation) = fPos;
-	m_BarStroke.m_BarNeg.scale.GetAnimFloat(eOrientation) = m_fLength - fPos;
+	m_BarStroke.m_BarPos.scale.GetAnimFloat(eOrientation) = fLocalSliderPos;
+	m_BarStroke.m_BarNeg.pos.GetAnimFloat(eOrientation) = fLocalSliderPos;
+	m_BarStroke.m_BarNeg.scale.GetAnimFloat(eOrientation) = m_fLength - fLocalSliderPos;
 
-	m_BarFill.m_BarPos.scale.GetAnimFloat(eOrientation) = fPos;
-	m_BarFill.m_BarNeg.pos.GetAnimFloat(eOrientation) = fPos;
-	m_BarFill.m_BarNeg.scale.GetAnimFloat(eOrientation) = m_fLength - fPos;
+	m_BarFill.m_BarPos.scale.GetAnimFloat(eOrientation) = fLocalSliderPos;
+	m_BarFill.m_BarNeg.pos.GetAnimFloat(eOrientation) = fLocalSliderPos;
+	m_BarFill.m_BarNeg.scale.GetAnimFloat(eOrientation) = m_fLength - fLocalSliderPos;
 
 	SetSizeAndLayoutDirty();
 }
