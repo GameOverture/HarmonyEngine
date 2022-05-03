@@ -217,9 +217,6 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 			return;
 	}
 
-	// This is above the actual removal of the TreeModelItems so assets can still determine their filter path upon deletion
-	OnRemoveAssets(assetsList);
-
 	for(int i = 0; i < assetsList.size(); ++i)
 	{
 		QModelIndex index = FindIndex<AssetItemData *>(assetsList[i], 0);
@@ -232,6 +229,9 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 		if(removeRow(index.row(), index.parent()) == false)
 			HyGuiLog("IManagerModel::removeRow returned false on: " % filtersList[i]->GetText(), LOGTYPE_Error);
 	}
+
+	// This must be called after the removal of the TreeModelItems or it'll crash within GetItemsRecursively()
+	OnRemoveAssets(assetsList);
 
 	SaveMeta();
 }

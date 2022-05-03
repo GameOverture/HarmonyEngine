@@ -207,6 +207,16 @@ uint32 HyLabel::GetTextState() const
 	ResetTextAndPanel();
 }
 
+std::string HyLabel::GetTextPrefix() const
+{
+	return m_Text.GetPrefix();
+}
+
+std::string HyLabel::GetTextName() const
+{
+	return m_Text.GetName();
+}
+
 /*virtual*/ void HyLabel::SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor)
 {
 	m_Text.SetLayerColor(uiStateIndex, uiLayerIndex, topColor, botColor);

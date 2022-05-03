@@ -67,6 +67,8 @@ public:
 	virtual void SetText(const std::string &sUtf8Text);
 	uint32 GetTextState() const;
 	virtual void SetTextState(uint32 uiStateIndex);
+	std::string GetTextPrefix() const;
+	std::string GetTextName() const;
 	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
 	bool IsTextMonospacedDigits() const;
 	virtual void SetTextMonospacedDigits(bool bSet);
