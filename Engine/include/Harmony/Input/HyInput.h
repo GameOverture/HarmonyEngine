@@ -37,7 +37,7 @@ class HyInput
 	int32							m_iTextCursorIndex;
 	int32							m_iTextSelectLength;
 
-	bool							m_bTouchScreenHack;	// Some touch screens do not send a 'MOUSE DOWN' message on initial touch, until you "drag" the cursor at least 1px or release the touch
+	bool							m_bTouchScreen;	// Whether the user has a touch screen instead of a mouse
 
 	int32							m_JoystickList[HYNUM_JOYSTICK];
 	uint32							m_uiJoystickCount;
@@ -103,11 +103,10 @@ public:
 	void PlaybackStop();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-	// MISC
+	// Touch Screen
 
-	// Some touch screens do not send a 'MOUSE DOWN' message on initial touch, until you "drag" the cursor at least 1px or release the touch
-	// Enabling this hack will artificially send a 'MOUSE DOWN' message whenever the cursor position changes as touching/clicking is typically the only way to move the cursor
-	void EnableTouchScreenHack(bool bEnable);
+	void UsingTouchScreen(bool bEnable);
+	bool IsUsingTouchScreen() const;
 
 private:
 #ifdef HY_USE_GLFW

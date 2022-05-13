@@ -449,7 +449,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 			}
 			else
 			{
-				if(bLeftClickDown && (m_uiEntAttribs & ENT2DATTRIB_MouseInputDown) == 0)
+				if(HyEngine::Input().IsUsingTouchScreen() == false && bLeftClickDown && (m_uiEntAttribs & ENT2DATTRIB_MouseInputDown) == 0)
 					m_uiEntAttribs |= ENT2DATTRIB_MouseInputInvalid;
 			}
 		}
