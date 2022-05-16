@@ -9,10 +9,10 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
-#ifndef HY_PLATFORM_BROWSER
-	#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
-#else
+#ifdef HY_PLATFORM_BROWSER
 	#include "Renderer/OpenGL/HyOpenGLESShaderSrc.h"
+#else
+	#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 #endif
 #include "Window/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
@@ -138,7 +138,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 			//case GL_COMPRESSED_SIGNED_R11_EAC:					sCompressedTextureFormats += "";	break;
 			//case GL_COMPRESSED_RG11_EAC:						sCompressedTextureFormats += "";	break;
 			//case GL_COMPRESSED_SIGNED_RG11_EAC:					sCompressedTextureFormats += "";	break;
-#ifndef HY_PLATFORM_BROWSER // emscripten compiled these before when I used glew.h
+//#ifndef HY_PLATFORM_BROWSER // emscripten compiled these before when I used glew.h
 		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
 			sCompressedTextureFormats += "RGB_DXT1 ";
 			m_uiSupportedTextureFormats |= HYTEXTURE_RGB_DTX1;
@@ -155,7 +155,17 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 			sCompressedTextureFormats += "DXT5 ";
 			m_uiSupportedTextureFormats |= HYTEXTURE_DTX5;
 			break;
-#endif
+
+		case GL_COMPRESSED_RGBA_ASTC_6x6_KHR:
+			sCompressedTextureFormats += "ASTC_RGBA_6x6";
+			m_uiSupportedTextureFormats |= HYTEXTURE_DTX5;
+			break;
+
+		case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
+			sCompressedTextureFormats += "ASTC_SRGB8_6x6";
+			m_uiSupportedTextureFormats |= HYTEXTURE_DTX5;
+			break;
+//#endif
 		}
 	}
 	delete[] pFormatArray;
@@ -567,13 +577,25 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////
 }
 
-/*virtual*/ uint32 HyOpenGL::AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, uint32 hPBO, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) /*override*/
+/*virtual*/ uint32 HyOpenGL::AddTexture(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, uint32 hPBO) /*override*/
 {
+	
 	GLenum eInternalFormat = GL_RGBA;
-	switch(eDesiredFormat)
+	switch(infoRef.m_eFormat)
 	{
+	case HyTextureInfo::HYTEXTURE_Uncompressed:	// Param1: num channels						Param2: disk file type (PNG, ...)
+		if(infoRef.m_iParam1 == 4)
+			eInternalFormat = GL_RGBA;
+		else if(infoRef.m_iParam1 == 3)
+			eInternalFormat = GL_RGB;
+		break;
+
+	case HyTextureInfo::HYTEXTURE_DXT:			// Param1: num channels						Param2: DXT format (1,3,5)
+	case HyTextureInfo::HYTEXTURE_ASTC:			// Param1: Block Size index (4x4 -> 12x12)	Param2: Color Profile (LDR linear, LDR sRBG, HDR RGB, HDR RGBA)
+		break;
+
 	case HYTEXTURE_R8G8B8A8: {
-		eInternalFormat = GL_RGBA;
+		
 		break; }
 	case HYTEXTURE_R8G8B8: {
 		eInternalFormat = GL_RGB;
@@ -631,16 +653,19 @@ HyOpenGL::~HyOpenGL(void)
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, hPBO);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glBindBuffer");
 	}
+
+	int32 iNumMipLevels = 0;
+	if(infoRef.IsMipMaps())
+		iNumMipLevels = static_cast<int32>(std::floor(std::log2(std::max(uiWidth, uiHeight)))) + 1;
 	
 	if(bIsPixelDataCompressed == false)
 	{ 
-		glTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
-		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, uiWidth, uiHeight, eFormat, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, iNumMipLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
 	}
 	else
 	{
-		glCompressedTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
+		glCompressedTexImage2D(GL_TEXTURE_2D, iNumMipLevels, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
 	}
 

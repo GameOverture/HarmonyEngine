@@ -12,6 +12,90 @@
 #include "Afx/HyStdAfx.h"
 #include "Utilities/HyIO.h"
 
+HyTextureInfo::HyTextureInfo() :
+	m_uiFiltering(HYTEXFILTER_Unknown),
+	m_uiFormat(HYTEXFILTER_Unknown),
+	m_uiFormatParam1(0),
+	m_uiFormatParam2(0)
+{ }
+
+HyTextureInfo::HyTextureInfo(HyTextureFiltering eFiltering, HyTextureFormat eFormat, uint8 uiFormatParam1, uint8 uiFormatParam2) :
+	m_uiFiltering(eFiltering),
+	m_uiFormat(eFormat),
+	m_uiFormatParam1(uiFormatParam1),
+	m_uiFormatParam2(uiFormatParam2)
+{ }
+
+HyTextureInfo::HyTextureInfo(uint32 uiBucketId) :
+	m_uiFiltering(uiBucketId & 0xFF),
+	m_uiFormat((uiBucketId & 0xFF00) >> 8),
+	m_uiFormatParam1((uiBucketId & 0xFF0000) >> 16),
+	m_uiFormatParam2((uiBucketId & 0xFF000000) >> 24)
+{ }
+
+bool HyTextureInfo::operator==(const HyTextureInfo &rhs) const
+{
+	return GetBucketId() == rhs.GetBucketId();
+}
+
+bool HyTextureInfo::operator!=(const HyTextureInfo &rhs) const
+{
+	return GetBucketId() != rhs.GetBucketId();
+}
+
+HyTextureFormat HyTextureInfo::GetFormat() const
+{
+	return static_cast<HyTextureFormat>(m_uiFormat);
+}
+
+HyTextureFiltering HyTextureInfo::GetFiltering() const
+{
+	return static_cast<HyTextureFiltering>(m_uiFiltering);
+}
+
+bool HyTextureInfo::IsMipMaps() const
+{
+	switch(static_cast<HyTextureFiltering>(m_uiFiltering))
+	{
+	case HYTEXFILTER_NEAREST_MIPMAP:
+	case HYTEXFILTER_LINEAR_MIPMAP:
+	case HYTEXFILTER_BILINEAR_MIPMAP:
+	case HYTEXFILTER_TRILINEAR:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
+std::string HyTextureInfo::GetFileExt() const
+{
+	switch(m_uiFormat)
+	{
+	case HYTEXTURE_Uncompressed:
+		switch(m_uiFormatParam2)
+		{
+		case UNCOMPRESSEDFILE_PNG:
+			return ".png";
+		default:
+			return ".xxx";
+		}
+	case HYTEXTURE_DXT:
+		return ".dds";
+	case HYTEXTURE_ASTC:
+		return ".astc";
+
+	case HYTEXTURE_Unknown:
+	default:
+		return ".xxx";
+	}
+}
+
+uint32 HyTextureInfo::GetBucketId() const
+{
+	return m_uiFiltering | (m_uiFormat << 8) | (m_uiFormatParam1 << 16) | (m_uiFormatParam2 << 24);
+}
+
 HarmonyInit::HarmonyInit()
 {
 	sProjectDir = ".";

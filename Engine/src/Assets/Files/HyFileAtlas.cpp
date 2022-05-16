@@ -24,8 +24,7 @@ HyFileAtlas::HyFileAtlas(std::string sFileName,
 	m_uiINDEX_IN_GROUP(uiIndexInGroup),
 	m_uiWIDTH(textureObj["width"].GetUint()),
 	m_uiHEIGHT(textureObj["height"].GetUint()),
-	m_eTEXTURE_FORMAT(HyAssets::GetTextureFormatFromString(textureObj["format"].GetString())),
-	m_eTEXTURE_FILTERING(HyAssets::GetTextureFilteringFromString(textureObj["filtering"].GetString())),
+	m_TextureInfo(textureObj["textureInfo"].GetUint()),
 	m_hTextureHandle(0),
 	m_uiNUM_FRAMES(textureObj["assets"].GetArray().Size()),
 	m_pPixelData(nullptr),
@@ -158,7 +157,7 @@ void HyFileAtlas::DeletePixelData()
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, m_eTEXTURE_FILTERING, 0, m_uiWIDTH, m_uiHEIGHT, m_hGfxApiPbo, m_hGfxApiPbo != 0 ? nullptr : m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
+		m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, m_eTEXTURE_FILTERING, m_uiWIDTH, m_uiHEIGHT, m_hGfxApiPbo, m_hGfxApiPbo != 0 ? nullptr : m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
 		DeletePixelData();
 	}
 	else // GetLoadableState() == HYLOADSTATE_Discarded

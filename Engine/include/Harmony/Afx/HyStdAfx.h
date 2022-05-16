@@ -160,34 +160,6 @@ enum HyFileType
 	HYNUM_FILETYPES
 };
 
-enum HyTextureFormat
-{
-	HYTEXTURE_Unknown = -1,
-
-	HYTEXTURE_R8G8B8A8 = 0,	// Uncompressed with alpha (32-bpp)
-	HYTEXTURE_R8G8B8,		// Uncompressed no alpha (24-bpp)
-	HYTEXTURE_RGB_DTX1,
-	HYTEXTURE_RGBA_DTX1,
-	HYTEXTURE_DTX3,
-	HYTEXTURE_DTX5,
-
-	HYNUM_TEXTUREFORMATS
-};
-
-enum HyTextureFiltering
-{
-	HYTEXFILTER_Unknown = -1,
-
-	HYTEXFILTER_NEAREST = 0,
-	HYTEXFILTER_NEAREST_MIPMAP,
-	HYTEXFILTER_LINEAR_MIPMAP,
-	HYTEXFILTER_BILINEAR,
-	HYTEXFILTER_BILINEAR_MIPMAP,
-	HYTEXFILTER_TRILINEAR,
-
-	HYNUM_TEXTUREFILTERS
-};
-
 enum HyAudioFormat
 {
 	HYAUDFORMAT_WAV = 0,
@@ -301,6 +273,59 @@ enum HyDiagFlag
 	HYDIAG_Mouse			= 1 << 5,
 	
 	HYDIAG_ALL				= (HYDIAG_FRAMETIMES | HYDIAG_PROFILER | HYDIAG_Mouse)
+};
+
+enum HyTextureFiltering
+{
+	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
+	HYTEXFILTER_Unknown = 0,
+	HYTEXFILTER_NEAREST,
+	HYTEXFILTER_NEAREST_MIPMAP,
+	HYTEXFILTER_LINEAR_MIPMAP,
+	HYTEXFILTER_BILINEAR,
+	HYTEXFILTER_BILINEAR_MIPMAP,
+	HYTEXFILTER_TRILINEAR,
+
+	HYNUM_TEXTUREFILTERS
+};
+static_assert(HYNUM_TEXTUREFILTERS < 256, "HyTextureFiltering cannot exceed 255 values (including unknown). Needs to fit in uint8 (HyTextureInfo)");
+
+enum HyTextureFormat
+{
+	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
+	HYTEXTURE_Unknown = 0,
+	HYTEXTURE_Uncompressed,			// Param1: num channels						Param2: disk file type (PNG, ...)
+	HYTEXTURE_DXT,					// Param1: num channels						Param2: DXT format (1,3,5)
+	HYTEXTURE_ASTC,					// Param1: Block Size index (4x4 -> 12x12)	Param2: Color Profile (LDR linear, LDR sRBG, HDR RGB, HDR RGBA)
+
+	HYNUM_TEXTUREFORMATS
+};
+static_assert(HYNUM_TEXTUREFORMATS < 256, "HyTextureFormat cannot exceed 255 values (including unknown). Needs to fit in uint8 (HyTextureInfo)");
+
+struct HyTextureInfo
+{
+	enum UncompressedFileType
+	{
+		UNCOMPRESSEDFILE_PNG = 0
+	};
+	uint8				m_uiFiltering;
+	uint8				m_uiFormat;
+	uint8				m_uiFormatParam1;
+	uint8				m_uiFormatParam2;
+
+	HyTextureInfo();
+	HyTextureInfo(HyTextureFiltering eFiltering, HyTextureFormat eFormat, uint8 uiFormatParam1, uint8 uiFormatParam2);
+	HyTextureInfo(uint32 uiBucketId);
+
+	bool operator==(const HyTextureInfo &rhs) const;
+	bool operator!=(const HyTextureInfo &rhs) const;
+
+	HyTextureFormat GetFormat() const;
+	HyTextureFiltering GetFiltering() const;
+
+	bool IsMipMaps() const;
+	std::string GetFileExt() const; // Includes the dot (like ".png")
+	uint32 GetBucketId() const;
 };
 
 struct HyWindowInfo

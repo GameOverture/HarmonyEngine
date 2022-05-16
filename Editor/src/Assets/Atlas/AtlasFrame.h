@@ -26,9 +26,7 @@ class AtlasFrame : public AssetItemData
 	int									m_iHeight;
 	QRect								m_rAlphaCrop;
 
-	HyTextureFormat						m_eFormat;
-	HyTextureFiltering					m_eFiltering;
-
+	HyTextureInfo						m_TexInfo;
 	int									m_iTextureIndex;
 
 	int									m_iPosX;
@@ -42,8 +40,7 @@ public:
 			   quint32 uiBankId,
 			   QString sName,
 			   QRect rAlphaCrop,
-			   HyTextureFormat eFormat,
-			   HyTextureFiltering eFiltering,
+			   HyTextureInfo texInfo,
 			   int iW, int iH, int iX, int iY,
 			   int iTextureIndex,
 			   uint uiErrors);
@@ -54,6 +51,7 @@ public:
 	
 	HyTextureFormat GetFormat() const;
 	void SetFormat(HyTextureFormat eFormat);
+
 	HyTextureFiltering GetFiltering() const;
 	void SetFiltering(HyTextureFiltering eFiltering);
 

@@ -278,8 +278,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
 										   rAlphaCrop,
-										   HyAssets::GetTextureFormatFromString(metaObj["textureFormat"].toString().toStdString()),
-										   HyAssets::GetTextureFilteringFromString(metaObj["textureFiltering"].toString().toStdString()),
+										   HyTextureInfo(JSONOBJ_TOINT(metaObj, "textureInfo")),
 										   metaObj["width"].toInt(),
 										   metaObj["height"].toInt(),
 										   metaObj["x"].toInt(),
@@ -516,8 +515,10 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 			QJsonObject textureObj;
 			textureObj.insert("width", m_BanksModel.GetBank(i)->m_MetaObj["maxWidth"].toInt());
 			textureObj.insert("height", m_BanksModel.GetBank(i)->m_MetaObj["maxHeight"].toInt());
-			textureObj.insert("format", HyAssets::GetTextureFormatName(formatList[j]).c_str());
-			textureObj.insert("filtering", HyAssets::GetTextureFilteringName(filteringList[j]).c_str());
+
+			textureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(texInfo.GetBucketId())));
+			//textureObj.insert("format", HyAssets::GetTextureFormatName(formatList[j]).c_str());
+			//textureObj.insert("filtering", HyAssets::GetTextureFilteringName(filteringList[j]).c_str());
 			textureObj.insert("assets", assetArrayList[j]);
 
 			textureArray.append(textureObj);

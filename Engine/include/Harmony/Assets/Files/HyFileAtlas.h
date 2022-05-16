@@ -22,9 +22,8 @@ class HyFileAtlas : public IHyFile
 	const uint32							m_uiINDEX_IN_GROUP;
 	const uint32							m_uiWIDTH;
 	const uint32							m_uiHEIGHT;
-	const HyTextureFormat					m_eTEXTURE_FORMAT;
-	const HyTextureFiltering				m_eTEXTURE_FILTERING;
 
+	const HyTextureInfo						m_TextureInfo;
 	HyTextureHandle							m_hTextureHandle;
 
 	const uint32							m_uiNUM_FRAMES;

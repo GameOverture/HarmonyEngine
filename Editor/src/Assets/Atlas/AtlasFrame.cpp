@@ -19,8 +19,7 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 					   quint32 uiBankId,
 					   QString sName,
 					   QRect rAlphaCrop,
-					   HyTextureFormat eFormat,
-					   HyTextureFiltering eFiltering,
+					   HyTextureInfo texInfo,
 					   int iW,
 					   int iH,
 					   int iX,
@@ -31,11 +30,10 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 	m_iWidth(iW),
 	m_iHeight(iH),
 	m_rAlphaCrop(rAlphaCrop),
-	m_eFormat(eFormat),
-	m_eFiltering(eFiltering),
+	m_TexInfo(texInfo),
+	m_iTextureIndex(iTextureIndex),
 	m_iPosX(iX),
-	m_iPosY(iY),
-	m_iTextureIndex(iTextureIndex)
+	m_iPosY(iY)
 {
 }
 
@@ -55,22 +53,22 @@ QRect AtlasFrame::GetCrop() const
 
 HyTextureFormat AtlasFrame::GetFormat() const
 {
-	return m_eFormat;
+	return m_TexInfo.GetFormat();
 }
 
 void AtlasFrame::SetFormat(HyTextureFormat eFormat)
 {
-	m_eFormat = eFormat;
+	m_TexInfo.m_uiFormat = eFormat;
 }
 
 HyTextureFiltering AtlasFrame::GetFiltering() const
 {
-	return m_eFiltering;
+	return m_TexInfo.GetFiltering();
 }
 
 void AtlasFrame::SetFiltering(HyTextureFiltering eFiltering)
 {
-	m_eFiltering = eFiltering;
+	m_TexInfo.m_uiFiltering = eFiltering;
 }
 
 QPoint AtlasFrame::GetPosition() const
@@ -126,7 +124,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 
 /*virtual*/ QString AtlasFrame::GetPropertyInfo() /*override*/
 {
-	return QString(HyAssets::GetTextureFormatName(m_eFormat).c_str()) % " | " % QString(HyAssets::GetTextureFilteringName(m_eFiltering).c_str());
+	return QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(m_TexInfo.m_uiFormat)).c_str()) % " | " % QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(m_TexInfo.m_uiFiltering)).c_str());
 }
 
 /*virtual*/ void AtlasFrame::InsertUniqueJson(QJsonObject &frameObj) /*override*/
@@ -140,6 +138,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	frameObj.insert("cropTop", QJsonValue(GetCrop().top()));
 	frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
 	frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
-	frameObj.insert("textureFormat", HyAssets::GetTextureFormatName(m_eFormat).c_str());
-	frameObj.insert("textureFiltering", HyAssets::GetTextureFilteringName(m_eFiltering).c_str());
+	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TexInfo.GetBucketId())));
+	//frameObj.insert("textureFiltering", HyAssets::GetTextureFilteringName(m_TexInfo.m_uiFiltering).c_str());
+	//frameObj.insert("textureFormat", HyAssets::GetTextureFormatName(static_cast<m_TexInfo.m_uiFormat).c_str());
 }
