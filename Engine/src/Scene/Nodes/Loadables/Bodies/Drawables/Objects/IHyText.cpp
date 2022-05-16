@@ -352,8 +352,21 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
 	if(m_uiNumValidCharacters > 0)
 	{
-		const HyText2dGlyphInfo *pGlyph = pData->GetGlyph(this->m_uiState, 0, m_Utf32CodeList[m_uiNumValidCharacters - 1]);
-		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - 1, pData->GetNumLayers(this->m_uiState), 0);
+		uint32 uiLastCharOffset = 1;
+		uint32 uiUtf32Code = m_Utf32CodeList[m_uiNumValidCharacters - uiLastCharOffset];
+		while(uiUtf32Code == 10) // 10 == '\n' character
+		{
+			if(m_uiNumValidCharacters >= uiLastCharOffset)
+			{
+				uiLastCharOffset++;
+				uiUtf32Code = m_Utf32CodeList[m_uiNumValidCharacters - uiLastCharOffset];
+			}
+			else
+				return glm::vec2();
+		}
+		const HyText2dGlyphInfo *pGlyph = pData->GetGlyph(this->m_uiState, 0, uiUtf32Code);
+
+		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - uiLastCharOffset, pData->GetNumLayers(this->m_uiState), 0);
 
 		glm::vec2 ptCursorPos = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pGlyph->fADVANCE_X * m_fScaleBoxModifier, 0.0f);
 		ptCursorPos.y += (pGlyph->uiHEIGHT - pGlyph->iOFFSET_Y) * m_fScaleBoxModifier; // Find the baseline of this last glyph
