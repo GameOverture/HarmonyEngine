@@ -131,6 +131,7 @@ enum Theme
 #define HYGUIPATH_TempDir						"temp/"
 #define HYGUIPATH_EditorDataDir					"Editor/data/"
 #define HYGUIPATH_ProjGenDir					"Editor/data/_projGen/"
+#define HYGUIPATH_AstcEncDir					"Editor/external/astcenc/"
 
 #define HYGUIPATH_ItemsFileName					"Items"
 #define HYGUIPATH_MetaExt						".meta"

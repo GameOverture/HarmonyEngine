@@ -23,6 +23,35 @@ DlgAssetProperties::DlgAssetProperties(AssetType eManagerType, QList<AssetItemDa
 	ui->setupUi(this);
 	ui->stackedAssetType->setCurrentIndex(eManagerType);
 
+	// Assign values to each combobox entry
+	// Uncompressed
+	ui->cmbUncompressedColorChannels->setItemData(0, 3); // RGB
+	ui->cmbUncompressedColorChannels->setItemData(1, 4); // RGBA
+	ui->cmbUncompressedFileType->setItemData(0, HyTextureInfo::UNCOMPRESSEDFILE_PNG);
+	// DXT
+	ui->cmbDxtType->setItemData(0, 1); // DXT 1 (RGB)
+	ui->cmbDxtType->setItemData(1, 5); // DXT 5 (RGBA)
+	// ASTC
+	ui->cmbAstcColorProfile->setItemData(0, 0); // LDR Linear
+	ui->cmbAstcColorProfile->setItemData(1, 1); // LDR sRGBA
+	ui->cmbAstcColorProfile->setItemData(2, 2); // HDR RGB
+	ui->cmbAstcColorProfile->setItemData(3, 3); // HDR RGBA
+	ui->cmbAstcBlockSize->setItemData(0, 0); // 4x4
+	ui->cmbAstcBlockSize->setItemData(1, 1); // 5x4
+	ui->cmbAstcBlockSize->setItemData(2, 2); // 5x5
+	ui->cmbAstcBlockSize->setItemData(3, 3); // 6x5
+	ui->cmbAstcBlockSize->setItemData(4, 4); // 6x6
+	ui->cmbAstcBlockSize->setItemData(5, 5); // 8x5
+	ui->cmbAstcBlockSize->setItemData(6, 6); // 8x6
+	ui->cmbAstcBlockSize->setItemData(7, 7); // 10x5
+	ui->cmbAstcBlockSize->setItemData(8, 8); // 10x6
+	ui->cmbAstcBlockSize->setItemData(9, 9); // 8x8
+	ui->cmbAstcBlockSize->setItemData(10, 10); // 10x8
+	ui->cmbAstcBlockSize->setItemData(11, 11); // 10x10
+	ui->cmbAstcBlockSize->setItemData(12, 12); // 12x10
+	ui->cmbAstcBlockSize->setItemData(13, 13); // 12x12
+
+	// Set 'name' and 'num selected'
 	if(m_SelectedAssets.count() > 1)
 	{
 		QString	sGroupName = m_SelectedAssets[0]->GetName();
@@ -53,22 +82,48 @@ DlgAssetProperties::DlgAssetProperties(AssetType eManagerType, QList<AssetItemDa
 	switch(eManagerType)
 	{
 	case ASSET_Atlas: {
-		// Texture Type ///////////////////////////////////////////////////////////////////////////////////////////
-		HyTextureFormat eFormat = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetFormat();
+		// Texture Format ///////////////////////////////////////////////////////////////////////////////////////////
+		HyTextureInfo texInfo = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetTextureInfo();
+		bool bIsDiffOptions = false;
 		for(auto pAsset : m_SelectedAssets)
 		{
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-			if(pFrame->GetFormat() != eFormat)
+			if(pFrame->GetFormat() != texInfo.GetFormat())
 			{
 				ui->cmbTextureType->addItem("<different options>");
-				eFormat = HYTEXTURE_Unknown;
+				ui->cmbTextureType->setCurrentIndex(0);
+				bIsDiffOptions = true;
 				break;
 			}
 		}
 		for(int i = 0; i < HYNUM_TEXTUREFORMATS; ++i)
 			ui->cmbTextureType->addItem(QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(i)).c_str()));
 
-		ui->cmbTextureType->setCurrentIndex(eFormat == HYTEXTURE_Unknown ? 0 : eFormat);
+		if(bIsDiffOptions == false)
+		{
+			ui->cmbTextureType->setCurrentIndex(texInfo.GetFormat());
+
+			switch(texInfo.GetFormat())
+			{
+			case HYTEXTURE_Uncompressed:
+				ui->cmbUncompressedColorChannels->setCurrentIndex(ui->cmbUncompressedColorChannels->findData(QVariant(texInfo.m_uiFormatParam1)));
+				ui->cmbUncompressedFileType->setCurrentIndex(ui->cmbUncompressedFileType->findData(QVariant(texInfo.m_uiFormatParam2)));
+				break;
+
+			case HYTEXTURE_DXT:
+				if(texInfo.m_uiFormatParam2 == 1)
+					ui->cmbDxtType->setCurrentIndex(0);
+				else
+					ui->cmbDxtType->setCurrentIndex(1);
+				break;
+
+			case HYTEXTURE_ASTC:
+				ui->cmbAstcBlockSize->setCurrentIndex(ui->cmbAstcBlockSize->findData(QVariant(texInfo.m_uiFormatParam1)));
+				ui->cmbAstcColorProfile->setCurrentIndex(ui->cmbAstcColorProfile->findData(QVariant(texInfo.m_uiFormatParam2)));
+				break;
+			}
+			ui->grpFormatOptions->setVisible(true);
+		}
 
 		// Texture Filtering ///////////////////////////////////////////////////////////////////////////////////////////
 		HyTextureFiltering eFiltering = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetFiltering();
@@ -156,6 +211,11 @@ QList<AssetItemData *> DlgAssetProperties::GetChangedAssets()
 	return m_ChangedAssets;
 }
 
+void DlgAssetProperties::on_cmbTextureType_currentIndexChanged(int iIndex)
+{
+	Refresh();
+}
+
 void DlgAssetProperties::on_chkIsCompressed_clicked()
 {
 	Refresh();
@@ -196,12 +256,69 @@ void DlgAssetProperties::on_sbGlobalLimit_valueChanged(int iArg)
 	QDialog::done(r);
 }
 
+HyTextureFormat DlgAssetProperties::GetSelectedAtlasFormat(uint8 &uiParam1Out, uint8 &uiParam2Out) const
+{
+	bool bHasDiffOptions = ui->cmbTextureType->count() == (HYNUM_TEXTUREFORMATS + 1);
+	if(bHasDiffOptions && ui->cmbTextureType->currentIndex() == 0)
+	{
+		uiParam1Out = uiParam2Out = 0;
+		return HYTEXTURE_Unknown; // This means "<different options>" is selected
+	}
+
+	HyTextureFormat eFormat = static_cast<HyTextureFormat>(ui->cmbTextureType->currentIndex() - (bHasDiffOptions ? 1 : 0));
+	switch(eFormat)
+	{
+	case HYTEXTURE_Uncompressed:
+		uiParam1Out = static_cast<uint8>(ui->cmbUncompressedColorChannels->currentData().toUInt());
+		uiParam2Out = static_cast<uint8>(ui->cmbUncompressedFileType->currentData().toUInt());
+		break;
+
+	case HYTEXTURE_DXT:
+		if(ui->cmbDxtType->currentData().toUInt() == 1)
+		{
+			uiParam1Out = 3; // RGB
+			uiParam2Out = 1; // DXT 1
+		}
+		else
+		{
+			uiParam1Out = 4; // RGBA
+			uiParam2Out = 5; // DXT 5
+		}
+		break;
+
+	case HYTEXTURE_ASTC:
+		uiParam1Out = static_cast<uint8>(ui->cmbAstcBlockSize->currentData().toUInt());
+		uiParam2Out = static_cast<uint8>(ui->cmbAstcColorProfile->currentData().toUInt());
+		break;
+	}
+
+	return eFormat;
+}
+
+HyTextureFiltering DlgAssetProperties::GetSelectedAtlasFiltering() const
+{
+	bool bHasDiffOptions = ui->cmbTextureFiltering->count() == (HYNUM_TEXTUREFILTERS + 1);
+	if(bHasDiffOptions && ui->cmbTextureFiltering->currentIndex() == 0)
+		return HYTEXFILTER_Unknown; // This means "<different options>" is selected
+
+	return static_cast<HyTextureFiltering>(ui->cmbTextureFiltering->currentIndex() - (bHasDiffOptions ? 1 : 0));
+}
+
 void DlgAssetProperties::Refresh()
 {
 	switch(ui->stackedAssetType->currentIndex())
 	{
-	case ASSET_Atlas:
-		break;
+	case ASSET_Atlas: {
+		uint8 uiParam1 = 0, uiParam2 = 0;
+		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
+		if(eFormat == HYTEXTURE_Unknown)
+			ui->grpFormatOptions->setVisible(false);
+		else
+		{
+			ui->grpFormatOptions->setVisible(true);
+			ui->stackedFormatOptions->setCurrentIndex(eFormat);
+		}
+		break; }
 
 	case ASSET_Audio:
 		ui->sbVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
@@ -220,33 +337,21 @@ bool DlgAssetProperties::DetermineChangedAssets()
 	switch(ui->stackedAssetType->currentIndex())
 	{
 	case ASSET_Atlas: {
-		bool bHasDiffOptions = ui->cmbTextureType->count() == (HYNUM_TEXTUREFORMATS + 1);
-		bool bIsDiffOptions = bHasDiffOptions && ui->cmbTextureType->currentIndex() == 0;
-		if(bIsDiffOptions == false)
-		{
-			for(auto pAsset : m_SelectedAssets)
-			{
-				AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-				if(pFrame->GetFormat() != static_cast<HyTextureFormat>(ui->cmbTextureType->currentIndex() - (bHasDiffOptions ? 1 : 0)))
-				{
-					m_ChangedAssets.append(pAsset);
-					continue;
-				}
-			}
-		}
+		uint8 uiParam1 = 0, uiParam2 = 0;
+		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
+		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
 
-		bHasDiffOptions = ui->cmbTextureFiltering->count() == (HYNUM_TEXTUREFILTERS + 1);
-		bIsDiffOptions = bHasDiffOptions && ui->cmbTextureFiltering->currentIndex() == 0;
-		if(bIsDiffOptions == false)
+		for(auto pAsset : m_SelectedAssets)
 		{
-			for(auto pAsset : m_SelectedAssets)
+			HyTextureInfo assetTexInfo = static_cast<AtlasFrame *>(pAsset)->GetTextureInfo();
+
+			if(eFiltering != HYTEXFILTER_Unknown && eFiltering != assetTexInfo.GetFiltering())
+				m_ChangedAssets.append(pAsset);
+			else if(eFormat != HYTEXTURE_Unknown)
 			{
-				AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-				if(pFrame->GetFiltering() != static_cast<HyTextureFiltering>(ui->cmbTextureFiltering->currentIndex() - (bHasDiffOptions ? 1 : 0)))
-				{
+				HyTextureInfo selectedTexInfo(eFiltering, eFormat, uiParam1, uiParam2);
+				if(selectedTexInfo.GetBucketId() != assetTexInfo.GetBucketId())
 					m_ChangedAssets.append(pAsset);
-					continue;
-				}
 			}
 		}
 		break; }
@@ -296,28 +401,20 @@ void DlgAssetProperties::ApplyChanges()
 	switch(ui->stackedAssetType->currentIndex())
 	{
 	case ASSET_Atlas: {
-		bool bHasDiffOptions = ui->cmbTextureType->count() == (HYNUM_TEXTUREFORMATS + 1);
-		bool bIsDiffOptions = bHasDiffOptions && ui->cmbTextureType->currentIndex() == 0;
-		if(bIsDiffOptions == false)
-		{
-			HyTextureFormat eNewFormat = static_cast<HyTextureFormat>(ui->cmbTextureType->currentIndex() - (bHasDiffOptions ? 1 : 0));
-			for(auto pAsset : m_ChangedAssets)
-			{
-				AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-				pFrame->SetFormat(eNewFormat);
-			}
-		}
+		uint8 uiParam1 = 0, uiParam2 = 0;
+		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
+		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
 
-		bHasDiffOptions = ui->cmbTextureFiltering->count() == (HYNUM_TEXTUREFILTERS + 1);
-		bIsDiffOptions = bHasDiffOptions && ui->cmbTextureFiltering->currentIndex() == 0;
-		if(bIsDiffOptions == false)
+		for(auto pAsset : m_ChangedAssets)
 		{
-			HyTextureFiltering eNewFiltering = static_cast<HyTextureFiltering>(ui->cmbTextureFiltering->currentIndex() - (bHasDiffOptions ? 1 : 0));
-			for(auto pAsset : m_ChangedAssets)
-			{
-				AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-				pFrame->SetFiltering(eNewFiltering);
-			}
+			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+			HyTextureInfo assetTexInfo = pFrame->GetTextureInfo();
+
+			if(eFiltering != HYTEXFILTER_Unknown)
+				pFrame->SetFiltering(eFiltering);
+			
+			if(eFormat != HYTEXTURE_Unknown)
+				pFrame->SetFormat(eFormat, uiParam1, uiParam2);
 		}
 		break; }
 

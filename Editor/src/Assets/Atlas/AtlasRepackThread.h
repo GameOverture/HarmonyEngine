@@ -18,16 +18,16 @@ class AtlasRepackThread : public IRepackThread
 {
 	Q_OBJECT
 
-	BankData &			m_BankRef;
+	BankData &						m_BankRef;
 	
 	struct PackerBucket
 	{
-		ImagePacker			m_Packer;
+		ImagePacker					m_Packer;
 
-		QSet<int>			m_TextureIndexSet;
-		QList<AtlasFrame *> m_FramesList;
+		QSet<int>					m_TextureIndexSet;
+		QList<AtlasFrame *>			m_FramesList;
 	};
-	QMap<QPair<HyTextureFormat, HyTextureFiltering>, PackerBucket *> m_BucketMap;
+	QMap<uint32, PackerBucket *>	m_BucketMap;
 
 public:
 	AtlasRepackThread(BankData &bankRef, QList<AtlasFrame *> affectedFramesList, QDir metaDir);
@@ -36,7 +36,7 @@ public:
 	virtual void OnRun() override;
 
 private:
-	void ConstructAtlasTexture(ImagePacker &imagePackerRef, HyTextureFormat eFormat, int iPackerBinIndex, int iActualTextureIndex);
+	void ConstructAtlasTexture(ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex);
 	void SetPackerSettings(ImagePacker &imagePackerRef);
 };
 

@@ -56,9 +56,11 @@ HyTextureFormat AtlasFrame::GetFormat() const
 	return m_TexInfo.GetFormat();
 }
 
-void AtlasFrame::SetFormat(HyTextureFormat eFormat)
+void AtlasFrame::SetFormat(HyTextureFormat eFormat, uint8 uiFormatParam1, uint8 uiFormatParam2)
 {
 	m_TexInfo.m_uiFormat = eFormat;
+	m_TexInfo.m_uiFormatParam1 = uiFormatParam1;
+	m_TexInfo.m_uiFormatParam2 = uiFormatParam2;
 }
 
 HyTextureFiltering AtlasFrame::GetFiltering() const
@@ -69,6 +71,11 @@ HyTextureFiltering AtlasFrame::GetFiltering() const
 void AtlasFrame::SetFiltering(HyTextureFiltering eFiltering)
 {
 	m_TexInfo.m_uiFiltering = eFiltering;
+}
+
+HyTextureInfo AtlasFrame::GetTextureInfo() const
+{
+	return m_TexInfo;
 }
 
 QPoint AtlasFrame::GetPosition() const
@@ -139,6 +146,4 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
 	frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
 	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TexInfo.GetBucketId())));
-	//frameObj.insert("textureFiltering", HyAssets::GetTextureFilteringName(m_TexInfo.m_uiFiltering).c_str());
-	//frameObj.insert("textureFormat", HyAssets::GetTextureFormatName(static_cast<m_TexInfo.m_uiFormat).c_str());
 }

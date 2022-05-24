@@ -71,9 +71,9 @@ void ManagerProxyModel::FilterByBankIndex(int iBankIndex)
 	
 	if(pItemData)
 	{
-		// Don't display anything that starts with HyGuiInternalCharIndicator
-		if(pItemData->GetText().isEmpty() == false && pItemData->GetText()[0] == HyGuiInternalCharIndicator)
-			return false;
+		//// Don't display anything that starts with HyGuiInternalCharIndicator
+		//if(pItemData->GetText().isEmpty() == false && pItemData->GetText()[0] == HyGuiInternalCharIndicator)
+		//	return false;
 
 		QRegExp searchFilter = filterRegExp();
 
@@ -355,21 +355,30 @@ TreeModelItemData *ManagerWidget::GetSelected(QList<AssetItemData *> &selectedAs
 		if(selectedIndices[i].column() != 0)
 			continue;
 
-		itemList += m_pModel->GetItemsRecursively(selectedIndices[i]);;
+		itemList += m_pModel->GetItemsRecursively(selectedIndices[i]);
 	}
 
 	// Separate out items and filters to their own respective lists, while ignoring any duplicate items while preserving the order in 'itemList'
+	// Also only select assets that are in the currently selected bank
+	uint uiBankId = static_cast<IManagerModel *>(static_cast<ManagerProxyModel *>(ui->assetTree->model())->sourceModel())->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex());
+
 	QSet<TreeModelItemData *> seenItemSet;
 	for(int i = 0; i < itemList.size(); ++i)
 	{
 		if(seenItemSet.contains(itemList[i]))
 			continue;
+
 		seenItemSet.insert(itemList[i]);
 
 		if(itemList[i]->GetType() == ITEM_Filter)
 			selectedFiltersOut.append(itemList[i]);
 		else
+		{
+			if(ui->chkShowAllBanks->isChecked() == false && uiBankId != static_cast<AssetItemData *>(itemList[i])->GetBankId())
+				continue;
+
 			selectedAssetsOut.append(static_cast<AssetItemData *>(itemList[i]));
+		}
 	}
 
 	// The items within 'selectedAssetsOut' and 'selectedFiltersOut' are not sorted. Sort them alphabetically by name here

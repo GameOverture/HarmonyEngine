@@ -29,6 +29,9 @@ public:
 	static void ReadTextFile(const char *szFilePath, std::vector<char> &sContentsOut);
 	static void WriteTextFile(const char *szFilePath, const char *szContentBuffer);
 
+	static void ReadBinaryFile(const char *szFilePath, std::vector<uint8> &contentsOut);
+	//static uint8 *ReadBinaryFile(const char *szFilePath, uint32 &uiBufferSizeOut); // Returns a dynamically allocated buffer of file contents
+
 	static std::string UrlEncode(std::string sString);
 	static std::string UrlDecode(std::string sString);
 

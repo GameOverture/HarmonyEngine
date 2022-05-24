@@ -102,7 +102,11 @@ bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) co
 
 void HyFileAtlas::DeletePixelData()
 {
-	SOIL_free_image_data(m_pPixelData);// stbi_image_free(m_pPixelData);
+	if(m_TextureInfo.GetFormat() == HYTEXTURE_ASTC)
+		delete[] m_pPixelData;
+	else
+		SOIL_free_image_data(m_pPixelData);// stbi_image_free(m_pPixelData);
+
 	m_pPixelData = nullptr;
 	m_uiPixelDataSize = 0;
 }
@@ -131,14 +135,29 @@ void HyFileAtlas::DeletePixelData()
 		sAtlasFilePath += "/";
 		sAtlasFilePath += m_sFILE_NAME;
 
-		if(sAtlasFilePath[sAtlasFilePath.size() - 1] == 'g')
+		switch(m_TextureInfo.GetFormat())
 		{
+		case HYTEXTURE_Uncompressed: {
+			// Param1: num channels
+			// Param2: disk file type (PNG, ...)
 			int iWidth, iHeight, iNum8bitClrChannels; // out variables
-			m_pPixelData = SOIL_load_image(sAtlasFilePath.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);
+			m_pPixelData = SOIL_load_image(sAtlasFilePath.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, m_TextureInfo.m_uiFormatParam1);
 			m_uiPixelDataSize = iWidth * iHeight * 4;
-		}
-		else
+			break; }
+
+		case HYTEXTURE_DXT:
 			m_pPixelData = SOIL_load_DDS(sAtlasFilePath.c_str(), &m_uiPixelDataSize, 0);
+			break;
+
+		case HYTEXTURE_ASTC:
+			m_pPixelData = LoadAstc(sAtlasFilePath.c_str(), m_uiPixelDataSize);
+			break;
+
+		case HYTEXTURE_Unknown:
+		default:
+			HyError("HyFileAtlas::OnLoadThread() - Unknown texture type");
+			break;
+		}
 
 		// Use PBO/DMA transfer if available
 		if(m_pGfxApiPixelBuffer)
@@ -157,7 +176,7 @@ void HyFileAtlas::DeletePixelData()
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		m_hTextureHandle = rendererRef.AddTexture(m_eTEXTURE_FORMAT, m_eTEXTURE_FILTERING, m_uiWIDTH, m_uiHEIGHT, m_hGfxApiPbo, m_hGfxApiPbo != 0 ? nullptr : m_pPixelData, m_uiPixelDataSize, m_eTEXTURE_FORMAT);
+		m_hTextureHandle = rendererRef.AddTexture(m_TextureInfo, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_hGfxApiPbo);
 		DeletePixelData();
 	}
 	else // GetLoadableState() == HYLOADSTATE_Discarded
@@ -165,4 +184,49 @@ void HyFileAtlas::DeletePixelData()
 		rendererRef.DeleteTexture(m_hTextureHandle);
 	}
 	m_Mutex_PixelData.unlock();
+}
+
+uint8 *HyFileAtlas::LoadAstc(std::string sAtlasFilePath, uint32 &uiPixelDataSizeOut)
+{
+	std::vector<uint8> astcData;
+	HyIO::ReadBinaryFile(sAtlasFilePath.c_str(), astcData);
+	if(astcData.empty())
+	{
+		HyLogError("HyFileAtlas::LoadAstc() failed to read binary file: " << sAtlasFilePath);
+		return nullptr;
+	}
+
+	// ASTC header declaration.
+	struct AstcHeader
+	{
+		unsigned char  magic[4];
+		unsigned char  blockdim_x;
+		unsigned char  blockdim_y;
+		unsigned char  blockdim_z;
+		unsigned char  xsize[3];   /* x-size = xsize[0] + xsize[1] + xsize[2] */
+		unsigned char  ysize[3];   /* x-size, y-size and z-size are given in texels */
+		unsigned char  zsize[3];   /* block count is inferred */
+	};
+
+	// Traverse the file structure
+	AstcHeader *pAstcHeader = reinterpret_cast<AstcHeader *>(astcData.data());
+
+	// Store number of bytes for each dimension
+	// Merge x,y,z-sizes from 3 chars into one integer value
+	int32 xsize = pAstcHeader->xsize[0] + (pAstcHeader->xsize[1] << 8) + (pAstcHeader->xsize[2] << 16);
+	int32 ysize = pAstcHeader->ysize[0] + (pAstcHeader->ysize[1] << 8) + (pAstcHeader->ysize[2] << 16);
+	int32 zsize = pAstcHeader->zsize[0] + (pAstcHeader->zsize[1] << 8) + (pAstcHeader->zsize[2] << 16);
+
+	// Number of blocks in the x, y and z direction
+	int32 xblocks = (xsize + pAstcHeader->blockdim_x - 1) / pAstcHeader->blockdim_x;
+	int32 yblocks = (ysize + pAstcHeader->blockdim_y - 1) / pAstcHeader->blockdim_y;
+	int32 zblocks = (zsize + pAstcHeader->blockdim_z - 1) / pAstcHeader->blockdim_z;
+
+	// Each block is encoded on 16 bytes, so calculate total compressed image data size
+	uiPixelDataSizeOut = xblocks * yblocks * zblocks << 4;
+
+	uint8 *pPixelBuffer = HY_NEW uint8[uiPixelDataSizeOut];
+	memcpy(pPixelBuffer, &pAstcHeader[1], uiPixelDataSizeOut);
+
+	return pPixelBuffer;
 }

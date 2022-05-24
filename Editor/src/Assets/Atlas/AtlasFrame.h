@@ -50,10 +50,12 @@ public:
 	QRect GetCrop() const;
 	
 	HyTextureFormat GetFormat() const;
-	void SetFormat(HyTextureFormat eFormat);
+	void SetFormat(HyTextureFormat eFormat, uint8 uiFormatParam1, uint8 uiFormatParam2);
 
 	HyTextureFiltering GetFiltering() const;
 	void SetFiltering(HyTextureFiltering eFiltering);
+
+	HyTextureInfo GetTextureInfo() const;
 
 	QPoint GetPosition() const;
 

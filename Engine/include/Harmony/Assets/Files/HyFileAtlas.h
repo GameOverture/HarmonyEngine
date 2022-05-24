@@ -67,6 +67,9 @@ public:
 	virtual std::string AssetTypeName() override;
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
+
+protected:
+	unsigned char *LoadAstc(std::string sAtlasFilePath, uint32 &uiPixelDataSizeOut);
 };
 
 #endif /* HyFileAtlas_h__ */

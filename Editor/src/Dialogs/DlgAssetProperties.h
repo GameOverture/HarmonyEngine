@@ -33,6 +33,7 @@ public:
 	QList<AssetItemData *> GetChangedAssets();
 
 private Q_SLOTS:
+	void on_cmbTextureType_currentIndexChanged(int iIndex);
 	void on_chkIsCompressed_clicked();
 	void on_sbVbrQuality_valueChanged(double dArg);
 	void on_chkUseGlobalLimit_clicked();
@@ -42,6 +43,9 @@ private Q_SLOTS:
 
 private:
 	Ui::DlgAssetProperties *ui;
+
+	HyTextureFormat GetSelectedAtlasFormat(uint8 &uiParam1Out, uint8 &uiParam2Out) const;
+	HyTextureFiltering GetSelectedAtlasFiltering() const;
 
 	void Refresh();
 	bool DetermineChangedAssets();

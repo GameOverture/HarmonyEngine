@@ -278,8 +278,8 @@ enum HyDiagFlag
 enum HyTextureFiltering
 {
 	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
-	HYTEXFILTER_Unknown = 0,
-	HYTEXFILTER_NEAREST,
+	HYTEXFILTER_Unknown = 255,
+	HYTEXFILTER_NEAREST = 0,
 	HYTEXFILTER_NEAREST_MIPMAP,
 	HYTEXFILTER_LINEAR_MIPMAP,
 	HYTEXFILTER_BILINEAR,
@@ -288,19 +288,19 @@ enum HyTextureFiltering
 
 	HYNUM_TEXTUREFILTERS
 };
-static_assert(HYNUM_TEXTUREFILTERS < 256, "HyTextureFiltering cannot exceed 255 values (including unknown). Needs to fit in uint8 (HyTextureInfo)");
+static_assert(HYNUM_TEXTUREFILTERS < 255, "HyTextureFiltering cannot exceed 255 values (including unknown). Needs to fit in uint8 (HyTextureInfo)");
 
 enum HyTextureFormat
 {
 	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
-	HYTEXTURE_Unknown = 0,
-	HYTEXTURE_Uncompressed,			// Param1: num channels						Param2: disk file type (PNG, ...)
+	HYTEXTURE_Unknown = 255,
+	HYTEXTURE_Uncompressed = 0,		// Param1: num channels						Param2: disk file type (PNG, ...)
 	HYTEXTURE_DXT,					// Param1: num channels						Param2: DXT format (1,3,5)
-	HYTEXTURE_ASTC,					// Param1: Block Size index (4x4 -> 12x12)	Param2: Color Profile (LDR linear, LDR sRBG, HDR RGB, HDR RGBA)
+	HYTEXTURE_ASTC,					// Param1: Block Size index (4x4 -> 12x12)	Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
 
 	HYNUM_TEXTUREFORMATS
 };
-static_assert(HYNUM_TEXTUREFORMATS < 256, "HyTextureFormat cannot exceed 255 values (including unknown). Needs to fit in uint8 (HyTextureInfo)");
+static_assert(HYNUM_TEXTUREFORMATS < 255, "HyTextureFormat cannot exceed 255 values (including unknown). Needs to fit in uint8 (HyTextureInfo)");
 
 struct HyTextureInfo
 {

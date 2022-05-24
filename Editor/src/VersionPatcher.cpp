@@ -144,30 +144,39 @@
 		case 0:
 			HyGuiLog("Patching project files: version 0 -> 1", LOGTYPE_Info);
 			Patch_0to1(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 1:
 			HyGuiLog("Patching project files: version 1 -> 2", LOGTYPE_Info);
 			Patch_1to2(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 2:
 			HyGuiLog("Patching project files: version 2 -> 3", LOGTYPE_Info);
 			Patch_2to3(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 3:
 			HyGuiLog("Patching project files: version 3 -> 4", LOGTYPE_Info);
 			Patch_3to4(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 4:
 			HyGuiLog("Patching project files: version 4 -> 5", LOGTYPE_Info);
 			Patch_4to5(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 5:
 			HyGuiLog("Patching project files: version 5 -> 6", LOGTYPE_Info);
 			Patch_5to6(projDoc);
+			[[fallthrough]];
 		case 6:
 			HyGuiLog("Patching project files: version 6 -> 7", LOGTYPE_Info);
 			Patch_6to7(pProj, projDoc);
+			[[fallthrough]];
 		case 7:
 			HyGuiLog("Patching project files: version 7 -> 8", LOGTYPE_Info);
 			Patch_7to8(projDoc);
+			[[fallthrough]];
 		case 8:
 			HyGuiLog("Patching project files: version 7 -> 8", LOGTYPE_Info);
-			Patch_8to9(metaAtlasDoc);
+			Patch_8to9(metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 9:
 			// current version
 			static_assert(HYGUI_FILE_VERSION == 9, "Improper file version set in VersionPatcher");
@@ -821,10 +830,10 @@
 {
 	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
 	QJsonArray assetsArray = metaAtlasObj["assets"].toArray();
-	for(int i = 0; i < assetsArray.size(); ++i)
+	for(int iAssetIndex = 0; iAssetIndex < assetsArray.size(); ++iAssetIndex)
 	{
 		// Remove "textureFiltering" and "textureFormat" and replace with "textureInfo"
-		QJsonObject assetObj = assetsArray.at(i).toObject();
+		QJsonObject assetObj = assetsArray.at(iAssetIndex).toObject();
 
 		HyTextureFiltering eFiltering = HYTEXFILTER_BILINEAR;
 		QString sFiltering = assetObj["textureFiltering"].toString();
@@ -854,11 +863,13 @@
 			uiParam2 = 5; // DXT Type
 		}
 
-		HyTextureInfo texInfo(eFiltering, eFormat, uiParam1, uiParam2);
 		assetObj.remove("textureFiltering");
 		assetObj.remove("textureFormat");
-		assetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(texInfo.GetBucketId())));
-		assetsArray.replace(i, assetObj);
+
+		HyTextureInfo texInfo(eFiltering, eFormat, uiParam1, uiParam2);
+		uint32 uiBucketId = texInfo.GetBucketId();
+		assetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(uiBucketId)));
+		assetsArray.replace(iAssetIndex, assetObj);
 	}
 	metaAtlasObj.insert("assets", assetsArray);
 	metaAtlasDocRef.setObject(metaAtlasObj);
@@ -866,15 +877,15 @@
 
 	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
 	QJsonArray banksArray = dataAtlasObj["banks"].toArray();
-	for(int i = 0; i < banksArray.size(); ++i)
+	for(int iBankIndex = 0; iBankIndex < banksArray.size(); ++iBankIndex)
 	{
-		QJsonObject bankObj = banksArray.at(i).toObject();
+		QJsonObject bankObj = banksArray.at(iBankIndex).toObject();
 
 		QJsonArray texturesArray = bankObj["textures"].toArray();
 		for(int iTextureIndex = 0; iTextureIndex < texturesArray.size(); ++iTextureIndex)
 		{
 			// Remove "textureFiltering" and "textureFormat" and replace with "textureInfo"
-			QJsonObject textureObj = texturesArray.at(i).toObject();
+			QJsonObject textureObj = texturesArray.at(iTextureIndex).toObject();
 
 			HyTextureFiltering eFiltering = HYTEXFILTER_BILINEAR;
 			QString sFiltering = textureObj["filtering"].toString();
@@ -908,9 +919,10 @@
 			textureObj.remove("filtering");
 			textureObj.remove("format");
 			textureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(texInfo.GetBucketId())));
-			texturesArray.replace(i, textureObj);
+			texturesArray.replace(iTextureIndex, textureObj);
 		}
 		bankObj.insert("textures", texturesArray);
+		banksArray.replace(iBankIndex, bankObj);
 	}
 	dataAtlasObj.insert("banks", banksArray);
 	dataAtlasDocRef.setObject(dataAtlasObj);

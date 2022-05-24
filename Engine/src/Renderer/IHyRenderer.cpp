@@ -25,8 +25,7 @@ IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> 
 	m_VertexBuffer(*this),
 	m_pCurWindow(nullptr),
 	m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
-	m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive)),
-	m_uiSupportedTextureFormats(HYTEXTURE_R8G8B8A8 | HYTEXTURE_R8G8B8)
+	m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive))
 {
 	HyAssert(sm_pInstance == nullptr, "IHyRenderer ctor called twice");
 	sm_pInstance = this;
