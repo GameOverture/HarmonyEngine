@@ -45,15 +45,12 @@ void TextDraw::SetTextState(uint uiStateIndex)
 		Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(m_hTexture);
 
 	// Upload texture to gfx api
-	m_hTexture = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HYTEXTURE_R8G8B8A8,
-																								  HYTEXFILTER_BILINEAR,
-																								  0,
+	m_hTexture = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
 																								  atlasDimensions.width(),
 																								  atlasDimensions.height(),
-																								  0,
 																								  pAtlasPixelData,
 																								  uiAtlasPixelDataSize,
-																								  HYTEXTURE_R8G8B8A8);
+																								  0);
 
 	// Re-acquire latest FileDataPair because a newly generated preview texture may have been created above via GetAtlasInfo()
 	FileDataPair itemFileData;

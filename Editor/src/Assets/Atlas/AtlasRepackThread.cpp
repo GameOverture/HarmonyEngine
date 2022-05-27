@@ -9,26 +9,28 @@
  *************************************************************************/
 #include "Global.h"
 #include "AtlasRepackThread.h"
+#include "MainWindow.h"
 
 #include "soil2/SOIL2.h"
 
 #include <QPainter>
 #include <QImageWriter>
+#include <QProcess>
 
 AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<AtlasFrame *> affectedFramesList, QDir metaDir) :
 	IRepackThread(metaDir),
 	m_BankRef(bankRef)
 {
-	// Organize all affected frames into buckets (format/filter)
+	// Organize all affected frames into buckets (HyTextureInfo's bucket ID)
 	for(int i = 0; i < affectedFramesList.size(); ++i)
 	{
-		QPair<HyTextureFormat, HyTextureFiltering> key(affectedFramesList[i]->GetFormat(), affectedFramesList[i]->GetFiltering());
+		uint32 uiKey = affectedFramesList[i]->GetTextureInfo().GetBucketId();
 
-		if(m_BucketMap.contains(key) == false)
-			m_BucketMap.insert(key, new PackerBucket());
+		if(m_BucketMap.contains(uiKey) == false)
+			m_BucketMap.insert(uiKey, new PackerBucket());
 
-		m_BucketMap[key]->m_TextureIndexSet.insert(affectedFramesList[i]->GetTextureIndex());
-		m_BucketMap[key]->m_FramesList.append(affectedFramesList[i]);
+		m_BucketMap[uiKey]->m_TextureIndexSet.insert(affectedFramesList[i]->GetTextureIndex());
+		m_BucketMap[uiKey]->m_FramesList.append(affectedFramesList[i]);
 	}
 }
 
@@ -100,7 +102,7 @@ AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<AtlasFrame *> affe
 
 			if(iNumNewTexturesUsed < iNumNewTextures)
 			{
-				ConstructAtlasTexture(iter.value()->m_Packer, iter.key().first, iNumNewTexturesUsed, iCurrentIndex);
+				ConstructAtlasTexture(iter.value()->m_Packer, HyTextureInfo(iter.key()), iNumNewTexturesUsed, iCurrentIndex);
 				iNumNewTexturesUsed++;
 
 				// Store off the last packed texture to indicate it is "unfilled"
@@ -167,7 +169,7 @@ AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<AtlasFrame *> affe
 	m_BankRef.m_MetaObj["unfilledIndices"] = unfilledIndicesArray;
 }
 
-void AtlasRepackThread::ConstructAtlasTexture(ImagePacker &imagePackerRef, HyTextureFormat eFormat, int iPackerBinIndex, int iActualTextureIndex)
+void AtlasRepackThread::ConstructAtlasTexture(ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex)
 {
 	if(m_BankRef.m_MetaObj["maxWidth"].toInt() != imagePackerRef.bins[iPackerBinIndex].width() ||
 	   m_BankRef.m_MetaObj["maxHeight"].toInt() != imagePackerRef.bins[iPackerBinIndex].height())
@@ -230,59 +232,113 @@ void AtlasRepackThread::ConstructAtlasTexture(ImagePacker &imagePackerRef, HyTex
 	QImage *pTexture = static_cast<QImage *>(p.device());
 	QDir runtimeBankDir(m_BankRef.m_sAbsPath);
 
-	switch(eFormat)
+	switch(texInfo.GetFormat())
 	{
-		case HYTEXTURE_R8G8B8A8: {
-			if(false == pTexture->save(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png"))) {
+	case HYTEXTURE_Uncompressed:
+		// Param1: num channels
+		// Param2: disk file type (PNG, ...)
+		switch(texInfo.m_uiFormatParam2)
+		{
+		case HyTextureInfo::UNCOMPRESSEDFILE_PNG:
+			if(false == pTexture->save(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str())))
 				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
-			}
-		} break;
+			break;
 
-		case HYTEXTURE_DTX5: {
-			QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGBA8888);
-			if(0 == SOIL_save_image_quality(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
-											SOIL_SAVE_TYPE_DDS,
-											imgProperlyFormatted.width(),
-											imgProperlyFormatted.height(),
-											4,
-											imgProperlyFormatted.bits(),
-											0))
-			{
-				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DTX5 atlas", LOGTYPE_Error);
-			}
-		} break;
+		default:
+			HyGuiLog("AtlasModel::ConstructAtlasTexture unknown uncompressed file type", LOGTYPE_Error);
+			break;
+		}
+		break;
 
-		case HYTEXTURE_RGB_DTX1: {
-			QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGB888);
-			if(0 == SOIL_save_image_quality(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
-											SOIL_SAVE_TYPE_DDS,
-											imgProperlyFormatted.width(),
-											imgProperlyFormatted.height(),
-											3,
-											imgProperlyFormatted.bits(),
-											0))
-			{
-				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a RGB DTX1 atlas", LOGTYPE_Error);
-			}
-		} break;
+	case HYTEXTURE_DXT: {
+		// Param1: num channels
+		// Param2: DXT format (1,3,5)
+		QImage imgProperlyFormatted = pTexture->convertToFormat(texInfo.m_uiFormatParam1 == 4 ? QImage::Format_RGBA8888 : QImage::Format_RGB888);
+		if(0 == SOIL_save_image_quality(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str()).toStdString().c_str(),
+										SOIL_SAVE_TYPE_DDS,
+										imgProperlyFormatted.width(),
+										imgProperlyFormatted.height(),
+										texInfo.m_uiFormatParam1,
+										imgProperlyFormatted.bits(),
+										0))
+		{
+			HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DTX5 atlas", LOGTYPE_Error);
+		}
+		break; }
 
-		case HYTEXTURE_RGBA_DTX1: {
-			QImage imgProperlyFormatted = pTexture->convertToFormat(QImage::Format_RGBA8888);
-			if(0 == SOIL_save_image_quality(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".dds").toStdString().c_str(),
-											SOIL_SAVE_TYPE_DDS,
-											imgProperlyFormatted.width(),
-											imgProperlyFormatted.height(),
-											4,
-											imgProperlyFormatted.bits(),
-											0))
-			{
-				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a RGBA DTX1 atlas", LOGTYPE_Error);
-			}
-		} break;
+	case HYTEXTURE_ASTC: {
+		// Param1: Block Size index (4x4 -> 12x12)
+		// Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
+		QString sProgramPath = MainWindow::EngineSrcLocation() % HYGUIPATH_AstcEncDir;
+#if defined(Q_OS_WIN)
+		sProgramPath += "win/astcenc-sse2.exe";
+#elif defined(Q_OS_LINUX)
+		sProgramPath += "linux/astcenc-sse2";
+#else
+		HyGuiLog("ASTC Encoder not found for this platform", LOGTYPE_Error);
+#endif
 
-		default: {
-			HyGuiLog("AtlasModel::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(eFormat), LOGTYPE_Error);
-		} break;
+		QStringList sArgList;
+		switch(texInfo.m_uiFormatParam2)
+		{
+		case 0: sArgList << "-cl"; break; // LDR linear
+		case 1: sArgList << "-cs"; break; // LDR sRGB
+		case 2: sArgList << "-ch"; break; // HDR RGB
+		case 3: sArgList << "-cH"; break; // HDR RGBA
+		default:
+			HyGuiLog("Invalid ASTC Encoder color profile", LOGTYPE_Error);
+			break;
+		}
+
+		// Create temp PNG file to be used
+		QString sTempTexturePath = runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png");
+		QString sAstcTexturePath = runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str());
+		pTexture->save(sTempTexturePath);
+
+		sArgList << sTempTexturePath;
+		sArgList << sAstcTexturePath;
+
+		switch(texInfo.m_uiFormatParam1)
+		{
+		case 0:  sArgList << "4x4"; break;   // 8.00 bpp
+		case 1:  sArgList << "5x4"; break;   // 6.40 bpp
+		case 2:  sArgList << "5x5"; break;   // 5.12 bpp
+		case 3:  sArgList << "6x5"; break;   // 4.27 bpp
+		case 4:  sArgList << "6x6"; break;   // 3.56 bpp
+		case 5:  sArgList << "8x5"; break;   // 3.20 bpp
+		case 6:  sArgList << "8x6"; break;   // 2.67 bpp
+		case 7:  sArgList << "10x5"; break;  // 2.56 bpp
+		case 8:  sArgList << "10x6"; break;  // 2.13 bpp
+		case 9:  sArgList << "8x8"; break;   // 2.00 bpp
+		case 10: sArgList << "10x8"; break;  // 1.60 bpp
+		case 11: sArgList << "10x10"; break; // 1.28 bpp
+		case 12: sArgList << "12x10"; break; // 1.07 bpp
+		case 13: sArgList << "12x12"; break; // 0.89 bpp
+		default:
+			HyGuiLog("Invalid ASTC Encoder block footprint", LOGTYPE_Error);
+			break;
+		}
+
+		sArgList << "-thorough";
+
+		QProcess astcEncProcess;
+		astcEncProcess.start(sProgramPath, sArgList);
+		if(!astcEncProcess.waitForStarted())
+			HyGuiLog("ASTC Encoder failed to start", LOGTYPE_Error);
+		else
+		{
+			if(!astcEncProcess.waitForFinished(-1))
+				HyGuiLog("ASTC Encoder failed while encoding", LOGTYPE_Error);
+		}
+
+		// Remove the temp texture
+		if(false == QFile::remove(sTempTexturePath))
+			HyGuiLog("Could not remove temp PNG texture when encoding into ASTC: " % sTempTexturePath, LOGTYPE_Warning);
+		break; }
+
+	default:
+		HyGuiLog("AtlasModel::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(texInfo.GetFormat()), LOGTYPE_Error);
+		break;
 	}
 }
 

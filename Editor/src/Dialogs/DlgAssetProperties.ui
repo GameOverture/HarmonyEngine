@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>270</width>
-    <height>185</height>
+    <width>250</width>
+    <height>273</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,28 +38,219 @@
    <item>
     <widget class="QStackedWidget" name="stackedAssetType">
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page"/>
      <widget class="QWidget" name="atlasPage">
       <layout class="QFormLayout" name="formLayout">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Format</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="cmbTextureType"/>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QGroupBox" name="grpFormatOptions">
+         <property name="title">
+          <string>Format Options</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QStackedWidget" name="stackedFormatOptions">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="page_3">
+             <layout class="QFormLayout" name="formLayout_2">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Color Channels</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="cmbUncompressedColorChannels">
+                <item>
+                 <property name="text">
+                  <string>RGB</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>RGBA</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>Runtime File Type</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="cmbUncompressedFileType">
+                <item>
+                 <property name="text">
+                  <string>PNG</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_4">
+             <layout class="QFormLayout" name="formLayout_3">
+              <item row="0" column="1">
+               <widget class="QComboBox" name="cmbDxtType">
+                <item>
+                 <property name="text">
+                  <string>RGB DXT 1</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>RGBA DXT 5</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_5">
+             <layout class="QFormLayout" name="formLayout_4">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Color Profile</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="cmbAstcColorProfile">
+                <item>
+                 <property name="text">
+                  <string>Linear</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>sRGB</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>HDR RGB</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>HDR RGBA</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Block Size</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="cmbAstcBlockSize">
+                <item>
+                 <property name="text">
+                  <string>4x4 (8.00bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>5x4 (6.40bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>5x5 (5.12bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>6x5 (4.27bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>6x6 (3.56bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>8x5 (3.20bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>8x6 (2.67bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>10x5 (2.56bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>10x6 (2.13bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>8x8 (2.00bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>10x8 (1.60bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>10x10 (1.28bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>12x10 (1.07bpp)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>12x12 (0.89bpp)</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item row="1" column="1">
         <widget class="QComboBox" name="cmbTextureFiltering"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Filtering:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="cmbTextureType"/>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Type:</string>
+          <string>Filtering</string>
          </property>
         </widget>
        </item>

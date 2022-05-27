@@ -9,10 +9,10 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Renderer/OpenGL/HyOpenGL.h"
-#ifndef HY_PLATFORM_BROWSER
-	#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
-#else
+#ifdef HY_PLATFORM_BROWSER
 	#include "Renderer/OpenGL/HyOpenGLESShaderSrc.h"
+#else
+	#include "Renderer/OpenGL/HyOpenGLShaderSrc.h"
 #endif
 #include "Window/HyWindow.h"
 #include "Renderer/Effects/HyStencil.h"
@@ -113,8 +113,6 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 			m_pPboStates[i] = PBO_Free;
 	}
 
-	GLint iMaxTextureSize = 0;
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &iMaxTextureSize);
 	GLint iFormatCount = 0;
 	glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &iFormatCount);
 	GLint *pFormatArray = HY_NEW GLint[iFormatCount];
@@ -124,46 +122,40 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	{
 		switch(pFormatArray[i])
 		{
-			//case GL_COMPRESSED_RGBA_BPTC_UNORM:					sCompressedTextureFormats += "DXT_BC7";	break;
-			//case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB:		sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB:		sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB:		sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_RGB8_ETC2:						sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_SRGB8_ETC2:						sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:	sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:	sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_RGBA8_ETC2_EAC:					sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:			sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_R11_EAC:							sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_SIGNED_R11_EAC:					sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_RG11_EAC:						sCompressedTextureFormats += "";	break;
-			//case GL_COMPRESSED_SIGNED_RG11_EAC:					sCompressedTextureFormats += "";	break;
 #ifndef HY_PLATFORM_BROWSER // emscripten compiled these before when I used glew.h
 		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
 			sCompressedTextureFormats += "RGB_DXT1 ";
-			m_uiSupportedTextureFormats |= HYTEXTURE_RGB_DTX1;
 			break;
 		case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
 			sCompressedTextureFormats += "RGBA_DXT1 ";
-			m_uiSupportedTextureFormats |= HYTEXTURE_RGB_DTX1;
 			break;
 		case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
 			sCompressedTextureFormats += "DXT3 ";
-			m_uiSupportedTextureFormats |= HYTEXTURE_DTX3;
 			break;
 		case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
 			sCompressedTextureFormats += "DXT5 ";
-			m_uiSupportedTextureFormats |= HYTEXTURE_DTX5;
+			break;
+
+		case GL_COMPRESSED_RGBA_ASTC_6x6_KHR:
+			sCompressedTextureFormats += "ASTC_RGBA";
+			break;
+		case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
+			sCompressedTextureFormats += "ASTC_SRGB8";
 			break;
 #endif
 		}
 	}
 	delete[] pFormatArray;
 
+	//const GLubyte *szExtensions = glGetString(GL_EXTENSIONS);
+	//HyLog("GL EXTENSIONS: " << szExtensions);
+
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);		// 4-byte pixel alignment
 
 	m_VertexBuffer.Initialize2d();				// vertex buffer for 2D scene nodes
 
+	GLint iMaxTextureSize = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &iMaxTextureSize);
 	SetRendererInfo("OpenGL",
 					reinterpret_cast<const char *>(glGetString(GL_VERSION)),
 					reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
@@ -567,55 +559,107 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////
 }
 
-/*virtual*/ uint32 HyOpenGL::AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, uint32 hPBO, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) /*override*/
+/*virtual*/ uint32 HyOpenGL::AddTexture(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, uint32 hPBO) /*override*/
 {
 	GLenum eInternalFormat = GL_RGBA;
-	switch(eDesiredFormat)
-	{
-	case HYTEXTURE_R8G8B8A8: {
-		eInternalFormat = GL_RGBA;
-		break; }
-	case HYTEXTURE_R8G8B8: {
-		eInternalFormat = GL_RGB;
-		break; }
-#ifndef HY_PLATFORM_BROWSER // emscripten compiled these before when I used glew.h
-	case HYTEXTURE_RGB_DTX1: {
-		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_RGB_DTX1)) ? GL_COMPRESSED_RGB_S3TC_DXT1_EXT : GL_COMPRESSED_RGB;
-		break; }
-	case HYTEXTURE_RGBA_DTX1: {
-		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_RGBA_DTX1)) ? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : GL_COMPRESSED_RGBA;
-		break; }
-	case HYTEXTURE_DTX3: {
-		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_DTX3)) ? GL_COMPRESSED_RGBA_S3TC_DXT3_EXT : GL_COMPRESSED_RGBA;
-		break; }
-	case HYTEXTURE_DTX5: {
-		eInternalFormat = (0 != (m_uiSupportedTextureFormats & HYTEXTURE_DTX5)) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGBA;
-		break; }
-#endif
-	default: {
-		HyLogError("Unknown TextureFormat used for 'eDesiredFormat'");
-		break; }
-	}
-
-	GLenum eFormat = GL_RGBA;
+	GLenum eFormat = GL_RGBA; // Used in uncompressed
 	bool bIsPixelDataCompressed = false;
-	switch(ePixelDataFormat)
+	switch(infoRef.m_uiFormat)
 	{
-	case HYTEXTURE_R8G8B8A8: {
-		eFormat = GL_RGBA;
-		break; }
-	case HYTEXTURE_R8G8B8: {
-		eFormat = GL_RGB;
-		break; }
-	case HYTEXTURE_RGB_DTX1:
-	case HYTEXTURE_RGBA_DTX1:
-	case HYTEXTURE_DTX3:
-	case HYTEXTURE_DTX5: {
+	case HYTEXTURE_Uncompressed:
+		// Param1: num channels
+		// Param2: disk file type (PNG, ...)
+		if(infoRef.m_uiFormatParam1 == 4)
+		{
+			eInternalFormat = GL_RGBA;
+			eFormat = GL_RGBA;
+		}
+		else if(infoRef.m_uiFormatParam1 == 3)
+		{
+			eInternalFormat = GL_RGB;
+			eFormat = GL_RGB;
+		}
+		break;
+
+	case HYTEXTURE_DXT:
 		bIsPixelDataCompressed = true;
-		break; }
-	default: {
-		HyLogError("Unknown TextureFormat used for 'ePixelDataFormat'");
-		break; }
+		// Param1: num channels
+		// Param2: DXT format (1,3,5)
+		if(infoRef.m_uiFormatParam2 == 1) // DXT1
+		{
+			if(infoRef.m_uiFormatParam1 == 4)
+				eInternalFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+			else
+				eInternalFormat = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+		}
+		else if(infoRef.m_uiFormatParam2 == 3) // DXT3
+			eInternalFormat = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+		else // DXT5
+			eInternalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		break;
+
+	case HYTEXTURE_ASTC:
+		bIsPixelDataCompressed = true;
+		// Param1: Block Size index (4x4 -> 12x12)
+		// Param2: Color Profile (LDR linear, LDR sRBG, HDR RGB, HDR RGBA)
+		if(infoRef.m_uiFormatParam2 == 0)
+		{
+			switch(infoRef.m_uiFormatParam1)
+			{
+			case 0:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_4x4_KHR; break;   // 8.00 bpp
+			case 1:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_5x4_KHR; break;   // 6.40 bpp
+			case 2:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_5x5_KHR; break;   // 5.12 bpp
+			case 3:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_6x5_KHR; break;   // 4.27 bpp
+			case 4:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_6x6_KHR; break;   // 3.56 bpp
+			case 5:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_8x5_KHR; break;   // 3.20 bpp
+			case 6:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_8x6_KHR; break;   // 2.67 bpp
+			case 7:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_10x5_KHR; break;  // 2.56 bpp
+			case 8:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_10x6_KHR; break;  // 2.13 bpp
+			case 9:  eInternalFormat = GL_COMPRESSED_RGBA_ASTC_8x8_KHR; break;   // 2.00 bpp
+			case 10: eInternalFormat = GL_COMPRESSED_RGBA_ASTC_10x8_KHR; break;  // 1.60 bpp
+			case 11: eInternalFormat = GL_COMPRESSED_RGBA_ASTC_10x10_KHR; break; // 1.28 bpp
+			case 12: eInternalFormat = GL_COMPRESSED_RGBA_ASTC_12x10_KHR; break; // 1.07 bpp
+			case 13: eInternalFormat = GL_COMPRESSED_RGBA_ASTC_12x12_KHR; break; // 0.89 bpp
+			default:
+				HyError("AddTexture() - Invalid ASTC m_uiFormatParam1");
+				eInternalFormat = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
+				break;
+			}
+		}
+		else if(infoRef.m_uiFormatParam2 == 1)
+		{
+			switch(infoRef.m_uiFormatParam1)
+			{
+			case 0:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR; break;   // 8.00 bpp
+			case 1:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR; break;   // 6.40 bpp
+			case 2:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR; break;   // 5.12 bpp
+			case 3:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR; break;   // 4.27 bpp
+			case 4:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR; break;   // 3.56 bpp
+			case 5:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR; break;   // 3.20 bpp
+			case 6:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR; break;   // 2.67 bpp
+			case 7:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR; break;  // 2.56 bpp
+			case 8:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR; break;  // 2.13 bpp
+			case 9:  eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR; break;   // 2.00 bpp
+			case 10: eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR; break;  // 1.60 bpp
+			case 11: eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR; break; // 1.28 bpp
+			case 12: eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR; break; // 1.07 bpp
+			case 13: eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR; break; // 0.89 bpp
+			default:
+				HyError("AddTexture() - Invalid SRGB8 ASTC m_uiFormatParam1");
+				eInternalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
+				break;
+			}
+		}
+		else
+		{
+			HyError("AddTexture() - Invalid ASTC m_uiFormatParam2");
+			eInternalFormat = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
+		}
+		break;
+		
+	default:
+		HyLogError("Unknown TextureFormat used for 'eDesiredFormat'");
+		break;
 	}
 
 	GLuint hGLTexture;
@@ -631,16 +675,19 @@ HyOpenGL::~HyOpenGL(void)
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, hPBO);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glBindBuffer");
 	}
+
+	int32 iNumMipLevels = 0;
+	if(infoRef.IsMipMaps())
+		iNumMipLevels = static_cast<int32>(std::floor(std::log2(std::max(uiWidth, uiHeight)))) + 1;
 	
 	if(bIsPixelDataCompressed == false)
 	{ 
-		glTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
-		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, uiWidth, uiHeight, eFormat, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, iNumMipLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
 	}
 	else
 	{
-		glCompressedTexImage2D(GL_TEXTURE_2D, iNumLodLevels, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
+		glCompressedTexImage2D(GL_TEXTURE_2D, iNumMipLevels, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
 	}
 
@@ -654,7 +701,7 @@ HyOpenGL::~HyOpenGL(void)
 		//glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 	}
 
-	switch(eTexFiltering)
+	switch(infoRef.m_uiFiltering)
 	{
 	case HYTEXFILTER_NEAREST:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -708,65 +755,65 @@ HyOpenGL::~HyOpenGL(void)
 }
 
 // Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
-/*virtual*/ uint32 HyOpenGL::AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) /*override*/
-{
-	GLenum eInternalFormat = uiNumColorChannels == 4 ? GL_RGBA8 : (uiNumColorChannels == 3 ? GL_RGB8 : GL_R8);
-	GLenum eFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_RED);
-
-	GLuint hGLTextureArray;
-	glGenTextures(1, &hGLTextureArray);
-	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glGenTextures");
-
-	//glActiveTexture(GL_TEXTURE0 + hGLTextureArray);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
-	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glBindTexture");
-
-	// Create (blank) storage for the texture array
-	GLenum eError = GL_NO_ERROR;
-	uiNumTexturesUploadedOut = static_cast<uint32>(pixelDataList.size());
-
-	// TODO: Don't upload huge texture arrays. Actually calculate required bytes, and then size array accordingly to hardware constraints
-	if(uiNumTexturesUploadedOut > 8)
-		uiNumTexturesUploadedOut = 8;
-
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTexturesUploadedOut, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
-	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexImage3D");
-	eError = glGetError();
-
-	while (eError)
-	{
-		uiNumTexturesUploadedOut /= 2;
-		if(uiNumTexturesUploadedOut == 0)
-			HyError("Could not allocate texture array.");
-
-		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTexturesUploadedOut, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
-		eError = glGetError();
-	}
-
-	for(uint32 i = 0; i != uiNumTexturesUploadedOut; ++i)
-	{
-		// Write each texture into storage
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-						0,						// Mipmap number
-						0, 0, i,				// xoffset, yoffset, zoffset
-						uiWidth, uiHeight, 1,	// width, height, depth (of texture you're copying in)
-						eFormat,				// format
-						GL_UNSIGNED_BYTE,		// type
-						pixelDataList[i]);		// pointer to pixel data
-
-		HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexSubImage3D");
-	}
-
-	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexParameteri");
-
-	return hGLTextureArray;
-}
+///*virtual*/ uint32 HyOpenGL::AddTextureArray(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) /*override*/
+//{
+//	GLenum eInternalFormat = uiNumColorChannels == 4 ? GL_RGBA8 : (uiNumColorChannels == 3 ? GL_RGB8 : GL_R8);
+//	GLenum eFormat = uiNumColorChannels == 4 ? GL_RGBA : (uiNumColorChannels == 3 ? GL_RGB : GL_RED);
+//
+//	GLuint hGLTextureArray;
+//	glGenTextures(1, &hGLTextureArray);
+//	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glGenTextures");
+//
+//	//glActiveTexture(GL_TEXTURE0 + hGLTextureArray);
+//	glBindTexture(GL_TEXTURE_2D_ARRAY, hGLTextureArray);
+//	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glBindTexture");
+//
+//	// Create (blank) storage for the texture array
+//	GLenum eError = GL_NO_ERROR;
+//	uiNumTexturesUploadedOut = static_cast<uint32>(pixelDataList.size());
+//
+//	// TODO: Don't upload huge texture arrays. Actually calculate required bytes, and then size array accordingly to hardware constraints
+//	if(uiNumTexturesUploadedOut > 8)
+//		uiNumTexturesUploadedOut = 8;
+//
+//	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTexturesUploadedOut, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+//	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexImage3D");
+//	eError = glGetError();
+//
+//	while (eError)
+//	{
+//		uiNumTexturesUploadedOut /= 2;
+//		if(uiNumTexturesUploadedOut == 0)
+//			HyError("Could not allocate texture array.");
+//
+//		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, uiNumTexturesUploadedOut, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+//		eError = glGetError();
+//	}
+//
+//	for(uint32 i = 0; i != uiNumTexturesUploadedOut; ++i)
+//	{
+//		// Write each texture into storage
+//		glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+//						0,						// Mipmap number
+//						0, 0, i,				// xoffset, yoffset, zoffset
+//						uiWidth, uiHeight, 1,	// width, height, depth (of texture you're copying in)
+//						eFormat,				// format
+//						GL_UNSIGNED_BYTE,		// type
+//						pixelDataList[i]);		// pointer to pixel data
+//
+//		HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexSubImage3D");
+//	}
+//
+//	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexParameteri");
+//
+//	return hGLTextureArray;
+//}
 
 /*virtual*/ void HyOpenGL::DeleteTexture(uint32 uiTextureHandle) /*override*/
 {

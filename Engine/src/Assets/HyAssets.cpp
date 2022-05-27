@@ -648,12 +648,8 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 				std::string sAtlasFilePath = szTmpBuffer;
 
 				HyJsonObj texObj = texturesArray[j].GetObject();
-				HyTextureFormat eFormat = GetTextureFormatFromString(texObj["format"].GetString());
-
-				if(eFormat == HYTEXTURE_R8G8B8A8 || eFormat == HYTEXTURE_R8G8B8)
-					sAtlasFilePath += ".png";
-				else
-					sAtlasFilePath += ".dds";
+				HyTextureInfo texInfo(texObj["textureInfo"].GetUint());
+				sAtlasFilePath += texInfo.GetFileExt();
 
 				new (pAtlasWriteLocation)HyFileAtlas(sAtlasFilePath,
 					uiBankId,
@@ -849,13 +845,10 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 /*static*/ std::vector<HyTextureFormat> HyAssets::GetTextureFormatList()
 {
 	std::vector<HyTextureFormat> list;
-	list.push_back(HYTEXTURE_R8G8B8A8);
-	list.push_back(HYTEXTURE_R8G8B8);
-	list.push_back(HYTEXTURE_RGB_DTX1);
-	list.push_back(HYTEXTURE_RGBA_DTX1);
-	list.push_back(HYTEXTURE_DTX3);
-	list.push_back(HYTEXTURE_DTX5);
-
+	list.push_back(HYTEXTURE_Uncompressed);
+	list.push_back(HYTEXTURE_DXT);
+	list.push_back(HYTEXTURE_ASTC);
+	
 	HyAssert(list.size() == HYNUM_TEXTUREFORMATS, "HyGlobal::GetTextureFormatList missing a format!");
 
 	return list;
@@ -877,19 +870,13 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	// WARNING: Changing any of these strings affects data and meta files and requires a version patcher bump!
 	switch(eType)
 	{
-	case HYTEXTURE_R8G8B8A8:
-		return "R8G8B8A8";
-	case HYTEXTURE_R8G8B8:
-		return "R8G8B8 (unsupported)";
-	case HYTEXTURE_RGB_DTX1:
-		return "RGB_DTX1";
-	case HYTEXTURE_RGBA_DTX1:
-		return "RGBA_DTX1 (unsupported)";
-	case HYTEXTURE_DTX3:
-		return "DTX3 (unsupported)";
-	case HYTEXTURE_DTX5:
-		return "DTX5";
-
+	case HYTEXTURE_Uncompressed:
+		return "Uncompressed";
+	case HYTEXTURE_DXT:
+		return "DXT";
+	case HYTEXTURE_ASTC:
+		return "ASTC";
+	
 	case HYTEXTURE_Unknown:
 	default:
 		return "Unknown";

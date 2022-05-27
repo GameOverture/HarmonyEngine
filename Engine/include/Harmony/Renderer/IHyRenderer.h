@@ -51,9 +51,6 @@ protected:
 	HyShader *										m_pShaderQuadBatch;
 	HyShader *										m_pShaderPrimitive;
 
-	// Diagnostics/Metrics
-	uint32											m_uiSupportedTextureFormats;	// Bitflags that represent supported texture in 'HyTextureFormat' enum
-
 public:
 	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
 	virtual ~IHyRenderer(void);
@@ -83,8 +80,8 @@ public:
 	virtual void DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera) = 0;
 	virtual void FinishRender() = 0;
 	virtual void UploadShader(HyShader *pShader) = 0;
-	virtual uint32 AddTexture(HyTextureFormat eDesiredFormat, HyTextureFiltering eTexFiltering, int32 iNumLodLevels, uint32 uiWidth, uint32 uiHeight, uint32 hPBO, unsigned char *pPixelData, uint32 uiPixelDataSize, HyTextureFormat ePixelDataFormat) = 0;
-	virtual uint32 AddTextureArray(uint32 uiNumColorChannels, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
+	virtual uint32 AddTexture(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, uint32 hPBO) = 0;
+	//virtual uint32 AddTextureArray(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 	virtual uint32 GenerateVertexBuffer() = 0;	// Returns the graphics API handle to a new vertex buffer in the form of a uint32
 	virtual uint8 *GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) = 0;

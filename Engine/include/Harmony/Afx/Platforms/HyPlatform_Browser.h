@@ -17,8 +17,12 @@
 
 #define HY_USE_SDL2
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_opengl_glext.h>
 
 #include <GLES3/gl3.h>
+//#include <GL/gl.h>
+//#include <GL/glext.h>
 
 //#define HY_USE_GLEW
 

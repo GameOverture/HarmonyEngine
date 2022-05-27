@@ -144,30 +144,42 @@
 		case 0:
 			HyGuiLog("Patching project files: version 0 -> 1", LOGTYPE_Info);
 			Patch_0to1(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 1:
 			HyGuiLog("Patching project files: version 1 -> 2", LOGTYPE_Info);
 			Patch_1to2(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 2:
 			HyGuiLog("Patching project files: version 2 -> 3", LOGTYPE_Info);
 			Patch_2to3(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 3:
 			HyGuiLog("Patching project files: version 3 -> 4", LOGTYPE_Info);
 			Patch_3to4(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 4:
 			HyGuiLog("Patching project files: version 4 -> 5", LOGTYPE_Info);
 			Patch_4to5(metaItemsDoc, dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
 		case 5:
 			HyGuiLog("Patching project files: version 5 -> 6", LOGTYPE_Info);
 			Patch_5to6(projDoc);
+			[[fallthrough]];
 		case 6:
 			HyGuiLog("Patching project files: version 6 -> 7", LOGTYPE_Info);
 			Patch_6to7(pProj, projDoc);
+			[[fallthrough]];
 		case 7:
 			HyGuiLog("Patching project files: version 7 -> 8", LOGTYPE_Info);
 			Patch_7to8(projDoc);
+			[[fallthrough]];
 		case 8:
+			HyGuiLog("Patching project files: version 7 -> 8", LOGTYPE_Info);
+			Patch_8to9(metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
+		case 9:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 8, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 9, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -812,6 +824,108 @@
 	projObj.insert("SourcePath", sSourcePath); // Re-add back 'SourcePath' from version 6 since that is needed to be separated from meta (to make clones/skins etc easier)
 
 	projDocRef.setObject(projObj);
+}
+
+/*static*/ void VersionPatcher::Patch_8to9(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
+{
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray assetsArray = metaAtlasObj["assets"].toArray();
+	for(int iAssetIndex = 0; iAssetIndex < assetsArray.size(); ++iAssetIndex)
+	{
+		// Remove "textureFiltering" and "textureFormat" and replace with "textureInfo"
+		QJsonObject assetObj = assetsArray.at(iAssetIndex).toObject();
+
+		HyTextureFiltering eFiltering = HYTEXFILTER_BILINEAR;
+		QString sFiltering = assetObj["textureFiltering"].toString();
+		if(sFiltering.compare("Nearest", Qt::CaseInsensitive) == 0)
+			eFiltering = HYTEXFILTER_NEAREST;
+
+		HyTextureFormat eFormat = HYTEXTURE_Unknown;
+		uint8 uiParam1 = 0;
+		uint8 uiParam2 = 0;
+		QString sFormat = assetObj["textureFormat"].toString();
+		if(sFormat.compare("R8G8B8A8", Qt::CaseInsensitive) == 0)
+		{
+			eFormat = HYTEXTURE_Uncompressed;
+			uiParam1 = 4; // Num channels
+			uiParam2 = HyTextureInfo::UNCOMPRESSEDFILE_PNG;
+		}
+		else if(sFormat.compare("RGB_DTX1", Qt::CaseInsensitive) == 0)
+		{
+			eFormat = HYTEXTURE_DXT;
+			uiParam1 = 3; // Num channels
+			uiParam2 = 1; // DXT Type
+		}
+		else if(sFormat.compare("DTX5", Qt::CaseInsensitive) == 0)
+		{
+			eFormat = HYTEXTURE_DXT;
+			uiParam1 = 4; // Num channels
+			uiParam2 = 5; // DXT Type
+		}
+
+		assetObj.remove("textureFiltering");
+		assetObj.remove("textureFormat");
+
+		HyTextureInfo texInfo(eFiltering, eFormat, uiParam1, uiParam2);
+		uint32 uiBucketId = texInfo.GetBucketId();
+		assetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(uiBucketId)));
+		assetsArray.replace(iAssetIndex, assetObj);
+	}
+	metaAtlasObj.insert("assets", assetsArray);
+	metaAtlasDocRef.setObject(metaAtlasObj);
+
+
+	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
+	QJsonArray banksArray = dataAtlasObj["banks"].toArray();
+	for(int iBankIndex = 0; iBankIndex < banksArray.size(); ++iBankIndex)
+	{
+		QJsonObject bankObj = banksArray.at(iBankIndex).toObject();
+
+		QJsonArray texturesArray = bankObj["textures"].toArray();
+		for(int iTextureIndex = 0; iTextureIndex < texturesArray.size(); ++iTextureIndex)
+		{
+			// Remove "textureFiltering" and "textureFormat" and replace with "textureInfo"
+			QJsonObject textureObj = texturesArray.at(iTextureIndex).toObject();
+
+			HyTextureFiltering eFiltering = HYTEXFILTER_BILINEAR;
+			QString sFiltering = textureObj["filtering"].toString();
+			if(sFiltering.compare("Nearest", Qt::CaseInsensitive) == 0)
+				eFiltering = HYTEXFILTER_NEAREST;
+
+			HyTextureFormat eFormat = HYTEXTURE_Unknown;
+			uint8 uiParam1 = 0;
+			uint8 uiParam2 = 0;
+			QString sFormat = textureObj["format"].toString();
+			if(sFormat.compare("R8G8B8A8", Qt::CaseInsensitive) == 0)
+			{
+				eFormat = HYTEXTURE_Uncompressed;
+				uiParam1 = 4; // Num channels
+				uiParam2 = HyTextureInfo::UNCOMPRESSEDFILE_PNG;
+			}
+			else if(sFormat.compare("RGB_DTX1", Qt::CaseInsensitive) == 0)
+			{
+				eFormat = HYTEXTURE_DXT;
+				uiParam1 = 3; // Num channels
+				uiParam2 = 1; // DXT Type
+			}
+			else if(sFormat.compare("DTX5", Qt::CaseInsensitive) == 0)
+			{
+				eFormat = HYTEXTURE_DXT;
+				uiParam1 = 4; // Num channels
+				uiParam2 = 5; // DXT Type
+			}
+
+			HyTextureInfo texInfo(eFiltering, eFormat, uiParam1, uiParam2);
+			textureObj.remove("filtering");
+			textureObj.remove("format");
+			textureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(texInfo.GetBucketId())));
+			texturesArray.replace(iTextureIndex, textureObj);
+		}
+		bankObj.insert("textures", texturesArray);
+		banksArray.replace(iBankIndex, bankObj);
+	}
+	dataAtlasObj.insert("banks", banksArray);
+	dataAtlasDocRef.setObject(dataAtlasObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

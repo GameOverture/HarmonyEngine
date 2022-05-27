@@ -191,7 +191,7 @@
 	if(szFilePath == nullptr)
 		return;
 
-	std::ifstream infile(szFilePath, std::ios::binary | std::ios::ate);
+	std::ifstream infile(szFilePath, std::ifstream::in | std::ios::binary | std::ios::ate);
 	HyAssert(infile, "HyReadTextFile invalid file: " << szFilePath);
 
 	std::streamsize size = infile.tellg();
@@ -206,6 +206,39 @@
 
 	infile.close();
 }
+
+/*static*/ void HyIO::ReadBinaryFile(const char *szFilePath, std::vector<uint8> &contentsOut)
+{
+	if(szFilePath == nullptr)
+		return;
+
+	std::ifstream infile(szFilePath, std::ifstream::in | std::ios::binary);
+	contentsOut = std::vector<uint8>(std::istreambuf_iterator<char>(infile), {});
+
+	infile.close();
+}
+
+///*static*/ uint8 *HyIO::ReadBinaryFile(const char *szFilePath, uint32 &uiBufferSizeOut)
+//{
+//	if(szFilePath == nullptr)
+//		return nullptr;
+//
+//	std::ifstream infile(szFilePath, std::ifstream::in | std::ios::binary | std::ios::ate);
+//	HyAssert(infile, "ReadBinaryFile invalid file: " << szFilePath);
+//
+//	std::streamsize size = infile.tellg();
+//	infile.seekg(0, std::ios::beg);
+//
+//	uiBufferSizeOut = static_cast<uint32>(size);
+//	uint8 *pBuffer = HY_NEW uint8[uiBufferSizeOut];
+//
+//	if(!infile.read(reinterpret_cast<char *>(pBuffer), size))
+//		HyLogError("HyIO::ReadBinaryFile - only " << infile.gcount() << " bytes was read");
+//
+//	infile.close();
+//
+//	return pBuffer;
+//}
 
 /*static*/ void HyIO::WriteTextFile(const char *szFilePath, const char *szContentBuffer)
 {
