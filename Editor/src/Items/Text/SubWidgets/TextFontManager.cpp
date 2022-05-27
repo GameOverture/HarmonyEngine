@@ -727,6 +727,8 @@ void TextFontManager::RegenFontArray()
 		fontArray.append(QJsonValue(stageObj));
 	}
 
+	static_cast<TextModel *>(m_GlyphsModel.GetOwner().GetModel())->SetRuntimeAtlasDirty();
+
 	m_FontArray = fontArray;
 }
 

@@ -240,8 +240,7 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 {
 	ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
 
-	// Keep track of any linked/referenced items as they will need to be re-saved after image replacement
-	QList<ProjectItemData *> affectedItemList;
+	m_RepackAffectedItemList.clear();
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
 		QSet<ProjectItemData *> sLinks = assetsList[i]->GetDependencies();
@@ -250,7 +249,7 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 			for(QSet<ProjectItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
 			{
 				ProjectItemData *pLinkedItem = *linksIter;
-				affectedItemList.append(pLinkedItem);
+				m_RepackAffectedItemList.append(pLinkedItem);
 
 				// Abort if any of these linked items are currently opened & unsaved
 				for(int i = 0; i < pTabBar->count(); ++i)
@@ -304,15 +303,6 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 	}
 	else
 		OnUpdateAssets(assetsList);
-
-	// Resave all affected items that had a replaced asset
-	for(int i = 0; i < affectedItemList.size(); ++i)
-	{
-		if(affectedItemList[i]->Save(i == (affectedItemList.size() - 1)) == false)
-			HyGuiLog(affectedItemList[i]->GetName(true) % " failed to save after replacing assets", LOGTYPE_Error);
-	}
-
-	SaveMeta();
 }
 
 void IManagerModel::Rename(TreeModelItemData *pItem, QString sNewName)
@@ -1007,5 +997,13 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sName
 
 /*slot*/ void IManagerModel::OnRepackFinished()
 {
+	// Re-save all affected items that had a replaced asset
+	for(int i = 0; i < m_RepackAffectedItemList.size(); ++i)
+	{
+		if(m_RepackAffectedItemList[i]->Save(i == (m_RepackAffectedItemList.size() - 1)) == false)
+			HyGuiLog(m_RepackAffectedItemList[i]->GetName(true) % " failed to save after replacing assets", LOGTYPE_Error);
+	}
+	m_RepackAffectedItemList.clear();
+
 	SaveRuntime();
 }

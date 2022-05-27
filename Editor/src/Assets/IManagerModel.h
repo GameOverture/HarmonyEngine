@@ -40,6 +40,8 @@ protected:
 	QMap<QUuid, AssetItemData *>				m_AssetUuidMap;
 	QMap<quint32, QList<AssetItemData *> >		m_AssetChecksumMap;
 
+	QList<ProjectItemData *>					m_RepackAffectedItemList; // Keep track of any linked/referenced items as they will need to be re-saved after asset repacking
+
 public:
 	IManagerModel(Project &projRef, AssetType eAssetType);
 	virtual ~IManagerModel();

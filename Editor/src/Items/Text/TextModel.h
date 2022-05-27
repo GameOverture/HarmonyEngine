@@ -52,6 +52,8 @@ class TextModel : public IModel
 	TextFontManager 		m_FontManager;
 	AtlasFrame *			m_pAtlasFrame;
 
+	bool					m_bGenerateRuntimeAtlas;
+
 public:
 	TextModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~TextModel();
@@ -59,6 +61,8 @@ public:
 	TextFontManager &GetFontManager();
 	TextLayersModel *GetLayersModel(uint uiIndex) const;
 	PropertiesTreeModel *GetGlyphsModel();
+
+	void SetRuntimeAtlasDirty();
 
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;

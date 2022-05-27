@@ -122,7 +122,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	{
 		switch(pFormatArray[i])
 		{
-//#ifndef HY_PLATFORM_BROWSER // emscripten compiled these before when I used glew.h
+#ifndef HY_PLATFORM_BROWSER // emscripten compiled these before when I used glew.h
 		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
 			sCompressedTextureFormats += "RGB_DXT1 ";
 			break;
@@ -142,10 +142,13 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 		case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
 			sCompressedTextureFormats += "ASTC_SRGB8";
 			break;
-//#endif
+#endif
 		}
 	}
 	delete[] pFormatArray;
+
+	//const GLubyte *szExtensions = glGetString(GL_EXTENSIONS);
+	//HyLog("GL EXTENSIONS: " << szExtensions);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);		// 4-byte pixel alignment
 

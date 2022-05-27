@@ -44,7 +44,8 @@ TextLayersModel &TextStateData::GetLayersModel()
 TextModel::TextModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_FontManager(m_ItemRef, itemFileDataRef.m_Meta["availableGlyphs"].toObject(), itemFileDataRef.m_Data["fontArray"].toArray()),
-	m_pAtlasFrame(nullptr)
+	m_pAtlasFrame(nullptr),
+	m_bGenerateRuntimeAtlas(false)
 {
 	InitStates<TextStateData>(itemFileDataRef);
 		
@@ -89,8 +90,16 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	return m_FontManager.GetGlyphsModel();
 }
 
+void TextModel::SetRuntimeAtlasDirty()
+{
+	m_bGenerateRuntimeAtlas = true;
+}
+
 /*virtual*/ bool TextModel::OnPrepSave() /*override*/
 {
+	if(m_bGenerateRuntimeAtlas == false)
+		return true;
+
 	m_FontManager.CleanupLayers(m_StateList);
 
 	m_FontManager.GenerateOptimizedAtlas();
@@ -157,6 +166,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	else
 		HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
 
+	m_bGenerateRuntimeAtlas = false;
 	return true;
 }
 
