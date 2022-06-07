@@ -230,6 +230,20 @@ void HyWindow::SetWindowSize(glm::ivec2 vSizeHint)
 #endif
 }
 
+void HyWindow::ApiRefreshWindowSize()
+{
+	int32 iWidth = 0;
+	int32 iHeight = 0;
+
+#if defined(HY_USE_GLFW)
+	glfwGetWindowSize(m_pInterop, &iWidth, &iHeight);
+	glfwSetWindowSize(m_pInterop, iWidth, iHeight);
+#elif defined(HY_USE_SDL2)
+	SDL_GetWindowSize(m_pInterop, &iWidth, &iHeight);
+	SDL_SetWindowSize(m_pInterop, iWidth, iHeight);
+#endif
+}
+
 glm::ivec2 HyWindow::GetLocation()
 {
 	return m_Info.ptLocation;

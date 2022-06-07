@@ -413,6 +413,29 @@ bool HyInput::IsUsingTouchScreen() const
 	{
 		m_pMouseWindow = pWindow;
 	}
+
+	void HyInput::DoTouchDownEvent(const SDL_Event &eventRef)
+	{
+		m_ptMousePos.x = eventRef.tfinger.x * m_pMouseWindow->GetWidthF();
+		m_ptMousePos.y = eventRef.tfinger.y * m_pMouseWindow->GetHeightF();
+
+		m_uiMouseBtnFlags |= (1 << SDL_BUTTON_LEFT);
+		m_uiMouseBtnFlags_NewlyPressed |= (1 << SDL_BUTTON_LEFT);
+	}
+
+	void HyInput::DoTouchMoveEvent(const SDL_Event &eventRef)
+	{
+		m_ptMousePos.x = eventRef.tfinger.x * m_pMouseWindow->GetWidthF();
+		m_ptMousePos.y = eventRef.tfinger.y * m_pMouseWindow->GetHeightF();
+	}
+
+	void HyInput::DoTouchUpEvent(const SDL_Event &eventRef)
+	{
+		m_ptMousePos.x = eventRef.tfinger.x * m_pMouseWindow->GetWidthF();
+		m_ptMousePos.y = eventRef.tfinger.y * m_pMouseWindow->GetHeightF();
+
+		m_uiMouseBtnFlags &= ~(1 << SDL_BUTTON_LEFT);
+	}
 #endif
 
 void HyInput::DistrubuteTextInput(std::string sNewText)

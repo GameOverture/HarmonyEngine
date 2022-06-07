@@ -88,6 +88,8 @@ public:
 	float								GetHeightF(float fPercent = 1.0f);
 	glm::ivec2							GetWindowSize() const;
 	void								SetWindowSize(glm::ivec2 vSizeHint);
+	void								ApiRefreshWindowSize();
+
 	glm::ivec2							GetLocation();
 	void								SetLocation(glm::ivec2 ptLocation);
 

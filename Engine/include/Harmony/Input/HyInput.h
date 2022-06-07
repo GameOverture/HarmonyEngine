@@ -128,6 +128,9 @@ private:
 	void DoMouseUpEvent(const SDL_Event &eventRef);
 	void DoMouseWheelEvent(const SDL_Event &eventRef);
 	void SetMouseWindow(HyWindow *pWindow);
+	void DoTouchDownEvent(const SDL_Event &eventRef);
+	void DoTouchMoveEvent(const SDL_Event &eventRef);
+	void DoTouchUpEvent(const SDL_Event &eventRef);
 #endif
 
 	void DistrubuteTextInput(std::string sNewText);
