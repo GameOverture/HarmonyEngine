@@ -48,6 +48,7 @@ public:
 
 	uint32 InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
 	uint32 InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
+	void RemoveSubButton(uint32 uiSubBtnIndex);
 	void ClearSubButtons();
 
 	void SetExpandType(HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate);

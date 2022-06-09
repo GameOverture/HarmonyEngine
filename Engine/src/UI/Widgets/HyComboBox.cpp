@@ -64,6 +64,23 @@ uint32 HyComboBox::InsertSubButton(const HyPanelInit &initRef, std::string sText
 	return static_cast<uint32>(m_SubBtnList.size()) - 1;
 }
 
+void HyComboBox::RemoveSubButton(uint32 uiSubBtnIndex)
+{
+	uint32 uiIndexCount = 0;
+	for(auto it = m_SubBtnList.begin(); it != m_SubBtnList.end(); ++it, ++uiIndexCount)
+	{
+		if(uiIndexCount == uiSubBtnIndex)
+		{
+			HyButton *pSubBtn = *it;
+			m_SubBtnList.erase(it);
+			delete pSubBtn;
+			return;
+		}
+	}
+
+	HyLogWarning("HyComboBox::RemoveSubButton was passed invalid index");
+}
+
 void HyComboBox::ClearSubButtons()
 {
 	for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
