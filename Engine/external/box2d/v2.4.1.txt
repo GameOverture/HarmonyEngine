@@ -1,0 +1,4 @@
+HARMONY CHANGES:
+
+collision\b2_polygon_shape.cpp line 156:
+    - Commented out the b2Assert(false);

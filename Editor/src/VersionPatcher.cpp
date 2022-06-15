@@ -174,7 +174,7 @@
 			Patch_7to8(projDoc);
 			[[fallthrough]];
 		case 8:
-			HyGuiLog("Patching project files: version 7 -> 8", LOGTYPE_Info);
+			HyGuiLog("Patching project files: version 8 -> 9", LOGTYPE_Info);
 			Patch_8to9(metaAtlasDoc, dataAtlasDoc);
 			[[fallthrough]];
 		case 9:

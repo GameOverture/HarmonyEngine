@@ -105,7 +105,7 @@ protected:
 //	// Note: This method will not unpause an Spine2d. It will just set its play rate for
 //	//       when it is told to resume.
 //	//--------------------------------------------------------------------------------------
-//	void AnimSetPlayRate(float fPlayRate)	{ m_fAnimPlayRate = fPlayRate; }
+//	void SetAnimRate(float fPlayRate)	{ m_fAnimPlayRate = fPlayRate; }
 //
 //
 //	//// For internal engine use

@@ -87,9 +87,9 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 
 		HyScrollBar *pScrollBar = static_cast<HyScrollBar *>(m_pParent);
 		if(pScrollBar->GetOrientation() == HYORIEN_Vertical)
-			pScrollBar->OffsetSlider(vDist.y);
+			pScrollBar->OffsetSlider(vDist.y, false);
 		else
-			pScrollBar->OffsetSlider(vDist.x);
+			pScrollBar->OffsetSlider(vDist.x, false);
 
 		m_ptDragPos = ptMousePos;
 	}
@@ -320,19 +320,24 @@ void HyScrollBar::DoPageScroll(int32 iPagesOffset)
 	m_AnimScrollPos.Tween(m_AnimScrollPos.GetAnimDestination() + (iPagesOffset * m_fClientShownSize), 0.15f);
 }
 
-void HyScrollBar::OffsetSlider(float fPixels)
+void HyScrollBar::OffsetSlider(float fPixels, bool bOffsetClientContentPixels)
 {
-	// Convert fPixels to client sizing
-	float fScrollBarLength = 0.0f;
 	if(m_eORIENTATION == HYORIEN_Vertical)
-	{
 		fPixels *= -1.0f;
-		fScrollBarLength = m_PageControl.GetSceneHeight();
-	}
-	else
-		fScrollBarLength = m_PageControl.GetSceneWidth();
 
-	m_AnimScrollPos.Offset((fPixels * m_fClientTotalSize) / fScrollBarLength);
+	if(bOffsetClientContentPixels == false)
+	{
+		// Convert fPixels to scroll bar size
+		float fScrollBarLength = 0.0f;
+		if(m_eORIENTATION == HYORIEN_Vertical)
+			fScrollBarLength = m_PageControl.GetSceneHeight();
+		else
+			fScrollBarLength = m_PageControl.GetSceneWidth();
+
+		fPixels = (fPixels * m_fClientTotalSize) / fScrollBarLength;
+	}
+
+	m_AnimScrollPos.Offset(fPixels);
 	InvokeOnScrollCallback();
 }
 

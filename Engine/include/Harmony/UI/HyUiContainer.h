@@ -16,6 +16,7 @@
 #include "UI/Components/HyLayout.h"
 #include "UI/Components/HySpacer.h"
 #include "UI/Components/HyCloseButton.h"
+#include "UI/Components/HyScrollBar.h"
 
 class HyUiContainer : public HyEntity2d
 {
@@ -49,6 +50,12 @@ protected:
 	ContainerState							m_eContainerState;
 	float									m_fElapsedTime;
 
+	// Scrolling functionality
+	bool									m_bUseVertBar;
+	bool									m_bUseHorzBar;
+	HyScrollBar								m_VertBar;
+	HyScrollBar								m_HorzBar;
+
 public:
 	HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyUiContainer();
@@ -56,7 +63,7 @@ public:
 	static bool IsModalActive();
 
 	glm::ivec2 GetSize();
-	virtual void SetSize(int32 iNewWidth, int32 iNewHeight);
+	void SetSize(int32 iNewWidth, int32 iNewHeight);
 
 	bool Show(bool bInstant = false);
 	bool Hide(bool bInstant = false);
@@ -84,12 +91,16 @@ public:
 	
 	void ClearItems();
 
+	void EnableScrollBars(bool bUseVert, bool bUseHorz);
+	void SetScrollBarColor(HyColor color);
+	void SetLineScrollAmt(float fLineScrollAmt);
+
 protected:
 	virtual void OnUpdate() override final;
 	std::vector<IHyWidget *> AssembleWidgetList();
 
+	virtual void OnRootLayoutUpdate();// { m_RootLayout.Resize(static_cast<uint32>(m_Panel.size.X()), static_cast<uint32>(m_Panel.size.Y())); }
 	virtual void OnContainerUpdate() { }
-	virtual void OnRootLayoutUpdate() { m_RootLayout.Resize(static_cast<uint32>(m_Panel.size.X()), static_cast<uint32>(m_Panel.size.Y())); }
 
 	// Optional overrides to control show and hide animations/functionality
 	virtual float OnBeginShow() { return 0.0f; }	// Returns the duration (in seconds) of the show transition
@@ -102,6 +113,8 @@ private:
 
 	static void DistrubuteTextInput(std::string sText);
 	static void DistrubuteKeyboardInput(HyKeyboardBtn eBtn);
+
+	static void OnScroll(HyScrollBar *pSelf, float fNewPosition, float fTotalRange, void *pData);
 };
 
 #endif /* HyUiContainer_h__ */

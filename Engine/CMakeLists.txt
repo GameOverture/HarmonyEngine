@@ -140,7 +140,6 @@ set(HYENGINE_SOURCE_FILES
 	src/Time/Watches/IHyTimeInst.cpp
 	src/UI/IHyEntityUi.cpp
 	src/UI/HyUiContainer.cpp
-	src/UI/HyScrollContainer.cpp
 	src/UI/Widgets/HyButton.cpp
 	src/UI/Widgets/HyCheckBox.cpp
 	src/UI/Widgets/HyComboBox.cpp
@@ -267,7 +266,6 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Time/Watches/IHyTimeInst.h
 	include/Harmony/UI/IHyEntityUi.h
 	include/Harmony/UI/HyUiContainer.h
-	include/Harmony/UI/HyScrollContainer.h
 	include/Harmony/UI/Widgets/HyButton.h
 	include/Harmony/UI/Widgets/HyCheckBox.h
 	include/Harmony/UI/Widgets/HyComboBox.h
