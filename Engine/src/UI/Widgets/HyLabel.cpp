@@ -180,6 +180,12 @@ void HyLabel::SetPanelVisible(bool bVisible)
 	ResetTextAndPanel();
 }
 
+void HyLabel::SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl)
+{
+	m_Panel.GetSprite().SetAnimCtrl(eAnimCtrl);
+	ResetTextAndPanel();
+}
+
 /*virtual*/ std::string HyLabel::GetUtf8String() const
 {
 	return m_Text.GetUtf8String();

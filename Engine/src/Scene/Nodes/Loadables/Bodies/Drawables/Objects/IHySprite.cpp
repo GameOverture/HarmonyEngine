@@ -235,7 +235,7 @@ template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(float fPercent /*= 1.0f*/)
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameWidth invoked on null data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth invoked on null data");
 		return 0.0f;
 	}
 
@@ -250,7 +250,7 @@ template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight(float fPercent /*= 1.0f*/)
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameHeight invoked on null data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight invoked on null data");
 		return 0.0f;
 	}
 

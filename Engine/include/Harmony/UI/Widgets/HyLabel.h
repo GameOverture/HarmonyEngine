@@ -61,6 +61,7 @@ public:
 	void SetPanelVisible(bool bVisible);
 	uint32 GetSpriteState() const;
 	virtual void SetSpriteState(uint32 uiStateIndex);
+	void SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl);
 
 	std::string GetUtf8String() const;
 	void SetText(const std::stringstream &ssUtf8Text);

@@ -42,7 +42,7 @@ HyRackMeter::HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, st
 {
 }
 
-/*virtual*/ void HyRackMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_HCenter*/, bool bUseScaleBox /*= true*/) /*override*/
+/*virtual*/ void HyRackMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_Center*/, bool bUseScaleBox /*= true*/) /*override*/
 {
 	HyLabel::SetAsStacked(eTextAlignment, bUseScaleBox);
 
