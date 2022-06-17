@@ -265,7 +265,7 @@ template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetStateWidth(uint32 uiStateIndex, float fPercent /*= 1.0f*/)
 {
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
-	if(pData == nullptr || pData->GetNumStates() == 0) {
+	if(pData == nullptr || uiStateIndex >= pData->GetNumStates() || pData->GetFrame(uiStateIndex, 0).pAtlas == nullptr) {
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth invoked on null data");
 		return 0.0f;
 	}
@@ -286,7 +286,7 @@ template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetStateHeight(uint32 uiStateIndex, float fPercent /*= 1.0f*/)
 {
 	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
-	if(pData == nullptr) {
+	if(pData == nullptr || uiStateIndex >= pData->GetNumStates() || pData->GetFrame(uiStateIndex, 0).pAtlas == nullptr) {
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight invoked on null data");
 		return 0.0f;
 	}
