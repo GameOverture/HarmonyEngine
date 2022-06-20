@@ -11,7 +11,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
-#include "Assets/Nodes/HyText2dData.h"
+#include "Assets/Nodes/HyTextData.h"
 #include "Utilities/HyMath.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
@@ -150,7 +150,7 @@ float IHyText<NODETYPE, ENTTYPE>::GetLineBreakHeight(float fPercent /*= 1.0f*/)
 		return 0.0f;
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	float fLineHeight = pData->GetLineHeight(this->m_uiState);
 
 	return fLineHeight * fPercent;
@@ -196,7 +196,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 
 		return glm::vec2(0);
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	uint32 uiNumLayers = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
@@ -215,9 +215,9 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphSize invoked on null data");
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	HyAssert(uiCharIndex < m_Utf32CodeList.size(), "IHyText<NODETYPE, ENTTYPE>::GetGlyphSize() was passed invalid 'uiCharIndex'");
-	const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
+	const HyTextGlyph *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, m_Utf32CodeList[uiCharIndex]);
 	if(pGlyphRef == nullptr)
 		return glm::vec2(0.0f);
 
@@ -238,7 +238,7 @@ float IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha(uint32 uiCharIndex)
 		return 1.0f;
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
@@ -260,7 +260,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 		return;
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
@@ -285,7 +285,7 @@ uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers(uint32 uiStateIndex)
 		return 0;
 	}
 
-	return static_cast<const HyText2dData *>(this->UncheckedGetData())->GetNumLayers(uiStateIndex);
+	return static_cast<const HyTextData *>(this->UncheckedGetData())->GetNumLayers(uiStateIndex);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -349,7 +349,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 		return glm::vec2();
 	}
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	if(m_uiNumValidCharacters > 0)
 	{
 		uint32 uiLastCharOffset = 1;
@@ -364,7 +364,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 			else
 				return glm::vec2();
 		}
-		const HyText2dGlyphInfo *pGlyph = pData->GetGlyph(this->m_uiState, 0, uiUtf32Code);
+		const HyTextGlyph *pGlyph = pData->GetGlyph(this->m_uiState, 0, uiUtf32Code);
 
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - uiLastCharOffset, pData->GetNumLayers(this->m_uiState), 0);
 
@@ -391,7 +391,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 	}
 
 	CalculateGlyphInfos();
-	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 
 	float fX = 0.0f;
 	if((m_uiTextAttributes & TEXTATTRIB_IsColumn) == 0)
@@ -512,7 +512,7 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHyText<NODETYPE, ENTTYPE>::IsLoadDataValid() /*override*/
 {
-	const HyText2dData *pData = static_cast<const HyText2dData *>(this->AcquireData());
+	const HyTextData *pData = static_cast<const HyTextData *>(this->AcquireData());
 	return pData && pData->GetNumStates() != 0;
 }
 
@@ -525,7 +525,7 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHyText<NODETYPE, ENTTYPE>::OnDataAcquired() /*override*/
 {
-	const HyText2dData *pTextData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pTextData = static_cast<const HyTextData *>(this->UncheckedGetData());
 
 	for(uint32 i = 0; i < m_StateColors.size(); ++i)
 	{
@@ -557,7 +557,7 @@ template<typename NODETYPE, typename ENTTYPE>
 {
 	NODETYPE::OnLoaded();
 
-	const HyText2dData *pTextData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pTextData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	if(pTextData == nullptr)
 		return;
 
@@ -573,7 +573,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 	if((m_uiTextAttributes & TEXTATTRIB_IsDirty) == 0 || this->AcquireData() == nullptr)
 		return;
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(this->UncheckedGetData());
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 
 	m_uiNumValidCharacters = m_uiNumRenderQuads = 0;
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
@@ -615,7 +615,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 			// UTF-32 value of '48' == zero (...and '57' == nine)
 			for(uint32 iDigit = 48; iDigit < 58; ++iDigit)
 			{
-				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, iDigit);
+				const HyTextGlyph *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, iDigit);
 				if(pGlyphRef)
 				{
 					if(pMonospaceWidths[uiLayerIndex] < pGlyphRef->fADVANCE_X)
@@ -703,7 +703,7 @@ offsetCalculation:
 			{
 				uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiStrIndex, uiNUM_LAYERS, uiLayerIndex);
 
-				const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
+				const HyTextGlyph *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
 				if(pGlyphRef == nullptr)
 					break;
 

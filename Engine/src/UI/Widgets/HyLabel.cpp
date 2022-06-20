@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyLabel.h"
-#include "Assets/Nodes/HySprite2dData.h"
+#include "Assets/Nodes/HySpriteData.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
@@ -305,8 +305,8 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 			float fScaleY = uiNewHeight / vTextSize.y;
 			m_Text.scale.Set(HyMin(fScaleX, fScaleY));
 
-			uiNewWidth = m_Text.GetWidth(m_Text.scale.X());
-			uiNewHeight = m_Text.GetHeight(m_Text.scale.Y());
+			uiNewWidth = static_cast<uint32>(m_Text.GetWidth(m_Text.scale.X()));
+			uiNewHeight = static_cast<uint32>(m_Text.GetHeight(m_Text.scale.Y()));
 		}
 		else
 			m_Panel.size.Set(static_cast<int32>(uiNewWidth), static_cast<int32>(uiNewHeight));

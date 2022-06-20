@@ -13,12 +13,11 @@
 #include "Assets/Files/HyFileAtlas.h"
 #include "Assets/Files/HyGLTF.h"
 #include "Assets/Files/HyFileAudio.h"
-#include "Assets/Nodes/HyEntityData.h"
 #include "Assets/Nodes/HyAudioData.h"
-#include "Assets/Nodes/HySpine2dData.h"
-#include "Assets/Nodes/HySprite2dData.h"
-#include "Assets/Nodes/HyText2dData.h"
-#include "Assets/Nodes/HyTexturedQuad2dData.h"
+#include "Assets/Nodes/HySpineData.h"
+#include "Assets/Nodes/HySpriteData.h"
+#include "Assets/Nodes/HyTextData.h"
+#include "Assets/Nodes/HyTexturedQuadData.h"
 #include "Assets/Nodes/HyPrefabData.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/IHyLoadable.h"
@@ -223,8 +222,8 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 {
 	switch(pLoadable->_LoadableGetType())
 	{
-	case HYTYPE_Entity:
-		pDataOut = m_EntityFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+	case HYTYPE_Audio:
+		pDataOut = m_AudioFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
 	case HYTYPE_Sprite:
 		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
@@ -232,19 +231,20 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 	case HYTYPE_Text:
 		pDataOut = m_TextFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
+	case HYTYPE_Spine:
+		pDataOut = m_SpineFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+		break;
 	case HYTYPE_Prefab:
 		pDataOut = m_PrefabFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
-	case HYTYPE_Audio:
-		pDataOut = m_AudioFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
-		break;
+	
 	case HYTYPE_TexturedQuad:
 		if(pLoadable->GetName() != "raw")
 		{
 			std::pair<uint32, uint32> key(std::stoi(pLoadable->GetPrefix()), std::stoi(pLoadable->GetName()));
 			if(m_Quad2d.find(key) == m_Quad2d.end())
 			{
-				HyTexturedQuad2dData *pNewQuadData = HY_NEW HyTexturedQuad2dData(key.first, key.second, *this);
+				HyTexturedQuadData *pNewQuadData = HY_NEW HyTexturedQuadData(key.first, key.second, *this);
 				m_Quad2d[key] = pNewQuadData;
 			}
 			pDataOut = m_Quad2d[key];
@@ -516,19 +516,14 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	if(itemsDoc.HasMember("Audio"))
 		m_AudioFactory.Init(itemsDoc["Audio"].GetObject(), *this);
-	if(itemsDoc.HasMember("Prefabs"))
-	{
-		HyJsonObj prefabObj = itemsDoc["Prefabs"].GetObject();
-
-		//for(auto iter = prefabObj.kv_map().begin(); iter != prefabObj.kv_map().end(); ++iter)
-		//	m_GltfMap[iter->first] = HY_NEW HyGLTF(iter->first, 0);
-
-		//m_PrefabFactory.Init(prefabObj, *this);
-	}
-	if(itemsDoc.HasMember("Texts"))
-		m_TextFactory.Init(itemsDoc["Texts"].GetObject(), *this);
 	if(itemsDoc.HasMember("Sprites"))
 		m_SpriteFactory.Init(itemsDoc["Sprites"].GetObject(), *this);
+	if(itemsDoc.HasMember("Texts"))
+		m_TextFactory.Init(itemsDoc["Texts"].GetObject(), *this);
+	if(itemsDoc.HasMember("Spine"))
+		m_SpineFactory.Init(itemsDoc["Spine"].GetObject(), *this);
+	if(itemsDoc.HasMember("Prefabs"))
+		m_PrefabFactory.Init(itemsDoc["Prefabs"].GetObject(), *this);
 #endif
 
 	// Atomic boolean indicated to main thread that we're initialized

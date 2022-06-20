@@ -66,12 +66,11 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Files/HyFilesManifest.cpp
 	src/Assets/Files/HyGLTF.cpp
 	src/Assets/Nodes/HyAudioData.cpp
-	src/Assets/Nodes/HyEntityData.cpp
 	src/Assets/Nodes/HyPrefabData.cpp
-	src/Assets/Nodes/HySpine2dData.cpp
-	src/Assets/Nodes/HySprite2dData.cpp
-	src/Assets/Nodes/HyText2dData.cpp
-	src/Assets/Nodes/HyTexturedQuad2dData.cpp
+	src/Assets/Nodes/HySpineData.cpp
+	src/Assets/Nodes/HySpriteData.cpp
+	src/Assets/Nodes/HyTextData.cpp
+	src/Assets/Nodes/HyTexturedQuadData.cpp
 	src/Assets/Nodes/IHyNodeData.cpp
 	src/Audio/IHyAudioCore.cpp
 	src/Audio/SDL2/HyAudioCore_SDL2.cpp
@@ -187,12 +186,11 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Assets/Files/HyGLTF.h
 	include/Harmony/Assets/Files/IHyFile.h
 	include/Harmony/Assets/Nodes/HyAudioData.h
-	include/Harmony/Assets/Nodes/HyEntityData.h
 	include/Harmony/Assets/Nodes/HyPrefabData.h
-	include/Harmony/Assets/Nodes/HySpine2dData.h
-	include/Harmony/Assets/Nodes/HySprite2dData.h
-	include/Harmony/Assets/Nodes/HyText2dData.h
-	include/Harmony/Assets/Nodes/HyTexturedQuad2dData.h
+	include/Harmony/Assets/Nodes/HySpineData.h
+	include/Harmony/Assets/Nodes/HySpriteData.h
+	include/Harmony/Assets/Nodes/HyTextData.h
+	include/Harmony/Assets/Nodes/HyTexturedQuadData.h
 	include/Harmony/Assets/Nodes/IHyNodeData.h
 	include/Harmony/Audio/IHyAudioCore.h
 	include/Harmony/Audio/IHyFileAudioImpl.h

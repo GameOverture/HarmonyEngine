@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HySprite2dData.h
+ *	HySpriteData.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -7,22 +7,22 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HySprite2dData_h__
-#define HySprite2dData_h__
+#ifndef HySpriteData_h__
+#define HySpriteData_h__
 
 #include "Afx/HyStdAfx.h"
 
 #include "Assets/Nodes/IHyNodeData.h"
 #include "Assets/HyAssets.h"
 
-struct HySprite2dFrame
+struct HySpriteFrame
 {
 	HyFileAtlas *				pAtlas;
 	const HyRectangle<float>	rSRC_RECT;
 	const glm::ivec2			vOFFSET;
 	const float					fDURATION;
 
-	HySprite2dFrame(HyFileAtlas *pAtlas,
+	HySpriteFrame(HyFileAtlas *pAtlas,
 					float fSrcLeft,
 					float fSrcTop,
 					float fSrcRight,
@@ -41,11 +41,11 @@ struct HySprite2dFrame
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class HySprite2dData : public IHyNodeData
+class HySpriteData : public IHyNodeData
 {
 public:
-	HySprite2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
-	virtual ~HySprite2dData();
+	HySpriteData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
+	virtual ~HySpriteData();
 
 	class AnimState
 	{
@@ -55,18 +55,18 @@ public:
 		const bool			m_bBOUNCE;
 		const float			m_fDURATION;
 
-		HySprite2dFrame *	m_pFrames;
+		HySpriteFrame *		m_pFrames;
 		const uint32		m_uiNUMFRAMES;
 
 		AnimState(bool bLoop, bool bReverse, bool bBounce, float fDuration, HyFilesManifest &requiredAtlasIndicesRef, HyJsonArray frameArray, HyAssets &assetsRef);
 		~AnimState();
 
-		const HySprite2dFrame &GetFrame(uint32 uiFrameIndex) const;
+		const HySpriteFrame &GetFrame(uint32 uiFrameIndex) const;
 	};
-	AnimState *			m_pAnimStates;
+	AnimState *				m_pAnimStates;
 
 	const AnimState &GetState(uint32 uiAnimStateIndex) const;
-	const HySprite2dFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
+	const HySpriteFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
 };
 
-#endif /* HySprite2dData_h__ */
+#endif /* HySpriteData_h__ */

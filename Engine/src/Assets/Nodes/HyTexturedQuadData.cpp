@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyTexturedQuad2dData.h
+*	HyTexturedQuadData.h
 *
 *	Harmony Engine
 *	Copyright (c) 2013 Jason Knobler
@@ -8,11 +8,11 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HyTexturedQuad2dData.h"
+#include "Assets/Nodes/HyTexturedQuadData.h"
 #include "Renderer/IHyRenderer.h"
 
 
-HyTexturedQuad2dData::HyTexturedQuad2dData(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyAssets &assetsRef) :
+HyTexturedQuadData::HyTexturedQuadData(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyAssets &assetsRef) :
 	IHyNodeData("N/A"),
 	m_uiATLAS_GROUP_ID(uiAtlasGrpId),
 	m_uiINDEX_IN_GROUP(uiIndexInGroup),
@@ -22,11 +22,11 @@ HyTexturedQuad2dData::HyTexturedQuad2dData(uint32 uiAtlasGrpId, uint32 uiIndexIn
 	m_RequiredAtlases.Set(m_pAtlas->GetManifestIndex());
 }
 
-HyTexturedQuad2dData::~HyTexturedQuad2dData()
+HyTexturedQuadData::~HyTexturedQuadData()
 {
 }
 
-HyFileAtlas *HyTexturedQuad2dData::GetAtlas() const
+HyFileAtlas *HyTexturedQuadData::GetAtlas() const
 {
 	return m_pAtlas;
 }

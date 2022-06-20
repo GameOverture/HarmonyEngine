@@ -14,8 +14,8 @@
 #include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable.h"
 #include "Scene/Physics/HyShape2d.h"
-#include "Assets/Nodes/HySprite2dData.h"
-#include "Assets/Nodes/HyText2dData.h"
+#include "Assets/Nodes/HySpriteData.h"
+#include "Assets/Nodes/HyTextData.h"
 
 class IHyDrawable2d : public IHyBody2d, public IHyDrawable
 {

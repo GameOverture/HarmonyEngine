@@ -11,7 +11,6 @@
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Scene/HyScene.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Assets/Nodes/HyEntityData.h"
 #include "HyEngine.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
@@ -499,12 +498,6 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 	}
 
 	return true;
-}
-
-/*virtual*/ void HyEntity2d::OnDataAcquired() /*override*/
-{
-	const HyEntityData *pData = static_cast<const HyEntityData *>(UncheckedGetData());
-	//pData->
 }
 
 void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)

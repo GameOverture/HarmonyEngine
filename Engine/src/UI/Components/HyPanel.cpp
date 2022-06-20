@@ -217,8 +217,8 @@ glm::vec2 HyPanel::GetBotLeftOffset()
 	{
 		glm::vec2 vPanelDimensions = size.Get();
 
-		const HySprite2dData *pPanelData = static_cast<const HySprite2dData *>(m_SpritePanel.AcquireData());
-		const HySprite2dFrame &frameRef = pPanelData->GetFrame(m_SpritePanel.GetState(), m_SpritePanel.GetFrame());
+		const HySpriteData *pPanelData = static_cast<const HySpriteData *>(m_SpritePanel.AcquireData());
+		const HySpriteFrame &frameRef = pPanelData->GetFrame(m_SpritePanel.GetState(), m_SpritePanel.GetFrame());
 
 		auto vUiSizeHint = GetSizeHint();
 		return -glm::vec2(frameRef.vOFFSET.x * (vPanelDimensions.x / vUiSizeHint.x), frameRef.vOFFSET.y * (vPanelDimensions.y / vUiSizeHint.y));

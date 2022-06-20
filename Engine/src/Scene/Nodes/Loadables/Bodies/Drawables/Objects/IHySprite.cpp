@@ -12,7 +12,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
-#include "Assets/Nodes/HySprite2dData.h"
+#include "Assets/Nodes/HySpriteData.h"
 #include "Renderer/Components/HyVertexBuffer.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
@@ -82,8 +82,8 @@ void IHySprite<NODETYPE, ENTTYPE>::SetAnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiSt
 	case HYANIMCTRL_Reset:
 		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_IsBouncing;
 		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Finished;
-		if(m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Reverse && static_cast<const HySprite2dData *>(this->AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES > 0)
-			SetFrame(static_cast<const HySprite2dData *>(this->AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES - 1);
+		if(m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Reverse && static_cast<const HySpriteData *>(this->AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES > 0)
+			SetFrame(static_cast<const HySpriteData *>(this->AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES - 1);
 		else
 			SetFrame(0);
 		break;
@@ -135,7 +135,7 @@ uint32 IHySprite<NODETYPE, ENTTYPE>::GetNumFrames()
 		return 0;
 	}
 
-	return static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES;
+	return static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -147,13 +147,13 @@ uint32 IHySprite<NODETYPE, ENTTYPE>::GetFrame() const
 template<typename NODETYPE, typename ENTTYPE>
 void IHySprite<NODETYPE, ENTTYPE>::SetFrame(uint32 uiFrameIndex)
 {
-	if(this->AcquireData() == nullptr || uiFrameIndex >= static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
+	if(this->AcquireData() == nullptr || uiFrameIndex >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
 	{
 		if(this->UncheckedGetData() == nullptr) {
 			HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::AnimSetFrame invoked on null data");
 		}
 		else {
-			HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimSetFrame wants to set frame index of '" << uiFrameIndex << "' when total number of frames is '" << static_cast<const HySprite2dData *>(this->AcquireData())->GetState(this->m_uiState).m_uiNUMFRAMES << "'");
+			HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::AnimSetFrame wants to set frame index of '" << uiFrameIndex << "' when total number of frames is '" << static_cast<const HySpriteData *>(this->AcquireData())->GetState(this->m_uiState).m_uiNUMFRAMES << "'");
 		}
 
 		return;
@@ -164,7 +164,7 @@ void IHySprite<NODETYPE, ENTTYPE>::SetFrame(uint32 uiFrameIndex)
 
 	m_uiCurFrame = uiFrameIndex;
 
-	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	this->m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
 	
 	this->SetDirty(this->DIRTY_BoundingVolume);
@@ -230,7 +230,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetAnimDuration()
 		return 0.0f;
 	}
 
-	return static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_fDURATION;
+	return static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_fDURATION;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -238,13 +238,13 @@ float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(float fPercent /*= 1.0f*/)
 {
 	if(this->AcquireData() == nullptr ||
 	   this->m_uiState >= this->UncheckedGetData()->GetNumStates() ||
-	   m_uiCurFrame >= static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
+	   m_uiCurFrame >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
 	{
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth invoked on null data");
 		return 0.0f;
 	}
 
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
@@ -256,13 +256,13 @@ float IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight(float fPercent /*= 1.0f*/)
 {
 	if(this->AcquireData() == nullptr ||
 		this->m_uiState >= this->UncheckedGetData()->GetNumStates() ||
-		m_uiCurFrame >= static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
+		m_uiCurFrame >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
 	{
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight invoked on null data");
 		return 0.0f;
 	}
 
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
@@ -272,7 +272,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight(float fPercent /*= 1.0f*/)
 template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetStateWidth(uint32 uiStateIndex, float fPercent /*= 1.0f*/)
 {
-	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
+	const HySpriteData *pData = static_cast<const HySpriteData *>(this->AcquireData());
 	if(pData == nullptr ||
 	   uiStateIndex >= pData->GetNumStates() ||
 	   pData->GetFrame(uiStateIndex, 0).pAtlas == nullptr)
@@ -284,7 +284,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateWidth(uint32 uiStateIndex, float fPe
 	float fMaxWidth = 0.0f;
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
-		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
+		const HySpriteFrame &frameRef = pData->GetFrame(uiStateIndex, i);
 		float fFrameWidth = (frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth()) * fPercent;
 		if(fMaxWidth < fFrameWidth)
 			fMaxWidth = fFrameWidth;
@@ -296,7 +296,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateWidth(uint32 uiStateIndex, float fPe
 template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetStateHeight(uint32 uiStateIndex, float fPercent /*= 1.0f*/)
 {
-	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
+	const HySpriteData *pData = static_cast<const HySpriteData *>(this->AcquireData());
 	if(pData == nullptr ||
 	   uiStateIndex >= pData->GetNumStates() ||
 	   pData->GetFrame(uiStateIndex, 0).pAtlas == nullptr)
@@ -308,7 +308,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateHeight(uint32 uiStateIndex, float fP
 	float fMaxHeight = 0.0f;
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
-		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
+		const HySpriteFrame &frameRef = pData->GetFrame(uiStateIndex, i);
 		float fFrameHeight = (frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight()) * fPercent;
 		if(fMaxHeight < fFrameHeight)
 			fMaxHeight = fFrameHeight;
@@ -322,20 +322,20 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 {
 	if(this->AcquireData() == nullptr ||
 	   this->m_uiState >= this->UncheckedGetData()->GetNumStates() ||
-	   m_uiCurFrame >= static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
+	   m_uiCurFrame >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
 	{
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset invoked on null data");
 		return glm::ivec2(0);
 	}
 
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	return frameRef.vOFFSET;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetStateOffset(uint32 uiStateIndex)
 {
-	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
+	const HySpriteData *pData = static_cast<const HySpriteData *>(this->AcquireData());
 	if(pData == nullptr ||
 	   uiStateIndex >= this->UncheckedGetData()->GetNumStates())
 	{
@@ -346,7 +346,7 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetStateOffset(uint32 uiStateIndex)
 	glm::ivec2 vMaxOffset(0, 0);
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
-		const HySprite2dFrame &frameRef = pData->GetFrame(uiStateIndex, i);
+		const HySpriteFrame &frameRef = pData->GetFrame(uiStateIndex, i);
 		if(abs(vMaxOffset.x) < abs(frameRef.vOFFSET.x))
 			vMaxOffset.x = frameRef.vOFFSET.x;
 		if(abs(vMaxOffset.y) < abs(frameRef.vOFFSET.y))
@@ -370,7 +370,7 @@ template<typename NODETYPE, typename ENTTYPE>
 	else
 		m_uiCurFrame = GetNumFrames() - 1;
 
-	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	this->m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
 
 	this->SetDirty(this->DIRTY_BoundingVolume);
@@ -380,7 +380,7 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHySprite<NODETYPE, ENTTYPE>::IsLoadDataValid() /*override*/
 {
-	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->AcquireData());
+	const HySpriteData *pData = static_cast<const HySpriteData *>(this->AcquireData());
 	return pData && pData->GetNumStates() != 0;
 }
 
@@ -393,7 +393,7 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHySprite<NODETYPE, ENTTYPE>::OnDataAcquired() /*override*/
 {
-	const HySprite2dData *pData = static_cast<const HySprite2dData *>(this->UncheckedGetData());
+	const HySpriteData *pData = static_cast<const HySpriteData *>(this->UncheckedGetData());
 	uint32 uiNumStates = pData->GetNumStates();
 
 	while(m_AnimCtrlAttribList.size() > uiNumStates)
@@ -404,7 +404,7 @@ template<typename NODETYPE, typename ENTTYPE>
 
 	for(uint32 i = 0; i < uiNumStates; ++i)
 	{
-		const HySprite2dData::AnimState &stateRef = pData->GetState(i);
+		const HySpriteData::AnimState &stateRef = pData->GetState(i);
 
 		if(stateRef.m_bLOOP)
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Loop;
@@ -426,7 +426,7 @@ template<typename NODETYPE, typename ENTTYPE>
 	if(m_bIsAnimPaused == false)
 		m_fElapsedFrameTime += HyEngine::DeltaTime() * m_fAnimPlayRate;
 
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[this->m_uiState];
 	while(m_fElapsedFrameTime >= frameRef.fDURATION && frameRef.fDURATION > 0.0f)
 	{
@@ -534,7 +534,7 @@ template<typename NODETYPE, typename ENTTYPE>
 			OnInvokeCallback(this->m_uiState);
 	}
 
-	const HySprite2dFrame &UpdatedFrameRef = static_cast<const HySprite2dData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	this->m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
 }
 

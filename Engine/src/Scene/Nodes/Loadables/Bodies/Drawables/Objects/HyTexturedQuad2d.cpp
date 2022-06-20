@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
-#include "Assets/Nodes/HyTexturedQuad2dData.h"
+#include "Assets/Nodes/HyTexturedQuadData.h"
 
 HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TexturedQuad, "", "", pParent),
@@ -78,8 +78,8 @@ void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
 	float fY = static_cast<float>(iY);
 	float fWidth = static_cast<float>(iWidth);
 	float fHeight = static_cast<float>(iHeight);
-	float fTexWidth = m_bIsRaw ? m_uiRawTextureWidth : static_cast<float>(static_cast<const HyTexturedQuad2dData *>(AcquireData())->GetAtlas()->GetWidth());
-	float fTexHeight = m_bIsRaw ? m_uiRawTextureHeight : static_cast<float>(static_cast<const HyTexturedQuad2dData *>(AcquireData())->GetAtlas()->GetHeight());
+	float fTexWidth = m_bIsRaw ? m_uiRawTextureWidth : static_cast<float>(static_cast<const HyTexturedQuadData *>(AcquireData())->GetAtlas()->GetWidth());
+	float fTexHeight = m_bIsRaw ? m_uiRawTextureHeight : static_cast<float>(static_cast<const HyTexturedQuadData *>(AcquireData())->GetAtlas()->GetHeight());
 
 	m_SrcRect.left = fX / fTexWidth;
 	m_SrcRect.top = fY / fTexHeight;
@@ -109,7 +109,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureWidth()
 	if(m_bIsRaw)
 		return m_uiRawTextureWidth;
 
-	return static_cast<const HyTexturedQuad2dData *>(AcquireData())->GetAtlas()->GetWidth();
+	return static_cast<const HyTexturedQuadData *>(AcquireData())->GetAtlas()->GetWidth();
 }
 
 uint32 HyTexturedQuad2d::GetEntireTextureHeight()
@@ -117,7 +117,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	if(m_bIsRaw)
 		return m_uiRawTextureHeight;
 
-	return static_cast<const HyTexturedQuad2dData *>(AcquireData())->GetAtlas()->GetHeight();
+	return static_cast<const HyTexturedQuadData *>(AcquireData())->GetAtlas()->GetHeight();
 }
 
 /*virtual*/ void HyTexturedQuad2d::OnLoaded() /*override*/
@@ -125,7 +125,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	IHyDrawable2d::OnLoaded();
 
 	if(m_bIsRaw == false)
-		m_hTextureHandle = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
+		m_hTextureHandle = static_cast<const HyTexturedQuadData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
 }
 
 /*virtual*/ bool HyTexturedQuad2d::OnIsValidToRender() /*override*/
@@ -140,7 +140,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 
 /*virtual*/ void HyTexturedQuad2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
 {
-	const HyTexturedQuad2dData *pData = static_cast<const HyTexturedQuad2dData *>(UncheckedGetData());
+	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 
 	glm::vec2 vSize(m_SrcRect.Width() * (m_bIsRaw ? m_uiRawTextureWidth : pData->GetAtlas()->GetWidth()),
 					m_SrcRect.Height() * (m_bIsRaw ? m_uiRawTextureHeight : pData->GetAtlas()->GetHeight()));

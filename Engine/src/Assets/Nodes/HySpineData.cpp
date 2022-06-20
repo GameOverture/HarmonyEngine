@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HySpine2dData.h
+ *	HySpineData.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -8,12 +8,12 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HySpine2dData.h"
+#include "Assets/Nodes/HySpineData.h"
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HySpine2dData::HySpine2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
+HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_pAtlasData(nullptr),
 	m_pSkeletonData(nullptr),
@@ -51,6 +51,10 @@ HySpine2dData::HySpine2dData(const std::string &sPath, HyJsonObj itemDataObj, Hy
 	//spSkeletonJson_dispose(pSpineJsonData);
 
 	//printf("Default skin name: %s\n", m_SpineSkeletonData->defaultSkin->name);
+}
+
+/*virtual*/ HySpineData::~HySpineData()
+{
 }
 //
 //HySpine2dData::~HySpine2dData()

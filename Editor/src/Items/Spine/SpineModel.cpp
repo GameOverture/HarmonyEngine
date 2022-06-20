@@ -77,11 +77,11 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 		QTextStream stream(&atlasFile);
 		QString sLine = stream.readLine();
-		QStringList atlasFileNameList;
+		QStringList textureFileNameList;
 		while(!sLine.isNull())
 		{
 			if(sLine.contains(".png", Qt::CaseInsensitive))
-				atlasFileNameList.append(sLine);
+				textureFileNameList.append(sLine);
 			
 			sLine = stream.readLine();
 		};
@@ -91,30 +91,16 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 			uiAtlasBankIndex = m_ItemRef.GetProject().GetAtlasModel().GetBankIndexFromBankId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedBankId());
 		
 		// Copy atlas files (exported from spine tool) to meta data
-		for(QString sAtlasFile : atlasFileNameList)
+		metaDir.mkdir(sUuidName);
+		for(QString sTextureFile : textureFileNameList)
 		{
-			QFileInfo atlasImageFileInfo(sAtlasFile);
-			if(QFile::copy(atlasImageFileInfo.absoluteFilePath(), metaDir.absoluteFilePath(sUuidName % '/' % atlasImageFileInfo.fileName())) == false)
-				HyGuiLog("SpineModel import: " % atlasFileInfo.absoluteFilePath() % " did not copy to runtime data", LOGTYPE_Error);
-
-
-
-			QImage atlasPageImage(importFileInfo.absolutePath() + "/" + sAtlasFile);
-			AtlasFrame *pNewPage = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef,
-																						m_ItemRef.GetName(false),
-																						atlasPageImage,
-																						uiAtlasBankIndex,
-																						ITEM_Spine);
-			m_AtlasFrameList.append(pNewPage);
-
-			//if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true) == false)
-			//{
-			//	HyGuiLog("Cannot ReplaceFrame text sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
-			//	return false;
-			//}
+			QFileInfo textureFileInfo(sTextureFile);
+			QString sTextureDestinationPath = metaDir.absoluteFilePath(sUuidName % '/' % textureFileInfo.fileName());
+			if(QFile::copy(textureFileInfo.absoluteFilePath(), sTextureDestinationPath) == false)
+				HyGuiLog("SpineModel import: " % textureFileInfo.absoluteFilePath() % " did not copy to: " % sTextureDestinationPath, LOGTYPE_Error);
 		}
 
-		// TODO: fill out data/meta FileDataPair
+		// Fill out data/meta FileDataPair
 		//itemFileDataRef.m_Data
 	}
 

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyText2dData.cpp
+ *	HyTextData.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -8,11 +8,11 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HyText2dData.h"
+#include "Assets/Nodes/HyTextData.h"
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyText2dData::FontState::FontState(Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, HyJsonArray layersArray) :
+HyTextData::FontState::FontState(Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, HyJsonArray layersArray) :
 	fLINE_HEIGHT(fLineHeight),
 	fLINE_ASCENDER(fLineAcender),
 	fLINE_DESCENDER(fLineDescender),
@@ -35,7 +35,7 @@ HyText2dData::FontState::FontState(Typeface *pTypefaces, float fLineHeight, floa
 	}
 }
 
-HyText2dData::FontState::~FontState()
+HyTextData::FontState::~FontState()
 {
 	unsigned char *pLayerBuffer = reinterpret_cast<unsigned char *>(pLayers);
 	delete[] pLayerBuffer;
@@ -44,7 +44,7 @@ HyText2dData::FontState::~FontState()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyText2dData::HyText2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
+HyTextData::HyTextData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_pTypefaces(nullptr),
 	m_uiNumTypefaces(0),
@@ -118,7 +118,7 @@ HyText2dData::HyText2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAs
 
 			uint32 uiCode = glyphObj["code"].GetUint();
 			HyAssert(curTypeface.find(uiCode) == curTypeface.end(), "Duplicate glyph codes found - fix in HyEditor");
-			curTypeface[uiCode] = HY_NEW HyText2dGlyphInfo(
+			curTypeface[uiCode] = HY_NEW HyTextGlyph(
 				glyphObj["width"].GetUint(),
 				glyphObj["height"].GetUint(),
 				glyphObj["offset_x"].GetInt(),
@@ -149,7 +149,7 @@ HyText2dData::HyText2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAs
 	}
 }
 
-HyText2dData::~HyText2dData(void)
+HyTextData::~HyTextData(void)
 {
 	for(uint32 i = 0; i < m_uiNumStates; ++i)
 		m_pFontStates[i].~FontState();
@@ -164,12 +164,12 @@ HyText2dData::~HyText2dData(void)
 	delete[] m_pTypefaces;
 }
 
-uint32 HyText2dData::GetNumLayers(uint32 uiStateIndex) const
+uint32 HyTextData::GetNumLayers(uint32 uiStateIndex) const
 {
 	return m_pFontStates[uiStateIndex].uiNUM_LAYERS;
 }
 
-const HyText2dGlyphInfo *HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const
+const HyTextGlyph *HyTextData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const
 {
 	// Special case: No-Break Space CodePoint: 160
 	if(uiUtf32Code == 160)
@@ -192,7 +192,7 @@ const HyText2dGlyphInfo *HyText2dData::GetGlyph(uint32 uiStateIndex, uint32 uiLa
 	return iter->second;
 }
 
-HyColor HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const
+HyColor HyTextData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const
 {
 	if(bTop)
 		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].DEFAULT_TOP_COLOR;
@@ -200,27 +200,27 @@ HyColor HyText2dData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, 
 		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].DEFAULT_BOT_COLOR;
 }
 
-HyFileAtlas *HyText2dData::GetAtlas() const
+HyFileAtlas *HyTextData::GetAtlas() const
 {
 	return m_pAtlas;
 }
 
-float HyText2dData::GetLineHeight(uint32 uiStateIndex) const
+float HyTextData::GetLineHeight(uint32 uiStateIndex) const
 {
 	return m_pFontStates[uiStateIndex].fLINE_HEIGHT;
 }
 
-float HyText2dData::GetLineAscender(uint32 uiStateIndex) const
+float HyTextData::GetLineAscender(uint32 uiStateIndex) const
 {
 	return m_pFontStates[uiStateIndex].fLINE_ASCENDER;
 }
 
-float HyText2dData::GetLineDescender(uint32 uiStateIndex) const
+float HyTextData::GetLineDescender(uint32 uiStateIndex) const
 {
 	return m_pFontStates[uiStateIndex].fLINE_DESCENDER;
 }
 
-float HyText2dData::GetLeftSideNudgeAmt(uint32 uiStateIndex) const
+float HyTextData::GetLeftSideNudgeAmt(uint32 uiStateIndex) const
 {
 	if(m_pFontStates)
 		return m_pFontStates[uiStateIndex].fLEFT_SIDE_NUDGE_AMT;

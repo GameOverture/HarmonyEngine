@@ -12,7 +12,7 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
-#include "Assets/Nodes/HySpine2dData.h"
+#include "Assets/Nodes/HySpineData.h"
 
 class HySpine2d : public IHyDrawable2d
 {

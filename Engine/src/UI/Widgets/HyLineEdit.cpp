@@ -83,7 +83,7 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 		return;
 	}
 
-	const HyText2dData *pTextData = static_cast<const HyText2dData *>(m_Text.AcquireData());
+	const HyTextData *pTextData = static_cast<const HyTextData *>(m_Text.AcquireData());
 	float fCursorHeight = pTextData->GetLineHeight(m_Text.GetState());
 
 	if(m_iSelectionLength > 0)

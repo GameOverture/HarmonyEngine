@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HySprite2dData.cpp
+ *	HySpriteData.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
@@ -8,15 +8,15 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HySprite2dData.h"
+#include "Assets/Nodes/HySpriteData.h"
 #include "Renderer/IHyRenderer.h"
 
-HyTextureHandle HySprite2dFrame::GetGfxApiHandle() const
+HyTextureHandle HySpriteFrame::GetGfxApiHandle() const
 {
 	return pAtlas ? pAtlas->GetTextureHandle() : HY_UNUSED_HANDLE;
 }
 
-bool HySprite2dFrame::IsAtlasValid() const
+bool HySpriteFrame::IsAtlasValid() const
 {
 	return pAtlas != nullptr;
 }
@@ -24,7 +24,7 @@ bool HySprite2dFrame::IsAtlasValid() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HySprite2dData::HySprite2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
+HySpriteData::HySpriteData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_pAnimStates(nullptr)
 {
@@ -48,7 +48,7 @@ HySprite2dData::HySprite2dData(const std::string &sPath, HyJsonObj itemDataObj, 
 	}
 }
 
-/*virtual*/ HySprite2dData::~HySprite2dData(void)
+/*virtual*/ HySpriteData::~HySpriteData(void)
 {
 	for(uint32 i = 0; i < m_uiNumStates; ++i)
 		m_pAnimStates[i].~AnimState();
@@ -58,17 +58,17 @@ HySprite2dData::HySprite2dData(const std::string &sPath, HyJsonObj itemDataObj, 
 	pAnimStatesBuffer = nullptr;
 }
 
-const HySprite2dData::AnimState &HySprite2dData::GetState(uint32 uiAnimStateIndex) const
+const HySpriteData::AnimState &HySpriteData::GetState(uint32 uiAnimStateIndex) const
 {
 	return m_pAnimStates[uiAnimStateIndex];
 }
 
-const HySprite2dFrame &HySprite2dData::GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const
+const HySpriteFrame &HySpriteData::GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const
 {
 	return m_pAnimStates[uiAnimStateIndex].GetFrame(uiFrameIndex);
 }
 
-HySprite2dData::AnimState::AnimState(bool bLoop,
+HySpriteData::AnimState::AnimState(bool bLoop,
 									 bool bReverse,
 									 bool bBounce,
 									 float fDuration,
@@ -81,8 +81,8 @@ HySprite2dData::AnimState::AnimState(bool bLoop,
 	m_fDURATION(fDuration),
 	m_uiNUMFRAMES(frameArray.Empty() ? 1 : frameArray.Size())	// Cannot have '0' frames
 {
-	m_pFrames = reinterpret_cast<HySprite2dFrame *>(HY_NEW unsigned char[sizeof(HySprite2dFrame) * m_uiNUMFRAMES]);
-	HySprite2dFrame *pFrameWriteLocation = m_pFrames;
+	m_pFrames = reinterpret_cast<HySpriteFrame *>(HY_NEW unsigned char[sizeof(HySpriteFrame) * m_uiNUMFRAMES]);
+	HySpriteFrame *pFrameWriteLocation = m_pFrames;
 
 	for(uint32 i = 0; i < m_uiNUMFRAMES; ++i, ++pFrameWriteLocation)
 	{
@@ -102,24 +102,24 @@ HySprite2dData::AnimState::AnimState(bool bLoop,
 			fDuration = frameObj["duration"].GetFloat();
 		}
 
-		new (pFrameWriteLocation)HySprite2dFrame(pAtlas,
+		new (pFrameWriteLocation)HySpriteFrame(pAtlas,
 												 rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
 												 vOffset,
 												 fDuration);
 	}
 }
 
-HySprite2dData::AnimState::~AnimState()
+HySpriteData::AnimState::~AnimState()
 {
 	for(uint32 i = 0; i < m_uiNUMFRAMES; ++i)
-		m_pFrames[i].~HySprite2dFrame();
+		m_pFrames[i].~HySpriteFrame();
 
 	unsigned char *pSpriteFramesBuffer = reinterpret_cast<unsigned char *>(m_pFrames);
 	delete[] pSpriteFramesBuffer;
 	pSpriteFramesBuffer = NULL;
 }
 
-const HySprite2dFrame &HySprite2dData::AnimState::GetFrame(uint32 uiFrameIndex) const
+const HySpriteFrame &HySpriteData::AnimState::GetFrame(uint32 uiFrameIndex) const
 {
 	return m_pFrames[uiFrameIndex];
 }

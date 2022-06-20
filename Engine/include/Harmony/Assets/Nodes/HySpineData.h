@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HySpine2dData.h
+ *	HySpineData.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,13 +7,13 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HySpine2dData_h__
-#define HySpine2dData_h__
+#ifndef HySpineData_h__
+#define HySpineData_h__
 
 #include "Afx/HyInteropAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
-class HySpine2dData : public IHyNodeData
+class HySpineData : public IHyNodeData
 {
 	//class HySpineTextureLoader : public spine::TextureLoader
 	//{
@@ -50,8 +50,8 @@ class HySpine2dData : public IHyNodeData
 	spine::AnimationStateData *		m_pAnimStateData;
 
 public:
-	HySpine2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
-	virtual ~HySpine2dData();
+	HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
+	virtual ~HySpineData();
 
 	//spSkeletonData *GetSkeletonData()								{ return m_SpineSkeletonData; }
 
@@ -62,4 +62,4 @@ public:
 	void AnimInitBlend(uint32 uiAnimIdFrom, uint32 uiAnimIdTo, float fInterpDur);
 };
 
-#endif /* HySpine2dData_h__ */
+#endif /* HySpineData_h__ */

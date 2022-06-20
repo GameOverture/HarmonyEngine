@@ -11,7 +11,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
-#include "Assets/Nodes/HySprite2dData.h"
+#include "Assets/Nodes/HySpriteData.h"
 
 HySprite2d::HySprite2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
 	IHySprite<IHyDrawable2d, HyEntity2d>(sPrefix, sName, pParent)
@@ -42,12 +42,12 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 
 void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/, void *pParam /*= nullptr*/)
 {
-	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySprite2dData *>(UncheckedGetData())->GetNumStates())
+	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySpriteData *>(UncheckedGetData())->GetNumStates())
 	{
 		if(UncheckedGetData() == nullptr)
 			HyLogDebug("HySprite2d::AnimSetCallback invoked on null data");
 		else
-			HyLogWarning(this->m_sPrefix << "/" << this->m_sName << " (HySprite) wants to set anim callback on index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySprite2dData *>(AcquireData())->GetNumStates() << "'");
+			HyLogWarning(this->m_sPrefix << "/" << this->m_sName << " (HySprite) wants to set anim callback on index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySpriteData *>(AcquireData())->GetNumStates() << "'");
 
 		return;
 	}
@@ -69,7 +69,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 		return;
 	}
 
-	glm::vec2 vFrameOffset = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET;
+	glm::vec2 vFrameOffset = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET;
 
 	float fHalfWidth = GetFrameWidth(0.5f);
 	float fHalfHeight = GetFrameHeight(0.5f);
@@ -84,7 +84,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 {
 	IHySprite<IHyDrawable2d, HyEntity2d>::OnDataAcquired();
 
-	const HySprite2dData *pData = static_cast<const HySprite2dData *>(UncheckedGetData());
+	const HySpriteData *pData = static_cast<const HySpriteData *>(UncheckedGetData());
 	uint32 uiNumStates = pData->GetNumStates();
 
 	while(m_AnimCallbackList.size() < uiNumStates)
@@ -93,7 +93,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 
 /*virtual*/ void HySprite2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
 {
-	const HySprite2dFrame &frameRef = static_cast<const HySprite2dData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
+	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 
 	glm::vec2 vSize(frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth(), frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight());
 	vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));

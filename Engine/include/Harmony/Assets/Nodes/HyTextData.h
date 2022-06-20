@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyText2dData.h
+ *	HyTextData.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HyText2dData_h__
-#define HyText2dData_h__
+#ifndef HyTextData_h__
+#define HyTextData_h__
 
 #include "Afx/HyStdAfx.h"
 
@@ -47,7 +47,7 @@
 *              |                                   |
 *              |------------- advance_x ---------->|
 */
-struct HyText2dGlyphInfo
+struct HyTextGlyph
 {
 	const uint32				uiWIDTH;
 	const uint32				uiHEIGHT;
@@ -60,16 +60,16 @@ struct HyText2dGlyphInfo
 
 	const HyRectangle<float>	rSRC_RECT;
 
-	HyText2dGlyphInfo(uint32 uiWidth,
-					  uint32 uiHeight,
-					  int iOffsetX,
-					  int iOffsetY,
-					  float fAdvanceX,
-					  float fAdvanceY,
-					  float fSrcLeft,
-					  float fSrcTop,
-					  float fSrcRight,
-					  float fSrcBot) :
+	HyTextGlyph(uint32 uiWidth,
+				uint32 uiHeight,
+				int iOffsetX,
+				int iOffsetY,
+				float fAdvanceX,
+				float fAdvanceY,
+				float fSrcLeft,
+				float fSrcTop,
+				float fSrcRight,
+				float fSrcBot) :
 		uiWIDTH(uiWidth),
 		uiHEIGHT(uiHeight),
 		iOFFSET_X(iOffsetX),
@@ -84,9 +84,9 @@ struct HyText2dGlyphInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class HyText2dData : public IHyNodeData
+class HyTextData : public IHyNodeData
 {
-	typedef std::map<uint32, HyText2dGlyphInfo *> Typeface;
+	typedef std::map<uint32, HyTextGlyph *> Typeface;
 
 	HyFileAtlas *					m_pAtlas;
 
@@ -121,11 +121,11 @@ class HyText2dData : public IHyNodeData
 	FontState *						m_pFontStates;
 
 public:
-	HyText2dData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
-	virtual ~HyText2dData();
+	HyTextData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
+	virtual ~HyTextData();
 
 	uint32 GetNumLayers(uint32 uiStateIndex) const;
-	const HyText2dGlyphInfo *GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const;
+	const HyTextGlyph *GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const;
 	HyColor GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const;
 	HyFileAtlas *GetAtlas() const;
 	float GetLineHeight(uint32 uiStateIndex) const;
@@ -134,4 +134,4 @@ public:
 	float GetLeftSideNudgeAmt(uint32 uiStateIndex) const;
 };
 
-#endif /* HyText2dData_h__ */
+#endif /* HyTextData_h__ */

@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
-#include "Assets/Nodes/HyText2dData.h"
+#include "Assets/Nodes/HyTextData.h"
 
 HyText2d::HyText2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
 	IHyText<IHyDrawable2d, HyEntity2d>(sPrefix, sName, pParent)
@@ -123,7 +123,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	// CalculateGlyphInfos called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
 	CalculateGlyphInfos();
 
-	const HyText2dData *pData = static_cast<const HyText2dData *>(UncheckedGetData());
+	const HyTextData *pData = static_cast<const HyTextData *>(UncheckedGetData());
 
 	const uint32 uiNUMLAYERS = pData->GetNumLayers(m_uiState);
 	const glm::mat4 &mtxTransformRef = GetSceneTransform();
@@ -138,7 +138,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 			if(m_Utf32CodeList[j] == '\n')
 				continue;
 
-			const HyText2dGlyphInfo *pGlyphRef = pData->GetGlyph(m_uiState, i, m_Utf32CodeList[j]);
+			const HyTextGlyph *pGlyphRef = pData->GetGlyph(m_uiState, i, m_Utf32CodeList[j]);
 			if(pGlyphRef == nullptr)
 				continue;
 

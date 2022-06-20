@@ -181,7 +181,7 @@ void HyRichText::AssembleDrawables()
 			m_fUsedWidth = ptCurPos.x;
 
 		// TODO: 'm_fColumnLineHeightOffset' should actually be (I think) the max of first line's height, not the max line height overall
-		const HyText2dData *pTextData = static_cast<const HyText2dData *>(pNewText->AcquireData());
+		const HyTextData *pTextData = static_cast<const HyTextData *>(pNewText->AcquireData());
 		if(sCurText.empty() == false && pTextData)
 			m_fColumnLineHeightOffset = HyMax(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
 
@@ -195,7 +195,7 @@ void HyRichText::AssembleDrawables()
 			{
 				// Using the text's data, determine how the line height used to scale the inserted sprite
 				float fLineHeight = 32.0f; // Some default value to fallback to
-				const HyText2dData *pTextData = static_cast<const HyText2dData *>(pNewText->AcquireData());
+				const HyTextData *pTextData = static_cast<const HyTextData *>(pNewText->AcquireData());
 				if(pTextData)
 					fLineHeight = pTextData->GetLineHeight(uiCurTextState);
 				else

@@ -103,7 +103,6 @@ protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void Update() override final;
 	virtual bool IsChildrenLoaded() const override final;
-	virtual void OnDataAcquired() override;
 
 	virtual void SetNewChildAttributes(IHyNode2d &childRef);
 
