@@ -26,6 +26,7 @@ class SpineModel : public IModel
 {
 	Q_OBJECT
 
+	QList<unsigned char *>	m_pPreviewAtlasPixelData;
 	QList<AtlasFrame *>		m_AtlasFrameList;
 
 public:

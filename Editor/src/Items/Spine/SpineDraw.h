@@ -14,7 +14,8 @@
 
 class SpineDraw : public IDraw
 {
-	HySpine2d			m_Spine;
+	HySpine2d				m_Spine;
+	QList<HyTextureHandle>	m_hTextureList;
 
 public:
 	SpineDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);

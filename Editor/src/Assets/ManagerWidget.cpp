@@ -487,9 +487,25 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
 		contextMenu.addAction(ui->actionAddFilter);
+
+		// Check if any selected assets are 'generated' from their project item. If so, prevent delete/replace
+		bool bHasGeneratedAssets = false;
+		for(int32 i = 0; i < selectedAssetsList.size(); ++i)
+		{
+			if(selectedAssetsList[i]->GetType() == ITEM_Text ||
+			   selectedAssetsList[i]->GetType() == ITEM_Spine ||
+			   selectedAssetsList[i]->GetType() == ITEM_Prefab)
+			{
+				bHasGeneratedAssets = true;
+				break;
+			}
+		}
 		contextMenu.addSeparator();
-		contextMenu.addAction(ui->actionDeleteAssets);
-		contextMenu.addAction(ui->actionReplaceAssets);
+		if(bHasGeneratedAssets == false)
+		{
+			contextMenu.addAction(ui->actionDeleteAssets);
+			contextMenu.addAction(ui->actionReplaceAssets);
+		}
 		contextMenu.addAction(ui->actionRename);
 	}
 

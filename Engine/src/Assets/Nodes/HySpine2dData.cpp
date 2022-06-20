@@ -19,6 +19,16 @@ HySpine2dData::HySpine2dData(const std::string &sPath, HyJsonObj itemDataObj, Hy
 	m_pSkeletonData(nullptr),
 	m_pAnimStateData(nullptr)
 {
+	//itemDataObj
+
+	//m_uiNumStates = m_pSkeletonData->getAnimations().size();
+
+
+
+
+
+
+
 	//m_pAtlasData = new spine::Atlas("", );
 
 	//std::string sAtlasPath(GetPath());

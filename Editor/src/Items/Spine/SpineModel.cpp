@@ -54,7 +54,7 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 			HyGuiLog("SpineModel could not navigate to Spine data directory", LOGTYPE_Error);
 		
 		// Import Spine files
-		QString sUuidName = itemFileDataRef.m_Meta["UUID"].toString();
+		QString sUuidName = GetUuid().toString(QUuid::WithoutBraces);
 
 		QFileInfo importFileInfo(itemFileDataRef.m_Meta["newImport"].toString());
 		if(importFileInfo.exists() == false)
@@ -80,23 +80,31 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 		QStringList atlasFileNameList;
 		while(!sLine.isNull())
 		{
-			sLine = stream.readLine();
 			if(sLine.contains(".png", Qt::CaseInsensitive))
 				atlasFileNameList.append(sLine);
+			
+			sLine = stream.readLine();
 		};
 
 		quint32 uiAtlasBankIndex = 0;
 		if(m_ItemRef.GetProject().GetAtlasWidget())
 			uiAtlasBankIndex = m_ItemRef.GetProject().GetAtlasModel().GetBankIndexFromBankId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedBankId());
 		
+		// Copy atlas files (exported from spine tool) to meta data
 		for(QString sAtlasFile : atlasFileNameList)
 		{
+			QFileInfo atlasImageFileInfo(sAtlasFile);
+			if(QFile::copy(atlasImageFileInfo.absoluteFilePath(), metaDir.absoluteFilePath(sUuidName % '/' % atlasImageFileInfo.fileName())) == false)
+				HyGuiLog("SpineModel import: " % atlasFileInfo.absoluteFilePath() % " did not copy to runtime data", LOGTYPE_Error);
+
+
+
 			QImage atlasPageImage(importFileInfo.absolutePath() + "/" + sAtlasFile);
 			AtlasFrame *pNewPage = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef,
 																						m_ItemRef.GetName(false),
 																						atlasPageImage,
 																						uiAtlasBankIndex,
-																						ITEM_Text);
+																						ITEM_Spine);
 			m_AtlasFrameList.append(pNewPage);
 
 			//if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true) == false)
@@ -107,9 +115,10 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 		}
 
 		// TODO: fill out data/meta FileDataPair
+		//itemFileDataRef.m_Data
 	}
 
-
+	// Only checks for "stateArray" within itemFileDataRef.m_Meta/m_Data and initializes states
 	InitStates<SpineStateData>(itemFileDataRef);
 }
 
