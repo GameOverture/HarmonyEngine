@@ -16,6 +16,7 @@
 #include "Scene/Physics/HyShape2d.h"
 #include "Assets/Nodes/HySpriteData.h"
 #include "Assets/Nodes/HyTextData.h"
+#include "Assets/Nodes/HySpineData.h"
 
 class IHyDrawable2d : public IHyBody2d, public IHyDrawable
 {

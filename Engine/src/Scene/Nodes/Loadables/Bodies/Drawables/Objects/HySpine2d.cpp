@@ -9,20 +9,16 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySpine2d.h"
-#include "HyEngine.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
-#include "Scene/HyScene.h"
+#include "Diagnostics/Console/IHyConsole.h"
+#include "Assets/Nodes/HySpineData.h"
+#include "HyEngine.h"
 
 HySpine2d::HySpine2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Spine, sPrefix, sName, pParent)
-//	m_pSpineSkeleton(nullptr),
-//	m_ppSpineAnims(NULL),
-//	m_ppAnimStates(NULL),
-//	m_fAnimPlayRate(1.0f),
-//	m_uiNumAnims(0),
-//	m_uiNumAnimStates(0),
-//	m_uiCurAnimState(0),
-//	m_spSkeletonBounds(NULL)
+	IHyDrawable2d(HYTYPE_Spine, sPrefix, sName, pParent),
+	m_pSkeleton(nullptr),
+	m_pAnimationState(nullptr),
+	m_pSkeletonBounds(nullptr)
 {
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
@@ -32,8 +28,13 @@ HySpine2d::HySpine2d(const HySpine2d &copyRef) :
 {
 }
 
-HySpine2d::~HySpine2d(void)
+/*virtual*/ HySpine2d::~HySpine2d(void)
 {
+#ifdef HY_USE_SPINE
+	delete m_pSkeleton;
+	delete m_pAnimationState;
+	delete m_pSkeletonBounds;
+#endif
 }
 
 const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
@@ -42,13 +43,19 @@ const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
 	return *this;
 }
 
-uint32 HySpine2d::GetNumSlots() const
+uint32 HySpine2d::GetNumSlots()
 {
+#ifdef HY_USE_SPINE
+	if(AcquireData())
+		return static_cast<uint32>(m_pSkeleton->getSlots().size());
+#endif
 	return 0;
 }
 
-/*virtual*/ void HySpine2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HySpine2d::IsLoadDataValid() /*override*/
 {
+	const HySpineData *pData = static_cast<const HySpineData *>(this->AcquireData());
+	return pData;
 }
 
 /*virtual*/ bool HySpine2d::OnIsValidToRender() /*override*/
@@ -56,223 +63,170 @@ uint32 HySpine2d::GetNumSlots() const
 	return true;
 }
 
+/*virtual*/ void HySpine2d::OnDataAcquired() /*override*/
+{
+	const HySpineData *pData = static_cast<const HySpineData *>(this->UncheckedGetData());
+
+#ifdef HY_USE_SPINE
+	m_pSkeleton = HY_NEW spine::Skeleton(pData->GetSkeletonData());
+	m_pAnimationState = HY_NEW spine::AnimationState(pData->GetAnimationStateData());
+	m_pSkeletonBounds = HY_NEW spine::SkeletonBounds();
+#endif
+}
+
+/*virtual*/ void HySpine2d::OnLoadedUpdate() /*override*/
+{
+#ifdef HY_USE_SPINE
+	//m_pSkeleton->setX(pos.X());
+	//m_pSkeleton->setY(pos.Y());
+	//m_pSkeleton->setScaleX(scale.X());
+	//m_pSkeleton->setScaleY(scale.Y());
+
+	m_pSkeleton->update(HyEngine::DeltaTime() /** m_fAnimPlayRate*/);	// Update the time field used for attachments and such
+	m_pAnimationState->apply(*m_pSkeleton);								// Apply the state to the skeleton
+	m_pSkeleton->updateWorldTransform();								// Calculate world transforms for rendering
+#endif
+}
+
+/*virtual*/ void HySpine2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+{
+#ifdef HY_USE_SPINE
+	spine::Slot *pCurSlot = nullptr;
+	uint32 uiNumSlots = GetNumSlots();
+	for(uint32 i = 0; i < uiNumSlots; ++i) // For each slot in the draw order array of the skeleton
+	{
+		pCurSlot = m_pSkeleton->getDrawOrder()[i];
+
+		// Fetch the currently active attachment
+		spine::Attachment *pAttachment = pCurSlot->getAttachment();
+		if(!pAttachment)
+			continue; // continue with the next slot in the draw order if no attachment is active on the slot
+
+		// Fetch the blend mode from the slot and translate it to the engine blend mode
+		spine::BlendMode engineBlendMode;
+		//switch(pCurSlot->getData().getBlendMode())
+		//{
+		//case spine::BlendMode_Normal:		//		  int source, int sourcePMA, int destColor, int sourceAlpha
+		//	engineBlendMode = BLEND_NORMAL; // normal(GL_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE)
+		//	break;
+		//case spine::BlendMode_Additive:
+		//	engineBlendMode = BLEND_ADDITIVE; // additive(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE)
+		//	break;
+		//case spine::BlendMode_Multiply:
+		//	engineBlendMode = BLEND_MULTIPLY; // multiply(GL_DST_COLOR, GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+		//	break;
+		//case spine::BlendMode_Screen:
+		//	engineBlendMode = BLEND_SCREEN; // screen(GL_ONE, GL_ONE, GL_ONE_MINUS_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR)
+		//	break;
+		//default:
+		//	engineBlendMode = BLEND_NORMAL;
+		//}
+
+		// Calculate the tinting color based on the skeleton's color and the slot's color. spine::Color is given in the range [0-1] for each color channel
+		spine::Color skeletonColor = m_pSkeleton->getColor();
+		spine::Color slotColor = pCurSlot->getColor();
+		spine::Color slotTint(skeletonColor.r * slotColor.r, skeletonColor.g * slotColor.g, skeletonColor.b * slotColor.b, skeletonColor.a * slotColor.a);
+
+		// Fill the vertices attributes based on the type of attachment
+		if(pAttachment->getRTTI().isExactly(spine::RegionAttachment::rtti))
+		{
+			// Cast to an spRegionAttachment so we can get the rendererObject and compute the world vertices
+			spine::RegionAttachment *pRegionAttachment = static_cast<spine::RegionAttachment *>(pAttachment);
+
+			// Our engine specific Texture is stored in the AtlasRegion which was
+			// assigned to the attachment on load. It represents the texture atlas
+			// page that contains the image the region attachment is mapped to.
+			//texture = (Texture *)((spine::AtlasRegion *)pRegionAttachment->getRendererObject())->page->getRendererObject();
+
+			// Computed the world vertices positions for the 4 vertices that make up
+			// the rectangular region attachment. This assumes the world transform of the
+			// bone to which the slot (and hence attachment) is attached has been calculated
+			// before rendering via Skeleton::updateWorldTransform(). The vertex positions
+			// will be written directory into the vertices array, with a stride of sizeof(Vertex)
+			spine::Vector<float> ptWorldPos;
+			ptWorldPos.setSize(8, 0.0f);
+			pRegionAttachment->computeWorldVertices(pCurSlot->getBone(), ptWorldPos, 0, 2);
+
+			// SIZE
+#define GetPosX(index) ptWorldPos[index * 2]
+#define GetPosY(index) ptWorldPos[index * 2 + 1]
+			glm::vec2 vSize(abs(GetPosX(0) - GetPosX(3)), abs(GetPosY(2) - GetPosY(3)));
+			vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
+
+			// OFFSET
+			vertexBufferRef.AppendData2d(&ptWorldPos[0], sizeof(glm::vec2));
+
+			glm::vec4 vColor;
+			// TOP COLOR
+			HyCopyVec(vColor, CalculateTopTint());
+			vColor.a = CalculateAlpha();
+			vColor.r *= slotTint.r;
+			vColor.g *= slotTint.g;
+			vColor.b *= slotTint.b;
+			vColor.a *= slotTint.a;
+			vertexBufferRef.AppendData2d(&vColor, sizeof(glm::vec4));
+			// BOT COLOR
+			HyCopyVec(vColor, CalculateBotTint());
+			vColor.a = CalculateAlpha();
+			vColor.r *= slotTint.r;
+			vColor.g *= slotTint.g;
+			vColor.b *= slotTint.b;
+			vColor.a *= slotTint.a;
+			vertexBufferRef.AppendData2d(&vColor, sizeof(glm::vec4));
+			
+			// UV's
+#define GetUVs(index) &pRegionAttachment->getUVs()[index * 2]
+			//vUV.x = frameRef.rSRC_RECT.right;//1.0f;
+			//vUV.y = frameRef.rSRC_RECT.top;//1.0f;
+			vertexBufferRef.AppendData2d(GetUVs(2), sizeof(glm::vec2));
+
+			//vUV.x = frameRef.rSRC_RECT.left;//0.0f;
+			//vUV.y = frameRef.rSRC_RECT.top;//1.0f;
+			vertexBufferRef.AppendData2d(GetUVs(1), sizeof(glm::vec2));
+
+			//vUV.x = frameRef.rSRC_RECT.right;//1.0f;
+			//vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
+			vertexBufferRef.AppendData2d(GetUVs(3), sizeof(glm::vec2));
+
+			//vUV.x = frameRef.rSRC_RECT.left;//0.0f;
+			//vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
+			vertexBufferRef.AppendData2d(GetUVs(0), sizeof(glm::vec2));
+
+			// TRANSFORM MTX
+			vertexBufferRef.AppendData2d(&GetSceneTransform(), sizeof(glm::mat4));
+		}
+		else if(pAttachment->getRTTI().isExactly(spine::MeshAttachment::rtti))
+		{
+			// Cast to an MeshAttachment so we can get the rendererObject
+			// and compute the world vertices
+			spine::MeshAttachment *pMeshAttachment = static_cast<spine::MeshAttachment *>(pAttachment);
+
+			// Ensure there is enough room for vertices
+			//vertices.setSize(pMeshAttachment->getWorldVerticesLength() / 2, Vertex());
+
+			// Our engine specific Texture is stored in the AtlasRegion which was
+			// assigned to the attachment on load. It represents the texture atlas
+			// page that contains the image the region attachment is mapped to.
+			//texture = (Texture *)((AtlasRegion *)mesh->getRendererObject())->page->getRendererObject();
+
+			// Computed the world vertices positions for the vertices that make up
+			// the mesh attachment. This assumes the world transform of the
+			// bone to which the slot (and hence attachment) is attached has been calculated
+			// before rendering via Skeleton::updateWorldTransform(). The vertex positions will
+			// be written directly into the vertices array, with a stride of sizeof(Vertex)
+			size_t numVertices = pMeshAttachment->getWorldVerticesLength() / 2;
+			std::vector<glm::vec2> ptWorldPosList(numVertices);
+			//pMeshAttachment->computeWorldVertices(pCurSlot, 0, numVertices, &ptWorldPosList.data()->x, 0, sizeof(glm::vec2));
+
+			HyError("Mesh Attachments are not yet supported");
+		}
+
+		//// Draw the mesh we created for the attachment
+		//engine_drawMesh(vertices, 0, vertexIndex, texture, engineBlendMode);
+	}
+#endif
+}
+
 /*virtual*/ void HySpine2d::OnCalcBoundingVolume() /*override*/
 {
 }
-
-////uint32 HySpine2d::GetTextureId()
-////{
-////	if(m_uiTextureid == 0)
-////		m_uiTextureid = m_pDataPtr->GetTextureId();
-////
-////	return m_uiTextureid;
-////}
-//
-//void HySpine2d::AnimInitState(uint32 uiNumStates)
-//{
-//	HyAssert(uiNumStates != 0, "HySpine2d::AnimInitState must take uiNumState > 0");
-//
-//	m_uiNumAnimStates = uiNumStates;
-//	m_ppAnimStates = HY_NEW spAnimationState *[m_uiNumAnimStates];
-//	m_pIsAnimStateEnabled = HY_NEW bool[m_uiNumAnimStates];
-//
-//	for(uint32 i = 0; i < m_uiNumAnimStates; ++i)
-//	{
-//		m_ppAnimStates[i] = spAnimationState_create(m_pAnimStateData);
-//		m_pIsAnimStateEnabled[i] = true;
-//	}
-//}
-//
-////--------------------------------------------------------------------------------------
-//// Change the state of the Spine2d instance, in other words, essentially swaps the animation and
-//// goes to frame [0] or frame [last] if playing in reverse.
-////
-//// Note: This does not automatically begin playing the animation. If spine2d was instructed
-////       to pause prior to SetState(), it will switch to inital frame and continue 
-////       to pause.
-////--------------------------------------------------------------------------------------
-//void HySpine2d::SetState(uint32 uiAnimId, bool bLoop, uint32 uiStateId /*= 0*/)
-//{
-//	if(m_uiCurAnimState == uiAnimId)
-//		return;
-//
-//	m_uiCurAnimState = uiAnimId;
-//	m_bLooping = bLoop;
-//
-//
-//	spTrackEntry *pTrkEntry = spAnimationState_setAnimation(m_ppAnimStates[uiStateId], 0, m_ppSpineAnims[m_uiCurAnimState], m_bLooping);
-//	//pTrkEntry->listener = OnAnimationStateListen;
-//}
-//
-//void HySpine2d::SetState(const char *szAnimName, bool bLoop, uint32 uiIndex /*= 0*/)
-//{
-//	spTrackEntry *pTrkEntry = spAnimationState_setAnimationByName(m_ppAnimStates[uiIndex], 0, szAnimName, bLoop);
-//	m_pIsAnimStateEnabled[uiIndex] = true;
-//}
-//
-//void HySpine2d::AnimChainState(uint32 uiAnimId, bool bLoop, float fDelay, uint32 uiIndex /*= 0*/)
-//{
-//	spTrackEntry *pTrkEntry = spAnimationState_addAnimation(m_ppAnimStates[uiIndex], 0, m_ppSpineAnims[m_uiCurAnimState], bLoop, fDelay);
-//}
-//
-//void HySpine2d::AnimSetStateEnabled(bool bEnable, uint32 uiIndex)
-//{
-//	m_pIsAnimStateEnabled[uiIndex] = bEnable;
-//}
-//
-//void HySpine2d::AnimSetListener(void (*fpCallback)(spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount), void *pParam /*= NULL*/, int uiIndex /*= 0*/)
-//{
-//	//m_ppAnimStates[uiIndex]->listener = fpCallback;
-//	//m_ppAnimStates[uiIndex]->context = pParam;
-//}
-//
-//void HySpine2d::AnimInitBlend(float fInterpDur)
-//{
-//	for(uint32 i = 0; i < m_uiNumAnims; ++i)
-//	{
-//		for(uint32 j = 0; j < m_uiNumAnims; ++j)
-//		{
-//			if(i != j)
-//				spAnimationStateData_setMix(m_pAnimStateData, m_ppSpineAnims[i], m_ppSpineAnims[j], fInterpDur);
-//		}
-//	}
-//}
-//
-//
-//void HySpine2d::AnimInitBlend(const char *szAnimFrom, const char *szAnimTo, float fInterpDur)
-//{
-//	spAnimationStateData_setMixByName(m_pAnimStateData, szAnimFrom, szAnimTo, fInterpDur);
-//}
-//
-//void HySpine2d::AnimInitBlend(uint32 uiAnimIdFrom, uint32 uiAnimIdTo, float fInterpDur)
-//{
-//	spAnimationStateData_setMix(m_pAnimStateData, m_ppSpineAnims[uiAnimIdFrom], m_ppSpineAnims[uiAnimIdTo], fInterpDur);
-//}
-
-
-///*virtual*/ void HySpine2d::OnDataLoaded()
-//{
-//	HySpine2dData *pSpineData = reinterpret_cast<HySpine2dData *>(m_pData);
-//
-//	m_pSpineSkeleton = spSkeleton_create(pSpineData->GetSkeletonData());
-//
-//	m_spSkeletonBounds = spSkeletonBounds_create();
-//
-//	//m_uiNumAnims = pSpineData->GetSkeletonData()->animationCount;
-//	m_ppSpineAnims = pSpineData->GetSkeletonData()->animations;
-//	m_pAnimStateData = spAnimationStateData_create(pSpineData->GetSkeletonData());
-//
-//	m_RenderState.SetNumInstances(0);
-//	for(int i = 0; i < m_pSpineSkeleton->slotsCount; ++i)
-//	{
-//		spAttachment* attachment = m_pSpineSkeleton->drawOrder[i]->attachment;
-//		if(attachment == NULL || attachment->type != SP_ATTACHMENT_REGION)
-//			continue;
-//
-//		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
-//
-//		m_RenderState.SetTextureHandle(0);//, reinterpret_cast<HyAtlasGroupData *>(reinterpret_cast<spAtlasRegion *>(regionAttachment->rendererObject)->page->rendererObject)->GetId());
-//		m_RenderState.AppendInstances(1);
-//	}
-//
-//	//SetState(m_uiNumAnims, m_bLooping);
-//}
-
-///*virtual*/ void HySpine2d::OnLoadedUpdate() /*override*/
-//{
-//	// Update the time field used for attachments and such
-//	spSkeleton_update(m_pSpineSkeleton, HyEngine::DeltaTime());
-//
-//	// Calculate the animation state
-//	for(uint32 i = 0; i < m_uiNumAnimStates; ++i)
-//	{
-//		if(m_pIsAnimStateEnabled[i])
-//		{
-//			spAnimationState_update(m_ppAnimStates[i], HyEngine::DeltaTime() * m_fAnimPlayRate);
-//			spAnimationState_apply(m_ppAnimStates[i], m_pSpineSkeleton);
-//		}
-//	}
-//	
-//	// Update the transform
-//	//float fCoordModifier = m_eCoordType == HYCOORD_Meter ? HyScene::PixelsPerMeter() : 1.0f;
-//	//m_pSpineSkeleton->x = m_ptPosition.Get().x * fCoordModifier;
-//	//m_pSpineSkeleton->y = m_ptPosition.Get().y * fCoordModifier;
-//	
-//	// TODO: Use botColor as well
-//	const glm::vec3 &tint = CalculateTopTint();
-//	m_pSpineSkeleton->r = tint.r;
-//	m_pSpineSkeleton->g = tint.g;
-//	m_pSpineSkeleton->b = tint.b;
-//	m_pSpineSkeleton->a = CalculateAlpha();
-//
-//	//m_pSpineSkeleton->root->rotation = m_vRotation.Get().z;
-//
-//	//m_pSpineSkeleton->root->scaleX = m_vScale.Get().x;
-//	//m_pSpineSkeleton->root->scaleY = m_vScale.Get().y;
-//
-//	// This actually produces the Local transform as far as Harmony is concerned
-//	spSkeleton_updateWorldTransform(m_pSpineSkeleton);
-//}
-
-///*virtual*/ void HySpine2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
-//{
-//	spSlot *pCurSlot;
-//	for (int i = 0; i < m_pSpineSkeleton->slotsCount; ++i)
-//	{
-//		pCurSlot = m_pSpineSkeleton->drawOrder[i];
-//
-//		spAttachment* attachment = pCurSlot->attachment;
-//		if(attachment == NULL || attachment->type != SP_ATTACHMENT_REGION)
-//			continue;
-//
-//		spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
-//
-//		float pPos[8];
-//		//spRegionAttachment_computeWorldVertices(regionAttachment, pCurSlot->skeleton->x, pCurSlot->skeleton->y, pCurSlot->bone, pPos);
-//#define vertX(index) pPos[index*2]
-//#define vertY(index) pPos[index*2+1]
-//#define vertU(index) regionAttachment->uvs[index*2]
-//#define vertV(index) regionAttachment->uvs[index*2+1]
-//
-//		glm::vec2 vSize(abs(vertX(0) - vertX(3)), abs(vertY(2) - vertY(3)));
-//		glm::vec2 vOffset(vertX(0), vertY(0));
-//
-//		*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vSize;
-//		pWritePositionRef += sizeof(glm::vec2);
-//		*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vOffset;
-//		pWritePositionRef += sizeof(glm::vec2);
-//
-//		glm::vec4 vVertColorRGBA;
-//		vVertColorRGBA.r = m_pSpineSkeleton->r * pCurSlot->r;
-//		vVertColorRGBA.g = m_pSpineSkeleton->g * pCurSlot->g;
-//		vVertColorRGBA.b = m_pSpineSkeleton->b * pCurSlot->b;
-//		vVertColorRGBA.a = m_pSpineSkeleton->a * pCurSlot->a;
-//		*reinterpret_cast<glm::vec4 *>(pWritePositionRef) = vVertColorRGBA;
-//		pWritePositionRef += sizeof(glm::vec4);
-//
-//		glm::vec2 vUV;
-//
-//		vUV.x = vertU(0);
-//		vUV.y = vertV(0);
-//		*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-//		pWritePositionRef += sizeof(glm::vec2);
-//
-//		vUV.x = vertU(1);
-//		vUV.y = vertV(1);
-//		*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-//		pWritePositionRef += sizeof(glm::vec2);
-//
-//		vUV.x = vertU(3);
-//		vUV.y = vertV(3);
-//		*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-//		pWritePositionRef += sizeof(glm::vec2);
-//
-//		vUV.x = vertU(2);
-//		vUV.y = vertV(2);
-//		*reinterpret_cast<glm::vec2 *>(pWritePositionRef) = vUV;
-//		pWritePositionRef += sizeof(glm::vec2);
-//		
-//		GetWorldTransform(*reinterpret_cast<glm::mat4 *>(pWritePositionRef));
-//		pWritePositionRef += sizeof(glm::mat4);
-//	}
-//}

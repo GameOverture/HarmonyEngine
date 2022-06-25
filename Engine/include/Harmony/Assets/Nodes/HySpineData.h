@@ -15,36 +15,6 @@
 
 class HySpineData : public IHyNodeData
 {
-	//class HySpineTextureLoader : public spine::TextureLoader
-	//{
-	//public:
-	//	HySpineTextureLoader() { }
-	//	virtual ~HySpineTextureLoader() { }
-
-	//	// Called when the atlas loads the texture of a page.
-	//	virtual void load(spine::AtlasPage &page, const spine::String &path) override {
-	//		HyFileAtlas Texture *texture = engine_loadTexture(path);
-
-	//		// if texture loading failed, we simply return.
-	//		if(!texture) return;
-
-	//		// store the Texture on the rendererObject so we can
-	//		// retrieve it later for rendering.
-	//		page.setRendererObject(texture);
-
-	//		// store the texture width and height on the spAtlasPage
-	//		// so spine-c can calculate texture coordinates for
-	//		// rendering.
-	//		page. .setWidth(texture->width);
-	//		page.setHeight(texture->height);
-	//	}
-
-	//	// Called when the atlas is disposed and itself disposes its atlas pages.
-	//	virtual void unload(void *texture) {
-	//		// the texture parameter is the texture we stored in the page via page->setRendererObject()
-	//		engine_disposeTexture(texture);
-	//	}
-	//};
 	spine::Atlas *					m_pAtlasData;
 	spine::SkeletonData *			m_pSkeletonData;
 	spine::AnimationStateData *		m_pAnimStateData;
@@ -53,7 +23,8 @@ public:
 	HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HySpineData();
 
-	//spSkeletonData *GetSkeletonData()								{ return m_SpineSkeletonData; }
+	spine::SkeletonData *GetSkeletonData() const;
+	spine::AnimationStateData *GetAnimationStateData() const;
 
 	// Sets every combination of animation blend to this amount
 	void AnimInitBlend(float fInterpDur);

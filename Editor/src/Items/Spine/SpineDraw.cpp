@@ -18,6 +18,7 @@ SpineDraw::SpineDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDat
 	IDraw(pProjItem, initFileDataRef)
 {
 	m_Spine.Init("", "+GuiPreview", this);
+
 }
 
 SpineDraw::~SpineDraw()
@@ -42,6 +43,10 @@ SpineDraw::~SpineDraw()
 	//	pAtlasPixelData,
 	//	uiAtlasPixelDataSize,
 	//	0);
+
+
+	m_Spine.GuiOverrideData<HySpineData>(itemDataObj, HY_UNUSED_HANDLE);
+	m_Spine.Load();
 }
 
 /*virtual*/ void SpineDraw::OnShow() /*override*/

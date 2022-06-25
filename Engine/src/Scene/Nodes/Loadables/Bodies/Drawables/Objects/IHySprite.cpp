@@ -40,7 +40,7 @@ IHySprite<NODETYPE, ENTTYPE>::IHySprite(const IHySprite &copyRef) :
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-IHySprite<NODETYPE, ENTTYPE>::~IHySprite(void)
+/*virtual*/ IHySprite<NODETYPE, ENTTYPE>::~IHySprite(void)
 {
 }
 

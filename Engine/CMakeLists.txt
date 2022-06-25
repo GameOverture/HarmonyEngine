@@ -119,6 +119,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.cpp
 	src/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.cpp
@@ -243,6 +244,7 @@ set(HYENGINE_HEADER_FILES
 	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h
 	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h
 	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h
+	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.h
 	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h
 	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h
 	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h

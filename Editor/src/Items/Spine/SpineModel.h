@@ -10,13 +10,18 @@
 #ifndef SPINEMODEL_H
 #define SPINEMODEL_H
 
+#include "Global.h"
 #include "IModel.h"
 
 class SpineStateData : public IStateData
 {
+	QMap<QString, double>	m_CrossFadeMap;
+
 public:
 	SpineStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~SpineStateData();
+
+	const QMap<QString, double> &GetCrossFadeMap() const;
 
 	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
 	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
@@ -26,8 +31,19 @@ class SpineModel : public IModel
 {
 	Q_OBJECT
 
-	QList<unsigned char *>	m_pPreviewAtlasPixelData;
-	QList<AtlasFrame *>		m_AtlasFrameList;
+	QFileInfo					m_AtlasFileInfo;
+	QFileInfo					m_SkeletonFileInfo;
+	
+	bool						m_bIsBinaryRuntime;
+	float						m_fScale;
+	float						m_fDefaultMix;
+
+	spine::Atlas *				m_pAtlasData;
+	spine::SkeletonData *		m_pSkeletonData;
+	spine::AnimationStateData *	m_pAnimStateData;
+
+	QList<unsigned char *>		m_pPreviewAtlasPixelData;
+	QList<AtlasFrame *>			m_AtlasFrameList;
 
 public:
 	SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
@@ -38,6 +54,8 @@ public:
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
 	virtual QList<AssetItemData *> GetAssets(HyGuiItemType eType) const override;
 	virtual QStringList GetFontUrls() const override;
+
+	void AcquireSpineData();
 };
 
 #endif // SPINEMODEL_H

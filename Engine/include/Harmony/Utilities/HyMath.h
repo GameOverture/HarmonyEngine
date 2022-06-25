@@ -37,7 +37,8 @@ void HyCopyVec(glm::vec2 &destRef, const glm::vec2 &srcRef);
 void HyCopyVec(glm::vec3 &destRef, const glm::vec3 &srcRef);
 void HyCopyVec(glm::vec2 &destRef, const glm::vec3 &srcRef);
 void HyCopyVec(glm::vec3 &destRef, const glm::vec2 &srcRef);
-
+void HyCopyVec(glm::vec4 &destRef, const glm::vec3 &srcRef);
+void HyCopyVec(glm::vec4 &destRef, const glm::vec2 &srcRef);
 
 bool HyTestPointAABB(const b2AABB &aabb, const glm::vec2 &pt);
 

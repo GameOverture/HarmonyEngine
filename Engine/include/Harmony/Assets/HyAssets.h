@@ -23,6 +23,7 @@
 #define HYASSETS_AtlasDir "Atlases/"
 #define HYASSETS_PrefabDir "Prefabs/"
 #define HYASSETS_AudioDir "Audio/"
+#define HYASSETS_SpineDir "Spine/"
 
 class IHyAudioCore;
 class HyScene;

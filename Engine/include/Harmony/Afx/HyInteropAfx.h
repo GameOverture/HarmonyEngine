@@ -74,6 +74,8 @@ typedef HyOpenGL HyRendererInterop;
 		typedef void Atlas;
 		typedef void SkeletonData;
 		typedef void AnimationStateData;
+		typedef void AnimationState;
+		typedef void SkeletonBounds;
 	}
 #endif
 

@@ -135,7 +135,7 @@ void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCa
 									 scissorRect,
 									 (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
 									 instanceRef.GetCoordinateSystem(),
-									 m_VertexBuffer.GetNumUsedBytes2d(),
+									 m_VertexBuffer.GetNumUsedBytes2d(), // Get current offset into vertex buffer (before
 									 uiNumInstances,
 									 uiNumVerticesPerInstance);
 	
