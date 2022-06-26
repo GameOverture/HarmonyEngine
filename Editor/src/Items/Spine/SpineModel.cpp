@@ -116,6 +116,11 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 			if(QFile::copy(textureFileInfo.absoluteFilePath(), sTextureDestinationPath) == false)
 				HyGuiLog("SpineModel import: " % textureFileInfo.absoluteFilePath() % " did not copy to: " % sTextureDestinationPath, LOGTYPE_Error);
+
+			SpineSubAtlas subAtlas;
+			subAtlas.m_pAtlasFrame = nullptr;
+			subAtlas.m_pPreviewAtlas = new QImage(sTextureDestinationPath);
+			m_SubAtlasList.push_back(subAtlas);
 		}
 
 		m_bIsBinaryRuntime = importFileInfo.suffix().compare("skel", Qt::CaseInsensitive) == 0;
@@ -133,6 +138,27 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 		m_SkeletonFileInfo.setFile(itemRef.GetProject().GetAssetsAbsPath() % HYASSETS_SpineDir % sUuidName % (m_bIsBinaryRuntime ? ".skel" : ".json"));
 		m_AtlasFileInfo.setFile(itemRef.GetProject().GetAssetsAbsPath() % HYASSETS_SpineDir % sUuidName % ".atlas");
+
+		QJsonArray atlasesMetaArray = itemFileDataRef.m_Meta["atlases"].toArray();
+		QJsonArray atlasesDataArray = itemFileDataRef.m_Data["atlases"].toArray();
+		for(int i = 0; i < atlasesMetaArray.size(); ++i)
+		{
+			QJsonObject atlasMetaObj = atlasesMetaArray[i].toObject();
+			QJsonObject atlasDataObj = atlasesDataArray[i].toObject();
+
+			QList<QUuid> uuidRequestList;
+			uuidRequestList.append(QUuid(atlasMetaObj["assetUUID"].toString()));
+			QList<AssetItemData *> pRequestedList = m_ItemRef.GetProject().GetAtlasModel().RequestAssetsByUuid(&m_ItemRef, uuidRequestList);
+			
+			SpineSubAtlas subAtlas;
+			if(pRequestedList.size() == 1)
+				subAtlas.m_pAtlasFrame = static_cast<AtlasFrame *>(pRequestedList[0]);
+			else
+				HyGuiLog("More than one frame returned for a spine sub-atlas", LOGTYPE_Error);
+
+			subAtlas.m_pPreviewAtlas = nullptr;
+			m_SubAtlasList.push_back(subAtlas);
+		}
 	}
 
 	AcquireSpineData();
@@ -142,7 +168,7 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	{
 		uint32 uiNumStates = 0;
 #ifdef HY_USE_SPINE
-		uiNumState = static_cast<uint32>(m_pSkeletonData->getAnimations().size());
+		uiNumStates = static_cast<uint32>(m_pSkeletonData->getAnimations().size());
 #endif
 
 		QJsonArray metaStateArray;
@@ -166,6 +192,8 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 /*virtual*/ SpineModel::~SpineModel()
 {
+	for(auto subAtlas : m_SubAtlasList)
+		delete subAtlas.m_pPreviewAtlas;
 }
 
 /*virtual*/ bool SpineModel::OnPrepSave() /*override*/
@@ -179,6 +207,27 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	itemSpecificFileDataOut.m_Data.insert("isBinary", m_bIsBinaryRuntime);
 	itemSpecificFileDataOut.m_Data.insert("scale", m_fScale);
 	itemSpecificFileDataOut.m_Data.insert("defaultMix", m_fDefaultMix);
+
+#ifdef HY_USE_SPINE
+	QJsonArray atlasesMetaArray;
+	QJsonArray atlasesDataArray;
+	for(int i = 0; i < m_pAtlasData->getPages().size(); ++i)
+	{
+		QJsonObject atlasMetaObj;
+		QJsonObject atlasDataObj;
+
+		atlasMetaObj.insert("assetUUID", m_SubAtlasList[i].m_pAtlasFrame == nullptr ? 0 : m_SubAtlasList[i].m_pAtlasFrame->GetUuid().toString(QUuid::WithoutBraces));
+
+		atlasDataObj.insert("checksum", m_SubAtlasList[i].m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_SubAtlasList[i].m_pAtlasFrame->GetChecksum())));
+		atlasDataObj.insert("name", m_pAtlasData->getPages()[i]->name.buffer());
+
+		atlasesMetaArray.append(atlasMetaObj);
+		atlasesDataArray.append(atlasDataObj);
+	}
+	itemSpecificFileDataOut.m_Meta.insert("atlases", atlasesMetaArray);
+	itemSpecificFileDataOut.m_Data.insert("atlases", atlasesDataArray);
+	
+#endif
 }
 
 /*virtual*/ void SpineModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/

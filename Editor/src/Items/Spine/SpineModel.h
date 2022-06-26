@@ -27,6 +27,12 @@ public:
 	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
 };
 ////////////////////////////////////////////////////////////////////////////////////////
+struct SpineSubAtlas
+{
+	AtlasFrame *m_pAtlasFrame = nullptr;
+	QImage *m_pPreviewAtlas = nullptr;	// For when it's not packed into the atlas manager (initial unsaved Spine item)
+};
+////////////////////////////////////////////////////////////////////////////////////////
 class SpineModel : public IModel
 {
 	Q_OBJECT
@@ -42,8 +48,7 @@ class SpineModel : public IModel
 	spine::SkeletonData *		m_pSkeletonData;
 	spine::AnimationStateData *	m_pAnimStateData;
 
-	QList<unsigned char *>		m_pPreviewAtlasPixelData;
-	QList<AtlasFrame *>			m_AtlasFrameList;
+	QList<SpineSubAtlas>		m_SubAtlasList;
 
 public:
 	SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);

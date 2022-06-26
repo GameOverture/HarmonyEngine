@@ -13,8 +13,42 @@
 #include "Afx/HyInteropAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
+#ifdef HY_USE_SPINE // Custom engine class extensions to assist spine-cpp with loading
+	class HySpineTextureLoader : public spine::TextureLoader
+	{
+	public:
+		virtual void load(spine::AtlasPage &page, const spine::String &path) override;
+		virtual void unload(void *pTexture) override;
+	};
+#endif
+
+struct HySpineAtlas
+{
+	std::string					m_sName;
+	HyFileAtlas *				m_pAtlas;
+	const HyRectangle<float>	m_rSRC_RECT;
+
+	HySpineAtlas(std::string sName, HyFileAtlas *pAtlas, float fSrcLeft, float fSrcTop, float fSrcRight, float fSrcBot) :
+		m_sName(sName),
+		m_pAtlas(pAtlas),
+		m_rSRC_RECT(fSrcLeft, fSrcBot, fSrcRight, fSrcTop)
+	{ }
+
+	HyTextureHandle GetGfxApiHandle() const
+	{
+		return m_pAtlas ? m_pAtlas->GetTextureHandle() : HY_UNUSED_HANDLE;
+	}
+	
+	bool IsAtlasValid() const
+	{
+		return m_pAtlas != nullptr;
+	}
+};
+
 class HySpineData : public IHyNodeData
 {
+	std::vector<HySpineAtlas>		m_SubAtlasList;
+
 	spine::Atlas *					m_pAtlasData;
 	spine::SkeletonData *			m_pSkeletonData;
 	spine::AnimationStateData *		m_pAnimStateData;

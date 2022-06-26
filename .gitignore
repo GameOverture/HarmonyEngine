@@ -6,6 +6,7 @@ Release/
 GuiRelease/
 ipch/
 build/
+buildSpine/
 build-HyEditor-*/
 .vs/
 GeneratedFiles/

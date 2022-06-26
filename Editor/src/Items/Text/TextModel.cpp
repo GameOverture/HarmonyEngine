@@ -52,7 +52,6 @@ TextModel::TextModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataR
 	// Find existing AtlasFrame * to assign to 'm_pAtlasFrame'
 	if(itemFileDataRef.m_Meta.contains("assetUUID"))
 	{
-		int iAffectedFrameIndex = 0;
 		QList<QUuid> uuidRequestList;
 		uuidRequestList.append(QUuid(itemFileDataRef.m_Meta["assetUUID"].toString()));
 
