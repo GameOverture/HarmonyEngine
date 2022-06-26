@@ -84,7 +84,7 @@ HyShaderHandle IHyDrawable::GetShaderHandle()
 	return m_hShader;
 }
 
-const HyShaderUniforms &IHyDrawable::GetShaderUniforms() const
+HyShaderUniforms &IHyDrawable::GetShaderUniforms()
 {
 	return m_ShaderUniforms;
 }

@@ -43,7 +43,7 @@ public:
 	// Passing nullptr will use built-in default shader
 	void SetShader(HyShader *pShader);
 	HyShaderHandle GetShaderHandle();
-	const HyShaderUniforms &GetShaderUniforms() const;
+	HyShaderUniforms &GetShaderUniforms();
 
 protected:
 	virtual bool IsValidToRender() = 0;

@@ -18,7 +18,9 @@
 HyRenderBuffer::HyRenderBuffer() :
 	m_pBUFFER(HY_NEW uint8[HY_RENDERSTATE_BUFFER_SIZE]),
 	m_pCurWritePosition(m_pBUFFER),
-	m_pRenderStatesUserStartPos(nullptr)
+	m_pRenderStatesUserStartPos(nullptr),
+	m_uiPrevUniformCrc(0),
+	m_pPrevRenderState(nullptr)
 {
 #ifdef HY_DEBUG
 	memset(m_pBUFFER, 0, HY_RENDERSTATE_BUFFER_SIZE);
@@ -44,9 +46,11 @@ void HyRenderBuffer::Reset()
 {
 	m_pCurWritePosition = m_pBUFFER;
 	m_pRenderStatesUserStartPos = nullptr;
+	m_uiPrevUniformCrc = 0;
+	m_pPrevRenderState = nullptr;
 }
 
-void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, HyCameraMask uiCameraMask, HyScreenRect<int32> &scissorRectRef, HyStencilHandle hStencil, int32 iCoordinateSystem, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance)
+bool HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, HyCameraMask uiCameraMask, HyScreenRect<int32> &scissorRectRef, HyStencilHandle hStencil, int32 iCoordinateSystem, uint32 uiDataOffset, uint32 uiNumInstances, uint32 uiNumVerticesPerInstance)
 {
 	State *pRenderState = new (m_pCurWritePosition)State(uiId,
 														 uiCameraMask,
@@ -60,20 +64,38 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, Hy
 														 uiNumInstances,
 														 uiNumVerticesPerInstance);
 	m_pCurWritePosition += sizeof(State);
-
 	uint8 *pStartOfExData = m_pCurWritePosition;
-	AppendShaderUniforms(instanceRef.GetShaderUniforms());
-	pRenderState->m_uiExDataSize = (static_cast<uint32>(m_pCurWritePosition - pStartOfExData));
-	HyAssert(static_cast<uint32>(m_pCurWritePosition - m_pBUFFER) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
 
-	if(m_pRenderStatesUserStartPos)
+	// Determine if we can combine this render state with the previous one, to batch less render calls
+	if(m_uiPrevUniformCrc == instanceRef.GetShaderUniforms().GetCrc32() &&
+		instanceRef._DrawableGetNodeRef().GetType() != HYTYPE_Primitive && // Primitives cannot batch render calls
+		m_pPrevRenderState && *pRenderState == *m_pPrevRenderState)
 	{
-		Header *pHeader = reinterpret_cast<Header *>(m_pRenderStatesUserStartPos);
+		m_pPrevRenderState->m_uiNumInstances += pRenderState->m_uiNumInstances;
+		m_pCurWritePosition -= sizeof(State);
 
-		if(instanceRef._DrawableGetNodeRef().Is2D())
-			pHeader->uiNum2dRenderStates++;
-		else
-			pHeader->uiNum3dRenderStates++;
+		return true;
+	}
+	else
+	{
+		AppendShaderUniforms(instanceRef.GetShaderUniforms());
+		pRenderState->m_uiExDataSize = (static_cast<uint32>(m_pCurWritePosition - pStartOfExData));
+		HyAssert(static_cast<uint32>(m_pCurWritePosition - m_pBUFFER) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
+
+		if(m_pRenderStatesUserStartPos)
+		{
+			Header *pHeader = reinterpret_cast<Header *>(m_pRenderStatesUserStartPos);
+
+			if(instanceRef._DrawableGetNodeRef().Is2D())
+				pHeader->m_uiNum2dRenderStates++;
+			else
+				pHeader->m_uiNum3dRenderStates++;
+		}
+
+		m_uiPrevUniformCrc = instanceRef.GetShaderUniforms().GetCrc32();
+		m_pPrevRenderState = pRenderState;
+
+		return false;
 	}
 }
 
@@ -86,7 +108,7 @@ void HyRenderBuffer::CreateRenderHeader()
 	m_pCurWritePosition += sizeof(Header);
 }
 
-void HyRenderBuffer::AppendShaderUniforms(const HyShaderUniforms &shaderUniformRef)
+void HyRenderBuffer::AppendShaderUniforms(HyShaderUniforms &shaderUniformRef)
 {
 	uint32 uiNumUniforms = shaderUniformRef.GetNumUniforms();
 	*reinterpret_cast<uint32 *>(m_pCurWritePosition) = uiNumUniforms;
@@ -128,4 +150,6 @@ void HyRenderBuffer::AppendShaderUniforms(const HyShaderUniforms &shaderUniformR
 		memcpy(m_pCurWritePosition, shaderUniformRef.GetData(i), uiDataSize);
 		m_pCurWritePosition += uiDataSize;
 	}
+
+	m_uiPrevUniformCrc = shaderUniformRef.GetCrc32();
 }

@@ -38,7 +38,7 @@ HyShaderUniforms::~HyShaderUniforms()
 
 HyShaderUniforms &HyShaderUniforms::operator=(const HyShaderUniforms &rhs)
 {
-	m_bDirty = rhs.m_bDirty;
+	m_bDirty = true;
 	m_uiCrc32 = rhs.m_uiCrc32;
 	m_UniformList = rhs.m_UniformList;
 

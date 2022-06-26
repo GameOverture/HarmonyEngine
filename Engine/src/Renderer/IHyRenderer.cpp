@@ -135,11 +135,12 @@ void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCa
 									 scissorRect,
 									 (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
 									 instanceRef.GetCoordinateSystem(),
-									 m_VertexBuffer.GetNumUsedBytes2d(), // Get current offset into vertex buffer (before
+									 m_VertexBuffer.GetNumUsedBytes2d(), // Get current offset into vertex buffer
 									 uiNumInstances,
 									 uiNumVerticesPerInstance);
 	
-	instanceRef.AcquireData();
+	instanceRef.AcquireData(); // TODO: Why is this here?
+
 	instanceRef.OnWriteVertexData(m_VertexBuffer);
 }
 
@@ -218,7 +219,7 @@ void IHyRenderer::Render()
 		pRsBufferPos += sizeof(HyRenderBuffer::Header);
 
 		Begin_3d();
-		for(uint32 k = 0; k < pRsHeader->uiNum3dRenderStates; k++)
+		for(uint32 k = 0; k < pRsHeader->m_uiNum3dRenderStates; k++)
 		{
 			pCurRenderState = reinterpret_cast<HyRenderBuffer::State *>(pRsBufferPos);
 			DrawRenderState_3d(pCurRenderState);
@@ -227,16 +228,16 @@ void IHyRenderer::Render()
 
 		Begin_2d();
 		HyWindow::CameraIterator2d cameraIter(m_pCurWindow->GetCamera2dList());
-		for(uint32 k = 0; k < pRsHeader->uiNum2dRenderStates; k++)
+		for(uint32 k = 0; k < pRsHeader->m_uiNum2dRenderStates; k++)
 		{
 			pCurRenderState = reinterpret_cast<HyRenderBuffer::State *>(pRsBufferPos);
-			if(pCurRenderState->iCOORDINATE_SYSTEM < 0 || pCurRenderState->iCOORDINATE_SYSTEM == m_pCurWindow->GetIndex())
+			if(pCurRenderState->m_iCOORDINATE_SYSTEM < 0 || pCurRenderState->m_iCOORDINATE_SYSTEM == m_pCurWindow->GetIndex())
 			{
 				cameraIter.Reset();
 				do
 				{
 					// Check the cull mask to exit rendering under this camera early if not in frustum
-					if(pCurRenderState->iCOORDINATE_SYSTEM < 0 && 0 == (pCurRenderState->uiCAMERA_MASK & (1 << cameraIter.Get()->GetCameraBitFlag())))
+					if(pCurRenderState->m_iCOORDINATE_SYSTEM < 0 && 0 == (pCurRenderState->m_uiCAMERA_MASK & (1 << cameraIter.Get()->GetCameraBitFlag())))
 					{
 						++cameraIter;
 						continue;
@@ -245,7 +246,7 @@ void IHyRenderer::Render()
 					DrawRenderState_2d(pCurRenderState, cameraIter.Get());
 					
 					++cameraIter;
-				} while(pCurRenderState->iCOORDINATE_SYSTEM < 0 && cameraIter.IsEnd() == false);	// Check whether there are other cameras to render from
+				} while(pCurRenderState->m_iCOORDINATE_SYSTEM < 0 && cameraIter.IsEnd() == false);	// Check whether there are other cameras to render from
 			}
 
 			pRsBufferPos += pCurRenderState->m_uiExDataSize + sizeof(HyRenderBuffer::State);
