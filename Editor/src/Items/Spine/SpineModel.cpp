@@ -56,7 +56,8 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	m_fDefaultMix(0.0f),
 	m_pAtlasData(nullptr),
 	m_pSkeletonData(nullptr),
-	m_pAnimStateData(nullptr)
+	m_pAnimStateData(nullptr),
+	m_bUsingTempFiles(true)
 {
 	QString sUuidName = GetUuid().toString(QUuid::WithoutBraces);
 
@@ -72,10 +73,13 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 		dataDir.mkdir("Spine");
 		if(dataDir.cd("Spine") == false)
 			HyGuiLog("SpineModel could not navigate to Spine data directory", LOGTYPE_Error);
+
+		// Store all imported files into temp directory for now. Will be moved appropriately once this item is saved
+		QDir spineTempDir = HyGlobal::PrepTempDir(GetItem().GetProject(), sUuidName);
 		
 		// Import Spine files - SKELETON -----------------------------------------------------------------------------------------
 		QFileInfo importFileInfo(itemFileDataRef.m_Meta["newImport"].toString());
-		m_SkeletonFileInfo.setFile(dataDir.absoluteFilePath(sUuidName % "." % importFileInfo.completeSuffix()));
+		m_SkeletonFileInfo.setFile(spineTempDir.absoluteFilePath(sUuidName % "." % importFileInfo.completeSuffix()));
 
 		if(importFileInfo.exists() == false)
 			HyGuiLog("SpineModel import: " % importFileInfo.absoluteFilePath() % " does not exist", LOGTYPE_Error);
@@ -84,7 +88,7 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 		// Import Spine files - ATLAS -----------------------------------------------------------------------------------------
 		QFileInfo atlasFileInfo(importFileInfo.absolutePath() + "/" + importFileInfo.baseName() + ".atlas");
-		m_AtlasFileInfo.setFile(dataDir.absoluteFilePath(sUuidName % ".atlas"));
+		m_AtlasFileInfo.setFile(spineTempDir.absoluteFilePath(sUuidName % ".atlas"));
 
 		if(atlasFileInfo.exists() == false)
 			HyGuiLog("SpineModel import: " % atlasFileInfo.absoluteFilePath() % " does not exist", LOGTYPE_Error);
@@ -107,24 +111,26 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 			
 			sLine = stream.readLine();
 		};
-		// Copy atlas files (exported from spine tool) to meta data
-		metaDir.mkdir(sUuidName);
+		// Copy atlas image files exported from spine tool, to spine's temp dir (once saved, it'll be copied once more to its meta dir)
+		
 		for(QString sTextureFile : textureFileNameList)
 		{
 			QFileInfo textureFileInfo(importFileInfo.absolutePath() % '/' % sTextureFile);
-			QString sTextureDestinationPath = metaDir.absoluteFilePath(sUuidName % '/' % textureFileInfo.fileName());
+			QString sTextureDestinationPath = spineTempDir.absoluteFilePath(textureFileInfo.fileName());
 
 			if(QFile::copy(textureFileInfo.absoluteFilePath(), sTextureDestinationPath) == false)
 				HyGuiLog("SpineModel import: " % textureFileInfo.absoluteFilePath() % " did not copy to: " % sTextureDestinationPath, LOGTYPE_Error);
 
 			SpineSubAtlas subAtlas;
+			subAtlas.m_ImageFileInfo.setFile(sTextureDestinationPath);
 			subAtlas.m_pAtlasFrame = nullptr;
-			subAtlas.m_pPreviewAtlas = new QImage(sTextureDestinationPath);
 			m_SubAtlasList.push_back(subAtlas);
 		}
 
 		m_bIsBinaryRuntime = importFileInfo.suffix().compare("skel", Qt::CaseInsensitive) == 0;
 		m_fScale = 1.0f;
+
+		m_bUsingTempFiles = true;
 	}
 	else
 	{
@@ -156,9 +162,11 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 			else
 				HyGuiLog("More than one frame returned for a spine sub-atlas", LOGTYPE_Error);
 
-			subAtlas.m_pPreviewAtlas = nullptr;
+			subAtlas.m_ImageFileInfo.setFile();
 			m_SubAtlasList.push_back(subAtlas);
 		}
+
+		m_bUsingTempFiles = false;
 	}
 
 	AcquireSpineData();
@@ -192,12 +200,76 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 /*virtual*/ SpineModel::~SpineModel()
 {
-	for(auto subAtlas : m_SubAtlasList)
-		delete subAtlas.m_pPreviewAtlas;
 }
 
 /*virtual*/ bool SpineModel::OnPrepSave() /*override*/
 {
+	if(m_bUsingTempFiles)
+	{
+		QDir metaDir(m_ItemRef.GetProject().GetMetaAbsPath());
+		metaDir.mkdir("Spine");
+		if(metaDir.cd("Spine") == false)
+		{
+			HyGuiLog("SpineModel could not navigate to Spine meta directory", LOGTYPE_Error);
+			return false;
+		}
+		QDir dataDir(m_ItemRef.GetProject().GetAssetsAbsPath());
+		dataDir.mkdir("Spine");
+		if(dataDir.cd("Spine") == false)
+		{
+			HyGuiLog("SpineModel could not navigate to Spine data directory", LOGTYPE_Error);
+			return false;
+		}
+
+		// Move temp files into their appropriate meta/data dirs
+		QString sUuidName = GetUuid().toString(QUuid::WithoutBraces);
+		metaDir.mkdir(sUuidName);
+		if(metaDir.cd(sUuidName) == false)
+		{
+			HyGuiLog("SpineModel could not navigate to this Spine's UUID meta directory: " % sUuidName, LOGTYPE_Error);
+			return false;
+		}
+		dataDir.mkdir(sUuidName);
+		if(dataDir.cd(sUuidName) == false)
+		{
+			HyGuiLog("SpineModel could not navigate to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
+			return false;
+		}
+
+		QFile skelFile(m_SkeletonFileInfo.absoluteFilePath());
+		QString sSkelFileDestination = dataDir.absoluteFilePath(skelFile.fileName());
+		if(false == skelFile.copy(sSkelFileDestination))
+		{
+			HyGuiLog("SpineModel could not copy Spine Skeleton to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
+			return false;
+		}
+		m_SkeletonFileInfo.setFile(sSkelFileDestination);
+
+		QFile atlasFile(m_AtlasFileInfo.absoluteFilePath());
+		QString sAtlasFileDestination = dataDir.absoluteFilePath(atlasFile.fileName());
+		if(false == atlasFile.copy(sAtlasFileDestination))
+		{
+			HyGuiLog("SpineModel could not copy Spine Atlas file to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
+			return false;
+		}
+		m_AtlasFileInfo.setFile(sAtlasFileDestination);
+
+		for(SpineSubAtlas &subAtlas : m_SubAtlasList)
+		{
+			QFile subAtlasFile(subAtlas.m_ImageFileInfo.absoluteFilePath());
+			QString sSubAtlasFileDestination = metaDir.absoluteFilePath(subAtlasFile.fileName());
+			if(false == subAtlasFile.copy(sSubAtlasFileDestination))
+			{
+				HyGuiLog("SpineModel could not copy Spine Sub-Atlas image file to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
+				return false;
+			}
+			subAtlas.m_ImageFileInfo.setFile(sSubAtlasFileDestination);
+		}
+
+		m_bUsingTempFiles = false;
+	}
+	
+
 	return true;
 }
 

@@ -129,6 +129,9 @@ enum Theme
 //#define HYTREEWIDGETITEM_IsFilter				"HyTreeFilter"
 
 #define HYGUIPATH_TempDir						"temp/"
+#define HYGUIPATH_TEMPSUBDIR_ImportTileSheet	"TileSheets"
+#define HYGUIPATH_TEMPSUBDIR_PasteAssets		"PasteAssets"
+
 #define HYGUIPATH_EditorDataDir					"Editor/data/"
 #define HYGUIPATH_ProjGenDir					"Editor/data/_projGen/"
 #define HYGUIPATH_AstcEncDir					"Editor/external/astcenc/"
@@ -221,7 +224,8 @@ public:
 	// Includes 'pParentItem' in returned list
 	static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem);
 
-	static QDir PrepTempDir(Project *pProject);
+	static QDir PrepTempDir(Project &projectRef, QString sDirName);
+	static void CleanAllTempDirs(Project &projectRef);
 
 	static bool IsItemFileDataValid(const FileDataPair &itemfileDataRef);
 	static FileDataPair GenerateNewItemFileData(QString sImportPath = "");

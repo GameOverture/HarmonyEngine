@@ -29,8 +29,8 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////
 struct SpineSubAtlas
 {
-	AtlasFrame *m_pAtlasFrame = nullptr;
-	QImage *m_pPreviewAtlas = nullptr;	// For when it's not packed into the atlas manager (initial unsaved Spine item)
+	QFileInfo					m_ImageFileInfo;			// This may point to a temp directory (if unsaved) or in its meta dir
+	AtlasFrame *				m_pAtlasFrame = nullptr;	// Once saved and packed into atlas manager this should be valid
 };
 ////////////////////////////////////////////////////////////////////////////////////////
 class SpineModel : public IModel
@@ -49,6 +49,8 @@ class SpineModel : public IModel
 	spine::AnimationStateData *	m_pAnimStateData;
 
 	QList<SpineSubAtlas>		m_SubAtlasList;
+
+	bool						m_bUsingTempFiles;
 
 public:
 	SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);

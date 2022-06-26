@@ -47,7 +47,7 @@ void DlgImportTileSheet::on_buttonBox_accepted()
 	if(QMessageBox::Yes != QMessageBox::question(MainWindow::GetInstance(), "Confirm Batch Import", "Do you want to import '" % QString::number(m_TilePixmaps.size()) % "' images?", QMessageBox::Yes, QMessageBox::No))
 		return;
 
-	QDir tempDir = HyGlobal::PrepTempDir(&m_ProjectRef);
+	QDir tempDir = HyGlobal::PrepTempDir(m_ProjectRef, HYGUIPATH_TEMPSUBDIR_ImportTileSheet);
 
 	char szBuffer[16];
 	uint uiPixmapIndex = 0;
