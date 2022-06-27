@@ -17,9 +17,9 @@
 
 class HySpine2d : public IHyDrawable2d
 {
-	spine::Skeleton *			m_pSkeleton;
-	spine::AnimationState *		m_pAnimationState;
-	spine::SkeletonBounds *		m_pSkeletonBounds;
+	spine::Skeleton *				m_pSkeleton;
+	spine::AnimationState *			m_pAnimationState;
+	spine::SkeletonBounds *			m_pSkeletonBounds;
 
 public:
 	HySpine2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);

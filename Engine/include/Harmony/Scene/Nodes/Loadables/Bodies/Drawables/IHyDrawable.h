@@ -25,7 +25,6 @@ class IHyDrawable
 protected:
 	HyShaderHandle					m_hShader;
 	HyRenderMode					m_eRenderMode;
-	HyTextureHandle					m_hTextureHandle;
 	HyShaderUniforms 				m_ShaderUniforms;
 
 public:
@@ -38,7 +37,6 @@ public:
 	IHyDrawable &operator=(IHyDrawable &&donor) noexcept;
 
 	HyRenderMode GetRenderMode() const;
-	HyTextureHandle GetTextureHandle() const;
 
 	// Passing nullptr will use built-in default shader
 	void SetShader(HyShader *pShader);
@@ -47,7 +45,6 @@ public:
 
 protected:
 	virtual bool IsValidToRender() = 0;
-	virtual void OnUpdateUniforms() { }			// Upon updating, this function will set the shaders' uniforms when using the default shader
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) = 0;
 
 private:

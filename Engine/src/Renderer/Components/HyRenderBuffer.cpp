@@ -56,7 +56,6 @@ bool HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, Hy
 														 uiCameraMask,
 														 uiDataOffset,
 														 instanceRef.GetRenderMode(),
-														 instanceRef.GetTextureHandle(),
 														 instanceRef.GetShaderHandle(),
 														 scissorRectRef,
 														 hStencil,
@@ -67,7 +66,7 @@ bool HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, Hy
 	uint8 *pStartOfExData = m_pCurWritePosition;
 
 	// Determine if we can combine this render state with the previous one, to batch less render calls
-	if(m_uiPrevUniformCrc == instanceRef.GetShaderUniforms().GetCrc32() &&
+	if(m_uiPrevUniformCrc == instanceRef.GetShaderUniforms().GetCrc64() &&
 		instanceRef._DrawableGetNodeRef().GetType() != HYTYPE_Primitive && // Primitives cannot batch render calls
 		m_pPrevRenderState && *pRenderState == *m_pPrevRenderState)
 	{
@@ -78,7 +77,7 @@ bool HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, Hy
 	}
 	else
 	{
-		AppendShaderUniforms(instanceRef.GetShaderUniforms());
+		AppendExData(instanceRef.GetShaderUniforms()); // This advances the 'm_pCurWritePosition'
 		pRenderState->m_uiExDataSize = (static_cast<uint32>(m_pCurWritePosition - pStartOfExData));
 		HyAssert(static_cast<uint32>(m_pCurWritePosition - m_pBUFFER) < HY_RENDERSTATE_BUFFER_SIZE, "IHyRenderer::AppendDrawable2d() has written passed its render state bounds! Embiggen 'HY_RENDERSTATE_BUFFER_SIZE'");
 
@@ -92,7 +91,7 @@ bool HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable &instanceRef, Hy
 				pHeader->m_uiNum3dRenderStates++;
 		}
 
-		m_uiPrevUniformCrc = instanceRef.GetShaderUniforms().GetCrc32();
+		m_uiPrevUniformCrc = instanceRef.GetShaderUniforms().GetCrc64();
 		m_pPrevRenderState = pRenderState;
 
 		return false;
@@ -108,8 +107,19 @@ void HyRenderBuffer::CreateRenderHeader()
 	m_pCurWritePosition += sizeof(Header);
 }
 
-void HyRenderBuffer::AppendShaderUniforms(HyShaderUniforms &shaderUniformRef)
+void HyRenderBuffer::AppendExData(HyShaderUniforms &shaderUniformRef)
 {
+	uint32 uiNumSamplers = shaderUniformRef.GetNumTexUnits();
+	*reinterpret_cast<uint32 *>(m_pCurWritePosition) = uiNumSamplers;
+	m_pCurWritePosition += sizeof(uint32);
+
+	for(uint32 i = 0; i < uiNumSamplers; ++i)
+	{
+		*reinterpret_cast<HyTextureHandle *>(m_pCurWritePosition) = static_cast<HyTextureHandle>(shaderUniformRef.GetTexHandle(i));
+		m_pCurWritePosition += sizeof(HyTextureHandle);
+	}
+
+
 	uint32 uiNumUniforms = shaderUniformRef.GetNumUniforms();
 	*reinterpret_cast<uint32 *>(m_pCurWritePosition) = uiNumUniforms;
 	m_pCurWritePosition += sizeof(uint32);
@@ -151,5 +161,5 @@ void HyRenderBuffer::AppendShaderUniforms(HyShaderUniforms &shaderUniformRef)
 		m_pCurWritePosition += uiDataSize;
 	}
 
-	m_uiPrevUniformCrc = shaderUniformRef.GetCrc32();
+	m_uiPrevUniformCrc = shaderUniformRef.GetCrc64();
 }

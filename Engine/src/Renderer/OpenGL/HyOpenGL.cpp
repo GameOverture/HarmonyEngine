@@ -963,13 +963,27 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	glUseProgram(hGlHandle);
 	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUseProgram");
 
+	HyShader *pShader = m_ShaderMap[pRenderState->m_hSHADER];
+	HyAssert(pShader, "HyShader not found for render state: " << pRenderState->m_uiID);
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Bind texture(s)
-	glActiveTexture(GL_TEXTURE0);
-	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glActiveTexture");
+	
+	// Parse texture unit/samplers & uniform data from ExBuffer
+	char *pTexUnitExBuffer = reinterpret_cast<char *>(pRenderState) + sizeof(HyRenderBuffer::State);
+	uint32 uiNumTextureUnits = *reinterpret_cast<uint32 *>(pTexUnitExBuffer);
+	pTexUnitExBuffer += sizeof(uint32);
+	for(uint32 i = 0; i < uiNumTextureUnits; ++i)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glActiveTexture");
 
-	glBindTexture(GL_TEXTURE_2D, pRenderState->m_hTEXTURE_0);
-	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glBindTexture");
+		GLuint uiTexHandle = *reinterpret_cast<HyTextureHandle *>(pTexUnitExBuffer);
+		pTexUnitExBuffer += sizeof(HyTextureHandle);
+		
+		glBindTexture(GL_TEXTURE_2D, uiTexHandle);
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glBindTexture");
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if(pRenderState->m_SCISSOR_RECT.iTag != IHyBody::SCISSORTAG_Disabled)
@@ -1012,10 +1026,11 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Assign any other uniforms by parsing the RenderState's ex buffer portion
-	char *pExBuffer = reinterpret_cast<char *>(pRenderState) + sizeof(HyRenderBuffer::State);
 
+	char *pExBuffer = reinterpret_cast<char *>(pRenderState) + sizeof(HyRenderBuffer::State) + sizeof(uint32) + (uiNumTextureUnits * sizeof(HyTextureHandle));
 	uint32 uiNumUniforms = *reinterpret_cast<uint32 *>(pExBuffer);
 	pExBuffer += sizeof(uint32);
+
 	for(uint32 i = 0; i < uiNumUniforms; ++i)
 	{
 		const char *szUniformName = pExBuffer;
@@ -1149,12 +1164,8 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set vertex attribute pointers to the vertex data locations in bound buffer
 	size_t uiStartOffset = pRenderState->m_uiDATA_OFFSET;
-	HyShader *pShader = m_ShaderMap[pRenderState->m_hSHADER];
-	HyAssert(pShader, "HyShader not found for render state: " << pRenderState->m_uiID);
-
-	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
-
 	size_t uiOffset = 0;
+	std::vector<HyShaderVertexAttribute> &shaderVertexAttribListRef = pShader->GetVertextAttributes();
 	for(size_t i = 0; i < shaderVertexAttribListRef.size(); ++i)
 	{
 		// TODO: Cache the attribute location instead of finding it every time

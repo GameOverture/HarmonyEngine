@@ -25,6 +25,8 @@ protected:
 	float			m_fLineThickness;
 	uint32			m_uiNumSegments;
 
+	bool			m_bUpdateShaderUniforms;
+
 public:
 	HyPrimitive2d(HyEntity2d *pParent = nullptr);
 	HyPrimitive2d(const HyPrimitive2d &copyRef);
@@ -46,11 +48,13 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 protected:
+	virtual void SetDirty(uint32 uiDirtyFlags) override;
+
 	virtual void OnShapeChanged() override;
 	virtual bool OnIsValidToRender() override;
+	virtual void OnLoadedUpdate() override;
 	virtual void OnCalcBoundingVolume() override;
 
-	virtual void OnUpdateUniforms() override;
 	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 
 private:

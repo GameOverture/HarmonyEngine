@@ -31,6 +31,7 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(std::string sPrefix, std::string sName, ENTT
 	m_fUsedPixelHeight(0.0f)
 {
 	this->m_eRenderMode = HYRENDERMODE_TriangleStrip;
+	this->m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -50,6 +51,8 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(const IHyText &copyRef) :
 	m_fUsedPixelWidth(copyRef.m_fUsedPixelWidth),
 	m_fUsedPixelHeight(copyRef.m_fUsedPixelHeight)
 {
+	this->m_eRenderMode = HYRENDERMODE_TriangleStrip;
+	this->m_ShaderUniforms.SetNumTexUnits(1);
 	MarkAsDirty();
 }
 
@@ -562,7 +565,7 @@ template<typename NODETYPE, typename ENTTYPE>
 		return;
 
 	if(pTextData->GetAtlas())
-		this->m_hTextureHandle = pTextData->GetAtlas()->GetTextureHandle();
+		this->m_ShaderUniforms.SetTexHandle(0, pTextData->GetAtlas()->GetTextureHandle());
 
 	MarkAsDirty();
 }

@@ -62,7 +62,8 @@ void TextDraw::SetTextState(uint uiStateIndex)
 		HyGuiLog("TextDraw::OnApplyJsonData failed to parse", LOGTYPE_Error);
 
 	#undef GetObject
-	m_Text.GuiOverrideData<HyTextData>(itemDataDoc.GetObject(), m_hTexture);
+	m_Text.GuiOverrideData<HyTextData>(itemDataDoc.GetObject());
+	m_Text.GetShaderUniforms().SetTexHandle(0, m_hTexture);
 	SetPreviewText();
 }
 

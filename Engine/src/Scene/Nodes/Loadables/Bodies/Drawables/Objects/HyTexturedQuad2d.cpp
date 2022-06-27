@@ -24,6 +24,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, H
 	m_sPrefix = std::to_string(uiAtlasGrpId);
 	m_sName = std::to_string(uiIndexInGroup);
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
+	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent /*= nullptr*/) :
@@ -38,7 +39,8 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiText
 	m_sName = "raw";
 
 	m_eRenderMode = HYRENDERMODE_TriangleStrip;
-	m_hTextureHandle = hTextureHandle;
+	m_ShaderUniforms.SetNumTexUnits(1);
+	m_ShaderUniforms.SetTexHandle(0, hTextureHandle);
 
 	m_LocalBoundingVolume.SetAsBox(static_cast<float>(m_uiRawTextureWidth), static_cast<float>(m_uiRawTextureHeight));
 }
@@ -125,7 +127,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	IHyDrawable2d::OnLoaded();
 
 	if(m_bIsRaw == false)
-		m_hTextureHandle = static_cast<const HyTexturedQuadData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
+		m_ShaderUniforms.SetTexHandle(0, static_cast<const HyTexturedQuadData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle());
 }
 
 /*virtual*/ bool HyTexturedQuad2d::OnIsValidToRender() /*override*/

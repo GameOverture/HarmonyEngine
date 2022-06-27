@@ -14,20 +14,25 @@
 
 HyShaderUniforms::HyShaderUniforms() :
 	m_bDirty(true),
-	m_uiCrc32(0)
+	m_uiSamplersCrc32(0),
+	m_uiUniformsCrc32(0)
 {
 }
 
 HyShaderUniforms::HyShaderUniforms(const HyShaderUniforms &copyRef) :
 	m_bDirty(copyRef.m_bDirty),
-	m_uiCrc32(copyRef.m_uiCrc32),
+	m_uiSamplersCrc32(copyRef.m_uiSamplersCrc32),
+	m_uiUniformsCrc32(copyRef.m_uiUniformsCrc32),
+	m_SamplersList(copyRef.m_SamplersList),
 	m_UniformList(copyRef.m_UniformList)
 {
 }
 
 HyShaderUniforms::HyShaderUniforms(HyShaderUniforms &&donor) :
 	m_bDirty(std::move(donor.m_bDirty)),
-	m_uiCrc32(std::move(donor.m_uiCrc32)),
+	m_uiSamplersCrc32(std::move(donor.m_uiSamplersCrc32)),
+	m_uiUniformsCrc32(std::move(donor.m_uiUniformsCrc32)),
+	m_SamplersList(std::move(donor.m_SamplersList)),
 	m_UniformList(std::move(donor.m_UniformList))
 {
 }
@@ -39,7 +44,9 @@ HyShaderUniforms::~HyShaderUniforms()
 HyShaderUniforms &HyShaderUniforms::operator=(const HyShaderUniforms &rhs)
 {
 	m_bDirty = true;
-	m_uiCrc32 = rhs.m_uiCrc32;
+	m_uiSamplersCrc32 = rhs.m_uiSamplersCrc32;
+	m_uiUniformsCrc32 = rhs.m_uiUniformsCrc32;
+	m_SamplersList = rhs.m_SamplersList;
 	m_UniformList = rhs.m_UniformList;
 
 	return *this;
@@ -48,7 +55,9 @@ HyShaderUniforms &HyShaderUniforms::operator=(const HyShaderUniforms &rhs)
 HyShaderUniforms &HyShaderUniforms::operator=(HyShaderUniforms &&donor)
 {
 	m_bDirty = std::move(donor.m_bDirty);
-	m_uiCrc32 = std::move(donor.m_uiCrc32);
+	m_uiSamplersCrc32 = std::move(donor.m_uiSamplersCrc32);
+	m_uiUniformsCrc32 = std::move(donor.m_uiUniformsCrc32);
+	m_SamplersList = std::move(donor.m_SamplersList);
 	m_UniformList = std::move(donor.m_UniformList);
 
 	return *this;
@@ -56,22 +65,50 @@ HyShaderUniforms &HyShaderUniforms::operator=(HyShaderUniforms &&donor)
 
 bool HyShaderUniforms::operator==(HyShaderUniforms &rhs)
 {
-	return GetCrc32() == rhs.GetCrc32();
+	return GetCrc64() == rhs.GetCrc64();
 }
 
-uint32 HyShaderUniforms::GetCrc32()
+uint64 HyShaderUniforms::GetCrc64()
 {
 	if(m_bDirty == false)
-		return m_uiCrc32;
+		return m_uiSamplersCrc32 | (m_uiUniformsCrc32 << 32);
+
+	if(m_SamplersList.empty())
+		m_uiSamplersCrc32 = 0;
+	else
+		m_uiSamplersCrc32 = crc32_fast(&m_SamplersList[0], m_SamplersList.size() * sizeof(HyTextureHandle), 0);// m_uiSamplersCrc32);
 
 	if(m_UniformList.empty())
-		m_uiCrc32 = 0;
+		m_uiUniformsCrc32 = 0;
 	else
-		m_uiCrc32 = crc32_fast(&m_UniformList[0], m_UniformList.size() * sizeof(UniformBuffer), m_uiCrc32);
+		m_uiUniformsCrc32 = crc32_fast(&m_UniformList[0], m_UniformList.size() * sizeof(UniformBuffer), 0);// m_uiUniformsCrc32);
 
 	m_bDirty = false;
+	return m_uiSamplersCrc32 | (m_uiUniformsCrc32 << 32);
+}
 
-	return m_uiCrc32;
+void HyShaderUniforms::SetNumTexUnits(uint32 uiNumSamplers)
+{
+	m_SamplersList.resize(static_cast<size_t>(uiNumSamplers), HY_UNUSED_HANDLE);
+	m_bDirty = true;
+}
+
+uint32 HyShaderUniforms::GetNumTexUnits() const
+{
+	return static_cast<uint32>(m_SamplersList.size());
+}
+
+HyTextureHandle HyShaderUniforms::GetTexHandle(uint32 uiIndex) const
+{
+	HyAssert(uiIndex < m_SamplersList.size(), "HyShaderUniforms::GetTexHandle passed invalid index: " << uiIndex);
+	return m_SamplersList[uiIndex];
+}
+
+void HyShaderUniforms::SetTexHandle(uint32 uiIndex, HyTextureHandle hGfxApiHandle)
+{
+	HyAssert(uiIndex < m_SamplersList.size(), "HyShaderUniforms::SetTexHandle passed invalid index: " << uiIndex);
+	m_SamplersList[uiIndex] = hGfxApiHandle;
+	m_bDirty = true;
 }
 
 uint32 HyShaderUniforms::GetNumUniforms() const

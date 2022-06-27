@@ -132,7 +132,7 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 		m_bUsingTempFiles = true;
 	}
-	else
+	else // Existing Meta and Data JSON exist (and therefore any Spine imported files are in their respective directories)
 	{
 		if(itemFileDataRef.m_Data.contains("isBinary") == false)
 			HyGuiLog("SpineModel did not contain 'isBinary'", LOGTYPE_Error);
@@ -145,25 +145,30 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 		m_SkeletonFileInfo.setFile(itemRef.GetProject().GetAssetsAbsPath() % HYASSETS_SpineDir % sUuidName % (m_bIsBinaryRuntime ? ".skel" : ".json"));
 		m_AtlasFileInfo.setFile(itemRef.GetProject().GetAssetsAbsPath() % HYASSETS_SpineDir % sUuidName % ".atlas");
 
+		QDir metaDir(itemRef.GetProject().GetMetaAbsPath());
+		metaDir.mkdir("Spine");
+		if(metaDir.cd("Spine") == false)
+			HyGuiLog("SpineModel could not navigate to Spine meta directory", LOGTYPE_Error);
+		if(metaDir.cd(sUuidName) == false)
+			HyGuiLog("SpineModel could not navigate to Spine meta UUID directory", LOGTYPE_Error);
 		QJsonArray atlasesMetaArray = itemFileDataRef.m_Meta["atlases"].toArray();
-		QJsonArray atlasesDataArray = itemFileDataRef.m_Data["atlases"].toArray();
 		for(int i = 0; i < atlasesMetaArray.size(); ++i)
 		{
 			QJsonObject atlasMetaObj = atlasesMetaArray[i].toObject();
-			QJsonObject atlasDataObj = atlasesDataArray[i].toObject();
 
 			QList<QUuid> uuidRequestList;
 			uuidRequestList.append(QUuid(atlasMetaObj["assetUUID"].toString()));
 			QList<AssetItemData *> pRequestedList = m_ItemRef.GetProject().GetAtlasModel().RequestAssetsByUuid(&m_ItemRef, uuidRequestList);
 			
-			SpineSubAtlas subAtlas;
 			if(pRequestedList.size() == 1)
+			{
+				SpineSubAtlas subAtlas;
 				subAtlas.m_pAtlasFrame = static_cast<AtlasFrame *>(pRequestedList[0]);
+				subAtlas.m_ImageFileInfo.setFile(metaDir.absoluteFilePath(atlasMetaObj["textureFileName"].toString()));
+				m_SubAtlasList.push_back(subAtlas);
+			}
 			else
 				HyGuiLog("More than one frame returned for a spine sub-atlas", LOGTYPE_Error);
-
-			subAtlas.m_ImageFileInfo.setFile();
-			m_SubAtlasList.push_back(subAtlas);
 		}
 
 		m_bUsingTempFiles = false;
@@ -268,6 +273,8 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 		m_bUsingTempFiles = false;
 	}
+
+	// TODO: pack into atlas manager
 	
 
 	return true;
@@ -281,6 +288,9 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	itemSpecificFileDataOut.m_Data.insert("defaultMix", m_fDefaultMix);
 
 #ifdef HY_USE_SPINE
+	if(m_SubAtlasList.size() != m_pAtlasData->getPages().size())
+		HyGuiLog("Spine SubAtlasList size did not equal Atlas file pages size", LOGTYPE_Error);
+
 	QJsonArray atlasesMetaArray;
 	QJsonArray atlasesDataArray;
 	for(int i = 0; i < m_pAtlasData->getPages().size(); ++i)
@@ -289,6 +299,7 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 		QJsonObject atlasDataObj;
 
 		atlasMetaObj.insert("assetUUID", m_SubAtlasList[i].m_pAtlasFrame == nullptr ? 0 : m_SubAtlasList[i].m_pAtlasFrame->GetUuid().toString(QUuid::WithoutBraces));
+		atlasMetaObj.insert("textureFileName", m_SubAtlasList[i].m_ImageFileInfo.fileName());
 
 		atlasDataObj.insert("checksum", m_SubAtlasList[i].m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_SubAtlasList[i].m_pAtlasFrame->GetChecksum())));
 		atlasDataObj.insert("name", m_pAtlasData->getPages()[i]->name.buffer());
@@ -298,7 +309,6 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	}
 	itemSpecificFileDataOut.m_Meta.insert("atlases", atlasesMetaArray);
 	itemSpecificFileDataOut.m_Data.insert("atlases", atlasesDataArray);
-	
 #endif
 }
 
@@ -329,6 +339,16 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 /*virtual*/ QStringList SpineModel::GetFontUrls() const /*override*/
 {
 	return QStringList();
+}
+
+bool SpineModel::IsUsingTempFiles() const
+{
+	return m_bUsingTempFiles;
+}
+
+const QList<SpineSubAtlas> &SpineModel::GetSubAtlasList() const
+{
+	return m_SubAtlasList;
 }
 
 void SpineModel::AcquireSpineData()

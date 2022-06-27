@@ -25,6 +25,7 @@ IHySprite<NODETYPE, ENTTYPE>::IHySprite(std::string sPrefix, std::string sName, 
 	m_uiCurFrame(0)
 {
 	this->m_eRenderMode = HYRENDERMODE_TriangleStrip;
+	this->m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -165,7 +166,7 @@ void IHySprite<NODETYPE, ENTTYPE>::SetFrame(uint32 uiFrameIndex)
 	m_uiCurFrame = uiFrameIndex;
 
 	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	this->m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
+	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
 	
 	this->SetDirty(this->DIRTY_BoundingVolume);
 }
@@ -371,7 +372,7 @@ template<typename NODETYPE, typename ENTTYPE>
 		m_uiCurFrame = GetNumFrames() - 1;
 
 	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	this->m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
+	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
 
 	this->SetDirty(this->DIRTY_BoundingVolume);
 	return true;
@@ -535,7 +536,7 @@ template<typename NODETYPE, typename ENTTYPE>
 	}
 
 	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	this->m_hTextureHandle = UpdatedFrameRef.GetGfxApiHandle();
+	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
 }
 
 template class IHySprite<IHyDrawable2d, HyEntity2d>;

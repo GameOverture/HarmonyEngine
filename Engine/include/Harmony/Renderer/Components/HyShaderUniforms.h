@@ -20,7 +20,10 @@
 class HyShaderUniforms
 {
 	bool							m_bDirty;
-	uint32							m_uiCrc32;
+	uint32							m_uiSamplersCrc32;
+	uint32							m_uiUniformsCrc32;
+
+	std::vector<HyTextureHandle>	m_SamplersList;
 
 	struct UniformBuffer
 	{
@@ -51,7 +54,13 @@ public:
 
 	bool operator==(HyShaderUniforms &rhs);
 
-	uint32 GetCrc32();
+	uint64 GetCrc64();
+
+	void SetNumTexUnits(uint32 uiNumSamplers);
+	uint32 GetNumTexUnits() const;
+	HyTextureHandle GetTexHandle(uint32 uiIndex) const;
+	void SetTexHandle(uint32 uiIndex, HyTextureHandle hGfxApiHandle);
+
 	uint32 GetNumUniforms() const;
 	HyShaderVariable GetVariableType(uint32 uiIndex) const;
 	const char *GetName(uint32 uiIndex) const;

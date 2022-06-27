@@ -85,7 +85,8 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 			}
 		}
 
-		m_SubAtlasList.push_back(HySpineAtlas(sName, pAtlas, rSubAtlasUVRect.left, rSubAtlasUVRect.top, rSubAtlasUVRect.right, rSubAtlasUVRect.bottom));
+		// TODO: fix
+		//m_SubAtlasList.push_back(HySpineAtlas(sName, pAtlas, rSubAtlasUVRect.left, rSubAtlasUVRect.top, rSubAtlasUVRect.right, rSubAtlasUVRect.bottom));
 	}
 
 	// Atlas ------------------------------------------------------------------------

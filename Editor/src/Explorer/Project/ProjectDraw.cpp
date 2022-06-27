@@ -66,7 +66,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 {
 }
 
-/*virtual*/ void CheckerGrid::OnUpdateUniforms() /*override*/
+/*virtual*/ void CheckerGrid::OnLoadedUpdate() /*override*/
 {
 	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform();
 

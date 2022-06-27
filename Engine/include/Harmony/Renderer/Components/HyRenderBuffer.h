@@ -35,9 +35,8 @@ public:
 	{
 		const uint32							m_uiID;							// Used for debugging
 		const uint32							m_uiCAMERA_MASK;
-		const uint32							m_uiDATA_OFFSET;
+		const uint32							m_uiDATA_OFFSET;				// Offset into vertex buffer
 		const HyRenderMode						m_eRENDER_MODE;
-		const HyTextureHandle					m_hTEXTURE_0;
 		const HyShaderHandle					m_hSHADER;
 		const HyScreenRect<int32>				m_SCISSOR_RECT;
 		const HyStencilHandle					m_hSTENCIL;
@@ -46,13 +45,13 @@ public:
 		uint32									m_uiNumInstances;
 		const uint32							m_uiNUM_VERTS_PER_INSTANCE;		// Or total number of vertices if single instance
 
-		uint32									m_uiExDataSize;					// Currently only stores Uniform data for this state
+																				//                  uint32       uint32 uint32    uint32       HY_SHADER_UNIFORM_NAME_LENGTH       uint32   XXX
+		uint32									m_uiExDataSize;					// Buffer Layout:   [NumTexUnits][Tex 0][Tex 1]...[NumUniforms][Uniform Name for next var/val pair][varType][varValue]...
 		
 		State(uint32 uiId,
 			uint32 uiCameraMask,
 			uint32 uiDataOffset,
 			HyRenderMode eRenderMode,
-			HyTextureHandle hTexture,
 			HyShaderHandle hShader,
 			HyScreenRect<int32> &scissorRect,
 			HyStencilHandle hStencil,
@@ -62,7 +61,6 @@ public:
 												m_uiCAMERA_MASK(uiCameraMask),
 												m_uiDATA_OFFSET(uiDataOffset),
 												m_eRENDER_MODE(eRenderMode),
-												m_hTEXTURE_0(hTexture),
 												m_hSHADER(hShader),
 												m_SCISSOR_RECT(scissorRect),
 												m_hSTENCIL(hStencil),
@@ -77,9 +75,8 @@ public:
 		bool operator==(State &rhs)
 		{
 			return m_uiCAMERA_MASK == rhs.m_uiCAMERA_MASK &&
-				   //m_uiDATA_OFFSET == rhs.m_uiDATA_OFFSET &&
+				   //m_uiDATA_OFFSET == rhs.m_uiDATA_OFFSET && // Don't check
 				   m_eRENDER_MODE == rhs.m_eRENDER_MODE &&
-				   m_hTEXTURE_0 == rhs.m_hTEXTURE_0 &&
 				   m_hSHADER == rhs.m_hSHADER &&
 				   m_SCISSOR_RECT == rhs.m_SCISSOR_RECT &&
 				   m_hSTENCIL == rhs.m_hSTENCIL &&
@@ -94,7 +91,7 @@ private:
 
 	uint8 *										m_pRenderStatesUserStartPos;
 
-	uint32										m_uiPrevUniformCrc;
+	uint64										m_uiPrevUniformCrc;
 	State *										m_pPrevRenderState;
 
 public:
@@ -109,7 +106,7 @@ public:
 	void CreateRenderHeader();
 
 private:
-	void AppendShaderUniforms(HyShaderUniforms &shaderUniformRef);
+	void AppendExData(HyShaderUniforms &shaderUniformRef);
 };
 
 #endif /* HyRenderBuffer_h__ */

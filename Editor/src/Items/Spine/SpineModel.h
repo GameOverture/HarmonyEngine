@@ -62,6 +62,10 @@ public:
 	virtual QList<AssetItemData *> GetAssets(HyGuiItemType eType) const override;
 	virtual QStringList GetFontUrls() const override;
 
+	bool IsUsingTempFiles() const;
+	const QList<SpineSubAtlas> &GetSubAtlasList() const;
+
+protected:
 	void AcquireSpineData();
 };
 
