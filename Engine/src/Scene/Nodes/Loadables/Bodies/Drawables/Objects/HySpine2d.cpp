@@ -88,7 +88,7 @@ uint32 HySpine2d::GetNumSlots()
 #endif
 }
 
-/*virtual*/ void HySpine2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HySpine2d::WriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
 {
 #ifdef HY_USE_SPINE
 	spine::Slot *pCurSlot = nullptr;
@@ -132,6 +132,8 @@ uint32 HySpine2d::GetNumSlots()
 		{
 			// Cast to an spRegionAttachment so we can get the rendererObject and compute the world vertices
 			spine::RegionAttachment *pRegionAttachment = static_cast<spine::RegionAttachment *>(pAttachment);
+
+			//static_cast<spine::AtlasRegion *>(pRegionAttachment->getRendererObject())->page->name
 
 			// Our engine specific Texture is stored in the AtlasRegion which was
 			// assigned to the attachment on load. It represents the texture atlas
@@ -225,6 +227,8 @@ uint32 HySpine2d::GetNumSlots()
 		//engine_drawMesh(vertices, 0, vertexIndex, texture, engineBlendMode);
 	}
 #endif
+
+	return true;
 }
 
 /*virtual*/ void HySpine2d::OnCalcBoundingVolume() /*override*/

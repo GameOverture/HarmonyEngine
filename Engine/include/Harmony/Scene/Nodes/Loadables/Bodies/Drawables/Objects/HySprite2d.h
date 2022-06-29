@@ -41,7 +41,7 @@ protected:
 	virtual void OnInvokeCallback(uint32 uiStateIndex) override;
 	virtual void OnCalcBoundingVolume() override;
 	virtual void OnDataAcquired() override;
-	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
+	virtual bool WriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 	
 	static void NullAnimCallback(HySprite2d *pSelf, void *pParam) { }
 };

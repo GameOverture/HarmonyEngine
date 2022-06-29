@@ -94,50 +94,7 @@ void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCa
 
 void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask)
 {
-	uint32 uiNumInstances, uiNumVerticesPerInstance;
-	switch(instanceRef.GetType())
-	{
-	case HYTYPE_Sprite:
-	case HYTYPE_TexturedQuad:
-		uiNumInstances = 1;
-		uiNumVerticesPerInstance = 4;
-		break;
-
-	case HYTYPE_Primitive:
-		uiNumInstances = 1;
-		uiNumVerticesPerInstance = static_cast<HyPrimitive2d &>(instanceRef).GetNumVerts();
-		break;
-		
-	case HYTYPE_Text:
-		uiNumInstances = static_cast<HyText2d &>(instanceRef).GetNumRenderQuads();
-		uiNumVerticesPerInstance = 4;
-		break;
-
-	case HYTYPE_Spine:
-		uiNumInstances = static_cast<HySpine2d &>(instanceRef).GetNumSlots();
-		uiNumVerticesPerInstance = 4;
-		break;
-
-	default:
-		HyError("IHyRenderer::AppendDrawable2d - Unknown instance type");
-	}
-
-	HyScreenRect<int32> scissorRect;
-	instanceRef.GetWorldScissor(scissorRect);
-
-	m_RenderBuffer.AppendRenderState(uiId,
-									 instanceRef,
-									 uiCameraMask,
-									 scissorRect,
-									 (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
-									 instanceRef.GetCoordinateSystem(),
-									 m_VertexBuffer.GetNumUsedBytes2d(), // Get current offset into vertex buffer
-									 uiNumInstances,
-									 uiNumVerticesPerInstance);
-	
-	instanceRef.AcquireData(); // TODO: Why is this here?
-
-	instanceRef.OnWriteVertexData(m_VertexBuffer);
+	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, m_VertexBuffer);
 }
 
 HyVertexBufferHandle IHyRenderer::AppendVertexData3d(const uint8 *pData, uint32 uiSize)

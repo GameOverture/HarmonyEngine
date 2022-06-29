@@ -147,9 +147,10 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	m_LocalBoundingVolume = shape;
 }
 
-/*virtual*/ void HyPrimitive2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
+/*virtual*/ bool HyPrimitive2d::WriteVertexData(HyVertexBuffer &vertexBufferRef)
 {
 	vertexBufferRef.AppendData2d(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
+	return true;
 }
 
 /*virtual*/ void HyPrimitive2d::Load() /*override*/

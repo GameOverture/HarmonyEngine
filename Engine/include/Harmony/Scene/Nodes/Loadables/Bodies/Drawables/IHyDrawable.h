@@ -24,7 +24,7 @@ class IHyDrawable
 
 protected:
 	HyShaderHandle					m_hShader;
-	HyRenderMode					m_eRenderMode;
+	HyRenderMode					m_eRenderMode; //start here!
 	HyShaderUniforms 				m_ShaderUniforms;
 
 public:
@@ -45,7 +45,13 @@ public:
 
 protected:
 	virtual bool IsValidToRender() = 0;
-	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) = 0;
+
+	//start_here_too
+	//virtual void GetRenderInfo(HyRenderMode &eRenderModeOut, HyShaderHandle &hShaderHandleOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstanceOut) = 0;
+
+	// Returns 'true' if finished writing vertex data. Returns 'false' if the render state needs to change (aka can't batch)
+	// and needs to loop within HyRenderBuffer::AppendRenderState
+	virtual bool WriteVertexData(HyVertexBuffer &vertexBufferRef) = 0;
 
 private:
 	virtual IHyNode &_DrawableGetNodeRef() = 0;

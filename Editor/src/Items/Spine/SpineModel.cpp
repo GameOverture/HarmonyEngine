@@ -282,6 +282,9 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 /*virtual*/ void SpineModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
+	if(m_bUsingTempFiles)
+		itemSpecificFileDataOut.m_Data.insert("usingTempFiles", QString(m_SkeletonFileInfo.absolutePath() % "/"));
+
 	itemSpecificFileDataOut.m_Data.insert("UUID", m_UUID.toString(QUuid::WithoutBraces));
 	itemSpecificFileDataOut.m_Data.insert("isBinary", m_bIsBinaryRuntime);
 	itemSpecificFileDataOut.m_Data.insert("scale", m_fScale);
@@ -303,6 +306,9 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 		atlasDataObj.insert("checksum", m_SubAtlasList[i].m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_SubAtlasList[i].m_pAtlasFrame->GetChecksum())));
 		atlasDataObj.insert("name", m_pAtlasData->getPages()[i]->name.buffer());
+
+		atlasDataObj.insert("subAtlasWidth", m_SubAtlasList[i].m_pAtlasFrame == nullptr ? 0 : QJsonValue(m_SubAtlasList[i].m_pAtlasFrame->GetSize().width()));
+		atlasDataObj.insert("subAtlasHeight", m_SubAtlasList[i].m_pAtlasFrame == nullptr ? 0 : QJsonValue(m_SubAtlasList[i].m_pAtlasFrame->GetSize().height()));
 
 		atlasesMetaArray.append(atlasMetaObj);
 		atlasesDataArray.append(atlasDataObj);

@@ -77,7 +77,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 	m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
-/*virtual*/ void CheckerGrid::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool CheckerGrid::WriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	HyAssert(GetNumVerts() == 6, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 
@@ -117,6 +117,8 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 		//pRefDataWritePos += sizeof(glm::vec2);
 	}
+
+	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

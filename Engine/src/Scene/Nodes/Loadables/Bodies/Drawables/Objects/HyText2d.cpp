@@ -118,7 +118,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	}
 }
 
-/*virtual*/ void HyText2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HyText2d::WriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	// CalculateGlyphInfos called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
 	CalculateGlyphInfos();
@@ -182,4 +182,6 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 			vertexBufferRef.AppendData2d(&mtxTransformRef, sizeof(glm::mat4));
 		}
 	}
+
+	return true;
 }

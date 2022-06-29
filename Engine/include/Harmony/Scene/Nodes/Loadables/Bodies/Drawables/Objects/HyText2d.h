@@ -34,7 +34,7 @@ protected:
 #endif
 	virtual void OnLoadedUpdate() override;
 	virtual void OnCalcBoundingVolume() override;
-	virtual void OnWriteVertexData(HyVertexBuffer &vertexBufferRef) override;
+	virtual bool WriteVertexData(HyVertexBuffer &vertexBufferRef) override;
 };
 
 #endif /* HyText2d_h__ */

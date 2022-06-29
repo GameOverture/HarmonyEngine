@@ -25,18 +25,32 @@
 struct HySpineAtlas
 {
 	std::string					m_sName;
+	HyFileAtlas *				m_pAtlas;
 	HyTextureHandle				m_hGfxApiHandle;
 	const HyRectangle<float>	m_rSRC_RECT;
 
-	HySpineAtlas(std::string sName, HyTextureHandle hGfxApiHandle, float fSrcLeft, float fSrcTop, float fSrcRight, float fSrcBot) :
+	// GUI temp data constructor
+	HySpineAtlas(std::string sName, HyTextureHandle hGfxApiHandle) :
 		m_sName(sName),
+		m_pAtlas(nullptr),
 		m_hGfxApiHandle(hGfxApiHandle),
+		m_rSRC_RECT(0.0f, 1.0f, 1.0f, 0.0f)
+	{ }
+
+	// Normal runtime files constructor
+	HySpineAtlas(std::string sName, HyFileAtlas *pAtlas, float fSrcLeft, float fSrcTop, float fSrcRight, float fSrcBot) :
+		m_sName(sName),
+		m_pAtlas(pAtlas),
+		m_hGfxApiHandle(HY_UNUSED_HANDLE),
 		m_rSRC_RECT(fSrcLeft, fSrcBot, fSrcRight, fSrcTop)
 	{ }
-	
-	bool IsAtlasValid() const
+
+	HyTextureHandle GetTexHandle() const
 	{
-		return m_hGfxApiHandle != HY_UNUSED_HANDLE;
+		if(m_pAtlas)
+			return m_pAtlas->GetTextureHandle();
+		else
+			m_hGfxApiHandle;
 	}
 };
 

@@ -139,6 +139,7 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	}
 
 	ScanMetaFontDir();
+	HyGlobal::CleanAllTempDirs(*this);
 }
 
 /*virtual*/ Project::~Project()

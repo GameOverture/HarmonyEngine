@@ -390,7 +390,7 @@
 				HyGuiLog("Could not remove temp file: " % tempFileInfoList[i].fileName(), LOGTYPE_Error);
 		}
 	}
-	else if(false == metaTempSubDir.mkpath(sDirName))
+	else if(false == metaTempSubDir.mkdir("."))
 		HyGuiLog("Could not make meta temp directory", LOGTYPE_Error);
 	
 	return metaTempSubDir;

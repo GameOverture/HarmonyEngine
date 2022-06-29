@@ -140,7 +140,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 
 }
 
-/*virtual*/ void HyTexturedQuad2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef)
+/*virtual*/ bool HyTexturedQuad2d::WriteVertexData(HyVertexBuffer &vertexBufferRef)
 {
 	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 
@@ -177,4 +177,6 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
 	vertexBufferRef.AppendData2d(&GetSceneTransform(), sizeof(glm::mat4));
+
+	return true;
 }

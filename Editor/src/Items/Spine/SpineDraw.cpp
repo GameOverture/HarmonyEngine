@@ -27,41 +27,29 @@ SpineDraw::~SpineDraw()
 
 /*virtual*/ void SpineDraw::OnApplyJsonData(HyJsonObj itemDataObj) /*override*/
 {
+	m_Spine.GuiOverrideData<HySpineData>(itemDataObj);
+	m_Spine.Load();
+
 	SpineModel *pSpineModel = static_cast<SpineModel *>(m_pProjItem->GetModel());
 	if(pSpineModel->IsUsingTempFiles())
 	{
-		//for(auto hTex : m_hTextureList)
-		//{
-		//	if(hTex != HY_UNUSED_HANDLE)
-		//		Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(hTex);
-		//}
-		//m_hTextureList.clear();
+		const QList<SpineSubAtlas> &subAtlasList = pSpineModel->GetSubAtlasList();
+		for(const auto &subAtlasRef : subAtlasList)
+		{
+			QImage atlasImage(subAtlasRef.m_ImageFileInfo.absoluteFilePath());
 
-		//const QList<SpineSubAtlas> &subAtlasList = pSpineModel->GetSubAtlasList();
-		//for(const SpineSubAtlas &subAtlas : subAtlasList)
-		//{
-		//	uint uiAtlasPixelDataSize = 0;
-		//	QSize atlasDimensions;
-		//	unsigned char *pAtlasPixelData = static_cast<SpineModel *>(m_pProjItem->GetModel())->GetFontManager().GetAtlasInfo(uiAtlasPixelDataSize, atlasDimensions);
-		//	if(pAtlasPixelData == nullptr || Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer() == nullptr)
-		//		return;
+			HyTextureHandle hNewTex = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(
+				HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
+				atlasImage.width(),
+				atlasImage.height(),
+				atlasImage.bits(),
+				atlasImage.byteCount(),
+				0);
 
-		//	HyTextureHandle hNewTex = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
-		//		atlasDimensions.width(),
-		//		atlasDimensions.height(),
-		//		pAtlasPixelData,
-		//		uiAtlasPixelDataSize,
-		//		0);
-
-		//	m_hTextureList.push_back(hNewTex);
-		//}
-
-		//m_Spine.GuiOverrideTextures(m_hTextureList);
+			// TODO: start here
+			//hNewTex = 
+		}
 	}
-
-
-	m_Spine.GuiOverrideData<HySpineData>(itemDataObj);
-	m_Spine.Load();
 }
 
 /*virtual*/ void SpineDraw::OnShow() /*override*/

@@ -91,7 +91,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(NullAnimCallback, nullptr));
 }
 
-/*virtual*/ void HySprite2d::OnWriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HySprite2d::WriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 
@@ -129,4 +129,6 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
 	vertexBufferRef.AppendData2d(&GetSceneTransform(), sizeof(glm::mat4));
+
+	return true;
 }
