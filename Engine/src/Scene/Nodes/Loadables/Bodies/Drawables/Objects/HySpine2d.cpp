@@ -90,6 +90,7 @@ uint32 HySpine2d::GetNumSlots()
 
 /*virtual*/ void HySpine2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
 {
+#ifdef HY_USE_SPINE
 	eRenderModeOut = HYRENDERMODE_TriangleStrip;
 	uiNumVerticesPerInstOut = 4;
 	bIsBatchable = true;
@@ -146,6 +147,7 @@ uint32 HySpine2d::GetNumSlots()
 
 	//static_cast<HySpineData *>(UncheckedGetData())->GetTexHandle()
 	//m_ShaderUniforms.SetTexHandle(0, 
+#endif
 }
 
 /*virtual*/ bool HySpine2d::WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) /*override*/
