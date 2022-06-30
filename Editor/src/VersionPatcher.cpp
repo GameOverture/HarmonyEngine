@@ -44,13 +44,13 @@
 	QDir metaDir(sMetaAbsPath);
 	if(metaDir.exists() == false)
 	{
-		HyGuiLog("Meta directory is missing, recreating", LOGTYPE_Info);
+		HyGuiLog("Meta directory is missing, recreating: " % sMetaAbsPath, LOGTYPE_Info);
 		metaDir.mkpath(metaDir.absolutePath());
 	}
 	QDir dataDir(sDataAbsPath);
 	if(dataDir.exists() == false)
 	{
-		HyGuiLog("Data directory is missing, recreating", LOGTYPE_Info);
+		HyGuiLog("Data directory is missing, recreating: " % sDataAbsPath, LOGTYPE_Info);
 		dataDir.mkpath(dataDir.absolutePath());
 	}
 	

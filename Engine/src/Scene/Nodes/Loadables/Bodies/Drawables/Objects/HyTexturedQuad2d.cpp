@@ -23,7 +23,6 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, H
 {
 	m_sPrefix = std::to_string(uiAtlasGrpId);
 	m_sName = std::to_string(uiIndexInGroup);
-	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
@@ -38,7 +37,6 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiText
 {
 	m_sName = "raw";
 
-	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 	m_ShaderUniforms.SetNumTexUnits(1);
 	m_ShaderUniforms.SetTexHandle(0, hTextureHandle);
 
@@ -140,7 +138,15 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 
 }
 
-/*virtual*/ bool HyTexturedQuad2d::WriteVertexData(HyVertexBuffer &vertexBufferRef)
+/*virtual*/ void HyTexturedQuad2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
+{
+	eRenderModeOut = HYRENDERMODE_TriangleStrip;
+	uiNumInstancesOut = 1;
+	uiNumVerticesPerInstOut = 4;
+	bIsBatchable = true;
+}
+
+/*virtual*/ bool HyTexturedQuad2d::WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef)
 {
 	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 

@@ -90,6 +90,9 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Parse/Load .hyproj file
 	m_SettingsObj = ReadProjFile();
+	if(m_bHasError)
+		return;
+
 	VersionPatcher::Run(this);
 	m_SettingsObj = ReadProjFile();
 

@@ -20,6 +20,7 @@ HyPrimitive2d::HyPrimitive2d(HyEntity2d *pParent /*= nullptr*/) :
 	m_bWireframe(false),
 	m_fLineThickness(1.0f),
 	m_uiNumSegments(16),
+	m_eRenderMode(HYRENDERMODE_Unknown),
 	m_bUpdateShaderUniforms(true)
 {
 }
@@ -31,6 +32,7 @@ HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
 	m_bWireframe(copyRef.m_bWireframe),
 	m_fLineThickness(copyRef.m_fLineThickness),
 	m_uiNumSegments(copyRef.m_uiNumSegments),
+	m_eRenderMode(copyRef.m_eRenderMode),
 	m_bUpdateShaderUniforms(true)
 {
 	AssembleData();
@@ -49,6 +51,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	m_bWireframe = rhs.m_bWireframe;
 	m_fLineThickness = rhs.m_fLineThickness;
 	m_uiNumSegments = rhs.m_uiNumSegments;
+	m_eRenderMode = rhs.m_eRenderMode;
 	AssembleData();
 
 	return *this;
@@ -147,7 +150,15 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	m_LocalBoundingVolume = shape;
 }
 
-/*virtual*/ bool HyPrimitive2d::WriteVertexData(HyVertexBuffer &vertexBufferRef)
+/*virtual*/ void HyPrimitive2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
+{
+	eRenderModeOut = m_eRenderMode;
+	uiNumInstancesOut = 1;
+	uiNumVerticesPerInstOut = GetNumVerts();
+	bIsBatchable = false;
+}
+
+/*virtual*/ bool HyPrimitive2d::WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	vertexBufferRef.AppendData2d(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
 	return true;

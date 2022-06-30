@@ -22,7 +22,7 @@ public:
 	virtual ~CheckerGrid();
 
 	virtual void OnLoadedUpdate() override;
-	virtual bool WriteVertexData(HyVertexBuffer &vertexBufferRef) override;
+	virtual bool WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) override;
 };
 
 class ProjectDraw : public IDraw

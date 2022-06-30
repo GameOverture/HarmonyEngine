@@ -18,9 +18,9 @@ HySpine2d::HySpine2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, H
 	IHyDrawable2d(HYTYPE_Spine, sPrefix, sName, pParent),
 	m_pSkeleton(nullptr),
 	m_pAnimationState(nullptr),
-	m_pSkeletonBounds(nullptr)
+	m_pSkeletonBounds(nullptr),
+	m_uiSlotStartIndex(0)
 {
-	m_eRenderMode = HYRENDERMODE_TriangleStrip;
 }
 
 HySpine2d::HySpine2d(const HySpine2d &copyRef) :
@@ -88,22 +88,30 @@ uint32 HySpine2d::GetNumSlots()
 #endif
 }
 
-/*virtual*/ bool HySpine2d::WriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ void HySpine2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
 {
-#ifdef HY_USE_SPINE
-	spine::Slot *pCurSlot = nullptr;
-	uint32 uiNumSlots = GetNumSlots();
-	for(uint32 i = 0; i < uiNumSlots; ++i) // For each slot in the draw order array of the skeleton
-	{
-		pCurSlot = m_pSkeleton->getDrawOrder()[i];
+	eRenderModeOut = HYRENDERMODE_TriangleStrip;
+	uiNumVerticesPerInstOut = 4;
+	bIsBatchable = true;
 
-		// Fetch the currently active attachment
-		spine::Attachment *pAttachment = pCurSlot->getAttachment();
+	HyTextureHandle hCurTexture = HY_UNUSED_HANDLE;
+	if(uiStageIndex == 0)
+		m_uiSlotStartIndex = 0;
+	else
+		hCurTexture = m_ShaderUniforms.GetTexHandle(0);
+
+	uiNumInstancesOut = 0;
+	for(uint32 i = m_uiSlotStartIndex; i < m_pSkeleton->getDrawOrder().size(); ++i)
+	{
+		spine::Slot *pCurSlot = m_pSkeleton->getDrawOrder()[i];
+		spine::Attachment *pAttachment = pCurSlot->getAttachment(); // Fetch the currently active attachment
 		if(!pAttachment)
 			continue; // continue with the next slot in the draw order if no attachment is active on the slot
 
+		// TODO: Add 'blending' to the render state
+
 		// Fetch the blend mode from the slot and translate it to the engine blend mode
-		spine::BlendMode engineBlendMode;
+		//spine::BlendMode engineBlendMode;
 		//switch(pCurSlot->getData().getBlendMode())
 		//{
 		//case spine::BlendMode_Normal:		//		  int source, int sourcePMA, int destColor, int sourceAlpha
@@ -121,6 +129,38 @@ uint32 HySpine2d::GetNumSlots()
 		//default:
 		//	engineBlendMode = BLEND_NORMAL;
 		//}
+
+		uiNumInstancesOut++;
+
+		if(pAttachment->getRTTI().isExactly(spine::RegionAttachment::rtti))
+		{
+			// Cast to an spRegionAttachment so we can get the rendererObject and compute the world vertices
+			spine::RegionAttachment *pRegionAttachment = static_cast<spine::RegionAttachment *>(pAttachment);
+			//pRegionAttachment->getRendererObject()
+		}
+		else
+			HyError("Spine attachment type not yet supported: " << std::string(pAttachment->getName().buffer()));
+	}
+
+
+
+	//static_cast<HySpineData *>(UncheckedGetData())->GetTexHandle()
+	//m_ShaderUniforms.SetTexHandle(0, 
+}
+
+/*virtual*/ bool HySpine2d::WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) /*override*/
+{
+#ifdef HY_USE_SPINE
+	spine::Slot *pCurSlot = nullptr;
+	uint32 uiNumSlots = GetNumSlots();
+	for(uint32 i = 0; i < uiNumSlots; ++i) // For each slot in the draw order array of the skeleton
+	{
+		pCurSlot = m_pSkeleton->getDrawOrder()[i];
+
+		// Fetch the currently active attachment
+		spine::Attachment *pAttachment = pCurSlot->getAttachment();
+		if(!pAttachment)
+			continue; // continue with the next slot in the draw order if no attachment is active on the slot
 
 		// Calculate the tinting color based on the skeleton's color and the slot's color. spine::Color is given in the range [0-1] for each color channel
 		spine::Color skeletonColor = m_pSkeleton->getColor();

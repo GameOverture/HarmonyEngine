@@ -30,7 +30,6 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(std::string sPrefix, std::string sName, ENTT
 	m_fUsedPixelWidth(0.0f),
 	m_fUsedPixelHeight(0.0f)
 {
-	this->m_eRenderMode = HYRENDERMODE_TriangleStrip;
 	this->m_ShaderUniforms.SetNumTexUnits(1);
 }
 
@@ -51,7 +50,6 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(const IHyText &copyRef) :
 	m_fUsedPixelWidth(copyRef.m_fUsedPixelWidth),
 	m_fUsedPixelHeight(copyRef.m_fUsedPixelHeight)
 {
-	this->m_eRenderMode = HYRENDERMODE_TriangleStrip;
 	this->m_ShaderUniforms.SetNumTexUnits(1);
 	MarkAsDirty();
 }

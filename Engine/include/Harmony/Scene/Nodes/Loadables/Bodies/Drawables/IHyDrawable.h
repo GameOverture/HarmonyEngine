@@ -24,7 +24,6 @@ class IHyDrawable
 
 protected:
 	HyShaderHandle					m_hShader;
-	HyRenderMode					m_eRenderMode; //start here!
 	HyShaderUniforms 				m_ShaderUniforms;
 
 public:
@@ -36,8 +35,6 @@ public:
 	IHyDrawable &operator=(const IHyDrawable &rhs);
 	IHyDrawable &operator=(IHyDrawable &&donor) noexcept;
 
-	HyRenderMode GetRenderMode() const;
-
 	// Passing nullptr will use built-in default shader
 	void SetShader(HyShader *pShader);
 	HyShaderHandle GetShaderHandle();
@@ -46,12 +43,12 @@ public:
 protected:
 	virtual bool IsValidToRender() = 0;
 
-	//start_here_too
-	//virtual void GetRenderInfo(HyRenderMode &eRenderModeOut, HyShaderHandle &hShaderHandleOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstanceOut) = 0;
+	// Prepares the render stage for the next WriteVertexData. Also returns the required render state information for this stage.
+	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) = 0;
 
-	// Returns 'true' if finished writing vertex data. Returns 'false' if the render state needs to change (aka can't batch)
-	// and needs to loop within HyRenderBuffer::AppendRenderState
-	virtual bool WriteVertexData(HyVertexBuffer &vertexBufferRef) = 0;
+	// Returns 'true' if finished writing vertex data. Returns 'false' if another render stage needs to be preformed, and the render state 
+	// needs to change (loop within HyRenderBuffer::AppendRenderState)
+	virtual bool WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) = 0;
 
 private:
 	virtual IHyNode &_DrawableGetNodeRef() = 0;

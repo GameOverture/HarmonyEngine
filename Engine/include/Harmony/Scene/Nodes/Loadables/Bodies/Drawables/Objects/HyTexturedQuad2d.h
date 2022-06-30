@@ -48,7 +48,8 @@ protected:
 	virtual bool OnIsValidToRender() override;
 	virtual void OnCalcBoundingVolume() override;
 
-	virtual bool WriteVertexData(HyVertexBuffer &vertexBufferRef) override;
+	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
+	virtual bool WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) override;
 };
 
 #endif /* HyTexturedQuad2d_h__ */

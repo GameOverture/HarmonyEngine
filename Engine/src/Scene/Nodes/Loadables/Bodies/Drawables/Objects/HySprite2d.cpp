@@ -91,7 +91,15 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(NullAnimCallback, nullptr));
 }
 
-/*virtual*/ bool HySprite2d::WriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ void HySprite2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
+{
+	eRenderModeOut = HYRENDERMODE_TriangleStrip;
+	uiNumInstancesOut = 1;
+	uiNumVerticesPerInstOut = 4;
+	bIsBatchable = true;
+}
+
+/*virtual*/ bool HySprite2d::WriteVertexData(uint32 uiStateIndex, HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 

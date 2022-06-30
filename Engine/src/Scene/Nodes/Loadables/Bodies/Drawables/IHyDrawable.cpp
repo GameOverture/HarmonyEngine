@@ -12,21 +12,18 @@
 #include "HyEngine.h"
 
 IHyDrawable::IHyDrawable() :
-	m_hShader(HY_UNUSED_HANDLE),
-	m_eRenderMode(HYRENDERMODE_Unknown)
+	m_hShader(HY_UNUSED_HANDLE)
 {
 }
 
 IHyDrawable::IHyDrawable(const IHyDrawable &copyRef) :
 	m_hShader(copyRef.m_hShader),
-	m_eRenderMode(copyRef.m_eRenderMode),
 	m_ShaderUniforms(copyRef.m_ShaderUniforms)
 {
 }
 
 IHyDrawable::IHyDrawable(IHyDrawable &&donor) noexcept :
 	m_hShader(std::move(donor.m_hShader)),
-	m_eRenderMode(std::move(donor.m_eRenderMode)),
 	m_ShaderUniforms(std::move(donor.m_ShaderUniforms))
 {
 }
@@ -38,7 +35,6 @@ IHyDrawable::~IHyDrawable()
 IHyDrawable &IHyDrawable::operator=(const IHyDrawable &rhs)
 {
 	m_hShader = rhs.m_hShader;
-	m_eRenderMode = rhs.m_eRenderMode;
 	m_ShaderUniforms = rhs.m_ShaderUniforms;
 
 	return *this;
@@ -47,15 +43,9 @@ IHyDrawable &IHyDrawable::operator=(const IHyDrawable &rhs)
 IHyDrawable &IHyDrawable::operator=(IHyDrawable &&donor) noexcept
 {
 	m_hShader = std::move(donor.m_hShader);
-	m_eRenderMode = std::move(donor.m_eRenderMode);
 	m_ShaderUniforms = std::move(donor.m_ShaderUniforms);
 
 	return *this;
-}
-
-HyRenderMode IHyDrawable::GetRenderMode() const
-{
-	return m_eRenderMode;
 }
 
 void IHyDrawable::SetShader(HyShader *pShader)

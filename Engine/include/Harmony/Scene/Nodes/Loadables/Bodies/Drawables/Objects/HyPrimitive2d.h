@@ -25,6 +25,7 @@ protected:
 	float			m_fLineThickness;
 	uint32			m_uiNumSegments;
 
+	HyRenderMode	m_eRenderMode;
 	bool			m_bUpdateShaderUniforms;
 
 public:
@@ -55,7 +56,8 @@ protected:
 	virtual void OnLoadedUpdate() override;
 	virtual void OnCalcBoundingVolume() override;
 
-	virtual bool WriteVertexData(HyVertexBuffer &vertexBufferRef) override;
+	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
+	virtual bool WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) override;
 
 private:
 	virtual void Load() override;

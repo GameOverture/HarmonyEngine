@@ -21,6 +21,8 @@ class HySpine2d : public IHyDrawable2d
 	spine::AnimationState *			m_pAnimationState;
 	spine::SkeletonBounds *			m_pSkeletonBounds;
 
+	uint32							m_uiSlotStartIndex;
+
 public:
 	HySpine2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);
 	HySpine2d(const HySpine2d &copyRef);
@@ -37,7 +39,8 @@ protected:
 	virtual void OnDataAcquired() override;
 	virtual void OnLoadedUpdate() override;
 
-	virtual bool WriteVertexData(HyVertexBuffer &vertexBufferRef) override;
+	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
+	virtual bool WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) override;
 	virtual void OnCalcBoundingVolume() override;
 };
 

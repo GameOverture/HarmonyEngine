@@ -24,7 +24,6 @@ IHySprite<NODETYPE, ENTTYPE>::IHySprite(std::string sPrefix, std::string sName, 
 	m_fElapsedFrameTime(0.0f),
 	m_uiCurFrame(0)
 {
-	this->m_eRenderMode = HYRENDERMODE_TriangleStrip;
 	this->m_ShaderUniforms.SetNumTexUnits(1);
 }
 

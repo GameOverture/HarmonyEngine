@@ -118,7 +118,15 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	}
 }
 
-/*virtual*/ bool HyText2d::WriteVertexData(HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ void HyText2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
+{
+	eRenderModeOut = HYRENDERMODE_TriangleStrip;
+	uiNumInstancesOut = GetNumRenderQuads();
+	uiNumVerticesPerInstOut = 4;
+	bIsBatchable = true;
+}
+
+/*virtual*/ bool HyText2d::WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	// CalculateGlyphInfos called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
 	CalculateGlyphInfos();

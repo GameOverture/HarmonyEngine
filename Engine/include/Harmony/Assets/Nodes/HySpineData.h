@@ -16,6 +16,7 @@
 #ifdef HY_USE_SPINE // Custom engine class extensions to assist spine-cpp with loading
 	class HySpineTextureLoader : public spine::TextureLoader
 	{
+		//HySpineTextureLoader(
 	public:
 		virtual void load(spine::AtlasPage &page, const spine::String &path) override;
 		virtual void unload(void *pTexture) override;
@@ -65,6 +66,11 @@ class HySpineData : public IHyNodeData
 public:
 	HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HySpineData();
+
+	HyTextureHandle GetTexHandle(uint32 uiAtlasIndex) const
+	{
+		return m_SubAtlasList[uiAtlasIndex].GetTexHandle();
+	}
 
 	spine::SkeletonData *GetSkeletonData() const;
 	spine::AnimationStateData *GetAnimationStateData() const;
