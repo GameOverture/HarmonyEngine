@@ -1,9 +1,13 @@
     
 # Harmony Engine
 
-Cross-platform game engine and editor for making expansive 2D or 2.5D games.
+### Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 
 **Disclaimer:** This is a very much work in progress and not ready for public consumption.
+
+The Harmony Engine consists of two main projects
+- The GUI editor (HyEditor) that manages and handles all the offline work
+- The engine itself (HyEngine) which is a static library that links into your application.
 
 ## Technologies Utilized
 
@@ -13,23 +17,32 @@ Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 
 **Build:** CMake, Emscripten
 
-  
-## Engine Features
+## Editor Features (HyEditor)
+* Generate and manage game projects and code builds
+    - Manages all the CMake shenanigans under the hood
+    - Use any major IDE
+    - All library dependencies taken care of, including any specified ones you use
+* A full asset pipeline from import -> optimize -> engine
+    - Handle various types of assets such as tilesheets, PNG sequences, GLTF, and audio
+    - Assets are packed into optimized banks with optional compression techniques
+    - Quickly replace and iterate on existing assets
+* Visually create every element in the game
+    - Manage sprite animations with various states
+    - Generate truetype fonts with optional effects such as outlines, inlines, and color blending
+    - Audio can be logically grouped into cues with specified weighted randomness
+    - Particle effects (TBD)
+    - Visualize in-engine Spine® skeletons imports and specify runtime animation blending and mixing
+* Create complex Entities using the elements above
+    - Apply physics, add colliders, and setup bounding volumes
+
+![Harmony Editor Screenshot](https://user-images.githubusercontent.com/344924/140581279-a3899c64-ea8b-4c9a-b869-b11d07444db2.png)
+
+## Engine Features (HyEngine)
 
 - Compile and run the same game code in Windows, Mac, Linux environments. As well as target web and mobile environments by transpiling to wasm via Emscripten.
 - Robust and simple programming API, learn once, apply to every type of game object
 - First-class support for Spine Animation
 - TBD
-  
-## Editor Features
-Setup and design sprite animations, fonts, sound cues, particles, and more. Or by using any combination of them, create complex entity hierarchies, apply physics or colliders, and setup bounding volumes
-
-![Harmony Editor Screenshot](https://user-images.githubusercontent.com/344924/140581279-a3899c64-ea8b-4c9a-b869-b11d07444db2.png)
-- Quickly generate and setup new code projects and builds with all dependencies taken care of
-- Handle the entire asset pipeline from importing, previewing, and replacing assets
-- Efficient texture atlas management, packing, and compression
-- Stylized bitmap font creation
-- Audio designer
 
 ## Installation 
 
