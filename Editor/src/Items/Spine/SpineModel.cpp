@@ -54,9 +54,11 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	m_bIsBinaryRuntime(false),
 	m_fScale(1.0f),
 	m_fDefaultMix(0.0f),
+#ifdef HY_USE_SPINE
 	m_pAtlasData(nullptr),
 	m_pSkeletonData(nullptr),
 	m_pAnimStateData(nullptr),
+#endif
 	m_bUsingTempFiles(true)
 {
 	QString sUuidName = GetUuid().toString(QUuid::WithoutBraces);

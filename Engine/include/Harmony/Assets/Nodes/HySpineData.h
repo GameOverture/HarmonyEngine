@@ -61,9 +61,11 @@ class HySpineData : public IHyNodeData
 {
 	std::vector<HySpineAtlas>		m_SubAtlasList;
 
+#ifdef HY_USE_SPINE
 	spine::Atlas *					m_pAtlasData;
 	spine::SkeletonData *			m_pSkeletonData;
 	spine::AnimationStateData *		m_pAnimStateData;
+#endif
 
 public:
 	HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
@@ -74,8 +76,10 @@ public:
 		return m_SubAtlasList[uiAtlasIndex].GetTexHandle();
 	}
 
+#ifdef HY_USE_SPINE
 	spine::SkeletonData *GetSkeletonData() const;
 	spine::AnimationStateData *GetAnimationStateData() const;
+#endif
 
 	// Sets every combination of animation blend to this amount
 	void AnimInitBlend(float fInterpDur);

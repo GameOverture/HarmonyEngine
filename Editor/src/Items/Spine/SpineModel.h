@@ -44,9 +44,11 @@ class SpineModel : public IModel
 	float						m_fScale;
 	float						m_fDefaultMix;
 
+#ifdef HY_USE_SPINE
 	spine::Atlas *				m_pAtlasData;
 	spine::SkeletonData *		m_pSkeletonData;
 	spine::AnimationStateData *	m_pAnimStateData;
+#endif
 
 	QList<SpineSubAtlas>		m_SubAtlasList;
 

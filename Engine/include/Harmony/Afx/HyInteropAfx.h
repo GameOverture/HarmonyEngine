@@ -67,16 +67,6 @@ typedef HyOpenGL HyRendererInterop;
 // SPINE RUNTIME ////////////////////////////////////////////////////////////
 #ifdef HY_USE_SPINE
 	#include "spine/spine.h"
-#else
-	namespace spine
-	{
-		typedef void Skeleton;
-		typedef void Atlas;
-		typedef void SkeletonData;
-		typedef void AnimationStateData;
-		typedef void AnimationState;
-		typedef void SkeletonBounds;
-	}
 #endif
 
 #endif /* HyInteropAfx_h__ */

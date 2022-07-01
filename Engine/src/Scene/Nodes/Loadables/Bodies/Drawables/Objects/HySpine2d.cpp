@@ -16,9 +16,11 @@
 
 HySpine2d::HySpine2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_Spine, sPrefix, sName, pParent),
+#ifdef HY_USE_SPINE
 	m_pSkeleton(nullptr),
 	m_pAnimationState(nullptr),
 	m_pSkeletonBounds(nullptr),
+#endif
 	m_uiStartingSlotIndex(0)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
@@ -83,7 +85,7 @@ uint32 HySpine2d::GetNumSlots()
 	//m_pSkeleton->setScaleX(scale.X());
 	//m_pSkeleton->setScaleY(scale.Y());
 
-	m_pSkeleton->update(HyEngine::DeltaTime() /** m_fAnimPlayRate*/);	// Update the time field used for attachments and such
+	m_pAnimationState->update(HyEngine::DeltaTime());
 	m_pAnimationState->apply(*m_pSkeleton);								// Apply the state to the skeleton
 	m_pSkeleton->updateWorldTransform();								// Calculate world transforms for rendering
 #endif
@@ -191,7 +193,7 @@ uint32 HySpine2d::GetNumSlots()
 			// will be written directory into the vertices array, with a stride of sizeof(Vertex)
 			spine::Vector<float> ptWorldPos;
 			ptWorldPos.setSize(8, 0.0f);
-			pRegionAttachment->computeWorldVertices(pCurSlot->getBone(), ptWorldPos, 0, 2);
+			pRegionAttachment->computeWorldVertices(*pCurSlot, ptWorldPos, 0, 2);
 
 			// These macros convert ptWorldPos[x] to Harmony's winding order
 #define Vert2Index 0

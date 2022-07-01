@@ -17,9 +17,11 @@
 
 class HySpine2d : public IHyDrawable2d
 {
+#ifdef HY_USE_SPINE
 	spine::Skeleton *				m_pSkeleton;
 	spine::AnimationState *			m_pAnimationState;
 	spine::SkeletonBounds *			m_pSkeletonBounds;
+#endif
 
 	uint32							m_uiStartingSlotIndex;
 

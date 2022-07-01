@@ -1,9 +1,8 @@
 Please see the Spine Runtimes License before integrating the Spine Runtimes into your applications.
 http://en.esotericsoftware.com/spine-runtimes-license
 
-1. Clone the spine-runtimes Git repository. If you don't want to use Git, download the latest version as a ZIP and unpack it.
-   https://github.com/esotericsoftware/spine-runtimes - Repo
-   http://esotericsoftware.com/git/spine-runtimes/archive - ZIP
+1. Download the matching runtime (to your Spine editor's version) from the Spine repository's releases
+   https://github.com/EsotericSoftware/spine-runtimes/releases
    
 2. Copy *JUST* the folder 'spine-cpp' (located within the spine-runtimes folder) to 'HarmonyEngine/Engine/extras/Spine' aka this README.txt location
 

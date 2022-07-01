@@ -14,6 +14,8 @@
 #include "Harmony.h"
 #include "HarmonyWidget.h"
 
+#include "soil2/SOIL2.h"
+
 SpineDraw::SpineDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef)
 {
@@ -39,19 +41,22 @@ SpineDraw::~SpineDraw()
 		rapidjson::Value guiTexturesArray(rapidjson::kArrayType);
 		for(const auto &subAtlasRef : subAtlasList)
 		{
-			QImage atlasImage(subAtlasRef.m_ImageFileInfo.absoluteFilePath());
+			int iWidth, iHeight, iNum8bitClrChannels;
+			uchar *pPixelData = SOIL_load_image(subAtlasRef.m_ImageFileInfo.absoluteFilePath().toStdString().c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);
+			uint32 uiPixelDataSize = iWidth * iHeight * 4;
 
 			HyTextureHandle hNewTex = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(
 				HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
-				atlasImage.width(),
-				atlasImage.height(),
-				atlasImage.bits(),
-				atlasImage.byteCount(),
+				iWidth,
+				iHeight,
+				pPixelData,
+				uiPixelDataSize,
 				0);
+
+			SOIL_free_image_data(pPixelData);
 
 			rapidjson::Value value(rapidjson::kNumberType);
 			value.SetUint(hNewTex);
-
 			guiTexturesArray.PushBack(value, itemDataDocRef.GetAllocator());
 		}
 

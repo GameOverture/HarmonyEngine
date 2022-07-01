@@ -50,10 +50,12 @@ HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasLi
 #endif
 
 HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
-	IHyNodeData(sPath),
-	m_pAtlasData(nullptr),
+	IHyNodeData(sPath)
+#ifdef HY_USE_SPINE
+	, m_pAtlasData(nullptr),
 	m_pSkeletonData(nullptr),
 	m_pAnimStateData(nullptr)
+#endif
 {
 #ifdef HY_USE_SPINE
 
@@ -151,11 +153,14 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 
 /*virtual*/ HySpineData::~HySpineData()
 {
+#ifdef HY_USE_SPINE
 	delete m_pAtlasData;
 	delete m_pSkeletonData;
 	delete m_pAnimStateData;
+#endif
 }
 
+#ifdef HY_USE_SPINE
 spine::SkeletonData *HySpineData::GetSkeletonData() const
 {
 	return m_pSkeletonData;
@@ -165,6 +170,7 @@ spine::AnimationStateData *HySpineData::GetAnimationStateData() const
 {
 	return m_pAnimStateData;
 }
+#endif
 
 //
 //HySpine2dData::~HySpine2dData()

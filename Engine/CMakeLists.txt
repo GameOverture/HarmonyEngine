@@ -6,11 +6,7 @@ add_subdirectory(external/soil2)
 
 if(HYBUILD_SPINE)
 	add_subdirectory(extras/Spine/spine-cpp)
-	set_target_properties(spine-cpp PROPERTIES
-	CXX_STANDARD 14
-	CXX_STANDARD_REQUIRED YES
-	CXX_EXTENSIONS NO
-	FOLDER "Engine Libs")
+	set_target_properties(spine-cpp PROPERTIES FOLDER "Engine Libs")
 endif()
 
 # Emscripten provides its own ports of SDL, GLFW, and GLEW
