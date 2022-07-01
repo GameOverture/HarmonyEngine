@@ -99,7 +99,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	bIsBatchable = true;
 }
 
-/*virtual*/ bool HySprite2d::WriteVertexData(uint32 uiStateIndex, HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HySprite2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 

@@ -13,20 +13,10 @@
 #include "Afx/HyInteropAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
-#ifdef HY_USE_SPINE // Custom engine class extensions to assist spine-cpp with loading
-	class HySpineTextureLoader : public spine::TextureLoader
-	{
-		//HySpineTextureLoader(
-	public:
-		virtual void load(spine::AtlasPage &page, const spine::String &path) override;
-		virtual void unload(void *pTexture) override;
-	};
-#endif
-
 struct HySpineAtlas
 {
 	std::string					m_sName;
-	HyFileAtlas *				m_pAtlas;
+	HyFileAtlas *m_pAtlas;
 	HyTextureHandle				m_hGfxApiHandle;
 	const HyRectangle<float>	m_rSRC_RECT;
 
@@ -51,9 +41,21 @@ struct HySpineAtlas
 		if(m_pAtlas)
 			return m_pAtlas->GetTextureHandle();
 		else
-			m_hGfxApiHandle;
+			return m_hGfxApiHandle;
 	}
 };
+
+#ifdef HY_USE_SPINE // Custom engine class extensions to assist spine-cpp with loading
+	class HySpineTextureLoader : public spine::TextureLoader
+	{
+		std::vector<HySpineAtlas> &	m_SubAtlasListRef;
+
+	public:
+		HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasListRef);
+		virtual void load(spine::AtlasPage &page, const spine::String &path) override;
+		virtual void unload(void *pTexture) override;
+	};
+#endif
 
 class HySpineData : public IHyNodeData
 {

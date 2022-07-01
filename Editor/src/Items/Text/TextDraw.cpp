@@ -33,7 +33,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 	m_Text.SetState(uiStateIndex);
 }
 
-/*virtual*/ void TextDraw::OnApplyJsonData(HyJsonObj itemDataObj) /*override*/
+/*virtual*/ void TextDraw::OnApplyJsonData(HyJsonDoc &itemDataDocRef) /*override*/
 {
 	uint uiAtlasPixelDataSize = 0;
 	QSize atlasDimensions;

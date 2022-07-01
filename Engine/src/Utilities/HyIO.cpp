@@ -153,6 +153,14 @@
 	return sPath;
 }
 
+/*static*/ std::string HyIO::GetFileFromPath(const char *szPath, bool bMakeLowercase)
+{
+	std::string sPath = CleanPath(szPath, nullptr, bMakeLowercase);
+	size_t uiStartIndex = sPath.rfind("/", std::string::npos) + 1;
+
+	return sPath.substr(uiStartIndex);
+}
+
 /*static*/ bool HyIO::FileExists(const std::string &sFilePath)
 {
 	std::ifstream infile(sFilePath.c_str());

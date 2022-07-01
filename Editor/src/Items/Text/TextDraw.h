@@ -23,7 +23,7 @@ public:
 
 	void SetTextState(uint uiStateIndex);
 
-	virtual void OnApplyJsonData(HyJsonObj itemDataObj) override;
+	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) override;
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;

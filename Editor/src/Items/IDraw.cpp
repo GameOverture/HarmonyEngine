@@ -63,8 +63,7 @@ void IDraw::ApplyJsonData()
 	if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
 		HyGuiLog("IDraw::ApplyJsonData failed to parse", LOGTYPE_Error);
 
-	#undef GetObject
-	OnApplyJsonData(itemDataDoc.GetObject());
+	OnApplyJsonData(itemDataDoc);
 }
 
 void IDraw::Show()

@@ -48,7 +48,7 @@ protected:
 
 	// Returns 'true' if finished writing vertex data. Returns 'false' if another render stage needs to be preformed, and the render state 
 	// needs to change (loop within HyRenderBuffer::AppendRenderState)
-	virtual bool WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) = 0;
+	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) = 0;
 
 private:
 	virtual IHyNode &_DrawableGetNodeRef() = 0;

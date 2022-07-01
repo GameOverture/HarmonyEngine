@@ -24,6 +24,7 @@ public:
 	static void Utf8Insert(std::string &sStrRef, size_t uiOffset, const std::string &sUtf8Str);
 
 	static std::string CleanPath(const char *szPath, const char *szExtension, bool bMakeLowercase);
+	static std::string GetFileFromPath(const char *szPath, bool bMakeLowercase);
 	static bool FileExists(const std::string &sFilePath);
 
 	static void ReadTextFile(const char *szFilePath, std::vector<char> &sContentsOut);

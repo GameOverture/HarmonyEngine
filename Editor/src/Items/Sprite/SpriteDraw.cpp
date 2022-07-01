@@ -127,7 +127,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	IDraw::OnMouseMoveEvent(pEvent);
 }
 
-/*virtual*/ void SpriteDraw::OnApplyJsonData(HyJsonObj itemDataObj) /*override*/
+/*virtual*/ void SpriteDraw::OnApplyJsonData(HyJsonDoc &itemDataDocRef) /*override*/
 {
 	if(m_Sprite.AcquireData() != nullptr)
 	{
@@ -140,6 +140,9 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 			m_Sprite.SetAnimCtrl(HYANIMCTRL_Play, i);
 		}
 	}
+
+#undef GetObject
+	HyJsonObj itemDataObj = itemDataDocRef.GetObject();
 
 	m_Sprite.GuiOverrideData<HySpriteData>(itemDataObj);
 	m_Sprite.SetAnimCtrl(HYANIMCTRL_Reset);

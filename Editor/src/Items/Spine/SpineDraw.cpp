@@ -25,15 +25,18 @@ SpineDraw::~SpineDraw()
 {
 }
 
-/*virtual*/ void SpineDraw::OnApplyJsonData(HyJsonObj itemDataObj) /*override*/
+/*virtual*/ void SpineDraw::OnApplyJsonData(HyJsonDoc &itemDataDocRef) /*override*/
 {
-	m_Spine.GuiOverrideData<HySpineData>(itemDataObj);
-	m_Spine.Load();
+#undef GetObject
+	HyJsonObj itemDataObj = itemDataDocRef.GetObject();
 
 	SpineModel *pSpineModel = static_cast<SpineModel *>(m_pProjItem->GetModel());
 	if(pSpineModel->IsUsingTempFiles())
 	{
+		HyJsonArray atlasesArray = itemDataObj["atlases"].GetArray();
 		const QList<SpineSubAtlas> &subAtlasList = pSpineModel->GetSubAtlasList();
+
+		rapidjson::Value guiTexturesArray(rapidjson::kArrayType);
 		for(const auto &subAtlasRef : subAtlasList)
 		{
 			QImage atlasImage(subAtlasRef.m_ImageFileInfo.absoluteFilePath());
@@ -46,10 +49,17 @@ SpineDraw::~SpineDraw()
 				atlasImage.byteCount(),
 				0);
 
-			// TODO: start here
-			//hNewTex = 
+			rapidjson::Value value(rapidjson::kNumberType);
+			value.SetUint(hNewTex);
+
+			guiTexturesArray.PushBack(value, itemDataDocRef.GetAllocator());
 		}
+
+		itemDataObj.AddMember("guiTextures", guiTexturesArray, itemDataDocRef.GetAllocator());
 	}
+
+	m_Spine.GuiOverrideData<HySpineData>(itemDataObj);
+	m_Spine.Load();
 }
 
 /*virtual*/ void SpineDraw::OnShow() /*override*/

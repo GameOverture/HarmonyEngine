@@ -21,7 +21,7 @@ public:
 	SpineDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~SpineDraw();
 
-	virtual void OnApplyJsonData(HyJsonObj itemDataObj) override;
+	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) override;
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;

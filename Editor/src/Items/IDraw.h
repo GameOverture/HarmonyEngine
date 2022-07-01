@@ -49,7 +49,7 @@ public:
 	virtual void OnDrawUpdate() { }
 
 protected:
-	virtual void OnApplyJsonData(HyJsonObj itemDataObj) { }
+	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) { }
 	virtual void OnShow() = 0;
 	virtual void OnHide() = 0;
 	virtual void OnResizeRenderer() = 0;

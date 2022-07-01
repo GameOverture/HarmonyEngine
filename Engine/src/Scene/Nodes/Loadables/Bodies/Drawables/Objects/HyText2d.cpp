@@ -126,7 +126,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	bIsBatchable = true;
 }
 
-/*virtual*/ bool HyText2d::WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HyText2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	// CalculateGlyphInfos called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
 	CalculateGlyphInfos();

@@ -20,11 +20,28 @@ spine::SpineExtension *spine::getDefaultExtension() {
 	return new spine::DefaultSpineExtension();
 }
 
+HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasListRef) :
+	m_SubAtlasListRef(subAtlasListRef)
+{
+}
+
 /*virtual*/ void HySpineTextureLoader::load(spine::AtlasPage &page, const spine::String &path) /*override*/
 {
-	//page.name
-	//void *texture = ... load the texture based on path ...
-	//page->setRendererObject(texture); // use the texture later in your rendering code
+	std::string sFileName = HyIO::GetFileFromPath(path.buffer(), true); // Make lowercase for easier compare
+	uint32 uiNumAtlases = m_SubAtlasListRef.size();
+	for(uint32 i = 0; i < uiNumAtlases; ++i)
+	{
+		std::string sSubAtlasName = m_SubAtlasListRef[i].m_sName;
+		std::transform(sSubAtlasName.begin(), sSubAtlasName.end(), sSubAtlasName.begin(), ::tolower); // Make lowercase for easier compare
+
+		if(strcmp(sSubAtlasName.c_str(), sFileName.c_str()) == 0)
+		{
+			page.setRendererObject(reinterpret_cast<void *>(&m_SubAtlasListRef[i])); // Store the sub-atlas index. The void *'s value (aka address) is essentially the integer index
+			return;
+		}
+	}
+
+	HyError("Spine SubAtlas page was not found: " << sFileName);
 }
 
 /*virtual*/ void HySpineTextureLoader::unload(void *pTexture) /*override*/
@@ -71,8 +88,9 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 			uint32 uiAtlasWidth = static_cast<uint32>(HyMax(0, atlasObj["subAtlasWidth"].GetInt()));
 			uint32 uiAtlasHeight = static_cast<uint32>(HyMax(0, atlasObj["subAtlasHeight"].GetInt()));
 
-			// TODO: Fix
-			//m_SubAtlasList.push_back(HySpineAtlas(sName, pAtlas, rSubAtlasUVRect.left, rSubAtlasUVRect.top, rSubAtlasUVRect.right, rSubAtlasUVRect.bottom));
+			HyJsonArray guiTexturesArray = itemDataObj["guiTextures"].GetArray();
+			HyTextureHandle hGfxApiHandle = guiTexturesArray[i].GetUint();
+			m_SubAtlasList.push_back(HySpineAtlas(sName, hGfxApiHandle));
 		}
 	}
 
@@ -86,7 +104,8 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 	//std::vector<char> atlasFile;
 	//HyIO::ReadTextFile(sAtlasFilePath.c_str(), atlasFile);
 	
-	m_pAtlasData = HY_NEW spine::Atlas(sAtlasFilePath.c_str(), nullptr, false); //atlasFile.data(), atlasFile.size(), "", nullptr, false);
+	HySpineTextureLoader texLoader(m_SubAtlasList);
+	m_pAtlasData = HY_NEW spine::Atlas(sAtlasFilePath.c_str(), &texLoader, true);
 
 	// Skeleton ---------------------------------------------------------------------
 	float fScale = itemDataObj["scale"].GetFloat();

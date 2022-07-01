@@ -43,7 +43,7 @@ protected:
 	virtual void OnDataAcquired() override;
 
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
-	virtual bool WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) override;
+	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) override;
 	
 	static void NullAnimCallback(HySprite2d *pSelf, void *pParam) { }
 };

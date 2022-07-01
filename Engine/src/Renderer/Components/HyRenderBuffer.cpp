@@ -97,7 +97,8 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 			m_pPrevRenderState = pRenderState;
 		}
 
-	} while(instanceRef.WriteVertexData(uiStageIndex++, vertexBufferRef) == false);
+		uiStageIndex++;
+	} while(instanceRef.WriteVertexData(uiNumInstances, vertexBufferRef) == false);
 }
 
 void HyRenderBuffer::CreateRenderHeader()

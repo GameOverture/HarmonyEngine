@@ -19,8 +19,9 @@ HySpine2d::HySpine2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, H
 	m_pSkeleton(nullptr),
 	m_pAnimationState(nullptr),
 	m_pSkeletonBounds(nullptr),
-	m_uiSlotStartIndex(0)
+	m_uiStartingSlotIndex(0)
 {
+	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HySpine2d::HySpine2d(const HySpine2d &copyRef) :
@@ -95,16 +96,17 @@ uint32 HySpine2d::GetNumSlots()
 	uiNumVerticesPerInstOut = 4;
 	bIsBatchable = true;
 
-	HyTextureHandle hCurTexture = HY_UNUSED_HANDLE;
 	if(uiStageIndex == 0)
-		m_uiSlotStartIndex = 0;
-	else
-		hCurTexture = m_ShaderUniforms.GetTexHandle(0);
+		m_uiStartingSlotIndex = 0;
+
+	// Used to determine when the render stage ends
+	HyTextureHandle hCurTexture = HY_UNUSED_HANDLE;
 
 	uiNumInstancesOut = 0;
-	for(uint32 i = m_uiSlotStartIndex; i < m_pSkeleton->getDrawOrder().size(); ++i)
+	uint32 uiSlotIndex = m_uiStartingSlotIndex;
+	for(; uiSlotIndex < m_pSkeleton->getDrawOrder().size(); ++uiSlotIndex)
 	{
-		spine::Slot *pCurSlot = m_pSkeleton->getDrawOrder()[i];
+		spine::Slot *pCurSlot = m_pSkeleton->getDrawOrder()[uiSlotIndex];
 		spine::Attachment *pAttachment = pCurSlot->getAttachment(); // Fetch the currently active attachment
 		if(!pAttachment)
 			continue; // continue with the next slot in the draw order if no attachment is active on the slot
@@ -131,33 +133,40 @@ uint32 HySpine2d::GetNumSlots()
 		//	engineBlendMode = BLEND_NORMAL;
 		//}
 
-		uiNumInstancesOut++;
-
 		if(pAttachment->getRTTI().isExactly(spine::RegionAttachment::rtti))
 		{
-			// Cast to an spRegionAttachment so we can get the rendererObject and compute the world vertices
+			// Cast to an spine::RegionAttachment so we can get its AtlasRegion's, page's rendererObject, which is the index into *this subatlas list
 			spine::RegionAttachment *pRegionAttachment = static_cast<spine::RegionAttachment *>(pAttachment);
-			//pRegionAttachment->getRendererObject()
+			spine::AtlasRegion *pSpineAtlasRegion = static_cast<spine::AtlasRegion *>(pRegionAttachment->getRendererObject());
+			HySpineAtlas *pSpineSubAtlas = reinterpret_cast<HySpineAtlas *>(pSpineAtlasRegion->page->getRendererObject());
+
+			// Check if this texture handle ends this render stage
+			HyTextureHandle hTex = pSpineSubAtlas->GetTexHandle();
+			if(hCurTexture == HY_UNUSED_HANDLE)
+				hCurTexture = hTex;
+			else if(hCurTexture != hTex)
+				break; // Break
 		}
 		else
 			HyError("Spine attachment type not yet supported: " << std::string(pAttachment->getName().buffer()));
+
+		// All passed above, increment number of instances to be rendered this stage
+		uiNumInstancesOut++;
 	}
 
-
-
-	//static_cast<HySpineData *>(UncheckedGetData())->GetTexHandle()
-	//m_ShaderUniforms.SetTexHandle(0, 
+	m_ShaderUniforms.SetTexHandle(0, hCurTexture);
 #endif
 }
 
-/*virtual*/ bool HySpine2d::WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HySpine2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) /*override*/
 {
 #ifdef HY_USE_SPINE
-	spine::Slot *pCurSlot = nullptr;
-	uint32 uiNumSlots = GetNumSlots();
-	for(uint32 i = 0; i < uiNumSlots; ++i) // For each slot in the draw order array of the skeleton
+	uint32 uiNumSlots = static_cast<uint32>(m_pSkeleton->getDrawOrder().size());
+	uint32 uiSlotIndex = m_uiStartingSlotIndex;
+
+	for(; uiNumInstances > 0 && uiSlotIndex < uiNumSlots; ++uiSlotIndex) // For each slot in the draw order array of the skeleton
 	{
-		pCurSlot = m_pSkeleton->getDrawOrder()[i];
+		spine::Slot *pCurSlot = m_pSkeleton->getDrawOrder()[uiSlotIndex];
 
 		// Fetch the currently active attachment
 		spine::Attachment *pAttachment = pCurSlot->getAttachment();
@@ -175,13 +184,6 @@ uint32 HySpine2d::GetNumSlots()
 			// Cast to an spRegionAttachment so we can get the rendererObject and compute the world vertices
 			spine::RegionAttachment *pRegionAttachment = static_cast<spine::RegionAttachment *>(pAttachment);
 
-			//static_cast<spine::AtlasRegion *>(pRegionAttachment->getRendererObject())->page->name
-
-			// Our engine specific Texture is stored in the AtlasRegion which was
-			// assigned to the attachment on load. It represents the texture atlas
-			// page that contains the image the region attachment is mapped to.
-			//texture = (Texture *)((spine::AtlasRegion *)pRegionAttachment->getRendererObject())->page->getRendererObject();
-
 			// Computed the world vertices positions for the 4 vertices that make up
 			// the rectangular region attachment. This assumes the world transform of the
 			// bone to which the slot (and hence attachment) is attached has been calculated
@@ -191,14 +193,18 @@ uint32 HySpine2d::GetNumSlots()
 			ptWorldPos.setSize(8, 0.0f);
 			pRegionAttachment->computeWorldVertices(pCurSlot->getBone(), ptWorldPos, 0, 2);
 
+			// These macros convert ptWorldPos[x] to Harmony's winding order
+#define Vert2Index 0
+#define Vert3Index 2
+#define Vert1Index 4
+#define Vert0Index 6
+
 			// SIZE
-#define GetPosX(index) ptWorldPos[index * 2]
-#define GetPosY(index) ptWorldPos[index * 2 + 1]
-			glm::vec2 vSize(abs(GetPosX(0) - GetPosX(3)), abs(GetPosY(2) - GetPosY(3)));
+			glm::vec2 vSize(abs(ptWorldPos[Vert2Index] - ptWorldPos[Vert3Index]), abs(ptWorldPos[Vert0Index + 1] - ptWorldPos[Vert2Index + 1]));
 			vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
 
 			// OFFSET
-			vertexBufferRef.AppendData2d(&ptWorldPos[0], sizeof(glm::vec2));
+			vertexBufferRef.AppendData2d(&ptWorldPos[Vert3Index], sizeof(glm::vec2));
 
 			glm::vec4 vColor;
 			// TOP COLOR
@@ -219,22 +225,21 @@ uint32 HySpine2d::GetNumSlots()
 			vertexBufferRef.AppendData2d(&vColor, sizeof(glm::vec4));
 			
 			// UV's
-#define GetUVs(index) &pRegionAttachment->getUVs()[index * 2]
 			//vUV.x = frameRef.rSRC_RECT.right;//1.0f;
 			//vUV.y = frameRef.rSRC_RECT.top;//1.0f;
-			vertexBufferRef.AppendData2d(GetUVs(2), sizeof(glm::vec2));
+			vertexBufferRef.AppendData2d(&pRegionAttachment->getUVs()[Vert0Index], sizeof(glm::vec2));
 
 			//vUV.x = frameRef.rSRC_RECT.left;//0.0f;
 			//vUV.y = frameRef.rSRC_RECT.top;//1.0f;
-			vertexBufferRef.AppendData2d(GetUVs(1), sizeof(glm::vec2));
+			vertexBufferRef.AppendData2d(&pRegionAttachment->getUVs()[Vert1Index], sizeof(glm::vec2));
 
 			//vUV.x = frameRef.rSRC_RECT.right;//1.0f;
 			//vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
-			vertexBufferRef.AppendData2d(GetUVs(3), sizeof(glm::vec2));
+			vertexBufferRef.AppendData2d(&pRegionAttachment->getUVs()[Vert2Index], sizeof(glm::vec2));
 
 			//vUV.x = frameRef.rSRC_RECT.left;//0.0f;
 			//vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
-			vertexBufferRef.AppendData2d(GetUVs(0), sizeof(glm::vec2));
+			vertexBufferRef.AppendData2d(&pRegionAttachment->getUVs()[Vert3Index], sizeof(glm::vec2));
 
 			// TRANSFORM MTX
 			vertexBufferRef.AppendData2d(&GetSceneTransform(), sizeof(glm::mat4));
@@ -265,12 +270,16 @@ uint32 HySpine2d::GetNumSlots()
 			HyError("Mesh Attachments are not yet supported");
 		}
 
-		//// Draw the mesh we created for the attachment
-		//engine_drawMesh(vertices, 0, vertexIndex, texture, engineBlendMode);
-	}
-#endif
+		uiNumInstances--;
+	} // Slot for-loop
 
-	return true;
+	if(uiSlotIndex == uiNumSlots)
+		return true;
+	else
+		m_uiStartingSlotIndex = uiSlotIndex;
+
+#endif
+	return false;
 }
 
 /*virtual*/ void HySpine2d::OnCalcBoundingVolume() /*override*/

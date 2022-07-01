@@ -50,7 +50,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 //	}
 //}
 
-/*virtual*/ void EntityDraw::OnApplyJsonData(HyJsonObj itemDataObj) /*override*/
+/*virtual*/ void EntityDraw::OnApplyJsonData(HyJsonDoc &itemDataDocRef) /*override*/
 {
 }
 

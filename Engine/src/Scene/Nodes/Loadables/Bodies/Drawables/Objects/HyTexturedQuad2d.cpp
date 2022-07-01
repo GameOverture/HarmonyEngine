@@ -146,7 +146,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	bIsBatchable = true;
 }
 
-/*virtual*/ bool HyTexturedQuad2d::WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef)
+/*virtual*/ bool HyTexturedQuad2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef)
 {
 	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 

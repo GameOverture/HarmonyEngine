@@ -158,7 +158,7 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	bIsBatchable = false;
 }
 
-/*virtual*/ bool HyPrimitive2d::WriteVertexData(uint32 uiStageIndex, HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HyPrimitive2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) /*override*/
 {
 	vertexBufferRef.AppendData2d(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
 	return true;
