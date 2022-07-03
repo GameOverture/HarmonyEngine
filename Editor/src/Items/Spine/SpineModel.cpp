@@ -313,48 +313,45 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 			else
 				sNewImageList;
 
-			if(m_pAtlasFrame)
-				m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetBankId());
-			else
-				return false;
+			//if(m_pAtlasFrame)
+			//	m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetBankId());
+			//else
+			//	return false;
 		}
 
-		// Pack the Spine sub-atlas into the Atlas Manager (either replacing existing, or generating new)
-		for(SpineSubAtlas &subAtlas : m_SubAtlasList)
-		{
+		//// Pack the Spine sub-atlas into the Atlas Manager (either replacing existing, or generating new)
+		//for(SpineSubAtlas &subAtlas : m_SubAtlasList)
+		//{
+		//	if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(subAtlas.m_pAtlasFrame, subAtlas.m_pAtlasFrame->GetName(), subAtlasImage, ) == false)
+		//	{
+		//		HyGuiLog("Cannot ReplaceFrame text sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
+		//		return false;
+		//	}
 
-			if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(subAtlas.m_pAtlasFrame, subAtlas.m_pAtlasFrame->GetName(), subAtlasImage, ) == false)
-			{
-				HyGuiLog("Cannot ReplaceFrame text sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
-				return false;
-			}
+		//	QStringList sImportList = dlg.selectedFiles();
 
+		//	QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
+		//	TreeModelItemData *pFirstSelected = GetSelected(selectedAssetsList, selectedFiltersList);
 
+		//	TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
 
-			QStringList sImportList = dlg.selectedFiles();
+		//	QList<TreeModelItemData *> correspondingParentList;
+		//	QList<QUuid> correspondingUuidList;
+		//	for(int i = 0; i < sImportList.size(); ++i)
+		//	{
+		//		correspondingParentList.append(pParent);
+		//		correspondingUuidList.append(QUuid::createUuid());
+		//	}
 
-			QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-			TreeModelItemData *pFirstSelected = GetSelected(selectedAssetsList, selectedFiltersList);
-
-			TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
-
-			QList<TreeModelItemData *> correspondingParentList;
-			QList<QUuid> correspondingUuidList;
-			for(int i = 0; i < sImportList.size(); ++i)
-			{
-				correspondingParentList.append(pParent);
-				correspondingUuidList.append(QUuid::createUuid());
-			}
-
-			m_pModel->ImportNewAssets(sImportList,
-				m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
-				ITEM_Unknown, // Uses default item type of manager
-				correspondingParentList,
-				correspondingUuidList);
+		//	m_pModel->ImportNewAssets(sImportList,
+		//		m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
+		//		ITEM_Unknown, // Uses default item type of manager
+		//		correspondingParentList,
+		//		correspondingUuidList);
 
 
-			subAtlas.m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasBankIndex, ITEM_Text);
-		}
+		//	subAtlas.m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasBankIndex, ITEM_Text);
+		//}
 
 		m_bUsingTempFiles = false;
 	}
