@@ -855,6 +855,14 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 		return;
 	}
 
+#ifndef HY_USE_SPINE
+	if(eItem == ITEM_Spine)
+	{
+		HyGuiLog("This Editor was not built with CMake option 'HYBUILD_SPINE' enabled.", LOGTYPE_Warning);
+		return;
+	}
+#endif
+
 	QString sDefaultPrefix = pFirstSelected->GetType() == ITEM_Prefix ? pFirstSelected->GetName(true) : pFirstSelected->GetPrefix();
 	if(sDefaultPrefix.isEmpty() == false && sDefaultPrefix[sDefaultPrefix.size() - 1] == '/')
 		sDefaultPrefix = sDefaultPrefix.left(sDefaultPrefix.size() - 1);
@@ -867,7 +875,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 															 pDlg->GetPrefix(),
 															 pDlg->GetName(),
 															 HyGlobal::GenerateNewItemFileData(pDlg->GetImportFile()),
-															 pDlg->GetImportFile().isEmpty()); // Blank items are pending save
+															 true);//pDlg->GetImportFile().isEmpty()); // Blank items are pending save
 
 		if(pNewItem->IsProjectItem())
 		{

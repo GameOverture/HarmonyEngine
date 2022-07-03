@@ -137,7 +137,8 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	else // Existing Meta and Data JSON exist (and therefore any Spine imported files are in their respective directories)
 	{
 		if(itemFileDataRef.m_Data.contains("isBinary") == false)
-			HyGuiLog("SpineModel did not contain 'isBinary'", LOGTYPE_Error);
+			return; // If 'isBinary' doesn't exist, it could be due to a unsaved, discarded Spine item
+			
 		m_bIsBinaryRuntime = itemFileDataRef.m_Data["isBinary"].toBool();
 
 		if(itemFileDataRef.m_Data.contains("scale") == false)
@@ -243,8 +244,11 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 			return false;
 		}
 
+		// Skeleton File
 		QFile skelFile(m_SkeletonFileInfo.absoluteFilePath());
 		QString sSkelFileDestination = dataDir.absoluteFilePath(skelFile.fileName());
+
+		QFile::remove(sSkelFileDestination);
 		if(false == skelFile.copy(sSkelFileDestination))
 		{
 			HyGuiLog("SpineModel could not copy Spine Skeleton to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
@@ -252,8 +256,11 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 		}
 		m_SkeletonFileInfo.setFile(sSkelFileDestination);
 
+		// Atlas File
 		QFile atlasFile(m_AtlasFileInfo.absoluteFilePath());
 		QString sAtlasFileDestination = dataDir.absoluteFilePath(atlasFile.fileName());
+
+		QFile::remove(sAtlasFileDestination);
 		if(false == atlasFile.copy(sAtlasFileDestination))
 		{
 			HyGuiLog("SpineModel could not copy Spine Atlas file to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
@@ -261,23 +268,96 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 		}
 		m_AtlasFileInfo.setFile(sAtlasFileDestination);
 
+		// Image/Textures Files
+		QList<AtlasFrame *> replaceImageList;
+		QStringList sNewImageList; // If sub-atlas's 'AtlasFrame' doesn't exist yet, store the image file path and pass into a ImportNewAssets()
 		for(SpineSubAtlas &subAtlas : m_SubAtlasList)
 		{
 			QFile subAtlasFile(subAtlas.m_ImageFileInfo.absoluteFilePath());
 			QString sSubAtlasFileDestination = metaDir.absoluteFilePath(subAtlasFile.fileName());
+
+			QFile::remove(sSubAtlasFileDestination);
 			if(false == subAtlasFile.copy(sSubAtlasFileDestination))
 			{
 				HyGuiLog("SpineModel could not copy Spine Sub-Atlas image file to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
 				return false;
 			}
 			subAtlas.m_ImageFileInfo.setFile(sSubAtlasFileDestination);
+
+
+			// Pack sub atlases into 
+			QImage subAtlasImage(subAtlas.m_ImageFileInfo.absoluteFilePath());
+
+			// Best determine atlas bank to save generated texture in
+			uint uiSubAtlasIndex = 0;
+			if(subAtlas.m_pAtlasFrame == nullptr)
+			{
+				if(m_ItemRef.GetProject().GetAtlasWidget())
+					uiSubAtlasIndex = m_ItemRef.GetProject().GetAtlasModel().GetBankIndexFromBankId(m_ItemRef.GetProject().GetAtlasWidget()->GetSelectedBankId());
+			}
+			else
+				uiSubAtlasIndex = m_ItemRef.GetProject().GetAtlasModel().GetBankIndexFromBankId(subAtlas.m_pAtlasFrame->GetBankId());
+
+			// Ensure newly generated font sub-atlas will fit in atlas bank dimensions
+			quint32 uiSubAtlasBankId = m_ItemRef.GetProject().GetAtlasModel().GetBankIdFromBankIndex(uiSubAtlasIndex);
+			if(m_ItemRef.GetProject().GetAtlasModel().IsImageValid(subAtlasImage, uiSubAtlasBankId) == false)
+			{
+				QSize atlasDimensions = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiSubAtlasIndex);
+				HyGuiLog("Cannot pack Spine sub-atlas for " % m_ItemRef.GetName(true) % " because it will not fit in atlas group '" % QString::number(uiSubAtlasBankId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
+				return false;
+			}
+
+			// Keep track of sub-atlas replacements
+			if(subAtlas.m_pAtlasFrame)
+				replaceImageList.push_back(subAtlas.m_pAtlasFrame);
+			else
+				sNewImageList;
+
+			if(m_pAtlasFrame)
+				m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetBankId());
+			else
+				return false;
+		}
+
+		// Pack the Spine sub-atlas into the Atlas Manager (either replacing existing, or generating new)
+		for(SpineSubAtlas &subAtlas : m_SubAtlasList)
+		{
+
+			if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(subAtlas.m_pAtlasFrame, subAtlas.m_pAtlasFrame->GetName(), subAtlasImage, ) == false)
+			{
+				HyGuiLog("Cannot ReplaceFrame text sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
+				return false;
+			}
+
+
+
+			QStringList sImportList = dlg.selectedFiles();
+
+			QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
+			TreeModelItemData *pFirstSelected = GetSelected(selectedAssetsList, selectedFiltersList);
+
+			TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
+
+			QList<TreeModelItemData *> correspondingParentList;
+			QList<QUuid> correspondingUuidList;
+			for(int i = 0; i < sImportList.size(); ++i)
+			{
+				correspondingParentList.append(pParent);
+				correspondingUuidList.append(QUuid::createUuid());
+			}
+
+			m_pModel->ImportNewAssets(sImportList,
+				m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
+				ITEM_Unknown, // Uses default item type of manager
+				correspondingParentList,
+				correspondingUuidList);
+
+
+			subAtlas.m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasBankIndex, ITEM_Text);
 		}
 
 		m_bUsingTempFiles = false;
 	}
-
-	// TODO: pack into atlas manager
-	
 
 	return true;
 }
