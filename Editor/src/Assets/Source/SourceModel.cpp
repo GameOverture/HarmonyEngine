@@ -421,6 +421,10 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	return false;
 }
 
+/*virtual*/ void SourceModel::OnFlushRepack() /*override*/
+{
+}
+
 /*virtual*/ void SourceModel::OnSaveMeta() /*override*/
 {
 	const BankData *pSourceBank = m_BanksModel.GetBank(0);

@@ -17,167 +17,182 @@
 #include <QImageWriter>
 #include <QProcess>
 
-AtlasRepackThread::AtlasRepackThread(BankData &bankRef, QList<AtlasFrame *> affectedFramesList, QDir metaDir) :
-	IRepackThread(metaDir),
-	m_BankRef(bankRef)
+AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &affectedAssetsMapRef, QDir metaDir) :
+	IRepackThread(affectedAssetsMapRef, metaDir)
 {
-	// Organize all affected frames into buckets (HyTextureInfo's bucket ID)
-	for(int i = 0; i < affectedFramesList.size(); ++i)
+	for(auto iter = m_AffectedAssetsMapRef.begin(); iter != m_AffectedAssetsMapRef.end(); ++iter)
 	{
-		uint32 uiKey = affectedFramesList[i]->GetTextureInfo().GetBucketId();
+		BankData *pBankData = iter.key();
+		QSet<AssetItemData *> &affectedAssetsSet = iter.value();
 
-		if(m_BucketMap.contains(uiKey) == false)
-			m_BucketMap.insert(uiKey, new PackerBucket());
+		m_RepackBankList.push_back(RepackBank());
+		RepackBank &curBankRef = m_RepackBankList.back();
+		
+		curBankRef.m_pBankData = pBankData;
 
-		m_BucketMap[uiKey]->m_TextureIndexSet.insert(affectedFramesList[i]->GetTextureIndex());
-		m_BucketMap[uiKey]->m_FramesList.append(affectedFramesList[i]);
+		// Organize all affected frames into buckets (HyTextureInfo's bucket ID)
+		QList<AssetItemData *>affectedFramesList = affectedAssetsSet.values();
+		for(int i = 0; i < affectedFramesList.size(); ++i)
+		{
+			AtlasFrame *pAtlasFrame = static_cast<AtlasFrame *>(affectedFramesList[i]);
+			uint32 uiKey = pAtlasFrame->GetTextureInfo().GetBucketId();
+
+			if(curBankRef.m_BucketMap.contains(uiKey) == false)
+				curBankRef.m_BucketMap.insert(uiKey, new RepackBank::PackerBucket());
+
+			//curBankRef.m_BucketMap[uiKey]->m_TextureIndexSet.insert(pAtlasFrame->GetTextureIndex());
+			curBankRef.m_BucketMap[uiKey]->m_FramesList.append(pAtlasFrame);
+		}
 	}
 }
 
 /*virtual*/ AtlasRepackThread::~AtlasRepackThread()
 {
-	for(auto iter = m_BucketMap.begin(); iter != m_BucketMap.end(); ++iter)
-		delete iter.value();
 }
 
 /*virtual*/ void AtlasRepackThread::OnRun() /*override*/
 {
-	QDir runtimeBankDir(m_BankRef.m_sAbsPath);
-
-	// Keep track of the last texture index to be used in next Repack (because it likely has room remaining)
-	QList<int> unfilledTextureIndexList;
-
-	// Run image packer on each bucket's m_FramesList, and insert/rename textures to have sequential index name
-	for(auto iter = m_BucketMap.begin(); iter != m_BucketMap.end(); ++iter)
+	for(uint32 iBankCnt = 0; iBankCnt < m_RepackBankList.size(); ++iBankCnt)
 	{
-		iter.value()->m_Packer.clear();
+		BankData *pBankData = m_RepackBankList[iBankCnt].m_pBankData;
+		QMap<uint32, RepackBank::PackerBucket *> &bucketMapRef = m_RepackBankList[iBankCnt].m_BucketMap;
 
-		// Repack the affected frames and determine how many textures this repack took
-		for(int i = 0; i < iter.value()->m_FramesList.size(); ++i)
+		QDir runtimeBankDir(pBankData->m_sAbsPath);
+
+		// Keep track of the last texture index to be used in next Repack (because it likely has room remaining)
+		QList<int> unfilledTextureIndexList;
+
+		// Run image packer on each bucket's m_FramesList, and insert/rename textures to have sequential index name
+		for(auto iter = bucketMapRef.begin(); iter != bucketMapRef.end(); ++iter)
 		{
-			iter.value()->m_Packer.addItem(iter.value()->m_FramesList[i]->GetSize(),
-										   iter.value()->m_FramesList[i]->GetCrop(),
-										   iter.value()->m_FramesList[i]->GetChecksum(),
-										   iter.value()->m_FramesList[i],
-										   m_MetaDir.absoluteFilePath(iter.value()->m_FramesList[i]->ConstructMetaFileName()));
-		}
-	
-		SetPackerSettings(iter.value()->m_Packer);
+			iter.value()->m_Packer.clear();
 
-		iter.value()->m_Packer.pack(m_BankRef.m_MetaObj["cmbHeuristic"].toInt(),
-								    m_BankRef.m_MetaObj["maxWidth"].toInt(),
-								    m_BankRef.m_MetaObj["maxHeight"].toInt());
-
-
-		int iNumNewTextures = iter.value()->m_Packer.bins.size();
-
-		// Grab 'existingTexturesInfoList' after deleting obsolete textures
-		QFileInfoList existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-
-		// Using our stock of newly generated textures, fill in any gaps in the texture array.
-		// If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
-		int iTotalNumTextures = iNumNewTextures + existingTexturesInfoList.size();
-
-		int iNumNewTexturesUsed = 0;
-		int iCurrentIndex = 0;
-		for(; iCurrentIndex < iTotalNumTextures; ++iCurrentIndex)
-		{
-			// TODO: Fix this calculation since we use buckets now
-			float fPercComplete = (static_cast<float>(iCurrentIndex) / static_cast<float>(iTotalNumTextures));
-			fPercComplete *= 100.0f;
-			Q_EMIT LoadUpdate("Constructing Atlases", static_cast<int>(fPercComplete));
-
-			bool bFound = false;
-			for(int i = 0; i < existingTexturesInfoList.size(); ++i)
+			// Repack the affected frames and determine how many textures this repack took
+			for(int i = 0; i < iter.value()->m_FramesList.size(); ++i)
 			{
-				if(existingTexturesInfoList[i].baseName().toInt() == iCurrentIndex)
-				{
-					bFound = true;
-					break;
-				}
+				iter.value()->m_Packer.addItem(iter.value()->m_FramesList[i]->GetSize(),
+					iter.value()->m_FramesList[i]->GetCrop(),
+					iter.value()->m_FramesList[i]->GetChecksum(),
+					iter.value()->m_FramesList[i],
+					m_MetaDir.absoluteFilePath(iter.value()->m_FramesList[i]->ConstructMetaFileName()));
 			}
 
-			if(bFound)
-				continue;
+			SetPackerSettings(pBankData, iter.value()->m_Packer);
 
-			if(iNumNewTexturesUsed < iNumNewTextures)
-			{
-				ConstructAtlasTexture(iter.value()->m_Packer, HyTextureInfo(iter.key()), iNumNewTexturesUsed, iCurrentIndex);
-				iNumNewTexturesUsed++;
+			iter.value()->m_Packer.pack(pBankData->m_MetaObj["cmbHeuristic"].toInt(),
+				pBankData->m_MetaObj["maxWidth"].toInt(),
+				pBankData->m_MetaObj["maxHeight"].toInt());
 
-				// Store off the last packed texture to indicate it is "unfilled"
-				if(iNumNewTexturesUsed == iNumNewTextures)
-					unfilledTextureIndexList.append(iCurrentIndex);
-			}
-			else
+
+			int iNumNewTextures = iter.value()->m_Packer.bins.size();
+
+			// Grab 'existingTexturesInfoList' after deleting obsolete textures
+			QFileInfoList existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+
+			// Using our stock of newly generated textures, fill in any gaps in the texture array.
+			// If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
+			int iTotalNumTextures = iNumNewTextures + existingTexturesInfoList.size();
+
+			int iNumNewTexturesUsed = 0;
+			int iCurrentIndex = 0;
+			for(; iCurrentIndex < iTotalNumTextures; ++iCurrentIndex)
 			{
-				// There aren't enough new textures to fill all the gaps in indices. Start shifting assets into the next texture index.
-				// Find the next existing texture and assign it to iCurrentIndex
-				bool bHandled = false;
-				int iNextAvailableFoundIndex = iCurrentIndex;
-				do
+				// TODO: Fix this calculation since we use buckets now
+				float fPercComplete = (static_cast<float>(iCurrentIndex) / static_cast<float>(iTotalNumTextures));
+				fPercComplete *= 100.0f;
+				Q_EMIT LoadUpdate("Constructing Atlases", static_cast<int>(fPercComplete));
+
+				bool bFound = false;
+				for(int i = 0; i < existingTexturesInfoList.size(); ++i)
 				{
-					++iNextAvailableFoundIndex;
-					for(int i = 0; i < existingTexturesInfoList.size(); ++i)
+					if(existingTexturesInfoList[i].baseName().toInt() == iCurrentIndex)
 					{
-						int iExistingTextureIndex = existingTexturesInfoList[i].baseName().toInt();
-
-						if(iExistingTextureIndex == iNextAvailableFoundIndex)
-						{
-							// Texture found, start migrating its frames
-							QList<AssetItemData *> &atlasGrpFrameListRef = m_BankRef.m_AssetList;
-							for(int j = 0; j < atlasGrpFrameListRef.size(); ++j)
-							{
-								AtlasFrame *pFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[j]);
-								if(pFrame->GetTextureIndex() == iExistingTextureIndex)
-									pFrame->UpdateInfoFromPacker(iCurrentIndex, pFrame->GetX(), pFrame->GetY());
-							}
-
-							// Rename the texture file to be the new index
-							QFile::rename(existingTexturesInfoList[i].absoluteFilePath(), runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iCurrentIndex) % "." % existingTexturesInfoList[i].completeSuffix()));
-
-							// Regrab 'existingTexturesInfoList' after renaming a texture
-							existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-
-							bHandled = true;
-							break;
-						}
+						bFound = true;
+						break;
 					}
 				}
-				while(bHandled == false);
-			}
-		}
 
-		// Correct all the duplicate frames
-		for(int i = 0; i < iter.value()->m_Packer.images.size(); ++i)
-		{
-			inputImage &imgInfoRef = iter.value()->m_Packer.images[i];
-			if(imgInfoRef.duplicateId != nullptr)
+				if(bFound)
+					continue;
+
+				if(iNumNewTexturesUsed < iNumNewTextures)
+				{
+					ConstructAtlasTexture(pBankData, iter.value()->m_Packer, HyTextureInfo(iter.key()), iNumNewTexturesUsed, iCurrentIndex);
+					iNumNewTexturesUsed++;
+
+					// Store off the last packed texture to indicate it is "unfilled"
+					if(iNumNewTexturesUsed == iNumNewTextures)
+						unfilledTextureIndexList.append(iCurrentIndex);
+				}
+				else
+				{
+					// There aren't enough new textures to fill all the gaps in indices. Start shifting assets into the next texture index.
+					// Find the next existing texture and assign it to iCurrentIndex
+					bool bHandled = false;
+					int iNextAvailableFoundIndex = iCurrentIndex;
+					do
+					{
+						++iNextAvailableFoundIndex;
+						for(int i = 0; i < existingTexturesInfoList.size(); ++i)
+						{
+							int iExistingTextureIndex = existingTexturesInfoList[i].baseName().toInt();
+
+							if(iExistingTextureIndex == iNextAvailableFoundIndex)
+							{
+								// Texture found, start migrating its frames
+								QList<AssetItemData *> &atlasGrpFrameListRef = pBankData->m_AssetList;
+								for(int j = 0; j < atlasGrpFrameListRef.size(); ++j)
+								{
+									AtlasFrame *pFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[j]);
+									if(pFrame->GetTextureIndex() == iExistingTextureIndex)
+										pFrame->UpdateInfoFromPacker(iCurrentIndex, pFrame->GetX(), pFrame->GetY());
+								}
+
+								// Rename the texture file to be the new index
+								QFile::rename(existingTexturesInfoList[i].absoluteFilePath(), runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iCurrentIndex) % "." % existingTexturesInfoList[i].completeSuffix()));
+
+								// Regrab 'existingTexturesInfoList' after renaming a texture
+								existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+
+								bHandled = true;
+								break;
+							}
+						}
+					} while(bHandled == false);
+				}
+			}
+
+			// Correct all the duplicate frames
+			for(int i = 0; i < iter.value()->m_Packer.images.size(); ++i)
 			{
-				AtlasFrame *pFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.id);
-				AtlasFrame *pDupFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.duplicateId);
+				inputImage &imgInfoRef = iter.value()->m_Packer.images[i];
+				if(imgInfoRef.duplicateId != nullptr)
+				{
+					AtlasFrame *pFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.id);
+					AtlasFrame *pDupFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.duplicateId);
 
-				pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(), pDupFrame->GetX(), pDupFrame->GetY());
+					pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(), pDupFrame->GetX(), pDupFrame->GetY());
+				}
 			}
 		}
-	}
 
-	// Replace "unfilledIndices" with all the buckets' last (least packed) bin
-	QJsonArray unfilledIndicesArray;
-	for(auto idx : unfilledTextureIndexList)
-		unfilledIndicesArray.append(idx);
-	m_BankRef.m_MetaObj["unfilledIndices"] = unfilledIndicesArray;
+		// Replace "unfilledIndices" with all the buckets' last (least packed) bin
+		QJsonArray unfilledIndicesArray;
+		for(auto idx : unfilledTextureIndexList)
+			unfilledIndicesArray.append(idx);
+		pBankData->m_MetaObj["unfilledIndices"] = unfilledIndicesArray;
+	}
 }
 
-void AtlasRepackThread::ConstructAtlasTexture(ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex)
+void AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex)
 {
-	if(m_BankRef.m_MetaObj["maxWidth"].toInt() != imagePackerRef.bins[iPackerBinIndex].width() ||
-	   m_BankRef.m_MetaObj["maxHeight"].toInt() != imagePackerRef.bins[iPackerBinIndex].height())
+	if(pBankData->m_MetaObj["maxWidth"].toInt() != imagePackerRef.bins[iPackerBinIndex].width() ||
+	   pBankData->m_MetaObj["maxHeight"].toInt() != imagePackerRef.bins[iPackerBinIndex].height())
 	{
 		HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimensions", LOGTYPE_Error);
 	}
 
-	QImage newTexture(m_BankRef.m_MetaObj["maxWidth"].toInt(), m_BankRef.m_MetaObj["maxHeight"].toInt(), QImage::Format_ARGB32);
+	QImage newTexture(pBankData->m_MetaObj["maxWidth"].toInt(), pBankData->m_MetaObj["maxHeight"].toInt(), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
 
 	QPainter p(&newTexture);
@@ -230,7 +245,7 @@ void AtlasRepackThread::ConstructAtlasTexture(ImagePacker &imagePackerRef, HyTex
 	}
 
 	QImage *pTexture = static_cast<QImage *>(p.device());
-	QDir runtimeBankDir(m_BankRef.m_sAbsPath);
+	QDir runtimeBankDir(pBankData->m_sAbsPath);
 
 	switch(texInfo.GetFormat())
 	{
@@ -342,13 +357,13 @@ void AtlasRepackThread::ConstructAtlasTexture(ImagePacker &imagePackerRef, HyTex
 	}
 }
 
-void AtlasRepackThread::SetPackerSettings(ImagePacker &imagePackerRef)
+void AtlasRepackThread::SetPackerSettings(BankData *pBankData, ImagePacker &imagePackerRef)
 {
-	imagePackerRef.sortOrder = m_BankRef.m_MetaObj["cmbSortOrder"].toInt();
-	imagePackerRef.border.t = m_BankRef.m_MetaObj["sbFrameMarginTop"].toInt();
-	imagePackerRef.border.l = m_BankRef.m_MetaObj["sbFrameMarginLeft"].toInt();
-	imagePackerRef.border.r = m_BankRef.m_MetaObj["sbFrameMarginRight"].toInt();
-	imagePackerRef.border.b = m_BankRef.m_MetaObj["sbFrameMarginBottom"].toInt();
+	imagePackerRef.sortOrder = pBankData->m_MetaObj["cmbSortOrder"].toInt();
+	imagePackerRef.border.t = pBankData->m_MetaObj["sbFrameMarginTop"].toInt();
+	imagePackerRef.border.l = pBankData->m_MetaObj["sbFrameMarginLeft"].toInt();
+	imagePackerRef.border.r = pBankData->m_MetaObj["sbFrameMarginRight"].toInt();
+	imagePackerRef.border.b = pBankData->m_MetaObj["sbFrameMarginBottom"].toInt();
 	imagePackerRef.extrude = 1;
 	imagePackerRef.merge = true;
 	imagePackerRef.square = true;

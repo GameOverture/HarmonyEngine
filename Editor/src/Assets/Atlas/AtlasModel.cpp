@@ -88,22 +88,21 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QIm
 	// This will also create a meta image and register asset
 	AtlasFrame *pFrame = ImportImage(sName, newImage, m_BanksModel.GetBank(uiBankIndex)->GetId(), eType, QUuid::createUuid());
 
-	QSet<AtlasFrame *> newFrameSet;
-	newFrameSet.insert(pFrame);
-	Repack(uiBankIndex, QSet<int>(), newFrameSet);
-
 	// This retrieves the newly created AtlasFrame and links it to its ProjectItemData
 	QList<QUuid> idList;
 	idList.append(pFrame->GetUuid());
 	QList<AssetItemData *> returnList = RequestAssetsByUuid(pItem, idList);
 
 	if(returnList.empty() == false)
+	{
+		AddAssetsToRepack(m_BanksModel.GetBank(uiBankIndex), returnList[0]);
 		return static_cast<AtlasFrame *>(returnList[0]);
+	}
 
 	return nullptr;
 }
 
-bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack)
+bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage)
 {
 	if(IsImageValid(newImage, pFrame->GetBankId()) == false)
 		return false;
@@ -123,66 +122,25 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	// Re-enter the frame into the map
 	RegisterAsset(pFrame);
 
-	if(bDoAtlasGroupRepack)
-	{
-		uint uiBankIndex = GetBankIndexFromBankId(pFrame->GetBankId());
-		Repack(uiBankIndex, textureIndexToReplaceSet, QSet<AtlasFrame *>());
-	}
+	uint uiBankIndex = GetBankIndexFromBankId(pFrame->GetBankId());
+	AddAssetsToRepack(m_BanksModel.GetBank(uiBankIndex), pFrame);
 
 	return true;
 }
 
-void AtlasModel::RepackAll(uint uiBankIndex)
-{
-	int iNumTotalTextures = GetNumTextures(uiBankIndex);
-	
-	QSet<int> textureIndexSet;
-	for(int i = 0; i < iNumTotalTextures; ++i)
-		textureIndexSet.insert(i);
-
-	if(textureIndexSet.empty() == false)
-		Repack(uiBankIndex, textureIndexSet, QSet<AtlasFrame *>());
-	else
-		SaveRuntime();
-}
-
-void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet)
-{
-	// Always repack the unfilled textures to ensure it gets filled as much as it can
-	QJsonArray unfilledTextureIndicesArray = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["unfilledIndices"].toArray();
-	for(auto unfilledTextureIndex : unfilledTextureIndicesArray)
-		repackTexIndicesSet.insert(unfilledTextureIndex.toInt());
-
-	QList<int> textureIndexList = repackTexIndicesSet.values();
-
-	// Get all the remaining/affected frames into a list
-	QList<AssetItemData *> entireAssetList = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
-	for(int i = 0; i < entireAssetList.size(); ++i)
-	{
-		AtlasFrame *pFrame = static_cast<AtlasFrame *>(entireAssetList[i]);
-		for(int j = 0; j < textureIndexList.size(); ++j)
-		{
-			if(pFrame->GetTextureIndex() == textureIndexList[j])
-			{
-				newFramesSet.insert(pFrame);
-				break;
-			}
-		}
-	}
-
-	// Delete all affected textures. The following AtlasRepackThread will regenerate all the remaining/modified assets
-	QDir runtimeBankDir(m_BanksModel.GetBank(uiBankIndex)->m_sAbsPath);
-	for(int i = 0; i < textureIndexList.size(); ++i)
-	{
-		QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
-		QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".dds"));
-		QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".astc"));
-	}
-
-	QList<AtlasFrame *> affectedFramesList = newFramesSet.values();
-	AtlasRepackThread *pWorkerThread = new AtlasRepackThread(*m_BanksModel.GetBank(uiBankIndex), affectedFramesList, m_MetaDir);
-	StartRepackThread("Repacking Atlases", pWorkerThread);
-}
+//void AtlasModel::RepackAll(uint uiBankIndex)
+//{
+//	int iNumTotalTextures = GetNumTextures(uiBankIndex);
+//	
+//	QSet<int> textureIndexSet;
+//	for(int i = 0; i < iNumTotalTextures; ++i)
+//		textureIndexSet.insert(i);
+//
+//	if(textureIndexSet.empty() == false)
+//		Repack(uiBankIndex, textureIndexSet, QSet<AtlasFrame *>());
+//	else
+//		SaveRuntime();
+//}
 
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
 {
@@ -218,10 +176,14 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	
 		if(bPackIsValid)
 		{
-			m_BanksModel.GetBank(uiBankIndex)->m_MetaObj = newPackerSettings;
+			BankData *pBankData = m_BanksModel.GetBank(uiBankIndex);
+			pBankData->m_MetaObj = newPackerSettings;
 	
 			if(pDlg->IsSettingsDirty() && bBankHasAssets)
-				RepackAll(uiBankIndex);
+			{
+				AddAssetsToRepack(pBankData);
+				FlushRepack();
+			}
 			else
 				SaveRuntime();
 	
@@ -325,10 +287,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	if(returnList.empty() == false)
 	{
 		QSet<AssetItemData *> returnListAsSet(returnList.begin(), returnList.end());
-		QSet<AtlasFrame *> newSet;
-		for(auto pItem : returnListAsSet)
-			newSet.insert(static_cast<AtlasFrame *>(pItem));
-		Repack(GetBankIndexFromBankId(uiBankId), QSet<int>(), newSet);
+		AddAssetsToRepack(m_BanksModel.GetBank(GetBankIndexFromBankId(uiBankId)), returnListAsSet);
 	}
 
 	for(auto image : newImageList)
@@ -338,20 +297,17 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 
 /*virtual*/ bool AtlasModel::OnRemoveAssets(QList<AssetItemData *> assetList) /*override*/
 {
-	QMap<uint, QSet<int> > affectedTextureIndexMap;
+	QMap<BankData *, QSet<int> > repackTexIndexMap;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
-		affectedTextureIndexMap[GetBankIndexFromBankId(pFrame->GetBankId())].insert(pFrame->GetTextureIndex());
+		repackTexIndexMap[m_BanksModel.GetBank(GetBankIndexFromBankId(pFrame->GetBankId()))].insert(pFrame->GetTextureIndex());
 
 		DeleteAsset(pFrame);
 	}
 
-	if(affectedTextureIndexMap.empty() == false)
-	{
-		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
-			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
-	}
+	for(auto iter = repackTexIndexMap.begin(); iter != repackTexIndexMap.end(); ++iter)
+		AddTexturesToRepack(iter.key(), iter.value());
 
 	return true;
 }
@@ -379,44 +335,37 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 		newReplacementImageList.push_back(pNewImage);
 	}
 
-	QMap<uint, QSet<int> > affectedTextureIndexMap;
+	QMap<BankData *, QSet<int> > repackTexIndexMap;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
 		HyGuiLog("Replacing: " % pFrame->GetName() % " -> " % sImportAssetList[i], LOGTYPE_Info);
 
-		affectedTextureIndexMap[GetBankIndexFromBankId(pFrame->GetBankId())].insert(pFrame->GetTextureIndex());
+		repackTexIndexMap[m_BanksModel.GetBank(GetBankIndexFromBankId(pFrame->GetBankId()))].insert(pFrame->GetTextureIndex());
 
 		QFileInfo fileInfo(sImportAssetList[i]);
-		ReplaceFrame(pFrame, fileInfo.baseName(), *newReplacementImageList[i], false);
+		ReplaceFrame(pFrame, fileInfo.baseName(), *newReplacementImageList[i]);
 	}
-
 	for(int j = 0; j < newReplacementImageList.size(); ++j)
 		delete newReplacementImageList[j];
 
-	if(affectedTextureIndexMap.empty() == false)
-	{
-		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
-			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
-	}
+	for(auto iter = repackTexIndexMap.begin(); iter != repackTexIndexMap.end(); ++iter)
+		AddTexturesToRepack(iter.key(), iter.value());
 
 	return true;
 }
 
 /*virtual*/ bool AtlasModel::OnUpdateAssets(QList<AssetItemData *> assetList) /*override*/
 {
-	QMap<uint, QSet<int> > affectedTextureIndexMap;
+	QMap<BankData *, QSet<int> > repackTexIndexMap;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
-		affectedTextureIndexMap[GetBankIndexFromBankId(pFrame->GetBankId())].insert(pFrame->GetTextureIndex());
+		repackTexIndexMap[m_BanksModel.GetBank(GetBankIndexFromBankId(pFrame->GetBankId()))].insert(pFrame->GetTextureIndex());
 	}
 
-	if(affectedTextureIndexMap.empty() == false)
-	{
-		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
-			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
-	}
+	for(auto iter = repackTexIndexMap.begin(); iter != repackTexIndexMap.end(); ++iter)
+		AddTexturesToRepack(iter.key(), iter.value());
 
 	return true;
 }
@@ -439,7 +388,7 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	}
 
 	QMap<uint, QSet<int> > affectedTextureIndexMap; // old
-	QSet<AtlasFrame *> framesGoingToNewAtlasGrpSet; // new
+	QSet<AssetItemData *> framesGoingToNewAtlasGrpSet; // new
 
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
@@ -457,13 +406,43 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	if(affectedTextureIndexMap.empty() == false)
 	{
 		for(auto iter = affectedTextureIndexMap.begin(); iter != affectedTextureIndexMap.end(); ++iter)
-			Repack(iter.key(), iter.value(), QSet<AtlasFrame *>());
+			AddTexturesToRepack(m_BanksModel.GetBank(iter.key()), iter.value());
 	}
 
 	// Repack new affected atlas group
-	Repack(GetBankIndexFromBankId(uiNewBankId), QSet<int>(), framesGoingToNewAtlasGrpSet);
+	AddAssetsToRepack(m_BanksModel.GetBank(GetBankIndexFromBankId(uiNewBankId)), framesGoingToNewAtlasGrpSet);
 
 	return true;
+}
+
+/*virtual*/ void AtlasModel::OnFlushRepack() /*override*/
+{
+	// Always repack the unfilled textures to ensure it gets filled as much as it can
+	QSet<int> repackTexIndicesSet;
+
+	for(auto iter = m_RepackAffectedAssetsMap.begin(); iter != m_RepackAffectedAssetsMap.end(); ++iter)
+	{
+		BankData *pBank = iter.key();
+		QJsonArray unfilledTextureIndicesArray = pBank->m_MetaObj["unfilledIndices"].toArray();
+		for(auto unfilledTextureIndex : unfilledTextureIndicesArray)
+			repackTexIndicesSet.insert(unfilledTextureIndex.toInt());
+
+		QSet<AssetItemData *> affectedSet(iter.value());
+		for(auto *pAsset : affectedSet)
+			repackTexIndicesSet.insert(static_cast<AtlasFrame *>(pAsset)->GetTextureIndex());
+
+		AddTexturesToRepack(pBank, repackTexIndicesSet);
+
+		// Delete all affected textures. The following AtlasRepackThread will regenerate all the remaining/modified assets
+		QList<int> textureIndexList = repackTexIndicesSet.values();
+		QDir runtimeBankDir(pBank->m_sAbsPath);
+		for(int i = 0; i < textureIndexList.size(); ++i)
+		{
+			QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
+			QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".dds"));
+			QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".astc"));
+		}
+	}
 }
 
 /*virtual*/ void AtlasModel::OnSaveMeta() /*override*/
@@ -530,6 +509,26 @@ void AtlasModel::Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<At
 	atlasInfoObj.insert("banks", banksArray);
 
 	return atlasInfoObj;
+}
+
+void AtlasModel::AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet)
+{
+	QList<int> repackTexIndicesList = texIndicesSet.values();
+
+	// Make sure all the affected frames within 'repackTexIndicesList' are added to 'AddAssetsToRepack'
+	QList<AssetItemData *> entireAssetList = pBankData->m_AssetList;
+	for(int i = 0; i < entireAssetList.size(); ++i)
+	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(entireAssetList[i]);
+		for(int j = 0; j < repackTexIndicesList.size(); ++j)
+		{
+			if(pFrame->GetTextureIndex() == repackTexIndicesList[j])
+			{
+				AddAssetsToRepack(pBankData, pFrame);
+				break;
+			}
+		}
+	}
 }
 
 AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, HyGuiItemType eType, QUuid uuid)

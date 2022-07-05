@@ -130,7 +130,7 @@ void TextModel::SetRuntimeAtlasDirty()
 	// Apply newly generated font sub-atlas
 	if(m_pAtlasFrame)
 	{
-		if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true) == false)
+		if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage) == false)
 		{
 			HyGuiLog("Cannot ReplaceFrame text sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
 			return false;
@@ -165,6 +165,7 @@ void TextModel::SetRuntimeAtlasDirty()
 	else
 		HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
 
+	m_ItemRef.GetProject().GetAtlasModel().FlushRepack();
 	m_bGenerateRuntimeAtlas = false;
 	return true;
 }

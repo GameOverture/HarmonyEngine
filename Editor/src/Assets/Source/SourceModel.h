@@ -54,6 +54,8 @@ protected:
 	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) override;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) override; // Must call MoveAsset() on each asset
 
+	virtual void OnFlushRepack() override;
+
 	virtual void OnSaveMeta() override;
 	virtual QJsonObject GetSaveJson() override;
 };

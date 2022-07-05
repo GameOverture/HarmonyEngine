@@ -18,26 +18,41 @@ class AtlasRepackThread : public IRepackThread
 {
 	Q_OBJECT
 
-	BankData &						m_BankRef;
-	
-	struct PackerBucket
+	struct RepackBank
 	{
-		ImagePacker					m_Packer;
+		BankData *						m_pBankData;
 
-		QSet<int>					m_TextureIndexSet;
-		QList<AtlasFrame *>			m_FramesList;
+		struct PackerBucket
+		{
+			ImagePacker					m_Packer;
+
+			//QSet<int>					m_TextureIndexSet;
+			QList<AtlasFrame *>			m_FramesList;
+		};
+		QMap<uint32, PackerBucket *>	m_BucketMap;
+
+		RepackBank() :
+			m_pBankData(nullptr)
+		{ }
+
+		~RepackBank() {
+			for(auto iter = m_BucketMap.begin(); iter != m_BucketMap.end(); ++iter)
+				delete iter.value(); // Deletes dynamically allocated PackerBucker *
+		}
 	};
-	QMap<uint32, PackerBucket *>	m_BucketMap;
+	QList<RepackBank>					m_RepackBankList;
 
 public:
-	AtlasRepackThread(BankData &bankRef, QList<AtlasFrame *> affectedFramesList, QDir metaDir);
+	AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &affectedAssetsMapRef, QDir metaDir);
 	virtual ~AtlasRepackThread();
 
 	virtual void OnRun() override;
 
+	//void RepackBank(BankData *pBankData, 
+
 private:
-	void ConstructAtlasTexture(ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex);
-	void SetPackerSettings(ImagePacker &imagePackerRef);
+	void ConstructAtlasTexture(BankData *pBankData, ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex);
+	void SetPackerSettings(BankData *pBankData, ImagePacker &imagePackerRef);
 };
 
 #endif // ATLASREPACKTHREAD_H

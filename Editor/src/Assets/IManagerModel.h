@@ -25,22 +25,23 @@ class IManagerModel : public ITreeModel
 	Q_OBJECT
 
 protected:
-	BanksModel									m_BanksModel;
+	BanksModel										m_BanksModel;
 
-	Project &									m_ProjectRef;
-	const AssetType								m_eASSET_TYPE;
+	Project &										m_ProjectRef;
+	const AssetType									m_eASSET_TYPE;
 
-	bool										m_bIsSingleBank;
+	bool											m_bIsSingleBank;
 
-	QDir										m_MetaDir;
-	QDir										m_DataDir;
+	QDir											m_MetaDir;
+	QDir											m_DataDir;
 
-	quint32										m_uiNextBankId;
+	quint32											m_uiNextBankId;
 
-	QMap<QUuid, AssetItemData *>				m_AssetUuidMap;
-	QMap<quint32, QList<AssetItemData *> >		m_AssetChecksumMap;
+	QMap<QUuid, AssetItemData *>					m_AssetUuidMap;
+	QMap<quint32, QList<AssetItemData *> >			m_AssetChecksumMap;
 
-	QList<ProjectItemData *>					m_RepackAffectedItemList; // Keep track of any linked/referenced items as they will need to be re-saved after asset repacking
+	QMap<BankData *, QSet<AssetItemData *>>			m_RepackAffectedAssetsMap;
+	QList<ProjectItemData *>						m_RepackAffectedItemList; // Keep track of any linked/referenced items as they will need to be re-saved after asset repacking
 
 public:
 	IManagerModel(Project &projRef, AssetType eAssetType);
@@ -68,6 +69,11 @@ public:
 	void ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets);
 	void Rename(TreeModelItemData *pItem, QString sNewName);
 	bool TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId);
+
+	void AddAssetsToRepack(BankData *pBankData);
+	void AddAssetsToRepack(BankData *pBankData, AssetItemData *pAsset);
+	void AddAssetsToRepack(BankData *pBankData, QSet<AssetItemData *> &assetsSet);
+	void FlushRepack();
 
 	QString AssembleFilter(TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const;
 	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
@@ -130,6 +136,8 @@ protected:
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) = 0;
 	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) = 0;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) = 0; // Must call MoveAsset() on each asset
+
+	virtual void OnFlushRepack() = 0;
 
 	virtual void OnSaveMeta() = 0;
 	virtual QJsonObject GetSaveJson() = 0;

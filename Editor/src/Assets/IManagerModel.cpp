@@ -14,6 +14,8 @@
 #include "MainWindow.h"
 #include "ProjectItemData.h"
 #include "AssetMimeData.h"
+#include "AtlasRepackThread.h"
+#include "AudioRepackThread.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -178,13 +180,15 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, H
 	for(int i = 0; i < returnList.size(); ++i)
 		InsertTreeItem(returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
 
+	FlushRepack();
+
 	SaveMeta();
 	return true;
 }
 
 void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList)
 {
-	// First loop through and check to see if any links are present, and abort if dependecies are found
+	// First loop through and check to see if any links are present, and abort if dependencies are found
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
 		QSet<ProjectItemData *> sLinks = assetsList[i]->GetDependencies();
@@ -232,6 +236,7 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 
 	// This must be called after the removal of the TreeModelItems or it'll crash within GetItemsRecursively()
 	OnRemoveAssets(assetsList);
+	FlushRepack();
 
 	SaveMeta();
 }
@@ -303,6 +308,8 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 	}
 	else
 		OnUpdateAssets(assetsList);
+
+	FlushRepack();
 }
 
 void IManagerModel::Rename(TreeModelItemData *pItem, QString sNewName)
@@ -322,7 +329,47 @@ bool IManagerModel::TransferAssets(QList<AssetItemData *> assetsList, uint uiNew
 			++i;
 	}
 
-	return OnMoveAssets(assetsList, uiNewBankId);
+	bool bTransferSucceeded = OnMoveAssets(assetsList, uiNewBankId);
+	FlushRepack();
+
+	return bTransferSucceeded;
+}
+
+void IManagerModel::AddAssetsToRepack(BankData *pBankData)
+{
+	if(m_RepackAffectedAssetsMap.find(pBankData) == m_RepackAffectedAssetsMap.end())
+		m_RepackAffectedAssetsMap.insert(pBankData, pBankData->m_AssetList.toSet());
+}
+
+void IManagerModel::AddAssetsToRepack(BankData *pBankData, AssetItemData *pAsset)
+{
+	if(m_RepackAffectedAssetsMap.find(pBankData) == m_RepackAffectedAssetsMap.end())
+		m_RepackAffectedAssetsMap.insert(pBankData, QSet<AssetItemData *>());
+	
+	m_RepackAffectedAssetsMap[pBankData].insert(pAsset);
+}
+
+void IManagerModel::AddAssetsToRepack(BankData *pBankData, QSet<AssetItemData *> &assetsSet)
+{
+	if(m_RepackAffectedAssetsMap.find(pBankData) == m_RepackAffectedAssetsMap.end())
+		m_RepackAffectedAssetsMap.insert(pBankData, assetsSet);
+	else
+		m_RepackAffectedAssetsMap[pBankData].unite(assetsSet);
+}
+
+void IManagerModel::FlushRepack()
+{
+	OnFlushRepack();
+
+	switch(m_eASSET_TYPE)
+	{
+	case ASSET_Atlas:
+		StartRepackThread("Repacking Atlases", new AtlasRepackThread(m_RepackAffectedAssetsMap /**m_BanksModel.GetBank(uiBankIndex), affectedFramesList*/, m_MetaDir));
+		break;
+	case ASSET_Audio:
+		StartRepackThread("Repacking Audio", new AudioRepackThread(m_RepackAffectedAssetsMap, m_MetaDir));
+		break;
+	}
 }
 
 QString IManagerModel::AssembleFilter(TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const
@@ -997,6 +1044,8 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sName
 
 /*slot*/ void IManagerModel::OnRepackFinished()
 {
+	m_RepackAffectedAssetsMap.clear();
+
 	// Re-save all affected items that had a replaced asset
 	for(int i = 0; i < m_RepackAffectedItemList.size(); ++i)
 	{

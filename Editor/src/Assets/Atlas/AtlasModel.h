@@ -32,10 +32,7 @@ public:
 	bool IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings);
 
 	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType);
-	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bDoAtlasGroupRepack);
-
-	void RepackAll(uint uiBankIndex);
-	void Repack(uint uiBankIndex, QSet<int> repackTexIndicesSet, QSet<AtlasFrame *> newFramesSet);
+	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage);
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
@@ -55,8 +52,12 @@ protected:
 	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) override;
 	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) override; // Must call MoveAsset() on each asset
 
+	virtual void OnFlushRepack() override;
+
 	virtual void OnSaveMeta() override;
 	virtual QJsonObject GetSaveJson() override;
+
+	void AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet);
 
 private:
 	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiBankIndex, HyGuiItemType eType, QUuid uuid);

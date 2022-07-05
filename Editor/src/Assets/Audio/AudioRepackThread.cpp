@@ -12,9 +12,8 @@
 
 #include <vorbis/vorbisenc.h>
 
-AudioRepackThread::AudioRepackThread(QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAssetsList, QDir metaDir) :
-	IRepackThread(metaDir),
-	m_AffectedAssetsList(affectedAssetsList)
+AudioRepackThread::AudioRepackThread(QMap<BankData *, QSet<AssetItemData *>> &affectedAssetsMapRef, QDir metaDir) :
+	IRepackThread(affectedAssetsMapRef, metaDir)
 {
 }
 
@@ -24,10 +23,10 @@ AudioRepackThread::AudioRepackThread(QList<QPair<BankData *, QSet<AudioAsset *>>
 
 /*virtual*/ void AudioRepackThread::OnRun() /*override*/
 {
-	for(auto bankPair : m_AffectedAssetsList)
+	for(auto iter = m_AffectedAssetsMapRef.begin(); iter != m_AffectedAssetsMapRef.end(); ++iter)
 	{
-		BankData *pBank = bankPair.first;
-		QSet<AudioAsset *> affectedSet(bankPair.second);
+		BankData *pBank = iter.key();
+		QSet<AssetItemData *> affectedSet(iter.value());
 
 		// First remove any stale audio files that are missing in 'pBank->m_AssetList'
 		QDir runtimeBankDir(pBank->m_sAbsPath);
@@ -61,17 +60,19 @@ AudioRepackThread::AudioRepackThread(QList<QPair<BankData *, QSet<AudioAsset *>>
 		// Repack all audio in affectedSet
 		for(auto audio : affectedSet)
 		{
-			if(audio->IsCompressed())
-				PackToOgg(audio, runtimeBankDir);
+			AudioAsset *pAudioAsset = static_cast<AudioAsset *>(audio);
+
+			if(pAudioAsset->IsCompressed())
+				PackToOgg(pAudioAsset, runtimeBankDir);
 			else
-				PackToWav(audio, runtimeBankDir);
+				PackToWav(pAudioAsset, runtimeBankDir);
 		}
 	}
 }
 
 bool AudioRepackThread::PackToWav(AudioAsset *pAudio, QDir runtimeBankDir)
 {
-	// TODO: convert wav to target format
+	// TODO: convert WAV to target format
 	return QFile::copy(m_MetaDir.absoluteFilePath(pAudio->ConstructMetaFileName()),
 					   runtimeBankDir.absoluteFilePath(pAudio->ConstructDataFileName(true)));
 }

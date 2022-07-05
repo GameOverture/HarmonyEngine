@@ -11,7 +11,6 @@
 #include "AudioManagerModel.h"
 #include "Project.h"
 #include "MainWindow.h"
-#include "AudioRepackThread.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -87,12 +86,6 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 {
 }
 
-void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList)
-{
-	AudioRepackThread *pWorkerThread = new AudioRepackThread(affectedAudioList, m_MetaDir);
-	StartRepackThread("Repacking Audio", pWorkerThread);
-}
-
 /*virtual*/ void AudioManagerModel::OnInit() /*override*/
 {
 	// Create data manifest file if one doesn't exist
@@ -156,15 +149,11 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 	if(returnList.empty() == false)
 	{
 		QSet<AssetItemData *> returnListAsSet(returnList.begin(), returnList.end());
-		QSet<AudioAsset *> newSet;
+		QSet<AssetItemData *> newSet;
 		for(auto pItem : returnListAsSet)
-			newSet.insert(static_cast<AudioAsset *>(pItem));
+			newSet.insert(pItem);
 
-		QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
-		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(GetBankIndexFromBankId(uiBankId)), newSet);
-		affectedAudioList.append(bankPair);
-
-		Repack(affectedAudioList);
+		AddAssetsToRepack(m_BanksModel.GetBank(GetBankIndexFromBankId(uiBankId)), newSet);
 	}
 
 	return returnList;
@@ -172,25 +161,16 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 
 /*virtual*/ bool AudioManagerModel::OnRemoveAssets(QList<AssetItemData *> assetList) /*override*/
 {
-	// NOTE: there's no error checking on duplicates in 'assetList', will crash
-
-	QList <uint> affectedBankIndexList;
+	QSet<BankData *> affectedBankSet;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
-		affectedBankIndexList.push_back(GetBankIndexFromBankId(assetList[i]->GetBankId()));
+		affectedBankSet.insert(m_BanksModel.GetBank(GetBankIndexFromBankId(assetList[i]->GetBankId())));
 		DeleteAsset(assetList[i]);
 	}
 
-
-	QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
-	for(int i = 0; i < affectedBankIndexList.count(); ++i)
-	{
-		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(affectedBankIndexList[i]), QSet<AudioAsset *>());
-		affectedAudioList.append(bankPair);
-	}
-	
-	Repack(affectedAudioList);
-	
+	for(auto iter = affectedBankSet.begin(); iter != affectedBankSet.end(); ++iter)
+		AddAssetsToRepack(*iter);
+		
 	return true;
 }
 
@@ -206,7 +186,7 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 			return false;
 	}
 
-	QMap<uint, QSet<AudioAsset *>> affectedMap;
+	QMap<uint, QSet<AssetItemData *>> affectedMap;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		AudioAsset *pAudio = static_cast<AudioAsset *>(assetList[i]);
@@ -239,41 +219,19 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 		// Re-enter the audio into the registry
 		RegisterAsset(pAudio);
 
-		QSet<AudioAsset *> &affectedSetRef = affectedMap[GetBankIndexFromBankId(pAudio->GetBankId())];
-		affectedSetRef.insert(pAudio);
+		affectedMap[GetBankIndexFromBankId(pAudio->GetBankId())].insert(pAudio);
 	}
 
-	QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
 	for(auto iter = affectedMap.begin(); iter != affectedMap.end(); ++iter)
-	{
-		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(iter.key()), iter.value());
-		affectedAudioList.append(bankPair);
-	}
-
-	Repack(affectedAudioList);
+		AddAssetsToRepack(m_BanksModel.GetBank(iter.key()), iter.value());
 
 	return true;
 }
 
 /*virtual*/ bool AudioManagerModel::OnUpdateAssets(QList<AssetItemData *> assetList) /*override*/
 {
-	QMap<uint, QSet<AudioAsset *>> affectedMap;
 	for(int i = 0; i < assetList.count(); ++i)
-	{
-		AudioAsset *pAudio = static_cast<AudioAsset *>(assetList[i]);
-
-		QSet<AudioAsset *> &affectedSetRef = affectedMap[GetBankIndexFromBankId(pAudio->GetBankId())];
-		affectedSetRef.insert(pAudio);
-	}
-
-	QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
-	for(auto iter = affectedMap.begin(); iter != affectedMap.end(); ++iter)
-	{
-		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(iter.key()), iter.value());
-		affectedAudioList.append(bankPair);
-	}
-
-	Repack(affectedAudioList);
+		AddAssetsToRepack(m_BanksModel.GetBank(GetBankIndexFromBankId(assetList[i]->GetBankId())), assetList[i]);
 
 	return true;
 }
@@ -281,7 +239,7 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 /*virtual*/ bool AudioManagerModel::OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
 {
 	QList<uint> affectedBankIndexList;			// old
-	QSet<AudioAsset *> assetsGoingToNewBankSet;	// new
+	QSet<AssetItemData *> assetsGoingToNewBankSet;	// new
 
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
@@ -289,23 +247,29 @@ void AudioManagerModel::Repack(QList<QPair<BankData *, QSet<AudioAsset *>>> affe
 			continue;
 
 		affectedBankIndexList.push_back(GetBankIndexFromBankId(assetsList[i]->GetBankId()));
-		assetsGoingToNewBankSet.insert(static_cast<AudioAsset *>(assetsList[i]));
+		assetsGoingToNewBankSet.insert(assetsList[i]);
 
 		MoveAsset(assetsList[i], uiNewBankId);
 	}
 
-	QList<QPair<BankData *, QSet<AudioAsset *>>> affectedAudioList;
+	QList<QPair<BankData *, QSet<AssetItemData *>>> affectedAudioList;
 	for(int i = 0; i < affectedBankIndexList.count(); ++i)
 	{
-		QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(affectedBankIndexList[i]), QSet<AudioAsset *>());
+		QPair<BankData *, QSet<AssetItemData *>> bankPair(m_BanksModel.GetBank(affectedBankIndexList[i]), QSet<AssetItemData *>());
 		affectedAudioList.append(bankPair);
 	}
-	QPair<BankData *, QSet<AudioAsset *>> bankPair(m_BanksModel.GetBank(uiNewBankId), assetsGoingToNewBankSet);
+	QPair<BankData *, QSet<AssetItemData *>> bankPair(m_BanksModel.GetBank(uiNewBankId), assetsGoingToNewBankSet);
 	affectedAudioList.append(bankPair);
 
-	Repack(affectedAudioList);
+	for(auto repack : affectedAudioList)
+		AddAssetsToRepack(repack.first, repack.second);
 
 	return true;
+}
+
+/*virtual*/ void AudioManagerModel::OnFlushRepack() /*override*/
+{
+
 }
 
 /*virtual*/ void AudioManagerModel::OnSaveMeta() /*override*/
