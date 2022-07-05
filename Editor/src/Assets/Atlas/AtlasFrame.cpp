@@ -11,6 +11,7 @@
 #include "AtlasFrame.h"
 #include "IManagerModel.h"
 #include "_Dependencies/scriptum/imagepacker.h"
+#include "SpineModel.h"
 
 AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 					   HyGuiItemType eType,
@@ -108,6 +109,14 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY)
 		ClearError(ASSETERROR_CouldNotPack);
 	else
 		SetError(ASSETERROR_CouldNotPack);
+
+	//// If this is a 'Spine' type, it means it is a Sub-Atlas that was just packed into a larger texture.
+	//// Update the corresponding .atlas file
+	//if(m_eTYPE == ITEM_Spine)
+	//{
+	//	for(auto iter = m_DependencySet.begin(); iter != m_DependencySet.end(); ++iter) // There should only be '1' dependency
+	//		static_cast<SpineModel *>((*iter)->GetModel())->RewriteAtlasFile(this);
+	//}
 }
 
 void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)

@@ -67,6 +67,8 @@ public:
 	bool IsUsingTempFiles() const;
 	const QList<SpineSubAtlas> &GetSubAtlasList() const;
 
+	void RewriteAtlasFile(AtlasFrame *pUpdatedFrame, QSize fullAtlasSize);
+
 protected:
 	void AcquireSpineData();
 };

@@ -60,12 +60,13 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 #ifdef HY_USE_SPINE
 
 	bool bIsUsingTempFiles = false;
-	std::string sDataDir = assetsRef.GetDataDir() + "/" + HYASSETS_SpineDir;
+	std::string sDataDir = assetsRef.GetDataDir() + HYASSETS_SpineDir;
 	if(itemDataObj.HasMember("usingTempFiles"))
 	{
 		bIsUsingTempFiles = true;
 		sDataDir = itemDataObj["usingTempFiles"].GetString();
 	}
+	sDataDir += "/";
 
 	HyJsonArray spineAtlasesArray = itemDataObj["atlases"].GetArray();
 	uint32 uiNumAtlases = spineAtlasesArray.Size();

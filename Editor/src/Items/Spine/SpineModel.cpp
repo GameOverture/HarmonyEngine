@@ -237,28 +237,22 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 			HyGuiLog("SpineModel could not navigate to this Spine's UUID meta directory: " % sUuidName, LOGTYPE_Error);
 			return false;
 		}
-		dataDir.mkdir(sUuidName);
-		if(dataDir.cd(sUuidName) == false)
-		{
-			HyGuiLog("SpineModel could not navigate to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
-			return false;
-		}
 
 		// Skeleton File
 		QFile skelFile(m_SkeletonFileInfo.absoluteFilePath());
-		QString sSkelFileDestination = dataDir.absoluteFilePath(skelFile.fileName());
+		QString sSkelFileDestination = dataDir.absoluteFilePath(m_SkeletonFileInfo.fileName());
 
 		QFile::remove(sSkelFileDestination);
 		if(false == skelFile.copy(sSkelFileDestination))
 		{
-			HyGuiLog("SpineModel could not copy Spine Skeleton to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
+			HyGuiLog("SpineModel could not copy temp Spine Skeleton (" % m_SkeletonFileInfo.absoluteFilePath() % ") to this Spine's UUID data directory: " % sUuidName, LOGTYPE_Error);
 			return false;
 		}
 		m_SkeletonFileInfo.setFile(sSkelFileDestination);
 
 		// Atlas File
 		QFile atlasFile(m_AtlasFileInfo.absoluteFilePath());
-		QString sAtlasFileDestination = dataDir.absoluteFilePath(atlasFile.fileName());
+		QString sAtlasFileDestination = dataDir.absoluteFilePath(m_AtlasFileInfo.fileName());
 
 		QFile::remove(sAtlasFileDestination);
 		if(false == atlasFile.copy(sAtlasFileDestination))
@@ -269,12 +263,10 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 		m_AtlasFileInfo.setFile(sAtlasFileDestination);
 
 		// Image/Textures Files
-		QList<AtlasFrame *> replaceImageList;
-		QStringList sNewImageList; // If sub-atlas's 'AtlasFrame' doesn't exist yet, store the image file path and pass into a ImportNewAssets()
 		for(SpineSubAtlas &subAtlas : m_SubAtlasList)
 		{
 			QFile subAtlasFile(subAtlas.m_ImageFileInfo.absoluteFilePath());
-			QString sSubAtlasFileDestination = metaDir.absoluteFilePath(subAtlasFile.fileName());
+			QString sSubAtlasFileDestination = metaDir.absoluteFilePath(subAtlas.m_ImageFileInfo.fileName());
 
 			QFile::remove(sSubAtlasFileDestination);
 			if(false == subAtlasFile.copy(sSubAtlasFileDestination))
@@ -309,50 +301,18 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 			// Keep track of sub-atlas replacements
 			if(subAtlas.m_pAtlasFrame)
-				replaceImageList.push_back(subAtlas.m_pAtlasFrame);
+			{
+				if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(subAtlas.m_pAtlasFrame, subAtlas.m_pAtlasFrame->GetName(), subAtlasImage) == false)
+				{
+					HyGuiLog("Cannot ReplaceFrame Spine sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
+					return false;
+				}
+			}
 			else
-				sNewImageList;
-
-			//if(m_pAtlasFrame)
-			//	m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetBankId());
-			//else
-			//	return false;
+				subAtlas.m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, subAtlas.m_ImageFileInfo.fileName(), subAtlasImage, uiSubAtlasBankId, ITEM_Spine);
 		}
 
-		//// Pack the Spine sub-atlas into the Atlas Manager (either replacing existing, or generating new)
-		//for(SpineSubAtlas &subAtlas : m_SubAtlasList)
-		//{
-		//	if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(subAtlas.m_pAtlasFrame, subAtlas.m_pAtlasFrame->GetName(), subAtlasImage, ) == false)
-		//	{
-		//		HyGuiLog("Cannot ReplaceFrame text sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
-		//		return false;
-		//	}
-
-		//	QStringList sImportList = dlg.selectedFiles();
-
-		//	QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-		//	TreeModelItemData *pFirstSelected = GetSelected(selectedAssetsList, selectedFiltersList);
-
-		//	TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
-
-		//	QList<TreeModelItemData *> correspondingParentList;
-		//	QList<QUuid> correspondingUuidList;
-		//	for(int i = 0; i < sImportList.size(); ++i)
-		//	{
-		//		correspondingParentList.append(pParent);
-		//		correspondingUuidList.append(QUuid::createUuid());
-		//	}
-
-		//	m_pModel->ImportNewAssets(sImportList,
-		//		m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
-		//		ITEM_Unknown, // Uses default item type of manager
-		//		correspondingParentList,
-		//		correspondingUuidList);
-
-
-		//	subAtlas.m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasBankIndex, ITEM_Text);
-		//}
-
+		m_ItemRef.GetProject().GetAtlasModel().FlushRepack();
 		m_bUsingTempFiles = false;
 	}
 
@@ -434,6 +394,63 @@ bool SpineModel::IsUsingTempFiles() const
 const QList<SpineSubAtlas> &SpineModel::GetSubAtlasList() const
 {
 	return m_SubAtlasList;
+}
+
+// TODO: This isn't finished - Should be invoked instead of doing the sub-atlas offset calculation every frame in HySpine2d::WriteVertexData
+void SpineModel::RewriteAtlasFile(AtlasFrame *pUpdatedFrame, QSize fullAtlasSize)
+{
+	for(uint i = 0; i < m_SubAtlasList.size(); ++i)
+	{
+		if(m_SubAtlasList[i].m_pAtlasFrame == nullptr) // Only change runtime files, not temp
+			continue;
+
+		if(pUpdatedFrame == m_SubAtlasList[i].m_pAtlasFrame)
+		{
+			QFile atlasFile(m_AtlasFileInfo.absoluteFilePath());
+			if(!atlasFile.open(QIODevice::ReadOnly | QIODevice::Text))
+				return;
+
+			QStringList sFileContents;
+
+			// Read contents
+			QTextStream in(&atlasFile);
+			while(!in.atEnd())
+				sFileContents.push_back(in.readLine());
+			atlasFile.close();
+
+			// Write (modified) contents
+			if(!atlasFile.open(QIODevice::WriteOnly | QIODevice::Text))
+				return;
+			QTextStream out(&atlasFile);
+
+			SpineSubAtlas *pCurAtlas = nullptr;
+			for(auto sLine : sFileContents)
+			{
+				// Determine the current atlas
+				for(auto &subAtlasRef : m_SubAtlasList)
+				{
+					if(sLine.compare(subAtlasRef.m_ImageFileInfo.fileName()) == 0)
+					{
+						pCurAtlas = &subAtlasRef;
+						break;
+					}
+				}
+				
+				
+				if(sLine.startsWith("size:"))
+					sLine = "size:" % QString::number(fullAtlasSize.width()) % "," % QString::number(fullAtlasSize.height());
+				else if(sLine.startsWith("bounds:"))
+				{
+					sLine = "bounds:";
+
+				}
+
+
+				out << sLine << "\n";
+			}
+			atlasFile.close();
+		}
+	}
 }
 
 void SpineModel::AcquireSpineData()

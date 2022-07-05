@@ -16,7 +16,7 @@
 struct HySpineAtlas
 {
 	std::string					m_sName;
-	HyFileAtlas *m_pAtlas;
+	HyFileAtlas *				m_pAtlas;
 	HyTextureHandle				m_hGfxApiHandle;
 	const HyRectangle<float>	m_rSRC_RECT;
 
