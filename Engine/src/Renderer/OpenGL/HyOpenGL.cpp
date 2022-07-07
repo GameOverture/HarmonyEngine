@@ -37,6 +37,7 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 	// Create the context with the first window, and share it between any other windows
 	if(m_WindowListRef.empty() == false)
 	{
+		HyLog("Creating SDL Context");
 		m_Context = SDL_GL_CreateContext(m_WindowListRef[0]->GetInterop());
 		if(m_Context)
 			HyLog("SDL_GL_CreateContext passed");

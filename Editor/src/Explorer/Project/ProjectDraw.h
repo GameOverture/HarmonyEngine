@@ -21,7 +21,7 @@ public:
 	CheckerGrid(float fWidth, float fHeight, float fGridSize);
 	virtual ~CheckerGrid();
 
-	virtual void OnLoadedUpdate() override;
+	virtual void OnUpdateUniforms() override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) override;
 };
 
