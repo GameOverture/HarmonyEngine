@@ -396,7 +396,7 @@ const QList<SpineSubAtlas> &SpineModel::GetSubAtlasList() const
 	return m_SubAtlasList;
 }
 
-// TODO: This isn't finished - Should be invoked instead of doing the sub-atlas offset calculation every frame in HySpine2d::WriteVertexData
+// Bake the sub-atlas offset
 void SpineModel::RewriteAtlasFile(AtlasFrame *pUpdatedFrame, QSize fullAtlasSize)
 {
 	for(uint i = 0; i < m_SubAtlasList.size(); ++i)
@@ -423,28 +423,51 @@ void SpineModel::RewriteAtlasFile(AtlasFrame *pUpdatedFrame, QSize fullAtlasSize
 				return;
 			QTextStream out(&atlasFile);
 
-			SpineSubAtlas *pCurAtlas = nullptr;
+			// Determine the sub-atlas associated with 'pUpdatedFrame'
+			SpineSubAtlas *pAssociatedSubAtlas = nullptr;
+			for(auto &subAtlasRef : m_SubAtlasList)
+			{
+				if(subAtlasRef.m_pAtlasFrame == pUpdatedFrame)
+				{
+					pAssociatedSubAtlas = &subAtlasRef;
+					break;
+				}
+			}
+
+			bool bSubAtlasActive = false;
 			for(auto sLine : sFileContents)
 			{
-				// Determine the current atlas
 				for(auto &subAtlasRef : m_SubAtlasList)
 				{
 					if(sLine.compare(subAtlasRef.m_ImageFileInfo.fileName()) == 0)
 					{
-						pCurAtlas = &subAtlasRef;
+						bSubAtlasActive = (pAssociatedSubAtlas == &subAtlasRef);
 						break;
 					}
 				}
-				
-				
-				if(sLine.startsWith("size:"))
-					sLine = "size:" % QString::number(fullAtlasSize.width()) % "," % QString::number(fullAtlasSize.height());
-				else if(sLine.startsWith("bounds:"))
+
+				if(bSubAtlasActive)
 				{
-					sLine = "bounds:";
+					if(sLine.startsWith("size:"))
+						sLine = "size:" % QString::number(fullAtlasSize.width()) % "," % QString::number(fullAtlasSize.height());
+					else if(sLine.startsWith("bounds:"))
+					{
+						QStringList sBoundsSplitList = sLine.split(':');
+						sBoundsSplitList = sBoundsSplitList[1].split(',');
 
+						sLine = "bounds:";
+						int iX = sBoundsSplitList[0].toInt() + pAssociatedSubAtlas->m_pAtlasFrame->GetX();
+						int iY = sBoundsSplitList[1].toInt() + pAssociatedSubAtlas->m_pAtlasFrame->GetY();
+
+						sLine += QString::number(iX);
+						sLine += ",";
+						sLine += QString::number(iY);
+						sLine += ",";
+						sLine += sBoundsSplitList[2];
+						sLine += ",";
+						sLine += sBoundsSplitList[3];
+					}
 				}
-
 
 				out << sLine << "\n";
 			}

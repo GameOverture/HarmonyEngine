@@ -46,6 +46,20 @@ const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
 	return *this;
 }
 
+/*virtual*/ bool HySpine2d::SetState(uint32 uiStateIndex) /*override*/
+{
+	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)
+		return false;
+
+#ifdef HY_USE_SPINE
+	const HySpineData *pData = static_cast<const HySpineData *>(this->AcquireData());
+	if(m_pAnimationState && pData && uiStateIndex < pData->GetSkeletonData()->getAnimations().size())
+		m_pAnimationState->addAnimation(0, pData->GetSkeletonData()->getAnimations()[uiStateIndex], true, 0.0f);
+#endif
+
+	return true;
+}
+
 uint32 HySpine2d::GetNumSlots()
 {
 #ifdef HY_USE_SPINE
@@ -142,9 +156,6 @@ uint32 HySpine2d::GetNumSlots()
 			spine::AtlasRegion *pSpineAtlasRegion = static_cast<spine::AtlasRegion *>(pRegionAttachment->getRendererObject());
 			HySpineAtlas *pSpineSubAtlas = reinterpret_cast<HySpineAtlas *>(pSpineAtlasRegion->page->getRendererObject());
 
-			// TODO: Offset sub-atlas UV's
-			//pSpineSubAtlas->m_rSRC_RECT
-
 			// Check if this texture handle ends this render stage
 			HyTextureHandle hTex = pSpineSubAtlas->GetTexHandle();
 			if(hCurTexture == HY_UNUSED_HANDLE)
@@ -230,22 +241,21 @@ uint32 HySpine2d::GetNumSlots()
 			vertexBufferRef.AppendData2d(&vColor, sizeof(glm::vec4));
 			
 			// UV's
-			glm::vec2 vUV;
-			vUV.x = pRegionAttachment->getUVs()[Vert0Index];//1.0f;
-			vUV.y = pRegionAttachment->getUVs()[Vert0Index + 1];//1.0f;
-			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+			//vUV.x = frameRef.rSRC_RECT.right;//1.0f;
+			//vUV.y = frameRef.rSRC_RECT.top;//1.0f;
+			vertexBufferRef.AppendData2d(&pRegionAttachment->getUVs()[Vert0Index], sizeof(glm::vec2));
 
-			vUV.x = pRegionAttachment->getUVs()[Vert1Index];//0.0f;
-			vUV.y = pRegionAttachment->getUVs()[Vert1Index + 1];//1.0f;
-			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+			//vUV.x = frameRef.rSRC_RECT.left;//0.0f;
+			//vUV.y = frameRef.rSRC_RECT.top;//1.0f;
+			vertexBufferRef.AppendData2d(&pRegionAttachment->getUVs()[Vert1Index], sizeof(glm::vec2));
 
-			vUV.x = pRegionAttachment->getUVs()[Vert2Index];//1.0f;
-			vUV.y = pRegionAttachment->getUVs()[Vert2Index + 1];//0.0f;
-			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+			//vUV.x = frameRef.rSRC_RECT.right;//1.0f;
+			//vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
+			vertexBufferRef.AppendData2d(&pRegionAttachment->getUVs()[Vert2Index], sizeof(glm::vec2));
 
-			vUV.x = pRegionAttachment->getUVs()[Vert3Index];//0.0f;
-			vUV.y = pRegionAttachment->getUVs()[Vert3Index + 1];//0.0f;
-			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+			//vUV.x = frameRef.rSRC_RECT.left;//0.0f;
+			//vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
+			vertexBufferRef.AppendData2d(&pRegionAttachment->getUVs()[Vert3Index], sizeof(glm::vec2));
 
 			// TRANSFORM MTX
 			vertexBufferRef.AppendData2d(&GetSceneTransform(), sizeof(glm::mat4));
@@ -284,8 +294,10 @@ uint32 HySpine2d::GetNumSlots()
 	else
 		m_uiStartingSlotIndex = uiSlotIndex;
 
-#endif
 	return false;
+#else
+	return true;
+#endif
 }
 
 /*virtual*/ void HySpine2d::OnCalcBoundingVolume() /*override*/

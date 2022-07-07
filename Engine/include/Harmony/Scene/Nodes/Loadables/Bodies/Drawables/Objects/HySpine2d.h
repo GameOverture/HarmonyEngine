@@ -32,9 +32,13 @@ public:
 
 	const HySpine2d &operator=(const HySpine2d &rhs);
 
+	virtual bool SetState(uint32 uiStateIndex) override;
+
 	uint32 GetNumSlots();
 
 	virtual bool IsLoadDataValid() override;
+
+
 
 protected:
 	virtual bool OnIsValidToRender() override;

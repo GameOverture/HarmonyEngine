@@ -67,6 +67,7 @@ public:
 	bool IsUsingTempFiles() const;
 	const QList<SpineSubAtlas> &GetSubAtlasList() const;
 
+	// Bake the sub-atlas offset
 	void RewriteAtlasFile(AtlasFrame *pUpdatedFrame, QSize fullAtlasSize);
 
 protected:

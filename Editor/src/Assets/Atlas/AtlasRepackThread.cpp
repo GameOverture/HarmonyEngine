@@ -78,11 +78,9 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &af
 			}
 
 			SetPackerSettings(pBankData, iter.value()->m_Packer);
+			QSize fullAtlasSize(pBankData->m_MetaObj["maxWidth"].toInt(), pBankData->m_MetaObj["maxHeight"].toInt());
 
-			iter.value()->m_Packer.pack(pBankData->m_MetaObj["cmbHeuristic"].toInt(),
-				pBankData->m_MetaObj["maxWidth"].toInt(),
-				pBankData->m_MetaObj["maxHeight"].toInt());
-
+			iter.value()->m_Packer.pack(pBankData->m_MetaObj["cmbHeuristic"].toInt(), fullAtlasSize.width(), fullAtlasSize.height());
 
 			int iNumNewTextures = iter.value()->m_Packer.bins.size();
 
@@ -145,7 +143,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &af
 								{
 									AtlasFrame *pFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[j]);
 									if(pFrame->GetTextureIndex() == iExistingTextureIndex)
-										pFrame->UpdateInfoFromPacker(iCurrentIndex, pFrame->GetX(), pFrame->GetY());
+										pFrame->UpdateInfoFromPacker(iCurrentIndex, pFrame->GetX(), pFrame->GetY(), fullAtlasSize);
 								}
 
 								// Rename the texture file to be the new index
@@ -171,7 +169,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &af
 					AtlasFrame *pFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.id);
 					AtlasFrame *pDupFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.duplicateId);
 
-					pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(), pDupFrame->GetX(), pDupFrame->GetY());
+					pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(), pDupFrame->GetX(), pDupFrame->GetY(), fullAtlasSize);
 				}
 			}
 		}
@@ -191,8 +189,9 @@ void AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, ImagePacker &
 	{
 		HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimensions", LOGTYPE_Error);
 	}
+	QSize fullAtlasSize(pBankData->m_MetaObj["maxWidth"].toInt(), pBankData->m_MetaObj["maxHeight"].toInt());
 
-	QImage newTexture(pBankData->m_MetaObj["maxWidth"].toInt(), pBankData->m_MetaObj["maxHeight"].toInt(), QImage::Format_ARGB32);
+	QImage newTexture(fullAtlasSize.width(), fullAtlasSize.height(), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
 
 	QPainter p(&newTexture);
@@ -206,7 +205,7 @@ void AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, ImagePacker &
 
 		if(imgInfoRef.pos.x() == 999999) // This is scriptum image packer's magic number to indicate an invalid image...
 		{
-			pFrame->UpdateInfoFromPacker(-1, -1, -1);
+			pFrame->UpdateInfoFromPacker(-1, -1, -1, fullAtlasSize);
 			bValidToDraw = false;
 		}
 		else
@@ -223,7 +222,8 @@ void AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, ImagePacker &
 
 		pFrame->UpdateInfoFromPacker(iActualTextureIndex,
 									 imgInfoRef.pos.x() + imagePackerRef.border.l,
-									 imgInfoRef.pos.y() + imagePackerRef.border.t);
+									 imgInfoRef.pos.y() + imagePackerRef.border.t,
+									 fullAtlasSize);
 
 		QImage imgFrame(imgInfoRef.path);
 

@@ -63,7 +63,7 @@ public:
 	int GetX() const;
 	int GetY() const;
 
-	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY);
+	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize fullAtlasSize);
 	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
 
 	virtual QString GetPropertyInfo() override;
