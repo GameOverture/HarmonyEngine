@@ -124,7 +124,7 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	return m_pVertBuffer != nullptr && shape.IsValidShape();
 }
 
-/*virtual*/ void HyPrimitive2d::OnLoadedUpdate() /*override*/
+/*virtual*/ void HyPrimitive2d::OnUpdateUniforms() /*override*/
 {
 	if(m_bUpdateShaderUniforms)
 	{

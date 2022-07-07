@@ -87,6 +87,8 @@ void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCa
 		HyError("IHyRenderer::AppendDrawable3d - Unknown instance type");
 		return;
 	}
+
+	instanceRef.OnUpdateUniforms();
 	
 	const HyPrefabData *pData = static_cast<const HyPrefabData *>(instanceRef.AcquireData());
 	pData->GetGltf()->AppendRenderStates(m_RenderBuffer);
@@ -94,6 +96,7 @@ void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCa
 
 void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask)
 {
+	instanceRef.OnUpdateUniforms();
 	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, m_VertexBuffer);
 }
 
