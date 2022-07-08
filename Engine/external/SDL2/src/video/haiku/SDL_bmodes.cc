@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -228,7 +228,7 @@ static void _AddDisplay(BScreen *screen) {
     display.desktop_mode = *mode;
     display.current_mode = *mode;
     
-    SDL_AddVideoDisplay(&display, SDL_FALSE);
+    SDL_AddVideoDisplay(&display);
 }
 
 /*
@@ -281,7 +281,7 @@ void HAIKU_GetDisplayModes(_THIS, SDL_VideoDisplay *display) {
             SDL_AddDisplayMode(display, &mode);
         }
     }
-    free(bmodes); /* This should not be SDL_free() */
+    free(bmodes);
 }
 
 
@@ -313,7 +313,7 @@ int HAIKU_SetDisplayMode(_THIS, SDL_VideoDisplay *display, SDL_DisplayMode *mode
         return SDL_SetError("Bad video mode");
     }
     
-    free(bmode_list); /* This should not be SDL_free() */
+    free(bmode_list);
     
 #if SDL_VIDEO_OPENGL
     /* FIXME: Is there some way to reboot the OpenGL context?  This doesn't

@@ -1,3 +1,7 @@
+https://github.com/SpartanJ/SOIL2/releases/tag/release-1.20
+
+HARMONY CHANGES:
+
 /** Gets the (possibly compressed) DDS texture memory that can be directly to the 
 	GPU memory (removes check for support 'cuz we're invoking on a different thread than OpenGL)
 

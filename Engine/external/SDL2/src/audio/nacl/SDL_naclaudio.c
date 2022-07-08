@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -99,7 +99,7 @@ static void NACLAUDIO_CloseDevice(SDL_AudioDevice *device) {
 }
 
 static int
-NACLAUDIO_OpenDevice(_THIS, const char *devname) {
+NACLAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture) {
     PP_Instance instance = PSGetInstanceId();
     const PPB_Audio *ppb_audio = PSInterfaceAudio();
     const PPB_AudioConfig *ppb_audiocfg = PSInterfaceAudioConfig();
@@ -133,18 +133,18 @@ NACLAUDIO_OpenDevice(_THIS, const char *devname) {
     return 0;
 }
 
-static SDL_bool
+static int
 NACLAUDIO_Init(SDL_AudioDriverImpl * impl)
 {
     if (PSGetInstanceId() == 0) {
-        return SDL_FALSE;
+        return 0;
     }
     
     /* Set the function pointers */
     impl->OpenDevice = NACLAUDIO_OpenDevice;
     impl->CloseDevice = NACLAUDIO_CloseDevice;
-    impl->OnlyHasDefaultOutputDevice = SDL_TRUE;
-    impl->ProvidesOwnCallbackThread = SDL_TRUE;
+    impl->OnlyHasDefaultOutputDevice = 1;
+    impl->ProvidesOwnCallbackThread = 1;
     /*
      *    impl->WaitDevice = NACLAUDIO_WaitDevice;
      *    impl->GetDeviceBuf = NACLAUDIO_GetDeviceBuf;
@@ -152,12 +152,12 @@ NACLAUDIO_Init(SDL_AudioDriverImpl * impl)
      *    impl->Deinitialize = NACLAUDIO_Deinitialize;
      */
     
-    return SDL_TRUE;
+    return 1;
 }
 
 AudioBootStrap NACLAUDIO_bootstrap = {
     NACLAUDIO_DRIVER_NAME, "SDL NaCl Audio Driver",
-    NACLAUDIO_Init, SDL_FALSE
+    NACLAUDIO_Init, 0
 };
 
 #endif /* SDL_AUDIO_DRIVER_NACL */

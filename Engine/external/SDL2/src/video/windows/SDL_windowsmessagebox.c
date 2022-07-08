@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,13 +24,15 @@
 
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
-#endif
+#else
 #ifndef SIZE_MAX
 #define SIZE_MAX ((size_t)-1)
+#endif
 #endif
 
 #include "../../core/windows/SDL_windows.h"
 
+#include "SDL_assert.h"
 #include "SDL_windowsvideo.h"
 #include "SDL_windowstaskdialog.h"
 
@@ -117,7 +119,7 @@ static SDL_bool GetButtonIndex(const SDL_MessageBoxData *messageboxdata, Uint32 
     return SDL_FALSE;
 }
 
-static INT_PTR CALLBACK MessageBoxDialogProc(HWND hDlg, UINT iMessage, WPARAM wParam, LPARAM lParam)
+static INT_PTR MessageBoxDialogProc(HWND hDlg, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
     const SDL_MessageBoxData *messageboxdata;
     size_t buttonindex;
@@ -260,7 +262,7 @@ static SDL_bool AddDialogString(WIN_DialogData *dialog, const char *string)
         string = "";
     }
 
-    wstring = WIN_UTF8ToStringW(string);
+    wstring = WIN_UTF8ToString(string);
     if (!wstring) {
         return SDL_FALSE;
     }
@@ -585,6 +587,7 @@ WIN_ShowOldMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
 
     /* Jan 25th, 2013 - dant@fleetsa.com
      *
+     *
      * I've tried to make this more reasonable, but I've run in to a lot
      * of nonsense.
      *
@@ -608,6 +611,8 @@ WIN_ShowOldMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
      * somewhat correct.
      *
      * Honestly, a long term solution is to use CreateWindow, not CreateDialog.
+     *
+
      *
      * In order to get text dimensions we need to have a DC with the desired font.
      * I'm assuming a dialog box in SDL is rare enough we can to the create.
@@ -645,9 +650,9 @@ WIN_ShowOldMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
     }
 
     /* Measure the *pixel* size of the string. */
-    wmessage = WIN_UTF8ToStringW(messageboxdata->message);
+    wmessage = WIN_UTF8ToString(messageboxdata->message);
     SDL_zero(TextSize);
-    DrawTextW(FontDC, wmessage, -1, &TextSize, DT_CALCRECT | DT_LEFT | DT_NOPREFIX | DT_EDITCONTROL);
+    DrawText(FontDC, wmessage, -1, &TextSize, DT_CALCRECT | DT_LEFT | DT_NOPREFIX | DT_EDITCONTROL);
 
     /* Add margins and some padding for hangs, etc. */
     TextSize.left += TextMargin;
@@ -742,7 +747,7 @@ WIN_ShowOldMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
         ParentWindow = ((SDL_WindowData*)messageboxdata->window->driverdata)->hwnd;
     }
 
-    result = DialogBoxIndirectParam(NULL, (DLGTEMPLATE*)dialog->lpDialog, ParentWindow, MessageBoxDialogProc, (LPARAM)messageboxdata);
+    result = DialogBoxIndirectParam(NULL, (DLGTEMPLATE*)dialog->lpDialog, ParentWindow, (DLGPROC)MessageBoxDialogProc, (LPARAM)messageboxdata);
     if (result >= IDBUTTONINDEX0 && result - IDBUTTONINDEX0 < messageboxdata->numbuttons) {
         *buttonid = messageboxdata->buttons[result - IDBUTTONINDEX0].buttonid;
         retval = 0;
@@ -798,7 +803,7 @@ WIN_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
     }
 
     /* If we cannot load comctl32.dll use the old messagebox! */
-    hComctl32 = LoadLibrary(TEXT("comctl32.dll"));
+    hComctl32 = LoadLibrary(TEXT("Comctl32.dll"));
     if (hComctl32 == NULL) {
         return WIN_ShowOldMessageBox(messageboxdata, buttonid);
     }
@@ -822,8 +827,8 @@ WIN_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
         ParentWindow = ((SDL_WindowData *) messageboxdata->window->driverdata)->hwnd;
     }
 
-    wmessage = WIN_UTF8ToStringW(messageboxdata->message);
-    wtitle = WIN_UTF8ToStringW(messageboxdata->title);
+    wmessage = WIN_UTF8ToString(messageboxdata->message);
+    wtitle = WIN_UTF8ToString(messageboxdata->title);
 
     SDL_zero(TaskConfig);
     TaskConfig.cbSize = sizeof (TASKDIALOGCONFIG);
@@ -872,7 +877,7 @@ WIN_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
             SDL_free(pButtons);
             return -1;
         }
-        pButton->pszButtonText = WIN_UTF8ToStringW(buttontext);
+        pButton->pszButtonText = WIN_UTF8ToString(buttontext);
         if (messageboxdata->buttons[i].flags & SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT) {
             TaskConfig.nDefaultButton = pButton->nButtonID;
         }

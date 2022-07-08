@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -38,12 +38,11 @@ int done;
 static void
 quit(int rc)
 {
-    SDL_Quit();
     exit(rc);
 }
 
 int
-LoadSprite(const char *file)
+LoadSprite(char *file, SDL_Renderer *renderer)
 {
     SDL_Surface *temp;
 
@@ -92,7 +91,7 @@ LoadSprite(const char *file)
 }
 
 void
-MoveSprites()
+MoveSprites(SDL_Renderer * renderer, SDL_Texture * sprite)
 {
     int i;
     int window_w = WINDOW_WIDTH;
@@ -136,7 +135,7 @@ void loop()
             done = 1;
         }
     }
-    MoveSprites();
+    MoveSprites(renderer, sprite);
 #ifdef __EMSCRIPTEN__
     if (done) {
         emscripten_cancel_main_loop();
@@ -158,7 +157,7 @@ main(int argc, char *argv[])
         quit(2);
     }
 
-    if (LoadSprite("icon.bmp") < 0) {
+    if (LoadSprite("icon.bmp", renderer) < 0) {
         quit(2);
     }
 

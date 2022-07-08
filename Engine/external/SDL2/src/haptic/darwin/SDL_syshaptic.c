@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,12 +22,13 @@
 
 #ifdef SDL_HAPTIC_IOKIT
 
+#include "SDL_assert.h"
 #include "SDL_stdinc.h"
 #include "SDL_haptic.h"
 #include "../SDL_syshaptic.h"
 #include "SDL_joystick.h"
 #include "../../joystick/SDL_sysjoystick.h"     /* For the real SDL_Joystick */
-#include "../../joystick/darwin/SDL_iokitjoystick_c.h"    /* For joystick hwdata */
+#include "../../joystick/darwin/SDL_sysjoystick_c.h"    /* For joystick hwdata */
 #include "SDL_syshaptic_c.h"
 
 #include <IOKit/IOKitLib.h>
@@ -598,14 +599,12 @@ SDL_SYS_HapticMouse(void)
 int
 SDL_SYS_JoystickIsHaptic(SDL_Joystick * joystick)
 {
-#ifdef SDL_JOYSTICK_IOKIT
     if (joystick->driver != &SDL_DARWIN_JoystickDriver) {
         return SDL_FALSE;
     }
     if (joystick->hwdata->ffservice != 0) {
         return SDL_TRUE;
     }
-#endif
     return SDL_FALSE;
 }
 
@@ -616,7 +615,6 @@ SDL_SYS_JoystickIsHaptic(SDL_Joystick * joystick)
 int
 SDL_SYS_JoystickSameHaptic(SDL_Haptic * haptic, SDL_Joystick * joystick)
 {
-#ifdef SDL_JOYSTICK_IOKIT
     if (joystick->driver != &SDL_DARWIN_JoystickDriver) {
         return 0;
     }
@@ -624,7 +622,6 @@ SDL_SYS_JoystickSameHaptic(SDL_Haptic * haptic, SDL_Joystick * joystick)
                           joystick->hwdata->ffservice)) {
         return 1;
     }
-#endif
     return 0;
 }
 
@@ -635,7 +632,6 @@ SDL_SYS_JoystickSameHaptic(SDL_Haptic * haptic, SDL_Joystick * joystick)
 int
 SDL_SYS_HapticOpenFromJoystick(SDL_Haptic * haptic, SDL_Joystick * joystick)
 {
-#ifdef SDL_JOYSTICK_IOKIT
     int device_index = 0;
     SDL_hapticlist_item *item;
     
@@ -652,9 +648,6 @@ SDL_SYS_HapticOpenFromJoystick(SDL_Haptic * haptic, SDL_Joystick * joystick)
     }
 
     return SDL_SYS_HapticOpenFromService(haptic, joystick->hwdata->ffservice);
-#else
-    return -1;
-#endif
 }
 
 
@@ -772,10 +765,6 @@ SDL_SYS_SetDirection(FFEFFECT * effect, SDL_HapticDirection * dir, int naxes)
             rglDir[2] = dir->dir[2];
         }
         return 0;
-    case SDL_HAPTIC_STEERING_AXIS:
-        effect->dwFlags |= FFEFF_CARTESIAN;
-        rglDir[0] = 0;
-        return 0;
 
     default:
         return SDL_SetError("Haptic: Unknown direction type.");
@@ -824,11 +813,7 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest, SDL_HapticEffect * src)
     envelope->dwSize = sizeof(FFENVELOPE);      /* Always should be this. */
 
     /* Axes. */
-    if (src->constant.direction.type == SDL_HAPTIC_STEERING_AXIS) {
-        dest->cAxes = 1;
-    } else {
-        dest->cAxes = haptic->naxes;
-    }
+    dest->cAxes = haptic->naxes;
     if (dest->cAxes > 0) {
         axes = SDL_malloc(sizeof(DWORD) * dest->cAxes);
         if (axes == NULL) {

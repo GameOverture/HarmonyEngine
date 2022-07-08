@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,7 +23,8 @@
 #if SDL_VIDEO_DRIVER_WINDOWS
 
 #include "SDL_windowsvideo.h"
-#include "../../events/SDL_displayevents_c.h"
+#include "../../../include/SDL_assert.h"
+#include "../../../include/SDL_log.h"
 
 /* Windows CE compatibility */
 #ifndef CDS_FULLSCREEN
@@ -33,7 +34,7 @@
 /* #define DEBUG_MODES */
 
 static void
-WIN_UpdateDisplayMode(_THIS, LPCWSTR deviceName, DWORD index, SDL_DisplayMode * mode)
+WIN_UpdateDisplayMode(_THIS, LPCTSTR deviceName, DWORD index, SDL_DisplayMode * mode)
 {
     SDL_DisplayModeData *data = (SDL_DisplayModeData *) mode->driverdata;
     HDC hdc;
@@ -109,57 +110,15 @@ WIN_UpdateDisplayMode(_THIS, LPCWSTR deviceName, DWORD index, SDL_DisplayMode * 
     }
 }
 
-static SDL_DisplayOrientation
-WIN_GetDisplayOrientation(DEVMODE *mode)
-{
-    int width = mode->dmPelsWidth;
-    int height = mode->dmPelsHeight;
-
-    /* Use unrotated width/height to guess orientation */
-    if (mode->dmDisplayOrientation == DMDO_90 || mode->dmDisplayOrientation == DMDO_270) {
-        int temp = width;
-        width = height;
-        height = temp;
-    }
-
-    if (width >= height) {
-        switch (mode->dmDisplayOrientation) {
-        case DMDO_DEFAULT:
-            return SDL_ORIENTATION_LANDSCAPE;
-        case DMDO_90:
-            return SDL_ORIENTATION_PORTRAIT;
-        case DMDO_180:
-            return SDL_ORIENTATION_LANDSCAPE_FLIPPED;
-        case DMDO_270:
-            return SDL_ORIENTATION_PORTRAIT_FLIPPED;
-        default:
-            return SDL_ORIENTATION_UNKNOWN;
-        }
-    } else {
-        switch (mode->dmDisplayOrientation) {
-        case DMDO_DEFAULT:
-            return SDL_ORIENTATION_PORTRAIT;
-        case DMDO_90:
-            return SDL_ORIENTATION_LANDSCAPE_FLIPPED;
-        case DMDO_180:
-            return SDL_ORIENTATION_PORTRAIT_FLIPPED;
-        case DMDO_270:
-            return SDL_ORIENTATION_LANDSCAPE;
-        default:
-            return SDL_ORIENTATION_UNKNOWN;
-        }
-    }
-}
-
 static SDL_bool
-WIN_GetDisplayMode(_THIS, LPCWSTR deviceName, DWORD index, SDL_DisplayMode * mode, SDL_DisplayOrientation *orientation)
+WIN_GetDisplayMode(_THIS, LPCTSTR deviceName, DWORD index, SDL_DisplayMode * mode)
 {
     SDL_DisplayModeData *data;
     DEVMODE devmode;
 
     devmode.dmSize = sizeof(devmode);
     devmode.dmDriverExtra = 0;
-    if (!EnumDisplaySettingsW(deviceName, index, &devmode)) {
+    if (!EnumDisplaySettings(deviceName, index, &devmode)) {
         return SDL_FALSE;
     }
 
@@ -178,49 +137,23 @@ WIN_GetDisplayMode(_THIS, LPCWSTR deviceName, DWORD index, SDL_DisplayMode * mod
 
     /* Fill in the mode information */
     WIN_UpdateDisplayMode(_this, deviceName, index, mode);
-
-    if (orientation) {
-        *orientation = WIN_GetDisplayOrientation(&devmode);
-    }
-
     return SDL_TRUE;
 }
 
 static SDL_bool
-WIN_AddDisplay(_THIS, HMONITOR hMonitor, const MONITORINFOEXW *info, SDL_bool send_event)
+WIN_AddDisplay(_THIS, HMONITOR hMonitor, const MONITORINFOEX *info)
 {
-    int i;
     SDL_VideoDisplay display;
     SDL_DisplayData *displaydata;
     SDL_DisplayMode mode;
-    SDL_DisplayOrientation orientation;
-    DISPLAY_DEVICEW device;
+    DISPLAY_DEVICE device;
 
 #ifdef DEBUG_MODES
-    SDL_Log("Display: %s\n", WIN_StringToUTF8W(info->szDevice));
+    SDL_Log("Display: %s\n", WIN_StringToUTF8(info->szDevice));
 #endif
 
-    if (!WIN_GetDisplayMode(_this, info->szDevice, ENUM_CURRENT_SETTINGS, &mode, &orientation)) {
+    if (!WIN_GetDisplayMode(_this, info->szDevice, ENUM_CURRENT_SETTINGS, &mode)) {
         return SDL_FALSE;
-    }
-
-    // Prevent adding duplicate displays. Do this after we know the display is
-    // ready to be added to allow any displays that we can't fully query to be
-    // removed
-    for(i = 0; i < _this->num_displays; ++i) {
-        SDL_DisplayData *driverdata = (SDL_DisplayData *)_this->displays[i].driverdata;
-        if (SDL_wcscmp(driverdata->DeviceName, info->szDevice) == 0) {
-            driverdata->MonitorHandle = hMonitor;
-            driverdata->IsValid = SDL_TRUE;
-
-            if (!_this->setting_display_mode) {
-                SDL_ResetDisplayModes(i);
-                SDL_SetCurrentDisplayMode(&_this->displays[i], &mode);
-                SDL_SetDesktopDisplayMode(&_this->displays[i], &mode);
-                SDL_SendDisplayEvent(&_this->displays[i], SDL_DISPLAYEVENT_ORIENTATION, orientation);
-            }
-            return SDL_FALSE;
-        }
     }
 
     displaydata = (SDL_DisplayData *) SDL_malloc(sizeof(*displaydata));
@@ -230,25 +163,22 @@ WIN_AddDisplay(_THIS, HMONITOR hMonitor, const MONITORINFOEXW *info, SDL_bool se
     SDL_memcpy(displaydata->DeviceName, info->szDevice,
                sizeof(displaydata->DeviceName));
     displaydata->MonitorHandle = hMonitor;
-    displaydata->IsValid = SDL_TRUE;
 
     SDL_zero(display);
     device.cb = sizeof(device);
-    if (EnumDisplayDevicesW(info->szDevice, 0, &device, 0)) {
-        display.name = WIN_StringToUTF8W(device.DeviceString);
+    if (EnumDisplayDevices(info->szDevice, 0, &device, 0)) {
+        display.name = WIN_StringToUTF8(device.DeviceString);
     }
     display.desktop_mode = mode;
     display.current_mode = mode;
-    display.orientation = orientation;
     display.driverdata = displaydata;
-    SDL_AddVideoDisplay(&display, send_event);
+    SDL_AddVideoDisplay(&display);
     SDL_free(display.name);
     return SDL_TRUE;
 }
 
 typedef struct _WIN_AddDisplaysData {
     SDL_VideoDevice *video_device;
-    SDL_bool send_event;
     SDL_bool want_primary;
 } WIN_AddDisplaysData;
 
@@ -259,16 +189,16 @@ WIN_AddDisplaysCallback(HMONITOR hMonitor,
                         LPARAM   dwData)
 {
     WIN_AddDisplaysData *data = (WIN_AddDisplaysData*)dwData;
-    MONITORINFOEXW info;
+    MONITORINFOEX info;
 
     SDL_zero(info);
     info.cbSize = sizeof(info);
 
-    if (GetMonitorInfoW(hMonitor, (LPMONITORINFO)&info) != 0) {
+    if (GetMonitorInfo(hMonitor, (LPMONITORINFO)&info) != 0) {
         const SDL_bool is_primary = ((info.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY);
 
         if (is_primary == data->want_primary) {
-            WIN_AddDisplay(data->video_device, hMonitor, &info, data->send_event);
+            WIN_AddDisplay(data->video_device, hMonitor, &info);
         }
     }
 
@@ -277,11 +207,10 @@ WIN_AddDisplaysCallback(HMONITOR hMonitor,
 }
 
 static void
-WIN_AddDisplays(_THIS, SDL_bool send_event)
+WIN_AddDisplays(_THIS)
 {
     WIN_AddDisplaysData callback_data;
     callback_data.video_device = _this;
-    callback_data.send_event = send_event;
 
     callback_data.want_primary = SDL_TRUE;
     EnumDisplayMonitors(NULL, NULL, WIN_AddDisplaysCallback, (LPARAM)&callback_data);
@@ -293,7 +222,7 @@ WIN_AddDisplays(_THIS, SDL_bool send_event)
 int
 WIN_InitModes(_THIS)
 {
-    WIN_AddDisplays(_this, SDL_FALSE);
+    WIN_AddDisplays(_this);
 
     if (_this->num_displays == 0) {
         return SDL_SetError("No displays available");
@@ -413,8 +342,8 @@ WIN_GetDisplayModes(_THIS, SDL_VideoDisplay * display)
     DWORD i;
     SDL_DisplayMode mode;
 
-    for (i = 0; ; ++i) {
-        if (!WIN_GetDisplayMode(_this, data->DeviceName, i, &mode, NULL)) {
+    for (i = 0;; ++i) {
+        if (!WIN_GetDisplayMode(_this, data->DeviceName, i, &mode)) {
             break;
         }
         if (SDL_ISPIXELFORMAT_INDEXED(mode.format)) {
@@ -440,9 +369,9 @@ WIN_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
     LONG status;
 
     if (mode->driverdata == display->desktop_mode.driverdata) {
-        status = ChangeDisplaySettingsExW(displaydata->DeviceName, NULL, NULL, CDS_FULLSCREEN, NULL);
+        status = ChangeDisplaySettingsEx(displaydata->DeviceName, NULL, NULL, CDS_FULLSCREEN, NULL);
     } else {
-        status = ChangeDisplaySettingsExW(displaydata->DeviceName, &data->DeviceMode, NULL, CDS_FULLSCREEN, NULL);
+        status = ChangeDisplaySettingsEx(displaydata->DeviceName, &data->DeviceMode, NULL, CDS_FULLSCREEN, NULL);
     }
     if (status != DISP_CHANGE_SUCCESSFUL) {
         const char *reason = "Unknown reason";
@@ -462,35 +391,9 @@ WIN_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
         }
         return SDL_SetError("ChangeDisplaySettingsEx() failed: %s", reason);
     }
-    EnumDisplaySettingsW(displaydata->DeviceName, ENUM_CURRENT_SETTINGS, &data->DeviceMode);
+    EnumDisplaySettings(displaydata->DeviceName, ENUM_CURRENT_SETTINGS, &data->DeviceMode);
     WIN_UpdateDisplayMode(_this, displaydata->DeviceName, ENUM_CURRENT_SETTINGS, mode);
     return 0;
-}
-
-void
-WIN_RefreshDisplays(_THIS)
-{
-    int i;
-
-    // Mark all displays as potentially invalid to detect
-    // entries that have actually been removed
-    for (i = 0; i < _this->num_displays; ++i) {
-        SDL_DisplayData *driverdata = (SDL_DisplayData *)_this->displays[i].driverdata;
-        driverdata->IsValid = SDL_FALSE;
-    }
-
-    // Enumerate displays to add any new ones and mark still
-    // connected entries as valid
-    WIN_AddDisplays(_this, SDL_TRUE);
-
-    // Delete any entries still marked as invalid, iterate
-    // in reverse as each delete takes effect immediately
-    for (i = _this->num_displays - 1; i >= 0; --i) {
-        SDL_DisplayData *driverdata = (SDL_DisplayData *)_this->displays[i].driverdata;
-        if (driverdata->IsValid == SDL_FALSE) {
-            SDL_DelVideoDisplay(i);
-        }
-    }
 }
 
 void

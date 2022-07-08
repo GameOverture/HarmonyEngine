@@ -1,6 +1,6 @@
-/* See LICENSE.txt for the full license governing this code. */
+/* See COPYING.txt for the full license governing this code. */
 /**
- * \file windows_screenshot.c
+ * \file windows_screenshot.c 
  *
  * Source file for the screenshot API on windows.
  */
@@ -14,9 +14,9 @@
 #endif
 
 #if defined(__WIN32__)
-#include <windows.h>
+#include <Windows.h>
 
-void LogLastError(const char* str);
+void LogLastError(char* str);
 
 static int img_num;
 static SDL_ProcessInfo screenshot_pinfo;
@@ -241,7 +241,7 @@ ScreenshotWindow(HWND hwnd, char* filename, SDL_bool only_client_area)
         goto screenshotwindow_cleanup_capturebitmap;
     }
 
-    /* Free resources */
+    /* free resources */
 
 screenshotwindow_cleanup_capturebitmap:
     if(!DeleteObject(capturebitmap))
@@ -297,7 +297,7 @@ ScreenshotHwnd(HWND hwnd, LPARAM lparam)
     filename = (char*)SDL_malloc(len * sizeof(char));
     if(!filename)
     {
-        SDLTest_LogError("SDL_malloc() failed");
+        SDLTest_LogError("malloc() failed");
         return FALSE;
     }
 

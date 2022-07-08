@@ -1,4 +1,4 @@
-/* See LICENSE.txt for the full license governing this code. */
+/* See COPYING.txt for the full license governing this code. */
 /**
  * \file harness_argparser.c
  *
@@ -19,7 +19,7 @@
 
 /* String compare s1 and s2 ignoring leading hyphens */
 static int
-StrCaseCmpIgnoreHyphen(const char* s1, const char* s2)
+StrCaseCmpIgnoreHyphen(char* s1, char* s2)
 {
     /* treat NULL pointer as empty strings */
     if(!s1)
@@ -199,7 +199,7 @@ ParseArg(char** argv, int index, SDLVisualTest_HarnessState* state)
 
 /* TODO: Trailing/leading spaces and spaces between equals sign not supported. */
 static int
-ParseConfig(const char* file, SDLVisualTest_HarnessState* state)
+ParseConfig(char* file, SDLVisualTest_HarnessState* state)
 {
     SDL_RWops* rw;
     SDLVisualTest_RWHelperBuffer buffer;
@@ -234,7 +234,7 @@ ParseConfig(const char* file, SDLVisualTest_HarnessState* state)
         argv = (char**)SDL_malloc((num_params + 1) * sizeof(char*));
         if(!argv)
         {
-            SDLTest_LogError("SDL_malloc() failed.");
+            SDLTest_LogError("malloc() failed.");
             SDL_RWclose(rw);
             return 0;
         }

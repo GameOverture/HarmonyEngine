@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
 #include "../../SDL_internal.h"
 
 /* This is code that Windows uses to talk to WASAPI-related system APIs.
@@ -33,6 +34,8 @@
 #include "SDL_timer.h"
 #include "../SDL_audio_c.h"
 #include "../SDL_sysaudio.h"
+#include "SDL_assert.h"
+#include "SDL_log.h"
 
 #define COBJMACROS
 #include <mmdeviceapi.h>
@@ -53,7 +56,7 @@ static IMMDeviceEnumerator *enumerator = NULL;
 
 /* handle to Avrt.dll--Vista and later!--for flagging the callback thread as "Pro Audio" (low latency). */
 static HMODULE libavrt = NULL;
-typedef HANDLE(WINAPI *pfnAvSetMmThreadCharacteristicsW)(LPCWSTR, LPDWORD);
+typedef HANDLE(WINAPI *pfnAvSetMmThreadCharacteristicsW)(LPWSTR, LPDWORD);
 typedef BOOL(WINAPI *pfnAvRevertMmThreadCharacteristics)(HANDLE);
 static pfnAvSetMmThreadCharacteristicsW pAvSetMmThreadCharacteristicsW = NULL;
 static pfnAvRevertMmThreadCharacteristics pAvRevertMmThreadCharacteristics = NULL;
@@ -65,31 +68,26 @@ static const IID SDL_IID_IMMNotificationClient = { 0x7991eec9, 0x7e89, 0x4d85,{ 
 static const IID SDL_IID_IMMEndpoint = { 0x1be09788, 0x6894, 0x4089,{ 0x85, 0x86, 0x9a, 0x2a, 0x6c, 0x26, 0x5a, 0xc5 } };
 static const IID SDL_IID_IAudioClient = { 0x1cb9ad4c, 0xdbfa, 0x4c32,{ 0xb1, 0x78, 0xc2, 0xf5, 0x68, 0xa7, 0x03, 0xb2 } };
 static const PROPERTYKEY SDL_PKEY_Device_FriendlyName = { { 0xa45c254e, 0xdf1c, 0x4efd,{ 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, } }, 14 };
-static const PROPERTYKEY SDL_PKEY_AudioEngine_DeviceFormat = { { 0xf19f064d, 0x82c, 0x4e27,{ 0xbc, 0x73, 0x68, 0x82, 0xa1, 0xbb, 0x8e, 0x4c, } }, 0 };
 
 
-static void
-GetWasapiDeviceInfo(IMMDevice *device, char **utf8dev, WAVEFORMATEXTENSIBLE *fmt)
+static char *
+GetWasapiDeviceName(IMMDevice *device)
 {
     /* PKEY_Device_FriendlyName gives you "Speakers (SoundBlaster Pro)" which drives me nuts. I'd rather it be
        "SoundBlaster Pro (Speakers)" but I guess that's developers vs users. Windows uses the FriendlyName in
        its own UIs, like Volume Control, etc. */
+    char *utf8dev = NULL;
     IPropertyStore *props = NULL;
-    *utf8dev = NULL;
-    SDL_zerop(fmt);
     if (SUCCEEDED(IMMDevice_OpenPropertyStore(device, STGM_READ, &props))) {
         PROPVARIANT var;
         PropVariantInit(&var);
         if (SUCCEEDED(IPropertyStore_GetValue(props, &SDL_PKEY_Device_FriendlyName, &var))) {
-            *utf8dev = WIN_StringToUTF8W(var.pwszVal);
-        }
-        PropVariantClear(&var);
-        if (SUCCEEDED(IPropertyStore_GetValue(props, &SDL_PKEY_AudioEngine_DeviceFormat, &var))) {
-            SDL_memcpy(fmt, var.blob.pBlobData, SDL_min(var.blob.cbSize, sizeof(WAVEFORMATEXTENSIBLE)));
+            utf8dev = WIN_StringToUTF8(var.pwszVal);
         }
         PropVariantClear(&var);
         IPropertyStore_Release(props);
     }
+    return utf8dev;
 }
 
 
@@ -199,11 +197,9 @@ SDLMMNotificationClient_OnDeviceStateChanged(IMMNotificationClient *ithis, LPCWS
             if (SUCCEEDED(IMMEndpoint_GetDataFlow(endpoint, &flow))) {
                 const SDL_bool iscapture = (flow == eCapture);
                 if (dwNewState == DEVICE_STATE_ACTIVE) {
-                    char *utf8dev;
-                    WAVEFORMATEXTENSIBLE fmt;
-                    GetWasapiDeviceInfo(device, &utf8dev, &fmt);
+                    char *utf8dev = GetWasapiDeviceName(device);
                     if (utf8dev) {
-                        WASAPI_AddDevice(iscapture, utf8dev, &fmt, pwstrDeviceId);
+                        WASAPI_AddDevice(iscapture, utf8dev, pwstrDeviceId);
                         SDL_free(utf8dev);
                     }
                 } else {
@@ -252,13 +248,13 @@ WASAPI_PlatformInit(void)
         return SDL_SetError("WASAPI: CoInitialize() failed");
     }
 
-    ret = CoCreateInstance(&SDL_CLSID_MMDeviceEnumerator, NULL, CLSCTX_INPROC_SERVER, &SDL_IID_IMMDeviceEnumerator, (LPVOID *) &enumerator);
+    ret = CoCreateInstance(&SDL_CLSID_MMDeviceEnumerator, NULL, CLSCTX_INPROC_SERVER, &SDL_IID_IMMDeviceEnumerator, (LPVOID) &enumerator);
     if (FAILED(ret)) {
         WIN_CoUninitialize();
         return WIN_SetErrorFromHRESULT("WASAPI CoCreateInstance(MMDeviceEnumerator)", ret);
     }
 
-    libavrt = LoadLibrary(TEXT("avrt.dll"));  /* this library is available in Vista and later. No WinXP, so have to LoadLibrary to use it for now! */
+    libavrt = LoadLibraryW(L"avrt.dll");  /* this library is available in Vista and later. No WinXP, so have to LoadLibrary to use it for now! */
     if (libavrt) {
         pAvSetMmThreadCharacteristicsW = (pfnAvSetMmThreadCharacteristicsW) GetProcAddress(libavrt, "AvSetMmThreadCharacteristicsW");
         pAvRevertMmThreadCharacteristics = (pfnAvRevertMmThreadCharacteristics) GetProcAddress(libavrt, "AvRevertMmThreadCharacteristics");
@@ -298,7 +294,7 @@ WASAPI_PlatformThreadInit(_THIS)
     /* Set this thread to very high "Pro Audio" priority. */
     if (pAvSetMmThreadCharacteristicsW) {
         DWORD idx = 0;
-        this->hidden->task = pAvSetMmThreadCharacteristicsW(L"Pro Audio", &idx);
+        this->hidden->task = pAvSetMmThreadCharacteristicsW(TEXT("Pro Audio"), &idx);
     }
 }
 
@@ -359,7 +355,6 @@ typedef struct
 {
     LPWSTR devid;
     char *devname;
-    WAVEFORMATEXTENSIBLE fmt;
 } EndpointItem;
 
 static int sort_endpoints(const void *_a, const void *_b)
@@ -416,7 +411,7 @@ WASAPI_EnumerateEndpointsForFlow(const SDL_bool iscapture)
         IMMDevice *device = NULL;
         if (SUCCEEDED(IMMDeviceCollection_Item(collection, i, &device))) {
             if (SUCCEEDED(IMMDevice_GetId(device, &item->devid))) {
-                GetWasapiDeviceInfo(device, &item->devname, &item->fmt);
+                item->devname = GetWasapiDeviceName(device);
             }
             IMMDevice_Release(device);
         }
@@ -429,7 +424,7 @@ WASAPI_EnumerateEndpointsForFlow(const SDL_bool iscapture)
     for (i = 0; i < total; i++) {
         EndpointItem *item = items + i;
         if ((item->devid) && (item->devname)) {
-            WASAPI_AddDevice(iscapture, item->devname, &item->fmt, item->devid);
+            WASAPI_AddDevice(iscapture, item->devname, item->devid);
         }
         SDL_free(item->devname);
         CoTaskMemFree(item->devid);

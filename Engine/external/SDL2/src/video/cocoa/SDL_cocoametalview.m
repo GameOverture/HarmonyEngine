@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,15 +24,13 @@
  * Thanks to Alex Szpakowski, @slime73 on GitHub, for his gist showing
  * how to add a CAMetalLayer backed view.
  */
-#include "../../SDL_internal.h"
 
 #import "SDL_cocoametalview.h"
 
 #if SDL_VIDEO_DRIVER_COCOA && (SDL_VIDEO_VULKAN || SDL_VIDEO_METAL)
 
+#include "SDL_assert.h"
 #include "SDL_events.h"
-#include "SDL_syswm.h"
-
 
 static int SDLCALL
 SDL_MetalViewEventWatch(void *userdata, SDL_Event *event)
@@ -105,7 +103,7 @@ SDL_MetalViewEventWatch(void *userdata, SDL_Event *event)
 
 - (NSInteger)tag
 {
-    return SDL_METALVIEW_TAG;
+    return METALVIEW_TAG;
 }
 
 - (void)updateDrawableSize
@@ -123,10 +121,6 @@ SDL_MetalViewEventWatch(void *userdata, SDL_Event *event)
 
     metalLayer.contentsScale = backingSize.height / size.height;
     metalLayer.drawableSize = NSSizeToCGSize(backingSize);
-}
-
-- (NSView *)hitTest:(NSPoint)point {
-    return nil;
 }
 
 @end
@@ -163,19 +157,12 @@ Cocoa_Metal_DestroyView(_THIS, SDL_MetalView view)
     [metalview removeFromSuperview];
 }}
 
-void *
-Cocoa_Metal_GetLayer(_THIS, SDL_MetalView view)
-{ @autoreleasepool {
-    SDL_cocoametalview *cocoaview = (__bridge SDL_cocoametalview *)view;
-    return (__bridge void *)cocoaview.layer;
-}}
-
 void
-Cocoa_Metal_GetDrawableSize(_THIS, SDL_Window * window, int * w, int * h)
+Cocoa_Metal_GetDrawableSize(SDL_Window * window, int * w, int * h)
 { @autoreleasepool {
     SDL_WindowData *data = (__bridge SDL_WindowData *)window->driverdata;
-    NSView *contentView = data->sdlContentView;
-    SDL_cocoametalview* metalview = [contentView viewWithTag:SDL_METALVIEW_TAG];
+    NSView *view = data->nswindow.contentView;
+    SDL_cocoametalview* metalview = [view viewWithTag:METALVIEW_TAG];
     if (metalview) {
         CAMetalLayer *layer = (CAMetalLayer*)metalview.layer;
         SDL_assert(layer != NULL);
@@ -186,21 +173,7 @@ Cocoa_Metal_GetDrawableSize(_THIS, SDL_Window * window, int * w, int * h)
             *h = layer.drawableSize.height;
         }
     } else {
-        /* Fall back to the viewport size. */
-        NSRect viewport = [contentView bounds];
-        if (window->flags & SDL_WINDOW_ALLOW_HIGHDPI) {
-            /* This gives us the correct viewport for a Retina-enabled view, only
-             * supported on 10.7+. */
-            if ([contentView respondsToSelector:@selector(convertRectToBacking:)]) {
-                viewport = [contentView convertRectToBacking:viewport];
-            }
-        }
-        if (w) {
-            *w = viewport.size.width;
-        }
-        if (h) {
-            *h = viewport.size.height;
-        }
+        SDL_GetWindowSize(window, w, h);
     }
 }}
 

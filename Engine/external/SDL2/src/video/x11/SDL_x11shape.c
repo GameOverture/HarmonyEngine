@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,6 +22,7 @@
 
 #if SDL_VIDEO_DRIVER_X11
 
+#include "SDL_assert.h"
 #include "SDL_x11video.h"
 #include "SDL_x11shape.h"
 #include "SDL_x11window.h"
@@ -35,7 +36,7 @@ X11_CreateShaper(SDL_Window* window) {
 
 #if SDL_VIDEO_DRIVER_X11_XSHAPE
     if (SDL_X11_HAVE_XSHAPE) {  /* Make sure X server supports it. */
-        result = SDL_malloc(sizeof(SDL_WindowShaper));
+        result = malloc(sizeof(SDL_WindowShaper));
         result->window = window;
         result->mode.mode = ShapeModeDefault;
         result->mode.parameters.binarizationCutoff = 1;
@@ -65,13 +66,13 @@ X11_ResizeWindowShape(SDL_Window* window) {
     if(data->bitmapsize != bitmapsize || data->bitmap == NULL) {
         data->bitmapsize = bitmapsize;
         if(data->bitmap != NULL)
-            SDL_free(data->bitmap);
-        data->bitmap = SDL_malloc(data->bitmapsize);
+            free(data->bitmap);
+        data->bitmap = malloc(data->bitmapsize);
         if(data->bitmap == NULL) {
             return SDL_SetError("Could not allocate memory for shaped-window bitmap.");
         }
     }
-    SDL_memset(data->bitmap,0,data->bitmapsize);
+    memset(data->bitmap,0,data->bitmapsize);
 
     window->shaper->userx = window->x;
     window->shaper->usery = window->y;

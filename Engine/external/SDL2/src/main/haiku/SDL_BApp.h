@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,9 +21,7 @@
 #ifndef SDL_BAPP_H
 #define SDL_BAPP_H
 
-#include <Path.h>
 #include <InterfaceKit.h>
-#include <LocaleRoster.h>
 #if SDL_VIDEO_OPENGL
 #include <OpenGLKit.h>
 #endif
@@ -94,15 +92,6 @@ public:
     }
 
 
-	virtual void RefsReceived(BMessage* message) {
-		char filePath[512];
-		entry_ref entryRef;
-		for (int32 i = 0; message->FindRef("refs", i, &entryRef) == B_OK; i++) {
-			BPath referencePath = BPath(&entryRef);
-			SDL_SendDropFile(NULL, referencePath.Path());
-		}
-		return;
-	}
 
         /* Event-handling functions */
     virtual void MessageReceived(BMessage* message) {
@@ -164,10 +153,6 @@ public:
             _HandleWindowResized(message);
             break;
 
-        case B_LOCALE_CHANGED:
-            SDL_SendLocaleChangedEvent();
-            break;
-
         case BAPP_SCREEN_CHANGED:
             /* TODO: Handle screen resize or workspace change */
             break;
@@ -208,10 +193,6 @@ public:
     }
 
 #if SDL_VIDEO_OPENGL
-    BGLView *GetCurrentContext() {
-        return _current_context;
-    }
-    
     void SetCurrentContext(BGLView *newContext) {
         if(_current_context)
             _current_context->UnlockGL();
@@ -248,22 +229,25 @@ private:
         }
         win = GetSDLWindow(winID);
 
-        // Simple relative mode support for mouse.
-        if (SDL_GetMouse()->relative_mode) {
-            int winWidth, winHeight, winPosX, winPosY;
-            SDL_GetWindowSize(win, &winWidth, &winHeight);
-            SDL_GetWindowPosition(win, &winPosX, &winPosY);
-            int dx = x - (winWidth / 2);
-            int dy = y - (winHeight / 2);
-            SDL_SendMouseMotion(win, 0, SDL_GetMouse()->relative_mode, dx, dy);
-            set_mouse_position((winPosX + winWidth / 2), (winPosY + winHeight / 2));
-            if (!be_app->IsCursorHidden())
-                be_app->HideCursor();
-        } else {
-            SDL_SendMouseMotion(win, 0, 0, x, y);
-            if (SDL_ShowCursor(-1) && be_app->IsCursorHidden())
-                be_app->ShowCursor();
-        }
+		// Simple relative mode support for mouse.
+		if (SDL_GetMouse()->relative_mode) {
+			int winWidth, winHeight, winPosX, winPosY;
+			SDL_GetWindowSize(win, &winWidth, &winHeight);
+			SDL_GetWindowPosition(win, &winPosX, &winPosY);
+			int dx = x - (winWidth / 2);
+			int dy = y - (winHeight / 2);
+			SDL_SendMouseMotion(win, 0, SDL_GetMouse()->relative_mode, dx, dy);
+			set_mouse_position((winPosX + winWidth / 2), (winPosY + winHeight / 2));
+			if (!be_app->IsCursorHidden())
+				be_app->HideCursor();
+		} else {
+			SDL_SendMouseMotion(win, 0, 0, x, y);
+			if (SDL_ShowCursor(-1) && be_app->IsCursorHidden())
+				be_app->ShowCursor();
+		}
+
+        /* Tell the application that the mouse passed over, redraw needed */
+        HAIKU_UpdateWindowFramebuffer(NULL,win,NULL,-1);
     }
 
     void _HandleMouseButton(BMessage *msg) {
@@ -311,7 +295,7 @@ private:
         }
         HAIKU_SetKeyState(scancode, state);
         SDL_SendKeyboardKey(state, HAIKU_GetScancodeFromBeKey(scancode));
-
+        
         if (state == SDL_PRESSED && SDL_EventState(SDL_TEXTINPUT, SDL_QUERY)) {
             const int8 *keyUtf8;
             ssize_t count;

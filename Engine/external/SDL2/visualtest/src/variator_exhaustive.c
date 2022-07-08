@@ -1,4 +1,4 @@
-/* See LICENSE.txt for the full license governing this code. */
+/* See COPYING.txt for the full license governing this code. */
 /**
  * \file variator_exhaustive.c
  *
@@ -39,7 +39,6 @@ NextVariation(SDLVisualTest_Variation* variation,
         return 0;
     if(carry == 0)
         return 1;
-
     SDLTest_LogError("NextVariation() failed");
     return -1;
 }

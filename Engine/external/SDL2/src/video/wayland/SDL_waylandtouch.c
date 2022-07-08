@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,6 +25,7 @@
 
 #ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
 
+#include "SDL_log.h"
 #include "SDL_mouse.h"
 #include "SDL_keyboard.h"
 #include "SDL_waylandtouch.h"
@@ -73,8 +74,8 @@ touch_handle_touch(void *data,
      **/
 
     float FIXED_TO_FLOAT = 1. / 10000.;
-    float xf = FIXED_TO_FLOAT * normalized_x;
-    float yf = FIXED_TO_FLOAT * normalized_y;
+    float xf = FIXED_TO_FLOAT * x;
+    float yf = FIXED_TO_FLOAT * y;
 
     float PRESSURE_TO_FLOAT = 1. / 255.;
     float pressuref = PRESSURE_TO_FLOAT * pressure;
@@ -160,7 +161,7 @@ static const struct wl_message qt_touch_extension_events[] = {
     { "configure", "u", qt_touch_extension_types + 0 },
 };
 
-const struct wl_interface qt_touch_extension_interface = {
+WL_EXPORT const struct wl_interface qt_touch_extension_interface = {
     "qt_touch_extension", 1,
     1, qt_touch_extension_requests,
     2, qt_touch_extension_events,
@@ -183,7 +184,7 @@ static const struct wl_message qt_windowmanager_events[] = {
     { "quit", "", qt_windowmanager_types + 0 },
 };
 
-const struct wl_interface qt_windowmanager_interface = {
+WL_EXPORT const struct wl_interface qt_windowmanager_interface = {
     "qt_windowmanager", 1,
     1, qt_windowmanager_requests,
     2, qt_windowmanager_events,
@@ -214,7 +215,7 @@ static const struct wl_message qt_surface_extension_requests[] = {
     { "get_extended_surface", "no", qt_surface_extension_types + 2 },
 };
 
-const struct wl_interface qt_surface_extension_interface = {
+WL_EXPORT const struct wl_interface qt_surface_extension_interface = {
     "qt_surface_extension", 1,
     1, qt_surface_extension_requests,
     0, NULL,
@@ -232,7 +233,7 @@ static const struct wl_message qt_extended_surface_events[] = {
     { "close", "", qt_surface_extension_types + 0 },
 };
 
-const struct wl_interface qt_extended_surface_interface = {
+WL_EXPORT const struct wl_interface qt_extended_surface_interface = {
     "qt_extended_surface", 1,
     3, qt_extended_surface_requests,
     3, qt_extended_surface_events,
