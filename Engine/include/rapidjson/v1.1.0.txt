@@ -1,0 +1,4 @@
+https://github.com/Tencent/rapidjson/releases/tag/v1.1.0
+
+HARMONY CHANGES:
+ - Only using the rapidjson-1.1.0\include\rapidjson\* files
