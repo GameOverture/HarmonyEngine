@@ -1,0 +1,5 @@
+https://github.com/g-truc/glm/releases/tag/0.9.9.8
+
+HARMONY CHANGES:
+ - Only using the \glm-0.9.9.8\glm\* files
+ 
