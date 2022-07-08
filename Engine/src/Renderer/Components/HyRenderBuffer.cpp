@@ -76,8 +76,6 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 		m_pCurWritePosition += sizeof(State);
 		uint8 *pStartOfExData = m_pCurWritePosition;
 
-		// TODO: Figure out why browser is unable to batch render. It seems texture handles get mixed up (only with Emscripten builds)
-#ifndef HY_PLATFORM_BROWSER
 		// Determine if we can combine this render state with the previous one, to batch less render calls
 		if(bIsBatchable &&
 		   m_uiPrevUniformCrc == instanceRef.GetShaderUniforms().GetCrc64() &&
@@ -87,7 +85,6 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 			m_pCurWritePosition -= sizeof(State);
 		}
 		else
-#endif
 		{
 			AppendExData(instanceRef.GetShaderUniforms()); // This advances the 'm_pCurWritePosition'
 			pRenderState->m_uiExDataSize = (static_cast<uint32>(m_pCurWritePosition - pStartOfExData));

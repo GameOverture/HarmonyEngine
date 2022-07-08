@@ -71,7 +71,7 @@ bool HyShaderUniforms::operator==(HyShaderUniforms &rhs)
 uint64 HyShaderUniforms::GetCrc64()
 {
 	if(m_bDirty == false)
-		return m_uiSamplersCrc32 | (m_uiUniformsCrc32 << 32);
+		return m_uiSamplersCrc32 | (static_cast<uint64>(m_uiUniformsCrc32) << 32);
 
 	if(m_SamplersList.empty())
 		m_uiSamplersCrc32 = 0;
@@ -84,7 +84,7 @@ uint64 HyShaderUniforms::GetCrc64()
 		m_uiUniformsCrc32 = crc32_fast(&m_UniformList[0], m_UniformList.size() * sizeof(UniformBuffer), 0);// m_uiUniformsCrc32);
 
 	m_bDirty = false;
-	return m_uiSamplersCrc32 | (m_uiUniformsCrc32 << 32);
+	return m_uiSamplersCrc32 | (static_cast<uint64>(m_uiUniformsCrc32) << 32);
 }
 
 void HyShaderUniforms::SetNumTexUnits(uint32 uiNumSamplers)
