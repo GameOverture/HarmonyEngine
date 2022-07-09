@@ -80,6 +80,7 @@ void HyPhysicsCtrl2d::Init(HyPhysicsType eType,
 		m_pSimData->m_pBody->SetSleepingAllowed(bAllowSleep);
 		m_pSimData->m_pBody->SetGravityScale(fGravityScale);
 		m_pSimData->m_pBody->SetBullet(bIsCcd);
+		m_pSimData->m_pBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
 
 		m_pSimData->m_pFixture->SetFriction(fFriction);
 		m_pSimData->m_pFixture->SetRestitution(fRestitution);
@@ -87,6 +88,7 @@ void HyPhysicsCtrl2d::Init(HyPhysicsType eType,
 		m_pSimData->m_pFixture->SetDensity(fDensity);
 		m_pSimData->m_pFixture->SetSensor(bIsSensor);
 		m_pSimData->m_pFixture->SetFilterData(filter);
+		m_pSimData->m_pFixture->GetUserData().pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
 
 		return;
 	}
@@ -105,6 +107,7 @@ void HyPhysicsCtrl2d::Init(HyPhysicsType eType,
 	m_pInit->m_BodyDef.allowSleep = bAllowSleep;
 	m_pInit->m_BodyDef.gravityScale = fGravityScale;
 	m_pInit->m_BodyDef.bullet = bIsCcd;
+	m_pInit->m_BodyDef.userData.pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
 
 	m_pInit->m_FixtureDef.friction = fFriction;
 	m_pInit->m_FixtureDef.restitution = fRestitution;
@@ -112,6 +115,7 @@ void HyPhysicsCtrl2d::Init(HyPhysicsType eType,
 	m_pInit->m_FixtureDef.density = fDensity;
 	m_pInit->m_FixtureDef.isSensor = bIsSensor;
 	m_pInit->m_FixtureDef.filter = filter;
+	m_pInit->m_FixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
 
 	// If already attached to physics grid, call its HyPhysicsGrid2d::TryInitChildPhysics to try and start simulation
 	if(m_NodeRef.ParentGet() && (m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid))
