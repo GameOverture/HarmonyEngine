@@ -133,7 +133,7 @@ std::vector<HyPrimitive2d> &HyPhysicsGrid2d::GetDebugDrawList()
 	return m_DebugDraw.GetDrawList();
 }
 
-/*virtual*/ void HyPhysicsGrid2d::OnUpdate() /*override*/
+/*virtual*/ void HyPhysicsGrid2d::Update() /*override*/
 {
 	for(auto iter = m_PhysChildMap.begin(); iter != m_PhysChildMap.end(); ++iter)
 		iter->first->physics.Update();
@@ -145,4 +145,6 @@ std::vector<HyPrimitive2d> &HyPhysicsGrid2d::GetDebugDrawList()
 	}
 
 	m_b2World.Step(HyEngine::DeltaTime(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+
+	HyEntity2d::Update();
 }

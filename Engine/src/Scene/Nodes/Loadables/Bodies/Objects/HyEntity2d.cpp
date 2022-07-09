@@ -42,6 +42,12 @@ HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor) noexcept
 	return *this;
 }
 
+void HyEntity2d::InitChildren()
+{
+	for(auto iter = m_ChildList.begin(); iter != m_ChildList.end(); ++iter)
+		SetNewChildAttributes(*(*iter));
+}
+
 /*virtual*/ void HyEntity2d::SetVisible(bool bEnabled) /*override*/
 {
 	SetVisible(bEnabled, false);
@@ -417,7 +423,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		m_ChildList[i]->SetDirty(uiDirtyFlags);
 }
 
-/*virtual*/ void HyEntity2d::Update() /*override final*/
+/*virtual*/ void HyEntity2d::Update() /*override*/
 {
 	IHyBody2d::Update();
 

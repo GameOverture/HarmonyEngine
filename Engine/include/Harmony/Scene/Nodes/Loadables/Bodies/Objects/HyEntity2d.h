@@ -39,6 +39,10 @@ public:
 
 	HyEntity2d &operator=(HyEntity2d &&donor) noexcept;
 
+	// When children are established in the member-initializer list, it doesn't call SetNewChildAttributes().
+	// InitChildren() will call SetNewChildAttributes() on all the current children
+	void InitChildren();
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OVERRIDES + OVERLOADS
 	virtual void SetVisible(bool bEnabled) override;
@@ -101,7 +105,7 @@ public:
 	
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
-	virtual void Update() override final;
+	virtual void Update() override;
 	virtual bool IsChildrenLoaded() const override final;
 
 	virtual void SetNewChildAttributes(IHyNode2d &childRef);

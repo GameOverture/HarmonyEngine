@@ -274,6 +274,8 @@ float IHyBody2d::GetSceneWidth()
 
 void IHyBody2d::ShapeChanged()
 {
+	if(physics.IsSimulating() == false && m_pParent && (m_pParent->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid))
+		static_cast<HyPhysicsGrid2d *>(m_pParent)->TryInitChildPhysics(*this);
 
 	OnShapeChanged();
 }

@@ -29,6 +29,7 @@ struct HyPhysicsComponent2d
 class HyPhysicsGrid2d : public HyEntity2d
 {
 	friend class HyPhysicsCtrl2d;
+	friend class IHyBody2d;
 
 protected:
 	b2World										m_b2World;
@@ -60,7 +61,7 @@ public:
 	std::vector<HyPrimitive2d> &GetDebugDrawList();
 
 protected:
-	virtual void OnUpdate() override;
+	virtual void Update() override;
 	
 	void TryInitChildPhysics(IHyBody2d &bodyRef); // Does nothing if 'bodyRef.physics.m_pInit' is null or shape not valid
 	void UninitChildPhysics(IHyBody2d &bodyRef);
