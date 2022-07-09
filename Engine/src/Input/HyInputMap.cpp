@@ -15,6 +15,8 @@
 
 HyInputMap::HyInputMap()
 {
+	for(uint32 i = 0; i < HYNUM_HYPADAXIS; ++i)
+		m_AxisValues[i] = 0.0f;
 }
 
 HyInputMap::~HyInputMap(void)
@@ -145,14 +147,41 @@ int32 HyInputMap::MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn)
 	return MapAlternativeBtn(iActionId, static_cast<HyKeyboardBtn>(eBtn));
 }
 
-bool HyInputMap::MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex)
+bool HyInputMap::MapPadBtn(int32 iActionId, HyGamePadBtn eBtn)
 {
-	return false;
-}
+	auto iter = m_ActionIndexMap.find(iActionId);
+	if(iter != m_ActionIndexMap.end())
+	{
+		ActionInfo &actionRef = m_ActionList[iter->second];
+		actionRef.ePadBtn = eBtn;
+	}
+	else
+	{
+		m_ActionList.emplace_back(iActionId);
+		m_ActionList.back().ePadBtn = eBtn;
 
-bool HyInputMap::MapJoystickAxis(int32 iUserId, HyGamePadBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/)
-{
-	return false;
+		m_ActionIndexMap[iActionId] = static_cast<uint32>(m_ActionList.size() - 1);
+	}
+
+	// Determine if eBtn was already used for a different action in this same action category. If so, remove that button,
+	// and return the other action id it was assigned to.
+	ActionInfo &actionRef = (iter != m_ActionIndexMap.end()) ? m_ActionList[iter->second] : m_ActionList.back();
+	for(uint32 i = 0; i < m_ActionList.size(); ++i)
+	{
+		if(m_ActionList[i].iID == iActionId ||
+			(m_ActionList[i].uiFlags & ActionInfo::FLAG_CategoryBitMask) != (actionRef.uiFlags & ActionInfo::FLAG_CategoryBitMask))
+		{
+			continue;
+		}
+
+		if(m_ActionList[i].ePadBtn == eBtn)
+		{
+			m_ActionList[i].ePadBtn = HYPAD_Unassigned;
+			return m_ActionList[i].iID;
+		}
+	}
+
+	return -1;
 }
 
 bool HyInputMap::Unmap(int32 iUserId)
@@ -187,14 +216,12 @@ bool HyInputMap::IsActionReleased(int32 iActionId) const
 	return (m_ActionList[iter->second].uiFlags & ActionInfo::FLAG_IsReleased) != 0;
 }
 
-float HyInputMap::GetAxis(int32 iUserId) const
+float HyInputMap::GetAxis(HyGamePadAxis eAxis) const
 {
-	// TODO:
-	HyError("HyInputMap::GetAxis not implemented");
-	return 0.0f;
+	return m_AxisValues[eAxis];
 }
 
-float HyInputMap::GetAxisDelta(int32 iUserId) const
+float HyInputMap::GetAxisDelta(HyGamePadAxis eAxis) const
 {
 	// TODO:
 	HyError("HyInputMap::GetAxisDelta not implemented");
@@ -230,4 +257,26 @@ void HyInputMap::ApplyInput(int32 iKey, HyBtnPressState ePressState)
 			}
 		}
 	}
+}
+
+void HyInputMap::ApplyPadInput(int32 iPadBtn, HyBtnPressState ePressState)
+{
+	for(uint32 i = 0; i < static_cast<uint32>(m_ActionList.size()); ++i)
+	{
+		if(m_ActionList[i].ePadBtn == iPadBtn)
+		{
+			if(ePressState == HYBTN_Press)
+				m_ActionList[i].uiFlags |= ActionInfo::FLAG_Pressed;
+			if(ePressState == HYBTN_Release)
+			{
+				m_ActionList[i].uiFlags &= ~ActionInfo::FLAG_Pressed;
+				m_ActionList[i].uiFlags |= ActionInfo::FLAG_WasReleased;
+			}
+		}
+	}
+}
+
+void HyInputMap::ApplyPadAxis(int32 iAxis, float fValue)
+{
+	m_AxisValues[iAxis] = fValue;
 }

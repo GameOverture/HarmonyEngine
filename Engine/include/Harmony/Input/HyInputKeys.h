@@ -504,6 +504,7 @@ enum HyMouseCursor
 enum HyGamePadBtn
 {
 #if defined(HY_USE_GLFW) && !defined(HY_PLATFORM_BROWSER) // Not supported with Emscripten's GLFW
+	HYPAD_Unassigned		= -1,
 	HYPAD_A					= GLFW_GAMEPAD_BUTTON_A,
 	HYPAD_B					= GLFW_GAMEPAD_BUTTON_B,
 	HYPAD_X					= GLFW_GAMEPAD_BUTTON_X,
@@ -520,6 +521,7 @@ enum HyGamePadBtn
 	HYPAD_DpadUp			= GLFW_GAMEPAD_BUTTON_DPAD_UP,
 	HYPAD_DpadDown			= GLFW_GAMEPAD_BUTTON_DPAD_DOWN,
 #elif defined(HY_USE_SDL2) && !defined(HY_PLATFORM_BROWSER) // Not supported with Emscripten's SDL2
+	HYPAD_Unassigned		= SDL_CONTROLLER_BUTTON_INVALID,
 	HYPAD_A					= SDL_CONTROLLER_BUTTON_A,
 	HYPAD_B					= SDL_CONTROLLER_BUTTON_B,
 	HYPAD_X					= SDL_CONTROLLER_BUTTON_X,
@@ -536,6 +538,7 @@ enum HyGamePadBtn
 	HYPAD_DpadUp			= SDL_CONTROLLER_BUTTON_DPAD_UP,
 	HYPAD_DpadDown			= SDL_CONTROLLER_BUTTON_DPAD_DOWN,
 #else
+	HYPAD_Unassigned		= -1,
 	HYPAD_A					= 0,
 	HYPAD_B					= 1,
 	HYPAD_X					= 2,
@@ -557,6 +560,37 @@ enum HyGamePadBtn
 	HYPAD_Circle			= HYPAD_B,
 	HYPAD_Square			= HYPAD_X,
 	HYPAD_Triangle			= HYPAD_Y,
+};
+
+enum HyGamePadAxis
+{
+#if defined(HY_USE_GLFW) && !defined(HY_PLATFORM_BROWSER) // Not supported with Emscripten's GLFW
+	HYPADAXIS_Invalid		= -1,
+	HYPADAXIS_LeftX			= GLFW_GAMEPAD_AXIS_LEFT_X,
+	HYPADAXIS_LeftY			= GLFW_GAMEPAD_AXIS_LEFT_Y,
+	HYPADAXIS_RightX		= GLFW_GAMEPAD_AXIS_RIGHT_X,
+	HYPADAXIS_RightY		= GLFW_GAMEPAD_AXIS_RIGHT_Y,
+	HYPADAXIS_TriggerLeft	= GLFW_GAMEPAD_AXIS_LEFT_TRIGGER,
+	HYPADAXIS_TriggerRight	= GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER,
+#elif defined(HY_USE_SDL2) && !defined(HY_PLATFORM_BROWSER) // Not supported with Emscripten's SDL2
+	HYPADAXIS_Invalid		= SDL_CONTROLLER_AXIS_INVALID,
+	HYPADAXIS_LeftX			= SDL_CONTROLLER_AXIS_LEFTX,
+	HYPADAXIS_LeftY			= SDL_CONTROLLER_AXIS_LEFTY,
+	HYPADAXIS_RightX		= SDL_CONTROLLER_AXIS_RIGHTX,
+	HYPADAXIS_RightY		= SDL_CONTROLLER_AXIS_RIGHTY,
+	HYPADAXIS_TriggerLeft	= SDL_CONTROLLER_AXIS_TRIGGERLEFT,
+	HYPADAXIS_TriggerRight	= SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
+#else
+	HYPADAXIS_Invalid		= -1,
+	HYPADAXIS_LeftX			= 0,
+	HYPADAXIS_LeftY			= 1,
+	HYPADAXIS_RightX		= 2,
+	HYPADAXIS_RightY		= 3,
+	HYPADAXIS_TriggerLeft	= 4,
+	HYPADAXIS_TriggerRight	= 5,
+#endif
+
+	HYNUM_HYPADAXIS
 };
 
 enum HyJoystick

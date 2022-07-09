@@ -76,8 +76,7 @@ public:
 	int32 MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn, uint32 uiMappingIndex = 0);
 	int32 MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn, uint32 uiMappingIndex = 0);
 
-	bool MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex, uint32 uiMappingIndex = 0);
-	bool MapJoystickAxis(int32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f, uint32 uiMappingIndex = 0);
+	bool MapGamePadBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiMappingIndex = 0);
 
 	bool Unmap(int32 iActionId, uint32 uiMappingIndex = 0);
 	bool IsMapped(int32 iActionId, uint32 uiMappingIndex = 0) const;
@@ -86,8 +85,8 @@ public:
 	// Check for Input
 	bool IsActionDown(int32 iUserId, uint32 uiMappingIndex = 0) const;
 	bool IsActionReleased(int32 iUserId, uint32 uiMappingIndex = 0) const;	// Only true for a single frame upon button release
-	float GetAxis(int32 iUserId, uint32 uiMappingIndex = 0) const;
-	float GetAxisDelta(int32 iUserId, uint32 uiMappingIndex = 0) const;
+	float GetGamePadAxis(HyGamePadAxis eAxis, uint32 uiMappingIndex = 0) const;
+	float GetGamePadAxisDelta(HyGamePadAxis eAxis, uint32 uiMappingIndex = 0) const;
 
 	bool IsTextInputActive();
 	void StartTextInput();
@@ -128,6 +127,9 @@ private:
 	void DoMouseUpEvent(const SDL_Event &eventRef);
 	void DoMouseWheelEvent(const SDL_Event &eventRef);
 	void SetMouseWindow(HyWindow *pWindow);
+	void DoPadAxis(const SDL_Event &eventRef);
+	void DoPadBtnDown(const SDL_Event &eventRef);
+	void DoPadBtnUp(const SDL_Event &eventRef);
 	void DoTouchDownEvent(const SDL_Event &eventRef);
 	void DoTouchMoveEvent(const SDL_Event &eventRef);
 	void DoTouchUpEvent(const SDL_Event &eventRef);

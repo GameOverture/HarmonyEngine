@@ -203,6 +203,16 @@ bool HyEngine::PollPlatformApi()
 			m_Input.DoMouseWheelEvent(sdlEvent);
 			break;
 
+		case SDL_CONTROLLERAXISMOTION:
+			m_Input.DoPadAxis(sdlEvent);
+			break;
+		case SDL_CONTROLLERBUTTONDOWN:
+			m_Input.DoPadBtnDown(sdlEvent);
+			break;
+		case SDL_CONTROLLERBUTTONUP:
+			m_Input.DoPadBtnUp(sdlEvent);
+			break;
+
 		case SDL_FINGERDOWN:
 			m_Input.DoTouchDownEvent(sdlEvent);
 			break;

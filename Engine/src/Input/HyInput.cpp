@@ -242,16 +242,16 @@ int32 HyInput::MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn, uint32 uiMapp
 	return m_pInputMaps[uiMappingIndex].MapAlternativeBtn(iActionId, eBtn);
 }
 
-bool HyInput::MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex, uint32 uiMappingIndex /*= 0*/)
+bool HyInput::MapGamePadBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiMappingIndex /*= 0*/)
 {
 	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
-	return m_pInputMaps[uiMappingIndex].MapJoystickBtn(iActionId, eBtn, uiJoystickIndex);
-}
 
-bool HyInput::MapJoystickAxis(int32 iUserId, HyGamePadBtn eAxis, float fMin /*= 0.0f*/, float fMax /*= 1.0f*/, uint32 uiMappingIndex /*= 0*/)
-{
-	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
-	return m_pInputMaps[uiMappingIndex].MapJoystickAxis(iUserId, eAxis, fMin, fMax);
+#ifdef HY_USE_GLFW
+#elif defined(HY_USE_SDL2)
+	SDL_GameControllerOpen(uiMappingIndex);
+#endif
+
+	return m_pInputMaps[uiMappingIndex].MapPadBtn(iActionId, eBtn);
 }
 
 bool HyInput::Unmap(int32 iActionId, uint32 uiMappingIndex /*= 0*/)
@@ -278,16 +278,16 @@ bool HyInput::IsActionReleased(int32 iUserId, uint32 uiMappingIndex /*= 0*/) con
 	return m_pInputMaps[uiMappingIndex].IsActionReleased(iUserId);
 }
 
-float HyInput::GetAxis(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
+float HyInput::GetGamePadAxis(HyGamePadAxis eAxis, uint32 uiMappingIndex /*= 0*/) const
 {
 	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
-	return m_pInputMaps[uiMappingIndex].GetAxis(iUserId);
+	return m_pInputMaps[uiMappingIndex].GetAxis(eAxis);
 }
 
-float HyInput::GetAxisDelta(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
+float HyInput::GetGamePadAxisDelta(HyGamePadAxis eAxis, uint32 uiMappingIndex /*= 0*/) const
 {
 	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
-	return m_pInputMaps[uiMappingIndex].GetAxisDelta(iUserId);
+	return m_pInputMaps[uiMappingIndex].GetAxisDelta(eAxis);
 }
 
 bool HyInput::IsTextInputActive()
@@ -412,6 +412,24 @@ bool HyInput::IsUsingTouchScreen() const
 	void HyInput::SetMouseWindow(HyWindow *pWindow)
 	{
 		m_pMouseWindow = pWindow;
+	}
+
+	void HyInput::DoPadAxis(const SDL_Event &eventRef)
+	{
+		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+			m_pInputMaps[i].ApplyPadAxis(eventRef.caxis.axis, static_cast<float>(eventRef.caxis.value) / static_cast<float>(SDL_JOYSTICK_AXIS_MAX));
+	}
+
+	void HyInput::DoPadBtnDown(const SDL_Event &eventRef)
+	{
+		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+			m_pInputMaps[i].ApplyPadInput(static_cast<HyGamePadBtn>(eventRef.cbutton.button), HYBTN_Press);
+	}
+
+	void HyInput::DoPadBtnUp(const SDL_Event &eventRef)
+	{
+		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+			m_pInputMaps[i].ApplyPadInput(static_cast<HyGamePadBtn>(eventRef.cbutton.button), HYBTN_Release);
 	}
 
 	void HyInput::DoTouchDownEvent(const SDL_Event &eventRef)

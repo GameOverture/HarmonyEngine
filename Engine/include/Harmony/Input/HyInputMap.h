@@ -19,8 +19,9 @@ class HyInputMap
 	{
 		const int32	iID;
 
-		int32	iBtn;
-		int32	iBtnAlternative;
+		int32			iBtn;
+		int32			iBtnAlternative;
+		HyGamePadBtn	ePadBtn;
 
 		enum Flag
 		{
@@ -38,11 +39,14 @@ class HyInputMap
 		ActionInfo(int32 iId) :	iID(iId),
 								iBtn(HYKEY_Unassigned),
 								iBtnAlternative(HYKEY_Unassigned),
+								ePadBtn(HYPAD_Unassigned),
 								uiFlags(0)
 		{ }
 	};
 	std::map<int32, uint32>			m_ActionIndexMap;
 	std::vector<ActionInfo>			m_ActionList;
+
+	float							m_AxisValues[HYNUM_HYPADAXIS];
 
 public:
 	HyInputMap();
@@ -62,9 +66,7 @@ public:
 	int32 MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn);
 	int32 MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn);
 
-
-	bool MapJoystickBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiJoystickIndex);
-	bool MapJoystickAxis(int32 iUserId, HyGamePadBtn eAxis, float fMin = 0.0f, float fMax = 1.0f);
+	bool MapPadBtn(int32 iActionId, HyGamePadBtn eBtn);
 
 	bool Unmap(int32 iActionId);
 	bool IsMapped(int32 iActionId) const;
@@ -74,11 +76,13 @@ public:
 
 	bool IsActionDown(int32 iUserId) const;
 	bool IsActionReleased(int32 iUserId) const;	// Only true for a single frame upon button release
-	float GetAxis(int32 iUserId) const;
-	float GetAxisDelta(int32 iUserId) const;
+	float GetAxis(HyGamePadAxis eAxis) const;
+	float GetAxisDelta(HyGamePadAxis eAxis) const;
 
 	void Update();
 	void ApplyInput(int32 iKey, HyBtnPressState ePressState);
+	void ApplyPadInput(int32 iPadBtn, HyBtnPressState ePressState);
+	void ApplyPadAxis(int32 iAxis, float fValue);
 };
 
 #endif /* HyInputMap_h__ */
