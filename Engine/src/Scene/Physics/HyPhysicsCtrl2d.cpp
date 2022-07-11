@@ -15,7 +15,8 @@
 HyPhysicsCtrl2d::HyPhysicsCtrl2d(IHyBody2d &nodeRef) :
 	m_NodeRef(nodeRef),
 	m_pInit(nullptr),
-	m_pSimData(nullptr)
+	m_pSimData(nullptr),
+	m_bEnabled(true)
 {
 }
 
@@ -64,6 +65,8 @@ void HyPhysicsCtrl2d::Init(HyPhysicsType eType,
 	bool bIsCcd /*= false*/)
 {
 	HyAssert(eType != HYPHYS_Unknown, "HyPhysicsCtrl2d::Init was passed 'HYPHYS_Unknown'");
+
+	m_bEnabled = bIsEnabled;
 
 	// If 'm_pSimData' exists, then this node is already apart of an active simulation. Simply update the m_pSimData->m_pBody with all the incoming parameters
 	if(m_pSimData)
@@ -186,6 +189,15 @@ void HyPhysicsCtrl2d::SetEnabled(bool bEnable)
 		b2BodyDef def;
 		def.enabled = bEnable;
 		Init(def, b2FixtureDef());
+	}
+
+	m_bEnabled = bEnable;
+
+	if(m_bEnabled == false && m_NodeRef.pos.IsAnimating())
+	{
+		m_NodeRef.pos.GetAnimFloat(0).StopAnim();
+		m_NodeRef.pos.GetAnimFloat(1).StopAnim();
+		m_NodeRef.rot.StopAnim();
 	}
 }
 
@@ -621,19 +633,33 @@ float HyPhysicsCtrl2d::GetInertia() const
 // Should only be invoked by the parent HyPhysicsGrid2d
 void HyPhysicsCtrl2d::Update()
 {
-	// 'm_pSimData' is guarenteed to be valid if FlushTransform() is invoked (via HyPhysicsGrid2d)
+	// 'm_pSimData' is guarenteed to be valid if Update() is invoked (via HyPhysicsGrid2d)
 	HyAssert(m_pSimData, "HyPhysicsCtrl2d::Update() - m_pSimData was null");
 	HyAssert(m_NodeRef.ParentGet(), "HyPhysicsCtrl2d::Update() - Node's parent is null"); // Node's parent must exist
 	HyAssert(m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid, "HyPhysicsCtrl2d::Update() - Node's parent isn't a physics grid"); // and also be the HyPhysicsGrid2d that invoked this
 
-	// If any HyAnimFloat controlling the position or rotation are not animating, reset the below lambda that will have the b2Body set them respectively
-	if(m_NodeRef.pos.IsAnimating() == false)
+	if(m_pSimData->m_pBody->GetType() != b2_staticBody && m_bEnabled)
 	{
-		m_NodeRef.pos.GetAnimFloat(0).Updater([&](float fElapsedTime) { return (m_pSimData->m_pBody->GetPosition().x * static_cast<HyPhysicsGrid2d *>(m_NodeRef.ParentGet())->GetPixelsPerMeter()); });
-		m_NodeRef.pos.GetAnimFloat(1).Updater([&](float fElapsedTime) { return (m_pSimData->m_pBody->GetPosition().y * static_cast<HyPhysicsGrid2d *>(m_NodeRef.ParentGet())->GetPixelsPerMeter()); });
+		// If any HyAnimFloat controlling the position or rotation are not animating, reset the below lambda that will have the b2Body set them respectively
+		if(m_NodeRef.pos.IsAnimating() == false)
+		{
+			auto fpUpdaterPosX = [&](float fElapsedTime) {
+				return (m_pSimData->m_pBody->GetPosition().x * static_cast<HyPhysicsGrid2d *>(m_NodeRef.ParentGet())->GetPixelsPerMeter());
+			};
+			auto fpUpdaterPosY = [&](float fElapsedTime) {
+				return (m_pSimData->m_pBody->GetPosition().y * static_cast<HyPhysicsGrid2d *>(m_NodeRef.ParentGet())->GetPixelsPerMeter());
+			};
+
+			m_NodeRef.pos.GetAnimFloat(0).Updater(fpUpdaterPosX);
+			m_NodeRef.pos.GetAnimFloat(1).Updater(fpUpdaterPosY);
+		}
+		if(m_NodeRef.rot.IsAnimating() == false)
+		{
+			m_NodeRef.rot.Updater([&](float fElapsedTime) {
+				return glm::degrees(m_pSimData->m_pBody->GetAngle());
+				});
+		}
 	}
-	if(m_NodeRef.rot.IsAnimating() == false)
-		m_NodeRef.rot.Updater([&](float fElapsedTime) { return glm::degrees(m_pSimData->m_pBody->GetAngle()); });
 }
 
 void HyPhysicsCtrl2d::FlushTransform()

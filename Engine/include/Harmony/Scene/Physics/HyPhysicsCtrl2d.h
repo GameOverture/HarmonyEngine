@@ -29,6 +29,7 @@ class HyPhysicsCtrl2d
 	IHyBody2d &				m_NodeRef;
 	HyPhysicsInit2d *		m_pInit;		// Dynamically allocated when physics simulation is desired. Simulation will then start if/once owner of *this is a child of a HyPhysicsGrid2d.
 	HyPhysicsComponent2d *	m_pSimData;		// A pointer to the parent's concrete value in HyPhysicsGrid2d::m_PhysChildMap. Null if owner of *this is not yet a child of a HyPhysicsGrid2d
+	bool					m_bEnabled;
 
 public:
 	HyPhysicsCtrl2d(IHyBody2d &nodeRef);
