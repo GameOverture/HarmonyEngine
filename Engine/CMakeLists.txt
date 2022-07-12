@@ -26,6 +26,10 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			set(SDL_SHARED ON)
 		endif()
 		
+		if (MSVC)
+			list(APPEND EXTRA_LIBS vcruntime) # prevents memset issue in vcruntime.dll
+		endif()
+		
 		add_subdirectory(external/SDL2)
 		include_directories(external/SDL2/include)
 		set_target_properties(SDL2main PROPERTIES FOLDER "Engine Libs")
