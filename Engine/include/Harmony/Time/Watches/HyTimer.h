@@ -30,7 +30,7 @@ public:
 	void InitStart(double dDuration);
 	void Reset();
 
-	void Start();
+	void Start(); void Resume(); // Synonymous functions
 	void Pause();
 
 	bool IsExpired() const;

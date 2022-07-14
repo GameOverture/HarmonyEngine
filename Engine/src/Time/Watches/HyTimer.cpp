@@ -62,6 +62,11 @@ void HyTimer::Start()
 	m_bIsRunning = true;
 }
 
+void HyTimer::Resume()
+{
+	Start();
+}
+
 void HyTimer::Pause()
 {
 	m_bIsRunning = false;
