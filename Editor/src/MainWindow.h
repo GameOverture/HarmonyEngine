@@ -112,8 +112,6 @@ private Q_SLOTS:
 	void on_actionNewPackage_triggered();
 
 	void on_actionConnect_triggered();
-
-	void on_actionImportTileSheet_triggered();
 	
 	void on_actionAbout_triggered();
 	

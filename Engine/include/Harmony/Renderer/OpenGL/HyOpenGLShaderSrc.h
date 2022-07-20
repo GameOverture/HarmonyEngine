@@ -111,7 +111,7 @@ uniform vec4					u_vColor;
 
 //layout(location = 0) in vec2	attr_vPosition;
 
-attribute vec2	attr_vPosition;
+attribute vec2					attr_vPosition;
 
 void main()
 {
@@ -131,6 +131,59 @@ out vec4		out_vColor;
 void main()
 {
 	out_vColor = u_vColor;
+}
+)src";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CIRCLE
+const char *const szHYCIRCLE_VERTEXSHADER = R"src(
+#version 140
+//#extension GL_ARB_explicit_attrib_location : enable
+
+uniform mat4					u_mtxTransform;
+uniform mat4					u_mtxWorldToCamera;
+uniform mat4					u_mtxCameraToClip;
+uniform vec4					u_vColor;
+
+//layout(location = 0) in vec2	attr_vPosition;
+
+attribute vec2					attr_vPosition;
+
+smooth out vec2					interp_vUV;
+
+
+void main()
+{
+	vec4 vTemp = u_mtxTransform * vec4(attr_vPosition, 0, 1);
+	vTemp = u_mtxWorldToCamera * vTemp;
+	gl_Position = u_mtxCameraToClip * vTemp;
+}
+)src";
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+const char *const szHYCIRCLE_FRAGMENTSHADER = R"src(
+#version 140
+//#extension GL_ARB_explicit_attrib_location : enable
+
+uniform vec4	u_vColor;
+out vec4		out_vColor;
+
+void main()
+{
+	out_vColor = u_vColor;
+
+	// Normalized pixel coordinates (from 0 to 1)
+	vec2 uv = fragCoord/iResolution.xy * 2.0 - 1.0;
+	float fAspect = iResolution.x / iResolution.y;
+	// uv.x *= fAspect;
+
+	float fDist = 1.0 - length(uv);
+
+	if(fDist > 0.0)
+		fDist = 1.0;
+	else
+		discard
+
+	out_vColor.rgb = vec3(fDist);
 }
 )src";
 

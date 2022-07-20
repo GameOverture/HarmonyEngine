@@ -20,7 +20,6 @@
 #include "DlgNewPackage.h"
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
-#include "DlgImportTileSheet.h"
 #include "ExplorerWidget.h"
 #include "AudioAssetsWidget.h"
 #include "ManagerWidget.h"
@@ -64,7 +63,6 @@ MainWindow::MainWindow(QWidget *pParent) :
 
 	ui->explorer->SetModel(m_ExplorerModel);
 	
-	// TODO: Don't copy action pointers to other widgets, have function here that manipulates them instead
 	ui->explorer->addAction(ui->actionProjectSettings);
 	ui->explorer->addAction(ui->actionCloseProject);
 	ui->explorer->addAction(ui->actionCopy);
@@ -84,7 +82,6 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionRename);
 	ui->explorer->addAction(ui->actionBuildSettings);
 	ui->explorer->addAction(ui->actionNewBuild);
-	ui->explorer->addAction(ui->actionImportTileSheet);
 	ui->explorer->addAction(ui->actionActivateProject);
 	ui->explorer->addAction(ui->actionOpenFolderExplorer);
 	
@@ -791,11 +788,7 @@ void MainWindow::on_actionConnect_triggered()
 	//m_pDebugConnection->Connect();
 }
 
-void MainWindow::on_actionImportTileSheet_triggered()
-{
-	DlgImportTileSheet dlgImportTileSheet(*Harmony::GetProject(), this);
-	dlgImportTileSheet.exec();
-}
+
 
 void MainWindow::on_actionAbout_triggered()
 {

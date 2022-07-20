@@ -140,7 +140,8 @@ AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
 		m_SelectedTexQuadList[i]->Load();
 		m_SelectedTexQuadList[i]->SetVisible(true);
 		m_SelectedTexQuadList[i]->SetDisplayOrder(DISPLAYORDER_AtlasSelectedFrames);
-		m_SelectedTexQuadList[i]->pos.Tween(ptPos.x, ptPos.y - fCurMaxHeight, 0.1f, HyTween::QuadInOut);
+		//m_SelectedTexQuadList[i]->pos.Tween(ptPos.x, ptPos.y - fCurMaxHeight, 0.1f, HyTween::QuadInOut);
+		m_SelectedTexQuadList[i]->pos.Set(ptPos.x, ptPos.y - fCurMaxHeight);
 		
 		ptPos.x += m_SelectedTexQuadList[i]->GetWidth();
 	}

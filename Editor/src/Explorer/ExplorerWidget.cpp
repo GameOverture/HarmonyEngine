@@ -349,7 +349,6 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 	FINDACTION("actionNewEntity3d")->setEnabled(bValidItem);
 	FINDACTION("actionBuildSettings")->setEnabled(bValidItem);
 	FINDACTION("actionNewBuild")->setEnabled(bValidItem);
-	FINDACTION("actionImportTileSheet")->setEnabled(bValidItem);
 
 	if(pCurSelected)
 	{

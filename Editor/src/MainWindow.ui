@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>581</width>
+    <width>580</width>
     <height>396</height>
    </rect>
   </property>
@@ -55,7 +55,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>581</width>
+     <width>580</width>
      <height>21</height>
     </rect>
    </property>
@@ -100,8 +100,6 @@
      <string>&amp;Tools</string>
     </property>
     <addaction name="actionProjectSettings"/>
-    <addaction name="separator"/>
-    <addaction name="actionImportTileSheet"/>
     <addaction name="separator"/>
     <addaction name="actionConnect"/>
    </widget>
@@ -636,21 +634,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+N, Ctrl+T</string>
-   </property>
-  </action>
-  <action name="actionImportTileSheet">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/Tools-ImportTileSheet.png</normaloff>:/icons16x16/Tools-ImportTileSheet.png</iconset>
-   </property>
-   <property name="text">
-    <string>Import Tile Sheet</string>
-   </property>
-   <property name="toolTip">
-    <string>Automatically slice an assembled grid of sprites from a single image</string>
    </property>
   </action>
   <action name="actionNewPackage">

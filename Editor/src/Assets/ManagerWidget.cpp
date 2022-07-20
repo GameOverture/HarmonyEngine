@@ -21,6 +21,7 @@
 #include "PrefabModel.h"
 #include "MainWindow.h"
 #include "DlgAssetProperties.h"
+#include "DlgImportTileSheet.h"
 
 #include <QUndoCommand>
 #include <QMessageBox>
@@ -439,6 +440,9 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		}
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
+		if(m_pModel->GetAssetType() == ASSET_Atlas)
+			contextMenu.addAction(ui->actionImportTileSheet);
+
 		contextMenu.addAction(ui->actionAddFilter);
 		if(selectedFiltersList.empty() == false)
 		{
@@ -486,6 +490,8 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		contextMenu.addSeparator();
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
+		if(m_pModel->GetAssetType() == ASSET_Atlas)
+			contextMenu.addAction(ui->actionImportTileSheet);
 		contextMenu.addAction(ui->actionAddFilter);
 
 		// Check if any selected assets are 'generated' from their project item. If so, prevent delete/replace
@@ -780,4 +786,10 @@ void ManagerWidget::on_txtSearch_textChanged(const QString &text)
 	//			ui->assetTree->expand(srcIndex);
 	//	}
 	//}
+}
+
+void ManagerWidget::on_actionImportTileSheet_triggered()
+{
+	DlgImportTileSheet dlgImportTileSheet(*Harmony::GetProject(), this);
+	dlgImportTileSheet.exec();
 }

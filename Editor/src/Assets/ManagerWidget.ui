@@ -369,6 +369,18 @@
     <string>Add a new file to project</string>
    </property>
   </action>
+  <action name="actionImportTileSheet">
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/Tools-ImportTileSheet.png</normaloff>:/icons16x16/Tools-ImportTileSheet.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import Tile Sheet</string>
+   </property>
+   <property name="toolTip">
+    <string>Automatically slice an assembled grid of sprites from a single image</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

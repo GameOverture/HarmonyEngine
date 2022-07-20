@@ -113,6 +113,8 @@ private Q_SLOTS:
 	void on_chkShowAllBanks_clicked();
 
 	void on_txtSearch_textChanged(const QString &text);
+
+	void on_actionImportTileSheet_triggered();
 	
 private:
 	Ui::ManagerWidget *ui;
