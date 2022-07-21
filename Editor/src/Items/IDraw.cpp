@@ -24,19 +24,40 @@
 
 #define KEY_PanCamera Qt::Key_Space
 
+const int32 iNUM_ZOOM_LEVELS = 14;
+QString g_sZoomLevels[iNUM_ZOOM_LEVELS] = { "1600%", "800%", "600%",   "500%", "400%", "300%", "200%", "100%", "75%", "50%", "33.3%", "25%", "12.5%", "6.25%" };
+float g_fZoomLevels[iNUM_ZOOM_LEVELS] =   { 0.0625f, 0.125f, 0.166667f, 0.2f,  0.25f,  0.375f,  0.5f,   1.0f,   1.5f,  2.0f,  3.0f,   4.0f,   8.0f,    16.0f };
+
 IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_pProjItem(pProjItem),
 	m_pCamera(HyEngine::Window().GetCamera2d(0)),
 	m_bPanCameraKeyDown(false),
 	m_bIsCameraPanning(false),
 	m_ptCamPos(0.0f, 0.0f),
-	m_fCamZoom(1.0f)
+	m_fCamZoom(1.0f),
+	m_sZoomStatus("100%")
 {
 	if(HyGlobal::IsItemFileDataValid(initFileDataRef))
 	{
 		HySetVec(m_ptCamPos, initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[0].toDouble()) : 0.0f,
 							 initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[1].toDouble()) : 0.0f);
 		m_fCamZoom = static_cast<float>(initFileDataRef.m_Meta["CameraZoom"].toDouble());
+
+		int32 iZoomLevel = 0;
+		for(; iZoomLevel < iNUM_ZOOM_LEVELS; ++iZoomLevel)
+		{
+			if(m_fCamZoom <= g_fZoomLevels[iZoomLevel])
+			{
+				m_fCamZoom = g_fZoomLevels[iZoomLevel];
+				break;
+			}
+		}
+		iZoomLevel = HyClamp(iZoomLevel, 0, iNUM_ZOOM_LEVELS - 1);
+
+		m_fCamZoom = g_fZoomLevels[iZoomLevel];
+		m_sZoomStatus = g_sZoomLevels[iZoomLevel];
+
+		m_pCamera->SetZoom(m_fCamZoom);
 	}
 	//m_pCamera->SetVisible(false);
 }
@@ -105,12 +126,11 @@ void IDraw::ResizeRenderer()
 void IDraw::UpdateDrawStatus(QString sSizeDescription)
 {
 	m_sSizeStatus = sSizeDescription;
-	QString sZoom = QString::number(m_pCamera->scale.X());
 	glm::vec2 ptWorldMousePos;
 	if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
-		MainWindow::SetDrawStatus("", m_sSizeStatus, sZoom);
+		MainWindow::SetDrawStatus("", m_sSizeStatus, m_sZoomStatus);
 	else
-		MainWindow::SetDrawStatus(QString::number(floor(ptWorldMousePos.x)) % " " % QString::number(floor(ptWorldMousePos.y)), m_sSizeStatus, sZoom);
+		MainWindow::SetDrawStatus(QString::number(floor(ptWorldMousePos.x)) % " " % QString::number(floor(ptWorldMousePos.y)), m_sSizeStatus, m_sZoomStatus);
 }
 
 /*virtual*/ void IDraw::OnKeyPressEvent(QKeyEvent *pEvent)
@@ -176,16 +196,13 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 	if(!numDegrees.isNull())
 	{
-		const int32 iNUM_ZOOM_LEVELS = 5;
-		float fZoomLevels[iNUM_ZOOM_LEVELS] = { 0.25f, 0.5f, 1.0f, 1.5f, 2.0f };
-
 		float fCurScale = m_pCamera->scale.X();
 		int32 iZoomLevel = 0;
 		for(; iZoomLevel < iNUM_ZOOM_LEVELS; ++iZoomLevel)
 		{
-			if(fCurScale <= fZoomLevels[iZoomLevel])
+			if(fCurScale <= g_fZoomLevels[iZoomLevel])
 			{
-				fCurScale = fZoomLevels[iZoomLevel];
+				fCurScale = g_fZoomLevels[iZoomLevel];
 				break;
 			}
 		}
@@ -196,7 +213,9 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 			iZoomLevel--;
 		iZoomLevel = HyClamp(iZoomLevel, 0, iNUM_ZOOM_LEVELS - 1);
 
-		fCurScale = fZoomLevels[iZoomLevel];
+		fCurScale = g_fZoomLevels[iZoomLevel];
+		m_sZoomStatus = g_sZoomLevels[iZoomLevel];
+
 		m_pCamera->SetZoom(fCurScale);
 		//m_pCamera->scale.TweenOffset(fCurScale, fCurScale, 0.5f, HyTween::QuadInOut);
 

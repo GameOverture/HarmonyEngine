@@ -31,6 +31,7 @@ protected:
 
 private:
 	QString				m_sSizeStatus;	// Derived classes should set this using UpdateDrawStatus()
+	QString				m_sZoomStatus;
 
 public:
 	IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
