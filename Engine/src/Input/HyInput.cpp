@@ -454,6 +454,11 @@ bool HyInput::IsUsingTouchScreen() const
 
 		m_uiMouseBtnFlags &= ~(1 << SDL_BUTTON_LEFT);
 	}
+#elif defined(HY_PLATFORM_GUI)
+	void HyInput::SetWidgetMousePos(glm::vec2 ptMousePos)
+	{
+		m_ptMousePos = ptMousePos;
+	}
 #endif
 
 void HyInput::DistrubuteTextInput(std::string sNewText)

@@ -28,6 +28,7 @@ HarmonyWidget::HarmonyWidget(Project *pProject) :
 	connect(m_pTimer, SIGNAL(timeout()), this, SLOT(OnBootCheck()));
 	m_pTimer->start(50);
 
+	setMouseTracking(true);
 	setAcceptDrops(true);
 	RestoreCursor();
 }
@@ -256,6 +257,9 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	if(pCurItem == nullptr)
 		return;
 
+	QPointF ptCurMousePos = pEvent->localPos();
+	m_pHyEngine->SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y()));
+	
 	pCurItem->GetDraw()->OnMouseMoveEvent(pEvent);
 }
 

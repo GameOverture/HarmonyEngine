@@ -206,4 +206,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		if(m_Sprite.IsAnimFinished())
 			pWidget->StopPlayingAnim();
 	}
+
+	UpdateDrawStatus(QString("[") % QString::number(m_Sprite.GetFrameWidth()) % " " % QString::number(m_Sprite.GetFrameHeight()) % "]");
 }

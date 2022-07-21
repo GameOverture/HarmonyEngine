@@ -180,11 +180,15 @@ void ProjectItemData::GetLatestFileData(FileDataPair &itemFileDataOut) const
 	// Replace camera data if a draw instance is instantiated
 	if(m_pDraw)
 	{
+		glm::vec2 ptCamPos(0.0f, 0.0f);
+		float fCamZoom = 1.0f;
+		m_pDraw->GetCameraInfo(ptCamPos, fCamZoom);
+
 		QJsonArray cameraPosArray;
-		cameraPosArray.append(m_pDraw->GetCamera()->pos.X());
-		cameraPosArray.append(m_pDraw->GetCamera()->pos.Y());
+		cameraPosArray.append(ptCamPos.x);
+		cameraPosArray.append(ptCamPos.y);
 		itemFileDataOut.m_Meta["CameraPos"] = cameraPosArray;
-		itemFileDataOut.m_Meta["CameraZoom"] = m_pDraw->GetCamera()->GetZoom();
+		itemFileDataOut.m_Meta["CameraZoom"] = fCamZoom;
 	}
 
 	// Assemble item specific data

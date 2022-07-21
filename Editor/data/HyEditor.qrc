@@ -214,5 +214,7 @@
         <file>icons16x16/items/Source-Settings.png</file>
         <file>icons16x16/items/Source-Warning.png</file>
         <file>icons16x16/search.png</file>
+        <file>icons16x16/StatusMouse.png</file>
+        <file>icons16x16/StatusSize.png</file>
     </qresource>
 </RCC>

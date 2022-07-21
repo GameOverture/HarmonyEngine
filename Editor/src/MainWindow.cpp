@@ -204,11 +204,25 @@ MainWindow::MainWindow(QWidget *pParent) :
 	//QPixmap *pPixmap = new QPixmap(":/icons16x16/smiley-sad.gif");
 	//QLabel *pSvnStatusIcon = new QLabel;
 	//pSvnStatusIcon->setPixmap(*pPixmap);
-	//statusBar()->addPermanentWidget(pSvnStatusIcon);
+	//ui->statusBar->addPermanentWidget(&pSvnStatusIcon);
 
 	//QLabel *pSvnLoginLabel = new QLabel;
 	//pSvnLoginLabel->setText("SVN Not Detected");
-	//statusBar()->addPermanentWidget(pSvnLoginLabel);
+	//ui->statusBar->addPermanentWidget(pSvnLoginLabel);
+
+	QPixmap *pPixmap = new QPixmap(":/icons16x16/StatusMouse.png");
+	m_StatusBarMouseIcon.setPixmap(*pPixmap);
+	pPixmap = new QPixmap(":/icons16x16/StatusSize.png");
+	m_StatusBarSizeIcon.setPixmap(*pPixmap);
+	pPixmap = new QPixmap(":/icons16x16/search.png");
+	m_StatusBarZoomIcon.setPixmap(*pPixmap);
+
+	ui->statusBar->addPermanentWidget(&m_StatusBarMouseIcon);
+	ui->statusBar->addPermanentWidget(&m_StatusBarMouse);
+	ui->statusBar->addPermanentWidget(&m_StatusBarSizeIcon);
+	ui->statusBar->addPermanentWidget(&m_StatusBarSize);
+	ui->statusBar->addPermanentWidget(&m_StatusBarZoomIcon);
+	ui->statusBar->addPermanentWidget(&m_StatusBarZoom);
 
 	HyGuiLog("Ready to go!", LOGTYPE_Normal);
 }
@@ -434,6 +448,13 @@ void MainWindow::SetCurrentProject(Project *pProject)
 /*static*/ IWidget *MainWindow::GetItemProperties()
 {
 	return static_cast<IWidget *>(sm_pInstance->ui->dockWidgetProperties->widget());
+}
+
+/*static*/ void MainWindow::SetDrawStatus(QString sMouse, QString sSize, QString sZoom)
+{
+	sm_pInstance->m_StatusBarMouse.setText(sMouse);
+	sm_pInstance->m_StatusBarSize.setText(sSize);
+	sm_pInstance->m_StatusBarZoom.setText(sZoom);
 }
 
 /*virtual*/ void MainWindow::closeEvent(QCloseEvent *pEvent) /*override*/ 

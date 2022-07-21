@@ -13,6 +13,7 @@
 #include "Global.h"
 
 #include <QWidget>
+#include <QString>
 
 class ProjectItemData;
 
@@ -21,22 +22,28 @@ class IDraw : public HyEntity2d
 protected:
 	ProjectItemData *	m_pProjItem;
 	HyCamera2d *		m_pCamera;
+	glm::vec2			m_ptCamPos;
+	float				m_fCamZoom;
 
 	bool				m_bPanCameraKeyDown;
 	bool				m_bIsCameraPanning;
 	QPointF				m_ptOldMousePos;
 
+private:
+	QString				m_sSizeStatus;	// Derived classes should set this using UpdateDrawStatus()
+
 public:
 	IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~IDraw();
 
-	HyCamera2d *GetCamera();
+	void GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut);
 	
 	void ApplyJsonData();
 
 	void Show();
 	void Hide();
 	void ResizeRenderer();
+	void UpdateDrawStatus(QString sSizeDescription);
 
 	// Derived classes should pass their input events to this class, if they want their main camera to accept user control
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent);

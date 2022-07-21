@@ -32,6 +32,7 @@ class HarmonyWidget : public QOpenGLWidget//, protected QOpenGLFunctions
 			HyEngine(initStruct),
 			m_pProject(pProject)
 		{
+			HyEngine::Window().CreateCamera2d();
 			//m_pProject->HarmonyInitialize();
 		}
 

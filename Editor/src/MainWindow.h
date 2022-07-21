@@ -51,6 +51,13 @@ class MainWindow : public QMainWindow
 	QLabel							m_LoadingMsg;
 	QProgressBar					m_LoadingBar;
 
+	QLabel 							m_StatusBarMouseIcon;
+	QLabel 							m_StatusBarMouse;
+	QLabel 							m_StatusBarSizeIcon;
+	QLabel							m_StatusBarSize;
+	QLabel 							m_StatusBarZoomIcon;
+	QLabel							m_StatusBarZoom;
+
 public:
 	explicit MainWindow(QWidget *pParent = 0);
 	~MainWindow();
@@ -77,6 +84,8 @@ public:
 	static int GetAssetManagerTabIndex();
 
 	static IWidget *GetItemProperties();
+
+	static void SetDrawStatus(QString sMouse, QString sSize, QString sZoom);
 
 protected:
 	virtual void closeEvent(QCloseEvent *pEvent) override;

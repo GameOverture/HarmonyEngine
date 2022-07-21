@@ -133,6 +133,8 @@ private:
 	void DoTouchDownEvent(const SDL_Event &eventRef);
 	void DoTouchMoveEvent(const SDL_Event &eventRef);
 	void DoTouchUpEvent(const SDL_Event &eventRef);
+#elif defined(HY_PLATFORM_GUI)
+	void SetWidgetMousePos(glm::vec2 ptMousePos);
 #endif
 
 	void DistrubuteTextInput(std::string sNewText);

@@ -19,34 +19,37 @@
 #include <QJsonArray>
 #include <QKeyEvent>
 #include <QApplication>
+#include <QString>
 
 #define KEY_PanCamera Qt::Key_Space
 
 IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_pProjItem(pProjItem),
-	m_pCamera(nullptr),
+	m_pCamera(HyEngine::Window().GetCamera2d(0)),
 	m_bPanCameraKeyDown(false),
-	m_bIsCameraPanning(false)
+	m_bIsCameraPanning(false),
+	m_ptCamPos(0.0f, 0.0f),
+	m_fCamZoom(1.0f)
 {
-	m_pCamera = HyEngine::Window().CreateCamera2d();
 	if(HyGlobal::IsItemFileDataValid(initFileDataRef))
 	{
-		m_pCamera->pos.Set(initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[0].toDouble()) : 0.0f,
-						   initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[1].toDouble()) : 0.0f);
-		m_pCamera->SetZoom(static_cast<float>(initFileDataRef.m_Meta["CameraZoom"].toDouble()));
+		HySetVec(m_ptCamPos, initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[0].toDouble()) : 0.0f,
+							 initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[1].toDouble()) : 0.0f);
+		m_fCamZoom = static_cast<float>(initFileDataRef.m_Meta["CameraZoom"].toDouble());
 	}
-	m_pCamera->SetVisible(false);
+	//m_pCamera->SetVisible(false);
 }
 
 /*virtual*/ IDraw::~IDraw()
 {
-	if(HyEngine::IsInitialized())
-		HyEngine::Window().RemoveCamera(m_pCamera);
+	//if(HyEngine::IsInitialized())
+	//	HyEngine::Window().RemoveCamera(m_pCamera);
 }
 
-HyCamera2d *IDraw::GetCamera()
+void IDraw::GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut)
 {
-	return m_pCamera;
+	ptPosOut = m_ptCamPos;
+	fZoomOut = m_fCamZoom;
 }
 
 void IDraw::ApplyJsonData()
@@ -68,15 +71,21 @@ void IDraw::ApplyJsonData()
 
 void IDraw::Show()
 {
-	m_pCamera->SetVisible(true);
+	m_pCamera->pos.Set(m_ptCamPos);
+	m_pCamera->SetZoom(m_fCamZoom);
+
+	//m_pCamera->SetVisible(true);
 	OnResizeRenderer();
 
 	OnShow();
+	UpdateDrawStatus(m_sSizeStatus);
 }
 
 void IDraw::Hide()
 {
-	m_pCamera->SetVisible(false);
+	//m_pCamera->SetVisible(false);
+	m_ptCamPos = m_pCamera->pos.Get();
+	m_fCamZoom = m_pCamera->GetZoom();
 
 	OnHide();
 }
@@ -84,6 +93,17 @@ void IDraw::Hide()
 void IDraw::ResizeRenderer()
 {
 	OnResizeRenderer();
+}
+
+void IDraw::UpdateDrawStatus(QString sSizeDescription)
+{
+	m_sSizeStatus = sSizeDescription;
+	QString sZoom = QString::number(m_pCamera->scale.X());
+	glm::vec2 ptWorldMousePos;
+	if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+		MainWindow::SetDrawStatus("", m_sSizeStatus, sZoom);
+	else
+		MainWindow::SetDrawStatus(QString::number(floor(ptWorldMousePos.x)) % " " % QString::number(floor(ptWorldMousePos.y)), m_sSizeStatus, sZoom);
 }
 
 /*virtual*/ void IDraw::OnKeyPressEvent(QKeyEvent *pEvent)
@@ -145,8 +165,29 @@ void IDraw::ResizeRenderer()
 	}
 	else */if(!numDegrees.isNull())
 	{
-		QPoint numSteps = numDegrees / 15;
-		m_pCamera->scale.TweenOffset(numSteps.y() * -0.2f, numSteps.y() * -0.2f, 0.5f, HyTween::QuadInOut);
+		const int32 iNUM_ZOOM_LEVELS = 5;
+		float fZoomLevels[iNUM_ZOOM_LEVELS] = { 0.25f, 0.5f, 1.0f, 1.5f, 2.0f };
+
+		float fCurScale = m_pCamera->scale.X();
+		int32 iZoomLevel = 0;
+		for(; iZoomLevel < iNUM_ZOOM_LEVELS; ++iZoomLevel)
+		{
+			if(fCurScale <= fZoomLevels[iZoomLevel])
+			{
+				fCurScale = fZoomLevels[iZoomLevel];
+				break;
+			}
+		}
+
+		if(numDegrees.y() < 0.0f)
+			iZoomLevel++;
+		else 
+			iZoomLevel--;
+		iZoomLevel = HyClamp(iZoomLevel, 0, iNUM_ZOOM_LEVELS - 1);
+
+		fCurScale = fZoomLevels[iZoomLevel];
+		m_pCamera->SetZoom(fCurScale);
+		//m_pCamera->scale.TweenOffset(fCurScale, fCurScale, 0.5f, HyTween::QuadInOut);
 		//scrollWithDegrees(numSteps);
 	}
 
@@ -155,9 +196,10 @@ void IDraw::ResizeRenderer()
 
 /*virtual*/ void IDraw::OnMouseMoveEvent(QMouseEvent *pEvent)
 {
+	QPointF ptCurMousePos = pEvent->localPos();
+
 	if(m_bIsCameraPanning)//0 != (pEvent->buttons() & Qt::MidButton))
 	{
-		QPointF ptCurMousePos = pEvent->localPos();
 		if(ptCurMousePos != m_ptOldMousePos)
 		{
 			QPointF vDeltaMousePos = m_ptOldMousePos - ptCurMousePos;
@@ -166,4 +208,6 @@ void IDraw::ResizeRenderer()
 
 		m_ptOldMousePos = ptCurMousePos;
 	}
+
+	UpdateDrawStatus(m_sSizeStatus);
 }

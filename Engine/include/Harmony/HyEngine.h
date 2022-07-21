@@ -92,6 +92,10 @@ private:
 	bool Update();
 	bool PollPlatformApi();
 
+#if defined(HY_PLATFORM_GUI)
+	void SetWidgetMousePos(glm::vec2 ptMousePos);
+#endif
+
 public:
 	static bool IsInitialized();
 	static const HarmonyInit &InitValues();
