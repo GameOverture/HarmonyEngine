@@ -478,7 +478,7 @@ unsigned char *TextFontManager::GetAtlasInfo(uint &uiAtlasPixelDataSizeOut, QSiz
 		for(uint i = 0; i < uiNumPixels; ++i)
 			m_pPreviewAtlasPixelData[i*4+3] = m_pPreviewAtlas->data[i];
 
-		RegenFontArray();
+		RegenFontArray(false);
 		m_bPreviewAtlasPixelDataInitialized = true;
 	}
 
@@ -629,7 +629,7 @@ void TextFontManager::ClearAndEmbiggenAtlas()
 	HyGuiLog("Preview font's atlas has been embiggened to: " % QString::number(m_uiPreviewAtlasDimension), LOGTYPE_Info);
 }
 
-void TextFontManager::RegenFontArray()
+void TextFontManager::RegenFontArray(bool bSetRuntimeAtlasDirty /*= true*/)
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Cleanup unused fonts
@@ -727,7 +727,8 @@ void TextFontManager::RegenFontArray()
 		fontArray.append(QJsonValue(stageObj));
 	}
 
-	static_cast<TextModel *>(m_GlyphsModel.GetOwner().GetModel())->SetRuntimeAtlasDirty();
+	if(bSetRuntimeAtlasDirty)
+		static_cast<TextModel *>(m_GlyphsModel.GetOwner().GetModel())->SetRuntimeAtlasDirty();
 
 	m_FontArray = fontArray;
 }

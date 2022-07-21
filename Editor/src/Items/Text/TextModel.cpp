@@ -91,6 +91,7 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 
 void TextModel::SetRuntimeAtlasDirty()
 {
+	HyGuiLog(m_ItemRef.GetName(true) % " runtime atlas is dirty.", LOGTYPE_Normal);
 	m_bGenerateRuntimeAtlas = true;
 }
 

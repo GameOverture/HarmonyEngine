@@ -260,7 +260,8 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	QPointF ptCurMousePos = pEvent->localPos();
 	m_pHyEngine->SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y()));
 	
-	pCurItem->GetDraw()->OnMouseMoveEvent(pEvent);
+	if(pCurItem->GetDraw())
+		pCurItem->GetDraw()->OnMouseMoveEvent(pEvent);
 }
 
 /*virtual*/ void HarmonyWidget::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
