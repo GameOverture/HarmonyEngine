@@ -37,6 +37,7 @@ public:
 	virtual ~IDraw();
 
 	void GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut);
+	void SetCamera(glm::vec2 ptCamPos, float fZoom);
 	
 	void ApplyJsonData();
 

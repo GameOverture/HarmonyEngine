@@ -14,6 +14,7 @@
 #include "MainWindow.h"
 #include "Harmony.h"
 #include "HarmonyWidget.h"
+#include "GlobalUndoCmds.h"
 
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -52,6 +53,15 @@ void IDraw::GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut)
 	fZoomOut = m_fCamZoom;
 }
 
+void IDraw::SetCamera(glm::vec2 ptCamPos, float fZoom)
+{
+	m_ptCamPos = ptCamPos;
+	m_fCamZoom = fZoom;
+
+	m_pCamera->pos.Set(m_ptCamPos);
+	m_pCamera->SetZoom(m_fCamZoom);
+}
+
 void IDraw::ApplyJsonData()
 {
 	if(m_pProjItem == nullptr)
@@ -84,9 +94,6 @@ void IDraw::Show()
 void IDraw::Hide()
 {
 	//m_pCamera->SetVisible(false);
-	m_ptCamPos = m_pCamera->pos.Get();
-	m_fCamZoom = m_pCamera->GetZoom();
-
 	OnHide();
 }
 
@@ -150,6 +157,14 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(Qt::OpenHandCursor);
 			else
 				Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursor();
+
+			if(m_ptCamPos.x != m_pCamera->pos.X() || m_ptCamPos.y != m_pCamera->pos.Y())
+			{
+				QUndoCommand *pCmd = new UndoCmd_CameraUpdate("Camera Pan", *m_pProjItem, m_ptCamPos, m_fCamZoom, m_pCamera->pos.Get(), m_pCamera->GetZoom());
+				m_pProjItem->GetUndoStack()->push(pCmd);
+				
+				m_ptCamPos = m_pCamera->pos.Get();
+			}
 		}
 	}
 }
@@ -159,11 +174,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 	QPoint numPixels = pEvent->pixelDelta();
 	QPoint numDegrees = pEvent->angleDelta() / 8;
 
-	/*if(!numPixels.isNull())
-	{
-		//scrollWithPixels(numPixels);
-	}
-	else */if(!numDegrees.isNull())
+	if(!numDegrees.isNull())
 	{
 		const int32 iNUM_ZOOM_LEVELS = 5;
 		float fZoomLevels[iNUM_ZOOM_LEVELS] = { 0.25f, 0.5f, 1.0f, 1.5f, 2.0f };
@@ -188,7 +199,13 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		fCurScale = fZoomLevels[iZoomLevel];
 		m_pCamera->SetZoom(fCurScale);
 		//m_pCamera->scale.TweenOffset(fCurScale, fCurScale, 0.5f, HyTween::QuadInOut);
-		//scrollWithDegrees(numSteps);
+
+		UpdateDrawStatus(m_sSizeStatus);
+
+		QUndoCommand *pCmd = new UndoCmd_CameraUpdate("Camera Zoom", *m_pProjItem, m_ptCamPos, m_fCamZoom, m_pCamera->pos.Get(), m_pCamera->GetZoom());
+		m_pProjItem->GetUndoStack()->push(pCmd);
+
+		m_fCamZoom = m_pCamera->GetZoom();
 	}
 
 	pEvent->accept();

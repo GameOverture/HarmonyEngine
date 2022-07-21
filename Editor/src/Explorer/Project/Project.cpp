@@ -965,24 +965,6 @@ void Project::OpenTab(ProjectItemData *pItem)
 void Project::CloseTab(ProjectItemData *pItem)
 {
 	pItem->WidgetUnload();
-
-	// Save camera view
-	IDraw *pItemDraw = pItem->GetDraw();
-	if(pItemDraw && pItem->IsExistencePendingSave() == false)
-	{
-		glm::vec2 ptCamPos(0.0f, 0.0f);
-		float fCamZoom = 1.0f;
-		pItemDraw->GetCameraInfo(ptCamPos, fCamZoom);
-
-		QJsonArray cameraPosArray;
-		cameraPosArray.append(ptCamPos.x);
-		cameraPosArray.append(ptCamPos.y);
-		m_ProjectFileData.m_Meta["CameraPos"] = cameraPosArray;
-		m_ProjectFileData.m_Meta["CameraZoom"] = fCamZoom;
-
-		//pItem->WriteMetaData();
-	}
-
 	pItem->DrawUnload();
 
 	if(pItem == m_pCurOpenItem)

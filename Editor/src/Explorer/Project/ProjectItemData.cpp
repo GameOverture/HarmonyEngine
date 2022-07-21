@@ -205,8 +205,8 @@ bool ProjectItemData::Save(bool bWriteToDisk)
 	// Register the item's file data into the project
 	GetProject().SaveItemData(m_eTYPE, GetName(true), m_ItemFileData, bWriteToDisk);
 	
-	m_pUndoStack->setClean();
 	m_bExistencePendingSave = false;
+	m_pUndoStack->setClean();
 
 	return true;
 }

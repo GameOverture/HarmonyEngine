@@ -62,6 +62,7 @@ public:
 	void RemoveDependency(ProjectItemData *pProjItem);
 	
 	void GiveMenuActions(QMenu *pMenu);
+
 	void GetLatestFileData(FileDataPair &itemFileDataOut) const;
 	bool Save(bool bWriteToDisk);
 	bool IsExistencePendingSave() const;
