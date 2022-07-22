@@ -52,6 +52,32 @@ void main()
 	out_vColor = mix(u_vGridColor1, u_vGridColor2, step((float(int(floor(vScreenCoords.x) + floor(vScreenCoords.y)) & 1)), 0.9));
 }
 )src";
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+const char *const szOVERGRID_FRAGMENTSHADER = R"src(
+#version 400
+
+uniform float                   u_fGridSize;
+uniform vec2                    u_vDimensions;
+uniform vec4                    u_vGridColor;
+
+smooth in vec2                  interp_vUV;
+out vec4                        out_vColor;
+
+void main()
+{
+	vec2 vScreenCoords = (interp_vUV * u_vDimensions);
+
+	int iWidth = int(vScreenCoords.x);
+	int iHeight = int(vScreenCoords.y);
+	int iGridSize = int(u_fGridSize);
+
+	if(iWidth % iGridSize == 0 || iHeight % iGridSize == 0)
+		out_vColor = u_vGridColor;
+	else
+		out_vColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+}
+)src";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
@@ -121,12 +147,33 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 	return true;
 }
 
+
+OverGrid::OverGrid(float fWidth, float fHeight, float fGridSize) :
+	CheckerGrid(fWidth, fHeight, fGridSize)
+{
+}
+
+/*virtual*/ OverGrid::~OverGrid()
+{
+}
+
+/*virtual*/ void OverGrid::OnUpdateUniforms() /*override*/
+{
+	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform();
+
+	m_ShaderUniforms.Set("u_mtxTransform", mtx);
+	m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);
+	m_ShaderUniforms.Set("u_vDimensions", m_vDIMENSIONS);
+	m_ShaderUniforms.Set("u_vGridColor", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ProjectDraw::ProjectDraw() :
 	IDraw(nullptr, FileDataPair()),
-	m_CheckerGrid(20000.0f, 20000.0f, 25.0f)
+	m_CheckerGrid(20000.0f, 20000.0f, 25.0f),
+	m_OverGrid(20000.0f, 20000.0f, 25.0f)
 {
 	ChildAppend(m_CheckerGrid);
 
@@ -139,6 +186,20 @@ ProjectDraw::ProjectDraw() :
 
 	m_CheckerGrid.SetShader(m_pCheckerGridShader);
 	m_CheckerGrid.SetDisplayOrder(-1000);
+
+
+	ChildAppend(m_OverGrid);
+
+	m_pOverGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
+	m_pOverGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
+	m_pOverGridShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
+	m_pOverGridShader->AddVertexAttribute("attr_vUVcoord", HyShaderVariable::vec2);
+	m_pOverGridShader->SetSourceCode(szOVERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
+	m_pOverGridShader->Finalize();
+
+	m_OverGrid.SetShader(m_pOverGridShader);
+	m_OverGrid.SetDisplayOrder(99999);
+	m_OverGrid.SetVisible(false);
 }
 
 /*virtual*/ ProjectDraw::~ProjectDraw()

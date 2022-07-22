@@ -24,9 +24,7 @@
 
 #define KEY_PanCamera Qt::Key_Space
 
-const int32 iNUM_ZOOM_LEVELS = 14;
-QString g_sZoomLevels[iNUM_ZOOM_LEVELS] = { "1600%", "800%", "600%",   "500%", "400%", "300%", "200%", "100%", "75%", "50%", "33.3%", "25%", "12.5%", "6.25%" };
-float g_fZoomLevels[iNUM_ZOOM_LEVELS] =   { 0.0625f, 0.125f, 0.166667f, 0.2f,  0.25f,  0.375f,  0.5f,   1.0f,   1.5f,  2.0f,  3.0f,   4.0f,   8.0f,    16.0f };
+const QString g_sZoomLevels[HYNUM_ZOOMLEVELS] = { "6.25%","12.5%", "25%",  "33.33%","50%", "75%","100%","200%","300%","400%","500%","600%","800%","1200%","1600%" };
 
 IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_pProjItem(pProjItem),
@@ -43,21 +41,11 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 							 initFileDataRef.m_Meta["CameraPos"].isArray() ? static_cast<float>(initFileDataRef.m_Meta["CameraPos"].toArray()[1].toDouble()) : 0.0f);
 		m_fCamZoom = static_cast<float>(initFileDataRef.m_Meta["CameraZoom"].toDouble());
 
-		int32 iZoomLevel = 0;
-		for(; iZoomLevel < iNUM_ZOOM_LEVELS; ++iZoomLevel)
-		{
-			if(m_fCamZoom <= g_fZoomLevels[iZoomLevel])
-			{
-				m_fCamZoom = g_fZoomLevels[iZoomLevel];
-				break;
-			}
-		}
-		iZoomLevel = HyClamp(iZoomLevel, 0, iNUM_ZOOM_LEVELS - 1);
-
-		m_fCamZoom = g_fZoomLevels[iZoomLevel];
-		m_sZoomStatus = g_sZoomLevels[iZoomLevel];
-
 		m_pCamera->SetZoom(m_fCamZoom);
+		HyZoomLevel eZoomLevel = m_pCamera->SetZoomLevel();
+
+		m_fCamZoom = m_pCamera->GetZoom();
+		m_sZoomStatus = g_sZoomLevels[eZoomLevel];
 	}
 	//m_pCamera->SetVisible(false);
 }
@@ -196,29 +184,16 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 	if(!numDegrees.isNull())
 	{
-		float fCurScale = m_pCamera->scale.X();
-		int32 iZoomLevel = 0;
-		for(; iZoomLevel < iNUM_ZOOM_LEVELS; ++iZoomLevel)
-		{
-			if(fCurScale <= g_fZoomLevels[iZoomLevel])
-			{
-				fCurScale = g_fZoomLevels[iZoomLevel];
-				break;
-			}
-		}
-
+		int iZoomLevel = m_pCamera->SetZoomLevel();
 		if(numDegrees.y() < 0.0f)
-			iZoomLevel++;
-		else 
 			iZoomLevel--;
-		iZoomLevel = HyClamp(iZoomLevel, 0, iNUM_ZOOM_LEVELS - 1);
+		else 
+			iZoomLevel++;
 
-		fCurScale = g_fZoomLevels[iZoomLevel];
+		iZoomLevel = HyClamp(iZoomLevel, 0, HYNUM_ZOOMLEVELS - 1);
+		m_pCamera->SetZoomLevel(static_cast<HyZoomLevel>(iZoomLevel));
+
 		m_sZoomStatus = g_sZoomLevels[iZoomLevel];
-
-		m_pCamera->SetZoom(fCurScale);
-		//m_pCamera->scale.TweenOffset(fCurScale, fCurScale, 0.5f, HyTween::QuadInOut);
-
 		UpdateDrawStatus(m_sSizeStatus);
 
 		QUndoCommand *pCmd = new UndoCmd_CameraUpdate("Camera Zoom", *m_pProjItem, m_ptCamPos, m_fCamZoom, m_pCamera->pos.Get(), m_pCamera->GetZoom());

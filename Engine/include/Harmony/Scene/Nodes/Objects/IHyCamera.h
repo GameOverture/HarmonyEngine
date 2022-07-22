@@ -50,8 +50,11 @@ public:
 	bool IsCameraShake();
 	void CameraShake(float fRadius);
 
-	virtual void SetZoom(const float fZoom) = 0;
+	// Values greater than 1.0 are zoomed in (2.0 == 200%)
 	virtual float GetZoom() const = 0;
+	virtual void SetZoom(const float fZoom) = 0;
+	void SetZoomLevel(HyZoomLevel eZoomLevel);
+	HyZoomLevel SetZoomLevel();	// Takes the current zoom and sets it to the closest zoom level. Returns the chosen zoom level
 
 protected:
 	virtual void Update() override;

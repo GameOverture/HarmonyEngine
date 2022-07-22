@@ -14,8 +14,9 @@
 
 class CheckerGrid : public HyPrimitive2d
 {
-	const glm::vec2     m_vDIMENSIONS;
-	float               m_fGridSize;
+protected:
+	const glm::vec2		m_vDIMENSIONS;
+	float				m_fGridSize;
 
 public:
 	CheckerGrid(float fWidth, float fHeight, float fGridSize);
@@ -25,10 +26,22 @@ public:
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) override;
 };
 
+class OverGrid : public CheckerGrid
+{
+public:
+	OverGrid(float fWidth, float fHeight, float fGridSize);
+	virtual ~OverGrid();
+
+	virtual void OnUpdateUniforms() override;
+};
+
 class ProjectDraw : public IDraw
 {
 	CheckerGrid			m_CheckerGrid;
 	HyShader *			m_pCheckerGridShader;
+
+	OverGrid			m_OverGrid;
+	HyShader *			m_pOverGridShader;
 
 public:
 	ProjectDraw();

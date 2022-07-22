@@ -18,15 +18,17 @@ HyCamera2d::HyCamera2d(HyWindow *pWindow) :
 HyCamera2d::~HyCamera2d()
 { }
 
-/*virtual*/ void HyCamera2d::SetZoom(const float fZoom)
-{
-	scale.Set(fZoom, fZoom);
-}
-
 /*virtual*/ float HyCamera2d::GetZoom() const
 {
-	return scale.Get().x;
+	return 1.0f / scale.Get().x;
 }
+
+/*virtual*/ void HyCamera2d::SetZoom(const float fZoom)
+{
+	// Inverse the value before storing it in scale. This is done because the renderer will glm::inverse(pCamera->GetSceneTransform()) to get the view matrix
+	scale.Set(1.0f / fZoom);
+}
+
 
 const b2AABB &HyCamera2d::GetWorldViewBounds()
 {
@@ -49,12 +51,13 @@ HyCamera3d::HyCamera3d(HyWindow *pWindow) :
 HyCamera3d::~HyCamera3d()
 { }
 
-/*virtual*/ void HyCamera3d::SetZoom(const float fZoom)
-{
-	scale.Set(1.0f, 1.0f, fZoom);
-}
-
 /*virtual*/ float HyCamera3d::GetZoom() const
 {
 	return scale.Get().z;
+}
+
+/*virtual*/ void HyCamera3d::SetZoom(const float fZoom)
+{
+	// Inverse the value before storing it in scale. This is done because the renderer will glm::inverse(pCamera->GetSceneTransform()) to get the view matrix
+	scale.SetZ(1.0f / fZoom);
 }

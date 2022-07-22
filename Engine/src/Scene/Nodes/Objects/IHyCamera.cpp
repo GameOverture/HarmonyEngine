@@ -77,6 +77,41 @@ void IHyCamera<NODETYPE>::CameraShake(float fRadius)
 }
 
 template<typename NODETYPE>
+void IHyCamera<NODETYPE>::SetZoomLevel(HyZoomLevel eZoomLevel)
+{
+	SetZoom(Hy_ZoomLevelList[eZoomLevel]);
+}
+
+// Takes the current zoom and sets it to the closest zoom level
+template<typename NODETYPE>
+HyZoomLevel IHyCamera<NODETYPE>::SetZoomLevel()
+{
+	float fCurZoom = GetZoom();
+
+	auto iter_geq = std::lower_bound(Hy_ZoomLevelList.begin(), Hy_ZoomLevelList.end(), fCurZoom);
+	if(iter_geq == Hy_ZoomLevelList.begin())
+	{
+		SetZoom(Hy_ZoomLevelList[0]);
+		return static_cast<HyZoomLevel>(0);
+	}
+
+	float a = *(iter_geq - 1);
+	float b = *(iter_geq);
+
+	
+	if(fabs(fCurZoom - a) < fabs(fCurZoom - b))
+	{
+		int32 iZoomIndex = iter_geq - Hy_ZoomLevelList.begin() - 1;
+		SetZoom(Hy_ZoomLevelList[iZoomIndex]);
+		return static_cast<HyZoomLevel>(iZoomIndex);
+	}
+
+	int32 iZoomIndex = iter_geq - Hy_ZoomLevelList.begin();
+	SetZoom(Hy_ZoomLevelList[iZoomIndex]);
+	return static_cast<HyZoomLevel>(iZoomIndex);
+}
+
+template<typename NODETYPE>
 /*virtual*/ void IHyCamera<NODETYPE>::Update() /*override*/
 {
 	NODETYPE::Update();

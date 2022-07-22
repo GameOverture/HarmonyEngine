@@ -114,6 +114,28 @@ enum HyPhysicsType
 };
 static_assert((int)HYPHYS_Static == (int)b2_staticBody && (int)HYPHYS_Kinematic == (int)b2_kinematicBody && (int)HYPHYS_Dynamic == (int)b2_dynamicBody, "Harmony and Box2d types don't match!");
 
+enum HyZoomLevel
+{
+	HYZOOM_6 = 0,	// 6.25%
+	HYZOOM_12,		// 12.5%
+	HYZOOM_25,
+	HYZOOM_33,		// 33.333%
+	HYZOOM_50,
+	HYZOOM_75,
+	HYZOOM_100,
+	HYZOOM_200,
+	HYZOOM_300,
+	HYZOOM_400,
+	HYZOOM_500,
+	HYZOOM_600,
+	HYZOOM_800,
+	HYZOOM_1200,
+	HYZOOM_1600,
+
+	HYNUM_ZOOMLEVELS
+};
+const std::vector<float> Hy_ZoomLevelList = { 0.0625f, 0.125f, 0.25f, 0.333333f, 0.5f, 0.75f, 1.0f,  2.0f,  3.0f,  4.0f,  5.0f,  6.0f,  8.0f,  12.0f,  16.0f };
+
 enum HyAnimCtrl
 {
 	HYANIMCTRL_Play = 0,

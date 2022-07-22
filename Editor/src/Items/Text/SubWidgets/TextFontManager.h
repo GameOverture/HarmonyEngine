@@ -137,7 +137,7 @@ private:
 	int InitAtlas();
 	void ClearAndEmbiggenAtlas();
 
-	void RegenFontArray(bool bSetRuntimeAtlasDirty = true);
+	void RegenFontArray();
 
 	QString GetAvailableTypefaceGlyphs() const;
 };

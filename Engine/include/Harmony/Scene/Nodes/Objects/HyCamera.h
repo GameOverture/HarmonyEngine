@@ -27,8 +27,8 @@ private:
 	virtual ~HyCamera2d();
 	
 public:
-	virtual void SetZoom(const float fZoom) override;
 	virtual float GetZoom() const override;
+	virtual void SetZoom(const float fZoom) override;
 
 	const b2AABB &GetWorldViewBounds();
 };
@@ -44,8 +44,8 @@ protected:
 	virtual ~HyCamera3d();
 
 public:
+	virtual float GetZoom() const override;
 	virtual void SetZoom(const float fZoom) override;
-	virtual float GetZoom() const override;;
 };
 
 #endif /* HyCamera_h__ */
