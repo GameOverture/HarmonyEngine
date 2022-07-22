@@ -464,14 +464,28 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	// Check to see if any loaded data (from the load thread) is ready to uploaded to graphics card
 	if(m_Mutex.try_lock())
 	{
-		while(m_Load_Retrieval.empty() == false)
+		// should be doing the initial bootup 
+		if (m_Load_Retrieval.size() >= 10)
 		{
-			IHyFile *pData = m_Load_Retrieval.front();
-			m_Load_Retrieval.pop();
+			while(m_Load_Retrieval.empty() == false)
+			{
+				IHyFile* pData = m_Load_Retrieval.front();
+				m_Load_Retrieval.pop();
 
-			rendererRef.TxData(pData);
+				rendererRef.TxData(pData);
+			}
 		}
-	
+		else
+		{
+			if (m_Load_Retrieval.empty() == false)
+			{
+				IHyFile* pData = m_Load_Retrieval.front();
+				m_Load_Retrieval.pop();
+
+				rendererRef.TxData(pData);
+			}
+		}
+
 		m_Mutex.unlock();
 	}
 
