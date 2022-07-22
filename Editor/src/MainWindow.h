@@ -128,8 +128,8 @@ private Q_SLOTS:
 	
 	void on_actionExit_triggered();
 
-	void on_actionTheme_Lappy486_triggered();
-
+    void on_actionTheme_Decemberween_triggered();
+	void on_actionTheme_CorpyNT6_triggered();
 	void on_actionTheme_Compe_triggered();
 
 	void on_actionActivateProject_triggered();

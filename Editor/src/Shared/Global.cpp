@@ -113,7 +113,9 @@
 	sm_ItemColors[ITEM_BoundingVolume] = QColor(234, 232, 58);
 	sm_ItemColors[ITEM_Physics] = QColor(201, 58, 203);
 
-	sm_Themes[THEME_Lappy486] = "Lappy486";
+	sm_Themes[THEME_Decemberween] = "Decemberween";
+	sm_Themes[THEME_CorpyNT6] = "Corpy NT6";
+	sm_Themes[THEME_Lappy486] = "Lappy 486";
 	sm_Themes[THEME_Compe] = "Compe";
 
 	sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));					// Can't begin with number. Alphanumberic and underscore only.

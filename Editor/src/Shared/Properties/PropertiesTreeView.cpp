@@ -26,9 +26,19 @@
 PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) :
 	QTreeView(pParent)
 {
-	setIndentation(0);
+	//setIndentation(0);
 	setAnimated(true);
 	//setColumnWidth(0, 200);
+
+
+	QPalette pal = QPalette();
+
+	// set black background
+	// Qt::black / "#000000" / "black"
+	pal.setColor(QPalette::Window, Qt::black);
+
+	setAutoFillBackground(true);
+	setPalette(pal);
 }
 
 PropertiesTreeView::~PropertiesTreeView()

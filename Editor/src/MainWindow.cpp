@@ -24,6 +24,7 @@
 #include "AudioAssetsWidget.h"
 #include "ManagerWidget.h"
 #include "SourceModel.h"
+#include "Themes.h"
 
 #include <QFileDialog>
 #include <QShowEvent>
@@ -43,7 +44,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	QMainWindow(pParent),
 	ui(new Ui::MainWindow),
 	m_Harmony(*this),
-	m_eTheme(THEME_Lappy486),
+	m_eTheme(THEME_Decemberween),
 	m_Settings(HyOrganizationName, HyEditorToolName)
 {
 	ui->setupUi(this);
@@ -689,8 +690,9 @@ void MainWindow::on_menu_View_aboutToShow()
 	ui->menu_View->clear();
 
 	QMenu *pThemesMenu = new QMenu("Themes");
-	pThemesMenu->addAction(ui->actionTheme_Lappy486);
-	pThemesMenu->addAction(ui->actionTheme_Compe);
+	pThemesMenu->addAction(ui->actionTheme_Decemberween);
+	pThemesMenu->addAction(ui->actionTheme_CorpyNT6);
+	//pThemesMenu->addAction(ui->actionTheme_Compe);
 
 	ui->menu_View->addMenu(pThemesMenu);
 	ui->menu_View->addSeparator();
@@ -835,9 +837,14 @@ void MainWindow::on_actionExit_triggered()
 	close();
 }
 
-void MainWindow::on_actionTheme_Lappy486_triggered()
+void MainWindow::on_actionTheme_Decemberween_triggered()
 {
-	SelectTheme(THEME_Lappy486);
+	SelectTheme(THEME_Decemberween);
+}
+
+void MainWindow::on_actionTheme_CorpyNT6_triggered()
+{
+	SelectTheme(THEME_CorpyNT6);
 }
 
 void MainWindow::on_actionTheme_Compe_triggered()
@@ -1002,11 +1009,13 @@ void MainWindow::SelectTheme(Theme eTheme)
 	m_eTheme = eTheme;
 	switch(m_eTheme)
 	{
-	case THEME_Lappy486:
-		setStyleSheet("");
+	case THEME_Decemberween:
+		setStyleSheet(QString(szDECEMBERWEEN_STYLESHEET));
 		break;
+	case THEME_CorpyNT6:
+	case THEME_Lappy486:
 	case THEME_Compe:
-		setStyleSheet("background-color:black;");
+		setStyleSheet("");
 		break;
 	default:
 		HyGuiLog("MainWindow::SelectTheme was given unknown theme", LOGTYPE_Error);

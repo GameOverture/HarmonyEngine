@@ -38,6 +38,8 @@ public:
 	void UpdateActions();
 	void FocusState(int iStateIndex, QVariant subState);
 
+	void ShowStates(bool bShow);
+
 	virtual void OnGiveMenuActions(QMenu *pMenu) = 0;
 	virtual void OnUpdateActions() = 0;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) = 0;
@@ -56,7 +58,7 @@ private Q_SLOTS:
 	void OnOrderStateForwardsTriggered();
 
 private:
-	Ui::IWidget *ui;
+	Ui::IWidget *uiWidget;
 };
 
 #endif // IWIDGET_H

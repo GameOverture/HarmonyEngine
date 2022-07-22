@@ -73,7 +73,9 @@ struct PropertiesDef
 	}
 
 	QColor GetColor() const {
-		return IsCategory() ? QColor(33,33,33) : QColor(99,99,99);
+		return IsCategory() ?
+			QColor(HyColor::WidgetPanel.GetRed(), HyColor::WidgetPanel.GetGreen(), HyColor::WidgetPanel.GetBlue()) :
+			QColor(HyColor::WidgetFrame.GetRed(), HyColor::WidgetFrame.GetGreen(), HyColor::WidgetFrame.GetBlue());
 	}
 };
 

@@ -25,33 +25,33 @@
 
 IWidget::IWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
-	ui(new Ui::IWidget),
+	uiWidget(new Ui::IWidget),
 	m_ItemRef(itemRef)
 {
-	ui->setupUi(this);
+	uiWidget->setupUi(this);
 
-	ui->cmbStates->blockSignals(true);
-	ui->cmbStates->clear();
-	ui->cmbStates->setModel(m_ItemRef.GetModel());
-	ui->cmbStates->blockSignals(false);
+	uiWidget->cmbStates->blockSignals(true);
+	uiWidget->cmbStates->clear();
+	uiWidget->cmbStates->setModel(m_ItemRef.GetModel());
+	uiWidget->cmbStates->blockSignals(false);
 
-	ui->btnAddState->setDefaultAction(ui->actionAddState);
-	ui->btnRemoveState->setDefaultAction(ui->actionRemoveState);
-	ui->btnRenameState->setDefaultAction(ui->actionRenameState);
-	ui->btnOrderStateBack->setDefaultAction(ui->actionOrderStateBackwards);
-	ui->btnOrderStateForward->setDefaultAction(ui->actionOrderStateForwards);
+	uiWidget->btnAddState->setDefaultAction(uiWidget->actionAddState);
+	uiWidget->btnRemoveState->setDefaultAction(uiWidget->actionRemoveState);
+	uiWidget->btnRenameState->setDefaultAction(uiWidget->actionRenameState);
+	uiWidget->btnOrderStateBack->setDefaultAction(uiWidget->actionOrderStateBackwards);
+	uiWidget->btnOrderStateForward->setDefaultAction(uiWidget->actionOrderStateForwards);
 
-	connect(ui->cmbStates, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCurrentIndexChanged(int)));
-	connect(ui->actionAddState, &QAction::triggered, this, &IWidget::OnAddStateTriggered);
-	connect(ui->actionRemoveState, &QAction::triggered, this, &IWidget::OnRemoveStateTriggered);
-	connect(ui->actionRenameState, &QAction::triggered, this, &IWidget::OnRenameStateTriggered);
-	connect(ui->actionOrderStateBackwards, &QAction::triggered, this, &IWidget::OnOrderStateBackwardsTriggered);
-	connect(ui->actionOrderStateForwards, &QAction::triggered, this, &IWidget::OnOrderStateForwardsTriggered);
+	connect(uiWidget->cmbStates, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCurrentIndexChanged(int)));
+	connect(uiWidget->actionAddState, &QAction::triggered, this, &IWidget::OnAddStateTriggered);
+	connect(uiWidget->actionRemoveState, &QAction::triggered, this, &IWidget::OnRemoveStateTriggered);
+	connect(uiWidget->actionRenameState, &QAction::triggered, this, &IWidget::OnRenameStateTriggered);
+	connect(uiWidget->actionOrderStateBackwards, &QAction::triggered, this, &IWidget::OnOrderStateBackwardsTriggered);
+	connect(uiWidget->actionOrderStateForwards, &QAction::triggered, this, &IWidget::OnOrderStateForwardsTriggered);
 }
 
 IWidget::~IWidget()
 {
-    delete ui;
+    delete uiWidget;
 }
 
 ProjectItemData &IWidget::GetItem()
@@ -61,9 +61,9 @@ ProjectItemData &IWidget::GetItem()
 
 void IWidget::UpdateActions()
 {
-	ui->actionRemoveState->setEnabled(ui->cmbStates->count() > 1);
-	ui->actionOrderStateBackwards->setEnabled(ui->cmbStates->currentIndex() != 0);
-	ui->actionOrderStateForwards->setEnabled(ui->cmbStates->currentIndex() != (ui->cmbStates->count() - 1));
+	uiWidget->actionRemoveState->setEnabled(uiWidget->cmbStates->count() > 1);
+	uiWidget->actionOrderStateBackwards->setEnabled(uiWidget->cmbStates->currentIndex() != 0);
+	uiWidget->actionOrderStateForwards->setEnabled(uiWidget->cmbStates->currentIndex() != (uiWidget->cmbStates->count() - 1));
 
 	OnUpdateActions();
 }
@@ -72,9 +72,9 @@ void IWidget::FocusState(int iStateIndex, QVariant subState)
 {
 	if(iStateIndex >= 0)
 	{
-		ui->cmbStates->blockSignals(true);
-		ui->cmbStates->setCurrentIndex(iStateIndex);
-		ui->cmbStates->blockSignals(false);
+		uiWidget->cmbStates->blockSignals(true);
+		uiWidget->cmbStates->setCurrentIndex(iStateIndex);
+		uiWidget->cmbStates->blockSignals(false);
 
 		OnFocusState(iStateIndex, subState);
 	}
@@ -82,14 +82,19 @@ void IWidget::FocusState(int iStateIndex, QVariant subState)
 	UpdateActions();
 }
 
+void IWidget::ShowStates(bool bShow)
+{
+	uiWidget->grpStates->setVisible(bShow);
+}
+
 int IWidget::GetCurStateIndex()
 {
-	return ui->cmbStates->currentIndex();
+	return uiWidget->cmbStates->currentIndex();
 }
 
 IStateData *IWidget::GetCurStateData()
 {
-	return m_ItemRef.GetModel()->GetStateData(ui->cmbStates->currentIndex());
+	return m_ItemRef.GetModel()->GetStateData(uiWidget->cmbStates->currentIndex());
 }
 
 void IWidget::OnCurrentIndexChanged(int index)
@@ -134,19 +139,19 @@ void IWidget::OnRemoveStateTriggered()
 	switch(m_ItemRef.GetType())
 	{
 	case ITEM_Sprite:
-		pCmd = new UndoCmd_RemoveState<SpriteStateData>("Remove Sprite State", m_ItemRef, ui->cmbStates->currentIndex());
+		pCmd = new UndoCmd_RemoveState<SpriteStateData>("Remove Sprite State", m_ItemRef, uiWidget->cmbStates->currentIndex());
 		break;
 	case ITEM_Text:
-		pCmd = new UndoCmd_RemoveState<TextStateData>("Remove Text State", m_ItemRef, ui->cmbStates->currentIndex());
+		pCmd = new UndoCmd_RemoveState<TextStateData>("Remove Text State", m_ItemRef, uiWidget->cmbStates->currentIndex());
 		break;
 	case ITEM_Entity:
-		pCmd = new UndoCmd_RemoveState<EntityStateData>("Remove Entity State", m_ItemRef, ui->cmbStates->currentIndex());
+		pCmd = new UndoCmd_RemoveState<EntityStateData>("Remove Entity State", m_ItemRef, uiWidget->cmbStates->currentIndex());
 		break;
 	case ITEM_Prefab:
-		pCmd = new UndoCmd_RemoveState<PrefabStateData>("Remove Prefab State", m_ItemRef, ui->cmbStates->currentIndex());
+		pCmd = new UndoCmd_RemoveState<PrefabStateData>("Remove Prefab State", m_ItemRef, uiWidget->cmbStates->currentIndex());
 		break;
 	case ITEM_Audio:
-		pCmd = new UndoCmd_RemoveState<AudioStateData>("Remove Audio State", m_ItemRef, ui->cmbStates->currentIndex());
+		pCmd = new UndoCmd_RemoveState<AudioStateData>("Remove Audio State", m_ItemRef, uiWidget->cmbStates->currentIndex());
 		break;
 	default:
 		HyGuiLog("Unimplemented item on_actionRemoveState_triggered(): " % QString::number(m_ItemRef.GetType()), LOGTYPE_Error);
@@ -162,7 +167,7 @@ void IWidget::OnRenameStateTriggered()
 	DlgInputName *pDlg = new DlgInputName("Rename State", GetCurStateData()->GetName(), HyGlobal::FreeFormValidator());
 	if(pDlg->exec() == QDialog::Accepted)
 	{
-		QUndoCommand *pCmd = new UndoCmd_RenameState("Rename State", m_ItemRef, pDlg->GetName(), ui->cmbStates->currentIndex());
+		QUndoCommand *pCmd = new UndoCmd_RenameState("Rename State", m_ItemRef, pDlg->GetName(), uiWidget->cmbStates->currentIndex());
 		m_ItemRef.GetUndoStack()->push(pCmd);
 	}
 	delete pDlg;
@@ -170,12 +175,12 @@ void IWidget::OnRenameStateTriggered()
 
 void IWidget::OnOrderStateBackwardsTriggered()
 {
-	QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift State Index <-", m_ItemRef, ui->cmbStates->currentIndex());
+	QUndoCommand *pCmd = new UndoCmd_MoveStateBack("Shift State Index <-", m_ItemRef, uiWidget->cmbStates->currentIndex());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void IWidget::OnOrderStateForwardsTriggered()
 {
-	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift State Index ->", m_ItemRef, ui->cmbStates->currentIndex());
+	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift State Index ->", m_ItemRef, uiWidget->cmbStates->currentIndex());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }

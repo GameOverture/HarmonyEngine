@@ -22,6 +22,8 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 {
 	ui->setupUi(this);
 
+	ShowStates(false);
+
 	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
 	layout()->removeItem(ui->verticalLayout);
 	layout()->addItem(ui->verticalLayout);

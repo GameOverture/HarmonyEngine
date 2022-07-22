@@ -120,7 +120,9 @@ enum SubIcon
 
 enum Theme
 {
-	THEME_Lappy486 = 0,
+	THEME_Decemberween = 0,
+	THEME_CorpyNT6,
+	THEME_Lappy486,
 	THEME_Compe,
 
 	NUMTHEMES

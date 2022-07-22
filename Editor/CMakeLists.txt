@@ -14,6 +14,7 @@ if(Qt5_DIR)
 		src/MainWindow.cpp
 		src/MainWindow.h
 		src/MainWindow.ui
+		src/Themes.h
 		src/VersionPatcher.cpp
 		src/VersionPatcher.h
 		src/HyEditor.rc
