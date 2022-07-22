@@ -127,6 +127,8 @@ protected:
 	friend void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode);
 
 private: // Hide inherited functionality that doesn't exist for entities
+	using IHyLoadable::GetState;
+	using IHyLoadable::SetState;
 	using IHyLoadable::GetName;
 	using IHyLoadable::GetPrefix;
 	using IHyLoadable2d::Init;
