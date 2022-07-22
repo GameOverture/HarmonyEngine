@@ -614,6 +614,14 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 	}
 }
 
+void Project::ShowGrid(bool bShow)
+{
+	if(m_pDraw == nullptr)
+		return;
+
+	m_pDraw->EnableOverGrid(bShow);
+}
+
 void Project::SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);

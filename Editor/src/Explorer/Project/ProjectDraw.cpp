@@ -164,7 +164,7 @@ OverGrid::OverGrid(float fWidth, float fHeight, float fGridSize) :
 	m_ShaderUniforms.Set("u_mtxTransform", mtx);
 	m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);
 	m_ShaderUniforms.Set("u_vDimensions", m_vDIMENSIONS);
-	m_ShaderUniforms.Set("u_vGridColor", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_ShaderUniforms.Set("u_vGridColor", glm::vec4(0.0f, 0.0f, 0.0f, 0.25f));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,11 +199,15 @@ ProjectDraw::ProjectDraw() :
 
 	m_OverGrid.SetShader(m_pOverGridShader);
 	m_OverGrid.SetDisplayOrder(99999);
-	m_OverGrid.SetVisible(false);
 }
 
 /*virtual*/ ProjectDraw::~ProjectDraw()
 {
+}
+
+void ProjectDraw::EnableOverGrid(bool bEnable)
+{
+	m_OverGrid.SetVisible(bEnable);
 }
 
 /*virtual*/ void ProjectDraw::OnShow() /*override*/

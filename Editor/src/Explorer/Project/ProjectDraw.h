@@ -46,6 +46,8 @@ class ProjectDraw : public IDraw
 public:
 	ProjectDraw();
 	virtual ~ProjectDraw();
+
+	void EnableOverGrid(bool bEnable);
 	
 	virtual void OnShow() override;
 	virtual void OnHide() override;

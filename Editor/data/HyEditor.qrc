@@ -216,5 +216,6 @@
         <file>icons16x16/search.png</file>
         <file>icons16x16/StatusMouse.png</file>
         <file>icons16x16/StatusSize.png</file>
+        <file>icons16x16/view-guides.png</file>
     </qresource>
 </RCC>

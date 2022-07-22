@@ -302,6 +302,8 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	}
 	settings.endGroup();
 
+	pProject->ShowGrid(ui->actionShowGrid->isChecked());
+
 	RefreshBuildMenu();
 }
 
@@ -692,7 +694,17 @@ void MainWindow::on_menu_View_aboutToShow()
 
 	ui->menu_View->addMenu(pThemesMenu);
 	ui->menu_View->addSeparator();
+	ui->menu_View->addAction(ui->actionShowGrid);
+	ui->menu_View->addSeparator();
 	ui->menu_View->addActions(pPopupMenu->actions());
+}
+
+void MainWindow::on_actionShowGrid_triggered()
+{
+	//ui->actionShowGrid->setChecked(!ui->actionShowGrid->isChecked());
+
+	if(Harmony::GetProject())
+		Harmony::GetProject()->ShowGrid(ui->actionShowGrid->isChecked());
 }
 
 void MainWindow::on_actionBuildSettings_triggered()
