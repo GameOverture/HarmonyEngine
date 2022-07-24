@@ -375,15 +375,20 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 #endif
 }
 
-/*virtual*/ QList<AssetItemData *> SpineModel::GetAssets(HyGuiItemType eType) const /*override*/
+/*virtual*/ QList<AssetItemData *> SpineModel::GetAssets(AssetType eAssetType) const /*override*/
 {
 	QList<AssetItemData *> retAtlasFrameList;
-	return retAtlasFrameList;
-}
 
-/*virtual*/ QStringList SpineModel::GetFontUrls() const /*override*/
-{
-	return QStringList();
+	if(eAssetType == ASSET_Atlas)
+	{
+		for(auto &subAtlas : m_SubAtlasList)
+		{
+			if(subAtlas.m_pAtlasFrame)
+				retAtlasFrameList.push_back(subAtlas.m_pAtlasFrame);
+		}
+	}
+
+	return retAtlasFrameList;
 }
 
 bool SpineModel::IsUsingTempFiles() const

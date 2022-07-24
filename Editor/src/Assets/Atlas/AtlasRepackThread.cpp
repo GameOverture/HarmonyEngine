@@ -52,7 +52,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &af
 
 /*virtual*/ void AtlasRepackThread::OnRun() /*override*/
 {
-	for(uint32 iBankCnt = 0; iBankCnt < m_RepackBankList.size(); ++iBankCnt)
+	for(int32 iBankCnt = 0; iBankCnt < m_RepackBankList.size(); ++iBankCnt)
 	{
 		BankData *pBankData = m_RepackBankList[iBankCnt].m_pBankData;
 		QMap<uint32, RepackBank::PackerBucket *> &bucketMapRef = m_RepackBankList[iBankCnt].m_BucketMap;

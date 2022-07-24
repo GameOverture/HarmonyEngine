@@ -106,7 +106,7 @@ public:
 
 	int GetFontIndex(TextLayerHandle hLayer) const;
 	QString GetFontName(TextLayerHandle hLayer) const;
-	QString GetFontPath(TextLayerHandle hLayer) const;
+	QString GetFontPath(TextLayerHandle hLayer);
 	rendermode_t GetRenderMode(TextLayerHandle hLayer) const;
 	float GetOutlineThickness(TextLayerHandle hLayer) const;
 	float GetSize(TextLayerHandle hLayer) const;
@@ -132,6 +132,7 @@ public:
 
 private:
 	int DoesFontExist(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
+	QString GetFontPathFromName(QString sFontName);
 	int CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize);
 
 	int InitAtlas();

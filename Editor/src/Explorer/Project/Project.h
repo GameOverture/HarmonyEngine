@@ -15,6 +15,7 @@
 #include "ProjectItemData.h"
 #include "ExplorerItemData.h"
 #include "DlgProjectSettings.h"
+#include "IMimeData.h"
 
 #include <QQueue>
 #include <QJsonObject>
@@ -105,7 +106,8 @@ public:
 	AudioManagerModel &GetAudioModel();
 	ManagerWidget *GetAudioWidget();
 
-	bool PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, HyGuiItemType eManagerType);
+	bool OnHarmonyMimeDrop(const IMimeData *pDroppedMimeData, QPoint ptDropPosition);
+	bool PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, AssetType eAssetType);
 
 	//void SetAudioModel(QJsonObject audioObj);
 

@@ -217,5 +217,8 @@
         <file>icons16x16/StatusMouse.png</file>
         <file>icons16x16/StatusSize.png</file>
         <file>icons16x16/view-guides.png</file>
+        <file>checkbox.png</file>
+        <file>down_arrow.png</file>
+        <file>handle.png</file>
     </qresource>
 </RCC>

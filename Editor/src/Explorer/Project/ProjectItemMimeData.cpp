@@ -13,114 +13,63 @@
 #include "Project.h"
 #include "IModel.h"
 #include "AtlasFrame.h"
+#include "TextModel.h"
 
-ProjectItemMimeData::ProjectItemMimeData(QList<TreeModelItemData *> &itemListRef)
+ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef) :
+	IMimeData(MIMETYPE_ProjectItems)
 {
-	QJsonArray clipboardArray;
-
+	QJsonArray itemsArray;
 	for(int i = 0; i < itemListRef.size(); ++i)
 	{
-		ExplorerItemData *pExplorerItemData = static_cast<ExplorerItemData *>(itemListRef[i]);
+		if(itemListRef[i]->IsProjectItem() == false)
+			continue;
 
 		QJsonObject itemObj;
-		itemObj.insert("project", pExplorerItemData->GetProject().GetAbsPath());
-		itemObj.insert("itemName", pExplorerItemData->GetName(true));
-		itemObj.insert("itemType", HyGlobal::ItemName(pExplorerItemData->GetType(), false));
+		itemObj.insert("project", itemListRef[i]->GetProject().GetAbsPath().toLower());
+		itemObj.insert("name", itemListRef[i]->GetName(true));
+		itemObj.insert("type", HyGlobal::ItemName(itemListRef[i]->GetType(), false));
 
-		if(pExplorerItemData->IsProjectItem() == false)
+		ProjectItemData *pProjectItem = static_cast<ProjectItemData *>(itemListRef[i]);
+
+		// STANDARD INFO
+		FileDataPair itemFileData;
+		pProjectItem->GetLatestFileData(itemFileData);
+		itemObj.insert("metaObj", itemFileData.m_Meta);
+		itemObj.insert("dataObj", itemFileData.m_Data);
+
+		// ASSETS FROM MANAGERS
+		for(int iAssetCount = 0; iAssetCount < NUMASSETTYPES; ++iAssetCount)
 		{
-			itemObj.insert("isPrefix", true);
+			QList<AssetItemData *> assetList = pProjectItem->GetModel()->GetAssets(static_cast<AssetType>(iAssetCount));
+			QJsonArray assetArray;
+			for(int i = 0; i < assetList.size(); ++i)
+			{
+				if(assetList[i] == nullptr)
+					continue;
+
+				QJsonObject assetObj = MakeAssetJsonObj(*assetList[i]);
+				assetArray.append(assetObj);
+			}
+			itemObj.insert(HyGlobal::AssetName(static_cast<AssetType>(iAssetCount)), assetArray);
 		}
-		else
+
+		// FONT INFO
+		if(pProjectItem->GetType() == ITEM_Text)
 		{
-			itemObj.insert("isPrefix", false);
-
-			ProjectItemData *pProjectItem = static_cast<ProjectItemData *>(itemListRef[i]);
-
-			// STANDARD INFO
-			FileDataPair itemFileData;
-			pProjectItem->GetLatestFileData(itemFileData);
-			itemObj.insert("metaObj", itemFileData.m_Meta);
-			itemObj.insert("dataObj", itemFileData.m_Data);
-
-			// IMAGE INFO
-			QJsonArray imagesArray = GetAssetsArray(ITEM_AtlasImage, pProjectItem);
-			itemObj.insert("images", imagesArray);
-
-			// SOUND INFO
-			QJsonArray soundsArray = GetAssetsArray(ITEM_Audio, pProjectItem);
-			itemObj.insert("sounds", soundsArray);
-
-			// FONT INFO
-			QStringList fontUrlList = pProjectItem->GetModel()->GetFontUrls();
+			QStringList fontUrlList = static_cast<TextModel *>(pProjectItem->GetModel())->GetFontUrls();
 			QJsonArray fontUrlArray;
 			for(int i = 0; i < fontUrlList.size(); ++i)
 				fontUrlArray.append(fontUrlList[i]);
 			itemObj.insert("fonts", fontUrlArray);
 		}
-
-		clipboardArray.append(itemObj);
+		
+		itemsArray.append(itemObj);
 	}
 
 	// Serialize the item info into json source
-	m_Data = JsonValueToSrc(QJsonValue(clipboardArray));
-	setData(HYGUI_MIMETYPE_ITEM, m_Data);
-}
-
-ProjectItemMimeData::ProjectItemMimeData(const QVariant &data) :
-	m_Data(data.value<QByteArray>())
-{
+	m_Data = JsonValueToSrc(QJsonValue(itemsArray));
 	setData(HYGUI_MIMETYPE_ITEM, m_Data);
 }
 
 /*virtual*/ ProjectItemMimeData::~ProjectItemMimeData()
 { }
-
-/*virtual*/ bool ProjectItemMimeData::hasFormat(const QString &sMimeType) const /*override*/
-{
-	if(HYGUI_MIMETYPE_ITEM == sMimeType.toLower() || "application/json" == sMimeType.toLower())
-		return true;
-
-	return false;
-}
-
-/*virtual*/ QStringList ProjectItemMimeData::formats() const /*override*/
-{
-	QStringList sFormatList;
-	sFormatList << HYGUI_MIMETYPE_ITEM;
-	sFormatList << "application/json";
-
-	return sFormatList;
-}
-
-/*virtual*/ QVariant ProjectItemMimeData::retrieveData(const QString &mimeType, QVariant::Type type) const /*override*/
-{
-	if((mimeType.toLower() == HYGUI_MIMETYPE_ITEM || mimeType.toLower() == "application/json") &&
-		(type == QVariant::UserType || type == QVariant::ByteArray || type == QVariant::String))
-	{
-		QByteArray dataSrc = QByteArray(m_Data);
-		return QVariant(dataSrc);
-	}
-
-	return QVariant();
-}
-
-QJsonArray ProjectItemMimeData::GetAssetsArray(HyGuiItemType eManagerType, ProjectItemData *pProjectItem)
-{
-	QList<AssetItemData *> assetList = pProjectItem->GetModel()->GetAssets(eManagerType);
-	QJsonArray assetArray;
-	for(int i = 0; i < assetList.size(); ++i)
-	{
-		QJsonObject assetObj;
-		assetObj.insert("assetUUID", assetList[i]->GetUuid().toString(QUuid::WithoutBraces));
-		assetObj.insert("checksum", QJsonValue(static_cast<qint64>(assetList[i]->GetChecksum())));
-		assetObj.insert("filter", assetList[i]->GetFilter());
-		assetObj.insert("name", QJsonValue(assetList[i]->GetName()));
-
-		// TODO: Make source code assets work with this
-		assetObj.insert("uri", QJsonValue(pProjectItem->GetProject().GetMetaAbsPath() % HyGlobal::ItemName(eManagerType, true) % "/" % assetList[i]->ConstructMetaFileName()));
-		assetArray.append(assetObj);
-	}
-
-	return assetArray;
-}

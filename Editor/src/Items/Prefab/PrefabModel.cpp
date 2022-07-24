@@ -341,14 +341,10 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 {
 }
 
-/*virtual*/ QList<AssetItemData *> PrefabModel::GetAssets(HyGuiItemType eType) const /*override*/
+/*virtual*/ QList<AssetItemData *> PrefabModel::GetAssets(AssetType eAssetType) const /*override*/
 {
+	// TODO: PrefabModel::GetAssets
 	return QList<AssetItemData *>();
-}
-
-/*virtual*/ QStringList PrefabModel::GetFontUrls() const /*override*/
-{
-	return QStringList();
 }
 
 //void PrefabModel::AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip)

@@ -10,28 +10,16 @@
 #ifndef ProjectItemMimeData_H
 #define ProjectItemMimeData_H
 
-#include <QMimeData>
+#include "IMimeData.h"
 
-#define HYGUI_MIMETYPE_ITEM "application/x-harmonyitem"
-
-class TreeModelItemData;
+class ExplorerItemData;
 class ProjectItemData;
 
-class ProjectItemMimeData : public QMimeData
+class ProjectItemMimeData : public IMimeData
 {
-	QByteArray				m_Data;
-
 public:
-	ProjectItemMimeData(QList<TreeModelItemData *> &itemListRef);
-	ProjectItemMimeData(const QVariant &data);
+	ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef);
 	virtual ~ProjectItemMimeData();
-
-	virtual bool hasFormat(const QString &sMimeType) const override;
-	virtual QStringList formats() const override;
-
-protected:
-	virtual QVariant retrieveData(const QString &mimeType, QVariant::Type type) const override;
-	QJsonArray GetAssetsArray(HyGuiItemType eManagerType, ProjectItemData *pProjectItem);
 };
 
 #endif // ProjectItemMimeData_H

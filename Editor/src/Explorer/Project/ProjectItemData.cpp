@@ -352,8 +352,8 @@ void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)
 
 	// Unlinks all dependencies
 	//m_pModel->RelinquishAllFrames();
-	GetProject().GetAtlasModel().RelinquishAssets(this, m_pModel->GetAssets(ITEM_AtlasImage));
-	GetProject().GetAudioModel().RelinquishAssets(this, m_pModel->GetAssets(ITEM_Audio));
+	GetProject().GetAtlasModel().RelinquishAssets(this, m_pModel->GetAssets(ASSET_Atlas));
+	GetProject().GetAudioModel().RelinquishAssets(this, m_pModel->GetAssets(ASSET_Audio));
 
 	ExplorerItemData::DeleteFromProject();
 }

@@ -135,7 +135,10 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 /*virtual*/ void HarmonyWidget::dragEnterEvent(QDragEnterEvent *pEvent) /*override*/
 {
 	if(m_pProject == nullptr)
+	{
+		pEvent->ignore();
 		return;
+	}
 
 	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
 	ProjectItemData *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItemData *>();
@@ -155,49 +158,14 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::dropEvent(QDropEvent *pEvent) /*override*/
 {
-	if(m_pProject == nullptr)
-		return;
-
-	ProjectTabBar *pTabBar = m_pProject->GetTabBar();
-	ProjectItemData *pCurOpenTabItem = pTabBar->tabData(pTabBar->currentIndex()).value<ProjectItemData *>();
-
-	if(pCurOpenTabItem &&
-	   pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE_ITEM) &&
-	   static_cast<ProjectItemData *>(pEvent->source()) != pCurOpenTabItem &&
-	   pCurOpenTabItem->GetType() == ITEM_Entity)
+	if(m_pProject == nullptr || pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE_ITEM) == false)
 	{
-		QList<QVariant> validItemList;
-		// Parse mime data source for project item array
-		QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HYGUI_MIMETYPE_ITEM));
-		QJsonArray itemArray = doc.array();
-		for(int iIndex = 0; iIndex < itemArray.size(); ++iIndex)
-		{
-			QJsonObject itemObj = itemArray[iIndex].toObject();
-
-			// Ensure this item is apart of this project
-			if(itemObj["project"].toString().toLower() == m_pProject->GetAbsPath().toLower())
-			{
-				QString sItemPath = itemObj["itemName"].toString();
-				ExplorerItemData *pItem = MainWindow::GetExplorerModel().FindItemByItemPath(m_pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
-
-				EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
-				if(entityTreeModelRef.IsItemValid(pItem, true) == false)
-					continue;
-
-				QVariant v;
-				v.setValue<ExplorerItemData *>(pItem);
-				validItemList.push_back(v);
-			}
-			else
-				HyGuiLog("Item " % itemObj["itemName"].toString() % " is not apart of the entity's project and cannot be added.", LOGTYPE_Info);
-		}
-
-		QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChildren, *pCurOpenTabItem, validItemList);
-		pCurOpenTabItem->GetUndoStack()->push(pCmd);
-
-		pEvent->setDropAction(Qt::LinkAction);
-		pEvent->accept();
+		pEvent->ignore();
+		return;
 	}
+
+	if(m_pProject->OnHarmonyMimeDrop(static_cast<const IMimeData *>(pEvent->mimeData()), pEvent->pos()) == false)
+		pEvent->ignore();
 }
 
 /*virtual*/ void HarmonyWidget::keyPressEvent(QKeyEvent *pEvent) /*override*/

@@ -17,6 +17,7 @@
 #include <QUuid>
 
 class IManagerModel;
+class Project;
 
 class AssetItemData : public TreeModelItemData
 {
@@ -40,15 +41,18 @@ public:
 	quint32 GetBankId();
 	void SetBankId(quint32 uiNewBankId);
 
-	QString GetFilter();
+	Project &GetProject();
+
+	QString GetFilter() const;
 	QString GetName() const;
-	QString GetMetaFileExt() const;
 
 	QSet<ProjectItemData *> GetDependencies();
 	void InsertDependency(ProjectItemData *pProjItem);
 	void RemoveDependency(ProjectItemData *pProjItem);
 
-	virtual QString ConstructMetaFileName();
+	virtual QString ConstructMetaFileName() const;
+	QString GetMetaFileExt() const;
+	QString GetAbsMetaFilePath() const;
 	bool DeleteMetaFile();
 
 	virtual QString GetPropertyInfo() = 0;

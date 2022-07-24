@@ -27,7 +27,7 @@ SourceFile::~SourceFile()
 {
 }
 
-/*virtual*/ QString SourceFile::ConstructMetaFileName() /*override*/
+/*virtual*/ QString SourceFile::ConstructMetaFileName() const /*override*/
 {
 	QString sCombinedPath;
 	QString sFilterPath = GetFilter();

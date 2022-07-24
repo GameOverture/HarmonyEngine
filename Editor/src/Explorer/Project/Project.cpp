@@ -17,6 +17,8 @@
 #include "VersionPatcher.h"
 #include "ManagerWidget.h"
 #include "AtlasModel.h"
+#include "GlobalUndoCmds.h"
+#include "IAssetItemData.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -252,27 +254,27 @@ void Project::LoadExplorerModel()
 		}
 	}
 
-	if(bSystemFontFound == false)
-	{
-		QDir projGenDataDir(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "data/");
-		QFile srcFile(projGenDataDir.absoluteFilePath("src.json"));
-		if(!srcFile.open(QFile::ReadOnly))
-		{
-			HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
-			m_bHasError = true;
-		}
-		else
-		{
-			QByteArray sContents = srcFile.readAll();
-			srcFile.close();
+	//if(bSystemFontFound == false)
+	//{
+	//	QDir projGenDataDir(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "data/");
+	//	QFile srcFile(projGenDataDir.absoluteFilePath("src.json"));
+	//	if(!srcFile.open(QFile::ReadOnly))
+	//	{
+	//		HyGuiLog("Error reading " % srcFile.fileName() % " when generating default font: " % srcFile.errorString(), LOGTYPE_Error);
+	//		m_bHasError = true;
+	//	}
+	//	else
+	//	{
+	//		QByteArray sContents = srcFile.readAll();
+	//		srcFile.close();
 
-			QByteArray sBefore("[HyHarmonyTemplateDataDir]");
-			QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "data/").toLocal8Bit());
-			sContents.replace(sBefore, sAfter);
+	//		QByteArray sBefore("[HyHarmonyTemplateDataDir]");
+	//		QByteArray sAfter(QString(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "data/").toLocal8Bit());
+	//		sContents.replace(sBefore, sAfter);
 
-			MainWindow::GetExplorerModel().PasteItemSrc(sContents, MainWindow::GetExplorerModel().FindIndex<ExplorerItemData *>(this, 0));
-		}
-	}
+	//		MainWindow::GetExplorerModel().PasteItemSrc(sContents, MainWindow::GetExplorerModel().FindIndex<ExplorerItemData *>(this, 0));
+	//	}
+	//}
 }
 
 QJsonObject Project::ReadProjFile()
@@ -492,22 +494,93 @@ ManagerWidget *Project::GetAudioWidget()
 	return m_pAudioWidget;
 }
 
-bool Project::PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, HyGuiItemType eManagerType)
+bool Project::OnHarmonyMimeDrop(const IMimeData *pDroppedMimeData, QPoint ptDropPosition)
 {
+	if(m_pTabBar->count() == 0)
+		return false;
+
+	ProjectItemData *pCurOpenTabItem = m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItemData *>();
+	if(pCurOpenTabItem == nullptr)
+		return false;
+
+	if(pCurOpenTabItem->GetType() == ITEM_Sprite)
+	{
+		QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
+		m_pProject->GetAtlasWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
+
+		int iStateIndex = pCurOpenTabItem->GetWidget()->GetCurStateIndex();
+		QUndoCommand *pCmd = new UndoCmd_LinkStateAssets("Add Frames", *pCurOpenTabItem, iStateIndex, selectedAssetsList);
+		pCurOpenTabItem->GetUndoStack()->push(pCmd);
+
+		return true;
+	}
+
+	return false;
+
+	//switch(pCurOpenTabItem->GetType())
+	//{
+	//case ITEM_Entity:
+	//	QList<QVariant> validItemList;
+	//	// Parse mime data source for project item array
+	//	QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HYGUI_MIMETYPE_ITEM));
+	//	QJsonArray itemArray = doc.array();
+	//	for(int iIndex = 0; iIndex < itemArray.size(); ++iIndex)
+	//	{
+	//		QJsonObject itemObj = itemArray[iIndex].toObject();
+
+	//		// Ensure this item is apart of this project
+	//		if(itemObj["project"].toString().toLower() == m_pProject->GetAbsPath().toLower())
+	//		{
+	//			QString sItemPath = itemObj["itemName"].toString();
+	//			ExplorerItemData *pItem = MainWindow::GetExplorerModel().FindItemByItemPath(m_pProject, sItemPath, HyGlobal::GetTypeFromString(itemObj["itemType"].toString()));
+
+	//			EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
+	//			if(entityTreeModelRef.IsItemValid(pItem, true) == false)
+	//				continue;
+
+	//			QVariant v;
+	//			v.setValue<ExplorerItemData *>(pItem);
+	//			validItemList.push_back(v);
+	//		}
+	//		else
+	//			HyGuiLog("Item " % itemObj["itemName"].toString() % " is not apart of the entity's project and cannot be added.", LOGTYPE_Info);
+	//	}
+
+	//	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChildren, *pCurOpenTabItem, validItemList);
+	//	pCurOpenTabItem->GetUndoStack()->push(pCmd);
+
+	//	pEvent->setDropAction(Qt::LinkAction);
+	//	pEvent->accept();
+	//	break;
+
+	//default:
+	//	break;
+	//}
+}
+
+bool Project::PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, AssetType eAssetType)
+{
+	if(assetArrayRef.count() == 0)
+		return true;
+
 	IManagerModel *pManager = nullptr;
 	quint32 uiBankId = 0;
-	switch(eManagerType)
+	switch(eAssetType)
 	{
-	case ITEM_AtlasImage:
+	case ASSET_Source:
+		pManager = m_pSourceModel;
+		uiBankId = 0;
+		break;
+	case ASSET_Atlas:
 		pManager = m_pAtlasModel;
 		uiBankId = m_pAtlasWidget ? m_pAtlasWidget->GetSelectedBankId() : 0;
 		break;
-	case ITEM_Audio:
+	case ASSET_Audio:
 		pManager = m_pAudioModel;
 		uiBankId = m_pAudioWidget ? m_pAudioWidget->GetSelectedBankId() : 0;
 		break;
 	default:
-		HyGuiLog("Project::PasteAssets - Unknown eManagerType: " % QString::number(eManagerType), LOGTYPE_Error);
+		HyGuiLog("Project::PasteAssets - Unknown eAssetType: " % QString::number(eAssetType), LOGTYPE_Error);
 		break;
 	}
 	if(pManager == nullptr)

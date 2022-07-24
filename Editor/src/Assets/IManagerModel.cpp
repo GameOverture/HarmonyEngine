@@ -83,7 +83,8 @@ void IManagerModel::Init()
 			AssetItemData *pAssetData = CreateAssetTreeItem(assetObj["filter"].toString(), assetObj["name"].toString(), assetObj);
 
 			// Check to see if the actual meta asset exists on disk
-			if(QFile::exists(m_MetaDir.absoluteFilePath(pAssetData->ConstructMetaFileName())) == false)
+			QString sFilePath = m_MetaDir.absoluteFilePath(pAssetData->ConstructMetaFileName());
+			if(QFile::exists(sFilePath) == false)
 				pAssetData->SetError(ASSETERROR_CannotFindMetaFile);
 			else
 				pAssetData->ClearError(ASSETERROR_CannotFindMetaFile);
@@ -338,7 +339,7 @@ bool IManagerModel::TransferAssets(QList<AssetItemData *> assetsList, uint uiNew
 void IManagerModel::AddAssetsToRepack(BankData *pBankData)
 {
 	if(m_RepackAffectedAssetsMap.find(pBankData) == m_RepackAffectedAssetsMap.end())
-		m_RepackAffectedAssetsMap.insert(pBankData, pBankData->m_AssetList.toSet());
+		m_RepackAffectedAssetsMap.insert(pBankData, QSet<AssetItemData *>(pBankData->m_AssetList.begin(), pBankData->m_AssetList.end()));
 }
 
 void IManagerModel::AddAssetsToRepack(BankData *pBankData, AssetItemData *pAsset)
@@ -835,18 +836,17 @@ void IManagerModel::SaveRuntime()
 
 /*virtual*/ QMimeData *IManagerModel::mimeData(const QModelIndexList &indexes) const /*override*/
 {
-	QList<TreeModelItemData *> itemList;
+	QList<AssetItemData *> assetList;
 	for(const auto &index : indexes)
 	{
 		if(index.column() != 0)
 			continue;
 
-		itemList.push_back(data(index, Qt::UserRole).value<TreeModelItemData *>());
+		assetList.push_back(data(index, Qt::UserRole).value<AssetItemData *>());
 	}
 
-	RemoveRedundantItems(ITEM_Filter, itemList);
-
-	QMimeData *pNewMimeData = new AssetMimeData(m_ProjectRef, m_eASSET_TYPE, itemList);
+	//RemoveRedundantItems(ITEM_Filter, itemList);
+	QMimeData *pNewMimeData = new AssetMimeData(assetList);
 	return pNewMimeData;
 }
 
@@ -925,8 +925,10 @@ void IManagerModel::SaveRuntime()
 
 			continue;
 		}
-
-		// TODO: Import new assets if not from current project
+		else
+		{
+			// TODO: Import new assets if not from current project
+		}
 	}
 
 	SaveMeta();

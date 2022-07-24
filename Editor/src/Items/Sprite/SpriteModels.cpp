@@ -425,11 +425,11 @@ SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	stateFileDataOut.m_Data.insert("duration", fTotalDuration);
 }
 
-/*virtual*/ QList<AssetItemData *> SpriteModel::GetAssets(HyGuiItemType eType) const /*override*/
+/*virtual*/ QList<AssetItemData *> SpriteModel::GetAssets(AssetType eAssetType) const /*override*/
 {
 	QList<AssetItemData *> retAtlasFrameList;
 
-	if(eType == ITEM_AtlasImage)
+	if(eAssetType == ASSET_Atlas)
 	{
 		for(int i = 0; i < m_StateList.size(); ++i)
 		{
@@ -439,9 +439,4 @@ SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	}
 
 	return retAtlasFrameList;
-}
-
-/*virtual*/ QStringList SpriteModel::GetFontUrls() const /*override*/
-{
-	return QStringList();
 }

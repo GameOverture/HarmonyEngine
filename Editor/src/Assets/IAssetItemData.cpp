@@ -42,19 +42,20 @@ void AssetItemData::SetBankId(quint32 uiNewBankId)
 	m_uiBankId = uiNewBankId;
 }
 
-QString AssetItemData::GetFilter()
+Project &AssetItemData::GetProject()
 {
-	return m_ModelRef.AssembleFilter(this, false);
+	return m_ModelRef.GetProjOwner();
+}
+
+QString AssetItemData::GetFilter() const
+{
+	AssetItemData *pAssetData = const_cast<AssetItemData *>(this);
+	return m_ModelRef.AssembleFilter(pAssetData, false);
 }
 
 QString AssetItemData::GetName() const
 {
 	return m_sName;
-}
-
-QString AssetItemData::GetMetaFileExt() const
-{
-	return m_sMetaFileExt;
 }
 
 QSet<ProjectItemData *> AssetItemData::GetDependencies()
@@ -72,7 +73,7 @@ void AssetItemData::RemoveDependency(ProjectItemData *pProjItem)
 	m_DependencySet.remove(pProjItem);
 }
 
-/*virtual*/ QString AssetItemData::ConstructMetaFileName()
+/*virtual*/ QString AssetItemData::ConstructMetaFileName() const
 {
 	QString sMetaName;
 	sMetaName = sMetaName.asprintf("%010u", m_uiChecksum);
@@ -81,9 +82,19 @@ void AssetItemData::RemoveDependency(ProjectItemData *pProjItem)
 	return sMetaName;
 }
 
+QString AssetItemData::GetMetaFileExt() const
+{
+	return m_sMetaFileExt;
+}
+
+QString AssetItemData::GetAbsMetaFilePath() const
+{
+	return m_ModelRef.GetMetaDir().absoluteFilePath(ConstructMetaFileName());
+}
+
 bool AssetItemData::DeleteMetaFile()
 {
-	QFile imageFile(m_ModelRef.GetMetaDir().absoluteFilePath(ConstructMetaFileName()));
+	QFile imageFile(GetAbsMetaFilePath());
 	if(imageFile.remove() == false)
 		return false;
 

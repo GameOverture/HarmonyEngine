@@ -371,12 +371,8 @@ bool EntityModel::RemoveChild(ProjectItemData *pItem)
 {
 }
 
-/*virtual*/ QList<AssetItemData *> EntityModel::GetAssets(HyGuiItemType eType) const /*override*/
+/*virtual*/ QList<AssetItemData *> EntityModel::GetAssets(AssetType eAssetType) const /*override*/
 {
+	// TODO: EntityModel::GetAssets
 	return QList<AssetItemData *>();
-}
-
-/*virtual*/ QStringList EntityModel::GetFontUrls() const /*override*/
-{
-	return QStringList();
 }

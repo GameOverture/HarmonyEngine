@@ -27,12 +27,7 @@ PrimitiveModel::~PrimitiveModel()
 {
 }
 
-/*virtual*/ QList<AssetItemData *> PrimitiveModel::GetAssets(HyGuiItemType eType) const /*override*/
+/*virtual*/ QList<AssetItemData *> PrimitiveModel::GetAssets(AssetType eAssetType) const /*override*/
 {
 	return QList<AssetItemData *>();
-}
-
-/*virtual*/ QStringList PrimitiveModel::GetFontUrls() const /*override*/
-{
-	return QStringList();
 }

@@ -153,17 +153,18 @@ QString TextFontManager::GetFontName(TextLayerHandle hLayer) const
 	return sFontName;
 }
 
-QString TextFontManager::GetFontPath(TextLayerHandle hLayer) const
+QString TextFontManager::GetFontPath(TextLayerHandle hLayer)
 {
-	int iFontIndex = GetFontIndex(hLayer);
+	return GetFontPathFromName(GetFontName(hLayer));
+	//int iFontIndex = GetFontIndex(hLayer);
 
-	if(iFontIndex >= m_PreviewFontList.size())
-	{
-		HyGuiLog("TextFontManager::GetFontPath failed because 'm_PreviewFontList' has not been generated", LOGTYPE_Error);
-		return QString();
-	}
+	//if(iFontIndex >= m_PreviewFontList.size())
+	//{
+	//	HyGuiLog("TextFontManager::GetFontPath failed because 'm_PreviewFontList' has not been generated", LOGTYPE_Error);
+	//	return QString();
+	//}
 
-	return QString(m_PreviewFontList[iFontIndex]->GetTextureFont()->filename);
+	//return QString(m_PreviewFontList[iFontIndex]->GetTextureFont()->filename);
 }
 
 rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer) const
@@ -508,13 +509,9 @@ int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, 
 	return -1;
 }
 
-int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
+QString TextFontManager::GetFontPathFromName(QString sFontName)
 {
-	m_bPreviewAtlasPixelDataInitialized = false;
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Get font path
-	QStandardItemModel *pProjectFontsModel = m_GlyphsModel.GetOwner().GetProject().GetFontListModel();
+	const QStandardItemModel *pProjectFontsModel = m_GlyphsModel.GetOwner().GetProject().GetFontListModel();
 	int iNumFonts = pProjectFontsModel->rowCount();
 	QString sFontPath;
 	for(int i = 0; i < iNumFonts; ++i)
@@ -526,8 +523,20 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 	if(sFontPath.isEmpty())
 	{
 		HyGuiLog("TextFontManager::CreatePreviewFont could not find font: " % sFontName, LOGTYPE_Error);
-		return TEXTFONTERROR_FontNotFound;
+		return "";
 	}
+
+	return sFontPath;
+}
+
+int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMode, float fOutlineThickness, float fSize)
+{
+	m_bPreviewAtlasPixelDataInitialized = false;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	QString sFontPath = GetFontPathFromName(sFontName);
+	if(sFontName.isEmpty())
+		return TEXTFONTERROR_FontNotFound;
 
 	QString sGlyphList = GetAvailableTypefaceGlyphs();
 

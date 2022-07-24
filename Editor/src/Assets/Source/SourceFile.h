@@ -30,7 +30,7 @@ public:
 			   uint uiErrors);
 	~SourceFile();
 
-	virtual QString ConstructMetaFileName() override;
+	virtual QString ConstructMetaFileName() const override;
 	virtual QString GetPropertyInfo() override;
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 

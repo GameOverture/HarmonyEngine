@@ -70,10 +70,6 @@ ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
 	if(pMimeData == nullptr)
 		return;
 
-	QList<QPersistentModelIndex> persistentIndexes;
-	for (int i = 0; i<indexes.count(); i++)
-		persistentIndexes.append(QPersistentModelIndex(indexes.at(i)));
-
 	QPixmap pixmap = indexes.first().data(Qt::DecorationRole).value<QPixmap>();
 	QDrag *pDrag = new QDrag(this);
 	pDrag->setPixmap(pixmap);
@@ -81,11 +77,18 @@ ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
 	pDrag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
 
 	Qt::DropAction eDropAction = pDrag->exec(supportedActions);
-	if(eDropAction != Qt::MoveAction)
-	{
-		supportedActions &= ~Qt::MoveAction;
-		eDropAction = pDrag->exec(supportedActions);
-	}
+	//if(eDropAction != Qt::MoveAction)
+	//{
+	//	supportedActions &= ~Qt::MoveAction;
+	//	eDropAction = pDrag->exec(supportedActions);
+	//}
+
+
+
+
+	//QList<QPersistentModelIndex> persistentIndexes;
+	//for(int i = 0; i < indexes.count(); i++)
+	//	persistentIndexes.append(QPersistentModelIndex(indexes.at(i)));
 
 	//Qt::DropAction defaultDropAction = Qt::IgnoreAction;
 	//if(supportedActions & Qt::MoveAction || dragDropMode() == QAbstractItemView::InternalMove)
@@ -473,7 +476,7 @@ void ExplorerWidget::on_actionCopyItem_triggered()
 		return;
 	}
 
-	QList<TreeModelItemData *> treeItemList;
+	QList<ExplorerItemData *> treeItemList;
 	for(auto item : selectedItems)
 		treeItemList << item;
 	ProjectItemMimeData *pNewMimeData = new ProjectItemMimeData(treeItemList);
@@ -498,7 +501,7 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 	{
 		QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
 		if(curIndex.isValid())
-			GetExplorerModel()->PasteItemSrc(pMimeData->data(HYGUI_MIMETYPE_ITEM), curIndex);
+			GetExplorerModel()->PasteItemSrc(static_cast<const ProjectItemMimeData *>(pMimeData), curIndex);
 	}
 }
 

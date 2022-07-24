@@ -180,7 +180,7 @@ QString ExplorerModel::AssemblePrefix(ExplorerItemData *pItem) const
 	return sPrefix;
 }
 
-bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
+bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const QModelIndex &indexRef)
 {
 	// Error check destination index 'indexRef'
 	TreeModelItem *pDestTreeItem = FindPrefixTreeItem(indexRef);
@@ -195,19 +195,19 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 	// Destination is known, get project information
 	Project *pDestProject = &pDestItem->GetProject();
 
-	// Parse 'sSrc' for paste information
-	QJsonDocument pasteDoc = QJsonDocument::fromJson(sSrc);
+	// Parse 'pProjMimeData' for paste information
+	QJsonDocument pasteDoc = QJsonDocument::fromJson(pProjMimeData->data(HYGUI_MIMETYPE_ITEM));
 	QJsonArray pasteArray = pasteDoc.array();
 	for(int iPasteIndex = 0; iPasteIndex < pasteArray.size(); ++iPasteIndex)
 	{
 		QJsonObject pasteObj = pasteArray[iPasteIndex].toObject();
 
-		HyGuiItemType ePasteItemType = HyGlobal::GetTypeFromString(pasteObj["itemType"].toString());
+		HyGuiItemType ePasteItemType = HyGlobal::GetTypeFromString(pasteObj["type"].toString());
 
 		// If paste item is already in the destination project, just simply move it to new location
 		if(pasteObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
 		{
-			QString sItemPath = pasteObj["itemName"].toString();
+			QString sItemPath = pasteObj["name"].toString();
 			QModelIndex sourceIndex = FindIndexByItemPath(pDestProject, sItemPath, ePasteItemType);
 			TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
 			ExplorerItemData *pSourceItem = pSourceTreeItem->data(0).value<ExplorerItemData *>();
@@ -231,53 +231,65 @@ bool ExplorerModel::PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef)
 			continue;
 		}
 
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Pasted item's assets needs to be imported into this project
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Import any missing fonts (.ttf)
-		QDir metaDir(pDestProject->GetMetaAbsPath());
-		QString sFontMetaDir = metaDir.absoluteFilePath(HYMETA_FontsDir);
-		QDir fontMetaDir(sFontMetaDir);
-		fontMetaDir.mkdir(".");
-
-		QJsonArray fontArray = pasteObj["fonts"].toArray();
-		for(int i = 0; i < fontArray.size(); ++i)
+		for(int iAssetCount = 0; iAssetCount < NUMASSETTYPES; ++iAssetCount)
 		{
-			QFileInfo pasteFontFileInfo(fontArray[i].toString());
-
-			QString sAbsFilePath = pasteFontFileInfo.absoluteFilePath();
-			QString sAbsDestPath = sFontMetaDir % "/" % pasteFontFileInfo.fileName();
-			if(QFile::exists(sAbsDestPath) == false)
-			{
-				if(QFile::copy(sAbsFilePath, sAbsDestPath))
-					HyGuiLog("Paste imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
-				else
-					HyGuiLog("Paste failed to imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Error);
-			}
+			QJsonArray assetArray = pasteObj[HyGlobal::AssetName(static_cast<AssetType>(iAssetCount))].toArray();
+			if(pDestProject->PasteAssets(ePasteItemType, assetArray, static_cast<AssetType>(iAssetCount)) == false)
+				HyGuiLog("Paste failed to import assets of type: " % QString::number(iAssetCount), LOGTYPE_Error);
 		}
-		if(fontArray.empty() == false)
-			pDestProject->ScanMetaFontDir();
+		
+		// Import any missing fonts (.ttf)
+		if(pasteObj.contains("fonts"))
+		{
+			QDir metaDir(pDestProject->GetMetaAbsPath());
+			QString sFontMetaDir = metaDir.absoluteFilePath(HYMETA_FontsDir);
+			QDir fontMetaDir(sFontMetaDir);
+			fontMetaDir.mkdir(".");
 
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// IManagerModels
-		QJsonArray imageArray = pasteObj["images"].toArray();
-		if(pDestProject->PasteAssets(ePasteItemType, imageArray, ITEM_AtlasImage) == false)
-			HyGuiLog("Paste failed to import texture assets", LOGTYPE_Error);
+			QJsonArray fontArray = pasteObj["fonts"].toArray();
+			for(int i = 0; i < fontArray.size(); ++i)
+			{
+				QFileInfo pasteFontFileInfo(fontArray[i].toString());
 
-		QJsonArray soundArray = pasteObj["sounds"].toArray();
-		if(pDestProject->PasteAssets(ePasteItemType, soundArray, ITEM_Audio) == false)
-			HyGuiLog("Paste failed to import sound assets", LOGTYPE_Error);
+				QString sAbsFilePath = pasteFontFileInfo.absoluteFilePath();
+				QString sAbsDestPath = sFontMetaDir % "/" % pasteFontFileInfo.fileName();
+				if(QFile::exists(sAbsDestPath) == false)
+				{
+					if(QFile::copy(sAbsFilePath, sAbsDestPath))
+						HyGuiLog("Paste imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+					else
+						HyGuiLog("Paste failed to imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Error);
+				}
+			}
+			if(fontArray.empty() == false)
+				pDestProject->ScanMetaFontDir();
+		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Create a new project item representing the pasted item and save it
-		QFileInfo itemNameFileInfo(pasteObj["itemName"].toString());
+		QString sItemPath = pasteObj["name"].toString();
+		QString sPrefix, sName;
+		int iSplitIndex = sItemPath.lastIndexOf('/');
+		if(-1 == iSplitIndex)
+		{
+			sPrefix = "";
+			sName = sItemPath;
+		}
+		else
+		{
+			sPrefix = sItemPath.left(iSplitIndex);
+			sName = sItemPath.right(sItemPath.length() - iSplitIndex - 1);
+		}
+
 		FileDataPair initFileItemData;
 		initFileItemData.m_Meta = pasteObj["metaObj"].toObject();
 		initFileItemData.m_Data = pasteObj["dataObj"].toObject();
 		ProjectItemData *pImportedProjItem = static_cast<ProjectItemData *>(AddItem(pDestProject,
 																			ePasteItemType,
-																			itemNameFileInfo.path(),
-																			itemNameFileInfo.baseName(),
+																			sPrefix,
+																			sName,
 																			initFileItemData,
 																			false));
 		
@@ -402,17 +414,16 @@ void ExplorerModel::RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectIt
 
 /*virtual*/ QMimeData *ExplorerModel::mimeData(const QModelIndexList &indexes) const /*override*/
 {
-	QList<TreeModelItemData *> itemList;
+	QList<ExplorerItemData *> itemList;
 	for(const auto &index : indexes)
 	{
 		if(index.column() != 0)
 			continue;
 
-		itemList.push_back(data(index, Qt::UserRole).value<TreeModelItemData *>());
+		itemList.push_back(data(index, Qt::UserRole).value<ExplorerItemData *>());
 	}
 
-	RemoveRedundantItems(ITEM_Prefix, itemList);
-
+	//RemoveRedundantItems(ITEM_Prefix, itemList);
 	if(itemList.empty())
 		return nullptr;
 
@@ -441,8 +452,8 @@ void ExplorerModel::RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectIt
 	if(eAction == Qt::IgnoreAction)
 		return true;
 	
-	if(eAction == Qt::MoveAction)
-		return PasteItemSrc(pData->data(HYGUI_MIMETYPE_ITEM), parentRef);
+	if(eAction == Qt::MoveAction && pData->hasFormat(HYGUI_MIMETYPE_ITEM))
+		return PasteItemSrc(static_cast<const ProjectItemMimeData *>(pData), parentRef);
 
 	HyGuiLog("dropMimeData isn't MOVEACTION", LOGTYPE_Normal);
 	return false;

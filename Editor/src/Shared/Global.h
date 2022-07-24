@@ -79,6 +79,12 @@ enum AssetType
 	NUMASSETTYPES
 };
 
+enum MimeType
+{
+	MIMETYPE_ProjectItems = 0,
+	MIMETYPE_Assets
+};
+
 enum AssetErrorType
 {
 	ASSETERROR_CannotFindMetaFile = 0,

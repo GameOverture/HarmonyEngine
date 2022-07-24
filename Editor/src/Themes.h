@@ -1,5 +1,6 @@
 #pragma once
 
+// http://discourse.techart.online/t/release-qt-dark-orange-stylesheet/2287
 const char *const szDECEMBERWEEN_STYLESHEET = R"src(
 QToolTip
 {
@@ -333,7 +334,7 @@ QMainWindow::separator:hover
 QToolBar::handle
 {
      spacing: 3px; /* spacing between items in the tool bar */
-     background: url(:/images/handle.png);
+     background: url(:/handle.png);
 }
 
 QMenu::separator
@@ -453,7 +454,7 @@ QRadioButton::indicator:hover, QCheckBox::indicator:hover
 
 QCheckBox::indicator:checked
 {
-    image:url(:/images/checkbox.png);
+    image:url(:/checkbox.png);
 }
 
 QCheckBox::indicator:disabled, QRadioButton::indicator:disabled

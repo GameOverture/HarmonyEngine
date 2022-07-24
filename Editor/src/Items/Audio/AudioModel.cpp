@@ -154,9 +154,9 @@ PropertiesTreeModel &AudioModel::GetPropertiesModel(uint uiStateIndex)
 		stateFileDataOut.m_Data.insert("maxDist", 0);
 }
 
-/*virtual*/ QList<AssetItemData *> AudioModel::GetAssets(HyGuiItemType eType) const /*override*/
+/*virtual*/ QList<AssetItemData *> AudioModel::GetAssets(AssetType eAssetType) const /*override*/
 {
-	if(eType != ITEM_Audio)
+	if(eAssetType != ASSET_Audio)
 		return QList<AssetItemData *>();
 
 	QList<AssetItemData *> returnList;
@@ -167,9 +167,4 @@ PropertiesTreeModel &AudioModel::GetPropertiesModel(uint uiStateIndex)
 	}
 
 	return returnList;
-}
-
-/*virtual*/ QStringList AudioModel::GetFontUrls() const /*override*/
-{
-	return QStringList();
 }

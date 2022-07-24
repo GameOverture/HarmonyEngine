@@ -89,6 +89,22 @@ PropertiesTreeModel *TextModel::GetGlyphsModel()
 	return m_FontManager.GetGlyphsModel();
 }
 
+QStringList TextModel::GetFontUrls()
+{
+	QStringList fontUrlList;
+	for(int i = 0; i < m_StateList.size(); ++i)
+	{
+		TextLayersModel *pLayersModel = GetLayersModel(i);
+		
+		//QString sFontPath = m_FontManager.GetFontPath(sFontName);
+		
+		fontUrlList.append(pLayersModel->GetFontPath());
+	}
+	fontUrlList.removeDuplicates();
+
+	return fontUrlList;
+}
+
 void TextModel::SetRuntimeAtlasDirty()
 {
 	HyGuiLog(m_ItemRef.GetName(true) % " runtime atlas is dirty.", LOGTYPE_Normal);
@@ -216,28 +232,15 @@ void TextModel::SetRuntimeAtlasDirty()
 	stateFileDataOut.m_Data.insert("layers", layersArray);
 }
 
-/*virtual*/ QList<AssetItemData *> TextModel::GetAssets(HyGuiItemType eType) const /*override*/
+/*virtual*/ QList<AssetItemData *> TextModel::GetAssets(AssetType eAssetType) const /*override*/
 {
 	QList<AssetItemData *> retAtlasFrameList;
 
-	if(eType == ITEM_AtlasImage)
+	if(eAssetType == ASSET_Atlas)
 	{
 		if(m_pAtlasFrame)
 			retAtlasFrameList.push_back(m_pAtlasFrame);
 	}
 
 	return retAtlasFrameList;
-}
-
-/*virtual*/ QStringList TextModel::GetFontUrls() const /*override*/
-{
-	QStringList fontUrlList;
-	//for(int i = 0; i < m_StateList.size(); ++i)
-	//{
-	//	FontStateData *pState = static_cast<FontStateData *>(m_StateList[i]);
-	//	fontUrlList.append(pState->GetFontFilePath());
-	//}
-
-	//fontUrlList.removeDuplicates();
-	return fontUrlList;
 }

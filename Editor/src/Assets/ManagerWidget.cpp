@@ -131,11 +131,11 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 	pDrag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
 
 	Qt::DropAction eDropAction = pDrag->exec(supportedActions);
-	if(eDropAction != Qt::MoveAction)
-	{
-		supportedActions &= ~Qt::MoveAction;
-		eDropAction = pDrag->exec(supportedActions);
-	}
+	//if(eDropAction != Qt::MoveAction)
+	//{
+	//	supportedActions &= ~Qt::MoveAction;
+	//	eDropAction = pDrag->exec(supportedActions);
+	//}
 }
 
 ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :

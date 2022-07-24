@@ -15,6 +15,8 @@
 #include "Explorer/ExplorerItemData.h"
 #include "Project/Project.h"
 
+class ProjectItemMimeData;
+
 class ExplorerModel : public ITreeModel
 {
 	Q_OBJECT
@@ -35,7 +37,7 @@ public:
 
 	QString AssemblePrefix(ExplorerItemData *pItem) const;
 
-	bool PasteItemSrc(QByteArray sSrc, const QModelIndex &indexRef);
+	bool PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const QModelIndex &indexRef);
 
 	ProjectItemData *FindByUuid(QUuid uuid);
 
