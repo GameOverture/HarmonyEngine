@@ -244,6 +244,8 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			contextMenu.addAction(FINDACTION("actionProjectSettings"));
 			contextMenu.addSeparator();
 			contextMenu.addAction(FINDACTION("actionOpenFolderExplorer"));
+			contextMenu.addSeparator();
+			contextMenu.addAction(ui->actionPasteItem);
 			break;
 		case ITEM_Audio:
 		case ITEM_Particles:
@@ -483,11 +485,19 @@ void ExplorerWidget::on_actionCopyItem_triggered()
 	QClipboard *pClipboard = QApplication::clipboard();
 	pClipboard->setMimeData(pNewMimeData);
 
+	HyGuiLog("Copied...", LOGTYPE_Normal);
+	bool bNothing = true;
 	for(int i = 0; i < selectedItems.size(); ++i)
 	{
 		if(selectedItems[i]->IsProjectItem())
-			HyGuiLog("Copied " % HyGlobal::ItemName(selectedItems[i]->GetType(), false) % " item (" % selectedItems[i]->GetName(true) % ") to the clipboard.", LOGTYPE_Normal);
+		{
+			HyGuiLog(HyGlobal::ItemName(selectedItems[i]->GetType(), false) % " item (" % selectedItems[i]->GetName(true) % ")", LOGTYPE_Normal);
+			bNothing = false;
+		}
 	}
+	if(bNothing)
+		HyGuiLog("NOTHING!", LOGTYPE_Normal);
+	HyGuiLog("...to the clipboard.", LOGTYPE_Normal);
 
 	ui->actionPasteItem->setEnabled(true);
 }

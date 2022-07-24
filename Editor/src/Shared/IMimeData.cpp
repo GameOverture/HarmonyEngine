@@ -55,25 +55,33 @@ IMimeData::IMimeData(MimeType eMimeType) :
 	return QVariant();
 }
 
-QJsonObject IMimeData::MakeAssetJsonObj(AssetItemData &assetDataRef)
+QJsonArray IMimeData::MakeAssetJsonArray(QList<AssetItemData *> assetList, AssetType eAssetType)
 {
-	QJsonObject assetObj;
-	assetObj.insert("project", assetDataRef.GetProject().GetAbsPath().toLower());
-	if(assetDataRef.GetType() == ITEM_Filter)
+	QJsonArray assetArray;
+	for(int i = 0; i < assetList.size(); ++i)
 	{
-		assetObj.insert("isFilter", true);
-		assetObj.insert("filter", assetDataRef.GetFilter());
-		assetObj.insert("name", QJsonValue(assetDataRef.GetText()));
-	}
-	else
-	{
-		assetObj.insert("isFilter", false);
-		assetObj.insert("assetUUID", assetDataRef.GetUuid().toString(QUuid::WithoutBraces));
-		assetObj.insert("checksum", QJsonValue(static_cast<qint64>(assetDataRef.GetChecksum())));
-		assetObj.insert("filter", assetDataRef.GetFilter());
-		assetObj.insert("name", QJsonValue(assetDataRef.GetName()));
-		assetObj.insert("uri", QJsonValue(assetDataRef.GetAbsMetaFilePath()));
+		if(assetList[i] == nullptr)
+			continue;
+
+		QJsonObject assetObj;
+		assetObj.insert("project", assetList[i]->GetProject().GetAbsPath().toLower());
+		if(assetList[i]->GetType() == ITEM_Filter)
+		{
+			assetObj.insert("isFilter", true);
+			assetObj.insert("filter", assetList[i]->GetFilter());
+			assetObj.insert("name", QJsonValue(assetList[i]->GetText()));
+		}
+		else
+		{
+			assetObj.insert("isFilter", false);
+			assetObj.insert("assetUUID", assetList[i]->GetUuid().toString(QUuid::WithoutBraces));
+			assetObj.insert("checksum", QJsonValue(static_cast<qint64>(assetList[i]->GetChecksum())));
+			assetObj.insert("filter", assetList[i]->GetFilter());
+			assetObj.insert("name", QJsonValue(assetList[i]->GetName()));
+			assetObj.insert("uri", QJsonValue(assetList[i]->GetAbsMetaFilePath()));
+		}
+		assetArray.append(assetObj);
 	}
 
-	return assetObj;
+	return assetArray;
 }

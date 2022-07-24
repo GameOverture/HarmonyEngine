@@ -427,6 +427,15 @@ void ExplorerModel::RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectIt
 	if(itemList.empty())
 		return nullptr;
 
+	for(auto *pItem : itemList)
+	{
+		if(pItem->IsProjectItem() && static_cast<ProjectItemData *>(pItem)->IsSaveClean() == false)
+		{
+			HyGuiLog("Cannot drag project items that are unsaved: " % pItem->GetName(true), LOGTYPE_Warning);
+			return nullptr;
+		}
+	}
+
 	return new ProjectItemMimeData(itemList);
 }
 

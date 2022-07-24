@@ -15,9 +15,14 @@
 
 class AssetMimeData : public IMimeData
 {
+	uint32				m_AssetCounts[NUMASSETTYPES];
+
 public:
-	AssetMimeData(QList<AssetItemData *> &assetListRef);
+	AssetMimeData(QList<AssetItemData *> &assetListRef, AssetType eAssetType);
 	virtual ~AssetMimeData();
+
+	uint32 GetNumAssetsOfType(AssetType eAssetType) const;
+	QJsonArray GetAssetsArray(AssetType eAssetType) const;
 };
 
 #endif // AssetMimeData_H

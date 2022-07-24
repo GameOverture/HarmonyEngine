@@ -106,7 +106,6 @@ public:
 	AudioManagerModel &GetAudioModel();
 	ManagerWidget *GetAudioWidget();
 
-	bool OnHarmonyMimeDrop(const IMimeData *pDroppedMimeData, QPoint ptDropPosition);
 	bool PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, AssetType eAssetType);
 
 	//void SetAudioModel(QJsonObject audioObj);
@@ -146,6 +145,7 @@ public:
 	void UnloadAllTabs();
 
 	void ApplySaveEnables();
+	bool IsUnsavedOpenItems();
 
 	void RunCMakeGui();
 

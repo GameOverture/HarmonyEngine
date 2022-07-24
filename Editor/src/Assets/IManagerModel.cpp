@@ -846,7 +846,7 @@ void IManagerModel::SaveRuntime()
 	}
 
 	//RemoveRedundantItems(ITEM_Filter, itemList);
-	QMimeData *pNewMimeData = new AssetMimeData(assetList);
+	QMimeData *pNewMimeData = new AssetMimeData(assetList, m_eASSET_TYPE);
 	return pNewMimeData;
 }
 
@@ -877,7 +877,9 @@ void IManagerModel::SaveRuntime()
 	// Parse 'sSrc' for paste information
 	QByteArray sSrc = pData->data(HYGUI_MIMETYPE_ASSET);
 	QJsonDocument assetDoc = QJsonDocument::fromJson(sSrc);
-	QJsonArray assetArray = assetDoc.array();
+	QJsonObject rootAssetObj = assetDoc.object();
+
+	QJsonArray assetArray = rootAssetObj[HyGlobal::AssetName(m_eASSET_TYPE)].toArray();
 	for(int iAssetIndex = 0; iAssetIndex < assetArray.size(); ++iAssetIndex)
 	{
 		QJsonObject assetObj = assetArray[iAssetIndex].toObject();
@@ -930,8 +932,8 @@ void IManagerModel::SaveRuntime()
 			// TODO: Import new assets if not from current project
 		}
 	}
-
-	SaveMeta();
+	if(assetArray.isEmpty() == false)
+		SaveMeta();
 
 	return true;
 }

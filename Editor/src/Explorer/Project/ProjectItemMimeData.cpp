@@ -18,7 +18,7 @@
 ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef) :
 	IMimeData(MIMETYPE_ProjectItems)
 {
-	QJsonArray itemsArray;
+	QJsonArray rootArray; // An array of ProjectItems
 	for(int i = 0; i < itemListRef.size(); ++i)
 	{
 		if(itemListRef[i]->IsProjectItem() == false)
@@ -29,10 +29,10 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 		itemObj.insert("name", itemListRef[i]->GetName(true));
 		itemObj.insert("type", HyGlobal::ItemName(itemListRef[i]->GetType(), false));
 
-		ProjectItemData *pProjectItem = static_cast<ProjectItemData *>(itemListRef[i]);
 
 		// STANDARD INFO
 		FileDataPair itemFileData;
+		ProjectItemData *pProjectItem = static_cast<ProjectItemData *>(itemListRef[i]);
 		pProjectItem->GetLatestFileData(itemFileData);
 		itemObj.insert("metaObj", itemFileData.m_Meta);
 		itemObj.insert("dataObj", itemFileData.m_Data);
@@ -41,15 +41,8 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 		for(int iAssetCount = 0; iAssetCount < NUMASSETTYPES; ++iAssetCount)
 		{
 			QList<AssetItemData *> assetList = pProjectItem->GetModel()->GetAssets(static_cast<AssetType>(iAssetCount));
-			QJsonArray assetArray;
-			for(int i = 0; i < assetList.size(); ++i)
-			{
-				if(assetList[i] == nullptr)
-					continue;
-
-				QJsonObject assetObj = MakeAssetJsonObj(*assetList[i]);
-				assetArray.append(assetObj);
-			}
+			
+			QJsonArray assetArray = MakeAssetJsonArray(assetList, static_cast<AssetType>(iAssetCount));
 			itemObj.insert(HyGlobal::AssetName(static_cast<AssetType>(iAssetCount)), assetArray);
 		}
 
@@ -63,11 +56,11 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 			itemObj.insert("fonts", fontUrlArray);
 		}
 		
-		itemsArray.append(itemObj);
+		rootArray.append(itemObj);
 	}
 
 	// Serialize the item info into json source
-	m_Data = JsonValueToSrc(QJsonValue(itemsArray));
+	m_Data = JsonValueToSrc(QJsonValue(rootArray));
 	setData(HYGUI_MIMETYPE_ITEM, m_Data);
 }
 

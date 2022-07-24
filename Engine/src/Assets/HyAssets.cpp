@@ -729,7 +729,11 @@ void HyAssets::QueueData(IHyFile *pData)
 void HyAssets::DequeData(IHyFile *pData)
 {
 	HyAssert(pData->m_eLoadState != HYLOADSTATE_Inactive, "Trying to DequeData that is HYLOADSTATE_Inactive");
-	HyAssert(pData->m_uiRefCount > 0, "Tried to decrement a '0' reference");
+	if(pData->m_uiRefCount <= 0)
+	{
+		HyLogError("HyAssets::DequeData Tried to decrement a '0' reference");
+		return;
+	}
 
 	pData->m_uiRefCount--;
 	if(pData->m_uiRefCount == 0)

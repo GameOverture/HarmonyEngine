@@ -856,6 +856,14 @@ void MainWindow::on_actionActivateProject_triggered()
 {
 	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
 	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+
+	if(Harmony::GetProject() &&
+	   Harmony::GetProject() != &pFirstSelected->GetProject() &&
+	   Harmony::GetProject()->IsUnsavedOpenItems())
+	{
+		HyGuiLog("Cannot activate project because there are unsaved items open", LOGTYPE_Warning);
+		return;
+	}
 	
 	bool bNewProject = Harmony::GetProject() != &pFirstSelected->GetProject();
 	if(bNewProject)
