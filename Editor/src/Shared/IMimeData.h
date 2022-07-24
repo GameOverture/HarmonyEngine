@@ -30,6 +30,8 @@ public:
 	IMimeData(MimeType eMimeType);
 	virtual ~IMimeData();
 
+	MimeType GetMimeType() const;
+
 	virtual bool hasFormat(const QString &sMimeType) const override;
 	virtual QStringList formats() const override;
 

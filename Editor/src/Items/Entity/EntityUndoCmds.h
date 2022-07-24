@@ -15,22 +15,14 @@
 class ProjectItemData;
 class ExplorerItemData;
 
-enum EntityCmd
+class EntityUndoCmd_AddChildren : public QUndoCommand
 {
-	ENTITYCMD_AddNewChildren = 0,
-	ENTITYCMD_AddPrimitive,
-};
-
-class EntityUndoCmd : public QUndoCommand
-{
-	const EntityCmd		m_eCMD;
-	ProjectItemData &	m_EntityItemRef;
-	QList<QVariant>		m_ParameterList;
-	int					m_iStateIndex;
+	ProjectItemData &			m_EntityItemRef;
+	QList<ProjectItemData *>	m_ChildrenList;
 
 public:
-	EntityUndoCmd(EntityCmd eCMD, ProjectItemData &entityItemRef, QList<QVariant> parameterList, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd();
+	EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddChildren();
 
 	virtual void redo() override;
 	virtual void undo() override;

@@ -133,26 +133,23 @@ void EntityWidget::on_actionAppendChildren_triggered()
 		return;
 	}
 
-	QList<QVariant> validItemList;
+	QList<ProjectItemData *> validItemList;
 	for(auto pItem : selectedItems)
 	{
 		EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
 		if(pTreeModel->IsItemValid(pItem, false) == false)
 			continue;
-	
-		QVariant v;
-		v.setValue<TreeModelItemData *>(pItem);
-		validItemList.push_back(v);
-	}
 
-	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddNewChildren, m_ItemRef, validItemList);
+		validItemList.push_back(pItem);
+	}
+	QUndoCommand *pCmd = new EntityUndoCmd_AddChildren(m_ItemRef, validItemList);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPrimitive_triggered()
 {
-	QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, QVariantList());
-	m_ItemRef.GetUndoStack()->push(pCmd);
+	//QUndoCommand *pCmd = new EntityUndoCmd(ENTITYCMD_AddPrimitive, m_ItemRef, QVariantList());
+	//m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionInsertBoundingVolume_triggered()

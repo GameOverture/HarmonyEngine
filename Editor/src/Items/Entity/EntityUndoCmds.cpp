@@ -12,72 +12,42 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 
-EntityUndoCmd::EntityUndoCmd(EntityCmd eCMD, ProjectItemData &entityItemRef, QList<QVariant> parameterList, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
-	m_eCMD(eCMD),
-	m_ParameterList(parameterList),
 	m_EntityItemRef(entityItemRef),
-	m_iStateIndex(-1)
+	m_ChildrenList(projItemList)
 {
 	if(m_EntityItemRef.GetType() != ITEM_Entity)
 		HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_EntityItemRef.GetType()) , LOGTYPE_Error);
 
-	switch(m_eCMD)
-	{
-	case ENTITYCMD_AddNewChildren:
-		setText("Add New Child Node(s)");
-		break;
-
-	case ENTITYCMD_AddPrimitive:
-		setText("Add Primitive");
-		break;
-	}
-
-	if(entityItemRef.GetWidget())
-		m_iStateIndex = entityItemRef.GetWidget()->GetCurStateIndex();
+	setText("Add New Child Node(s)");
 }
 
-/*virtual*/ EntityUndoCmd::~EntityUndoCmd()
+/*virtual*/ EntityUndoCmd_AddChildren::~EntityUndoCmd_AddChildren()
 {
 }
 
-/*virtual*/ void EntityUndoCmd::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddChildren::redo() /*override*/
 {
-	switch(m_eCMD)
+	QList<ProjectItemData *> itemList;
+	for(auto *pProjItem : m_ChildrenList)
 	{
-	case ENTITYCMD_AddNewChildren: {
-		QList<TreeModelItemData *> itemList;
-		for(auto param : m_ParameterList)
-		{
-			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<ProjectItemData *>(), true))
-				itemList.push_back(param.value<ProjectItemData *>());
-		}
-
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChildren(itemList);
-		break; }
-
-	case ENTITYCMD_AddPrimitive:
-		break;
+		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(pProjItem, true))
+			itemList.push_back(pProjItem);
 	}
 
-	m_EntityItemRef.FocusWidgetState(m_iStateIndex, -1);
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChildren(itemList);
+
+	m_EntityItemRef.FocusWidgetState(0, -1);
 }
 
-/*virtual*/ void EntityUndoCmd::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddChildren::undo() /*override*/
 {
-	switch(m_eCMD)
+	for(auto *pProjItem : m_ChildrenList)
 	{
-	case ENTITYCMD_AddNewChildren: {
-		for(auto param : m_ParameterList)
-		{
-			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<ProjectItemData *>(), true))
-				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(param.value<ProjectItemData *>());
-		}
-		break; }
-
-	case ENTITYCMD_AddPrimitive:
-		break;
+		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(pProjItem, true))
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(pProjItem);
 	}
 
-	m_EntityItemRef.FocusWidgetState(m_iStateIndex, -1);
+	m_EntityItemRef.FocusWidgetState(0, -1);
 }

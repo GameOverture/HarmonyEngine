@@ -29,13 +29,14 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 		itemObj.insert("name", itemListRef[i]->GetName(true));
 		itemObj.insert("type", HyGlobal::ItemName(itemListRef[i]->GetType(), false));
 
-
 		// STANDARD INFO
 		FileDataPair itemFileData;
 		ProjectItemData *pProjectItem = static_cast<ProjectItemData *>(itemListRef[i]);
 		pProjectItem->GetLatestFileData(itemFileData);
 		itemObj.insert("metaObj", itemFileData.m_Meta);
 		itemObj.insert("dataObj", itemFileData.m_Data);
+
+		itemObj.insert("UUID", pProjectItem->GetUuid().toString(QUuid::WithoutBraces));
 
 		// ASSETS FROM MANAGERS
 		for(int iAssetCount = 0; iAssetCount < NUMASSETTYPES; ++iAssetCount)

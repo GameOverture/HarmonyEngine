@@ -21,6 +21,11 @@ IMimeData::IMimeData(MimeType eMimeType) :
 {
 }
 
+MimeType IMimeData::GetMimeType() const
+{
+	return m_eMIME_TYPE;
+}
+
 /*virtual*/ bool IMimeData::hasFormat(const QString &sMimeType) const /*override*/
 {
 	return ("application/json" == sMimeType.toLower() ||

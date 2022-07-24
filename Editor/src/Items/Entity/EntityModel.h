@@ -88,7 +88,7 @@ public:
 	EntityNodeTreeModel &GetNodeTreeModel();
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItemData *pItem);
 
-	void AddNewChildren(QList<TreeModelItemData *> itemList);
+	void AddNewChildren(QList<ProjectItemData *> projItemList);
 	bool RemoveChild(ProjectItemData *pItem);
 
 	virtual bool OnPrepSave() override;

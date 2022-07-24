@@ -321,18 +321,15 @@ PropertiesTreeModel *EntityModel::GetPropertiesModel(int iStateIndex, ExplorerIt
 	return pPropertiesModel;
 }
 
-void EntityModel::AddNewChildren(QList<TreeModelItemData *> itemList)
+void EntityModel::AddNewChildren(QList<ProjectItemData *> projItemList)
 {
-	for(auto item : itemList)
+	for(auto item : projItemList)
 	{
-		if(item->IsProjectItem())
-		{
-			QList<ProjectItemData *> list;
-			list << static_cast<ProjectItemData *>(item);
-			m_ItemRef.GetProject().RegisterItems(&m_ItemRef, list);
+		QList<ProjectItemData *> list;
+		list << static_cast<ProjectItemData *>(item);
+		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, list);
 
-			m_TreeModel.InsertNewChild(static_cast<ProjectItemData *>(item));
-		}
+		m_TreeModel.InsertNewChild(static_cast<ProjectItemData *>(item));
 	}
 }
 
