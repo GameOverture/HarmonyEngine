@@ -18,7 +18,7 @@ class AssetMimeData : public IMimeData
 	uint32				m_AssetCounts[NUMASSETTYPES];
 
 public:
-	AssetMimeData(QList<AssetItemData *> &assetListRef, AssetType eAssetType);
+	AssetMimeData(Project &projRef, QList<TreeModelItemData *> &assetListRef, AssetType eAssetType);
 	virtual ~AssetMimeData();
 
 	uint32 GetNumAssetsOfType(AssetType eAssetType) const;

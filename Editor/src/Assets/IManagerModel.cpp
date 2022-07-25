@@ -836,17 +836,17 @@ void IManagerModel::SaveRuntime()
 
 /*virtual*/ QMimeData *IManagerModel::mimeData(const QModelIndexList &indexes) const /*override*/
 {
-	QList<AssetItemData *> assetList;
+	QList<TreeModelItemData *> assetList;
 	for(const auto &index : indexes)
 	{
 		if(index.column() != 0)
 			continue;
 
-		assetList.push_back(data(index, Qt::UserRole).value<AssetItemData *>());
+		assetList.push_back(data(index, Qt::UserRole).value<TreeModelItemData *>());
 	}
 
 	//RemoveRedundantItems(ITEM_Filter, itemList);
-	QMimeData *pNewMimeData = new AssetMimeData(assetList, m_eASSET_TYPE);
+	QMimeData *pNewMimeData = new AssetMimeData(GetProjOwner(), assetList, m_eASSET_TYPE);
 	return pNewMimeData;
 }
 

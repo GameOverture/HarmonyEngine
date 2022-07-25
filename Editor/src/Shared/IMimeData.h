@@ -18,7 +18,7 @@
 #define HYGUI_MIMETYPE_ASSET "application/x-harmonyasset"
 
 class AssetItemData;
-class ProjectItemData;
+class TreeModelItemData;
 
 class IMimeData : public QMimeData
 {
@@ -38,7 +38,7 @@ public:
 protected:
 	virtual QVariant retrieveData(const QString &sMimeType, QVariant::Type type) const override;
 
-	QJsonArray MakeAssetJsonArray(QList<AssetItemData *> assetList, AssetType eAssetType);
+	QJsonArray MakeAssetJsonArray(Project &projRef, QList<TreeModelItemData *> assetList, AssetType eAssetType);
 };
 
 #endif // IMIMEDATA_H

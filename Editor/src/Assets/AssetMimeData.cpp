@@ -15,7 +15,7 @@
 #include "AtlasFrame.h"
 #include "IManagerModel.h"
 
-AssetMimeData::AssetMimeData(QList<AssetItemData *> &assetListRef, AssetType eAssetType) :
+AssetMimeData::AssetMimeData(Project &projRef, QList<TreeModelItemData *> &assetListRef, AssetType eAssetType) :
 	IMimeData(MIMETYPE_Assets)
 {
 	for(uint32 i = 0; i < NUMASSETTYPES; ++i)
@@ -27,7 +27,7 @@ AssetMimeData::AssetMimeData(QList<AssetItemData *> &assetListRef, AssetType eAs
 		QJsonArray assetArray;
 		if(eAssetType == static_cast<AssetType>(iAssetCount))
 		{
-			assetArray = MakeAssetJsonArray(assetListRef, static_cast<AssetType>(iAssetCount));
+			assetArray = MakeAssetJsonArray(projRef, assetListRef, static_cast<AssetType>(iAssetCount));
 			m_AssetCounts[static_cast<AssetType>(iAssetCount)] = assetArray.size();
 		}
 		

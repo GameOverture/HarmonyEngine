@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "IMimeData.h"
 #include "IAssetItemData.h"
+#include "IManagerModel.h"
 #include "Project.h"
 
 IMimeData::IMimeData(MimeType eMimeType) :
@@ -60,7 +61,7 @@ MimeType IMimeData::GetMimeType() const
 	return QVariant();
 }
 
-QJsonArray IMimeData::MakeAssetJsonArray(QList<AssetItemData *> assetList, AssetType eAssetType)
+QJsonArray IMimeData::MakeAssetJsonArray(Project &projRef, QList<TreeModelItemData *> assetList, AssetType eAssetType)
 {
 	QJsonArray assetArray;
 	for(int i = 0; i < assetList.size(); ++i)
@@ -69,21 +70,28 @@ QJsonArray IMimeData::MakeAssetJsonArray(QList<AssetItemData *> assetList, Asset
 			continue;
 
 		QJsonObject assetObj;
-		assetObj.insert("project", assetList[i]->GetProject().GetAbsPath().toLower());
 		if(assetList[i]->GetType() == ITEM_Filter)
 		{
+			IManagerModel *pManager = projRef.GetManagerModel(eAssetType);
+			if(pManager == nullptr)
+				continue;
+
 			assetObj.insert("isFilter", true);
-			assetObj.insert("filter", assetList[i]->GetFilter());
+			assetObj.insert("project", projRef.GetAbsPath().toLower());
+			assetObj.insert("filter", pManager->AssembleFilter(assetList[i], false));
 			assetObj.insert("name", QJsonValue(assetList[i]->GetText()));
 		}
 		else
 		{
+			AssetItemData *pAssetItem = static_cast<AssetItemData *>(assetList[i]);
+
 			assetObj.insert("isFilter", false);
-			assetObj.insert("assetUUID", assetList[i]->GetUuid().toString(QUuid::WithoutBraces));
-			assetObj.insert("checksum", QJsonValue(static_cast<qint64>(assetList[i]->GetChecksum())));
-			assetObj.insert("filter", assetList[i]->GetFilter());
-			assetObj.insert("name", QJsonValue(assetList[i]->GetName()));
-			assetObj.insert("uri", QJsonValue(assetList[i]->GetAbsMetaFilePath()));
+			assetObj.insert("project", pAssetItem->GetProject().GetAbsPath().toLower());
+			assetObj.insert("assetUUID", pAssetItem->GetUuid().toString(QUuid::WithoutBraces));
+			assetObj.insert("checksum", QJsonValue(static_cast<qint64>(pAssetItem->GetChecksum())));
+			assetObj.insert("filter", pAssetItem->GetFilter());
+			assetObj.insert("name", QJsonValue(pAssetItem->GetName()));
+			assetObj.insert("uri", QJsonValue(pAssetItem->GetAbsMetaFilePath()));
 		}
 		assetArray.append(assetObj);
 	}
