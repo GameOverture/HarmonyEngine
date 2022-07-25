@@ -233,6 +233,11 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Pasted item's assets needs to be imported into this project
+
+		// TODO: if it's a prefix, grab all the items within it and import them?
+		if(pasteObj["isPrefix"].toBool())
+			continue;
+		
 		for(int iAssetCount = 0; iAssetCount < NUMASSETTYPES; ++iAssetCount)
 		{
 			QJsonArray assetArray = pasteObj[HyGlobal::AssetName(static_cast<AssetType>(iAssetCount))].toArray();
