@@ -264,15 +264,15 @@ bool HyScene::CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &
 	return uiCameraMaskOut != 0;
 }
 
-/*static*/ bool HyScene::Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2)
+/*static*/ bool HyScene::Node2dSortPredicate(IHyDrawable2d *pInst1, IHyDrawable2d *pInst2)
 {
-	//if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
-	//{
-	//	if(pInst1->GetShaderUniforms().GetCrc64() == pInst2->GetShaderUniforms().GetCrc64())
-	//		return reinterpret_cast<const char *>(pInst1) < reinterpret_cast<const char *>(pInst2);
+	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
+	{
+		if(pInst1->GetShaderUniforms().GetCrc64() == pInst2->GetShaderUniforms().GetCrc64())
+			return reinterpret_cast<const char *>(pInst1) < reinterpret_cast<const char *>(pInst2);
 
-	//	return pInst1->GetShaderUniforms().GetCrc64() < pInst2->GetShaderUniforms().GetCrc64();
-	//}
+		return pInst1->GetShaderUniforms().GetCrc64() < pInst2->GetShaderUniforms().GetCrc64();
+	}
 
 	return pInst1->GetDisplayOrder() < pInst2->GetDisplayOrder();
 }

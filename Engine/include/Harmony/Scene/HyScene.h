@@ -68,7 +68,7 @@ public:
 
 	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut) const;
 	
-	static bool Node2dSortPredicate(const IHyDrawable2d *pInst1, const IHyDrawable2d *pInst2);
+	static bool Node2dSortPredicate(IHyDrawable2d *pInst1, IHyDrawable2d *pInst2);
 };
 
 #endif /* HyScene_h__ */

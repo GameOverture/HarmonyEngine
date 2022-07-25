@@ -301,10 +301,10 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::FinishRender()
 {
 #ifdef HY_USE_GLFW
-	//glfwSwapInterval(0);
-	// This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
+	//glfwSwapInterval(0); // This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
 	glfwSwapBuffers(m_pCurWindow->GetInterop());
 #elif defined(HY_USE_SDL2)
+	//SDL_GL_SetSwapInterval(0); // 0 for immediate updates, 1 for updates synchronized with the vertical retrace, -1 for adaptive vsync
 	SDL_GL_SwapWindow(m_pCurWindow->GetInterop());
 #endif
 }
