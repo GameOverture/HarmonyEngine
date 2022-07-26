@@ -17,6 +17,30 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>C++ Class Name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="txtClassName"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Entity Type</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="cmbEntityType"/>
+       </item>
+      </layout>
+     </item>
+     <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
         <string>Nodes:</string>
@@ -189,7 +213,7 @@
           </layout>
          </item>
          <item>
-          <widget class="QTreeView" name="propertyTree">
+          <widget class="PropertiesTreeView" name="propertyTree">
            <attribute name="headerVisible">
             <bool>false</bool>
            </attribute>
@@ -259,6 +283,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PropertiesTreeView</class>
+   <extends>QTreeView</extends>
+   <header>PropertiesTreeView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../data/HyEditor.qrc"/>
   <include location="../../../data/HyEditor.qrc"/>
