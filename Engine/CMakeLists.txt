@@ -165,141 +165,141 @@ set(HYENGINE_SOURCE_FILES
 	src/Window/HyWindowManager.cpp)
 
 set(HYENGINE_HEADER_FILES
-	include/Harmony/HyEngine.h
-	include/Harmony/Afx/HyFlags.h
-	include/Harmony/Afx/HyInteropAfx.h
-	include/Harmony/Afx/HyStdAfx.h
-	include/Harmony/Afx/Compilers/HyCompiler.h
-	include/Harmony/Afx/Compilers/HyCompiler_GNU.h
-	include/Harmony/Afx/Compilers/HyCompiler_MSVC.h
-	include/Harmony/Afx/Compilers/HyCompiler_MWerks.h
-	include/Harmony/Afx/Platforms/HyPlatAfx.h
-	include/Harmony/Afx/Platforms/HyPlatform.h
-	include/Harmony/Afx/Platforms/HyPlatform_Browser.h
-	include/Harmony/Afx/Platforms/HyPlatform_Gui.h
-	include/Harmony/Afx/Platforms/HyPlatform_OSX.h
-	include/Harmony/Afx/Platforms/HyPlatform_Unix.h
-	include/Harmony/Afx/Platforms/HyPlatform_Windows.h
-	include/Harmony/Assets/HyAssets.h
-	include/Harmony/Assets/Files/HyFileAtlas.h
-	include/Harmony/Assets/Files/HyFileAudio.h
-	include/Harmony/Assets/Files/HyFilesManifest.h
-	include/Harmony/Assets/Files/HyGLTF.h
-	include/Harmony/Assets/Files/IHyFile.h
-	include/Harmony/Assets/Nodes/HyAudioData.h
-	include/Harmony/Assets/Nodes/HyPrefabData.h
-	include/Harmony/Assets/Nodes/HySpineData.h
-	include/Harmony/Assets/Nodes/HySpriteData.h
-	include/Harmony/Assets/Nodes/HyTextData.h
-	include/Harmony/Assets/Nodes/HyTexturedQuadData.h
-	include/Harmony/Assets/Nodes/IHyNodeData.h
-	include/Harmony/Audio/IHyAudioCore.h
-	include/Harmony/Audio/IHyFileAudioImpl.h
-	include/Harmony/Audio/SDL2/HyAudioCore_SDL2.h
-	include/Harmony/Audio/SDL2/HyFileAudioImpl_SDL2.h
-	include/Harmony/Diagnostics/HyDiagnostics.h
-	include/Harmony/Diagnostics/Console/IHyConsole.h
-	include/Harmony/Diagnostics/Console/Interop/HyConsole_Std.h
-	include/Harmony/Diagnostics/Console/Interop/HyConsole_Win.h
-	include/Harmony/Diagnostics/GuiComms/HyGuiComms.h
-	include/Harmony/Diagnostics/GuiComms/HyGuiMessage.h
-	include/Harmony/Diagnostics/GuiComms/HyLiveVarManager.h
-	include/Harmony/Diagnostics/Output/HyDiagOutput.h
-	include/Harmony/Diagnostics/Output/HyProfiler.h
-	include/Harmony/Input/HyInput.h
-	include/Harmony/Input/HyInputKeys.h
-	include/Harmony/Input/HyInputMap.h
-	include/Harmony/Networking/HyNetworking.h
-	include/Harmony/Networking/IHyNetworkClass.h
-	include/Harmony/Renderer/IHyRenderer.h
-	include/Harmony/Renderer/Components/HyRenderBuffer.h
-	include/Harmony/Renderer/Components/HyShaderUniforms.h
-	include/Harmony/Renderer/Components/HyVertexBuffer.h
-	include/Harmony/Renderer/Effects/HyShader.h
-	include/Harmony/Renderer/Effects/HyStencil.h
-	include/Harmony/Renderer/OpenGL/HyOpenGL.h
-	include/Harmony/Renderer/OpenGL/HyOpenGLESShaderSrc.h
-	include/Harmony/Renderer/OpenGL/HyOpenGLShaderSrc.h
-	include/Harmony/Scene/HyScene.h
-	include/Harmony/Scene/AnimFloats/HyAnimFloat.h
-	include/Harmony/Scene/AnimFloats/HyAnimVec2.h
-	include/Harmony/Scene/AnimFloats/HyAnimVec3.h
-	include/Harmony/Scene/AnimFloats/HyTweenFuncs.h
-	include/Harmony/Scene/Nodes/IHyNode.h
-	include/Harmony/Scene/Nodes/IHyNode2d.h
-	include/Harmony/Scene/Nodes/IHyNode3d.h
-	include/Harmony/Scene/Nodes/Loadables/IHyLoadable.h
-	include/Harmony/Scene/Nodes/Loadables/IHyLoadable2d.h
-	include/Harmony/Scene/Nodes/Loadables/IHyLoadable3d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/IHyBody.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/IHyBody2d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/IHyBody3d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrefab3d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySpine2d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyEntityLeaf2d.h
-	include/Harmony/Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h
-	include/Harmony/Scene/Nodes/Loadables/Objects/IHyAudio.h
-	include/Harmony/Scene/Nodes/Loadables/Objects/HyAudio2d.h
-	include/Harmony/Scene/Nodes/Loadables/Objects/HyAudio3d.h
-	include/Harmony/Scene/Nodes/Objects/HyCamera.h
-	include/Harmony/Scene/Nodes/Objects/IHyCamera.h
-	include/Harmony/Scene/Physics/HyBox2dRuntime.h
-	include/Harmony/Scene/Physics/HyPhysicsCtrl2d.h
-	include/Harmony/Scene/Physics/HyPhysicsDebug2d.h
-	include/Harmony/Scene/Physics/HyShape2d.h
-	include/Harmony/Threading/IHyThreadClass.h
-	include/Harmony/Time/HyTime.h
-	include/Harmony/Time/Watches/HyStopwatch.h
-	include/Harmony/Time/Watches/HyTimer.h
-	include/Harmony/Time/Watches/IHyTimeInst.h
-	include/Harmony/UI/IHyEntityUi.h
-	include/Harmony/UI/HyUiContainer.h
-	include/Harmony/UI/Widgets/HyButton.h
-	include/Harmony/UI/Widgets/HyCheckBox.h
-	include/Harmony/UI/Widgets/HyComboBox.h
-	include/Harmony/UI/Widgets/HyLabel.h
-	include/Harmony/UI/Widgets/HyLineEdit.h
-	include/Harmony/UI/Widgets/HyProgressBar.h
-	include/Harmony/UI/Widgets/HyRackMeter.h
-	include/Harmony/UI/Widgets/HyRichText.h
-	include/Harmony/UI/Widgets/HySlider.h
-	include/Harmony/UI/Widgets/IHyWidget.h
-	include/Harmony/UI/Components/HyCloseButton.h
-	include/Harmony/UI/Components/HyLayout.h
-	include/Harmony/UI/Components/HyPanel.h
-	include/Harmony/UI/Components/HyScrollBar.h
-	include/Harmony/UI/Components/HySpacer.h
-	include/Harmony/UI/Localization/HyLocale.h
-	include/Harmony/UI/Localization/HyNumpunct.h
-	include/Harmony/UI/Localization/HyNumberFormat.h
-	include/Harmony/UI/Localization/HyTranslateTable.h
-	include/Harmony/Utilities/Crc32.h
-	include/Harmony/Utilities/HyIO.h
-	include/Harmony/Utilities/HyMath.h
-	include/Harmony/Utilities/HyRand.h
-	include/Harmony/Window/HyWindow.h
-	include/Harmony/Window/HyWindowManager.h)
+	include/HyEngine.h
+	include/Afx/HyFlags.h
+	include/Afx/HyInteropAfx.h
+	include/Afx/HyStdAfx.h
+	include/Afx/Compilers/HyCompiler.h
+	include/Afx/Compilers/HyCompiler_GNU.h
+	include/Afx/Compilers/HyCompiler_MSVC.h
+	include/Afx/Compilers/HyCompiler_MWerks.h
+	include/Afx/Platforms/HyPlatAfx.h
+	include/Afx/Platforms/HyPlatform.h
+	include/Afx/Platforms/HyPlatform_Browser.h
+	include/Afx/Platforms/HyPlatform_Gui.h
+	include/Afx/Platforms/HyPlatform_OSX.h
+	include/Afx/Platforms/HyPlatform_Unix.h
+	include/Afx/Platforms/HyPlatform_Windows.h
+	include/Assets/HyAssets.h
+	include/Assets/Files/HyFileAtlas.h
+	include/Assets/Files/HyFileAudio.h
+	include/Assets/Files/HyFilesManifest.h
+	include/Assets/Files/HyGLTF.h
+	include/Assets/Files/IHyFile.h
+	include/Assets/Nodes/HyAudioData.h
+	include/Assets/Nodes/HyPrefabData.h
+	include/Assets/Nodes/HySpineData.h
+	include/Assets/Nodes/HySpriteData.h
+	include/Assets/Nodes/HyTextData.h
+	include/Assets/Nodes/HyTexturedQuadData.h
+	include/Assets/Nodes/IHyNodeData.h
+	include/Audio/IHyAudioCore.h
+	include/Audio/IHyFileAudioImpl.h
+	include/Audio/SDL2/HyAudioCore_SDL2.h
+	include/Audio/SDL2/HyFileAudioImpl_SDL2.h
+	include/Diagnostics/HyDiagnostics.h
+	include/Diagnostics/Console/IHyConsole.h
+	include/Diagnostics/Console/Interop/HyConsole_Std.h
+	include/Diagnostics/Console/Interop/HyConsole_Win.h
+	include/Diagnostics/GuiComms/HyGuiComms.h
+	include/Diagnostics/GuiComms/HyGuiMessage.h
+	include/Diagnostics/GuiComms/HyLiveVarManager.h
+	include/Diagnostics/Output/HyDiagOutput.h
+	include/Diagnostics/Output/HyProfiler.h
+	include/Input/HyInput.h
+	include/Input/HyInputKeys.h
+	include/Input/HyInputMap.h
+	include/Networking/HyNetworking.h
+	include/Networking/IHyNetworkClass.h
+	include/Renderer/IHyRenderer.h
+	include/Renderer/Components/HyRenderBuffer.h
+	include/Renderer/Components/HyShaderUniforms.h
+	include/Renderer/Components/HyVertexBuffer.h
+	include/Renderer/Effects/HyShader.h
+	include/Renderer/Effects/HyStencil.h
+	include/Renderer/OpenGL/HyOpenGL.h
+	include/Renderer/OpenGL/HyOpenGLESShaderSrc.h
+	include/Renderer/OpenGL/HyOpenGLShaderSrc.h
+	include/Scene/HyScene.h
+	include/Scene/AnimFloats/HyAnimFloat.h
+	include/Scene/AnimFloats/HyAnimVec2.h
+	include/Scene/AnimFloats/HyAnimVec3.h
+	include/Scene/AnimFloats/HyTweenFuncs.h
+	include/Scene/Nodes/IHyNode.h
+	include/Scene/Nodes/IHyNode2d.h
+	include/Scene/Nodes/IHyNode3d.h
+	include/Scene/Nodes/Loadables/IHyLoadable.h
+	include/Scene/Nodes/Loadables/IHyLoadable2d.h
+	include/Scene/Nodes/Loadables/IHyLoadable3d.h
+	include/Scene/Nodes/Loadables/Bodies/IHyBody.h
+	include/Scene/Nodes/Loadables/Bodies/IHyBody2d.h
+	include/Scene/Nodes/Loadables/Bodies/IHyBody3d.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrefab3d.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySpine2d.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h
+	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h
+	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h
+	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntityLeaf2d.h
+	include/Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h
+	include/Scene/Nodes/Loadables/Objects/IHyAudio.h
+	include/Scene/Nodes/Loadables/Objects/HyAudio2d.h
+	include/Scene/Nodes/Loadables/Objects/HyAudio3d.h
+	include/Scene/Nodes/Objects/HyCamera.h
+	include/Scene/Nodes/Objects/IHyCamera.h
+	include/Scene/Physics/HyBox2dRuntime.h
+	include/Scene/Physics/HyPhysicsCtrl2d.h
+	include/Scene/Physics/HyPhysicsDebug2d.h
+	include/Scene/Physics/HyShape2d.h
+	include/Threading/IHyThreadClass.h
+	include/Time/HyTime.h
+	include/Time/Watches/HyStopwatch.h
+	include/Time/Watches/HyTimer.h
+	include/Time/Watches/IHyTimeInst.h
+	include/UI/IHyEntityUi.h
+	include/UI/HyUiContainer.h
+	include/UI/Widgets/HyButton.h
+	include/UI/Widgets/HyCheckBox.h
+	include/UI/Widgets/HyComboBox.h
+	include/UI/Widgets/HyLabel.h
+	include/UI/Widgets/HyLineEdit.h
+	include/UI/Widgets/HyProgressBar.h
+	include/UI/Widgets/HyRackMeter.h
+	include/UI/Widgets/HyRichText.h
+	include/UI/Widgets/HySlider.h
+	include/UI/Widgets/IHyWidget.h
+	include/UI/Components/HyCloseButton.h
+	include/UI/Components/HyLayout.h
+	include/UI/Components/HyPanel.h
+	include/UI/Components/HyScrollBar.h
+	include/UI/Components/HySpacer.h
+	include/UI/Localization/HyLocale.h
+	include/UI/Localization/HyNumpunct.h
+	include/UI/Localization/HyNumberFormat.h
+	include/UI/Localization/HyTranslateTable.h
+	include/Utilities/Crc32.h
+	include/Utilities/HyIO.h
+	include/Utilities/HyMath.h
+	include/Utilities/HyRand.h
+	include/Window/HyWindow.h
+	include/Window/HyWindowManager.h)
 
-add_library(HyEngine STATIC ${HYENGINE_SOURCE_FILES} ${HYENGINE_HEADER_FILES} include/tinygltf/tiny_gltf.h)
+add_library(HyEngine STATIC ${HYENGINE_SOURCE_FILES} ${HYENGINE_HEADER_FILES})
 set_target_properties(HyEngine PROPERTIES
 	CXX_STANDARD 17
 	CXX_STANDARD_REQUIRED YES
 	CXX_EXTENSIONS NO)
 	
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony")
+target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor")
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/include")
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/soil2/include")
 
@@ -313,7 +313,7 @@ endif()
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include")
 	target_link_libraries(HyEngine PUBLIC glad)
-	target_precompile_headers(HyEngine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/Afx/HyStdAfx.h")
+	target_precompile_headers(HyEngine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/Afx/HyStdAfx.h")
 	
 	# Qt provides its own implementation of SDL facitlities
 	if(NOT HYBUILD_Qt)
@@ -358,4 +358,4 @@ if (MSVC)
 endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES ${HYENGINE_SOURCE_FILES})
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/Harmony/" PREFIX "Source Files" FILES ${HYENGINE_HEADER_FILES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/" PREFIX "Source Files" FILES ${HYENGINE_HEADER_FILES})

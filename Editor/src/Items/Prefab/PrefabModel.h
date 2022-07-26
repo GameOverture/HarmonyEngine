@@ -12,7 +12,7 @@
 
 #include "IModel.h"
 #include "PropertiesTreeModel.h"
-#include "Harmony/Assets/Files/HyGLTF.h"
+#include "Assets/Files/HyGLTF.h"
 
 #include <QObject>
 

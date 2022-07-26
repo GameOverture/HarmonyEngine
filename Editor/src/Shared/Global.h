@@ -10,7 +10,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "Harmony/HyEngine.h"
+#include "HyEngine.h"
 #ifdef HY_COMPILER_MSVC
 	#pragma warning ( push )
 	#pragma warning( disable: 4100 )
