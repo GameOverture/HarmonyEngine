@@ -11,7 +11,7 @@
 #define TEXTFONTMANAGER_H
 
 #include "PropertiesTreeModel.h"
-#include "freetype-gl/freetype-gl.h"
+#include "vendor/freetype-gl/freetype-gl.h"
 
 #include <QFileInfo>
 
@@ -72,6 +72,7 @@ class TextFontManager
 			m_pTextureFont->size = fSize;
 			m_pTextureFont->rendermode = eMode;
 			m_pTextureFont->outline_thickness = fThickness;
+			m_pTextureFont->padding = 1;
 
 			m_uiMissedGlyphs = texture_font_load_glyphs(m_pTextureFont, sGlyphs.toUtf8().data());
 		}

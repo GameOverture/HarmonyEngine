@@ -12,7 +12,7 @@
 
 #include "SubWidgets/TextFontManager.h"
 
-#include "freetype-gl/freetype-gl.h"
+#include "vendor/freetype-gl/freetype-gl.h"
 
 #include <QUndoCommand>
 #include <QComboBox>

@@ -1,1 +1,0 @@
-https://github.com/libsdl-org/SDL_net/releases/tag/release-2.0.1

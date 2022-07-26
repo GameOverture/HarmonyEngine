@@ -14,7 +14,7 @@
 #include "Harmony.h"
 #include "HarmonyWidget.h"
 
-#include "soil2/SOIL2.h"
+#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
 
 SpineDraw::SpineDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef)

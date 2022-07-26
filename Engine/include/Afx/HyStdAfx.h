@@ -19,21 +19,21 @@
 #ifdef HY_COMPILER_MSVC
 	#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
 #endif
-#include "rapidjson/document.h"
+#include "vendor/rapidjson/document.h"
 typedef rapidjson::Document HyJsonDoc;
 typedef rapidjson::Value HyJsonValue;
 typedef rapidjson::GenericArray<false, rapidjson::Value> HyJsonArray;
 typedef rapidjson::GenericObject<false, rapidjson::Value> HyJsonObj;
 
-#include "box2d/box2d.h"
+#include "vendor/box2d/include/box2d/box2d.h"
 
 //#define GLM_SWIZZLE
 #define GLM_FORCE_CTOR_INIT
 #define GLM_ENABLE_EXPERIMENTAL
-#include "glm/glm.hpp"
-#include "glm/gtx/transform.hpp"
-#include "glm/gtx/matrix_decompose.hpp"
-#include "glm/gtc/quaternion.hpp"
+#include "vendor/glm/glm.hpp"
+#include "vendor/glm/gtx/transform.hpp"
+#include "vendor/glm/gtx/matrix_decompose.hpp"
+#include "vendor/glm/gtc/quaternion.hpp"
 
 #ifdef HY_USE_GLFW
 	#include <GLFW/glfw3.h>

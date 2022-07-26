@@ -1,0 +1,30 @@
+[submodule "Engine/vendor/box2d"]
+	path = Engine/vendor/box2d
+	url = https://github.com/GameOverture/Hy_box2d.git
+[submodule "Engine/vendor/SOIL2"]
+	path = Engine/vendor/SOIL2
+	url = https://github.com/GameOverture/Hy_SOIL2.git
+[submodule "Engine/vendor/glfw"]
+	path = Engine/vendor/glfw
+	url = https://github.com/GameOverture/Hy_glfw.git
+[submodule "Engine/vendor/SDL"]
+	path = Engine/vendor/SDL
+	url = https://github.com/GameOverture/Hy_SDL.git
+[submodule "Engine/vendor/SDL_net"]
+	path = Engine/vendor/SDL_net
+	url = https://github.com/GameOverture/Hy_SDL_net.git
+[submodule "Engine/vendor/SDL_mixer"]
+	path = Engine/vendor/SDL_mixer
+	url = https://github.com/GameOverture/Hy_SDL_mixer.git
+[submodule "Editor/vendor/freetype2"]
+	path = Editor/vendor/freetype2
+	url = https://github.com/GameOverture/Hy_freetype2.git
+[submodule "Editor/vendor/freetype-gl"]
+	path = Editor/vendor/freetype-gl
+	url = https://github.com/GameOverture/Hy_freetype-gl.git
+[submodule "Editor/vendor/ogg"]
+	path = Editor/vendor/ogg
+	url = https://github.com/GameOverture/Hy_ogg.git
+[submodule "Editor/vendor/vorbis"]
+	path = Editor/vendor/vorbis
+	url = https://github.com/GameOverture/Hy_vorbis.git

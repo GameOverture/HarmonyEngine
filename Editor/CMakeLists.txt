@@ -2,10 +2,23 @@
 set(Qt5_DIR "" CACHE PATH "Specify cmake Qt5 directory. Ex. C:/Qt/5.12.0/msvc2017_64/lib/cmake/Qt5")
 
 if(Qt5_DIR)
-	add_subdirectory(external/freetype2)
-	add_subdirectory(external/freetype-gl)
-	add_subdirectory(external/libogg-1.3.4)
-	add_subdirectory(external/libvorbis-1.3.7)
+	add_subdirectory(vendor/freetype2)
+	set_target_properties(freetype PROPERTIES FOLDER "Editor Libs")
+	
+	cmake_policy(SET CMP0079 NEW)
+	add_subdirectory(vendor/freetype-gl)
+	set_target_properties(freetype-gl PROPERTIES FOLDER "Editor Libs")
+	target_include_directories(freetype-gl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/vendor/glad/include")
+	target_include_directories(freetype-gl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/freetype2/include")
+	target_link_libraries(freetype-gl PUBLIC freetype)
+	
+	add_subdirectory(vendor/ogg)
+	set_target_properties(ogg PROPERTIES FOLDER "Editor Libs")
+	
+	add_subdirectory(vendor/vorbis)
+	set_target_properties(vorbis PROPERTIES FOLDER "Editor Libs")
+	set_target_properties(vorbisenc PROPERTIES FOLDER "Editor Libs")
+	set_target_properties(vorbisfile PROPERTIES FOLDER "Editor Libs")
 
 	find_package(Qt5 COMPONENTS Core Gui Network Widgets Multimedia REQUIRED)
 

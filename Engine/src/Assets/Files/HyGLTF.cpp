@@ -13,8 +13,8 @@
 #include "Diagnostics/Console/IHyConsole.h"
 #include "HyEngine.h"
 
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/gtx/quaternion.hpp"
+#include "vendor/glm/gtc/type_ptr.hpp"
+#include "vendor/glm/gtx/quaternion.hpp"
 
 HyGLTF::HyGLTF(const std::string &sIdentifier, uint32 uiManifestIndex) :
 	IHyFile(sIdentifier, HYFILE_GLTF, uiManifestIndex),

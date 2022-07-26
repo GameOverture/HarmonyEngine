@@ -1,8 +1,8 @@
 # BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_STATIC
 # BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_ICU
 
-add_subdirectory(external/box2d)
-add_subdirectory(external/soil2)
+add_subdirectory(vendor/box2d)
+add_subdirectory(vendor/soil2)
 
 if(HYBUILD_SPINE)
 	add_subdirectory(extras/Spine/spine-cpp)
@@ -11,7 +11,7 @@ endif()
 
 # Emscripten provides its own ports of SDL, GLFW, and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
-	add_subdirectory(external/glad)
+	add_subdirectory(vendor/glad)
 	
 	# Qt provides its own implementation of SDL/GLFW facilities
 	if(HYBUILD_Qt)
@@ -30,17 +30,17 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			list(APPEND EXTRA_LIBS vcruntime) # prevents memset issue in vcruntime.dll
 		endif()
 		
-		add_subdirectory(external/SDL2)
-		include_directories(external/SDL2/include)
+		add_subdirectory(vendor/SDL)
+		include_directories(vendor/SDL/include)
 		set_target_properties(SDL2main PROPERTIES FOLDER "Engine Libs")
 		set_target_properties(SDL2-static PROPERTIES FOLDER "Engine Libs")
 		set_target_properties(SDL2 PROPERTIES FOLDER "Engine Libs")
 		
-		add_subdirectory(external/SDL2_mixer)
+		add_subdirectory(vendor/SDL_mixer)
 
 		# Optional SDL2 extensions
 		if(HYBUILD_SDL_NET)
-			add_subdirectory(external/SDL2_net)
+			add_subdirectory(vendor/SDL_net)
 		endif()
 		
 		if(HYBUILD_GLFW)
@@ -49,7 +49,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			set(GLFW_BUILD_TESTS, OFF)
 			set(GLFW_BUILD_DOCS, OFF)
 			set(GLFW_INSTALL, OFF)
-			add_subdirectory(external/glfw)
+			add_subdirectory(vendor/glfw)
 			set_target_properties(glfw PROPERTIES FOLDER "Engine Libs")
 		endif()
 	endif()
@@ -297,11 +297,9 @@ set_target_properties(HyEngine PROPERTIES
 	CXX_STANDARD 17
 	CXX_STANDARD_REQUIRED YES
 	CXX_EXTENSIONS NO)
-	
+
+target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")	
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor")
-target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/include")
-target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/soil2/include")
 
 target_link_libraries(HyEngine PUBLIC box2d soil2)
 
@@ -311,23 +309,23 @@ endif()
 
 # Emscripten provides its own ports of SDL and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
-	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include")
+	target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/include")
 	target_link_libraries(HyEngine PUBLIC glad)
 	target_precompile_headers(HyEngine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/Afx/HyStdAfx.h")
 	
 	# Qt provides its own implementation of SDL facitlities
 	if(NOT HYBUILD_Qt)
 		# Below is typical desktop deployment
-		target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_mixer")
+		target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/SDL_mixer")
 		target_link_libraries(HyEngine PUBLIC SDL2 SDL2main SDL2_mixer)
 		
 		if(HYBUILD_SDL_NET)
-			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2_net")
+			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/SDL_net")
 			target_link_libraries(HyEngine PUBLIC SDL2_net)
 		endif()
 		
 		if(HYBUILD_GLFW)
-			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/external/glfw")
+			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw")
 			target_link_libraries(HyEngine PUBLIC glfw)
 		endif()
 		

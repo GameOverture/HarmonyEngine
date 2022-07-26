@@ -11,8 +11,9 @@
 #include "Assets/Files/HyFileAtlas.h"
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
-#include "soil2/SOIL2.h"
 #include "HyEngine.h"
+
+#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
 
 HyFileAtlas::HyFileAtlas(std::string sFileName,
 				 uint32 uiBankId,

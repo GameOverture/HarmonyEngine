@@ -11,7 +11,7 @@
 #include "AtlasRepackThread.h"
 #include "MainWindow.h"
 
-#include "soil2/SOIL2.h"
+#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
 
 #include <QPainter>
 #include <QImageWriter>

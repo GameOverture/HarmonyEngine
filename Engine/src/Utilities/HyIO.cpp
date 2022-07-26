@@ -11,7 +11,7 @@
 #include "Utilities/HyIO.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-#include "soil2/SOIL2.h"
+#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
 
 #include <fstream>
 #include <iomanip>
