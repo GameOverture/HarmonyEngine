@@ -75,11 +75,23 @@ void WidgetColor::ApplyColorToSampleBtn()
 	QColor color = GetColor();
 	if(color.isValid())
 	{
+		// Override the current stylesheet
+		QString sStyleSheet = "QPushButton { background-color: rgb(";
+		sStyleSheet += QString::number(color.red());
+		sStyleSheet += ", ";
+		sStyleSheet += QString::number(color.green());
+		sStyleSheet += ", ";
+		sStyleSheet += QString::number(color.blue());
+		sStyleSheet += "); }";
+		ui->btnSample->setStyleSheet(sStyleSheet);
+
+		// This is required for a blank stylesheet (Corpy NT6)
 		QPalette pal = ui->btnSample->palette();
 		pal.setColor(QPalette::Button, color);
-
 		ui->btnSample->setAutoFillBackground(true);
 		ui->btnSample->setPalette(pal);
+
+		// Refresh the widget and redraw
 		ui->btnSample->update();
 	}
 }
