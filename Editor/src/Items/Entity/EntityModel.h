@@ -26,13 +26,13 @@ class EntityNodeItemData : public TreeModelItemData
 {
 	Q_OBJECT
 
-	ProjectItemData *	m_pProjItem;
-	
+	QUuid				m_ItemGuid;
+
 public:
-	EntityNodeItemData(ProjectItemData *pProjItem);
+	EntityNodeItemData(HyGuiItemType eType, QString sName, QUuid uuid);
 	virtual ~EntityNodeItemData();
 
-	ProjectItemData *GetProjItem();
+	QString GetCodeName() const;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityNodeTreeModel : public ITreeModel
@@ -41,6 +41,14 @@ class EntityNodeTreeModel : public ITreeModel
 
 	EntityModel *										m_pEntityModel;
 	QList<EntityNodeItemData *>							m_NodeList;
+
+	enum ColumnType
+	{
+		COLUMN_CodeName = 0,
+		COLUMN_ItemPath,
+
+		NUMCOLUMNS
+	};
 
 public:
 	explicit EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
@@ -60,19 +68,12 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityStateData : public IStateData
 {
-	QMap<ExplorerItemData *, PropertiesTreeModel *>			m_PropertiesMap;
-
 public:
 	EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~EntityStateData();
 
-	PropertiesTreeModel *GetPropertiesModel(ExplorerItemData *pItem);
-
 	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
 	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
-
-private:
-	PropertiesTreeModel *AllocNewPropertiesModel(ProjectItemData &entityItemRef, QVariant &subState, ExplorerItemData *pItemToAdd);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
@@ -80,21 +81,27 @@ class EntityModel : public IModel
 	Q_OBJECT
 
 	EntityNodeTreeModel										m_TreeModel;
+	QMap<EntityNodeItemData *, PropertiesTreeModel *>		m_PropertiesMap;
 
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
 	EntityNodeTreeModel &GetNodeTreeModel();
-	PropertiesTreeModel *GetPropertiesModel(int iStateIndex, ExplorerItemData *pItem);
+	PropertiesTreeModel *GetPropertiesModel(EntityNodeItemData *pItem);
 
-	void AddNewChildren(QList<ProjectItemData *> projItemList);
-	bool RemoveChild(ProjectItemData *pItem);
+	// Command Modifiers - should (only) be called from UndoCmd's
+	void Cmd_AddNewChildren(QList<ProjectItemData *> projItemList);
+	bool Cmd_RemoveChild(ProjectItemData *pItem);
+	void Cmd_AddPrimitive();
 
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
 	virtual QList<AssetItemData *> GetAssets(AssetType eAssetType) const override;
+
+protected:
+	PropertiesTreeModel *AllocNewPropertiesModel(QVariant &subState, EntityNodeItemData *pItemToAdd);
 };
 
 #endif // ENTITYMODEL_H

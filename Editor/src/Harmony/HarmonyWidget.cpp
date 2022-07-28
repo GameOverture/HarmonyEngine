@@ -226,6 +226,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 			if(pFoundAsset)
 				assetsList.push_back(pFoundAsset);
 		}
+		
 		if(assetsList.isEmpty() == false)
 		{
 			int iStateIndex = pCurOpenTabItem->GetWidget()->GetCurStateIndex();
@@ -246,6 +247,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 			if(pFoundAsset)
 				assetsList.push_back(pFoundAsset);
 		}
+		
 		if(assetsList.isEmpty() == false)
 		{
 			int iStateIndex = pCurOpenTabItem->GetWidget()->GetCurStateIndex();
@@ -255,44 +257,41 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		break; }
 
 	case ITEM_Entity: {
-		//const IMimeData *pMimeData = static_cast<const IMimeData *>(pEvent->mimeData());
-		//if(pMimeData->GetMimeType() == MIMETYPE_ProjectItems)
-		//{
-		//	QList<ProjectItemData *> validItemList;
-		//	// Parse mime data source for project item array
-		//	QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HYGUI_MIMETYPE_ITEM));
-		//	QJsonArray itemArray = doc.array();
-		//	for(int iIndex = 0; iIndex < itemArray.size(); ++iIndex)
-		//	{
-		//		QJsonObject itemObj = itemArray[iIndex].toObject();
+		const IMimeData *pMimeData = static_cast<const IMimeData *>(pEvent->mimeData());
+		if(pMimeData->GetMimeType() == MIMETYPE_ProjectItems)
+		{
+			QList<ProjectItemData *> validItemList;
+			// Parse mime data source for project item array
+			QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HYGUI_MIMETYPE_ITEM));
+			QJsonArray itemArray = doc.array();
+			for(int iIndex = 0; iIndex < itemArray.size(); ++iIndex)
+			{
+				QJsonObject itemObj = itemArray[iIndex].toObject();
 
-		//		// Ensure this item is apart of this project
-		//		if(itemObj["project"].toString().toLower() == m_pProject->GetAbsPath().toLower())
-		//		{
-		//			QString sItemPath = itemObj["name"].toString();
-		//			QUuid itemUuid(itemObj["UUID"].toString());
+				// Ensure this item is apart of this project
+				if(itemObj["project"].toString().toLower() == m_pProject->GetAbsPath().toLower())
+				{
+					QString sItemPath = itemObj["name"].toString();
+					QUuid itemUuid(itemObj["UUID"].toString());
 
-		//			ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(itemUuid);
+					ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(itemUuid);
 
-		//			EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
-		//			if(entityTreeModelRef.IsItemValid(pProjItem, true) == false)
-		//				continue;
+					EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
+					if(entityTreeModelRef.IsItemValid(pProjItem, true) == false)
+						continue;
 
-		//			validItemList.push_back(pProjItem);
-		//		}
-		//		else
-		//			HyGuiLog("Item " % itemObj["itemName"].toString() % " is not apart of the entity's project and cannot be added.", LOGTYPE_Info);
-		//	}
+					validItemList.push_back(pProjItem);
+				}
+				else
+					HyGuiLog("Item " % itemObj["itemName"].toString() % " is not apart of the entity's project and cannot be added.", LOGTYPE_Info);
+			}
 
-		//	QUndoCommand *pCmd = new EntityUndoCmd_AddChildren(*pCurOpenTabItem, validItemList);
-		//	pCurOpenTabItem->GetUndoStack()->push(pCmd);
-
-		//	pEvent->setDropAction(Qt::LinkAction);
-		//	pEvent->accept();
-		//}
-		//else // MIMETYPE_Assets
-		//{
-		//}
+			QUndoCommand *pCmd = new EntityUndoCmd_AddChildren(*pCurOpenTabItem, validItemList);
+			pCurOpenTabItem->GetUndoStack()->push(pCmd);
+		}
+		else // MIMETYPE_Assets
+		{
+		}
 		break; }
 
 	default:

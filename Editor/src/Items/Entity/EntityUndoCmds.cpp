@@ -36,7 +36,7 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 			itemList.push_back(pProjItem);
 	}
 
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->AddNewChildren(itemList);
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewChildren(itemList);
 
 	m_EntityItemRef.FocusWidgetState(0, -1);
 }
@@ -46,7 +46,7 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 	for(auto *pProjItem : m_ChildrenList)
 	{
 		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(pProjItem, true))
-			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->RemoveChild(pProjItem);
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveChild(pProjItem);
 	}
 
 	m_EntityItemRef.FocusWidgetState(0, -1);

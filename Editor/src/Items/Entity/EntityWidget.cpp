@@ -96,9 +96,9 @@ EntityWidget::~EntityWidget()
 		ui->lblSelectedItemIcon->setVisible(true);
 		ui->lblSelectedItemIcon->setPixmap(pSubStateItem->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
 		ui->lblSelectedItemText->setVisible(true);
-		ui->lblSelectedItemText->setText(pSubStateItem->GetProjItem()->GetName(false) % " Properties");
+		ui->lblSelectedItemText->setText(pSubStateItem->GetCodeName() % " Properties");
 
-		PropertiesTreeModel *pPropertiesModel = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetPropertiesModel(GetCurStateIndex(), pSubStateItem->GetProjItem());
+		PropertiesTreeModel *pPropertiesModel = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetPropertiesModel(pSubStateItem);
 		ui->propertyTree->setModel(pPropertiesModel);
 
 		// Expand the top level nodes (the properties' categories)
