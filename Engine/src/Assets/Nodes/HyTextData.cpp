@@ -184,7 +184,9 @@ const HyTextGlyph *HyTextData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex
 		iter = m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(65533);
 		if(iter == m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end())
 		{
+#ifndef HY_PLATFORM_GUI
 			HyError("Could not retrive Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) which should always be available");
+#endif
 			return nullptr; // Returning nullptr here causes glitched out sprites and other corruption. Fatal error.
 		}
 	}
