@@ -14,6 +14,19 @@
 
 class IHyBody2d;
 
+enum HyShapeType
+{
+	HYSHAPE_Unknown = -1,
+
+	HYSHAPE_LineSegment = 0,
+	HYSHAPE_LineChain,
+	HYSHAPE_LineLoop,
+	HYSHAPE_Circle,
+	HYSHAPE_Polygon,
+
+	HYNUM_SHAPE
+};
+
 class HyShape2d
 {
 	friend class IHyBody2d; // In order to invoke IHyBody2d::ShapeChanged()

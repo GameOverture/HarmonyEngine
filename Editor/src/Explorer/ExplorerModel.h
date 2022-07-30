@@ -39,7 +39,7 @@ public:
 
 	bool PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const QModelIndex &indexRef);
 
-	ProjectItemData *FindByUuid(QUuid uuid);
+	ProjectItemData *FindByUuid(QUuid uuid) const;
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// [ITEM-ITEM] DEPENDENCIES LINK FUNCTIONS

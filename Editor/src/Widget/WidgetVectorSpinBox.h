@@ -16,19 +16,24 @@ namespace Ui {
 class WidgetVectorSpinBox;
 }
 
+enum SpinBoxType
+{
+	// This is also the QStackedWidget's page index
+	SPINBOXTYPE_Int2d = 0,
+	SPINBOXTYPE_Double2d,
+	SPINBOXTYPE_Int3d,
+	SPINBOXTYPE_Double3d,
+	SPINBOXTYPE_Int4d,
+	SPINBOXTYPE_Double4d,
+};
+
 class WidgetVectorSpinBox : public QWidget
 {
 	Q_OBJECT
 
-	enum PageIndex
-	{
-		PAGE_Int = 0,
-		PAGE_Double
-	};
-
 public:
 	explicit WidgetVectorSpinBox(QWidget *parent = 0);
-	WidgetVectorSpinBox(bool bIsIntVector, QWidget *parent = 0);
+	WidgetVectorSpinBox(SpinBoxType eSpinBoxType, QWidget *parent = nullptr);
 	virtual ~WidgetVectorSpinBox();
 
 	QVariant GetValue();

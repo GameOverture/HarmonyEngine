@@ -91,19 +91,6 @@ enum HyType
 };
 static_assert((int)HYNUM_TYPES < 16, "HyType cannot exceed 15 items due to IHyNode only reserving 4 bits to store this value");
 
-enum HyShapeType
-{
-	HYSHAPE_Unknown = -1,
-
-	HYSHAPE_LineSegment = 0,
-	HYSHAPE_LineChain,
-	HYSHAPE_LineLoop,
-	HYSHAPE_Circle,
-	HYSHAPE_Polygon,
-
-	HYNUM_SHAPE
-};
-
 enum HyPhysicsType
 {
 	HYPHYS_Unknown = -1,

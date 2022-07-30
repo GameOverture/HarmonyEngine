@@ -13,6 +13,7 @@
 #include "IModel.h"
 #include "WidgetVectorSpinBox.h"
 #include "SpriteModels.h"
+#include "MainWindow.h"
 
 #include <QCheckBox>
 #include <QSpinBox>
@@ -50,6 +51,27 @@ const PropertiesDef PropertiesTreeModel::GetPropertyDefinition(const QModelIndex
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
 	return m_PropertyDefMap[pTreeItem];
+}
+
+const PropertiesDef PropertiesTreeModel::FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+			{
+				if(0 == pCategoryTreeItem->GetChild(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+				{
+					TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
+					return m_PropertyDefMap[pPropertyItem];
+				}
+			}
+		}
+	}
+
+	return PropertiesDef();
 }
 
 QString PropertiesTreeModel::GetPropertyName(const QModelIndex &indexRef) const
@@ -236,6 +258,153 @@ void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
 	}
 }
 
+QJsonObject PropertiesTreeModel::SerializeJson()
+{
+	QJsonObject propertiesObj;
+
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+
+		QJsonObject categoryObj;
+		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+		{
+			TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
+			QString sPropName = pPropertyItem->data(COLUMN_Name).toString();
+			QVariant propValue = pPropertyItem->data(COLUMN_Value);
+
+			const PropertiesDef &propDefRef = m_PropertyDefMap[pPropertyItem];
+			switch(propDefRef.eType)
+			{
+			case PROPERTIESTYPE_bool:
+				categoryObj.insert(sPropName, propValue.toBool());
+				break;
+			case PROPERTIESTYPE_int:
+			case PROPERTIESTYPE_ComboBox:
+			case PROPERTIESTYPE_Slider:
+			case PROPERTIESTYPE_StatesComboBox:
+			case PROPERTIESTYPE_SpriteFrames:
+				categoryObj.insert(sPropName, propValue.toInt());
+				break;
+			case PROPERTIESTYPE_double:
+				categoryObj.insert(sPropName, propValue.toDouble());
+				break;
+			case PROPERTIESTYPE_ivec2:
+				categoryObj.insert(sPropName, QJsonArray() << propValue.toPoint().x() << propValue.toPoint().y());
+				break;
+			case PROPERTIESTYPE_vec2:
+				categoryObj.insert(sPropName, QJsonArray() << propValue.toPointF().x() << propValue.toPointF().y());
+				break;
+			case PROPERTIESTYPE_ivec3:
+			case PROPERTIESTYPE_Color:
+				categoryObj.insert(sPropName, QJsonArray() << propValue.toRect().left() << propValue.toRect().top() << propValue.toRect().width());
+				break;
+			case PROPERTIESTYPE_vec3:
+				categoryObj.insert(sPropName, QJsonArray() << propValue.toRectF().left() << propValue.toRectF().top() << propValue.toRectF().width());
+				break;
+			case PROPERTIESTYPE_ivec4:
+				categoryObj.insert(sPropName, QJsonArray() << propValue.toRect().left() << propValue.toRect().top() << propValue.toRect().width() << propValue.toRect().height());
+				break;
+			case PROPERTIESTYPE_vec4:
+				categoryObj.insert(sPropName, QJsonArray() << propValue.toRectF().left() << propValue.toRectF().top() << propValue.toRectF().width() << propValue.toRectF().height());
+				break;
+			case PROPERTIESTYPE_LineEdit:
+				categoryObj.insert(sPropName, propValue.toString());
+				break;
+
+			default:
+				HyGuiLog("Unhandled PropertiesTreeModel::SerializeJson property", LOGTYPE_Error);
+				break;
+			}
+			
+		}
+		propertiesObj.insert(pCategoryTreeItem->data(COLUMN_Name).toString(), categoryObj);
+	}
+
+	return propertiesObj;
+}
+
+void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
+{
+	QStringList sCategoryList = propertiesObj.keys();
+	for(const QString &sCategory : sCategoryList)
+	{
+		QJsonObject categoryObj = propertiesObj[sCategory].toObject();
+
+		QStringList sPropertyList = categoryObj.keys();
+		for(const QString &sProperty : sPropertyList)
+		{
+			const PropertiesDef propDef = FindPropertyDefinition(sCategory, sProperty);
+			switch(propDef.eType)
+			{
+			case PROPERTIESTYPE_Unknown:
+				break;
+
+			case PROPERTIESTYPE_bool:
+				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toBool());
+				break;
+
+			case PROPERTIESTYPE_int:
+			case PROPERTIESTYPE_ComboBox:
+			case PROPERTIESTYPE_StatesComboBox:
+			case PROPERTIESTYPE_Slider:
+			case PROPERTIESTYPE_SpriteFrames:
+				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toInt());
+				break;
+					
+			case PROPERTIESTYPE_double:
+				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toDouble());
+				break;
+
+			case PROPERTIESTYPE_ivec2: {
+				QJsonArray ivec2Array = categoryObj[sProperty].toArray();
+				QPoint ptPoint(ivec2Array[0].toInt(), ivec2Array[1].toInt());
+				SetPropertyValue(sCategory, sProperty, ptPoint);
+				break; }
+					
+			case PROPERTIESTYPE_vec2: {
+				QJsonArray vec2Array = categoryObj[sProperty].toArray();
+				QPointF ptPoint(vec2Array[0].toDouble(), vec2Array[1].toDouble());
+				SetPropertyValue(sCategory, sProperty, ptPoint);
+				break; }
+
+			case PROPERTIESTYPE_ivec3:
+			case PROPERTIESTYPE_Color: {
+				QJsonArray ivec3Array = categoryObj[sProperty].toArray();
+				QRect rect(ivec3Array[0].toInt(), ivec3Array[1].toInt(), ivec3Array[2].toInt(), 0);
+				SetPropertyValue(sCategory, sProperty, rect);
+				break; }
+
+			case PROPERTIESTYPE_vec3: {
+				QJsonArray vec3Array = categoryObj[sProperty].toArray();
+				QRectF rect(vec3Array[0].toDouble(), vec3Array[1].toDouble(), vec3Array[2].toDouble(), 0.0);
+				SetPropertyValue(sCategory, sProperty, rect);
+				break; }
+
+			case PROPERTIESTYPE_ivec4: {
+				QJsonArray ivec4Array = categoryObj[sProperty].toArray();
+				QRect rect(ivec4Array[0].toInt(), ivec4Array[1].toInt(), ivec4Array[2].toInt(), ivec4Array[3].toInt());
+				SetPropertyValue(sCategory, sProperty, rect);
+				break; }
+
+			case PROPERTIESTYPE_vec4: {
+				QJsonArray vec4Array = categoryObj[sProperty].toArray();
+				QRectF rect(vec4Array[0].toDouble(), vec4Array[1].toDouble(), vec4Array[2].toDouble(), vec4Array[3].toDouble());
+				SetPropertyValue(sCategory, sProperty, rect);
+				break; }
+
+			case PROPERTIESTYPE_LineEdit:
+				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toString());
+				break;
+
+			default:
+				HyGuiLog("Unhandled PropertiesTreeModel::DeserializeJson property", LOGTYPE_Error);
+				break;
+			}
+		}
+	}
+}
+
 /*virtual*/ bool PropertiesTreeModel::setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole /*= Qt::EditRole*/) /*override*/
 {
 	if(iRole == Qt::UserRole)
@@ -380,27 +549,27 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 	case PROPERTIESTYPE_ivec2: {
 		QPoint pt = treeItemValue.toPoint();
 		sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
-	} break;
+		break; }
 	case PROPERTIESTYPE_vec2: {
 		QPointF pt = treeItemValue.toPointF();
 		sRetStr += QString::number(pt.x()) % " x " % QString::number(pt.y());
-	} break;
+		break; }
 	case PROPERTIESTYPE_ivec3: {
 		QRect rect = treeItemValue.toRect();
 		sRetStr += "{ " % QString::number(rect.left()) % ", " % QString::number(rect.top()) % ", " % QString::number(rect.width()) % " }";
-	} break;
+		break; }
 	case PROPERTIESTYPE_vec3: {
 		QRectF rect = treeItemValue.toRectF();
 		sRetStr += "{ " % QString::number(rect.left()) % ", " % QString::number(rect.top()) % ", " % QString::number(rect.width()) % " }";
-	} break;
+		break; }
 	case PROPERTIESTYPE_ivec4: {
 		QRect rect = treeItemValue.toRect();
 		sRetStr += "{ " % QString::number(rect.left()) % ", " % QString::number(rect.top()) % ", " % QString::number(rect.width()) % ", " % QString::number(rect.height()) % " }";
-	} break;
+		break; }
 	case PROPERTIESTYPE_vec4: {
 		QRectF rect = treeItemValue.toRectF();
 		sRetStr += "{ " % QString::number(rect.left()) % ", " % QString::number(rect.top()) % ", " % QString::number(rect.width()) % ", " % QString::number(rect.height()) % " }";
-	} break;
+		break; }
 	case PROPERTIESTYPE_LineEdit:
 		sRetStr += treeItemValue.toString();
 		break;
@@ -408,11 +577,21 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 		sRetStr += propDefRef.delegateBuilder.toStringList()[treeItemValue.toInt()];
 		break;
 	case PROPERTIESTYPE_StatesComboBox: {
-		QComboBox tmpComboBox(nullptr);
-		tmpComboBox.setModel(propDefRef.delegateBuilder.value<ProjectItemData *>()->GetModel());
-		sRetStr += tmpComboBox.itemText(treeItemValue.toInt());
-	} break;
-
+		sRetStr += treeItemValue.toString();
+		//ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(QUuid(propDefRef.delegateBuilder.toString()));
+		//if(pProjItem)
+		//{
+		//	QComboBox tmpComboBox(nullptr);
+		//	tmpComboBox.setModel(pProjItem->GetModel());
+		//	sRetStr += tmpComboBox.itemText(treeItemValue.toInt());
+		//}
+		//else
+		//	HyGuiLog("PROPERTIESTYPE_StatesComboBox could not find UUID", LOGTYPE_Error);
+		break; }
+	case PROPERTIESTYPE_Color: {
+		QRect rect = treeItemValue.toRect();
+		sRetStr += "RGB(" % QString::number(rect.left()) % ", " % QString::number(rect.top()) % ", " % QString::number(rect.width()) % ")";
+		break; }
 	case PROPERTIESTYPE_Root:
 	case PROPERTIESTYPE_Category:
 	case PROPERTIESTYPE_CategoryChecked:

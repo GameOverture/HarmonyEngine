@@ -40,6 +40,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
 	ui->nodeTree->setModel(&pEntityModel->GetNodeTreeModel());
+	pEntityModel->RegisterWidgets(*ui->txtClassName, *ui->cmbEntityType);
 }
 
 EntityWidget::~EntityWidget()
@@ -66,7 +67,7 @@ EntityWidget::~EntityWidget()
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
 	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);
 	bool bEnableAddNodeBtn = false;
-	EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
 	for(auto pItem : selectedItems)
 	{
 		if(pTreeModel->IsItemValid(pItem, false))
@@ -83,7 +84,7 @@ EntityWidget::~EntityWidget()
 	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
 	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
 
-	EntityNodeItemData *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<EntityNodeItemData *>();
+	EntityNodeItem *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<EntityNodeItem *>();
 	if(pSubStateItem == nullptr)
 	{
 		ui->lblSelectedItemIcon->setVisible(false);
@@ -98,14 +99,14 @@ EntityWidget::~EntityWidget()
 		ui->lblSelectedItemText->setVisible(true);
 		ui->lblSelectedItemText->setText(pSubStateItem->GetCodeName() % " Properties");
 
-		PropertiesTreeModel *pPropertiesModel = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetPropertiesModel(pSubStateItem);
-		ui->propertyTree->setModel(pPropertiesModel);
+		PropertiesTreeModel &propModelRef = pSubStateItem->GetPropertiesModel();
+		ui->propertyTree->setModel(&propModelRef);
 
 		// Expand the top level nodes (the properties' categories)
 		QModelIndex rootIndex = ui->propertyTree->rootIndex();
 		ui->propertyTree->expand(rootIndex);
-		for(int i = 0; i < pPropertiesModel->rowCount(); ++i)
-			ui->propertyTree->expand(pPropertiesModel->index(i, 0, rootIndex));
+		for(int i = 0; i < propModelRef.rowCount(); ++i)
+			ui->propertyTree->expand(propModelRef.index(i, 0, rootIndex));
 	}
 }
 
@@ -136,7 +137,7 @@ void EntityWidget::on_actionAppendChildren_triggered()
 	QList<ProjectItemData *> validItemList;
 	for(auto pItem : selectedItems)
 	{
-		EntityNodeTreeModel *pTreeModel = static_cast<EntityNodeTreeModel *>(ui->nodeTree->model());
+		EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
 		if(pTreeModel->IsItemValid(pItem, false) == false)
 			continue;
 

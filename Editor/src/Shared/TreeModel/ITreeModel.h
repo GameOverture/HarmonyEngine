@@ -22,7 +22,7 @@ class ITreeModel : public QAbstractItemModel
 	Q_OBJECT
 
 protected:
-	TreeModelItem *		m_pRootItem;
+	TreeModelItem *		m_pRootItem;	// Not visible in the tree view. Used internally.
 
 public:
 	ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject *pParent = nullptr);

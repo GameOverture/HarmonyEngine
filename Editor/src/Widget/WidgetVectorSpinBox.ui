@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>148</width>
+    <width>196</width>
     <height>20</height>
    </rect>
   </property>
@@ -41,7 +41,7 @@
       <number>0</number>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="intPage">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -133,6 +133,148 @@
           <string>Y: </string>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="intPage3d">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QSpinBox" name="intSpinBox3dX">
+         <property name="prefix">
+          <string>X: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="intSpinBox3dY">
+         <property name="prefix">
+          <string>Y: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="intSpinBox3dZ">
+         <property name="prefix">
+          <string>Z: </string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="doublePage3d">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox3dX">
+         <property name="prefix">
+          <string>X: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox3dY">
+         <property name="prefix">
+          <string>Y: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox3dZ">
+         <property name="prefix">
+          <string>Z: </string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="intPage4d">
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QSpinBox" name="intSpinBox4dX"/>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="intSpinBox4dY"/>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="intSpinBox4dZ"/>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="intSpinBox4dW"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="doublePage4d">
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox4dX"/>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox4dY"/>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox4dZ"/>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox4dW"/>
        </item>
       </layout>
      </widget>

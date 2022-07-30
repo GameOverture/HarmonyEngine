@@ -17,6 +17,8 @@
 
 enum PropertiesType
 {
+	PROPERTIESTYPE_Unknown = -1,
+
 	PROPERTIESTYPE_Root = 0,
 	PROPERTIESTYPE_Category,
 	PROPERTIESTYPE_CategoryChecked,
@@ -34,6 +36,7 @@ enum PropertiesType
 	PROPERTIESTYPE_ComboBox,        // delegateBuilder [QStringList] = QComboBox's selection list
 	PROPERTIESTYPE_StatesComboBox,  // delegateBuilder [ProjectItemData *] = A pointer to the ProjectItemData that owns this property
 	PROPERTIESTYPE_Slider,
+	PROPERTIESTYPE_Color,
 	PROPERTIESTYPE_SpriteFrames
 };
 
@@ -53,7 +56,9 @@ struct PropertiesDef
 
 	QVariant								delegateBuilder; // Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
 
-	PropertiesDef()
+	PropertiesDef() : 
+		eType(PROPERTIESTYPE_Unknown),
+		bReadOnly(false)
 	{ }
 	PropertiesDef(PropertiesType type, bool readOnly, QString toolTip, QVariant defaultData_, QVariant minRange_, QVariant maxRange_, QVariant stepAmt_, QString prefix, QString suffix, QVariant delegateBuilder_) :
 		eType(type),
@@ -102,6 +107,7 @@ public:
 	int GetStateIndex() const;
 	const QVariant &GetSubstate() const;
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
+	const PropertiesDef FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const;
 	QString GetPropertyName(const QModelIndex &indexRef) const;
 
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
@@ -125,6 +131,9 @@ public:
 						QVariant delegateBuilder = QVariant());
 
 	void RefreshCategory(const QModelIndex &indexRef);
+
+	QJsonObject SerializeJson();
+	void DeserializeJson(const QJsonObject &propertiesObj);
 
 	virtual bool setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole = Qt::EditRole) override;
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;

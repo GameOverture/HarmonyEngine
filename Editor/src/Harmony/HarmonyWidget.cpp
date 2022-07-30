@@ -276,7 +276,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 					ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(itemUuid);
 
-					EntityNodeTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
+					EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetNodeTreeModel();
 					if(entityTreeModelRef.IsItemValid(pProjItem, true) == false)
 						continue;
 

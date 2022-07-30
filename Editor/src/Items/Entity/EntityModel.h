@@ -22,25 +22,33 @@
 
 class EntityModel;
 
-class EntityNodeItemData : public TreeModelItemData
+class EntityNodeItem : public TreeModelItemData
 {
 	Q_OBJECT
 
-	QUuid				m_ItemGuid;
+	QUuid												m_Uuid;
+	PropertiesTreeModel									m_PropertiesTreeModel;
 
 public:
-	EntityNodeItemData(HyGuiItemType eType, QString sName, QUuid uuid);
-	virtual ~EntityNodeItemData();
+	EntityNodeItem(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem);
+	EntityNodeItem(ProjectItemData &entityItemDataRef, QJsonObject initObj);
+	virtual ~EntityNodeItem();
 
 	QString GetCodeName() const;
+	QUuid GetUuid() const;
+	PropertiesTreeModel &GetPropertiesModel();
+
+	void InsertJsonInfo(QJsonObject &childObjRef);
+
+protected:
+	void InitalizePropertiesTree();
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class EntityNodeTreeModel : public ITreeModel
+class EntityTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
-	EntityModel *										m_pEntityModel;
-	QList<EntityNodeItemData *>							m_NodeList;
+	EntityModel &										m_ModelRef;
 
 	enum ColumnType
 	{
@@ -51,19 +59,23 @@ class EntityNodeTreeModel : public ITreeModel
 	};
 
 public:
-	explicit EntityNodeTreeModel(EntityModel *pEntityModel, QObject *parent = nullptr);
-	virtual ~EntityNodeTreeModel();
+	explicit EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QUuid uuidOfEntity, QObject *pParent = nullptr);
+	virtual ~EntityTreeModel();
 	
-	EntityNodeItemData *FindEntityNodeItem(ProjectItemData *pItem);
+	QList<EntityNodeItem *> GetChildrenNodes() const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
-	bool InsertNewChild(ProjectItemData *pProjItem, TreeModelItem *pParentTreeItem = nullptr, int iRow = -1);
-	bool RemoveChild(EntityNodeItemData *pItem);
+	EntityNodeItem *InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
+	bool InsertChild(EntityNodeItem *pItem, int iRow);
+	int32 PopChild(EntityNodeItem *pItem);
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
+
+protected:
+	QString GenerateCodeName(QString sDesiredName) const;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityStateData : public IStateData
@@ -80,28 +92,29 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	EntityNodeTreeModel										m_TreeModel;
-	QMap<EntityNodeItemData *, PropertiesTreeModel *>		m_PropertiesMap;
+	LineEditMapper										m_CodeNameMapper;
+	ComboBoxMapper										m_EntityTypeMapper;
+
+	EntityTreeModel										m_TreeModel;
 
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
-	EntityNodeTreeModel &GetNodeTreeModel();
-	PropertiesTreeModel *GetPropertiesModel(EntityNodeItemData *pItem);
+	void RegisterWidgets(QLineEdit &txtCodeNameRef, QComboBox &cmbEntityTypeRef);
+
+	EntityTreeModel &GetNodeTreeModel();
 
 	// Command Modifiers - should (only) be called from UndoCmd's
-	void Cmd_AddNewChildren(QList<ProjectItemData *> projItemList);
-	bool Cmd_RemoveChild(ProjectItemData *pItem);
+	QList<EntityNodeItem *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
+	bool Cmd_AddChild(EntityNodeItem *pNodeItem, int iRow);
+	int32 Cmd_RemoveChild(EntityNodeItem *pItem);
 	void Cmd_AddPrimitive();
 
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
 	virtual QList<AssetItemData *> GetAssets(AssetType eAssetType) const override;
-
-protected:
-	PropertiesTreeModel *AllocNewPropertiesModel(QVariant &subState, EntityNodeItemData *pItemToAdd);
 };
 
 #endif // ENTITYMODEL_H

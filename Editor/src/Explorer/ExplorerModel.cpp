@@ -305,9 +305,13 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 	return true;
 }
 
-ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid)
+ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid) const
 {
-	return m_ItemUuidMap[uuid];
+	auto iter = m_ItemUuidMap.find(uuid);
+	if(iter == m_ItemUuidMap.end())
+		return nullptr;
+
+	return *iter;
 }
 
 QList<ProjectItemData *> ExplorerModel::RequestItemsByUuid(ProjectItemData *pItemOwner, QList<QUuid> requestList)

@@ -129,30 +129,40 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 
 	case PROPERTIESTYPE_ivec2:
-		pReturnWidget = new WidgetVectorSpinBox(true, pParent);
-
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int2d, pParent);
 		if(propDefRef.defaultData.isValid())
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_vec2:
-		pReturnWidget = new WidgetVectorSpinBox(false, pParent);
-
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double2d, pParent);
 		if(propDefRef.defaultData.isValid())
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
-		//case PROPERTIESTYPE_ivec3:
-		//	break;
+	case PROPERTIESTYPE_ivec3:
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int3d, pParent);
+		if(propDefRef.defaultData.isValid())
+			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+		break;
 
-		//case PROPERTIESTYPE_vec3:
-		//	break;
+	case PROPERTIESTYPE_vec3:
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double3d, pParent);
+		if(propDefRef.defaultData.isValid())
+			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+		break;
 
-		//case PROPERTIESTYPE_ivec4:
-		//	break;
+	case PROPERTIESTYPE_ivec4:
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int4d, pParent);
+		if(propDefRef.defaultData.isValid())
+			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+		break;
 
-		//case PROPERTIESTYPE_vec4:
-		//	break;
+	case PROPERTIESTYPE_vec4:
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double4d, pParent);
+		if(propDefRef.defaultData.isValid())
+			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+		break;
 
 	case PROPERTIESTYPE_LineEdit:
 		pReturnWidget = new QLineEdit(pParent);
@@ -190,6 +200,9 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<QSlider *>(pReturnWidget)->setMaximum(propDefRef.maxRange.toInt());
 		if(propDefRef.stepAmt.isValid())
 			static_cast<QSlider *>(pReturnWidget)->setSingleStep(propDefRef.stepAmt.toInt());
+		break;
+
+	case PROPERTIESTYPE_Color:
 		break;
 
 	case PROPERTIESTYPE_SpriteFrames:
@@ -233,13 +246,12 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 	case PROPERTIESTYPE_ivec2:
 	case PROPERTIESTYPE_vec2:
+	case PROPERTIESTYPE_ivec3:
+	case PROPERTIESTYPE_vec3:
+	case PROPERTIESTYPE_ivec4:
+	case PROPERTIESTYPE_vec4:
 		static_cast<WidgetVectorSpinBox *>(pEditor)->SetValue(propValue);
 		break;
-	//case PROPERTIESTYPE_ivec3:
-	//case PROPERTIESTYPE_vec3:
-	//case PROPERTIESTYPE_ivec4:
-	//case PROPERTIESTYPE_vec4:
-	//	break;
 	case PROPERTIESTYPE_LineEdit:
 		static_cast<QLineEdit *>(pEditor)->setText(propValue.toString());
 		break;
@@ -250,6 +262,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_Slider:
 		static_cast<QSlider *>(pEditor)->setValue(propValue.toInt());
 		break;
+
 	default:
 		HyGuiLog("PropertiesDelegate::setEditorData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
 	}
@@ -275,13 +288,12 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 	case PROPERTIESTYPE_ivec2:
 	case PROPERTIESTYPE_vec2:
+	case PROPERTIESTYPE_ivec3:
+	case PROPERTIESTYPE_vec3:
+	case PROPERTIESTYPE_ivec4:
+	case PROPERTIESTYPE_vec4:
 		newValue = QVariant(static_cast<WidgetVectorSpinBox *>(pEditor)->GetValue());
 		break;
-	//case PROPERTIESTYPE_ivec3:
-	//case PROPERTIESTYPE_vec3:
-	//case PROPERTIESTYPE_ivec4:
-	//case PROPERTIESTYPE_vec4:
-	//	break;
 	case PROPERTIESTYPE_LineEdit:
 		newValue = QVariant(static_cast<QLineEdit *>(pEditor)->text());
 		break;
