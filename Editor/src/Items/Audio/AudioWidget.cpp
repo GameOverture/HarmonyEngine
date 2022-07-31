@@ -90,6 +90,7 @@ AudioWidget::~AudioWidget()
 	//////////////////////////////////////////////////////
 	PropertiesTreeModel &propertiesModelRef = static_cast<AudioModel *>(m_ItemRef.GetModel())->GetPropertiesModel(GetCurStateIndex());
 	ui->statePropertiesTreeView->setModel(&propertiesModelRef);
+	ui->statePropertiesTreeView->resizeColumnToContents(0);
 }
 
 /*virtual*/ void AudioWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/

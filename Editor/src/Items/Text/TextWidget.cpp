@@ -59,6 +59,7 @@ TextWidget::TextWidget(ProjectItemData &itemRef, QWidget *parent) :
 	//connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_layersView_selectionChanged(const QItemSelection &, const QItemSelection &)));
 
 	ui.glyphsTreeView->setModel(static_cast<TextModel *>(m_ItemRef.GetModel())->GetGlyphsModel());
+	ui.glyphsTreeView->resizeColumnToContents(0);
 
 
 	//QPalette p =  ui.grpOutlines->palette();

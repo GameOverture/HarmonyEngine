@@ -163,8 +163,11 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 
 	QVariant v;
 	v.setValue<EntityNodeItem *>(pNewItem);
-	if(setData(index(0, 0, QModelIndex()), v, Qt::UserRole) == false)
-		HyGuiLog("EntityTreeModel::EntityTreeModel() - setData failed", LOGTYPE_Error);
+	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
+	{
+		if(setData(index(0, iCol, QModelIndex()), v, Qt::UserRole) == false)
+			HyGuiLog("EntityTreeModel::EntityTreeModel() - setData failed", LOGTYPE_Error);
+	}
 }
 
 /*virtual*/ EntityTreeModel::~EntityTreeModel()
@@ -231,8 +234,11 @@ EntityNodeItem *EntityTreeModel::InsertNewChild(ProjectItemData *pProjItem, QStr
 
 	QVariant v;
 	v.setValue<EntityNodeItem *>(pNewItem);
-	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
-		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
+	{
+		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
+			HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+	}
 
 	return pNewItem;
 }
@@ -253,8 +259,11 @@ bool EntityTreeModel::InsertChild(EntityNodeItem *pItem, int iRow)
 
 	QVariant v;
 	v.setValue<EntityNodeItem *>(pItem);
-	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
-		HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
+	{
+		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
+			HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+	}
 
 	return true;
 }

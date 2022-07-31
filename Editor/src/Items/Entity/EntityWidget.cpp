@@ -64,6 +64,8 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
 {
+	ui->nodeTree->expandAll();
+
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
 	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);
 	bool bEnableAddNodeBtn = false;
@@ -107,6 +109,8 @@ EntityWidget::~EntityWidget()
 		ui->propertyTree->expand(rootIndex);
 		for(int i = 0; i < propModelRef.rowCount(); ++i)
 			ui->propertyTree->expand(propModelRef.index(i, 0, rootIndex));
+
+		ui->propertyTree->resizeColumnToContents(0);
 	}
 }
 

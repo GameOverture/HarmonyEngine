@@ -450,8 +450,8 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 	case Qt::BackgroundRole:
 		if(propDefRef.IsCategory())
 			return QBrush(propDefRef.GetColor());
-		else
-			return QBrush((0 == (pTreeItem->GetIndex() & 1)) ? propDefRef.GetColor() : propDefRef.GetColor().lighter());
+		//else
+		//	return QBrush((0 == (pTreeItem->GetIndex() & 1)) ? propDefRef.GetColor() : propDefRef.GetColor().lighter());
 
 	case Qt::ForegroundRole:
 		if(propDefRef.IsCategory())

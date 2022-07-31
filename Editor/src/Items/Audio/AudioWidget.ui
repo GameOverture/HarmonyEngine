@@ -74,7 +74,11 @@
       </widget>
      </item>
      <item>
-      <widget class="PropertiesTreeView" name="statePropertiesTreeView"/>
+      <widget class="PropertiesTreeView" name="statePropertiesTreeView">
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+      </widget>
      </item>
     </layout>
    </item>
