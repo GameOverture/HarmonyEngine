@@ -19,9 +19,6 @@ class SpriteDraw : public IDraw
 
 	QPoint					m_vTranslateAmt;
 
-	HyPrimitive2d			m_primOriginHorz;
-	HyPrimitive2d			m_primOriginVert;
-
 public:
 	SpriteDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~SpriteDraw();

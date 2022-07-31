@@ -11,6 +11,7 @@
 #include "SpriteDraw.h"
 #include "SpriteWidget.h"
 #include "SpriteUndoCmds.h"
+#include "Project.h"
 
 #include <QKeyEvent>
 
@@ -18,28 +19,6 @@ SpriteDraw::SpriteDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	IDraw(pProjItem, initFileDataRef)
 {
 	m_Sprite.Init("", "+GuiPreview", this);
-	ChildAppend(m_primOriginHorz);
-	ChildAppend(m_primOriginVert);
-
-	std::vector<glm::vec2> lineList(2, glm::vec2());
-
-	lineList[0].x = -5000.0f;
-	lineList[0].y = 0.0f;
-	lineList[1].x = 5000.0f;
-	lineList[1].y = 0.0f;
-	m_primOriginHorz.SetLineThickness(2.0f);
-	m_primOriginHorz.SetTint(HyColor::White);
-	m_primOriginHorz.SetVisible(false);
-	m_primOriginHorz.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
-
-	lineList[0].x = 0.0f;
-	lineList[0].y = -5000.0f;
-	lineList[1].x = 0.0f;
-	lineList[1].y = 5000.0f;
-	m_primOriginVert.SetLineThickness(2.0f);
-	m_primOriginVert.SetTint(HyColor::White);
-	m_primOriginVert.SetVisible(false);
-	m_primOriginVert.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 }
 
 /*virtual*/ SpriteDraw::~SpriteDraw()
@@ -156,9 +135,8 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 /*virtual*/ void SpriteDraw::OnShow() /*override*/
 {
 	m_Sprite.SetVisible(true);
-	
-	m_primOriginHorz.SetVisible(true);
-	m_primOriginVert.SetVisible(true);
+	if(m_pProjItem)
+		m_pProjItem->GetProject().ShowOrigin(true);
 }
 
 /*virtual*/ void SpriteDraw::OnHide() /*override*/
@@ -168,7 +146,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnResizeRenderer() /*override*/
 {
-
 }
 
 /*virtual*/ void SpriteDraw::OnUpdate() /*override*/

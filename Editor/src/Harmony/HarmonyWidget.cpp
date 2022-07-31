@@ -346,6 +346,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		return;
 
 	pCurItem->GetDraw()->OnMouseWheelEvent(pEvent);
+	m_pProject->UpdateOriginThickness();
 }
 
 /*virtual*/ void HarmonyWidget::mouseMoveEvent(QMouseEvent *pEvent) /*override*/

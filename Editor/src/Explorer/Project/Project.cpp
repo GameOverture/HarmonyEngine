@@ -631,6 +631,16 @@ void Project::ShowGrid(bool bShow)
 	m_pDraw->EnableOverGrid(bShow);
 }
 
+void Project::ShowOrigin(bool bShow)
+{
+	m_pDraw->EnableOrigin(bShow);
+}
+
+void Project::UpdateOriginThickness()
+{
+	m_pDraw->UpdateOriginThickness();
+}
+
 void Project::SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);

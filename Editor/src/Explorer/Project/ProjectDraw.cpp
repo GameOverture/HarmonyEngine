@@ -170,10 +170,12 @@ OverGrid::OverGrid(float fWidth, float fHeight, float fGridSize) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const float fDIMENSION_SIZE = 20000.0f;
+
 ProjectDraw::ProjectDraw() :
 	IDraw(nullptr, FileDataPair()),
-	m_CheckerGrid(20000.0f, 20000.0f, 25.0f),
-	m_OverGrid(20000.0f, 20000.0f, 25.0f)
+	m_CheckerGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, 25.0f),
+	m_OverGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, 25.0f)
 {
 	ChildAppend(m_CheckerGrid);
 
@@ -187,6 +189,27 @@ ProjectDraw::ProjectDraw() :
 	m_CheckerGrid.SetShader(m_pCheckerGridShader);
 	m_CheckerGrid.SetDisplayOrder(-1000);
 
+	std::vector<glm::vec2> lineList(2, glm::vec2());
+	lineList[0].x = -fDIMENSION_SIZE * 0.5f;
+	lineList[0].y = 0.0f;
+	lineList[1].x = fDIMENSION_SIZE * 0.5f;
+	lineList[1].y = 0.0f;
+	m_OriginHorz.SetLineThickness(2.0f);
+	m_OriginHorz.SetTint(HyColor::White);
+	m_OriginHorz.SetVisible(false);
+	m_OriginHorz.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+
+	lineList[0].x = 0.0f;
+	lineList[0].y = -fDIMENSION_SIZE * 0.5f;
+	lineList[1].x = 0.0f;
+	lineList[1].y = fDIMENSION_SIZE * 0.5f;
+	m_OriginVert.SetLineThickness(2.0f);
+	m_OriginVert.SetTint(HyColor::White);
+	m_OriginVert.SetVisible(false);
+	m_OriginVert.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+
+	ChildAppend(m_OriginHorz);
+	ChildAppend(m_OriginVert);
 
 	ChildAppend(m_OverGrid);
 
@@ -203,6 +226,43 @@ ProjectDraw::ProjectDraw() :
 
 /*virtual*/ ProjectDraw::~ProjectDraw()
 {
+}
+
+void ProjectDraw::UpdateOriginThickness()
+{
+	HyZoomLevel eZoomLevel = m_pCamera->SetZoomLevel();
+	switch(eZoomLevel)
+	{
+	case HYZOOM_6:
+		m_OriginHorz.SetLineThickness(8.0f);
+		m_OriginVert.SetLineThickness(8.0f);
+		break;
+	case HYZOOM_12:
+		m_OriginHorz.SetLineThickness(6.0f);
+		m_OriginVert.SetLineThickness(6.0f);
+		break;
+	case HYZOOM_25:
+	case HYZOOM_33:
+		m_OriginHorz.SetLineThickness(4.0f);
+		m_OriginVert.SetLineThickness(4.0f);
+		break;
+	case HYZOOM_50:
+	case HYZOOM_75:
+		m_OriginHorz.SetLineThickness(2.0f);
+		m_OriginVert.SetLineThickness(2.0f);
+		break;
+	case HYZOOM_100:
+	default:
+		m_OriginHorz.SetLineThickness(1.0f);
+		m_OriginVert.SetLineThickness(1.0f);
+		break;
+	}
+}
+
+void ProjectDraw::EnableOrigin(bool bEnable)
+{
+	m_OriginHorz.SetVisible(bEnable);
+	m_OriginVert.SetVisible(bEnable);
 }
 
 void ProjectDraw::EnableOverGrid(bool bEnable)
