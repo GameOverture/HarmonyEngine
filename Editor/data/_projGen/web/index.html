@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Game title</title>
+  </head>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background-color: #000000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading * {
+      animation-play-state: paused !important;
+    }
+
+    #preload {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 280px;
+    }
+
+    #harmony_text {
+      position: absolute;
+      left: 10px;
+      top: 50px;
+      width: 412px;
+      height: 77px;
+      background: no-repeat left top url("./harmony_text.svg");
+      background-size: cover;
+      filter: drop-shadow(0 0 10px #f8e29477);
+      animation: slide-in-from-left 0.5s ease-out 0s 1 normal forwards;
+    }
+
+    #engine_text {
+      position: absolute;
+      left: 0;
+      top: 112px;
+      width: 417px;
+      height: 93px;
+      background: no-repeat left top url("./engine_text.svg");
+      background-size: cover;
+      filter: drop-shadow(0 0 10px #f8e29477);
+      animation: slide-in-from-right 0.5s ease-out 0s 1 normal forwards;
+    }
+
+    #load_bar_frame {
+      position: absolute;
+      left: 0px;
+      top: 232px;
+      width: 488px;
+      height: 48px;
+      background: no-repeat left top url("./load_bar_frame.svg");
+      background-size: cover;
+      filter: drop-shadow(0 0 10px #f8e29477);
+    }
+
+    #progress {
+      position: absolute;
+      left: 12px;
+      top: 244px;
+      width: 464px;
+      height: 24px;
+      overflow: hidden;
+    }
+
+    #progress_bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: no-repeat left top url("./load_bar_inside.svg");
+      background-size: cover;
+      transform: translateX(-100%);
+    }
+
+    #canvas {
+      padding-right: 0;
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+      border: 0px none;
+      background-color: black;
+    }
+
+    @keyframes slide-in-from-left {
+      0% {
+        transform: translateX(-120%);
+        opacity: 0;
+      }
+      75% {
+        transform: translateX(10%);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slide-in-from-right {
+      0% {
+        transform: translateX(120%);
+        opacity: 0;
+      }
+      75% {
+        transform: translateX(-10%);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes zoom-in {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      75% {
+        transform: scale(1.5);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+    @keyframes fade-in {
+      0% {
+        opacity: 0;
+      }
+      75% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  </style>
+  <body class="loading">
+    <div id="preload">
+      <div id="harmony_text"></div>
+      <div id="engine_text"></div>
+      <div id="load_bar_frame"></div>
+      <div id="progress">
+        <div id="progress_bar"></div>
+      </div>
+    </div>
+    <canvas
+      class="emscripten"
+      id="canvas"
+      oncontextmenu="event.preventDefault()"
+      tabindex="-1"
+    ></canvas>
+    <script type="text/javascript">
+      window.addEventListener("load", function () {
+        document.body.classList.remove("loading");
+      });
+
+      var preload = document.getElementById("preload");
+      var progressBar = document.getElementById("progress_bar");
+
+      var Module = {
+        preRun: [],
+        postRun: [],
+        print: (function () {
+          return function (text) {
+            if (arguments.length > 1) {
+              text = Array.prototype.slice.call(arguments).join(" ");
+            }
+            console.log(text);
+          };
+        })(),
+        printErr: function (text) {
+          if (arguments.length > 1) {
+            text = Array.prototype.slice.call(arguments).join(" ");
+          }
+          console.error(text);
+        },
+        canvas: (function () {
+          var canvas = document.getElementById("canvas");
+
+          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+          // application robust, you may want to override this behavior before shipping!
+          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+          canvas.addEventListener(
+            "webglcontextlost",
+            function (e) {
+              alert("WebGL context lost. You will need to reload the page.");
+              e.preventDefault();
+            },
+            false
+          );
+
+          return canvas;
+        })(),
+        setStatus: function (text) {
+          //console.log("text:", text);
+          if (!Module.setStatus.last)
+            Module.setStatus.last = { time: Date.now(), text: "" };
+          if (text === Module.setStatus.last.text) return;
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+          var now = Date.now();
+          if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+          Module.setStatus.last.time = now;
+          Module.setStatus.last.text = text;
+          if (m && m[1] === "Downloading data... ") {
+            const value = parseInt(m[2]) * 100;
+            const max = parseInt(m[4]) * 100;
+            const percentage = (value / max) * 100;
+            const transform = -100 + percentage;
+            progressBar.style.transform = `translateX(${transform}%)`;
+            preload.style.display = "block";
+          } else {
+            preload.style.display = "none";
+          }
+        },
+        monitorRunDependencies: function (left) {},
+      };
+
+      // Parse querystring and assign them as command line arguments to be handled in game code
+      Module['arguments'] = window.location.search.substr(1).split('&');
+
+      window.onerror = function (event) {};
+    </script>
+    <script
+      async
+      type="text/javascript"
+      src="LG_HTML5_ScreamingLinks.js"
+    ></script>
+  </body>
+</html>

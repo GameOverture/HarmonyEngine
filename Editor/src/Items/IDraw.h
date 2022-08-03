@@ -62,6 +62,9 @@ protected:
 	virtual void OnShow() = 0;
 	virtual void OnHide() = 0;
 	virtual void OnResizeRenderer() = 0;
+	virtual void OnZoom(HyZoomLevel eZoomLevel) { }
+
+	float GetLineThickness(HyZoomLevel eZoomLevel);
 };
 
 #endif // IDRAW_H

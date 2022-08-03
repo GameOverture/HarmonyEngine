@@ -45,6 +45,7 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/HyImage.h"
 #include "Utilities/HyIO.h"
+#include "Utilities/HyJson.h"
 #include "Utilities/HyRand.h"
 #include "Window/HyWindowManager.h"
 

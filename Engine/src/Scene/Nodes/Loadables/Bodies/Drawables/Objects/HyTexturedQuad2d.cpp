@@ -135,7 +135,15 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 
 /*virtual*/ void HyTexturedQuad2d::OnCalcBoundingVolume() /*override*/
 {
+	m_LocalBoundingVolume.SetAsBox(m_SrcRect.Width(), m_SrcRect.Height());
 
+	//float fHalfWidth = m_SrcRect.Width() * 0.5f;
+	//float fHalfHeight = m_SrcRect.Height() * 0.5f;
+
+	//if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
+	//	m_LocalBoundingVolume.SetAsNothing();
+	//else
+	//	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(fHalfWidth, fHalfHeight), 0.0f);
 }
 
 /*virtual*/ void HyTexturedQuad2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

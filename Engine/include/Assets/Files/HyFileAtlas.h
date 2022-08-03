@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/IHyFile.h"
 #include "Utilities/HyMath.h"
+#include "Utilities/HyJson.h"
 
 class HyAssets;
 

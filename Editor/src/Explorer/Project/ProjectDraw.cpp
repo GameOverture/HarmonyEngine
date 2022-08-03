@@ -228,37 +228,6 @@ ProjectDraw::ProjectDraw() :
 {
 }
 
-void ProjectDraw::UpdateOriginThickness()
-{
-	HyZoomLevel eZoomLevel = m_pCamera->SetZoomLevel();
-	switch(eZoomLevel)
-	{
-	case HYZOOM_6:
-		m_OriginHorz.SetLineThickness(8.0f);
-		m_OriginVert.SetLineThickness(8.0f);
-		break;
-	case HYZOOM_12:
-		m_OriginHorz.SetLineThickness(6.0f);
-		m_OriginVert.SetLineThickness(6.0f);
-		break;
-	case HYZOOM_25:
-	case HYZOOM_33:
-		m_OriginHorz.SetLineThickness(4.0f);
-		m_OriginVert.SetLineThickness(4.0f);
-		break;
-	case HYZOOM_50:
-	case HYZOOM_75:
-		m_OriginHorz.SetLineThickness(2.0f);
-		m_OriginVert.SetLineThickness(2.0f);
-		break;
-	case HYZOOM_100:
-	default:
-		m_OriginHorz.SetLineThickness(1.0f);
-		m_OriginVert.SetLineThickness(1.0f);
-		break;
-	}
-}
-
 void ProjectDraw::EnableOrigin(bool bEnable)
 {
 	m_OriginHorz.SetVisible(bEnable);
@@ -280,4 +249,11 @@ void ProjectDraw::EnableOverGrid(bool bEnable)
 
 /*virtual*/ void ProjectDraw::OnResizeRenderer() /*override*/
 {
+}
+
+/*virtual*/ void ProjectDraw::OnZoom(HyZoomLevel eZoomLevel) /*override*/
+{
+	float fLineThickness = GetLineThickness(eZoomLevel);
+	m_OriginHorz.SetLineThickness(fLineThickness);
+	m_OriginVert.SetLineThickness(fLineThickness);
 }

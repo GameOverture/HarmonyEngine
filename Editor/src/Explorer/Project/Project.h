@@ -119,7 +119,6 @@ public:
 	void SetRenderSize(int iWidth, int iHeight);
 	void ShowGrid(bool bShow);
 	void ShowOrigin(bool bShow);
-	void UpdateOriginThickness();
 
 	void SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
 	void DeleteItemData(HyGuiItemType eType, QString sPath, bool bWriteToDisk);

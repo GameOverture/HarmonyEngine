@@ -200,6 +200,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		m_pProjItem->GetUndoStack()->push(pCmd);
 
 		m_fCamZoom = m_pCamera->GetZoom();
+		OnZoom(static_cast<HyZoomLevel>(iZoomLevel));
 	}
 
 	pEvent->accept();
@@ -221,4 +222,28 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 	}
 
 	UpdateDrawStatus(m_sSizeStatus);
+}
+
+float IDraw::GetLineThickness(HyZoomLevel eZoomLevel)
+{
+	switch(eZoomLevel)
+	{
+	case HYZOOM_6:
+		return 8.0f;
+	
+	case HYZOOM_12:
+		return 6.0f;
+	
+	case HYZOOM_25:
+	case HYZOOM_33:
+		return 4.0f;
+	
+	case HYZOOM_50:
+	case HYZOOM_75:
+		return 2.0f;
+
+	case HYZOOM_100:
+	default:
+		return 1.0f;
+	}
 }

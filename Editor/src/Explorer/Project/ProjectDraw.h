@@ -50,8 +50,6 @@ public:
 	ProjectDraw();
 	virtual ~ProjectDraw();
 
-	void UpdateOriginThickness();
-
 	void EnableOrigin(bool bEnable);
 	void EnableOverGrid(bool bEnable);
 	
@@ -59,6 +57,7 @@ protected:
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
+	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
 };
 
 #endif // PROJECTDRAW_H

@@ -302,4 +302,5 @@ uint32 HySpine2d::GetNumSlots()
 
 /*virtual*/ void HySpine2d::OnCalcBoundingVolume() /*override*/
 {
+	HyError("HySpine2d::OnCalcBoundingVolume not implemented");
 }

@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/HyFileAudio.h"
 #include "Scene/Nodes/IHyNode.h"
+#include "Utilities/HyJson.h"
 
 class IHyAudioCore
 {

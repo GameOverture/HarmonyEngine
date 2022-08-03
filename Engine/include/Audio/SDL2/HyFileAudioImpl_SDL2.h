@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Audio/IHyFileAudioImpl.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "Utilities/HyJson.h"
 
 #if defined(HY_USE_SDL2)
 

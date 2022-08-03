@@ -11,6 +11,7 @@
 // This cpp module includes HyStdAfx.h to create the precompiled header
 #include "Afx/HyStdAfx.h"
 #include "Utilities/HyIO.h"
+#include "Utilities/HyJson.h"
 
 HyTextureInfo::HyTextureInfo() :
 	m_uiFiltering(HYTEXFILTER_Unknown),

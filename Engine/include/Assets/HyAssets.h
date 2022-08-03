@@ -14,6 +14,7 @@
 #include "Threading/IHyThreadClass.h"
 #include "Assets/Files/HyFilesManifest.h"
 #include "Utilities/HyMath.h"
+#include "Utilities/HyJson.h"
 
 #define HYASSETS_DataFile "Items.data"
 #define HYASSETS_AtlasFile "Atlases.data"

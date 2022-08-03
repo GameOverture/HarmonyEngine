@@ -160,6 +160,7 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Localization/HyTranslateTable.cpp
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
+	src/Utilities/HyJson.cpp
 	src/Utilities/HyMath.cpp
 	src/Window/HyWindow.cpp
 	src/Window/HyWindowManager.cpp)
@@ -287,6 +288,7 @@ set(HYENGINE_HEADER_FILES
 	include/UI/Localization/HyTranslateTable.h
 	include/Utilities/Crc32.h
 	include/Utilities/HyIO.h
+	include/Utilities/HyJson.h
 	include/Utilities/HyMath.h
 	include/Utilities/HyRand.h
 	include/Window/HyWindow.h

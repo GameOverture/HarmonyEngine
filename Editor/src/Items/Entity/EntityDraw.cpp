@@ -13,28 +13,6 @@
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef)
 {
-	ChildAppend(m_primOriginHorz);
-	ChildAppend(m_primOriginVert);
-
-	std::vector<glm::vec2> lineList(2, glm::vec2());
-
-	lineList[0].x = -5000.0f;
-	lineList[0].y = 0.0f;
-	lineList[1].x = 5000.0f;
-	lineList[1].y = 0.0f;
-	m_primOriginHorz.SetLineThickness(2.0f);
-	m_primOriginHorz.SetTint(HyColor::White);
-	m_primOriginHorz.SetVisible(false);
-	m_primOriginHorz.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
-
-	lineList[0].x = 0.0f;
-	lineList[0].y = -5000.0f;
-	lineList[1].x = 0.0f;
-	lineList[1].y = 5000.0f;
-	m_primOriginVert.SetLineThickness(2.0f);
-	m_primOriginVert.SetTint(HyColor::White);
-	m_primOriginVert.SetVisible(false);
-	m_primOriginVert.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 }
 
 /*virtual*/ EntityDraw::~EntityDraw()
@@ -56,8 +34,6 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ void EntityDraw::OnShow() /*override*/
 {
-	m_primOriginHorz.SetVisible(true);
-	m_primOriginVert.SetVisible(true);
 }
 
 /*virtual*/ void EntityDraw::OnHide() /*override*/
@@ -67,4 +43,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ void EntityDraw::OnResizeRenderer() /*override*/
 {
+}
+
+/*virtual*/ void EntityDraw::OnZoom(HyZoomLevel eZoomLevel) /*override*/
+{
+	
 }
