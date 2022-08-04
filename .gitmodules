@@ -28,3 +28,6 @@
 [submodule "Editor/vendor/vorbis"]
 	path = Editor/vendor/vorbis
 	url = https://github.com/GameOverture/Hy_vorbis.git
+[submodule "Engine/vendor/json"]
+	path = Engine/vendor/json
+	url = https://github.com/GameOverture/Hy_json.git

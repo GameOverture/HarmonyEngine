@@ -1,5 +1,5 @@
 # BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_STATIC
-# BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_ICU
+# BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_RAPIDJSON, HYBUILD_ICU
 
 add_subdirectory(vendor/box2d)
 add_subdirectory(vendor/soil2)
@@ -7,6 +7,14 @@ add_subdirectory(vendor/soil2)
 if(HYBUILD_SPINE)
 	add_subdirectory(extras/Spine/spine-cpp)
 	set_target_properties(spine-cpp PROPERTIES FOLDER "Engine Libs")
+endif()
+
+if(HYBUILD_RAPIDJSON)
+	
+else() #nlohmann_json
+	# If you only include this third party in PRIVATE source files, you do not need to install it when your main project gets installed.
+	set(JSON_Install OFF CACHE INTERNAL "")
+	add_subdirectory(vendor/json)
 endif()
 
 # Emscripten provides its own ports of SDL, GLFW, and GLEW
@@ -307,6 +315,12 @@ target_link_libraries(HyEngine PUBLIC box2d soil2)
 
 if(HYBUILD_SPINE)
 	target_link_libraries(HyEngine PUBLIC spine-cpp)
+endif()
+
+if(HYBUILD_RAPIDJSON)
+	
+else() #nlohmann_json
+	target_link_libraries(HyEngine PRIVATE nlohmann_json::nlohmann_json)
 endif()
 
 # Emscripten provides its own ports of SDL and GLEW

@@ -15,6 +15,9 @@
 #include "Platforms/HyPlatform.h"
 #include "HyFlags.h"
 
+// TODO: Get rid of this #define - Upgrade RapidJson to a newer release version once it becomes available
+#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+
 #include "vendor/box2d/include/box2d/box2d.h"
 
 //#define GLM_SWIZZLE
