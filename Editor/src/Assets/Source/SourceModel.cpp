@@ -550,7 +550,8 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 		if(sFilter.isEmpty() == false)
 			srcFolderList.push_back(sFilter);
 	}
-	srcFolderList = srcFolderList.toSet().toList(); // Remove duplicates
+	QSet<QString> uniqueSet(srcFolderList.begin(), srcFolderList.end());
+	srcFolderList = uniqueSet.values(); // Remove duplicates
 	QString sIncludeDirs;
 	for(auto sFolder : srcFolderList)
 		sIncludeDirs += "list(APPEND GAME_INCLUDE_DIRS \"${CMAKE_CURRENT_SOURCE_DIR}/" + sFolder + "\")\n";

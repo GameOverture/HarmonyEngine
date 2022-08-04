@@ -147,7 +147,7 @@ int32 HyInputMap::MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn)
 	return MapAlternativeBtn(iActionId, static_cast<HyKeyboardBtn>(eBtn));
 }
 
-bool HyInputMap::MapPadBtn(int32 iActionId, HyGamePadBtn eBtn)
+int32 HyInputMap::MapPadBtn(int32 iActionId, HyGamePadBtn eBtn)
 {
 	auto iter = m_ActionIndexMap.find(iActionId);
 	if(iter != m_ActionIndexMap.end())

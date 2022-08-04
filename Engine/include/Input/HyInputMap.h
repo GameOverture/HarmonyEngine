@@ -66,7 +66,7 @@ public:
 	int32 MapAlternativeBtn(int32 iActionId, HyKeyboardBtn eBtn);
 	int32 MapAlternativeBtn(int32 iActionId, HyMouseBtn eBtn);
 
-	bool MapPadBtn(int32 iActionId, HyGamePadBtn eBtn);
+	int32 MapPadBtn(int32 iActionId, HyGamePadBtn eBtn);
 
 	bool Unmap(int32 iActionId);
 	bool IsMapped(int32 iActionId) const;

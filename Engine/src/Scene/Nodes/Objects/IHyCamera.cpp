@@ -101,12 +101,12 @@ HyZoomLevel IHyCamera<NODETYPE>::SetZoomLevel()
 	
 	if(fabs(fCurZoom - a) < fabs(fCurZoom - b))
 	{
-		int32 iZoomIndex = iter_geq - Hy_ZoomLevelList.begin() - 1;
+		auto iZoomIndex = iter_geq - Hy_ZoomLevelList.begin() - 1;
 		SetZoom(Hy_ZoomLevelList[iZoomIndex]);
 		return static_cast<HyZoomLevel>(iZoomIndex);
 	}
 
-	int32 iZoomIndex = iter_geq - Hy_ZoomLevelList.begin();
+	auto iZoomIndex = iter_geq - Hy_ZoomLevelList.begin();
 	SetZoom(Hy_ZoomLevelList[iZoomIndex]);
 	return static_cast<HyZoomLevel>(iZoomIndex);
 }

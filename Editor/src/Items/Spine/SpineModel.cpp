@@ -189,7 +189,7 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 		QJsonArray metaStateArray;
 		QJsonArray dataStateArray;
-		for(int i = 0; i < uiNumStates; ++i)
+		for(uint32 i = 0; i < uiNumStates; ++i)
 		{
 			FileDataPair stateFileData;
 			InsertStateSpecificData(i, stateFileData);
@@ -404,7 +404,7 @@ const QList<SpineSubAtlas> &SpineModel::GetSubAtlasList() const
 // Bake the sub-atlas offset
 void SpineModel::RewriteAtlasFile(AtlasFrame *pUpdatedFrame, QSize fullAtlasSize)
 {
-	for(uint i = 0; i < m_SubAtlasList.size(); ++i)
+	for(int i = 0; i < m_SubAtlasList.size(); ++i)
 	{
 		if(m_SubAtlasList[i].m_pAtlasFrame == nullptr) // Only change runtime files, not temp
 			continue;

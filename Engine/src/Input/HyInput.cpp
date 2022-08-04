@@ -60,12 +60,18 @@
 
 	/*friend*/ void HyGlfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint)
 	{
-		// the UTF-8 - UTF-32 standard conversion facet
-		std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cvt;
+		//// the UTF-8 - UTF-32 standard conversion facet
+		//std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cvt;
 
-		// UTF-32 to UTF-8
-		std::u32string sUtf32;//(uiCodepoint); // TODO: fix this
-		std::string sUtf8 = cvt.to_bytes(sUtf32);
+		//// UTF-32 to UTF-8
+		//std::u32string sUtf32;//(uiCodepoint); // TODO: fix this
+		//std::string sUtf8 = cvt.to_bytes(sUtf32);
+
+		if(uiCodepoint >= 128)
+			HyLogWarning("HyGlfw_CharCallback needs proper conversion!");
+
+		std::string sUtf8;
+		sUtf8 += static_cast<char>(uiCodepoint);
 		
 		HyEngine::Input().DistrubuteTextInput(sUtf8);
 	}
