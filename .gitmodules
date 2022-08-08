@@ -31,6 +31,3 @@
 [submodule "Engine/vendor/json"]
 	path = Engine/vendor/json
 	url = https://github.com/GameOverture/Hy_json.git
-[submodule "Engine/vendor/tinygltf"]
-	path = Engine/vendor/tinygltf
-	url = https://github.com/LightningGaming/Hy_tinygltf.git
