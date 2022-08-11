@@ -11,6 +11,9 @@
 #define HyJson_h__
 
 #include "vendor/rapidjson/document.h"
+#include "vendor/rapidjson/writer.h"
+#include "vendor/rapidjson/prettywriter.h"
+#include "vendor/rapidjson/stringbuffer.h"
 typedef rapidjson::Document HyJsonDoc;
 typedef rapidjson::Value HyJsonValue;
 typedef rapidjson::GenericArray<false, rapidjson::Value> HyJsonArray;
