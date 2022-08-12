@@ -148,6 +148,7 @@ uint32 HyRackMeter::GetDenomination() const
 void HyRackMeter::SetDenomination(uint32 uiDenom)
 {
 	m_uiDenomination = uiDenom;
+	FormatDigits();
 }
 
 /*virtual*/ void HyRackMeter::SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor) /*override*/
