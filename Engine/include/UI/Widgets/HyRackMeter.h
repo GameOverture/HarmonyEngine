@@ -35,6 +35,7 @@ protected:
 	float					m_fElapsedTimeRack = 0.0f;
 
 	HyNumberFormat			m_NumberFormat;
+	uint32					m_uiDenomination = 1;
 
 	// Spin digits member variables
 	double					m_dTotalDistance = 0.0f;
@@ -88,6 +89,9 @@ public:
 
 	HyNumberFormat GetNumFormat() const;
 	void SetNumFormat(HyNumberFormat format);
+
+	uint32 GetDenomination() const;
+	void SetDenomination(uint32 uiDenom);
 
 	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor) override;
 	virtual void SetTextMonospacedDigits(bool bSet) override;

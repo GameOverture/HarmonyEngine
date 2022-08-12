@@ -140,6 +140,16 @@ void HyRackMeter::SetNumFormat(HyNumberFormat format)
 	FormatDigits();
 }
 
+uint32 HyRackMeter::GetDenomination() const
+{
+	return m_uiDenomination;
+}
+
+void HyRackMeter::SetDenomination(uint32 uiDenom)
+{
+	m_uiDenomination = uiDenom;
+}
+
 /*virtual*/ void HyRackMeter::SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor) /*override*/
 {
 	HyLabel::SetTextLayerColor(uiStateIndex, uiLayerIndex, topColor, botColor);
@@ -254,7 +264,7 @@ void HyRackMeter::FormatDigits()
 	if(IsShowAsCash())
 		m_Text.SetText(HyLocale::Money_Format(m_iCurValue, m_NumberFormat));
 	else
-		m_Text.SetText(HyLocale::Number_Format(m_iCurValue, m_NumberFormat));
+		m_Text.SetText(HyLocale::Number_Format(static_cast<int64>(m_iCurValue / m_uiDenomination), m_NumberFormat));
 
 	// HyLocale::*_Format() should not produce empty strings
 	HyAssert(m_Text.GetNumCharacters() != 0, "HyRackMeter - EMPTY STRING! " << "IsCash: " << (IsShowAsCash() ? "true" : "false") << ", Value: " << m_iCurValue);
@@ -271,7 +281,7 @@ void HyRackMeter::FormatDigits()
 			if(IsShowAsCash())
 				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Money_Format(m_iCurValue + 1, m_NumberFormat));
 			else
-				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Number_Format(m_iCurValue + 1, m_NumberFormat));
+				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Number_Format(static_cast<int64>((m_iCurValue + 1) / m_uiDenomination), m_NumberFormat));
 
 			m_SpinText.m_SpinText_Padded.pos.Y(m_SpinText.m_SpinText_Shown.pos.Y() - fThreshold);
 
@@ -290,7 +300,7 @@ void HyRackMeter::FormatDigits()
 			if(IsShowAsCash())
 				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Money_Format(m_iCurValue - 1, m_NumberFormat));
 			else
-				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Number_Format(m_iCurValue - 1, m_NumberFormat));
+				m_SpinText.m_SpinText_Padded.SetText(HyLocale::Number_Format(static_cast<int64>((m_iCurValue - 1) / m_uiDenomination), m_NumberFormat));
 
 			m_SpinText.m_SpinText_Padded.pos.Y(m_SpinText.m_SpinText_Shown.pos.Y() + fThreshold);
 
