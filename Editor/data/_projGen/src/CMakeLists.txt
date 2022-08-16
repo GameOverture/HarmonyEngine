@@ -153,7 +153,7 @@ if (MSVC)
 	set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 	
 	# Copy OGG/VORBIS DLL's to output directory
-	set(HY_AUDIO_RUNTIME_DIR "${REL_HARMONY_DIR}/Engine/vendor/SDL2_mixer/VisualC/external/lib")
+	set(HY_AUDIO_RUNTIME_DIR "${REL_HARMONY_DIR}/Engine/vendor/SDL_mixer/VisualC/external/lib")
 	if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Win32")
 		set(HY_AUDIO_RUNTIME_DIR "${HY_AUDIO_RUNTIME_DIR}/x86")
 	else()
