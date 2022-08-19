@@ -74,7 +74,7 @@ public:
 
 	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, bool bUseScaleBox = true) override;
 
-	int64 GetValue();
+	int64 GetValue(bool bInCredits = false);
 	void SetValue(int64 iValue, float fRackDuration);
 	void OffsetValue(int64 iOffsetAmt, float fRackDuration);
 
