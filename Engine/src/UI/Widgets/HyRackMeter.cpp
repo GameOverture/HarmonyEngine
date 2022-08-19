@@ -54,7 +54,7 @@ HyRackMeter::HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, st
 
 int64 HyRackMeter::GetValue()
 {
-	return m_iTargetValue;
+	return m_iTargetValue / m_uiDenomination;
 }
 
 void HyRackMeter::SetValue(int64 iValue, float fRackDuration)
