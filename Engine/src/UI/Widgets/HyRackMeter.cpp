@@ -54,7 +54,7 @@ HyRackMeter::HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, st
 
 int64 HyRackMeter::GetValue()
 {
-	return IsShowAsCash() ? m_iTargetValue : (m_iTargetValue / m_uiDenomination);
+	return m_iTargetValue;
 }
 
 void HyRackMeter::SetValue(int64 iValue, float fRackDuration)
