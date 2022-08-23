@@ -26,8 +26,20 @@
 /*static*/ HyLocale::FallbackNumpunctData<wchar_t> HyLocale::sm_FallbackNumpunctWideData(L'.', L',', "\003", L"$", L"+", L"-", 2);
 /*static*/ std::map<std::string, int32>	HyLocale::sm_Iso4217Map;
 
-/*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code /*= ""*/)
+/*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code)
 {
+	// Break up any combo (lang/country) locale codes
+	if(sIso639Code.find('-') != std::string::npos)
+	{
+		sIso3166Code = sIso639Code.substr(sIso639Code.find('-') + 1);
+		sIso639Code = sIso639Code.substr(0, sIso639Code.find('-'));
+	}
+	else if(sIso639Code.find('_') != std::string::npos)
+	{
+		sIso3166Code = sIso639Code.substr(sIso639Code.find('_') + 1);
+		sIso639Code = sIso639Code.substr(0, sIso639Code.find('_'));
+	}
+
 	HyAssert(sIso639Code.empty() || sIso639Code.size() == 2, "ISO 639 code must be empty string or '2' characters");
 	HyAssert(sIso3166Code.empty() || sIso3166Code.size() == 2, "ISO 3166 code must be empty string or '2' characters");
 	HyAssert(sIso4217Code.empty() || sIso4217Code.size() == 3, "ISO 4217 code must be empty string or '3' characters");
@@ -48,6 +60,11 @@
 	std::transform(sm_sIso4217Code.begin(), sm_sIso4217Code.end(), sm_sIso4217Code.begin(), ::toupper);
 
 	AssembleFallbackNumpunct();
+}
+
+/*static*/ void HyLocale::Imbue(std::string sLangCountryCode, std::string sIso4217Code)
+{
+	HyLocale::Imbue(sLangCountryCode, "", sIso4217Code);
 }
 
 /*static*/ void HyLocale::SetMinorCurrencySymbol(std::string sMinorCurrencySymbolUtf8)
@@ -405,19 +422,46 @@
 	if(sm_Iso4217Map.empty())
 	{
 		sm_Iso4217Map["AED"] = 784;
+		sm_Iso4217Map["GBP"] = 826;
+		sm_Iso4217Map["EUR"] = 978;
 	}
 
-	if(sm_Iso4217Map.find(sm_sIso639Code) == sm_Iso4217Map.end())
+	if(sm_Iso4217Map.find(sm_sIso4217Code) == sm_Iso4217Map.end())
 	{
 		sm_FallbackNumpunctData.Set('.', ',', "\003", "$", "+", "-", 2);
 		sm_FallbackNumpunctWideData.Set(L'.', L',', "\003", L"$", L"+", L"-", 2);
 		return;
 	}
 
-	switch(sm_Iso4217Map[sm_sIso639Code])
+	char cDecimalPoint, cThousandsSep;
+	if(sm_sIso639Code == "en")
+	{
+		cDecimalPoint = '.';
+		cThousandsSep = ',';
+	}
+	else
+	{
+		cDecimalPoint = ',';
+		cThousandsSep = '.';
+	}
+
+	switch(sm_Iso4217Map[sm_sIso4217Code])
 	{
 	case 784: // AED - United Arab Emirates dirham
-		sm_FallbackNumpunctData.Set('.', ',', "\003", "$", "+", "-", 2);
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "$", "+", "-", 2);
+		break;
+
+	case 826: // GBP - Pound Sterling
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xC2\xA3", "+", "-", 2); // \xC2\xA3 is the "Pound" symbol
+		break;
+
+	case 978: // EUR - Euro
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xAC", "+", "-", 2); // \xE2\x82\xAC is the "Euro" symbol
+		break;
+
+	default:
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "$", "+", "-", 2);
+		sm_FallbackNumpunctWideData.Set(L'.', L',', "\003", L"$", L"+", L"-", 2);
 		break;
 	}
 }

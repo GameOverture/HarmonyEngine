@@ -65,11 +65,12 @@ class HyLocale
 
 public:
 	// Globally sets all HyLocale formatting
-	// if no ICU library, specified locale must be supported by the operating system
+	// if no ICU library, specified locale must be supported by the operating system or maintained in Harmony's fallback table
 	// sIso639Code: 2 letter lowercase Language Code (example: en)
 	// sIso3166Code: 2 letter uppercase Country Code (example: US)
-	// sIso4217Code: ***ONLY USED WITH ICU LIBRARY*** 3 letter uppercase Currency Code (example: USD)
-	static void Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code = "");
+	// sIso4217Code: 3 letter uppercase Currency Code (example: USD)
+	static void Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code);
+	static void Imbue(std::string sLangCountryCode, std::string sIso4217Code); // sLangCountryCode: a combined ISO639 and ISO3166 code delimited with a '-' or a '_'
 
 	// Once specified, HyNumberFormat's used in Money_Format() can optionally use the minor
 	// fractional symbol if the value is less than 1 integer unit (aka 50¢)
