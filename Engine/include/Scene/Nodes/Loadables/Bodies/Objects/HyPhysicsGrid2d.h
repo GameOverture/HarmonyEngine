@@ -36,6 +36,7 @@ protected:
 
 	float										m_fPixelsPerMeter;
 	float										m_fPpmInverse;
+	float										m_fTimeScalar;
 
 	int32										m_iPhysVelocityIterations;
 	int32										m_iPhysPositionIterations;
@@ -53,8 +54,12 @@ public:
 	virtual void SetNewChildAttributes(IHyNode2d &childRef) override;
 	virtual bool ChildRemove(IHyNode2d *pChild) override;
 	
+	void  SetTimeScalar(float fTimeScalar);
+
 	float GetPixelsPerMeter();
 	float GetPpmInverse();
+
+	b2World& GetWorld() { return m_b2World; }
 
 	bool IsDebugDraw();
 	void EnableDebugDraw(bool bEnableDebugDraw);

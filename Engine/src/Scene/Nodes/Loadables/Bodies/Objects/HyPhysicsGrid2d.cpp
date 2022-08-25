@@ -16,6 +16,7 @@ HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*
 	m_b2World(b2Vec2(vGravity.x, vGravity.y)),
 	m_fPixelsPerMeter(fPixelsPerMeter),
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
+	m_fTimeScalar(1.0f),
 	m_iPhysVelocityIterations(iVelocityIterations),
 	m_iPhysPositionIterations(iPositionIterations),
 	m_DebugDraw(*this)
@@ -105,6 +106,11 @@ void HyPhysicsGrid2d::UninitChildPhysics(IHyBody2d &bodyRef)
 	m_PhysChildMap.erase(&bodyRef);
 }
 
+void  HyPhysicsGrid2d::SetTimeScalar(float fTimeScalar)
+{
+	m_fTimeScalar = fTimeScalar;
+}
+
 float HyPhysicsGrid2d::GetPixelsPerMeter()
 {
 	return m_fPixelsPerMeter;
@@ -144,7 +150,7 @@ std::vector<HyPrimitive2d> &HyPhysicsGrid2d::GetDebugDrawList()
 		m_b2World.DebugDraw();
 	}
 
-	m_b2World.Step(HyEngine::DeltaTime(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	m_b2World.Step(HyEngine::DeltaTime() * m_fTimeScalar, m_iPhysVelocityIterations, m_iPhysPositionIterations);
 
 	HyEntity2d::Update();
 }
