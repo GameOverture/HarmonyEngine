@@ -73,7 +73,8 @@ public:
 	~HyDiagnostics();
 
 	void BootMessage();
-	
+
+	void Init(std::string sTextPrefix, std::string sTextName, uint32 uiTextState);
 	void Show(uint32 uiDiagFlags);
 	uint32 GetShowFlags();
 

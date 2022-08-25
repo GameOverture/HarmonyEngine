@@ -152,16 +152,26 @@ void HyDiagnostics::BootMessage()
 	HyLog("");
 }
 
-void HyDiagnostics::Show(uint32 uiDiagFlags)
+void HyDiagnostics::Init(std::string sTextPrefix, std::string sTextName, uint32 uiTextState)
 {
 	if(m_pDiagOutput == nullptr)
 		m_pDiagOutput = HY_NEW HyDiagOutput();
+	
+	m_pDiagOutput->InitText(sTextPrefix, sTextName, uiTextState);
+}
+
+void HyDiagnostics::Show(uint32 uiDiagFlags)
+{
+	if(m_pDiagOutput == nullptr)
+	{
+		HyLogWarning("HyDiagnostics::Show() was invoked before HyDiagnostics::Init() was callled");
+		return;
+	}
 
 	if(uiDiagFlags != 0 && m_pDiagOutput->IsLoaded() == false)
 		m_pDiagOutput->Load();
 
 	m_pDiagOutput->SetShowFlags(uiDiagFlags);
-	m_pDiagOutput->pos.Set(5, HyEngine::Window().GetHeight() - 5);
 	m_pDiagOutput->UseWindowCoordinates(0);
 }
 

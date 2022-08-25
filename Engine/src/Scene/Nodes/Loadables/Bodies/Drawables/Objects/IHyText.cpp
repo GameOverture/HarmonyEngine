@@ -668,7 +668,6 @@ offsetCalculation:
 	uint32 uiLastSpaceIndex = 0;
 	uint32 uiNewlineIndex = 0;
 	uint32 uiNumUnprintableCharacters = 0;
-	bool bTerminatedEarly = false;
 	bool bFirstCharacterOnNewLine = true;
 	float fFirstCharacterNudgeRightAmt = 0.0f;
 
@@ -754,7 +753,7 @@ offsetCalculation:
 				if(fCurLineDecender < (fDecender * m_fScaleBoxModifier))
 					fCurLineDecender = (fDecender * m_fScaleBoxModifier);
 
-				// If drawing text within a box, and we advance past our width, determine if we should newline
+				// If drawing text within a column, and we advance past our width, determine if we should newline
 				if((m_uiTextAttributes & TEXTATTRIB_IsScaleBox) == 0 &&
 					(m_uiTextAttributes & TEXTATTRIB_IsColumn) != 0 &&
 					fCurLineWidth > m_vBoxDimensions.x)
@@ -825,15 +824,8 @@ offsetCalculation:
 
 			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) != 0)
 				fNewLineOffset = fCurLineHeight;
-			else if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n')
-			{
-				// Text box is too small to fit a single character
+			else if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n') {
 				HyLogWarning("Text box is too small to fit a single character");
-
-				// NOTE: Commenting this out until I see if indents cause any issues
-				//m_uiNumValidCharacters = 0;
-				//bTerminatedEarly = true;
-				//break;
 			}
 
 			// Reset the write position onto a newline
@@ -863,6 +855,7 @@ offsetCalculation:
 			fLastSpacePosX = 0.0f;
 			fLastCharWidth = 0.0f;
 			fCurLineWidth = 0.0f;
+			fCurLineHeight = 0.0f;
 			fCurLineAscender = 0.0f;
 			fCurLineDecender = 0.0f;
 
@@ -873,12 +866,10 @@ offsetCalculation:
 		}
 	} // for(uiStrIndex < uiSTR_SIZE)
 
-	if(bTerminatedEarly == false)
-	{
-		m_uiNumValidCharacters = uiSTR_SIZE;
-		vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));	// Push the final line (row)
-	}
+	// Push the final line (row)
+	vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));
 
+	m_uiNumValidCharacters = uiSTR_SIZE;
 	m_uiNumRenderQuads = ((m_uiNumValidCharacters - uiNumUnprintableCharacters) * uiNUM_LAYERS);
 
 	// Fix each text line to match proper alignment (by default, HYALIGN_Left is already set at this point)

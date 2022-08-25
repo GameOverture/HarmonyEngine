@@ -16,10 +16,6 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
-#define HY_SYSTEM_FONT "+HyInternal", "+SystemText"
-#define HY_SYSTEM_FONT_SIZE 16.0f
-#define HY_SYSTEM_FONT_DISPLAYORDER 0x7FFFFF00
-
 class HyDiagOutput : public HyEntity2d
 {
 	double					m_dFrameTime_Low;
@@ -39,6 +35,8 @@ class HyDiagOutput : public HyEntity2d
 public:
 	HyDiagOutput();
 	virtual ~HyDiagOutput();
+
+	void InitText(std::string sPrefix, std::string sName, uint32 uiTextState);
 
 	void SetShowFlags(uint32 uiDiagFlags);
 	uint32 GetShowFlags();
