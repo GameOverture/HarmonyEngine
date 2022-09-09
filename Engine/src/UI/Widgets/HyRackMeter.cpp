@@ -35,7 +35,7 @@ HyRackMeter::HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, st
 	HyLabel(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_SpinText(this)
 {
-	OnSetup();
+	OnSetup(); 
 }
 
 /*virtual*/ HyRackMeter::~HyRackMeter()

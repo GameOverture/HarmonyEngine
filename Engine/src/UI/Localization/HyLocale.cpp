@@ -421,6 +421,7 @@
 {
 	if(sm_Iso4217Map.empty())
 	{
+		sm_Iso4217Map["PTS"] = 000;		// Points
 		sm_Iso4217Map["AED"] = 784;
 		sm_Iso4217Map["GBP"] = 826;
 		sm_Iso4217Map["EUR"] = 978;
@@ -445,23 +446,28 @@
 		cThousandsSep = '.';
 	}
 
+	int32 iFracDigits = 2;
 	switch(sm_Iso4217Map[sm_sIso4217Code])
 	{
+	case 000: // PTS - Points or game credits (not actual currency)
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "PT", "+", "-", iFracDigits);
+		break;
+
 	case 784: // AED - United Arab Emirates dirham
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "$", "+", "-", 2);
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "$", "+", "-", iFracDigits);
 		break;
 
 	case 826: // GBP - Pound Sterling
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xC2\xA3", "+", "-", 2); // \xC2\xA3 is the "Pound" symbol
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xC2\xA3", "+", "-", iFracDigits); // \xC2\xA3 is the "Pound" symbol
 		break;
 
 	case 978: // EUR - Euro
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xAC", "+", "-", 2); // \xE2\x82\xAC is the "Euro" symbol
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xAC", "+", "-", iFracDigits); // \xE2\x82\xAC is the "Euro" symbol
 		break;
 
 	default:
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "$", "+", "-", 2);
-		sm_FallbackNumpunctWideData.Set(L'.', L',', "\003", L"$", L"+", L"-", 2);
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "$", "+", "-", iFracDigits);
+		sm_FallbackNumpunctWideData.Set(L'.', L',', "\003", L"$", L"+", L"-", iFracDigits);
 		break;
 	}
 }
