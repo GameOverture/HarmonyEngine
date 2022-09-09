@@ -89,10 +89,13 @@ public:
 
 private:
 #ifdef HY_USE_ICU
-	static icu::number::LocalizedNumberFormatter AssembleFormatter(HyNumberFormat format);
+	static icu::number::LocalizedNumberFormatter AssembleFormatter(HyNumberFormat format, bool bIsMoney);
 #endif
 
 	static std::locale AssembleStdLocale();
+
+	static void HideFractionIfZero(std::string &sTextRef, char cDecimalChar);
+
 	static void AssembleFallbackNumpunct();
 
 	template<typename CharT>

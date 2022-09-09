@@ -105,6 +105,14 @@ HyNumberFormat HyNumberFormat::SetRounding(HyNumFmtRounding eRounding)
 	return *this;
 }
 
+// Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
+HyNumberFormat HyNumberFormat::SetFractionPrecision(int32 iMinFractionPlaces /*= 0*/, int32 iMaxFractionPlaces /*= 6*/)
+{
+	m_uiMinFraction = HyClamp(iMinFractionPlaces, 0, 15);
+	m_uiMaxFraction = HyClamp(iMaxFractionPlaces, 0, 15);
+	return *this;
+}
+
 bool HyNumberFormat::IsUsingMinorCurrencySymbol() const
 {
 	return (m_uiUseMinorCurrencySymbol == 1);
@@ -124,14 +132,6 @@ bool HyNumberFormat::IsUsingScientificNotation() const
 HyNumberFormat HyNumberFormat::SetUsingScientificNotation(bool bUseScientificNotation)
 {
 	m_uiUseScientificNotation = bUseScientificNotation ? 1 : 0;
-	return *this;
-}
-
-// Values will clamp to [0-15]
-HyNumberFormat HyNumberFormat::SetFractionPrecision(int32 iMinFractionPlaces /*= 0*/, int32 iMaxFractionPlaces /*= 6*/)
-{
-	m_uiMinFraction = HyClamp(iMinFractionPlaces, 0, 15);
-	m_uiMaxFraction = HyClamp(iMaxFractionPlaces, 0, 15);
 	return *this;
 }
 

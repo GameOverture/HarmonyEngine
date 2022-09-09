@@ -78,7 +78,7 @@
 
 #if HY_USE_ICU
 	UErrorCode eStatus = U_ZERO_ERROR;
-	auto localizedNumFormatter = AssembleFormatter(format);
+	auto localizedNumFormatter = AssembleFormatter(format, false);
 	auto formattedNum = localizedNumFormatter.formatInt(iValue, eStatus);
 	CHECK_ICU_STATUS(eStatus);
 
@@ -91,7 +91,8 @@
 #else
 	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	str.imbue(std::locale(loc, new HyNumpunct<char, int64>(format, iValue, loc.name())));
+	const auto *pFacet = new HyNumpunct<char, int64>(format, iValue, loc.name());
+	str.imbue(std::locale(loc, pFacet));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -104,6 +105,9 @@
 
 	str << iValue;
 	sText = str.str();
+
+	if(format.GetRounding() == HYFMTROUNDING_HideZeros)
+		HideFractionIfZero(sText, pFacet->decimal_point());
 #endif
 
 	return sText;
@@ -115,7 +119,7 @@
 
 #if HY_USE_ICU
 	UErrorCode eStatus = U_ZERO_ERROR;
-	auto localizedNumFormatter = AssembleFormatter(format);
+	auto localizedNumFormatter = AssembleFormatter(format, false);
 	auto formattedNum = localizedNumFormatter.formatDouble(dValue, eStatus);
 	CHECK_ICU_STATUS(eStatus);
 
@@ -128,7 +132,8 @@
 #else
 	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	str.imbue(std::locale(loc, new HyNumpunct<char, double>(format, dValue, loc.name())));
+	const auto *pFacet = new HyNumpunct<char, double>(format, dValue, loc.name());
+	str.imbue(std::locale(loc, pFacet));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -146,6 +151,9 @@
 		str << std::fixed << dValue;
 	
 	sText = str.str();
+
+	if(format.GetRounding() == HYFMTROUNDING_HideZeros)
+		HideFractionIfZero(sText, pFacet->decimal_point());
 #endif
 
 	return sText;
@@ -172,7 +180,7 @@
 		dDenominator *= 10.0;
 
 	UErrorCode eStatus = U_ZERO_ERROR;
-	auto localizedNumFormatter = AssembleFormatter(format);
+	auto localizedNumFormatter = AssembleFormatter(format, true);
 	localizedNumFormatter = localizedNumFormatter.unit(icu::CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
 	CHECK_ICU_STATUS(eStatus);
 
@@ -188,7 +196,8 @@
 #else
 	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	str.imbue(std::locale(loc, new HyMoneypunct<char, false, int64>(format, iValue, loc.name())));
+	const auto *pFacet = new HyMoneypunct<char, false, int64>(format, iValue, loc.name());
+	str.imbue(std::locale(loc, pFacet));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -204,6 +213,9 @@
 	else
 		str << std::showbase << std::put_money(iValue);
 	sText = str.str();
+	
+	if(format.GetRounding() == HYFMTROUNDING_HideZeros)
+		HideFractionIfZero(sText, pFacet->decimal_point());
 #endif
 
 	return sText;
@@ -225,7 +237,7 @@
 
 #if HY_USE_ICU
 	UErrorCode eStatus = U_ZERO_ERROR;
-	auto localizedNumFormatter = AssembleFormatter(format);
+	auto localizedNumFormatter = AssembleFormatter(format, true);
 	localizedNumFormatter = localizedNumFormatter.unit(icu::CurrencyUnit(sm_sIso4217Code.c_str(), eStatus));
 	CHECK_ICU_STATUS(eStatus);
 
@@ -243,7 +255,8 @@
 	std::locale loc = AssembleStdLocale();
 
 	std::stringstream str;
-	str.imbue(std::locale(loc, new HyMoneypunct<char, false, double>(format, dValue, loc.name())));
+	const auto *pFacet = new HyMoneypunct<char, false, double>(format, dValue, loc.name());
+	str.imbue(std::locale(loc, pFacet));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -265,6 +278,9 @@
 		str << std::showbase << std::put_money(dValue * dDenominator);
 
 	sText = str.str();
+
+	if(format.GetRounding() == HYFMTROUNDING_HideZeros)
+		HideFractionIfZero(sText, pFacet->decimal_point());
 #endif
 
 	return sText;
@@ -295,7 +311,7 @@
 
 #if HY_USE_ICU
 	UErrorCode eStatus = U_ZERO_ERROR;
-	auto localizedNumFormatter = AssembleFormatter(format);
+	auto localizedNumFormatter = AssembleFormatter(format, false);
 	localizedNumFormatter = localizedNumFormatter.unit(icu::NoUnit::percent());
 
 	auto formattedNum = localizedNumFormatter.formatDouble(dValue, eStatus);
@@ -318,7 +334,7 @@
 }
 
 #ifdef HY_USE_ICU
-/*static*/ icu::number::LocalizedNumberFormatter HyLocale::AssembleFormatter(HyNumberFormat format)
+/*static*/ icu::number::LocalizedNumberFormatter HyLocale::AssembleFormatter(HyNumberFormat format, bool bIsMoney)
 {
 	auto localizedNumFormatter = icu::number::NumberFormatter::withLocale(icu::Locale(sm_sIso639Code.c_str(), sm_sIso3166Code.c_str()));
 
@@ -373,6 +389,13 @@
 		//localizedNumFormatter = localizedNumFormatter.precision(number::Precision::minMaxFraction(format.m_uiMinFraction, format.m_uiMaxFraction));
 	default:
 		break;
+
+	case HYFMTROUNDING_HideZeros:
+		if(bIsMoney)
+			localizedNumFormatter = localizedNumFormatter.precision(icu::number::Precision::currency(UCURR_USAGE_STANDARD).trailingZeroDisplay(UNUM_TRAILING_ZERO_HIDE_IF_WHOLE));
+		else
+			localizedNumFormatter = localizedNumFormatter.precision(icu::number::Precision::minMaxFraction(format.m_uiMinFraction, format.m_uiMaxFraction).trailingZeroDisplay(UNUM_TRAILING_ZERO_HIDE_IF_WHOLE));
+		break;
 	case HYFMTROUNDING_Ceiling:
 		localizedNumFormatter = localizedNumFormatter.roundingMode(UNumberFormatRoundingMode::UNUM_ROUND_CEILING);
 		break;
@@ -415,6 +438,25 @@
 	}
 	
 	return assembledLocale;
+}
+
+/*static*/ void HyLocale::HideFractionIfZero(std::string &sTextRef, char cDecimalChar)
+{
+	size_t uiDecIndex = sTextRef.find_last_of(cDecimalChar);
+	if(uiDecIndex != std::string::npos)
+	{
+		bool bAllZeros = true;
+		for(size_t i = uiDecIndex + 1; i < sTextRef.size(); ++i)
+		{
+			if(sTextRef[i] != '0')
+			{
+				bAllZeros = false;
+				break;
+			}
+		}
+		if(bAllZeros)
+			sTextRef = sTextRef.substr(0, uiDecIndex);
+	}
 }
 
 /*static*/ void HyLocale::AssembleFallbackNumpunct()

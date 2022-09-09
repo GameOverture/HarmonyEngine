@@ -38,9 +38,10 @@ enum HyNumFmtGrouping // Use separators to break up larger integer values (aka t
 	HYFMTGROUPING_Min2,						// Display grouping using locale defaults, except do not show grouping on values smaller than 10000 (such that there is a minimum of two digits before the first separator)
 	HYFMTGROUPING_Thousands					// Use the Western defaults: groups of 3 and enabled for all numbers 1000 or greater. Do not use locale data for determining the grouping strategy.
 };
-enum HyNumFmtRounding // Whether to round any fractional values to a whole integer
+enum HyNumFmtRounding // Decides how to round any fractional values to a whole integer
 {
 	HYFMTROUNDING_None = 0,					// Default. Shows fractional values using the precision specified by HyNumberFormat::SetFractionPrecision() padding values
+	HYFMTROUNDING_HideZeros,				// Hides trailing zeros in the fractional display of numbers (unless it's money). If showing money, will hide entire fraction if value is whole number
 	HYFMTROUNDING_Ceiling,
 	HYFMTROUNDING_Floor,
 #ifdef HY_USE_ICU
@@ -93,6 +94,9 @@ public:
 	// Whether to round any fractional values to a whole integer
 	HyNumberFormat SetRounding(HyNumFmtRounding eRounding);
 
+	// Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
+	HyNumberFormat SetFractionPrecision(int32 iMinFractionPlaces = 0, int32 iMaxFractionPlaces = 6);
+
 	// Whether to optionally use the minor fractional symbol when formatting currencies if the value is less than 1 integer unit (aka 50¢)
 	bool IsUsingMinorCurrencySymbol() const;
 	// Whether to optionally use the minor fractional symbol when formatting currencies if the value is less than 1 integer unit (aka 50¢)
@@ -102,9 +106,6 @@ public:
 	bool IsUsingScientificNotation() const;
 	// Whether to optionally format floating-point values using scientific notation
 	HyNumberFormat SetUsingScientificNotation(bool bUseScientificNotation);
-
-	// Values will clamp to [0-15]
-	HyNumberFormat SetFractionPrecision(int32 iMinFractionPlaces = 0, int32 iMaxFractionPlaces = 6);
 
 	// Minimum number of integer digits to display. Will pad with zeros.
 	// Valid values for 'iZeroPaddingPlaces' [0-127]
