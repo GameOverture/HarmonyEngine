@@ -116,7 +116,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	QString sBaseClassDecl;
 	QString sClassCtorSignature;
 	QString sMemberInitializerList;
-	QString sClassFuncs;
+	QString sClassFuncs; // protected class methods
 	if(sBaseClass.isEmpty() == false)
 	{
 		sBaseClassDecl = " : public " + sBaseClass;

@@ -9,6 +9,7 @@ public:
 	%HY_CLASS%(%HY_CLASSCTORSIG%);
 	virtual ~%HY_CLASS%();
 
+protected:
 	%HY_CLASSFUNCS%
 };
 

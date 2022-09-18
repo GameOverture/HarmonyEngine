@@ -71,7 +71,7 @@ class HyAssets : public IHyThreadClass
 	};
 	Factory<HyAudioData>										m_AudioFactory;
 	Factory<HySpriteData>										m_SpriteFactory;
-	Factory<HyTextData>										m_TextFactory;
+	Factory<HyTextData>											m_TextFactory;
 	Factory<HySpineData>										m_SpineFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
 	std::map<std::pair<uint32, uint32>, HyTexturedQuadData *>	m_Quad2d;
