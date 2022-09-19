@@ -498,11 +498,11 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 	return true;
 }
-
+		
 void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	SetDirty(DIRTY_ALL);
-	childRef.SetParentsVisible(GetInternalFlags() & EXPLICIT_ParentsVisible);
+	childRef.SetParentsVisible(IsVisible() && (GetInternalFlags() & EXPLICIT_ParentsVisible));
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsBody)
@@ -526,7 +526,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	IHyNode::SetParentsVisible(bParentsVisible);
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->SetParentsVisible(bParentsVisible);
+		m_ChildList[i]->SetParentsVisible(IsVisible() && bParentsVisible);
 }
 
 /*virtual*/ void HyEntity2d::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) /*override final*/
