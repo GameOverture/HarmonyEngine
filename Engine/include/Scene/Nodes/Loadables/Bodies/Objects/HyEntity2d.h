@@ -46,7 +46,6 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OVERRIDES + OVERLOADS
 	virtual void SetVisible(bool bEnabled) override;
-	void SetVisible(bool bEnabled, bool bOverrideExplicitChildren);
 
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused) override;
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
@@ -110,7 +109,7 @@ protected:
 
 	virtual void SetNewChildAttributes(IHyNode2d &childRef);
 
-	virtual void _SetVisible(bool bEnabled, bool bIsOverriding) override final;
+	virtual void SetParentsVisible(bool bParentsVisible) override final;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
 	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding) override final;
 	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;

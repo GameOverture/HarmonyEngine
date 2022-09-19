@@ -38,7 +38,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ void EntityDraw::OnHide() /*override*/
 {
-	SetVisible(false, true);
+	SetVisible(false);
 }
 
 /*virtual*/ void EntityDraw::OnResizeRenderer() /*override*/

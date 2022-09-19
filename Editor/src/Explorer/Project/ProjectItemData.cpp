@@ -301,7 +301,7 @@ void ProjectItemData::DrawLoad()
 
 	m_pDraw->ApplyJsonData();
 	m_pDraw->Load();
-	m_pDraw->SetVisible(false, true);
+	m_pDraw->SetVisible(false);
 }
 
 void ProjectItemData::DrawUnload()

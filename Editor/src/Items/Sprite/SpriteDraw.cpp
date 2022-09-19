@@ -134,6 +134,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnShow() /*override*/
 {
+	SetVisible(true);
 	m_Sprite.SetVisible(true);
 	if(m_pProjItem)
 		m_pProjItem->GetProject().ShowOrigin(true);
@@ -141,7 +142,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnHide() /*override*/
 {
-	SetVisible(false, true);
+	SetVisible(false);
 }
 
 /*virtual*/ void SpriteDraw::OnResizeRenderer() /*override*/

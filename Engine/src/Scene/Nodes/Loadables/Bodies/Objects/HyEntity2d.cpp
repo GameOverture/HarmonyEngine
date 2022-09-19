@@ -50,20 +50,11 @@ void HyEntity2d::InitChildren()
 
 /*virtual*/ void HyEntity2d::SetVisible(bool bEnabled) /*override*/
 {
-	SetVisible(bEnabled, false);
-}
+	IHyNode::SetVisible(bEnabled);
 
-void HyEntity2d::SetVisible(bool bEnabled, bool bOverrideExplicitChildren)
-{
-	if(bEnabled)
-		m_uiFlags |= SETTING_IsVisible;
-	else
-		m_uiFlags &= ~SETTING_IsVisible;
-
-	m_uiFlags |= EXPLICIT_Visible;
-
+	bool bPropagateVisible = IsVisible() && (GetInternalFlags() & EXPLICIT_ParentsVisible);
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_SetVisible(bEnabled, bOverrideExplicitChildren);
+		m_ChildList[i]->SetParentsVisible(bPropagateVisible);
 }
 
 /*virtual*/ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused) /*override*/
@@ -509,7 +500,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	SetDirty(DIRTY_ALL);
-	childRef._SetVisible(IsVisible(), false);
+	childRef.SetParentsVisible(GetInternalFlags() & EXPLICIT_ParentsVisible);
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsBody)
@@ -529,15 +520,11 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 		sm_pHyAssets->SetEntityLoaded(this);
 }
 
-/*virtual*/ void HyEntity2d::_SetVisible(bool bEnabled, bool bIsOverriding) /*override final*/
+/*virtual*/ void HyEntity2d::SetParentsVisible(bool bParentsVisible) /*override final*/
 {
-	IHyNode::_SetVisible(bEnabled, bIsOverriding);
-
-	if(0 == (m_uiFlags & EXPLICIT_Visible))
-	{
-		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetVisible(IsVisible(), bIsOverriding);
-	}
+	IHyNode::SetParentsVisible(bParentsVisible);
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+		m_ChildList[i]->SetParentsVisible(bParentsVisible);
 }
 
 /*virtual*/ void HyEntity2d::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) /*override final*/

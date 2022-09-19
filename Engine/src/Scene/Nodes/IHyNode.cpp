@@ -15,7 +15,7 @@
 HyScene *IHyNode::sm_pScene = nullptr;
 
 IHyNode::IHyNode(HyType eNodeType) :
-	m_uiFlags(static_cast<uint32>(eNodeType) | SETTING_IsVisible)
+	m_uiFlags(static_cast<uint32>(eNodeType) | SETTING_IsVisible | EXPLICIT_ParentsVisible)
 #ifdef HY_ENABLE_USER_TAGS
 	, m_iTag(0)
 #endif
@@ -130,8 +130,6 @@ bool IHyNode::IsVisible() const
 		m_uiFlags |= SETTING_IsVisible;
 	else
 		m_uiFlags &= ~SETTING_IsVisible;
-
-	m_uiFlags |= EXPLICIT_Visible;
 }
 
 bool IHyNode::IsPauseUpdate() const
@@ -198,18 +196,12 @@ bool IHyNode::IsRegistered() const
 	}
 }
 
-/*virtual*/ void IHyNode::_SetVisible(bool bEnabled, bool bIsOverriding)
+/*virtual*/ void IHyNode::SetParentsVisible(bool bParentsVisible)
 {
-	if(bIsOverriding)
-		m_uiFlags &= ~EXPLICIT_Visible;
-
-	if(0 == (m_uiFlags & EXPLICIT_Visible))
-	{
-		if(bEnabled)
-			m_uiFlags |= SETTING_IsVisible;
-		else
-			m_uiFlags &= ~SETTING_IsVisible;
-	}
+	if(bParentsVisible)
+		m_uiFlags |= EXPLICIT_ParentsVisible;
+	else
+		m_uiFlags &= ~EXPLICIT_ParentsVisible;
 }
 
 /*virtual*/ void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)

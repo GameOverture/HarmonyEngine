@@ -74,7 +74,7 @@ SpineDraw::~SpineDraw()
  
 /*virtual*/ void SpineDraw::OnHide() /*override*/
 {
-	SetVisible(false, true);
+	SetVisible(false);
 }
 
 /*virtual*/ void SpineDraw::OnResizeRenderer() /*override*/

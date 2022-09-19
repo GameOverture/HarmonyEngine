@@ -52,7 +52,11 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 		return;
 	}
 
-	m_AnimCallbackList[uiStateIndex].first = callBack;
+	if(callBack == nullptr)
+		m_AnimCallbackList[uiStateIndex].first = NullAnimCallback;
+	else
+		m_AnimCallbackList[uiStateIndex].first = callBack;
+
 	m_AnimCallbackList[uiStateIndex].second = pParam;
 }
 

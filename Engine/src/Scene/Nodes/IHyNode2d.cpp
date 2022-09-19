@@ -31,10 +31,9 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 	if(m_pParent)
 	{
 		HyNodeCtorAppend(m_pParent, this);
-		if(m_pParent->IsVisible() == false)
-		{
-			m_uiFlags &= ~SETTING_IsVisible;
-		}
+
+		SetParentsVisible(m_pParent->IsVisible() && m_pParent->GetInternalFlags() & EXPLICIT_ParentsVisible);
+
 		if(m_pParent->IsPauseUpdate())
 		{
 			m_uiFlags |= SETTING_IsPauseUpdate;

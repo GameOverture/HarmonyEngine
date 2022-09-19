@@ -245,5 +245,29 @@ float IDraw::GetLineThickness(HyZoomLevel eZoomLevel)
 	case HYZOOM_100:
 	default:
 		return 1.0f;
+			
+	case HYZOOM_200:
+		return 0.5f;
+			
+	case HYZOOM_300:
+		return 0.333333f;
+		
+	case HYZOOM_400:
+		return 0.25f;
+
+	case HYZOOM_500:
+		return 0.2f;
+
+	case HYZOOM_600:
+		return 0.166666f;
+
+	case HYZOOM_800:
+		return 0.125f;
+
+	case HYZOOM_1200:
+		return 0.083333f;
+
+	case HYZOOM_1600:
+		return 0.0625f;
 	}
 }

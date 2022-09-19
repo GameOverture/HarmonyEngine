@@ -56,7 +56,7 @@ public:
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
 	enum ExplicitFlag // NOTE: continue the bits in DirtyFlag (stored in same 32bit member 'm_uiFlags')
 	{
-		EXPLICIT_Visible			= 1 << 18,
+		EXPLICIT_ParentsVisible		= 1 << 18,
 		EXPLICIT_PauseUpdate		= 1 << 19,
 		EXPLICIT_Scissor			= 1 << 20,
 		EXPLICIT_Stencil			= 1 << 21,
@@ -109,7 +109,7 @@ protected:
 
 	virtual void Update();																// Only Scene will invoke this
 	
-	virtual void _SetVisible(bool bEnabled, bool bIsOverriding);						// Only Entity2d/3d will invoke this
+	virtual void SetParentsVisible(bool bParentsVisible);								// Only Entity2d/3d will invoke this
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
 
 	virtual void SetDirty(uint32 uiDirtyFlags);

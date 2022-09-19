@@ -69,6 +69,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 
 /*virtual*/ void TextDraw::OnShow() /*override*/
 {
+	SetVisible(true);
 	m_Text.SetVisible(true);
 	if(m_pProjItem)
 		m_pProjItem->GetProject().ShowOrigin(false);
@@ -76,7 +77,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 
 /*virtual*/ void TextDraw::OnHide() /*override*/
 {
-	SetVisible(false, true);
+	SetVisible(false);
 }
 
 /*virtual*/ void TextDraw::OnResizeRenderer() /*override*/

@@ -132,7 +132,7 @@ void HyEntity3d::ForEachChild(std::function<void(IHyNode3d *)> func)
 void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 {
 	SetDirty(DIRTY_ALL);
-	childRef._SetVisible(IsVisible(), false);
+	childRef.SetParentsVisible(GetInternalFlags() & EXPLICIT_ParentsVisible);
 	childRef._SetPauseUpdate(IsPauseUpdate(), false);
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsBody)
