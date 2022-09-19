@@ -279,6 +279,8 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 			if(pChild->m_uiFlags & NODETYPE_IsBody)
 				static_cast<IHyBody2d *>(pChild)->physics.Uninit();
 
+			(*iter)->m_uiFlags |= EXPLICIT_ParentsVisible;
+
 			(*iter)->m_pParent = nullptr;
 			m_ChildList.erase(iter);
 
