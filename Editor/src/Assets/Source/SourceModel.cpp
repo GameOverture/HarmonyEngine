@@ -383,21 +383,23 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	return returnList;
 }
 
-/*virtual*/ bool SourceModel::OnRemoveAssets(QList<AssetItemData *> assetList) /*override*/
+/*virtual*/ bool SourceModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<AssetItemData *> assetList) /*override*/
 {
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		SourceFile *pFile = static_cast<SourceFile *>(assetList[i]);
-		QString sFileToDelete = m_MetaDir.filePath(pFile->GetFilter() % "/" % pFile->GetName());
+		QString sPrefix = sPreviousFilterPaths[i];
+		if(sPrefix.isEmpty() == false)
+			sPrefix += "/";
+		QString sFileToDelete = m_MetaDir.absoluteFilePath(sPrefix % pFile->GetName());
 		
+		// Instead of DeleteAsset(), do it manually here
+		RemoveLookup(pFile);
 		if(QFile::remove(sFileToDelete) == false)
 		{
 			HyGuiLog("QFile::remove failed: " % sFileToDelete, LOGTYPE_Error);
 			continue;
 		}
-
-		//DeleteAsset(pFile);
-		//delete pFile;
 	}
 
 	return true;

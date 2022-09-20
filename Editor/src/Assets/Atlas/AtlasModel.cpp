@@ -295,7 +295,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	return returnList;
 }
 
-/*virtual*/ bool AtlasModel::OnRemoveAssets(QList<AssetItemData *> assetList) /*override*/
+/*virtual*/ bool AtlasModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<AssetItemData *> assetList) /*override*/
 {
 	QMap<BankData *, QSet<int> > repackTexIndexMap;
 	for(int i = 0; i < assetList.count(); ++i)

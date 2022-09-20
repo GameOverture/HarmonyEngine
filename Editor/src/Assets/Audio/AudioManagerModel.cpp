@@ -159,7 +159,7 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 	return returnList;
 }
 
-/*virtual*/ bool AudioManagerModel::OnRemoveAssets(QList<AssetItemData *> assetList) /*override*/
+/*virtual*/ bool AudioManagerModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<AssetItemData *> assetList) /*override*/
 {
 	QSet<BankData *> affectedBankSet;
 	for(int i = 0; i < assetList.count(); ++i)
