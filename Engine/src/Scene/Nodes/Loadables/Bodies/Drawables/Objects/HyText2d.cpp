@@ -83,7 +83,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	m_DebugBox.scale.Set(vScale);
 	m_DebugBox.UseWindowCoordinates(GetCoordinateSystem());
 	m_DebugBox.SetDisplayOrder(GetDisplayOrder()+1);
-	m_DebugBox.SetVisible(IsVisible());
+	m_DebugBox.SetVisible(IsValidToRender());
 #endif
 
 	CalculateGlyphInfos();
