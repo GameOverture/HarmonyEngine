@@ -112,6 +112,8 @@ public:
 	static HyShaderHandle DefaultShaderHandle(HyType eType);
 	static std::string DateTime();
 	static std::string DataDir();
+	static HyTextureHandle HotLoadTexture(std::string sFilePath, HyTextureFiltering eFiltering, int32 &iWidthOut, int32 &iHeightOut);
+	static void HotUnloadTexture(HyTextureHandle hTexHandle);
 };
 
 #endif /* HyEngine_h__ */
