@@ -80,9 +80,12 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Nodes/HyTextData.cpp
 	src/Assets/Nodes/HyTexturedQuadData.cpp
 	src/Assets/Nodes/IHyNodeData.cpp
+	src/Audio/HyAudioBank.cpp
 	src/Audio/IHyAudioCore.cpp
+	src/Audio/miniaudio/HyAudioCore_miniaudio.cpp
+	src/Audio/miniaudio/HySoundBuffer_miniaudio.cpp
 	src/Audio/SDL2/HyAudioCore_SDL2.cpp
-	src/Audio/SDL2/HyFileAudioImpl_SDL2.cpp
+	src/Audio/SDL2/HySoundBuffer_SDL2.cpp
 	src/Diagnostics/HyDiagnostics.cpp
 	src/Diagnostics/Console/IHyConsole.cpp
 	src/Diagnostics/Console/Interop/HyConsole_Std.cpp
@@ -203,9 +206,11 @@ set(HYENGINE_HEADER_FILES
 	include/Assets/Nodes/HyTexturedQuadData.h
 	include/Assets/Nodes/IHyNodeData.h
 	include/Audio/IHyAudioCore.h
-	include/Audio/IHyFileAudioImpl.h
+	include/Audio/HyAudioBank.h
+	include/Audio/miniaudio/HyAudioCore_miniaudio.h
+	include/Audio/miniaudio/HySoundBuffer_miniaudio.h
 	include/Audio/SDL2/HyAudioCore_SDL2.h
-	include/Audio/SDL2/HyFileAudioImpl_SDL2.h
+	include/Audio/SDL2/HySoundBuffer_SDL2.h
 	include/Diagnostics/HyDiagnostics.h
 	include/Diagnostics/Console/IHyConsole.h
 	include/Diagnostics/Console/Interop/HyConsole_Std.h

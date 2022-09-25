@@ -40,7 +40,7 @@ protected:
 	float											m_fGlobalSfxVolume;
 	float											m_fGlobalMusicVolume;
 
-	std::vector<IHyFileAudioImpl *>					m_AudioFileList;
+	std::vector<HyAudioBank *>						m_AudioFileList;
 
 	// Keep track of active SFX's
 	struct PlayInfo
@@ -64,10 +64,9 @@ public:
 	void SetMusicVolume(float fGlobalMusicVolume);
 
 protected:
-	IHyFileAudioImpl *AllocateAudioBank(HyJsonObj bankObj);
+	HyAudioBank *AllocateAudioBank(HyJsonObj bankObj);
 	void ProcessCue(IHyNode *pNode, CueType eCueType);
 
-	virtual IHyFileAudioImpl *OnAllocateAudioBank(HyJsonObj bankObj) = 0;
 	virtual void OnSetSfxVolume(float fGlobalSfxVolume) = 0;
 	virtual void OnSetMusicVolume(float fGlobalMusicVolume) = 0;
 
@@ -87,10 +86,6 @@ public:
 	HyAudioCore_Null() = default;
 	virtual ~HyAudioCore_Null() = default;
 
-	virtual IHyFileAudioImpl *OnAllocateAudioBank(HyJsonObj bankObj) override
-	{
-		return HY_NEW HyAudioBank_Null();
-	}
 	virtual void OnSetSfxVolume(float fGlobalSfxVolume) override
 	{ }
 	virtual void OnSetMusicVolume(float fGlobalMusicVolume) override

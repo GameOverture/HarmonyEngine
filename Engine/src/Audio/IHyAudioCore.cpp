@@ -39,12 +39,12 @@ void IHyAudioCore::SetMusicVolume(float fGlobalMusicVolume)
 	OnSetMusicVolume(m_fGlobalMusicVolume);
 }
 
-IHyFileAudioImpl *IHyAudioCore::AllocateAudioBank(HyJsonObj bankObj)
+HyAudioBank *IHyAudioCore::AllocateAudioBank(HyJsonObj bankObj)
 {
-	IHyFileAudioImpl *pNewlyAlloc = OnAllocateAudioBank(bankObj);
-	m_AudioFileList.push_back(pNewlyAlloc);
+	HyAudioBank *pNewBank = HY_NEW HyAudioBank(*this, bankObj);
+	m_AudioFileList.push_back(pNewBank);
 
-	return pNewlyAlloc;
+	return pNewBank;
 }
 
 void IHyAudioCore::ProcessCue(IHyNode *pNode, CueType eCueType)

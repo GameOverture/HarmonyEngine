@@ -178,8 +178,12 @@
 			Patch_8to9(metaAtlasDoc, dataAtlasDoc);
 			[[fallthrough]];
 		case 9:
+			HyGuiLog("Patching project files: version 9 -> 10", LOGTYPE_Info);
+			Patch_9to10(metaAudioDoc, dataAudioDoc);
+			[[fallthrough]];
+		case 10:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 9, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 10, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -926,6 +930,77 @@
 	}
 	dataAtlasObj.insert("banks", banksArray);
 	dataAtlasDocRef.setObject(dataAtlasObj);
+}
+
+/*static*/ void VersionPatcher::Patch_9to10(QJsonDocument &metaAudioDocRef, QJsonDocument &dataAudioDocRef)
+{
+	QJsonObject metaAudioObj = metaAudioDocRef.object();
+	metaAudioObj.insert("nextGroupId", 2);
+	QJsonArray assetsArray = metaAudioObj["assets"].toArray();
+	for(int iAssetIndex = 0; iAssetIndex < assetsArray.size(); ++iAssetIndex)
+	{
+		// Add "groupId"; rename "isMusic" -> "isStreaming"; rename "globalLimit" -> "instanceLimit"
+		QJsonObject assetObj = assetsArray.at(iAssetIndex).toObject();
+
+		assetObj.insert("groupId", 0);
+
+		bool bStreaming = assetObj["isMusic"].toBool();
+		assetObj.remove("isMusic");
+		assetObj.insert("isStreaming", bStreaming);
+
+		int iInstanceLimit = assetObj["globalLimit"].toInt();
+		if(iInstanceLimit < 0)
+			iInstanceLimit = 0;
+		assetObj.remove("globalLimit");
+		assetObj.insert("instanceLimit", iInstanceLimit);
+
+		assetsArray.replace(iAssetIndex, assetObj);
+	}
+	metaAudioObj.insert("assets", assetsArray);
+	metaAudioDocRef.setObject(metaAudioObj);
+
+
+	QJsonObject dataAudioObj = dataAudioDocRef.object();
+	QJsonArray banksArray = dataAudioObj["banks"].toArray();
+	for(int iBankIndex = 0; iBankIndex < banksArray.size(); ++iBankIndex)
+	{
+		QJsonObject bankObj = banksArray.at(iBankIndex).toObject();
+		QJsonArray bankAssetsArray = bankObj["assets"].toArray();
+		for(int iAssetIndex = 0; iAssetIndex < bankAssetsArray.size(); ++iAssetIndex)
+		{
+			// Add "groupId"; rename "isMusic" -> "isStreaming"; rename "globalLimit" -> "instanceLimit"
+			QJsonObject assetObj = bankAssetsArray.at(iAssetIndex).toObject();
+			assetObj.insert("groupId", 0);
+
+			bool bStreaming = assetObj["isMusic"].toBool();
+			assetObj.remove("isMusic");
+			assetObj.insert("isStreaming", bStreaming);
+
+			int iInstanceLimit = assetObj["globalLimit"].toInt();
+			if(iInstanceLimit < 0)
+				iInstanceLimit = 0;
+			assetObj.remove("globalLimit");
+			assetObj.insert("instanceLimit", iInstanceLimit);
+
+			bankAssetsArray.replace(iAssetIndex, assetObj);
+		}
+		bankObj.insert("assets", bankAssetsArray);
+		banksArray.replace(iBankIndex, bankObj);
+	}
+	dataAudioObj.insert("banks", banksArray);
+
+	QJsonArray groupsArray;
+	QJsonObject sfxGroup;
+	sfxGroup.insert("groupName", "SFX");
+	sfxGroup.insert("groupId", 0);
+	groupsArray.push_back(sfxGroup);
+	QJsonObject musicGroup;
+	musicGroup.insert("groupName", "Music");
+	musicGroup.insert("groupId", 1);
+	groupsArray.push_back(musicGroup);
+	dataAudioObj.insert("groups", groupsArray);
+
+	dataAudioDocRef.setObject(dataAudioObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

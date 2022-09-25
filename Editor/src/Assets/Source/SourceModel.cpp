@@ -427,7 +427,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 {
 }
 
-/*virtual*/ void SourceModel::OnSaveMeta() /*override*/
+/*virtual*/ void SourceModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
 {
 	const BankData *pSourceBank = m_BanksModel.GetBank(0);
 

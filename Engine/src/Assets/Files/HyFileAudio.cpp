@@ -11,7 +11,7 @@
 #include "Assets/Files/HyFileAudio.h"
 #include "HyEngine.h"
 
-HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyFileAudioImpl *pInternal) :
+HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, HyAudioBank *pInternal) :
 	IHyFile(sFilePath, HYFILE_AudioBank, uiManifestIndex),
 	m_pInternal(pInternal)
 {
@@ -25,7 +25,7 @@ HyFileAudio::~HyFileAudio()
 
 bool HyFileAudio::ContainsAsset(uint32 uiAssetChecksum)
 {
-	return m_pInternal->ContainsAsset(uiAssetChecksum);
+	return m_pInternal->ContainsSound(uiAssetChecksum);
 }
 
 /*virtual*/ std::string HyFileAudio::AssetTypeName() /*override*/

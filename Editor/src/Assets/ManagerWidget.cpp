@@ -530,7 +530,7 @@ void ManagerWidget::on_actionAssetSettings_triggered()
 	if(selectedAssetsList.empty())
 		return;
 
-	DlgAssetProperties dlg(m_pModel->GetAssetType(), selectedAssetsList);
+	DlgAssetProperties dlg(m_pModel, selectedAssetsList);
 	if(dlg.exec() == QDialog::Accepted)
 		m_pModel->ReplaceAssets(dlg.GetChangedAssets(), false);
 }

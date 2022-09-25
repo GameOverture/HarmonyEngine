@@ -1,32 +1,29 @@
 /**************************************************************************
-*	HyFileAudioImpl_SDL2.h
-*
+*	HyAudioBank.cpp
+*	
 *	Harmony Engine
-*	Copyright (c) 2020 Jason Knobler
+*	Copyright (c) 2019 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "Audio/SDL2/HyFileAudioImpl_SDL2.h"
-#include "Diagnostics/Console/IHyConsole.h"
-#include "Utilities/HyIO.h"
+#include "Afx/HyInteropAfx.h"
+#include "Audio/HyAudioBank.h"
 
-#if defined(HY_USE_SDL2)
-
-HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj bankObj)
+HyAudioBank::HyAudioBank(IHyAudioCore &coreRef, HyJsonObj bankObj)
 {
 	HyJsonArray assetsArray = bankObj["assets"].GetArray();
 	for(uint32 i = 0; i < assetsArray.Size(); ++i)
 	{
 		HyJsonObj assetObj = assetsArray[i].GetObject();
+		IHySoundBuffer *pNewBuffer = HY_NEW HySoundBufferInterop(coreRef, assetObj["fileName"].GetString(), assetObj["groupId"].GetInt(), assetObj["isStreaming"].GetBool(), assetObj["instanceLimit"].GetInt());
 
-		HySdlRawSoundBuffer *pNewBuffer = HY_NEW HySdlRawSoundBuffer(assetObj["fileName"].GetString(), assetObj["isMusic"].GetBool());
 		m_SoundBuffers.push_back(pNewBuffer);
 		m_ChecksumMap[assetObj["checksum"].GetUint()] = pNewBuffer;
 	}
 }
 
-/*virtual*/ HyFileAudioImpl_SDL2::~HyFileAudioImpl_SDL2()
+/*virtual*/ HyAudioBank::~HyAudioBank()
 {
 	Unload();
 
@@ -34,12 +31,21 @@ HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj bankObj)
 		delete m_SoundBuffers[i];
 }
 
-/*virtual*/ bool HyFileAudioImpl_SDL2::ContainsAsset(uint32 uiAssetChecksum) /*override*/
+/*virtual*/ bool HyAudioBank::ContainsSound(uint32 uiAssetChecksum)
 {
 	return m_ChecksumMap.find(uiAssetChecksum) != m_ChecksumMap.end();
 }
 
-/*virtual*/ bool HyFileAudioImpl_SDL2::Load(std::string sFilePath) /*override*/
+IHySoundBuffer *HyAudioBank::GetSound(uint32 uiChecksum)
+{
+	auto iter = m_ChecksumMap.find(uiChecksum);
+	if(iter == m_ChecksumMap.end())
+		return nullptr;
+
+	return iter->second;
+}
+
+/*virtual*/ bool HyAudioBank::Load(std::string sFilePath)
 {
 	bool bAllLoaded = true;
 	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBuffers.size()); ++i)
@@ -51,19 +57,8 @@ HyFileAudioImpl_SDL2::HyFileAudioImpl_SDL2(HyJsonObj bankObj)
 	return bAllLoaded;
 }
 
-/*virtual*/ void HyFileAudioImpl_SDL2::Unload() /*override*/
+/*virtual*/ void HyAudioBank::Unload()
 {
 	for(uint32 i = 0; i < m_SoundBuffers.size(); ++i)
 		m_SoundBuffers[i]->Unload();
 }
-
-HySdlRawSoundBuffer *HyFileAudioImpl_SDL2::GetBufferInfo(uint32 uiChecksum)
-{
-	auto iter = m_ChecksumMap.find(uiChecksum);
-	if(iter == m_ChecksumMap.end())
-		return nullptr;
-
-	return iter->second;
-}
-
-#endif // defined(HY_USE_SDL2)

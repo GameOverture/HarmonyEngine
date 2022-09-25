@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/HyAudioData.h"
 #include "Audio/SDL2/HyAudioCore_SDL2.h"
-#include "Audio/SDL2/HyFileAudioImpl_SDL2.h"
+#include "Audio/SDL2/HySoundBuffer_SDL2.h"
 #include "Utilities/HyMath.h"
 
 #if defined(HY_USE_SDL2)
@@ -116,11 +116,6 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 	return SDL_GetCurrentAudioDriver();
 }
 
-/*virtual*/ IHyFileAudioImpl *HyAudioCore_SDL2::OnAllocateAudioBank(HyJsonObj bankObj) /*override*/
-{
-	return HY_NEW HyFileAudioImpl_SDL2(bankObj);
-}
-
 /*virtual*/ void HyAudioCore_SDL2::OnSetSfxVolume(float fGlobalSfxVolume) /*override*/
 {
 	m_fGlobalSfxVolume = HyClamp(fGlobalSfxVolume, 0.0f, 1.0f) * HYAUDIO_SDL_VOLUME_DAMPENING;
@@ -140,11 +135,11 @@ const char *HyAudioCore_SDL2::GetAudioDriver()
 
 /*virtual*/ void HyAudioCore_SDL2::OnCue_Play(PlayInfo &playInfoRef) /*override*/
 {
-	// Determine 'HySdlRawSoundBuffer'
-	HySdlRawSoundBuffer *pBuffer = nullptr;
+	// Determine the sound buffer
+	HySoundBuffer_SDL2 *pBuffer = nullptr;
 	for(auto file : m_AudioFileList)
 	{
-		pBuffer = static_cast<HyFileAudioImpl_SDL2 *>(file)->GetBufferInfo(playInfoRef.m_uiSoundChecksum);
+		pBuffer = static_cast<HySoundBuffer_SDL2 *>(file->GetSound(playInfoRef.m_uiSoundChecksum));
 		if(pBuffer)
 			break;
 	}

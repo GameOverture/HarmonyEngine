@@ -106,7 +106,7 @@ public:
 	static uint32 NumWindows();
 	static HyWindow &Window(uint32 uiWindowIndex = 0);
 	static HyInput &Input();
-	static void SetVolume(float fGlobalSfxVolume, float fGlobalMusicVolume);
+	static HyAudioInterop &Audio();
 	static void LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut);
 	static HyDiagnostics &Diagnostics();
 	static HyShaderHandle DefaultShaderHandle(HyType eType);

@@ -286,11 +286,10 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 	return sm_pInstance->m_Input;
 }
 
-/*static*/ void HyEngine::SetVolume(float fGlobalSfxVolume, float fGlobalMusicVolume)
+/*static*/ HyAudioInterop &HyEngine::Audio()
 {
-	HyAssert(sm_pInstance != nullptr, "HyEngine::SetVolume() was invoked before engine has been initialized.");
-	sm_pInstance->m_Audio.SetSfxVolume(fGlobalSfxVolume);
-	sm_pInstance->m_Audio.SetMusicVolume(fGlobalMusicVolume);
+	HyAssert(sm_pInstance != nullptr, "HyEngine::Audio() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Audio;
 }
 
 /*static*/ void HyEngine::LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut)

@@ -19,8 +19,63 @@
 #include <QAudioDeviceInfo>
 #include <QMimeData>
 
+AudioGroupsModel::AudioGroupsModel()
+{
+}
+
+/*virtual*/ AudioGroupsModel::~AudioGroupsModel()
+{
+}
+
+void AudioGroupsModel::AddGroup(QString sName, quint32 uiId)
+{
+	m_GroupList.push_back(QPair<QString, quint32>(sName, uiId));
+}
+
+QString AudioGroupsModel::GetName(uint uiIndex) const
+{
+	return m_GroupList[uiIndex].first;
+}
+
+quint32 AudioGroupsModel::GetId(uint uiIndex) const
+{
+	return m_GroupList[uiIndex].second;
+}
+
+int AudioGroupsModel::GetIndex(quint32 uiId) const
+{
+	for(int i = 0; i < m_GroupList.size(); ++i)
+	{
+		if(uiId == m_GroupList[i].second)
+			return i;
+	}
+	return -1;
+}
+
+/*virtual*/ int AudioGroupsModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
+{
+	return m_GroupList.size();
+}
+
+/*virtual*/ QVariant AudioGroupsModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+{
+	if(role == Qt::TextAlignmentRole)
+		return Qt::AlignLeft;
+
+	if(role == Qt::DisplayRole || role == Qt::EditRole)
+		return QString::number(index.row()) % " - " % m_GroupList[index.row()].first;
+
+	return QVariant();
+}
+
+/*virtual*/ QVariant AudioGroupsModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+{
+	return QVariant();
+}
+
 AudioManagerModel::AudioManagerModel(Project &projRef) :
-	IManagerModel(projRef, ASSET_Audio)
+	IManagerModel(projRef, ASSET_Audio),
+	m_uiNextGroupId(2) // Defaults are SFX:0, Music:1
 {
 	m_DesiredRawFormat.setChannelCount(2);
 	m_DesiredRawFormat.setCodec("audio/wav"); // also consider "audio/x-raw" or "audio/pcm"
@@ -31,6 +86,11 @@ AudioManagerModel::AudioManagerModel(Project &projRef) :
 
 /*virtual*/ AudioManagerModel::~AudioManagerModel()
 {
+}
+
+AudioGroupsModel &AudioManagerModel::GetGroupsModel()
+{
+	return m_AudioGroupsModel;
 }
 
 bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
@@ -86,12 +146,56 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 {
 }
 
+int AudioManagerModel::GetGroupIndexFromGroupId(quint32 uiGroupId) const
+{
+	return m_AudioGroupsModel.GetIndex(uiGroupId);
+}
+
+quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
+{
+	return m_AudioGroupsModel.GetId(uiGroupIndex);
+}
+
 /*virtual*/ void AudioManagerModel::OnInit() /*override*/
 {
-	// Create data manifest file if one doesn't exist
-	QFile manifestFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
-	if(manifestFile.exists() == false)
+	// Create data runtime file if one doesn't exist
+	QFile runtimeFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
+	if(runtimeFile.exists() == false)
 		SaveRuntime();
+
+	// Initialize audio groups
+	if(runtimeFile.exists() == false)
+		HyGuiLog("audio runtime file doesn't exist!", LOGTYPE_Error);
+	if(!runtimeFile.open(QIODevice::ReadOnly))
+		HyGuiLog(QString("AudioManagerModel::OnInit() could not open ") % HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt, LOGTYPE_Error);
+
+	QJsonDocument runtimeDoc = QJsonDocument::fromJson(runtimeFile.readAll());
+	runtimeFile.close();
+
+	QJsonObject runtimeObj = runtimeDoc.object();
+	QJsonArray groupArray = runtimeObj["groups"].toArray();
+	for(int i = 0; i < groupArray.size(); ++i)
+	{
+		QJsonObject groupObj = groupArray[i].toObject();
+		m_AudioGroupsModel.AddGroup(groupObj["groupName"].toString(), groupObj["groupId"].toInt());
+	}
+
+	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt));
+	if(settingsFile.exists() == false)
+		HyGuiLog("audio meta file doesn't exist!", LOGTYPE_Error);
+	
+	if(!settingsFile.open(QIODevice::ReadOnly))
+		HyGuiLog(QString("AudioManagerModel::OnInit() could not open ") % HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt, LOGTYPE_Error);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+	QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
+#else
+	QJsonDocument settingsDoc = QJsonDocument::fromJson(settingsFile.readAll());
+#endif
+	settingsFile.close();
+
+	QJsonObject settingsObj = settingsDoc.object();
+	m_uiNextGroupId = JSONOBJ_TOINT(settingsObj, "nextGroupId");
 }
 
 /*virtual*/ void AudioManagerModel::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
@@ -108,9 +212,10 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
 										   wavHeader,
-										   metaObj["isMusic"].toBool(),
+										   metaObj["groupId"].toInt(),
+										   metaObj["isStreaming"].toBool(),
 										   metaObj["isExportMono"].toBool(),
-										   metaObj["globalLimit"].toInt(),
+										   metaObj["instanceLimit"].toInt(),
 										   metaObj["isCompressed"].toBool(),
 										   metaObj["vbrQuality"].toDouble(),
 										   metaObj["errors"].toInt(0));
@@ -272,8 +377,9 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 
 }
 
-/*virtual*/ void AudioManagerModel::OnSaveMeta() /*override*/
+/*virtual*/ void AudioManagerModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
 {
+	metaObjRef.insert("nextGroupId", static_cast<qint64>(m_uiNextGroupId));
 }
 
 /*virtual*/ QJsonObject AudioManagerModel::GetSaveJson() /*override*/
@@ -292,8 +398,9 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 			QJsonObject assetObj;
 			assetObj.insert("checksum", QJsonValue(static_cast<qint64>(bankAssetListRef[i]->GetChecksum())));
 			assetObj.insert("fileName", static_cast<AudioAsset *>(bankAssetListRef[i])->ConstructDataFileName(true));
-			assetObj.insert("isMusic", static_cast<AudioAsset *>(bankAssetListRef[i])->IsMusic());
-			assetObj.insert("globalLimit", static_cast<AudioAsset *>(bankAssetListRef[i])->GetGlobalLimit());
+			assetObj.insert("groupId", static_cast<AudioAsset *>(bankAssetListRef[i])->GetGroupId());
+			assetObj.insert("isStreaming", static_cast<AudioAsset *>(bankAssetListRef[i])->IsStreaming());
+			assetObj.insert("instanceLimit", static_cast<AudioAsset *>(bankAssetListRef[i])->GetInstanceLimit());
 
 			assetsArray.append(assetObj);
 		}
@@ -302,9 +409,20 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 		bankArray.append(bankObj);
 	}
 
+	QJsonArray groupArray;
+	for(int i = 0; i < m_AudioGroupsModel.rowCount(); ++i)
+	{
+		QJsonObject groupObj;
+		groupObj.insert("groupName", m_AudioGroupsModel.GetName(i));
+		groupObj.insert("groupId", static_cast<qint64>(m_AudioGroupsModel.GetId(i)));
+
+		groupArray.append(groupObj);
+	}
+
 	QJsonObject atlasInfoObj;
 	atlasInfoObj.insert("$fileVersion", HYGUI_FILE_VERSION);
 	atlasInfoObj.insert("banks", bankArray);
+	atlasInfoObj.insert("groups", groupArray);
 
 	return atlasInfoObj;
 }
@@ -334,7 +452,7 @@ AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, 
 	quint32 uiChecksum = HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(pBinaryData.constData()), pBinaryData.size());
 	QFileInfo fileInfo(sFilePath);
 	
-	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, false, wavHeaderRef.NumOfChan == 1, -1, false, 1.0f, 0);
+	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, GetGroupIdFromGroupIndex(0), false, wavHeaderRef.NumOfChan == 1, 0, false, 1.0f, 0);
 
 	if(QFile::copy(sFilePath, m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName())) == false)
 	{
