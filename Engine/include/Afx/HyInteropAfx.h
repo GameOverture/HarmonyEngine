@@ -29,26 +29,26 @@ typedef HyOpenGL HyRendererInterop;
 #endif
 
 // AUDIO ////////////////////////////////////////////////////////////////////
-#if defined(HY_USE_MINIAUDIO)
-	#include "Audio/miniaudio/HyAudioCore_miniaudio.h"
-	#include "Audio/miniaudio/HySoundBuffer_miniaudio.h"
-	typedef HyAudioCore_miniaudio HyAudioInterop;
-	typedef HySoundBuffer_miniaudio HySoundBufferInterop;
-#elif defined(HY_USE_SDL2)
-	#ifdef HY_PLATFORM_BROWSER
-		#include <SDL2/SDL_mixer.h>
-	#else
-		#include "SDL_mixer.h"
-	#endif
-	#include "Audio/SDL2/HyAudioCore_SDL2.h"
-	#include "Audio/SDL2/HySoundBuffer_SDL2.h"
-	typedef HyAudioCore_SDL2 HyAudioInterop;
-	typedef HySoundBuffer_SDL2 HySoundBufferInterop;
-#else
-	#include  "Audio/IHyAudioCore.h"
-	typedef HyAudioCore_Null HyAudioInterop;
-	typedef HySoundBuffer_Null HySoundBufferInterop;
-#endif
+//#if defined(HY_USE_MINIAUDIO)
+//	#include "Audio/miniaudio/HyAudioCore_miniaudio.h"
+//	#include "Audio/miniaudio/HySoundBuffer_miniaudio.h"
+//	typedef HyAudioCore_miniaudio HyAudioInterop;
+//	typedef HySoundBuffer_miniaudio HySoundBufferInterop;
+//#elif defined(HY_USE_SDL2)
+//	#ifdef HY_PLATFORM_BROWSER
+//		#include <SDL2/SDL_mixer.h>
+//	#else
+//		#include "SDL_mixer.h"
+//	#endif
+//	#include "Audio/SDL2/HyAudioCore_SDL2.h"
+//	#include "Audio/SDL2/HySoundBuffer_SDL2.h"
+//	typedef HyAudioCore_SDL2 HyAudioInterop;
+//	//typedef HySoundBuffer_SDL2 HySoundBufferInterop;
+//#else
+//	#include  "Audio/IHyAudioCore.h"
+//	typedef HyAudioCore_Null HyAudioInterop;
+//	typedef HySoundBuffer_Null HySoundBufferInterop;
+//#endif
 
 // NETWORKING //////////////////////////////////////////////////////////////
 #ifdef HY_USE_SDL2_NET

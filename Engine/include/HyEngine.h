@@ -59,7 +59,7 @@ class HyEngine
 	HyConsoleInterop			m_Console;
 	HyWindowManager				m_WindowManager;
 	HyNetworking				m_Networking;
-	HyAudioInterop 				m_Audio;
+	HyAudioCore 				m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
 	HyGuiComms					m_GuiComms;
@@ -106,7 +106,7 @@ public:
 	static uint32 NumWindows();
 	static HyWindow &Window(uint32 uiWindowIndex = 0);
 	static HyInput &Input();
-	static HyAudioInterop &Audio();
+	static HyAudioCore &Audio();
 	static void LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut);
 	static HyDiagnostics &Diagnostics();
 	static HyShaderHandle DefaultShaderHandle(HyType eType);

@@ -26,7 +26,7 @@
 #define HYASSETS_AudioDir "Audio/"
 #define HYASSETS_SpineDir "Spine/"
 
-class IHyAudioCore;
+class HyAudioCore;
 class HyScene;
 class IHyRenderer;
 class IHyLoadable;
@@ -45,7 +45,7 @@ class HyFileAudio;
 
 class HyAssets : public IHyThreadClass
 {
-	IHyAudioCore &												m_AudioCoreRef;
+	HyAudioCore &												m_AudioCoreRef;
 	HyScene &													m_SceneRef;
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
@@ -86,7 +86,7 @@ class HyAssets : public IHyThreadClass
 	uint32														m_uiLoadingCountTotal;	// Used to determine best guess at % loaded of all queued assets [0.0 - 1.0]
 
 public:
-	HyAssets(IHyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath);
+	HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath);
 	virtual ~HyAssets();
 
 	const std::string &GetDataDir();

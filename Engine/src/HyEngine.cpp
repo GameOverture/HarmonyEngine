@@ -286,7 +286,7 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 	return sm_pInstance->m_Input;
 }
 
-/*static*/ HyAudioInterop &HyEngine::Audio()
+/*static*/ HyAudioCore &HyEngine::Audio()
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::Audio() was invoked before engine has been initialized.");
 	return sm_pInstance->m_Audio;

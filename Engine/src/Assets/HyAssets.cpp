@@ -75,7 +75,7 @@ const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyAssets::HyAssets(IHyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath) :
+HyAssets::HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath) :
 	IHyThreadClass(HYTHREAD_Lowest),
 	m_AudioCoreRef(audioCoreRef),
 	m_SceneRef(sceneRef),
@@ -687,11 +687,11 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 
 			uint32 uiBankId = bankObj["bankId"].GetUint();
 
-			std::string sBankFilePath = HYASSETS_AudioDir;
+			std::string sBankFilePath = GetDataDir() + HYASSETS_AudioDir;
 			sprintf(szTmpBuffer, "%05d", uiBankId);
 			sBankFilePath += szTmpBuffer;
 
-			new (pPlacementLocation)HyFileAudio(sBankFilePath, i, m_AudioCoreRef.AllocateAudioBank(bankObj));
+			new (pPlacementLocation)HyFileAudio(sBankFilePath, i, m_AudioCoreRef.AllocateAudioBank(bankObj, sBankFilePath));
 			++pPlacementLocation;
 		}
 		break; }

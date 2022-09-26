@@ -30,10 +30,10 @@ HyWindowManager::HyWindowManager(uint32 uiNumWindows, bool bShowCursor, const Hy
 
 #ifdef HY_USE_SDL2
 	#ifdef HY_USE_GLFW
-		if(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) != 0)
+		if(SDL_Init(/*SDL_INIT_AUDIO |*/ SDL_INIT_GAMECONTROLLER) != 0)
 			HyLogError(SDL_GetError());
 	#else
-		if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) != 0)
+		if(SDL_Init(SDL_INIT_VIDEO | /*SDL_INIT_AUDIO |*/ SDL_INIT_GAMECONTROLLER) != 0)
 			HyLogError(SDL_GetError());
 
 		SDL_ShowCursor(bShowCursor ? SDL_ENABLE : SDL_DISABLE);

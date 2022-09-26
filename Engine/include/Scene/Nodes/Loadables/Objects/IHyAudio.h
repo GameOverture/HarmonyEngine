@@ -71,7 +71,7 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 	uint32 PullNextSound();	// Returns the next sound checksum to be played
-	uint32 GetLastPlayed();
+	uint32 GetLastPulledSound() const;
 
 protected:
 	virtual void OnDataAcquired() override;

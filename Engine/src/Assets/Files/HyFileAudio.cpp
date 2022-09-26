@@ -37,9 +37,7 @@ bool HyFileAudio::ContainsAsset(uint32 uiAssetChecksum)
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		std::string sFilePath = HyEngine::DataDir();
-		sFilePath += m_sFILE_NAME;
-		if(m_pInternal->Load(sFilePath) == false)
+		if(m_pInternal->Load() == false)
 		{
 			HyLogError("HyFileAudio::OnLoadThread() failed");
 			return;

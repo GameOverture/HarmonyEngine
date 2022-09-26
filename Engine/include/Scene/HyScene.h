@@ -11,7 +11,7 @@
 #define HyScene_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Audio/IHyAudioCore.h"
+#include "Audio/HyAudioCore.h"
 
 // Forward declarations
 class IHyNode;
@@ -28,7 +28,7 @@ class IHyRenderer;
 //////////////////////////////////////////////////////////////////////////
 class HyScene
 {
-	IHyAudioCore &										m_AudioCoreRef;
+	HyAudioCore &										m_AudioCoreRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
 	// TODO: Make tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
@@ -42,7 +42,7 @@ class HyScene
 	std::vector<IHyDrawable3d *>						m_NodeList_LoadedDrawable3d;
 
 public:
-	HyScene(IHyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
+	HyScene(HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
 	static void SetInstOrderingDirty();
@@ -59,7 +59,7 @@ public:
 	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
 	void CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut);
 
-	void ProcessAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType);
+	void ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType);
 
 	void SetPause(bool bPause);
 

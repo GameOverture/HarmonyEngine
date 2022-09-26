@@ -10,13 +10,15 @@
 #include "Afx/HyInteropAfx.h"
 #include "Audio/HyAudioBank.h"
 
-HyAudioBank::HyAudioBank(IHyAudioCore &coreRef, HyJsonObj bankObj)
+HyAudioBank::HyAudioBank(HyAudioCore &coreRef, HyJsonObj bankObj, std::string sBankFilePath)
 {
 	HyJsonArray assetsArray = bankObj["assets"].GetArray();
 	for(uint32 i = 0; i < assetsArray.Size(); ++i)
 	{
 		HyJsonObj assetObj = assetsArray[i].GetObject();
-		IHySoundBuffer *pNewBuffer = HY_NEW HySoundBufferInterop(coreRef, assetObj["fileName"].GetString(), assetObj["groupId"].GetInt(), assetObj["isStreaming"].GetBool(), assetObj["instanceLimit"].GetInt());
+		std::string sFilePath = sBankFilePath + "/";
+		sFilePath += assetObj["fileName"].GetString();
+		HySoundBuffers *pNewBuffer = HY_NEW HySoundBuffers(coreRef, sFilePath, assetObj["groupId"].GetInt(), assetObj["isStreaming"].GetBool(), assetObj["instanceLimit"].GetInt());
 
 		m_SoundBuffers.push_back(pNewBuffer);
 		m_ChecksumMap[assetObj["checksum"].GetUint()] = pNewBuffer;
@@ -36,7 +38,7 @@ HyAudioBank::HyAudioBank(IHyAudioCore &coreRef, HyJsonObj bankObj)
 	return m_ChecksumMap.find(uiAssetChecksum) != m_ChecksumMap.end();
 }
 
-IHySoundBuffer *HyAudioBank::GetSound(uint32 uiChecksum)
+HySoundBuffers *HyAudioBank::GetSound(uint32 uiChecksum)
 {
 	auto iter = m_ChecksumMap.find(uiChecksum);
 	if(iter == m_ChecksumMap.end())
@@ -45,12 +47,12 @@ IHySoundBuffer *HyAudioBank::GetSound(uint32 uiChecksum)
 	return iter->second;
 }
 
-/*virtual*/ bool HyAudioBank::Load(std::string sFilePath)
+/*virtual*/ bool HyAudioBank::Load()
 {
 	bool bAllLoaded = true;
 	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBuffers.size()); ++i)
 	{
-		if(m_SoundBuffers[i]->Load(sFilePath) == false)
+		if(m_SoundBuffers[i]->Load() == false)
 			bAllLoaded = false;
 	}
 

@@ -25,7 +25,7 @@ std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 bool HyScene::sm_bInst2dOrderingDirty = false;
 
-HyScene::HyScene(IHyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef) :
+HyScene::HyScene(HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef) :
 	m_AudioCoreRef(audioCoreRef),
 	m_WindowListRef(WindowListRef),
 	m_bPauseGame(false)
@@ -135,7 +135,7 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
-void HyScene::ProcessAudioCue(IHyNode *pNode, IHyAudioCore::CueType eCueType)
+void HyScene::ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType)
 {
 	m_AudioCoreRef.ProcessCue(pNode, eCueType);
 }
