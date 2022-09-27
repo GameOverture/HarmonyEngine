@@ -47,22 +47,22 @@ HyAudioCore::HyAudioCore() :
 	//}
 
 	// Resource Manager
-	m_ResConfig = ma_resource_manager_config_init();
+	//m_ResConfig = ma_resource_manager_config_init();
 	//m_ResConfig.decodedFormat = m_Device.playback.format;
 	//m_ResConfig.decodedChannels = m_Device.playback.channels;
 	//m_ResConfig.decodedSampleRate = m_Device.sampleRate;
 
-	eResult = ma_resource_manager_init(&m_ResConfig, &m_ResourceManager);
-	if(eResult != MA_SUCCESS)
-	{
-		ma_device_uninit(&m_Device);
-		HyLogError("Failed to initialize the resource manager: " << eResult);
-		return;
-	}
+	//eResult = ma_resource_manager_init(&m_ResConfig, &m_ResourceManager);
+	//if(eResult != MA_SUCCESS)
+	//{
+	//	ma_device_uninit(&m_Device);
+	//	HyLogError("Failed to initialize the resource manager: " << eResult);
+	//	return;
+	//}
 
 	// Engine
 	m_EngConfig = ma_engine_config_init();
-	m_EngConfig.pResourceManager = &m_ResourceManager;
+	//m_EngConfig.pResourceManager = &m_ResourceManager;
 	//m_EngConfig.pDevice = &m_Device;
 
 	eResult = ma_engine_init(&m_EngConfig, &m_Engine);
