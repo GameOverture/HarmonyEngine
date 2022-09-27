@@ -371,3 +371,13 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 	HyAssert(sm_pInstance != nullptr, "HyEngine::HotUnloadTexture() was invoked before engine has been initialized.");
 	sm_pInstance->m_Renderer.DeleteTexture(hTexHandle);
 }
+
+/*static*/ HyAudioHandle HyEngine::HotLoadAudio(std::string sFilePath, bool bIsStreaming /*= false*/, int32 iInstanceLimit /*= 0*/)
+{
+	HyAssert(sm_pInstance != nullptr, "HyEngine::HotLoadAudio() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Audio.HotLoad(sFilePath, bIsStreaming, iInstanceLimit);
+}
+
+/*static*/ void HyEngine::HotUnloadAudio(HyAudioHandle hAudioHandle)
+{
+}

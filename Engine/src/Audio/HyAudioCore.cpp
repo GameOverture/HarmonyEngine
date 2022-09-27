@@ -20,7 +20,8 @@
 #undef STB_VORBIS_HEADER_ONLY
 #include "vendor/stb/stb_vorbis.c"
 
-HyAudioCore::HyAudioCore()
+HyAudioCore::HyAudioCore() :
+	m_uiHotLoadCount(1)
 {
 	// Device
 	//m_DevConfig = ma_device_config_init(ma_device_type_playback);
@@ -77,7 +78,8 @@ HyAudioCore::HyAudioCore()
 	for(auto *pGrp : m_GroupList)
 		delete pGrp;
 
-	ma_device_uninit(&m_Device);
+	//ma_device_uninit(&m_Device);
+	ma_engine_uninit(&m_Engine);
 }
 
 const char *HyAudioCore::GetAudioDriver()
@@ -125,6 +127,26 @@ void HyAudioCore::SetGlobalVolume(float fVolume)
 	ma_result eResult = ma_engine_set_volume(&m_Engine, fVolume);
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_engine_set_volume failed: " << eResult);
+}
+
+HyAudioHandle HyAudioCore::HotLoad(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit)
+{
+	HySoundBuffers *pNewSndBuffer = HY_NEW HySoundBuffers(*this, sFilePath, 0, bIsStreaming, iInstanceLimit);
+	pNewSndBuffer->Load();
+	
+	m_uiHotLoadCount++;
+	m_HotLoadMap.insert({ static_cast<HyAudioHandle>(m_uiHotLoadCount), pNewSndBuffer });
+	
+	return static_cast<HyAudioHandle>(m_uiHotLoadCount);
+}
+
+void HyAudioCore::HotUnload(HyAudioHandle hAudioHandle)
+{
+	if(m_HotLoadMap.count(hAudioHandle) == 0)
+		return;
+
+	delete m_HotLoadMap[hAudioHandle];
+	m_HotLoadMap.erase(hAudioHandle);
 }
 
 void HyAudioCore::AddBank(HyFileAudio *pBankFile)
@@ -178,7 +200,7 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 		PlayInfo *pPlayInfo = nullptr;
 		if(pNode->Is2D())
 		{
-			HyAudioHandle hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
+			HyAudioNodeHandle hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
 			if(m_PlayMap.count(hHandle) == 0)
 				m_PlayMap[hHandle] = PlayInfo();
 			pPlayInfo = &m_PlayMap[hHandle];
@@ -190,7 +212,7 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 		}
 		else
 		{
-			HyAudioHandle hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
+			HyAudioNodeHandle hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
 			if(m_PlayMap.count(hHandle) == 0)
 				m_PlayMap[hHandle] = PlayInfo();
 			pPlayInfo = &m_PlayMap[hHandle];
@@ -207,7 +229,7 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 	case HYSOUNDCUE_Stop:
 	case HYSOUNDCUE_Pause:
 	case HYSOUNDCUE_Unpause: {
-		HyAudioHandle hHandle = HY_UNUSED_HANDLE;
+		HyAudioNodeHandle hHandle = HY_UNUSED_HANDLE;
 		if(pNode->Is2D())
 			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
 		else
@@ -225,7 +247,7 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 		break; }
 
 	case HYSOUNDCUE_Attributes: {
-		HyAudioHandle hHandle = HY_UNUSED_HANDLE;
+		HyAudioNodeHandle hHandle = HY_UNUSED_HANDLE;
 		float fVolume = 1.0f;
 		float fPitch = 0.0f;
 		if(pNode->Is2D())
@@ -268,8 +290,21 @@ void HyAudioCore::StartSound(PlayInfo &playInfoRef)
 	}
 	if(pBuffer == nullptr)
 	{
-		HyLogWarning("HyAudioCore::StartPlay() Could not find audio: " << playInfoRef.m_uiSoundChecksum);
-		return;
+		// Not found in standard assets, check if it was hotloaded
+		for(auto &hotLoad : m_HotLoadMap)
+		{
+			// When looking through hotloads, the checksum is assigned to the same value as its HyAudioHandle
+			if(hotLoad.first == playInfoRef.m_uiSoundChecksum)
+			{
+				pBuffer = hotLoad.second;
+				break;
+			}
+		}
+		if(pBuffer == nullptr)
+		{
+			HyLogWarning("HyAudioCore::StartPlay() Could not find audio: " << playInfoRef.m_uiSoundChecksum);
+			return;
+		}
 	}
 
 	playInfoRef.m_pSound = pBuffer->GetFreshBuffer();

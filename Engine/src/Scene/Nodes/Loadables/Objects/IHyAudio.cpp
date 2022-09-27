@@ -16,7 +16,7 @@
 #include "Scene/HyScene.h"
 
 template<typename NODETYPE, typename ENTTYPE>
-HyAudioHandle IHyAudio<NODETYPE, ENTTYPE>::sm_hUniqueIdCounter = 1;
+HyAudioNodeHandle IHyAudio<NODETYPE, ENTTYPE>::sm_hUniqueIdCounter = 1;
 
 template<typename NODETYPE, typename ENTTYPE>
 IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
@@ -24,10 +24,23 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, EN
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),
-	m_fPitch(1.0f),
+	m_fPitch(0.0f),
 	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
 	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
 {
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(HyAudioHandle hAudioHandle, ENTTYPE *pParent) :
+	NODETYPE(HYTYPE_Audio, std::to_string(hAudioHandle), HYASSETS_Hotload, pParent),
+	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
+	m_uiCueFlags(0),
+	m_fVolume(1.0f),
+	m_fPitch(0.0f),
+	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
+	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
+{
+
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -72,7 +85,7 @@ const IHyAudio<NODETYPE, ENTTYPE> &IHyAudio<NODETYPE, ENTTYPE>::operator=(const 
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-HyAudioHandle IHyAudio<NODETYPE, ENTTYPE>::GetHandle() const
+HyAudioNodeHandle IHyAudio<NODETYPE, ENTTYPE>::GetHandle() const
 {
 	return m_hUNIQUE_ID;
 }

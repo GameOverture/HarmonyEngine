@@ -16,6 +16,7 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/HyJson.h"
 
+#define HYASSETS_Hotload "+HotLoad"
 #define HYASSETS_DataFile "Items.data"
 #define HYASSETS_AtlasFile "Atlases.data"
 #define HYASSETS_AudioFile "Audio.data"
@@ -74,7 +75,8 @@ class HyAssets : public IHyThreadClass
 	Factory<HyTextData>											m_TextFactory;
 	Factory<HySpineData>										m_SpineFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
-	std::map<std::pair<uint32, uint32>, HyTexturedQuadData *>	m_Quad2d;
+	std::map<std::pair<uint32, uint32>, HyTexturedQuadData *>	m_HotLoadTextureMap;
+	std::map<HyAudioHandle, HyAudioData *>						m_HotLoadAudioMap;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
 	std::vector<IHyFile *>										m_ReloadDataList;

@@ -47,6 +47,8 @@ class HyAudioCore
 	};
 	std::vector<SoundGroup *>						m_GroupList;
 	std::vector<HyFileAudio *>						m_BankList;
+	std::map<HyAudioHandle, HySoundBuffers *>		m_HotLoadMap;
+	uint32											m_uiHotLoadCount;
 
 	struct PlayInfo
 	{
@@ -57,7 +59,7 @@ class HyAudioCore
 
 		ma_sound *									m_pSound = nullptr;
 	};
-	std::unordered_map<HyAudioHandle, PlayInfo>		m_PlayMap;
+	std::unordered_map<HyAudioNodeHandle, PlayInfo>	m_PlayMap;
 	std::vector<PlayInfo>							m_OneShotList;
 
 	std::vector<std::string>						m_sDeviceList;
@@ -81,6 +83,9 @@ public:
 	ma_sound_group *GetGroup(int32 iId);
 
 	void SetGlobalVolume(float fVolume);
+
+	HyAudioHandle HotLoad(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit);
+	void HotUnload(HyAudioHandle hAudioHandle);
 
 protected:
 	void AddBank(HyFileAudio *pBankFile);

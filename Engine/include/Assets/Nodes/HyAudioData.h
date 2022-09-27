@@ -36,6 +36,7 @@ class HyAudioData : public IHyNodeData
 
 public:
 	HyAudioData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
+	HyAudioData(HyAudioHandle hAudioHandle);
 	virtual ~HyAudioData(void);
 
 	const HyAudioPlayList &GetPlayList(uint32 uiStateIndex) const;

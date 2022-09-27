@@ -117,7 +117,10 @@ HyAssets::~HyAssets()
 		delete iter->second;
 	m_GltfMap.clear();
 
-	for(auto iter = m_Quad2d.begin(); iter != m_Quad2d.end(); ++iter)
+	for(auto iter = m_HotLoadTextureMap.begin(); iter != m_HotLoadTextureMap.end(); ++iter)
+		delete iter->second;
+
+	for(auto iter = m_HotLoadAudioMap.begin(); iter != m_HotLoadAudioMap.end(); ++iter)
 		delete iter->second;
 }
 
@@ -223,7 +226,16 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 	switch(pLoadable->_LoadableGetType())
 	{
 	case HYTYPE_Audio:
-		pDataOut = m_AudioFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+		if(pLoadable->GetName() == HYASSETS_Hotload)
+		{
+			HyAudioHandle hAudioHandle = static_cast<HyAudioHandle>(std::stoi(pLoadable->GetPrefix()));
+			if(m_HotLoadAudioMap.find(hAudioHandle) == m_HotLoadAudioMap.end())
+				m_HotLoadAudioMap[hAudioHandle] = HY_NEW HyAudioData(hAudioHandle);
+
+			pDataOut = m_HotLoadAudioMap[hAudioHandle];
+		}
+		else
+			pDataOut = m_AudioFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
 	case HYTYPE_Sprite:
 		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
@@ -239,15 +251,15 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		break;
 	
 	case HYTYPE_TexturedQuad:
-		if(pLoadable->GetName() != "raw")
+		if(pLoadable->GetName() != HYASSETS_Hotload)
 		{
 			std::pair<uint32, uint32> key(std::stoi(pLoadable->GetPrefix()), std::stoi(pLoadable->GetName()));
-			if(m_Quad2d.find(key) == m_Quad2d.end())
+			if(m_HotLoadTextureMap.find(key) == m_HotLoadTextureMap.end())
 			{
 				HyTexturedQuadData *pNewQuadData = HY_NEW HyTexturedQuadData(key.first, key.second, *this);
-				m_Quad2d[key] = pNewQuadData;
+				m_HotLoadTextureMap[key] = pNewQuadData;
 			}
-			pDataOut = m_Quad2d[key];
+			pDataOut = m_HotLoadTextureMap[key];
 		}
 		break;
 

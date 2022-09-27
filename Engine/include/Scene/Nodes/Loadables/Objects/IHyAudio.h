@@ -18,21 +18,21 @@ typedef std::vector<std::pair<uint32, uint32>> HyAudioPlayList;	// <checksum, we
 template<typename NODETYPE, typename ENTTYPE>
 class IHyAudio : public NODETYPE
 {
-	static HyAudioHandle		sm_hUniqueIdCounter;
-	const HyAudioHandle			m_hUNIQUE_ID;
+	static HyAudioNodeHandle		sm_hUniqueIdCounter;
+	const HyAudioNodeHandle			m_hUNIQUE_ID;
 
-	uint32						m_uiCueFlags;
-	float						m_fVolume;
-	float						m_fPitch;
-	
+	uint32							m_uiCueFlags;
+	float							m_fVolume;
+	float							m_fPitch;
+
 	// Configurable
 	struct AudioStateAttribs
 	{
-		uint32					m_ePlayListMode : 3;
-		uint32					m_bAllowRepeats : 1;
-		uint32					m_uiPriority : 4;
-		uint32					m_uiLoops : 8;			// 255 = loop forever
-		uint32					m_uiMaxDistance : 16;
+		uint32						m_ePlayListMode : 3;
+		uint32						m_bAllowRepeats : 1;
+		uint32						m_uiPriority : 4;
+		uint32						m_uiLoops : 8;			// 255 = loop forever
+		uint32						m_uiMaxDistance : 16;
 
 		AudioStateAttribs(HyPlayListMode ePlayList, bool bAllowRepeats, uint8 uiPriority, uint8 uiLoops, uint16 uiMaxDist)
 		{
@@ -48,17 +48,18 @@ class IHyAudio : public NODETYPE
 	uint32							m_uiLastPlayed;		// Checksum of last played audio
 
 public:
-	HyAnimFloat					volume;
-	HyAnimFloat					pitch;
+	HyAnimFloat						volume;
+	HyAnimFloat						pitch;
 
 public:
 	IHyAudio(std::string sPrefix, std::string sName, ENTTYPE *pParent);
+	IHyAudio(HyAudioHandle hAudioHandle, ENTTYPE *pParent);
 	IHyAudio(const IHyAudio &copyRef);
 	virtual ~IHyAudio(void);
 	
 	const IHyAudio &operator=(const IHyAudio &rhs);
 
-	HyAudioHandle GetHandle() const;
+	HyAudioNodeHandle GetHandle() const;
 
 	int32 GetLoops() const;
 	void SetLoops(int32 iLoops);

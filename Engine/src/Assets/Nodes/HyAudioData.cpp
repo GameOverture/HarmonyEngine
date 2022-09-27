@@ -37,12 +37,35 @@ HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &
 		}
 
 		m_pAudioStates[i].m_ePlayListMode = static_cast<HyPlayListMode>(stateObj["playListMode"].GetInt());
-
 		m_pAudioStates[i].m_fVolume = static_cast<float>(stateObj["volume"].GetDouble());
 		m_pAudioStates[i].m_fPitch = static_cast<float>(stateObj["pitch"].GetDouble());
 		m_pAudioStates[i].m_iPriority = stateObj["priority"].GetInt();
 		m_pAudioStates[i].m_iLoops = stateObj["loops"].GetInt();
 		m_pAudioStates[i].m_uiMaxDistance = stateObj["maxDist"].GetInt();
+	}
+
+	m_pSequentialCountList = HY_NEW std::vector<uint32>(m_uiNumStates, 0);
+}
+
+HyAudioData::HyAudioData(HyAudioHandle hAudioHandle) :
+	IHyNodeData(HYASSETS_Hotload),
+	m_pAudioStates(nullptr)
+{
+	m_uiNumStates = 1;
+	m_pAudioStates = HY_NEW AudioState[m_uiNumStates];
+
+	for(uint32 i = 0; i < m_uiNumStates; ++i)
+	{
+		uint32 uiChecksum = hAudioHandle; // Utilize the checksum to hold the HyAudioHandle
+		uint32 uiWeight = 1;
+
+		m_pAudioStates[i].m_PlayList.push_back(std::pair<uint32, uint32>(uiChecksum, uiWeight));
+		m_pAudioStates[i].m_ePlayListMode = HYPLAYLIST_Shuffle;
+		m_pAudioStates[i].m_fVolume = 1.0f;
+		m_pAudioStates[i].m_fPitch = 0.0f;
+		m_pAudioStates[i].m_iPriority = 0;
+		m_pAudioStates[i].m_iLoops = 0;
+		m_pAudioStates[i].m_uiMaxDistance = 0;
 	}
 
 	m_pSequentialCountList = HY_NEW std::vector<uint32>(m_uiNumStates, 0);
