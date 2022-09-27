@@ -74,6 +74,9 @@ HyAudioCore::HyAudioCore()
 
 /*virtual*/ HyAudioCore::~HyAudioCore(void)
 {
+	for(auto *pGrp : m_GroupList)
+		delete pGrp;
+
 	ma_device_uninit(&m_Device);
 }
 
@@ -108,10 +111,10 @@ ma_engine *HyAudioCore::GetEngine()
 
 ma_sound_group *HyAudioCore::GetGroup(int32 iId)
 {
-	for(auto &grp : m_GroupList)
+	for(auto *pGrp : m_GroupList)
 	{
-		if(grp.m_iID == iId)
-			return &grp.m_Group;
+		if(pGrp->m_iID == iId)
+			return &pGrp->m_Group;
 	}
 
 	return nullptr;
@@ -124,18 +127,15 @@ void HyAudioCore::SetGlobalVolume(float fVolume)
 		HyLogError("ma_engine_set_volume failed: " << eResult);
 }
 
-HyAudioBank *HyAudioCore::AllocateAudioBank(HyJsonObj bankObj, std::string sBankFilePath)
+void HyAudioCore::AddBank(HyFileAudio *pBankFile)
 {
-	HyAudioBank *pNewBank = HY_NEW HyAudioBank(*this, bankObj, sBankFilePath);
-	m_BankList.push_back(pNewBank);
-
-	return pNewBank;
+	m_BankList.push_back(pBankFile);
 }
 
 void HyAudioCore::AddGroup(std::string sName, int32 iId)
 {
-	m_GroupList.emplace_back(sName, iId);
-	ma_result eResult = ma_sound_group_init(&m_Engine, 0, nullptr, &m_GroupList.back().m_Group);
+	m_GroupList.push_back(HY_NEW SoundGroup(sName, iId));
+	ma_result eResult = ma_sound_group_init(&m_Engine, 0, nullptr, &m_GroupList.back()->m_Group);
 	if(eResult != MA_SUCCESS)
 		HyLogError("HyAudioCore::AddGroup failed: " << eResult);
 }

@@ -23,7 +23,7 @@ class HySoundBuffers
 	const bool					m_bIS_STREAMING;
 	const int32					m_iINSTANCE_LIMIT;
 
-	std::vector<ma_sound>		m_SoundList;
+	std::vector<ma_sound *>		m_SoundList;
 
 public:
 	HySoundBuffers(HyAudioCore &coreRef, std::string sFilePath, int32 iGroupId, bool bIsStreaming, int32 iInstanceLimit);

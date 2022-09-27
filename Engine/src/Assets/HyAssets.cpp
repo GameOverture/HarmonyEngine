@@ -691,7 +691,8 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 			sprintf(szTmpBuffer, "%05d", uiBankId);
 			sBankFilePath += szTmpBuffer;
 
-			new (pPlacementLocation)HyFileAudio(sBankFilePath, i, m_AudioCoreRef.AllocateAudioBank(bankObj, sBankFilePath));
+			new (pPlacementLocation)HyFileAudio(sBankFilePath, i, m_AudioCoreRef, bankObj);
+			m_AudioCoreRef.AddBank(pPlacementLocation);
 			++pPlacementLocation;
 		}
 		break; }

@@ -20,14 +20,21 @@ HySoundBuffers::HySoundBuffers(HyAudioCore &coreRef, std::string sFilePath, int3
 {
 	HyAssert(m_iINSTANCE_LIMIT >= 0, "Invalid instance limit in HySoundBuffers");
 	if(m_iINSTANCE_LIMIT == 0)
-		m_SoundList.resize(1);
+		m_SoundList.push_back(HY_NEW ma_sound());
 	else
+	{
 		m_SoundList.resize(m_iINSTANCE_LIMIT);
+		for(int i = 0; i < m_SoundList.size(); ++i)
+			m_SoundList[i] = HY_NEW ma_sound();
+	}
 }
 
 HySoundBuffers::~HySoundBuffers()
 {
 	Unload();
+
+	for(int i = 0; i < m_SoundList.size(); ++i)
+		delete m_SoundList[i];
 }
 
 std::string HySoundBuffers::GetFilePath() const
@@ -62,7 +69,7 @@ bool HySoundBuffers::Load()
 			uiFlags,
 			pGroup,
 			nullptr,
-			&m_SoundList[i]);
+			m_SoundList[i]);
 
 		if(eResult != MA_SUCCESS)
 		{
@@ -77,7 +84,7 @@ bool HySoundBuffers::Load()
 void HySoundBuffers::Unload()
 {
 	for(uint32 i = 0; i < static_cast<uint32>(m_SoundList.size()); ++i)
-		ma_sound_uninit(&m_SoundList[i]);
+		ma_sound_uninit(m_SoundList[i]);
 }
 
 ma_sound *HySoundBuffers::GetFreshBuffer()
@@ -86,38 +93,38 @@ ma_sound *HySoundBuffers::GetFreshBuffer()
 	{
 		for(int32 i = 0; i < static_cast<int32>(m_SoundList.size()); ++i)
 		{
-			if(ma_sound_is_playing(&m_SoundList[i]) == false)
-				return &m_SoundList[i];
+			if(ma_sound_is_playing(m_SoundList[i]) == false)
+				return m_SoundList[i];
 		}
 
-		//if(m_iINSTANCE_LIMIT == 0) // Allows dynamic resizing
-		//	AppendBuffer();
-		//else
+		if(m_iINSTANCE_LIMIT == 0) // Allows dynamic resizing
+			AppendBuffer();
+		else
 			return nullptr; // No available buffer
 	}
 }
 
 void HySoundBuffers::AppendBuffer()
 {
-	m_SoundList.resize(m_SoundList.size() + 1);
+	m_SoundList.push_back(HY_NEW ma_sound());
 
 	ma_uint32 uiFlags = m_bIS_STREAMING ? MA_SOUND_FLAG_STREAM : 0;
-	//uiFlags |= MA_SOUND_FLAG_ASYNC;
+	uiFlags |= MA_SOUND_FLAG_ASYNC;
 
 	ma_sound_group *pGroup = m_CoreRef.GetGroup(GetGroupId());
 
-	ma_result eResult = ma_sound_init_copy(m_CoreRef.GetEngine(),
-		&m_SoundList[0],
-		uiFlags,
-		pGroup,
-		&m_SoundList[m_SoundList.size() - 1]);
-
-	//ma_result eResult = ma_sound_init_from_file(m_CoreRef.GetEngine(),
-	//	m_sFILE_PATH.c_str(),
+	//ma_result eResult = ma_sound_init_copy(m_CoreRef.GetEngine(),
+	//	&m_SoundList[0],
 	//	uiFlags,
 	//	pGroup,
-	//	nullptr,
 	//	&m_SoundList[m_SoundList.size() - 1]);
+
+	ma_result eResult = ma_sound_init_from_file(m_CoreRef.GetEngine(),
+		m_sFILE_PATH.c_str(),
+		uiFlags,
+		pGroup,
+		nullptr,
+		m_SoundList.back());
 
 	if(eResult != MA_SUCCESS)
 		HyLogError("AppendBuffer() - ma_sound_init_from_file failed: " << eResult);

@@ -45,8 +45,8 @@ class HyAudioCore
 			m_iID(iId)
 		{ }
 	};
-	std::vector<SoundGroup>							m_GroupList;
-	std::vector<HyAudioBank *>						m_BankList;
+	std::vector<SoundGroup *>						m_GroupList;
+	std::vector<HyFileAudio *>						m_BankList;
 
 	struct PlayInfo
 	{
@@ -83,7 +83,7 @@ public:
 	void SetGlobalVolume(float fVolume);
 
 protected:
-	HyAudioBank *AllocateAudioBank(HyJsonObj bankObj, std::string sBankFilePath);
+	void AddBank(HyFileAudio *pBankFile);
 	void AddGroup(std::string sName, int32 iId);
 	void ProcessCue(IHyNode *pNode, HySoundCue eCueType);
 
