@@ -13,9 +13,6 @@
 [submodule "Engine/vendor/SDL_net"]
 	path = Engine/vendor/SDL_net
 	url = https://github.com/GameOverture/Hy_SDL_net.git
-[submodule "Engine/vendor/SDL_mixer"]
-	path = Engine/vendor/SDL_mixer
-	url = https://github.com/GameOverture/Hy_SDL_mixer.git
 [submodule "Editor/vendor/freetype2"]
 	path = Editor/vendor/freetype2
 	url = https://github.com/GameOverture/Hy_freetype2.git

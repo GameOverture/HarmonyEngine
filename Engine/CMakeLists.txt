@@ -43,8 +43,6 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 		set_target_properties(SDL2main PROPERTIES FOLDER "Engine Libs")
 		set_target_properties(SDL2-static PROPERTIES FOLDER "Engine Libs")
 		set_target_properties(SDL2 PROPERTIES FOLDER "Engine Libs")
-		
-		add_subdirectory(vendor/SDL_mixer)
 
 		# Optional SDL2 extensions
 		if(HYBUILD_SDL_NET)
@@ -329,8 +327,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	# Qt provides its own implementation of SDL facitlities
 	if(NOT HYBUILD_Qt)
 		# Below is typical desktop deployment
-		target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/SDL_mixer")
-		target_link_libraries(HyEngine PUBLIC SDL2 SDL2main SDL2_mixer)
+		target_link_libraries(HyEngine PUBLIC SDL2 SDL2main)
 		
 		if(HYBUILD_SDL_NET)
 			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/SDL_net")
