@@ -105,6 +105,7 @@ void IHyLoadable::_Reinitialize(std::string sPrefix, std::string sName)
 
 	m_sPrefix = sPrefix;
 	m_sName = sName;
+	m_pData = nullptr;
 
 	if(bWasLoaded)
 		Load();
