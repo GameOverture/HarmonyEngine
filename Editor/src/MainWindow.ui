@@ -99,8 +99,9 @@
     <property name="title">
      <string>&amp;Tools</string>
     </property>
-    <addaction name="actionProjectSettings"/>
+    <addaction name="actionChangeHarmonyLocation"/>
     <addaction name="separator"/>
+    <addaction name="actionProjectSettings"/>
     <addaction name="actionConnect"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
@@ -728,6 +729,18 @@
   <action name="actionTheme_Decemberween">
    <property name="text">
     <string>Decemberween</string>
+   </property>
+  </action>
+  <action name="actionChangeHarmonyLocation">
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/Harmony.png</normaloff>:/icons16x16/Harmony.png</iconset>
+   </property>
+   <property name="text">
+    <string>Change &amp;Harmony Location</string>
+   </property>
+   <property name="toolTip">
+    <string>Update the location of the Harmony engine repository</string>
    </property>
   </action>
  </widget>
