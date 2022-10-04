@@ -65,24 +65,27 @@ class AudioAsset : public AssetItemData
 
 	WaveHeader		m_WaveHeader;
 
-	bool			m_bIsMusic;
+	int32			m_iGroupId;
+	bool			m_bIsStreaming;
 	bool			m_bExportMono;
 	bool			m_bCompressed;
 	double			m_dVbrQuality;
-	int32			m_iGlobalLimit;	// -1 indicates no global limit
+	int32			m_iInstanceLimit;
 
 public:
-	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, bool bIsMusic, bool bExportMono, int32 iGlobalLimit, bool bCompressed, double dVbrQuality, uint uiErrors);
+	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, int32 iGroupId, bool bIsStreaming, bool bExportMono, int32 iInstanceLimit, bool bCompressed, double dVbrQuality, uint uiErrors);
 	~AudioAsset();
 
-	bool IsMusic() const;
+	int32 GetGroupId() const;
+	bool IsStreaming() const;
 	bool IsExportMono() const;
-	int32 GetGlobalLimit() const;
+	int32 GetInstanceLimit() const;
 	bool IsCompressed() const;
 	double GetVbrQuality() const;
-	void SetIsMusic(bool bIsMusic);
+	void SetGroupId(int32 iGroupId);
+	void SetIsStreaming(bool bIsStreaming);
 	void SetIsExportMono(bool bIsExportMono);
-	void SetGlobalLimit(int32 iGlobalLimit);
+	void SetInstanceLimit(int32 iInstanceLimit);
 	void SetIsCompressed(bool bIsCompressed);
 	void SetVbrQuality(double dVbrQuality);
 

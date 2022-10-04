@@ -1,4 +1,4 @@
-# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL_NET, HYBUILD_GLFW, HYBUILD_STATIC
+# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL2, HYBUILD_SDL_NET, HYBUILD_STATIC
 # BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_RAPIDJSON, HYBUILD_ICU
 
 add_subdirectory(vendor/box2d)
@@ -23,34 +23,10 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	
 	# Qt provides its own implementation of SDL/GLFW facilities
 	if(HYBUILD_Qt)
+		set(HYBUILD_SDL2 OFF)
 		set(HYBUILD_SDL_NET OFF)
-		set(HYBUILD_GLFW OFF)
 	else()
 		# Below is typical desktop deployment
-		if(HYBUILD_STATIC)
-			set(SDL_STATIC ON)
-			set(SDL_SHARED OFF)
-		else()
-			set(SDL_SHARED ON)
-		endif()
-		
-		if (MSVC)
-			list(APPEND EXTRA_LIBS vcruntime) # prevents memset issue in vcruntime.dll
-		endif()
-		
-		add_subdirectory(vendor/SDL)
-		include_directories(vendor/SDL/include)
-		set_target_properties(SDL2main PROPERTIES FOLDER "Engine Libs")
-		set_target_properties(SDL2-static PROPERTIES FOLDER "Engine Libs")
-		set_target_properties(SDL2 PROPERTIES FOLDER "Engine Libs")
-		
-		add_subdirectory(vendor/SDL_mixer)
-
-		# Optional SDL2 extensions
-		if(HYBUILD_SDL_NET)
-			add_subdirectory(vendor/SDL_net)
-		endif()
-		
 		if(HYBUILD_GLFW)
 			add_compile_definitions(HY_USE_GLFW)
 			set(GLFW_BUILD_EXAMPLES, OFF)
@@ -59,6 +35,30 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			set(GLFW_INSTALL, OFF)
 			add_subdirectory(vendor/glfw)
 			set_target_properties(glfw PROPERTIES FOLDER "Engine Libs")
+		endif()
+		
+		if(HYBUILD_SDL2)
+			if(HYBUILD_STATIC)
+				set(SDL_STATIC ON)
+				set(SDL_SHARED OFF)
+			else()
+				set(SDL_SHARED ON)
+			endif()
+			
+			if (MSVC)
+				list(APPEND EXTRA_LIBS vcruntime) # prevents memset issue in vcruntime.dll
+			endif()
+			
+			add_subdirectory(vendor/SDL)
+			include_directories(vendor/SDL/include)
+			set_target_properties(SDL2main PROPERTIES FOLDER "Engine Libs")
+			set_target_properties(SDL2-static PROPERTIES FOLDER "Engine Libs")
+			set_target_properties(SDL2 PROPERTIES FOLDER "Engine Libs")
+
+			# Optional SDL2 extensions
+			if(HYBUILD_SDL_NET)
+				add_subdirectory(vendor/SDL_net)
+			endif()
 		endif()
 	endif()
 else()
@@ -80,9 +80,8 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Nodes/HyTextData.cpp
 	src/Assets/Nodes/HyTexturedQuadData.cpp
 	src/Assets/Nodes/IHyNodeData.cpp
-	src/Audio/IHyAudioCore.cpp
-	src/Audio/SDL2/HyAudioCore_SDL2.cpp
-	src/Audio/SDL2/HyFileAudioImpl_SDL2.cpp
+	src/Audio/HyAudioCore.cpp
+	src/Audio/HySoundBuffers.cpp
 	src/Diagnostics/HyDiagnostics.cpp
 	src/Diagnostics/Console/IHyConsole.cpp
 	src/Diagnostics/Console/Interop/HyConsole_Std.cpp
@@ -94,8 +93,12 @@ set(HYENGINE_SOURCE_FILES
 	src/Diagnostics/Output/HyProfiler.cpp
 	src/Input/HyInput.cpp
 	src/Input/HyInputMap.cpp
-	src/Networking/HyNetworking.cpp
+	src/Networking/Sockets/HyNullSocket.cpp
+	src/Networking/Sockets/HyPosix.cpp
+	src/Networking/Sockets/HySdlNet.cpp
+	src/Networking/Sockets/HyWinsock.cpp
 	src/Networking/IHyNetworkClass.cpp
+	src/Networking/IHyNetworking.cpp
 	src/Renderer/IHyRenderer.cpp
 	src/Renderer/Components/HyRenderBuffer.cpp
 	src/Renderer/Components/HyShaderUniforms.cpp
@@ -169,6 +172,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
 	src/Utilities/HyJson.cpp
+	src/Utilities/HyMain.cpp
 	src/Utilities/HyMath.cpp
 	src/Window/HyWindow.cpp
 	src/Window/HyWindowManager.cpp)
@@ -202,10 +206,8 @@ set(HYENGINE_HEADER_FILES
 	include/Assets/Nodes/HyTextData.h
 	include/Assets/Nodes/HyTexturedQuadData.h
 	include/Assets/Nodes/IHyNodeData.h
-	include/Audio/IHyAudioCore.h
-	include/Audio/IHyFileAudioImpl.h
-	include/Audio/SDL2/HyAudioCore_SDL2.h
-	include/Audio/SDL2/HyFileAudioImpl_SDL2.h
+	include/Audio/HyAudioCore.h
+	include/Audio/HySoundBuffers.h
 	include/Diagnostics/HyDiagnostics.h
 	include/Diagnostics/Console/IHyConsole.h
 	include/Diagnostics/Console/Interop/HyConsole_Std.h
@@ -218,8 +220,12 @@ set(HYENGINE_HEADER_FILES
 	include/Input/HyInput.h
 	include/Input/HyInputKeys.h
 	include/Input/HyInputMap.h
-	include/Networking/HyNetworking.h
+	include/Networking/Sockets/HyNullSocket.h
+	include/Networking/Sockets/HyPosix.h
+	include/Networking/Sockets/HySdlNet.h
+	include/Networking/Sockets/HyWinsock.h
 	include/Networking/IHyNetworkClass.h
+	include/Networking/IHyNetworking.h
 	include/Renderer/IHyRenderer.h
 	include/Renderer/Components/HyRenderBuffer.h
 	include/Renderer/Components/HyShaderUniforms.h
@@ -297,6 +303,7 @@ set(HYENGINE_HEADER_FILES
 	include/Utilities/Crc32.h
 	include/Utilities/HyIO.h
 	include/Utilities/HyJson.h
+	include/Utilities/HyMain.h
 	include/Utilities/HyMath.h
 	include/Utilities/HyRand.h
 	include/Window/HyWindow.h
@@ -332,18 +339,21 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	# Qt provides its own implementation of SDL facitlities
 	if(NOT HYBUILD_Qt)
 		# Below is typical desktop deployment
-		target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/SDL_mixer")
-		target_link_libraries(HyEngine PUBLIC SDL2 SDL2main SDL2_mixer)
-		
-		if(HYBUILD_SDL_NET)
-			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/SDL_net")
-			target_link_libraries(HyEngine PUBLIC SDL2_net)
-		endif()
-		
 		if(HYBUILD_GLFW)
 			target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw")
 			target_link_libraries(HyEngine PUBLIC glfw)
 		endif()
+		
+		
+		if(HYBUILD_SDL2)
+			target_link_libraries(HyEngine PUBLIC SDL2 SDL2main)
+			
+			if(HYBUILD_SDL_NET)
+				target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/SDL_net")
+				target_link_libraries(HyEngine PUBLIC SDL2_net)
+			endif()
+		endif()
+		
 		
 		if(HYBUILD_ICU)
 			# ICU - International Components for Unicode (aka Insane Clown Union)

@@ -16,15 +16,40 @@
 #include <QAudioFormat>
 #include <QSoundEffect>
 
+class AudioGroupsModel : public QAbstractListModel
+{
+	Q_OBJECT
+
+	QList<QPair<QString, quint32>>			m_GroupList;			// QPair<Name, ID>
+
+public:
+	AudioGroupsModel();
+	virtual ~AudioGroupsModel();
+
+	void AddGroup(QString sName, quint32 uiId);
+
+	QString GetName(uint uiIndex) const;
+	quint32 GetId(uint uiIndex) const;
+	int GetIndex(quint32 uiId) const;
+
+	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+};
+
 class AudioManagerModel : public IManagerModel
 {
 	Q_OBJECT
 
-	QAudioFormat	m_DesiredRawFormat;
+	QAudioFormat							m_DesiredRawFormat;
+	AudioGroupsModel						m_AudioGroupsModel;
+	quint32									m_uiNextGroupId;
 
 public:
 	AudioManagerModel(Project &projRef);
 	virtual ~AudioManagerModel();
+
+	AudioGroupsModel &GetGroupsModel();
 
 	bool IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut);
 	
@@ -34,6 +59,9 @@ public:
 
 	// Draw occur when the mouse hovers over the manager widget. ManagerWidget holds the ptr to IManagerDraw, but IManagerModel init/updates the actual concrete IDraw object
 	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) override;
+
+	int GetGroupIndexFromGroupId(quint32 uiGroupId) const;
+	quint32 GetGroupIdFromGroupIndex(uint uiGroupIndex) const;
 
 protected:
 	virtual void OnInit() override;
@@ -50,7 +78,7 @@ protected:
 
 	virtual void OnFlushRepack() override;
 
-	virtual void OnSaveMeta() override;
+	virtual void OnSaveMeta(QJsonObject &metaObjRef) override;
 	virtual QJsonObject GetSaveJson() override;
 
 private Q_SLOTS:

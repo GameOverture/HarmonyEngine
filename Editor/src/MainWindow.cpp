@@ -810,6 +810,25 @@ void MainWindow::on_actionNewPackage_triggered()
 	delete pDlg;
 }
 
+void MainWindow::on_actionChangeHarmonyLocation_triggered()
+{
+	QDir engineDir(m_Settings.value("engineLocation").toString());
+	DlgSetEngineLocation *pDlg = new DlgSetEngineLocation(this);
+	if(pDlg->exec() == QDialog::Accepted)
+	{
+		engineDir.setPath(pDlg->SelectedDir());
+		if(HyGlobal::IsEngineDirValid(engineDir))
+		{
+			m_Settings.setValue("engineLocation", QVariant(pDlg->SelectedDir()));
+			SaveSettings();
+		}
+		else
+			HyGuiLog(engineDir.absolutePath() % " is an invalid Harmony path", LOGTYPE_Error);
+	}
+
+	delete pDlg;
+}
+
 void MainWindow::on_actionConnect_triggered()
 {
 //    // Network initialization

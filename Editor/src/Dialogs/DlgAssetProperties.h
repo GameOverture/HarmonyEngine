@@ -15,6 +15,8 @@
 #include <QDialog>
 #include <QJsonObject>
 
+class IManagerModel;
+
 namespace Ui {
 class DlgAssetProperties;
 }
@@ -27,7 +29,7 @@ class DlgAssetProperties : public QDialog
 	QList<AssetItemData *>		m_ChangedAssets; // Order is preserved from 'm_SelectedAssets'
 
 public:
-	explicit DlgAssetProperties(AssetType eManagerType, QList<AssetItemData *> assetList, QWidget *parent = 0);
+	explicit DlgAssetProperties(IManagerModel *pManagerModel, QList<AssetItemData *> assetList, QWidget *parent = 0);
 	~DlgAssetProperties();
 
 	QList<AssetItemData *> GetChangedAssets();
@@ -37,7 +39,7 @@ private Q_SLOTS:
 	void on_chkIsCompressed_clicked();
 	void on_sbVbrQuality_valueChanged(double dArg);
 	void on_chkUseGlobalLimit_clicked();
-	void on_sbGlobalLimit_valueChanged(int iArg);
+	void on_sbInstanceLimit_valueChanged(int iArg);
 
 	virtual void done(int r);
 

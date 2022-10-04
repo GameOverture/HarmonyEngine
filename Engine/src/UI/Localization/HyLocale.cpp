@@ -91,8 +91,7 @@
 #else
 	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	const auto *pFacet = new HyNumpunct<char, int64>(format, iValue, loc.name());
-	str.imbue(std::locale(loc, pFacet));
+	str.imbue(std::locale(loc, new HyNumpunct<char, int64>(format, iValue, loc.name())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -107,7 +106,7 @@
 	sText = str.str();
 
 	if(format.GetRounding() == HYFMTROUNDING_HideZeros)
-		HideFractionIfZero(sText, pFacet->decimal_point());
+		HideFractionIfZero(sText, std::use_facet<HyNumpunct<char, int64>>(str.getloc()).decimal_point());
 #endif
 
 	return sText;
@@ -132,8 +131,7 @@
 #else
 	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	const auto *pFacet = new HyNumpunct<char, double>(format, dValue, loc.name());
-	str.imbue(std::locale(loc, pFacet));
+	str.imbue(std::locale(loc, new HyNumpunct<char, double>(format, dValue, loc.name())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -153,7 +151,7 @@
 	sText = str.str();
 
 	if(format.GetRounding() == HYFMTROUNDING_HideZeros)
-		HideFractionIfZero(sText, pFacet->decimal_point());
+		HideFractionIfZero(sText, std::use_facet<HyNumpunct<char, double>>(str.getloc()).decimal_point());
 #endif
 
 	return sText;
@@ -196,8 +194,7 @@
 #else
 	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	const auto *pFacet = new HyMoneypunct<char, false, int64>(format, iValue, loc.name());
-	str.imbue(std::locale(loc, pFacet));
+	str.imbue(std::locale(loc, new HyMoneypunct<char, false, int64>(format, iValue, loc.name())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -215,7 +212,7 @@
 	sText = str.str();
 	
 	if(format.GetRounding() == HYFMTROUNDING_HideZeros)
-		HideFractionIfZero(sText, pFacet->decimal_point());
+		HideFractionIfZero(sText, std::use_facet<HyMoneypunct<char, false, int64>>(str.getloc()).decimal_point());
 #endif
 
 	return sText;
@@ -255,8 +252,7 @@
 	std::locale loc = AssembleStdLocale();
 
 	std::stringstream str;
-	const auto *pFacet = new HyMoneypunct<char, false, double>(format, dValue, loc.name());
-	str.imbue(std::locale(loc, pFacet));
+	str.imbue(std::locale(loc, new HyMoneypunct<char, false, double>(format, dValue, loc.name())));
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -280,7 +276,7 @@
 	sText = str.str();
 
 	if(format.GetRounding() == HYFMTROUNDING_HideZeros)
-		HideFractionIfZero(sText, pFacet->decimal_point());
+		HideFractionIfZero(sText, std::use_facet<HyMoneypunct<char, false, double>>(str.getloc()).decimal_point());
 #endif
 
 	return sText;

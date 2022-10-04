@@ -12,11 +12,11 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
+#include "Utilities/HyMain.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Input/HyInput.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Networking/HyNetworking.h"
 #include "Networking/IHyNetworkClass.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
@@ -58,8 +58,8 @@ class HyEngine
 
 	HyConsoleInterop			m_Console;
 	HyWindowManager				m_WindowManager;
-	HyNetworking				m_Networking;
-	HyAudioInterop 				m_Audio;
+	HyNetworkInterop			m_Networking;
+	HyAudioCore 				m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
 	HyGuiComms					m_GuiComms;
@@ -76,14 +76,14 @@ public:
 
 	int32 RunGame();
 
-protected:
-	// Derived game class overrides
-	virtual bool OnUpdate() { return true; }
-
 	virtual void OnWindowResized(HyWindow &windowRef) {
 		windowRef.SetFramebufferSize(windowRef.GetWindowSize());
 	}
 	virtual void OnWindowMoved(HyWindow &windowRef) { }
+
+protected:
+	// Derived game class overrides
+	virtual bool OnUpdate() { return true; }
 
 #if defined(HY_PLATFORM_GUI) || defined(HY_PLATFORM_BROWSER)
 public:
@@ -106,7 +106,7 @@ public:
 	static uint32 NumWindows();
 	static HyWindow &Window(uint32 uiWindowIndex = 0);
 	static HyInput &Input();
-	static void SetVolume(float fGlobalSfxVolume, float fGlobalMusicVolume);
+	static HyAudioCore &Audio();
 	static void LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut);
 	static HyDiagnostics &Diagnostics();
 	static HyShaderHandle DefaultShaderHandle(HyType eType);
@@ -114,6 +114,8 @@ public:
 	static std::string DataDir();
 	static HyTextureHandle HotLoadTexture(std::string sFilePath, HyTextureFiltering eFiltering, int32 &iWidthOut, int32 &iHeightOut);
 	static void HotUnloadTexture(HyTextureHandle hTexHandle);
+	static HyAudioHandle HotLoadAudio(std::string sFilePath, bool bIsStreaming = false, int32 iInstanceLimit = 0);
+	static void HotUnloadAudio(HyAudioHandle hAudioHandle);
 };
 
 #endif /* HyEngine_h__ */

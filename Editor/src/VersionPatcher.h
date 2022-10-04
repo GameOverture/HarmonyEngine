@@ -17,6 +17,8 @@ private:
 	static void Patch_6to7(Project *pProj, QJsonDocument &projDocRef);
 	static void Patch_7to8(QJsonDocument &projDocRef);
 	static void Patch_8to9(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // Changing to use "textureInfo"
+	static void Patch_9to10(QJsonDocument &metaAudioDocRef, QJsonDocument &dataAudioDocRef);
+	static void Patch_10to11(QJsonDocument &metaSourceDocRef);
 
 	static void RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta);
 };

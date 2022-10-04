@@ -15,8 +15,9 @@
 #include <glad/glad.h>
 #define HY_USE_GLAD
 
-#include <SDL.h>
-#define HY_USE_SDL2
+#ifdef HY_USE_SDL2
+	#include <SDL.h>
+#endif
 
 #define HY_MAXWINDOWS 6
 #define HY_ENDIAN_LITTLE	// All x86 and x86-64 machines are little-endian.

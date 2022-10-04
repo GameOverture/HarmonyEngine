@@ -445,7 +445,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	}
 }
 
-/*virtual*/ void AtlasModel::OnSaveMeta() /*override*/
+/*virtual*/ void AtlasModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
 {
 }
 

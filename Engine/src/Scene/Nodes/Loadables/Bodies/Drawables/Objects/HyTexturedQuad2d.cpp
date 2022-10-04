@@ -27,7 +27,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, H
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, "", "raw", pParent),
+	IHyDrawable2d(HYTYPE_TexturedQuad, "", HYASSETS_Hotload, pParent),
 	m_bIsRaw(true),
 	m_uiAtlasGroupId(0),
 	m_uiAtlasIndexInGroup(0),
@@ -35,7 +35,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiText
 	m_uiRawTextureHeight(uiTextureHeight),
 	m_SrcRect(0.0f, 1.0f, 1.0f, 0.0f)
 {
-	m_sName = "raw";
+	m_sName = HYASSETS_Hotload;
 
 	m_ShaderUniforms.SetNumTexUnits(1);
 	m_ShaderUniforms.SetTexHandle(0, hTextureHandle);

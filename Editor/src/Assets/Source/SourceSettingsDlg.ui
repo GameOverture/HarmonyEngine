@@ -45,17 +45,25 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="chkUseGlfw">
-     <property name="text">
-      <string>Use GLFW for windowing, glcontext, input, and time instead of SDL2</string>
+    <widget class="QGroupBox" name="grpSdl2">
+     <property name="title">
+      <string>Use SDL2 for windowing, glcontext, input, and time</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="chkUseSdlNet">
-     <property name="text">
-      <string>Use SDL_NET for networking sockets</string>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="chkUseSdlNet">
+        <property name="text">
+         <string>Use SDL_NET for networking sockets</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

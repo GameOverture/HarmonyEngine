@@ -139,7 +139,7 @@ protected:
 
 	virtual void OnFlushRepack() = 0;
 
-	virtual void OnSaveMeta() = 0;
+	virtual void OnSaveMeta(QJsonObject &metaObjRef) = 0;
 	virtual QJsonObject GetSaveJson() = 0;
 
 private:

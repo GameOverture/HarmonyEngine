@@ -667,6 +667,8 @@ void IManagerModel::SaveMeta()
 	settingsObj.insert("banks", banksArray);
 	settingsObj.insert("nextBankId", QJsonValue(static_cast<qint64>(m_uiNextBankId)));
 
+	OnSaveMeta(settingsObj);
+
 	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt));
 	if(!settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
@@ -687,8 +689,6 @@ void IManagerModel::SaveMeta()
 
 		settingsFile.close();
 	}
-
-	OnSaveMeta();
 }
 
 void IManagerModel::SaveRuntime()

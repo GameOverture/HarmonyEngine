@@ -217,6 +217,9 @@ if(Qt5_DIR)
 		src/Shared/TreeModel/ITreeModel.h
 		src/Shared/TreeModel/TreeModelItem.h
 		src/Shared/TreeModel/TreeModelItemData.h
+		src/Widget/WgtAudioGroup.cpp
+		src/Widget/WgtAudioGroup.h
+		src/Widget/WgtAudioGroup.ui
 		src/Widget/WgtMakeRelDir.cpp
 		src/Widget/WgtMakeRelDir.h
 		src/Widget/WgtMakeRelDir.ui

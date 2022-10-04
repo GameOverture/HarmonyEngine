@@ -14,6 +14,7 @@
 #include "Scene/Nodes/Objects/HyCamera.h"
 
 class HyInput;
+class HyWindowManager;
 
 class HyWindow
 {
@@ -21,6 +22,7 @@ class HyWindow
 	friend class HyScene;
 
 	const uint32							m_uiINDEX;
+	HyWindowManager &						m_ManagerRef;
 	uint32									m_uiId;
 
 	HyWindowInfo							m_Info;
@@ -73,7 +75,7 @@ public:
 	};
 
 public:
-	HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowInteropPtr hSharedContext);
+	HyWindow(uint32 uiIndex, HyWindowManager &managerRef, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowInteropPtr hSharedContext);
 	~HyWindow(void);
 
 	uint32								GetIndex() const;
@@ -128,6 +130,10 @@ public:
 #elif defined(HY_USE_SDL2)
 	void DoEvent(const SDL_Event &eventRef, HyInput &inputRef);
 #endif
+
+protected:
+	void DoWindowResized();
+	void DoWindowMoved();
 };
 
 #endif /* HyWindow_h__ */

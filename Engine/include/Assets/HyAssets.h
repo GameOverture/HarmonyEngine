@@ -16,6 +16,7 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/HyJson.h"
 
+#define HYASSETS_Hotload "+HotLoad"
 #define HYASSETS_DataFile "Items.data"
 #define HYASSETS_AtlasFile "Atlases.data"
 #define HYASSETS_AudioFile "Audio.data"
@@ -26,7 +27,7 @@
 #define HYASSETS_AudioDir "Audio/"
 #define HYASSETS_SpineDir "Spine/"
 
-class IHyAudioCore;
+class HyAudioCore;
 class HyScene;
 class IHyRenderer;
 class IHyLoadable;
@@ -45,7 +46,7 @@ class HyFileAudio;
 
 class HyAssets : public IHyThreadClass
 {
-	IHyAudioCore &												m_AudioCoreRef;
+	HyAudioCore &												m_AudioCoreRef;
 	HyScene &													m_SceneRef;
 	const std::string											m_sDATADIR;
 	std::atomic<bool>											m_bInitialized;
@@ -74,7 +75,8 @@ class HyAssets : public IHyThreadClass
 	Factory<HyTextData>											m_TextFactory;
 	Factory<HySpineData>										m_SpineFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
-	std::map<std::pair<uint32, uint32>, HyTexturedQuadData *>	m_Quad2d;
+	std::map<std::pair<uint32, uint32>, HyTexturedQuadData *>	m_HotLoadTextureMap;
+	std::map<HyAudioHandle, HyAudioData *>						m_HotLoadAudioMap;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
 	std::vector<IHyFile *>										m_ReloadDataList;
@@ -86,7 +88,7 @@ class HyAssets : public IHyThreadClass
 	uint32														m_uiLoadingCountTotal;	// Used to determine best guess at % loaded of all queued assets [0.0 - 1.0]
 
 public:
-	HyAssets(IHyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath);
+	HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath);
 	virtual ~HyAssets();
 
 	const std::string &GetDataDir();

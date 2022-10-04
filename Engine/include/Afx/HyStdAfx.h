@@ -54,6 +54,7 @@ typedef uint32 HyTextureHandle;
 typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
 typedef uint32 HyVertexBufferHandle;
+typedef uint32 HyAudioNodeHandle;
 typedef uint32 HyAudioHandle;
 typedef uint32 HySpacerHandle;
 typedef uint32 HyLayoutHandle;

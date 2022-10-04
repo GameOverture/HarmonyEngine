@@ -12,17 +12,20 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Files/IHyFile.h"
-#include "Audio/IHyFileAudioImpl.h"
+#include "Audio/HySoundBuffers.h"
+#include "Utilities/HyJson.h"
 
 class HyFileAudio : public IHyFile
 {
-	IHyFileAudioImpl *		m_pInternal;
+	std::vector<HySoundBuffers *>			m_SoundBuffers;
+	std::map<uint32, HySoundBuffers *>		m_ChecksumMap;
 
 public:
-	HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, IHyFileAudioImpl *pInternal);
+	HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, HyAudioCore &coreRef, HyJsonObj bankObj);
 	virtual ~HyFileAudio();
 
 	bool ContainsAsset(uint32 uiAssetChecksum);
+	HySoundBuffers *GetSound(uint32 uiChecksum);
 
 	virtual std::string AssetTypeName() override;
 	virtual void OnLoadThread() override;

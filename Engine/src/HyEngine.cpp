@@ -37,7 +37,7 @@ HyEngine *HyEngine::sm_pInstance = nullptr;
 HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	m_Init(initStruct),
 	m_Console(m_Init.bUseConsole, m_Init.consoleInfo),
-	m_WindowManager(m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
+	m_WindowManager(*this, m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Audio(),
 	m_Scene(m_Audio, m_WindowManager.GetWindowList()),
 	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
@@ -286,11 +286,10 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 	return sm_pInstance->m_Input;
 }
 
-/*static*/ void HyEngine::SetVolume(float fGlobalSfxVolume, float fGlobalMusicVolume)
+/*static*/ HyAudioCore &HyEngine::Audio()
 {
-	HyAssert(sm_pInstance != nullptr, "HyEngine::SetVolume() was invoked before engine has been initialized.");
-	sm_pInstance->m_Audio.SetSfxVolume(fGlobalSfxVolume);
-	sm_pInstance->m_Audio.SetMusicVolume(fGlobalMusicVolume);
+	HyAssert(sm_pInstance != nullptr, "HyEngine::Audio() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Audio;
 }
 
 /*static*/ void HyEngine::LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut)
@@ -371,4 +370,14 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::HotUnloadTexture() was invoked before engine has been initialized.");
 	sm_pInstance->m_Renderer.DeleteTexture(hTexHandle);
+}
+
+/*static*/ HyAudioHandle HyEngine::HotLoadAudio(std::string sFilePath, bool bIsStreaming /*= false*/, int32 iInstanceLimit /*= 0*/)
+{
+	HyAssert(sm_pInstance != nullptr, "HyEngine::HotLoadAudio() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Audio.HotLoad(sFilePath, bIsStreaming, iInstanceLimit);
+}
+
+/*static*/ void HyEngine::HotUnloadAudio(HyAudioHandle hAudioHandle)
+{
 }

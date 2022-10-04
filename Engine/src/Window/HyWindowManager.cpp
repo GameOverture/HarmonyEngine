@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Afx/HyInteropAfx.h"
 #include "Window/HyWindowManager.h"
+#include "HyEngine.h"
 
 #ifdef HY_USE_GLFW
 void HyGlfw_ErrorCallback(int iError, const char *szDescription)
@@ -18,7 +19,8 @@ void HyGlfw_ErrorCallback(int iError, const char *szDescription)
 }
 #endif
 
-HyWindowManager::HyWindowManager(uint32 uiNumWindows, bool bShowCursor, const HyWindowInfo windowInfos[HY_MAXWINDOWS])
+HyWindowManager::HyWindowManager(HyEngine &engineRef, uint32 uiNumWindows, bool bShowCursor, const HyWindowInfo windowInfos[HY_MAXWINDOWS]) :
+	m_EngineRef(engineRef)
 {
 #ifdef HY_USE_GLFW
 	// Setup error callback before glfwInit to catch anything that might go wrong with glfwInit
@@ -30,10 +32,10 @@ HyWindowManager::HyWindowManager(uint32 uiNumWindows, bool bShowCursor, const Hy
 
 #ifdef HY_USE_SDL2
 	#ifdef HY_USE_GLFW
-		if(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) != 0)
+		if(SDL_Init(/*SDL_INIT_AUDIO |*/ SDL_INIT_GAMECONTROLLER) != 0)
 			HyLogError(SDL_GetError());
 	#else
-		if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) != 0)
+		if(SDL_Init(SDL_INIT_VIDEO | /*SDL_INIT_AUDIO |*/ SDL_INIT_GAMECONTROLLER) != 0)
 			HyLogError(SDL_GetError());
 
 		SDL_ShowCursor(bShowCursor ? SDL_ENABLE : SDL_DISABLE);
@@ -43,7 +45,7 @@ HyWindowManager::HyWindowManager(uint32 uiNumWindows, bool bShowCursor, const Hy
 	HyAssert(uiNumWindows >= 1, "HyWindowManager was constructed with 0 windows");
 	HyLog("HyWindowManager creating '" << uiNumWindows << "' window(s)");
 	for(uint32 i = 0; i < uiNumWindows; ++i)
-		m_WindowList.push_back(HY_NEW HyWindow(i, windowInfos[i], bShowCursor, i != 0 ? m_WindowList[0]->GetInterop() : nullptr));
+		m_WindowList.push_back(HY_NEW HyWindow(i, *this, windowInfos[i], bShowCursor, i != 0 ? m_WindowList[0]->GetInterop() : nullptr));
 }
 
 HyWindowManager::~HyWindowManager()
@@ -61,6 +63,16 @@ HyWindow& HyWindowManager::GetWindow(uint32 uiWindowIndex)
 {
 	HyAssert(uiWindowIndex < m_WindowList.size(), "HyWindowManager::GetWindow was passed an invalid index");
 	return *m_WindowList[uiWindowIndex];
+}
+
+void HyWindowManager::DoWindowResized(HyWindow &windowRef)
+{
+	m_EngineRef.OnWindowResized(windowRef);
+}
+
+void HyWindowManager::DoWindowMoved(HyWindow &windowRef)
+{
+	m_EngineRef.OnWindowMoved(windowRef);
 }
 
 #if defined(HY_USE_SDL2) && !defined(HY_USE_GLFW)

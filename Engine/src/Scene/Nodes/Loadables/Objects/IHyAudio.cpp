@@ -16,7 +16,7 @@
 #include "Scene/HyScene.h"
 
 template<typename NODETYPE, typename ENTTYPE>
-HyAudioHandle IHyAudio<NODETYPE, ENTTYPE>::sm_hUniqueIdCounter = 1;
+HyAudioNodeHandle IHyAudio<NODETYPE, ENTTYPE>::sm_hUniqueIdCounter = 1;
 
 template<typename NODETYPE, typename ENTTYPE>
 IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
@@ -24,10 +24,23 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, EN
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),
-	m_fPitch(1.0f),
+	m_fPitch(0.0f),
 	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
 	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
 {
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(HyAudioHandle hAudioHandle, ENTTYPE *pParent) :
+	NODETYPE(HYTYPE_Audio, std::to_string(hAudioHandle), HYASSETS_Hotload, pParent),
+	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
+	m_uiCueFlags(0),
+	m_fVolume(1.0f),
+	m_fPitch(0.0f),
+	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
+	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
+{
+
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -72,7 +85,7 @@ const IHyAudio<NODETYPE, ENTTYPE> &IHyAudio<NODETYPE, ENTTYPE>::operator=(const 
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-HyAudioHandle IHyAudio<NODETYPE, ENTTYPE>::GetHandle() const
+HyAudioNodeHandle IHyAudio<NODETYPE, ENTTYPE>::GetHandle() const
 {
 	return m_hUNIQUE_ID;
 }
@@ -93,23 +106,23 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyAudio<NODETYPE, ENTTYPE>::PlayOneShot(bool bUseCurrentSettings /*= true*/)
 {
 	if(bUseCurrentSettings)
-		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_PlayOneShot);
+		m_uiCueFlags |= (1 << HYSOUNDCUE_PlayOneShot);
 	else
-		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_PlayOneShotDefault);
+		m_uiCueFlags |= (1 << HYSOUNDCUE_PlayOneShotDefault);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyAudio<NODETYPE, ENTTYPE>::Play()
 {
-	m_uiCueFlags &= ~(1 << IHyAudioCore::CUETYPE_Stop);
-	m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Start);
+	m_uiCueFlags &= ~(1 << HYSOUNDCUE_Stop);
+	m_uiCueFlags |= (1 << HYSOUNDCUE_Start);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyAudio<NODETYPE, ENTTYPE>::Stop()
 {
-	m_uiCueFlags &= ~(1 << IHyAudioCore::CUETYPE_Start);
-	m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Stop);
+	m_uiCueFlags &= ~(1 << HYSOUNDCUE_Start);
+	m_uiCueFlags |= (1 << HYSOUNDCUE_Stop);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -117,13 +130,13 @@ void IHyAudio<NODETYPE, ENTTYPE>::SetPause(bool bPause)
 {
 	if(bPause)
 	{
-		m_uiCueFlags &= ~(1 << IHyAudioCore::CUETYPE_Unpause);
-		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Pause);
+		m_uiCueFlags &= ~(1 << HYSOUNDCUE_Unpause);
+		m_uiCueFlags |= (1 << HYSOUNDCUE_Pause);
 	}
 	else
 	{
-		m_uiCueFlags &= ~(1 << IHyAudioCore::CUETYPE_Pause);
-		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Unpause);
+		m_uiCueFlags &= ~(1 << HYSOUNDCUE_Pause);
+		m_uiCueFlags |= (1 << HYSOUNDCUE_Unpause);
 	}
 }
 
@@ -187,7 +200,7 @@ uint32 IHyAudio<NODETYPE, ENTTYPE>::PullNextSound()
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyAudio<NODETYPE, ENTTYPE>::GetLastPlayed()
+uint32 IHyAudio<NODETYPE, ENTTYPE>::GetLastPulledSound() const
 {
 	return m_uiLastPlayed;
 }
@@ -215,16 +228,16 @@ template<typename NODETYPE, typename ENTTYPE>
 {
 	if(IHyNode::IsDirty(IHyNode::DIRTY_Audio))
 	{
-		m_uiCueFlags |= (1 << IHyAudioCore::CUETYPE_Attributes);
+		m_uiCueFlags |= (1 << HYSOUNDCUE_Attributes);
 		IHyNode::ClearDirty(IHyNode::DIRTY_Audio);
 	}
 
 	if(m_uiCueFlags)
 	{
-		for(uint32 i = 0; i < IHyAudioCore::NUM_CUETYPES; ++i)
+		for(uint32 i = 0; i < NUM_HYSOUNDCUE; ++i)
 		{
 			if(0 != (m_uiCueFlags & (1 << i)))
-				IHyNode::sm_pScene->ProcessAudioCue(this, static_cast<IHyAudioCore::CueType>(i));
+				IHyNode::sm_pScene->ProcessAudioCue(this, static_cast<HySoundCue>(i));
 		}
 
 		m_uiCueFlags = 0;

@@ -18,8 +18,9 @@
 #include <glad/glad.h>
 #define HY_USE_GLAD
 
-#include <SDL.h>
-#define HY_USE_SDL2
+#ifdef HY_USE_SDL2
+	#include <SDL.h>
+#endif
 
 #define NOMINMAX			// This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
 
