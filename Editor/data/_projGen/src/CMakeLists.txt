@@ -22,6 +22,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 # Build Options
 %HY_USEGLFW%
+%HY_USESDL2%
 %HY_USESDLNET%
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
 option(HYBUILD_STATIC "Statically link all dependencies into the executable" OFF)
@@ -32,6 +33,9 @@ option(HYBUILD_STATIC "Statically link all dependencies into the executable" OFF
 
 if(HYBUILD_GLFW)
 	add_compile_definitions(HY_USE_GLFW)
+endif()
+if(HYBUILD_SDL2)
+	add_compile_definitions(HY_USE_SDL2)
 endif()
 if(HYBUILD_SPINE)
 	add_compile_definitions(HY_USE_SPINE)
@@ -47,29 +51,36 @@ message(STATUS "%HY_TITLE% building for target: ${CMAKE_SYSTEM_NAME}")
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${REL_PROJ_PATH}/bin/web")
 	set(HYEM_COMPILE_FLAGS "")
-
-	list(APPEND HYEM_COMPILE_FLAGS "-s USE_SDL=2")
 	list(APPEND HYEM_COMPILE_FLAGS "-s USE_OGG=1")
 	list(APPEND HYEM_COMPILE_FLAGS "-s USE_VORBIS=1")
 	
 	set(HYEM_LINK_FLAGS "")
 	list(APPEND HYEM_LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
 	list(APPEND HYEM_LINK_FLAGS "-s USE_WEBGL2=1")
-	list(APPEND HYEM_LINK_FLAGS "-s USE_SDL=2")
 	list(APPEND HYEM_LINK_FLAGS "-s USE_OGG=1")
 	list(APPEND HYEM_LINK_FLAGS "-s USE_VORBIS=1")
 	list(APPEND HYEM_LINK_FLAGS "-s FETCH")
 	#list(APPEND HYEM_LINK_FLAGS "-s EXPORTED_RUNTIME_METHODS=ccall")
 	#list(APPEND HYEM_LINK_FLAGS "-s EXPORTED_FUNCTIONS=_main,_doPariplayEvent")
 	
-	if(HYBUILD_ICU)
-		list(APPEND HYEM_COMPILE_FLAGS "-s USE_ICU=1")
-		list(APPEND HYEM_LINK_FLAGS "-s USE_ICU=1")
+	if(HYBUILD_GLFW)
+		list(APPEND HYEM_COMPILE_FLAGS "-s USE_GLFW=3")
+		list(APPEND HYEM_LINK_FLAGS "-s USE_GLFW=3")
+	endif()
+	
+	if(HYBUILD_SDL2)
+		list(APPEND HYEM_COMPILE_FLAGS "-s USE_SDL=2")
+		list(APPEND HYEM_LINK_FLAGS "-s USE_SDL=2")
 	endif()
 	
 	if(HYBUILD_SDL_NET)
 		list(APPEND HYEM_COMPILE_FLAGS "-s USE_SDL_NET=2")
 		list(APPEND HYEM_LINK_FLAGS "-s USE_SDL_NET=2")
+	endif()
+	
+	if(HYBUILD_ICU)
+		list(APPEND HYEM_COMPILE_FLAGS "-s USE_ICU=1")
+		list(APPEND HYEM_LINK_FLAGS "-s USE_ICU=1")
 	endif()
 	
 	list(APPEND HYEM_LINK_FLAGS "--no-heap-copy")

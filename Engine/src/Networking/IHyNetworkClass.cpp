@@ -9,11 +9,11 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Networking/IHyNetworkClass.h"
-#include "Networking/HyNetworking.h"
+#include "Networking/IHyNetworking.h"
 #include "Diagnostics/Console/IHyConsole.h"
 #include "Utilities/HyMath.h"
 
-/*static*/ HyNetworking *IHyNetworkClass::sm_pNetworking = nullptr;
+/*static*/ IHyNetworking *IHyNetworkClass::sm_pNetworking = nullptr;
 
 IHyNetworkClass::IHyNetworkClass(uint32 uiRecvBufferSize, HyThreadPriority ePriority /*= HYTHREAD_Normal*/, uint32 uiUpdateThrottleMs /*= 15*/) :
 	IHyThreadClass(ePriority, uiUpdateThrottleMs),

@@ -12,11 +12,11 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
+#include "Utilities/HyMain.h"
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Input/HyInput.h"
 #include "Renderer/Effects/HyStencil.h"
-#include "Networking/HyNetworking.h"
 #include "Networking/IHyNetworkClass.h"
 #include "Scene/HyScene.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
@@ -58,7 +58,7 @@ class HyEngine
 
 	HyConsoleInterop			m_Console;
 	HyWindowManager				m_WindowManager;
-	HyNetworking				m_Networking;
+	HyNetworkInterop			m_Networking;
 	HyAudioCore 				m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;

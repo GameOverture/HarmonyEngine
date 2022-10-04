@@ -13,12 +13,12 @@
 #include "Afx/HyInteropAfx.h"
 #include "Threading/IHyThreadClass.h"
 
-class HyNetworking;
+class IHyNetworking;
 
 class IHyNetworkClass : public IHyThreadClass
 {
-	friend class HyNetworking;
-	static HyNetworking *		sm_pNetworking;
+	friend class IHyNetworking;
+	static IHyNetworking *		sm_pNetworking;
 
 	const uint32				m_uiMAX_RECV_SIZE;
 

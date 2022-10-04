@@ -281,7 +281,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 {
 	newMetaBankObjRef["OutputName"] = m_ProjectRef.GetName();
 	newMetaBankObjRef["SrcDepends"] = QJsonArray();
-	newMetaBankObjRef["UseGlfw"] = false;
+	newMetaBankObjRef["UseSdl2"] = false;
 	newMetaBankObjRef["UseSdlNet"] = false;
 	newMetaBankObjRef["UseIcu"] = false;
 }
@@ -514,21 +514,29 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	sContents.replace("%HY_RELHARMONYDIR%", m_MetaDir.relativeFilePath(MainWindow::EngineSrcLocation()));
 	sContents.replace("%HY_OUTPUTNAME%", pSourceBank->m_MetaObj["OutputName"].toString());
 
-	if(pSourceBank->m_MetaObj["UseGlfw"].toBool())
+	// SDL or GLFW
+	if(pSourceBank->m_MetaObj["UseSdl2"].toBool() == false)
 		sContents.replace("%HY_USEGLFW%", "set(HYBUILD_GLFW ON)");
 	else
 		sContents.replace("%HY_USEGLFW%", "set(HYBUILD_GLFW OFF)");
+	if(pSourceBank->m_MetaObj["UseSdl2"].toBool())
+		sContents.replace("%HY_USESDL2%", "set(HYBUILD_SDL2 ON)");
+	else
+		sContents.replace("%HY_USESDL2%", "set(HYBUILD_SDL2 OFF)");
 
+	// SDL_net
 	if(pSourceBank->m_MetaObj["UseSdlNet"].toBool())
 		sContents.replace("%HY_USESDLNET%", "set(HYBUILD_SDL_NET ON)");
 	else
 		sContents.replace("%HY_USESDLNET%", "set(HYBUILD_SDL_NET OFF)");
 
+	// Spine
 	if(pSourceBank->m_MetaObj["UseSpine"].toBool())
 		sContents.replace("%HY_USESPINE%", "set(HYBUILD_SPINE ON)");
 	else
 		sContents.replace("%HY_USESPINE%", "set(HYBUILD_SPINE OFF)");
 
+	// ICU
 	if(pSourceBank->m_MetaObj["UseIcu"].toBool())
 		sContents.replace("%HY_USEICU%", "set(HYBUILD_ICU ON)");
 	else

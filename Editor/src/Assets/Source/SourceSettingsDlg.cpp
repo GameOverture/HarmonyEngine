@@ -23,7 +23,7 @@ SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject sett
 
 	ui->txtOutputName->setText(settingsObj["OutputName"].toString());
 
-	ui->chkUseGlfw->setChecked(settingsObj["UseGlfw"].toBool());
+	ui->grpSdl2->setChecked(settingsObj["UseSdl2"].toBool());
 	ui->chkUseSdlNet->setChecked(settingsObj["UseSdlNet"].toBool());
 
 	ui->chkUseSpine->setChecked(settingsObj["UseSpine"].toBool());
@@ -99,8 +99,8 @@ void SourceSettingsDlg::UpdateMetaObj(QJsonObject &metaObjRef) const
 {
 	metaObjRef.insert("OutputName", ui->txtOutputName->text());
 
-	metaObjRef.insert("UseGlfw", ui->chkUseGlfw->isChecked());
-	metaObjRef.insert("UseSdlNet", ui->chkUseSdlNet->isChecked());
+	metaObjRef.insert("UseSdl2", ui->grpSdl2->isChecked());
+	metaObjRef.insert("UseSdlNet", ui->grpSdl2->isChecked() && ui->chkUseSdlNet->isChecked());
 
 	metaObjRef.insert("UseSpine", ui->chkUseSpine->isChecked());
 	metaObjRef.insert("UseIcu", ui->chkUseIcu->isChecked());
