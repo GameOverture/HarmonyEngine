@@ -12,13 +12,13 @@
 
 #include <emscripten.h>
 #include <emscripten/html5.h>
-
 #include <emscripten/fetch.h>
 
-#define HY_USE_SDL2
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-#include <SDL2/SDL_opengl_glext.h>
+#ifdef HY_USE_SDL2
+	#include <SDL2/SDL.h>
+	#include <SDL2/SDL_opengl.h>
+	#include <SDL2/SDL_opengl_glext.h>
+#endif
 
 #include <GLES3/gl3.h>
 //#include <GL/gl.h>

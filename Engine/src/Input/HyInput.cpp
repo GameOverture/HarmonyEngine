@@ -50,7 +50,7 @@
 		HyInput &inputRef = HyEngine::Input();
 
 		inputRef.m_vMouseScroll_LiveCount.x += static_cast<int32>(dX);
-		inputRef.m_vMouseScroll_LiveCount.y += static_cast<int32>(dY);
+		inputRef.m_vMouseScroll_LiveCount.y += static_cast<int32>(-dY);
 	}
 
 	/*friend*/ void HyGlfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods)

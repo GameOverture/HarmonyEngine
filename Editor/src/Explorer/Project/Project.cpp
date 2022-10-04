@@ -95,7 +95,7 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	if(m_bHasError)
 		return;
 
-	VersionPatcher::Run(this);
+	bool bFilesPatched = VersionPatcher::Run(this);
 	m_SettingsObj = ReadProjFile();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +113,8 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 	m_pSourceModel = new SourceModel(*this);
 	m_pSourceModel->Init();
+	if(bFilesPatched)
+		m_pSourceModel->SaveMeta();
 
 	m_pAtlasModel = new AtlasModel(*this);
 	m_pAtlasModel->Init();

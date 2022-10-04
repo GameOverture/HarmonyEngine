@@ -76,14 +76,14 @@ public:
 
 	int32 RunGame();
 
-protected:
-	// Derived game class overrides
-	virtual bool OnUpdate() { return true; }
-
 	virtual void OnWindowResized(HyWindow &windowRef) {
 		windowRef.SetFramebufferSize(windowRef.GetWindowSize());
 	}
 	virtual void OnWindowMoved(HyWindow &windowRef) { }
+
+protected:
+	// Derived game class overrides
+	virtual bool OnUpdate() { return true; }
 
 #if defined(HY_PLATFORM_GUI) || defined(HY_PLATFORM_BROWSER)
 public:

@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Window/HyWindow.h"
 #include "Input/HyInput.h"
+#include "Window/HyWindowManager.h"
 
 #ifdef HY_USE_GLFW
 	void HyGlfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
@@ -17,6 +18,8 @@
 		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
 		pHyWindow->m_Info.vSize.x = iWidth;
 		pHyWindow->m_Info.vSize.y = iHeight;
+
+		pHyWindow->DoWindowResized();
 	}
 
 	void HyGlfw_FramebufferSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
@@ -24,6 +27,8 @@
 		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
 		pHyWindow->m_vFramebufferSize.x = iWidth;
 		pHyWindow->m_vFramebufferSize.y = iHeight;
+
+		pHyWindow->DoWindowResized();
 	}
 
 	void HyGlfw_WindowPosCallback(GLFWwindow *pWindow, int32 iX, int32 iY)
@@ -31,11 +36,14 @@
 		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
 		pHyWindow->m_Info.ptLocation.x = iX;
 		pHyWindow->m_Info.ptLocation.y = iY;
+
+		pHyWindow->DoWindowMoved();
 	}
 #endif
 
-HyWindow::HyWindow(uint32 uiIndex, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowInteropPtr hSharedContext) :
+HyWindow::HyWindow(uint32 uiIndex, HyWindowManager &managerRef, const HyWindowInfo &windowInfoRef, bool bShowCursor, HyWindowInteropPtr hSharedContext) :
 	m_uiINDEX(uiIndex),
+	m_ManagerRef(managerRef),
 	m_uiId(m_uiINDEX),
 	m_pInterop(nullptr)
 {
@@ -621,3 +629,13 @@ void HyWindow::DoEvent(const SDL_Event &eventRef, HyInput &inputRef)
 	}
 }
 #endif
+
+void HyWindow::DoWindowResized()
+{
+	m_ManagerRef.DoWindowResized(*this);
+}
+
+void HyWindow::DoWindowMoved()
+{
+	m_ManagerRef.DoWindowMoved(*this);
+}

@@ -12,16 +12,22 @@
 
 #include "Window/HyWindow.h"
 
+class HyEngine;
+
 class HyWindowManager
 {
+	HyEngine &							m_EngineRef;
 	std::vector<HyWindow *>				m_WindowList;
 
 public:
-	HyWindowManager(uint32 uiNumWindows, bool bShowCursor, const HyWindowInfo windowInfos[HY_MAXWINDOWS]);
+	HyWindowManager(HyEngine &engineRef, uint32 uiNumWindows, bool bShowCursor, const HyWindowInfo windowInfos[HY_MAXWINDOWS]);
 	~HyWindowManager();
 
 	std::vector<HyWindow *> &GetWindowList();
 	HyWindow &GetWindow(uint32 uiWindowIndex);
+
+	void DoWindowResized(HyWindow &windowRef);
+	void DoWindowMoved(HyWindow &windowRef);
 
 #ifdef HY_USE_SDL2
 	HyWindow *DoEvent(const SDL_Event &eventRef, HyInput &inputRef);

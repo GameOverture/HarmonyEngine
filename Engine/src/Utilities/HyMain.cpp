@@ -61,7 +61,6 @@
 				return FALSE;
 			}
 			strcpy(argv[i], sConvStr.c_str());
-			argv[sConvStr.size()] = '\0';
 		}
 		argv[i] = NULL;
 		LocalFree(argvw);
