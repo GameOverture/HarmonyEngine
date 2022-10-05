@@ -161,6 +161,8 @@ void HyScene::UpdateNodes()
 			sm_NodeList_PauseUpdate[i]->Update();
 	}
 	HY_PROFILE_END
+
+	m_AudioCoreRef.Update();
 }
 
 // RENDER STATE BUFFER

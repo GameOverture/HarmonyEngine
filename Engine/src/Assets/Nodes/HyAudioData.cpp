@@ -94,6 +94,9 @@ int32 HyAudioData::GetPriority(uint32 uiStateIndex) const
 
 int32 HyAudioData::GetLoops(uint32 uiStateIndex) const
 {
+	if(m_pAudioStates[uiStateIndex].m_iLoops < 0 || m_pAudioStates[uiStateIndex].m_iLoops >= HYAUDIO_InfiniteLoops)
+		return HYAUDIO_InfiniteLoops;
+	
 	return m_pAudioStates[uiStateIndex].m_iLoops;
 }
 

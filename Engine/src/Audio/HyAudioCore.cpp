@@ -149,6 +149,37 @@ void HyAudioCore::HotUnload(HyAudioHandle hAudioHandle)
 	m_HotLoadMap.erase(hAudioHandle);
 }
 
+void HyAudioCore::Update()
+{
+	for(auto iter = m_PlayMap.begin(); iter != m_PlayMap.end(); )
+	{
+		PlayInfo &playInfoRef = iter->second;
+		if(ma_sound_at_end(playInfoRef.m_pSound))
+		{
+			if(playInfoRef.m_uiLoops > 0)
+			{
+				ma_sound_seek_to_pcm_frame(playInfoRef.m_pSound, 0); // Rewind sound to beginning
+				ma_result eResult = ma_sound_start(playInfoRef.m_pSound);
+				if(eResult != MA_SUCCESS)
+				{
+					HyLogError("ma_sound_seek_to_pcm_frame failed: " << eResult);
+					return;
+				}
+
+				if(playInfoRef.m_uiLoops != HYAUDIO_InfiniteLoops)
+					playInfoRef.m_uiLoops--;
+			}
+			else
+			{
+				iter = m_PlayMap.erase(iter);
+				continue;
+			}
+		}
+
+		++iter;
+	}
+}
+
 void HyAudioCore::AddBank(HyFileAudio *pBankFile)
 {
 	m_BankList.push_back(pBankFile);
@@ -340,16 +371,16 @@ void HyAudioCore::StopSound(PlayInfo &playInfoRef)
 
 void HyAudioCore::PauseSound(PlayInfo &playInfoRef)
 {
-	ma_result eResult = ma_sound_stop(playInfoRef.m_pSound); // When a sound is stopped, it is not rewound to the start
+	ma_result eResult = ma_sound_stop(playInfoRef.m_pSound); // When a sound is ma_sound_stop()'ed, it is not rewound to the start
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_sound_stop failed: " << eResult);
 }
 
 void HyAudioCore::UnpauseSound(PlayInfo &playInfoRef)
 {
-	ma_result eResult = ma_sound_start(playInfoRef.m_pSound); // When a sound is stopped, it is not rewound to the start
+	ma_result eResult = ma_sound_start(playInfoRef.m_pSound); // When a sound is ma_sound_stop()'ed, it is not rewound to the start
 	if(eResult != MA_SUCCESS)
-		HyLogError("ma_sound_stop failed: " << eResult);
+		HyLogError("ma_sound_start failed: " << eResult);
 }
 
 void HyAudioCore::ManipSound(PlayInfo &playInfoRef)

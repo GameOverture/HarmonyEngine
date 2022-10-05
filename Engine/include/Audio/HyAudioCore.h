@@ -88,6 +88,8 @@ public:
 	void HotUnload(HyAudioHandle hAudioHandle);
 
 protected:
+	void Update();
+
 	void AddBank(HyFileAudio *pBankFile);
 	void AddGroup(std::string sName, int32 iId);
 	void ProcessCue(IHyNode *pNode, HySoundCue eCueType);

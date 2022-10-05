@@ -13,6 +13,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/AnimFloats/HyAnimFloat.h"
 
+#define HYAUDIO_InfiniteLoops 255
+
 typedef std::vector<std::pair<uint32, uint32>> HyAudioPlayList;	// <checksum, weight>
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -31,7 +33,7 @@ class IHyAudio : public NODETYPE
 		uint32						m_ePlayListMode : 3;
 		uint32						m_bAllowRepeats : 1;
 		uint32						m_uiPriority : 4;
-		uint32						m_uiLoops : 8;			// 255 = loop forever
+		uint32						m_uiLoops : 8;			// 255 = loop forever (HYAUDIO_InfiniteLoops)
 		uint32						m_uiMaxDistance : 16;
 
 		AudioStateAttribs(HyPlayListMode ePlayList, bool bAllowRepeats, uint8 uiPriority, uint8 uiLoops, uint16 uiMaxDist)
