@@ -17,7 +17,8 @@
 SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject settingsObj, QWidget *pParent /*= nullptr*/) :
 	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
 	ui(new Ui::SourceSettingsDlg),
-	m_ProjectRef(projectRef)
+	m_ProjectRef(projectRef),
+	m_bIsError(false)
 {
 	ui->setupUi(this);
 
@@ -118,6 +119,16 @@ void SourceSettingsDlg::UpdateMetaObj(QJsonObject &metaObjRef) const
 	metaObjRef.insert("SrcDepends", srcDependsArray);
 }
 
+bool SourceSettingsDlg::IsError() const
+{
+	return m_bIsError;
+}
+
+QString SourceSettingsDlg::GetError() const
+{
+	return ui->lblError->text();
+}
+
 void SourceSettingsDlg::on_txtOutputName_textChanged(const QString &arg1)
 {
 	ErrorCheck();
@@ -125,13 +136,13 @@ void SourceSettingsDlg::on_txtOutputName_textChanged(const QString &arg1)
 
 void SourceSettingsDlg::ErrorCheck()
 {
-	bool bIsError = false;
+	m_bIsError = false;
 	do
 	{
 		if(ui->txtOutputName->text().isEmpty())
 		{
 			ui->lblError->setText("'Output Name' cannot be blank");
-			bIsError = true;
+			m_bIsError = true;
 			break;
 		}
 
@@ -141,16 +152,16 @@ void SourceSettingsDlg::ErrorCheck()
 			if(sError.isEmpty() == false)
 			{
 				ui->lblError->setText(sError);
-				bIsError = true;
+				m_bIsError = true;
 				break;
 			}
 		}
-		if(bIsError)
+		if(m_bIsError)
 			break;
 	}while(false);
 
-	ui->lblError->setVisible(bIsError);
-	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
+	ui->lblError->setVisible(m_bIsError);
+	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_bIsError);
 }
 
 void SourceSettingsDlg::on_btnAddDependency_clicked()

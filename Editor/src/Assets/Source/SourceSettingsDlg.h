@@ -29,6 +29,7 @@ class SourceSettingsDlg : public QDialog
 
 	const Project &				m_ProjectRef;
 	QList<WgtSrcDependency *>	m_SrcDependencyList;
+	bool						m_bIsError;
 
 public:
 	SourceSettingsDlg(const Project &projectRef, QJsonObject settingsObj, QWidget *pParent = nullptr);
@@ -41,6 +42,9 @@ public:
 	void Refresh();
 
 	void UpdateMetaObj(QJsonObject &metaObjRef) const;
+
+	bool IsError() const;
+	QString GetError() const;
 
 private Q_SLOTS:
 	void on_txtOutputName_textChanged(const QString &arg1);

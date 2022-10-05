@@ -19,6 +19,7 @@
 #include "AtlasModel.h"
 #include "GlobalUndoCmds.h"
 #include "IAssetItemData.h"
+#include "SourceSettingsDlg.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -115,6 +116,10 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	m_pSourceModel->Init();
 	if(bFilesPatched)
 		m_pSourceModel->SaveMeta();
+	SourceSettingsDlg *pDlg = new SourceSettingsDlg(*this, static_cast<BanksModel *>(m_pSourceModel->GetBanksModel())->GetBank(0)->m_MetaObj);
+	if(pDlg->IsError())
+		HyGuiLog("Project " % GetName(false) % " has invalid build settings.\n\n" % pDlg->GetError() % "\n\nPlease activate project, and resolve in Build -> Build Settings", LOGTYPE_Error);
+	delete pDlg;
 
 	m_pAtlasModel = new AtlasModel(*this);
 	m_pAtlasModel->Init();
