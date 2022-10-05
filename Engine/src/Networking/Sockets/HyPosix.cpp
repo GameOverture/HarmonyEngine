@@ -11,7 +11,7 @@
 #include "Networking/Sockets/HyPosix.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-#if !defined(HY_USE_SDL2_NET) && defined(HY_PLATFORM_LINUX)
+#if !(defined(HY_USE_SDL2) && defined(HY_USE_SDL2_NET)) && defined(HY_PLATFORM_LINUX)
 
 HyPosix::HyPosix()
 {
@@ -111,4 +111,4 @@ HyPosix::HyPosix()
 		::close(hSocket);
 }
 
-#endif // #if !defined(HY_USE_SDL2_NET) && defined(HY_PLATFORM_LINUX)
+#endif // !(defined(HY_USE_SDL2) && defined(HY_USE_SDL2_NET)) && defined(HY_PLATFORM_LINUX)

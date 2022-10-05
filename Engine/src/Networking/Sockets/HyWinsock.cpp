@@ -11,7 +11,7 @@
 #include "Networking/Sockets/HyWinsock.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-#if !defined(HY_USE_SDL2_NET) && defined(HY_PLATFORM_WINDOWS)
+#if !(defined(HY_USE_SDL2) && defined(HY_USE_SDL2_NET)) && defined(HY_PLATFORM_WINDOWS)
 
 HyWinsock::HyWinsock()
 {
@@ -116,4 +116,4 @@ HyWinsock::HyWinsock()
 	WSACleanup();
 }
 
-#endif // #if !defined(HY_USE_SDL2_NET) && defined(HY_PLATFORM_WINDOWS)
+#endif // #if !(defined(HY_USE_SDL2) && defined(HY_USE_SDL2_NET)) && defined(HY_PLATFORM_WINDOWS)

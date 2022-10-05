@@ -13,7 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Networking/IHyNetworking.h"
 
-#if !defined(HY_USE_SDL2_NET) && defined(HY_PLATFORM_WINDOWS)
+#if !(defined(HY_USE_SDL2) && defined(HY_USE_SDL2_NET)) && defined(HY_PLATFORM_WINDOWS)
 class HyWinsock : public IHyNetworking
 {
 public:
