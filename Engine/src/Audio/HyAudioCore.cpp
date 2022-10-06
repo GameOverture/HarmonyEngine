@@ -23,6 +23,7 @@
 HyAudioCore::HyAudioCore() :
 	m_uiHotLoadCount(1)
 {
+#ifndef HY_PLATFORM_GUI
 	// Device
 	//m_DevConfig = ma_device_config_init(ma_device_type_playback);
 	////m_DevConfig.playback.pDeviceID = &pPlaybackInfos[chosenPlaybackDeviceIndex].id;
@@ -71,6 +72,7 @@ HyAudioCore::HyAudioCore() :
 		HyLogError("HyAudioCore_miniaudio failed: " << eResult);  // Failed to initialize the engine.
 		return;
 	}
+#endif
 }
 
 /*virtual*/ HyAudioCore::~HyAudioCore(void)
@@ -78,8 +80,10 @@ HyAudioCore::HyAudioCore() :
 	for(auto *pGrp : m_GroupList)
 		delete pGrp;
 
+#ifndef HY_PLATFORM_GUI
 	//ma_device_uninit(&m_Device);
 	ma_engine_uninit(&m_Engine);
+#endif
 }
 
 const char *HyAudioCore::GetAudioDriver()
@@ -124,9 +128,11 @@ ma_sound_group *HyAudioCore::GetGroup(int32 iId)
 
 void HyAudioCore::SetGlobalVolume(float fVolume)
 {
+#ifndef HY_PLATFORM_GUI
 	ma_result eResult = ma_engine_set_volume(&m_Engine, fVolume);
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_engine_set_volume failed: " << eResult);
+#endif
 }
 
 HyAudioHandle HyAudioCore::HotLoad(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit)

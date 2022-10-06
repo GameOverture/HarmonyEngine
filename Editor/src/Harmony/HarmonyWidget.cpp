@@ -37,11 +37,11 @@ HarmonyWidget::HarmonyWidget(Project *pProject) :
 
 /*virtual*/ HarmonyWidget::~HarmonyWidget()
 {
+	sm_bHarmonyLoaded = false;
 	m_pTimer->stop();
 
 	makeCurrent();
 	delete m_pHyEngine;
-	sm_bHarmonyLoaded = false;
 }
 
 Project *HarmonyWidget::GetProject()
