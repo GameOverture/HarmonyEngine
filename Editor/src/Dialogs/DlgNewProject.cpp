@@ -126,6 +126,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	jsonObj.insert("BuildPath", QString(ui->wgtBuildDir->GetRelPath() + "/"));
 
 	jsonObj.insert("UpdatesPerSec", static_cast<qint64>(hyInit.uiUpdatesPerSec));
+	jsonObj.insert("VSync", hyInit.iVSync);
 	jsonObj.insert("NumInputMaps", static_cast<qint64>(hyInit.uiNumInputMaps));
 	jsonObj.insert("ShowCursor", hyInit.bShowCursor);
 

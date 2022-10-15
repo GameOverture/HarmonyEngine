@@ -19,9 +19,10 @@
 
 IHyRenderer *IHyRenderer::sm_pInstance = nullptr;
 
-IHyRenderer::IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :
-	m_DiagnosticsRef(diagnosticsRef),
+IHyRenderer::IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef) :
+	m_iVSync(iVSync),
 	m_WindowListRef(windowListRef),
+	m_DiagnosticsRef(diagnosticsRef),
 	m_VertexBuffer(*this),
 	m_pCurWindow(nullptr),
 	m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),

@@ -13,14 +13,11 @@
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-#define HYTIME_ThresholdWarningsEvery 25.0	// How often to print a warning
-#define HYTIME_ThresholdMaxReset 100.0		// Maximum threshold until we hard reset
-
 std::vector<IHyTimeInst *>	HyTime::sm_TimeInstList;
 
 HyTime::HyTime(uint32 uiUpdatesPerSec) :
-	m_CurrTime(0),
-	m_PrevTime(0),
+	m_CurrTime(HyTimeStampDefaultVal),
+	m_PrevTime(HyTimeStampDefaultVal),
 	m_dFrameDelta(0.0),
 	m_dFixedUpdateDelta(0.0),
 	m_fpIsUpdateNeeded(nullptr),
@@ -117,7 +114,7 @@ double HyTime::GetTotalElapsedTime() const
 #elif defined(HY_USE_SDL2)
 	return static_cast<double>(SDL_GetPerformanceCounter()) / static_cast<double>(SDL_GetPerformanceFrequency());
 #else
-	return std::chrono::high_resolution_clock::now().count();
+	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 #endif
 }
 

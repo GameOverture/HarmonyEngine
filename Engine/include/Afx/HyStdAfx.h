@@ -365,6 +365,7 @@ struct HarmonyInit
 	uint32					uiNumWindows;
 	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
 	uint32					uiUpdatesPerSec;
+	int32					iVSync;
 	uint32					uiNumInputMaps;
 	bool					bShowCursor;
 	bool					bUseConsole;

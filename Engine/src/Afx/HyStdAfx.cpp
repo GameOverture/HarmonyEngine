@@ -104,6 +104,7 @@ HarmonyInit::HarmonyInit()
 	sGameName = "Untitled Game";
 	sDataDir = "data";
 	uiUpdatesPerSec = 0;
+	iVSync = 1;
 	uiNumInputMaps = 1;
 	bShowCursor = true;
 
@@ -178,6 +179,10 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		uiUpdatesPerSec = projDoc["UpdatesPerSec"].GetUint();
 	else
 		uiUpdatesPerSec = defaultVals.uiUpdatesPerSec;
+	if(projDoc.HasMember("VSync"))
+		iVSync = projDoc["VSync"].GetInt();
+	else
+		iVSync = defaultVals.iVSync;
 	if(projDoc.HasMember("NumInputMaps"))
 		uiNumInputMaps = projDoc["NumInputMaps"].GetUint();
 	else

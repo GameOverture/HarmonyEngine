@@ -92,9 +92,9 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 {
 }
 
-/*virtual*/ void CheckerGrid::OnUpdateUniforms() /*override*/
+/*virtual*/ void CheckerGrid::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
 {
-	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform();
+	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform(fExtrapolatePercent);
 
 	m_ShaderUniforms.Set("u_mtxTransform", mtx);
 	m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);
@@ -103,7 +103,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 	m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
 }
 
-/*virtual*/ bool CheckerGrid::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool CheckerGrid::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
 	HyAssert(GetNumVerts() == 6, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 
@@ -157,9 +157,9 @@ OverGrid::OverGrid(float fWidth, float fHeight, float fGridSize) :
 {
 }
 
-/*virtual*/ void OverGrid::OnUpdateUniforms() /*override*/
+/*virtual*/ void OverGrid::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
 {
-	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform();
+	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform(fExtrapolatePercent);
 
 	m_ShaderUniforms.Set("u_mtxTransform", mtx);
 	m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);

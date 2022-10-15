@@ -30,8 +30,9 @@ class IHyRenderer
 protected:
 	static IHyRenderer *							sm_pInstance;
 
-	HyDiagnostics &									m_DiagnosticsRef;
+	int32											m_iVSync;
 	std::vector<HyWindow *> &						m_WindowListRef;
+	HyDiagnostics &									m_DiagnosticsRef;
 
 	// Preallocated buffers
 	HyRenderBuffer									m_RenderBuffer;
@@ -52,7 +53,7 @@ protected:
 	HyShader *										m_pShaderPrimitive;
 
 public:
-	IHyRenderer(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef);
+	IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef);
 	virtual ~IHyRenderer(void);
 
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
@@ -72,6 +73,8 @@ public:
 	
 	void ProcessMsgs();
 	void Render();
+
+	virtual void SetVSync(int32 iVSync) = 0;
 
 	virtual void StartRender() = 0;
 	virtual void Begin_3d() = 0;

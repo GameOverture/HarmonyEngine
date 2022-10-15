@@ -31,10 +31,13 @@ typedef HyOpenGL HyRendererInterop;
 // TIME ////////////////////////////////////////////////////////////////////
 #ifdef HY_USE_GLFW
 	typedef double HyTimeStamp;
+	#define HyTimeStampDefaultVal 0.0
 #elif defined(HY_USE_SDL2)
 	typedef uint64_t HyTimeStamp;
+	#define HyTimeStampDefaultVal 0
 #else
 	typedef std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::duration<double>> HyTimeStamp;
+	#define HyTimeStampDefaultVal
 #endif
 
 // DEBUG CONSOLE ///////////////////////////////////////////////////////////

@@ -20,8 +20,8 @@
 #include "Scene/Nodes/Objects/HyCamera.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 
-HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windowListRef) :
-	IHyRenderer(diagnosticsRef, windowListRef),
+HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef) :
+	IHyRenderer(iVSync, windowListRef, diagnosticsRef),
 	m_mtxView(1.0f),
 	m_mtxProj(1.0f),
 	m_pPboHandles(nullptr),
@@ -164,6 +164,8 @@ HyOpenGL::HyOpenGL(HyDiagnostics &diagnosticsRef, std::vector<HyWindow *> &windo
 					reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)),
 					iMaxTextureSize,
 					sCompressedTextureFormats);
+
+	SetVSync(m_iVSync);
 }
 
 HyOpenGL::~HyOpenGL(void)
@@ -187,6 +189,20 @@ HyOpenGL::~HyOpenGL(void)
 	glfwMakeContextCurrent(m_pCurWindow->GetInterop());
 #elif defined(HY_USE_SDL2)
 	SDL_GL_MakeCurrent(m_pCurWindow->GetInterop(), m_Context);
+#endif
+}
+
+/*virtual*/ void HyOpenGL::SetVSync(int32 iVSync) /*override*/
+{
+	m_iVSync = iVSync;
+
+	// 0 for immediate updates
+	// 1 for updates synchronized with the vertical retrace
+	// -1 for adaptive vsync (SDL only?)
+#ifdef HY_USE_GLFW
+	glfwSwapInterval(m_iVSync);
+#elif defined(HY_USE_SDL2)
+	SDL_GL_SetSwapInterval(m_iVSync);
 #endif
 }
 
@@ -301,7 +317,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::FinishRender()
 {
 #ifdef HY_USE_GLFW
-	glfwSwapInterval(0); // This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
+	//glfwSwapInterval(0); // This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
 	glfwSwapBuffers(m_pCurWindow->GetInterop());
 #elif defined(HY_USE_SDL2)
 	//SDL_GL_SetSwapInterval(0); // 0 for immediate updates, 1 for updates synchronized with the vertical retrace, -1 for adaptive vsync

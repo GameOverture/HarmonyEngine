@@ -22,8 +22,8 @@ public:
 	CheckerGrid(float fWidth, float fHeight, float fGridSize);
 	virtual ~CheckerGrid();
 
-	virtual void OnUpdateUniforms() override;
-	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) override;
+	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
+	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 };
 
 class OverGrid : public CheckerGrid
@@ -32,7 +32,7 @@ public:
 	OverGrid(float fWidth, float fHeight, float fGridSize);
 	virtual ~OverGrid();
 
-	virtual void OnUpdateUniforms() override;
+	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 };
 
 class ProjectDraw : public IDraw

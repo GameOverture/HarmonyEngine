@@ -38,7 +38,7 @@ HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	m_Time(m_Init.uiUpdatesPerSec),
 	m_Diagnostics(m_Init, m_Time, m_Assets, m_Scene),
 	m_Input(m_Init.uiNumInputMaps, m_WindowManager.GetWindowList()),
-	m_Renderer(m_Diagnostics, m_WindowManager.GetWindowList())
+	m_Renderer(m_Init.iVSync, m_WindowManager.GetWindowList(), m_Diagnostics)
 {
 	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");
 
