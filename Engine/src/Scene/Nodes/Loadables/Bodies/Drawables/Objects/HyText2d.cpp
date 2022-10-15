@@ -70,7 +70,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 /*virtual*/ void HyText2d::OnLoadedUpdate() /*override*/
 {
 #ifdef HY_USE_TEXT_DEBUG_BOXES
-	const glm::mat4 &mtxSceneRef = GetSceneTransform();
+	const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
 	glm::vec3 vScale(1.0f);
 	glm::quat quatRot;
 	glm::vec3 ptTranslation;
@@ -126,7 +126,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	bIsBatchable = true;
 }
 
-/*virtual*/ bool HyText2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HyText2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
 	// CalculateGlyphInfos called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
 	CalculateGlyphInfos();
@@ -134,7 +134,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	const HyTextData *pData = static_cast<const HyTextData *>(UncheckedGetData());
 
 	const uint32 uiNUMLAYERS = pData->GetNumLayers(m_uiState);
-	const glm::mat4 &mtxTransformRef = GetSceneTransform();
+	const glm::mat4 &mtxTransformRef = GetSceneTransform(fExtrapolatePercent);
 
 	uint32 iOffsetIndex = 0;
 	for(int32 i = uiNUMLAYERS - 1; i >= 0; --i)
@@ -157,14 +157,14 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 			vertexBufferRef.AppendData2d(&m_pGlyphInfos[uiGlyphOffsetIndex].vOffset, sizeof(glm::vec2));
 
 			glm::vec3 vTopColor = m_StateColors[m_uiState]->m_LayerColors[i]->topClr.GetAsVec3();
-			vTopColor *= CalculateTopTint();
+			vTopColor *= CalculateTopTint(fExtrapolatePercent);
 			vertexBufferRef.AppendData2d(&vTopColor, sizeof(glm::vec3));
 
-			float fAlpha = CalculateAlpha() * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
+			float fAlpha = CalculateAlpha(fExtrapolatePercent) * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
 			vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 
 			glm::vec3 vBotColor = m_StateColors[m_uiState]->m_LayerColors[i]->botClr.GetAsVec3();
-			vBotColor *= CalculateBotTint();
+			vBotColor *= CalculateBotTint(fExtrapolatePercent);
 			vertexBufferRef.AppendData2d(&vBotColor, sizeof(glm::vec3));
 
 			vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));

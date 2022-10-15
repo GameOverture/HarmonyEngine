@@ -53,7 +53,7 @@ void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string
 	m_DiagnosticsRef.SetRendererInfo(sApiName, sVersion, sVendor, sRenderer, sShader, iMaxTextureSize, sCompressedTextures);
 }
 
-void IHyRenderer::PrepareBuffers()
+void IHyRenderer::PrepareBuffers(float fExtrapolatePercent)
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Init everything to beginning of buffers
@@ -72,7 +72,7 @@ void IHyRenderer::PrepareBuffers()
 
 		const std::vector<IHyDrawable2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
-			AppendDrawable2d(0, *instanceListRef[i], HY_FULL_CAMERA_MASK);
+			AppendDrawable2d(0, *instanceListRef[i], HY_FULL_CAMERA_MASK, fExtrapolatePercent);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ void IHyRenderer::PrepareBuffers()
 	m_RenderBuffer.CreateRenderHeader();
 }
 
-void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask)
+void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask, float fExtrapolatePercent)
 {
 	if(instanceRef.GetType() != HYTYPE_Prefab)
 	{
@@ -88,16 +88,16 @@ void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCa
 		return;
 	}
 
-	instanceRef.OnUpdateUniforms();
+	instanceRef.OnUpdateUniforms(fExtrapolatePercent);
 	
 	const HyPrefabData *pData = static_cast<const HyPrefabData *>(instanceRef.AcquireData());
 	pData->GetGltf()->AppendRenderStates(m_RenderBuffer);
 }
 
-void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask)
+void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, float fExtrapolatePercent)
 {
-	instanceRef.OnUpdateUniforms();
-	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, m_VertexBuffer);
+	instanceRef.OnUpdateUniforms(fExtrapolatePercent);
+	m_RenderBuffer.AppendRenderState(uiId, instanceRef, uiCameraMask, m_VertexBuffer, fExtrapolatePercent);
 }
 
 HyVertexBufferHandle IHyRenderer::AppendVertexData3d(const uint8 *pData, uint32 uiSize)
@@ -155,8 +155,6 @@ void IHyRenderer::ProcessMsgs()
 
 void IHyRenderer::Render()
 {
-	HY_PROFILE_BEGIN(HYPROFILERSECTION_Render)
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup render state buffer
 	HyRenderBuffer::Header *pRsHeader = m_RenderBuffer.GetHeaderPtr();
@@ -210,8 +208,6 @@ void IHyRenderer::Render()
 
 		FinishRender();
 	}
-	
-	HY_PROFILE_END
 }
 
 /*virtual*/ void IHyRenderer::SetCurrentWindow(uint32 uiIndex)

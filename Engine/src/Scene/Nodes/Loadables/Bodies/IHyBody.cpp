@@ -32,7 +32,7 @@ IHyBody::IHyBody(const IHyBody &copyRef) :
 	{
 		m_pScissor = HY_NEW ScissorRect();
 		m_pScissor->m_LocalScissorRect = copyRef.m_pScissor->m_LocalScissorRect;
-		GetWorldScissor(m_pScissor->m_WorldScissorRect);
+		GetWorldScissor(m_pScissor->m_WorldScissorRect, 0.0f);
 	}
 }
 
@@ -56,7 +56,7 @@ IHyBody &IHyBody::operator=(const IHyBody &rhs)
 	{
 		m_pScissor = HY_NEW ScissorRect();
 		m_pScissor->m_LocalScissorRect = rhs.m_pScissor->m_LocalScissorRect;
-		GetWorldScissor(m_pScissor->m_WorldScissorRect);
+		GetWorldScissor(m_pScissor->m_WorldScissorRect, 0.0f);
 	}
 
 	m_hStencil = rhs.m_hStencil;
@@ -89,7 +89,7 @@ void IHyBody::GetLocalScissor(HyScreenRect<int32> &scissorOut) const
 	scissorOut = m_pScissor->m_LocalScissorRect;
 }
 
-void IHyBody::GetWorldScissor(HyScreenRect<int32> &scissorOut)
+void IHyBody::GetWorldScissor(HyScreenRect<int32> &scissorOut, float fExtrapolatePercent)
 {
 	if(m_pScissor == nullptr)
 	{
@@ -97,15 +97,15 @@ void IHyBody::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 		return;
 	}
 
-	if(_VisableGetNodeRef().IsDirty(IHyNode::DIRTY_Scissor))
+	if(_VisableGetNodeRef().IsDirty(IHyNode::DIRTY_Scissor) || fExtrapolatePercent != 0.0f)
 	{
 		bool bHasParent = (_VisableGetParent2dPtr() != nullptr || _VisableGetParent3dPtr() != nullptr);
 		if((_VisableGetNodeRef().m_uiFlags & IHyNode::EXPLICIT_Scissor) == 0 && bHasParent)
 		{
 			if(_VisableGetParent2dPtr())
-				_VisableGetParent2dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+				_VisableGetParent2dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect, fExtrapolatePercent);
 			else
-				_VisableGetParent3dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+				_VisableGetParent3dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect, fExtrapolatePercent);
 		}
 		else
 		{
@@ -114,9 +114,9 @@ void IHyBody::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 				glm::mat4 mtx;
 
 				if((_VisableGetNodeRef().m_uiFlags & IHyNode::NODETYPE_Is2d) != 0)
-					mtx = static_cast<IHyNode2d &>(_VisableGetNodeRef()).GetSceneTransform();
+					mtx = static_cast<IHyNode2d &>(_VisableGetNodeRef()).GetSceneTransform(fExtrapolatePercent);
 				else
-					mtx = static_cast<IHyNode3d &>(_VisableGetNodeRef()).GetSceneTransform();
+					mtx = static_cast<IHyNode3d &>(_VisableGetNodeRef()).GetSceneTransform(fExtrapolatePercent);
 
 				m_pScissor->m_WorldScissorRect.x = static_cast<int32>(mtx[3].x + m_pScissor->m_LocalScissorRect.x);
 				m_pScissor->m_WorldScissorRect.y = static_cast<int32>(mtx[3].y + m_pScissor->m_LocalScissorRect.y);
@@ -150,7 +150,7 @@ void IHyBody::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 	_VisableGetNodeRef().m_uiFlags |= IHyNode::EXPLICIT_Scissor;
 	_VisableGetNodeRef().SetDirty(IHyNode::DIRTY_Scissor);
 
-	GetWorldScissor(m_pScissor->m_WorldScissorRect);
+	GetWorldScissor(m_pScissor->m_WorldScissorRect, 0.0f);
 }
 
 /*virtual*/ void IHyBody::ClearScissor(bool bUseParentScissor)
@@ -169,9 +169,9 @@ void IHyBody::GetWorldScissor(HyScreenRect<int32> &scissorOut)
 		if(_VisableGetParent2dPtr() != nullptr || _VisableGetParent3dPtr() != nullptr)
 		{
 			if(_VisableGetParent2dPtr())
-				_VisableGetParent2dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+				_VisableGetParent2dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect, 0.0f);
 			else
-				_VisableGetParent3dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect);
+				_VisableGetParent3dPtr()->GetWorldScissor(m_pScissor->m_WorldScissorRect, 0.0f);
 		}
 	}
 }

@@ -125,6 +125,10 @@ void DlgNewProject::on_buttonBox_accepted()
 	jsonObj.insert("SourcePath", QString(ui->wgtSourceDir->GetRelPath() + "/"));
 	jsonObj.insert("BuildPath", QString(ui->wgtBuildDir->GetRelPath() + "/"));
 
+	jsonObj.insert("UpdatesPerSec", static_cast<qint64>(hyInit.uiUpdatesPerSec));
+	jsonObj.insert("NumInputMaps", static_cast<qint64>(hyInit.uiNumInputMaps));
+	jsonObj.insert("ShowCursor", hyInit.bShowCursor);
+
 	QJsonArray windowInfoArray;
 	QJsonObject windowInfoObj;
 	windowInfoObj.insert("Name", ui->txtTitleName->text());
@@ -140,7 +144,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	QJsonObject consoleInfoObj;
 	consoleInfoObj.insert("LocationX", hyInit.consoleInfo.ptLocation.x);
 	consoleInfoObj.insert("LocationY", hyInit.consoleInfo.ptLocation.y);
-	consoleInfoObj.insert("Name", "Harmony Log Console");
+	consoleInfoObj.insert("Name", hyInit.consoleInfo.sName.c_str());
 	consoleInfoObj.insert("ResolutionX", hyInit.consoleInfo.vSize.x);
 	consoleInfoObj.insert("ResolutionY", hyInit.consoleInfo.vSize.y);
 	consoleInfoObj.insert("Type", hyInit.consoleInfo.eMode);

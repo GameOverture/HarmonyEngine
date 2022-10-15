@@ -149,6 +149,24 @@ void HyAnimFloat::Updater(std::function<float(float)> fpUpdaterFunc)
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
 
+void HyAnimFloat::Displace(float fMagnitude)
+{
+	if(fMagnitude == 0.0f)
+		StopAnim();
+	else
+	{
+		m_fStart = fMagnitude;
+		m_fTarget = m_fValueRef + m_fStart;
+		m_fDuration = 0.0f;
+		m_fpAnimFunc = nullptr;
+		m_fElapsedTime = 0.0f;
+		m_fpBehaviorUpdate = &HyAnimFloat::_Displace;
+		m_fpAnimFinishedFunc = nullptr;
+
+		m_OwnerRef.InsertActiveAnimFloat(this);
+	}
+}
+
 void HyAnimFloat::StopAnim()
 {
 	m_fpBehaviorUpdate = nullptr;
@@ -163,6 +181,19 @@ float HyAnimFloat::GetAnimDestination() const
 float HyAnimFloat::GetAnimRemainingDuration() const
 {
 	return m_fDuration - m_fElapsedTime;
+}
+
+float HyAnimFloat::Extrapolate(float fExtrapolatePercent) const
+{
+	if(m_fpBehaviorUpdate == nullptr)
+		return Get();
+	
+	uint32 uiDirtyFlags = 0;
+	float fElapsedTime = m_fElapsedTime;
+	float fExtrapolatedValue = m_fValueRef;
+	(this->*m_fpBehaviorUpdate)(HyEngine::DeltaTime() * fExtrapolatePercent, fElapsedTime, fExtrapolatedValue, uiDirtyFlags);
+
+	return fExtrapolatedValue;
 }
 
 HyAnimFloat &HyAnimFloat::operator=(const float &rhs)
@@ -303,8 +334,11 @@ bool HyAnimFloat::UpdateFloat()
 	if(m_fpBehaviorUpdate == nullptr)
 		return true;
 
-	if((this->*m_fpBehaviorUpdate)())
+	uint32 uiDirtyFlags = 0;
+	if((this->*m_fpBehaviorUpdate)(HyEngine::DeltaTime(), m_fElapsedTime, m_fValueRef, uiDirtyFlags))
 	{
+		m_OwnerRef.SetDirty(uiDirtyFlags);
+
 		// Store the callback in a temp func pointer and clear 'm_fpBehaviorUpdate' with StopAnim().
 		// When invoking the temp callback, if it happens to set 'm_fpBehaviorUpdate' again, it will stay 
 		// assigned and not be removed from m_OwnerRef's update
@@ -316,38 +350,47 @@ bool HyAnimFloat::UpdateFloat()
 		return (m_fpBehaviorUpdate == nullptr);
 	}
 	else
+	{
+		m_OwnerRef.SetDirty(uiDirtyFlags);
 		return false;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Update Behaviors
 //////////////////////////////////////////////////////////////////////////
-bool HyAnimFloat::_Tween()
+bool HyAnimFloat::_Tween(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const
 {
-	m_fElapsedTime = HyClamp(m_fElapsedTime + HyEngine::DeltaTime(), 0.0f, m_fDuration);
-	
-	m_fValueRef = m_fStart + (m_fTarget - m_fStart) * m_fpAnimFunc(m_fElapsedTime / m_fDuration);
-	m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
+	fElapsedTimeOut = HyClamp(fElapsedTimeOut + fDeltaTime, 0.0f, m_fDuration);
+	fValueOut = m_fStart + (m_fTarget - m_fStart) * m_fpAnimFunc(fElapsedTimeOut / m_fDuration);
+	uiDirtyFlagsOut = m_uiDIRTY_FLAGS;
 
-	return m_fElapsedTime == m_fDuration;
+	return fElapsedTimeOut == m_fDuration;
 }
 
-bool HyAnimFloat::_Proc()
+bool HyAnimFloat::_Proc(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const
 {
-	m_fElapsedTime = HyClamp(m_fElapsedTime + HyEngine::DeltaTime(), 0.0f, m_fDuration);
+	fElapsedTimeOut = HyClamp(fElapsedTimeOut + fDeltaTime, 0.0f, m_fDuration);
+	fValueOut = m_fpAnimFunc(fElapsedTimeOut / m_fDuration);
+	uiDirtyFlagsOut = m_uiDIRTY_FLAGS;
 
-	m_fValueRef = m_fpAnimFunc(m_fElapsedTime / m_fDuration);
-	m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS);
-
-	return m_fElapsedTime == m_fDuration;
+	return fElapsedTimeOut == m_fDuration;
 }
 
-bool HyAnimFloat::_Updater()
+bool HyAnimFloat::_Updater(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const
 {
-	m_fElapsedTime += HyEngine::DeltaTime();
+	fElapsedTimeOut += fDeltaTime;
+	fValueOut = m_fpAnimFunc(fElapsedTimeOut);
+	uiDirtyFlagsOut = m_uiDIRTY_FLAGS | IHyNode::DIRTY_FromUpdater;
 
-	m_fValueRef = m_fpAnimFunc(m_fElapsedTime);
-	m_OwnerRef.SetDirty(m_uiDIRTY_FLAGS | IHyNode::DIRTY_FromUpdater);
+	return false;
+}
+
+bool HyAnimFloat::_Displace(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const
+{
+	fElapsedTimeOut += fDeltaTime;
+	fValueOut *= (m_fStart * fDeltaTime);
+	uiDirtyFlagsOut = m_uiDIRTY_FLAGS;
 
 	return false;
 }

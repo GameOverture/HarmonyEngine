@@ -14,12 +14,6 @@
 
 #include <stdio.h>
 
-#ifdef HY_PLATFORM_GUI
-	#define HyThrottleUpdate
-#else
-	#define HyThrottleUpdate while(m_Time.ThrottleUpdate())
-#endif
-
 #ifdef HY_PLATFORM_BROWSER
 	EM_BOOL EmscriptenResizeCallback(int eventType, const EmscriptenUiEvent *e, void *userData)
 	{
@@ -41,10 +35,9 @@ HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	m_Audio(),
 	m_Scene(m_Audio, m_WindowManager.GetWindowList()),
 	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
-	m_GuiComms(m_Init.uiDebugPort, m_Assets),
-	m_Time(m_Init.uiUpdateTickMs),
+	m_Time(m_Init.uiUpdatesPerSec),
 	m_Diagnostics(m_Init, m_Time, m_Assets, m_Scene),
-	m_Input(m_Init.uiNumInputMappings, m_WindowManager.GetWindowList()),
+	m_Input(m_Init.uiNumInputMaps, m_WindowManager.GetWindowList()),
 	m_Renderer(m_Diagnostics, m_WindowManager.GetWindowList())
 {
 	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");
@@ -121,29 +114,27 @@ int32 HyEngine::RunGame()
 
 bool HyEngine::Update()
 {
-	m_Time.CalcTimeDelta();
-	m_Diagnostics.ApplyTimeDelta();
+	m_Time.BeginFrame();
+	m_Diagnostics.BeginFrame();
 
 #ifdef HY_CONFIG_SINGLETHREAD
 	IHyThreadClass::SingleThreadUpdate();
 #endif
 
-	//HyThrottleUpdate
+	while(m_Time.IsUpdateNeeded())
 	{
+		m_Diagnostics.BeginUpdate();
 		m_Scene.UpdateNodes();
-		
-		HY_PROFILE_BEGIN(HYPROFILERSECTION_Update)
 		if(PollPlatformApi() == false || OnUpdate() == false)
 			return false;
-		HY_PROFILE_END
-
-		m_Assets.Update(m_Renderer);
-		m_Renderer.ProcessMsgs();
-
-		m_GuiComms.Update();
 	}
 
-	m_Scene.PrepareRender(m_Renderer);
+	m_Diagnostics.BeginRenderPrep();
+	m_Assets.Update(m_Renderer);
+	m_Renderer.ProcessMsgs();
+	m_Scene.PrepareRender(m_Renderer, m_Time.GetExtrapolatePercent());
+
+	m_Diagnostics.BeginRender();
 	m_Renderer.Render();
 
 	return true;
@@ -253,13 +244,13 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 /*static*/ float HyEngine::DeltaTime()
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::DeltaTime() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Time.GetUpdateStepSeconds();
+	return sm_pInstance->m_Time.GetUpdateDelta();
 }
 
 /*static*/ double HyEngine::DeltaTimeD()
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::DeltaTimeD() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Time.GetUpdateStepSecondsDbl();
+	return sm_pInstance->m_Time.GetUpdateDeltaDbl();
 }
 
 /*static*/ void HyEngine::PauseGame(bool bPause)

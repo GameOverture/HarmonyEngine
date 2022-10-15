@@ -45,8 +45,8 @@ public:
 	void ParentDetach();
 	HyEntity2d *ParentGet() const;
 
-	void GetLocalTransform(glm::mat4 &mtxOut) const;
-	const glm::mat4 &GetSceneTransform();
+	void GetLocalTransform(glm::mat4 &mtxOut, float fExtrapolatePercent) const;
+	const glm::mat4 &GetSceneTransform(float fExtrapolatePercent);
 };
 
 #endif /* IHyNode2d_h__ */

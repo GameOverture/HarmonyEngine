@@ -34,7 +34,11 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	m_iMaxTextureSize(0),
 	m_sCompressedTextures("Unknown"),
 	m_bInitialMemCheckpointSet(false),
-	m_pDiagOutput(nullptr)
+	m_pProfiler(nullptr),
+	m_fpBeginFrame(nullptr),
+	m_fpBeginUpdate(nullptr),
+	m_fpBeginRenderPrep(nullptr),
+	m_fpBeginRender(nullptr)
 {
 #if defined(HY_COMPILER_MSVC)
 	m_sCompiler = "MSVC";
@@ -95,92 +99,61 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 		HyError("HY_ENDIAN_BIG was defined but did not pass calculation test");
 	}
 #endif
+
+	// This is required to initialize profiler function pointers
+	Show(HYDIAG_NONE);
 }
 
 HyDiagnostics::~HyDiagnostics()
 {
-	delete m_pDiagOutput;
-}
-
-void HyDiagnostics::BootMessage()
-{
-	std::string sGameTitle = m_InitStructRef.sGameName;
-#if defined(HY_DEBUG)
-	sGameTitle += " [Debug]";
-#else
-	sGameTitle += " [Release]";
-#endif
-
-	HyLog("");
-	HyLogTitle(sGameTitle << "\n\t" << m_TimeRef.GetDateTime());
-	HyLog("Compiler:         " << m_sCompiler);
-	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
-	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMappings);
-	
-	HyLogSection("Platform");
-
-	HyLog(m_sPlatform);
-
-	if(m_uiNumCpuCores != 0)
-		HyLog("Num CPU Cores:    " << m_uiNumCpuCores);
-	else
-		HyLog("Num CPU Cores:    unknown");
-
-	if(m_uiL1CacheSizeBytes != 0)
-		HyLog("CPU L1 Cache:     " << m_uiL1CacheSizeBytes << " bytes");
-	else
-		HyLog("CPU L1 Cache:     unknown");
-
-	HyLog("System Memory:    " << (m_uiTotalMemBytes / 1024 / 1024) << " MB");
-	if(m_uiVirtualMemBytes != 0) {
-		HyLog("Available Memory: " << (m_uiVirtualMemBytes / 1024 / 1024) << " MB");
-	}
-#if defined(HY_ENDIAN_LITTLE)
-	HyLog("Endian:           " << "Little");
-#else
-	HyLog("Endian:           " << "Big");
-#endif
-
-	HyLogSection(m_sGfxApi);
-
-	HyLog("Version:          " << m_sVersion);
-	HyLog("Vendor:           " << m_sVendor);
-	HyLog("Renderer:         " << m_sRenderer);
-	HyLog("Shader:           " << m_sShader);
-	HyLog("Max Texture Size: " << m_iMaxTextureSize);
-	HyLog("Compression:      " << m_sCompressedTextures);
-	HyLog("");
 }
 
 void HyDiagnostics::Init(std::string sTextPrefix, std::string sTextName, uint32 uiTextState)
 {
-	if(m_pDiagOutput == nullptr)
-		m_pDiagOutput = HY_NEW HyDiagOutput();
-	
-	m_pDiagOutput->InitText(sTextPrefix, sTextName, uiTextState);
+	if(m_pProfiler == nullptr)
+		m_pProfiler = HY_NEW HyProfiler();
+
+	m_pProfiler->InitText(sTextPrefix, sTextName, uiTextState);
 }
 
 void HyDiagnostics::Show(uint32 uiDiagFlags)
 {
-	if(m_pDiagOutput == nullptr)
+	if(uiDiagFlags == HYDIAG_NONE)
 	{
-		HyLogWarning("HyDiagnostics::Show() was invoked before HyDiagnostics::Init() was callled");
-		return;
+		m_fpBeginFrame = []() {};
+		m_fpBeginUpdate = []() {};
+		m_fpBeginRenderPrep = []() {};
+		m_fpBeginRender = []() {};
+
+		if(m_pProfiler)
+			m_pProfiler->SetVisible(false);
 	}
+	else
+	{
+		HyAssert(m_pProfiler, "HyDiagnostics::Init was not invoked before HyDiagnostics::Show");
 
-	if(uiDiagFlags != 0 && m_pDiagOutput->IsLoaded() == false)
-		m_pDiagOutput->Load();
+		m_fpBeginFrame = [this]() { m_pProfiler->BeginFrame(m_TimeRef); };
+		m_fpBeginUpdate = [this]() { m_pProfiler->BeginUpdate(m_TimeRef); };
+		m_fpBeginRenderPrep = [this]() { m_pProfiler->BeginRenderPrep(m_TimeRef); };
+		m_fpBeginRender = [this]() { m_pProfiler->BeginRender(m_TimeRef); };
 
-	m_pDiagOutput->SetShowFlags(uiDiagFlags);
-	m_pDiagOutput->UseWindowCoordinates(0);
+		m_pProfiler->SetVisible(true);
+		m_pProfiler->SetSize(static_cast<int32>(HyEngine::Window().GetWidthF(0.33f)), HyEngine::Window().GetHeight());
+	}
+	
+	if(m_pProfiler)
+	{
+		m_pProfiler->SetShowFlags(uiDiagFlags);
+		m_pProfiler->Load();
+	}
 }
 
 uint32 HyDiagnostics::GetShowFlags()
 {
-	if(m_pDiagOutput)
-		return m_pDiagOutput->GetShowFlags();
-
-	return 0;
+	if(m_pProfiler)
+		return m_pProfiler->GetShowFlags();
+	else
+		return HYDIAG_NONE;
 }
 
 void HyDiagnostics::DumpAtlasUsage()
@@ -332,20 +305,54 @@ void HyDiagnostics::EndMemoryCheckpoint()
 #endif
 }
 
-void HyDiagnostics::ProfileBegin(HyProfilerSection eSection)
+void HyDiagnostics::BootMessage()
 {
-	m_Profiler.BeginSection(eSection);
-}
+	std::string sGameTitle = m_InitStructRef.sGameName;
+#if defined(HY_DEBUG)
+	sGameTitle += " [Debug]";
+#else
+	sGameTitle += " [Release]";
+#endif
 
-void HyDiagnostics::ProfileEnd()
-{
-	m_Profiler.EndSection();
-}
+	HyLog("");
+	HyLogTitle(sGameTitle << "\n\t" << m_TimeRef.GetDateTime());
+	HyLog("Compiler:         " << m_sCompiler);
+	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
+	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMaps);
 
-void HyDiagnostics::ApplyTimeDelta()
-{
-	if(m_pDiagOutput)
-		m_pDiagOutput->ApplyTimeDelta(m_TimeRef.GetUpdateStepSecondsDbl());
+	HyLogSection("Platform");
+
+	HyLog(m_sPlatform);
+
+	if(m_uiNumCpuCores != 0)
+		HyLog("Num CPU Cores:    " << m_uiNumCpuCores);
+	else
+		HyLog("Num CPU Cores:    unknown");
+
+	if(m_uiL1CacheSizeBytes != 0)
+		HyLog("CPU L1 Cache:     " << m_uiL1CacheSizeBytes << " bytes");
+	else
+		HyLog("CPU L1 Cache:     unknown");
+
+	HyLog("System Memory:    " << (m_uiTotalMemBytes / 1024 / 1024) << " MB");
+	if(m_uiVirtualMemBytes != 0) {
+		HyLog("Available Memory: " << (m_uiVirtualMemBytes / 1024 / 1024) << " MB");
+	}
+#if defined(HY_ENDIAN_LITTLE)
+	HyLog("Endian:           " << "Little");
+#else
+	HyLog("Endian:           " << "Big");
+#endif
+
+	HyLogSection(m_sGfxApi);
+
+	HyLog("Version:          " << m_sVersion);
+	HyLog("Vendor:           " << m_sVendor);
+	HyLog("Renderer:         " << m_sRenderer);
+	HyLog("Shader:           " << m_sShader);
+	HyLog("Max Texture Size: " << m_iMaxTextureSize);
+	HyLog("Compression:      " << m_sCompressedTextures);
+	HyLog("");
 }
 
 void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)
@@ -357,4 +364,24 @@ void HyDiagnostics::SetRendererInfo(const std::string &sApi, const std::string &
 	m_sShader = sShader;
 	m_iMaxTextureSize = iMaxTextureSize;
 	m_sCompressedTextures = sCompressedTextures;
+}
+
+void HyDiagnostics::BeginFrame()
+{
+	m_fpBeginFrame();
+}
+
+void HyDiagnostics::BeginUpdate()
+{
+	m_fpBeginUpdate();
+}
+
+void HyDiagnostics::BeginRenderPrep()
+{
+	m_fpBeginRenderPrep();
+}
+
+void HyDiagnostics::BeginRender()
+{
+	m_fpBeginRender();
 }

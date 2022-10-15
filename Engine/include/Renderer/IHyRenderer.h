@@ -57,9 +57,9 @@ public:
 
 	void SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
 
-	void PrepareBuffers();
-	void AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask);
-	void AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask);
+	void PrepareBuffers(float fExtrapolatePercent);
+	void AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCameraMask uiCameraMask, float fExtrapolatePercent);
+	void AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, float fExtrapolatePercent);
 
 	HyVertexBufferHandle AppendVertexData3d(const uint8 *pData, uint32 uiSize);
 

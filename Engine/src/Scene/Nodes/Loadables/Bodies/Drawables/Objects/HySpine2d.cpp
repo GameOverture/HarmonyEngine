@@ -174,7 +174,7 @@ uint32 HySpine2d::GetNumSlots()
 #endif
 }
 
-/*virtual*/ bool HySpine2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HySpine2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
 #ifdef HY_USE_SPINE
 	uint32 uiNumSlots = static_cast<uint32>(m_pSkeleton->getDrawOrder().size());

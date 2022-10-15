@@ -117,6 +117,11 @@ HyWindow::HyWindow(uint32 uiIndex, HyWindowManager &managerRef, const HyWindowIn
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	#endif
 
+	if(bShowCursor)
+		SDL_ShowCursor(SDL_ENABLE);
+	else
+		SDL_ShowCursor(SDL_DISABLE);
+
 	uint32 uiWindowFlags = SDL_WINDOW_OPENGL;
 	switch(m_Info.eMode)
 	{

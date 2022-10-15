@@ -227,11 +227,8 @@ bool HyLayout::IsWidgetInputAllowed()
 /*virtual*/ glm::ivec2 HyLayout::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
 	glm::ivec2 vTargetSize(uiNewWidth, uiNewHeight);
-	if(m_vActualSize == vTargetSize)
-	{
-		m_bLayoutDirty = false;
+	if(m_vActualSize == vTargetSize && m_bLayoutDirty == false)
 		return m_vActualSize;
-	}
 
 	HyOrientation eOrientation, eInverseOrien;
 	int32 iInverseOrienMargin;

@@ -33,6 +33,18 @@ const glm::vec3 &HyAnimVec3::Get() const
 	return m_vValue;
 }
 
+HyAnimFloat &HyAnimVec3::GetAnimFloat(uint32 uiIndex)
+{
+	return m_AnimFloatList[uiIndex];
+}
+
+glm::vec3 HyAnimVec3::Extrapolate(float fExtrapolatePercent) const
+{
+	return glm::vec3(m_AnimFloatList[0].Extrapolate(fExtrapolatePercent),
+					 m_AnimFloatList[1].Extrapolate(fExtrapolatePercent),
+					 m_AnimFloatList[2].Extrapolate(fExtrapolatePercent));
+}
+
 float HyAnimVec3::X() const
 {
 	return m_AnimFloatList[0].Get();
@@ -229,6 +241,34 @@ void HyAnimVec3::Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::v
 	m_AnimFloatList[0].Proc(fSeconds, [=](float fRatio) { auto p = ((1-fRatio) * (1-fRatio) * (1-fRatio)) * pt1 + 3 * fRatio * ((1-fRatio) * (1-fRatio)) * pt2 + 3 * (fRatio * fRatio) * (1-fRatio) * pt3 + (fRatio * fRatio * fRatio) * pt4; return p.x; }, fpFinishedCallback);
 	m_AnimFloatList[1].Proc(fSeconds, [=](float fRatio) { auto p = ((1-fRatio) * (1-fRatio) * (1-fRatio)) * pt1 + 3 * fRatio * ((1-fRatio) * (1-fRatio)) * pt2 + 3 * (fRatio * fRatio) * (1-fRatio) * pt3 + (fRatio * fRatio * fRatio) * pt4; return p.y; });
 	m_AnimFloatList[2].Proc(fSeconds, [=](float fRatio) { auto p = ((1-fRatio) * (1-fRatio) * (1-fRatio)) * pt1 + 3 * fRatio * ((1-fRatio) * (1-fRatio)) * pt2 + 3 * (fRatio * fRatio) * (1-fRatio) * pt3 + (fRatio * fRatio * fRatio) * pt4; return p.z; });
+}
+
+void HyAnimVec3::Displace(float fX, float fY, float fZ)
+{
+	m_AnimFloatList[0].Displace(fX);
+	m_AnimFloatList[1].Displace(fY);
+	m_AnimFloatList[2].Displace(fZ);
+}
+
+void HyAnimVec3::Displace(const glm::vec3 &srcVec)
+{
+	m_AnimFloatList[0].Displace(srcVec[0]);
+	m_AnimFloatList[1].Displace(srcVec[1]);
+	m_AnimFloatList[2].Displace(srcVec[2]);
+}
+
+void HyAnimVec3::Displace(const glm::ivec3 &srcVec)
+{
+	m_AnimFloatList[0].Displace(srcVec[0]);
+	m_AnimFloatList[1].Displace(srcVec[1]);
+	m_AnimFloatList[2].Displace(srcVec[2]);
+}
+
+void HyAnimVec3::Displace(const HyAnimVec3 &srcVec)
+{
+	m_AnimFloatList[0].Displace(srcVec[0]);
+	m_AnimFloatList[1].Displace(srcVec[1]);
+	m_AnimFloatList[2].Displace(srcVec[2]);
 }
 
 void HyAnimVec3::StopAnim()

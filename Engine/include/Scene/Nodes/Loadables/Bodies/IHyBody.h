@@ -50,7 +50,7 @@ public:
 
 	bool IsScissorSet() const;
 	void GetLocalScissor(HyScreenRect<int32> &scissorOut) const;
-	void GetWorldScissor(HyScreenRect<int32> &scissorOut);
+	void GetWorldScissor(HyScreenRect<int32> &scissorOut, float fExtrapolatePercent);
 	virtual void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
 	virtual void ClearScissor(bool bUseParentScissor);
 

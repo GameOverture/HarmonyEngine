@@ -103,7 +103,7 @@ public:
 	HyRenderBuffer::State *GetCurWritePosPtr();
 
 	void Reset();
-	void AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, HyVertexBuffer &vertexBufferRef);
+	void AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent);
 	void CreateRenderHeader();
 
 private:

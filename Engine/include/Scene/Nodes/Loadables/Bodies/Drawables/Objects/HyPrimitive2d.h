@@ -55,10 +55,10 @@ protected:
 	virtual bool OnIsValidToRender() override;
 	virtual void OnCalcBoundingVolume() override;
 
-	virtual void OnUpdateUniforms() override;
+	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
-	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) override;
+	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 
 private:
 	virtual void Load() override;

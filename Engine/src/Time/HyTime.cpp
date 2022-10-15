@@ -17,123 +17,136 @@
 #define HYTIME_ThresholdMaxReset 100.0		// Maximum threshold until we hard reset
 
 std::vector<IHyTimeInst *>	HyTime::sm_TimeInstList;
-std::chrono::time_point<StdPerfClock>	HyTime::sm_TimeStamp;
 
-HyTime::HyTime(uint32 uiUpdateTickMs) :
-	m_dTotalElapsedTime(0.0),
-	m_dThrottledTime(0.0),
-	m_dSpiralOfDeathCounter(HYTIME_ThresholdWarningsEvery),
-	m_dCurDeltaTime(0.0)
-#ifdef HY_USE_GLFW
-	, m_dPrevTime(0.0f)
-#elif defined(HY_USE_SDL2)
-	, m_uiPrev(0),
-	m_uiCur(0)
-#endif
+HyTime::HyTime(uint32 uiUpdatesPerSec) :
+	m_CurrTime(0),
+	m_PrevTime(0),
+	m_dFrameDelta(0.0),
+	m_dFixedUpdateDelta(0.0),
+	m_fpIsUpdateNeeded(nullptr),
+	m_dAccumulatedUpdateTime(0.0),
+	m_fpGetUpdateDelta(nullptr)
 {
-	SetUpdateTickMs(uiUpdateTickMs);
+	SetUpdatesPerSec(uiUpdatesPerSec);
 }
 
 HyTime::~HyTime(void)
 {
 }
 
-void HyTime::SetUpdateTickMs(uint32 uiUpdateTickMs)
+void HyTime::BeginFrame()
 {
-	if(uiUpdateTickMs == 0)
+#ifdef HY_USE_GLFW
+	m_CurrTime = glfwGetTime();
+	m_dFrameDelta = m_CurrTime - m_PrevTime;
+#elif defined(HY_USE_SDL2)
+	m_CurrTime = SDL_GetPerformanceCounter();
+	m_dFrameDelta = static_cast<double>(m_CurrTime - m_PrevTime) / static_cast<double>(SDL_GetPerformanceFrequency());
+#else
+	m_CurrTime = std::chrono::high_resolution_clock::now();
+	m_dFrameDelta = (m_PrevTime - m_CurrTime).count();
+#endif
+	m_PrevTime = m_CurrTime;
+	m_dFrameDelta = HyMin(m_dFrameDelta, 0.25); // Clamp delta times to 0.25
+
+	// Update all timers/stopwatches
+	m_dAccumulatedUpdateTime += m_dFrameDelta;
+	for(auto timer : sm_TimeInstList)
 	{
-		HyLogInfo("HyTime::SetUpdateTickMs was passed '0', using non-throttled, variable updating.");
-		uiUpdateTickMs = 20;
+		if(timer->IsRunning())
+			timer->Update(m_dFrameDelta);
 	}
-
-	m_dUpdateTick_Seconds = (1.0 / static_cast<double>(uiUpdateTickMs) * 1000.0) / 1000.0;
-	m_dThrottledTime = 0.0;
 }
 
-float HyTime::GetUpdateStepSeconds() const
+double HyTime::GetFrameDelta() const
 {
-	return static_cast<float>(m_dCurDeltaTime);
+	return m_dFrameDelta;
 }
 
-double HyTime::GetUpdateStepSecondsDbl() const
+void HyTime::SetUpdatesPerSec(uint32 uiUpdatesPerSec)
 {
-	return m_dCurDeltaTime;
+#ifdef HY_PLATFORM_GUI
+	uiUpdatesPerSec = 0; // Disable throttled update on GUI
+#endif
+
+	if(uiUpdatesPerSec == 0)
+	{
+		HyLogInfo("Update rate was passed '0', using non-throttled, variable updating.");
+		m_dFixedUpdateDelta = 0.0;
+		m_dAccumulatedUpdateTime = 0.0;
+		m_fpIsUpdateNeeded = &HyTime::VariableUpdate;
+		m_fpGetUpdateDelta = [this]() { return m_dFrameDelta; };
+	}
+	else
+	{
+		HyLogInfo("Update rate has been set to '" << uiUpdatesPerSec << "' updates per second");
+		m_dFixedUpdateDelta = (1.0 / uiUpdatesPerSec);
+		m_dAccumulatedUpdateTime = 0.0;
+		m_fpIsUpdateNeeded = &HyTime::ThrottledUpdate;
+		m_fpGetUpdateDelta = [this]() { return m_dFixedUpdateDelta; };
+	}
+}
+
+bool HyTime::IsUpdateNeeded()
+{
+	return m_fpIsUpdateNeeded(this);
+}
+
+float HyTime::GetExtrapolatePercent() const
+{
+	if(m_dFixedUpdateDelta == 0.0f)
+		return 0.0f;
+
+	return m_dAccumulatedUpdateTime / m_dFixedUpdateDelta;
+}
+
+float HyTime::GetUpdateDelta() const
+{
+	return static_cast<float>(m_fpGetUpdateDelta());
+}
+
+double HyTime::GetUpdateDeltaDbl() const
+{
+	return m_fpGetUpdateDelta();
 }
 
 double HyTime::GetTotalElapsedTime() const
 {
-	return m_dTotalElapsedTime;
-}
-
-void HyTime::SetCurDeltaTime()
-{
 #ifdef HY_USE_GLFW
-	double dCurTime = glfwGetTime();
-
-	m_dCurDeltaTime = dCurTime - m_dPrevTime;
-	m_dPrevTime = dCurTime;
+	return glfwGetTime();
 #elif defined(HY_USE_SDL2)
-	m_uiPrev = m_uiCur;
-	m_uiCur = SDL_GetPerformanceCounter();
-
-	m_dCurDeltaTime = static_cast<double>(m_uiCur - m_uiPrev) / static_cast<double>(SDL_GetPerformanceFrequency());
+	return static_cast<double>(SDL_GetPerformanceCounter()) / static_cast<double>(SDL_GetPerformanceFrequency());
 #else
-	m_dCurDeltaTime = 0.0166667;
+	return std::chrono::high_resolution_clock::now().count();
 #endif
 }
 
-void HyTime::CalcTimeDelta()
-{
-	SetCurDeltaTime();	// m_dCurDeltaTime will be set within
-	
-	m_dTotalElapsedTime += m_dCurDeltaTime;
-	m_dThrottledTime += m_dCurDeltaTime;
-	 
-	// Update all timers/stopwatches
-	for(auto timer: sm_TimeInstList)
-	{
-		if(timer->IsRunning())
-			timer->Update(m_dCurDeltaTime);
-	}
-}
-
-bool HyTime::ThrottleUpdate()
-{
-	if(m_dThrottledTime >= m_dUpdateTick_Seconds)
-	{
-		m_dThrottledTime -= m_dUpdateTick_Seconds;
-
-		if(m_dThrottledTime >= m_dUpdateTick_Seconds)
-		{
-			// We're falling behind in updates, keep track to avoid "Spiral of Death"
-			if(m_dThrottledTime >= m_dUpdateTick_Seconds * m_dSpiralOfDeathCounter)
-			{
-				HyLogWarning("HyTime::ThrottleUpdate is behind by '" << static_cast<uint32>(m_dSpiralOfDeathCounter) << "' update thresholds");
-				m_dSpiralOfDeathCounter += HYTIME_ThresholdWarningsEvery;
-
-				if(m_dSpiralOfDeathCounter >= HYTIME_ThresholdMaxReset)
-				{
-					HyLogError("HyTime::ThrottleUpdate behind by max '" << static_cast<uint32>(HYTIME_ThresholdMaxReset) << "' - resetting delta (this will corrupt input replays)");
-					m_dThrottledTime = 0.0f;
-				}
-			}
-		}
-		else // We're on time, reset "SoD" counter
-			m_dSpiralOfDeathCounter = HYTIME_ThresholdWarningsEvery;
-
-		return true;
-	}
-
-	return false;
-}
+//double HyTime::GetFrameElapsedTime() const
+//{
+//#ifdef HY_USE_GLFW
+//	return (glfwGetTime() - m_CurrTime);
+//#elif defined(HY_USE_SDL2)
+//	return static_cast<double>(SDL_GetPerformanceCounter() - m_CurrTime) / static_cast<double>(SDL_GetPerformanceFrequency());
+//	m_dFrameDelta = static_cast<double>(m_CurrTime - m_PrevTime
+//#else
+//	return (std::chrono::high_resolution_clock::now() - m_CurrTime).count();
+//#endif
+//}
 
 void HyTime::ResetDelta()
 {
-	SetCurDeltaTime();
-	SetCurDeltaTime();
+#ifdef HY_USE_GLFW
+	m_CurrTime = glfwGetTime();
+#elif defined(HY_USE_SDL2)
+	m_CurrTime = SDL_GetPerformanceCounter();
+#else
+	m_CurrTime = std::chrono::high_resolution_clock::now();
+#endif
+	m_PrevTime = m_CurrTime;
+	m_dFrameDelta = 0.0;
 }
 
-std::string HyTime::GetDateTime()
+std::string HyTime::GetDateTime() const
 {
 #ifdef HY_PLATFORM_WINDOWS
 	char am_pm[] = "AM";
@@ -191,12 +204,21 @@ std::string HyTime::GetDateTime()
 	}
 }
 
-/*static*/ void HyTime::StartTimeStamp()
+bool HyTime::ThrottledUpdate()
 {
-	sm_TimeStamp = StdPerfClock::now();
+	if(m_dAccumulatedUpdateTime >= m_dFixedUpdateDelta)
+	{
+		m_dAccumulatedUpdateTime -= m_dFixedUpdateDelta;
+		return true;
+	}
+
+	return false;
 }
 
-/*static*/ double HyTime::EndTimeStamp()
+bool HyTime::VariableUpdate()
 {
-	return std::chrono::duration_cast<StdSecondDur>(StdPerfClock::now() - sm_TimeStamp).count();
+	static bool bDoUpdate = false;
+
+	bDoUpdate = !bDoUpdate;
+	return bDoUpdate;
 }

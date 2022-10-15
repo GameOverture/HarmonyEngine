@@ -129,38 +129,38 @@ HyEntity3d *IHyNode3d::ParentGet() const
 	return m_pParent;
 }
 
-void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx) const
+void IHyNode3d::GetLocalTransform(glm::mat4 &outMtx, float fExtrapolatePercent) const
 {
 	outMtx = glm::mat4(1.0f);
 
-	outMtx = glm::translate(outMtx, pos.Get());
+	outMtx = glm::translate(outMtx, pos.Extrapolate(fExtrapolatePercent));
 
-	outMtx = glm::translate(outMtx, rot_pivot.Get());
-	outMtx = glm::rotate(outMtx, rot.Get().x, glm::vec3(1, 0, 0));
-	outMtx = glm::rotate(outMtx, rot.Get().y, glm::vec3(0, 1, 0));
-	outMtx = glm::rotate(outMtx, rot.Get().z, glm::vec3(0, 0, 1));
-	outMtx = glm::translate(outMtx, rot_pivot.Get() * -1.0f);
+	outMtx = glm::translate(outMtx, rot_pivot.Extrapolate(fExtrapolatePercent));
+	outMtx = glm::rotate(outMtx, rot.Extrapolate(fExtrapolatePercent).x, glm::vec3(1, 0, 0));
+	outMtx = glm::rotate(outMtx, rot.Extrapolate(fExtrapolatePercent).y, glm::vec3(0, 1, 0));
+	outMtx = glm::rotate(outMtx, rot.Extrapolate(fExtrapolatePercent).z, glm::vec3(0, 0, 1));
+	outMtx = glm::translate(outMtx, rot_pivot.Extrapolate(fExtrapolatePercent) * -1.0f);
 
-	outMtx = glm::translate(outMtx, scale_pivot.Get());
-	outMtx = glm::scale(outMtx, scale.Get());
-	outMtx = glm::translate(outMtx, scale_pivot.Get() * -1.0f);
+	outMtx = glm::translate(outMtx, scale_pivot.Extrapolate(fExtrapolatePercent));
+	outMtx = glm::scale(outMtx, scale.Extrapolate(fExtrapolatePercent));
+	outMtx = glm::translate(outMtx, scale_pivot.Extrapolate(fExtrapolatePercent) * -1.0f);
 }
 
-const glm::mat4 &IHyNode3d::GetSceneTransform()
+const glm::mat4 &IHyNode3d::GetSceneTransform(float fExtrapolatePercent)
 {
-	if(IsDirty(DIRTY_Transform))
+	if(IsDirty(DIRTY_Transform) || fExtrapolatePercent != 0.0f)
 	{
 		if(m_pParent)
 		{
-			m_mtxCached = m_pParent->GetSceneTransform();
+			m_mtxCached = m_pParent->GetSceneTransform(fExtrapolatePercent);
 			
 			glm::mat4 mtxLocal;
-			GetLocalTransform(mtxLocal);
+			GetLocalTransform(mtxLocal, fExtrapolatePercent);
 
 			m_mtxCached *= mtxLocal;
 		}
 		else
-			GetLocalTransform(m_mtxCached);
+			GetLocalTransform(m_mtxCached, fExtrapolatePercent);
 
 		ClearDirty(DIRTY_Transform);
 	}

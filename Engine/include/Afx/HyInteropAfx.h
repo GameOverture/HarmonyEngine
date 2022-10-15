@@ -28,6 +28,28 @@ typedef HyOpenGL HyRendererInterop;
 	typedef void *HyMouseCursorPtr;
 #endif
 
+// TIME ////////////////////////////////////////////////////////////////////
+#ifdef HY_USE_GLFW
+	typedef double HyTimeStamp;
+#elif defined(HY_USE_SDL2)
+	typedef uint64_t HyTimeStamp;
+#else
+	typedef std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::duration<double>> HyTimeStamp;
+#endif
+
+// DEBUG CONSOLE ///////////////////////////////////////////////////////////
+#if defined(HY_PLATFORM_GUI)
+	// TODO: Ideally send Harmony log output to the editor's output window
+	#include "Diagnostics/Console/Interop/HyConsole_Std.h"
+	typedef HyConsole_Std HyConsoleInterop;
+#elif defined(HY_PLATFORM_WINDOWS)
+	#include "Diagnostics/Console/Interop/HyConsole_Win.h"
+	typedef HyConsole_Win HyConsoleInterop;
+#else
+	#include "Diagnostics/Console/Interop/HyConsole_Std.h"
+	typedef HyConsole_Std HyConsoleInterop;
+#endif
+
 // NETWORKING //////////////////////////////////////////////////////////////
 #if defined(HY_USE_SDL2) && defined(HY_USE_SDL2_NET)
 	#ifdef HY_PLATFORM_BROWSER
@@ -59,19 +81,6 @@ typedef HyOpenGL HyRendererInterop;
 	typedef int HyTcpSocket;
 	#include "Networking/Sockets/HyNullSocket.h"
 	typedef HyNullSocket HyNetworkInterop;
-#endif
-
-// DEBUG CONSOLE ///////////////////////////////////////////////////////////
-#if defined(HY_PLATFORM_GUI)
-	// TODO: Ideally send Harmony log output to the editor's output window
-	#include "Diagnostics/Console/Interop/HyConsole_Std.h"
-	typedef HyConsole_Std HyConsoleInterop;
-#elif defined(HY_PLATFORM_WINDOWS)
-	#include "Diagnostics/Console/Interop/HyConsole_Win.h"
-	typedef HyConsole_Win HyConsoleInterop;
-#else
-	#include "Diagnostics/Console/Interop/HyConsole_Std.h"
-	typedef HyConsole_Std HyConsoleInterop;
 #endif
 
 // SPINE RUNTIME ////////////////////////////////////////////////////////////

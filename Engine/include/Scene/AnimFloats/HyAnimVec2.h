@@ -26,7 +26,7 @@ public:
 
 	const glm::vec2 &Get() const;
 	HyAnimFloat &GetAnimFloat(uint32 uiIndex);
-	const glm::vec3 Extrapolate() const;
+	glm::vec3 Extrapolate(float fExtrapolatePercent) const;
 
 	float X() const;
 	float X(float fNewValue);
@@ -59,6 +59,11 @@ public:
 
 	void Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, float fSeconds, HyTweenFunc fpTween = HyTween::Linear, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
 	void Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, const glm::vec2 &pt4, float fSeconds, HyTweenFunc fpTween = HyTween::Linear, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
+
+	void Displace(float fX, float fY);
+	void Displace(const glm::vec2 &srcVec);
+	void Displace(const glm::ivec2 &srcVec);
+	void Displace(const HyAnimVec2 &srcVec);
 	
 	bool IsAnimating();
 	void StopAnim();

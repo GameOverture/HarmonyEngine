@@ -31,7 +31,7 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 	ui->txtAssetsLocation->setText(projSettingsObj["DataPath"].toString());
 	ui->txtMetaDataLocation->setText(projSettingsObj["MetaPath"].toString());
 
-	ui->sbInputMaps->setValue(projSettingsObj["NumInputMappings"].toInt());
+	ui->sbInputMaps->setValue(projSettingsObj["NumInputMaps"].toInt());
 	ui->sbUpdateFpsCap->setValue(projSettingsObj["UpdateFpsCap"].toInt());
 	ui->chkShowCursor->setChecked(projSettingsObj["ShowCursor"].toBool());
 

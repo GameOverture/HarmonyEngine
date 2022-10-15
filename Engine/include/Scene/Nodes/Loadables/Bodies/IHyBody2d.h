@@ -53,9 +53,9 @@ public:
 	void SetTint(HyColor color);
 	void SetTint(HyColor topColor, HyColor botColor);
 
-	float CalculateAlpha();
-	const glm::vec3 &CalculateTopTint();
-	const glm::vec3 &CalculateBotTint();
+	float CalculateAlpha(float fExtrapolatePercent);
+	const glm::vec3 &CalculateTopTint(float fExtrapolatePercent);
+	const glm::vec3 &CalculateBotTint(float fExtrapolatePercent);
 
 	int32 GetDisplayOrder() const;
 	virtual void SetDisplayOrder(int32 iOrderValue);
@@ -78,7 +78,7 @@ protected:
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding);
 
 private:
-	void CalculateColor();
+	void CalculateColor(float fExtrapolatePercent);
 
 	virtual IHyNode &_VisableGetNodeRef() override final;
 	virtual HyEntity2d *_VisableGetParent2dPtr() override final;

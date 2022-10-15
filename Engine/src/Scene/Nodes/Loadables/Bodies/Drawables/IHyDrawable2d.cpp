@@ -80,7 +80,7 @@ const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
 		HyMath::InvalidateAABB(m_SceneAABB);
 
 		GetLocalBoundingVolume(); // This will update 'm_LocalBoundingVolume' if it's dirty
-		m_LocalBoundingVolume.ComputeAABB(m_SceneAABB, GetSceneTransform());
+		m_LocalBoundingVolume.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 
 		ClearDirty(DIRTY_SceneAABB);
 	}

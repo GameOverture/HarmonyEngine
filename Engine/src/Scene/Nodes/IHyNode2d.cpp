@@ -136,20 +136,20 @@ HyEntity2d *IHyNode2d::ParentGet() const
 	return m_pParent;
 }
 
-void IHyNode2d::GetLocalTransform(glm::mat4 &mtxOut) const
+void IHyNode2d::GetLocalTransform(glm::mat4 &mtxOut, float fExtrapolatePercent) const
 {
 	mtxOut = glm::mat4(1.0f);
 
-	glm::vec3 ptPos = pos.Extrapolate();
-	glm::vec3 vScale = scale.Extrapolate();
+	glm::vec3 ptPos = pos.Extrapolate(fExtrapolatePercent);
+	glm::vec3 vScale = scale.Extrapolate(fExtrapolatePercent);
 	vScale.z = 1.0f;
-	glm::vec3 ptRotPivot = rot_pivot.Extrapolate();
-	glm::vec3 ptScalePivot = scale_pivot.Extrapolate();
+	glm::vec3 ptRotPivot = rot_pivot.Extrapolate(fExtrapolatePercent);
+	glm::vec3 ptScalePivot = scale_pivot.Extrapolate(fExtrapolatePercent);
 	
 	mtxOut = glm::translate(mtxOut, ptPos);
 
 	mtxOut = glm::translate(mtxOut, ptRotPivot);
-	mtxOut = glm::rotate(mtxOut, glm::radians(rot.Get()), glm::vec3(0, 0, 1));
+	mtxOut = glm::rotate(mtxOut, glm::radians(rot.Extrapolate(fExtrapolatePercent)), glm::vec3(0, 0, 1));
 	mtxOut = glm::translate(mtxOut, ptRotPivot * -1.0f);
 
 	mtxOut = glm::translate(mtxOut, ptScalePivot);
@@ -157,21 +157,21 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &mtxOut) const
 	mtxOut = glm::translate(mtxOut, ptScalePivot * -1.0f);
 }
 
-const glm::mat4 &IHyNode2d::GetSceneTransform()
+const glm::mat4 &IHyNode2d::GetSceneTransform(float fExtrapolatePercent)
 {
-	if(IsDirty(DIRTY_Transform))
+	if(IsDirty(DIRTY_Transform) || fExtrapolatePercent != 0.0f)
 	{
 		if(m_pParent)
 		{
-			m_mtxCached = m_pParent->GetSceneTransform();
+			m_mtxCached = m_pParent->GetSceneTransform(fExtrapolatePercent);
 
 			glm::mat4 mtxLocal;
-			GetLocalTransform(mtxLocal);
+			GetLocalTransform(mtxLocal, fExtrapolatePercent);
 
 			m_mtxCached *= mtxLocal;
 		}
 		else
-			GetLocalTransform(m_mtxCached);
+			GetLocalTransform(m_mtxCached, fExtrapolatePercent);
 
 		ClearDirty(DIRTY_Transform);
 	}

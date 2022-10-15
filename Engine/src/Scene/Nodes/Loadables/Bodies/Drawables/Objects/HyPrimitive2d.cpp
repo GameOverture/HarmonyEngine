@@ -124,19 +124,20 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	return m_pVertBuffer != nullptr && shape.IsValidShape();
 }
 
-/*virtual*/ void HyPrimitive2d::OnUpdateUniforms() /*override*/
+/*virtual*/ void HyPrimitive2d::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
 {
+	// TODO: get rid of this check and improve m_ShaderUniforms
 	if(m_bUpdateShaderUniforms)
 	{
-		glm::mat4 mtx = GetSceneTransform();
+		glm::mat4 mtx = GetSceneTransform(fExtrapolatePercent);
 
 		// TODO: Get rid of top/bot color
-		glm::vec3 tint = CalculateTopTint();
+		glm::vec3 tint = CalculateTopTint(fExtrapolatePercent);
 		glm::vec4 vTop;
 		vTop.x = tint.x;
 		vTop.y = tint.y;
 		vTop.z = tint.z;
-		vTop.a = CalculateAlpha();
+		vTop.a = CalculateAlpha(fExtrapolatePercent);
 
 		m_ShaderUniforms.Set("u_mtxTransform", mtx);
 		m_ShaderUniforms.Set("u_vColor", vTop);
@@ -158,7 +159,7 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	bIsBatchable = false;
 }
 
-/*virtual*/ bool HyPrimitive2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HyPrimitive2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
 	vertexBufferRef.AppendData2d(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
 	return true;

@@ -11,68 +11,53 @@
 #define HyDiagnostics_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Diagnostics/Output/HyDiagOutput.h"
+#include "Diagnostics/HyProfiler.h"
 
 struct HarmonyInit;
-class HyTime;
 class HyAssets;
 class HyScene;
-
-#if defined(HY_COMPILER_MSVC)
-	// Comment this out to disable profiler
-	#define HYSETTING_ProfilerEnabled
-#endif
-
-#if defined(HY_PLATFORM_GUI) || defined(HY_PLATFORM_BROWSER)
-	#undef HYSETTING_ProfilerEnabled
-#endif
-#ifdef HYSETTING_ProfilerEnabled
-	#define HY_PROFILE_BEGIN(name) HyEngine::Diagnostics().ProfileBegin(name);
-	#define HY_PROFILE_END HyEngine::Diagnostics().ProfileEnd();
-#else
-	#define HY_PROFILE_BEGIN(name) 
-	#define HY_PROFILE_END 
-#endif
+class HyTime;
 
 class HyDiagnostics
 {
 	friend class HyEngine;
 	friend class IHyRenderer;
 
-	const HarmonyInit &			m_InitStructRef;
-	HyTime &					m_TimeRef;
-	HyAssets &					m_AssetsRef;
-	HyScene &					m_SceneRef;
+	const HarmonyInit &					m_InitStructRef;
+	HyTime &							m_TimeRef;
+	HyAssets &							m_AssetsRef;
+	HyScene &							m_SceneRef;
 
-	std::string					m_sCompiler;
-	std::string					m_sPlatform;
-	uint32						m_uiNumCpuCores;
-	uint32						m_uiL1CacheSizeBytes;
-	uint64_t					m_uiTotalMemBytes;
-	uint64_t					m_uiVirtualMemBytes;
+	std::string							m_sCompiler;
+	std::string							m_sPlatform;
+	uint32								m_uiNumCpuCores;
+	uint32								m_uiL1CacheSizeBytes;
+	uint64_t							m_uiTotalMemBytes;
+	uint64_t							m_uiVirtualMemBytes;
 
-	std::string					m_sGfxApi;
-	std::string					m_sVersion;
-	std::string					m_sVendor;
-	std::string					m_sRenderer;
-	std::string					m_sShader;
-	int32						m_iMaxTextureSize;
-	std::string					m_sCompressedTextures;
+	std::string							m_sGfxApi;
+	std::string							m_sVersion;
+	std::string							m_sVendor;
+	std::string							m_sRenderer;
+	std::string							m_sShader;
+	int32								m_iMaxTextureSize;
+	std::string							m_sCompressedTextures;
 
-	bool						m_bInitialMemCheckpointSet;
+	bool								m_bInitialMemCheckpointSet;
 #if defined(HY_DEBUG) && defined(HY_COMPILER_MSVC) && defined(HY_PLATFORM_WINDOWS)
-	_CrtMemState				m_MemCheckpoint1;
-	_CrtMemState				m_MemCheckpoint2;
+	_CrtMemState						m_MemCheckpoint1;
+	_CrtMemState						m_MemCheckpoint2;
 #endif
 
-	HyProfiler					m_Profiler;
-	HyDiagOutput *				m_pDiagOutput;
+	HyProfiler *						m_pProfiler;
+	std::function<void()>				m_fpBeginFrame;
+	std::function<void()>				m_fpBeginUpdate;
+	std::function<void()>				m_fpBeginRenderPrep;
+	std::function<void()>				m_fpBeginRender;
 
 public:
 	HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
-
-	void BootMessage();
 
 	void Init(std::string sTextPrefix, std::string sTextName, uint32 uiTextState);
 	void Show(uint32 uiDiagFlags);
@@ -85,12 +70,14 @@ public:
 	void StartMemoryCheckpoint();
 	void EndMemoryCheckpoint();
 
-	void ProfileBegin(HyProfilerSection eSection);
-	void ProfileEnd();
-
 private:
-	void ApplyTimeDelta();
+	void BootMessage();
 	void SetRendererInfo(const std::string &sApi, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures);
+
+	void BeginFrame();
+	void BeginUpdate();
+	void BeginRenderPrep();
+	void BeginRender();
 };
 
 #endif /* HyDiagnostics_h__ */

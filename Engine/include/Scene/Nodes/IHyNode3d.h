@@ -44,8 +44,8 @@ public:
 	void ParentDetach();
 	HyEntity3d *ParentGet() const;
 
-	void GetLocalTransform(glm::mat4 &outMtx) const;
-	const glm::mat4 &GetSceneTransform();
+	void GetLocalTransform(glm::mat4 &outMtx, float fExtrapolatePercent) const;
+	const glm::mat4 &GetSceneTransform(float fExtrapolatePercent);
 };
 
 #endif /* IHyNode3d_h__ */

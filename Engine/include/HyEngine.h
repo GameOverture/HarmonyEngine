@@ -62,7 +62,6 @@ class HyEngine
 	HyAudioCore 				m_Audio;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
-	HyGuiComms					m_GuiComms;
 	HyTime						m_Time;
 	HyDiagnostics				m_Diagnostics;
 	HyInput						m_Input;

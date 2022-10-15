@@ -103,10 +103,9 @@ HarmonyInit::HarmonyInit()
 
 	sGameName = "Untitled Game";
 	sDataDir = "data";
-	uiUpdateTickMs = 0;
+	uiUpdatesPerSec = 0;
+	uiNumInputMaps = 1;
 	bShowCursor = true;
-	uiNumInputMappings = 1;
-	uiDebugPort = 1313;
 
 	uiNumWindows = 1;
 	for(uint32 i = 0; i < HY_MAXWINDOWS; ++i)
@@ -166,15 +165,31 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		sProjectDir = ".";
 		sDataDir = projDoc["DataPath"].GetString();
 	}
-
 	sProjectDir = HyIO::CleanPath(sProjectDir.c_str(), "", true);
 	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "", true);
+
+	HarmonyInit defaultVals;
 	
-	sGameName				= projDoc["Title"].GetString();
-	uiUpdateTickMs			= 0;//projDoc["UpdateFpsCap"].GetUint();
-	bShowCursor				= true;//projDoc["ShowCursor"].GetBool();
-	uiNumInputMappings		= 1;//projDoc["NumInputMappings"].GetUint();
-	uiDebugPort				= 3333;//projDoc["DebugPort"].GetUint();
+	if(projDoc.HasMember("Title"))
+		sGameName = projDoc["Title"].GetString();
+	else
+		sGameName = defaultVals.sGameName;
+	if(projDoc.HasMember("UpdatesPerSec"))
+		uiUpdatesPerSec = projDoc["UpdatesPerSec"].GetUint();
+	else
+		uiUpdatesPerSec = defaultVals.uiUpdatesPerSec;
+	if(projDoc.HasMember("NumInputMaps"))
+		uiNumInputMaps = projDoc["NumInputMaps"].GetUint();
+	else
+		uiNumInputMaps = defaultVals.uiNumInputMaps;
+	if(projDoc.HasMember("ShowCursor"))
+		bShowCursor = projDoc["ShowCursor"].GetBool();
+	else
+		bShowCursor = defaultVals.bShowCursor;
+
+	uiNumWindows = defaultVals.uiNumWindows;
+	for(uint32 i = 0; i < HY_MAXWINDOWS; ++i)
+		windowInfo[i] = defaultVals.windowInfo[i];
 
 	if(projDoc.HasMember("WindowInfo"))
 	{
@@ -192,20 +207,9 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 			windowInfo[i].ptLocation.y = windowInfoObj["LocationY"].GetInt();
 		}
 	}
-	else
-	{
-		uiNumWindows = 1;
-		for(uint32 i = 0; i < HY_MAXWINDOWS; ++i)
-		{
-			windowInfo[i].sName = "Window: " + std::to_string(i);
-			windowInfo[i].eMode = HYWINDOW_WindowedFixed;
-			windowInfo[i].vSize.x = 512;
-			windowInfo[i].vSize.y = 256;
-			windowInfo[i].ptLocation.x = i * windowInfo[i].vSize.x;
-			windowInfo[i].ptLocation.y = 0;
-		}
-	}
 
+	bUseConsole = defaultVals.bUseConsole;
+	consoleInfo = defaultVals.consoleInfo;
 	if(projDoc.HasMember("UseConsole"))// projObject.has<jsonxx::Boolean>("UseConsole") == true)
 	{
 		// Log Console
@@ -219,15 +223,5 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		consoleInfo.vSize.y = consoleInfoObj["ResolutionY"].GetInt();//static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("ResolutionY"));
 		consoleInfo.ptLocation.x = consoleInfoObj["LocationX"].GetInt();//static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("LocationX"));
 		consoleInfo.ptLocation.y = consoleInfoObj["LocationY"].GetInt();//static_cast<int32>(consoleInfoObj.get<jsonxx::Number>("LocationY"));
-	}
-	else
-	{
-		bUseConsole = false;
-		consoleInfo.sName = "Harmony Log Console";
-		consoleInfo.eMode = HYWINDOW_WindowedSizeable;
-		consoleInfo.vSize.x = 64;
-		consoleInfo.vSize.y = 80;
-		consoleInfo.ptLocation.x = 512;
-		consoleInfo.ptLocation.y = 256;
 	}
 }

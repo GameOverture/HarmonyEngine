@@ -103,7 +103,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	bIsBatchable = true;
 }
 
-/*virtual*/ bool HySprite2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef) /*override*/
+/*virtual*/ bool HySprite2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
 	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 
@@ -113,12 +113,12 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	glm::vec2 vOffset(frameRef.vOFFSET.x, frameRef.vOFFSET.y);
 	vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
 
-	vertexBufferRef.AppendData2d(&CalculateTopTint(), sizeof(glm::vec3));
+	vertexBufferRef.AppendData2d(&CalculateTopTint(fExtrapolatePercent), sizeof(glm::vec3));
 
-	float fAlpha = CalculateAlpha();
+	float fAlpha = CalculateAlpha(fExtrapolatePercent);
 	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 
-	vertexBufferRef.AppendData2d(&CalculateBotTint(), sizeof(glm::vec3));
+	vertexBufferRef.AppendData2d(&CalculateBotTint(fExtrapolatePercent), sizeof(glm::vec3));
 
 	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 
@@ -140,7 +140,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
-	vertexBufferRef.AppendData2d(&GetSceneTransform(), sizeof(glm::mat4));
+	vertexBufferRef.AppendData2d(&GetSceneTransform(fExtrapolatePercent), sizeof(glm::mat4));
 
 	return true;
 }

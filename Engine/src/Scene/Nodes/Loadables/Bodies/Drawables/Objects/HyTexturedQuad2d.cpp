@@ -154,7 +154,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	bIsBatchable = true;
 }
 
-/*virtual*/ bool HyTexturedQuad2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef)
+/*virtual*/ bool HyTexturedQuad2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent)
 {
 	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 
@@ -166,11 +166,11 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	glm::vec2 vOffset(0.0f, 0.0f);
 	vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
 
-	vertexBufferRef.AppendData2d(&CalculateTopTint(), sizeof(glm::vec3));
+	vertexBufferRef.AppendData2d(&CalculateTopTint(fExtrapolatePercent), sizeof(glm::vec3));
 
-	float fAlpha = CalculateAlpha();
+	float fAlpha = CalculateAlpha(fExtrapolatePercent);
 	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
-	vertexBufferRef.AppendData2d(&CalculateBotTint(), sizeof(glm::vec3));
+	vertexBufferRef.AppendData2d(&CalculateBotTint(fExtrapolatePercent), sizeof(glm::vec3));
 	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 
 	glm::vec2 vUV;
@@ -190,7 +190,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	vUV.y = m_SrcRect.bottom;//0.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
-	vertexBufferRef.AppendData2d(&GetSceneTransform(), sizeof(glm::mat4));
+	vertexBufferRef.AppendData2d(&GetSceneTransform(fExtrapolatePercent), sizeof(glm::mat4));
 
 	return true;
 }

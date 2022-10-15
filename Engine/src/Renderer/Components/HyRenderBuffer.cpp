@@ -51,7 +51,7 @@ void HyRenderBuffer::Reset()
 	m_pPrevRenderState = nullptr;
 }
 
-void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, HyVertexBuffer &vertexBufferRef)
+void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent)
 {
 	HyRenderMode eRenderMode = HYRENDERMODE_Unknown;
 	uint32 uiNumInstances = 0, uiNumVerticesPerInstance = 0;
@@ -61,7 +61,7 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 	do
 	{
 		instanceRef.PrepRenderStage(uiStageIndex, eRenderMode, uiNumInstances, uiNumVerticesPerInstance, bIsBatchable);
-		instanceRef.GetWorldScissor(scissorRect);
+		instanceRef.GetWorldScissor(scissorRect, fExtrapolatePercent);
 
 		State *pRenderState = new (m_pCurWritePosition)State(uiId,
 															 uiCameraMask,
@@ -98,7 +98,7 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 		}
 
 		uiStageIndex++;
-	} while(instanceRef.WriteVertexData(uiNumInstances, vertexBufferRef) == false);
+	} while(instanceRef.WriteVertexData(uiNumInstances, vertexBufferRef, fExtrapolatePercent) == false);
 }
 
 void HyRenderBuffer::CreateRenderHeader()

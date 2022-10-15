@@ -121,7 +121,7 @@ IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
 	botColor = rhs.botColor;
 	alpha = rhs.alpha;
 
-	CalculateColor();
+	CalculateColor(0.0f);
 
 	shape = rhs.shape;
 
@@ -139,7 +139,7 @@ IHyBody2d &IHyBody2d::operator=(IHyBody2d &&donor) noexcept
 	botColor = std::move(donor.botColor);
 	alpha = std::move(donor.alpha);
 
-	CalculateColor();
+	CalculateColor(0.0f);
 
 	shape = std::move(donor.shape);
 
@@ -158,21 +158,21 @@ void IHyBody2d::SetTint(HyColor topClr, HyColor botClr)
 	botColor.Set(botClr.GetRedF(), botClr.GetGreenF(), botClr.GetBlueF());
 }
 
-float IHyBody2d::CalculateAlpha()
+float IHyBody2d::CalculateAlpha(float fExtrapolatePercent)
 {
-	CalculateColor();
+	CalculateColor(fExtrapolatePercent);
 	return m_fCachedAlpha;
 }
 
-const glm::vec3 &IHyBody2d::CalculateTopTint()
+const glm::vec3 &IHyBody2d::CalculateTopTint(float fExtrapolatePercent)
 {
-	CalculateColor();
+	CalculateColor(fExtrapolatePercent);
 	return m_CachedTopColor;
 }
 
-const glm::vec3 &IHyBody2d::CalculateBotTint()
+const glm::vec3 &IHyBody2d::CalculateBotTint(float fExtrapolatePercent)
 {
-	CalculateColor();
+	CalculateColor(fExtrapolatePercent);
 	return m_CachedBotColor;
 }
 
@@ -217,7 +217,7 @@ bool IHyBody2d::IsMouseInBounds()
 	if(GetCoordinateSystem() >= 0 && HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem())
 	{
 		if(shape.IsValidShape())
-			return shape.TestPoint(GetSceneTransform(), HyEngine::Input().GetMousePos());
+			return shape.TestPoint(GetSceneTransform(0.0f), HyEngine::Input().GetMousePos());
 		else
 			return HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
 	}
@@ -227,7 +227,7 @@ bool IHyBody2d::IsMouseInBounds()
 		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
 		{
 			if(shape.IsValidShape())
-				return shape.TestPoint(GetSceneTransform(), ptWorldMousePos);
+				return shape.TestPoint(GetSceneTransform(0.0f), ptWorldMousePos);
 			else
 				return HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
 		}
@@ -296,19 +296,19 @@ void IHyBody2d::ShapeChanged()
 	return iOrderValue;
 }
 
-void IHyBody2d::CalculateColor()
+void IHyBody2d::CalculateColor(float fExtrapolatePercent)
 {
 	if(IsDirty(DIRTY_Color))
 	{
-		m_fCachedAlpha = alpha.Get();
-		m_CachedTopColor = topColor.Get();
-		m_CachedBotColor = botColor.Get();
+		m_fCachedAlpha = alpha.Extrapolate(fExtrapolatePercent);
+		m_CachedTopColor = topColor.Extrapolate(fExtrapolatePercent);
+		m_CachedBotColor = botColor.Extrapolate(fExtrapolatePercent);
 
 		if(m_pParent)
 		{
-			m_fCachedAlpha *= m_pParent->CalculateAlpha();
-			m_CachedTopColor *= m_pParent->CalculateTopTint();
-			m_CachedBotColor *= m_pParent->CalculateTopTint();
+			m_fCachedAlpha *= m_pParent->CalculateAlpha(fExtrapolatePercent);
+			m_CachedTopColor *= m_pParent->CalculateTopTint(fExtrapolatePercent);
+			m_CachedBotColor *= m_pParent->CalculateTopTint(fExtrapolatePercent);
 		}
 
 		ClearDirty(DIRTY_Color);

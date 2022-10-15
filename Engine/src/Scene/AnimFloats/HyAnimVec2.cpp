@@ -38,10 +38,9 @@ HyAnimFloat &HyAnimVec2::GetAnimFloat(uint32 uiIndex)
 	return m_AnimFloatList[uiIndex];
 }
 
-const glm::vec3 HyAnimVec2::Extrapolate() const
+glm::vec3 HyAnimVec2::Extrapolate(float fExtrapolatePercent) const
 {
-	// TODO: extropolate value between static time updates
-	return glm::vec3(m_vValue.x, m_vValue.y, 0.0f);
+	return glm::vec3(m_AnimFloatList[0].Extrapolate(fExtrapolatePercent), m_AnimFloatList[1].Extrapolate(fExtrapolatePercent), 0.0f);
 }
 
 float HyAnimVec2::X() const
@@ -221,6 +220,30 @@ void HyAnimVec2::Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::v
 			auto p = ((1-fRatio) * (1-fRatio) * (1-fRatio)) * pt1 + 3 * fRatio * ((1-fRatio) * (1-fRatio)) * pt2 + 3 * (fRatio * fRatio) * (1-fRatio) * pt3 + (fRatio * fRatio * fRatio) * pt4;
 			return p.y;
 		});
+}
+
+void HyAnimVec2::Displace(float fX, float fY)
+{
+	m_AnimFloatList[0].Displace(fX);
+	m_AnimFloatList[1].Displace(fY);
+}
+
+void HyAnimVec2::Displace(const glm::vec2 &srcVec)
+{
+	m_AnimFloatList[0].Displace(srcVec[0]);
+	m_AnimFloatList[1].Displace(srcVec[1]);
+}
+
+void HyAnimVec2::Displace(const glm::ivec2 &srcVec)
+{
+	m_AnimFloatList[0].Displace(srcVec[0]);
+	m_AnimFloatList[1].Displace(srcVec[1]);
+}
+
+void HyAnimVec2::Displace(const HyAnimVec2 &srcVec)
+{
+	m_AnimFloatList[0].Displace(srcVec[0]);
+	m_AnimFloatList[1].Displace(srcVec[1]);
 }
 
 bool HyAnimVec2::IsAnimating()

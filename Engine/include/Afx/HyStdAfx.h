@@ -268,18 +268,20 @@ enum HyDiagFlag
 {
 	HYDIAG_NONE				= 0,
 
-	HYDIAG_LastFrameTime	= 1 << 0,
-	HYDIAG_AvgFrameTimes	= 1 << 1,
-	HYDIAG_Fps				= 1 << 2,
-	HYDIAG_FRAMETIMES		= (HYDIAG_LastFrameTime | HYDIAG_AvgFrameTimes | HYDIAG_Fps),
+	HYDIAG_Fps				= 1 << 0,
+	HYDIAG_FrameTimes		= 1 << 1,
+	HYDIAG_FRAMERATE		= (HYDIAG_Fps | HYDIAG_FrameTimes),
 
-	HYDIAG_ProfilerGraph	= 1 << 3,
-	HYDIAG_ProfilerText		= 1 << 4,
-	HYDIAG_PROFILER			= (HYDIAG_ProfilerGraph | HYDIAG_ProfilerText),
+	HYDIAG_Graph			= 1 << 2,
+	HYDIAG_GraphKey			= 1 << 3,
+	HYDIAG_GRAPH			= (HYDIAG_Graph | HYDIAG_GraphKey),
 
-	HYDIAG_Mouse			= 1 << 5,
+	HYDIAG_Mouse			= 1 << 4,
+	HYDIAG_MouseWorld		= 1 << 5,
+	HYDIAG_MouseButtons		= 1 << 6,
+	HYDIAG_INPUT			= (HYDIAG_Mouse | HYDIAG_MouseWorld | HYDIAG_MouseButtons),
 	
-	HYDIAG_ALL				= (HYDIAG_FRAMETIMES | HYDIAG_PROFILER | HYDIAG_Mouse)
+	HYDIAG_ALL				= (HYDIAG_FRAMERATE | HYDIAG_GRAPH | HYDIAG_INPUT)
 };
 
 enum HyTextureFiltering
@@ -362,11 +364,10 @@ struct HarmonyInit
 	std::string				sDataDir;
 	uint32					uiNumWindows;
 	HyWindowInfo			windowInfo[HY_MAXWINDOWS];
-	uint32					uiUpdateTickMs;
-	uint32					uiNumInputMappings;
-	uint16					uiDebugPort;
-	bool					bUseConsole;
+	uint32					uiUpdatesPerSec;
+	uint32					uiNumInputMaps;
 	bool					bShowCursor;
+	bool					bUseConsole;
 	HyWindowInfo			consoleInfo;
 
 	HarmonyInit();

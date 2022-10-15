@@ -149,7 +149,6 @@ void HyScene::SetPause(bool bPause)
 
 void HyScene::UpdateNodes()
 {
-	HY_PROFILE_BEGIN(HYPROFILERSECTION_Nodes)
 	if(m_bPauseGame == false)
 	{
 		for(uint32 i = 0; i < sm_NodeList_All.size(); ++i)
@@ -160,7 +159,6 @@ void HyScene::UpdateNodes()
 		for(uint32 i = 0; i < sm_NodeList_PauseUpdate.size(); ++i)
 			sm_NodeList_PauseUpdate[i]->Update();
 	}
-	HY_PROFILE_END
 
 	m_AudioCoreRef.Update();
 }
@@ -168,16 +166,14 @@ void HyScene::UpdateNodes()
 // RENDER STATE BUFFER
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Buffer Header (contains uiNum3dRenderStates; uiNum2dRenderStates) || RenderState3D/UniformData-|-RenderState2D/UniformData-|
-void HyScene::PrepareRender(IHyRenderer &rendererRef)
+void HyScene::PrepareRender(IHyRenderer &rendererRef, float fExtrapolatePercent)
 {
 	// TODO: Determine whether I can multi-thread this buffer prep and HyRenderBuffer::State instantiations... Make everything take const references!
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
-	HY_PROFILE_BEGIN(HYPROFILERSECTION_PrepRender)
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Initialize the buffer - PrepareBuffers may manipulate current IHyDrawable or insert new IHyDrawable while it updates all the effects
-	rendererRef.PrepareBuffers();
+	rendererRef.PrepareBuffers(fExtrapolatePercent);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Append 3d Render States to buffer
@@ -187,7 +183,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		if(m_NodeList_LoadedDrawable3d[i]->IsValidToRender() == false)
 			continue;
 
-		rendererRef.AppendDrawable3d(i, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CAMERA_MASK);
+		rendererRef.AppendDrawable3d(i, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CAMERA_MASK, fExtrapolatePercent);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +204,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 		if(m_NodeList_LoadedDrawable2d[i]->IsValidToRender() == false || CalculateCameraMask(*m_NodeList_LoadedDrawable2d[i], uiCameraMask) == false)
 			continue;
 
-		rendererRef.AppendDrawable2d(i, *m_NodeList_LoadedDrawable2d[i], uiCameraMask);
+		rendererRef.AppendDrawable2d(i, *m_NodeList_LoadedDrawable2d[i], uiCameraMask, fExtrapolatePercent);
 	}
 	
 	//// Debug physics draws
@@ -237,8 +233,6 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef)
 			++iBit;
 		}
 	}
-
-	HY_PROFILE_END
 }
 
 bool HyScene::CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut) const

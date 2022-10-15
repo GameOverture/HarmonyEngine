@@ -301,7 +301,7 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::FinishRender()
 {
 #ifdef HY_USE_GLFW
-	//glfwSwapInterval(0); // This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
+	glfwSwapInterval(0); // This function will block if glfwSwapInterval is set to '1' (AKA VSync enabled)
 	glfwSwapBuffers(m_pCurWindow->GetInterop());
 #elif defined(HY_USE_SDL2)
 	//SDL_GL_SetSwapInterval(0); // 0 for immediate updates, 1 for updates synchronized with the vertical retrace, -1 for adaptive vsync
@@ -929,7 +929,10 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	if(pCamera)
 	{
 		viewportRect = pCamera->GetViewport();
-		m_mtxView = glm::inverse(pCamera->GetSceneTransform()); // View Matrix is calculated by taking the inverse of the camera transform
+
+		// TODO: Pass in the proper fExtrapolatePercent
+		float fExtrapolatePercent = 0.0f;
+		m_mtxView = glm::inverse(pCamera->GetSceneTransform(fExtrapolatePercent)); // View Matrix is calculated by taking the inverse of the camera transform
 	}
 	else // Using window coordinates (origin is bottom left corner)
 	{

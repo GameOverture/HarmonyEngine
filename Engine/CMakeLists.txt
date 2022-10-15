@@ -83,14 +83,13 @@ set(HYENGINE_SOURCE_FILES
 	src/Audio/HyAudioCore.cpp
 	src/Audio/HySoundBuffers.cpp
 	src/Diagnostics/HyDiagnostics.cpp
+	src/Diagnostics/HyProfiler.cpp
 	src/Diagnostics/Console/IHyConsole.cpp
 	src/Diagnostics/Console/Interop/HyConsole_Std.cpp
 	src/Diagnostics/Console/Interop/HyConsole_Win.cpp
 	src/Diagnostics/GuiComms/HyGuiComms.cpp
 	src/Diagnostics/GuiComms/HyGuiMessage.cpp
 	src/Diagnostics/GuiComms/HyLiveVarManager.cpp
-	src/Diagnostics/Output/HyDiagOutput.cpp
-	src/Diagnostics/Output/HyProfiler.cpp
 	src/Input/HyInput.cpp
 	src/Input/HyInputMap.cpp
 	src/Networking/Sockets/HyNullSocket.cpp
@@ -209,14 +208,13 @@ set(HYENGINE_HEADER_FILES
 	include/Audio/HyAudioCore.h
 	include/Audio/HySoundBuffers.h
 	include/Diagnostics/HyDiagnostics.h
+	include/Diagnostics/HyProfiler.h
 	include/Diagnostics/Console/IHyConsole.h
 	include/Diagnostics/Console/Interop/HyConsole_Std.h
 	include/Diagnostics/Console/Interop/HyConsole_Win.h
 	include/Diagnostics/GuiComms/HyGuiComms.h
 	include/Diagnostics/GuiComms/HyGuiMessage.h
 	include/Diagnostics/GuiComms/HyLiveVarManager.h
-	include/Diagnostics/Output/HyDiagOutput.h
-	include/Diagnostics/Output/HyProfiler.h
 	include/Input/HyInput.h
 	include/Input/HyInputKeys.h
 	include/Input/HyInputMap.h

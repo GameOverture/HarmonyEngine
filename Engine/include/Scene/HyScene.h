@@ -64,7 +64,7 @@ public:
 	void SetPause(bool bPause);
 
 	void UpdateNodes();
-	void PrepareRender(IHyRenderer &rendererRef);
+	void PrepareRender(IHyRenderer &rendererRef, float fExtrapolatePercent);
 
 	bool CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut) const;
 	

@@ -28,7 +28,7 @@ class HyAnimFloat
 	IHyNode &						m_OwnerRef;
 	const uint32					m_uiDIRTY_FLAGS;
 
-	float							m_fStart;
+	float							m_fStart; // Or magnitude when Displace()
 	float							m_fTarget;
 	float							m_fDuration;
 	float							m_fElapsedTime;
@@ -37,7 +37,7 @@ class HyAnimFloat
 	HyTweenFunc						m_fpAnimFunc;
 	HyAnimFinishedCallback			m_fpAnimFinishedFunc;
 
-	bool (HyAnimFloat::*m_fpBehaviorUpdate)();
+	bool (HyAnimFloat::*m_fpBehaviorUpdate)(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const;
 
 public:
 	HyAnimFloat(float &valueReference, IHyNode &ownerRef, uint32 uiDirtyFlags);
@@ -59,10 +59,14 @@ public:
 
 	void Updater(std::function<float(float)> fpUpdaterFunc);
 
+	void Displace(float fMagnitude);
+
 	void StopAnim();
 
 	float GetAnimDestination() const;
 	float GetAnimRemainingDuration() const;
+
+	float Extrapolate(float fExtrapolatePercent) const;
 
 	HyAnimFloat &operator=(const float &rhs);
 	HyAnimFloat &operator+=(const float &rhs);
@@ -83,9 +87,10 @@ private:
 	//////////////////////////////////////////////////////////////////////////
 	// Update Behaviors
 	//////////////////////////////////////////////////////////////////////////
-	bool _Tween();
-	bool _Proc();
-	bool _Updater();
+	bool _Tween(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const;
+	bool _Proc(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const;
+	bool _Updater(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const;
+	bool _Displace(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const;
 
 public:
 	// Default (do-nothing) callback when tween finishes
