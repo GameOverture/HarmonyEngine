@@ -259,9 +259,9 @@ void HyAnimVec3::Displace(const glm::vec3 &srcVec)
 
 void HyAnimVec3::Displace(const glm::ivec3 &srcVec)
 {
-	m_AnimFloatList[0].Displace(srcVec[0]);
-	m_AnimFloatList[1].Displace(srcVec[1]);
-	m_AnimFloatList[2].Displace(srcVec[2]);
+	m_AnimFloatList[0].Displace(static_cast<float>(srcVec[0]));
+	m_AnimFloatList[1].Displace(static_cast<float>(srcVec[1]));
+	m_AnimFloatList[2].Displace(static_cast<float>(srcVec[2]));
 }
 
 void HyAnimVec3::Displace(const HyAnimVec3 &srcVec)

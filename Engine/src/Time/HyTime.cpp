@@ -97,7 +97,7 @@ float HyTime::GetExtrapolatePercent() const
 	if(m_dFixedUpdateDelta == 0.0f)
 		return 0.0f;
 
-	return m_dAccumulatedUpdateTime / m_dFixedUpdateDelta;
+	return static_cast<float>(m_dAccumulatedUpdateTime / m_dFixedUpdateDelta);
 }
 
 float HyTime::GetUpdateDelta() const

@@ -97,7 +97,7 @@ HyWinsock::HyWinsock()
 	int32 iResult = send(hSocket, static_cast<const char *>(pData), uiNumBytes, 0);
 	if(iResult == SOCKET_ERROR)
 	{
-		HyLogError("send failed: %d\n", WSAGetLastError());
+		HyLogError("send failed: " << WSAGetLastError());
 		closesocket(hSocket);
 		WSACleanup();
 		return -1;
