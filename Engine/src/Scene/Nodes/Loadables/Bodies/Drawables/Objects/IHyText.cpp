@@ -370,7 +370,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - uiLastCharOffset, pData->GetNumLayers(this->m_uiState), 0);
 
 		glm::vec2 ptCursorPos = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pGlyph->fADVANCE_X * m_fScaleBoxModifier, 0.0f);
-		ptCursorPos.y += (pGlyph->uiHEIGHT - pGlyph->iOFFSET_Y) * m_fScaleBoxModifier; // Find the baseline of this last glyph
+		ptCursorPos.y += (static_cast<int32>(pGlyph->uiHEIGHT) - pGlyph->iOFFSET_Y) * m_fScaleBoxModifier; // Find the baseline of this last glyph
 		
 		ptCursorPos.x *= this->scale.X();
 		ptCursorPos.y *= this->scale.Y();
@@ -625,8 +625,8 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 					if(pMonospaceAscender[uiLayerIndex] < pGlyphRef->iOFFSET_Y)
 						pMonospaceAscender[uiLayerIndex] = static_cast<float>(pGlyphRef->iOFFSET_Y);
 
-					if(pMonospaceDecender[uiLayerIndex] < (pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y))
-						pMonospaceDecender[uiLayerIndex] = static_cast<float>(pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y);
+					if(pMonospaceDecender[uiLayerIndex] < (static_cast<int32>(pGlyphRef->uiHEIGHT) - pGlyphRef->iOFFSET_Y))
+						pMonospaceDecender[uiLayerIndex] = static_cast<float>(static_cast<int32>(pGlyphRef->uiHEIGHT) - pGlyphRef->iOFFSET_Y);
 				}
 			}
 		}
@@ -721,7 +721,7 @@ offsetCalculation:
 
 				float fAdvanceAmtX = pGlyphRef->fADVANCE_X;
 				float fAscender = static_cast<float>(pGlyphRef->iOFFSET_Y);
-				float fDecender = HyClamp(static_cast<float>(pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(this->m_uiState));
+				float fDecender = HyClamp(static_cast<float>(static_cast<int32>(pGlyphRef->uiHEIGHT) - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(this->m_uiState));
 				float fOffsetX = static_cast<float>(pGlyphRef->iOFFSET_X);
 
 				if(IsMonospacedDigits() && m_Utf32CodeList[uiStrIndex] >= 48 && m_Utf32CodeList[uiStrIndex] <= 57)
@@ -734,7 +734,7 @@ offsetCalculation:
 				}
 
 				m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x = pWritePos[uiLayerIndex].x + ((fKerning + fOffsetX) * m_fScaleBoxModifier);
-				m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.y = pWritePos[uiLayerIndex].y - ((pGlyphRef->uiHEIGHT - pGlyphRef->iOFFSET_Y) * m_fScaleBoxModifier);
+				m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.y = pWritePos[uiLayerIndex].y - ((static_cast<int32>(pGlyphRef->uiHEIGHT) - pGlyphRef->iOFFSET_Y) * m_fScaleBoxModifier);
 
 				if(fLastCharWidth < pWritePos[uiLayerIndex].x)
 					fLastCharWidth = pWritePos[uiLayerIndex].x;

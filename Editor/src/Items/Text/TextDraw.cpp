@@ -90,10 +90,7 @@ void TextDraw::SetPreviewText()
 		"The Quick Brown Fox Jumped Over The Lazy Dog!?\n" <<
 		"abcdefghijklmnopqrstuvwxyz\n" <<
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ\n" <<
-		"1234567890 !$#%&()+,.");// /\\[]_{}|:;<>?@");
-
-	// "ALL" SYMBOLS: ! \" # $ % & ' ( ) * + , - . / \\ [ ] ^ _ ` { | } ~ : ; < = > ? @
-	// BAD SYMBOLS: ' * - " ^ ` ~ =
+		"1234567890 !\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@");
 	
 	m_Text.SetTextAlignment(HYALIGN_Center);
 }
