@@ -274,6 +274,22 @@ void DlgNewProject::ErrorCheck()
 			bIsError = true;
 			break;
 		}
+
+		sError = ui->wgtSourceDir->GetError();
+		if(sError.isEmpty() == false)
+		{
+			ui->lblError->setText(sError);
+			bIsError = true;
+			break;
+		}
+
+		sError = ui->wgtBuildDir->GetError();
+		if(sError.isEmpty() == false)
+		{
+			ui->lblError->setText(sError);
+			bIsError = true;
+			break;
+		}
 	}while(false);
 
 	ui->lblError->setVisible(bIsError);

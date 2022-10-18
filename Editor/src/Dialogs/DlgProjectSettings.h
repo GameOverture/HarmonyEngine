@@ -10,6 +10,8 @@
 #ifndef DLGPROJECTSETTINGS_H
 #define DLGPROJECTSETTINGS_H
 
+#include "WgtSrcDependency.h"
+
 #include <QDialog>
 #include <QJsonObject>
 
@@ -32,8 +34,13 @@ public:
 	bool HasSettingsChanged();
 	QJsonObject GetNewSettingsObj();
 
+private Q_SLOTS:
+	void on_buttonBox_accepted();
+
 private:
 	Ui::DlgProjectSettings *ui;
+
+	void ErrorCheck();
 };
 
 #endif // DLGPROJECTSETTINGS_H

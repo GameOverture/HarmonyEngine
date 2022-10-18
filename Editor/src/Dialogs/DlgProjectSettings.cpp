@@ -15,6 +15,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QPushButton>
 
 DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 	QDialog(parent),
@@ -26,14 +27,25 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 	QJsonObject projSettingsObj = m_ProjectRef.GetSettingsObj();
 
 	ui->txtTitleName->setText(projSettingsObj["Title"].toString());
-	ui->txtCodeName->setText(projectRef.GetName());
 
-	ui->txtAssetsLocation->setText(projSettingsObj["DataPath"].toString());
-	ui->txtMetaDataLocation->setText(projSettingsObj["MetaPath"].toString());
+	ui->wgtDataDir->Setup("Assets", "data", m_ProjectRef.GetAbsPath(), m_ProjectRef.GetAssetsRelPath());
+	ui->wgtMetaDir->Setup("Meta-Data", "meta", m_ProjectRef.GetAbsPath(), m_ProjectRef.GetMetaRelPath());
+	ui->wgtSourceDir->Setup("Source Code", "Source", m_ProjectRef.GetAbsPath(), m_ProjectRef.GetSourceRelPath());
+	ui->wgtBuildDir->Setup("Build", "build", m_ProjectRef.GetAbsPath(), m_ProjectRef.GetBuildRelPath());
 
-	ui->sbInputMaps->setValue(projSettingsObj["NumInputMaps"].toInt());
-	ui->sbUpdateFpsCap->setValue(projSettingsObj["UpdateFpsCap"].toInt());
+	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
+	connect(ui->wgtDataDir, &WgtMakeRelDir::OnDirty, this, &DlgProjectSettings::ErrorCheck);
+	connect(ui->wgtMetaDir, &WgtMakeRelDir::OnDirty, this, &DlgProjectSettings::ErrorCheck);
+	connect(ui->wgtSourceDir, &WgtMakeRelDir::OnDirty, this, &DlgProjectSettings::ErrorCheck);
+	connect(ui->wgtBuildDir, &WgtMakeRelDir::OnDirty, this, &DlgProjectSettings::ErrorCheck);
+	ErrorCheck();
+
+	ui->sbUpdatePerSec->setValue(projSettingsObj["UpdatesPerSec"].toInt());
+	ui->chkVSync->setChecked(projSettingsObj["VSync"].toBool());
 	ui->chkShowCursor->setChecked(projSettingsObj["ShowCursor"].toBool());
+	ui->sbInputMaps->setValue(projSettingsObj["NumInputMaps"].toInt());
+
+	ui->grpConsoleWindow->setChecked(projSettingsObj["UseConsole"].toBool());
 
 	setWindowTitle(m_ProjectRef.GetTitle() % " Settings");
 	setWindowIcon(HyGlobal::ItemIcon(ITEM_Project, SUBICON_Settings));
@@ -52,4 +64,149 @@ bool DlgProjectSettings::HasSettingsChanged()
 QJsonObject DlgProjectSettings::GetNewSettingsObj()
 {
 	return m_ProjectRef.GetSettingsObj();
+}
+
+void DlgProjectSettings::on_buttonBox_accepted()
+{
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	//// Create workspace file tree
+	//QDir buildDir(m_ProjectRef.GetAbsPath());
+	//buildDir.mkpath(".");
+
+	//// DATA
+	//buildDir.mkdir(ui->wgtDataDir->GetRelPath());
+	//buildDir.cd(ui->wgtDataDir->GetRelPath());
+	//buildDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
+	//buildDir.mkdir(HyGlobal::ItemName(ITEM_Audio, true));
+
+	//// META-DATA
+	//buildDir.setPath(m_ProjectRef.GetAbsPath());
+	//buildDir.mkdir(ui->wgtMetaDir->GetRelPath());
+	//buildDir.cd(ui->wgtMetaDir->GetRelPath());
+	//buildDir.mkdir(HyGlobal::ItemName(ITEM_Source, true));
+	//buildDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
+	//buildDir.mkdir(HyGlobal::ItemName(ITEM_Audio, true));
+
+	//// SOURCE
+	//buildDir.setPath(m_ProjectRef.GetAbsPath());
+	//buildDir.mkdir(ui->wgtSourceDir->GetRelPath());
+
+	////// BUILD
+	////buildDir.setPath(GetProjDirPath());
+	////buildDir.mkdir(ui->wgtBuildDir->GetRelPath());
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	//// Generate HyProj file. Insert the minimum required fields for it.
+	//// The project's DlgProjectSettings will fill in the rest of the defaults
+	//HarmonyInit hyInit; // Use default values of struct;
+	//QJsonObject jsonObj;
+	//jsonObj.insert("$fileVersion", HYGUI_FILE_VERSION);
+	//jsonObj.insert("Title", ui->txtTitleName->text());
+	//jsonObj.insert("DataPath", QString(ui->wgtDataDir->GetRelPath() + "/"));
+	//jsonObj.insert("MetaPath", QString(ui->wgtMetaDir->GetRelPath() + "/"));
+	//jsonObj.insert("SourcePath", QString(ui->wgtSourceDir->GetRelPath() + "/"));
+	//jsonObj.insert("BuildPath", QString(ui->wgtBuildDir->GetRelPath() + "/"));
+
+	//jsonObj.insert("UpdatesPerSec", static_cast<qint64>(hyInit.uiUpdatesPerSec));
+	//jsonObj.insert("VSync", hyInit.iVSync);
+	//jsonObj.insert("NumInputMaps", static_cast<qint64>(hyInit.uiNumInputMaps));
+	//jsonObj.insert("ShowCursor", hyInit.bShowCursor);
+
+	//QJsonArray windowInfoArray;
+	//QJsonObject windowInfoObj;
+	//windowInfoObj.insert("Name", ui->txtTitleName->text());
+	//windowInfoObj.insert("Type", hyInit.windowInfo[0].eMode);
+	//windowInfoObj.insert("ResolutionX", hyInit.windowInfo[0].vSize.x);
+	//windowInfoObj.insert("ResolutionY", hyInit.windowInfo[0].vSize.y);
+	//windowInfoObj.insert("LocationX", hyInit.windowInfo[0].ptLocation.x);
+	//windowInfoObj.insert("LocationY", hyInit.windowInfo[0].ptLocation.y);
+	//windowInfoArray.append(windowInfoObj);
+	//jsonObj.insert("WindowInfo", windowInfoArray);
+
+	//jsonObj.insert("UseConsole", true);
+	//QJsonObject consoleInfoObj;
+	//consoleInfoObj.insert("LocationX", hyInit.consoleInfo.ptLocation.x);
+	//consoleInfoObj.insert("LocationY", hyInit.consoleInfo.ptLocation.y);
+	//consoleInfoObj.insert("Name", hyInit.consoleInfo.sName.c_str());
+	//consoleInfoObj.insert("ResolutionX", hyInit.consoleInfo.vSize.x);
+	//consoleInfoObj.insert("ResolutionY", hyInit.consoleInfo.vSize.y);
+	//consoleInfoObj.insert("Type", hyInit.consoleInfo.eMode);
+	//jsonObj.insert("ConsoleInfo", consoleInfoObj);
+
+	//QFile newProjectFile(GetProjFilePath());
+	//if(newProjectFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+	//{
+	//	HyGuiLog("Couldn't open new project file for writing", LOGTYPE_Error);
+	//}
+	//else
+	//{
+	//	QJsonDocument newProjectDoc(jsonObj);
+	//	qint64 iBytesWritten = newProjectFile.write(newProjectDoc.toJson());
+	//	if(0 == iBytesWritten || -1 == iBytesWritten)
+	//	{
+	//		HyGuiLog("Could not write new project file: " % newProjectFile.errorString(), LOGTYPE_Error);
+	//	}
+
+	//	newProjectFile.close();
+	//}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//// Copy standard git files to new project location
+	//if(ui->chkUseGit->isChecked())
+	//{
+	//	QDir projGenDir(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir);
+	//	QFileInfoList fileInfoList = projGenDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+	//	for(int i = 0; i < fileInfoList.size(); ++i)
+	//		QFile::copy(fileInfoList[i].absoluteFilePath(), QDir(GetProjDirPath()).absoluteFilePath(fileInfoList[i].fileName()));
+	//}
+}
+
+void DlgProjectSettings::ErrorCheck()
+{
+	bool bIsError = false;
+	do
+	{
+		if(ui->txtTitleName->text().isEmpty())
+		{
+			ui->lblError->setText("Error: Game title cannot be blank.");
+			bIsError = true;
+			break;
+		}
+		
+		QString sError;
+		sError = ui->wgtDataDir->GetError();
+		if(sError.isEmpty() == false)
+		{
+			ui->lblError->setText(sError);
+			bIsError = true;
+			break;
+		}
+
+		sError = ui->wgtMetaDir->GetError();
+		if(sError.isEmpty() == false)
+		{
+			ui->lblError->setText(sError);
+			bIsError = true;
+			break;
+		}
+
+		sError = ui->wgtSourceDir->GetError();
+		if(sError.isEmpty() == false)
+		{
+			ui->lblError->setText(sError);
+			bIsError = true;
+			break;
+		}
+
+		sError = ui->wgtBuildDir->GetError();
+		if(sError.isEmpty() == false)
+		{
+			ui->lblError->setText(sError);
+			bIsError = true;
+			break;
+		}
+	} while(false);
+
+	ui->lblError->setVisible(bIsError);
+	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
 }
