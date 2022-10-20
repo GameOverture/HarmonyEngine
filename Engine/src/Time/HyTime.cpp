@@ -41,7 +41,7 @@ void HyTime::BeginFrame()
 	m_dFrameDelta = static_cast<double>(m_CurrTime - m_PrevTime) / static_cast<double>(SDL_GetPerformanceFrequency());
 #else
 	m_CurrTime = std::chrono::high_resolution_clock::now();
-	m_dFrameDelta = (m_PrevTime - m_CurrTime).count();
+	m_dFrameDelta = (m_CurrTime - m_PrevTime).count();
 #endif
 	m_PrevTime = m_CurrTime;
 	m_dFrameDelta = HyMin(m_dFrameDelta, 0.25); // Clamp delta times to 0.25
