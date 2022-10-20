@@ -174,10 +174,20 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 
 	QJsonObject runtimeObj = runtimeDoc.object();
 	QJsonArray groupArray = runtimeObj["groups"].toArray();
-	for(int i = 0; i < groupArray.size(); ++i)
+	if(groupArray.empty())
 	{
-		QJsonObject groupObj = groupArray[i].toObject();
-		m_AudioGroupsModel.AddGroup(groupObj["groupName"].toString(), groupObj["groupId"].toInt());
+		// Add default groups
+		m_AudioGroupsModel.AddGroup("SFX", 0);
+		m_AudioGroupsModel.AddGroup("Music", 1);
+	}
+	else
+	{
+		// Parse saved groups
+		for(int i = 0; i < groupArray.size(); ++i)
+		{
+			QJsonObject groupObj = groupArray[i].toObject();
+			m_AudioGroupsModel.AddGroup(groupObj["groupName"].toString(), groupObj["groupId"].toInt());
+		}
 	}
 
 	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt));
