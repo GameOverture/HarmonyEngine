@@ -234,8 +234,8 @@ bool IHyNode::IsRegistered() const
 	HyAssert((uiDirtyFlags & ~DIRTY_ALL) == 0, "IHyNode::SetDirty was passed flags that are not apart of the DirtyFlag enum");
 
 	// Special cases
-	if((uiDirtyFlags & (DIRTY_BoundingVolume | DIRTY_Transform)) != 0)
-		uiDirtyFlags |= DIRTY_SceneAABB;
+	if(uiDirtyFlags & DIRTY_Transform)
+		uiDirtyFlags |= (DIRTY_SceneAABB | DIRTY_Collision);
 
 	m_uiFlags |= uiDirtyFlags;
 }

@@ -167,7 +167,7 @@ void IHySprite<NODETYPE, ENTTYPE>::SetFrame(uint32 uiFrameIndex)
 	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
 	
-	this->SetDirty(this->DIRTY_BoundingVolume);
+	this->SetDirty(this->DIRTY_SceneAABB);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -373,7 +373,7 @@ template<typename NODETYPE, typename ENTTYPE>
 	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
 
-	this->SetDirty(this->DIRTY_BoundingVolume);
+	this->SetDirty(this->DIRTY_SceneAABB);
 	return true;
 }
 
@@ -525,7 +525,7 @@ template<typename NODETYPE, typename ENTTYPE>
 		if(m_uiCurFrame != iNextFrameIndex)
 		{
 			m_uiCurFrame = iNextFrameIndex;
-			this->SetDirty(this->DIRTY_BoundingVolume);
+			this->SetDirty(this->DIRTY_SceneAABB);
 		}
 
 		m_fElapsedFrameTime -= frameRef.fDURATION;

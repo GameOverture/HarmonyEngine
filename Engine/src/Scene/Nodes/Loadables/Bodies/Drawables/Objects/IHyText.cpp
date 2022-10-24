@@ -987,7 +987,7 @@ offsetCalculation:
 	delete[] pMonospaceAscender;
 	delete[] pMonospaceDecender;
 
-	this->SetDirty(this->DIRTY_BoundingVolume);
+	this->SetDirty(this->DIRTY_SceneAABB);
 	m_uiTextAttributes &= ~TEXTATTRIB_IsDirty;
 
 #ifdef HY_USE_TEXT_DEBUG_BOXES

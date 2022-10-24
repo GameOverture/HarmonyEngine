@@ -38,8 +38,8 @@ public:
 	void SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack = HySprite2d::NullAnimCallback, void *pParam = nullptr);
 
 protected:
+	virtual void OnCalcSceneAABB() override;
 	virtual void OnInvokeCallback(uint32 uiStateIndex) override;
-	virtual void OnCalcBoundingVolume() override;
 	virtual void OnDataAcquired() override;
 
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;

@@ -59,7 +59,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	else if(m_uiTextAttributes & TEXTATTRIB_IsScaleBox)
 		m_DebugBox.shape.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
 	else if(m_uiTextAttributes & TEXTATTRIB_IsColumn)
-		m_DebugBox.shape = GetLocalBoundingVolume();
+		m_DebugBox.shape.SetAsBox(m_vBoxDimensions.x, GetHeight());
 	else if(m_uiTextAttributes & TEXTATTRIB_IsVertical)
 		m_DebugBox.shape.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetHeight()));
 	else
@@ -89,7 +89,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	CalculateGlyphInfos();
 }
 
-/*virtual*/ void HyText2d::OnCalcBoundingVolume() /*override*/
+/*virtual*/ void HyText2d::OnCalcSceneAABB() /*override*/
 {
 	CalculateGlyphInfos();
 	if(m_uiNumReservedGlyphs == 0)
@@ -110,12 +110,12 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	float fHalfHeight = GetHeight(0.5f);
 
 	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
-		m_LocalBoundingVolume.SetAsNothing();
-	else
-	{
-		glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
-		m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
-	}
+		return;
+
+	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
+	HyShape2d tmpShape;
+	tmpShape.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
+	tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 }
 
 /*virtual*/ void HyText2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

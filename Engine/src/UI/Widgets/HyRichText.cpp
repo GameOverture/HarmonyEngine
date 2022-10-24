@@ -257,6 +257,6 @@ void HyRichText::AssembleDrawables()
 	m_fTotalHeight = std::fabs(ptCurPos.y);
 	m_fTotalHeight += m_fColumnLineHeightOffset;// std::fabs(pTextData->GetLineDescender(uiCurTextState)
 
-	SetDirty(IHyNode::DIRTY_BoundingVolume);
+	SetDirty(IHyNode::DIRTY_SceneAABB);
 	SetSizeAndLayoutDirty();
 }

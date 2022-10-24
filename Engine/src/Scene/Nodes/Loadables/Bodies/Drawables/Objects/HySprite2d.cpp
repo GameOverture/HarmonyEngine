@@ -60,12 +60,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	m_AnimCallbackList[uiStateIndex].second = pParam;
 }
 
-/*virtual*/ void HySprite2d::OnInvokeCallback(uint32 uiStateIndex) /*override*/
-{
-	m_AnimCallbackList[uiStateIndex].first(this, m_AnimCallbackList[uiStateIndex].second);
-}
-
-/*virtual*/ void HySprite2d::OnCalcBoundingVolume() /*override*/
+/*virtual*/ void HySprite2d::OnCalcSceneAABB() /*override*/
 {
 	if(AcquireData() == nullptr)
 	{
@@ -77,11 +72,17 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 
 	float fHalfWidth = GetFrameWidth(0.5f);
 	float fHalfHeight = GetFrameHeight(0.5f);
-
 	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
-		m_LocalBoundingVolume.SetAsNothing();
-	else
-		m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
+		return;
+
+	HyShape2d tmpShape;
+	tmpShape.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
+	tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
+}
+
+/*virtual*/ void HySprite2d::OnInvokeCallback(uint32 uiStateIndex) /*override*/
+{
+	m_AnimCallbackList[uiStateIndex].first(this, m_AnimCallbackList[uiStateIndex].second);
 }
 
 /*virtual*/ void HySprite2d::OnDataAcquired() /*override*/

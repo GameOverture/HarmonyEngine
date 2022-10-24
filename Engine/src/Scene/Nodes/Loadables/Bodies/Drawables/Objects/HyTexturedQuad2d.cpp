@@ -39,8 +39,6 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiText
 
 	m_ShaderUniforms.SetNumTexUnits(1);
 	m_ShaderUniforms.SetTexHandle(0, hTextureHandle);
-
-	m_LocalBoundingVolume.SetAsBox(static_cast<float>(m_uiRawTextureWidth), static_cast<float>(m_uiRawTextureHeight));
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(const HyTexturedQuad2d &copyRef) :
@@ -85,8 +83,6 @@ void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
 	m_SrcRect.top = fY / fTexHeight;
 	m_SrcRect.right = (fX + fWidth) / fTexWidth;
 	m_SrcRect.bottom = (fY + fHeight) / fTexHeight;
-
-	m_LocalBoundingVolume.SetAsBox(static_cast<float>(iWidth), static_cast<float>(iHeight));
 }
 
 uint32 HyTexturedQuad2d::GetAtlasIndexInGroup()
@@ -133,17 +129,14 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	return true;
 }
 
-/*virtual*/ void HyTexturedQuad2d::OnCalcBoundingVolume() /*override*/
+/*virtual*/ void HyTexturedQuad2d::OnCalcSceneAABB() /*override*/
 {
-	m_LocalBoundingVolume.SetAsBox(m_SrcRect.Width(), m_SrcRect.Height());
+	if(m_SrcRect.Width() <= HyShape2d::FloatSlop || m_SrcRect.Height() <= HyShape2d::FloatSlop)
+		return;
 
-	//float fHalfWidth = m_SrcRect.Width() * 0.5f;
-	//float fHalfHeight = m_SrcRect.Height() * 0.5f;
-
-	//if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
-	//	m_LocalBoundingVolume.SetAsNothing();
-	//else
-	//	m_LocalBoundingVolume.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(fHalfWidth, fHalfHeight), 0.0f);
+	HyShape2d tmpShape;
+	tmpShape.SetAsBox(m_SrcRect.Width(), m_SrcRect.Height());
+	tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 }
 
 /*virtual*/ void HyTexturedQuad2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

@@ -146,9 +146,10 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	}
 }
 
-/*virtual*/ void HyPrimitive2d::OnCalcBoundingVolume() /*override*/
+/*virtual*/ void HyPrimitive2d::OnCalcSceneAABB() /*override*/
 {
-	m_LocalBoundingVolume = shape;
+	if(shape.IsValidShape())
+		shape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 }
 
 /*virtual*/ void HyPrimitive2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
@@ -228,7 +229,7 @@ void HyPrimitive2d::AssembleData()
 		HyLogError("HyPrimitive2d::AssembleData() - Unknown shape type: " << shape.GetType());
 	}
 
-	SetDirty(DIRTY_BoundingVolume);
+	SetDirty(DIRTY_SceneAABB);
 	Load();
 }
 

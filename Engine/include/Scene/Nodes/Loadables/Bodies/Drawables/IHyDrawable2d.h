@@ -23,7 +23,7 @@ class IHyDrawable2d : public IHyBody2d, public IHyDrawable
 	friend class HyScene;
 
 protected:
-	HyShape2d				m_LocalBoundingVolume; // A conforming shape around *this that assumes an identity matrix for its transform.
+	//HyShape2d				m_LocalBoundingVolume; // A conforming shape around *this that assumes an identity matrix for its transform.
 
 public:
 	IHyDrawable2d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
@@ -34,7 +34,7 @@ public:
 	IHyDrawable2d &operator=(const IHyDrawable2d &rhs);
 	IHyDrawable2d &operator=(IHyDrawable2d &&donor) noexcept;
 
-	const HyShape2d &GetLocalBoundingVolume();
+	//const HyShape2d &GetLocalBoundingVolume();
 	virtual const b2AABB &GetSceneAABB() override;
 
 	virtual bool IsValidToRender() override final;
@@ -46,7 +46,7 @@ protected:
 	virtual void OnUnloaded() override;
 
 	virtual bool OnIsValidToRender() = 0;
-	virtual void OnCalcBoundingVolume() = 0; // Set 'm_LocalBoundingVolume' to a conforming shape around *this that assumes an identity matrix for its transform.
+	virtual void OnCalcSceneAABB() = 0; // Sets 'm_SceneAABB' to a scene transformed, conforming AABB around the visible portion of *this (used for frustum culling)
 
 #ifdef HY_PLATFORM_GUI
 public:

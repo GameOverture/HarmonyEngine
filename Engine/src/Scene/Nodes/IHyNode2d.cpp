@@ -21,8 +21,8 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB)
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -50,8 +50,8 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB)
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -70,8 +70,8 @@ IHyNode2d::IHyNode2d(IHyNode2d &&donor) noexcept :
 	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
 	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_BoundingVolume | DIRTY_SceneAABB)
+	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 

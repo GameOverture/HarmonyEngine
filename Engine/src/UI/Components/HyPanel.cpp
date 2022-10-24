@@ -62,7 +62,7 @@ HyPanel::HyPanel(HyEntity2d *pParent /*= nullptr*/) :
 	m_uiFrameSize(0),
 	m_Frame1(this),
 	m_Frame2(this),
-	size(*this, DIRTY_Size | DIRTY_BoundingVolume | DIRTY_SceneAABB)
+	size(*this, DIRTY_Size | DIRTY_SceneAABB)
 {
 	Setup(HyPanelInit(), false);
 }
@@ -74,7 +74,7 @@ HyPanel::HyPanel(const HyPanelInit &initRef, bool bIsContainer, HyEntity2d *pPar
 	m_uiFrameSize(0),
 	m_Frame1(this),
 	m_Frame2(this),
-	size(*this, DIRTY_Size | DIRTY_BoundingVolume | DIRTY_SceneAABB)
+	size(*this, DIRTY_Size | DIRTY_SceneAABB)
 {
 	Setup(initRef, m_bIsContainer);
 }

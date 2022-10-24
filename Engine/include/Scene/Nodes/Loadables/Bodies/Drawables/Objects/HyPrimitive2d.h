@@ -53,7 +53,7 @@ protected:
 
 	virtual void OnShapeChanged() override;
 	virtual bool OnIsValidToRender() override;
-	virtual void OnCalcBoundingVolume() override;
+	virtual void OnCalcSceneAABB() override;
 
 	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 

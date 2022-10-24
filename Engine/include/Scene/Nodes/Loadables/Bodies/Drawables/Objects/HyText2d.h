@@ -33,7 +33,7 @@ protected:
 	virtual void OnSetDebugBox() override;
 #endif
 	virtual void OnLoadedUpdate() override;
-	virtual void OnCalcBoundingVolume() override;
+	virtual void OnCalcSceneAABB() override;
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 };

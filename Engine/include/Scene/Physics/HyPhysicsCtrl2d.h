@@ -35,6 +35,7 @@ public:
 	HyPhysicsCtrl2d(IHyBody2d &nodeRef);
 	~HyPhysicsCtrl2d();
 
+	// Don't set the b2FixtureDef::shape, instead use .shape of 'm_NodeRef'
 	void Init(const b2BodyDef &bodyDef, const b2FixtureDef &fixtureDef);
 	void Init(HyPhysicsType eType,
 		bool bIsEnabled = true,

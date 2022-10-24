@@ -22,7 +22,6 @@ IHyDrawable2d::IHyDrawable2d(const IHyDrawable2d &copyRef) :
 	IHyDrawable(copyRef)
 {
 	m_uiFlags |= NODETYPE_IsDrawable;
-	m_LocalBoundingVolume = copyRef.m_LocalBoundingVolume;
 }
 
 IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) noexcept :
@@ -30,7 +29,6 @@ IHyDrawable2d::IHyDrawable2d(IHyDrawable2d &&donor) noexcept :
 	IHyDrawable(std::move(donor))
 {
 	m_uiFlags |= NODETYPE_IsDrawable;
-	m_LocalBoundingVolume = donor.m_LocalBoundingVolume;
 }
 
 IHyDrawable2d::~IHyDrawable2d()
@@ -46,8 +44,6 @@ IHyDrawable2d &IHyDrawable2d::operator=(const IHyDrawable2d &rhs)
 {
 	IHyBody2d::operator=(rhs);
 	IHyDrawable::operator=(rhs);
-	
-	m_LocalBoundingVolume = rhs.m_LocalBoundingVolume;
 
 	return *this;
 }
@@ -57,30 +53,29 @@ IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor) noexcept
 	IHyBody2d::operator=(std::move(donor));
 	IHyDrawable::operator=(std::move(donor));
 
-	m_LocalBoundingVolume = std::move(donor.m_LocalBoundingVolume);
-
 	return *this;
 }
 
-const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
-{
-	if(IsDirty(DIRTY_BoundingVolume) || m_LocalBoundingVolume.IsValidShape() == false)
-	{
-		OnCalcBoundingVolume();
-		ClearDirty(DIRTY_BoundingVolume);
-	}
-
-	return m_LocalBoundingVolume;
-}
+//const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
+//{
+//	if(IsDirty(DIRTY_BoundingVolume) || m_LocalBoundingVolume.IsValidShape() == false)
+//	{
+//		OnCalcBoundingVolume();
+//		ClearDirty(DIRTY_BoundingVolume);
+//	}
+//
+//	return m_LocalBoundingVolume;
+//}
 
 /*virtual*/ const b2AABB &IHyDrawable2d::GetSceneAABB() /*override*/
 {
 	if(IsDirty(DIRTY_SceneAABB))
 	{
 		HyMath::InvalidateAABB(m_SceneAABB);
+		OnCalcSceneAABB(); // This will update 'm_SceneAABB'
 
-		GetLocalBoundingVolume(); // This will update 'm_LocalBoundingVolume' if it's dirty
-		m_LocalBoundingVolume.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
+		//GetLocalBoundingVolume(); 
+		//m_LocalBoundingVolume.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 
 		ClearDirty(DIRTY_SceneAABB);
 	}

@@ -75,6 +75,11 @@ uint32 HySpine2d::GetNumSlots()
 	return pData;
 }
 
+/*virtual*/ void HySpine2d::OnCalcSceneAABB() /*override*/
+{
+	HyError("HySpine2d::OnCalcSceneAABB not implemented");
+}
+
 /*virtual*/ bool HySpine2d::OnIsValidToRender() /*override*/
 {
 	return true;
@@ -298,9 +303,4 @@ uint32 HySpine2d::GetNumSlots()
 #else
 	return true;
 #endif
-}
-
-/*virtual*/ void HySpine2d::OnCalcBoundingVolume() /*override*/
-{
-	HyError("HySpine2d::OnCalcBoundingVolume not implemented");
 }

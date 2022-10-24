@@ -42,15 +42,15 @@ public:
 	enum DirtyFlag // NOTE: continue the bits in TypeFlag (stored in same 32bit member 'm_uiFlags')
 	{
 		DIRTY_FromUpdater			= 1 << 10,
-		DIRTY_BoundingVolume		= 1 << 11,
-		DIRTY_SceneAABB				= 1 << 12,
+		DIRTY_SceneAABB				= 1 << 11,
+		DIRTY_Collision				= 1 << 12,
 		DIRTY_Transform				= 1 << 13,
 		DIRTY_Size					= 1 << 14,
 		DIRTY_Color					= 1 << 15,
 		DIRTY_Scissor				= 1 << 16,
 		DIRTY_Audio					= 1 << 17,
 
-		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_BoundingVolume | DIRTY_SceneAABB | DIRTY_Transform | DIRTY_Size | DIRTY_Color | DIRTY_Scissor | DIRTY_Audio
+		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_Collision | DIRTY_SceneAABB | DIRTY_Transform | DIRTY_Size | DIRTY_Color | DIRTY_Scissor | DIRTY_Audio
 	};
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
