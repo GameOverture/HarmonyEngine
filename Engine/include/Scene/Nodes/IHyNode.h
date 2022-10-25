@@ -33,9 +33,9 @@ public:
 		NODETYPE_HyType				= 0xF,		// First 4 bits are reserved for the HyType
 		NODETYPE_Is2d				= 1 << 4,
 		NODETYPE_IsLoadable			= 1 << 5,
-		NODETYPE_IsBody				= 1 << 6,
+		NODETYPE_IsBody				= 1 << 6,	// Must at least be a 'body' to participate in physics and collisions
 		NODETYPE_IsDrawable			= 1 << 7,
-		NODETYPE_IsLayout			= 1 << 8,
+		NODETYPE_IsLayout			= 1 << 8,	// A special entity type used for UI to arrange its child nodes as widgets
 		NODETYPE_IsPhysicsGrid		= 1 << 9,
 	};
 	// These flags get set by HyAnimFloat's when their corresponding respective values are manipulated

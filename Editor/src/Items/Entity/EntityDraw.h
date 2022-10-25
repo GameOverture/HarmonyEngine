@@ -36,7 +36,7 @@ class EntityDraw : public IDraw
 
 		void Set(IHyDrawable2d &nodeRef, float fLineThickness)
 		{
-			m_Box.shape = nodeRef.GetLocalBoundingVolume();
+			//m_Box.shape = nodeRef.GetLocalBoundingVolume();
 			m_Box.SetLineThickness(fLineThickness);
 			HyAssert(m_Box.shape.GetType() == HYSHAPE_Polygon && static_cast<const b2PolygonShape *>(m_Box.shape.GetB2Shape())->m_count == 4, "TransformWidget got a shape that wasn't a box polygon");
 
