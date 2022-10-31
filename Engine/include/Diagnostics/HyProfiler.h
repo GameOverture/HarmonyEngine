@@ -11,7 +11,7 @@
 #define HyProfiler_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyUIContainer.h"
+#include "UI/HyUiContainer.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
