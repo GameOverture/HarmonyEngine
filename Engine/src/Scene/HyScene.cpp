@@ -172,7 +172,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef, float fExtrapolatePercent)
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Initialize the buffer - PrepareBuffers may manipulate current IHyDrawable or insert new IHyDrawable while it updates all the effects
+	// Initialize the buffer - PrepareBuffers writes internal render states first, used by things like HyStencil
 	rendererRef.PrepareBuffers(fExtrapolatePercent);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

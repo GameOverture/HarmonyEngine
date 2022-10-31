@@ -37,7 +37,7 @@ public:
 
 	// Don't set the b2FixtureDef::shape, instead use .shape of 'm_NodeRef'
 	void Init(const b2BodyDef &bodyDef, const b2FixtureDef &fixtureDef);
-	void Init(HyPhysicsType eType,
+	void Init(HyBodyType eType,
 		bool bIsEnabled = true,
 		bool bIsFixedRotation = false,
 		float fDensity = 1.0f,
@@ -58,8 +58,8 @@ public:
 	void Uninit();
 	bool IsSimulating() const;
 
-	HyPhysicsType GetType() const;
-	void SetType(HyPhysicsType eType);
+	HyBodyType GetType() const;
+	void SetType(HyBodyType eType);
 	bool IsEnabled() const;
 	void SetEnabled(bool bEnable);
 	bool IsFixedRotation() const;

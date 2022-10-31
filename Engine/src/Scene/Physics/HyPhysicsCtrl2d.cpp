@@ -27,7 +27,7 @@ HyPhysicsCtrl2d::~HyPhysicsCtrl2d()
 
 void HyPhysicsCtrl2d::Init(const b2BodyDef &bodyDef, const b2FixtureDef &fixtureDef)
 {
-	Init(static_cast<HyPhysicsType>(bodyDef.type),
+	Init(static_cast<HyBodyType>(bodyDef.type),
 		bodyDef.enabled,
 		bodyDef.fixedRotation,
 		fixtureDef.density,
@@ -46,7 +46,7 @@ void HyPhysicsCtrl2d::Init(const b2BodyDef &bodyDef, const b2FixtureDef &fixture
 		bodyDef.bullet);
 }
 
-void HyPhysicsCtrl2d::Init(HyPhysicsType eType,
+void HyPhysicsCtrl2d::Init(HyBodyType eType,
 	bool bIsEnabled /*= true*/,
 	bool bIsFixedRotation /*= false*/,
 	float fDensity /*= 1.0f*/,
@@ -64,7 +64,7 @@ void HyPhysicsCtrl2d::Init(HyPhysicsType eType,
 	float fGravityScale /*= 1.0f*/,
 	bool bIsCcd /*= false*/)
 {
-	HyAssert(eType != HYPHYS_Unknown, "HyPhysicsCtrl2d::Init was passed 'HYPHYS_Unknown'");
+	HyAssert(eType != HYBODY_Unknown, "HyPhysicsCtrl2d::Init was passed 'HYBODY_Unknown'");
 
 	m_bEnabled = bIsEnabled;
 
@@ -144,17 +144,17 @@ bool HyPhysicsCtrl2d::IsSimulating() const
 	return m_pSimData != nullptr;
 }
 
-HyPhysicsType HyPhysicsCtrl2d::GetType() const
+HyBodyType HyPhysicsCtrl2d::GetType() const
 {
 	if(m_pSimData)
-		return static_cast<HyPhysicsType>(m_pSimData->m_pBody->GetType());
+		return static_cast<HyBodyType>(m_pSimData->m_pBody->GetType());
 	else if(m_pInit)
-		return static_cast<HyPhysicsType>(m_pInit->m_BodyDef.type);
+		return static_cast<HyBodyType>(m_pInit->m_BodyDef.type);
 	else
-		return HYPHYS_Unknown;
+		return HYBODY_Unknown;
 }
 
-void HyPhysicsCtrl2d::SetType(HyPhysicsType eType)
+void HyPhysicsCtrl2d::SetType(HyBodyType eType)
 {
 	if(m_pSimData)
 		m_pSimData->m_pBody->SetType(static_cast<b2BodyType>(eType));

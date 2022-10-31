@@ -85,15 +85,15 @@ enum HyType
 };
 static_assert((int)HYNUM_TYPES < 16, "HyType cannot exceed 15 items due to IHyNode only reserving 4 bits to store this value");
 
-enum HyPhysicsType
+enum HyBodyType
 {
-	HYPHYS_Unknown = -1,
+	HYBODY_Unknown = -1,
 
-	HYPHYS_Static = 0,
-	HYPHYS_Kinematic,
-	HYPHYS_Dynamic
+	HYBODY_Static = 0,
+	HYBODY_Kinematic,
+	HYBODY_Dynamic
 };
-static_assert((int)HYPHYS_Static == (int)b2_staticBody && (int)HYPHYS_Kinematic == (int)b2_kinematicBody && (int)HYPHYS_Dynamic == (int)b2_dynamicBody, "Harmony and Box2d types don't match!");
+static_assert((int)HYBODY_Static == (int)b2_staticBody && (int)HYBODY_Kinematic == (int)b2_kinematicBody && (int)HYBODY_Dynamic == (int)b2_dynamicBody, "Harmony and Box2d types don't match!");
 
 enum HyZoomLevel
 {
