@@ -393,10 +393,6 @@ bool HyWindow::ProjectToWorldPos2d(const glm::vec2 &ptWindowCoordinate, glm::vec
 				ptWorldPosOut.y = (aabbWorldRef.upperBound.y - aabbWorldRef.lowerBound.y) * vOffsetInViewport.y;
 				ptWorldPosOut.y += aabbWorldRef.lowerBound.y;
 
-
-				ptWorldPosOut.x *= m_Cams2dList[i]->scale.X();
-				ptWorldPosOut.y *= m_Cams2dList[i]->scale.Y();
-
 				return true;
 			}
 
