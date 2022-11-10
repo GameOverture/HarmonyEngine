@@ -135,6 +135,15 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
+void HyScene::AddNode_Collidable(IHyBody2d *pBody)
+{
+	//pBody-> = m_CollisionTree.CreateProxy(pBody->GetSceneAABB(), pBody);
+}
+
+void HyScene::RemoveNode_Collidable(IHyBody2d *pBody)
+{
+}
+
 void HyScene::ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType)
 {
 	m_AudioCoreRef.ProcessCue(pNode, eCueType);

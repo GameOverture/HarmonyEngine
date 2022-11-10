@@ -17,6 +17,7 @@
 class IHyNode;
 class IHyNode2d;
 class IHyNode3d;
+class IHyBody2d;
 class HyEntity2d;
 class HyEntity3d;
 class IHyLoadable;
@@ -41,6 +42,8 @@ class HyScene
 	std::vector<IHyDrawable2d *>						m_NodeList_LoadedDrawable2d;
 	std::vector<IHyDrawable3d *>						m_NodeList_LoadedDrawable3d;
 
+	//b2World												m_World;						// Collision/Physics
+
 public:
 	HyScene(HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
@@ -58,6 +61,9 @@ public:
 	void RemoveNode_Loaded(const IHyDrawable2d *pDrawable);
 	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
 	void CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut);
+
+	void AddNode_Collidable(IHyBody2d *pBody);
+	void RemoveNode_Collidable(IHyBody2d *pBody);
 
 	void ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType);
 

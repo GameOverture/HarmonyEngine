@@ -33,6 +33,8 @@ protected:
 	b2AABB							m_SceneAABB;			// Don't directly use, acquiring using GetSceneAABB()
 															// Derived versions of this function will properly update 'm_SceneAABB' before returning
 
+	HyCollideHandle					m_hCollide;
+
 public:
 	HyAnimVec3						topColor;
 	HyAnimVec3						botColor;
@@ -67,12 +69,16 @@ public:
 	float GetSceneHeight();
 	float GetSceneWidth();
 
+	void SetCollidable(HyBodyType eBodyType);
+
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void Update() override;
 
 	void ShapeChanged();
 	virtual void OnShapeChanged() { }; // Optional override to indicate whenever IHyBody2d::shape gets modified
+
+
 
 	// Internal Entity propagation function overrides
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding);

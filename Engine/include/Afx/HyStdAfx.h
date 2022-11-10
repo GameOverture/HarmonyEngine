@@ -58,6 +58,7 @@ typedef uint32 HyAudioNodeHandle;
 typedef uint32 HyAudioHandle;
 typedef uint32 HySpacerHandle;
 typedef uint32 HyLayoutHandle;
+typedef int32 HyCollideHandle;
 
 // Tags aren't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 // They increase the memory footprint of every node/instance by 8 bytes

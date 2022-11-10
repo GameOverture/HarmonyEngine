@@ -254,6 +254,10 @@ float IHyBody2d::GetSceneWidth()
 	return 0.0f;
 }
 
+void IHyBody2d::SetCollidable(HyBodyType eBodyType)
+{
+}
+
 /*virtual*/ void IHyBody2d::SetDirty(uint32 uiDirtyFlags) /*override*/
 {
 	IHyNode2d::SetDirty(uiDirtyFlags);
