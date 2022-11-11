@@ -250,7 +250,8 @@ void HyWindow::ApiRefreshWindowSize()
 
 #if defined(HY_USE_GLFW)
 	glfwGetWindowSize(m_pInterop, &iWidth, &iHeight);
-	glfwSetWindowSize(m_pInterop, iWidth, iHeight);
+	HyGlfw_WindowSizeCallback(m_pInterop, iWidth, iHeight);
+	//glfwSetWindowSize(m_pInterop, iWidth, iHeight);
 #elif defined(HY_USE_SDL2)
 	SDL_GetWindowSize(m_pInterop, &iWidth, &iHeight);
 	SDL_SetWindowSize(m_pInterop, iWidth, iHeight);
