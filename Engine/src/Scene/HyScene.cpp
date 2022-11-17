@@ -25,10 +25,13 @@ std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
 bool HyScene::sm_bInst2dOrderingDirty = false;
 
-HyScene::HyScene(HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef) :
+HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef) :
 	m_AudioCoreRef(audioCoreRef),
 	m_WindowListRef(WindowListRef),
-	m_bPauseGame(false)
+	m_bPauseGame(false),
+	m_fPixelsPerMeter(fPixelsPerMeter),
+	m_fPpmInverse(1.0f / fPixelsPerMeter),
+	m_b2World(b2Vec2(vGravity2d.x, vGravity2d.y))
 {
 	IHyNode::sm_pScene = this;
 }

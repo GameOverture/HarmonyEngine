@@ -42,10 +42,13 @@ class HyScene
 	std::vector<IHyDrawable2d *>						m_NodeList_LoadedDrawable2d;
 	std::vector<IHyDrawable3d *>						m_NodeList_LoadedDrawable3d;
 
-	//b2World												m_World;						// Collision/Physics
+	// Collision/Physics
+	float												m_fPixelsPerMeter;
+	float												m_fPpmInverse;
+	b2World												m_b2World;
 
 public:
-	HyScene(HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
+	HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
 	static void SetInstOrderingDirty();
