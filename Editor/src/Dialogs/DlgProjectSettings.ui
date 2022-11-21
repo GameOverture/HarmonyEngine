@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>509</width>
-    <height>426</height>
+    <width>513</width>
+    <height>510</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,8 +38,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>491</width>
-        <height>260</height>
+        <width>495</width>
+        <height>335</height>
        </rect>
       </property>
       <attribute name="label">
@@ -65,62 +65,165 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>491</width>
-        <height>224</height>
+        <width>495</width>
+        <height>335</height>
        </rect>
       </property>
       <attribute name="label">
-       <string>Framerate and Gameloop</string>
+       <string>Game Options</string>
       </attribute>
-      <layout class="QFormLayout" name="formLayout_2">
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="chkVSync">
-         <property name="text">
-          <string>Use VSync</string>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Framerate and Gameloop</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QCheckBox" name="chkVSync">
+            <property name="text">
+             <string>Use VSync</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Updates Per Second (0 means unbound, 1:1 with render frames)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="sbUpdatePerSec">
+              <property name="maximum">
+               <number>300</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Updates Per Second (0 means unbound, 1:1 with render frames)</string>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Input</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QCheckBox" name="chkShowCursor">
+            <property name="text">
+             <string>Show Mouse Cursor in window</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Number of Input Maps</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="sbInputMaps"/>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="sbUpdatePerSec">
-         <property name="maximum">
-          <number>300</number>
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Physics 2D</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Pixels Per Meter</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="sbPixelsPerMeter"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Gravity</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="WidgetVectorSpinBox" name="wgtGravity2d" native="true"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_5">
-      <attribute name="label">
-       <string>Input</string>
-      </attribute>
-      <layout class="QFormLayout" name="formLayout_4">
-       <item row="0" column="0" colspan="2">
-        <widget class="QCheckBox" name="chkShowCursor">
-         <property name="text">
-          <string>Show Mouse Cursor in window</string>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Number of Input Maps</string>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>64</height>
+          </size>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="sbInputMaps"/>
+        </spacer>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_6">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>495</width>
+        <height>335</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Console Window</string>
       </attribute>
@@ -170,6 +273,12 @@
    <class>WgtMakeRelDir</class>
    <extends>QWidget</extends>
    <header>WgtMakeRelDir.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetVectorSpinBox</class>
+   <extends>QWidget</extends>
+   <header>WidgetVectorSpinBox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

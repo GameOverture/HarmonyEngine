@@ -369,6 +369,8 @@ struct HarmonyInit
 	int32					iVSync;
 	uint32					uiNumInputMaps;
 	bool					bShowCursor;
+	glm::vec2				vGravity2d;
+	float					fPixelsPerMeter;
 	bool					bUseConsole;
 	HyWindowInfo			consoleInfo;
 
