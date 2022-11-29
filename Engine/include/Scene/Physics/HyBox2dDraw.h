@@ -1,30 +1,33 @@
 /**************************************************************************
- *	HyPhysicsDebug2d.h
+ *	HyBox2dDraw.h
  *	
  *	Harmony Engine
- *	Copyright (c) 2020 Jason Knobler
+ *	Copyright (c) 2022 Jason Knobler
  *
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HyPhysicsDebug2d_h__
-#define HyPhysicsDebug2d_h__
+#ifndef HyBox2dDraw_h__
+#define HyBox2dDraw_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
 class HyPhysicsGrid2d;
 
-class HyPhysicsDebug2d : public b2Draw
+class HyBox2dDraw : public HyEntity2d, public b2Draw
 {
-	HyPhysicsGrid2d &			m_GridRef;
+	float						m_fPixelsPerMeter;
 	std::vector<HyPrimitive2d>	m_DrawList;
 
-public:
-	HyPhysicsDebug2d(HyPhysicsGrid2d &gridRef);
-	virtual ~HyPhysicsDebug2d(void);
+	int32						m_iDrawIndex;
 
-	std::vector<HyPrimitive2d> &GetDrawList();
+public:
+	HyBox2dDraw(float fPixelsPerMeter);
+	virtual ~HyBox2dDraw(void);
+
+	void BeginFrame();
 
 	// Draw a closed polygon provided in CCW order.
 	virtual void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
@@ -47,6 +50,8 @@ public:
 
 	// Draw a point.
 	virtual void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
+
+	void EndFrame();
 };
 
-#endif /* HyPhysicsDebug2d_h__ */
+#endif /* HyBox2dDraw_h__ */

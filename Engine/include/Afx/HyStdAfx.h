@@ -58,7 +58,6 @@ typedef uint32 HyAudioNodeHandle;
 typedef uint32 HyAudioHandle;
 typedef uint32 HySpacerHandle;
 typedef uint32 HyLayoutHandle;
-typedef int32 HyCollideHandle;
 
 // Tags aren't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
 // They increase the memory footprint of every node/instance by 8 bytes
@@ -88,7 +87,8 @@ static_assert((int)HYNUM_TYPES < 16, "HyType cannot exceed 15 items due to IHyNo
 
 enum HyBodyType
 {
-	HYBODY_Unknown = -1,
+	HYBODY_Unknown = -2,
+	HYBODY_None = -1,
 
 	HYBODY_Static = 0,
 	HYBODY_Kinematic,

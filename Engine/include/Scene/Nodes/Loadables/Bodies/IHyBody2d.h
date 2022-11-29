@@ -17,10 +17,23 @@
 #include "Scene/AnimFloats/HyAnimVec3.h"
 #include "Scene/Physics/HyPhysicsCtrl2d.h"
 
+struct HyBox2dComponent
+{
+	b2Body *						m_pBody;
+	b2Fixture *						m_pFixture;
+
+	HyBox2dComponent() :
+		m_pBody(nullptr),
+		m_pFixture(nullptr)
+	{ }
+};
+
 class IHyBody2d : public IHyLoadable2d, public IHyBody
 {
+	friend class HyScene;
 	friend class HyEntity2d;
 	friend class HyShape2d;
+	friend class HyPhysicsCtrl2d;
 
 protected:
 	float							m_fAlpha;
@@ -33,7 +46,7 @@ protected:
 	b2AABB							m_SceneAABB;			// Don't directly use, acquiring using GetSceneAABB()
 															// Derived versions of this function will properly update 'm_SceneAABB' before returning
 
-	HyCollideHandle					m_hCollide;
+	HyBox2dComponent *				m_pBox2d;				// A pointer to the concrete value in HyScene::m_NodeMap_Collision, nullptr otherwise
 
 public:
 	HyAnimVec3						topColor;
@@ -69,7 +82,7 @@ public:
 	float GetSceneHeight();
 	float GetSceneWidth();
 
-	void SetCollidable(HyBodyType eBodyType);
+	bool SetCollidable(HyBodyType eBodyType);
 
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;

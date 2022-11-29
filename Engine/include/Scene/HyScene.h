@@ -12,6 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Audio/HyAudioCore.h"
+#include "Scene/Physics/HyBox2dDraw.h"
+#include "Scene/Physics/HyBox2dContactListener.h"
 
 // Forward declarations
 class IHyNode;
@@ -26,13 +28,12 @@ class IHyDrawable3d;
 class HyWindow;
 class IHyRenderer;
 
-//////////////////////////////////////////////////////////////////////////
 class HyScene
 {
 	HyAudioCore &										m_AudioCoreRef;
 	std::vector<HyWindow *> &							m_WindowListRef;
 
-	// TODO: Make tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
+	// TODO: Try tightly packed (memory contiguous) node arrays that holds the "Hot" data needed to be updated and drawn
 	static std::vector<IHyNode *>						sm_NodeList_All;
 	static std::vector<IHyNode *>						sm_NodeList_PauseUpdate;		// List of nodes who will update when the game is paused
 	bool												m_bPauseGame;
@@ -43,9 +44,16 @@ class HyScene
 	std::vector<IHyDrawable3d *>						m_NodeList_LoadedDrawable3d;
 
 	// Collision/Physics
+	std::map<IHyBody2d *, HyBox2dComponent>				m_NodeMap_Collision;
 	float												m_fPixelsPerMeter;
 	float												m_fPpmInverse;
+	int32												m_iPhysVelocityIterations;
+	int32												m_iPhysPositionIterations;
+	HyBox2dContactListener								m_ContactListener;
+	HyBox2dDraw											m_Box2dDraw;
 	b2World												m_b2World;
+
+	
 
 public:
 	HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
@@ -65,8 +73,8 @@ public:
 	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
 	void CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut);
 
-	void AddNode_Collidable(IHyBody2d *pBody);
-	void RemoveNode_Collidable(IHyBody2d *pBody);
+	bool AddNode_Collidable(IHyBody2d *pBody, HyBodyType eBodyType);
+	bool RemoveNode_Collidable(IHyBody2d *pBody);
 
 	void ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType);
 

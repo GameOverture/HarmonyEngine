@@ -31,9 +31,18 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 	m_bPauseGame(false),
 	m_fPixelsPerMeter(fPixelsPerMeter),
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
+	m_iPhysVelocityIterations(8),
+	m_iPhysPositionIterations(3),
+	m_ContactListener(),
+	m_Box2dDraw(fPixelsPerMeter),
 	m_b2World(b2Vec2(vGravity2d.x, vGravity2d.y))
 {
+	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	IHyNode::sm_pScene = this;
+
+	m_Box2dDraw.SetFlags(0xff);
+	m_b2World.SetDebugDraw(&m_Box2dDraw);
+	m_b2World.SetContactListener(&m_ContactListener);
 }
 
 HyScene::~HyScene(void)
@@ -138,13 +147,57 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
-void HyScene::AddNode_Collidable(IHyBody2d *pBody)
+bool HyScene::AddNode_Collidable(IHyBody2d *pBody, HyBodyType eBodyType)
 {
-	//pBody-> = m_CollisionTree.CreateProxy(pBody->GetSceneAABB(), pBody);
+	if(eBodyType == HYBODY_Unknown || eBodyType == HYBODY_None || pBody->shape.IsValidShape() == false)
+		return false;
+
+	HyAssert(m_NodeMap_Collision.find(pBody) == m_NodeMap_Collision.end(), "AddNode_Collidable was invoked with a IHyBody2d that was already simulating");
+	auto nodePair = m_NodeMap_Collision.emplace(std::pair<IHyBody2d *, HyBox2dComponent>(pBody, HyBox2dComponent()));
+	if(nodePair.second) // New node being inserted
+	{
+		HyBox2dComponent &compRef = nodePair.first->second;
+
+		b2BodyDef bodyDef;
+		bodyDef.position.x = pBody->pos.X() * m_fPpmInverse;
+		bodyDef.position.y = pBody->pos.Y() * m_fPpmInverse;
+		bodyDef.angle = glm::radians(pBody->rot.Get());
+		bodyDef.fixedRotation = false;
+		bodyDef.type = static_cast<b2BodyType>(eBodyType);
+		bodyDef.enabled = true;
+		bodyDef.gravityScale = 0.0f;
+		compRef.m_pBody = m_b2World.CreateBody(&bodyDef);
+
+		b2FixtureDef fixtureDef;
+		fixtureDef.shape = pBody->shape.ClonePpmShape(m_fPpmInverse);
+		fixtureDef.friction = 0.2f;
+		fixtureDef.restitution = 0.0f;
+		fixtureDef.restitutionThreshold = m_fPixelsPerMeter;
+		fixtureDef.density = 0.0f;
+		fixtureDef.isSensor = true;
+		compRef.m_pFixture = compRef.m_pBody->CreateFixture(&fixtureDef);
+		delete fixtureDef.shape;
+		fixtureDef.shape = nullptr;
+
+		pBody->m_pBox2d = &compRef;
+
+		return true;
+	}
+	else
+		return false;
 }
 
-void HyScene::RemoveNode_Collidable(IHyBody2d *pBody)
+bool HyScene::RemoveNode_Collidable(IHyBody2d *pBody)
 {
+	auto iter = m_NodeMap_Collision.find(pBody);
+	if(iter == m_NodeMap_Collision.end())
+		return false;
+
+	m_b2World.DestroyBody(iter->second.m_pBody);
+	m_NodeMap_Collision.erase(pBody);
+	pBody->m_pBox2d = nullptr;
+
+	return true;
 }
 
 void HyScene::ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType)
@@ -173,6 +226,11 @@ void HyScene::UpdateNodes()
 	}
 
 	m_AudioCoreRef.Update();
+
+	// Box2d - Collision & Physics
+	m_Box2dDraw.BeginFrame();
+	m_b2World.Step(HyEngine::DeltaTime(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	m_Box2dDraw.EndFrame();
 }
 
 // RENDER STATE BUFFER

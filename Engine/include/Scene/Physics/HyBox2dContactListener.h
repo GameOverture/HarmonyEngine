@@ -1,22 +1,22 @@
 /**************************************************************************
- *	HyBox2dRuntime.h
+ *	HyBox2dContactListener.h
  *	
  *	Harmony Engine
- *	Copyright (c) 2013 Jason Knobler
+ *	Copyright (c) 2022 Jason Knobler
  *
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HyBox2dRuntime_h__
-#define HyBox2dRuntime_h__
+#ifndef HyBox2dContactListener_h__
+#define HyBox2dContactListener_h__
 
 #include "Afx/HyStdAfx.h"
 
-class HyBox2dRuntime : public b2ContactListener
+class HyBox2dContactListener : public b2ContactListener
 {
 public:
-	HyBox2dRuntime(void);
-	virtual ~HyBox2dRuntime(void);
+	HyBox2dContactListener(void);
+	virtual ~HyBox2dContactListener(void);
 
 	/// Called when two fixtures begin to touch.
 	virtual void BeginContact(b2Contact* contact);
@@ -45,4 +45,4 @@ public:
 	virtual void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
 };
 
-#endif /* HyBox2dRuntime_h__ */
+#endif /* HyBox2dContactListener_h__ */

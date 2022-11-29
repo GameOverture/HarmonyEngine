@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
-#include "Scene/Physics/HyBox2dRuntime.h"
+#include "Scene/Physics/HyBox2dContactListener.h"
 #include "Scene/Physics/HyPhysicsDebug2d.h"
 
 struct HyPhysicsComponent2d
@@ -41,7 +41,7 @@ protected:
 	int32										m_iPhysVelocityIterations;
 	int32										m_iPhysPositionIterations;
 
-	HyBox2dRuntime								m_ContactListener;
+	HyBox2dContactListener						m_ContactListener;
 	HyPhysicsDebug2d							m_DebugDraw;
 
 	

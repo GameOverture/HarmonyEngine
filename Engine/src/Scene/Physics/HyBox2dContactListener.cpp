@@ -1,26 +1,26 @@
 /**************************************************************************
- *	HyBox2dRuntime.cpp
- *	
+ *	HyBox2dContactListener.cpp
+ *
  *	Harmony Engine
- *	Copyright (c) 2013 Jason Knobler
+ *	Copyright (c) 2022 Jason Knobler
  *
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Scene/Physics/HyBox2dRuntime.h"
+#include "Scene/Physics/HyBox2dContactListener.h"
 
-HyBox2dRuntime::HyBox2dRuntime(void)
+HyBox2dContactListener::HyBox2dContactListener(void)
 {
 }
 
 
-HyBox2dRuntime::~HyBox2dRuntime(void)
+HyBox2dContactListener::~HyBox2dContactListener(void)
 {
 }
 
 /// Called when two fixtures begin to touch.
-/*virtual*/ void HyBox2dRuntime::BeginContact(b2Contact* contact)
+/*virtual*/ void HyBox2dContactListener::BeginContact(b2Contact *contact)
 {
 	//if(contact->GetFixtureA()->GetBody()->GetType() == b2_dynamicBody)
 	//{
@@ -35,7 +35,7 @@ HyBox2dRuntime::~HyBox2dRuntime(void)
 }
 
 /// Called when two fixtures cease to touch.
-/*virtual*/ void HyBox2dRuntime::EndContact(b2Contact* contact)
+/*virtual*/ void HyBox2dContactListener::EndContact(b2Contact *contact)
 {
 	//if(contact->GetFixtureA()->GetBody()->GetType() == b2_dynamicBody)
 	//{
@@ -59,7 +59,7 @@ HyBox2dRuntime::~HyBox2dRuntime(void)
 /// Note: if you set the number of contact points to zero, you will not
 /// get an EndContact callback. However, you may get a BeginContact callback
 /// the next step.
-/*virtual*/ void HyBox2dRuntime::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+/*virtual*/ void HyBox2dContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold)
 {
 }
 
@@ -69,6 +69,6 @@ HyBox2dRuntime::~HyBox2dRuntime(void)
 /// arbitrarily large if the sub-step is small. Hence the impulse is provided explicitly
 /// in a separate data structure.
 /// Note: this is only called for contacts that are touching, solid, and awake.
-/*virtual*/ void HyBox2dRuntime::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
+/*virtual*/ void HyBox2dContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse)
 {
 }

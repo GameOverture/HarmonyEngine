@@ -22,6 +22,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	m_iDisplayOrder(0),
+	m_pBox2d(nullptr),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
@@ -254,8 +255,12 @@ float IHyBody2d::GetSceneWidth()
 	return 0.0f;
 }
 
-void IHyBody2d::SetCollidable(HyBodyType eBodyType)
+bool IHyBody2d::SetCollidable(HyBodyType eBodyType)
 {
+	if(HYBODY_None == eBodyType)
+		return sm_pScene->RemoveNode_Collidable(this);
+	else
+		return sm_pScene->AddNode_Collidable(this, eBodyType);
 }
 
 /*virtual*/ void IHyBody2d::SetDirty(uint32 uiDirtyFlags) /*override*/
