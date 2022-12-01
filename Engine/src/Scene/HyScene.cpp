@@ -50,6 +50,16 @@ HyScene::~HyScene(void)
 	IHyNode::sm_pScene = nullptr;
 }
 
+float HyScene::GetPixelsPerMeter()
+{
+	return m_fPixelsPerMeter;
+}
+
+float HyScene::GetPpmInverse()
+{
+	return m_fPpmInverse;
+}
+
 /*static*/ void HyScene::SetInstOrderingDirty()
 {
 	sm_bInst2dOrderingDirty = true;
@@ -228,8 +238,10 @@ void HyScene::UpdateNodes()
 	m_AudioCoreRef.Update();
 
 	// Box2d - Collision & Physics
-	m_Box2dDraw.BeginFrame();
 	m_b2World.Step(HyEngine::DeltaTime(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	
+	m_Box2dDraw.BeginFrame();
+	m_b2World.DebugDraw();
 	m_Box2dDraw.EndFrame();
 }
 

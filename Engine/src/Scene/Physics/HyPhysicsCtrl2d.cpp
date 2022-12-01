@@ -126,7 +126,7 @@ void HyPhysicsCtrl2d::Init(HyBodyType eType,
 
 void HyPhysicsCtrl2d::Uninit()
 {
-	if(IsSimulating())
+	if(m_NodeRef.IsSimulating())
 	{
 		HyAssert(m_NodeRef.ParentGet() && (m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid), "HyPhysicsCtrl2d::Uninit() - node didn't have proper parent");
 		if(m_NodeRef.ParentGet() && (m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid))
@@ -136,11 +136,6 @@ void HyPhysicsCtrl2d::Uninit()
 		m_NodeRef.pos.GetAnimFloat(1).StopAnim();
 		m_NodeRef.rot.StopAnim();
 	}
-}
-
-bool HyPhysicsCtrl2d::IsSimulating() const
-{
-	return m_NodeRef.m_pBox2d != nullptr;
 }
 
 HyBodyType HyPhysicsCtrl2d::GetType() const
@@ -665,8 +660,8 @@ void HyPhysicsCtrl2d::FlushTransform()
 {
 	// 'm_NodeRef.m_pBox2d' is guarenteed to be valid if FlushTransform() is invoked (via HyPhysicsGrid2d)
 	HyAssert(m_NodeRef.m_pBox2d, "HyPhysicsCtrl2d::FlushTransform() - m_NodeRef.m_pBox2d was null");
-	HyAssert(m_NodeRef.ParentGet(), "HyPhysicsCtrl2d::Update() - Node's parent is null"); // Node's parent must exist
-	HyAssert(m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid, "HyPhysicsCtrl2d::Update() - Node's parent isn't a physics grid"); // and also be the HyPhysicsGrid2d that invoked this
+	//HyAssert(m_NodeRef.ParentGet(), "HyPhysicsCtrl2d::Update() - Node's parent is null"); // Node's parent must exist
+	//HyAssert(m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid, "HyPhysicsCtrl2d::Update() - Node's parent isn't a physics grid"); // and also be the HyPhysicsGrid2d that invoked this
 
 	// TODO: If scale is different, modify all shapes in fixtures (cannot change num of vertices in shape says Box2d)
 	float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_NodeRef.ParentGet())->GetPpmInverse();

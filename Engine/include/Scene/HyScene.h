@@ -59,6 +59,9 @@ public:
 	HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
+	float GetPixelsPerMeter();
+	float GetPpmInverse();
+
 	static void SetInstOrderingDirty();
 	
 	static void AddNode(IHyNode *pNode);

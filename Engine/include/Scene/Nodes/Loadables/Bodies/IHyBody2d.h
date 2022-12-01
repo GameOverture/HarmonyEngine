@@ -83,6 +83,7 @@ public:
 	float GetSceneWidth();
 
 	bool SetCollidable(HyBodyType eBodyType);
+	bool IsSimulating() const;
 
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;

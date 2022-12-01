@@ -56,7 +56,6 @@ public:
 		bool bIsCcd = false);
 
 	void Uninit();
-	bool IsSimulating() const;
 
 	HyBodyType GetType() const;
 	void SetType(HyBodyType eType);

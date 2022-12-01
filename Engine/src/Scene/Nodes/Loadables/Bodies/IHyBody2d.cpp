@@ -64,6 +64,7 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	IHyLoadable2d(copyRef),
 	IHyBody(copyRef),
 	m_iDisplayOrder(copyRef.m_iDisplayOrder),
+	m_pBox2d(nullptr),
 	m_SceneAABB(copyRef.m_SceneAABB),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
@@ -87,6 +88,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	IHyLoadable2d(std::move(donor)),
 	IHyBody(std::move(donor)),
 	m_iDisplayOrder(std::move(donor.m_iDisplayOrder)),
+	m_pBox2d(nullptr),
 	m_SceneAABB(std::move(donor.m_SceneAABB)),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
@@ -135,6 +137,7 @@ IHyBody2d &IHyBody2d::operator=(IHyBody2d &&donor) noexcept
 	IHyBody::operator=(std::move(donor));
 
 	m_iDisplayOrder = std::move(donor.m_iDisplayOrder);
+	m_pBox2d = std::move(donor.m_pBox2d);
 
 	topColor = std::move(donor.topColor);
 	botColor = std::move(donor.botColor);
@@ -263,12 +266,17 @@ bool IHyBody2d::SetCollidable(HyBodyType eBodyType)
 		return sm_pScene->AddNode_Collidable(this, eBodyType);
 }
 
+bool IHyBody2d::IsSimulating() const
+{
+	return m_pBox2d != nullptr;
+}
+
 /*virtual*/ void IHyBody2d::SetDirty(uint32 uiDirtyFlags) /*override*/
 {
 	IHyNode2d::SetDirty(uiDirtyFlags);
 
 	// If this body is actively being simulated by a HyPhysicsGrid2d, and has a dirty transform NOT from the updater
-	if(physics.IsSimulating() &&
+	if(IsSimulating() &&
 		(uiDirtyFlags & IHyNode::DIRTY_FromUpdater) == 0 &&
 		(uiDirtyFlags & DIRTY_Transform))
 	{
@@ -283,7 +291,7 @@ bool IHyBody2d::SetCollidable(HyBodyType eBodyType)
 
 void IHyBody2d::ShapeChanged()
 {
-	if(physics.IsSimulating() == false && m_pParent && (m_pParent->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid))
+	if(IsSimulating() == false && m_pParent && (m_pParent->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid))
 		static_cast<HyPhysicsGrid2d *>(m_pParent)->TryInitChildPhysics(*this);
 
 	OnShapeChanged();
