@@ -41,7 +41,7 @@ protected:
 	int32										m_iPhysVelocityIterations;
 	int32										m_iPhysPositionIterations;
 
-	HyBox2dContactListener						m_ContactListener;
+	//HyBox2dContactListener						m_ContactListener;
 	HyPhysicsDebug2d							m_DebugDraw;
 
 	

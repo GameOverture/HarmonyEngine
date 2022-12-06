@@ -275,12 +275,20 @@ bool IHyBody2d::IsSimulating() const
 {
 	IHyNode2d::SetDirty(uiDirtyFlags);
 
-	// If this body is actively being simulated by a HyPhysicsGrid2d, and has a dirty transform NOT from the updater
-	if(IsSimulating() &&
-		(uiDirtyFlags & IHyNode::DIRTY_FromUpdater) == 0 &&
-		(uiDirtyFlags & DIRTY_Transform))
+	// If this body is actively being simulated by Box2d, and has a dirty transform NOT from the updater
+	if(IsSimulating() && m_pBox2d->m_bLockUpdate == false && (uiDirtyFlags & DIRTY_Transform))
 	{
-		physics.FlushTransform();
+		HyAssert(m_pBox2d, "IHyBody2d::SetDirty - m_pBox2d was null");
+
+		// TODO: SCALE NOT SUPPORTED - If scale is different, modify all shapes in fixtures (cannot change num of vertices in shape says Box2d)
+		const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
+		glm::vec3 ptTranslation = mtxSceneRef[3];
+		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+
+		float fPpmInverse = sm_pScene->GetPpmInverse();
+		m_pBox2d->m_pBody->SetTransform(b2Vec2(ptTranslation.x * fPpmInverse, ptTranslation.y * fPpmInverse), vRotations.z);
+		m_pBox2d->m_pBody->SetLinearVelocity(b2Vec2(0, 0));
+		m_pBox2d->m_pBody->SetAngularVelocity(0.0f);
 	}
 }
 

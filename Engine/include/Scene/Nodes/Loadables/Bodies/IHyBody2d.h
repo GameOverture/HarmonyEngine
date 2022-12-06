@@ -21,10 +21,12 @@ struct HyBox2dComponent
 {
 	b2Body *						m_pBody;
 	b2Fixture *						m_pFixture;
+	bool							m_bLockUpdate;
 
 	HyBox2dComponent() :
 		m_pBody(nullptr),
-		m_pFixture(nullptr)
+		m_pFixture(nullptr),
+		m_bLockUpdate(false)
 	{ }
 };
 

@@ -24,7 +24,7 @@ HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*
 	m_uiFlags |= NODETYPE_IsPhysicsGrid;
 
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
-	m_b2World.SetContactListener(&m_ContactListener);
+	//m_b2World.SetContactListener(&m_ContactListener);
 
 	//m_DebugDraw.SetFlags(0xff);
 	//m_b2World.SetDebugDraw(&m_DebugDraw);

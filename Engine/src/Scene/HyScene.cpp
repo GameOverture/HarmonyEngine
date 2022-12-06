@@ -33,14 +33,18 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
 	m_iPhysVelocityIterations(8),
 	m_iPhysPositionIterations(3),
-	m_ContactListener(),
+	m_ContactListener(*this),
 	m_Box2dDraw(fPixelsPerMeter),
 	m_b2World(b2Vec2(vGravity2d.x, vGravity2d.y))
 {
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	IHyNode::sm_pScene = this;
 
-	m_Box2dDraw.SetFlags(0xff);
+	m_Box2dDraw.SetFlags(b2Draw::e_shapeBit | //< draw shapes
+						 b2Draw::e_jointBit | //< draw joint connections
+						 //b2Draw::e_aabbBit | //< draw axis aligned bounding boxes
+						 b2Draw::e_pairBit | //< draw broad-phase pairs
+						 b2Draw::e_centerOfMassBit);
 	m_b2World.SetDebugDraw(&m_Box2dDraw);
 	m_b2World.SetContactListener(&m_ContactListener);
 }
@@ -168,23 +172,32 @@ bool HyScene::AddNode_Collidable(IHyBody2d *pBody, HyBodyType eBodyType)
 	{
 		HyBox2dComponent &compRef = nodePair.first->second;
 
+		const glm::mat4 &mtxSceneRef = pBody->GetSceneTransform(0.0f);
+		glm::vec3 ptTranslation = mtxSceneRef[3];
+		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+		
 		b2BodyDef bodyDef;
-		bodyDef.position.x = pBody->pos.X() * m_fPpmInverse;
-		bodyDef.position.y = pBody->pos.Y() * m_fPpmInverse;
-		bodyDef.angle = glm::radians(pBody->rot.Get());
+		bodyDef.position.x = ptTranslation.x * m_fPpmInverse;
+		bodyDef.position.y = ptTranslation.y * m_fPpmInverse;
+		bodyDef.angle = vRotations.z;
+		bodyDef.allowSleep = false;
+		bodyDef.awake = true;
 		bodyDef.fixedRotation = false;
 		bodyDef.type = static_cast<b2BodyType>(eBodyType);
 		bodyDef.enabled = true;
-		bodyDef.gravityScale = 0.0f;
+		//bodyDef.gravityScale = 0.0f;
+		//bodyDef.bullet = true;
+		bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(pBody);
 		compRef.m_pBody = m_b2World.CreateBody(&bodyDef);
 
 		b2FixtureDef fixtureDef;
 		fixtureDef.shape = pBody->shape.ClonePpmShape(m_fPpmInverse);
-		fixtureDef.friction = 0.2f;
-		fixtureDef.restitution = 0.0f;
-		fixtureDef.restitutionThreshold = m_fPixelsPerMeter;
-		fixtureDef.density = 0.0f;
-		fixtureDef.isSensor = true;
+		//fixtureDef.friction = 0.2f;
+		//fixtureDef.restitution = 0.0f;
+		//fixtureDef.restitutionThreshold = m_fPixelsPerMeter;
+		fixtureDef.density = 1.0f;
+		//fixtureDef.isSensor = true;
+		fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(pBody);
 		compRef.m_pFixture = compRef.m_pBody->CreateFixture(&fixtureDef);
 		delete fixtureDef.shape;
 		fixtureDef.shape = nullptr;
@@ -243,6 +256,24 @@ void HyScene::UpdateNodes()
 	m_Box2dDraw.BeginFrame();
 	m_b2World.DebugDraw();
 	m_Box2dDraw.EndFrame();
+
+	for(auto iter = m_NodeMap_Collision.begin(); iter != m_NodeMap_Collision.end(); ++iter)
+	{
+		b2Body *pBodyBox2d = iter->second.m_pBody;
+		if(pBodyBox2d->GetType() == b2_staticBody)
+			continue;
+	
+		IHyBody2d *pBodyNode = reinterpret_cast<IHyBody2d *>(pBodyBox2d->GetUserData().pointer);
+		const glm::mat4 &mtxSceneRef = pBodyNode->GetSceneTransform(0.0f);
+		glm::vec3 ptTranslation = mtxSceneRef[3];
+		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+
+		pBodyNode->m_pBox2d->m_bLockUpdate = true;
+		pBodyNode->pos.Offset(pBodyBox2d->GetPosition().x * GetPixelsPerMeter() - ptTranslation.x,
+							  pBodyBox2d->GetPosition().y * GetPixelsPerMeter() - ptTranslation.y);
+		pBodyNode->rot.Offset(glm::degrees(pBodyBox2d->GetAngle() - vRotations.z));
+		pBodyNode->m_pBox2d->m_bLockUpdate = false;
+	}
 }
 
 // RENDER STATE BUFFER

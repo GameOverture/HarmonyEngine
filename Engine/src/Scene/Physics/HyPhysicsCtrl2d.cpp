@@ -656,17 +656,6 @@ void HyPhysicsCtrl2d::Update()
 	}
 }
 
-void HyPhysicsCtrl2d::FlushTransform()
-{
-	// 'm_NodeRef.m_pBox2d' is guarenteed to be valid if FlushTransform() is invoked (via HyPhysicsGrid2d)
-	HyAssert(m_NodeRef.m_pBox2d, "HyPhysicsCtrl2d::FlushTransform() - m_NodeRef.m_pBox2d was null");
-	//HyAssert(m_NodeRef.ParentGet(), "HyPhysicsCtrl2d::Update() - Node's parent is null"); // Node's parent must exist
-	//HyAssert(m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid, "HyPhysicsCtrl2d::Update() - Node's parent isn't a physics grid"); // and also be the HyPhysicsGrid2d that invoked this
-
-	// TODO: If scale is different, modify all shapes in fixtures (cannot change num of vertices in shape says Box2d)
-	float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_NodeRef.ParentGet())->GetPpmInverse();
-	m_NodeRef.m_pBox2d->m_pBody->SetTransform(b2Vec2(m_NodeRef.pos.X() * fPpmInverse, m_NodeRef.pos.Y() * fPpmInverse), glm::radians(m_NodeRef.rot.Get()));
-}
 //
 //std::unique_ptr<HyPhysicsCtrl2d> HyPhysicsCtrl2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
 //{

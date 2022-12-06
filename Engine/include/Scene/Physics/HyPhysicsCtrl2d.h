@@ -107,7 +107,6 @@ public:
 
 private:
 	void Update();			// Should only be invoked by the parent HyPhysicsGrid2d
-	void FlushTransform();	// Should only be invoked by the node IHyBody2d
 };
 
 #endif /* HyPhysicsCtrl2d_h__ */
