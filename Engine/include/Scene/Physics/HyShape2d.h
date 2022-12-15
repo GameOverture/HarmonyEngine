@@ -27,12 +27,23 @@ enum HyShapeType
 	HYNUM_SHAPE
 };
 
+struct HyBox2dFixture
+{
+	b2FixtureDef	m_FixtureDef;
+	b2Fixture *		m_pFixture;
+
+	HyBox2dFixture() :
+		m_pFixture(nullptr)
+	{ }
+};
+
 class HyShape2d
 {
 	friend class IHyBody2d; // In order to invoke IHyBody2d::ShapeChanged()
 
 	HyShapeType									m_eType;
 	b2Shape *									m_pShape;
+	HyBox2dFixture *							m_pFixture;
 
 	IHyBody2d *									m_pRegisteredBodyShape;	// This only gets set by the shape owned by IHyBody2d in order to properly call IHyBody2d::ShapeChanged()
 
@@ -88,6 +99,20 @@ public:
 	// ptBoxCenter is the center of the box in local coordinates.
 	// fRot the rotation of the box in local coordinates.
 	bool SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
+
+	// Applies when attached to a physics body
+	float GetDensity() const;
+	void SetDensity(float fDensity);
+	float GetFriction() const;
+	void SetFriction(float fFriction);
+	float GetRestitution() const;
+	void SetRestitution(float fRestitution);
+	float GetRestitutionThreshold() const;
+	void SetRestitutionThreshold(float fRestitutionThreshold);
+	b2Filter GetFilter() const;
+	void SetFilter(const b2Filter &filter);
+	bool IsSensor() const;
+	void SetSensor(bool bIsSensor);
 
 	bool TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const;
 	//bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;

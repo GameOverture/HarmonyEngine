@@ -22,7 +22,6 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	m_iDisplayOrder(0),
-	m_pBox2d(nullptr),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
@@ -64,7 +63,6 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	IHyLoadable2d(copyRef),
 	IHyBody(copyRef),
 	m_iDisplayOrder(copyRef.m_iDisplayOrder),
-	m_pBox2d(nullptr),
 	m_SceneAABB(copyRef.m_SceneAABB),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
@@ -88,7 +86,6 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	IHyLoadable2d(std::move(donor)),
 	IHyBody(std::move(donor)),
 	m_iDisplayOrder(std::move(donor.m_iDisplayOrder)),
-	m_pBox2d(nullptr),
 	m_SceneAABB(std::move(donor.m_SceneAABB)),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
@@ -110,7 +107,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 
 IHyBody2d::~IHyBody2d()
 {
-	physics.Uninit();
+	physics.Deactivate();
 }
 
 IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
@@ -258,13 +255,13 @@ float IHyBody2d::GetSceneWidth()
 	return 0.0f;
 }
 
-bool IHyBody2d::SetCollidable(HyBodyType eBodyType)
-{
-	if(HYBODY_None == eBodyType)
-		return sm_pScene->RemoveNode_Collidable(this);
-	else
-		return sm_pScene->AddNode_Collidable(this, eBodyType);
-}
+//bool IHyBody2d::SetCollidable(HyBodyType eBodyType)
+//{
+//	if(HYBODY_None == eBodyType)
+//		return sm_pScene->RemoveNode_Collidable(this);
+//	else
+//		return sm_pScene->AddNode_Collidable(this, eBodyType);
+//}
 
 bool IHyBody2d::IsSimulating() const
 {
@@ -276,7 +273,7 @@ bool IHyBody2d::IsSimulating() const
 	IHyNode2d::SetDirty(uiDirtyFlags);
 
 	// If this body is actively being simulated by Box2d, and has a dirty transform NOT from the updater
-	if(IsSimulating() && m_pBox2d->m_bLockUpdate == false && (uiDirtyFlags & DIRTY_Transform))
+	if(IsSimulating() && sm_pScene->m_bLockUpdate == false && (uiDirtyFlags & DIRTY_Transform))
 	{
 		HyAssert(m_pBox2d, "IHyBody2d::SetDirty - m_pBox2d was null");
 

@@ -44,7 +44,6 @@ class HyScene
 	std::vector<IHyDrawable3d *>						m_NodeList_LoadedDrawable3d;
 
 	// Collision/Physics
-	std::map<IHyBody2d *, HyBox2dComponent>				m_NodeMap_Collision;
 	float												m_fPixelsPerMeter;
 	float												m_fPpmInverse;
 	int32												m_iPhysVelocityIterations;
@@ -76,8 +75,8 @@ public:
 	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
 	void CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut);
 
-	bool AddNode_Collidable(IHyBody2d *pBody, HyBodyType eBodyType);
-	bool RemoveNode_Collidable(IHyBody2d *pBody);
+	bool AddNode_PhysBody(IHyBody2d *pBody, bool bActivate);
+	bool RemoveNode_PhysBody(IHyBody2d *pBody);
 
 	void ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType);
 

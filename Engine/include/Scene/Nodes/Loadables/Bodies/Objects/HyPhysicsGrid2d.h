@@ -15,16 +15,16 @@
 #include "Scene/Physics/HyBox2dContactListener.h"
 #include "Scene/Physics/HyPhysicsDebug2d.h"
 
-struct HyPhysicsComponent2d
-{
-	b2Body *									m_pBody;
-	b2Fixture *									m_pFixture;
-
-	HyPhysicsComponent2d() :
-		m_pBody(nullptr),
-		m_pFixture(nullptr)
-	{ }
-};
+//struct HyPhysicsComponent2d
+//{
+//	b2Body *									m_pBody;
+//	b2Fixture *									m_pFixture;
+//
+//	HyPhysicsComponent2d() :
+//		m_pBody(nullptr),
+//		m_pFixture(nullptr)
+//	{ }
+//};
 
 class HyPhysicsGrid2d : public HyEntity2d
 {
@@ -45,7 +45,7 @@ protected:
 	HyPhysicsDebug2d							m_DebugDraw;
 
 	
-	std::map<IHyBody2d *, HyPhysicsComponent2d>	m_PhysChildMap;
+	//std::map<IHyBody2d *, HyPhysicsComponent2d>	m_PhysChildMap;
 
 public:
 	HyPhysicsGrid2d(glm::vec2 vGravity = glm::vec2(0.0f, -10.0f), float fPixelsPerMeter = 80.0f, int32 iVelocityIterations = 8, int32 iPositionIterations = 3, HyEntity2d *pParent = nullptr);

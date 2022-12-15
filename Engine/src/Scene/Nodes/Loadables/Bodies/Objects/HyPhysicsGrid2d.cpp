@@ -71,27 +71,7 @@ HyPhysicsGrid2d::HyPhysicsGrid2d(glm::vec2 vGravity /*= glm::vec2(0.0f, -10.0f)*
 
 void HyPhysicsGrid2d::TryInitChildPhysics(IHyBody2d &bodyRef)
 {
-	if(bodyRef.physics.m_pInit == nullptr || bodyRef.shape.IsValidShape() == false)
-		return;
 
-	auto resultPair = m_PhysChildMap.emplace(std::pair<IHyBody2d *, HyPhysicsComponent2d>(&bodyRef, HyPhysicsComponent2d()));
-	HyPhysicsComponent2d &compRef = resultPair.first->second;
-	HyAssert(resultPair.second, "HyPhysicsGrid2d::TryInitChildPhysics() was invoked with a IHyBody2d that was already simulating");
-	if(resultPair.second) // New insert occurred
-	{
-		bodyRef.physics.m_pInit->m_BodyDef.position.x = bodyRef.pos.X() * GetPpmInverse();
-		bodyRef.physics.m_pInit->m_BodyDef.position.y = bodyRef.pos.Y() * GetPpmInverse();
-		bodyRef.physics.m_pInit->m_BodyDef.angle = glm::radians(bodyRef.rot.Get());
-
-		compRef.m_pBody = m_b2World.CreateBody(&bodyRef.physics.m_pInit->m_BodyDef);
-
-		bodyRef.physics.m_pInit->m_FixtureDef.shape = bodyRef.shape.ClonePpmShape(GetPpmInverse());
-		compRef.m_pFixture = compRef.m_pBody->CreateFixture(&bodyRef.physics.m_pInit->m_FixtureDef);
-		delete bodyRef.physics.m_pInit->m_FixtureDef.shape;
-		bodyRef.physics.m_pInit->m_FixtureDef.shape = nullptr;
-
-		bodyRef.physics.m_pSimData = &compRef;
-	}
 }
 
 void HyPhysicsGrid2d::UninitChildPhysics(IHyBody2d &bodyRef)

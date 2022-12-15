@@ -356,6 +356,158 @@ bool HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 	return true;
 }
 
+//m_pInit->m_FixtureDef.friction = fFriction;
+//m_pInit->m_FixtureDef.restitution = fRestitution;
+//m_pInit->m_FixtureDef.restitutionThreshold = fRestitutionThreshold;
+//m_pInit->m_FixtureDef.density = fDensity;
+//m_pInit->m_FixtureDef.isSensor = bIsSensor;
+//m_pInit->m_FixtureDef.filter = filter;
+//m_pInit->m_FixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
+
+float HyShape2d::GetDensity() const
+{
+	if(m_pBox2d)
+		return m_pBox2d->m_pFixture->GetDensity();
+	else if(m_pInit)
+		return m_pInit->m_FixtureDef.density;
+	else
+		return b2FixtureDef().density;
+}
+
+void HyShape2d::SetDensity(float fDensity)
+{
+	if(m_pBox2d)
+		m_pBox2d->m_pFixture->SetDensity(fDensity);
+	else if(m_pInit)
+		m_pInit->m_FixtureDef.density = fDensity;
+	else
+	{
+		b2FixtureDef def;
+		def.density = fDensity;
+		Init(b2BodyDef(), def);
+	}
+}
+
+float HyShape2d::GetFriction() const
+{
+	if(m_pBox2d)
+		return m_pBox2d->m_pFixture->GetFriction();
+	else if(m_pInit)
+		return m_pInit->m_FixtureDef.friction;
+	else
+		return b2FixtureDef().friction;
+}
+
+void HyShape2d::SetFriction(float fFriction)
+{
+	if(m_pBox2d)
+		m_pBox2d->m_pFixture->SetFriction(fFriction);
+	else if(m_pInit)
+		m_pInit->m_FixtureDef.friction = fFriction;
+	else
+	{
+		b2FixtureDef def;
+		def.friction = fFriction;
+		Init(b2BodyDef(), def);
+	}
+}
+
+float HyShape2d::GetRestitution() const
+{
+	if(m_pBox2d)
+		return m_pBox2d->m_pFixture->GetRestitution();
+	else if(m_pInit)
+		return m_pInit->m_FixtureDef.restitution;
+	else
+		return b2FixtureDef().restitution;
+}
+
+void HyShape2d::SetRestitution(float fRestitution)
+{
+	if(m_pBox2d)
+		m_pBox2d->m_pFixture->SetRestitution(fRestitution);
+	else if(m_pInit)
+		m_pInit->m_FixtureDef.restitution = fRestitution;
+	else
+	{
+		b2FixtureDef def;
+		def.restitution = fRestitution;
+		Init(b2BodyDef(), def);
+	}
+}
+
+float HyShape2d::GetRestitutionThreshold() const
+{
+	if(m_pBox2d)
+		return m_pBox2d->m_pFixture->GetRestitutionThreshold();
+	else if(m_pInit)
+		return m_pInit->m_FixtureDef.restitutionThreshold;
+	else
+		return b2FixtureDef().restitutionThreshold;
+}
+
+void HyShape2d::SetRestitutionThreshold(float fRestitutionThreshold)
+{
+	if(m_pBox2d)
+		m_pBox2d->m_pFixture->SetRestitutionThreshold(fRestitutionThreshold);
+	else if(m_pInit)
+		m_pInit->m_FixtureDef.restitutionThreshold = fRestitutionThreshold;
+	else
+	{
+		b2FixtureDef def;
+		def.restitutionThreshold = fRestitutionThreshold;
+		Init(b2BodyDef(), def);
+	}
+}
+
+b2Filter HyShape2d::GetFilter() const
+{
+	if(m_pBox2d)
+		return m_pBox2d->m_pFixture->GetFilterData();
+	else if(m_pInit)
+		return m_pInit->m_FixtureDef.filter;
+	else
+		return b2Filter();
+}
+
+void HyShape2d::SetFilter(const b2Filter &filter)
+{
+	if(m_pBox2d)
+		m_pBox2d->m_pFixture->SetFilterData(filter);
+	else if(m_pInit)
+		m_pInit->m_FixtureDef.filter = filter;
+	else
+	{
+		b2FixtureDef def;
+		def.filter = filter;
+		Init(b2BodyDef(), def);
+	}
+}
+
+bool HyShape2d::IsSensor() const
+{
+	if(m_pBox2d)
+		return m_pBox2d->m_pFixture->IsSensor();
+	else if(m_pInit)
+		return m_pInit->m_FixtureDef.isSensor;
+	else
+		return b2FixtureDef().isSensor;
+}
+
+void HyShape2d::SetSensor(bool bIsSensor)
+{
+	if(m_pBox2d)
+		m_pBox2d->m_pFixture->SetSensor(bIsSensor);
+	else if(m_pInit)
+		m_pInit->m_FixtureDef.isSensor = bIsSensor;
+	else
+	{
+		b2FixtureDef def;
+		def.isSensor = bIsSensor;
+		Init(b2BodyDef(), def);
+	}
+}
+
 bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const
 {
 	bool bIsCollide = false;

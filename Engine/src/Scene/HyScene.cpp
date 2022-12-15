@@ -161,56 +161,37 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
-bool HyScene::AddNode_Collidable(IHyBody2d *pBody, HyBodyType eBodyType)
+bool HyScene::AddNode_PhysBody(IHyBody2d *pBody, bool bActivate)
 {
-	if(eBodyType == HYBODY_Unknown || eBodyType == HYBODY_None || pBody->shape.IsValidShape() == false)
+	if(pBody == nullptr || pBody->physics.m_pInit == nullptr || pBody->physics.m_pBody)
 		return false;
 
-	HyAssert(m_NodeMap_Collision.find(pBody) == m_NodeMap_Collision.end(), "AddNode_Collidable was invoked with a IHyBody2d that was already simulating");
-	auto nodePair = m_NodeMap_Collision.emplace(std::pair<IHyBody2d *, HyBox2dComponent>(pBody, HyBox2dComponent()));
-	if(nodePair.second) // New node being inserted
+#ifdef HY_DEBUG
+	int32 iNumBodies = m_b2World.GetBodyCount();
+	b2Body *pBodies = m_b2World.GetBodyList();
+	for(int32 i = 0; i < iNumBodies; ++i)
 	{
-		HyBox2dComponent &compRef = nodePair.first->second;
-
-		const glm::mat4 &mtxSceneRef = pBody->GetSceneTransform(0.0f);
-		glm::vec3 ptTranslation = mtxSceneRef[3];
-		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
-		
-		b2BodyDef bodyDef;
-		bodyDef.position.x = ptTranslation.x * m_fPpmInverse;
-		bodyDef.position.y = ptTranslation.y * m_fPpmInverse;
-		bodyDef.angle = vRotations.z;
-		bodyDef.allowSleep = false;
-		bodyDef.awake = true;
-		bodyDef.fixedRotation = false;
-		bodyDef.type = static_cast<b2BodyType>(eBodyType);
-		bodyDef.enabled = true;
-		//bodyDef.gravityScale = 0.0f;
-		//bodyDef.bullet = true;
-		bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(pBody);
-		compRef.m_pBody = m_b2World.CreateBody(&bodyDef);
-
-		b2FixtureDef fixtureDef;
-		fixtureDef.shape = pBody->shape.ClonePpmShape(m_fPpmInverse);
-		//fixtureDef.friction = 0.2f;
-		//fixtureDef.restitution = 0.0f;
-		//fixtureDef.restitutionThreshold = m_fPixelsPerMeter;
-		fixtureDef.density = 1.0f;
-		//fixtureDef.isSensor = true;
-		fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(pBody);
-		compRef.m_pFixture = compRef.m_pBody->CreateFixture(&fixtureDef);
-		delete fixtureDef.shape;
-		fixtureDef.shape = nullptr;
-
-		pBody->m_pBox2d = &compRef;
-
-		return true;
+		HyAssert(reinterpret_cast<IHyBody2d *>(pBodies[i].GetUserData().pointer) != pBody, "Body is already simulating in Box2d");
 	}
-	else
-		return false;
+#endif
+
+	const glm::mat4 &mtxSceneRef = pBody->GetSceneTransform(0.0f);
+	glm::vec3 ptTranslation = mtxSceneRef[3];
+	glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+	pBody->physics.m_pInit->position.x = ptTranslation.x * m_fPpmInverse;
+	pBody->physics.m_pInit->position.y = ptTranslation.y * m_fPpmInverse;
+	pBody->physics.m_pInit->angle = vRotations.z;
+
+	pBody->physics.m_pInit->enabled = bActivate;
+
+	pBody->physics.m_pBody = m_b2World.CreateBody(pBody->physics.m_pInit);
+	delete pBody->physics.m_pInit;
+	pBody->physics.m_pInit = nullptr;
+
+	return true;
 }
 
-bool HyScene::RemoveNode_Collidable(IHyBody2d *pBody)
+bool HyScene::RemoveNode_PhysBody(IHyBody2d *pBody)
 {
 	auto iter = m_NodeMap_Collision.find(pBody);
 	if(iter == m_NodeMap_Collision.end())
@@ -218,7 +199,7 @@ bool HyScene::RemoveNode_Collidable(IHyBody2d *pBody)
 
 	m_b2World.DestroyBody(iter->second.m_pBody);
 	m_NodeMap_Collision.erase(pBody);
-	pBody->m_pBox2d = nullptr;
+	pBody->physics.m_pBox2d = nullptr;
 
 	return true;
 }
@@ -257,6 +238,7 @@ void HyScene::UpdateNodes()
 	m_b2World.DebugDraw();
 	m_Box2dDraw.EndFrame();
 
+	m_bLockUpdate = true;
 	for(auto iter = m_NodeMap_Collision.begin(); iter != m_NodeMap_Collision.end(); ++iter)
 	{
 		b2Body *pBodyBox2d = iter->second.m_pBody;
@@ -268,12 +250,13 @@ void HyScene::UpdateNodes()
 		glm::vec3 ptTranslation = mtxSceneRef[3];
 		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
 
-		pBodyNode->m_pBox2d->m_bLockUpdate = true;
+		pBodyNode->physics.m_pBox2d->m_bLockUpdate = true;
 		pBodyNode->pos.Offset(pBodyBox2d->GetPosition().x * GetPixelsPerMeter() - ptTranslation.x,
 							  pBodyBox2d->GetPosition().y * GetPixelsPerMeter() - ptTranslation.y);
 		pBodyNode->rot.Offset(glm::degrees(pBodyBox2d->GetAngle() - vRotations.z));
-		pBodyNode->m_pBox2d->m_bLockUpdate = false;
+		pBodyNode->physics.m_pBox2d->
 	}
+	m_bLockUpdate = false;
 }
 
 // RENDER STATE BUFFER
