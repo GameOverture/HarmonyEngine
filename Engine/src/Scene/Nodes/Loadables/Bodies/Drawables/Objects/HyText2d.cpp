@@ -112,10 +112,12 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
 		return;
 
-	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
-	HyShape2d tmpShape;
-	tmpShape.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
-	tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
+	//HyShape2d tmpShape;
+	//tmpShape.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
+	//tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
+	b2PolygonShape tmpShape;
+	tmpShape.SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight), 0.0f);
+	tmpShape.ComputeAABB(&m_SceneAABB, b2Transform(b2Vec2(pos.X(), pos.Y()), b2Rot(glm::radians(rot.Get()))), 0);
 }
 
 /*virtual*/ void HyText2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

@@ -12,8 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 
-class IHyBody2d;
-
 enum HyShapeType
 {
 	HYSHAPE_Unknown = -1,
@@ -27,31 +25,24 @@ enum HyShapeType
 	HYNUM_SHAPE
 };
 
-struct HyBox2dFixture
-{
-	b2FixtureDef	m_FixtureDef;
-	b2Fixture *		m_pFixture;
-
-	HyBox2dFixture() :
-		m_pFixture(nullptr)
-	{ }
-};
+class IHyBody2d;
 
 class HyShape2d
 {
-	friend class IHyBody2d; // In order to invoke IHyBody2d::ShapeChanged()
+	friend class HyPhysicsCtrl2d;
+	friend class HyBox2dDestructListener;
 
+	IHyBody2d &									m_NodeRef;
 	HyShapeType									m_eType;
-	b2Shape *									m_pShape;
-	HyBox2dFixture *							m_pFixture;
 
-	IHyBody2d *									m_pRegisteredBodyShape;	// This only gets set by the shape owned by IHyBody2d in order to properly call IHyBody2d::ShapeChanged()
+	b2Shape *									m_pShape;
+	b2FixtureDef *								m_pInit;
+	b2Fixture *									m_pFixture;
 
 public:
 	static const float							FloatSlop;
 
-	HyShape2d();
-	HyShape2d(const HyShape2d &copyRef);
+	HyShape2d(IHyBody2d &nodeRef);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
@@ -122,7 +113,9 @@ public:
 protected:
 	b2Shape *CloneTransform(const glm::mat4 &mtxTransform) const;
 
-	void RegisterBody(IHyBody2d *pBody);
+	void RegisterBody(b2Body *pBody);
+
+	void ShapeChanged();
 };
 
 #endif /* HyShape2d_h__ */

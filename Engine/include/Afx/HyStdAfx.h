@@ -87,9 +87,6 @@ static_assert((int)HYNUM_TYPES < 16, "HyType cannot exceed 15 items due to IHyNo
 
 enum HyBodyType
 {
-	HYBODY_Unknown = -2,
-	HYBODY_None = -1,
-
 	HYBODY_Static = 0,
 	HYBODY_Kinematic,
 	HYBODY_Dynamic

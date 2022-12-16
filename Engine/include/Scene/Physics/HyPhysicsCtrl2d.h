@@ -13,9 +13,12 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyShape2d.h"
 
+class IHyBody2d;
+
 class HyPhysicsCtrl2d
 {
-	friend class HyScene;					// To init and invoke Update
+	friend class HyScene;
+	friend class IHyBody2d;
 
 	IHyBody2d &					m_NodeRef;
 	b2BodyDef *					m_pInit;	// Dynamically allocated when physics simulation is desired. Simulation will then start if/once owner of *this is a child of a HyPhysicsGrid2d.
@@ -27,6 +30,7 @@ public:
 
 	void Activate();
 	void Deactivate();
+	bool IsActivated() const;
 
 	void Setup(const b2BodyDef &bodyDef);
 	void Setup(HyBodyType eType,
@@ -43,8 +47,6 @@ public:
 
 	HyBodyType GetType() const;
 	void SetType(HyBodyType eType);
-	bool IsEnabled() const;
-	void SetEnabled(bool bEnable);
 	bool IsFixedRotation() const;
 	void SetFixedRotation(bool bFixedRot);
 	bool IsAwake() const;
@@ -64,8 +66,8 @@ public:
 	bool IsCcd() const;
 	void SetCcd(bool bContinuousCollisionDetection);
 
-	void AddShape();
-	void AddShape(HyShape2d &shapeRef);
+	void AddShape(float fDensity);
+	void AddShape(HyShape2d &shapeRef, float fDensity);
 
 	glm::vec2 GridCenterMass() const;
 	glm::vec2 LocalCenterMass() const;

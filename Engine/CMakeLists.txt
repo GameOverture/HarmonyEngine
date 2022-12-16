@@ -140,6 +140,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Objects/HyCamera.cpp
 	src/Scene/Nodes/Objects/IHyCamera.cpp
 	src/Scene/Physics/HyBox2dContactListener.cpp
+	src/Scene/Physics/HyBox2dDestructListener.cpp
 	src/Scene/Physics/HyBox2dDraw.cpp
 	src/Scene/Physics/HyPhysicsCtrl2d.cpp
 	src/Scene/Physics/HyPhysicsDebug2d.cpp
@@ -270,6 +271,7 @@ set(HYENGINE_HEADER_FILES
 	include/Scene/Nodes/Objects/HyCamera.h
 	include/Scene/Nodes/Objects/IHyCamera.h
 	include/Scene/Physics/HyBox2dContactListener.h
+	include/Scene/Physics/HyBox2dDestructListener.h
 	include/Scene/Physics/HyBox2dDraw.h
 	include/Scene/Physics/HyPhysicsCtrl2d.h
 	include/Scene/Physics/HyPhysicsDebug2d.h

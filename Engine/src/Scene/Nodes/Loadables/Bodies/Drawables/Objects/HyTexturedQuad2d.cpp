@@ -134,9 +134,12 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	if(m_SrcRect.Width() <= HyShape2d::FloatSlop || m_SrcRect.Height() <= HyShape2d::FloatSlop)
 		return;
 
-	HyShape2d tmpShape;
-	tmpShape.SetAsBox(m_SrcRect.Width(), m_SrcRect.Height());
-	tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
+	//HyShape2d tmpShape;
+	//tmpShape.SetAsBox(m_SrcRect.Width(), m_SrcRect.Height());
+	//tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
+	b2PolygonShape tmpShape;
+	tmpShape.SetAsBox(m_SrcRect.Width() * 0.5f, m_SrcRect.Height() * 0.5f);
+	tmpShape.ComputeAABB(&m_SceneAABB, b2Transform(b2Vec2(pos.X(), pos.Y()), b2Rot(glm::radians(rot.Get()))), 0);
 }
 
 /*virtual*/ void HyTexturedQuad2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

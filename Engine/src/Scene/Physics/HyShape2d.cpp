@@ -8,6 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
+#include "Scene/HyScene.h"
 #include "Scene/Physics/HyShape2d.h"
 #include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
@@ -15,24 +16,19 @@
 
 const float HyShape2d::FloatSlop = b2_linearSlop;
 
-HyShape2d::HyShape2d() :
+HyShape2d::HyShape2d(IHyBody2d &nodeRef) :
+	m_NodeRef(nodeRef),
 	m_eType(HYSHAPE_Unknown),
 	m_pShape(nullptr),
-	m_pRegisteredBodyShape(nullptr)
+	m_pInit(nullptr),
+	m_pFixture(nullptr)
 {
-}
-
-HyShape2d::HyShape2d(const HyShape2d &copyRef) :
-	m_eType(HYSHAPE_Unknown),
-	m_pShape(nullptr),
-	m_pRegisteredBodyShape(nullptr)
-{
-	operator=(copyRef);
 }
 
 /*virtual*/ HyShape2d::~HyShape2d()
 {
 	delete m_pShape;
+	delete m_pInit;
 }
 
 const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
@@ -88,8 +84,7 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 		break;
 	}
 
-	if(m_pRegisteredBodyShape)
-		m_pRegisteredBodyShape->ShapeChanged();
+	ShapeChanged();
 
 	return *this;
 }
@@ -200,8 +195,7 @@ void HyShape2d::SetAsNothing()
 	delete m_pShape;
 	m_pShape = nullptr;
 
-	if(m_pRegisteredBodyShape)
-		m_pRegisteredBodyShape->ShapeChanged();
+	ShapeChanged();
 }
 
 void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
@@ -217,8 +211,7 @@ void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
 	m_pShape = HY_NEW b2EdgeShape();
 	static_cast<b2EdgeShape *>(m_pShape)->SetTwoSided(pt1, pt2);
 
-	if(m_pRegisteredBodyShape)
-		m_pRegisteredBodyShape->ShapeChanged();
+	ShapeChanged();
 }
 
 void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -234,8 +227,7 @@ void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(&vertList[0], uiNumVerts);
 
-	if(m_pRegisteredBodyShape)
-		m_pRegisteredBodyShape->ShapeChanged();
+	ShapeChanged();
 }
 
 void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
@@ -251,8 +243,7 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
 
-	if(m_pRegisteredBodyShape)
-		m_pRegisteredBodyShape->ShapeChanged();
+	ShapeChanged();
 }
 
 bool HyShape2d::SetAsCircle(float fRadius)
@@ -280,8 +271,7 @@ bool HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
 	static_cast<b2CircleShape *>(m_pShape)->m_p = center;
 	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
 
-	if(m_pRegisteredBodyShape)
-		m_pRegisteredBodyShape->ShapeChanged();
+	ShapeChanged();
 
 	return true;
 }
@@ -305,8 +295,7 @@ void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->Set(pPointArray, uiCount);
 
-	if(m_pRegisteredBodyShape)
-		m_pRegisteredBodyShape->ShapeChanged();
+	ShapeChanged();
 }
 
 bool HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)
@@ -330,8 +319,7 @@ bool HyShape2d::SetAsBox(float fWidth, float fHeight)
 	// Offsets Box2d's center to Harmony's default bottom left
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fWidth * 0.5f, fHeight * 0.5f, b2Vec2(fWidth * 0.5f, fHeight * 0.5f), 0.0f);
 
-	if(m_pRegisteredBodyShape)
-		m_pRegisteredBodyShape->ShapeChanged();
+	ShapeChanged();
 
 	return true;
 }
@@ -350,8 +338,7 @@ bool HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(ptBoxCenter.x, ptBoxCenter.y), glm::radians(fRotDeg));
 
-	if(m_pRegisteredBodyShape)
-		m_pRegisteredBodyShape->ShapeChanged();
+	ShapeChanged();
 
 	return true;
 }
@@ -366,145 +353,142 @@ bool HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 
 float HyShape2d::GetDensity() const
 {
-	if(m_pBox2d)
-		return m_pBox2d->m_pFixture->GetDensity();
+	if(m_pFixture)
+		return m_pFixture->GetDensity();
 	else if(m_pInit)
-		return m_pInit->m_FixtureDef.density;
+		return m_pInit->density;
 	else
 		return b2FixtureDef().density;
 }
 
 void HyShape2d::SetDensity(float fDensity)
 {
-	if(m_pBox2d)
-		m_pBox2d->m_pFixture->SetDensity(fDensity);
+	if(m_pFixture)
+	{
+		m_pFixture->SetDensity(fDensity);
+		m_pFixture->GetBody()->ResetMassData();
+	}
 	else if(m_pInit)
-		m_pInit->m_FixtureDef.density = fDensity;
+		m_pInit->density = fDensity;
 	else
 	{
-		b2FixtureDef def;
-		def.density = fDensity;
-		Init(b2BodyDef(), def);
+		m_pInit = HY_NEW b2FixtureDef();
+		m_pInit->density = fDensity;
 	}
 }
 
 float HyShape2d::GetFriction() const
 {
-	if(m_pBox2d)
-		return m_pBox2d->m_pFixture->GetFriction();
+	if(m_pFixture)
+		return m_pFixture->GetFriction();
 	else if(m_pInit)
-		return m_pInit->m_FixtureDef.friction;
+		return m_pInit->friction;
 	else
 		return b2FixtureDef().friction;
 }
 
 void HyShape2d::SetFriction(float fFriction)
 {
-	if(m_pBox2d)
-		m_pBox2d->m_pFixture->SetFriction(fFriction);
+	if(m_pFixture)
+		m_pFixture->SetFriction(fFriction);
 	else if(m_pInit)
-		m_pInit->m_FixtureDef.friction = fFriction;
+		m_pInit->friction = fFriction;
 	else
 	{
-		b2FixtureDef def;
-		def.friction = fFriction;
-		Init(b2BodyDef(), def);
+		m_pInit = HY_NEW b2FixtureDef();
+		m_pInit->friction = fFriction;
 	}
 }
 
 float HyShape2d::GetRestitution() const
 {
-	if(m_pBox2d)
-		return m_pBox2d->m_pFixture->GetRestitution();
+	if(m_pFixture)
+		return m_pFixture->GetRestitution();
 	else if(m_pInit)
-		return m_pInit->m_FixtureDef.restitution;
+		return m_pInit->restitution;
 	else
 		return b2FixtureDef().restitution;
 }
 
 void HyShape2d::SetRestitution(float fRestitution)
 {
-	if(m_pBox2d)
-		m_pBox2d->m_pFixture->SetRestitution(fRestitution);
+	if(m_pFixture)
+		m_pFixture->SetRestitution(fRestitution);
 	else if(m_pInit)
-		m_pInit->m_FixtureDef.restitution = fRestitution;
+		m_pInit->restitution = fRestitution;
 	else
 	{
-		b2FixtureDef def;
-		def.restitution = fRestitution;
-		Init(b2BodyDef(), def);
+		m_pInit = HY_NEW b2FixtureDef();
+		m_pInit->restitution = fRestitution;
 	}
 }
 
 float HyShape2d::GetRestitutionThreshold() const
 {
-	if(m_pBox2d)
-		return m_pBox2d->m_pFixture->GetRestitutionThreshold();
+	if(m_pFixture)
+		return m_pFixture->GetRestitutionThreshold();
 	else if(m_pInit)
-		return m_pInit->m_FixtureDef.restitutionThreshold;
+		return m_pInit->restitutionThreshold;
 	else
 		return b2FixtureDef().restitutionThreshold;
 }
 
 void HyShape2d::SetRestitutionThreshold(float fRestitutionThreshold)
 {
-	if(m_pBox2d)
-		m_pBox2d->m_pFixture->SetRestitutionThreshold(fRestitutionThreshold);
+	if(m_pFixture)
+		m_pFixture->SetRestitutionThreshold(fRestitutionThreshold);
 	else if(m_pInit)
-		m_pInit->m_FixtureDef.restitutionThreshold = fRestitutionThreshold;
+		m_pInit->restitutionThreshold = fRestitutionThreshold;
 	else
 	{
-		b2FixtureDef def;
-		def.restitutionThreshold = fRestitutionThreshold;
-		Init(b2BodyDef(), def);
+		m_pInit = HY_NEW b2FixtureDef();
+		m_pInit->restitutionThreshold = fRestitutionThreshold;
 	}
 }
 
 b2Filter HyShape2d::GetFilter() const
 {
-	if(m_pBox2d)
-		return m_pBox2d->m_pFixture->GetFilterData();
+	if(m_pFixture)
+		return m_pFixture->GetFilterData();
 	else if(m_pInit)
-		return m_pInit->m_FixtureDef.filter;
+		return m_pInit->filter;
 	else
 		return b2Filter();
 }
 
 void HyShape2d::SetFilter(const b2Filter &filter)
 {
-	if(m_pBox2d)
-		m_pBox2d->m_pFixture->SetFilterData(filter);
+	if(m_pFixture)
+		m_pFixture->SetFilterData(filter);
 	else if(m_pInit)
-		m_pInit->m_FixtureDef.filter = filter;
+		m_pInit->filter = filter;
 	else
 	{
-		b2FixtureDef def;
-		def.filter = filter;
-		Init(b2BodyDef(), def);
+		m_pInit = HY_NEW b2FixtureDef();
+		m_pInit->filter = filter;
 	}
 }
 
 bool HyShape2d::IsSensor() const
 {
-	if(m_pBox2d)
-		return m_pBox2d->m_pFixture->IsSensor();
+	if(m_pFixture)
+		return m_pFixture->IsSensor();
 	else if(m_pInit)
-		return m_pInit->m_FixtureDef.isSensor;
+		return m_pInit->isSensor;
 	else
 		return b2FixtureDef().isSensor;
 }
 
 void HyShape2d::SetSensor(bool bIsSensor)
 {
-	if(m_pBox2d)
-		m_pBox2d->m_pFixture->SetSensor(bIsSensor);
+	if(m_pFixture)
+		m_pFixture->SetSensor(bIsSensor);
 	else if(m_pInit)
-		m_pInit->m_FixtureDef.isSensor = bIsSensor;
+		m_pInit->isSensor = bIsSensor;
 	else
 	{
-		b2FixtureDef def;
-		def.isSensor = bIsSensor;
-		Init(b2BodyDef(), def);
+		m_pInit = HY_NEW b2FixtureDef();
+		m_pInit->isSensor = bIsSensor;
 	}
 }
 
@@ -703,7 +687,30 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 	return pCloneB2Shape;
 }
 
-void HyShape2d::RegisterBody(IHyBody2d *pBody)
+void HyShape2d::RegisterBody(b2Body *pBody)
 {
-	m_pRegisteredBodyShape = pBody;
+	if(m_pInit == nullptr)
+		m_pInit = HY_NEW b2FixtureDef();
+
+	m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(this);
+	m_pInit->shape = ClonePpmShape(IHyNode::sm_pScene->GetPpmInverse());
+
+	m_pFixture = pBody->CreateFixture(m_pInit);
+	delete m_pInit->shape;
+	delete m_pInit;
+	m_pInit = nullptr;
+}
+
+void HyShape2d::ShapeChanged()
+{
+	if(m_pFixture)
+	{
+		b2Body *pBody = m_pFixture->GetBody();
+		pBody->DestroyFixture(m_pFixture);
+		m_pFixture = nullptr;
+
+		RegisterBody(pBody);
+	}
+
+	m_NodeRef.OnShapeChanged();
 }

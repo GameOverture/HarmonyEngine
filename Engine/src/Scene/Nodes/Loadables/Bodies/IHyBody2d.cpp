@@ -25,6 +25,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
+	shape(*this),
 	physics(*this)
 {
 	m_uiFlags |= NODETYPE_IsBody;
@@ -55,8 +56,6 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 
 		m_pParent->SetChildrenDisplayOrder(false);
 	}
-
-	shape.RegisterBody(this);
 }
 
 IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
@@ -67,6 +66,7 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
+	shape(*this),
 	physics(*this)
 {
 	m_uiFlags |= NODETYPE_IsBody;
@@ -79,7 +79,6 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	m_CachedBotColor = botColor.Get();
 
 	shape = copyRef.shape;
-	shape.RegisterBody(this);
 }
 
 IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
@@ -90,7 +89,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
-	shape(std::move(donor.shape)),
+	shape(*this),
 	physics(*this)
 {
 	m_uiFlags |= NODETYPE_IsBody;
@@ -101,8 +100,6 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
-
-	shape.RegisterBody(this);
 }
 
 IHyBody2d::~IHyBody2d()
@@ -134,7 +131,6 @@ IHyBody2d &IHyBody2d::operator=(IHyBody2d &&donor) noexcept
 	IHyBody::operator=(std::move(donor));
 
 	m_iDisplayOrder = std::move(donor.m_iDisplayOrder);
-	m_pBox2d = std::move(donor.m_pBox2d);
 
 	topColor = std::move(donor.topColor);
 	botColor = std::move(donor.botColor);
@@ -255,51 +251,29 @@ float IHyBody2d::GetSceneWidth()
 	return 0.0f;
 }
 
-//bool IHyBody2d::SetCollidable(HyBodyType eBodyType)
-//{
-//	if(HYBODY_None == eBodyType)
-//		return sm_pScene->RemoveNode_Collidable(this);
-//	else
-//		return sm_pScene->AddNode_Collidable(this, eBodyType);
-//}
-
-bool IHyBody2d::IsSimulating() const
-{
-	return m_pBox2d != nullptr;
-}
-
 /*virtual*/ void IHyBody2d::SetDirty(uint32 uiDirtyFlags) /*override*/
 {
 	IHyNode2d::SetDirty(uiDirtyFlags);
 
 	// If this body is actively being simulated by Box2d, and has a dirty transform NOT from the updater
-	if(IsSimulating() && sm_pScene->m_bLockUpdate == false && (uiDirtyFlags & DIRTY_Transform))
+	if(physics.m_pBody && sm_pScene->IsPhysicsUpdating() == false && (uiDirtyFlags & DIRTY_Transform))
 	{
-		HyAssert(m_pBox2d, "IHyBody2d::SetDirty - m_pBox2d was null");
-
 		// TODO: SCALE NOT SUPPORTED - If scale is different, modify all shapes in fixtures (cannot change num of vertices in shape says Box2d)
 		const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
 		glm::vec3 ptTranslation = mtxSceneRef[3];
 		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
 
 		float fPpmInverse = sm_pScene->GetPpmInverse();
-		m_pBox2d->m_pBody->SetTransform(b2Vec2(ptTranslation.x * fPpmInverse, ptTranslation.y * fPpmInverse), vRotations.z);
-		m_pBox2d->m_pBody->SetLinearVelocity(b2Vec2(0, 0));
-		m_pBox2d->m_pBody->SetAngularVelocity(0.0f);
+		physics.m_pBody->SetTransform(b2Vec2(ptTranslation.x * fPpmInverse, ptTranslation.y * fPpmInverse), vRotations.z);
+		physics.m_pBody->SetLinearVelocity(b2Vec2(0, 0));
+		physics.m_pBody->SetAngularVelocity(0.0f);
+		physics.m_pBody->SetAwake(true);
 	}
 }
 
 /*virtual*/ void IHyBody2d::Update() /*override*/
 {
 	IHyLoadable2d::Update();
-}
-
-void IHyBody2d::ShapeChanged()
-{
-	if(IsSimulating() == false && m_pParent && (m_pParent->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid))
-		static_cast<HyPhysicsGrid2d *>(m_pParent)->TryInitChildPhysics(*this);
-
-	OnShapeChanged();
 }
 
 /*virtual*/ int32 IHyBody2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)

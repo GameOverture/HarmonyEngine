@@ -33,9 +33,10 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
 	m_iPhysVelocityIterations(8),
 	m_iPhysPositionIterations(3),
-	m_ContactListener(*this),
 	m_Box2dDraw(fPixelsPerMeter),
-	m_b2World(b2Vec2(vGravity2d.x, vGravity2d.y))
+	m_ContactListener(*this),
+	m_b2World(b2Vec2(vGravity2d.x, vGravity2d.y)),
+	m_bPhysUpdating(false)
 {
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	IHyNode::sm_pScene = this;
@@ -47,6 +48,7 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 						 b2Draw::e_centerOfMassBit);
 	m_b2World.SetDebugDraw(&m_Box2dDraw);
 	m_b2World.SetContactListener(&m_ContactListener);
+	m_b2World.SetDestructionListener(&m_DestructListener);
 }
 
 HyScene::~HyScene(void)
@@ -161,19 +163,17 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
-bool HyScene::AddNode_PhysBody(IHyBody2d *pBody, bool bActivate)
+void HyScene::AddNode_PhysBody(IHyBody2d *pBody, bool bActivate)
 {
-	if(pBody == nullptr || pBody->physics.m_pInit == nullptr || pBody->physics.m_pBody)
-		return false;
-
-#ifdef HY_DEBUG
-	int32 iNumBodies = m_b2World.GetBodyCount();
-	b2Body *pBodies = m_b2World.GetBodyList();
-	for(int32 i = 0; i < iNumBodies; ++i)
+	HyAssert(pBody, "HyScene::AddNode_PhysBody was passed a null IHyBody2d *");
+	if(pBody->physics.m_pBody)
 	{
-		HyAssert(reinterpret_cast<IHyBody2d *>(pBodies[i].GetUserData().pointer) != pBody, "Body is already simulating in Box2d");
+		pBody->physics.m_pBody->SetEnabled(bActivate);
+		return;
 	}
-#endif
+
+	if(pBody->physics.m_pInit == nullptr)
+		pBody->physics.m_pInit = HY_NEW b2BodyDef();
 
 	const glm::mat4 &mtxSceneRef = pBody->GetSceneTransform(0.0f);
 	glm::vec3 ptTranslation = mtxSceneRef[3];
@@ -187,21 +187,19 @@ bool HyScene::AddNode_PhysBody(IHyBody2d *pBody, bool bActivate)
 	pBody->physics.m_pBody = m_b2World.CreateBody(pBody->physics.m_pInit);
 	delete pBody->physics.m_pInit;
 	pBody->physics.m_pInit = nullptr;
-
-	return true;
 }
 
-bool HyScene::RemoveNode_PhysBody(IHyBody2d *pBody)
+void HyScene::RemoveNode_PhysBody(IHyBody2d *pBody)
 {
-	auto iter = m_NodeMap_Collision.find(pBody);
-	if(iter == m_NodeMap_Collision.end())
-		return false;
+	HyAssert(pBody && pBody->physics.m_pBody, "HyScene::RemoveNode_PhysBody was passed a null IHyBody2d or it had a null b2Body");
 
-	m_b2World.DestroyBody(iter->second.m_pBody);
-	m_NodeMap_Collision.erase(pBody);
-	pBody->physics.m_pBox2d = nullptr;
+	m_b2World.DestroyBody(pBody->physics.m_pBody);
+	pBody->physics.m_pBody = nullptr;
+}
 
-	return true;
+bool HyScene::IsPhysicsUpdating() const
+{
+	return m_bPhysUpdating;
 }
 
 void HyScene::ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType)
@@ -238,25 +236,25 @@ void HyScene::UpdateNodes()
 	m_b2World.DebugDraw();
 	m_Box2dDraw.EndFrame();
 
-	m_bLockUpdate = true;
-	for(auto iter = m_NodeMap_Collision.begin(); iter != m_NodeMap_Collision.end(); ++iter)
+	m_bPhysUpdating = true;
+	b2Body *pBody = m_b2World.GetBodyList();
+	while(pBody)
 	{
-		b2Body *pBodyBox2d = iter->second.m_pBody;
-		if(pBodyBox2d->GetType() == b2_staticBody)
-			continue;
-	
-		IHyBody2d *pBodyNode = reinterpret_cast<IHyBody2d *>(pBodyBox2d->GetUserData().pointer);
-		const glm::mat4 &mtxSceneRef = pBodyNode->GetSceneTransform(0.0f);
-		glm::vec3 ptTranslation = mtxSceneRef[3];
-		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+		if(pBody->GetType() != b2_staticBody)
+		{
+			IHyBody2d *pBodyNode = reinterpret_cast<IHyBody2d *>(pBody->GetUserData().pointer);
+			const glm::mat4 &mtxSceneRef = pBodyNode->GetSceneTransform(0.0f);
+			glm::vec3 ptTranslation = mtxSceneRef[3];
+			glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
 
-		pBodyNode->physics.m_pBox2d->m_bLockUpdate = true;
-		pBodyNode->pos.Offset(pBodyBox2d->GetPosition().x * GetPixelsPerMeter() - ptTranslation.x,
-							  pBodyBox2d->GetPosition().y * GetPixelsPerMeter() - ptTranslation.y);
-		pBodyNode->rot.Offset(glm::degrees(pBodyBox2d->GetAngle() - vRotations.z));
-		pBodyNode->physics.m_pBox2d->
+			pBodyNode->pos.Offset(pBody->GetPosition().x * GetPixelsPerMeter() - ptTranslation.x,
+								  pBody->GetPosition().y * GetPixelsPerMeter() - ptTranslation.y);
+			pBodyNode->rot.Offset(glm::degrees(pBody->GetAngle() - vRotations.z));
+		}
+		
+		pBody = pBody->GetNext();
 	}
-	m_bLockUpdate = false;
+	m_bPhysUpdating = false;
 }
 
 // RENDER STATE BUFFER
