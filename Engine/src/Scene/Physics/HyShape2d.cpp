@@ -16,8 +16,8 @@
 
 const float HyShape2d::FloatSlop = b2_linearSlop;
 
-HyShape2d::HyShape2d(IHyBody2d &nodeRef) :
-	m_NodeRef(nodeRef),
+HyShape2d::HyShape2d(IHyBody2d *pNode /*= nullptr*/) :
+	m_pNode(pNode),
 	m_eType(HYSHAPE_Unknown),
 	m_pShape(nullptr),
 	m_pInit(nullptr),
@@ -496,6 +496,7 @@ bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &pt
 {
 	bool bIsCollide = false;
 	
+	// CloneTransform applies scaling
 	b2Shape *pTransformedSelf = CloneTransform(mtxSelfTransform);
 	if(pTransformedSelf)
 	{
@@ -594,6 +595,7 @@ bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &pt
 
 bool HyShape2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const
 {
+	// CloneTransform applies scaling
 	b2Shape *pTransformedSelf = CloneTransform(mtxTransform);
 	if(pTransformedSelf)
 	{
@@ -712,5 +714,6 @@ void HyShape2d::ShapeChanged()
 		RegisterBody(pBody);
 	}
 
-	m_NodeRef.OnShapeChanged();
+	if(m_pNode)
+		m_pNode->OnShapeChanged();
 }

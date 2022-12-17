@@ -25,7 +25,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
-	shape(*this),
+	shape(this),
 	physics(*this)
 {
 	m_uiFlags |= NODETYPE_IsBody;
@@ -66,7 +66,7 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
-	shape(*this),
+	shape(this),
 	physics(*this)
 {
 	m_uiFlags |= NODETYPE_IsBody;
@@ -89,7 +89,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
 	alpha(m_fAlpha, *this, DIRTY_Color),
-	shape(*this),
+	shape(this),
 	physics(*this)
 {
 	m_uiFlags |= NODETYPE_IsBody;

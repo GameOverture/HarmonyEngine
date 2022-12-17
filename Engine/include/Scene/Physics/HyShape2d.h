@@ -32,7 +32,7 @@ class HyShape2d
 	friend class HyPhysicsCtrl2d;
 	friend class HyBox2dDestructListener;
 
-	IHyBody2d &									m_NodeRef;
+	IHyBody2d *									m_pNode;
 	HyShapeType									m_eType;
 
 	b2Shape *									m_pShape;
@@ -42,7 +42,7 @@ class HyShape2d
 public:
 	static const float							FloatSlop;
 
-	HyShape2d(IHyBody2d &nodeRef);
+	HyShape2d(IHyBody2d *pNode = nullptr);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
