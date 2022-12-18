@@ -181,6 +181,7 @@ void HyScene::AddNode_PhysBody(IHyBody2d *pBody, bool bActivate)
 	pBody->physics.m_pInit->position.x = ptTranslation.x * m_fPpmInverse;
 	pBody->physics.m_pInit->position.y = ptTranslation.y * m_fPpmInverse;
 	pBody->physics.m_pInit->angle = vRotations.z;
+	pBody->physics.m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(pBody);
 
 	pBody->physics.m_pInit->enabled = bActivate;
 
