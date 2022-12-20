@@ -13,6 +13,7 @@
 
 HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(pParent),
+	m_Shape(this),
 	m_SubBtnPanel(this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
@@ -22,6 +23,7 @@ HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 
 HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(initRef, sTextPrefix, sTextName, pParent),
+	m_Shape(this),
 	m_SubBtnPanel(this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
@@ -32,6 +34,7 @@ HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std:
 
 HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+	m_Shape(this),
 	m_SubBtnPanel(this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
@@ -260,7 +263,7 @@ void HyComboBox::ResetExpandedTimeout()
 	HyButton::OnSetup();
 	SetButtonClickedCallback(OnComboBoxClickedCallback, this);
 
-	shape.SetAsBox(GetWidth(), GetHeight());
+	m_Shape.SetAsBox(GetWidth(), GetHeight());
 }
 
 /*static*/ void HyComboBox::OnComboBoxClickedCallback(HyButton *pBtn, void *pData)

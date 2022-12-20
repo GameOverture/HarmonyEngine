@@ -24,9 +24,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 	m_iDisplayOrder(0),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color),
-	shape(this),
-	physics(*this)
+	alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -65,9 +63,7 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	m_SceneAABB(copyRef.m_SceneAABB),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color),
-	shape(this),
-	physics(*this)
+	alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -77,8 +73,6 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
-
-	shape = copyRef.shape;
 }
 
 IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
@@ -88,9 +82,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	m_SceneAABB(std::move(donor.m_SceneAABB)),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color),
-	shape(this),
-	physics(*this)
+	alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -104,7 +96,6 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 
 IHyBody2d::~IHyBody2d()
 {
-	physics.Deactivate();
 }
 
 IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
@@ -119,8 +110,6 @@ IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
 	alpha = rhs.alpha;
 
 	CalculateColor(0.0f);
-
-	shape = rhs.shape;
 
 	return *this;
 }
@@ -137,8 +126,6 @@ IHyBody2d &IHyBody2d::operator=(IHyBody2d &&donor) noexcept
 	alpha = std::move(donor.alpha);
 
 	CalculateColor(0.0f);
-
-	shape = std::move(donor.shape);
 
 	return *this;
 }
@@ -209,30 +196,6 @@ int32 IHyBody2d::GetDisplayOrder() const
 	}
 }
 
-bool IHyBody2d::IsMouseInBounds()
-{
-	if(GetCoordinateSystem() >= 0 && HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem())
-	{
-		if(shape.IsValidShape())
-			return shape.TestPoint(GetSceneTransform(0.0f), HyEngine::Input().GetMousePos());
-		else
-			return HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
-	}
-	else if(GetCoordinateSystem() < 0)
-	{
-		glm::vec2 ptWorldMousePos;
-		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
-		{
-			if(shape.IsValidShape())
-				return shape.TestPoint(GetSceneTransform(0.0f), ptWorldMousePos);
-			else
-				return HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
-		}
-	}
-
-	return false;
-}
-
 float IHyBody2d::GetSceneHeight()
 {
 	const b2AABB &aabbRef = GetSceneAABB();
@@ -254,21 +217,6 @@ float IHyBody2d::GetSceneWidth()
 /*virtual*/ void IHyBody2d::SetDirty(uint32 uiDirtyFlags) /*override*/
 {
 	IHyNode2d::SetDirty(uiDirtyFlags);
-
-	// If this body is actively being simulated by Box2d, and has a dirty transform NOT from the updater
-	if(physics.m_pBody && sm_pScene->IsPhysicsUpdating() == false && (uiDirtyFlags & DIRTY_Transform))
-	{
-		// TODO: SCALE NOT SUPPORTED - If scale is different, modify all shapes in fixtures (cannot change num of vertices in shape says Box2d)
-		const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
-		glm::vec3 ptTranslation = mtxSceneRef[3];
-		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
-
-		float fPpmInverse = sm_pScene->GetPpmInverse();
-		physics.m_pBody->SetTransform(b2Vec2(ptTranslation.x * fPpmInverse, ptTranslation.y * fPpmInverse), vRotations.z);
-		physics.m_pBody->SetLinearVelocity(b2Vec2(0, 0));
-		physics.m_pBody->SetAngularVelocity(0.0f);
-		physics.m_pBody->SetAwake(true);
-	}
 }
 
 /*virtual*/ void IHyBody2d::Update() /*override*/

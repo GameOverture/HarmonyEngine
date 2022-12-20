@@ -16,13 +16,16 @@
 
 const float HyShape2d::FloatSlop = b2_linearSlop;
 
-HyShape2d::HyShape2d(IHyBody2d *pNode /*= nullptr*/) :
-	m_pNode(pNode),
-	m_eType(HYSHAPE_Unknown),
+HyShape2d::HyShape2d(HyEntity2d *pParent /*= nullptr*/) :
+	m_eType(HYSHAPE_Nothing),
+	m_pParent(nullptr),
 	m_pShape(nullptr),
+	m_bFixtureDirty(false),
 	m_pInit(nullptr),
 	m_pFixture(nullptr)
 {
+	if(pParent)
+		pParent->ShapeAppend(*this);
 }
 
 /*virtual*/ HyShape2d::~HyShape2d()
@@ -94,6 +97,11 @@ HyShapeType HyShape2d::GetType() const
 	return m_eType;
 }
 
+bool HyShape2d::IsValidShape() const
+{
+	return m_pShape != nullptr && m_eType != HYSHAPE_Nothing;
+}
+
 void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
 {
 	switch(m_eType)
@@ -111,6 +119,45 @@ void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
 	default:
 		HyError("HyShape2d::GetCentoid() - Unsupported shape type: " << m_eType);
 	}
+}
+
+float HyShape2d::CalcArea() const
+{
+	float fArea = 0.0f;
+
+	switch(m_eType)
+	{
+	case HYSHAPE_LineSegment:
+	case HYSHAPE_LineChain:
+	case HYSHAPE_LineLoop:
+		fArea = 0.0f;
+		break;
+
+	case HYSHAPE_Circle: {
+		float fRadius = static_cast<b2CircleShape *>(m_pShape)->m_radius;
+		fArea = b2_pi * (fRadius * fRadius);
+		break; }
+
+	case HYSHAPE_Polygon: {
+		// Get a reference point for forming triangles.
+		// Use the first vertex to reduce round-off errors.
+		auto &verticesRef = static_cast<b2PolygonShape *>(m_pShape)->m_vertices;
+		b2Vec2 s = verticesRef[0];
+
+		int32 iNumVerts = static_cast<b2PolygonShape *>(m_pShape)->m_count;
+		for(int32 i = 0; i < iNumVerts; ++i)
+		{
+			// Triangle vertices.
+			b2Vec2 e1 = verticesRef[i] - s;
+			b2Vec2 e2 = i + 1 < iNumVerts ? verticesRef[i + 1] - s : verticesRef[0] - s;
+
+			float fTriangleArea = 0.5f * b2Cross(e1, e2);
+			fArea += fTriangleArea;
+		}
+		break; }
+	}
+
+	return fArea;
 }
 
 const b2Shape *HyShape2d::GetB2Shape() const
@@ -183,14 +230,27 @@ b2Shape *HyShape2d::ClonePpmShape(float fPpmInverse) const
 	return pCloneB2Shape;
 }
 
-bool HyShape2d::IsValidShape() const
+void HyShape2d::ParentDetach()
 {
-	return m_pShape != nullptr && m_eType != HYSHAPE_Unknown;
+	HyEntity2d *pParent = ParentGet();
+	if(pParent == nullptr)
+		return;
+
+	pParent->ShapeRemove(*this);
+}
+
+HyEntity2d *HyShape2d::ParentGet() const
+{
+	return m_pParent;
+	//if(m_pFixture)
+	//	return reinterpret_cast<HyEntity2d *>(m_pFixture->GetBody()->GetUserData().pointer);
+
+	//return nullptr;
 }
 
 void HyShape2d::SetAsNothing()
 {
-	m_eType = HYSHAPE_Unknown;
+	m_eType = HYSHAPE_Nothing;
 
 	delete m_pShape;
 	m_pShape = nullptr;
@@ -375,6 +435,18 @@ void HyShape2d::SetDensity(float fDensity)
 		m_pInit = HY_NEW b2FixtureDef();
 		m_pInit->density = fDensity;
 	}
+}
+
+bool HyShape2d::SetDensityInKg(float fWeightKg)
+{
+	if(IsValidShape() == false || fWeightKg < 0.0f)
+		return false;
+
+	float fAreaMetersSq = CalcArea();
+	if(fAreaMetersSq <= 0.0f)
+		return false;
+
+	SetDensity(fWeightKg / fAreaMetersSq);
 }
 
 float HyShape2d::GetFriction() const
@@ -689,31 +761,42 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 	return pCloneB2Shape;
 }
 
-void HyShape2d::RegisterBody(b2Body *pBody)
+void HyShape2d::CreateFixture(b2Body *pBody)
 {
+	DestroyFixture();
+
 	if(m_pInit == nullptr)
 		m_pInit = HY_NEW b2FixtureDef();
 
 	m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(this);
 	m_pInit->shape = ClonePpmShape(IHyNode::sm_pScene->GetPpmInverse());
-
 	m_pFixture = pBody->CreateFixture(m_pInit);
 	delete m_pInit->shape;
+
 	delete m_pInit;
 	m_pInit = nullptr;
+
+	m_bFixtureDirty = false;
+}
+
+void HyShape2d::DestroyFixture()
+{
+	if(m_pFixture == nullptr)
+		return;
+	
+	b2Body *pBody = m_pFixture->GetBody();
+	pBody->DestroyFixture(m_pFixture);
+	m_pFixture = nullptr;
+
+	m_bFixtureDirty = false;
 }
 
 void HyShape2d::ShapeChanged()
 {
-	if(m_pFixture)
-	{
-		b2Body *pBody = m_pFixture->GetBody();
-		pBody->DestroyFixture(m_pFixture);
-		m_pFixture = nullptr;
+	m_bFixtureDirty = true;
+}
 
-		RegisterBody(pBody);
-	}
-
-	if(m_pNode)
-		m_pNode->OnShapeChanged();
+bool HyShape2d::IsFixtureDirty()
+{
+	return m_bFixtureDirty;
 }

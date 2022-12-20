@@ -15,14 +15,16 @@
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyBody2d(HYTYPE_Entity, "", "", pParent),
-	m_uiEntAttribs(0)
+	m_uiEntAttribs(0),
+	physics(*this)
 {
 }
 
 HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 	IHyBody2d(std::move(donor)),
 	m_ChildList(std::move(donor.m_ChildList)),
-	m_uiEntAttribs(std::move(donor.m_uiEntAttribs))
+	m_uiEntAttribs(std::move(donor.m_uiEntAttribs)),
+	physics(*this)
 {
 }
 
@@ -30,6 +32,8 @@ HyEntity2d::~HyEntity2d(void)
 {
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
+
+	physics.Deactivate();
 }
 
 HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor) noexcept
@@ -340,6 +344,80 @@ void HyEntity2d::DisableMouseInput()
 	m_uiEntAttribs &= ~ENT2DATTRIB_MouseInputEnabled;
 }
 
+bool HyEntity2d::IsMouseInBounds()
+{
+	glm::vec2 ptMouseInSceneCoords;
+	if(GetCoordinateSystem() >= 0 && HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem())
+	{
+		ptMouseInSceneCoords = HyEngine::Input().GetMousePos();
+	}
+	else if(GetCoordinateSystem() < 0)
+	{
+		if(HyEngine::Input().GetWorldMousePos(ptMouseInSceneCoords) == false)
+			return false;
+	}
+
+	if(ShapeCount() > 0)
+	{
+		for(int32 i = 0; i < m_ShapeList.size(); ++i)
+		{
+			HyShape2d *pHyShape = m_ShapeList[i];
+			if(pHyShape->TestPoint(GetSceneTransform(0.0f), ptMouseInSceneCoords))
+				return true;
+		}
+	}
+	else
+		return HyTestPointAABB(GetSceneAABB(), ptMouseInSceneCoords);
+
+	return false;
+}
+
+void HyEntity2d::ShapeAppend(HyShape2d &shapeRef)
+{
+	if(this == shapeRef.ParentGet())
+		return;
+
+	shapeRef.ParentDetach();
+	m_ShapeList.push_back(&shapeRef);
+
+	SyncPhysicsFixtures();
+
+	//// A Box2d Body needs to exist in order to create/attach fixtures.
+	//// HyScene::AddNode_PhysBody() will create a m_pBody when one doesn't exist
+	//if(physics.m_pBody == nullptr)
+	//	IHyNode::sm_pScene->AddNode_PhysBody(this, false);
+
+	// ... and then set the density so it doesn't affect the previous body
+	//shapeRef.SetDensity(fDensity);
+
+	// Finally register the connection between the body and fixture (shape)
+	
+}
+
+bool HyEntity2d::ShapeRemove(HyShape2d &childShapeRef)
+{
+	if(physics.m_pBody == nullptr)
+		return false;
+
+	for(b2Fixture *pFixture = physics.m_pBody->GetFixtureList(); pFixture != nullptr; pFixture = pFixture->GetNext())
+	{
+		HyShape2d *pShape = reinterpret_cast<HyShape2d *>(pFixture->GetUserData().pointer);
+		if(pShape == &childShapeRef)
+		{
+			physics.m_pBody->DestroyFixture(pFixture);
+			childShapeRef.m_pFixture = nullptr;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+uint32 HyEntity2d::ShapeCount() const
+{
+	return static_cast<uint32>(m_ShapeList.size());
+}
+
 bool HyEntity2d::IsReverseDisplayOrder() const
 {
 	return (m_uiEntAttribs & ENT2DATTRIB_ReverseDisplayOrder);
@@ -411,6 +489,13 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		m_ChildList[i]->SetDirty(uiDirtyFlags);
+
+	// If this body is actively being simulated by Box2d, and has a dirty transform
+	// AND this isn't coming from the Scene updating physics normally
+	if(physics.m_pBody && (uiDirtyFlags & DIRTY_Transform) && sm_pScene->IsPhysicsUpdating() == false)
+	{
+		SyncPhysicsBody();
+	}
 }
 
 /*virtual*/ void HyEntity2d::Update() /*override*/
@@ -587,6 +672,40 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 		iOrderValue = SetChildrenDisplayOrder(bIsOverriding);
 
 	return iOrderValue;
+}
+
+void HyEntity2d::SyncPhysicsFixtures()
+{
+	if(physics.m_pBody == nullptr)
+		return;
+
+	for(int32 i = 0; i < m_ShapeList.size(); ++i)
+	{
+		HyShape2d *pShape = m_ShapeList[i];
+		if(pShape->IsFixtureDirty())
+		{
+			if(pShape->IsValidShape())
+				pShape->CreateFixture(physics.m_pBody);
+			else
+				pShape->DestroyFixture();
+		}
+	}
+}
+
+void HyEntity2d::SyncPhysicsBody()
+{
+	HyAssert(physics.m_pBody, "HyEntity2d::SyncPhysicsBody invoked with null physics body");
+
+	// TODO: SCALE NOT SUPPORTED - If scale is different, modify all shapes in fixtures (cannot change num of vertices in shape says Box2d)
+	const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
+	glm::vec3 ptTranslation = mtxSceneRef[3];
+	glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+
+	float fPpmInverse = sm_pScene->GetPpmInverse();
+	physics.m_pBody->SetTransform(b2Vec2(ptTranslation.x * fPpmInverse, ptTranslation.y * fPpmInverse), vRotations.z);
+	physics.m_pBody->SetLinearVelocity(b2Vec2(0, 0));
+	physics.m_pBody->SetAngularVelocity(0.0f);
+	physics.m_pBody->SetAwake(true);
 }
 
 /*friend*/ void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode)

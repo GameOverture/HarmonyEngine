@@ -28,6 +28,8 @@ class HyUiContainer : public HyEntity2d
 	static std::vector<HyUiContainer *>		sm_pContainerList;
 
 protected:
+	HyShape2d								m_Shape;
+
 	bool									m_bInputAllowed;
 	int32									m_iDefaultWidgetSpacing;
 

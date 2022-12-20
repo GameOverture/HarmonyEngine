@@ -14,7 +14,7 @@
 
 enum HyShapeType
 {
-	HYSHAPE_Unknown = -1,
+	HYSHAPE_Nothing = -1,
 
 	HYSHAPE_LineSegment = 0,
 	HYSHAPE_LineChain,
@@ -25,35 +25,42 @@ enum HyShapeType
 	HYNUM_SHAPE
 };
 
-class IHyBody2d;
+class HyEntity2d;
 
 class HyShape2d
 {
+	friend class HyEntity2d;
+	friend class HyPrimitive2d;
 	friend class HyPhysicsCtrl2d;
 	friend class HyBox2dDestructListener;
 
-	IHyBody2d *									m_pNode;
 	HyShapeType									m_eType;
+	HyEntity2d *								m_pParent;
 
 	b2Shape *									m_pShape;
 	b2FixtureDef *								m_pInit;
 	b2Fixture *									m_pFixture;
+	bool										m_bFixtureDirty;
 
 public:
 	static const float							FloatSlop;
 
-	HyShape2d(IHyBody2d *pNode = nullptr);
+	HyShape2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
 
 	HyShapeType GetType() const;
+	bool IsValidShape() const;
+
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
+	float CalcArea() const; // Returns the area in meters squared
 	
 	const b2Shape *GetB2Shape() const;
 	b2Shape *ClonePpmShape(float fPpmInverse) const;
 
-	bool IsValidShape() const;
+	void ParentDetach();
+	HyEntity2d *ParentGet() const;
 
 	void SetAsNothing();
 
@@ -93,7 +100,8 @@ public:
 
 	// Applies when attached to a physics body
 	float GetDensity() const;
-	void SetDensity(float fDensity);
+	void SetDensity(float fDensity); // Usually in kg / m ^ 2.
+	bool SetDensityInKg(float fWeightKg); // Sets the density using the "weight" of currently set shape. Returns if valid/successful
 	float GetFriction() const;
 	void SetFriction(float fFriction);
 	float GetRestitution() const;
@@ -113,9 +121,11 @@ public:
 protected:
 	b2Shape *CloneTransform(const glm::mat4 &mtxTransform) const;
 
-	void RegisterBody(b2Body *pBody);
-
+	void CreateFixture(b2Body *pBody);
+	void DestroyFixture();
+	
 	void ShapeChanged();
+	bool IsFixtureDirty();
 };
 
 #endif /* HyShape2d_h__ */

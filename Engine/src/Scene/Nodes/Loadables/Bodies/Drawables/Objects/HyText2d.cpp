@@ -44,24 +44,24 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		{
 		case HYALIGN_Left:
 		case HYALIGN_Justify:
-			m_DebugBox.shape.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(GetWidth(), 0.0f));
+			m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(GetWidth(), 0.0f));
 			break;
 
 		case HYALIGN_Center:
-			m_DebugBox.shape.SetAsLineSegment(glm::vec2(GetWidth(-0.5f), 0.0f), glm::vec2(GetWidth(0.5f), 0.0f));
+			m_DebugBox.SetAsLineSegment(glm::vec2(GetWidth(-0.5f), 0.0f), glm::vec2(GetWidth(0.5f), 0.0f));
 			break;
 
 		case HYALIGN_Right:
-			m_DebugBox.shape.SetAsLineSegment(glm::vec2(-GetWidth(), 0.0f), glm::vec2(0.0f, 0.0f));
+			m_DebugBox.SetAsLineSegment(glm::vec2(-GetWidth(), 0.0f), glm::vec2(0.0f, 0.0f));
 			break;
 		}
 	}
 	else if(m_uiTextAttributes & TEXTATTRIB_IsScaleBox)
-		m_DebugBox.shape.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
+		m_DebugBox.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
 	else if(m_uiTextAttributes & TEXTATTRIB_IsColumn)
-		m_DebugBox.shape.SetAsBox(m_vBoxDimensions.x, GetHeight());
+		m_DebugBox.SetAsBox(m_vBoxDimensions.x, GetHeight());
 	else if(m_uiTextAttributes & TEXTATTRIB_IsVertical)
-		m_DebugBox.shape.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetHeight()));
+		m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetHeight()));
 	else
 		HyError("HyText2d::OnSetDebugBox - Unknown HyText2d text attributes");
 }
@@ -113,9 +113,9 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		return;
 
 	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
-	HyShape2d tmpShape;
-	tmpShape.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
-	tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
+	HyShape2d tmp;
+	tmp.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
+	tmp.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 }
 
 /*virtual*/ void HyText2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

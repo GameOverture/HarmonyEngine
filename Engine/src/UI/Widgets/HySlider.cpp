@@ -27,21 +27,21 @@ void HySlider::BarPrimitives::Assemble(HyOrientation eOrientation, float fBarThi
 
 	float fRadius = (fBarThickness * 0.5f) - fIndentAmt;
 	m_EndCapNeg.pos.Set(0.0f, 0.0f);
-	m_EndCapNeg.shape.SetAsCircle(fRadius);
+	m_EndCapNeg.SetAsCircle(fRadius);
 
 	m_EndCapPos.pos.GetAnimFloat(eOrientation) = fBarLength;
 	m_EndCapPos.pos.GetAnimFloat(eInverseOrien) = 0.0f;
-	m_EndCapPos.shape.SetAsCircle(fRadius);
+	m_EndCapPos.SetAsCircle(fRadius);
 
 	if(eOrientation == HYORIEN_Horizontal)
 	{
-		m_BarPos.shape.SetAsBox(1.0f, fBarThickness - fIndentAmt);
-		m_BarNeg.shape.SetAsBox(1.0f, fBarThickness - fIndentAmt);
+		m_BarPos.SetAsBox(1.0f, fBarThickness - fIndentAmt);
+		m_BarNeg.SetAsBox(1.0f, fBarThickness - fIndentAmt);
 	}
 	else
 	{
-		m_BarPos.shape.SetAsBox(fBarThickness - fIndentAmt, 1.0f);
-		m_BarNeg.shape.SetAsBox(fBarThickness - fIndentAmt, 1.0f);
+		m_BarPos.SetAsBox(fBarThickness - fIndentAmt, 1.0f);
+		m_BarNeg.SetAsBox(fBarThickness - fIndentAmt, 1.0f);
 	}
 
 	m_BarPos.pos.GetAnimFloat(eOrientation) = 0.0f;

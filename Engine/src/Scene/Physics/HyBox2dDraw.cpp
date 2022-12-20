@@ -39,7 +39,7 @@ void HyBox2dDraw::BeginFrame()
 	for(int i = 0; i < vertexCount; ++i)
 		convertedVertList.emplace_back(vertices[i].x * m_fPixelsPerMeter, vertices[i].y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].shape.SetAsPolygon(convertedVertList.data(), vertexCount);
+	m_DrawList[m_iDrawIndex].SetAsPolygon(convertedVertList.data(), vertexCount);
 	m_DrawList[m_iDrawIndex].SetWireframe(true);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
 
@@ -56,7 +56,7 @@ void HyBox2dDraw::BeginFrame()
 	for(int i = 0; i < vertexCount; ++i)
 		convertedVertList.emplace_back(vertices[i].x * m_fPixelsPerMeter, vertices[i].y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].shape.SetAsPolygon(convertedVertList.data(), vertexCount);
+	m_DrawList[m_iDrawIndex].SetAsPolygon(convertedVertList.data(), vertexCount);
 	m_DrawList[m_iDrawIndex].SetWireframe(false);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
 
@@ -71,7 +71,7 @@ void HyBox2dDraw::BeginFrame()
 
 	b2Vec2 ptConvertedCenter(center.x * m_fPixelsPerMeter, center.y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].shape.SetAsCircle(ptConvertedCenter, radius * m_fPixelsPerMeter);
+	m_DrawList[m_iDrawIndex].SetAsCircle(ptConvertedCenter, radius * m_fPixelsPerMeter);
 	m_DrawList[m_iDrawIndex].SetWireframe(true);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
 
@@ -86,7 +86,7 @@ void HyBox2dDraw::BeginFrame()
 
 	b2Vec2 ptConvertedCenter(center.x * m_fPixelsPerMeter, center.y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].shape.SetAsCircle(ptConvertedCenter, radius * m_fPixelsPerMeter);
+	m_DrawList[m_iDrawIndex].SetAsCircle(ptConvertedCenter, radius * m_fPixelsPerMeter);
 	m_DrawList[m_iDrawIndex].SetWireframe(false);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
 
@@ -102,7 +102,7 @@ void HyBox2dDraw::BeginFrame()
 	b2Vec2 ptConvertedP1(p1.x * m_fPixelsPerMeter, p1.y * m_fPixelsPerMeter);
 	b2Vec2 ptConvertedP2(p2.x * m_fPixelsPerMeter, p2.y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].shape.SetAsLineSegment(ptConvertedP1, ptConvertedP2);
+	m_DrawList[m_iDrawIndex].SetAsLineSegment(ptConvertedP1, ptConvertedP2);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
 
 	m_iDrawIndex++;

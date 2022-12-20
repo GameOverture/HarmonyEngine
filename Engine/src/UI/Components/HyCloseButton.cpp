@@ -22,17 +22,17 @@ HyCloseButton::HyCloseButton(uint32 uiDiameter, HyColor panelColor, HyColor fram
 	m_PanelColor = panelColor;
 	m_FrameColor = frameColor;
 
-	m_CircleStroke.shape.SetAsCircle((m_uiDiameter + 4) * 0.5f);
-	m_Circle.shape.SetAsCircle(m_uiDiameter * 0.5f);
+	m_CircleStroke.SetAsCircle((m_uiDiameter + 4) * 0.5f);
+	m_Circle.SetAsCircle(m_uiDiameter * 0.5f);
 
 	m_Circle.SetNumCircleSegments(20);
 	m_CircleStroke.SetNumCircleSegments(20);
 
 	int32 iXDiameter = static_cast<int32>(m_uiDiameter / 4);
-	m_X1.shape.SetAsLineSegment(glm::vec2(-iXDiameter, -iXDiameter), glm::vec2(iXDiameter, iXDiameter));
+	m_X1.SetAsLineSegment(glm::vec2(-iXDiameter, -iXDiameter), glm::vec2(iXDiameter, iXDiameter));
 	m_X1.SetLineThickness(3);
 	
-	m_X2.shape.SetAsLineSegment(glm::vec2(-iXDiameter, iXDiameter), glm::vec2(iXDiameter, -iXDiameter));
+	m_X2.SetAsLineSegment(glm::vec2(-iXDiameter, iXDiameter), glm::vec2(iXDiameter, -iXDiameter));
 	m_X2.SetLineThickness(3);
 
 	m_XColor = HyColor::Black;

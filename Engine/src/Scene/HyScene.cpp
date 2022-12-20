@@ -163,39 +163,47 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
-void HyScene::AddNode_PhysBody(IHyBody2d *pBody, bool bActivate)
+void HyScene::AddNode_PhysBody(HyEntity2d *pEntity)
 {
-	HyAssert(pBody, "HyScene::AddNode_PhysBody was passed a null IHyBody2d *");
-	if(pBody->physics.m_pBody)
+	HyAssert(pEntity, "HyScene::AddNode_PhysBody was passed a null HyEntity2d *");
+
+	const glm::mat4 &mtxSceneRef = pEntity->GetSceneTransform(0.0f);
+	glm::vec3 ptTranslation = mtxSceneRef[3];
+	glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+
+	if(pEntity->physics.m_pBody)
 	{
-		pBody->physics.m_pBody->SetEnabled(bActivate);
+		if(pEntity->physics.m_pBody->IsEnabled() == false)
+		{
+			pEntity->SyncPhysicsBody();
+			pEntity->SyncPhysicsFixtures(); // Is this needed?
+			pEntity->physics.m_pBody->SetEnabled(true);
+		}
 		return;
 	}
 
-	if(pBody->physics.m_pInit == nullptr)
-		pBody->physics.m_pInit = HY_NEW b2BodyDef();
+	if(pEntity->physics.m_pInit == nullptr)
+		pEntity->physics.m_pInit = HY_NEW b2BodyDef();
+	pEntity->physics.m_pInit->position.x = ptTranslation.x * m_fPpmInverse;
+	pEntity->physics.m_pInit->position.y = ptTranslation.y * m_fPpmInverse;
+	pEntity->physics.m_pInit->angle = vRotations.z;
+	pEntity->physics.m_pInit->enabled = true;
+	pEntity->physics.m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(pEntity);
 
-	const glm::mat4 &mtxSceneRef = pBody->GetSceneTransform(0.0f);
-	glm::vec3 ptTranslation = mtxSceneRef[3];
-	glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
-	pBody->physics.m_pInit->position.x = ptTranslation.x * m_fPpmInverse;
-	pBody->physics.m_pInit->position.y = ptTranslation.y * m_fPpmInverse;
-	pBody->physics.m_pInit->angle = vRotations.z;
-	pBody->physics.m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(pBody);
+	pEntity->physics.m_pBody = m_b2World.CreateBody(pEntity->physics.m_pInit);
+	delete pEntity->physics.m_pInit;
+	pEntity->physics.m_pInit = nullptr;
 
-	pBody->physics.m_pInit->enabled = bActivate;
-
-	pBody->physics.m_pBody = m_b2World.CreateBody(pBody->physics.m_pInit);
-	delete pBody->physics.m_pInit;
-	pBody->physics.m_pInit = nullptr;
+	// Physics body now exists for this entity, add all its shapes as fixtures
+	pEntity->SyncPhysicsFixtures();
 }
 
-void HyScene::RemoveNode_PhysBody(IHyBody2d *pBody)
+void HyScene::RemoveNode_PhysBody(HyEntity2d *pEntity)
 {
-	HyAssert(pBody && pBody->physics.m_pBody, "HyScene::RemoveNode_PhysBody was passed a null IHyBody2d or it had a null b2Body");
+	HyAssert(pEntity && pEntity->physics.m_pBody, "HyScene::RemoveNode_PhysBody was passed a null HyEntity2d or it had a null b2Body");
 
-	m_b2World.DestroyBody(pBody->physics.m_pBody);
-	pBody->physics.m_pBody = nullptr;
+	m_b2World.DestroyBody(pEntity->physics.m_pBody);
+	pEntity->physics.m_pBody = nullptr;
 }
 
 bool HyScene::IsPhysicsUpdating() const
@@ -241,16 +249,16 @@ void HyScene::UpdateNodes()
 	b2Body *pBody = m_b2World.GetBodyList();
 	while(pBody)
 	{
-		if(pBody->GetType() != b2_staticBody)
+		if(pBody->GetType() != b2_staticBody && pBody->IsEnabled())
 		{
-			IHyBody2d *pBodyNode = reinterpret_cast<IHyBody2d *>(pBody->GetUserData().pointer);
-			const glm::mat4 &mtxSceneRef = pBodyNode->GetSceneTransform(0.0f);
+			HyEntity2d *pEntNode = reinterpret_cast<HyEntity2d *>(pBody->GetUserData().pointer);
+			const glm::mat4 &mtxSceneRef = pEntNode->GetSceneTransform(0.0f);
 			glm::vec3 ptTranslation = mtxSceneRef[3];
 			glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
 
-			pBodyNode->pos.Offset(pBody->GetPosition().x * GetPixelsPerMeter() - ptTranslation.x,
+			pEntNode->pos.Offset(pBody->GetPosition().x * GetPixelsPerMeter() - ptTranslation.x,
 								  pBody->GetPosition().y * GetPixelsPerMeter() - ptTranslation.y);
-			pBodyNode->rot.Offset(glm::degrees(pBody->GetAngle() - vRotations.z));
+			pEntNode->rot.Offset(glm::degrees(pBody->GetAngle() - vRotations.z));
 		}
 		
 		pBody = pBody->GetNext();

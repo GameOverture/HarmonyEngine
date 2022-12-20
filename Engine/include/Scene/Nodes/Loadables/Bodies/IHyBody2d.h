@@ -40,9 +40,6 @@ public:
 	HyAnimVec3						botColor;
 	HyAnimFloat						alpha;
 
-	HyShape2d						shape;					// A shape representing *this for collision and physics
-	HyPhysicsCtrl2d					physics;
-
 public:
 	IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
 	IHyBody2d(const IHyBody2d &copyRef);
@@ -63,8 +60,6 @@ public:
 	virtual void SetDisplayOrder(int32 iOrderValue);
 	virtual void ResetDisplayOrder();
 
-	bool IsMouseInBounds();
-
 	virtual const b2AABB &GetSceneAABB() = 0;
 	float GetSceneHeight();
 	float GetSceneWidth();
@@ -72,8 +67,6 @@ public:
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void Update() override;
-
-	virtual void OnShapeChanged() { }; // Optional override to indicate whenever IHyBody2d::shape gets modified
 
 	// Internal Entity propagation function overrides
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding);

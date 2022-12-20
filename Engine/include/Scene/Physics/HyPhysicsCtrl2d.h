@@ -13,19 +13,19 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyShape2d.h"
 
-class IHyBody2d;
+class HyEntity2d;
 
 class HyPhysicsCtrl2d
 {
 	friend class HyScene;
-	friend class IHyBody2d;
+	friend class HyEntity2d;
 
-	IHyBody2d &					m_NodeRef;
+	HyEntity2d &				m_EntityRef;
 	b2BodyDef *					m_pInit;	// Dynamically allocated when physics simulation is desired. Simulation will then start if/once owner of *this is a child of a HyPhysicsGrid2d.
 	b2Body *					m_pBody;	// A pointer to the concrete value in HyScene::m_NodeMap_Collision, nullptr otherwise
 
 public:
-	HyPhysicsCtrl2d(IHyBody2d &nodeRef);
+	HyPhysicsCtrl2d(HyEntity2d &entityRef);
 	~HyPhysicsCtrl2d();
 
 	void Activate();
@@ -66,9 +66,6 @@ public:
 	bool IsCcd() const;
 	void SetCcd(bool bContinuousCollisionDetection);
 
-	void AddShape(float fDensity);
-	void AddShape(HyShape2d &shapeRef, float fDensity);
-
 	glm::vec2 GridCenterMass() const;
 	glm::vec2 LocalCenterMass() const;
 	void ApplyForce(const glm::vec2 &vForce, const glm::vec2 &ptPoint, bool bWake);
@@ -79,9 +76,6 @@ public:
 	void ApplyAngularImpulse(float fImpulse, bool bWake);
 	float GetMass() const;
 	float GetInertia() const;
-
-private:
-	void Update();			// Should only be invoked by the parent HyPhysicsGrid2d
 };
 
 #endif /* HyPhysicsCtrl2d_h__ */

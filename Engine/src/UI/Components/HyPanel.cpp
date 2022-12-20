@@ -89,9 +89,9 @@ void HyPanel::Setup(const HyPanelInit &initRef, bool bIsContainer)
 	m_bIsContainer = bIsContainer;
 
 	m_SpritePanel.Uninit();
-	m_Frame1.shape.SetAsNothing();
-	m_Frame2.shape.SetAsNothing();
-	m_Panel.shape.SetAsNothing();
+	m_Frame1.SetAsNothing();
+	m_Frame2.SetAsNothing();
+	m_Panel.SetAsNothing();
 	
 	m_uiFrameSize = initRef.m_uiFrameSize;
 	m_ePanelType = initRef.m_ePanelType;
@@ -270,25 +270,25 @@ void HyPanel::SetFrameColor(HyColor color)
 
 void HyPanel::ConstructPrimitives()
 {
-	m_Panel.shape.SetAsBox(size.X() - (m_uiFrameSize * 2), size.Y() - (m_uiFrameSize * 2));
+	m_Panel.SetAsBox(size.X() - (m_uiFrameSize * 2), size.Y() - (m_uiFrameSize * 2));
 	m_Panel.pos.Set(static_cast<int32>(m_uiFrameSize), static_cast<int32>(m_uiFrameSize));
 
 	if(m_uiFrameSize > 0)
 	{
-		m_Frame1.shape.SetAsBox(size.X(), size.Y());
+		m_Frame1.SetAsBox(size.X(), size.Y());
 
 		uint32 uiHalfFrameSize = m_uiFrameSize / 3;
 		if(uiHalfFrameSize > 0)
 		{
-			m_Frame2.shape.SetAsBox(size.X() - (m_uiFrameSize * 2) + (uiHalfFrameSize * 2), size.Y() - (m_uiFrameSize * 2) + (uiHalfFrameSize * 2));
+			m_Frame2.SetAsBox(size.X() - (m_uiFrameSize * 2) + (uiHalfFrameSize * 2), size.Y() - (m_uiFrameSize * 2) + (uiHalfFrameSize * 2));
 			m_Frame2.pos.Set(static_cast<int32>(m_uiFrameSize - uiHalfFrameSize), static_cast<int32>(m_uiFrameSize - uiHalfFrameSize));
 		}
 		else
-			m_Frame2.shape.SetAsNothing();
+			m_Frame2.SetAsNothing();
 	}
 	else
 	{
-		m_Frame1.shape.SetAsNothing();
-		m_Frame2.shape.SetAsNothing();
+		m_Frame1.SetAsNothing();
+		m_Frame2.SetAsNothing();
 	}
 }

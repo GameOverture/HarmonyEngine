@@ -20,6 +20,7 @@ HyLayoutHandle HyUiContainer::sm_hLayoutHandleCounter = 1;
 
 HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
+	m_Shape(this),
 	m_bInputAllowed(true),
 	m_iDefaultWidgetSpacing(HYUICONTAINER_DefaultWidgetSpacing),
 	m_Panel(initRef, true, this),
@@ -69,7 +70,7 @@ glm::ivec2 HyUiContainer::GetSize()
 
 void HyUiContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
-	shape.SetAsBox(iNewWidth, iNewHeight);
+	m_Shape.SetAsBox(iNewWidth, iNewHeight);
 	m_Panel.size.Set(iNewWidth, iNewHeight);
 	m_RootLayout.SetLayoutDirty();
 }

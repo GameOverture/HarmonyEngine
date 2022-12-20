@@ -15,6 +15,8 @@
 
 class HyComboBox : public HyButton
 {
+	HyShape2d			m_Shape;
+
 protected:
 	enum ComboBoxAttributes
 	{

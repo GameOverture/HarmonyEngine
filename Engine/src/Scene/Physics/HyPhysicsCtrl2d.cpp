@@ -13,8 +13,8 @@
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyPhysicsCtrl2d::HyPhysicsCtrl2d(IHyBody2d &nodeRef) :
-	m_NodeRef(nodeRef),
+HyPhysicsCtrl2d::HyPhysicsCtrl2d(HyEntity2d &entityRef) :
+	m_EntityRef(entityRef),
 	m_pInit(nullptr),
 	m_pBody(nullptr)
 {
@@ -25,29 +25,18 @@ HyPhysicsCtrl2d::~HyPhysicsCtrl2d()
 	delete m_pInit;
 
 	if(m_pBody)
-		IHyNode::sm_pScene->RemoveNode_PhysBody(&m_NodeRef);
+		IHyNode::sm_pScene->RemoveNode_PhysBody(&m_EntityRef);
 }
 
 void HyPhysicsCtrl2d::Activate()
 {
-	IHyNode::sm_pScene->AddNode_PhysBody(&m_NodeRef, true);
+	IHyNode::sm_pScene->AddNode_PhysBody(&m_EntityRef);
 }
 
 void HyPhysicsCtrl2d::Deactivate()
 {
 	if(m_pBody)
 		m_pBody->SetEnabled(false);
-
-	//if(m_NodeRef.IsSimulating())
-	//{
-	//	HyAssert(m_NodeRef.ParentGet() && (m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid), "HyPhysicsCtrl2d::Uninit() - node didn't have proper parent");
-	//	if(m_NodeRef.ParentGet() && (m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid))
-	//		static_cast<HyPhysicsGrid2d *>(m_NodeRef.ParentGet())->UninitChildPhysics(m_NodeRef);
-
-	//	m_NodeRef.pos.GetAnimFloat(0).StopAnim();
-	//	m_NodeRef.pos.GetAnimFloat(1).StopAnim();
-	//	m_NodeRef.rot.StopAnim();
-	//}
 }
 
 bool HyPhysicsCtrl2d::IsActivated() const
@@ -97,7 +86,7 @@ void HyPhysicsCtrl2d::Setup(HyBodyType eType,
 		m_pBody->SetAngularDamping(fAngularDamping);
 		m_pBody->SetSleepingAllowed(bAllowSleep);
 		m_pBody->SetBullet(bIsCcd);
-		m_pBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
+		m_pBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(&m_EntityRef);
 
 		return;
 	}
@@ -116,7 +105,7 @@ void HyPhysicsCtrl2d::Setup(HyBodyType eType,
 	m_pInit->angularDamping = fAngularDamping;
 	m_pInit->allowSleep = bAllowSleep;
 	m_pInit->bullet = bIsCcd;
-	m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
+	m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(&m_EntityRef);
 }
 
 HyBodyType HyPhysicsCtrl2d::GetType() const
@@ -357,30 +346,6 @@ void HyPhysicsCtrl2d::SetCcd(bool bContinuousCollisionDetection)
 		def.bullet = bContinuousCollisionDetection;
 		Setup(def);
 	}
-}
-
-void HyPhysicsCtrl2d::AddShape(float fDensity)
-{
-	AddShape(m_NodeRef.shape, fDensity);
-}
-
-void HyPhysicsCtrl2d::AddShape(HyShape2d &shapeRef, float fDensity)
-{
-	// A Box2d Body needs to exist in order to create/attach fixtures.
-	if(m_pBody == nullptr)
-		IHyNode::sm_pScene->AddNode_PhysBody(&m_NodeRef, false);
-
-	// If 'shapeRef' is already being simulated by another body, first remove the connection
-	if(shapeRef.m_pFixture)
-	{
-		shapeRef.m_pFixture->GetBody()->DestroyFixture(shapeRef.m_pFixture);
-		shapeRef.m_pFixture = nullptr;
-	}
-	// ... and then set the density so it doesn't affect the previous body
-	shapeRef.SetDensity(fDensity);
-
-	// Finally register the connection between the body and fixture (shape)
-	shapeRef.RegisterBody(m_pBody);
 }
 
 glm::vec2 HyPhysicsCtrl2d::GridCenterMass() const

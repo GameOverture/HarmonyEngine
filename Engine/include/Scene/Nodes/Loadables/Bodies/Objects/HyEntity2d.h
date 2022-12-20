@@ -19,6 +19,7 @@ class HyEntity2d : public IHyBody2d
 
 protected:
 	std::vector<IHyNode2d *>				m_ChildList;
+	std::vector<HyShape2d *>				m_ShapeList;
 
 	enum Entity2dAttributes
 	{
@@ -30,6 +31,9 @@ protected:
 		ENT2DATTRIB_ReverseDisplayOrder		= 1 << 5,
 	};
 	uint32									m_uiEntAttribs;
+
+public:
+	HyPhysicsCtrl2d							physics;
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -87,9 +91,13 @@ public:
 	std::vector<IHyNode2d *> FindChildren(std::function<bool(IHyNode2d *)> func);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// MOUSE BUTTON INPUT
+	// MOUSE INPUT & SHAPES (hitboxes and/or collision)
 	void EnableMouseInput();
 	void DisableMouseInput();
+	bool IsMouseInBounds();
+	void ShapeAppend(HyShape2d &shapeRef);
+	bool ShapeRemove(HyShape2d &shapeRef);
+	uint32 ShapeCount() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DISPLAY ORDER
@@ -98,7 +106,7 @@ public:
 	int32 SetChildrenDisplayOrder(bool bOverrideExplicitChildren);
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// CHILDREN LOAD/UNLOAD
+	// LOAD/UNLOAD ALL CHILDREN
 	virtual void Load() override;
 	virtual void Unload() override;
 	
@@ -115,6 +123,9 @@ protected:
 	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override final;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override final;
+
+	void SyncPhysicsFixtures();
+	void SyncPhysicsBody();
 
 	// Optional user overrides below
 	virtual void OnUpdate() { }

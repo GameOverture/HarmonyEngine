@@ -76,8 +76,8 @@ public:
 	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
 	void CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut);
 
-	void AddNode_PhysBody(IHyBody2d *pBody, bool bActivate);
-	void RemoveNode_PhysBody(IHyBody2d *pBody);
+	void AddNode_PhysBody(HyEntity2d *pEntity);
+	void RemoveNode_PhysBody(HyEntity2d *pEntity);
 	bool IsPhysicsUpdating() const;
 
 	void ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType);
