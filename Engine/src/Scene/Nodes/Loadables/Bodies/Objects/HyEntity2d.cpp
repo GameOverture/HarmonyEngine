@@ -703,8 +703,6 @@ void HyEntity2d::SyncPhysicsBody()
 
 	float fPpmInverse = sm_pScene->GetPpmInverse();
 	physics.m_pBody->SetTransform(b2Vec2(ptTranslation.x * fPpmInverse, ptTranslation.y * fPpmInverse), vRotations.z);
-	physics.m_pBody->SetLinearVelocity(b2Vec2(0, 0));
-	physics.m_pBody->SetAngularVelocity(0.0f);
 	physics.m_pBody->SetAwake(true);
 }
 
