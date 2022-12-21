@@ -290,6 +290,11 @@ void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	ShapeChanged();
 }
 
+void HyShape2d::SetAsLineLoop(const std::vector<glm::vec2> &verticesList)
+{
+	SetAsLineLoop(verticesList.data(), static_cast<uint32>(verticesList.size()));
+}
+
 void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 {
 	HyAssert(uiNumVerts >= 2, "HyShape2d::SetAsLineChain - not enough verts. Must be >= 2");
@@ -304,6 +309,11 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
 
 	ShapeChanged();
+}
+
+void HyShape2d::SetAsLineChain(const std::vector<glm::vec2> &verticesList)
+{
+	SetAsLineChain(verticesList.data(), static_cast<uint32>(verticesList.size()));
 }
 
 bool HyShape2d::SetAsCircle(float fRadius)
@@ -437,16 +447,16 @@ void HyShape2d::SetDensity(float fDensity)
 	}
 }
 
-bool HyShape2d::SetDensityInKg(float fWeightKg)
+void HyShape2d::SetDensityInKg(float fWeightKg)
 {
 	if(IsValidShape() == false || fWeightKg < 0.0f)
-		return false;
+		fWeightKg = 0.0f;
 
 	float fAreaMetersSq = CalcArea();
 	if(fAreaMetersSq <= 0.0f)
-		return false;
-
-	SetDensity(fWeightKg / fAreaMetersSq);
+		SetDensity(0.0f);
+	else
+		SetDensity(fWeightKg / fAreaMetersSq);
 }
 
 float HyShape2d::GetFriction() const

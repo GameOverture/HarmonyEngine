@@ -37,6 +37,8 @@ public:
 
 	const HyPrimitive2d &operator=(const HyPrimitive2d &rhs);
 
+	HyShapeType GetShapeType() const;
+
 	void SetAsNothing();
 
 	// Set as an isolated edge.
@@ -46,10 +48,12 @@ public:
 	// Set as a line loop. This automatically connects last vertex to the first.
 	// Passed in parameters are copied, and understood to be local coordinates
 	void SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts);
+	void SetAsLineLoop(const std::vector<glm::vec2> &verticesList);
 
 	// Set as a line chain with isolated end vertices. Passed in parameters are 
 	// copied, and understood to be local coordinates
 	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts);
+	void SetAsLineChain(const std::vector<glm::vec2> &verticesList);
 
 	// Set as a circle with the specified center and radius
 	void SetAsCircle(float fRadius);

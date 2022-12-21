@@ -59,6 +59,11 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	return *this;
 }
 
+HyShapeType HyPrimitive2d::GetShapeType() const
+{
+	return m_Shape.GetType();
+}
+
 void HyPrimitive2d::SetAsNothing()
 {
 	m_Shape.SetAsNothing();
@@ -83,9 +88,21 @@ void HyPrimitive2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	AssembleData();
 }
 
+void HyPrimitive2d::SetAsLineLoop(const std::vector<glm::vec2> &verticesList)
+{
+	m_Shape.SetAsLineLoop(verticesList);
+	AssembleData();
+}
+
 void HyPrimitive2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 {
 	m_Shape.SetAsLineChain(pVertices, uiNumVerts);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsLineChain(const std::vector<glm::vec2> &verticesList)
+{
+	m_Shape.SetAsLineChain(verticesList);
 	AssembleData();
 }
 

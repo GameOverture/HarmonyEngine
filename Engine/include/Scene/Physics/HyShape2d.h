@@ -71,10 +71,12 @@ public:
 	// Set as a line loop. This automatically connects last vertex to the first.
 	// Passed in parameters are copied, and understood to be local coordinates
 	void SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts);
+	void SetAsLineLoop(const std::vector<glm::vec2> &verticesList);
 
 	// Set as a line chain with isolated end vertices. Passed in parameters are 
 	// copied, and understood to be local coordinates
 	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts);
+	void SetAsLineChain(const std::vector<glm::vec2> &verticesList);
 
 	// Set as a circle with the specified center and radius
 	bool SetAsCircle(float fRadius);
@@ -101,7 +103,7 @@ public:
 	// Applies when attached to a physics body
 	float GetDensity() const;
 	void SetDensity(float fDensity); // Usually in kg / m ^ 2.
-	bool SetDensityInKg(float fWeightKg); // Sets the density using the "weight" of currently set shape. Returns if valid/successful
+	void SetDensityInKg(float fWeightKg); // Sets the density using the "weight" of currently set shape. Returns if valid/successful
 	float GetFriction() const;
 	void SetFriction(float fFriction);
 	float GetRestitution() const;

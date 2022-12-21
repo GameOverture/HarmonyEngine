@@ -38,13 +38,13 @@ class EntityDraw : public IDraw
 		{
 			//m_Box.shape = nodeRef.GetLocalBoundingVolume();
 			m_Box.SetLineThickness(fLineThickness);
-			HyAssert(m_Box.shape.GetType() == HYSHAPE_Polygon && static_cast<const b2PolygonShape *>(m_Box.shape.GetB2Shape())->m_count == 4, "TransformWidget got a shape that wasn't a box polygon");
+			//HyAssert(m_Box.GetShapeType() == HYSHAPE_Polygon && static_cast<const b2PolygonShape *>(m_Box.shape.GetB2Shape())->m_count == 4, "TransformWidget got a shape that wasn't a box polygon");
 
 			for(uint i = 0; i < 4; ++i)
 			{
-				const b2PolygonShape *pB2Shape = static_cast<const b2PolygonShape *>(m_Box.shape.GetB2Shape());
-				m_GrabOutline[i].pos.Set(pB2Shape->m_vertices[i].x, pB2Shape->m_vertices[i].y);
-				m_GrabFill[i].pos.Set(pB2Shape->m_vertices[i].x, pB2Shape->m_vertices[i].y);
+				//const b2PolygonShape *pB2Shape = static_cast<const b2PolygonShape *>(m_Box.GetB2Shape());
+				//m_GrabOutline[i].pos.Set(pB2Shape->m_vertices[i].x, pB2Shape->m_vertices[i].y);
+				//m_GrabFill[i].pos.Set(pB2Shape->m_vertices[i].x, pB2Shape->m_vertices[i].y);
 			}
 		}
 	};

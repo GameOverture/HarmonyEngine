@@ -84,7 +84,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 	m_vDIMENSIONS(fWidth, fHeight),
 	m_fGridSize(fGridSize)
 {
-	shape.SetAsBox(m_vDIMENSIONS.x, m_vDIMENSIONS.y);
+	SetAsBox(m_vDIMENSIONS.x, m_vDIMENSIONS.y);
 	pos.Set(m_vDIMENSIONS.x * -0.5f, m_vDIMENSIONS.y * -0.5f);
 }
 
@@ -197,7 +197,7 @@ ProjectDraw::ProjectDraw() :
 	m_OriginHorz.SetLineThickness(2.0f);
 	m_OriginHorz.SetTint(HyColor::White);
 	m_OriginHorz.SetVisible(false);
-	m_OriginHorz.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+	m_OriginHorz.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 
 	lineList[0].x = 0.0f;
 	lineList[0].y = -fDIMENSION_SIZE * 0.5f;
@@ -206,7 +206,7 @@ ProjectDraw::ProjectDraw() :
 	m_OriginVert.SetLineThickness(2.0f);
 	m_OriginVert.SetTint(HyColor::White);
 	m_OriginVert.SetVisible(false);
-	m_OriginVert.shape.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+	m_OriginVert.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
 
 	ChildAppend(m_OriginHorz);
 	ChildAppend(m_OriginVert);
