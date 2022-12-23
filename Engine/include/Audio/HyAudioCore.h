@@ -14,6 +14,12 @@
 #include "Assets/Files/HyFileAudio.h"
 #include "Scene/Nodes/IHyNode.h"
 #include "Utilities/HyJson.h"
+
+#define HY_DEFAULT_SAMPLE_RATE 48000
+
+#ifdef HY_USE_SDL2_AUDIO
+	#define MA_NO_DEVICE_IO // Disables the ma_device API. SDL will provide the backend
+#endif
 #include "vendor/miniaudio/miniaudio.h"
 
 enum HySoundCue
@@ -67,7 +73,10 @@ class HyAudioCore
 	ma_device_config								m_DevConfig;
 	ma_device										m_Device;
 
-	ma_engine_config								m_EngConfig;
+#ifdef HY_USE_SDL2_AUDIO
+	SDL_AudioDeviceID								m_SdlDeviceId;
+#endif
+
 	ma_engine										m_Engine;
 
 	ma_resource_manager_config						m_ResConfig;
@@ -101,6 +110,10 @@ protected:
 	void ManipSound(PlayInfo &playInfoRef);
 
 	static void DataCallback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount);
+
+#ifdef HY_USE_SDL2_AUDIO
+	friend void SdlDataCallback(void *pUserData, Uint8 *pBuffer, int bufferSizeInBytes);
+#endif
 };
 
 #endif /* HyAudioCore_h__ */

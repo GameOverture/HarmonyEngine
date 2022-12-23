@@ -68,7 +68,7 @@ void HyProgressBar::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 	if(m_pBar && m_pBar->GetType() == HYTYPE_Primitive)
 	{
 		glm::vec2 vTotalFillArea(m_Panel.size.X() - (m_vBarOffset.x * 2.0f), m_Panel.size.Y() - (m_vBarOffset.y * 2.0f));
-		static_cast<HyPrimitive2d *>(m_pBar)->shape.SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
+		static_cast<HyPrimitive2d *>(m_pBar)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
 	}
 
 	AdjustProgress();
@@ -153,7 +153,7 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 		m_pBar = HY_NEW HyPrimitive2d();
 
 		glm::vec2 vTotalFillArea(m_Panel.size.X() - (m_vBarOffset.x * 2.0f), m_Panel.size.Y() - (m_vBarOffset.y * 2.0f));
-		static_cast<HyPrimitive2d *>(m_pBar)->shape.SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
+		static_cast<HyPrimitive2d *>(m_pBar)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
 	}
 	m_pBar->Load();
 	ChildInsert(m_Text, *m_pBar);

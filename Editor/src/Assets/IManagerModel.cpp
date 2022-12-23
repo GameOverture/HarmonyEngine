@@ -39,6 +39,7 @@ IManagerModel::IManagerModel(Project &projRef, AssetType eAssetType) :
 // Init() exists because we need to construct using virtual functions (or after derived ctor initialization)
 void IManagerModel::Init()
 {
+	// Ensure proper data directories exist
 	if(m_MetaDir.exists() == false)
 	{
 		HyGuiLog(HyGlobal::AssetName(m_eASSET_TYPE) % " meta directory is missing, recreating", LOGTYPE_Info);
@@ -50,6 +51,7 @@ void IManagerModel::Init()
 		m_DataDir.mkpath(m_DataDir.absolutePath());
 	}
 
+	// Read this manager's banks and assets from existing file, or create a new default bank
 	QFile settingsFile(m_MetaDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt));
 	if(settingsFile.exists())
 	{

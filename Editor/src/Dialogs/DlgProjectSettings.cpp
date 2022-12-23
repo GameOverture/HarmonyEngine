@@ -25,8 +25,12 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 	ui->setupUi(this);
 
 	QJsonObject projSettingsObj = m_ProjectRef.GetSettingsObj();
+	HarmonyInit defaultVals;
 
-	ui->txtTitleName->setText(projSettingsObj["Title"].toString());
+	if(projSettingsObj.contains("Title"))
+		ui->txtTitleName->setText(projSettingsObj["Title"].toString());
+	else
+		ui->txtTitleName->setText(defaultVals.sGameName.c_str());
 
 	ui->wgtDataDir->Setup("Assets", "data", m_ProjectRef.GetAbsPath(), m_ProjectRef.GetAssetsRelPath());
 	ui->wgtMetaDir->Setup("Meta-Data", "meta", m_ProjectRef.GetAbsPath(), m_ProjectRef.GetMetaRelPath());
@@ -40,12 +44,49 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 	connect(ui->wgtBuildDir, &WgtMakeRelDir::OnDirty, this, &DlgProjectSettings::ErrorCheck);
 	ErrorCheck();
 
-	ui->sbUpdatePerSec->setValue(projSettingsObj["UpdatesPerSec"].toInt());
-	ui->chkVSync->setChecked(projSettingsObj["VSync"].toBool());
-	ui->chkShowCursor->setChecked(projSettingsObj["ShowCursor"].toBool());
-	ui->sbInputMaps->setValue(projSettingsObj["NumInputMaps"].toInt());
+	if(projSettingsObj.contains("UpdatesPerSec"))
+		ui->sbUpdatePerSec->setValue(projSettingsObj["UpdatesPerSec"].toInt());
+	else
+		ui->sbUpdatePerSec->setValue(defaultVals.uiUpdatesPerSec);
 
-	ui->grpConsoleWindow->setChecked(projSettingsObj["UseConsole"].toBool());
+	if(projSettingsObj.contains("VSync"))
+		ui->chkVSync->setChecked(projSettingsObj["VSync"].toBool());
+	else
+		ui->chkVSync->setChecked(defaultVals.iVSync);
+
+	if(projSettingsObj.contains("ShowCursor"))
+		ui->chkShowCursor->setChecked(projSettingsObj["ShowCursor"].toBool());
+	else
+		ui->chkShowCursor->setChecked(defaultVals.bShowCursor);
+
+	if(projSettingsObj.contains("NumInputMaps"))
+		ui->sbInputMaps->setValue(projSettingsObj["NumInputMaps"].toInt());
+	else
+		ui->sbInputMaps->setValue(defaultVals.uiNumInputMaps);
+
+	ui->wgtGravity2d->Init(SPINBOXTYPE_Double2d, QVariant(-100.0), QVariant(100.0));
+	QVariant vGravity2d;
+	if(projSettingsObj.contains("Gravity2d"))
+	{
+		vGravity2d.setValue(QPointF(projSettingsObj["Gravity2d"].toArray().at(0).toDouble(),
+									projSettingsObj["Gravity2d"].toArray().at(1).toDouble()));
+	}
+	else
+	{
+		vGravity2d.setValue(QPointF(defaultVals.vGravity2d.x,
+									defaultVals.vGravity2d.y));
+	}
+	ui->wgtGravity2d->SetValue(vGravity2d);
+
+	if(projSettingsObj.contains("PixelsPerMeter"))
+		ui->sbPixelsPerMeter->setValue(projSettingsObj["PixelsPerMeter"].toDouble());
+	else
+		ui->sbPixelsPerMeter->setValue(defaultVals.fPixelsPerMeter);
+
+	if(projSettingsObj.contains("UseConsole"))
+		ui->grpConsoleWindow->setChecked(projSettingsObj["UseConsole"].toBool());
+	else
+		ui->grpConsoleWindow->setChecked(defaultVals.bUseConsole);
 
 	setWindowTitle(m_ProjectRef.GetTitle() % " Settings");
 	setWindowIcon(HyGlobal::ItemIcon(ITEM_Project, SUBICON_Settings));

@@ -36,6 +36,8 @@ public:
 	WidgetVectorSpinBox(SpinBoxType eSpinBoxType, QWidget *parent = nullptr);
 	virtual ~WidgetVectorSpinBox();
 
+	void Init(SpinBoxType eSpinBoxType, QVariant minValue, QVariant maxValue); // Required when using default ctor
+
 	QVariant GetValue();
 	void SetValue(QVariant data);
 

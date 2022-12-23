@@ -130,6 +130,12 @@ void DlgNewProject::on_buttonBox_accepted()
 	jsonObj.insert("NumInputMaps", static_cast<qint64>(hyInit.uiNumInputMaps));
 	jsonObj.insert("ShowCursor", hyInit.bShowCursor);
 
+	QJsonArray gravity2dArray;
+	gravity2dArray.append(hyInit.vGravity2d.x);
+	gravity2dArray.append(hyInit.vGravity2d.y);
+	jsonObj.insert("Gravity2d", gravity2dArray);
+	jsonObj.insert("PixelsPerMeter", hyInit.fPixelsPerMeter);
+
 	QJsonArray windowInfoArray;
 	QJsonObject windowInfoObj;
 	windowInfoObj.insert("Name", ui->txtTitleName->text());

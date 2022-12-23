@@ -12,11 +12,9 @@
 
 #include "Afx/HyStdAfx.h"
 
-class IHyBody2d;
-
 enum HyShapeType
 {
-	HYSHAPE_Unknown = -1,
+	HYSHAPE_Nothing = -1,
 
 	HYSHAPE_LineSegment = 0,
 	HYSHAPE_LineChain,
@@ -27,31 +25,42 @@ enum HyShapeType
 	HYNUM_SHAPE
 };
 
+class HyEntity2d;
+
 class HyShape2d
 {
-	friend class IHyBody2d; // In order to invoke IHyBody2d::ShapeChanged()
+	friend class HyEntity2d;
+	friend class HyPrimitive2d;
+	friend class HyPhysicsCtrl2d;
+	friend class HyBox2dDestructListener;
 
 	HyShapeType									m_eType;
-	b2Shape *									m_pShape;
+	HyEntity2d *								m_pParent;
 
-	IHyBody2d *									m_pRegisteredBodyShape;	// This only gets set by the shape owned by IHyBody2d in order to properly call IHyBody2d::ShapeChanged()
+	b2Shape *									m_pShape;
+	b2FixtureDef *								m_pInit;
+	b2Fixture *									m_pFixture;
+	bool										m_bFixtureDirty;
 
 public:
 	static const float							FloatSlop;
 
-	HyShape2d();
-	HyShape2d(const HyShape2d &copyRef);
+	HyShape2d(HyEntity2d *pParent = nullptr);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
 
 	HyShapeType GetType() const;
+	bool IsValidShape() const;
+
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
+	float CalcArea() const; // Returns the area in meters squared
 	
 	const b2Shape *GetB2Shape() const;
 	b2Shape *ClonePpmShape(float fPpmInverse) const;
 
-	bool IsValidShape() const;
+	void ParentDetach();
+	HyEntity2d *ParentGet() const;
 
 	void SetAsNothing();
 
@@ -62,10 +71,12 @@ public:
 	// Set as a line loop. This automatically connects last vertex to the first.
 	// Passed in parameters are copied, and understood to be local coordinates
 	void SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts);
+	void SetAsLineLoop(const std::vector<glm::vec2> &verticesList);
 
 	// Set as a line chain with isolated end vertices. Passed in parameters are 
 	// copied, and understood to be local coordinates
 	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts);
+	void SetAsLineChain(const std::vector<glm::vec2> &verticesList);
 
 	// Set as a circle with the specified center and radius
 	bool SetAsCircle(float fRadius);
@@ -89,6 +100,22 @@ public:
 	// fRot the rotation of the box in local coordinates.
 	bool SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
+	// Applies when attached to a physics body
+	void Setup(const b2FixtureDef &fixtureDefRef);
+	float GetDensity() const;
+	void SetDensity(float fDensity); // Usually in kg / m ^ 2.
+	void SetDensityInKg(float fWeightKg); // Sets the density using the "weight" of currently set shape. Returns if valid/successful
+	float GetFriction() const;
+	void SetFriction(float fFriction);
+	float GetRestitution() const;
+	void SetRestitution(float fRestitution);
+	float GetRestitutionThreshold() const;
+	void SetRestitutionThreshold(float fRestitutionThreshold);
+	b2Filter GetFilter() const;
+	void SetFilter(const b2Filter &filter);
+	bool IsSensor() const;
+	void SetSensor(bool bIsSensor);
+
 	bool TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const;
 	//bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;
 
@@ -97,7 +124,11 @@ public:
 protected:
 	b2Shape *CloneTransform(const glm::mat4 &mtxTransform) const;
 
-	void RegisterBody(IHyBody2d *pBody);
+	void CreateFixture(b2Body *pBody);
+	void DestroyFixture();
+	
+	void ShapeChanged();
+	bool IsFixtureDirty();
 };
 
 #endif /* HyShape2d_h__ */

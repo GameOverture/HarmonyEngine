@@ -20,11 +20,16 @@
 #undef STB_VORBIS_HEADER_ONLY
 #include "vendor/stb/stb_vorbis.c"
 
+#ifdef HY_USE_SDL2_AUDIO
+	extern void SdlDataCallback(void *pUserData, Uint8 *pBuffer, int bufferSizeInBytes);
+#endif
+
 HyAudioCore::HyAudioCore() :
 	m_uiHotLoadCount(1)
 {
 #ifndef HY_PLATFORM_GUI
 	// Device
+	// 
 	//m_DevConfig = ma_device_config_init(ma_device_type_playback);
 	////m_DevConfig.playback.pDeviceID = &pPlaybackInfos[chosenPlaybackDeviceIndex].id;
 	//m_DevConfig.playback.format = ma_format_s16;	// Set to ma_format_unknown to use the device's native format.
@@ -62,17 +67,46 @@ HyAudioCore::HyAudioCore() :
 	//}
 
 	// Engine
-	m_EngConfig = ma_engine_config_init();
+	ma_engine_config engConfig;
+	engConfig = ma_engine_config_init();
+
+	#ifdef HY_USE_SDL2_AUDIO
+		engConfig.noDevice = MA_TRUE;
+		engConfig.channels = 2;							// Must be set when not using a device.
+		engConfig.sampleRate = HY_DEFAULT_SAMPLE_RATE;	// Must be set when not using a device.
+	#endif
 	//m_EngConfig.pResourceManager = &m_ResourceManager;
 	//m_EngConfig.pDevice = &m_Device;
 
-	eResult = ma_engine_init(&m_EngConfig, &m_Engine);
+	eResult = ma_engine_init(&engConfig, &m_Engine);
 	if(eResult != MA_SUCCESS)
 	{
 		HyLogError("HyAudioCore_miniaudio failed: " << eResult);  // Failed to initialize the engine.
 		return;
 	}
-#endif
+
+	#ifdef HY_USE_SDL2_AUDIO
+		SDL_AudioSpec desiredSpec;
+		MA_ZERO_OBJECT(&desiredSpec);
+		desiredSpec.freq = ma_engine_get_sample_rate(&m_Engine);
+		desiredSpec.format = AUDIO_F32;
+		desiredSpec.channels = ma_engine_get_channels(&m_Engine);
+		desiredSpec.samples = 512;
+		desiredSpec.callback = SdlDataCallback;
+		desiredSpec.userdata = this;
+
+		SDL_AudioSpec obtainedSpec;
+		m_SdlDeviceId = SDL_OpenAudioDevice(nullptr, 0, &desiredSpec, &obtainedSpec, SDL_AUDIO_ALLOW_ANY_CHANGE);
+		if(m_SdlDeviceId == 0)
+		{
+			HyLogError("Failed to open SDL audio device.");
+			return;
+		}
+		SDL_PauseAudioDevice(m_SdlDeviceId, 0); // Start playback
+
+	#endif // HY_USE_SDL2_AUDIO
+
+#endif // HY_PLATFORM_GUI
 }
 
 /*virtual*/ HyAudioCore::~HyAudioCore(void)
@@ -83,6 +117,10 @@ HyAudioCore::HyAudioCore() :
 #ifndef HY_PLATFORM_GUI
 	//ma_device_uninit(&m_Device);
 	ma_engine_uninit(&m_Engine);
+#endif
+
+#ifdef HY_USE_SDL2_AUDIO
+	SDL_CloseAudioDevice(m_SdlDeviceId);
 #endif
 }
 
@@ -402,3 +440,15 @@ void HyAudioCore::ManipSound(PlayInfo &playInfoRef)
 	HyAudioCore *pThis = reinterpret_cast<HyAudioCore *>(pDevice->pUserData);
 	ma_engine_read_pcm_frames(&pThis->m_Engine, pOutput, frameCount, nullptr);
 }
+
+// Data Callbacks
+#ifdef HY_USE_SDL2_AUDIO
+	/*friend*/ void SdlDataCallback(void *pUserData, Uint8 *pBuffer, int bufferSizeInBytes)
+	{
+		HyAudioCore *pThis = reinterpret_cast<HyAudioCore *>(pUserData);
+
+		// Reading for SDL is just a matter of reading straight from the engine.
+		ma_uint32 bufferSizeInFrames = (ma_uint32)bufferSizeInBytes / ma_get_bytes_per_frame(ma_format_f32, ma_engine_get_channels(&pThis->m_Engine));
+		ma_engine_read_pcm_frames(&pThis->m_Engine, pBuffer, bufferSizeInFrames, NULL);
+	}
+#endif

@@ -118,17 +118,26 @@ void HyDiagnostics::Init(std::string sTextPrefix, std::string sTextName, uint32 
 
 void HyDiagnostics::Show(uint32 uiDiagFlags)
 {
-	if(uiDiagFlags == HYDIAG_NONE)
+	if(uiDiagFlags & HYDIAG_PHYSICS)
 	{
-		m_fpBeginFrame = []() {};
-		m_fpBeginUpdate = []() {};
-		m_fpBeginRenderPrep = []() {};
-		m_fpBeginRender = []() {};
+		uint32 uiBox2dFlags = 0;
+		if(uiDiagFlags & HYDIAG_PhysShapes)
+			uiBox2dFlags |= b2Draw::e_shapeBit;
+		if(uiDiagFlags & HYDIAG_PhysJoints)
+			uiBox2dFlags |= b2Draw::e_jointBit;
+		if(uiDiagFlags & HYDIAG_PhysAabb)
+			uiBox2dFlags |= b2Draw::e_aabbBit;
+		if(uiDiagFlags & HYDIAG_PhysPairs)
+			uiBox2dFlags |= b2Draw::e_pairBit;
+		if(uiDiagFlags & HYDIAG_PhysCenterOfMass)
+			uiBox2dFlags |= b2Draw::e_centerOfMassBit;
 
-		if(m_pProfiler)
-			m_pProfiler->SetVisible(false);
+		m_SceneRef.SetPhysicsDrawFlags(uiBox2dFlags);
 	}
 	else
+		m_SceneRef.SetPhysicsDrawFlags(0);
+
+	if(uiDiagFlags & (HYDIAG_FRAMERATE | HYDIAG_GRAPH))
 	{
 		HyAssert(m_pProfiler, "HyDiagnostics::Init was not invoked before HyDiagnostics::Show");
 
@@ -139,6 +148,16 @@ void HyDiagnostics::Show(uint32 uiDiagFlags)
 
 		m_pProfiler->SetVisible(true);
 		m_pProfiler->SetSize(static_cast<int32>(HyEngine::Window().GetWidthF(0.33f)), HyEngine::Window().GetHeight());
+	}
+	else
+	{
+		m_fpBeginFrame = []() {};
+		m_fpBeginUpdate = []() {};
+		m_fpBeginRenderPrep = []() {};
+		m_fpBeginRender = []() {};
+
+		if(m_pProfiler)
+			m_pProfiler->SetVisible(false);
 	}
 	
 	if(m_pProfiler)

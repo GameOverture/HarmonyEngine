@@ -92,7 +92,7 @@ protected:
 		float fXPos = 0.0f;
 		for(uint32 i = 0; i < NUM_PORTIONS; ++i)
 		{
-			m_PortionList[i].m_Bar.shape.SetAsBox(m_fWidth * static_cast<float>(m_PortionList[i].m_dDuration / dTotal), m_fHEIGHT);
+			m_PortionList[i].m_Bar.SetAsBox(m_fWidth * static_cast<float>(m_PortionList[i].m_dDuration / dTotal), m_fHEIGHT);
 			m_PortionList[i].m_Bar.pos.Set(fXPos, 0.0f);
 			fXPos += m_PortionList[i].m_Bar.GetSceneWidth();
 		}

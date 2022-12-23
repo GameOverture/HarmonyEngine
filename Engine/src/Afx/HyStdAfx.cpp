@@ -119,6 +119,9 @@ HarmonyInit::HarmonyInit()
 		windowInfo[i].ptLocation.y = 80;
 	}
 
+	vGravity2d = glm::vec2(0.0f, -10.0);
+	fPixelsPerMeter = 50.0f;
+
 	bUseConsole = false;
 	consoleInfo.sName = "Harmony Log Console";
 	consoleInfo.eMode = HYWINDOW_WindowedSizeable;
@@ -191,6 +194,17 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		bShowCursor = projDoc["ShowCursor"].GetBool();
 	else
 		bShowCursor = defaultVals.bShowCursor;
+	if(projDoc.HasMember("Gravity2d"))
+	{
+		vGravity2d.x = projDoc["Gravity2d"].GetArray()[0].GetFloat();
+		vGravity2d.y = projDoc["Gravity2d"].GetArray()[1].GetFloat();
+	}
+	else
+		vGravity2d = defaultVals.vGravity2d;
+	if(projDoc.HasMember("PixelsPerMeter"))
+		fPixelsPerMeter = projDoc["PixelsPerMeter"].GetFloat();
+	else
+		fPixelsPerMeter = defaultVals.fPixelsPerMeter;
 
 	uiNumWindows = defaultVals.uiNumWindows;
 	for(uint32 i = 0; i < HY_MAXWINDOWS; ++i)

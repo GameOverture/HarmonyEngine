@@ -57,6 +57,13 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
+       <widget class="QCheckBox" name="chkUseSdlAudio">
+        <property name="text">
+         <string>Use SDL for audio backend</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="chkUseSdlNet">
         <property name="text">
          <string>Use SDL_NET for networking sockets</string>

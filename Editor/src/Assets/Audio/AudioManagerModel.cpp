@@ -81,7 +81,7 @@ AudioManagerModel::AudioManagerModel(Project &projRef) :
 	m_DesiredRawFormat.setCodec("audio/wav"); // also consider "audio/x-raw" or "audio/pcm"
 	m_DesiredRawFormat.setSampleType(QAudioFormat::SignedInt);
 	m_DesiredRawFormat.setSampleSize(16);
-	m_DesiredRawFormat.setSampleRate(48000);
+	m_DesiredRawFormat.setSampleRate(HY_DEFAULT_SAMPLE_RATE);
 }
 
 /*virtual*/ AudioManagerModel::~AudioManagerModel()

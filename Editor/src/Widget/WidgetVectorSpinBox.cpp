@@ -17,8 +17,8 @@ WidgetVectorSpinBox::WidgetVectorSpinBox(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	// NOTE: THIS CONSTRUCTOR IS INVALID TO USE. IT EXISTS FOR QT TO ALLOW Q_OBJECT TO WORK
-	HyGuiLog("WidgetVectorSpinBox::WidgetVectorSpinBox() invalid constructor used", LOGTYPE_Error);
+	// NOTE: WHEN THIS CONSTRUCTOR IS USED. Init() MUST BE CALLED
+	//HyGuiLog("WidgetVectorSpinBox::WidgetVectorSpinBox() invalid constructor used", LOGTYPE_Error);
 }
 
 WidgetVectorSpinBox::WidgetVectorSpinBox(SpinBoxType eSpinBoxType, QWidget *parent /*= nullptr*/) :
@@ -33,6 +33,71 @@ WidgetVectorSpinBox::WidgetVectorSpinBox(SpinBoxType eSpinBoxType, QWidget *pare
 /*virtual*/ WidgetVectorSpinBox::~WidgetVectorSpinBox()
 {
 	delete ui;
+}
+
+void WidgetVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVariant maxValue)
+{
+	ui->stackedWidget->setCurrentIndex(eSpinBoxType);
+	switch(eSpinBoxType)
+	{
+	case SPINBOXTYPE_Int2d:
+		ui->intSpinBoxX->setMinimum(minValue.toInt());
+		ui->intSpinBoxY->setMinimum(minValue.toInt());
+		ui->intSpinBoxX->setMaximum(maxValue.toInt());
+		ui->intSpinBoxY->setMaximum(maxValue.toInt());
+		break;
+
+	case SPINBOXTYPE_Double2d:
+		ui->doubleSpinBoxX->setMinimum(minValue.toDouble());
+		ui->doubleSpinBoxY->setMinimum(minValue.toDouble());
+		ui->doubleSpinBoxX->setMaximum(maxValue.toDouble());
+		ui->doubleSpinBoxY->setMaximum(maxValue.toDouble());
+		break;
+
+	case SPINBOXTYPE_Int3d:
+		ui->intSpinBox3dX->setMinimum(minValue.toInt());
+		ui->intSpinBox3dY->setMinimum(minValue.toInt());
+		ui->intSpinBox3dZ->setMinimum(minValue.toInt());
+		ui->intSpinBox3dX->setMaximum(maxValue.toInt());
+		ui->intSpinBox3dY->setMaximum(maxValue.toInt());
+		ui->intSpinBox3dZ->setMaximum(maxValue.toInt());
+		break;
+
+	case SPINBOXTYPE_Double3d:
+		ui->doubleSpinBox3dX->setMinimum(minValue.toDouble());
+		ui->doubleSpinBox3dY->setMinimum(minValue.toDouble());
+		ui->doubleSpinBox3dZ->setMinimum(minValue.toDouble());
+		ui->doubleSpinBox3dX->setMaximum(maxValue.toDouble());
+		ui->doubleSpinBox3dY->setMaximum(maxValue.toDouble());
+		ui->doubleSpinBox3dZ->setMaximum(maxValue.toDouble());
+		break;
+
+	case SPINBOXTYPE_Int4d:
+		ui->intSpinBox4dX->setMinimum(minValue.toInt());
+		ui->intSpinBox4dY->setMinimum(minValue.toInt());
+		ui->intSpinBox4dZ->setMinimum(minValue.toInt());
+		ui->intSpinBox4dW->setMinimum(minValue.toInt());
+		ui->intSpinBox4dX->setMaximum(maxValue.toInt());
+		ui->intSpinBox4dY->setMaximum(maxValue.toInt());
+		ui->intSpinBox4dZ->setMaximum(maxValue.toInt());
+		ui->intSpinBox4dW->setMaximum(maxValue.toInt());
+		break;
+
+	case SPINBOXTYPE_Double4d:
+		ui->doubleSpinBox4dX->setMinimum(minValue.toDouble());
+		ui->doubleSpinBox4dY->setMinimum(minValue.toDouble());
+		ui->doubleSpinBox4dZ->setMinimum(minValue.toDouble());
+		ui->doubleSpinBox4dW->setMinimum(minValue.toDouble());
+		ui->doubleSpinBox4dX->setMaximum(maxValue.toDouble());
+		ui->doubleSpinBox4dY->setMaximum(maxValue.toDouble());
+		ui->doubleSpinBox4dZ->setMaximum(maxValue.toDouble());
+		ui->doubleSpinBox4dW->setMaximum(maxValue.toDouble());
+		break;
+
+	default:
+		HyGuiLog("Unknown WidgetVectorSpinBox type: " % QString::number(eSpinBoxType), LOGTYPE_Error);
+		break;
+	}
 }
 
 QVariant WidgetVectorSpinBox::GetValue()

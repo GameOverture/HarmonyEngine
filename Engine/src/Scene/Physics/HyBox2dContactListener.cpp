@@ -1,41 +1,48 @@
 /**************************************************************************
- *	HyBox2dRuntime.cpp
- *	
+ *	HyBox2dContactListener.cpp
+ *
  *	Harmony Engine
- *	Copyright (c) 2013 Jason Knobler
+ *	Copyright (c) 2022 Jason Knobler
  *
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Scene/Physics/HyBox2dRuntime.h"
+#include "Scene/HyScene.h"
+#include "Scene/Physics/HyBox2dContactListener.h"
+#include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 
-HyBox2dRuntime::HyBox2dRuntime(void)
+HyBox2dContactListener::HyBox2dContactListener(HyScene &sceneRef) :
+	m_SceneRef(sceneRef)
 {
 }
 
 
-HyBox2dRuntime::~HyBox2dRuntime(void)
+HyBox2dContactListener::~HyBox2dContactListener(void)
 {
 }
 
 /// Called when two fixtures begin to touch.
-/*virtual*/ void HyBox2dRuntime::BeginContact(b2Contact* contact)
+/*virtual*/ void HyBox2dContactListener::BeginContact(b2Contact *contact) /*override*/
 {
+	//contact->GetWorldManifold(
 	//if(contact->GetFixtureA()->GetBody()->GetType() == b2_dynamicBody)
 	//{
 	//	if(contact->GetFixtureB()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureB()->GetBody()->GetType() == b2_staticBody)
-	//		reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureA()->GetUserData())->SetGrounded();
+	//	{
+	//		IHyBody2d *pBodyNode = reinterpret_cast<IHyBody2d *>(contact->GetFixtureA()->GetUserData().pointer);
+	//		pBodyNode->shape
+	//	}
 	//}
 	//else if(contact->GetFixtureB()->GetBody()->GetType() == b2_dynamicBody)
 	//{
 	//	if(contact->GetFixtureA()->GetBody()->GetType() == b2_kinematicBody || contact->GetFixtureA()->GetBody()->GetType() == b2_staticBody)
-	//		reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureB()->GetUserData())->SetGrounded();
+	//		int i = 0;// reinterpret_cast<HyPhysEntity2d::tFixture *>(contact->GetFixtureB()->GetUserData())->SetGrounded();
 	//}
 }
 
 /// Called when two fixtures cease to touch.
-/*virtual*/ void HyBox2dRuntime::EndContact(b2Contact* contact)
+/*virtual*/ void HyBox2dContactListener::EndContact(b2Contact *contact) /*override*/
 {
 	//if(contact->GetFixtureA()->GetBody()->GetType() == b2_dynamicBody)
 	//{
@@ -59,7 +66,7 @@ HyBox2dRuntime::~HyBox2dRuntime(void)
 /// Note: if you set the number of contact points to zero, you will not
 /// get an EndContact callback. However, you may get a BeginContact callback
 /// the next step.
-/*virtual*/ void HyBox2dRuntime::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+/*virtual*/ void HyBox2dContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold) /*override*/
 {
 }
 
@@ -69,6 +76,28 @@ HyBox2dRuntime::~HyBox2dRuntime(void)
 /// arbitrarily large if the sub-step is small. Hence the impulse is provided explicitly
 /// in a separate data structure.
 /// Note: this is only called for contacts that are touching, solid, and awake.
-/*virtual*/ void HyBox2dRuntime::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
+/*virtual*/ void HyBox2dContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse) /*override*/
 {
+	if(contact->GetFixtureA()->GetBody()->GetType() == b2_dynamicBody)
+	{
+	
+	}
+	
+	if(contact->GetFixtureB()->GetBody()->GetType() == b2_dynamicBody)
+	{
+		//b2Body *pBodyBox2d = contact->GetFixtureB()->GetBody();
+		//IHyBody2d *pBodyNode = reinterpret_cast<IHyBody2d *>(pBodyBox2d->GetUserData().pointer);
+
+		//pBodyNode->SetDirty(IHyNode::DIRTY_FromUpdater);
+		//HyLog("PHYS POS: " << pBodyBox2d->GetPosition().x * m_SceneRef.GetPixelsPerMeter() << ", " << pBodyBox2d->GetPosition().y * m_SceneRef.GetPixelsPerMeter());
+
+		//const glm::mat4 &mtxSceneRef = pBodyNode->GetSceneTransform(0.0f);
+		//glm::vec3 ptTranslation = mtxSceneRef[3];
+		//glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+		//
+		//pBodyNode->pos.Offset(pBodyBox2d->GetPosition().x * m_SceneRef.GetPixelsPerMeter() - ptTranslation.x,
+		//					  pBodyBox2d->GetPosition().y * m_SceneRef.GetPixelsPerMeter() - ptTranslation.y);
+		//pBodyNode->rot.Set(glm::degrees(pBodyBox2d->GetAngle()));
+		//pBodyNode->ClearDirty(IHyNode::DIRTY_FromUpdater);
+	}
 }

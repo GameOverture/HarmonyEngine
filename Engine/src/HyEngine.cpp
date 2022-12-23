@@ -33,7 +33,7 @@ HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	m_Console(m_Init.bUseConsole, m_Init.consoleInfo),
 	m_WindowManager(*this, m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
 	m_Audio(),
-	m_Scene(m_Audio, m_WindowManager.GetWindowList()),
+	m_Scene(m_Init.vGravity2d, m_Init.fPixelsPerMeter, m_Audio, m_WindowManager.GetWindowList()),
 	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
 	m_Time(m_Init.uiUpdatesPerSec),
 	m_Diagnostics(m_Init, m_Time, m_Assets, m_Scene),

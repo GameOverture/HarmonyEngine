@@ -35,6 +35,7 @@ HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
 	m_eRenderMode(copyRef.m_eRenderMode),
 	m_bUpdateShaderUniforms(true)
 {
+	m_Shape = copyRef.m_Shape;
 	AssembleData();
 }
 
@@ -48,6 +49,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	ClearVertexData();
 	IHyDrawable2d::operator=(rhs);
 
+	m_Shape = rhs.m_Shape;
 	m_bWireframe = rhs.m_bWireframe;
 	m_fLineThickness = rhs.m_fLineThickness;
 	m_uiNumSegments = rhs.m_uiNumSegments;
@@ -55,6 +57,101 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	AssembleData();
 
 	return *this;
+}
+
+HyShapeType HyPrimitive2d::GetShapeType() const
+{
+	return m_Shape.GetType();
+}
+
+void HyPrimitive2d::SetAsNothing()
+{
+	m_Shape.SetAsNothing();
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
+{
+	m_Shape.SetAsLineSegment(pt1, pt2);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
+{
+	m_Shape.SetAsLineSegment(pt1, pt2);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
+{
+	m_Shape.SetAsLineLoop(pVertices, uiNumVerts);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsLineLoop(const std::vector<glm::vec2> &verticesList)
+{
+	m_Shape.SetAsLineLoop(verticesList);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
+{
+	m_Shape.SetAsLineChain(pVertices, uiNumVerts);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsLineChain(const std::vector<glm::vec2> &verticesList)
+{
+	m_Shape.SetAsLineChain(verticesList);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsCircle(float fRadius)
+{
+	m_Shape.SetAsCircle(fRadius);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
+{
+	m_Shape.SetAsCircle(ptCenter, fRadius);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsCircle(const b2Vec2 &center, float fRadius)
+{
+	m_Shape.SetAsCircle(center, fRadius);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
+{
+	m_Shape.SetAsPolygon(pPointArray, uiCount);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
+{
+	m_Shape.SetAsPolygon(pPointArray, uiCount);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsBox(int32 iWidth, int32 iHeight)
+{
+	m_Shape.SetAsBox(iWidth, iHeight);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsBox(float fWidth, float fHeight)
+{
+	m_Shape.SetAsBox(fWidth, fHeight);
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
+{
+	m_Shape.SetAsBox(fHalfWidth, fHalfHeight, ptBoxCenter, fRotDeg);
+	AssembleData();
 }
 
 uint32 HyPrimitive2d::GetNumVerts() const
@@ -103,7 +200,7 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 
 /*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
 {
-	return m_pVertBuffer != nullptr && shape.IsValidShape();
+	return m_pVertBuffer != nullptr && m_Shape.IsValidShape();
 }
 
 /*virtual*/ void HyPrimitive2d::SetDirty(uint32 uiDirtyFlags) /*override*/
@@ -114,14 +211,9 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 		m_bUpdateShaderUniforms = true;
 }
 
-/*virtual*/ void HyPrimitive2d::OnShapeChanged() /*override*/
-{
-	AssembleData();
-}
-
 /*virtual*/ bool HyPrimitive2d::OnIsValidToRender() /*override*/
 {
-	return m_pVertBuffer != nullptr && shape.IsValidShape();
+	return m_pVertBuffer != nullptr && m_Shape.IsValidShape();
 }
 
 /*virtual*/ void HyPrimitive2d::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
@@ -148,8 +240,8 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 
 /*virtual*/ void HyPrimitive2d::OnCalcSceneAABB() /*override*/
 {
-	if(shape.IsValidShape())
-		shape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
+	if(m_Shape.IsValidShape())
+		m_Shape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 }
 
 /*virtual*/ void HyPrimitive2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
@@ -183,27 +275,27 @@ void HyPrimitive2d::ClearVertexData()
 
 void HyPrimitive2d::AssembleData()
 {
-	const b2Shape *pb2Shape = shape.GetB2Shape();
+	const b2Shape *pb2Shape = m_Shape.GetB2Shape();
 
-	switch(shape.GetType())
+	switch(m_Shape.GetType())
 	{
-	case HYSHAPE_Unknown:	// Shape hasn't been set yet by user
+	case HYSHAPE_Nothing:	// Shape hasn't been set yet by user
 		break;
 
 	case HYSHAPE_LineSegment: {
 		std::vector<b2Vec2> pointList;
 		pointList.push_back(static_cast<const b2EdgeShape *>(pb2Shape)->m_vertex1);
 		pointList.push_back(static_cast<const b2EdgeShape *>(pb2Shape)->m_vertex2);
-		_SetAsLineChain(pointList.data(), 2);
+		AssembleLineChain(pointList.data(), 2);
 		break; }
 
 	case HYSHAPE_LineLoop:
 	case HYSHAPE_LineChain: {
-		_SetAsLineChain(static_cast<const b2ChainShape *>(pb2Shape)->m_vertices, static_cast<const b2ChainShape *>(pb2Shape)->m_count);
+		AssembleLineChain(static_cast<const b2ChainShape *>(pb2Shape)->m_vertices, static_cast<const b2ChainShape *>(pb2Shape)->m_count);
 		break; }
 
 	case HYSHAPE_Circle:
-		_SetAsCircle(glm::vec2(static_cast<const b2CircleShape *>(pb2Shape)->m_p.x, static_cast<const b2CircleShape *>(pb2Shape)->m_p.y), pb2Shape->m_radius, m_uiNumSegments);
+		AssembleCircle(glm::vec2(static_cast<const b2CircleShape *>(pb2Shape)->m_p.x, static_cast<const b2CircleShape *>(pb2Shape)->m_p.y), pb2Shape->m_radius, m_uiNumSegments);
 		break;
 
 	case HYSHAPE_Polygon: {
@@ -219,21 +311,21 @@ void HyPrimitive2d::AssembleData()
 			// Make it loop
 			vertList.push_back(static_cast<const b2PolygonShape *>(pb2Shape)->m_vertices[0]);
 
-			_SetAsLineChain(vertList.data(), iNumVerts + 1);
+			AssembleLineChain(vertList.data(), iNumVerts + 1);
 		}
 		else
-			_SetAsPolygon(static_cast<const b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<const b2PolygonShape *>(pb2Shape)->m_count);
+			AssemblePolygon(static_cast<const b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<const b2PolygonShape *>(pb2Shape)->m_count);
 		break; }
 
 	default:
-		HyLogError("HyPrimitive2d::AssembleData() - Unknown shape type: " << shape.GetType());
+		HyLogError("HyPrimitive2d::AssembleData() - Unknown shape type: " << m_Shape.GetType());
 	}
 
 	SetDirty(DIRTY_SceneAABB);
 	Load();
 }
 
-void HyPrimitive2d::_SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
+void HyPrimitive2d::AssembleLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
 	HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
 	ClearVertexData();
@@ -288,7 +380,7 @@ void HyPrimitive2d::_SetAsLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	return;
 }
 
-void HyPrimitive2d::_SetAsCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSegments)
+void HyPrimitive2d::AssembleCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSegments)
 {
 	const float k_segments = static_cast<float>(uiSegments);
 	const float k_increment = 2.0f * b2_pi / k_segments;
@@ -349,11 +441,11 @@ void HyPrimitive2d::_SetAsCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSeg
 			//v1 = v2;
 		}
 
-		_SetAsLineChain(&vertexList[0], static_cast<uint32>(vertexList.size()));
+		AssembleLineChain(&vertexList[0], static_cast<uint32>(vertexList.size()));
 	}
 }
 
-void HyPrimitive2d::_SetAsPolygon(const b2Vec2 *pVertexList, uint32 uiNumVertices)
+void HyPrimitive2d::AssemblePolygon(const b2Vec2 *pVertexList, uint32 uiNumVertices)
 {
 	ClearVertexData();
 
@@ -379,4 +471,10 @@ void HyPrimitive2d::_SetAsPolygon(const b2Vec2 *pVertexList, uint32 uiNumVertice
 		m_pVertBuffer[uiBufferIndex].y = pVertexList[i+1].y;
 		uiBufferIndex++;
 	}
+}
+
+/*static*/ void HyPrimitive2d::OnShapeChanged(void *pData)
+{
+	HyPrimitive2d *pThis = reinterpret_cast<HyPrimitive2d *>(pData);
+	pThis->AssembleData();
 }

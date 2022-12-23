@@ -24,8 +24,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 	m_iDisplayOrder(0),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color),
-	physics(*this)
+	alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -55,8 +54,6 @@ IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, H
 
 		m_pParent->SetChildrenDisplayOrder(false);
 	}
-
-	shape.RegisterBody(this);
 }
 
 IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
@@ -66,8 +63,7 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	m_SceneAABB(copyRef.m_SceneAABB),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color),
-	physics(*this)
+	alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -77,9 +73,6 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
-
-	shape = copyRef.shape;
-	shape.RegisterBody(this);
 }
 
 IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
@@ -89,9 +82,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	m_SceneAABB(std::move(donor.m_SceneAABB)),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color),
-	shape(std::move(donor.shape)),
-	physics(*this)
+	alpha(m_fAlpha, *this, DIRTY_Color)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -101,13 +92,10 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
-
-	shape.RegisterBody(this);
 }
 
 IHyBody2d::~IHyBody2d()
 {
-	physics.Uninit();
 }
 
 IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
@@ -122,8 +110,6 @@ IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
 	alpha = rhs.alpha;
 
 	CalculateColor(0.0f);
-
-	shape = rhs.shape;
 
 	return *this;
 }
@@ -140,8 +126,6 @@ IHyBody2d &IHyBody2d::operator=(IHyBody2d &&donor) noexcept
 	alpha = std::move(donor.alpha);
 
 	CalculateColor(0.0f);
-
-	shape = std::move(donor.shape);
 
 	return *this;
 }
@@ -212,30 +196,6 @@ int32 IHyBody2d::GetDisplayOrder() const
 	}
 }
 
-bool IHyBody2d::IsMouseInBounds()
-{
-	if(GetCoordinateSystem() >= 0 && HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem())
-	{
-		if(shape.IsValidShape())
-			return shape.TestPoint(GetSceneTransform(0.0f), HyEngine::Input().GetMousePos());
-		else
-			return HyTestPointAABB(GetSceneAABB(), HyEngine::Input().GetMousePos());
-	}
-	else if(GetCoordinateSystem() < 0)
-	{
-		glm::vec2 ptWorldMousePos;
-		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
-		{
-			if(shape.IsValidShape())
-				return shape.TestPoint(GetSceneTransform(0.0f), ptWorldMousePos);
-			else
-				return HyTestPointAABB(GetSceneAABB(), ptWorldMousePos);
-		}
-	}
-
-	return false;
-}
-
 float IHyBody2d::GetSceneHeight()
 {
 	const b2AABB &aabbRef = GetSceneAABB();
@@ -257,27 +217,11 @@ float IHyBody2d::GetSceneWidth()
 /*virtual*/ void IHyBody2d::SetDirty(uint32 uiDirtyFlags) /*override*/
 {
 	IHyNode2d::SetDirty(uiDirtyFlags);
-
-	// If this body is actively being simulated by a HyPhysicsGrid2d, and has a dirty transform NOT from the updater
-	if(physics.IsSimulating() &&
-		(uiDirtyFlags & IHyNode::DIRTY_FromUpdater) == 0 &&
-		(uiDirtyFlags & DIRTY_Transform))
-	{
-		physics.FlushTransform();
-	}
 }
 
 /*virtual*/ void IHyBody2d::Update() /*override*/
 {
 	IHyLoadable2d::Update();
-}
-
-void IHyBody2d::ShapeChanged()
-{
-	if(physics.IsSimulating() == false && m_pParent && (m_pParent->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid))
-		static_cast<HyPhysicsGrid2d *>(m_pParent)->TryInitChildPhysics(*this);
-
-	OnShapeChanged();
 }
 
 /*virtual*/ int32 IHyBody2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)

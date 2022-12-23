@@ -78,6 +78,11 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	HyShape2d tmpShape;
 	tmpShape.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
 	tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
+	
+	// Below doesn't account for scale
+	//b2PolygonShape tmpShape;
+	//tmpShape.SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
+	//tmpShape.ComputeAABB(&m_SceneAABB, b2Transform(b2Vec2(pos.X(), pos.Y()), b2Rot(glm::radians(rot.Get()))), 0);
 }
 
 /*virtual*/ void HySprite2d::OnInvokeCallback(uint32 uiStateIndex) /*override*/

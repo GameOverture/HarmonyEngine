@@ -78,8 +78,8 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 
 	if(m_Text.IsLoadDataValid() == false || IsCursorShown() == false)
 	{
-		m_Selection.shape.SetAsNothing();
-		m_Cursor.shape.SetAsNothing();
+		m_Selection.SetAsNothing();
+		m_Cursor.SetAsNothing();
 		return;
 	}
 
@@ -89,11 +89,11 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	if(m_iSelectionLength > 0)
 	{
 		float fWidth = m_Text.GetGlyphOffset(m_iCursorIndex + m_iSelectionLength, 0).x - m_Text.GetGlyphOffset(m_iCursorIndex, 0).x;
-		m_Selection.shape.SetAsBox(fWidth, fCursorHeight);
+		m_Selection.SetAsBox(fWidth, fCursorHeight);
 	}
 	else
-		m_Selection.shape.SetAsNothing();
-	m_Cursor.shape.SetAsBox(2.0f, fCursorHeight);
+		m_Selection.SetAsNothing();
+	m_Cursor.SetAsBox(2.0f, fCursorHeight);
 
 	m_Selection.SetDisplayOrder(m_Text.GetDisplayOrder() - 1);
 	m_Cursor.SetDisplayOrder(m_Text.GetDisplayOrder() + 1);
