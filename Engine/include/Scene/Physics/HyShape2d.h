@@ -101,6 +101,7 @@ public:
 	bool SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
 	// Applies when attached to a physics body
+	void Setup(const b2FixtureDef &fixtureDefRef);
 	float GetDensity() const;
 	void SetDensity(float fDensity); // Usually in kg / m ^ 2.
 	void SetDensityInKg(float fWeightKg); // Sets the density using the "weight" of currently set shape. Returns if valid/successful

@@ -79,6 +79,7 @@ public:
 	void AddNode_PhysBody(HyEntity2d *pEntity);
 	void RemoveNode_PhysBody(HyEntity2d *pEntity);
 	bool IsPhysicsUpdating() const;
+	void SetPhysicsDrawFlags(uint32 uib2DrawFlags);
 
 	void ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType);
 

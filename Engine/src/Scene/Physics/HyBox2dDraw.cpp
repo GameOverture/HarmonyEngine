@@ -33,7 +33,7 @@ void HyBox2dDraw::BeginFrame()
 /*virtual*/ void HyBox2dDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) /*override*/
 {
 	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back();
+		m_DrawList.emplace_back(this);
 
 	std::vector<b2Vec2> convertedVertList;
 	for(int i = 0; i < vertexCount; ++i)
@@ -42,6 +42,7 @@ void HyBox2dDraw::BeginFrame()
 	m_DrawList[m_iDrawIndex].SetAsPolygon(convertedVertList.data(), vertexCount);
 	m_DrawList[m_iDrawIndex].SetWireframe(true);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
+	m_DrawList[m_iDrawIndex].SetVisible(true);
 
 	m_iDrawIndex++;
 }
@@ -50,7 +51,7 @@ void HyBox2dDraw::BeginFrame()
 /*virtual*/ void HyBox2dDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) /*override*/
 {
 	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back();
+		m_DrawList.emplace_back(this);
 
 	std::vector<b2Vec2> convertedVertList;
 	for(int i = 0; i < vertexCount; ++i)
@@ -59,6 +60,7 @@ void HyBox2dDraw::BeginFrame()
 	m_DrawList[m_iDrawIndex].SetAsPolygon(convertedVertList.data(), vertexCount);
 	m_DrawList[m_iDrawIndex].SetWireframe(false);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
+	m_DrawList[m_iDrawIndex].SetVisible(true);
 
 	m_iDrawIndex++;
 }
@@ -67,13 +69,14 @@ void HyBox2dDraw::BeginFrame()
 /*virtual*/ void HyBox2dDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color) /*override*/
 {
 	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back();
+		m_DrawList.emplace_back(this);
 
 	b2Vec2 ptConvertedCenter(center.x * m_fPixelsPerMeter, center.y * m_fPixelsPerMeter);
 
 	m_DrawList[m_iDrawIndex].SetAsCircle(ptConvertedCenter, radius * m_fPixelsPerMeter);
 	m_DrawList[m_iDrawIndex].SetWireframe(true);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
+	m_DrawList[m_iDrawIndex].SetVisible(true);
 
 	m_iDrawIndex++;
 }
@@ -82,13 +85,14 @@ void HyBox2dDraw::BeginFrame()
 /*virtual*/ void HyBox2dDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) /*override*/
 {
 	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back();
+		m_DrawList.emplace_back(this);
 
 	b2Vec2 ptConvertedCenter(center.x * m_fPixelsPerMeter, center.y * m_fPixelsPerMeter);
 
 	m_DrawList[m_iDrawIndex].SetAsCircle(ptConvertedCenter, radius * m_fPixelsPerMeter);
 	m_DrawList[m_iDrawIndex].SetWireframe(false);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
+	m_DrawList[m_iDrawIndex].SetVisible(true);
 
 	m_iDrawIndex++;
 }
@@ -97,13 +101,14 @@ void HyBox2dDraw::BeginFrame()
 /*virtual*/ void HyBox2dDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) /*override*/
 {
 	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back();
+		m_DrawList.emplace_back(this);
 
 	b2Vec2 ptConvertedP1(p1.x * m_fPixelsPerMeter, p1.y * m_fPixelsPerMeter);
 	b2Vec2 ptConvertedP2(p2.x * m_fPixelsPerMeter, p2.y * m_fPixelsPerMeter);
 
 	m_DrawList[m_iDrawIndex].SetAsLineSegment(ptConvertedP1, ptConvertedP2);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color.r, color.g, color.b));
+	m_DrawList[m_iDrawIndex].SetVisible(true);
 
 	m_iDrawIndex++;
 }
@@ -120,6 +125,7 @@ void HyBox2dDraw::BeginFrame()
 	//m_DrawList.back().SetAsBox(size * 0.5f, size * 0.5f, glm::vec2(p.x * m_fPixelsPerMeter, p.y * m_fPixelsPerMeter), 0.0f);
 	//m_DrawList.back().SetWireframe(false);
 	//m_DrawList.back().SetTint(color.r, color.g, color.b);
+	//m_DrawList[m_iDrawIndex].SetVisible(true);
 }
 
 void HyBox2dDraw::EndFrame()

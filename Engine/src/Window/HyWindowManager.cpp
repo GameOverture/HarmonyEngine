@@ -31,11 +31,16 @@ HyWindowManager::HyWindowManager(HyEngine &engineRef, uint32 uiNumWindows, bool 
 #endif
 
 #ifdef HY_USE_SDL2
+	uint32 uiInitFlags = SDL_INIT_GAMECONTROLLER;
+	#ifdef HY_USE_SDL2_AUDIO
+		uiInitFlags |= SDL_INIT_AUDIO;
+	#endif
 	#ifdef HY_USE_GLFW
-		if(SDL_Init(/*SDL_INIT_AUDIO |*/ SDL_INIT_GAMECONTROLLER) != 0)
+		if(SDL_Init(uiInitFlags) != 0)
 			HyLogError(SDL_GetError());
 	#else
-		if(SDL_Init(SDL_INIT_VIDEO | /*SDL_INIT_AUDIO |*/ SDL_INIT_GAMECONTROLLER) != 0)
+		uiInitFlags |= SDL_INIT_VIDEO;
+		if(SDL_Init(uiInitFlags) != 0)
 			HyLogError(SDL_GetError());
 
 		SDL_ShowCursor(bShowCursor ? SDL_ENABLE : SDL_DISABLE);

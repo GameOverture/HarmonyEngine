@@ -130,6 +130,7 @@ float HyShape2d::CalcArea() const
 	case HYSHAPE_LineSegment:
 	case HYSHAPE_LineChain:
 	case HYSHAPE_LineLoop:
+	default:
 		fArea = 0.0f;
 		break;
 
@@ -420,6 +421,34 @@ bool HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 //m_pInit->m_FixtureDef.isSensor = bIsSensor;
 //m_pInit->m_FixtureDef.filter = filter;
 //m_pInit->m_FixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
+
+void HyShape2d::Setup(const b2FixtureDef &fixtureDefRef)
+{
+	if(m_pFixture)
+	{
+		m_pFixture->SetDensity(fixtureDefRef.density);
+		m_pFixture->SetFilterData(fixtureDefRef.filter);
+		m_pFixture->SetFriction(fixtureDefRef.friction);
+		m_pFixture->SetSensor(fixtureDefRef.isSensor);
+		m_pFixture->SetRestitution(fixtureDefRef.restitution);
+		m_pFixture->SetRestitutionThreshold(fixtureDefRef.restitutionThreshold);
+
+		m_pFixture->GetBody()->ResetMassData();
+	}
+	else
+	{
+		if(m_pInit == nullptr)
+			m_pInit = HY_NEW b2FixtureDef();
+
+		m_pInit->density = fixtureDefRef.density;
+		m_pInit->filter = fixtureDefRef.filter;
+		m_pInit->friction = fixtureDefRef.friction;
+		m_pInit->isSensor = fixtureDefRef.isSensor;
+		m_pInit->restitution = fixtureDefRef.restitution;
+		m_pInit->restitutionThreshold = fixtureDefRef.restitutionThreshold;
+		m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(this);
+	}
+}
 
 float HyShape2d::GetDensity() const
 {

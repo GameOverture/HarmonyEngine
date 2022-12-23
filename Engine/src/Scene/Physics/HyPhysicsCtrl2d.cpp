@@ -25,12 +25,12 @@ HyPhysicsCtrl2d::~HyPhysicsCtrl2d()
 	delete m_pInit;
 
 	if(m_pBody)
-		IHyNode::sm_pScene->RemoveNode_PhysBody(&m_EntityRef);
+		IHyBody2d::sm_pScene->RemoveNode_PhysBody(&m_EntityRef);
 }
 
 void HyPhysicsCtrl2d::Activate()
 {
-	IHyNode::sm_pScene->AddNode_PhysBody(&m_EntityRef);
+	IHyBody2d::sm_pScene->AddNode_PhysBody(&m_EntityRef);
 }
 
 void HyPhysicsCtrl2d::Deactivate()

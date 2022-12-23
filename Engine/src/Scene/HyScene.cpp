@@ -41,11 +41,6 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	IHyNode::sm_pScene = this;
 
-	m_Box2dDraw.SetFlags(b2Draw::e_shapeBit | //< draw shapes
-						 b2Draw::e_jointBit | //< draw joint connections
-						 //b2Draw::e_aabbBit | //< draw axis aligned bounding boxes
-						 b2Draw::e_pairBit | //< draw broad-phase pairs
-						 b2Draw::e_centerOfMassBit);
 	m_b2World.SetDebugDraw(&m_Box2dDraw);
 	m_b2World.SetContactListener(&m_ContactListener);
 	m_b2World.SetDestructionListener(&m_DestructListener);
@@ -209,6 +204,11 @@ void HyScene::RemoveNode_PhysBody(HyEntity2d *pEntity)
 bool HyScene::IsPhysicsUpdating() const
 {
 	return m_bPhysUpdating;
+}
+
+void HyScene::SetPhysicsDrawFlags(uint32 uib2DrawFlags)
+{
+	m_Box2dDraw.SetFlags(uib2DrawFlags);
 }
 
 void HyScene::ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType)

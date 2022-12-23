@@ -282,6 +282,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	newMetaBankObjRef["OutputName"] = m_ProjectRef.GetName();
 	newMetaBankObjRef["SrcDepends"] = QJsonArray();
 	newMetaBankObjRef["UseSdl2"] = false;
+	newMetaBankObjRef["UseSdlAudio"] = false;
 	newMetaBankObjRef["UseSdlNet"] = false;
 	newMetaBankObjRef["UseIcu"] = false;
 }
@@ -433,7 +434,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// First ensure all source files are residing in their proper folder on disk (represented here with filters)
-	// If any changes need to be made, the file's checksum will also be updated and the .meta file will need to be resaved
+	// If any changes need to be made, the file's checksum will also be updated and the .meta file will need to be resaved by calling IManagerModel::SaveMeta()
 	bool bResaveMeta = false;
 	QStringList srcFilePathList;
 	QList<quint32> currentChecksumList;
@@ -523,6 +524,12 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 		sContents.replace("%HY_USESDL2%", "set(HYBUILD_SDL2 ON)");
 	else
 		sContents.replace("%HY_USESDL2%", "set(HYBUILD_SDL2 OFF)");
+
+	// SDL AUDIO
+	if(pSourceBank->m_MetaObj["UseSdlAudio"].toBool())
+		sContents.replace("%HY_USESDLAUDIO%", "set(HYBUILD_SDL_AUDIO ON)");
+	else
+		sContents.replace("%HY_USESDLAUDIO%", "set(HYBUILD_SDL_AUDIO OFF)");
 
 	// SDL_net
 	if(pSourceBank->m_MetaObj["UseSdlNet"].toBool())

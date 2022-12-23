@@ -23,6 +23,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 # Build Options
 %HY_USEGLFW%
 %HY_USESDL2%
+%HY_USESDLAUDIO%
 %HY_USESDLNET%
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
 option(HYBUILD_STATIC "Statically link all dependencies into the executable" OFF)
@@ -36,6 +37,9 @@ if(HYBUILD_GLFW)
 endif()
 if(HYBUILD_SDL2)
 	add_compile_definitions(HY_USE_SDL2)
+endif()
+if(HYBUILD_SDL_AUDIO)
+	add_compile_definitions(HY_USE_SDL2_AUDIO)
 endif()
 if(HYBUILD_SPINE)
 	add_compile_definitions(HY_USE_SPINE)
