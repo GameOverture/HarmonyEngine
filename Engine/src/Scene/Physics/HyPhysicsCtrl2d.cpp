@@ -180,102 +180,6 @@ void HyPhysicsCtrl2d::SetAwake(bool bAwake)
 	}
 }
 
-glm::vec2 HyPhysicsCtrl2d::GetLinearVelocity() const
-{
-	if(m_pBody)
-		return glm::vec2(m_pBody->GetLinearVelocity().x, m_pBody->GetLinearVelocity().y);
-	else if(m_pInit)
-		return glm::vec2(m_pInit->linearVelocity.x, m_pInit->linearVelocity.y);
-	else
-		return glm::vec2(b2BodyDef().linearVelocity.x, b2BodyDef().linearVelocity.y);
-}
-
-void HyPhysicsCtrl2d::SetLinearVelocity(glm::vec2 vVelocity)
-{
-	if(m_pBody)
-		m_pBody->SetLinearVelocity(b2Vec2(vVelocity.x, vVelocity.y));
-	else if(m_pInit)
-		m_pInit->linearVelocity = b2Vec2(vVelocity.x, vVelocity.y);
-	else
-	{
-		b2BodyDef def;
-		def.linearVelocity = b2Vec2(vVelocity.x, vVelocity.y);
-		Setup(def);
-	}
-}
-
-float HyPhysicsCtrl2d::GetAngularVelocity() const
-{
-	if(m_pBody)
-		return m_pBody->GetAngularVelocity();
-	else if(m_pInit)
-		return m_pInit->angularVelocity;
-	else
-		return b2BodyDef().angularVelocity;
-}
-
-void HyPhysicsCtrl2d::SetAngularVelocity(float fOmega)
-{
-	if(m_pBody)
-		m_pBody->SetAngularVelocity(fOmega);
-	else if(m_pInit)
-		m_pInit->angularVelocity = fOmega;
-	else
-	{
-		b2BodyDef def;
-		def.angularVelocity = fOmega;
-		Setup(def);
-	}
-}
-
-float HyPhysicsCtrl2d::GetLinearDamping() const
-{
-	if(m_pBody)
-		return m_pBody->GetLinearDamping();
-	else if(m_pInit)
-		return m_pInit->linearDamping;
-	else
-		return b2BodyDef().linearDamping;
-}
-
-void HyPhysicsCtrl2d::SetLinearDamping(float fLinearDamping)
-{
-	if(m_pBody)
-		m_pBody->SetLinearDamping(fLinearDamping);
-	else if(m_pInit)
-		m_pInit->linearDamping = fLinearDamping;
-	else
-	{
-		b2BodyDef def;
-		def.linearDamping = fLinearDamping;
-		Setup(def);
-	}
-}
-
-float HyPhysicsCtrl2d::GetAngularDamping() const
-{
-	if(m_pBody)
-		return m_pBody->GetAngularDamping();
-	else if(m_pInit)
-		return m_pInit->angularDamping;
-	else
-		return b2BodyDef().angularDamping;
-}
-
-void HyPhysicsCtrl2d::SetAngularDamping(float fAngularDamping)
-{
-	if(m_pBody)
-		m_pBody->SetAngularDamping(fAngularDamping);
-	else if(m_pInit)
-		m_pInit->angularDamping = fAngularDamping;
-	else
-	{
-		b2BodyDef def;
-		def.angularDamping = fAngularDamping;
-		Setup(def);
-	}
-}
-
 bool HyPhysicsCtrl2d::IsSleepingAllowed() const
 {
 	if(m_pBody)
@@ -348,70 +252,246 @@ void HyPhysicsCtrl2d::SetCcd(bool bContinuousCollisionDetection)
 	}
 }
 
-glm::vec2 HyPhysicsCtrl2d::GridCenterMass() const
+glm::vec2 HyPhysicsCtrl2d::GetVel() const
+{
+	if(m_pBody)
+		return glm::vec2(m_pBody->GetLinearVelocity().x, m_pBody->GetLinearVelocity().y);
+	else if(m_pInit)
+		return glm::vec2(m_pInit->linearVelocity.x, m_pInit->linearVelocity.y);
+	else
+		return glm::vec2(b2BodyDef().linearVelocity.x, b2BodyDef().linearVelocity.y);
+}
+
+float HyPhysicsCtrl2d::GetVelX() const
+{
+	if(m_pBody)
+		return m_pBody->GetLinearVelocity().x;
+	else if(m_pInit)
+		return m_pInit->linearVelocity.x;
+	else
+		return b2BodyDef().linearVelocity.x;
+}
+
+float HyPhysicsCtrl2d::GetVelY() const
+{
+	if(m_pBody)
+		return m_pBody->GetLinearVelocity().y;
+	else if(m_pInit)
+		return m_pInit->linearVelocity.y;
+	else
+		return b2BodyDef().linearVelocity.y;
+}
+
+void HyPhysicsCtrl2d::SetVel(const glm::vec2 &vVelocity)
+{
+	if(m_pBody)
+		m_pBody->SetLinearVelocity(b2Vec2(vVelocity.x, vVelocity.y));
+	else if(m_pInit)
+		m_pInit->linearVelocity = b2Vec2(vVelocity.x, vVelocity.y);
+	else
+	{
+		b2BodyDef def;
+		def.linearVelocity = b2Vec2(vVelocity.x, vVelocity.y);
+		Setup(def);
+	}
+}
+
+void HyPhysicsCtrl2d::SetVelX(float fVelocityX)
+{
+	if(m_pBody)
+		m_pBody->SetLinearVelocity(b2Vec2(fVelocityX, m_pBody->GetLinearVelocity().y));
+	else if(m_pInit)
+		m_pInit->linearVelocity = b2Vec2(fVelocityX, m_pInit->linearVelocity.y);
+	else
+	{
+		b2BodyDef def;
+		def.linearVelocity = b2Vec2(fVelocityX, def.linearVelocity.y);
+		Setup(def);
+	}
+}
+
+void HyPhysicsCtrl2d::SetVelY(float fVelocityY)
+{
+	if(m_pBody)
+		m_pBody->SetLinearVelocity(b2Vec2(m_pBody->GetLinearVelocity().x, fVelocityY));
+	else if(m_pInit)
+		m_pInit->linearVelocity = b2Vec2(m_pInit->linearVelocity.x, fVelocityY);
+	else
+	{
+		b2BodyDef def;
+		def.linearVelocity = b2Vec2(def.linearVelocity.x, fVelocityY);
+		Setup(def);
+	}
+}
+
+float HyPhysicsCtrl2d::GetAngVel() const
+{
+	if(m_pBody)
+		return m_pBody->GetAngularVelocity();
+	else if(m_pInit)
+		return m_pInit->angularVelocity;
+	else
+		return b2BodyDef().angularVelocity;
+}
+
+void HyPhysicsCtrl2d::SetAngVel(float fOmega)
+{
+	if(m_pBody)
+		m_pBody->SetAngularVelocity(fOmega);
+	else if(m_pInit)
+		m_pInit->angularVelocity = fOmega;
+	else
+	{
+		b2BodyDef def;
+		def.angularVelocity = fOmega;
+		Setup(def);
+	}
+}
+
+void HyPhysicsCtrl2d::AddForce(const glm::vec2 &vForce)
+{
+	if(m_pBody)
+		m_pBody->ApplyForceToCenter(b2Vec2(vForce.x, vForce.y), true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::ApplyForceToCenter invoked before physics component was set active");
+}
+
+void HyPhysicsCtrl2d::AddForceX(float fForceX)
+{
+	if(m_pBody)
+		m_pBody->ApplyForceToCenter(b2Vec2(fForceX, 0.0f), true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::AddForceX invoked before physics component was set active");
+}
+
+void HyPhysicsCtrl2d::AddForceY(float fForceY)
+{
+	if(m_pBody)
+		m_pBody->ApplyForceToCenter(b2Vec2(0.0f, fForceY), true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::AddForceY invoked before physics component was set active");
+}
+
+void HyPhysicsCtrl2d::AddForceToPt(const glm::vec2 &vForce, const glm::vec2 &ptScenePoint)
+{
+	if(m_pBody)
+		m_pBody->ApplyForce(b2Vec2(vForce.x, vForce.y), b2Vec2(ptScenePoint.x * IHyNode::sm_pScene->GetPpmInverse(), ptScenePoint.y * IHyNode::sm_pScene->GetPpmInverse()), true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::AddForceToPt invoked before physics component was set active");
+}
+
+void HyPhysicsCtrl2d::AddTorque(float fTorque)
+{
+	if(m_pBody)
+		m_pBody->ApplyTorque(fTorque, true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::AddTorque invoked before physics component was set active");
+}
+
+void HyPhysicsCtrl2d::AddImpulse(const glm::vec2 &vImpulse)
+{
+	if(m_pBody)
+		m_pBody->ApplyLinearImpulseToCenter(b2Vec2(vImpulse.x, vImpulse.y), true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::AddImpulse invoked before physics component was set active");
+}
+
+void HyPhysicsCtrl2d::AddImpulseX(float fImpuseX)
+{
+	if(m_pBody)
+		m_pBody->ApplyLinearImpulseToCenter(b2Vec2(fImpuseX, 0.0f), true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::AddImpulseX invoked before physics component was set active");
+}
+
+void HyPhysicsCtrl2d::AddImpulseY(float fImpuseY)
+{
+	if(m_pBody)
+		m_pBody->ApplyLinearImpulseToCenter(b2Vec2(0.0f, fImpuseY), true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::AddImpulseY invoked before physics component was set active");
+}
+
+void HyPhysicsCtrl2d::AddImpulseToPt(const glm::vec2 &vImpulse, const glm::vec2 &ptScenePoint)
+{
+	if(m_pBody)
+		m_pBody->ApplyLinearImpulse(b2Vec2(vImpulse.x, vImpulse.y), b2Vec2(ptScenePoint.x * IHyNode::sm_pScene->GetPpmInverse(), ptScenePoint.y * IHyNode::sm_pScene->GetPpmInverse()), true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::AddImpulse invoked before physics component was set active");
+}
+
+void HyPhysicsCtrl2d::AddAngImpulse(float fImpulse)
+{
+	if(m_pBody)
+		m_pBody->ApplyAngularImpulse(fImpulse, true);
+	else
+		HyLogWarning("HyPhysicsCtrl2d::AddAngImpulse invoked before physics component was set active");
+}
+
+float HyPhysicsCtrl2d::GetLinearDamping() const
+{
+	if(m_pBody)
+		return m_pBody->GetLinearDamping();
+	else if(m_pInit)
+		return m_pInit->linearDamping;
+	else
+		return b2BodyDef().linearDamping;
+}
+
+void HyPhysicsCtrl2d::SetLinearDamping(float fLinearDamping)
+{
+	if(m_pBody)
+		m_pBody->SetLinearDamping(fLinearDamping);
+	else if(m_pInit)
+		m_pInit->linearDamping = fLinearDamping;
+	else
+	{
+		b2BodyDef def;
+		def.linearDamping = fLinearDamping;
+		Setup(def);
+	}
+}
+
+float HyPhysicsCtrl2d::GetAngularDamping() const
+{
+	if(m_pBody)
+		return m_pBody->GetAngularDamping();
+	else if(m_pInit)
+		return m_pInit->angularDamping;
+	else
+		return b2BodyDef().angularDamping;
+}
+
+void HyPhysicsCtrl2d::SetAngularDamping(float fAngularDamping)
+{
+	if(m_pBody)
+		m_pBody->SetAngularDamping(fAngularDamping);
+	else if(m_pInit)
+		m_pInit->angularDamping = fAngularDamping;
+	else
+	{
+		b2BodyDef def;
+		def.angularDamping = fAngularDamping;
+		Setup(def);
+	}
+}
+
+glm::vec2 HyPhysicsCtrl2d::GetSceneCenterMass() const
 {
 	if(m_pBody)
 		return glm::vec2(m_pBody->GetWorldCenter().x, m_pBody->GetWorldCenter().y);
 
-	HyLogWarning("HyPhysicsCtrl2d::GridCenterMass invoked before physics component was set active");
+	HyLogWarning("HyPhysicsCtrl2d::GetSceneCenter invoked before physics component was set active");
 	return glm::vec2(0.0f, 0.0f);
 }
 
-glm::vec2 HyPhysicsCtrl2d::LocalCenterMass() const
+glm::vec2 HyPhysicsCtrl2d::GetLocalCenterMass() const
 {
 	if(m_pBody)
 		return glm::vec2(m_pBody->GetLocalCenter().x, m_pBody->GetLocalCenter().y);
 
 	HyLogWarning("HyPhysicsCtrl2d::LocalCenterMass invoked before physics component was set active");
 	return glm::vec2(0.0f, 0.0f);
-}
-
-void HyPhysicsCtrl2d::ApplyForce(const glm::vec2 &vForce, const glm::vec2 &ptPoint, bool bWake)
-{
-	if(m_pBody)
-		m_pBody->ApplyForce(b2Vec2(vForce.x, vForce.y), b2Vec2(ptPoint.x, ptPoint.y), bWake);
-	else
-		HyLogWarning("HyPhysicsCtrl2d::ApplyForce invoked before physics component was set active");
-}
-
-void HyPhysicsCtrl2d::ApplyForceToCenter(const glm::vec2 &vForce, bool bWake)
-{
-	if(m_pBody)
-		m_pBody->ApplyForceToCenter(b2Vec2(vForce.x, vForce.y), bWake);
-	else
-		HyLogWarning("HyPhysicsCtrl2d::ApplyForceToCenter invoked before physics component was set active");
-}
-
-void HyPhysicsCtrl2d::ApplyTorque(float fTorque, bool bWake)
-{
-	if(m_pBody)
-		m_pBody->ApplyTorque(fTorque, bWake);
-	else
-		HyLogWarning("HyPhysicsCtrl2d::ApplyTorque invoked before physics component was set active");
-}
-
-void HyPhysicsCtrl2d::ApplyLinearImpulse(const glm::vec2 &vImpulse, const glm::vec2 &ptPoint, bool bWake)
-{
-	if(m_pBody)
-		m_pBody->ApplyLinearImpulse(b2Vec2(vImpulse.x, vImpulse.y), b2Vec2(ptPoint.x, ptPoint.y), bWake);
-	else
-		HyLogWarning("HyPhysicsCtrl2d::ApplyLinearImpulse invoked before physics component was set active");
-}
-
-void HyPhysicsCtrl2d::ApplyLinearImpulseToCenter(const glm::vec2 &vImpulse, bool bWake)
-{
-	if(m_pBody)
-		m_pBody->ApplyLinearImpulseToCenter(b2Vec2(vImpulse.x, vImpulse.y), bWake);
-	else
-		HyLogWarning("HyPhysicsCtrl2d::ApplyLinearImpulseToCenter invoked before physics component was set active");
-}
-
-void HyPhysicsCtrl2d::ApplyAngularImpulse(float fImpulse, bool bWake)
-{
-	if(m_pBody)
-		m_pBody->ApplyAngularImpulse(fImpulse, bWake);
-	else
-		HyLogWarning("HyPhysicsCtrl2d::ApplyAngularImpulse invoked before physics component was set active");
 }
 
 float HyPhysicsCtrl2d::GetMass() const

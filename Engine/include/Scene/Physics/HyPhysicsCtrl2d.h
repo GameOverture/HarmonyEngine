@@ -21,15 +21,15 @@ class HyPhysicsCtrl2d
 	friend class HyEntity2d;
 
 	HyEntity2d &				m_EntityRef;
-	b2BodyDef *					m_pInit;	// Dynamically allocated when physics simulation is desired. Simulation will then start if/once owner of *this is a child of a HyPhysicsGrid2d.
-	b2Body *					m_pBody;	// A pointer to the concrete value in HyScene::m_NodeMap_Collision, nullptr otherwise
+	b2BodyDef *					m_pInit;					// Dynamically allocated when physics simulation is getting initialized. Simulation will then start when Activate() is invoked. It is more optimal to initalize before calling Activate().
+	b2Body *					m_pBody;					// A pointer to the concrete value in HyScene::m_NodeMap_Collision, nullptr otherwise
 
 public:
 	HyPhysicsCtrl2d(HyEntity2d &entityRef);
 	~HyPhysicsCtrl2d();
 
-	void Activate();
-	void Deactivate();
+	void Activate();										// Enables physics simulation when invoked. It is more optimal to initalize values and append shapes to this entity before calling Activate().
+	void Deactivate();										// Disables physics simulation when invoked. This does not delete the body/fixtures under the hood in Box2d
 	bool IsActivated() const;
 
 	void Setup(const b2BodyDef &bodyDef);
@@ -51,14 +51,6 @@ public:
 	void SetFixedRotation(bool bFixedRot);
 	bool IsAwake() const;
 	void SetAwake(bool bAwake);
-	glm::vec2 GetLinearVelocity() const;
-	void SetLinearVelocity(glm::vec2 vVelocity);
-	float GetAngularVelocity() const;
-	void SetAngularVelocity(float fOmega);
-	float GetLinearDamping() const;
-	void SetLinearDamping(float fLinearDamping);
-	float GetAngularDamping() const;
-	void SetAngularDamping(float fAngularDamping);
 	bool IsSleepingAllowed() const;
 	void SetSleepingAllowed(bool bAllowSleep);
 	float GetGravityScale() const;
@@ -66,14 +58,38 @@ public:
 	bool IsCcd() const;
 	void SetCcd(bool bContinuousCollisionDetection);
 
-	glm::vec2 GridCenterMass() const;
-	glm::vec2 LocalCenterMass() const;
-	void ApplyForce(const glm::vec2 &vForce, const glm::vec2 &ptPoint, bool bWake);
-	void ApplyForceToCenter(const glm::vec2 &vForce, bool bWake);
-	void ApplyTorque(float fTorque, bool bWake);
-	void ApplyLinearImpulse(const glm::vec2 &vImpulse, const glm::vec2 &ptPoint, bool bWake);
-	void ApplyLinearImpulseToCenter(const glm::vec2 &vImpulse, bool bWake);
-	void ApplyAngularImpulse(float fImpulse, bool bWake);
+	glm::vec2 GetVel() const;								// Retrieve the linear velocity of this body's center of mass in m/s
+	float GetVelX() const;									// Retrieve the X linear velocity of this body's center of mass in m/s
+	float GetVelY() const;									// Retrieve the Y linear velocity of this body's center of mass in m/s
+	void SetVel(const glm::vec2 &vVelocity);				// Set the linear velocity of this body's center of mass in m/s
+	void SetVelX(float fVelocityX);							// Set the X linear velocity of this body's center of mass in m/s
+	void SetVelY(float fVelocityY);							// Set the Y linear velocity of this body's center of mass in m/s
+
+	float GetAngVel() const;								// Retrieve the angular velocity of this body in radians/second
+	void SetAngVel(float fOmega);							// Set the angular velocity of this body in radians/second
+
+	void AddForce(const glm::vec2 &vForce);
+	void AddForceX(float fForceX);
+	void AddForceY(float fForceY);
+
+	void AddForceToPt(const glm::vec2 &vForce, const glm::vec2 &ptScenePoint);
+	void AddTorque(float fTorque);
+
+	void AddImpulse(const glm::vec2 &vImpulse);
+	void AddImpulseX(float fImpuseX);
+	void AddImpulseY(float fImpuseY);
+
+	void AddImpulseToPt(const glm::vec2 &vImpulse, const glm::vec2 &ptScenePoint);
+	void AddAngImpulse(float fImpulse);
+
+	float GetLinearDamping() const;
+	void SetLinearDamping(float fLinearDamping);
+	float GetAngularDamping() const;
+	void SetAngularDamping(float fAngularDamping);
+
+	glm::vec2 GetSceneCenterMass() const;
+	glm::vec2 GetLocalCenterMass() const;
+
 	float GetMass() const;
 	float GetInertia() const;
 };

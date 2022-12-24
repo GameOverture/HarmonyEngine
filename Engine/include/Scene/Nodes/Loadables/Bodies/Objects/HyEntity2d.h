@@ -33,7 +33,7 @@ protected:
 	uint32									m_uiEntAttribs;
 
 public:
-	HyPhysicsCtrl2d							physics;
+	HyPhysicsCtrl2d							physics;				// Optional physics component
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
