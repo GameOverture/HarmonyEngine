@@ -23,19 +23,19 @@ class EntityWidget : public IWidget
 {
 	Q_OBJECT
 
-	enum StackedWidgetLayer
-	{
-		STACKED_Null = 0,
-		STACKED_Entity,
-		STACKED_Primitive,
-		STACKED_TexturedQuad,
-		STACKED_Sprite,
-		STACKED_Font,
-		STACKED_BoundingVolume,
-		STACKED_Physics,
+	//enum StackedWidgetLayer
+	//{
+	//	STACKED_Null = 0,
+	//	STACKED_Entity,
+	//	STACKED_Primitive,
+	//	STACKED_TexturedQuad,
+	//	STACKED_Sprite,
+	//	STACKED_Font,
+	//	STACKED_BoundingVolume,
+	//	STACKED_Physics,
 
-		NUMSTACKED
-	};
+	//	NUMSTACKED
+	//};
 
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);

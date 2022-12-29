@@ -50,7 +50,7 @@
 	sm_sItemNames[ITEM_Entity] = "Entity2d";
     sm_sItemNames[ITEM_Prefab] = "Prefab";
 	sm_sItemNames[ITEM_Entity3d] = "Entity3d";
-	sm_sItemNames[ITEM_BoundingVolume] = "BoundingVolume";
+	sm_sItemNames[ITEM_Shape] = "Shape";
 	sm_sItemNames[ITEM_Physics] = "Physics";
 
 	sm_sItemNamesPlural[ITEM_Project] = "Projects";
@@ -68,7 +68,7 @@
 	sm_sItemNamesPlural[ITEM_Entity] = "Entities2d";
     sm_sItemNamesPlural[ITEM_Prefab] = "Prefabs";
 	sm_sItemNamesPlural[ITEM_Entity3d] = "Entities3d";
-	sm_sItemNamesPlural[ITEM_BoundingVolume] = "BoundingVolumes";
+	sm_sItemNamesPlural[ITEM_Shape] = "Shapes";
 	sm_sItemNamesPlural[ITEM_Physics] = "Physics";
 
 	sm_AssetNames[ASSET_Source] = "Source";
@@ -110,7 +110,7 @@
 	sm_ItemColors[ITEM_Entity] = QColor(128, 128, 128);
     sm_ItemColors[ITEM_Prefab] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Entity3d] = QColor(128, 128, 128);
-	sm_ItemColors[ITEM_BoundingVolume] = QColor(234, 232, 58);
+	sm_ItemColors[ITEM_Shape] = QColor(234, 232, 58);
 	sm_ItemColors[ITEM_Physics] = QColor(201, 58, 203);
 
 	sm_Themes[THEME_Decemberween] = "Decemberween";
@@ -163,7 +163,7 @@
 	list.append(ITEM_Entity);
 	list.append(ITEM_Prefab);
 	list.append(ITEM_Entity3d);
-	list.append(ITEM_BoundingVolume);
+	list.append(ITEM_Shape);
 	list.append(ITEM_Physics);
 
 	if(list.size() != NUMTYPES)

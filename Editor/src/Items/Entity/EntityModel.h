@@ -22,7 +22,7 @@
 
 class EntityModel;
 
-class EntityNodeItem : public TreeModelItemData
+class EntityTreeItem : public TreeModelItemData
 {
 	Q_OBJECT
 
@@ -30,9 +30,9 @@ class EntityNodeItem : public TreeModelItemData
 	PropertiesTreeModel									m_PropertiesTreeModel;
 
 public:
-	EntityNodeItem(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem);
-	EntityNodeItem(ProjectItemData &entityItemDataRef, QJsonObject initObj);
-	virtual ~EntityNodeItem();
+	EntityTreeItem(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem);
+	EntityTreeItem(ProjectItemData &entityItemDataRef, QJsonObject initObj);
+	virtual ~EntityTreeItem();
 
 	QString GetCodeName() const;
 	QUuid GetUuid() const;
@@ -62,12 +62,12 @@ public:
 	explicit EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QUuid uuidOfEntity, QObject *pParent = nullptr);
 	virtual ~EntityTreeModel();
 	
-	QList<EntityNodeItem *> GetChildrenNodes() const;
+	QList<EntityTreeItem *> GetChildrenNodes() const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
-	EntityNodeItem *InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
-	bool InsertChild(EntityNodeItem *pItem, int iRow);
-	int32 PopChild(EntityNodeItem *pItem);
+	EntityTreeItem *InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
+	bool InsertChild(EntityTreeItem *pItem, int iRow);
+	int32 PopChild(EntityTreeItem *pItem);
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -106,10 +106,11 @@ public:
 	EntityTreeModel &GetNodeTreeModel();
 
 	// Command Modifiers - should (only) be called from UndoCmd's
-	QList<EntityNodeItem *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
-	bool Cmd_AddChild(EntityNodeItem *pNodeItem, int iRow);
-	int32 Cmd_RemoveChild(EntityNodeItem *pItem);
+	QList<EntityTreeItem *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
+	bool Cmd_AddChild(EntityTreeItem *pNodeItem, int iRow);
 	void Cmd_AddPrimitive();
+	void Cmd_AddShape();
+	int32 Cmd_RemoveTreeItem(EntityTreeItem *pItem);
 
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;

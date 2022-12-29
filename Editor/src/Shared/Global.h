@@ -60,8 +60,8 @@ enum HyGuiItemType
 	ITEM_Header,
 	ITEM_Entity,
 	ITEM_Prefab,
-	ITEM_Entity3d,
-	ITEM_BoundingVolume,
+	ITEM_Entity3d,			// TO BE REPLACED
+	ITEM_Shape,
 	ITEM_Physics,
 
 	NUMTYPES

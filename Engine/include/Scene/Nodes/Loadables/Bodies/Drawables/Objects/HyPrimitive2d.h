@@ -112,6 +112,14 @@ private:
 	void AssemblePolygon(const b2Vec2 *pVertexList, uint32 uiNumVertices);
 
 	static void OnShapeChanged(void *pData);
+
+private: // Hide inherited functionality that doesn't exist for primitives
+	using IHyLoadable::GetState;
+	using IHyLoadable::SetState;
+	using IHyLoadable::GetName;
+	using IHyLoadable::GetPrefix;
+	using IHyLoadable2d::Init;
+	using IHyLoadable2d::Uninit;
 };
 
 #endif /* HyPrimitive2d_h__ */

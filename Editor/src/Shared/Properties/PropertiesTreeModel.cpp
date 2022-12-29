@@ -15,11 +15,6 @@
 #include "SpriteModels.h"
 #include "MainWindow.h"
 
-#include <QCheckBox>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QLineEdit>
-
 PropertiesTreeModel::PropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
 	ITreeModel(2, { "Property", "Value" }, pParent),
 	m_OwnerRef(ownerRef),
@@ -450,12 +445,28 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 	case Qt::BackgroundRole:
 		if(propDefRef.IsCategory())
 			return QBrush(propDefRef.GetColor());
-		//else
+		else if(indexRef.column() == COLUMN_Value && propDefRef.eType == PROPERTIESTYPE_Color)
+			return QBrush(QColor(pTreeItem->data(COLUMN_Value).toRect().left(), pTreeItem->data(COLUMN_Value).toRect().top(), pTreeItem->data(COLUMN_Value).toRect().width()));
 		//	return QBrush((0 == (pTreeItem->GetIndex() & 1)) ? propDefRef.GetColor() : propDefRef.GetColor().lighter());
 
 	case Qt::ForegroundRole:
 		if(propDefRef.IsCategory())
 			return QBrush(QColor::fromRgb(255, 255, 255));
+		else if(indexRef.column() == COLUMN_Value && propDefRef.eType == PROPERTIESTYPE_Color)
+		{
+			QColor clr(pTreeItem->data(COLUMN_Value).toRect().left(), pTreeItem->data(COLUMN_Value).toRect().top(), pTreeItem->data(COLUMN_Value).toRect().width());
+			double a = 1 - (0.299 * clr.redF() + 0.587 * clr.greenF() + 0.114 * clr.blueF()) / 255;
+			if(a < 0.5)
+			{
+				QBrush bgColorBrush(Qt::black);
+				return QVariant(bgColorBrush);
+			}
+			else
+			{
+				QBrush bgColorBrush(Qt::white);
+				return QVariant(bgColorBrush);
+			}
+		}
 
 	case Qt::FontRole:
 		if(propDefRef.IsCategory())

@@ -30,8 +30,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	ui->btnAddChild->setDefaultAction(ui->actionAppendChildren);
 	ui->btnAddChildPrimitive->setDefaultAction(ui->actionAddPrimitive);
-	ui->btnInsertBoundingVolume->setDefaultAction(ui->actionInsertBoundingVolume);
-	ui->btnInsertPhysics->setDefaultAction(ui->actionInsertPhysicsBody);
+	ui->btnAddShape->setDefaultAction(ui->actionAddShape);
 
 	ui->nodeTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	ui->nodeTree->setDragEnabled(true);
@@ -82,11 +81,8 @@ EntityWidget::~EntityWidget()
 
 	bool bFrameIsSelected = true;
 	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
-	ui->actionAddScissorBox->setEnabled(bFrameIsSelected);
-	ui->actionInsertBoundingVolume->setEnabled(bFrameIsSelected);
-	ui->actionInsertPhysicsBody->setEnabled(bFrameIsSelected);
 
-	EntityNodeItem *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<EntityNodeItem *>();
+	EntityTreeItem *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<EntityTreeItem *>();
 	if(pSubStateItem == nullptr)
 	{
 		ui->lblSelectedItemIcon->setVisible(false);
@@ -112,6 +108,8 @@ EntityWidget::~EntityWidget()
 
 		ui->propertyTree->resizeColumnToContents(0);
 	}
+
+	ui->nodeTree->resizeColumnToContents(0);
 }
 
 /*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/

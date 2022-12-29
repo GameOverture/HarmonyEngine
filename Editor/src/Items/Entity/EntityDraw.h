@@ -15,14 +15,16 @@
 
 class EntityDraw : public IDraw
 {
-	class TransformWidget : public HyEntity2d
+	class ChildWidget : public HyEntity2d
 	{
 		HyPrimitive2d				m_Box;
 		HyPrimitive2d				m_GrabOutline[8];
 		HyPrimitive2d				m_GrabFill[8];
 
+		IHyLoadable2d *				m_Child;
+
 	public:
-		TransformWidget(HyEntity2d *pParent) :
+		ChildWidget(HyEntity2d *pParent) :
 			HyEntity2d(pParent)
 		{
 			ChildAppend(m_Box);
@@ -48,11 +50,21 @@ class EntityDraw : public IDraw
 			}
 		}
 	};
-	struct ChildNode
+
+	class ShapeWidget : public HyEntity2d
 	{
-		IHyLoadable2d *				m_Child;
-		HyPrimitive2d				m_Shape;
+		QList<HyPrimitive2d *>		m_PrimList;
+		HyShape2d					m_Shape;
+
+	public:
+		ShapeWidget(HyEntity2d *pParent) :
+			HyEntity2d(pParent)
+		{
+		}
 	};
+	
+	QList<ChildWidget *>				m_ChildWidgetList;
+	QList<ShapeWidget *>				m_ShapeWidgetList;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);

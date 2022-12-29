@@ -18,7 +18,7 @@ class EntityUndoCmd_AddChildren : public QUndoCommand
 {
 	ProjectItemData &			m_EntityItemRef;
 	QList<ProjectItemData *>	m_ChildrenList;
-	QList<EntityNodeItem *>		m_NodeList;
+	QList<EntityTreeItem *>		m_NodeList;
 
 public:
 	EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent = nullptr) :
@@ -53,7 +53,7 @@ public:
 		for(auto *pNodeItem : m_NodeList)
 		{
 			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(pNodeItem, true))
-				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveChild(pNodeItem);
+				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pNodeItem);
 		}
 		m_NodeList.clear();
 
@@ -66,11 +66,11 @@ public:
 class EntityUndoCmd_PopChild : public QUndoCommand
 {
 	ProjectItemData &			m_EntityItemRef;
-	EntityNodeItem *			m_pNode;
+	EntityTreeItem *			m_pNode;
 	uint32						m_uiIndex;
 
 public:
-	EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, EntityNodeItem *pNodeItem, QUndoCommand *pParent = nullptr) :
+	EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, EntityTreeItem *pNodeItem, QUndoCommand *pParent = nullptr) :
 		m_EntityItemRef(entityItemRef),
 		m_pNode(pNodeItem),
 		m_uiIndex(0)
@@ -86,7 +86,7 @@ public:
 
 	virtual void redo() override
 	{
-		m_uiIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveChild(m_pNode);
+		m_uiIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pNode);
 		m_EntityItemRef.FocusWidgetState(0, -1);
 	}
 

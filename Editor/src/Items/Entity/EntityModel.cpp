@@ -15,7 +15,7 @@
 
 #include <QVariant>
 
-EntityNodeItem::EntityNodeItem(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem) :
+EntityTreeItem::EntityTreeItem(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem) :
 	TreeModelItemData(eItemType, sCodeName),
 	m_Uuid(uuidOfItem),
 	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this)))
@@ -23,7 +23,7 @@ EntityNodeItem::EntityNodeItem(ProjectItemData &entityItemDataRef, QString sCode
 	InitalizePropertiesTree();
 }
 
-EntityNodeItem::EntityNodeItem(ProjectItemData &entityItemDataRef, QJsonObject initObj) :
+EntityTreeItem::EntityTreeItem(ProjectItemData &entityItemDataRef, QJsonObject initObj) :
 	TreeModelItemData(HyGlobal::GetTypeFromString(initObj["itemType"].toString()), initObj["codeName"].toString()),
 	m_Uuid(initObj["itemUUID"].toString()),
 	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this)))
@@ -32,54 +32,36 @@ EntityNodeItem::EntityNodeItem(ProjectItemData &entityItemDataRef, QJsonObject i
 	m_PropertiesTreeModel.DeserializeJson(initObj);
 }
 
-/*virtual*/ EntityNodeItem::~EntityNodeItem()
+/*virtual*/ EntityTreeItem::~EntityTreeItem()
 {
 }
 
-QString EntityNodeItem::GetCodeName() const
+QString EntityTreeItem::GetCodeName() const
 {
 	return m_sName;
 }
 
-QUuid EntityNodeItem::GetUuid() const
+QUuid EntityTreeItem::GetUuid() const
 {
 	return m_Uuid;
 }
 
-PropertiesTreeModel &EntityNodeItem::GetPropertiesModel()
+PropertiesTreeModel &EntityTreeItem::GetPropertiesModel()
 {
 	return m_PropertiesTreeModel;
 }
 
-void EntityNodeItem::InsertJsonInfo(QJsonObject &childObjRef)
+void EntityTreeItem::InsertJsonInfo(QJsonObject &childObjRef)
 {
-	childObjRef = m_PropertiesTreeModel.SerializeJson();
+	childObjRef = m_PropertiesTreeModel.SerializeJson(); // Tree item specific stuff
 
+	// Common stuff
 	childObjRef.insert("codeName", GetCodeName());
 	childObjRef.insert("itemType", HyGlobal::ItemName(m_eTYPE, false));
 	childObjRef.insert("itemUUID", m_Uuid.toString(QUuid::WithoutBraces));
-
-	//QPointF ptPos = m_PropertiesTreeModel.FindPropertyValue("Transformation", "Position").toPointF();
-	//QPointF vScale = m_PropertiesTreeModel.FindPropertyValue("Transformation", "Scale").toPointF();
-
-	//childObjRef.insert("pos", QJsonArray() << ptPos.x() << ptPos.y());
-	//childObjRef.insert("rot", m_PropertiesTreeModel.FindPropertyValue("Transformation", "Rotation").toFloat());
-	//childObjRef.insert("scale", QJsonArray() << vScale.x() << vScale.y());
-	//childObjRef.insert("visible", m_PropertiesTreeModel.FindPropertyValue("Common", "Visible").toBool());
-	//childObjRef.insert("pauseUpdate", m_PropertiesTreeModel.FindPropertyValue("Common", "Update During Paused").toBool());
-	//childObjRef.insert("tag", m_PropertiesTreeModel.FindPropertyValue("Common", "User Tag").toInt());
-	//childObjRef.insert("displayOrder", m_PropertiesTreeModel.FindPropertyValue("Common", "Display Order").toInt());
-
-	//// Type specific key/values
-	//switch(m_eTYPE)
-	//{
-	//case ITEM_Sprite:
-	//	childObjRef.insert("stateIndex", m_PropertiesTreeModel.FindPropertyValue("Sprite", "State").toInt());
-	//	childObjRef.insert("animFrame", m_PropertiesTreeModel.FindPropertyValue("Sprite", "Frame").toInt());
-	//}
 }
 
-void EntityNodeItem::InitalizePropertiesTree()
+void EntityTreeItem::InitalizePropertiesTree()
 {
 	// Default ranges
 	const int iRANGE = 16777215;        // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
@@ -88,25 +70,60 @@ void EntityNodeItem::InitalizePropertiesTree()
 
 	m_PropertiesTreeModel.AppendCategory("Common", HyGlobal::ItemColor(ITEM_Prefix));
 	m_PropertiesTreeModel.AppendProperty("Common", "UUID", PROPERTIESTYPE_LineEdit, m_Uuid.toString(QUuid::WithoutBraces), "The universally unique identifier of the Project Item this node represents", true);
-	if(m_eTYPE != ITEM_Audio)
-	{
-		m_PropertiesTreeModel.AppendProperty("Common", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated");
-		m_PropertiesTreeModel.AppendProperty("Common", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
-	}
-	m_PropertiesTreeModel.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused");
-	m_PropertiesTreeModel.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", false, -iRANGE, iRANGE, 1);
 
-	m_PropertiesTreeModel.AppendCategory("Transformation", HyGlobal::ItemColor(ITEM_Project));
-	m_PropertiesTreeModel.AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", false, QPointF(-fRANGE, -fRANGE), QPointF(fRANGE, fRANGE), 1.0, "[", "]");
-	m_PropertiesTreeModel.AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", false, QPointF(-fRANGE, -fRANGE), QPointF(fRANGE, fRANGE), 0.01, "[", "]");
-	m_PropertiesTreeModel.AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", false, 0.0, 360.0, 0.1, "", "°");
+	if(m_eTYPE != ITEM_Shape)
+	{
+		if(m_eTYPE != ITEM_Audio)
+		{
+			m_PropertiesTreeModel.AppendProperty("Common", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated");
+			m_PropertiesTreeModel.AppendProperty("Common", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
+		}
+		m_PropertiesTreeModel.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused");
+		m_PropertiesTreeModel.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", false, -iRANGE, iRANGE, 1);
+
+		m_PropertiesTreeModel.AppendCategory("Transformation", HyGlobal::ItemColor(ITEM_Project));
+		m_PropertiesTreeModel.AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", false, QPointF(-fRANGE, -fRANGE), QPointF(fRANGE, fRANGE), 1.0, "[", "]");
+		m_PropertiesTreeModel.AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", false, QPointF(-fRANGE, -fRANGE), QPointF(fRANGE, fRANGE), 0.01, "[", "]");
+		m_PropertiesTreeModel.AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", false, 0.0, 360.0, 0.1, "", "°");
+	}
 
 	switch(m_eTYPE)
 	{
 	case ITEM_Entity:
+		m_PropertiesTreeModel.AppendCategory("Physics", QVariant(), true, false, "Optionally create a physics component that can affect the transformation of this entity");
+		m_PropertiesTreeModel.AppendProperty("Physics", "Start Activated", PROPERTIESTYPE_bool, Qt::Checked, "This entity will start its physics simulation upon creation");
+		m_PropertiesTreeModel.AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBox, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
+		m_PropertiesTreeModel.AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters");
+		m_PropertiesTreeModel.AppendProperty("Physics", "Initially Awake", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to make body initially awake. Start sleeping otherwise");
+		m_PropertiesTreeModel.AppendProperty("Physics", "Allow Sleep", PROPERTIESTYPE_bool, Qt::Checked, "Uncheck this if this body should never fall asleep. This increases CPU usage");
+		m_PropertiesTreeModel.AppendProperty("Physics", "Gravity Scale", PROPERTIESTYPE_double, 1.0, "Adjusts the gravity on this single body. Negative values will reverse gravity. Increased gravity can decrease stability", false, -100.0, 100.0, 0.1);
+		m_PropertiesTreeModel.AppendProperty("Physics", "Dynamic CCD", PROPERTIESTYPE_bool, Qt::Unchecked, "Continuous collision detection for other dynamic moving bodies. Note that all bodies are prevented from tunneling through kinematic and static bodies. This setting is only considered on dynamic bodies. You should use this flag sparingly since it increases processing time");
+		m_PropertiesTreeModel.AppendProperty("Physics", "Linear Damping", PROPERTIESTYPE_double, 0.0, "Reduces the world linear velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
+		m_PropertiesTreeModel.AppendProperty("Physics", "Angular Damping", PROPERTIESTYPE_double, 0.01, "Reduces the world angular velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
+		m_PropertiesTreeModel.AppendProperty("Physics", "Linear Velocity", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Starting Linear velocity of the body's origin in scene coordinates", false, QPointF(-fRANGE, -fRANGE), QPointF(fRANGE, fRANGE), 1.0, "[", "]");
+		m_PropertiesTreeModel.AppendProperty("Physics", "Angular Velocity", PROPERTIESTYPE_double, 0.0, "Starting Angular velocity of the body", false, 0.0, 100.0, 0.01);
 		break;
 
 	case ITEM_Primitive:
+		m_PropertiesTreeModel.AppendCategory("Primitive", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc.");
+		m_PropertiesTreeModel.AppendProperty("Primitive", "Shape Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Nothing" << "Box" << "Circle" << "Polygon" << "Line" << "Line Chain" << "Line Loop");
+		m_PropertiesTreeModel.AppendProperty("Primitive", "Shape Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
+		m_PropertiesTreeModel.AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type");
+		m_PropertiesTreeModel.AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", false, 1.0, 100.0, 1.0);
+		break;
+
+	case ITEM_Shape:
+		m_PropertiesTreeModel.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc.");
+		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Nothing" << "Box" << "Circle" << "Polygon" << "Line" << "Line Chain" << "Line Loop");
+		m_PropertiesTreeModel.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
+		m_PropertiesTreeModel.AppendProperty("Shape", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		m_PropertiesTreeModel.AppendProperty("Shape", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		m_PropertiesTreeModel.AppendProperty("Shape", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		m_PropertiesTreeModel.AppendProperty("Shape", "Restitution Threshold", PROPERTIESTYPE_double, 1.0, "Restitution velocity threshold, usually in m/s. Collisions above this speed have restitution applied (will bounce)", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		m_PropertiesTreeModel.AppendProperty("Shape", "Sensor", PROPERTIESTYPE_bool, Qt::Unchecked, "A sensor shape collects contact information but never generates a collision response");
+		m_PropertiesTreeModel.AppendProperty("Shape", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", false, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+		m_PropertiesTreeModel.AppendProperty("Shape", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", false, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+		m_PropertiesTreeModel.AppendProperty("Shape", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", false, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
 		break;
 
 	case ITEM_AtlasImage:
@@ -116,6 +133,7 @@ void EntityNodeItem::InitalizePropertiesTree()
 	case ITEM_Text:
 		m_PropertiesTreeModel.AppendCategory("Text", m_Uuid.toString(QUuid::WithoutBraces));
 		m_PropertiesTreeModel.AppendProperty("Text", "State", PROPERTIESTYPE_StatesComboBox, 0, "The text state to be displayed");
+		m_PropertiesTreeModel.AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", false);
 		break;
 
 	case ITEM_Sprite:
@@ -125,24 +143,8 @@ void EntityNodeItem::InitalizePropertiesTree()
 		break;
 
 	default:
-		HyGuiLog(QString("EntityNodeItem::InitalizePropertiesTree - unsupported type: ") % QString::number(m_eTYPE), LOGTYPE_Error);
+		HyGuiLog(QString("EntityTreeItem::InitalizePropertiesTree - unsupported type: ") % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
-	}
-
-	if(m_eTYPE != ITEM_Audio)
-	{
-		m_PropertiesTreeModel.AppendCategory("Shape", QVariant(), true, false, "Specify this node's bounding volume");
-		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this bounding volume will be", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Box" << "Circle" << "Polygon" << "Line" << "Line Chain" << "Line Loop");
-
-		m_PropertiesTreeModel.AppendCategory("Physics", QVariant(), true, false, "Optionally enable physics to be applied to above shape");
-		m_PropertiesTreeModel.AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBox, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
-		m_PropertiesTreeModel.AppendProperty("Physics", "Gravity Scale", PROPERTIESTYPE_double, 1.0, "Adjusts the gravity on this single body. Negative values will reverse gravity. Increased gravity can decrease stability", false, -100.0, 100.0, 0.1);
-		m_PropertiesTreeModel.AppendProperty("Physics", "Linear Damping", PROPERTIESTYPE_double, 0.0, "Reduces the world linear velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
-		m_PropertiesTreeModel.AppendProperty("Physics", "Angular Damping", PROPERTIESTYPE_double, 0.01, "Reduces the world angular velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
-		m_PropertiesTreeModel.AppendProperty("Physics", "Dynamic CCD", PROPERTIESTYPE_bool, Qt::Unchecked, "Continuous collision detection for other dynamic moving bodies. Note that all bodies are prevented from tunneling through kinematic and static bodies. This setting is only considered on dynamic bodies. You should use this flag sparingly since it increases processing time");
-		m_PropertiesTreeModel.AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters");
-		m_PropertiesTreeModel.AppendProperty("Physics", "Initially Awake", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to make body initially awake. Start sleeping otherwise");
-		m_PropertiesTreeModel.AppendProperty("Physics", "Allow Sleep", PROPERTIESTYPE_bool, Qt::Checked, "Uncheck this if this body should never fall asleep. This increases CPU usage");
 	}
 }
 
@@ -159,10 +161,10 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		return;
 	}
 
-	EntityNodeItem *pNewItem = new EntityNodeItem(m_ModelRef.GetItem(), sEntityCodeName, ITEM_Entity, uuidOfEntity);
+	EntityTreeItem *pNewItem = new EntityTreeItem(m_ModelRef.GetItem(), sEntityCodeName, ITEM_Entity, uuidOfEntity);
 
 	QVariant v;
-	v.setValue<EntityNodeItem *>(pNewItem);
+	v.setValue<EntityTreeItem *>(pNewItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
 	{
 		if(setData(index(0, iCol, QModelIndex()), v, Qt::UserRole) == false)
@@ -174,11 +176,11 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 {
 }
 
-QList<EntityNodeItem *> EntityTreeModel::GetChildrenNodes() const
+QList<EntityTreeItem *> EntityTreeModel::GetChildrenNodes() const
 {
-	QList<EntityNodeItem *> nodeList;
+	QList<EntityTreeItem *> nodeList;
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
-		nodeList.push_back(m_pRootItem->GetChild(i)->data(0).value<EntityNodeItem *>());
+		nodeList.push_back(m_pRootItem->GetChild(i)->data(0).value<EntityTreeItem *>());
 
 	return nodeList;
 }
@@ -215,10 +217,10 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 	return true;
 }
 
-EntityNodeItem *EntityTreeModel::InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow /*= -1*/)
+EntityTreeItem *EntityTreeModel::InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	TreeModelItem *pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
-	QModelIndex parentIndex = FindIndex<EntityNodeItem *>(pParentTreeItem->data(0).value<EntityNodeItem *>(), 0);
+	QModelIndex parentIndex = FindIndex<EntityTreeItem *>(pParentTreeItem->data(0).value<EntityTreeItem *>(), 0);
 	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 	if(insertRow(iRow, parentIndex) == false)
 	{
@@ -230,10 +232,10 @@ EntityNodeItem *EntityTreeModel::InsertNewChild(ProjectItemData *pProjItem, QStr
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pProjItem->GetName(false));
 	
 	// Allocate and store the new item in the tree model
-	EntityNodeItem *pNewItem = new EntityNodeItem(m_ModelRef.GetItem(), sCodeName, pProjItem->GetType(), pProjItem->GetUuid());
+	EntityTreeItem *pNewItem = new EntityTreeItem(m_ModelRef.GetItem(), sCodeName, pProjItem->GetType(), pProjItem->GetUuid());
 
 	QVariant v;
-	v.setValue<EntityNodeItem *>(pNewItem);
+	v.setValue<EntityTreeItem *>(pNewItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
 	{
 		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
@@ -243,10 +245,10 @@ EntityNodeItem *EntityTreeModel::InsertNewChild(ProjectItemData *pProjItem, QStr
 	return pNewItem;
 }
 
-bool EntityTreeModel::InsertChild(EntityNodeItem *pItem, int iRow)
+bool EntityTreeModel::InsertChild(EntityTreeItem *pItem, int iRow)
 {
 	TreeModelItem *pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
-	QModelIndex parentIndex = FindIndex<EntityNodeItem *>(pParentTreeItem->data(0).value<EntityNodeItem *>(), 0);
+	QModelIndex parentIndex = FindIndex<EntityTreeItem *>(pParentTreeItem->data(0).value<EntityTreeItem *>(), 0);
 	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 	if(insertRow(iRow, parentIndex) == false)
 	{
@@ -258,7 +260,7 @@ bool EntityTreeModel::InsertChild(EntityNodeItem *pItem, int iRow)
 	QString sCodeName = GenerateCodeName(pItem->GetCodeName());
 
 	QVariant v;
-	v.setValue<EntityNodeItem *>(pItem);
+	v.setValue<EntityTreeItem *>(pItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
 	{
 		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
@@ -268,9 +270,9 @@ bool EntityTreeModel::InsertChild(EntityNodeItem *pItem, int iRow)
 	return true;
 }
 
-int32 EntityTreeModel::PopChild(EntityNodeItem *pItem)
+int32 EntityTreeModel::PopChild(EntityTreeItem *pItem)
 {
-	TreeModelItem *pTreeItem = GetItem(FindIndex<EntityNodeItem *>(pItem, 0));
+	TreeModelItem *pTreeItem = GetItem(FindIndex<EntityTreeItem *>(pItem, 0));
 	TreeModelItem *pParentTreeItem = pTreeItem->GetParent();
 
 	int32 iRow = pTreeItem->GetIndex();
@@ -292,7 +294,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 	if(iRole == Qt::UserRole)
 		return ITreeModel::data(indexRef, iRole);
 
-	EntityNodeItem *pItem = pTreeItem->data(0).value<EntityNodeItem *>();
+	EntityTreeItem *pItem = pTreeItem->data(0).value<EntityTreeItem *>();
 	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pItem->GetUuid());
 
 	switch(iRole)
@@ -311,12 +313,18 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		}
 
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
-		if(pProjItem && pProjItem->IsExistencePendingSave())
-			return QVariant(pItem->GetIcon(SUBICON_New));
-		else if(pProjItem && pProjItem->IsSaveClean() == false)
-			return QVariant(pItem->GetIcon(SUBICON_Dirty));
-		
-		return QVariant(pItem->GetIcon(SUBICON_None));
+		if(indexRef.column() == COLUMN_CodeName)
+		{
+			if(pProjItem && pProjItem->IsExistencePendingSave())
+				return QVariant(pItem->GetIcon(SUBICON_New));
+			else if(pProjItem && pProjItem->IsSaveClean() == false)
+				return QVariant(pItem->GetIcon(SUBICON_Dirty));
+
+			return QVariant(pItem->GetIcon(SUBICON_None));
+		}
+		else
+			return QVariant();
+
 
 	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
 		return QVariant(pItem->GetUuid().toString());
@@ -339,7 +347,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 
 QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 {
-	QList<EntityNodeItem *> nodeList = GetChildrenNodes();
+	QList<EntityTreeItem *> nodeList = GetChildrenNodes();
 	uint uiConflictCount = 0;
 	bool bIsUnique = false;
 	do
@@ -411,12 +419,12 @@ EntityTreeModel &EntityModel::GetNodeTreeModel()
 	return m_TreeModel;
 }
 
-QList<EntityNodeItem *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow)
+QList<EntityTreeItem *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow)
 {
-	QList<EntityNodeItem *> treeNodeList;
+	QList<EntityTreeItem *> treeNodeList;
 	for(auto *pItem : projItemList)
 	{
-		EntityNodeItem *pAddedItem = m_TreeModel.InsertNewChild(pItem, "m_", iRow);
+		EntityTreeItem *pAddedItem = m_TreeModel.InsertNewChild(pItem, "m_", iRow);
 		if(pAddedItem)
 			treeNodeList.push_back(pAddedItem);
 		else
@@ -428,7 +436,7 @@ QList<EntityNodeItem *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *>
 	return treeNodeList;
 }
 
-bool EntityModel::Cmd_AddChild(EntityNodeItem *pNodeItem, int iRow)
+bool EntityModel::Cmd_AddChild(EntityTreeItem *pNodeItem, int iRow)
 {
 	if(m_TreeModel.InsertChild(pNodeItem, iRow) == false)
 		return false;
@@ -440,7 +448,15 @@ bool EntityModel::Cmd_AddChild(EntityNodeItem *pNodeItem, int iRow)
 	return true;
 }
 
-int32 EntityModel::Cmd_RemoveChild(EntityNodeItem *pItem)
+void EntityModel::Cmd_AddPrimitive()
+{
+}
+
+void EntityModel::Cmd_AddShape()
+{
+}
+
+int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItem *pItem)
 {
 	if(pItem == nullptr)
 		return -1;
@@ -466,16 +482,18 @@ int32 EntityModel::Cmd_RemoveChild(EntityNodeItem *pItem)
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_CodeNameMapper.GetString());
 	itemSpecificFileDataOut.m_Meta.insert("entityType", m_CodeNameMapper.GetString());
 	
-	QJsonArray childrenNodesArray;
-	QList<EntityNodeItem *> childList = m_TreeModel.GetChildrenNodes();
+	QJsonArray childArray;
+	QJsonArray shapeArray;
+	QList<EntityTreeItem *> childList = m_TreeModel.GetChildrenNodes();
 	for(auto *pChild : childList)
 	{
 		QJsonObject childObj;
 		pChild->InsertJsonInfo(childObj);
-		childrenNodesArray.append(childObj);
+		childArray.append(childObj);
 	}
 
-	itemSpecificFileDataOut.m_Meta.insert("childrenNodes", childrenNodesArray);
+	itemSpecificFileDataOut.m_Meta.insert("childList", childArray);
+	itemSpecificFileDataOut.m_Meta.insert("shapeList", shapeArray);
 }
 
 /*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/

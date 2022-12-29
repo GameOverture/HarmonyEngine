@@ -15,6 +15,7 @@
 #include "IModel.h"
 #include "SpriteModels.h"
 #include "PropertiesUndoCmd.h"
+#include "DlgColorPicker.h"
 
 #include <QPainter>
 #include <QHeaderView>
@@ -85,7 +86,8 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 {
 	QWidget *pReturnWidget = nullptr;
 
-	const PropertiesDef &propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyDefinition(index);
+	PropertiesTreeModel *pPropertiesTreeModel = static_cast<PropertiesTreeModel *>(m_pTableView->model());
+	const PropertiesDef &propDefRef = pPropertiesTreeModel->GetPropertyDefinition(index);
 	switch(propDefRef.eType)
 	{
 	case PROPERTIESTYPE_bool:
@@ -202,8 +204,25 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<QSlider *>(pReturnWidget)->setSingleStep(propDefRef.stepAmt.toInt());
 		break;
 
-	case PROPERTIESTYPE_Color:
-		break;
+	case PROPERTIESTYPE_Color: {
+		QColor topColor, botColor;
+		DlgColorPicker *pDlg = new DlgColorPicker("Choose Color", topColor, botColor, pParent);
+		if(pDlg->exec() == QDialog::Accepted)
+		{
+			QVariant newValue;
+			if(pDlg->IsSolidColor())
+				newValue = pDlg->GetSolidColor();
+			else
+				newValue = pDlg->GetVgTopColor(); // NOTE: Only getting top color!!
+
+			const QVariant &origValue = pPropertiesTreeModel->GetPropertyValue(index);
+			if(origValue != newValue)
+			{
+				QUndoCommand *pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, newValue);
+				pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
+			}
+		}
+		break; }
 
 	case PROPERTIESTYPE_SpriteFrames:
 		pReturnWidget = new QSlider(pParent);
@@ -303,6 +322,8 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 	case PROPERTIESTYPE_Slider:
 		newValue = QVariant(static_cast<QSlider *>(pEditor)->value());
+		break;
+	case PROPERTIESTYPE_Color: // Handled in DlgColorPicker
 		break;
 	default:
 		HyGuiLog("PropertiesDelegate::setModelData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);

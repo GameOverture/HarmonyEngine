@@ -30,6 +30,18 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ void EntityDraw::OnApplyJsonData(HyJsonDoc &itemDataDocRef) /*override*/
 {
+	HyJsonObj itemDataObj = itemDataDocRef.GetObject();
+
+	itemDataObj["childList"].GetArray();
+	itemDataObj["shapeList"].GetArray();
+
+	//m_Sprite.GuiOverrideData<HySpriteData>(itemDataObj);
+	//m_Sprite.SetAnimCtrl(HYANIMCTRL_Reset);
+
+	//SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
+	//m_Sprite.SetAnimPause(pWidget->IsPlayingAnim() == false);
+
+	//m_Sprite.Load();
 }
 
 /*virtual*/ void EntityDraw::OnShow() /*override*/
