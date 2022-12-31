@@ -47,6 +47,10 @@ public:
 
 	ExplorerItemData *GetSelectedNode();
 
+protected:
+	virtual void showEvent(QShowEvent *pEvent) override;
+	virtual void resizeEvent(QResizeEvent *pEvent) override;
+
 private Q_SLOTS:
 	void on_nodeTree_clicked(QModelIndex);
 	void on_actionAppendChildren_triggered();

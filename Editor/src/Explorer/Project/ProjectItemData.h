@@ -23,6 +23,7 @@ class AudioAssetsWidget;
 class Project;
 class AtlasFrame;
 class IModel;
+class PropertiesTreeModel;
 
 class ProjectItemData : public ExplorerItemData
 {
@@ -72,6 +73,7 @@ public:
 	
 	void BlockAllWidgetSignals(bool bBlock);
 
+	void PropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty);
 	void FocusWidgetState(int iStateIndex, QVariant subState);
 	
 	virtual void DeleteFromProject() override;

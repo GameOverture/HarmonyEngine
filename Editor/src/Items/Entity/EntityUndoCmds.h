@@ -18,7 +18,7 @@ class EntityUndoCmd_AddChildren : public QUndoCommand
 {
 	ProjectItemData &			m_EntityItemRef;
 	QList<ProjectItemData *>	m_ChildrenList;
-	QList<EntityTreeItem *>		m_NodeList;
+	QList<EntityTreeItemData *>		m_NodeList;
 
 public:
 	EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent = nullptr) :
@@ -66,11 +66,11 @@ public:
 class EntityUndoCmd_PopChild : public QUndoCommand
 {
 	ProjectItemData &			m_EntityItemRef;
-	EntityTreeItem *			m_pNode;
+	EntityTreeItemData *		m_pNode;
 	uint32						m_uiIndex;
 
 public:
-	EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, EntityTreeItem *pNodeItem, QUndoCommand *pParent = nullptr) :
+	EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, EntityTreeItemData *pNodeItem, QUndoCommand *pParent = nullptr) :
 		m_EntityItemRef(entityItemRef),
 		m_pNode(pNodeItem),
 		m_uiIndex(0)
@@ -92,7 +92,7 @@ public:
 
 	virtual void undo() override
 	{
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddChild(m_pNode, m_uiIndex);
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pNode, m_uiIndex);
 		m_EntityItemRef.FocusWidgetState(0, -1);
 	}
 };

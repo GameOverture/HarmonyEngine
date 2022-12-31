@@ -17,6 +17,26 @@
 
 class ProjectItemData;
 
+class TransformWidget : public HyEntity2d
+{
+	HyPrimitive2d				m_Box;
+	HyPrimitive2d				m_GrabOutline[8];
+	HyPrimitive2d				m_GrabFill[8];
+
+public:
+	TransformWidget(HyEntity2d *pParent) :
+		HyEntity2d(pParent)
+	{
+		ChildAppend(m_Box);
+
+		for(uint i = 0; i < 8; ++i)
+		{
+			ChildAppend(m_GrabOutline[i]);
+			ChildAppend(m_GrabFill[i]);
+		}
+	}
+};
+
 class IDraw : public HyEntity2d
 {
 protected:
@@ -59,6 +79,7 @@ public:
 
 protected:
 	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) { }
+	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) { }
 	virtual void OnShow() = 0;
 	virtual void OnHide() = 0;
 	virtual void OnResizeRenderer() = 0;

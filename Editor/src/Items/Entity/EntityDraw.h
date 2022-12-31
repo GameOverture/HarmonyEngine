@@ -17,54 +17,50 @@ class EntityDraw : public IDraw
 {
 	class ChildWidget : public HyEntity2d
 	{
-		HyPrimitive2d				m_Box;
-		HyPrimitive2d				m_GrabOutline[8];
-		HyPrimitive2d				m_GrabFill[8];
+		HyGuiItemType							m_eGuiType;
+		QUuid									m_ItemUuid;
 
-		IHyLoadable2d *				m_Child;
+		TransformWidget							m_Transform;
+		IHyLoadable2d *							m_pChild;
+
+		bool									m_bStale;
 
 	public:
-		ChildWidget(HyEntity2d *pParent) :
-			HyEntity2d(pParent)
-		{
-			ChildAppend(m_Box);
-
-			for(uint i = 0; i < 8; ++i)
-			{
-				ChildAppend(m_GrabOutline[i]);
-				ChildAppend(m_GrabFill[i]);
-			}
+		ChildWidget(HyGuiItemType eType, QUuid uuid, HyEntity2d *pParent);
+		virtual ~ChildWidget();
+		HyGuiItemType GetGuiType() const {
+			return m_eGuiType;
 		}
-
-		void Set(IHyDrawable2d &nodeRef, float fLineThickness)
-		{
-			//m_Box.shape = nodeRef.GetLocalBoundingVolume();
-			m_Box.SetLineThickness(fLineThickness);
-			//HyAssert(m_Box.GetShapeType() == HYSHAPE_Polygon && static_cast<const b2PolygonShape *>(m_Box.shape.GetB2Shape())->m_count == 4, "TransformWidget got a shape that wasn't a box polygon");
-
-			for(uint i = 0; i < 4; ++i)
-			{
-				//const b2PolygonShape *pB2Shape = static_cast<const b2PolygonShape *>(m_Box.GetB2Shape());
-				//m_GrabOutline[i].pos.Set(pB2Shape->m_vertices[i].x, pB2Shape->m_vertices[i].y);
-				//m_GrabFill[i].pos.Set(pB2Shape->m_vertices[i].x, pB2Shape->m_vertices[i].y);
-			}
+		const QUuid &GetUuid() const {
+			return m_ItemUuid;
 		}
+		bool IsStale() const {
+			return m_bStale;
+		}
+		void SetStale() {
+			m_bStale = true;
+		}
+		void RefreshJson(QJsonObject childObj); // Clears stale flag
+	
+	protected:
+		void RefreshOverrideData();
 	};
 
 	class ShapeWidget : public HyEntity2d
 	{
-		QList<HyPrimitive2d *>		m_PrimList;
-		HyShape2d					m_Shape;
+		TransformWidget							m_Transform;
+		HyShape2d								m_Shape;
 
 	public:
 		ShapeWidget(HyEntity2d *pParent) :
-			HyEntity2d(pParent)
+			HyEntity2d(pParent),
+			m_Transform(this)
 		{
 		}
 	};
 	
-	QList<ChildWidget *>				m_ChildWidgetList;
-	QList<ShapeWidget *>				m_ShapeWidgetList;
+	QList<ChildWidget *>						m_ChildWidgetList;
+	QList<ShapeWidget *>						m_ShapeWidgetList;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
@@ -73,11 +69,14 @@ public:
 	//void Sync();
 
 protected:
-	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) override;
+	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
+
+	ChildWidget *FindStaleChild(HyGuiItemType eType, QUuid uuid);
+	void DeleteStaleChildren();
 };
 
 #endif // ENTITYDRAW_H

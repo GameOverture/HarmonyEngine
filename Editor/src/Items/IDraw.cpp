@@ -79,13 +79,17 @@ void IDraw::ApplyJsonData()
 	FileDataPair itemFileData;
 	m_pProjItem->GetLatestFileData(itemFileData);
 
-	QByteArray src = JsonValueToSrc(m_pProjItem->GetType() == ITEM_Entity ? itemFileData.m_Meta : itemFileData.m_Data);
+	if(m_pProjItem->GetType() == ITEM_Entity)
+		OnApplyJsonMeta(itemFileData.m_Meta);
+	else
+	{
+		QByteArray src = JsonValueToSrc(itemFileData.m_Data);
+		HyJsonDoc itemDataDoc;
+		if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+			HyGuiLog("IDraw::ApplyJsonData failed to parse", LOGTYPE_Error);
 
-	HyJsonDoc itemDataDoc;
-	if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-		HyGuiLog("IDraw::ApplyJsonData failed to parse", LOGTYPE_Error);
-
-	OnApplyJsonData(itemDataDoc);
+		OnApplyJsonData(itemDataDoc);
+	}
 }
 
 void IDraw::Show()

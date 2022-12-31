@@ -30,6 +30,7 @@
 #include "AudioModel.h"
 #include "AudioWidget.h"
 #include "AudioDraw.h"
+#include "PropertiesTreeModel.h"
 
 #include <QMenu>
 #include <QJsonDocument>
@@ -333,6 +334,11 @@ void ProjectItemData::BlockAllWidgetSignals(bool bBlock)
 	QList<QWidget *> widgetList = m_pWidget->findChildren<QWidget *>();
 	for(auto iter = widgetList.begin(); iter != widgetList.end(); ++iter)
 		(*iter)->blockSignals(bBlock);
+}
+
+void ProjectItemData::PropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty)
+{
+	m_pModel->OnPropertyModified(propertiesModelRef, sCategory, sProperty);
 }
 
 void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)

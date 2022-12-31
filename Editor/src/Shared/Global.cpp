@@ -47,9 +47,9 @@
 	sm_sItemNames[ITEM_Sprite] = "Sprite";
 	sm_sItemNames[ITEM_Source] = "Source";
 	sm_sItemNames[ITEM_Header] = "Header";
-	sm_sItemNames[ITEM_Entity] = "Entity2d";
+	sm_sItemNames[ITEM_Entity] = "Entity";
     sm_sItemNames[ITEM_Prefab] = "Prefab";
-	sm_sItemNames[ITEM_Entity3d] = "Entity3d";
+	sm_sItemNames[ITEM_Entity3d] = "Not Used";
 	sm_sItemNames[ITEM_Shape] = "Shape";
 	sm_sItemNames[ITEM_Physics] = "Physics";
 
@@ -65,9 +65,9 @@
 	sm_sItemNamesPlural[ITEM_Sprite] = "Sprites";
 	sm_sItemNamesPlural[ITEM_Source] = "Source";
 	sm_sItemNamesPlural[ITEM_Header] = "Headers";
-	sm_sItemNamesPlural[ITEM_Entity] = "Entities2d";
+	sm_sItemNamesPlural[ITEM_Entity] = "Entities";
     sm_sItemNamesPlural[ITEM_Prefab] = "Prefabs";
-	sm_sItemNamesPlural[ITEM_Entity3d] = "Entities3d";
+	sm_sItemNamesPlural[ITEM_Entity3d] = "Not Used";
 	sm_sItemNamesPlural[ITEM_Shape] = "Shapes";
 	sm_sItemNamesPlural[ITEM_Physics] = "Physics";
 

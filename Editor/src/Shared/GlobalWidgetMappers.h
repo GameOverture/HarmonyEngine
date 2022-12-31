@@ -332,11 +332,17 @@ public:
 
 	QString GetCurrentItem()
 	{
+		if(currentIndex() < 0)
+			return QString();
+
 		return static_cast<ModelComboBox *>(model())->GetItem(currentIndex());
 	}
 
 	QVariant GetCurrentData()
 	{
+		if(currentIndex() < 0)
+			return QVariant();
+
 		return static_cast<ModelComboBox *>(model())->GetData(currentIndex());
 	}
 

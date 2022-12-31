@@ -33,6 +33,12 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 	else
 		m_pModel->setData(m_ModelIndex, m_NewData, Qt::UserRole);
 
+	if(m_pModel->GetPropertyDefinition(m_ModelIndex).IsCategory() == false)
+	{
+		QString sCategory = m_pModel->GetPropertyName(m_ModelIndex.parent());
+		QString sProperty = m_pModel->GetPropertyName(m_ModelIndex);
+		m_pModel->GetOwner().PropertyModified(*m_pModel, sCategory, sProperty);
+	}
 	m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
 }
 
@@ -46,5 +52,11 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 	else
 		m_pModel->setData(m_ModelIndex, m_OldData, Qt::UserRole);
 
+	if(m_pModel->GetPropertyDefinition(m_ModelIndex).IsCategory() == false)
+	{
+		QString sCategory = m_pModel->GetPropertyName(m_ModelIndex.parent());
+		QString sProperty = m_pModel->GetPropertyName(m_ModelIndex);
+		m_pModel->GetOwner().PropertyModified(*m_pModel, sCategory, sProperty);
+	}
 	m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
 }

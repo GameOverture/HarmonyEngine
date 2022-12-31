@@ -15,7 +15,7 @@
 
 #include <QVariant>
 
-EntityTreeItem::EntityTreeItem(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem) :
+EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem) :
 	TreeModelItemData(eItemType, sCodeName),
 	m_Uuid(uuidOfItem),
 	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this)))
@@ -23,7 +23,7 @@ EntityTreeItem::EntityTreeItem(ProjectItemData &entityItemDataRef, QString sCode
 	InitalizePropertiesTree();
 }
 
-EntityTreeItem::EntityTreeItem(ProjectItemData &entityItemDataRef, QJsonObject initObj) :
+EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj) :
 	TreeModelItemData(HyGlobal::GetTypeFromString(initObj["itemType"].toString()), initObj["codeName"].toString()),
 	m_Uuid(initObj["itemUUID"].toString()),
 	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this)))
@@ -32,26 +32,26 @@ EntityTreeItem::EntityTreeItem(ProjectItemData &entityItemDataRef, QJsonObject i
 	m_PropertiesTreeModel.DeserializeJson(initObj);
 }
 
-/*virtual*/ EntityTreeItem::~EntityTreeItem()
+/*virtual*/ EntityTreeItemData::~EntityTreeItemData()
 {
 }
 
-QString EntityTreeItem::GetCodeName() const
+QString EntityTreeItemData::GetCodeName() const
 {
 	return m_sName;
 }
 
-QUuid EntityTreeItem::GetUuid() const
+QUuid EntityTreeItemData::GetUuid() const
 {
 	return m_Uuid;
 }
 
-PropertiesTreeModel &EntityTreeItem::GetPropertiesModel()
+PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
 {
 	return m_PropertiesTreeModel;
 }
 
-void EntityTreeItem::InsertJsonInfo(QJsonObject &childObjRef)
+void EntityTreeItemData::InsertJsonInfo(QJsonObject &childObjRef)
 {
 	childObjRef = m_PropertiesTreeModel.SerializeJson(); // Tree item specific stuff
 
@@ -61,7 +61,7 @@ void EntityTreeItem::InsertJsonInfo(QJsonObject &childObjRef)
 	childObjRef.insert("itemUUID", m_Uuid.toString(QUuid::WithoutBraces));
 }
 
-void EntityTreeItem::InitalizePropertiesTree()
+void EntityTreeItemData::InitalizePropertiesTree()
 {
 	// Default ranges
 	const int iRANGE = 16777215;        // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
@@ -160,11 +160,9 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-
-	EntityTreeItem *pNewItem = new EntityTreeItem(m_ModelRef.GetItem(), sEntityCodeName, ITEM_Entity, uuidOfEntity);
-
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sEntityCodeName, ITEM_Entity, uuidOfEntity);
 	QVariant v;
-	v.setValue<EntityTreeItem *>(pNewItem);
+	v.setValue<EntityTreeItemData *>(pNewItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
 	{
 		if(setData(index(0, iCol, QModelIndex()), v, Qt::UserRole) == false)
@@ -176,13 +174,36 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 {
 }
 
-QList<EntityTreeItem *> EntityTreeModel::GetChildrenNodes() const
+TreeModelItem *EntityTreeModel::GetEntityTreeItem() const
 {
-	QList<EntityTreeItem *> nodeList;
-	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
-		nodeList.push_back(m_pRootItem->GetChild(i)->data(0).value<EntityTreeItem *>());
+	if(m_pRootItem->GetNumChildren() == 0)
+		return nullptr;
 
-	return nodeList;
+	return m_pRootItem->GetChild(0);
+}
+
+EntityTreeItemData *EntityTreeModel::GetEntityTreeItemData() const
+{
+	if(m_pRootItem->GetNumChildren() == 0)
+		return nullptr;
+
+	return m_pRootItem->GetChild(0)->data(0).value<EntityTreeItemData *>();
+}
+
+void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const
+{
+	TreeModelItem *pThisEntity = GetEntityTreeItem();
+	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pCurItem = pThisEntity->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pCurItem == nullptr)
+			continue;
+		
+		if(pCurItem->GetType() != ITEM_Shape)
+			childListOut.push_back(pCurItem);
+		else
+			shapeListOut.push_back(pCurItem);
+	}
 }
 
 bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const
@@ -217,10 +238,10 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 	return true;
 }
 
-EntityTreeItem *EntityTreeModel::InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	TreeModelItem *pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
-	QModelIndex parentIndex = FindIndex<EntityTreeItem *>(pParentTreeItem->data(0).value<EntityTreeItem *>(), 0);
+	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
 	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 	if(insertRow(iRow, parentIndex) == false)
 	{
@@ -232,10 +253,9 @@ EntityTreeItem *EntityTreeModel::InsertNewChild(ProjectItemData *pProjItem, QStr
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pProjItem->GetName(false));
 	
 	// Allocate and store the new item in the tree model
-	EntityTreeItem *pNewItem = new EntityTreeItem(m_ModelRef.GetItem(), sCodeName, pProjItem->GetType(), pProjItem->GetUuid());
-
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pProjItem->GetType(), pProjItem->GetUuid());
 	QVariant v;
-	v.setValue<EntityTreeItem *>(pNewItem);
+	v.setValue<EntityTreeItemData *>(pNewItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
 	{
 		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
@@ -245,10 +265,37 @@ EntityTreeItem *EntityTreeModel::InsertNewChild(ProjectItemData *pProjItem, QStr
 	return pNewItem;
 }
 
-bool EntityTreeModel::InsertChild(EntityTreeItem *pItem, int iRow)
+EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjItem, QJsonObject initObj, int iRow /*= -1*/)
+{
+	HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(initObj["itemType"].toString());
+	QString sCodeName = initObj["codeName"].toString();
+
+	TreeModelItem *pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
+	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
+	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
+	if(insertRow(iRow, parentIndex) == false)
+	{
+		HyGuiLog("EntityTreeModel::InsertNewChild() - insertRow failed", LOGTYPE_Error);
+		return nullptr;
+	}
+
+	// Allocate and store the new item in the tree model
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), initObj);
+	QVariant v;
+	v.setValue<EntityTreeItemData *>(pNewItem);
+	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
+	{
+		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
+			HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+	}
+
+	return pNewItem;
+}
+
+bool EntityTreeModel::Cmd_InsertChild(EntityTreeItemData *pItem, int iRow)
 {
 	TreeModelItem *pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
-	QModelIndex parentIndex = FindIndex<EntityTreeItem *>(pParentTreeItem->data(0).value<EntityTreeItem *>(), 0);
+	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
 	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 	if(insertRow(iRow, parentIndex) == false)
 	{
@@ -260,7 +307,7 @@ bool EntityTreeModel::InsertChild(EntityTreeItem *pItem, int iRow)
 	QString sCodeName = GenerateCodeName(pItem->GetCodeName());
 
 	QVariant v;
-	v.setValue<EntityTreeItem *>(pItem);
+	v.setValue<EntityTreeItemData *>(pItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
 	{
 		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
@@ -270,9 +317,9 @@ bool EntityTreeModel::InsertChild(EntityTreeItem *pItem, int iRow)
 	return true;
 }
 
-int32 EntityTreeModel::PopChild(EntityTreeItem *pItem)
+int32 EntityTreeModel::Cmd_PopChild(EntityTreeItemData *pItem)
 {
-	TreeModelItem *pTreeItem = GetItem(FindIndex<EntityTreeItem *>(pItem, 0));
+	TreeModelItem *pTreeItem = GetItem(FindIndex<EntityTreeItemData *>(pItem, 0));
 	TreeModelItem *pParentTreeItem = pTreeItem->GetParent();
 
 	int32 iRow = pTreeItem->GetIndex();
@@ -294,7 +341,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 	if(iRole == Qt::UserRole)
 		return ITreeModel::data(indexRef, iRole);
 
-	EntityTreeItem *pItem = pTreeItem->data(0).value<EntityTreeItem *>();
+	EntityTreeItemData *pItem = pTreeItem->data(0).value<EntityTreeItemData *>();
 	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pItem->GetUuid());
 
 	switch(iRole)
@@ -347,7 +394,11 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 
 QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 {
-	QList<EntityTreeItem *> nodeList = GetChildrenNodes();
+	QList<EntityTreeItemData *> childList;
+	QList<EntityTreeItemData *> shapeList;
+	GetTreeItemData(childList, shapeList);
+	childList += shapeList; // Just combine the two since they all need to be unique
+
 	uint uiConflictCount = 0;
 	bool bIsUnique = false;
 	do
@@ -357,15 +408,15 @@ QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 			sFullCodeName += QString::number(uiConflictCount);
 
 		int i = 0;
-		for(; i < nodeList.size(); ++i)
+		for(; i < childList.size(); ++i)
 		{
-			if(sFullCodeName.compare(nodeList[i]->GetCodeName()) == 0)
+			if(sFullCodeName.compare(childList[i]->GetCodeName()) == 0)
 			{
 				uiConflictCount++;
 				break;
 			}
 		}
-		if(i == nodeList.size())
+		if(i == childList.size())
 		{
 			sDesiredName = sFullCodeName;
 			bIsUnique = true;
@@ -397,20 +448,38 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
-	m_CodeNameMapper(this),
 	m_EntityTypeMapper(this),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this)
 {
 	InitStates<EntityStateData>(itemFileDataRef);
+
+	// Insert all the items into the nodeTree
+	QJsonArray childArray = itemFileDataRef.m_Meta["childList"].toArray();
+	for(int i = 0; i < childArray.size(); ++i)
+	{
+		QJsonObject childObj = childArray[i].toObject();
+		
+		HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
+		if(eGuiType == ITEM_Primitive)
+			Cmd_AddNewChild(nullptr, childObj, i);
+		else
+		{
+			QUuid uuid(childObj["itemUUID"].toString());
+			ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(uuid);
+			if(pProjItem)
+				Cmd_AddNewChild(nullptr, childObj, i);
+			else
+				HyGuiLog("Null project item for UUID: " % uuid.toString() % " type: " % HyGlobal::ItemName(eGuiType, false), LOGTYPE_Error);
+		}
+	}
 }
 
 /*virtual*/ EntityModel::~EntityModel()
 {
 }
 
-void EntityModel::RegisterWidgets(QLineEdit &txtCodeNameRef, QComboBox &cmbEntityTypeRef)
+void EntityModel::RegisterWidgets(QComboBox &cmbEntityTypeRef)
 {
-	m_CodeNameMapper.AddLineEditMapping(&txtCodeNameRef);
 	m_EntityTypeMapper.AddComboBoxMapping(&cmbEntityTypeRef);
 }
 
@@ -419,12 +488,12 @@ EntityTreeModel &EntityModel::GetNodeTreeModel()
 	return m_TreeModel;
 }
 
-QList<EntityTreeItem *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow)
+QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow)
 {
-	QList<EntityTreeItem *> treeNodeList;
+	QList<EntityTreeItemData *> treeNodeList;
 	for(auto *pItem : projItemList)
 	{
-		EntityTreeItem *pAddedItem = m_TreeModel.InsertNewChild(pItem, "m_", iRow);
+		EntityTreeItemData *pAddedItem = m_TreeModel.Cmd_InsertNewChild(pItem, "m_", iRow);
 		if(pAddedItem)
 			treeNodeList.push_back(pAddedItem);
 		else
@@ -436,32 +505,31 @@ QList<EntityTreeItem *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *>
 	return treeNodeList;
 }
 
-bool EntityModel::Cmd_AddChild(EntityTreeItem *pNodeItem, int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddNewChild(ProjectItemData *pProjItemData, QJsonObject initObj, int iRow)
 {
-	if(m_TreeModel.InsertChild(pNodeItem, iRow) == false)
-		return false;
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewChild(pProjItemData, initObj, iRow);
+	if(pProjItemData)
+		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItemData);
 
-	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pNodeItem->GetUuid());
-	if(pProjItem)
-		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItem);
-
-	return true;
+	return pTreeItemData;
 }
 
-void EntityModel::Cmd_AddPrimitive()
+EntityTreeItemData *EntityModel::Cmd_AddNewPrimitive(int iRow)
 {
+	return nullptr;
 }
 
-void EntityModel::Cmd_AddShape()
+EntityTreeItemData *EntityModel::Cmd_AddShape(int iRow)
 {
+	return nullptr;
 }
 
-int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItem *pItem)
+int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 {
 	if(pItem == nullptr)
 		return -1;
 
-	int32 iRow = m_TreeModel.PopChild(pItem);
+	int32 iRow = m_TreeModel.Cmd_PopChild(pItem);
 	if(iRow < 0)
 		return iRow;
 
@@ -472,6 +540,25 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItem *pItem)
 	return iRow;
 }
 
+bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
+{
+	if(m_TreeModel.Cmd_InsertChild(pNodeItem, iRow) == false)
+		return false;
+
+	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pNodeItem->GetUuid());
+	if(pProjItem)
+		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItem);
+
+	return true;
+}
+
+/*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) /*override*/
+{
+	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(propertiesModelRef.GetSubstate().toLongLong());
+	
+
+}
+
 /*virtual*/ bool EntityModel::OnPrepSave() /*override*/
 {
 	return true;
@@ -479,20 +566,29 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItem *pItem)
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	itemSpecificFileDataOut.m_Meta.insert("codeName", m_CodeNameMapper.GetString());
-	itemSpecificFileDataOut.m_Meta.insert("entityType", m_CodeNameMapper.GetString());
+	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetEntityTreeItemData()->GetCodeName());
+	itemSpecificFileDataOut.m_Meta.insert("entityType", m_EntityTypeMapper.GetCurrentItem());
 	
+	QList<EntityTreeItemData *> childList;
+	QList<EntityTreeItemData *> shapeList;
+	m_TreeModel.GetTreeItemData(childList, shapeList);
+
 	QJsonArray childArray;
-	QJsonArray shapeArray;
-	QList<EntityTreeItem *> childList = m_TreeModel.GetChildrenNodes();
-	for(auto *pChild : childList)
+	for(EntityTreeItemData *pChild : childList)
 	{
 		QJsonObject childObj;
 		pChild->InsertJsonInfo(childObj);
 		childArray.append(childObj);
 	}
-
 	itemSpecificFileDataOut.m_Meta.insert("childList", childArray);
+
+	QJsonArray shapeArray;
+	for(EntityTreeItemData *pShape : shapeList)
+	{
+		QJsonObject childObj;
+		pShape->InsertJsonInfo(childObj);
+		childArray.append(childObj);
+	}	
 	itemSpecificFileDataOut.m_Meta.insert("shapeList", shapeArray);
 }
 

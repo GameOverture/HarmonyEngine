@@ -22,7 +22,7 @@
 
 class EntityModel;
 
-class EntityTreeItem : public TreeModelItemData
+class EntityTreeItemData : public TreeModelItemData
 {
 	Q_OBJECT
 
@@ -30,9 +30,9 @@ class EntityTreeItem : public TreeModelItemData
 	PropertiesTreeModel									m_PropertiesTreeModel;
 
 public:
-	EntityTreeItem(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem);
-	EntityTreeItem(ProjectItemData &entityItemDataRef, QJsonObject initObj);
-	virtual ~EntityTreeItem();
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj);
+	virtual ~EntityTreeItemData();
 
 	QString GetCodeName() const;
 	QUuid GetUuid() const;
@@ -62,12 +62,15 @@ public:
 	explicit EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QUuid uuidOfEntity, QObject *pParent = nullptr);
 	virtual ~EntityTreeModel();
 	
-	QList<EntityTreeItem *> GetChildrenNodes() const;
+	TreeModelItem *GetEntityTreeItem() const;
+	EntityTreeItemData *GetEntityTreeItemData() const;
+	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
-	EntityTreeItem *InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
-	bool InsertChild(EntityTreeItem *pItem, int iRow);
-	int32 PopChild(EntityTreeItem *pItem);
+	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QJsonObject initObj, int iRow = -1);
+	bool Cmd_InsertChild(EntityTreeItemData *pItem, int iRow);
+	int32 Cmd_PopChild(EntityTreeItemData *pItem);
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -92,25 +95,27 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	LineEditMapper										m_CodeNameMapper;
 	ComboBoxMapper										m_EntityTypeMapper;
-
 	EntityTreeModel										m_TreeModel;
 
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
-	void RegisterWidgets(QLineEdit &txtCodeNameRef, QComboBox &cmbEntityTypeRef);
+	void RegisterWidgets(QComboBox &cmbEntityTypeRef);
 
 	EntityTreeModel &GetNodeTreeModel();
 
-	// Command Modifiers - should (only) be called from UndoCmd's
-	QList<EntityTreeItem *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
-	bool Cmd_AddChild(EntityTreeItem *pNodeItem, int iRow);
-	void Cmd_AddPrimitive();
-	void Cmd_AddShape();
-	int32 Cmd_RemoveTreeItem(EntityTreeItem *pItem);
+	// Command Modifiers (Cmd_) - should only be called from this constructor and from UndoCmd's
+	QList<EntityTreeItemData *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
+	EntityTreeItemData *Cmd_AddNewChild(ProjectItemData *pProjItemData, QJsonObject initObj, int iRow);
+	EntityTreeItemData *Cmd_AddNewPrimitive(int iRow);
+	EntityTreeItemData *Cmd_AddShape(int iRow);
+	void Cmd_UpdateItem(EntityTreeItemData *pItem);
+	int32 Cmd_RemoveTreeItem(EntityTreeItemData *pItem);
+	bool Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow);
+
+	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) override;
 
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;

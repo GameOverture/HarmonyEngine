@@ -157,15 +157,6 @@
         <file>icons16x16/items/Entity3d-Pending.png</file>
         <file>icons16x16/items/Entity3d-Settings.png</file>
         <file>icons16x16/items/Entity3d-Warning.png</file>
-        <file>icons16x16/items/Entity2d.png</file>
-        <file>icons16x16/items/Entity2d-Close.png</file>
-        <file>icons16x16/items/Entity2d-Delete.png</file>
-        <file>icons16x16/items/Entity2d-Dirty.png</file>
-        <file>icons16x16/items/Entity2d-New.png</file>
-        <file>icons16x16/items/Entity2d-Open.png</file>
-        <file>icons16x16/items/Entity2d-Pending.png</file>
-        <file>icons16x16/items/Entity2d-Settings.png</file>
-        <file>icons16x16/items/Entity2d-Warning.png</file>
         <file>icons16x16/items/Prefab.png</file>
         <file>icons16x16/items/Prefab-Close.png</file>
         <file>icons16x16/items/Prefab-Delete.png</file>
@@ -220,5 +211,14 @@
         <file>checkbox.png</file>
         <file>down_arrow.png</file>
         <file>handle.png</file>
+        <file>icons16x16/items/Entity.png</file>
+        <file>icons16x16/items/Entity-Close.png</file>
+        <file>icons16x16/items/Entity-Delete.png</file>
+        <file>icons16x16/items/Entity-Dirty.png</file>
+        <file>icons16x16/items/Entity-New.png</file>
+        <file>icons16x16/items/Entity-Open.png</file>
+        <file>icons16x16/items/Entity-Pending.png</file>
+        <file>icons16x16/items/Entity-Settings.png</file>
+        <file>icons16x16/items/Entity-Warning.png</file>
     </qresource>
 </RCC>

@@ -39,7 +39,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
 	ui->nodeTree->setModel(&pEntityModel->GetNodeTreeModel());
-	pEntityModel->RegisterWidgets(*ui->txtClassName, *ui->cmbEntityType);
+	pEntityModel->RegisterWidgets(*ui->cmbEntityType);
 }
 
 EntityWidget::~EntityWidget()
@@ -82,7 +82,7 @@ EntityWidget::~EntityWidget()
 	bool bFrameIsSelected = true;
 	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
 
-	EntityTreeItem *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<EntityTreeItem *>();
+	EntityTreeItemData *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<EntityTreeItemData *>();
 	if(pSubStateItem == nullptr)
 	{
 		ui->lblSelectedItemIcon->setVisible(false);
@@ -108,13 +108,17 @@ EntityWidget::~EntityWidget()
 
 		ui->propertyTree->resizeColumnToContents(0);
 	}
-
-	ui->nodeTree->resizeColumnToContents(0);
 }
 
 /*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
-	
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+
+	// This occurs whenever a property changes within ui->propertyTree
+	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(subState.toLongLong());
+	QModelIndex index = pTreeModel->FindIndex<EntityTreeItemData *>(pEntityTreeData, 0);
+
+	ui->nodeTree->selectionModel()->select(index, QItemSelectionModel::Select);
 }
 
 ExplorerItemData *EntityWidget::GetSelectedNode()
@@ -124,6 +128,25 @@ ExplorerItemData *EntityWidget::GetSelectedNode()
 		return nullptr;
 
 	return ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItemData *>();
+}
+
+/*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/
+{
+	resizeEvent(nullptr);
+}
+
+/*virtual*/ void EntityWidget::resizeEvent(QResizeEvent *pEvent) /*override*/
+{
+	QWidget::resizeEvent(pEvent);
+
+	if(ui->nodeTree == nullptr)
+		return;
+
+	// TODO: Use formula to account for device pixels and scaling using QWindow::devicePixelRatio()
+	const int iInfoColumnWidth = 130;
+
+	int iTotalWidth = ui->nodeTree->size().width();
+	ui->nodeTree->setColumnWidth(0, iTotalWidth - iInfoColumnWidth);
 }
 
 void EntityWidget::on_actionAppendChildren_triggered()

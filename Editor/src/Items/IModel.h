@@ -124,6 +124,8 @@ public:
 		dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 	}
 
+	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) { }
+
 	virtual bool OnPrepSave() = 0;	// Prepares item for saving, and returns if valid
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const = 0;

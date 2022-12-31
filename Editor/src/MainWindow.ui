@@ -77,7 +77,6 @@
      <addaction name="actionNewAudio"/>
      <addaction name="separator"/>
      <addaction name="actionNewEntity"/>
-     <addaction name="actionNewEntity3d"/>
     </widget>
     <addaction name="actionNewProject"/>
     <addaction name="actionOpenProject"/>
@@ -539,7 +538,7 @@
      <normaloff>:/icons16x16/items/Entity2d-New.png</normaloff>:/icons16x16/items/Entity2d-New.png</iconset>
    </property>
    <property name="text">
-    <string>New 2d Entity</string>
+    <string>New Entity</string>
    </property>
    <property name="toolTip">
     <string>Add a new entity in the currently selected project</string>

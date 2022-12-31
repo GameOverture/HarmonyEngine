@@ -336,7 +336,7 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 				break;
 
 			case PROPERTIESTYPE_bool:
-				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toBool());
+				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toBool() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 				break;
 
 			case PROPERTIESTYPE_int:
