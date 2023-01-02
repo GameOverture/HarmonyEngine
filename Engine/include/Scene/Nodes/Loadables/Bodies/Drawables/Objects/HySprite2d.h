@@ -29,6 +29,8 @@ public:
 
 	const HySprite2d &operator=(const HySprite2d &rhs);
 
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+
 	//--------------------------------------------------------------------------------------
 	// Invoke a callback function when animation loops or completes. The
 	// callback will pass this sprite as a pointer with an optional parameter.
@@ -38,7 +40,6 @@ public:
 	void SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack = HySprite2d::NullAnimCallback, void *pParam = nullptr);
 
 protected:
-	virtual void OnCalcSceneAABB() override;
 	virtual void OnInvokeCallback(uint32 uiStateIndex) override;
 	virtual void OnDataAcquired() override;
 

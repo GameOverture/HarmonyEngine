@@ -46,6 +46,11 @@ const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
 	return *this;
 }
 
+/*virtual*/ void HySpine2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
+{
+	HyError("HySpine2d::CalcLocalBoundingShape not implemented");
+}
+
 /*virtual*/ bool HySpine2d::SetState(uint32 uiStateIndex) /*override*/
 {
 	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)
@@ -73,11 +78,6 @@ uint32 HySpine2d::GetNumSlots()
 {
 	const HySpineData *pData = static_cast<const HySpineData *>(this->AcquireData());
 	return pData;
-}
-
-/*virtual*/ void HySpine2d::OnCalcSceneAABB() /*override*/
-{
-	HyError("HySpine2d::OnCalcSceneAABB not implemented");
 }
 
 /*virtual*/ bool HySpine2d::OnIsValidToRender() /*override*/

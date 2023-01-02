@@ -205,6 +205,8 @@ if(Qt5_DIR)
 		src/Shared/GlobalWidgetMappers.h
 		src/Shared/IMimeData.cpp
 		src/Shared/IMimeData.h
+		src/Shared/TransformCtrl.cpp
+		src/Shared/TransformCtrl.h
 		src/Shared/Properties/PropertiesTreeModel.cpp
 		src/Shared/Properties/PropertiesTreeView.cpp
 		src/Shared/Properties/PropertiesUndoCmd.cpp

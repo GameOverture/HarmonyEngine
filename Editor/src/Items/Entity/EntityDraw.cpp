@@ -11,9 +11,9 @@
 #include "EntityDraw.h"
 #include "MainWindow.h"
 
-EntityDraw::ChildWidget::ChildWidget(HyGuiItemType eType, QUuid uuid, HyEntity2d *pParent) :
+EntityDraw::ChildWidget::ChildWidget(HyGuiItemType eGuiType, QUuid uuid, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
-	m_eGuiType(eType),
+	m_eGuiType(eGuiType),
 	m_ItemUuid(uuid),
 	m_Transform(this),
 	m_pChild(nullptr),
@@ -34,6 +34,7 @@ EntityDraw::ChildWidget::ChildWidget(HyGuiItemType eType, QUuid uuid, HyEntity2d
 	}
 
 	RefreshOverrideData();
+	m_Transform.SetDisplayOrder(9999999);
 }
 
 /*virtual*/ EntityDraw::ChildWidget::~ChildWidget()
@@ -41,7 +42,7 @@ EntityDraw::ChildWidget::ChildWidget(HyGuiItemType eType, QUuid uuid, HyEntity2d
 	delete m_pChild;
 }
 
-void EntityDraw::ChildWidget::RefreshJson(QJsonObject childObj)
+void EntityDraw::ChildWidget::RefreshJson(HyCamera2d *pCamera, QJsonObject childObj)
 {
 	QJsonObject commonObj = childObj["Common"].toObject();
 	if(commonObj.contains("Display Order"))
@@ -56,10 +57,12 @@ void EntityDraw::ChildWidget::RefreshJson(QJsonObject childObj)
 
 	QJsonObject transformObj = childObj["Transformation"].toObject();
 	QJsonArray posArray = transformObj["Position"].toArray();
-	m_pChild->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
-	m_pChild->rot.Set(transformObj["Rotation"].toDouble());
+	pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
+	rot.Set(transformObj["Rotation"].toDouble());
 	QJsonArray scaleArray = transformObj["Scale"].toArray();
-	m_pChild->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+	scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+
+	m_Transform.Resize(m_eGuiType, m_pChild, pCamera);
 
 	m_bStale = false;
 }
@@ -85,12 +88,6 @@ void EntityDraw::ChildWidget::RefreshOverrideData()
 #undef GetObject
 		switch(m_eGuiType)
 		{
-		case ITEM_Primitive:
-			break;
-
-		case ITEM_Audio:
-			break;
-
 		case ITEM_Text:
 			static_cast<HyText2d *>(m_pChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject());
 			break;
@@ -103,7 +100,9 @@ void EntityDraw::ChildWidget::RefreshOverrideData()
 			static_cast<HySprite2d *>(m_pChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
 			break;
 
-		case ITEM_AtlasImage:	//m_pChild = new HyTexturedQuad2d();
+		case ITEM_Primitive:
+		case ITEM_Audio:
+		case ITEM_AtlasImage:
 		default:
 			HyLogError("EntityDraw::ChildWidget::RefreshOverrideData - unhandled child node type");
 			break;
@@ -120,14 +119,35 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 }
 
-//void EntityDraw::Sync()
-//{
-//	const QList<ProjectItemData *> &primitiveListRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetPrimitiveList();
-//	for(uint32 i = 0; i < static_cast<uint32>(primitiveListRef.size()); ++i)
-//	{
-//
-//	}
-//}
+/*virtual*/ void EntityDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
+{
+	IDraw::OnKeyPressEvent(pEvent);
+}
+
+/*virtual*/ void EntityDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
+{
+	IDraw::OnKeyReleaseEvent(pEvent);
+}
+
+/*virtual*/ void EntityDraw::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
+{
+	IDraw::OnMousePressEvent(pEvent);
+}
+
+/*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
+{
+	IDraw::OnMouseReleaseEvent(pEvent);
+}
+
+/*virtual*/ void EntityDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
+{
+	IDraw::OnMouseWheelEvent(pEvent);
+}
+
+/*virtual*/ void EntityDraw::OnMouseMoveEvent(QMouseEvent *pEvent) /*override*/
+{
+	IDraw::OnMouseMoveEvent(pEvent);
+}
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/
 {
@@ -149,7 +169,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			m_ChildWidgetList.push_back(pChildWidget);
 		}
 
-		pChildWidget->RefreshJson(childObj);
+		pChildWidget->RefreshJson(m_pCamera, childObj);
 	}
 	DeleteStaleChildren();
 

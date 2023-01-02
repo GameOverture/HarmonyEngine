@@ -20,8 +20,6 @@ class HyCamera2d final : public IHyCamera<IHyNode2d>
 {
 	friend class HyWindow;
 
-	b2AABB		m_aabbViewBounds;
-
 private:
 	HyCamera2d(HyWindow *pWindow);
 	virtual ~HyCamera2d();
@@ -30,7 +28,8 @@ public:
 	virtual float GetZoom() const override;
 	virtual void SetZoom(const float fZoom) override;
 
-	const b2AABB &GetWorldViewBounds();
+	void CalcWorldViewBounds(b2AABB &aabbOut) const;
+	void ProjectToCamera(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const;
 };
 
 class HyCamera3d final : public IHyCamera<IHyNode3d>

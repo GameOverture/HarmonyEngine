@@ -33,6 +33,8 @@ public:
 
 	const HyTexturedQuad2d &operator=(const HyTexturedQuad2d &rhs);
 
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+
 	void SetTextureSource(int iX, int iY, int iWidth, int iHeight);
 
 	uint32 GetAtlasIndexInGroup();
@@ -46,7 +48,6 @@ protected:
 	virtual void OnLoaded() override;
 
 	virtual bool OnIsValidToRender() override;
-	virtual void OnCalcSceneAABB() override;
 
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;

@@ -31,6 +31,33 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	return *this;
 }
 
+/*virtual*/ void HyText2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
+{
+	CalculateGlyphInfos();
+	if(m_uiNumReservedGlyphs == 0)
+		return;
+
+	glm::vec2 ptBotLeft(m_pGlyphInfos[0].vOffset.x - m_uiIndent, m_pGlyphInfos[0].vOffset.y);
+	for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
+	{
+		if(m_pGlyphInfos[i].vOffset.x < ptBotLeft.x)
+			ptBotLeft.x = m_pGlyphInfos[i].vOffset.x;
+		if(m_pGlyphInfos[i].vOffset.y < ptBotLeft.y)
+			ptBotLeft.y = m_pGlyphInfos[i].vOffset.y;
+	}
+	ptBotLeft.x *= std::fabs(scale.X());
+	ptBotLeft.y *= std::fabs(scale.Y());
+
+	float fHalfWidth = GetWidth(0.5f);
+	float fHalfHeight = GetHeight(0.5f);
+
+	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
+		return;
+
+	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
+	shapeOut.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
+}
+
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 /*virtual*/ void HyText2d::OnSetDebugBox() /*override*/
 {
@@ -87,35 +114,6 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 #endif
 
 	CalculateGlyphInfos();
-}
-
-/*virtual*/ void HyText2d::OnCalcSceneAABB() /*override*/
-{
-	CalculateGlyphInfos();
-	if(m_uiNumReservedGlyphs == 0)
-		return;
-
-	glm::vec2 ptBotLeft(m_pGlyphInfos[0].vOffset.x - m_uiIndent, m_pGlyphInfos[0].vOffset.y);
-	for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
-	{
-		if(m_pGlyphInfos[i].vOffset.x < ptBotLeft.x)
-			ptBotLeft.x = m_pGlyphInfos[i].vOffset.x;
-		if(m_pGlyphInfos[i].vOffset.y < ptBotLeft.y)
-			ptBotLeft.y = m_pGlyphInfos[i].vOffset.y;
-	}
-	ptBotLeft.x *= std::fabs(scale.X());
-	ptBotLeft.y *= std::fabs(scale.Y());
-
-	float fHalfWidth = GetWidth(0.5f);
-	float fHalfHeight = GetHeight(0.5f);
-
-	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
-		return;
-
-	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
-	HyShape2d tmp;
-	tmp.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
-	tmp.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 }
 
 /*virtual*/ void HyText2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

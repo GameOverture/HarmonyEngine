@@ -344,13 +344,15 @@ bool HyScene::CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &
 	if(instanceRef.GetCoordinateSystem() >= 0) // Only test if using camera (world) coordinates
 		return true;
 
+	b2AABB worldAABB;
 	uint32 iBit = 0;
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		HyWindow::CameraIterator2d iter(m_WindowListRef[i]->GetCamera2dList());
 		while(iter.IsEnd() == false)
 		{
-			if(b2TestOverlap(iter.Get()->GetWorldViewBounds(), instanceRef.GetSceneAABB()))
+			iter.Get()->CalcWorldViewBounds(worldAABB);
+			if(b2TestOverlap(worldAABB, instanceRef.GetSceneAABB()))
 				uiCameraMaskOut |= (1 << iBit);
 
 			iBit++;

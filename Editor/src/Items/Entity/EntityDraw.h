@@ -20,13 +20,13 @@ class EntityDraw : public IDraw
 		HyGuiItemType							m_eGuiType;
 		QUuid									m_ItemUuid;
 
-		TransformWidget							m_Transform;
+		TransformCtrl							m_Transform;
 		IHyLoadable2d *							m_pChild;
 
 		bool									m_bStale;
 
 	public:
-		ChildWidget(HyGuiItemType eType, QUuid uuid, HyEntity2d *pParent);
+		ChildWidget(HyGuiItemType eGuiType, QUuid uuid, HyEntity2d *pParent);
 		virtual ~ChildWidget();
 		HyGuiItemType GetGuiType() const {
 			return m_eGuiType;
@@ -40,7 +40,7 @@ class EntityDraw : public IDraw
 		void SetStale() {
 			m_bStale = true;
 		}
-		void RefreshJson(QJsonObject childObj); // Clears stale flag
+		void RefreshJson(HyCamera2d *pCamera, QJsonObject childObj); // Clears stale flag
 	
 	protected:
 		void RefreshOverrideData();
@@ -48,7 +48,7 @@ class EntityDraw : public IDraw
 
 	class ShapeWidget : public HyEntity2d
 	{
-		TransformWidget							m_Transform;
+		TransformCtrl							m_Transform;
 		HyShape2d								m_Shape;
 
 	public:
@@ -66,7 +66,12 @@ public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~EntityDraw();
 
-	//void Sync();
+	virtual void OnKeyPressEvent(QKeyEvent *pEvent) override;
+	virtual void OnKeyReleaseEvent(QKeyEvent *pEvent) override;
+	virtual void OnMousePressEvent(QMouseEvent *pEvent) override;
+	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
+	virtual void OnMouseWheelEvent(QWheelEvent *pEvent) override;
+	virtual void OnMouseMoveEvent(QMouseEvent *pEvent) override;
 
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;

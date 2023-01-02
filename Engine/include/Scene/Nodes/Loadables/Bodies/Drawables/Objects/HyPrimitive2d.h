@@ -37,9 +37,13 @@ public:
 
 	const HyPrimitive2d &operator=(const HyPrimitive2d &rhs);
 
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+
 	HyShapeType GetShapeType() const;
 
 	void SetAsNothing();
+
+	void SetAsShape(const HyShape2d &shapeRef);
 
 	// Set as an isolated edge.
 	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);
@@ -94,7 +98,6 @@ protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 
 	virtual bool OnIsValidToRender() override;
-	virtual void OnCalcSceneAABB() override;
 
 	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 

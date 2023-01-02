@@ -121,9 +121,9 @@ public:
 
 	bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const;
 
-protected:
 	b2Shape *CloneTransform(const glm::mat4 &mtxTransform) const;
 
+protected:
 	void CreateFixture(b2Body *pBody);
 	void DestroyFixture();
 	

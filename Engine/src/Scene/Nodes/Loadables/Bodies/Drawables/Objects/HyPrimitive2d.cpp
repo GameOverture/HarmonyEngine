@@ -59,6 +59,11 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	return *this;
 }
 
+/*virtual*/ void HyPrimitive2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
+{
+	shapeOut = m_Shape;
+}
+
 HyShapeType HyPrimitive2d::GetShapeType() const
 {
 	return m_Shape.GetType();
@@ -67,6 +72,12 @@ HyShapeType HyPrimitive2d::GetShapeType() const
 void HyPrimitive2d::SetAsNothing()
 {
 	m_Shape.SetAsNothing();
+	AssembleData();
+}
+
+void HyPrimitive2d::SetAsShape(const HyShape2d &shapeRef)
+{
+	m_Shape = shapeRef;
 	AssembleData();
 }
 
@@ -236,12 +247,6 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 
 		m_bUpdateShaderUniforms = false;
 	}
-}
-
-/*virtual*/ void HyPrimitive2d::OnCalcSceneAABB() /*override*/
-{
-	if(m_Shape.IsValidShape())
-		m_Shape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 }
 
 /*virtual*/ void HyPrimitive2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

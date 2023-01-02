@@ -376,7 +376,8 @@ bool HyWindow::ProjectToWorldPos2d(const glm::vec2 &ptWindowCoordinate, glm::vec
 			vOffsetInViewport.y = (ptNormalizedCoord.y - viewportRect.bottom) / (viewportRect.top - viewportRect.bottom);
 
 			// Now using the found camera's transformation convert to the world position
-			const b2AABB &aabbWorldRef = m_Cams2dList[i]->GetWorldViewBounds();
+			b2AABB aabbWorld;
+			m_Cams2dList[i]->CalcWorldViewBounds(aabbWorld);
 			
 			float fDeg = m_Cams2dList[i]->rot.Get();
 
@@ -388,11 +389,11 @@ bool HyWindow::ProjectToWorldPos2d(const glm::vec2 &ptWindowCoordinate, glm::vec
 			}
 			else
 			{
-				ptWorldPosOut.x = (aabbWorldRef.upperBound.x - aabbWorldRef.lowerBound.x) * vOffsetInViewport.x;
-				ptWorldPosOut.x += aabbWorldRef.lowerBound.x;
+				ptWorldPosOut.x = (aabbWorld.upperBound.x - aabbWorld.lowerBound.x) * vOffsetInViewport.x;
+				ptWorldPosOut.x += aabbWorld.lowerBound.x;
 
-				ptWorldPosOut.y = (aabbWorldRef.upperBound.y - aabbWorldRef.lowerBound.y) * vOffsetInViewport.y;
-				ptWorldPosOut.y += aabbWorldRef.lowerBound.y;
+				ptWorldPosOut.y = (aabbWorld.upperBound.y - aabbWorld.lowerBound.y) * vOffsetInViewport.y;
+				ptWorldPosOut.y += aabbWorld.lowerBound.y;
 
 				return true;
 			}
@@ -407,18 +408,19 @@ bool HyWindow::ProjectToWorldPos2d(const glm::vec2 &ptWindowCoordinate, glm::vec
 bool HyWindow::ProjectToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const
 {
 	// Find the first camera that contains this ptWorldPos
+	b2AABB aabbWorld;
 	for(uint32 i = 0; i < m_Cams2dList.size(); ++i)
 	{
-		const b2AABB &aabbWorldRef = m_Cams2dList[i]->GetWorldViewBounds();
-		if(HyTestPointAABB(aabbWorldRef, ptWorldPos))
+		m_Cams2dList[i]->CalcWorldViewBounds(aabbWorld);
+		if(HyTestPointAABB(aabbWorld, ptWorldPos))
 		{
 			const HyRectangle<float> &viewportRect = m_Cams2dList[i]->GetViewport();
 			float fFbWidth = (viewportRect.Width() * GetFramebufferSize().x);
 			float fFbHeight = (viewportRect.Height() * GetFramebufferSize().y);
 
 			glm::vec2 ptNormalized;
-			ptNormalized.x = (ptWorldPos.x - aabbWorldRef.lowerBound.x) / (aabbWorldRef.GetExtents().x * 2.0f);
-			ptNormalized.y = (ptWorldPos.y - aabbWorldRef.lowerBound.y) / (aabbWorldRef.GetExtents().y * 2.0f);
+			ptNormalized.x = (ptWorldPos.x - aabbWorld.lowerBound.x) / (aabbWorld.GetExtents().x * 2.0f);
+			ptNormalized.y = (ptWorldPos.y - aabbWorld.lowerBound.y) / (aabbWorld.GetExtents().y * 2.0f);
 
 			ptWindowCoordinateOut.x = (viewportRect.left * GetFramebufferSize().x) + (ptNormalized.x * fFbWidth);
 			ptWindowCoordinateOut.y = (viewportRect.bottom * GetFramebufferSize().y) + (ptNormalized.y * fFbHeight);

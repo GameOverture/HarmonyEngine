@@ -28,12 +28,13 @@ public:
 
 	const HyText2d &operator=(const HyText2d &rhs);
 
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+
 protected:
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 	virtual void OnSetDebugBox() override;
 #endif
 	virtual void OnLoadedUpdate() override;
-	virtual void OnCalcSceneAABB() override;
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 };

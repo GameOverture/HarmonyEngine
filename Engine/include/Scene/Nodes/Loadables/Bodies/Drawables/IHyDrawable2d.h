@@ -34,7 +34,7 @@ public:
 	IHyDrawable2d &operator=(const IHyDrawable2d &rhs);
 	IHyDrawable2d &operator=(IHyDrawable2d &&donor) noexcept;
 
-	//const HyShape2d &GetLocalBoundingVolume();
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) = 0;
 	virtual const b2AABB &GetSceneAABB() override;
 
 	virtual bool IsValidToRender() override final;
@@ -45,8 +45,10 @@ protected:
 	virtual void OnLoaded() override;
 	virtual void OnUnloaded() override;
 
+	// Sets 'm_SceneAABB' to a scene transformed, conforming AABB around the visible portion of *this (used for frustum culling)
+	void OnCalcSceneAABB();
+
 	virtual bool OnIsValidToRender() = 0;
-	virtual void OnCalcSceneAABB() = 0; // Sets 'm_SceneAABB' to a scene transformed, conforming AABB around the visible portion of *this (used for frustum culling)
 
 #ifdef HY_PLATFORM_GUI
 public:

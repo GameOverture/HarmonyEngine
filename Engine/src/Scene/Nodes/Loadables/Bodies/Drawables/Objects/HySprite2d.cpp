@@ -40,6 +40,24 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 	return *this;
 }
 
+/*virtual*/ void HySprite2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
+{
+	if(AcquireData() == nullptr)
+	{
+		HyLogDebug("HySprite2d::CalcLocalBoundingShape invoked on null data");
+		return;
+	}
+
+	glm::vec2 vFrameOffset = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET;
+
+	float fHalfWidth = GetFrameWidth(0.5f);
+	float fHalfHeight = GetFrameHeight(0.5f);
+	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
+		return;
+
+	shapeOut.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
+}
+
 void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/, void *pParam /*= nullptr*/)
 {
 	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySpriteData *>(UncheckedGetData())->GetNumStates())
@@ -58,31 +76,6 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 		m_AnimCallbackList[uiStateIndex].first = callBack;
 
 	m_AnimCallbackList[uiStateIndex].second = pParam;
-}
-
-/*virtual*/ void HySprite2d::OnCalcSceneAABB() /*override*/
-{
-	if(AcquireData() == nullptr)
-	{
-		HyLogDebug("HySprite2d::OnCalcBoundingVolume invoked on null data");
-		return;
-	}
-
-	glm::vec2 vFrameOffset = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET;
-
-	float fHalfWidth = GetFrameWidth(0.5f);
-	float fHalfHeight = GetFrameHeight(0.5f);
-	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
-		return;
-
-	HyShape2d tmpShape;
-	tmpShape.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
-	tmpShape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
-	
-	// Below doesn't account for scale
-	//b2PolygonShape tmpShape;
-	//tmpShape.SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
-	//tmpShape.ComputeAABB(&m_SceneAABB, b2Transform(b2Vec2(pos.X(), pos.Y()), b2Rot(glm::radians(rot.Get()))), 0);
 }
 
 /*virtual*/ void HySprite2d::OnInvokeCallback(uint32 uiStateIndex) /*override*/

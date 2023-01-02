@@ -32,6 +32,8 @@ public:
 
 	const HySpine2d &operator=(const HySpine2d &rhs);
 
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+
 	virtual bool SetState(uint32 uiStateIndex) override;
 
 	uint32 GetNumSlots();
@@ -41,7 +43,6 @@ public:
 
 
 protected:
-	virtual void OnCalcSceneAABB() override;
 	virtual bool OnIsValidToRender() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoadedUpdate() override;
