@@ -693,18 +693,14 @@ HyOpenGL::~HyOpenGL(void)
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glBindBuffer");
 	}
 
-	int32 iNumMipLevels = 0;
-	if(infoRef.IsMipMaps())
-		iNumMipLevels = static_cast<int32>(std::floor(std::log2(std::max(uiWidth, uiHeight)))) + 1;
-	
 	if(bIsPixelDataCompressed == false)
 	{ 
-		glTexImage2D(GL_TEXTURE_2D, iNumMipLevels, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
+		glTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
 	}
 	else
 	{
-		glCompressedTexImage2D(GL_TEXTURE_2D, iNumMipLevels, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
+		glCompressedTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
 	}
 
