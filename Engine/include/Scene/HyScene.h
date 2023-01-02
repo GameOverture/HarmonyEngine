@@ -12,7 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Audio/HyAudioCore.h"
-#include "Scene/Physics/HyBox2dDraw.h"
 #include "Scene/Physics/HyBox2dContactListener.h"
 #include "Scene/Physics/HyBox2dDestructListener.h"
 
@@ -28,6 +27,7 @@ class IHyDrawable2d;
 class IHyDrawable3d;
 class HyWindow;
 class IHyRenderer;
+class HyBox2dDraw;
 
 class HyScene
 {
@@ -49,9 +49,9 @@ class HyScene
 	float												m_fPpmInverse;
 	int32												m_iPhysVelocityIterations;
 	int32												m_iPhysPositionIterations;
-	HyBox2dDraw											m_Box2dDraw;
 	HyBox2dContactListener								m_ContactListener;
 	HyBox2dDestructListener								m_DestructListener;
+	HyBox2dDraw *										m_pCurBox2dDraw;
 	b2World												m_b2World;
 	bool												m_bPhysUpdating;
 
@@ -79,7 +79,7 @@ public:
 	void AddNode_PhysBody(HyEntity2d *pEntity);
 	void RemoveNode_PhysBody(HyEntity2d *pEntity);
 	bool IsPhysicsUpdating() const;
-	void SetPhysicsDrawFlags(uint32 uib2DrawFlags);
+	void SetPhysicsDrawClass(HyBox2dDraw *pBox2dDraw);
 
 	void ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType);
 

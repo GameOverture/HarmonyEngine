@@ -33,15 +33,14 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
 	m_iPhysVelocityIterations(8),
 	m_iPhysPositionIterations(3),
-	m_Box2dDraw(fPixelsPerMeter),
 	m_ContactListener(*this),
+	m_pCurBox2dDraw(nullptr),
 	m_b2World(b2Vec2(vGravity2d.x, vGravity2d.y)),
 	m_bPhysUpdating(false)
 {
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	IHyNode::sm_pScene = this;
 
-	m_b2World.SetDebugDraw(&m_Box2dDraw);
 	m_b2World.SetContactListener(&m_ContactListener);
 	m_b2World.SetDestructionListener(&m_DestructListener);
 }
@@ -206,9 +205,10 @@ bool HyScene::IsPhysicsUpdating() const
 	return m_bPhysUpdating;
 }
 
-void HyScene::SetPhysicsDrawFlags(uint32 uib2DrawFlags)
+void HyScene::SetPhysicsDrawClass(HyBox2dDraw *pBox2dDraw)
 {
-	m_Box2dDraw.SetFlags(uib2DrawFlags);
+	m_pCurBox2dDraw = pBox2dDraw;
+	m_b2World.SetDebugDraw(m_pCurBox2dDraw);
 }
 
 void HyScene::ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType)
@@ -241,9 +241,12 @@ void HyScene::UpdateNodes()
 	// Box2d - Collision & Physics
 	m_b2World.Step(HyEngine::DeltaTime(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
 	
-	m_Box2dDraw.BeginFrame();
-	m_b2World.DebugDraw();
-	m_Box2dDraw.EndFrame();
+	if(m_pCurBox2dDraw)
+	{
+		m_pCurBox2dDraw->BeginFrame();
+		m_b2World.DebugDraw();
+		m_pCurBox2dDraw->EndFrame();
+	}
 
 	m_bPhysUpdating = true;
 	b2Body *pBody = m_b2World.GetBodyList();

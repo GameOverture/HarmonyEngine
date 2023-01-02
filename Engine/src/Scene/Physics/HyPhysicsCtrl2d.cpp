@@ -8,8 +8,9 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Scene/HyScene.h"
 #include "Scene/Physics/HyPhysicsCtrl2d.h"
+#include "Scene/HyScene.h"
+#include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
 

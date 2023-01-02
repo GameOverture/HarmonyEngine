@@ -31,7 +31,7 @@ HySoundBuffers::HySoundBuffers(HyAudioCore &coreRef, std::string sFilePath, int3
 
 HySoundBuffers::~HySoundBuffers()
 {
-	Unload();
+	//Unload();
 
 	for(int i = 0; i < m_SoundList.size(); ++i)
 		delete m_SoundList[i];

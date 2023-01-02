@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/HyScene.h"
 #include "Scene/Physics/HyShape2d.h"
-#include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
 #include "Utilities/HyMath.h"
 
