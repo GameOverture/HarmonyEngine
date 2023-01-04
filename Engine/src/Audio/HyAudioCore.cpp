@@ -12,6 +12,7 @@
 #include "vendor/stb/stb_vorbis.c" // Enables Vorbis decoding for miniaudio
 #define MINIAUDIO_IMPLEMENTATION
 #include "Audio/HyAudioCore.h"
+#include "Input/HyInput.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
 #include "Scene/Nodes/Loadables/Objects/HyAudio3d.h"
 #include "Diagnostics/Console/IHyConsole.h"
@@ -24,89 +25,13 @@
 	extern void SdlDataCallback(void *pUserData, Uint8 *pBuffer, int bufferSizeInBytes);
 #endif
 
-HyAudioCore::HyAudioCore() :
+HyAudioCore::HyAudioCore(HyInput &inputRef) :
+	m_InputRef(inputRef),
+	m_pEngine(nullptr),
+	m_fDeferredGlobalVolume(1.0f),
 	m_uiHotLoadCount(1)
 {
-#ifndef HY_PLATFORM_GUI
-	// Device
-	// 
-	//m_DevConfig = ma_device_config_init(ma_device_type_playback);
-	////m_DevConfig.playback.pDeviceID = &pPlaybackInfos[chosenPlaybackDeviceIndex].id;
-	//m_DevConfig.playback.format = ma_format_s16;	// Set to ma_format_unknown to use the device's native format.
-	//m_DevConfig.playback.channels = 2;				// Set to 0 to use the device's native channel count.
-	//m_DevConfig.sampleRate = 48000;					// Set to 0 to use the device's native sample rate.
-	//m_DevConfig.dataCallback = DataCallback;		// This function will be called when miniaudio needs more data.
-	//m_DevConfig.pUserData = this;					// Can be accessed from the device object (device.pUserData).
-
-	ma_result eResult;
-	//eResult = ma_device_init(NULL, &m_DevConfig, &m_Device);
-	//if(eResult != MA_SUCCESS)
-	//{
-	//	HyLogError("ma_device_init failed: " << eResult);
-	//	return;  // Failed to initialize the device.
-	//}
-	//eResult = ma_device_start(&m_Device);     // The device is sleeping by default so you'll need to start it manually.
-	//if(eResult != MA_SUCCESS)
-	//{
-	//	HyLogError("ma_device_start failed: " << eResult);
-	//	return;  // Failed to initialize the device.
-	//}
-
-	// Resource Manager
-	//m_ResConfig = ma_resource_manager_config_init();
-	//m_ResConfig.decodedFormat = m_Device.playback.format;
-	//m_ResConfig.decodedChannels = m_Device.playback.channels;
-	//m_ResConfig.decodedSampleRate = m_Device.sampleRate;
-
-	//eResult = ma_resource_manager_init(&m_ResConfig, &m_ResourceManager);
-	//if(eResult != MA_SUCCESS)
-	//{
-	//	ma_device_uninit(&m_Device);
-	//	HyLogError("Failed to initialize the resource manager: " << eResult);
-	//	return;
-	//}
-
-	// Engine
-	ma_engine_config engConfig;
-	engConfig = ma_engine_config_init();
-
-	#ifdef HY_USE_SDL2_AUDIO
-		engConfig.noDevice = MA_TRUE;
-		engConfig.channels = 2;							// Must be set when not using a device.
-		engConfig.sampleRate = HY_DEFAULT_SAMPLE_RATE;	// Must be set when not using a device.
-	#endif
-	//m_EngConfig.pResourceManager = &m_ResourceManager;
-	//m_EngConfig.pDevice = &m_Device;
-
-	eResult = ma_engine_init(&engConfig, &m_Engine);
-	if(eResult != MA_SUCCESS)
-	{
-		HyLogError("HyAudioCore_miniaudio failed: " << eResult);  // Failed to initialize the engine.
-		return;
-	}
-
-	#ifdef HY_USE_SDL2_AUDIO
-		SDL_AudioSpec desiredSpec;
-		MA_ZERO_OBJECT(&desiredSpec);
-		desiredSpec.freq = ma_engine_get_sample_rate(&m_Engine);
-		desiredSpec.format = AUDIO_F32;
-		desiredSpec.channels = ma_engine_get_channels(&m_Engine);
-		desiredSpec.samples = 512;
-		desiredSpec.callback = SdlDataCallback;
-		desiredSpec.userdata = this;
-
-		SDL_AudioSpec obtainedSpec;
-		m_SdlDeviceId = SDL_OpenAudioDevice(nullptr, 0, &desiredSpec, &obtainedSpec, SDL_AUDIO_ALLOW_ANY_CHANGE);
-		if(m_SdlDeviceId == 0)
-		{
-			HyLogError("Failed to open SDL audio device.");
-			return;
-		}
-		SDL_PauseAudioDevice(m_SdlDeviceId, 0); // Start playback
-
-	#endif // HY_USE_SDL2_AUDIO
-
-#endif // HY_PLATFORM_GUI
+	InitDevice();
 }
 
 /*virtual*/ HyAudioCore::~HyAudioCore(void)
@@ -114,14 +39,65 @@ HyAudioCore::HyAudioCore() :
 	for(auto *pGrp : m_GroupList)
 		delete pGrp;
 
-#ifndef HY_PLATFORM_GUI
-	//ma_device_uninit(&m_Device);
-	ma_engine_uninit(&m_Engine);
-#endif
+	ma_engine_uninit(m_pEngine);
+	delete m_pEngine;
+	m_pEngine = nullptr;
 
 #ifdef HY_USE_SDL2_AUDIO
 	SDL_CloseAudioDevice(m_SdlDeviceId);
 #endif
+}
+
+void HyAudioCore::InitDevice()
+{
+#ifdef HY_PLATFORM_GUI
+	return;
+#endif
+
+#ifdef HY_PLATFORM_BROWSER
+	// Google has implemented a policy in their browsers that prevent automatic media output without first receiving some kind of user input
+	// Starting the device may fail if you try to start playback without first handling some kind of user input
+	if(m_InputRef.UserInputOccured() == false)
+		return;
+#endif
+
+	HyLog("--- Initalizing Audio Device ---");
+	m_pEngine = HY_NEW ma_engine();
+
+	ma_engine_config engConfig;
+	engConfig = ma_engine_config_init();
+#ifdef HY_USE_SDL2_AUDIO
+	engConfig.noDevice = MA_TRUE;
+	engConfig.channels = 2;							// Must be set when not using a device.
+	engConfig.sampleRate = HY_DEFAULT_SAMPLE_RATE;	// Must be set when not using a device.
+#endif
+
+	ma_result eResult = ma_engine_init(&engConfig, m_pEngine);
+	if(eResult != MA_SUCCESS)
+	{
+		HyLogError("HyAudioCore_miniaudio failed: " << eResult);  // Failed to initialize the engine.
+		return;
+	}
+
+#ifdef HY_USE_SDL2_AUDIO
+	SDL_AudioSpec desiredSpec;
+	MA_ZERO_OBJECT(&desiredSpec);
+	desiredSpec.freq = ma_engine_get_sample_rate(m_pEngine);
+	desiredSpec.format = AUDIO_F32;
+	desiredSpec.channels = ma_engine_get_channels(m_pEngine);
+	desiredSpec.samples = 512;
+	desiredSpec.callback = SdlDataCallback;
+	desiredSpec.userdata = this;
+
+	SDL_AudioSpec obtainedSpec;
+	m_SdlDeviceId = SDL_OpenAudioDevice(nullptr, 0, &desiredSpec, &obtainedSpec, SDL_AUDIO_ALLOW_ANY_CHANGE);
+	if(m_SdlDeviceId == 0)
+	{
+		HyLogError("Failed to open SDL audio device.");
+		return;
+	}
+	SDL_PauseAudioDevice(m_SdlDeviceId, 0); // Start playback
+#endif // HY_USE_SDL2_AUDIO
 }
 
 const char *HyAudioCore::GetAudioDriver()
@@ -140,17 +116,11 @@ const char *HyAudioCore::GetAudioDriver()
 		HyLogError("ma_context_get_devices failed: " << eResult);
 
 	return pPlaybackInfos[0].name;
-
-	//// Loop over each device info and do something with it. Here we just print the name with their index. You may want
-	//// to give the user the opportunity to choose which device they'd prefer.
-	//for(ma_uint32 iDevice = 0; iDevice < playbackCount; iDevice += 1) {
-	//	printf("%d - %s\n", iDevice, pPlaybackInfos[iDevice].name);
-	//}
 }
 
 ma_engine *HyAudioCore::GetEngine()
 {
-	return &m_Engine;
+	return m_pEngine;
 }
 
 ma_sound_group *HyAudioCore::GetGroup(int32 iId)
@@ -166,12 +136,23 @@ ma_sound_group *HyAudioCore::GetGroup(int32 iId)
 
 void HyAudioCore::SetGlobalVolume(float fVolume)
 {
-#ifndef HY_PLATFORM_GUI
-	ma_result eResult = ma_engine_set_volume(&m_Engine, fVolume);
+	if(m_pEngine == nullptr)
+	{
+		m_fDeferredGlobalVolume = fVolume;
+		return;
+	}
+
+	ma_result eResult = ma_engine_set_volume(m_pEngine, fVolume);
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_engine_set_volume failed: " << eResult);
-#endif
 }
+
+#ifdef HY_PLATFORM_BROWSER
+void HyAudioCore::DeferLoading(HySoundBuffers *pBuffer)
+{
+	m_DeferredLoadingList.push_back(pBuffer);
+}
+#endif
 
 HyAudioHandle HyAudioCore::HotLoad(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit)
 {
@@ -195,6 +176,26 @@ void HyAudioCore::HotUnload(HyAudioHandle hAudioHandle)
 
 void HyAudioCore::Update()
 {
+#ifdef HY_PLATFORM_BROWSER
+	if(m_pEngine == nullptr)
+	{
+		if(m_InputRef.UserInputOccured())
+		{
+			InitDevice();
+
+			// Now do all the deferred loading and settings
+			SetGlobalVolume(m_fDeferredGlobalVolume);
+			for(SoundGroup *pGrp : m_GroupList)
+				GroupInit(pGrp);
+			for(HySoundBuffers *pSndBuff : m_DeferredLoadingList)
+				pSndBuff->Load();
+			m_DeferredLoadingList.clear();
+		}
+		else
+			return;
+	}
+#endif
+
 	for(auto iter = m_PlayMap.begin(); iter != m_PlayMap.end(); )
 	{
 		PlayInfo &playInfoRef = iter->second;
@@ -231,8 +232,16 @@ void HyAudioCore::AddBank(HyFileAudio *pBankFile)
 
 void HyAudioCore::AddGroup(std::string sName, int32 iId)
 {
-	m_GroupList.push_back(HY_NEW SoundGroup(sName, iId));
-	ma_result eResult = ma_sound_group_init(&m_Engine, 0, nullptr, &m_GroupList.back()->m_Group);
+	SoundGroup *pSndGrp = HY_NEW SoundGroup(sName, iId);
+	m_GroupList.push_back(pSndGrp);
+	
+	if(m_pEngine)
+		GroupInit(pSndGrp);
+}
+
+void HyAudioCore::GroupInit(SoundGroup *pSndGrp)
+{
+	ma_result eResult = ma_sound_group_init(m_pEngine, 0, nullptr, &pSndGrp->m_Group);
 	if(eResult != MA_SUCCESS)
 		HyLogError("HyAudioCore::AddGroup failed: " << eResult);
 }
@@ -438,7 +447,7 @@ void HyAudioCore::ManipSound(PlayInfo &playInfoRef)
 	// In playback mode copy data to pOutput. In capture mode read data from pInput. In full-duplex mode, both
 	// pOutput and pInput will be valid and you can move data from pInput into pOutput. Never process more than frameCount frames.
 	HyAudioCore *pThis = reinterpret_cast<HyAudioCore *>(pDevice->pUserData);
-	ma_engine_read_pcm_frames(&pThis->m_Engine, pOutput, frameCount, nullptr);
+	ma_engine_read_pcm_frames(pThis->m_pEngine, pOutput, frameCount, nullptr);
 }
 
 // Data Callbacks
@@ -448,7 +457,7 @@ void HyAudioCore::ManipSound(PlayInfo &playInfoRef)
 		HyAudioCore *pThis = reinterpret_cast<HyAudioCore *>(pUserData);
 
 		// Reading for SDL is just a matter of reading straight from the engine.
-		ma_uint32 bufferSizeInFrames = (ma_uint32)bufferSizeInBytes / ma_get_bytes_per_frame(ma_format_f32, ma_engine_get_channels(&pThis->m_Engine));
-		ma_engine_read_pcm_frames(&pThis->m_Engine, pBuffer, bufferSizeInFrames, NULL);
+		ma_uint32 bufferSizeInFrames = (ma_uint32)bufferSizeInBytes / ma_get_bytes_per_frame(ma_format_f32, ma_engine_get_channels(pThis->m_pEngine));
+		ma_engine_read_pcm_frames(pThis->m_pEngine, pBuffer, bufferSizeInFrames, NULL);
 	}
 #endif

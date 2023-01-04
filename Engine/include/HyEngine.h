@@ -55,16 +55,15 @@ class HyEngine
 
 	// The order of these member declarations matter as some are used to initialize each other
 	const HarmonyInit			m_Init;
-
 	HyConsoleInterop			m_Console;
 	HyWindowManager				m_WindowManager;
-	HyNetworkInterop			m_Networking;
+	HyInput						m_Input;
 	HyAudioCore 				m_Audio;
+	HyNetworkInterop			m_Networking;
 	HyScene						m_Scene;
 	HyAssets 					m_Assets;
 	HyTime						m_Time;
 	HyDiagnostics				m_Diagnostics;
-	HyInput						m_Input;
 	HyRendererInterop			m_Renderer;
 
 public:

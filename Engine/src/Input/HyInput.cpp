@@ -109,6 +109,7 @@
 
 HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef) :
 	m_uiNUM_INPUT_MAPS(uiNumInputMappings),
+	m_uiUserInputOccured(0),
 	m_WindowListRef(windowListRef),
 	m_uiMouseBtnFlags(0),
 	m_uiMouseBtnFlags_NewlyPressed(0),
@@ -159,6 +160,11 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 
 	unsigned char *pMemBuffer = reinterpret_cast<unsigned char *>(m_pInputMaps);
 	delete[] pMemBuffer;
+}
+
+bool HyInput::UserInputOccured() const
+{
+	return m_uiUserInputOccured != 0;
 }
 
 bool HyInput::IsMouseBtnDown(HyMouseBtn eBtn) const
@@ -483,6 +489,8 @@ void HyInput::Update()
 
 	m_uiMouseBtnFlags_Buffered = (m_uiMouseBtnFlags ^ m_uiMouseBtnFlags_NewlyPressed);
 	m_uiMouseBtnFlags_NewlyPressed = 0;
+
+	m_uiUserInputOccured |= m_uiMouseBtnFlags_Buffered;
 	
 	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 		m_pInputMaps[i].Update();

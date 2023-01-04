@@ -32,12 +32,12 @@ HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	m_Init(initStruct),
 	m_Console(m_Init.bUseConsole, m_Init.consoleInfo),
 	m_WindowManager(*this, m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
-	m_Audio(),
+	m_Input(m_Init.uiNumInputMaps, m_WindowManager.GetWindowList()),
+	m_Audio(m_Input),
 	m_Scene(m_Init.vGravity2d, m_Init.fPixelsPerMeter, m_Audio, m_WindowManager.GetWindowList()),
 	m_Assets(m_Audio, m_Scene, m_Init.sDataDir),
 	m_Time(m_Init.uiUpdatesPerSec),
 	m_Diagnostics(m_Init, m_Time, m_Assets, m_Scene),
-	m_Input(m_Init.uiNumInputMaps, m_WindowManager.GetWindowList()),
 	m_Renderer(m_Init.iVSync, m_WindowManager.GetWindowList(), m_Diagnostics)
 {
 	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");

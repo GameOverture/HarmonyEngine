@@ -22,6 +22,8 @@
 #endif
 #include "vendor/miniaudio/miniaudio.h"
 
+class HyInput;
+
 enum HySoundCue
 {
 	HYSOUNDCUE_PlayOneShotDefault = 0,
@@ -39,6 +41,8 @@ class HyAudioCore
 {
 	friend class HyAssets;
 	friend class HyScene;
+
+	HyInput &										m_InputRef;
 
 	struct SoundGroup
 	{
@@ -68,23 +72,21 @@ class HyAudioCore
 	std::unordered_map<HyAudioNodeHandle, PlayInfo>	m_PlayMap;
 	std::vector<PlayInfo>							m_OneShotList;
 
-	std::vector<std::string>						m_sDeviceList;
-
-	ma_device_config								m_DevConfig;
-	ma_device										m_Device;
-
 #ifdef HY_USE_SDL2_AUDIO
 	SDL_AudioDeviceID								m_SdlDeviceId;
 #endif
 
-	ma_engine										m_Engine;
+	ma_engine *										m_pEngine;
 
-	ma_resource_manager_config						m_ResConfig;
-	ma_resource_manager								m_ResourceManager;
+	// Used in browser environments to queue up loads (and other settings) until user input occurs. Once input occurs we can initialize the audio device (then load all the sounds that are queued up)
+	std::vector<HySoundBuffers *>					m_DeferredLoadingList;
+	float											m_fDeferredGlobalVolume;
 
 public:
-	HyAudioCore();
+	HyAudioCore(HyInput &inputRef);
 	virtual ~HyAudioCore(void);
+
+	void InitDevice();
 
 	const char *GetAudioDriver();
 
@@ -92,6 +94,8 @@ public:
 	ma_sound_group *GetGroup(int32 iId);
 
 	void SetGlobalVolume(float fVolume);
+
+	void DeferLoading(HySoundBuffers *pBuffer);
 
 	HyAudioHandle HotLoad(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit);
 	void HotUnload(HyAudioHandle hAudioHandle);
@@ -101,6 +105,7 @@ protected:
 
 	void AddBank(HyFileAudio *pBankFile);
 	void AddGroup(std::string sName, int32 iId);
+	void GroupInit(SoundGroup *pSndGrp);
 	void ProcessCue(IHyNode *pNode, HySoundCue eCueType);
 
 	void StartSound(PlayInfo &playInfoRef);

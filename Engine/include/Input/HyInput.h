@@ -23,6 +23,8 @@ class HyInput
 	const uint32					m_uiNUM_INPUT_MAPS;
 	HyInputMap *					m_pInputMaps;
 
+	uint32							m_uiUserInputOccured;
+
 	std::vector<HyWindow *> &		m_WindowListRef;
 	HyWindow *						m_pMouseWindow;
 	glm::vec2						m_ptMousePos;
@@ -48,6 +50,8 @@ class HyInput
 public:
 	HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListRef);
 	~HyInput();
+
+	bool UserInputOccured() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Mouse
