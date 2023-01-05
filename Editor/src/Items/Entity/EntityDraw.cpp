@@ -15,7 +15,6 @@ EntityDraw::ChildWidget::ChildWidget(HyGuiItemType eGuiType, QUuid uuid, HyEntit
 	HyEntity2d(pParent),
 	m_eGuiType(eGuiType),
 	m_ItemUuid(uuid),
-	m_Transform(this),
 	m_pChild(nullptr),
 	m_bStale(false)
 {
@@ -51,7 +50,7 @@ void EntityDraw::ChildWidget::RefreshJson(HyCamera2d *pCamera, QJsonObject child
 		if(iDisplayOrder != 0)
 			static_cast<IHyBody2d *>(m_pChild)->SetDisplayOrder(iDisplayOrder);
 	}
-	m_pChild->SetPauseUpdate(commonObj["Update During Paused"].toBool());
+	m_pChild->SetPauseUpdate(commonObj["Update During Paused"].toBool()); 
 	m_pChild->SetTag(commonObj["User Tag"].toVariant().toLongLong());
 	m_pChild->SetVisible(commonObj["Visible"].toBool());
 
@@ -62,9 +61,14 @@ void EntityDraw::ChildWidget::RefreshJson(HyCamera2d *pCamera, QJsonObject child
 	QJsonArray scaleArray = transformObj["Scale"].toArray();
 	scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
 
-	m_Transform.Resize(m_eGuiType, m_pChild, pCamera);
+	RefreshTransformCtrl(pCamera);
 
 	m_bStale = false;
+}
+
+void EntityDraw::ChildWidget::RefreshTransformCtrl(HyCamera2d *pCamera)
+{
+	m_Transform.WrapTo(m_eGuiType, m_pChild, pCamera);
 }
 
 void EntityDraw::ChildWidget::RefreshOverrideData()
@@ -117,6 +121,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ EntityDraw::~EntityDraw()
 {
+	SetEverythingStale();
+	DeleteStaleChildren();
 }
 
 /*virtual*/ void EntityDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
@@ -147,12 +153,14 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 /*virtual*/ void EntityDraw::OnMouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
 	IDraw::OnMouseMoveEvent(pEvent);
+
+	if(m_bPanCameraKeyDown)
+		RefreshTransforms();
 }
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/
 {
-	for(ChildWidget *pChild : m_ChildWidgetList)
-		pChild->SetStale();
+	SetEverythingStale();
 
 	QJsonArray childArray = itemMetaObj["childList"].toArray();
 	for(uint32 i = 0; i < childArray.size(); ++i)
@@ -194,11 +202,18 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ void EntityDraw::OnResizeRenderer() /*override*/
 {
+	RefreshTransforms();
 }
 
 /*virtual*/ void EntityDraw::OnZoom(HyZoomLevel eZoomLevel) /*override*/
 {
-	
+	RefreshTransforms();
+}
+
+void EntityDraw::SetEverythingStale()
+{
+	for(ChildWidget *pChild : m_ChildWidgetList)
+		pChild->SetStale();
 }
 
 EntityDraw::ChildWidget *EntityDraw::FindStaleChild(HyGuiItemType eType, QUuid uuid)
@@ -217,14 +232,18 @@ void EntityDraw::DeleteStaleChildren()
 	for(auto iter = m_ChildWidgetList.begin(); iter != m_ChildWidgetList.end(); )
 	{
 		if((*iter)->IsStale())
+		{
+			delete (*iter);
 			iter = m_ChildWidgetList.erase(iter);
+		}
 		else
 			++iter;
 	}
-
-	//m_ChildWidgetList.erase(std::remove_if(m_ChildWidgetList.begin(), m_ChildWidgetList.end(),
-	//	[](const ChildWidget *pChild)
-	//	{
-	//		return pChild->IsStale();
-	//	}), m_ChildWidgetList.end());
 }
+
+void EntityDraw::RefreshTransforms()
+{
+	for(ChildWidget *pChild : m_ChildWidgetList)
+		pChild->RefreshTransformCtrl(m_pCamera);
+}
+

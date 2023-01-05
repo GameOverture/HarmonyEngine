@@ -29,10 +29,9 @@ HyCamera2d::~HyCamera2d()
 	scale.Set(1.0f / fZoom);
 }
 
+// NOTE: Doesn't account for camera rotation!
 void HyCamera2d::CalcWorldViewBounds(b2AABB &aabbOut) const
 {
-	// TODO: Account for camera rotation!
-
 	float fHalfWidth = ((m_pWindowPtr->GetFramebufferSize().x * m_ViewportRect.Width()) * 0.5f) * scale.X();
 	float fHalfHeight = ((m_pWindowPtr->GetFramebufferSize().y * m_ViewportRect.Height()) * 0.5f) * scale.Y();
 
@@ -45,15 +44,8 @@ void HyCamera2d::ProjectToCamera(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindo
 	b2AABB aabbWorld;
 	CalcWorldViewBounds(aabbWorld);
 
-	float fFbWidth = (m_ViewportRect.Width() * m_pWindowPtr->GetFramebufferSize().x);
-	float fFbHeight = (m_ViewportRect.Height() * m_pWindowPtr->GetFramebufferSize().y);
-
-	glm::vec2 ptNormalized;
-	ptNormalized.x = (ptWorldPos.x - aabbWorld.lowerBound.x) / (aabbWorld.GetExtents().x * 2.0f);
-	ptNormalized.y = (ptWorldPos.y - aabbWorld.lowerBound.y) / (aabbWorld.GetExtents().y * 2.0f);
-
-	ptWindowCoordinateOut.x = (ptNormalized.x * fFbWidth);
-	ptWindowCoordinateOut.y = (ptNormalized.y * fFbHeight);
+	ptWindowCoordinateOut.x = (ptWorldPos.x - aabbWorld.lowerBound.x) * (1.0f / scale.X());
+	ptWindowCoordinateOut.y = (ptWorldPos.y - aabbWorld.lowerBound.y) * (1.0f / scale.Y());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

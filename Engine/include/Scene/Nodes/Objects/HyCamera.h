@@ -28,7 +28,7 @@ public:
 	virtual float GetZoom() const override;
 	virtual void SetZoom(const float fZoom) override;
 
-	void CalcWorldViewBounds(b2AABB &aabbOut) const;
+	void CalcWorldViewBounds(b2AABB &aabbOut) const; // NOTE: Doesn't account for camera rotation!
 	void ProjectToCamera(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const;
 };
 

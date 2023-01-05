@@ -41,6 +41,7 @@ class EntityDraw : public IDraw
 			m_bStale = true;
 		}
 		void RefreshJson(HyCamera2d *pCamera, QJsonObject childObj); // Clears stale flag
+		void RefreshTransformCtrl(HyCamera2d *pCamera);
 	
 	protected:
 		void RefreshOverrideData();
@@ -53,8 +54,7 @@ class EntityDraw : public IDraw
 
 	public:
 		ShapeWidget(HyEntity2d *pParent) :
-			HyEntity2d(pParent),
-			m_Transform(this)
+			HyEntity2d(pParent)
 		{
 		}
 	};
@@ -80,8 +80,11 @@ protected:
 	virtual void OnResizeRenderer() override;
 	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
 
+	void SetEverythingStale();
 	ChildWidget *FindStaleChild(HyGuiItemType eType, QUuid uuid);
 	void DeleteStaleChildren();
+
+	void RefreshTransforms();
 };
 
 #endif // ENTITYDRAW_H

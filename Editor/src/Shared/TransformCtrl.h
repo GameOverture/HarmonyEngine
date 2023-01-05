@@ -37,10 +37,10 @@ protected:
 
 
 public:
-	TransformCtrl(HyEntity2d *pParent);
+	TransformCtrl();
 	virtual ~TransformCtrl();
 
-	void Resize(HyGuiItemType eGuiType, IHyLoadable2d *pNode, HyCamera2d *pCamera);
+	void WrapTo(HyGuiItemType eGuiType, IHyLoadable2d *pNode, HyCamera2d *pCamera);
 };
 
 #endif // TRANSFORMCTRL_H

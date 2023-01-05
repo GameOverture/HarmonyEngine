@@ -16,18 +16,15 @@ WidgetVectorSpinBox::WidgetVectorSpinBox(QWidget *parent) :
 	ui(new Ui::WidgetVectorSpinBox)
 {
 	ui->setupUi(this);
-
 	// NOTE: WHEN THIS CONSTRUCTOR IS USED. Init() MUST BE CALLED
-	//HyGuiLog("WidgetVectorSpinBox::WidgetVectorSpinBox() invalid constructor used", LOGTYPE_Error);
 }
 
-WidgetVectorSpinBox::WidgetVectorSpinBox(SpinBoxType eSpinBoxType, QWidget *parent /*= nullptr*/) :
+WidgetVectorSpinBox::WidgetVectorSpinBox(SpinBoxType eSpinBoxType, QVariant minValue, QVariant maxValue, QWidget *parent /*= nullptr*/) :
 	QWidget(parent),
 	ui(new Ui::WidgetVectorSpinBox)
 {
 	ui->setupUi(this);
-
-	ui->stackedWidget->setCurrentIndex(eSpinBoxType);
+	Init(eSpinBoxType, minValue, maxValue);
 }
 
 /*virtual*/ WidgetVectorSpinBox::~WidgetVectorSpinBox()

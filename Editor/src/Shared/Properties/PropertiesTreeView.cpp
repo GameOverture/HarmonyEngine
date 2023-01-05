@@ -131,37 +131,39 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 
 	case PROPERTIESTYPE_ivec2:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int2d, pParent);
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int2d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_vec2:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double2d, pParent);
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double2d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
+		{
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+		}
 		break;
 
 	case PROPERTIESTYPE_ivec3:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int3d, pParent);
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int3d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_vec3:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double3d, pParent);
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double3d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_ivec4:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int4d, pParent);
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int4d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_vec4:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double4d, pParent);
+		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double4d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;

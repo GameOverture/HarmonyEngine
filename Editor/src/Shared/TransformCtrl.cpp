@@ -10,8 +10,8 @@
 #include "Global.h"
 #include "TransformCtrl.h"
 
-TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
-	HyEntity2d(pParent)
+TransformCtrl::TransformCtrl() :
+	HyEntity2d(nullptr)
 {
 	m_BoundingVolume.SetTint(HyColor::Blue.Lighten());
 	m_BoundingVolume.SetWireframe(true);
@@ -33,12 +33,13 @@ TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 {
 }
 
-void TransformCtrl::Resize(HyGuiItemType eGuiType, IHyLoadable2d *pNode, HyCamera2d *pCamera)
+void TransformCtrl::WrapTo(HyGuiItemType eGuiType, IHyLoadable2d *pNode, HyCamera2d *pCamera)
 {
 	HyShape2d boundingShape;
 
 	switch(eGuiType)
 	{
+	case ITEM_AtlasImage:
 	case ITEM_Primitive:
 	case ITEM_Text:
 	case ITEM_Spine:
@@ -48,7 +49,6 @@ void TransformCtrl::Resize(HyGuiItemType eGuiType, IHyLoadable2d *pNode, HyCamer
 		break; }
 
 	case ITEM_Audio:
-	case ITEM_AtlasImage:
 	case ITEM_Entity:
 	default:
 		HyLogError("TransformCtrl::Resize - unhandled child node type");
@@ -80,7 +80,7 @@ void TransformCtrl::Resize(HyGuiItemType eGuiType, IHyLoadable2d *pNode, HyCamer
 		const float fRADIUS = 5.0f;
 		for(int i = 0; i < NUM_GRABPOINTS; ++i)
 		{
-			glm::vec4 ptTransformPos(m_ptGrabPos[i].x, m_ptGrabPos[i].y, 0.0f, 0.0f);
+			glm::vec4 ptTransformPos(m_ptGrabPos[i].x, m_ptGrabPos[i].y, 0.0f, 1.0f);
 			ptTransformPos = sceneMtx * ptTransformPos;
 			HySetVec(m_ptGrabPos[i], ptTransformPos.x, ptTransformPos.y);
 			pCamera->ProjectToCamera(m_ptGrabPos[i], m_ptGrabPos[i]);
