@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Global.h"
 #include "EntityWidget.h"
+#include "EntityDraw.h"
 #include "ui_EntityWidget.h"
 #include "Project.h"
 #include "EntityUndoCmds.h"
@@ -38,7 +39,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->nodeTree->setDragDropMode(QAbstractItemView::InternalMove);
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
-	ui->nodeTree->setModel(&pEntityModel->GetNodeTreeModel());
+	ui->nodeTree->setModel(&pEntityModel->GetTreeModel());
 	pEntityModel->RegisterWidgets(*ui->cmbEntityType);
 }
 
@@ -65,6 +66,7 @@ EntityWidget::~EntityWidget()
 {
 	ui->nodeTree->expandAll();
 
+	// Query what items are selected in the Explorer Widget
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
 	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);
 	bool bEnableAddNodeBtn = false;
@@ -79,11 +81,9 @@ EntityWidget::~EntityWidget()
 	}
 	ui->actionAppendChildren->setEnabled(bEnableAddNodeBtn);
 
-	bool bFrameIsSelected = true;
-	ui->actionAddPrimitive->setEnabled(bFrameIsSelected);
-
-	EntityTreeItemData *pSubStateItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetNodeTreeModel().data(ui->nodeTree->currentIndex(), Qt::UserRole).value<EntityTreeItemData *>();
-	if(pSubStateItem == nullptr)
+	// Manage currently selected items in the item tree
+	QList<EntityTreeItemData *> selectedItemDataList = GetSelectedItems(true, true);
+	if(selectedItemDataList.empty())
 	{
 		ui->lblSelectedItemIcon->setVisible(false);
 		ui->lblSelectedItemText->setVisible(false);
@@ -92,22 +92,32 @@ EntityWidget::~EntityWidget()
 	}
 	else
 	{
-		ui->lblSelectedItemIcon->setVisible(true);
-		ui->lblSelectedItemIcon->setPixmap(pSubStateItem->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
-		ui->lblSelectedItemText->setVisible(true);
-		ui->lblSelectedItemText->setText(pSubStateItem->GetCodeName() % " Properties");
+		if(selectedItemDataList.size() == 1)
+		{
+			ui->lblSelectedItemIcon->setVisible(true);
+			ui->lblSelectedItemIcon->setPixmap(selectedItemDataList[0]->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+			ui->lblSelectedItemText->setVisible(true);
+			ui->lblSelectedItemText->setText(selectedItemDataList[0]->GetCodeName() % " Properties");
 
-		PropertiesTreeModel &propModelRef = pSubStateItem->GetPropertiesModel();
-		ui->propertyTree->setModel(&propModelRef);
+			PropertiesTreeModel &propModelRef = selectedItemDataList[0]->GetPropertiesModel();
+			ui->propertyTree->setModel(&propModelRef);
+		}
+		else
+		{
+			ui->lblSelectedItemIcon->setVisible(false);
+			ui->lblSelectedItemText->setVisible(true);
+			ui->lblSelectedItemText->setText("Multiple items selected");
+
+			ui->propertyTree->setModel(nullptr);
+		}
 
 		// Expand the top level nodes (the properties' categories)
-		QModelIndex rootIndex = ui->propertyTree->rootIndex();
-		ui->propertyTree->expand(rootIndex);
-		for(int i = 0; i < propModelRef.rowCount(); ++i)
-			ui->propertyTree->expand(propModelRef.index(i, 0, rootIndex));
-
+		ui->propertyTree->expandAll();
 		ui->propertyTree->resizeColumnToContents(0);
 	}
+
+	if(m_ItemRef.GetDraw())
+		static_cast<EntityDraw *>(m_ItemRef.GetDraw())->RefreshSelectedItems();
 }
 
 /*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
@@ -121,13 +131,34 @@ EntityWidget::~EntityWidget()
 	ui->nodeTree->selectionModel()->select(index, QItemSelectionModel::Select);
 }
 
-ExplorerItemData *EntityWidget::GetSelectedNode()
+QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes)
 {
-	QModelIndexList selectedIndices = ui->nodeTree->selectionModel()->selectedIndexes();
-	if(selectedIndices.empty())
-		return nullptr;
+	EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().GetEntityTreeItemData();
 
-	return ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<ExplorerItemData *>();
+	QModelIndexList selectedIndices = ui->nodeTree->selectionModel()->selectedIndexes();
+	QList<EntityTreeItemData *> selectedItemList;
+	for(QModelIndex index : selectedIndices)
+	{
+		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+
+		if(pCurItemData == pEntityTreeItemData)
+		{
+			if(bIncludeMainEntity)
+				selectedItemList.push_back(pCurItemData);
+		}
+		else
+		{
+			if(pCurItemData->GetType() == ITEM_Shape)
+			{
+				if(bIncludeShapes)
+					selectedItemList.push_back(pCurItemData);
+			}
+			else
+				selectedItemList.push_back(pCurItemData);
+		}
+	}
+
+	return selectedItemList;
 }
 
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/

@@ -30,6 +30,8 @@ SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject sett
 
 	ui->chkUseSpine->setChecked(settingsObj["UseSpine"].toBool());
 	ui->chkUseIcu->setChecked(settingsObj["UseIcu"].toBool());
+
+	ui->txtEmscriptenCcall->setText(settingsObj["EmscriptenCcall"].toString());
 	
 	QJsonArray dependsArray = settingsObj["SrcDepends"].toArray();
 	for(int32 i = 0; i < dependsArray.size(); ++i)
@@ -107,6 +109,8 @@ void SourceSettingsDlg::UpdateMetaObj(QJsonObject &metaObjRef) const
 
 	metaObjRef.insert("UseSpine", ui->chkUseSpine->isChecked());
 	metaObjRef.insert("UseIcu", ui->chkUseIcu->isChecked());
+
+	metaObjRef.insert("EmscriptenCcall", ui->txtEmscriptenCcall->text());
 
 	QDir metaDir(m_ProjectRef.GetSourceAbsPath());
 	QJsonArray srcDependsArray;

@@ -12,55 +12,12 @@
 
 #include "IDraw.h"
 #include "EntityModel.h"
+#include "EntityItemDraw.h"
 
 class EntityDraw : public IDraw
 {
-	class ChildWidget : public HyEntity2d
-	{
-		HyGuiItemType							m_eGuiType;
-		QUuid									m_ItemUuid;
-
-		TransformCtrl							m_Transform;
-		IHyLoadable2d *							m_pChild;
-
-		bool									m_bStale;
-
-	public:
-		ChildWidget(HyGuiItemType eGuiType, QUuid uuid, HyEntity2d *pParent);
-		virtual ~ChildWidget();
-		HyGuiItemType GetGuiType() const {
-			return m_eGuiType;
-		}
-		const QUuid &GetUuid() const {
-			return m_ItemUuid;
-		}
-		bool IsStale() const {
-			return m_bStale;
-		}
-		void SetStale() {
-			m_bStale = true;
-		}
-		void RefreshJson(HyCamera2d *pCamera, QJsonObject childObj); // Clears stale flag
-		void RefreshTransformCtrl(HyCamera2d *pCamera);
-	
-	protected:
-		void RefreshOverrideData();
-	};
-
-	class ShapeWidget : public HyEntity2d
-	{
-		TransformCtrl							m_Transform;
-		HyShape2d								m_Shape;
-
-	public:
-		ShapeWidget(HyEntity2d *pParent) :
-			HyEntity2d(pParent)
-		{
-		}
-	};
-	
-	QList<ChildWidget *>						m_ChildWidgetList;
-	QList<ShapeWidget *>						m_ShapeWidgetList;
+	QList<EntityItemDraw *>					m_ItemList;
+	TransformCtrl							m_Transform;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
@@ -73,6 +30,8 @@ public:
 	virtual void OnMouseWheelEvent(QWheelEvent *pEvent) override;
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent) override;
 
+	void RefreshSelectedItems();
+
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
 	virtual void OnShow() override;
@@ -81,10 +40,12 @@ protected:
 	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
 
 	void SetEverythingStale();
-	ChildWidget *FindStaleChild(HyGuiItemType eType, QUuid uuid);
+	EntityItemDraw *FindStaleChild(HyGuiItemType eType, QUuid uuid);
 	void DeleteStaleChildren();
 
 	void RefreshTransforms();
+
+	QList<EntityItemDraw *> GetSelectedItems() const;
 };
 
 #endif // ENTITYDRAW_H

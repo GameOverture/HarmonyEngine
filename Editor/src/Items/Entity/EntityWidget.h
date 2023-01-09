@@ -45,14 +45,14 @@ public:
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
-	ExplorerItemData *GetSelectedNode();
+	QList<EntityTreeItemData *> GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes);
 
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;
 	virtual void resizeEvent(QResizeEvent *pEvent) override;
 
 private Q_SLOTS:
-	void on_nodeTree_clicked(QModelIndex);
+	void on_nodeTree_clicked(QModelIndex index);
 	void on_actionAppendChildren_triggered();
 	void on_actionAddPrimitive_triggered();
 	void on_actionInsertBoundingVolume_triggered();

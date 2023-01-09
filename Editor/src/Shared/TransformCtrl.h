@@ -12,6 +12,8 @@
 
 #include "Global.h"
 
+class EntityItemDraw;
+
 class TransformCtrl : public HyEntity2d
 {
 	enum GrabPoints
@@ -25,6 +27,8 @@ class TransformCtrl : public HyEntity2d
 		GRAB_TopMid,
 		GRAB_MidLeft,
 
+		GRAB_Rotate,
+
 		NUM_GRABPOINTS
 	};
 
@@ -32,15 +36,19 @@ protected:
 	glm::vec2					m_ptGrabPos[NUM_GRABPOINTS];
 
 	HyPrimitive2d				m_BoundingVolume;
+	HyPrimitive2d				m_ExtrudeSegment;
 	HyPrimitive2d				m_GrabOutline[NUM_GRABPOINTS];
 	HyPrimitive2d				m_GrabFill[NUM_GRABPOINTS];
-
 
 public:
 	TransformCtrl();
 	virtual ~TransformCtrl();
 
-	void WrapTo(HyGuiItemType eGuiType, IHyLoadable2d *pNode, HyCamera2d *pCamera);
+	void WrapTo(EntityItemDraw *pDrawItem, HyCamera2d *pCamera);
+	void WrapTo(QList<EntityItemDraw *> itemDrawList, HyCamera2d *pCamera);
+
+protected:
+	void ExtractTransform(EntityItemDraw *pDrawItem, glm::mat4 &transformMtxOut, HyShape2d &boundingShapeOut);
 };
 
 #endif // TRANSFORMCTRL_H

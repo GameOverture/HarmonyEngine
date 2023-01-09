@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>625</width>
-    <height>275</height>
+    <height>345</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -92,6 +92,33 @@
          <string>Use ICU (international components unicode) for localization formatting</string>
         </property>
        </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpEnscripten">
+     <property name="title">
+      <string>Enscripten (Browser Builds)</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="lblOutputName_2">
+          <property name="text">
+           <string>ccall - Exported runtime methods (comma delimited)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="txtEmscriptenCcall">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

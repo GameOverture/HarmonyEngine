@@ -117,13 +117,16 @@ if(Qt5_DIR)
 		src/Items/Text/SubWidgets/TextLayersWidget.h
 		src/Items/Entity/EntityDraw.cpp
 		src/Items/Entity/EntityDraw.h
+		src/Items/Entity/EntityItemDraw.cpp
+		src/Items/Entity/EntityItemDraw.h
 		src/Items/Entity/EntityModel.cpp
 		src/Items/Entity/EntityModel.h
+		src/Items/Entity/EntityTreeModel.cpp
+		src/Items/Entity/EntityTreeModel.h
 		src/Items/Entity/EntityUndoCmds.cpp
 		src/Items/Entity/EntityUndoCmds.h
 		src/Items/Entity/EntityWidget.cpp
 		src/Items/Entity/EntityWidget.h
-		src/Items/Entity/EntityToolbox.ui
 		src/Items/Entity/EntityWidget.ui
 		src/Items/Prefab/PrefabDraw.cpp
 		src/Items/Prefab/PrefabModel.cpp

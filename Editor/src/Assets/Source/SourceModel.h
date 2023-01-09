@@ -42,6 +42,7 @@ protected:
 	quint32 ComputeFileChecksum(QString sFilterPath, QString sFileName) const;
 	QString GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName, QString sBaseClass, bool bEntityBaseClass);
 	void GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint32> &checksumListOut) const;
+	QString CleanEmscriptenCcall(QString sUserValue) const;
 
 	virtual void OnInit() override;
 	virtual void OnCreateNewBank(QJsonObject &newMetaBankObjRef) override;

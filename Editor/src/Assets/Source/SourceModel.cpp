@@ -201,6 +201,37 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	}
 }
 
+QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
+{
+	sUserValue = sUserValue.simplified();
+	sUserValue.replace(' ', "");
+	if(sUserValue.isEmpty())
+		return QString();
+
+	QStringList sFuncList = sUserValue.split(',', Qt::SkipEmptyParts);
+	if(sFuncList.empty())
+		return QString();
+
+	// list(APPEND HYEM_LINK_FLAGS "-sEXPORTED_RUNTIME_METHODS=ccall")
+	// list(APPEND HYEM_LINK_FLAGS "-sEXPORTED_FUNCTIONS=_main,_foo,_bar")
+	QString sLinkFlags = "list(APPEND HYEM_LINK_FLAGS \"-sEXPORTED_RUNTIME_METHODS=ccall\")\n\tlist(APPEND HYEM_LINK_FLAGS \"-sEXPORTED_FUNCTIONS=_main";
+
+	for(int i = 0; i < sFuncList.size(); ++i)
+	{
+		if(sFuncList[i].startsWith('_') == false)
+			sFuncList[i].prepend('_');
+
+		if(sFuncList[i] == "_main")
+			continue;
+
+		sLinkFlags += ",";
+		sLinkFlags += sFuncList[i];
+	}
+	sLinkFlags += "\")";
+
+	return sLinkFlags;
+}
+
 /*virtual*/ void SourceModel::OnInit() /*override*/
 {
 	if(m_BanksModel.GetBank(0)->m_AssetList.empty())
@@ -285,6 +316,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	newMetaBankObjRef["UseSdlAudio"] = false;
 	newMetaBankObjRef["UseSdlNet"] = false;
 	newMetaBankObjRef["UseIcu"] = false;
+	newMetaBankObjRef["EmscriptenCcall"] = "";
 }
 
 /*virtual*/ AssetItemData *SourceModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
@@ -548,6 +580,10 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 		sContents.replace("%HY_USEICU%", "set(HYBUILD_ICU ON)");
 	else
 		sContents.replace("%HY_USEICU%", "set(HYBUILD_ICU OFF)");
+
+	// Emscripten ccall runtime methods
+	QString sEmscriptenCcall = CleanEmscriptenCcall(pSourceBank->m_MetaObj["EmscriptenCcall"].toString());
+	sContents.replace("%HY_EMSCRIPTEN_CCALL%", sEmscriptenCcall);
 
 	QString sSrcFiles;
 	for(int32 i = 0; i < pSourceBank->m_AssetList.size(); ++i)

@@ -40,7 +40,7 @@ public:
 		QList<ProjectItemData *> itemList;
 		for(auto *pProjItem : m_ChildrenList)
 		{
-			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(pProjItem, true))
+			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pProjItem, true))
 				itemList.push_back(pProjItem);
 		}
 
@@ -52,7 +52,7 @@ public:
 	{
 		for(auto *pNodeItem : m_NodeList)
 		{
-			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetNodeTreeModel().IsItemValid(pNodeItem, true))
+			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pNodeItem, true))
 				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pNodeItem);
 		}
 		m_NodeList.clear();
