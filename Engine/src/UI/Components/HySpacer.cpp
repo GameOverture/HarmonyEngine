@@ -44,9 +44,9 @@ void HySpacer::Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint)
 
 	m_iSizeHint = uiSizeHint;
 	if(m_eORIEN_TYPE == HYORIEN_Horizontal)
-		SetSizePolicy(eSizePolicy, HYSIZEPOLICY_Flexible);
+		SetSizePolicy(eSizePolicy, HYSIZEPOLICY_Fixed);
 	else
-		SetSizePolicy(HYSIZEPOLICY_Flexible, eSizePolicy);
+		SetSizePolicy(HYSIZEPOLICY_Fixed, eSizePolicy);
 }
 
 /*virtual*/ glm::vec2 HySpacer::GetPosOffset() /*override*/

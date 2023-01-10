@@ -15,7 +15,7 @@
 #include "UI/Components/HyPanel.h"
 #include "UI/Components/HyLayout.h"
 #include "UI/Components/HySpacer.h"
-#include "UI/Components/HyCloseButton.h"
+#include "UI/Components/HyToolButton.h"
 #include "UI/Components/HyScrollBar.h"
 
 class HyUiContainer : public HyEntity2d
@@ -32,6 +32,9 @@ protected:
 
 	bool									m_bInputAllowed;
 	int32									m_iDefaultWidgetSpacing;
+
+	bool									m_bFlexSizeX;
+	bool									m_bFlexSizeY;
 
 	HyPanel									m_Panel;
 	HyLayout								m_RootLayout;

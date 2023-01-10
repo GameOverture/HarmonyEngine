@@ -23,6 +23,8 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	m_Shape(this),
 	m_bInputAllowed(true),
 	m_iDefaultWidgetSpacing(HYUICONTAINER_DefaultWidgetSpacing),
+	m_bFlexSizeX(true),
+	m_bFlexSizeY(true),
 	m_Panel(initRef, true, this),
 	m_RootLayout(eRootLayoutDirection, HYUICONTAINER_DefaultWidgetSpacing, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
@@ -32,6 +34,9 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	m_VertBar(HYORIEN_Vertical, 20, this),
 	m_HorzBar(HYORIEN_Horizontal, 20, this)
 {
+	m_bFlexSizeX = m_Panel.size.X() == 0.0f;
+	m_bFlexSizeY = m_Panel.size.Y() == 0.0f;
+
 	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
 	m_RootLayout.SetLayoutDirty();
 
@@ -416,7 +421,10 @@ void HyUiContainer::SetLineScrollAmt(float fLineScrollAmt)
 /*virtual*/ void HyUiContainer::OnUpdate() /*override final*/
 {
 	if(m_RootLayout.IsLayoutDirty())
+	{
 		OnRootLayoutUpdate();
+		OnRootLayoutUpdate();
+	}
 
 	if(m_fElapsedTime > 0.0f)
 	{
@@ -487,9 +495,10 @@ void HyUiContainer::OnRootLayoutUpdate()
 		if(m_Panel.IsPrimitive())
 			iScissorMargin = m_Panel.GetFrameSize();
 
-		SetScissor(iScissorMargin, iScissorMargin,
-			iNewWidth - (iScissorMargin * 2) - (static_cast<int32>(m_bUseVertBar) * m_VertBar.GetDiameter()),
-			iNewHeight - (iScissorMargin * 2) - (static_cast<int32>(m_bUseHorzBar) * m_HorzBar.GetDiameter()));
+		int32 iScissorWidth = iNewWidth - (iScissorMargin * 2) - (static_cast<int32>(m_bUseVertBar) * m_VertBar.GetDiameter());
+		int32 iScissorHeight = iNewHeight - (iScissorMargin * 2) - (static_cast<int32>(m_bUseHorzBar) * m_HorzBar.GetDiameter());
+		if(iScissorWidth > 0 && iScissorHeight > 0)
+			SetScissor(iScissorMargin, iScissorMargin, iScissorWidth, iScissorHeight);
 
 		m_Panel.ClearScissor(false);
 		m_VertBar.ClearScissor(false);
