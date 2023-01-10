@@ -262,7 +262,7 @@ void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiClientTotalSize, uint32 u
 {
 	uint32 uiDiameter = GetDiameter();
 
-	if(uiClientTotalSize <= 0 || uiClientTotalSize <= uiClientShownSize)
+	if(uiClientTotalSize <= 0 || uiClientTotalSize < uiClientShownSize)
 	{
 		m_bIsValidMetrics = false;
 		return;

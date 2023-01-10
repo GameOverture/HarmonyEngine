@@ -489,57 +489,75 @@ void HyUiContainer::OnRootLayoutUpdate()
 	int32 iNewWidth = static_cast<int32>(m_Panel.size.X());
 	int32 iNewHeight = static_cast<int32>(m_Panel.size.Y());
 
+	if(iNewWidth == 0 || iNewHeight == 0)
+		return;
+
 	int32 iScissorMargin = 0;
 	if(m_bUseVertBar || m_bUseHorzBar)
+	{
+		// If scrolling, then use '0' for that dimension, to indicate to the layout use the exact amount it needs.
+		// NOTE: Using the layout's size hint (instead of '0') may be inaccurate if other dimension is being resized
+		if(m_bUseHorzBar && m_RootLayout.GetSizeHint().x > iNewWidth)
+		{
+			iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
+			iNewHeight -= m_HorzBar.GetDiameter();
+			iNewWidth = 0;
+		}
+
+		if(m_bUseVertBar && m_RootLayout.GetSizeHint().y > iNewHeight)
+		{
+			if(iNewWidth != 0)
+			{
+				iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
+				iNewWidth -= m_VertBar.GetDiameter();
+			}
+			iNewHeight = 0;
+		}
+	}
+
+	bool bVertBarShown = iNewHeight == 0;
+	bool bHorzBarShown = iNewWidth == 0;
+
+	if(bVertBarShown || bHorzBarShown)
 	{
 		if(m_Panel.IsPrimitive())
 			iScissorMargin = m_Panel.GetFrameSize();
 
-		int32 iScissorWidth = iNewWidth - (iScissorMargin * 2) - (static_cast<int32>(m_bUseVertBar) * m_VertBar.GetDiameter());
-		int32 iScissorHeight = iNewHeight - (iScissorMargin * 2) - (static_cast<int32>(m_bUseHorzBar) * m_HorzBar.GetDiameter());
+		int32 iScissorWidth = static_cast<int32>(m_Panel.size.X()) - (iScissorMargin * 2) - (static_cast<int32>(bVertBarShown) * m_VertBar.GetDiameter());
+		int32 iScissorHeight = static_cast<int32>(m_Panel.size.Y()) - (iScissorMargin * 2) - (static_cast<int32>(bHorzBarShown) * m_HorzBar.GetDiameter());
 		if(iScissorWidth > 0 && iScissorHeight > 0)
 			SetScissor(iScissorMargin, iScissorMargin, iScissorWidth, iScissorHeight);
-
-		m_Panel.ClearScissor(false);
-		m_VertBar.ClearScissor(false);
-		m_HorzBar.ClearScissor(false);
-
-		// If scrolling, then use '0' for that dimension, to indicate to the layout use the exact amount it needs.
-		// NOTE: Using the layout's size hint (instead of '0') may be inaccurate if other dimension is being resized
-		if(m_bUseHorzBar)
-			iNewWidth = 0;
-		else if(m_bUseVertBar)
-		{
-			iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
-			iNewWidth -= m_VertBar.GetDiameter();
-		}
-
-		if(m_bUseVertBar)
-			iNewHeight = 0;
-		else if(m_bUseHorzBar)
-		{
-			iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
-			iNewHeight -= m_HorzBar.GetDiameter();
-		}
+		else
+			ClearScissor(true);
 	}
+	else
+		ClearScissor(true);
+
+	m_Panel.ClearScissor(false);
+	m_VertBar.ClearScissor(false);
+	m_HorzBar.ClearScissor(false);
 
 	glm::ivec2 vActualSize = m_RootLayout.Resize(iNewWidth, iNewHeight);
 
-	if(m_bUseVertBar && m_bUseHorzBar == false)
+	if(bVertBarShown && bHorzBarShown == false)
 	{
 		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2), vActualSize.y, GetSize().y);
 		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter() - iScissorMargin, iScissorMargin);
 		m_VertBar.alpha.Set(1.0f);
+		
 		m_HorzBar.alpha.Set(0.0f);
+		m_HorzBar.SetMetrics(GetSize().y - (iScissorMargin * 2), iNewWidth, iNewWidth);
 	}
-	else if(m_bUseVertBar == false && m_bUseHorzBar)
+	else if(bVertBarShown == false && bHorzBarShown)
 	{
 		m_HorzBar.SetMetrics(GetSize().x - (iScissorMargin * 2), vActualSize.x, GetSize().x);
 		m_HorzBar.pos.Set(iScissorMargin, iScissorMargin);
 		m_HorzBar.alpha.Set(1.0f);
+		
 		m_VertBar.alpha.Set(0.0f);
+		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2), iNewHeight, iNewHeight);
 	}
-	else if(m_bUseVertBar && m_bUseHorzBar)
+	else if(bVertBarShown && bHorzBarShown)
 	{
 		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2) - m_HorzBar.GetDiameter(), vActualSize.y, GetSize().y);
 		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter() - iScissorMargin, iScissorMargin + static_cast<int32>(m_HorzBar.GetDiameter()));
@@ -548,6 +566,14 @@ void HyUiContainer::OnRootLayoutUpdate()
 		m_HorzBar.SetMetrics(GetSize().x - (iScissorMargin * 2) - m_VertBar.GetDiameter(), vActualSize.x, GetSize().x);
 		m_HorzBar.pos.Set(iScissorMargin, iScissorMargin);
 		m_HorzBar.alpha.Set(1.0f);
+	}
+	else if(bVertBarShown == false && bHorzBarShown == false)
+	{
+		m_HorzBar.alpha.Set(0.0f);
+		m_HorzBar.SetMetrics(GetSize().x - (iScissorMargin * 2), iNewWidth, iNewWidth);
+
+		m_VertBar.alpha.Set(0.0f);
+		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2), iNewHeight, iNewHeight);
 	}
 }
 
