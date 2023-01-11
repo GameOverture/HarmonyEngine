@@ -351,6 +351,11 @@ void HyScrollBar::OffsetSlider(float fPixels, bool bOffsetClientContentPixels)
 	InvokeOnScrollCallback();
 }
 
+void HyScrollBar::ScrollTo(float fPos)
+{
+	m_AnimScrollPos.Set(fPos);
+}
+
 /*virtual*/ void HyScrollBar::OnUpdate() /*override*/
 {
 	if(m_AnimScrollPos.IsAnimating())

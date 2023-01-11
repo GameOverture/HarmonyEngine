@@ -426,6 +426,12 @@ void HyUiContainer::SetLineScrollAmt(float fLineScrollAmt)
 	m_HorzBar.SetLineScrollAmt(fLineScrollAmt);
 }
 
+void HyUiContainer::ScrollTo(float fVertScrollPos, float fHorzScrollPos)
+{
+	m_VertBar.ScrollTo(fVertScrollPos);
+	m_HorzBar.ScrollTo(fHorzScrollPos);
+}
+
 /*virtual*/ void HyUiContainer::OnUpdate() /*override final*/
 {
 	if(m_RootLayout.IsLayoutDirty())

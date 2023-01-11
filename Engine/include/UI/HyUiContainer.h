@@ -100,6 +100,7 @@ public:
 	void SetScrollBarColor(HyColor color);
 	void SetScrollBarSize(uint32 uiDiameter);
 	void SetLineScrollAmt(float fLineScrollAmt);
+	void ScrollTo(float fVertScrollPos, float fHorzScrollPos);
 
 protected:
 	virtual void OnUpdate() override final;

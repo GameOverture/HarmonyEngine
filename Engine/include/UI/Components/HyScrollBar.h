@@ -94,6 +94,7 @@ public:
 	void DoPageScroll(int32 iPagesOffset);
 
 	void OffsetSlider(float fPixels, bool bOffsetClientContentPixels);
+	void ScrollTo(float fPos);
 
 protected:
 	virtual void OnUpdate() override;
