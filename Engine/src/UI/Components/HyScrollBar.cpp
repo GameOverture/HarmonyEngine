@@ -29,6 +29,11 @@ uint32 HyScrollBar::PageControl::GetDiameter() const
 	return m_uiDiameter;
 }
 
+void HyScrollBar::PageControl::SetDiameter(uint32 uiDiameter)
+{
+	m_uiDiameter = uiDiameter;
+}
+
 void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, float fSliderPercent)
 {
 	m_uiDiameter = uiDiameter;
@@ -256,6 +261,11 @@ void HyScrollBar::SetColor(HyColor color)
 	m_PageControl.SetColor(color);
 	m_PosBtn.SetColor(color);
 	m_NegBtn.SetColor(color);
+}
+
+void HyScrollBar::SetDiameter(uint32 uiDiameter)
+{
+	m_PageControl.SetDiameter(uiDiameter);
 }
 
 void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiClientTotalSize, uint32 uiClientShownSize)

@@ -412,6 +412,14 @@ void HyUiContainer::SetScrollBarColor(HyColor color)
 	m_HorzBar.SetColor(color);
 }
 
+void HyUiContainer::SetScrollBarSize(uint32 uiDiameter)
+{
+	m_VertBar.SetDiameter(uiDiameter);
+	m_HorzBar.SetDiameter(uiDiameter);
+	
+	m_RootLayout.SetLayoutDirty();
+}
+
 void HyUiContainer::SetLineScrollAmt(float fLineScrollAmt)
 {
 	m_VertBar.SetLineScrollAmt(fLineScrollAmt);

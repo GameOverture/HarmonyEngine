@@ -17,7 +17,9 @@ enum HyToolButtonType
 {
 	HYTOOLBTN_Close = 0,
 	HYTOOLBTN_LeftArrow,
-	HYTOOLBTN_RightArrow
+	HYTOOLBTN_RightArrow,
+	HYTOOLBTN_UpArrow,
+	HYTOOLBTN_DownArrow
 };
 
 class HyToolButton : public HyButton

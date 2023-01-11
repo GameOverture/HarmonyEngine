@@ -665,7 +665,7 @@ offsetCalculation:
 	float fCurLineAscender = 0.0f;
 	float fCurLineDecender = 0.0f;	// Stored as positive value
 
-	uint32 uiLastSpaceIndex = 0;
+	int32 iLastSpaceIndex = -1;
 	uint32 uiNewlineIndex = 0;
 	uint32 uiNumUnprintableCharacters = 0;
 	bool bFirstCharacterOnNewLine = true;
@@ -680,7 +680,7 @@ offsetCalculation:
 
 		if(m_Utf32CodeList[uiStrIndex] == 32)	// 32 = ' ' character
 		{
-			uiLastSpaceIndex = uiStrIndex;
+			iLastSpaceIndex = uiStrIndex;
 			fLastSpacePosX = fCurLineWidth;
 		}
 
@@ -763,7 +763,7 @@ offsetCalculation:
 					//	((m_uiTextAttributes & TEXTATTRIB_ColumnSplitWordsToFit) == 0 && uiNewlineIndex != uiLastSpaceIndex))
 					{
 						// Don't newline on ' ' characters
-						if(uiStrIndex != uiLastSpaceIndex)
+						if(uiStrIndex != iLastSpaceIndex)
 						{
 							bDoNewline = true;
 							break;
@@ -824,9 +824,9 @@ offsetCalculation:
 
 			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) != 0)
 				fNewLineOffset = fCurLineHeight;
-			else if(uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n') {
-				HyLogWarning("Text box is too small to fit a single character");
-			}
+			//else if(m_uiIndent == 0 && uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n') {
+			//	HyLogWarning("Text box is too small to fit a single character");
+			//}
 
 			// Reset the write position onto a newline
 			for(uint32 i = 0; i < uiNUM_LAYERS; ++i)
@@ -838,9 +838,9 @@ offsetCalculation:
 			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) == 0)
 			{
 				// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
-				if(bHandleNewlineCharacter == false && (uiNewlineIndex != uiLastSpaceIndex || uiLastSpaceIndex == 0))
+				if(bHandleNewlineCharacter == false && (uiNewlineIndex != iLastSpaceIndex || iLastSpaceIndex == 0))
 				{
-					uiStrIndex = uiLastSpaceIndex;
+					uiStrIndex = iLastSpaceIndex;
 					fCurLineWidth = fLastSpacePosX;
 				}
 				else // Handling '\n' or we're splitting mid-word, go back one character to place on newline
@@ -860,7 +860,7 @@ offsetCalculation:
 			fCurLineDecender = 0.0f;
 
 			// The next for-loop iteration will increment uiStrIndex to the character after the ' '. Assign uiNewlineIndex and uiLastSpaceIndex a '+1' to compensate
-			uiNewlineIndex = uiLastSpaceIndex = uiStrIndex + 1;
+			uiNewlineIndex = iLastSpaceIndex = uiStrIndex + 1;
 
 			bFirstCharacterOnNewLine = true;
 		}

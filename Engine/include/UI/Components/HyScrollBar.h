@@ -32,6 +32,7 @@ class HyScrollBar : public HyEntity2d
 		PageControl(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, HyEntity2d *pParent);
 
 		uint32 GetDiameter() const;
+		void SetDiameter(uint32 uiDiameter);
 
 		void SetMetrics(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, float fSliderPercent);
 		void SetSliderPos(HyOrientation eOrientation, float fAnimScrollPos, float fClientTotalSize, float fClientShownSize);
@@ -83,6 +84,7 @@ public:
 	void SetLineScrollAmt(float fLineScrollAmt);
 
 	void SetColor(HyColor color);
+	void SetDiameter(uint32 uiDiameter);
 	void SetMetrics(uint32 uiLength, uint32 uiClientTotalSize, uint32 uiClientShownSize);
 	bool IsValidMetrics() const;
 

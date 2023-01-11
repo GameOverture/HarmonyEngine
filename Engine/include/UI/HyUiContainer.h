@@ -98,6 +98,7 @@ public:
 
 	void EnableScrollBars(bool bUseVert, bool bUseHorz);
 	void SetScrollBarColor(HyColor color);
+	void SetScrollBarSize(uint32 uiDiameter);
 	void SetLineScrollAmt(float fLineScrollAmt);
 
 protected:
