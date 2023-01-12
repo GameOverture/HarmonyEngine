@@ -32,6 +32,10 @@ public:
 #ifdef HY_USE_SDL2
 	HyWindow *DoEvent(const SDL_Event &eventRef, HyInput &inputRef);
 #endif
+
+#ifdef HY_PLATFORM_BROWSER
+	static EM_BOOL OnHtmlFocus(int iEventType, const EmscriptenFocusEvent *pFocusEvent, void *pUserData);
+#endif
 };
 
 #endif /* HyWindowManager_h__ */

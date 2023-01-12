@@ -57,7 +57,7 @@ void HyAudioCore::InitDevice()
 #ifdef HY_PLATFORM_BROWSER
 	// Google has implemented a policy in their browsers that prevent automatic media output without first receiving some kind of user input
 	// Starting the device may fail if you try to start playback without first handling some kind of user input
-	if(m_InputRef.UserInputOccured() == false)
+	if(m_pEngine || m_InputRef.UserInputOccured() == false)
 		return;
 #endif
 
@@ -98,6 +98,35 @@ void HyAudioCore::InitDevice()
 	}
 	SDL_PauseAudioDevice(m_SdlDeviceId, 0); // Start playback
 #endif // HY_USE_SDL2_AUDIO
+}
+
+void HyAudioCore::StartDevice()
+{
+	if(m_pEngine == nullptr)
+		return;
+
+#ifdef HY_USE_SDL2_AUDIO
+	SDL_PauseAudioDevice(m_SdlDeviceId, 0);
+#else
+	ma_result eResult = ma_engine_start(m_pEngine);
+	if(eResult != MA_SUCCESS)
+		HyLogError("HyAudioCore::StartDevice failed: " << eResult);
+#endif
+}
+
+void HyAudioCore::StopDevice()
+{
+	if(m_pEngine == nullptr)
+		return;
+
+#ifdef HY_USE_SDL2_AUDIO
+	SDL_PauseAudioDevice(m_SdlDeviceId, 1);
+#else
+	ma_result eResult = ma_engine_stop(m_pEngine);
+	if(eResult != MA_SUCCESS)
+		HyLogError("HyAudioCore::StopDevice failed: " << eResult);
+#endif
+	
 }
 
 const char *HyAudioCore::GetAudioDriver()

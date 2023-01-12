@@ -87,6 +87,8 @@ public:
 	virtual ~HyAudioCore(void);
 
 	void InitDevice();
+	void StartDevice();
+	void StopDevice();
 
 	const char *GetAudioDriver();
 

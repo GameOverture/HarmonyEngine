@@ -15,14 +15,54 @@
 #include <stdio.h>
 
 #ifdef HY_PLATFORM_BROWSER
-	EM_BOOL EmscriptenResizeCallback(int eventType, const EmscriptenUiEvent *e, void *userData)
+	EM_BOOL OnHtmlResizeCallback(int iEventType, const EmscriptenUiEvent *e, void *pUserData)
 	{
 		glm::ivec2 vNewWindowSize(e->windowInnerWidth, e->windowInnerHeight);
 
-		HyLog("Em Resize Callback: " << vNewWindowSize.x << ", " << vNewWindowSize.y);
+		HyLog("HtmlResize Callback: " << vNewWindowSize.x << ", " << vNewWindowSize.y);
 		HyEngine::Window().SetWindowSize(vNewWindowSize);
 
-		return 0;
+		return EMSCRIPTEN_RESULT_SUCCESS;
+	}
+
+	EM_BOOL OnHtmlFocusCallback(int iEventType, const EmscriptenFocusEvent *pFocusEvent, void *pUserData)
+	{
+		HyEngine *pEngine = reinterpret_cast<HyEngine *>(pUserData);
+
+		switch(iEventType)
+		{
+		case EMSCRIPTEN_EVENT_BLUR:		// Dispatched after focus has shifted from this
+			HyLog("HtmlFocus Callback: Blur");
+			break;
+
+		case EMSCRIPTEN_EVENT_FOCUS:
+			HyLog("HtmlFocus Callback: Focus");
+			break;
+
+		case EMSCRIPTEN_EVENT_FOCUSOUT:
+			HyLog("HtmlFocus Callback: FocusOut");
+			pEngine->Audio().StopDevice();
+			break;
+
+		case EMSCRIPTEN_EVENT_FOCUSIN:	// Dispatched before focus is shifted to this
+			HyLog("HtmlFocus Callback: FocusIn");
+			pEngine->Audio().StartDevice();
+			break;
+
+		default:
+			break;
+		}
+
+		return EMSCRIPTEN_RESULT_SUCCESS;
+	}
+
+	EM_BOOL OnHtmlOrientationChangeCallback(int iEventType, const EmscriptenOrientationChangeEvent *pOrientationChangeEvent, void *pUserData)
+	{
+		HyEngine *pEngine = reinterpret_cast<HyEngine *>(pUserData);
+		HyLog("HtmlOrientationChange Callback: " >> pOrientationChangeEvent->orientationIndex);
+		pEngine->Window().ApiRefreshWindowSize();
+
+		return EMSCRIPTEN_RESULT_SUCCESS;
 	}
 #endif
 
@@ -50,7 +90,14 @@ HyEngine::HyEngine(const HarmonyInit &initStruct) :
 #endif
 
 #ifdef HY_PLATFORM_BROWSER
-	emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, EmscriptenResizeCallback);
+	emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, OnHtmlResizeCallback);
+	
+	emscripten_set_blur_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, OnHtmlFocusCallback);
+	emscripten_set_focus_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, OnHtmlFocusCallback);
+	emscripten_set_focusin_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, OnHtmlFocusCallback);
+	emscripten_set_focusout_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, OnHtmlFocusCallback);
+
+	emscripten_set_orientationchange_callback(this, EM_TRUE, OnHtmlOrientationChangeCallback);
 #endif
 
 	sm_pInstance = this;
@@ -142,6 +189,10 @@ bool HyEngine::Update()
 
 bool HyEngine::PollPlatformApi()
 {
+#ifdef HY_PLATFORM_BROWSER
+
+#endif
+
 #ifdef HY_USE_GLFW
 	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
 	{
@@ -149,8 +200,7 @@ bool HyEngine::PollPlatformApi()
 			return false;
 	}
 
-	// TODO: invoke OnWindowResized() and OnWindowMoved() where appropriate
-
+	// OnWindowResized() and OnWindowMoved() are invoked when appropriate
 	glfwPollEvents();
 #elif defined(HY_USE_SDL2)
 	SDL_Event sdlEvent;
