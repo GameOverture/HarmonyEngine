@@ -74,7 +74,7 @@ void HyButton::SetHideDownState(bool bIsHideDownState)
 
 bool HyButton::IsHideHoverState() const
 {
-	return (m_uiAttribs & BTNATTRIB_HideHoverState) != 0 && HyEngine::Input().IsUsingTouchScreen();
+	return (m_uiAttribs & BTNATTRIB_HideHoverState) != 0 || HyEngine::Input().IsUsingTouchScreen();
 }
 
 void HyButton::SetHideHoverState(bool bIsHideHoverState)

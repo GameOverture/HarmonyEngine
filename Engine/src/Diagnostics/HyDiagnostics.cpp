@@ -143,7 +143,7 @@ void HyDiagnostics::Show(uint32 uiDiagFlags)
 	else
 		m_pBox2dDraw->SetFlags(0);
 
-	if(uiDiagFlags & (HYDIAG_FRAMERATE | HYDIAG_GRAPH))
+	if(uiDiagFlags & (HYDIAG_FRAMERATE | HYDIAG_GRAPH | HYDIAG_INPUT))
 	{
 		HyAssert(m_pProfiler, "HyDiagnostics::Init was not invoked before HyDiagnostics::Show");
 

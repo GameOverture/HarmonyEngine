@@ -68,6 +68,7 @@ endif()
 set(HYENGINE_SOURCE_FILES
 	src/HyEngine.cpp
 	src/Afx/HyStdAfx.cpp
+	src/Afx/Platforms/HyPlatform_Browser.cpp
 	src/Assets/HyAssets.cpp
 	src/Assets/Files/HyFileAtlas.cpp
 	src/Assets/Files/HyFileAudio.cpp

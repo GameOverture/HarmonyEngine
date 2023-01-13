@@ -40,6 +40,8 @@ class HyInput
 	int32							m_iTextSelectLength;
 
 	bool							m_bTouchScreen;	// Whether the user has a touch screen instead of a mouse
+	bool							m_bTouchActive;
+	int32							m_iTouchId;
 
 	int32							m_JoystickList[HYNUM_JOYSTICK];
 	uint32							m_uiJoystickCount;
@@ -110,6 +112,11 @@ public:
 
 	void UsingTouchScreen(bool bEnable);
 	bool IsUsingTouchScreen() const;
+
+	void DoTouchStart(int32 iId, int32 iX, int32 iY);
+	void DoTouchMove(int32 iId, int32 iX, int32 iY);
+	void DoTouchEnd(int32 iId, int32 iX, int32 iY);
+	void DoTouchCancel(int32 iId);
 
 private:
 #ifdef HY_USE_GLFW

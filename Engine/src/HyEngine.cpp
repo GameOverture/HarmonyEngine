@@ -14,58 +14,6 @@
 
 #include <stdio.h>
 
-#ifdef HY_PLATFORM_BROWSER
-	EM_BOOL OnHtmlResizeCallback(int iEventType, const EmscriptenUiEvent *e, void *pUserData)
-	{
-		glm::ivec2 vNewWindowSize(e->windowInnerWidth, e->windowInnerHeight);
-
-		HyLog("HtmlResize Callback: " << vNewWindowSize.x << ", " << vNewWindowSize.y);
-		HyEngine::Window().SetWindowSize(vNewWindowSize);
-
-		return EMSCRIPTEN_RESULT_SUCCESS;
-	}
-
-	EM_BOOL OnHtmlFocusCallback(int iEventType, const EmscriptenFocusEvent *pFocusEvent, void *pUserData)
-	{
-		HyEngine *pEngine = reinterpret_cast<HyEngine *>(pUserData);
-
-		switch(iEventType)
-		{
-		case EMSCRIPTEN_EVENT_BLUR:		// Dispatched after focus has shifted from this
-			HyLog("HtmlFocus Callback: Blur");
-			break;
-
-		case EMSCRIPTEN_EVENT_FOCUS:
-			HyLog("HtmlFocus Callback: Focus");
-			break;
-
-		case EMSCRIPTEN_EVENT_FOCUSOUT:
-			HyLog("HtmlFocus Callback: FocusOut");
-			pEngine->Audio().StopDevice();
-			break;
-
-		case EMSCRIPTEN_EVENT_FOCUSIN:	// Dispatched before focus is shifted to this
-			HyLog("HtmlFocus Callback: FocusIn");
-			pEngine->Audio().StartDevice();
-			break;
-
-		default:
-			break;
-		}
-
-		return EMSCRIPTEN_RESULT_SUCCESS;
-	}
-
-	EM_BOOL OnHtmlOrientationChangeCallback(int iEventType, const EmscriptenOrientationChangeEvent *pOrientationChangeEvent, void *pUserData)
-	{
-		HyEngine *pEngine = reinterpret_cast<HyEngine *>(pUserData);
-		HyLog("HtmlOrientationChange Callback: " >> pOrientationChangeEvent->orientationIndex);
-		pEngine->Window().ApiRefreshWindowSize();
-
-		return EMSCRIPTEN_RESULT_SUCCESS;
-	}
-#endif
-
 HyEngine *HyEngine::sm_pInstance = nullptr;
 
 HyEngine::HyEngine(const HarmonyInit &initStruct) :
@@ -98,6 +46,11 @@ HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	emscripten_set_focusout_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, OnHtmlFocusCallback);
 
 	emscripten_set_orientationchange_callback(this, EM_TRUE, OnHtmlOrientationChangeCallback);
+
+	emscripten_set_touchstart_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, &m_Input, EM_TRUE, OnHtmlTouchCallback);
+	emscripten_set_touchend_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, &m_Input, EM_TRUE, OnHtmlTouchCallback);
+	emscripten_set_touchmove_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, &m_Input, EM_TRUE, OnHtmlTouchCallback);
+	emscripten_set_touchcancel_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, &m_Input, EM_TRUE, OnHtmlTouchCallback);
 #endif
 
 	sm_pInstance = this;

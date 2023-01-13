@@ -37,9 +37,12 @@
 	{
 		HyInput &inputRef = HyEngine::Input();
 
-		inputRef.m_pMouseWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
-		inputRef.m_ptMousePos.x = static_cast<float>(dX);
-		inputRef.m_ptMousePos.y = static_cast<float>(dY);
+		if(inputRef.m_bTouchActive == false)
+		{
+			inputRef.m_pMouseWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
+			inputRef.m_ptMousePos.x = static_cast<float>(dX);
+			inputRef.m_ptMousePos.y = static_cast<float>(dY);
+		}
 
 		//if(inputRef.m_bTouchScreenHack)
 		//	HyGlfw_MouseButtonCallback(pWindow, HYMOUSE_BtnLeft, GLFW_PRESS, 0);
@@ -116,6 +119,8 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	m_uiMouseBtnFlags_Buffered(0),
 	m_bTextInputActive(false),
 	m_bTouchScreen(false),
+	m_bTouchActive(false),
+	m_iTouchId(0),
 	m_uiJoystickCount(0)
 {
 	memset(m_JoystickList, 0, sizeof(int32) * HYNUM_JOYSTICK);
@@ -353,6 +358,49 @@ bool HyInput::IsUsingTouchScreen() const
 	return m_bTouchScreen;
 }
 
+void HyInput::DoTouchStart(int32 iId, int32 iX, int32 iY)
+{
+	m_bTouchScreen = true;
+	//if(/*m_bTouchScreen == false ||*/ m_bTouchActive)
+	//	return;
+
+	m_bTouchActive = true;
+	m_iTouchId = iId;
+	
+	m_ptMousePos.x = static_cast<float>(iX);
+	m_ptMousePos.y = static_cast<float>(iY);
+
+	m_uiMouseBtnFlags |= (1 << HYMOUSE_BtnLeft);
+	m_uiMouseBtnFlags_NewlyPressed |= (1 << HYMOUSE_BtnLeft);
+}
+
+void HyInput::DoTouchMove(int32 iId, int32 iX, int32 iY)
+{
+	if(m_iTouchId != iId)
+		return;
+
+	m_ptMousePos.x = static_cast<float>(iX);
+	m_ptMousePos.y = static_cast<float>(iY);
+}
+
+void HyInput::DoTouchEnd(int32 iId, int32 iX, int32 iY)
+{
+	if(m_iTouchId != iId)
+		return;
+
+	m_bTouchActive = false;
+	m_uiMouseBtnFlags &= ~(1 << HYMOUSE_BtnLeft);
+}
+
+void HyInput::DoTouchCancel(int32 iId)
+{
+	if(m_iTouchId != iId)
+		return;
+
+	m_bTouchActive = false;
+	m_uiMouseBtnFlags &= ~(1 << HYMOUSE_BtnLeft);
+}
+
 #ifdef HY_USE_GLFW
 	void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
 	{
@@ -400,8 +448,11 @@ bool HyInput::IsUsingTouchScreen() const
 
 	void HyInput::DoMouseMoveEvent(const SDL_Event &eventRef)
 	{
-		m_ptMousePos.x = static_cast<float>(eventRef.motion.x);
-		m_ptMousePos.y = static_cast<float>(eventRef.motion.y);
+		if(m_bTouchActive == false)
+		{
+			m_ptMousePos.x = static_cast<float>(eventRef.motion.x);
+			m_ptMousePos.y = static_cast<float>(eventRef.motion.y);
+		}
 	}
 
 	void HyInput::DoMouseDownEvent(const SDL_Event &eventRef)

@@ -47,5 +47,9 @@
 	#define HyError(message) do { } while (false)
 #endif
 
+EM_BOOL OnHtmlResizeCallback(int iEventType, const EmscriptenUiEvent *pUiEvent, void *pUserData);
+EM_BOOL OnHtmlFocusCallback(int iEventType, const EmscriptenFocusEvent *pFocusEvent, void *pUserData);
+EM_BOOL OnHtmlOrientationChangeCallback(int iEventType, const EmscriptenOrientationChangeEvent *pOrientationChangeEvent, void *pUserData);
+EM_BOOL OnHtmlTouchCallback(int iEventType, const EmscriptenTouchEvent *pTouchEvent, void *pUserData);
 
 #endif /* HyPlatform_Browser_h__ */
