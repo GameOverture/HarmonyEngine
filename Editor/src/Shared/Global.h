@@ -40,6 +40,8 @@ class Project;
 
 #define HYGUI_FILE_VERSION 11
 
+#define DISPLAYORDER_TransformCtrl 9999999
+
 //#define HYGUI_UseBinaryMetaFiles
 
 enum HyGuiItemType

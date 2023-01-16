@@ -12,12 +12,14 @@
 
 #include "IDraw.h"
 #include "EntityModel.h"
-#include "EntityItemDraw.h"
+#include "EntityDrawItem.h"
 
 class EntityDraw : public IDraw
 {
-	QList<EntityItemDraw *>					m_ItemList;
-	TransformCtrl							m_Transform;
+	QList<EntityDrawItem *>					m_ItemList;
+
+	QList<EntityDrawItem *>					m_SelectedItemList;
+	TransformCtrl							m_MultiTransform;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
@@ -30,7 +32,7 @@ public:
 	virtual void OnMouseWheelEvent(QWheelEvent *pEvent) override;
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent) override;
 
-	void RefreshSelectedItems();
+	void OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList);
 
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
@@ -40,12 +42,12 @@ protected:
 	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
 
 	void SetEverythingStale();
-	EntityItemDraw *FindStaleChild(HyGuiItemType eType, QUuid uuid);
+	EntityDrawItem *FindStaleChild(HyGuiItemType eType, QUuid uuid);
 	void DeleteStaleChildren();
 
 	void RefreshTransforms();
 
-	QList<EntityItemDraw *> GetSelectedItems() const;
+	//QList<EntityItemDraw *> GetSelectedItems() const;
 };
 
 #endif // ENTITYDRAW_H

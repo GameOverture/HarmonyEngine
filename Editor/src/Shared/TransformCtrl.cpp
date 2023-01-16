@@ -9,10 +9,11 @@
  *************************************************************************/
 #include "Global.h"
 #include "TransformCtrl.h"
-#include "EntityItemDraw.h"
+#include "EntityDrawItem.h"
 
 TransformCtrl::TransformCtrl() :
-	HyEntity2d(nullptr)
+	HyEntity2d(nullptr),
+	m_bUseExtrudeSegment(false)
 {
 	m_BoundingVolume.SetTint(HyColor::Blue.Lighten());
 	m_BoundingVolume.SetWireframe(true);
@@ -34,18 +35,15 @@ TransformCtrl::TransformCtrl() :
 	m_GrabFill[GRAB_Rotate].SetTint(HyColor::White);
 
 	UseWindowCoordinates(0);
+	SetDisplayOrder(DISPLAYORDER_TransformCtrl);
 }
 
 /*virtual*/ TransformCtrl::~TransformCtrl()
 {
 }
 
-void TransformCtrl::WrapTo(EntityItemDraw *pDrawItem, HyCamera2d *pCamera)
+void TransformCtrl::WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera)
 {
-	glm::mat4 transformMtx;
-	HyShape2d boundingShape;
-	ExtractTransform(pDrawItem, transformMtx, boundingShape);
-
 	if(boundingShape.IsValidShape() == false)
 		return;
 
@@ -72,7 +70,7 @@ void TransformCtrl::WrapTo(EntityItemDraw *pDrawItem, HyCamera2d *pCamera)
 		glm::vec2 vExtrudeDir = HyMath::PerpendicularCounterClockwise(vTopEdge);
 		vExtrudeDir = glm::normalize(vExtrudeDir);
 		vExtrudeDir *= 50.0f;  // 50px line segment length
-				vTopEdge *= 0.5f;
+		vTopEdge *= 0.5f;
 		glm::vec2 ptExtrudeStart = m_ptGrabPos[GRAB_TopLeft] + vTopEdge;
 		m_ptGrabPos[GRAB_Rotate] = ptExtrudeStart + vExtrudeDir;
 
@@ -80,7 +78,7 @@ void TransformCtrl::WrapTo(EntityItemDraw *pDrawItem, HyCamera2d *pCamera)
 		for(int i = 0; i < NUM_GRABPOINTS; ++i)
 		{
 			glm::vec4 ptTransformPos(m_ptGrabPos[i].x, m_ptGrabPos[i].y, 0.0f, 1.0f);
-			ptTransformPos = transformMtx * ptTransformPos;
+			ptTransformPos = mtxShapeTransform * ptTransformPos;
 
 			HySetVec(m_ptGrabPos[i], ptTransformPos.x, ptTransformPos.y);
 			pCamera->ProjectToCamera(m_ptGrabPos[i], m_ptGrabPos[i]);
@@ -91,62 +89,107 @@ void TransformCtrl::WrapTo(EntityItemDraw *pDrawItem, HyCamera2d *pCamera)
 
 		m_BoundingVolume.SetAsPolygon(m_ptGrabPos, 4);
 
+		glm::vec4 ptTransformPos(ptExtrudeStart.x, ptExtrudeStart.y, 0.0f, 1.0f);
+		ptTransformPos = mtxShapeTransform * ptTransformPos;
+		HySetVec(ptExtrudeStart, ptTransformPos.x, ptTransformPos.y);
+		pCamera->ProjectToCamera(ptExtrudeStart, ptExtrudeStart);
 		m_ExtrudeSegment.SetAsLineSegment(ptExtrudeStart, m_ptGrabPos[GRAB_Rotate]);
+		m_bUseExtrudeSegment = true;
 	}
 }
 
-void TransformCtrl::WrapTo(QList<EntityItemDraw *> itemDrawList, HyCamera2d *pCamera)
+void TransformCtrl::WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCamera)
 {
 	if(itemDrawList.size() == 1)
 	{
-		WrapTo(itemDrawList[0], pCamera);
+		HyShape2d boundingShape;
+		glm::mat4 mtxShapeTransform;
+		itemDrawList[0]->ExtractTransform(boundingShape, mtxShapeTransform);
+
+		WrapTo(boundingShape, mtxShapeTransform, pCamera);
 		return;
 	}
 
 	bool bCommonRotation = true;
-	float fRotation = 0.0f;
-	for(EntityItemDraw *pDrawItem : itemDrawList)
+	float fRotation = -1.0f; // Not yet set (valid values are 0.0-360.0)
+	QList<b2Shape *> transformedShapeList;
+	for(EntityDrawItem *pDrawItem : itemDrawList)
 	{
-		//if(pDrawItem->GetGuiType() != ITEM_Shape)
-			//pDrawItem
-
-		glm::mat4 transformMtx;
-		HyShape2d boundingShape;
-
-		ExtractTransform(pDrawItem, transformMtx, boundingShape);
-		
-		if(boundingShape.IsValidShape() == false)
+		HyShape2d *pLocalShape = new HyShape2d();
+		glm::mat4 mtxShapeTransform;
+		pDrawItem->ExtractTransform(*pLocalShape, mtxShapeTransform);
+		if(pLocalShape->IsValidShape() == false)
+		{
+			delete pLocalShape;
 			continue;
+		}
+		b2Shape *pSceneShape = pLocalShape->CloneTransform(mtxShapeTransform);
+		delete pLocalShape;
+		transformedShapeList.push_back(pSceneShape);
 
-		b2Shape *pB2Shape = boundingShape.CloneTransform(transformMtx);
+		if(bCommonRotation && pDrawItem->GetGuiType() != ITEM_Shape)
+		{
+			if(fRotation < 0.0f)
+				fRotation = pDrawItem->GetNodeChild()->rot.Get();
 
-		delete pB2Shape;
+			if(fRotation >= 0.0f && fRotation != pDrawItem->GetNodeChild()->rot.Get())
+				bCommonRotation = false;
+		}
 	}
+
+	if(bCommonRotation)
+		fRotation = glm::radians(-fRotation);
+	else
+		fRotation = 0.0f;
+
+	b2AABB combinedAabb;
+	HyMath::InvalidateAABB(combinedAabb);
+	for(b2Shape *pTransformedShape : transformedShapeList)
+	{
+		b2AABB shapeAabb;
+		pTransformedShape->ComputeAABB(&shapeAabb, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(fRotation)), 0);
+		
+		if(combinedAabb.IsValid() == false)
+			combinedAabb = shapeAabb;
+		else
+			combinedAabb.Combine(shapeAabb);
+
+		delete pTransformedShape;
+	}
+	transformedShapeList.clear();
+
+	HyShape2d combinedShape;
+	std::vector<glm::vec2> ptExtents;
+	ptExtents.push_back(glm::vec2(combinedAabb.lowerBound.x, combinedAabb.lowerBound.y));
+	ptExtents.push_back(glm::vec2(combinedAabb.upperBound.x, combinedAabb.lowerBound.y));
+	ptExtents.push_back(glm::vec2(combinedAabb.upperBound.x, combinedAabb.upperBound.y));
+	ptExtents.push_back(glm::vec2(combinedAabb.lowerBound.x, combinedAabb.upperBound.y));
+
+	combinedShape.SetAsPolygon(ptExtents);
+
+	WrapTo(combinedShape, glm::mat4(1.0f), pCamera);
 }
 
-void TransformCtrl::ExtractTransform(EntityItemDraw *pDrawItem, glm::mat4 &transformMtxOut, HyShape2d &boundingShapeOut)
+void TransformCtrl::Show(bool bShowGrabPoints)
 {
-	transformMtxOut = glm::identity<glm::mat4>();
-	switch(pDrawItem->GetGuiType())
+	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
 	{
-	case ITEM_Shape:
-		boundingShapeOut = *pDrawItem->GetShape();
-		break;
-
-	case ITEM_AtlasImage:
-	case ITEM_Primitive:
-	case ITEM_Text:
-	case ITEM_Spine:
-	case ITEM_Sprite: {
-		IHyDrawable2d *pDrawable = static_cast<IHyDrawable2d *>(pDrawItem->GetNodeChild());
-		pDrawable->CalcLocalBoundingShape(boundingShapeOut);
-		transformMtxOut = pDrawItem->GetNodeChild()->GetSceneTransform(0.0f);
-		break; }
-
-	case ITEM_Audio:
-	case ITEM_Entity:
-	default:
-		HyLogError("TransformCtrl::Resize - unhandled child node type");
-		break;
+		m_GrabOutline[i].SetVisible(bShowGrabPoints);
+		m_GrabFill[i].SetVisible(bShowGrabPoints);
 	}
+
+	m_BoundingVolume.SetVisible(true);
+	m_ExtrudeSegment.SetVisible(m_bUseExtrudeSegment);
+}
+
+void TransformCtrl::Hide()
+{
+	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
+	{
+		m_GrabOutline[i].SetVisible(false);
+		m_GrabFill[i].SetVisible(false);
+	}
+
+	m_BoundingVolume.SetVisible(false);
+	m_ExtrudeSegment.SetVisible(false);
 }

@@ -38,6 +38,9 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QTreeView" name="nodeTree">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
           <property name="rootIsDecorated">
            <bool>false</bool>
           </property>

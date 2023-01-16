@@ -117,8 +117,8 @@ if(Qt5_DIR)
 		src/Items/Text/SubWidgets/TextLayersWidget.h
 		src/Items/Entity/EntityDraw.cpp
 		src/Items/Entity/EntityDraw.h
-		src/Items/Entity/EntityItemDraw.cpp
-		src/Items/Entity/EntityItemDraw.h
+		src/Items/Entity/EntityDrawItem.cpp
+		src/Items/Entity/EntityDrawItem.h
 		src/Items/Entity/EntityModel.cpp
 		src/Items/Entity/EntityModel.h
 		src/Items/Entity/EntityTreeModel.cpp

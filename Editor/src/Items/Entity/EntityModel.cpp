@@ -12,6 +12,7 @@
 #include "Project.h"
 #include "ExplorerModel.h"
 #include "MainWindow.h"
+#include "EntityDraw.h"
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData)
@@ -91,7 +92,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemDat
 
 EntityTreeItemData *EntityModel::Cmd_AddNewChild(ProjectItemData *pProjItemData, QJsonObject initObj, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewChild(pProjItemData, initObj, iRow);
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewChild(initObj, iRow);
 	if(pProjItemData)
 		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItemData);
 
@@ -108,6 +109,13 @@ EntityTreeItemData *EntityModel::Cmd_AddShape(int iRow)
 	return nullptr;
 }
 
+void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList)
+{
+	EntityDraw *pDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pDraw)
+		pDraw->OnSelectionChange(selectedList, deselectedList);
+}
+
 int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 {
 	if(pItem == nullptr)
@@ -117,7 +125,7 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 	if(iRow < 0)
 		return iRow;
 
-	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pItem->GetUuid());
+	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pItem->GetItemUuid());
 	if(pProjItem)
 		m_ItemRef.GetProject().RelinquishItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItem);
 
@@ -129,7 +137,7 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 	if(m_TreeModel.Cmd_InsertChild(pNodeItem, iRow) == false)
 		return false;
 
-	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pNodeItem->GetUuid());
+	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pNodeItem->GetItemUuid());
 	if(pProjItem)
 		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItem);
 

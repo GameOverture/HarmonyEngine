@@ -16,49 +16,16 @@
 
 class EntityUndoCmd_AddChildren : public QUndoCommand
 {
-	ProjectItemData &			m_EntityItemRef;
-	QList<ProjectItemData *>	m_ChildrenList;
+	ProjectItemData &				m_EntityItemRef;
+	QList<ProjectItemData *>		m_ChildrenList;
 	QList<EntityTreeItemData *>		m_NodeList;
 
 public:
-	EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent = nullptr) :
-		QUndoCommand(pParent),
-		m_EntityItemRef(entityItemRef),
-		m_ChildrenList(projItemList)
-	{
-		if(m_EntityItemRef.GetType() != ITEM_Entity)
-			HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_EntityItemRef.GetType()), LOGTYPE_Error);
+	EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddChildren();
 
-		setText("Add New Child Node(s)");
-	}
-
-	virtual ~EntityUndoCmd_AddChildren()
-	{ }
-
-	virtual void redo() override
-	{
-		QList<ProjectItemData *> itemList;
-		for(auto *pProjItem : m_ChildrenList)
-		{
-			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pProjItem, true))
-				itemList.push_back(pProjItem);
-		}
-
-		m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewChildren(itemList, -1);
-		m_EntityItemRef.FocusWidgetState(0, -1);
-	}
-
-	virtual void undo() override
-	{
-		for(auto *pNodeItem : m_NodeList)
-		{
-			if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pNodeItem, true))
-				static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pNodeItem);
-		}
-		m_NodeList.clear();
-
-		m_EntityItemRef.FocusWidgetState(0, -1);
-	}
+	virtual void redo() override;
+	virtual void undo() override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,31 +37,29 @@ class EntityUndoCmd_PopChild : public QUndoCommand
 	uint32						m_uiIndex;
 
 public:
-	EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, EntityTreeItemData *pNodeItem, QUndoCommand *pParent = nullptr) :
-		m_EntityItemRef(entityItemRef),
-		m_pNode(pNodeItem),
-		m_uiIndex(0)
-	{
-		if(m_EntityItemRef.GetType() != ITEM_Entity)
-			HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_EntityItemRef.GetType()), LOGTYPE_Error);
+	EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, EntityTreeItemData *pNodeItem, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_PopChild();
 
-		setText("Remove Child Node");
-	}
-
-	virtual ~EntityUndoCmd_PopChild()
-	{ }
-
-	virtual void redo() override
-	{
-		m_uiIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pNode);
-		m_EntityItemRef.FocusWidgetState(0, -1);
-	}
-
-	virtual void undo() override
-	{
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pNode, m_uiIndex);
-		m_EntityItemRef.FocusWidgetState(0, -1);
-	}
+	virtual void redo() override;
+	virtual void undo() override;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_SelectionChanged : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	QList<EntityTreeItemData *>		m_SelectedItemDataList;
+	QList<EntityTreeItemData *>		m_DeselectedItemDataList;
+
+public:
+	EntityUndoCmd_SelectionChanged(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_SelectionChanged();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif // ENTITYUNDOCMDS_H

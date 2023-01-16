@@ -12,7 +12,7 @@
 
 #include "Global.h"
 
-class EntityItemDraw;
+class EntityDrawItem;
 
 class TransformCtrl : public HyEntity2d
 {
@@ -40,15 +40,17 @@ protected:
 	HyPrimitive2d				m_GrabOutline[NUM_GRABPOINTS];
 	HyPrimitive2d				m_GrabFill[NUM_GRABPOINTS];
 
+	bool						m_bUseExtrudeSegment;
+
 public:
 	TransformCtrl();
 	virtual ~TransformCtrl();
 
-	void WrapTo(EntityItemDraw *pDrawItem, HyCamera2d *pCamera);
-	void WrapTo(QList<EntityItemDraw *> itemDrawList, HyCamera2d *pCamera);
+	void WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera);
+	void WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCamera);
 
-protected:
-	void ExtractTransform(EntityItemDraw *pDrawItem, glm::mat4 &transformMtxOut, HyShape2d &boundingShapeOut);
+	void Show(bool bShowGrabPoints);
+	void Hide();
 };
 
 #endif // TRANSFORMCTRL_H

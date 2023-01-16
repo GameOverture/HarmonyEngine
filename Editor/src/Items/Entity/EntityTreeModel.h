@@ -24,7 +24,9 @@ class EntityTreeItemData : public TreeModelItemData
 	Q_OBJECT
 
 	QUuid												m_Uuid;
+	QUuid												m_ItemUuid;
 	PropertiesTreeModel									m_PropertiesTreeModel;
+	bool												m_bIsSelected;
 
 public:
 	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem);
@@ -32,8 +34,11 @@ public:
 	virtual ~EntityTreeItemData();
 
 	QString GetCodeName() const;
-	QUuid GetUuid() const;
+	QUuid GetThisUuid() const;
+	QUuid GetItemUuid() const;
 	PropertiesTreeModel &GetPropertiesModel();
+
+	void SetSelected(bool bIsSelected);
 
 	void InsertJsonInfo(QJsonObject &childObjRef);
 
@@ -65,7 +70,7 @@ public:
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QJsonObject initObj, int iRow = -1);
+	EntityTreeItemData *Cmd_InsertNewChild(QJsonObject initObj, int iRow = -1);
 	bool Cmd_InsertChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);
 

@@ -52,7 +52,7 @@ protected:
 	virtual void resizeEvent(QResizeEvent *pEvent) override;
 
 private Q_SLOTS:
-	void on_nodeTree_clicked(QModelIndex index);
+	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void on_actionAppendChildren_triggered();
 	void on_actionAddPrimitive_triggered();
 	void on_actionInsertBoundingVolume_triggered();

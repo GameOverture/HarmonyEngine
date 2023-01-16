@@ -20,12 +20,23 @@ HyShape2d::HyShape2d(HyEntity2d *pParent /*= nullptr*/) :
 	m_eType(HYSHAPE_Nothing),
 	m_pParent(nullptr),
 	m_pShape(nullptr),
-	m_bFixtureDirty(false),
 	m_pInit(nullptr),
-	m_pFixture(nullptr)
+	m_pFixture(nullptr),
+	m_bFixtureDirty(false)
 {
 	if(pParent)
 		pParent->ShapeAppend(*this);
+}
+
+HyShape2d::HyShape2d(const HyShape2d &copyRef) : 
+	m_eType(HYSHAPE_Nothing),
+	m_pParent(nullptr),
+	m_pShape(nullptr),
+	m_pInit(nullptr),
+	m_pFixture(nullptr),
+	m_bFixtureDirty(false)
+{
+	*this = copyRef;
 }
 
 /*virtual*/ HyShape2d::~HyShape2d()
@@ -36,6 +47,9 @@ HyShape2d::HyShape2d(HyEntity2d *pParent /*= nullptr*/) :
 
 const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 {
+	if(this == &rhs)
+		return *this;
+
 	delete m_pShape;
 	m_pShape = nullptr;
 
@@ -367,6 +381,11 @@ void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
 	static_cast<b2PolygonShape *>(m_pShape)->Set(pPointArray, uiCount);
 
 	ShapeChanged();
+}
+
+void HyShape2d::SetAsPolygon(const std::vector<glm::vec2> &verticesList)
+{
+	SetAsPolygon(verticesList.data(), static_cast<uint32>(verticesList.size()));
 }
 
 bool HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)

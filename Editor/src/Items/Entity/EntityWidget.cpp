@@ -41,6 +41,8 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
 	ui->nodeTree->setModel(&pEntityModel->GetTreeModel());
 	pEntityModel->RegisterWidgets(*ui->cmbEntityType);
+
+	connect(ui->nodeTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection &)), this, SLOT(OnTreeSelectionChanged(const QItemSelection &, const QItemSelection &)));
 }
 
 EntityWidget::~EntityWidget()
@@ -116,8 +118,8 @@ EntityWidget::~EntityWidget()
 		ui->propertyTree->resizeColumnToContents(0);
 	}
 
-	if(m_ItemRef.GetDraw())
-		static_cast<EntityDraw *>(m_ItemRef.GetDraw())->RefreshSelectedItems();
+	//if(m_ItemRef.GetDraw())
+	//	static_cast<EntityDraw *>(m_ItemRef.GetDraw())->On RefreshSelectedItems();
 }
 
 /*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
@@ -139,6 +141,9 @@ QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEnti
 	QList<EntityTreeItemData *> selectedItemList;
 	for(QModelIndex index : selectedIndices)
 	{
+		if(index.column() != 0)
+			continue;
+
 		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
 
 		if(pCurItemData == pEntityTreeItemData)
@@ -180,6 +185,37 @@ QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEnti
 	ui->nodeTree->setColumnWidth(0, iTotalWidth - iInfoColumnWidth);
 }
 
+void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+	UpdateActions();
+
+	QList<EntityTreeItemData *> selectedItemDataList;
+	QModelIndexList selectedIndices = selected.indexes();
+	for(QModelIndex index : selectedIndices)
+	{
+		if(index.column() != 0)
+			continue;
+
+		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pCurItemData)
+			selectedItemDataList.push_back(pCurItemData);
+	}
+
+	QList<EntityTreeItemData *> deselectedItemDataList;
+	QModelIndexList deselectedIndices = deselected.indexes();
+	for(QModelIndex index : deselectedIndices)
+	{
+		if(index.column() != 0)
+			continue;
+
+		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pCurItemData)
+			deselectedItemDataList.push_back(pCurItemData);
+	}
+
+	m_ItemRef.GetUndoStack()->push(new EntityUndoCmd_SelectionChanged(m_ItemRef, selectedItemDataList, deselectedItemDataList));
+}
+
 void EntityWidget::on_actionAppendChildren_triggered()
 {
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
@@ -217,9 +253,4 @@ void EntityWidget::on_actionInsertBoundingVolume_triggered()
 void EntityWidget::on_actionInsertPhysicsBody_triggered()
 {
 
-}
-
-void EntityWidget::on_nodeTree_clicked(QModelIndex index)
-{
-	UpdateActions();
 }

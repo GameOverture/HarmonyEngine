@@ -18,16 +18,20 @@
 
 EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem) :
 	TreeModelItemData(eItemType, sCodeName),
-	m_Uuid(uuidOfItem),
-	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this)))
+	m_Uuid(QUuid::createUuid()),
+	m_ItemUuid(uuidOfItem),
+	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this))),
+	m_bIsSelected(false)
 {
 	InitalizePropertiesTree();
 }
 
 EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj) :
 	TreeModelItemData(HyGlobal::GetTypeFromString(initObj["itemType"].toString()), initObj["codeName"].toString()),
-	m_Uuid(initObj["itemUUID"].toString()),
-	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this)))
+	m_Uuid(initObj["UUID"].toString()),
+	m_ItemUuid(initObj["itemUUID"].toString()),
+	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this))),
+	m_bIsSelected(initObj["isSelected"].toBool())
 {
 	InitalizePropertiesTree();
 	m_PropertiesTreeModel.DeserializeJson(initObj);
@@ -42,14 +46,24 @@ QString EntityTreeItemData::GetCodeName() const
 	return m_sName;
 }
 
-QUuid EntityTreeItemData::GetUuid() const
+QUuid EntityTreeItemData::GetThisUuid() const
 {
 	return m_Uuid;
+}
+
+QUuid EntityTreeItemData::GetItemUuid() const
+{
+	return m_ItemUuid;
 }
 
 PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
 {
 	return m_PropertiesTreeModel;
+}
+
+void EntityTreeItemData::SetSelected(bool bIsSelected)
+{
+	m_bIsSelected = bIsSelected;
 }
 
 void EntityTreeItemData::InsertJsonInfo(QJsonObject &childObjRef)
@@ -59,7 +73,9 @@ void EntityTreeItemData::InsertJsonInfo(QJsonObject &childObjRef)
 	// Common stuff
 	childObjRef.insert("codeName", GetCodeName());
 	childObjRef.insert("itemType", HyGlobal::ItemName(m_eTYPE, false));
-	childObjRef.insert("itemUUID", m_Uuid.toString(QUuid::WithoutBraces));
+	childObjRef.insert("UUID", m_Uuid.toString(QUuid::WithoutBraces));
+	childObjRef.insert("itemUUID", m_ItemUuid.toString(QUuid::WithoutBraces));
+	childObjRef.insert("isSelected", m_bIsSelected);
 }
 
 void EntityTreeItemData::InitalizePropertiesTree()
@@ -132,13 +148,13 @@ void EntityTreeItemData::InitalizePropertiesTree()
 		break;
 
 	case ITEM_Text:
-		m_PropertiesTreeModel.AppendCategory("Text", m_Uuid.toString(QUuid::WithoutBraces));
+		m_PropertiesTreeModel.AppendCategory("Text", m_ItemUuid.toString(QUuid::WithoutBraces));
 		m_PropertiesTreeModel.AppendProperty("Text", "State", PROPERTIESTYPE_StatesComboBox, 0, "The text state to be displayed");
 		m_PropertiesTreeModel.AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", false);
 		break;
 
 	case ITEM_Sprite:
-		m_PropertiesTreeModel.AppendCategory("Sprite", m_Uuid.toString(QUuid::WithoutBraces));
+		m_PropertiesTreeModel.AppendCategory("Sprite", m_ItemUuid.toString(QUuid::WithoutBraces));
 		m_PropertiesTreeModel.AppendProperty("Sprite", "State", PROPERTIESTYPE_StatesComboBox, 0, "The sprite state to be displayed");
 		m_PropertiesTreeModel.AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on");
 		break;
@@ -266,7 +282,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjIt
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjItem, QJsonObject initObj, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(QJsonObject initObj, int iRow /*= -1*/)
 {
 	HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(initObj["itemType"].toString());
 	QString sCodeName = initObj["codeName"].toString();
@@ -343,7 +359,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		return ITreeModel::data(indexRef, iRole);
 
 	EntityTreeItemData *pItem = pTreeItem->data(0).value<EntityTreeItemData *>();
-	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pItem->GetUuid());
+	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pItem->GetItemUuid());
 
 	switch(iRole)
 	{
@@ -375,7 +391,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 
 
 	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
-		return QVariant(pItem->GetUuid().toString());
+		return QVariant(pItem->GetThisUuid().toString());
 
 	default:
 		return QVariant();

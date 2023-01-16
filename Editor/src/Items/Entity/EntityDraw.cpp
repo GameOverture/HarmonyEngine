@@ -18,8 +18,7 @@
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef)
 {
-	m_Transform.SetDisplayOrder(9999999);
-	m_Transform.SetVisible(false);
+	m_MultiTransform.Hide();
 }
 
 /*virtual*/ EntityDraw::~EntityDraw()
@@ -88,12 +87,49 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	}
 }
 
-void EntityDraw::RefreshSelectedItems()
+void EntityDraw::OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList)
 {
-	QList<EntityItemDraw *> selectedDrawList = GetSelectedItems();
+	for(EntityTreeItemData *pDeselectItem : deselectedItemDataList)
+	{
+		bool bFound = false;
+		for(EntityDrawItem *pDrawItem : m_ItemList)
+		{
+			if(pDrawItem->GetThisUuid() == pDeselectItem->GetThisUuid())
+			{
+				m_SelectedItemList.removeOne(pDrawItem);
 
-	//selectedDrawList
+				pDrawItem->HideTransformCtrl();
+				bFound = true;
+				break;
+			}
+		}
+
+		if(bFound == false)
+			HyGuiLog("EntityDraw::OnSelectionChange() could not find matching EntityItemDraw to deselect item: " % pDeselectItem->GetCodeName(), LOGTYPE_Error);
+	}
+
+	for(EntityTreeItemData *pTreeItemData : selectedItemDataList)
+	{
+		// Search for the corresponding EntityItemDraw to the current 'pTreeItemData'
+		bool bFound = false;
+		for(EntityDrawItem *pDrawItem : m_ItemList)
+		{
+			if(pDrawItem->GetThisUuid() == pTreeItemData->GetThisUuid())
+			{
+				m_SelectedItemList.push_back(pDrawItem);
+				bFound = true;
+				break;
+			}
+		}
+
+		if(bFound == false)
+			HyGuiLog("EntityDraw::GetSelectedItems() could not find matching EntityItemDraw for a selected item: " % pTreeItemData->GetCodeName(), LOGTYPE_Error);
+	}
 	
+	for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
+		pSelectedItemDraw->ShowTransformCtrl(m_SelectedItemList.size() == 1);
+
+	RefreshTransforms();
 }
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/
@@ -106,11 +142,13 @@ void EntityDraw::RefreshSelectedItems()
 		QJsonObject childObj = childArray[i].toObject();
 
 		HyGuiItemType eType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
-		QUuid uuid(childObj["itemUUID"].toString());
-		EntityItemDraw *pItemWidget = FindStaleChild(eType, uuid);
+		QUuid uuid(childObj["UUID"].toString());
+		EntityDrawItem *pItemWidget = FindStaleChild(eType, uuid);
 		if(pItemWidget == nullptr)
 		{
-			pItemWidget = new EntityItemDraw(eType, uuid, this);
+			QUuid itemUuid(childObj["itemUUID"].toString());
+
+			pItemWidget = new EntityDrawItem(eType, uuid, itemUuid, this);
 			m_ItemList.push_back(pItemWidget);
 		}
 
@@ -147,15 +185,15 @@ void EntityDraw::RefreshSelectedItems()
 
 void EntityDraw::SetEverythingStale()
 {
-	for(EntityItemDraw *pItem : m_ItemList)
+	for(EntityDrawItem *pItem : m_ItemList)
 		pItem->SetStale();
 }
 
-EntityItemDraw *EntityDraw::FindStaleChild(HyGuiItemType eType, QUuid uuid)
+EntityDrawItem *EntityDraw::FindStaleChild(HyGuiItemType eType, QUuid uuid)
 {
-	for(EntityItemDraw *pItem : m_ItemList)
+	for(EntityDrawItem *pItem : m_ItemList)
 	{
-		if(pItem->GetGuiType() == eType && pItem->GetUuid() == uuid && pItem->IsStale())
+		if(pItem->GetGuiType() == eType && pItem->GetThisUuid() == uuid && pItem->IsStale())
 			return pItem;
 	}
 
@@ -178,39 +216,24 @@ void EntityDraw::DeleteStaleChildren()
 
 void EntityDraw::RefreshTransforms()
 {
-	QList<EntityItemDraw *> selectedItemDrawList = GetSelectedItems();
-	if(selectedItemDrawList.empty())
-		return;
-
-	if(selectedItemDrawList.size() == 1)
-		m_Transform.WrapTo(selectedItemDrawList[0], m_pCamera);
-
-	m_Transform.WrapTo(selectedItemDrawList, m_pCamera);
-}
-
-QList<EntityItemDraw *> EntityDraw::GetSelectedItems() const
-{
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
-	QList<EntityTreeItemData *> selectedItemDataList = pWidget->GetSelectedItems(false, true);
-
-	QList<EntityItemDraw *> matchedItemList;
-	for(EntityTreeItemData *pTreeItemData : selectedItemDataList)
+	if(m_SelectedItemList.size() > 1)
 	{
-		// Search for the corresponding EntityItemDraw to the current 'pTreeItemData'
-		bool bFound = false;
-		for(EntityItemDraw *pItemDraw : m_ItemList)
-		{
-			if(pItemDraw->GetUuid() == pTreeItemData->GetUuid())
-			{
-				matchedItemList.push_back(pItemDraw);
-				bFound = true;
-				break;
-			}
-		}
-
-		if(bFound == false)
-			HyGuiLog("EntityDraw::GetSelectedItems() could not find matching EntityItemDraw for a selected item", LOGTYPE_Error);
+		m_MultiTransform.Show(true);
+		m_MultiTransform.WrapTo(m_SelectedItemList, m_pCamera);
 	}
+	else
+		m_MultiTransform.Hide();
 
-	return matchedItemList;
+	for(EntityDrawItem *pItemDraw : m_SelectedItemList)
+		pItemDraw->RefreshTransform(m_pCamera);
 }
+
+//QList<EntityItemDraw *> EntityDraw::GetSelectedItems() const
+//{
+//	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
+//	QList<EntityTreeItemData *> selectedItemDataList = pWidget->GetSelectedItems(false, true);
+//
+//	
+//
+//	return matchedItemList;
+//}

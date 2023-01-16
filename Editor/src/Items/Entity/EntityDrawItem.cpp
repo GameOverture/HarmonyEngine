@@ -1,5 +1,5 @@
 /**************************************************************************
-*	EntityItemDraw.cpp
+*	EntityDrawItem.cpp
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2023 Jason Knobler
@@ -8,12 +8,13 @@
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Global.h"
-#include "EntityItemDraw.h"
+#include "EntityDrawItem.h"
 #include "MainWindow.h"
 
-EntityItemDraw::EntityItemDraw(HyGuiItemType eGuiType, QUuid uuid, HyEntity2d *pParent) :
+EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent) :
 	m_eGuiType(eGuiType),
-	m_ItemUuid(uuid),
+	m_Uuid(uuid),
+	m_ItemUuid(itemUuid),
 	m_pChild(nullptr),
 	m_pShape(nullptr),
 	m_bStale(false)
@@ -40,15 +41,52 @@ EntityItemDraw::EntityItemDraw(HyGuiItemType eGuiType, QUuid uuid, HyEntity2d *p
 		RefreshOverrideData();
 		m_pChild->Load();
 	}
+
+	HideTransformCtrl();
 }
 
-/*virtual*/ EntityItemDraw::~EntityItemDraw()
+/*virtual*/ EntityDrawItem::~EntityDrawItem()
 {
 	delete m_pChild;
 	delete m_pShape;
 }
 
-void EntityItemDraw::RefreshJson(HyCamera2d *pCamera, QJsonObject childObj)
+HyGuiItemType EntityDrawItem::GetGuiType() const
+{
+	return m_eGuiType;
+}
+
+IHyLoadable2d *EntityDrawItem::GetNodeChild() const
+{
+	return m_pChild;
+}
+
+HyShape2d *EntityDrawItem::GetShape() const
+{
+	return m_pShape;
+}
+
+const QUuid &EntityDrawItem::GetThisUuid() const
+{
+	return m_Uuid;
+}
+
+const QUuid &EntityDrawItem::GetItemUuid() const
+{
+	return m_ItemUuid;
+}
+
+bool EntityDrawItem::IsStale() const
+{
+	return m_bStale;
+}
+
+void EntityDrawItem::SetStale()
+{
+	m_bStale = true;
+}
+
+void EntityDrawItem::RefreshJson(HyCamera2d *pCamera, QJsonObject childObj)
 {
 	QJsonObject commonObj = childObj["Common"].toObject();
 	if(commonObj.contains("Display Order"))
@@ -68,12 +106,21 @@ void EntityItemDraw::RefreshJson(HyCamera2d *pCamera, QJsonObject childObj)
 	QJsonArray scaleArray = transformObj["Scale"].toArray();
 	m_pChild->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
 
-	//RefreshTransformCtrl(pCamera);
+	RefreshTransform(pCamera);
 
 	m_bStale = false;
 }
 
-void EntityItemDraw::RefreshOverrideData()
+void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
+{
+	HyShape2d boundingShape;
+	glm::mat4 mtxShapeTransform;
+	ExtractTransform(boundingShape, mtxShapeTransform);
+
+	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
+}
+
+void EntityDrawItem::RefreshOverrideData()
 {
 	ProjectItemData *pItemData = MainWindow::GetExplorerModel().FindByUuid(m_ItemUuid);
 	FileDataPair fileDataPair;
@@ -114,4 +161,41 @@ void EntityItemDraw::RefreshOverrideData()
 			break;
 		}
 	}
+}
+
+void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
+{
+	transformMtxOut = glm::identity<glm::mat4>();
+	switch(GetGuiType())
+	{
+	case ITEM_Shape:
+		boundingShapeOut = *GetShape();
+		break;
+
+	case ITEM_AtlasImage:
+	case ITEM_Primitive:
+	case ITEM_Text:
+	case ITEM_Spine:
+	case ITEM_Sprite: {
+		IHyDrawable2d *pDrawable = static_cast<IHyDrawable2d *>(GetNodeChild());
+		pDrawable->CalcLocalBoundingShape(boundingShapeOut);
+		transformMtxOut = GetNodeChild()->GetSceneTransform(0.0f);
+		break; }
+
+	case ITEM_Audio:
+	case ITEM_Entity:
+	default:
+		HyLogError("EntityItemDraw::ExtractTransform - unhandled child node type");
+		break;
+	}
+}
+
+void EntityDrawItem::ShowTransformCtrl(bool bShowGrabPoints)
+{
+	m_Transform.Show(bShowGrabPoints);
+}
+
+void EntityDrawItem::HideTransformCtrl()
+{
+	m_Transform.Hide();
 }

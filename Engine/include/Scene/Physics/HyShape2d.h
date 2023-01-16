@@ -46,6 +46,7 @@ public:
 	static const float							FloatSlop;
 
 	HyShape2d(HyEntity2d *pParent = nullptr);
+	HyShape2d(const HyShape2d &copyRef);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
@@ -90,6 +91,7 @@ public:
 	// may lead to poor stacking behavior in physics simulation.
 	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
 	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
+	void SetAsPolygon(const std::vector<glm::vec2> &verticesList);
 
 	// Build vertices to represent an axis-aligned box
 	bool SetAsBox(int32 iWidth, int32 iHeight);
