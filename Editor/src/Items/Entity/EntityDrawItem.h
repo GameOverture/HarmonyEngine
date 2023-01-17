@@ -38,11 +38,13 @@ public:
 	bool IsStale() const;
 	void SetStale();
 
+	bool IsMouseInBounds() const;
+
 	void RefreshJson(HyCamera2d *pCamera, QJsonObject childObj); // Clears stale flag
 	void RefreshTransform(HyCamera2d *pCamera);
 	void RefreshOverrideData();
 
-	void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut);
+	void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut) const;
 
 	void ShowTransformCtrl(bool bShowGrabPoints);
 	void HideTransformCtrl();

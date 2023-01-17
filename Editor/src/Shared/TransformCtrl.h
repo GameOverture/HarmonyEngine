@@ -14,24 +14,26 @@
 
 class EntityDrawItem;
 
+enum GrabPoint
+{
+	GRAB_None = -1,
+
+	GRAB_BotLeft = 0,
+	GRAB_BotRight,
+	GRAB_TopRight,
+	GRAB_TopLeft,
+	GRAB_BotMid,
+	GRAB_MidRight,
+	GRAB_TopMid,
+	GRAB_MidLeft,
+
+	GRAB_Rotate,
+
+	NUM_GRABPOINTS
+};
+
 class TransformCtrl : public HyEntity2d
 {
-	enum GrabPoints
-	{
-		GRAB_BotLeft = 0,
-		GRAB_BotRight,
-		GRAB_TopRight,
-		GRAB_TopLeft,
-		GRAB_BotMid,
-		GRAB_MidRight,
-		GRAB_TopMid,
-		GRAB_MidLeft,
-
-		GRAB_Rotate,
-
-		NUM_GRABPOINTS
-	};
-
 protected:
 	glm::vec2					m_ptGrabPos[NUM_GRABPOINTS];
 
@@ -51,6 +53,8 @@ public:
 
 	void Show(bool bShowGrabPoints);
 	void Hide();
+
+	GrabPoint IsMouseOverGrabPoint();
 };
 
 #endif // TRANSFORMCTRL_H

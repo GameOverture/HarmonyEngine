@@ -86,6 +86,16 @@ void EntityDrawItem::SetStale()
 	m_bStale = true;
 }
 
+bool EntityDrawItem::IsMouseInBounds() const
+{
+	HyShape2d boundingShape;
+	glm::mat4 transformMtx;
+	ExtractTransform(boundingShape, transformMtx);
+	
+	glm::vec2 ptWorldMousePos;
+	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(transformMtx, ptWorldMousePos);
+}
+
 void EntityDrawItem::RefreshJson(HyCamera2d *pCamera, QJsonObject childObj)
 {
 	QJsonObject commonObj = childObj["Common"].toObject();
@@ -163,7 +173,7 @@ void EntityDrawItem::RefreshOverrideData()
 	}
 }
 
-void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
+void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut) const
 {
 	transformMtxOut = glm::identity<glm::mat4>();
 	switch(GetGuiType())

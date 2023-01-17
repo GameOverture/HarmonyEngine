@@ -21,6 +21,8 @@ class EntityDraw : public IDraw
 	QList<EntityDrawItem *>					m_SelectedItemList;
 	TransformCtrl							m_MultiTransform;
 
+	EntityDrawItem *						m_pCurHoverItem;
+
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~EntityDraw();

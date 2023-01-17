@@ -16,7 +16,8 @@
 #include <QKeyEvent>
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
-	IDraw(pProjItem, initFileDataRef)
+	IDraw(pProjItem, initFileDataRef),
+	m_pCurHoverItem(false)
 {
 	m_MultiTransform.Hide();
 }
@@ -70,7 +71,30 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		RefreshTransforms();
 	else
 	{
-		QPointF ptCurMousePos = pEvent->localPos();
+		Qt::CursorShape eCursorShape = Qt::CrossCursor;
+		m_pCurHoverItem = nullptr;
+		for(int32 i = 0; i < m_ItemList.size(); ++i)
+		{
+			if(m_ItemList[i]->IsMouseInBounds())
+			{
+				m_pCurHoverItem = m_ItemList[i];
+
+				for(int32 j = 0; j < m_SelectedItemList.size(); ++j)
+				{
+					if(m_ItemList[i] != m_SelectedItemList[j])
+						continue;
+
+					eCursorShape = Qt::SizeAllCursor;
+					break;
+				}
+				if(eCursorShape != Qt::SizeAllCursor)
+					eCursorShape = Qt::PointingHandCursor;
+
+				break;
+			}
+		}
+
+		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(eCursorShape);
 		
 		// Iterate backwards since those generally have higher display ordering
 		//for(int32 i = m_ItemList.size() - 1; i >= 0; --i)

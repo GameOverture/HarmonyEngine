@@ -193,3 +193,13 @@ void TransformCtrl::Hide()
 	m_BoundingVolume.SetVisible(false);
 	m_ExtrudeSegment.SetVisible(false);
 }
+
+GrabPoint TransformCtrl::IsMouseOverGrabPoint()
+{
+	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
+	{
+		//m_GrabOutline[i]
+	}
+
+	return GRAB_None;
+}
