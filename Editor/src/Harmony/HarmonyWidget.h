@@ -58,8 +58,9 @@ public:
 	bool IsProject(Project *pProjectToTest);
 	void CloseProject();
 
-	void SetCursor(Qt::CursorShape eShape);
-	void RestoreCursor();
+	Qt::CursorShape GetCursorShape() const;
+	void SetCursorShape(Qt::CursorShape eShape);
+	void RestoreCursorShape();
 
 	HyRendererInterop *GetHarmonyRenderer();
 

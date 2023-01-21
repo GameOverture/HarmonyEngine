@@ -30,10 +30,12 @@ public:
 	virtual ~EntityDrawItem();
 
 	HyGuiItemType GetGuiType() const;
-	IHyLoadable2d *GetNodeChild() const;
-	HyShape2d *GetShape() const;
 	const QUuid &GetThisUuid() const;
 	const QUuid &GetItemUuid() const;
+
+	IHyLoadable2d *GetNodeChild() const;
+	HyShape2d *GetShape() const;
+	TransformCtrl &GetTransformCtrl();
 
 	bool IsStale() const;
 	void SetStale();

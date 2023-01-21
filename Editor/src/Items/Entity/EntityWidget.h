@@ -46,6 +46,7 @@ public:
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
 	QList<EntityTreeItemData *> GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes);
+	void SetSelectedItems(QList<QUuid> uuidList);
 
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;

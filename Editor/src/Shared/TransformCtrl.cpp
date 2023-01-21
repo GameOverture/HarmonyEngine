@@ -13,7 +13,9 @@
 
 TransformCtrl::TransformCtrl() :
 	HyEntity2d(nullptr),
-	m_bUseExtrudeSegment(false)
+	m_bIsShown(false),
+	m_bShowGrabPoints(false),
+	m_fCachedRotation(0.0f)
 {
 	m_BoundingVolume.SetTint(HyColor::Blue.Lighten());
 	m_BoundingVolume.SetWireframe(true);
@@ -36,6 +38,8 @@ TransformCtrl::TransformCtrl() :
 
 	UseWindowCoordinates(0);
 	SetDisplayOrder(DISPLAYORDER_TransformCtrl);
+
+	Hide();
 }
 
 /*virtual*/ TransformCtrl::~TransformCtrl()
@@ -94,7 +98,8 @@ void TransformCtrl::WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform,
 		HySetVec(ptExtrudeStart, ptTransformPos.x, ptTransformPos.y);
 		pCamera->ProjectToCamera(ptExtrudeStart, ptExtrudeStart);
 		m_ExtrudeSegment.SetAsLineSegment(ptExtrudeStart, m_ptGrabPos[GRAB_Rotate]);
-		m_bUseExtrudeSegment = true;
+
+		m_fCachedRotation = HyMath::AngleFromVector(m_ptGrabPos[GRAB_Rotate] - ptExtrudeStart) - 90.0f;
 	}
 }
 
@@ -111,7 +116,7 @@ void TransformCtrl::WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCa
 	}
 
 	bool bCommonRotation = true;
-	float fRotation = -1.0f; // Not yet set (valid values are 0.0-360.0)
+	m_fCachedRotation = -1.0f; // Not yet set (valid values are 0.0-360.0)
 	QList<b2Shape *> transformedShapeList;
 	for(EntityDrawItem *pDrawItem : itemDrawList)
 	{
@@ -129,25 +134,25 @@ void TransformCtrl::WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCa
 
 		if(bCommonRotation && pDrawItem->GetGuiType() != ITEM_Shape)
 		{
-			if(fRotation < 0.0f)
-				fRotation = pDrawItem->GetNodeChild()->rot.Get();
+			if(m_fCachedRotation < 0.0f)
+				m_fCachedRotation = pDrawItem->GetNodeChild()->rot.Get();
 
-			if(fRotation >= 0.0f && fRotation != pDrawItem->GetNodeChild()->rot.Get())
+			if(m_fCachedRotation >= 0.0f && m_fCachedRotation != pDrawItem->GetNodeChild()->rot.Get())
 				bCommonRotation = false;
 		}
 	}
 
 	if(bCommonRotation)
-		fRotation = glm::radians(-fRotation);
+		m_fCachedRotation = glm::radians(-m_fCachedRotation);
 	else
-		fRotation = 0.0f;
+		m_fCachedRotation = 0.0f;
 
 	b2AABB combinedAabb;
 	HyMath::InvalidateAABB(combinedAabb);
 	for(b2Shape *pTransformedShape : transformedShapeList)
 	{
 		b2AABB shapeAabb;
-		pTransformedShape->ComputeAABB(&shapeAabb, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(fRotation)), 0);
+		pTransformedShape->ComputeAABB(&shapeAabb, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(m_fCachedRotation)), 0);
 		
 		if(combinedAabb.IsValid() == false)
 			combinedAabb = shapeAabb;
@@ -170,20 +175,30 @@ void TransformCtrl::WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCa
 	WrapTo(combinedShape, glm::mat4(1.0f), pCamera);
 }
 
+bool TransformCtrl::IsShown() const
+{
+	return m_bIsShown;
+}
+
 void TransformCtrl::Show(bool bShowGrabPoints)
 {
+	m_bIsShown = true;
+	m_bShowGrabPoints = bShowGrabPoints;
+
 	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
 	{
-		m_GrabOutline[i].SetVisible(bShowGrabPoints);
-		m_GrabFill[i].SetVisible(bShowGrabPoints);
+		m_GrabOutline[i].SetVisible(m_bShowGrabPoints);
+		m_GrabFill[i].SetVisible(m_bShowGrabPoints);
 	}
+	m_ExtrudeSegment.SetVisible(m_bShowGrabPoints);
 
 	m_BoundingVolume.SetVisible(true);
-	m_ExtrudeSegment.SetVisible(m_bUseExtrudeSegment);
 }
 
 void TransformCtrl::Hide()
 {
+	m_bIsShown = false;
+
 	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
 	{
 		m_GrabOutline[i].SetVisible(false);
@@ -194,12 +209,42 @@ void TransformCtrl::Hide()
 	m_ExtrudeSegment.SetVisible(false);
 }
 
+float TransformCtrl::GetCachedRotation() const
+{
+	return m_fCachedRotation;
+}
+
+bool TransformCtrl::IsMouseOverBoundingVolume()
+{
+	glm::vec2 ptWorldMousePos;
+	if(m_bIsShown == false || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+		return false;
+
+	ptWorldMousePos = HyEngine::Input().GetMousePos();
+
+	HyShape2d tmpShape;
+	m_BoundingVolume.CalcLocalBoundingShape(tmpShape);
+	
+	return tmpShape.TestPoint(m_BoundingVolume.GetSceneTransform(0.0f), ptWorldMousePos);
+}
+
 GrabPoint TransformCtrl::IsMouseOverGrabPoint()
 {
+	glm::vec2 ptWorldMousePos;
+	if(m_bIsShown == false || m_bShowGrabPoints == false || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+		return GRAB_None;
+
+	ptWorldMousePos = HyEngine::Input().GetMousePos();
+
 	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
 	{
-		//m_GrabOutline[i]
+		HyShape2d tmpShape;
+		m_GrabOutline[i].CalcLocalBoundingShape(tmpShape);
+		if(tmpShape.TestPoint(m_GrabOutline[i].GetSceneTransform(0.0f), ptWorldMousePos))
+			return static_cast<GrabPoint>(i);
 	}
 
 	return GRAB_None;
 }
+
+

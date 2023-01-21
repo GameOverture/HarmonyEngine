@@ -21,7 +21,20 @@ class EntityDraw : public IDraw
 	QList<EntityDrawItem *>					m_SelectedItemList;
 	TransformCtrl							m_MultiTransform;
 
+
+	bool									m_bCurHoverMultiTransform;
 	EntityDrawItem *						m_pCurHoverItem;
+	GrabPoint								m_eCurHoverGrabPoint;
+
+	enum DragState
+	{
+		DRAGSTATE_None = 0,
+		DRAGSTATE_Marquee,
+		DRAGSTATE_Starting,
+		DRAGSTATE_Transforming
+	};
+	DragState								m_DragState;
+	glm::vec2								m_ptDragStart;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
@@ -35,6 +48,7 @@ public:
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent) override;
 
 	void OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList);
+	void RequestSelection(QList<EntityDrawItem *> selectionList);
 
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
@@ -49,7 +63,7 @@ protected:
 
 	void RefreshTransforms();
 
-	//QList<EntityItemDraw *> GetSelectedItems() const;
+	Qt::CursorShape GetGrabPointCursorShape(GrabPoint eGrabPoint, float fRotation) const;
 };
 
 #endif // ENTITYDRAW_H

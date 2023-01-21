@@ -17,7 +17,10 @@
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
-	m_pCurHoverItem(false)
+	m_bCurHoverMultiTransform(false),
+	m_pCurHoverItem(nullptr),
+	m_eCurHoverGrabPoint(GRAB_None),
+	m_DragState(DRAGSTATE_None)
 {
 	m_MultiTransform.Hide();
 }
@@ -44,18 +47,71 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	if(pEvent->button() == Qt::LeftButton)
 	{
-		if(m_bPanCameraKeyDown && m_bIsCameraPanning == false)
+		switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
 		{
-			m_bIsCameraPanning = true;
-			m_ptOldMousePos = pEvent->localPos();
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(Qt::ClosedHandCursor);
+		case Qt::PointingHandCursor:
+			if(m_pCurHoverItem)
+			{
+				QList<EntityDrawItem *> selectList;
+				selectList << m_pCurHoverItem;
+				
+				if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+					selectList += m_SelectedItemList;
+
+				RequestSelection(selectList);
+				break;
+			}
+		[[fallthrough]];
+		case Qt::CrossCursor:
+			RequestSelection(QList<EntityDrawItem *>());
+			m_DragState = DRAGSTATE_Marquee;
+			break;
+
+		case Qt::SizeAllCursor:
+			break;
+
+		case Qt::SizeBDiagCursor:
+		case Qt::SizeVerCursor:
+		case Qt::SizeFDiagCursor:
+		case Qt::SizeHorCursor:
+			break;
+
+		case Qt::OpenHandCursor:
+			break;
+
+		default:
+			HyGuiLog("EntityDraw::OnMousePressEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 		}
+
+		
+		{
+			if(m_bCurHoverMultiTransform && m_MultiTransform.IsShown())
+			{
+				if(m_eCurHoverGrabPoint != GRAB_None)
+				{
+				}
+
+			}
+			else if(m_eCurHoverGrabPoint != GRAB_None)
+			{
+
+			}
+			else if(m_pCurHoverItem)
+			{
+				//m_DragState = DRAGSTATE_Started;
+			}
+		}
+		
+		
+	//	if(m_MultiTransform.IsShown() &&  == Qt::PointingHandCursor)
 	}
 }
 
 /*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
 	IDraw::OnMouseReleaseEvent(pEvent);
+
+	m_DragState = DRAGSTATE_None;
 }
 
 /*virtual*/ void EntityDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
@@ -71,43 +127,67 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		RefreshTransforms();
 	else
 	{
-		Qt::CursorShape eCursorShape = Qt::CrossCursor;
-		m_pCurHoverItem = nullptr;
-		for(int32 i = 0; i < m_ItemList.size(); ++i)
+		if(m_DragState != DRAGSTATE_None)
 		{
-			if(m_ItemList[i]->IsMouseInBounds())
-			{
-				m_pCurHoverItem = m_ItemList[i];
 
-				for(int32 j = 0; j < m_SelectedItemList.size(); ++j)
-				{
-					if(m_ItemList[i] != m_SelectedItemList[j])
-						continue;
-
-					eCursorShape = Qt::SizeAllCursor;
-					break;
-				}
-				if(eCursorShape != Qt::SizeAllCursor)
-					eCursorShape = Qt::PointingHandCursor;
-
-				break;
-			}
 		}
+		else
+		{
+			Qt::CursorShape eNextCursorShape = Qt::CrossCursor;
 
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(eCursorShape);
-		
-		// Iterate backwards since those generally have higher display ordering
-		//for(int32 i = m_ItemList.size() - 1; i >= 0; --i)
-		//{
-		//	if(m_ItemList[i]->IsMouseInBounds())
-		//	{
+			m_bCurHoverMultiTransform = false;
+			m_pCurHoverItem = nullptr;
+			m_eCurHoverGrabPoint = GRAB_None;
 
-		//		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursor(Qt::PointingHandCursor);
+			if(m_MultiTransform.IsShown())
+			{
+				m_eCurHoverGrabPoint = m_MultiTransform.IsMouseOverGrabPoint();
+				eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, m_MultiTransform.GetCachedRotation());
 
-		//	}
-		//	else
-		//		Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursor();
-		//}
+				if(eNextCursorShape == Qt::CrossCursor)
+				{
+					if(m_MultiTransform.IsMouseOverBoundingVolume())
+					{
+						eNextCursorShape = Qt::SizeAllCursor;
+						m_bCurHoverMultiTransform = true;
+					}
+				}
+				else
+					m_bCurHoverMultiTransform = true;
+			}
+
+			if(eNextCursorShape == Qt::CrossCursor) // Not hovering over multi-transform control
+			{
+				if(m_SelectedItemList.size() == 1)
+				{
+					TransformCtrl &transformCtrlRef = m_SelectedItemList[0]->GetTransformCtrl();
+
+					m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
+					eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation());
+					if(eNextCursorShape == Qt::CrossCursor && transformCtrlRef.IsMouseOverBoundingVolume())
+					{
+						eNextCursorShape = Qt::SizeAllCursor;
+						m_pCurHoverItem = m_SelectedItemList[0];
+					}
+				}
+
+				if(eNextCursorShape == Qt::CrossCursor) // Not hovering over multi-transform control or the any selected item
+				{
+					for(int32 i = 0; i < m_ItemList.size(); ++i)
+					{
+						if(m_ItemList[i]->IsMouseInBounds())
+						{
+							eNextCursorShape = Qt::PointingHandCursor;
+							m_pCurHoverItem = m_ItemList[i];
+
+							break;
+						}
+					}
+				}
+			}
+
+			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
+		}
 	}
 }
 
@@ -154,6 +234,16 @@ void EntityDraw::OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataL
 		pSelectedItemDraw->ShowTransformCtrl(m_SelectedItemList.size() == 1);
 
 	RefreshTransforms();
+}
+
+void EntityDraw::RequestSelection(QList<EntityDrawItem *> selectionList)
+{
+	QList<QUuid> uuidList;
+	for(EntityDrawItem *pDrawItem : selectionList)
+		uuidList.push_back(pDrawItem->GetThisUuid());
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
+	pWidget->SetSelectedItems(uuidList);
 }
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/
@@ -252,12 +342,63 @@ void EntityDraw::RefreshTransforms()
 		pItemDraw->RefreshTransform(m_pCamera);
 }
 
-//QList<EntityItemDraw *> EntityDraw::GetSelectedItems() const
-//{
-//	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
-//	QList<EntityTreeItemData *> selectedItemDataList = pWidget->GetSelectedItems(false, true);
-//
-//	
-//
-//	return matchedItemList;
-//}
+Qt::CursorShape EntityDraw::GetGrabPointCursorShape(GrabPoint eGrabPoint, float fRotation) const
+{
+	fRotation = HyMath::NormalizeRange(fRotation, 0.0f, 360.0f);
+
+	int32 iThresholds = 0;
+	if(fRotation <= 22.5f || fRotation >= 337.5f)
+		iThresholds = 0;
+	else if(fRotation >= 22.5f && fRotation <= 67.5f)
+		iThresholds = 1;
+	else if(fRotation >= 67.5f && fRotation <= 112.5f)
+		iThresholds = 2;
+	else if(fRotation >= 112.5 && fRotation <= 157.5f)
+		iThresholds = 3;
+	else if(fRotation >= 157.5f && fRotation <= 202.5f)
+		iThresholds = 4;
+	else if(fRotation >= 202.5f && fRotation <= 247.5f)
+		iThresholds = 5;
+	else if(fRotation >= 247.5f && fRotation <= 292.5f)
+		iThresholds = 6;
+	else //if(fRotation >= 292.5f && fRotation <= 337.5f)
+		iThresholds = 7;
+
+	std::function<Qt::CursorShape(Qt::CursorShape, int32)> fpRotateCursor = [](Qt::CursorShape eStartCursor, int32 iThresholds)
+	{
+		const Qt::CursorShape cursorShapes[] = { Qt::SizeBDiagCursor, Qt::SizeVerCursor, Qt::SizeFDiagCursor, Qt::SizeHorCursor };
+		for(int32 i = 0; i < 4; ++i)
+		{
+			if(eStartCursor == cursorShapes[i])
+				return cursorShapes[HyMath::NormalizeRange(i + iThresholds, 0, 4)];
+		}
+
+		return eStartCursor;
+	};
+
+	switch(eGrabPoint)
+	{
+	default:
+	case GRAB_None:
+		return Qt::CrossCursor;
+
+	case GRAB_BotLeft:
+		return fpRotateCursor(Qt::SizeBDiagCursor, iThresholds);
+	case GRAB_BotRight:
+		return fpRotateCursor(Qt::SizeFDiagCursor, iThresholds);
+	case GRAB_TopRight:
+		return fpRotateCursor(Qt::SizeBDiagCursor, iThresholds);
+	case GRAB_TopLeft:
+		return fpRotateCursor(Qt::SizeFDiagCursor, iThresholds);
+	case GRAB_BotMid:
+		return fpRotateCursor(Qt::SizeVerCursor, iThresholds);
+	case GRAB_MidRight:
+		return fpRotateCursor(Qt::SizeHorCursor, iThresholds);
+	case GRAB_TopMid:
+		return fpRotateCursor(Qt::SizeVerCursor, iThresholds);
+	case GRAB_MidLeft:
+		return fpRotateCursor(Qt::SizeHorCursor, iThresholds);
+	case GRAB_Rotate:
+		return Qt::OpenHandCursor;
+	}
+}

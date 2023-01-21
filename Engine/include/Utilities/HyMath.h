@@ -310,6 +310,10 @@ public:
 
 	static float AngleFromVector(const glm::vec2 &vDirVector);
 
+	// Normalizes a value to an arbitrary range. The value wraps when going below min range or above max range.
+	static float NormalizeRange(float fValue, float fMin, float fMax);
+	static int32 NormalizeRange(int32 iValue, int32 iMin, int32 iMax);
+
 	template <typename VEC>
 	int32 HalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptPointOnPlane)
 	{

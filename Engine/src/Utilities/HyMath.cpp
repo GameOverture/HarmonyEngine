@@ -222,3 +222,23 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	glm::vec2 vNormalizedDirVector = glm::normalize(vDirVector);
 	return glm::degrees(atan2(vNormalizedDirVector.y, vNormalizedDirVector.x));
 }
+
+/*static*/ float HyMath::NormalizeRange(float fValue, float fMin, float fMax)
+{
+	float fWidth = fMax - fMin;
+	if(fWidth == 0.0f)
+		return fMin;
+
+	float fOffsetValue = fValue - fMin;
+	return (fOffsetValue - (floor(fOffsetValue / fWidth) * fWidth)) + fMin;	// + fMin to reset back to start of original range
+}
+
+/*static*/ int32 HyMath::NormalizeRange(int32 iValue, int32 iMin, int32 iMax)
+{
+	int32 iWidth = iMax - iMin;
+	if(iWidth == 0)
+		return iMin;
+
+	int32 iOffsetValue = iValue - iMin;
+	return (iOffsetValue - ((iOffsetValue / iWidth) * iWidth)) + iMin;	// + iMin to reset back to start of original range
+}

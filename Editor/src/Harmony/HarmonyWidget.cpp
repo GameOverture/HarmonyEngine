@@ -32,7 +32,7 @@ HarmonyWidget::HarmonyWidget(Project *pProject) :
 
 	setMouseTracking(true);
 	setAcceptDrops(true);
-	RestoreCursor();
+	RestoreCursorShape();
 }
 
 /*virtual*/ HarmonyWidget::~HarmonyWidget()
@@ -61,12 +61,17 @@ void HarmonyWidget::CloseProject()
 	m_pProject = nullptr;
 }
 
-void HarmonyWidget::SetCursor(Qt::CursorShape eShape)
+Qt::CursorShape HarmonyWidget::GetCursorShape() const
+{
+	return cursor().shape();
+}
+
+void HarmonyWidget::SetCursorShape(Qt::CursorShape eShape)
 {
 	setCursor(eShape);
 }
 
-void HarmonyWidget::RestoreCursor()
+void HarmonyWidget::RestoreCursorShape()
 {
 	setCursor(Qt::CrossCursor);
 }

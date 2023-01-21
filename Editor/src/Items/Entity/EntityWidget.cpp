@@ -166,6 +166,28 @@ QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEnti
 	return selectedItemList;
 }
 
+void EntityWidget::SetSelectedItems(QList<QUuid> uuidList)
+{
+	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
+	QModelIndexList indexList = entityTreeModelRef.GetAllIndices();
+	
+	QItemSelection *pItemSelection = new QItemSelection();
+	for(QUuid uuid : uuidList)
+	{
+		for(QModelIndex index : indexList)
+		{
+			EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+			if(uuid == pCurItemData->GetThisUuid())
+				pItemSelection->select(index, index);
+		}
+	}
+
+
+	QItemSelectionModel *pSelectionModel = ui->nodeTree->selectionModel();
+	pSelectionModel->select(*pItemSelection, QItemSelectionModel::ClearAndSelect);
+	delete pItemSelection;
+}
+
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/
 {
 	resizeEvent(nullptr);

@@ -42,7 +42,9 @@ protected:
 	HyPrimitive2d				m_GrabOutline[NUM_GRABPOINTS];
 	HyPrimitive2d				m_GrabFill[NUM_GRABPOINTS];
 
-	bool						m_bUseExtrudeSegment;
+	bool						m_bIsShown;
+	bool						m_bShowGrabPoints;
+	float						m_fCachedRotation;
 
 public:
 	TransformCtrl();
@@ -51,9 +53,13 @@ public:
 	void WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera);
 	void WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCamera);
 
+	bool IsShown() const;
 	void Show(bool bShowGrabPoints);
 	void Hide();
 
+	float GetCachedRotation() const;
+
+	bool IsMouseOverBoundingVolume();
 	GrabPoint IsMouseOverGrabPoint();
 };
 

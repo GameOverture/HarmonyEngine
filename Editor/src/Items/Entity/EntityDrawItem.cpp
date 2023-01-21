@@ -56,6 +56,16 @@ HyGuiItemType EntityDrawItem::GetGuiType() const
 	return m_eGuiType;
 }
 
+const QUuid &EntityDrawItem::GetThisUuid() const
+{
+	return m_Uuid;
+}
+
+const QUuid &EntityDrawItem::GetItemUuid() const
+{
+	return m_ItemUuid;
+}
+
 IHyLoadable2d *EntityDrawItem::GetNodeChild() const
 {
 	return m_pChild;
@@ -66,14 +76,9 @@ HyShape2d *EntityDrawItem::GetShape() const
 	return m_pShape;
 }
 
-const QUuid &EntityDrawItem::GetThisUuid() const
+TransformCtrl &EntityDrawItem::GetTransformCtrl()
 {
-	return m_Uuid;
-}
-
-const QUuid &EntityDrawItem::GetItemUuid() const
-{
-	return m_ItemUuid;
+	return m_Transform;
 }
 
 bool EntityDrawItem::IsStale() const
