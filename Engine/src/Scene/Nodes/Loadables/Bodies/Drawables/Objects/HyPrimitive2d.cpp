@@ -170,6 +170,11 @@ uint32 HyPrimitive2d::GetNumVerts() const
 	return m_uiNumVerts;
 }
 
+void HyPrimitive2d::GetCentroid(glm::vec2 &ptCentroidOut) const
+{
+	m_Shape.GetCentroid(ptCentroidOut);
+}
+
 bool HyPrimitive2d::IsWireframe()
 {
 	return m_bWireframe;

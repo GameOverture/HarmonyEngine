@@ -209,6 +209,11 @@ void TransformCtrl::Hide()
 	m_ExtrudeSegment.SetVisible(false);
 }
 
+void TransformCtrl::GetCentroid(glm::vec2 &ptCenterOut) const
+{
+	m_BoundingVolume.GetCentroid(ptCenterOut);
+}
+
 float TransformCtrl::GetCachedRotation() const
 {
 	return m_fCachedRotation;

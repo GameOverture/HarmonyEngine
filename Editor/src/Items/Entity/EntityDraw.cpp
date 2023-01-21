@@ -67,43 +67,22 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			m_DragState = DRAGSTATE_Marquee;
 			break;
 
-		case Qt::SizeAllCursor:
-			break;
-
-		case Qt::SizeBDiagCursor:
-		case Qt::SizeVerCursor:
-		case Qt::SizeFDiagCursor:
-		case Qt::SizeHorCursor:
-			break;
-
-		case Qt::OpenHandCursor:
+		case Qt::OpenHandCursor:	// Rotating
+			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
+		[[fallthrough]];
+		case Qt::SizeAllCursor:		// Translating
+		case Qt::SizeBDiagCursor:	// Scaling
+		case Qt::SizeVerCursor:		// Scaling
+		case Qt::SizeFDiagCursor:	// Scaling
+		case Qt::SizeHorCursor:		// Scaling
+			if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
+				HyGuiLog("EntityDraw::OnMousePressEvent - GetWorldMousePos failed", LOGTYPE_Error);
+			m_DragState = DRAGSTATE_Starting;
 			break;
 
 		default:
 			HyGuiLog("EntityDraw::OnMousePressEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 		}
-
-		
-		{
-			if(m_bCurHoverMultiTransform && m_MultiTransform.IsShown())
-			{
-				if(m_eCurHoverGrabPoint != GRAB_None)
-				{
-				}
-
-			}
-			else if(m_eCurHoverGrabPoint != GRAB_None)
-			{
-
-			}
-			else if(m_pCurHoverItem)
-			{
-				//m_DragState = DRAGSTATE_Started;
-			}
-		}
-		
-		
-	//	if(m_MultiTransform.IsShown() &&  == Qt::PointingHandCursor)
 	}
 }
 
@@ -129,7 +108,41 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	{
 		if(m_DragState != DRAGSTATE_None)
 		{
+			switch(m_DragState)
+			{
+			case DRAGSTATE_Marquee:
+				break;
 
+			case DRAGSTATE_Starting: {
+				glm::vec2 ptCurMousePos;
+				HyEngine::Input().GetWorldMousePos(ptCurMousePos);
+				if(glm::distance(m_ptDragStart, ptCurMousePos) >= 10.0f)
+					m_DragState = DRAGSTATE_Transforming;
+				break; }
+
+			case DRAGSTATE_Transforming: {
+				glm::vec2 ptCenter;
+				if(m_MultiTransform.IsShown())
+					m_MultiTransform.GetCentroid(ptCenter);
+				else
+					m_SelectedItemList[0]->GetTransformCtrl().GetCentroid(ptCenter);
+
+				switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
+				{
+				case Qt::ClosedHandCursor:	// Rotating
+					break;
+
+				case Qt::SizeAllCursor:		// Translating
+					break;
+
+				case Qt::SizeBDiagCursor:	// Scaling
+				case Qt::SizeVerCursor:		// Scaling
+				case Qt::SizeFDiagCursor:	// Scaling
+				case Qt::SizeHorCursor:		// Scaling
+					break;
+				}
+				break; }
+			}
 		}
 		else
 		{
@@ -164,11 +177,16 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 					m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
 					eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation());
-					if(eNextCursorShape == Qt::CrossCursor && transformCtrlRef.IsMouseOverBoundingVolume())
+					if(eNextCursorShape == Qt::CrossCursor)
 					{
-						eNextCursorShape = Qt::SizeAllCursor;
-						m_pCurHoverItem = m_SelectedItemList[0];
+						if(transformCtrlRef.IsMouseOverBoundingVolume())
+						{
+							eNextCursorShape = Qt::SizeAllCursor;
+							m_pCurHoverItem = m_SelectedItemList[0];
+						}
 					}
+					else
+						m_pCurHoverItem = m_SelectedItemList[0];
 				}
 
 				if(eNextCursorShape == Qt::CrossCursor) // Not hovering over multi-transform control or the any selected item

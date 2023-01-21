@@ -57,6 +57,8 @@ public:
 	void Show(bool bShowGrabPoints);
 	void Hide();
 
+	void GetCentroid(glm::vec2 &ptCenterOut) const;
+
 	float GetCachedRotation() const;
 
 	bool IsMouseOverBoundingVolume();
