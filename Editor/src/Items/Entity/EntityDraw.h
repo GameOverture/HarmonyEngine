@@ -34,6 +34,7 @@ class EntityDraw : public IDraw
 	};
 	DragState								m_DragState;
 	glm::vec2								m_ptDragStart;
+	glm::vec2								m_ptDragCenter;
 
 	HyEntity2d								m_ActiveTransform;
 	QList<glm::mat4>						m_PrevTransformList;
@@ -52,6 +53,8 @@ public:
 	void OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList);
 	void RequestSelection(QList<EntityDrawItem *> selectionList);
 
+	void RefreshTransforms();
+
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
 	virtual void OnShow() override;
@@ -62,8 +65,6 @@ protected:
 	void SetEverythingStale();
 	EntityDrawItem *FindStaleChild(HyGuiItemType eType, QUuid uuid);
 	void DeleteStaleChildren();
-
-	void RefreshTransforms();
 
 	Qt::CursorShape GetGrabPointCursorShape(GrabPoint eGrabPoint, float fRotation) const;
 };

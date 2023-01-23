@@ -166,7 +166,7 @@ QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEnti
 	return selectedItemList;
 }
 
-void EntityWidget::SetSelectedItems(QList<QUuid> uuidList)
+void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList)
 {
 	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
 	QModelIndexList indexList = entityTreeModelRef.GetAllIndices();
@@ -186,6 +186,34 @@ void EntityWidget::SetSelectedItems(QList<QUuid> uuidList)
 	QItemSelectionModel *pSelectionModel = ui->nodeTree->selectionModel();
 	pSelectionModel->select(*pItemSelection, QItemSelectionModel::ClearAndSelect);
 	delete pItemSelection;
+}
+
+void EntityWidget::SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList)
+{
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+
+	QItemSelection *pItemSelection = new QItemSelection();
+	for(EntityTreeItemData *pSelectItem : selectedList)
+	{
+		QModelIndex index = pTreeModel->FindIndex<EntityTreeItemData *>(pSelectItem, 0);
+		pItemSelection->select(index, index);
+	}
+
+	QItemSelection *pItemDeselection = new QItemSelection();
+	for(EntityTreeItemData *pDeselectItem : deselectedList)
+	{
+		QModelIndex index = pTreeModel->FindIndex<EntityTreeItemData *>(pDeselectItem, 0);
+		pItemDeselection->select(index, index);
+	}
+
+	QItemSelectionModel *pSelectionModel = ui->nodeTree->selectionModel();
+	pSelectionModel->blockSignals(true);
+	pSelectionModel->select(*pItemSelection, QItemSelectionModel::Select);
+	pSelectionModel->select(*pItemDeselection, QItemSelectionModel::Deselect);
+	pSelectionModel->blockSignals(false);
+	delete pItemSelection;
+
+	ui->nodeTree->repaint();
 }
 
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/

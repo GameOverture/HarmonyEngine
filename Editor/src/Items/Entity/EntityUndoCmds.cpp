@@ -11,6 +11,7 @@
 #include "EntityUndoCmds.h"
 #include "EntityModel.h"
 #include "EntityWidget.h"
+#include "EntityDraw.h"
 
 EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
@@ -141,6 +142,9 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
 	}
+
+	if(m_EntityItemRef.GetDraw())
+		static_cast<EntityDraw *>(m_EntityItemRef.GetDraw())->RefreshTransforms();
 }
 
 /*virtual*/ void EntityUndoCmd_Transform::undo() /*override*/
@@ -159,4 +163,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
 	}
+
+	if(m_EntityItemRef.GetDraw())
+		static_cast<EntityDraw *>(m_EntityItemRef.GetDraw())->RefreshTransforms();
 }

@@ -13,6 +13,7 @@
 #include "ExplorerModel.h"
 #include "MainWindow.h"
 #include "EntityDraw.h"
+#include "EntityWidget.h"
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData)
@@ -114,6 +115,10 @@ void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList,
 	EntityDraw *pDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pDraw)
 		pDraw->OnSelectionChange(selectedList, deselectedList);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	if(pWidget)
+		pWidget->SetSelectedItems(selectedList, deselectedList);
 }
 
 int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)

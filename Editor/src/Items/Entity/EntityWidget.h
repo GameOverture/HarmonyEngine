@@ -46,7 +46,8 @@ public:
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
 	QList<EntityTreeItemData *> GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes);
-	void SetSelectedItems(QList<QUuid> uuidList);
+	void RequestSelectedItems(QList<QUuid> uuidList); // Calls signal
+	void SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList); // Does not call signal
 
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;

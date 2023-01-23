@@ -79,6 +79,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
 				HyGuiLog("EntityDraw::OnMousePressEvent - GetWorldMousePos failed", LOGTYPE_Error);
 
+			if(m_MultiTransform.IsShown())
+				m_MultiTransform.GetCentroid(m_ptDragCenter);
+			else
+				m_SelectedItemList[0]->GetTransformCtrl().GetCentroid(m_ptDragCenter);
+			HyEngine::Window().ProjectToWorldPos2d(m_ptDragCenter, m_ptDragCenter);
+
 			m_DragState = DRAGSTATE_Starting;
 			break;
 
@@ -99,15 +105,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		for(EntityDrawItem *pDrawItem : m_SelectedItemList)
 		{
 			if(pDrawItem->GetGuiType() != ITEM_Shape)
-			{
-				m_ActiveTransform.ChildAppend(*pDrawItem->GetNodeChild());
 				newTransformList.push_back(pDrawItem->GetNodeChild()->GetSceneTransform(0.0f));
-			}
 			else
-			{
-				m_ActiveTransform.ShapeAppend(*pDrawItem->GetShape());
-				newTransformList.push_back(glm::mat4(1.0f));
-			}
+				newTransformList.push_back(m_ActiveTransform.GetSceneTransform(0.0f));
 
 			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetThisUuid());;
 			treeItemDataList.push_back(pTreeItemData);
@@ -172,25 +172,17 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				break; }
 
 			case DRAGSTATE_Transforming: {
-				//TransformCtrl *pCurTransform = nullptr;
-				//if(m_MultiTransform.IsShown())
-				//	pCurTransform = &m_MultiTransform;
-				//else
-				//	pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
-
-				//glm::vec2 ptCenter;
-				//pCurTransform->GetCentroid(ptCenter);
+				
 
 				glm::vec2 ptMousePos;
 				if(HyEngine::Input().GetWorldMousePos(ptMousePos) == false)
-				{
-					HyGuiLog("EntityDraw::OnMouseMoveEvent - GetWorldMousePos failed", LOGTYPE_Error);
-					break;
-				}
+					break; // Cursor is currently dragged off render window
 
 				switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
 				{
 				case Qt::ClosedHandCursor:	// Rotating
+					m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
+					m_ActiveTransform.rot.Set(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) + 90.0f);
 					break;
 
 				case Qt::SizeAllCursor:		// Translating
@@ -325,7 +317,21 @@ void EntityDraw::RequestSelection(QList<EntityDrawItem *> selectionList)
 		uuidList.push_back(pDrawItem->GetThisUuid());
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
-	pWidget->SetSelectedItems(uuidList);
+	pWidget->RequestSelectedItems(uuidList);
+}
+
+void EntityDraw::RefreshTransforms()
+{
+	if(m_SelectedItemList.size() > 1)
+	{
+		m_MultiTransform.Show(true);
+		m_MultiTransform.WrapTo(m_SelectedItemList, m_pCamera);
+	}
+	else
+		m_MultiTransform.Hide();
+
+	for(EntityDrawItem *pItemDraw : m_SelectedItemList)
+		pItemDraw->RefreshTransform(m_pCamera);
 }
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/
@@ -408,20 +414,6 @@ void EntityDraw::DeleteStaleChildren()
 		else
 			++iter;
 	}
-}
-
-void EntityDraw::RefreshTransforms()
-{
-	if(m_SelectedItemList.size() > 1)
-	{
-		m_MultiTransform.Show(true);
-		m_MultiTransform.WrapTo(m_SelectedItemList, m_pCamera);
-	}
-	else
-		m_MultiTransform.Hide();
-
-	for(EntityDrawItem *pItemDraw : m_SelectedItemList)
-		pItemDraw->RefreshTransform(m_pCamera);
 }
 
 Qt::CursorShape EntityDraw::GetGrabPointCursorShape(GrabPoint eGrabPoint, float fRotation) const
