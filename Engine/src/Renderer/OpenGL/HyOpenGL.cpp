@@ -165,7 +165,9 @@ HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagn
 					iMaxTextureSize,
 					sCompressedTextureFormats);
 
+#ifndef HY_PLATFORM_BROWSER
 	SetVSync(m_iVSync);
+#endif
 }
 
 HyOpenGL::~HyOpenGL(void)

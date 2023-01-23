@@ -67,6 +67,7 @@ public:
 	TreeModelItem *GetEntityTreeItem() const;
 	EntityTreeItemData *GetEntityTreeItemData() const;
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const;
+	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);

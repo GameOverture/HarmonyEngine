@@ -62,4 +62,19 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_Transform : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	QList<EntityTreeItemData *>		m_AffectedItemDataList;
+	QList<glm::mat4>				m_NewTransformList;
+	QList<glm::mat4>				m_OldTransformList;
+
+public:
+	EntityUndoCmd_Transform(ProjectItemData &entityItemRef, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_Transform();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
 #endif // ENTITYUNDOCMDS_H

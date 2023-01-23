@@ -95,9 +95,11 @@ public:
 	void EnableMouseInput();
 	void DisableMouseInput();
 	bool IsMouseInBounds();
+
 	void ShapeAppend(HyShape2d &shapeRef);
 	bool ShapeRemove(HyShape2d &shapeRef);
 	uint32 ShapeCount() const;
+	HyShape2d *ShapeGet(uint32 uiIndex);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DISPLAY ORDER

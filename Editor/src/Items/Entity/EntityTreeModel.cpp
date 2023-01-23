@@ -223,6 +223,22 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 	}
 }
 
+EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
+{
+	TreeModelItem *pThisEntity = GetEntityTreeItem();
+	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pCurItem = pThisEntity->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pCurItem == nullptr)
+			continue;
+
+		if(pCurItem->GetThisUuid() == uuid)
+			return pCurItem;
+	}
+
+	return nullptr;
+}
+
 bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const
 {
 	if(pItem == nullptr)

@@ -21,7 +21,6 @@ class EntityDraw : public IDraw
 	QList<EntityDrawItem *>					m_SelectedItemList;
 	TransformCtrl							m_MultiTransform;
 
-
 	bool									m_bCurHoverMultiTransform;
 	EntityDrawItem *						m_pCurHoverItem;
 	GrabPoint								m_eCurHoverGrabPoint;
@@ -35,6 +34,9 @@ class EntityDraw : public IDraw
 	};
 	DragState								m_DragState;
 	glm::vec2								m_ptDragStart;
+
+	HyEntity2d								m_ActiveTransform;
+	QList<glm::mat4>						m_PrevTransformList;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);

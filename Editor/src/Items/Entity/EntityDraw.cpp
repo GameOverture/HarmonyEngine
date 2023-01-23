@@ -12,6 +12,7 @@
 #include "EntityWidget.h"
 #include "MainWindow.h"
 #include "HarmonyWidget.h"
+#include "EntityUndoCmds.h"
 
 #include <QKeyEvent>
 
@@ -77,6 +78,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		case Qt::SizeHorCursor:		// Scaling
 			if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
 				HyGuiLog("EntityDraw::OnMousePressEvent - GetWorldMousePos failed", LOGTYPE_Error);
+
 			m_DragState = DRAGSTATE_Starting;
 			break;
 
@@ -89,8 +91,40 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 /*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
 	IDraw::OnMouseReleaseEvent(pEvent);
+	
+	if(m_DragState == DRAGSTATE_Transforming)
+	{
+		QList<EntityTreeItemData *> treeItemDataList;
+		QList<glm::mat4> newTransformList;
+		for(EntityDrawItem *pDrawItem : m_SelectedItemList)
+		{
+			if(pDrawItem->GetGuiType() != ITEM_Shape)
+			{
+				m_ActiveTransform.ChildAppend(*pDrawItem->GetNodeChild());
+				newTransformList.push_back(pDrawItem->GetNodeChild()->GetSceneTransform(0.0f));
+			}
+			else
+			{
+				m_ActiveTransform.ShapeAppend(*pDrawItem->GetShape());
+				newTransformList.push_back(glm::mat4(1.0f));
+			}
+
+			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetThisUuid());;
+			treeItemDataList.push_back(pTreeItemData);
+		}
+
+		QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, treeItemDataList, newTransformList, m_PrevTransformList);
+		m_pProjItem->GetUndoStack()->push(pCmd);
+
+		m_ActiveTransform.ChildrenTransfer(*this);
+
+		m_ActiveTransform.pos.Set(0.0f, 0.0f);
+		m_ActiveTransform.rot.Set(0.0f);
+		m_ActiveTransform.scale.Set(1.0f, 1.0f);
+	}
 
 	m_DragState = DRAGSTATE_None;
+	RefreshTransforms();
 }
 
 /*virtual*/ void EntityDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
@@ -117,15 +151,42 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				glm::vec2 ptCurMousePos;
 				HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 				if(glm::distance(m_ptDragStart, ptCurMousePos) >= 10.0f)
+				{
+					m_PrevTransformList.clear();
+					for(EntityDrawItem *pDrawItem : m_SelectedItemList)
+					{
+						if(pDrawItem->GetGuiType() != ITEM_Shape)
+						{
+							m_ActiveTransform.ChildAppend(*pDrawItem->GetNodeChild());
+							m_PrevTransformList.push_back(pDrawItem->GetNodeChild()->GetSceneTransform(0.0f));
+						}
+						else
+						{
+							m_ActiveTransform.ShapeAppend(*pDrawItem->GetShape());
+							m_PrevTransformList.push_back(glm::mat4(1.0f));
+						}
+					}
+					
 					m_DragState = DRAGSTATE_Transforming;
+				}
 				break; }
 
 			case DRAGSTATE_Transforming: {
-				glm::vec2 ptCenter;
-				if(m_MultiTransform.IsShown())
-					m_MultiTransform.GetCentroid(ptCenter);
-				else
-					m_SelectedItemList[0]->GetTransformCtrl().GetCentroid(ptCenter);
+				//TransformCtrl *pCurTransform = nullptr;
+				//if(m_MultiTransform.IsShown())
+				//	pCurTransform = &m_MultiTransform;
+				//else
+				//	pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
+
+				//glm::vec2 ptCenter;
+				//pCurTransform->GetCentroid(ptCenter);
+
+				glm::vec2 ptMousePos;
+				if(HyEngine::Input().GetWorldMousePos(ptMousePos) == false)
+				{
+					HyGuiLog("EntityDraw::OnMouseMoveEvent - GetWorldMousePos failed", LOGTYPE_Error);
+					break;
+				}
 
 				switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
 				{
@@ -133,6 +194,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 					break;
 
 				case Qt::SizeAllCursor:		// Translating
+					m_ActiveTransform.pos.Set(ptMousePos - m_ptDragStart);
 					break;
 
 				case Qt::SizeBDiagCursor:	// Scaling
@@ -141,6 +203,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				case Qt::SizeHorCursor:		// Scaling
 					break;
 				}
+
+				RefreshTransforms();
 				break; }
 			}
 		}

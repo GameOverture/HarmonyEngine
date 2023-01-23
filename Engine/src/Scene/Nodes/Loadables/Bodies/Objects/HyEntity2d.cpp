@@ -418,6 +418,12 @@ uint32 HyEntity2d::ShapeCount() const
 	return static_cast<uint32>(m_ShapeList.size());
 }
 
+HyShape2d *HyEntity2d::ShapeGet(uint32 uiIndex)
+{
+	HyAssert(uiIndex < static_cast<uint32>(m_ShapeList.size()), "HyEntity2d::ShapeGet passed an invalid index");
+	return m_ShapeList[uiIndex];
+}
+
 bool HyEntity2d::IsReverseDisplayOrder() const
 {
 	return (m_uiEntAttribs & ENT2DATTRIB_ReverseDisplayOrder);
