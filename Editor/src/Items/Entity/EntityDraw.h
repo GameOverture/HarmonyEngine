@@ -20,6 +20,7 @@ class EntityDraw : public IDraw
 
 	QList<EntityDrawItem *>					m_SelectedItemList;
 	TransformCtrl							m_MultiTransform;
+	float									m_fMultiTransformStartRot;
 
 	bool									m_bCurHoverMultiTransform;
 	EntityDrawItem *						m_pCurHoverItem;

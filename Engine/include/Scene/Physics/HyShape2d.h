@@ -65,6 +65,8 @@ public:
 
 	void SetAsNothing();
 
+	void SetAsB2Shape(const b2Shape *pShape);
+
 	// Set as an isolated edge.
 	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);
 	void SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2);
@@ -124,6 +126,7 @@ public:
 	bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const;
 
 	b2Shape *CloneTransform(const glm::mat4 &mtxTransform) const;
+	void TransformSelf(const glm::mat4 &mtxTransform);
 
 protected:
 	void CreateFixture(b2Body *pBody);

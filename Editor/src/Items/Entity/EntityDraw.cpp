@@ -18,6 +18,7 @@
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
+	m_fMultiTransformStartRot(0.0f),
 	m_bCurHoverMultiTransform(false),
 	m_pCurHoverItem(nullptr),
 	m_eCurHoverGrabPoint(GRAB_None),
@@ -46,7 +47,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnMousePressEvent(pEvent);
 
-	if(pEvent->button() == Qt::LeftButton)
+	if(m_bPanCameraKeyDown)
+		RefreshTransforms();
+	else if(pEvent->button() == Qt::LeftButton)
 	{
 		switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
 		{
@@ -167,22 +170,21 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 						}
 					}
 					
+					m_fMultiTransformStartRot = m_MultiTransform.rot.Get();
 					m_DragState = DRAGSTATE_Transforming;
 				}
 				break; }
 
 			case DRAGSTATE_Transforming: {
-				
-
 				glm::vec2 ptMousePos;
 				if(HyEngine::Input().GetWorldMousePos(ptMousePos) == false)
 					break; // Cursor is currently dragged off render window
 
 				switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
 				{
-				case Qt::ClosedHandCursor:	// Rotating
+				case Qt::ClosedHandCursor: // Rotating
 					m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
-					m_ActiveTransform.rot.Set(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) + 90.0f);
+					m_ActiveTransform.rot.Set(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart));
 					break;
 
 				case Qt::SizeAllCursor:		// Translating
@@ -325,7 +327,22 @@ void EntityDraw::RefreshTransforms()
 	if(m_SelectedItemList.size() > 1)
 	{
 		m_MultiTransform.Show(true);
-		m_MultiTransform.WrapTo(m_SelectedItemList, m_pCamera);
+		if(m_ActiveTransform.rot.Get() == 0.0f)
+		{
+			m_MultiTransform.rot_pivot.Set(0.0f, 0.0f);
+			m_MultiTransform.rot.Set(0.0f);
+			m_MultiTransform.WrapTo(m_SelectedItemList, m_pCamera);
+		}
+		else
+		{
+			if(m_DragState == DRAGSTATE_Transforming)
+			{
+				glm::vec2 ptCenterPivot;
+				m_MultiTransform.GetCentroid(ptCenterPivot);
+				m_MultiTransform.rot_pivot.Set(ptCenterPivot);
+				m_MultiTransform.rot.Set(m_fMultiTransformStartRot + m_ActiveTransform.rot.Get());
+			}
+		}
 	}
 	else
 		m_MultiTransform.Hide();

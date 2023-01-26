@@ -129,7 +129,8 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 {
 	if(pEvent->key() == KEY_PanCamera)
 	{
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::OpenHandCursor);
+		if(m_bIsCameraPanning == false)
+			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::OpenHandCursor);
 		m_bPanCameraKeyDown = true;
 	}
 }

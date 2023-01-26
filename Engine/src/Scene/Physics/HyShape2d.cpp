@@ -273,6 +273,42 @@ void HyShape2d::SetAsNothing()
 	ShapeChanged();
 }
 
+void HyShape2d::SetAsB2Shape(const b2Shape *pShape)
+{
+	if(m_pShape == pShape)
+		return;
+
+	if(pShape == nullptr)
+	{
+		SetAsNothing();
+		return;
+	}
+
+	delete m_pShape;
+	switch(pShape->GetType())
+	{
+	case b2Shape::e_circle:
+		m_eType = HYSHAPE_Circle;
+		m_pShape = HY_NEW b2CircleShape();
+		break;
+	case b2Shape::e_edge:
+		m_eType = HYSHAPE_LineSegment;
+		m_pShape = HY_NEW b2EdgeShape();
+		break;
+	case b2Shape::e_polygon:
+		m_eType = HYSHAPE_Polygon;
+		m_pShape = HY_NEW b2PolygonShape();
+		break;
+	case b2Shape::e_chain:
+		m_eType = HYSHAPE_LineChain;
+		m_pShape = HY_NEW b2ChainShape();
+		break;
+	}
+	*m_pShape = *pShape;
+
+	ShapeChanged();
+}
+
 void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
 {
 	SetAsLineSegment(b2Vec2(pt1.x, pt1.y), b2Vec2(pt2.x, pt2.y));
@@ -817,6 +853,13 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 	}
 
 	return pCloneB2Shape;
+}
+
+void HyShape2d::TransformSelf(const glm::mat4 &mtxTransform)
+{
+	b2Shape *pCloneShape = CloneTransform(mtxTransform);
+	SetAsB2Shape(pCloneShape);
+	delete pCloneShape;
 }
 
 void HyShape2d::CreateFixture(b2Body *pBody)

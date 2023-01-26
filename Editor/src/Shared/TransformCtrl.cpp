@@ -105,74 +105,135 @@ void TransformCtrl::WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform,
 
 void TransformCtrl::WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCamera)
 {
+	HyShape2d boundingShape;
+
 	if(itemDrawList.size() == 1)
 	{
-		HyShape2d boundingShape;
 		glm::mat4 mtxShapeTransform;
-		itemDrawList[0]->ExtractTransform(boundingShape, mtxShapeTransform);
 
+		itemDrawList[0]->ExtractTransform(boundingShape, mtxShapeTransform);
 		WrapTo(boundingShape, mtxShapeTransform, pCamera);
+
 		return;
 	}
 
-	bool bCommonRotation = true;
-	m_fCachedRotation = -1.0f; // Not yet set (valid values are 0.0-360.0)
-	QList<b2Shape *> transformedShapeList;
-	for(EntityDrawItem *pDrawItem : itemDrawList)
-	{
-		HyShape2d *pLocalShape = new HyShape2d();
-		glm::mat4 mtxShapeTransform;
-		pDrawItem->ExtractTransform(*pLocalShape, mtxShapeTransform);
-		if(pLocalShape->IsValidShape() == false)
-		{
-			delete pLocalShape;
-			continue;
-		}
-		b2Shape *pSceneShape = pLocalShape->CloneTransform(mtxShapeTransform);
-		delete pLocalShape;
-		transformedShapeList.push_back(pSceneShape);
+	//// Determine the rotation of this transform control. If not specified, determine if all draw items share a common rotation and use that
+	//if(fRotation != 0.0f)
+	//	m_fCachedRotation = fRotation;
+	//else 
+	//{
+	//	// Find common rotation using an int (truncating float values) of degrees
+	//	int32 iCommonRotation = 99999; // Not yet set (valid values are 0-360)
+	//	for(EntityDrawItem *pDrawItem : itemDrawList)
+	//	{
+	//		if(pDrawItem->GetGuiType() != ITEM_Shape)
+	//		{
+	//			float fItemRotation = pDrawItem->GetNodeChild()->rot.Get();
 
-		if(bCommonRotation && pDrawItem->GetGuiType() != ITEM_Shape)
-		{
-			if(m_fCachedRotation < 0.0f)
-				m_fCachedRotation = pDrawItem->GetNodeChild()->rot.Get();
+	//			if(iCommonRotation == 99999)
+	//				iCommonRotation = static_cast<int32>(fItemRotation);
 
-			if(m_fCachedRotation >= 0.0f && m_fCachedRotation != pDrawItem->GetNodeChild()->rot.Get())
-				bCommonRotation = false;
-		}
-	}
+	//			if(iCommonRotation != static_cast<int32>(fItemRotation))
+	//			{
+	//				iCommonRotation = 99999;
+	//				break;
+	//			}
+	//		}
+	//	}
+	//	if(iCommonRotation == 99999)
+	//		iCommonRotation = 0;
 
-	if(bCommonRotation)
-		m_fCachedRotation = glm::radians(-m_fCachedRotation);
-	else
-		m_fCachedRotation = 0.0f;
+	//	m_fCachedRotation = iCommonRotation;
+	//}
 
+	// Determine the center point of all the items and store in 'ptRotPivot'
+	glm::vec3 ptRotPivot;
 	b2AABB combinedAabb;
 	HyMath::InvalidateAABB(combinedAabb);
-	for(b2Shape *pTransformedShape : transformedShapeList)
+	for(EntityDrawItem *pDrawItem : itemDrawList)
 	{
-		b2AABB shapeAabb;
-		pTransformedShape->ComputeAABB(&shapeAabb, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(m_fCachedRotation)), 0);
-		
+		HyShape2d *pItemShape = new HyShape2d();
+		glm::mat4 mtxItemTransform;
+		pDrawItem->ExtractTransform(*pItemShape, mtxItemTransform);
+		if(pItemShape->IsValidShape() == false)
+		{
+			delete pItemShape;
+			continue;
+		}
+
+		b2AABB itemAabb;
+		pItemShape->ComputeAABB(itemAabb, mtxItemTransform);
+
 		if(combinedAabb.IsValid() == false)
-			combinedAabb = shapeAabb;
+			combinedAabb = itemAabb;
 		else
-			combinedAabb.Combine(shapeAabb);
-
-		delete pTransformedShape;
+			combinedAabb.Combine(itemAabb);
 	}
-	transformedShapeList.clear();
+	HySetVec(ptRotPivot, combinedAabb.GetCenter().x, combinedAabb.GetCenter().y, 0.0f);
 
-	HyShape2d combinedShape;
-	std::vector<glm::vec2> ptExtents;
-	ptExtents.push_back(glm::vec2(combinedAabb.lowerBound.x, combinedAabb.lowerBound.y));
-	ptExtents.push_back(glm::vec2(combinedAabb.upperBound.x, combinedAabb.lowerBound.y));
-	ptExtents.push_back(glm::vec2(combinedAabb.upperBound.x, combinedAabb.upperBound.y));
-	ptExtents.push_back(glm::vec2(combinedAabb.lowerBound.x, combinedAabb.upperBound.y));
+	//// Recalculate 'combinedAabb' but transform each item with a rotation matrix ('ptRotPivot' and by 'm_fCachedRotation' degrees)
+	//HyMath::InvalidateAABB(combinedAabb);
+	//for(EntityDrawItem *pDrawItem : itemDrawList)
+	//{
+	//	HyShape2d *pItemShape = new HyShape2d();
+	//	glm::mat4 mtxItemTransform;
+	//	pDrawItem->ExtractTransform(*pItemShape, mtxItemTransform);
+	//	if(pItemShape->IsValidShape() == false)
+	//	{
+	//		delete pItemShape;
+	//		continue;
+	//	}
 
-	combinedShape.SetAsPolygon(ptExtents);
+	//	// Rotation compensation
+	//	//glm::mat4 mtxRotateCompensate(1.0f);
+	//	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot);
+	//	//mtxRotateCompensate = glm::rotate(mtxRotateCompensate, glm::radians(-m_fCachedRotation), glm::vec3(0, 0, 1));
+	//	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot * -1.0f);
+	//	//mtxItemTransform *= mtxRotateCompensate;
 
-	WrapTo(combinedShape, glm::mat4(1.0f), pCamera);
+	//		
+	//	//glm::vec3 ptItemPos = mtxItemTransform[3];
+	//	//glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxItemTransform));
+
+	//	//glm::mat4 mtxOut(1.0f);
+	//	//mtxOut = glm::translate(mtxOut, ptItemPos);
+
+	//	//mtxOut = glm::translate(mtxOut, ptRotPivot);
+	//	//mtxOut = glm::rotate(mtxOut, glm::radians(rot.Extrapolate(fExtrapolatePercent)), glm::vec3(0, 0, 1));
+	//	//mtxOut = glm::translate(mtxOut, ptRotPivot * -1.0f);
+
+
+
+	//	// Rotation compensation
+	//	mtxItemTransform = glm::translate(mtxItemTransform, ptRotPivot * -1.0f);
+	//	mtxItemTransform = glm::rotate(mtxItemTransform, glm::radians(-m_fCachedRotation), glm::vec3(0, 0, 1));
+	//	mtxItemTransform = glm::translate(mtxItemTransform, ptRotPivot);
+	//	//glm::mat4 mtxRotateCompensate(1.0f);
+	//	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot * -1.0f);
+	//	//mtxRotateCompensate = glm::rotate(mtxRotateCompensate, glm::radians(-m_fCachedRotation), glm::vec3(0, 0, 1));
+	//	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot);
+	//	//mtxItemTransform *= mtxRotateCompensate;
+
+	//	b2AABB itemAabb;
+	//	pItemShape->ComputeAABB(itemAabb, mtxItemTransform);
+
+	//	if(combinedAabb.IsValid() == false)
+	//		combinedAabb = itemAabb;
+	//	else
+	//		combinedAabb.Combine(itemAabb);
+	//}
+
+	// Using 'combinedAabb' create an OBB in 'boundingShape', then rotate it back by the previous rotation compensation
+	// Cannot use SetAsPolygon() because Box2d wields the vertices in an odd order
+	boundingShape.SetAsBox(combinedAabb.GetExtents().x, combinedAabb.GetExtents().y, ptRotPivot, 0.0f);
+
+	//glm::mat4 mtxRotateCompensate(1.0f);
+	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot);
+	//mtxRotateCompensate = glm::rotate(mtxRotateCompensate, glm::radians(m_fCachedRotation), glm::vec3(0, 0, 1));
+	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot * -1.0f);
+	//
+	//boundingShape.TransformSelf(mtxRotateCompensate);
+	WrapTo(boundingShape, glm::mat4(1.0f), pCamera);
 }
 
 bool TransformCtrl::IsShown() const
