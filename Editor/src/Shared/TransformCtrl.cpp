@@ -275,6 +275,11 @@ void TransformCtrl::GetCentroid(glm::vec2 &ptCenterOut) const
 	m_BoundingVolume.GetCentroid(ptCenterOut);
 }
 
+glm::vec2 TransformCtrl::GetGrabPointPos(GrabPoint eGrabPoint) const
+{
+	return m_ptGrabPos[eGrabPoint];
+}
+
 float TransformCtrl::GetCachedRotation() const
 {
 	return m_fCachedRotation;

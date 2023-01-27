@@ -78,18 +78,43 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		case Qt::SizeBDiagCursor:	// Scaling
 		case Qt::SizeVerCursor:		// Scaling
 		case Qt::SizeFDiagCursor:	// Scaling
-		case Qt::SizeHorCursor:		// Scaling
+		case Qt::SizeHorCursor: {	// Scaling
 			if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
 				HyGuiLog("EntityDraw::OnMousePressEvent - GetWorldMousePos failed", LOGTYPE_Error);
 
+			TransformCtrl *pCurTransform = nullptr;
 			if(m_MultiTransform.IsShown())
-				m_MultiTransform.GetCentroid(m_ptDragCenter);
+				pCurTransform = &m_MultiTransform;
 			else
-				m_SelectedItemList[0]->GetTransformCtrl().GetCentroid(m_ptDragCenter);
+				pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
+
+			pCurTransform->GetCentroid(m_ptDragCenter);
 			HyEngine::Window().ProjectToWorldPos2d(m_ptDragCenter, m_ptDragCenter);
 
+			glm::vec2 ptMidRight, ptMidLeft, ptTopMid, ptBotMid;
+			HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_MidRight), ptMidRight);
+			HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_MidLeft), ptMidLeft);
+			HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_TopMid), ptTopMid);
+			HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_BotMid), ptBotMid);
+			HySetVec(m_vDragStartSize, fabs(ptMidRight.x - ptMidLeft.x), fabs(ptTopMid.y - ptBotMid.y));
+
+			switch(m_eCurHoverGrabPoint)
+			{
+			case GRAB_BotLeft:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopRight); break;
+			case GRAB_BotRight:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopLeft); break;
+			case GRAB_TopRight:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotLeft); break;
+			case GRAB_TopLeft:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotRight); break;
+			case GRAB_BotMid:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopMid); break;
+			case GRAB_MidRight:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_MidLeft); break;
+			case GRAB_TopMid:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotMid); break;
+			case GRAB_MidLeft:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_MidRight); break;
+			default:
+				break;
+			}
+			HyEngine::Window().ProjectToWorldPos2d(m_ptDragAnchorPoint, m_ptDragAnchorPoint);
+
 			m_DragState = DRAGSTATE_Starting;
-			break;
+			break; }
 
 		default:
 			HyGuiLog("EntityDraw::OnMousePressEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
@@ -194,8 +219,20 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				case Qt::SizeBDiagCursor:	// Scaling
 				case Qt::SizeVerCursor:		// Scaling
 				case Qt::SizeFDiagCursor:	// Scaling
-				case Qt::SizeHorCursor:		// Scaling
-					break;
+				case Qt::SizeHorCursor: {	// Scaling
+					m_ActiveTransform.scale_pivot.Set(m_ptDragAnchorPoint);
+
+					float fRequiredWidth = fabs(m_ActiveTransform.scale_pivot.X() - ptMousePos.x);//m_Init.layout.m_vLayoutExtents[eLayout].x * 2.0f;
+					float fRequiredHeight = fabs(m_ActiveTransform.scale_pivot.Y() - ptMousePos.y);//m_Init.layout.m_vLayoutExtents[eLayout].y * 2.0f;
+
+					// Determine if zooming out is required to fit required width/height
+					float fZoomAmt = HyMax(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
+					m_ActiveTransform.scale.Set(fZoomAmt, fZoomAmt);
+
+					break; }
+
+				default:
+					HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 				}
 
 				RefreshTransforms();

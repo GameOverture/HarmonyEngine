@@ -36,6 +36,8 @@ class EntityDraw : public IDraw
 	DragState								m_DragState;
 	glm::vec2								m_ptDragStart;
 	glm::vec2								m_ptDragCenter;
+	glm::vec2								m_vDragStartSize;
+	glm::vec2								m_ptDragAnchorPoint;
 
 	HyEntity2d								m_ActiveTransform;
 	QList<glm::mat4>						m_PrevTransformList;
