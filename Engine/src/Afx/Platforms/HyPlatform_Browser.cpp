@@ -29,20 +29,20 @@ EM_BOOL OnHtmlFocusCallback(int iEventType, const EmscriptenFocusEvent *pFocusEv
 	switch(iEventType)
 	{
 	case EMSCRIPTEN_EVENT_BLUR:		// Dispatched after focus has shifted from this
-		HyLog("HtmlFocus Callback: Blur");
+		//HyLog("HtmlFocus Callback: Blur");
 		break;
 
 	case EMSCRIPTEN_EVENT_FOCUS:
-		HyLog("HtmlFocus Callback: Focus");
+		//HyLog("HtmlFocus Callback: Focus");
 		break;
 
 	case EMSCRIPTEN_EVENT_FOCUSOUT:
-		HyLog("HtmlFocus Callback: FocusOut");
+		//HyLog("HtmlFocus Callback: FocusOut");
 		pEngine->Audio().StopDevice();
 		break;
 
 	case EMSCRIPTEN_EVENT_FOCUSIN:	// Dispatched before focus is shifted to this
-		HyLog("HtmlFocus Callback: FocusIn");
+		//HyLog("HtmlFocus Callback: FocusIn");
 		pEngine->Audio().StartDevice();
 		break;
 
@@ -55,7 +55,7 @@ EM_BOOL OnHtmlFocusCallback(int iEventType, const EmscriptenFocusEvent *pFocusEv
 
 EM_BOOL OnHtmlOrientationChangeCallback(int iEventType, const EmscriptenOrientationChangeEvent *pOrientationChangeEvent, void *pUserData)
 {
-	HyLog("HtmlOrientationChange Callback: " << pOrientationChangeEvent->orientationIndex);
+	//HyLog("HtmlOrientationChange Callback: " << pOrientationChangeEvent->orientationIndex);
 
 	HyEngine *pEngine = reinterpret_cast<HyEngine *>(pUserData);
 	pEngine->Window().ApiRefreshWindowSize();

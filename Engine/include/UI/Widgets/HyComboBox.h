@@ -42,6 +42,8 @@ protected:
 	float								m_fElapsedExpandedTime;
 	float								m_fExpandedTimeout;
 
+	std::map<HyButton *, bool>			m_SubBtnEnabledMap;
+
 public:
 	HyComboBox(HyEntity2d *pParent = nullptr);
 	HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
@@ -50,6 +52,7 @@ public:
 
 	uint32 InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
 	uint32 InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
+	void SetSubButtonEnabled(uint32 uiSubBtnIndex, bool bEnabled);
 	void RemoveSubButton(uint32 uiSubBtnIndex);
 	void ClearSubButtons();
 

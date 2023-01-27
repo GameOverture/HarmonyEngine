@@ -63,8 +63,20 @@ uint32 HyComboBox::InsertSubButton(const HyPanelInit &initRef, std::string sText
 	pNewBtn->Load();
 
 	m_SubBtnList.push_back(pNewBtn);
+	m_SubBtnEnabledMap.insert(std::pair<HyButton *, bool>(pNewBtn, true));
 
 	return static_cast<uint32>(m_SubBtnList.size()) - 1;
+}
+
+void HyComboBox::SetSubButtonEnabled(uint32 uiSubBtnIndex, bool bEnabled)
+{
+	if(uiSubBtnIndex >= m_SubBtnList.size())
+		return;
+
+	m_SubBtnEnabledMap[m_SubBtnList[uiSubBtnIndex]] = bEnabled;
+
+	if(IsExpanded() && bEnabled)
+		m_SubBtnList[uiSubBtnIndex]->SetAsEnabled(true);
 }
 
 void HyComboBox::RemoveSubButton(uint32 uiSubBtnIndex)
@@ -75,6 +87,7 @@ void HyComboBox::RemoveSubButton(uint32 uiSubBtnIndex)
 		if(uiIndexCount == uiSubBtnIndex)
 		{
 			HyButton *pSubBtn = *it;
+			m_SubBtnEnabledMap.erase(pSubBtn);
 			m_SubBtnList.erase(it);
 			delete pSubBtn;
 			return;
@@ -90,6 +103,7 @@ void HyComboBox::ClearSubButtons()
 		delete m_SubBtnList[i];
 
 	m_SubBtnList.clear();
+	m_SubBtnEnabledMap.clear();
 }
 
 void HyComboBox::SetExpandType(HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate)
@@ -248,7 +262,7 @@ void HyComboBox::ResetExpandedTimeout()
 		if(bAllFinished)
 		{
 			for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
-				m_SubBtnList[i]->SetAsEnabled(true);
+				m_SubBtnList[i]->SetAsEnabled(m_SubBtnEnabledMap[m_SubBtnList[i]]);
 
 			ResetExpandedTimeout();
 			m_uiAttribs &= ~(COMBOBOXATTRIB_IsTransition | COMBOBOXATTRIB_IsExpandMouseDwn);
