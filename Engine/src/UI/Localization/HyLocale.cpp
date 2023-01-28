@@ -263,15 +263,18 @@
 		str.setf(std::ios_base::showpos);
 	}
 
+	// TODO: is this working?
 	int32 iNumFractionDigits = Money_GetNumFractionalDigits();
 	double dDenominator = 1.0;
 	for(int32 i = 0; i < iNumFractionDigits; ++i)
 		dDenominator *= 10.0;
+	// This is backup for now
+	int32 iCents = static_cast<int32>(dValue * 100.0); // Truncate any fractional values
 
 	if(format.IsUsingScientificNotation())
-		str << std::scientific << std::showbase << std::put_money(dValue * dDenominator);
+		str << std::scientific << std::showbase << std::put_money(iCents);
 	else
-		str << std::showbase << std::put_money(dValue * dDenominator);
+		str << std::showbase << std::put_money(iCents);
 
 	sText = str.str();
 
