@@ -32,13 +32,29 @@ public:
 
 class EntityUndoCmd_PopChild : public QUndoCommand
 {
-	ProjectItemData &			m_EntityItemRef;
-	EntityTreeItemData *		m_pNode;
-	uint32						m_uiIndex;
+	ProjectItemData &				m_EntityItemRef;
+	EntityTreeItemData *			m_pNode;
+	uint32							m_uiIndex;
 
 public:
 	EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, EntityTreeItemData *pNodeItem, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PopChild();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_AddPrimitive : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	QUuid							m_Uuid;
+	uint32							m_uiIndex;
+
+public:
+	EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddPrimitive();
 
 	virtual void redo() override;
 	virtual void undo() override;

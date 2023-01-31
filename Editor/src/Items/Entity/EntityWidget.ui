@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>272</width>
+    <width>332</width>
     <height>565</height>
    </rect>
   </property>
@@ -66,12 +66,18 @@
             <property name="text">
              <string>...</string>
             </property>
+            <property name="popupMode">
+             <enum>QToolButton::MenuButtonPopup</enum>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QToolButton" name="btnAddShape">
             <property name="text">
              <string>...</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::MenuButtonPopup</enum>
             </property>
            </widget>
           </item>
@@ -210,10 +216,10 @@
      <normaloff>:/icons16x16/items/Primitive-New.png</normaloff>:/icons16x16/items/Primitive-New.png</iconset>
    </property>
    <property name="text">
-    <string>Add a Primitive shape as a child</string>
+    <string>Add New Primitive</string>
    </property>
    <property name="toolTip">
-    <string>Inserts a primitive shape as a child, at the selected node</string>
+    <string>Inserts a new HyPrimitive as a child, at the selected node</string>
    </property>
   </action>
   <action name="actionAddShape">
@@ -225,19 +231,19 @@
     <string>Add New Shape</string>
    </property>
    <property name="toolTip">
-    <string>Inserts a shape to detect collision, mouse input, hitbox, etc.</string>
+    <string>Inserts a new shape to detect collision, mouse input, hitbox, etc.</string>
    </property>
   </action>
-  <action name="actionAppendChildren">
+  <action name="actionAddChildren">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
    </property>
    <property name="text">
-    <string>Add Selected Child</string>
+    <string>Add Children</string>
    </property>
    <property name="toolTip">
-    <string>Add the selected item in Project Explorer as a child</string>
+    <string>Inserts the selected items in Project Explorer as children</string>
    </property>
   </action>
  </widget>

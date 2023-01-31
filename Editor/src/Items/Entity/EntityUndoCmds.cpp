@@ -84,6 +84,25 @@ EntityUndoCmd_PopChild::EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, E
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef)
+{
+}
+
+/*virtual*/ EntityUndoCmd_AddPrimitive::~EntityUndoCmd_AddPrimitive()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddPrimitive::redo() /*override*/
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddPrimitive::undo() /*override*/
+{
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_SelectionChanged::EntityUndoCmd_SelectionChanged(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_SelectedItemDataList(selectedItemDataList),

@@ -55,10 +55,9 @@ protected:
 
 private Q_SLOTS:
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-	void on_actionAppendChildren_triggered();
+	void on_actionAddChildren_triggered();
 	void on_actionAddPrimitive_triggered();
-	void on_actionInsertBoundingVolume_triggered();
-	void on_actionInsertPhysicsBody_triggered();
+	void on_actionAddShape_triggered();
 
 private:
 	Ui::EntityWidget *ui;

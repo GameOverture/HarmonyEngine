@@ -29,7 +29,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	layout()->removeItem(ui->verticalLayout);
 	layout()->addItem(ui->verticalLayout);
 
-	ui->btnAddChild->setDefaultAction(ui->actionAppendChildren);
+	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
 	ui->btnAddChildPrimitive->setDefaultAction(ui->actionAddPrimitive);
 	ui->btnAddShape->setDefaultAction(ui->actionAddShape);
 
@@ -81,7 +81,7 @@ EntityWidget::~EntityWidget()
 			break;
 		}
 	}
-	ui->actionAppendChildren->setEnabled(bEnableAddNodeBtn);
+	ui->actionAddChildren->setEnabled(bEnableAddNodeBtn);
 
 	// Manage currently selected items in the item tree
 	QList<EntityTreeItemData *> selectedItemDataList = GetSelectedItems(true, true);
@@ -266,7 +266,7 @@ void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const 
 	m_ItemRef.GetUndoStack()->push(new EntityUndoCmd_SelectionChanged(m_ItemRef, selectedItemDataList, deselectedItemDataList));
 }
 
-void EntityWidget::on_actionAppendChildren_triggered()
+void EntityWidget::on_actionAddChildren_triggered()
 {
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
 	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);
@@ -295,12 +295,7 @@ void EntityWidget::on_actionAddPrimitive_triggered()
 	//m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-void EntityWidget::on_actionInsertBoundingVolume_triggered()
-{
-
-}
-
-void EntityWidget::on_actionInsertPhysicsBody_triggered()
+void EntityWidget::on_actionAddShape_triggered()
 {
 
 }
