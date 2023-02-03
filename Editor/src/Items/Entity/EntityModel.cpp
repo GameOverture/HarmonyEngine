@@ -102,10 +102,15 @@ EntityTreeItemData *EntityModel::Cmd_AddNewChild(ProjectItemData *pProjItemData,
 
 EntityTreeItemData *EntityModel::Cmd_AddNewPrimitive(int iRow)
 {
+	//EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewPrimitive(initObj, iRow);
+	//if(pProjItemData)
+	//	m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItemData);
+
+	//return pTreeItemData;
 	return nullptr;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddShape(int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddNewShape()
 {
 	return nullptr;
 }

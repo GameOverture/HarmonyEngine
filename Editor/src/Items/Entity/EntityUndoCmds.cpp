@@ -84,9 +84,12 @@ EntityUndoCmd_PopChild::EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, E
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, QUndoCommand *pParent /*= nullptr*/) :
-	m_EntityItemRef(entityItemRef)
+EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, uint32 uiRowIndex, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_uiIndex(uiRowIndex),
+	m_pPrimitiveTreeItemData(nullptr)
 {
+	setText("Add Primitive Child");
 }
 
 /*virtual*/ EntityUndoCmd_AddPrimitive::~EntityUndoCmd_AddPrimitive()
@@ -95,10 +98,37 @@ EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityIt
 
 /*virtual*/ void EntityUndoCmd_AddPrimitive::redo() /*override*/
 {
+	m_pPrimitiveTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewPrimitive(m_uiIndex);
 }
 
 /*virtual*/ void EntityUndoCmd_AddPrimitive::undo() /*override*/
 {
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pPrimitiveTreeItemData);
+	m_pPrimitiveTreeItemData = nullptr;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_AddShape::EntityUndoCmd_AddShape(ProjectItemData &entityItemRef, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_pShapeTreeItemData(nullptr)
+{
+	setText("Add New Shape");
+}
+
+/*virtual*/ EntityUndoCmd_AddShape::~EntityUndoCmd_AddShape()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddShape::redo() /*override*/
+{
+	m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape();
+}
+
+/*virtual*/ void EntityUndoCmd_AddShape::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pShapeTreeItemData);
+	m_pShapeTreeItemData = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

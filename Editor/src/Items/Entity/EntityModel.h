@@ -48,9 +48,8 @@ public:
 	QList<EntityTreeItemData *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
 	EntityTreeItemData *Cmd_AddNewChild(ProjectItemData *pProjItemData, QJsonObject initObj, int iRow);
 	EntityTreeItemData *Cmd_AddNewPrimitive(int iRow);
-	EntityTreeItemData *Cmd_AddShape(int iRow);
+	EntityTreeItemData *Cmd_AddNewShape();
 	void Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList);
-	void Cmd_UpdateItem(EntityTreeItemData *pItem);
 	int32 Cmd_RemoveTreeItem(EntityTreeItemData *pItem);
 	bool Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow);
 

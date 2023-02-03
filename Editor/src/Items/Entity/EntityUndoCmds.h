@@ -49,12 +49,30 @@ public:
 class EntityUndoCmd_AddPrimitive : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	QUuid							m_Uuid;
 	uint32							m_uiIndex;
+	
+	EntityTreeItemData *			m_pPrimitiveTreeItemData;
 
 public:
-	EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, uint32 uiRowIndex, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_AddPrimitive();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_AddShape : public QUndoCommand
+{
+	ProjectItemData &		m_EntityItemRef;
+	uint32					m_uiIndex;
+
+	EntityTreeItemData *	m_pShapeTreeItemData;
+
+public:
+	EntityUndoCmd_AddShape(ProjectItemData &entityItemRef, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddShape();
 
 	virtual void redo() override;
 	virtual void undo() override;

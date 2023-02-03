@@ -69,6 +69,10 @@ HyWindow::HyWindow(uint32 uiIndex, HyWindowManager &managerRef, const HyWindowIn
 	case HYWINDOW_FullScreen:
 		pMonitorOwner = GetGlfwMonitor();
 		break;
+
+	case HYWINDOW_Unknown:
+	default:
+		HyLogError("HyWindow ctor had an invalid mode for its window");
 	}
 	
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);		// Will be shown after positioned
