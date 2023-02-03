@@ -176,6 +176,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Utilities/HyJson.cpp
 	src/Utilities/HyMain.cpp
 	src/Utilities/HyMath.cpp
+	src/Utilities/HyStorage.cpp
 	src/Window/HyWindow.cpp
 	src/Window/HyWindowManager.cpp)
 
@@ -309,6 +310,7 @@ set(HYENGINE_HEADER_FILES
 	include/Utilities/HyMain.h
 	include/Utilities/HyMath.h
 	include/Utilities/HyRand.h
+	include/Utilities/HyStorage.h
 	include/Window/HyWindow.h
 	include/Window/HyWindowManager.h)
 

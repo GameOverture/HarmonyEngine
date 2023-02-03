@@ -11,10 +11,14 @@
 #define HyFileIO_h__
 
 #include "Afx/HyStdAfx.h"
+#include "HyStorage.h"
 
 class HyIO
 {
 public:
+	static HyStorage	SessionStorage;
+	static HyStorage	LocalStorage;
+
 	// Return the number of UTF-8 characters from a well formed UTF-8 string sequence
 	static size_t Utf8Length(const std::string &sStrRef);
 

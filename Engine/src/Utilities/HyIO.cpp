@@ -16,6 +16,9 @@
 #include <fstream>
 #include <iomanip>
 
+/*static*/ HyStorage HyIO::SessionStorage(true);
+/*static*/ HyStorage HyIO::LocalStorage(false);
+
 /*static*/ size_t HyIO::Utf8Length(const std::string &sStrRef)
 {
 	const char *szStr = sStrRef.c_str();
