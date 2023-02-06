@@ -223,6 +223,22 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	return glm::degrees(atan2(vNormalizedDirVector.y, vNormalizedDirVector.x));
 }
 
+/*static*/ glm::vec2 HyMath::ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint)
+{
+	// Get the vector from the start of the ray to the test point
+	glm::vec2 v = ptTestPoint - ptRayStart;
+
+	// Get the projection of v onto the ray direction
+	float t = glm::dot(v, vNormalizedRayDir);
+
+	// If the projection is negative, the closest point is the start of the ray
+	if(t < 0.0f)
+		return ptRayStart;
+
+	// Otherwise, the closest point is along the ray
+	return ptRayStart + t * vNormalizedRayDir;
+}
+
 /*static*/ float HyMath::NormalizeRange(float fValue, float fMin, float fMax)
 {
 	float fWidth = fMax - fMin;

@@ -209,11 +209,48 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				{
 				case Qt::ClosedHandCursor: // Rotating
 					m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
-					m_ActiveTransform.rot.Set(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart));
+					if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+					{
+						float fRot = HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart);
+						fRot = HyMath::RoundToNearest(fRot, 22.5f);
+						m_ActiveTransform.rot.Set(fRot);
+					}
+					else
+						m_ActiveTransform.rot.Set(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart));
 					break;
 
 				case Qt::SizeAllCursor:		// Translating
-					m_ActiveTransform.pos.Set(ptMousePos - m_ptDragStart);
+					if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+					{
+						glm::vec2 ptTarget = ptMousePos;// -m_ptDragStart;
+						const glm::vec2 UNIT_VECTOR_LIST[] = {
+							glm::vec2(1, 1),
+							glm::vec2(1, 0),
+							glm::vec2(1, -1),
+							glm::vec2(0, -1),
+							glm::vec2(-1, -1),
+							glm::vec2(-1, 0),
+							glm::vec2(-1, 1),
+							glm::vec2(0, 1)
+						};
+
+						glm::vec2 ptClosest = m_ptDragCenter;
+						float fMinDist = glm::length(ptTarget - m_ptDragCenter);
+						for(int i = 0; i < 8; ++i)
+						{
+							glm::vec2 ptCandidate = HyMath::ClosestPointOnRay(m_ptDragCenter, glm::normalize(UNIT_VECTOR_LIST[i]), ptTarget);
+							float fDist = glm::length(ptTarget - ptCandidate);
+							if(fDist < fMinDist)
+							{
+								ptClosest = ptCandidate;
+								fMinDist = fDist;
+							}
+						}
+
+						m_ActiveTransform.pos.Set(ptClosest - m_ptDragCenter);
+					}
+					else
+						m_ActiveTransform.pos.Set(ptMousePos - m_ptDragStart);
 					break;
 
 				case Qt::SizeBDiagCursor:	// Scaling
@@ -225,9 +262,13 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 					float fRequiredWidth = fabs(m_ActiveTransform.scale_pivot.X() - ptMousePos.x);//m_Init.layout.m_vLayoutExtents[eLayout].x * 2.0f;
 					float fRequiredHeight = fabs(m_ActiveTransform.scale_pivot.Y() - ptMousePos.y);//m_Init.layout.m_vLayoutExtents[eLayout].y * 2.0f;
 
-					// Determine if zooming out is required to fit required width/height
-					float fZoomAmt = HyMax(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
-					m_ActiveTransform.scale.Set(fZoomAmt, fZoomAmt);
+					if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+						m_ActiveTransform.scale.Set(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
+					else
+					{
+						float fScaleAmt = HyMax(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
+						m_ActiveTransform.scale.Set(fScaleAmt, fScaleAmt);
+					}
 
 					break; }
 

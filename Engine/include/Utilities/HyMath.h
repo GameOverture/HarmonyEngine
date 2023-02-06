@@ -309,13 +309,21 @@ public:
 	static glm::ivec2 PerpendicularCounterClockwise(const glm::ivec2 &vDirVector);
 
 	static float AngleFromVector(const glm::vec2 &vDirVector);
+	static glm::vec2 HyMath::ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint);
 
 	// Normalizes a value to an arbitrary range. The value wraps when going below min range or above max range.
 	static float NormalizeRange(float fValue, float fMin, float fMax);
 	static int32 NormalizeRange(int32 iValue, int32 iMin, int32 iMax);
 
+	// Rounds a given number to the nearest multiple of a specified value
+	template<typename TYPE>
+	static TYPE RoundToNearest(TYPE value, TYPE multiple)
+	{
+		return round(value / multiple) * multiple;
+	}
+
 	template <typename VEC>
-	int32 HalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptPointOnPlane)
+	static int32 HalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptPointOnPlane)
 	{
 		// Calculate a vector from the point on the plane to our test point
 		VEC vTemp(ptTestPoint - ptPointOnPlane);
