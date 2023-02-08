@@ -33,6 +33,10 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->btnAddChildPrimitive->setDefaultAction(ui->actionAddPrimitive);
 	ui->btnAddShape->setDefaultAction(ui->actionAddShape);
 
+	ui->btnOrderUp->setDefaultAction(ui->actionOrderChildrenUp);
+	ui->btnOrderDown->setDefaultAction(ui->actionOrderChildrenDown);
+	ui->btnRemove->setDefaultAction(ui->actionRemoveItems);
+
 	ui->nodeTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	ui->nodeTree->setDragEnabled(true);
 	ui->nodeTree->setDropIndicatorShown(true);
@@ -298,4 +302,16 @@ void EntityWidget::on_actionAddPrimitive_triggered()
 void EntityWidget::on_actionAddShape_triggered()
 {
 
+}
+
+void EntityWidget::on_actionOrderChildrenUp_triggered()
+{
+}
+
+void EntityWidget::on_actionOrderChildrenDown_triggered()
+{
+}
+
+void EntityWidget::on_actionRemoveItems_triggered()
+{
 }

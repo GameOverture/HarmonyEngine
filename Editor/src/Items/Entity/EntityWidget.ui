@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>332</width>
+    <width>365</width>
     <height>565</height>
    </rect>
   </property>
@@ -67,7 +67,7 @@
              <string>...</string>
             </property>
             <property name="popupMode">
-             <enum>QToolButton::MenuButtonPopup</enum>
+             <enum>QToolButton::DelayedPopup</enum>
             </property>
            </widget>
           </item>
@@ -77,7 +77,7 @@
              <string>...</string>
             </property>
             <property name="popupMode">
-             <enum>QToolButton::MenuButtonPopup</enum>
+             <enum>QToolButton::DelayedPopup</enum>
             </property>
            </widget>
           </item>
@@ -93,6 +93,27 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnOrderUp">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnOrderDown">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnRemove">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -244,6 +265,42 @@
    </property>
    <property name="toolTip">
     <string>Inserts the selected items in Project Explorer as children</string>
+   </property>
+  </action>
+  <action name="actionOrderChildrenUp">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Selected Children Upward</string>
+   </property>
+   <property name="toolTip">
+    <string>Moves the selected children nodes upward toward the root.</string>
+   </property>
+  </action>
+  <action name="actionOrderChildrenDown">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Chidlren Downward</string>
+   </property>
+   <property name="toolTip">
+    <string>Moves the selected children nodes downward away from the root.</string>
+   </property>
+  </action>
+  <action name="actionRemoveItems">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Selected Items</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected items (children and shapes) from the entity</string>
    </property>
   </action>
  </widget>

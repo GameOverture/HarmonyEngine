@@ -247,6 +247,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 	}
 
+	//pReturnWidget->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 	return pReturnWidget;
 }
 
@@ -343,4 +344,3 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 {
 	pEditor->setGeometry(option.rect);
 }
-

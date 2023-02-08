@@ -59,6 +59,10 @@ private Q_SLOTS:
 	void on_actionAddPrimitive_triggered();
 	void on_actionAddShape_triggered();
 
+	void on_actionOrderChildrenUp_triggered();
+	void on_actionOrderChildrenDown_triggered();
+	void on_actionRemoveItems_triggered();
+
 private:
 	Ui::EntityWidget *ui;
 };
