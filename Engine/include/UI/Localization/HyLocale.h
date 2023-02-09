@@ -43,12 +43,13 @@ class HyLocale
 		std::basic_string<CharT>		m_sPositiveSign;		// Only the first character of the string returned is the character that appears in the pos_format() position indicated by the value sign. The rest of the characters appear after the rest of the monetary string.
 		std::basic_string<CharT>		m_sNegativeSign;		// Only the first character of the string returned is the character that appears in the neg_format() position indicated by the value sign. The rest of the characters appear after the rest of the monetary string.
 		int32							m_iFracDigits;			// The number of digits to be displayed after the decimal point (when writing money). In common U.S. locales, this is the value 2
+		bool							m_bSymbolOnLeft;		// If true, the currency symbol is on the left side of the value
 
-		FallbackNumpunctData(CharT cDecimalPoint, CharT cThousandsSep, std::string sGrouping, std::basic_string<CharT> sCurrSymbol, std::basic_string<CharT> sPositiveSign, std::basic_string<CharT> sNegativeSign, int32 iFracDigits)
+		FallbackNumpunctData(CharT cDecimalPoint, CharT cThousandsSep, std::string sGrouping, std::basic_string<CharT> sCurrSymbol, std::basic_string<CharT> sPositiveSign, std::basic_string<CharT> sNegativeSign, int32 iFracDigits, bool bSymbolOnLeft)
 		{
-			Set(cDecimalPoint, cThousandsSep, sGrouping, sCurrSymbol, sPositiveSign, sNegativeSign, iFracDigits);
+			Set(cDecimalPoint, cThousandsSep, sGrouping, sCurrSymbol, sPositiveSign, sNegativeSign, iFracDigits, bSymbolOnLeft);
 		}
-		void Set(CharT cDecimalPoint, CharT cThousandsSep, std::string sGrouping, std::basic_string<CharT> sCurrSymbol, std::basic_string<CharT> sPositiveSign, std::basic_string<CharT> sNegativeSign, int32 iFracDigits)
+		void Set(CharT cDecimalPoint, CharT cThousandsSep, std::string sGrouping, std::basic_string<CharT> sCurrSymbol, std::basic_string<CharT> sPositiveSign, std::basic_string<CharT> sNegativeSign, int32 iFracDigits, bool bSymbolOnLeft)
 		{
 			m_cDecimalPoint = cDecimalPoint;
 			m_cThousandsSep = cThousandsSep;
@@ -57,6 +58,7 @@ class HyLocale
 			m_sPositiveSign = sPositiveSign;
 			m_sNegativeSign = sNegativeSign;
 			m_iFracDigits = iFracDigits;
+			m_bSymbolOnLeft = bSymbolOnLeft;
 		}
 	};
 	static FallbackNumpunctData<char>	sm_FallbackNumpunctData;

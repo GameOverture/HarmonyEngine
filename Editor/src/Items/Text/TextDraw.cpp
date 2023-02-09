@@ -86,11 +86,15 @@ void TextDraw::SetTextState(uint uiStateIndex)
 
 void TextDraw::SetPreviewText()
 {
+	QVariant propValue = static_cast<TextModel *>(m_pProjItem->GetModel())->GetFontManager().GetGlyphsModel()->FindPropertyValue("Uses Glyphs", TEXTPROP_AdditionalSyms);
+	QString sAdditionalGlyphs = propValue.toString();
+
 	m_Text.SetText(std::stringstream() <<
 		"The Quick Brown Fox Jumped Over The Lazy Dog!?\n" <<
 		"abcdefghijklmnopqrstuvwxyz\n" <<
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ\n" <<
-		"1234567890 !\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@");
+		"1234567890 !\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@\n" <<
+		sAdditionalGlyphs.toStdString().c_str());
 	
 	m_Text.SetTextAlignment(HYALIGN_Center);
 }

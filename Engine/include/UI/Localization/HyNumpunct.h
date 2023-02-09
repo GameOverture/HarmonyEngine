@@ -308,6 +308,34 @@ protected:
 			return HyLocale::GetFallbackNumpunctData<CharT>().m_iFracDigits;
 		return iNumFracDigits;
 	}
+
+	virtual std::money_base::pattern do_pos_format() const override
+	{
+		if(HyLocale::GetFallbackNumpunctData<CharT>().m_bSymbolOnLeft)
+			return std::moneypunct_byname<CharT, bIntSyms>::do_pos_format();
+
+		std::money_base::pattern posFormat;
+		posFormat.field[0] = std::money_base::sign;
+		posFormat.field[1] = std::money_base::value;
+		posFormat.field[2] = std::money_base::space;
+		posFormat.field[3] = std::money_base::symbol;
+
+		return posFormat;
+	}
+
+	virtual std::money_base::pattern do_neg_format() const override
+	{
+		if(HyLocale::GetFallbackNumpunctData<CharT>().m_bSymbolOnLeft)
+			return std::moneypunct_byname<CharT, bIntSyms>::do_neg_format();
+
+		std::money_base::pattern posFormat;
+		posFormat.field[0] = std::money_base::sign;
+		posFormat.field[1] = std::money_base::value;
+		posFormat.field[2] = std::money_base::space;
+		posFormat.field[3] = std::money_base::symbol;
+
+		return posFormat;
+	}
 };
 
 #endif /* HyNumpunct_h__ */

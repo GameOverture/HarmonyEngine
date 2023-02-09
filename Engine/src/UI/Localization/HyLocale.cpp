@@ -22,8 +22,8 @@
 /*static*/ std::string HyLocale::sm_sIso3166Code("US");
 /*static*/ std::string HyLocale::sm_sIso4217Code("USD");
 /*static*/ std::string HyLocale::sm_sMinorCurrencySymbol("\xC2\xA2"); // Cent symbol in UTF8
-/*static*/ HyLocale::FallbackNumpunctData<char> HyLocale::sm_FallbackNumpunctData('.', ',', "\003", "$", "+", "-", 2);
-/*static*/ HyLocale::FallbackNumpunctData<wchar_t> HyLocale::sm_FallbackNumpunctWideData(L'.', L',', "\003", L"$", L"+", L"-", 2);
+/*static*/ HyLocale::FallbackNumpunctData<char> HyLocale::sm_FallbackNumpunctData('.', ',', "\003", "$", "+", "-", 2, true);
+/*static*/ HyLocale::FallbackNumpunctData<wchar_t> HyLocale::sm_FallbackNumpunctWideData(L'.', L',', "\003", L"$", L"+", L"-", 2, true);
 /*static*/ std::map<std::string, int32>	HyLocale::sm_Iso4217Map;
 
 /*static*/ void HyLocale::Imbue(std::string sIso639Code, std::string sIso3166Code, std::string sIso4217Code)
@@ -463,16 +463,41 @@
 	if(sm_Iso4217Map.empty())
 	{
 		sm_Iso4217Map["PTS"] = 000;		// Points
-		sm_Iso4217Map["AED"] = 784;
-		sm_Iso4217Map["GBP"] = 826;
+		sm_Iso4217Map["USD"] = 840;
 		sm_Iso4217Map["EUR"] = 978;
-	}
-
-	if(sm_Iso4217Map.find(sm_sIso4217Code) == sm_Iso4217Map.end())
-	{
-		sm_FallbackNumpunctData.Set('.', ',', "\003", "$", "+", "-", 2);
-		sm_FallbackNumpunctWideData.Set(L'.', L',', "\003", L"$", L"+", L"-", 2);
-		return;
+		sm_Iso4217Map["JPY"] = 392;
+		sm_Iso4217Map["GBP"] = 826;
+		sm_Iso4217Map["AUD"] = 036;
+		sm_Iso4217Map["CHF"] = 756;
+		sm_Iso4217Map["CAD"] = 124;
+		sm_Iso4217Map["CNY"] = 156;
+		sm_Iso4217Map["HKD"] = 344;
+		sm_Iso4217Map["SGD"] = 702;
+		sm_Iso4217Map["NZD"] = 554;
+		sm_Iso4217Map["KRW"] = 410;
+		sm_Iso4217Map["NOK"] = 578;
+		sm_Iso4217Map["SEK"] = 752;
+		sm_Iso4217Map["DKK"] = 208;
+		sm_Iso4217Map["ZAR"] = 710;
+		sm_Iso4217Map["MXN"] = 484;
+		sm_Iso4217Map["BRL"] = 986;
+		sm_Iso4217Map["INR"] = 356;
+		sm_Iso4217Map["RUB"] = 643;
+		sm_Iso4217Map["TRY"] = 949;
+		sm_Iso4217Map["MYR"] = 458;
+		sm_Iso4217Map["PHP"] = 608;
+		sm_Iso4217Map["THB"] = 764;
+		sm_Iso4217Map["IDR"] = 360;
+		sm_Iso4217Map["SAR"] = 682;
+		sm_Iso4217Map["AED"] = 784;
+		sm_Iso4217Map["ILS"] = 376;
+		sm_Iso4217Map["UAH"] = 980;
+		sm_Iso4217Map["BYN"] = 933;
+		sm_Iso4217Map["CRC"] = 188;
+		sm_Iso4217Map["GYD"] = 328;
+		sm_Iso4217Map["NGN"] = 566;
+		sm_Iso4217Map["PEN"] = 604;
+		sm_Iso4217Map["KES"] = 404;
 	}
 
 	char cDecimalPoint, cThousandsSep;
@@ -487,30 +512,136 @@
 		cThousandsSep = '.';
 	}
 
-	int32 iFracDigits = 2;
-	switch(sm_Iso4217Map[sm_sIso4217Code])
+	int32 iIso4217Code = -1;
+	if(sm_Iso4217Map.find(sm_sIso4217Code) != sm_Iso4217Map.end())
+		iIso4217Code = sm_Iso4217Map[sm_sIso4217Code];
+
+	switch(iIso4217Code)
 	{
 	case 000: // PTS - Points or game credits (not actual currency)
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "PT", "+", "-", iFracDigits);
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "PT", "+", "-", 2, true);
 		break;
 
-	case 784: // AED - United Arab Emirates dirham
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "$", "+", "-", iFracDigits);
-		break;
-
-	case 826: // GBP - Pound Sterling
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xC2\xA3", "+", "-", iFracDigits); // \xC2\xA3 is the "Pound" symbol
+	case 840: // USD - United States dollar (US$)
+	case 036: // AUD - Australian dollar (A$)
+	case 124: // CAD - Canadian dollar (C$)
+	case 702: // SGD - Singapore dollar (S$)
+	case 554: // NZD - New Zealand dollar (NZ$)
+	case 484: // MXN - Mexican peso ($)
+	case 986: // BRL - Brazilian real (R$)
+	case 328: // GYD - Guyanese dollar (G$)
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "$", "+", "-", 2, true);
 		break;
 
 	case 978: // EUR - Euro
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xAC", "+", "-", iFracDigits); // \xE2\x82\xAC is the "Euro" symbol
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xAC", "+", "-", 2, true); // \xE2\x82\xAC is the "Euro" symbol
+		break;
+
+	case 392: // JPY - Japanese yen
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xC2\xA5", "+", "-", 0, true); // \xC2\xA5 is the "Yen" or "Yuan" symbol
+		break;
+
+	case 826: // GBP - Pound Sterling
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xC2\xA3", "+", "-", 2, true); // \xC2\xA3 is the "Pound" symbol
+		break;
+
+	case 756: // CHF - Swiss franc
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "CHF"/*sm_sIso639Code == "de" ? "Fr" : "fr"*/, "+", "-", 2, true);
+		break;
+
+	case 156: // CNY - Renminbi, China
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xC2\xA5", "+", "-", 2, true); // \xC2\xA5 is the "Yen" or "Yuan" symbol
+		break;
+
+	case 344: // HKD - Hong Kong dollar
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "HK$", "+", "-", 2, true);
+		break;
+
+	case 410: // KRW - South Korean won
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xA9", "+", "-", 2, true); // \xE2\x82\xA9 is the South Korean "Won" symbol
+		break;
+
+	case 578: // NOK - Norwegian krone
+	case 752: // SEK - Swedish krona
+	case 208: // DKK - Danish krone
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "kr", "+", "-", 2, false);
+		break;
+
+	case 710: // ZAR - South African rand
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "R", "+", "-", 2, true);
+		break;
+
+	case 356: // INR - Indian rupee
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xB9", "+", "-", 2, true); // \xE2\x82\xB9 is the Indian "rupee" symbol
+		break;
+
+	case 643: // RUB - Russian ruble
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xBD", "+", "-", 2, false); // \xE2\x82\xBD is the "Ruble" symbol
+		break;
+
+	case 949: // TRY - Turkish lira
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xBA", "+", "-", 2, true); // \xE2\x82\xBA is the Turkish "Lira" symbol
+		break;
+
+	case 458: // MYR - Malaysian ringgit
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "RM", "+", "-", 2, true);
+		break;
+
+	case 608: // PHP - Philippine peso
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xB1", "+", "-", 2, true); // \xE2\x82\xB1 is the Philippine "peso" symbol
+		break;
+
+	case 764: // THB - Thai baht
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE0\xB8\xBF", "+", "-", 2, true); // \xE0\xB8\xBF is the Thai "baht" symbol
+		break;
+
+	case 360: // IDR - Indonesian rupiah
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "Rp", "+", "-", 2, true);
+		break;
+
+	case 682: // SAR - Saudi riyal
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "SAR", "+", "-", 2, false);
+		break;
+
+	case 784: // AED - United Arab Emirates dirham
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "Dhs", "+", "-", 2, true);
+		break;
+
+	case 376: // ILS - Israeli new shekel
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xAA", "+", "-", 2, true); // \xE2\x82\xAA is the Israeli "new shekel" symbol
+		break;
+
+	case 980: // UAH - Ukrainian hryvnia
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xB4", "+", "-", 2, true); // \xE2\x82\xB4 is the Ukrainian "hryvnia" symbol
+		break; 
+
+	case 933: // BYN - Belarusian ruble
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "Rbls", "+", "-", 2, true);
+		break;
+
+	case 188: // CRC - Costa Rican colon
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xA1", "+", "-", 2, true); // \xE2\x82\xA1 is the Costa Rican "colon" symbol
+		break;
+
+	case 566: // NGN - Nigerian naira
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "\xE2\x82\xA6", "+", "-", 2, true); // \xE2\x82\xA6 is the Nigerian "naira" symbol
+		break;
+
+	case 604: // PEN - Peruvian sol
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "S/", "+", "-", 2, true);
+		break;
+
+	case 404: // KES - Kenyan shilling
+		sm_FallbackNumpunctData.Set('/', cThousandsSep, "\003", "KSh", "+", "-", 2, true);
 		break;
 
 	default:
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", "$", "+", "-", iFracDigits);
-		sm_FallbackNumpunctWideData.Set(L'.', L',', "\003", L"$", L"+", L"-", iFracDigits);
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", sm_sIso4217Code.empty() ? "$" : sm_sIso4217Code.c_str(), "+", "-", 2, true);
 		break;
 	}
+
+	// TODO: Set wide fallback as above, but using wide characters
+	sm_FallbackNumpunctWideData.Set(L'.', L',', sm_FallbackNumpunctData.m_sGrouping, L"$", L"+", L"-", sm_FallbackNumpunctData.m_iFracDigits, sm_FallbackNumpunctData.m_bSymbolOnLeft);
 }
 
 template<typename CharT>
