@@ -705,7 +705,10 @@ offsetCalculation:
 
 				const HyTextGlyph *pGlyphRef = pData->GetGlyph(this->m_uiState, uiLayerIndex, m_Utf32CodeList[uiStrIndex]);
 				if(pGlyphRef == nullptr)
+				{
+					uiNumUnprintableCharacters++;
 					break;
+				}
 
 				float fKerning = 0.0f;
 				if(bFirstCharacterOnNewLine)
