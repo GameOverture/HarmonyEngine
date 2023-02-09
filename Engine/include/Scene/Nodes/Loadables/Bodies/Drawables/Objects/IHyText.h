@@ -85,6 +85,8 @@ public:
 
 	const IHyText &operator=(const IHyText &rhs);
 
+	bool IsGlyphAvailable(const std::string sUtf8Character); // Pass a single utf8 character, returns whether that character exists in the font
+
 	const std::string &GetUtf8String() const;
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'

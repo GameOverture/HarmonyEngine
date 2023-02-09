@@ -33,6 +33,8 @@ public:
 	HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent = nullptr);
 	virtual ~HyRichText();
 
+	bool IsGlyphAvailable(std::string sUtf8Character);
+
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
 

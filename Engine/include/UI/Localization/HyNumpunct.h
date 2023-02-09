@@ -183,11 +183,20 @@ protected:
 
 	virtual std::basic_string<CharT> do_curr_symbol() const override
 	{
-		std::string sCurrSym = std::moneypunct_byname<CharT, bIntSyms>::do_curr_symbol();
-		if(sCurrSym.empty())
-			return HyLocale::GetFallbackNumpunctData<CharT>().m_sCurrSymbol;
+		//std::string sCurrSym = std::moneypunct_byname<CharT, bIntSyms>::do_curr_symbol();
+		//if(sCurrSym.empty())
+		//{
+			if(m_NumberFormat.IsUsingCurrencySymbol())
+				return HyLocale::GetFallbackNumpunctData<CharT>().m_sCurrSymbol;
+			else
+			{
+				std::basic_string<CharT> sIsoCodeWithSpace = HyLocale::sm_sIso4217Code;
+				sIsoCodeWithSpace += " ";
+				return sIsoCodeWithSpace;
+			}
+		//}
 
-		return sCurrSym;
+	//	return sCurrSym;
 	}
 
 	// Provides the string to indicate a positive value

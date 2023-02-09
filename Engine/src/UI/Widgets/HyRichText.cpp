@@ -45,6 +45,15 @@ HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextN
 	}
 }
 
+bool HyRichText::IsGlyphAvailable(std::string sUtf8Character)
+{
+	HyText2d *pNewText = HY_NEW HyText2d(m_sTextPrefix, m_sTextName, this);
+	bool bIsAvailable = pNewText->IsGlyphAvailable(sUtf8Character);
+	delete pNewText;
+
+	return bIsAvailable;
+}
+
 /*virtual*/ float HyRichText::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
 	return m_uiColumnWidth * fPercent;

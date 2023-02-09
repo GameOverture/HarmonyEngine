@@ -61,12 +61,13 @@ class HyNumberFormat
 
 	uint32	m_uiUseMinorCurrencySymbol : 1;
 	uint32	m_uiUseScientificNotation : 1;
+	uint32	m_uiUseCurrencySymbol : 1;
 
 	uint32	m_uiFillIntegerZeros : 7;
 
 	uint32	m_uiMinFraction : 4;
 	uint32	m_uiMaxFraction : 4;
-	// Total bits used: 27
+	// Total bits used: 28
 
 public:
 	HyNumberFormat();
@@ -106,6 +107,11 @@ public:
 	bool IsUsingScientificNotation() const;
 	// Whether to optionally format floating-point values using scientific notation
 	HyNumberFormat SetUsingScientificNotation(bool bUseScientificNotation);
+
+	// Whether to use the currency symbol (e.g. $), otherwise it will try to use the ISO currency code (e.g. USD)
+	bool IsUsingCurrencySymbol() const;
+	// Whether to use the currency symbol (e.g. $), otherwise it will try to use the ISO currency code (e.g. USD)
+	HyNumberFormat SetUsingCurrencySymbol(bool bUseCurrencySymbol);
 
 	// Minimum number of integer digits to display. Will pad with zeros.
 	// Valid values for 'iZeroPaddingPlaces' [0-127]

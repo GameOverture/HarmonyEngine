@@ -86,6 +86,7 @@ public:
 	static std::string Money_Format(int64 iValue, HyNumberFormat format = HyNumberFormat());
 	static std::string Money_Format(double dValue, HyNumberFormat format = HyNumberFormat());
 	static int32 Money_GetNumFractionalDigits();
+	static std::string Money_GetCurrencySymbol();
 
 	static std::string Percent_Format(double dValue, HyNumberFormat format = HyNumberFormat());
 

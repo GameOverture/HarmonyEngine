@@ -20,6 +20,7 @@ HyNumberFormat::HyNumberFormat()
 
 	m_uiUseMinorCurrencySymbol = 0;
 	m_uiUseScientificNotation = 0;
+	m_uiUseCurrencySymbol = 1;
 	
 	m_uiFillIntegerZeros = 1;
 
@@ -36,6 +37,7 @@ HyNumberFormat::HyNumberFormat(const HyNumberFormat &copyRef)
 
 	m_uiUseMinorCurrencySymbol = copyRef.m_uiUseMinorCurrencySymbol;
 	m_uiUseScientificNotation = copyRef.m_uiUseScientificNotation;
+	m_uiUseCurrencySymbol = copyRef.m_uiUseCurrencySymbol;
 
 	m_uiFillIntegerZeros = copyRef.m_uiFillIntegerZeros;
 
@@ -52,6 +54,7 @@ HyNumberFormat &HyNumberFormat::operator=(const HyNumberFormat &rhs)
 
 	m_uiUseMinorCurrencySymbol = rhs.m_uiUseMinorCurrencySymbol;
 	m_uiUseScientificNotation = rhs.m_uiUseScientificNotation;
+	m_uiUseCurrencySymbol = rhs.m_uiUseCurrencySymbol;
 
 	m_uiFillIntegerZeros = rhs.m_uiFillIntegerZeros;
 
@@ -132,6 +135,17 @@ bool HyNumberFormat::IsUsingScientificNotation() const
 HyNumberFormat HyNumberFormat::SetUsingScientificNotation(bool bUseScientificNotation)
 {
 	m_uiUseScientificNotation = bUseScientificNotation ? 1 : 0;
+	return *this;
+}
+
+bool HyNumberFormat::IsUsingCurrencySymbol() const
+{
+	return (m_uiUseCurrencySymbol == 1);
+}
+
+HyNumberFormat HyNumberFormat::SetUsingCurrencySymbol(bool bUseCurrencySymbol)
+{
+	m_uiUseCurrencySymbol = bUseCurrencySymbol ? 1 : 0;
 	return *this;
 }
 

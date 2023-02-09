@@ -194,7 +194,11 @@
 #else
 	std::locale loc = AssembleStdLocale();
 	std::stringstream str;
-	str.imbue(std::locale(loc, new HyMoneypunct<char, false, int64>(format, iValue, loc.name())));
+	//if(format.IsUsingCurrencySymbol())
+		str.imbue(std::locale(loc, new HyMoneypunct<char, false, int64>(format, iValue, loc.name())));
+	//else
+	//	str.imbue(std::locale(loc, new HyMoneypunct<char, true, int64>(format, iValue, loc.name())));
+
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -252,7 +256,11 @@
 	std::locale loc = AssembleStdLocale();
 
 	std::stringstream str;
-	str.imbue(std::locale(loc, new HyMoneypunct<char, false, double>(format, dValue, loc.name())));
+	//if(format.IsUsingCurrencySymbol())
+		str.imbue(std::locale(loc, new HyMoneypunct<char, false, double>(format, dValue, loc.name())));
+	//else
+	//	str.imbue(std::locale(loc, new HyMoneypunct<char, true, double>(format, dValue, loc.name())));
+
 	if(format.m_uiDecimalSeparator == HYFMTDECIMAL_Always)
 		str.setf(std::ios_base::showpoint);
 	if(format.m_uiSign == HYFMTSIGN_Always ||
@@ -302,6 +310,11 @@
 #else
 	return std::use_facet<std::moneypunct<char>>(AssembleStdLocale()).frac_digits();
 #endif
+}
+
+/*static*/ std::string HyLocale::Money_GetCurrencySymbol()
+{
+	return sm_FallbackNumpunctData.m_sCurrSymbol;
 }
 
 /*static*/ std::string HyLocale::Percent_Format(double dValue, HyNumberFormat format /*= HyNumberFormat()*/)
@@ -635,9 +648,12 @@
 		sm_FallbackNumpunctData.Set('/', cThousandsSep, "\003", "KSh", "+", "-", 2, true);
 		break;
 
-	default:
-		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", sm_sIso4217Code.empty() ? "$" : sm_sIso4217Code.c_str(), "+", "-", 2, true);
-		break;
+	default: {
+		std::string sCurrCodeWithSpace = sm_sIso4217Code.c_str();
+		if(sm_sIso4217Code.empty() == false)
+			sCurrCodeWithSpace += " ";
+		sm_FallbackNumpunctData.Set(cDecimalPoint, cThousandsSep, "\003", sCurrCodeWithSpace, "+", "-", 2, true);
+		break; }
 	}
 
 	// TODO: Set wide fallback as above, but using wide characters

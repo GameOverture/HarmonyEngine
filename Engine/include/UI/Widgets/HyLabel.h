@@ -63,6 +63,7 @@ public:
 	virtual void SetSpriteState(uint32 uiStateIndex);
 	void SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl);
 
+	bool IsGlyphAvailable(std::string sUtf8Character);
 	std::string GetUtf8String() const;
 	void SetText(const std::stringstream &ssUtf8Text);
 	virtual void SetText(const std::string &sUtf8Text);

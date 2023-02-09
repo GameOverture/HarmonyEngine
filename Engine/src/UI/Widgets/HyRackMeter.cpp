@@ -262,6 +262,8 @@ float HyRackMeter::GetSpinHeightThreshold()
 
 void HyRackMeter::FormatDigits()
 {
+	m_NumberFormat.SetUsingCurrencySymbol(m_Text.IsGlyphAvailable(HyLocale::Money_GetCurrencySymbol()));
+
 	if(IsShowAsCash())
 		m_Text.SetText(HyLocale::Money_Format(m_iCurValue, m_NumberFormat));
 	else

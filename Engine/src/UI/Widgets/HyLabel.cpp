@@ -186,6 +186,11 @@ void HyLabel::SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl)
 	ResetTextAndPanel();
 }
 
+bool HyLabel::IsGlyphAvailable(std::string sUtf8Character)
+{
+	return m_Text.IsGlyphAvailable(sUtf8Character);
+}
+
 /*virtual*/ std::string HyLabel::GetUtf8String() const
 {
 	return m_Text.GetUtf8String();
