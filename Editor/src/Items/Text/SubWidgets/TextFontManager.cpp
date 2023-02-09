@@ -409,7 +409,7 @@ void TextFontManager::SetColors(TextLayerHandle hLayer, const QColor &topColor, 
 
 void TextFontManager::RegenAtlas()
 {
-	RegenFontArray();
+	//RegenFontArray();
 
 	m_uiPreviewAtlasGrowSize = 0;
 	ClearAndEmbiggenAtlas();

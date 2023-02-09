@@ -55,6 +55,7 @@ public:
 	template<typename HYDATATYPE>
 	void GuiOverrideData(HyJsonObj itemDataObj)
 	{
+		// TODO: THREAD SAFETY FIX! Ensure HarmonyWidget::paintGL() doesn't invoke m_pHyEngine->Update() while we delete/reallocate 'm_pData'
 		delete m_pData;
 		m_pData = HY_NEW HYDATATYPE(HY_GUI_DATAOVERRIDE, itemDataObj, *IHyLoadable::sm_pHyAssets);
 		OnDataAcquired();

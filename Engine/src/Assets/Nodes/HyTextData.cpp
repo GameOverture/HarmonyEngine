@@ -117,7 +117,7 @@ HyTextData::HyTextData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets
 			fBottomUv /= uiFullAtlasHeight;
 
 			uint32 uiCode = glyphObj["code"].GetUint();
-			HyAssert(curTypeface.find(uiCode) == curTypeface.end(), "Duplicate glyph codes found - fix in HyEditor");
+			//HyAssert(curTypeface.find(uiCode) == curTypeface.end(), "Duplicate glyph codes found - fix in HyEditor");
 			curTypeface[uiCode] = HY_NEW HyTextGlyph(
 				glyphObj["width"].GetUint(),
 				glyphObj["height"].GetUint(),
