@@ -99,6 +99,33 @@ QModelIndexList ITreeModel::GetAllIndices() const
 	return returnList;
 }
 
+void ITreeModel::MoveTreeItem(TreeModelItemData *pSourceItemData, TreeModelItemData *pDestinationParent, int32 iDestRow)
+{
+	QModelIndex sourceIndex = FindIndex<TreeModelItemData *>(pSourceItemData, 0);
+	TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
+
+	QModelIndex destParentIndex = FindIndex<TreeModelItemData *>(pDestinationParent, 0);
+	TreeModelItem *pDestParentTreeItem = GetItem(destParentIndex);
+
+	int iSourceIndex = pSourceTreeItem->GetIndex();
+
+	// Appease the stupid Qt API - if sourceParent and destinationParent are the same, you must ensure
+	// that the destinationChild is not within the range of sourceFirst and sourceLast + 1
+	int iQtDestRow = iDestRow;
+	if(sourceIndex.parent() == destParentIndex && (iSourceIndex + 1) == iDestRow)
+		iQtDestRow = iDestRow + 1;
+
+	// Move tree item to new location
+	bool bValidMove = beginMoveRows(sourceIndex.parent(), iSourceIndex, iSourceIndex, destParentIndex, iQtDestRow);
+	if(bValidMove == false)
+	{
+		HyGuiLog("ITreeModel::MoveTreeItem - beginMoveRows returned false", LOGTYPE_Error);
+		return;
+	}
+	pSourceTreeItem->GetParent()->MoveChild(iSourceIndex, pDestParentTreeItem, iDestRow);
+	endMoveRows();
+}
+
 /*virtual*/ QVariant ITreeModel::headerData(int iSection, Qt::Orientation orientation, int iRole /*= Qt::DisplayRole*/) const /*override*/
 {
 	if(iRole == Qt::TextAlignmentRole)

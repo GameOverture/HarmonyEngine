@@ -159,6 +159,45 @@ EntityUndoCmd_SelectionChanged::EntityUndoCmd_SelectionChanged(ProjectItemData &
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> selectedItemDataList, QList<int> prevItemIndexList, QList<int> newItemIndexList, bool bOrderUpwards, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_SelectedItemDataList(selectedItemDataList),
+	m_PrevItemIndexList(prevItemIndexList),
+	m_NewItemIndexList(newItemIndexList),
+	m_bOrderUpwards(bOrderUpwards)
+{
+	EntityTreeModel &treeModelRef = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
+	if(m_bOrderUpwards)
+		setText(m_SelectedItemDataList.size() == 1 ? "Order Child Upwards" : "Order Children Upwards");
+	else
+		setText(m_SelectedItemDataList.size() == 1 ? "Order Child Downwards" : "Order Children Downwards");
+}
+
+/*virtual*/ EntityUndoCmd_OrderChildren::~EntityUndoCmd_OrderChildren()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_OrderChildren::redo() /*override*/
+{
+	EntityModel *pModel = static_cast<EntityModel *>(m_EntityItemRef.GetModel());
+	EntityTreeModel &entTreeModelRef = pModel->GetTreeModel();
+
+	for(int i = 0; i < m_SelectedItemDataList.size(); ++i)
+		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetEntityTreeItemData(), m_NewItemIndexList[i]);
+
+	//pModel->
+}
+
+/*virtual*/ void EntityUndoCmd_OrderChildren::undo() /*override*/
+{
+	EntityTreeModel &entTreeModelRef = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
+
+	for(int i = m_SelectedItemDataList.size() - 1; i >= 0; --i)
+		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetEntityTreeItemData(), m_PrevItemIndexList[i]);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_AffectedItemDataList(affectedItemDataList),
@@ -191,9 +230,6 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
 	}
-
-	if(m_EntityItemRef.GetDraw())
-		static_cast<EntityDraw *>(m_EntityItemRef.GetDraw())->RefreshTransforms();
 }
 
 /*virtual*/ void EntityUndoCmd_Transform::undo() /*override*/
@@ -212,7 +248,4 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
 	}
-
-	if(m_EntityItemRef.GetDraw())
-		static_cast<EntityDraw *>(m_EntityItemRef.GetDraw())->RefreshTransforms();
 }

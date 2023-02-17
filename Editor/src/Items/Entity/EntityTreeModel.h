@@ -29,7 +29,7 @@ class EntityTreeItemData : public TreeModelItemData
 	bool												m_bIsSelected;
 
 public:
-	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem, QUuid uuidOfThis);
 	EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj);
 	virtual ~EntityTreeItemData();
 

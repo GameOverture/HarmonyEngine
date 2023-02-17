@@ -306,10 +306,92 @@ void EntityWidget::on_actionAddShape_triggered()
 
 void EntityWidget::on_actionOrderChildrenUp_triggered()
 {
+	QModelIndexList selectedIndexList = ui->nodeTree->selectionModel()->selectedIndexes();
+	std::sort(selectedIndexList.begin(), selectedIndexList.end(), [](const QModelIndex &a, const QModelIndex &b)
+		{
+			return a.row() < b.row();
+		});
+
+	QList<EntityTreeItemData *> selectedItemDataList;
+	QList<int> curIndexList;
+	QList<int> newIndexList;
+	int iDiscardTopIndices = -1;
+	for(QModelIndex index : selectedIndexList)
+	{
+		// Only take selected items that are the first column, and they're children under the root entity tree item
+		if(index.column() != 0 || index.parent().row() != 0)
+			continue;
+
+		if(iDiscardTopIndices == -1 && index.row() == 0)
+			iDiscardTopIndices = 0;
+		else if((iDiscardTopIndices + 1) == index.row())
+			iDiscardTopIndices = index.row();
+
+		EntityTreeItemData *pEntTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		selectedItemDataList.push_back(pEntTreeItemData);
+
+		int iRow = index.row();
+		curIndexList.push_back(iRow);
+		newIndexList.push_back(iRow - 1);
+	}
+
+	while(iDiscardTopIndices >= 0)
+	{
+		selectedItemDataList.takeFirst();
+		curIndexList.takeFirst();
+		newIndexList.takeFirst();
+
+		iDiscardTopIndices--;
+	}
+
+	QUndoCommand *pCmd = new EntityUndoCmd_OrderChildren(m_ItemRef, selectedItemDataList, curIndexList, newIndexList, true);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionOrderChildrenDown_triggered()
 {
+	QModelIndexList selectedIndexList = ui->nodeTree->selectionModel()->selectedIndexes();
+	std::sort(selectedIndexList.begin(), selectedIndexList.end(), [](const QModelIndex &a, const QModelIndex &b)
+		{
+			return a.row() > b.row();
+		});
+
+	int iNumChildren = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().GetEntityTreeItem()->GetNumChildren();
+
+	QList<EntityTreeItemData *> selectedItemDataList;
+	QList<int> curIndexList;
+	QList<int> newIndexList;
+	int iDiscardBotIndices = -1;
+	for(QModelIndex index : selectedIndexList)
+	{
+		// Only take selected items that are the first column, and they're children under the root entity tree item
+		if(index.column() != 0 || index.parent().row() != 0)
+			continue;
+
+		if(iDiscardBotIndices == -1 && index.row() == (iNumChildren - 1))
+			iDiscardBotIndices = (iNumChildren - 1);
+		else if((iDiscardBotIndices - 1) == index.row())
+			iDiscardBotIndices = index.row();
+
+		EntityTreeItemData *pEntTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		selectedItemDataList.push_back(pEntTreeItemData);
+
+		int iRow = index.row();
+		curIndexList.push_back(iRow);
+		newIndexList.push_back(iRow + 1);
+	}
+
+	while(iDiscardBotIndices >= 0 && iDiscardBotIndices < iNumChildren)
+	{
+		selectedItemDataList.takeFirst();
+		curIndexList.takeFirst();
+		newIndexList.takeFirst();
+
+		iDiscardBotIndices++;
+	}
+
+	QUndoCommand *pCmd = new EntityUndoCmd_OrderChildren(m_ItemRef, selectedItemDataList, curIndexList, newIndexList, false);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionRemoveItems_triggered()

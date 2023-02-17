@@ -16,9 +16,9 @@
 
 #include <QVariant>
 
-EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem) :
+EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem, QUuid uuidOfThis) :
 	TreeModelItemData(eItemType, sCodeName),
-	m_Uuid(QUuid::createUuid()),
+	m_Uuid(uuidOfThis),
 	m_ItemUuid(uuidOfItem),
 	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this))),
 	m_bIsSelected(false)
@@ -177,7 +177,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef.GetItem(), sEntityCodeName, ITEM_Entity, uuidOfEntity);
+	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef.GetItem(), sEntityCodeName, ITEM_Entity, uuidOfEntity, uuidOfEntity);
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pThisEntityItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -286,7 +286,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjIt
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pProjItem->GetName(false));
 	
 	// Allocate and store the new item in the tree model
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pProjItem->GetType(), pProjItem->GetUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pProjItem->GetType(), pProjItem->GetUuid(), QUuid::createUuid());
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pNewItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -340,7 +340,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewPrimitiveChild(QString sCodeNa
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + "Primitive");
 
 	// Allocate and store the new item in the tree model
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, ITEM_Primitive, QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, ITEM_Primitive, QUuid(), QUuid::createUuid());
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pNewItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)

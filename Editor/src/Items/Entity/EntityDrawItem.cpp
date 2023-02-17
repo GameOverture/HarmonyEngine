@@ -121,7 +121,7 @@ void EntityDrawItem::RefreshJson(HyCamera2d *pCamera, QJsonObject childObj)
 	QJsonArray scaleArray = transformObj["Scale"].toArray();
 	m_pChild->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
 
-	RefreshTransform(pCamera);
+	//RefreshTransform(pCamera);
 
 	m_bStale = false;
 }

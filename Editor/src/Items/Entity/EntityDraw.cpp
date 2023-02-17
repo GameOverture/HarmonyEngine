@@ -349,6 +349,9 @@ void EntityDraw::OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataL
 {
 	for(EntityTreeItemData *pDeselectItem : deselectedItemDataList)
 	{
+		if(m_pProjItem->GetUuid() == pDeselectItem->GetItemUuid())
+			continue;
+
 		bool bFound = false;
 		for(EntityDrawItem *pDrawItem : m_ItemList)
 		{
@@ -368,6 +371,9 @@ void EntityDraw::OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataL
 
 	for(EntityTreeItemData *pTreeItemData : selectedItemDataList)
 	{
+		if(m_pProjItem->GetUuid() == pTreeItemData->GetItemUuid())
+			continue;
+
 		// Search for the corresponding EntityItemDraw to the current 'pTreeItemData'
 		bool bFound = false;
 		for(EntityDrawItem *pDrawItem : m_ItemList)
@@ -381,7 +387,7 @@ void EntityDraw::OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataL
 		}
 
 		if(bFound == false)
-			HyGuiLog("EntityDraw::GetSelectedItems() could not find matching EntityItemDraw for a selected item: " % pTreeItemData->GetCodeName(), LOGTYPE_Error);
+			HyGuiLog("EntityDraw::OnSelectionChange() could not find matching EntityItemDraw for a selected item: " % pTreeItemData->GetCodeName(), LOGTYPE_Error);
 	}
 	
 	for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
@@ -458,6 +464,8 @@ void EntityDraw::RefreshTransforms()
 	{
 		QJsonObject shapeObj = shapeArray[i].toObject();
 	}
+
+	RefreshTransforms();
 }
 
 /*virtual*/ void EntityDraw::OnShow() /*override*/
