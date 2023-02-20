@@ -66,7 +66,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				break;
 			}
 		[[fallthrough]];
-		case Qt::CrossCursor:
+		case Qt::ArrowCursor:
 			RequestSelection(QList<EntityDrawItem *>());
 			m_DragState = DRAGSTATE_Marquee;
 			break;
@@ -282,7 +282,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		}
 		else
 		{
-			Qt::CursorShape eNextCursorShape = Qt::CrossCursor;
+			Qt::CursorShape eNextCursorShape = Qt::ArrowCursor;
 
 			m_bCurHoverMultiTransform = false;
 			m_pCurHoverItem = nullptr;
@@ -293,7 +293,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				m_eCurHoverGrabPoint = m_MultiTransform.IsMouseOverGrabPoint();
 				eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, m_MultiTransform.GetCachedRotation());
 
-				if(eNextCursorShape == Qt::CrossCursor)
+				if(eNextCursorShape == Qt::ArrowCursor)
 				{
 					if(m_MultiTransform.IsMouseOverBoundingVolume())
 					{
@@ -305,7 +305,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 					m_bCurHoverMultiTransform = true;
 			}
 
-			if(eNextCursorShape == Qt::CrossCursor) // Not hovering over multi-transform control
+			if(eNextCursorShape == Qt::ArrowCursor) // Not hovering over multi-transform control
 			{
 				if(m_SelectedItemList.size() == 1)
 				{
@@ -313,7 +313,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 					m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
 					eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation());
-					if(eNextCursorShape == Qt::CrossCursor)
+					if(eNextCursorShape == Qt::ArrowCursor)
 					{
 						if(transformCtrlRef.IsMouseOverBoundingVolume())
 						{
@@ -325,7 +325,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 						m_pCurHoverItem = m_SelectedItemList[0];
 				}
 
-				if(eNextCursorShape == Qt::CrossCursor) // Not hovering over multi-transform control or the any selected item
+				if(eNextCursorShape == Qt::ArrowCursor) // Not hovering over multi-transform control or the any selected item
 				{
 					for(int32 i = 0; i < m_ItemList.size(); ++i)
 					{
@@ -557,7 +557,7 @@ Qt::CursorShape EntityDraw::GetGrabPointCursorShape(GrabPoint eGrabPoint, float 
 	{
 	default:
 	case GRAB_None:
-		return Qt::CrossCursor;
+		return Qt::ArrowCursor;
 
 	case GRAB_BotLeft:
 		return fpRotateCursor(Qt::SizeBDiagCursor, iThresholds);

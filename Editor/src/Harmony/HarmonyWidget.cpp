@@ -73,7 +73,7 @@ void HarmonyWidget::SetCursorShape(Qt::CursorShape eShape)
 
 void HarmonyWidget::RestoreCursorShape()
 {
-	setCursor(Qt::CrossCursor);
+	setCursor(Qt::ArrowCursor);
 }
 
 HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
