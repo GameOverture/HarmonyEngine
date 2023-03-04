@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
-    <height>396</height>
+    <width>671</width>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>580</width>
+     <width>671</width>
      <height>21</height>
     </rect>
    </property>
@@ -211,36 +211,6 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidgetOutputLog">
-   <property name="allowedAreas">
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string>Output Log</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>8</number>
-   </attribute>
-   <widget class="QWidget" name="outputLogContents">
-    <layout class="QVBoxLayout" name="verticalLayout_4">
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="WidgetOutputLog" name="outputLog" native="true"/>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QDockWidget" name="dockWidgetAssets">
    <property name="mouseTracking">
     <bool>false</bool>
@@ -278,6 +248,78 @@
        <widget class="QWidget" name="tabAudio">
         <attribute name="title">
          <string>Audio</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidgetAuxiliary">
+   <property name="windowTitle">
+    <string>Aux</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="tabWidgetAux">
+       <property name="tabPosition">
+        <enum>QTabWidget::South</enum>
+       </property>
+       <property name="currentIndex">
+        <number>2</number>
+       </property>
+       <widget class="QWidget" name="tabOutputLog">
+        <attribute name="title">
+         <string>Output</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="WidgetOutputLog" name="outputLog" native="true"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabPreview">
+        <attribute name="title">
+         <string>Preview</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="tabToolBox">
+        <attribute name="title">
+         <string>ToolBox</string>
         </attribute>
        </widget>
       </widget>
