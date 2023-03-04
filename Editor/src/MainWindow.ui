@@ -145,10 +145,9 @@
    <addaction name="actionCloseProject"/>
    <addaction name="actionProjectSettings"/>
    <addaction name="separator"/>
-   <addaction name="actionNewBuild"/>
-   <addaction name="actionConnect"/>
-   <addaction name="separator"/>
-   <addaction name="actionShowGrid"/>
+   <addaction name="actionShowGridBackground"/>
+   <addaction name="actionShowGridOrigin"/>
+   <addaction name="actionShowGridOverlay"/>
    <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -534,7 +533,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../data/HyEditor.qrc">
+    <iconset>
      <normaloff>:/icons16x16/items/Entity2d-New.png</normaloff>:/icons16x16/items/Entity2d-New.png</iconset>
    </property>
    <property name="text">
@@ -707,22 +706,22 @@
     <string>Change build settings for currently active project</string>
    </property>
   </action>
-  <action name="actionShowGrid">
+  <action name="actionShowGridOverlay">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/view-guides.png</normaloff>:/icons16x16/view-guides.png</iconset>
+     <normaloff>:/icons16x16/showGrid-Overlay.png</normaloff>:/icons16x16/showGrid-Overlay.png</iconset>
    </property>
    <property name="text">
-    <string>ShowGrid</string>
+    <string>Show Grid Overlay</string>
    </property>
    <property name="toolTip">
     <string>Toggles a grid overlay in the preview window</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+G</string>
+    <string>Ctrl+Alt+Shift+G</string>
    </property>
   </action>
   <action name="actionTheme_Decemberween">
@@ -740,6 +739,42 @@
    </property>
    <property name="toolTip">
     <string>Update the location of the Harmony engine repository</string>
+   </property>
+  </action>
+  <action name="actionShowGridOrigin">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/showGrid-Origin.png</normaloff>:/icons16x16/showGrid-Origin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Grid Origin</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggles origin guides in the preview window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+Shift+O</string>
+   </property>
+  </action>
+  <action name="actionShowGridBackground">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/showGrid-Background.png</normaloff>:/icons16x16/showGrid-Background.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Grid Background</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggles a grid background in the preview window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+Shift+B</string>
    </property>
   </action>
  </widget>

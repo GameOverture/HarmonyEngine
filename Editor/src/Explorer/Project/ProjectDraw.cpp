@@ -194,19 +194,21 @@ ProjectDraw::ProjectDraw() :
 	lineList[0].y = 0.0f;
 	lineList[1].x = fDIMENSION_SIZE * 0.5f;
 	lineList[1].y = 0.0f;
-	m_OriginHorz.SetLineThickness(2.0f);
+	m_OriginHorz.SetLineThickness(1.0f);
 	m_OriginHorz.SetTint(HyColor::White);
 	m_OriginHorz.SetVisible(false);
 	m_OriginHorz.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+	m_OriginHorz.UseWindowCoordinates();
 
 	lineList[0].x = 0.0f;
 	lineList[0].y = -fDIMENSION_SIZE * 0.5f;
 	lineList[1].x = 0.0f;
 	lineList[1].y = fDIMENSION_SIZE * 0.5f;
-	m_OriginVert.SetLineThickness(2.0f);
+	m_OriginVert.SetLineThickness(1.0f);
 	m_OriginVert.SetTint(HyColor::White);
 	m_OriginVert.SetVisible(false);
 	m_OriginVert.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+	m_OriginVert.UseWindowCoordinates();
 
 	ChildAppend(m_OriginHorz);
 	ChildAppend(m_OriginVert);
@@ -228,13 +230,27 @@ ProjectDraw::ProjectDraw() :
 {
 }
 
-void ProjectDraw::EnableOrigin(bool bEnable)
+/*virtual*/ void ProjectDraw::OnDrawUpdate() /*override*/
+{
+	glm::vec2 m_ptCameraPos;
+	m_pCamera->ProjectToCamera(glm::vec2(0.0f, 0.0f), m_ptCameraPos);
+
+	m_OriginHorz.pos.Set(m_ptCameraPos);
+	m_OriginVert.pos.Set(m_ptCameraPos);
+}
+
+void ProjectDraw::EnableGridBackground(bool bEnable)
+{
+	m_CheckerGrid.SetVisible(bEnable);
+}
+
+void ProjectDraw::EnableGridOrigin(bool bEnable)
 {
 	m_OriginHorz.SetVisible(bEnable);
 	m_OriginVert.SetVisible(bEnable);
 }
 
-void ProjectDraw::EnableOverGrid(bool bEnable)
+void ProjectDraw::EnableGridOverlay(bool bEnable)
 {
 	m_OverGrid.SetVisible(bEnable);
 }

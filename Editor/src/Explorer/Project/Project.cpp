@@ -630,17 +630,28 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 	}
 }
 
-void Project::ShowGrid(bool bShow)
+void Project::ShowGridBackground(bool bShow)
 {
 	if(m_pDraw == nullptr)
 		return;
 
-	m_pDraw->EnableOverGrid(bShow);
+	m_pDraw->EnableGridBackground(bShow);
 }
 
-void Project::ShowOrigin(bool bShow)
+void Project::ShowGridOrigin(bool bShow)
 {
-	m_pDraw->EnableOrigin(bShow);
+	if(m_pDraw == nullptr)
+		return;
+
+	m_pDraw->EnableGridOrigin(bShow);
+}
+
+void Project::ShowGridOverlay(bool bShow)
+{
+	if(m_pDraw == nullptr)
+		return;
+
+	m_pDraw->EnableGridOverlay(bShow);
 }
 
 void Project::SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk)
@@ -899,6 +910,12 @@ void Project::SaveUserData() const
 		settings.setValue(HyGlobal::AssetName(ASSET_Atlas), m_pAtlasWidget->GetExpandedFilters());
 		//settings.setValue(HyGlobal::AssetName(ASSET_Prefabs), m_pGltfWidget->GetExpandedFilters());
 		settings.setValue(HyGlobal::AssetName(ASSET_Audio), m_pAudioWidget->GetExpandedFilters());
+
+		bool bShowGridBackground, bShowGridOrigin, bShowGridOverlay;
+		MainWindow::GetGridStatus(bShowGridBackground, bShowGridOrigin, bShowGridOverlay);
+		settings.setValue("ShowGridBackground", bShowGridBackground);
+		settings.setValue("ShowGridOrigin", bShowGridOrigin);
+		settings.setValue("ShowGridOverlay", bShowGridOverlay);
 	}
 	settings.endGroup();
 }

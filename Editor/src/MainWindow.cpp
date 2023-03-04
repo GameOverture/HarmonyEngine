@@ -303,10 +303,15 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 		QStringList expandedAudioList = settings.value(HyGlobal::AssetName(ASSET_Audio)).toStringList();
 		pProject->GetAudioWidget()->RestoreExpandedState(expandedAudioList);
+
+		ui->actionShowGridBackground->setChecked(settings.value("ShowGridBackground", true).toBool());
+		ui->actionShowGridOrigin->setChecked(settings.value("ShowGridOrigin", true).toBool());
+		ui->actionShowGridOverlay->setChecked(settings.value("ShowGridOverlay", false).toBool());
+		pProject->ShowGridBackground(ui->actionShowGridBackground->isChecked());
+		pProject->ShowGridOrigin(ui->actionShowGridOrigin->isChecked());
+		pProject->ShowGridOverlay(ui->actionShowGridOverlay->isChecked());
 	}
 	settings.endGroup();
-
-	pProject->ShowGrid(ui->actionShowGrid->isChecked());
 
 	RefreshBuildMenu();
 }
@@ -471,6 +476,13 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	sm_pInstance->m_StatusBarMouse.setText(sMouse);
 	sm_pInstance->m_StatusBarSize.setText(sSize);
 	sm_pInstance->m_StatusBarZoom.setText(sZoom);
+}
+
+/*static*/ void MainWindow::GetGridStatus(bool &bShowBackgroundOut, bool &bShowOriginOut, bool &bShowOverlayOut)
+{
+	bShowBackgroundOut = sm_pInstance->ui->actionShowGridBackground->isChecked();
+	bShowOriginOut = sm_pInstance->ui->actionShowGridOrigin->isChecked();
+	bShowOverlayOut = sm_pInstance->ui->actionShowGridOverlay->isChecked();
 }
 
 /*virtual*/ void MainWindow::closeEvent(QCloseEvent *pEvent) /*override*/ 
@@ -709,17 +721,29 @@ void MainWindow::on_menu_View_aboutToShow()
 
 	ui->menu_View->addMenu(pThemesMenu);
 	ui->menu_View->addSeparator();
-	ui->menu_View->addAction(ui->actionShowGrid);
+	ui->menu_View->addAction(ui->actionShowGridBackground);
+	ui->menu_View->addAction(ui->actionShowGridOrigin);
+	ui->menu_View->addAction(ui->actionShowGridOverlay);
 	ui->menu_View->addSeparator();
 	ui->menu_View->addActions(pPopupMenu->actions());
 }
 
-void MainWindow::on_actionShowGrid_triggered()
+void MainWindow::on_actionShowGridBackground_triggered()
 {
-	//ui->actionShowGrid->setChecked(!ui->actionShowGrid->isChecked());
-
 	if(Harmony::GetProject())
-		Harmony::GetProject()->ShowGrid(ui->actionShowGrid->isChecked());
+		Harmony::GetProject()->ShowGridBackground(ui->actionShowGridBackground->isChecked());
+}
+
+void MainWindow::on_actionShowGridOrigin_triggered()
+{
+	if(Harmony::GetProject())
+		Harmony::GetProject()->ShowGridOrigin(ui->actionShowGridOrigin->isChecked());
+}
+
+void MainWindow::on_actionShowGridOverlay_triggered()
+{
+	if(Harmony::GetProject())
+		Harmony::GetProject()->ShowGridOverlay(ui->actionShowGridOverlay->isChecked());
 }
 
 void MainWindow::on_actionBuildSettings_triggered()

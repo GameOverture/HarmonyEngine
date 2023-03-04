@@ -136,8 +136,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 {
 	SetVisible(true);
 	m_Sprite.SetVisible(true);
-	if(m_pProjItem)
-		m_pProjItem->GetProject().ShowOrigin(true);
 }
 
 /*virtual*/ void SpriteDraw::OnHide() /*override*/

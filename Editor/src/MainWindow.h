@@ -89,6 +89,8 @@ public:
 	static void ClearStatus();
 	static void SetDrawStatus(QString sMouse, QString sSize, QString sZoom);
 
+	static void GetGridStatus(bool &bShowBackgroundOut, bool &bShowOriginOut, bool &bShowOverlayOut);
+
 protected:
 	virtual void closeEvent(QCloseEvent *pEvent) override;
 
@@ -118,7 +120,9 @@ private Q_SLOTS:
 
 	void on_menu_View_aboutToShow();
 	
-	void on_actionShowGrid_triggered();
+	void on_actionShowGridBackground_triggered();
+	void on_actionShowGridOrigin_triggered();
+	void on_actionShowGridOverlay_triggered();
 	
 	void on_actionBuildSettings_triggered();
 	void on_actionNewBuild_triggered();

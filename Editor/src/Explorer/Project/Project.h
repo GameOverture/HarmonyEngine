@@ -117,8 +117,10 @@ public:
 	ProjectItemData *GetCurrentOpenItem();
 
 	void SetRenderSize(int iWidth, int iHeight);
-	void ShowGrid(bool bShow);
-	void ShowOrigin(bool bShow);
+	
+	void ShowGridBackground(bool bShow);
+	void ShowGridOrigin(bool bShow);
+	void ShowGridOverlay(bool bShow);
 
 	void SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
 	void DeleteItemData(HyGuiItemType eType, QString sPath, bool bWriteToDisk);

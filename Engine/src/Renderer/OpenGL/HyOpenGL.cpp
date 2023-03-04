@@ -88,7 +88,7 @@ HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagn
 		HyLog("glew initalized");
 #endif
 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f);
 	}
 
 	if(m_WindowListRef.empty() == false)
