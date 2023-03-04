@@ -22,7 +22,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_bCurHoverMultiTransform(false),
 	m_pCurHoverItem(nullptr),
 	m_eCurHoverGrabPoint(GRAB_None),
-	m_DragState(DRAGSTATE_None)
+	m_eDragState(DRAGSTATE_None),
+	m_eCurDrawShape(SHAPE_None)
 {
 	m_MultiTransform.Hide();
 }
@@ -51,73 +52,83 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		RefreshTransforms();
 	else if(pEvent->button() == Qt::LeftButton)
 	{
-		switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
+		if(m_eCurDrawShape != SHAPE_None)
 		{
-		case Qt::PointingHandCursor:
-			if(m_pCurHoverItem)
-			{
-				QList<EntityDrawItem *> selectList;
-				selectList << m_pCurHoverItem;
-				
-				if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
-					selectList += m_SelectedItemList;
-
-				RequestSelection(selectList);
-				break;
-			}
-		[[fallthrough]];
-		case Qt::ArrowCursor:
-			RequestSelection(QList<EntityDrawItem *>());
-			m_DragState = DRAGSTATE_Marquee;
-			break;
-
-		case Qt::OpenHandCursor:	// Rotating
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
-		[[fallthrough]];
-		case Qt::SizeAllCursor:		// Translating
-		case Qt::SizeBDiagCursor:	// Scaling
-		case Qt::SizeVerCursor:		// Scaling
-		case Qt::SizeFDiagCursor:	// Scaling
-		case Qt::SizeHorCursor: {	// Scaling
 			if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
-				HyGuiLog("EntityDraw::OnMousePressEvent - GetWorldMousePos failed", LOGTYPE_Error);
+				HyGuiLog("EntityDraw::OnMousePressEvent - Edit Shape GetWorldMousePos failed", LOGTYPE_Error);
 
-			TransformCtrl *pCurTransform = nullptr;
-			if(m_MultiTransform.IsShown())
-				pCurTransform = &m_MultiTransform;
-			else
-				pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
-
-			pCurTransform->GetCentroid(m_ptDragCenter);
-			HyEngine::Window().ProjectToWorldPos2d(m_ptDragCenter, m_ptDragCenter);
-
-			glm::vec2 ptMidRight, ptMidLeft, ptTopMid, ptBotMid;
-			HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_MidRight), ptMidRight);
-			HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_MidLeft), ptMidLeft);
-			HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_TopMid), ptTopMid);
-			HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_BotMid), ptBotMid);
-			HySetVec(m_vDragStartSize, fabs(ptMidRight.x - ptMidLeft.x), fabs(ptTopMid.y - ptBotMid.y));
-
-			switch(m_eCurHoverGrabPoint)
+			m_eDragState = DRAGSTATE_DrawingShape;
+		}
+		else
+		{
+			switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
 			{
-			case GRAB_BotLeft:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopRight); break;
-			case GRAB_BotRight:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopLeft); break;
-			case GRAB_TopRight:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotLeft); break;
-			case GRAB_TopLeft:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotRight); break;
-			case GRAB_BotMid:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopMid); break;
-			case GRAB_MidRight:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_MidLeft); break;
-			case GRAB_TopMid:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotMid); break;
-			case GRAB_MidLeft:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_MidRight); break;
-			default:
+			case Qt::PointingHandCursor:
+				if(m_pCurHoverItem)
+				{
+					QList<EntityDrawItem *> selectList;
+					selectList << m_pCurHoverItem;
+
+					if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+						selectList += m_SelectedItemList;
+
+					RequestSelection(selectList);
+					break;
+				}
+				[[fallthrough]];
+			case Qt::ArrowCursor:
+				RequestSelection(QList<EntityDrawItem *>());
+				m_eDragState = DRAGSTATE_Marquee;
 				break;
+
+			case Qt::OpenHandCursor:	// Rotating
+				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
+				[[fallthrough]];
+			case Qt::SizeAllCursor:		// Translating
+			case Qt::SizeBDiagCursor:	// Scaling
+			case Qt::SizeVerCursor:		// Scaling
+			case Qt::SizeFDiagCursor:	// Scaling
+			case Qt::SizeHorCursor: {	// Scaling
+				if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
+					HyGuiLog("EntityDraw::OnMousePressEvent - GetWorldMousePos failed", LOGTYPE_Error);
+
+				TransformCtrl *pCurTransform = nullptr;
+				if(m_MultiTransform.IsShown())
+					pCurTransform = &m_MultiTransform;
+				else
+					pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
+
+				pCurTransform->GetCentroid(m_ptDragCenter);
+				HyEngine::Window().ProjectToWorldPos2d(m_ptDragCenter, m_ptDragCenter);
+
+				glm::vec2 ptMidRight, ptMidLeft, ptTopMid, ptBotMid;
+				HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_MidRight), ptMidRight);
+				HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_MidLeft), ptMidLeft);
+				HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_TopMid), ptTopMid);
+				HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_BotMid), ptBotMid);
+				HySetVec(m_vDragStartSize, fabs(ptMidRight.x - ptMidLeft.x), fabs(ptTopMid.y - ptBotMid.y));
+
+				switch(m_eCurHoverGrabPoint)
+				{
+				case GRAB_BotLeft:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopRight); break;
+				case GRAB_BotRight:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopLeft); break;
+				case GRAB_TopRight:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotLeft); break;
+				case GRAB_TopLeft:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotRight); break;
+				case GRAB_BotMid:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopMid); break;
+				case GRAB_MidRight:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_MidLeft); break;
+				case GRAB_TopMid:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotMid); break;
+				case GRAB_MidLeft:	m_ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_MidRight); break;
+				default:
+					break;
+				}
+				HyEngine::Window().ProjectToWorldPos2d(m_ptDragAnchorPoint, m_ptDragAnchorPoint);
+
+				m_eDragState = DRAGSTATE_Starting;
+				break; }
+
+			default:
+				HyGuiLog("EntityDraw::OnMousePressEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 			}
-			HyEngine::Window().ProjectToWorldPos2d(m_ptDragAnchorPoint, m_ptDragAnchorPoint);
-
-			m_DragState = DRAGSTATE_Starting;
-			break; }
-
-		default:
-			HyGuiLog("EntityDraw::OnMousePressEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 		}
 	}
 }
@@ -126,7 +137,11 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnMouseReleaseEvent(pEvent);
 	
-	if(m_DragState == DRAGSTATE_Transforming)
+	if(m_eDragState == DRAGSTATE_DrawingShape)
+	{
+		ClearDrawShape();
+	}
+	else if(m_eDragState == DRAGSTATE_Transforming)
 	{
 		QList<EntityTreeItemData *> treeItemDataList;
 		QList<glm::mat4> newTransformList;
@@ -151,7 +166,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		m_ActiveTransform.scale.Set(1.0f, 1.0f);
 	}
 
-	m_DragState = DRAGSTATE_None;
+	m_eDragState = DRAGSTATE_None;
 	RefreshTransforms();
 }
 
@@ -168,11 +183,17 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		RefreshTransforms();
 	else
 	{
-		if(m_DragState != DRAGSTATE_None)
+		if(m_eDragState != DRAGSTATE_None)
 		{
-			switch(m_DragState)
+			switch(m_eDragState)
 			{
 			case DRAGSTATE_Marquee:
+				m_eCurDrawShape = SHAPE_Box;
+				SetDrawShape(SHAPE_Box, false);
+				m_DrawShape.SetTint(HyColor::Red);
+			case DRAGSTATE_DrawingShape:
+				UpdateDrawShape(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier));
+				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 				break;
 
 			case DRAGSTATE_Starting: {
@@ -196,7 +217,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 					}
 					
 					m_fMultiTransformStartRot = m_MultiTransform.rot.Get();
-					m_DragState = DRAGSTATE_Transforming;
+					m_eDragState = DRAGSTATE_Transforming;
 				}
 				break; }
 
@@ -282,13 +303,16 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		}
 		else
 		{
-			Qt::CursorShape eNextCursorShape = Qt::ArrowCursor;
-
 			m_bCurHoverMultiTransform = false;
 			m_pCurHoverItem = nullptr;
 			m_eCurHoverGrabPoint = GRAB_None;
 
-			if(m_MultiTransform.IsShown())
+			Qt::CursorShape eNextCursorShape = Qt::ArrowCursor;
+
+			if(m_eCurDrawShape != SHAPE_None)
+				eNextCursorShape = Qt::CrossCursor;
+
+			if(eNextCursorShape == Qt::ArrowCursor && m_MultiTransform.IsShown())
 			{
 				m_eCurHoverGrabPoint = m_MultiTransform.IsMouseOverGrabPoint();
 				eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, m_MultiTransform.GetCachedRotation());
@@ -419,7 +443,7 @@ void EntityDraw::RefreshTransforms()
 		}
 		else
 		{
-			if(m_DragState == DRAGSTATE_Transforming)
+			if(m_eDragState == DRAGSTATE_Transforming)
 			{
 				glm::vec2 ptCenterPivot;
 				m_MultiTransform.GetCentroid(ptCenterPivot);
@@ -433,6 +457,50 @@ void EntityDraw::RefreshTransforms()
 
 	for(EntityDrawItem *pItemDraw : m_SelectedItemList)
 		pItemDraw->RefreshTransform(m_pCamera);
+}
+
+void EntityDraw::SetDrawShape(EditorShape eShape, bool bAsPrimitive)
+{
+	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
+	m_eCurDrawShape = eShape;
+
+	if(bAsPrimitive)
+	{
+		m_DrawShape.SetTint(HyColor::DarkMagenta);
+		m_DrawShape.SetWireframe(false);
+	}
+	else
+	{
+		m_DrawShape.SetTint(HyColor::Blue);
+		m_DrawShape.SetWireframe(true);
+	}
+}
+
+void EntityDraw::UpdateDrawShape(bool bCtrlModifer)
+{
+	glm::vec2 ptCurMousePos;
+	if(HyEngine::Input().GetWorldMousePos(ptCurMousePos) == false)
+		return;
+
+	switch(m_eCurDrawShape)
+	{
+	case SHAPE_Box: {
+		glm::vec2 vDragVec = ptCurMousePos - m_ptDragStart;
+		if(bCtrlModifer)
+			m_DrawShape.SetAsBox(abs(m_ptDragStart.x - ptCurMousePos.x), abs(m_ptDragStart.y - ptCurMousePos.y), m_ptDragStart, 0.0f);
+		else
+		{
+			glm::vec2 ptBoxCenter = m_ptDragStart + (vDragVec * 0.5f);
+			m_DrawShape.SetAsBox(abs(m_ptDragStart.x - ptCurMousePos.x) * 0.5f, abs(m_ptDragStart.y - ptCurMousePos.y) * 0.5f, ptBoxCenter, 0.0f);
+		}
+		break; }
+	}
+}
+
+void EntityDraw::ClearDrawShape()
+{
+	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+	m_eCurDrawShape = SHAPE_None;
 }
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/

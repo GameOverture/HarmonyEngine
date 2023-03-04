@@ -14,6 +14,7 @@
 #include "IWidget.h"
 
 #include <QWidget>
+#include <QToolBar>
 
 namespace Ui {
 class EntityWidget;
@@ -23,19 +24,8 @@ class EntityWidget : public IWidget
 {
 	Q_OBJECT
 
-	//enum StackedWidgetLayer
-	//{
-	//	STACKED_Null = 0,
-	//	STACKED_Entity,
-	//	STACKED_Primitive,
-	//	STACKED_TexturedQuad,
-	//	STACKED_Sprite,
-	//	STACKED_Font,
-	//	STACKED_BoundingVolume,
-	//	STACKED_Physics,
-
-	//	NUMSTACKED
-	//};
+	QMenu				m_MenuAddPrimitive;
+	QMenu				m_MenuAddShape;
 
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
@@ -44,6 +34,8 @@ public:
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
+
+	void ResetLabels();
 
 	QList<EntityTreeItemData *> GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes);
 	void RequestSelectedItems(QList<QUuid> uuidList); // Calls signal
@@ -56,8 +48,20 @@ protected:
 private Q_SLOTS:
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void on_actionAddChildren_triggered();
-	void on_actionAddPrimitive_triggered();
-	void on_actionAddShape_triggered();
+	
+	void on_actionAddBoxPrimitive_triggered();
+	void on_actionAddCirclePrimitive_triggered();
+	void on_actionAddPolygonPrimitive_triggered();
+	void on_actionAddSegmentPrimitive_triggered();
+	void on_actionAddLineChainPrimitive_triggered();
+	void on_actionAddLineLoopPrimitive_triggered();
+
+	void on_actionAddBoxShape_triggered();
+	void on_actionAddCircleShape_triggered();
+	void on_actionAddPolygonShape_triggered();
+	void on_actionAddSegmentShape_triggered();
+	void on_actionAddLineChainShape_triggered();
+	void on_actionAddLineLoopShape_triggered();
 
 	void on_actionOrderChildrenUp_triggered();
 	void on_actionOrderChildrenDown_triggered();

@@ -196,7 +196,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 		pLoadingSpinner->setColor(QColor(25, 255, 25));
 	}
 
-	m_LoadingMsg.setText("Ready");
+	//m_LoadingMsg.setText("Ready");
 	m_LoadingBar.setRange(0, 100);
 	m_LoadingBar.reset();
 	statusBar()->addWidget(&m_LoadingMsg);
@@ -226,6 +226,9 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->statusBar->addPermanentWidget(&m_StatusBarZoom);
 
 	HyGuiLog("Ready to go!", LOGTYPE_Normal);
+
+	setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 }
 
 MainWindow::~MainWindow()
@@ -334,7 +337,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 /*static*/ void MainWindow::ClearLoading()
 {
-	sm_pInstance->statusBar()->showMessage("Ready");
+	sm_pInstance->statusBar()->showMessage("Loading Complete", 2000);
 
 	for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
 		sm_pInstance->m_LoadingSpinnerList[i]->stop();
@@ -451,6 +454,16 @@ void MainWindow::SetCurrentProject(Project *pProject)
 /*static*/ IWidget *MainWindow::GetItemProperties()
 {
 	return static_cast<IWidget *>(sm_pInstance->ui->dockWidgetProperties->widget());
+}
+
+/*static*/ void MainWindow::SetStatus(const QString &sMessage, int iTimeoutMs)
+{
+	sm_pInstance->ui->statusBar->showMessage(sMessage, iTimeoutMs);
+}
+
+/*static*/ void MainWindow::ClearStatus()
+{
+	sm_pInstance->ui->statusBar->clearMessage();
 }
 
 /*static*/ void MainWindow::SetDrawStatus(QString sMouse, QString sSize, QString sZoom)

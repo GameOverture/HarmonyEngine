@@ -85,6 +85,8 @@ public:
 
 	static IWidget *GetItemProperties();
 
+	static void SetStatus(const QString &sMessage, int iTimeoutMs);
+	static void ClearStatus();
 	static void SetDrawStatus(QString sMouse, QString sSize, QString sZoom);
 
 protected:

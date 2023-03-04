@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
+    <width>391</width>
     <height>565</height>
    </rect>
   </property>
@@ -53,25 +53,15 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="ChildrenToolbar">
-          <item>
-           <widget class="QToolButton" name="btnAddChild">
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="1" column="2">
+           <widget class="QLabel" name="lblAddingPrim">
             <property name="text">
-             <string>...</string>
+             <string>...Adding </string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QToolButton" name="btnAddChildPrimitive">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="popupMode">
-             <enum>QToolButton::MenuButtonPopup</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
+          <item row="2" column="1">
            <widget class="QToolButton" name="btnAddShape">
             <property name="text">
              <string>...</string>
@@ -81,39 +71,88 @@
             </property>
            </widget>
           </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+          <item row="2" column="2">
+           <widget class="QLabel" name="lblAddingShape">
+            <property name="text">
+             <string>...Adding</string>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+           </widget>
           </item>
-          <item>
-           <widget class="QToolButton" name="btnOrderUp">
+          <item row="1" column="0">
+           <widget class="QLabel" name="lblAddPrimitive">
+            <property name="text">
+             <string>Add Primitive</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QToolButton" name="btnAddChildPrimitive">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::MenuButtonPopup</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lblAddShape">
+            <property name="text">
+             <string>Add Shape</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblAddChildren">
+            <property name="text">
+             <string>Add Children</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QToolButton" name="btnAddChild">
             <property name="text">
              <string>...</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QToolButton" name="btnOrderDown">
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnRemove">
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
+          <item row="0" column="3">
+           <layout class="QHBoxLayout" name="ChildrenToolbar">
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QToolButton" name="btnOrderUp">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="btnOrderDown">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="btnRemove">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
@@ -301,6 +340,150 @@
    </property>
    <property name="toolTip">
     <string>Removes the selected items (children and shapes) from the entity</string>
+   </property>
+  </action>
+  <action name="actionAddBoxPrimitive">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_box.png</normaloff>:/icons16x16/shapes/primitive_box.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Box Primitive</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a child primitive to the entity, set as a box</string>
+   </property>
+  </action>
+  <action name="actionAddCirclePrimitive">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_circle.png</normaloff>:/icons16x16/shapes/primitive_circle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Circle Primitive</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a child primitive to the entity, set as a circle</string>
+   </property>
+  </action>
+  <action name="actionAddPolygonPrimitive">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_polygon.png</normaloff>:/icons16x16/shapes/primitive_polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Polygon Primitive</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a child primitive to the entity, set as a polygon</string>
+   </property>
+  </action>
+  <action name="actionAddSegmentPrimitive">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_lineSeg.png</normaloff>:/icons16x16/shapes/primitive_lineSeg.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Line Segment Primitive</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a child primitive to the entity, set as a line segment</string>
+   </property>
+  </action>
+  <action name="actionAddLineChainPrimitive">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_lineChain.png</normaloff>:/icons16x16/shapes/primitive_lineChain.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Line Chain Primitive</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a child primitive to the entity, set as a line chain</string>
+   </property>
+  </action>
+  <action name="actionAddLineLoopPrimitive">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_lineLoop.png</normaloff>:/icons16x16/shapes/primitive_lineLoop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Line Loop Primitive</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a child primitive to the entity, set as a line loop</string>
+   </property>
+  </action>
+  <action name="actionAddBoxShape">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/shapes_box.png</normaloff>:/icons16x16/shapes/shapes_box.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Box Shape</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a shape bounding volume to the entity, set as a box</string>
+   </property>
+  </action>
+  <action name="actionAddCircleShape">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/shapes_circle.png</normaloff>:/icons16x16/shapes/shapes_circle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Circle Shape</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a shape bounding volume to the entity, set as a circle</string>
+   </property>
+  </action>
+  <action name="actionAddPolygonShape">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/shapes_polygon.png</normaloff>:/icons16x16/shapes/shapes_polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Polygon Shape</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a shape bounding volume to the entity, set as a polygon</string>
+   </property>
+  </action>
+  <action name="actionAddSegmentShape">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/shapes_lineSeg.png</normaloff>:/icons16x16/shapes/shapes_lineSeg.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Line Segment Shape</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a shape bounding volume to the entity, set as a line segment</string>
+   </property>
+  </action>
+  <action name="actionAddLineChainShape">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/shapes_lineChain.png</normaloff>:/icons16x16/shapes/shapes_lineChain.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Line Chain Shape</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a shape bounding volume to the entity, set as a line chain</string>
+   </property>
+  </action>
+  <action name="actionAddLineLoopShape">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/shapes_lineLoop.png</normaloff>:/icons16x16/shapes/shapes_lineLoop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Line Loop Shape</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a shape bounding volume to the entity, set as a line loop</string>
    </property>
   </action>
  </widget>

@@ -14,6 +14,17 @@
 #include "EntityModel.h"
 #include "EntityDrawItem.h"
 
+enum EditorShape
+{
+	SHAPE_None = -1,
+	SHAPE_Box = 0,
+	SHAPE_Circle,
+	SHAPE_Polygon,
+	SHAPE_Segment,
+	SHAPE_LineChain,
+	SHAPE_LineLoop
+};
+
 class EntityDraw : public IDraw
 {
 	QList<EntityDrawItem *>					m_ItemList;
@@ -31,13 +42,17 @@ class EntityDraw : public IDraw
 		DRAGSTATE_None = 0,
 		DRAGSTATE_Marquee,
 		DRAGSTATE_Starting,
-		DRAGSTATE_Transforming
+		DRAGSTATE_Transforming,
+		DRAGSTATE_DrawingShape,
 	};
-	DragState								m_DragState;
+	DragState								m_eDragState;
 	glm::vec2								m_ptDragStart;
 	glm::vec2								m_ptDragCenter;
 	glm::vec2								m_vDragStartSize;
 	glm::vec2								m_ptDragAnchorPoint;
+
+	EditorShape								m_eCurDrawShape;
+	HyPrimitive2d							m_DrawShape;
 
 	HyEntity2d								m_ActiveTransform;
 	QList<glm::mat4>						m_PrevTransformList;
@@ -57,6 +72,10 @@ public:
 	void RequestSelection(QList<EntityDrawItem *> selectionList);
 
 	void RefreshTransforms();
+
+	void SetDrawShape(EditorShape eShape, bool bAsPrimitive);
+	void UpdateDrawShape(bool bCtrlModifer);
+	void ClearDrawShape();
 
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;

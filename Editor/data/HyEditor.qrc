@@ -220,5 +220,19 @@
         <file>icons16x16/items/Entity-Pending.png</file>
         <file>icons16x16/items/Entity-Settings.png</file>
         <file>icons16x16/items/Entity-Warning.png</file>
+        <file>icons16x16/shapes/primitive_box.png</file>
+        <file>icons16x16/shapes/primitive_circle.png</file>
+        <file>icons16x16/shapes/primitive_icon.png</file>
+        <file>icons16x16/shapes/primitive_lineChain.png</file>
+        <file>icons16x16/shapes/primitive_lineLoop.png</file>
+        <file>icons16x16/shapes/primitive_lineSeg.png</file>
+        <file>icons16x16/shapes/primitive_polygon.png</file>
+        <file>icons16x16/shapes/shapes_box.png</file>
+        <file>icons16x16/shapes/shapes_circle.png</file>
+        <file>icons16x16/shapes/shapes_icon.png</file>
+        <file>icons16x16/shapes/shapes_lineChain.png</file>
+        <file>icons16x16/shapes/shapes_lineLoop.png</file>
+        <file>icons16x16/shapes/shapes_lineSeg.png</file>
+        <file>icons16x16/shapes/shapes_polygon.png</file>
     </qresource>
 </RCC>
