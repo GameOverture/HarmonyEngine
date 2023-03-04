@@ -773,8 +773,11 @@ void IManagerModel::SaveRuntime()
 			if(pItemData->GetType() != ITEM_Filter)
 			{
 				AssetItemData *pAsset = static_cast<AssetItemData *>(pItemData);
+
 				if(pAsset->GetErrors() != 0)
 					return QVariant(pItemData->GetIcon(SUBICON_Warning));
+				else if(m_eASSET_TYPE == ASSET_Atlas)
+					return QVariant(QIcon(pAsset->GetAbsMetaFilePath()));
 			}
 			return QVariant(pItemData->GetIcon(SUBICON_None));
 		}
