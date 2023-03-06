@@ -16,7 +16,8 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 	m_Uuid(uuid),
 	m_ItemUuid(itemUuid),
 	m_pChild(nullptr),
-	m_pShape(nullptr)
+	m_pShape(nullptr),
+	m_Transform(pParent)
 {
 	switch(m_eGuiType)
 	{

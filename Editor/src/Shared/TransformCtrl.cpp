@@ -11,8 +11,8 @@
 #include "TransformCtrl.h"
 #include "EntityDrawItem.h"
 
-TransformCtrl::TransformCtrl() :
-	HyEntity2d(nullptr),
+TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
+	HyEntity2d(pParent),
 	m_bIsShown(false),
 	m_bShowGrabPoints(false),
 	m_fCachedRotation(0.0f)

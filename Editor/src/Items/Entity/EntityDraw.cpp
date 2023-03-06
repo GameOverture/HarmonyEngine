@@ -18,12 +18,14 @@
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
+	m_MultiTransform(this),
 	m_fMultiTransformStartRot(0.0f),
 	m_bCurHoverMultiTransform(false),
 	m_pCurHoverItem(nullptr),
 	m_eCurHoverGrabPoint(GRAB_None),
 	m_eDragState(DRAGSTATE_None),
-	m_eCurDrawShape(SHAPE_None)
+	m_eCurDrawShape(SHAPE_None),
+	m_DrawShape(this)
 {
 	m_MultiTransform.Hide();
 }

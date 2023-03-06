@@ -47,7 +47,7 @@ protected:
 	float						m_fCachedRotation;
 
 public:
-	TransformCtrl();
+	TransformCtrl(HyEntity2d *pParent);
 	virtual ~TransformCtrl();
 
 	void WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera);
