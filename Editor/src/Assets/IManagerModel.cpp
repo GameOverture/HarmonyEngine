@@ -777,7 +777,7 @@ void IManagerModel::SaveRuntime()
 				if(pAsset->GetErrors() != 0)
 					return QVariant(pItemData->GetIcon(SUBICON_Warning));
 				else if(m_eASSET_TYPE == ASSET_Atlas)
-					return QVariant(QIcon(pAsset->GetAbsMetaFilePath()));
+					return QVariant(static_cast<AtlasFrame *>(pAsset)->GetThumbnail());
 			}
 			return QVariant(pItemData->GetIcon(SUBICON_None));
 		}

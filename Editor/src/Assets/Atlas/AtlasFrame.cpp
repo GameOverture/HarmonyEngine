@@ -99,6 +99,14 @@ int AtlasFrame::GetY() const
 	return m_iPosY;
 }
 
+QIcon &AtlasFrame::GetThumbnail()
+{
+	if(m_Thumbnail.isNull())
+		m_Thumbnail = QIcon(GetAbsMetaFilePath());
+
+	return m_Thumbnail;
+}
+
 void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize fullAtlasSize)
 {
 	m_iTextureIndex = iTextureIndex;
@@ -138,6 +146,8 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 
 	if(newImage.save(metaDir.path() % "/" % ConstructMetaFileName()) == false)
 		HyGuiLog("Could not save frame image to meta directory: " % m_sName, LOGTYPE_Error);
+
+	m_Thumbnail = QIcon(); // Reset thumbnail
 }
 
 /*virtual*/ QString AtlasFrame::GetPropertyInfo() /*override*/

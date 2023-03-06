@@ -32,6 +32,8 @@ class AtlasFrame : public AssetItemData
 	int									m_iPosX;
 	int									m_iPosY;
 
+	QIcon								m_Thumbnail;
+
 public:
 	AtlasFrame(IManagerModel &modelRef,
 			   HyGuiItemType eType,
@@ -62,6 +64,8 @@ public:
 	int GetTextureIndex() const;
 	int GetX() const;
 	int GetY() const;
+
+	QIcon &GetThumbnail();
 
 	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize fullAtlasSize);
 	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);

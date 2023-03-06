@@ -24,5 +24,5 @@ AuxAssetInspector::AuxAssetInspector(QWidget *parent) :
 
 void AuxAssetInspector::SetSelected(AssetType eAssetType, QList<AssetItemData *> selectedAssetsList)
 {
-
+	//selectedAssetsList
 }

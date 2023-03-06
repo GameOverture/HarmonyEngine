@@ -543,7 +543,7 @@ void ManagerWidget::on_assetTree_clicked()
 	QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
 	GetSelected(selectedAssetsList, selectedFiltersList);
 
-	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_Preview))->SetSelected(ASSET_Atlas, selectedAssetsList);
+	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->SetSelected(m_pModel->GetAssetType(), selectedAssetsList);
 
 	int iNumSelected = selectedAssetsList.count();
 	ui->actionRename->setEnabled(iNumSelected == 1 || selectedFiltersList.empty() == false);

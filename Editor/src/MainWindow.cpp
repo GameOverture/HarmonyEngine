@@ -469,7 +469,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	{
 	case AUXTAB_Output:
 		return sm_pInstance->ui->outputLog;
-	case AUXTAB_Preview:
+	case AUXTAB_AssetInspector:
 		return sm_pInstance->ui->assetInspector;
 	case AUXTAB_ToolBox:
 		return sm_pInstance->ui->toolBox;
@@ -548,8 +548,8 @@ void MainWindow::on_tabWidgetAux_currentChanged(int iIndex)
 		ui->dockWidgetAuxiliary->setWindowTitle("Output");
 		break;
 
-	case AUXTAB_Preview:
-		ui->dockWidgetAuxiliary->setWindowTitle("Preview");
+	case AUXTAB_AssetInspector:
+		ui->dockWidgetAuxiliary->setWindowTitle("Asset Inspector");
 		break;
 
 	case AUXTAB_ToolBox:

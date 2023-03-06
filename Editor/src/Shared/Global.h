@@ -114,7 +114,7 @@ enum MdiArea
 enum AuxTab
 {
 	AUXTAB_Output = 0,
-	AUXTAB_Preview,
+	AUXTAB_AssetInspector,
 	AUXTAB_ToolBox
 };
 
