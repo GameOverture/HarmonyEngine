@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>949</width>
-    <height>152</height>
+    <width>882</width>
+    <height>195</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,8 +26,26 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>GroupBox</string>
+     </property>
+    </widget>
+   </item>
   </layout>
+  <action name="actionAddNewShape">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Primitive-New.png</normaloff>:/icons16x16/items/Primitive-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add New Shape</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../data/HyEditor.qrc"/>
+ </resources>
  <connections/>
 </ui>

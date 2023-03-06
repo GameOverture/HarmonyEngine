@@ -23,37 +23,25 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 {
 	ui->setupUi(this);
 
-	m_MenuAddPrimitive.addAction(ui->actionAddBoxPrimitive);
-	m_MenuAddPrimitive.addAction(ui->actionAddCirclePrimitive);
-	m_MenuAddPrimitive.addAction(ui->actionAddPolygonPrimitive);
-	m_MenuAddPrimitive.addAction(ui->actionAddSegmentPrimitive);
-	m_MenuAddPrimitive.addAction(ui->actionAddLineChainPrimitive);
-	m_MenuAddPrimitive.addAction(ui->actionAddLineLoopPrimitive);
-	ui->btnAddChildPrimitive->setMenu(&m_MenuAddPrimitive);
-	ui->btnAddChildPrimitive->setDefaultAction(ui->actionAddBoxPrimitive);
-	connect(ui->btnAddChildPrimitive, SIGNAL(triggered(QAction *)),
-		ui->btnAddChildPrimitive, SLOT(setDefaultAction(QAction *)));
-
-	ui->lblAddingPrim->setVisible(false);
-
-	m_MenuAddShape.addAction(ui->actionAddBoxShape);
-	m_MenuAddShape.addAction(ui->actionAddCircleShape);
-	m_MenuAddShape.addAction(ui->actionAddPolygonShape);
-	m_MenuAddShape.addAction(ui->actionAddSegmentShape);
-	m_MenuAddShape.addAction(ui->actionAddLineChainShape);
-	m_MenuAddShape.addAction(ui->actionAddLineLoopShape);
-	ui->btnAddShape->setMenu(&m_MenuAddShape);
-	ui->btnAddShape->setDefaultAction(ui->actionAddBoxShape);
-	connect(ui->btnAddShape, SIGNAL(triggered(QAction *)),
-		ui->btnAddShape, SLOT(setDefaultAction(QAction *)));
-
-	ui->lblAddingShape->setVisible(false);
-
 	ShowStates(false);
 
 	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
 	layout()->removeItem(ui->verticalLayout);
 	layout()->addItem(ui->verticalLayout);
+
+	ui->btnAddPrimitiveBox->setDefaultAction(ui->actionAddBoxPrimitive);
+	ui->btnAddPrimitiveCircle->setDefaultAction(ui->actionAddCirclePrimitive);
+	ui->btnAddPrimitivePolygon->setDefaultAction(ui->actionAddPolygonPrimitive);
+	ui->btnAddPrimitiveSegment->setDefaultAction(ui->actionAddSegmentPrimitive);
+	ui->btnAddPrimitiveChain->setDefaultAction(ui->actionAddLineChainPrimitive);
+	ui->btnAddPrimitiveLoop->setDefaultAction(ui->actionAddLineLoopPrimitive);
+
+	ui->btnAddShapeBox->setDefaultAction(ui->actionAddBoxShape);
+	ui->btnAddShapeCircle->setDefaultAction(ui->actionAddCircleShape);
+	ui->btnAddShapePolygon->setDefaultAction(ui->actionAddPolygonShape);
+	ui->btnAddShapeSegment->setDefaultAction(ui->actionAddSegmentShape);
+	ui->btnAddShapeChain->setDefaultAction(ui->actionAddLineChainShape);
+	ui->btnAddShapeLoop->setDefaultAction(ui->actionAddLineLoopShape);
 
 	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
 	//ui->btnAddChildPrimitive->setDefaultAction(ui->actionAddPrimitive);
@@ -163,12 +151,6 @@ EntityWidget::~EntityWidget()
 	ui->nodeTree->selectionModel()->select(index, QItemSelectionModel::Select);
 }
 
-void EntityWidget::ResetLabels()
-{
-	ui->lblAddingPrim->setVisible(false);
-	ui->lblAddingShape->setVisible(false);
-}
-
 QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes)
 {
 	EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().GetEntityTreeItemData();
@@ -271,6 +253,43 @@ void EntityWidget::SetSelectedItems(QList<EntityTreeItemData *> selectedList, QL
 	ui->nodeTree->setColumnWidth(0, iTotalWidth - iInfoColumnWidth);
 }
 
+void EntityWidget::DoShapeTriggered(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType)
+{
+	if(pBtn->isChecked() == false)
+	{
+		ClearAddShape();
+		pBtn->setChecked(Qt::Checked);
+
+		MainWindow::SetStatus(sStatusMsg, 0);
+		EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+		if(pEntDraw)
+			pEntDraw->SetDrawShape(eShapeType, true);
+	}
+	else
+		ClearAddShape();
+}
+
+void EntityWidget::ClearAddShape()
+{
+	ui->btnAddPrimitiveBox->setChecked(Qt::Unchecked);
+	ui->btnAddPrimitiveCircle->setChecked(Qt::Unchecked);
+	ui->btnAddPrimitivePolygon->setChecked(Qt::Unchecked);
+	ui->btnAddPrimitiveSegment->setChecked(Qt::Unchecked);
+	ui->btnAddPrimitiveChain->setChecked(Qt::Unchecked);
+	ui->btnAddPrimitiveLoop->setChecked(Qt::Unchecked);
+	ui->btnAddShapeBox->setChecked(Qt::Unchecked);
+	ui->btnAddShapeCircle->setChecked(Qt::Unchecked);
+	ui->btnAddShapePolygon->setChecked(Qt::Unchecked);
+	ui->btnAddShapeSegment->setChecked(Qt::Unchecked);
+	ui->btnAddShapeChain->setChecked(Qt::Unchecked);
+	ui->btnAddShapeLoop->setChecked(Qt::Unchecked);
+
+	MainWindow::ClearStatus();
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntDraw)
+		pEntDraw->ClearDrawShape();
+}
+
 void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
 	UpdateActions();
@@ -327,92 +346,62 @@ void EntityWidget::on_actionAddChildren_triggered()
 
 void EntityWidget::on_actionAddBoxPrimitive_triggered()
 {
-	MainWindow::SetStatus("Drawing new primitive box...", 0);
-	ui->lblAddingPrim->setText("...Placing Box");
-	ui->lblAddingPrim->setVisible(true);
-
-	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntDraw)
-		pEntDraw->SetDrawShape(SHAPE_Box, true);
+	DoShapeTriggered(ui->btnAddPrimitiveBox, "Drawing new primitive box...", SHAPE_Box);
 }
 
 void EntityWidget::on_actionAddCirclePrimitive_triggered()
 {
-	MainWindow::SetStatus("Drawing new primitive circle...", 0);
-	ui->lblAddingPrim->setText("...Placing Circle");
-	ui->lblAddingPrim->setVisible(true);
-
-	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntDraw)
-		pEntDraw->SetDrawShape(SHAPE_Circle, true);
+	DoShapeTriggered(ui->btnAddPrimitiveCircle, "Drawing new primitive circle...", SHAPE_Circle);
 }
 
 void EntityWidget::on_actionAddPolygonPrimitive_triggered()
 {
-	MainWindow::SetStatus("Drawing new primitive polygon...", 0);
-	ui->lblAddingPrim->setText("...Placing Polygon");
-	ui->lblAddingPrim->setVisible(true);
-
-	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntDraw)
-		pEntDraw->SetDrawShape(SHAPE_Polygon, true);
+	DoShapeTriggered(ui->btnAddPrimitivePolygon, "Drawing new primitive polygon...", SHAPE_Polygon);
 }
 
 void EntityWidget::on_actionAddSegmentPrimitive_triggered()
 {
-	MainWindow::SetStatus("Drawing new primitive line segment...", 0);
-	ui->lblAddingPrim->setText("...Placing Line Segment");
-	ui->lblAddingPrim->setVisible(true);
-
-	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntDraw)
-		pEntDraw->SetDrawShape(SHAPE_Segment, true);
+	DoShapeTriggered(ui->btnAddPrimitiveSegment, "Drawing new primitive line segment...", SHAPE_Segment);
 }
 
 void EntityWidget::on_actionAddLineChainPrimitive_triggered()
 {
-	MainWindow::SetStatus("Drawing new primitive line chain...", 0);
-	ui->lblAddingPrim->setText("...Placing Line Chain");
-	ui->lblAddingPrim->setVisible(true);
-
-	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntDraw)
-		pEntDraw->SetDrawShape(SHAPE_LineChain, true);
+	DoShapeTriggered(ui->btnAddPrimitiveChain, "Drawing new primitive line chain...", SHAPE_LineChain);
 }
 
 void EntityWidget::on_actionAddLineLoopPrimitive_triggered()
 {
-	MainWindow::SetStatus("Drawing new primitive line loop...", 0);
-	ui->lblAddingPrim->setText("...Placing Line Loop");
-	ui->lblAddingPrim->setVisible(true);
-
-	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntDraw)
-		pEntDraw->SetDrawShape(SHAPE_LineLoop, true);
+	DoShapeTriggered(ui->btnAddPrimitiveLoop, "Drawing new primitive line loop...", SHAPE_LineLoop);
 }
 
 void EntityWidget::on_actionAddBoxShape_triggered()
 {
+	DoShapeTriggered(ui->btnAddShapeBox, "Drawing new box...", SHAPE_Box);
 }
 
 void EntityWidget::on_actionAddCircleShape_triggered()
 {
+	DoShapeTriggered(ui->btnAddShapeCircle, "Drawing new circle...", SHAPE_Circle);
 }
 
 void EntityWidget::on_actionAddPolygonShape_triggered()
 {
+	DoShapeTriggered(ui->btnAddShapePolygon, "Drawing new polygon...", SHAPE_Polygon);
 }
 
 void EntityWidget::on_actionAddSegmentShape_triggered()
 {
+	DoShapeTriggered(ui->btnAddShapeSegment, "Drawing new line segment...", SHAPE_Segment);
 }
 
 void EntityWidget::on_actionAddLineChainShape_triggered()
 {
+	DoShapeTriggered(ui->btnAddShapeChain, "Drawing new line chain...", SHAPE_LineChain);
 }
 
 void EntityWidget::on_actionAddLineLoopShape_triggered()
 {
+	DoShapeTriggered(ui->btnAddShapeLoop, "Drawing new line loop...", SHAPE_LineLoop);
 }
 
 void EntityWidget::on_actionOrderChildrenUp_triggered()

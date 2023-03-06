@@ -10,20 +10,10 @@
 #ifndef ENTITYDRAW_H
 #define ENTITYDRAW_H
 
+#include "Global.h"
 #include "IDraw.h"
 #include "EntityModel.h"
 #include "EntityDrawItem.h"
-
-enum EditorShape
-{
-	SHAPE_None = -1,
-	SHAPE_Box = 0,
-	SHAPE_Circle,
-	SHAPE_Polygon,
-	SHAPE_Segment,
-	SHAPE_LineChain,
-	SHAPE_LineLoop
-};
 
 class EntityDraw : public IDraw
 {

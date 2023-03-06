@@ -118,6 +118,17 @@ enum AuxTab
 	AUXTAB_ToolBox
 };
 
+enum EditorShape
+{
+	SHAPE_None = -1,
+	SHAPE_Box = 0,
+	SHAPE_Circle,
+	SHAPE_Polygon,
+	SHAPE_Segment,
+	SHAPE_LineChain,
+	SHAPE_LineLoop
+};
+
 enum SubIcon
 {
 	SUBICON_None = 0,

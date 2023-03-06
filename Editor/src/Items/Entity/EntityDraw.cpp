@@ -90,8 +90,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 			case Qt::OpenHandCursor:	// Rotating
 				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
-			case Qt::ClosedHandCursor:	// Rotating
 				[[fallthrough]];
+			case Qt::ClosedHandCursor:	// Rotating
 			case Qt::SizeAllCursor:		// Translating
 			case Qt::SizeBDiagCursor:	// Scaling
 			case Qt::SizeVerCursor:		// Scaling

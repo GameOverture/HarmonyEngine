@@ -10,6 +10,7 @@
 #ifndef ENTITYWIDGET_H
 #define ENTITYWIDGET_H
 
+#include "Global.h"
 #include "EntityModel.h"
 #include "IWidget.h"
 
@@ -24,9 +25,6 @@ class EntityWidget : public IWidget
 {
 	Q_OBJECT
 
-	QMenu				m_MenuAddPrimitive;
-	QMenu				m_MenuAddShape;
-
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~EntityWidget();
@@ -35,8 +33,6 @@ public:
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
-	void ResetLabels();
-
 	QList<EntityTreeItemData *> GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes);
 	void RequestSelectedItems(QList<QUuid> uuidList); // Calls signal
 	void SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList); // Does not call signal
@@ -44,6 +40,9 @@ public:
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;
 	virtual void resizeEvent(QResizeEvent *pEvent) override;
+
+	void DoShapeTriggered(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType);
+	void ClearAddShape();
 
 private Q_SLOTS:
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
