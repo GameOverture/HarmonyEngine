@@ -16,8 +16,7 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 	m_Uuid(uuid),
 	m_ItemUuid(itemUuid),
 	m_pChild(nullptr),
-	m_pShape(nullptr),
-	m_bStale(false)
+	m_pShape(nullptr)
 {
 	switch(m_eGuiType)
 	{
@@ -81,16 +80,6 @@ TransformCtrl &EntityDrawItem::GetTransformCtrl()
 	return m_Transform;
 }
 
-bool EntityDrawItem::IsStale() const
-{
-	return m_bStale;
-}
-
-void EntityDrawItem::SetStale()
-{
-	m_bStale = true;
-}
-
 bool EntityDrawItem::IsMouseInBounds() const
 {
 	HyShape2d boundingShape;
@@ -122,8 +111,6 @@ void EntityDrawItem::RefreshJson(HyCamera2d *pCamera, QJsonObject childObj)
 	m_pChild->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
 
 	//RefreshTransform(pCamera);
-
-	m_bStale = false;
 }
 
 void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)

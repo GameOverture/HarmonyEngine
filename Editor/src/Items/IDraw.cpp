@@ -64,7 +64,7 @@ void IDraw::GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut)
 
 void IDraw::SetCamera(glm::vec2 ptCamPos, float fZoom)
 {
-	m_ptCamPos = ptCamPos;
+	m_ptCamPos = HyMath::RoundVec(ptCamPos);
 	m_fCamZoom = fZoom;
 
 	m_pCamera->pos.Set(m_ptCamPos);

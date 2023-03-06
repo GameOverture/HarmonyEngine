@@ -23,8 +23,6 @@ class EntityDrawItem
 
 	TransformCtrl							m_Transform;
 
-	bool									m_bStale;
-
 public:
 	EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
@@ -36,9 +34,6 @@ public:
 	IHyLoadable2d *GetNodeChild() const;
 	HyShape2d *GetShape() const;
 	TransformCtrl &GetTransformCtrl();
-
-	bool IsStale() const;
-	void SetStale();
 
 	bool IsMouseInBounds() const;
 

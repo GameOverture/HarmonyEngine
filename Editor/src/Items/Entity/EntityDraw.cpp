@@ -30,8 +30,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ EntityDraw::~EntityDraw()
 {
-	SetEverythingStale();
-	DeleteStaleChildren();
+	for(auto pItem : m_ItemList)
+		delete pItem;
 }
 
 /*virtual*/ void EntityDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
@@ -42,6 +42,11 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 /*virtual*/ void EntityDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
 {
 	IDraw::OnKeyReleaseEvent(pEvent);
+}
+
+/*virtual*/ void EntityDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
+{
+	IDraw::OnMouseWheelEvent(pEvent);
 }
 
 /*virtual*/ void EntityDraw::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
@@ -83,6 +88,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 			case Qt::OpenHandCursor:	// Rotating
 				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
+			case Qt::ClosedHandCursor:	// Rotating
 				[[fallthrough]];
 			case Qt::SizeAllCursor:		// Translating
 			case Qt::SizeBDiagCursor:	// Scaling
@@ -133,48 +139,6 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	}
 }
 
-/*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
-{
-	IDraw::OnMouseReleaseEvent(pEvent);
-	
-	if(m_eDragState == DRAGSTATE_DrawingShape)
-	{
-		ClearDrawShape();
-	}
-	else if(m_eDragState == DRAGSTATE_Transforming)
-	{
-		QList<EntityTreeItemData *> treeItemDataList;
-		QList<glm::mat4> newTransformList;
-		for(EntityDrawItem *pDrawItem : m_SelectedItemList)
-		{
-			if(pDrawItem->GetGuiType() != ITEM_Shape)
-				newTransformList.push_back(pDrawItem->GetNodeChild()->GetSceneTransform(0.0f));
-			else
-				newTransformList.push_back(m_ActiveTransform.GetSceneTransform(0.0f));
-
-			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetThisUuid());;
-			treeItemDataList.push_back(pTreeItemData);
-		}
-
-		QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, treeItemDataList, newTransformList, m_PrevTransformList);
-		m_pProjItem->GetUndoStack()->push(pCmd);
-
-		m_ActiveTransform.ChildrenTransfer(*this);
-
-		m_ActiveTransform.pos.Set(0.0f, 0.0f);
-		m_ActiveTransform.rot.Set(0.0f);
-		m_ActiveTransform.scale.Set(1.0f, 1.0f);
-	}
-
-	m_eDragState = DRAGSTATE_None;
-	RefreshTransforms();
-}
-
-/*virtual*/ void EntityDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
-{
-	IDraw::OnMouseWheelEvent(pEvent);
-}
-
 /*virtual*/ void EntityDraw::OnMouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
 	IDraw::OnMouseMoveEvent(pEvent);
@@ -206,6 +170,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 					{
 						if(pDrawItem->GetGuiType() != ITEM_Shape)
 						{
+							if(pDrawItem->GetNodeChild()->GetInternalFlags() & NODETYPE_IsBody)
+							{
+								IHyBody2d *pDrawBody = static_cast<IHyBody2d *>(pDrawItem->GetNodeChild());
+								pDrawBody->SetDisplayOrder(pDrawBody->GetDisplayOrder()); // This enables the 'EXPLICIT_DisplayOrder' flag to be used during m_ActiveTransform's parental guidance
+							}
+
 							m_ActiveTransform.ChildAppend(*pDrawItem->GetNodeChild());
 							m_PrevTransformList.push_back(pDrawItem->GetNodeChild()->GetSceneTransform(0.0f));
 						}
@@ -237,7 +207,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 						m_ActiveTransform.rot.Set(fRot);
 					}
 					else
-						m_ActiveTransform.rot.Set(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart));
+						m_ActiveTransform.rot.Set(HyMath::Round(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart)));
 					break;
 
 				case Qt::SizeAllCursor:		// Translating
@@ -268,10 +238,10 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 							}
 						}
 
-						m_ActiveTransform.pos.Set(ptClosest - m_ptDragCenter);
+						m_ActiveTransform.pos.Set(HyMath::RoundVec(ptClosest - m_ptDragCenter));
 					}
 					else
-						m_ActiveTransform.pos.Set(ptMousePos - m_ptDragStart);
+						m_ActiveTransform.pos.Set(HyMath::RoundVec(ptMousePos - m_ptDragStart));
 					break;
 
 				case Qt::SizeBDiagCursor:	// Scaling
@@ -280,8 +250,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				case Qt::SizeHorCursor: {	// Scaling
 					m_ActiveTransform.scale_pivot.Set(m_ptDragAnchorPoint);
 
-					float fRequiredWidth = fabs(m_ActiveTransform.scale_pivot.X() - ptMousePos.x);//m_Init.layout.m_vLayoutExtents[eLayout].x * 2.0f;
-					float fRequiredHeight = fabs(m_ActiveTransform.scale_pivot.Y() - ptMousePos.y);//m_Init.layout.m_vLayoutExtents[eLayout].y * 2.0f;
+					float fRequiredWidth = fabs(m_ActiveTransform.scale_pivot.X() - ptMousePos.x);
+					float fRequiredHeight = fabs(m_ActiveTransform.scale_pivot.Y() - ptMousePos.y);
 
 					if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
 						m_ActiveTransform.scale.Set(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
@@ -367,6 +337,43 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
 		}
 	}
+}
+
+/*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
+{
+	IDraw::OnMouseReleaseEvent(pEvent);
+
+	if(m_eDragState == DRAGSTATE_DrawingShape)
+	{
+		ClearDrawShape();
+	}
+	else if(m_eDragState == DRAGSTATE_Transforming)
+	{
+		QList<EntityTreeItemData *> treeItemDataList;
+		QList<glm::mat4> newTransformList;
+		for(EntityDrawItem *pDrawItem : m_SelectedItemList)
+		{
+			if(pDrawItem->GetGuiType() != ITEM_Shape)
+				newTransformList.push_back(pDrawItem->GetNodeChild()->GetSceneTransform(0.0f));
+			else
+				newTransformList.push_back(m_ActiveTransform.GetSceneTransform(0.0f));
+
+			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetThisUuid());;
+			treeItemDataList.push_back(pTreeItemData);
+		}
+
+		// Transferring the children in 'm_ActiveTransform' back into *this will be done automatically in OnApplyJsonMeta()
+		QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, treeItemDataList, newTransformList, m_PrevTransformList);
+		m_pProjItem->GetUndoStack()->push(pCmd);
+
+		// Reset 'm_ActiveTransform' to prep for the next transform
+		m_ActiveTransform.pos.Set(0.0f, 0.0f);
+		m_ActiveTransform.rot.Set(0.0f);
+		m_ActiveTransform.scale.Set(1.0f, 1.0f);
+	}
+
+	m_eDragState = DRAGSTATE_None;
+	RefreshTransforms();
 }
 
 void EntityDraw::OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList)
@@ -505,7 +512,19 @@ void EntityDraw::ClearDrawShape()
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/
 {
-	SetEverythingStale();
+	for(auto pItem : m_ItemList)
+	{
+		if(pItem->GetGuiType() != ITEM_Shape)
+		{
+			if(pItem->GetNodeChild()->GetInternalFlags() & NODETYPE_IsBody)
+			{
+				pItem->GetNodeChild()->ParentDetach();
+				static_cast<IHyBody2d *>(pItem->GetNodeChild())->ResetDisplayOrder();
+			}
+		}
+	}
+	m_StaleItemList = m_ItemList;
+	m_ItemList.clear();
 
 	QJsonArray childArray = itemMetaObj["childList"].toArray();
 	for(int32 i = 0; i < childArray.size(); ++i)
@@ -514,18 +533,31 @@ void EntityDraw::ClearDrawShape()
 
 		HyGuiItemType eType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
 		QUuid uuid(childObj["UUID"].toString());
+		
 		EntityDrawItem *pItemWidget = FindStaleChild(eType, uuid);
 		if(pItemWidget == nullptr)
 		{
 			QUuid itemUuid(childObj["itemUUID"].toString());
-
 			pItemWidget = new EntityDrawItem(eType, uuid, itemUuid, this);
-			m_ItemList.push_back(pItemWidget);
 		}
+		else
+			m_StaleItemList.removeOne(pItemWidget);
 
+		m_ItemList.push_back(pItemWidget);
+
+		if(pItemWidget->GetGuiType() != ITEM_Shape)
+			ChildAppend(*pItemWidget->GetNodeChild());
+		else
+			ShapeAppend(*pItemWidget->GetShape());
+		
 		pItemWidget->RefreshJson(m_pCamera, childObj);
 	}
-	DeleteStaleChildren();
+	
+	// Delete all the remaining stale items
+	for(auto pStaleItem : m_StaleItemList)
+		delete pStaleItem;
+	m_StaleItemList.clear();
+
 
 	QJsonArray shapeArray = itemMetaObj["shapeList"].toArray();
 	for(int32 i = 0; i < shapeArray.size(); ++i)
@@ -556,35 +588,15 @@ void EntityDraw::ClearDrawShape()
 	RefreshTransforms();
 }
 
-void EntityDraw::SetEverythingStale()
-{
-	for(EntityDrawItem *pItem : m_ItemList)
-		pItem->SetStale();
-}
-
 EntityDrawItem *EntityDraw::FindStaleChild(HyGuiItemType eType, QUuid uuid)
 {
-	for(EntityDrawItem *pItem : m_ItemList)
+	for(EntityDrawItem *pStaleItem : m_StaleItemList)
 	{
-		if(pItem->GetGuiType() == eType && pItem->GetThisUuid() == uuid && pItem->IsStale())
-			return pItem;
+		if(pStaleItem->GetGuiType() == eType && pStaleItem->GetThisUuid() == uuid)
+			return pStaleItem;
 	}
 
 	return nullptr;
-}
-
-void EntityDraw::DeleteStaleChildren()
-{
-	for(auto iter = m_ItemList.begin(); iter != m_ItemList.end(); )
-	{
-		if((*iter)->IsStale())
-		{
-			delete (*iter);
-			iter = m_ItemList.erase(iter);
-		}
-		else
-			++iter;
-	}
 }
 
 Qt::CursorShape EntityDraw::GetGrabPointCursorShape(GrabPoint eGrabPoint, float fRotation) const

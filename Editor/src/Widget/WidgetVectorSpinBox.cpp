@@ -42,6 +42,9 @@ void WidgetVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVar
 		ui->intSpinBoxY->setMinimum(minValue.toInt());
 		ui->intSpinBoxX->setMaximum(maxValue.toInt());
 		ui->intSpinBoxY->setMaximum(maxValue.toInt());
+
+		ui->intSpinBoxX->setFocus();
+		ui->intSpinBoxX->selectAll();
 		break;
 
 	case SPINBOXTYPE_Double2d:
@@ -49,6 +52,9 @@ void WidgetVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVar
 		ui->doubleSpinBoxY->setMinimum(minValue.toDouble());
 		ui->doubleSpinBoxX->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBoxY->setMaximum(maxValue.toDouble());
+
+		ui->doubleSpinBoxX->setFocus();
+		ui->doubleSpinBoxX->selectAll();
 		break;
 
 	case SPINBOXTYPE_Int3d:
@@ -58,6 +64,9 @@ void WidgetVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVar
 		ui->intSpinBox3dX->setMaximum(maxValue.toInt());
 		ui->intSpinBox3dY->setMaximum(maxValue.toInt());
 		ui->intSpinBox3dZ->setMaximum(maxValue.toInt());
+
+		ui->intSpinBox3dX->setFocus();
+		ui->intSpinBox3dX->selectAll();
 		break;
 
 	case SPINBOXTYPE_Double3d:
@@ -67,6 +76,9 @@ void WidgetVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVar
 		ui->doubleSpinBox3dX->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBox3dY->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBox3dZ->setMaximum(maxValue.toDouble());
+
+		ui->doubleSpinBox3dX->setFocus();
+		ui->doubleSpinBox3dX->selectAll();
 		break;
 
 	case SPINBOXTYPE_Int4d:
@@ -78,6 +90,9 @@ void WidgetVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVar
 		ui->intSpinBox4dY->setMaximum(maxValue.toInt());
 		ui->intSpinBox4dZ->setMaximum(maxValue.toInt());
 		ui->intSpinBox4dW->setMaximum(maxValue.toInt());
+
+		ui->intSpinBox4dX->setFocus();
+		ui->intSpinBox4dX->selectAll();
 		break;
 
 	case SPINBOXTYPE_Double4d:
@@ -89,6 +104,9 @@ void WidgetVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVar
 		ui->doubleSpinBox4dY->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBox4dZ->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBox4dW->setMaximum(maxValue.toDouble());
+
+		ui->doubleSpinBox4dX->setFocus();
+		ui->doubleSpinBox4dX->selectAll();
 		break;
 
 	default:

@@ -315,11 +315,30 @@ public:
 	static float NormalizeRange(float fValue, float fMin, float fMax);
 	static int32 NormalizeRange(int32 iValue, int32 iMin, int32 iMax);
 
+	template<typename TYPE>
+	static TYPE Round(TYPE value)
+	{
+		return round(value);
+	}
+
 	// Rounds a given number to the nearest multiple of a specified value
 	template<typename TYPE>
 	static TYPE RoundToNearest(TYPE value, TYPE multiple)
 	{
 		return round(value / multiple) * multiple;
+	}
+
+	static glm::vec2 RoundVec(const glm::vec2 &vectorOut)
+	{
+		return glm::vec2(round(vectorOut.x), round(vectorOut.y));
+	}
+	static glm::vec3 RoundVec(const glm::vec3 &vectorOut)
+	{
+		return glm::vec3(round(vectorOut.x), round(vectorOut.y), round(vectorOut.z));
+	}
+	static glm::vec4 RoundVec(const glm::vec4 &vectorOut)
+	{
+		return glm::vec4(round(vectorOut.x), round(vectorOut.y), round(vectorOut.z), round(vectorOut.w));
 	}
 
 	template <typename VEC>

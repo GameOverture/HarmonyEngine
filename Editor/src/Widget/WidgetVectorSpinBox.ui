@@ -41,7 +41,7 @@
       <number>0</number>
      </property>
      <property name="currentIndex">
-      <number>5</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="intPage">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -282,6 +282,26 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>doubleSpinBox4dX</tabstop>
+  <tabstop>doubleSpinBox4dY</tabstop>
+  <tabstop>doubleSpinBox4dZ</tabstop>
+  <tabstop>doubleSpinBox4dW</tabstop>
+  <tabstop>intSpinBoxX</tabstop>
+  <tabstop>intSpinBoxY</tabstop>
+  <tabstop>doubleSpinBoxX</tabstop>
+  <tabstop>doubleSpinBoxY</tabstop>
+  <tabstop>intSpinBox3dX</tabstop>
+  <tabstop>intSpinBox3dY</tabstop>
+  <tabstop>intSpinBox3dZ</tabstop>
+  <tabstop>doubleSpinBox3dX</tabstop>
+  <tabstop>doubleSpinBox3dY</tabstop>
+  <tabstop>doubleSpinBox3dZ</tabstop>
+  <tabstop>intSpinBox4dX</tabstop>
+  <tabstop>intSpinBox4dY</tabstop>
+  <tabstop>intSpinBox4dZ</tabstop>
+  <tabstop>intSpinBox4dW</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
