@@ -33,6 +33,7 @@ public:
 	~DlgAssetProperties();
 
 	QList<AssetItemData *> GetChangedAssets();
+	void ApplyChanges();
 
 private Q_SLOTS:
 	void on_cmbTextureType_currentIndexChanged(int iIndex);
@@ -51,7 +52,6 @@ private:
 
 	void Refresh();
 	bool DetermineChangedAssets();
-	void ApplyChanges();
 };
 
 #endif // DLGASSETPROPERTIES_H

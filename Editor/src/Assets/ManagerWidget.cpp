@@ -513,7 +513,14 @@ void ManagerWidget::on_actionAssetSettings_triggered()
 
 	DlgAssetProperties dlg(m_pModel, selectedAssetsList);
 	if(dlg.exec() == QDialog::Accepted)
-		m_pModel->ReplaceAssets(dlg.GetChangedAssets(), false);
+	{
+		QList<ProjectItemData *> tmpUnusedList;
+		if(m_pModel->CanReplaceAssets(dlg.GetChangedAssets(), tmpUnusedList))
+		{
+			dlg.ApplyChanges();
+			m_pModel->ReplaceAssets(dlg.GetChangedAssets(), false);
+		}
+	}
 }
 
 void ManagerWidget::on_actionDeleteAssets_triggered()

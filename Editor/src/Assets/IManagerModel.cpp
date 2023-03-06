@@ -247,11 +247,11 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 	SaveMeta();
 }
 
-void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets)
+bool IManagerModel::CanReplaceAssets(QList<AssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const
 {
 	ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
 
-	m_RepackAffectedItemList.clear();
+	affectedItemListOut.clear();
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
 		QSet<ProjectItemData *> sLinks = assetsList[i]->GetDependencies();
@@ -260,7 +260,7 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 			for(QSet<ProjectItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
 			{
 				ProjectItemData *pLinkedItem = *linksIter;
-				m_RepackAffectedItemList.append(pLinkedItem);
+				affectedItemListOut.append(pLinkedItem);
 
 				// Abort if any of these linked items are currently opened & unsaved
 				for(int iTabBarIndex = 0; iTabBarIndex < pTabBar->count(); ++iTabBarIndex)
@@ -272,12 +272,23 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 					{
 						QString sMessage = "'" % assetsList[i]->GetName() % "' asset cannot be replaced because an item that references it is currently opened and unsaved:\n" % pOpenItem->GetName(true);
 						HyGuiLog(sMessage, LOGTYPE_Warning);
-						return;
+						
+						affectedItemListOut.clear();
+						
+						return false;
 					}
 				}
 			}
 		}
 	}
+
+	return true;
+}
+
+void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets)
+{
+	if(CanReplaceAssets(assetsList, m_RepackAffectedItemList) == false)
+		return;
 
 	if(bWithNewAssets)
 	{

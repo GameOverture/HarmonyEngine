@@ -225,6 +225,56 @@ QList<AssetItemData *> DlgAssetProperties::GetChangedAssets()
 	return m_ChangedAssets;
 }
 
+void DlgAssetProperties::ApplyChanges()
+{
+	switch(ui->stackedAssetType->currentIndex())
+	{
+	case ASSET_Atlas: {
+		uint8 uiParam1 = 0, uiParam2 = 0;
+		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
+		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
+
+		for(auto pAsset : m_ChangedAssets)
+		{
+			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+			HyTextureInfo assetTexInfo = pFrame->GetTextureInfo();
+
+			if(eFiltering != HYTEXFILTER_Unknown)
+				pFrame->SetFiltering(eFiltering);
+
+			if(eFormat != HYTEXTURE_Unknown)
+				pFrame->SetFormat(eFormat, uiParam1, uiParam2);
+		}
+		break; }
+
+	case ASSET_Audio:
+		for(auto pAsset : m_ChangedAssets)
+		{
+			AudioAsset *pAudio = static_cast<AudioAsset *>(pAsset);
+
+			if(ui->audioGroup->IsValid() && ui->audioGroup->GetCurrentId() != pAudio->GetGroupId())
+				pAudio->SetGroupId(ui->audioGroup->GetCurrentId());
+
+			if(ui->chkIsStreaming->checkState() != Qt::PartiallyChecked)
+				pAudio->SetIsStreaming(ui->chkIsStreaming->checkState() == Qt::Checked);
+
+			if(ui->chkExportAsMono->checkState() != Qt::PartiallyChecked)
+				pAudio->SetIsExportMono(ui->chkExportAsMono->checkState() == Qt::Checked);
+
+			if(ui->chkIsCompressed->checkState() != Qt::PartiallyChecked)
+			{
+				pAudio->SetIsCompressed(ui->chkIsCompressed->checkState() == Qt::Checked);
+				if(ui->chkIsCompressed->checkState() == Qt::Checked)
+					pAudio->SetVbrQuality(ui->sbVbrQuality->value());
+			}
+
+			if(ui->grpMaxInstances->isCheckable() == false || ui->grpMaxInstances->isChecked())
+				pAudio->SetInstanceLimit(ui->sbInstanceLimit->value());
+		}
+		break;
+	}
+}
+
 void DlgAssetProperties::on_cmbTextureType_currentIndexChanged(int iIndex)
 {
 	Refresh();
@@ -259,7 +309,6 @@ void DlgAssetProperties::on_sbInstanceLimit_valueChanged(int iArg)
 	{
 		if(bAssetsChanged && QMessageBox::Ok == QMessageBox::warning(nullptr, QString("Save asset properties?"), QString("Save asset properties? Changed assets will need to be repacked."), QMessageBox::Ok, QMessageBox::Cancel))
 		{
-			ApplyChanges();
 			QDialog::done(r);
 		}
 		else
@@ -414,52 +463,3 @@ bool DlgAssetProperties::DetermineChangedAssets()
 	return m_ChangedAssets.empty() == false;
 }
 
-void DlgAssetProperties::ApplyChanges()
-{
-	switch(ui->stackedAssetType->currentIndex())
-	{
-	case ASSET_Atlas: {
-		uint8 uiParam1 = 0, uiParam2 = 0;
-		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
-		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
-
-		for(auto pAsset : m_ChangedAssets)
-		{
-			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-			HyTextureInfo assetTexInfo = pFrame->GetTextureInfo();
-
-			if(eFiltering != HYTEXFILTER_Unknown)
-				pFrame->SetFiltering(eFiltering);
-			
-			if(eFormat != HYTEXTURE_Unknown)
-				pFrame->SetFormat(eFormat, uiParam1, uiParam2);
-		}
-		break; }
-
-	case ASSET_Audio:
-		for(auto pAsset : m_ChangedAssets)
-		{
-			AudioAsset *pAudio = static_cast<AudioAsset *>(pAsset);
-
-			if(ui->audioGroup->IsValid() && ui->audioGroup->GetCurrentId() != pAudio->GetGroupId())
-				pAudio->SetGroupId(ui->audioGroup->GetCurrentId());
-
-			if(ui->chkIsStreaming->checkState() != Qt::PartiallyChecked)
-				pAudio->SetIsStreaming(ui->chkIsStreaming->checkState() == Qt::Checked);
-
-			if(ui->chkExportAsMono->checkState() != Qt::PartiallyChecked)
-				pAudio->SetIsExportMono(ui->chkExportAsMono->checkState() == Qt::Checked);
-				
-			if(ui->chkIsCompressed->checkState() != Qt::PartiallyChecked)
-			{
-				pAudio->SetIsCompressed(ui->chkIsCompressed->checkState() == Qt::Checked);
-				if(ui->chkIsCompressed->checkState() == Qt::Checked)
-					pAudio->SetVbrQuality(ui->sbVbrQuality->value());
-			}
-
-			if(ui->grpMaxInstances->isCheckable() == false || ui->grpMaxInstances->isChecked())
-				pAudio->SetInstanceLimit(ui->sbInstanceLimit->value());
-		}
-		break;
-	}
-}

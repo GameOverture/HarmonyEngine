@@ -66,6 +66,7 @@ public:
 	void GenerateAssetsDlg(const QModelIndex &indexDestination);
 	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
 	void RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
+	bool CanReplaceAssets(QList<AssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const;
 	void ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets);
 	void Rename(TreeModelItemData *pItem, QString sNewName);
 	bool TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId);
