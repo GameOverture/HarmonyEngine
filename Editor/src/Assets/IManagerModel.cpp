@@ -263,12 +263,12 @@ void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithN
 				m_RepackAffectedItemList.append(pLinkedItem);
 
 				// Abort if any of these linked items are currently opened & unsaved
-				for(int i = 0; i < pTabBar->count(); ++i)
+				for(int iTabBarIndex = 0; iTabBarIndex < pTabBar->count(); ++iTabBarIndex)
 				{
-					QVariant v = pTabBar->tabData(i);
+					QVariant v = pTabBar->tabData(iTabBarIndex);
 					ProjectItemData *pOpenItem = v.value<ProjectItemData *>();
 
-					if(pLinkedItem == pOpenItem && pTabBar->tabText(i).contains('*', Qt::CaseInsensitive))
+					if(pLinkedItem == pOpenItem && pTabBar->tabText(iTabBarIndex).contains('*', Qt::CaseInsensitive))
 					{
 						QString sMessage = "'" % assetsList[i]->GetName() % "' asset cannot be replaced because an item that references it is currently opened and unsaved:\n" % pOpenItem->GetName(true);
 						HyGuiLog(sMessage, LOGTYPE_Warning);
