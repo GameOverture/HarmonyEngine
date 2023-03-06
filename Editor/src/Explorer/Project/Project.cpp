@@ -1111,14 +1111,8 @@ bool Project::HarmonyInitialize()
 // IHyEngine
 bool Project::HarmonyUpdate()
 {
-	if(m_pAtlasWidget)
-		m_pAtlasWidget->DrawUpdate();
-
 	if(m_pTabBar->count() > 0)
-	{
 		m_pDraw->Hide();
-		//m_pTabBar->tabData(m_pTabBar->currentIndex()).value<ProjectItemData *>()->WidgetUpdate(*this);
-	}
 	else
 		m_pDraw->Show();
 

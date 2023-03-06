@@ -1,31 +1,31 @@
 /**************************************************************************
- *	WidgetOutputLog.cpp
+ *	AuxOutputLog.cpp
  *
  *	Harmony Engine - Editor Tool
- *	Copyright (c) 2016 Jason Knobler
+ *	Copyright (c) 2023 Jason Knobler
  *
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "WidgetOutputLog.h"
-#include "ui_WidgetOutputLog.h"
+#include "AuxOutputLog.h"
+#include "ui_AuxOutputLog.h"
 
 #include <QStringBuilder>
 #include <QMessageBox>
 
-WidgetOutputLog *WidgetOutputLog::sm_pInstance = nullptr;
+AuxOutputLog *AuxOutputLog::sm_pInstance = nullptr;
 
-/*static*/ const QString WidgetOutputLog::sm_ksNormalHtml = "<font color=\"White\">";
-/*static*/ const QString WidgetOutputLog::sm_ksWarningHtml = "<font color=\"Yellow\">";
-/*static*/ const QString WidgetOutputLog::sm_ksErrorHtml = "<font color=\"DeepPink\">";
-/*static*/ const QString WidgetOutputLog::sm_ksInfoHtml = "<font color=\"Aqua\">";
-/*static*/ const QString WidgetOutputLog::sm_ksTitleHtml = "<font color=\"DarkCyan\">";
-/*static*/ const QString WidgetOutputLog::sm_ksEndHtml = "</font>";
+/*static*/ const QString AuxOutputLog::sm_ksNormalHtml = "<font color=\"White\">";
+/*static*/ const QString AuxOutputLog::sm_ksWarningHtml = "<font color=\"Yellow\">";
+/*static*/ const QString AuxOutputLog::sm_ksErrorHtml = "<font color=\"DeepPink\">";
+/*static*/ const QString AuxOutputLog::sm_ksInfoHtml = "<font color=\"Aqua\">";
+/*static*/ const QString AuxOutputLog::sm_ksTitleHtml = "<font color=\"DarkCyan\">";
+/*static*/ const QString AuxOutputLog::sm_ksEndHtml = "</font>";
 
-WidgetOutputLog::WidgetOutputLog(QWidget *parent) :
+AuxOutputLog::AuxOutputLog(QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::WidgetOutputLog)
+	ui(new Ui::AuxOutputLog)
 {
 	Q_ASSERT(sm_pInstance == nullptr);
 
@@ -34,12 +34,12 @@ WidgetOutputLog::WidgetOutputLog(QWidget *parent) :
 	sm_pInstance = this;
 }
 
-WidgetOutputLog::~WidgetOutputLog()
+AuxOutputLog::~AuxOutputLog()
 {
 	delete ui;
 }
 
-/*static*/ void WidgetOutputLog::Log(QString sMessage, eLogType eType /*= LOGTYPE_Normal*/)
+/*static*/ void AuxOutputLog::Log(QString sMessage, eLogType eType /*= LOGTYPE_Normal*/)
 {
 	QPlainTextEdit *pTxt = sm_pInstance->ui->m_TextLog;
 

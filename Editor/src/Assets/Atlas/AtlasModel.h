@@ -38,8 +38,6 @@ public:
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() const override;
 
-	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) override;
-
 protected:
 	virtual void OnInit() override;
 	virtual void OnCreateNewBank(QJsonObject &newMetaBankObjRef) override;

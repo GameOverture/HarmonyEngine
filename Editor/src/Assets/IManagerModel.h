@@ -115,9 +115,6 @@ public:
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;
 	virtual QStringList GetSupportedFileExtList() const = 0;
 
-	// Draw occurs when the mouse hovers over the manager widget. ManagerWidget holds the ptr to IManagerDraw, but IManagerModel init/updates the actual concrete IDraw object
-	virtual void OnAllocateDraw(IManagerDraw *&pDrawOut) = 0;
-
 protected:
 	void RegisterAsset(AssetItemData *pAsset);
 	void DeleteAsset(AssetItemData *pAsset);

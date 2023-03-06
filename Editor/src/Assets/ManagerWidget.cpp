@@ -20,6 +20,7 @@
 #include "EntityModel.h"
 #include "PrefabModel.h"
 #include "MainWindow.h"
+#include "AuxAssetInspector.h"
 #include "DlgAssetProperties.h"
 #include "DlgImportTileSheet.h"
 
@@ -141,8 +142,7 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::ManagerWidget),
-	m_pModel(nullptr),
-	m_pDraw(nullptr)
+	m_pModel(nullptr)
 {
 	ui->setupUi(this);
 
@@ -153,8 +153,7 @@ ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :
 ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::ManagerWidget),
-	m_pModel(pModel),
-	m_pDraw(nullptr)
+	m_pModel(pModel)
 {
 	ui->setupUi(this);
 
@@ -163,8 +162,6 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 		ui->grpBank->hide();
 		ui->chkShowAllBanks->hide();
 	}
-
-	m_pModel->OnAllocateDraw(m_pDraw);
 
 	ManagerProxyModel *pProxyModel = new ManagerProxyModel(this);
 	pProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -253,18 +250,6 @@ IManagerModel &ManagerWidget::GetModel()
 quint32 ManagerWidget::GetSelectedBankId()
 {
 	return m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex());
-}
-
-void ManagerWidget::DrawUpdate()
-{
-	if(m_pDraw)
-	{
-		QPoint pos(mapFromGlobal(QCursor::pos()).x(), mapFromGlobal(QCursor::pos()).y());
-		QModelIndex index = ui->assetTree->indexAt(pos);
-
-		//m_pDraw->SetHover(m_pModel->data(index, Qt::UserRole).value<TreeModelItemData *>());
-		m_pDraw->OnDrawUpdate();
-	}
 }
 
 void ManagerWidget::RefreshInfo()
@@ -395,15 +380,11 @@ TreeModelItemData *ManagerWidget::GetSelected(QList<AssetItemData *> &selectedAs
 
 /*virtual*/ void ManagerWidget::enterEvent(QEvent *pEvent) /*override*/
 {
-	if(m_pDraw)
-		m_pDraw->Show();
 	QWidget::enterEvent(pEvent);
 }
 
 /*virtual*/ void ManagerWidget::leaveEvent(QEvent *pEvent) /*override*/
 {
-	if(m_pDraw)
-		m_pDraw->Hide();
 	QWidget::leaveEvent(pEvent);
 }
 
@@ -562,8 +543,7 @@ void ManagerWidget::on_assetTree_clicked()
 	QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
 	GetSelected(selectedAssetsList, selectedFiltersList);
 
-	if(m_pDraw)
-		m_pDraw->SetSelected(selectedAssetsList);
+	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_Preview))->SetSelected(ASSET_Atlas, selectedAssetsList);
 
 	int iNumSelected = selectedAssetsList.count();
 	ui->actionRename->setEnabled(iNumSelected == 1 || selectedFiltersList.empty() == false);

@@ -222,6 +222,15 @@ if(Qt5_DIR)
 		src/Shared/TreeModel/ITreeModel.h
 		src/Shared/TreeModel/TreeModelItem.h
 		src/Shared/TreeModel/TreeModelItemData.h
+		src/Widget/Auxiliary/AuxOutputLog.cpp
+		src/Widget/Auxiliary/AuxOutputLog.h
+		src/Widget/Auxiliary/AuxOutputLog.ui
+		src/Widget/Auxiliary/AuxAssetInspector.cpp
+		src/Widget/Auxiliary/AuxAssetInspector.h
+		src/Widget/Auxiliary/AuxAssetInspector.ui
+		src/Widget/Auxiliary/AuxToolBox.cpp
+		src/Widget/Auxiliary/AuxToolBox.h
+		src/Widget/Auxiliary/AuxToolBox.ui
 		src/Widget/WgtAudioGroup.cpp
 		src/Widget/WgtAudioGroup.h
 		src/Widget/WgtAudioGroup.ui
@@ -235,21 +244,18 @@ if(Qt5_DIR)
 		src/Widget/WidgetGradientEditor.cpp
 		src/Widget/WidgetLiveVariable.cpp
 		src/Widget/WidgetLiveVarManager.cpp
-		src/Widget/WidgetOutputLog.cpp
 		src/Widget/WidgetRangedSlider.cpp
 		src/Widget/WidgetVectorSpinBox.cpp
 		src/Widget/WidgetColor.h
 		src/Widget/WidgetGradientEditor.h
 		src/Widget/WidgetLiveVariable.h
 		src/Widget/WidgetLiveVarManager.h
-		src/Widget/WidgetOutputLog.h
 		src/Widget/WidgetRangedSlider.h
 		src/Widget/WidgetVectorSpinBox.h
 		src/Widget/WidgetColor.ui
 		src/Widget/WidgetGradientEditor.ui
 		src/Widget/WidgetLiveVariable.ui
 		src/Widget/WidgetLiveVarManager.ui
-		src/Widget/WidgetOutputLog.ui
 		src/Widget/WidgetRangedSlider.ui
 		src/Widget/WidgetVectorSpinBox.ui
 		src/_Dependencies/QtWaitingSpinner/waitingspinnerwidget.cpp
@@ -287,6 +293,7 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Dialogs")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Harmony")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Widget")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Widget/Auxiliary")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer/Project")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared")

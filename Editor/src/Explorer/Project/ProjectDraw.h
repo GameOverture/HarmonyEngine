@@ -50,7 +50,7 @@ public:
 	ProjectDraw();
 	virtual ~ProjectDraw();
 
-	virtual void OnDrawUpdate() override;
+	virtual void OnUpdate() override;
 
 	void EnableGridBackground(bool bEnable);
 	void EnableGridOrigin(bool bEnable);

@@ -56,13 +56,7 @@ public:
 	virtual void OnMouseWheelEvent(QWheelEvent *pEvent);
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent);
 
-	virtual void OnDrawUpdate() { }
-
 protected:
-	virtual void OnUpdate() override {
-		OnDrawUpdate();
-	}
-
 	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) { }
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) { }
 	virtual void OnShow() = 0;

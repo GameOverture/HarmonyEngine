@@ -202,11 +202,6 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	return QStringList() << ".png";
 }
 
-/*virtual*/ void AtlasModel::OnAllocateDraw(IManagerDraw *&pDrawOut) /*override*/
-{
-	pDrawOut = new AtlasDraw(*this);
-}
-
 /*virtual*/ void AtlasModel::OnInit() /*override*/
 {
 	// Create data manifest file if one doesn't exist

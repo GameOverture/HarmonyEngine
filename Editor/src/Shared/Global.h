@@ -29,7 +29,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-#include "WidgetOutputLog.h"
+#include "AuxOutputLog.h"
 
 
 class Project;
@@ -111,6 +111,13 @@ enum MdiArea
 	MDILOAD_Renderer    = MDI_MainWindow//(MDI_Explorer | MDI_Managers | MDI_ItemProperties)
 };
 
+enum AuxTab
+{
+	AUXTAB_Output = 0,
+	AUXTAB_Preview,
+	AUXTAB_ToolBox
+};
+
 enum SubIcon
 {
 	SUBICON_None = 0,
@@ -159,7 +166,7 @@ enum Theme
 QAction *FindAction(QList<QAction *> list, QString sName);
 #define FINDACTION(str) FindAction(this->actions(), str)
 
-#define HyGuiLog(msg, type) WidgetOutputLog::Log(QString(msg), type)
+#define HyGuiLog(msg, type) AuxOutputLog::Log(QString(msg), type)
 
 #define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
 

@@ -66,10 +66,6 @@ SourceModel::SourceModel(Project &projRef) :
 	return QStringList() << ".cpp" << ".h"; // TODO: Add shader file types eventually
 }
 
-/*virtual*/ void SourceModel::OnAllocateDraw(IManagerDraw *&pDrawOut) /*override*/
-{
-}
-
 quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName) const
 {
 	QString sCombinedPath;

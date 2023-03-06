@@ -85,6 +85,8 @@ public:
 
 	static IWidget *GetItemProperties();
 
+	static QWidget *GetAuxWidget(AuxTab eTabIndex);
+
 	static void SetStatus(const QString &sMessage, int iTimeoutMs);
 	static void ClearStatus();
 	static void SetDrawStatus(QString sMouse, QString sSize, QString sZoom);
@@ -98,6 +100,8 @@ private Q_SLOTS:
 	void OnCtrlTab();
 	void OnProcessStdOut();
 	void OnProcessErrorOut();
+
+	void on_tabWidgetAux_currentChanged(int iIndex);
 
 	void on_actionNewProject_triggered();
 	void on_actionOpenProject_triggered();

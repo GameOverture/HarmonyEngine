@@ -54,7 +54,6 @@ class ManagerWidget : public QWidget
 	Q_OBJECT
 
 	IManagerModel *				m_pModel;
-	IManagerDraw *				m_pDraw;
 
 public:
 	explicit ManagerWidget(QWidget *pParent = nullptr);
@@ -64,7 +63,6 @@ public:
 	IManagerModel &GetModel();
 	quint32 GetSelectedBankId();
 
-	void DrawUpdate();
 	void RefreshInfo();
 
 	QStringList GetExpandedFilters();

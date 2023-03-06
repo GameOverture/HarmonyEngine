@@ -129,6 +129,8 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->dockWidgetProperties->setWidget(nullptr);
 	ui->dockWidgetProperties->hide();
 
+	ui->tabWidgetAux->setTabVisible(AUXTAB_ToolBox, false);
+
 	HyGuiLog("Recovering previously opened session...", LOGTYPE_Normal);
 	m_Settings.beginGroup("MainWindow");
 	{
@@ -461,6 +463,21 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	return static_cast<IWidget *>(sm_pInstance->ui->dockWidgetProperties->widget());
 }
 
+/*static*/ QWidget *MainWindow::GetAuxWidget(AuxTab eTabIndex)
+{
+	switch(eTabIndex)
+	{
+	case AUXTAB_Output:
+		return sm_pInstance->ui->outputLog;
+	case AUXTAB_Preview:
+		return sm_pInstance->ui->assetInspector;
+	case AUXTAB_ToolBox:
+		return sm_pInstance->ui->toolBox;
+	}
+
+	return nullptr;
+}
+
 /*static*/ void MainWindow::SetStatus(const QString &sMessage, int iTimeoutMs)
 {
 	sm_pInstance->ui->statusBar->showMessage(sMessage, iTimeoutMs);
@@ -521,6 +538,24 @@ void MainWindow::OnProcessErrorOut()
 {
 	QProcess *p = (QProcess *)sender();
 	HyGuiLog(p->readAllStandardError(), LOGTYPE_Info);
+}
+
+void MainWindow::on_tabWidgetAux_currentChanged(int iIndex)
+{
+	switch(iIndex)
+	{
+	case AUXTAB_Output:
+		ui->dockWidgetAuxiliary->setWindowTitle("Output");
+		break;
+
+	case AUXTAB_Preview:
+		ui->dockWidgetAuxiliary->setWindowTitle("Preview");
+		break;
+
+	case AUXTAB_ToolBox:
+		ui->dockWidgetAuxiliary->setWindowTitle("Tool Box");
+		break;
+	}
 }
 
 void MainWindow::on_actionNewProject_triggered()

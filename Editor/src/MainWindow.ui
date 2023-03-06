@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>671</width>
-    <height>504</height>
+    <height>560</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -285,7 +285,7 @@
         <enum>QTabWidget::South</enum>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tabOutputLog">
         <attribute name="title">
@@ -308,7 +308,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="WidgetOutputLog" name="outputLog" native="true"/>
+          <widget class="AuxOutputLog" name="outputLog" native="true"/>
          </item>
         </layout>
        </widget>
@@ -316,11 +316,51 @@
         <attribute name="title">
          <string>Preview</string>
         </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QWidget" name="assetInspector" native="true"/>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabToolBox">
         <attribute name="title">
-         <string>ToolBox</string>
+         <string>Tool Box</string>
         </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QWidget" name="toolBox" native="true"/>
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>
@@ -823,9 +863,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>WidgetOutputLog</class>
+   <class>AuxOutputLog</class>
    <extends>QWidget</extends>
-   <header>WidgetOutputLog.h</header>
+   <header>AuxOutputLog.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
