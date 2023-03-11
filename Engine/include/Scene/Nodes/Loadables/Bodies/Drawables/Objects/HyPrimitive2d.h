@@ -82,6 +82,7 @@ public:
 	void SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
 	uint32 GetNumVerts() const;
+	const glm::vec2 *GetVerts() const;
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
 
 	bool IsWireframe();

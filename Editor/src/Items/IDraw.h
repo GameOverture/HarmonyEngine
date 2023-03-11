@@ -51,6 +51,7 @@ public:
 	// Derived classes should pass their input events to this class, if they want their main camera to accept user control
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent);
 	virtual void OnKeyReleaseEvent(QKeyEvent *pEvent);
+
 	virtual void OnMousePressEvent(QMouseEvent *pEvent);
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent);
 	virtual void OnMouseWheelEvent(QWheelEvent *pEvent);

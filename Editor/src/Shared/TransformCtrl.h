@@ -64,6 +64,26 @@ public:
 
 	bool IsMouseOverBoundingVolume();
 	GrabPoint IsMouseOverGrabPoint();
+
+	bool IsContained(const b2AABB &aabb) const;
+};
+
+class MarqueeBox : public HyEntity2d
+{
+	HyPrimitive2d		m_BoundingVolume;
+	HyPrimitive2d		m_Outline;
+
+	glm::vec2			m_ptStartPos;
+
+public:
+	MarqueeBox(HyEntity2d *pParent);
+	virtual ~MarqueeBox();
+
+	b2AABB GetSelectionBox();
+
+	void SetStartPt(glm::vec2 ptStartPos);
+	void SetDragPt(glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	void Clear();
 };
 
 #endif // TRANSFORMCTRL_H

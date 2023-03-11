@@ -13,330 +13,107 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Entity Type</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="cmbEntityType"/>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox">
-       <property name="title">
-        <string>Nodes:</string>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Entity Type</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbEntityType"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpNodes">
+     <property name="title">
+      <string>Nodes:</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QTreeView" name="nodeTree">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
+        </property>
+        <property name="rootIsDecorated">
+         <bool>false</bool>
+        </property>
+        <property name="itemsExpandable">
+         <bool>false</bool>
+        </property>
+        <attribute name="headerVisible">
+         <bool>false</bool>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="ChildrenToolbar">
         <item>
-         <widget class="QTreeView" name="nodeTree">
-          <property name="selectionMode">
-           <enum>QAbstractItemView::ExtendedSelection</enum>
+         <widget class="QLabel" name="lblAddChildren">
+          <property name="text">
+           <string>Add New Project Items</string>
           </property>
-          <property name="rootIsDecorated">
-           <bool>false</bool>
-          </property>
-          <property name="itemsExpandable">
-           <bool>false</bool>
-          </property>
-          <attribute name="headerVisible">
-           <bool>false</bool>
-          </attribute>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="ChildrenToolbar">
-          <item>
-           <widget class="QLabel" name="lblAddChildren">
-            <property name="text">
-             <string>Add New Project Items</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnAddChild">
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnOrderUp">
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnOrderDown">
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnRemove">
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QToolButton" name="btnAddChild">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="grpAddShape">
-          <property name="title">
-           <string>Add New Shape</string>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <layout class="QFormLayout" name="formLayout_2">
-           <property name="horizontalSpacing">
-            <number>4</number>
-           </property>
-           <property name="verticalSpacing">
-            <number>4</number>
-           </property>
-           <property name="leftMargin">
-            <number>2</number>
-           </property>
-           <property name="topMargin">
-            <number>2</number>
-           </property>
-           <property name="rightMargin">
-            <number>2</number>
-           </property>
-           <property name="bottomMargin">
-            <number>2</number>
-           </property>
-           <item row="1" column="0">
-            <widget class="QLabel" name="lblAddPrimitive">
-             <property name="text">
-              <string>as Primitive</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QToolButton" name="btnAddPrimitiveBox">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddPrimitiveCircle">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddPrimitivePolygon">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddPrimitiveSegment">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddPrimitiveChain">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddPrimitiveLoop">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="lblAddShape">
-             <property name="text">
-              <string>as Bounding Volume</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
-              <widget class="QToolButton" name="btnAddShapeBox">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddShapeCircle">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddShapePolygon">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddShapeSegment">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddShapeChain">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="btnAddShapeLoop">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item row="3" column="1">
-            <widget class="QCheckBox" name="chkSelectAfterAddShape">
-             <property name="text">
-              <string>Select shape after adding</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnOrderUp">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnOrderDown">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnRemove">
+          <property name="text">
+           <string>...</string>
+          </property>
          </widget>
         </item>
        </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSplitter" name="splitter">
-       <property name="mouseTracking">
-        <bool>true</bool>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="childrenCollapsible">
-        <bool>false</bool>
-       </property>
-       <widget class="QFrame" name="SelectedItemFrame">
-        <property name="frameShape">
-         <enum>QFrame::HLine</enum>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="grpAddShape">
+        <property name="title">
+         <string>Add New Shape</string>
         </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>3</number>
-        </property>
-        <property name="midLineWidth">
-         <number>1</number>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <layout class="QFormLayout" name="formLayout_2">
+         <property name="horizontalSpacing">
+          <number>4</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>4</number>
+         </property>
          <property name="leftMargin">
           <number>2</number>
          </property>
@@ -349,53 +126,77 @@
          <property name="bottomMargin">
           <number>2</number>
          </property>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblAddPrimitive">
+           <property name="text">
+            <string>as Primitive</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblSelectedItemIcon">
+            <widget class="QToolButton" name="btnAddPrimitiveBox">
              <property name="text">
-              <string/>
+              <string>...</string>
              </property>
-             <property name="pixmap">
-              <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/Harmony.png</pixmap>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="lblSelectedItemText">
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-               <underline>true</underline>
-              </font>
-             </property>
+            <widget class="QToolButton" name="btnAddPrimitiveCircle">
              <property name="text">
-              <string>TextLabel</string>
+              <string>...</string>
              </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_5">
+            <widget class="QToolButton" name="btnAddPrimitivePolygon">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddPrimitiveSegment">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddPrimitiveChain">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddPrimitiveLoop">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -409,18 +210,172 @@
            </item>
           </layout>
          </item>
-         <item>
-          <widget class="PropertiesTreeView" name="propertyTree">
-           <attribute name="headerVisible">
-            <bool>false</bool>
-           </attribute>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblAddShape">
+           <property name="text">
+            <string>as Bounding Volume</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QToolButton" name="btnAddShapeBox">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddShapeCircle">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddShapePolygon">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddShapeSegment">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddShapeChain">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddShapeLoop">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="chkSelectAfterAddShape">
+           <property name="text">
+            <string>Select shape after adding</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
         </layout>
        </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="lytPropertiesHeader">
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblSelectedItemIcon">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/Harmony.png</pixmap>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
       </widget>
      </item>
+     <item>
+      <widget class="QLabel" name="lblSelectedItemText">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+         <underline>true</underline>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
+   </item>
+   <item>
+    <widget class="PropertiesTreeView" name="propertyTree">
+     <attribute name="headerVisible">
+      <bool>false</bool>
+     </attribute>
+    </widget>
    </item>
   </layout>
   <action name="actionAddPrimitive">

@@ -258,12 +258,12 @@ void EntityWidget::DoShapeTriggered(QToolButton *pBtn, QString sStatusMsg, Edito
 	if(pBtn->isChecked() == false)
 	{
 		ClearAddShape();
-		pBtn->setChecked(Qt::Checked);
+		pBtn->setChecked(true);
 
 		MainWindow::SetStatus(sStatusMsg, 0);
 		EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-		if(pEntDraw)
-			pEntDraw->SetDrawShape(eShapeType, true);
+		//if(pEntDraw)
+		//	pEntDraw->SetDrawShape(eShapeType, true);
 	}
 	else
 		ClearAddShape();
@@ -286,8 +286,8 @@ void EntityWidget::ClearAddShape()
 
 	MainWindow::ClearStatus();
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntDraw)
-		pEntDraw->ClearDrawShape();
+	//if(pEntDraw)
+	//	pEntDraw->ClearDrawShape();
 }
 
 void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)

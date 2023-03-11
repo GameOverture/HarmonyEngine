@@ -318,4 +318,90 @@ GrabPoint TransformCtrl::IsMouseOverGrabPoint()
 	return GRAB_None;
 }
 
+bool TransformCtrl::IsContained(const b2AABB &aabb) const
+{
+	for(int i = 0; i < m_BoundingVolume.GetNumVerts(); ++i)
+	{
+		const glm::vec2 &vertRef = m_BoundingVolume.GetVerts()[i];
+		if(vertRef.x < aabb.lowerBound.x ||
+			vertRef.y < aabb.lowerBound.y ||
+			vertRef.x > aabb.upperBound.x ||
+			vertRef.y > aabb.upperBound.y)
+		{
+			return false;
+		}
+	}
 
+	return true;
+}
+
+MarqueeBox::MarqueeBox(HyEntity2d *pParent) :
+	HyEntity2d(pParent),
+	m_BoundingVolume(this),
+	m_Outline(this)
+{
+	m_BoundingVolume.alpha.Set(0.25f);
+	m_BoundingVolume.SetTint(HyColor::Blue.Lighten());
+
+	m_Outline.UseWindowCoordinates();
+	m_Outline.SetTint(HyColor::Blue.Lighten());
+	m_Outline.SetWireframe(true);
+
+	SetVisible(false);
+}
+
+/*virtual*/ MarqueeBox::~MarqueeBox()
+{
+}
+
+b2AABB MarqueeBox::GetSelectionBox()
+{
+	if(IsVisible() == false)
+	{
+		b2AABB aabb;
+		aabb.lowerBound.x = aabb.lowerBound.y = aabb.upperBound.x = aabb.upperBound.y = 0.0f;
+		return aabb;
+	}
+
+	HyShape2d shape;
+	m_BoundingVolume.CalcLocalBoundingShape(shape);
+
+	b2AABB aabb;
+	shape.ComputeAABB(aabb, glm::mat4(1.0f));
+	return aabb;
+}
+
+void MarqueeBox::SetStartPt(glm::vec2 ptStartPos)
+{
+	SetVisible(true);
+	m_ptStartPos = ptStartPos;
+
+	m_BoundingVolume.SetAsNothing();
+	m_Outline.SetAsNothing();
+}
+
+void MarqueeBox::SetDragPt(glm::vec2 ptDragPos, HyCamera2d *pCamera)
+{
+	glm::vec2 ptLowerBound(m_ptStartPos.x < ptDragPos.x ? m_ptStartPos.x : ptDragPos.x,
+						   m_ptStartPos.y < ptDragPos.y ? m_ptStartPos.y : ptDragPos.y);
+	glm::vec2 ptUpperBound(m_ptStartPos.x >= ptDragPos.x ? m_ptStartPos.x : ptDragPos.x,
+						   m_ptStartPos.y >= ptDragPos.y ? m_ptStartPos.y : ptDragPos.y);
+
+	// Bounding Volume
+	glm::vec2 ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
+	m_BoundingVolume.SetAsBox((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f);
+
+	// Outline
+	pCamera->ProjectToCamera(ptLowerBound, ptLowerBound);
+	pCamera->ProjectToCamera(ptUpperBound, ptUpperBound);
+	ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
+	m_Outline.SetAsBox((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f);
+}
+
+void MarqueeBox::Clear()
+{
+	SetVisible(false);
+
+	m_BoundingVolume.SetAsNothing();
+	m_Outline.SetAsNothing();
+}
