@@ -184,8 +184,8 @@ void HySlider::SetRange(const std::vector<int32> &stepList)
 	m_iMin = m_iMax = m_StepList[0];
 	for(uint32 i = 1; i < static_cast<uint32>(m_StepList.size()); ++i)
 	{
-		m_iMin = HyMin(m_iMin, m_StepList[i]);
-		m_iMax = HyMax(m_iMax, m_StepList[i]);
+		m_iMin = HyMath::Min(m_iMin, m_StepList[i]);
+		m_iMax = HyMath::Max(m_iMax, m_StepList[i]);
 	}
 	
 	FixValues();

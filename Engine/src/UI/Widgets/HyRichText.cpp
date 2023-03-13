@@ -192,7 +192,7 @@ void HyRichText::AssembleDrawables()
 		// TODO: 'm_fColumnLineHeightOffset' should actually be (I think) the max of first line's height, not the max line height overall
 		const HyTextData *pTextData = static_cast<const HyTextData *>(pNewText->AcquireData());
 		if(sCurText.empty() == false && pTextData)
-			m_fColumnLineHeightOffset = HyMax(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
+			m_fColumnLineHeightOffset = HyMath::Max(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
 
 		// Handle next format change
 		if(uiCurFmtIndex < formatChangeList.size())
@@ -229,7 +229,7 @@ void HyRichText::AssembleDrawables()
 				// Determine sprite scale with remaining room left on line
 				float fScaleX = (m_uiColumnWidth - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
 				float fScaleY = fLineHeight / pNewSprite->GetStateHeight(pNewSprite->GetState());
-				pNewSprite->scale.Set(HyMin(fScaleX, fScaleY));
+				pNewSprite->scale.Set(HyMath::Min(fScaleX, fScaleY));
 
 				// Determine if this sprite will not fit in the remaining space on this text line
 				if((ptCurPos.x + pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X())) >= (m_uiColumnWidth-1)) // the -1 should help with scale floating point above
@@ -242,7 +242,7 @@ void HyRichText::AssembleDrawables()
 					// Recalculate sprite scale with modified ptCurPos
 					float fScaleX = (m_uiColumnWidth - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
 					float fScaleY = fLineHeight / pNewSprite->GetStateHeight(pNewSprite->GetState());
-					pNewSprite->scale.Set(HyMin(fScaleX, fScaleY));
+					pNewSprite->scale.Set(HyMath::Min(fScaleX, fScaleY));
 				}
 				pNewSprite->pos.Set(ptCurPos);
 

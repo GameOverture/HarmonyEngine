@@ -479,7 +479,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit
 	else
 		m_uiTextAttributes &= ~TEXTATTRIB_ColumnSplitWordsToFit;
 
-	m_vBoxDimensions.x = HyMax(1.0f, fWidth);
+	m_vBoxDimensions.x = HyMath::Max(1.0f, fWidth);
 	m_vBoxDimensions.y = 0.0f;
 
 	MarkAsDirty();
@@ -979,7 +979,7 @@ offsetCalculation:
 			float fScaleX = m_vBoxDimensions.x / m_fUsedPixelWidth;
 			float fScaleY = m_vBoxDimensions.y / m_fUsedPixelHeight;
 
-			m_fScaleBoxModifier = HyMin(fScaleX, fScaleY);
+			m_fScaleBoxModifier = HyMath::Min(fScaleX, fScaleY);
 
 			bScaleBoxModiferIsSet = true;
 			goto offsetCalculation;

@@ -30,15 +30,15 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_PopChild : public QUndoCommand
+class EntityUndoCmd_PopItems : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	EntityTreeItemData *			m_pNode;
-	uint32							m_uiIndex;
+	QList<EntityTreeItemData *>		m_PoppedItemList;
+	QList<int>						m_PoppedIndexList;
 
 public:
-	EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, EntityTreeItemData *pNodeItem, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_PopChild();
+	EntityUndoCmd_PopItems(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> poppedItemList, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_PopItems();
 
 	virtual void redo() override;
 	virtual void undo() override;

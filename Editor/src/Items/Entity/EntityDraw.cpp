@@ -23,6 +23,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_fMultiTransformStartRot(0.0f),
 	m_pCurHoverItem(nullptr),
 	m_eCurHoverGrabPoint(GRAB_None),
+	m_bSelectionHandled(false),
 	m_eDragState(DRAGSTATE_None)
 {
 	m_MultiTransform.Hide();
@@ -475,7 +476,8 @@ void EntityDraw::DoMousePress_Select(bool bCtrlMod, bool bShiftMod)
 	else
 	{
 		// Check if the click position (m_ptDragStart) is over an item
-		if(m_pCurHoverItem == nullptr)
+		if((m_MultiTransform.IsShown() && m_MultiTransform.IsMouseOverBoundingVolume()) == false &&
+			m_pCurHoverItem == nullptr)
 		{
 			m_Marquee.SetStartPt(m_ptDragStart);
 			m_eDragState = DRAGSTATE_Marquee;
@@ -508,17 +510,9 @@ void EntityDraw::DoMousePress_Select(bool bCtrlMod, bool bShiftMod)
 						selectList += m_SelectedItemList;
 
 					RequestSelection(selectList);
+					m_bSelectionHandled = true;
 				}
 			}
-
-			TransformCtrl *pCurTransform = nullptr;
-			if(m_MultiTransform.IsShown() && m_MultiTransform.IsMouseOverBoundingVolume())
-				pCurTransform = &m_MultiTransform;
-			else
-				pCurTransform = &m_pCurHoverItem->GetTransformCtrl();
-
-			pCurTransform->GetCentroid(m_ptDragCenter);
-			HyEngine::Window().ProjectToWorldPos2d(m_ptDragCenter, m_ptDragCenter);
 
 			m_eDragState = DRAGSTATE_Pending;
 		}
@@ -529,26 +523,43 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 {
 	m_PressTimer.Reset();
 
-	QList<EntityDrawItem *> selectList;
+	QList<EntityDrawItem *> affectedItemList;	// Items that are getting selected or deselected
 	if(m_eDragState == DRAGSTATE_Marquee)
 	{
 		b2AABB marqueeAabb = m_Marquee.GetSelectionBox();
 		for(EntityDrawItem *pItem : m_ItemList)
 		{
-			if(pItem->GetTransformCtrl().IsContained(marqueeAabb))
-				selectList << pItem;
+			if(pItem->GetTransformCtrl().IsContained(marqueeAabb, m_pCamera))
+				affectedItemList << pItem;
 		}
 
 		m_Marquee.Clear();
 	}
 	else if(m_pCurHoverItem) // This covers the resolution of "Special Case" in EntityDraw::DoMousePress_Select
-		selectList << m_pCurHoverItem;
+		affectedItemList << m_pCurHoverItem;
 
-	if(bShiftMod)
-		selectList += m_SelectedItemList;
+	if(m_bSelectionHandled == false)
+	{
+		if(bShiftMod == false)
+			RequestSelection(affectedItemList);
+		else
+		{
+			QList<EntityDrawItem *> selectList = m_SelectedItemList;
 
-	RequestSelection(selectList);
+			for(EntityDrawItem *pAffectedItem : affectedItemList)
+			{
+				if(m_SelectedItemList.contains(pAffectedItem))
+					selectList.removeOne(pAffectedItem);
+				else
+					selectList.append(pAffectedItem);
+			}
 
+			RequestSelection(selectList);
+		}
+	}
+
+	// Reset
+	m_bSelectionHandled = false;
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
@@ -556,6 +567,17 @@ void EntityDraw::BeginTransform()
 {
 	if(m_eDragState == DRAGSTATE_Transforming)
 		return;
+
+	TransformCtrl *pCurTransform = nullptr;
+	if(m_MultiTransform.IsShown())
+		pCurTransform = &m_MultiTransform;
+	else if(m_pCurHoverItem)
+		pCurTransform = &m_pCurHoverItem->GetTransformCtrl();
+	if(pCurTransform)
+	{
+		pCurTransform->GetCentroid(m_ptDragCenter);
+		HyEngine::Window().ProjectToWorldPos2d(m_ptDragCenter, m_ptDragCenter);
+	}
 
 	m_PrevTransformList.clear();
 	for(EntityDrawItem *pDrawItem : m_SelectedItemList)
@@ -601,8 +623,11 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		if(bShiftMod)
 		{
 			float fRot = HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart);
-			fRot = HyMath::RoundToNearest(fRot, 22.5f);
-			m_ActiveTransform.rot.Set(fRot);
+
+			if(m_ActiveTransform.ChildCount() == 1)
+				m_ActiveTransform.ChildGet(0)->rot.Set(HyMath::RoundToNearest(m_ActiveTransform.ChildGet(0)->rot.Get(), 15.0f));
+
+			m_ActiveTransform.rot.Set(HyMath::RoundToNearest(fRot, 15.0f));
 		}
 		else
 			m_ActiveTransform.rot.Set(HyMath::Round(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart)));
@@ -686,7 +711,7 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 			m_ActiveTransform.scale.Set(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
 		else
 		{
-			float fScaleAmt = HyMax(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
+			float fScaleAmt = HyMath::Max(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
 			m_ActiveTransform.scale.Set(fScaleAmt, fScaleAmt);
 		}
 
@@ -722,6 +747,8 @@ void EntityDraw::DoMouseRelease_Transform()
 	m_ActiveTransform.pos.Set(0.0f, 0.0f);
 	m_ActiveTransform.rot.Set(0.0f);
 	m_ActiveTransform.scale.Set(1.0f, 1.0f);
+
+	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
 void EntityDraw::DoMouseMove_NewShape()

@@ -88,7 +88,7 @@ void HyProgressBar::SetMinimum(int32 iMinimum)
 		return;
 
 	m_iMinimum = iMinimum;
-	m_iMaximum = HyMax(m_iMaximum, m_iMinimum);
+	m_iMaximum = HyMath::Max(m_iMaximum, m_iMinimum);
 	m_iValue = HyClamp(m_iValue, m_iMinimum, m_iMaximum);
 	AdjustProgress();
 }
@@ -99,7 +99,7 @@ void HyProgressBar::SetMaximum(int32 iMaximum)
 		return;
 
 	m_iMaximum = iMaximum;
-	m_iMinimum = HyMin(m_iMinimum, m_iMaximum);
+	m_iMinimum = HyMath::Min(m_iMinimum, m_iMaximum);
 	m_iValue = HyClamp(m_iValue, m_iMinimum, m_iMaximum);
 	AdjustProgress();
 }

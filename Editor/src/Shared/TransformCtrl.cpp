@@ -318,15 +318,17 @@ GrabPoint TransformCtrl::IsMouseOverGrabPoint()
 	return GRAB_None;
 }
 
-bool TransformCtrl::IsContained(const b2AABB &aabb) const
+bool TransformCtrl::IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const
 {
-	for(int i = 0; i < m_BoundingVolume.GetNumVerts(); ++i)
+	for(uint i = GRAB_BotLeft; i < 4; ++i)
 	{
-		const glm::vec2 &vertRef = m_BoundingVolume.GetVerts()[i];
-		if(vertRef.x < aabb.lowerBound.x ||
-			vertRef.y < aabb.lowerBound.y ||
-			vertRef.x > aabb.upperBound.x ||
-			vertRef.y > aabb.upperBound.y)
+		glm::vec2 ptVertex = m_ptGrabPos[i];
+		pCamera->GetWindow().ProjectToWorldPos2d(ptVertex, ptVertex);
+
+		if(ptVertex.x < aabb.lowerBound.x ||
+			ptVertex.y < aabb.lowerBound.y ||
+			ptVertex.x > aabb.upperBound.x ||
+			ptVertex.y > aabb.upperBound.y)
 		{
 			return false;
 		}
@@ -356,9 +358,9 @@ MarqueeBox::MarqueeBox(HyEntity2d *pParent) :
 
 b2AABB MarqueeBox::GetSelectionBox()
 {
+	b2AABB aabb;
 	if(IsVisible() == false)
 	{
-		b2AABB aabb;
 		aabb.lowerBound.x = aabb.lowerBound.y = aabb.upperBound.x = aabb.upperBound.y = 0.0f;
 		return aabb;
 	}
@@ -366,7 +368,6 @@ b2AABB MarqueeBox::GetSelectionBox()
 	HyShape2d shape;
 	m_BoundingVolume.CalcLocalBoundingShape(shape);
 
-	b2AABB aabb;
 	shape.ComputeAABB(aabb, glm::mat4(1.0f));
 	return aabb;
 }

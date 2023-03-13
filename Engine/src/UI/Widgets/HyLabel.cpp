@@ -51,7 +51,7 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 		if((m_uiAttribs & LABELATTRIB_SideBySideVertical) == 0)
 			return (m_Panel.size.X() + (m_Text.GetWidth() * m_Text.scale.X()) + m_TextMargins.iTag) * fPercent;
 		else
-			return HyMax(m_Panel.size.X(), m_Text.GetWidth() * m_Text.scale.X()) * fPercent;
+			return HyMath::Max(m_Panel.size.X(), m_Text.GetWidth() * m_Text.scale.X()) * fPercent;
 	}
 	else // Is stacked
 	{
@@ -69,7 +69,7 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
 			return (m_Panel.size.Y() + (m_Text.GetHeight() * m_Text.scale.Y()) + m_TextMargins.iTag) * fPercent;
 		else
-			return HyMax(m_Panel.size.Y(), m_Text.GetHeight() * m_Text.scale.Y()) * fPercent;
+			return HyMath::Max(m_Panel.size.Y(), m_Text.GetHeight() * m_Text.scale.Y()) * fPercent;
 	}
 	else // Is stacked
 	{
@@ -287,13 +287,13 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 		glm::vec2 vPanelSizeHint = m_Panel.GetSizeHint();
 		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
 		{
-			m_vSizeHint.x = static_cast<int32>(HyMax(vPanelSizeHint.x, m_Text.GetWidth()));
+			m_vSizeHint.x = static_cast<int32>(HyMath::Max(vPanelSizeHint.x, m_Text.GetWidth()));
 			m_vSizeHint.y = static_cast<int32>(vPanelSizeHint.y + m_TextMargins.iTag + m_Text.GetHeight());
 		}
 		else // Horizontal
 		{
 			m_vSizeHint.x = static_cast<int32>(vPanelSizeHint.x + m_TextMargins.iTag + m_Text.GetWidth());
-			m_vSizeHint.y = static_cast<int32>(HyMax(vPanelSizeHint.y, m_Text.GetHeight()));
+			m_vSizeHint.y = static_cast<int32>(HyMath::Max(vPanelSizeHint.y, m_Text.GetHeight()));
 		}
 	}
 }
@@ -308,7 +308,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 
 			float fScaleX = uiNewWidth / vTextSize.x;
 			float fScaleY = uiNewHeight / vTextSize.y;
-			m_Text.scale.Set(HyMin(fScaleX, fScaleY));
+			m_Text.scale.Set(HyMath::Min(fScaleX, fScaleY));
 
 			uiNewWidth = static_cast<uint32>(m_Text.GetWidth(m_Text.scale.X()));
 			uiNewHeight = static_cast<uint32>(m_Text.GetHeight(m_Text.scale.Y()));
@@ -345,7 +345,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 
 		float fScaleX = static_cast<float>(vNewTextSize.x) / static_cast<float>(vTextSizeHint.x);
 		float fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);
-		m_Text.scale.Set(HyMin(fScaleX, fScaleY));
+		m_Text.scale.Set(HyMath::Min(fScaleX, fScaleY));
 	}
 
 	ResetTextAndPanel();

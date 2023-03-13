@@ -97,8 +97,8 @@ void HyProfiler::BeginFrame(const HyTime &timeRef)
 
 	double dFrameDelta = timeRef.GetFrameDelta();
 	m_dFrameTime_Cumulative += dFrameDelta;
-	m_dFrameTime_Low = HyMin(m_dFrameTime_Low, dFrameDelta);
-	m_dFrameTime_High = HyMax(m_dFrameTime_High, dFrameDelta);
+	m_dFrameTime_Low = HyMath::Min(m_dFrameTime_Low, dFrameDelta);
+	m_dFrameTime_High = HyMath::Max(m_dFrameTime_High, dFrameDelta);
 
 	if(m_dFrameTime_Cumulative > 1.0)
 	{

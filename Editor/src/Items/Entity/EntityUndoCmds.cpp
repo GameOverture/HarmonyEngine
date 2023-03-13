@@ -55,31 +55,35 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_PopChild::EntityUndoCmd_PopChild(ProjectItemData &entityItemRef, EntityTreeItemData *pNodeItem, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_PopItems::EntityUndoCmd_PopItems(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> poppedItemList, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_pNode(pNodeItem),
-	m_uiIndex(0)
+	m_PoppedItemList(poppedItemList)
 {
 	if(m_EntityItemRef.GetType() != ITEM_Entity)
 		HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_EntityItemRef.GetType()), LOGTYPE_Error);
 
-	setText("Remove Child Node");
+	if(m_PoppedItemList.size() > 1)
+		setText("Remove Items");
+	else if(m_PoppedItemList.size() == 1)
+		setText("Remove " % m_PoppedItemList[0]->GetText());
 }
 
-/*virtual*/ EntityUndoCmd_PopChild::~EntityUndoCmd_PopChild()
+/*virtual*/ EntityUndoCmd_PopItems::~EntityUndoCmd_PopItems()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_PopChild::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_PopItems::redo() /*override*/
 {
-	m_uiIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pNode);
-	//m_EntityItemRef.FocusWidgetState(0, -1);
+	m_PoppedIndexList.clear();
+	for(EntityTreeItemData *pItem : m_PoppedItemList)
+		m_PoppedIndexList.append(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem));
 }
 
-/*virtual*/ void EntityUndoCmd_PopChild::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_PopItems::undo() /*override*/
 {
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pNode, m_uiIndex);
-	//m_EntityItemRef.FocusWidgetState(0, -1);
+	// Reinsert the 'm_PoppedItemList' in reverse order (so the indices work)
+	for(int32 i = m_PoppedItemList.size() - 1; i >= 0; --i)
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_PoppedItemList[i], m_PoppedIndexList[i]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

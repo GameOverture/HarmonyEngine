@@ -78,8 +78,8 @@ HyTextData::HyTextData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets
 
 		if(itemDataObj.HasMember("subAtlasWidth") && itemDataObj.HasMember("subAtlasHeight"))
 		{
-			uiFullAtlasWidth = static_cast<uint32>(HyMax(0, itemDataObj["subAtlasWidth"].GetInt()));
-			uiFullAtlasHeight = static_cast<uint32>(HyMax(0, itemDataObj["subAtlasHeight"].GetInt()));
+			uiFullAtlasWidth = static_cast<uint32>(HyMath::Max(0, itemDataObj["subAtlasWidth"].GetInt()));
+			uiFullAtlasHeight = static_cast<uint32>(HyMath::Max(0, itemDataObj["subAtlasHeight"].GetInt()));
 		}
 		else
 		{

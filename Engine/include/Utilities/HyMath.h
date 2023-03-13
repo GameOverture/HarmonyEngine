@@ -60,18 +60,6 @@ T HyClamp(const T& value, const T& low, const T& high)
 	return value < low ? low : (value > high ? high : value); 
 }
 
-template <class T>
-const T &HyMin(const T &a, const T &b)
-{
-	return (a < b) ? a : b;
-}
-
-template <class T>
-const T &HyMax(const T &a, const T &b)
-{
-	return (a > b) ? a : b;
-}
-
 float HyEase_Linear(float a, float b, float t);
 
 //--------------------------------------------------------------------------------------
@@ -300,6 +288,28 @@ typedef HyColor HyColour;
 class HyMath
 {
 public:
+	template <class T>
+	static const T &Min(const T &a, const T &b)
+	{
+		return (a < b) ? a : b;
+	}
+
+	static glm::vec2 Min(const glm::vec2 &a, const glm::vec2 &b)
+	{
+		return glm::vec2(Min(a.x, b.x), Min(a.y, b.y));
+	}
+
+	template <class T>
+	static const T &Max(const T &a, const T &b)
+	{
+		return (a > b) ? a : b;
+	}
+
+	static glm::vec2 Max(const glm::vec2 &a, const glm::vec2 &b)
+	{
+		return glm::vec2(Max(a.x, b.x), Max(a.y, b.y));
+	}
+
 	static glm::ivec2 LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight);
 	static void InvalidateAABB(b2AABB &aabbOut);
 

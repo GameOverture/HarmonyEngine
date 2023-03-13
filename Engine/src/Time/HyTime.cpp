@@ -44,7 +44,7 @@ void HyTime::BeginFrame()
 	m_dFrameDelta = (m_CurrTime - m_PrevTime).count();
 #endif
 	m_PrevTime = m_CurrTime;
-	m_dFrameDelta = HyMin(m_dFrameDelta, 0.25); // Clamp delta times to 0.25
+	m_dFrameDelta = HyMath::Min(m_dFrameDelta, 0.25); // Clamp delta times to 0.25
 
 	// Update all timers/stopwatches
 	m_dAccumulatedUpdateTime += m_dFrameDelta;

@@ -65,7 +65,7 @@ public:
 	bool IsMouseOverBoundingVolume();
 	GrabPoint IsMouseOverGrabPoint();
 
-	bool IsContained(const b2AABB &aabb) const;
+	bool IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const;
 };
 
 class MarqueeBox : public HyEntity2d

@@ -70,7 +70,7 @@ void IHyCamera<NODETYPE>::CameraShake(float fRadius)
 	if(IsCameraShake() == false)
 		HyCopyVec(m_ptCameraShakeCenter, NODETYPE::pos.Get());
 
-	fRadius = HyMax(fRadius, 2.5f);
+	fRadius = HyMath::Max(fRadius, 2.5f);
 
 	m_fCameraShakeRadius = fRadius;
 	m_fCameraShakeAngle = HyRand::Range(0.0f, 360.0f);

@@ -82,7 +82,7 @@ double HyTimer::TimeLeft() const
 	if(IsExpired())
 		return 0.0f;
 	
-	return HyMax(m_dDuration - m_dElapsedTime, 0.0);
+	return HyMath::Max(m_dDuration - m_dElapsedTime, 0.0);
 }
 
 void HyTimer::SetExpiredCallback(std::function<void(void *)> fpFunc, void *pData)

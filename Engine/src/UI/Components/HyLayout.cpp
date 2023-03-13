@@ -213,14 +213,14 @@ bool HyLayout::IsWidgetInputAllowed()
 
 		glm::ivec2 vItemMinSize = pItem->GetMinSize();
 		m_vMinSize[eOrientation] += vItemMinSize[eOrientation];
-		m_vMinSize[eInverseOrien] = HyMax(m_vMinSize[eInverseOrien], vItemMinSize[eInverseOrien]);
+		m_vMinSize[eInverseOrien] = HyMath::Max(m_vMinSize[eInverseOrien], vItemMinSize[eInverseOrien]);
 
 		m_uiNumExpandItems += (pItem->GetSizePolicy(eOrientation) & HY_SIZEFLAG_EXPAND);		// Adds 1 or 0
 		m_uiNumShrinkItems += ((pItem->GetSizePolicy(eOrientation) & HY_SIZEFLAG_SHRINK) >> 1);	// Adds 1 or 0
 
 		glm::ivec2 vItemSizeHint = pItem->GetSizeHint();
 		m_vSizeHint[eOrientation] += vItemSizeHint[eOrientation];
-		m_vSizeHint[eInverseOrien] = HyMax(m_vSizeHint[eInverseOrien], vItemSizeHint[eInverseOrien]);
+		m_vSizeHint[eInverseOrien] = HyMath::Max(m_vSizeHint[eInverseOrien], vItemSizeHint[eInverseOrien]);
 	}
 }
 
@@ -290,7 +290,7 @@ bool HyLayout::IsWidgetInputAllowed()
 			}
 		}
 		else
-			iMaxInverse = HyMax(iMaxInverse, vItemSize[eInverseOrien]);
+			iMaxInverse = HyMath::Max(iMaxInverse, vItemSize[eInverseOrien]);
 
 		// If 'pItem' is a nested layout, it should pass '0' to Resize where appropriate
 		glm::ivec2 vResize = vItemSize;

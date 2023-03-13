@@ -80,12 +80,12 @@ glm::ivec2 IHyEntityUi::GetMinSize()
 	if((m_SizePolicies[HYORIEN_Horizontal] & HY_SIZEFLAG_SHRINK) == 0)
 		vMinSize.x = vSizeHint.x;
 	else
-		vMinSize.x = HyMin(vMinSize.x, vSizeHint.x);
+		vMinSize.x = HyMath::Min(vMinSize.x, vSizeHint.x);
 
 	if((m_SizePolicies[HYORIEN_Vertical] & HY_SIZEFLAG_SHRINK) == 0)
 		vMinSize.y = vSizeHint.y;
 	else
-		vMinSize.y = HyMin(vMinSize.y, vSizeHint.y);
+		vMinSize.y = HyMath::Min(vMinSize.y, vSizeHint.y);
 
 	return vMinSize;
 }
@@ -104,12 +104,12 @@ glm::ivec2 IHyEntityUi::GetMaxSize()
 	if((m_SizePolicies[HYORIEN_Horizontal] & HY_SIZEFLAG_EXPAND) == 0)
 		vMaxSize.x = vSizeHint.x;
 	else
-		vMaxSize.x = HyMax(vMaxSize.x, vSizeHint.x);
+		vMaxSize.x = HyMath::Max(vMaxSize.x, vSizeHint.x);
 
 	if((m_SizePolicies[HYORIEN_Vertical] & HY_SIZEFLAG_EXPAND) == 0)
 		vMaxSize.y = vSizeHint.y;
 	else
-		vMaxSize.y = HyMax(vMaxSize.y, vSizeHint.y);
+		vMaxSize.y = HyMath::Max(vMaxSize.y, vSizeHint.y);
 
 	return vMaxSize;
 }
@@ -142,8 +142,8 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 			uiNewWidth = vSizeHint.x + ((m_SizePolicies[0] & HY_SIZEFLAG_EXPAND) * vDiff[0]);
 		else
 			uiNewWidth = vSizeHint.x + (((m_SizePolicies[0] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[0]);
-		uiNewWidth = HyMax(uiNewWidth, static_cast<uint32>(m_vMinSize.x));
-		uiNewWidth = HyMin(uiNewWidth, static_cast<uint32>(m_vMaxSize.x));
+		uiNewWidth = HyMath::Max(uiNewWidth, static_cast<uint32>(m_vMinSize.x));
+		uiNewWidth = HyMath::Min(uiNewWidth, static_cast<uint32>(m_vMaxSize.x));
 	}
 
 	// Y-Axis
@@ -153,8 +153,8 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 			uiNewHeight = vSizeHint.y + ((m_SizePolicies[1] & HY_SIZEFLAG_EXPAND) * vDiff[1]);
 		else
 			uiNewHeight = vSizeHint.y + (((m_SizePolicies[1] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[1]);
-		uiNewHeight = HyMax(uiNewHeight, static_cast<uint32>(m_vMinSize.y));
-		uiNewHeight = HyMin(uiNewHeight, static_cast<uint32>(m_vMaxSize.y));
+		uiNewHeight = HyMath::Max(uiNewHeight, static_cast<uint32>(m_vMinSize.y));
+		uiNewHeight = HyMath::Min(uiNewHeight, static_cast<uint32>(m_vMaxSize.y));
 	}
 
 	if(m_bLockProportions && uiNewWidth != 0 && uiNewHeight != 0)

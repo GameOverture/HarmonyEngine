@@ -496,4 +496,8 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 
 void EntityWidget::on_actionRemoveItems_triggered()
 {
+	QList<EntityTreeItemData *> poppedItemList = GetSelectedItems(false, true);
+
+	QUndoCommand *pCmd = new EntityUndoCmd_PopItems(m_ItemRef, poppedItemList);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }

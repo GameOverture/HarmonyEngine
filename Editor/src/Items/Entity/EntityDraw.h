@@ -33,6 +33,7 @@ class EntityDraw : public IDraw
 
 	// Mouse press/dragging
 	HyTimer									m_PressTimer;
+	bool									m_bSelectionHandled;
 	enum DragState
 	{
 		DRAGSTATE_None = 0,

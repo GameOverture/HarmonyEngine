@@ -832,7 +832,7 @@ b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
 
 		vertList[0] = mtxTransform * vertList[0];
 		static_cast<b2CircleShape *>(pCloneB2Shape)->m_p.Set(vertList[0].x, vertList[0].y);
-		static_cast<b2CircleShape *>(pCloneB2Shape)->m_radius = static_cast<b2CircleShape *>(m_pShape)->m_radius * HyMax(fScaleX, fScaleY);
+		static_cast<b2CircleShape *>(pCloneB2Shape)->m_radius = static_cast<b2CircleShape *>(m_pShape)->m_radius * HyMath::Max(fScaleX, fScaleY);
 		break; }
 
 	case HYSHAPE_Polygon:
