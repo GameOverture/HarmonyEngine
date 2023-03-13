@@ -361,7 +361,7 @@ bool HyAnimFloat::UpdateFloat()
 //////////////////////////////////////////////////////////////////////////
 bool HyAnimFloat::_Tween(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const
 {
-	fElapsedTimeOut = HyClamp(fElapsedTimeOut + fDeltaTime, 0.0f, m_fDuration);
+	fElapsedTimeOut = HyMath::Clamp(fElapsedTimeOut + fDeltaTime, 0.0f, m_fDuration);
 	fValueOut = m_fStart + (m_fTarget - m_fStart) * m_fpAnimFunc(fElapsedTimeOut / m_fDuration);
 	uiDirtyFlagsOut = m_uiDIRTY_FLAGS;
 
@@ -370,7 +370,7 @@ bool HyAnimFloat::_Tween(float fDeltaTime, float &fElapsedTimeOut, float &fValue
 
 bool HyAnimFloat::_Proc(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const
 {
-	fElapsedTimeOut = HyClamp(fElapsedTimeOut + fDeltaTime, 0.0f, m_fDuration);
+	fElapsedTimeOut = HyMath::Clamp(fElapsedTimeOut + fDeltaTime, 0.0f, m_fDuration);
 	fValueOut = m_fpAnimFunc(fElapsedTimeOut / m_fDuration);
 	uiDirtyFlagsOut = m_uiDIRTY_FLAGS;
 

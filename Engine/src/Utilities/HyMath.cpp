@@ -105,68 +105,68 @@ bool HyTestPointAABB(const b2AABB &aabb, const glm::vec2 &pt)
 			pt.x >= aabb.lowerBound.x && pt.y >= aabb.lowerBound.y &&
 			pt.x <= aabb.upperBound.x && pt.y <= aabb.upperBound.y);
 }
-
-float HyEase_Linear(float a, float b, float t)
-{
-	return ((b-a)*t)+a;
-}
-
-//--------------------------------------------------------------------------------------
-// Accelerating from zero velocity
-//--------------------------------------------------------------------------------------
-float HyEase_QuadraticIn(float fTime, float fStart, float fDist, float fDur)
-{
-	fTime /= fDur;
-	return fDist * fTime * fTime + fStart;
-}
-
-//--------------------------------------------------------------------------------------
-// Decelerating to zero velocity
-//--------------------------------------------------------------------------------------
-float HyEase_QuadraticOut(float fTime, float fStart, float fDist, float fDur)
-{
-	fTime /= fDur;
-	return -fDist * fTime*(fTime-2) + fStart;
-}
-
-//--------------------------------------------------------------------------------------
-// Acceleration until halfway, then deceleration
-//--------------------------------------------------------------------------------------
-float HyEase_QuadraticInOut(float fTime, float fStart, float fDist, float fDur)
-{
-	fTime /= fDur/2;
-
-	if (fTime < 1) 
-		return fDist/2*fTime*fTime + fStart;
-
-	fTime--;
-
-	return -fDist/2 * (fTime*(fTime-2) - 1) + fStart;
-}
-
-float HyEase_AngleLinear(float angleA, float angleB, int32 spin, float t)
-{
-	if(spin==0)
-	{
-		return angleA;
-	}
-	if(spin>0)
-	{
-		if((angleB-angleA)<0)
-		{
-			angleB+=360;
-		}
-	}
-	else if(spin<0)
-	{
-		if((angleB-angleA)>0)
-		{    
-			angleB-=360;
-		}
-	}
-
-	return HyEase_Linear(angleA,angleB,t);
-}
+//
+//float HyEase_Linear(float a, float b, float t)
+//{
+//	return ((b-a)*t)+a;
+//}
+//
+////--------------------------------------------------------------------------------------
+//// Accelerating from zero velocity
+////--------------------------------------------------------------------------------------
+//float HyEase_QuadraticIn(float fTime, float fStart, float fDist, float fDur)
+//{
+//	fTime /= fDur;
+//	return fDist * fTime * fTime + fStart;
+//}
+//
+////--------------------------------------------------------------------------------------
+//// Decelerating to zero velocity
+////--------------------------------------------------------------------------------------
+//float HyEase_QuadraticOut(float fTime, float fStart, float fDist, float fDur)
+//{
+//	fTime /= fDur;
+//	return -fDist * fTime*(fTime-2) + fStart;
+//}
+//
+////--------------------------------------------------------------------------------------
+//// Acceleration until halfway, then deceleration
+////--------------------------------------------------------------------------------------
+//float HyEase_QuadraticInOut(float fTime, float fStart, float fDist, float fDur)
+//{
+//	fTime /= fDur/2;
+//
+//	if (fTime < 1) 
+//		return fDist/2*fTime*fTime + fStart;
+//
+//	fTime--;
+//
+//	return -fDist/2 * (fTime*(fTime-2) - 1) + fStart;
+//}
+//
+//float HyEase_AngleLinear(float angleA, float angleB, int32 spin, float t)
+//{
+//	if(spin==0)
+//	{
+//		return angleA;
+//	}
+//	if(spin>0)
+//	{
+//		if((angleB-angleA)<0)
+//		{
+//			angleB+=360;
+//		}
+//	}
+//	else if(spin<0)
+//	{
+//		if((angleB-angleA)>0)
+//		{    
+//			angleB-=360;
+//		}
+//	}
+//
+//	return HyEase_Linear(angleA,angleB,t);
+//}
 
 
 glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight)
@@ -257,4 +257,10 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 
 	int32 iOffsetValue = iValue - iMin;
 	return (iOffsetValue - ((iOffsetValue / iWidth) * iWidth)) + iMin;	// + iMin to reset back to start of original range
+}
+
+/*static*/ float HyMath::TweenProgress(float fStart, float fEnd, float fElaspedTime, float fFullDuration, HyTweenFunc fpTweenFunc /*= HyTween::Linear*/)
+{
+	fElaspedTime = HyMath::Clamp(fElaspedTime, 0.0f, fFullDuration);
+	return fStart + (fEnd - fStart) * fpTweenFunc(fElaspedTime / fFullDuration);
 }

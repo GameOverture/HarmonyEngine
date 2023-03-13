@@ -172,7 +172,7 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 	if(m_iCurValue == m_iTargetValue)
 		return;
 
-	m_fElapsedTimeRack = HyClamp(m_fElapsedTimeRack + HyEngine::DeltaTime(), 0.0f, m_fRackingDuration);
+	m_fElapsedTimeRack = HyMath::Clamp(m_fElapsedTimeRack + HyEngine::DeltaTime(), 0.0f, m_fRackingDuration);
 
 	if(m_fElapsedTimeRack == m_fRackingDuration)
 	{

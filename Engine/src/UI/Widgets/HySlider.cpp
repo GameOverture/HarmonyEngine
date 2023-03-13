@@ -270,11 +270,11 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 						break;
 					}
 				}
-				iCurIndex = HyClamp(iCurIndex + iNumThresholds, 0, static_cast<int32>(m_StepList.size() - 1));
+				iCurIndex = HyMath::Clamp(iCurIndex + iNumThresholds, 0, static_cast<int32>(m_StepList.size() - 1));
 				iNewValue = m_StepList[iCurIndex];
 			}
 			else
-				iNewValue = HyClamp(m_iValue + static_cast<int32>(iNumThresholds * m_uiStep), m_iMin, m_iMax);
+				iNewValue = HyMath::Clamp(m_iValue + static_cast<int32>(iNumThresholds * m_uiStep), m_iMin, m_iMax);
 
 			SetValue(iNewValue);
 		}
@@ -373,7 +373,7 @@ void HySlider::FixValues()
 		}
 	}
 	else
-		m_iValue = HyClamp(m_iValue, m_iMin, m_iMax);
+		m_iValue = HyMath::Clamp(m_iValue, m_iMin, m_iMax);
 
 	float fLocalSliderPos = m_fLength * (static_cast<float>(m_iValue - m_iMin) / static_cast<float>(m_iMax - m_iMin));
 	m_Slider.pos.GetAnimFloat(eOrientation) = fLocalSliderPos - (m_Slider.size.GetAnimFloat(eOrientation).Get() * 0.5f);

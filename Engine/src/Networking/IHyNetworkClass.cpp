@@ -49,7 +49,7 @@ bool IHyNetworkClass::StartClient(const char *szHost, uint16 uiPort)
 
 uint8 *IHyNetworkClass::NetRecv(uint32 uiWaitBytes)
 {
-	uiWaitBytes = HyClamp(uiWaitBytes, 0u, m_uiMAX_RECV_SIZE);
+	uiWaitBytes = HyMath::Clamp(uiWaitBytes, 0u, m_uiMAX_RECV_SIZE);
 	if(sm_pNetworking->TcpRecv(m_hSock, m_pRecvBuff, static_cast<int>(uiWaitBytes)) <= 0)
 		return nullptr;
 

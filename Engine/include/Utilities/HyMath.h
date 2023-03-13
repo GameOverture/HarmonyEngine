@@ -11,6 +11,7 @@
 #define HyMath_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Scene/AnimFloats/HyTweenFuncs.h"
 
 #define HY_PI 3.141592f
 
@@ -48,37 +49,31 @@ bool HyCompareFloat(T lhs, T rhs)
 	return trunc(1000. * lhs) == trunc(1000. * rhs);
 }
 
-template <typename T>
-T HyRound(T num)
-{
-	return (num - floor(num) >= 0.5) ? ceil(num) : floor(num);
-}
+//template <typename T>
+//T HyRound(T num)
+//{
+//	return (num - floor(num) >= 0.5) ? ceil(num) : floor(num);
+//}
 
-template <typename T>
-T HyClamp(const T& value, const T& low, const T& high) 
-{
-	return value < low ? low : (value > high ? high : value); 
-}
-
-float HyEase_Linear(float a, float b, float t);
-
-//--------------------------------------------------------------------------------------
-// Accelerating from zero velocity
-//--------------------------------------------------------------------------------------
-float HyEase_QuadraticIn(float fTime, float fStart, float fDist, float fDur);
-
-//--------------------------------------------------------------------------------------
-// Decelerating to zero velocity
-//--------------------------------------------------------------------------------------
-float HyEase_QuadraticOut(float fTime, float fStart, float fDist, float fDur);
-
-//--------------------------------------------------------------------------------------
-// Acceleration until halfway, then deceleration
-//--------------------------------------------------------------------------------------
-float HyEase_QuadraticInOut(float fTime, float fStart, float fDist, float fDur);
-
-// 
-float HyEase_AngleLinear(float angleA, float angleB, int32 spin, float t);
+//float HyEase_Linear(float a, float b, float t);
+//
+////--------------------------------------------------------------------------------------
+//// Accelerating from zero velocity
+////--------------------------------------------------------------------------------------
+//float HyEase_QuadraticIn(float fTime, float fStart, float fDist, float fDur);
+//
+////--------------------------------------------------------------------------------------
+//// Decelerating to zero velocity
+////--------------------------------------------------------------------------------------
+//float HyEase_QuadraticOut(float fTime, float fStart, float fDist, float fDur);
+//
+////--------------------------------------------------------------------------------------
+//// Acceleration until halfway, then deceleration
+////--------------------------------------------------------------------------------------
+//float HyEase_QuadraticInOut(float fTime, float fStart, float fDist, float fDur);
+//
+//// 
+//float HyEase_AngleLinear(float angleA, float angleB, int32 spin, float t);
 
 template<typename T>
 struct HyRectangle
@@ -158,6 +153,106 @@ struct HyScreenRect
 	}
 };
 
+class HyMath
+{
+public:
+	template <typename T>
+	static T Clamp(const T &value, const T &low, const T &high)
+	{
+		return value < low ? low : (value > high ? high : value);
+	}
+
+	template <class T>
+	static const T &Min(const T &a, const T &b)
+	{
+		return (a < b) ? a : b;
+	}
+
+	static glm::vec2 Min(const glm::vec2 &a, const glm::vec2 &b)
+	{
+		return glm::vec2(Min(a.x, b.x), Min(a.y, b.y));
+	}
+
+	template <class T>
+	static const T &Max(const T &a, const T &b)
+	{
+		return (a > b) ? a : b;
+	}
+
+	static glm::vec2 Max(const glm::vec2 &a, const glm::vec2 &b)
+	{
+		return glm::vec2(Max(a.x, b.x), Max(a.y, b.y));
+	}
+
+	static glm::ivec2 LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight);
+	static void InvalidateAABB(b2AABB &aabbOut);
+
+	static glm::vec2 PerpendicularClockwise(const glm::vec2 &vDirVector);
+	static glm::ivec2 PerpendicularClockwise(const glm::ivec2 &vDirVector);
+	static glm::vec2 PerpendicularCounterClockwise(const glm::vec2 &vDirVector);
+	static glm::ivec2 PerpendicularCounterClockwise(const glm::ivec2 &vDirVector);
+
+	static float AngleFromVector(const glm::vec2 &vDirVector);
+	static glm::vec2 ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint);
+
+	// Normalizes a value to an arbitrary range. The value wraps when going below min range or above max range.
+	static float NormalizeRange(float fValue, float fMin, float fMax);
+	static int32 NormalizeRange(int32 iValue, int32 iMin, int32 iMax);
+
+	template<typename TYPE>
+	static TYPE Round(TYPE value)
+	{
+		return round(value);
+	}
+
+	// Rounds a given number to the nearest multiple of a specified value
+	template<typename TYPE>
+	static TYPE RoundToNearest(TYPE value, TYPE multiple)
+	{
+		return round(value / multiple) * multiple;
+	}
+
+	static glm::vec2 RoundVec(const glm::vec2 &vectorOut)
+	{
+		return glm::vec2(round(vectorOut.x), round(vectorOut.y));
+	}
+	static glm::vec3 RoundVec(const glm::vec3 &vectorOut)
+	{
+		return glm::vec3(round(vectorOut.x), round(vectorOut.y), round(vectorOut.z));
+	}
+	static glm::vec4 RoundVec(const glm::vec4 &vectorOut)
+	{
+		return glm::vec4(round(vectorOut.x), round(vectorOut.y), round(vectorOut.z), round(vectorOut.w));
+	}
+
+	template <typename VEC>
+	static int32 HalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptPointOnPlane)
+	{
+		// Calculate a vector from the point on the plane to our test point
+		VEC vTemp(ptTestPoint - ptPointOnPlane);
+
+		// Calculate the distance: dot product of the new vector with the plane's normal
+		float fDist = glm::dot(vTemp, vNormal);
+
+		float fEpsilon = std::numeric_limits<float>::epsilon();
+		if(fDist > fEpsilon)
+		{
+			// ptTestPoint is in front of the plane
+			return 1;
+		}
+		else if(fDist < -fEpsilon)
+		{
+			// ptTestPoint is behind the plane
+			return -1;
+		}
+
+		// If neither of these were true, then ptTestPoint is on the plane
+		return 0;
+	}
+
+	static float TweenProgress(float fStart, float fEnd, float fElaspedTime, float fFullDuration, HyTweenFunc fpTweenFunc = HyTween::Linear);
+};
+
 class HyColor
 {
 	uint8		m_uiA;
@@ -191,10 +286,10 @@ public:
 		m_uiB(uiColor & 0xFF)
 	{ }
 	HyColor(float fRed, float fGreen, float fBlue, float fAlpha = 1.0f) :
-		m_uiA(static_cast<uint8>(255.0f * HyClamp(fAlpha, 0.0f, 1.0f))),
-		m_uiR(static_cast<uint8>(255.0f * HyClamp(fRed, 0.0f, 1.0f))),
-		m_uiG(static_cast<uint8>(255.0f * HyClamp(fGreen, 0.0f, 1.0f))),
-		m_uiB(static_cast<uint8>(255.0f * HyClamp(fBlue, 0.0f, 1.0f)))
+		m_uiA(static_cast<uint8>(255.0f * HyMath::Clamp(fAlpha, 0.0f, 1.0f))),
+		m_uiR(static_cast<uint8>(255.0f * HyMath::Clamp(fRed, 0.0f, 1.0f))),
+		m_uiG(static_cast<uint8>(255.0f * HyMath::Clamp(fGreen, 0.0f, 1.0f))),
+		m_uiB(static_cast<uint8>(255.0f * HyMath::Clamp(fBlue, 0.0f, 1.0f)))
 	{ }
 
 	// Returned as uint32 mask: ARGB
@@ -284,97 +379,5 @@ public:
 	static const HyColor WidgetFrame;
 };
 typedef HyColor HyColour;
-
-class HyMath
-{
-public:
-	template <class T>
-	static const T &Min(const T &a, const T &b)
-	{
-		return (a < b) ? a : b;
-	}
-
-	static glm::vec2 Min(const glm::vec2 &a, const glm::vec2 &b)
-	{
-		return glm::vec2(Min(a.x, b.x), Min(a.y, b.y));
-	}
-
-	template <class T>
-	static const T &Max(const T &a, const T &b)
-	{
-		return (a > b) ? a : b;
-	}
-
-	static glm::vec2 Max(const glm::vec2 &a, const glm::vec2 &b)
-	{
-		return glm::vec2(Max(a.x, b.x), Max(a.y, b.y));
-	}
-
-	static glm::ivec2 LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight);
-	static void InvalidateAABB(b2AABB &aabbOut);
-
-	static glm::vec2 PerpendicularClockwise(const glm::vec2 &vDirVector);
-	static glm::ivec2 PerpendicularClockwise(const glm::ivec2 &vDirVector);
-	static glm::vec2 PerpendicularCounterClockwise(const glm::vec2 &vDirVector);
-	static glm::ivec2 PerpendicularCounterClockwise(const glm::ivec2 &vDirVector);
-
-	static float AngleFromVector(const glm::vec2 &vDirVector);
-	static glm::vec2 ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint);
-
-	// Normalizes a value to an arbitrary range. The value wraps when going below min range or above max range.
-	static float NormalizeRange(float fValue, float fMin, float fMax);
-	static int32 NormalizeRange(int32 iValue, int32 iMin, int32 iMax);
-
-	template<typename TYPE>
-	static TYPE Round(TYPE value)
-	{
-		return round(value);
-	}
-
-	// Rounds a given number to the nearest multiple of a specified value
-	template<typename TYPE>
-	static TYPE RoundToNearest(TYPE value, TYPE multiple)
-	{
-		return round(value / multiple) * multiple;
-	}
-
-	static glm::vec2 RoundVec(const glm::vec2 &vectorOut)
-	{
-		return glm::vec2(round(vectorOut.x), round(vectorOut.y));
-	}
-	static glm::vec3 RoundVec(const glm::vec3 &vectorOut)
-	{
-		return glm::vec3(round(vectorOut.x), round(vectorOut.y), round(vectorOut.z));
-	}
-	static glm::vec4 RoundVec(const glm::vec4 &vectorOut)
-	{
-		return glm::vec4(round(vectorOut.x), round(vectorOut.y), round(vectorOut.z), round(vectorOut.w));
-	}
-
-	template <typename VEC>
-	static int32 HalfSpaceTest(const VEC &ptTestPoint, const VEC &vNormal, const VEC &ptPointOnPlane)
-	{
-		// Calculate a vector from the point on the plane to our test point
-		VEC vTemp(ptTestPoint - ptPointOnPlane);
-
-		// Calculate the distance: dot product of the new vector with the plane's normal
-		float fDist = glm::dot(vTemp, vNormal);
-
-		float fEpsilon = std::numeric_limits<float>::epsilon();
-		if(fDist > fEpsilon)
-		{
-			// ptTestPoint is in front of the plane
-			return 1;
-		}
-		else if(fDist < -fEpsilon)
-		{
-			// ptTestPoint is behind the plane
-			return -1;
-		}
-
-		// If neither of these were true, then ptTestPoint is on the plane
-		return 0;
-	}
-};
 
 #endif /* HyMath_h__ */

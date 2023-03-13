@@ -111,8 +111,8 @@ HyNumberFormat HyNumberFormat::SetRounding(HyNumFmtRounding eRounding)
 // Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
 HyNumberFormat HyNumberFormat::SetFractionPrecision(int32 iMinFractionPlaces /*= 0*/, int32 iMaxFractionPlaces /*= 6*/)
 {
-	m_uiMinFraction = HyClamp(iMinFractionPlaces, 0, 15);
-	m_uiMaxFraction = HyClamp(iMaxFractionPlaces, 0, 15);
+	m_uiMinFraction = HyMath::Clamp(iMinFractionPlaces, 0, 15);
+	m_uiMaxFraction = HyMath::Clamp(iMaxFractionPlaces, 0, 15);
 	return *this;
 }
 
@@ -152,6 +152,6 @@ HyNumberFormat HyNumberFormat::SetUsingCurrencySymbol(bool bUseCurrencySymbol)
 // Values will clamp to [0-127]
 HyNumberFormat HyNumberFormat::SetIntegerPaddingWidth(int32 iZeroPaddingPlaces /*= 1*/)
 {
-	m_uiFillIntegerZeros = HyClamp(iZeroPaddingPlaces, 0, 127);
+	m_uiFillIntegerZeros = HyMath::Clamp(iZeroPaddingPlaces, 0, 127);
 	return *this;
 }

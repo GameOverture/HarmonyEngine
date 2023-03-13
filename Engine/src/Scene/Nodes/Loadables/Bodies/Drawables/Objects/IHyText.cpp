@@ -737,7 +737,7 @@ offsetCalculation:
 
 				float fAdvanceAmtX = pGlyphRef->fADVANCE_X;
 				float fAscender = static_cast<float>(pGlyphRef->iOFFSET_Y);
-				float fDecender = HyClamp(static_cast<float>(static_cast<int32>(pGlyphRef->uiHEIGHT) - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(this->m_uiState));
+				float fDecender = HyMath::Clamp(static_cast<float>(static_cast<int32>(pGlyphRef->uiHEIGHT) - pGlyphRef->iOFFSET_Y), 0.0f, pData->GetLineHeight(this->m_uiState));
 				float fOffsetX = static_cast<float>(pGlyphRef->iOFFSET_X);
 
 				if(IsMonospacedDigits() && m_Utf32CodeList[uiStrIndex] >= 48 && m_Utf32CodeList[uiStrIndex] <= 57)
