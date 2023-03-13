@@ -183,7 +183,7 @@ bool AudioRepackThread::PackToOgg(AudioAsset *pAudio, QDir runtimeBankDir)
 	wavFile.read(reinterpret_cast<char *>(&wavHeader), sizeof(WaveHeader));
 
 	vorbis_info_init(&vi);
-	ret = vorbis_encode_init_vbr(&vi, wavHeader.NumOfChan, wavHeader.SamplesPerSec, HyClamp(pAudio->GetVbrQuality(), 0.0, 1.0));
+	ret = vorbis_encode_init_vbr(&vi, wavHeader.NumOfChan, wavHeader.SamplesPerSec, HyMath::Clamp(pAudio->GetVbrQuality(), 0.0, 1.0));
 	if(ret)
 	{
 		// do not continue if setup failed; this can happen if we ask for a

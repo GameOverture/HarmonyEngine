@@ -195,7 +195,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		else 
 			iZoomLevel++;
 
-		iZoomLevel = HyClamp(iZoomLevel, 0, HYNUM_ZOOMLEVELS - 1);
+		iZoomLevel = HyMath::Clamp(iZoomLevel, 0, HYNUM_ZOOMLEVELS - 1);
 		m_pCamera->SetZoomLevel(static_cast<HyZoomLevel>(iZoomLevel));
 
 		m_sZoomStatus = g_sZoomLevels[iZoomLevel];
