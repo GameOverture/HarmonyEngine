@@ -29,7 +29,8 @@ public:
 	virtual void SetZoom(const float fZoom) override;
 
 	void CalcWorldViewBounds(b2AABB &aabbOut) const; // NOTE: Doesn't account for camera rotation!
-	void ProjectToCamera(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const;
+	void ProjectToCamera(const glm::vec2 &ptWorldPos, glm::vec2 &ptCameraCoordinateOut) const; // 'ptCameraCoordinateOut' will be the bottom left of the camera's viewport in the window. If the camera is using 100% of the window, then 'ptCameraCoordinateOut' is essentially the window coordinates
+	void ProjectToWorld(const glm::vec2 &ptCameraCoordinate, glm::vec2 &ptWorldPosOut) const; // 'ptCameraCoordinate' is the bottom left of the camera's viewport in the window. If the camera is using 100% of the window, then 'ptCameraCoordinate' is essentially the window coordinates
 };
 
 class HyCamera3d final : public IHyCamera<IHyNode3d>

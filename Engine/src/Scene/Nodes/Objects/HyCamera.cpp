@@ -39,13 +39,22 @@ void HyCamera2d::CalcWorldViewBounds(b2AABB &aabbOut) const
 	aabbOut.upperBound.Set(pos.X() + fHalfWidth, pos.Y() + fHalfHeight);
 }
 
-void HyCamera2d::ProjectToCamera(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindowCoordinateOut) const
+void HyCamera2d::ProjectToCamera(const glm::vec2 &ptWorldPos, glm::vec2 &ptCameraCoordinateOut) const
 {
 	b2AABB aabbWorld;
 	CalcWorldViewBounds(aabbWorld);
 
-	ptWindowCoordinateOut.x = (ptWorldPos.x - aabbWorld.lowerBound.x) * (1.0f / scale.X());
-	ptWindowCoordinateOut.y = (ptWorldPos.y - aabbWorld.lowerBound.y) * (1.0f / scale.Y());
+	ptCameraCoordinateOut.x = (ptWorldPos.x - aabbWorld.lowerBound.x) * (1.0f / scale.X());
+	ptCameraCoordinateOut.y = (ptWorldPos.y - aabbWorld.lowerBound.y) * (1.0f / scale.Y());
+}
+
+void HyCamera2d::ProjectToWorld(const glm::vec2 &ptCameraCoordinate, glm::vec2 &ptWorldPosOut) const
+{
+	b2AABB aabbWorld;
+	CalcWorldViewBounds(aabbWorld);
+
+	glm::vec2 ptLowerBound(aabbWorld.lowerBound.x, aabbWorld.lowerBound.y);
+	ptWorldPosOut = ptLowerBound + (ptCameraCoordinate * scale.Get());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

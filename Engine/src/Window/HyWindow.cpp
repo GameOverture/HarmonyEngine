@@ -388,7 +388,7 @@ bool HyWindow::ProjectToWorldPos2d(const glm::vec2 &ptWindowCoordinate, glm::vec
 			if(fDeg != 0.0f)
 			{
 				// TODO: Calculate world vector orientation
-				HyError("ConvertViewportCoordinateToWorldPos() TODO: Calculate world vector orientation for camera");
+				HyError("HyWindow::ProjectToWorldPos2d() TODO: Calculate world vector orientation for camera");
 				glm::vec2 vOrientation(cos(glm::radians(fDeg)), sin(glm::radians(fDeg)));
 			}
 			else

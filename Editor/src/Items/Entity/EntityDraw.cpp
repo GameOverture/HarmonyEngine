@@ -573,10 +573,19 @@ void EntityDraw::BeginTransform()
 		pCurTransform = &m_MultiTransform;
 	else if(m_pCurHoverItem)
 		pCurTransform = &m_pCurHoverItem->GetTransformCtrl();
+
 	if(pCurTransform)
 	{
+		// Set 'm_ptDragCenter'
 		pCurTransform->GetCentroid(m_ptDragCenter);
-		HyEngine::Window().ProjectToWorldPos2d(m_ptDragCenter, m_ptDragCenter);
+		m_pCamera->ProjectToWorld(m_ptDragCenter, m_ptDragCenter);
+
+		// Set 'm_vDragStartSize'
+		glm::vec2 ptMidRight = pCurTransform->GetGrabPointWorldPos(GRAB_MidRight, m_pCamera);
+		glm::vec2 ptMidLeft = pCurTransform->GetGrabPointWorldPos(GRAB_MidLeft, m_pCamera); 
+		glm::vec2 ptTopMid = pCurTransform->GetGrabPointWorldPos(GRAB_TopMid, m_pCamera);
+		glm::vec2 ptBotMid = pCurTransform->GetGrabPointWorldPos(GRAB_BotMid, m_pCamera);
+		HySetVec(m_vDragStartSize, glm::distance(ptMidLeft, ptMidRight), glm::distance(ptTopMid, ptBotMid));
 	}
 
 	m_PrevTransformList.clear();
@@ -671,49 +680,105 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 	case Qt::SizeVerCursor:		// Scaling
 	case Qt::SizeFDiagCursor:	// Scaling
 	case Qt::SizeHorCursor: {	// Scaling
-
 		TransformCtrl *pCurTransform = nullptr;
 		if(m_MultiTransform.IsShown())
 			pCurTransform = &m_MultiTransform;
 		else
 			pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
 
-		glm::vec2 ptMidRight, ptMidLeft, ptTopMid, ptBotMid;
-		HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_MidRight), ptMidRight);
-		HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_MidLeft), ptMidLeft);
-		HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_TopMid), ptTopMid);
-		HyEngine::Window().ProjectToWorldPos2d(pCurTransform->GetGrabPointPos(GRAB_BotMid), ptBotMid);
-		HySetVec(m_vDragStartSize, fabs(ptMidRight.x - ptMidLeft.x), fabs(ptTopMid.y - ptBotMid.y));
-
-		glm::vec2 ptDragAnchorPoint;
+		bool bUniformScale = true;
+		GrabPoint eAnchorPoint = GRAB_None;
+		GrabPoint eAnchorWidth = GRAB_None;
+		GrabPoint eAnchorHeight = GRAB_None;
+		glm::bvec2 bScaleDimensions;
 		switch(m_eCurHoverGrabPoint)
 		{
-		case GRAB_BotLeft:	ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopRight); break;
-		case GRAB_BotRight:	ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopLeft); break;
-		case GRAB_TopRight:	ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotLeft); break;
-		case GRAB_TopLeft:	ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotRight); break;
-		case GRAB_BotMid:	ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_TopMid); break;
-		case GRAB_MidRight:	ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_MidLeft); break;
-		case GRAB_TopMid:	ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_BotMid); break;
-		case GRAB_MidLeft:	ptDragAnchorPoint = pCurTransform->GetGrabPointPos(GRAB_MidRight); break;
+		case GRAB_BotLeft:
+			bUniformScale = true;
+			eAnchorPoint = GRAB_TopRight;
+			eAnchorWidth = GRAB_TopLeft;
+			eAnchorHeight = GRAB_BotRight;
+			bScaleDimensions.x = bScaleDimensions.y = true;
+			break;
+		case GRAB_BotRight:
+			bUniformScale = true;
+			eAnchorPoint = GRAB_TopLeft;
+			eAnchorWidth = GRAB_TopRight;
+			eAnchorHeight = GRAB_BotLeft;
+			bScaleDimensions.x = bScaleDimensions.y = true;
+			break;
+		case GRAB_TopRight:
+			bUniformScale = true;
+			eAnchorPoint = GRAB_BotLeft;
+			eAnchorWidth = GRAB_BotRight;
+			eAnchorHeight = GRAB_TopLeft;
+			bScaleDimensions.x = bScaleDimensions.y = true;
+			break;
+		case GRAB_TopLeft:
+			bUniformScale = true;
+			eAnchorPoint = GRAB_BotRight;
+			eAnchorWidth = GRAB_BotLeft;
+			eAnchorHeight = GRAB_TopRight;
+			bScaleDimensions.x = bScaleDimensions.y = true;
+			break;
+		case GRAB_BotMid:
+			bUniformScale = false;
+			eAnchorPoint = GRAB_TopMid;
+			eAnchorHeight = GRAB_BotMid;
+			bScaleDimensions.x = false;
+			bScaleDimensions.y = true;
+			break;
+		case GRAB_MidRight:
+			bUniformScale = false;
+			eAnchorPoint = GRAB_MidLeft;
+			eAnchorWidth = GRAB_MidRight;
+			bScaleDimensions.x = true;
+			bScaleDimensions.y = false;
+			break;
+		case GRAB_TopMid:
+			bUniformScale = false;
+			eAnchorPoint = GRAB_BotMid;
+			eAnchorHeight = GRAB_TopMid;
+			bScaleDimensions.x = false;
+			bScaleDimensions.y = true;
+			break;
+		case GRAB_MidLeft:
+			bUniformScale = false;
+			eAnchorPoint = GRAB_MidRight;
+			eAnchorWidth = GRAB_MidLeft;
+			bScaleDimensions.x = true;
+			bScaleDimensions.y = false;
+			break;
 		default:
 			break;
 		}
-		HyEngine::Window().ProjectToWorldPos2d(ptDragAnchorPoint, ptDragAnchorPoint);
 
-
+		glm::vec2 ptDragAnchorPoint = pCurTransform->GetGrabPointWorldPos(eAnchorPoint, m_pCamera);
 		m_ActiveTransform.scale_pivot.Set(ptDragAnchorPoint);
 
-		float fRequiredWidth = fabs(m_ActiveTransform.scale_pivot.X() - ptMousePos.x);
-		float fRequiredHeight = fabs(m_ActiveTransform.scale_pivot.Y() - ptMousePos.y);
+		glm::vec2 vDesiredSize(m_vDragStartSize);
+		if(bScaleDimensions.x)
+		{
+			glm::vec2 ptAnchorWidth = pCurTransform->GetGrabPointWorldPos(eAnchorWidth, m_pCamera);
+			ptAnchorWidth = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorWidth - ptDragAnchorPoint), ptMousePos);
+			vDesiredSize.x = glm::distance(ptDragAnchorPoint, ptAnchorWidth);
+		}
+		if(bScaleDimensions.y)
+		{
+			glm::vec2 ptAnchorHeight = pCurTransform->GetGrabPointWorldPos(eAnchorHeight, m_pCamera);
+			ptAnchorHeight = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorHeight - ptDragAnchorPoint), ptMousePos);
+			vDesiredSize.y = glm::distance(ptDragAnchorPoint, ptAnchorHeight);
+		}
 
 		if(bShiftMod)
-			m_ActiveTransform.scale.Set(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
-		else
+			bUniformScale = !bUniformScale;
+		if(bUniformScale)
 		{
-			float fScaleAmt = HyMath::Max(fRequiredWidth / m_vDragStartSize.x, fRequiredHeight / m_vDragStartSize.y);
+			float fScaleAmt = HyMath::Max(vDesiredSize.x / m_vDragStartSize.x, vDesiredSize.y / m_vDragStartSize.y);
 			m_ActiveTransform.scale.Set(fScaleAmt, fScaleAmt);
 		}
+		else
+			m_ActiveTransform.scale.Set(vDesiredSize.x / m_vDragStartSize.x, vDesiredSize.y / m_vDragStartSize.y);
 
 		break; }
 

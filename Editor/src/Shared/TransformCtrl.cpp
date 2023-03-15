@@ -275,9 +275,14 @@ void TransformCtrl::GetCentroid(glm::vec2 &ptCenterOut) const
 	m_BoundingVolume.GetCentroid(ptCenterOut);
 }
 
-glm::vec2 TransformCtrl::GetGrabPointPos(GrabPoint eGrabPoint) const
+glm::vec2 TransformCtrl::GetGrabPointWorldPos(GrabPoint eGrabPoint, HyCamera2d *pCamera) const
 {
-	return m_ptGrabPos[eGrabPoint];
+	HyAssert(eGrabPoint > GRAB_None && eGrabPoint < NUM_GRABPOINTS, "TransformCtrl::GetGrabPointPos invalid grab enum");
+
+	glm::vec2 ptWorldPos;
+	pCamera->ProjectToWorld(m_ptGrabPos[eGrabPoint], ptWorldPos);
+	
+	return ptWorldPos;
 }
 
 float TransformCtrl::GetCachedRotation() const
@@ -322,10 +327,10 @@ bool TransformCtrl::IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const
 {
 	for(uint i = GRAB_BotLeft; i < 4; ++i)
 	{
-		glm::vec2 ptVertex = m_ptGrabPos[i];
-		pCamera->GetWindow().ProjectToWorldPos2d(ptVertex, ptVertex);
+		glm::vec2 ptVertex;
+		pCamera->ProjectToWorld(m_ptGrabPos[i], ptVertex);
 
-		if(ptVertex.x < aabb.lowerBound.x ||
+		if( ptVertex.x < aabb.lowerBound.x ||
 			ptVertex.y < aabb.lowerBound.y ||
 			ptVertex.x > aabb.upperBound.x ||
 			ptVertex.y > aabb.upperBound.y)
