@@ -18,8 +18,9 @@ class EntityDrawItem
 	QUuid									m_Uuid;
 	QUuid									m_ItemUuid;
 
+	// *this is either a 'm_pChild' or 'm_pShape', not ever both
 	IHyLoadable2d *							m_pChild;
-	HyShape2d *								m_pShape;
+	ShapeCtrl *								m_pShape;
 
 	TransformCtrl							m_Transform;
 
@@ -31,8 +32,8 @@ public:
 	const QUuid &GetThisUuid() const;
 	const QUuid &GetItemUuid() const;
 
-	IHyLoadable2d *GetNodeChild() const;
-	HyShape2d *GetShape() const;
+	IHyLoadable2d *GetAsChild() const;
+	ShapeCtrl *GetAsShape() const;
 	TransformCtrl &GetTransformCtrl();
 
 	bool IsMouseInBounds() const;

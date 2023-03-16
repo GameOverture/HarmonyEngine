@@ -29,7 +29,7 @@ class EntityDraw : public IDraw
 
 	// Mouse hovering
 	EntityDrawItem *						m_pCurHoverItem;
-	GrabPoint								m_eCurHoverGrabPoint;
+	TransformCtrl::GrabPointType			m_eCurHoverGrabPoint;
 
 	// Mouse press/dragging
 	HyTimer									m_PressTimer;
@@ -46,9 +46,16 @@ class EntityDraw : public IDraw
 	glm::vec2								m_ptDragCenter;
 	glm::vec2								m_vDragStartSize;
 
-
-	//EditorShape								m_eCurDrawShape;
-	//HyPrimitive2d							m_DrawShape;
+	enum ShapeEditState
+	{
+		SHAPESTATE_None = 0,
+		SHAPESTATE_InitialPlacement_Primitive,
+		SHAPESTATE_InitialPlacement_Shape,
+		SHAPESTATE_VertexManip
+	};
+	ShapeEditState							m_eShapeEditState;
+	EditorShape								m_eCurEditShape;
+	//EntityDrawItem *						m_pCurDrawShape;
 
 	// Used to help transform (translate, rotate, scale) selected items
 	HyEntity2d								m_ActiveTransform;
@@ -72,7 +79,8 @@ public:
 
 	void RefreshTransforms();
 
-	//void SetDrawShape(EditorShape eShape, bool bAsPrimitive);
+	void NewShape(EditorShape eShape, bool bAsPrimitive);
+	void NewShapeFinished();
 	//void UpdateDrawShape(bool bCtrlModifer);
 	//void ClearDrawShape();
 
@@ -84,7 +92,7 @@ protected:
 	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
 
 	EntityDrawItem *FindStaleChild(HyGuiItemType eType, QUuid uuid);
-	Qt::CursorShape GetGrabPointCursorShape(GrabPoint eGrabPoint, float fRotation) const;
+	Qt::CursorShape GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const;
 
 	void DoMouseMove_Select();
 	void DoMousePress_Select(bool bCtrlMod, bool bShiftMod);
@@ -95,13 +103,9 @@ protected:
 	void DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_Transform();
 
-	void DoMouseMove_NewShape();
-	void DoMousePress_NewShape();
-	void DoMouseRelease_NewShape();
-
-	void DoMouseMove_EditShape();
-	void DoMousePress_EditShape();
-	void DoMouseRelease_EditShape();
+	void DoMouseMove_ShapeEdit();
+	void DoMousePress_ShapeEdit();
+	void DoMouseRelease_ShapeEdit();
 
 	static void OnMousePressTimer(void *pData);
 };

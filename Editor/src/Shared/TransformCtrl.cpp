@@ -11,6 +11,30 @@
 #include "TransformCtrl.h"
 #include "EntityDrawItem.h"
 
+GrabPoint::GrabPoint(HyColor outlineColor, HyColor fillColor, HyEntity2d *pParent) :
+	HyEntity2d(pParent),
+	m_GrabOutline(this),
+	m_GrabFill(this)
+{
+	const float fRADIUS = 5.0f;
+	m_GrabOutline.SetTint(outlineColor);
+	m_GrabOutline.SetAsCircle(fRADIUS);
+
+	m_GrabFill.SetTint(fillColor);
+	m_GrabFill.SetAsCircle(fRADIUS - 1.0f);
+
+	UseWindowCoordinates(0);
+}
+
+/*virtual*/ GrabPoint::~GrabPoint()
+{
+}
+
+void GrabPoint::GetLocalBoundingShape(HyShape2d &shapeRefOut)
+{
+	m_GrabOutline.CalcLocalBoundingShape(shapeRefOut);
+}
+
 TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_bIsShown(false),
@@ -25,16 +49,9 @@ TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 	m_ExtrudeSegment.SetWireframe(true);
 	ChildAppend(m_ExtrudeSegment);
 
-	for(uint i = 0; i < NUM_GRABPOINTS; ++i)
-	{
-		m_GrabOutline[i].SetTint(HyColor::White);
-		ChildAppend(m_GrabOutline[i]);
-
-		m_GrabFill[i].SetTint(HyColor::Blue.Lighten());
-		ChildAppend(m_GrabFill[i]);
-	}
-	m_GrabOutline[GRAB_Rotate].SetTint(HyColor::Blue.Lighten());
-	m_GrabFill[GRAB_Rotate].SetTint(HyColor::White);
+	for(uint i = 0; i < GRAB_Rotate; ++i)
+		m_GrabPoints[i] = new GrabPoint(HyColor::White, HyColor::Blue.Lighten(), this);
+	m_GrabPoints[GRAB_Rotate] = new GrabPoint(HyColor::Blue.Lighten(), HyColor::White, this);
 
 	UseWindowCoordinates(0);
 	SetDisplayOrder(DISPLAYORDER_TransformCtrl);
@@ -44,6 +61,8 @@ TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 
 /*virtual*/ TransformCtrl::~TransformCtrl()
 {
+	for(uint i = 0; i < NUM_GRABPOINTS; ++i)
+		delete m_GrabPoints[i];
 }
 
 void TransformCtrl::WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera)
@@ -78,7 +97,7 @@ void TransformCtrl::WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform,
 		glm::vec2 ptExtrudeStart = m_ptGrabPos[GRAB_TopLeft] + vTopEdge;
 		m_ptGrabPos[GRAB_Rotate] = ptExtrudeStart + vExtrudeDir;
 
-		const float fRADIUS = 5.0f;
+		
 		for(int i = 0; i < NUM_GRABPOINTS; ++i)
 		{
 			glm::vec4 ptTransformPos(m_ptGrabPos[i].x, m_ptGrabPos[i].y, 0.0f, 1.0f);
@@ -87,8 +106,9 @@ void TransformCtrl::WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform,
 			HySetVec(m_ptGrabPos[i], ptTransformPos.x, ptTransformPos.y);
 			pCamera->ProjectToCamera(m_ptGrabPos[i], m_ptGrabPos[i]);
 
-			m_GrabOutline[i].SetAsCircle(m_ptGrabPos[i], fRADIUS);
-			m_GrabFill[i].SetAsCircle(m_ptGrabPos[i], fRADIUS - 1.0f);
+			m_GrabPoints[i]->pos.Set(m_ptGrabPos[i]);
+			//m_GrabOutline[i].SetAsCircle(m_ptGrabPos[i], fRADIUS);
+			//m_GrabFill[i].SetAsCircle(m_ptGrabPos[i], fRADIUS - 1.0f);
 		}
 
 		m_BoundingVolume.SetAsPolygon(m_ptGrabPos, 4);
@@ -247,10 +267,7 @@ void TransformCtrl::Show(bool bShowGrabPoints)
 	m_bShowGrabPoints = bShowGrabPoints;
 
 	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
-	{
-		m_GrabOutline[i].SetVisible(m_bShowGrabPoints);
-		m_GrabFill[i].SetVisible(m_bShowGrabPoints);
-	}
+		m_GrabPoints[i]->SetVisible(m_bShowGrabPoints);
 	m_ExtrudeSegment.SetVisible(m_bShowGrabPoints);
 
 	m_BoundingVolume.SetVisible(true);
@@ -261,10 +278,7 @@ void TransformCtrl::Hide()
 	m_bIsShown = false;
 
 	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
-	{
-		m_GrabOutline[i].SetVisible(false);
-		m_GrabFill[i].SetVisible(false);
-	}
+		m_GrabPoints[i]->SetVisible(false);
 
 	m_BoundingVolume.SetVisible(false);
 	m_ExtrudeSegment.SetVisible(false);
@@ -275,7 +289,7 @@ void TransformCtrl::GetCentroid(glm::vec2 &ptCenterOut) const
 	m_BoundingVolume.GetCentroid(ptCenterOut);
 }
 
-glm::vec2 TransformCtrl::GetGrabPointWorldPos(GrabPoint eGrabPoint, HyCamera2d *pCamera) const
+glm::vec2 TransformCtrl::GetGrabPointWorldPos(GrabPointType eGrabPoint, HyCamera2d *pCamera) const
 {
 	HyAssert(eGrabPoint > GRAB_None && eGrabPoint < NUM_GRABPOINTS, "TransformCtrl::GetGrabPointPos invalid grab enum");
 
@@ -304,7 +318,7 @@ bool TransformCtrl::IsMouseOverBoundingVolume()
 	return tmpShape.TestPoint(m_BoundingVolume.GetSceneTransform(0.0f), ptWorldMousePos);
 }
 
-GrabPoint TransformCtrl::IsMouseOverGrabPoint()
+TransformCtrl::GrabPointType TransformCtrl::IsMouseOverGrabPoint()
 {
 	glm::vec2 ptWorldMousePos;
 	if(m_bIsShown == false || m_bShowGrabPoints == false || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
@@ -315,9 +329,9 @@ GrabPoint TransformCtrl::IsMouseOverGrabPoint()
 	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
 	{
 		HyShape2d tmpShape;
-		m_GrabOutline[i].CalcLocalBoundingShape(tmpShape);
-		if(tmpShape.TestPoint(m_GrabOutline[i].GetSceneTransform(0.0f), ptWorldMousePos))
-			return static_cast<GrabPoint>(i);
+		m_GrabPoints[i]->GetLocalBoundingShape(tmpShape);
+		if(tmpShape.TestPoint(m_GrabPoints[i]->GetSceneTransform(0.0f), ptWorldMousePos))
+			return static_cast<GrabPointType>(i);
 	}
 
 	return GRAB_None;
@@ -410,4 +424,21 @@ void MarqueeBox::Clear()
 
 	m_BoundingVolume.SetAsNothing();
 	m_Outline.SetAsNothing();
+}
+
+
+ShapeCtrl::ShapeCtrl(HyEntity2d *pParent) :
+	m_eDrawShape(SHAPE_None),
+	m_PrimShape(pParent)
+{
+
+}
+
+/*virtual*/ ShapeCtrl::~ShapeCtrl()
+{
+}
+
+void ShapeCtrl::GetShape(HyShape2d &shapeRefOut)
+{
+	m_PrimShape.CalcLocalBoundingShape(shapeRefOut);
 }

@@ -27,7 +27,7 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 	case ITEM_Spine:			m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Sprite:			m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 
-	case ITEM_Shape:			m_pShape = new HyShape2d(pParent); break;
+	case ITEM_Shape:			m_pShape = new ShapeCtrl(pParent); break;
 
 	case ITEM_AtlasImage:		//m_pChild = new HyTexturedQuad2d();
 	case ITEM_Entity:
@@ -66,12 +66,12 @@ const QUuid &EntityDrawItem::GetItemUuid() const
 	return m_ItemUuid;
 }
 
-IHyLoadable2d *EntityDrawItem::GetNodeChild() const
+IHyLoadable2d *EntityDrawItem::GetAsChild() const
 {
 	return m_pChild;
 }
 
-HyShape2d *EntityDrawItem::GetShape() const
+ShapeCtrl *EntityDrawItem::GetAsShape() const
 {
 	return m_pShape;
 }
@@ -172,7 +172,7 @@ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &tr
 	switch(GetGuiType())
 	{
 	case ITEM_Shape:
-		boundingShapeOut = *GetShape();
+		GetAsShape()->GetShape(boundingShapeOut);
 		break;
 
 	case ITEM_AtlasImage:
@@ -180,9 +180,9 @@ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &tr
 	case ITEM_Text:
 	case ITEM_Spine:
 	case ITEM_Sprite: {
-		IHyDrawable2d *pDrawable = static_cast<IHyDrawable2d *>(GetNodeChild());
+		IHyDrawable2d *pDrawable = static_cast<IHyDrawable2d *>(GetAsChild());
 		pDrawable->CalcLocalBoundingShape(boundingShapeOut);
-		transformMtxOut = GetNodeChild()->GetSceneTransform(0.0f);
+		transformMtxOut = GetAsChild()->GetSceneTransform(0.0f);
 		break; }
 
 	case ITEM_Audio:

@@ -134,7 +134,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <layout class="QHBoxLayout" name="lytAddPrimitiveShape">
            <item>
             <widget class="QToolButton" name="btnAddPrimitiveBox">
              <property name="text">
@@ -218,7 +218,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <layout class="QHBoxLayout" name="lytAddBoundingShape">
            <item>
             <widget class="QToolButton" name="btnAddShapeBox">
              <property name="text">
@@ -451,6 +451,9 @@
    </property>
   </action>
   <action name="actionAddBoxPrimitive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_box.png</normaloff>:/icons16x16/shapes/primitive_box.png</iconset>
@@ -463,6 +466,9 @@
    </property>
   </action>
   <action name="actionAddCirclePrimitive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_circle.png</normaloff>:/icons16x16/shapes/primitive_circle.png</iconset>
@@ -475,6 +481,9 @@
    </property>
   </action>
   <action name="actionAddPolygonPrimitive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_polygon.png</normaloff>:/icons16x16/shapes/primitive_polygon.png</iconset>
@@ -487,6 +496,9 @@
    </property>
   </action>
   <action name="actionAddSegmentPrimitive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_lineSeg.png</normaloff>:/icons16x16/shapes/primitive_lineSeg.png</iconset>
@@ -499,6 +511,9 @@
    </property>
   </action>
   <action name="actionAddLineChainPrimitive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_lineChain.png</normaloff>:/icons16x16/shapes/primitive_lineChain.png</iconset>
@@ -511,6 +526,9 @@
    </property>
   </action>
   <action name="actionAddLineLoopPrimitive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_lineLoop.png</normaloff>:/icons16x16/shapes/primitive_lineLoop.png</iconset>
@@ -523,6 +541,9 @@
    </property>
   </action>
   <action name="actionAddBoxShape">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_box.png</normaloff>:/icons16x16/shapes/shapes_box.png</iconset>
@@ -535,6 +556,9 @@
    </property>
   </action>
   <action name="actionAddCircleShape">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_circle.png</normaloff>:/icons16x16/shapes/shapes_circle.png</iconset>
@@ -547,6 +571,9 @@
    </property>
   </action>
   <action name="actionAddPolygonShape">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_polygon.png</normaloff>:/icons16x16/shapes/shapes_polygon.png</iconset>
@@ -559,6 +586,9 @@
    </property>
   </action>
   <action name="actionAddSegmentShape">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_lineSeg.png</normaloff>:/icons16x16/shapes/shapes_lineSeg.png</iconset>
@@ -571,6 +601,9 @@
    </property>
   </action>
   <action name="actionAddLineChainShape">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_lineChain.png</normaloff>:/icons16x16/shapes/shapes_lineChain.png</iconset>
@@ -583,6 +616,9 @@
    </property>
   </action>
   <action name="actionAddLineLoopShape">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_lineLoop.png</normaloff>:/icons16x16/shapes/shapes_lineLoop.png</iconset>

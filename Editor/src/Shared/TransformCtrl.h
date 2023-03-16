@@ -14,33 +14,45 @@
 
 class EntityDrawItem;
 
-enum GrabPoint
+class GrabPoint : public HyEntity2d
 {
-	GRAB_None = -1,
+	HyPrimitive2d				m_GrabOutline;
+	HyPrimitive2d				m_GrabFill;
 
-	GRAB_BotLeft = 0,
-	GRAB_BotRight,
-	GRAB_TopRight,
-	GRAB_TopLeft,
-	GRAB_BotMid,
-	GRAB_MidRight,
-	GRAB_TopMid,
-	GRAB_MidLeft,
+public:
+	GrabPoint(HyColor outlineColor, HyColor fillColor, HyEntity2d *pParent);
+	virtual ~GrabPoint();
 
-	GRAB_Rotate,
-
-	NUM_GRABPOINTS
+	void GetLocalBoundingShape(HyShape2d &shapeRefOut);
 };
 
 class TransformCtrl : public HyEntity2d
 {
+public:
+	enum GrabPointType
+	{
+		GRAB_None = -1,
+
+		GRAB_BotLeft = 0,
+		GRAB_BotRight,
+		GRAB_TopRight,
+		GRAB_TopLeft,
+		GRAB_BotMid,
+		GRAB_MidRight,
+		GRAB_TopMid,
+		GRAB_MidLeft,
+
+		GRAB_Rotate,
+
+		NUM_GRABPOINTS
+	};
+
 protected:
 	glm::vec2					m_ptGrabPos[NUM_GRABPOINTS];
 
 	HyPrimitive2d				m_BoundingVolume;
 	HyPrimitive2d				m_ExtrudeSegment;
-	HyPrimitive2d				m_GrabOutline[NUM_GRABPOINTS];
-	HyPrimitive2d				m_GrabFill[NUM_GRABPOINTS];
+	GrabPoint *					m_GrabPoints[NUM_GRABPOINTS];
 
 	bool						m_bIsShown;
 	bool						m_bShowGrabPoints;
@@ -58,22 +70,22 @@ public:
 	void Hide();
 
 	void GetCentroid(glm::vec2 &ptCenterOut) const;
-	glm::vec2 GetGrabPointWorldPos(GrabPoint eGrabPoint, HyCamera2d *pCamera) const;
+	glm::vec2 GetGrabPointWorldPos(GrabPointType eGrabPoint, HyCamera2d *pCamera) const;
 
 	float GetCachedRotation() const;
 
 	bool IsMouseOverBoundingVolume();
-	GrabPoint IsMouseOverGrabPoint();
+	GrabPointType IsMouseOverGrabPoint();
 
 	bool IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const;
 };
 
 class MarqueeBox : public HyEntity2d
 {
-	HyPrimitive2d		m_BoundingVolume;
-	HyPrimitive2d		m_Outline;
+	HyPrimitive2d				m_BoundingVolume;
+	HyPrimitive2d				m_Outline;
 
-	glm::vec2			m_ptStartPos;
+	glm::vec2					m_ptStartPos;
 
 public:
 	MarqueeBox(HyEntity2d *pParent);
@@ -84,6 +96,21 @@ public:
 	void SetStartPt(glm::vec2 ptStartPos);
 	void SetDragPt(glm::vec2 ptDragPos, HyCamera2d *pCamera);
 	void Clear();
+};
+
+// Essentially a wrapper around 'm_PrimShape' that will allow the user to manipulate what the HyPrimitive is in the editor
+class ShapeCtrl
+{
+	EditorShape					m_eDrawShape;
+	HyPrimitive2d				m_PrimShape;
+
+	QList<GrabPoint *>			m_GrabPointList;
+
+public:
+	ShapeCtrl(HyEntity2d *pParent);
+	virtual ~ShapeCtrl();
+
+	void GetShape(HyShape2d &shapeRefOut);
 };
 
 #endif // TRANSFORMCTRL_H

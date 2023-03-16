@@ -22,7 +22,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_MultiTransform(this),
 	m_fMultiTransformStartRot(0.0f),
 	m_pCurHoverItem(nullptr),
-	m_eCurHoverGrabPoint(GRAB_None),
+	m_eCurHoverGrabPoint(TransformCtrl::GRAB_None),
 	m_bSelectionHandled(false),
 	m_eDragState(DRAGSTATE_None)
 {
@@ -60,14 +60,19 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		RefreshTransforms();
 	else
 	{
-		if(m_eDragState == DRAGSTATE_None ||
-			m_eDragState == DRAGSTATE_Marquee ||
-			m_eDragState == DRAGSTATE_Pending)
+		if(m_eShapeEditState == SHAPESTATE_None)
 		{
-			DoMouseMove_Select();
+			if(m_eDragState == DRAGSTATE_None ||
+				m_eDragState == DRAGSTATE_Marquee ||
+				m_eDragState == DRAGSTATE_Pending)
+			{
+				DoMouseMove_Select();
+			}
+			else // DRAGSTATE_Transforming
+				DoMouseMove_Transform(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 		}
-		else // DRAGSTATE_Transforming
-			DoMouseMove_Transform(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+		else
+			DoMouseMove_ShapeEdit();
 	}
 }
 
@@ -79,20 +84,15 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		RefreshTransforms();
 	else if(pEvent->button() == Qt::LeftButton)
 	{
-		if(m_eDragState == DRAGSTATE_None)
+		if(m_eShapeEditState != SHAPESTATE_None)
+			DoMousePress_ShapeEdit();
+		else if(m_eDragState == DRAGSTATE_None)
 			DoMousePress_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-
-		//if(m_eCurDrawShape != SHAPE_None)
-		//{
-		//	if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
-		//		HyGuiLog("EntityDraw::OnMousePressEvent - Edit Shape GetWorldMousePos failed", LOGTYPE_Error);
-
-		//	m_eDragState = DRAGSTATE_DrawingShape;
-		//}
-		//else // Not drawing shape
-		//{
-		//	DoMousePress(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-		//}
+	}
+	else if(pEvent->button() == Qt::RightButton)
+	{
+		if(m_eShapeEditState != SHAPESTATE_None)
+			NewShapeFinished();
 	}
 }
 
@@ -100,15 +100,18 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnMouseReleaseEvent(pEvent);
 
-	if(m_eDragState == DRAGSTATE_None ||
-		m_eDragState == DRAGSTATE_Marquee ||
-		m_eDragState == DRAGSTATE_Pending)
+	if(m_eShapeEditState != SHAPESTATE_None)
+		DoMouseRelease_ShapeEdit();
+	else if(pEvent->button() == Qt::LeftButton)
 	{
-		DoMouseRelease_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-	}
-	else // DRAGSTATE_Transforming
-	{
-		DoMouseRelease_Transform(/*pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier)*/);
+		if(m_eDragState == DRAGSTATE_None ||
+			m_eDragState == DRAGSTATE_Marquee ||
+			m_eDragState == DRAGSTATE_Pending)
+		{
+			DoMouseRelease_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+		}
+		else // DRAGSTATE_Transforming
+			DoMouseRelease_Transform(/*pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier)*/);
 	}
 
 	m_eDragState = DRAGSTATE_None;
@@ -216,23 +219,25 @@ void EntityDraw::RefreshTransforms()
 		pItemDraw->RefreshTransform(m_pCamera);
 }
 
-//void EntityDraw::SetDrawShape(EditorShape eShape, bool bAsPrimitive)
-//{
-//	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
-//	m_eCurDrawShape = eShape;
-//
-//	if(bAsPrimitive)
-//	{
-//		m_DrawShape.SetTint(HyColor::DarkMagenta);
-//		m_DrawShape.SetWireframe(false);
-//	}
-//	else
-//	{
-//		m_DrawShape.SetTint(HyColor::Blue);
-//		m_DrawShape.SetWireframe(true);
-//	}
-//}
-//
+void EntityDraw::NewShape(EditorShape eShape, bool bAsPrimitive)
+{
+	m_eShapeEditState = bAsPrimitive ? SHAPESTATE_InitialPlacement_Primitive : SHAPESTATE_InitialPlacement_Shape;
+	m_eCurEditShape = eShape;
+	
+	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
+}
+
+void EntityDraw::NewShapeFinished()
+{
+	m_eShapeEditState = SHAPESTATE_None;
+	m_eCurEditShape = SHAPE_None;
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
+	pWidget->OnNewShapeFinished();
+
+	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+}
+
 //void EntityDraw::UpdateDrawShape(bool bCtrlModifer)
 //{
 //	glm::vec2 ptCurMousePos;
@@ -266,10 +271,10 @@ void EntityDraw::RefreshTransforms()
 	{
 		if(pItem->GetGuiType() != ITEM_Shape)
 		{
-			if(pItem->GetNodeChild()->GetInternalFlags() & NODETYPE_IsBody)
+			if(pItem->GetAsChild()->GetInternalFlags() & NODETYPE_IsBody)
 			{
-				pItem->GetNodeChild()->ParentDetach();
-				static_cast<IHyBody2d *>(pItem->GetNodeChild())->ResetDisplayOrder();
+				pItem->GetAsChild()->ParentDetach();
+				static_cast<IHyBody2d *>(pItem->GetAsChild())->ResetDisplayOrder();
 			}
 		}
 	}
@@ -296,9 +301,9 @@ void EntityDraw::RefreshTransforms()
 		m_ItemList.push_back(pItemWidget);
 
 		if(pItemWidget->GetGuiType() != ITEM_Shape)
-			ChildAppend(*pItemWidget->GetNodeChild());
-		else
-			ShapeAppend(*pItemWidget->GetShape());
+			ChildAppend(*pItemWidget->GetAsChild());
+		//else
+		//	ShapeAppend(*pItemWidget->GetAsShape());
 		
 		pItemWidget->RefreshJson(m_pCamera, childObj);
 	}
@@ -349,7 +354,7 @@ EntityDrawItem *EntityDraw::FindStaleChild(HyGuiItemType eType, QUuid uuid)
 	return nullptr;
 }
 
-Qt::CursorShape EntityDraw::GetGrabPointCursorShape(GrabPoint eGrabPoint, float fRotation) const
+Qt::CursorShape EntityDraw::GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const
 {
 	fRotation = HyMath::NormalizeRange(fRotation, 0.0f, 360.0f);
 
@@ -386,26 +391,26 @@ Qt::CursorShape EntityDraw::GetGrabPointCursorShape(GrabPoint eGrabPoint, float 
 	switch(eGrabPoint)
 	{
 	default:
-	case GRAB_None:
+	case TransformCtrl::GRAB_None:
 		return Qt::ArrowCursor;
 
-	case GRAB_BotLeft:
+	case TransformCtrl::GRAB_BotLeft:
 		return fpRotateCursor(Qt::SizeBDiagCursor, iThresholds);
-	case GRAB_BotRight:
+	case TransformCtrl::GRAB_BotRight:
 		return fpRotateCursor(Qt::SizeFDiagCursor, iThresholds);
-	case GRAB_TopRight:
+	case TransformCtrl::GRAB_TopRight:
 		return fpRotateCursor(Qt::SizeBDiagCursor, iThresholds);
-	case GRAB_TopLeft:
+	case TransformCtrl::GRAB_TopLeft:
 		return fpRotateCursor(Qt::SizeFDiagCursor, iThresholds);
-	case GRAB_BotMid:
+	case TransformCtrl::GRAB_BotMid:
 		return fpRotateCursor(Qt::SizeVerCursor, iThresholds);
-	case GRAB_MidRight:
+	case TransformCtrl::GRAB_MidRight:
 		return fpRotateCursor(Qt::SizeHorCursor, iThresholds);
-	case GRAB_TopMid:
+	case TransformCtrl::GRAB_TopMid:
 		return fpRotateCursor(Qt::SizeVerCursor, iThresholds);
-	case GRAB_MidLeft:
+	case TransformCtrl::GRAB_MidLeft:
 		return fpRotateCursor(Qt::SizeHorCursor, iThresholds);
-	case GRAB_Rotate:
+	case TransformCtrl::GRAB_Rotate:
 		return Qt::OpenHandCursor;
 	}
 }
@@ -441,7 +446,7 @@ void EntityDraw::DoMouseMove_Select()
 				break;
 			}
 		}
-		m_eCurHoverGrabPoint = GRAB_None;
+		m_eCurHoverGrabPoint = TransformCtrl::GRAB_None;
 
 		if(m_MultiTransform.IsShown())
 		{
@@ -471,7 +476,7 @@ void EntityDraw::DoMousePress_Select(bool bCtrlMod, bool bShiftMod)
 	if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
 		HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
 
-	if(m_eCurHoverGrabPoint != GRAB_None)
+	if(m_eCurHoverGrabPoint != TransformCtrl::GRAB_None)
 		BeginTransform();
 	else
 	{
@@ -581,10 +586,10 @@ void EntityDraw::BeginTransform()
 		m_pCamera->ProjectToWorld(m_ptDragCenter, m_ptDragCenter);
 
 		// Set 'm_vDragStartSize'
-		glm::vec2 ptMidRight = pCurTransform->GetGrabPointWorldPos(GRAB_MidRight, m_pCamera);
-		glm::vec2 ptMidLeft = pCurTransform->GetGrabPointWorldPos(GRAB_MidLeft, m_pCamera); 
-		glm::vec2 ptTopMid = pCurTransform->GetGrabPointWorldPos(GRAB_TopMid, m_pCamera);
-		glm::vec2 ptBotMid = pCurTransform->GetGrabPointWorldPos(GRAB_BotMid, m_pCamera);
+		glm::vec2 ptMidRight = pCurTransform->GetGrabPointWorldPos(TransformCtrl::GRAB_MidRight, m_pCamera);
+		glm::vec2 ptMidLeft = pCurTransform->GetGrabPointWorldPos(TransformCtrl::GRAB_MidLeft, m_pCamera);
+		glm::vec2 ptTopMid = pCurTransform->GetGrabPointWorldPos(TransformCtrl::GRAB_TopMid, m_pCamera);
+		glm::vec2 ptBotMid = pCurTransform->GetGrabPointWorldPos(TransformCtrl::GRAB_BotMid, m_pCamera);
 		HySetVec(m_vDragStartSize, glm::distance(ptMidLeft, ptMidRight), glm::distance(ptTopMid, ptBotMid));
 	}
 
@@ -593,19 +598,19 @@ void EntityDraw::BeginTransform()
 	{
 		if(pDrawItem->GetGuiType() != ITEM_Shape)
 		{
-			if(pDrawItem->GetNodeChild()->GetInternalFlags() & NODETYPE_IsBody)
+			if(pDrawItem->GetAsChild()->GetInternalFlags() & NODETYPE_IsBody)
 			{
-				IHyBody2d *pDrawBody = static_cast<IHyBody2d *>(pDrawItem->GetNodeChild());
+				IHyBody2d *pDrawBody = static_cast<IHyBody2d *>(pDrawItem->GetAsChild());
 				pDrawBody->SetDisplayOrder(pDrawBody->GetDisplayOrder()); // This enables the 'EXPLICIT_DisplayOrder' flag to be used during m_ActiveTransform's parental guidance
 			}
 
-			m_ActiveTransform.ChildAppend(*pDrawItem->GetNodeChild());
-			m_PrevTransformList.push_back(pDrawItem->GetNodeChild()->GetSceneTransform(0.0f));
+			m_ActiveTransform.ChildAppend(*pDrawItem->GetAsChild());
+			m_PrevTransformList.push_back(pDrawItem->GetAsChild()->GetSceneTransform(0.0f));
 		}
 		else
 		{
-			m_ActiveTransform.ShapeAppend(*pDrawItem->GetShape());
-			m_PrevTransformList.push_back(glm::mat4(1.0f));
+			//m_ActiveTransform.ShapeAppend(*pDrawItem->GetShape());
+			//m_PrevTransformList.push_back(glm::mat4(1.0f));
 		}
 	}
 
@@ -687,65 +692,65 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 			pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
 
 		bool bUniformScale = true;
-		GrabPoint eAnchorPoint = GRAB_None;
-		GrabPoint eAnchorWidth = GRAB_None;
-		GrabPoint eAnchorHeight = GRAB_None;
+		TransformCtrl::GrabPointType eAnchorPoint = TransformCtrl::GRAB_None;
+		TransformCtrl::GrabPointType eAnchorWidth = TransformCtrl::GRAB_None;
+		TransformCtrl::GrabPointType eAnchorHeight = TransformCtrl::GRAB_None;
 		glm::bvec2 bScaleDimensions;
 		switch(m_eCurHoverGrabPoint)
 		{
-		case GRAB_BotLeft:
+		case TransformCtrl::GRAB_BotLeft:
 			bUniformScale = true;
-			eAnchorPoint = GRAB_TopRight;
-			eAnchorWidth = GRAB_TopLeft;
-			eAnchorHeight = GRAB_BotRight;
+			eAnchorPoint = TransformCtrl::GRAB_TopRight;
+			eAnchorWidth = TransformCtrl::GRAB_TopLeft;
+			eAnchorHeight = TransformCtrl::GRAB_BotRight;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
-		case GRAB_BotRight:
+		case TransformCtrl::GRAB_BotRight:
 			bUniformScale = true;
-			eAnchorPoint = GRAB_TopLeft;
-			eAnchorWidth = GRAB_TopRight;
-			eAnchorHeight = GRAB_BotLeft;
+			eAnchorPoint = TransformCtrl::GRAB_TopLeft;
+			eAnchorWidth = TransformCtrl::GRAB_TopRight;
+			eAnchorHeight = TransformCtrl::GRAB_BotLeft;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
-		case GRAB_TopRight:
+		case TransformCtrl::GRAB_TopRight:
 			bUniformScale = true;
-			eAnchorPoint = GRAB_BotLeft;
-			eAnchorWidth = GRAB_BotRight;
-			eAnchorHeight = GRAB_TopLeft;
+			eAnchorPoint = TransformCtrl::GRAB_BotLeft;
+			eAnchorWidth = TransformCtrl::GRAB_BotRight;
+			eAnchorHeight = TransformCtrl::GRAB_TopLeft;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
-		case GRAB_TopLeft:
+		case TransformCtrl::GRAB_TopLeft:
 			bUniformScale = true;
-			eAnchorPoint = GRAB_BotRight;
-			eAnchorWidth = GRAB_BotLeft;
-			eAnchorHeight = GRAB_TopRight;
+			eAnchorPoint = TransformCtrl::GRAB_BotRight;
+			eAnchorWidth = TransformCtrl::GRAB_BotLeft;
+			eAnchorHeight = TransformCtrl::GRAB_TopRight;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
-		case GRAB_BotMid:
+		case TransformCtrl::GRAB_BotMid:
 			bUniformScale = false;
-			eAnchorPoint = GRAB_TopMid;
-			eAnchorHeight = GRAB_BotMid;
+			eAnchorPoint = TransformCtrl::GRAB_TopMid;
+			eAnchorHeight = TransformCtrl::GRAB_BotMid;
 			bScaleDimensions.x = false;
 			bScaleDimensions.y = true;
 			break;
-		case GRAB_MidRight:
+		case TransformCtrl::GRAB_MidRight:
 			bUniformScale = false;
-			eAnchorPoint = GRAB_MidLeft;
-			eAnchorWidth = GRAB_MidRight;
+			eAnchorPoint = TransformCtrl::GRAB_MidLeft;
+			eAnchorWidth = TransformCtrl::GRAB_MidRight;
 			bScaleDimensions.x = true;
 			bScaleDimensions.y = false;
 			break;
-		case GRAB_TopMid:
+		case TransformCtrl::GRAB_TopMid:
 			bUniformScale = false;
-			eAnchorPoint = GRAB_BotMid;
-			eAnchorHeight = GRAB_TopMid;
+			eAnchorPoint = TransformCtrl::GRAB_BotMid;
+			eAnchorHeight = TransformCtrl::GRAB_TopMid;
 			bScaleDimensions.x = false;
 			bScaleDimensions.y = true;
 			break;
-		case GRAB_MidLeft:
+		case TransformCtrl::GRAB_MidLeft:
 			bUniformScale = false;
-			eAnchorPoint = GRAB_MidRight;
-			eAnchorWidth = GRAB_MidLeft;
+			eAnchorPoint = TransformCtrl::GRAB_MidRight;
+			eAnchorWidth = TransformCtrl::GRAB_MidLeft;
 			bScaleDimensions.x = true;
 			bScaleDimensions.y = false;
 			break;
@@ -796,9 +801,9 @@ void EntityDraw::DoMouseRelease_Transform()
 	for(EntityDrawItem *pDrawItem : m_SelectedItemList)
 	{
 		if(pDrawItem->GetGuiType() != ITEM_Shape)
-			newTransformList.push_back(pDrawItem->GetNodeChild()->GetSceneTransform(0.0f));
-		else
-			newTransformList.push_back(m_ActiveTransform.GetSceneTransform(0.0f));
+			newTransformList.push_back(pDrawItem->GetAsChild()->GetSceneTransform(0.0f));
+		//else
+		//	newTransformList.push_back(m_ActiveTransform.GetSceneTransform(0.0f));
 
 		EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetThisUuid());;
 		treeItemDataList.push_back(pTreeItemData);
@@ -816,27 +821,15 @@ void EntityDraw::DoMouseRelease_Transform()
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
-void EntityDraw::DoMouseMove_NewShape()
+void EntityDraw::DoMouseMove_ShapeEdit()
 {
 }
 
-void EntityDraw::DoMousePress_NewShape()
+void EntityDraw::DoMousePress_ShapeEdit()
 {
 }
 
-void EntityDraw::DoMouseRelease_NewShape()
-{
-}
-
-void EntityDraw::DoMouseMove_EditShape()
-{
-}
-
-void EntityDraw::DoMousePress_EditShape()
-{
-}
-
-void EntityDraw::DoMouseRelease_EditShape()
+void EntityDraw::DoMouseRelease_ShapeEdit()
 {
 }
 

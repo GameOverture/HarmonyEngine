@@ -25,6 +25,12 @@ class EntityWidget : public IWidget
 {
 	Q_OBJECT
 
+	QActionGroup		m_AddShapeActionGroup;
+
+	// I think it looks better without QToolBars, but kept here if advantageous to switch back
+	//QToolBar		m_AddPrimitiveToolBar;
+	//QToolBar		m_AddShapeToolBar;
+
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~EntityWidget();
@@ -37,12 +43,12 @@ public:
 	void RequestSelectedItems(QList<QUuid> uuidList); // Calls signal
 	void SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList); // Does not call signal
 
+	void DoNewShape(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType);
+	void OnNewShapeFinished();
+
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;
 	virtual void resizeEvent(QResizeEvent *pEvent) override;
-
-	void DoShapeTriggered(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType);
-	void ClearAddShape();
 
 private Q_SLOTS:
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
