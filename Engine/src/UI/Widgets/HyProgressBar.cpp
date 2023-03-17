@@ -65,11 +65,19 @@ void HyProgressBar::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 {
 	HySetVec(m_vBarOffset, iBarOffsetX, iBarOffsetY);
 
-	if(m_pBar && m_pBar->GetType() == HYTYPE_Primitive)
+	if(m_pBar)
 	{
-		glm::vec2 vTotalFillArea(m_Panel.size.X() - (m_vBarOffset.x * 2.0f), m_Panel.size.Y() - (m_vBarOffset.y * 2.0f));
-		static_cast<HyPrimitive2d *>(m_pBar)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
-	}
+		if (m_pBar->GetType() == HYTYPE_Primitive)
+		{
+			glm::vec2 vTotalFillArea(m_Panel.size.X() - (m_vBarOffset.x * 2.0f), m_Panel.size.Y() - (m_vBarOffset.y * 2.0f));
+			static_cast<HyPrimitive2d*>(m_pBar)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
+		}
+		else
+		{
+			m_Panel.pos.Offset(iBarOffsetX, iBarOffsetY);
+			pos.Offset(iBarOffsetX, iBarOffsetY);
+		}
+	 }
 
 	AdjustProgress();
 }
