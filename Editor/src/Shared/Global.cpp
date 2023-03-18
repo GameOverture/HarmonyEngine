@@ -17,6 +17,7 @@
 /*static*/ QString HyGlobal::sm_sItemNames[NUMTYPES];
 /*static*/ QString HyGlobal::sm_sItemNamesPlural[NUMTYPES];
 /*static*/ QString HyGlobal::sm_AssetNames[NUMASSETTYPES];
+/*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
@@ -75,6 +76,14 @@
 	sm_AssetNames[ASSET_Atlas] = "Atlases";
 	sm_AssetNames[ASSET_Prefabs] = "Prefabs";
 	sm_AssetNames[ASSET_Audio] = "Audio";
+
+	sm_ShapeNames[SHAPE_None] = "None";
+	sm_ShapeNames[SHAPE_Box] = "Box";
+	sm_ShapeNames[SHAPE_Circle] = "Circle";
+	sm_ShapeNames[SHAPE_Polygon] = "Polygon";
+	sm_ShapeNames[SHAPE_LineSegment] = "Line Segment";
+	sm_ShapeNames[SHAPE_LineChain] = "Line Chain";
+	sm_ShapeNames[SHAPE_LineLoop] = "Line Loop";
 
 	sm_sSubIconNames[SUBICON_None] = "";
 	sm_sSubIconNames[SUBICON_New] = "-New";
@@ -193,6 +202,17 @@
 	}
 
 	return ITEM_Unknown;
+}
+
+/*static*/ EditorShape HyGlobal::GetShapeFromString(QString sShape)
+{
+	for(int i = 0; i < NUM_SHAPES; ++i)
+	{
+		if(sShape.compare(ShapeName(static_cast<EditorShape>(i)), Qt::CaseInsensitive) == 0)
+			return static_cast<EditorShape>(i);
+	}
+
+	return SHAPE_None;
 }
 
 /*static*/ const QString HyGlobal::ItemExt(HyGuiItemType eItem)

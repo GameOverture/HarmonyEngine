@@ -388,7 +388,7 @@ void EntityWidget::on_actionAddPolygonPrimitive_triggered()
 
 void EntityWidget::on_actionAddSegmentPrimitive_triggered()
 {
-	DoNewShape(ui->btnAddPrimitiveSegment, "Drawing new primitive line segment...", SHAPE_Segment);
+	DoNewShape(ui->btnAddPrimitiveSegment, "Drawing new primitive line segment...", SHAPE_LineSegment);
 }
 
 void EntityWidget::on_actionAddLineChainPrimitive_triggered()
@@ -418,7 +418,7 @@ void EntityWidget::on_actionAddPolygonShape_triggered()
 
 void EntityWidget::on_actionAddSegmentShape_triggered()
 {
-	DoNewShape(ui->btnAddShapeSegment, "Drawing new line segment...", SHAPE_Segment);
+	DoNewShape(ui->btnAddShapeSegment, "Drawing new line segment...", SHAPE_LineSegment);
 }
 
 void EntityWidget::on_actionAddLineChainShape_triggered()

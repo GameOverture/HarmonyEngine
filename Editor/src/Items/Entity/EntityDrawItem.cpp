@@ -16,18 +16,20 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 	m_Uuid(uuid),
 	m_ItemUuid(itemUuid),
 	m_pChild(nullptr),
-	m_pShape(nullptr),
-	m_Transform(pParent)
+	m_Transform(pParent),
+	m_ShapeCtrl(pParent)
 {
 	switch(m_eGuiType)
 	{
-	case ITEM_Primitive:		m_pChild = new HyPrimitive2d(pParent); break;
+	case ITEM_Shape:
+	case ITEM_Primitive:
+		m_pChild = nullptr; // When either shape or primitive 'm_pChild' is provided via the m_ShapeCtrl
+		break;
 	case ITEM_Audio:			m_pChild = new HyAudio2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Text:				m_pChild = new HyText2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Spine:			m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Sprite:			m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 
-	case ITEM_Shape:			m_pShape = new ShapeCtrl(pParent); break;
 
 	case ITEM_AtlasImage:		//m_pChild = new HyTexturedQuad2d();
 	case ITEM_Entity:
@@ -48,7 +50,6 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 /*virtual*/ EntityDrawItem::~EntityDrawItem()
 {
 	delete m_pChild;
-	delete m_pShape;
 }
 
 HyGuiItemType EntityDrawItem::GetGuiType() const
@@ -66,14 +67,19 @@ const QUuid &EntityDrawItem::GetItemUuid() const
 	return m_ItemUuid;
 }
 
-IHyLoadable2d *EntityDrawItem::GetAsChild() const
+IHyLoadable2d *EntityDrawItem::GetAsChild()
 {
+	if(m_eGuiType == ITEM_Primitive)
+		return static_cast<IHyLoadable2d *>(&m_ShapeCtrl.GetPrimitive(true));
+	else if(m_eGuiType == ITEM_Shape)
+		return static_cast<IHyLoadable2d *>(&m_ShapeCtrl.GetPrimitive(false));
+
 	return m_pChild;
 }
 
-ShapeCtrl *EntityDrawItem::GetAsShape() const
+ShapeCtrl &EntityDrawItem::GetShapeCtrl()
 {
-	return m_pShape;
+	return m_ShapeCtrl;
 }
 
 TransformCtrl &EntityDrawItem::GetTransformCtrl()
@@ -81,7 +87,7 @@ TransformCtrl &EntityDrawItem::GetTransformCtrl()
 	return m_Transform;
 }
 
-bool EntityDrawItem::IsMouseInBounds() const
+bool EntityDrawItem::IsMouseInBounds()
 {
 	HyShape2d boundingShape;
 	glm::mat4 transformMtx;
@@ -91,8 +97,11 @@ bool EntityDrawItem::IsMouseInBounds() const
 	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(transformMtx, ptWorldMousePos);
 }
 
-void EntityDrawItem::RefreshJson(HyCamera2d *pCamera, QJsonObject childObj)
+void EntityDrawItem::RefreshJson(QJsonObject childObj)
 {
+	// TODO: parse all and only the potential categories
+
+
 	QJsonObject commonObj = childObj["Common"].toObject();
 	if(commonObj.contains("Display Order"))
 	{
@@ -110,8 +119,6 @@ void EntityDrawItem::RefreshJson(HyCamera2d *pCamera, QJsonObject childObj)
 	m_pChild->rot.Set(transformObj["Rotation"].toDouble());
 	QJsonArray scaleArray = transformObj["Scale"].toArray();
 	m_pChild->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
-
-	//RefreshTransform(pCamera);
 }
 
 void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
@@ -166,15 +173,12 @@ void EntityDrawItem::RefreshOverrideData()
 	}
 }
 
-void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut) const
+void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
 {
 	transformMtxOut = glm::identity<glm::mat4>();
 	switch(GetGuiType())
 	{
 	case ITEM_Shape:
-		GetAsShape()->GetShape(boundingShapeOut);
-		break;
-
 	case ITEM_AtlasImage:
 	case ITEM_Primitive:
 	case ITEM_Text:

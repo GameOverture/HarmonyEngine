@@ -356,7 +356,7 @@ bool TransformCtrl::IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const
 	return true;
 }
 
-MarqueeBox::MarqueeBox(HyEntity2d *pParent) :
+ShapeCtrl::ShapeCtrl(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_BoundingVolume(this),
 	m_Outline(this)
@@ -371,11 +371,16 @@ MarqueeBox::MarqueeBox(HyEntity2d *pParent) :
 	SetVisible(false);
 }
 
-/*virtual*/ MarqueeBox::~MarqueeBox()
+/*virtual*/ ShapeCtrl::~ShapeCtrl()
 {
 }
 
-b2AABB MarqueeBox::GetSelectionBox()
+HyPrimitive2d &ShapeCtrl::GetPrimitive(bool bWorldSpace)
+{
+	return bWorldSpace ? m_BoundingVolume : m_Outline;
+}
+
+b2AABB ShapeCtrl::GetSelectionBox()
 {
 	b2AABB aabb;
 	if(IsVisible() == false)
@@ -391,54 +396,43 @@ b2AABB MarqueeBox::GetSelectionBox()
 	return aabb;
 }
 
-void MarqueeBox::SetStartPt(glm::vec2 ptStartPos)
+void ShapeCtrl::SetAsDrag(EditorShape eShape, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
 {
-	SetVisible(true);
-	m_ptStartPos = ptStartPos;
+	switch(eShape)
+	{
+	case SHAPE_None:
+		Clear();
+		break;
 
-	m_BoundingVolume.SetAsNothing();
-	m_Outline.SetAsNothing();
+	case SHAPE_Box: {
+		SetVisible(true);
+
+		glm::vec2 ptLowerBound(ptStartPos.x < ptDragPos.x ? ptStartPos.x : ptDragPos.x,
+			ptStartPos.y < ptDragPos.y ? ptStartPos.y : ptDragPos.y);
+		glm::vec2 ptUpperBound(ptStartPos.x >= ptDragPos.x ? ptStartPos.x : ptDragPos.x,
+			ptStartPos.y >= ptDragPos.y ? ptStartPos.y : ptDragPos.y);
+
+		// Bounding Volume
+		glm::vec2 ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
+		m_BoundingVolume.SetAsBox((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f);
+
+		// Outline
+		pCamera->ProjectToCamera(ptLowerBound, ptLowerBound);
+		pCamera->ProjectToCamera(ptUpperBound, ptUpperBound);
+		ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
+		m_Outline.SetAsBox((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f);
+		break; }
+
+	default:
+		HyGuiLog("ShapeCtrl::SetAsDrag - Unhandled shape type: " % QString::number(eShape), LOGTYPE_Error);
+		break;
+	}
 }
 
-void MarqueeBox::SetDragPt(glm::vec2 ptDragPos, HyCamera2d *pCamera)
-{
-	glm::vec2 ptLowerBound(m_ptStartPos.x < ptDragPos.x ? m_ptStartPos.x : ptDragPos.x,
-						   m_ptStartPos.y < ptDragPos.y ? m_ptStartPos.y : ptDragPos.y);
-	glm::vec2 ptUpperBound(m_ptStartPos.x >= ptDragPos.x ? m_ptStartPos.x : ptDragPos.x,
-						   m_ptStartPos.y >= ptDragPos.y ? m_ptStartPos.y : ptDragPos.y);
-
-	// Bounding Volume
-	glm::vec2 ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
-	m_BoundingVolume.SetAsBox((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f);
-
-	// Outline
-	pCamera->ProjectToCamera(ptLowerBound, ptLowerBound);
-	pCamera->ProjectToCamera(ptUpperBound, ptUpperBound);
-	ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
-	m_Outline.SetAsBox((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f);
-}
-
-void MarqueeBox::Clear()
+void ShapeCtrl::Clear()
 {
 	SetVisible(false);
 
 	m_BoundingVolume.SetAsNothing();
 	m_Outline.SetAsNothing();
-}
-
-
-ShapeCtrl::ShapeCtrl(HyEntity2d *pParent) :
-	m_eDrawShape(SHAPE_None),
-	m_PrimShape(pParent)
-{
-
-}
-
-/*virtual*/ ShapeCtrl::~ShapeCtrl()
-{
-}
-
-void ShapeCtrl::GetShape(HyShape2d &shapeRefOut)
-{
-	m_PrimShape.CalcLocalBoundingShape(shapeRefOut);
 }

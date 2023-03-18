@@ -120,13 +120,15 @@ enum AuxTab
 
 enum EditorShape
 {
-	SHAPE_None = -1,
-	SHAPE_Box = 0,
+	SHAPE_None = 0,
+	SHAPE_Box,
 	SHAPE_Circle,
 	SHAPE_Polygon,
-	SHAPE_Segment,
+	SHAPE_LineSegment,
 	SHAPE_LineChain,
-	SHAPE_LineLoop
+	SHAPE_LineLoop,
+
+	NUM_SHAPES
 };
 
 enum SubIcon
@@ -198,6 +200,7 @@ class HyGlobal
 	static QString														sm_sItemNames[NUMTYPES];
 	static QString														sm_sItemNamesPlural[NUMTYPES];
 	static QString														sm_AssetNames[NUMASSETTYPES];
+	static QString														sm_ShapeNames[NUM_SHAPES];
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
 
 	static QIcon														sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
@@ -221,9 +224,11 @@ public:
 	static QList<HyGuiItemType> GetTypeList();
 	static QStringList GetTypeNameList();
 	static HyGuiItemType GetTypeFromString(QString sType);
+	static EditorShape GetShapeFromString(QString sShape);
 
 	static const QString ItemName(HyGuiItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString AssetName(AssetType eAsset)					{ return sm_AssetNames[eAsset]; }
+	static const QString ShapeName(EditorShape eShape)					{ return sm_ShapeNames[eShape]; }
 	static const QString ItemExt(HyGuiItemType eItem);
 	static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)	{ return sm_ItemIcons[eItm][eSubIcon]; }
 	static const QIcon AssetIcon(AssetType eAsset, SubIcon eSubIcon);

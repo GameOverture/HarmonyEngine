@@ -399,7 +399,7 @@ void ProjectItemData::on_undoStack_indexChanged(int iIndex)
 		HyGuiLog("m_pDraw was nullptr in on_undoStack_indexChanged", LOGTYPE_Error);
 		return;
 	}
-	
+	m_pDraw->OnUndoStackIndexChanged(iIndex);
 	m_pDraw->ApplyJsonData();
 }
 

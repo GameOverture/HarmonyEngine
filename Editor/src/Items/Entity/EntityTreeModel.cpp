@@ -122,25 +122,27 @@ void EntityTreeItemData::InitalizePropertiesTree()
 		break;
 
 	case ITEM_Primitive:
-		m_PropertiesTreeModel.AppendCategory("Primitive", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc.");
-		m_PropertiesTreeModel.AppendProperty("Primitive", "Shape Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Nothing" << "Box" << "Circle" << "Polygon" << "Line" << "Line Chain" << "Line Loop");
-		m_PropertiesTreeModel.AppendProperty("Primitive", "Shape Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
+		m_PropertiesTreeModel.AppendCategory("Primitive", QVariant(), false, false, "A visible shape that can be drawn to the screen");
 		m_PropertiesTreeModel.AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type");
 		m_PropertiesTreeModel.AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", false, 1.0, 100.0, 1.0);
+		m_PropertiesTreeModel.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
+		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Nothing" << "Box" << "Circle" << "Polygon" << "Line" << "Line Chain" << "Line Loop");
+		m_PropertiesTreeModel.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
 		break;
 
 	case ITEM_Shape:
-		m_PropertiesTreeModel.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc.");
+		m_PropertiesTreeModel.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Nothing" << "Box" << "Circle" << "Polygon" << "Line" << "Line Chain" << "Line Loop");
 		m_PropertiesTreeModel.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
-		m_PropertiesTreeModel.AppendProperty("Shape", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
-		m_PropertiesTreeModel.AppendProperty("Shape", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
-		m_PropertiesTreeModel.AppendProperty("Shape", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
-		m_PropertiesTreeModel.AppendProperty("Shape", "Restitution Threshold", PROPERTIESTYPE_double, 1.0, "Restitution velocity threshold, usually in m/s. Collisions above this speed have restitution applied (will bounce)", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
-		m_PropertiesTreeModel.AppendProperty("Shape", "Sensor", PROPERTIESTYPE_bool, Qt::Unchecked, "A sensor shape collects contact information but never generates a collision response");
-		m_PropertiesTreeModel.AppendProperty("Shape", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", false, 0, 0xFFFF, 1, QString(), QString(), QVariant());
-		m_PropertiesTreeModel.AppendProperty("Shape", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", false, 0, 0xFFFF, 1, QString(), QString(), QVariant());
-		m_PropertiesTreeModel.AppendProperty("Shape", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", false, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
+		m_PropertiesTreeModel.AppendCategory("Fixture", QVariant(), true, true, "Become a fixture used in physics simulations and collision");
+		m_PropertiesTreeModel.AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		m_PropertiesTreeModel.AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		m_PropertiesTreeModel.AppendProperty("Fixture", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		m_PropertiesTreeModel.AppendProperty("Fixture", "Restitution Threshold", PROPERTIESTYPE_double, 1.0, "Restitution velocity threshold, usually in m/s. Collisions above this speed have restitution applied (will bounce)", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		m_PropertiesTreeModel.AppendProperty("Fixture", "Sensor", PROPERTIESTYPE_bool, Qt::Unchecked, "A sensor shape collects contact information but never generates a collision response");
+		m_PropertiesTreeModel.AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", false, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+		m_PropertiesTreeModel.AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", false, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+		m_PropertiesTreeModel.AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", false, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
 		break;
 
 	case ITEM_AtlasImage:

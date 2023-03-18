@@ -80,29 +80,10 @@ public:
 	bool IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const;
 };
 
-class MarqueeBox : public HyEntity2d
+class ShapeCtrl : public HyEntity2d
 {
-	HyPrimitive2d				m_BoundingVolume;
-	HyPrimitive2d				m_Outline;
-
-	glm::vec2					m_ptStartPos;
-
-public:
-	MarqueeBox(HyEntity2d *pParent);
-	virtual ~MarqueeBox();
-
-	b2AABB GetSelectionBox();
-
-	void SetStartPt(glm::vec2 ptStartPos);
-	void SetDragPt(glm::vec2 ptDragPos, HyCamera2d *pCamera);
-	void Clear();
-};
-
-// Essentially a wrapper around 'm_PrimShape' that will allow the user to manipulate what the HyPrimitive is in the editor
-class ShapeCtrl
-{
-	EditorShape					m_eDrawShape;
-	HyPrimitive2d				m_PrimShape;
+	HyPrimitive2d				m_BoundingVolume;	// Uses world/camera coordinates
+	HyPrimitive2d				m_Outline;			// Uses window coordinates (unaffected by zoom)
 
 	QList<GrabPoint *>			m_GrabPointList;
 
@@ -110,7 +91,12 @@ public:
 	ShapeCtrl(HyEntity2d *pParent);
 	virtual ~ShapeCtrl();
 
-	void GetShape(HyShape2d &shapeRefOut);
+	HyPrimitive2d &GetPrimitive(bool bWorldSpace);
+
+	b2AABB GetSelectionBox();
+
+	void SetAsDrag(EditorShape eShape, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	void Clear();
 };
 
 #endif // TRANSFORMCTRL_H

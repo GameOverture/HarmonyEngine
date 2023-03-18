@@ -24,7 +24,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_pCurHoverItem(nullptr),
 	m_eCurHoverGrabPoint(TransformCtrl::GRAB_None),
 	m_bSelectionHandled(false),
-	m_eDragState(DRAGSTATE_None)
+	m_eDragState(DRAGSTATE_None),
+	m_eShapeEditState(SHAPESTATE_None),
+	m_pShapeEditInitial(nullptr)
 {
 	m_MultiTransform.Hide();
 
@@ -35,6 +37,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	for(auto pItem : m_ItemList)
 		delete pItem;
+}
+
+/*virtual*/ void EntityDraw::OnUndoStackIndexChanged(int iIndex) /*override*/
+{
+	if(m_eShapeEditState != SHAPESTATE_None)
+		NewShapeFinished();
 }
 
 /*virtual*/ void EntityDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
@@ -221,16 +229,22 @@ void EntityDraw::RefreshTransforms()
 
 void EntityDraw::NewShape(EditorShape eShape, bool bAsPrimitive)
 {
+	RequestSelection(QList<EntityDrawItem *>()); // Clear any selected item
+
+	m_eDragState = DRAGSTATE_None;
+
 	m_eShapeEditState = bAsPrimitive ? SHAPESTATE_InitialPlacement_Primitive : SHAPESTATE_InitialPlacement_Shape;
-	m_eCurEditShape = eShape;
+	m_pShapeEditInitial = new EntityDrawItem(bAsPrimitive ? ITEM_Primitive : ITEM_Shape, QUuid::createUuid(), m_pProjItem->GetUuid(), this);
 	
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 }
 
 void EntityDraw::NewShapeFinished()
 {
+	m_eDragState = DRAGSTATE_None;
+
 	m_eShapeEditState = SHAPESTATE_None;
-	m_eCurEditShape = SHAPE_None;
+	delete m_pShapeEditInitial; m_pShapeEditInitial = nullptr;
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
 	pWidget->OnNewShapeFinished();
@@ -305,7 +319,7 @@ void EntityDraw::NewShapeFinished()
 		//else
 		//	ShapeAppend(*pItemWidget->GetAsShape());
 		
-		pItemWidget->RefreshJson(m_pCamera, childObj);
+		pItemWidget->RefreshJson(childObj);
 	}
 	
 	// Delete all the remaining stale items
@@ -424,7 +438,7 @@ void EntityDraw::DoMouseMove_Select()
 		glm::vec2 ptCurMousePos;
 		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 		
-		m_Marquee.SetDragPt(ptCurMousePos, m_pCamera);
+		m_Marquee.SetAsDrag(SHAPE_Box, m_ptDragStart, ptCurMousePos, m_pCamera);
 	}
 	else if(m_eDragState == DRAGSTATE_Pending)
 	{
@@ -484,7 +498,7 @@ void EntityDraw::DoMousePress_Select(bool bCtrlMod, bool bShiftMod)
 		if((m_MultiTransform.IsShown() && m_MultiTransform.IsMouseOverBoundingVolume()) == false &&
 			m_pCurHoverItem == nullptr)
 		{
-			m_Marquee.SetStartPt(m_ptDragStart);
+			//m_Marquee.SetStartPt(m_ptDragStart);
 			m_eDragState = DRAGSTATE_Marquee;
 		}
 		else
@@ -823,10 +837,41 @@ void EntityDraw::DoMouseRelease_Transform()
 
 void EntityDraw::DoMouseMove_ShapeEdit()
 {
+	switch(m_eDragState)
+	{
+	case DRAGSTATE_None:
+		break;
+
+	case DRAGSTATE_Pending: {
+		glm::vec2 ptCurMousePos;
+		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
+		if(glm::distance(m_ptDragStart, ptCurMousePos) >= 2.0f)
+			m_eDragState = DRAGSTATE_Transforming;
+		break; }
+
+	case DRAGSTATE_Transforming: {
+		HyPrimitive2d *pShapePrim = static_cast<HyPrimitive2d *>(m_pShapeEditInitial->GetAsChild());
+
+		break; }
+	}
 }
 
 void EntityDraw::DoMousePress_ShapeEdit()
 {
+	if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
+		HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
+
+	switch(m_eShapeEditState)
+	{
+	case SHAPESTATE_InitialPlacement_Primitive:
+	case SHAPESTATE_InitialPlacement_Shape:
+		m_PressTimer.InitStart(0.5f);
+		m_eDragState = DRAGSTATE_Pending;
+		break;
+
+	case SHAPESTATE_VertexManip:
+		break;
+	}
 }
 
 void EntityDraw::DoMouseRelease_ShapeEdit()

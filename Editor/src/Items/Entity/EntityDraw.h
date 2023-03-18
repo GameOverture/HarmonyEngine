@@ -21,7 +21,7 @@ class EntityDraw : public IDraw
 	QList<EntityDrawItem *>					m_StaleItemList;
 	QList<EntityDrawItem *>					m_SelectedItemList;
 
-	MarqueeBox								m_Marquee;
+	ShapeCtrl								m_Marquee;
 
 	// Multi transform used when 'm_SelectedItemList' contains more than 1 item. It wraps around all selected items.
 	TransformCtrl							m_MultiTransform;
@@ -54,8 +54,7 @@ class EntityDraw : public IDraw
 		SHAPESTATE_VertexManip
 	};
 	ShapeEditState							m_eShapeEditState;
-	EditorShape								m_eCurEditShape;
-	//EntityDrawItem *						m_pCurDrawShape;
+	EntityDrawItem *						m_pShapeEditInitial;	// Used when initially placing a new shape
 
 	// Used to help transform (translate, rotate, scale) selected items
 	HyEntity2d								m_ActiveTransform;
@@ -64,6 +63,8 @@ class EntityDraw : public IDraw
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~EntityDraw();
+
+	virtual void OnUndoStackIndexChanged(int iIndex) override;
 
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent) override;
 	virtual void OnKeyReleaseEvent(QKeyEvent *pEvent) override;

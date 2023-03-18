@@ -48,6 +48,8 @@ public:
 	void ResizeRenderer();
 	void UpdateDrawStatus(QString sSizeDescription);
 
+	virtual void OnUndoStackIndexChanged(int iIndex) { }
+
 	// Derived classes should pass their input events to this class, if they want their main camera to accept user control
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent);
 	virtual void OnKeyReleaseEvent(QKeyEvent *pEvent);
