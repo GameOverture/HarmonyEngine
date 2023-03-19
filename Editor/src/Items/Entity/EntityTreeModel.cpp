@@ -78,6 +78,8 @@ void EntityTreeItemData::InsertJsonInfo(QJsonObject &childObjRef)
 	childObjRef.insert("isSelected", m_bIsSelected);
 }
 
+// NOTE: These properties get set to the proper harmony node within EntityDrawItem::RefreshJson
+//		 Updates here should reflect to the function above
 void EntityTreeItemData::InitalizePropertiesTree()
 {
 	if(m_eTYPE == ITEM_Prefix) // aka Shapes folder
@@ -129,13 +131,13 @@ void EntityTreeItemData::InitalizePropertiesTree()
 		m_PropertiesTreeModel.AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type");
 		m_PropertiesTreeModel.AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", false, 1.0, 100.0, 1.0);
 		m_PropertiesTreeModel.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Nothing" << "Box" << "Circle" << "Polygon" << "Line" << "Line Chain" << "Line Loop");
+		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
 		m_PropertiesTreeModel.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
 		break;
 
 	case ITEM_Shape:
 		m_PropertiesTreeModel.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Nothing" << "Box" << "Circle" << "Polygon" << "Line" << "Line Chain" << "Line Loop");
+		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
 		m_PropertiesTreeModel.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
 		m_PropertiesTreeModel.AppendCategory("Fixture", QVariant(), true, true, "Become a fixture used in physics simulations and collision");
 		m_PropertiesTreeModel.AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
@@ -148,9 +150,9 @@ void EntityTreeItemData::InitalizePropertiesTree()
 		m_PropertiesTreeModel.AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", false, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
 		break;
 
-	case ITEM_AtlasImage:
-		m_PropertiesTreeModel.AppendCategory("Textured Quad");
-		break;
+	//case ITEM_AtlasImage:
+	//	m_PropertiesTreeModel.AppendCategory("Textured Quad");
+	//	break;
 
 	case ITEM_Text:
 		m_PropertiesTreeModel.AppendCategory("Text", m_ItemUuid.toString(QUuid::WithoutBraces));

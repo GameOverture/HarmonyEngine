@@ -87,6 +87,7 @@ class ShapeCtrl : public HyEntity2d
 	HyPrimitive2d				m_BoundingVolume;	// Uses world/camera coordinates
 	HyPrimitive2d				m_Outline;			// Uses window coordinates (unaffected by zoom)
 
+	QList<float>				m_DeserializedFloatList;
 	QList<GrabPoint *>			m_GrabPointList;
 
 public:
@@ -104,8 +105,9 @@ public:
 	QString Serialize();
 	void Deserialize(QString sData, HyCamera2d *pCamera);
 
+	void RefreshTransform(HyCamera2d *pCamera);
+
 protected:
-	void UpdateWindowOutline(HyCamera2d *pCamera);
 	void ConvertTo(EditorShape eShape);
 };
 

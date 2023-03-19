@@ -39,7 +39,7 @@ public:
 	void RequestSelectedItems(QList<QUuid> uuidList); // Calls signal
 	void SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList); // Does not call signal
 
-	void DoNewShape(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType);
+	void DoNewShape(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive);
 	void OnNewShapeFinished();
 
 	void SetVertexModeCheck(bool bChecked);

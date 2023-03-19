@@ -25,6 +25,7 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 	case ITEM_Primitive:
 		m_pChild = nullptr; // When either shape or primitive 'm_pChild' is provided via the m_ShapeCtrl
 		break;
+
 	case ITEM_Audio:			m_pChild = new HyAudio2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Text:				m_pChild = new HyText2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Spine:			m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent); break;
@@ -37,7 +38,6 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 		HyLogError("EntityDraw::OnApplyJsonData - unhandled child node type");
 		break;
 	}
-
 	if(m_pChild)
 	{
 		RefreshOverrideData();
@@ -67,7 +67,7 @@ const QUuid &EntityDrawItem::GetItemUuid() const
 	return m_ItemUuid;
 }
 
-IHyLoadable2d *EntityDrawItem::GetAsChild()
+IHyLoadable2d *EntityDrawItem::GetHyNode()
 {
 	if(m_eGuiType == ITEM_Primitive)
 		return static_cast<IHyLoadable2d *>(&m_ShapeCtrl.GetPrimitive(true));
@@ -97,28 +97,79 @@ bool EntityDrawItem::IsMouseInBounds()
 	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(transformMtx, ptWorldMousePos);
 }
 
-void EntityDrawItem::RefreshJson(QJsonObject childObj)
+// NOTE: This matches how EntityTreeItemData::InitalizePropertiesTree initializes the 'm_PropertiesTreeModel'
+//		 Updates here should reflect to the function above
+void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 {
-	// TODO: parse all and only the potential categories
+	if(m_eGuiType == ITEM_Prefix) // aka Shapes folder
+		return;
 
+	IHyLoadable2d *pHyNode = GetHyNode();
 
-	QJsonObject commonObj = childObj["Common"].toObject();
-	if(commonObj.contains("Display Order"))
+	// Parse all and only the potential categories of the 'm_eGuiType' type, and set the values to 'pHyNode'
+	if(m_eGuiType != ITEM_Shape)
 	{
-		int iDisplayOrder = commonObj["Display Order"].toInt();
-		if(iDisplayOrder != 0)
-			static_cast<IHyBody2d *>(m_pChild)->SetDisplayOrder(iDisplayOrder);
-	}
-	m_pChild->SetPauseUpdate(commonObj["Update During Paused"].toBool());
-	m_pChild->SetTag(commonObj["User Tag"].toVariant().toLongLong());
-	m_pChild->SetVisible(commonObj["Visible"].toBool());
+		QJsonObject commonObj = childObj["Common"].toObject();
 
-	QJsonObject transformObj = childObj["Transformation"].toObject();
-	QJsonArray posArray = transformObj["Position"].toArray();
-	m_pChild->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
-	m_pChild->rot.Set(transformObj["Rotation"].toDouble());
-	QJsonArray scaleArray = transformObj["Scale"].toArray();
-	m_pChild->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+		if(m_eGuiType != ITEM_Audio)
+		{
+			pHyNode->SetVisible(commonObj["Visible"].toBool());
+
+			int iDisplayOrder = commonObj["Display Order"].toInt();
+			if(iDisplayOrder != 0)
+				static_cast<IHyBody2d *>(pHyNode)->SetDisplayOrder(iDisplayOrder);
+		}
+
+		pHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
+		pHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
+
+		QJsonObject transformObj = childObj["Transformation"].toObject();
+		QJsonArray posArray = transformObj["Position"].toArray();
+		pHyNode->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
+		pHyNode->rot.Set(transformObj["Rotation"].toDouble());
+		QJsonArray scaleArray = transformObj["Scale"].toArray();
+		pHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+	}
+
+	switch(m_eGuiType)
+	{
+	case ITEM_Entity:
+		// "Physics" category doesn't need to be set
+		break;
+
+	case ITEM_Primitive: {
+		QJsonObject primitiveObj = childObj["Primitive"].toObject();
+		static_cast<HyPrimitive2d *>(pHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
+		static_cast<HyPrimitive2d *>(pHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
+		}
+		[[fallthrough]];
+	case ITEM_Shape: {
+		QJsonObject shapeObj = childObj["Shape"].toObject();
+		GetShapeCtrl().SetShapeType(HyGlobal::GetShapeFromString(shapeObj["Type"].toString()));
+		GetShapeCtrl().Deserialize(shapeObj["Data"].toString(), pCamera);
+		// "Fixture" category doesn't need to be set
+		break; }
+
+	//case ITEM_AtlasImage:
+		//m_PropertiesTreeModel.AppendCategory("Textured Quad");
+	//	break;
+
+	case ITEM_Text: {
+		QJsonObject textObj = childObj["Text"].toObject();
+		static_cast<HyText2d *>(pHyNode)->SetState(textObj["State"].toInt());
+		static_cast<HyText2d *>(pHyNode)->SetText(textObj["Text"].toString().toStdString());
+		break; }
+
+	case ITEM_Sprite: {
+		QJsonObject spriteObj = childObj["Sprite"].toObject();
+		static_cast<HySprite2d *>(pHyNode)->SetState(spriteObj["State"].toInt());
+		static_cast<HySprite2d *>(pHyNode)->SetFrame(spriteObj["Frame"].toInt());
+		break; }
+
+	default:
+		HyGuiLog(QString("EntityDrawItem::RefreshJson - unsupported type: ") % QString::number(m_eGuiType), LOGTYPE_Error);
+		break;
+	}
 }
 
 void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
@@ -128,6 +179,8 @@ void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
 	ExtractTransform(boundingShape, mtxShapeTransform);
 
 	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
+
+	GetShapeCtrl().RefreshTransform(pCamera);
 }
 
 void EntityDrawItem::RefreshOverrideData()
@@ -184,9 +237,9 @@ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &tr
 	case ITEM_Text:
 	case ITEM_Spine:
 	case ITEM_Sprite: {
-		IHyDrawable2d *pDrawable = static_cast<IHyDrawable2d *>(GetAsChild());
+		IHyDrawable2d *pDrawable = static_cast<IHyDrawable2d *>(GetHyNode());
 		pDrawable->CalcLocalBoundingShape(boundingShapeOut);
-		transformMtxOut = GetAsChild()->GetSceneTransform(0.0f);
+		transformMtxOut = GetHyNode()->GetSceneTransform(0.0f);
 		break; }
 
 	case ITEM_Audio:

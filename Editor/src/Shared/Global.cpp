@@ -181,6 +181,23 @@
 	return list;
 }
 
+/*static*/ QList<EditorShape> HyGlobal::GetShapeList()
+{
+	QList<EditorShape> list;
+	list.append(SHAPE_None);
+	list.append(SHAPE_Box);
+	list.append(SHAPE_Circle);
+	list.append(SHAPE_Polygon);
+	list.append(SHAPE_LineSegment);
+	list.append(SHAPE_LineChain);
+	list.append(SHAPE_LineLoop);
+
+	if(list.size() != NUM_SHAPES)
+		HyGuiLog("HyGlobal::GetShapeList missing a type!", LOGTYPE_Error);
+
+	return list;
+}
+
 /*static*/ QStringList HyGlobal::GetTypeNameList()
 {
 	QList<HyGuiItemType> dirList = GetTypeList();
@@ -202,6 +219,17 @@
 	}
 
 	return ITEM_Unknown;
+}
+
+/*static*/ QStringList HyGlobal::GetShapeNameList()
+{
+	QList<EditorShape> shapeList = GetShapeList();
+
+	QStringList list;
+	for(int i = 0; i < shapeList.size(); ++i)
+		list.append(ShapeName(shapeList[i]));
+
+	return list;
 }
 
 /*static*/ EditorShape HyGlobal::GetShapeFromString(QString sShape)

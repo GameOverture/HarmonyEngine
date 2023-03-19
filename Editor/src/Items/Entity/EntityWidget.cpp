@@ -250,14 +250,14 @@ void EntityWidget::SetSelectedItems(QList<EntityTreeItemData *> selectedList, QL
 	ui->nodeTree->repaint();
 }
 
-void EntityWidget::DoNewShape(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType)
+void EntityWidget::DoNewShape(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive)
 {
 	pBtn->setChecked(true);
 
 	MainWindow::SetStatus(sStatusMsg, 0);
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pEntDraw)
-		pEntDraw->SetShapeEditDrag(eShapeType, true);
+		pEntDraw->SetShapeEditDrag(eShapeType, bAsPrimitive);
 }
 
 void EntityWidget::OnNewShapeFinished()
@@ -369,62 +369,62 @@ void EntityWidget::on_actionAddChildren_triggered()
 
 void EntityWidget::on_actionAddBoxPrimitive_triggered()
 {
-	DoNewShape(ui->btnAddPrimitiveBox, "Drawing new primitive box...", SHAPE_Box);
+	DoNewShape(ui->btnAddPrimitiveBox, "Drawing new primitive box...", SHAPE_Box, true);
 }
 
 void EntityWidget::on_actionAddCirclePrimitive_triggered()
 {
-	DoNewShape(ui->btnAddPrimitiveCircle, "Drawing new primitive circle...", SHAPE_Circle);
+	DoNewShape(ui->btnAddPrimitiveCircle, "Drawing new primitive circle...", SHAPE_Circle, true);
 }
 
 void EntityWidget::on_actionAddPolygonPrimitive_triggered()
 {
-	DoNewShape(ui->btnAddPrimitivePolygon, "Drawing new primitive polygon...", SHAPE_Polygon);
+	DoNewShape(ui->btnAddPrimitivePolygon, "Drawing new primitive polygon...", SHAPE_Polygon, true);
 }
 
 void EntityWidget::on_actionAddSegmentPrimitive_triggered()
 {
-	DoNewShape(ui->btnAddPrimitiveSegment, "Drawing new primitive line segment...", SHAPE_LineSegment);
+	DoNewShape(ui->btnAddPrimitiveSegment, "Drawing new primitive line segment...", SHAPE_LineSegment, true);
 }
 
 void EntityWidget::on_actionAddLineChainPrimitive_triggered()
 {
-	DoNewShape(ui->btnAddPrimitiveChain, "Drawing new primitive line chain...", SHAPE_LineChain);
+	DoNewShape(ui->btnAddPrimitiveChain, "Drawing new primitive line chain...", SHAPE_LineChain, true);
 }
 
 void EntityWidget::on_actionAddLineLoopPrimitive_triggered()
 {
-	DoNewShape(ui->btnAddPrimitiveLoop, "Drawing new primitive line loop...", SHAPE_LineLoop);
+	DoNewShape(ui->btnAddPrimitiveLoop, "Drawing new primitive line loop...", SHAPE_LineLoop, true);
 }
 
 void EntityWidget::on_actionAddBoxShape_triggered()
 {
-	DoNewShape(ui->btnAddShapeBox, "Drawing new box...", SHAPE_Box);
+	DoNewShape(ui->btnAddShapeBox, "Drawing new box...", SHAPE_Box, false);
 }
 
 void EntityWidget::on_actionAddCircleShape_triggered()
 {
-	DoNewShape(ui->btnAddShapeCircle, "Drawing new circle...", SHAPE_Circle);
+	DoNewShape(ui->btnAddShapeCircle, "Drawing new circle...", SHAPE_Circle, false);
 }
 
 void EntityWidget::on_actionAddPolygonShape_triggered()
 {
-	DoNewShape(ui->btnAddShapePolygon, "Drawing new polygon...", SHAPE_Polygon);
+	DoNewShape(ui->btnAddShapePolygon, "Drawing new polygon...", SHAPE_Polygon, false);
 }
 
 void EntityWidget::on_actionAddSegmentShape_triggered()
 {
-	DoNewShape(ui->btnAddShapeSegment, "Drawing new line segment...", SHAPE_LineSegment);
+	DoNewShape(ui->btnAddShapeSegment, "Drawing new line segment...", SHAPE_LineSegment, false);
 }
 
 void EntityWidget::on_actionAddLineChainShape_triggered()
 {
-	DoNewShape(ui->btnAddShapeChain, "Drawing new line chain...", SHAPE_LineChain);
+	DoNewShape(ui->btnAddShapeChain, "Drawing new line chain...", SHAPE_LineChain, false);
 }
 
 void EntityWidget::on_actionAddLineLoopShape_triggered()
 {
-	DoNewShape(ui->btnAddShapeLoop, "Drawing new line loop...", SHAPE_LineLoop);
+	DoNewShape(ui->btnAddShapeLoop, "Drawing new line loop...", SHAPE_LineLoop, false);
 }
 
 void EntityWidget::on_actionVertexManip_triggered()

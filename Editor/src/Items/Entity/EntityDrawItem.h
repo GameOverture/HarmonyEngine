@@ -31,13 +31,13 @@ public:
 	const QUuid &GetThisUuid() const;
 	const QUuid &GetItemUuid() const;
 
-	IHyLoadable2d *GetAsChild();
+	IHyLoadable2d *GetHyNode();
 	ShapeCtrl &GetShapeCtrl();
 	TransformCtrl &GetTransformCtrl();
 
 	bool IsMouseInBounds();
 
-	void RefreshJson(QJsonObject childObj);
+	void RefreshJson(QJsonObject childObj, HyCamera2d *pCamera);
 	void RefreshTransform(HyCamera2d *pCamera);
 	void RefreshOverrideData();
 

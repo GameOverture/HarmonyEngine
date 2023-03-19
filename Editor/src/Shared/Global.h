@@ -222,8 +222,10 @@ public:
 
 	static QList<HyGuiItemType> GetProjItemTypeList();
 	static QList<HyGuiItemType> GetTypeList();
+	static QList<EditorShape> GetShapeList();
 	static QStringList GetTypeNameList();
 	static HyGuiItemType GetTypeFromString(QString sType);
+	static QStringList GetShapeNameList();
 	static EditorShape GetShapeFromString(QString sShape);
 
 	static const QString ItemName(HyGuiItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }

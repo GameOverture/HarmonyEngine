@@ -268,12 +268,12 @@ void EntityDraw::ClearShapeEdit()
 {
 	for(auto pItem : m_ItemList)
 	{
-		if(pItem->GetGuiType() != ITEM_Shape)
+		//if(pItem->GetGuiType() != ITEM_Shape)
 		{
-			if(pItem->GetAsChild()->GetInternalFlags() & NODETYPE_IsBody)
+			if(pItem->GetHyNode()->GetInternalFlags() & NODETYPE_IsBody)
 			{
-				pItem->GetAsChild()->ParentDetach();
-				static_cast<IHyBody2d *>(pItem->GetAsChild())->ResetDisplayOrder();
+				pItem->GetHyNode()->ParentDetach();
+				static_cast<IHyBody2d *>(pItem->GetHyNode())->ResetDisplayOrder();
 			}
 		}
 	}
@@ -299,12 +299,12 @@ void EntityDraw::ClearShapeEdit()
 
 		m_ItemList.push_back(pItemWidget);
 
-		if(pItemWidget->GetGuiType() != ITEM_Shape)
-			ChildAppend(*pItemWidget->GetAsChild());
+		//if(pItemWidget->GetGuiType() != ITEM_Shape)
+			ChildAppend(*pItemWidget->GetHyNode());
 		//else
 		//	ShapeAppend(*pItemWidget->GetAsShape());
 		
-		pItemWidget->RefreshJson(childObj);
+		pItemWidget->RefreshJson(childObj, m_pCamera);
 	}
 	
 	// Delete all the remaining stale items
@@ -603,22 +603,22 @@ void EntityDraw::BeginTransform()
 	m_PrevTransformList.clear();
 	for(EntityDrawItem *pDrawItem : m_SelectedItemList)
 	{
-		if(pDrawItem->GetGuiType() != ITEM_Shape)
+		//if(pDrawItem->GetGuiType() != ITEM_Shape)
 		{
-			if(pDrawItem->GetAsChild()->GetInternalFlags() & NODETYPE_IsBody)
+			if(pDrawItem->GetHyNode()->GetInternalFlags() & NODETYPE_IsBody)
 			{
-				IHyBody2d *pDrawBody = static_cast<IHyBody2d *>(pDrawItem->GetAsChild());
+				IHyBody2d *pDrawBody = static_cast<IHyBody2d *>(pDrawItem->GetHyNode());
 				pDrawBody->SetDisplayOrder(pDrawBody->GetDisplayOrder()); // This enables the 'EXPLICIT_DisplayOrder' flag to be used during m_ActiveTransform's parental guidance
 			}
 
-			m_ActiveTransform.ChildAppend(*pDrawItem->GetAsChild());
-			m_PrevTransformList.push_back(pDrawItem->GetAsChild()->GetSceneTransform(0.0f));
+			m_ActiveTransform.ChildAppend(*pDrawItem->GetHyNode());
+			m_PrevTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
 		}
-		else
-		{
-			//m_ActiveTransform.ShapeAppend(*pDrawItem->GetShape());
-			//m_PrevTransformList.push_back(glm::mat4(1.0f));
-		}
+		//else
+		//{
+		//	//m_ActiveTransform.ShapeAppend(*pDrawItem->GetShape());
+		//	//m_PrevTransformList.push_back(glm::mat4(1.0f));
+		//}
 	}
 
 	// The mouse cursor must be set when transforming - it is used to determine the type of transform
@@ -807,8 +807,8 @@ void EntityDraw::DoMouseRelease_Transform()
 	QList<glm::mat4> newTransformList;
 	for(EntityDrawItem *pDrawItem : m_SelectedItemList)
 	{
-		if(pDrawItem->GetGuiType() != ITEM_Shape)
-			newTransformList.push_back(pDrawItem->GetAsChild()->GetSceneTransform(0.0f));
+		//if(pDrawItem->GetGuiType() != ITEM_Shape)
+			newTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
 		//else
 		//	newTransformList.push_back(m_ActiveTransform.GetSceneTransform(0.0f));
 

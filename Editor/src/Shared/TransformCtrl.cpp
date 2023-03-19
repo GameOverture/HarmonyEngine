@@ -569,13 +569,13 @@ void ShapeCtrl::Deserialize(QString sData, HyCamera2d *pCamera)
 {
 	QStringList sFloatList = sData.split(',', Qt::SkipEmptyParts);
 
-	QList<float> floatList;
+	m_DeserializedFloatList.clear();
 	for(QString sFloat : sFloatList)
 	{
 		bool bOk;
 		float fValue = sFloat.toFloat(&bOk);
 		if(bOk)
-			floatList.push_back(fValue);
+			m_DeserializedFloatList.push_back(fValue);
 	}
 
 	switch(m_eShape)
@@ -586,39 +586,92 @@ void ShapeCtrl::Deserialize(QString sData, HyCamera2d *pCamera)
 	case SHAPE_Polygon:
 	case SHAPE_Box: {
 		std::vector<glm::vec2> vertList;
-		for(int i = 0; i < floatList.size(); i += 2)
-			vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
+		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2)
+			vertList.push_back(glm::vec2(m_DeserializedFloatList[i], m_DeserializedFloatList[i + 1]));
 
 		m_BoundingVolume.SetAsPolygon(vertList);
 		break; }
 
 	case SHAPE_Circle: {
-		glm::vec2 ptCenter(floatList[0], floatList[1]);
-		float fRadius = floatList[2];
+		glm::vec2 ptCenter(m_DeserializedFloatList[0], m_DeserializedFloatList[1]);
+		float fRadius = m_DeserializedFloatList[2];
 		m_BoundingVolume.SetAsCircle(ptCenter, fRadius);
 		break; }
 
 	case SHAPE_LineSegment: {
-		glm::vec2 ptOne(floatList[0], floatList[1]);
-		glm::vec2 ptTwo(floatList[2], floatList[3]);
+		glm::vec2 ptOne(m_DeserializedFloatList[0], m_DeserializedFloatList[1]);
+		glm::vec2 ptTwo(m_DeserializedFloatList[2], m_DeserializedFloatList[3]);
 		m_BoundingVolume.SetAsLineSegment(ptOne, ptTwo);
 		break; }
 
 	case SHAPE_LineChain:
 	case SHAPE_LineLoop: {
 		std::vector<glm::vec2> vertList;
-		for(int i = 0; i < floatList.size(); i += 2)
-			vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
+		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2)
+			vertList.push_back(glm::vec2(m_DeserializedFloatList[i], m_DeserializedFloatList[i + 1]));
 
 		m_BoundingVolume.SetAsLineChain(vertList);
 		break; }
 	}
 
-	UpdateWindowOutline(pCamera);
+	RefreshTransform(pCamera);
 }
 
-void ShapeCtrl::UpdateWindowOutline(HyCamera2d * pCamera)
+void ShapeCtrl::RefreshTransform(HyCamera2d *pCamera)
 {
+	if(m_DeserializedFloatList.empty())
+		return;
+
+	SetVisible(true);
+
+	switch(m_eShape)
+	{
+	case SHAPE_None:
+		break;
+
+	case SHAPE_Polygon:
+	case SHAPE_Box: {
+		std::vector<glm::vec2> vertList;
+		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2)
+		{
+			glm::vec2 ptCameraPos(m_DeserializedFloatList[i], m_DeserializedFloatList[i + 1]);
+			pCamera->ProjectToCamera(ptCameraPos, ptCameraPos);
+			vertList.push_back(ptCameraPos);
+		}
+
+		m_Outline.SetAsPolygon(vertList);
+		break; }
+
+	case SHAPE_Circle: {
+		glm::vec2 ptCenter(m_DeserializedFloatList[0], m_DeserializedFloatList[1]);
+		pCamera->ProjectToCamera(ptCenter, ptCenter);
+		float fRadius = m_DeserializedFloatList[2] * pCamera->GetZoom();
+
+		m_Outline.SetAsCircle(ptCenter, fRadius);
+		break; }
+
+	case SHAPE_LineSegment: {
+		glm::vec2 ptOne(m_DeserializedFloatList[0], m_DeserializedFloatList[1]);
+		pCamera->ProjectToCamera(ptOne, ptOne);
+		glm::vec2 ptTwo(m_DeserializedFloatList[2], m_DeserializedFloatList[3]);
+		pCamera->ProjectToCamera(ptTwo, ptTwo);
+
+		m_Outline.SetAsLineSegment(ptOne, ptTwo);
+		break; }
+
+	case SHAPE_LineChain:
+	case SHAPE_LineLoop: {
+		std::vector<glm::vec2> vertList;
+		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2)
+		{
+			glm::vec2 ptCameraPos(m_DeserializedFloatList[i], m_DeserializedFloatList[i + 1]);
+			pCamera->ProjectToCamera(ptCameraPos, ptCameraPos);
+			vertList.push_back(ptCameraPos);
+		}
+
+		m_Outline.SetAsLineChain(vertList);
+		break; }
+	}
 }
 
 void ShapeCtrl::ConvertTo(EditorShape eShape)
