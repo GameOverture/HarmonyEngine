@@ -49,12 +49,11 @@ class EntityDraw : public IDraw
 	enum ShapeEditState
 	{
 		SHAPESTATE_None = 0,
-		SHAPESTATE_InitialPlacement_Primitive,
-		SHAPESTATE_InitialPlacement_Shape,
-		SHAPESTATE_VertexManip
+		SHAPESTATE_DragPlacement,
+		SHAPESTATE_VertexManip				// When editing polygons, line chains, and line loops
 	};
 	ShapeEditState							m_eShapeEditState;
-	EntityDrawItem *						m_pShapeEditInitial;	// Used when initially placing a new shape
+	EntityDrawItem *						m_pShapeEditDragPlacement;	// Used when initially placing a new shape
 
 	// Used to help transform (translate, rotate, scale) selected items
 	HyEntity2d								m_ActiveTransform;
@@ -80,10 +79,9 @@ public:
 
 	void RefreshTransforms();
 
-	void NewShape(EditorShape eShape, bool bAsPrimitive);
-	void NewShapeFinished();
-	//void UpdateDrawShape(bool bCtrlModifer);
-	//void ClearDrawShape();
+	void SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive);
+	void SetShapeEditManip();
+	void ClearShapeEdit();
 
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
@@ -95,7 +93,7 @@ protected:
 	EntityDrawItem *FindStaleChild(HyGuiItemType eType, QUuid uuid);
 	Qt::CursorShape GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const;
 
-	void DoMouseMove_Select();
+	void DoMouseMove_Select(bool bCtrlMod, bool bShiftMod);
 	void DoMousePress_Select(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod);
 
@@ -104,7 +102,7 @@ protected:
 	void DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_Transform();
 
-	void DoMouseMove_ShapeEdit();
+	void DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod);
 	void DoMousePress_ShapeEdit();
 	void DoMouseRelease_ShapeEdit();
 

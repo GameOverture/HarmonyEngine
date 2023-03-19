@@ -135,6 +135,12 @@ void HyPrimitive2d::SetAsCircle(const b2Vec2 &center, float fRadius)
 	AssembleData();
 }
 
+void HyPrimitive2d::SetAsPolygon(const std::vector<glm::vec2> &verticesList)
+{
+	m_Shape.SetAsPolygon(verticesList);
+	AssembleData();
+}
+
 void HyPrimitive2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
 {
 	m_Shape.SetAsPolygon(pPointArray, uiCount);

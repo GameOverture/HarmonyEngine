@@ -42,13 +42,6 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->btnAddPrimitiveSegment->setDefaultAction(ui->actionAddSegmentPrimitive);
 	ui->btnAddPrimitiveChain->setDefaultAction(ui->actionAddLineChainPrimitive);
 	ui->btnAddPrimitiveLoop->setDefaultAction(ui->actionAddLineLoopPrimitive);
-	//m_AddPrimitiveToolBar.addWidget(ui->btnAddPrimitiveBox);
-	//m_AddPrimitiveToolBar.addWidget(ui->btnAddPrimitiveCircle);
-	//m_AddPrimitiveToolBar.addWidget(ui->btnAddPrimitivePolygon);
-	//m_AddPrimitiveToolBar.addWidget(ui->btnAddPrimitiveSegment);
-	//m_AddPrimitiveToolBar.addWidget(ui->btnAddPrimitiveChain);
-	//m_AddPrimitiveToolBar.addWidget(ui->btnAddPrimitiveLoop);
-	//ui->lytAddPrimitiveShape->insertWidget(0, &m_AddPrimitiveToolBar);
 
 	m_AddShapeActionGroup.addAction(ui->actionAddBoxShape);
 	m_AddShapeActionGroup.addAction(ui->actionAddCircleShape);
@@ -62,13 +55,9 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->btnAddShapeSegment->setDefaultAction(ui->actionAddSegmentShape);
 	ui->btnAddShapeChain->setDefaultAction(ui->actionAddLineChainShape);
 	ui->btnAddShapeLoop->setDefaultAction(ui->actionAddLineLoopShape);
-	//m_AddShapeToolBar.addWidget(ui->btnAddShapeBox);
-	//m_AddShapeToolBar.addWidget(ui->btnAddShapeCircle);
-	//m_AddShapeToolBar.addWidget(ui->btnAddShapePolygon);
-	//m_AddShapeToolBar.addWidget(ui->btnAddShapeSegment);
-	//m_AddShapeToolBar.addWidget(ui->btnAddShapeChain);
-	//m_AddShapeToolBar.addWidget(ui->btnAddShapeLoop);
-	//ui->lytAddBoundingShape->insertWidget(0, &m_AddShapeToolBar);
+
+	m_AddShapeActionGroup.addAction(ui->actionVertexManip);
+	ui->btnVertexManip->setDefaultAction(ui->actionVertexManip);
 
 	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
 
@@ -256,6 +245,8 @@ void EntityWidget::SetSelectedItems(QList<EntityTreeItemData *> selectedList, QL
 	pSelectionModel->blockSignals(false);
 	delete pItemSelection;
 
+	ui->actionVertexManip->setEnabled(selectedList.size() == 1 && (selectedList[0]->GetType() == ITEM_Primitive || selectedList[0]->GetType() == ITEM_Shape));
+
 	ui->nodeTree->repaint();
 }
 
@@ -266,7 +257,7 @@ void EntityWidget::DoNewShape(QToolButton *pBtn, QString sStatusMsg, EditorShape
 	MainWindow::SetStatus(sStatusMsg, 0);
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pEntDraw)
-		pEntDraw->NewShape(eShapeType, true);
+		pEntDraw->SetShapeEditDrag(eShapeType, true);
 }
 
 void EntityWidget::OnNewShapeFinished()
@@ -275,6 +266,11 @@ void EntityWidget::OnNewShapeFinished()
 		pAction->setChecked(false);
 
 	MainWindow::ClearStatus();
+}
+
+void EntityWidget::SetVertexModeCheck(bool bChecked)
+{
+	ui->btnVertexManip->setChecked(bChecked);
 }
 
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/
@@ -429,6 +425,12 @@ void EntityWidget::on_actionAddLineChainShape_triggered()
 void EntityWidget::on_actionAddLineLoopShape_triggered()
 {
 	DoNewShape(ui->btnAddShapeLoop, "Drawing new line loop...", SHAPE_LineLoop);
+}
+
+void EntityWidget::on_actionVertexManip_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_ToggleVertexManip(m_ItemRef, true);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionOrderChildrenUp_triggered()

@@ -27,10 +27,6 @@ class EntityWidget : public IWidget
 
 	QActionGroup		m_AddShapeActionGroup;
 
-	// I think it looks better without QToolBars, but kept here if advantageous to switch back
-	//QToolBar		m_AddPrimitiveToolBar;
-	//QToolBar		m_AddShapeToolBar;
-
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~EntityWidget();
@@ -45,6 +41,8 @@ public:
 
 	void DoNewShape(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType);
 	void OnNewShapeFinished();
+
+	void SetVertexModeCheck(bool bChecked);
 
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;
@@ -67,6 +65,8 @@ private Q_SLOTS:
 	void on_actionAddSegmentShape_triggered();
 	void on_actionAddLineChainShape_triggered();
 	void on_actionAddLineLoopShape_triggered();
+
+	void on_actionVertexManip_triggered();
 
 	void on_actionOrderChildrenUp_triggered();
 	void on_actionOrderChildrenDown_triggered();

@@ -82,6 +82,8 @@ public:
 
 class ShapeCtrl : public HyEntity2d
 {
+	EditorShape					m_eShape;
+
 	HyPrimitive2d				m_BoundingVolume;	// Uses world/camera coordinates
 	HyPrimitive2d				m_Outline;			// Uses window coordinates (unaffected by zoom)
 
@@ -91,12 +93,20 @@ public:
 	ShapeCtrl(HyEntity2d *pParent);
 	virtual ~ShapeCtrl();
 
+	EditorShape GetShapeType() const;
+	void SetShapeType(EditorShape eShape);
+
 	HyPrimitive2d &GetPrimitive(bool bWorldSpace);
 
-	b2AABB GetSelectionBox();
-
-	void SetAsDrag(EditorShape eShape, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	void SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
 	void Clear();
+
+	QString Serialize();
+	void Deserialize(QString sData, HyCamera2d *pCamera);
+
+protected:
+	void UpdateWindowOutline(HyCamera2d *pCamera);
+	void ConvertTo(EditorShape eShape);
 };
 
 #endif // TRANSFORMCTRL_H

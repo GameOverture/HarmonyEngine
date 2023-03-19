@@ -46,14 +46,14 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		QJsonObject childObj = childArray[i].toObject();
 		
 		HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
-		if(eGuiType == ITEM_Primitive)
+		if(eGuiType == ITEM_Primitive || eGuiType == ITEM_Shape)
 			Cmd_AddNewChild(nullptr, childObj, i);
 		else
 		{
 			QUuid uuid(childObj["itemUUID"].toString());
 			ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(uuid);
 			if(pProjItem)
-				Cmd_AddNewChild(nullptr, childObj, i);
+				Cmd_AddNewChild(pProjItem, childObj, i);
 			else
 				HyGuiLog("Null project item for UUID: " % uuid.toString() % " type: " % HyGlobal::ItemName(eGuiType, false), LOGTYPE_Error);
 		}
@@ -91,29 +91,35 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemDat
 	return treeNodeList;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddNewChild(ProjectItemData *pProjItemData, QJsonObject initObj, int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddNewChild(ProjectItemData *pProjItemDataToRegister, QJsonObject initObj, int iRow)
 {
 	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewChild(initObj, iRow);
-	if(pProjItemData)
-		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItemData);
+	if(pProjItemDataToRegister)
+		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItemDataToRegister);
 
 	return pTreeItemData;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddNewPrimitive(int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, int iRow)
 {
-	//EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewPrimitive(initObj, iRow);
-	//if(pProjItemData)
-	//	m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItemData);
-
-	//return pTreeItemData;
-	return nullptr;
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewShape(eShape, sData, bIsPrimitive, "m_", iRow);
+	return pTreeItemData;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddNewShape()
-{
-	return nullptr;
-}
+//EntityTreeItemData *EntityModel::Cmd_AddNewPrimitive(int iRow)
+//{
+//	//EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewPrimitive(initObj, iRow);
+//	//if(pProjItemData)
+//	//	m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItemData);
+//
+//	//return pTreeItemData;
+//	return nullptr;
+//}
+//
+//EntityTreeItemData *EntityModel::Cmd_AddNewShape()
+//{
+//	return nullptr;
+//}
 
 void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList)
 {

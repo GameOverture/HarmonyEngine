@@ -46,33 +46,19 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_AddPrimitive : public QUndoCommand
+class EntityUndoCmd_AddNewShape : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	uint32							m_uiIndex;
+	EditorShape						m_eShape;
+	QString							m_sData;
+	bool							m_bIsPrimitive;
+	int32							m_iIndex;
 	
-	EntityTreeItemData *			m_pPrimitiveTreeItemData;
+	EntityTreeItemData *			m_pShapeTreeItemData;
 
 public:
-	EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, uint32 uiRowIndex, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AddPrimitive();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class EntityUndoCmd_AddShape : public QUndoCommand
-{
-	ProjectItemData &		m_EntityItemRef;
-	uint32					m_uiIndex;
-
-	EntityTreeItemData *	m_pShapeTreeItemData;
-
-public:
-	EntityUndoCmd_AddShape(ProjectItemData &entityItemRef, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AddShape();
+	EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, QString sData, bool bIsPrimitive, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddNewShape();
 
 	virtual void redo() override;
 	virtual void undo() override;
@@ -124,6 +110,21 @@ class EntityUndoCmd_Transform : public QUndoCommand
 public:
 	EntityUndoCmd_Transform(ProjectItemData &entityItemRef, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_Transform();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_ToggleVertexManip : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	bool							m_bEnable;
+
+public:
+	EntityUndoCmd_ToggleVertexManip(ProjectItemData &entityItemRef, bool bEnable, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_ToggleVertexManip();
 
 	virtual void redo() override;
 	virtual void undo() override;

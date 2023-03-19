@@ -358,6 +358,7 @@ bool TransformCtrl::IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const
 
 ShapeCtrl::ShapeCtrl(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
+	m_eShape(SHAPE_None),
 	m_BoundingVolume(this),
 	m_Outline(this)
 {
@@ -375,56 +376,125 @@ ShapeCtrl::ShapeCtrl(HyEntity2d *pParent) :
 {
 }
 
+EditorShape ShapeCtrl::GetShapeType() const
+{
+	return m_eShape;
+}
+
+void ShapeCtrl::SetShapeType(EditorShape eShape)
+{
+	if(m_eShape != SHAPE_None)
+		ConvertTo(eShape);
+
+	m_eShape = eShape;
+}
+
 HyPrimitive2d &ShapeCtrl::GetPrimitive(bool bWorldSpace)
 {
 	return bWorldSpace ? m_BoundingVolume : m_Outline;
 }
 
-b2AABB ShapeCtrl::GetSelectionBox()
+void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
 {
-	b2AABB aabb;
-	if(IsVisible() == false)
+	SetVisible(true);
+
+	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
+	if(bShiftMod)
 	{
-		aabb.lowerBound.x = aabb.lowerBound.y = aabb.upperBound.x = aabb.upperBound.y = 0.0f;
-		return aabb;
+		ptCenter = ptStartPos;
+
+		glm::vec2 vRadius = ptStartPos - ptDragPos;
+		vRadius.x = abs(vRadius.x);
+		vRadius.y = abs(vRadius.y);
+		ptUpperBound = (ptCenter + vRadius);
+		ptLowerBound = (ptCenter + (vRadius * -1.0f));
+	}
+	else
+	{
+		HySetVec(ptLowerBound, ptStartPos.x < ptDragPos.x ? ptStartPos.x : ptDragPos.x, ptStartPos.y < ptDragPos.y ? ptStartPos.y : ptDragPos.y);
+		HySetVec(ptUpperBound, ptStartPos.x >= ptDragPos.x ? ptStartPos.x : ptDragPos.x, ptStartPos.y >= ptDragPos.y ? ptStartPos.y : ptDragPos.y);
+		ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
 	}
 
-	HyShape2d shape;
-	m_BoundingVolume.CalcLocalBoundingShape(shape);
+	glm::vec2 ptWindowLowerBound, ptWindowUpperBound, ptWindowCenter;
+	pCamera->ProjectToCamera(ptLowerBound, ptWindowLowerBound);
+	pCamera->ProjectToCamera(ptUpperBound, ptWindowUpperBound);
+	ptWindowCenter = ptWindowLowerBound + ((ptWindowUpperBound - ptWindowLowerBound) * 0.5f);
 
-	shape.ComputeAABB(aabb, glm::mat4(1.0f));
-	return aabb;
-}
-
-void ShapeCtrl::SetAsDrag(EditorShape eShape, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
-{
-	switch(eShape)
+	switch(m_eShape)
 	{
 	case SHAPE_None:
 		Clear();
 		break;
 
-	case SHAPE_Box: {
-		SetVisible(true);
-
-		glm::vec2 ptLowerBound(ptStartPos.x < ptDragPos.x ? ptStartPos.x : ptDragPos.x,
-			ptStartPos.y < ptDragPos.y ? ptStartPos.y : ptDragPos.y);
-		glm::vec2 ptUpperBound(ptStartPos.x >= ptDragPos.x ? ptStartPos.x : ptDragPos.x,
-			ptStartPos.y >= ptDragPos.y ? ptStartPos.y : ptDragPos.y);
-
-		// Bounding Volume
-		glm::vec2 ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
+	case SHAPE_Box:
 		m_BoundingVolume.SetAsBox((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f);
+		m_Outline.SetAsBox((ptWindowUpperBound.x - ptWindowLowerBound.x) * 0.5f, (ptWindowUpperBound.y - ptWindowLowerBound.y) * 0.5f, ptWindowCenter, 0.0f);
+		break;
 
-		// Outline
-		pCamera->ProjectToCamera(ptLowerBound, ptLowerBound);
-		pCamera->ProjectToCamera(ptUpperBound, ptUpperBound);
-		ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
-		m_Outline.SetAsBox((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f);
+	case SHAPE_Circle:
+		m_BoundingVolume.SetAsCircle(ptCenter, glm::distance(ptCenter, ptUpperBound));
+		m_Outline.SetAsCircle(ptWindowCenter, glm::distance(ptWindowCenter, ptWindowUpperBound));
+		break;
+
+	case SHAPE_Polygon: {
+		glm::vec2 ptVertList[6];
+		float fRadius = glm::distance(ptCenter, ptUpperBound);
+		ptVertList[0] = ptCenter + glm::vec2(fRadius, 0.0f);
+		ptVertList[1] = ptCenter + glm::vec2(fRadius * 0.5f, fRadius * sqrt(3.0f) * 0.5f);
+		ptVertList[2] = ptCenter + glm::vec2(-fRadius * 0.5f, fRadius * sqrt(3.0f) * 0.5f);
+		ptVertList[3] = ptCenter + glm::vec2(-fRadius, 0.0f);
+		ptVertList[4] = ptCenter + glm::vec2(-fRadius * 0.5f, -fRadius * sqrt(3.0f) * 0.5f);
+		ptVertList[5] = ptCenter + glm::vec2(fRadius * 0.5f, -fRadius * sqrt(3.0f) * 0.5f);
+		m_BoundingVolume.SetAsPolygon(ptVertList, 6);
+
+		fRadius = glm::distance(ptWindowCenter, ptWindowUpperBound);
+		ptVertList[0] = ptWindowCenter + glm::vec2(fRadius, 0.0f);
+		ptVertList[1] = ptWindowCenter + glm::vec2(fRadius * 0.5f, fRadius * sqrt(3.0f) * 0.5f);
+		ptVertList[2] = ptWindowCenter + glm::vec2(-fRadius * 0.5f, fRadius * sqrt(3.0f) * 0.5f);
+		ptVertList[3] = ptWindowCenter + glm::vec2(-fRadius, 0.0f);
+		ptVertList[4] = ptWindowCenter + glm::vec2(-fRadius * 0.5f, -fRadius * sqrt(3.0f) * 0.5f);
+		ptVertList[5] = ptWindowCenter + glm::vec2(fRadius * 0.5f, -fRadius * sqrt(3.0f) * 0.5f);
+		m_Outline.SetAsPolygon(ptVertList, 6);
+		break; }
+
+	case SHAPE_LineSegment:
+		m_BoundingVolume.SetAsLineSegment(ptStartPos, ptDragPos);
+		pCamera->ProjectToCamera(ptStartPos, ptStartPos);
+		pCamera->ProjectToCamera(ptDragPos, ptDragPos);
+		m_Outline.SetAsLineSegment(ptStartPos, ptDragPos);
+		break;
+
+	case SHAPE_LineChain: {
+		std::vector<glm::vec2> vertList;
+		vertList.push_back(ptStartPos);
+		vertList.push_back(ptDragPos);
+		m_BoundingVolume.SetAsLineChain(vertList);
+
+		pCamera->ProjectToCamera(ptStartPos, ptStartPos);
+		pCamera->ProjectToCamera(ptDragPos, ptDragPos);
+		vertList.clear();
+		vertList.push_back(ptStartPos);
+		vertList.push_back(ptDragPos);
+		m_Outline.SetAsLineChain(vertList);
+		break; }
+
+	case SHAPE_LineLoop: {
+		std::vector<glm::vec2> vertList;
+		vertList.push_back(ptStartPos);
+		vertList.push_back(ptDragPos);
+		m_BoundingVolume.SetAsLineLoop(vertList);
+
+		pCamera->ProjectToCamera(ptStartPos, ptStartPos);
+		pCamera->ProjectToCamera(ptDragPos, ptDragPos);
+		vertList.clear();
+		vertList.push_back(ptStartPos);
+		vertList.push_back(ptDragPos);
+		m_Outline.SetAsLineLoop(vertList);
 		break; }
 
 	default:
-		HyGuiLog("ShapeCtrl::SetAsDrag - Unhandled shape type: " % QString::number(eShape), LOGTYPE_Error);
+		HyGuiLog("ShapeCtrl::SetAsDrag - Unhandled shape type: " % QString::number(m_eShape), LOGTYPE_Error);
 		break;
 	}
 }
@@ -435,4 +505,123 @@ void ShapeCtrl::Clear()
 
 	m_BoundingVolume.SetAsNothing();
 	m_Outline.SetAsNothing();
+}
+
+QString ShapeCtrl::Serialize()
+{
+	HyShape2d shape;
+	m_BoundingVolume.CalcLocalBoundingShape(shape);
+
+	QList<float> floatList;
+	switch(m_eShape)
+	{
+	case SHAPE_None:
+		break;
+
+	case SHAPE_Polygon:
+	case SHAPE_Box: {
+		const b2PolygonShape *pPolyShape = static_cast<const b2PolygonShape *>(shape.GetB2Shape());
+		for(int i = 0; i < pPolyShape->m_count; ++i)
+		{
+			floatList.push_back(pPolyShape->m_vertices[i].x);
+			floatList.push_back(pPolyShape->m_vertices[i].y);
+		}
+		break; }
+
+	case SHAPE_Circle: {
+		const b2CircleShape *pCircleShape = static_cast<const b2CircleShape *>(shape.GetB2Shape());
+		floatList.push_back(pCircleShape->m_p.x);
+		floatList.push_back(pCircleShape->m_p.y);
+		floatList.push_back(pCircleShape->m_radius);
+		break; }
+
+	case SHAPE_LineSegment: {
+		const b2EdgeShape *pLineSegment = static_cast<const b2EdgeShape *>(shape.GetB2Shape());
+		floatList.push_back(pLineSegment->m_vertex1.x);
+		floatList.push_back(pLineSegment->m_vertex1.y);
+		floatList.push_back(pLineSegment->m_vertex2.x);
+		floatList.push_back(pLineSegment->m_vertex2.y);
+		break; }
+
+	case SHAPE_LineChain:
+	case SHAPE_LineLoop: {
+		const b2ChainShape *pChainShape = static_cast<const b2ChainShape *>(shape.GetB2Shape());
+		for(int i = 0; i < pChainShape->m_count; ++i)
+		{
+			floatList.push_back(pChainShape->m_vertices[i].x);
+			floatList.push_back(pChainShape->m_vertices[i].y);
+		}
+		break; }
+	}
+
+	QString sSerializedData;
+	for(float f : floatList)
+	{
+		sSerializedData.append(QString::number(f));
+		sSerializedData.append(',');
+	}
+	sSerializedData.chop(1);
+
+	return sSerializedData;
+}
+
+void ShapeCtrl::Deserialize(QString sData, HyCamera2d *pCamera)
+{
+	QStringList sFloatList = sData.split(',', Qt::SkipEmptyParts);
+
+	QList<float> floatList;
+	for(QString sFloat : sFloatList)
+	{
+		bool bOk;
+		float fValue = sFloat.toFloat(&bOk);
+		if(bOk)
+			floatList.push_back(fValue);
+	}
+
+	switch(m_eShape)
+	{
+	case SHAPE_None:
+		break;
+
+	case SHAPE_Polygon:
+	case SHAPE_Box: {
+		std::vector<glm::vec2> vertList;
+		for(int i = 0; i < floatList.size(); i += 2)
+			vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
+
+		m_BoundingVolume.SetAsPolygon(vertList);
+		break; }
+
+	case SHAPE_Circle: {
+		glm::vec2 ptCenter(floatList[0], floatList[1]);
+		float fRadius = floatList[2];
+		m_BoundingVolume.SetAsCircle(ptCenter, fRadius);
+		break; }
+
+	case SHAPE_LineSegment: {
+		glm::vec2 ptOne(floatList[0], floatList[1]);
+		glm::vec2 ptTwo(floatList[2], floatList[3]);
+		m_BoundingVolume.SetAsLineSegment(ptOne, ptTwo);
+		break; }
+
+	case SHAPE_LineChain:
+	case SHAPE_LineLoop: {
+		std::vector<glm::vec2> vertList;
+		for(int i = 0; i < floatList.size(); i += 2)
+			vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
+
+		m_BoundingVolume.SetAsLineChain(vertList);
+		break; }
+	}
+
+	UpdateWindowOutline(pCamera);
+}
+
+void ShapeCtrl::UpdateWindowOutline(HyCamera2d * pCamera)
+{
+}
+
+void ShapeCtrl::ConvertTo(EditorShape eShape)
+{
+	HyGuiLog("ShapeCtrl::ConvertTo - Not implemented", LOGTYPE_Error);
 }

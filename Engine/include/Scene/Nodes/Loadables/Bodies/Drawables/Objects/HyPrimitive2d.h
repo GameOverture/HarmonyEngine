@@ -69,6 +69,7 @@ public:
 	// The points may be re-ordered, even if they form a convex polygon
 	// Collinear points are handled but not removed. Collinear points
 	// may lead to poor stacking behavior in physics simulation.
+	void SetAsPolygon(const std::vector<glm::vec2> &verticesList);
 	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
 	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
 

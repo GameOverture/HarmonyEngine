@@ -12,6 +12,7 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 #include "EntityDraw.h"
+#include "MainWindow.h"
 
 EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
@@ -88,48 +89,27 @@ EntityUndoCmd_PopItems::EntityUndoCmd_PopItems(ProjectItemData &entityItemRef, Q
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, uint32 uiRowIndex, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, QString sData, bool bIsPrimitive, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_uiIndex(uiRowIndex),
-	m_pPrimitiveTreeItemData(nullptr)
-{
-	setText("Add Primitive Child");
-}
-
-/*virtual*/ EntityUndoCmd_AddPrimitive::~EntityUndoCmd_AddPrimitive()
-{
-}
-
-/*virtual*/ void EntityUndoCmd_AddPrimitive::redo() /*override*/
-{
-	m_pPrimitiveTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewPrimitive(m_uiIndex);
-}
-
-/*virtual*/ void EntityUndoCmd_AddPrimitive::undo() /*override*/
-{
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pPrimitiveTreeItemData);
-	m_pPrimitiveTreeItemData = nullptr;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-EntityUndoCmd_AddShape::EntityUndoCmd_AddShape(ProjectItemData &entityItemRef, QUndoCommand *pParent /*= nullptr*/) :
-	m_EntityItemRef(entityItemRef),
+	m_eShape(eShape),
+	m_sData(sData),
+	m_bIsPrimitive(bIsPrimitive),
+	m_iIndex(iRowIndex),
 	m_pShapeTreeItemData(nullptr)
 {
-	setText("Add New Shape");
+	setText("Add New " % HyGlobal::ShapeName(m_eShape) % (m_bIsPrimitive ? "Primitive" : "") % " Shape");
 }
 
-/*virtual*/ EntityUndoCmd_AddShape::~EntityUndoCmd_AddShape()
+/*virtual*/ EntityUndoCmd_AddNewShape::~EntityUndoCmd_AddNewShape()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_AddShape::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddNewShape::redo() /*override*/
 {
-	m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape();
+	m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(m_eShape, m_sData, m_bIsPrimitive, m_iIndex);
 }
 
-/*virtual*/ void EntityUndoCmd_AddShape::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddNewShape::undo() /*override*/
 {
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pShapeTreeItemData);
 	m_pShapeTreeItemData = nullptr;
@@ -251,5 +231,54 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_ToggleVertexManip::EntityUndoCmd_ToggleVertexManip(ProjectItemData &entityItemRef, bool bEnable, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_bEnable(bEnable)
+{
+	setText(QString("Toggle Vertex Edit Mode ") % (m_bEnable ? "On" : "Off"));
+}
+
+/*virtual*/ EntityUndoCmd_ToggleVertexManip::~EntityUndoCmd_ToggleVertexManip()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_ToggleVertexManip::redo() /*override*/
+{
+	EntityWidget *pEntityWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
+	if(m_bEnable)
+	{
+		MainWindow::SetStatus("Vertex Edit Mode", 0);
+		pEntityWidget->SetVertexModeCheck(true);
+		pEntityDraw->SetShapeEditManip();
+	}
+	else
+	{
+		MainWindow::ClearStatus();
+		pEntityWidget->SetVertexModeCheck(false);
+		pEntityDraw->ClearShapeEdit();
+	}
+}
+
+/*virtual*/ void EntityUndoCmd_ToggleVertexManip::undo() /*override*/
+{
+	EntityWidget *pEntityWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
+	if(m_bEnable)
+	{
+		MainWindow::ClearStatus();
+		pEntityWidget->SetVertexModeCheck(false);
+		pEntityDraw->ClearShapeEdit();
+	}
+	else
+	{
+		MainWindow::SetStatus("Vertex Edit Mode", 0);
+		pEntityWidget->SetVertexModeCheck(true);
+		pEntityDraw->SetShapeEditManip();
 	}
 }
