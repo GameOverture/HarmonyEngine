@@ -66,6 +66,9 @@ public:
 	
 	TreeModelItem *GetEntityTreeItem() const;
 	EntityTreeItemData *GetEntityTreeItemData() const;
+
+	TreeModelItem *GetShapesFolderTreeItem() const;
+
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const;
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
 

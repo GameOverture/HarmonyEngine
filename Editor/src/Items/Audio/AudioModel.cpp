@@ -42,7 +42,7 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 	const int iRANGE = 16777215;	// Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
 
 	m_PropertiesModel.AppendCategory("Play List");
-	m_PropertiesModel.AppendProperty("Play List", "Mode", PROPERTIESTYPE_ComboBox, stateFileData.m_Data["playListMode"].toInt(0), "The method by which the next audio asset is chosen when this item is played", false, QVariant(), QVariant(), QVariant(), QString(), QString(), sPlayListModeList);
+	m_PropertiesModel.AppendProperty("Play List", "Mode", PROPERTIESTYPE_ComboBoxInt, stateFileData.m_Data["playListMode"].toInt(0), "The method by which the next audio asset is chosen when this item is played", false, QVariant(), QVariant(), QVariant(), QString(), QString(), sPlayListModeList);
 
 	m_PropertiesModel.AppendCategory("Mixing");
 	m_PropertiesModel.AppendProperty("Mixing", "Volume", PROPERTIESTYPE_double, stateFileData.m_Data["volume"].toDouble(1.0), "Volume modifier [0.0 to 1.0] applied to source volume", false, 0.0, 1.0, 0.1, QString(), QString(), 4);

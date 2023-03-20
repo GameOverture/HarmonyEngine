@@ -175,7 +175,16 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<QLineEdit *>(pReturnWidget)->setText(propDefRef.defaultData.toString());
 		break;
 
-	case PROPERTIESTYPE_ComboBox:
+	case PROPERTIESTYPE_ComboBoxString:
+		pReturnWidget = new QComboBox(pParent);
+
+		if(propDefRef.delegateBuilder.isValid())
+			static_cast<QComboBox *>(pReturnWidget)->addItems(propDefRef.delegateBuilder.toStringList());
+		if(propDefRef.defaultData.isValid())
+			static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(propDefRef.delegateBuilder.toStringList().indexOf(propDefRef.defaultData.toString()));
+		break;
+
+	case PROPERTIESTYPE_ComboBoxInt:
 		pReturnWidget = new QComboBox(pParent);
 
 		if(propDefRef.delegateBuilder.isValid())
@@ -277,7 +286,10 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_LineEdit:
 		static_cast<QLineEdit *>(pEditor)->setText(propValue.toString());
 		break;
-	case PROPERTIESTYPE_ComboBox:
+	case PROPERTIESTYPE_ComboBoxString:
+		static_cast<QComboBox *>(pEditor)->setCurrentIndex(propDefRef.delegateBuilder.toStringList().indexOf(propValue.toString()));
+		break;
+	case PROPERTIESTYPE_ComboBoxInt:
 	case PROPERTIESTYPE_StatesComboBox:
 		static_cast<QComboBox *>(pEditor)->setCurrentIndex(propValue.toInt());
 		break;
@@ -319,7 +331,10 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_LineEdit:
 		newValue = QVariant(static_cast<QLineEdit *>(pEditor)->text());
 		break;
-	case PROPERTIESTYPE_ComboBox:
+	case PROPERTIESTYPE_ComboBoxString:
+		newValue = QVariant(propDefRef.delegateBuilder.toStringList()[static_cast<QComboBox *>(pEditor)->currentIndex()]);
+		break;
+	case PROPERTIESTYPE_ComboBoxInt:
 	case PROPERTIESTYPE_StatesComboBox:
 		newValue = QVariant(static_cast<QComboBox *>(pEditor)->currentIndex());
 		break;

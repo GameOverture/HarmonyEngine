@@ -274,8 +274,11 @@ QJsonObject PropertiesTreeModel::SerializeJson()
 			case PROPERTIESTYPE_bool:
 				categoryObj.insert(sPropName, propValue.toBool());
 				break;
+			case PROPERTIESTYPE_ComboBoxString:
+				categoryObj.insert(sPropName, propValue.toString());
+				break;
 			case PROPERTIESTYPE_int:
-			case PROPERTIESTYPE_ComboBox:
+			case PROPERTIESTYPE_ComboBoxInt:
 			case PROPERTIESTYPE_Slider:
 			case PROPERTIESTYPE_StatesComboBox:
 			case PROPERTIESTYPE_SpriteFrames:
@@ -339,8 +342,15 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toBool() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 				break;
 
+			case PROPERTIESTYPE_ComboBoxString:
+				if(propDef.delegateBuilder.toStringList().contains(categoryObj[sProperty].toString()) == false)
+					HyGuiLog("PropertiesTreeModel::DeserializeJson could not resolve ComboBoxString: " % categoryObj[sProperty].toString(), LOGTYPE_Error);
+
+				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toString());
+				break;
+
 			case PROPERTIESTYPE_int:
-			case PROPERTIESTYPE_ComboBox:
+			case PROPERTIESTYPE_ComboBoxInt:
 			case PROPERTIESTYPE_StatesComboBox:
 			case PROPERTIESTYPE_Slider:
 			case PROPERTIESTYPE_SpriteFrames:
@@ -584,7 +594,10 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 	case PROPERTIESTYPE_LineEdit:
 		sRetStr += treeItemValue.toString();
 		break;
-	case PROPERTIESTYPE_ComboBox:
+	case PROPERTIESTYPE_ComboBoxString:
+		sRetStr += treeItemValue.toString();
+		break;
+	case PROPERTIESTYPE_ComboBoxInt:
 		sRetStr += propDefRef.delegateBuilder.toStringList()[treeItemValue.toInt()];
 		break;
 	case PROPERTIESTYPE_StatesComboBox: {

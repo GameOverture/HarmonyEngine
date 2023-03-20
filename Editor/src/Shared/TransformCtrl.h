@@ -100,7 +100,6 @@ public:
 	HyPrimitive2d &GetPrimitive(bool bWorldSpace);
 
 	void SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
-	void Clear();
 
 	QString Serialize();
 	void Deserialize(QString sData, HyCamera2d *pCamera);

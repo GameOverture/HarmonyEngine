@@ -70,57 +70,60 @@ void TransformCtrl::WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform,
 	if(boundingShape.IsValidShape() == false)
 		return;
 
-	if(boundingShape.GetType() == HYSHAPE_Polygon)
+	if(boundingShape.GetType() == HYSHAPE_Polygon && static_cast<const b2PolygonShape *>(boundingShape.GetB2Shape())->m_count == 4)
 	{
 		const b2PolygonShape *pPolyShape = static_cast<const b2PolygonShape *>(boundingShape.GetB2Shape());
-		if(pPolyShape->m_count != 4)
-		{
-			HyLogError("TransformCtrl::WrapTo - HYSHAPE_Polygon shape did not have 4 vertices");
-			return;
-		}
-		
 		HySetVec(m_ptGrabPos[GRAB_BotLeft], pPolyShape->m_vertices[0].x, pPolyShape->m_vertices[0].y);
 		HySetVec(m_ptGrabPos[GRAB_BotRight], pPolyShape->m_vertices[1].x, pPolyShape->m_vertices[1].y);
 		HySetVec(m_ptGrabPos[GRAB_TopRight], pPolyShape->m_vertices[2].x, pPolyShape->m_vertices[2].y);
 		HySetVec(m_ptGrabPos[GRAB_TopLeft], pPolyShape->m_vertices[3].x, pPolyShape->m_vertices[3].y);
-		m_ptGrabPos[GRAB_BotMid] = m_ptGrabPos[GRAB_BotLeft] + ((m_ptGrabPos[GRAB_BotRight] - m_ptGrabPos[GRAB_BotLeft]) * 0.5f);
-		m_ptGrabPos[GRAB_MidRight] = m_ptGrabPos[GRAB_BotRight] + ((m_ptGrabPos[GRAB_TopRight] - m_ptGrabPos[GRAB_BotRight]) * 0.5f);
-		m_ptGrabPos[GRAB_TopMid] = m_ptGrabPos[GRAB_TopLeft] + ((m_ptGrabPos[GRAB_TopRight] - m_ptGrabPos[GRAB_TopLeft]) * 0.5f);
-		m_ptGrabPos[GRAB_MidLeft] = m_ptGrabPos[GRAB_BotLeft] + ((m_ptGrabPos[GRAB_TopLeft] - m_ptGrabPos[GRAB_BotLeft]) * 0.5f);
-		
-		// Create the top rotate grab anchor - Along the top edge, find the midpoint and extrude a line segment out perpendicularly
-		glm::vec2 vTopEdge = m_ptGrabPos[GRAB_TopRight] - m_ptGrabPos[GRAB_TopLeft];
-		glm::vec2 vExtrudeDir = HyMath::PerpendicularCounterClockwise(vTopEdge);
-		vExtrudeDir = glm::normalize(vExtrudeDir);
-		vExtrudeDir *= 50.0f;  // 50px line segment length
-		vTopEdge *= 0.5f;
-		glm::vec2 ptExtrudeStart = m_ptGrabPos[GRAB_TopLeft] + vTopEdge;
-		m_ptGrabPos[GRAB_Rotate] = ptExtrudeStart + vExtrudeDir;
-
-		
-		for(int i = 0; i < NUM_GRABPOINTS; ++i)
-		{
-			glm::vec4 ptTransformPos(m_ptGrabPos[i].x, m_ptGrabPos[i].y, 0.0f, 1.0f);
-			ptTransformPos = mtxShapeTransform * ptTransformPos;
-
-			HySetVec(m_ptGrabPos[i], ptTransformPos.x, ptTransformPos.y);
-			pCamera->ProjectToCamera(m_ptGrabPos[i], m_ptGrabPos[i]);
-
-			m_GrabPoints[i]->pos.Set(m_ptGrabPos[i]);
-			//m_GrabOutline[i].SetAsCircle(m_ptGrabPos[i], fRADIUS);
-			//m_GrabFill[i].SetAsCircle(m_ptGrabPos[i], fRADIUS - 1.0f);
-		}
-
-		m_BoundingVolume.SetAsPolygon(m_ptGrabPos, 4);
-
-		glm::vec4 ptTransformPos(ptExtrudeStart.x, ptExtrudeStart.y, 0.0f, 1.0f);
-		ptTransformPos = mtxShapeTransform * ptTransformPos;
-		HySetVec(ptExtrudeStart, ptTransformPos.x, ptTransformPos.y);
-		pCamera->ProjectToCamera(ptExtrudeStart, ptExtrudeStart);
-		m_ExtrudeSegment.SetAsLineSegment(ptExtrudeStart, m_ptGrabPos[GRAB_Rotate]);
-
-		m_fCachedRotation = HyMath::AngleFromVector(m_ptGrabPos[GRAB_Rotate] - ptExtrudeStart) - 90.0f;
 	}
+	else
+	{
+		b2AABB aabb;
+		boundingShape.ComputeAABB(aabb, glm::identity<glm::mat4>());
+		HySetVec(m_ptGrabPos[GRAB_BotLeft], aabb.lowerBound.x, aabb.lowerBound.y);
+		HySetVec(m_ptGrabPos[GRAB_BotRight], aabb.upperBound.x, aabb.lowerBound.y);
+		HySetVec(m_ptGrabPos[GRAB_TopRight], aabb.upperBound.x, aabb.upperBound.y);
+		HySetVec(m_ptGrabPos[GRAB_TopLeft], aabb.lowerBound.x, aabb.upperBound.y);
+	}
+
+	m_ptGrabPos[GRAB_BotMid] = m_ptGrabPos[GRAB_BotLeft] + ((m_ptGrabPos[GRAB_BotRight] - m_ptGrabPos[GRAB_BotLeft]) * 0.5f);
+	m_ptGrabPos[GRAB_MidRight] = m_ptGrabPos[GRAB_BotRight] + ((m_ptGrabPos[GRAB_TopRight] - m_ptGrabPos[GRAB_BotRight]) * 0.5f);
+	m_ptGrabPos[GRAB_TopMid] = m_ptGrabPos[GRAB_TopLeft] + ((m_ptGrabPos[GRAB_TopRight] - m_ptGrabPos[GRAB_TopLeft]) * 0.5f);
+	m_ptGrabPos[GRAB_MidLeft] = m_ptGrabPos[GRAB_BotLeft] + ((m_ptGrabPos[GRAB_TopLeft] - m_ptGrabPos[GRAB_BotLeft]) * 0.5f);
+	
+	// Create the top rotate grab anchor - Along the top edge, find the midpoint and extrude a line segment out perpendicularly
+	glm::vec2 vTopEdge = m_ptGrabPos[GRAB_TopRight] - m_ptGrabPos[GRAB_TopLeft];
+	glm::vec2 vExtrudeDir = HyMath::PerpendicularCounterClockwise(vTopEdge);
+	vExtrudeDir = glm::normalize(vExtrudeDir);
+	vExtrudeDir *= 50.0f;  // 50px line segment length
+	vTopEdge *= 0.5f;
+	glm::vec2 ptExtrudeStart = m_ptGrabPos[GRAB_TopLeft] + vTopEdge;
+	m_ptGrabPos[GRAB_Rotate] = ptExtrudeStart + vExtrudeDir;
+
+	for(int i = 0; i < NUM_GRABPOINTS; ++i)
+	{
+		glm::vec4 ptTransformPos(m_ptGrabPos[i].x, m_ptGrabPos[i].y, 0.0f, 1.0f);
+		ptTransformPos = mtxShapeTransform * ptTransformPos;
+
+		HySetVec(m_ptGrabPos[i], ptTransformPos.x, ptTransformPos.y);
+		pCamera->ProjectToCamera(m_ptGrabPos[i], m_ptGrabPos[i]);
+
+		m_GrabPoints[i]->pos.Set(m_ptGrabPos[i]);
+		//m_GrabOutline[i].SetAsCircle(m_ptGrabPos[i], fRADIUS);
+		//m_GrabFill[i].SetAsCircle(m_ptGrabPos[i], fRADIUS - 1.0f);
+	}
+
+	m_BoundingVolume.SetAsPolygon(m_ptGrabPos, 4);
+
+	glm::vec4 ptTransformPos(ptExtrudeStart.x, ptExtrudeStart.y, 0.0f, 1.0f);
+	ptTransformPos = mtxShapeTransform * ptTransformPos;
+	HySetVec(ptExtrudeStart, ptTransformPos.x, ptTransformPos.y);
+	pCamera->ProjectToCamera(ptExtrudeStart, ptExtrudeStart);
+	m_ExtrudeSegment.SetAsLineSegment(ptExtrudeStart, m_ptGrabPos[GRAB_Rotate]);
+
+	m_fCachedRotation = HyMath::AngleFromVector(m_ptGrabPos[GRAB_Rotate] - ptExtrudeStart) - 90.0f;
 }
 
 void TransformCtrl::WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCamera)
@@ -383,7 +386,12 @@ EditorShape ShapeCtrl::GetShapeType() const
 
 void ShapeCtrl::SetShapeType(EditorShape eShape)
 {
-	if(m_eShape != SHAPE_None)
+	if(eShape == SHAPE_None)
+	{
+		m_BoundingVolume.SetAsNothing();
+		m_Outline.SetAsNothing();
+	}
+	else if(m_eShape != SHAPE_None && m_eShape != eShape)
 		ConvertTo(eShape);
 
 	m_eShape = eShape;
@@ -424,7 +432,8 @@ void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDrag
 	switch(m_eShape)
 	{
 	case SHAPE_None:
-		Clear();
+		m_BoundingVolume.SetAsNothing();
+		m_Outline.SetAsNothing();
 		break;
 
 	case SHAPE_Box:
@@ -497,14 +506,6 @@ void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDrag
 		HyGuiLog("ShapeCtrl::SetAsDrag - Unhandled shape type: " % QString::number(m_eShape), LOGTYPE_Error);
 		break;
 	}
-}
-
-void ShapeCtrl::Clear()
-{
-	SetVisible(false);
-
-	m_BoundingVolume.SetAsNothing();
-	m_Outline.SetAsNothing();
 }
 
 QString ShapeCtrl::Serialize()

@@ -114,7 +114,7 @@ void EntityTreeItemData::InitalizePropertiesTree()
 	case ITEM_Entity:
 		m_PropertiesTreeModel.AppendCategory("Physics", QVariant(), true, false, "Optionally create a physics component that can affect the transformation of this entity");
 		m_PropertiesTreeModel.AppendProperty("Physics", "Start Activated", PROPERTIESTYPE_bool, Qt::Checked, "This entity will start its physics simulation upon creation");
-		m_PropertiesTreeModel.AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBox, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
+		m_PropertiesTreeModel.AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBoxInt, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
 		m_PropertiesTreeModel.AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters");
 		m_PropertiesTreeModel.AppendProperty("Physics", "Initially Awake", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to make body initially awake. Start sleeping otherwise");
 		m_PropertiesTreeModel.AppendProperty("Physics", "Allow Sleep", PROPERTIESTYPE_bool, Qt::Checked, "Uncheck this if this body should never fall asleep. This increases CPU usage");
@@ -131,13 +131,13 @@ void EntityTreeItemData::InitalizePropertiesTree()
 		m_PropertiesTreeModel.AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type");
 		m_PropertiesTreeModel.AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", false, 1.0, 100.0, 1.0);
 		m_PropertiesTreeModel.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
+		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
 		m_PropertiesTreeModel.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
 		break;
 
 	case ITEM_Shape:
 		m_PropertiesTreeModel.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBox, 0, "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
+		m_PropertiesTreeModel.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
 		m_PropertiesTreeModel.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
 		m_PropertiesTreeModel.AppendCategory("Fixture", QVariant(), true, true, "Become a fixture used in physics simulations and collision");
 		m_PropertiesTreeModel.AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
@@ -229,6 +229,14 @@ EntityTreeItemData *EntityTreeModel::GetEntityTreeItemData() const
 	return m_pRootItem->GetChild(0)->data(0).value<EntityTreeItemData *>();
 }
 
+TreeModelItem *EntityTreeModel::GetShapesFolderTreeItem() const
+{
+	if(m_pRootItem->GetNumChildren() != 2)
+		return nullptr;
+
+	return m_pRootItem->GetChild(1);
+}
+
 void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const
 {
 	TreeModelItem *pThisEntity = GetEntityTreeItem();
@@ -238,10 +246,17 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 		if(pCurItem == nullptr)
 			continue;
 		
-		if(pCurItem->GetType() != ITEM_Shape)
-			childListOut.push_back(pCurItem);
-		else
-			shapeListOut.push_back(pCurItem);
+		childListOut.push_back(pCurItem);
+	}
+
+	TreeModelItem *pThisShapesFolder = GetShapesFolderTreeItem();
+	for(int i = 0; i < pThisShapesFolder->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pCurShape = pThisShapesFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pCurShape == nullptr)
+			continue;
+
+		shapeListOut.push_back(pCurShape);
 	}
 }
 
@@ -373,7 +388,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewShape(EditorShape eShape, QStr
 
 	// Allocate and store the new item in the tree model
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_Shape, QUuid(), QUuid::createUuid());
-	pNewItem->GetPropertiesModel().SetPropertyValue("Shape", "Type", eShape);
+	pNewItem->GetPropertiesModel().SetPropertyValue("Shape", "Type", HyGlobal::ShapeName(eShape));
 	pNewItem->GetPropertiesModel().SetPropertyValue("Shape", "Data", sData);
 
 	QVariant v;

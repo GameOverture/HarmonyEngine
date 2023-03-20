@@ -18,17 +18,15 @@
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
-	m_Marquee(this),
+	m_DragShape(this),
 	m_MultiTransform(this),
 	m_fMultiTransformStartRot(0.0f),
 	m_pCurHoverItem(nullptr),
 	m_eCurHoverGrabPoint(TransformCtrl::GRAB_None),
 	m_bSelectionHandled(false),
 	m_eDragState(DRAGSTATE_None),
-	m_eShapeEditState(SHAPESTATE_None),
-	m_pShapeEditDragPlacement(nullptr)
+	m_eShapeEditState(SHAPESTATE_None)
 {
-	m_Marquee.SetShapeType(SHAPE_Box);
 	m_MultiTransform.Hide();
 	m_PressTimer.SetExpiredCallback(OnMousePressTimer, this);
 }
@@ -41,7 +39,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ void EntityDraw::OnUndoStackIndexChanged(int iIndex) /*override*/
 {
-	if(m_eShapeEditState == SHAPESTATE_DragPlacement)
+	if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
 		ClearShapeEdit();
 }
 
@@ -99,7 +97,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	}
 	else if(pEvent->button() == Qt::RightButton)
 	{
-		if(m_eShapeEditState == SHAPESTATE_DragPlacement)
+		if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
 			ClearShapeEdit();
 	}
 }
@@ -233,9 +231,8 @@ void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
 
 	m_eDragState = DRAGSTATE_None;
 
-	m_eShapeEditState = SHAPESTATE_DragPlacement;
-	m_pShapeEditDragPlacement = new EntityDrawItem(bAsPrimitive ? ITEM_Primitive : ITEM_Shape, QUuid::createUuid(), m_pProjItem->GetUuid(), this);
-	m_pShapeEditDragPlacement->GetShapeCtrl().SetShapeType(eShape);
+	m_eShapeEditState = bAsPrimitive ? SHAPESTATE_DragAddPrimitive : SHAPESTATE_DragAddShape;
+	m_DragShape.SetShapeType(eShape);
 	
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 }
@@ -245,8 +242,6 @@ void EntityDraw::SetShapeEditManip()
 	m_eDragState = DRAGSTATE_None;
 
 	m_eShapeEditState = SHAPESTATE_VertexManip;
-	//m_pShapeEditInitial = new EntityDrawItem(bAsPrimitive ? ITEM_Primitive : ITEM_Shape, QUuid::createUuid(), m_pProjItem->GetUuid(), this);
-	//m_pShapeEditInitial->GetShapeCtrl().SetShapeType(eShape);
 
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
@@ -256,7 +251,7 @@ void EntityDraw::ClearShapeEdit()
 	m_eDragState = DRAGSTATE_None;
 
 	m_eShapeEditState = SHAPESTATE_None;
-	delete m_pShapeEditDragPlacement; m_pShapeEditDragPlacement = nullptr;
+	m_DragShape.SetShapeType(SHAPE_None);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
 	pWidget->OnNewShapeFinished();
@@ -268,19 +263,19 @@ void EntityDraw::ClearShapeEdit()
 {
 	for(auto pItem : m_ItemList)
 	{
-		//if(pItem->GetGuiType() != ITEM_Shape)
-		{
-			if(pItem->GetHyNode()->GetInternalFlags() & NODETYPE_IsBody)
-			{
-				pItem->GetHyNode()->ParentDetach();
-				static_cast<IHyBody2d *>(pItem->GetHyNode())->ResetDisplayOrder();
-			}
-		}
+		pItem->GetHyNode()->ParentDetach();
+		if(pItem->GetHyNode()->GetInternalFlags() & NODETYPE_IsBody)
+			static_cast<IHyBody2d *>(pItem->GetHyNode())->ResetDisplayOrder();
 	}
-	m_StaleItemList = m_ItemList;
+
+	QList<EntityDrawItem *> staleItemList(m_ItemList);
 	m_ItemList.clear();
 
 	QJsonArray childArray = itemMetaObj["childList"].toArray();
+	QJsonArray shapeArray = itemMetaObj["shapeList"].toArray();
+	for(int32 i = 0; i < shapeArray.size(); ++i)
+		childArray.append(shapeArray[i].toObject());
+
 	for(int32 i = 0; i < childArray.size(); ++i)
 	{
 		QJsonObject childObj = childArray[i].toObject();
@@ -288,14 +283,23 @@ void EntityDraw::ClearShapeEdit()
 		HyGuiItemType eType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
 		QUuid uuid(childObj["UUID"].toString());
 		
-		EntityDrawItem *pItemWidget = FindStaleChild(eType, uuid);
+		EntityDrawItem *pItemWidget = nullptr;
+		for(EntityDrawItem *pStaleItem : staleItemList)
+		{
+			if(pStaleItem->GetGuiType() == eType && pStaleItem->GetThisUuid() == uuid)
+			{
+				pItemWidget = pStaleItem;
+				break;
+			}
+		}
+
 		if(pItemWidget == nullptr)
 		{
 			QUuid itemUuid(childObj["itemUUID"].toString());
 			pItemWidget = new EntityDrawItem(eType, uuid, itemUuid, this);
 		}
 		else
-			m_StaleItemList.removeOne(pItemWidget);
+			staleItemList.removeOne(pItemWidget);
 
 		m_ItemList.push_back(pItemWidget);
 
@@ -308,16 +312,9 @@ void EntityDraw::ClearShapeEdit()
 	}
 	
 	// Delete all the remaining stale items
-	for(auto pStaleItem : m_StaleItemList)
+	for(auto pStaleItem : staleItemList)
 		delete pStaleItem;
-	m_StaleItemList.clear();
-
-
-	QJsonArray shapeArray = itemMetaObj["shapeList"].toArray();
-	for(int32 i = 0; i < shapeArray.size(); ++i)
-	{
-		QJsonObject shapeObj = shapeArray[i].toObject();
-	}
+	staleItemList.clear();
 
 	RefreshTransforms();
 }
@@ -340,17 +337,6 @@ void EntityDraw::ClearShapeEdit()
 /*virtual*/ void EntityDraw::OnZoom(HyZoomLevel eZoomLevel) /*override*/
 {
 	RefreshTransforms();
-}
-
-EntityDrawItem *EntityDraw::FindStaleChild(HyGuiItemType eType, QUuid uuid)
-{
-	for(EntityDrawItem *pStaleItem : m_StaleItemList)
-	{
-		if(pStaleItem->GetGuiType() == eType && pStaleItem->GetThisUuid() == uuid)
-			return pStaleItem;
-	}
-
-	return nullptr;
 }
 
 Qt::CursorShape EntityDraw::GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const
@@ -423,7 +409,8 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 		glm::vec2 ptCurMousePos;
 		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 		
-		m_Marquee.SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
+		m_DragShape.SetShapeType(SHAPE_Box);
+		m_DragShape.SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
 	}
 	else if(m_eDragState == DRAGSTATE_Pending)
 	{
@@ -530,12 +517,12 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 	if(m_eDragState == DRAGSTATE_Marquee)
 	{
 		b2AABB marqueeAabb;
-		if(m_Marquee.IsVisible() == false)
+		if(m_DragShape.IsVisible() == false)
 			marqueeAabb.lowerBound.x = marqueeAabb.lowerBound.y = marqueeAabb.upperBound.x = marqueeAabb.upperBound.y = 0.0f;
 		else
 		{
 			HyShape2d tmpShape;
-			m_Marquee.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
+			m_DragShape.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
 			tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
 		}
 
@@ -545,7 +532,7 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 				affectedItemList << pItem;
 		}
 
-		m_Marquee.Clear();
+		m_DragShape.SetShapeType(SHAPE_None);
 	}
 	else if(m_pCurHoverItem) // This covers the resolution of "Special Case" in EntityDraw::DoMousePress_Select
 		affectedItemList << m_pCurHoverItem;
@@ -833,7 +820,7 @@ void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 	glm::vec2 ptCurMousePos;
 	HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 
-	if(m_eShapeEditState == SHAPESTATE_DragPlacement)
+	if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
 	{
 		switch(m_eDragState)
 		{
@@ -846,7 +833,7 @@ void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 			break;
 
 		case DRAGSTATE_Transforming:
-			m_pShapeEditDragPlacement->GetShapeCtrl().SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
+			m_DragShape.SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
 			break;
 		}
 	}
@@ -858,7 +845,7 @@ void EntityDraw::DoMousePress_ShapeEdit()
 	if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
 		HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
 
-	if(m_eShapeEditState == SHAPESTATE_DragPlacement)
+	if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
 	{
 		m_PressTimer.InitStart(0.5f);
 		m_eDragState = DRAGSTATE_Pending;
@@ -870,14 +857,17 @@ void EntityDraw::DoMousePress_ShapeEdit()
 
 void EntityDraw::DoMouseRelease_ShapeEdit()
 {
-	if(m_eShapeEditState == SHAPESTATE_DragPlacement && m_eDragState == DRAGSTATE_Transforming)
+	if((m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape) &&
+		m_eDragState == DRAGSTATE_Transforming)
 	{
 		QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(*m_pProjItem,
-														   m_pShapeEditDragPlacement->GetShapeCtrl().GetShapeType(),
-														   m_pShapeEditDragPlacement->GetShapeCtrl().Serialize(),
-														   m_pShapeEditDragPlacement->GetGuiType() == ITEM_Primitive,
+														   m_DragShape.GetShapeType(),
+														   m_DragShape.Serialize(),
+														   m_eShapeEditState == SHAPESTATE_DragAddPrimitive,
 														   -1);
 		m_pProjItem->GetUndoStack()->push(pCmd);
+
+		m_DragShape.SetShapeType(SHAPE_None);
 	}
 }
 
@@ -888,6 +878,6 @@ void EntityDraw::DoMouseRelease_ShapeEdit()
 	if(pThis->m_eDragState == DRAGSTATE_Marquee)
 		return;
 
-	if(pThis->m_eDragState == DRAGSTATE_Pending)
+	if(pThis->m_eShapeEditState == SHAPESTATE_None && pThis->m_eDragState == DRAGSTATE_Pending)
 		pThis->BeginTransform();
 }

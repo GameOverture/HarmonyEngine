@@ -18,10 +18,9 @@
 class EntityDraw : public IDraw
 {
 	QList<EntityDrawItem *>					m_ItemList;
-	QList<EntityDrawItem *>					m_StaleItemList;
 	QList<EntityDrawItem *>					m_SelectedItemList;
 
-	ShapeCtrl								m_Marquee;
+	ShapeCtrl								m_DragShape;		// Used for marquee selects and initially adding new shapes
 
 	// Multi transform used when 'm_SelectedItemList' contains more than 1 item. It wraps around all selected items.
 	TransformCtrl							m_MultiTransform;
@@ -49,11 +48,11 @@ class EntityDraw : public IDraw
 	enum ShapeEditState
 	{
 		SHAPESTATE_None = 0,
-		SHAPESTATE_DragPlacement,
+		SHAPESTATE_DragAddPrimitive,		// Uses 'm_DragShape' when initially placing a new primitive
+		SHAPESTATE_DragAddShape,			// Uses 'm_DragShape' when initially placing a new shape
 		SHAPESTATE_VertexManip				// When editing polygons, line chains, and line loops
 	};
 	ShapeEditState							m_eShapeEditState;
-	EntityDrawItem *						m_pShapeEditDragPlacement;	// Used when initially placing a new shape
 
 	// Used to help transform (translate, rotate, scale) selected items
 	HyEntity2d								m_ActiveTransform;
@@ -90,7 +89,6 @@ protected:
 	virtual void OnResizeRenderer() override;
 	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
 
-	EntityDrawItem *FindStaleChild(HyGuiItemType eType, QUuid uuid);
 	Qt::CursorShape GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const;
 
 	void DoMouseMove_Select(bool bCtrlMod, bool bShiftMod);

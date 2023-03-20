@@ -25,7 +25,7 @@ enum PropertiesType
 
 	PROPERTIESTYPE_bool,
 	PROPERTIESTYPE_int,
-	PROPERTIESTYPE_double,          // delegateBuilder [int] = QDoubleSpinBox's decimals value. Aka precision.
+	PROPERTIESTYPE_double,			// delegateBuilder [int] = QDoubleSpinBox's decimals value. Aka precision.
 	PROPERTIESTYPE_ivec2,
 	PROPERTIESTYPE_vec2,
 	PROPERTIESTYPE_ivec3,
@@ -33,8 +33,9 @@ enum PropertiesType
 	PROPERTIESTYPE_ivec4,
 	PROPERTIESTYPE_vec4,
 	PROPERTIESTYPE_LineEdit,
-	PROPERTIESTYPE_ComboBox,        // delegateBuilder [QStringList] = QComboBox's selection list
-	PROPERTIESTYPE_StatesComboBox,  // delegateBuilder [ProjectItemData *] = A pointer to the ProjectItemData that owns this property
+	PROPERTIESTYPE_ComboBoxInt,		// delegateBuilder [QStringList] = QComboBox's selection list
+	PROPERTIESTYPE_ComboBoxString,	// delegateBuilder [QStringList] = QComboBox's selection list
+	PROPERTIESTYPE_StatesComboBox,	// delegateBuilder [ProjectItemData *] = A pointer to the ProjectItemData that owns this property
 	PROPERTIESTYPE_Slider,
 	PROPERTIESTYPE_Color,
 	PROPERTIESTYPE_SpriteFrames
