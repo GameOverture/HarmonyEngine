@@ -268,9 +268,9 @@ void EntityWidget::OnNewShapeFinished()
 	MainWindow::ClearStatus();
 }
 
-void EntityWidget::SetVertexModeCheck(bool bChecked)
+void EntityWidget::SetVertexEditMode(bool bEnabled)
 {
-	ui->btnVertexManip->setChecked(bChecked);
+	ui->btnVertexManip->setChecked(bEnabled);
 }
 
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/
@@ -429,7 +429,9 @@ void EntityWidget::on_actionAddLineLoopShape_triggered()
 
 void EntityWidget::on_actionVertexManip_triggered()
 {
-	QUndoCommand *pCmd = new EntityUndoCmd_ToggleVertexManip(m_ItemRef, true);
+	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
+
+	QUndoCommand *pCmd = new EntityUndoCmd_ToggleVertexManip(m_ItemRef, !pEntityModel->IsVertexExitMode());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

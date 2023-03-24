@@ -249,36 +249,10 @@ EntityUndoCmd_ToggleVertexManip::EntityUndoCmd_ToggleVertexManip(ProjectItemData
 
 /*virtual*/ void EntityUndoCmd_ToggleVertexManip::redo() /*override*/
 {
-	EntityWidget *pEntityWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
-	if(m_bEnable)
-	{
-		MainWindow::SetStatus("Vertex Edit Mode", 0);
-		pEntityWidget->SetVertexModeCheck(true);
-		pEntityDraw->SetShapeEditManip();
-	}
-	else
-	{
-		MainWindow::ClearStatus();
-		pEntityWidget->SetVertexModeCheck(false);
-		pEntityDraw->ClearShapeEdit();
-	}
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SetVertexEditMode(m_bEnable);
 }
 
 /*virtual*/ void EntityUndoCmd_ToggleVertexManip::undo() /*override*/
 {
-	EntityWidget *pEntityWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
-	if(m_bEnable)
-	{
-		MainWindow::ClearStatus();
-		pEntityWidget->SetVertexModeCheck(false);
-		pEntityDraw->ClearShapeEdit();
-	}
-	else
-	{
-		MainWindow::SetStatus("Vertex Edit Mode", 0);
-		pEntityWidget->SetVertexModeCheck(true);
-		pEntityDraw->SetShapeEditManip();
-	}
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SetVertexEditMode(!m_bEnable);
 }

@@ -233,17 +233,27 @@ void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
 
 	m_eShapeEditState = bAsPrimitive ? SHAPESTATE_DragAddPrimitive : SHAPESTATE_DragAddShape;
 	m_DragShape.SetShapeType(eShape);
+	m_DragShape.GetPrimitive(true).alpha.Set(1.0f);
+	if(bAsPrimitive)
+		m_DragShape.SetTint(HyColor::DarkMagenta);
+	else
+		m_DragShape.SetTint(HyColor::Cyan);
 	
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 }
 
-void EntityDraw::SetShapeEditManip()
+void EntityDraw::SetVertexEditMode(bool bEnable)
 {
-	m_eDragState = DRAGSTATE_None;
+	if(bEnable)
+	{
+		m_eDragState = DRAGSTATE_None;
 
-	m_eShapeEditState = SHAPESTATE_VertexManip;
+		m_eShapeEditState = SHAPESTATE_VertexEditMode;
 
-	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+	}
+	else
+		ClearShapeEdit();
 }
 
 void EntityDraw::ClearShapeEdit()
@@ -252,6 +262,8 @@ void EntityDraw::ClearShapeEdit()
 
 	m_eShapeEditState = SHAPESTATE_None;
 	m_DragShape.SetShapeType(SHAPE_None);
+	m_DragShape.GetPrimitive(true).alpha.Set(1.0f);
+	m_DragShape.SetTint(HyColor::White);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
 	pWidget->OnNewShapeFinished();
@@ -410,6 +422,9 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 		
 		m_DragShape.SetShapeType(SHAPE_Box);
+		m_DragShape.GetPrimitive(true).alpha.Set(0.25f);
+		m_DragShape.SetTint(HyColor::Blue.Lighten());
+
 		m_DragShape.SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
 	}
 	else if(m_eDragState == DRAGSTATE_Pending)
@@ -533,6 +548,8 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 		}
 
 		m_DragShape.SetShapeType(SHAPE_None);
+		m_DragShape.GetPrimitive(true).alpha.Set(1.0f);
+		m_DragShape.SetTint(HyColor::White);
 	}
 	else if(m_pCurHoverItem) // This covers the resolution of "Special Case" in EntityDraw::DoMousePress_Select
 		affectedItemList << m_pCurHoverItem;
@@ -754,6 +771,7 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 		glm::vec2 ptDragAnchorPoint = pCurTransform->GetGrabPointWorldPos(eAnchorPoint, m_pCamera);
 		m_ActiveTransform.scale_pivot.Set(ptDragAnchorPoint);
+		m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
 
 		glm::vec2 vDesiredSize(m_vDragStartSize);
 		if(bScaleDimensions.x)
@@ -771,13 +789,18 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 		if(bShiftMod)
 			bUniformScale = !bUniformScale;
+
+		glm::vec2 vScaleAmt(1.0f);
 		if(bUniformScale)
 		{
 			float fScaleAmt = HyMath::Max(vDesiredSize.x / m_vDragStartSize.x, vDesiredSize.y / m_vDragStartSize.y);
-			m_ActiveTransform.scale.Set(fScaleAmt, fScaleAmt);
+			HySetVec(vScaleAmt, fScaleAmt, fScaleAmt);
 		}
 		else
-			m_ActiveTransform.scale.Set(vDesiredSize.x / m_vDragStartSize.x, vDesiredSize.y / m_vDragStartSize.y);
+			HySetVec(vScaleAmt, vDesiredSize.x / m_vDragStartSize.x, vDesiredSize.y / m_vDragStartSize.y);
+
+		// TODO: When transforming a single item that has a non-zero rotation, it skews the scaling during preview
+		m_ActiveTransform.scale.Set(vScaleAmt);
 
 		break; }
 

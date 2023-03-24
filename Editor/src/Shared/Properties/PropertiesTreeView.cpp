@@ -220,11 +220,13 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		DlgColorPicker *pDlg = new DlgColorPicker("Choose Color", topColor, botColor, pParent);
 		if(pDlg->exec() == QDialog::Accepted)
 		{
-			QVariant newValue;
+			QColor newColor;
 			if(pDlg->IsSolidColor())
-				newValue = pDlg->GetSolidColor();
+				newColor = pDlg->GetSolidColor();
 			else
-				newValue = pDlg->GetVgTopColor(); // NOTE: Only getting top color!!
+				newColor = pDlg->GetVgTopColor(); // NOTE: Only getting top color!!
+
+			QVariant newValue = QRect(newColor.red(), newColor.green(), newColor.blue(), newColor.alpha());
 
 			const QVariant &origValue = pPropertiesTreeModel->GetPropertyValue(index);
 			if(origValue != newValue)

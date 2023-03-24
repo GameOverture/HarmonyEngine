@@ -110,16 +110,6 @@ void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 	if(m_eGuiType != ITEM_Shape)
 	{
 		QJsonObject commonObj = childObj["Common"].toObject();
-
-		if(m_eGuiType != ITEM_Audio)
-		{
-			pHyNode->SetVisible(commonObj["Visible"].toBool());
-
-			int iDisplayOrder = commonObj["Display Order"].toInt();
-			if(iDisplayOrder != 0)
-				static_cast<IHyBody2d *>(pHyNode)->SetDisplayOrder(iDisplayOrder);
-		}
-
 		pHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
 		pHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
 
@@ -129,6 +119,22 @@ void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 		pHyNode->rot.Set(transformObj["Rotation"].toDouble());
 		QJsonArray scaleArray = transformObj["Scale"].toArray();
 		pHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+
+		if(m_eGuiType != ITEM_Audio && (pHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
+		{
+			QJsonObject bodyObj = childObj["Body"].toObject();
+			pHyNode->SetVisible(bodyObj["Visible"].toBool());
+
+			QJsonArray colorArray = bodyObj["Color Tint"].toArray();
+			static_cast<IHyBody2d *>(pHyNode)->SetTint(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
+			GetShapeCtrl().SetTint(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
+
+			static_cast<IHyBody2d *>(pHyNode)->alpha.Set(bodyObj["Alpha"].toDouble());
+
+			int iDisplayOrder = bodyObj["Display Order"].toInt();
+			if(iDisplayOrder != 0)
+				static_cast<IHyBody2d *>(pHyNode)->SetDisplayOrder(iDisplayOrder);
+		}
 	}
 
 	switch(m_eGuiType)

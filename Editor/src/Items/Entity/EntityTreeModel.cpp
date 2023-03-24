@@ -95,11 +95,6 @@ void EntityTreeItemData::InitalizePropertiesTree()
 
 	if(m_eTYPE != ITEM_Shape)
 	{
-		if(m_eTYPE != ITEM_Audio)
-		{
-			m_PropertiesTreeModel.AppendProperty("Common", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated");
-			m_PropertiesTreeModel.AppendProperty("Common", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
-		}
 		m_PropertiesTreeModel.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused");
 		m_PropertiesTreeModel.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", false, -iRANGE, iRANGE, 1);
 
@@ -107,6 +102,15 @@ void EntityTreeItemData::InitalizePropertiesTree()
 		m_PropertiesTreeModel.AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", false, -fRANGE, fRANGE, 1.0, "[", "]");
 		m_PropertiesTreeModel.AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", false, -fRANGE, fRANGE, 0.01, "[", "]");
 		m_PropertiesTreeModel.AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", false, 0.0, 360.0, 0.1, "", "°");
+
+		if(m_eTYPE != ITEM_Audio)
+		{
+			m_PropertiesTreeModel.AppendCategory("Body", HyGlobal::ItemColor(ITEM_Prefix));
+			m_PropertiesTreeModel.AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated");
+			m_PropertiesTreeModel.AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 255), "A color to alpha blend this item with");
+			m_PropertiesTreeModel.AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", false, 0.0, 1.0, 0.05);
+			m_PropertiesTreeModel.AppendProperty("Body", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
+		}
 	}
 
 	switch(m_eTYPE)

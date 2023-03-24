@@ -35,11 +35,13 @@ class EntityModel : public IModel
 
 	ComboBoxMapper										m_EntityTypeMapper;
 	EntityTreeModel										m_TreeModel;
+	bool												m_bVertexEditMode;
 
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
+	bool IsVertexExitMode() const;
 	void RegisterWidgets(QComboBox &cmbEntityTypeRef);
 
 	EntityTreeModel &GetTreeModel();
@@ -51,6 +53,7 @@ public:
 	void Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList);
 	int32 Cmd_RemoveTreeItem(EntityTreeItemData *pItem);
 	bool Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow);
+	void Cmd_SetVertexEditMode(bool bEnabled);
 
 	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) override;
 

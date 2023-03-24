@@ -208,6 +208,8 @@ if(Qt5_DIR)
 		src/Shared/GlobalWidgetMappers.h
 		src/Shared/IMimeData.cpp
 		src/Shared/IMimeData.h
+		src/Shared/ShapeCtrl.cpp
+		src/Shared/ShapeCtrl.h
 		src/Shared/TransformCtrl.cpp
 		src/Shared/TransformCtrl.h
 		src/Shared/Properties/PropertiesTreeModel.cpp

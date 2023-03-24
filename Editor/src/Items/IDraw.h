@@ -11,7 +11,7 @@
 #define IDRAW_H
 
 #include "Global.h"
-#include "TransformCtrl.h"
+#include "ShapeCtrl.h"
 
 #include <QWidget>
 #include <QString>

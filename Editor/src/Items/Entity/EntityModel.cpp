@@ -35,7 +35,8 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_EntityTypeMapper(this),
-	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this)
+	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this),
+	m_bVertexEditMode(itemFileDataRef.m_Meta["vertexEditMode"].toBool())
 {
 	InitStates<EntityStateData>(itemFileDataRef);
 
@@ -62,6 +63,11 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 
 /*virtual*/ EntityModel::~EntityModel()
 {
+}
+
+bool EntityModel::IsVertexExitMode() const
+{
+	return m_bVertexEditMode;
 }
 
 void EntityModel::RegisterWidgets(QComboBox &cmbEntityTypeRef)
@@ -123,6 +129,11 @@ EntityTreeItemData *EntityModel::Cmd_AddNewShape(EditorShape eShape, QString sDa
 
 void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList)
 {
+	for(EntityTreeItemData *pTreeItem : selectedList)
+		pTreeItem->SetSelected(true);
+	for(EntityTreeItemData *pTreeItem : deselectedList)
+		pTreeItem->SetSelected(false);
+
 	EntityDraw *pDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pDraw)
 		pDraw->OnSelectionChange(selectedList, deselectedList);
@@ -160,6 +171,31 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 	return true;
 }
 
+void EntityModel::Cmd_SetVertexEditMode(bool bEnabled)
+{
+	m_bVertexEditMode = bEnabled;
+
+	EntityWidget *pEntityWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+
+	if(bEnabled)
+	{
+		MainWindow::SetStatus("Vertex Edit Mode", 0);
+		if(pEntityWidget)
+			pEntityWidget->SetVertexEditMode(true);
+		if(pEntityDraw)
+			pEntityDraw->SetVertexEditMode(true);
+	}
+	else
+	{
+		MainWindow::ClearStatus();
+		if(pEntityWidget)
+			pEntityWidget->SetVertexEditMode(false);
+		if(pEntityDraw)
+			pEntityDraw->SetVertexEditMode(false);
+	}
+}
+
 /*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) /*override*/
 {
 	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(propertiesModelRef.GetSubstate().toLongLong());
@@ -174,6 +210,7 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
+	itemSpecificFileDataOut.m_Meta.insert("vertexEditMode", m_bVertexEditMode);
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetEntityTreeItemData()->GetCodeName());
 	itemSpecificFileDataOut.m_Meta.insert("entityType", m_EntityTypeMapper.GetCurrentItem());
 	

@@ -50,7 +50,7 @@ class EntityDraw : public IDraw
 		SHAPESTATE_None = 0,
 		SHAPESTATE_DragAddPrimitive,		// Uses 'm_DragShape' when initially placing a new primitive
 		SHAPESTATE_DragAddShape,			// Uses 'm_DragShape' when initially placing a new shape
-		SHAPESTATE_VertexManip				// When editing polygons, line chains, and line loops
+		SHAPESTATE_VertexEditMode			// When editing polygons, line chains, and line loops
 	};
 	ShapeEditState							m_eShapeEditState;
 
@@ -79,7 +79,7 @@ public:
 	void RefreshTransforms();
 
 	void SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive);
-	void SetShapeEditManip();
+	void SetVertexEditMode(bool bEnable);
 	void ClearShapeEdit();
 
 protected:

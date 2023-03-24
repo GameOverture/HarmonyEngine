@@ -80,34 +80,4 @@ public:
 	bool IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const;
 };
 
-class ShapeCtrl : public HyEntity2d
-{
-	EditorShape					m_eShape;
-
-	HyPrimitive2d				m_BoundingVolume;	// Uses world/camera coordinates
-	HyPrimitive2d				m_Outline;			// Uses window coordinates (unaffected by zoom)
-
-	QList<float>				m_DeserializedFloatList;
-	QList<GrabPoint *>			m_GrabPointList;
-
-public:
-	ShapeCtrl(HyEntity2d *pParent);
-	virtual ~ShapeCtrl();
-
-	EditorShape GetShapeType() const;
-	void SetShapeType(EditorShape eShape);
-
-	HyPrimitive2d &GetPrimitive(bool bWorldSpace);
-
-	void SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
-
-	QString Serialize();
-	void Deserialize(QString sData, HyCamera2d *pCamera);
-
-	void RefreshTransform(HyCamera2d *pCamera);
-
-protected:
-	void ConvertTo(EditorShape eShape);
-};
-
 #endif // TRANSFORMCTRL_H

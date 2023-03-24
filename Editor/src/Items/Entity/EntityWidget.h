@@ -42,7 +42,7 @@ public:
 	void DoNewShape(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive);
 	void OnNewShapeFinished();
 
-	void SetVertexModeCheck(bool bChecked);
+	void SetVertexEditMode(bool bEnabled);
 
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;
