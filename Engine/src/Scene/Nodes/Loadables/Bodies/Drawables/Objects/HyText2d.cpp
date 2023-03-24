@@ -127,7 +127,9 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 /*virtual*/ bool HyText2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
 	// CalculateGlyphInfos called here to ensure 'm_uiNumValidCharacters' is up to date with 'm_sCurrentString'
-	CalculateGlyphInfos();
+	// TODO: This is commented out because 'CalculateGlyphInfos()' is called in 'IHyText<NODETYPE, ENTTYPE>::OnIsValidToRender()'
+	//       which should be guaranteed to be called before this HyText2d::WriteVertexData()
+	//CalculateGlyphInfos();
 
 	const HyTextData *pData = static_cast<const HyTextData *>(UncheckedGetData());
 

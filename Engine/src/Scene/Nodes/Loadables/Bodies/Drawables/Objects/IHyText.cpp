@@ -533,6 +533,9 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHyText<NODETYPE, ENTTYPE>::OnIsValidToRender() /*override*/
 {
+	// OnIsValidToRender() will always be invoked before this IHyText is sent off to render.
+	// Esure CalculateGlyphInfos() will always have a chance to be invoked here to not skip any rendering frame
+	CalculateGlyphInfos(); // sets 'm_uiNumValidCharacters' inside
 	return m_uiNumValidCharacters > 0;
 }
 
