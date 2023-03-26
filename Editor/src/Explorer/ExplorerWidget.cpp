@@ -421,7 +421,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		{
 			ProjectItemData *pProjItem = static_cast<ProjectItemData *>(selectedItems[i]);
 
-			auto itemOwners = pProjItem->GetProject().GetItemOwners(pProjItem);
+			auto itemOwners = pProjItem->GetProject().GetItemLinks(pProjItem);
 			if(itemOwners.empty() == false)
 			{
 				QString sMessage = "'" % selectedItems[i]->GetName(true) % "' cannot be deleted because it is in use by the following items: \n\n";

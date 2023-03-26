@@ -105,8 +105,10 @@ void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 		return;
 
 	IHyLoadable2d *pHyNode = GetHyNode();
+	bool bIsSelected = childObj["isSelected"].toBool();
 
 	// Parse all and only the potential categories of the 'm_eGuiType' type, and set the values to 'pHyNode'
+	HyColor colorTint;
 	if(m_eGuiType != ITEM_Shape)
 	{
 		QJsonObject commonObj = childObj["Common"].toObject();
@@ -126,8 +128,8 @@ void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 			pHyNode->SetVisible(bodyObj["Visible"].toBool());
 
 			QJsonArray colorArray = bodyObj["Color Tint"].toArray();
-			static_cast<IHyBody2d *>(pHyNode)->SetTint(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
-			GetShapeCtrl().SetTint(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
+			colorTint = HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt());
+			static_cast<IHyBody2d *>(pHyNode)->SetTint(colorTint);
 
 			static_cast<IHyBody2d *>(pHyNode)->alpha.Set(bodyObj["Alpha"].toDouble());
 
@@ -151,7 +153,11 @@ void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 		[[fallthrough]];
 	case ITEM_Shape: {
 		QJsonObject shapeObj = childObj["Shape"].toObject();
-		GetShapeCtrl().SetShapeType(HyGlobal::GetShapeFromString(shapeObj["Type"].toString()));
+		EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
+		float fBvAlpha = (m_eGuiType == ITEM_Shape) ? 0.0f : 1.0f;
+		float fOutlineAlpha = (m_eGuiType == ITEM_Shape || bIsSelected) ? 1.0f : 0.0f;
+
+		GetShapeCtrl().Setup(eShape, colorTint, fBvAlpha, fOutlineAlpha);
 		GetShapeCtrl().Deserialize(shapeObj["Data"].toString(), pCamera);
 		// "Fixture" category doesn't need to be set
 		break; }
@@ -193,7 +199,7 @@ void EntityDrawItem::RefreshOverrideData()
 {
 	ProjectItemData *pItemData = MainWindow::GetExplorerModel().FindByUuid(m_ItemUuid);
 	FileDataPair fileDataPair;
-	pItemData->GetLatestFileData(fileDataPair);
+	pItemData->GetSavedFileData(fileDataPair);
 
 	if(m_eGuiType == ITEM_Entity)
 	{
@@ -211,7 +217,8 @@ void EntityDrawItem::RefreshOverrideData()
 		switch(m_eGuiType)
 		{
 		case ITEM_Text:
-			static_cast<HyText2d *>(m_pChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject());
+			static_cast<HyText2d *>(m_pChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject(), false);
+			//static_cast<HyText2d *>(m_pChild)->GetShaderUniforms().SetTexHandle(0, m_hTexture);
 			break;
 
 		case ITEM_Spine:

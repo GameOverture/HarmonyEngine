@@ -37,12 +37,10 @@ public:
 
 	QList<EntityTreeItemData *> GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes);
 	void RequestSelectedItems(QList<QUuid> uuidList); // Calls signal
-	void SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList); // Does not call signal
+	void SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList); // This catches all cases when selection occurs. Does not call signal
 
-	void DoNewShape(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive);
-	void OnNewShapeFinished();
-
-	void SetVertexEditMode(bool bEnabled);
+	void OnDrawShapeEdit(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive);
+	void OnDrawShapeEditFinished();
 
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;
@@ -66,7 +64,7 @@ private Q_SLOTS:
 	void on_actionAddLineChainShape_triggered();
 	void on_actionAddLineLoopShape_triggered();
 
-	void on_actionVertexManip_triggered();
+	void on_actionVertexEditMode_toggled(bool bChecked);
 
 	void on_actionOrderChildrenUp_triggered();
 	void on_actionOrderChildrenDown_triggered();

@@ -79,7 +79,7 @@ public:
 	void RefreshTransforms();
 
 	void SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive);
-	void SetVertexEditMode(bool bEnable);
+	void SetShapeEditVertex();
 	void ClearShapeEdit();
 
 protected:

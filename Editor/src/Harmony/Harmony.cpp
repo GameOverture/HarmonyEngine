@@ -54,7 +54,7 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 	if(pProject != nullptr)
 	{
 		connect(sm_pInstance->m_pWidget, &HarmonyWidget::HarmonyWidgetReady, sm_pInstance, &Harmony::HarmonyWidgetReady);
-		sm_pInstance->m_MainWindowRef.SetLoading("Loading new Harmony instance", -1);
+		sm_pInstance->m_MainWindowRef.SetStatus("Loading new Harmony instance", 0);
 	}
 	else
 		sm_pInstance->m_MainWindowRef.SetCurrentProject(nullptr);
@@ -94,5 +94,6 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 	m_pWidget->GetProject()->HarmonyInitialize();
 
 	m_MainWindowRef.SetCurrentProject(m_pWidget->GetProject());
+	m_MainWindowRef.ClearStatus();
 	m_MainWindowRef.ClearLoading();
 }

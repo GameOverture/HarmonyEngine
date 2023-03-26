@@ -65,9 +65,10 @@ class Project : public ExplorerItemData
 
 	FileDataPair										m_ProjectFileData;
 
-	QMap<ProjectItemData *, QSet<ProjectItemData *>>	m_ItemOwnerMap;
+	QMap<QUuid, QSet<QUuid>>							m_ItemLinksMap; // Key = item in question, Value = other items that reference 'Key'
 
 	bool												m_bHasError;
+	bool												m_bExplorerModelLoaded;
 	
 public:
 	Project(const QString sProjectFilePath, ExplorerModel &modelRef);
@@ -134,10 +135,9 @@ public:
 	void SaveUserData() const;
 
 	// Dependency links between items
-	QList<ProjectItemData *> RegisterItemsById(ProjectItemData *pItemOwner, QList<QUuid> requestList);
-	QList<ProjectItemData *> RegisterItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList);
-	void RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> relinquishList);
-	QList<ProjectItemData *> GetItemOwners(ProjectItemData *pItem);
+	void RegisterItems(QUuid uuidItemOwner, QList<QUuid> requestList);
+	void RelinquishItems(QUuid uuidItemOwner, QList<QUuid> relinquishList);
+	QList<ProjectItemData *> GetItemLinks(ProjectItemData *pItem);
 
 	// These tab functions are only called from MainWindow
 	void OpenTab(ProjectItemData *pItem);

@@ -33,7 +33,7 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 
 			FileDataPair itemFileData;
 			ProjectItemData *pProjectItem = static_cast<ProjectItemData *>(itemListRef[i]);
-			pProjectItem->GetLatestFileData(itemFileData);
+			pProjectItem->GetSavedFileData(itemFileData);
 			itemObj.insert("metaObj", itemFileData.m_Meta);
 			itemObj.insert("dataObj", itemFileData.m_Data);
 

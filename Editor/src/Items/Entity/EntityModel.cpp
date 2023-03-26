@@ -35,8 +35,7 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_EntityTypeMapper(this),
-	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this),
-	m_bVertexEditMode(itemFileDataRef.m_Meta["vertexEditMode"].toBool())
+	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this)
 {
 	InitStates<EntityStateData>(itemFileDataRef);
 
@@ -45,29 +44,12 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	for(int i = 0; i < childArray.size(); ++i)
 	{
 		QJsonObject childObj = childArray[i].toObject();
-		
-		HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
-		if(eGuiType == ITEM_Primitive || eGuiType == ITEM_Shape)
-			Cmd_AddNewChild(nullptr, childObj, i);
-		else
-		{
-			QUuid uuid(childObj["itemUUID"].toString());
-			ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(uuid);
-			if(pProjItem)
-				Cmd_AddNewChild(pProjItem, childObj, i);
-			else
-				HyGuiLog("Null project item for UUID: " % uuid.toString() % " type: " % HyGlobal::ItemName(eGuiType, false), LOGTYPE_Error);
-		}
+		Cmd_AddNewChild(childObj, i);
 	}
 }
 
 /*virtual*/ EntityModel::~EntityModel()
 {
-}
-
-bool EntityModel::IsVertexExitMode() const
-{
-	return m_bVertexEditMode;
 }
 
 void EntityModel::RegisterWidgets(QComboBox &cmbEntityTypeRef)
@@ -83,6 +65,7 @@ EntityTreeModel &EntityModel::GetTreeModel()
 QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow)
 {
 	QList<EntityTreeItemData *> treeNodeList;
+	QList<QUuid> registerList;
 	for(auto *pItem : projItemList)
 	{
 		EntityTreeItemData *pAddedItem = m_TreeModel.Cmd_InsertNewChild(pItem, "m_", iRow);
@@ -90,18 +73,22 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemDat
 			treeNodeList.push_back(pAddedItem);
 		else
 			HyGuiLog("EntityModel::Cmd_AddNewChildren could not insert a child: " % pItem->GetName(true), LOGTYPE_Error);
+
+		registerList.push_back(pItem->GetUuid());
 	}
 
-	m_ItemRef.GetProject().RegisterItems(&m_ItemRef, projItemList);
+	m_ItemRef.GetProject().RegisterItems(GetUuid(), registerList);
 	
 	return treeNodeList;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddNewChild(ProjectItemData *pProjItemDataToRegister, QJsonObject initObj, int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddNewChild(QJsonObject initObj, int iRow)
 {
 	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewChild(initObj, iRow);
-	if(pProjItemDataToRegister)
-		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItemDataToRegister);
+
+	QUuid uuidToRegister(initObj["itemUUID"].toString());
+	if(uuidToRegister.isNull() == false)
+		m_ItemRef.GetProject().RegisterItems(GetUuid(), QList<QUuid>() << uuidToRegister);
 
 	return pTreeItemData;
 }
@@ -111,21 +98,6 @@ EntityTreeItemData *EntityModel::Cmd_AddNewShape(EditorShape eShape, QString sDa
 	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewShape(eShape, sData, bIsPrimitive, "m_", iRow);
 	return pTreeItemData;
 }
-
-//EntityTreeItemData *EntityModel::Cmd_AddNewPrimitive(int iRow)
-//{
-//	//EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewPrimitive(initObj, iRow);
-//	//if(pProjItemData)
-//	//	m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItemData);
-//
-//	//return pTreeItemData;
-//	return nullptr;
-//}
-//
-//EntityTreeItemData *EntityModel::Cmd_AddNewShape()
-//{
-//	return nullptr;
-//}
 
 void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList)
 {
@@ -152,9 +124,7 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 	if(iRow < 0)
 		return iRow;
 
-	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pItem->GetItemUuid());
-	if(pProjItem)
-		m_ItemRef.GetProject().RelinquishItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItem);
+	m_ItemRef.GetProject().RelinquishItems(GetUuid(), QList<QUuid>() << pItem->GetItemUuid());
 
 	return iRow;
 }
@@ -164,36 +134,9 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 	if(m_TreeModel.Cmd_InsertChild(pNodeItem, iRow) == false)
 		return false;
 
-	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pNodeItem->GetItemUuid());
-	if(pProjItem)
-		m_ItemRef.GetProject().RegisterItems(&m_ItemRef, QList<ProjectItemData *>() << pProjItem);
+	m_ItemRef.GetProject().RegisterItems(GetUuid(), QList<QUuid>() << pNodeItem->GetItemUuid());
 
 	return true;
-}
-
-void EntityModel::Cmd_SetVertexEditMode(bool bEnabled)
-{
-	m_bVertexEditMode = bEnabled;
-
-	EntityWidget *pEntityWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-
-	if(bEnabled)
-	{
-		MainWindow::SetStatus("Vertex Edit Mode", 0);
-		if(pEntityWidget)
-			pEntityWidget->SetVertexEditMode(true);
-		if(pEntityDraw)
-			pEntityDraw->SetVertexEditMode(true);
-	}
-	else
-	{
-		MainWindow::ClearStatus();
-		if(pEntityWidget)
-			pEntityWidget->SetVertexEditMode(false);
-		if(pEntityDraw)
-			pEntityDraw->SetVertexEditMode(false);
-	}
 }
 
 /*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) /*override*/
@@ -210,7 +153,6 @@ void EntityModel::Cmd_SetVertexEditMode(bool bEnabled)
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	itemSpecificFileDataOut.m_Meta.insert("vertexEditMode", m_bVertexEditMode);
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetEntityTreeItemData()->GetCodeName());
 	itemSpecificFileDataOut.m_Meta.insert("entityType", m_EntityTypeMapper.GetCurrentItem());
 	

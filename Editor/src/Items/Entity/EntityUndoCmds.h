@@ -117,14 +117,17 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_ToggleVertexManip : public QUndoCommand
+class EntityUndoCmd_ShapeData : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	bool							m_bEnable;
+	EntityTreeItemData *			m_pShapeItemData;
+	ShapeCtrl::VertexEditType		m_eEditType;
+	QString							m_sNewData;
+	QString							m_sPrevData;
 
 public:
-	EntityUndoCmd_ToggleVertexManip(ProjectItemData &entityItemRef, bool bEnable, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_ToggleVertexManip();
+	EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, ShapeCtrl::VertexEditType eEditType, QString sNewData, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_ShapeData();
 
 	virtual void redo() override;
 	virtual void undo() override;

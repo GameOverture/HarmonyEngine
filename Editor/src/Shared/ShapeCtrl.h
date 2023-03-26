@@ -15,6 +15,15 @@
 
 class ShapeCtrl : public HyEntity2d
 {
+public:
+	enum VertexEditType
+	{
+		EDIT_Add = 0,
+		EDIT_Remove,
+		EDIT_Translate
+	};
+
+protected:
 	EditorShape					m_eShape;
 
 	HyPrimitive2d				m_BoundingVolume;	// Uses world/camera coordinates
@@ -28,9 +37,7 @@ public:
 	virtual ~ShapeCtrl();
 
 	EditorShape GetShapeType() const;
-	void SetShapeType(EditorShape eShape);
-
-	void SetTint(HyColor color);
+	void Setup(EditorShape eShape, HyColor color, float fBvAlpha, float fOutlineAlpha); // Alphas of 0.0f just get their SetVisible(false)
 
 	HyPrimitive2d &GetPrimitive(bool bWorldSpace);
 

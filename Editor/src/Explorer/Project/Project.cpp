@@ -88,7 +88,8 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	m_pAudioWidget(nullptr),
 	m_pTabBar(nullptr),
 	m_pCurOpenItem(nullptr),
-	m_bHasError(false)
+	m_bHasError(false),
+	m_bExplorerModelLoaded(false)
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Parse/Load .hyproj file
@@ -282,6 +283,8 @@ void Project::LoadExplorerModel()
 	//		MainWindow::GetExplorerModel().PasteItemSrc(sContents, MainWindow::GetExplorerModel().FindIndex<ExplorerItemData *>(this, 0));
 	//	}
 	//}
+
+	m_bExplorerModelLoaded = true;
 }
 
 QJsonObject Project::ReadProjFile()
@@ -920,45 +923,51 @@ void Project::SaveUserData() const
 	settings.endGroup();
 }
 
-QList<ProjectItemData *> Project::RegisterItemsById(ProjectItemData *pItemOwner, QList<QUuid> requestList)
+void Project::RegisterItems(QUuid uuidItemOwner, QList<QUuid> requestList)
 {
-	QList<ProjectItemData *> itemList;
-	for(auto uuid : requestList)
-		itemList.append(MainWindow::GetExplorerModel().FindByUuid(uuid));
-
-	return RegisterItems(pItemOwner, itemList);
-}
-
-QList<ProjectItemData *> Project::RegisterItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList)
-{
-	for(auto item : requestList)
+	for(QUuid uuid : requestList)
 	{
-		if(m_ItemOwnerMap.contains(item) == false)
-			m_ItemOwnerMap[item] = QSet<ProjectItemData *>();
-
-		m_ItemOwnerMap[item].insert(pItemOwner);
+		if(m_ItemLinksMap.contains(uuid) == false)
+			m_ItemLinksMap[uuid] = QSet<QUuid>();
+		
+		m_ItemLinksMap[uuid].insert(uuidItemOwner);
 	}
-
-	return requestList;
 }
 
-void Project::RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> relinquishList)
+void Project::RelinquishItems(QUuid uuidItemOwner, QList<QUuid> relinquishList)
 {
-	for(auto item : relinquishList)
+	for(QUuid uuid : relinquishList)
 	{
-		if(m_ItemOwnerMap.contains(item) == false)
+		if(m_ItemLinksMap.contains(uuid) == false)
 			continue;
 
-		m_ItemOwnerMap[item].remove(pItemOwner);
+		m_ItemLinksMap[uuid].remove(uuidItemOwner);
 	}
 }
 
-QList<ProjectItemData *> Project::GetItemOwners(ProjectItemData *pItem)
+QList<ProjectItemData *> Project::GetItemLinks(ProjectItemData *pItem)
 {
-	if(m_ItemOwnerMap.contains(pItem) == false)
-		return QList<ProjectItemData *>();
+	QList<ProjectItemData *> returnList;
 
-	return m_ItemOwnerMap[pItem].values();
+	if(m_bExplorerModelLoaded == false)
+	{
+		HyGuiLog("Project::GetItemLinks was invoked before this project's explorer model was loaded", LOGTYPE_Error);
+		return returnList;
+	}
+
+	QUuid itemUuid = pItem->GetUuid();
+	if(m_ItemLinksMap.contains(itemUuid) == false)
+		return returnList;
+
+	QList<QUuid> itemLinksList = m_ItemLinksMap[itemUuid].values();
+	for(QUuid uuid : itemLinksList)
+	{
+		ProjectItemData *pProjItemData = MainWindow::GetExplorerModel().FindByUuid(uuid);
+		if(pProjItemData)
+			returnList.append(pProjItemData);
+	}
+
+	return returnList;
 }
 
 void Project::OpenTab(ProjectItemData *pItem)

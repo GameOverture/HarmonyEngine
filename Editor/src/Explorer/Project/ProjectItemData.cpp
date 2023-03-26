@@ -196,6 +196,11 @@ void ProjectItemData::GetLatestFileData(FileDataPair &itemFileDataOut) const
 	m_pModel->InsertItemSpecificData(itemFileDataOut);
 }
 
+void ProjectItemData::GetSavedFileData(FileDataPair &itemFileDataOut) const
+{
+	itemFileDataOut = m_ItemFileData;
+}
+
 bool ProjectItemData::Save(bool bWriteToDisk)
 {
 	if(m_pModel->OnPrepSave() == false)

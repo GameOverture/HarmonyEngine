@@ -169,8 +169,9 @@ void EntityDraw::OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataL
 			HyGuiLog("EntityDraw::OnSelectionChange() could not find matching EntityItemDraw for a selected item: " % pTreeItemData->GetCodeName(), LOGTYPE_Error);
 	}
 	
+	bool bOneSelected = m_SelectedItemList.size() == 1;
 	for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
-		pSelectedItemDraw->ShowTransformCtrl(m_SelectedItemList.size() == 1);
+		pSelectedItemDraw->ShowTransformCtrl(bOneSelected);
 
 	RefreshTransforms();
 }
@@ -232,28 +233,18 @@ void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
 	m_eDragState = DRAGSTATE_None;
 
 	m_eShapeEditState = bAsPrimitive ? SHAPESTATE_DragAddPrimitive : SHAPESTATE_DragAddShape;
-	m_DragShape.SetShapeType(eShape);
-	m_DragShape.GetPrimitive(true).alpha.Set(1.0f);
-	if(bAsPrimitive)
-		m_DragShape.SetTint(HyColor::DarkMagenta);
-	else
-		m_DragShape.SetTint(HyColor::Cyan);
+	m_DragShape.Setup(eShape, bAsPrimitive ? HyColor::DarkMagenta : HyColor::Cyan, 1.0f, 1.0f);
 	
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 }
 
-void EntityDraw::SetVertexEditMode(bool bEnable)
+void EntityDraw::SetShapeEditVertex()
 {
-	if(bEnable)
-	{
-		m_eDragState = DRAGSTATE_None;
+	m_eDragState = DRAGSTATE_None;
 
-		m_eShapeEditState = SHAPESTATE_VertexEditMode;
+	m_eShapeEditState = SHAPESTATE_VertexEditMode;
 
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
-	}
-	else
-		ClearShapeEdit();
+	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
 void EntityDraw::ClearShapeEdit()
@@ -261,12 +252,10 @@ void EntityDraw::ClearShapeEdit()
 	m_eDragState = DRAGSTATE_None;
 
 	m_eShapeEditState = SHAPESTATE_None;
-	m_DragShape.SetShapeType(SHAPE_None);
-	m_DragShape.GetPrimitive(true).alpha.Set(1.0f);
-	m_DragShape.SetTint(HyColor::White);
+	m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
-	pWidget->OnNewShapeFinished();
+	pWidget->OnDrawShapeEditFinished();
 
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
@@ -421,10 +410,7 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 		glm::vec2 ptCurMousePos;
 		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 		
-		m_DragShape.SetShapeType(SHAPE_Box);
-		m_DragShape.GetPrimitive(true).alpha.Set(0.25f);
-		m_DragShape.SetTint(HyColor::Blue.Lighten());
-
+		m_DragShape.Setup(SHAPE_Box, HyColor::Blue.Lighten(), 0.25f, 1.0f);
 		m_DragShape.SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
 	}
 	else if(m_eDragState == DRAGSTATE_Pending)
@@ -547,9 +533,7 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 				affectedItemList << pItem;
 		}
 
-		m_DragShape.SetShapeType(SHAPE_None);
-		m_DragShape.GetPrimitive(true).alpha.Set(1.0f);
-		m_DragShape.SetTint(HyColor::White);
+		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
 	}
 	else if(m_pCurHoverItem) // This covers the resolution of "Special Case" in EntityDraw::DoMousePress_Select
 		affectedItemList << m_pCurHoverItem;
@@ -890,7 +874,7 @@ void EntityDraw::DoMouseRelease_ShapeEdit()
 														   -1);
 		m_pProjItem->GetUndoStack()->push(pCmd);
 
-		m_DragShape.SetShapeType(SHAPE_None);
+		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
 	}
 }
 

@@ -203,6 +203,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	m_LoadingBar.reset();
 	statusBar()->addWidget(&m_LoadingMsg);
 	statusBar()->addWidget(&m_LoadingBar);
+	m_LoadingBar.setVisible(false);
 
 	//QPixmap *pPixmap = new QPixmap(":/icons16x16/smiley-sad.gif");
 	//QLabel *pSvnStatusIcon = new QLabel;
@@ -345,6 +346,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 /*static*/ void MainWindow::ClearLoading()
 {
 	sm_pInstance->statusBar()->showMessage("Loading Complete", 2000);
+	sm_pInstance->m_LoadingBar.setVisible(false);
 
 	for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
 		sm_pInstance->m_LoadingSpinnerList[i]->stop();

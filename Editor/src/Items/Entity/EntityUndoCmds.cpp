@@ -236,23 +236,37 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_ToggleVertexManip::EntityUndoCmd_ToggleVertexManip(ProjectItemData &entityItemRef, bool bEnable, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, ShapeCtrl::VertexEditType eEditType, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_bEnable(bEnable)
+	m_pShapeItemData(pShapeItemData),
+	m_eEditType(eEditType),
+	m_sNewData(sNewData),
+	m_sPrevData(m_pShapeItemData->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString())
 {
-	setText(QString("Toggle Vertex Edit Mode ") % (m_bEnable ? "On" : "Off"));
+	switch(m_eEditType)
+	{
+	case ShapeCtrl::EDIT_Add:
+		setText("Add Vertex to shape");
+		break;
+	case ShapeCtrl::EDIT_Remove:
+		setText("Remove Vertex from shape");
+		break;
+	case ShapeCtrl::EDIT_Translate:
+		setText("Move Vertex on shape");
+		break;
+	}
 }
 
-/*virtual*/ EntityUndoCmd_ToggleVertexManip::~EntityUndoCmd_ToggleVertexManip()
+/*virtual*/ EntityUndoCmd_ShapeData::~EntityUndoCmd_ShapeData()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_ToggleVertexManip::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_ShapeData::redo() /*override*/
 {
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SetVertexEditMode(m_bEnable);
+	m_pShapeItemData->GetPropertiesModel().SetPropertyValue("Shape", "Data", m_sNewData);
 }
 
-/*virtual*/ void EntityUndoCmd_ToggleVertexManip::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_ShapeData::undo() /*override*/
 {
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SetVertexEditMode(!m_bEnable);
+	m_pShapeItemData->GetPropertiesModel().SetPropertyValue("Shape", "Data", m_sPrevData);
 }

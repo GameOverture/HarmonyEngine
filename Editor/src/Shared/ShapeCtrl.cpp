@@ -31,7 +31,7 @@ EditorShape ShapeCtrl::GetShapeType() const
 	return m_eShape;
 }
 
-void ShapeCtrl::SetShapeType(EditorShape eShape)
+void ShapeCtrl::Setup(EditorShape eShape, HyColor color, float fBvAlpha, float fOutlineAlpha)
 {
 	if(eShape == SHAPE_None)
 	{
@@ -42,12 +42,15 @@ void ShapeCtrl::SetShapeType(EditorShape eShape)
 		ConvertTo(eShape);
 
 	m_eShape = eShape;
-}
 
-void ShapeCtrl::SetTint(HyColor color)
-{
 	m_BoundingVolume.SetTint(color);
 	m_Outline.SetTint(color);
+
+	m_BoundingVolume.SetVisible(fBvAlpha != 0.0f);
+	m_BoundingVolume.alpha.Set(fBvAlpha);
+	
+	m_Outline.SetVisible(fOutlineAlpha != 0.0f);
+	m_Outline.alpha.Set(fOutlineAlpha);
 }
 
 HyPrimitive2d &ShapeCtrl::GetPrimitive(bool bWorldSpace)
@@ -292,6 +295,8 @@ void ShapeCtrl::RefreshTransform(HyCamera2d *pCamera)
 			pCamera->ProjectToCamera(ptCameraPos, ptCameraPos);
 			vertList.push_back(ptCameraPos);
 		}
+
+		
 
 		m_Outline.SetAsPolygon(vertList);
 		break; }
