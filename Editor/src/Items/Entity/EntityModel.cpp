@@ -46,6 +46,13 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		QJsonObject childObj = childArray[i].toObject();
 		Cmd_AddNewChild(childObj, i);
 	}
+
+	QJsonArray shapeArray = itemFileDataRef.m_Meta["shapeList"].toArray();
+	for(int i = 0; i < shapeArray.size(); ++i)
+	{
+		QJsonObject shapeObj = shapeArray[i].toObject();
+		Cmd_AddNewChild(shapeObj, i);
+	}
 }
 
 /*virtual*/ EntityModel::~EntityModel()
@@ -174,7 +181,7 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 	{
 		QJsonObject childObj;
 		pShape->InsertJsonInfo(childObj);
-		childArray.append(childObj);
+		shapeArray.append(childObj);
 	}	
 	itemSpecificFileDataOut.m_Meta.insert("shapeList", shapeArray);
 }

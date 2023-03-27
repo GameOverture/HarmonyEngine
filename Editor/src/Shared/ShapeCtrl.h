@@ -39,7 +39,7 @@ public:
 	EditorShape GetShapeType() const;
 	void Setup(EditorShape eShape, HyColor color, float fBvAlpha, float fOutlineAlpha); // Alphas of 0.0f just get their SetVisible(false)
 
-	HyPrimitive2d &GetPrimitive(bool bWorldSpace);
+	HyPrimitive2d &GetPrimitive();
 
 	void SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
 

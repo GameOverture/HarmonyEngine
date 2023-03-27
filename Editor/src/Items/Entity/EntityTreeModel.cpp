@@ -277,6 +277,19 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 			return pCurItem;
 	}
 
+
+	TreeModelItem *pThisShapeFolder = GetShapesFolderTreeItem();
+	for(int i = 0; i < pThisShapeFolder->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pCurShape = pThisShapeFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pCurShape == nullptr)
+			continue;
+
+		if(pCurShape->GetThisUuid() == uuid)
+			return pCurShape;
+	}
+
+
 	return nullptr;
 }
 
@@ -508,6 +521,28 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			else if(pProjItem && pProjItem->IsSaveClean() == false)
 				return QVariant(pItem->GetIcon(SUBICON_Dirty));
 
+			if(pItem->GetType() == ITEM_Primitive || pItem->GetType() == ITEM_Shape)
+			{
+				QIcon icon;
+				QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_Primitive ? "primitive_" : "shapes_");
+				switch(HyGlobal::GetShapeFromString(pItem->GetPropertiesModel().FindPropertyValue("Shape", "Type").toString()))
+				{
+				default:
+				case SHAPE_None:
+					return QVariant();
+					
+				case SHAPE_Box:			sIconUrl += "box.png"; break;
+				case SHAPE_Circle:		sIconUrl += "circle.png"; break;
+				case SHAPE_Polygon:		sIconUrl += "polygon.png"; break;
+				case SHAPE_LineSegment:	sIconUrl += "lineSeg.png"; break;
+				case SHAPE_LineChain:	sIconUrl += "lineChain.png"; break;
+				case SHAPE_LineLoop:	sIconUrl += "lineLoop.png"; break;
+				}
+
+				icon.addFile(sIconUrl);
+				return QVariant(icon);
+			}
+			
 			return QVariant(pItem->GetIcon(SUBICON_None));
 		}
 		else

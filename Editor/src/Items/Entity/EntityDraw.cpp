@@ -117,7 +117,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			DoMouseRelease_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 		}
 		else // DRAGSTATE_Transforming
-			DoMouseRelease_Transform(/*pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier)*/);
+			DoMouseRelease_Transform();
 	}
 
 	m_eDragState = DRAGSTATE_None;
@@ -303,12 +303,7 @@ void EntityDraw::ClearShapeEdit()
 			staleItemList.removeOne(pItemWidget);
 
 		m_ItemList.push_back(pItemWidget);
-
-		//if(pItemWidget->GetGuiType() != ITEM_Shape)
-			ChildAppend(*pItemWidget->GetHyNode());
-		//else
-		//	ShapeAppend(*pItemWidget->GetAsShape());
-		
+		ChildAppend(*pItemWidget->GetHyNode());
 		pItemWidget->RefreshJson(childObj, m_pCamera);
 	}
 	
@@ -523,7 +518,7 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 		else
 		{
 			HyShape2d tmpShape;
-			m_DragShape.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
+			m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
 			tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
 		}
 
@@ -645,7 +640,7 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 	case Qt::SizeAllCursor:		// Translating
 		if(bShiftMod)
 		{
-			glm::vec2 ptTarget = ptMousePos;// -m_ptDragStart;
+			glm::vec2 ptTarget = ptMousePos;
 			const glm::vec2 UNIT_VECTOR_LIST[] = {
 				glm::vec2(1, 1),
 				glm::vec2(1, 0),
@@ -801,10 +796,7 @@ void EntityDraw::DoMouseRelease_Transform()
 	QList<glm::mat4> newTransformList;
 	for(EntityDrawItem *pDrawItem : m_SelectedItemList)
 	{
-		//if(pDrawItem->GetGuiType() != ITEM_Shape)
-			newTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
-		//else
-		//	newTransformList.push_back(m_ActiveTransform.GetSceneTransform(0.0f));
+		newTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
 
 		EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetThisUuid());;
 		treeItemDataList.push_back(pTreeItemData);

@@ -208,11 +208,20 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
 		glm::decompose(m_NewTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
-
 		double dRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
-		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
-		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
-		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+
+		if(m_AffectedItemDataList[i]->GetType() != ITEM_Shape)
+		{
+			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
+			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
+			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+		}
+		else
+		{
+			QString sCurData = m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString();
+			//ShapeCtrl::CalcTransform(sCurData, m_NewTransformList[i]);
+			//m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Shape", "Data", sTransformedData);
+		}
 	}
 }
 

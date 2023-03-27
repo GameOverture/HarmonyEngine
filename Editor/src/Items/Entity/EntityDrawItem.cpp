@@ -31,7 +31,6 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 	case ITEM_Spine:			m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Sprite:			m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 
-
 	case ITEM_AtlasImage:		//m_pChild = new HyTexturedQuad2d();
 	case ITEM_Entity:
 	default:
@@ -69,10 +68,8 @@ const QUuid &EntityDrawItem::GetItemUuid() const
 
 IHyLoadable2d *EntityDrawItem::GetHyNode()
 {
-	if(m_eGuiType == ITEM_Primitive)
-		return static_cast<IHyLoadable2d *>(&m_ShapeCtrl.GetPrimitive(true));
-	else if(m_eGuiType == ITEM_Shape)
-		return static_cast<IHyLoadable2d *>(&m_ShapeCtrl.GetPrimitive(false));
+	if(m_eGuiType == ITEM_Primitive || m_eGuiType == ITEM_Shape)
+		return &m_ShapeCtrl.GetPrimitive();
 
 	return m_pChild;
 }
@@ -217,8 +214,7 @@ void EntityDrawItem::RefreshOverrideData()
 		switch(m_eGuiType)
 		{
 		case ITEM_Text:
-			static_cast<HyText2d *>(m_pChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject(), false);
-			//static_cast<HyText2d *>(m_pChild)->GetShaderUniforms().SetTexHandle(0, m_hTexture);
+			static_cast<HyText2d *>(m_pChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject(), false); // The 'false' here has it so HyTextData loads the atlas as it would normally
 			break;
 
 		case ITEM_Spine:
