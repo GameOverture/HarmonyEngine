@@ -42,7 +42,7 @@ public:
 
 	void SetShapeEditDrag(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive);
 	void SetShapeEditVertex(bool bEnable);
-	void OnDrawShapeEditFinished();
+	void ClearShapeEdit();
 
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;

@@ -80,6 +80,7 @@ public:
 
 	void SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive);
 	void SetShapeEditVertex();
+	void RequestClearShapeEdit();
 	void ClearShapeEdit();
 
 protected:

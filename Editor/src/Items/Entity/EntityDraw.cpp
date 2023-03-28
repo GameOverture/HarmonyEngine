@@ -40,7 +40,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 /*virtual*/ void EntityDraw::OnUndoStackIndexChanged(int iIndex) /*override*/
 {
 	if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
-		ClearShapeEdit();
+		RequestClearShapeEdit();
 }
 
 /*virtual*/ void EntityDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
@@ -98,7 +98,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	else if(pEvent->button() == Qt::RightButton)
 	{
 		if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
-			ClearShapeEdit();
+			RequestClearShapeEdit();
 	}
 }
 
@@ -200,15 +200,17 @@ void EntityDraw::SetShapeEditVertex()
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
+void EntityDraw::RequestClearShapeEdit()
+{
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
+	pWidget->ClearShapeEdit();
+}
+
 void EntityDraw::ClearShapeEdit()
 {
 	m_eDragState = DRAGSTATE_None;
-
 	m_eShapeEditState = SHAPESTATE_None;
 	m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
-
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
-	pWidget->OnDrawShapeEditFinished();
 
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }

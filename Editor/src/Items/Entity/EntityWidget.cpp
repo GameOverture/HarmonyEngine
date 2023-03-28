@@ -290,12 +290,29 @@ void EntityWidget::SetShapeEditDrag(QToolButton *pBtn, QString sStatusMsg, Edito
 		pEntDraw->SetShapeEditDrag(eShapeType, bAsPrimitive);
 }
 
-void EntityWidget::OnDrawShapeEditFinished()
+void EntityWidget::SetShapeEditVertex(bool bEnable)
 {
-	MainWindow::ClearStatus();
+	ClearShapeEdit();
+	ui->btnVertexEditMode->setChecked(bEnable);
 
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntityDraw)
+	{
+		if(bEnable)
+			pEntityDraw->SetShapeEditVertex();
+		else
+			pEntityDraw->ClearShapeEdit();
+	}
+}
+
+void EntityWidget::ClearShapeEdit()
+{
 	for(QAction *pAction : m_AddShapeActionGroup.actions())
 		pAction->setChecked(false);
+
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntityDraw)
+		pEntityDraw->ClearShapeEdit();
 }
 
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/
@@ -460,21 +477,7 @@ void EntityWidget::on_actionAddLineLoopShape_triggered()
 
 void EntityWidget::on_actionVertexEditMode_toggled(bool bChecked)
 {
-	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(bChecked)
-	{
-		OnDrawShapeEditFinished(); // Clear all button checks
-
-		MainWindow::SetStatus("Vertex Edit Mode", 0);
-		if(pEntityDraw)
-			pEntityDraw->SetShapeEditVertex();
-	}
-	else
-	{
-		OnDrawShapeEditFinished();
-		if(pEntityDraw)
-			pEntityDraw->ClearShapeEdit();
-	}
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetVemMode(bChecked);
 }
 
 void EntityWidget::on_actionOrderChildrenUp_triggered()
