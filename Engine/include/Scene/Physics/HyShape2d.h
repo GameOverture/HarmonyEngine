@@ -16,11 +16,10 @@ enum HyShapeType
 {
 	HYSHAPE_Nothing = -1,
 
-	HYSHAPE_LineSegment = 0,
-	HYSHAPE_LineChain,
-	HYSHAPE_LineLoop,
-	HYSHAPE_Circle,
+	HYSHAPE_Circle = 0,
+	HYSHAPE_LineSegment,
 	HYSHAPE_Polygon,
+	HYSHAPE_LineChain,
 
 	HYNUM_SHAPE
 };

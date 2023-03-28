@@ -61,6 +61,11 @@ PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
 	return m_PropertiesTreeModel;
 }
 
+bool EntityTreeItemData::IsSelected() const
+{
+	return m_bIsSelected;
+}
+
 void EntityTreeItemData::SetSelected(bool bIsSelected)
 {
 	m_bIsSelected = bIsSelected;

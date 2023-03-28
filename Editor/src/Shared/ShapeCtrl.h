@@ -13,7 +13,7 @@
 #include "Global.h"
 #include "TransformCtrl.h"
 
-class ShapeCtrl : public HyEntity2d
+class ShapeCtrl
 {
 public:
 	enum VertexEditType
@@ -30,10 +30,11 @@ protected:
 	HyPrimitive2d				m_Outline;			// Uses window coordinates (unaffected by zoom)
 
 	QList<float>				m_DeserializedFloatList;
-	QList<GrabPoint *>			m_GrabPointList;
+	//QList<GrabPoint *>			m_GrabPointList;
 
 public:
-	ShapeCtrl(HyEntity2d *pParent);
+	ShapeCtrl();
+	ShapeCtrl(const ShapeCtrl &copyRef);
 	virtual ~ShapeCtrl();
 
 	EditorShape GetShapeType() const;
@@ -46,7 +47,10 @@ public:
 	QString Serialize();
 	void Deserialize(QString sData, HyCamera2d *pCamera);
 
-	void RefreshTransform(HyCamera2d *pCamera);
+	void TransformSelf(glm::mat4 mtxTransform, HyCamera2d *pCamera);
+	//void SetOutline(HyShape2d boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera);
+
+	void RefreshOutline(HyCamera2d *pCamera);
 
 protected:
 	void ConvertTo(EditorShape eShape);

@@ -38,6 +38,7 @@ public:
 	QUuid GetItemUuid() const;
 	PropertiesTreeModel &GetPropertiesModel();
 
+	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
 
 	void InsertJsonInfo(QJsonObject &childObjRef);

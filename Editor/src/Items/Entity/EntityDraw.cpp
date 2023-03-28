@@ -18,7 +18,7 @@
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
-	m_DragShape(this),
+	m_DragShape(),
 	m_MultiTransform(this),
 	m_fMultiTransformStartRot(0.0f),
 	m_pCurHoverItem(nullptr),
@@ -104,75 +104,28 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
-	IDraw::OnMouseReleaseEvent(pEvent);
-
-	if(m_eShapeEditState != SHAPESTATE_None)
-		DoMouseRelease_ShapeEdit();
-	else if(pEvent->button() == Qt::LeftButton)
+	if(m_bPanCameraKeyDown)
+		IDraw::OnMouseReleaseEvent(pEvent);
+	else
 	{
-		if(m_eDragState == DRAGSTATE_None ||
-			m_eDragState == DRAGSTATE_Marquee ||
-			m_eDragState == DRAGSTATE_Pending)
+		IDraw::OnMouseReleaseEvent(pEvent);
+
+		if(m_eShapeEditState != SHAPESTATE_None)
+			DoMouseRelease_ShapeEdit();
+		else if(pEvent->button() == Qt::LeftButton)
 		{
-			DoMouseRelease_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+			if(m_eDragState == DRAGSTATE_None ||
+				m_eDragState == DRAGSTATE_Marquee ||
+				m_eDragState == DRAGSTATE_Pending)
+			{
+				DoMouseRelease_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+			}
+			else // DRAGSTATE_Transforming
+				DoMouseRelease_Transform();
 		}
-		else // DRAGSTATE_Transforming
-			DoMouseRelease_Transform();
 	}
 
 	m_eDragState = DRAGSTATE_None;
-	RefreshTransforms();
-}
-
-void EntityDraw::OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList)
-{
-	for(EntityTreeItemData *pDeselectItem : deselectedItemDataList)
-	{
-		if(m_pProjItem->GetUuid() == pDeselectItem->GetItemUuid())
-			continue;
-
-		bool bFound = false;
-		for(EntityDrawItem *pDrawItem : m_ItemList)
-		{
-			if(pDrawItem->GetThisUuid() == pDeselectItem->GetThisUuid())
-			{
-				m_SelectedItemList.removeOne(pDrawItem);
-
-				pDrawItem->HideTransformCtrl();
-				bFound = true;
-				break;
-			}
-		}
-
-		if(bFound == false)
-			HyGuiLog("EntityDraw::OnSelectionChange() could not find matching EntityItemDraw to deselect item: " % pDeselectItem->GetCodeName(), LOGTYPE_Error);
-	}
-
-	for(EntityTreeItemData *pTreeItemData : selectedItemDataList)
-	{
-		if(m_pProjItem->GetUuid() == pTreeItemData->GetItemUuid())
-			continue;
-
-		// Search for the corresponding EntityItemDraw to the current 'pTreeItemData'
-		bool bFound = false;
-		for(EntityDrawItem *pDrawItem : m_ItemList)
-		{
-			if(pDrawItem->GetThisUuid() == pTreeItemData->GetThisUuid())
-			{
-				m_SelectedItemList.push_back(pDrawItem);
-				bFound = true;
-				break;
-			}
-		}
-
-		if(bFound == false)
-			HyGuiLog("EntityDraw::OnSelectionChange() could not find matching EntityItemDraw for a selected item: " % pTreeItemData->GetCodeName(), LOGTYPE_Error);
-	}
-	
-	bool bOneSelected = m_SelectedItemList.size() == 1;
-	for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
-		pSelectedItemDraw->ShowTransformCtrl(bOneSelected);
-
 	RefreshTransforms();
 }
 
@@ -194,7 +147,7 @@ void EntityDraw::RequestSelection(QList<EntityDrawItem *> selectionList)
 		return;
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
-	pWidget->RequestSelectedItems(uuidList);
+	pWidget->RequestSelectedItems(uuidList, true);
 }
 
 void EntityDraw::RefreshTransforms()
@@ -271,6 +224,7 @@ void EntityDraw::ClearShapeEdit()
 
 	QList<EntityDrawItem *> staleItemList(m_ItemList);
 	m_ItemList.clear();
+	m_SelectedItemList.clear();
 
 	QJsonArray childArray = itemMetaObj["childList"].toArray();
 	QJsonArray shapeArray = itemMetaObj["shapeList"].toArray();
@@ -280,10 +234,10 @@ void EntityDraw::ClearShapeEdit()
 	for(int32 i = 0; i < childArray.size(); ++i)
 	{
 		QJsonObject childObj = childArray[i].toObject();
-
 		HyGuiItemType eType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
 		QUuid uuid(childObj["UUID"].toString());
-		
+		bool bSelected = childObj["isSelected"].toBool();
+
 		EntityDrawItem *pItemWidget = nullptr;
 		for(EntityDrawItem *pStaleItem : staleItemList)
 		{
@@ -293,7 +247,6 @@ void EntityDraw::ClearShapeEdit()
 				break;
 			}
 		}
-
 		if(pItemWidget == nullptr)
 		{
 			QUuid itemUuid(childObj["itemUUID"].toString());
@@ -304,6 +257,12 @@ void EntityDraw::ClearShapeEdit()
 
 		m_ItemList.push_back(pItemWidget);
 		ChildAppend(*pItemWidget->GetHyNode());
+
+		if(bSelected)
+			m_SelectedItemList.push_back(pItemWidget);
+		else
+			pItemWidget->HideTransformCtrl();
+
 		pItemWidget->RefreshJson(childObj, m_pCamera);
 	}
 	
@@ -311,6 +270,10 @@ void EntityDraw::ClearShapeEdit()
 	for(auto pStaleItem : staleItemList)
 		delete pStaleItem;
 	staleItemList.clear();
+
+	bool bShowGrabPoints = m_SelectedItemList.size() == 1;
+	for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
+		pSelectedItemDraw->ShowTransformCtrl(bShowGrabPoints);
 
 	RefreshTransforms();
 }
@@ -513,9 +476,9 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 	if(m_eDragState == DRAGSTATE_Marquee)
 	{
 		b2AABB marqueeAabb;
-		if(m_DragShape.IsVisible() == false)
-			marqueeAabb.lowerBound.x = marqueeAabb.lowerBound.y = marqueeAabb.upperBound.x = marqueeAabb.upperBound.y = 0.0f;
-		else
+		//if(m_DragShape.IsVisible() == false)
+		//	marqueeAabb.lowerBound.x = marqueeAabb.lowerBound.y = marqueeAabb.upperBound.x = marqueeAabb.upperBound.y = 0.0f;
+		//else
 		{
 			HyShape2d tmpShape;
 			m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
@@ -786,6 +749,15 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 	default:
 		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 	}
+
+	//for(EntityDrawItem *pSelectedItem : m_SelectedItemList)
+	//{
+	//	if(pSelectedItem->GetGuiType() == ITEM_Shape)
+	//	{
+	//		pSelectedItem->GetShapeCtrl().Serialize() SetOutline(boundingShape, mtxShapeTransform, pCamera);
+	//	}
+	//}
+
 
 	RefreshTransforms();
 }

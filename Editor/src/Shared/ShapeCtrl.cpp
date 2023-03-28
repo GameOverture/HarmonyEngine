@@ -10,16 +10,24 @@
 #include "Global.h"
 #include "ShapeCtrl.h"
 
-ShapeCtrl::ShapeCtrl(HyEntity2d *pParent) :
-	HyEntity2d(pParent),
+ShapeCtrl::ShapeCtrl() :
 	m_eShape(SHAPE_None),
-	m_BoundingVolume(this),
-	m_Outline(this)
+	m_BoundingVolume(nullptr),
+	m_Outline(nullptr)
 {
+	m_BoundingVolume.SetVisible(false);
+
 	m_Outline.UseWindowCoordinates();
 	m_Outline.SetWireframe(true);
+	m_Outline.SetVisible(false);
+}
 
-	SetVisible(false);
+ShapeCtrl::ShapeCtrl(const ShapeCtrl &copyRef) :
+	m_eShape(copyRef.m_eShape),
+	m_BoundingVolume(copyRef.m_BoundingVolume),
+	m_Outline(copyRef.m_Outline),
+	m_DeserializedFloatList(copyRef.m_DeserializedFloatList)
+{
 }
 
 /*virtual*/ ShapeCtrl::~ShapeCtrl()
@@ -76,7 +84,7 @@ HyPrimitive2d &ShapeCtrl::GetPrimitive()
 
 void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
 {
-	SetVisible(true);
+	//SetVisible(true);
 
 	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
 	if(bShiftMod)
@@ -287,15 +295,25 @@ void ShapeCtrl::Deserialize(QString sData, HyCamera2d *pCamera)
 		break; }
 	}
 
-	RefreshTransform(pCamera);
+	RefreshOutline(pCamera);
 }
 
-void ShapeCtrl::RefreshTransform(HyCamera2d *pCamera)
+void ShapeCtrl::TransformSelf(glm::mat4 mtxTransform, HyCamera2d *pCamera)
 {
-	if(m_DeserializedFloatList.empty())
+	HyShape2d shape;
+	m_BoundingVolume.CalcLocalBoundingShape(shape);
+	shape.TransformSelf(mtxTransform);
+	m_BoundingVolume.SetAsShape(shape);
+
+	RefreshOutline(pCamera);
+}
+
+void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
+{
+	if(m_DeserializedFloatList.empty() || pCamera == nullptr)
 		return;
 
-	SetVisible(true);
+	//SetVisible(true);
 
 	switch(m_eShape)
 	{
@@ -311,8 +329,6 @@ void ShapeCtrl::RefreshTransform(HyCamera2d *pCamera)
 			pCamera->ProjectToCamera(ptCameraPos, ptCameraPos);
 			vertList.push_back(ptCameraPos);
 		}
-
-		
 
 		m_Outline.SetAsPolygon(vertList);
 		break; }

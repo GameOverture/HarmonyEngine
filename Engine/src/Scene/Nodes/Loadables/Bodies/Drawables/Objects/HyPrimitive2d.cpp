@@ -310,16 +310,15 @@ void HyPrimitive2d::AssembleData()
 		AssembleLineChain(pointList.data(), 2);
 		break; }
 
-	case HYSHAPE_LineLoop:
-	case HYSHAPE_LineChain: {
+	case HYSHAPE_LineChain:
 		AssembleLineChain(static_cast<const b2ChainShape *>(pb2Shape)->m_vertices, static_cast<const b2ChainShape *>(pb2Shape)->m_count);
-		break; }
+		break;
 
 	case HYSHAPE_Circle:
 		AssembleCircle(glm::vec2(static_cast<const b2CircleShape *>(pb2Shape)->m_p.x, static_cast<const b2CircleShape *>(pb2Shape)->m_p.y), pb2Shape->m_radius, m_uiNumSegments);
 		break;
 
-	case HYSHAPE_Polygon: {
+	case HYSHAPE_Polygon:
 		if(m_bWireframe)
 		{
 			int32 iNumVerts = static_cast<const b2PolygonShape *>(pb2Shape)->m_count;
@@ -336,7 +335,7 @@ void HyPrimitive2d::AssembleData()
 		}
 		else
 			AssemblePolygon(static_cast<const b2PolygonShape *>(pb2Shape)->m_vertices, static_cast<const b2PolygonShape *>(pb2Shape)->m_count);
-		break; }
+		break;
 
 	default:
 		HyLogError("HyPrimitive2d::AssembleData() - Unknown shape type: " << m_Shape.GetType());

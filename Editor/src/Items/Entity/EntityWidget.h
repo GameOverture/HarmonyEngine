@@ -26,6 +26,7 @@ class EntityWidget : public IWidget
 	Q_OBJECT
 
 	QActionGroup		m_AddShapeActionGroup;
+	bool				m_bAllowSelectionUndoCmd;
 
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
@@ -36,10 +37,11 @@ public:
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
 	QList<EntityTreeItemData *> GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes);
-	void RequestSelectedItems(QList<QUuid> uuidList); // Calls signal
+	void RequestSelectedItems(QList<QUuid> uuidList, bool bInvokeSignalCallback); // Will clear and select only what 'uuidList' contains. Will optionally invoke signal callback that pushes an UndoCmd on the stack for selection
 	void SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList); // This catches all cases when selection occurs. Does not call signal
 
-	void OnDrawShapeEdit(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive);
+	void SetShapeEditDrag(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive);
+	void SetShapeEditVertex(bool bEnable);
 	void OnDrawShapeEditFinished();
 
 protected:

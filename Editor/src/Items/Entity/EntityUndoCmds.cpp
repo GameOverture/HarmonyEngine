@@ -218,9 +218,14 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		}
 		else
 		{
-			QString sCurData = m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString();
-			//ShapeCtrl::CalcTransform(sCurData, m_NewTransformList[i]);
-			//m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Shape", "Data", sTransformedData);
+			HyColor color = HyColor::White;
+
+			ShapeCtrl shapeCtrl;
+			shapeCtrl.Setup(HyGlobal::GetShapeFromString(m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Type").toString()), color, 0.0f, 1.0f);
+			shapeCtrl.Deserialize(m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString(), nullptr);
+			shapeCtrl.TransformSelf(m_NewTransformList[i], nullptr);
+			
+			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Shape", "Data", shapeCtrl.Serialize());
 		}
 	}
 }

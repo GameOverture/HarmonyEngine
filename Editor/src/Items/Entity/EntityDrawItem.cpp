@@ -17,7 +17,7 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 	m_ItemUuid(itemUuid),
 	m_pChild(nullptr),
 	m_Transform(pParent),
-	m_ShapeCtrl(pParent)
+	m_ShapeCtrl()
 {
 	switch(m_eGuiType)
 	{
@@ -188,8 +188,7 @@ void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
 	ExtractTransform(boundingShape, mtxShapeTransform);
 
 	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
-
-	GetShapeCtrl().RefreshTransform(pCamera);
+	GetShapeCtrl().RefreshOutline(pCamera);
 }
 
 void EntityDrawItem::RefreshOverrideData()

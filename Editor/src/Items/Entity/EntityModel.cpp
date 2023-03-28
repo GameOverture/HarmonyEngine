@@ -103,6 +103,11 @@ EntityTreeItemData *EntityModel::Cmd_AddNewChild(QJsonObject initObj, int iRow)
 EntityTreeItemData *EntityModel::Cmd_AddNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, int iRow)
 {
 	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewShape(eShape, sData, bIsPrimitive, "m_", iRow);
+	
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << pTreeItemData->GetThisUuid(), false);
+
 	return pTreeItemData;
 }
 
@@ -113,9 +118,9 @@ void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList,
 	for(EntityTreeItemData *pTreeItem : deselectedList)
 		pTreeItem->SetSelected(false);
 
-	EntityDraw *pDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pDraw)
-		pDraw->OnSelectionChange(selectedList, deselectedList);
+	//EntityDraw *pDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	//if(pDraw)
+	//	pDraw->OnSelectionChange(selectedList, deselectedList);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
 	if(pWidget)

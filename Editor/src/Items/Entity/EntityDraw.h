@@ -73,7 +73,7 @@ public:
 	virtual void OnMousePressEvent(QMouseEvent *pEvent) override;
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
 
-	void OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList);
+	//void OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList);
 	void RequestSelection(QList<EntityDrawItem *> selectionList);
 
 	void RefreshTransforms();

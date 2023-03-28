@@ -20,7 +20,8 @@
 EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
 	ui(new Ui::EntityWidget),
-	m_AddShapeActionGroup(this)
+	m_AddShapeActionGroup(this),
+	m_bAllowSelectionUndoCmd(true)
 {
 	ui->setupUi(this);
 
@@ -76,7 +77,17 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	connect(ui->nodeTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection &)), this, SLOT(OnTreeSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
-	SetSelectedItems(QList<EntityTreeItemData *>(), QList<EntityTreeItemData *>());
+	// Initialize what items are selected in the model
+	QList<EntityTreeItemData *> childList, shapeList;
+	pEntityModel->GetTreeModel().GetTreeItemData(childList, shapeList);
+	childList += shapeList;
+	QList<EntityTreeItemData *> selectedItemsList;
+	for(EntityTreeItemData *pItem : childList)
+	{
+		if(pItem->IsSelected())
+			selectedItemsList.push_back(pItem);
+	}
+	SetSelectedItems(selectedItemsList, QList<EntityTreeItemData *>());
 }
 
 EntityWidget::~EntityWidget()
@@ -118,6 +129,7 @@ EntityWidget::~EntityWidget()
 	ui->actionAddChildren->setEnabled(bEnableAddNodeBtn);
 
 	// Manage currently selected items in the item tree
+	bool bEnableVemMode = false;
 	QList<EntityTreeItemData *> selectedItemDataList = GetSelectedItems(true, true);
 	if(selectedItemDataList.empty())
 	{
@@ -125,6 +137,8 @@ EntityWidget::~EntityWidget()
 		ui->lblSelectedItemText->setVisible(false);
 
 		ui->propertyTree->setModel(nullptr);
+
+		bEnableVemMode = false;
 	}
 	else
 	{
@@ -137,6 +151,8 @@ EntityWidget::~EntityWidget()
 
 			PropertiesTreeModel &propModelRef = selectedItemDataList[0]->GetPropertiesModel();
 			ui->propertyTree->setModel(&propModelRef);
+
+			bEnableVemMode = (selectedItemDataList[0]->GetType() == ITEM_Primitive || selectedItemDataList[0]->GetType() == ITEM_Shape);
 		}
 		else
 		{
@@ -145,6 +161,8 @@ EntityWidget::~EntityWidget()
 			ui->lblSelectedItemText->setText("Multiple items selected");
 
 			ui->propertyTree->setModel(nullptr);
+
+			bEnableVemMode = false;
 		}
 
 		// Expand the top level nodes (the properties' categories)
@@ -152,8 +170,15 @@ EntityWidget::~EntityWidget()
 		ui->propertyTree->resizeColumnToContents(0);
 	}
 
-	//if(m_ItemRef.GetDraw())
-	//	static_cast<EntityDraw *>(m_ItemRef.GetDraw())->On RefreshSelectedItems();
+	if(bEnableVemMode)
+		ui->actionVertexEditMode->setEnabled(true);
+	else
+	{
+		ui->actionVertexEditMode->setChecked(false);
+		ui->actionVertexEditMode->setEnabled(false);
+	}
+
+	ui->nodeTree->repaint();
 }
 
 /*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
@@ -200,8 +225,11 @@ QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEnti
 	return selectedItemList;
 }
 
-void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList)
+// Will clear and select only what 'uuidList' contains. Will optionally allow the signal callback to push an UndoCmd on the stack for selection
+void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList, bool bPushUndoCmd)
 {
+	m_bAllowSelectionUndoCmd = bPushUndoCmd;
+
 	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
 	QModelIndexList indexList = entityTreeModelRef.GetAllIndices();
 	
@@ -216,9 +244,9 @@ void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList)
 		}
 	}
 
-
 	QItemSelectionModel *pSelectionModel = ui->nodeTree->selectionModel();
 	pSelectionModel->select(*pItemSelection, QItemSelectionModel::ClearAndSelect);
+	
 	delete pItemSelection;
 }
 
@@ -247,21 +275,11 @@ void EntityWidget::SetSelectedItems(QList<EntityTreeItemData *> selectedList, QL
 	pSelectionModel->select(*pItemDeselection, QItemSelectionModel::Deselect);
 	pSelectionModel->blockSignals(false);
 	delete pItemSelection;
-
-
-	QList<EntityTreeItemData *> allSelectedItemsList = GetSelectedItems(true, true);
-	if(allSelectedItemsList.size() == 1 && (allSelectedItemsList[0]->GetType() == ITEM_Primitive || allSelectedItemsList[0]->GetType() == ITEM_Shape))
-		ui->actionVertexEditMode->setEnabled(true);
-	else
-	{
-		ui->actionVertexEditMode->setChecked(false);
-		ui->actionVertexEditMode->setEnabled(false);
-	}
-
-	ui->nodeTree->repaint();
+	
+	UpdateActions();
 }
 
-void EntityWidget::OnDrawShapeEdit(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive)
+void EntityWidget::SetShapeEditDrag(QToolButton *pBtn, QString sStatusMsg, EditorShape eShapeType, bool bAsPrimitive)
 {
 	MainWindow::SetStatus(sStatusMsg, 0);
 	
@@ -348,7 +366,13 @@ void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const 
 			deselectedItemDataList.push_back(pCurItemData);
 	}
 
-	m_ItemRef.GetUndoStack()->push(new EntityUndoCmd_SelectionChanged(m_ItemRef, selectedItemDataList, deselectedItemDataList));
+	if(m_bAllowSelectionUndoCmd)
+		m_ItemRef.GetUndoStack()->push(new EntityUndoCmd_SelectionChanged(m_ItemRef, selectedItemDataList, deselectedItemDataList)); 
+	else
+	{
+		static_cast<EntityModel *>(m_ItemRef.GetModel())->Cmd_SelectionChanged(selectedItemDataList, deselectedItemDataList);
+		m_bAllowSelectionUndoCmd = true; // Only block UndoCmd once
+	}
 }
 
 void EntityWidget::on_actionAddChildren_triggered()
@@ -376,62 +400,62 @@ void EntityWidget::on_actionAddChildren_triggered()
 
 void EntityWidget::on_actionAddBoxPrimitive_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddPrimitiveBox, "Drawing new primitive box...", SHAPE_Box, true);
+	SetShapeEditDrag(ui->btnAddPrimitiveBox, "Drawing new primitive box...", SHAPE_Box, true);
 }
 
 void EntityWidget::on_actionAddCirclePrimitive_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddPrimitiveCircle, "Drawing new primitive circle...", SHAPE_Circle, true);
+	SetShapeEditDrag(ui->btnAddPrimitiveCircle, "Drawing new primitive circle...", SHAPE_Circle, true);
 }
 
 void EntityWidget::on_actionAddPolygonPrimitive_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddPrimitivePolygon, "Drawing new primitive polygon...", SHAPE_Polygon, true);
+	SetShapeEditDrag(ui->btnAddPrimitivePolygon, "Drawing new primitive polygon...", SHAPE_Polygon, true);
 }
 
 void EntityWidget::on_actionAddSegmentPrimitive_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddPrimitiveSegment, "Drawing new primitive line segment...", SHAPE_LineSegment, true);
+	SetShapeEditDrag(ui->btnAddPrimitiveSegment, "Drawing new primitive line segment...", SHAPE_LineSegment, true);
 }
 
 void EntityWidget::on_actionAddLineChainPrimitive_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddPrimitiveChain, "Drawing new primitive line chain...", SHAPE_LineChain, true);
+	SetShapeEditDrag(ui->btnAddPrimitiveChain, "Drawing new primitive line chain...", SHAPE_LineChain, true);
 }
 
 void EntityWidget::on_actionAddLineLoopPrimitive_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddPrimitiveLoop, "Drawing new primitive line loop...", SHAPE_LineLoop, true);
+	SetShapeEditDrag(ui->btnAddPrimitiveLoop, "Drawing new primitive line loop...", SHAPE_LineLoop, true);
 }
 
 void EntityWidget::on_actionAddBoxShape_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddShapeBox, "Drawing new box...", SHAPE_Box, false);
+	SetShapeEditDrag(ui->btnAddShapeBox, "Drawing new box...", SHAPE_Box, false);
 }
 
 void EntityWidget::on_actionAddCircleShape_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddShapeCircle, "Drawing new circle...", SHAPE_Circle, false);
+	SetShapeEditDrag(ui->btnAddShapeCircle, "Drawing new circle...", SHAPE_Circle, false);
 }
 
 void EntityWidget::on_actionAddPolygonShape_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddShapePolygon, "Drawing new polygon...", SHAPE_Polygon, false);
+	SetShapeEditDrag(ui->btnAddShapePolygon, "Drawing new polygon...", SHAPE_Polygon, false);
 }
 
 void EntityWidget::on_actionAddSegmentShape_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddShapeSegment, "Drawing new line segment...", SHAPE_LineSegment, false);
+	SetShapeEditDrag(ui->btnAddShapeSegment, "Drawing new line segment...", SHAPE_LineSegment, false);
 }
 
 void EntityWidget::on_actionAddLineChainShape_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddShapeChain, "Drawing new line chain...", SHAPE_LineChain, false);
+	SetShapeEditDrag(ui->btnAddShapeChain, "Drawing new line chain...", SHAPE_LineChain, false);
 }
 
 void EntityWidget::on_actionAddLineLoopShape_triggered()
 {
-	OnDrawShapeEdit(ui->btnAddShapeLoop, "Drawing new line loop...", SHAPE_LineLoop, false);
+	SetShapeEditDrag(ui->btnAddShapeLoop, "Drawing new line loop...", SHAPE_LineLoop, false);
 }
 
 void EntityWidget::on_actionVertexEditMode_toggled(bool bChecked)

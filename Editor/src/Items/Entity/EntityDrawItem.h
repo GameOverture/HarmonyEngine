@@ -12,6 +12,7 @@
 
 #include "IDraw.h"
 
+// NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
 class EntityDrawItem
 {
 	HyGuiItemType							m_eGuiType;
