@@ -148,9 +148,25 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 	return true;
 }
 
-void EntityModel::ToggleVemMode()
+void EntityModel::SetShapeEditDrag(EditorShape eShapeType, bool bAsPrimitive)
 {
-	m_bVertexEditMode = !m_bVertexEditMode;
+	QString sStatusMsg("Drawing new ");
+	sStatusMsg += bAsPrimitive ? "primitive " : "";
+	sStatusMsg += HyGlobal::ShapeName(eShapeType);
+	MainWindow::SetStatus(sStatusMsg, 0);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	if(pWidget)
+		pWidget->CheckShapeAdd(eShapeType, bAsPrimitive);
+
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntDraw)
+		pEntDraw->SetShapeEditDrag(eShapeType, bAsPrimitive);
+}
+
+void EntityModel::SetShapeEditVemMode(bool bEnable)
+{
+	m_bVertexEditMode = bEnable;
 
 	if(m_bVertexEditMode)
 		MainWindow::SetStatus("Vertex Edit Mode", 0);
@@ -159,19 +175,32 @@ void EntityModel::ToggleVemMode()
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
 	if(pWidget)
-		pWidget->SetShapeEditVertex(m_bVertexEditMode);
+		pWidget->CheckVertexEditMode(m_bVertexEditMode);
+
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntityDraw)
+	{
+		if(bEnable)
+			pEntityDraw->SetShapeEditVertex();
+		else
+			pEntityDraw->ClearShapeEdit();
+	}
 }
 
-void EntityModel::SetVemMode(bool bEnable)
+void EntityModel::ClearShapeEdit()
 {
-	m_bVertexEditMode = bEnable;
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	if(pWidget)
+		pWidget->UncheckAll();
+
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntityDraw)
+		pEntityDraw->ClearShapeEdit();
 }
 
 /*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) /*override*/
 {
 	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(propertiesModelRef.GetSubstate().toLongLong());
-	
-
 }
 
 /*virtual*/ bool EntityModel::OnPrepSave() /*override*/

@@ -203,6 +203,7 @@ void EntityDraw::SetShapeEditVertex()
 	m_eShapeEditState = SHAPESTATE_VertexEditMode;
 
 	m_pCurVertexEditItem = m_SelectedItemList[0];
+	m_pCurVertexEditItem->HideTransformCtrl();
 	m_pCurVertexEditItem->GetShapeCtrl().EnableVertexEditMode();
 
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
@@ -210,8 +211,7 @@ void EntityDraw::SetShapeEditVertex()
 
 void EntityDraw::RequestClearShapeEdit()
 {
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
-	pWidget->ClearShapeEdit();
+	static_cast<EntityModel *>(m_pProjItem->GetModel())->ClearShapeEdit();
 }
 
 void EntityDraw::ClearShapeEdit()

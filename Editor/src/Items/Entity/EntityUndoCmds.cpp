@@ -265,7 +265,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 	case ShapeCtrl::EDIT_Remove:
 		setText("Remove Vertex from shape");
 		break;
-	case ShapeCtrl::EDIT_Translate:
+	case ShapeCtrl::EDIT_TranslateOne:
 		setText("Move Vertex on shape");
 		break;
 	}

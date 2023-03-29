@@ -20,6 +20,7 @@ ShapeCtrl::ShapeCtrl() :
 	m_Outline.UseWindowCoordinates();
 	m_Outline.SetWireframe(true);
 	m_Outline.SetVisible(false);
+	m_Outline.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 1);
 }
 
 ShapeCtrl::ShapeCtrl(const ShapeCtrl &copyRef) :
@@ -314,7 +315,8 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 		return;
 
 
-
+	// Using 'm_DeserializedFloatList' (which are stored in world coordinates) construct the 'm_Outline' by first converting points to camera space
+	// Also update 'm_VertexGrabPointList' with the converted to camera space points
 	switch(m_eShape)
 	{
 	case SHAPE_None:
@@ -322,6 +324,10 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 
 	case SHAPE_Polygon:
 	case SHAPE_Box: {
+		if(m_DeserializedFloatList.size() & 1)
+			HyGuiLog("ShapeCtrl::RefreshOutline was a box/polygon with an odd number of serialized floats", LOGTYPE_Error);
+		SetVertexGrabPointListSize(m_DeserializedFloatList.size() / 2);
+
 		std::vector<glm::vec2> vertList;
 		int iGrabPtCountIndex = 0;
 		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2, iGrabPtCountIndex++)
@@ -330,12 +336,6 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 			pCamera->ProjectToCamera(ptCameraPos, ptCameraPos);
 			vertList.push_back(ptCameraPos);
 
-			if(m_VertexGrabPointList.count() <= iGrabPtCountIndex)
-			{
-				GrabPoint *pNewGrabPt = new GrabPoint(HyColor::Red, HyColor::Red.Lighten(), nullptr);
-				pNewGrabPt->SetVisible(false);
-				m_VertexGrabPointList.push_back(pNewGrabPt);
-			}
 			m_VertexGrabPointList[iGrabPtCountIndex]->pos.Set(ptCameraPos);
 		}
 
@@ -343,38 +343,29 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 		break; }
 
 	case SHAPE_Circle: {
+		SetVertexGrabPointListSize(5);
+
 		glm::vec2 ptCenter(m_DeserializedFloatList[0], m_DeserializedFloatList[1]);
 		pCamera->ProjectToCamera(ptCenter, ptCenter);
 		float fRadius = m_DeserializedFloatList[2] * pCamera->GetZoom();
-
-		while(m_VertexGrabPointList.count() < 4)
-		{
-			GrabPoint *pNewGrabPt = new GrabPoint(HyColor::Red, HyColor::Red.Lighten(), nullptr);
-			pNewGrabPt->SetVisible(false);
-			m_VertexGrabPointList.push_back(pNewGrabPt);
-		}
 
 		m_VertexGrabPointList[0]->pos.Set(ptCenter);
 		m_VertexGrabPointList[1]->pos.Set(ptCenter + glm::vec2(fRadius, 0.0f));
 		m_VertexGrabPointList[2]->pos.Set(ptCenter + glm::vec2(0.0f, fRadius));
 		m_VertexGrabPointList[3]->pos.Set(ptCenter + glm::vec2(-fRadius, 0.0f));
-		m_VertexGrabPointList[3]->pos.Set(ptCenter + glm::vec2(0.0f, -fRadius));
+		m_VertexGrabPointList[4]->pos.Set(ptCenter + glm::vec2(0.0f, -fRadius));
 
 		m_Outline.SetAsCircle(ptCenter, fRadius);
 		break; }
 
 	case SHAPE_LineSegment: {
+		SetVertexGrabPointListSize(2);
+
 		glm::vec2 ptOne(m_DeserializedFloatList[0], m_DeserializedFloatList[1]);
 		pCamera->ProjectToCamera(ptOne, ptOne);
 		glm::vec2 ptTwo(m_DeserializedFloatList[2], m_DeserializedFloatList[3]);
 		pCamera->ProjectToCamera(ptTwo, ptTwo);
 
-		while(m_VertexGrabPointList.count() < 2)
-		{
-			GrabPoint *pNewGrabPt = new GrabPoint(HyColor::Red, HyColor::Red.Lighten(), nullptr);
-			pNewGrabPt->SetVisible(false);
-			m_VertexGrabPointList.push_back(pNewGrabPt);
-		}
 		m_VertexGrabPointList[0]->pos.Set(ptOne);
 		m_VertexGrabPointList[1]->pos.Set(ptTwo);
 
@@ -383,6 +374,10 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 
 	case SHAPE_LineChain:
 	case SHAPE_LineLoop: {
+		if(m_DeserializedFloatList.size() & 1)
+			HyGuiLog("ShapeCtrl::RefreshOutline was a LineChain/LineLoop with an odd number of serialized floats", LOGTYPE_Error);
+		SetVertexGrabPointListSize(m_DeserializedFloatList.size() / 2);
+
 		std::vector<glm::vec2> vertList;
 		int iGrabPtCountIndex = 0;
 		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2, iGrabPtCountIndex++)
@@ -391,12 +386,6 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 			pCamera->ProjectToCamera(ptCameraPos, ptCameraPos);
 			vertList.push_back(ptCameraPos);
 
-			if(m_VertexGrabPointList.count() <= iGrabPtCountIndex)
-			{
-				GrabPoint *pNewGrabPt = new GrabPoint(HyColor::Red, HyColor::Red.Lighten(), nullptr);
-				pNewGrabPt->SetVisible(false);
-				m_VertexGrabPointList.push_back(pNewGrabPt);
-			}
 			m_VertexGrabPointList[iGrabPtCountIndex]->pos.Set(ptCameraPos);
 		}
 
@@ -407,13 +396,31 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 
 void ShapeCtrl::EnableVertexEditMode()
 {
-
-
-
+	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+		pGrabPt->SetVisible(true);
 }
 
 void ShapeCtrl::ClearVertexEditMode()
 {
+	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+		pGrabPt->SetVisible(false);
+}
+
+void ShapeCtrl::SetVertexGrabPointListSize(uint32 uiNumGrabPoints)
+{
+	while(m_VertexGrabPointList.size() > uiNumGrabPoints)
+	{
+		delete m_VertexGrabPointList.back();
+		m_VertexGrabPointList.pop_back();
+	}
+
+	while(m_VertexGrabPointList.size() < uiNumGrabPoints)
+	{
+		GrabPoint *pNewGrabPt = new GrabPoint(HyColor::White, HyColor::Red, nullptr);
+		pNewGrabPt->SetVisible(false);
+		pNewGrabPt->SetDisplayOrder(DISPLAYORDER_TransformCtrl);
+		m_VertexGrabPointList.push_back(pNewGrabPt);
+	}
 }
 
 void ShapeCtrl::ConvertTo(EditorShape eShape)

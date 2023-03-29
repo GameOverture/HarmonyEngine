@@ -54,8 +54,9 @@ public:
 	int32 Cmd_RemoveTreeItem(EntityTreeItemData *pItem);
 	bool Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow);
 
-	void ToggleVemMode();
-	void SetVemMode(bool bEnable);
+	void SetShapeEditDrag(EditorShape eShapeType, bool bAsPrimitive);
+	void SetShapeEditVemMode(bool bEnable);
+	void ClearShapeEdit();
 
 	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) override;
 

@@ -18,9 +18,12 @@ class ShapeCtrl
 public:
 	enum VertexEditType
 	{
-		EDIT_Add = 0,
+		EDIT_None = -1,
+
+		EDIT_TranslateAll = 0,
+		EDIT_TranslateOne,
+		EDIT_Add,
 		EDIT_Remove,
-		EDIT_Translate
 	};
 
 protected:
@@ -54,7 +57,28 @@ public:
 	void EnableVertexEditMode();
 	void ClearVertexEditMode();
 
+	
+	//VertexEditType IsMouseOverGrabPoint()
+	//{
+	//	glm::vec2 ptWorldMousePos;
+	//	if(m_bIsShown == false || m_bShowGrabPoints == false || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+	//		return GRAB_None;
+
+	//	ptWorldMousePos = HyEngine::Input().GetMousePos();
+
+	//	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
+	//	{
+	//		HyShape2d tmpShape;
+	//		m_GrabPoints[i]->GetLocalBoundingShape(tmpShape);
+	//		if(tmpShape.TestPoint(m_GrabPoints[i]->GetSceneTransform(0.0f), ptWorldMousePos))
+	//			return static_cast<GrabPointType>(i);
+	//	}
+
+	//	return GRAB_None;
+	//}
+
 protected:
+	void SetVertexGrabPointListSize(uint32 uiNumGrabPoints);
 	void ConvertTo(EditorShape eShape);
 };
 
