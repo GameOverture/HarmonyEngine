@@ -53,6 +53,7 @@ class EntityDraw : public IDraw
 		SHAPESTATE_VertexEditMode			// When editing polygons, line chains, and line loops
 	};
 	ShapeEditState							m_eShapeEditState;
+	EntityDrawItem *						m_pCurVertexEditItem;
 
 	// Used to help transform (translate, rotate, scale) selected items
 	HyEntity2d								m_ActiveTransform;

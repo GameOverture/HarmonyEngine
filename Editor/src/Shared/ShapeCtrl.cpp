@@ -32,11 +32,8 @@ ShapeCtrl::ShapeCtrl(const ShapeCtrl &copyRef) :
 
 /*virtual*/ ShapeCtrl::~ShapeCtrl()
 {
-}
-
-EditorShape ShapeCtrl::GetShapeType() const
-{
-	return m_eShape;
+	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+		delete pGrabPt;
 }
 
 void ShapeCtrl::Setup(EditorShape eShape, HyColor color, float fBvAlpha, float fOutlineAlpha)
@@ -77,6 +74,11 @@ void ShapeCtrl::Setup(EditorShape eShape, HyColor color, float fBvAlpha, float f
 	}
 }
 
+EditorShape ShapeCtrl::GetShapeType() const
+{
+	return m_eShape;
+}
+
 HyPrimitive2d &ShapeCtrl::GetPrimitive()
 {
 	return m_BoundingVolume;
@@ -84,8 +86,6 @@ HyPrimitive2d &ShapeCtrl::GetPrimitive()
 
 void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
 {
-	//SetVisible(true);
-
 	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
 	if(bShiftMod)
 	{
@@ -313,7 +313,7 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 	if(m_DeserializedFloatList.empty() || pCamera == nullptr)
 		return;
 
-	//SetVisible(true);
+
 
 	switch(m_eShape)
 	{
@@ -323,11 +323,20 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 	case SHAPE_Polygon:
 	case SHAPE_Box: {
 		std::vector<glm::vec2> vertList;
-		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2)
+		int iGrabPtCountIndex = 0;
+		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2, iGrabPtCountIndex++)
 		{
 			glm::vec2 ptCameraPos(m_DeserializedFloatList[i], m_DeserializedFloatList[i + 1]);
 			pCamera->ProjectToCamera(ptCameraPos, ptCameraPos);
 			vertList.push_back(ptCameraPos);
+
+			if(m_VertexGrabPointList.count() <= iGrabPtCountIndex)
+			{
+				GrabPoint *pNewGrabPt = new GrabPoint(HyColor::Red, HyColor::Red.Lighten(), nullptr);
+				pNewGrabPt->SetVisible(false);
+				m_VertexGrabPointList.push_back(pNewGrabPt);
+			}
+			m_VertexGrabPointList[iGrabPtCountIndex]->pos.Set(ptCameraPos);
 		}
 
 		m_Outline.SetAsPolygon(vertList);
@@ -338,6 +347,19 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 		pCamera->ProjectToCamera(ptCenter, ptCenter);
 		float fRadius = m_DeserializedFloatList[2] * pCamera->GetZoom();
 
+		while(m_VertexGrabPointList.count() < 4)
+		{
+			GrabPoint *pNewGrabPt = new GrabPoint(HyColor::Red, HyColor::Red.Lighten(), nullptr);
+			pNewGrabPt->SetVisible(false);
+			m_VertexGrabPointList.push_back(pNewGrabPt);
+		}
+
+		m_VertexGrabPointList[0]->pos.Set(ptCenter);
+		m_VertexGrabPointList[1]->pos.Set(ptCenter + glm::vec2(fRadius, 0.0f));
+		m_VertexGrabPointList[2]->pos.Set(ptCenter + glm::vec2(0.0f, fRadius));
+		m_VertexGrabPointList[3]->pos.Set(ptCenter + glm::vec2(-fRadius, 0.0f));
+		m_VertexGrabPointList[3]->pos.Set(ptCenter + glm::vec2(0.0f, -fRadius));
+
 		m_Outline.SetAsCircle(ptCenter, fRadius);
 		break; }
 
@@ -347,22 +369,51 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 		glm::vec2 ptTwo(m_DeserializedFloatList[2], m_DeserializedFloatList[3]);
 		pCamera->ProjectToCamera(ptTwo, ptTwo);
 
+		while(m_VertexGrabPointList.count() < 2)
+		{
+			GrabPoint *pNewGrabPt = new GrabPoint(HyColor::Red, HyColor::Red.Lighten(), nullptr);
+			pNewGrabPt->SetVisible(false);
+			m_VertexGrabPointList.push_back(pNewGrabPt);
+		}
+		m_VertexGrabPointList[0]->pos.Set(ptOne);
+		m_VertexGrabPointList[1]->pos.Set(ptTwo);
+
 		m_Outline.SetAsLineSegment(ptOne, ptTwo);
 		break; }
 
 	case SHAPE_LineChain:
 	case SHAPE_LineLoop: {
 		std::vector<glm::vec2> vertList;
-		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2)
+		int iGrabPtCountIndex = 0;
+		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2, iGrabPtCountIndex++)
 		{
 			glm::vec2 ptCameraPos(m_DeserializedFloatList[i], m_DeserializedFloatList[i + 1]);
 			pCamera->ProjectToCamera(ptCameraPos, ptCameraPos);
 			vertList.push_back(ptCameraPos);
+
+			if(m_VertexGrabPointList.count() <= iGrabPtCountIndex)
+			{
+				GrabPoint *pNewGrabPt = new GrabPoint(HyColor::Red, HyColor::Red.Lighten(), nullptr);
+				pNewGrabPt->SetVisible(false);
+				m_VertexGrabPointList.push_back(pNewGrabPt);
+			}
+			m_VertexGrabPointList[iGrabPtCountIndex]->pos.Set(ptCameraPos);
 		}
 
 		m_Outline.SetAsLineChain(vertList);
 		break; }
 	}
+}
+
+void ShapeCtrl::EnableVertexEditMode()
+{
+
+
+
+}
+
+void ShapeCtrl::ClearVertexEditMode()
+{
 }
 
 void ShapeCtrl::ConvertTo(EditorShape eShape)

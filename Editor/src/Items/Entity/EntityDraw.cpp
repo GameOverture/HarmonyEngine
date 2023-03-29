@@ -25,7 +25,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_eCurHoverGrabPoint(TransformCtrl::GRAB_None),
 	m_bSelectionHandled(false),
 	m_eDragState(DRAGSTATE_None),
-	m_eShapeEditState(SHAPESTATE_None)
+	m_eShapeEditState(SHAPESTATE_None),
+	m_pCurVertexEditItem(nullptr)
 {
 	m_MultiTransform.Hide();
 	m_PressTimer.SetExpiredCallback(OnMousePressTimer, this);
@@ -184,7 +185,6 @@ void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
 	RequestSelection(QList<EntityDrawItem *>()); // Clear any selected item
 
 	m_eDragState = DRAGSTATE_None;
-
 	m_eShapeEditState = bAsPrimitive ? SHAPESTATE_DragAddPrimitive : SHAPESTATE_DragAddShape;
 	m_DragShape.Setup(eShape, bAsPrimitive ? HyColor::DarkMagenta : HyColor::Cyan, 1.0f, 1.0f);
 	
@@ -193,9 +193,17 @@ void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
 
 void EntityDraw::SetShapeEditVertex()
 {
-	m_eDragState = DRAGSTATE_None;
+	if(m_SelectedItemList.count() != 1 && m_SelectedItemList[0]->GetGuiType() != ITEM_Primitive && m_SelectedItemList[0]->GetGuiType() != ITEM_Shape)
+	{
+		HyGuiLog("EntityDraw::SetShapeEditVertex() invoked when selection is invalid", LOGTYPE_Error);
+		return;
+	}
 
+	m_eDragState = DRAGSTATE_None;
 	m_eShapeEditState = SHAPESTATE_VertexEditMode;
+
+	m_pCurVertexEditItem = m_SelectedItemList[0];
+	m_pCurVertexEditItem->GetShapeCtrl().EnableVertexEditMode();
 
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
@@ -211,6 +219,12 @@ void EntityDraw::ClearShapeEdit()
 	m_eDragState = DRAGSTATE_None;
 	m_eShapeEditState = SHAPESTATE_None;
 	m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+
+	if(m_pCurVertexEditItem)
+	{
+		m_pCurVertexEditItem->GetShapeCtrl().ClearVertexEditMode();
+		m_pCurVertexEditItem = nullptr;
+	}
 
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
@@ -810,7 +824,10 @@ void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 			break;
 		}
 	}
-
+	else // SHAPESTATE_VertexEditMode
+	{
+		m_pCurVertexEditItem->GetShapeCtrl();
+	}
 }
 
 void EntityDraw::DoMousePress_ShapeEdit()
@@ -823,8 +840,9 @@ void EntityDraw::DoMousePress_ShapeEdit()
 		m_PressTimer.InitStart(0.5f);
 		m_eDragState = DRAGSTATE_Pending;
 	}
-	else
+	else // SHAPESTATE_VertexEditMode
 	{
+
 	}
 }
 
