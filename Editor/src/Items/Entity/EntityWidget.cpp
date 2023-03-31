@@ -97,16 +97,7 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
-	//    pMenu->addAction(ui->actionAddState);
-	//    pMenu->addAction(ui->actionRemoveState);
-	//    pMenu->addAction(ui->actionRenameState);
-	//    pMenu->addAction(ui->actionOrderStateBackwards);
-	//    pMenu->addAction(ui->actionOrderStateForwards);
-	//    pMenu->addSeparator();
-	//    pMenu->addAction(ui->actionAddLayer);
-	//    pMenu->addAction(ui->actionRemoveLayer);
-	//    pMenu->addAction(ui->actionOrderLayerUpwards);
-	//    pMenu->addAction(ui->actionOrderLayerDownwards);
+	pMenu->addAction(ui->actionVertexEditMode);
 }
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/

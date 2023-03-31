@@ -314,7 +314,6 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 	if(m_DeserializedFloatList.empty() || pCamera == nullptr)
 		return;
 
-
 	// Using 'm_DeserializedFloatList' (which are stored in world coordinates) construct the 'm_Outline' by first converting points to camera space
 	// Also update 'm_VertexGrabPointList' with the converted to camera space points
 	switch(m_eShape)

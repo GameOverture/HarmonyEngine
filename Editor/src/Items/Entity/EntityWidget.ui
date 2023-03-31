@@ -648,6 +648,9 @@
    <property name="toolTip">
     <string>Translate, add, or remove vertices when a single shape is selected</string>
    </property>
+   <property name="shortcut">
+    <string>V</string>
+   </property>
   </action>
  </widget>
  <customwidgets>

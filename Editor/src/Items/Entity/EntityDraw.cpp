@@ -222,6 +222,8 @@ void EntityDraw::ClearShapeEdit()
 
 	if(m_pCurVertexEditItem)
 	{
+		if(m_SelectedItemList.count() == 1 && m_SelectedItemList[0] == m_pCurVertexEditItem)
+			m_pCurVertexEditItem->ShowTransformCtrl(true);
 		m_pCurVertexEditItem->GetShapeCtrl().ClearVertexEditMode();
 		m_pCurVertexEditItem = nullptr;
 	}
@@ -287,9 +289,17 @@ void EntityDraw::ClearShapeEdit()
 		delete pStaleItem;
 	staleItemList.clear();
 
-	bool bShowGrabPoints = m_SelectedItemList.size() == 1;
-	for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
-		pSelectedItemDraw->ShowTransformCtrl(bShowGrabPoints);
+	if(m_eShapeEditState == SHAPESTATE_None)
+	{
+		bool bShowGrabPoints = m_SelectedItemList.size() == 1;
+		for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
+			pSelectedItemDraw->ShowTransformCtrl(bShowGrabPoints);
+	}
+	else
+	{
+		for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
+			pSelectedItemDraw->HideTransformCtrl();
+	}
 
 	RefreshTransforms();
 }
@@ -766,13 +776,12 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 	}
 
-	//for(EntityDrawItem *pSelectedItem : m_SelectedItemList)
-	//{
-	//	if(pSelectedItem->GetGuiType() == ITEM_Shape)
-	//	{
-	//		pSelectedItem->GetShapeCtrl().Serialize() SetOutline(boundingShape, mtxShapeTransform, pCamera);
-	//	}
-	//}
+	// This updates the preview of a shape (its 'outline') when being transformed
+	for(EntityDrawItem *pSelectedItem : m_SelectedItemList)
+	{
+		if(pSelectedItem->GetGuiType() == ITEM_Shape)
+			pSelectedItem->GetShapeCtrl().Setup(pSelectedItem->GetShapeCtrl().GetShapeType(), HyColor::Cyan, 1.0f, 0.0f);
+	}
 
 
 	RefreshTransforms();
