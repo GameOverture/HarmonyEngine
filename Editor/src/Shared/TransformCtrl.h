@@ -19,11 +19,23 @@ class GrabPoint : public HyEntity2d
 	HyPrimitive2d				m_GrabOutline;
 	HyPrimitive2d				m_GrabFill;
 
+	HyColor						m_OutlineColor;
+	HyColor						m_FillColor;
+	HyColor						m_SelectedOutlineColor;
+	HyColor						m_SelectedFillColor;
+
+	bool						m_bIsSelected;
+
 public:
-	GrabPoint(HyColor outlineColor, HyColor fillColor, HyEntity2d *pParent);
+	GrabPoint(HyColor outlineColor, HyColor fillColor, HyColor selectedOutlineColor, HyColor selectedFillColor, HyEntity2d *pParent);
 	virtual ~GrabPoint();
 
 	void GetLocalBoundingShape(HyShape2d &shapeRefOut);
+
+	bool IsSelected() const;
+	void SetSelected(bool bSelected);
+	HyColor GetOutlineColor();
+	HyColor GetFillColor();
 };
 
 class TransformCtrl : public HyEntity2d

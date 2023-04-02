@@ -41,8 +41,6 @@ void HyCopyVec(glm::vec3 &destRef, const glm::vec2 &srcRef);
 void HyCopyVec(glm::vec4 &destRef, const glm::vec3 &srcRef);
 void HyCopyVec(glm::vec4 &destRef, const glm::vec2 &srcRef);
 
-bool HyTestPointAABB(const b2AABB &aabb, const glm::vec2 &pt);
-
 template <typename T>
 bool HyCompareFloat(T lhs, T rhs)
 {
@@ -186,6 +184,7 @@ public:
 
 	static glm::ivec2 LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight);
 	static void InvalidateAABB(b2AABB &aabbOut);
+	static bool TestPointAABB(const b2AABB &aabb, const glm::vec2 &pt);
 
 	static glm::vec2 PerpendicularClockwise(const glm::vec2 &vDirVector);
 	static glm::ivec2 PerpendicularClockwise(const glm::ivec2 &vDirVector);
@@ -291,6 +290,11 @@ public:
 		m_uiG(static_cast<uint8>(255.0f * HyMath::Clamp(fGreen, 0.0f, 1.0f))),
 		m_uiB(static_cast<uint8>(255.0f * HyMath::Clamp(fBlue, 0.0f, 1.0f)))
 	{ }
+
+	bool operator==(const HyColor &rhs)
+	{
+		return m_uiA == rhs.m_uiA && m_uiR == rhs.m_uiR && m_uiG == rhs.m_uiG && m_uiB == rhs.m_uiB;
+	}
 
 	// Returned as uint32 mask: ARGB
 	uint32 GetAsUint32() const {

@@ -26,7 +26,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_bSelectionHandled(false),
 	m_eDragState(DRAGSTATE_None),
 	m_eShapeEditState(SHAPESTATE_None),
-	m_pCurVertexEditItem(nullptr)
+	m_pCurVertexEditItem(nullptr),
+	m_eCurVemAction(ShapeCtrl::VEMACTION_None)
 {
 	m_MultiTransform.Hide();
 	m_PressTimer.SetExpiredCallback(OnMousePressTimer, this);
@@ -92,7 +93,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	else if(pEvent->button() == Qt::LeftButton)
 	{
 		if(m_eShapeEditState != SHAPESTATE_None)
-			DoMousePress_ShapeEdit();
+			DoMousePress_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 		else if(m_eDragState == DRAGSTATE_None)
 			DoMousePress_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 	}
@@ -112,7 +113,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		IDraw::OnMouseReleaseEvent(pEvent);
 
 		if(m_eShapeEditState != SHAPESTATE_None)
-			DoMouseRelease_ShapeEdit();
+			DoMouseRelease_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 		else if(pEvent->button() == Qt::LeftButton)
 		{
 			if(m_eDragState == DRAGSTATE_None ||
@@ -186,7 +187,7 @@ void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
 
 	m_eDragState = DRAGSTATE_None;
 	m_eShapeEditState = bAsPrimitive ? SHAPESTATE_DragAddPrimitive : SHAPESTATE_DragAddShape;
-	m_DragShape.Setup(eShape, bAsPrimitive ? HyColor::DarkMagenta : HyColor::Cyan, 1.0f, 1.0f);
+	m_DragShape.Setup(eShape, bAsPrimitive ? ENTCOLOR_Primitive : ENTCOLOR_Shape, 1.0f, 1.0f);
 	
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 }
@@ -218,7 +219,7 @@ void EntityDraw::ClearShapeEdit()
 {
 	m_eDragState = DRAGSTATE_None;
 	m_eShapeEditState = SHAPESTATE_None;
-	m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+	m_DragShape.Setup(SHAPE_None, ENTCOLOR_Clear, 1.0f, 1.0f);
 
 	if(m_pCurVertexEditItem)
 	{
@@ -227,6 +228,7 @@ void EntityDraw::ClearShapeEdit()
 		m_pCurVertexEditItem->GetShapeCtrl().ClearVertexEditMode();
 		m_pCurVertexEditItem = nullptr;
 	}
+	m_eCurVemAction = ShapeCtrl::VEMACTION_None;
 
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
@@ -394,8 +396,8 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 		glm::vec2 ptCurMousePos;
 		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 		
-		m_DragShape.Setup(SHAPE_Box, HyColor::Blue.Lighten(), 0.25f, 1.0f);
-		m_DragShape.SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
+		m_DragShape.Setup(SHAPE_Box, ENTCOLOR_Marquee, 0.25f, 1.0f);
+		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptCurMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
 	}
 	else if(m_eDragState == DRAGSTATE_Pending)
 	{
@@ -502,22 +504,17 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 	if(m_eDragState == DRAGSTATE_Marquee)
 	{
 		b2AABB marqueeAabb;
-		//if(m_DragShape.IsVisible() == false)
-		//	marqueeAabb.lowerBound.x = marqueeAabb.lowerBound.y = marqueeAabb.upperBound.x = marqueeAabb.upperBound.y = 0.0f;
-		//else
-		{
-			HyShape2d tmpShape;
-			m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
-			tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
-		}
-
+		HyShape2d tmpShape;
+		m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
+		tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
+		
 		for(EntityDrawItem *pItem : m_ItemList)
 		{
 			if(pItem->GetTransformCtrl().IsContained(marqueeAabb, m_pCamera))
 				affectedItemList << pItem;
 		}
 
-		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+		m_DragShape.Setup(SHAPE_None, ENTCOLOR_Clear, 1.0f, 1.0f);
 	}
 	else if(m_pCurHoverItem) // This covers the resolution of "Special Case" in EntityDraw::DoMousePress_Select
 		affectedItemList << m_pCurHoverItem;
@@ -780,9 +777,8 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 	for(EntityDrawItem *pSelectedItem : m_SelectedItemList)
 	{
 		if(pSelectedItem->GetGuiType() == ITEM_Shape)
-			pSelectedItem->GetShapeCtrl().Setup(pSelectedItem->GetShapeCtrl().GetShapeType(), HyColor::Cyan, 1.0f, 0.0f);
+			pSelectedItem->GetShapeCtrl().Setup(pSelectedItem->GetShapeCtrl().GetShapeType(), ENTCOLOR_Shape, 0.7f, 0.0f);
 	}
-
 
 	RefreshTransforms();
 }
@@ -816,30 +812,55 @@ void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 	glm::vec2 ptCurMousePos;
 	HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 
-	if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
+	switch(m_eDragState)
 	{
-		switch(m_eDragState)
+	case DRAGSTATE_None:
+		if(m_eShapeEditState == SHAPESTATE_VertexEditMode)
 		{
-		case DRAGSTATE_None:
-			break;
+			m_eCurVemAction = m_pCurVertexEditItem->GetShapeCtrl().GetMouseVemAction(false);
 
-		case DRAGSTATE_Pending:
-			if(glm::distance(m_ptDragStart, ptCurMousePos) >= 2.0f)
-				m_eDragState = DRAGSTATE_Transforming;
-			break;
-
-		case DRAGSTATE_Transforming:
-			m_DragShape.SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
-			break;
+			Qt::CursorShape eCursorShape = Qt::ArrowCursor;
+			switch(m_eCurVemAction)
+			{
+			case ShapeCtrl::VEMACTION_Invalid:				eCursorShape = Qt::ForbiddenCursor; break;
+			case ShapeCtrl::VEMACTION_Translate:			eCursorShape = Qt::SizeAllCursor; break;
+			case ShapeCtrl::VEMACTION_GrabPoint:			eCursorShape = Qt::PointingHandCursor; break;
+			case ShapeCtrl::VEMACTION_RadiusHorizontal:		eCursorShape = Qt::SizeHorCursor; break;
+			case ShapeCtrl::VEMACTION_RadiusVertical:		eCursorShape = Qt::SizeVerCursor; break;
+			case ShapeCtrl::VEMACTION_Add:					eCursorShape = Qt::CrossCursor; break;
+			case ShapeCtrl::VEMACTION_None:					eCursorShape = Qt::ArrowCursor; break;
+			default:
+				HyGuiLog("EntityDraw::DoMouseMove_ShapeEdit() - Unhandled ShapeCtrl::VemAction for DRAGSTATE_None", LOGTYPE_Error);
+				break;
+			}
+			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(eCursorShape);
 		}
-	}
-	else // SHAPESTATE_VertexEditMode
-	{
-		m_pCurVertexEditItem->GetShapeCtrl();
+		break;
+
+	case DRAGSTATE_Marquee:
+		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
+
+		m_DragShape.Setup(SHAPE_Box, ENTCOLOR_Marquee, 0.25f, 1.0f);
+		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptCurMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
+		break;
+
+	case DRAGSTATE_Pending:
+		if(glm::distance(m_ptDragStart, ptCurMousePos) >= 2.0f)
+			m_eDragState = DRAGSTATE_Transforming;
+		break;
+
+	case DRAGSTATE_Transforming:
+		if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
+			m_DragShape.SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
+		else // SHAPESTATE_VertexEditMode
+		{
+			m_pCurVertexEditItem->GetShapeCtrl().TransformVemVerts(m_eCurVemAction, m_ptDragStart, ptCurMousePos, m_pCamera);
+		}
+		break;
 	}
 }
 
-void EntityDraw::DoMousePress_ShapeEdit()
+void EntityDraw::DoMousePress_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 {
 	if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
 		HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
@@ -851,23 +872,55 @@ void EntityDraw::DoMousePress_ShapeEdit()
 	}
 	else // SHAPESTATE_VertexEditMode
 	{
+		if(bShiftMod == false)
+			m_pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
 
+		m_eCurVemAction = m_pCurVertexEditItem->GetShapeCtrl().GetMouseVemAction(true);
+		if(m_eCurVemAction == ShapeCtrl::VEMACTION_None)
+			m_eDragState = DRAGSTATE_Marquee;
+		else if(m_eCurVemAction != ShapeCtrl::VEMACTION_Invalid) // A GrabPoint is selected
+		{
+			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
+
+			m_PressTimer.InitStart(0.5f);
+			m_eDragState = DRAGSTATE_Pending;
+		}
 	}
 }
 
-void EntityDraw::DoMouseRelease_ShapeEdit()
+void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 {
-	if((m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape) &&
-		m_eDragState == DRAGSTATE_Transforming)
+	if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
 	{
-		QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(*m_pProjItem,
-														   m_DragShape.GetShapeType(),
-														   m_DragShape.Serialize(),
-														   m_eShapeEditState == SHAPESTATE_DragAddPrimitive,
-														   -1);
-		m_pProjItem->GetUndoStack()->push(pCmd);
+		if(m_eDragState == DRAGSTATE_Transforming)
+		{
+			QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(*m_pProjItem,
+				m_DragShape.GetShapeType(),
+				m_DragShape.Serialize(),
+				m_eShapeEditState == SHAPESTATE_DragAddPrimitive,
+				-1);
+			m_pProjItem->GetUndoStack()->push(pCmd);
 
-		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+			m_DragShape.Setup(SHAPE_None, ENTCOLOR_Clear, 1.0f, 1.0f);
+		}
+	}
+	else // SHAPESTATE_VertexEditMode
+	{
+		if(m_eDragState == DRAGSTATE_Marquee)
+		{
+			b2AABB marqueeAabb;
+			HyShape2d tmpShape;
+			m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
+			tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
+
+			if(bShiftMod == false)
+				m_pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
+			m_pCurVertexEditItem->GetShapeCtrl().SelectVemVerts(marqueeAabb, m_pCamera);
+
+			m_DragShape.Setup(SHAPE_None, ENTCOLOR_Clear, 1.0f, 1.0f);
+		}
+
+		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 	}
 }
 

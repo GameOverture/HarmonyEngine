@@ -16,14 +16,16 @@
 class ShapeCtrl
 {
 public:
-	enum VertexEditType
+	enum VemAction
 	{
-		EDIT_None = -1,
+		VEMACTION_Invalid = -2,
+		VEMACTION_None = -1,
 
-		EDIT_TranslateAll = 0,
-		EDIT_TranslateOne,
-		EDIT_Add,
-		EDIT_Remove,
+		VEMACTION_Translate = 0,
+		VEMACTION_GrabPoint,
+		VEMACTION_RadiusHorizontal,
+		VEMACTION_RadiusVertical,
+		VEMACTION_Add
 	};
 
 protected:
@@ -55,10 +57,12 @@ public:
 	void RefreshOutline(HyCamera2d *pCamera);
 
 	void EnableVertexEditMode();
+	VemAction GetMouseVemAction(bool bSelectVert);
+	void SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera);
+	void TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	void UnselectAllVemVerts();
 	void ClearVertexEditMode();
 
-	
-	//VertexEditType IsMouseOverGrabPoint()
 	//{
 	//	glm::vec2 ptWorldMousePos;
 	//	if(m_bIsShown == false || m_bShowGrabPoints == false || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)

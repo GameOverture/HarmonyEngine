@@ -99,12 +99,6 @@ void HyCopyVec(glm::vec4 &destRef, const glm::vec2 &srcRef)
 	destRef.y = srcRef.y;
 }
 
-bool HyTestPointAABB(const b2AABB &aabb, const glm::vec2 &pt)
-{
-	return (aabb.IsValid() &&
-			pt.x >= aabb.lowerBound.x && pt.y >= aabb.lowerBound.y &&
-			pt.x <= aabb.upperBound.x && pt.y <= aabb.upperBound.y);
-}
 //
 //float HyEase_Linear(float a, float b, float t)
 //{
@@ -195,6 +189,13 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 {
 	aabbOut.lowerBound.Set(1.0f, 1.0f);
 	aabbOut.upperBound.Set(-1.0f, -1.0f);
+}
+
+/*static*/ bool HyMath::TestPointAABB(const b2AABB &aabb, const glm::vec2 &pt)
+{
+	return (aabb.IsValid() &&
+		pt.x >= aabb.lowerBound.x && pt.y >= aabb.lowerBound.y &&
+		pt.x <= aabb.upperBound.x && pt.y <= aabb.upperBound.y);
 }
 
 /*static*/ glm::vec2 HyMath::PerpendicularClockwise(const glm::vec2 &vDirVector)

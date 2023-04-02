@@ -122,7 +122,7 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 		sliderAABB.upperBound.y += static_cast<float>(m_uiDiameter) * 0.5f;
 	}
 	
-	if(HyTestPointAABB(sliderAABB, ptMousePos))
+	if(HyMath::TestPointAABB(sliderAABB, ptMousePos))
 	{
 		m_bIsDragging = true;
 		m_ptDragPos = ptMousePos;

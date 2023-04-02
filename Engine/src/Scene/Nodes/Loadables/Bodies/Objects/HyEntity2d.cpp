@@ -367,7 +367,7 @@ bool HyEntity2d::IsMouseInBounds()
 		}
 	}
 	else
-		return HyTestPointAABB(GetSceneAABB(), ptMouseInSceneCoords);
+		return HyMath::TestPointAABB(GetSceneAABB(), ptMouseInSceneCoords);
 
 	return false;
 }

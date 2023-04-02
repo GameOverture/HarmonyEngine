@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "ShapeCtrl.h"
+#include "EntityModel.h"
 
 ShapeCtrl::ShapeCtrl() :
 	m_eShape(SHAPE_None),
@@ -399,6 +400,120 @@ void ShapeCtrl::EnableVertexEditMode()
 		pGrabPt->SetVisible(true);
 }
 
+ShapeCtrl::VemAction ShapeCtrl::GetMouseVemAction(bool bSelectVert)
+{
+	// Get selected grab points
+	QList<GrabPoint *> selectedGrabPtList;
+	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+	{
+		if(pGrabPt->IsSelected())
+			selectedGrabPtList.push_back(pGrabPt);
+	}
+
+	if(selectedGrabPtList.isEmpty() == false)
+	{
+		b2AABB selectedVertsArea;
+		HyMath::InvalidateAABB(selectedVertsArea);
+		for(GrabPoint *pSelectedPt : selectedGrabPtList)
+		{
+			if(selectedVertsArea.IsValid() == false)
+				selectedVertsArea = pSelectedPt->GetSceneAABB();
+			else
+				selectedVertsArea.Combine(pSelectedPt->GetSceneAABB());
+		}
+
+		if(HyMath::TestPointAABB(selectedVertsArea, HyEngine::Input().GetMousePos()))
+			return VEMACTION_Translate;
+	}
+	
+
+	switch(m_eShape)
+	{
+	case SHAPE_None:
+		return VEMACTION_None;
+
+	case SHAPE_Box:
+	case SHAPE_Polygon:
+	case SHAPE_LineSegment:
+	case SHAPE_LineChain:
+	case SHAPE_LineLoop:
+		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+		{
+			if(pGrabPt->IsMouseInBounds())
+			{
+				if(bSelectVert)
+					pGrabPt->SetSelected(true);
+				return VEMACTION_GrabPoint;
+			}
+		}
+		break;
+
+	case SHAPE_Circle:
+		for(int i = 0; i < m_VertexGrabPointList.size(); ++i)
+		{
+			if(m_VertexGrabPointList[i]->IsMouseInBounds())
+			{
+				if(bSelectVert)
+					m_VertexGrabPointList[i]->SetSelected(true);
+
+				if(i == 0)
+					return VEMACTION_Translate;
+
+				return i & 1 ? VEMACTION_RadiusHorizontal : VEMACTION_RadiusVertical;
+			}
+		}
+		break;
+	}
+
+	return VEMACTION_None;
+}
+
+void ShapeCtrl::SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera)
+{
+	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+	{
+		glm::vec2 ptPos = pGrabPt->pos.Get();
+		pCamera->ProjectToWorld(ptPos, ptPos);
+		if(HyMath::TestPointAABB(selectionAabb, ptPos))
+			pGrabPt->SetSelected(true);
+	}
+}
+
+void ShapeCtrl::TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
+{
+	// Get selected grab points
+	QList<GrabPoint *> selectedGrabPtList;
+	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+	{
+		if(pGrabPt->IsSelected())
+			selectedGrabPtList.push_back(pGrabPt);
+	}
+
+	switch(eAction)
+	{
+	case VEMACTION_Invalid:
+	case VEMACTION_None:
+		break;
+
+	case VEMACTION_Translate:
+	case VEMACTION_GrabPoint:
+	case VEMACTION_RadiusHorizontal:
+	case VEMACTION_RadiusVertical:
+	case VEMACTION_Add:
+		break;
+
+	default:
+		HyGuiLog("ShapeCtrl::TransformVemVerts() - Unhandled ShapeCtrl::VemAction", LOGTYPE_Error);
+		break;
+	}
+}
+
+void ShapeCtrl::UnselectAllVemVerts()
+{
+	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+		pGrabPt->SetSelected(false);
+}
+
 void ShapeCtrl::ClearVertexEditMode()
 {
 	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
@@ -415,7 +530,7 @@ void ShapeCtrl::SetVertexGrabPointListSize(uint32 uiNumGrabPoints)
 
 	while(m_VertexGrabPointList.size() < uiNumGrabPoints)
 	{
-		GrabPoint *pNewGrabPt = new GrabPoint(HyColor::White, HyColor::Red, nullptr);
+		GrabPoint *pNewGrabPt = new GrabPoint(ENTCOLORPOINT_Vem, ENTCOLORPOINT_VemSelected, nullptr);
 		pNewGrabPt->SetVisible(false);
 		pNewGrabPt->SetDisplayOrder(DISPLAYORDER_TransformCtrl);
 		m_VertexGrabPointList.push_back(pNewGrabPt);

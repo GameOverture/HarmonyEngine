@@ -54,6 +54,7 @@ class EntityDraw : public IDraw
 	};
 	ShapeEditState							m_eShapeEditState;
 	EntityDrawItem *						m_pCurVertexEditItem;
+	ShapeCtrl::VemAction					m_eCurVemAction;
 
 	// Used to help transform (translate, rotate, scale) selected items
 	HyEntity2d								m_ActiveTransform;
@@ -103,8 +104,8 @@ protected:
 	void DoMouseRelease_Transform();
 
 	void DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod);
-	void DoMousePress_ShapeEdit();
-	void DoMouseRelease_ShapeEdit();
+	void DoMousePress_ShapeEdit(bool bCtrlMod, bool bShiftMod);
+	void DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod);
 
 	static void OnMousePressTimer(void *pData);
 };

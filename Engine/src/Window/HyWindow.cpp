@@ -416,7 +416,7 @@ bool HyWindow::ProjectToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindo
 	for(uint32 i = 0; i < m_Cams2dList.size(); ++i)
 	{
 		m_Cams2dList[i]->CalcWorldViewBounds(aabbWorld);
-		if(HyTestPointAABB(aabbWorld, ptWorldPos))
+		if(HyMath::TestPointAABB(aabbWorld, ptWorldPos))
 		{
 			const HyRectangle<float> &viewportRect = m_Cams2dList[i]->GetViewport();
 			float fFbWidth = (viewportRect.Width() * GetFramebufferSize().x);

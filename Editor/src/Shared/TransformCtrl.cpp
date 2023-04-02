@@ -9,19 +9,26 @@
  *************************************************************************/
 #include "Global.h"
 #include "TransformCtrl.h"
+#include "EntityModel.h"
 #include "EntityDrawItem.h"
 
-GrabPoint::GrabPoint(HyColor outlineColor, HyColor fillColor, HyEntity2d *pParent) :
+GrabPoint::GrabPoint(HyColor outlineColor, HyColor fillColor, HyColor selectedOutlineColor, HyColor selectedFillColor, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_GrabOutline(this),
-	m_GrabFill(this)
+	m_GrabFill(this),
+	m_OutlineColor(outlineColor),
+	m_FillColor(fillColor),
+	m_SelectedOutlineColor(selectedOutlineColor),
+	m_SelectedFillColor(selectedFillColor),
+	m_bIsSelected(false)
 {
 	const float fRADIUS = 5.0f;
-	m_GrabOutline.SetTint(outlineColor);
-	m_GrabOutline.SetAsCircle(fRADIUS);
 
-	m_GrabFill.SetTint(fillColor);
+	m_GrabOutline.SetAsCircle(fRADIUS);
+	m_GrabOutline.SetTint(m_OutlineColor);
+
 	m_GrabFill.SetAsCircle(fRADIUS - 1.0f);
+	m_GrabFill.SetTint(m_FillColor);
 
 	UseWindowCoordinates(0);
 }
@@ -35,23 +42,53 @@ void GrabPoint::GetLocalBoundingShape(HyShape2d &shapeRefOut)
 	m_GrabOutline.CalcLocalBoundingShape(shapeRefOut);
 }
 
+bool GrabPoint::IsSelected() const
+{
+	return m_bIsSelected;
+}
+
+void GrabPoint::SetSelected(bool bSelected)
+{
+	m_bIsSelected = bSelected;
+	if(m_bIsSelected)
+	{
+		m_GrabOutline.SetTint(m_SelectedOutlineColor);
+		m_GrabFill.SetTint(m_SelectedFillColor);
+	}
+	else
+	{
+		m_GrabOutline.SetTint(m_OutlineColor);
+		m_GrabFill.SetTint(m_FillColor);
+	}
+}
+
+HyColor GrabPoint::GetOutlineColor()
+{
+	return HyColor(m_GrabOutline.topColor.X(), m_GrabOutline.topColor.Y(), m_GrabOutline.topColor.Z());
+}
+
+HyColor GrabPoint::GetFillColor()
+{
+	return HyColor(m_GrabFill.topColor.X(), m_GrabFill.topColor.Y(), m_GrabFill.topColor.Z());
+}
+
 TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_bIsShown(false),
 	m_bShowGrabPoints(false),
 	m_fCachedRotation(0.0f)
 {
-	m_BoundingVolume.SetTint(HyColor::Blue.Lighten());
+	m_BoundingVolume.SetTint(ENTCOLOR_TransformBv);
 	m_BoundingVolume.SetWireframe(true);
 	ChildAppend(m_BoundingVolume);
 
-	m_ExtrudeSegment.SetTint(HyColor::Blue.Lighten());
+	m_ExtrudeSegment.SetTint(ENTCOLOR_TransformBv);
 	m_ExtrudeSegment.SetWireframe(true);
 	ChildAppend(m_ExtrudeSegment);
 
 	for(uint i = 0; i < GRAB_Rotate; ++i)
-		m_GrabPoints[i] = new GrabPoint(HyColor::White, HyColor::Blue.Lighten(), this);
-	m_GrabPoints[GRAB_Rotate] = new GrabPoint(HyColor::Blue.Lighten(), HyColor::White, this);
+		m_GrabPoints[i] = new GrabPoint(ENTCOLORPOINT_Transform, ENTCOLORPOINT_Transform, this);
+	m_GrabPoints[GRAB_Rotate] = new GrabPoint(ENTCOLORPOINT_TransformRotate, ENTCOLORPOINT_TransformRotate, this);
 
 	UseWindowCoordinates(0);
 	SetDisplayOrder(DISPLAYORDER_TransformCtrl);
