@@ -791,7 +791,7 @@ void EntityDraw::DoMouseRelease_Transform()
 	{
 		newTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
 
-		EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetThisUuid());;
+		EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetThisUuid());
 		treeItemDataList.push_back(pTreeItemData);
 	}
 
@@ -854,7 +854,10 @@ void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 			m_DragShape.SetAsDrag(bShiftMod, m_ptDragStart, ptCurMousePos, m_pCamera);
 		else // SHAPESTATE_VertexEditMode
 		{
-			m_pCurVertexEditItem->GetShapeCtrl().TransformVemVerts(m_eCurVemAction, m_ptDragStart, ptCurMousePos, m_pCamera);
+			if(m_pCurVertexEditItem->GetShapeCtrl().TransformVemVerts(m_eCurVemAction, m_ptDragStart, ptCurMousePos, m_pCamera))
+				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
+			else
+				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ForbiddenCursor);
 		}
 		break;
 	}
@@ -872,10 +875,11 @@ void EntityDraw::DoMousePress_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 	}
 	else // SHAPESTATE_VertexEditMode
 	{
-		if(bShiftMod == false)
+		if(m_eCurVemAction != ShapeCtrl::VEMACTION_Translate && bShiftMod == false)
 			m_pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
 
 		m_eCurVemAction = m_pCurVertexEditItem->GetShapeCtrl().GetMouseVemAction(true);
+
 		if(m_eCurVemAction == ShapeCtrl::VEMACTION_None)
 			m_eDragState = DRAGSTATE_Marquee;
 		else if(m_eCurVemAction != ShapeCtrl::VEMACTION_Invalid) // A GrabPoint is selected
@@ -918,6 +922,13 @@ void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 			m_pCurVertexEditItem->GetShapeCtrl().SelectVemVerts(marqueeAabb, m_pCamera);
 
 			m_DragShape.Setup(SHAPE_None, ENTCOLOR_Clear, 1.0f, 1.0f);
+		}
+		else if(m_eDragState == DRAGSTATE_Transforming)
+		{
+			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(m_pCurVertexEditItem->GetThisUuid());
+
+			QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, pTreeItemData, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
+			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
 
 		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);

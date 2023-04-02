@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Global.h"
 #include "EntityDrawItem.h"
+#include "EntityModel.h"
 #include "MainWindow.h"
 
 EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent) :
@@ -105,7 +106,7 @@ void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 	bool bIsSelected = childObj["isSelected"].toBool();
 
 	// Parse all and only the potential categories of the 'm_eGuiType' type, and set the values to 'pHyNode'
-	HyColor colorTint;
+	HyColor colorTint = ENTCOLOR_Shape;
 	if(m_eGuiType != ITEM_Shape)
 	{
 		QJsonObject commonObj = childObj["Common"].toObject();

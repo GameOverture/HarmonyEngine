@@ -51,6 +51,13 @@ void ShapeCtrl::Setup(EditorShape eShape, HyColor color, float fBvAlpha, float f
 	m_eShape = eShape;
 
 	m_BoundingVolume.SetTint(color);
+	if(color != ENTCOLOR_Shape)
+	{
+		if(color.IsDark())
+			color = color.Lighten();
+		else
+			color = color.Darken();
+	}
 	m_Outline.SetTint(color);
 
 	if(fBvAlpha == 0.0f)
@@ -156,6 +163,7 @@ void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDrag
 		m_Outline.SetAsLineSegment(ptStartPos, ptDragPos);
 		break;
 
+	case SHAPE_LineLoop:
 	case SHAPE_LineChain: {
 		std::vector<glm::vec2> vertList;
 		vertList.push_back(ptStartPos);
@@ -168,20 +176,6 @@ void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDrag
 		vertList.push_back(ptStartPos);
 		vertList.push_back(ptDragPos);
 		m_Outline.SetAsLineChain(vertList);
-		break; }
-
-	case SHAPE_LineLoop: {
-		std::vector<glm::vec2> vertList;
-		vertList.push_back(ptStartPos);
-		vertList.push_back(ptDragPos);
-		m_BoundingVolume.SetAsLineLoop(vertList);
-
-		pCamera->ProjectToCamera(ptStartPos, ptStartPos);
-		pCamera->ProjectToCamera(ptDragPos, ptDragPos);
-		vertList.clear();
-		vertList.push_back(ptStartPos);
-		vertList.push_back(ptDragPos);
-		m_Outline.SetAsLineLoop(vertList);
 		break; }
 
 	default:
@@ -300,14 +294,13 @@ void ShapeCtrl::Deserialize(QString sData, HyCamera2d *pCamera)
 	RefreshOutline(pCamera);
 }
 
-void ShapeCtrl::TransformSelf(glm::mat4 mtxTransform, HyCamera2d *pCamera)
+// NOTE: Does not update m_Outline, requires a RefreshOutline()
+void ShapeCtrl::TransformSelf(glm::mat4 mtxTransform)
 {
 	HyShape2d shape;
 	m_BoundingVolume.CalcLocalBoundingShape(shape);
 	shape.TransformSelf(mtxTransform);
 	m_BoundingVolume.SetAsShape(shape);
-
-	RefreshOutline(pCamera);
 }
 
 void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
@@ -410,7 +403,7 @@ ShapeCtrl::VemAction ShapeCtrl::GetMouseVemAction(bool bSelectVert)
 			selectedGrabPtList.push_back(pGrabPt);
 	}
 
-	if(selectedGrabPtList.isEmpty() == false)
+	if(selectedGrabPtList.isEmpty() == false && m_eShape != SHAPE_Circle)
 	{
 		b2AABB selectedVertsArea;
 		HyMath::InvalidateAABB(selectedVertsArea);
@@ -425,7 +418,6 @@ ShapeCtrl::VemAction ShapeCtrl::GetMouseVemAction(bool bSelectVert)
 		if(HyMath::TestPointAABB(selectedVertsArea, HyEngine::Input().GetMousePos()))
 			return VEMACTION_Translate;
 	}
-	
 
 	switch(m_eShape)
 	{
@@ -479,9 +471,17 @@ void ShapeCtrl::SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera)
 	}
 }
 
-void ShapeCtrl::TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
+bool ShapeCtrl::TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
 {
-	// Get selected grab points
+	if(eAction == VEMACTION_Invalid || eAction == VEMACTION_None)
+		return true;
+
+	// Calculate mouse drag (vTranslate) in camera coordinates
+	pCamera->ProjectToCamera(ptStartPos, ptStartPos);
+	pCamera->ProjectToCamera(ptDragPos, ptDragPos);
+	glm::vec2 vTranslate = ptDragPos - ptStartPos;
+
+	// Get currently selected grab points
 	QList<GrabPoint *> selectedGrabPtList;
 	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
 	{
@@ -489,23 +489,154 @@ void ShapeCtrl::TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::
 			selectedGrabPtList.push_back(pGrabPt);
 	}
 
+	// Apply the transform based on the action
+	RefreshOutline(pCamera);
 	switch(eAction)
 	{
-	case VEMACTION_Invalid:
-	case VEMACTION_None:
-		break;
-
 	case VEMACTION_Translate:
-	case VEMACTION_GrabPoint:
+	case VEMACTION_GrabPoint: {
+
+		if(m_eShape == SHAPE_Box)
+		{
+			// Box has special case to lock vertices together to keep box form
+			if(selectedGrabPtList.size() == 1 || selectedGrabPtList.size() == 3)
+			{
+
+			}
+			else if(selectedGrabPtList.size() == 2)
+			{
+			}
+		}
+		else if(m_eShape == SHAPE_Circle)
+		{
+			// Select all verts
+			selectedGrabPtList.clear();
+			for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+				selectedGrabPtList.push_back(pGrabPt);
+		}
+
+		for(GrabPoint *pSelectedPt : selectedGrabPtList)
+			pSelectedPt->pos.Offset(vTranslate);
+
+		std::vector<glm::vec2> vertList;
+		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+			vertList.push_back(pGrabPt->pos.Get());
+
+		switch(m_eShape)
+		{
+		case SHAPE_Box:
+			break;
+
+		case SHAPE_LineSegment:
+			m_Outline.SetAsLineSegment(vertList[0], vertList[1]);
+			break;
+
+		case SHAPE_LineChain:
+		case SHAPE_LineLoop:
+			m_Outline.SetAsLineChain(vertList);
+			break;
+
+		case SHAPE_Polygon:
+			m_Outline.SetAsPolygon(vertList);
+			break;
+
+		case SHAPE_Circle: {
+			HyShape2d tmpShape;
+			m_Outline.CalcLocalBoundingShape(tmpShape);
+			m_Outline.SetAsCircle(vertList[0], tmpShape.GetB2Shape()->m_radius);
+			break; }
+
+		default:
+			HyGuiLog("ShapeCtrl::TransformVemVerts - Unhandled shape type", LOGTYPE_Error);
+			break;
+		}
+		break; }
+
 	case VEMACTION_RadiusHorizontal:
 	case VEMACTION_RadiusVertical:
-	case VEMACTION_Add:
+		m_Outline.SetAsCircle(m_VertexGrabPointList[0]->pos.Get(), glm::distance(m_VertexGrabPointList[0]->pos.Get(), ptDragPos));
 		break;
 
 	default:
-		HyGuiLog("ShapeCtrl::TransformVemVerts() - Unhandled ShapeCtrl::VemAction", LOGTYPE_Error);
+		HyGuiLog("ShapeCtrl::TransformVemVerts - Unhandled VEM ACTION", LOGTYPE_Error);
 		break;
 	}
+
+	return true;
+}
+
+QString ShapeCtrl::SerializeVemVerts(HyCamera2d *pCamera)
+{
+	HyShape2d shape;
+	m_Outline.CalcLocalBoundingShape(shape);
+
+	QList<float> floatList;
+	switch(m_eShape)
+	{
+	case SHAPE_None:
+		break;
+
+	case SHAPE_Polygon:
+	case SHAPE_Box: {
+		const b2PolygonShape *pPolyShape = static_cast<const b2PolygonShape *>(shape.GetB2Shape());
+		for(int i = 0; i < pPolyShape->m_count; ++i)
+		{
+			glm::vec2 ptVert(pPolyShape->m_vertices[i].x, pPolyShape->m_vertices[i].y);
+			pCamera->ProjectToWorld(ptVert, ptVert);
+
+			floatList.push_back(ptVert.x);
+			floatList.push_back(ptVert.y);
+		}
+		break; }
+
+	case SHAPE_Circle: {
+		const b2CircleShape *pCircleShape = static_cast<const b2CircleShape *>(shape.GetB2Shape());
+
+		glm::vec2 ptCenter(pCircleShape->m_p.x, pCircleShape->m_p.y);
+		pCamera->ProjectToWorld(ptCenter, ptCenter);
+
+		floatList.push_back(ptCenter.x);
+		floatList.push_back(ptCenter.y);
+		floatList.push_back(pCircleShape->m_radius / pCamera->GetZoom());
+		break; }
+
+	case SHAPE_LineSegment: {
+		const b2EdgeShape *pLineSegment = static_cast<const b2EdgeShape *>(shape.GetB2Shape());
+
+		glm::vec2 ptVert1(pLineSegment->m_vertex1.x, pLineSegment->m_vertex1.y);
+		glm::vec2 ptVert2(pLineSegment->m_vertex2.x, pLineSegment->m_vertex2.y);
+		pCamera->ProjectToWorld(ptVert1, ptVert1);
+		pCamera->ProjectToWorld(ptVert2, ptVert2);
+
+		floatList.push_back(ptVert1.x);
+		floatList.push_back(ptVert1.y);
+		floatList.push_back(ptVert2.x);
+		floatList.push_back(ptVert2.y);
+		break; }
+
+	case SHAPE_LineChain:
+	case SHAPE_LineLoop: {
+		const b2ChainShape *pChainShape = static_cast<const b2ChainShape *>(shape.GetB2Shape());
+		for(int i = 0; i < pChainShape->m_count; ++i)
+		{
+			glm::vec2 ptVert(pChainShape->m_vertices[i].x, pChainShape->m_vertices[i].y);
+			pCamera->ProjectToWorld(ptVert, ptVert);
+
+			floatList.push_back(ptVert.x);
+			floatList.push_back(ptVert.y);
+		}
+		break; }
+	}
+
+	QString sSerializedData;
+	for(float f : floatList)
+	{
+		sSerializedData.append(QString::number(f));
+		sSerializedData.append(',');
+	}
+	sSerializedData.chop(1);
+
+	return sSerializedData;
 }
 
 void ShapeCtrl::UnselectAllVemVerts()

@@ -52,34 +52,17 @@ public:
 	QString Serialize();
 	void Deserialize(QString sData, HyCamera2d *pCamera);
 
-	void TransformSelf(glm::mat4 mtxTransform, HyCamera2d *pCamera);
+	void TransformSelf(glm::mat4 mtxTransform); // NOTE: Does not update m_Outline, requires a RefreshOutline()
 
 	void RefreshOutline(HyCamera2d *pCamera);
 
 	void EnableVertexEditMode();
 	VemAction GetMouseVemAction(bool bSelectVert);
 	void SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera);
-	void TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	bool TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	QString SerializeVemVerts(HyCamera2d *pCamera);
 	void UnselectAllVemVerts();
 	void ClearVertexEditMode();
-
-	//{
-	//	glm::vec2 ptWorldMousePos;
-	//	if(m_bIsShown == false || m_bShowGrabPoints == false || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
-	//		return GRAB_None;
-
-	//	ptWorldMousePos = HyEngine::Input().GetMousePos();
-
-	//	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
-	//	{
-	//		HyShape2d tmpShape;
-	//		m_GrabPoints[i]->GetLocalBoundingShape(tmpShape);
-	//		if(tmpShape.TestPoint(m_GrabPoints[i]->GetSceneTransform(0.0f), ptWorldMousePos))
-	//			return static_cast<GrabPointType>(i);
-	//	}
-
-	//	return GRAB_None;
-	//}
 
 protected:
 	void SetVertexGrabPointListSize(uint32 uiNumGrabPoints);

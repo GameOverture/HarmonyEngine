@@ -296,6 +296,11 @@ public:
 		return m_uiA == rhs.m_uiA && m_uiR == rhs.m_uiR && m_uiG == rhs.m_uiG && m_uiB == rhs.m_uiB;
 	}
 
+	bool operator!=(const HyColor &rhs)
+	{
+		return !(*this == rhs);
+	}
+
 	// Returned as uint32 mask: ARGB
 	uint32 GetAsUint32() const {
 		return (m_uiA << 24) | (m_uiR << 16) | (m_uiG << 8) | m_uiB;

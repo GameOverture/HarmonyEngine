@@ -223,7 +223,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			ShapeCtrl shapeCtrl;
 			shapeCtrl.Setup(HyGlobal::GetShapeFromString(m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Type").toString()), color, 0.0f, 1.0f);
 			shapeCtrl.Deserialize(m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString(), nullptr);
-			shapeCtrl.TransformSelf(m_NewTransformList[i], nullptr);
+			shapeCtrl.TransformSelf(m_NewTransformList[i]);
 			
 			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Shape", "Data", shapeCtrl.Serialize());
 		}
@@ -250,25 +250,13 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_pShapeItemData(pShapeItemData),
-	m_eVemAction(eVemAction),
 	m_sNewData(sNewData),
 	m_sPrevData(m_pShapeItemData->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString())
 {
-	switch(m_eVemAction)
-	{
-	//case ShapeCtrl::EDIT_Add:
-	//	setText("Add Vertex to shape");
-	//	break;
-	//case ShapeCtrl::EDIT_Remove:
-	//	setText("Remove Vertex from shape");
-	//	break;
-	//case ShapeCtrl::EDIT_TranslateOne:
-	//	setText("Move Vertex on shape");
-	//	break;
-	}
+	setText("Modified shape data on " % pShapeItemData->GetCodeName());
 }
 
 /*virtual*/ EntityUndoCmd_ShapeData::~EntityUndoCmd_ShapeData()
