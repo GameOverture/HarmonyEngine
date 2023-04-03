@@ -14,7 +14,8 @@
 ShapeCtrl::ShapeCtrl() :
 	m_eShape(SHAPE_None),
 	m_BoundingVolume(nullptr),
-	m_Outline(nullptr)
+	m_Outline(nullptr),
+	m_bIsVem(false)
 {
 	m_BoundingVolume.SetVisible(false);
 
@@ -28,7 +29,8 @@ ShapeCtrl::ShapeCtrl(const ShapeCtrl &copyRef) :
 	m_eShape(copyRef.m_eShape),
 	m_BoundingVolume(copyRef.m_BoundingVolume),
 	m_Outline(copyRef.m_Outline),
-	m_DeserializedFloatList(copyRef.m_DeserializedFloatList)
+	m_DeserializedFloatList(copyRef.m_DeserializedFloatList),
+	m_bIsVem(copyRef.m_bIsVem)
 {
 }
 
@@ -385,18 +387,44 @@ void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
 		m_Outline.SetAsLineChain(vertList);
 		break; }
 	}
+
+	if(IsVemEnabled())
+	{
+		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+			pGrabPt->SetVisible(true);
+	}
+}
+
+bool ShapeCtrl::IsVemEnabled() const
+{
+	return m_bIsVem;
 }
 
 void ShapeCtrl::EnableVertexEditMode()
 {
+	m_bIsVem = true;
+
 	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
 		pGrabPt->SetVisible(true);
 
 	UnselectAllVemVerts();
 }
 
-ShapeCtrl::VemAction ShapeCtrl::GetMouseVemAction(bool bSelectVert)
+ShapeCtrl::VemAction ShapeCtrl::GetMouseVemAction(bool bCtrlMod, bool bShiftMod, bool bSelectVert)
 {
+	if(bCtrlMod && m_eShape != SHAPE_None && m_eShape != SHAPE_Box && m_eShape != SHAPE_Circle && m_eShape != SHAPE_LineSegment)
+	{
+		if(m_eShape == SHAPE_Polygon)
+		{
+			if(m_VertexGrabPointList.count() >= b2_maxPolygonVertices)
+				return VEMACTION_Invalid;
+			else
+				return VEMACTION_Add;
+		}
+		
+		return VEMACTION_Add;
+	}
+
 	// Get selected grab points
 	QList<GrabPoint *> selectedGrabPtList;
 	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
@@ -476,20 +504,12 @@ void ShapeCtrl::SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera)
 bool ShapeCtrl::TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
 {
 	if(eAction == VEMACTION_Invalid || eAction == VEMACTION_None)
-		return true;
+		return eAction == VEMACTION_None; // Will return 'false' when eAction == VEMACTION_Invalid
 
 	// Calculate mouse drag (vTranslate) in camera coordinates
 	pCamera->ProjectToCamera(ptStartPos, ptStartPos);
 	pCamera->ProjectToCamera(ptDragPos, ptDragPos);
 	glm::vec2 vTranslate = ptDragPos - ptStartPos;
-
-	// Get currently selected grab points
-	QList<GrabPoint *> selectedGrabPtList;
-	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
-	{
-		if(pGrabPt->IsSelected())
-			selectedGrabPtList.push_back(pGrabPt);
-	}
 
 	// Apply the transform based on the action
 	RefreshOutline(pCamera);
@@ -497,6 +517,13 @@ bool ShapeCtrl::TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::
 	{
 	case VEMACTION_Translate:
 	case VEMACTION_GrabPoint: {
+		// Get currently selected grab points
+		QList<GrabPoint *> selectedGrabPtList;
+		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+		{
+			if(pGrabPt->IsSelected())
+				selectedGrabPtList.push_back(pGrabPt);
+		}
 
 		if(m_eShape == SHAPE_Box)
 		{
@@ -550,14 +577,124 @@ bool ShapeCtrl::TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::
 
 		default:
 			HyGuiLog("ShapeCtrl::TransformVemVerts - Unhandled shape type", LOGTYPE_Error);
-			break;
+			return false;
 		}
 		break; }
 
+	//////////////////////////////////////////////////////////////////////////
 	case VEMACTION_RadiusHorizontal:
 	case VEMACTION_RadiusVertical:
 		m_Outline.SetAsCircle(m_VertexGrabPointList[0]->pos.Get(), glm::distance(m_VertexGrabPointList[0]->pos.Get(), ptDragPos));
 		break;
+
+	//////////////////////////////////////////////////////////////////////////
+	case VEMACTION_Add: {
+		std::vector<glm::vec2> vertList;
+		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+			vertList.push_back(pGrabPt->pos.Get());
+
+		switch(m_eShape)
+		{
+		case SHAPE_Polygon: {
+			auto fpCompareDistance = [ptDragPos](const glm::vec2 &ptA, const glm::vec2 &ptB) {
+				return glm::distance(ptDragPos, ptA) < glm::distance(ptDragPos, ptB);
+			};
+
+			auto closestIter = std::min_element(vertList.begin(), vertList.end(), fpCompareDistance);
+			auto closestIndex = std::distance(vertList.begin(), closestIter);
+
+			auto nextIt = std::next(closestIter);
+			auto nextIndex = closestIndex + 1;
+
+			if(nextIt == vertList.end())
+				vertList.push_back(ptDragPos);
+			else
+			{
+				auto insertIt = vertList.begin() + nextIndex;
+				vertList.insert(insertIt, ptDragPos);
+			}
+
+			m_Outline.SetAsPolygon(vertList);
+			break; }
+
+		case SHAPE_LineChain:
+		case SHAPE_LineLoop: {
+			bool bPrepend = false;
+			bool bUseClosestEnd = true;
+
+			// Use selected verts to determine whether to prepend or append
+			for(int i = 0; i < m_VertexGrabPointList.size(); )
+			{
+				if(m_VertexGrabPointList[i]->IsSelected())
+				{
+					bUseClosestEnd = false;
+
+					if(i <= m_VertexGrabPointList.size() / 2)
+					{
+						bPrepend = true;
+						
+						if(i <= ((m_VertexGrabPointList.size() - 1) - i))
+							break;
+						else
+							i = ((m_VertexGrabPointList.size() - 1) - i);
+					}
+					else
+					{
+						bPrepend = false;
+						break;
+					}
+				}
+				else
+					++i;
+			}
+
+			if(bUseClosestEnd)
+			{
+				float fPrependDistance = glm::distance(ptDragPos, vertList.front());
+				float fAppendDistance = glm::distance(ptDragPos, vertList.back());
+				bPrepend = (fPrependDistance < fAppendDistance);
+			}
+
+			if(bPrepend)
+				vertList.insert(vertList.begin(), ptDragPos);
+			else
+				vertList.push_back(ptDragPos);
+
+			m_Outline.SetAsLineChain(vertList);
+			break; }
+
+		case SHAPE_Box:
+		case SHAPE_Circle:
+		case SHAPE_LineSegment:
+		default:
+			HyGuiLog("ShapeCtrl::TransformVemVerts - VEMACTION_Add invalid shape type", LOGTYPE_Error);
+			return false;
+		}
+		break; }
+
+	case VEMACTION_RemoveSelected: {
+		bool bHasSelection = false;
+		std::vector<glm::vec2> vertList;
+		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+		{
+			if(pGrabPt->IsSelected())
+				bHasSelection = true; // Skip over selected items
+			else
+				vertList.push_back(pGrabPt->pos.Get());
+		}
+		if(bHasSelection == false || vertList.size() <= 2)
+			return false;
+
+		if(m_eShape == SHAPE_Polygon)
+			m_Outline.SetAsPolygon(vertList);
+		else if(m_eShape == SHAPE_LineChain || m_eShape == SHAPE_LineLoop)
+			m_Outline.SetAsLineChain(vertList);
+		else
+		{
+			HyGuiLog("ShapeCtrl::TransformVemVerts - VEMACTION_Add invalid shape type", LOGTYPE_Error);
+			return false;
+		}
+		break; }
 
 	default:
 		HyGuiLog("ShapeCtrl::TransformVemVerts - Unhandled VEM ACTION", LOGTYPE_Error);
@@ -651,6 +788,8 @@ void ShapeCtrl::ClearVertexEditMode()
 {
 	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
 		pGrabPt->SetVisible(false);
+
+	m_bIsVem = false;
 }
 
 void ShapeCtrl::SetVertexGrabPointListSize(uint32 uiNumGrabPoints)

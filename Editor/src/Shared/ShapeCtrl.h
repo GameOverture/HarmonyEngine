@@ -25,7 +25,8 @@ public:
 		VEMACTION_GrabPoint,
 		VEMACTION_RadiusHorizontal,
 		VEMACTION_RadiusVertical,
-		VEMACTION_Add
+		VEMACTION_Add,
+		VEMACTION_RemoveSelected
 	};
 
 protected:
@@ -36,6 +37,8 @@ protected:
 
 	QList<float>				m_DeserializedFloatList;
 	QList<GrabPoint *>			m_VertexGrabPointList;
+
+	bool						m_bIsVem;
 
 public:
 	ShapeCtrl();
@@ -56,8 +59,9 @@ public:
 
 	void RefreshOutline(HyCamera2d *pCamera);
 
+	bool IsVemEnabled() const;
 	void EnableVertexEditMode();
-	VemAction GetMouseVemAction(bool bSelectVert);
+	VemAction GetMouseVemAction(bool bCtrlMod, bool bShiftMod, bool bSelectVert);
 	void SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera);
 	bool TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
 	QString SerializeVemVerts(HyCamera2d *pCamera);

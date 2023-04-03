@@ -84,6 +84,7 @@ public:
 	void SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive);
 	void ActivateVemOnNextJsonMeta();
 	void SetShapeEditVertex();
+
 	void RequestClearShapeEdit();
 	void ClearShapeEdit();
 
@@ -95,6 +96,8 @@ protected:
 	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
 
 	Qt::CursorShape GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const;
+
+	void DoMouseMove(bool bCtrlMod, bool bShiftMod);
 
 	void DoMouseMove_Select(bool bCtrlMod, bool bShiftMod);
 	void DoMousePress_Select(bool bCtrlMod, bool bShiftMod);

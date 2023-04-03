@@ -49,11 +49,39 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 /*virtual*/ void EntityDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
 	IDraw::OnKeyPressEvent(pEvent);
+	
+	if(m_bPanCameraKeyDown)
+		RefreshTransforms();
+	else
+	{
+		if(pEvent->key() == Qt::Key_Backspace) // Qt::Key_Delete isn't being passed to this callback
+		{
+			if(m_eShapeEditState == SHAPESTATE_VertexEditMode)
+			{
+				if(m_pCurVertexEditItem->GetShapeCtrl().TransformVemVerts(ShapeCtrl::VEMACTION_RemoveSelected, glm::vec2(), glm::vec2(), m_pCamera) == false)
+					return;
+
+				EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(m_pCurVertexEditItem->GetThisUuid());
+				QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, pTreeItemData, ShapeCtrl::VEMACTION_RemoveSelected, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
+				m_pProjItem->GetUndoStack()->push(pCmd);
+			}
+		}
+		if(pEvent->key() == Qt::Key_Control || pEvent->key() == Qt::Key_Shift)
+			DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+	}
 }
 
 /*virtual*/ void EntityDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
 {
 	IDraw::OnKeyReleaseEvent(pEvent);
+	
+	if(m_bPanCameraKeyDown)
+		RefreshTransforms();
+	else
+	{
+		if(pEvent->key() == Qt::Key_Control || pEvent->key() == Qt::Key_Shift)
+			DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+	}
 }
 
 /*virtual*/ void EntityDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
@@ -68,21 +96,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	if(m_bPanCameraKeyDown)
 		RefreshTransforms();
 	else
-	{
-		if(m_eShapeEditState == SHAPESTATE_None)
-		{
-			if(m_eDragState == DRAGSTATE_None ||
-				m_eDragState == DRAGSTATE_Marquee ||
-				m_eDragState == DRAGSTATE_Pending)
-			{
-				DoMouseMove_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-			}
-			else // DRAGSTATE_Transforming
-				DoMouseMove_Transform(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-		}
-		else
-			DoMouseMove_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-	}
+		DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 }
 
 /*virtual*/ void EntityDraw::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
@@ -405,6 +419,23 @@ Qt::CursorShape EntityDraw::GetGrabPointCursorShape(TransformCtrl::GrabPointType
 	}
 }
 
+void EntityDraw::DoMouseMove(bool bCtrlMod, bool bShiftMod)
+{
+	if(m_eShapeEditState == SHAPESTATE_None)
+	{
+		if(m_eDragState == DRAGSTATE_None ||
+			m_eDragState == DRAGSTATE_Marquee ||
+			m_eDragState == DRAGSTATE_Pending)
+		{
+			DoMouseMove_Select(bCtrlMod, bShiftMod);
+		}
+		else // DRAGSTATE_Transforming
+			DoMouseMove_Transform(bCtrlMod, bShiftMod);
+	}
+	else
+		DoMouseMove_ShapeEdit(bCtrlMod, bShiftMod);
+}
+
 void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 {
 	if(m_eDragState == DRAGSTATE_Marquee)
@@ -590,22 +621,14 @@ void EntityDraw::BeginTransform()
 	m_PrevTransformList.clear();
 	for(EntityDrawItem *pDrawItem : m_SelectedItemList)
 	{
-		//if(pDrawItem->GetGuiType() != ITEM_Shape)
+		if(pDrawItem->GetHyNode()->GetInternalFlags() & NODETYPE_IsBody)
 		{
-			if(pDrawItem->GetHyNode()->GetInternalFlags() & NODETYPE_IsBody)
-			{
-				IHyBody2d *pDrawBody = static_cast<IHyBody2d *>(pDrawItem->GetHyNode());
-				pDrawBody->SetDisplayOrder(pDrawBody->GetDisplayOrder()); // This enables the 'EXPLICIT_DisplayOrder' flag to be used during m_ActiveTransform's parental guidance
-			}
-
-			m_ActiveTransform.ChildAppend(*pDrawItem->GetHyNode());
-			m_PrevTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
+			IHyBody2d *pDrawBody = static_cast<IHyBody2d *>(pDrawItem->GetHyNode());
+			pDrawBody->SetDisplayOrder(pDrawBody->GetDisplayOrder()); // This enables the 'EXPLICIT_DisplayOrder' flag to be used during m_ActiveTransform's parental guidance
 		}
-		//else
-		//{
-		//	//m_ActiveTransform.ShapeAppend(*pDrawItem->GetShape());
-		//	//m_PrevTransformList.push_back(glm::mat4(1.0f));
-		//}
+
+		m_ActiveTransform.ChildAppend(*pDrawItem->GetHyNode());
+		m_PrevTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
 	}
 
 	// The mouse cursor must be set when transforming - it is used to determine the type of transform
@@ -835,7 +858,7 @@ void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 	case DRAGSTATE_None:
 		if(m_eShapeEditState == SHAPESTATE_VertexEditMode)
 		{
-			m_eCurVemAction = m_pCurVertexEditItem->GetShapeCtrl().GetMouseVemAction(false);
+			m_eCurVemAction = m_pCurVertexEditItem->GetShapeCtrl().GetMouseVemAction(bCtrlMod, bShiftMod, false);
 
 			Qt::CursorShape eCursorShape = Qt::ArrowCursor;
 			switch(m_eCurVemAction)
@@ -873,7 +896,10 @@ void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 		else // SHAPESTATE_VertexEditMode
 		{
 			if(m_pCurVertexEditItem->GetShapeCtrl().TransformVemVerts(m_eCurVemAction, m_ptDragStart, ptCurMousePos, m_pCamera))
-				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
+			{
+				if(m_eCurVemAction != ShapeCtrl::VEMACTION_Add)
+					Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
+			}
 			else
 				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ForbiddenCursor);
 		}
@@ -896,13 +922,19 @@ void EntityDraw::DoMousePress_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 		if(m_eCurVemAction != ShapeCtrl::VEMACTION_Translate && bShiftMod == false)
 			m_pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
 
-		m_eCurVemAction = m_pCurVertexEditItem->GetShapeCtrl().GetMouseVemAction(true);
+		m_eCurVemAction = m_pCurVertexEditItem->GetShapeCtrl().GetMouseVemAction(bCtrlMod, bShiftMod, true);
 
 		if(m_eCurVemAction == ShapeCtrl::VEMACTION_None)
 			m_eDragState = DRAGSTATE_Marquee;
 		else if(m_eCurVemAction != ShapeCtrl::VEMACTION_Invalid) // A GrabPoint is selected
 		{
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
+			if(m_eCurVemAction == ShapeCtrl::VEMACTION_Add)
+			{
+				if(m_pCurVertexEditItem->GetShapeCtrl().TransformVemVerts(m_eCurVemAction, m_ptDragStart, m_ptDragStart, m_pCamera) == false)
+					Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ForbiddenCursor);
+			}
+			else
+				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
 
 			m_PressTimer.InitStart(0.5f);
 			m_eDragState = DRAGSTATE_Pending;
@@ -945,7 +977,7 @@ void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 		{
 			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(m_pCurVertexEditItem->GetThisUuid());
 
-			QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, pTreeItemData, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
+			QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, pTreeItemData, m_eCurVemAction, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
 			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
 
