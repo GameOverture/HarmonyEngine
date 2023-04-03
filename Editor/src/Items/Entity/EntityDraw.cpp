@@ -27,7 +27,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_eDragState(DRAGSTATE_None),
 	m_eShapeEditState(SHAPESTATE_None),
 	m_pCurVertexEditItem(nullptr),
-	m_eCurVemAction(ShapeCtrl::VEMACTION_None)
+	m_eCurVemAction(ShapeCtrl::VEMACTION_None),
+	m_bActivateVemOnNextJsonMeta(false)
 {
 	m_MultiTransform.Hide();
 	m_PressTimer.SetExpiredCallback(OnMousePressTimer, this);
@@ -192,9 +193,15 @@ void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 }
 
+void EntityDraw::ActivateVemOnNextJsonMeta()
+{
+	m_bActivateVemOnNextJsonMeta = true;
+}
+
 void EntityDraw::SetShapeEditVertex()
 {
-	if(m_SelectedItemList.count() != 1 && m_SelectedItemList[0]->GetGuiType() != ITEM_Primitive && m_SelectedItemList[0]->GetGuiType() != ITEM_Shape)
+	if(m_SelectedItemList.count() != 1 ||
+	  (m_SelectedItemList[0]->GetGuiType() != ITEM_Primitive && m_SelectedItemList[0]->GetGuiType() != ITEM_Shape))
 	{
 		HyGuiLog("EntityDraw::SetShapeEditVertex() invoked when selection is invalid", LOGTYPE_Error);
 		return;
@@ -291,16 +298,27 @@ void EntityDraw::ClearShapeEdit()
 		delete pStaleItem;
 	staleItemList.clear();
 
-	if(m_eShapeEditState == SHAPESTATE_None)
-	{
-		bool bShowGrabPoints = m_SelectedItemList.size() == 1;
-		for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
-			pSelectedItemDraw->ShowTransformCtrl(bShowGrabPoints);
-	}
-	else
+	if(m_bActivateVemOnNextJsonMeta)
 	{
 		for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
 			pSelectedItemDraw->HideTransformCtrl();
+
+		static_cast<EntityModel *>(m_pProjItem->GetModel())->SetShapeEditVemMode(true);
+		m_bActivateVemOnNextJsonMeta = false;
+	}
+	else
+	{
+		if(m_eShapeEditState == SHAPESTATE_None)
+		{
+			bool bShowGrabPoints = m_SelectedItemList.size() == 1;
+			for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
+				pSelectedItemDraw->ShowTransformCtrl(bShowGrabPoints);
+		}
+		else
+		{
+			for(EntityDrawItem *pSelectedItemDraw : m_SelectedItemList)
+				pSelectedItemDraw->HideTransformCtrl();
+		}
 	}
 
 	RefreshTransforms();

@@ -109,6 +109,10 @@ EntityTreeItemData *EntityModel::Cmd_AddNewShape(EditorShape eShape, QString sDa
 	if(pWidget)
 		pWidget->RequestSelectedItems(QList<QUuid>() << pTreeItemData->GetThisUuid(), false);
 
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntDraw)
+		pEntDraw->ActivateVemOnNextJsonMeta();
+
 	return pTreeItemData;
 }
 
@@ -134,6 +138,8 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 		return iRow;
 
 	m_ItemRef.GetProject().RelinquishItems(GetUuid(), QList<QUuid>() << pItem->GetItemUuid());
+
+	ClearShapeEdit();
 
 	return iRow;
 }
@@ -180,7 +186,7 @@ void EntityModel::SetShapeEditVemMode(bool bEnable)
 	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pEntityDraw)
 	{
-		if(bEnable)
+		if(m_bVertexEditMode)
 			pEntityDraw->SetShapeEditVertex();
 		else
 			pEntityDraw->ClearShapeEdit();

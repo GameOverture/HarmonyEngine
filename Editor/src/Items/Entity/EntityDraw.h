@@ -60,6 +60,8 @@ class EntityDraw : public IDraw
 	HyEntity2d								m_ActiveTransform;
 	QList<glm::mat4>						m_PrevTransformList;
 
+	bool									m_bActivateVemOnNextJsonMeta;
+
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~EntityDraw();
@@ -75,12 +77,12 @@ public:
 	virtual void OnMousePressEvent(QMouseEvent *pEvent) override;
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
 
-	//void OnSelectionChange(QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList);
 	void RequestSelection(QList<EntityDrawItem *> selectionList);
 
 	void RefreshTransforms();
 
 	void SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive);
+	void ActivateVemOnNextJsonMeta();
 	void SetShapeEditVertex();
 	void RequestClearShapeEdit();
 	void ClearShapeEdit();
