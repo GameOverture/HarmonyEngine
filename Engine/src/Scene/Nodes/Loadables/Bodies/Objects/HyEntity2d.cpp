@@ -347,8 +347,11 @@ void HyEntity2d::DisableMouseInput()
 bool HyEntity2d::IsMouseInBounds()
 {
 	glm::vec2 ptMouseInSceneCoords;
-	if(GetCoordinateSystem() >= 0 && HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem())
+	if(GetCoordinateSystem() >= 0)
 	{
+		if(HyEngine::Input().GetMouseWindowIndex() != GetCoordinateSystem())
+			return false;
+
 		ptMouseInSceneCoords = HyEngine::Input().GetMousePos();
 	}
 	else if(GetCoordinateSystem() < 0)

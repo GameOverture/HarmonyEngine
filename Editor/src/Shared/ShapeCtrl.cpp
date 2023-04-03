@@ -391,6 +391,8 @@ void ShapeCtrl::EnableVertexEditMode()
 {
 	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
 		pGrabPt->SetVisible(true);
+
+	UnselectAllVemVerts();
 }
 
 ShapeCtrl::VemAction ShapeCtrl::GetMouseVemAction(bool bSelectVert)
