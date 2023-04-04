@@ -735,7 +735,23 @@ bool HyShape2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) cons
 	b2Shape *pTransformedSelf = CloneTransform(mtxTransform);
 	if(pTransformedSelf)
 	{
-		pTransformedSelf->ComputeAABB(&aabbOut, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), 0);
+		if(m_eType == HYSHAPE_LineChain)
+		{
+			for(int i = 0; i < static_cast<b2ChainShape *>(pTransformedSelf)->m_count; ++i)
+			{
+				if(i == 0)
+					pTransformedSelf->ComputeAABB(&aabbOut, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), i);
+				else
+				{
+					b2AABB tmpAabb;
+					pTransformedSelf->ComputeAABB(&tmpAabb, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), i);
+					aabbOut.Combine(tmpAabb);
+				}
+			}
+		}
+		else
+			pTransformedSelf->ComputeAABB(&aabbOut, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), 0);
+
 		delete pTransformedSelf;
 
 		return true;

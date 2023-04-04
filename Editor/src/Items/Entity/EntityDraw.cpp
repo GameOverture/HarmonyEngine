@@ -919,7 +919,7 @@ void EntityDraw::DoMousePress_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 	}
 	else // SHAPESTATE_VertexEditMode
 	{
-		if(m_eCurVemAction != ShapeCtrl::VEMACTION_Translate && bShiftMod == false)
+		if(m_eCurVemAction != ShapeCtrl::VEMACTION_Translate && m_eCurVemAction != ShapeCtrl::VEMACTION_Add && bShiftMod == false)
 			m_pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
 
 		m_eCurVemAction = m_pCurVertexEditItem->GetShapeCtrl().GetMouseVemAction(bCtrlMod, bShiftMod, true);
@@ -973,7 +973,7 @@ void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 
 			m_DragShape.Setup(SHAPE_None, ENTCOLOR_Clear, 1.0f, 1.0f);
 		}
-		else if(m_eDragState == DRAGSTATE_Transforming)
+		else if(m_eDragState == DRAGSTATE_Transforming || (m_eDragState == DRAGSTATE_Pending && m_eCurVemAction == ShapeCtrl::VEMACTION_Add))
 		{
 			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(m_pCurVertexEditItem->GetThisUuid());
 

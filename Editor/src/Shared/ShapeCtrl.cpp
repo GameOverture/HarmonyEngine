@@ -633,7 +633,7 @@ bool ShapeCtrl::TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::
 					{
 						bPrepend = true;
 						
-						if(i <= ((m_VertexGrabPointList.size() - 1) - i))
+						if(i >= ((m_VertexGrabPointList.size() - 1) - i))
 							break;
 						else
 							i = ((m_VertexGrabPointList.size() - 1) - i);
