@@ -19,23 +19,37 @@
 
 class EntityModel;
 
+enum EntityItemType
+{
+	ENTTYPE_Root,
+	ENTTYPE_BvFolder,
+	ENTTYPE_Item,
+	ENTTYPE_ArrayFolder,
+	ENTTYPE_ArrayItem,
+};
+
 class EntityTreeItemData : public TreeModelItemData
 {
 	Q_OBJECT
 
+	EntityItemType										m_eEntType;
 	QUuid												m_Uuid;
 	QUuid												m_ItemUuid;
+
 	PropertiesTreeModel									m_PropertiesTreeModel;
 	bool												m_bIsSelected;
 
 public:
-	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem, QUuid uuidOfThis);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis);
 	EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj);
 	virtual ~EntityTreeItemData();
 
+
+	EntityItemType GetEntType() const;
 	QString GetCodeName() const;
 	QUuid GetThisUuid() const;
 	QUuid GetItemUuid() const;
+	bool IsForwardDeclared() const;
 	PropertiesTreeModel &GetPropertiesModel();
 
 	bool IsSelected() const;

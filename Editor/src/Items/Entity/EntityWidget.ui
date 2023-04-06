@@ -640,7 +640,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
+     <normaloff>:/icons16x16/showGrid-Origin.png</normaloff>:/icons16x16/showGrid-Origin.png</iconset>
    </property>
    <property name="text">
     <string>Vertex Edit Mode</string>
@@ -650,6 +650,42 @@
    </property>
    <property name="shortcut">
     <string>V</string>
+   </property>
+  </action>
+  <action name="actionConvertToArray">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Prefix-Open.png</normaloff>:/icons16x16/items/Prefix-Open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert To/From Array</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert item to and from being an array of a specified size</string>
+   </property>
+  </action>
+  <action name="actionConvertShape">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/shapes_icon.png</normaloff>:/icons16x16/shapes/shapes_icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert Shape</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert this shape into another shape type, either as a primitive or bounding volume</string>
+   </property>
+  </action>
+  <action name="actionRenameItem">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Item</string>
+   </property>
+   <property name="toolTip">
+    <string>Renames the selected item. This name is used for the member variable when generating the C++ class</string>
    </property>
   </action>
  </widget>

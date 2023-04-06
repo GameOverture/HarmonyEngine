@@ -16,8 +16,9 @@
 
 #include <QVariant>
 
-EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, QUuid uuidOfItem, QUuid uuidOfThis) :
+EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis) :
 	TreeModelItemData(eItemType, sCodeName),
+	m_eEntType(eEntType),
 	m_Uuid(uuidOfThis),
 	m_ItemUuid(uuidOfItem),
 	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this))),
@@ -41,6 +42,11 @@ EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QJson
 {
 }
 
+EntityItemType EntityTreeItemData::GetEntType() const
+{
+	return m_eEntType;
+}
+
 QString EntityTreeItemData::GetCodeName() const
 {
 	return m_sName;
@@ -54,6 +60,11 @@ QUuid EntityTreeItemData::GetThisUuid() const
 QUuid EntityTreeItemData::GetItemUuid() const
 {
 	return m_ItemUuid;
+}
+
+bool EntityTreeItemData::IsForwardDeclared() const
+{
+
 }
 
 PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
