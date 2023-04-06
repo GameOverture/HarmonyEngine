@@ -30,6 +30,22 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_AddAssets : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	QList<AssetItemData*>			m_AssetList;
+	QList<EntityTreeItemData*>		m_NodeList;
+
+public:
+	EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef, QList<AssetItemData*> assetItemList, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddAssets();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_PopItems : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
