@@ -296,6 +296,8 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		}
 		else // MIMETYPE_Assets
 		{
+			//QUndoCommand* pCmd = new EntityUndoCmd_AddAssets(*pCurOpenTabItem, validItemList);
+			//pCurOpenTabItem->GetUndoStack()->push(pCmd);
 		}
 		break; }
 

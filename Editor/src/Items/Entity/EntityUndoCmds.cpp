@@ -56,6 +56,44 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef, QList<AssetItemData *> assetItemList, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_AssetList(assetItemList)
+{
+	setText("Add New Asset Node(s) as child");
+}
+
+/*virtual*/ EntityUndoCmd_AddAssets::~EntityUndoCmd_AddAssets()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddAssets::redo() /*override*/
+{
+	QList<ProjectItemData *> itemList;
+	for(auto *pAssetItem : m_AssetList)
+	{
+		//if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pProjItem, true))
+		//	itemList.push_back(pProjItem);
+	}
+
+	m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewChildren(itemList, -1);
+	//m_EntityItemRef.FocusWidgetState(0, -1);
+}
+
+/*virtual*/ void EntityUndoCmd_AddAssets::undo() /*override*/
+{
+	for(auto *pNodeItem : m_NodeList)
+	{
+		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pNodeItem, true))
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pNodeItem);
+	}
+	m_NodeList.clear();
+
+	//m_EntityItemRef.FocusWidgetState(0, -1);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_PopItems::EntityUndoCmd_PopItems(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> poppedItemList, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_PoppedItemList(poppedItemList)
