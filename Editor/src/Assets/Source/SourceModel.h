@@ -26,6 +26,8 @@ class SourceModel : public IManagerModel
 		TEMPLATE_MainClassH,
 		TEMPLATE_ClassCpp,
 		TEMPLATE_ClassH,
+
+		TEMPLATE_Entity
 	};
 
 public:

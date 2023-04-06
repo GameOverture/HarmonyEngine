@@ -75,6 +75,9 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->nodeTree->setModel(&pEntityModel->GetTreeModel());
 	pEntityModel->RegisterWidgets(*ui->cmbEntityType);
 
+	ui->nodeTree->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui->nodeTree, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(OnContextMenu(const QPoint &)));
+
 	connect(ui->nodeTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection &)), this, SLOT(OnTreeSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
 	// Initialize what items are selected in the model
@@ -368,6 +371,135 @@ void EntityWidget::UncheckAll()
 //	//if(pEntDraw)
 //	//	pEntDraw->ClearDrawShape();
 //}
+
+void EntityWidget::OnContextMenu(const QPoint &pos)
+{
+	QList<EntityTreeItemData *> selectedItemList = GetSelectedItems(false, true);
+
+	QMenu contextMenu;
+
+	// Determine if 'convert to array' is valid
+	
+	//HyGuiItemType eAllSameType = ITEM_Unknown;
+	//for(EntityTreeItemData *pSelItem : selectedItemList)
+	//{
+	//	if(eAllSameType == ITEM_Unknown)
+	//		eAllSameType = pSelItem->
+	//}
+
+	//if(selectedItems.count() == 1)
+	//{
+	//	switch(selectedItems[0]->GetEntType())
+	//	{
+	//	case ENTTYPE_Root:
+	//	case ENTTYPE_BvFolder:
+	//		break;
+
+	//	case ENTTYPE_Item:
+	//	case ENTTYPE_ArrayFolder:
+	//	case ENTTYPE_ArrayItem:
+	//		break;
+
+	//	default:
+	//		HyGuiLog("EntityWidget::OnContextMenu - Unknown EntityItemType", LOGTYPE_Error);
+	//		break;
+	//	}
+	//}
+	////ui->actionConvertToArray->setText("Open Selected Items");
+	//ui->actionConvertToArray->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
+	//contextMenu.addAction(ui->actionConvertToArray);
+	//
+	//if(selectedItems.count() == 1)
+	//	contextMenu.addAction(ui->actionRenameItem);
+
+
+
+
+
+	//if(pContextExplorerItem == nullptr)
+	//{
+	//	contextMenu.addAction(FINDACTION("actionNewProject"));
+	//	contextMenu.addAction(FINDACTION("actionOpenProject"));
+	//}
+	//else
+	//{
+	//	switch(pContextExplorerItem->GetType())
+	//	{
+	//	case ITEM_Project:
+	//		if(Harmony::GetProject() != pContextExplorerItem)
+	//			contextMenu.addAction(FINDACTION("actionActivateProject"));
+	//		else
+	//			contextMenu.addMenu(MainWindow::GetNewItemMenu());
+	//		contextMenu.addSeparator();
+	//		contextMenu.addAction(FINDACTION("actionCloseProject"));
+	//		contextMenu.addAction(FINDACTION("actionProjectSettings"));
+	//		contextMenu.addSeparator();
+	//		contextMenu.addAction(FINDACTION("actionOpenFolderExplorer"));
+	//		contextMenu.addSeparator();
+	//		contextMenu.addAction(ui->actionPasteItem);
+	//		break;
+	//	case ITEM_Audio:
+	//	case ITEM_Particles:
+	//	case ITEM_Text:
+	//	case ITEM_Spine:
+	//	case ITEM_Sprite:
+	//	case ITEM_Source:
+	//	case ITEM_Header:
+	//	case ITEM_Entity:
+	//	case ITEM_Prefab:
+	//	case ITEM_Prefix:
+	//		if(Harmony::GetProject() != &pContextExplorerItem->GetProject())
+	//		{
+	//			contextMenu.addAction(FINDACTION("actionActivateProject"));
+	//			contextMenu.addSeparator();
+	//		}
+	//		else
+	//		{
+	//			if(selectedItems.count() > 0)
+	//			{
+	//				if(selectedItems.count() > 1)
+	//				{
+	//					ui->actionOpen->setText("Open Selected Items");
+	//					ui->actionOpen->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
+	//				}
+	//				else
+	//				{
+	//					ui->actionOpen->setText("Open " % pContextExplorerItem->GetName(false));
+	//					ui->actionOpen->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_None));
+	//				}
+	//				contextMenu.addAction(ui->actionOpen);
+	//				contextMenu.addSeparator();
+	//			}
+
+	//			contextMenu.addMenu(MainWindow::GetNewItemMenu());
+	//			contextMenu.addSeparator();
+	//		}
+
+	//		contextMenu.addAction(ui->actionRename);
+	//		contextMenu.addAction(ui->actionCopyItem);
+	//		contextMenu.addAction(ui->actionPasteItem);
+	//		contextMenu.addSeparator();
+	//		if(selectedItems.count() + selectedPrefixes.count() == 1)
+	//		{
+	//			ui->actionDeleteItem->setText("Delete " % pContextExplorerItem->GetName(false));
+	//			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_Delete));
+	//		}
+	//		else
+	//		{
+	//			ui->actionDeleteItem->setText("Delete Selected Items");
+	//			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_Delete));
+	//		}
+	//		contextMenu.addAction(ui->actionDeleteItem);
+	//		break;
+
+	//	default: {
+	//		HyGuiLog("ExplorerWidget::OnContextMenu - Unknown TreeModelItemData type", LOGTYPE_Error);
+	//	} break;
+	//	}
+	//}
+
+	contextMenu.exec(ui->nodeTree->mapToGlobal(pos));
+}
 
 void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {

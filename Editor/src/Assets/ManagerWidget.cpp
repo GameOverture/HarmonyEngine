@@ -563,7 +563,12 @@ void ManagerWidget::on_actionRename_triggered()
 	QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
 	TreeModelItemData *pItemToBeRenamed = GetSelected(selectedAssetsList, selectedFiltersList);
 
-	DlgInputName *pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FreeFormValidator());
+	DlgInputName *pDlg = nullptr;
+	if(m_pModel->GetAssetType() == ASSET_Source)
+		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FileNameValidator());
+	else
+		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FreeFormValidator());
+
 	if(pDlg->exec() == QDialog::Accepted)
 	{
 		m_pModel->Rename(pItemToBeRenamed, pDlg->GetName());

@@ -49,6 +49,7 @@ protected:
 	virtual void resizeEvent(QResizeEvent *pEvent) override;
 
 private Q_SLOTS:
+	void OnContextMenu(const QPoint &pos);
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void on_actionAddChildren_triggered();
 	

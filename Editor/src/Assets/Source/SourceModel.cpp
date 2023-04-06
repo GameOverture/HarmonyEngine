@@ -89,6 +89,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	case TEMPLATE_MainClassH:	sTemplateFilePath += "MainClass.h";		break;
 	case TEMPLATE_ClassCpp:		sTemplateFilePath += "Class.cpp";		break;
 	case TEMPLATE_ClassH:		sTemplateFilePath += "Class.h";			break;
+	case TEMPLATE_Entity:		sTemplateFilePath += "Entity.h";		break;
 	}
 
 	QFile file(sTemplateFilePath);

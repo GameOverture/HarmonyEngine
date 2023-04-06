@@ -232,6 +232,9 @@ void EntityModel::ClearShapeEdit()
 
 /*virtual*/ bool EntityModel::OnPrepSave() /*override*/
 {
+	// Save generated C++ class in a .h
+	//m_ItemRef.GetProject().GetSourceAbsPath()
+
 	return true;
 }
 
