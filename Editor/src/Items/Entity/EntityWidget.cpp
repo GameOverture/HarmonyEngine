@@ -379,38 +379,41 @@ void EntityWidget::OnContextMenu(const QPoint &pos)
 	QMenu contextMenu;
 
 	// Determine if 'convert to array' is valid
-	HyGuiItemType eAllSameType = ITEM_Unknown;
-	for(EntityTreeItemData *pSelItem : selectedItemList)
-	{
-		if(eAllSameType == ITEM_Unknown)
-			eAllSameType = pSelItem->
-	}
-
-	if(selectedItems.count() == 1)
-	{
-		switch(selectedItems[0]->GetEntType())
-		{
-		case ENTTYPE_Root:
-		case ENTTYPE_BvFolder:
-			break;
-
-		case ENTTYPE_Item:
-		case ENTTYPE_ArrayFolder:
-		case ENTTYPE_ArrayItem:
-			break;
-
-		default:
-			HyGuiLog("EntityWidget::OnContextMenu - Unknown EntityItemType", LOGTYPE_Error);
-			break;
-		}
-	}
-
-	//ui->actionConvertToArray->setText("Open Selected Items");
-	ui->actionConvertToArray->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
-	contextMenu.addAction(ui->actionConvertToArray);
 	
-	if(selectedItems.count() == 1)
-		contextMenu.addAction(ui->actionRenameItem);
+	//HyGuiItemType eAllSameType = ITEM_Unknown;
+	//for(EntityTreeItemData *pSelItem : selectedItemList)
+	//{
+	//	if(eAllSameType == ITEM_Unknown)
+	//		eAllSameType = pSelItem->
+	//}
+
+	//if(selectedItems.count() == 1)
+	//{
+	//	switch(selectedItems[0]->GetEntType())
+	//	{
+	//	case ENTTYPE_Root:
+	//	case ENTTYPE_BvFolder:
+	//		break;
+
+	//	case ENTTYPE_Item:
+	//	case ENTTYPE_ArrayFolder:
+	//	case ENTTYPE_ArrayItem:
+	//		break;
+
+	//	default:
+	//		HyGuiLog("EntityWidget::OnContextMenu - Unknown EntityItemType", LOGTYPE_Error);
+	//		break;
+	//	}
+	//}
+	////ui->actionConvertToArray->setText("Open Selected Items");
+	//ui->actionConvertToArray->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
+	//contextMenu.addAction(ui->actionConvertToArray);
+	//
+	//if(selectedItems.count() == 1)
+	//	contextMenu.addAction(ui->actionRenameItem);
+
+
+
 
 
 	//if(pContextExplorerItem == nullptr)

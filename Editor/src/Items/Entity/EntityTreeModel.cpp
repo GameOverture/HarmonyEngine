@@ -64,7 +64,8 @@ QUuid EntityTreeItemData::GetItemUuid() const
 
 bool EntityTreeItemData::IsForwardDeclared() const
 {
-
+	// TODO
+	return false;
 }
 
 PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
@@ -204,7 +205,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef.GetItem(), sEntityCodeName, ITEM_Entity, uuidOfEntity, uuidOfEntity);
+	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef.GetItem(), sEntityCodeName, ITEM_Entity, ENTTYPE_Root, uuidOfEntity, uuidOfEntity);
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pThisEntityItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -219,7 +220,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pShapeFolderItem = new EntityTreeItemData(m_ModelRef.GetItem(), "Bounding Volumes", ITEM_Prefix, QUuid(), QUuid());
+	EntityTreeItemData *pShapeFolderItem = new EntityTreeItemData(m_ModelRef.GetItem(), "Bounding Volumes", ITEM_Prefix, ENTTYPE_BvFolder, QUuid(), QUuid());
 	QVariant shapeData;
 	shapeData.setValue<EntityTreeItemData *>(pShapeFolderItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -356,7 +357,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjIt
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pProjItem->GetName(false));
 	
 	// Allocate and store the new item in the tree model
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pProjItem->GetType(), pProjItem->GetUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pProjItem->GetType(), ENTTYPE_Item, pProjItem->GetUuid(), QUuid::createUuid());
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pNewItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -420,7 +421,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewShape(EditorShape eShape, QStr
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + (bIsPrimitive ? "Prim" : "") + HyGlobal::ShapeName(eShape).simplified().remove(' '));
 
 	// Allocate and store the new item in the tree model
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_Shape, QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_Shape, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	pNewItem->GetPropertiesModel().SetPropertyValue("Shape", "Type", HyGlobal::ShapeName(eShape));
 	pNewItem->GetPropertiesModel().SetPropertyValue("Shape", "Data", sData);
 
