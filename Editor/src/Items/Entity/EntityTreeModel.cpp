@@ -384,7 +384,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(AssetItemData *pAssetIte
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pAssetItem->GetName());
 
 	// Allocate and store the new item in the tree model
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pAssetItem->GetType(), QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pAssetItem->GetType(), ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pNewItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
