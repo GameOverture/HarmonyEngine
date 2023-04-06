@@ -12,6 +12,7 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 #include "EntityDraw.h"
+#include "IAssetItemData.h"
 #include "MainWindow.h"
 
 EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent /*= nullptr*/) :
@@ -69,14 +70,14 @@ EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_AddAssets::redo() /*override*/
 {
-	QList<ProjectItemData *> itemList;
+	QList<AssetItemData *> assetItemList;
 	for(auto *pAssetItem : m_AssetList)
 	{
-		//if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pProjItem, true))
-		//	itemList.push_back(pProjItem);
+		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pAssetItem, true))
+			assetItemList.push_back(pAssetItem);
 	}
 
-	m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewChildren(itemList, -1);
+	m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewAssets(assetItemList, -1);
 	//m_EntityItemRef.FocusWidgetState(0, -1);
 }
 

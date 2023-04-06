@@ -12,6 +12,7 @@
 
 #include "ProjectItemData.h"
 #include "PropertiesTreeModel.h"
+#include "IAssetItemData.h"
 #include "Shared/TreeModel/ITreeModel.h"
 
 #include <QObject>
@@ -75,6 +76,7 @@ public:
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_InsertNewChild(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewChild(QJsonObject initObj, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_InsertChild(EntityTreeItemData *pItem, int iRow);

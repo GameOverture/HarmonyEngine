@@ -357,6 +357,33 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjIt
 	return pNewItem;
 }
 
+EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow /*= -1*/)
+{
+	TreeModelItem *pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
+	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
+	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
+	if(insertRow(iRow, parentIndex) == false)
+	{
+		HyGuiLog("EntityTreeModel::InsertNewChild(asset) - insertRow failed", LOGTYPE_Error);
+		return nullptr;
+	}
+
+	// Generate a unique code name for this new item
+	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pAssetItem->GetName());
+
+	// Allocate and store the new item in the tree model
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pAssetItem->GetType(), QUuid(), QUuid::createUuid());
+	QVariant v;
+	v.setValue<EntityTreeItemData *>(pNewItem);
+	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
+	{
+		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
+			HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
+	}
+
+	return pNewItem;
+}
+
 EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(QJsonObject initObj, int iRow /*= -1*/)
 {
 	HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(initObj["itemType"].toString());

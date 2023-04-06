@@ -14,6 +14,7 @@
 #include "MainWindow.h"
 #include "EntityDraw.h"
 #include "EntityWidget.h"
+#include "IAssetItemData.h"
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData)
@@ -87,6 +88,26 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemDat
 
 	m_ItemRef.GetProject().RegisterItems(GetUuid(), registerList);
 	
+	return treeNodeList;
+}
+
+QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<AssetItemData *> assetItemList, int iRow)
+{
+	QList<EntityTreeItemData *> treeNodeList;
+	QList<QUuid> registerList;
+	for(auto *pAssetItem : assetItemList)
+	{
+		EntityTreeItemData *pAddedItem = m_TreeModel.Cmd_InsertNewChild(pAssetItem, "m_", iRow);
+		if(pAddedItem)
+			treeNodeList.push_back(pAddedItem);
+		else
+			HyGuiLog("EntityModel::Cmd_AddNewChildren could not insert an asset child: " % pAssetItem->GetName(), LOGTYPE_Error);
+
+		registerList.push_back(pAssetItem->GetUuid());
+	}
+
+	m_ItemRef.GetProject().RegisterItems(GetUuid(), registerList);
+
 	return treeNodeList;
 }
 
