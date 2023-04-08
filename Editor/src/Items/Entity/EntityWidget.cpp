@@ -78,7 +78,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->nodeTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->nodeTree, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(OnContextMenu(const QPoint &)));
 
-	connect(ui->nodeTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection &)), this, SLOT(OnTreeSelectionChanged(const QItemSelection &, const QItemSelection &)));
+	connect(ui->nodeTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(OnTreeSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
 	// Initialize what items are selected in the model
 	QList<EntityTreeItemData *> childList, shapeList;
@@ -124,7 +124,7 @@ EntityWidget::~EntityWidget()
 
 	// Manage currently selected items in the item tree
 	bool bEnableVemMode = false;
-	QList<EntityTreeItemData *> selectedItemDataList = GetSelectedItems(true, true);
+	QList<EntityTreeItemData *> selectedItemDataList = GetSelectedItems(true, true, true, true);
 	if(selectedItemDataList.empty())
 	{
 		ui->lblSelectedItemIcon->setVisible(false);
@@ -186,7 +186,7 @@ EntityWidget::~EntityWidget()
 	ui->nodeTree->selectionModel()->select(index, QItemSelectionModel::Select);
 }
 
-QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEntity, bool bIncludeShapes)
+QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeRootEntity, bool bIncludeBvFolder, bool bIncludeArrayFolders, bool bIncludeShapes)
 {
 	EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().GetEntityTreeItemData();
 
@@ -199,13 +199,29 @@ QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEnti
 
 		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
 
-		if(pCurItemData == pEntityTreeItemData)
+		switch(pCurItemData->GetEntType())
 		{
-			if(bIncludeMainEntity)
+		case ENTTYPE_Root:
+			if(bIncludeRootEntity)
 				selectedItemList.push_back(pCurItemData);
-		}
-		else
-		{
+			break;
+
+		case ENTTYPE_BvFolder:
+			if(bIncludeBvFolder)
+				selectedItemList.push_back(pCurItemData);
+			break;
+
+		case ENTTYPE_ArrayFolder: {
+			if(bIncludeArrayFolders)
+				selectedItemList.push_back(pCurItemData);
+
+			QList<TreeModelItemData *> arrayItemDataList = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().GetItemsRecursively(index);
+			for(TreeModelItemData *pArrayItemData : arrayItemDataList)
+				selectedItemList.push_back(static_cast<EntityTreeItemData *>(pArrayItemData));
+			break; }
+
+		case ENTTYPE_Item:
+		case ENTTYPE_ArrayItem:
 			if(pCurItemData->GetType() == ITEM_Shape)
 			{
 				if(bIncludeShapes)
@@ -213,6 +229,11 @@ QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeMainEnti
 			}
 			else
 				selectedItemList.push_back(pCurItemData);
+			break;
+
+		default:
+			HyGuiLog("EntityWidget::GetSelectedItems - Unknown EntityItemType", LOGTYPE_Error);
+			break;
 		}
 	}
 
@@ -226,7 +247,7 @@ void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList, bool bPushUndoCmd
 
 	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
 	QModelIndexList indexList = entityTreeModelRef.GetAllIndices();
-	
+
 	QItemSelection *pItemSelection = new QItemSelection();
 	for(QUuid uuid : uuidList)
 	{
@@ -240,7 +261,7 @@ void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList, bool bPushUndoCmd
 
 	QItemSelectionModel *pSelectionModel = ui->nodeTree->selectionModel();
 	pSelectionModel->select(*pItemSelection, QItemSelectionModel::ClearAndSelect);
-	
+
 	delete pItemSelection;
 }
 
@@ -269,7 +290,7 @@ void EntityWidget::SetSelectedItems(QList<EntityTreeItemData *> selectedList, QL
 	pSelectionModel->select(*pItemDeselection, QItemSelectionModel::Deselect);
 	pSelectionModel->blockSignals(false);
 	delete pItemSelection;
-	
+
 	UpdateActions();
 }
 
@@ -374,12 +395,12 @@ void EntityWidget::UncheckAll()
 
 void EntityWidget::OnContextMenu(const QPoint &pos)
 {
-	QList<EntityTreeItemData *> selectedItemList = GetSelectedItems(false, true);
+	QList<EntityTreeItemData *> selectedItemList = GetSelectedItems(true, false, true, true);
 
 	QMenu contextMenu;
 
 	// Determine if 'convert to array' is valid
-	
+
 	//HyGuiItemType eAllSameType = ITEM_Unknown;
 	//for(EntityTreeItemData *pSelItem : selectedItemList)
 	//{
@@ -530,7 +551,7 @@ void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const 
 	}
 
 	if(m_bAllowSelectionUndoCmd)
-		m_ItemRef.GetUndoStack()->push(new EntityUndoCmd_SelectionChanged(m_ItemRef, selectedItemDataList, deselectedItemDataList)); 
+		m_ItemRef.GetUndoStack()->push(new EntityUndoCmd_SelectionChanged(m_ItemRef, selectedItemDataList, deselectedItemDataList));
 	else
 	{
 		static_cast<EntityModel *>(m_ItemRef.GetModel())->Cmd_SelectionChanged(selectedItemDataList, deselectedItemDataList);
@@ -718,7 +739,7 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 
 void EntityWidget::on_actionRemoveItems_triggered()
 {
-	QList<EntityTreeItemData *> poppedItemList = GetSelectedItems(false, true);
+	QList<EntityTreeItemData *> poppedItemList = GetSelectedItems(false, false, false, true);
 
 	QUndoCommand *pCmd = new EntityUndoCmd_PopItems(m_ItemRef, poppedItemList);
 	m_ItemRef.GetUndoStack()->push(pCmd);

@@ -60,7 +60,7 @@ public:
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
 	QList<EntityTreeItemData *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewAssets(QList<AssetItemData *> assetItemList, int iRow);
-	EntityTreeItemData *Cmd_AddNewChild(QJsonObject initObj, int iRow);
+	EntityTreeItemData *Cmd_AddExistingChild(QJsonObject initObj, bool bIsArrayItem, int iRow);
 	EntityTreeItemData *Cmd_AddNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, int iRow);
 	void Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList);
 	int32 Cmd_RemoveTreeItem(EntityTreeItemData *pItem);

@@ -34,6 +34,7 @@ class EntityTreeItemData : public TreeModelItemData
 	Q_OBJECT
 
 	EntityItemType										m_eEntType;
+	int													m_iArrayIndex;	// -1 when not apart of an array
 	QUuid												m_Uuid;
 	QUuid												m_ItemUuid;
 
@@ -41,13 +42,14 @@ class EntityTreeItemData : public TreeModelItemData
 	bool												m_bIsSelected;
 
 public:
-	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis);
-	EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, int iArrayIndex, QUuid uuidOfItem, QUuid uuidOfThis);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj, int iArrayIndex);
 	virtual ~EntityTreeItemData();
 
 
 	EntityItemType GetEntType() const;
 	QString GetCodeName() const;
+	int32 GetArrayIndex() const;
 	QUuid GetThisUuid() const;
 	QUuid GetItemUuid() const;
 	bool IsForwardDeclared() const;
@@ -91,7 +93,7 @@ public:
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewChild(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_InsertNewChild(QJsonObject initObj, int iRow = -1);
+	EntityTreeItemData *Cmd_InsertExistingChild(QJsonObject initObj, bool bIsArrayItem, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_InsertChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);

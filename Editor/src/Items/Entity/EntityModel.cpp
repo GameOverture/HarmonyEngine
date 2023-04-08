@@ -42,18 +42,40 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	InitStates<EntityStateData>(itemFileDataRef);
 
 	// Insert all the items into the nodeTree
-	QJsonArray childArray = itemFileDataRef.m_Meta["childList"].toArray();
-	for(int i = 0; i < childArray.size(); ++i)
+	QJsonArray childListArray = itemFileDataRef.m_Meta["childList"].toArray();
+	for(int i = 0; i < childListArray.size(); ++i)
 	{
-		QJsonObject childObj = childArray[i].toObject();
-		Cmd_AddNewChild(childObj, i);
+		if(childListArray[i].isObject())
+		{
+			QJsonObject childObj = childListArray[i].toObject();
+			Cmd_AddExistingChild(childObj, false, i);
+		}
+		else if(childListArray[i].isArray())
+		{
+			QJsonArray childArray = childListArray[i].toArray();
+			for(int j = 0; j < childArray.size(); ++j)
+				Cmd_AddExistingChild(childArray[j].toObject(), true, j);
+		}
+		else
+			HyGuiLog("EntityModel::EntityModel invalid childlist", LOGTYPE_Error);
 	}
 
-	QJsonArray shapeArray = itemFileDataRef.m_Meta["shapeList"].toArray();
-	for(int i = 0; i < shapeArray.size(); ++i)
+	QJsonArray shapeListArray = itemFileDataRef.m_Meta["shapeList"].toArray();
+	for(int i = 0; i < shapeListArray.size(); ++i)
 	{
-		QJsonObject shapeObj = shapeArray[i].toObject();
-		Cmd_AddNewChild(shapeObj, i);
+		if(shapeListArray[i].isObject())
+		{
+			QJsonObject shapeObj = shapeListArray[i].toObject();
+			Cmd_AddExistingChild(shapeObj, false, i);
+		}
+		else if(shapeListArray[i].isArray())
+		{
+			QJsonArray shapeArray = shapeListArray[i].toArray();
+			for(int j = 0; j < shapeArray.size(); ++j)
+				Cmd_AddExistingChild(shapeArray[j].toObject(), true, j);
+		}
+		else
+			HyGuiLog("EntityModel::EntityModel invalid shapeList", LOGTYPE_Error);
 	}
 }
 
@@ -111,9 +133,9 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<AssetItemData *>
 	return treeNodeList;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddNewChild(QJsonObject initObj, int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddExistingChild(QJsonObject initObj, bool bIsArrayItem, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewChild(initObj, iRow);
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertExistingChild(initObj, bIsArrayItem, iRow);
 
 	QUuid uuidToRegister(initObj["itemUUID"].toString());
 	if(uuidToRegister.isNull() == false)
@@ -248,20 +270,60 @@ void EntityModel::ClearShapeEdit()
 	m_TreeModel.GetTreeItemData(childList, shapeList);
 
 	QJsonArray childArray;
-	for(EntityTreeItemData *pChild : childList)
+	for(int i = 0; i < childList.size(); )
 	{
-		QJsonObject childObj;
-		pChild->InsertJsonInfo(childObj);
-		childArray.append(childObj);
+		if(childList[i]->GetEntType() == ENTTYPE_ArrayItem && childList[i]->GetArrayIndex() == 0)
+		{
+			QJsonArray packedArray;
+
+			do
+			{
+				QJsonObject arrayItemObj;
+				childList[i]->InsertJsonInfo(arrayItemObj);
+				packedArray.append(arrayItemObj);
+				++i;
+
+			} while (i < childList.size() && childList[i]->GetEntType() == ENTTYPE_ArrayItem && childList[i]->GetArrayIndex() > 0);
+
+			childArray.append(packedArray);
+		}
+		else
+		{
+			QJsonObject childObj;
+			childList[i]->InsertJsonInfo(childObj);
+			childArray.append(childObj);
+
+			++i;
+		}
 	}
 	itemSpecificFileDataOut.m_Meta.insert("childList", childArray);
 
 	QJsonArray shapeArray;
-	for(EntityTreeItemData *pShape : shapeList)
+	for(int i = 0; i < shapeList.size(); )
 	{
-		QJsonObject childObj;
-		pShape->InsertJsonInfo(childObj);
-		shapeArray.append(childObj);
+		if(shapeList[i]->GetEntType() == ENTTYPE_ArrayItem && shapeList[i]->GetArrayIndex() == 0)
+		{
+			QJsonArray packedArray;
+
+			do
+			{
+				QJsonObject arrayItemObj;
+				shapeList[i]->InsertJsonInfo(arrayItemObj);
+				packedArray.append(arrayItemObj);
+				++i;
+
+			} while(i < shapeList.size() && shapeList[i]->GetEntType() == ENTTYPE_ArrayItem && shapeList[i]->GetArrayIndex() > 0);
+
+			shapeArray.append(packedArray);
+		}
+		else
+		{
+			QJsonObject shapeObj;
+			shapeList[i]->InsertJsonInfo(shapeObj);
+			shapeArray.append(shapeObj);
+
+			++i;
+		}
 	}	
 	itemSpecificFileDataOut.m_Meta.insert("shapeList", shapeArray);
 }
