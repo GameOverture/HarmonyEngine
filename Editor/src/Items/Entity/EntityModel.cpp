@@ -262,7 +262,7 @@ void EntityModel::ClearShapeEdit()
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetEntityTreeItemData()->GetCodeName());
+	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetRootTreeItemData()->GetCodeName());
 	itemSpecificFileDataOut.m_Meta.insert("entityType", m_EntityTypeMapper.GetCurrentItem());
 	
 	QList<EntityTreeItemData *> childList;

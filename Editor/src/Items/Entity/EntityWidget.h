@@ -28,6 +28,8 @@ class EntityWidget : public IWidget
 	QActionGroup		m_AddShapeActionGroup;
 	bool				m_bAllowSelectionUndoCmd;
 
+	QMenu				m_ContextMenu;
+
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~EntityWidget();
@@ -72,6 +74,13 @@ private Q_SLOTS:
 	void on_actionOrderChildrenUp_triggered();
 	void on_actionOrderChildrenDown_triggered();
 	void on_actionRemoveItems_triggered();
+
+	void on_actionUnpackFromArray_triggered();
+	void on_actionConvertToArray_triggered();
+	void on_actionPackToArray_triggered();
+	
+	void on_actionCopyEntityItems_triggered();
+	void on_actionPasteEntityItems_triggered();
 
 private:
 	Ui::EntityWidget *ui;

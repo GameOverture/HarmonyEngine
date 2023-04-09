@@ -124,9 +124,30 @@ EntityWidget::~EntityWidget()
 
 	// Manage currently selected items in the item tree
 	bool bEnableVemMode = false;
-	QList<EntityTreeItemData *> selectedItemDataList = GetSelectedItems(true, true, true, true);
-	if(selectedItemDataList.empty())
+	QModelIndexList selectedIndices = ui->nodeTree->selectionModel()->selectedIndexes();
+	selectedIndices.erase(std::remove_if(selectedIndices.begin(), selectedIndices.end(),
+		[](const QModelIndex &index) {
+			return index.column() != 0;
+		}),
+		selectedIndices.end());
+
+	m_ContextMenu.clear();
+
+	if(selectedIndices.empty())
 	{
+		ui->actionOrderChildrenUp->setEnabled(false);
+		ui->actionOrderChildrenDown->setEnabled(false);
+		ui->actionRemoveItems->setEnabled(false);
+
+		ui->actionRenameItem->setEnabled(false);
+
+		ui->actionConvertToArray->setEnabled(false);
+		ui->actionUnpackFromArray->setEnabled(false);
+		ui->actionPackToArray->setEnabled(false);
+
+		ui->actionCopyEntityItems->setEnabled(false);
+		ui->actionPasteEntityItems->setEnabled(false);
+
 		ui->lblSelectedItemIcon->setVisible(false);
 		ui->lblSelectedItemText->setVisible(false);
 
@@ -136,17 +157,81 @@ EntityWidget::~EntityWidget()
 	}
 	else
 	{
-		if(selectedItemDataList.size() == 1)
-		{
-			ui->lblSelectedItemIcon->setVisible(true);
-			ui->lblSelectedItemIcon->setPixmap(selectedItemDataList[0]->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
-			ui->lblSelectedItemText->setVisible(true);
-			ui->lblSelectedItemText->setText(selectedItemDataList[0]->GetCodeName() % " Properties");
+		bool bRootOrBvFolder = false;
+		bool bSelectedHaveSameParent = true;
+		bool bAllSameType = true;
+		bool bAllArrayItems = true;
 
-			PropertiesTreeModel &propModelRef = selectedItemDataList[0]->GetPropertiesModel();
+		QModelIndex parentIndex = selectedIndices.at(0).parent();
+		HyGuiItemType eType = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>()->GetType();
+		for(const QModelIndex &index : selectedIndices)
+		{
+			if(index.parent() != parentIndex)
+				bSelectedHaveSameParent = false;
+
+			EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+			if(pEntItemData->GetType() != eType)
+				bAllSameType = false;
+			if(pEntItemData->GetEntType() != ENTTYPE_ArrayItem)
+				bAllArrayItems = false;
+			if(pEntItemData->GetEntType() == ENTTYPE_Root || pEntItemData->GetEntType() == ENTTYPE_BvFolder)
+				bRootOrBvFolder = true;
+		}
+		
+		if(bSelectedHaveSameParent && bAllSameType && bAllArrayItems)
+		{
+			ui->actionPackToArray->setEnabled(false);
+			ui->actionConvertToArray->setEnabled(false);
+			ui->actionUnpackFromArray->setEnabled(true);
+
+			ui->actionUnpackFromArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_Close));
+			m_ContextMenu.addAction(ui->actionUnpackFromArray);
+		}
+		else if(bSelectedHaveSameParent && bAllSameType && selectedIndices.size() == 1)
+		{
+			ui->actionPackToArray->setEnabled(false);
+			ui->actionConvertToArray->setEnabled(true);
+			ui->actionUnpackFromArray->setEnabled(false);
+
+			ui->actionConvertToArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_New));
+			m_ContextMenu.addAction(ui->actionConvertToArray);
+		}
+		else
+		{
+			ui->actionPackToArray->setEnabled(bSelectedHaveSameParent && bAllSameType);
+			ui->actionConvertToArray->setEnabled(false);
+			ui->actionUnpackFromArray->setEnabled(false);
+
+			ui->actionPackToArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_Open));
+			m_ContextMenu.addAction(ui->actionPackToArray);
+		}
+
+		m_ContextMenu.addSeparator();
+
+		ui->actionCopyEntityItems->setEnabled(bRootOrBvFolder == false);
+		ui->actionPasteEntityItems->setEnabled(bRootOrBvFolder == false);
+
+		m_ContextMenu.addAction(ui->actionCopyEntityItems);
+		m_ContextMenu.addAction(ui->actionPasteEntityItems);
+
+		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent);
+		ui->actionOrderChildrenDown->setEnabled(bSelectedHaveSameParent);
+		
+		ui->actionRemoveItems->setEnabled(bRootOrBvFolder == false);
+
+		if(selectedIndices.size() == 1)
+		{
+			EntityTreeItemData *pEntTreeItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
+
+			ui->lblSelectedItemIcon->setVisible(true);
+			ui->lblSelectedItemIcon->setPixmap(pEntTreeItemData->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+			ui->lblSelectedItemText->setVisible(true);
+			ui->lblSelectedItemText->setText(pEntTreeItemData->GetCodeName() % " Properties");
+
+			PropertiesTreeModel &propModelRef = pEntTreeItemData->GetPropertiesModel();
 			ui->propertyTree->setModel(&propModelRef);
 
-			bEnableVemMode = (selectedItemDataList[0]->GetType() == ITEM_Primitive || selectedItemDataList[0]->GetType() == ITEM_Shape);
+			bEnableVemMode = (pEntTreeItemData->GetType() == ITEM_Primitive || pEntTreeItemData->GetType() == ITEM_Shape);
 		}
 		else
 		{
@@ -188,8 +273,6 @@ EntityWidget::~EntityWidget()
 
 QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeRootEntity, bool bIncludeBvFolder, bool bIncludeArrayFolders, bool bIncludeShapes)
 {
-	EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().GetEntityTreeItemData();
-
 	QModelIndexList selectedIndices = ui->nodeTree->selectionModel()->selectedIndexes();
 	QList<EntityTreeItemData *> selectedItemList;
 	for(QModelIndex index : selectedIndices)
@@ -395,11 +478,9 @@ void EntityWidget::UncheckAll()
 
 void EntityWidget::OnContextMenu(const QPoint &pos)
 {
-	QList<EntityTreeItemData *> selectedItemList = GetSelectedItems(true, false, true, true);
+	
 
-	QMenu contextMenu;
 
-	// Determine if 'convert to array' is valid
 
 	//HyGuiItemType eAllSameType = ITEM_Unknown;
 	//for(EntityTreeItemData *pSelItem : selectedItemList)
@@ -519,7 +600,7 @@ void EntityWidget::OnContextMenu(const QPoint &pos)
 	//	}
 	//}
 
-	contextMenu.exec(ui->nodeTree->mapToGlobal(pos));
+	m_ContextMenu.exec(ui->nodeTree->mapToGlobal(pos));
 }
 
 void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
@@ -652,6 +733,9 @@ void EntityWidget::on_actionOrderChildrenUp_triggered()
 	QModelIndexList selectedIndexList = ui->nodeTree->selectionModel()->selectedIndexes();
 	std::sort(selectedIndexList.begin(), selectedIndexList.end(), [](const QModelIndex &a, const QModelIndex &b)
 		{
+			if(a.parent() != b.parent())
+				HyGuiLog("EntityWidget::on_actionOrderChildrenUp_triggered - selected indices have different parents", LOGTYPE_Error);
+
 			return a.row() < b.row();
 		});
 
@@ -694,21 +778,26 @@ void EntityWidget::on_actionOrderChildrenUp_triggered()
 void EntityWidget::on_actionOrderChildrenDown_triggered()
 {
 	QModelIndexList selectedIndexList = ui->nodeTree->selectionModel()->selectedIndexes();
+	if(selectedIndexList.empty())
+		return;
+
 	std::sort(selectedIndexList.begin(), selectedIndexList.end(), [](const QModelIndex &a, const QModelIndex &b)
 		{
+			if(a.parent() != b.parent())
+				HyGuiLog("EntityWidget::on_actionOrderChildrenDown_triggered - selected indices have different parents", LOGTYPE_Error);
+
 			return a.row() > b.row();
 		});
 
-	int iNumChildren = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().GetEntityTreeItem()->GetNumChildren();
-
+	int iNumChildren = ui->nodeTree->model()->rowCount(ui->nodeTree->model()->parent(selectedIndexList[0]));
 	QList<EntityTreeItemData *> selectedItemDataList;
 	QList<int> curIndexList;
 	QList<int> newIndexList;
 	int iDiscardBotIndices = -1;
 	for(QModelIndex index : selectedIndexList)
 	{
-		// Only take selected items that are the first column, and they're children under the root entity tree item
-		if(index.column() != 0 || index.parent().row() != 0)
+		// Only take selected items that are the first column
+		if(index.column() != 0)
 			continue;
 
 		if(iDiscardBotIndices == -1 && index.row() == (iNumChildren - 1))
@@ -743,4 +832,24 @@ void EntityWidget::on_actionRemoveItems_triggered()
 
 	QUndoCommand *pCmd = new EntityUndoCmd_PopItems(m_ItemRef, poppedItemList);
 	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionUnpackFromArray_triggered()
+{
+}
+
+void EntityWidget::on_actionConvertToArray_triggered()
+{
+}
+
+void EntityWidget::on_actionPackToArray_triggered()
+{
+}
+
+void EntityWidget::on_actionCopyEntityItems_triggered()
+{
+}
+
+void EntityWidget::on_actionPasteEntityItems_triggered()
+{
 }

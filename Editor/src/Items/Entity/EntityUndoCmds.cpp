@@ -206,9 +206,12 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 	EntityTreeModel &entTreeModelRef = pModel->GetTreeModel();
 
 	for(int i = 0; i < m_SelectedItemDataList.size(); ++i)
-		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetEntityTreeItemData(), m_NewItemIndexList[i]);
-
-	//pModel->
+	{
+		if(m_SelectedItemDataList[i]->GetType() == ITEM_Shape)
+			entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetBvFolderTreeItemData(), m_NewItemIndexList[i]);
+		else
+			entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetRootTreeItemData(), m_NewItemIndexList[i]);
+	}
 }
 
 /*virtual*/ void EntityUndoCmd_OrderChildren::undo() /*override*/
@@ -216,7 +219,12 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 	EntityTreeModel &entTreeModelRef = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
 
 	for(int i = m_SelectedItemDataList.size() - 1; i >= 0; --i)
-		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetEntityTreeItemData(), m_PrevItemIndexList[i]);
+	{
+		if(m_SelectedItemDataList[i]->GetType() == ITEM_Shape)
+			entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetBvFolderTreeItemData(), m_PrevItemIndexList[i]);
+		else
+			entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetRootTreeItemData(), m_PrevItemIndexList[i]);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

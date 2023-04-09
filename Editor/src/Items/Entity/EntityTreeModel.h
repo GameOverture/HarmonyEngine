@@ -82,10 +82,11 @@ public:
 	explicit EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QUuid uuidOfEntity, QObject *pParent = nullptr);
 	virtual ~EntityTreeModel();
 	
-	TreeModelItem *GetEntityTreeItem() const;
-	EntityTreeItemData *GetEntityTreeItemData() const;
+	TreeModelItem *GetRootTreeItem() const;
+	EntityTreeItemData *GetRootTreeItemData() const;
 
-	TreeModelItem *GetShapesFolderTreeItem() const;
+	TreeModelItem *GetBvFolderTreeItem() const;
+	EntityTreeItemData *GetBvFolderTreeItemData() const;
 
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const;
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;

@@ -382,30 +382,6 @@
     </widget>
    </item>
   </layout>
-  <action name="actionAddPrimitive">
-   <property name="icon">
-    <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/Primitive-New.png</normaloff>:/icons16x16/items/Primitive-New.png</iconset>
-   </property>
-   <property name="text">
-    <string>Add New Primitive</string>
-   </property>
-   <property name="toolTip">
-    <string>Inserts a new HyPrimitive as a child, at the selected node</string>
-   </property>
-  </action>
-  <action name="actionAddShape">
-   <property name="icon">
-    <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/BoundingVolume-New.png</normaloff>:/icons16x16/items/BoundingVolume-New.png</iconset>
-   </property>
-   <property name="text">
-    <string>Add New Shape</string>
-   </property>
-   <property name="toolTip">
-    <string>Inserts a new shape to detect collision, mouse input, hitbox, etc.</string>
-   </property>
-  </action>
   <action name="actionAddChildren">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
@@ -652,18 +628,6 @@
     <string>V</string>
    </property>
   </action>
-  <action name="actionConvertToArray">
-   <property name="icon">
-    <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/Prefix-Open.png</normaloff>:/icons16x16/items/Prefix-Open.png</iconset>
-   </property>
-   <property name="text">
-    <string>Convert To/From Array</string>
-   </property>
-   <property name="toolTip">
-    <string>Convert item to and from being an array of a specified size</string>
-   </property>
-  </action>
   <action name="actionConvertShape">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
@@ -686,6 +650,66 @@
    </property>
    <property name="toolTip">
     <string>Renames the selected item. This name is used for the member variable when generating the C++ class</string>
+   </property>
+  </action>
+  <action name="actionUnpackFromArray">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Prefix-Close.png</normaloff>:/icons16x16/items/Prefix-Close.png</iconset>
+   </property>
+   <property name="text">
+    <string>Unpack From Array</string>
+   </property>
+   <property name="toolTip">
+    <string>Selected items that are packed into an array will be extracted out to their own instance</string>
+   </property>
+  </action>
+  <action name="actionPackToArray">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Prefix-Open.png</normaloff>:/icons16x16/items/Prefix-Open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pack Into Array</string>
+   </property>
+   <property name="toolTip">
+    <string>Group selected items into an array</string>
+   </property>
+  </action>
+  <action name="actionConvertToArray">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Prefix-New.png</normaloff>:/icons16x16/items/Prefix-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert To Array</string>
+   </property>
+   <property name="toolTip">
+    <string>Group selected items into an array</string>
+   </property>
+  </action>
+  <action name="actionCopyEntityItems">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-copy.png</normaloff>:/icons16x16/edit-copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy Entity Item(s)</string>
+   </property>
+   <property name="toolTip">
+    <string>Copies the selected entity items to the clipboard</string>
+   </property>
+  </action>
+  <action name="actionPasteEntityItems">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-paste.png</normaloff>:/icons16x16/edit-paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste Entity Item(s)</string>
+   </property>
+   <property name="toolTip">
+    <string>Pastes the entity items currently stored on the clipboard</string>
    </property>
   </action>
  </widget>

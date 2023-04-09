@@ -242,7 +242,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 {
 }
 
-TreeModelItem *EntityTreeModel::GetEntityTreeItem() const
+TreeModelItem *EntityTreeModel::GetRootTreeItem() const
 {
 	if(m_pRootItem->GetNumChildren() == 0)
 		return nullptr;
@@ -250,7 +250,7 @@ TreeModelItem *EntityTreeModel::GetEntityTreeItem() const
 	return m_pRootItem->GetChild(0);
 }
 
-EntityTreeItemData *EntityTreeModel::GetEntityTreeItemData() const
+EntityTreeItemData *EntityTreeModel::GetRootTreeItemData() const
 {
 	if(m_pRootItem->GetNumChildren() == 0)
 		return nullptr;
@@ -258,17 +258,25 @@ EntityTreeItemData *EntityTreeModel::GetEntityTreeItemData() const
 	return m_pRootItem->GetChild(0)->data(0).value<EntityTreeItemData *>();
 }
 
-TreeModelItem *EntityTreeModel::GetShapesFolderTreeItem() const
+TreeModelItem *EntityTreeModel::GetBvFolderTreeItem() const
 {
-	if(m_pRootItem->GetNumChildren() != 2)
+	if(m_pRootItem->GetNumChildren() < 2)
 		return nullptr;
 
 	return m_pRootItem->GetChild(1);
 }
 
+EntityTreeItemData *EntityTreeModel::GetBvFolderTreeItemData() const
+{
+	if(m_pRootItem->GetNumChildren() < 2)
+		return nullptr;
+
+	return m_pRootItem->GetChild(1)->data(0).value<EntityTreeItemData *>();
+}
+
 void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const
 {
-	TreeModelItem *pThisEntity = GetEntityTreeItem();
+	TreeModelItem *pThisEntity = GetRootTreeItem();
 	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
 	{
 		EntityTreeItemData *pCurItem = pThisEntity->GetChild(i)->data(0).value<EntityTreeItemData *>();
@@ -288,7 +296,7 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 			childListOut.push_back(pCurItem);
 	}
 
-	TreeModelItem *pThisShapesFolder = GetShapesFolderTreeItem();
+	TreeModelItem *pThisShapesFolder = GetBvFolderTreeItem();
 	for(int i = 0; i < pThisShapesFolder->GetNumChildren(); ++i)
 	{
 		EntityTreeItemData *pCurShape = pThisShapesFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
@@ -311,7 +319,7 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 
 EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 {
-	TreeModelItem *pThisEntity = GetEntityTreeItem();
+	TreeModelItem *pThisEntity = GetRootTreeItem();
 	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
 	{
 		EntityTreeItemData *pCurItem = pThisEntity->GetChild(i)->data(0).value<EntityTreeItemData *>();
@@ -322,7 +330,7 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 			return pCurItem;
 	}
 
-	TreeModelItem *pThisShapeFolder = GetShapesFolderTreeItem();
+	TreeModelItem *pThisShapeFolder = GetBvFolderTreeItem();
 	for(int i = 0; i < pThisShapeFolder->GetNumChildren(); ++i)
 	{
 		EntityTreeItemData *pCurShape = pThisShapeFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
