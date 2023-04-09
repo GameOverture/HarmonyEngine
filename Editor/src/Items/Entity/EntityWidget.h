@@ -75,10 +75,15 @@ private Q_SLOTS:
 	void on_actionOrderChildrenDown_triggered();
 	void on_actionRemoveItems_triggered();
 
+	void on_actionConvertShape_triggered();
+
+	void on_actionRenameItem_triggered();
+
 	void on_actionUnpackFromArray_triggered();
 	void on_actionConvertToArray_triggered();
 	void on_actionPackToArray_triggered();
 	
+	void on_actionCutEntityItems_triggered();
 	void on_actionCopyEntityItems_triggered();
 	void on_actionPasteEntityItems_triggered();
 

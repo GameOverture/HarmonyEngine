@@ -354,6 +354,7 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 	}
 	if(&m_ModelRef.GetItem() == pItem)
 	{
+		// TODO: Allow adding self, but treat as forward declaration
 		if(bShowDialogsOnFail)
 			HyGuiLog("Entity cannot add itself as a child", LOGTYPE_Error);
 		return false;
@@ -654,7 +655,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 
 
 	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
-		return QVariant(pItem->GetThisUuid().toString());
+		return QVariant();// QVariant(pItem->GetThisUuid().toString());
 
 	default:
 		return QVariant();

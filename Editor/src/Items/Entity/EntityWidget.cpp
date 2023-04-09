@@ -139,12 +139,14 @@ EntityWidget::~EntityWidget()
 		ui->actionOrderChildrenDown->setEnabled(false);
 		ui->actionRemoveItems->setEnabled(false);
 
+		ui->actionConvertShape->setEnabled(false);
 		ui->actionRenameItem->setEnabled(false);
 
 		ui->actionConvertToArray->setEnabled(false);
 		ui->actionUnpackFromArray->setEnabled(false);
 		ui->actionPackToArray->setEnabled(false);
 
+		ui->actionCutEntityItems->setEnabled(false);
 		ui->actionCopyEntityItems->setEnabled(false);
 		ui->actionPasteEntityItems->setEnabled(false);
 
@@ -177,6 +179,35 @@ EntityWidget::~EntityWidget()
 			if(pEntItemData->GetEntType() == ENTTYPE_Root || pEntItemData->GetEntType() == ENTTYPE_BvFolder)
 				bRootOrBvFolder = true;
 		}
+
+		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent);
+		ui->actionOrderChildrenDown->setEnabled(bSelectedHaveSameParent);
+
+		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_Primitive || eType == ITEM_Shape))
+		{
+			ui->actionConvertShape->setEnabled(true);
+			if(eType == ITEM_Primitive)
+			{
+				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_Shape, SUBICON_None));
+				ui->actionConvertShape->setText("Convert Shape to Bounding Volume");
+			}
+			else
+			{
+				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_Primitive, SUBICON_None));
+				ui->actionConvertShape->setText("Convert Shape to Primitive");
+			}
+		}
+		else
+		{
+			ui->actionConvertShape->setEnabled(false);
+			ui->actionConvertShape->setText("Convert Shape");
+		}
+		ui->actionRenameItem->setEnabled(bRootOrBvFolder == false && selectedIndices.size() == 1);
+		ui->actionCutEntityItems->setEnabled(bRootOrBvFolder == false);
+		ui->actionCopyEntityItems->setEnabled(bRootOrBvFolder == false);
+		ui->actionPasteEntityItems->setEnabled(bRootOrBvFolder == false);
+
+		ui->actionRemoveItems->setEnabled(bRootOrBvFolder == false);
 		
 		if(bSelectedHaveSameParent && bAllSameType && bAllArrayItems)
 		{
@@ -206,18 +237,17 @@ EntityWidget::~EntityWidget()
 			m_ContextMenu.addAction(ui->actionPackToArray);
 		}
 
+		if(ui->actionConvertShape->isEnabled())
+			m_ContextMenu.addAction(ui->actionConvertShape);
+		m_ContextMenu.addAction(ui->actionOrderChildrenUp);
+		m_ContextMenu.addAction(ui->actionOrderChildrenDown);
 		m_ContextMenu.addSeparator();
-
-		ui->actionCopyEntityItems->setEnabled(bRootOrBvFolder == false);
-		ui->actionPasteEntityItems->setEnabled(bRootOrBvFolder == false);
-
+		m_ContextMenu.addAction(ui->actionRenameItem);
+		m_ContextMenu.addAction(ui->actionCutEntityItems);
 		m_ContextMenu.addAction(ui->actionCopyEntityItems);
 		m_ContextMenu.addAction(ui->actionPasteEntityItems);
-
-		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent);
-		ui->actionOrderChildrenDown->setEnabled(bSelectedHaveSameParent);
-		
-		ui->actionRemoveItems->setEnabled(bRootOrBvFolder == false);
+		m_ContextMenu.addSeparator();
+		m_ContextMenu.addAction(ui->actionRemoveItems);
 
 		if(selectedIndices.size() == 1)
 		{
@@ -455,152 +485,10 @@ void EntityWidget::UncheckAll()
 	ui->nodeTree->setColumnWidth(0, iTotalWidth - iInfoColumnWidth);
 }
 
-//void EntityWidget::ClearAddShape()
-//{
-//	ui->btnAddPrimitiveBox->setChecked(Qt::Unchecked);
-//	ui->btnAddPrimitiveCircle->setChecked(Qt::Unchecked);
-//	ui->btnAddPrimitivePolygon->setChecked(Qt::Unchecked);
-//	ui->btnAddPrimitiveSegment->setChecked(Qt::Unchecked);
-//	ui->btnAddPrimitiveChain->setChecked(Qt::Unchecked);
-//	ui->btnAddPrimitiveLoop->setChecked(Qt::Unchecked);
-//	ui->btnAddShapeBox->setChecked(Qt::Unchecked);
-//	ui->btnAddShapeCircle->setChecked(Qt::Unchecked);
-//	ui->btnAddShapePolygon->setChecked(Qt::Unchecked);
-//	ui->btnAddShapeSegment->setChecked(Qt::Unchecked);
-//	ui->btnAddShapeChain->setChecked(Qt::Unchecked);
-//	ui->btnAddShapeLoop->setChecked(Qt::Unchecked);
-//
-//	MainWindow::ClearStatus();
-//	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-//	//if(pEntDraw)
-//	//	pEntDraw->ClearDrawShape();
-//}
-
 void EntityWidget::OnContextMenu(const QPoint &pos)
 {
-	
-
-
-
-	//HyGuiItemType eAllSameType = ITEM_Unknown;
-	//for(EntityTreeItemData *pSelItem : selectedItemList)
-	//{
-	//	if(eAllSameType == ITEM_Unknown)
-	//		eAllSameType = pSelItem->
-	//}
-
-	//if(selectedItems.count() == 1)
-	//{
-	//	switch(selectedItems[0]->GetEntType())
-	//	{
-	//	case ENTTYPE_Root:
-	//	case ENTTYPE_BvFolder:
-	//		break;
-
-	//	case ENTTYPE_Item:
-	//	case ENTTYPE_ArrayFolder:
-	//	case ENTTYPE_ArrayItem:
-	//		break;
-
-	//	default:
-	//		HyGuiLog("EntityWidget::OnContextMenu - Unknown EntityItemType", LOGTYPE_Error);
-	//		break;
-	//	}
-	//}
-	////ui->actionConvertToArray->setText("Open Selected Items");
-	//ui->actionConvertToArray->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
-	//contextMenu.addAction(ui->actionConvertToArray);
-	//
-	//if(selectedItems.count() == 1)
-	//	contextMenu.addAction(ui->actionRenameItem);
-
-
-
-
-
-	//if(pContextExplorerItem == nullptr)
-	//{
-	//	contextMenu.addAction(FINDACTION("actionNewProject"));
-	//	contextMenu.addAction(FINDACTION("actionOpenProject"));
-	//}
-	//else
-	//{
-	//	switch(pContextExplorerItem->GetType())
-	//	{
-	//	case ITEM_Project:
-	//		if(Harmony::GetProject() != pContextExplorerItem)
-	//			contextMenu.addAction(FINDACTION("actionActivateProject"));
-	//		else
-	//			contextMenu.addMenu(MainWindow::GetNewItemMenu());
-	//		contextMenu.addSeparator();
-	//		contextMenu.addAction(FINDACTION("actionCloseProject"));
-	//		contextMenu.addAction(FINDACTION("actionProjectSettings"));
-	//		contextMenu.addSeparator();
-	//		contextMenu.addAction(FINDACTION("actionOpenFolderExplorer"));
-	//		contextMenu.addSeparator();
-	//		contextMenu.addAction(ui->actionPasteItem);
-	//		break;
-	//	case ITEM_Audio:
-	//	case ITEM_Particles:
-	//	case ITEM_Text:
-	//	case ITEM_Spine:
-	//	case ITEM_Sprite:
-	//	case ITEM_Source:
-	//	case ITEM_Header:
-	//	case ITEM_Entity:
-	//	case ITEM_Prefab:
-	//	case ITEM_Prefix:
-	//		if(Harmony::GetProject() != &pContextExplorerItem->GetProject())
-	//		{
-	//			contextMenu.addAction(FINDACTION("actionActivateProject"));
-	//			contextMenu.addSeparator();
-	//		}
-	//		else
-	//		{
-	//			if(selectedItems.count() > 0)
-	//			{
-	//				if(selectedItems.count() > 1)
-	//				{
-	//					ui->actionOpen->setText("Open Selected Items");
-	//					ui->actionOpen->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_None));
-	//				}
-	//				else
-	//				{
-	//					ui->actionOpen->setText("Open " % pContextExplorerItem->GetName(false));
-	//					ui->actionOpen->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_None));
-	//				}
-	//				contextMenu.addAction(ui->actionOpen);
-	//				contextMenu.addSeparator();
-	//			}
-
-	//			contextMenu.addMenu(MainWindow::GetNewItemMenu());
-	//			contextMenu.addSeparator();
-	//		}
-
-	//		contextMenu.addAction(ui->actionRename);
-	//		contextMenu.addAction(ui->actionCopyItem);
-	//		contextMenu.addAction(ui->actionPasteItem);
-	//		contextMenu.addSeparator();
-	//		if(selectedItems.count() + selectedPrefixes.count() == 1)
-	//		{
-	//			ui->actionDeleteItem->setText("Delete " % pContextExplorerItem->GetName(false));
-	//			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(pContextExplorerItem->GetType(), SUBICON_Delete));
-	//		}
-	//		else
-	//		{
-	//			ui->actionDeleteItem->setText("Delete Selected Items");
-	//			ui->actionDeleteItem->setIcon(HyGlobal::ItemIcon(ITEM_Prefix, SUBICON_Delete));
-	//		}
-	//		contextMenu.addAction(ui->actionDeleteItem);
-	//		break;
-
-	//	default: {
-	//		HyGuiLog("ExplorerWidget::OnContextMenu - Unknown TreeModelItemData type", LOGTYPE_Error);
-	//	} break;
-	//	}
-	//}
-
-	m_ContextMenu.exec(ui->nodeTree->mapToGlobal(pos));
+	if(m_ContextMenu.isEmpty() == false)
+		m_ContextMenu.exec(ui->nodeTree->mapToGlobal(pos));
 }
 
 void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
@@ -834,6 +722,14 @@ void EntityWidget::on_actionRemoveItems_triggered()
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
+void EntityWidget::on_actionConvertShape_triggered()
+{
+}
+
+void EntityWidget::on_actionRenameItem_triggered()
+{
+}
+
 void EntityWidget::on_actionUnpackFromArray_triggered()
 {
 }
@@ -843,6 +739,10 @@ void EntityWidget::on_actionConvertToArray_triggered()
 }
 
 void EntityWidget::on_actionPackToArray_triggered()
+{
+}
+
+void EntityWidget::on_actionCutEntityItems_triggered()
 {
 }
 
