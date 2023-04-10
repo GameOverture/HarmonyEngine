@@ -553,7 +553,13 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewShape(EditorShape eShape, QStr
 
 bool EntityTreeModel::Cmd_InsertChild(EntityTreeItemData *pItem, int iRow)
 {
-	TreeModelItem *pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
+	TreeModelItem *pParentTreeItem = nullptr;
+	
+	if(pItem->GetType() != ITEM_Shape)
+		pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
+	else
+		pParentTreeItem = GetItem(index(1, 0, QModelIndex()));
+
 	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
 	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 	if(insertRow(iRow, parentIndex) == false)

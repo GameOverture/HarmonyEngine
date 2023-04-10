@@ -70,6 +70,8 @@ public:
 	void SetShapeEditVemMode(bool bEnable);
 	void ClearShapeEdit();
 
+	QString GenerateCodeName(QString sDesiredName) const;
+
 	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) override;
 
 	virtual bool OnPrepSave() override;

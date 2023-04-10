@@ -77,8 +77,6 @@ public:
 	virtual void OnMousePressEvent(QMouseEvent *pEvent) override;
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
 
-	void RequestSelection(QList<EntityDrawItem *> selectionList);
-
 	void RefreshTransforms();
 
 	void SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive);
@@ -94,6 +92,8 @@ protected:
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
+
+	void RequestSelection(QList<EntityDrawItem *> selectionList);
 
 	Qt::CursorShape GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const;
 

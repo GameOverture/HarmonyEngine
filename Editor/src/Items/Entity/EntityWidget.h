@@ -38,11 +38,11 @@ public:
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
-	QList<EntityTreeItemData *> GetSelectedItems(bool bIncludeRootEntity, bool bIncludeBvFolder, bool bIncludeArrayFolders, bool bIncludeShapes);
+	QModelIndexList GetSelectedItems();
 	void RequestSelectedItems(QList<QUuid> uuidList, bool bInvokeSignalCallback); // Will clear and select only what 'uuidList' contains. Will optionally invoke signal callback that pushes an UndoCmd on the stack for selection
 	void SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList); // This catches all cases when selection occurs. Does not call signal
 
-	void CheckShapeAdd(EditorShape eShapeType, bool bAsPrimitive);
+	void CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive);
 	void CheckVertexEditMode(bool bCheck);
 	void UncheckAll();
 

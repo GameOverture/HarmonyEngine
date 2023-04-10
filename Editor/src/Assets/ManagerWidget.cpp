@@ -565,9 +565,9 @@ void ManagerWidget::on_actionRename_triggered()
 
 	DlgInputName *pDlg = nullptr;
 	if(m_pModel->GetAssetType() == ASSET_Source)
-		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FileNameValidator());
+		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FileNameValidator(), nullptr, nullptr);
 	else
-		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FreeFormValidator());
+		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FreeFormValidator(), nullptr, nullptr);
 
 	if(pDlg->exec() == QDialog::Accepted)
 	{
@@ -589,7 +589,7 @@ void ManagerWidget::on_cmbBanks_currentIndexChanged(int index)
 
 void ManagerWidget::on_actionAddBank_triggered()
 {
-	DlgInputName *pDlg = new DlgInputName("Creating New Bank", "NewAssetBank", HyGlobal::FreeFormValidator());
+	DlgInputName *pDlg = new DlgInputName("Creating New Bank", "NewAssetBank", HyGlobal::FreeFormValidator(), nullptr, nullptr);
 	if(pDlg->exec() == QDialog::Accepted)
 	{
 		m_pModel->CreateNewBank(pDlg->GetName());
@@ -744,7 +744,7 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 
 void ManagerWidget::on_actionAddFilter_triggered()
 {
-	DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter", HyGlobal::FreeFormValidator());
+	DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter", HyGlobal::FreeFormValidator(), nullptr, nullptr);
 	if(pDlg->exec() == QDialog::Accepted)
 	{
 		TreeModelItemData *pNewFilter = nullptr;

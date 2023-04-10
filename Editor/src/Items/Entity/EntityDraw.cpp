@@ -146,27 +146,6 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	RefreshTransforms();
 }
 
-void EntityDraw::RequestSelection(QList<EntityDrawItem *> selectionList)
-{
-	selectionList = QSet<EntityDrawItem *>(selectionList.begin(), selectionList.end()).values();
-
-	bool bValidRequest = m_SelectedItemList.size() != selectionList.size(); // Ensure this request isn't redundant
-	QList<QUuid> uuidList;
-	for(EntityDrawItem *pDrawItem : selectionList)
-	{
-		if(m_SelectedItemList.contains(pDrawItem) == false)
-			bValidRequest = true;
-
-		uuidList.push_back(pDrawItem->GetThisUuid());
-	}
-
-	if(bValidRequest == false)
-		return;
-
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
-	pWidget->RequestSelectedItems(uuidList, true);
-}
-
 void EntityDraw::RefreshTransforms()
 {
 	if(m_SelectedItemList.size() > 1)
@@ -356,6 +335,27 @@ void EntityDraw::ClearShapeEdit()
 /*virtual*/ void EntityDraw::OnZoom(HyZoomLevel eZoomLevel) /*override*/
 {
 	RefreshTransforms();
+}
+
+void EntityDraw::RequestSelection(QList<EntityDrawItem *> selectionList)
+{
+	selectionList = QSet<EntityDrawItem *>(selectionList.begin(), selectionList.end()).values();
+
+	bool bValidRequest = m_SelectedItemList.size() != selectionList.size(); // Ensure this request isn't redundant
+	QList<QUuid> uuidList;
+	for(EntityDrawItem *pDrawItem : selectionList)
+	{
+		if(m_SelectedItemList.contains(pDrawItem) == false)
+			bValidRequest = true;
+
+		uuidList.push_back(pDrawItem->GetThisUuid());
+	}
+
+	if(bValidRequest == false)
+		return;
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
+	pWidget->RequestSelectedItems(uuidList, true);
 }
 
 Qt::CursorShape EntityDraw::GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const

@@ -104,7 +104,6 @@ public:
 
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
 
-protected:
 	QString GenerateCodeName(QString sDesiredName) const;
 };
 

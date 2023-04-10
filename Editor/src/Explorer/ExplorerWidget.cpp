@@ -397,7 +397,7 @@ void ExplorerWidget::on_actionRename_triggered()
 		return;
 	}
 	
-	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pFirstSelected->GetType(), false), pFirstSelected->GetName(false), HyGlobal::CodeNameValidator());
+	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pFirstSelected->GetType(), false), pFirstSelected->GetName(false), HyGlobal::CodeNameValidator(), nullptr, nullptr);
 	if(pDlg->exec() == QDialog::Accepted)
 		pFirstSelected->Rename(pDlg->GetName());
 

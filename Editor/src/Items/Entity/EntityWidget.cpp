@@ -124,12 +124,7 @@ EntityWidget::~EntityWidget()
 
 	// Manage currently selected items in the item tree
 	bool bEnableVemMode = false;
-	QModelIndexList selectedIndices = ui->nodeTree->selectionModel()->selectedIndexes();
-	selectedIndices.erase(std::remove_if(selectedIndices.begin(), selectedIndices.end(),
-		[](const QModelIndex &index) {
-			return index.column() != 0;
-		}),
-		selectedIndices.end());
+	QModelIndexList selectedIndices = GetSelectedItems();
 
 	m_ContextMenu.clear();
 
@@ -301,56 +296,17 @@ EntityWidget::~EntityWidget()
 	ui->nodeTree->selectionModel()->select(index, QItemSelectionModel::Select);
 }
 
-QList<EntityTreeItemData *> EntityWidget::GetSelectedItems(bool bIncludeRootEntity, bool bIncludeBvFolder, bool bIncludeArrayFolders, bool bIncludeShapes)
+QModelIndexList EntityWidget::GetSelectedItems()
 {
-	QModelIndexList selectedIndices = ui->nodeTree->selectionModel()->selectedIndexes();
-	QList<EntityTreeItemData *> selectedItemList;
-	for(QModelIndex index : selectedIndices)
-	{
-		if(index.column() != 0)
-			continue;
+	QModelIndexList indexList = ui->nodeTree->selectionModel()->selectedIndexes();
 
-		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+	indexList.erase(std::remove_if(indexList.begin(), indexList.end(),
+		[](const QModelIndex &index) {
+			return index.column() != 0;
+		}),
+		indexList.end());
 
-		switch(pCurItemData->GetEntType())
-		{
-		case ENTTYPE_Root:
-			if(bIncludeRootEntity)
-				selectedItemList.push_back(pCurItemData);
-			break;
-
-		case ENTTYPE_BvFolder:
-			if(bIncludeBvFolder)
-				selectedItemList.push_back(pCurItemData);
-			break;
-
-		case ENTTYPE_ArrayFolder: {
-			if(bIncludeArrayFolders)
-				selectedItemList.push_back(pCurItemData);
-
-			QList<TreeModelItemData *> arrayItemDataList = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().GetItemsRecursively(index);
-			for(TreeModelItemData *pArrayItemData : arrayItemDataList)
-				selectedItemList.push_back(static_cast<EntityTreeItemData *>(pArrayItemData));
-			break; }
-
-		case ENTTYPE_Item:
-		case ENTTYPE_ArrayItem:
-			if(pCurItemData->GetType() == ITEM_Shape)
-			{
-				if(bIncludeShapes)
-					selectedItemList.push_back(pCurItemData);
-			}
-			else
-				selectedItemList.push_back(pCurItemData);
-			break;
-
-		default:
-			HyGuiLog("EntityWidget::GetSelectedItems - Unknown EntityItemType", LOGTYPE_Error);
-			break;
-		}
-	}
-
-	return selectedItemList;
+	return indexList;
 }
 
 // Will clear and select only what 'uuidList' contains. Will optionally allow the signal callback to push an UndoCmd on the stack for selection
@@ -407,7 +363,7 @@ void EntityWidget::SetSelectedItems(QList<EntityTreeItemData *> selectedList, QL
 	UpdateActions();
 }
 
-void EntityWidget::CheckShapeAdd(EditorShape eShapeType, bool bAsPrimitive)
+void EntityWidget::CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive)
 {
 	switch(eShapeType)
 	{
@@ -493,7 +449,7 @@ void EntityWidget::OnContextMenu(const QPoint &pos)
 
 void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-	UpdateActions();
+	//UpdateActions();
 
 	QList<EntityTreeItemData *> selectedItemDataList;
 	QModelIndexList selectedIndices = selected.indexes();
@@ -618,12 +574,9 @@ void EntityWidget::on_actionVertexEditMode_toggled(bool bChecked)
 
 void EntityWidget::on_actionOrderChildrenUp_triggered()
 {
-	QModelIndexList selectedIndexList = ui->nodeTree->selectionModel()->selectedIndexes();
+	QModelIndexList selectedIndexList = GetSelectedItems();
 	std::sort(selectedIndexList.begin(), selectedIndexList.end(), [](const QModelIndex &a, const QModelIndex &b)
 		{
-			if(a.parent() != b.parent())
-				HyGuiLog("EntityWidget::on_actionOrderChildrenUp_triggered - selected indices have different parents", LOGTYPE_Error);
-
 			return a.row() < b.row();
 		});
 
@@ -665,7 +618,7 @@ void EntityWidget::on_actionOrderChildrenUp_triggered()
 
 void EntityWidget::on_actionOrderChildrenDown_triggered()
 {
-	QModelIndexList selectedIndexList = ui->nodeTree->selectionModel()->selectedIndexes();
+	QModelIndexList selectedIndexList = GetSelectedItems();
 	if(selectedIndexList.empty())
 		return;
 
@@ -684,10 +637,6 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 	int iDiscardBotIndices = -1;
 	for(QModelIndex index : selectedIndexList)
 	{
-		// Only take selected items that are the first column
-		if(index.column() != 0)
-			continue;
-
 		if(iDiscardBotIndices == -1 && index.row() == (iNumChildren - 1))
 			iDiscardBotIndices = (iNumChildren - 1);
 		else if((iDiscardBotIndices - 1) == index.row())
@@ -716,7 +665,15 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 
 void EntityWidget::on_actionRemoveItems_triggered()
 {
-	QList<EntityTreeItemData *> poppedItemList = GetSelectedItems(false, false, false, true);
+	QModelIndexList selectedIndices = GetSelectedItems();
+
+	QList<EntityTreeItemData *> poppedItemList;
+	for(QModelIndex index : selectedIndices)
+	{
+		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pCurItemData->GetEntType() == ENTTYPE_Item || pCurItemData->GetEntType() == ENTTYPE_ArrayItem)
+			poppedItemList.push_back(pCurItemData);
+	}
 
 	QUndoCommand *pCmd = new EntityUndoCmd_PopItems(m_ItemRef, poppedItemList);
 	m_ItemRef.GetUndoStack()->push(pCmd);
@@ -724,14 +681,57 @@ void EntityWidget::on_actionRemoveItems_triggered()
 
 void EntityWidget::on_actionConvertShape_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
+
+	if(selectedIndexList.size() != 1)
+	{
+		HyGuiLog("EntityWidget::on_actionConvertShape_triggered was invoked with improper selection size", LOGTYPE_Error);
+		return;
+	}
+	EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndexList[0], Qt::UserRole).value<EntityTreeItemData *>();
+	if(pCurItemData->GetType() != ITEM_Primitive && pCurItemData->GetType() != ITEM_Shape)
+	{
+		HyGuiLog("EntityWidget::on_actionConvertShape_triggered was invoked with improper selection type", LOGTYPE_Error);
+		return;
+	}
+
+	QUndoCommand *pCmd = new EntityUndoCmd_ConvertShape(m_ItemRef, pCurItemData);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionRenameItem_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
+
+	if(selectedIndexList.size() != 1)
+	{
+		HyGuiLog("EntityWidget::on_actionRenameItem_triggered was invoked with improper selection size", LOGTYPE_Error);
+		return;
+	}
+
+	EntityTreeItemData *pEntTreeItemData = ui->nodeTree->model()->data(selectedIndexList[0], Qt::UserRole).value<EntityTreeItemData *>();
+
+	DlgInputName dlg("Rename " % pEntTreeItemData->GetText(),
+		pEntTreeItemData->GetCodeName(),
+		HyGlobal::FileNameValidator(),
+		[&](QString sTest) -> QString {
+			QString sGenName = static_cast<EntityModel *>(m_ItemRef.GetModel())->GenerateCodeName(sTest);
+			if(sGenName == sTest)
+				return QString();
+			else
+				return "Name already exists";
+		}, nullptr);
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		QUndoCommand *pCmd = new EntityUndoCmd_RenameItem(m_ItemRef, pEntTreeItemData, dlg.GetName());
+		m_ItemRef.GetUndoStack()->push(pCmd);
+	}
 }
 
 void EntityWidget::on_actionUnpackFromArray_triggered()
 {
+
 }
 
 void EntityWidget::on_actionConvertToArray_triggered()
@@ -740,6 +740,7 @@ void EntityWidget::on_actionConvertToArray_triggered()
 
 void EntityWidget::on_actionPackToArray_triggered()
 {
+
 }
 
 void EntityWidget::on_actionCutEntityItems_triggered()

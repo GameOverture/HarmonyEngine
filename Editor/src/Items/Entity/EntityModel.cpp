@@ -206,7 +206,7 @@ void EntityModel::SetShapeEditDrag(EditorShape eShapeType, bool bAsPrimitive)
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
 	if(pWidget)
-		pWidget->CheckShapeAdd(eShapeType, bAsPrimitive);
+		pWidget->CheckShapeAddBtn(eShapeType, bAsPrimitive);
 
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pEntDraw)
@@ -245,6 +245,11 @@ void EntityModel::ClearShapeEdit()
 	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pEntityDraw)
 		pEntityDraw->ClearShapeEdit();
+}
+
+QString EntityModel::GenerateCodeName(QString sDesiredName) const
+{
+	return m_TreeModel.GenerateCodeName(sDesiredName);
 }
 
 /*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) /*override*/

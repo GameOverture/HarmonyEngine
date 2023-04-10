@@ -345,3 +345,67 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 {
 	m_pShapeItemData->GetPropertiesModel().SetPropertyValue("Shape", "Data", m_sPrevData);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_pNewShapeItemData(nullptr),
+	m_pPrevShapeItemData(pShapeItemData),
+	m_iPoppedIndex(-1)
+{
+	if(m_pPrevShapeItemData->GetType() == ITEM_Shape)
+		setText("Convert shape to Primitive");
+	else
+		setText("Convert shape to Bounding Volume");
+}
+
+/*virtual*/ EntityUndoCmd_ConvertShape::~EntityUndoCmd_ConvertShape()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_ConvertShape::redo() /*override*/
+{
+	EditorShape eShape = HyGlobal::GetShapeFromString(m_pPrevShapeItemData->GetPropertiesModel().FindPropertyValue("Shape", "Type").toString());
+	QString sData = m_pPrevShapeItemData->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString();
+	bool bConvertingToPrimitive = m_pPrevShapeItemData->GetType() == ITEM_Shape;
+
+	m_iPoppedIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pPrevShapeItemData);
+
+	if(m_pNewShapeItemData == nullptr)
+		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(eShape, sData, bConvertingToPrimitive, -1);
+	else
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pNewShapeItemData, -1);
+}
+
+/*virtual*/ void EntityUndoCmd_ConvertShape::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pNewShapeItemData);
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pPrevShapeItemData, m_iPoppedIndex);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_RenameItem::EntityUndoCmd_RenameItem(ProjectItemData &entityItemRef, EntityTreeItemData *pItemData, QString sNewName, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_EntityItemRef(entityItemRef),
+	m_pItemData(pItemData),
+	m_sNewName(sNewName),
+	m_sOldName(m_pItemData->GetCodeName())
+{
+	setText("Rename entity item to " % sNewName);
+}
+
+/*virtual*/ EntityUndoCmd_RenameItem::~EntityUndoCmd_RenameItem()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_RenameItem::redo() /*override*/
+{
+	m_pItemData->SetText(m_sNewName);
+}
+
+/*virtual*/ void EntityUndoCmd_RenameItem::undo() /*override*/
+{
+	m_pItemData->SetText(m_sOldName);
+}

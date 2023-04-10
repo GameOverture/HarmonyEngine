@@ -164,7 +164,7 @@ void IWidget::OnRemoveStateTriggered()
 
 void IWidget::OnRenameStateTriggered()
 {
-	DlgInputName *pDlg = new DlgInputName("Rename State", GetCurStateData()->GetName(), HyGlobal::FreeFormValidator());
+	DlgInputName *pDlg = new DlgInputName("Rename State", GetCurStateData()->GetName(), HyGlobal::FreeFormValidator(), nullptr, nullptr);
 	if(pDlg->exec() == QDialog::Accepted)
 	{
 		QUndoCommand *pCmd = new UndoCmd_RenameState("Rename State", m_ItemRef, pDlg->GetName(), uiWidget->cmbStates->currentIndex());

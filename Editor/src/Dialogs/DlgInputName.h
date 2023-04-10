@@ -20,12 +20,14 @@ class DlgInputName;
 class DlgInputName : public QDialog
 {
 	Q_OBJECT
+
+	std::function<QString(QString)>			m_fpErrorCheckFunc;
 	
 	void CtorInit(QString sDlgTitle, QString sCurName, const QValidator *pValidator);
 
 public:
-	explicit DlgInputName(const QString sDlgTitle, QString sCurName, const QValidator *pValidator, QWidget *pParent = 0);
-	explicit DlgInputName(const QString sDlgTitle, ExplorerItemData *pItem, const QValidator *pValidator, QWidget *parent = 0);
+	explicit DlgInputName(const QString sDlgTitle, QString sCurName, const QValidator *pValidator, std::function<QString(QString)> fpErrorCheckFunc, QWidget *pParent = nullptr);
+	explicit DlgInputName(const QString sDlgTitle, ExplorerItemData *pItem, const QValidator *pValidator, std::function<QString(QString)> fpErrorCheckFunc, QWidget *pParent = nullptr);
 	~DlgInputName();
 	
 	QString GetName();

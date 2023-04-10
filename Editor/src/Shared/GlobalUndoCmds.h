@@ -444,7 +444,7 @@ public:
 		m_pNewRadBtnToggle->blockSignals(false);
 		m_pPrevRadBtnToggle->blockSignals(false);
 		
-		m_pOwner->UpdateActions();
+		m_pOwner->UpdateActions(); // TODO: remove this, it's called elsewhere
 	}
 	
 	void undo() override
@@ -457,7 +457,7 @@ public:
 		m_pNewRadBtnToggle->blockSignals(false);
 		m_pPrevRadBtnToggle->blockSignals(false);
 		
-		m_pOwner->UpdateActions();
+		m_pOwner->UpdateActions(); // TODO: remove this, it's called elsewhere 
 	}
 };
 

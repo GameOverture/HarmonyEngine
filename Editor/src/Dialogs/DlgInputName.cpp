@@ -28,15 +28,17 @@ void DlgInputName::CtorInit(QString sDlgTitle, QString sCurName, const QValidato
 	ui->lblName->setText("Name:");
 }
 
-DlgInputName::DlgInputName(const QString sDlgTitle, QString sCurName, const QValidator *pValidator, QWidget *pParent /*= 0*/) :
+DlgInputName::DlgInputName(const QString sDlgTitle, QString sCurName, const QValidator *pValidator, std::function<QString(QString)> fpErrorCheckFunc, QWidget *pParent /*= nullptr*/) :
 	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+	m_fpErrorCheckFunc(fpErrorCheckFunc),
 	ui(new Ui::DlgInputName)
 {
 	CtorInit(sDlgTitle, sCurName, pValidator);
 }
 
-DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerItemData *pItem, const QValidator *pValidator, QWidget *parent /*= 0*/) :
-	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+DlgInputName::DlgInputName(const QString sDlgTitle, ExplorerItemData *pItem, const QValidator *pValidator, std::function<QString(QString)> fpErrorCheckFunc, QWidget *pParent /*= nullptr*/) :
+	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
+	m_fpErrorCheckFunc(fpErrorCheckFunc),
 	ui(new Ui::DlgInputName)
 {
 	CtorInit(sDlgTitle, pItem->GetName(false), pValidator);
@@ -78,6 +80,17 @@ void DlgInputName::ErrorCheck()
 			ui->lblError->setText("Error: name cannot be blank");
 			bIsError = true;
 			break;
+		}
+
+		if(m_fpErrorCheckFunc)
+		{
+			QString sError = m_fpErrorCheckFunc(ui->txtName->text());
+			if(sError.isEmpty() == false)
+			{
+				ui->lblError->setText(sError);
+				bIsError = true;
+				break;
+			}
 		}
 		
 	}while(false);

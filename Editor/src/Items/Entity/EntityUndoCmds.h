@@ -133,6 +133,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// TODO: Add shape type to this an use this UndoCmd when changing shape type
 class EntityUndoCmd_ShapeData : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
@@ -144,6 +145,40 @@ class EntityUndoCmd_ShapeData : public QUndoCommand
 public:
 	EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_ShapeData();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// NOTE: Converts shape to/from Primitive and Bounding Volume, not between shape types
+class EntityUndoCmd_ConvertShape : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	EntityTreeItemData *			m_pNewShapeItemData;
+	EntityTreeItemData *			m_pPrevShapeItemData;
+	int								m_iPoppedIndex;
+
+public:
+	EntityUndoCmd_ConvertShape(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_ConvertShape();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class EntityUndoCmd_RenameItem : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	EntityTreeItemData *			m_pItemData;
+	QString							m_sNewName;
+	QString							m_sOldName;
+
+public:
+	EntityUndoCmd_RenameItem(ProjectItemData &entityItemRef, EntityTreeItemData *pItemData, QString sNewName, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_RenameItem();
 
 	virtual void redo() override;
 	virtual void undo() override;

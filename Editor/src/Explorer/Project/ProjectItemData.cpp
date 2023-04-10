@@ -406,5 +406,8 @@ void ProjectItemData::on_undoStack_indexChanged(int iIndex)
 	}
 	m_pDraw->OnUndoStackIndexChanged(iIndex);
 	m_pDraw->ApplyJsonData();
+
+	if(m_pWidget)
+		m_pWidget->UpdateActions();
 }
 
