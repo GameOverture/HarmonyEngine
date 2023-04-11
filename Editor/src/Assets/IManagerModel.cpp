@@ -838,7 +838,7 @@ void IManagerModel::SaveRuntime()
 /*virtual*/ QStringList IManagerModel::mimeTypes() const /*override*/
 {
 	QStringList sMimeTypeList;
-	sMimeTypeList << HYGUI_MIMETYPE_ASSET;
+	sMimeTypeList << HyGlobal::MimeTypeString(MIMETYPE_AssetItems);
 
 	switch(m_eASSET_TYPE)
 	{
@@ -871,7 +871,7 @@ void IManagerModel::SaveRuntime()
 
 /*virtual*/ bool IManagerModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
 {
-	if(pData->hasFormat(HYGUI_MIMETYPE_ASSET) == false)
+	if(pData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_AssetItems)) == false)
 		return false;
 
 	return true;
@@ -894,7 +894,7 @@ void IManagerModel::SaveRuntime()
 	TreeModelItem *pDestFilterTreeItem = GetItem(FindIndex<TreeModelItemData *>(pDestFilter, 0));
 
 	// Parse 'sSrc' for paste information
-	QByteArray sSrc = pData->data(HYGUI_MIMETYPE_ASSET);
+	QByteArray sSrc = pData->data(HyGlobal::MimeTypeString(MIMETYPE_AssetItems));
 	QJsonDocument assetDoc = QJsonDocument::fromJson(sSrc);
 	QJsonObject rootAssetObj = assetDoc.object();
 

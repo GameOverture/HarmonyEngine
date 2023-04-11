@@ -16,7 +16,7 @@
 #include "IManagerModel.h"
 
 AssetMimeData::AssetMimeData(Project &projRef, QList<TreeModelItemData *> &assetListRef, AssetType eAssetType) :
-	IMimeData(MIMETYPE_Assets)
+	IMimeData(MIMETYPE_AssetItems)
 {
 	for(uint32 i = 0; i < NUMASSETTYPES; ++i)
 		m_AssetCounts[i] = 0;
@@ -36,7 +36,7 @@ AssetMimeData::AssetMimeData(Project &projRef, QList<TreeModelItemData *> &asset
 
 	// Serialize the asset info into json source
 	m_Data = JsonValueToSrc(QJsonValue(rootAssetObj));
-	setData(HYGUI_MIMETYPE_ASSET, m_Data);
+	setData(HyGlobal::MimeTypeString(m_eMIME_TYPE), m_Data);
 }
 
 /*virtual*/ AssetMimeData::~AssetMimeData()

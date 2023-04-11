@@ -80,8 +80,8 @@ private Q_SLOTS:
 	void on_actionRenameItem_triggered();
 
 	void on_actionUnpackFromArray_triggered();
-	void on_actionConvertToArray_triggered();
 	void on_actionPackToArray_triggered();
+	void on_actionDuplicateToArray_triggered();
 	
 	void on_actionCutEntityItems_triggered();
 	void on_actionCopyEntityItems_triggered();

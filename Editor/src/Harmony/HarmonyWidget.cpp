@@ -161,7 +161,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		switch(pCurOpenTabItem->GetType())
 		{
 		case ITEM_Audio:
-			if(pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE_ASSET))
+			if(pEvent->mimeData()->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_AssetItems)))
 			{
 				const AssetMimeData *pMimeData = static_cast<const AssetMimeData *>(pEvent->mimeData());
 				if(pMimeData && pMimeData->GetNumAssetsOfType(ASSET_Audio) != 0)
@@ -170,7 +170,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 			break;
 
 		case ITEM_Sprite:
-			if(pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE_ASSET))
+			if(pEvent->mimeData()->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_AssetItems)))
 			{
 				const AssetMimeData *pMimeData = static_cast<const AssetMimeData *>(pEvent->mimeData());
 				if(pMimeData && pMimeData->GetNumAssetsOfType(ASSET_Atlas) != 0)
@@ -179,8 +179,8 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 			break;
 
 		case ITEM_Entity:
-			if(pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE_ITEM) ||
-				pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE_ASSET))
+			if(pEvent->mimeData()->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)) ||
+				pEvent->mimeData()->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_AssetItems)))
 			{
 				bIsValid = true;
 			}
@@ -267,7 +267,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		{
 			QList<ProjectItemData *> validItemList;
 			// Parse mime data source for project item array
-			QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HYGUI_MIMETYPE_ITEM));
+			QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)));
 			QJsonArray itemArray = doc.array();
 			for(int iIndex = 0; iIndex < itemArray.size(); ++iIndex)
 			{

@@ -41,7 +41,6 @@ class Project;
 #define HYGUI_FILE_VERSION 11
 
 #define DISPLAYORDER_TransformCtrl 9999999
-
 //#define HYGUI_UseBinaryMetaFiles
 
 enum HyGuiItemType
@@ -81,12 +80,6 @@ enum AssetType
 	NUMASSETTYPES
 };
 
-enum MimeType
-{
-	MIMETYPE_ProjectItems = 0,
-	MIMETYPE_Assets
-};
-
 enum AssetErrorType
 {
 	ASSETERROR_CannotFindMetaFile = 0,
@@ -116,6 +109,15 @@ enum AuxTab
 	AUXTAB_Output = 0,
 	AUXTAB_AssetInspector,
 	AUXTAB_ToolBox
+};
+
+enum MimeType
+{
+	MIMETYPE_ProjectItems = 0,
+	MIMETYPE_AssetItems,
+	MIMETYPE_EntityItems,
+
+	NUM_MIMETYPES
 };
 
 enum EditorShape
@@ -206,6 +208,8 @@ class HyGlobal
 	static QIcon														sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
 	static QColor														sm_ItemColors[NUMTYPES];
 
+	static QString														sm_MimeTypes[NUM_MIMETYPES];
+
 	static QString														sm_Themes[NUMTHEMES];
 
 	static QRegExpValidator *											sm_pCodeNameValidator;
@@ -235,6 +239,7 @@ public:
 	static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)	{ return sm_ItemIcons[eItm][eSubIcon]; }
 	static const QIcon AssetIcon(AssetType eAsset, SubIcon eSubIcon);
 	static const QColor ItemColor(HyGuiItemType eItem)					{ return sm_ItemColors[eItem]; }
+	static const QString MimeTypeString(MimeType eMimeType)				{ return sm_MimeTypes[eMimeType]; }
 	static const QString ThemeString(Theme eTheme)						{ return sm_Themes[eTheme]; }
 
 	static const QRegExpValidator *CodeNameValidator()					{ return sm_pCodeNameValidator; }

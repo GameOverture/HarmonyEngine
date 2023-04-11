@@ -637,7 +637,7 @@
     <string>Convert Shape</string>
    </property>
    <property name="toolTip">
-    <string>Convert this shape into another shape type, either as a primitive or bounding volume</string>
+    <string>Convert this shape to and from a primitive or a bounding volume</string>
    </property>
   </action>
   <action name="actionRenameItem">
@@ -676,7 +676,7 @@
     <string>Group selected items into an array</string>
    </property>
   </action>
-  <action name="actionConvertToArray">
+  <action name="actionDuplicateToArray">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/items/Prefix-New.png</normaloff>:/icons16x16/items/Prefix-New.png</iconset>

@@ -119,6 +119,8 @@ if(Qt5_DIR)
 		src/Items/Entity/EntityDraw.h
 		src/Items/Entity/EntityDrawItem.cpp
 		src/Items/Entity/EntityDrawItem.h
+		src/Items/Entity/EntityItemMimeData.cpp
+		src/Items/Entity/EntityItemMimeData.h
 		src/Items/Entity/EntityModel.cpp
 		src/Items/Entity/EntityModel.h
 		src/Items/Entity/EntityTreeModel.cpp
@@ -163,6 +165,9 @@ if(Qt5_DIR)
 		src/Dialogs/DlgInputName.cpp
 		src/Dialogs/DlgInputName.h
 		src/Dialogs/DlgInputName.ui
+		src/Dialogs/DlgInputNumber.cpp
+		src/Dialogs/DlgInputNumber.h
+		src/Dialogs/DlgInputNumber.ui
 		src/Dialogs/DlgNewBuild.cpp
 		src/Dialogs/DlgNewBuild.h
 		src/Dialogs/DlgNewBuild.ui

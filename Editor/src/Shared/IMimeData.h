@@ -14,9 +14,6 @@
 
 #include <QMimeData>
 
-#define HYGUI_MIMETYPE_ITEM "application/x-harmonyitem"
-#define HYGUI_MIMETYPE_ASSET "application/x-harmonyasset"
-
 class AssetItemData;
 class TreeModelItemData;
 

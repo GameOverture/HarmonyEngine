@@ -69,7 +69,7 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 
 	// Serialize the item info into json source
 	m_Data = JsonValueToSrc(QJsonValue(rootArray));
-	setData(HYGUI_MIMETYPE_ITEM, m_Data);
+	setData(HyGlobal::MimeTypeString(m_eMIME_TYPE), m_Data);
 }
 
 /*virtual*/ ProjectItemMimeData::~ProjectItemMimeData()

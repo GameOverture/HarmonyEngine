@@ -12,10 +12,14 @@
 #include "EntityDraw.h"
 #include "ui_EntityWidget.h"
 #include "Project.h"
+#include "EntityItemMimeData.h"
 #include "EntityUndoCmds.h"
 #include "GlobalUndoCmds.h"
 #include "DlgInputName.h"
+#include "DlgInputNumber.h"
 #include "MainWindow.h"
+
+#include <QClipboard>
 
 EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
@@ -137,7 +141,7 @@ EntityWidget::~EntityWidget()
 		ui->actionConvertShape->setEnabled(false);
 		ui->actionRenameItem->setEnabled(false);
 
-		ui->actionConvertToArray->setEnabled(false);
+		ui->actionDuplicateToArray->setEnabled(false);
 		ui->actionUnpackFromArray->setEnabled(false);
 		ui->actionPackToArray->setEnabled(false);
 
@@ -207,7 +211,7 @@ EntityWidget::~EntityWidget()
 		if(bSelectedHaveSameParent && bAllSameType && bAllArrayItems)
 		{
 			ui->actionPackToArray->setEnabled(false);
-			ui->actionConvertToArray->setEnabled(false);
+			ui->actionDuplicateToArray->setEnabled(false);
 			ui->actionUnpackFromArray->setEnabled(true);
 
 			ui->actionUnpackFromArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_Close));
@@ -216,16 +220,16 @@ EntityWidget::~EntityWidget()
 		else if(bSelectedHaveSameParent && bAllSameType && selectedIndices.size() == 1)
 		{
 			ui->actionPackToArray->setEnabled(false);
-			ui->actionConvertToArray->setEnabled(true);
+			ui->actionDuplicateToArray->setEnabled(true);
 			ui->actionUnpackFromArray->setEnabled(false);
 
-			ui->actionConvertToArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_New));
-			m_ContextMenu.addAction(ui->actionConvertToArray);
+			ui->actionDuplicateToArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_New));
+			m_ContextMenu.addAction(ui->actionDuplicateToArray);
 		}
 		else
 		{
 			ui->actionPackToArray->setEnabled(bSelectedHaveSameParent && bAllSameType);
-			ui->actionConvertToArray->setEnabled(false);
+			ui->actionDuplicateToArray->setEnabled(false);
 			ui->actionUnpackFromArray->setEnabled(false);
 
 			ui->actionPackToArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_Open));
@@ -734,23 +738,68 @@ void EntityWidget::on_actionUnpackFromArray_triggered()
 
 }
 
-void EntityWidget::on_actionConvertToArray_triggered()
-{
-}
-
 void EntityWidget::on_actionPackToArray_triggered()
 {
 
 }
 
+void EntityWidget::on_actionDuplicateToArray_triggered()
+{
+	QModelIndex index = ui->nodeTree->currentIndex();
+	
+	DlgInputNumber dlg("Specify number of array elements", QIcon(":/icons16x16/generic-rename.png"), 1, 1, 0x0FFFFFFF, nullptr, nullptr);
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		//QUndoCommand *pCmd = new EntityUndoCmd_DuplicateToArray(m_ItemRef, pEntTreeItemData, dlg.GetName());
+		//m_ItemRef.GetUndoStack()->push(pCmd);
+	}
+}
+
 void EntityWidget::on_actionCutEntityItems_triggered()
 {
+	on_actionCopyEntityItems_triggered();
+	on_actionRemoveItems_triggered();
 }
 
 void EntityWidget::on_actionCopyEntityItems_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
+
+	QList<EntityTreeItemData *>selectedTreeItemDataList;
+	for(QModelIndex index : selectedIndexList)
+	{
+		EntityTreeItemData *pTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pTreeItemData->GetEntType() == ENTTYPE_Item || pTreeItemData->GetEntType() == ENTTYPE_ArrayItem)
+			selectedTreeItemDataList.push_back(pTreeItemData);
+	}
+
+	QClipboard *pClipboard = QGuiApplication::clipboard();
+	EntityItemMimeData *pMimeData = new EntityItemMimeData(m_ItemRef, selectedTreeItemDataList);
+	pClipboard->setMimeData(pMimeData);
 }
 
 void EntityWidget::on_actionPasteEntityItems_triggered()
 {
+	QClipboard *pClipboard = QGuiApplication::clipboard();
+	const QMimeData *pMimeData = pClipboard->mimeData();
+
+	if(pMimeData->hasFormat("application/json") == false &&
+		pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityItems)) == false)
+	{
+		HyGuiLog("EntityWidget::on_actionPasteEntityItems_triggered - Wrong mime data type", LOGTYPE_Error);
+		return;
+	}
+
+	QByteArray jsonData = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityItems));
+	QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonData);
+	QJsonObject pastedObject = jsonDocument.object();
+
+	if(m_ItemRef.GetProject().GetAbsPath().compare(pastedObject["project"].toString(), Qt::CaseInsensitive) != 0)
+	{
+		HyGuiLog("Pasted entity items originate from a different project", LOGTYPE_Warning);
+		return;
+	}
+
+	EntityUndoCmd_PasteItems *pCmd = new EntityUndoCmd_PasteItems(m_ItemRef, pastedObject["itemList"].toArray());
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }

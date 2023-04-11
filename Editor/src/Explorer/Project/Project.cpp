@@ -47,16 +47,16 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 {
 	const QMimeData *pMimeData = pEvent->mimeData();
 
-	if(pMimeData->hasFormat(HYGUI_MIMETYPE_ITEM))
+	if(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)))
 		pEvent->acceptProposedAction();
 }
 
 /*virtual*/ void ProjectTabBar::dropEvent(QDropEvent *pEvent) /*override*/
 {
-	if(pEvent->proposedAction() == Qt::LinkAction && pEvent->mimeData()->hasFormat(HYGUI_MIMETYPE_ITEM))
+	if(pEvent->proposedAction() == Qt::LinkAction && pEvent->mimeData()->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)))
 	{
 		// Process the data from the event.
-		QByteArray dragDataSrc = pEvent->mimeData()->data(HYGUI_MIMETYPE_ITEM);
+		QByteArray dragDataSrc = pEvent->mimeData()->data(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems));
 		QJsonDocument userDoc = QJsonDocument::fromJson(dragDataSrc);
 
 		QJsonObject dragObj = userDoc.object();

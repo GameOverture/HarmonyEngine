@@ -128,6 +128,35 @@ EntityUndoCmd_PopItems::EntityUndoCmd_PopItems(ProjectItemData &entityItemRef, Q
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonArray pastedItemArray, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_PastedItemArray(pastedItemArray)
+{
+	setText("Pasted items");
+}
+
+/*virtual*/ EntityUndoCmd_PasteItems::~EntityUndoCmd_PasteItems()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_PasteItems::redo() /*override*/
+{
+	m_PastedItemList.clear();
+	for(int i = 0; i < m_PastedItemArray.size(); ++i)
+	{
+		QJsonObject itemObj = m_PastedItemArray[i].toObject();
+		m_PastedItemList.push_back(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingChild(itemObj, false, -1));
+	}
+}
+
+/*virtual*/ void EntityUndoCmd_PasteItems::undo() /*override*/
+{
+	for(EntityTreeItemData *pItem : m_PastedItemList)
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, QString sData, bool bIsPrimitive, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_eShape(eShape),

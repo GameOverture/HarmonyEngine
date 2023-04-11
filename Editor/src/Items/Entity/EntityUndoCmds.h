@@ -62,6 +62,22 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_PasteItems : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	QJsonArray						m_PastedItemArray;
+	QList<EntityTreeItemData *>		m_PastedItemList;
+
+public:
+	EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonArray pastedItemArray, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_PasteItems();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_AddNewShape : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;

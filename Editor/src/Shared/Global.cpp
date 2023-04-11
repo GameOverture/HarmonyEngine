@@ -23,6 +23,8 @@
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
 /*static*/ QColor HyGlobal::sm_ItemColors[NUMTYPES];
 
+/*static*/ QString HyGlobal::sm_MimeTypes[NUM_MIMETYPES];
+
 /*static*/ QString HyGlobal::sm_Themes[NUMTHEMES];
 
 /*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = nullptr;
@@ -121,6 +123,10 @@
 	sm_ItemColors[ITEM_Entity3d] = QColor(128, 128, 128);
 	sm_ItemColors[ITEM_Shape] = QColor(234, 232, 58);
 	sm_ItemColors[ITEM_Physics] = QColor(201, 58, 203);
+
+	sm_MimeTypes[MIMETYPE_ProjectItems] = "application/x-hyprojitems";
+	sm_MimeTypes[MIMETYPE_AssetItems] = "application/x-hyassetitems";
+	sm_MimeTypes[MIMETYPE_EntityItems] = "application/x-hyentityitems";
 
 	sm_Themes[THEME_Decemberween] = "Decemberween";
 	sm_Themes[THEME_CorpyNT6] = "Corpy NT6";

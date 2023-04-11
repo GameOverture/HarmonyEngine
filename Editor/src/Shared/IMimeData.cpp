@@ -29,18 +29,13 @@ MimeType IMimeData::GetMimeType() const
 
 /*virtual*/ bool IMimeData::hasFormat(const QString &sMimeType) const /*override*/
 {
-	return ("application/json" == sMimeType.toLower() ||
-		(m_eMIME_TYPE == MIMETYPE_ProjectItems && HYGUI_MIMETYPE_ITEM == sMimeType.toLower()) ||
-		(m_eMIME_TYPE == MIMETYPE_Assets && HYGUI_MIMETYPE_ASSET == sMimeType.toLower()));
+	return ("application/json" == sMimeType.toLower() || HyGlobal::MimeTypeString(m_eMIME_TYPE) == sMimeType.toLower());
 }
 
 /*virtual*/ QStringList IMimeData::formats() const /*override*/
 {
 	QStringList sFormatList;
-	if(m_eMIME_TYPE == MIMETYPE_ProjectItems)
-		sFormatList << HYGUI_MIMETYPE_ITEM;
-	else
-		sFormatList << HYGUI_MIMETYPE_ASSET;
+	sFormatList << HyGlobal::MimeTypeString(m_eMIME_TYPE);
 	sFormatList << "application/json";
 
 	return sFormatList;
@@ -51,12 +46,8 @@ MimeType IMimeData::GetMimeType() const
 	if(type != QVariant::UserType && type != QVariant::ByteArray && type != QVariant::String)
 		return QVariant();
 
-	if(sMimeType.compare(HYGUI_MIMETYPE_ITEM, Qt::CaseInsensitive) == 0 ||
-		sMimeType.compare(HYGUI_MIMETYPE_ASSET, Qt::CaseInsensitive) == 0 ||
-		sMimeType.toLower() == "application/json")
-	{
+	if(hasFormat(sMimeType))
 		return QVariant(m_Data);
-	}
 
 	return QVariant();
 }

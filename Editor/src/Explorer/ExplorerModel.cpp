@@ -196,7 +196,7 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 	Project *pDestProject = &pDestItem->GetProject();
 
 	// Parse 'pProjMimeData' for paste information
-	QJsonDocument pasteDoc = QJsonDocument::fromJson(pProjMimeData->data(HYGUI_MIMETYPE_ITEM));
+	QJsonDocument pasteDoc = QJsonDocument::fromJson(pProjMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)));
 	QJsonArray pasteArray = pasteDoc.array();
 	for(int iPasteIndex = 0; iPasteIndex < pasteArray.size(); ++iPasteIndex)
 	{
@@ -450,12 +450,12 @@ void ExplorerModel::RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectIt
 
 /*virtual*/ QStringList ExplorerModel::mimeTypes() const /*override*/
 {
-	return QStringList() << HYGUI_MIMETYPE_ITEM;
+	return QStringList() << HyGlobal::MimeTypeString(MIMETYPE_ProjectItems);
 }
 
 /*virtual*/ bool ExplorerModel::canDropMimeData(const QMimeData *pData, Qt::DropAction eAction, int iRow, int iColumn, const QModelIndex &parentRef) const /*override*/
 {
-	if(pData->hasFormat(HYGUI_MIMETYPE_ITEM) == false)
+	if(pData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)) == false)
 		return false;
 
 	TreeModelItem *pParentTreeItem = FindPrefixTreeItem(parentRef);
@@ -470,7 +470,7 @@ void ExplorerModel::RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectIt
 	if(eAction == Qt::IgnoreAction)
 		return true;
 	
-	if(eAction == Qt::MoveAction && pData->hasFormat(HYGUI_MIMETYPE_ITEM))
+	if(eAction == Qt::MoveAction && pData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)))
 		return PasteItemSrc(static_cast<const ProjectItemMimeData *>(pData), parentRef);
 
 	HyGuiLog("dropMimeData isn't MOVEACTION", LOGTYPE_Normal);

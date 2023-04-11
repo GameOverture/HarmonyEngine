@@ -46,7 +46,6 @@ public:
 	EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj, int iArrayIndex);
 	virtual ~EntityTreeItemData();
 
-
 	EntityItemType GetEntType() const;
 	QString GetCodeName() const;
 	int32 GetArrayIndex() const;
