@@ -15,7 +15,7 @@
 #include <QStringBuilder>
 
 
-DlgInputNumber::DlgInputNumber(const QString &sDlgTitle, const QIcon &icon, int iStartValue, int iMin, int iMax, std::function<QString(int)> fpErrorCheckFunc, QWidget *pParent /*= nullptr*/) :
+DlgInputNumber::DlgInputNumber(const QString &sDlgTitle, const QString &sLabel, const QIcon &icon, int iStartValue, int iMin, int iMax, std::function<QString(int)> fpErrorCheckFunc, QWidget *pParent /*= nullptr*/) :
 	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
 	m_iStartValue(iStartValue),
 	m_fpErrorCheckFunc(fpErrorCheckFunc),
@@ -30,7 +30,7 @@ DlgInputNumber::DlgInputNumber(const QString &sDlgTitle, const QIcon &icon, int 
 	ui->sbValue->setMinimum(iMin);
 	ui->sbValue->setMaximum(iMax);
 
-	ui->lblName->setText("Value");
+	ui->lblName->setText(sLabel);
 
 	ErrorCheck();
 }
@@ -40,7 +40,7 @@ DlgInputNumber::DlgInputNumber(const QString &sDlgTitle, const QIcon &icon, int 
 	delete ui;
 }
 
-void DlgInputNumber::on_txtName_textChanged(const QString &arg1)
+void DlgInputNumber::on_sbValue_valueChanged(int iArg)
 {
 	ErrorCheck();
 }

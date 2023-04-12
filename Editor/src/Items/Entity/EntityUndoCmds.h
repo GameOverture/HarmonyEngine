@@ -67,9 +67,10 @@ class EntityUndoCmd_PasteItems : public QUndoCommand
 	ProjectItemData &				m_EntityItemRef;
 	QJsonArray						m_PastedItemArray;
 	QList<EntityTreeItemData *>		m_PastedItemList;
+	EntityTreeItemData *			m_pArrayFolder;
 
 public:
-	EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonArray pastedItemArray, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonArray pastedItemArray, EntityTreeItemData *pArrayFolder, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PasteItems();
 
 	virtual void redo() override;
@@ -185,6 +186,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_RenameItem : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
@@ -195,6 +197,25 @@ class EntityUndoCmd_RenameItem : public QUndoCommand
 public:
 	EntityUndoCmd_RenameItem(ProjectItemData &entityItemRef, EntityTreeItemData *pItemData, QString sNewName, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_RenameItem();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_DuplicateToArray : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	EntityTreeItemData *			m_pItemData;
+	int								m_iPoppedIndex;
+	int								m_iArraySize;
+
+	QList<EntityTreeItemData *>		m_DuplicateItemList;
+
+public:
+	EntityUndoCmd_DuplicateToArray(ProjectItemData &entityItemRef, EntityTreeItemData *pItemData, int iArraySize, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_DuplicateToArray();
 
 	virtual void redo() override;
 	virtual void undo() override;

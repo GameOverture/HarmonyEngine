@@ -204,7 +204,10 @@ EntityWidget::~EntityWidget()
 		ui->actionRenameItem->setEnabled(bRootOrBvFolder == false && selectedIndices.size() == 1);
 		ui->actionCutEntityItems->setEnabled(bRootOrBvFolder == false);
 		ui->actionCopyEntityItems->setEnabled(bRootOrBvFolder == false);
-		ui->actionPasteEntityItems->setEnabled(bRootOrBvFolder == false);
+
+		QClipboard *pClipboard = QGuiApplication::clipboard();
+		const QMimeData *pMimeData = pClipboard->mimeData();
+		ui->actionPasteEntityItems->setEnabled(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityItems)));
 
 		ui->actionRemoveItems->setEnabled(bRootOrBvFolder == false);
 		
@@ -746,12 +749,17 @@ void EntityWidget::on_actionPackToArray_triggered()
 void EntityWidget::on_actionDuplicateToArray_triggered()
 {
 	QModelIndex index = ui->nodeTree->currentIndex();
+	EntityTreeItemData *pEntTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
 	
-	DlgInputNumber dlg("Specify number of array elements", QIcon(":/icons16x16/generic-rename.png"), 1, 1, 0x0FFFFFFF, nullptr, nullptr);
+	QString sDlgTitle = "Duplicate " % pEntTreeItemData->GetCodeName() % " into array of " % HyGlobal::ItemName(pEntTreeItemData->GetType(), false) % " elements";
+	DlgInputNumber dlg(sDlgTitle, "Size", HyGlobal::ItemIcon(pEntTreeItemData->GetType(), SUBICON_New), 1, 1, 0x0FFFFFFF, nullptr, nullptr);
 	if(dlg.exec() == QDialog::Accepted)
 	{
-		//QUndoCommand *pCmd = new EntityUndoCmd_DuplicateToArray(m_ItemRef, pEntTreeItemData, dlg.GetName());
-		//m_ItemRef.GetUndoStack()->push(pCmd);
+		// Must clear selection because below action will remove the selected item, which will cause an unwanted selection action cmd
+		RequestSelectedItems(QList<QUuid>(), false);
+
+		QUndoCommand *pCmd = new EntityUndoCmd_DuplicateToArray(m_ItemRef, pEntTreeItemData, dlg.GetValue());
+		m_ItemRef.GetUndoStack()->push(pCmd);
 	}
 }
 
@@ -800,6 +808,26 @@ void EntityWidget::on_actionPasteEntityItems_triggered()
 		return;
 	}
 
-	EntityUndoCmd_PasteItems *pCmd = new EntityUndoCmd_PasteItems(m_ItemRef, pastedObject["itemList"].toArray());
+	EntityTreeItemData *pArrayFolder = nullptr;
+	QModelIndex index = ui->nodeTree->currentIndex();
+	EntityTreeItemData *pEntTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+	if(pEntTreeItemData->GetEntType() == ENTTYPE_ArrayFolder)
+	{
+		pArrayFolder = pEntTreeItemData;
+
+		// Needs to error check that all items on the clipboard match the type of the ArrayFolder before continuing with the paste
+		QJsonArray itemListArray = pastedObject["itemList"].toArray();
+		for(int i = 0; i < itemListArray.size(); ++i)
+		{
+			QJsonObject itemObj = itemListArray[i].toObject();
+			if(HyGlobal::GetTypeFromString(itemObj["itemType"].toString()) != pArrayFolder->GetType())
+			{
+				HyGuiLog("Pasted entity item " % itemObj["codeName"].toString() % " has a mismatching type of " % itemObj["itemType"].toString() % " and cannot be inserted into the array.", LOGTYPE_Warning);
+				return;
+			}
+		}
+	}
+
+	EntityUndoCmd_PasteItems *pCmd = new EntityUndoCmd_PasteItems(m_ItemRef, pastedObject["itemList"].toArray(), pArrayFolder);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }

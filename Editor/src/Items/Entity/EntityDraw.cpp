@@ -248,12 +248,35 @@ void EntityDraw::ClearShapeEdit()
 
 	QJsonArray childArray = itemMetaObj["childList"].toArray();
 	QJsonArray shapeArray = itemMetaObj["shapeList"].toArray();
-	for(int32 i = 0; i < shapeArray.size(); ++i)
-		childArray.append(shapeArray[i].toObject());
 
+	// Pull out all the valid json objects that represent items in the entity
+	QList<QJsonObject> itemObjectList;
 	for(int32 i = 0; i < childArray.size(); ++i)
 	{
-		QJsonObject childObj = childArray[i].toObject();
+		if(childArray[i].isObject())
+			itemObjectList.push_back(childArray[i].toObject());
+		else if(childArray[i].isArray())
+		{
+			QJsonArray arrayFolder = childArray[i].toArray();
+			for(int32 j = 0; j < arrayFolder.size(); ++j)
+				itemObjectList.push_back(arrayFolder[j].toObject());
+		}
+	}
+	for(int32 i = 0; i < shapeArray.size(); ++i)
+	{
+		if(shapeArray[i].isObject())
+			itemObjectList.push_back(shapeArray[i].toObject());
+		else if(shapeArray[i].isArray())
+		{
+			QJsonArray arrayFolder = shapeArray[i].toArray();
+			for(int32 j = 0; j < arrayFolder.size(); ++j)
+				itemObjectList.push_back(arrayFolder[j].toObject());
+		}
+	}
+
+	for(int32 i = 0; i < itemObjectList.size(); ++i)
+	{
+		QJsonObject childObj = itemObjectList[i];
 		HyGuiItemType eType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
 		QUuid uuid(childObj["UUID"].toString());
 		bool bSelected = childObj["isSelected"].toBool();

@@ -12,6 +12,7 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 #include "EntityDraw.h"
+#include "EntityItemMimeData.h"
 #include "IAssetItemData.h"
 #include "MainWindow.h"
 
@@ -128,11 +129,12 @@ EntityUndoCmd_PopItems::EntityUndoCmd_PopItems(ProjectItemData &entityItemRef, Q
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonArray pastedItemArray, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonArray pastedItemArray, EntityTreeItemData *pArrayFolder, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_PastedItemArray(pastedItemArray)
+	m_PastedItemArray(pastedItemArray),
+	m_pArrayFolder(pArrayFolder)
 {
-	setText("Pasted items");
+	setText("Pasted " % QString::number(m_PastedItemArray.size()) % " items");
 }
 
 /*virtual*/ EntityUndoCmd_PasteItems::~EntityUndoCmd_PasteItems()
@@ -145,7 +147,22 @@ EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRe
 	for(int i = 0; i < m_PastedItemArray.size(); ++i)
 	{
 		QJsonObject itemObj = m_PastedItemArray[i].toObject();
-		m_PastedItemList.push_back(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingChild(itemObj, false, -1));
+
+		bool bIsArrayItem = false;
+		if(m_pArrayFolder)
+		{
+			HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(itemObj["itemType"].toString());
+			if(eGuiType != m_pArrayFolder->GetType())
+			{
+				HyGuiLog("EntityUndoCmd_PasteItems::redo - pasted array item (" % itemObj["codeName"].toString() % ") " % itemObj["itemType"].toString() % " did match array type", LOGTYPE_Error);
+				continue;
+			}
+
+			itemObj["codeName"] = m_pArrayFolder->GetCodeName();
+			bIsArrayItem = true;
+		}
+
+		m_PastedItemList.push_back(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingChild(itemObj, bIsArrayItem, -1));
 	}
 }
 
@@ -437,4 +454,59 @@ EntityUndoCmd_RenameItem::EntityUndoCmd_RenameItem(ProjectItemData &entityItemRe
 /*virtual*/ void EntityUndoCmd_RenameItem::undo() /*override*/
 {
 	m_pItemData->SetText(m_sOldName);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_DuplicateToArray::EntityUndoCmd_DuplicateToArray(ProjectItemData &entityItemRef, EntityTreeItemData *pItemData, int iArraySize, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_pItemData(pItemData),
+	m_iPoppedIndex(-1),
+	m_iArraySize(iArraySize)
+{
+	if(pItemData->GetEntType() != ENTTYPE_Item)
+		HyGuiLog("EntityUndoCmd_DuplicateToArray - invalid pItemData passed to ctor, was not ENTTYPE_Item", LOGTYPE_Error);
+	
+	setText("Duplicate " % pItemData->GetCodeName() % " into " % HyGlobal::ItemName(pItemData->GetType(), false) % " array[" % QString::number(iArraySize) % "]");
+}
+
+/*virtual*/ EntityUndoCmd_DuplicateToArray::~EntityUndoCmd_DuplicateToArray()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_DuplicateToArray::redo() /*override*/
+{
+	// First remove the item
+	m_iPoppedIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pItemData);
+	
+	QList<EntityTreeItemData *> mimeItemList;
+	for(int i = 0; i < m_iArraySize; ++i)
+		mimeItemList << m_pItemData;
+
+	// Create temporary a EntityItemMimeData to generate JSON object that contains an "itemList" array of duplicated 'm_pItemData'
+	EntityItemMimeData *pMimeData = new EntityItemMimeData(m_EntityItemRef, mimeItemList);
+	QByteArray jsonData = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityItems));
+	delete pMimeData;
+	QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonData);
+	QJsonObject mimeObject = jsonDocument.object();
+	QJsonArray duplicateItemArray = mimeObject["itemList"].toArray();
+
+	// Add all the duplicates in the array
+	m_DuplicateItemList.clear();
+	for(int i = 0; i < duplicateItemArray.size(); ++i)
+	{
+		QJsonObject dupItemObj = duplicateItemArray[i].toObject();
+		dupItemObj["UUID"] = QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
+		dupItemObj["isSelected"] = false;
+
+		m_DuplicateItemList.push_back(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingChild(dupItemObj, true, -1));
+	}
+}
+
+/*virtual*/ void EntityUndoCmd_DuplicateToArray::undo() /*override*/
+{
+	for(EntityTreeItemData *pItem : m_DuplicateItemList)
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem);
+
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pItemData, m_iPoppedIndex);
 }

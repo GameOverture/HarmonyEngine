@@ -326,6 +326,17 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 		if(pCurItem == nullptr)
 			continue;
 
+		if(pCurItem->GetEntType() == ENTTYPE_ArrayFolder)
+		{
+			TreeModelItem *pArrayFolder = pThisEntity->GetChild(i);
+			for(int i = 0; i < pArrayFolder->GetNumChildren(); ++i)
+			{
+				EntityTreeItemData *pArrayItem = pArrayFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
+				if(pArrayItem->GetThisUuid() == uuid)
+					return pArrayItem;
+			}
+		}
+
 		if(pCurItem->GetThisUuid() == uuid)
 			return pCurItem;
 	}
@@ -336,6 +347,17 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 		EntityTreeItemData *pCurShape = pThisShapeFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
 		if(pCurShape == nullptr)
 			continue;
+
+		if(pCurShape->GetEntType() == ENTTYPE_ArrayFolder)
+		{
+			TreeModelItem *pArrayFolder = pThisShapeFolder->GetChild(i);
+			for(int i = 0; i < pArrayFolder->GetNumChildren(); ++i)
+			{
+				EntityTreeItemData *pArrayItem = pArrayFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
+				if(pArrayItem->GetThisUuid() == uuid)
+					return pArrayItem;
+			}
+		}
 
 		if(pCurShape->GetThisUuid() == uuid)
 			return pCurShape;
@@ -450,7 +472,8 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertExistingChild(QJsonObject initObj
 		bool bFoundArrayFolder = false;
 		for(int i = 0; i < pParentTreeItem->GetNumChildren(); ++i)
 		{
-			if(sCodeName == pParentTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>()->GetCodeName())
+			EntityTreeItemData *pSubItem = pParentTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
+			if(sCodeName == pSubItem->GetCodeName() && pSubItem->GetEntType() == ENTTYPE_ArrayFolder)
 			{
 				pParentTreeItem = pParentTreeItem->GetChild(i);
 				bFoundArrayFolder = true;
@@ -461,11 +484,23 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertExistingChild(QJsonObject initObj
 		if(bFoundArrayFolder == false)
 		{
 			QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-			if(insertRow(pParentTreeItem->GetNumChildren(), parentIndex) == false)
+			int iArrayFolderRow = pParentTreeItem->GetNumChildren();
+
+			if(insertRow(iArrayFolderRow, parentIndex) == false)
 			{
 				HyGuiLog("EntityTreeModel::Cmd_InsertNewChild() - ArrayFolder insertRow failed", LOGTYPE_Error);
 				return nullptr;
 			}
+			// Allocate and store the new array folder item in the tree model
+			EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, eGuiType, ENTTYPE_ArrayFolder, -1, QUuid(), QUuid());
+			QVariant v;
+			v.setValue<EntityTreeItemData *>(pNewItem);
+			for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
+			{
+				if(setData(index(iArrayFolderRow, iCol, parentIndex), v, Qt::UserRole) == false)
+					HyGuiLog("ExplorerModel::Cmd_InsertNewChild() - setData failed", LOGTYPE_Error);
+			}
+
 			pParentTreeItem = pParentTreeItem->GetChild(pParentTreeItem->GetNumChildren() - 1);
 		}
 	}
@@ -563,10 +598,22 @@ int32 EntityTreeModel::Cmd_PopChild(EntityTreeItemData *pItem)
 	TreeModelItem *pParentTreeItem = pTreeItem->GetParent();
 
 	int32 iRow = pTreeItem->GetIndex();
-	if(removeRow(iRow, createIndex(pParentTreeItem->GetIndex(), 0, pParentTreeItem)) == false)
+	QModelIndex parentIndex = createIndex(pParentTreeItem->GetIndex(), 0, pParentTreeItem);
+	if(removeRow(iRow, parentIndex) == false)
 	{
 		HyGuiLog("ExplorerModel::PopChild() - removeRow failed", LOGTYPE_Error);
 		return -1;
+	}
+
+	// If item removed was apart of an array, check if its array folder is now empty. If so, remove the array folder too
+	EntityTreeItemData *pParentTreeItemData = pParentTreeItem->data(0).value<EntityTreeItemData *>();
+	if(pParentTreeItemData->GetEntType() == ENTTYPE_ArrayFolder && pParentTreeItem->GetNumChildren() == 0)
+	{
+		TreeModelItem *pArrayFolderParent = pParentTreeItem->GetParent();
+		
+		int iArrayFolderRow = pParentTreeItem->GetIndex();
+		if(removeRow(iArrayFolderRow, createIndex(pArrayFolderParent->GetIndex(), 0, pArrayFolderParent)) == false)
+			HyGuiLog("ExplorerModel::PopChild() - removeRow failed for array folder", LOGTYPE_Error);
 	}
 
 	return iRow;

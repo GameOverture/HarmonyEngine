@@ -25,13 +25,13 @@ class DlgInputNumber : public QDialog
 	std::function<QString(int)>			m_fpErrorCheckFunc;
 
 public:
-	explicit DlgInputNumber(const QString &sDlgTitle, const QIcon &icon, int iStartValue, int iMin, int iMax, std::function<QString(int)> fpErrorCheckFunc, QWidget *pParent = nullptr);
+	explicit DlgInputNumber(const QString &sDlgTitle, const QString &sLabel, const QIcon &icon, int iStartValue, int iMin, int iMax, std::function<QString(int)> fpErrorCheckFunc, QWidget *pParent = nullptr);
 	virtual ~DlgInputNumber();
 	
 	int GetValue();
 	
 private Q_SLOTS:
-	void on_txtName_textChanged(const QString &arg1);
+	void on_sbValue_valueChanged(int iArg);
 	
 private:
 	Ui::DlgInputNumber *ui;
