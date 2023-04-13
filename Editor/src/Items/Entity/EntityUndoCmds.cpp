@@ -499,7 +499,7 @@ EntityUndoCmd_DuplicateToArray::EntityUndoCmd_DuplicateToArray(ProjectItemData &
 		dupItemObj["UUID"] = QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
 		dupItemObj["isSelected"] = false;
 
-		m_DuplicateItemList.push_back(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingChild(dupItemObj, true, -1));
+		m_DuplicateItemList.push_back(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingChild(dupItemObj, true, i == 0 ? m_iPoppedIndex : -1));
 	}
 }
 
@@ -509,4 +509,25 @@ EntityUndoCmd_DuplicateToArray::EntityUndoCmd_DuplicateToArray(ProjectItemData &
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem);
 
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pItemData, m_iPoppedIndex);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> packItemList, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_PackItemList(packItemList)
+{
+	setText("Pack items into " % HyGlobal::ItemName(m_PackItemList[0]->GetType(), false) % " array");
+}
+
+/*virtual*/ EntityUndoCmd_PackToArray::~EntityUndoCmd_PackToArray()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_PackToArray::redo() /*override*/
+{
+}
+
+/*virtual*/ void EntityUndoCmd_PackToArray::undo() /*override*/
+{
 }

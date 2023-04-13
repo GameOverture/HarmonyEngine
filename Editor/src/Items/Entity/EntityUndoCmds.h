@@ -221,4 +221,19 @@ public:
 	virtual void undo() override;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_PackToArray : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	QList<EntityTreeItemData *>		m_PackItemList;
+
+public:
+	EntityUndoCmd_PackToArray(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> packItemList, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_PackToArray();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
 #endif // ENTITYUNDOCMDS_H

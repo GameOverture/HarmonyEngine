@@ -231,7 +231,7 @@ EntityWidget::~EntityWidget()
 		}
 		else
 		{
-			ui->actionPackToArray->setEnabled(bSelectedHaveSameParent && bAllSameType);
+			ui->actionPackToArray->setEnabled(bSelectedHaveSameParent && bAllSameType && bAllArrayItems == false);
 			ui->actionDuplicateToArray->setEnabled(false);
 			ui->actionUnpackFromArray->setEnabled(false);
 
@@ -743,7 +743,32 @@ void EntityWidget::on_actionUnpackFromArray_triggered()
 
 void EntityWidget::on_actionPackToArray_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
 
+	QList<EntityTreeItemData *>selectedTreeItemDataList;
+	for(QModelIndex index : selectedIndexList)
+	{
+		EntityTreeItemData *pTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pTreeItemData->GetEntType() == ENTTYPE_Item)
+			selectedTreeItemDataList.push_back(pTreeItemData);
+	}
+
+	// Move the 'primary' selected item to the front of the list
+	QModelIndex primaryIndex = ui->nodeTree->currentIndex();
+	EntityTreeItemData *pPrimarySelectedTreeItemData = ui->nodeTree->model()->data(primaryIndex, Qt::UserRole).value<EntityTreeItemData *>();
+	int iIndex = selectedTreeItemDataList.indexOf(pPrimarySelectedTreeItemData);
+	if(iIndex >= 0)
+	{
+		EntityTreeItemData *pPrimaryItem = selectedTreeItemDataList.takeAt(iIndex);
+		if(pPrimaryItem != nullptr)
+			selectedTreeItemDataList.prepend(pPrimaryItem);
+	}
+
+	// Must clear selection because below action will remove the selected items, which will cause an unwanted selection action cmd
+	RequestSelectedItems(QList<QUuid>(), false);
+
+	QUndoCommand *pCmd = new EntityUndoCmd_PackToArray(m_ItemRef, selectedTreeItemDataList);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionDuplicateToArray_triggered()

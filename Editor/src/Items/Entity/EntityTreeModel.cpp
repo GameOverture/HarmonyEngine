@@ -484,7 +484,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertExistingChild(QJsonObject initObj
 		if(bFoundArrayFolder == false)
 		{
 			QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-			int iArrayFolderRow = pParentTreeItem->GetNumChildren();
+			int iArrayFolderRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
 
 			if(insertRow(iArrayFolderRow, parentIndex) == false)
 			{
@@ -506,7 +506,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertExistingChild(QJsonObject initObj
 	}
 
 	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
+	iRow = (iRow == -1 || bIsArrayItem) ? pParentTreeItem->GetNumChildren() : iRow;
 	if(insertRow(iRow, parentIndex) == false)
 	{
 		HyGuiLog("EntityTreeModel::Cmd_InsertNewChild() - insertRow failed", LOGTYPE_Error);
