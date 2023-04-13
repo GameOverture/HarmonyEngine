@@ -53,6 +53,7 @@ protected:
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+	void OnCollapsedNode(const QModelIndex &indexRef);
 	void on_actionAddChildren_triggered();
 	
 	void on_actionAddBoxPrimitive_triggered();

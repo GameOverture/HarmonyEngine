@@ -278,7 +278,7 @@ void EntityDraw::ClearShapeEdit()
 	{
 		QJsonObject childObj = itemObjectList[i];
 		HyGuiItemType eType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
-		QUuid uuid(childObj["UUID"].toString());
+		QUuid uuid(childObj["Common"].toObject()["UUID"].toString());
 		bool bSelected = childObj["isSelected"].toBool();
 
 		EntityDrawItem *pItemWidget = nullptr;

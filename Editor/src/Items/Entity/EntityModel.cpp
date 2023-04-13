@@ -54,7 +54,7 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		{
 			QJsonArray childArray = childListArray[i].toArray();
 			for(int j = 0; j < childArray.size(); ++j)
-				Cmd_AddExistingChild(childArray[j].toObject(), true, j);
+				Cmd_AddExistingChild(childArray[j].toObject(), true, j == 0 ? i : j);
 		}
 		else
 			HyGuiLog("EntityModel::EntityModel invalid childlist", LOGTYPE_Error);
@@ -72,7 +72,7 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		{
 			QJsonArray shapeArray = shapeListArray[i].toArray();
 			for(int j = 0; j < shapeArray.size(); ++j)
-				Cmd_AddExistingChild(shapeArray[j].toObject(), true, j);
+				Cmd_AddExistingChild(shapeArray[j].toObject(), true, j == 0 ? i : j);
 		}
 		else
 			HyGuiLog("EntityModel::EntityModel invalid shapeList", LOGTYPE_Error);
@@ -189,12 +189,37 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 
 bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 {
-	if(m_TreeModel.Cmd_InsertChild(pNodeItem, iRow) == false)
+	if(m_TreeModel.Cmd_ReaddChild(pNodeItem, iRow) == false)
 		return false;
 
 	m_ItemRef.GetProject().RegisterItems(GetUuid(), QList<QUuid>() << pNodeItem->GetItemUuid());
 
 	return true;
+}
+
+void EntityModel::Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName)
+{
+	if(pItemData->GetEntType() == ENTTYPE_ArrayFolder)
+	{
+		pItemData->SetText(sNewName);
+
+		QList<TreeModelItemData *> arrayChildrenList = m_TreeModel.GetItemsRecursively(m_TreeModel.FindIndex<EntityTreeItemData *>(pItemData, 0));
+		for(TreeModelItemData *pItemData : arrayChildrenList)
+			pItemData->SetText(sNewName);
+	}
+	else if(pItemData->GetEntType() == ENTTYPE_ArrayItem)
+	{
+		QModelIndex arrayFolderIndex = m_TreeModel.parent(m_TreeModel.FindIndex<EntityTreeItemData *>(pItemData, 0));
+		EntityTreeItemData *pArrayFolderItemData = m_TreeModel.data(arrayFolderIndex, Qt::UserRole).value<EntityTreeItemData *>();
+
+		pArrayFolderItemData->SetText(sNewName);
+
+		QList<TreeModelItemData *> arrayChildrenList = m_TreeModel.GetItemsRecursively(arrayFolderIndex);
+		for(TreeModelItemData *pItemData : arrayChildrenList)
+			pItemData->SetText(sNewName);
+	}
+	else
+		pItemData->SetText(sNewName);
 }
 
 void EntityModel::SetShapeEditDrag(EditorShape eShapeType, bool bAsPrimitive)

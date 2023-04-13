@@ -32,7 +32,7 @@ EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, QJson
 	TreeModelItemData(HyGlobal::GetTypeFromString(initObj["itemType"].toString()), initObj["codeName"].toString()),
 	m_eEntType(iArrayIndex >= 0 ? ENTTYPE_ArrayItem : ENTTYPE_Item),
 	m_iArrayIndex(iArrayIndex),
-	m_Uuid(initObj["UUID"].toString()),
+	m_Uuid(initObj["Common"].toObject()["UUID"].toString()),
 	m_ItemUuid(initObj["itemUUID"].toString()),
 	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this))),
 	m_bIsSelected(initObj["isSelected"].toBool())
@@ -93,12 +93,11 @@ void EntityTreeItemData::SetSelected(bool bIsSelected)
 
 void EntityTreeItemData::InsertJsonInfo(QJsonObject &childObjRef)
 {
-	childObjRef = m_PropertiesTreeModel.SerializeJson(); // Tree item specific stuff
+	childObjRef = m_PropertiesTreeModel.SerializeJson(); // The UUID is serialized among this in: category "Common"; property "UUID"
 
 	// Common stuff
 	childObjRef.insert("codeName", GetCodeName());
 	childObjRef.insert("itemType", HyGlobal::ItemName(m_eTYPE, false));
-	childObjRef.insert("UUID", m_Uuid.toString(QUuid::WithoutBraces));
 	childObjRef.insert("itemUUID", m_ItemUuid.toString(QUuid::WithoutBraces));
 	childObjRef.insert("isSelected", m_bIsSelected);
 }
@@ -466,47 +465,12 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertExistingChild(QJsonObject initObj
 	else
 		pParentTreeItem = GetItem(index(1, 0, QModelIndex()));
 
+	bool bFoundArrayFolder = false;
 	if(bIsArrayItem)
-	{
-		// Find array tree item parent or create it
-		bool bFoundArrayFolder = false;
-		for(int i = 0; i < pParentTreeItem->GetNumChildren(); ++i)
-		{
-			EntityTreeItemData *pSubItem = pParentTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
-			if(sCodeName == pSubItem->GetCodeName() && pSubItem->GetEntType() == ENTTYPE_ArrayFolder)
-			{
-				pParentTreeItem = pParentTreeItem->GetChild(i);
-				bFoundArrayFolder = true;
-				break;
-			}
-		}
-
-		if(bFoundArrayFolder == false)
-		{
-			QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-			int iArrayFolderRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
-
-			if(insertRow(iArrayFolderRow, parentIndex) == false)
-			{
-				HyGuiLog("EntityTreeModel::Cmd_InsertNewChild() - ArrayFolder insertRow failed", LOGTYPE_Error);
-				return nullptr;
-			}
-			// Allocate and store the new array folder item in the tree model
-			EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, eGuiType, ENTTYPE_ArrayFolder, -1, QUuid(), QUuid());
-			QVariant v;
-			v.setValue<EntityTreeItemData *>(pNewItem);
-			for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
-			{
-				if(setData(index(iArrayFolderRow, iCol, parentIndex), v, Qt::UserRole) == false)
-					HyGuiLog("ExplorerModel::Cmd_InsertNewChild() - setData failed", LOGTYPE_Error);
-			}
-
-			pParentTreeItem = pParentTreeItem->GetChild(pParentTreeItem->GetNumChildren() - 1);
-		}
-	}
+		bFoundArrayFolder = FindArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
 
 	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-	iRow = (iRow == -1 || bIsArrayItem) ? pParentTreeItem->GetNumChildren() : iRow;
+	iRow = (iRow == -1 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
 	if(insertRow(iRow, parentIndex) == false)
 	{
 		HyGuiLog("EntityTreeModel::Cmd_InsertNewChild() - insertRow failed", LOGTYPE_Error);
@@ -561,7 +525,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewShape(EditorShape eShape, QStr
 	return pNewItem;
 }
 
-bool EntityTreeModel::Cmd_InsertChild(EntityTreeItemData *pItem, int iRow)
+bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 {
 	TreeModelItem *pParentTreeItem = nullptr;
 	
@@ -570,11 +534,15 @@ bool EntityTreeModel::Cmd_InsertChild(EntityTreeItemData *pItem, int iRow)
 	else
 		pParentTreeItem = GetItem(index(1, 0, QModelIndex()));
 
+	bool bFoundArrayFolder = false;
+	if(pItem->GetEntType() == ENTTYPE_ArrayItem)
+		bFoundArrayFolder = FindArrayFolder(pParentTreeItem, pItem->GetCodeName(), pItem->GetType(), iRow);
+
 	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
+	iRow = (iRow == -1 || (pItem->GetEntType() == ENTTYPE_ArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
 	if(insertRow(iRow, parentIndex) == false)
 	{
-		HyGuiLog("EntityTreeModel::InsertChild() - insertRow failed", LOGTYPE_Error);
+		HyGuiLog("EntityTreeModel::Cmd_ReaddChild() - insertRow failed", LOGTYPE_Error);
 		return false;
 	}
 
@@ -614,6 +582,8 @@ int32 EntityTreeModel::Cmd_PopChild(EntityTreeItemData *pItem)
 		int iArrayFolderRow = pParentTreeItem->GetIndex();
 		if(removeRow(iArrayFolderRow, createIndex(pArrayFolderParent->GetIndex(), 0, pArrayFolderParent)) == false)
 			HyGuiLog("ExplorerModel::PopChild() - removeRow failed for array folder", LOGTYPE_Error);
+
+		iRow = iArrayFolderRow; // Return the ArrayFolder row so if the item gets readded, it'll recreate the ArrayFolder on the same row
 	}
 
 	return iRow;
@@ -637,7 +607,14 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 	case Qt::EditRole:			// The data in a form suitable for editing in an editor. (QString)
 	case Qt::StatusTipRole:		// The data displayed in the status bar. (QString)
 		if(indexRef.column() == COLUMN_CodeName)
-			return pItem->GetCodeName();
+		{
+			if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
+				return pItem->GetCodeName() % "[" % QString::number(pTreeItem->GetNumChildren()) % "]";
+			else if(pItem->GetEntType() == ENTTYPE_ArrayItem)
+				return "[" % QString::number(pTreeItem->GetIndex()) % "]";
+			else
+				return pItem->GetCodeName();
+		}
 		else // COLUMN_ItemPath
 		{
 			if(pProjItem)
@@ -653,6 +630,9 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 				return QVariant(pItem->GetIcon(SUBICON_New));
 			else if(pProjItem && pProjItem->IsSaveClean() == false)
 				return QVariant(pItem->GetIcon(SUBICON_Dirty));
+
+			if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
+				return HyGlobal::ItemIcon(pItem->GetType(), SUBICON_Open);
 
 			if(pItem->GetType() == ITEM_Primitive || pItem->GetType() == ITEM_Shape)
 			{
@@ -734,4 +714,46 @@ QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 	} while(!bIsUnique);
 
 	return sDesiredName;
+}
+
+bool EntityTreeModel::FindArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, HyGuiItemType eItemType, int iRowToCreateAt)
+{
+	bool bFoundArrayFolder = false;
+
+	// Find array tree item parent or create it
+	for(int i = 0; i < pParentTreeItemOut->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pSubItem = pParentTreeItemOut->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(sCodeName == pSubItem->GetCodeName() && pSubItem->GetEntType() == ENTTYPE_ArrayFolder)
+		{
+			pParentTreeItemOut = pParentTreeItemOut->GetChild(i);
+			bFoundArrayFolder = true;
+			break;
+		}
+	}
+
+	if(bFoundArrayFolder == false)
+	{
+		QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItemOut->data(0).value<EntityTreeItemData *>(), 0);
+		int iArrayFolderRow = (iRowToCreateAt == -1 ? pParentTreeItemOut->GetNumChildren() : iRowToCreateAt);
+
+		if(insertRow(iArrayFolderRow, parentIndex) == false)
+		{
+			HyGuiLog("EntityTreeModel::Cmd_InsertNewChild() - ArrayFolder insertRow failed", LOGTYPE_Error);
+			return nullptr;
+		}
+		// Allocate and store the new array folder item in the tree model
+		EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, eItemType, ENTTYPE_ArrayFolder, -1, QUuid(), QUuid());
+		QVariant v;
+		v.setValue<EntityTreeItemData *>(pNewItem);
+		for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
+		{
+			if(setData(index(iArrayFolderRow, iCol, parentIndex), v, Qt::UserRole) == false)
+				HyGuiLog("ExplorerModel::Cmd_InsertNewChild() - setData failed", LOGTYPE_Error);
+		}
+
+		pParentTreeItemOut = pParentTreeItemOut->GetChild(iArrayFolderRow);
+	}
+
+	return bFoundArrayFolder;
 }

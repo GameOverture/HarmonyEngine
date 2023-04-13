@@ -95,7 +95,7 @@ public:
 	EntityTreeItemData *Cmd_InsertNewChild(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertExistingChild(QJsonObject initObj, bool bIsArrayItem, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
-	bool Cmd_InsertChild(EntityTreeItemData *pItem, int iRow);
+	bool Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);
 
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
@@ -104,6 +104,9 @@ public:
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
 
 	QString GenerateCodeName(QString sDesiredName) const;
+
+protected:
+	bool FindArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, HyGuiItemType eItemType, int iRowToCreateAt); // 'pParentTreeItemOut' must point to either Root or BvFolder, it will be reassigned to the ArrayFolder that is either found (return true), or newly created (return false)
 };
 
 #endif // ENTITYTREEMODEL_H

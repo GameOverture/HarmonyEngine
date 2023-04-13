@@ -84,6 +84,8 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	connect(ui->nodeTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(OnTreeSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
+	connect(ui->nodeTree, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(OnCollapsedNode(const QModelIndex &)));
+
 	// Initialize what items are selected in the model
 	QList<EntityTreeItemData *> childList, shapeList;
 	pEntityModel->GetTreeModel().GetTreeItemData(childList, shapeList);
@@ -109,13 +111,17 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
 {
-	ui->nodeTree->expandAll();
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+
+	// Root and BvFolder should always be expanded
+	ui->nodeTree->expand(pTreeModel->FindIndex<EntityTreeItemData *>(pTreeModel->GetRootTreeItemData(), 0));
+	ui->nodeTree->expand(pTreeModel->FindIndex<EntityTreeItemData *>(pTreeModel->GetBvFolderTreeItemData(), 0));
 
 	// Query what items are selected in the Explorer Widget
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
 	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);
 	bool bEnableAddNodeBtn = false;
-	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+	
 	for(auto pItem : selectedItems)
 	{
 		if(pTreeModel->IsItemValid(pItem, false))
@@ -456,18 +462,34 @@ void EntityWidget::OnContextMenu(const QPoint &pos)
 
 void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-	//UpdateActions();
-
 	QList<EntityTreeItemData *> selectedItemDataList;
 	QModelIndexList selectedIndices = selected.indexes();
-	for(QModelIndex index : selectedIndices)
+	for(QModelIndex selIndex : selectedIndices)
 	{
-		if(index.column() != 0)
+		if(selIndex.column() != 0)
 			continue;
 
-		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
-		if(pCurItemData)
-			selectedItemDataList.push_back(pCurItemData);
+		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selIndex, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pCurItemData == nullptr)
+			continue;
+		
+		selectedItemDataList.push_back(pCurItemData);
+
+		// NOTE: Below tries to select all array items when their folder is selected - enabling this will require refactor on how selection is being handled
+		//if(pCurItemData->GetEntType() == ENTTYPE_ArrayFolder)
+		//{
+		//	QAbstractItemModel *pModel = ui->nodeTree->model();
+		//	int numRows = pModel->rowCount(selIndex);
+		//	for(int row = 0; row < numRows; ++row)
+		//	{
+		//		QModelIndex childIndex = pModel->index(row, 0, selIndex);
+		//		if(childIndex.isValid())
+		//		{
+		//			ui->nodeTree->selectionModel()->select(childIndex, QItemSelectionModel::Select);
+		//			selectedItemDataList.push_back(ui->nodeTree->model()->data(childIndex, Qt::UserRole).value<EntityTreeItemData *>());
+		//		}
+		//	}
+		//}
 	}
 
 	QList<EntityTreeItemData *> deselectedItemDataList;
@@ -489,6 +511,15 @@ void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const 
 		static_cast<EntityModel *>(m_ItemRef.GetModel())->Cmd_SelectionChanged(selectedItemDataList, deselectedItemDataList);
 		m_bAllowSelectionUndoCmd = true; // Only block UndoCmd once
 	}
+}
+
+void EntityWidget::OnCollapsedNode(const QModelIndex &indexRef)
+{
+	EntityTreeItemData *pTreeItemData = ui->nodeTree->model()->data(indexRef, Qt::UserRole).value<EntityTreeItemData *>();
+
+	// Prevent Root or BvFolder from collapsing
+	if(pTreeItemData->GetEntType() == ENTTYPE_Root || pTreeItemData->GetEntType() == ENTTYPE_BvFolder)
+		ui->nodeTree->expand(indexRef);
 }
 
 void EntityWidget::on_actionAddChildren_triggered()

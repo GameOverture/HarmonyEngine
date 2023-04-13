@@ -227,6 +227,7 @@ class EntityUndoCmd_PackToArray : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
 	QList<EntityTreeItemData *>		m_PackItemList;
+	QList<int>						m_PoppedIndexList;
 
 public:
 	EntityUndoCmd_PackToArray(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> packItemList, QUndoCommand *pParent = nullptr);
