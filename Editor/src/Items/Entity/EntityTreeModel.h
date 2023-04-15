@@ -34,7 +34,6 @@ class EntityTreeItemData : public TreeModelItemData
 	Q_OBJECT
 
 	EntityItemType										m_eEntType;
-	int													m_iArrayIndex;	// -1 when not apart of an array
 	QUuid												m_Uuid;
 	QUuid												m_ItemUuid;
 
@@ -42,13 +41,12 @@ class EntityTreeItemData : public TreeModelItemData
 	bool												m_bIsSelected;
 
 public:
-	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, int iArrayIndex, QUuid uuidOfItem, QUuid uuidOfThis);
-	EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj, int iArrayIndex);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj, bool bIsArrayItem);
 	virtual ~EntityTreeItemData();
 
 	EntityItemType GetEntType() const;
 	QString GetCodeName() const;
-	int32 GetArrayIndex() const;
 	QUuid GetThisUuid() const;
 	QUuid GetItemUuid() const;
 	bool IsForwardDeclared() const;

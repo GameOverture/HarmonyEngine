@@ -334,12 +334,13 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 	m_TreeModel.GetTreeItemData(childList, shapeList);
 
 	QJsonArray childArray;
+	QString sCurrentArrayCodeName = "";
 	for(int i = 0; i < childList.size(); )
 	{
-		if(childList[i]->GetEntType() == ENTTYPE_ArrayItem && childList[i]->GetArrayIndex() == 0)
+		if(childList[i]->GetEntType() == ENTTYPE_ArrayItem && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) != 0)
 		{
+			sCurrentArrayCodeName = childList[i]->GetCodeName();
 			QJsonArray packedArray;
-
 			do
 			{
 				QJsonObject arrayItemObj;
@@ -347,7 +348,7 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 				packedArray.append(arrayItemObj);
 				++i;
 
-			} while (i < childList.size() && childList[i]->GetEntType() == ENTTYPE_ArrayItem && childList[i]->GetArrayIndex() > 0);
+			} while(i < childList.size() && childList[i]->GetEntType() == ENTTYPE_ArrayItem && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) == 0);
 
 			childArray.append(packedArray);
 		}
@@ -363,12 +364,13 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 	itemSpecificFileDataOut.m_Meta.insert("childList", childArray);
 
 	QJsonArray shapeArray;
+	sCurrentArrayCodeName = "";
 	for(int i = 0; i < shapeList.size(); )
 	{
-		if(shapeList[i]->GetEntType() == ENTTYPE_ArrayItem && shapeList[i]->GetArrayIndex() == 0)
+		if(shapeList[i]->GetEntType() == ENTTYPE_ArrayItem && sCurrentArrayCodeName.compare(shapeList[i]->GetCodeName()) != 0)
 		{
+			sCurrentArrayCodeName = shapeList[i]->GetCodeName();
 			QJsonArray packedArray;
-
 			do
 			{
 				QJsonObject arrayItemObj;
@@ -376,7 +378,7 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 				packedArray.append(arrayItemObj);
 				++i;
 
-			} while(i < shapeList.size() && shapeList[i]->GetEntType() == ENTTYPE_ArrayItem && shapeList[i]->GetArrayIndex() > 0);
+			} while(i < shapeList.size() && shapeList[i]->GetEntType() == ENTTYPE_ArrayItem && sCurrentArrayCodeName.compare(shapeList[i]->GetCodeName()) == 0);
 
 			shapeArray.append(packedArray);
 		}

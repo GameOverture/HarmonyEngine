@@ -173,8 +173,8 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 			if(m_ptCamPos.x != m_pCamera->pos.X() || m_ptCamPos.y != m_pCamera->pos.Y())
 			{
-				QUndoCommand *pCmd = new UndoCmd_CameraUpdate("Camera Pan", *m_pProjItem, m_ptCamPos, m_fCamZoom, m_pCamera->pos.Get(), m_pCamera->GetZoom());
-				m_pProjItem->GetUndoStack()->push(pCmd);
+				//QUndoCommand *pCmd = new UndoCmd_CameraUpdate("Camera Pan", *m_pProjItem, m_ptCamPos, m_fCamZoom, m_pCamera->pos.Get(), m_pCamera->GetZoom());
+				//m_pProjItem->GetUndoStack()->push(pCmd);
 				
 				m_ptCamPos = m_pCamera->pos.Get();
 			}
@@ -201,8 +201,8 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		m_sZoomStatus = g_sZoomLevels[iZoomLevel];
 		UpdateDrawStatus(m_sSizeStatus);
 
-		QUndoCommand *pCmd = new UndoCmd_CameraUpdate("Camera Zoom", *m_pProjItem, m_ptCamPos, m_fCamZoom, m_pCamera->pos.Get(), m_pCamera->GetZoom());
-		m_pProjItem->GetUndoStack()->push(pCmd);
+		//QUndoCommand *pCmd = new UndoCmd_CameraUpdate("Camera Zoom", *m_pProjItem, m_ptCamPos, m_fCamZoom, m_pCamera->pos.Get(), m_pCamera->GetZoom());
+		//m_pProjItem->GetUndoStack()->push(pCmd);
 
 		m_fCamZoom = m_pCamera->GetZoom();
 		OnZoom(static_cast<HyZoomLevel>(iZoomLevel));

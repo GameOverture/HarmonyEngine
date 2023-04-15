@@ -24,41 +24,41 @@
 #include <QRadioButton>
 
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class UndoCmd_CameraUpdate : public QUndoCommand
-{
-	ProjectItemData &	m_ItemRef;
-
-	glm::vec2			m_ptOldCamPos;
-	float				m_fOldCamZoom;
-
-	glm::vec2			m_ptNewCamPos;
-	float				m_fNewCamZoom;
-
-public:
-	UndoCmd_CameraUpdate(QString sText, ProjectItemData &itemRef, glm::vec2 ptOldCamPos, float fOldCamZoom, glm::vec2 ptNewCamPos, float fNewCamZoom, QUndoCommand *pParent = nullptr) :
-		QUndoCommand(pParent),
-		m_ItemRef(itemRef),
-		m_ptOldCamPos(ptOldCamPos),
-		m_fOldCamZoom(fOldCamZoom),
-		m_ptNewCamPos(ptNewCamPos),
-		m_fNewCamZoom(fNewCamZoom)
-	{
-		setText(sText);
-	}
-
-	virtual ~UndoCmd_CameraUpdate()
-	{ }
-
-	void redo() override
-	{
-		m_ItemRef.GetDraw()->SetCamera(m_ptNewCamPos, m_fNewCamZoom);
-	}
-
-	void undo() override
-	{
-		m_ItemRef.GetDraw()->SetCamera(m_ptOldCamPos, m_fOldCamZoom);
-	}
-};
+//class UndoCmd_CameraUpdate : public QUndoCommand
+//{
+//	ProjectItemData &	m_ItemRef;
+//
+//	glm::vec2			m_ptOldCamPos;
+//	float				m_fOldCamZoom;
+//
+//	glm::vec2			m_ptNewCamPos;
+//	float				m_fNewCamZoom;
+//
+//public:
+//	UndoCmd_CameraUpdate(QString sText, ProjectItemData &itemRef, glm::vec2 ptOldCamPos, float fOldCamZoom, glm::vec2 ptNewCamPos, float fNewCamZoom, QUndoCommand *pParent = nullptr) :
+//		QUndoCommand(pParent),
+//		m_ItemRef(itemRef),
+//		m_ptOldCamPos(ptOldCamPos),
+//		m_fOldCamZoom(fOldCamZoom),
+//		m_ptNewCamPos(ptNewCamPos),
+//		m_fNewCamZoom(fNewCamZoom)
+//	{
+//		setText(sText);
+//	}
+//
+//	virtual ~UndoCmd_CameraUpdate()
+//	{ }
+//
+//	void redo() override
+//	{
+//		m_ItemRef.GetDraw()->SetCamera(m_ptNewCamPos, m_fNewCamZoom);
+//	}
+//
+//	void undo() override
+//	{
+//		m_ItemRef.GetDraw()->SetCamera(m_ptOldCamPos, m_fOldCamZoom);
+//	}
+//};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <typename STATEDATA>
