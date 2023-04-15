@@ -22,6 +22,11 @@ AssetItemData::AssetItemData(IManagerModel &modelRef, HyGuiItemType eType, QUuid
 {
 }
 
+AssetType AssetItemData::GetManagerAssetType() const
+{
+	return m_ModelRef.GetAssetType();
+}
+
 const QUuid &AssetItemData::GetUuid()
 {
 	return m_UNIQUE_ID;

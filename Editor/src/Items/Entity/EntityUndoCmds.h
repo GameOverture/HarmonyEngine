@@ -99,22 +99,6 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_SelectionChanged : public QUndoCommand
-{
-	ProjectItemData &				m_EntityItemRef;
-	QList<EntityTreeItemData *>		m_SelectedItemDataList;
-	QList<EntityTreeItemData *>		m_DeselectedItemDataList;
-
-public:
-	EntityUndoCmd_SelectionChanged(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_SelectionChanged();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class EntityUndoCmd_OrderChildren : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
@@ -211,7 +195,7 @@ class EntityUndoCmd_DuplicateToArray : public QUndoCommand
 	int								m_iPoppedIndex;
 	int								m_iArraySize;
 
-	QList<EntityTreeItemData *>		m_DuplicateItemList;
+	QList<EntityTreeItemData *>		m_ArrayItemList;
 
 public:
 	EntityUndoCmd_DuplicateToArray(ProjectItemData &entityItemRef, EntityTreeItemData *pItemData, int iArraySize, QUndoCommand *pParent = nullptr);
@@ -227,10 +211,14 @@ class EntityUndoCmd_PackToArray : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
 	QList<EntityTreeItemData *>		m_PackItemList;
+	QString							m_sArrayName;
+	int								m_iArrayFolderRow;
 	QList<int>						m_PoppedIndexList;
 
+	QList<EntityTreeItemData *>		m_ArrayItemList;
+
 public:
-	EntityUndoCmd_PackToArray(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> packItemList, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_PackToArray(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> packItemList, QString sArrayName, int iArrayFolderRow, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PackToArray();
 
 	virtual void redo() override;

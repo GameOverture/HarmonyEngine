@@ -102,9 +102,19 @@ QModelIndexList ITreeModel::GetAllIndices() const
 void ITreeModel::MoveTreeItem(TreeModelItemData *pSourceItemData, TreeModelItemData *pDestinationParent, int32 iDestRow)
 {
 	QModelIndex sourceIndex = FindIndex<TreeModelItemData *>(pSourceItemData, 0);
+	if(sourceIndex.isValid() == false)
+	{
+		HyGuiLog("ITreeModel::MoveTreeItem was passed an invalid pSourceItemData", LOGTYPE_Error);
+		return;
+	}
 	TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
 
 	QModelIndex destParentIndex = FindIndex<TreeModelItemData *>(pDestinationParent, 0);
+	if(destParentIndex.isValid() == false)
+	{
+		HyGuiLog("ITreeModel::MoveTreeItem was passed an invalid pDestinationParent", LOGTYPE_Error);
+		return;
+	}
 	TreeModelItem *pDestParentTreeItem = GetItem(destParentIndex);
 
 	int iSourceIndex = pSourceTreeItem->GetIndex();

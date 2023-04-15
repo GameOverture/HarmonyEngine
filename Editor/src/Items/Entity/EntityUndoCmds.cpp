@@ -12,7 +12,6 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 #include "EntityDraw.h"
-#include "EntityItemMimeData.h"
 #include "IAssetItemData.h"
 #include "MainWindow.h"
 
@@ -24,7 +23,7 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 	if(m_EntityItemRef.GetType() != ITEM_Entity)
 		HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_EntityItemRef.GetType()), LOGTYPE_Error);
 
-	setText("Add New Child Node(s)");
+	setText("Add New Project Explorer Items(s)");
 }
 
 /*virtual*/ EntityUndoCmd_AddChildren::~EntityUndoCmd_AddChildren()
@@ -40,8 +39,20 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 			itemList.push_back(pProjItem);
 	}
 
-	m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewChildren(itemList, -1);
-	//m_EntityItemRef.FocusWidgetState(0, -1);
+	if(m_NodeList.empty())
+		m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewChildren(itemList, -1);
+	else
+	{
+		for(EntityTreeItemData *pItem : m_NodeList)
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(pItem, -1);
+	}
+
+	QList<QUuid> itemUuidList;
+	for(auto *pNodeItem : m_NodeList)
+		itemUuidList.push_back(pNodeItem->GetThisUuid());
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(itemUuidList);
 }
 
 /*virtual*/ void EntityUndoCmd_AddChildren::undo() /*override*/
@@ -51,9 +62,6 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pNodeItem, true))
 			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pNodeItem);
 	}
-	m_NodeList.clear();
-
-	//m_EntityItemRef.FocusWidgetState(0, -1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,8 +86,20 @@ EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef,
 			assetItemList.push_back(pAssetItem);
 	}
 
-	m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewAssets(assetItemList, -1);
-	//m_EntityItemRef.FocusWidgetState(0, -1);
+	if(m_NodeList.empty())
+		m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewAssets(assetItemList, -1);
+	else
+	{
+		for(EntityTreeItemData *pItem : m_NodeList)
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(pItem, -1);
+	}
+
+	QList<QUuid> itemUuidList;
+	for(auto *pNodeItem : m_NodeList)
+		itemUuidList.push_back(pNodeItem->GetThisUuid());
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(itemUuidList);
 }
 
 /*virtual*/ void EntityUndoCmd_AddAssets::undo() /*override*/
@@ -89,9 +109,6 @@ EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef,
 		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pNodeItem, true))
 			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pNodeItem);
 	}
-	m_NodeList.clear();
-
-	//m_EntityItemRef.FocusWidgetState(0, -1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,6 +132,7 @@ EntityUndoCmd_PopItems::EntityUndoCmd_PopItems(ProjectItemData &entityItemRef, Q
 
 /*virtual*/ void EntityUndoCmd_PopItems::redo() /*override*/
 {
+	// NOTE: m_PoppedItemList has been sorted with descending row order
 	m_PoppedIndexList.clear();
 	for(EntityTreeItemData *pItem : m_PoppedItemList)
 		m_PoppedIndexList.append(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem));
@@ -123,8 +141,16 @@ EntityUndoCmd_PopItems::EntityUndoCmd_PopItems(ProjectItemData &entityItemRef, Q
 /*virtual*/ void EntityUndoCmd_PopItems::undo() /*override*/
 {
 	// Reinsert the 'm_PoppedItemList' in reverse order (so the indices work)
+	QList<QUuid> readdedItemUuidList;
 	for(int32 i = m_PoppedItemList.size() - 1; i >= 0; --i)
+	{
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_PoppedItemList[i], m_PoppedIndexList[i]);
+		readdedItemUuidList << m_PoppedItemList[i]->GetThisUuid();
+	}
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(readdedItemUuidList);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,27 +169,43 @@ EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRe
 
 /*virtual*/ void EntityUndoCmd_PasteItems::redo() /*override*/
 {
-	m_PastedItemList.clear();
-	for(int i = 0; i < m_PastedItemArray.size(); ++i)
-	{
-		QJsonObject itemObj = m_PastedItemArray[i].toObject();
+	QList<QUuid> pastedItemUuidList;
 
-		bool bIsArrayItem = false;
-		if(m_pArrayFolder)
+	if(m_PastedItemList.empty())
+	{
+		for(int i = 0; i < m_PastedItemArray.size(); ++i)
 		{
-			HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(itemObj["itemType"].toString());
-			if(eGuiType != m_pArrayFolder->GetType())
+			QJsonObject itemObj = m_PastedItemArray[i].toObject();
+
+			bool bIsArrayItem = false;
+			if(m_pArrayFolder)
 			{
-				HyGuiLog("EntityUndoCmd_PasteItems::redo - pasted array item (" % itemObj["codeName"].toString() % ") " % itemObj["itemType"].toString() % " did match array type", LOGTYPE_Error);
-				continue;
+				HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(itemObj["itemType"].toString());
+				if(eGuiType != m_pArrayFolder->GetType())
+				{
+					HyGuiLog("EntityUndoCmd_PasteItems::redo - pasted array item (" % itemObj["codeName"].toString() % ") " % itemObj["itemType"].toString() % " did match array type", LOGTYPE_Error);
+					continue;
+				}
+
+				itemObj["codeName"] = m_pArrayFolder->GetCodeName();
+				bIsArrayItem = true;
 			}
 
-			itemObj["codeName"] = m_pArrayFolder->GetCodeName();
-			bIsArrayItem = true;
-		}
+			EntityTreeItemData *pPastedTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewItem(itemObj, bIsArrayItem, -1);
+			m_PastedItemList.push_back(pPastedTreeItemData);
 
-		m_PastedItemList.push_back(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingChild(itemObj, bIsArrayItem, -1));
+			pastedItemUuidList << pPastedTreeItemData->GetThisUuid();
+		}
 	}
+	else
+	{
+		for(EntityTreeItemData *pItem : m_PastedItemList)
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(pItem, -1);
+	}
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(pastedItemUuidList);
 }
 
 /*virtual*/ void EntityUndoCmd_PasteItems::undo() /*override*/
@@ -191,39 +233,15 @@ EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItem
 
 /*virtual*/ void EntityUndoCmd_AddNewShape::redo() /*override*/
 {
-	m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(m_eShape, m_sData, m_bIsPrimitive, m_iIndex);
+	if(m_pShapeTreeItemData == nullptr)
+		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(m_eShape, m_sData, m_bIsPrimitive, m_iIndex);
+	else
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pShapeTreeItemData, m_iIndex);
 }
 
 /*virtual*/ void EntityUndoCmd_AddNewShape::undo() /*override*/
 {
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pShapeTreeItemData);
-	m_pShapeTreeItemData = nullptr;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-EntityUndoCmd_SelectionChanged::EntityUndoCmd_SelectionChanged(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> selectedItemDataList, QList<EntityTreeItemData *> deselectedItemDataList, QUndoCommand *pParent /*= nullptr*/) :
-	m_EntityItemRef(entityItemRef),
-	m_SelectedItemDataList(selectedItemDataList),
-	m_DeselectedItemDataList(deselectedItemDataList)
-{
-	setText("Selection Changed");
-}
-
-/*virtual*/ EntityUndoCmd_SelectionChanged::~EntityUndoCmd_SelectionChanged()
-{
-}
-
-/*virtual*/ void EntityUndoCmd_SelectionChanged::redo() /*override*/
-{
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SelectionChanged(m_SelectedItemDataList, m_DeselectedItemDataList);
-	//m_EntityItemRef.FocusWidgetState(0, -1);
-}
-
-/*virtual*/ void EntityUndoCmd_SelectionChanged::undo() /*override*/
-{
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SelectionChanged(m_DeselectedItemDataList, m_SelectedItemDataList);
-	//m_EntityItemRef.FocusWidgetState(0, -1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,26 +269,56 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 	EntityModel *pModel = static_cast<EntityModel *>(m_EntityItemRef.GetModel());
 	EntityTreeModel &entTreeModelRef = pModel->GetTreeModel();
 
+	QList<QUuid> selectedItemUuidList;
 	for(int i = 0; i < m_SelectedItemDataList.size(); ++i)
 	{
-		if(m_SelectedItemDataList[i]->GetType() == ITEM_Shape)
-			entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetBvFolderTreeItemData(), m_NewItemIndexList[i]);
+		TreeModelItemData *pDestinationParent = nullptr;
+		if(m_SelectedItemDataList[i]->GetEntType() == ENTTYPE_ArrayItem)
+			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
-			entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetRootTreeItemData(), m_NewItemIndexList[i]);
+		{
+			if(m_SelectedItemDataList[i]->GetType() == ITEM_Shape)
+				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
+			else
+				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
+		}
+
+		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_NewItemIndexList[i]);
+
+		selectedItemUuidList << m_SelectedItemDataList[i]->GetThisUuid();
 	}
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(selectedItemUuidList);
 }
 
 /*virtual*/ void EntityUndoCmd_OrderChildren::undo() /*override*/
 {
 	EntityTreeModel &entTreeModelRef = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
 
+	QList<QUuid> selectedItemUuidList;
 	for(int i = m_SelectedItemDataList.size() - 1; i >= 0; --i)
 	{
-		if(m_SelectedItemDataList[i]->GetType() == ITEM_Shape)
-			entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetBvFolderTreeItemData(), m_PrevItemIndexList[i]);
+		TreeModelItemData *pDestinationParent = nullptr;
+		if(m_SelectedItemDataList[i]->GetEntType() == ENTTYPE_ArrayItem)
+			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
-			entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], entTreeModelRef.GetRootTreeItemData(), m_PrevItemIndexList[i]);
+		{
+			if(m_SelectedItemDataList[i]->GetType() == ITEM_Shape)
+				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
+			else
+				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
+		}
+
+		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_PrevItemIndexList[i]);
+
+		selectedItemUuidList << m_SelectedItemDataList[i]->GetThisUuid();
 	}
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(selectedItemUuidList);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -298,6 +346,8 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	glm::vec3 ptTranslation;
 	glm::vec3 vSkew;
 	glm::vec4 vPerspective;
+
+	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
 		glm::decompose(m_NewTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
@@ -320,7 +370,13 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			
 			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Shape", "Data", shapeCtrl.Serialize());
 		}
+
+		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(affectedItemUuidList);
 }
 
 /*virtual*/ void EntityUndoCmd_Transform::undo() /*override*/
@@ -330,6 +386,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	glm::vec3 ptTranslation;
 	glm::vec3 vSkew;
 	glm::vec4 vPerspective;
+	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
 		glm::decompose(m_OldTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
@@ -338,7 +395,13 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
 		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+
+		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(affectedItemUuidList);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -385,11 +448,27 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 /*virtual*/ void EntityUndoCmd_ShapeData::redo() /*override*/
 {
 	m_pShapeItemData->GetPropertiesModel().SetPropertyValue("Shape", "Data", m_sNewData);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pShapeItemData->GetThisUuid());
+
+	EntityDraw *pDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
+	if(pDraw)
+		pDraw->ActivateVemOnNextJsonMeta();
 }
 
 /*virtual*/ void EntityUndoCmd_ShapeData::undo() /*override*/
 {
 	m_pShapeItemData->GetPropertiesModel().SetPropertyValue("Shape", "Data", m_sPrevData);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pShapeItemData->GetThisUuid());
+
+	EntityDraw *pDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
+	if(pDraw)
+		pDraw->ActivateVemOnNextJsonMeta();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,12 +501,28 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(eShape, sData, bConvertingToPrimitive, -1);
 	else
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pNewShapeItemData, -1);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pNewShapeItemData->GetThisUuid());
+
+	//EntityDraw *pDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
+	//if(pDraw)
+	//	pDraw->ActivateVemOnNextJsonMeta();
 }
 
 /*virtual*/ void EntityUndoCmd_ConvertShape::undo() /*override*/
 {
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pNewShapeItemData);
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pPrevShapeItemData, m_iPoppedIndex);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pPrevShapeItemData->GetThisUuid());
+
+	//EntityDraw *pDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
+	//if(pDraw)
+	//	pDraw->ActivateVemOnNextJsonMeta();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -449,11 +544,19 @@ EntityUndoCmd_RenameItem::EntityUndoCmd_RenameItem(ProjectItemData &entityItemRe
 /*virtual*/ void EntityUndoCmd_RenameItem::redo() /*override*/
 {
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RenameItem(m_pItemData, m_sNewName);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pItemData->GetThisUuid());
 }
 
 /*virtual*/ void EntityUndoCmd_RenameItem::undo() /*override*/
 {
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RenameItem(m_pItemData, m_sOldName);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pItemData->GetThisUuid());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -479,47 +582,47 @@ EntityUndoCmd_DuplicateToArray::EntityUndoCmd_DuplicateToArray(ProjectItemData &
 	// First remove the item
 	m_iPoppedIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pItemData);
 	
-	QList<EntityTreeItemData *> mimeItemList;
-	for(int i = 0; i < m_iArraySize; ++i)
-		mimeItemList << m_pItemData;
-
-	// Create temporary a EntityItemMimeData to generate JSON object that contains an "itemList" array of duplicated 'm_pItemData'
-	EntityItemMimeData *pMimeData = new EntityItemMimeData(m_EntityItemRef, mimeItemList);
-	QByteArray jsonData = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityItems));
-	delete pMimeData;
-	QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonData);
-	QJsonObject mimeObject = jsonDocument.object();
-	QJsonArray duplicateItemArray = mimeObject["itemList"].toArray();
-
-	// Add all the duplicates in the array
-	m_DuplicateItemList.clear();
-	for(int i = 0; i < duplicateItemArray.size(); ++i)
+	if(m_ArrayItemList.empty())
 	{
-		QJsonObject dupItemObj = duplicateItemArray[i].toObject();
-		
-		QJsonObject commonObj = dupItemObj["Common"].toObject();
-		commonObj.insert("UUID", QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces));
+		QList<EntityTreeItemData *> mimeItemList;
+		for(int i = 0; i < m_iArraySize; ++i)
+			mimeItemList << m_pItemData;
 
-		dupItemObj.insert("Common", commonObj); // Reinsert "Common" with new UUID
-		dupItemObj.insert("isSelected", false);
-
-		m_DuplicateItemList.push_back(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingChild(dupItemObj, true, i == 0 ? m_iPoppedIndex : -1));
+		m_ArrayItemList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewArray(mimeItemList, m_pItemData->GetCodeName(), m_iPoppedIndex);
 	}
+	else
+	{
+		for(int i = 0; i < m_ArrayItemList.size(); ++i)
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_ArrayItemList[i], (i == 0) ? m_iPoppedIndex : -1);
+	}
+
+	QList<QUuid> arrayItemUuidList;
+	for(EntityTreeItemData *pArrayItem : m_ArrayItemList)
+		arrayItemUuidList.push_back(pArrayItem->GetThisUuid());
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(arrayItemUuidList);
 }
 
 /*virtual*/ void EntityUndoCmd_DuplicateToArray::undo() /*override*/
 {
-	for(EntityTreeItemData *pItem : m_DuplicateItemList)
+	for(EntityTreeItemData *pItem : m_ArrayItemList)
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem);
 
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pItemData, m_iPoppedIndex);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pItemData->GetThisUuid());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> packItemList, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> packItemList, QString sArrayName, int iArrayFolderRow, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_PackItemList(packItemList)
+	m_PackItemList(packItemList),
+	m_sArrayName(sArrayName),
+	m_iArrayFolderRow(iArrayFolderRow)
 {
 	setText("Pack items into " % HyGlobal::ItemName(m_PackItemList[0]->GetType(), false) % " array");
 }
@@ -530,39 +633,41 @@ EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItem
 
 /*virtual*/ void EntityUndoCmd_PackToArray::redo() /*override*/
 {
-	m_PackItemList;
-
+	// NOTE: m_PackItemList has been sorted to be in row descending order
 	m_PoppedIndexList.clear();
 	for(EntityTreeItemData *pItem : m_PackItemList)
 		m_PoppedIndexList.append(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem));
 
+	if(m_ArrayItemList.empty())
+		m_ArrayItemList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewArray(m_PackItemList, m_sArrayName, m_iArrayFolderRow);
+	else
+	{
+		for(int i = 0; i < m_ArrayItemList.size(); ++i)
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_ArrayItemList[i], (i == 0) ? m_iArrayFolderRow : -1);
+	}
 
-
-
-	//QList<EntityTreeItemData *> mimeItemList;
-	//for(int i = 0; i < m_iArraySize; ++i)
-	//	mimeItemList << m_pItemData;
-
-	//// Create temporary a EntityItemMimeData to generate JSON object that contains an "itemList" array of duplicated 'm_pItemData'
-	//EntityItemMimeData *pMimeData = new EntityItemMimeData(m_EntityItemRef, mimeItemList);
-	//QByteArray jsonData = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityItems));
-	//delete pMimeData;
-	//QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonData);
-	//QJsonObject mimeObject = jsonDocument.object();
-	//QJsonArray duplicateItemArray = mimeObject["itemList"].toArray();
-
-	//// Add all the duplicates in the array
-	//m_DuplicateItemList.clear();
-	//for(int i = 0; i < duplicateItemArray.size(); ++i)
-	//{
-	//	QJsonObject dupItemObj = duplicateItemArray[i].toObject();
-	//	dupItemObj["UUID"] = QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
-	//	dupItemObj["isSelected"] = false;
-
-	//	m_DuplicateItemList.push_back(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingChild(dupItemObj, true, i == 0 ? m_iPoppedIndex : -1));
-	//}
+	QList<QUuid> arrayItemUuidList;
+	for(EntityTreeItemData *pArrayItem : m_ArrayItemList)
+		arrayItemUuidList.push_back(pArrayItem->GetThisUuid());
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(arrayItemUuidList);
 }
 
 /*virtual*/ void EntityUndoCmd_PackToArray::undo() /*override*/
 {
+	for(EntityTreeItemData *pItem : m_ArrayItemList)
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem);
+
+	// Reinsert the 'm_PackItemList' in reverse order (so the indices work)
+	QList<QUuid> readdedItemUuidList;
+	for(int32 i = m_PackItemList.size() - 1; i >= 0; --i)
+	{
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_PackItemList[i], m_PoppedIndexList[i]);
+		readdedItemUuidList << m_PackItemList[i]->GetThisUuid();
+	}
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(readdedItemUuidList);
 }

@@ -36,6 +36,7 @@ protected:
 public:
 	AssetItemData(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors);
 
+	AssetType GetManagerAssetType() const;
 	const QUuid &GetUuid();
 	quint32 GetChecksum();
 	quint32 GetBankId();

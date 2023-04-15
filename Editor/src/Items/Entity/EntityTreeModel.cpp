@@ -273,6 +273,26 @@ EntityTreeItemData *EntityTreeModel::GetBvFolderTreeItemData() const
 	return m_pRootItem->GetChild(1)->data(0).value<EntityTreeItemData *>();
 }
 
+EntityTreeItemData *EntityTreeModel::GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const
+{
+	if(pArrayItem->GetEntType() != ENTTYPE_ArrayItem)
+	{
+		HyGuiLog("EntityTreeModel::GetArrayFolderTreeItemData was passed a non-array item", LOGTYPE_Error);
+		return nullptr;
+	}
+
+	TreeModelItem *pParentFolderItem = (pArrayItem->GetType() == ITEM_Shape) ? GetBvFolderTreeItem() : GetRootTreeItem();
+	for(int i = 0; i < pParentFolderItem->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pSubItem = pParentFolderItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pArrayItem->GetCodeName() == pSubItem->GetCodeName() && pSubItem->GetEntType() == ENTTYPE_ArrayFolder)
+			return pSubItem;
+	}
+
+	HyGuiLog("EntityTreeModel::GetArrayFolderTreeItemData array folder was not found", LOGTYPE_Error);
+	return nullptr;
+}
+
 void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const
 {
 	TreeModelItem *pThisEntity = GetRootTreeItem();
@@ -440,7 +460,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(AssetItemData *pAssetIte
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pAssetItem->GetName());
 
 	// Allocate and store the new item in the tree model
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pAssetItem->GetType(), ENTTYPE_Item, -1, QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), sCodeName, pAssetItem->GetManagerAssetType() == ASSET_Atlas ? ITEM_AtlasImage : ITEM_Audio, ENTTYPE_Item, -1, QUuid(), QUuid::createUuid());
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pNewItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -452,7 +472,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(AssetItemData *pAssetIte
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_InsertExistingChild(QJsonObject initObj, bool bIsArrayItem, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_InsertNewItem(QJsonObject initObj, bool bIsArrayItem, int iRow /*= -1*/)
 {
 	HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(initObj["itemType"].toString());
 	QString sCodeName = initObj["codeName"].toString();
@@ -467,7 +487,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertExistingChild(QJsonObject initObj
 
 	bool bFoundArrayFolder = false;
 	if(bIsArrayItem)
-		bFoundArrayFolder = FindArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
+		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
 
 	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
 	iRow = (iRow == -1 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
@@ -536,7 +556,7 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 
 	bool bFoundArrayFolder = false;
 	if(pItem->GetEntType() == ENTTYPE_ArrayItem)
-		bFoundArrayFolder = FindArrayFolder(pParentTreeItem, pItem->GetCodeName(), pItem->GetType(), iRow);
+		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, pItem->GetCodeName(), pItem->GetType(), iRow);
 
 	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
 	iRow = (iRow == -1 || (pItem->GetEntType() == ENTTYPE_ArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
@@ -562,7 +582,14 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 
 int32 EntityTreeModel::Cmd_PopChild(EntityTreeItemData *pItem)
 {
-	TreeModelItem *pTreeItem = GetItem(FindIndex<EntityTreeItemData *>(pItem, 0));
+	QModelIndex itemIndex = FindIndex<EntityTreeItemData *>(pItem, 0);
+	if(itemIndex.isValid() == false)
+	{
+		HyGuiLog("EntityTreeModel::Cmd_PopChild could not find index for pItem", LOGTYPE_Error);
+		return -1;
+	}
+
+	TreeModelItem *pTreeItem = GetItem(itemIndex);
 	TreeModelItem *pParentTreeItem = pTreeItem->GetParent();
 
 	int32 iRow = pTreeItem->GetIndex();
@@ -611,7 +638,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
 				return pItem->GetCodeName() % "[" % QString::number(pTreeItem->GetNumChildren()) % "]";
 			else if(pItem->GetEntType() == ENTTYPE_ArrayItem)
-				return "[" % QString::number(pTreeItem->GetIndex()) % "]";
+				return "[" % QString::number(pTreeItem->GetIndex()) % "] - " % pItem->GetThisUuid().toString(QUuid::StringFormat::WithoutBraces).split('-')[0];
 			else
 				return pItem->GetCodeName();
 		}
@@ -699,6 +726,9 @@ QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 		int i = 0;
 		for(; i < childList.size(); ++i)
 		{
+			if(childList[i] == nullptr)
+				continue;
+
 			if(sFullCodeName.compare(childList[i]->GetCodeName()) == 0)
 			{
 				uiConflictCount++;
@@ -716,7 +746,7 @@ QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 	return sDesiredName;
 }
 
-bool EntityTreeModel::FindArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, HyGuiItemType eItemType, int iRowToCreateAt)
+bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, HyGuiItemType eItemType, int iRowToCreateAt)
 {
 	bool bFoundArrayFolder = false;
 

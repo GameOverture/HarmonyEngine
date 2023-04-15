@@ -348,13 +348,11 @@ void ProjectItemData::PropertyModified(PropertiesTreeModel &propertiesModelRef, 
 
 void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)
 {
-	if(m_pWidget == nullptr)
-		return;
-
-	m_pWidget->FocusState(iStateIndex, subState);
-	
-	// This refreshes any changed values done programmatically
-	m_pWidget->repaint();
+	if(m_pWidget)
+	{
+		m_pWidget->FocusState(iStateIndex, subState);
+		m_pWidget->repaint(); // This refreshes any changed values done programmatically
+	}
 }
 
 /*virtual*/ void ProjectItemData::DeleteFromProject() /*override*/

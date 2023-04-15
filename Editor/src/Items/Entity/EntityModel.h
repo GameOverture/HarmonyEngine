@@ -60,8 +60,9 @@ public:
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
 	QList<EntityTreeItemData *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewAssets(QList<AssetItemData *> assetItemList, int iRow);
-	EntityTreeItemData *Cmd_AddExistingChild(QJsonObject initObj, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
+	EntityTreeItemData *Cmd_AddNewItem(QJsonObject initObj, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
 	EntityTreeItemData *Cmd_AddNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, int iRow);
+	QList<EntityTreeItemData *> Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow); // It is assumed that the items within 'itemDataList' have been removed/popped prior
 	void Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList);
 	int32 Cmd_RemoveTreeItem(EntityTreeItemData *pItem);
 	bool Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow);

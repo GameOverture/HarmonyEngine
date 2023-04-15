@@ -24,8 +24,7 @@
 EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
 	ui(new Ui::EntityWidget),
-	m_AddShapeActionGroup(this),
-	m_bAllowSelectionUndoCmd(true)
+	m_AddShapeActionGroup(this)
 {
 	ui->setupUi(this);
 
@@ -96,7 +95,22 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 		if(pItem->IsSelected())
 			selectedItemsList.push_back(pItem);
 	}
-	SetSelectedItems(selectedItemsList, QList<EntityTreeItemData *>());
+
+	QItemSelection *pItemSelection = new QItemSelection();
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+	for(EntityTreeItemData *pSelectItem : selectedItemsList)
+	{
+		QModelIndex index = pTreeModel->FindIndex<EntityTreeItemData *>(pSelectItem, 0);
+		pItemSelection->select(index, index);
+	}
+
+	QItemSelectionModel *pSelectionModel = ui->nodeTree->selectionModel();
+	pSelectionModel->blockSignals(true);
+	pSelectionModel->select(*pItemSelection, QItemSelectionModel::Select);
+	pSelectionModel->blockSignals(false);
+	delete pItemSelection;
+
+	UpdateActions();
 }
 
 EntityWidget::~EntityWidget()
@@ -301,12 +315,6 @@ EntityWidget::~EntityWidget()
 /*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
 	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
-
-	// This occurs whenever a property changes within ui->propertyTree
-	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(subState.toLongLong());
-	QModelIndex index = pTreeModel->FindIndex<EntityTreeItemData *>(pEntityTreeData, 0);
-
-	ui->nodeTree->selectionModel()->select(index, QItemSelectionModel::Select);
 }
 
 QModelIndexList EntityWidget::GetSelectedItems()
@@ -322,11 +330,9 @@ QModelIndexList EntityWidget::GetSelectedItems()
 	return indexList;
 }
 
-// Will clear and select only what 'uuidList' contains. Will optionally allow the signal callback to push an UndoCmd on the stack for selection
-void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList, bool bPushUndoCmd)
+// Will clear and select only what 'uuidList' contains
+void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList)
 {
-	m_bAllowSelectionUndoCmd = bPushUndoCmd;
-
 	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
 	QModelIndexList indexList = entityTreeModelRef.GetAllIndices();
 
@@ -345,35 +351,6 @@ void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList, bool bPushUndoCmd
 	pSelectionModel->select(*pItemSelection, QItemSelectionModel::ClearAndSelect);
 
 	delete pItemSelection;
-}
-
-// This catches all cases when selection occurs. Does not call signal
-void EntityWidget::SetSelectedItems(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList)
-{
-	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
-
-	QItemSelection *pItemSelection = new QItemSelection();
-	for(EntityTreeItemData *pSelectItem : selectedList)
-	{
-		QModelIndex index = pTreeModel->FindIndex<EntityTreeItemData *>(pSelectItem, 0);
-		pItemSelection->select(index, index);
-	}
-
-	QItemSelection *pItemDeselection = new QItemSelection();
-	for(EntityTreeItemData *pDeselectItem : deselectedList)
-	{
-		QModelIndex index = pTreeModel->FindIndex<EntityTreeItemData *>(pDeselectItem, 0);
-		pItemDeselection->select(index, index);
-	}
-
-	QItemSelectionModel *pSelectionModel = ui->nodeTree->selectionModel();
-	pSelectionModel->blockSignals(true);
-	pSelectionModel->select(*pItemSelection, QItemSelectionModel::Select);
-	pSelectionModel->select(*pItemDeselection, QItemSelectionModel::Deselect);
-	pSelectionModel->blockSignals(false);
-	delete pItemSelection;
-
-	UpdateActions();
 }
 
 void EntityWidget::CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive)
@@ -475,7 +452,7 @@ void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const 
 		
 		selectedItemDataList.push_back(pCurItemData);
 
-		// NOTE: Below tries to select all array items when their folder is selected - enabling this will require refactor on how selection is being handled
+		// Below selects all array items when their folder is selected - TODO: disabled until move up/down is handled differently
 		//if(pCurItemData->GetEntType() == ENTTYPE_ArrayFolder)
 		//{
 		//	QAbstractItemModel *pModel = ui->nodeTree->model();
@@ -504,13 +481,9 @@ void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const 
 			deselectedItemDataList.push_back(pCurItemData);
 	}
 
-	if(m_bAllowSelectionUndoCmd)
-		m_ItemRef.GetUndoStack()->push(new EntityUndoCmd_SelectionChanged(m_ItemRef, selectedItemDataList, deselectedItemDataList));
-	else
-	{
-		static_cast<EntityModel *>(m_ItemRef.GetModel())->Cmd_SelectionChanged(selectedItemDataList, deselectedItemDataList);
-		m_bAllowSelectionUndoCmd = true; // Only block UndoCmd once
-	}
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->Cmd_SelectionChanged(selectedItemDataList, deselectedItemDataList);
+
+	UpdateActions();
 }
 
 void EntityWidget::OnCollapsedNode(const QModelIndex &indexRef)
@@ -624,9 +597,9 @@ void EntityWidget::on_actionOrderChildrenUp_triggered()
 	int iDiscardTopIndices = -1;
 	for(QModelIndex index : selectedIndexList)
 	{
-		// Only take selected items that are the first column, and they're children under the root entity tree item
-		if(index.column() != 0 || index.parent().row() != 0)
-			continue;
+		//// Only take selected items that are the first column, and they're children under the root entity tree item
+		//if(index.column() != 0 || index.parent().row() != 0)
+		//	continue;
 
 		if(iDiscardTopIndices == -1 && index.row() == 0)
 			iDiscardTopIndices = 0;
@@ -662,9 +635,6 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 
 	std::sort(selectedIndexList.begin(), selectedIndexList.end(), [](const QModelIndex &a, const QModelIndex &b)
 		{
-			if(a.parent() != b.parent())
-				HyGuiLog("EntityWidget::on_actionOrderChildrenDown_triggered - selected indices have different parents", LOGTYPE_Error);
-
 			return a.row() > b.row();
 		});
 
@@ -704,6 +674,12 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 void EntityWidget::on_actionRemoveItems_triggered()
 {
 	QModelIndexList selectedIndices = GetSelectedItems();
+
+	// Sort indices so when removing the items, the other items' indices aren't affected (descending row index)
+	std::sort(selectedIndices.begin(), selectedIndices.end(), [](const QModelIndex &a, const QModelIndex &b)
+		{
+			return a.row() > b.row();
+		});
 
 	QList<EntityTreeItemData *> poppedItemList;
 	for(QModelIndex index : selectedIndices)
@@ -776,6 +752,12 @@ void EntityWidget::on_actionPackToArray_triggered()
 {
 	QModelIndexList selectedIndexList = GetSelectedItems();
 
+	// The selected items are going to be removed, so they need to be sorted in row descending order
+	std::sort(selectedIndexList.begin(), selectedIndexList.end(), [](const QModelIndex &a, const QModelIndex &b)
+		{
+			return a.row() > b.row();
+		});
+
 	QList<EntityTreeItemData *>selectedTreeItemDataList;
 	for(QModelIndex index : selectedIndexList)
 	{
@@ -786,19 +768,9 @@ void EntityWidget::on_actionPackToArray_triggered()
 
 	// Move the 'primary' selected item to the front of the list
 	QModelIndex primaryIndex = ui->nodeTree->currentIndex();
-	EntityTreeItemData *pPrimarySelectedTreeItemData = ui->nodeTree->model()->data(primaryIndex, Qt::UserRole).value<EntityTreeItemData *>();
-	int iIndex = selectedTreeItemDataList.indexOf(pPrimarySelectedTreeItemData);
-	if(iIndex >= 0)
-	{
-		EntityTreeItemData *pPrimaryItem = selectedTreeItemDataList.takeAt(iIndex);
-		if(pPrimaryItem != nullptr)
-			selectedTreeItemDataList.prepend(pPrimaryItem);
-	}
+	QString sArrayName = ui->nodeTree->model()->data(primaryIndex, Qt::UserRole).value<EntityTreeItemData *>()->GetCodeName();
 
-	// Must clear selection because below action will remove the selected items, which will cause an unwanted selection action cmd
-	RequestSelectedItems(QList<QUuid>(), false);
-
-	QUndoCommand *pCmd = new EntityUndoCmd_PackToArray(m_ItemRef, selectedTreeItemDataList);
+	QUndoCommand *pCmd = new EntityUndoCmd_PackToArray(m_ItemRef, selectedTreeItemDataList, sArrayName, primaryIndex.row());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
@@ -811,9 +783,6 @@ void EntityWidget::on_actionDuplicateToArray_triggered()
 	DlgInputNumber dlg(sDlgTitle, "Size", HyGlobal::ItemIcon(pEntTreeItemData->GetType(), SUBICON_New), 1, 1, 0x0FFFFFFF, nullptr, nullptr);
 	if(dlg.exec() == QDialog::Accepted)
 	{
-		// Must clear selection because below action will remove the selected item, which will cause an unwanted selection action cmd
-		RequestSelectedItems(QList<QUuid>(), false);
-
 		QUndoCommand *pCmd = new EntityUndoCmd_DuplicateToArray(m_ItemRef, pEntTreeItemData, dlg.GetValue());
 		m_ItemRef.GetUndoStack()->push(pCmd);
 	}

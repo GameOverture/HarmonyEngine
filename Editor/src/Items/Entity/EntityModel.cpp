@@ -14,6 +14,7 @@
 #include "MainWindow.h"
 #include "EntityDraw.h"
 #include "EntityWidget.h"
+#include "EntityItemMimeData.h"
 #include "IAssetItemData.h"
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
@@ -48,13 +49,13 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		if(childListArray[i].isObject())
 		{
 			QJsonObject childObj = childListArray[i].toObject();
-			Cmd_AddExistingChild(childObj, false, i);
+			Cmd_AddNewItem(childObj, false, i);
 		}
 		else if(childListArray[i].isArray())
 		{
 			QJsonArray childArray = childListArray[i].toArray();
 			for(int j = 0; j < childArray.size(); ++j)
-				Cmd_AddExistingChild(childArray[j].toObject(), true, j == 0 ? i : j);
+				Cmd_AddNewItem(childArray[j].toObject(), true, j == 0 ? i : j);
 		}
 		else
 			HyGuiLog("EntityModel::EntityModel invalid childlist", LOGTYPE_Error);
@@ -66,13 +67,13 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		if(shapeListArray[i].isObject())
 		{
 			QJsonObject shapeObj = shapeListArray[i].toObject();
-			Cmd_AddExistingChild(shapeObj, false, i);
+			Cmd_AddNewItem(shapeObj, false, i);
 		}
 		else if(shapeListArray[i].isArray())
 		{
 			QJsonArray shapeArray = shapeListArray[i].toArray();
 			for(int j = 0; j < shapeArray.size(); ++j)
-				Cmd_AddExistingChild(shapeArray[j].toObject(), true, j == 0 ? i : j);
+				Cmd_AddNewItem(shapeArray[j].toObject(), true, j == 0 ? i : j);
 		}
 		else
 			HyGuiLog("EntityModel::EntityModel invalid shapeList", LOGTYPE_Error);
@@ -133,9 +134,9 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<AssetItemData *>
 	return treeNodeList;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddExistingChild(QJsonObject initObj, bool bIsArrayItem, int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddNewItem(QJsonObject initObj, bool bIsArrayItem, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertExistingChild(initObj, bIsArrayItem, iRow);
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewItem(initObj, bIsArrayItem, iRow);
 
 	QUuid uuidToRegister(initObj["itemUUID"].toString());
 	if(uuidToRegister.isNull() == false)
@@ -150,13 +151,46 @@ EntityTreeItemData *EntityModel::Cmd_AddNewShape(EditorShape eShape, QString sDa
 	
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
 	if(pWidget)
-		pWidget->RequestSelectedItems(QList<QUuid>() << pTreeItemData->GetThisUuid(), false);
+		pWidget->RequestSelectedItems(QList<QUuid>() << pTreeItemData->GetThisUuid());
 
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pEntDraw)
 		pEntDraw->ActivateVemOnNextJsonMeta();
 
 	return pTreeItemData;
+}
+
+// It is assumed that the items within 'itemDataList' have been removed/popped prior
+QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow)
+{
+	sArrayName = GenerateCodeName(sArrayName);
+
+	// Create temporary EntityItemMimeData to generate JSON object that contains an "itemList" JSON array of that represents 'itemDataList'
+	EntityItemMimeData *pMimeData = new EntityItemMimeData(m_ItemRef, itemDataList);
+	QByteArray jsonData = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityItems));
+	delete pMimeData;
+	QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonData);
+	QJsonObject mimeObject = jsonDocument.object();
+	QJsonArray duplicateItemArray = mimeObject["itemList"].toArray();
+
+	// Add all the duplicates in the array
+	QList<EntityTreeItemData *> arrayItemList;
+	for(int i = 0; i < duplicateItemArray.size(); ++i)
+	{
+		QJsonObject arrayItemObj = duplicateItemArray[i].toObject();
+
+		QJsonObject commonObj = arrayItemObj["Common"].toObject();
+		commonObj.insert("UUID", QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces));
+
+		arrayItemObj.insert("Common", commonObj); // Reinsert "Common" with new UUID
+		arrayItemObj.insert("codeName", sArrayName);
+		arrayItemObj.insert("isSelected", false);
+
+		EntityTreeItemData *pDuplicateItem = Cmd_AddNewItem(arrayItemObj, true, i == 0 ? iArrayFolderRow : -1);
+		arrayItemList.push_back(pDuplicateItem);
+	}
+
+	return arrayItemList;
 }
 
 void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList)
@@ -166,9 +200,9 @@ void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList,
 	for(EntityTreeItemData *pTreeItem : deselectedList)
 		pTreeItem->SetSelected(false);
 
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	if(pWidget)
-		pWidget->SetSelectedItems(selectedList, deselectedList);
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntDraw)
+		pEntDraw->ApplyJsonData();
 }
 
 int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)

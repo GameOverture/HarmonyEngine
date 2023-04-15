@@ -378,7 +378,7 @@ void EntityDraw::RequestSelection(QList<EntityDrawItem *> selectionList)
 		return;
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_pProjItem->GetWidget());
-	pWidget->RequestSelectedItems(uuidList, true);
+	pWidget->RequestSelectedItems(uuidList);
 }
 
 Qt::CursorShape EntityDraw::GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const

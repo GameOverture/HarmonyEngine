@@ -87,13 +87,15 @@ public:
 	TreeModelItem *GetBvFolderTreeItem() const;
 	EntityTreeItemData *GetBvFolderTreeItemData() const;
 
+	EntityTreeItemData *GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const;
+
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const;
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewChild(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_InsertExistingChild(QJsonObject initObj, bool bIsArrayItem, int iRow = -1);
+	EntityTreeItemData *Cmd_InsertNewItem(QJsonObject initObj, bool bIsArrayItem, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);
@@ -106,7 +108,7 @@ public:
 	QString GenerateCodeName(QString sDesiredName) const;
 
 protected:
-	bool FindArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, HyGuiItemType eItemType, int iRowToCreateAt); // 'pParentTreeItemOut' must point to either Root or BvFolder, it will be reassigned to the ArrayFolder that is either found (return true), or newly created (return false)
+	bool FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, HyGuiItemType eItemType, int iRowToCreateAt); // 'pParentTreeItemOut' must point to either Root or BvFolder, it will be reassigned to the ArrayFolder that is either found (return true), or newly created (return false)
 };
 
 #endif // ENTITYTREEMODEL_H
