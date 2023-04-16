@@ -34,6 +34,7 @@ class EntityTreeItemData : public TreeModelItemData
 	Q_OBJECT
 
 	EntityItemType										m_eEntType;
+	bool												m_bIsForwardDeclared;
 	QUuid												m_Uuid;
 	QUuid												m_ItemUuid;
 
@@ -41,8 +42,8 @@ class EntityTreeItemData : public TreeModelItemData
 	bool												m_bIsSelected;
 
 public:
-	EntityTreeItemData(ProjectItemData &entityItemDataRef, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis);
-	EntityTreeItemData(ProjectItemData &entityItemDataRef, QJsonObject initObj, bool bIsArrayItem);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, bool bIsForwardDeclared, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, bool bIsForwardDeclared, QJsonObject initObj, bool bIsArrayItem);
 	virtual ~EntityTreeItemData();
 
 	EntityItemType GetEntType() const;
@@ -106,6 +107,9 @@ public:
 	QString GenerateCodeName(QString sDesiredName) const;
 
 protected:
+	bool ShouldForwardDeclare(ProjectItemData *pProjItem);
+	bool ShouldForwardDeclare(const QJsonObject &initObj);
+
 	bool FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, HyGuiItemType eItemType, int iRowToCreateAt); // 'pParentTreeItemOut' must point to either Root or BvFolder, it will be reassigned to the ArrayFolder that is either found (return true), or newly created (return false)
 };
 
