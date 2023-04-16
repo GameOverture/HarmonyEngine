@@ -131,7 +131,7 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemT
 			if(bFound == false)
 			{
 				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix ExplorerItemData here and continue traversing down the tree
-				InsertTreeItem(new ExplorerItemData(*pProj, ITEM_Prefix, sPathSplitList[i]), pCurTreeItem);
+				InsertTreeItem(new ExplorerItemData(*pProj, ITEM_Prefix, QUuid(), sPathSplitList[i]), pCurTreeItem);
 				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
 			}
 		}
@@ -139,7 +139,7 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemT
 
 	ExplorerItemData *pNewItem = nullptr;
 	if(eNewItemType == ITEM_Prefix)
-		pNewItem = new ExplorerItemData(*pProj, ITEM_Prefix, sName);
+		pNewItem = new ExplorerItemData(*pProj, ITEM_Prefix, QUuid(), sName);
 	else
 	{
 		pNewItem = new ProjectItemData(*pProj, eNewItemType, sName, initItemFileData, bIsPendingSave);

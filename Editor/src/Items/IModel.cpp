@@ -40,8 +40,7 @@ void IStateData::SetName(QString sNewName)
 
 IModel::IModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	QAbstractListModel(&itemRef),
-	m_ItemRef(itemRef),
-	m_UUID(itemFileDataRef.m_Meta["UUID"].toString())
+	m_ItemRef(itemRef)
 {
 }
 
@@ -61,7 +60,7 @@ const ProjectItemData &IModel::GetItem() const
 
 const QUuid &IModel::GetUuid() const
 {
-	return m_UUID;
+	return m_ItemRef.GetUuid();
 }
 
 int IModel::GetNumStates() const

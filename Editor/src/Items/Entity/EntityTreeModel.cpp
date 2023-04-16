@@ -17,10 +17,9 @@
 #include <QVariant>
 
 EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, bool bIsForwardDeclared, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis) :
-	TreeModelItemData(eItemType, sCodeName),
+	TreeModelItemData(eItemType, uuidOfThis, sCodeName),
 	m_eEntType(eEntType),
 	m_bIsForwardDeclared(bIsForwardDeclared),
-	m_Uuid(uuidOfThis),
 	m_ItemUuid(uuidOfItem),
 	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this))),
 	m_bIsSelected(false)
@@ -29,10 +28,9 @@ EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, bool 
 }
 
 EntityTreeItemData::EntityTreeItemData(ProjectItemData &entityItemDataRef, bool bIsForwardDeclared, QJsonObject initObj, bool bIsArrayItem) :
-	TreeModelItemData(HyGlobal::GetTypeFromString(initObj["itemType"].toString()), initObj["codeName"].toString()),
+	TreeModelItemData(HyGlobal::GetTypeFromString(initObj["itemType"].toString()), initObj["Common"].toObject()["UUID"].toString(), initObj["codeName"].toString()),
 	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
 	m_bIsForwardDeclared(bIsForwardDeclared),
-	m_Uuid(initObj["Common"].toObject()["UUID"].toString()),
 	m_ItemUuid(initObj["itemUUID"].toString()),
 	m_PropertiesTreeModel(entityItemDataRef, 0, QVariant(reinterpret_cast<qulonglong>(this))),
 	m_bIsSelected(initObj["isSelected"].toBool())
@@ -55,12 +53,12 @@ QString EntityTreeItemData::GetCodeName() const
 	return m_sName;
 }
 
-QUuid EntityTreeItemData::GetThisUuid() const
+const QUuid &EntityTreeItemData::GetThisUuid() const
 {
-	return m_Uuid;
+	return GetUuid();
 }
 
-QUuid EntityTreeItemData::GetItemUuid() const
+const QUuid &EntityTreeItemData::GetItemUuid() const
 {
 	return m_ItemUuid;
 }
@@ -109,7 +107,7 @@ void EntityTreeItemData::InitalizePropertiesTree()
 	const double dRANGE = 16777215.0;
 
 	m_PropertiesTreeModel.AppendCategory("Common", HyGlobal::ItemColor(ITEM_Prefix));
-	m_PropertiesTreeModel.AppendProperty("Common", "UUID", PROPERTIESTYPE_LineEdit, m_Uuid.toString(QUuid::WithoutBraces), "The universally unique identifier of the Project Item this node represents", true);
+	m_PropertiesTreeModel.AppendProperty("Common", "UUID", PROPERTIESTYPE_LineEdit, GetThisUuid().toString(QUuid::WithoutBraces), "The universally unique identifier of the Project Item this node represents", true);
 
 	if(m_eTYPE != ITEM_Shape)
 	{

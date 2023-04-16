@@ -794,13 +794,13 @@ void ShapeCtrl::ClearVertexEditMode()
 
 void ShapeCtrl::SetVertexGrabPointListSize(uint32 uiNumGrabPoints)
 {
-	while(m_VertexGrabPointList.size() > uiNumGrabPoints)
+	while(static_cast<uint32>(m_VertexGrabPointList.size()) > uiNumGrabPoints)
 	{
 		delete m_VertexGrabPointList.back();
 		m_VertexGrabPointList.pop_back();
 	}
 
-	while(m_VertexGrabPointList.size() < uiNumGrabPoints)
+	while(static_cast<uint32>(m_VertexGrabPointList.size()) < uiNumGrabPoints)
 	{
 		GrabPoint *pNewGrabPt = new GrabPoint(ENTCOLORPOINT_Vem, ENTCOLORPOINT_VemSelected, nullptr);
 		pNewGrabPt->SetVisible(false);

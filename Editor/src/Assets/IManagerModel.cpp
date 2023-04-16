@@ -465,7 +465,7 @@ TreeModelItemData *IManagerModel::ReturnFilter(QString sFilterPath, bool bCreate
 					return nullptr;
 
 				// Still more filters to dig thru, so this means we're at a filter. Add the prefix TreeModelItemData here and continue traversing down the tree
-				InsertTreeItem(new TreeModelItemData(ITEM_Filter, sPathSplitList[i]), pCurTreeItem);
+				InsertTreeItem(new TreeModelItemData(ITEM_Filter, QUuid(), sPathSplitList[i]), pCurTreeItem);
 				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
 			}
 		}
@@ -574,7 +574,7 @@ void IManagerModel::RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData
 TreeModelItemData *IManagerModel::CreateNewFilter(QString sName, TreeModelItemData *pParent)
 {
 	TreeModelItem *pTreeParent = pParent ? GetItem(FindIndex<TreeModelItemData *>(pParent, 0)) : nullptr;
-	TreeModelItemData *pNewFilterData = new TreeModelItemData(ITEM_Filter, sName);
+	TreeModelItemData *pNewFilterData = new TreeModelItemData(ITEM_Filter, QUuid(), sName);
 	if(InsertTreeItem(pNewFilterData, pTreeParent))
 	{
 		SaveMeta();
@@ -1047,7 +1047,7 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sName
 			if(bFound == false)
 			{
 				// Still more filters to dig thru, so this means we're at a filter. Add the prefix TreeModelItemData here and continue traversing down the tree
-				InsertTreeItem(new TreeModelItemData(ITEM_Filter, sPathSplitList[i]), pCurTreeItem);
+				InsertTreeItem(new TreeModelItemData(ITEM_Filter, QUuid(), sPathSplitList[i]), pCurTreeItem);
 				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
 			}
 		}

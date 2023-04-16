@@ -35,7 +35,6 @@ class EntityTreeItemData : public TreeModelItemData
 
 	EntityItemType										m_eEntType;
 	bool												m_bIsForwardDeclared;
-	QUuid												m_Uuid;
 	QUuid												m_ItemUuid;
 
 	PropertiesTreeModel									m_PropertiesTreeModel;
@@ -48,8 +47,8 @@ public:
 
 	EntityItemType GetEntType() const;
 	QString GetCodeName() const;
-	QUuid GetThisUuid() const;
-	QUuid GetItemUuid() const;
+	const QUuid &GetThisUuid() const;
+	const QUuid &GetItemUuid() const;
 	bool IsForwardDeclared() const;
 	PropertiesTreeModel &GetPropertiesModel();
 

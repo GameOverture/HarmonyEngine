@@ -324,7 +324,7 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	if(m_bUsingTempFiles)
 		itemSpecificFileDataOut.m_Data.insert("usingTempFiles", QString(m_SkeletonFileInfo.absolutePath() % "/"));
 
-	itemSpecificFileDataOut.m_Data.insert("UUID", m_UUID.toString(QUuid::WithoutBraces));
+	itemSpecificFileDataOut.m_Data.insert("UUID", GetUuid().toString(QUuid::WithoutBraces));
 	itemSpecificFileDataOut.m_Data.insert("isBinary", m_bIsBinaryRuntime);
 	itemSpecificFileDataOut.m_Data.insert("scale", m_fScale);
 	itemSpecificFileDataOut.m_Data.insert("defaultMix", m_fDefaultMix);

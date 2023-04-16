@@ -25,7 +25,6 @@ class AssetItemData : public TreeModelItemData
 
 protected:
 	IManagerModel &						m_ModelRef;
-	const QUuid							m_UNIQUE_ID;
 	quint32								m_uiChecksum;
 	quint32								m_uiBankId;
 	QString								m_sMetaFileExt; // includes period
@@ -37,7 +36,6 @@ public:
 	AssetItemData(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors);
 
 	AssetType GetManagerAssetType() const;
-	const QUuid &GetUuid();
 	quint32 GetChecksum();
 	quint32 GetBankId();
 	void SetBankId(quint32 uiNewBankId);

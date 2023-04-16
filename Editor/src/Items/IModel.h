@@ -43,7 +43,6 @@ class IModel : public QAbstractListModel
 {
 protected:
 	ProjectItemData &				m_ItemRef;
-	const QUuid						m_UUID;
 
 	QList<IStateData *>				m_StateList;
 	

@@ -18,8 +18,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-ExplorerItemData::ExplorerItemData(Project &projectRef, HyGuiItemType eType, const QString sName) :
-	TreeModelItemData(eType, sName),
+ExplorerItemData::ExplorerItemData(Project &projectRef, HyGuiItemType eType, const QUuid &uuid, const QString sName) :
+	TreeModelItemData(eType, uuid, sName),
 	m_pProject(&projectRef)
 { }
 

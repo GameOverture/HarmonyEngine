@@ -41,7 +41,7 @@ ProjectItemData::ProjectItemData(Project &projRef,
 						 const QString sName,
 						 const FileDataPair &initItemFileDataRef,
 						 bool bIsPendingSave) :
-	ExplorerItemData(projRef, eType, sName),
+	ExplorerItemData(projRef, eType, initItemFileDataRef.m_Meta["UUID"].toString(), sName),
 	m_ItemFileData(initItemFileDataRef),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_pModel(nullptr),
@@ -111,11 +111,6 @@ void ProjectItemData::LoadModel()
 		HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
 	}
-}
-
-QUuid ProjectItemData::GetUuid() const
-{
-	return m_pModel->GetUuid();
 }
 
 IModel *ProjectItemData::GetModel()
